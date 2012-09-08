@@ -66,11 +66,11 @@ public class MedInventoryTools {
 
     }
 
-    public static BigDecimal getInventorySum(MedInventory inventory) {
+    public static BigDecimal getSum(MedInventory inventory) {
 //        long timeStart = System.currentTimeMillis();
         BigDecimal result = BigDecimal.ZERO;
         for (MedStock bestand : inventory.getMedStocks()) {
-            BigDecimal summe = MedStockTools.getBestandSumme(bestand);
+            BigDecimal summe = MedStockTools.getSum(bestand);
             result = result.add(summe);
         }
 //        long time2 = System.currentTimeMillis();
@@ -78,11 +78,11 @@ public class MedInventoryTools {
         return result;
     }
 
-    public static BigDecimal getInventorySum(EntityManager em, MedInventory inventory) throws Exception {
+    public static BigDecimal getSum(EntityManager em, MedInventory inventory) throws Exception {
 //        long timeStart = System.currentTimeMillis();
         BigDecimal result = BigDecimal.ZERO;
         for (MedStock bestand : inventory.getMedStocks()) {
-            BigDecimal summe = MedStockTools.getBestandSumme(em, bestand);
+            BigDecimal summe = MedStockTools.getSum(em, bestand);
             result = result.add(summe);
         }
 //        long time2 = System.currentTimeMillis();
@@ -115,7 +115,7 @@ public class MedInventoryTools {
 
         if (anweinheit) { // Umrechnung der Anwendungs Menge in die Packungs-Menge.
             MedStock bestand = MedStockTools.getStockInUse(inventory);
-            BigDecimal apv = bestand.getApv();
+            BigDecimal apv = bestand.getAPV();
 
             if (apv.equals(BigDecimal.ZERO)) {
                 apv = BigDecimal.ONE;
@@ -163,7 +163,7 @@ public class MedInventoryTools {
         OPDE.debug("takeFrom/4: bestand: " + bestand);
 
         if (bestand != null && wunschmenge.compareTo(BigDecimal.ZERO) > 0) {
-            BigDecimal restsumme = MedStockTools.getBestandSumme(bestand); // wieviel der angebrochene Bestand noch hergibt.
+            BigDecimal restsumme = MedStockTools.getSum(bestand); // wieviel der angebrochene Bestand noch hergibt.
 
             // normalerweise wird immer das hergegeben, was auch gewünscht ist. Notfalls bis ins minus.
             BigDecimal entnahme = wunschmenge; // wieviel in diesem Durchgang tatsächlich entnommen wird.
@@ -193,7 +193,7 @@ public class MedInventoryTools {
             if (bestand.hasNextBestand()) {
                 if (restsumme.compareTo(wunschmenge) <= 0) { // ist nicht mehr genug in der Packung, bzw. die Packung wird jetzt leer.
 
-                    MedStock naechsterBestand = em.merge(bestand.getNaechsterBestand());
+                    MedStock naechsterBestand = em.merge(bestand.getNextStock());
                     em.lock(naechsterBestand, LockModeType.OPTIMISTIC);
 
                     // Es war mehr gewünscht, als die angebrochene Packung hergegeben hat.
@@ -226,7 +226,7 @@ public class MedInventoryTools {
         MedStock bestand = null;
         if (menge.compareTo(BigDecimal.ZERO) > 0) {
             bestand = new MedStock(inventory, darreichung, aPackage, text);
-            bestand.setApv(MedStockTools.getPassendesAPV(bestand));
+            bestand.setAPV(MedStockTools.getPassendesAPV(bestand));
             MedStockTransaction buchung = new MedStockTransaction(bestand, menge);
             bestand.getStockTransaction().add(buchung);
         }
@@ -240,7 +240,7 @@ public class MedInventoryTools {
             MedStock[] bestaende = inventory.getMedStocks().toArray(new MedStock[0]);
             Arrays.sort(bestaende); // nach Einbuchung
             for (MedStock myBestand : bestaende) {
-                if (!myBestand.isAngebrochen()) {
+                if (!myBestand.isOpened()) {
                     bestand = myBestand;
                     break;
                 }
@@ -255,7 +255,7 @@ public class MedInventoryTools {
 //            MedStock[] bestaende = inventory.getMedStocks().toArray(new MedStock[0]);
 //            Arrays.sort(bestaende); // nach Einbuchung
 //            for (MedStock myBestand : bestaende) {
-//                if (!myBestand.isAbgeschlossen()) {
+//                if (!myBestand.isClosed()) {
 //                    bestand = myBestand;
 //                    break;
 //                }
@@ -279,10 +279,10 @@ public class MedInventoryTools {
         Collections.sort(list);
 
         for (MedStock bestand : list) {
-            if (bestand.getAus().equals(SYSConst.DATE_BIS_AUF_WEITERES) && bestand.getAnbruch().equals(SYSConst.DATE_BIS_AUF_WEITERES)) {
+            if (bestand.getOut().equals(SYSConst.DATE_BIS_AUF_WEITERES) && bestand.getOpened().equals(SYSConst.DATE_BIS_AUF_WEITERES)) {
                 BigDecimal apv = MedStockTools.getPassendesAPV(bestand);
-                bestand.setAnbruch(new Date());
-                bestand.setApv(apv);
+                bestand.setOpened(new Date());
+                bestand.setAPV(apv);
                 result = bestand;
                 break;
             }

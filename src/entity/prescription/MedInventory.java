@@ -20,14 +20,14 @@ import java.util.Date;
         @NamedQuery(name = "MedInventory.findByVon", query = "SELECT m FROM MedInventory m WHERE m.from = :von"),
         @NamedQuery(name = "MedInventory.findByBis", query = "SELECT m FROM MedInventory m WHERE m.to = :bis"),
         @NamedQuery(name = "MedInventory.getSumme", query = " " +
-                " SELECT SUM(buch.menge) FROM MedInventory vor JOIN vor.medStocks best JOIN best.stockTransaction buch WHERE vor = :vorrat "),
+                " SELECT SUM(buch.amount) FROM MedInventory vor JOIN vor.medStocks best JOIN best.stockTransaction buch WHERE vor = :vorrat "),
 //        @NamedQuery(name = "MedInventory.findActiveByBewohnerAndDarreichung", query = " " +
 //                " SELECT DISTINCT inv FROM MedInventory inv " +
 //                " JOIN inv.medStocks stock " +
 //                " WHERE inv.resident = :resident AND stock.tradeform = :tradeform " +
 //                " AND inv.bis = " + SYSConst.MYSQL_DATETIME_BIS_AUF_WEITERES),
         @NamedQuery(name = "MedInventory.findByBewohnerMitBestand", query = " " +
-                " SELECT best.inventory, SUM(buch.menge) FROM MedStock best " +
+                " SELECT best.inventory, SUM(buch.amount) FROM MedStock best " +
                 " JOIN best.stockTransaction buch " +
                 " WHERE best.inventory.resident = :bewohner AND best.inventory.to = '9999-12-31 23:59:59' " +
                 " GROUP BY best.inventory ")
@@ -59,7 +59,7 @@ import java.util.Date;
 //        )
 //})
 
-public class MedInventory implements Serializable {
+public class MedInventory implements Serializable, Comparable<MedInventory> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -173,6 +173,11 @@ public class MedInventory implements Serializable {
     @Override
     public String toString() {
         return "entity.rest.MedInventory[vorID=" + id + "]";
+    }
+
+    @Override
+    public int compareTo(MedInventory o) {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public Collection<MedStock> getMedStocks() {

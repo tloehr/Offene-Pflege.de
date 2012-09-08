@@ -269,7 +269,7 @@ public class DlgBestandAbschliessen extends MyJDialog {
     private void initDialog() {
 ////        this.setTitle(SYSTools.getWindowTitle("Bestand abschließen"));
 
-        String text = "Sie möchten den Bestand mit der Nummer <font color=\"red\"><b>" + bestand.getBestID() + "</b></font> abschließen.";
+        String text = "Sie möchten den Bestand mit der Nummer <font color=\"red\"><b>" + bestand.getID() + "</b></font> abschließen.";
         text += "<br/>" + MedStockTools.getBestandTextAsHTML(bestand) + "</br>";
         text += "<br/>Bitte wählen Sie einen der drei folgenden Gründe für den Abschluss:";
         txtInfo.setContentType("text/html");
@@ -278,8 +278,8 @@ public class DlgBestandAbschliessen extends MyJDialog {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(" " +
                 " SELECT b FROM MedStock b " +
-                " WHERE b.vorrat = :vorrat AND b.aus = :aus AND b.anbruch = :anbruch " +
-                " ORDER BY b.ein, b.bestID "); // Geht davon aus, dass die PKs immer fortlaufend, automatisch vergeben werden.
+                " WHERE b.vorrat = :vorrat AND b.out = :aus AND b.opened = :anbruch " +
+                " ORDER BY b.ein, b.id "); // Geht davon aus, dass die PKs immer fortlaufend, automatisch vergeben werden.
         query.setParameter("vorrat", bestand.getInventory());
         query.setParameter("aus", SYSConst.DATE_BIS_AUF_WEITERES);
         query.setParameter("anbruch", SYSConst.DATE_BIS_AUF_WEITERES);
@@ -289,7 +289,7 @@ public class DlgBestandAbschliessen extends MyJDialog {
         cmbBestID.setRenderer(new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean b, boolean b1) {
-                String text = o instanceof MedStock ? ((MedStock) o).getBestID().toString() : o.toString();
+                String text = o instanceof MedStock ? ((MedStock) o).getID().toString() : o.toString();
                 return new JLabel(text);
             }
         });
@@ -351,7 +351,7 @@ public class DlgBestandAbschliessen extends MyJDialog {
             bestand = em.merge(bestand);
             em.lock(bestand, LockModeType.OPTIMISTIC);
 
-            OPDE.info("Bestands Nr. " + bestand.getBestID() + " wird abgeschlossen");
+            OPDE.info("Bestands Nr. " + bestand.getID() + " wird abgeschlossen");
             OPDE.info("UKennung: " + OPDE.getLogin().getUser().getUID());
 
             MedStock nextBest = null;
@@ -361,15 +361,15 @@ public class DlgBestandAbschliessen extends MyJDialog {
             }
 
             if (rbStellen.isSelected()) {
-                bestand.setNaechsterBestand(nextBest);
+                bestand.setNextStock(nextBest);
                 BigDecimal inhalt = new BigDecimal(Double.parseDouble(txtLetzte.getText().replace(",", ".")));
                 MedStockTools.setzeBestandAuf(em, bestand, inhalt, "Korrekturbuchung zum Packungsabschluss", MedStockTransactionTools.STATUS_KORREKTUR_AUTO_VORAB);
 
                 OPDE.info(classname + ": Vorabstellen angeklickt. Es sind noch " + inhalt + " in der Packung.");
-                OPDE.info(classname + ": Nächste Packung im Anbruch wird die Bestands Nr.: " + nextBest.getBestID() + " sein.");
+                OPDE.info(classname + ": Nächste Packung im Anbruch wird die Bestands Nr.: " + nextBest.getID() + " sein.");
 
             } else {
-                BigDecimal apv = bestand.getApv();
+                BigDecimal apv = bestand.getAPV();
 
                 if (rbGefallen.isSelected()) {
                     MedStockTools.abschliessen(em, bestand, "Packung ist runtergefallen.", MedStockTransactionTools.STATUS_KORREKTUR_AUTO_RUNTERGEFALLEN);

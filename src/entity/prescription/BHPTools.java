@@ -531,7 +531,7 @@ public class BHPTools {
 //                        !bhp.getPrescription().isDiscontinued()
 //                        // Offener Status geht immer
 //                        && (
-//                        bhp.getStatus() == BHPTools.STATE_OPEN
+//                        bhp.getState() == BHPTools.STATE_OPEN
 //                                // Nicht mehr offen ?
 //                                // Dann nur wenn derselbe Benutzer dass wieder rückgängig machen will
 //                                ||

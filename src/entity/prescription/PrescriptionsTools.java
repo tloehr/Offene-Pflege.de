@@ -477,8 +477,8 @@ public class PrescriptionsTools {
                     BigDecimal invSum = null;
                     BigDecimal stockSum = null;
                     try {
-                        invSum = MedInventoryTools.getInventorySum(em, inventory);
-                        stockSum = MedStockTools.getBestandSumme(em, stockInUse);
+                        invSum = MedInventoryTools.getSum(em, inventory);
+                        stockSum = MedStockTools.getSum(em, stockInUse);
                     } catch (Exception e) {
                         OPDE.fatal(e);
                     } finally {
@@ -492,21 +492,21 @@ public class PrescriptionsTools {
                                 "</font></b>";
                         if (!stockInUse.getTradeForm().getDosageForm().anwUndPackEinheitenGleich()) {
 
-                            BigDecimal anwmenge = invSum.multiply(stockInUse.getApv());
+                            BigDecimal anwmenge = invSum.multiply(stockInUse.getAPV());
 
                             result += " <i>entspricht " + anwmenge.setScale(2, BigDecimal.ROUND_UP) + " " +
                                     DosageFormTools.getUsageText(stockInUse.getTradeForm().getDosageForm());
-                            result += " (bei einem APV von " + stockInUse.getApv().setScale(2, BigDecimal.ROUND_UP) + " zu 1)";
+                            result += " (bei einem APV von " + stockInUse.getAPV().setScale(2, BigDecimal.ROUND_UP) + " zu 1)";
                             result += "</i>";
                         }
 
-                        result += "<br/>Bestand im Anbruch Nr.: <b><font color=\"green\">" + stockInUse.getBestID() + "</font></b>";
+                        result += "<br/>Bestand im Anbruch Nr.: <b><font color=\"green\">" + stockInUse.getID() + "</font></b>";
 
                         if (invSum.compareTo(stockSum) != 0) {
                             result += "<br/>Restmenge im Anbruch: <b><font color=\"green\">" + stockSum.setScale(2, BigDecimal.ROUND_UP) + " " +
                                     SYSConst.EINHEIT[stockInUse.getTradeForm().getDosageForm().getPackEinheit()] + "</font></b>";
                             if (!stockInUse.getTradeForm().getDosageForm().anwUndPackEinheitenGleich()) {
-                                BigDecimal usage = stockSum.multiply(stockInUse.getApv());
+                                BigDecimal usage = stockSum.multiply(stockInUse.getAPV());
 
                                 result += " <i>entspricht " + usage.setScale(2, BigDecimal.ROUND_UP) + " " +
                                         DosageFormTools.getUsageText(stockInUse.getTradeForm().getDosageForm()) + "</i>";

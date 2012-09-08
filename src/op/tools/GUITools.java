@@ -24,6 +24,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
+import java.util.MissingResourceException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -76,7 +77,14 @@ public class GUITools {
         };
     }
 
-    public static JToggleButton getNiceToggleButton(String title) {
+    public static JToggleButton getNiceToggleButton(String titleORlangbundle) {
+        String title = SYSTools.catchNull(titleORlangbundle);
+        try {
+            title = OPDE.lang.getString(titleORlangbundle);
+        } catch (Exception e){
+            // ok, its not a langbundle key
+        }
+
         JToggleButton tb = new JToggleButton(title);
         tb.setIcon(new ImageIcon(tb.getClass().getResource("/artwork/22x22/cb-off.png")));
         tb.setSelectedIcon(new ImageIcon(tb.getClass().getResource("/artwork/22x22/cb-on.png")));

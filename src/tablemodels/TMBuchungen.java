@@ -49,7 +49,7 @@ public class TMBuchungen extends AbstractTableModel {
 
         switch (col){
             case COL_ID : {
-                result = data.get(row).getBuchID();
+                result = data.get(row).getID();
                 break;
             }
             case COL_Datum : {
@@ -61,7 +61,7 @@ public class TMBuchungen extends AbstractTableModel {
                 break;
             }
             case COL_Menge : {
-                result = data.get(row).getMenge().setScale(2, BigDecimal.ROUND_HALF_UP);
+                result = data.get(row).getAmount().setScale(2, BigDecimal.ROUND_HALF_UP);
                 break;
             }
             case COL_User : {

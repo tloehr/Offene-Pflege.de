@@ -530,7 +530,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
                     String message = "VerID: " + selectedVerordnung.getVerid();
                     if (bestandImAnbruch != null) {
                         BigDecimal apv = MedStockTools.getAPVperBW(bestandImAnbruch.getInventory());
-                        BigDecimal apvBest = bestandImAnbruch.getApv();
+                        BigDecimal apvBest = bestandImAnbruch.getAPV();
                         message += "  VorID: " + bestandImAnbruch.getInventory().getID() + "  DafID: " + bestandImAnbruch.getTradeForm().getDafID() + "  APV per BW: " + apv + "  APV (Bestand): " + apvBest;
                     }
 

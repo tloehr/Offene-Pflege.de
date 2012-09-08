@@ -360,7 +360,7 @@ public class BHP implements Serializable, Comparable<BHP> {
         boolean yes = false;
         if (stockTransaction != null) {
             for (MedStockTransaction buchung : stockTransaction) {
-                yes = buchung.getBestand().isAbgeschlossen();
+                yes = buchung.getStock().isClosed();
                 if (yes) {
                     break;
                 }

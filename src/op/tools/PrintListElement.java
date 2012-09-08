@@ -22,7 +22,7 @@ public class PrintListElement implements Comparable {
 
         int result = 0;
         if (((PrintListElement) o).getObject() instanceof MedStock){
-            result = new Long(((MedStock) object).getBestID()).compareTo(((MedStock)((PrintListElement) o).getObject()).getBestID());
+            result = new Long(((MedStock) object).getID()).compareTo(((MedStock)((PrintListElement) o).getObject()).getID());
         }
         return result;
     }

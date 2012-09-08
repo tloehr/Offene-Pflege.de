@@ -510,7 +510,7 @@ public class DlgBestand extends MyJDialog {
                 OPDE.getPrintProcessor().addPrintJob(new PrintListElement(bestand, etiprinter, form1, OPDE.getProps().getProperty("etiprinter1")));
             }
 
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bestand Nr." + bestand.getBestID() + " wurde eingebucht", 2));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bestand Nr." + bestand.getID() + " wurde eingebucht", 2));
         } catch (OptimisticLockException ole) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();

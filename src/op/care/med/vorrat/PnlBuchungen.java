@@ -92,7 +92,7 @@ public class PnlBuchungen extends JPanel {
             itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    new DlgYesNo("Möchten Sie die Buchung Nr. " + tm.getData().get(row).getBuchID() + " wirklich löschen ?", new ImageIcon(getClass().getResource("/artwork/48x48/bw/trashcan_empty.png")), new Closure() {
+                    new DlgYesNo("Möchten Sie die Buchung Nr. " + tm.getData().get(row).getID() + " wirklich löschen ?", new ImageIcon(getClass().getResource("/artwork/48x48/bw/trashcan_empty.png")), new Closure() {
                         @Override
                         public void execute(Object answer) {
                             if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -109,7 +109,7 @@ public class PnlBuchungen extends JPanel {
                                     em.remove(mybuchung);
                                     em.getTransaction().commit();
 
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Buchung Nr. " + tm.getData().get(row).getBuchID() + " wurde gelöscht.", 2));
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Buchung Nr. " + tm.getData().get(row).getID() + " wurde gelöscht.", 2));
                                 } catch (OptimisticLockException ole) {
                                     em.getTransaction().rollback();
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Dieser Bestand wurde zwischenzeitlich geändert.", DisplayMessage.IMMEDIATELY, OPDE.getErrorMessageTime()));
@@ -187,7 +187,7 @@ public class PnlBuchungen extends JPanel {
     }
 
     public DlgYesNo resetBuchungen() {
-        return new DlgYesNo("Alle Buchungen von Bestand Nr." + bestand.getBestID() + " zurücksetzen. Sind Sie sicher ?", new ImageIcon(getClass().getResource("/artwork/48x48/bw/undo.png")), new Closure() {
+        return new DlgYesNo("Alle Buchungen von Bestand Nr." + bestand.getID() + " zurücksetzen. Sind Sie sicher ?", new ImageIcon(getClass().getResource("/artwork/48x48/bw/undo.png")), new Closure() {
             @Override
             public void execute(Object answer) {
                 if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -198,13 +198,13 @@ public class PnlBuchungen extends JPanel {
                         bestand = em.merge(bestand);
                         em.lock(bestand, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-                        Query query = em.createQuery("DELETE FROM MedStockTransaction b WHERE b.bestand = :bestand AND b.status <> :notStatus ");
+                        Query query = em.createQuery("DELETE FROM MedStockTransaction b WHERE b.stock = :bestand AND b.state <> :notStatus ");
                         query.setParameter("bestand", bestand);
                         query.setParameter("notStatus", MedStockTransactionTools.STATUS_EINBUCHEN_ANFANGSBESTAND);
                         query.executeUpdate();
 
                         em.getTransaction().commit();
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bestand Nr. " + bestand.getBestID() + " wurde zurück gesetzt.", 2));
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bestand Nr. " + bestand.getID() + " wurde zurück gesetzt.", 2));
                         em.refresh(bestand);
                     } catch (OptimisticLockException ole) {
                         em.getTransaction().rollback();

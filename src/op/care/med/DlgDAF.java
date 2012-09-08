@@ -67,11 +67,11 @@ public class DlgDAF extends javax.swing.JDialog {
 //                apv = new APV(BigDecimal.ONE, false, null, darreichung);
 //            }
 //
-//            if (darreichung.getDosageForm().getStatus() == MedFormenTools.APV1) {
+//            if (darreichung.getDosageForm().getState() == MedFormenTools.APV1) {
 //                txtAPV.setText("1");
 //                txtAPV.setEnabled(false);
 //            } else {
-//                txtAPV.setText(apv.getApv().setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+//                txtAPV.setText(apv.getAPV().setScale(2, BigDecimal.ROUND_HALF_UP).toString());
 //                txtAPV.setEnabled(true);
 //            }
 
@@ -243,7 +243,7 @@ public class DlgDAF extends javax.swing.JDialog {
 //                apv = em.merge(apv);
             } else {
                 em.persist(darreichung);
-//                apv.setTauschen(darreichung.getDosageForm().getStatus() == MedFormenTools.APV_PER_DAF);
+//                apv.setTauschen(darreichung.getDosageForm().getState() == MedFormenTools.APV_PER_DAF);
 //                em.persist(apv);
             }
             em.getTransaction().commit();
@@ -261,8 +261,8 @@ public class DlgDAF extends javax.swing.JDialog {
 //        lblAnw.setText(MedFormenTools.EINHEIT[form.getAnwEinheit()]);
 //        lblPack.setText(MedFormenTools.EINHEIT[form.getPackEinheit()]);
 //        txtAPV.setText("1");
-//        txtAPV.setEnabled(form.getStatus() != MedFormenTools.APV1);
-//        apv.setApv(BigDecimal.ONE);
+//        txtAPV.setEnabled(form.getState() != MedFormenTools.APV1);
+//        apv.setAPV(BigDecimal.ONE);
     }//GEN-LAST:event_cmbFormItemStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

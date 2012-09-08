@@ -168,8 +168,8 @@ public class DlgBestandAnbrechen extends MyJDialog {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(" " +
                 " SELECT b FROM MedStock b " +
-                " WHERE b.vorrat = :vorrat AND b.aus = :aus AND b.anbruch = :anbruch " +
-                " ORDER BY b.ein, b.bestID "); // Geht davon aus, dass die PKs immer fortlaufend, automatisch vergeben werden.
+                " WHERE b.vorrat = :vorrat AND b.out = :aus AND b.opened = :anbruch " +
+                " ORDER BY b.ein, b.id "); // Geht davon aus, dass die PKs immer fortlaufend, automatisch vergeben werden.
         query.setParameter("vorrat", inventory);
         query.setParameter("aus", SYSConst.DATE_BIS_AUF_WEITERES);
         query.setParameter("anbruch", SYSConst.DATE_BIS_AUF_WEITERES);

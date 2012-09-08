@@ -10,17 +10,15 @@ import com.jidesoft.pane.CollapsiblePanes;
 import entity.info.Resident;
 import entity.files.SYSFilesTools;
 import op.OPDE;
-import op.allowance.PnlAllowance;
 import op.care.nursingprocess.PnlNursingProcess;
 import op.care.reports.PnlReport;
 import op.care.bhp.PnlBHP;
 import op.care.dfn.PnlDFN;
 import op.care.info.PnlInfo;
-import op.care.med.vorrat.PnlVorrat;
+import op.care.med.vorrat.PnlInventory;
 import op.care.sysfiles.PnlFiles;
 import op.care.prescription.PnlVerordnung;
 import op.care.values.PnlVitalwerte;
-import op.system.InternalClassACL;
 import op.tools.CleanablePanel;
 import op.tools.NursingRecordsPanel;
 import op.tools.SYSTools;
@@ -169,7 +167,7 @@ public class PnlCare extends NursingRecordsPanel {
                 break;
             }
             case TAB_VORRAT: {
-                previousPanel = new PnlVorrat(currentBewohner, jspSearch);
+                previousPanel = new PnlInventory(currentBewohner, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_VORRAT, previousPanel);
 
                 break;

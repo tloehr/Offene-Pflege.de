@@ -15,23 +15,23 @@ import java.util.Date;
 @Table(name = "MPBestand")
 @NamedQueries({
         @NamedQuery(name = "MedStock.findAll", query = "SELECT m FROM MedStock m"),
-        @NamedQuery(name = "MedStock.findByBestID", query = "SELECT m FROM MedStock m WHERE m.bestID = :bestID"),
-        @NamedQuery(name = "MedStock.findByEin", query = "SELECT m FROM MedStock m WHERE m.ein = :ein"),
-        @NamedQuery(name = "MedStock.findByAnbruch", query = "SELECT m FROM MedStock m WHERE m.anbruch = :anbruch"),
-        @NamedQuery(name = "MedStock.findByAus", query = "SELECT m FROM MedStock m WHERE m.aus = :aus"),
+        @NamedQuery(name = "MedStock.findByBestID", query = "SELECT m FROM MedStock m WHERE m.id = :bestID"),
+        @NamedQuery(name = "MedStock.findByEin", query = "SELECT m FROM MedStock m WHERE m.in = :ein"),
+        @NamedQuery(name = "MedStock.findByAnbruch", query = "SELECT m FROM MedStock m WHERE m.opened = :anbruch"),
+        @NamedQuery(name = "MedStock.findByAus", query = "SELECT m FROM MedStock m WHERE m.out = :aus"),
         @NamedQuery(name = "MedStock.findByText", query = "SELECT m FROM MedStock m WHERE m.text = :text"),
         @NamedQuery(name = "MedStock.findByApv", query = "SELECT m FROM MedStock m WHERE m.apv = :apv"),
         @NamedQuery(name = "MedStock.findByDarreichungAndBewohnerImAnbruch", query = " " +
                 " SELECT b FROM MedStock b WHERE b.inventory.resident = :bewohner AND b.tradeform = :darreichung " +
-                " AND b.anbruch < '9999-12-31 23:59:59' AND b.aus = '9999-12-31 23:59:59'"),
+                " AND b.opened < '9999-12-31 23:59:59' AND b.out = '9999-12-31 23:59:59'"),
         @NamedQuery(name = "MedStock.findByVorratImAnbruch", query = " " +
                 " SELECT b FROM MedStock b WHERE b.inventory = :vorrat " +
-                " AND b.anbruch < '9999-12-31 23:59:59' AND b.aus = '9999-12-31 23:59:59'"),
+                " AND b.opened < '9999-12-31 23:59:59' AND b.out = '9999-12-31 23:59:59'"),
         @NamedQuery(name = "MedStock.findByBewohnerImAnbruchMitSalden", query = " " +
-                " SELECT best, SUM(buch.menge) FROM MedStock best" +
+                " SELECT best, SUM(buch.amount) FROM MedStock best" +
                 " JOIN best.stockTransaction buch" +
-                " WHERE best.inventory.resident = :bewohner AND best.aus = '9999-12-31 23:59:59' " +
-                " AND best.anbruch < '9999-12-31 23:59:59' " +
+                " WHERE best.inventory.resident = :bewohner AND best.out = '9999-12-31 23:59:59' " +
+                " AND best.opened < '9999-12-31 23:59:59' " +
                 " GROUP BY best ")
 })
 
@@ -59,22 +59,22 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "BestID")
-    private Long bestID;
+    private Long id;
     @Version
     @Column(name = "version")
     private Long version;
     @Basic(optional = false)
     @Column(name = "Ein")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date ein;
+    private Date in;
     @Basic(optional = false)
     @Column(name = "Anbruch")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date anbruch;
+    private Date opened;
     @Basic(optional = false)
     @Column(name = "Aus")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date aus;
+    private Date out;
     @Column(name = "Text")
     private String text;
     @Basic(optional = false)
@@ -84,53 +84,49 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     public MedStock() {
     }
 
-    public MedStock(MedInventory inventory, TradeForm darreichung, MedPackage aPackage, String text) {
+    public MedStock(MedInventory inventory, TradeForm tradeform, MedPackage aPackage, String text) {
         this.apv = BigDecimal.ONE;
 
         this.inventory = inventory;
         this.tradeform = tradeform;
         this.aPackage = aPackage;
         this.text = text;
-        this.ein = new Date();
-        this.anbruch = SYSConst.DATE_BIS_AUF_WEITERES;
-        this.aus = SYSConst.DATE_BIS_AUF_WEITERES;
+        this.in = new Date();
+        this.opened = SYSConst.DATE_BIS_AUF_WEITERES;
+        this.out = SYSConst.DATE_BIS_AUF_WEITERES;
         this.user = OPDE.getLogin().getUser();
         this.stockTransaction = new ArrayList<MedStockTransaction>();
 
-        this.naechsterBestand = null;
+        this.nextStock = null;
 
     }
 
-    public Long getBestID() {
-        return bestID;
-    }
-
-    public void setBestID(Long bestID) {
-        this.bestID = bestID;
+    public Long getID() {
+        return id;
     }
 
     public Date getEin() {
-        return ein;
+        return in;
     }
 
     public void setEin(Date ein) {
-        this.ein = ein;
+        this.in = ein;
     }
 
-    public Date getAnbruch() {
-        return anbruch;
+    public Date getOpened() {
+        return opened;
     }
 
-    public void setAnbruch(Date anbruch) {
-        this.anbruch = anbruch;
+    public void setOpened(Date anbruch) {
+        this.opened = anbruch;
     }
 
-    public Date getAus() {
-        return aus;
+    public Date getOut() {
+        return out;
     }
 
-    public void setAus(Date aus) {
-        this.aus = aus;
+    public void setOut(Date aus) {
+        this.out = aus;
     }
 
     public String getText() {
@@ -141,11 +137,11 @@ public class MedStock implements Serializable, Comparable<MedStock> {
         this.text = text;
     }
 
-    public BigDecimal getApv() {
+    public BigDecimal getAPV() {
         return apv;
     }
 
-    public void setApv(BigDecimal apv) {
+    public void setAPV(BigDecimal apv) {
         this.apv = apv;
     }
 
@@ -154,12 +150,12 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     // ==
     @JoinColumn(name = "nextbest", referencedColumnName = "BestID")
     @OneToOne
-    private MedStock naechsterBestand;
+    private MedStock nextStock;
 
     // ==
     // 1:N Relationen
     // ==
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bestand")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "stock")
     private Collection<MedStockTransaction> stockTransaction;
 
     // N:1 Relationen
@@ -192,12 +188,12 @@ public class MedStock implements Serializable, Comparable<MedStock> {
         return stockTransaction;
     }
 
-    public MedPackage getaPackage() {
+    public MedPackage getPackage() {
 
         return aPackage;
     }
 
-    public void setaPackage(MedPackage aPackage) {
+    public void setPackage(MedPackage aPackage) {
         this.aPackage = aPackage;
     }
 
@@ -206,7 +202,7 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     }
 
     public boolean hasNextBestand() {
-        return naechsterBestand != null;
+        return nextStock != null;
     }
 
 //    public void setVorrat(MedInventory inventory) {
@@ -221,33 +217,33 @@ public class MedStock implements Serializable, Comparable<MedStock> {
 //        this.darreichung = darreichung;
 //    }
 
-    public MedStock getNaechsterBestand() {
-        return naechsterBestand;
+    public MedStock getNextStock() {
+        return nextStock;
     }
 
-    public void setNaechsterBestand(MedStock naechsterBestand) {
-        this.naechsterBestand = naechsterBestand;
+    public void setNextStock(MedStock naechsterBestand) {
+        this.nextStock = naechsterBestand;
     }
 
-    public boolean isAngebrochen() {
-        return anbruch.before(SYSConst.DATE_BIS_AUF_WEITERES);
+    public boolean isOpened() {
+        return opened.before(SYSConst.DATE_BIS_AUF_WEITERES);
     }
 
     /*
     * <b>tested:</b> Test0002
     */
-    public boolean isAbgeschlossen() {
-        return aus.before(SYSConst.DATE_BIS_AUF_WEITERES);
+    public boolean isClosed() {
+        return out.before(SYSConst.DATE_BIS_AUF_WEITERES);
     }
 
-    public boolean hasPackung() {
+    public boolean hasPackage() {
         return aPackage != null;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (bestID != null ? bestID.hashCode() : 0);
+        hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
 
@@ -258,7 +254,7 @@ public class MedStock implements Serializable, Comparable<MedStock> {
             return false;
         }
         MedStock other = (MedStock) object;
-        if ((this.bestID == null && other.bestID != null) || (this.bestID != null && !this.bestID.equals(other.bestID))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
         return true;
@@ -266,9 +262,9 @@ public class MedStock implements Serializable, Comparable<MedStock> {
 
     @Override
     public int compareTo(MedStock o) {
-        int result = this.ein.compareTo(o.getEin());
+        int result = this.in.compareTo(o.getEin());
         if (result == 0) {
-            result = this.bestID.compareTo(o.getBestID());
+            result = this.id.compareTo(o.getID());
         }
         ;
         return result;
@@ -276,6 +272,6 @@ public class MedStock implements Serializable, Comparable<MedStock> {
 
     @Override
     public String toString() {
-        return "MedStock{bestID=" + bestID + '}';
+        return "MedStock{bestID=" + id + '}';
     }
 }

@@ -160,7 +160,7 @@ public class PrintProcessor extends Thread {
         Object printableObject = null;
         if (element.getObject() instanceof MedStock) {
             MedStock bestand = (MedStock) element.getObject();
-            OPDE.debug("PrintProcessor druckt BestID: " + bestand.getBestID());
+            OPDE.debug("PrintProcessor druckt BestID: " + bestand.getID());
 //            if (element.getPrinter().isPageprinter()) {
 //                printableObject = new TKLabel(VorratTools.getVorrat4Printing(vorrat));
 //            } else {
