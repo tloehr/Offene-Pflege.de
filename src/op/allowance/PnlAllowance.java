@@ -118,7 +118,7 @@ public class PnlAllowance extends CleanablePanel {
     @Override
     public void cleanup() {
         lstResidents.clear();
-        cpCash.removeAll();
+        cpsCash.removeAll();
         searchPanes.removeAll();
         cashmap.clear();
         cpMap.clear();
@@ -133,29 +133,29 @@ public class PnlAllowance extends CleanablePanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        pnlBarbetrag = new JPanel();
+        pnlCash = new JPanel();
         jspCash = new JScrollPane();
-        cpCash = new CollapsiblePanes();
+        cpsCash = new CollapsiblePanes();
 
         //======== this ========
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
-        //======== pnlBarbetrag ========
+        //======== pnlCash ========
         {
-            pnlBarbetrag.setLayout(new BoxLayout(pnlBarbetrag, BoxLayout.X_AXIS));
+            pnlCash.setLayout(new BoxLayout(pnlCash, BoxLayout.X_AXIS));
 
             //======== jspCash ========
             {
 
-                //======== cpCash ========
+                //======== cpsCash ========
                 {
-                    cpCash.setLayout(new BoxLayout(cpCash, BoxLayout.X_AXIS));
+                    cpsCash.setLayout(new BoxLayout(cpsCash, BoxLayout.X_AXIS));
                 }
-                jspCash.setViewportView(cpCash);
+                jspCash.setViewportView(cpsCash);
             }
-            pnlBarbetrag.add(jspCash);
+            pnlCash.add(jspCash);
         }
-        add(pnlBarbetrag);
+        add(pnlCash);
     }// </editor-fold>//GEN-END:initComponents
 
 
@@ -171,7 +171,7 @@ public class PnlAllowance extends CleanablePanel {
 
 
         final boolean withworker = true;
-        cpCash.removeAll();
+        cpsCash.removeAll();
         cashmap.clear();
         cpMap.clear();
         contentmap.clear();
@@ -786,9 +786,9 @@ public class PnlAllowance extends CleanablePanel {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JPanel pnlBarbetrag;
+    private JPanel pnlCash;
     private JScrollPane jspCash;
-    private CollapsiblePanes cpCash;
+    private CollapsiblePanes cpsCash;
     // End of variables declaration//GEN-END:variables
 
 
@@ -952,7 +952,7 @@ public class PnlAllowance extends CleanablePanel {
 
                         buildPanel();
 
-                        GUITools.scroll2show(jspCash, cpMap.get(keyMonth), cpCash, new Closure() {
+                        GUITools.scroll2show(jspCash, cpMap.get(keyMonth), cpsCash, new Closure() {
                             @Override
                             public void execute(Object o) {
                                 GUITools.flashBackground(linemap.get(myAllowance), Color.YELLOW, 2);
@@ -1016,14 +1016,14 @@ public class PnlAllowance extends CleanablePanel {
     }
 
     private void buildPanel() {
-        cpCash.removeAll();
-        cpCash.setLayout(new JideBoxLayout(cpCash, JideBoxLayout.Y_AXIS));
+        cpsCash.removeAll();
+        cpsCash.setLayout(new JideBoxLayout(cpsCash, JideBoxLayout.Y_AXIS));
 
         for (Resident resident : lstResidents) {
-            cpCash.add(cpMap.get(resident.getRID()));
+            cpsCash.add(cpMap.get(resident.getRID()));
         }
 
-        cpCash.addExpansion();
+        cpsCash.addExpansion();
     }
 
     private JPanel createContentPanel4(final Resident resident, BigDecimal carry, DateMidnight month) {

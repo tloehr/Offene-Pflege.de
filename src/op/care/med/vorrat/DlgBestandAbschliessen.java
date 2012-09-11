@@ -270,7 +270,7 @@ public class DlgBestandAbschliessen extends MyJDialog {
 ////        this.setTitle(SYSTools.getWindowTitle("Bestand abschließen"));
 
         String text = "Sie möchten den Bestand mit der Nummer <font color=\"red\"><b>" + bestand.getID() + "</b></font> abschließen.";
-        text += "<br/>" + MedStockTools.getBestandTextAsHTML(bestand) + "</br>";
+        text += "<br/>" + MedStockTools.getTextASHTML(bestand) + "</br>";
         text += "<br/>Bitte wählen Sie einen der drei folgenden Gründe für den Abschluss:";
         txtInfo.setContentType("text/html");
         txtInfo.setText(SYSTools.toHTML(text));
@@ -278,8 +278,8 @@ public class DlgBestandAbschliessen extends MyJDialog {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(" " +
                 " SELECT b FROM MedStock b " +
-                " WHERE b.vorrat = :vorrat AND b.out = :aus AND b.opened = :anbruch " +
-                " ORDER BY b.ein, b.id "); // Geht davon aus, dass die PKs immer fortlaufend, automatisch vergeben werden.
+                " WHERE b.inventory = :vorrat AND b.out = :aus AND b.opened = :anbruch " +
+                " ORDER BY b.in, b.id "); // Geht davon aus, dass die PKs immer fortlaufend, automatisch vergeben werden.
         query.setParameter("vorrat", bestand.getInventory());
         query.setParameter("aus", SYSConst.DATE_BIS_AUF_WEITERES);
         query.setParameter("anbruch", SYSConst.DATE_BIS_AUF_WEITERES);
@@ -334,7 +334,7 @@ public class DlgBestandAbschliessen extends MyJDialog {
             cmbBestID.setToolTipText(null);
         } else {
             MedStock myBestand = (MedStock) cmbBestID.getSelectedItem();
-            cmbBestID.setToolTipText(SYSTools.toHTML(MedStockTools.getBestandTextAsHTML(myBestand)));
+            cmbBestID.setToolTipText(SYSTools.toHTML(MedStockTools.getTextASHTML(myBestand)));
         }
     }//GEN-LAST:event_cmbBestIDItemStateChanged
 
@@ -363,7 +363,7 @@ public class DlgBestandAbschliessen extends MyJDialog {
             if (rbStellen.isSelected()) {
                 bestand.setNextStock(nextBest);
                 BigDecimal inhalt = new BigDecimal(Double.parseDouble(txtLetzte.getText().replace(",", ".")));
-                MedStockTools.setzeBestandAuf(em, bestand, inhalt, "Korrekturbuchung zum Packungsabschluss", MedStockTransactionTools.STATUS_KORREKTUR_AUTO_VORAB);
+                MedStockTools.setzeBestandAuf(em, bestand, inhalt, "Korrekturbuchung zum Packungsabschluss", MedStockTransactionTools.STATE_EDIT_EMPTY_SOON);
 
                 OPDE.info(classname + ": Vorabstellen angeklickt. Es sind noch " + inhalt + " in der Packung.");
                 OPDE.info(classname + ": Nächste Packung im Anbruch wird die Bestands Nr.: " + nextBest.getID() + " sein.");
@@ -372,14 +372,14 @@ public class DlgBestandAbschliessen extends MyJDialog {
                 BigDecimal apv = bestand.getAPV();
 
                 if (rbGefallen.isSelected()) {
-                    MedStockTools.abschliessen(em, bestand, "Packung ist runtergefallen.", MedStockTransactionTools.STATUS_KORREKTUR_AUTO_RUNTERGEFALLEN);
+                    MedStockTools.close(em, bestand, "Packung ist runtergefallen.", MedStockTransactionTools.STATE_EDIT_EMPTY_BROKEN_OR_LOST);
                     OPDE.info(classname + ": Runtergefallen angeklickt.");
                 } else if (rbAbgelaufen.isSelected()) {
-                    MedStockTools.abschliessen(em, bestand, "Packung ist abgelaufen.", MedStockTransactionTools.STATUS_KORREKTUR_AUTO_ABGELAUFEN);
+                    MedStockTools.close(em, bestand, "Packung ist abgelaufen.", MedStockTransactionTools.STATE_EDIT_EMPTY_PASS_EXPIRY);
                     OPDE.info(classname + ": Abgelaufen angeklickt.");
                 } else {
-                    MedStockTools.abschliessen(em, bestand, "Korrekturbuchung zum Packungsabschluss", MedStockTransactionTools.STATUS_KORREKTUR_AUTO_LEER);
-                    apv = MedStockTools.berechneAPV(bestand);
+                    MedStockTools.close(em, bestand, "Korrekturbuchung zum Packungsabschluss", MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
+                    apv = MedStockTools.calcAPV(bestand);
                     OPDE.info(classname + ": Packung ist nun leer angeklickt.");
                 }
             }

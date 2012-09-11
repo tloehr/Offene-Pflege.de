@@ -48,7 +48,7 @@ public class MedStockTransaction implements Serializable {
         this.stock = stock;
         this.amount = amount;
         this.bhp = null;
-        this.state = MedStockTransactionTools.STATUS_EINBUCHEN_ANFANGSBESTAND;
+        this.state = MedStockTransactionTools.STATE_CREDIT;
         this.user = OPDE.getLogin().getUser();
     }
 
@@ -57,7 +57,7 @@ public class MedStockTransaction implements Serializable {
         this.amount = amount;
         this.pit = new Date();
         this.bhp = bhp;
-        this.state = MedStockTransactionTools.STATUS_AUSBUCHEN_NORMAL;
+        this.state = MedStockTransactionTools.STATE_DEBIT;
         this.user = OPDE.getLogin().getUser();
 //        bestand.getStockTransaction().add(this);
 //        bhp.getStockTransaction().add(this);

@@ -60,12 +60,12 @@ public class DlgPack extends javax.swing.JDialog {
         this.aPackage = aPackage;
         cmbGroesse.setModel(new DefaultComboBoxModel(MedPackageTools.GROESSE));
 
-        if (aPackage.getMpid() != null) {
+        if (aPackage.getID() != null) {
             txtPZN.setText(SYSTools.catchNull(aPackage.getPzn()));
-            txtInhalt.setText(aPackage.getInhalt().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
-            cmbGroesse.setSelectedIndex(aPackage.getGroesse());
+            txtInhalt.setText(aPackage.getContent().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
+            cmbGroesse.setSelectedIndex(aPackage.getSize());
         }
-        lblPackEinheit.setText(TradeFormTools.getPackungsEinheit(aPackage.getDarreichung()));
+        lblPackEinheit.setText(TradeFormTools.getPackUnit(aPackage.getTradeForm()));
         SYSTools.centerOnParent(parent, this);
         pack();
         setVisible(true);
@@ -187,7 +187,7 @@ public class DlgPack extends javax.swing.JDialog {
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
 
-        String pzn = MedPackageTools.checkNewPZN(txtPZN.getText().trim(), aPackage.getMpid() != null ? aPackage : null);
+        String pzn = MedPackageTools.checkNewPZN(txtPZN.getText().trim(), aPackage.getID() != null ? aPackage : null);
         BigDecimal inhalt = SYSTools.parseBigDecimal(txtInhalt.getText());
         if (inhalt.compareTo(BigDecimal.ZERO) <= 0){
             inhalt = null;
@@ -210,10 +210,10 @@ public class DlgPack extends javax.swing.JDialog {
 
         if (pzn != null && inhalt != null) {
             aPackage.setPzn(txtPZN.getText());
-            aPackage.setGroesse((short) cmbGroesse.getSelectedIndex());
-            aPackage.setInhalt(inhalt);
+            aPackage.setSize((short) cmbGroesse.getSelectedIndex());
+            aPackage.setContent(inhalt);
 
-            if (aPackage.getMpid() != null) {
+            if (aPackage.getID() != null) {
                 aPackage = EntityTools.merge(aPackage);
             } else {
                 EntityTools.persist(aPackage);

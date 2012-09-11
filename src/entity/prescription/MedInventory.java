@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "MPVorrat")
@@ -126,7 +127,7 @@ public class MedInventory implements Serializable, Comparable<MedInventory> {
         return to;
     }
 
-    public boolean isAbgeschlossen(){
+    public boolean isClosed(){
         return to.before(SYSConst.DATE_BIS_AUF_WEITERES);
     }
 
@@ -135,7 +136,7 @@ public class MedInventory implements Serializable, Comparable<MedInventory> {
     // 1:N Relationen
     // ==
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "inventory")
-    private Collection<MedStock> medStocks;
+    private List<MedStock> medStocks;
 
     // ==
     // N:1 Relationen
@@ -180,7 +181,7 @@ public class MedInventory implements Serializable, Comparable<MedInventory> {
         return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public Collection<MedStock> getMedStocks() {
+    public List<MedStock> getMedStocks() {
         return medStocks;
     }
 }

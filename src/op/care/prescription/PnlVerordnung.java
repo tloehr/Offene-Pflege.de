@@ -460,7 +460,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
                 menu.add(new JSeparator());
 
                 final MedStock bestandImAnbruch = MedStockTools.getStockInUse(TradeFormTools.getInventory4TradeForm(bewohner, selectedVerordnung.getTradeForm()));
-                boolean bestandAbschliessenAllowed = !readOnly && !selectedVerordnung.isDiscontinued() && bestandImAnbruch != null && !bestandImAnbruch.hasNextBestand();
+                boolean bestandAbschliessenAllowed = !readOnly && !selectedVerordnung.isDiscontinued() && bestandImAnbruch != null && !bestandImAnbruch.hashNext2Open();
                 boolean bestandAnbrechenAllowed = !readOnly && !selectedVerordnung.isDiscontinued() && bestandImAnbruch == null;
 
                 JMenuItem itemPopupCloseBestand = new JMenuItem("Bestand abschließen");
@@ -529,7 +529,7 @@ public class PnlVerordnung extends NursingRecordsPanel {
 
                     String message = "VerID: " + selectedVerordnung.getVerid();
                     if (bestandImAnbruch != null) {
-                        BigDecimal apv = MedStockTools.getAPVperBW(bestandImAnbruch.getInventory());
+                        BigDecimal apv = MedStockTools.getAPV4(bestandImAnbruch.getInventory());
                         BigDecimal apvBest = bestandImAnbruch.getAPV();
                         message += "  VorID: " + bestandImAnbruch.getInventory().getID() + "  DafID: " + bestandImAnbruch.getTradeForm().getDafID() + "  APV per BW: " + apv + "  APV (Bestand): " + apvBest;
                     }

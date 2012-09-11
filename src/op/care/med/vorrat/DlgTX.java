@@ -27,10 +27,13 @@
 
 package op.care.med.vorrat;
 
-import java.awt.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.prescription.*;
+import entity.prescription.MedStockTools;
+import entity.prescription.MedStockTransaction;
+import entity.prescription.MedStockTransactionTools;
+import entity.prescription.TradeFormTools;
+import op.tools.MyJDialog;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
@@ -40,44 +43,51 @@ import javax.swing.event.CaretListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 
 /**
  *
  */
-public class DlgEditBuchung extends JPanel {
-    private BigDecimal menge;
+public class DlgTX extends MyJDialog {
+    private BigDecimal amount;
     private Closure actionBlock;
     private BigDecimal bestandsumme;
     private BigDecimal packgroesse;
-    private MedStock bestand;
-    private MedStockTransaction buchung;
+    private MedStockTransaction tx;
 
-    public DlgEditBuchung(MedStock bestand, Closure actionBlock) {
-        this.bestand = bestand;
+    public DlgTX(MedStockTransaction tx, Closure actionBlock) {
+        this.tx = tx;
         this.actionBlock = actionBlock;
-        this.buchung = null;
         initDialog();
+        setVisible(true);
     }
 
     private void txtMengeFocusGained(FocusEvent e) {
         SYSTools.markAllTxt(txtMenge);
     }
 
+    @Override
+    public void dispose() {
+        super.dispose();
+        actionBlock.execute(tx);
+    }
+
     private void initDialog() {
         initComponents();
-//        setTitle(SYSTools.getWindowTitle("Einzelbuchung"));
-        bestandsumme = MedStockTools.getSum(bestand);
+        bestandsumme = MedStockTools.getSum(tx.getStock());
 
-        lblEinheit.setText(TradeFormTools.getPackungsEinheit(bestand.getTradeForm()));
+        lblUnit.setText(TradeFormTools.getPackUnit(tx.getStock().getTradeForm()));
 
-        if (bestand.hasPackage()) {
-            packgroesse = bestand.getPackage().getInhalt();
+        if (tx.getStock().hasPackage()) {
+            packgroesse = tx.getStock().getPackage().getContent();
         } else {
             packgroesse = BigDecimal.valueOf(Double.MAX_VALUE);
         }
 
-        txtMenge.setText("0.00");
+        txtMenge.setText(NumberFormat.getNumberInstance().format(tx.getAmount()));
         setVisible(true);
     }
 
@@ -89,31 +99,32 @@ public class DlgEditBuchung extends JPanel {
      */
     // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jLabel3 = new JLabel();
+        lblText = new JLabel();
         scrollPane1 = new JScrollPane();
         txtText = new JTextArea();
         txtMenge = new JTextField();
-        jLabel2 = new JLabel();
-        lblEinheit = new JLabel();
+        lblValue = new JLabel();
+        lblUnit = new JLabel();
         panel1 = new JPanel();
         btnCancel = new JButton();
         btnBuchung = new JButton();
 
         //======== this ========
-        setLayout(new FormLayout(
-            "default, $lcgap, default, $ugap, 141dlu:grow, $rgap, default, $lcgap, default",
-            "default, $lgap, 40dlu, 2*($lgap, fill:default), $lgap, default"));
+        Container contentPane = getContentPane();
+        contentPane.setLayout(new FormLayout(
+                "default, $lcgap, default, $ugap, 141dlu:grow, $rgap, default, $lcgap, default",
+                "default, $lgap, 40dlu, 2*($lgap, fill:default), $lgap, default"));
 
-        //---- jLabel3 ----
-        jLabel3.setText("Buchungstext");
-        jLabel3.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(jLabel3, CC.xy(3, 3, CC.DEFAULT, CC.TOP));
+        //---- lblText ----
+        lblText.setText("Buchungstext");
+        lblText.setFont(new Font("Arial", Font.PLAIN, 14));
+        contentPane.add(lblText, CC.xy(3, 3, CC.DEFAULT, CC.TOP));
 
         //======== scrollPane1 ========
         {
             scrollPane1.setViewportView(txtText);
         }
-        add(scrollPane1, CC.xywh(5, 3, 3, 1, CC.DEFAULT, CC.FILL));
+        contentPane.add(scrollPane1, CC.xywh(5, 3, 3, 1, CC.DEFAULT, CC.FILL));
 
         //---- txtMenge ----
         txtMenge.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -131,18 +142,18 @@ public class DlgEditBuchung extends JPanel {
                 txtMengeFocusGained(e);
             }
         });
-        add(txtMenge, CC.xy(5, 5));
+        contentPane.add(txtMenge, CC.xy(5, 5));
 
-        //---- jLabel2 ----
-        jLabel2.setText("Menge");
-        jLabel2.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(jLabel2, CC.xy(3, 5));
+        //---- lblValue ----
+        lblValue.setText("Menge");
+        lblValue.setFont(new Font("Arial", Font.PLAIN, 14));
+        contentPane.add(lblValue, CC.xy(3, 5));
 
-        //---- lblEinheit ----
-        lblEinheit.setHorizontalAlignment(SwingConstants.TRAILING);
-        lblEinheit.setText("jLabel4");
-        lblEinheit.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(lblEinheit, CC.xy(7, 5));
+        //---- lblUnit ----
+        lblUnit.setHorizontalAlignment(SwingConstants.TRAILING);
+        lblUnit.setText("jLabel4");
+        lblUnit.setFont(new Font("Arial", Font.PLAIN, 14));
+        contentPane.add(lblUnit, CC.xy(7, 5));
 
         //======== panel1 ========
         {
@@ -168,37 +179,33 @@ public class DlgEditBuchung extends JPanel {
             });
             panel1.add(btnBuchung);
         }
-        add(panel1, CC.xywh(5, 7, 3, 1, CC.RIGHT, CC.DEFAULT));
+        contentPane.add(panel1, CC.xywh(5, 7, 3, 1, CC.RIGHT, CC.DEFAULT));
+        pack();
+        setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        actionBlock.execute(null);
+        tx = null;
+        dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
 
     private void btnBuchungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuchungActionPerformed
-        save();
-        actionBlock.execute(buchung);
+        tx.setAmount(amount);
+        tx.setState(MedStockTransactionTools.STATE_EDIT_MANUAL);
+        tx.setText(txtText.getText().trim());
+        dispose();
     }//GEN-LAST:event_btnBuchungActionPerformed
 
     private void save() {
-        buchung = new MedStockTransaction(bestand, menge, MedStockTransactionTools.STATUS_KORREKTUR_MANUELL);
-        buchung.setText(txtText.getText());
-    }
 
-    public JComponent getDefaultFocusComponent(){
-        return txtText;
-    }
-
-    public MedStockTransaction getBuchung() {
-        return buchung;
     }
 
     private void txtMengeCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtMengeCaretUpdate
-        menge = SYSTools.checkBigDecimal(evt, !SYSTools.MUST_BE_POSITIVE);
-        if (menge.compareTo(BigDecimal.ZERO) < 0) {
-            btnBuchung.setEnabled(menge.negate().compareTo(bestandsumme) <= 0);
-        } else if (menge.compareTo(BigDecimal.ZERO) > 0) {
-            btnBuchung.setEnabled(menge.compareTo(packgroesse.subtract(bestandsumme)) <= 0);
+        amount = SYSTools.checkBigDecimal(evt, false);
+        if (amount.compareTo(BigDecimal.ZERO) < 0) {
+            btnBuchung.setEnabled(amount.negate().compareTo(bestandsumme) <= 0);
+        } else if (amount.compareTo(BigDecimal.ZERO) > 0) {
+            btnBuchung.setEnabled(amount.compareTo(packgroesse.subtract(bestandsumme)) <= 0);
         } else {
             btnBuchung.setEnabled(false);
         }
@@ -206,12 +213,12 @@ public class DlgEditBuchung extends JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JLabel jLabel3;
+    private JLabel lblText;
     private JScrollPane scrollPane1;
     private JTextArea txtText;
     private JTextField txtMenge;
-    private JLabel jLabel2;
-    private JLabel lblEinheit;
+    private JLabel lblValue;
+    private JLabel lblUnit;
     private JPanel panel1;
     private JButton btnCancel;
     private JButton btnBuchung;

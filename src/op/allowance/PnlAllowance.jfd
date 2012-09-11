@@ -30,7 +30,7 @@
          <class>javax.swing.BoxLayout</class> 
         </object> 
         <void property="name"> 
-         <string>pnlBarbetrag</string> 
+         <string>pnlCash</string> 
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormContainer"> 
@@ -52,7 +52,7 @@
              </void> 
             </object> 
             <void property="name"> 
-             <string>cpCash</string> 
+             <string>cpsCash</string> 
             </void> 
            </object> 
           </void> 

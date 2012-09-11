@@ -124,7 +124,7 @@ public class DlgBestand extends MyJDialog {
                 query.setParameter("pzn", pzn);
                 try {
                     aPackage = (MedPackage) query.getSingleResult();
-                    darreichung = aPackage.getDarreichung();
+                    darreichung = aPackage.getTradeForm();
                     cmbMProdukt.setModel(new DefaultComboBoxModel(new TradeForm[]{darreichung}));
                     cmbMProdukt.getModel().setSelectedItem(darreichung);
                 } catch (NoResultException nre) {
@@ -263,8 +263,8 @@ public class DlgBestand extends MyJDialog {
         //======== mainPane ========
         {
             mainPane.setLayout(new FormLayout(
-                    "14dlu, $lcgap, default, $lcgap, 39dlu, $lcgap, default:grow, $lcgap, 14dlu",
-                    "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
+                "14dlu, $lcgap, default, $lcgap, 39dlu, $lcgap, default:grow, $lcgap, 14dlu",
+                "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
 
             //---- jLabel1 ----
             jLabel1.setText("PZN oder Suchbegriff");
@@ -308,7 +308,7 @@ public class DlgBestand extends MyJDialog {
             mainPane.add(jLabel3, CC.xy(3, 5));
 
             //---- cmbMProdukt ----
-            cmbMProdukt.setModel(new DefaultComboBoxModel(new String[]{
+            cmbMProdukt.setModel(new DefaultComboBoxModel(new String[] {
 
             }));
             cmbMProdukt.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -351,7 +351,7 @@ public class DlgBestand extends MyJDialog {
             mainPane.add(jLabel6, CC.xy(3, 7));
 
             //---- cmbPackung ----
-            cmbPackung.setModel(new DefaultComboBoxModel(new String[]{
+            cmbPackung.setModel(new DefaultComboBoxModel(new String[] {
 
             }));
             cmbPackung.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -485,7 +485,7 @@ public class DlgBestand extends MyJDialog {
             if (aPackage != null) {
                 aPackage = em.merge(aPackage);
                 if (menge == null) {
-                    menge = aPackage.getInhalt();
+                    menge = aPackage.getContent();
                 }
             }
 
@@ -592,10 +592,10 @@ public class DlgBestand extends MyJDialog {
                     ovrMenge.addOverlayComponent(attentionIconMenge, DefaultOverlayable.SOUTH_WEST);
                     attentionIconMenge.setToolTipText(SYSTools.toHTML("<i>Mengen müssen größer 0 sein.</i>"));
                     menge = null;
-                } else if (aPackage != null && menge.compareTo(aPackage.getInhalt()) > 0) {
+                } else if (aPackage != null && menge.compareTo(aPackage.getContent()) > 0) {
                     ovrMenge.addOverlayComponent(attentionIconMenge, DefaultOverlayable.SOUTH_WEST);
                     attentionIconMenge.setToolTipText(SYSTools.toHTML("<i>Mengen dürfen nicht größer als der Packungsinhalt sein.</i>"));
-                    menge = aPackage.getInhalt();
+                    menge = aPackage.getContent();
                 } else {
                     ovrMenge.addOverlayComponent(correctIconMenge, DefaultOverlayable.SOUTH_WEST);
                 }

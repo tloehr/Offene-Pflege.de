@@ -72,7 +72,7 @@ public class Misc {
 //        if (formstatus != op.care.med.DBHandling.FORMSTATUS_APV1) {
 //            HashMap filter = new HashMap();
 //            filter.put("BestID", new Object[]{bestid, "="});
-//            filter.put("Status", new Object[]{op.care.med.DBHandling.STATUS_EINBUCHEN_ANFANGSBESTAND, "="});
+//            filter.put("Status", new Object[]{op.care.med.DBHandling.STATE_CREDIT, "="});
 //            double inhaltReal = ((BigDecimal) op.tools.DBHandling.getSingleValue("MPBuchung", "Menge", filter)).doubleValue();
 //            filter.clear();
 //            double inhaltRechnerisch = 0d;

@@ -201,7 +201,7 @@ public class MedStock implements Serializable, Comparable<MedStock> {
         return inventory;
     }
 
-    public boolean hasNextBestand() {
+    public boolean hashNext2Open() {
         return nextStock != null;
     }
 
@@ -225,8 +225,12 @@ public class MedStock implements Serializable, Comparable<MedStock> {
         this.nextStock = naechsterBestand;
     }
 
+    public boolean isNew() {
+        return !isOpened() && !isClosed();
+    }
+
     public boolean isOpened() {
-        return opened.before(SYSConst.DATE_BIS_AUF_WEITERES);
+        return opened.before(SYSConst.DATE_BIS_AUF_WEITERES) && !isClosed();
     }
 
     /*

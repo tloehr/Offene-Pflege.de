@@ -150,8 +150,8 @@ public class PnlPackung extends JPanel {
         if (pzn != null && inhalt != null) {
             aPackage = new MedPackage(darreichung);
             aPackage.setPzn(pzn);
-            aPackage.setInhalt(inhalt);
-            aPackage.setGroesse((short) cmbGroesse.getSelectedIndex());
+            aPackage.setContent(inhalt);
+            aPackage.setSize((short) cmbGroesse.getSelectedIndex());
         } else {
             aPackage = null;
         }

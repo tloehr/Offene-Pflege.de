@@ -68,11 +68,11 @@ public class TMBestand extends AbstractTableModel {
         Object result = "";
         switch (col) {
             case COL_NAME: {
-                result = MedStockTools.getBestandAsHTML(getBestand(row));
+                result = MedStockTools.getASHTML(getBestand(row));
                 break;
             }
             case COL_MENGE: {
-                result = "<font face=\"" + SYSConst.ARIAL14.getFamily() + "\">"+ getBestandsMenge(row).setScale(2, BigDecimal.ROUND_HALF_UP) + " " + TradeFormTools.getPackungsEinheit(getBestand(row).getTradeForm())+"</font>";
+                result = "<font face=\"" + SYSConst.ARIAL14.getFamily() + "\">"+ getBestandsMenge(row).setScale(2, BigDecimal.ROUND_HALF_UP) + " " + TradeFormTools.getPackUnit(getBestand(row).getTradeForm())+"</font>";
                 break;
             }
             default: {

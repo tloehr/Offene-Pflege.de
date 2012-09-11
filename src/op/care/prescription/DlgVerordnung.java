@@ -245,7 +245,7 @@ public class DlgVerordnung extends MyJDialog {
 
                 try {
                     MedPackage medPackage = (MedPackage) pznQuery.getSingleResult();
-                    cmbMed.setModel(new DefaultComboBoxModel(new TradeForm[]{medPackage.getDarreichung()}));
+                    cmbMed.setModel(new DefaultComboBoxModel(new TradeForm[]{medPackage.getTradeForm()}));
                 } catch (NoResultException nre) {
                     OPDE.debug("Nichts passendes zu dieser PZN gefunden");
                 } catch (Exception ex) {

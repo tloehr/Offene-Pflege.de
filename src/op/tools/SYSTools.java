@@ -1940,7 +1940,7 @@ public class SYSTools {
     }
 
 
-    public static BigDecimal checkBigDecimal(javax.swing.event.CaretEvent evt, boolean mustBePositive) {
+    public static BigDecimal checkBigDecimal(javax.swing.event.CaretEvent evt, boolean nees2BePositive) {
         BigDecimal bd = null;
         JTextComponent txt = (JTextComponent) evt.getSource();
         Action toolTipAction = txt.getActionMap().get("hideTip");
@@ -1950,8 +1950,8 @@ public class SYSTools {
         }
         try {
             bd = BigDecimal.valueOf(Double.parseDouble(txt.getText().replaceAll(",", "\\.")));
-            if (mustBePositive && bd.compareTo(BigDecimal.ZERO) <= 0) {
-                txt.setToolTipText("<html><font color=\"red\"><b>Sie können nur Zahlen größer 0 eingeben</b></font></html>");
+            if (nees2BePositive && bd.compareTo(BigDecimal.ZERO) <= 0) {
+                txt.setToolTipText("<html><font color=\"red\"><b>"+OPDE.lang.getString("misc.msg.invalidnumber")+"</b></font></html>");
                 toolTipAction = txt.getActionMap().get("postTip");
                 bd = BigDecimal.ONE;
             } else {
@@ -1959,12 +1959,12 @@ public class SYSTools {
             }
 
         } catch (NumberFormatException ex) {
-            if (mustBePositive) {
+            if (nees2BePositive) {
                 bd = BigDecimal.ONE;
             } else {
                 bd = BigDecimal.ZERO;
             }
-            txt.setToolTipText("<html><font color=\"red\"><b>Sie haben eine ungültige Zahl eingegeben.</b></font></html>");
+            txt.setToolTipText("<html><font color=\"red\"><b>"+OPDE.lang.getString("misc.msg.invalidnumber")+"</b></font></html>");
             toolTipAction = txt.getActionMap().get("postTip");
             if (toolTipAction != null) {
                 ActionEvent postTip = new ActionEvent(txt, ActionEvent.ACTION_PERFORMED, "");

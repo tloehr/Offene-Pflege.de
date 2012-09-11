@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Table(name = "MPackung")
 @NamedQueries({
         @NamedQuery(name = "MedPackung.findAll", query = "SELECT m FROM MedPackage m"),
-        @NamedQuery(name = "MedPackung.findByMpid", query = "SELECT m FROM MedPackage m WHERE m.mpid = :mpid"),
+        @NamedQuery(name = "MedPackung.findByMpid", query = "SELECT m FROM MedPackage m WHERE m.id = :mpid"),
         @NamedQuery(name = "MedPackung.findByPzn", query = "SELECT m FROM MedPackage m WHERE m.pzn = :pzn"),
         @NamedQuery(name = "MedPackung.findByGroesse", query = "SELECT m FROM MedPackage m WHERE m.groesse = :groesse"),
         @NamedQuery(name = "MedPackung.findByInhalt", query = "SELECT m FROM MedPackage m WHERE m.inhalt = :inhalt")
@@ -20,9 +20,8 @@ public class MedPackage implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "MPID")
-    private Long mpid;
+    private Long id;
     @Column(name = "PZN")
     private String pzn;
     @Column(name = "Groesse")
@@ -33,32 +32,23 @@ public class MedPackage implements Serializable {
 
     @JoinColumn(name = "DafID", referencedColumnName = "DafID")
     @ManyToOne
-    private TradeForm darreichung;
+    private TradeForm tradeForm;
 
     public MedPackage() {
     }
 
-    public MedPackage(TradeForm darreichung) {
-        this.darreichung = darreichung;
+    public MedPackage(TradeForm tf) {
+        this.tradeForm = tf;
 //        this.darreichung.getPackungen().add(this);
     }
 
-    public TradeForm getDarreichung() {
-        return darreichung;
+    public TradeForm getTradeForm() {
+        return tradeForm;
     }
 
-    public void setDarreichung(TradeForm darreichung) {
-        this.darreichung = darreichung;
+    public Long getID() {
+        return id;
     }
-
-    public Long getMpid() {
-        return mpid;
-    }
-
-    public void setMpid(Long mpid) {
-        this.mpid = mpid;
-    }
-
 
     public String getPzn() {
         return pzn;
@@ -68,26 +58,26 @@ public class MedPackage implements Serializable {
         this.pzn = pzn;
     }
 
-    public Short getGroesse() {
+    public Short getSize() {
         return groesse;
     }
 
-    public void setGroesse(Short groesse) {
+    public void setSize(Short groesse) {
         this.groesse = groesse;
     }
 
-    public BigDecimal getInhalt() {
+    public BigDecimal getContent() {
         return inhalt;
     }
 
-    public void setInhalt(BigDecimal inhalt) {
+    public void setContent(BigDecimal inhalt) {
         this.inhalt = inhalt;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (mpid != null ? mpid.hashCode() : 0);
+        hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
 
@@ -98,7 +88,7 @@ public class MedPackage implements Serializable {
             return false;
         }
         MedPackage other = (MedPackage) object;
-        if ((this.mpid == null && other.mpid != null) || (this.mpid != null && !this.mpid.equals(other.mpid))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
         return true;
@@ -106,7 +96,7 @@ public class MedPackage implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.rest.MedPackage[mpid=" + mpid + "]";
+        return "entity.rest.MedPackage[mpid=" + id + "]";
     }
 
 }

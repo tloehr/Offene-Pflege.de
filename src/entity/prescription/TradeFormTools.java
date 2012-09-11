@@ -76,7 +76,7 @@ public class TradeFormTools {
         return text;
     }
 
-    public static String getPackungsEinheit(TradeForm darreichung) {
+    public static String getPackUnit(TradeForm darreichung) {
         return DosageFormTools.EINHEIT[darreichung.getDosageForm().getPackEinheit()];
     }
 

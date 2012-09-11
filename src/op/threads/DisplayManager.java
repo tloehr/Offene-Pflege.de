@@ -72,7 +72,7 @@ public class DisplayManager extends Thread {
     }
 
     public void clearAllMessages() {
-        setMainMessage(null);
+        setMainMessage(" ");
         messageQ.clear();
         oldMessages.clear();
         processSubMessage();

@@ -59,10 +59,10 @@ public class DlgDAF extends javax.swing.JDialog {
         if (editMode) {
 
 //            //HashMap daf = DBRetrieve.getSingleRecord("MPDarreichung", new String[]{"Zusatz", "FormID"}, "DafID", dafid);
-////            double apv = op.care.med.DBHandling.getAPV(dafid, "");
+////            double apv = op.care.med.DBHandling.getAPV4(dafid, "");
 ////            long thisFormID = ((BigInteger) daf.get("FormID")).longValue();
 //
-//            apv = APVTools.getAPV(darreichung);
+//            apv = APVTools.getAPV4(darreichung);
 //            if (apv == null) {
 //                apv = new APV(BigDecimal.ONE, false, null, darreichung);
 //            }
@@ -71,7 +71,7 @@ public class DlgDAF extends javax.swing.JDialog {
 //                txtAPV.setText("1");
 //                txtAPV.setEnabled(false);
 //            } else {
-//                txtAPV.setText(apv.getAPV().setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+//                txtAPV.setText(apv.getAPV4().setScale(2, BigDecimal.ROUND_HALF_UP).toString());
 //                txtAPV.setEnabled(true);
 //            }
 

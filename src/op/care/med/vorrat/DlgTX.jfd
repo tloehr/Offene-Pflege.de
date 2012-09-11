@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_31" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_33" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void property="contentType"> 
    <string>form/swing</string> 
@@ -7,8 +7,8 @@
   <void property="root"> 
    <object class="com.jformdesigner.model.FormRoot"> 
     <void method="add"> 
-     <object class="com.jformdesigner.model.FormContainer"> 
-      <string>javax.swing.JPanel</string> 
+     <object class="com.jformdesigner.model.FormWindow"> 
+      <string>javax.swing.JDialog</string> 
       <object class="com.jformdesigner.model.FormLayoutManager"> 
        <class>com.jgoodies.forms.layout.FormLayout</class> 
        <void method="setProperty"> 
@@ -20,9 +20,6 @@
         <string>default, linegap, 40dlu, linegap, fill:default, linegap, fill:default, linegap, default</string> 
        </void> 
       </object> 
-      <void property="name"> 
-       <string>this</string> 
-      </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormComponent"> 
         <string>javax.swing.JLabel</string> 
@@ -39,7 +36,7 @@
          </object> 
         </void> 
         <void property="name"> 
-         <string>jLabel3</string> 
+         <string>lblText</string> 
         </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -155,7 +152,7 @@
          <object idref="Font0"/> 
         </void> 
         <void property="name"> 
-         <string>jLabel2</string> 
+         <string>lblValue</string> 
         </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -186,7 +183,7 @@
          <object idref="Font0"/> 
         </void> 
         <void property="name"> 
-         <string>lblEinheit</string> 
+         <string>lblUnit</string> 
         </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -277,6 +274,9 @@
         </void> 
        </object> 
       </void> 
+      <void property="name"> 
+       <string>this</string> 
+      </void> 
      </object> 
      <object class="com.jformdesigner.model.FormLayoutConstraints"> 
       <null/> 
@@ -284,7 +284,7 @@
        <string>size</string> 
        <object class="java.awt.Dimension"> 
         <int>500</int> 
-        <int>225</int> 
+        <int>205</int> 
        </object> 
       </void> 
       <void method="setProperty"> 

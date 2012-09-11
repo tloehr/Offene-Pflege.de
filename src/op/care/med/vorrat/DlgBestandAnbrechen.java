@@ -163,13 +163,12 @@ public class DlgBestandAnbrechen extends MyJDialog {
     }
 
     private void initDialog() {
-        this.setTitle(SYSTools.getWindowTitle("Bestand anbrechen"));
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(" " +
                 " SELECT b FROM MedStock b " +
-                " WHERE b.vorrat = :vorrat AND b.out = :aus AND b.opened = :anbruch " +
-                " ORDER BY b.ein, b.id "); // Geht davon aus, dass die PKs immer fortlaufend, automatisch vergeben werden.
+                " WHERE b.inventory = :vorrat AND b.out = :aus AND b.opened = :anbruch " +
+                " ORDER BY b.in, b.id "); // Geht davon aus, dass die PKs immer fortlaufend, automatisch vergeben werden.
         query.setParameter("vorrat", inventory);
         query.setParameter("aus", SYSConst.DATE_BIS_AUF_WEITERES);
         query.setParameter("anbruch", SYSConst.DATE_BIS_AUF_WEITERES);
@@ -186,7 +185,7 @@ public class DlgBestandAnbrechen extends MyJDialog {
         if (cmbBestID.getSelectedIndex() == 0) {
             cmbBestID.setToolTipText(null);
         } else {
-            cmbBestID.setToolTipText(SYSTools.toHTML(MedStockTools.getBestandTextAsHTML((MedStock) cmbBestID.getSelectedItem())));
+            cmbBestID.setToolTipText(SYSTools.toHTML(MedStockTools.getTextASHTML((MedStock) cmbBestID.getSelectedItem())));
         }
         btnOK.setEnabled(cmbBestID.getSelectedIndex() > 0);
     }//GEN-LAST:event_cmbBestIDItemStateChanged

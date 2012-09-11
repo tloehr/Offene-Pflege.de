@@ -47,7 +47,7 @@ public class MedInventoryTools {
     public static String getInventoryAsHTML(MedInventory inventory) {
         String result = "";
 
-        String htmlcolor = inventory.isAbgeschlossen() ? "gray" : "blue";
+        String htmlcolor = inventory.isClosed() ? "gray" : "blue";
 
         result += "<font face =\"" + SYSConst.ARIAL14.getFamily() + "\">";
         result += "<font color=\"" + htmlcolor + "\"><b><u>" + inventory.getID() + "</u></b></font>&nbsp; ";
@@ -57,7 +57,7 @@ public class MedInventoryTools {
         DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
 
         result += "<br/><font color=\"blue\">Eingang: " + df.format(inventory.getFrom()) + "</font>";
-        if (inventory.isAbgeschlossen()) {
+        if (inventory.isClosed()) {
             result += "<br/><font color=\"green\">Abschluss: " + df.format(inventory.getTo()) + "</font>";
         }
 
@@ -94,8 +94,8 @@ public class MedInventoryTools {
      * Bucht eine Menge aus einem Vorrat aus, ggf. zugehörig zu einer BHP. Übersteigt die Entnahme-Menge den
      * Restbestband, dann wird entweder
      * <ul>
-     * <li>wenn der nächste Bestand <b>nicht</b> bekannt ist (<code>bestand.hasNextBestand() = <b>false</b></code>) &rarr; der Bestand trotzdem weiter gebucht. Bis ins negative.</li>
-     * <li>wenn der nächste Bestand <b>doch schon</b> bekannt ist (<code>bestand.hasNextBestand() = <b>true</b></code>)  &rarr; ein neuer Bestand wird angebrochen.</li>
+     * <li>wenn der nächste Bestand <b>nicht</b> bekannt ist (<code>bestand.hashNext2Open() = <b>false</b></code>) &rarr; der Bestand trotzdem weiter gebucht. Bis ins negative.</li>
+     * <li>wenn der nächste Bestand <b>doch schon</b> bekannt ist (<code>bestand.hashNext2Open() = <b>true</b></code>)  &rarr; ein neuer Bestand wird angebrochen.</li>
      * </ul>
      * Ist <b>keine</b> Packung im Anbruch, dann wird eine Exception geworfen. Das kann aber eingentlich nicht passieren. Es sei denn jemand hat von Hand
      * an den Datenbank rumgespielt.
@@ -175,7 +175,7 @@ public class MedInventoryTools {
              * erst mal auf und nehmen den Rest aus der nächsten.
              *
              */
-            if (bestand.hasNextBestand() && restsumme.compareTo(wunschmenge) <= 0) {
+            if (bestand.hashNext2Open() && restsumme.compareTo(wunschmenge) <= 0) {
                 entnahme = restsumme;
             }
 
@@ -190,7 +190,7 @@ public class MedInventoryTools {
              * So lange keine neue Packung bekannt nehmen wir immer weiter aus dieser hier.
              * Selbst wenn die dann ins Minus läuft.
              */
-            if (bestand.hasNextBestand()) {
+            if (bestand.hashNext2Open()) {
                 if (restsumme.compareTo(wunschmenge) <= 0) { // ist nicht mehr genug in der Packung, bzw. die Packung wird jetzt leer.
 
                     MedStock naechsterBestand = em.merge(bestand.getNextStock());
@@ -199,7 +199,7 @@ public class MedInventoryTools {
                     // Es war mehr gewünscht, als die angebrochene Packung hergegeben hat.
                     // Bzw. die Packung wurde mit dieser Gabe geleert.
                     // Dann müssen wird erstmal den alten Bestand abschließen.
-                    MedStockTools.abschliessen(em, bestand, "Automatischer Abschluss bei leerer Packung", MedStockTransactionTools.STATUS_KORREKTUR_AUTO_VORAB);
+                    MedStockTools.close(em, bestand, "Automatischer Abschluss bei leerer Packung", MedStockTransactionTools.STATE_EDIT_EMPTY_SOON);
                 }
 
                 if (wunschmenge.compareTo(entnahme) > 0) { // Sind wir hier fertig, oder müssen wir noch mehr ausbuchen.
@@ -226,7 +226,7 @@ public class MedInventoryTools {
         MedStock bestand = null;
         if (menge.compareTo(BigDecimal.ZERO) > 0) {
             bestand = new MedStock(inventory, darreichung, aPackage, text);
-            bestand.setAPV(MedStockTools.getPassendesAPV(bestand));
+            bestand.setAPV(MedStockTools.getAPV4(bestand));
             MedStockTransaction buchung = new MedStockTransaction(bestand, menge);
             bestand.getStockTransaction().add(buchung);
         }
@@ -247,6 +247,19 @@ public class MedInventoryTools {
             }
         }
         return bestand;
+    }
+
+     public static MedStock getCurrentOpened(MedInventory inventory) {
+        MedStock stock = null;
+        if (!inventory.getMedStocks().isEmpty()) {
+            for (MedStock mystock : inventory.getMedStocks()) {
+                if (mystock.isOpened()) {
+                    stock = mystock;
+                    break;
+                }
+            }
+        }
+        return stock;
     }
 
 //    public static MedStock getNaechsteNichtAbgeschlossene(MedInventory inventory) {
@@ -280,7 +293,7 @@ public class MedInventoryTools {
 
         for (MedStock bestand : list) {
             if (bestand.getOut().equals(SYSConst.DATE_BIS_AUF_WEITERES) && bestand.getOpened().equals(SYSConst.DATE_BIS_AUF_WEITERES)) {
-                BigDecimal apv = MedStockTools.getPassendesAPV(bestand);
+                BigDecimal apv = MedStockTools.getAPV4(bestand);
                 bestand.setOpened(new Date());
                 bestand.setAPV(apv);
                 result = bestand;
@@ -325,7 +338,7 @@ public class MedInventoryTools {
         ArrayList<MedInventory> result;
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT inv FROM MedInventory inv WHERE inv.resident = :resident ORDER BY inv.text");
+        Query query = em.createQuery("SELECT inv FROM MedInventory inv WHERE inv.resident = :resident ORDER BY inv.to DESC, inv.text");
         query.setParameter("resident", resident);
 
         result = new ArrayList<MedInventory>(query.getResultList());

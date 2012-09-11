@@ -8,15 +8,15 @@ package entity.prescription;
  * To change this template use File | Settings | File Templates.
  */
 public class MedStockTransactionTools {
-    public static final short STATUS_AUSBUCHEN_NORMAL = 0;
-    public static final short STATUS_EINBUCHEN_ANFANGSBESTAND = 1;
-    public static final short STATUS_KORREKTUR_MANUELL = 2;
-    public static final short STATUS_KORREKTUR_AUTO_LEER = 3;
-    public static final short STATUS_KORREKTUR_AUTO_VORAB = 4;
-    public static final short STATUS_KORREKTUR_AUTO_ABGELAUFEN = 5;
-    public static final short STATUS_KORREKTUR_AUTO_RUNTERGEFALLEN = 6;
-    public static final short STATUS_KORREKTUR_AUTO_ABSCHLUSS_BEI_PACKUNGSENDE = 7;
-    public static final short STATUS_KORREKTUR_AUTO_ABSCHLUSS_BEI_VORRATSABSCHLUSS = 8;
+    public static final short STATE_DEBIT = 0;
+    public static final short STATE_CREDIT = 1;
+    public static final short STATE_EDIT_MANUAL = 2;
+    public static final short STATE_EDIT_EMPTY_NOW = 3;
+    public static final short STATE_EDIT_EMPTY_SOON = 4;
+    public static final short STATE_EDIT_EMPTY_PASS_EXPIRY = 5;
+    public static final short STATE_EDIT_EMPTY_BROKEN_OR_LOST = 6;
+    public static final short STATE_EDIT_STOCK_CLOSED = 7;
+    public static final short STATE_EDIT_INVENTORY_CLOSED = 8;
 
 
 

@@ -36,8 +36,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class GUITools {
 
-    public static JideButton createHyperlinkButton(String name, Icon icon, ActionListener actionListener) {
-        final JideButton button = new JideButton(name, icon);
+    public static JideButton createHyperlinkButton(String titleORlangbundle, Icon icon, ActionListener actionListener) {
+        String title = SYSTools.catchNull(titleORlangbundle);
+        try {
+            title = OPDE.lang.getString(titleORlangbundle);
+        } catch (Exception e){
+            // ok, its not a langbundle key
+        }
+        final JideButton button = new JideButton(title, icon);
         button.setButtonStyle(JideButton.HYPERLINK_STYLE);
         button.setFont(SYSConst.ARIAL14);
 
@@ -224,6 +230,41 @@ public class GUITools {
                 setCollapsed((Container) component, collapsed);
             }
         }
+    }
+
+
+    public static void scroll2show(final JScrollPane jsp, final int end, final Closure what2doAfterwards) {
+        final int start = jsp.getVerticalScrollBar().getValue();
+        final int distance = end - start;
+
+        final TimingSource ts = new SwingTimerTimingSource();
+        Animator.setDefaultTimingSource(ts);
+        ts.init();
+
+        Animator animator = new Animator.Builder().setInterpolator(new AccelerationInterpolator(0.15f, 0.8f)).setDuration(750, TimeUnit.MILLISECONDS).setStartDirection(Animator.Direction.FORWARD).addTarget(new TimingTargetAdapter() {
+            @Override
+            public void begin(Animator source) {
+            }
+
+            @Override
+            public void timingEvent(Animator animator, double fraction) {
+                final BigDecimal value = new BigDecimal(start).add(new BigDecimal(fraction).multiply(new BigDecimal(distance)));
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        jsp.getVerticalScrollBar().setValue(value.intValue());
+                    }
+                });
+            }
+
+            @Override
+            public void end(Animator source) {
+                what2doAfterwards.execute(null);
+            }
+        }).build();
+        animator.start();
+
+//        jsp.getVerticalScrollBar().setValue(Math.min(SwingUtilities.convertPoint(component, component.getLocation(), container).y, jsp.getVerticalScrollBar().getMaximum()));
     }
 
     public static void scroll2show(final JScrollPane jsp, final Component component, Container container, final Closure what2doAfterwards) {

@@ -332,6 +332,10 @@ public class SYSConst {
     public static final Icon icon22passwordPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/password_pressed.png"));
     public static final Icon icon22play = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_play.png"));
     public static final Icon icon22playPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_play_pressed.png"));
+    public static final Icon icon22playerStart = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_start.png"));
+    public static final Icon icon22playerStartPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_start_pressed.png"));
+    public static final Icon icon22playerStop = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_stop.png"));
+    public static final Icon icon22playerStopPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_stop_pressed.png"));
     public static final Icon icon22print = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/printer1.png"));
     public static final Icon icon22printPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/printer1_pressed.png"));
     public static final Icon icon22redo = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/redo.png"));
