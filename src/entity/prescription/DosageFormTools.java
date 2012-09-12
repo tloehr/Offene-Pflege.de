@@ -32,7 +32,7 @@ public class DosageFormTools {
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                 String text;
                 if (o == null) {
-                    text = SYSTools.toHTML("<i>"+ OPDE.lang.getString("misc.commands.noselection")+"</i>");
+                    text = SYSTools.toHTML("<i>" + OPDE.lang.getString("misc.commands.noselection") + "</i>");
                 } else if (o instanceof DosageForm) {
                     DosageForm form = (DosageForm) o;
                     text = toPrettyString(form);
@@ -49,8 +49,9 @@ public class DosageFormTools {
 
     public static String getUsageText(DosageForm form) {
         String result = "";
-
-        if (form.getAnwText() != null && !form.getAnwText().isEmpty()) {
+        if (form == null) {
+            result = "?";
+        } else if (!form.getAnwText().isEmpty()) {
             result = form.getAnwText();
         } else {
             result = SYSConst.EINHEIT[form.getAnwEinheit()];
@@ -65,7 +66,7 @@ public class DosageFormTools {
 
     public static String toPrettyStringPackung(DosageForm form) {
         String result = "";
-        if (SYSTools.catchNull(form.getZubereitung()).isEmpty()){
+        if (SYSTools.catchNull(form.getZubereitung()).isEmpty()) {
             result = EINHEIT[form.getPackEinheit()] + " " + form.getAnwText();
         } else {
             result = EINHEIT[form.getPackEinheit()] + " " + form.getZubereitung();

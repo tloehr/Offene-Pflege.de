@@ -7,6 +7,7 @@ import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
@@ -249,7 +250,7 @@ public class MedInventoryTools {
         return bestand;
     }
 
-     public static MedStock getCurrentOpened(MedInventory inventory) {
+    public static MedStock getCurrentOpened(MedInventory inventory) {
         MedStock stock = null;
         if (!inventory.getMedStocks().isEmpty()) {
             for (MedStock mystock : inventory.getMedStocks()) {
@@ -305,22 +306,32 @@ public class MedInventoryTools {
     }
 
     public static DosageForm getForm(MedInventory inventory) {
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery(" " +
-                " SELECT tf.dosageForm FROM MedInventory i " +
-                " JOIN i.medStocks s " +
-                " JOIN s.tradeform tf" +
-                " WHERE i = :inventory");
-        query.setParameter("inventory", inventory);
-        query.setMaxResults(1);
+        DosageForm form = null;
+        try {
 
-        DosageForm form = (DosageForm) query.getSingleResult();
-        em.close();
+            EntityManager em = OPDE.createEM();
 
+            OPDE.debug("MedInventoryTools.getForm: inventory: " + inventory.getID());
+
+            Query query = em.createQuery(" " +
+                    " SELECT tf.dosageForm FROM MedInventory i " +
+                    " JOIN i.medStocks s " +
+                    " JOIN s.tradeform tf" +
+                    " WHERE i = :inventory");
+            query.setParameter("inventory", inventory);
+            query.setMaxResults(1);
+
+            form = (DosageForm) query.getSingleResult();
+            em.close();
+        } catch (NoResultException nre) {
+            form = null;
+        } catch (Exception e){
+            OPDE.fatal(e);
+        }
         return form;
     }
 
-    public static ArrayList<MedInventory> getAllActive(Resident resident){
+    public static ArrayList<MedInventory> getAllActive(Resident resident) {
         ArrayList<MedInventory> result;
 
         EntityManager em = OPDE.createEM();
@@ -334,7 +345,7 @@ public class MedInventoryTools {
         return result;
     }
 
-    public static ArrayList<MedInventory> getAll(Resident resident){
+    public static ArrayList<MedInventory> getAll(Resident resident) {
         ArrayList<MedInventory> result;
 
         EntityManager em = OPDE.createEM();

@@ -127,6 +127,14 @@ public class MedInventory implements Serializable, Comparable<MedInventory> {
         return to;
     }
 
+    public void setFrom(Date from) {
+        this.from = from;
+    }
+
+    public void setTo(Date to) {
+        this.to = to;
+    }
+
     public boolean isClosed(){
         return to.before(SYSConst.DATE_BIS_AUF_WEITERES);
     }

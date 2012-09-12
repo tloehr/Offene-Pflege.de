@@ -32,12 +32,17 @@ import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
+import entity.AllowanceTools;
+import entity.files.SYSFilesTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.prescription.*;
 import entity.system.SYSPropsTools;
 import op.OPDE;
+import op.care.info.PnlInfo;
+import op.system.Form;
 import op.system.InternalClassACL;
+import op.system.PrinterType;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
@@ -103,7 +108,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
-    private JToggleButton tbClosedVorrat;
+    private JToggleButton tbClosedInventory, tbLastAddedClosedStock; // <= only for search function
 
     /**
      * Creates new form DlgVorrat
@@ -120,6 +125,7 @@ public class PnlInventory extends NursingRecordsPanel {
     private void initPanel() {
         cpMap = new HashMap<String, CollapsiblePane>();
         contentmap = new HashMap<String, JPanel>();
+        lstInventories = new ArrayList<MedInventory>();
 //        invsummap = new HashMap<MedInventory, BigDecimal>();
 //        stocksummap = new HashMap<MedStock, BigDecimal>();
         linemap = new HashMap<MedStockTransaction, JPanel>();
@@ -128,10 +134,20 @@ public class PnlInventory extends NursingRecordsPanel {
 
     @Override
     public void switchResident(Resident resident) {
+        switchResident(resident, null);
+    }
+
+    public void switchResident(Resident resident, MedInventory inventory) {
         this.resident = resident;
         OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(resident));
         OPDE.getDisplayManager().clearSubMessages();
-        lstInventories = tbClosedVorrat.isSelected() ? MedInventoryTools.getAll(resident) : MedInventoryTools.getAllActive(resident);
+        if (inventory == null) {
+            lstInventories = tbClosedInventory.isSelected() ? MedInventoryTools.getAll(resident) : MedInventoryTools.getAllActive(resident);
+        } else {
+            lstInventories.clear();
+            lstInventories.add(inventory);
+        }
+
         reloadDisplay();
     }
 
@@ -189,85 +205,37 @@ public class PnlInventory extends NursingRecordsPanel {
         search.setInstantSearchDelay(5000);
         list.add(search);
 
-        tbClosedVorrat = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".showclosedinventories"));
-        SYSPropsTools.restoreState(internalClassID + ":tbClosedVorrat", tbClosedVorrat);
-        tbClosedVorrat.addItemListener(new ItemListener() {
+        tbClosedInventory = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".showclosedinventories"));
+        SYSPropsTools.restoreState(internalClassID + ":tbClosedInventory", tbClosedInventory);
+        tbClosedInventory.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                SYSPropsTools.storeState(internalClassID + ":tbClosedVorrat", tbClosedVorrat);
-                lstInventories = tbClosedVorrat.isSelected() ? MedInventoryTools.getAll(resident) : MedInventoryTools.getAllActive(resident);
+                SYSPropsTools.storeState(internalClassID + ":tbClosedInventory", tbClosedInventory);
+                lstInventories = tbClosedInventory.isSelected() ? MedInventoryTools.getAll(resident) : MedInventoryTools.getAllActive(resident);
                 reloadDisplay();
             }
         });
-        list.add(tbClosedVorrat);
+        list.add(tbClosedInventory);
 
         return list;
     }
 
     private java.util.List<Component> addCommands() {
         java.util.List<Component> list = new ArrayList<Component>();
-//        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
-//            JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID+".newmedstocktx"), SYSConst.icon22add, new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent actionEvent) {
-//                    if (pnlBuchungen.hasBestand()) {
-//                        pnlBuchungen.getNeueBuchungPopup((JComponent) actionEvent.getSource()).showPopup();
-//                    } else {
-//                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wählen Sie zuerst einen Bestand aus", 2));
-//                    }
-//                }
-//            });
-//            list.add(addButton);
-//        }
-//
-//        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)) {
-//            JideButton resetButton = GUITools.createHyperlinkButton("Alle Buchungen zurücksetzen", SYSConst.icon22undo, new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent actionEvent) {
-//                    if (pnlBuchungen.hasBestand()) {
-//                        pnlBuchungen.resetBuchungen();
-//                    } else {
-//                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wählen Sie zuerst einen Bestand aus", 2));
-//                    }
-//                }
-//            });
-//            list.add(resetButton);
-//        }
+
+
+        final JideButton btnPrintStat = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".printresident"), SYSConst.icon22print, null);
+        btnPrintStat.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                //TODO: hatte ich den schon ?
+                SYSFilesTools.print(, false);
+            }
+        });
+        list.add(btnPrintStat);
 
         return list;
     }
-
-//    private void jspBestandComponentResized(ComponentEvent e) {
-//        JScrollPane jsp = (JScrollPane) e.getComponent();
-//        Dimension dim = jsp.getSize();
-//
-//        TableColumnModel tcm1 = tblBestand.getColumnModel();
-//
-//        if (tcm1.getColumnCount() == 0) {
-//            return;
-//        }
-//
-//        tcm1.getColumn(TMBestand.COL_NAME).setPreferredWidth(dim.width / 5 * 4);  // 4/5 tel der Gesamtbreite
-//        tcm1.getColumn(TMBestand.COL_MENGE).setPreferredWidth(dim.width / 5);  // 1/5 tel der Gesamtbreite
-//        tcm1.getColumn(TMBestand.COL_NAME).setHeaderValue("Bestandsangabe");
-//        tcm1.getColumn(TMBestand.COL_MENGE).setHeaderValue("Restsumme");
-//    }
-//
-//    private void jspVorratComponentResized(ComponentEvent e) {
-//        JScrollPane jsp = (JScrollPane) e.getComponent();
-//        Dimension dim = jsp.getSize();
-//
-//        TableColumnModel tcm1 = tblVorrat.getColumnModel();
-//
-//        if (tcm1.getColumnCount() == 0) {
-//            return;
-//        }
-//
-//        tcm1.getColumn(TMVorraete.COL_NAME).setPreferredWidth(dim.width / 4 * 3);
-//        tcm1.getColumn(TMVorraete.COL_MENGE).setPreferredWidth(dim.width / 4);
-//        tcm1.getColumn(TMVorraete.COL_NAME).setHeaderValue("Vorratsbezeichnung");
-//        tcm1.getColumn(TMVorraete.COL_MENGE).setHeaderValue("Gesamtsumme");
-//    }
 
     @Override
     public void reload() {
@@ -285,7 +253,7 @@ public class PnlInventory extends NursingRecordsPanel {
          */
 
 
-        final boolean withworker = true;
+        final boolean withworker = false;
         cpsInventory.removeAll();
         cpMap.clear();
         contentmap.clear();
@@ -395,13 +363,133 @@ public class PnlInventory extends NursingRecordsPanel {
         cpInventory.setTitleLabelComponent(cptitle.getMain());
         cpInventory.setSlidingDirection(SwingConstants.SOUTH);
 
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)) {
+            final JButton btnCloseInventory = new JButton(SYSConst.icon22playerStop);
+            btnCloseInventory.setPressedIcon(SYSConst.icon22playerStopPressed);
+            btnCloseInventory.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnCloseInventory.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            btnCloseInventory.setContentAreaFilled(false);
+            btnCloseInventory.setBorder(null);
+            btnCloseInventory.setToolTipText(OPDE.lang.getString(internalClassID + ".btncloseinventory.tooltip"));
+            btnCloseInventory.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    new DlgYesNo(OPDE.lang.getString(internalClassID + ".question.close1") + "<br/><b>" + inventory.getText() + "</b>" +
+                            "<br/>" + OPDE.lang.getString(internalClassID + ".question.close2"), SYSConst.icon48stop, new Closure() {
+                        @Override
+                        public void execute(Object answer) {
+                            if (answer.equals(JOptionPane.YES_OPTION)) {
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
 
-        final JToggleButton tbClosedBestand = GUITools.getNiceToggleButton(null);
-        tbClosedBestand.setToolTipText(OPDE.lang.getString(internalClassID + ".showclosedstocks"));
-        tbClosedBestand.addItemListener(new ItemListener() {
+                                    MedInventory myInventory = em.merge(inventory);
+                                    em.lock(myInventory, LockModeType.OPTIMISTIC);
+                                    em.lock(myInventory.getResident(), LockModeType.OPTIMISTIC);
+
+                                    // close all stocks
+                                    for (MedStock stock : inventory.getMedStocks()) {
+                                        if (!stock.isClosed()) {
+                                            MedStock mystock = em.merge(stock);
+                                            em.lock(mystock, LockModeType.OPTIMISTIC);
+                                            MedStockTools.close(em, mystock, OPDE.lang.getString(internalClassID + ".stock.msg.inventory_closed"), MedStockTransactionTools.STATE_EDIT_INVENTORY_CLOSED);
+                                        }
+                                    }
+                                    // close inventory
+                                    myInventory.setTo(new Date());
+
+                                    em.getTransaction().commit();
+
+                                    lstInventories.remove(inventory);
+                                    lstInventories.add(myInventory);
+                                    createCP4(myInventory);
+                                    buildPanel();
+                                } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+            btnCloseInventory.setEnabled(!inventory.isClosed());
+            cptitle.getRight().add(btnCloseInventory);
+
+
+            final JButton btnDelInventory = new JButton(SYSConst.icon22delete);
+            btnDelInventory.setPressedIcon(SYSConst.icon22deletePressed);
+            btnDelInventory.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnDelInventory.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            btnDelInventory.setContentAreaFilled(false);
+            btnDelInventory.setBorder(null);
+            btnDelInventory.setToolTipText(OPDE.lang.getString(internalClassID + ".btndelinventory.tooltip"));
+            btnDelInventory.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    new DlgYesNo(OPDE.lang.getString(internalClassID + ".question.delete1") + "<br/><b>" + inventory.getText() + "</b>" +
+                            "<br/>" + OPDE.lang.getString(internalClassID + ".question.delete2"), SYSConst.icon48delete, new Closure() {
+                        @Override
+                        public void execute(Object answer) {
+                            if (answer.equals(JOptionPane.YES_OPTION)) {
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+
+                                    MedInventory myInventory = em.merge(inventory);
+                                    em.lock(myInventory, LockModeType.OPTIMISTIC);
+                                    em.lock(myInventory.getResident(), LockModeType.OPTIMISTIC);
+
+                                    em.remove(myInventory);
+
+                                    em.getTransaction().commit();
+
+                                    lstInventories.remove(inventory);
+                                    buildPanel();
+                                } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+            cptitle.getRight().add(btnDelInventory);
+        }
+
+        final JToggleButton tbClosedStock = GUITools.getNiceToggleButton(null);
+        tbClosedStock.setToolTipText(OPDE.lang.getString(internalClassID + ".showclosedstocks"));
+        tbClosedStock.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                cpInventory.setContentPane(createContentPanel4(inventory, tbClosedBestand.isSelected()));
+                cpInventory.setContentPane(createContentPanel4(inventory, tbClosedStock.isSelected()));
 
                 try {
                     cpInventory.setCollapsed(false);
@@ -411,8 +499,9 @@ public class PnlInventory extends NursingRecordsPanel {
 
             }
         });
+        tbLastAddedClosedStock = tbClosedStock;
+        cptitle.getRight().add(tbClosedStock);
 
-        cptitle.getRight().add(tbClosedBestand);
 
         /***
          *                                 _ _      _            _                 _                      _
@@ -425,12 +514,12 @@ public class PnlInventory extends NursingRecordsPanel {
         cpInventory.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                cpInventory.setContentPane(createContentPanel4(inventory, tbClosedBestand.isSelected()));
+                cpInventory.setContentPane(createContentPanel4(inventory, tbClosedStock.isSelected()));
             }
         });
 
         if (!cpInventory.isCollapsed()) {
-            cpInventory.setContentPane(createContentPanel4(inventory, tbClosedBestand.isSelected()));
+            cpInventory.setContentPane(createContentPanel4(inventory, tbClosedStock.isSelected()));
         }
 
         cpInventory.setHorizontalAlignment(SwingConstants.LEADING);
@@ -741,6 +830,24 @@ public class PnlInventory extends NursingRecordsPanel {
             cptitle.getRight().add(btnIn);
 
 
+            final JButton btnPrintLabel = new JButton(SYSConst.icon22print);
+            btnPrintLabel.setPressedIcon(SYSConst.icon22printPressed);
+            btnPrintLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnPrintLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            btnPrintLabel.setContentAreaFilled(false);
+            btnPrintLabel.setBorder(null);
+            btnPrintLabel.setToolTipText(OPDE.lang.getString(internalClassID + ".stock.btnprintlabel.tooltip"));
+            btnPrintLabel.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    PrinterType etiprinter = OPDE.getPrinters().getPrinters().get(OPDE.getProps().getProperty("etitype1"));
+                    Form form1 = etiprinter.getForms().get(OPDE.getProps().getProperty("etiform1"));
+                    OPDE.getPrintProcessor().addPrintJob(new PrintListElement(stock, etiprinter, form1, OPDE.getProps().getProperty("etiprinter1")));
+                }
+            });
+            btnPrintLabel.setEnabled(stock.isClosed() && openedStock == null);
+            cptitle.getRight().add(btnPrintLabel);
+
             if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)) {
                 /***
                  *      ____       _   ____  _             _
@@ -1033,62 +1140,6 @@ public class PnlInventory extends NursingRecordsPanel {
         return contentmap.get(key);
     }
 
-
-//    private void initDialog() {
-//
-//        pnlBuchungen = new PnlBuchungen(null, new Closure() {
-//            @Override
-//            public void execute(Object o) {
-//                if (o != null) {
-////                    if (o instanceof MedStockTransaction) {
-////                        recalculate(((MedStockTransaction) o).getStock());
-////                    } else if (o instanceof MedBestand) {
-////                        recalculate((MedBestand) o);
-////                    } else {
-////                        reloadVorratTable();
-////                        reloadBestandTable();
-////                    }
-//
-//                    reloadVorratTable();
-//                    reloadBestandTable();
-//                }
-//            }
-//        });
-//        add(pnlBuchungen, CC.xywh(3, 1, 1, 3));
-//
-//        prepareSearchArea();
-//
-//        tblVorrat.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-//            @Override
-//            public void valueChanged(ListSelectionEvent listSelectionEvent) {
-//                if (!listSelectionEvent.getValueIsAdjusting()) {
-//                    if (tblVorrat.getSelectedRowCount() > 0) {
-//                        MedInventory myInventory = ((TMVorraete) tblVorrat.getModel()).getVorrat(tblVorrat.getSelectedRow());
-//                        if (!myInventory.equals(inventory)) {
-//                            inventory = myInventory;
-//                            reloadBestandTable();
-//                        }
-//                    }
-//                }
-//            }
-//        });
-//        tblBestand.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-//            @Override
-//            public void valueChanged(ListSelectionEvent listSelectionEvent) {
-//                if (!listSelectionEvent.getValueIsAdjusting()) {
-//                    if (tblBestand.getSelectedRowCount() > 0) {
-//                        MedStock myBestand = ((TMBestand) tblBestand.getModel()).getStock(tblBestand.getSelectedRow());
-//                        if (!myBestand.equals(bestand)) {
-//                            bestand = myBestand;
-//                            pnlBuchungen.setBestand(bestand);
-//                        }
-//                    }
-//
-//                }
-//            }
-//        });
-//    }
-
     /**
      * This method is called from within the constructor to
      * initialize the form.
@@ -1115,20 +1166,6 @@ public class PnlInventory extends NursingRecordsPanel {
         add(jspInventory);
     }// </editor-fold>//GEN-END:initComponents
 
-//    private void printBestand() {
-////        if (!bwkennung.equals("") ||
-////                JOptionPane.showConfirmDialog(this, "Es wurde kein Bewohner ausgewählt.\nMöchten Sie wirklich eine Gesamtliste ausdrucken ?", "Frage", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-////
-////            HashMap params = new HashMap();
-////            JRDSMedBestand jrds = new JRDSMedBestand(bwkennung);
-////
-////            SYSPrint.printReport(preview, jrds, params, "medbestand", dialog);
-////            if (!preview && !dialog) {
-////                JOptionPane.showMessageDialog(this, "Der Druckvorgang ist abgeschlossen.", "Drucker", JOptionPane.INFORMATION_MESSAGE);
-////            }
-////        }
-//    }
-
     private void txtSucheActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSucheActionPerformed
 
         JXSearchField search = (JXSearchField) evt.getSource();
@@ -1136,373 +1173,44 @@ public class PnlInventory extends NursingRecordsPanel {
             // numbers only !
             long id = Long.parseLong(search.getText());
             EntityManager em = OPDE.createEM();
-            MedStock stock = em.find(MedStock.class, id);
+            final MedStock stock = em.find(MedStock.class, id);
             em.close();
 
-            if (bestand != null) {
-                if (!resident.equals(bestand.getInventory().getResident())) {
-                    resident = bestand.getInventory().getResident();
-                    OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(resident));
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Medikament gehört eine[m|r] anderen Bewohner[in]. Habe umgeschaltet.", 2));
-                    OPDE.getMainframe().change2Bewohner(resident);
-                }
+            if (stock != null) {
+                if (!resident.equals(stock.getInventory().getResident())) {
+                    if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlInfo.internalClassID, InternalClassACL.ARCHIVE)) { // => ACLMATRIX
+                        switchResident(stock.getInventory().getResident(), stock.getInventory());
+                    } else {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.noarchiveaccess"));
+                    }
 
-//                reloadVorratTable(bestand);
+                } else {
+                    lstInventories.clear();
+                    lstInventories.add(stock.getInventory());
+                    reloadDisplay();
+                }
+                tbLastAddedClosedStock.setSelected(true);
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        cpMap.get(stock.getID() + ".xstock").revalidate();
+                        GUITools.scroll2show(jspInventory, cpMap.get(stock.getID() + ".xstock").getLocation().y, new Closure() {
+                            @Override
+                            public void execute(Object o) {
+                                GUITools.flashBackground(cpMap.get(stock.getID() + ".xstock"), Color.YELLOW, 2);
+                            }
+                        });
+                    }
+                });
+
 
             } else {
-                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Der eingegebene Bestand existiert nicht.", 2));
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.notfound"));
             }
 
         }
     }//GEN-LAST:event_txtSucheActionPerformed
-
-//    private void tblBestandMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBestandMousePressed
-//        final TMBestand tm = (TMBestand) tblBestand.getModel();
-//        if (tm.getRowCount() == 0) {
-//            bestand = null;
-//            return;
-//        }
-//
-//        Point p = evt.getPoint();
-//        final int col = tblBestand.columnAtPoint(p);
-//        final int row = tblBestand.rowAtPoint(p);
-//
-//
-//        bestand = tm.getStock(row);
-//        pnlBuchungen.setBestand(bestand);
-//
-//
-//        // Menüeinträge
-//        if (evt.isPopupTrigger()) {
-//
-//            ListSelectionModel lsm = tblBestand.getSelectionModel();
-//            lsm.setSelectionInterval(row, row);
-//
-//            SYSTools.unregisterListeners(menuV);
-//            menuV = new JPopupMenu();
-//
-//            // ---------------
-//            JMenuItem itemPopupAnbruch = new JMenuItem("Bestand anbrechen", new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_play.png")));
-//            itemPopupAnbruch.addActionListener(new java.awt.event.ActionListener() {
-//
-//                public void actionPerformed(java.awt.event.ActionEvent evt) {
-//
-//                    EntityManager em = OPDE.createEM();
-//                    try {
-//                        em.getTransaction().begin();
-//                        bestand = em.merge(bestand);
-//                        em.lock(bestand, LockModeType.OPTIMISTIC);
-//                        BigDecimal apv = MedStockTools.getAPV4(bestand);
-//                        MedStockTools.anbrechen(bestand, apv);
-//                        em.getTransaction().commit();
-//                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bestand Nr. " + bestand.getID() + " wurde angebrochen", 2));
-//                        reloadBestandTable();
-//                    } catch (OptimisticLockException ole) {
-//                        em.getTransaction().rollback();
-//                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Dieser Bestand wurde zwischenzeitlich geändert.", internalClassID));
-//                        reloadVorratTable();
-//                    } catch (Exception e) {
-//                        if (em.getTransaction().isActive()) {
-//                            em.getTransaction().rollback();
-//                        }
-//                        OPDE.fatal(e);
-//                    } finally {
-//                        em.close();
-//                    }
-//
-//                    reloadBestandTable();
-//                }
-//            });
-//            itemPopupAnbruch.setEnabled(!bestand.isClosed() && !bestand.isOpened());
-//            menuV.add(itemPopupAnbruch);
-//
-//            // ---------------
-//            JMenuItem itemPopupVerschließen = new JMenuItem("Bestand wieder verschließen", new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_stop.png")));
-//            itemPopupVerschließen.addActionListener(new java.awt.event.ActionListener() {
-//
-//                public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                    EntityManager em = OPDE.createEM();
-//                    try {
-//                        em.getTransaction().begin();
-//                        bestand = em.merge(bestand);
-//                        em.lock(bestand, LockModeType.OPTIMISTIC);
-//                        bestand.setOut(SYSConst.DATE_BIS_AUF_WEITERES);
-//                        bestand.setOpened(SYSConst.DATE_BIS_AUF_WEITERES);
-//                        em.getTransaction().commit();
-//                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bestand Nr. " + bestand.getID() + " wurde wieder verschlossen", 2));
-//                        reloadBestandTable();
-//                    } catch (OptimisticLockException ole) {
-//                        em.getTransaction().rollback();
-//                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Dieser Bestand wurde zwischenzeitlich geändert.", internalClassID));
-//                        reloadVorratTable();
-//                    } catch (Exception e) {
-//                        if (em.getTransaction().isActive()) {
-//                            em.getTransaction().rollback();
-//                        }
-//                        OPDE.fatal(e);
-//                    } finally {
-//                        em.close();
-//                    }
-//                    reloadBestandTable();
-//                }
-//            });
-//            itemPopupVerschließen.setEnabled(!bestand.isClosed() && bestand.isOpened());
-//            menuV.add(itemPopupVerschließen);
-//
-//            // ----------------
-//            JMenuItem itemPopupClose = new JMenuItem("Bestand abschließen", new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_end.png")));
-//            itemPopupClose.addActionListener(new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent actionEvent) {
-//                    new DlgYesNo("Möchten Sie den Bestand Nr. " + bestand.getID() + " wirklich abschließen ?", new ImageIcon(getClass().getResource("/artwork/48x48/bw/bottom.png")), new Closure() {
-//                        @Override
-//                        public void execute(Object answer) {
-//                            if (answer.equals(JOptionPane.YES_OPTION)) {
-//                                EntityManager em = OPDE.createEM();
-//                                try {
-//                                    em.getTransaction().begin();
-//                                    bestand = em.merge(bestand);
-//                                    MedStockTools.close(em, bestand, "", MedStockTransactionTools.STATE_EDIT_MANUAL);
-//                                    em.getTransaction().commit();
-//                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bestand Nr. " + bestand.getID() + " wurde abgeschlossen", 2));
-//                                    reloadBestandTable();
-//                                } catch (OptimisticLockException ole) {
-//                                    em.getTransaction().rollback();
-//                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Dieser Bestand wurde zwischenzeitlich geändert.", internalClassID));
-//                                    reloadVorratTable();
-//                                } catch (Exception e) {
-//                                    if (em.getTransaction().isActive()) {
-//                                        em.getTransaction().rollback();
-//                                    }
-//                                    OPDE.fatal(e);
-//                                } finally {
-//                                    em.close();
-//                                }
-//                            }
-//                        }
-//                    });
-//                }
-//            });
-//
-//
-//            itemPopupClose.setEnabled(bestand.isOpened());
-//            menuV.add(itemPopupClose);
-//
-//            // ---------------
-//            JMenuItem itemPopupEinbuchen = new JMenuItem("Bestand wieder aktivieren", new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_start.png")));
-//            itemPopupEinbuchen.addActionListener(new java.awt.event.ActionListener() {
-//
-//                public void actionPerformed(java.awt.event.ActionEvent evt) {
-//
-//                    EntityManager em = OPDE.createEM();
-//                    try {
-//                        em.getTransaction().begin();
-//                        bestand = em.merge(bestand);
-//                        em.lock(bestand, LockModeType.OPTIMISTIC);
-//                        bestand.setOut(SYSConst.DATE_BIS_AUF_WEITERES);
-//                        em.getTransaction().commit();
-//                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bestand Nr. " + bestand.getID() + " wurde wieder aktiviert", 2));
-//                        reloadBestandTable();
-//                    } catch (OptimisticLockException ole) {
-//                        em.getTransaction().rollback();
-//                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Dieser Bestand wurde zwischenzeitlich geändert.", internalClassID));
-//                        reloadVorratTable();
-//                    } catch (Exception e) {
-//                        if (em.getTransaction().isActive()) {
-//                            em.getTransaction().rollback();
-//                        }
-//                        OPDE.fatal(e);
-//                    } finally {
-//                        em.close();
-//                    }
-//                }
-//            });
-//            itemPopupEinbuchen.setEnabled(bestand.isClosed());
-//            menuV.add(itemPopupEinbuchen);
-//
-//            JMenuItem itemPopupDelete = new JMenuItem("Löschen", new ImageIcon(getClass().getResource("/artwork/22x22/bw/trashcan_empty.png")));
-//            itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
-//
-//                public void actionPerformed(java.awt.event.ActionEvent evt) {
-//
-//                    new DlgYesNo("Möchten Sie den Bestand Nr. " + bestand.getID() + " wirklich löschen ?", new ImageIcon(getClass().getResource("/artwork/48x48/bw/trashcan_empty.png")), new Closure() {
-//                        @Override
-//                        public void execute(Object answer) {
-//                            if (answer.equals(JOptionPane.YES_OPTION)) {
-//                                EntityManager em = OPDE.createEM();
-//                                try {
-//                                    em.getTransaction().begin();
-//                                    bestand = em.merge(bestand);
-//
-//                                    MedInventory inventory = em.merge(bestand.getInventory());
-//
-//                                    em.lock(bestand, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-//                                    em.lock(inventory, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-//
-//                                    inventory.getMedStocks().remove(bestand);
-//                                    em.remove(bestand);
-//
-//                                    em.getTransaction().commit();
-//                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bestand Nr. " + bestand.getID() + " und alle zugehörigen Buchungen wurden gelöscht.", 2));
-//                                    reloadBestandTable();
-//                                } catch (OptimisticLockException ole) {
-//                                    em.getTransaction().rollback();
-//                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Dieser Bestand wurde zwischenzeitlich geändert.", internalClassID));
-//                                    reloadVorratTable();
-//                                } catch (Exception e) {
-//                                    if (em.getTransaction().isActive()) {
-//                                        em.getTransaction().rollback();
-//                                    }
-//                                    OPDE.fatal(e);
-//                                } finally {
-//                                    em.close();
-//                                }
-//                            }
-//                        }
-//                    });
-//                }
-//            });
-//            menuV.add(itemPopupDelete);
-//            // ----------------
-//            menuV.add(new JSeparator());
-//
-//            JMenuItem itemPopupPrint = new JMenuItem("Beleg drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")));
-//            itemPopupPrint.addActionListener(new java.awt.event.ActionListener() {
-//
-//                public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                    //SYSPrint.printLabel(mybestid);
-//                }
-//            });
-//            menuV.add(itemPopupPrint);
-//
-//
-//            menuV.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
-//        }
-//    }//GEN-LAST:event_tblBestandMousePressed
-//
-//    private void tblVorratMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblVorratMousePressed
-//        final TMVorraete tm = (TMVorraete) tblVorrat.getModel();
-//        if (tm.getRowCount() == 0) {
-//            inventory = null;
-//            return;
-//        }
-//
-//        Point p = evt.getPoint();
-////        final int col = tblVorrat.columnAtPoint(p);
-//        final int row = tblVorrat.rowAtPoint(p);
-//        ListSelectionModel lsm = tblVorrat.getSelectionModel();
-//        lsm.setSelectionInterval(row, row);
-//
-//        inventory = tm.getVorrat(row);
-//        reloadBestandTable();
-//
-//        if (evt.isPopupTrigger()) {
-//            // Menüeinträge
-//            SYSTools.unregisterListeners(menuV);
-//            menuV = new JPopupMenu();
-//
-//            // <** TEST 0001
-//            JMenuItem itemPopupDelete = new JMenuItem("Vorrat löschen", new ImageIcon(getClass().getResource("/artwork/22x22/bw/trashcan_empty.png")));
-//            itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
-//
-//                public void actionPerformed(java.awt.event.ActionEvent evt) {
-//
-//                    new DlgYesNo("Möchten Sie den Vorrat Nr. " + inventory.getID() + " wirklich löschen ?", new ImageIcon(getClass().getResource("/artwork/48x48/bw/trashcan_empty.png")), new Closure() {
-//                        @Override
-//                        public void execute(Object answer) {
-//                            if (answer.equals(JOptionPane.YES_OPTION)) {
-//                                OPDE.getDisplayManager().setDBActionMessage(true);
-//                                EntityManager em = OPDE.createEM();
-//                                try {
-//                                    em.getTransaction().begin();
-//
-//                                    inventory = em.merge(inventory);
-//                                    em.lock(inventory, LockModeType.OPTIMISTIC);
-//                                    em.remove(inventory);
-//
-//                                    em.getTransaction().commit();
-//                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Vorrat Nr. " + inventory.getID() + " und alle zugehörigen Bestände und Buchungen wurden gelöscht.", 2));
-//                                } catch (OptimisticLockException ole) {
-//                                    em.getTransaction().rollback();
-//                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Dieser Vorrat wurde zwischenzeitlich geändert.", internalClassID));
-//                                } catch (Exception e) {
-//                                    if (em.getTransaction().isActive()) {
-//                                        em.getTransaction().rollback();
-//                                    }
-//                                    OPDE.fatal(e);
-//                                } finally {
-//                                    em.close();
-//                                }
-//                                OPDE.getDisplayManager().setDBActionMessage(false);
-//                            }
-//                        }
-//                    });
-//                    reloadVorratTable();
-//
-//                }
-//            });
-//            menuV.add(itemPopupDelete);
-//            // TEST 0001 **>
-//
-//
-//            // <** TEST 0002
-//            JMenuItem itemPopupClose = new JMenuItem("Vorrat abschließen und ausbuchen", new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_end.png")));
-//            itemPopupClose.addActionListener(new java.awt.event.ActionListener() {
-//
-//                public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                    new DlgYesNo("Möchten Sie den Vorrat Nr. " + inventory.getID() + " wirklich abschließen ?", new ImageIcon(getClass().getResource("/artwork/48x48/bw/player_end.png")), new Closure() {
-//                        @Override
-//                        public void execute(Object answer) {
-//                            if (answer.equals(JOptionPane.YES_OPTION)) {
-//                                OPDE.getDisplayManager().setDBActionMessage(true);
-//                                EntityManager em = OPDE.createEM();
-//                                try {
-//                                    em.getTransaction().begin();
-//
-//                                    inventory = em.merge(inventory);
-//                                    em.lock(inventory, LockModeType.OPTIMISTIC);
-//
-//
-//                                    // Alle Bestände close.
-//                                    for (MedStock bestand : inventory.getMedStocks()) {
-//                                        if (!bestand.isClosed()) {
-//                                            bestand = em.merge(bestand);
-//                                            em.lock(bestand, LockModeType.OPTIMISTIC);
-//                                            MedStockTools.close(em, bestand, "Abschluss des Bestandes bei Vorratsabschluss.", MedStockTransactionTools.STATE_EDIT_INVENTORY_CLOSED);
-//                                        }
-//                                    }
-//
-//                                    // Vorrat close
-//                                    inventory.setBis(new Date());
-//
-//                                    em.getTransaction().commit();
-//                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Vorrat Nr. " + inventory.getID() + " und alle zugehörigen Bestände abgeschlossen", 2));
-//
-//                                } catch (OptimisticLockException ole) {
-//                                    em.getTransaction().rollback();
-//                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Dieser Vorrat wurde zwischenzeitlich geändert", internalClassID));
-//                                } catch (Exception e) {
-//                                    if (em.getTransaction().isActive()) {
-//                                        em.getTransaction().rollback();
-//                                    }
-//                                    OPDE.fatal(e);
-//                                } finally {
-//                                    em.close();
-//                                }
-//                                OPDE.getDisplayManager().setDBActionMessage(false);
-//                            }
-//                        }
-//                    });
-//                    reloadVorratTable();
-//                }
-//            });
-//            menuV.add(itemPopupClose);
-//            // TEST 0002 **>
-//
-//            menuV.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
-//        }
-//    }//GEN-LAST:event_tblVorratMousePressed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JScrollPane jspInventory;

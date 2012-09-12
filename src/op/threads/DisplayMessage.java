@@ -32,7 +32,14 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
 
 
     public DisplayMessage(String message) {
-        this.message = message;
+        String title = SYSTools.catchNull(message);
+        try {
+            title = OPDE.lang.getString(message);
+        } catch (Exception e){
+            // ok, its not a langbundle key
+        }
+
+        this.message = title;
         this.priority = NORMAL;
         this.timestamp = System.currentTimeMillis();
         this.processed = 0;
@@ -43,7 +50,15 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
     }
 
     public DisplayMessage(String message, int secondsToShow) {
-        this.message = message;
+
+        String title = SYSTools.catchNull(message);
+        try {
+            title = OPDE.lang.getString(message);
+        } catch (Exception e){
+            // ok, its not a langbundle key
+        }
+
+        this.message = title;
         this.priority = NORMAL;
         this.timestamp = System.currentTimeMillis();
         this.processed = 0;
@@ -54,7 +69,14 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
     }
 
     public DisplayMessage(String message, int progress, int max) {
-        this.message = message;
+        String title = SYSTools.catchNull(message);
+        try {
+            title = OPDE.lang.getString(message);
+        } catch (Exception e){
+            // ok, its not a langbundle key
+        }
+
+        this.message = title;
         this.priority = NORMAL;
         this.timestamp = System.currentTimeMillis();
         this.processed = 0;
@@ -65,7 +87,14 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
     }
 
     public DisplayMessage(String message, short priority, int secondsToShow) {
-        this.message = message;
+        String title = SYSTools.catchNull(message);
+        try {
+            title = OPDE.lang.getString(message);
+        } catch (Exception e){
+            // ok, its not a langbundle key
+        }
+
+        this.message = title;
         this.priority = priority;
         this.timestamp = System.currentTimeMillis();
         this.processed = 0;
@@ -76,7 +105,14 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
     }
 
     public DisplayMessage(String message, short priority) {
-        this.message = message;
+        String title = SYSTools.catchNull(message);
+        try {
+            title = OPDE.lang.getString(message);
+        } catch (Exception e){
+            // ok, its not a langbundle key
+        }
+
+        this.message = title;
         this.priority = priority;
         this.timestamp = System.currentTimeMillis();
         this.processed = 0;
@@ -97,7 +133,14 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
                           long timestamp,
                           long processed,
                           int secondsToShow) {
-        this.message = message;
+        String title = SYSTools.catchNull(message);
+        try {
+            title = OPDE.lang.getString(message);
+        } catch (Exception e){
+            // ok, its not a langbundle key
+        }
+
+        this.message = title;
         this.priority = priority;
         this.timestamp = timestamp;
         this.processed = processed;
@@ -108,7 +151,13 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
     }
 
     public DisplayMessage(String message, String classname) {
-        this.message = message;
+        String title = SYSTools.catchNull(message);
+        try {
+            title = OPDE.lang.getString(message);
+        } catch (Exception e){
+            // ok, its not a langbundle key
+        }
+        this.message = title;
         this.priority = IMMEDIATELY;
         this.timestamp = System.currentTimeMillis();
         this.processed = 0;
