@@ -32,8 +32,6 @@ import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
-import entity.AllowanceTools;
-import entity.files.SYSFilesTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.prescription.*;
@@ -102,8 +100,6 @@ public class PnlInventory extends NursingRecordsPanel {
     private ArrayList<MedInventory> lstInventories;
     private HashMap<String, CollapsiblePane> cpMap;
     private HashMap<String, JPanel> contentmap;
-    //    private HashMap<MedInventory, BigDecimal> invsummap;
-//    private HashMap<MedStock, BigDecimal> stocksummap;
     private HashMap<MedStockTransaction, JPanel> linemap;
 
     private JScrollPane jspSearch;
@@ -224,15 +220,24 @@ public class PnlInventory extends NursingRecordsPanel {
         java.util.List<Component> list = new ArrayList<Component>();
 
 
-        final JideButton btnPrintStat = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".printresident"), SYSConst.icon22print, null);
-        btnPrintStat.addActionListener(new ActionListener() {
+        JideButton buchenButton = GUITools.createHyperlinkButton(internalClassID + ".newstocks", SYSConst.icon22add, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                //TODO: hatte ich den schon ?
-                SYSFilesTools.print(, false);
+                new DlgNewStocks(resident);
             }
         });
-        list.add(btnPrintStat);
+        list.add(buchenButton);
+
+
+//        final JideButton btnPrintStat = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".printresident"), SYSConst.icon22print, null);
+//        btnPrintStat.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent actionEvent) {
+//
+//
+//            }
+//        });
+//        list.add(btnPrintStat);
 
         return list;
     }
@@ -253,7 +258,7 @@ public class PnlInventory extends NursingRecordsPanel {
          */
 
 
-        final boolean withworker = false;
+        final boolean withworker = true;
         cpsInventory.removeAll();
         cpMap.clear();
         contentmap.clear();
@@ -364,6 +369,14 @@ public class PnlInventory extends NursingRecordsPanel {
         cpInventory.setSlidingDirection(SwingConstants.SOUTH);
 
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)) {
+            /***
+             *       ____ _                ___                      _
+             *      / ___| | ___  ___  ___|_ _|_ ____   _____ _ __ | |_ ___  _ __ _   _
+             *     | |   | |/ _ \/ __|/ _ \| || '_ \ \ / / _ \ '_ \| __/ _ \| '__| | | |
+             *     | |___| | (_) \__ \  __/| || | | \ V /  __/ | | | || (_) | |  | |_| |
+             *      \____|_|\___/|___/\___|___|_| |_|\_/ \___|_| |_|\__\___/|_|   \__, |
+             *                                                                    |___/
+             */
             final JButton btnCloseInventory = new JButton(SYSConst.icon22playerStop);
             btnCloseInventory.setPressedIcon(SYSConst.icon22playerStopPressed);
             btnCloseInventory.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -429,7 +442,14 @@ public class PnlInventory extends NursingRecordsPanel {
             btnCloseInventory.setEnabled(!inventory.isClosed());
             cptitle.getRight().add(btnCloseInventory);
 
-
+            /***
+             *      ____       _ ___                      _
+             *     |  _ \  ___| |_ _|_ ____   _____ _ __ | |_ ___  _ __ _   _
+             *     | | | |/ _ \ || || '_ \ \ / / _ \ '_ \| __/ _ \| '__| | | |
+             *     | |_| |  __/ || || | | \ V /  __/ | | | || (_) | |  | |_| |
+             *     |____/ \___|_|___|_| |_|\_/ \___|_| |_|\__\___/|_|   \__, |
+             *                                                          |___/
+             */
             final JButton btnDelInventory = new JButton(SYSConst.icon22delete);
             btnDelInventory.setPressedIcon(SYSConst.icon22deletePressed);
             btnDelInventory.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -524,6 +544,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
         cpInventory.setHorizontalAlignment(SwingConstants.LEADING);
         cpInventory.setOpaque(false);
+        cpInventory.setBackground(SYSConst.greyscale[SYSConst.medium2]);
 
         return cpInventory;
     }
@@ -574,10 +595,10 @@ public class PnlInventory extends NursingRecordsPanel {
 
         String title = "<html><table border=\"0\">" +
                 "<tr>" +
-
+                (stock.isClosed() ? "<s>" : "") +
                 "<td width=\"600\" align=\"left\">" + MedStockTools.getCompactHTML(stock) + "</td>" +
                 "<td width=\"200\" align=\"right\">" + NumberFormat.getNumberInstance().format(sumStock) + " " + DosageFormTools.getUsageText(MedInventoryTools.getForm(stock.getInventory())) + "</td>" +
-
+                (stock.isClosed() ? "</s>" : "") +
                 "</tr>" +
                 "</table>" +
 
@@ -936,6 +957,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
         cpStock.setHorizontalAlignment(SwingConstants.LEADING);
         cpStock.setOpaque(false);
+        cpStock.setBackground(SYSConst.greyscale[SYSConst.medium1]);
         cpStock.revalidate();
         for (Component comp : cpStock.getComponents()) {
             OPDE.debug(comp.getLocation());
@@ -952,7 +974,10 @@ public class PnlInventory extends NursingRecordsPanel {
 
             final JPanel pnlTX = new JPanel(new VerticalLayout());
 //            pnlTX.setLayout(new BoxLayout(pnlTX, BoxLayout.PAGE_AXIS));
+
             pnlTX.setOpaque(false);
+
+            pnlTX.setBackground(SYSConst.greyscale[SYSConst.light3]);
 
             JTextPane txtPane = new JTextPane();
             txtPane.setContentType("text/html");

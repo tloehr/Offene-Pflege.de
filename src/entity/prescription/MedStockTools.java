@@ -245,9 +245,9 @@ public class MedStockTools {
                         verordnung = em.merge(verordnung);
                         em.lock(verordnung, LockModeType.OPTIMISTIC);
                         verordnung.setTo(new Date());
-                        verordnung.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
-                        verordnung.setAbArzt(verordnung.getAnArzt());
-                        verordnung.setAbKH(verordnung.getAnKH());
+                        verordnung.setUserOFF(em.merge(OPDE.getLogin().getUser()));
+                        verordnung.setDocOFF(verordnung.getDocON());
+                        verordnung.setHospitalOFF(verordnung.getHospitalON());
                         BHPTools.cleanup(em, verordnung);
                     }
                 }

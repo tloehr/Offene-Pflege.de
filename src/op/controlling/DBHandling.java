@@ -190,72 +190,7 @@ public class DBHandling {
         return html.toString();
     }
 
-//    public static String getMediKontrolle(String station, int headertiefe) {
-//        StringBuilder html = new StringBuilder(1000);
-//        String sql = "" +
-//                " SELECT bw.nachname, bw.vorname, bw.geschlecht, bw.bwkennung, prod.Bezeichnung, daf.Zusatz, form.Zubereitung, form.AnwText, " +
-//                " (CASE form.PackEinheit WHEN 1 THEN 'Stück' WHEN 2 THEN 'ml' WHEN 3 THEN 'l' WHEN 4 THEN 'mg' WHEN 5 THEN 'g' WHEN 6 THEN 'cm' WHEN 7 THEN 'm' ELSE '!FEHLER!' END) Bestandsmenge, " +
-//                " best.BestID, best.Anbruch " +
-//                " FROM Bewohner bw " +
-//                " INNER JOIN BWInfo ba ON bw.BWKennung = ba.BWKennung " +
-//                " INNER JOIN MPVorrat vor ON vor.BWKennung = bw.BWKennung " +
-//                " INNER JOIN MPBestand best ON vor.VorID = best.VorID " +
-//                " INNER JOIN MPDarreichung daf ON best.DafID = daf.DafID " +
-//                " INNER JOIN MProdukte prod ON prod.MedPID = daf.MedPID " +
-//                " INNER JOIN MPFormen form ON form.FormID = daf.FormID " +
-//                " WHERE ba.BWINFTYP = 'station' and ba.von < now() and ba.bis > now() and ba.XML = '<station value=\"" + station + "\"/>' " +
-//                " AND best.Anbruch < now() and best.Aus = '9999-12-31 23:59:59' AND adminonly <> 2 " +
-//                " ORDER BY bw.Nachname, bw.Vorname, vor.Text, best.Anbruch ";
-//
-//        try {
-//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-//            ResultSet rs = stmt.executeQuery();
-//            DateFormat df = DateFormat.getDateInstance();
-//            if (rs.first()) {
-//                html.append("<h" + headertiefe + ">");
-//                html.append("Liste zur Medikamentenkontrolle");
-//                html.append("</h" + headertiefe + ">");
-//                html.append("<h" + (headertiefe + 1) + ">");
-//                html.append("Legende");
-//                html.append("</h" + (headertiefe + 1) + ">");
-//                html.append("#1 - Medikament abgelaufen<br/>");
-//                html.append("#2 - Packung nicht beschriftet<br/>");
-//                html.append("#3 - Packung beschädigt<br/>");
-//                html.append("#4 - Anbruchsdatum nicht vermerkt<br/>");
-//                html.append("#5 - Medikament ist nicht verordnet<br/>");
-//                html.append("#6 - Mehr als 1 Blister im Anbruch<br/>");
-//                html.append("#7 - Mehr als 1 Tablette geteilt<br/><br/>");
-//
-//                html.append("<table border=\"1\"><tr>" +
-//                        "<th>BewohnerIn</th><th>BestNr</th><th>Präparat</th><th>Anbruch</th><th>#1</th><th>#2</th><th>#3</th><th>#4</th><th>#5</th><th>#6</th><th>#7</th></tr>");
-//                rs.beforeFirst();
-//                while (rs.next()) {
-//                    html.append("<tr>");
-//                    String name = SYSTools.anonymizeBW(rs.getString("Nachname"), rs.getString("Vorname"), rs.getString("BWKennung"), rs.getInt("geschlecht"));
-//                    //String name = rs.getString("BWName");
-//                    String bez = rs.getString("Bezeichnung");
-//                    String zusatz = rs.getString("Zusatz");
-//                    String zubereitung = rs.getString("Zubereitung");
-//                    String anwtext = rs.getString("AnwText");
-//                    //String bestmng = rs.getString("Bestandsmenge");
-//                    long bestid = rs.getLong("BestID");
-//                    Date datum = rs.getDate("Anbruch");
-//                    String praep = bez + SYSTools.catchNull(zusatz, " ", "") + SYSTools.catchNull(zubereitung, ", ", "") + SYSTools.catchNull(anwtext, ", ", "");
-//                    html.append("<td>" + name + "</td>");
-//                    html.append("<td>" + bestid + "</td>");
-//                    html.append("<td>" + praep + "</td>");
-//                    html.append("<td>" + df.format(datum) + "</td>");
-//                    html.append("<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>");
-//                    html.append("</tr>");
-//                }
-//                html.append("</table>");
-//            }
-//
-//        } catch (SQLException sQLException) {
-//            // new DlgException(sQLException);
-//        }
-//        return html.toString();
-//    }
+
 
 //    public static String getSozialBerichte(EntityManager em, String bwkennung, String ukennung, int headertiefe, int sozialwochen) {
 //

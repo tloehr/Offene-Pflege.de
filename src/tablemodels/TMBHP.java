@@ -203,7 +203,7 @@ public class TMBHP extends AbstractTableModel {
 
         switch (col) {
             case COL_BEZEICHNUNG: {
-                result = PrescriptionsTools.getPrescriptionAsText(bhp.getPrescriptionSchedule().getPrescription());
+                result = PrescriptionsTools.getShortDescription(bhp.getPrescriptionSchedule().getPrescription());
                 break;
             }
             case COL_DOSIS: {
@@ -235,8 +235,8 @@ public class TMBHP extends AbstractTableModel {
                         result = result.toString() + "<i>nächster anzubrechender Bestand Nr.: " + nextbest + "<i><br/>";
                     }
                 }
-                if (!SYSTools.catchNull(bhp.getPrescriptionSchedule().getPrescription().getBemerkung()).isEmpty()) {
-                    result = result.toString() + "<b>Bemerkung:</b> " + bhp.getPrescriptionSchedule().getPrescription().getBemerkung();
+                if (!SYSTools.catchNull(bhp.getPrescriptionSchedule().getPrescription().getText()).isEmpty()) {
+                    result = result.toString() + "<b>Bemerkung:</b> " + bhp.getPrescriptionSchedule().getPrescription().getText();
                 }
                 break;
             }

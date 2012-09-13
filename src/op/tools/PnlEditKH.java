@@ -6,7 +6,7 @@ package op.tools;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.Krankenhaus;
+import entity.prescription.Hospital;
 import op.OPDE;
 
 import javax.swing.*;
@@ -18,9 +18,9 @@ import java.awt.event.FocusEvent;
  * @author Torsten Löhr
  */
 public class PnlEditKH extends JPanel {
-    private Krankenhaus kh;
+    private Hospital kh;
 
-    public PnlEditKH(Krankenhaus kh) {
+    public PnlEditKH(Hospital kh) {
         this.kh = kh;
         initComponents();
         initPanel();
@@ -56,7 +56,7 @@ public class PnlEditKH extends JPanel {
         txtFax.addFocusListener(fa);
     }
 
-    public Krankenhaus getKrankenhaus(){
+    public Hospital getKrankenhaus(){
         if (txtKHName.getText().isEmpty()){
             return null;
         }

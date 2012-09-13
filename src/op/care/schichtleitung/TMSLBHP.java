@@ -280,12 +280,12 @@ public class TMSLBHP
                     result += "<b>" + rs.getString("mptext1").replaceAll("-", "- ") +
                             SYSTools.catchNull(rs.getString("dafzusatz1"), " ", "") + "</b>" + ", " +
                             SYSTools.catchNull(rs.getString("Zubereitung"), ", ", ", ") +
-                            SYSTools.catchNull(rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText"));
+                            SYSTools.catchNull(rs.getString("AnwText").equals("") ? SYSConst.UNITS[rs.getInt("AnwEinheit")] : rs.getString("AnwText"));
                 } else {
                     result += "<b>" + rs.getString("Bezeichnung").replaceAll("-", "- ") +
                             SYSTools.catchNull(rs.getString("Zusatz"), " ", "") + "</b>" + ", " +
                             SYSTools.catchNull(rs.getString("Zubereitung"), ", ", ", ") +
-                            SYSTools.catchNull(rs.getString("AnwText").equals("") ? SYSConst.EINHEIT[rs.getInt("AnwEinheit")] : rs.getString("AnwText"));
+                            SYSTools.catchNull(rs.getString("AnwText").equals("") ? SYSConst.UNITS[rs.getInt("AnwEinheit")] : rs.getString("AnwText"));
                 }
             }
             if (isAbgesetzt()) {

@@ -1,12 +1,5 @@
 package entity.info;
 
-import entity.Arzt;
-import op.OPDE;
-import op.tools.SYSTools;
-
-import javax.swing.*;
-import java.awt.*;
-
 /**
  * Created by IntelliJ IDEA.
  * User: tloehr
@@ -23,8 +16,8 @@ public class ICDTools {
 //                if (o == null) {
 //                    text = OPDE.lang.getString("misc.commands.>>noselection<<");
 //                } else if (o instanceof ICD) {
-////                    text = ((Arzt) o).getName() + ", " + ((Arzt) o).getVorname() + ", " + ((Arzt) o).getOrt();
-//                    text = getFullName((Arzt) o);
+////                    text = ((Doc) o).getName() + ", " + ((Doc) o).getVorname() + ", " + ((Doc) o).getOrt();
+//                    text = getFullName((Doc) o);
 //                } else {
 //                    text = o.toString();
 //                }

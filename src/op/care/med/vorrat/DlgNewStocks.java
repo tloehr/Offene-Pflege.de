@@ -64,15 +64,8 @@ import java.util.List;
 /**
  * @author tloehr
  */
-public class DlgBestand extends MyJDialog {
+public class DlgNewStocks extends MyJDialog {
     private boolean ignoreEvent;
-
-//    private String template;
-
-//    private boolean medEingegeben = false;
-//    private boolean mengeEingegeben = false;
-//    private boolean bwEingegeben = false;
-//    private boolean packungEingegeben = false;
 
     private BigDecimal menge;
     private MedPackage aPackage;
@@ -92,7 +85,7 @@ public class DlgBestand extends MyJDialog {
     private PrinterType etiprinter;
     private Form form1;
 
-    public DlgBestand(Resident bewohner) {
+    public DlgNewStocks(Resident bewohner) {
         super();
         this.bewohner = bewohner;
         initComponents();
@@ -479,7 +472,7 @@ public class DlgBestand extends MyJDialog {
         try {
             em.getTransaction().begin();
 
-            em.lock(bewohner, LockModeType.OPTIMISTIC);
+            em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
 
             // Wenn die aPackage null ist, dann ist eine Sonderpackung
             if (aPackage != null) {

@@ -175,7 +175,7 @@ public class TMVerordnung extends AbstractTableModel {
         if (cache.containsKey(getPrescription(row))) {
             result = cache.get(getPrescription(row)).toString();
         } else {
-            result = PrescriptionsTools.getDosis(getPrescription(row), mitBestand);
+            result = PrescriptionsTools.getDose(getPrescription(row), mitBestand);
             cache.put(getPrescription(row), result);
         }
         return result;
@@ -190,7 +190,7 @@ public class TMVerordnung extends AbstractTableModel {
             case COL_MSSN: {
 
                 String res = "";
-                res = PrescriptionsTools.getPrescriptionAsText(verordnung);
+//                res = PrescriptionsTools.getPrescriptionAsText(verordnung);
                 if (!verordnung.getAttachedFiles().isEmpty()) {
                     res += "<font color=\"green\">&#9679;</font>";
                 }
@@ -207,9 +207,9 @@ public class TMVerordnung extends AbstractTableModel {
             }
             case COL_Hinweis: {
 
-                String hinweis = PrescriptionsTools.getHinweis(verordnung);
-                String an = PrescriptionsTools.getAN(verordnung);
-                String ab = PrescriptionsTools.getAB(verordnung);
+                String hinweis = PrescriptionsTools.getRemark(verordnung);
+                String an = PrescriptionsTools.getON(verordnung);
+                String ab = PrescriptionsTools.getOFF(verordnung);
 
                 ab = ab.isEmpty() ? "" : "<br/>" + ab;
                 hinweis = hinweis.isEmpty() ? "" : hinweis + "<br/>";

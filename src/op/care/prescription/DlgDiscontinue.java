@@ -29,11 +29,9 @@ package op.care.prescription;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.Arzt;
-import entity.ArztTools;
-import entity.Krankenhaus;
-import entity.KrankenhausTools;
-import entity.prescription.Prescriptions;
+import entity.prescription.Hospital;
+import entity.prescription.*;
+import entity.prescription.HospitalTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
@@ -51,14 +49,14 @@ import java.awt.event.ItemListener;
 /**
  * @author root
  */
-public class DlgAbsetzen extends MyJDialog {
+public class DlgDiscontinue extends MyJDialog {
     private Prescriptions verordnung, verordnungToReturn;
     private Closure actionBlock;
 
     /**
-     * Creates new form DlgAbsetzen
+     * Creates new form DlgDiscontinue
      */
-    public DlgAbsetzen(Prescriptions verordnung, Closure actionBlock) {
+    public DlgDiscontinue(Prescriptions verordnung, Closure actionBlock) {
         this.actionBlock = actionBlock;
         this.verordnung = verordnung;
         initComponents();
@@ -171,14 +169,14 @@ public class DlgAbsetzen extends MyJDialog {
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
 
-        Arzt arzt = (Arzt) cmbArztAb.getSelectedItem();
-        Krankenhaus krankenhaus = (Krankenhaus) cmbKHAb.getSelectedItem();
+        Doc doc = (Doc) cmbArztAb.getSelectedItem();
+        Hospital hospital = (Hospital) cmbKHAb.getSelectedItem();
 
-        if (arzt == null && krankenhaus == null) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Arzt und Krankenhaus dürfen nicht beide leer sein.", 2));
+        if (doc == null && hospital == null) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Doc und Hospital dürfen nicht beide leer sein.", 2));
         } else {
-            verordnung.setAbArzt(arzt);
-            verordnung.setAbKH(krankenhaus);
+            verordnung.setDocOFF(doc);
+            verordnung.setHospitalOFF(hospital);
             verordnungToReturn = verordnung;
             dispose();
         }
@@ -196,19 +194,19 @@ public class DlgAbsetzen extends MyJDialog {
     private void fillAerzteUndKHs() {
         EntityManager em = OPDE.createEM();
         Query queryArzt = em.createNamedQuery("Arzt.findAll");
-        java.util.List<Arzt> listAerzte = queryArzt.getResultList();
+        java.util.List<Doc> listAerzte = queryArzt.getResultList();
         listAerzte.add(0, null);
 
         Query queryKH = em.createNamedQuery("Krankenhaus.findAll");
-        java.util.List<Krankenhaus> listKH = queryKH.getResultList();
+        java.util.List<Hospital> listKH = queryKH.getResultList();
         listKH.add(0, null);
 
         cmbArztAb.setModel(new DefaultComboBoxModel(listAerzte.toArray()));
-        cmbArztAb.setRenderer(ArztTools.getArztRenderer());
+        cmbArztAb.setRenderer(DocTools.getArztRenderer());
         cmbArztAb.setSelectedIndex(0);
 
         cmbKHAb.setModel(new DefaultComboBoxModel(listKH.toArray()));
-        cmbKHAb.setRenderer(KrankenhausTools.getKHRenderer());
+        cmbKHAb.setRenderer(HospitalTools.getKHRenderer());
         cmbKHAb.setSelectedIndex(0);
 
         em.close();

@@ -28,13 +28,12 @@ package op.care.info;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.Arzt;
-import entity.ArztTools;
-import entity.Krankenhaus;
-import entity.KrankenhausTools;
+import entity.prescription.Hospital;
+import entity.prescription.*;
 import entity.info.BWInfo;
 import entity.info.BWInfoTools;
 import entity.info.ICD;
+import entity.prescription.HospitalTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
@@ -94,20 +93,20 @@ public class DlgDiag extends MyJDialog {
     private void fillCMBs() {
         EntityManager em = OPDE.createEM();
         Query queryArzt = em.createNamedQuery("Arzt.findAllActive");
-        java.util.List<Arzt> listAerzte = queryArzt.getResultList();
+        java.util.List<Doc> listAerzte = queryArzt.getResultList();
         listAerzte.add(0, null);
 
         Query queryKH = em.createNamedQuery("Krankenhaus.findAllActive");
-        java.util.List<Krankenhaus> listKH = queryKH.getResultList();
+        java.util.List<Hospital> listKH = queryKH.getResultList();
         listKH.add(0, null);
         em.close();
 
         cmbArzt.setModel(new DefaultComboBoxModel(listAerzte.toArray()));
-        cmbArzt.setRenderer(ArztTools.getArztRenderer());
+        cmbArzt.setRenderer(DocTools.getArztRenderer());
         cmbArzt.setSelectedIndex(0);
 
         cmbKH.setModel(new DefaultComboBoxModel(listKH.toArray()));
-        cmbKH.setRenderer(KrankenhausTools.getKHRenderer());
+        cmbKH.setRenderer(HospitalTools.getKHRenderer());
         cmbKH.setSelectedIndex(0);
 
 
@@ -327,8 +326,8 @@ public class DlgDiag extends MyJDialog {
 
 
     private void save() {
-        Arzt arzt = (Arzt) cmbArzt.getSelectedItem();
-        Krankenhaus kh = (Krankenhaus) cmbKH.getSelectedItem();
+        Doc doc = (Doc) cmbArzt.getSelectedItem();
+        Hospital kh = (Hospital) cmbKH.getSelectedItem();
         ICD icd = (ICD) lstDiag.getSelectedValue();
 
         Properties props = new Properties();
@@ -336,20 +335,20 @@ public class DlgDiag extends MyJDialog {
         props.put("text", icd.getText());
         props.put("koerperseite", cmbKoerper.getSelectedItem());
         props.put("diagnosesicherheit", cmbSicherheit.getSelectedItem());
-        props.put("arztid", arzt == null ? "null" : arzt.getArztID().toString());
+        props.put("arztid", doc == null ? "null" : doc.getArztID().toString());
         props.put("khid", kh == null ? "null" : kh.getKhid().toString());
 
         String html = "";
         html += "&lt;br/&gt;&lt;b&gt;" + icd.getText() + "&lt;/b&gt;&lt;br/&gt;";
         html += OPDE.lang.getString(internalClassID + ".by") + ": ";
         if (kh != null) {
-            html += "&lt;b&gt;" + KrankenhausTools.getFullName(kh) + "&lt;/b&gt;";
+            html += "&lt;b&gt;" + HospitalTools.getFullName(kh) + "&lt;/b&gt;";
         }
-        if (arzt != null) {
+        if (doc != null) {
             if (kh != null) {
                 html += "&lt;br/&gt;" + OPDE.lang.getString("misc.msg.confirmedby") + ": ";
             }
-            html += "&lt;b&gt;" + ArztTools.getFullName(arzt) + "&lt;/b&gt;" + " &lt;br/&gt;";
+            html += "&lt;b&gt;" + DocTools.getFullName(doc) + "&lt;/b&gt;" + " &lt;br/&gt;";
         }
         html += OPDE.lang.getString("misc.msg.diag.side") + ": &lt;b&gt;" + cmbKoerper.getSelectedItem().toString() + "&lt;/b&gt;&lt;br/&gt;";
         html += OPDE.lang.getString("misc.msg.diag.security") + ": &lt;b&gt;" + cmbSicherheit.getSelectedItem().toString() + "&lt;/b&gt;";

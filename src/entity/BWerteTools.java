@@ -164,8 +164,8 @@ public class BWerteTools {
 
         result += " (" + WERTE[bwert.getType()] + ")";
 
-//        if (bwert.getBemerkung() != null && !bwert.getBemerkung().isEmpty()) {
-//            result += "<br/><b>Bemerkung:</b> " + bwert.getBemerkung();
+//        if (bwert.getText() != null && !bwert.getText().isEmpty()) {
+//            result += "<br/><b>Bemerkung:</b> " + bwert.getText();
 //        }
         return SYSTools.htmlUmlautConversion(colorize ? "<font " + color + " " + SYSConst.html_arial14 + ">" + result + "</font>" : result);
     }

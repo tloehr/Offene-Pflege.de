@@ -382,7 +382,7 @@ public class BHP implements Serializable, Comparable<BHP> {
             if (prescription.hasMed()) {
                 result = TradeFormTools.toPrettyString(prescription.getTradeForm()).compareTo(TradeFormTools.toPrettyString(that.getPrescription().getTradeForm()));
             } else {
-                result = this.prescription.getMassnahme().getBezeichnung().compareTo(that.getPrescription().getMassnahme().getBezeichnung());
+                result = this.prescription.getIntervention().getBezeichnung().compareTo(that.getPrescription().getIntervention().getBezeichnung());
             }
         }
         if (result == 0) {

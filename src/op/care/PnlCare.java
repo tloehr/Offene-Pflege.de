@@ -17,7 +17,7 @@ import op.care.dfn.PnlDFN;
 import op.care.info.PnlInfo;
 import op.care.med.vorrat.PnlInventory;
 import op.care.sysfiles.PnlFiles;
-import op.care.prescription.PnlVerordnung;
+import op.care.prescription.PnlPrescription;
 import op.care.values.PnlVitalwerte;
 import op.tools.CleanablePanel;
 import op.tools.NursingRecordsPanel;
@@ -161,7 +161,7 @@ public class PnlCare extends NursingRecordsPanel {
                 break;
             }
             case TAB_VERORDNUNG: {
-                previousPanel = new PnlVerordnung(currentBewohner, jspSearch);
+                previousPanel = new PnlPrescription(currentBewohner, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_VERORDNUNG, previousPanel);
 
                 break;

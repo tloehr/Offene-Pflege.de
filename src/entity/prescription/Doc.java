@@ -1,4 +1,4 @@
-package entity;
+package entity.prescription;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -6,21 +6,21 @@ import java.io.Serializable;
 @Entity
 @Table(name = "Arzt")
 @NamedQueries({
-        @NamedQuery(name = "Arzt.findAll", query = "SELECT a FROM Arzt a ORDER BY a.name, a.vorname"),
-        @NamedQuery(name = "Arzt.findAllActive", query = "SELECT a FROM Arzt a WHERE a.status >= 0 ORDER BY a.name, a.vorname"),
-        @NamedQuery(name = "Arzt.findByArztID", query = "SELECT a FROM Arzt a WHERE a.arztID = :arztID"),
-        @NamedQuery(name = "Arzt.findByAnrede", query = "SELECT a FROM Arzt a WHERE a.anrede = :anrede"),
-        @NamedQuery(name = "Arzt.findByTitel", query = "SELECT a FROM Arzt a WHERE a.titel = :titel"),
-        @NamedQuery(name = "Arzt.findByName", query = "SELECT a FROM Arzt a WHERE a.name = :name"),
-        @NamedQuery(name = "Arzt.findByVorname", query = "SELECT a FROM Arzt a WHERE a.vorname = :vorname"),
-        @NamedQuery(name = "Arzt.findByStrasse", query = "SELECT a FROM Arzt a WHERE a.strasse = :strasse"),
-        @NamedQuery(name = "Arzt.findByPlz", query = "SELECT a FROM Arzt a WHERE a.plz = :plz"),
-        @NamedQuery(name = "Arzt.findByOrt", query = "SELECT a FROM Arzt a WHERE a.ort = :ort"),
-        @NamedQuery(name = "Arzt.findByTel", query = "SELECT a FROM Arzt a WHERE a.tel = :tel"),
-        @NamedQuery(name = "Arzt.findByFax", query = "SELECT a FROM Arzt a WHERE a.fax = :fax"),
-        @NamedQuery(name = "Arzt.findByMobil", query = "SELECT a FROM Arzt a WHERE a.mobil = :mobil"),
-        @NamedQuery(name = "Arzt.findByEMail", query = "SELECT a FROM Arzt a WHERE a.eMail = :eMail")})
-public class Arzt implements Serializable {
+        @NamedQuery(name = "Arzt.findAll", query = "SELECT a FROM Doc a ORDER BY a.name, a.vorname"),
+        @NamedQuery(name = "Arzt.findAllActive", query = "SELECT a FROM Doc a WHERE a.status >= 0 ORDER BY a.name, a.vorname"),
+        @NamedQuery(name = "Arzt.findByArztID", query = "SELECT a FROM Doc a WHERE a.arztID = :arztID"),
+        @NamedQuery(name = "Arzt.findByAnrede", query = "SELECT a FROM Doc a WHERE a.anrede = :anrede"),
+        @NamedQuery(name = "Arzt.findByTitel", query = "SELECT a FROM Doc a WHERE a.titel = :titel"),
+        @NamedQuery(name = "Arzt.findByName", query = "SELECT a FROM Doc a WHERE a.name = :name"),
+        @NamedQuery(name = "Arzt.findByVorname", query = "SELECT a FROM Doc a WHERE a.vorname = :vorname"),
+        @NamedQuery(name = "Arzt.findByStrasse", query = "SELECT a FROM Doc a WHERE a.strasse = :strasse"),
+        @NamedQuery(name = "Arzt.findByPlz", query = "SELECT a FROM Doc a WHERE a.plz = :plz"),
+        @NamedQuery(name = "Arzt.findByOrt", query = "SELECT a FROM Doc a WHERE a.ort = :ort"),
+        @NamedQuery(name = "Arzt.findByTel", query = "SELECT a FROM Doc a WHERE a.tel = :tel"),
+        @NamedQuery(name = "Arzt.findByFax", query = "SELECT a FROM Doc a WHERE a.fax = :fax"),
+        @NamedQuery(name = "Arzt.findByMobil", query = "SELECT a FROM Doc a WHERE a.mobil = :mobil"),
+        @NamedQuery(name = "Arzt.findByEMail", query = "SELECT a FROM Doc a WHERE a.eMail = :eMail")})
+public class Doc implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -61,7 +61,7 @@ public class Arzt implements Serializable {
     @Column(name = "Status")
     private Integer status;
 
-    public Arzt() {
+    public Doc() {
         this.anrede = "";
         this.titel = "";
         this.name = "";
@@ -76,7 +76,7 @@ public class Arzt implements Serializable {
         this.status = 0;
     }
 
-    public Arzt(String anrede, String titel, String name, String vorname, String strasse, String plz, String ort, String tel, String fax) {
+    public Doc(String anrede, String titel, String name, String vorname, String strasse, String plz, String ort, String tel, String fax) {
         this.anrede = anrede;
         this.titel = titel;
         this.name = name;
@@ -202,10 +202,10 @@ public class Arzt implements Serializable {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof Arzt)) {
+        if (!(object instanceof Doc)) {
             return false;
         }
-        Arzt other = (Arzt) object;
+        Doc other = (Doc) object;
         if ((this.arztID == null && other.arztID != null) || (this.arztID != null && !this.arztID.equals(other.arztID))) {
             return false;
         }
@@ -214,7 +214,7 @@ public class Arzt implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.rest.Arzt[arztID=" + arztID + "]";
+        return "entity.rest.Doc[arztID=" + arztID + "]";
     }
 
 }

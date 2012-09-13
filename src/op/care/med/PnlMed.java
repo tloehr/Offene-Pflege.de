@@ -37,7 +37,7 @@ import com.jidesoft.wizard.WizardDialog;
 import entity.prescription.*;
 import op.OPDE;
 import op.care.med.prodassistant.MedProductWizard;
-import op.care.med.vorrat.DlgBestand;
+import op.care.med.vorrat.DlgNewStocks;
 import op.system.InternalClassACL;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
@@ -464,7 +464,7 @@ public class PnlMed extends CleanablePanel {
             JideButton buchenButton = GUITools.createHyperlinkButton("Medikamente einbuchen", new ImageIcon(getClass().getResource("/artwork/22x22/shetaddrow.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgBestand(null);
+                    new DlgNewStocks(null);
                 }
             });
             mypanel.add(buchenButton);

@@ -293,7 +293,7 @@ public class PnlBHP extends NursingRecordsPanel {
             for (BHP bhp : shiftMAPBHP.get(BHPTools.SHIFT_ON_DEMAND)) {
 //                OPDE.debug(bhp.getPrescription().getVerid());
 //                OPDE.debug(currentPrescription != null ? currentPrescription.getVerid() : "null");
-                if (currentPrescription == null || bhp.getPrescription().getVerid().longValue() != currentPrescription.getVerid().longValue()) {
+                if (currentPrescription == null || bhp.getPrescription().getID() != currentPrescription.getID()) {
                     if (currentPrescription != null) {
                         sitPane.setContentPane(sitPanel);
 //                        prPane.add(sitPane);
@@ -775,12 +775,12 @@ public class PnlBHP extends NursingRecordsPanel {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     popupInfo.setOwner(btnInfo);
-                    txt.setText(SYSTools.toHTMLForScreen(bhp.getPrescription().getBemerkung()));
+                    txt.setText(SYSTools.toHTMLForScreen(bhp.getPrescription().getText()));
                     GUITools.showPopup(popupInfo, SwingConstants.SOUTH_WEST);
                 }
             });
 
-            btnInfo.setEnabled(!SYSTools.catchNull(bhp.getPrescription().getBemerkung()).isEmpty());
+            btnInfo.setEnabled(!SYSTools.catchNull(bhp.getPrescription().getText()).isEmpty());
             titlePanelright.add(btnInfo);
 
         }

@@ -54,7 +54,7 @@ public class DosageFormTools {
         } else if (!form.getAnwText().isEmpty()) {
             result = form.getAnwText();
         } else {
-            result = SYSConst.EINHEIT[form.getAnwEinheit()];
+            result = SYSConst.UNITS[form.getAnwEinheit()];
         }
 
         return result;

@@ -45,7 +45,7 @@ public class PnlTextEntry extends JPanel {
     private Closure actionBlock;
 
     /**
-     * Creates new form DlgAbsetzen
+     * Creates new form DlgDiscontinue
      */
     public PnlTextEntry(String title, Closure actionBlock) {
         this.actionBlock = actionBlock;

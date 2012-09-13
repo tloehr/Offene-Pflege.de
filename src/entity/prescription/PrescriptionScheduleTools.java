@@ -215,11 +215,11 @@ public class PrescriptionScheduleTools {
         String wiederholung = getWiederholung(planung, writeTaeglich);
         result += wiederholung;
 
-        if (!SYSTools.catchNull(planung.getPrescription().getBemerkung()).isEmpty()) {
+        if (!SYSTools.catchNull(planung.getPrescription().getText()).isEmpty()) {
             if (!wiederholung.isEmpty()) {
                 result += "<br/>";
             }
-            result += "<b><u>Bemerkung:</u></b> " + planung.getPrescription().getBemerkung();
+            result += "<b><u>Bemerkung:</u></b> " + planung.getPrescription().getText();
         }
 
         return result.equals("") ? "&nbsp;" : result;

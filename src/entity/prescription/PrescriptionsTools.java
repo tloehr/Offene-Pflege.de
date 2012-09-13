@@ -9,7 +9,7 @@ import entity.Stationen;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import op.OPDE;
-import op.care.prescription.PnlVerordnung;
+import op.care.prescription.PnlPrescription;
 import op.tools.HTMLTools;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -55,7 +55,7 @@ public class PrescriptionsTools {
      *
      * @param einrichtungen Die Einrichtung, für die der Stellplan erstellt werden soll. Sortiert nach den Stationen.
      */
-    public static String getStellplanAsHTML(Einrichtungen einrichtungen) {
+    public static String getDailyPlanAsHTML(Einrichtungen einrichtungen) {
         EntityManager em = OPDE.createEM();
         String html = "";
 
@@ -81,7 +81,7 @@ public class PrescriptionsTools {
                     " AND st.EKennung = ? AND ((best.Aus = '9999-12-31 23:59:59' AND best.Anbruch < '9999-12-31 23:59:59') OR (v.DafID IS NULL)) " +
                     " ORDER BY st.statid, CONCAT(bw.nachname,bw.vorname), bw.BWKennung, v.DafID IS NOT NULL, F.Stellplan, CONCAT( M.Bezeichnung, Ms.Bezeichnung)");
             query.setParameter(1, einrichtungen.getEKennung());
-            html = getStellplan(query.getResultList());
+            html = getDailyPlan(query.getResultList());
 
         } catch (Exception e) {
             OPDE.fatal(e);
@@ -89,105 +89,105 @@ public class PrescriptionsTools {
         return html;
     }
 
-    /**
-     * Erzeugt eine Liste mit EntityBeans und Salden. Diese Liste enthält die zur Zeit verordnete Bedarfsverordnungen.
-     * Die Liste enthält ein Objekt Array mit dem folgenden Aufbau:
-     * <ol>
-     * <li></li>
-     * </ol>
-     *
-     * @param bewohner
-     * @return Liste mit allen Bedarfsverordnungen. <code>null</code>, wenn nichts da war oder bei Fehler.
-     */
-    public static List getBedarfsliste(Resident bewohner) {
-        String sql = " SELECT v.VerID, s.SitID, p.BHPPID, vor.Saldo, bisher.tagesdosis, d.DafID, bestand.APV, bestand.Summe, bestand.BestID " +
-                " FROM BHPVerordnung v " +
-                " INNER JOIN Situationen s ON v.SitID = s.SitID " +
-                " INNER JOIN BHPPlanung p ON v.VerID = p.VerID" +
-                " LEFT OUTER JOIN MPDarreichung d ON v.DafID = d.DafID " +
-                // Dieser Konstrukt bestimmt die Vorräte für einen Bewohner
-                // Dabei wird berücksichtigt, dass ein Vorrat unterschiedliche Hersteller umfassen
-                // kann. Dies wird durch den mehrfach join erreicht. Dadurch stehen die verschiedenen
-                // DafIDs der unterschiedlichen Produkte im selben Vorrat jeweils in verschiedenen Zeilen.
-                // Durch den LEFT OUTER JOIN pickt sich die Datenbank die richtigen Paare heraus.
-                " LEFT OUTER JOIN " +
-                "      ( " +
-                "        SELECT DISTINCT a.VorID, b.DafID, a.saldo FROM ( " +
-                "           SELECT best.VorID, best.DafID, sum(buch.Menge) saldo FROM MPBestand best " +
-                "           INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
-                "           INNER JOIN MPVorrat vor1 ON best.VorID = vor1.VorID" +
-                "           WHERE vor1.BWKennung=? AND vor1.Bis = '9999-12-31 23:59:59'" +
-                "           GROUP BY VorID" +
-                "           ) a  " +
-                "        INNER JOIN (" +
-                "           SELECT best.VorID, best.DafID FROM MPBestand best " +
-                "           ) b ON a.VorID = b.VorID " +
-                "      ) vor ON vor.DafID = v.DafID " +
-                // Hier wird berechnet, wieviel von der Tagesdosis der Bewohner heute schon bekommen hat.
-                " LEFT OUTER JOIN" +
-                "      (" +
-                "        SELECT b3.VerID, sum(b1.dosis) tagesdosis " +
-                "        FROM BHP b1" +
-                "        INNER JOIN BHPPlanung b2 ON b1.BHPPID = b2.BHPPID" +
-                "        INNER JOIN BHPVerordnung b3 ON b3.VerID = b2.VerID" +
-                "        WHERE b3.BWKennung=? AND b3.AbDatum = '9999-12-31 23:59:59'" +
-                "        AND DATE(b1.Ist) = Date(now()) AND b1.Status = " + BHPTools.STATE_DONE +
-                "        GROUP BY b3.VerID" +
-                "      ) bisher ON bisher.VerID = v.VerID" +
-                // Hier kommen jetzt die Bestände im Anbruch dabei. Die Namen der Medikamente könnten ja vom
-                // ursprünglich verordneten abweichen.
-                " LEFT OUTER JOIN( " +
-                "        SELECT best1.NextBest, best1.VorID, best1.BestID, best1.DafID, best1.APV, SUM(buch1.Menge) summe " +
-                "        FROM MPBestand best1 " +
-                "        INNER JOIN MPBuchung buch1 ON buch1.BestID = best1.BestID " +
-                "        WHERE best1.Aus = '9999-12-31 23:59:59' AND best1.Anbruch < now() " +
-                "        GROUP BY best1.BestID" +
-                "      ) bestand ON bestand.VorID = vor.VorID " +
-                " LEFT OUTER JOIN MPDarreichung D1 ON bestand.DafID = D1.DafID " +
-                " LEFT OUTER JOIN MProdukte M1 ON M1.MedPID = D1.MedPID " +
-                " WHERE v.BWKennung = ? AND v.AbDatum = '9999-12-31 23:59:59' " +
-                " ORDER BY s.Text";
-        EntityManager em = OPDE.createEM();
+//    /**
+//     * Erzeugt eine Liste mit EntityBeans und Salden. Diese Liste enthält die zur Zeit verordnete Bedarfsverordnungen.
+//     * Die Liste enthält ein Objekt Array mit dem folgenden Aufbau:
+//     * <ol>
+//     * <li></li>
+//     * </ol>
+//     *
+//     * @param bewohner
+//     * @return Liste mit allen Bedarfsverordnungen. <code>null</code>, wenn nichts da war oder bei Fehler.
+//     */
+//    public static List getBedarfsliste(Resident bewohner) {
+//        String sql = " SELECT v.VerID, s.SitID, p.BHPPID, vor.Saldo, bisher.tagesdosis, d.DafID, bestand.APV, bestand.Summe, bestand.BestID " +
+//                " FROM BHPVerordnung v " +
+//                " INNER JOIN Situationen s ON v.SitID = s.SitID " +
+//                " INNER JOIN BHPPlanung p ON v.VerID = p.VerID" +
+//                " LEFT OUTER JOIN MPDarreichung d ON v.DafID = d.DafID " +
+//                // Dieser Konstrukt bestimmt die Vorräte für einen Bewohner
+//                // Dabei wird berücksichtigt, dass ein Vorrat unterschiedliche Hersteller umfassen
+//                // kann. Dies wird durch den mehrfach join erreicht. Dadurch stehen die verschiedenen
+//                // DafIDs der unterschiedlichen Produkte im selben Vorrat jeweils in verschiedenen Zeilen.
+//                // Durch den LEFT OUTER JOIN pickt sich die Datenbank die richtigen Paare heraus.
+//                " LEFT OUTER JOIN " +
+//                "      ( " +
+//                "        SELECT DISTINCT a.VorID, b.DafID, a.saldo FROM ( " +
+//                "           SELECT best.VorID, best.DafID, sum(buch.Menge) saldo FROM MPBestand best " +
+//                "           INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
+//                "           INNER JOIN MPVorrat vor1 ON best.VorID = vor1.VorID" +
+//                "           WHERE vor1.BWKennung=? AND vor1.Bis = '9999-12-31 23:59:59'" +
+//                "           GROUP BY VorID" +
+//                "           ) a  " +
+//                "        INNER JOIN (" +
+//                "           SELECT best.VorID, best.DafID FROM MPBestand best " +
+//                "           ) b ON a.VorID = b.VorID " +
+//                "      ) vor ON vor.DafID = v.DafID " +
+//                // Hier wird berechnet, wieviel von der Tagesdosis der Bewohner heute schon bekommen hat.
+//                " LEFT OUTER JOIN" +
+//                "      (" +
+//                "        SELECT b3.VerID, sum(b1.dosis) tagesdosis " +
+//                "        FROM BHP b1" +
+//                "        INNER JOIN BHPPlanung b2 ON b1.BHPPID = b2.BHPPID" +
+//                "        INNER JOIN BHPVerordnung b3 ON b3.VerID = b2.VerID" +
+//                "        WHERE b3.BWKennung=? AND b3.AbDatum = '9999-12-31 23:59:59'" +
+//                "        AND DATE(b1.Ist) = Date(now()) AND b1.Status = " + BHPTools.STATE_DONE +
+//                "        GROUP BY b3.VerID" +
+//                "      ) bisher ON bisher.VerID = v.VerID" +
+//                // Hier kommen jetzt die Bestände im Anbruch dabei. Die Namen der Medikamente könnten ja vom
+//                // ursprünglich verordneten abweichen.
+//                " LEFT OUTER JOIN( " +
+//                "        SELECT best1.NextBest, best1.VorID, best1.BestID, best1.DafID, best1.APV, SUM(buch1.Menge) summe " +
+//                "        FROM MPBestand best1 " +
+//                "        INNER JOIN MPBuchung buch1 ON buch1.BestID = best1.BestID " +
+//                "        WHERE best1.Aus = '9999-12-31 23:59:59' AND best1.Anbruch < now() " +
+//                "        GROUP BY best1.BestID" +
+//                "      ) bestand ON bestand.VorID = vor.VorID " +
+//                " LEFT OUTER JOIN MPDarreichung D1 ON bestand.DafID = D1.DafID " +
+//                " LEFT OUTER JOIN MProdukte M1 ON M1.MedPID = D1.MedPID " +
+//                " WHERE v.BWKennung = ? AND v.AbDatum = '9999-12-31 23:59:59' " +
+//                " ORDER BY s.Text";
+//        EntityManager em = OPDE.createEM();
+//
+//        Query query = em.createNativeQuery(sql);
+//        query.setParameter(1, bewohner.getRID());
+//        query.setParameter(2, bewohner.getRID());
+//        query.setParameter(3, bewohner.getRID());
+//        List<Object[]> listeRohfassung = query.getResultList();
+//        ArrayList<Object[]> listeBedarf = null;
+//
+//        if (!listeRohfassung.isEmpty()) {
+//            listeBedarf = new ArrayList<Object[]>(listeRohfassung.size());
+//
+//            for (Object[] rohdaten : listeRohfassung) {
+//                Prescriptions verordnung = em.find(Prescriptions.class, ((BigInteger) rohdaten[0]).longValue());
+//                Situations situation = em.find(Situations.class, ((BigInteger) rohdaten[1]).longValue());
+//                PrescriptionSchedule planung = em.find(PrescriptionSchedule.class, ((BigInteger) rohdaten[2]).longValue());
+//                BigDecimal vorratSaldo = (BigDecimal) rohdaten[3];
+//                BigDecimal tagesdosisBisher = (BigDecimal) rohdaten[4];
+//                TradeForm darreichung = rohdaten[5] == null ? null : em.find(TradeForm.class, ((BigInteger) rohdaten[5]).longValue());
+//                BigDecimal apv = (BigDecimal) rohdaten[6];
+//                BigDecimal bestandSumme = (BigDecimal) rohdaten[7];
+//                MedStock bestand = rohdaten[8] == null ? null : em.find(MedStock.class, ((BigInteger) rohdaten[8]).longValue());
+//
+//                listeBedarf.add(new Object[]{verordnung, situation, planung, vorratSaldo, tagesdosisBisher, darreichung, apv, bestandSumme, bestand});
+//            }
+//        }
+//
+//        em.close();
+//        return listeBedarf;
+//    }
+//
+//
+//    public static boolean hasBedarf(Resident resident) {
+//        EntityManager em = OPDE.createEM();
+//        Query query = em.createQuery("SELECT COUNT(v) FROM Prescriptions v WHERE v.resident = :resident AND v.to >= :now AND v.situation IS NOT NULL ");
+//        query.setParameter("resident", resident);
+//        query.setParameter("now", new Date());
+//        return ((Long) query.getSingleResult()).longValue() > 0;
+//    }
 
-        Query query = em.createNativeQuery(sql);
-        query.setParameter(1, bewohner.getRID());
-        query.setParameter(2, bewohner.getRID());
-        query.setParameter(3, bewohner.getRID());
-        List<Object[]> listeRohfassung = query.getResultList();
-        ArrayList<Object[]> listeBedarf = null;
-
-        if (!listeRohfassung.isEmpty()) {
-            listeBedarf = new ArrayList<Object[]>(listeRohfassung.size());
-
-            for (Object[] rohdaten : listeRohfassung) {
-                Prescriptions verordnung = em.find(Prescriptions.class, ((BigInteger) rohdaten[0]).longValue());
-                Situations situation = em.find(Situations.class, ((BigInteger) rohdaten[1]).longValue());
-                PrescriptionSchedule planung = em.find(PrescriptionSchedule.class, ((BigInteger) rohdaten[2]).longValue());
-                BigDecimal vorratSaldo = (BigDecimal) rohdaten[3];
-                BigDecimal tagesdosisBisher = (BigDecimal) rohdaten[4];
-                TradeForm darreichung = rohdaten[5] == null ? null : em.find(TradeForm.class, ((BigInteger) rohdaten[5]).longValue());
-                BigDecimal apv = (BigDecimal) rohdaten[6];
-                BigDecimal bestandSumme = (BigDecimal) rohdaten[7];
-                MedStock bestand = rohdaten[8] == null ? null : em.find(MedStock.class, ((BigInteger) rohdaten[8]).longValue());
-
-                listeBedarf.add(new Object[]{verordnung, situation, planung, vorratSaldo, tagesdosisBisher, darreichung, apv, bestandSumme, bestand});
-            }
-        }
-
-        em.close();
-        return listeBedarf;
-    }
-
-
-    public static boolean hasBedarf(Resident resident) {
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT COUNT(v) FROM Prescriptions v WHERE v.resident = :resident AND v.to >= :now AND v.situation IS NOT NULL ");
-        query.setParameter("resident", resident);
-        query.setParameter("now", new Date());
-        return ((Long) query.getSingleResult()).longValue() > 0;
-    }
-
-    private static String getStellplan(List data) {
+    private static String getDailyPlan(List data) {
 
         int STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO = Integer.parseInt(OPDE.getProps().getProperty("stellplan_pagebreak_after_element_no"));
 
@@ -287,7 +287,7 @@ public class PrescriptionsTools {
 
 
             html += "<tr " + (grau ? "id=\"fonttextgrau\">" : ">");
-            html += "<td width=\"300\" >" + (verordnung.hasMed() ? "<b>" + TradeFormTools.toPrettyString(verordnung.getTradeForm()) + "</b>" : verordnung.getMassnahme().getBezeichnung());
+            html += "<td width=\"300\" >" + (verordnung.hasMed() ? "<b>" + TradeFormTools.toPrettyString(verordnung.getTradeForm()) + "</b>" : verordnung.getIntervention().getBezeichnung());
             html += (bestid != null ? "<br/><i>Bestand im Anbruch Nr.: " + bestid + "</i>" : "") + "</td>";
             html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getNachtMo()) + "</td>";
             html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getMorgens()) + "</td>";
@@ -311,39 +311,73 @@ public class PrescriptionsTools {
         return html;
     }
 
-    public static String getPrescriptionAsText(Prescriptions verordnung) {
+    public static String getShortDescription(Prescriptions prescription) {
+        String result = "<font size=+1>";// = SYSConst.html_fontface;
+
+        if (!prescription.hasMed()) {
+            result += prescription.getIntervention().getBezeichnung();
+        } else {
+
+            MedInventory inventory = TradeFormTools.getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm());
+            MedStock stockInUse = MedStockTools.getStockInUse(inventory);
+
+            if (stockInUse != null) {
+                result += "<b>" + prescription.getTradeForm().getMedProdukt().getBezeichnung()
+                        + (stockInUse.getTradeForm().getZusatz().isEmpty() ? "" : " " + stockInUse.getTradeForm().getZusatz()) + "</b>" +
+                        (stockInUse.getTradeForm().getDosageForm().getZubereitung().isEmpty() ? "" : " " + stockInUse.getTradeForm().getDosageForm().getZubereitung()) + " " +
+                        (prescription.getTradeForm().getDosageForm().getAnwText().isEmpty() ? SYSConst.UNITS[prescription.getTradeForm().getDosageForm().getAnwEinheit()] : prescription.getTradeForm().getDosageForm().getAnwText());
+
+            } else {
+                result += "<b>" + prescription.getTradeForm().getMedProdukt().getBezeichnung()
+                        + (prescription.getTradeForm().getZusatz().isEmpty() ? "" : " " + prescription.getTradeForm().getZusatz()) + "</b>" +
+                        (prescription.getTradeForm().getDosageForm().getZubereitung().isEmpty() ? "" : " " + prescription.getTradeForm().getDosageForm().getZubereitung()) + " " +
+                        (prescription.getTradeForm().getDosageForm().getAnwText().isEmpty() ? SYSConst.UNITS[prescription.getTradeForm().getDosageForm().getAnwEinheit()] : prescription.getTradeForm().getDosageForm().getAnwText());
+            }
+        }
+
+        result += "</font>";
+
+        if (prescription.isOnDemand()) {
+            result += "<br/><b><u>"+OPDE.lang.getString("misc.msg.ondemand")+":</u> " + prescription.getSituation().getText() + "</b>";
+        }
+
+        return result;
+    }
+
+    public static String getPrescriptionAsText2(Prescriptions verordnung) {
         String result = "<div id=\"fonttext\">";// = SYSConst.html_fontface;
 
         if (verordnung.isDiscontinued()) {
             result += "<s>"; // Abgesetzte
         }
         if (!verordnung.hasMed()) {
-            result += verordnung.getMassnahme().getBezeichnung();
+            result += verordnung.getIntervention().getBezeichnung();
         } else {
-            // Prüfen, was wirklich im Anbruch gegeben wird. (Wenn das Medikament über die Zeit gegen Generica getauscht wurde.)
 
             MedInventory inventory = TradeFormTools.getInventory4TradeForm(verordnung.getResident(), verordnung.getTradeForm());
-            MedStock aktuellerAnbruch = MedStockTools.getStockInUse(inventory);
+            MedStock stockInUse = MedStockTools.getStockInUse(inventory);
 
-            if (aktuellerAnbruch != null) {
-                if (!aktuellerAnbruch.getTradeForm().equals(verordnung.getTradeForm())) { // Nur bei Abweichung.
-                    result += "<b>" + aktuellerAnbruch.getTradeForm().getMedProdukt().getBezeichnung() +
-                            (aktuellerAnbruch.getTradeForm().getZusatz().isEmpty() ? "" : " " + aktuellerAnbruch.getTradeForm().getZusatz()) + "</b>" +
-                            (aktuellerAnbruch.getTradeForm().getDosageForm().getZubereitung().isEmpty() ? "" : " " + aktuellerAnbruch.getTradeForm().getDosageForm().getZubereitung()) + " " +
-                            (aktuellerAnbruch.getTradeForm().getDosageForm().getAnwText().isEmpty() ? SYSConst.EINHEIT[aktuellerAnbruch.getTradeForm().getDosageForm().getAnwEinheit()] : aktuellerAnbruch.getTradeForm().getDosageForm().getAnwText());
-                    result += " <i>(" + OPDE.lang.getString(PnlVerordnung.internalClassID + ".originalprescription") + ": " + verordnung.getTradeForm().getMedProdukt().getBezeichnung();
-                    result += (aktuellerAnbruch.getTradeForm().getZusatz().isEmpty() ? "" : " " + aktuellerAnbruch.getTradeForm().getZusatz()) + ")</i>";
+            if (stockInUse != null) {
+                // If the current prescription defers from the original one (different provider of the medication as in the beginning)
+                if (!stockInUse.getTradeForm().equals(verordnung.getTradeForm())) {
+                    result += "<b>" + stockInUse.getTradeForm().getMedProdukt().getBezeichnung() +
+                            (stockInUse.getTradeForm().getZusatz().isEmpty() ? "" : " " + stockInUse.getTradeForm().getZusatz()) + "</b>" +
+                            (stockInUse.getTradeForm().getDosageForm().getZubereitung().isEmpty() ? "" : " " + stockInUse.getTradeForm().getDosageForm().getZubereitung()) + " " +
+                            (stockInUse.getTradeForm().getDosageForm().getAnwText().isEmpty() ? SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getAnwEinheit()] : stockInUse.getTradeForm().getDosageForm().getAnwText());
+                    result += " <i>(" + OPDE.lang.getString(PnlPrescription.internalClassID + ".originalprescription") + ": " + verordnung.getTradeForm().getMedProdukt().getBezeichnung();
+                    result += (stockInUse.getTradeForm().getZusatz().isEmpty() ? "" : " " + stockInUse.getTradeForm().getZusatz()) + ")</i>";
                 } else {
+                    // No, the resident still gets the orginal stuff
                     result += "<b>" + verordnung.getTradeForm().getMedProdukt().getBezeichnung()
-                            + (aktuellerAnbruch.getTradeForm().getZusatz().isEmpty() ? "" : " " + aktuellerAnbruch.getTradeForm().getZusatz()) + "</b>" +
-                            (aktuellerAnbruch.getTradeForm().getDosageForm().getZubereitung().isEmpty() ? "" : " " + aktuellerAnbruch.getTradeForm().getDosageForm().getZubereitung()) + " " +
-                            (verordnung.getTradeForm().getDosageForm().getAnwText().isEmpty() ? SYSConst.EINHEIT[verordnung.getTradeForm().getDosageForm().getAnwEinheit()] : verordnung.getTradeForm().getDosageForm().getAnwText());
+                            + (stockInUse.getTradeForm().getZusatz().isEmpty() ? "" : " " + stockInUse.getTradeForm().getZusatz()) + "</b>" +
+                            (stockInUse.getTradeForm().getDosageForm().getZubereitung().isEmpty() ? "" : " " + stockInUse.getTradeForm().getDosageForm().getZubereitung()) + " " +
+                            (verordnung.getTradeForm().getDosageForm().getAnwText().isEmpty() ? SYSConst.UNITS[verordnung.getTradeForm().getDosageForm().getAnwEinheit()] : verordnung.getTradeForm().getDosageForm().getAnwText());
                 }
             } else {
                 result += "<b>" + verordnung.getTradeForm().getMedProdukt().getBezeichnung()
                         + (verordnung.getTradeForm().getZusatz().isEmpty() ? "" : " " + verordnung.getTradeForm().getZusatz()) + "</b>" +
                         (verordnung.getTradeForm().getDosageForm().getZubereitung().isEmpty() ? "" : " " + verordnung.getTradeForm().getDosageForm().getZubereitung()) + " " +
-                        (verordnung.getTradeForm().getDosageForm().getAnwText().isEmpty() ? SYSConst.EINHEIT[verordnung.getTradeForm().getDosageForm().getAnwEinheit()] : verordnung.getTradeForm().getDosageForm().getAnwText());
+                        (verordnung.getTradeForm().getDosageForm().getAnwText().isEmpty() ? SYSConst.UNITS[verordnung.getTradeForm().getDosageForm().getAnwEinheit()] : verordnung.getTradeForm().getDosageForm().getAnwText());
             }
 
 
@@ -362,7 +396,7 @@ public class PrescriptionsTools {
             result += "<s>"; // Abgesetzte
         }
         if (!verordnung.hasMed()) {
-            result += verordnung.getMassnahme().getBezeichnung();
+            result += verordnung.getIntervention().getBezeichnung();
         } else {
 
 
@@ -378,39 +412,39 @@ public class PrescriptionsTools {
         return result;
     }
 
-    public static String getHinweis(Prescriptions verordnung) {
+    public static String getRemark(Prescriptions verordnung) {
         String result = "<div id=\"fonttext\">";
 
         if (verordnung.isOnDemand()) {
             result += "<b><u>Nur bei Bedarf:</u> <font color=\"blue\">" + verordnung.getSituation().getText() + "</font></b>";
         }
-        if (!verordnung.getBemerkung().isEmpty()) {
+        if (!verordnung.getText().isEmpty()) {
             result += result.isEmpty() ? "" : "<br/>";
-            result += "<b><u>Bemerkung:</u> </b>" + verordnung.getBemerkung();
+            result += "<b><u>Bemerkung:</u> </b>" + verordnung.getText();
         }
         return result + "</div>";
     }
 
-    public static String getAN(Prescriptions verordnung) {
+    public static String getON(Prescriptions verordnung) {
         String result = "<div id=\"fonttext\">";
         String datum = DateFormat.getDateInstance().format(verordnung.getFrom());
 
         result += "<font color=\"green\">" + datum + "; ";
-        if (verordnung.getAnKH() != null) {
-            result += verordnung.getAnKH().getName();
+        if (verordnung.getHospitalON() != null) {
+            result += verordnung.getHospitalON().getName();
         }
-        if (verordnung.getAnArzt() != null) {
-            if (verordnung.getAnKH() != null) {
+        if (verordnung.getDocON() != null) {
+            if (verordnung.getHospitalON() != null) {
                 result += " <i>bestätigt durch:</i> ";
             }
-            result += verordnung.getAnArzt().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getAnArzt().getName(), SYSTools.INDEX_NACHNAME);
+            result += verordnung.getDocON().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getDocON().getName(), SYSTools.INDEX_NACHNAME);
         }
         result += "; " + verordnung.getAngesetztDurch().getFullname() + "</font>";
 
         return result + "</div>";
     }
 
-    public static String getAB(Prescriptions verordnung) {
+    public static String getOFF(Prescriptions verordnung) {
         String result = "<div id=\"fonttext\">";
 
         if (verordnung.isLimited()) {
@@ -418,25 +452,25 @@ public class PrescriptionsTools {
 
             result += "<font color=\"" + (verordnung.isDiscontinued() ? "red" : "lime") + "\">" + datum + "; ";
 
-            result += verordnung.getAbKH() != null ? verordnung.getAbKH().getName() : "";
+            result += verordnung.getHospitalOFF() != null ? verordnung.getHospitalOFF().getName() : "";
 
-            if (verordnung.getAbArzt() != null) {
-                if (verordnung.getAbKH() != null) {
+            if (verordnung.getDocOFF() != null) {
+                if (verordnung.getHospitalOFF() != null) {
                     result += " <i>bestätigt durch:</i> ";
                 }
-                result += verordnung.getAbArzt().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getAbArzt().getName(), SYSTools.INDEX_NACHNAME);
+                result += verordnung.getDocOFF().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getDocOFF().getName(), SYSTools.INDEX_NACHNAME);
             }
-            result += "; " + verordnung.getAbgesetztDurch().getFullname() + "</font>";
+            result += "; " + verordnung.getUserOFF().getFullname() + "</font>";
 
         }
         return result + "</div>";
     }
 
-    public static String getDosis(Prescriptions prescription) {
-        return getDosis(prescription, false);
+    public static String getDose(Prescriptions prescription) {
+        return getDose(prescription, false);
     }
 
-    public static String getDosis(Prescriptions prescription, boolean mitBestandsAnzeige) {
+    public static String getDose(Prescriptions prescription, boolean showInventory) {
 //        long timestart = System.currentTimeMillis();
         String result = "";
         if (prescription.getPrescriptionSchedule().size() > 1) {
@@ -463,7 +497,7 @@ public class PrescriptionsTools {
             result += "<i>Noch keine Dosierung / Anwendungsinformationen verfügbar</i><br/>";
         }
 
-        if (mitBestandsAnzeige && prescription.hasMed()) {
+        if (showInventory && prescription.hasMed()) {
             MedInventory inventory = TradeFormTools.getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm());
             MedStock stockInUse = MedStockTools.getStockInUse(inventory);
 
@@ -488,7 +522,7 @@ public class PrescriptionsTools {
 
                     if (invSum != null && invSum.compareTo(BigDecimal.ZERO) > 0) {
                         result += "<b><u>Vorrat:</u> <font color=\"green\">" + invSum.setScale(2, BigDecimal.ROUND_UP) + " " +
-                                SYSConst.EINHEIT[stockInUse.getTradeForm().getDosageForm().getPackEinheit()] +
+                                SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getPackEinheit()] +
                                 "</font></b>";
                         if (!stockInUse.getTradeForm().getDosageForm().anwUndPackEinheitenGleich()) {
 
@@ -504,7 +538,7 @@ public class PrescriptionsTools {
 
                         if (invSum.compareTo(stockSum) != 0) {
                             result += "<br/>Restmenge im Anbruch: <b><font color=\"green\">" + stockSum.setScale(2, BigDecimal.ROUND_UP) + " " +
-                                    SYSConst.EINHEIT[stockInUse.getTradeForm().getDosageForm().getPackEinheit()] + "</font></b>";
+                                    SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getPackEinheit()] + "</font></b>";
                             if (!stockInUse.getTradeForm().getDosageForm().anwUndPackEinheitenGleich()) {
                                 BigDecimal usage = stockSum.multiply(stockInUse.getAPV());
 
@@ -567,6 +601,19 @@ public class PrescriptionsTools {
         return result;
     }
 
+    public static ArrayList<Prescriptions> getAll(Resident resident) {
+        EntityManager em = OPDE.createEM();
+
+        ArrayList<Prescriptions> result = null;
+        Query query = em.createQuery(" SELECT p FROM Prescriptions p WHERE p.resident = :resident ");
+        query.setParameter("resident", resident);
+        result = new ArrayList<Prescriptions>(query.getResultList());
+
+        em.close();
+
+        return result;
+    }
+
 
     /**
      * Dieser Query ordnet Verordnungen den Vorräten zu. Dazu ist ein kleiner Trick nötig. Denn über die Zeit können verschiedene Vorräte mit verschiedenen
@@ -576,7 +623,7 @@ public class PrescriptionsTools {
         EntityManager em = OPDE.createEM();
 
 //        List<Prescriptions> list = null;
-        Query query = em.createQuery("SELECT p FROM Prescriptions p WHERE p.resident = :resident AND p.situation IS NOT NULL AND p.from <= :from AND p.to >= :to ORDER BY p.situation.text, p.verid");
+        Query query = em.createQuery("SELECT p FROM Prescriptions p WHERE p.resident = :resident AND p.situation IS NOT NULL AND p.from <= :from AND p.to >= :to ORDER BY p.situation.text, p.id");
         query.setParameter("resident", resident);
         query.setParameter("from", new DateTime(date).toDateMidnight().toDate());
         query.setParameter("to", new DateTime(date).toDateMidnight().plusDays(1).toDateTime().minusSeconds(1).toDate());
@@ -617,10 +664,10 @@ public class PrescriptionsTools {
                 verordnung = itVerordnung.next();
 
                 result += "<tr>";
-                result += "<td valign=\"top\">" + getPrescriptionAsText(verordnung) + "</td>";
-                result += "<td valign=\"top\">" + getDosis(verordnung, withmed) + "<br/>";
-                result += getHinweis(verordnung) + "</td>";
-                result += "<td valign=\"top\">" + getAN(verordnung) + "</td>";
+                result += "<td valign=\"top\">" + getShortDescription(verordnung) + "</td>";
+                result += "<td valign=\"top\">" + getDose(verordnung, withmed) + "<br/>";
+                result += getRemark(verordnung) + "</td>";
+                result += "<td valign=\"top\">" + getON(verordnung) + "</td>";
                 //result += "<td>" + SYSTools.unHTML2(tmv.getValueAt(v, TMVerordnung.COL_AB).toString()) + "</td>";
                 result += "</tr>";
             }
@@ -642,7 +689,7 @@ public class PrescriptionsTools {
     public static int getNumVerodnungenMitGleicherKennung(Prescriptions verordnung) {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("Verordnung.findByVerKennung");
-        query.setParameter("verKennung", verordnung.getVerKennung());
+        query.setParameter("verKennung", verordnung.getRelation());
         int num = query.getResultList().size();
         em.close();
         return num;
@@ -654,7 +701,7 @@ public class PrescriptionsTools {
         if (verordnung.hasMed()) {
             myPretty = TradeFormTools.toPrettyString(verordnung.getTradeForm());
         } else {
-            myPretty = verordnung.getMassnahme().getBezeichnung();
+            myPretty = verordnung.getIntervention().getBezeichnung();
         }
 
         myPretty += verordnung.isOnDemand() ? " (Nur bei Bedarf: " + verordnung.getSituation().getText() + ")" : "";
@@ -666,7 +713,7 @@ public class PrescriptionsTools {
         verordnung = em.merge(verordnung);
         em.lock(verordnung, LockModeType.OPTIMISTIC);
         verordnung.setTo(new Date());
-        verordnung.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
+        verordnung.setUserOFF(em.merge(OPDE.getLogin().getUser()));
         BHPTools.cleanup(em, verordnung);
     }
 

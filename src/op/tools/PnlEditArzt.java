@@ -9,18 +9,17 @@ import java.awt.event.*;
 import javax.swing.*;
 import com.jgoodies.forms.factories.*;
 import com.jgoodies.forms.layout.*;
-import entity.Arzt;
+import entity.prescription.Doc;
 import op.OPDE;
-import org.apache.commons.collections.Closure;
 
 /**
  * @author Torsten Löhr
  */
 public class PnlEditArzt extends JPanel {
-    private Arzt arzt;
+    private Doc doc;
 
-    public PnlEditArzt(Arzt arzt) {
-        this.arzt = arzt;
+    public PnlEditArzt(Doc doc) {
+        this.doc = doc;
         initComponents();
         initPanel();
 
@@ -40,17 +39,17 @@ public class PnlEditArzt extends JPanel {
         lblMobil.setText(OPDE.lang.getString("misc.msg.mobilephone"));
         lblEMAIL.setText(OPDE.lang.getString("misc.msg.email"));
 
-        txtAnrede.setText(arzt.getAnrede());
-        txtTitel.setText(arzt.getTitel());
-        txtNachname.setText(arzt.getName());
-        txtVorname.setText(arzt.getVorname());
-        txtStrasse.setText(arzt.getStrasse());
-        txtPLZ.setText(arzt.getPlz());
-        txtOrt.setText(arzt.getOrt());
-        txtTel.setText(arzt.getTel());
-        txtFax.setText(arzt.getFax());
-        txtMobil.setText(SYSTools.catchNull(arzt.getOrt()));
-        txtEMAIL.setText(SYSTools.catchNull(arzt.getEMail()));
+        txtAnrede.setText(doc.getAnrede());
+        txtTitel.setText(doc.getTitel());
+        txtNachname.setText(doc.getName());
+        txtVorname.setText(doc.getVorname());
+        txtStrasse.setText(doc.getStrasse());
+        txtPLZ.setText(doc.getPlz());
+        txtOrt.setText(doc.getOrt());
+        txtTel.setText(doc.getTel());
+        txtFax.setText(doc.getFax());
+        txtMobil.setText(SYSTools.catchNull(doc.getOrt()));
+        txtEMAIL.setText(SYSTools.catchNull(doc.getEMail()));
 
         FocusAdapter fa = new FocusAdapter() {
             @Override
@@ -73,24 +72,24 @@ public class PnlEditArzt extends JPanel {
 
     }
 
-    public Arzt getArzt(){
+    public Doc getDoc(){
         if (txtNachname.getText().isEmpty()){
             return null;
         }
 
-        arzt.setAnrede(txtAnrede.getText().trim());
-        arzt.setTitel(txtTitel.getText().trim());
-        arzt.setName(txtNachname.getText().trim());
-        arzt.setVorname(txtVorname.getText().trim());
-        arzt.setStrasse(txtStrasse.getText().trim());
-        arzt.setPlz(txtPLZ.getText().trim());
-        arzt.setOrt(txtOrt.getText().trim());
-        arzt.setTel(txtTel.getText().trim());
-        arzt.setFax(txtFax.getText().trim());
-        arzt.setMobil(txtMobil.getText().trim());
-        arzt.setEMail(txtEMAIL.getText().trim());
+        doc.setAnrede(txtAnrede.getText().trim());
+        doc.setTitel(txtTitel.getText().trim());
+        doc.setName(txtNachname.getText().trim());
+        doc.setVorname(txtVorname.getText().trim());
+        doc.setStrasse(txtStrasse.getText().trim());
+        doc.setPlz(txtPLZ.getText().trim());
+        doc.setOrt(txtOrt.getText().trim());
+        doc.setTel(txtTel.getText().trim());
+        doc.setFax(txtFax.getText().trim());
+        doc.setMobil(txtMobil.getText().trim());
+        doc.setEMail(txtEMAIL.getText().trim());
 
-        return arzt;
+        return doc;
     }
 
     private void initComponents() {

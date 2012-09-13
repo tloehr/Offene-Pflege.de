@@ -1,6 +1,7 @@
 package entity.info;
 
 import entity.*;
+import entity.prescription.DocTools;
 import entity.prescription.PrescriptionsTools;
 import entity.reports.NReportTools;
 import op.OPDE;
@@ -670,7 +671,7 @@ public class BWInfoTools {
          */
         if (bewohner.getHausarzt() != null) {
             result += "<h2 id=\"fonth2\">" + OPDE.lang.getString("misc.msg.gp") + "</h2>";
-            result += "<div id=\"fonttext\">" + ArztTools.getFullName(bewohner.getHausarzt()) + ", " + bewohner.getHausarzt().getStrasse();
+            result += "<div id=\"fonttext\">" + DocTools.getFullName(bewohner.getHausarzt()) + ", " + bewohner.getHausarzt().getStrasse();
             result += ", " + bewohner.getHausarzt().getPlz() + " " + bewohner.getHausarzt().getOrt();
             result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + bewohner.getHausarzt().getTel() + ", " + OPDE.lang.getString("misc.msg.fax") + ": " + bewohner.getHausarzt().getFax();
             result += "</div>";

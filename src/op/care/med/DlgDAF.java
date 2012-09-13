@@ -258,8 +258,8 @@ public class DlgDAF extends javax.swing.JDialog {
 
     private void cmbFormItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbFormItemStateChanged
         DosageForm form = (DosageForm) evt.getItem();
-//        lblAnw.setText(MedFormenTools.EINHEIT[form.getAnwEinheit()]);
-//        lblPack.setText(MedFormenTools.EINHEIT[form.getPackEinheit()]);
+//        lblAnw.setText(MedFormenTools.UNITS[form.getAnwEinheit()]);
+//        lblPack.setText(MedFormenTools.UNITS[form.getPackEinheit()]);
 //        txtAPV.setText("1");
 //        txtAPV.setEnabled(form.getState() != MedFormenTools.APV1);
 //        apv.setAPV(BigDecimal.ONE);

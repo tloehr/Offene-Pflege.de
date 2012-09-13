@@ -1,4 +1,4 @@
-package entity;
+package entity.prescription;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -6,16 +6,16 @@ import java.io.Serializable;
 @Entity
 @Table(name = "KH")
 @NamedQueries({
-    @NamedQuery(name = "Krankenhaus.findAll", query = "SELECT k FROM Krankenhaus k ORDER BY k.name"),
-        @NamedQuery(name = "Krankenhaus.findAllActive", query = "SELECT k FROM Krankenhaus k WHERE k.status >= 0 ORDER BY k.name"),
-    @NamedQuery(name = "Krankenhaus.findByKhid", query = "SELECT k FROM Krankenhaus k WHERE k.khid = :khid"),
-    @NamedQuery(name = "Krankenhaus.findByName", query = "SELECT k FROM Krankenhaus k WHERE k.name = :name"),
-    @NamedQuery(name = "Krankenhaus.findByStrasse", query = "SELECT k FROM Krankenhaus k WHERE k.strasse = :strasse"),
-    @NamedQuery(name = "Krankenhaus.findByPlz", query = "SELECT k FROM Krankenhaus k WHERE k.plz = :plz"),
-    @NamedQuery(name = "Krankenhaus.findByOrt", query = "SELECT k FROM Krankenhaus k WHERE k.ort = :ort"),
-    @NamedQuery(name = "Krankenhaus.findByTel", query = "SELECT k FROM Krankenhaus k WHERE k.tel = :tel"),
-    @NamedQuery(name = "Krankenhaus.findByFax", query = "SELECT k FROM Krankenhaus k WHERE k.fax = :fax")})
-public class Krankenhaus implements Serializable {
+    @NamedQuery(name = "Krankenhaus.findAll", query = "SELECT k FROM Hospital k ORDER BY k.name"),
+        @NamedQuery(name = "Krankenhaus.findAllActive", query = "SELECT k FROM Hospital k WHERE k.status >= 0 ORDER BY k.name"),
+    @NamedQuery(name = "Krankenhaus.findByKhid", query = "SELECT k FROM Hospital k WHERE k.khid = :khid"),
+    @NamedQuery(name = "Krankenhaus.findByName", query = "SELECT k FROM Hospital k WHERE k.name = :name"),
+    @NamedQuery(name = "Krankenhaus.findByStrasse", query = "SELECT k FROM Hospital k WHERE k.strasse = :strasse"),
+    @NamedQuery(name = "Krankenhaus.findByPlz", query = "SELECT k FROM Hospital k WHERE k.plz = :plz"),
+    @NamedQuery(name = "Krankenhaus.findByOrt", query = "SELECT k FROM Hospital k WHERE k.ort = :ort"),
+    @NamedQuery(name = "Krankenhaus.findByTel", query = "SELECT k FROM Hospital k WHERE k.tel = :tel"),
+    @NamedQuery(name = "Krankenhaus.findByFax", query = "SELECT k FROM Hospital k WHERE k.fax = :fax")})
+public class Hospital implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +38,7 @@ public class Krankenhaus implements Serializable {
     @Column(name = "Status")
     private Integer status;
 
-    public Krankenhaus() {
+    public Hospital() {
         this.name = "";
         this.strasse = "";
         this.plz = "";
@@ -122,10 +122,10 @@ public class Krankenhaus implements Serializable {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof Krankenhaus)) {
+        if (!(object instanceof Hospital)) {
             return false;
         }
-        Krankenhaus other = (Krankenhaus) object;
+        Hospital other = (Hospital) object;
         if ((this.khid == null && other.khid != null) || (this.khid != null && !this.khid.equals(other.khid))) {
             return false;
         }
@@ -134,7 +134,7 @@ public class Krankenhaus implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.rest.Krankenhaus[khid=" + khid + "]";
+        return "entity.rest.Hospital[khid=" + khid + "]";
     }
 
 }

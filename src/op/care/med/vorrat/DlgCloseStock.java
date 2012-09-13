@@ -48,7 +48,7 @@ import java.math.BigDecimal;
 /**
  * @author tloehr
  */
-public class DlgBestandAbschliessen extends MyJDialog {
+public class DlgCloseStock extends MyJDialog {
 
 
     private MedStock bestand;
@@ -57,7 +57,7 @@ public class DlgBestandAbschliessen extends MyJDialog {
     /**
      * Creates new form DlgBestandAnbruch
      */
-    public DlgBestandAbschliessen(MedStock bestand, Closure actionBlock) {
+    public DlgCloseStock(MedStock bestand, Closure actionBlock) {
         super();
         this.actionBlock = actionBlock;
         this.bestand = bestand;

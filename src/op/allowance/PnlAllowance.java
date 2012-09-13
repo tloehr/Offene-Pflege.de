@@ -1009,7 +1009,7 @@ public class PnlAllowance extends CleanablePanel {
 
     private Color getBG(Resident resident, int level) {
         if (lstResidents.indexOf(resident) % 2 == 0) {
-            return SYSConst.purple_pastel1[level];
+            return SYSConst.purple1[level];
         } else {
             return SYSConst.greyscale[level];
         }

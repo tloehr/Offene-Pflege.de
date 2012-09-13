@@ -8,8 +8,8 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.swing.JideTabbedPane;
 import entity.EntityTools;
-import entity.Krankenhaus;
-import entity.KrankenhausTools;
+import entity.prescription.Hospital;
+import entity.prescription.HospitalTools;
 import entity.info.BWInfo;
 import entity.info.BWInfoTools;
 import entity.info.BWInfoTypTools;
@@ -55,14 +55,14 @@ public class PnlAbwesend extends JPanel {
     private void initPanel() {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("Krankenhaus.findAllActive");
-        java.util.List<Krankenhaus> list = query.getResultList();
+        java.util.List<Hospital> list = query.getResultList();
         em.close();
 
-        pnlEditKH = new PnlEditKH(new Krankenhaus());
+        pnlEditKH = new PnlEditKH(new Hospital());
         pnlRight.add(pnlEditKH, 0);
 
         cmbKH.setModel(new DefaultComboBoxModel(list.toArray()));
-        cmbKH.setRenderer(KrankenhausTools.getKHRenderer());
+        cmbKH.setRenderer(HospitalTools.getKHRenderer());
 
         tab1.setTitleAt(TAB_KH, OPDE.lang.getString("misc.msg.hospital"));
         tab1.setTitleAt(TAB_HOLLIDAY, OPDE.lang.getString("misc.msg.holliday"));
@@ -86,10 +86,10 @@ public class PnlAbwesend extends JPanel {
             tab1.setSelectedIndex(TAB_KH);
         }
 
-        Krankenhaus preselect = null;
+        Hospital preselect = null;
         if (props.containsKey("khid")) {
             Long khid = Long.parseLong(props.getProperty("khid"));
-            preselect = EntityTools.find(Krankenhaus.class, khid);
+            preselect = EntityTools.find(Hospital.class, khid);
             cmbKH.setSelectedItem(preselect);
         }
 
@@ -107,9 +107,9 @@ public class PnlAbwesend extends JPanel {
     }
 
     private void btnToLeftActionPerformed(ActionEvent e) {
-        Krankenhaus newKH = pnlEditKH.getKrankenhaus();
+        Hospital newKH = pnlEditKH.getKrankenhaus();
         if (newKH != null) {
-            cmbKH.setModel(new DefaultComboBoxModel(new Krankenhaus[]{newKH}));
+            cmbKH.setModel(new DefaultComboBoxModel(new Hospital[]{newKH}));
         }
         SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, SYSConst.SCROLL_TIME_FAST);
 
@@ -125,16 +125,16 @@ public class PnlAbwesend extends JPanel {
             case TAB_KH: {
                 abwesenheit.setBemerkung(txtKH.getText().trim());
 
-                Krankenhaus krankenhaus = (Krankenhaus) cmbKH.getSelectedItem();
-                if (krankenhaus.getKhid() == null) {
-                    krankenhaus = EntityTools.merge(krankenhaus);
+                Hospital hospital = (Hospital) cmbKH.getSelectedItem();
+                if (hospital.getKhid() == null) {
+                    hospital = EntityTools.merge(hospital);
                 }
 
                 abwesenheit.setHtml("<div id=\"fonttext\"><br/><b><u>" + OPDE.lang.getString("misc.msg.hospital") + "</u></b>" +
-                        "<ul><li>" + KrankenhausTools.getFullName(krankenhaus) + "</li></ul></div>");
+                        "<ul><li>" + HospitalTools.getFullName(hospital) + "</li></ul></div>");
 
                 props.put("type", BWInfoTypTools.ABWE_TYP_KH);
-                props.put("khid", krankenhaus.getKhid().toString());
+                props.put("khid", hospital.getKhid().toString());
                 break;
             }
             case TAB_HOLLIDAY: {

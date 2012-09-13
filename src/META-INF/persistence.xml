@@ -5,7 +5,7 @@
     <persistence-unit name="OPDEPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <class>entity.system.Acl</class>
-        <class>entity.Arzt</class>
+        <class>entity.prescription.Doc</class>
         <class>entity.BWerte</class>
         <class>entity.Allowance</class>
         <class>entity.Betreuer</class>
@@ -15,7 +15,7 @@
         <class>entity.system.Groups</class>
         <class>entity.info.ICD</class>
         <class>entity.KKasse</class>
-        <class>entity.Krankenhaus</class>
+        <class>entity.prescription.Hospital</class>
         <class>entity.nursingprocess.InterventionSchedule</class>
         <class>entity.nursingprocess.Intervention</class>
         <class>entity.Mitarbeiter</class>

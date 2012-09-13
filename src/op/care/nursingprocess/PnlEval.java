@@ -50,7 +50,7 @@ public class PnlEval extends JPanel {
     private NursingProcess np;
 
     /**
-     * Creates new form DlgAbsetzen
+     * Creates new form DlgDiscontinue
      */
     public PnlEval(NursingProcess np, Closure actionBlock) {
         this.np = np;

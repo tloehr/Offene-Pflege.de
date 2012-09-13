@@ -859,7 +859,7 @@ public class DBRetrieve {
 //                String anw = rs.getString("AnwText");
 //                int anwein = rs.getInt("AnwEinheit");
 //                if (SYSTools.catchNull(anw).equals("")) {
-//                    anw = SYSConst.EINHEIT[anwein];
+//                    anw = SYSConst.UNITS[anwein];
 //                }
 //
 //                text = (SYSTools.catchNull(zub).equals("") ? anw : zub + ", " + anw);

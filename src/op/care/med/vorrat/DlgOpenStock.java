@@ -47,16 +47,16 @@ import java.awt.*;
 /**
  * @author tloehr
  */
-public class DlgBestandAnbrechen extends MyJDialog {
+public class DlgOpenStock extends MyJDialog {
 
     private MedInventory inventory;
     private Closure actionBlock;
     private MedStock bestand;
 
     /**
-     * Creates new form DlgBestandAnbrechen
+     * Creates new form DlgOpenStock
      */
-    public DlgBestandAnbrechen(TradeForm darreichung, Resident bewohner, Closure actionBlock) {
+    public DlgOpenStock(TradeForm darreichung, Resident bewohner, Closure actionBlock) {
         super();
         this.inventory = TradeFormTools.getInventory4TradeForm(bewohner, darreichung);
         this.bestand = null;

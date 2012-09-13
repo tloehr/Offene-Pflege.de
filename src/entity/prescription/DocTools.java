@@ -1,4 +1,4 @@
-package entity;
+package entity.prescription;
 
 import op.OPDE;
 import op.tools.SYSTools;
@@ -13,7 +13,7 @@ import java.awt.*;
  * Time: 13:27
  * To change this template use File | Settings | File Templates.
  */
-public class ArztTools {
+public class DocTools {
 
     public static ListCellRenderer getArztRenderer() {
         return new ListCellRenderer() {
@@ -22,9 +22,9 @@ public class ArztTools {
                 String text;
                 if (o == null) {
                     text = OPDE.lang.getString("misc.commands.>>noselection<<");
-                } else if (o instanceof Arzt) {
-//                    text = ((Arzt) o).getName() + ", " + ((Arzt) o).getVorname() + ", " + ((Arzt) o).getOrt();
-                    text = getFullName((Arzt) o);
+                } else if (o instanceof Doc) {
+//                    text = ((Doc) o).getName() + ", " + ((Doc) o).getVorname() + ", " + ((Doc) o).getOrt();
+                    text = getFullName((Doc) o);
                 } else {
                     text = o.toString();
                 }
@@ -33,8 +33,8 @@ public class ArztTools {
         };
     }
 
-    public static String getFullName(Arzt arzt) {
-        return arzt.getAnrede() + " " + SYSTools.catchNull(arzt.getTitel(), "", " ") + arzt.getVorname() + " " + arzt.getName();
+    public static String getFullName(Doc doc) {
+        return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitel(), "", " ") + doc.getVorname() + " " + doc.getName();
     }
 
 }

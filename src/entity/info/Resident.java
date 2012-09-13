@@ -26,6 +26,7 @@
 package entity.info;
 
 import entity.*;
+import entity.prescription.Doc;
 import entity.system.Users;
 import op.OPDE;
 import op.tools.SYSTools;
@@ -101,7 +102,7 @@ public class Resident implements Serializable, Comparable<Resident> {
     private Users bv2;
     @JoinColumn(name = "ArztID", referencedColumnName = "ArztID")
     @ManyToOne
-    private Arzt hausarzt;
+    private Doc hausarzt;
     @JoinColumn(name = "BetrID1", referencedColumnName = "BetrID")
     @ManyToOne
     private Betreuer betreuer1;
@@ -226,11 +227,11 @@ public class Resident implements Serializable, Comparable<Resident> {
         this.bv2 = bv2;
     }
 
-    public Arzt getHausarzt() {
+    public Doc getHausarzt() {
         return hausarzt;
     }
 
-    public void setHausarzt(Arzt hausarzt) {
+    public void setHausarzt(Doc hausarzt) {
         this.hausarzt = hausarzt;
     }
 

@@ -101,14 +101,28 @@ public class SYSConst {
     public static Color thistle2 = new Color(0xe9, 0xcf, 0xEC);
     public static Color thistle3 = new Color(0xc6, 0xae, 0xc7);
     public static Color thistle4 = new Color(0x80, 0x6d, 0x7E);
-    public static Color yellow1 = new Color(0xFF, 0xFF, 0x00);
+//    public static Color yellow1 = new Color(0xFF, 0xFF, 0x00);
     public static Color yellow2 = new Color(0xEE, 0xEE, 0x00);
     public static Color yellow3 = new Color(0xCD, 0xCD, 0x00);
     public static Color yellow4 = new Color(0x8B, 0x8B, 0x00);
     public static Color grey80 = new Color(0xc7, 0xc7, 0xc5);
     public static Color grey50 = new Color(0x74, 0x71, 0x70);
 
-    public static Color[] purple_pastel1 = new Color[]{
+
+    public static final int dark4 = 0;
+    public static final int dark3 = 1;
+    public static final int dark2 = 2;
+    public static final int dark1 = 3;
+    public static final int medium4 = 4;
+    public static final int medium3 = 5;
+    public static final int medium2 = 6;
+    public static final int medium1 = 7;
+    public static final int light4 = 8;
+    public static final int light3 = 9;
+    public static final int light2 = 10;
+    public static final int light1 = 11;
+
+    public static Color[] purple1 = new Color[]{
             SYSTools.getColor("800080"), SYSTools.getColor("BF00BF"),
             SYSTools.getColor("DB00DB"), SYSTools.getColor("F900F9"),
             SYSTools.getColor("FF4AFF"), SYSTools.getColor("FF86FF"),
@@ -124,6 +138,42 @@ public class SYSConst {
             SYSTools.getColor("BDBDBD"), SYSTools.getColor("D8D8D8"),
             SYSTools.getColor("E6E6E6"), SYSTools.getColor("F2F2F2"),
             SYSTools.getColor("FAFAFA"), SYSTools.getColor("FFFFFF")
+    };
+
+    public static Color[] yellow1 = new Color[]{
+            SYSTools.getColor("C8B400"), SYSTools.getColor("D9C400"),
+            SYSTools.getColor("E6CE00"), SYSTools.getColor("F7DE00"),
+            SYSTools.getColor("FFE920"), SYSTools.getColor("FFF06A"),
+            SYSTools.getColor("FFF284"), SYSTools.getColor("FFF7B7"),
+            SYSTools.getColor("FFF9CE"), SYSTools.getColor("FFFBDF"),
+            SYSTools.getColor("FFFEF7"), SYSTools.getColor("FFFFFF")
+    };
+
+    public static Color[] blue1 = new Color[]{
+            SYSTools.getColor("3923D6"), SYSTools.getColor("6755E3"),
+            SYSTools.getColor("8678E9"), SYSTools.getColor("9588EC"),
+            SYSTools.getColor("A095EE"), SYSTools.getColor("B0A7F1"),
+            SYSTools.getColor("BCB4F3"), SYSTools.getColor("CBC5F5"),
+            SYSTools.getColor("D7D1F8"), SYSTools.getColor("E3E0FA"),
+            SYSTools.getColor("EFEDFC"), SYSTools.getColor("F7F5FE")
+    };
+
+    public static Color[] red1 = new Color[]{
+            SYSTools.getColor("F70000"), SYSTools.getColor("FF2626"),
+            SYSTools.getColor("FF5353"), SYSTools.getColor("FF7373"),
+            SYSTools.getColor("FF8E8E"), SYSTools.getColor("FFA4A4"),
+            SYSTools.getColor("FFB5B5"), SYSTools.getColor("FFC8C8"),
+            SYSTools.getColor("FFEAEA"), SYSTools.getColor("E3E0FA"),
+            SYSTools.getColor("FFFDFD"), SYSTools.getColor("FFFFFF")
+    };
+
+    public static Color[] green2 = new Color[]{
+            SYSTools.getColor("4A9586"), SYSTools.getColor("5EAE9E"),
+            SYSTools.getColor("74BAAC"), SYSTools.getColor("8DC7BB"),
+            SYSTools.getColor("A5D3CA"), SYSTools.getColor("C0E0DA"),
+            SYSTools.getColor("CFE7E2"), SYSTools.getColor("DCEDEA"),
+            SYSTools.getColor("E7F3F1"), SYSTools.getColor("F2F9F8"),
+            SYSTools.getColor("F7FBFA"), SYSTools.getColor("FFFFFF")
     };
 
     public static Color colorWeekday = SYSTools.getColor("FFE6D0");
@@ -145,7 +195,7 @@ public class SYSConst {
 //    public static final int GESCHLECHT_MAENNLICH = 1;
 //    public static final int GESCHLECHT_WEIBLICH = 2;
 
-    public static final String EINHEIT[] = {"", OPDE.lang.getString("misc.msg.piece"), "ml", "l", "mg", "g", "cm", "m"}; // Für AnwEinheit, PackEinheit, Dimension
+    public static final String UNITS[] = {"", OPDE.lang.getString("misc.msg.piece"), "ml", "l", "mg", "g", "cm", "m"}; // Für AnwEinheit, PackEinheit, Dimension
 
     public static final byte UZ = 0; // Solluhrzeit
     public static final byte FM = 1; // Nacht Morgens
