@@ -439,7 +439,7 @@ public class PrescriptionsTools {
             }
             result += verordnung.getDocON().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getDocON().getName(), SYSTools.INDEX_NACHNAME);
         }
-        result += "; " + verordnung.getAngesetztDurch().getFullname() + "</font>";
+        result += "; " + verordnung.getUserON().getFullname() + "</font>";
 
         return result + "</div>";
     }

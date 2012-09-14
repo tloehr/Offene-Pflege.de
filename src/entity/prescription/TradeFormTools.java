@@ -81,7 +81,7 @@ public class TradeFormTools {
     }
 
 
-    public static List<TradeForm> findDarreichungByMedProduktText(EntityManager em, String suche) {
+    public static List<TradeForm> findTradeFormByMedProductText(EntityManager em, String suche) {
         suche = "%" + suche.trim() + "%";
 
         Query query = em.createQuery(" " +

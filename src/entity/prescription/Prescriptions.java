@@ -383,16 +383,16 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
         this.intervention = massnahme;
     }
 
-    public void setUserOFF(Users abgesetztDurch) {
-        this.userOFF = abgesetztDurch;
+    public void setUserOFF(Users userOFF) {
+        this.userOFF = userOFF;
     }
 
-    public Users getAngesetztDurch() {
+    public Users getUserON() {
         return userON;
     }
 
-    public void setAngesetztDurch(Users angesetztDurch) {
-        this.userON = angesetztDurch;
+    public void setUserON(Users userON) {
+        this.userON = userON;
     }
 
 

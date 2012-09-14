@@ -27,12 +27,10 @@ package op;
 
 import com.jidesoft.utils.Lm;
 import com.jidesoft.wizard.WizardStyle;
-import entity.system.*;
-import entity.system.UsersTools;
 import entity.files.SYSFilesTools;
 import entity.nursingprocess.DFNTools;
 import entity.prescription.BHPTools;
-import entity.system.Users;
+import entity.system.*;
 import op.system.AppInfo;
 import op.system.FrmInit;
 import op.system.PrinterTypes;
@@ -288,18 +286,19 @@ public class OPDE {
                 Message msg = new MimeMessage(session);
                 msg.setFrom(new InternetAddress(props.getProperty("mail.sender"), props.getProperty("mail.sender.personal")));
                 msg.addRecipient(Message.RecipientType.TO, new InternetAddress(props.getProperty("mail.recipient"), props.getProperty("mail.recipient.personal")));
-                msg.setSubject("OPDE Exception: " + e.getMessage());
+                msg.setSubject(lang.getString(internalClassID + ".errormail.subject") + ": " + e.getMessage());
 
 
                 BodyPart messageBodyPart = new MimeBodyPart();
 
                 messageBodyPart.setText("" +
-                        "Es ist ein Fehler in OPDE aufgetreten.\n" +
-                        "Auf Host: " + localMachine.getHostName() + "\n" +
-                        "IP-Adresse: " + localMachine.getHostAddress() + "\n" +
-                        "Angemelet war: " + getLogin().getUser().getUID() + "\n" +
-                        "Zeitpunkt: " + DateFormat.getDateTimeInstance().format(new Date()) + "\n\n\n" +
-                        "Siehe Anhang für Stacktrace");
+                        lang.getString(internalClassID + ".errormail.line1") + "\n" +
+                        lang.getString(internalClassID + ".errormail.line2") + ": " + localMachine.getHostName() + "\n" +
+                        lang.getString(internalClassID + ".errormail.line3") + ": " + localMachine.getHostAddress() + "\n" +
+                        lang.getString(internalClassID + ".errormail.line4") + ": " + getLogin().getUser().getUID() + "\n" +
+                        lang.getString(internalClassID + ".errormail.line5") + ": " + DateFormat.getDateTimeInstance().format(new Date()) + "\n\n\n" +
+                        lang.getString(internalClassID + ".errormail.line6")
+                );
 
                 Multipart multipart = new MimeMultipart();
                 multipart.addBodyPart(messageBodyPart);
@@ -316,7 +315,7 @@ public class OPDE {
                 Transport.send(msg);
             } catch (MessagingException e1) {
                 OPDE.info(e1);
-                OPDE.info("Mail-System nicht korrekt konfiguriert");
+                OPDE.info("Mail-System is not configured");
                 e1.printStackTrace();
             } catch (UnsupportedEncodingException e1) {
                 OPDE.info(e1);

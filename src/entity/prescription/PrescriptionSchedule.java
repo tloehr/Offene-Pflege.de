@@ -45,7 +45,6 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "BHPPID")
     private Long bhppid;
     @Version
@@ -103,7 +102,8 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
 
     }
 
-    public PrescriptionSchedule(boolean bedarf) {
+    public PrescriptionSchedule(Prescriptions prescription) {
+
         nachtMo = BigDecimal.ZERO;
         mittags = BigDecimal.ZERO;
         nachmittags = BigDecimal.ZERO;
@@ -117,9 +117,9 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
         tagNum = 0;
         lDatum = new Date();
 
-        this.prescription = null;
+        this.prescription = prescription;
 
-        if (bedarf) {
+        if (prescription.isOnDemand()) {
             morgens = BigDecimal.ZERO;
             maxAnzahl = 1;
             maxEDosis = BigDecimal.ONE;

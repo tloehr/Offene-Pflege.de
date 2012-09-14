@@ -72,7 +72,8 @@ public class PnlRegelDosis extends CleanablePanel {
 //        this.currentSelectedTime = null;
 
         if (planung == null) {
-            planung = new PrescriptionSchedule(false);
+            // TODO: ERROR. FIX THIS
+            planung = new PrescriptionSchedule(null);
         }
         this.planung = planung;
         initComponents();

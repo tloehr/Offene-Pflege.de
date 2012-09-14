@@ -35,7 +35,6 @@ import com.jidesoft.swing.JideButton;
 import entity.files.SYSFilesTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
-import entity.prescription.BHPTools;
 import entity.prescription.PrescriptionSchedule;
 import entity.prescription.Prescriptions;
 import entity.prescription.PrescriptionsTools;
@@ -45,11 +44,9 @@ import op.OPDE;
 import op.care.med.vorrat.DlgNewStocks;
 import op.system.InternalClassACL;
 import op.threads.DisplayManager;
-import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
-import org.joda.time.DateMidnight;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -810,26 +807,40 @@ public class PnlPrescription extends NursingRecordsPanel {
         java.util.List<Component> list = new ArrayList<Component>();
 
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
-            JideButton addButton = GUITools.createHyperlinkButton("Neue Verordnung eingeben", new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
+            JideButton addButton = GUITools.createHyperlinkButton(internalClassID + ".btnNewOnDemand", SYSConst.icon22add, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgPrescription(new Prescriptions(resident), DlgPrescription.ALLOW_ALL_EDIT, new Closure() {
+                    new DlgOnDemand(new Prescriptions(resident), DlgOnDemand.MODE_NEW, new Closure() {
                         @Override
                         public void execute(Object o) {
                             if (o != null) {
                                 Pair<Prescriptions, List<PrescriptionSchedule>> result = (Pair<Prescriptions, List<PrescriptionSchedule>>) o;
-                                Prescriptions verordnung = result.getFirst();
+
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();
                                     em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                    verordnung.setRelation(UniqueTools.getNewUID(em, "__verkenn").getUid());
-                                    verordnung = em.merge(verordnung);
-                                    if (!verordnung.isOnDemand()) {
-                                        BHPTools.generate(em, verordnung.getPrescriptionSchedule(), new DateMidnight(), true);
-                                    }
+                                    Prescriptions myPrescription = em.merge(result.getFirst());
+                                    myPrescription.setRelation(UniqueTools.getNewUID(em, "__verkenn").getUid());
                                     em.getTransaction().commit();
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Neu erstellt: " + PrescriptionsTools.toPrettyString(verordnung), 2));
+
+                                    lstPrescriptions.add(myPrescription);
+                                    Collections.sort(lstPrescriptions);
+                                    final CollapsiblePane myCP = createCP4(myPrescription);
+                                    buildPanel();
+
+                                    SwingUtilities.invokeLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            GUITools.scroll2show(jspPrescription, myCP.getLocation().y, new Closure() {
+                                                @Override
+                                                public void execute(Object o) {
+                                                    GUITools.flashBackground(myCP, Color.YELLOW, 2);
+                                                }
+                                            });
+                                        }
+                                    });
+
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
