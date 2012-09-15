@@ -27,7 +27,7 @@
 
 package tablemodels;
 
-import entity.prescription.Prescriptions;
+import entity.prescription.Prescription;
 import entity.prescription.PrescriptionScheduleTools;
 
 import javax.swing.table.AbstractTableModel;
@@ -42,11 +42,11 @@ public class TMDosis
 
     String anwendung;
 
-    Prescriptions verordnung = null;
+    Prescription verordnung = null;
     //VerordnungPlanung[] planungen;
 
 
-    public TMDosis(String anwtext, Prescriptions verordnung) {
+    public TMDosis(String anwtext, Prescription verordnung) {
         super();
 
         this.anwendung = anwtext;

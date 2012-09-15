@@ -43,24 +43,23 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
 /**
  * @author root
  */
 public class DlgDiscontinue extends MyJDialog {
-    private Prescriptions verordnung, verordnungToReturn;
+    private Prescription prescription;
     private Closure actionBlock;
 
     /**
      * Creates new form DlgDiscontinue
      */
-    public DlgDiscontinue(Prescriptions verordnung, Closure actionBlock) {
+    public DlgDiscontinue(Prescription prescription, Closure actionBlock) {
         this.actionBlock = actionBlock;
-        this.verordnung = verordnung;
+        this.prescription = prescription;
         initComponents();
-        fillAerzteUndKHs();
+        lblQuestion.setText(OPDE.lang.getString(PnlPrescription.internalClassID+".dlgDiscontinue.question"));
+        fillCMBs();
         setVisible(true);
     }
 
@@ -72,7 +71,7 @@ public class DlgDiscontinue extends MyJDialog {
      */
     // <editor-fold defaultstate="collapsed" desc=" Erzeugter Quelltext ">//GEN-BEGIN:initComponents
     private void initComponents() {
-        label1 = new JLabel();
+        lblQuestion = new JLabel();
         cmbArztAb = new JComboBox();
         cmbKHAb = new JComboBox();
         panel1 = new JPanel();
@@ -88,41 +87,29 @@ public class DlgDiscontinue extends MyJDialog {
             "$rgap, 200dlu:grow, $lcgap, $rgap",
             "$rgap, $lgap, default, 2*($lgap, fill:16dlu), $lgap, fill:default, $lgap, $rgap"));
 
-        //---- label1 ----
-        label1.setText("Wer hat die Verordnung abgesetzt ?");
-        label1.setFont(new Font("Arial", Font.PLAIN, 20));
-        contentPane.add(label1, CC.xy(2, 3));
+        //---- lblQuestion ----
+        lblQuestion.setText("Wer hat die Verordnung abgesetzt ?");
+        lblQuestion.setFont(new Font("Arial", Font.PLAIN, 18));
+        contentPane.add(lblQuestion, CC.xy(2, 3));
 
         //---- cmbArztAb ----
-        cmbArztAb.setModel(new DefaultComboBoxModel(new String[] {
-            "Item 1",
-            "Item 2",
-            "Item 3",
-            "Item 4"
+        cmbArztAb.setModel(new DefaultComboBoxModel(new String[]{
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
         }));
         cmbArztAb.setFont(new Font("Arial", Font.PLAIN, 14));
-        cmbArztAb.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                cmbArztAbItemStateChanged(e);
-            }
-        });
         contentPane.add(cmbArztAb, CC.xy(2, 5));
 
         //---- cmbKHAb ----
-        cmbKHAb.setModel(new DefaultComboBoxModel(new String[] {
-            "Item 1",
-            "Item 2",
-            "Item 3",
-            "Item 4"
+        cmbKHAb.setModel(new DefaultComboBoxModel(new String[]{
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
         }));
         cmbKHAb.setFont(new Font("Arial", Font.PLAIN, 14));
-        cmbKHAb.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                cmbKHAbItemStateChanged(e);
-            }
-        });
         contentPane.add(cmbKHAb, CC.xy(2, 7));
 
         //======== panel1 ========
@@ -143,7 +130,6 @@ public class DlgDiscontinue extends MyJDialog {
             //---- btnOK ----
             btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
             btnOK.setText(null);
-            btnOK.setEnabled(false);
             btnOK.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -153,17 +139,18 @@ public class DlgDiscontinue extends MyJDialog {
             panel1.add(btnOK);
         }
         contentPane.add(panel1, CC.xy(2, 9, CC.RIGHT, CC.DEFAULT));
-        pack();
+        setSize(490, 175);
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+        prescription = null;
         dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
 
     @Override
     public void dispose() {
-        actionBlock.execute(verordnungToReturn);
+        actionBlock.execute(prescription);
         super.dispose();
     }
 
@@ -173,25 +160,25 @@ public class DlgDiscontinue extends MyJDialog {
         Hospital hospital = (Hospital) cmbKHAb.getSelectedItem();
 
         if (doc == null && hospital == null) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Doc und Hospital dürfen nicht beide leer sein.", 2));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(PnlPrescription.internalClassID+".dlgDiscontinue.docandhospitalempty"));
         } else {
-            verordnung.setDocOFF(doc);
-            verordnung.setHospitalOFF(hospital);
-            verordnungToReturn = verordnung;
+            prescription.setDocOFF(doc);
+            prescription.setHospitalOFF(hospital);
+            prescription.setUserOFF(OPDE.getLogin().getUser());
             dispose();
         }
     }//GEN-LAST:event_btnOKActionPerformed
 
     private void cmbKHAbItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbKHAbItemStateChanged
-        btnOK.setEnabled(cmbArztAb.getSelectedIndex() > 0 || cmbKHAb.getSelectedIndex() > 0);
+
     }//GEN-LAST:event_cmbKHAbItemStateChanged
 
     private void cmbArztAbItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbArztAbItemStateChanged
-        btnOK.setEnabled(cmbArztAb.getSelectedIndex() > 0 || cmbKHAb.getSelectedIndex() > 0);
+
     }//GEN-LAST:event_cmbArztAbItemStateChanged
 
 
-    private void fillAerzteUndKHs() {
+    private void fillCMBs() {
         EntityManager em = OPDE.createEM();
         Query queryArzt = em.createNamedQuery("Arzt.findAll");
         java.util.List<Doc> listAerzte = queryArzt.getResultList();
@@ -214,7 +201,7 @@ public class DlgDiscontinue extends MyJDialog {
 
 
     // Variablendeklaration - nicht modifizieren//GEN-BEGIN:variables
-    private JLabel label1;
+    private JLabel lblQuestion;
     private JComboBox cmbArztAb;
     private JComboBox cmbKHAb;
     private JPanel panel1;

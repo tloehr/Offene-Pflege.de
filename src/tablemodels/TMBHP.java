@@ -29,7 +29,7 @@ package tablemodels;
 import entity.info.Resident;
 import entity.prescription.BHP;
 import entity.prescription.BHPTools;
-import entity.prescription.PrescriptionsTools;
+import entity.prescription.PrescriptionTools;
 import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
@@ -203,7 +203,7 @@ public class TMBHP extends AbstractTableModel {
 
         switch (col) {
             case COL_BEZEICHNUNG: {
-                result = PrescriptionsTools.getShortDescription(bhp.getPrescriptionSchedule().getPrescription());
+                result = PrescriptionTools.getShortDescription(bhp.getPrescriptionSchedule().getPrescription());
                 break;
             }
             case COL_DOSIS: {

@@ -233,15 +233,18 @@ public class GUITools {
     }
 
 
-    public static void scroll2show(final JScrollPane jsp, final int end, final Closure what2doAfterwards) {
+    public static void scroll2show(final JScrollPane jsp, int end, final Closure what2doAfterwards) {
         final int start = jsp.getVerticalScrollBar().getValue();
+        end = Math.max(0, end);
+        end = Math.min(jsp.getVerticalScrollBar().getMaximum(), end);
         final int distance = end - start;
+
 
         final TimingSource ts = new SwingTimerTimingSource();
         Animator.setDefaultTimingSource(ts);
         ts.init();
 
-        Animator animator = new Animator.Builder().setInterpolator(new AccelerationInterpolator(0.15f, 0.8f)).setDuration(750, TimeUnit.MILLISECONDS).setStartDirection(Animator.Direction.FORWARD).addTarget(new TimingTargetAdapter() {
+        Animator animator = new Animator.Builder().setInterpolator(new AccelerationInterpolator(0.15f, 0.8f)).setDuration(500, TimeUnit.MILLISECONDS).setStartDirection(Animator.Direction.FORWARD).addTarget(new TimingTargetAdapter() {
             @Override
             public void begin(Animator source) {
             }

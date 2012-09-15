@@ -64,14 +64,25 @@ public class BHPTools {
 
     public static final String[] SOLLZEITTEXT = new String[]{"Uhrzeit", "NachtMo", "Morgens", "Mittags", "Nachmittags", "Abends", "NachtAb"};
 
-    public static long getNumBHPs(Prescriptions prescription) {
+    public static long getNumBHPs(Prescription prescription) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("BHP.numByNOTStatusAndVerordnung");
+        Query query = em.createQuery("SELECT COUNT(bhp) FROM BHP bhp WHERE bhp.prescription = :prescription AND bhp.status <> :status");
         query.setParameter("prescription", prescription);
         query.setParameter("status", STATE_OPEN);
         long num = (Long) query.getSingleResult();
         em.close();
         return num;
+    }
+
+    public static boolean hasBeenUsedAlready(Prescription prescription) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT bhp FROM BHP bhp WHERE bhp.prescription = :prescription AND bhp.status <> :status");
+        query.setParameter("prescription", prescription);
+        query.setParameter("status", STATE_OPEN);
+        query.setMaxResults(1);
+        boolean used = query.getResultList().size() > 0;
+        em.close();
+        return used;
     }
 
     public static Comparator<BHP> getOnDemandComparator() {
@@ -177,7 +188,7 @@ public class BHPTools {
      * @param em           EntityManager, in dessen Kontext das hier ablaufen soll.
      * @param prescription um die es geht.
      */
-    public static void cleanup(EntityManager em, Prescriptions prescription) throws Exception {
+    public static void cleanup(EntityManager em, Prescription prescription) throws Exception {
 
         Date now = new Date();
 
@@ -389,7 +400,7 @@ public class BHPTools {
      */
     public static ArrayList<BHP> getBHPsOnDemand(Resident resident, Date date) {
 
-        List<Prescriptions> listPrescriptions = PrescriptionsTools.getOnDemandPrescriptions(resident, date);
+        List<Prescription> listPrescriptions = PrescriptionTools.getOnDemandPrescriptions(resident, date);
 
         EntityManager em = OPDE.createEM();
         ArrayList<BHP> listBHP = new ArrayList<BHP>();
@@ -404,7 +415,7 @@ public class BHPTools {
 
             Query query = em.createQuery(jpql);
 
-            for (Prescriptions prescription : listPrescriptions) {
+            for (Prescription prescription : listPrescriptions) {
                 query.setParameter("prescription", prescription);
                 query.setParameter("from", new DateTime(date).toDateMidnight().toDate());
                 query.setParameter("to", new DateTime(date).toDateMidnight().plusDays(1).toDateTime().minusSeconds(1).toDate());

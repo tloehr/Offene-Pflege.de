@@ -41,7 +41,6 @@ import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
 import org.joda.time.DateMidnight;
-import tablemodels.TMDosis;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -68,37 +67,32 @@ import java.util.List;
  */
 public class DlgOnDemand extends MyJDialog {
 
-    public static final int MODE_EDIT = 0;
-    public static final int MODE_CHANGE = 1;
-    public static final int MODE_NEW = 2;
-
     private boolean ignoreEvent;
 
-    private int editMode;
     private Closure actionBlock;
-    private Prescriptions prescription;
+    private Prescription prescription;
     private PrescriptionSchedule schedule;
     private List<PrescriptionSchedule> schedules2delete = null;
-    private Pair<Prescriptions, PrescriptionSchedule> returnPackage = null;
+    private Pair<Prescription, PrescriptionSchedule> returnPackage = null;
 
 
     /**
      * Creates new form DlgPrescription
      */
-    public DlgOnDemand(Prescriptions prescription, int mode, Closure actionBlock) {
+    public DlgOnDemand(Prescription prescription, Closure actionBlock) {
 
+        // OnDemand prescriptions have exactly ONE schedule
         if (prescription.getPrescriptionSchedule().isEmpty()) {
             PrescriptionSchedule schedule = new PrescriptionSchedule(prescription);
             schedule.setPrescription(prescription);
             prescription.getPrescriptionSchedule().add(schedule);
         }
-
         schedule = prescription.getPrescriptionSchedule().get(0);
 
         this.actionBlock = actionBlock;
         this.prescription = prescription;
         schedules2delete = new ArrayList<PrescriptionSchedule>();
-        this.editMode = mode;
+
         initComponents();
         initDialog();
         pack();
@@ -164,15 +158,11 @@ public class DlgOnDemand extends MyJDialog {
         popup.getContentPane().add(saveButton);
         popup.setDefaultFocusComponent(editor);
 
-        popup.showPopup();
+        GUITools.showPopup(popup, SwingConstants.SOUTH_WEST);
     }
 
     private void cmbSitPropertyChange(PropertyChangeEvent e) {
         cmbSitItemStateChanged(null);
-    }
-
-    private void btnEmptySitActionPerformed(ActionEvent e) {
-        cmbSit.setModel(new DefaultComboBoxModel());
     }
 
     private void txtMedActionPerformed(ActionEvent e) {
@@ -217,11 +207,16 @@ public class DlgOnDemand extends MyJDialog {
     }
 
     private void rbActiveItemStateChanged(ItemEvent e) {
-
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            jdcAB.setDate(null);
+        }
     }
 
     private void rbDateItemStateChanged(ItemEvent e) {
         jdcAB.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            jdcAB.setDate(new Date());
+        }
     }
 
     private void txtMaxTimesActionPerformed(ActionEvent e) {
@@ -230,10 +225,6 @@ public class DlgOnDemand extends MyJDialog {
 
     private void txtMaxTimesFocusGained(FocusEvent e) {
         SYSTools.markAllTxt((JTextField) e.getSource());
-    }
-
-    private void txtEDosisActionPerformed(ActionEvent e) {
-        // TODO add your code here
     }
 
     private void txtEDosisFocusGained(FocusEvent e) {
@@ -256,13 +247,11 @@ public class DlgOnDemand extends MyJDialog {
         txtMed = new JXSearchField();
         cmbMed = new JComboBox();
         panel4 = new JPanel();
-        btnEmptySit2 = new JButton();
         btnMed = new JButton();
         cmbIntervention = new JComboBox();
         txtSit = new JXSearchField();
         cmbSit = new JComboBox();
         panel3 = new JPanel();
-        btnEmptySit = new JButton();
         btnAddSit = new JButton();
         txtIntervention = new JXSearchField();
         jPanel2 = new JPanel();
@@ -293,15 +282,15 @@ public class DlgOnDemand extends MyJDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "2*(default, $lcgap), default:grow, $lcgap, default",
-                "default, $lgap, fill:default:grow, $lgap, fill:default, $lgap, default"));
+            "14dlu, $lcgap, default, 6dlu, default:grow, $lcgap, 14dlu",
+            "14dlu, $lgap, fill:default:grow, $lgap, fill:default, $lgap, 14dlu"));
 
         //======== jPanel1 ========
         {
             jPanel1.setBorder(null);
             jPanel1.setLayout(new FormLayout(
-                    "68dlu, $lcgap, pref:grow, $lcgap, pref",
-                    "3*(16dlu, $lgap), default, $lgap, fill:default:grow"));
+                "68dlu, $lcgap, pref:grow, $lcgap, pref",
+                "3*(16dlu, $lgap), default, $lgap, fill:default:grow"));
 
             //---- txtMed ----
             txtMed.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -322,11 +311,11 @@ public class DlgOnDemand extends MyJDialog {
             jPanel1.add(txtMed, CC.xy(1, 1));
 
             //---- cmbMed ----
-            cmbMed.setModel(new DefaultComboBoxModel(new String[]{
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+            cmbMed.setModel(new DefaultComboBoxModel(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
             }));
             cmbMed.setFont(new Font("Arial", Font.PLAIN, 14));
             cmbMed.addItemListener(new ItemListener() {
@@ -340,22 +329,6 @@ public class DlgOnDemand extends MyJDialog {
             //======== panel4 ========
             {
                 panel4.setLayout(new BoxLayout(panel4, BoxLayout.LINE_AXIS));
-
-                //---- btnEmptySit2 ----
-                btnEmptySit2.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/button_cancel.png")));
-                btnEmptySit2.setBorderPainted(false);
-                btnEmptySit2.setBorder(null);
-                btnEmptySit2.setContentAreaFilled(false);
-                btnEmptySit2.setToolTipText("Auswahl l\u00f6schen");
-                btnEmptySit2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnEmptySit2.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/button_cancel-pressed.png")));
-                btnEmptySit2.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnEmptySitActionPerformed(e);
-                    }
-                });
-                panel4.add(btnEmptySit2);
 
                 //---- btnMed ----
                 btnMed.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
@@ -376,11 +349,11 @@ public class DlgOnDemand extends MyJDialog {
             jPanel1.add(panel4, CC.xy(5, 1));
 
             //---- cmbIntervention ----
-            cmbIntervention.setModel(new DefaultComboBoxModel(new String[]{
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+            cmbIntervention.setModel(new DefaultComboBoxModel(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
             }));
             cmbIntervention.setFont(new Font("Arial", Font.PLAIN, 14));
             jPanel1.add(cmbIntervention, CC.xywh(3, 5, 3, 1));
@@ -397,11 +370,11 @@ public class DlgOnDemand extends MyJDialog {
             jPanel1.add(txtSit, CC.xy(1, 3));
 
             //---- cmbSit ----
-            cmbSit.setModel(new DefaultComboBoxModel(new String[]{
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+            cmbSit.setModel(new DefaultComboBoxModel(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
             }));
             cmbSit.setFont(new Font("Arial", Font.PLAIN, 14));
             cmbSit.addItemListener(new ItemListener() {
@@ -422,22 +395,6 @@ public class DlgOnDemand extends MyJDialog {
             {
                 panel3.setLayout(new BoxLayout(panel3, BoxLayout.LINE_AXIS));
 
-                //---- btnEmptySit ----
-                btnEmptySit.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/button_cancel.png")));
-                btnEmptySit.setBorderPainted(false);
-                btnEmptySit.setBorder(null);
-                btnEmptySit.setContentAreaFilled(false);
-                btnEmptySit.setToolTipText("Auswahl l\u00f6schen");
-                btnEmptySit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnEmptySit.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/button_cancel-pressed.png")));
-                btnEmptySit.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnEmptySitActionPerformed(e);
-                    }
-                });
-                panel3.add(btnEmptySit);
-
                 //---- btnAddSit ----
                 btnAddSit.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
                 btnAddSit.setBorderPainted(false);
@@ -454,7 +411,7 @@ public class DlgOnDemand extends MyJDialog {
                 });
                 panel3.add(btnAddSit);
             }
-            jPanel1.add(panel3, CC.xy(5, 3));
+            jPanel1.add(panel3, CC.xy(5, 3, CC.RIGHT, CC.DEFAULT));
 
             //---- txtIntervention ----
             txtIntervention.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -470,8 +427,8 @@ public class DlgOnDemand extends MyJDialog {
             //======== jPanel2 ========
             {
                 jPanel2.setLayout(new FormLayout(
-                        "default, $lcgap, pref, $lcgap, default, $lcgap, 37dlu",
-                        "23dlu, fill:22dlu"));
+                    "default, $lcgap, pref, $lcgap, default, $lcgap, 37dlu",
+                    "23dlu, fill:22dlu"));
 
                 //---- lblNumber ----
                 lblNumber.setText("Anzahl");
@@ -509,12 +466,6 @@ public class DlgOnDemand extends MyJDialog {
                 //---- txtEDosis ----
                 txtEDosis.setHorizontalAlignment(SwingConstants.RIGHT);
                 txtEDosis.setText("1.0");
-                txtEDosis.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        txtEDosisActionPerformed(e);
-                    }
-                });
                 txtEDosis.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusGained(FocusEvent e) {
@@ -531,15 +482,15 @@ public class DlgOnDemand extends MyJDialog {
         {
             jPanel3.setBorder(null);
             jPanel3.setLayout(new FormLayout(
-                    "149dlu",
-                    "3*(fill:default, $lgap), fill:default:grow"));
+                "149dlu",
+                "3*(fill:default, $lgap), fill:default:grow"));
 
             //======== pnlOFF ========
             {
                 pnlOFF.setBorder(new TitledBorder("Absetzung"));
                 pnlOFF.setLayout(new FormLayout(
-                        "pref, 86dlu:grow",
-                        "fill:17dlu, $lgap, fill:17dlu"));
+                    "pref, 86dlu:grow",
+                    "fill:17dlu, $lgap, fill:17dlu"));
 
                 //---- rbActive ----
                 rbActive.setText("text");
@@ -589,24 +540,24 @@ public class DlgOnDemand extends MyJDialog {
             {
                 pnlON.setBorder(new TitledBorder("Ansetzung"));
                 pnlON.setLayout(new FormLayout(
-                        "119dlu:grow",
-                        "17dlu, $lgap, fill:17dlu"));
+                    "119dlu:grow",
+                    "17dlu, $lgap, fill:17dlu"));
 
                 //---- cmbDocON ----
-                cmbDocON.setModel(new DefaultComboBoxModel(new String[]{
-                        "Item 1",
-                        "Item 2",
-                        "Item 3",
-                        "Item 4"
+                cmbDocON.setModel(new DefaultComboBoxModel(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
                 }));
                 pnlON.add(cmbDocON, CC.xy(1, 1));
 
                 //---- cmbHospitalON ----
-                cmbHospitalON.setModel(new DefaultComboBoxModel(new String[]{
-                        "Item 1",
-                        "Item 2",
-                        "Item 3",
-                        "Item 4"
+                cmbHospitalON.setModel(new DefaultComboBoxModel(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
                 }));
                 pnlON.add(cmbHospitalON, CC.xy(1, 3));
             }
@@ -641,7 +592,7 @@ public class DlgOnDemand extends MyJDialog {
             panel1.add(btnSave);
         }
         contentPane.add(panel1, CC.xy(5, 5, CC.RIGHT, CC.DEFAULT));
-        pack();
+        setSize(805, 445);
         setLocationRelativeTo(getOwner());
 
         //---- bgMedikament ----
@@ -654,6 +605,8 @@ public class DlgOnDemand extends MyJDialog {
         fillComboBoxes();
 
         ignoreEvent = true;
+
+        rbActive.setText(OPDE.lang.getString(PnlPrescription.internalClassID + ".dlgOnDemand.rbActive"));
 
         txtMed.setText("");
         jdcAB.setMinSelectableDate(new Date());
@@ -682,10 +635,10 @@ public class DlgOnDemand extends MyJDialog {
         txtMaxTimes.setText(NumberFormat.getNumberInstance().format(schedule.getMaxAnzahl()));
         txtEDosis.setText(NumberFormat.getNumberInstance().format(schedule.getMaxEDosis()));
 
-        txtMed.setEnabled(editMode != MODE_CHANGE);
-        cmbMed.setEnabled(editMode != MODE_CHANGE);
-        txtSit.setEnabled(editMode != MODE_CHANGE);
-        cmbSit.setEnabled(editMode != MODE_CHANGE);
+//        txtMed.setEnabled(editMode != MODE_CHANGE);
+//        cmbMed.setEnabled(editMode != MODE_CHANGE);
+//        txtSit.setEnabled(editMode != MODE_CHANGE);
+//        cmbSit.setEnabled(editMode != MODE_CHANGE);
 
         ignoreEvent = false;
 
@@ -735,21 +688,15 @@ public class DlgOnDemand extends MyJDialog {
         cmbIntervention.setEnabled(false);
         txtIntervention.setText(null);
         txtIntervention.setEnabled(false);
-//        cbStellplan.setEnabled(false);
-//        cbStellplan.setSelected(false);
-//        cbPackEnde.setSelected(false);
-//        cbPackEnde.setEnabled(cmbMed.getSelectedItem() != null);
-//        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(DarreichungTools.toPrettyString((Darreichung) cmbMed.getSelectedItem())));
-
     }//GEN-LAST:event_cmbMedItemStateChanged
 
     private boolean saveOK() {
         if (ignoreEvent) return false;
-        boolean ansetzungOK = (cmbDocON.getSelectedIndex() > 0 || cmbHospitalON.getSelectedIndex() > 0);
-        boolean absetzungOK = rbActive.isSelected() || jdcAB.getDate() != null;
+        boolean OnOK = (cmbDocON.getSelectedIndex() > 0 || cmbHospitalON.getSelectedIndex() > 0);
+        boolean OffOK = rbActive.isSelected() || jdcAB.getDate() != null;
         boolean sitOK = cmbSit.getSelectedItem() != null;
         boolean medOK = cmbMed.getModel().getSize() == 0 || cmbMed.getSelectedItem() != null;
-        boolean massOK = cmbIntervention.getSelectedItem() != null;
+        boolean intervOK = cmbIntervention.getSelectedItem() != null;
 
         boolean doseOK = true;
         try {
@@ -765,16 +712,16 @@ public class DlgOnDemand extends MyJDialog {
         }
 
         String reason = "";
-        reason += (ansetzungOK ? "" : "Die Informationen zum <b>an</b>setzenden <b>Arzt</b> oder <b>KH</b> sind unvollständig. ");
+        reason += (OnOK ? "" : "Die Informationen zum <b>an</b>setzenden <b>Arzt</b> oder <b>KH</b> sind unvollständig. ");
         reason += (medOK ? "" : "Die <b>Medikamentenangabe</b> ist falsch. ");
         reason += (sitOK ? "" : "Sie haben keine <b>Situation</b> angegeben. ");
-        reason += (massOK ? "" : "Die Angaben über die <b>Massnahmen</b> sind falsch. ");
+        reason += (intervOK ? "" : "Die Angaben über die <b>Massnahmen</b> sind falsch. ");
         reason += (doseOK ? "" : "Sie müssen eine gültige <b>Dosierung</b> angegeben. ");
 
         if (!reason.isEmpty()) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(reason, DisplayMessage.WARNING));
         }
-        return ansetzungOK & absetzungOK & medOK & massOK & doseOK;
+        return OnOK & OffOK & medOK & intervOK & doseOK;
     }
 
     private void btnSaveActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
@@ -891,13 +838,11 @@ public class DlgOnDemand extends MyJDialog {
     private JXSearchField txtMed;
     private JComboBox cmbMed;
     private JPanel panel4;
-    private JButton btnEmptySit2;
     private JButton btnMed;
     private JComboBox cmbIntervention;
     private JXSearchField txtSit;
     private JComboBox cmbSit;
     private JPanel panel3;
-    private JButton btnEmptySit;
     private JButton btnAddSit;
     private JXSearchField txtIntervention;
     private JPanel jPanel2;

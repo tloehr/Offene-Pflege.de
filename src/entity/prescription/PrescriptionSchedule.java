@@ -102,7 +102,7 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
 
     }
 
-    public PrescriptionSchedule(Prescriptions prescription) {
+    public PrescriptionSchedule(Prescription prescription) {
 
         nachtMo = BigDecimal.ZERO;
         mittags = BigDecimal.ZERO;
@@ -142,7 +142,7 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
 
     }
 
-    public PrescriptionSchedule(BigDecimal nachtMo, BigDecimal morgens, BigDecimal mittags, BigDecimal nachmittags, BigDecimal abends, BigDecimal nachtAb, BigDecimal uhrzeitDosis, Date uhrzeit, Integer maxAnzahl, BigDecimal maxEDosis, Short taeglich, Short woechentlich, Short monatlich, Short tagNum, Short mon, Short die, Short mit, Short don, Short fre, Short sam, Short son, Date lDatum, Users user, Prescriptions prescription) {
+    public PrescriptionSchedule(BigDecimal nachtMo, BigDecimal morgens, BigDecimal mittags, BigDecimal nachmittags, BigDecimal abends, BigDecimal nachtAb, BigDecimal uhrzeitDosis, Date uhrzeit, Integer maxAnzahl, BigDecimal maxEDosis, Short taeglich, Short woechentlich, Short monatlich, Short tagNum, Short mon, Short die, Short mit, Short don, Short fre, Short sam, Short son, Date lDatum, Users user, Prescription prescription) {
         this.nachtMo = nachtMo;
         this.morgens = morgens;
         this.mittags = mittags;
@@ -375,17 +375,17 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
     // ==
     @JoinColumn(name = "VerID", referencedColumnName = "VerID")
     @ManyToOne
-    private Prescriptions prescription;
+    private Prescription prescription;
 
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
     private Users user;
 
-    public Prescriptions getPrescription() {
+    public Prescription getPrescription() {
         return prescription;
     }
 
-    public void setprescription(Prescriptions prescription) {
+    public void setprescription(Prescription prescription) {
         this.prescription = prescription;
 //        if (!this.prescription.getPlanungen().contains(this)) {
 //            this.prescription.getPlanungen().add(this);
@@ -400,7 +400,7 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
         this.user = user;
     }
 
-    public void setPrescription(Prescriptions prescription) {
+    public void setPrescription(Prescription prescription) {
         this.prescription = prescription;
     }
 
@@ -615,7 +615,7 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
         return new PrescriptionSchedule(nachtMo, morgens, mittags, nachmittags, abends, nachtAb, uhrzeitDosis, uhrzeit, maxAnzahl, maxEDosis, taeglich, woechentlich, monatlich, tagNum, mon, die, mit, don, fre, sam, son, lDatum, user, prescription);
     }
 
-    public PrescriptionSchedule createCopy(Prescriptions myprescription) {
+    public PrescriptionSchedule createCopy(Prescription myprescription) {
         return new PrescriptionSchedule(nachtMo, morgens, mittags, nachmittags, abends, nachtAb, uhrzeitDosis, uhrzeit, maxAnzahl, maxEDosis, taeglich, woechentlich, monatlich, tagNum, mon, die, mit, don, fre, sam, son, lDatum, user, myprescription);
     }
 

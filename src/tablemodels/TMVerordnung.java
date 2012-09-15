@@ -61,16 +61,16 @@ public class TMVerordnung extends AbstractTableModel {
         listeVerordnungen = new ArrayList<Object[]>();
 
         EntityManager em = OPDE.createEM();
-        Query queryVerordnung = em.createQuery("SELECT v FROM Prescriptions v WHERE " + (archiv ? "" : " v.to >= :now AND ") + " v.resident = :bewohner ");
+        Query queryVerordnung = em.createQuery("SELECT v FROM Prescription v WHERE " + (archiv ? "" : " v.to >= :now AND ") + " v.resident = :bewohner ");
         if (!archiv) {
             queryVerordnung.setParameter("now", new Date());
         }
         queryVerordnung.setParameter("bewohner", bewohner);
-        List<Prescriptions> listeVerordnung = queryVerordnung.getResultList();
+        List<Prescription> listeVerordnung = queryVerordnung.getResultList();
         em.close();
 
         int i = 0;
-        for (Prescriptions verordnung : listeVerordnung) {
+        for (Prescription verordnung : listeVerordnung) {
             OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.loading"), i / 2, listeVerordnung.size()));
             MedInventory inventory = verordnung.getTradeForm() == null ? null : TradeFormTools.getInventory4TradeForm(bewohner, verordnung.getTradeForm());
             MedStock aktiverBestand = MedStockTools.getStockInUse(inventory);
@@ -82,8 +82,8 @@ public class TMVerordnung extends AbstractTableModel {
         Collections.sort(listeVerordnungen, new Comparator<Object[]>() {
             @Override
             public int compare(Object[] us, Object[] them) {
-                Prescriptions usVerordnung = (Prescriptions) us[0];
-                Prescriptions themVerordnung = (Prescriptions) them[0];
+                Prescription usVerordnung = (Prescription) us[0];
+                Prescription themVerordnung = (Prescription) them[0];
                 return usVerordnung.compareTo(themVerordnung);
             }
         });
@@ -98,8 +98,8 @@ public class TMVerordnung extends AbstractTableModel {
 
     }
 
-    public Prescriptions getPrescription(int row) {
-        return (Prescriptions) listeVerordnungen.get(row)[0];
+    public Prescription getPrescription(int row) {
+        return (Prescription) listeVerordnungen.get(row)[0];
     }
 
     public MedInventory getVorrat(int row) {
@@ -118,8 +118,8 @@ public class TMVerordnung extends AbstractTableModel {
         return (BigDecimal) listeVerordnungen.get(row)[4];
     }
 
-    public List<Prescriptions> getVordnungenAt(int[] sel) {
-        ArrayList<Prescriptions> selection = new ArrayList<Prescriptions>();
+    public List<Prescription> getVordnungenAt(int[] sel) {
+        ArrayList<Prescription> selection = new ArrayList<Prescription>();
         if (sel == null) { // dann alle
             for (int i = 0; i < listeVerordnungen.size(); i++) {
                 selection.add(getPrescription(i));
@@ -175,7 +175,7 @@ public class TMVerordnung extends AbstractTableModel {
         if (cache.containsKey(getPrescription(row))) {
             result = cache.get(getPrescription(row)).toString();
         } else {
-            result = PrescriptionsTools.getDose(getPrescription(row), mitBestand);
+            result = PrescriptionTools.getDose(getPrescription(row), mitBestand);
             cache.put(getPrescription(row), result);
         }
         return result;
@@ -184,13 +184,13 @@ public class TMVerordnung extends AbstractTableModel {
     @Override
     public Object getValueAt(int row, int col) {
         Object result = null;
-        Prescriptions verordnung = getPrescription(row);
+        Prescription verordnung = getPrescription(row);
 
         switch (col) {
             case COL_MSSN: {
 
                 String res = "";
-//                res = PrescriptionsTools.getPrescriptionAsText(verordnung);
+//                res = PrescriptionTools.getPrescriptionAsText(verordnung);
                 if (!verordnung.getAttachedFiles().isEmpty()) {
                     res += "<font color=\"green\">&#9679;</font>";
                 }
@@ -207,9 +207,9 @@ public class TMVerordnung extends AbstractTableModel {
             }
             case COL_Hinweis: {
 
-                String hinweis = PrescriptionsTools.getRemark(verordnung);
-                String an = PrescriptionsTools.getON(verordnung);
-                String ab = PrescriptionsTools.getOFF(verordnung);
+                String hinweis = PrescriptionTools.getRemark(verordnung);
+                String an = PrescriptionTools.getON(verordnung);
+                String ab = PrescriptionTools.getOFF(verordnung);
 
                 ab = ab.isEmpty() ? "" : "<br/>" + ab;
                 hinweis = hinweis.isEmpty() ? "" : hinweis + "<br/>";

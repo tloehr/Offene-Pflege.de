@@ -26,7 +26,7 @@ import java.util.*;
 /**
  * @author tloehr
  */
-public class PrescriptionsTools {
+public class PrescriptionTools {
 
     /**
      * Diese Methode erzeugt einen Stellplan für den aktuellen Tag im HTML Format.
@@ -160,7 +160,7 @@ public class PrescriptionsTools {
 //            listeBedarf = new ArrayList<Object[]>(listeRohfassung.size());
 //
 //            for (Object[] rohdaten : listeRohfassung) {
-//                Prescriptions verordnung = em.find(Prescriptions.class, ((BigInteger) rohdaten[0]).longValue());
+//                Prescription verordnung = em.find(Prescription.class, ((BigInteger) rohdaten[0]).longValue());
 //                Situations situation = em.find(Situations.class, ((BigInteger) rohdaten[1]).longValue());
 //                PrescriptionSchedule planung = em.find(PrescriptionSchedule.class, ((BigInteger) rohdaten[2]).longValue());
 //                BigDecimal vorratSaldo = (BigDecimal) rohdaten[3];
@@ -181,7 +181,7 @@ public class PrescriptionsTools {
 //
 //    public static boolean hasBedarf(Resident resident) {
 //        EntityManager em = OPDE.createEM();
-//        Query query = em.createQuery("SELECT COUNT(v) FROM Prescriptions v WHERE v.resident = :resident AND v.to >= :now AND v.situation IS NOT NULL ");
+//        Query query = em.createQuery("SELECT COUNT(v) FROM Prescription v WHERE v.resident = :resident AND v.to >= :now AND v.situation IS NOT NULL ");
 //        query.setParameter("resident", resident);
 //        query.setParameter("now", new Date());
 //        return ((Long) query.getSingleResult()).longValue() > 0;
@@ -215,7 +215,7 @@ public class PrescriptionsTools {
 
             Object[] objects = (Object[]) it.next();
 
-            Prescriptions verordnung = em.find(Prescriptions.class, ((BigInteger) objects[0]).longValue());
+            Prescription verordnung = em.find(Prescription.class, ((BigInteger) objects[0]).longValue());
             Stationen station = em.find(Stationen.class, ((BigInteger) objects[1]).longValue());
             PrescriptionSchedule planung = em.find(PrescriptionSchedule.class, ((BigInteger) objects[2]).longValue());
 
@@ -311,7 +311,7 @@ public class PrescriptionsTools {
         return html;
     }
 
-    public static String getShortDescription(Prescriptions prescription) {
+    public static String getShortDescription(Prescription prescription) {
         String result = "<font size=+1>";// = SYSConst.html_fontface;
 
         if (!prescription.hasMed()) {
@@ -344,7 +344,7 @@ public class PrescriptionsTools {
         return result;
     }
 
-    public static String getPrescriptionAsText2(Prescriptions verordnung) {
+    public static String getPrescriptionAsText2(Prescription verordnung) {
         String result = "<div id=\"fonttext\">";// = SYSConst.html_fontface;
 
         if (verordnung.isDiscontinued()) {
@@ -389,7 +389,7 @@ public class PrescriptionsTools {
         return result + "</div>";
     }
 
-    public static String getPrescriptionAsShortText(Prescriptions verordnung) {
+    public static String getPrescriptionAsShortText(Prescription verordnung) {
         String result = "";
 
         if (verordnung.isDiscontinued()) {
@@ -412,20 +412,20 @@ public class PrescriptionsTools {
         return result;
     }
 
-    public static String getRemark(Prescriptions verordnung) {
+    public static String getRemark(Prescription verordnung) {
         String result = "<div id=\"fonttext\">";
 
         if (verordnung.isOnDemand()) {
-            result += "<b><u>Nur bei Bedarf:</u> <font color=\"blue\">" + verordnung.getSituation().getText() + "</font></b>";
+            result += "<b><u>"+OPDE.lang.getString("misc.msg.ondemand")+":</u> <font color=\"blue\">" + verordnung.getSituation().getText() + "</font></b>";
         }
         if (!verordnung.getText().isEmpty()) {
             result += result.isEmpty() ? "" : "<br/>";
-            result += "<b><u>Bemerkung:</u> </b>" + verordnung.getText();
+            result += "<b><u>"+OPDE.lang.getString("misc.msg.comment")+":</u> </b>" + verordnung.getText();
         }
         return result + "</div>";
     }
 
-    public static String getON(Prescriptions verordnung) {
+    public static String getON(Prescription verordnung) {
         String result = "<div id=\"fonttext\">";
         String datum = DateFormat.getDateInstance().format(verordnung.getFrom());
 
@@ -435,7 +435,7 @@ public class PrescriptionsTools {
         }
         if (verordnung.getDocON() != null) {
             if (verordnung.getHospitalON() != null) {
-                result += " <i>bestätigt durch:</i> ";
+                result += " <i>"+OPDE.lang.getString("misc.msg.confirmedby")+":</i> ";
             }
             result += verordnung.getDocON().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getDocON().getName(), SYSTools.INDEX_NACHNAME);
         }
@@ -444,7 +444,7 @@ public class PrescriptionsTools {
         return result + "</div>";
     }
 
-    public static String getOFF(Prescriptions verordnung) {
+    public static String getOFF(Prescription verordnung) {
         String result = "<div id=\"fonttext\">";
 
         if (verordnung.isLimited()) {
@@ -456,7 +456,7 @@ public class PrescriptionsTools {
 
             if (verordnung.getDocOFF() != null) {
                 if (verordnung.getHospitalOFF() != null) {
-                    result += " <i>bestätigt durch:</i> ";
+                    result += " <i>"+OPDE.lang.getString("misc.msg.confirmedby")+":</i> ";
                 }
                 result += verordnung.getDocOFF().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getDocOFF().getName(), SYSTools.INDEX_NACHNAME);
             }
@@ -466,11 +466,11 @@ public class PrescriptionsTools {
         return result + "</div>";
     }
 
-    public static String getDose(Prescriptions prescription) {
+    public static String getDose(Prescription prescription) {
         return getDose(prescription, false);
     }
 
-    public static String getDose(Prescriptions prescription, boolean showInventory) {
+    public static String getDose(Prescription prescription, boolean showInventory) {
 //        long timestart = System.currentTimeMillis();
         String result = "";
         if (prescription.getPrescriptionSchedule().size() > 1) {
@@ -578,11 +578,11 @@ public class PrescriptionsTools {
      * Dieser Query ordnet Verordnungen den Vorräten zu. Dazu ist ein kleiner Trick nötig. Denn über die Zeit können verschiedene Vorräte mit verschiedenen
      * Darreichungen für dieselbe Verordnung verwendet werden. Der Trick ist der Join über zwei Spalten in der Zeile mit "MPBestand"
      */
-    public static List<Prescriptions> getPrescriptionsByInventory(MedInventory inventory) {
+    public static List<Prescription> getPrescriptionsByInventory(MedInventory inventory) {
         EntityManager em = OPDE.createEM();
 
         List<BigInteger> list = null;
-        List<Prescriptions> result = null;
+        List<Prescription> result = null;
         Query query = em.createNativeQuery(" SELECT DISTINCT ver.VerID FROM BHPVerordnung ver " +
                 " INNER JOIN MPVorrat v ON v.BWKennung = ver.BWKennung " + // Verbindung über Bewohner
                 " INNER JOIN MPBestand b ON ver.DafID = b.DafID AND v.VorID = b.VorID " + // Verbindung über Bestand zur Darreichung UND dem Vorrat
@@ -591,9 +591,9 @@ public class PrescriptionsTools {
         list = query.getResultList();
 
         if (!list.isEmpty()) {
-            result = new ArrayList<Prescriptions>(list.size());
+            result = new ArrayList<Prescription>(list.size());
             for (BigInteger verid : list) {
-                result.add(em.find(Prescriptions.class, verid.longValue()));
+                result.add(em.find(Prescription.class, verid.longValue()));
             }
         }
         em.close();
@@ -601,13 +601,13 @@ public class PrescriptionsTools {
         return result;
     }
 
-    public static ArrayList<Prescriptions> getAll(Resident resident) {
+    public static ArrayList<Prescription> getAll(Resident resident) {
         EntityManager em = OPDE.createEM();
 
-        ArrayList<Prescriptions> result = null;
-        Query query = em.createQuery(" SELECT p FROM Prescriptions p WHERE p.resident = :resident ");
+        ArrayList<Prescription> result = null;
+        Query query = em.createQuery(" SELECT p FROM Prescription p WHERE p.resident = :resident ");
         query.setParameter("resident", resident);
-        result = new ArrayList<Prescriptions>(query.getResultList());
+        result = new ArrayList<Prescription>(query.getResultList());
 
         em.close();
 
@@ -619,16 +619,16 @@ public class PrescriptionsTools {
      * Dieser Query ordnet Verordnungen den Vorräten zu. Dazu ist ein kleiner Trick nötig. Denn über die Zeit können verschiedene Vorräte mit verschiedenen
      * Darreichungen für dieselbe Verordnung verwendet werden. Der Trick ist der Join über zwei Spalten in der Zeile mit "MPBestand"
      */
-    public static List<Prescriptions> getOnDemandPrescriptions(Resident resident, Date date) {
+    public static List<Prescription> getOnDemandPrescriptions(Resident resident, Date date) {
         EntityManager em = OPDE.createEM();
 
-//        List<Prescriptions> list = null;
-        Query query = em.createQuery("SELECT p FROM Prescriptions p WHERE p.resident = :resident AND p.situation IS NOT NULL AND p.from <= :from AND p.to >= :to ORDER BY p.situation.text, p.id");
+//        List<Prescription> list = null;
+        Query query = em.createQuery("SELECT p FROM Prescription p WHERE p.resident = :resident AND p.situation IS NOT NULL AND p.from <= :from AND p.to >= :to ORDER BY p.situation.text, p.id");
         query.setParameter("resident", resident);
         query.setParameter("from", new DateTime(date).toDateMidnight().toDate());
         query.setParameter("to", new DateTime(date).toDateMidnight().plusDays(1).toDateTime().minusSeconds(1).toDate());
 
-        List<Prescriptions> list = query.getResultList();
+        List<Prescription> list = query.getResultList();
 //        Collections.sort(list);
 
         em.close();
@@ -636,8 +636,8 @@ public class PrescriptionsTools {
         return list;
     }
 
-    public static String getPrescriptionAsHTML(Prescriptions prescription, boolean withheader, boolean withlongheader, boolean withmed) {
-        ArrayList<Prescriptions> single = new ArrayList<Prescriptions>();
+    public static String getPrescriptionAsHTML(Prescription prescription, boolean withheader, boolean withlongheader, boolean withmed) {
+        ArrayList<Prescription> single = new ArrayList<Prescription>();
         single.add(prescription);
         return getPrescriptionAsHTML(single, withheader, withlongheader, withmed);
     }
@@ -645,12 +645,12 @@ public class PrescriptionsTools {
     /**
      * Gibt eine HTML Darstellung der Verordungen zurück, die in dem übergebenen TableModel enthalten sind.
      */
-    public static String getPrescriptionAsHTML(List<Prescriptions> list, boolean withheader, boolean withlongheader, boolean withmed) {
+    public static String getPrescriptionAsHTML(List<Prescription> list, boolean withheader, boolean withlongheader, boolean withmed) {
         String result = "";
 
         if (!list.isEmpty()) {
-            Prescriptions verordnung = list.get(0);
-            result += withheader ? "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.prescription") + (withlongheader ? " für " + ResidentTools.getLabelText(verordnung.getResident()) : "") + "</h2>" : "";
+            Prescription prescription = list.get(0);
+            result += withheader ? "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.prescription") + (withlongheader ? " für " + ResidentTools.getLabelText(prescription.getResident()) : "") + "</h2>" : "";
 
 //            if (prescription.getResident().getStation() != null) {
 //                result += EinrichtungenTools.getAsText(prescription.getResident().getStation().getEinrichtung());
@@ -659,15 +659,21 @@ public class PrescriptionsTools {
             result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
                     "<th >Medikament/Massnahme</th><th >Dosierung / Hinweise</th><th >Angesetzt</th></tr>";
 
-            Iterator<Prescriptions> itVerordnung = list.iterator();
+            Iterator<Prescription> itVerordnung = list.iterator();
             while (itVerordnung.hasNext()) {
-                verordnung = itVerordnung.next();
+                prescription = itVerordnung.next();
 
                 result += "<tr>";
-                result += "<td valign=\"top\">" + getShortDescription(verordnung) + "</td>";
-                result += "<td valign=\"top\">" + getDose(verordnung, withmed) + "<br/>";
-                result += getRemark(verordnung) + "</td>";
-                result += "<td valign=\"top\">" + getON(verordnung) + "</td>";
+                result += "<td valign=\"top\">" + getShortDescription(prescription) + "</td>";
+                result += "<td valign=\"top\">" + getDose(prescription, withmed) + "<br/>";
+                result += getRemark(prescription) + "</td>";
+                result += "<td valign=\"top\">" + getON(prescription);
+
+                if (prescription.isDiscontinued()){
+                    result += getOFF(prescription);
+                }
+
+                result += "</td>";
                 //result += "<td>" + SYSTools.unHTML2(tmv.getValueAt(v, TMVerordnung.COL_AB).toString()) + "</td>";
                 result += "</tr>";
             }
@@ -686,7 +692,7 @@ public class PrescriptionsTools {
      * @param verordnung
      * @return Anzahl der Verordnungen, die zu dieser gehören.e
      */
-    public static int getNumVerodnungenMitGleicherKennung(Prescriptions verordnung) {
+    public static int getNumVerodnungenMitGleicherKennung(Prescription verordnung) {
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("Verordnung.findByVerKennung");
         query.setParameter("verKennung", verordnung.getRelation());
@@ -695,7 +701,7 @@ public class PrescriptionsTools {
         return num;
     }
 
-    public static String toPrettyString(Prescriptions verordnung) {
+    public static String toPrettyString(Prescription verordnung) {
         String myPretty = "";
 
         if (verordnung.hasMed()) {
@@ -709,7 +715,7 @@ public class PrescriptionsTools {
         return myPretty;
     }
 
-    public static void absetzen(EntityManager em, Prescriptions verordnung) throws Exception {
+    public static void absetzen(EntityManager em, Prescription verordnung) throws Exception {
         verordnung = em.merge(verordnung);
         em.lock(verordnung, LockModeType.OPTIMISTIC);
         verordnung.setTo(new Date());
@@ -718,12 +724,12 @@ public class PrescriptionsTools {
     }
 
     public static void alleAbsetzen(EntityManager em, Resident resident) throws Exception {
-        Query query = em.createQuery("SELECT b FROM Prescriptions b WHERE b.resident = :resident AND b.to >= :now");
+        Query query = em.createQuery("SELECT b FROM Prescription b WHERE b.resident = :resident AND b.to >= :now");
         query.setParameter("resident", resident);
         query.setParameter("now", new Date());
-        List<Prescriptions> verordnungen = query.getResultList();
+        List<Prescription> verordnungen = query.getResultList();
 
-        for (Prescriptions verordnung : verordnungen) {
+        for (Prescription verordnung : verordnungen) {
             absetzen(em, verordnung);
         }
     }

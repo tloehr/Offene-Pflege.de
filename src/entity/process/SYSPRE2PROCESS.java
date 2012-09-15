@@ -1,6 +1,6 @@
 package entity.process;
 
-import entity.prescription.Prescriptions;
+import entity.prescription.Prescription;
 
 import javax.persistence.*;
 
@@ -33,12 +33,12 @@ public class SYSPRE2PROCESS {
 
     @ManyToOne
     @JoinColumn(name = "VerID", referencedColumnName = "VerID")
-    private Prescriptions verordnung;
+    private Prescription verordnung;
 
     protected SYSPRE2PROCESS() {
     }
 
-    public SYSPRE2PROCESS(QProcess vorgang, Prescriptions verordnung) {
+    public SYSPRE2PROCESS(QProcess vorgang, Prescription verordnung) {
         this.id = 0;
         this.vorgang = vorgang;
         this.verordnung = verordnung;
@@ -52,11 +52,11 @@ public class SYSPRE2PROCESS {
         this.vorgang = vorgang;
     }
 
-    public Prescriptions getPrescription() {
+    public Prescription getPrescription() {
         return verordnung;
     }
 
-    public void setVerordnung(Prescriptions verordnung) {
+    public void setVerordnung(Prescription verordnung) {
         this.verordnung = verordnung;
     }
 }

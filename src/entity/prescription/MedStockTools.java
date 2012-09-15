@@ -240,7 +240,7 @@ public class MedStockTools {
             if (MedInventoryTools.getNextToOpen(stock.getInventory()) == null) {
                 // No ??
                 // Are there any prescriptions that needs to be closed now, because of the empty package ?
-                for (Prescriptions verordnung : PrescriptionsTools.getPrescriptionsByInventory(stock.getInventory())) {
+                for (Prescription verordnung : PrescriptionTools.getPrescriptionsByInventory(stock.getInventory())) {
                     if (verordnung.isTillEndOfPackage()) {
                         verordnung = em.merge(verordnung);
                         em.lock(verordnung, LockModeType.OPTIMISTIC);

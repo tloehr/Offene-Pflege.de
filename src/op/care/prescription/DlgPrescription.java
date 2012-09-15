@@ -31,7 +31,6 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.wizard.WizardDialog;
 import com.toedter.calendar.JDateChooser;
-import entity.nursingprocess.Intervention;
 import entity.nursingprocess.InterventionTools;
 import entity.prescription.*;
 import op.OPDE;
@@ -76,15 +75,15 @@ public class DlgPrescription extends MyJDialog {
     private PropertyChangeListener myPropertyChangeListener;
     private int editMode;
     private Closure actionBlock;
-    private Prescriptions prescription;
+    private Prescription prescription;
     private List<PrescriptionSchedule> planungenToDelete = null;
-    private Pair<Prescriptions, List<PrescriptionSchedule>> returnPackage = null;
+    private Pair<Prescription, List<PrescriptionSchedule>> returnPackage = null;
 
 
     /**
      * Creates new form DlgPrescription
      */
-    public DlgPrescription(Prescriptions prescription, int mode, Closure actionBlock) {
+    public DlgPrescription(Prescription prescription, int mode, Closure actionBlock) {
         this.actionBlock = actionBlock;
         this.prescription = prescription;
         planungenToDelete = new ArrayList<PrescriptionSchedule>();

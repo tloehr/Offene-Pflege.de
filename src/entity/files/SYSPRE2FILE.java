@@ -25,8 +25,8 @@
  */
 package entity.files;
 
+import entity.prescription.Prescription;
 import entity.system.Users;
-import entity.prescription.Prescriptions;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -53,7 +53,7 @@ public class SYSPRE2FILE implements Serializable {
     private Date pit;
     @JoinColumn(name = "VERID", referencedColumnName = "VerID")
     @ManyToOne
-    private Prescriptions verordnung;
+    private Prescription verordnung;
     @JoinColumn(name = "FID", referencedColumnName = "OCFID")
     @ManyToOne
     private SYSFiles sysfile;
@@ -64,7 +64,7 @@ public class SYSPRE2FILE implements Serializable {
     public SYSPRE2FILE() {
     }
 
-    public SYSPRE2FILE(SYSFiles sysfile, Prescriptions verordnung, Users user, Date pit) {
+    public SYSPRE2FILE(SYSFiles sysfile, Prescription verordnung, Users user, Date pit) {
         this.sysfile = sysfile;
         this.verordnung = verordnung;
         this.user = user;
@@ -88,7 +88,7 @@ public class SYSPRE2FILE implements Serializable {
         return sysfile;
     }
 
-    public Prescriptions getPrescription() {
+    public Prescription getPrescription() {
         return verordnung;
     }
 

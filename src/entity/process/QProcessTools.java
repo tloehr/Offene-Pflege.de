@@ -5,12 +5,12 @@
 package entity.process;
 
 import entity.BWerte;
+import entity.prescription.Prescription;
 import entity.system.Users;
 import entity.info.BWInfo;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.nursingprocess.NursingProcess;
-import entity.prescription.Prescriptions;
 import entity.reports.NReport;
 import op.OPDE;
 import op.process.PnlProcess;
@@ -70,7 +70,7 @@ public class QProcessTools {
         } else if (element instanceof BWerte) {
             query = em.createNamedQuery("SYSVAL2PROCESS.findByElementAndVorgang");
             elementBezeichnung = "Bewohner Wert";
-        } else if (element instanceof Prescriptions) {
+        } else if (element instanceof Prescription) {
             query = em.createNamedQuery("SYSPRE2PROCESS.findByElementAndVorgang");
             elementBezeichnung = "Ärztliche Verordnung";
         } else if (element instanceof BWInfo) {
@@ -271,7 +271,7 @@ public class QProcessTools {
 //            complement = em.createNamedQuery("SYSPB2VORGANG.findActiveAssignedVorgaengeByElement");
 //        } else if (elementQ instanceof BWerte) {
 //            complement = em.createNamedQuery("SYSBWerte2VORGANG.findActiveAssignedVorgaengeByElement");
-//        } else if (elementQ instanceof Prescriptions) {
+//        } else if (elementQ instanceof Prescription) {
 //            complement = em.createNamedQuery("SYSVER2VORGANG.findActiveAssignedVorgaengeByElement");
 //        } else if (elementQ instanceof BWInfo) {
 //            complement = em.createNamedQuery("SYSBWI2VORGANG.findActiveAssignedVorgaengeByElement");
@@ -317,7 +317,7 @@ public class QProcessTools {
 //            query = em.createNamedQuery("SYSPB2VORGANG.findActiveAssignedVorgaengeByElement");
 //        } else if (elementQ instanceof BWerte) {
 //            query = em.createNamedQuery("SYSBWerte2VORGANG.findActiveAssignedVorgaengeByElement");
-//        } else if (elementQ instanceof Prescriptions) {
+//        } else if (elementQ instanceof Prescription) {
 //            query = em.createNamedQuery("SYSVER2VORGANG.findActiveAssignedVorgaengeByElement");
 //        } else if (elementQ instanceof BWInfo) {
 //            query = em.createNamedQuery("SYSBWI2VORGANG.findActiveAssignedVorgaengeByElement");

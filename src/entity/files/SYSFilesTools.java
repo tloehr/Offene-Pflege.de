@@ -27,7 +27,7 @@ package entity.files;
 
 import entity.info.BWInfo;
 import entity.info.Resident;
-import entity.prescription.Prescriptions;
+import entity.prescription.Prescription;
 import entity.reports.NReport;
 import op.OPDE;
 import op.threads.DisplayMessage;
@@ -118,8 +118,8 @@ public class SYSFilesTools {
         Resident bw = null;
         if (attachable instanceof NReport) {
             bw = ((NReport) attachable).getResident();
-        } else if (attachable instanceof Prescriptions) {
-            bw = ((Prescriptions) attachable).getResident();
+        } else if (attachable instanceof Prescription) {
+            bw = ((Prescription) attachable).getResident();
         } else if (attachable instanceof BWInfo) {
             bw = ((BWInfo) attachable).getResident();
         }
@@ -143,10 +143,10 @@ public class SYSFilesTools {
                                 SYSNR2FILE link = em.merge(new SYSNR2FILE(sysfile, (NReport) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getPbAssignCollection().add(link);
                                 ((NReport) attachable).getAttachedFiles().add(link);
-                            } else if (attachable instanceof Prescriptions) {
-                                SYSPRE2FILE link = em.merge(new SYSPRE2FILE(sysfile, (Prescriptions) attachable, OPDE.getLogin().getUser(), new Date()));
+                            } else if (attachable instanceof Prescription) {
+                                SYSPRE2FILE link = em.merge(new SYSPRE2FILE(sysfile, (Prescription) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getVerAssignCollection().add(link);
-                                ((Prescriptions) attachable).getAttachedFiles().add(link);
+                                ((Prescription) attachable).getAttachedFiles().add(link);
                             } else if (attachable instanceof BWInfo) {
                                 SYSINF2FILE link = em.merge(new SYSINF2FILE(sysfile, (BWInfo) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getBwiAssignCollection().add(link);

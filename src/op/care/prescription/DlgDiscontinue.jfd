@@ -35,6 +35,10 @@
         <string>APPLICATION_MODAL</string> 
        </object> 
       </void> 
+      <void method="setProperty"> 
+       <string>$sizePolicy</string> 
+       <int>1</int> 
+      </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormComponent"> 
         <string>javax.swing.JLabel</string> 
@@ -47,11 +51,11 @@
          <object class="java.awt.Font"> 
           <string>Arial</string> 
           <int>0</int> 
-          <int>20</int> 
+          <int>18</int> 
          </object> 
         </void> 
         <void property="name"> 
-         <string>label1</string> 
+         <string>lblQuestion</string> 
         </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -100,14 +104,6 @@
         <void property="name"> 
          <string>cmbArztAb</string> 
         </void> 
-        <void method="addEvent"> 
-         <object class="com.jformdesigner.model.FormEvent"> 
-          <string>java.awt.event.ItemListener</string> 
-          <string>itemStateChanged</string> 
-          <string>cmbArztAbItemStateChanged</string> 
-          <boolean>true</boolean> 
-         </object> 
-        </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
@@ -150,14 +146,6 @@
         </void> 
         <void property="name"> 
          <string>cmbKHAb</string> 
-        </void> 
-        <void method="addEvent"> 
-         <object class="com.jformdesigner.model.FormEvent"> 
-          <string>java.awt.event.ItemListener</string> 
-          <string>itemStateChanged</string> 
-          <string>cmbKHAbItemStateChanged</string> 
-          <boolean>true</boolean> 
-         </object> 
         </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -222,10 +210,6 @@
            <string>text</string> 
            <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
           </void> 
-          <void method="setProperty"> 
-           <string>enabled</string> 
-           <boolean>false</boolean> 
-          </void> 
           <void property="name"> 
            <string>btnOK</string> 
           </void> 
@@ -266,7 +250,7 @@
        <string>size</string> 
        <object class="java.awt.Dimension"> 
         <int>490</int> 
-        <int>285</int> 
+        <int>175</int> 
        </object> 
       </void> 
       <void method="setProperty"> 

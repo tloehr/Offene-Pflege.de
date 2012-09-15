@@ -79,18 +79,18 @@ import java.util.List;
 @Entity
 @Table(name = "BHPVerordnung")
 @NamedQueries({
-        @NamedQuery(name = "Verordnung.findAll", query = "SELECT b FROM Prescriptions b"),
-        @NamedQuery(name = "Verordnung.findByVerID", query = "SELECT b FROM Prescriptions b WHERE b.id = :verid"),
-        @NamedQuery(name = "Verordnung.findByAnDatum", query = "SELECT b FROM Prescriptions b WHERE b.from = :from"),
+        @NamedQuery(name = "Verordnung.findAll", query = "SELECT b FROM Prescription b"),
+        @NamedQuery(name = "Verordnung.findByVerID", query = "SELECT b FROM Prescription b WHERE b.id = :verid"),
+        @NamedQuery(name = "Verordnung.findByAnDatum", query = "SELECT b FROM Prescription b WHERE b.from = :from"),
         @NamedQuery(name = "Verordnung.findByVorgang", query = " "
-                + " SELECT ve FROM Prescriptions ve "
+                + " SELECT ve FROM Prescription ve "
                 + " JOIN ve.attachedProcesses av"
                 + " JOIN av.vorgang v"
                 + " WHERE v = :vorgang "),
-        @NamedQuery(name = "Verordnung.findByAbDatum", query = "SELECT b FROM Prescriptions b WHERE b.to = :to"),
-        @NamedQuery(name = "Verordnung.findByBisPackEnde", query = "SELECT b FROM Prescriptions b WHERE b.toEndOfPackage = :bisPackEnde"),
-        @NamedQuery(name = "Verordnung.findByVerKennung", query = "SELECT b FROM Prescriptions b WHERE b.prescRelation = :verKennung"),
-        @NamedQuery(name = "Verordnung.findByStellplan", query = "SELECT b FROM Prescriptions b WHERE b.showOnDailyPlan = :stellplan")
+        @NamedQuery(name = "Verordnung.findByAbDatum", query = "SELECT b FROM Prescription b WHERE b.to = :to"),
+        @NamedQuery(name = "Verordnung.findByBisPackEnde", query = "SELECT b FROM Prescription b WHERE b.toEndOfPackage = :bisPackEnde"),
+        @NamedQuery(name = "Verordnung.findByVerKennung", query = "SELECT b FROM Prescription b WHERE b.prescRelation = :verKennung"),
+        @NamedQuery(name = "Verordnung.findByStellplan", query = "SELECT b FROM Prescription b WHERE b.showOnDailyPlan = :stellplan")
 
 })
 
@@ -102,11 +102,11 @@ import java.util.List;
 ////                }
 ////        ),
 //        @SqlResultSetMapping(name = "Verordnung.findByBewohnerMitVorraetenResultMapping",
-//                entities = @EntityResult(entityClass = Prescriptions.class),
+//                entities = @EntityResult(entityClass = Prescription.class),
 //                columns = {@ColumnResult(name = "VorID"), @ColumnResult(name = "saldo"), @ColumnResult(name = "BestID"), @ColumnResult(name = "summe")}
 //        ),
 //        @SqlResultSetMapping(name = "Verordnung.findAllBedarfResultMapping",
-//                entities = {@EntityResult(entityClass = Prescriptions.class), @EntityResult(entityClass = Situations.class), @EntityResult(entityClass = PrescriptionSchedule.class)},
+//                entities = {@EntityResult(entityClass = Prescription.class), @EntityResult(entityClass = Situations.class), @EntityResult(entityClass = PrescriptionSchedule.class)},
 //                columns = {@ColumnResult(name = "vor.Saldo"), @ColumnResult(name = "bisher.tagesdosis"), @ColumnResult(name = "bestand.APV"), @ColumnResult(name = "bestand.Summe"),
 //                        @ColumnResult(name = "bestand.BestID")
 //                }
@@ -161,7 +161,7 @@ import java.util.List;
 //
 //})
 
-public class Prescriptions implements Serializable, QProcessElement, Cloneable, Comparable<Prescriptions> {
+public class Prescription implements Serializable, QProcessElement, Cloneable, Comparable<Prescription> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -236,10 +236,10 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
     private Doc docOFF;
 
 
-    public Prescriptions() {
+    public Prescription() {
     }
 
-    public Prescriptions(Resident resident) {
+    public Prescription(Resident resident) {
         this.resident = resident;
         this.attachedFiles = new ArrayList<SYSPRE2FILE>();
         this.attachedProcesses = new ArrayList<SYSPRE2PROCESS>();
@@ -249,7 +249,7 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
         this.userON = OPDE.getLogin().getUser();
     }
 
-    public Prescriptions(Date from, Date to, boolean toEndOfPackage, long prescRelation, String text, boolean showOnDailyPlan, List<SYSPRE2FILE> attachedFiles, List<SYSPRE2PROCESS> attachedProcesses, Users userON, Users userOFF, Resident resident, Intervention intervention, TradeForm tradeform, Situations situation, Hospital hospitalON, Hospital hospitalOFF, Doc docON, Doc docOFF) {
+    public Prescription(Date from, Date to, boolean toEndOfPackage, long prescRelation, String text, boolean showOnDailyPlan, List<SYSPRE2FILE> attachedFiles, List<SYSPRE2PROCESS> attachedProcesses, Users userON, Users userOFF, Resident resident, Intervention intervention, TradeForm tradeform, Situations situation, Hospital hospitalON, Hospital hospitalOFF, Doc docON, Doc docOFF) {
         this.from = from;
         this.to = to;
         this.toEndOfPackage = toEndOfPackage;
@@ -398,7 +398,7 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
 
     @Override
     public String getTitle() {
-        return PrescriptionsTools.getPrescriptionAsShortText(this);
+        return PrescriptionTools.getPrescriptionAsShortText(this);
     }
 
     public Resident getResident() {
@@ -475,7 +475,7 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Prescriptions that = (Prescriptions) o;
+        Prescription that = (Prescription) o;
 
         if (toEndOfPackage != that.toEndOfPackage) return false;
         if (showOnDailyPlan != that.showOnDailyPlan) return false;
@@ -536,7 +536,7 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
 
     @Override
     public Object clone() {
-        final Prescriptions copy = new Prescriptions(from, to, toEndOfPackage, prescRelation, text, showOnDailyPlan, attachedFiles, attachedProcesses, userON, userOFF, resident, intervention, tradeform, situation, hospitalON, hospitalOFF, docON, docOFF);
+        final Prescription copy = new Prescription(from, to, toEndOfPackage, prescRelation, text, showOnDailyPlan, attachedFiles, attachedProcesses, userON, userOFF, resident, intervention, tradeform, situation, hospitalON, hospitalOFF, docON, docOFF);
 
         CollectionUtils.forAllDo(pSchedule, new Closure() {
             public void execute(Object o) {
@@ -548,7 +548,7 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
     }
 
     @Override
-    public int compareTo(Prescriptions them) {
+    public int compareTo(Prescription them) {
 //        int result = ((Boolean) isDiscontinued()).compareTo(them.isDiscontinued()) * -1;
         int result = ((Boolean) isOnDemand()).compareTo(them.isOnDemand()) * -1;
 //        if (result == 0) {
@@ -558,14 +558,14 @@ public class Prescriptions implements Serializable, QProcessElement, Cloneable, 
             result = ((Boolean) hasMed()).compareTo(them.hasMed());
         }
         if (result == 0) {
-            result = PrescriptionsTools.getShortDescription(this).compareTo(PrescriptionsTools.getShortDescription(them));
+            result = PrescriptionTools.getShortDescription(this).compareTo(PrescriptionTools.getShortDescription(them));
         }
         return result;
     }
 
     @Override
     public String toString() {
-        return "Prescriptions{" +
+        return "Prescription{" +
                 "verid=" + id +
                 ", version=" + version +
                 ", anDatum=" + from +

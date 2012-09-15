@@ -163,7 +163,7 @@ public class BHP implements Serializable, Comparable<BHP> {
 
     @JoinColumn(name = "VerID", referencedColumnName = "VerID")
     @ManyToOne
-    private Prescriptions prescription;
+    private Prescription prescription;
 
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
@@ -303,11 +303,11 @@ public class BHP implements Serializable, Comparable<BHP> {
         this.dauer = dauer;
     }
 
-    public Prescriptions getPrescription() {
+    public Prescription getPrescription() {
         return prescription;
     }
 
-    public void setPrescription(Prescriptions prescription) {
+    public void setPrescription(Prescription prescription) {
         this.prescription = prescription;
     }
 

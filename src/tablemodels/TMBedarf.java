@@ -69,8 +69,8 @@ public class TMBedarf
         return String.class;
     }
 
-    public Prescriptions getPrescription(int row) {
-        return (Prescriptions) listeBedarf.get(row)[0];
+    public Prescription getPrescription(int row) {
+        return (Prescription) listeBedarf.get(row)[0];
     }
 
     public Situations getSituation(int row) {
@@ -129,7 +129,7 @@ public class TMBedarf
         if (cache.containsKey(getPrescription(row))) {
             result = cache.get(getPrescription(row)).toString();
         } else {
-            result = PrescriptionsTools.getDose(getPrescription(row), true);
+            result = PrescriptionTools.getDose(getPrescription(row), true);
             cache.put(getPrescription(row), result);
         }
         return result;
@@ -138,7 +138,7 @@ public class TMBedarf
     @Override
     public Object getValueAt(int row, int col) {
 
-        String result = "<font size=\"+1\">"+ PrescriptionsTools.getShortDescription(getPrescription(row))+"</font>";
+        String result = "<font size=\"+1\">"+ PrescriptionTools.getShortDescription(getPrescription(row))+"</font>";
 
         result += SYSConst.html_fontface;
         result += "<br/>" + getDosis(row);
@@ -153,7 +153,7 @@ public class TMBedarf
         }
 
         result += "</font>";
-        result += "<br/>" + PrescriptionsTools.getRemark(getPrescription(row));
+        result += "<br/>" + PrescriptionTools.getRemark(getPrescription(row));
 
 
         return result;

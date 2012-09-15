@@ -5,16 +5,11 @@
 package entity.info;
 
 import entity.EntityTools;
-import entity.prescription.PrescriptionsTools;
+import entity.prescription.PrescriptionTools;
 import op.OPDE;
-import op.tools.DlgListSelector;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
-import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.Years;
-import sun.jvm.hotspot.oops.ArrayKlass;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -23,7 +18,6 @@ import javax.swing.*;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author tloehr
@@ -145,7 +139,7 @@ public class ResidentTools {
     public static void endOfStay(EntityManager em, Resident bewohner, Date enddate) throws Exception {
         em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
         // TODO: Die ganzen Operationen bei Sterben und Ausziehen müssen gemacht werden, wenn der REST fertig ist.
-        PrescriptionsTools.alleAbsetzen(em, bewohner);
+        PrescriptionTools.alleAbsetzen(em, bewohner);
         // Alle Planungen absetzen
         BWInfoTools.alleAbsetzen(em, bewohner);
         // Alle Bestände schließen

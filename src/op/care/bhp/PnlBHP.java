@@ -70,9 +70,7 @@ public class PnlBHP extends NursingRecordsPanel {
 
     public static final String internalClassID = "nursingrecords.bhp";
     private Resident resident;
-    JPopupMenu menu;
     private boolean initPhase;
-    private boolean abwesend;
 
     private HashMap<BHP, CollapsiblePane> bhpCollapsiblePaneHashMap;
     private HashMap<Byte, ArrayList<BHP>> shiftMAPBHP;
@@ -285,7 +283,7 @@ public class PnlBHP extends NursingRecordsPanel {
 
 
         if (!shiftMAPBHP.get(BHPTools.SHIFT_ON_DEMAND).isEmpty()) {
-            Prescriptions currentPrescription = null;
+            Prescription currentPrescription = null;
             CollapsiblePane sitPane = null;
             JPanel sitPanel = null;
             JPanel sitOuterPanel = new JPanel();
@@ -306,7 +304,7 @@ public class PnlBHP extends NursingRecordsPanel {
                     sitPane = new CollapsiblePane(SYSTools.toHTMLForScreen("<b>" + currentPrescription.getSituation().getText()) + "</b>");
                     sitPane.setSlidingDirection(SwingConstants.SOUTH);
                     sitPane.setBackground(ColorUtils.getDerivedColor(SYSCalendar.getBGSHIFT(BHPTools.SHIFT_ON_DEMAND), 0.4f)); // a little darker
-                    sitPane.setForeground(SYSCalendar.getFGSHIFT(BHPTools.SHIFT_ON_DEMAND));
+                    sitPane.setForeground(Color.BLACK);//SYSCalendar.getFGSHIFT(BHPTools.SHIFT_ON_DEMAND));
                     sitPane.setOpaque(false);
                 }
 
@@ -386,7 +384,7 @@ public class PnlBHP extends NursingRecordsPanel {
          *
          */
         JideButton btnBHP = GUITools.createHyperlinkButton("<html><font size=+1>" +
-                SYSTools.left(PrescriptionsTools.getPrescriptionAsShortText(bhp.getPrescriptionSchedule().getPrescription()), MAX_TEXT_LENGTH) +
+                SYSTools.left(PrescriptionTools.getPrescriptionAsShortText(bhp.getPrescriptionSchedule().getPrescription()), MAX_TEXT_LENGTH) +
                 (bhp.hasMed() ? ", <b>" + SYSTools.getAsHTML(bhp.getDosis()) +
                         " " + DosageFormTools.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
                 BHPTools.getScheduleText(bhp, ", ", "") +
@@ -831,7 +829,7 @@ public class PnlBHP extends NursingRecordsPanel {
         bhpPane.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                contentPane.setText(SYSTools.toHTML(PrescriptionsTools.getPrescriptionAsHTML(bhp.getPrescription(), false, false, true)));
+                contentPane.setText(SYSTools.toHTML(PrescriptionTools.getPrescriptionAsHTML(bhp.getPrescription(), false, false, true)));
             }
         });
 

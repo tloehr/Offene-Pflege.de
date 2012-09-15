@@ -9,7 +9,7 @@ import entity.system.Users;
 import entity.info.BWInfo;
 import entity.info.Resident;
 import entity.nursingprocess.NursingProcess;
-import entity.prescription.Prescriptions;
+import entity.prescription.Prescription;
 import entity.reports.NReport;
 import op.OPDE;
 import op.tools.SYSConst;
@@ -156,7 +156,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
             getAttachedNReportConnections().remove(element);
         } else if (element instanceof BWerte) {
             getAttachedResidentValues().remove(element);
-        } else if (element instanceof Prescriptions) {
+        } else if (element instanceof Prescription) {
             getAttachedPrescriptions().remove(element);
         } else if (element instanceof BWInfo) {
             getAttachedInfos().remove(element);

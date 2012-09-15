@@ -2,7 +2,7 @@ package entity.info;
 
 import entity.*;
 import entity.prescription.DocTools;
-import entity.prescription.PrescriptionsTools;
+import entity.prescription.PrescriptionTools;
 import entity.reports.NReportTools;
 import op.OPDE;
 import op.tools.*;
@@ -699,12 +699,12 @@ public class BWInfoTools {
          */
         if (medi) {
             EntityManager em = OPDE.createEM();
-            Query query = em.createQuery("SELECT b FROM Prescriptions b WHERE b.bewohner = :bewohner AND b.to > :now ");
+            Query query = em.createQuery("SELECT b FROM Prescription b WHERE b.bewohner = :bewohner AND b.to > :now ");
             query.setParameter("bewohner", bewohner);
             query.setParameter("now", new Date());
             List listeVerordnungen = query.getResultList();
             Collections.sort(listeVerordnungen);
-            result += PrescriptionsTools.getPrescriptionAsHTML(listeVerordnungen, true, false, false);
+            result += PrescriptionTools.getPrescriptionAsHTML(listeVerordnungen, true, false, false);
             em.close();
         }
 
