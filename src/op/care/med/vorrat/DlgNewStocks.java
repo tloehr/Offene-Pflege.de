@@ -486,7 +486,7 @@ public class DlgNewStocks extends MyJDialog {
             inventory = em.merge(inventory);
 
             if (inventory.getID() == null) { // neuen Vorrat anlegen
-                inventory.setText(darreichung.getMedProdukt().getBezeichnung());
+                inventory.setText(darreichung.getMedProduct().getBezeichnung());
             }
 
             MedStock bestand = em.merge(MedInventoryTools.addTo(inventory, aPackage, darreichung, txtBemerkung.getText(), menge));
@@ -731,7 +731,7 @@ public class DlgNewStocks extends MyJDialog {
         darreichung = (TradeForm) cmbMProdukt.getSelectedItem();
 
         if (darreichung != null) {
-            DefaultComboBoxModel dcbm = new DefaultComboBoxModel(darreichung.getPackungen().toArray());
+            DefaultComboBoxModel dcbm = new DefaultComboBoxModel(darreichung.getPackages().toArray());
             dcbm.insertElementAt("<Sonderpackung>", 0);
             cmbPackung.setModel(dcbm);
             cmbPackung.setRenderer(MedPackageTools.getMedPackungRenderer());

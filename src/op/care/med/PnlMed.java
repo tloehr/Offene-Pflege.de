@@ -195,7 +195,7 @@ public class PnlMed extends CleanablePanel {
 //                        public void actionPerformed(java.awt.event.ActionEvent evt) {
 //                            MedPackage mypack = new MedPackage(darreichung);
 //                            new DlgPack(thisFrame, "Neu", mypack);
-////                            OPDE.getEMF().getCache().evict(Darreichung.class, darreichung.getDafID());
+////                            OPDE.getEMF().getCache().evict(Darreichung.class, darreichung.getID());
 //                            createTree();
 //                        }
 //                    });
@@ -284,7 +284,7 @@ public class PnlMed extends CleanablePanel {
 
     private java.util.List getPackung(TradeForm darreichung) {
         java.util.List result = new ArrayList();
-        for (MedPackage aPackage : darreichung.getPackungen()) {
+        for (MedPackage aPackage : darreichung.getPackages()) {
             result.add(new DefaultMutableTreeNode(aPackage));
         }
 

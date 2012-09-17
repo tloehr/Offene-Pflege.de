@@ -7,16 +7,16 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "MPFormen")
-@NamedQueries({
-    @NamedQuery(name = "MedFormen.findAll", query = "SELECT m FROM DosageForm m ORDER BY m.zubereitung, m.anwText "),
-    @NamedQuery(name = "MedFormen.findByFormID", query = "SELECT m FROM DosageForm m WHERE m.formID = :formID"),
-    @NamedQuery(name = "MedFormen.findByZubereitung", query = "SELECT m FROM DosageForm m WHERE m.zubereitung = :zubereitung"),
-    @NamedQuery(name = "MedFormen.findByAnwText", query = "SELECT m FROM DosageForm m WHERE m.anwText = :anwText"),
-    @NamedQuery(name = "MedFormen.findByAnwEinheit", query = "SELECT m FROM DosageForm m WHERE m.anwEinheit = :anwEinheit"),
-    @NamedQuery(name = "MedFormen.findByPackEinheit", query = "SELECT m FROM DosageForm m WHERE m.packEinheit = :packEinheit"),
-    @NamedQuery(name = "MedFormen.findByStellplan", query = "SELECT m FROM DosageForm m WHERE m.stellplan = :stellplan"),
-    @NamedQuery(name = "MedFormen.findByStatus", query = "SELECT m FROM DosageForm m WHERE m.status = :status"),
-    @NamedQuery(name = "MedFormen.findByEquiv", query = "SELECT m FROM DosageForm m WHERE m.equiv = :equiv")})
+//@NamedQueries({
+//    @NamedQuery(name = "MedFormen.findAll", query = "SELECT m FROM DosageForm m ORDER BY m.preparation, m.usageText "),
+//    @NamedQuery(name = "MedFormen.findByFormID", query = "SELECT m FROM DosageForm m WHERE m.id = :formID"),
+//    @NamedQuery(name = "MedFormen.findByZubereitung", query = "SELECT m FROM DosageForm m WHERE m.preparation = :zubereitung"),
+//    @NamedQuery(name = "MedFormen.findByAnwText", query = "SELECT m FROM DosageForm m WHERE m.usageText = :anwText"),
+//    @NamedQuery(name = "MedFormen.findByAnwEinheit", query = "SELECT m FROM DosageForm m WHERE m.usageUnit = :anwEinheit"),
+//    @NamedQuery(name = "MedFormen.findByPackEinheit", query = "SELECT m FROM DosageForm m WHERE m.packUnit = :packEinheit"),
+//    @NamedQuery(name = "MedFormen.findByStellplan", query = "SELECT m FROM DosageForm m WHERE m.dailyPlan = :stellplan"),
+//    @NamedQuery(name = "MedFormen.findByStatus", query = "SELECT m FROM DosageForm m WHERE m.state = :status"),
+//    @NamedQuery(name = "MedFormen.findByEquiv", query = "SELECT m FROM DosageForm m WHERE m.sameAs = :equiv")})
 /**
  *
  */
@@ -24,74 +24,47 @@ public class DosageForm implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "FormID")
-    private Long formID;
+    private Long id;
     @Basic(optional = false)
     @Column(name = "Zubereitung")
-    private String zubereitung;
+    private String preparation;
     @Basic(optional = false)
     @Column(name = "AnwText")
-    private String anwText;
+    private String usageText;
     @Basic(optional = false)
     @Column(name = "AnwEinheit")
-    private short anwEinheit;
+    private short usageUnit;
     @Basic(optional = false)
     @Column(name = "PackEinheit")
-    private short packEinheit;
+    private short packUnit;
     @Basic(optional = false)
     @Column(name = "Stellplan")
-    private short stellplan;
+    private short dailyPlan;
     @Basic(optional = false)
     @Column(name = "Status")
-    private short status;
+    private short state;
     @Basic(optional = false)
     @Column(name = "Equiv")
-    private int equiv;
+    private int sameAs;
 
     public DosageForm() {
     }
 
-
-
-    public Long getFormID() {
-        return formID;
+    public String getPreparation() {
+        return preparation;
     }
 
-    public void setFormID(Long formID) {
-        this.formID = formID;
+    public String getUsageTex() {
+        return usageText;
     }
 
-    public String getZubereitung() {
-        return zubereitung;
+    public short getUsageUnit() {
+        return usageUnit;
     }
 
-    public void setZubereitung(String zubereitung) {
-        this.zubereitung = zubereitung;
-    }
-
-    public String getAnwText() {
-        return anwText;
-    }
-
-    public void setAnwText(String anwText) {
-        this.anwText = anwText;
-    }
-
-    public short getAnwEinheit() {
-        return anwEinheit;
-    }
-
-    public void setAnwEinheit(short anwEinheit) {
-        this.anwEinheit = anwEinheit;
-    }
-
-    public short getPackEinheit() {
-        return packEinheit;
-    }
-
-    public void setPackEinheit(short packEinheit) {
-        this.packEinheit = packEinheit;
+    public short getPackUnit() {
+        return packUnit;
     }
 
     /**
@@ -101,49 +74,39 @@ public class DosageForm implements Serializable {
      * Die Vorlage ist so eingestellt, dass alles über 0 grau hinterlegt wird.
      * @return
      */
-    public short getStellplan() {
-        return stellplan;
+    public short getDailyPlan() {
+        return dailyPlan;
     }
 
-    public void setStellplan(short stellplan) {
-        this.stellplan = stellplan;
+    public short getState() {
+        return state;
     }
 
-
-    public short getStatus() {
-        return status;
+    public void setState(short state) {
+        this.state = state;
     }
 
-    public void setStatus(short status) {
-        this.status = status;
+    public int getSameAs() {
+        return sameAs;
+    }
+    public boolean isAPV1(){
+        return usageUnit == packUnit;
     }
 
-    public int getEquiv() {
-        return equiv;
-    }
-
-    public void setEquiv(int equiv) {
-        this.equiv = equiv;
-    }
-
-    public boolean anwUndPackEinheitenGleich(){
-        return anwEinheit == packEinheit;
-    }
-
-    public Intervention getMassnahme() {
-        return massnahme;
+    public Intervention getIntervention() {
+        return intervention;
     }
 
     // N:1 Relationen
     @JoinColumn(name = "MassID", referencedColumnName = "MassID")
     @ManyToOne
-    private Intervention massnahme;
+    private Intervention intervention;
 
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (formID != null ? formID.hashCode() : 0);
+        hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
 
@@ -154,25 +117,25 @@ public class DosageForm implements Serializable {
             return false;
         }
         DosageForm other = (DosageForm) object;
-        if ((this.formID == null && other.formID != null) || (this.formID != null && !this.formID.equals(other.formID))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
         return true;
     }
 
+
     @Override
     public String toString() {
-        return "MedFormen{" +
-                "formID=" + formID +
-                ", zubereitung='" + zubereitung + '\'' +
-                ", anwText='" + anwText + '\'' +
-                ", anwEinheit=" + anwEinheit +
-                ", packEinheit=" + packEinheit +
-                ", stellplan=" + stellplan +
-                ", status=" + status +
-                ", equiv=" + equiv +
-                ", massnahme=" + massnahme +
+        return "DosageForm{" +
+                "id=" + id +
+                ", preparation='" + preparation + '\'' +
+                ", usageText='" + usageText + '\'' +
+                ", usageUnit=" + usageUnit +
+                ", packUnit=" + packUnit +
+                ", dailyPlan=" + dailyPlan +
+                ", state=" + state +
+                ", sameAs=" + sameAs +
+                ", intervention=" + intervention +
                 '}';
     }
-
 }

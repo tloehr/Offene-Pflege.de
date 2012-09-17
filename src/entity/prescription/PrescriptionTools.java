@@ -249,7 +249,7 @@ public class PrescriptionTools {
             boolean grau = false;
             if (formid != null) {
                 DosageForm form = em.find(DosageForm.class, formid.longValue());
-                grau = form.getStellplan() > 0;
+                grau = form.getDailyPlan() > 0;
             }
 
             // Wenn der Bewohnername sich in der Liste ändert, muss
@@ -322,16 +322,16 @@ public class PrescriptionTools {
             MedStock stockInUse = MedStockTools.getStockInUse(inventory);
 
             if (stockInUse != null) {
-                result += "<b>" + prescription.getTradeForm().getMedProdukt().getBezeichnung()
-                        + (stockInUse.getTradeForm().getZusatz().isEmpty() ? "" : " " + stockInUse.getTradeForm().getZusatz()) + "</b>" +
-                        (stockInUse.getTradeForm().getDosageForm().getZubereitung().isEmpty() ? "" : " " + stockInUse.getTradeForm().getDosageForm().getZubereitung()) + " " +
-                        (prescription.getTradeForm().getDosageForm().getAnwText().isEmpty() ? SYSConst.UNITS[prescription.getTradeForm().getDosageForm().getAnwEinheit()] : prescription.getTradeForm().getDosageForm().getAnwText());
+                result += "<b>" + prescription.getTradeForm().getMedProduct().getBezeichnung()
+                        + (stockInUse.getTradeForm().getSubtext().isEmpty() ? "" : " " + stockInUse.getTradeForm().getSubtext()) + "</b>" +
+                        (stockInUse.getTradeForm().getDosageForm().getPreparation().isEmpty() ? "" : " " + stockInUse.getTradeForm().getDosageForm().getPreparation()) + " " +
+                        (prescription.getTradeForm().getDosageForm().getUsageTex().isEmpty() ? SYSConst.UNITS[prescription.getTradeForm().getDosageForm().getUsageUnit()] : prescription.getTradeForm().getDosageForm().getUsageTex());
 
             } else {
-                result += "<b>" + prescription.getTradeForm().getMedProdukt().getBezeichnung()
-                        + (prescription.getTradeForm().getZusatz().isEmpty() ? "" : " " + prescription.getTradeForm().getZusatz()) + "</b>" +
-                        (prescription.getTradeForm().getDosageForm().getZubereitung().isEmpty() ? "" : " " + prescription.getTradeForm().getDosageForm().getZubereitung()) + " " +
-                        (prescription.getTradeForm().getDosageForm().getAnwText().isEmpty() ? SYSConst.UNITS[prescription.getTradeForm().getDosageForm().getAnwEinheit()] : prescription.getTradeForm().getDosageForm().getAnwText());
+                result += "<b>" + prescription.getTradeForm().getMedProduct().getBezeichnung()
+                        + (prescription.getTradeForm().getSubtext().isEmpty() ? "" : " " + prescription.getTradeForm().getSubtext()) + "</b>" +
+                        (prescription.getTradeForm().getDosageForm().getPreparation().isEmpty() ? "" : " " + prescription.getTradeForm().getDosageForm().getPreparation()) + " " +
+                        (prescription.getTradeForm().getDosageForm().getUsageTex().isEmpty() ? SYSConst.UNITS[prescription.getTradeForm().getDosageForm().getUsageUnit()] : prescription.getTradeForm().getDosageForm().getUsageTex());
             }
         }
 
@@ -360,24 +360,24 @@ public class PrescriptionTools {
             if (stockInUse != null) {
                 // If the current prescription defers from the original one (different provider of the medication as in the beginning)
                 if (!stockInUse.getTradeForm().equals(verordnung.getTradeForm())) {
-                    result += "<b>" + stockInUse.getTradeForm().getMedProdukt().getBezeichnung() +
-                            (stockInUse.getTradeForm().getZusatz().isEmpty() ? "" : " " + stockInUse.getTradeForm().getZusatz()) + "</b>" +
-                            (stockInUse.getTradeForm().getDosageForm().getZubereitung().isEmpty() ? "" : " " + stockInUse.getTradeForm().getDosageForm().getZubereitung()) + " " +
-                            (stockInUse.getTradeForm().getDosageForm().getAnwText().isEmpty() ? SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getAnwEinheit()] : stockInUse.getTradeForm().getDosageForm().getAnwText());
-                    result += " <i>(" + OPDE.lang.getString(PnlPrescription.internalClassID + ".originalprescription") + ": " + verordnung.getTradeForm().getMedProdukt().getBezeichnung();
-                    result += (stockInUse.getTradeForm().getZusatz().isEmpty() ? "" : " " + stockInUse.getTradeForm().getZusatz()) + ")</i>";
+                    result += "<b>" + stockInUse.getTradeForm().getMedProduct().getBezeichnung() +
+                            (stockInUse.getTradeForm().getSubtext().isEmpty() ? "" : " " + stockInUse.getTradeForm().getSubtext()) + "</b>" +
+                            (stockInUse.getTradeForm().getDosageForm().getPreparation().isEmpty() ? "" : " " + stockInUse.getTradeForm().getDosageForm().getPreparation()) + " " +
+                            (stockInUse.getTradeForm().getDosageForm().getUsageTex().isEmpty() ? SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getUsageUnit()] : stockInUse.getTradeForm().getDosageForm().getUsageTex());
+                    result += " <i>(" + OPDE.lang.getString(PnlPrescription.internalClassID + ".originalprescription") + ": " + verordnung.getTradeForm().getMedProduct().getBezeichnung();
+                    result += (stockInUse.getTradeForm().getSubtext().isEmpty() ? "" : " " + stockInUse.getTradeForm().getSubtext()) + ")</i>";
                 } else {
                     // No, the resident still gets the orginal stuff
-                    result += "<b>" + verordnung.getTradeForm().getMedProdukt().getBezeichnung()
-                            + (stockInUse.getTradeForm().getZusatz().isEmpty() ? "" : " " + stockInUse.getTradeForm().getZusatz()) + "</b>" +
-                            (stockInUse.getTradeForm().getDosageForm().getZubereitung().isEmpty() ? "" : " " + stockInUse.getTradeForm().getDosageForm().getZubereitung()) + " " +
-                            (verordnung.getTradeForm().getDosageForm().getAnwText().isEmpty() ? SYSConst.UNITS[verordnung.getTradeForm().getDosageForm().getAnwEinheit()] : verordnung.getTradeForm().getDosageForm().getAnwText());
+                    result += "<b>" + verordnung.getTradeForm().getMedProduct().getBezeichnung()
+                            + (stockInUse.getTradeForm().getSubtext().isEmpty() ? "" : " " + stockInUse.getTradeForm().getSubtext()) + "</b>" +
+                            (stockInUse.getTradeForm().getDosageForm().getPreparation().isEmpty() ? "" : " " + stockInUse.getTradeForm().getDosageForm().getPreparation()) + " " +
+                            (verordnung.getTradeForm().getDosageForm().getUsageTex().isEmpty() ? SYSConst.UNITS[verordnung.getTradeForm().getDosageForm().getUsageUnit()] : verordnung.getTradeForm().getDosageForm().getUsageTex());
                 }
             } else {
-                result += "<b>" + verordnung.getTradeForm().getMedProdukt().getBezeichnung()
-                        + (verordnung.getTradeForm().getZusatz().isEmpty() ? "" : " " + verordnung.getTradeForm().getZusatz()) + "</b>" +
-                        (verordnung.getTradeForm().getDosageForm().getZubereitung().isEmpty() ? "" : " " + verordnung.getTradeForm().getDosageForm().getZubereitung()) + " " +
-                        (verordnung.getTradeForm().getDosageForm().getAnwText().isEmpty() ? SYSConst.UNITS[verordnung.getTradeForm().getDosageForm().getAnwEinheit()] : verordnung.getTradeForm().getDosageForm().getAnwText());
+                result += "<b>" + verordnung.getTradeForm().getMedProduct().getBezeichnung()
+                        + (verordnung.getTradeForm().getSubtext().isEmpty() ? "" : " " + verordnung.getTradeForm().getSubtext()) + "</b>" +
+                        (verordnung.getTradeForm().getDosageForm().getPreparation().isEmpty() ? "" : " " + verordnung.getTradeForm().getDosageForm().getPreparation()) + " " +
+                        (verordnung.getTradeForm().getDosageForm().getUsageTex().isEmpty() ? SYSConst.UNITS[verordnung.getTradeForm().getDosageForm().getUsageUnit()] : verordnung.getTradeForm().getDosageForm().getUsageTex());
             }
 
 
@@ -400,8 +400,8 @@ public class PrescriptionTools {
         } else {
 
 
-            result += verordnung.getTradeForm().getMedProdukt().getBezeichnung()
-                    + (verordnung.getTradeForm().getZusatz().isEmpty() ? "" : " " + verordnung.getTradeForm().getZusatz());
+            result += verordnung.getTradeForm().getMedProduct().getBezeichnung()
+                    + (verordnung.getTradeForm().getSubtext().isEmpty() ? "" : " " + verordnung.getTradeForm().getSubtext());
 
 
         }
@@ -484,7 +484,7 @@ public class PrescriptionTools {
             PrescriptionSchedule planung = null;
             while (planungen.hasNext()) {
                 planung = planungen.next();
-                result += PrescriptionScheduleTools.getDosisAsHTML(planung, vorherigePlanung, false);
+                result += PrescriptionScheduleTools.getDoseAsHTML(planung, vorherigePlanung, false);
                 vorherigePlanung = planung;
             }
             if (PrescriptionScheduleTools.getTerminStatus(planung) != PrescriptionScheduleTools.MAXDOSIS) {
@@ -522,9 +522,9 @@ public class PrescriptionTools {
 
                     if (invSum != null && invSum.compareTo(BigDecimal.ZERO) > 0) {
                         result += "<b><u>Vorrat:</u> <font color=\"green\">" + invSum.setScale(2, BigDecimal.ROUND_UP) + " " +
-                                SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getPackEinheit()] +
+                                SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getPackUnit()] +
                                 "</font></b>";
-                        if (!stockInUse.getTradeForm().getDosageForm().anwUndPackEinheitenGleich()) {
+                        if (!stockInUse.getTradeForm().getDosageForm().isAPV1()) {
 
                             BigDecimal anwmenge = invSum.multiply(stockInUse.getAPV());
 
@@ -538,8 +538,8 @@ public class PrescriptionTools {
 
                         if (invSum.compareTo(stockSum) != 0) {
                             result += "<br/>Restmenge im Anbruch: <b><font color=\"green\">" + stockSum.setScale(2, BigDecimal.ROUND_UP) + " " +
-                                    SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getPackEinheit()] + "</font></b>";
-                            if (!stockInUse.getTradeForm().getDosageForm().anwUndPackEinheitenGleich()) {
+                                    SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getPackUnit()] + "</font></b>";
+                            if (!stockInUse.getTradeForm().getDosageForm().isAPV1()) {
                                 BigDecimal usage = stockSum.multiply(stockInUse.getAPV());
 
                                 result += " <i>entspricht " + usage.setScale(2, BigDecimal.ROUND_UP) + " " +

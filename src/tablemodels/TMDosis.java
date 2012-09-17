@@ -67,11 +67,11 @@ public class TMDosis
 
 
 
-    public Object getValueAt(int r, int c) {
+    public Object getValueAt(int row, int col) {
         String result = "";
-        switch (c) {
+        switch (col) {
             case COL_Dosis: {
-                result = PrescriptionScheduleTools.getDosisAsHTML(verordnung.getPrescriptionSchedule().get(r), null, true);
+                result = PrescriptionScheduleTools.getDoseAsHTML(verordnung.getPrescriptionSchedule().get(row), null, true);
                 break;
             }
             default: {

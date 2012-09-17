@@ -74,7 +74,7 @@ public class TMVorraete extends AbstractTableModel {
                 break;
             }
             case COL_MENGE: {
-                result = "<font face=\"" + SYSConst.ARIAL14.getFamily() + "\">" + getBestandsMenge(row).setScale(2, BigDecimal.ROUND_HALF_UP) + " " + DosageFormTools.EINHEIT[MedInventoryTools.getForm(getVorrat(row)).getPackEinheit()] + "</font>";
+                result = "<font face=\"" + SYSConst.ARIAL14.getFamily() + "\">" + getBestandsMenge(row).setScale(2, BigDecimal.ROUND_HALF_UP) + " " + DosageFormTools.EINHEIT[MedInventoryTools.getForm(getVorrat(row)).getPackUnit()] + "</font>";
                 break;
             }
             default: {

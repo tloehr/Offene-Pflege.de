@@ -77,7 +77,7 @@ public class DlgOnDemand extends MyJDialog {
 
 
     /**
-     * Creates new form DlgPrescription
+     * Creates new form DlgRegular
      */
     public DlgOnDemand(Prescription prescription, Closure actionBlock) {
 
@@ -232,7 +232,7 @@ public class DlgOnDemand extends MyJDialog {
     }
 
     private void txtMassActionPerformed(ActionEvent e) {
-        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.MASSART_BHP, txtIntervention.getText()).toArray()));
+        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.TYPE_PRESCRIPTION, txtIntervention.getText()).toArray()));
     }
 
     /**
@@ -622,7 +622,7 @@ public class DlgOnDemand extends MyJDialog {
             cmbMed.setModel(new DefaultComboBoxModel(new TradeForm[]{prescription.getTradeForm()}));
         }
 
-        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.MASSART_BHP).toArray()));
+        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.TYPE_PRESCRIPTION).toArray()));
         cmbIntervention.setRenderer(InterventionTools.getMassnahmenRenderer());
         cmbIntervention.setEnabled(cmbMed.getModel().getSize() == 0);
         txtIntervention.setEnabled(cmbIntervention.isEnabled());
@@ -683,8 +683,8 @@ public class DlgOnDemand extends MyJDialog {
 
 
     private void cmbMedItemStateChanged(ItemEvent evt) {//GEN-FIRST:event_cmbMedItemStateChanged
-        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.MASSART_BHP).toArray()));
-        cmbIntervention.setSelectedItem(((TradeForm) cmbMed.getSelectedItem()).getDosageForm().getMassnahme());
+        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.TYPE_PRESCRIPTION).toArray()));
+        cmbIntervention.setSelectedItem(((TradeForm) cmbMed.getSelectedItem()).getDosageForm().getIntervention());
         cmbIntervention.setEnabled(false);
         txtIntervention.setText(null);
         txtIntervention.setEnabled(false);
@@ -779,15 +779,14 @@ public class DlgOnDemand extends MyJDialog {
         schedule.setMaxEDosis(new BigDecimal(Double.parseDouble(txtEDosis.getText())));
         schedule.setMaxAnzahl(Integer.parseInt(txtMaxTimes.getText()));
 
-        prescription.setDocON((Doc) cmbDocON.getSelectedItem());
         prescription.setHospitalON((Hospital) cmbHospitalON.getSelectedItem());
-        prescription.setUserON(OPDE.getLogin().getUser());
-        prescription.setShowOnDailyPlan(false);
-        prescription.setBisPackEnde(false);
-        prescription.setText(txtBemerkung.getText());
         prescription.setIntervention((Intervention) cmbIntervention.getSelectedItem());
-        prescription.setTradeForm((TradeForm) cmbMed.getSelectedItem());
+        prescription.setShowOnDailyPlan(false);
         prescription.setSituation((Situations) cmbSit.getSelectedItem());
+        prescription.setText(txtBemerkung.getText().trim());
+        prescription.setTradeForm((TradeForm) cmbMed.getSelectedItem());
+        prescription.setUserON(OPDE.getLogin().getUser());
+        prescription.setDocON((Doc) cmbDocON.getSelectedItem());
 
         prescription.setFrom(new DateMidnight().toDate());
         if (rbDate.isSelected()) {
@@ -801,6 +800,7 @@ public class DlgOnDemand extends MyJDialog {
             prescription.setDocOFF(null);
             prescription.setTo(SYSConst.DATE_BIS_AUF_WEITERES);
         }
+        prescription.setTillEndOfPackage(false);
 
         prescription.getPrescriptionSchedule().clear();
         prescription.getPrescriptionSchedule().add(schedule);

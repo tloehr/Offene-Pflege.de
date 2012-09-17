@@ -127,7 +127,7 @@ public class MedProductWizard {
                 produkt.getDarreichungen().add(darreichung);
             }
 
-            darreichung.getPackungen().add(aPackage);
+            darreichung.getPackages().add(aPackage);
 
             em.getTransaction().commit();
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(produkt.getBezeichnung() + ", " + TradeFormTools.toPrettyString(darreichung) + ", " + MedPackageTools.toPrettyString(aPackage) + " erfolgreich eingetragen", 6));
@@ -434,7 +434,7 @@ public class MedProductWizard {
             result += OPDE.lang.getString(internalClassID + ".summaryline2") + "<br/>";
             result += "<ul>";
             result += "<li>Medikament: <b>" + produkt.getBezeichnung() + "</b>" + (produkt.getMedPID() == null ? " <i>wird neu erstellt</i>" : " <i>gab es schon</i>") + "</li>";
-            result += "<li>Zusatzbezeichnung und Darreichungsform: <b>" + TradeFormTools.toPrettyStringMedium(darreichung) + "</b>" + (darreichung.getDafID() == null ? " <i>wird neu erstellt</i>" : " <i>gab es schon</i>") + "</li>";
+            result += "<li>Zusatzbezeichnung und Darreichungsform: <b>" + TradeFormTools.toPrettyStringMedium(darreichung) + "</b>" + (darreichung.getID() == null ? " <i>wird neu erstellt</i>" : " <i>gab es schon</i>") + "</li>";
             result += "<li>Es wird eine <b>neue</b> Packung eingetragen: <b>" + MedPackageTools.toPrettyString(aPackage) + "</b></li>";
 
             MedFactory displayFactory = factory == null ? produkt.getFactory() : factory;

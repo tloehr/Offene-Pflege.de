@@ -298,11 +298,11 @@ public class DlgCloseStock extends MyJDialog {
         int index = Math.min(2, cmbBestID.getItemCount());
         cmbBestID.setSelectedIndex(index - 1);
 
-        lblEinheiten.setText(DosageFormTools.EINHEIT[bestand.getTradeForm().getDosageForm().getPackEinheit()] + " verbraucht");
+        lblEinheiten.setText(DosageFormTools.EINHEIT[bestand.getTradeForm().getDosageForm().getPackUnit()] + " verbraucht");
         txtLetzte.setText("");
         txtLetzte.setEnabled(false);
         // Das mit dem Vorabstellen nur bei Formen, die auf Stück basieren also APV = 1
-        rbStellen.setEnabled(bestand.getTradeForm().getDosageForm().getStatus() == DosageFormTools.APV1);
+        rbStellen.setEnabled(bestand.getTradeForm().getDosageForm().getState() == DosageFormTools.APV1);
     }
 
     private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed

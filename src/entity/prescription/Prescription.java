@@ -323,8 +323,8 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         return toEndOfPackage;
     }
 
-    public void setBisPackEnde(boolean bisPackEnde) {
-        this.toEndOfPackage = bisPackEnde;
+    public void setTillEndOfPackage(boolean tillEndOfPackage) {
+        this.toEndOfPackage = tillEndOfPackage;
     }
 
     public long getRelation() {

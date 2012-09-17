@@ -153,7 +153,7 @@ public class MedStockTools {
 //
 //        result = SYSPrint.EPL2_CLEAR_IMAGE_BUFFER;
 //        result += SYSPrint.EPL2_labelformat(57, 19, 3);
-//        result += SYSPrint.EPL2_print_ascii(5, 5, 0, SYSPrint.EPL2_FONT_7pt, 1, 1, false, DarreichungTools.toPrettyString(bestand.getTradeForm())); // bestand.getTradeForm().getMedProdukt().getBezeichnung() + " " + bestand.getTradeForm().getZusatz())
+//        result += SYSPrint.EPL2_print_ascii(5, 5, 0, SYSPrint.EPL2_FONT_7pt, 1, 1, false, DarreichungTools.toPrettyString(bestand.getTradeForm())); // bestand.getTradeForm().getMedProduct().getBezeichnung() + " " + bestand.getTradeForm().getSubtext())
 //        if (!SYSTools.catchNull(bestand.getPackage().getPzn()).equals("")) {
 //            result += SYSPrint.EPL2_print_ascii(5, 30, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, "PZN:" + bestand.getPackage().getPzn() + "  Datum:" + DateFormat.getDateInstance().format(bestand.getEin()) + " (" + bestand.getUser().getUID() + ")");
 //        }
@@ -273,7 +273,7 @@ public class MedStockTools {
 
         BigDecimal apvNeu = BigDecimal.ONE;
 
-        if (stock.getTradeForm().getDosageForm().getStatus() != DosageFormTools.APV1) {
+        if (stock.getTradeForm().getDosageForm().getState() != DosageFormTools.APV1) {
 
             // Menge in der Packung (in der Packungseinheit). Also das, was wirklich in der Packung am Anfang
             // drin war. Meist das, was auf der Packung steht.
@@ -362,13 +362,13 @@ public class MedStockTools {
 
     public static String getTextASHTML(MedStock bestand) {
         String result = "";
-        result += "<font color=\"blue\"><b>" + bestand.getTradeForm().getMedProdukt().getBezeichnung() + " " + bestand.getTradeForm().getZusatz() + ", ";
+        result += "<font color=\"blue\"><b>" + bestand.getTradeForm().getMedProduct().getBezeichnung() + " " + bestand.getTradeForm().getSubtext() + ", ";
 
         if (!SYSTools.catchNull(bestand.getPackage().getPzn()).equals("")) {
             result += "PZN: " + bestand.getPackage().getPzn() + ", ";
-            result += MedPackageTools.GROESSE[bestand.getPackage().getSize()] + ", " + bestand.getPackage().getContent() + " " + DosageFormTools.EINHEIT[bestand.getTradeForm().getDosageForm().getPackEinheit()] + " ";
-            String zubereitung = SYSTools.catchNull(bestand.getTradeForm().getDosageForm().getZubereitung());
-            String anwtext = SYSTools.catchNull(bestand.getTradeForm().getDosageForm().getAnwText());
+            result += MedPackageTools.GROESSE[bestand.getPackage().getSize()] + ", " + bestand.getPackage().getContent() + " " + DosageFormTools.EINHEIT[bestand.getTradeForm().getDosageForm().getPackUnit()] + " ";
+            String zubereitung = SYSTools.catchNull(bestand.getTradeForm().getDosageForm().getPreparation());
+            String anwtext = SYSTools.catchNull(bestand.getTradeForm().getDosageForm().getUsageTex());
             result += zubereitung.equals("") ? anwtext : (anwtext.equals("") ? zubereitung : zubereitung + ", " + anwtext);
             result += "</b></font>";
         }
@@ -482,9 +482,9 @@ public class MedStockTools {
 
         BigDecimal apv = BigDecimal.ONE;
 
-        if (bestand.getTradeForm().getDosageForm().getStatus() == DosageFormTools.APV_PER_BW) {
+        if (bestand.getTradeForm().getDosageForm().getState() == DosageFormTools.APV_PER_BW) {
             apv = getAPV4(bestand.getInventory());
-        } else if (bestand.getTradeForm().getDosageForm().getStatus() == DosageFormTools.APV_PER_DAF) {
+        } else if (bestand.getTradeForm().getDosageForm().getState() == DosageFormTools.APV_PER_DAF) {
             apv = getAPV4(bestand.getTradeForm());
         }
 

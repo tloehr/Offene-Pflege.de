@@ -31,6 +31,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.wizard.WizardDialog;
 import com.toedter.calendar.JDateChooser;
+import entity.nursingprocess.Intervention;
 import entity.nursingprocess.InterventionTools;
 import entity.prescription.*;
 import op.OPDE;
@@ -39,6 +40,7 @@ import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
+import org.joda.time.DateMidnight;
 import tablemodels.TMDosis;
 import tablerenderer.RNDHTML;
 
@@ -52,7 +54,6 @@ import javax.swing.event.CaretListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Date;
@@ -64,29 +65,29 @@ import java.util.List;
  *
  * @author tloehr
  */
-public class DlgPrescription extends MyJDialog {
+public class DlgRegular extends MyJDialog {
 
-    public static final int ALLOW_ALL_EDIT = 0;
-    public static final int NO_CHANGE_MED_AND_SIT = 1;
+    public static final int MODE_EDIT = 0;
+    public static final int MODE_CHANGE = 1;
+    public static final int MODE_NEW = 2;
 
     private boolean ignoreEvent;
 
     private JPopupMenu menu;
-    private PropertyChangeListener myPropertyChangeListener;
     private int editMode;
     private Closure actionBlock;
     private Prescription prescription;
-    private List<PrescriptionSchedule> planungenToDelete = null;
+    private List<PrescriptionSchedule> schedules2delete = null;
     private Pair<Prescription, List<PrescriptionSchedule>> returnPackage = null;
 
 
     /**
-     * Creates new form DlgPrescription
+     * Creates new form DlgRegular
      */
-    public DlgPrescription(Prescription prescription, int mode, Closure actionBlock) {
+    public DlgRegular(Prescription prescription, int mode, Closure actionBlock) {
         this.actionBlock = actionBlock;
         this.prescription = prescription;
-        planungenToDelete = new ArrayList<PrescriptionSchedule>();
+        schedules2delete = new ArrayList<PrescriptionSchedule>();
         this.editMode = mode;
         initComponents();
         initDialog();
@@ -95,39 +96,18 @@ public class DlgPrescription extends MyJDialog {
     }
 
     private void btnAddDosisActionPerformed(ActionEvent e) {
-        if (isBedarf() && prescription.getPrescriptionSchedule().size() > 0) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bei einer Bedarfsverordnung kann nur <u>eine</u> Dosierung eingegeben werden.", 2));
-            return;
-        }
-
         final JidePopup popup = new JidePopup();
 
-        JPanel dlg = null;
-        if (isBedarf()) {
-//            dlg = new PnlBedarfDosis(null, new Closure() {
-//                @Override
-//                public void execute(Object o) {
-//                    if (o != null) {
-//                        ((PrescriptionSchedule) o).setPrescription(prescription);
-//                        prescription.getPrescriptionSchedule().add(((PrescriptionSchedule) o));
-//                        reloadTable();
-//                        popup.hidePopup();
-//                    }
-//                }
-//            });
-        } else {
-            dlg = new PnlRegelDosis(null, new Closure() {
-                @Override
-                public void execute(Object o) {
-                    if (o != null) {
-                        ((PrescriptionSchedule) o).setPrescription(prescription);
-                        prescription.getPrescriptionSchedule().add(((PrescriptionSchedule) o));
-                        reloadTable();
-                        popup.hidePopup();
-                    }
+        JPanel dlg = new PnlRegelDosis(new PrescriptionSchedule(prescription), new Closure() {
+            @Override
+            public void execute(Object o) {
+                if (o != null) {
+                    prescription.getPrescriptionSchedule().add(((PrescriptionSchedule) o));
+                    reloadTable();
+                    popup.hidePopup();
                 }
-            });
-        }
+            }
+        });
 
         popup.setMovable(false);
         popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
@@ -135,99 +115,26 @@ public class DlgPrescription extends MyJDialog {
         popup.setOwner(btnAddDosis);
         popup.removeExcludedComponent(btnAddDosis);
         popup.setDefaultFocusComponent(dlg);
-        popup.addPropertyChangeListener("visible", new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-                OPDE.debug("popup property: " + propertyChangeEvent.getPropertyName() + " value: " + propertyChangeEvent.getNewValue() + " compCount: " + popup.getContentPane().getComponentCount());
-                popup.getContentPane().getComponentCount();
-//                OPDE.getDisplayManager().addSubMessage(currentSubMessage);
-            }
-        });
+//        popup.addPropertyChangeListener("visible", new PropertyChangeListener() {
+//            @Override
+//            public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+//                OPDE.debug("popup property: " + propertyChangeEvent.getPropertyName() + " value: " + propertyChangeEvent.getNewValue() + " compCount: " + popup.getContentPane().getComponentCount());
+//                popup.getContentPane().getComponentCount();
+//            }
+//        });
 
+        GUITools.showPopup(popup, SwingConstants.NORTH);
 
-        Point p = new Point(btnAddDosis.getX(), btnAddDosis.getY());
-        // Convert a coordinate relative to a component's bounds to screen coordinates
-        SwingUtilities.convertPointToScreen(p, btnAddDosis);
-        popup.showPopup(p.x, p.y - (int) dlg.getPreferredSize().getHeight() - (int) btnAddDosis.getPreferredSize().getHeight());
     }
 
-    private void txtSitActionPerformed(ActionEvent e) {
-        if (txtSit.getText().isEmpty()) {
-            cmbSit.setModel(new DefaultComboBoxModel());
-        } else {
-            cmbSit.setModel(new DefaultComboBoxModel(SituationsTools.findSituationByText(txtSit.getText()).toArray()));
-        }
-    }
-
-    private void saveSituation(String text) {
-        if (text.isEmpty()) {
-            return;
-        }
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT s FROM Situations s WHERE s.text = :text");
-        query.setParameter("text", text);
-        if (query.getResultList().isEmpty()) {
-            Situations neueSituation = new Situations(text);
-            em.persist(neueSituation);
-            cmbSit.setModel(new DefaultComboBoxModel(new Situations[]{neueSituation}));
-        } else {
-            cmbSit.setModel(new DefaultComboBoxModel(query.getResultList().toArray()));
-        }
-        em.close();
-    }
-
-    private void btnSituationActionPerformed(ActionEvent e) {
-        if (cmbSit.getModel().getSize() != 0) {
-            return;
-        }
-
-        final JidePopup popup = new JidePopup();
-        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-
-        final JTextField editor = new JTextField(txtSit.getText(), 30);
-        editor.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                saveSituation(editor.getText());
-                popup.hidePopup();
-            }
-        });
-
-        popup.getContentPane().add(new JScrollPane(editor));
-        JButton saveButton = new JButton(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-        saveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                saveSituation(editor.getText());
-                popup.hidePopup();
-            }
-        });
-
-        popup.setMovable(false);
-        popup.setOwner(btnSituation);
-        popup.removeExcludedComponent(btnSituation);
-
-        popup.getContentPane().add(saveButton);
-        popup.setDefaultFocusComponent(editor);
-
-        popup.showPopup();
-    }
-
-    private void cmbSitPropertyChange(PropertyChangeEvent e) {
-        cmbSitItemStateChanged(null);
-    }
-
-    private void btnEmptySitActionPerformed(ActionEvent e) {
-        cmbSit.setModel(new DefaultComboBoxModel());
-    }
 
     private void txtMedActionPerformed(ActionEvent e) {
         if (txtMed.getText().isEmpty()) {
             cmbMed.setModel(new DefaultComboBoxModel());
             cmbIntervention.setEnabled(true);
             txtMass.setEnabled(true);
-            cbStellplan.setEnabled(true);
-            cbStellplan.setSelected(false);
+            cbDailyPlan.setEnabled(true);
+            cbDailyPlan.setSelected(false);
             rbEndOfPackage.setEnabled(false);
         } else {
             OPDE.getDisplayManager().setDBActionMessage(true);
@@ -237,14 +144,14 @@ public class DlgPrescription extends MyJDialog {
 
             if (pzn != null) {
 
-                Query pznQuery = em.createNamedQuery("MedPackung.findByPzn");
+                Query pznQuery = em.createQuery("SELECT m FROM MedPackage m WHERE m.pzn = :pzn");
                 pznQuery.setParameter("pzn", pzn);
 
                 try {
                     MedPackage medPackage = (MedPackage) pznQuery.getSingleResult();
                     cmbMed.setModel(new DefaultComboBoxModel(new TradeForm[]{medPackage.getTradeForm()}));
                 } catch (NoResultException nre) {
-                    OPDE.debug("Nichts passendes zu dieser PZN gefunden");
+                    OPDE.debug("nothing found for this PZN");
                 } catch (Exception ex) {
                     OPDE.fatal(ex);
                 }
@@ -262,28 +169,35 @@ public class DlgPrescription extends MyJDialog {
                 cmbIntervention.setSelectedIndex(-1);
                 cmbIntervention.setEnabled(true);
                 txtMass.setEnabled(true);
-                cbStellplan.setEnabled(true);
-                cbStellplan.setSelected(false);
+                cbDailyPlan.setEnabled(true);
+                cbDailyPlan.setSelected(false);
                 OPDE.getDisplayManager().clearSubMessages();
             }
-            rbEndOfPackage.setEnabled(!isBedarf() && cmbMed.getModel().getSize() > 0);
+            rbEndOfPackage.setEnabled(cmbMed.getModel().getSize() > 0);
         }
     }
 
     private void rbActiveItemStateChanged(ItemEvent e) {
-        // TODO add your code here
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            jdcAB.setDate(null);
+        }
     }
 
     private void rbDateItemStateChanged(ItemEvent e) {
-        // TODO add your code here
+        jdcAB.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            jdcAB.setDate(new Date());
+        }
     }
 
     private void rbEndOfPackageItemStateChanged(ItemEvent e) {
-        // TODO add your code here
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            jdcAB.setDate(null);
+        }
     }
 
     private void txtMassActionPerformed(ActionEvent e) {
-        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.MASSART_BHP, txtMass.getText()).toArray()));
+        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.TYPE_PRESCRIPTION, txtMass.getText()).toArray()));
     }
 
     /**
@@ -298,21 +212,15 @@ public class DlgPrescription extends MyJDialog {
         txtMed = new JXSearchField();
         cmbMed = new JComboBox();
         panel4 = new JPanel();
-        btnEmptySit2 = new JButton();
         btnMed = new JButton();
         cmbIntervention = new JComboBox();
-        txtSit = new JXSearchField();
-        cmbSit = new JComboBox();
-        panel3 = new JPanel();
-        btnEmptySit = new JButton();
-        btnSituation = new JButton();
         txtMass = new JXSearchField();
         jPanel8 = new JPanel();
         jspDosis = new JScrollPane();
         tblDosis = new JTable();
         panel2 = new JPanel();
         btnAddDosis = new JButton();
-        cbStellplan = new JCheckBox();
+        cbDailyPlan = new JCheckBox();
         jPanel3 = new JPanel();
         pnlOFF = new JPanel();
         rbActive = new JRadioButton();
@@ -342,8 +250,8 @@ public class DlgPrescription extends MyJDialog {
         {
             jPanel1.setBorder(null);
             jPanel1.setLayout(new FormLayout(
-                "68dlu, $lcgap, 242dlu:grow, $lcgap, pref",
-                "3*(16dlu, $lgap), default, $lgap, fill:default:grow"));
+                "68dlu, $lcgap, 284dlu, $lcgap, pref",
+                "2*(16dlu, $lgap), default, $lgap, fill:default:grow"));
 
             //---- txtMed ----
             txtMed.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -383,22 +291,6 @@ public class DlgPrescription extends MyJDialog {
             {
                 panel4.setLayout(new BoxLayout(panel4, BoxLayout.LINE_AXIS));
 
-                //---- btnEmptySit2 ----
-                btnEmptySit2.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/button_cancel.png")));
-                btnEmptySit2.setBorderPainted(false);
-                btnEmptySit2.setBorder(null);
-                btnEmptySit2.setContentAreaFilled(false);
-                btnEmptySit2.setToolTipText("Auswahl l\u00f6schen");
-                btnEmptySit2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnEmptySit2.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/button_cancel-pressed.png")));
-                btnEmptySit2.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnEmptySitActionPerformed(e);
-                    }
-                });
-                panel4.add(btnEmptySit2);
-
                 //---- btnMed ----
                 btnMed.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
                 btnMed.setBorderPainted(false);
@@ -425,78 +317,7 @@ public class DlgPrescription extends MyJDialog {
                 "Item 4"
             }));
             cmbIntervention.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel1.add(cmbIntervention, CC.xywh(3, 5, 3, 1));
-
-            //---- txtSit ----
-            txtSit.setPrompt("Situationen");
-            txtSit.setFont(new Font("Arial", Font.PLAIN, 14));
-            txtSit.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    txtSitActionPerformed(e);
-                }
-            });
-            jPanel1.add(txtSit, CC.xy(1, 3));
-
-            //---- cmbSit ----
-            cmbSit.setModel(new DefaultComboBoxModel(new String[] {
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
-            }));
-            cmbSit.setFont(new Font("Arial", Font.PLAIN, 14));
-            cmbSit.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    cmbSitItemStateChanged(e);
-                }
-            });
-            cmbSit.addPropertyChangeListener("model", new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent e) {
-                    cmbSitPropertyChange(e);
-                }
-            });
-            jPanel1.add(cmbSit, CC.xy(3, 3));
-
-            //======== panel3 ========
-            {
-                panel3.setLayout(new BoxLayout(panel3, BoxLayout.LINE_AXIS));
-
-                //---- btnEmptySit ----
-                btnEmptySit.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/button_cancel.png")));
-                btnEmptySit.setBorderPainted(false);
-                btnEmptySit.setBorder(null);
-                btnEmptySit.setContentAreaFilled(false);
-                btnEmptySit.setToolTipText("Auswahl l\u00f6schen");
-                btnEmptySit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnEmptySit.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/button_cancel-pressed.png")));
-                btnEmptySit.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnEmptySitActionPerformed(e);
-                    }
-                });
-                panel3.add(btnEmptySit);
-
-                //---- btnSituation ----
-                btnSituation.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
-                btnSituation.setBorderPainted(false);
-                btnSituation.setBorder(null);
-                btnSituation.setContentAreaFilled(false);
-                btnSituation.setToolTipText("Neue  Situation eintragen");
-                btnSituation.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnSituation.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png")));
-                btnSituation.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnSituationActionPerformed(e);
-                    }
-                });
-                panel3.add(btnSituation);
-            }
-            jPanel1.add(panel3, CC.xy(5, 3));
+            jPanel1.add(cmbIntervention, CC.xywh(3, 3, 3, 1));
 
             //---- txtMass ----
             txtMass.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -507,7 +328,7 @@ public class DlgPrescription extends MyJDialog {
                     txtMassActionPerformed(e);
                 }
             });
-            jPanel1.add(txtMass, CC.xy(1, 5));
+            jPanel1.add(txtMass, CC.xy(1, 3));
 
             //======== jPanel8 ========
             {
@@ -568,15 +389,15 @@ public class DlgPrescription extends MyJDialog {
                 }
                 jPanel8.add(panel2, CC.xy(1, 3, CC.LEFT, CC.DEFAULT));
             }
-            jPanel1.add(jPanel8, CC.xywh(1, 9, 5, 1));
+            jPanel1.add(jPanel8, CC.xywh(1, 7, 5, 1));
 
-            //---- cbStellplan ----
-            cbStellplan.setText("Auf den Stellplan, auch wenn kein Medikament");
-            cbStellplan.setBorder(BorderFactory.createEmptyBorder());
-            cbStellplan.setMargin(new Insets(0, 0, 0, 0));
-            cbStellplan.setFont(new Font("Arial", Font.PLAIN, 14));
-            cbStellplan.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            jPanel1.add(cbStellplan, CC.xywh(1, 7, 5, 1));
+            //---- cbDailyPlan ----
+            cbDailyPlan.setText("Auf den Stellplan, auch wenn kein Medikament");
+            cbDailyPlan.setBorder(BorderFactory.createEmptyBorder());
+            cbDailyPlan.setMargin(new Insets(0, 0, 0, 0));
+            cbDailyPlan.setFont(new Font("Arial", Font.PLAIN, 14));
+            cbDailyPlan.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            jPanel1.add(cbDailyPlan, CC.xywh(1, 5, 5, 1));
         }
         contentPane.add(jPanel1, CC.xy(5, 3));
 
@@ -596,6 +417,7 @@ public class DlgPrescription extends MyJDialog {
 
                 //---- rbActive ----
                 rbActive.setText("text");
+                rbActive.setSelected(true);
                 rbActive.addItemListener(new ItemListener() {
                     @Override
                     public void itemStateChanged(ItemEvent e) {
@@ -694,7 +516,6 @@ public class DlgPrescription extends MyJDialog {
 
             //---- btnSave ----
             btnSave.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-            btnSave.setEnabled(false);
             btnSave.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             btnSave.addActionListener(new ActionListener() {
                 @Override
@@ -705,7 +526,7 @@ public class DlgPrescription extends MyJDialog {
             panel1.add(btnSave);
         }
         contentPane.add(panel1, CC.xy(5, 5, CC.RIGHT, CC.DEFAULT));
-        pack();
+        setSize(1070, 640);
         setLocationRelativeTo(getOwner());
 
         //---- bgMedikament ----
@@ -719,19 +540,17 @@ public class DlgPrescription extends MyJDialog {
         fillComboBoxes();
 
         ignoreEvent = true;
-        txtSit.setText("");
+
+        rbActive.setText(OPDE.lang.getString(PnlPrescription.internalClassID + ".dlgRegular.rbActive"));
+        rbEndOfPackage.setText(OPDE.lang.getString(PnlPrescription.internalClassID + ".dlgRegular.rbEndOfPackage"));
+
         txtMed.setText("");
-        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.MASSART_BHP).toArray()));
-        cmbIntervention.setRenderer(InterventionTools.getMassnahmenRenderer());
         jdcAB.setMinSelectableDate(new Date());
+
         cmbMed.setRenderer(TradeFormTools.getDarreichungRenderer(TradeFormTools.LONG));
-        cmbSit.setRenderer(SituationsTools.getSituationenRenderer());
-        cmbMed.setModel(new DefaultComboBoxModel());
-
-        btnSave.setEnabled(true);
-
         cmbDocON.setSelectedItem(prescription.getDocON());
         cmbHospitalON.setSelectedItem(prescription.getHospitalON());
+        cmbMed.setModel(new DefaultComboBoxModel());
 
         rbEndOfPackage.setSelected(prescription.isTillEndOfPackage());
 
@@ -741,19 +560,17 @@ public class DlgPrescription extends MyJDialog {
             cmbMed.setModel(new DefaultComboBoxModel(new TradeForm[]{prescription.getTradeForm()}));
         }
 
+        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.TYPE_PRESCRIPTION).toArray()));
+        cmbIntervention.setRenderer(InterventionTools.getMassnahmenRenderer());
         cmbIntervention.setEnabled(cmbMed.getModel().getSize() == 0);
-        txtMass.setEnabled(cmbMed.getModel().getSize() == 0);
-        cbStellplan.setEnabled(cmbMed.getModel().getSize() == 0);
-        cbStellplan.setSelected(prescription.isOnDailyPlan());
-
-        cmbSit.setModel(new DefaultComboBoxModel(new Situations[]{prescription.getSituation()}));
-
         cmbIntervention.setSelectedItem(prescription.getIntervention());
+        txtMass.setEnabled(cmbMed.getModel().getSize() == 0);
 
-        cmbMed.setEnabled(editMode == ALLOW_ALL_EDIT);
-        txtMed.setEnabled(editMode == ALLOW_ALL_EDIT);
-        txtSit.setEnabled(editMode == ALLOW_ALL_EDIT);
-        cmbSit.setEnabled(editMode == ALLOW_ALL_EDIT);
+        cbDailyPlan.setEnabled(cmbMed.getModel().getSize() == 0);
+        cbDailyPlan.setSelected(prescription.isOnDailyPlan());
+
+        cmbMed.setEnabled(editMode != MODE_CHANGE);
+        txtMed.setEnabled(editMode != MODE_CHANGE);
 
         if (cmbMed.getSelectedItem() != null) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(TradeFormTools.toPrettyString((TradeForm) cmbMed.getSelectedItem())));
@@ -761,12 +578,13 @@ public class DlgPrescription extends MyJDialog {
         } else {
             rbEndOfPackage.setEnabled(false);
         }
-        if (prescription.isDiscontinued()) {
-            rbDate.setSelected(true);
-            jdcAB.setDate(prescription.getTo());
-        } else {
-
-        }
+//        if (prescription.isDiscontinued()) {
+//            rbDate.setSelected(true);
+//            jdcAB.setDate(prescription.getTo());
+//        } else {
+//
+//        }
+//
 
         ignoreEvent = false;
         txtMed.requestFocus();
@@ -810,52 +628,42 @@ public class DlgPrescription extends MyJDialog {
 
 
     private void cmbMedItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbMedItemStateChanged
-        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.MASSART_BHP).toArray()));
-        cmbIntervention.setSelectedItem(((TradeForm) cmbMed.getSelectedItem()).getDosageForm().getMassnahme());
+        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.TYPE_PRESCRIPTION).toArray()));
+        cmbIntervention.setSelectedItem(((TradeForm) cmbMed.getSelectedItem()).getDosageForm().getIntervention());
         cmbIntervention.setEnabled(false);
         txtMass.setText(null);
         txtMass.setEnabled(false);
-        cbStellplan.setEnabled(false);
-        cbStellplan.setSelected(false);
-//        cbPackEnde.setSelected(false);
-//        cbPackEnde.setEnabled(cmbMed.getSelectedItem() != null);
-//        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(DarreichungTools.toPrettyString((Darreichung) cmbMed.getSelectedItem())));
-
+        cbDailyPlan.setEnabled(false);
+        cbDailyPlan.setSelected(false);
     }//GEN-LAST:event_cmbMedItemStateChanged
 
-    private boolean isBedarf() {
-        return cmbSit.getSelectedItem() != null;
-    }
 
     private boolean saveOK() {
         if (ignoreEvent) return false;
-        boolean ansetzungOK = (cmbDocON.getSelectedIndex() > 0 || cmbHospitalON.getSelectedIndex() > 0);
-        boolean absetzungOK = !rbDate.isSelected() || jdcAB.getDate() != null;
+        boolean OnOK = (cmbDocON.getSelectedIndex() > 0 || cmbHospitalON.getSelectedIndex() > 0);
+        boolean OffOK = !rbDate.isSelected() || jdcAB.getDate() != null;
         boolean medOK = cmbMed.getModel().getSize() == 0 || cmbMed.getSelectedItem() != null;
-        boolean massOK = cmbIntervention.getSelectedItem() != null;
-        boolean dosisVorhanden = tblDosis.getModel().getRowCount() > 0;
-//        btnSave.setEnabled(ansetzungOK && absetzungOK && medOK && massOK && dosisVorhanden);
-//        cbPackEnde.setEnabled(!isOnDemand() && cmbMed.getModel().getSize() > 0);
+        boolean intervOK = cmbIntervention.getSelectedItem() != null;
+        boolean doseOK = tblDosis.getModel().getRowCount() > 0;
+
+        String reason = "";
+        reason += (OnOK ? "" : "Die Informationen zum <b>an</b>setzenden <b>Doc</b> oder KH sind unvollständig. ");
+        reason += (OffOK ? "" : "Die Informationen zum <b>ab</b>setzenden <b>Doc</b> oder KH sind unvollständig. ");
+        reason += (medOK ? "" : "Die <b>Medikamentenangabe</b> ist falsch. ");
+        reason += (intervOK ? "" : "Die Angaben über die <b>Massnahmen</b> sind falsch. ");
+        reason += (doseOK ? "" : "Sie müssen mindestens eine <b>Dosierung</b> angegeben. ");
 
 
-        String ursache = "";
-        ursache += (ansetzungOK ? "" : "Die Informationen zum <b>an</b>setzenden <b>Doc</b> oder KH sind unvollständig. ");
-        ursache += (absetzungOK ? "" : "Die Informationen zum <b>ab</b>setzenden <b>Doc</b> oder KH sind unvollständig. ");
-        ursache += (medOK ? "" : "Die <b>Medikamentenangabe</b> ist falsch. ");
-        ursache += (massOK ? "" : "Die Angaben über die <b>Massnahmen</b> sind falsch. ");
-        ursache += (dosisVorhanden ? "" : "Sie müssen mindestens eine <b>Dosierung</b> angegeben. ");
-
-
-        if (!ursache.isEmpty()) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ursache, DisplayMessage.WARNING));
+        if (!reason.isEmpty()) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(reason, DisplayMessage.WARNING));
         }
-        return ansetzungOK & absetzungOK & medOK & massOK & dosisVorhanden;
+        return OnOK & OffOK & medOK & intervOK & doseOK;
 
     }
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         if (save()) {
-            returnPackage = new Pair(prescription, planungenToDelete);
+            returnPackage = new Pair(prescription, schedules2delete);
             dispose();
         }
     }//GEN-LAST:event_btnSaveActionPerformed
@@ -863,76 +671,41 @@ public class DlgPrescription extends MyJDialog {
     @Override
     public void dispose() {
         actionBlock.execute(returnPackage);
-        jdcAB.removePropertyChangeListener(myPropertyChangeListener);
-
         jdcAB.cleanup();
-
-//        OPDE.getDisplayManager().clearSubMessages();
         SYSTools.unregisterListeners(this);
         super.dispose();
     }
-
-    private void cmbSitItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbSitItemStateChanged
-        if (ignoreEvent) return;
-
-        rbEndOfPackage.setEnabled(!isBedarf());
-        rbEndOfPackage.setSelected(false);
-
-        cbStellplan.setEnabled(!isBedarf());
-        cbStellplan.setSelected(false);
-
-        planungenToDelete.addAll(prescription.getPrescriptionSchedule());
-        prescription.getPrescriptionSchedule().clear();
-
-        reloadTable();
-
-//        saveOK();
-
-    }//GEN-LAST:event_cmbSitItemStateChanged
 
     private void txtBemerkungCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtBemerkungCaretUpdate
 
     }//GEN-LAST:event_txtBemerkungCaretUpdate
 
     private boolean save() {
-//        if (!saveOK()) return false;
-//
-//        if (cbAB.isSelected()) {
-//
-//            if (SYSCalendar.sameDay(jdcAB.getDate(), new Date()) == 0) {
-//                OPDE.debug("jdcAB steht auf HEUTE");
-//                if (SYSCalendar.sameDay(jdcAB.getDate(), jdcAN.getDate()) == 0) {
-//                    OPDE.debug("jdcAB und jdcAN sind gleich");
-//                    prescription.setFrom(new Date(SYSCalendar.startOfDay()));
-//                    prescription.setTo(new Date(SYSCalendar.endOfDay()));
-//                } else {
-//                    prescription.setTo(new Date());
-//                }
-//            } else {
-//                OPDE.debug("jdcAB steht nicht auf HEUTE");
-//                prescription.setTo(new Date(SYSCalendar.endOfDay(jdcAB.getDate())));
-//
-//            }
-//            prescription.setUserOFF(OPDE.getLogin().getUser());
-//        } else {
-//            prescription.setHospitalOFF(null);
-//            prescription.setDocOFF(null);
-//            prescription.setTo(SYSConst.DATE_BIS_AUF_WEITERES);
-//        }
-//
-//        prescription.setDocON((Doc) cmbDocON.getSelectedItem());
-//        prescription.setHospitalON((Hospital) cmbHospitalON.getSelectedItem());
-//        prescription.setDocOFF((Doc) cmbDocOFF.getSelectedItem());
-//        prescription.setHospitalOFF((Hospital) cmbKHAb.getSelectedItem());
-//        prescription.setUserON(OPDE.getLogin().getUser());
-//        prescription.setShowOnDailyPlan(cbStellplan.isSelected());
-//        prescription.setBisPackEnde(cbPackEnde.isSelected());
-//        prescription.setText(txtBemerkung.getText());
-//        prescription.setIntervention((Intervention) cmbIntervention.getSelectedItem());
-//        prescription.setTradeForm((TradeForm) cmbMed.getSelectedItem());
-//        prescription.setShowOnDailyPlan(cbStellplan.isSelected());
-//
-//        prescription.setSituation((Situations) cmbSit.getSelectedItem());
+        if (!saveOK()) return false;
+
+        prescription.setHospitalON((Hospital) cmbHospitalON.getSelectedItem());
+        prescription.setIntervention((Intervention) cmbIntervention.getSelectedItem());
+        prescription.setShowOnDailyPlan(cbDailyPlan.isSelected());
+        prescription.setSituation(null);
+        prescription.setText(txtBemerkung.getText().trim());
+        prescription.setTradeForm((TradeForm) cmbMed.getSelectedItem());
+        prescription.setUserON(OPDE.getLogin().getUser());
+        prescription.setDocON((Doc) cmbDocON.getSelectedItem());
+
+        prescription.setFrom(new DateMidnight().toDate());
+        if (rbDate.isSelected()) {
+            prescription.setTo(new DateMidnight(jdcAB.getDate()).plusDays(1).toDateTime().minusSeconds(1).toDate());
+            prescription.setUserOFF(OPDE.getLogin().getUser());
+            prescription.setHospitalOFF(prescription.getHospitalON());
+            prescription.setDocOFF(prescription.getDocON());
+            prescription.setTo(SYSConst.DATE_BIS_AUF_WEITERES);
+        } else {
+            prescription.setHospitalOFF(null);
+            prescription.setDocOFF(null);
+            prescription.setTo(SYSConst.DATE_BIS_AUF_WEITERES);
+        }
+        prescription.setTillEndOfPackage(rbEndOfPackage.isSelected());
+
         return true;
     }
 
@@ -942,10 +715,10 @@ public class DlgPrescription extends MyJDialog {
             return;
         }
 
-        if (prescription.isDiscontinued() && !SYSCalendar.isInFuture(jdcAB.getDate().getTime())) {
-            JOptionPane.showMessageDialog(tblDosis, "Verordnung wurde bereits abgesetzt. Sie können diese nicht mehr ändern.");
-            return;
-        }
+//        if (prescription.isDiscontinued() && new DateMidnight(jdcAB.getDate()).isBefore(new DateMidnight())) {
+//            JOptionPane.showMessageDialog(tblDosis, "Verordnung wurde bereits abgesetzt. Sie können diese nicht mehr ändern.");
+//            return;
+//        }
 
         final TMDosis tm = (TMDosis) tblDosis.getModel();
         if (tm.getRowCount() == 0) {
@@ -956,50 +729,34 @@ public class DlgPrescription extends MyJDialog {
         // Convert a coordinate relative to a component's bounds to screen coordinates
         SwingUtilities.convertPointToScreen(p2, tblDosis);
 
-        final Point screenposition = p2;
+//        final Point screenposition = p2;
         final int row = tblDosis.rowAtPoint(p);
 
         ListSelectionModel lsm = tblDosis.getSelectionModel();
         lsm.setSelectionInterval(row, row);
-
-
-        //final long bhppid = ((Long) tm.getValueAt(row, TMDosis.COL_BHPPID)).longValue();
-
 
         // Menüeinträge
         SYSTools.unregisterListeners(menu);
         menu = new JPopupMenu();
 
         // Bei Bedarfsmedikation kann immer nur eine Dosis eingegeben werden.
-        JMenuItem itemPopupEditText = new JMenuItem("Bearbeiten");
+        JMenuItem itemPopupEditText = new JMenuItem(OPDE.lang.getString("misc.msg.edit"), SYSConst.icon22edit);
         itemPopupEditText.addActionListener(new java.awt.event.ActionListener() {
 
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                PrescriptionSchedule planung = prescription.getPrescriptionSchedule().toArray(new PrescriptionSchedule[0])[row];
+                PrescriptionSchedule planung = prescription.getPrescriptionSchedule().get(row);
                 final JidePopup popup = new JidePopup();
 
                 CleanablePanel dlg = null;
-                if (prescription.isOnDemand()) {
-//                    dlg = new PnlBedarfDosis(planung, new Closure() {
-//                        @Override
-//                        public void execute(Object o) {
-//                            if (o != null) {
-//                                reloadTable();
-//                                popup.hidePopup();
-//                            }
-//                        }
-//                    });
-                } else {
-                    dlg = new PnlRegelDosis(planung, new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            if (o != null) {
-                                reloadTable();
-                                popup.hidePopup();
-                            }
+                dlg = new PnlRegelDosis(planung, new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        if (o != null) {
+                            reloadTable();
+                            popup.hidePopup();
                         }
-                    });
-                }
+                    }
+                });
 
                 popup.setMovable(false);
                 popup.setOwner(tblDosis);
@@ -1014,42 +771,27 @@ public class DlgPrescription extends MyJDialog {
             }
         });
         menu.add(itemPopupEditText);
-        //ocs.setEnabled(classname, "itemPopupEditText", itemPopupEditText, status > 0 && changeable);
 
         //-----------------------------------------
-        JMenuItem itemPopupDelete = new JMenuItem("löschen");
+        JMenuItem itemPopupDelete = new JMenuItem(OPDE.lang.getString("misc.msg.delete"), SYSConst.icon22delete);
         itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
 
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                PrescriptionSchedule schedule = prescription.getPrescriptionSchedule().toArray(new PrescriptionSchedule[0])[row];
+                PrescriptionSchedule schedule = prescription.getPrescriptionSchedule().get(row);
                 prescription.getPrescriptionSchedule().remove(schedule);
-                planungenToDelete.add(schedule);
+                schedules2delete.add(schedule);
                 reloadTable();
             }
         });
         menu.add(itemPopupDelete);
-        //ocs.setEnabled(classname, "itemPopupEditVer", itemPopupEditVer, true);
         menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
 
     }//GEN-LAST:event_tblDosisMousePressed
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
+        returnPackage = null;
         dispose();
     }//GEN-LAST:event_btnCloseActionPerformed
-
-    private void cbABActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbABActionPerformed
-//        jdcAB.setEnabled(cbAB.isSelected());
-//        cmbDocOFF.setEnabled(cbAB.isSelected());
-//        cmbKHAb.setEnabled(cbAB.isSelected());
-//        cmbDocOFF.setSelectedIndex(0);
-//        cmbKHAb.setSelectedIndex(0);
-//        jdcAB.setDate(new Date());
-//        jdcAB.setMinSelectableDate(jdcAN.getDate());
-//        lblAB.setText(cbAB.isSelected() ? OPDE.getLogin().getUser().getUID() : "");
-//        cbPackEnde.setSelected(false);
-//        cbPackEnde.setEnabled(!cbAB.isSelected());
-
-    }//GEN-LAST:event_cbABActionPerformed
 
 
     private void fillComboBoxes() {
@@ -1075,15 +817,14 @@ public class DlgPrescription extends MyJDialog {
     private void reloadTable() {
         String zubereitung = "x";
         if (prescription.getTradeForm() != null) {
-            zubereitung = prescription.getTradeForm().getDosageForm().getZubereitung();
+            zubereitung = prescription.getTradeForm().getDosageForm().getPreparation();
         }
 
         tblDosis.setModel(new TMDosis(zubereitung, prescription));
         tblDosis.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jspDosis.dispatchEvent(new ComponentEvent(jspDosis, ComponentEvent.COMPONENT_RESIZED));
         tblDosis.getColumnModel().getColumn(TMDosis.COL_Dosis).setCellRenderer(new RNDHTML());
-        tblDosis.getColumnModel().getColumn(TMDosis.COL_Dosis).setHeaderValue("Anwendung");
-
+        tblDosis.getColumnModel().getColumn(TMDosis.COL_Dosis).setHeaderValue(OPDE.lang.getString("misc.msg.usage"));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1091,21 +832,15 @@ public class DlgPrescription extends MyJDialog {
     private JXSearchField txtMed;
     private JComboBox cmbMed;
     private JPanel panel4;
-    private JButton btnEmptySit2;
     private JButton btnMed;
     private JComboBox cmbIntervention;
-    private JXSearchField txtSit;
-    private JComboBox cmbSit;
-    private JPanel panel3;
-    private JButton btnEmptySit;
-    private JButton btnSituation;
     private JXSearchField txtMass;
     private JPanel jPanel8;
     private JScrollPane jspDosis;
     private JTable tblDosis;
     private JPanel panel2;
     private JButton btnAddDosis;
-    private JCheckBox cbStellplan;
+    private JCheckBox cbDailyPlan;
     private JPanel jPanel3;
     private JPanel pnlOFF;
     private JRadioButton rbActive;

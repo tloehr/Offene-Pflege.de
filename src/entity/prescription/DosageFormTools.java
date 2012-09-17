@@ -51,25 +51,25 @@ public class DosageFormTools {
         String result = "";
         if (form == null) {
             result = "?";
-        } else if (!form.getAnwText().isEmpty()) {
-            result = form.getAnwText();
+        } else if (!form.getUsageTex().isEmpty()) {
+            result = form.getUsageTex();
         } else {
-            result = SYSConst.UNITS[form.getAnwEinheit()];
+            result = SYSConst.UNITS[form.getUsageUnit()];
         }
 
         return result;
     }
 
     public static String toPrettyString(DosageForm form) {
-        return (SYSTools.catchNull(form.getZubereitung()).isEmpty() ? form.getAnwText() : form.getZubereitung() + ", " + form.getAnwText());
+        return (SYSTools.catchNull(form.getPreparation()).isEmpty() ? form.getUsageTex() : form.getPreparation() + ", " + form.getUsageTex());
     }
 
     public static String toPrettyStringPackung(DosageForm form) {
         String result = "";
-        if (SYSTools.catchNull(form.getZubereitung()).isEmpty()) {
-            result = EINHEIT[form.getPackEinheit()] + " " + form.getAnwText();
+        if (SYSTools.catchNull(form.getPreparation()).isEmpty()) {
+            result = EINHEIT[form.getPackUnit()] + " " + form.getUsageTex();
         } else {
-            result = EINHEIT[form.getPackEinheit()] + " " + form.getZubereitung();
+            result = EINHEIT[form.getPackUnit()] + " " + form.getPreparation();
         }
 
         return result;

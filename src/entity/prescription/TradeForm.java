@@ -9,81 +9,72 @@ import java.util.Collection;
 @Table(name = "MPDarreichung")
 @NamedQueries({
         @NamedQuery(name = "Darreichung.findAll", query = "SELECT m FROM TradeForm m"),
-        @NamedQuery(name = "Darreichung.findByDafID", query = "SELECT m FROM TradeForm m WHERE m.dafID = :dafID"),
-        @NamedQuery(name = "Darreichung.findByZusatz", query = "SELECT m FROM TradeForm m WHERE m.zusatz = :zusatz"),
-        @NamedQuery(name = "Darreichung.findByMedProdukt", query = "SELECT m FROM TradeForm m WHERE m.medProdukt = :medProdukt ORDER BY m.dosageForm.zubereitung")
+        @NamedQuery(name = "Darreichung.findByDafID", query = "SELECT m FROM TradeForm m WHERE m.id = :dafID"),
+        @NamedQuery(name = "Darreichung.findByZusatz", query = "SELECT m FROM TradeForm m WHERE m.subtext = :zusatz"),
+        @NamedQuery(name = "Darreichung.findByMedProdukt", query = "SELECT m FROM TradeForm m WHERE m.medProduct = :medProdukt ORDER BY m.dosageForm.preparation")
 })
 public class TradeForm implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "DafID")
-    private Long dafID;
+    private Long id;
     @Column(name = "Zusatz")
-    private String zusatz;
+    private String subtext;
 
     public TradeForm() {
     }
 
-    public TradeForm(MedProducts medProdukt) {
-        this.medProdukt = medProdukt;
-        this.packungen = new ArrayList<MedPackage>();
-        this.bestaende = new ArrayList<MedStock>();
+    public TradeForm(MedProducts medProduct) {
+        this.medProduct = medProduct;
+        this.packages = new ArrayList<MedPackage>();
+        this.stocks = new ArrayList<MedStock>();
     }
 
-    public TradeForm(MedProducts medProdukt, String zusatz, DosageForm dosageForm) {
-        this.medProdukt = medProdukt;
-        this.zusatz = zusatz;
+    public TradeForm(MedProducts medProduct, String subtext, DosageForm dosageForm) {
+        this.medProduct = medProduct;
+        this.subtext = subtext;
         this.dosageForm = dosageForm;
-        this.packungen = new ArrayList<MedPackage>();
-        this.bestaende = new ArrayList<MedStock>();
+        this.packages = new ArrayList<MedPackage>();
+        this.stocks = new ArrayList<MedStock>();
     }
 
-    public Long getDafID() {
-        return dafID;
+    public Long getID() {
+        return id;
     }
 
-    public void setDafID(Long dafID) {
-        this.dafID = dafID;
+    public String getSubtext() {
+        return subtext;
     }
 
-    public String getZusatz() {
-        return zusatz;
+    public void setSubtext(String zusatz) {
+        this.subtext = zusatz;
     }
 
-    public void setZusatz(String zusatz) {
-        this.zusatz = zusatz;
-    }
-
-    public Collection<MedPackage> getPackungen() {
-        return packungen;
+    public Collection<MedPackage> getPackages() {
+        return packages;
     }
 
     // ==
     // 1:N Relationen
     // ==
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "tradeForm")
-    private Collection<MedPackage> packungen;
+    private Collection<MedPackage> packages;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "tradeform")
-    private Collection<MedStock> bestaende;
+    private Collection<MedStock> stocks;
 
     // N:1 Relationen
     @JoinColumn(name = "MedPID", referencedColumnName = "MedPID")
     @ManyToOne
-    private MedProducts medProdukt;
+    private MedProducts medProduct;
 
     @JoinColumn(name = "FormID", referencedColumnName = "FormID")
     @ManyToOne
     private DosageForm dosageForm;
 
-    public MedProducts getMedProdukt() {
-        return medProdukt;
-    }
-
-    public void setMedProdukt(MedProducts medProdukt) {
-        this.medProdukt = medProdukt;
+    public MedProducts getMedProduct() {
+        return medProduct;
     }
 
     public DosageForm getDosageForm() {
@@ -95,13 +86,13 @@ public class TradeForm implements Serializable {
     }
 
     public Collection<MedStock> getMedStocks() {
-        return bestaende;
+        return stocks;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (dafID != null ? dafID.hashCode() : 0);
+        hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
 
@@ -112,7 +103,7 @@ public class TradeForm implements Serializable {
             return false;
         }
         TradeForm other = (TradeForm) object;
-        if ((this.dafID == null && other.dafID != null) || (this.dafID != null && !this.dafID.equals(other.dafID))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
         return true;
@@ -120,7 +111,7 @@ public class TradeForm implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.rest.Darreichung[dafID=" + dafID + "]";
+        return "entity.rest.TradeForm[ID=" + id + "]";
     }
 
 }

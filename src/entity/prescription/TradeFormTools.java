@@ -38,7 +38,7 @@ public class TradeFormTools {
                 } else if (o instanceof TradeForm) {
                     TradeForm darreichung = (TradeForm) o;
                     if (v == SHORT) {
-                        text = darreichung.getZusatz();
+                        text = darreichung.getSubtext();
                     } else if (v == MEDIUM) {
                         text = toPrettyStringMedium(darreichung);
                     } else {
@@ -54,30 +54,30 @@ public class TradeFormTools {
 
 
     public static String toPrettyString(TradeForm darreichung) {
-        String zubereitung = SYSTools.catchNull(darreichung.getDosageForm().getZubereitung());
-        String anwtext = SYSTools.catchNull(darreichung.getDosageForm().getAnwText());
-        String zusatz = SYSTools.catchNull(darreichung.getZusatz());
+        String zubereitung = SYSTools.catchNull(darreichung.getDosageForm().getPreparation());
+        String anwtext = SYSTools.catchNull(darreichung.getDosageForm().getUsageTex());
+        String zusatz = SYSTools.catchNull(darreichung.getSubtext());
 
-        String text = darreichung.getMedProdukt().getBezeichnung();
+        String text = darreichung.getMedProduct().getBezeichnung();
         text += zusatz.isEmpty() ? "" : ", " + zusatz;
         text += zubereitung.isEmpty() ? " " : " " + zubereitung + ", ";
-        text += anwtext.isEmpty() ? DosageFormTools.EINHEIT[darreichung.getDosageForm().getAnwEinheit()] : anwtext;
+        text += anwtext.isEmpty() ? DosageFormTools.EINHEIT[darreichung.getDosageForm().getUsageUnit()] : anwtext;
         return text;
     }
 
     public static String toPrettyStringMedium(TradeForm darreichung) {
-        String zubereitung = SYSTools.catchNull(darreichung.getDosageForm().getZubereitung());
-        String anwtext = SYSTools.catchNull(darreichung.getDosageForm().getAnwText());
-        String zusatz = SYSTools.catchNull(darreichung.getZusatz());
+        String zubereitung = SYSTools.catchNull(darreichung.getDosageForm().getPreparation());
+        String anwtext = SYSTools.catchNull(darreichung.getDosageForm().getUsageTex());
+        String zusatz = SYSTools.catchNull(darreichung.getSubtext());
 
         String text = zusatz;
         text += zubereitung.isEmpty() ? " " : " " + zubereitung + ", ";
-        text += anwtext.isEmpty() ? DosageFormTools.EINHEIT[darreichung.getDosageForm().getAnwEinheit()] : anwtext;
+        text += anwtext.isEmpty() ? DosageFormTools.EINHEIT[darreichung.getDosageForm().getUsageUnit()] : anwtext;
         return text;
     }
 
     public static String getPackUnit(TradeForm darreichung) {
-        return DosageFormTools.EINHEIT[darreichung.getDosageForm().getPackEinheit()];
+        return DosageFormTools.EINHEIT[darreichung.getDosageForm().getPackUnit()];
     }
 
 
@@ -86,8 +86,8 @@ public class TradeFormTools {
 
         Query query = em.createQuery(" " +
                 " SELECT d FROM TradeForm d " +
-                " WHERE d.medProdukt.bezeichnung like :suche" +
-                " ORDER BY d.medProdukt.bezeichnung, d.zusatz, d.dosageForm.zubereitung ");
+                " WHERE d.medProduct.bezeichnung like :suche" +
+                " ORDER BY d.medProduct.bezeichnung, d.subtext, d.dosageForm.preparation ");
 
         query.setParameter("suche", suche);
 
@@ -103,8 +103,8 @@ public class TradeFormTools {
 
         Query query = em.createQuery(" " +
                 " SELECT d FROM TradeForm d " +
-                " WHERE d.medProdukt.bezeichnung like :suche" +
-                " ORDER BY d.medProdukt.bezeichnung, d.zusatz, d.dosageForm.zubereitung ");
+                " WHERE d.medProduct.bezeichnung like :suche" +
+                " ORDER BY d.medProduct.bezeichnung, d.subtext, d.dosageForm.preparation ");
 
         query.setParameter("suche", suche);
 
@@ -203,9 +203,9 @@ public class TradeFormTools {
 
         // 2. Alle äquivalenten Formen dazu finden
         List<DosageForm> aehnlicheFormen;
-        if (meineForm.getEquiv() != 0) {
+        if (meineForm.getSameAs() != 0) {
             Query query = em.createNamedQuery("MedFormen.findByEquiv");
-            query.setParameter("equiv", meineForm.getEquiv());
+            query.setParameter("equiv", meineForm.getSameAs());
             aehnlicheFormen = query.getResultList();
         } else {
             aehnlicheFormen = new ArrayList<DosageForm>();
@@ -217,7 +217,7 @@ public class TradeFormTools {
                 " SELECT DISTINCT b.inventory FROM MedStock b " +
                 " WHERE b.inventory.resident = :resident " +
                 " AND b.inventory.to = :to " +
-                " AND b.tradeform.dosageForm.formID  IN " +
+                " AND b.tradeform.dosageForm.id  IN " +
                 " ( " + EntityTools.getIDList(aehnlicheFormen) + " ) "
         );
         queryVorraete.setParameter("resident", resident);

@@ -58,7 +58,7 @@ import java.util.Date;
 public class PnlRegelDosis extends CleanablePanel {
 
     private boolean ignoreEvent = false;
-    private PrescriptionSchedule planung;
+    private PrescriptionSchedule schedule;
     private Closure actionBlock;
 
     private double splitRegularPos;
@@ -67,15 +67,11 @@ public class PnlRegelDosis extends CleanablePanel {
     private final int TAB_WEEKLY = 1;
     private final int TAB_MONTHLY = 2;
 
-    public PnlRegelDosis(PrescriptionSchedule planung, Closure actionBlock) {
+    public PnlRegelDosis(PrescriptionSchedule schedule, Closure actionBlock) {
         this.actionBlock = actionBlock;
 //        this.currentSelectedTime = null;
 
-        if (planung == null) {
-            // TODO: ERROR. FIX THIS
-            planung = new PrescriptionSchedule(null);
-        }
-        this.planung = planung;
+        this.schedule = schedule;
         initComponents();
         initPanel();
     }
@@ -134,67 +130,67 @@ public class PnlRegelDosis extends CleanablePanel {
         spinMonat.setModel(new SpinnerNumberModel(1, 1, 12, 1));
         spinMonatTag.setModel(new SpinnerNumberModel(1, 1, 31, 1));
 
-        spinTaeglich.setValue(Math.max(planung.getTaeglich(), 1));
-        spinWoche.setValue(Math.max(planung.getWoechentlich(), 1));
-        spinMonat.setValue(Math.max(planung.getMonatlich(), 1));
-        spinMonatTag.setValue(Math.max(planung.getTagNum(), 1));
+        spinTaeglich.setValue(Math.max(schedule.getTaeglich(), 1));
+        spinWoche.setValue(Math.max(schedule.getWoechentlich(), 1));
+        spinMonat.setValue(Math.max(schedule.getMonatlich(), 1));
+        spinMonatTag.setValue(Math.max(schedule.getTagNum(), 1));
 
         tabWdh.setSelectedIndex(TAB_DAILY);
 
-        if (planung.getWoechentlich() > 0) {
-            cbMon.setSelected(planung.getMon() > 0);
-            cbDie.setSelected(planung.getDie() > 0);
-            cbMit.setSelected(planung.getMit() > 0);
-            cbDon.setSelected(planung.getDon() > 0);
-            cbFre.setSelected(planung.getFre() > 0);
-            cbSam.setSelected(planung.getSam() > 0);
-            cbSon.setSelected(planung.getSon() > 0);
+        if (schedule.getWoechentlich() > 0) {
+            cbMon.setSelected(schedule.getMon() > 0);
+            cbDie.setSelected(schedule.getDie() > 0);
+            cbMit.setSelected(schedule.getMit() > 0);
+            cbDon.setSelected(schedule.getDon() > 0);
+            cbFre.setSelected(schedule.getFre() > 0);
+            cbSam.setSelected(schedule.getSam() > 0);
+            cbSon.setSelected(schedule.getSon() > 0);
             tabWdh.setSelectedIndex(TAB_WEEKLY);
         }
 
-        if (planung.getMonatlich() > 0) {
-            if (planung.getTagNum() > 0) {
+        if (schedule.getMonatlich() > 0) {
+            if (schedule.getTagNum() > 0) {
 
-                spinMonatTag.setValue(planung.getTagNum());
+                spinMonatTag.setValue(schedule.getTagNum());
                 cmbTag.setSelectedIndex(0);
             } else {
 
-                if (planung.getMon() > 0) {
+                if (schedule.getMon() > 0) {
                     cmbTag.setSelectedIndex(1);
-                    spinMonatTag.setValue(planung.getMon());
-                } else if (planung.getDie() > 0) {
+                    spinMonatTag.setValue(schedule.getMon());
+                } else if (schedule.getDie() > 0) {
                     cmbTag.setSelectedIndex(2);
-                    spinMonatTag.setValue(planung.getDie());
-                } else if (planung.getMit() > 0) {
+                    spinMonatTag.setValue(schedule.getDie());
+                } else if (schedule.getMit() > 0) {
                     cmbTag.setSelectedIndex(3);
-                    spinMonatTag.setValue(planung.getMit());
-                } else if (planung.getDon() > 0) {
+                    spinMonatTag.setValue(schedule.getMit());
+                } else if (schedule.getDon() > 0) {
                     cmbTag.setSelectedIndex(4);
-                    spinMonatTag.setValue(planung.getDon());
-                } else if (planung.getFre() > 0) {
+                    spinMonatTag.setValue(schedule.getDon());
+                } else if (schedule.getFre() > 0) {
                     cmbTag.setSelectedIndex(5);
-                    spinMonatTag.setValue(planung.getFre());
-                } else if (planung.getSam() > 0) {
+                    spinMonatTag.setValue(schedule.getFre());
+                } else if (schedule.getSam() > 0) {
                     cmbTag.setSelectedIndex(6);
-                    spinMonatTag.setValue(planung.getSam());
-                } else if (planung.getSon() > 0) {
+                    spinMonatTag.setValue(schedule.getSam());
+                } else if (schedule.getSon() > 0) {
                     cmbTag.setSelectedIndex(7);
-                    spinMonatTag.setValue(planung.getSon());
+                    spinMonatTag.setValue(schedule.getSon());
                 }
             }
             tabWdh.setSelectedIndex(TAB_MONTHLY);
         }
 
         jdcLDatum.setMinSelectableDate(new Date());
-        jdcLDatum.setDate(new Date(Math.max(planung.getLDatum().getTime(), SYSCalendar.startOfDay())));
+        jdcLDatum.setDate(new Date(Math.max(schedule.getLDatum().getTime(), SYSCalendar.startOfDay())));
 
-        txtNachtMo.setText(planung.getNachtMo().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
-        txtMorgens.setText(planung.getMorgens().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
-        txtMittags.setText(planung.getMittags().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
-        txtNachmittags.setText(planung.getNachmittags().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
-        txtAbends.setText(planung.getAbends().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
-        txtNachtAb.setText(planung.getNachtAb().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
-        txtUhrzeit.setText(planung.getUhrzeitDosis().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
+        txtNachtMo.setText(schedule.getNachtMo().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
+        txtMorgens.setText(schedule.getMorgens().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
+        txtMittags.setText(schedule.getMittags().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
+        txtNachmittags.setText(schedule.getNachmittags().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
+        txtAbends.setText(schedule.getAbends().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
+        txtNachtAb.setText(schedule.getNachtAb().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
+        txtUhrzeit.setText(schedule.getUhrzeitDosis().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
 
         txtMorgens.setBackground(SYSConst.lightblue);
         txtMittags.setBackground(SYSConst.gold7);
@@ -203,10 +199,10 @@ public class PnlRegelDosis extends CleanablePanel {
         txtNachtAb.setBackground(SYSConst.bluegrey);
 
         Date now = null;
-        if (planung.getUhrzeitDosis().compareTo(BigDecimal.ZERO) > 0) {
+        if (schedule.getUhrzeitDosis().compareTo(BigDecimal.ZERO) > 0) {
             splitRegularPos = 0.0d;
 //            currentSelectedTime = nursingprocess.getUhrzeit();
-            now = planung.getUhrzeit();
+            now = schedule.getUhrzeit();
 //            cmbUhrzeit.setSelectedItem(currentSelectedTime);
         } else {
             now = new Date();
@@ -943,7 +939,7 @@ public class PnlRegelDosis extends CleanablePanel {
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         try {
             save();
-            actionBlock.execute(planung);
+            actionBlock.execute(schedule);
         } catch (NumberFormatException nfe) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Eingabefehler bei der Dosierung. Bitte prüfen. " + nfe.getLocalizedMessage(), 2));
         }
@@ -957,49 +953,49 @@ public class PnlRegelDosis extends CleanablePanel {
             throw new NumberFormatException("Alle Dosierungen sind Null.");
         }
 
-        planung.setNachtMo(splitSetToTime ? BigDecimal.ZERO : new BigDecimal(Double.parseDouble(txtNachtMo.getText())));
-        planung.setMorgens(splitSetToTime ? BigDecimal.ZERO : new BigDecimal(Double.parseDouble(txtMorgens.getText())));
-        planung.setMittags(splitSetToTime ? BigDecimal.ZERO : new BigDecimal(Double.parseDouble(txtMittags.getText())));
-        planung.setNachmittags(splitSetToTime ? BigDecimal.ZERO : new BigDecimal(Double.parseDouble(txtNachmittags.getText())));
-        planung.setAbends(splitSetToTime ? BigDecimal.ZERO : new BigDecimal(Double.parseDouble(txtAbends.getText())));
-        planung.setNachtAb(splitSetToTime ? BigDecimal.ZERO : new BigDecimal(Double.parseDouble(txtNachtAb.getText())));
-        planung.setUhrzeitDosis(splitSetToTime ? new BigDecimal(Double.parseDouble(txtUhrzeit.getText())) : BigDecimal.ZERO);
-        planung.setUhrzeit(splitSetToTime ? (Date) cmbUhrzeit.getSelectedItem() : null);
+        schedule.setNachtMo(splitSetToTime ? BigDecimal.ZERO : new BigDecimal(Double.parseDouble(txtNachtMo.getText())));
+        schedule.setMorgens(splitSetToTime ? BigDecimal.ZERO : new BigDecimal(Double.parseDouble(txtMorgens.getText())));
+        schedule.setMittags(splitSetToTime ? BigDecimal.ZERO : new BigDecimal(Double.parseDouble(txtMittags.getText())));
+        schedule.setNachmittags(splitSetToTime ? BigDecimal.ZERO : new BigDecimal(Double.parseDouble(txtNachmittags.getText())));
+        schedule.setAbends(splitSetToTime ? BigDecimal.ZERO : new BigDecimal(Double.parseDouble(txtAbends.getText())));
+        schedule.setNachtAb(splitSetToTime ? BigDecimal.ZERO : new BigDecimal(Double.parseDouble(txtNachtAb.getText())));
+        schedule.setUhrzeitDosis(splitSetToTime ? new BigDecimal(Double.parseDouble(txtUhrzeit.getText())) : BigDecimal.ZERO);
+        schedule.setUhrzeit(splitSetToTime ? (Date) cmbUhrzeit.getSelectedItem() : null);
 
-        planung.setMaxAnzahl(0);
-        planung.setMaxEDosis(BigDecimal.ZERO);
+        schedule.setMaxAnzahl(0);
+        schedule.setMaxEDosis(BigDecimal.ZERO);
 
-        planung.setTaeglich(tabWdh.getSelectedIndex() == TAB_DAILY ? Short.parseShort(spinTaeglich.getValue().toString()) : (short) 0);
-        planung.setWoechentlich(tabWdh.getSelectedIndex() == TAB_WEEKLY ? Short.parseShort(spinWoche.getValue().toString()) : (short) 0);
-        planung.setMonatlich(tabWdh.getSelectedIndex() == TAB_MONTHLY ? Short.parseShort(spinMonat.getValue().toString()) : (short) 0);
-        planung.setLDatum(jdcLDatum.getDate());
+        schedule.setTaeglich(tabWdh.getSelectedIndex() == TAB_DAILY ? Short.parseShort(spinTaeglich.getValue().toString()) : (short) 0);
+        schedule.setWoechentlich(tabWdh.getSelectedIndex() == TAB_WEEKLY ? Short.parseShort(spinWoche.getValue().toString()) : (short) 0);
+        schedule.setMonatlich(tabWdh.getSelectedIndex() == TAB_MONTHLY ? Short.parseShort(spinMonat.getValue().toString()) : (short) 0);
+        schedule.setLDatum(jdcLDatum.getDate());
 
-        planung.setMon(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbMon.isSelected() ? (short) 1 : (short) 0);
-        planung.setDie(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbDie.isSelected() ? (short) 1 : (short) 0);
-        planung.setMit(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbMit.isSelected() ? (short) 1 : (short) 0);
-        planung.setDon(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbDon.isSelected() ? (short) 1 : (short) 0);
-        planung.setFre(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbFre.isSelected() ? (short) 1 : (short) 0);
-        planung.setSam(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbSam.isSelected() ? (short) 1 : (short) 0);
-        planung.setSon(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbSon.isSelected() ? (short) 1 : (short) 0);
+        schedule.setMon(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbMon.isSelected() ? (short) 1 : (short) 0);
+        schedule.setDie(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbDie.isSelected() ? (short) 1 : (short) 0);
+        schedule.setMit(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbMit.isSelected() ? (short) 1 : (short) 0);
+        schedule.setDon(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbDon.isSelected() ? (short) 1 : (short) 0);
+        schedule.setFre(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbFre.isSelected() ? (short) 1 : (short) 0);
+        schedule.setSam(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbSam.isSelected() ? (short) 1 : (short) 0);
+        schedule.setSon(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbSon.isSelected() ? (short) 1 : (short) 0);
 
         if (tabWdh.getSelectedIndex() == TAB_MONTHLY) {
             short s = Short.parseShort(spinMonatTag.getValue().toString());
-            planung.setTagNum(cmbTag.getSelectedIndex() == 0 ? s : (short) 0);
+            schedule.setTagNum(cmbTag.getSelectedIndex() == 0 ? s : (short) 0);
 
             if (cmbTag.getSelectedIndex() == 1) {
-                planung.setMon(s);
+                schedule.setMon(s);
             } else if (cmbTag.getSelectedIndex() == 2) {
-                planung.setDie(s);
+                schedule.setDie(s);
             } else if (cmbTag.getSelectedIndex() == 3) {
-                planung.setMit(s);
+                schedule.setMit(s);
             } else if (cmbTag.getSelectedIndex() == 4) {
-                planung.setDon(s);
+                schedule.setDon(s);
             } else if (cmbTag.getSelectedIndex() == 5) {
-                planung.setFre(s);
+                schedule.setFre(s);
             } else if (cmbTag.getSelectedIndex() == 6) {
-                planung.setSam(s);
+                schedule.setSam(s);
             } else if (cmbTag.getSelectedIndex() == 7) {
-                planung.setSon(s);
+                schedule.setSon(s);
             }
         }
 

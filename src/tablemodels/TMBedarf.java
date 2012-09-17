@@ -149,7 +149,7 @@ public class TMBedarf
             result += "<br/><b>Keine weitere Gabe des Medikamentes mehr möglich. Tagesdosis ist erreicht</b>";
         } else {
 
-            result += "<br/>Bisherige Tagesdosis: " + getTagesdosisBisher(row).setScale(2, BigDecimal.ROUND_HALF_UP) + " " + getDarreichung(row) == null ? "x" : DosageFormTools.EINHEIT[getDarreichung(row).getDosageForm().getAnwEinheit()];
+            result += "<br/>Bisherige Tagesdosis: " + getTagesdosisBisher(row).setScale(2, BigDecimal.ROUND_HALF_UP) + " " + getDarreichung(row) == null ? "x" : DosageFormTools.EINHEIT[getDarreichung(row).getDosageForm().getUsageUnit()];
         }
 
         result += "</font>";

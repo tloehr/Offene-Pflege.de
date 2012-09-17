@@ -68,7 +68,7 @@ public class PnlSelectIntervention extends JPanel {
     }
 
     private void txtSearchActionPerformed(ActionEvent e) {
-        lstInterventions.setModel(SYSTools.list2dlm(InterventionTools.findMassnahmenBy(InterventionTools.MASSART_PFLEGE, txtSearch.getText())));
+        lstInterventions.setModel(SYSTools.list2dlm(InterventionTools.findMassnahmenBy(InterventionTools.TYPE_CARE, txtSearch.getText())));
     }
 
     private void btnAddActionPerformed(ActionEvent e) {

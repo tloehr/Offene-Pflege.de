@@ -54,7 +54,7 @@ public class DlgDAF extends javax.swing.JDialog {
         cmbForm.setModel(new DefaultComboBoxModel(query.getResultList().toArray(new DosageForm[]{})));
         cmbForm.setRenderer(DosageFormTools.getRenderer(0));
         em.close();
-        editMode = darreichung.getDafID() != null;
+        editMode = darreichung.getID() != null;
 
         if (editMode) {
 
@@ -76,7 +76,7 @@ public class DlgDAF extends javax.swing.JDialog {
 //            }
 
             cmbForm.setSelectedItem(darreichung.getDosageForm());
-            txtZusatz.setText(SYSTools.catchNull(darreichung.getZusatz()));
+            txtZusatz.setText(SYSTools.catchNull(darreichung.getSubtext()));
 
         } else {
 //            apv = new APV(BigDecimal.ONE, false, null, darreichung);
@@ -231,7 +231,7 @@ public class DlgDAF extends javax.swing.JDialog {
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
 
-        darreichung.setZusatz(txtZusatz.getText());
+        darreichung.setSubtext(txtZusatz.getText());
         darreichung.setDosageForm((DosageForm) cmbForm.getSelectedItem());
 
 
@@ -258,8 +258,8 @@ public class DlgDAF extends javax.swing.JDialog {
 
     private void cmbFormItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbFormItemStateChanged
         DosageForm form = (DosageForm) evt.getItem();
-//        lblAnw.setText(MedFormenTools.UNITS[form.getAnwEinheit()]);
-//        lblPack.setText(MedFormenTools.UNITS[form.getPackEinheit()]);
+//        lblAnw.setText(MedFormenTools.UNITS[form.getUsageUnit()]);
+//        lblPack.setText(MedFormenTools.UNITS[form.getPackUnit()]);
 //        txtAPV.setText("1");
 //        txtAPV.setEnabled(form.getState() != MedFormenTools.APV1);
 //        apv.setAPV(BigDecimal.ONE);

@@ -1951,7 +1951,7 @@ public class SYSTools {
         try {
             bd = BigDecimal.valueOf(Double.parseDouble(txt.getText().replaceAll(",", "\\.")));
             if (nees2BePositive && bd.compareTo(BigDecimal.ZERO) <= 0) {
-                txt.setToolTipText("<html><font color=\"red\"><b>"+OPDE.lang.getString("misc.msg.invalidnumber")+"</b></font></html>");
+                txt.setToolTipText("<html><font color=\"red\"><b>" + OPDE.lang.getString("misc.msg.invalidnumber") + "</b></font></html>");
                 toolTipAction = txt.getActionMap().get("postTip");
                 bd = BigDecimal.ONE;
             } else {
@@ -1964,7 +1964,7 @@ public class SYSTools {
             } else {
                 bd = BigDecimal.ZERO;
             }
-            txt.setToolTipText("<html><font color=\"red\"><b>"+OPDE.lang.getString("misc.msg.invalidnumber")+"</b></font></html>");
+            txt.setToolTipText("<html><font color=\"red\"><b>" + OPDE.lang.getString("misc.msg.invalidnumber") + "</b></font></html>");
             toolTipAction = txt.getActionMap().get("postTip");
             if (toolTipAction != null) {
                 ActionEvent postTip = new ActionEvent(txt, ActionEvent.ACTION_PERFORMED, "");
@@ -2161,6 +2161,35 @@ public class SYSTools {
 
 
         SYSFilesTools.print(html, true);
+    }
+
+    public static Collection subtract(Collection coll1, Collection coll2) {
+        // http://code.hammerpig.com/find-the-difference-between-two-lists-in-java.html
+        Collection result = new ArrayList(coll2);
+        result.removeAll(coll1);
+        return result;
+    }
+
+    public static Collection difference(Collection coll1, Collection coll2) {
+        // http://code.hammerpig.com/find-the-difference-between-two-lists-in-java.html
+        Collection result = union(coll1, coll2);
+        result.removeAll(intersect(coll1, coll2));
+        return result;
+    }
+
+    public static Collection union(Collection coll1, Collection coll2) {
+        // http://code.hammerpig.com/find-the-difference-between-two-lists-in-java.html
+        Set union = new HashSet(coll1);
+        union.addAll(new HashSet(coll2));
+        return new ArrayList(union);
+    }
+
+
+    public static Collection intersect(Collection set1, Collection set2) {
+        // http://code.hammerpig.com/find-the-difference-between-two-lists-in-java.html
+        Set intersection = new HashSet(set1);
+        intersection.retainAll(new HashSet(set2));
+        return intersection;
     }
 
 }

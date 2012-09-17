@@ -77,9 +77,9 @@ public class PnlZusatz extends JPanel {
         em.close();
 
         form = (DosageForm) cmbFormen.getSelectedItem();
-        lblAPV.setVisible(!form.anwUndPackEinheitenGleich());
-        lblPV.setVisible(!form.anwUndPackEinheitenGleich());
-        txtA.setVisible(!form.anwUndPackEinheitenGleich());
+        lblAPV.setVisible(!form.isAPV1());
+        lblPV.setVisible(!form.isAPV1());
+        txtA.setVisible(!form.isAPV1());
 
         darreichung = new TradeForm(produkt, "", form);
         validate.execute(darreichung);
@@ -113,13 +113,13 @@ public class PnlZusatz extends JPanel {
     private void cmbFormenItemStateChanged(ItemEvent e) {
         form = (DosageForm) cmbFormen.getSelectedItem();
 
-        lblAPV.setVisible(!form.anwUndPackEinheitenGleich());
-        lblPV.setVisible(!form.anwUndPackEinheitenGleich());
-        txtA.setVisible(!form.anwUndPackEinheitenGleich());
+        lblAPV.setVisible(!form.isAPV1());
+        lblPV.setVisible(!form.isAPV1());
+        txtA.setVisible(!form.isAPV1());
 
-        if (!form.anwUndPackEinheitenGleich()) {
+        if (!form.isAPV1()) {
             txtA.setText("1");
-            lblPV.setText(" " + form.getAnwText() + " entsprechen 1 " + DosageFormTools.EINHEIT[form.getPackEinheit()]);
+            lblPV.setText(" " + form.getUsageTex() + " entsprechen 1 " + DosageFormTools.EINHEIT[form.getPackUnit()]);
         }
 
         darreichung = new TradeForm(produkt, txtZusatz.getText().trim(), form);

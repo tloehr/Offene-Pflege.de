@@ -39,7 +39,7 @@ public class MedPackage implements Serializable {
 
     public MedPackage(TradeForm tf) {
         this.tradeForm = tf;
-//        this.darreichung.getPackungen().add(this);
+//        this.darreichung.getPackages().add(this);
     }
 
     public TradeForm getTradeForm() {

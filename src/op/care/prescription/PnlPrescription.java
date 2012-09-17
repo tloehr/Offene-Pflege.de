@@ -37,6 +37,7 @@ import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.prescription.BHPTools;
 import entity.prescription.Prescription;
+import entity.prescription.PrescriptionSchedule;
 import entity.prescription.PrescriptionTools;
 import entity.system.SYSPropsTools;
 import entity.system.UniqueTools;
@@ -63,10 +64,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
+import java.util.List;
 
 /**
  * @author tloehr
@@ -124,6 +123,8 @@ public class PnlPrescription extends NursingRecordsPanel {
 
     @Override
     public void reload() {
+        lstPrescriptions = PrescriptionTools.getAll(resident);
+        Collections.sort(lstPrescriptions);
         reloadDisplay();
     }
 
@@ -399,7 +400,66 @@ public class PnlPrescription extends NursingRecordsPanel {
                             }
                         });
                     } else {
+                        new DlgRegular(prescription, DlgRegular.MODE_EDIT, new Closure() {
+                            @Override
+                            public void execute(Object o) {
+                                if (o != null) {
 
+                                    Pair<Prescription, java.util.List<PrescriptionSchedule>> returnPackage = (Pair<Prescription, List<PrescriptionSchedule>>) o;
+
+                                    EntityManager em = OPDE.createEM();
+                                    try {
+                                        em.getTransaction().begin();
+                                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                        Prescription myPrescription = em.merge(returnPackage.getFirst());
+                                        em.lock(myPrescription, LockModeType.OPTIMISTIC);
+
+                                        // delete whats not in the new prescription anymore
+                                        for (PrescriptionSchedule schedule : returnPackage.getSecond()) {
+                                            em.remove(em.merge(schedule));
+                                        }
+
+                                        em.getTransaction().commit();
+
+                                        lstPrescriptions.remove(prescription);
+                                        lstPrescriptions.add(myPrescription);
+                                        Collections.sort(lstPrescriptions);
+                                        final CollapsiblePane myCP = createCP4(myPrescription);
+                                        buildPanel();
+
+                                        SwingUtilities.invokeLater(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                GUITools.scroll2show(jspPrescription, myCP.getLocation().y - 100, new Closure() {
+                                                    @Override
+                                                    public void execute(Object o) {
+                                                        GUITools.flashBackground(myCP, Color.YELLOW, 2);
+                                                    }
+                                                });
+                                            }
+                                        });
+
+                                    } catch (OptimisticLockException ole) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                            OPDE.getMainframe().emptyFrame();
+                                            OPDE.getMainframe().afterLogin();
+                                        }
+                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                    } catch (Exception e) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        OPDE.fatal(e);
+                                    } finally {
+                                        em.close();
+                                    }
+                                    buildPanel();
+                                }
+                            }
+                        });
                     }
                 }
 
@@ -536,9 +596,9 @@ public class PnlPrescription extends NursingRecordsPanel {
 //
 //                public void actionPerformed(java.awt.event.ActionEvent evt) {
 ////                    long numVerKennung = VerordnungTools.getNumVerodnungenMitGleicherKennung(prescription);
-////                    int status = numVerKennung == 1 ? DlgPrescription.EDIT_MODE : DlgPrescription.EDIT_OF_CHANGE_MODE;
+////                    int status = numVerKennung == 1 ? DlgRegular.EDIT_MODE : DlgRegular.EDIT_OF_CHANGE_MODE;
 //
-//                    new DlgPrescription(selectedVerordnung, DlgPrescription.ALLOW_ALL_EDIT, new Closure() {
+//                    new DlgRegular(selectedVerordnung, DlgRegular.ALLOW_ALL_EDIT, new Closure() {
 //                        @Override
 //                        public void execute(Object o) {
 //                            if (o != null) {
@@ -605,7 +665,7 @@ public class PnlPrescription extends NursingRecordsPanel {
 //
 //                public void actionPerformed(java.awt.event.ActionEvent evt) {
 //
-//                    new DlgPrescription((Prescription) selectedVerordnung.clone(), DlgPrescription.NO_CHANGE_MED_AND_SIT, new Closure() {
+//                    new DlgRegular((Prescription) selectedVerordnung.clone(), DlgRegular.NO_CHANGE_MED_AND_SIT, new Closure() {
 //                        @Override
 //                        public void execute(Object o) {
 //                            if (o != null) {
@@ -833,7 +893,7 @@ public class PnlPrescription extends NursingRecordsPanel {
 //                    if (bestandImAnbruch != null) {
 //                        BigDecimal apv = MedStockTools.getAPV4(bestandImAnbruch.getInventory());
 //                        BigDecimal apvBest = bestandImAnbruch.getAPV();
-//                        message += "  VorID: " + bestandImAnbruch.getInventory().getID() + "  DafID: " + bestandImAnbruch.getTradeForm().getDafID() + "  APV per BW: " + apv + "  APV (Bestand): " + apvBest;
+//                        message += "  VorID: " + bestandImAnbruch.getInventory().getID() + "  DafID: " + bestandImAnbruch.getTradeForm().getID() + "  APV per BW: " + apv + "  APV (Bestand): " + apvBest;
 //                    }
 //
 //                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(message, 10));
@@ -965,7 +1025,67 @@ public class PnlPrescription extends NursingRecordsPanel {
         java.util.List<Component> list = new ArrayList<Component>();
 
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
-            JideButton addButton = GUITools.createHyperlinkButton(internalClassID + ".btnNewOnDemand", SYSConst.icon22add, new ActionListener() {
+            JideButton addRegular = GUITools.createHyperlinkButton(internalClassID + ".btnNewRegular", SYSConst.icon22add, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    new DlgRegular(new Prescription(resident), DlgRegular.MODE_NEW, new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            if (o != null) {
+
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                    Prescription myPrescription = em.merge((Prescription) o);
+                                    myPrescription.setRelation(UniqueTools.getNewUID(em, "__verkenn").getUid());
+                                    em.getTransaction().commit();
+
+                                    lstPrescriptions.add(myPrescription);
+                                    Collections.sort(lstPrescriptions);
+                                    final CollapsiblePane myCP = createCP4(myPrescription);
+                                    buildPanel();
+
+                                    SwingUtilities.invokeLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            GUITools.scroll2show(jspPrescription, myCP.getLocation().y - 100, new Closure() {
+                                                @Override
+                                                public void execute(Object o) {
+                                                    GUITools.flashBackground(myCP, Color.YELLOW, 2);
+                                                }
+                                            });
+                                        }
+                                    });
+
+                                } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+                                buildPanel();
+                            }
+                        }
+                    });
+                }
+            });
+            list.add(addRegular);
+        }
+
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
+            JideButton addNewOnDemand = GUITools.createHyperlinkButton(internalClassID + ".btnNewOnDemand", SYSConst.icon22add, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     new DlgOnDemand(new Prescription(resident), new Closure() {
@@ -1021,7 +1141,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                     });
                 }
             });
-            list.add(addButton);
+            list.add(addNewOnDemand);
         }
 
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
