@@ -418,8 +418,8 @@ public class PnlProcess extends NursingRecordsPanel {
                  *     |_.__/ \__|_| |_|_| \_\___|\___/| .__/ \___|_| |_|
                  *                                     |_|
                  */
-                final JButton btnClose = new JButton(SYSConst.icon22play);
-                btnClose.setPressedIcon(SYSConst.icon22playPressed);
+                final JButton btnClose = new JButton(SYSConst.icon22playerPlay);
+                btnClose.setPressedIcon(SYSConst.icon22playerPlayPressed);
                 btnClose.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 btnClose.setContentAreaFilled(false);
                 btnClose.setBorder(null);
@@ -521,7 +521,7 @@ public class PnlProcess extends NursingRecordsPanel {
                                     for (SYSINF2PROCESS att : myProcess.getAttachedInfos()) {
                                         em.remove(att);
                                     }
-                                    for (SYSPRE2PROCESS att : myProcess.getAttachedPrescriptions()) {
+                                    for (SYSPRE2PROCESS att : myProcess.getAttachedPrescriptionConnections()) {
                                         em.remove(att);
                                     }
                                     for (SYSVAL2PROCESS att : myProcess.getAttachedResidentValues()) {

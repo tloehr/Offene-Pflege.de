@@ -409,16 +409,16 @@ public class DBRetrieve {
     }
 
 //    /**
-//     * liest aus der Tabelle "BWerte" den jeweils letzten aktuell gemessenen Wert heraus.
+//     * liest aus der Tabelle "ResValues" den jeweils letzten aktuell gemessenen Wert heraus.
 //     *
 //     * @param Kennung des Bewohners
 //     * @param xml     code des gewünschten Wertes
 //     * @return Eine Liste mit zwei Elementen (Date datum, double wert)
 //     */
-//    public static ArrayList getLetztenBWert(String bwkennung, String xml) {
+//    public static ArrayList getLast(String bwkennung, String xml) {
 //        ArrayList result = new ArrayList();
 //
-//        String sql = "SELECT PIT, WERT FROM BWerte WHERE BWKennung = ? AND XML = ? " +
+//        String sql = "SELECT PIT, WERT FROM ResValues WHERE BWKennung = ? AND XML = ? " +
 //                " ORDER BY PIT DESC LIMIT 0,1 ";
 //        try {
 //            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);

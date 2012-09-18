@@ -367,7 +367,7 @@ public class DBHandling {
                             s += "<h" + (headertiefe + 2) + ">" + bwlabel + "</h" + (headertiefe + 2) + "> ";
 
                             // TODO: Das hier muss wieder gefixt werden.
-//                            BWerte groesse = BWerteTools.getLetztenBWert(bewohner, BWerteTools.GROESSE);
+//                            ResValues groesse = ResValuesTools.getLast(bewohner, ResValuesTools.GROESSE);
 //                            startGewicht = rs.getDouble("Wert");
 //                            if (groesse == null) {
 //                                gr = -1d;
@@ -1362,7 +1362,7 @@ public class DBHandling {
 //                    }
 //
 //                    String s = " SELECT * FROM (" +
-//                            "       SELECT PIT, SUM(Wert) EINFUHR FROM BWerte " +
+//                            "       SELECT PIT, SUM(Wert) EINFUHR FROM ResValues " +
 //                            "       WHERE ReplacedBy = 0 AND Wert > 0 AND BWKennung=? AND XML='<BILANZ/>' " +
 //                            "       AND DATE(PIT) >= ADDDATE(DATE(now()), INTERVAL ? DAY) " +
 //                            "       Group By DATE(PIT) " +

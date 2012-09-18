@@ -4,7 +4,7 @@
  */
 package entity.process;
 
-import entity.BWerte;
+import entity.ResValues;
 import entity.system.Users;
 import entity.info.BWInfo;
 import entity.info.Resident;
@@ -83,8 +83,8 @@ public class QProcess implements Serializable, Comparable<QProcess> {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "qProcess")
     private Collection<SYSNR2PROCESS> attachedNReportConnections;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
-    private Collection<SYSPRE2PROCESS> attachedPrescriptions;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "qProcess")
+    private Collection<SYSPRE2PROCESS> attachedPrescriptionConnections;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
     private Collection<SYSINF2PROCESS> attachedInfos;
@@ -122,7 +122,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
 //    @JoinTable(name = "SYSBWERTE2VORGANG", joinColumns =
 //    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
 //    @JoinColumn(name = "BWID"))
-//    private Collection<BWerte> bwerte;
+//    private Collection<ResValues> bwerte;
 
     public QProcess() {
     }
@@ -139,7 +139,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         this.PReports = new ArrayList<PReport>();
         this.PReports.add(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_CREATE), PReportTools.PREPORT_TYPE_CREATE, this));
         this.attachedNReportConnections = new ArrayList<SYSNR2PROCESS>();
-        this.attachedPrescriptions = new ArrayList<SYSPRE2PROCESS>();
+        this.attachedPrescriptionConnections = new ArrayList<SYSPRE2PROCESS>();
         this.attachedInfos = new ArrayList<SYSINF2PROCESS>();
         this.attachedNursingProcesses = new ArrayList<SYSNP2PROCESS>();
         this.attachedResidentValues = new ArrayList<SYSVAL2PROCESS>();
@@ -154,10 +154,10 @@ public class QProcess implements Serializable, Comparable<QProcess> {
     public void removeElement(QProcessElement element) {
         if (element instanceof NReport) {
             getAttachedNReportConnections().remove(element);
-        } else if (element instanceof BWerte) {
+        } else if (element instanceof ResValues) {
             getAttachedResidentValues().remove(element);
         } else if (element instanceof Prescription) {
-            getAttachedPrescriptions().remove(element);
+            getAttachedPrescriptionConnections().remove(element);
         } else if (element instanceof BWInfo) {
             getAttachedInfos().remove(element);
         } else if (element instanceof NursingProcess) {
@@ -179,8 +179,8 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         return list;
     }
 
-    public Collection<SYSPRE2PROCESS> getAttachedPrescriptions() {
-        return attachedPrescriptions;
+    public Collection<SYSPRE2PROCESS> getAttachedPrescriptionConnections() {
+        return attachedPrescriptionConnections;
     }
 
     public Collection<SYSINF2PROCESS> getAttachedInfos() {
@@ -279,7 +279,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         for (SYSINF2PROCESS att : attachedInfos) {
             elements.add(att.getBwinfo());
         }
-        for (SYSPRE2PROCESS att : attachedPrescriptions) {
+        for (SYSPRE2PROCESS att : attachedPrescriptionConnections) {
             elements.add(att.getPrescription());
         }
         for (SYSVAL2PROCESS att : attachedResidentValues) {

@@ -15,7 +15,7 @@ import op.care.reports.PnlReport;
 import op.care.bhp.PnlBHP;
 import op.care.dfn.PnlDFN;
 import op.care.info.PnlInfo;
-import op.care.med.vorrat.PnlInventory;
+import op.care.med.inventory.PnlInventory;
 import op.care.sysfiles.PnlFiles;
 import op.care.prescription.PnlPrescription;
 import op.care.values.PnlVitalwerte;

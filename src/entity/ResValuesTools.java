@@ -29,7 +29,7 @@ import java.util.List;
  * Time: 16:41
  * To change this template use File | Settings | File Templates.
  */
-public class BWerteTools {
+public class ResValuesTools {
     public static final int UNKNOWN = 0;
     public static final int RR = 1;
     public static final int PULS = 2;
@@ -56,7 +56,7 @@ public class BWerteTools {
      * @param colorize
      * @return
      */
-    public static String getPITasHTML(BWerte bwert, boolean showids, boolean colorize) {
+    public static String getPITasHTML(ResValues bwert, boolean showids, boolean colorize) {
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
         String color = "";
         if (colorize) {
@@ -79,12 +79,12 @@ public class BWerteTools {
      * @param bewohner
      * @return
      */
-    public static BWerte getFirstWert(Resident bewohner) {
+    public static ResValues getFirst(Resident bewohner) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM BWerte b WHERE b.bewohner = :bewohner ORDER BY b.pit ");
+        Query query = em.createQuery("SELECT b FROM ResValues b WHERE b.bewohner = :bewohner ORDER BY b.pit ");
         query.setParameter("bewohner", bewohner);
         query.setMaxResults(1);
-        BWerte p = (BWerte) query.getSingleResult();
+        ResValues p = (ResValues) query.getSingleResult();
         em.close();
         return p;
     }
@@ -96,20 +96,20 @@ public class BWerteTools {
      * @param type     des gesuchten Wertes
      * @return der Wert. <code>null</code>, wenn es keinen gibt.
      */
-    public static BWerte getLetztenBWert(Resident bewohner, int type) {
+    public static ResValues getLast(Resident bewohner, int type) {
 
-        BWerte result;
+        ResValues result;
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(" " +
-                " SELECT b FROM BWerte b WHERE b.bewohner = :bewohner AND b.type = :type " +
+                " SELECT b FROM ResValues b WHERE b.bewohner = :bewohner AND b.type = :type " +
                 " ORDER BY b.pit DESC ");
         query.setMaxResults(1);
         query.setParameter("bewohner", bewohner);
         query.setParameter("type", type);
 
         try {
-            result = (BWerte) query.getSingleResult();
+            result = (ResValues) query.getSingleResult();
         } catch (Exception e) {
             result = null;
         } finally {
@@ -126,7 +126,7 @@ public class BWerteTools {
      * @param colorize
      * @return
      */
-    public static String getBWertAsHTML(BWerte bwert, boolean colorize) {
+    public static String getAsHTML(ResValues bwert, boolean colorize) {
         String result = "";
         String color = "";
         if (colorize) {
@@ -139,7 +139,7 @@ public class BWerteTools {
 //        if (!bwert.getAttachedFiles().isEmpty()) {
 //            result += "<font color=\"green\">&#9679;</font>";
 //        }
-//        if (!bwert.getAttachedVorgaenge().isEmpty()) {
+//        if (!bwert.getAttachedProcessConnections().isEmpty()) {
 //            result += "<font color=\"red\">&#9679;</font>";
 //        }
         DateFormat df = DateFormat.getDateTimeInstance();
@@ -171,7 +171,7 @@ public class BWerteTools {
     }
 
 
-    public static String getTitle(BWerte param){
+    public static String getTitle(ResValues param){
         String result ="";
         if (param.getType() == RR) {
             result += "<b>" + param.getWert() + "/" + param.getWert2() + " " + EINHEIT[RR] + " " + WERTE[PULS] + ": " + param.getWert3() + " " + EINHEIT[PULS] + "</b>";
@@ -183,7 +183,7 @@ public class BWerteTools {
         return result;
     }
 
-    public static String getBemerkungAsHTML(BWerte wert, boolean colorize) {
+    public static String getTExtAsHTML(ResValues wert, boolean colorize) {
         String result = "";
         if (!SYSTools.catchNull(wert.getBemerkung()).isEmpty()) {
             String color = "";
@@ -200,7 +200,7 @@ public class BWerteTools {
     }
 
 
-    public static String getBWerteAsHTML(List<BWerte> bwerte) {
+    public static String getAsHTML(List<ResValues> bwerte) {
 
         if (bwerte.isEmpty()) {
             return "<i>" + OPDE.lang.getString("misc.msg.emptyselection") + "</i>";
@@ -215,11 +215,11 @@ public class BWerteTools {
                 "</th><th style=\"width:40%\">" + OPDE.lang.getString(PnlVitalwerte.internalClassID + ".tabheader2") + "</th>" +
                 "</th><th style=\"width:40%\">" + OPDE.lang.getString(PnlVitalwerte.internalClassID + ".tabheader3") + "</th></tr>\n";
 
-        for (BWerte wert : bwerte) {
+        for (ResValues wert : bwerte) {
             html += "<tr>";
             html += "<td>" + getPITasHTML(wert, false, false) + "</td>";
-            html += "<td>" + getBWertAsHTML(wert, false) + "</td>";
-            html += "<td>" + getBemerkungAsHTML(wert, false) + "</td>";
+            html += "<td>" + getAsHTML(wert, false) + "</td>";
+            html += "<td>" + getTExtAsHTML(wert, false) + "</td>";
             html += "</tr>\n";
         }
 
@@ -244,8 +244,8 @@ public class BWerteTools {
      * @param wert
      * @return den geänderten und somit gelöschten Wert. Null bei Fehler.
      */
-    public static BWerte deleteWert(BWerte wert) {
-        BWerte mywert = null;
+    public static ResValues deleteWert(ResValues wert) {
+        ResValues mywert = null;
         EntityManager em = OPDE.createEM();
         try {
             em.getTransaction().begin();
@@ -289,7 +289,7 @@ public class BWerteTools {
      * @param newOne siehe oben
      * @return den neuen Wert.
      */
-    public static BWerte changeWert(BWerte oldOne, BWerte newOne) {
+    public static ResValues changeWert(ResValues oldOne, ResValues newOne) {
         EntityManager em = OPDE.createEM();
         em.getTransaction().begin();
         try {
@@ -331,9 +331,9 @@ public class BWerteTools {
             boolean result = false;
 
             EntityManager em = OPDE.createEM();
-            Query query = em.createQuery("SELECT SUM(b.wert) FROM BWerte b WHERE b.wert > 0 AND b.replacedBy IS NULL AND b.bewohner = :bewohner AND b.type = :type AND b.pit >= :pit ");
+            Query query = em.createQuery("SELECT SUM(b.wert) FROM ResValues b WHERE b.wert > 0 AND b.replacedBy IS NULL AND b.bewohner = :bewohner AND b.type = :type AND b.pit >= :pit ");
             query.setParameter("bewohner", bewohner);
-            query.setParameter("type", BWerteTools.BILANZ);
+            query.setParameter("type", ResValuesTools.BILANZ);
             query.setParameter("pit", new DateTime().minusWeeks(1).toDateMidnight().toDate());
 
             BigDecimal sumwert = (BigDecimal) query.getSingleResult();
@@ -346,9 +346,9 @@ public class BWerteTools {
             boolean result = false;
 
             EntityManager em = OPDE.createEM();
-            Query query = em.createQuery("SELECT SUM(b.wert) FROM BWerte b WHERE b.wert < 0 AND b.replacedBy IS NULL AND b.bewohner = :bewohner AND b.type = :type AND b.pit >= :pit ");
+            Query query = em.createQuery("SELECT SUM(b.wert) FROM ResValues b WHERE b.wert < 0 AND b.replacedBy IS NULL AND b.bewohner = :bewohner AND b.type = :type AND b.pit >= :pit ");
             query.setParameter("bewohner", bewohner);
-            query.setParameter("type", BWerteTools.BILANZ);
+            query.setParameter("type", ResValuesTools.BILANZ);
             query.setParameter("pit", new DateTime().minusWeeks(1).toDateMidnight().toDate());
 
             BigDecimal sumwert = (BigDecimal) query.getSingleResult();

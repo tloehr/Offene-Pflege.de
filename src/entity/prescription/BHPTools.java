@@ -558,8 +558,11 @@ public class BHPTools {
 //
         boolean residentAbsent = bhp.getResident().isActive() && BWInfoTools.absentSince(bhp.getResident()) != null;
 
+        boolean medTrouble = bhp.hasMed() && TradeFormTools.getInventory4TradeForm(bhp.getResident(), bhp.getTradeForm()) == null;
+
         return !residentAbsent && bhp.getResident().isActive() &&
                 !bhp.getPrescription().isDiscontinued() &&
+                !medTrouble &&
                 (bhp.getUser() == null ||
                         (bhp.getUser().equals(OPDE.getLogin().getUser()) &&
                                 Minutes.minutesBetween(new DateTime(bhp.getMDate()), new DateTime()).getMinutes() < BHP_MAX_MINUTES_TO_WITHDRAW)) &&

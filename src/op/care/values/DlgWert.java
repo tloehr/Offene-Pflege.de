@@ -6,8 +6,8 @@ package op.care.values;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.BWerte;
-import entity.BWerteTools;
+import entity.ResValues;
+import entity.ResValuesTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
@@ -33,13 +33,13 @@ import java.util.Date;
 public class DlgWert extends MyJDialog {
     public static final String internalClassID = "nursingrecords.vitalparameters.dialog";
 
-    private BWerte wert;
+    private ResValues wert;
     private Closure actionBlock;
     private int type;
 
     private PnlUhrzeitDatum pnlUhrzeitDatum;
 
-    public DlgWert(BWerte wert, Closure actionBlock) {
+    public DlgWert(ResValues wert, Closure actionBlock) {
         super();
         this.wert = wert;
         this.actionBlock = actionBlock;
@@ -53,10 +53,10 @@ public class DlgWert extends MyJDialog {
 
         PnlWerte123 pnl123 = tabWert.getSelectedComponent() instanceof PnlWerte123 ? (PnlWerte123) tabWert.getSelectedComponent() : null;
 
-        boolean wert1OK = type == BWerteTools.ERBRECHEN || type == BWerteTools.STUHLGANG || pnl123.getWert1() != null;
-        boolean wert2OK = type != BWerteTools.RR || pnl123.getWert2() != null && pnl123.getWert2().compareTo(BigDecimal.ZERO) > 0;
-        boolean wert3OK = type != BWerteTools.RR || pnl123.getWert3() != null && pnl123.getWert3().compareTo(BigDecimal.ZERO) > 0;
-        boolean bemerkungOK = (type != BWerteTools.ERBRECHEN && type != BWerteTools.STUHLGANG) || !txtBemerkung.getText().trim().isEmpty();
+        boolean wert1OK = type == ResValuesTools.ERBRECHEN || type == ResValuesTools.STUHLGANG || pnl123.getWert1() != null;
+        boolean wert2OK = type != ResValuesTools.RR || pnl123.getWert2() != null && pnl123.getWert2().compareTo(BigDecimal.ZERO) > 0;
+        boolean wert3OK = type != ResValuesTools.RR || pnl123.getWert3() != null && pnl123.getWert3().compareTo(BigDecimal.ZERO) > 0;
+        boolean bemerkungOK = (type != ResValuesTools.ERBRECHEN && type != ResValuesTools.STUHLGANG) || !txtBemerkung.getText().trim().isEmpty();
 
         String ursache = "";
         ursache += (wert1OK ? "" : "Der 1. Wert ist falsch");
@@ -86,9 +86,9 @@ public class DlgWert extends MyJDialog {
         wert.setBemerkung(txtBemerkung.getText().trim());
         wert.setCdate(new Date());
         wert.setType(type);
-        wert.setWert(type == BWerteTools.ERBRECHEN || type == BWerteTools.STUHLGANG ? null : pnl123.getWert1());
-        wert.setWert2(type != BWerteTools.RR ? null : pnl123.getWert2());
-        wert.setWert3(type != BWerteTools.RR ? null : pnl123.getWert3());
+        wert.setWert(type == ResValuesTools.ERBRECHEN || type == ResValuesTools.STUHLGANG ? null : pnl123.getWert1());
+        wert.setWert2(type != ResValuesTools.RR ? null : pnl123.getWert2());
+        wert.setWert3(type != ResValuesTools.RR ? null : pnl123.getWert3());
 
         return true;
     }
@@ -98,16 +98,16 @@ public class DlgWert extends MyJDialog {
         pnlUhrzeitDatum = new PnlUhrzeitDatum(new Date());
         contentPanel.add(pnlUhrzeitDatum, CC.xy(3, 3));
 
-        for (int tabnum = 1; tabnum < BWerteTools.WERTE.length; tabnum++) {
-            if (tabnum == BWerteTools.RR) {
-                tabWert.addTab(BWerteTools.WERTE[BWerteTools.RR], new PnlWerte123(new BigDecimal(120), new BigDecimal(80), new BigDecimal(60), BWerteTools.RRSYS, BWerteTools.EINHEIT[BWerteTools.RR], BWerteTools.RRDIA, BWerteTools.EINHEIT[BWerteTools.RR], BWerteTools.WERTE[BWerteTools.PULS], BWerteTools.EINHEIT[BWerteTools.PULS]));
-            } else if (tabnum == BWerteTools.ERBRECHEN || tabnum == BWerteTools.STUHLGANG) {
+        for (int tabnum = 1; tabnum < ResValuesTools.WERTE.length; tabnum++) {
+            if (tabnum == ResValuesTools.RR) {
+                tabWert.addTab(ResValuesTools.WERTE[ResValuesTools.RR], new PnlWerte123(new BigDecimal(120), new BigDecimal(80), new BigDecimal(60), ResValuesTools.RRSYS, ResValuesTools.EINHEIT[ResValuesTools.RR], ResValuesTools.RRDIA, ResValuesTools.EINHEIT[ResValuesTools.RR], ResValuesTools.WERTE[ResValuesTools.PULS], ResValuesTools.EINHEIT[ResValuesTools.PULS]));
+            } else if (tabnum == ResValuesTools.ERBRECHEN || tabnum == ResValuesTools.STUHLGANG) {
                 JLabel lbl = new JLabel("Bemerkung nicht vergessen");
                 lbl.setHorizontalAlignment(SwingConstants.CENTER);
                 lbl.setFont(SYSConst.ARIAL20);
-                tabWert.addTab(BWerteTools.WERTE[tabnum], new JPanel(new VerticalLayout()).add(lbl));
+                tabWert.addTab(ResValuesTools.WERTE[tabnum], new JPanel(new VerticalLayout()).add(lbl));
             } else {
-                tabWert.addTab(BWerteTools.WERTE[tabnum], new PnlWerte123(BigDecimal.ONE, BWerteTools.WERTE[tabnum], BWerteTools.EINHEIT[tabnum]));
+                tabWert.addTab(ResValuesTools.WERTE[tabnum], new PnlWerte123(BigDecimal.ONE, ResValuesTools.WERTE[tabnum], ResValuesTools.EINHEIT[tabnum]));
             }
         }
 //        jdcDatum.setDate(new Date());

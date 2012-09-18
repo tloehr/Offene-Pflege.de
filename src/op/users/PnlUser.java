@@ -628,8 +628,8 @@ public class PnlUser extends CleanablePanel {
          *     |_.__/ \__|_| |_/_/   \_\___|\__|_| \_/ \___|___|_| |_|\__,_|\___|\__|_| \_/ \___|
          *
          */
-        final JButton btnActiveInactive = new JButton(user.isActive() ? SYSConst.icon22stop : SYSConst.icon22play);
-        btnActiveInactive.setPressedIcon(user.isActive() ? SYSConst.icon22stopPressed : SYSConst.icon22playPressed);
+        final JButton btnActiveInactive = new JButton(user.isActive() ? SYSConst.icon22stop : SYSConst.icon22playerPlay);
+        btnActiveInactive.setPressedIcon(user.isActive() ? SYSConst.icon22stopPressed : SYSConst.icon22playerPlayPressed);
         btnActiveInactive.setAlignmentX(Component.RIGHT_ALIGNMENT);
         btnActiveInactive.setContentAreaFilled(false);
         btnActiveInactive.setBorder(null);

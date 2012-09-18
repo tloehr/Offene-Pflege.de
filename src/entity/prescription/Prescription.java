@@ -84,8 +84,8 @@ import java.util.List;
         @NamedQuery(name = "Verordnung.findByAnDatum", query = "SELECT b FROM Prescription b WHERE b.from = :from"),
         @NamedQuery(name = "Verordnung.findByVorgang", query = " "
                 + " SELECT ve FROM Prescription ve "
-                + " JOIN ve.attachedProcesses av"
-                + " JOIN av.vorgang v"
+                + " JOIN ve.attachedProcessConnections av"
+                + " JOIN av.qProcess v"
                 + " WHERE v = :vorgang "),
         @NamedQuery(name = "Verordnung.findByAbDatum", query = "SELECT b FROM Prescription b WHERE b.to = :to"),
         @NamedQuery(name = "Verordnung.findByBisPackEnde", query = "SELECT b FROM Prescription b WHERE b.toEndOfPackage = :bisPackEnde"),
@@ -195,8 +195,8 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
     // ==
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "verordnung")
     private List<SYSPRE2FILE> attachedFiles;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "verordnung")
-    private List<SYSPRE2PROCESS> attachedProcesses;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
+    private List<SYSPRE2PROCESS> attachedProcessConnections;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
     private List<PrescriptionSchedule> pSchedule;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
@@ -242,14 +242,14 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
     public Prescription(Resident resident) {
         this.resident = resident;
         this.attachedFiles = new ArrayList<SYSPRE2FILE>();
-        this.attachedProcesses = new ArrayList<SYSPRE2PROCESS>();
+        this.attachedProcessConnections = new ArrayList<SYSPRE2PROCESS>();
         this.pSchedule = new ArrayList<PrescriptionSchedule>();
         this.from = new Date();
         this.to = SYSConst.DATE_BIS_AUF_WEITERES;
         this.userON = OPDE.getLogin().getUser();
     }
 
-    public Prescription(Date from, Date to, boolean toEndOfPackage, long prescRelation, String text, boolean showOnDailyPlan, List<SYSPRE2FILE> attachedFiles, List<SYSPRE2PROCESS> attachedProcesses, Users userON, Users userOFF, Resident resident, Intervention intervention, TradeForm tradeform, Situations situation, Hospital hospitalON, Hospital hospitalOFF, Doc docON, Doc docOFF) {
+    public Prescription(Date from, Date to, boolean toEndOfPackage, long prescRelation, String text, boolean showOnDailyPlan, List<SYSPRE2FILE> attachedFiles, List<SYSPRE2PROCESS> attachedProcessConnections, Users userON, Users userOFF, Resident resident, Intervention intervention, TradeForm tradeform, Situations situation, Hospital hospitalON, Hospital hospitalOFF, Doc docON, Doc docOFF) {
         this.from = from;
         this.to = to;
         this.toEndOfPackage = toEndOfPackage;
@@ -257,7 +257,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         this.text = text;
         this.showOnDailyPlan = showOnDailyPlan;
         this.attachedFiles = attachedFiles;
-        this.attachedProcesses = attachedProcesses;
+        this.attachedProcessConnections = attachedProcessConnections;
         this.userON = userON;
         this.userOFF = userOFF;
         this.resident = resident;
@@ -425,8 +425,8 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         return attachedFiles;
     }
 
-    public List<SYSPRE2PROCESS> getAttachedVorgaenge() {
-        return attachedProcesses;
+    public List<SYSPRE2PROCESS> getAttachedProcessConnections() {
+        return attachedProcessConnections;
     }
 
     public List<PrescriptionSchedule> getPrescriptionSchedule() {
@@ -446,8 +446,8 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
     @Override
     public ArrayList<QProcess> getAttachedProcesses() {
         ArrayList<QProcess> list = new ArrayList<QProcess>();
-        for (SYSPRE2PROCESS att : attachedProcesses) {
-            list.add(att.getVorgang());
+        for (SYSPRE2PROCESS att : attachedProcessConnections) {
+            list.add(att.getQProcess());
         }
         return list;
     }
@@ -492,7 +492,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
             return false;
         if (attachedFiles != null ? !attachedFiles.equals(that.attachedFiles) : that.attachedFiles != null)
             return false;
-        if (attachedProcesses != null ? !attachedProcesses.equals(that.attachedProcesses) : that.attachedProcesses != null)
+        if (attachedProcessConnections != null ? !attachedProcessConnections.equals(that.attachedProcessConnections) : that.attachedProcessConnections != null)
             return false;
         if (text != null ? !text.equals(that.text) : that.text != null) return false;
         if (bhps != null ? !bhps.equals(that.bhps) : that.bhps != null) return false;
@@ -518,7 +518,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         result = 31 * result + (text != null ? text.hashCode() : 0);
         result = 31 * result + (showOnDailyPlan ? 1 : 0);
         result = 31 * result + (attachedFiles != null ? attachedFiles.hashCode() : 0);
-        result = 31 * result + (attachedProcesses != null ? attachedProcesses.hashCode() : 0);
+        result = 31 * result + (attachedProcessConnections != null ? attachedProcessConnections.hashCode() : 0);
 
         result = 31 * result + (bhps != null ? bhps.hashCode() : 0);
         result = 31 * result + (userON != null ? userON.hashCode() : 0);
@@ -535,8 +535,8 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
     }
 
     @Override
-    public Object clone() {
-        final Prescription copy = new Prescription(from, to, toEndOfPackage, prescRelation, text, showOnDailyPlan, attachedFiles, attachedProcesses, userON, userOFF, resident, intervention, tradeform, situation, hospitalON, hospitalOFF, docON, docOFF);
+    public Prescription clone() {
+        final Prescription copy = new Prescription(from, to, toEndOfPackage, prescRelation, text, showOnDailyPlan, attachedFiles, attachedProcessConnections, userON, userOFF, resident, intervention, tradeform, situation, hospitalON, hospitalOFF, docON, docOFF);
 
         CollectionUtils.forAllDo(pSchedule, new Closure() {
             public void execute(Object o) {
@@ -575,7 +575,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
                 ", bemerkung='" + text + '\'' +
                 ", stellplan=" + showOnDailyPlan +
                 ", attachedFiles=" + attachedFiles +
-                ", attachedVorgaenge=" + attachedProcesses +
+                ", attachedVorgaenge=" + attachedProcessConnections +
                 ", pSchedule=" + pSchedule +
                 ", bhps=" + bhps +
                 ", angesetztDurch=" + userON +

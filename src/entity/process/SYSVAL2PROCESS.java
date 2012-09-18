@@ -1,6 +1,6 @@
 package entity.process;
 
-import entity.BWerte;
+import entity.ResValues;
 
 import javax.persistence.*;
 
@@ -33,12 +33,12 @@ public class SYSVAL2PROCESS {
 
     @ManyToOne
     @JoinColumn(name = "BWID", referencedColumnName = "BWID")
-    private BWerte bwerte;
+    private ResValues bwerte;
 
     protected SYSVAL2PROCESS() {
     }
 
-    public SYSVAL2PROCESS(QProcess vorgang, BWerte bwerte) {
+    public SYSVAL2PROCESS(QProcess vorgang, ResValues bwerte) {
         this.id = 0;
         this.vorgang = vorgang;
         this.bwerte = bwerte;
@@ -52,11 +52,11 @@ public class SYSVAL2PROCESS {
         this.vorgang = vorgang;
     }
 
-    public BWerte getBwerte() {
+    public ResValues getBwerte() {
         return bwerte;
     }
 
-    public void setBwerte(BWerte bwerte) {
+    public void setBwerte(ResValues bwerte) {
         this.bwerte = bwerte;
     }
 }

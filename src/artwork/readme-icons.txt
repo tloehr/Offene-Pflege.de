@@ -16,3 +16,5 @@ Lots of different icons and symbols taken from www.wpclipart.com. This material 
 -- collapse.png (http://www.webdesignerdepot.com via FindIcons.com)
 -- collapse_arrow.png (http://www.webdesignerdepot.com via FindIcons.com)
 -- medicine[0-4].png (modification of http://www.wpclipart.com/medical/pills/box_of_medicine.png.html)
+-- edit3.png (modification of http://www.wpclipart.com/education/supplies/pencils/stubby_pencils/Pencil_stylized_blue_T.png)
+-- print2.png (modification of http://www.wpclipart.com/computer/printer/printer_icon.png.html)

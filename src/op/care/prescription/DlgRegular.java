@@ -41,7 +41,6 @@ import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
 import org.joda.time.DateMidnight;
-import tablemodels.TMDosis;
 import tablerenderer.RNDHTML;
 
 import javax.persistence.EntityManager;
@@ -54,7 +53,6 @@ import javax.swing.event.CaretListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -720,7 +718,7 @@ public class DlgRegular extends MyJDialog {
 //            return;
 //        }
 
-        final TMDosis tm = (TMDosis) tblDosis.getModel();
+        final TMDose tm = (TMDose) tblDosis.getModel();
         if (tm.getRowCount() == 0) {
             return;
         }
@@ -739,38 +737,38 @@ public class DlgRegular extends MyJDialog {
         SYSTools.unregisterListeners(menu);
         menu = new JPopupMenu();
 
-        // Bei Bedarfsmedikation kann immer nur eine Dosis eingegeben werden.
-        JMenuItem itemPopupEditText = new JMenuItem(OPDE.lang.getString("misc.msg.edit"), SYSConst.icon22edit);
-        itemPopupEditText.addActionListener(new java.awt.event.ActionListener() {
-
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                PrescriptionSchedule planung = prescription.getPrescriptionSchedule().get(row);
-                final JidePopup popup = new JidePopup();
-
-                CleanablePanel dlg = null;
-                dlg = new PnlRegelDosis(planung, new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        if (o != null) {
-                            reloadTable();
-                            popup.hidePopup();
-                        }
-                    }
-                });
-
-                popup.setMovable(false);
-                popup.setOwner(tblDosis);
-                popup.removeExcludedComponent(tblDosis);
-                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-                popup.getContentPane().add(dlg);
-                popup.setDefaultFocusComponent(dlg);
-
-                Point p3 = new Point(btnAddDosis.getX(), btnAddDosis.getY());
-                SwingUtilities.convertPointToScreen(p3, btnAddDosis);
-                popup.showPopup(p3.x, p3.y - (int) dlg.getPreferredSize().getWidth() - (int) btnAddDosis.getPreferredSize().getHeight());
-            }
-        });
-        menu.add(itemPopupEditText);
+//
+//        JMenuItem itemPopupEditText = new JMenuItem(OPDE.lang.getString("misc.msg.edit"), SYSConst.icon22edit);
+//        itemPopupEditText.addActionListener(new java.awt.event.ActionListener() {
+//
+//            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                PrescriptionSchedule planung = prescription.getPrescriptionSchedule().get(row);
+//                final JidePopup popup = new JidePopup();
+//
+//                CleanablePanel dlg = null;
+//                dlg = new PnlRegelDosis(planung, new Closure() {
+//                    @Override
+//                    public void execute(Object o) {
+//                        if (o != null) {
+//                            reloadTable();
+//                            popup.hidePopup();
+//                        }
+//                    }
+//                });
+//
+//                popup.setMovable(false);
+//                popup.setOwner(tblDosis);
+//                popup.removeExcludedComponent(tblDosis);
+//                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+//                popup.getContentPane().add(dlg);
+//                popup.setDefaultFocusComponent(dlg);
+//
+//                Point p3 = new Point(btnAddDosis.getX(), btnAddDosis.getY());
+//                SwingUtilities.convertPointToScreen(p3, btnAddDosis);
+//                popup.showPopup(p3.x, p3.y - (int) dlg.getPreferredSize().getWidth() - (int) btnAddDosis.getPreferredSize().getHeight());
+//            }
+//        });
+//        menu.add(itemPopupEditText);
 
         //-----------------------------------------
         JMenuItem itemPopupDelete = new JMenuItem(OPDE.lang.getString("misc.msg.delete"), SYSConst.icon22delete);
@@ -820,11 +818,11 @@ public class DlgRegular extends MyJDialog {
             zubereitung = prescription.getTradeForm().getDosageForm().getPreparation();
         }
 
-        tblDosis.setModel(new TMDosis(zubereitung, prescription));
+        tblDosis.setModel(new TMDose(zubereitung, prescription));
         tblDosis.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jspDosis.dispatchEvent(new ComponentEvent(jspDosis, ComponentEvent.COMPONENT_RESIZED));
-        tblDosis.getColumnModel().getColumn(TMDosis.COL_Dosis).setCellRenderer(new RNDHTML());
-        tblDosis.getColumnModel().getColumn(TMDosis.COL_Dosis).setHeaderValue(OPDE.lang.getString("misc.msg.usage"));
+        tblDosis.getColumnModel().getColumn(TMDose.COL_Dosis).setCellRenderer(new RNDHTML());
+        tblDosis.getColumnModel().getColumn(TMDose.COL_Dosis).setHeaderValue(OPDE.lang.getString("misc.msg.usage"));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -350,7 +350,7 @@ public class BHP implements Serializable, Comparable<BHP> {
     }
 
     /**
-     * This method tells, whether there was more than one stock involved in order to provide the necessary medication in the cause of the
+     * This method tells, whether there was more than one stock involved in order to provide the necessary medication in the course of the
      * application of this BHP. This can only happen when a stock is closed in advance. After clicking this BHP the first stock is emptied and
      * then the next stock is opened.
      *

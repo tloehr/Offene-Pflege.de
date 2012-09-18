@@ -32,8 +32,8 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
-import entity.BWerte;
-import entity.BWerteTools;
+import entity.ResValues;
+import entity.ResValuesTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.files.SYSFilesTools;
@@ -165,10 +165,10 @@ public class PnlVitalwerte extends NursingRecordsPanel {
     private void printWerte(int[] sel) {
         try {
             TMWerte tm = (TMWerte) tblVital.getModel();
-            ArrayList<BWerte> printlist = tm.getContent();
+            ArrayList<ResValues> printlist = tm.getContent();
 
             if (sel != null) {
-                printlist = new ArrayList<BWerte>(sel.length);
+                printlist = new ArrayList<ResValues>(sel.length);
                 for (int row : sel) {
                     printlist.add(tm.getBWert(row));
                 }
@@ -184,7 +184,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
             BufferedWriter out = new BufferedWriter(new FileWriter(temp));
 
 
-            out.write(BWerteTools.getBWerteAsHTML(printlist));
+            out.write(ResValuesTools.getAsHTML(printlist));
 
             out.close();
             SYSFilesTools.handleFile(temp, Desktop.Action.OPEN);
@@ -280,7 +280,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
 
         TMWerte tm = (TMWerte) tblVital.getModel();
         if (tm.getRowCount() > 0 && row > -1) {
-            final BWerte wert = tm.getBWert(lsm.getLeadSelectionIndex());
+            final ResValues wert = tm.getBWert(lsm.getLeadSelectionIndex());
             boolean bearbeitenMoeglich = !wert.isReplaced() && !wert.isDeleted() && singleRowSelected;
 
             if (evt.isPopupTrigger()) {
@@ -307,12 +307,12 @@ public class PnlVitalwerte extends NursingRecordsPanel {
 
                                 case TMWerte.COL_CONTENT: {
 
-                                    if (wert.getType() == BWerteTools.RR) {
-                                        editor = new PnlWerte123(wert.getWert(), wert.getWert2(), wert.getWert3(), BWerteTools.RRSYS, BWerteTools.EINHEIT[BWerteTools.RR], BWerteTools.RRDIA, BWerteTools.EINHEIT[BWerteTools.RR], BWerteTools.WERTE[BWerteTools.PULS], BWerteTools.EINHEIT[BWerteTools.PULS]);
+                                    if (wert.getType() == ResValuesTools.RR) {
+                                        editor = new PnlWerte123(wert.getWert(), wert.getWert2(), wert.getWert3(), ResValuesTools.RRSYS, ResValuesTools.EINHEIT[ResValuesTools.RR], ResValuesTools.RRDIA, ResValuesTools.EINHEIT[ResValuesTools.RR], ResValuesTools.WERTE[ResValuesTools.PULS], ResValuesTools.EINHEIT[ResValuesTools.PULS]);
                                     } else if (wert.isOhneWert()) {
                                         editor = null;
                                     } else {
-                                        editor = new PnlWerte123(wert.getWert(), BWerteTools.WERTE[wert.getType()], BWerteTools.EINHEIT[wert.getType()]);
+                                        editor = new PnlWerte123(wert.getWert(), ResValuesTools.WERTE[wert.getType()], ResValuesTools.EINHEIT[wert.getType()]);
                                     }
                                     break;
                                 }
@@ -343,7 +343,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
                                     @Override
                                     public void actionPerformed(ActionEvent actionEvent) {
 
-                                        BWerte newOne = wert.clone();
+                                        ResValues newOne = wert.clone();
                                         popup.hidePopup();
 
                                         switch (col) {
@@ -372,7 +372,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
                                         } else if (col == TMWerte.COL_COMMENT && newOne.getBemerkung().equals(wert.getBemerkung())) {
                                             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.nochanges"), DisplayMessage.WARNING));
                                         } else {
-                                            newOne = BWerteTools.changeWert(wert, newOne);
+                                            newOne = ResValuesTools.changeWert(wert, newOne);
                                             reloadTable();
                                         }
                                     }
@@ -417,7 +417,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
                                 @Override
                                 public void execute(Object answer) {
                                     if (answer.equals(JOptionPane.YES_OPTION)) {
-                                        BWerte mywert = BWerteTools.deleteWert(wert);
+                                        ResValues mywert = ResValuesTools.deleteWert(wert);
                                         ((TMWerte) tblVital.getModel()).setBWert(row, mywert);
 
                                         if (!tbShowReplaced.isSelected()) {
@@ -451,15 +451,15 @@ public class PnlVitalwerte extends NursingRecordsPanel {
 //                if (!alreadyEdited && singleRowSelected) {
 //                    menu.add(new JSeparator());
 //                    // #0000003
-//                    menu.add(op.share.process.DBHandling.getVorgangContextMenu(parent, "BWerte", bwid, currentBW, fileActionListener));
+//                    menu.add(op.share.process.DBHandling.getVorgangContextMenu(parent, "ResValues", bwid, currentBW, fileActionListener));
 //
-//                    Query query = em.createNamedQuery("BWerte.findByBwid");
+//                    Query query = em.createNamedQuery("ResValues.findByBwid");
 //                    query.setParameter("bwid", bwid);
-//                    entity.BWerte bwert = (entity.BWerte) query.getSingleResult();
+//                    entity.ResValues bwert = (entity.ResValues) query.getSingleResult();
 //                    menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, bwert, fileActionListener));
 //
 //                    // #0000035
-//                    //menu.add(SYSFiles.getOPFilesContextMenu(parent, "BWerte", bwid, currentBW, tblVital, true, true, SYSFiles.CODE_BERICHTE, fileActionListener));
+//                    //menu.add(SYSFiles.getOPFilesContextMenu(parent, "ResValues", bwid, currentBW, tblVital, true, true, SYSFiles.CODE_BERICHTE, fileActionListener));
 //                }
 
 
@@ -512,7 +512,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                BWerte first = BWerteTools.getFirstWert(bewohner);
+                ResValues first = ResValuesTools.getFirst(bewohner);
                 jdcVon.setDate(first == null ? SYSCalendar.addField(SYSCalendar.today_date(), -2, GregorianCalendar.WEEK_OF_MONTH) : first.getPit());
             }
         });
@@ -576,7 +576,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
         labelPanel.add(buttonPanel);
 
 
-        DefaultComboBoxModel dcbm = new DefaultComboBoxModel(BWerteTools.WERTE);
+        DefaultComboBoxModel dcbm = new DefaultComboBoxModel(ResValuesTools.WERTE);
         dcbm.removeElementAt(0);
         dcbm.insertElementAt("<i>"+OPDE.lang.getString("misc.commands.noselection")+"</i>", 0);
         cmbAuswahl = new JComboBox(dcbm);
@@ -646,7 +646,7 @@ public class PnlVitalwerte extends NursingRecordsPanel {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
 
-                    new DlgWert(new BWerte(bewohner, OPDE.getLogin().getUser()), new Closure() {
+                    new DlgWert(new ResValues(bewohner, OPDE.getLogin().getUser()), new Closure() {
                         @Override
                         public void execute(Object o) {
                             if (o != null) {

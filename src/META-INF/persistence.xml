@@ -6,7 +6,7 @@
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <class>entity.system.Acl</class>
         <class>entity.prescription.Doc</class>
-        <class>entity.BWerte</class>
+        <class>entity.ResValues</class>
         <class>entity.Allowance</class>
         <class>entity.Betreuer</class>
         <class>entity.info.Resident</class>

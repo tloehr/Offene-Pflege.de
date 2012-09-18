@@ -17,9 +17,9 @@ import javax.persistence.*;
 @Table(name = "SYSPRE2PROCESS")
 @NamedQueries({
         @NamedQuery(name = "SYSPRE2PROCESS.findActiveAssignedVorgaengeByElement", query = " " +
-                " SELECT s.vorgang FROM SYSPRE2PROCESS s WHERE s.verordnung = :element AND s.vorgang.to = '9999-12-31 23:59:59' "),
+                " SELECT s.qProcess FROM SYSPRE2PROCESS s WHERE s.prescription = :element AND s.qProcess.to = '9999-12-31 23:59:59' "),
         @NamedQuery(name = "SYSPRE2PROCESS.findByElementAndVorgang", query = " " +
-                " SELECT s FROM SYSPRE2PROCESS s WHERE s.verordnung = :element AND s.vorgang = :process AND s.vorgang.to = '9999-12-31 23:59:59' ")
+                " SELECT s FROM SYSPRE2PROCESS s WHERE s.prescription = :element AND s.qProcess = :process AND s.qProcess.to = '9999-12-31 23:59:59' ")
 })
 public class SYSPRE2PROCESS {
     @Id
@@ -29,35 +29,28 @@ public class SYSPRE2PROCESS {
 
     @ManyToOne
     @JoinColumn(name = "VorgangID", referencedColumnName = "VorgangID")
-    private QProcess vorgang;
+    private QProcess qProcess;
 
     @ManyToOne
     @JoinColumn(name = "VerID", referencedColumnName = "VerID")
-    private Prescription verordnung;
+    private Prescription prescription;
 
     protected SYSPRE2PROCESS() {
     }
 
-    public SYSPRE2PROCESS(QProcess vorgang, Prescription verordnung) {
+    public SYSPRE2PROCESS(QProcess qProcess, Prescription prescription) {
         this.id = 0;
-        this.vorgang = vorgang;
-        this.verordnung = verordnung;
+        this.qProcess = qProcess;
+        this.prescription = prescription;
     }
 
-    public QProcess getVorgang() {
-        return vorgang;
-    }
-
-    public void setVorgang(QProcess vorgang) {
-        this.vorgang = vorgang;
+    public QProcess getQProcess() {
+        return qProcess;
     }
 
     public Prescription getPrescription() {
-        return verordnung;
+        return prescription;
     }
 
-    public void setVerordnung(Prescription verordnung) {
-        this.verordnung = verordnung;
-    }
 }
 

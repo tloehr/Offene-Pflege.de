@@ -25,10 +25,11 @@
  * 
  */
 
-package tablemodels;
+package op.care.prescription;
 
 import entity.prescription.Prescription;
 import entity.prescription.PrescriptionScheduleTools;
+import op.tools.SYSTools;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -36,7 +37,7 @@ import javax.swing.table.AbstractTableModel;
 /**
  * @author tloehr
  */
-public class TMDosis
+public class TMDose
         extends AbstractTableModel {
     public static final int COL_Dosis = 0;
 
@@ -46,7 +47,7 @@ public class TMDosis
     //VerordnungPlanung[] planungen;
 
 
-    public TMDosis(String anwtext, Prescription verordnung) {
+    public TMDose(String anwtext, Prescription verordnung) {
         super();
 
         this.anwendung = anwtext;
@@ -71,7 +72,7 @@ public class TMDosis
         String result = "";
         switch (col) {
             case COL_Dosis: {
-                result = PrescriptionScheduleTools.getDoseAsHTML(verordnung.getPrescriptionSchedule().get(row), null, true);
+                result = SYSTools.toHTML(PrescriptionScheduleTools.getDoseAsHTML(verordnung.getPrescriptionSchedule().get(row), null, true));
                 break;
             }
             default: {

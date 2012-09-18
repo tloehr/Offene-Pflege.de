@@ -24,7 +24,7 @@
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  * 
  */
-package op.care.med.vorrat;
+package op.care.med.inventory;
 
 import java.awt.event.*;
 import javax.persistence.EntityManager;

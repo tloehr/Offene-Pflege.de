@@ -1,14 +1,13 @@
 package op.tools;
 
-import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.swing.JideButton;
 import op.OPDE;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyVetoException;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,12 +21,10 @@ public class DefaultCPTitle {
 
     public DefaultCPTitle(String title, ActionListener actionListener) {
 
-
         titlePanelleft = new JPanel();
         titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
 
         JideButton btnTitle = GUITools.createHyperlinkButton(title, null, null);
-
         btnTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
         btnTitle.addActionListener(actionListener);
 
@@ -53,7 +50,6 @@ public class DefaultCPTitle {
         titlePanel.add(titlePanelright, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
                 GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
                 new Insets(0, 0, 0, 0), 0, 0));
-
 
     }
 

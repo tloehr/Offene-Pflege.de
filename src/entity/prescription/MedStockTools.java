@@ -3,7 +3,7 @@ package entity.prescription;
 import entity.Stationen;
 import entity.info.ResidentTools;
 import op.OPDE;
-import op.care.med.vorrat.PnlInventory;
+import op.care.med.inventory.PnlInventory;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
@@ -140,9 +140,9 @@ public class MedStockTools {
         hm.put("bestand.eingang", bestand.getEin());
         hm.put("bestand.userkurz", bestand.getUser().getUID());
         hm.put("bestand.userlang", bestand.getUser().getFullname());
-        hm.put("bestand.vorrat.bewohnername", ResidentTools.getBWLabel1(bestand.getInventory().getResident()));
-        hm.put("bestand.vorrat.bewohnergebdatum", bestand.getInventory().getResident().getGebDatum());
-        hm.put("bestand.vorrat.bewohnerkennung", bestand.getInventory().getResident().getRID());
+        hm.put("bestand.inventory.bewohnername", ResidentTools.getBWLabel1(bestand.getInventory().getResident()));
+        hm.put("bestand.inventory.bewohnergebdatum", bestand.getInventory().getResident().getGebDatum());
+        hm.put("bestand.inventory.bewohnerkennung", bestand.getInventory().getResident().getRID());
 
         return hm;
     }

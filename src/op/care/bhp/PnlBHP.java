@@ -613,7 +613,11 @@ public class PnlBHP extends NursingRecordsPanel {
 
                                 if (myBHP.hasMed()) {
                                     MedInventory inventory = TradeFormTools.getInventory4TradeForm(resident, myBHP.getTradeForm());
-                                    MedInventoryTools.takeFrom(em, em.merge(inventory), myBHP.getDosis(), true, myBHP);
+                                    if (inventory != null) {
+                                        MedInventoryTools.takeFrom(em, em.merge(inventory), myBHP.getDosis(), true, myBHP);
+                                    } else {
+                                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID+".NoInventory"));
+                                    }
                                 }
 
                                 bhpCollapsiblePaneHashMap.put(myBHP, createCPFor(myBHP));

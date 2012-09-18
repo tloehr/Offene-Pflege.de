@@ -24,7 +24,7 @@
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  * 
  */
-package op.care.med.vorrat;
+package op.care.med.inventory;
 
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
@@ -53,10 +53,7 @@ import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
 import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -628,8 +625,8 @@ public class PnlInventory extends NursingRecordsPanel {
              *      \___/| .__/ \___|_| |_|____/ \__\___/ \___|_|\_\
              *           |_|
              */
-            final JButton btnOpenStock = new JButton(SYSConst.icon22play);
-            btnOpenStock.setPressedIcon(SYSConst.icon22playPressed);
+            final JButton btnOpenStock = new JButton(SYSConst.icon22playerPlay);
+            btnOpenStock.setPressedIcon(SYSConst.icon22playerPlayPressed);
             btnOpenStock.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnOpenStock.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             btnOpenStock.setContentAreaFilled(false);
@@ -1079,8 +1076,9 @@ public class PnlInventory extends NursingRecordsPanel {
 
                         "</font></html>";
 
-                DefaultCPTitle pnlTitle = new DefaultCPTitle(title, null);
+                final DefaultCPTitle pnlTitle = new DefaultCPTitle(title, null);
 
+//                pnlTitle.getLeft().addMouseListener();
 
                 /***
                  *      ____       _ _______  __

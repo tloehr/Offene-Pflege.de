@@ -503,21 +503,21 @@ public class BWInfoTools {
          *      \____|_|  \___/| ||_/\___/_/  \____|\___| \_/\_/ |_|\___|_| |_|\__/_/  |____/|_|  |_|___|
          *                     |_|
          */
-        BWerte gewicht = BWerteTools.getLetztenBWert(bewohner, BWerteTools.GEWICHT);
+        ResValues gewicht = ResValuesTools.getLast(bewohner, ResValuesTools.GEWICHT);
         result += "<tr><td valign=\"top\">Zuletzt bestimmtes Körpergewicht</td><td valign=\"top\"><b>";
         if (gewicht == null) {
             result += "Die/der BW wurde noch nicht gewogen.";
         } else {
-            result += gewicht.getWert().toPlainString() + " " + BWerteTools.EINHEIT[BWerteTools.GEWICHT] + " (" + df.format(gewicht.getPit()) + ")";
+            result += gewicht.getWert().toPlainString() + " " + ResValuesTools.EINHEIT[ResValuesTools.GEWICHT] + " (" + df.format(gewicht.getPit()) + ")";
         }
         result += "</b></td></tr>";
 
-        BWerte groesse = BWerteTools.getLetztenBWert(bewohner, BWerteTools.GROESSE);
+        ResValues groesse = ResValuesTools.getLast(bewohner, ResValuesTools.GROESSE);
         result += "<tr><td valign=\"top\">Zuletzt bestimmte Körpergröße</td><td valign=\"top\"><b>";
         if (groesse == null) {
             result += "Bisher wurde noch keine Körpergröße ermittelt.";
         } else {
-            result += groesse.getWert().toPlainString() + " " + BWerteTools.EINHEIT[BWerteTools.GROESSE] + " (" + df.format(groesse.getPit()) + ")";
+            result += groesse.getWert().toPlainString() + " " + ResValuesTools.EINHEIT[ResValuesTools.GROESSE] + " (" + df.format(groesse.getPit()) + ")";
         }
         result += "</b></td></tr>";
 
@@ -538,12 +538,12 @@ public class BWInfoTools {
          *     |____/____|
          *
          */
-        BWerte bz = BWerteTools.getLetztenBWert(bewohner, BWerteTools.BZ);
+        ResValues bz = ResValuesTools.getLast(bewohner, ResValuesTools.BZ);
         result += "<tr><td valign=\"top\">Zuletzt gemessener BZ</td><td valign=\"top\"><b>";
         if (bz == null) {
             result += "Bisher kein BZ Wert vorhanden.";
         } else {
-            result += bz.getWert().toPlainString() + " " + BWerteTools.EINHEIT[BWerteTools.BZ] + " (" + df.format(bz.getPit()) + ")";
+            result += bz.getWert().toPlainString() + " " + ResValuesTools.EINHEIT[ResValuesTools.BZ] + " (" + df.format(bz.getPit()) + ")";
         }
         result += "</b></td></tr>";
 
@@ -699,12 +699,12 @@ public class BWInfoTools {
          */
         if (medi) {
             EntityManager em = OPDE.createEM();
-            Query query = em.createQuery("SELECT b FROM Prescription b WHERE b.bewohner = :bewohner AND b.to > :now ");
-            query.setParameter("bewohner", bewohner);
+            Query query = em.createQuery("SELECT b FROM Prescription b WHERE b.resident = :resident AND b.to > :now ");
+            query.setParameter("resident", bewohner);
             query.setParameter("now", new Date());
             List listeVerordnungen = query.getResultList();
             Collections.sort(listeVerordnungen);
-            result += PrescriptionTools.getPrescriptionAsHTML(listeVerordnungen, true, false, false);
+            result += PrescriptionTools.getPrescriptionsAsHTML(listeVerordnungen, true, false, false, false);
             em.close();
         }
 
@@ -740,8 +740,8 @@ public class BWInfoTools {
             BigDecimal trinkmin = BigDecimal.ZERO;
             BigDecimal trinkmax = BigDecimal.ZERO;
 
-            boolean hateinfuhren = BWerteTools.hatEinfuhren(bewohner);
-            boolean hatausfuhren = BWerteTools.hatAusfuhren(bewohner);
+            boolean hateinfuhren = ResValuesTools.hatEinfuhren(bewohner);
+            boolean hatausfuhren = ResValuesTools.hatAusfuhren(bewohner);
             result += hateinfuhren || hatausfuhren ? "<h2 id=\"fonth2\">" + OPDE.lang.getString("misc.msg.liquid.result") + "</h2>" : "";
 
             if (hatausfuhren) {
@@ -764,10 +764,10 @@ public class BWInfoTools {
                         + "ORDER BY aus.PIT desc";
                 Query query = em.createNativeQuery(sql);
                 query.setParameter(1, bewohner.getRID());
-                query.setParameter(2, BWerteTools.BILANZ);
+                query.setParameter(2, ResValuesTools.BILANZ);
                 query.setParameter(3, new DateTime().minusWeeks(1).toDateMidnight().toDate());
                 query.setParameter(4, bewohner.getRID());
-                query.setParameter(5, BWerteTools.BILANZ);
+                query.setParameter(5, ResValuesTools.BILANZ);
                 query.setParameter(6, new DateTime().minusWeeks(1).toDateMidnight().toDate());
 
                 List<Object[]> list = query.getResultList();
@@ -806,7 +806,7 @@ public class BWInfoTools {
             } else if (hateinfuhren) {
 
 
-                String s = " SELECT PIT, SUM(Wert) EINFUHR FROM BWerte "
+                String s = " SELECT PIT, SUM(Wert) EINFUHR FROM ResValues "
                         + "   WHERE ReplacedBy = 0 AND Wert > 0 AND BWKennung=? AND XML='<BILANZ/>' "
                         + "   AND DATE(PIT) >= ADDDATE(DATE(now()), INTERVAL -7 DAY) "
                         + "   Group By DATE(PIT) "
@@ -822,7 +822,7 @@ public class BWInfoTools {
 
                 Query query = em.createNativeQuery(sql);
                 query.setParameter(1, bewohner.getRID());
-                query.setParameter(2, BWerteTools.BILANZ);
+                query.setParameter(2, ResValuesTools.BILANZ);
                 query.setParameter(3, new DateTime().minusWeeks(1).toDateMidnight().toDate());
                 List<Object[]> list = query.getResultList();
                 em.close();

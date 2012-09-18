@@ -194,7 +194,7 @@ public class TMVerordnung extends AbstractTableModel {
                 if (!verordnung.getAttachedFiles().isEmpty()) {
                     res += "<font color=\"green\">&#9679;</font>";
                 }
-                if (!verordnung.getAttachedVorgaenge().isEmpty()) {
+                if (!verordnung.getAttachedProcessConnections().isEmpty()) {
                     res += "<font color=\"red\">&#9679;</font>";
                 }
                 result = res;

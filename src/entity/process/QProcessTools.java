@@ -4,7 +4,7 @@
  */
 package entity.process;
 
-import entity.BWerte;
+import entity.ResValues;
 import entity.prescription.Prescription;
 import entity.system.Users;
 import entity.info.BWInfo;
@@ -67,7 +67,7 @@ public class QProcessTools {
         if (element instanceof NReport) {
             query = em.createNamedQuery("SYSNR2PROCESS.findByElementAndVorgang");
             elementBezeichnung = "Pflegebericht";
-        } else if (element instanceof BWerte) {
+        } else if (element instanceof ResValues) {
             query = em.createNamedQuery("SYSVAL2PROCESS.findByElementAndVorgang");
             elementBezeichnung = "Bewohner Wert";
         } else if (element instanceof Prescription) {
@@ -269,7 +269,7 @@ public class QProcessTools {
 //        Query complement = null;
 //        if (elementQ instanceof NReport) {
 //            complement = em.createNamedQuery("SYSPB2VORGANG.findActiveAssignedVorgaengeByElement");
-//        } else if (elementQ instanceof BWerte) {
+//        } else if (elementQ instanceof ResValues) {
 //            complement = em.createNamedQuery("SYSBWerte2VORGANG.findActiveAssignedVorgaengeByElement");
 //        } else if (elementQ instanceof Prescription) {
 //            complement = em.createNamedQuery("SYSVER2VORGANG.findActiveAssignedVorgaengeByElement");
@@ -315,7 +315,7 @@ public class QProcessTools {
 //        Query query = null;
 //        if (elementQ instanceof NReport) {
 //            query = em.createNamedQuery("SYSPB2VORGANG.findActiveAssignedVorgaengeByElement");
-//        } else if (elementQ instanceof BWerte) {
+//        } else if (elementQ instanceof ResValues) {
 //            query = em.createNamedQuery("SYSBWerte2VORGANG.findActiveAssignedVorgaengeByElement");
 //        } else if (elementQ instanceof Prescription) {
 //            query = em.createNamedQuery("SYSVER2VORGANG.findActiveAssignedVorgaengeByElement");

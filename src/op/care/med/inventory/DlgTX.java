@@ -25,7 +25,7 @@
  * 
  */
 
-package op.care.med.vorrat;
+package op.care.med.inventory;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;

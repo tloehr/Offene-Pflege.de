@@ -338,7 +338,7 @@ public class PrescriptionTools {
         result += "</font>";
 
         if (prescription.isOnDemand()) {
-            result += "<br/><b><u>"+OPDE.lang.getString("misc.msg.ondemand")+":</u> " + prescription.getSituation().getText() + "</b>";
+            result += "<br/><b><u>" + OPDE.lang.getString("misc.msg.ondemand") + ":</u> " + prescription.getSituation().getText() + "</b>";
         }
 
         return result;
@@ -416,11 +416,11 @@ public class PrescriptionTools {
         String result = "<div id=\"fonttext\">";
 
         if (verordnung.isOnDemand()) {
-            result += "<b><u>"+OPDE.lang.getString("misc.msg.ondemand")+":</u> <font color=\"blue\">" + verordnung.getSituation().getText() + "</font></b>";
+            result += "<b><u>" + OPDE.lang.getString("misc.msg.ondemand") + ":</u> <font color=\"blue\">" + verordnung.getSituation().getText() + "</font></b>";
         }
         if (!verordnung.getText().isEmpty()) {
             result += result.isEmpty() ? "" : "<br/>";
-            result += "<b><u>"+OPDE.lang.getString("misc.msg.comment")+":</u> </b>" + verordnung.getText();
+            result += "<b><u>" + OPDE.lang.getString("misc.msg.comment") + ":</u> </b>" + verordnung.getText();
         }
         return result + "</div>";
     }
@@ -435,7 +435,7 @@ public class PrescriptionTools {
         }
         if (verordnung.getDocON() != null) {
             if (verordnung.getHospitalON() != null) {
-                result += " <i>"+OPDE.lang.getString("misc.msg.confirmedby")+":</i> ";
+                result += " <i>" + OPDE.lang.getString("misc.msg.confirmedby") + ":</i> ";
             }
             result += verordnung.getDocON().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getDocON().getName(), SYSTools.INDEX_NACHNAME);
         }
@@ -456,7 +456,7 @@ public class PrescriptionTools {
 
             if (verordnung.getDocOFF() != null) {
                 if (verordnung.getHospitalOFF() != null) {
-                    result += " <i>"+OPDE.lang.getString("misc.msg.confirmedby")+":</i> ";
+                    result += " <i>" + OPDE.lang.getString("misc.msg.confirmedby") + ":</i> ";
                 }
                 result += verordnung.getDocOFF().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getDocOFF().getName(), SYSTools.INDEX_NACHNAME);
             }
@@ -639,13 +639,13 @@ public class PrescriptionTools {
     public static String getPrescriptionAsHTML(Prescription prescription, boolean withheader, boolean withlongheader, boolean withmed) {
         ArrayList<Prescription> single = new ArrayList<Prescription>();
         single.add(prescription);
-        return getPrescriptionAsHTML(single, withheader, withlongheader, withmed);
+        return getPrescriptionsAsHTML(single, withheader, withlongheader, withmed, true);
     }
 
     /**
      * Gibt eine HTML Darstellung der Verordungen zurück, die in dem übergebenen TableModel enthalten sind.
      */
-    public static String getPrescriptionAsHTML(List<Prescription> list, boolean withheader, boolean withlongheader, boolean withmed) {
+    public static String getPrescriptionsAsHTML(List<Prescription> list, boolean withheader, boolean withlongheader, boolean withmed, boolean withDiscontinued) {
         String result = "";
 
         if (!list.isEmpty()) {
@@ -659,23 +659,23 @@ public class PrescriptionTools {
             result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
                     "<th >Medikament/Massnahme</th><th >Dosierung / Hinweise</th><th >Angesetzt</th></tr>";
 
-            Iterator<Prescription> itVerordnung = list.iterator();
-            while (itVerordnung.hasNext()) {
-                prescription = itVerordnung.next();
+            for (Prescription myprescription : list) {
 
-                result += "<tr>";
-                result += "<td valign=\"top\">" + getShortDescription(prescription) + "</td>";
-                result += "<td valign=\"top\">" + getDose(prescription, withmed) + "<br/>";
-                result += getRemark(prescription) + "</td>";
-                result += "<td valign=\"top\">" + getON(prescription);
+                if (withDiscontinued || !myprescription.isDiscontinued()) {
 
-                if (prescription.isDiscontinued()){
-                    result += getOFF(prescription);
+                    result += "<tr>";
+                    result += "<td valign=\"top\">" + getShortDescription(myprescription) + "</td>";
+                    result += "<td valign=\"top\">" + getDose(myprescription, withmed) + "<br/>";
+                    result += getRemark(myprescription) + "</td>";
+                    result += "<td valign=\"top\">" + getON(myprescription);
+
+                    if (myprescription.isDiscontinued()) {
+                        result += getOFF(myprescription);
+                    }
+
+                    result += "</td>";
+                    result += "</tr>";
                 }
-
-                result += "</td>";
-                //result += "<td>" + SYSTools.unHTML2(tmv.getValueAt(v, TMVerordnung.COL_AB).toString()) + "</td>";
-                result += "</tr>";
             }
 
             result += "</table>";

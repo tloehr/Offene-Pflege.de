@@ -33,6 +33,7 @@ public class DisplayManager extends Thread {
     private long dbZyklenRest = 0;
     private Icon icon1, icon2, icondead, iconaway, icongone;
     private SwingWorker worker;
+    private boolean isIndeterminate = false;
 
 //    private DateFormat df;
 
@@ -93,6 +94,9 @@ public class DisplayManager extends Thread {
     public void setProgressBarMessage(DisplayMessage progressBarMessage) {
         this.progressBarMessage = progressBarMessage;
         jp.setStringPainted(progressBarMessage != null);
+//        if (progressBarMessage == null) {
+//            jp.setIndeterminate(false);
+//        }
     }
 
     public void addSubMessage(DisplayMessage msg) {
@@ -179,16 +183,18 @@ public class DisplayManager extends Thread {
             jp.setForeground(defaultColor);
         }
 
-        jp.setIndeterminate(currentSubMessage != null && pbIntermediateZyklen < 40); // 40x 50ms lang bei neuen Nachrichten leuchten
+//        isIndeterminate = currentSubMessage != null && pbIntermediateZyklen < 40;
+//        jp.setIndeterminate(isIndeterminate); // 40x 50ms lang bei neuen Nachrichten leuchten
     }
 
     private void processProgressBar() {
         if (progressBarMessage != null) {  //  && zyklen/5%2 == 0 && zyklen % 5 == 0
-
             if (progressBarMessage.getPercentage() < 0) {
-                jp.setIndeterminate(true);
+                if (!isIndeterminate) {
+                    isIndeterminate = true;
+                }
             } else {
-                jp.setIndeterminate(false);
+                isIndeterminate = false;
                 jp.setValue(progressBarMessage.getPercentage());
             }
 
@@ -198,7 +204,11 @@ public class DisplayManager extends Thread {
                 jp.setValue(0);
                 jp.setString(null);
             }
+            isIndeterminate = false;
+
         }
+
+        jp.setIndeterminate(isIndeterminate);
     }
 
     public static DisplayMessage getLockMessage() {
