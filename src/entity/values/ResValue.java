@@ -2,12 +2,13 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity;
+package entity.values;
 
+import entity.files.SYSVAL2FILE;
 import entity.info.Resident;
 import entity.process.QProcess;
-import entity.process.SYSVAL2PROCESS;
 import entity.process.QProcessElement;
+import entity.process.SYSVAL2PROCESS;
 import entity.system.Users;
 
 import javax.persistence.*;
@@ -23,29 +24,29 @@ import java.util.Date;
 @Entity
 @Table(name = "BWerte")
 @NamedQueries({
-        @NamedQuery(name = "BWerte.findAll", query = "SELECT b FROM ResValues b"),
+        @NamedQuery(name = "BWerte.findAll", query = "SELECT b FROM ResValue b"),
         /**
          * Sucht Berichte für einen Bewohner mit bestimmten Markierungen
          */
         @NamedQuery(name = "BWerte.findByVorgang", query = " "
-                + " SELECT b FROM ResValues b "
-                + " JOIN b.attachedVorgaenge av"
+                + " SELECT b FROM ResValue b "
+                + " JOIN b.attachedProcesses av"
                 + " JOIN av.vorgang v"
                 + " WHERE v = :process "),
-        @NamedQuery(name = "BWerte.findByBwid", query = "SELECT b FROM ResValues b WHERE b.bwid = :bwid"),
-        @NamedQuery(name = "BWerte.findByPit", query = "SELECT b FROM ResValues b WHERE b.pit = :pit"),
-        @NamedQuery(name = "BWerte.findByWert", query = "SELECT b FROM ResValues b WHERE b.wert = :wert"),
-        @NamedQuery(name = "BWerte.findByReplacedBy", query = "SELECT b FROM ResValues b WHERE b.replacedBy = :replacedBy"),
-        @NamedQuery(name = "BWerte.findByReplacementFor", query = "SELECT b FROM ResValues b WHERE b.replacementFor = :replacementFor"),
-        @NamedQuery(name = "BWerte.findByCdate", query = "SELECT b FROM ResValues b WHERE b.cdate = :cdate"),
-        @NamedQuery(name = "BWerte.findByMdate", query = "SELECT b FROM ResValues b WHERE b.mdate = :mdate")})
-public class ResValues implements Serializable, QProcessElement, Cloneable {
+        @NamedQuery(name = "BWerte.findByBwid", query = "SELECT b FROM ResValue b WHERE b.id = :bwid"),
+        @NamedQuery(name = "BWerte.findByPit", query = "SELECT b FROM ResValue b WHERE b.pit = :pit"),
+        @NamedQuery(name = "BWerte.findByWert", query = "SELECT b FROM ResValue b WHERE b.val1 = :wert"),
+        @NamedQuery(name = "BWerte.findByReplacedBy", query = "SELECT b FROM ResValue b WHERE b.replacedBy = :replacedBy"),
+        @NamedQuery(name = "BWerte.findByReplacementFor", query = "SELECT b FROM ResValue b WHERE b.replacementFor = :replacementFor"),
+        @NamedQuery(name = "BWerte.findByCdate", query = "SELECT b FROM ResValue b WHERE b.createDate = :cdate"),
+        @NamedQuery(name = "BWerte.findByMdate", query = "SELECT b FROM ResValue b WHERE b.editDate = :mdate")})
+public class ResValue implements Serializable, QProcessElement, Cloneable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "BWID")
-    private Long bwid;
+    private Long id;
     @Version
     @Column(name = "version")
     private Long version;
@@ -55,27 +56,27 @@ public class ResValues implements Serializable, QProcessElement, Cloneable {
     private Date pit;
     @Basic(optional = false)
     @Column(name = "Wert2")
-    private BigDecimal wert2;
+    private BigDecimal val2;
     @Basic(optional = false)
     @Column(name = "Wert3")
-    private BigDecimal wert3;
+    private BigDecimal val3;
     @Basic(optional = false)
     @Column(name = "Wert")
-    private BigDecimal wert;
+    private BigDecimal val1;
     @Lob
     @Column(name = "Bemerkung")
-    private String bemerkung;
+    private String text;
     @Basic(optional = false)
     @Column(name = "_cdate")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date cdate;
+    private Date createDate;
     @Basic(optional = false)
     @Column(name = "_mdate")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date mdate;
-    @Basic(optional = false)
-    @Column(name = "Type")
-    private Integer type;
+    private Date editDate;
+    //    @Basic(optional = false)
+//    @Column(name = "Type")
+//    private Integer type;
     // ==
     // 1:1 Relationen
     // ==
@@ -84,10 +85,10 @@ public class ResValues implements Serializable, QProcessElement, Cloneable {
     private Users editedBy;
     @JoinColumn(name = "ReplacedBy", referencedColumnName = "BWID")
     @OneToOne
-    private ResValues replacedBy;
+    private ResValue replacedBy;
     @JoinColumn(name = "ReplacementFor", referencedColumnName = "BWID")
     @OneToOne
-    private ResValues replacementFor;
+    private ResValue replacementFor;
     // ==
     // N:1 Relationen
     // ==
@@ -96,11 +97,14 @@ public class ResValues implements Serializable, QProcessElement, Cloneable {
     private Users user;
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
-    private Resident bewohner;
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "wert")
-//    private Collection<Sysbwerte2file> attachedFiles;
+    private Resident resident;
+    @JoinColumn(name = "Type", referencedColumnName = "ID")
+    @ManyToOne
+    private ResValueType vtype;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "value")
+    private Collection<SYSVAL2FILE> attachedFiles;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwerte")
-    private Collection<SYSVAL2PROCESS> attachedVorgaenge;
+    private Collection<SYSVAL2PROCESS> attachedProcesses;
 
 //    // ==
 //    // M:N Relationen
@@ -111,35 +115,27 @@ public class ResValues implements Serializable, QProcessElement, Cloneable {
 //    @JoinColumn(name = "VorgangID"))
 //    private Collection<QProcess> vorgaenge;
 
-    public ResValues() {
+    public ResValue() {
     }
 
-    public ResValues(Resident bewohner, Users user) {
-        this(new Date(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, "", new Date(), new Date(), ResValuesTools.UNKNOWN, null, null, null, user, bewohner);
+    public ResValue(Resident resident, Users user, ResValueType vtype) {
+        this(new Date(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, "", new Date(), new Date(), vtype, null, null, null, user, resident);
     }
 
-    public ResValues(Date pit, BigDecimal wert2, BigDecimal wert3, BigDecimal wert, String bemerkung, Date cdate, Date mdate, Integer type, Users editedBy, ResValues replacedBy, ResValues replacementFor, Users user, Resident bewohner) {
+    public ResValue(Date pit, BigDecimal val2, BigDecimal val3, BigDecimal val1, String text, Date createDate, Date editDate, ResValueType vtype, Users editedBy, ResValue replacedBy, ResValue replacementFor, Users user, Resident resident) {
         this.pit = pit;
-        this.wert2 = wert2;
-        this.wert3 = wert3;
-        this.wert = wert;
-        this.bemerkung = bemerkung;
-        this.cdate = cdate;
-        this.mdate = mdate;
-        this.type = type;
+        this.val2 = val2;
+        this.val3 = val3;
+        this.val1 = val1;
+        this.text = text;
+        this.createDate = createDate;
+        this.editDate = editDate;
+        this.vtype = vtype;
         this.editedBy = editedBy;
         this.replacedBy = replacedBy;
         this.replacementFor = replacementFor;
         this.user = user;
-        this.bewohner = bewohner;
-    }
-
-    public Long getBwid() {
-        return bwid;
-    }
-
-    public void setBwid(Long bwid) {
-        this.bwid = bwid;
+        this.resident = resident;
     }
 
     public Date getPit() {
@@ -151,27 +147,27 @@ public class ResValues implements Serializable, QProcessElement, Cloneable {
     }
 
     public BigDecimal getWert() {
-        return wert;
+        return val1;
     }
 
     public void setWert(BigDecimal wert) {
-        this.wert = wert;
+        this.val1 = wert;
     }
 
-    public Integer getType() {
-        return type;
+    public ResValueType getType() {
+        return vtype;
     }
 
-    public void setType(Integer type) {
-        this.type = type;
+    public void setType(ResValueType type) {
+        this.vtype = type;
     }
 
-    public String getBemerkung() {
-        return bemerkung;
+    public String getText() {
+        return text;
     }
 
-    public void setBemerkung(String bemerkung) {
-        this.bemerkung = bemerkung;
+    public void setText(String text) {
+        this.text = text;
     }
 
     public Users getEditedBy() {
@@ -182,50 +178,50 @@ public class ResValues implements Serializable, QProcessElement, Cloneable {
         this.editedBy = editedBy;
     }
 
-    public ResValues getReplacedBy() {
+    public ResValue getReplacedBy() {
         return replacedBy;
     }
 
-    public void setReplacedBy(ResValues replacedBy) {
+    public void setReplacedBy(ResValue replacedBy) {
         this.replacedBy = replacedBy;
     }
 
-    public ResValues getReplacementFor() {
+    public ResValue getReplacementFor() {
         return replacementFor;
     }
 
-    public void setReplacementFor(ResValues replacementFor) {
+    public void setReplacementFor(ResValue replacementFor) {
         this.replacementFor = replacementFor;
     }
 
-    public Date getCdate() {
-        return cdate;
+    public Date getCreateDate() {
+        return createDate;
     }
 
     public void setCdate(Date cdate) {
-        this.cdate = cdate;
+        this.createDate = cdate;
     }
 
     public Date getMdate() {
-        return mdate;
+        return editDate;
     }
 
     public void setMdate(Date mdate) {
-        this.mdate = mdate;
+        this.editDate = mdate;
     }
 
-    public boolean isOhneWert(){
-        return type == ResValuesTools.ERBRECHEN || type == ResValuesTools.STUHLGANG;
+    public boolean isWithoutValue() {
+        return vtype.getID() == ResValueTools.VOMIT || vtype.getID() == ResValueTools.STOOL;
     }
 
-    public Collection<SYSVAL2PROCESS> getAttachedVorgaenge() {
-        return attachedVorgaenge;
+    public Collection<SYSVAL2PROCESS> getAttachedQProcesses() {
+        return attachedProcesses;
     }
 
     @Override
-    public ArrayList<QProcess> getAttachedProcesses(){
+    public ArrayList<QProcess> getAttachedProcesses() {
         ArrayList<QProcess> list = new ArrayList<QProcess>();
-        for (SYSVAL2PROCESS att : attachedVorgaenge){
+        for (SYSVAL2PROCESS att : attachedProcesses) {
             list.add(att.getVorgang());
         }
         return list;
@@ -233,14 +229,14 @@ public class ResValues implements Serializable, QProcessElement, Cloneable {
 
     @Override
     public Resident getResident() {
-        return bewohner;
+        return resident;
     }
 
-    public boolean isWrongValues(){
-        if (type == ResValuesTools.RR){
-            return wert == null || wert2 == null || wert3 == null;
+    public boolean isWrongValues() {
+        if (vtype.getID() == ResValueTools.RR) {
+            return val1 == null || val2 == null || val3 == null;
         } else {
-            return wert == null;
+            return val1 == null;
         }
     }
 
@@ -264,29 +260,29 @@ public class ResValues implements Serializable, QProcessElement, Cloneable {
 
     public void setDeletedBy(Users deletedBy) {
         editedBy = deletedBy;
-        cdate = new Date();
+        createDate = new Date();
         replacedBy = null;
         replacementFor = null;
     }
 
-    public void setBewohner(Resident bewohner) {
-        this.bewohner = bewohner;
+    public void setResident(Resident resident) {
+        this.resident = resident;
     }
 
-    public BigDecimal getWert2() {
-        return wert2;
+    public BigDecimal getValue2() {
+        return val2;
     }
 
-    public void setWert2(BigDecimal wert2) {
-        this.wert2 = wert2;
+    public void setValue2(BigDecimal wert2) {
+        this.val2 = wert2;
     }
 
-    public BigDecimal getWert3() {
-        return wert3;
+    public BigDecimal getValue3() {
+        return val3;
     }
 
-    public void setWert3(BigDecimal wert3) {
-        this.wert3 = wert3;
+    public void setValue3(BigDecimal wert3) {
+        this.val3 = wert3;
     }
 
     public Users getUser() {
@@ -304,44 +300,44 @@ public class ResValues implements Serializable, QProcessElement, Cloneable {
 
     @Override
     public String getContentAsHTML() {
-        return ResValuesTools.getAsHTML(this, false);
+        return "";
     }
 
     @Override
     public String getPITAsHTML() {
-        return ResValuesTools.getPITasHTML(this, false, false);
+        return ResValueTools.getPITasHTML(this, false, false);
     }
 
     @Override
     public long getID() {
-        return bwid;
+        return id;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (bwid != null ? bwid.hashCode() : 0);
+        hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
 
     @Override
     public String getTitle() {
-        return ResValuesTools.getTitle(this);
+        return "";
     }
 
     @Override
-    public ResValues clone() {
-        return new ResValues(pit, wert2, wert3, wert, bemerkung, new Date(), new Date(), type, editedBy, replacedBy, replacementFor, user, bewohner);
+    public ResValue clone() {
+        return new ResValue(pit, val2, val3, val1, text, new Date(), new Date(), vtype, editedBy, replacedBy, replacementFor, user, resident);
     }
 
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof ResValues)) {
+        if (!(object instanceof ResValue)) {
             return false;
         }
-        ResValues other = (ResValues) object;
-        if ((this.bwid == null && other.bwid != null) || (this.bwid != null && !this.bwid.equals(other.bwid))) {
+        ResValue other = (ResValue) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
         return true;
@@ -349,6 +345,6 @@ public class ResValues implements Serializable, QProcessElement, Cloneable {
 
     @Override
     public String toString() {
-        return "entity.ResValues[bwid=" + bwid + "]";
+        return "entity.values.ResValue[bwid=" + id + "]";
     }
 }

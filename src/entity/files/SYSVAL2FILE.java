@@ -25,7 +25,7 @@ package entity.files;
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  */
 
-import entity.ResValues;
+import entity.values.ResValue;
 import entity.system.Users;
 
 import javax.persistence.*;
@@ -50,7 +50,7 @@ public class SYSVAL2FILE implements Serializable {
     private Date pit;
     @JoinColumn(name = "ForeignID", referencedColumnName = "BWID")
     @ManyToOne
-    private ResValues value;
+    private ResValue value;
     @JoinColumn(name = "FID", referencedColumnName = "OCFID")
     @ManyToOne
     private SYSFiles sysfile;
@@ -61,7 +61,7 @@ public class SYSVAL2FILE implements Serializable {
     public SYSVAL2FILE() {
     }
 
-    public SYSVAL2FILE(SYSFiles sysfile, ResValues value, Users user, Date pit) {
+    public SYSVAL2FILE(SYSFiles sysfile, ResValue value, Users user, Date pit) {
         this.sysfile = sysfile;
         this.value = value;
         this.user = user;
@@ -85,7 +85,7 @@ public class SYSVAL2FILE implements Serializable {
         return sysfile;
     }
 
-    public ResValues getValue() {
+    public ResValue getValue() {
         return value;
     }
 

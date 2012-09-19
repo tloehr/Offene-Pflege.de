@@ -69,10 +69,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
@@ -117,17 +113,12 @@ public class PnlPrescription extends NursingRecordsPanel {
     @Override
     public void switchResident(Resident resident) {
         this.resident = resident;
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
-//        lstPrescriptions = PrescriptionTools.getAll(resident);
-        OPDE.getDisplayManager().clearSubMessages();
-//        Collections.sort(lstPrescriptions);
         OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(resident));
         reloadDisplay();
     }
 
     @Override
     public void reload() {
-
         reloadDisplay();
     }
 
@@ -140,8 +131,6 @@ public class PnlPrescription extends NursingRecordsPanel {
          *     |_|  \___|_|\___/ \__,_|\__,_|____/|_|___/ .__/|_|\__,_|\__, |
          *                                              |_|            |___/
          */
-
-
         final boolean withworker = true;
         cpsPrescription.removeAll();
         cpMap.clear();
@@ -194,12 +183,12 @@ public class PnlPrescription extends NursingRecordsPanel {
 
     private CollapsiblePane createCP4(final Prescription prescription) {
         /***
-         *                          _        ____ ____  _  _    _____                      _                 __
-         *       ___ _ __ ___  __ _| |_ ___ / ___|  _ \| || |  / /_ _|_ ____   _____ _ __ | |_ ___  _ __ _   \ \
-         *      / __| '__/ _ \/ _` | __/ _ \ |   | |_) | || |_| | | || '_ \ \ / / _ \ '_ \| __/ _ \| '__| | | | |
-         *     | (__| | |  __/ (_| | ||  __/ |___|  __/|__   _| | | || | | \ V /  __/ | | | || (_) | |  | |_| | |
-         *      \___|_|  \___|\__,_|\__\___|\____|_|      |_| | ||___|_| |_|\_/ \___|_| |_|\__\___/|_|   \__, | |
-         *                                                     \_\                                       |___/_/
+         *                          _        ____ ____  _  _    ______                          _       _   _           __
+         *       ___ _ __ ___  __ _| |_ ___ / ___|  _ \| || |  / /  _ \ _ __ ___  ___  ___ _ __(_)_ __ | |_(_) ___  _ __\ \
+         *      / __| '__/ _ \/ _` | __/ _ \ |   | |_) | || |_| || |_) | '__/ _ \/ __|/ __| '__| | '_ \| __| |/ _ \| '_ \| |
+         *     | (__| | |  __/ (_| | ||  __/ |___|  __/|__   _| ||  __/| | |  __/\__ \ (__| |  | | |_) | |_| | (_) | | | | |
+         *      \___|_|  \___|\__,_|\__\___|\____|_|      |_| | ||_|   |_|  \___||___/\___|_|  |_| .__/ \__|_|\___/|_| |_| |
+         *                                                     \_\                               |_|                    /_/
          */
         final String key = prescription.getID() + ".xprescription";
         if (!cpMap.containsKey(key)) {
@@ -681,9 +670,9 @@ public class PnlPrescription extends NursingRecordsPanel {
 
             btnFiles.setEnabled(!prescription.isDiscontinued());
             if (prescription.getAttachedFiles().size() > 0) {
-                JLabel lblNum = new JLabel(Integer.toString(prescription.getAttachedFiles().size()), SYSConst.icon16redStar, SwingConstants.CENTER);
+                JLabel lblNum = new JLabel(Integer.toString(prescription.getAttachedFiles().size()), SYSConst.icon16greenStar, SwingConstants.CENTER);
                 lblNum.setFont(SYSConst.ARIAL10BOLD);
-                lblNum.setForeground(Color.YELLOW);
+                lblNum.setForeground(Color.BLUE);
                 lblNum.setHorizontalTextPosition(SwingConstants.CENTER);
                 DefaultOverlayable overlayableBtn = new DefaultOverlayable(btnFiles, lblNum, DefaultOverlayable.CENTER);
                 overlayableBtn.setOpaque(false);
@@ -1260,7 +1249,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                 buildPanel();
             }
         });
-
+        tbClosed.setHorizontalAlignment(SwingConstants.LEFT);
         list.add(tbClosed);
 
         return list;

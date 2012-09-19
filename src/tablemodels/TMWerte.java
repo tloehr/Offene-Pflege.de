@@ -26,8 +26,8 @@
  */
 package tablemodels;
 
-import entity.ResValues;
-import entity.ResValuesTools;
+import entity.values.ResValue;
+import entity.values.ResValueTools;
 import entity.info.Resident;
 import op.OPDE;
 import op.threads.DisplayMessage;
@@ -51,7 +51,7 @@ public class TMWerte
     public static final int COL_COMMENT = 2;
 
     private boolean showids = false;
-    private ArrayList<ResValues> content;
+    private ArrayList<ResValue> content;
     private Resident bewohner;
 
     /**
@@ -75,7 +75,7 @@ public class TMWerte
 //                            " INNER JOIN " +
 //                            " (" +
 //                            " 	SELECT DISTINCT f1.BWID, ifnull(anzahl,0) anzahl" +
-//                            " 	FROM ResValues f1" +
+//                            " 	FROM ResValue f1" +
 //                            " 	LEFT OUTER JOIN (" +
 //                            " 		SELECT BWID, count(*) anzahl FROM SYSBWERTE2FILE" +
 //                            " 		GROUP BY BWID" +
@@ -86,7 +86,7 @@ public class TMWerte
 //                            " INNER JOIN " +
 //                            " (" +
 //                            " 	SELECT DISTINCT f2.BWID, ifnull(anzahl,0) anzahl" +
-//                            " 	FROM ResValues f2" +
+//                            " 	FROM ResValue f2" +
 //                            " 	LEFT OUTER JOIN (" +
 //                            " 		SELECT ForeignKey, count(*) anzahl FROM SYSBWERTE2VORGANG" +
 //                            " 		GROUP BY BWID " +
@@ -107,7 +107,7 @@ public class TMWerte
             }
 
             List<BigInteger> rawlist = query.getResultList();
-            content = new ArrayList<ResValues>(rawlist.size());
+            content = new ArrayList<ResValue>(rawlist.size());
 
             int i = 0;
             for (BigInteger bigint : rawlist) {
@@ -115,7 +115,7 @@ public class TMWerte
                     OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.loading"), i, rawlist.size()));
                 }
 
-                content.add(em.find(ResValues.class, bigint.longValue()));
+                content.add(em.find(ResValue.class, bigint.longValue()));
                 i++;
             }
 
@@ -130,15 +130,15 @@ public class TMWerte
         return content.size();
     }
 
-    public ArrayList<ResValues> getContent() {
+    public ArrayList<ResValue> getContent() {
         return content;
     }
 
-    public ResValues getBWert(int row) {
+    public ResValue getBWert(int row) {
         return content.get(row);
     }
 
-    public void setBWert(int row, ResValues wert) {
+    public void setBWert(int row, ResValue wert) {
         content.set(row, wert);
         fireTableRowsUpdated(row, row);
     }
@@ -160,7 +160,7 @@ public class TMWerte
         String result = "";
 //        String color = "";
 
-        ResValues wert = content.get(row);
+        ResValue wert = content.get(row);
 
 //        if (wert.isReplaced()) {
 //            color = SYSConst.html_lightslategrey;
@@ -171,15 +171,15 @@ public class TMWerte
 
         switch (col) {
             case COL_PIT: { // COL_DATUM
-                result = ResValuesTools.getPITasHTML(wert, showids, true);
+                result = ResValueTools.getPITasHTML(wert, showids, true);
                 break;
             }
             case COL_CONTENT: {
-                result = ResValuesTools.getAsHTML(wert, true);
+                result = ResValueTools.getAsHTML(wert, true);
                 break;
             }
             case COL_COMMENT: {
-                result = ResValuesTools.getTExtAsHTML(wert, true);
+                result = ResValueTools.getTExtAsHTML(wert, true);
                 break;
             }
 

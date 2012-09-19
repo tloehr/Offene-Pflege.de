@@ -367,7 +367,7 @@ public class DBHandling {
                             s += "<h" + (headertiefe + 2) + ">" + bwlabel + "</h" + (headertiefe + 2) + "> ";
 
                             // TODO: Das hier muss wieder gefixt werden.
-//                            ResValues groesse = ResValuesTools.getLast(bewohner, ResValuesTools.GROESSE);
+//                            ResValue groesse = ResValueTools.getLast(bewohner, ResValueTools.HEIGHT);
 //                            startGewicht = rs.getDouble("Wert");
 //                            if (groesse == null) {
 //                                gr = -1d;
@@ -1362,8 +1362,8 @@ public class DBHandling {
 //                    }
 //
 //                    String s = " SELECT * FROM (" +
-//                            "       SELECT PIT, SUM(Wert) EINFUHR FROM ResValues " +
-//                            "       WHERE ReplacedBy = 0 AND Wert > 0 AND BWKennung=? AND XML='<BILANZ/>' " +
+//                            "       SELECT PIT, SUM(Wert) EINFUHR FROM ResValue " +
+//                            "       WHERE ReplacedBy = 0 AND Wert > 0 AND BWKennung=? AND XML='<LIQUIDBALANCE/>' " +
 //                            "       AND DATE(PIT) >= ADDDATE(DATE(now()), INTERVAL ? DAY) " +
 //                            "       Group By DATE(PIT) " +
 //                            "       ORDER BY PIT desc " +

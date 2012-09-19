@@ -333,6 +333,7 @@ public class SYSConst {
     public static final Icon icon16exec = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/exec.png"));
     public static final Icon icon16pit = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/pointintime.png"));
     public static final Icon icon16redStar = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/redstar.png"));
+    public static final Icon icon16greenStar = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/greenstar.png"));
     public static final Icon icon16unlink = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/unlink.png"));
     public static final Icon icon16unlinkPressed = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/unlink_pressed.png"));
     public static final Icon icon22add = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/add.png"));

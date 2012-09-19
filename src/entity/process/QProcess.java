@@ -4,7 +4,7 @@
  */
 package entity.process;
 
-import entity.ResValues;
+import entity.values.ResValue;
 import entity.system.Users;
 import entity.info.BWInfo;
 import entity.info.Resident;
@@ -122,7 +122,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
 //    @JoinTable(name = "SYSBWERTE2VORGANG", joinColumns =
 //    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
 //    @JoinColumn(name = "BWID"))
-//    private Collection<ResValues> bwerte;
+//    private Collection<ResValue> bwerte;
 
     public QProcess() {
     }
@@ -154,7 +154,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
     public void removeElement(QProcessElement element) {
         if (element instanceof NReport) {
             getAttachedNReportConnections().remove(element);
-        } else if (element instanceof ResValues) {
+        } else if (element instanceof ResValue) {
             getAttachedResidentValues().remove(element);
         } else if (element instanceof Prescription) {
             getAttachedPrescriptionConnections().remove(element);

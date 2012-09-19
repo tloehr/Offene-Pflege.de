@@ -6,7 +6,7 @@
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <class>entity.system.Acl</class>
         <class>entity.prescription.Doc</class>
-        <class>entity.ResValues</class>
+        <class>entity.values.ResValue</class>
         <class>entity.Allowance</class>
         <class>entity.Betreuer</class>
         <class>entity.info.Resident</class>
@@ -63,6 +63,8 @@
         <class>entity.process.PReport</class>
         <class>entity.process.PCat</class>
         <class>entity.process.QProcess</class>
+        <class>entity.values.ResValueType</class>
+        <class>entity.values.ResValueType</class>
         <properties>
             <property name="javax.persistence.jdbc.url" value="jdbc:mysql://srv0004:3306/opde"/>
             <property name="javax.persistence.jdbc.password" value="75r9qq8"/>
