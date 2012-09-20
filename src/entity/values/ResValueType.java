@@ -1,6 +1,9 @@
 package entity.values;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,6 +26,19 @@ public class ResValueType {
     public void setID(long id) {
         this.id = id;
     }
+
+    private int valtype;
+
+    @javax.persistence.Column(name = "ValType", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
+    @Basic
+    public int getValType() {
+        return valtype;
+    }
+
+    public void setValType(int valtype) {
+        this.valtype = valtype;
+    }
+
 
     private String text;
 
@@ -56,6 +72,7 @@ public class ResValueType {
         ResValueType that = (ResValueType) o;
 
         if (id != that.id) return false;
+        if (valtype != that.valtype) return false;
         if (text != null ? !text.equals(that.text) : that.text != null) return false;
         if (unit != null ? !unit.equals(that.unit) : that.unit != null) return false;
 
@@ -65,6 +82,7 @@ public class ResValueType {
     @Override
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + valtype;
         result = 31 * result + (text != null ? text.hashCode() : 0);
         result = 31 * result + (unit != null ? unit.hashCode() : 0);
         return result;

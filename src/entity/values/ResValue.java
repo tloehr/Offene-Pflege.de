@@ -146,7 +146,7 @@ public class ResValue implements Serializable, QProcessElement, Cloneable {
         this.pit = pit;
     }
 
-    public BigDecimal getWert() {
+    public BigDecimal getValue1() {
         return val1;
     }
 

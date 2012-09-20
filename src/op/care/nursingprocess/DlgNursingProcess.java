@@ -43,7 +43,6 @@ import op.tools.Pair;
 import op.tools.SYSConst;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.HorizontalLayout;
-import tablemodels.TMPlanung;
 import tablerenderer.RNDHTML;
 
 import javax.swing.*;

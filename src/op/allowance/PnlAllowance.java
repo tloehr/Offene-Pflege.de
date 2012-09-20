@@ -396,6 +396,7 @@ public class PnlAllowance extends CleanablePanel {
 
     private JPanel createContentPanel4(final Resident resident) {
         JPanel pnlContent = new JPanel(new VerticalLayout());
+        // TODO: Fix this. what happens if there are not allowances at all yet ?
         Pair<Allowance, Allowance> minmax = AllowanceTools.getMinMax(resident);
 
         if (minmax != null) {
@@ -528,7 +529,7 @@ public class PnlAllowance extends CleanablePanel {
         btnPrintYear.setAlignmentX(Component.RIGHT_ALIGNMENT);
         btnPrintYear.setContentAreaFilled(false);
         btnPrintYear.setBorder(null);
-        btnPrintYear.setToolTipText(OPDE.lang.getString(internalClassID + ".btnprintmonth.tooltip"));
+        btnPrintYear.setToolTipText(OPDE.lang.getString("misc.tooltips.btnprintyear"));
         btnPrintYear.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -718,7 +719,7 @@ public class PnlAllowance extends CleanablePanel {
         btnPrintMonth.setAlignmentX(Component.RIGHT_ALIGNMENT);
         btnPrintMonth.setContentAreaFilled(false);
         btnPrintMonth.setBorder(null);
-        btnPrintMonth.setToolTipText(OPDE.lang.getString(internalClassID + ".btnprintmonth.tooltip"));
+        btnPrintMonth.setToolTipText(OPDE.lang.getString("misc.tooltips.btnprintmonth"));
         btnPrintMonth.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {

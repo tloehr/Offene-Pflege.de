@@ -19,7 +19,10 @@ import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,7 +32,7 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class ResValueTools {
-    public static final int UNKNOWN = 0;
+
     public static final int RR = 1;
     public static final int PULSE = 2;
     public static final int TEMP = 3;
@@ -41,36 +44,12 @@ public class ResValueTools {
     public static final int STOOL = 9;
     public static final int VOMIT = 10;
     public static final int LIQUIDBALANCE = 11;
+
     public static final String[] VALUES = new String[]{"UNKNOWN", "RR", "PULSE", "TEMP", "GLUCOSE", "WEIGHT", "HEIGHT", "BREATHING", "QUICK", "STOOL", "VOMIT", "LIQUIDBALANCE"};
 
     public static final String[] UNITS = new String[]{"", "mmHg", "s/m", "°C", "mg/dl", "kg", "m", "A/m", "%", "", "", "ml"};
     public static final String RRSYS = "systolisch";
     public static final String RRDIA = "diatolisch";
-
-
-    public static HashMap<Integer, String> getByID() {
-        HashMap<Integer, String> table = new HashMap<Integer, String>();
-        for (int i = 0; i <= 11; i++) {
-            table.put(i, OPDE.lang.getString("misc.msg." + VALUES[i]));
-        }
-        return table;
-    }
-
-    public static HashMap<Integer, String> getUnitsByID() {
-        HashMap<Integer, String> table = new HashMap<Integer, String>();
-        for (int i = 0; i <= 11; i++) {
-            table.put(i, OPDE.lang.getString("misc.msg.unit." + VALUES[i]));
-        }
-        return table;
-    }
-
-    public static HashMap<String, Integer> getByStringID() {
-        HashMap<String, Integer> table = new HashMap<String, Integer>();
-        for (int i = 0; i <= 11; i++) {
-            table.put(OPDE.lang.getString("misc.msg." + VALUES[i]), i);
-        }
-        return table;
-    }
 
     /**
      * Rendert eine HTML Darstellung des Datums und des Benutzers eines bestimmten Bewohner Wertes
@@ -179,11 +158,11 @@ public class ResValueTools {
 //        }
 //
 //        if (bwert.getType() == RR) {
-//            result += "<b>" + bwert.getWert() + "/" + bwert.getValue2() + " " + UNITS[RR] + " " + VALUES[PULSE] + ": " + bwert.getValue3() + " " + UNITS[PULSE] + "</b>";
+//            result += "<b>" + bwert.getValue1() + "/" + bwert.getValue2() + " " + UNITS[RR] + " " + VALUES[PULSE] + ": " + bwert.getValue3() + " " + UNITS[PULSE] + "</b>";
 //        } else if (bwert.getType() == STOOL || bwert.getType() == VOMIT) {
 //            result += "<i>" + OPDE.lang.getString("misc.msg.novalue") + "</i>";
 //        } else {
-//            result += "<b>" + bwert.getWert() + " " + UNITS[bwert.getType()] + "</b>";
+//            result += "<b>" + bwert.getValue1() + " " + UNITS[bwert.getType()] + "</b>";
 //        }
 //
 //        result += " (" + VALUES[bwert.getType()] + ")";
@@ -198,15 +177,15 @@ public class ResValueTools {
 //    public static String getTitle(ResValue param) {
 //        String result = "";
 //        if (param.getType() == RR) {
-//            result += "<b>" + param.getWert() + "/" + param.getValue2() + " " + UNITS[RR] + " " + VALUES[PULSE] + ": " + param.getValue3() + " " + UNITS[PULSE] + "</b>";
+//            result += "<b>" + param.getValue1() + "/" + param.getValue2() + " " + UNITS[RR] + " " + VALUES[PULSE] + ": " + param.getValue3() + " " + UNITS[PULSE] + "</b>";
 //        } else if (param.getType() == STOOL || param.getType() == VOMIT) {
 //            result += "<i>" + OPDE.lang.getString("misc.msg.novalue") + "</i>";
 //        } else {
-//            result += "<b>" + param.getWert() + " " + UNITS[param.getType()] + "</b>";
+//            result += "<b>" + param.getValue1() + " " + UNITS[param.getType()] + "</b>";
 //        }
 //        return result;
 //    }
-    public static String getTExtAsHTML(ResValue wert, boolean colorize) {
+    public static String getTextAsHTML(ResValue wert, boolean colorize) {
         String result = "";
         if (!SYSTools.catchNull(wert.getText()).isEmpty()) {
             String color = "";
@@ -242,7 +221,7 @@ public class ResValueTools {
             html += "<tr>";
             html += "<td>" + getPITasHTML(wert, false, false) + "</td>";
 //            html += "<td>" + getAsHTML(wert, false) + "</td>";
-            html += "<td>" + getTExtAsHTML(wert, false) + "</td>";
+            html += "<td>" + getTextAsHTML(wert, false) + "</td>";
             html += "</tr>\n";
         }
 
@@ -387,24 +366,66 @@ public class ResValueTools {
      * @param resident
      * @return
      */
-    public static Pair<ResValue, ResValue> getMinMax(Resident resident, ResValueType type) {
-        Pair<ResValue, ResValue> result = null;
+    public static Pair<DateTime, DateTime> getMinMax(Resident resident, ResValueType vtype) {
+        Pair<DateTime, DateTime> result = null;
 
         EntityManager em = OPDE.createEM();
-        Query queryMin = em.createQuery("SELECT rv FROM ResValue rv WHERE rv.resident = :resident ORDER BY rv.pit ASC ");
+        Query queryMin = em.createQuery("SELECT rv FROM ResValue rv WHERE rv.resident = :resident AND rv.vtype = :vtype ORDER BY rv.pit ASC ");
         queryMin.setParameter("resident", resident);
+        queryMin.setParameter("vtype", vtype);
         queryMin.setMaxResults(1);
 
-        Query queryMax = em.createQuery("SELECT rv FROM ResValue rv WHERE rv.resident = :resident ORDER BY rv.pit DESC ");
+        Query queryMax = em.createQuery("SELECT rv FROM ResValue rv WHERE rv.resident = :resident AND rv.vtype = :vtype ORDER BY rv.pit DESC ");
         queryMax.setParameter("resident", resident);
+        queryMax.setParameter("vtype", vtype);
         queryMax.setMaxResults(1);
 
         try {
             ArrayList<ResValue> min = new ArrayList<ResValue>(queryMin.getResultList());
             ArrayList<ResValue> max = new ArrayList<ResValue>(queryMax.getResultList());
-            result = new Pair<ResValue, ResValue>(min.get(0), max.get(0));
+            if (min.isEmpty()) {
+                result = null;
+            } else {
+                result = new Pair<DateTime, DateTime>(new DateTime(min.get(0).getPit()), new DateTime(max.get(0).getPit()));
+            }
+
         } catch (Exception e) {
             OPDE.fatal(e);
+        }
+        return result;
+    }
+
+    public static ArrayList<ResValue> getResValues(Resident resident, ResValueType vtype, DateTime month) {
+        DateTime from = month.dayOfMonth().withMinimumValue();
+        DateTime to = month.dayOfMonth().withMaximumValue();
+
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("" +
+                " SELECT rv FROM ResValue rv " +
+                " WHERE rv.resident = :resident " +
+                " AND rv.vtype = :vtype" +
+                " AND rv.pit >= :from" +
+                " AND rv.pit <= :to" +
+                " ORDER BY rv.pit DESC ");
+        query.setParameter("resident", resident);
+        query.setParameter("vtype", vtype);
+        query.setParameter("from", from.toDate());
+        query.setParameter("to", to.toDate());
+        ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
+        em.close();
+
+        return list;
+    }
+
+
+    public static String getValueAsHTML(ResValue rv) {
+        String result = "";
+        if (rv.getType().getValType() == RR) {
+            result += "<b>" + rv.getValue1() + "/" + rv.getValue2() + " " + ": " + rv.getValue3() + " " + rv.getType().getUnit() + "</b>";
+        } else if (rv.getType().getValType() == STOOL || rv.getType().getValType() == VOMIT) {
+            result += "<i>" + OPDE.lang.getString("misc.msg.novalue") + "</i>";
+        } else {
+            result += "<b>" + rv.getValue1() + " " + rv.getType().getUnit() + "</b>";
         }
         return result;
     }

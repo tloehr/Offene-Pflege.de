@@ -33,6 +33,7 @@
         <class>entity.files.SYSFiles</class>
         <class>entity.files.SYSINF2FILE</class>
         <class>entity.files.SYSNR2FILE</class>
+        <class>entity.files.SYSVAL2FILE</class>
         <class>entity.files.SYSPRE2FILE</class>
         <class>entity.info.BWInfo</class>
         <class>entity.info.BWInfoKat</class>

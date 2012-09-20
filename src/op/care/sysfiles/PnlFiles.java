@@ -43,7 +43,6 @@ import op.tools.NursingRecordsPanel;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
-import tablemodels.TMSYSFiles;
 import tablerenderer.RNDHTML;
 
 import javax.persistence.EntityManager;

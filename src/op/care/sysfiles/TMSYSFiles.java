@@ -23,7 +23,7 @@
  * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht,
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  */
-package tablemodels;
+package op.care.sysfiles;
 
 import entity.files.SYSFiles;
 import entity.files.SYSFilesTools;

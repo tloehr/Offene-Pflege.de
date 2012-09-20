@@ -378,7 +378,7 @@ public class DBHandling {
 //                                prevBMI = -1d;
 //                            } else {
 ////                                gr = ((Double) groesse.get(1)).doubleValue();
-//                                s += "Groesse: " + groesse.getWert().toPlainString() + " m";
+//                                s += "Groesse: " + groesse.getValue1().toPlainString() + " m";
 //                                startBMI = (startGewicht / (gr * gr));
 //                                bmiPlusMinus = 0d;
 //                                //bmiProzent = 0d;

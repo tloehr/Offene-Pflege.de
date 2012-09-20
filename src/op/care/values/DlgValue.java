@@ -1,217 +1,239 @@
 /*
- * Created by JFormDesigner on Wed Jun 13 11:31:13 CEST 2012
+ * Created by JFormDesigner on Thu Jun 14 14:23:47 CEST 2012
  */
 
 package op.care.values;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.values.ResValue;
-import entity.values.ResValueTools;
-import op.OPDE;
-import op.threads.DisplayMessage;
-import op.tools.MyJDialog;
-import op.tools.PnlUhrzeitDatum;
-import op.tools.SYSConst;
-import org.apache.commons.collections.Closure;
-import org.jdesktop.swingx.HorizontalLayout;
-import org.jdesktop.swingx.VerticalLayout;
+import op.tools.SYSTools;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.math.BigDecimal;
-
-import java.util.Date;
 
 /**
  * @author Torsten Löhr
  */
-public class DlgValue extends MyJDialog {
-    public static final String internalClassID = "nursingrecords.vitalparameters.dialog";
+public class DlgValue extends JDialog {
+    private BigDecimal wert1, wert2, wert3;
+    private String lbl1, lbl1einheit, lbl2, lbl2einheit, lbl3, lbl3einheit;
 
-    private ResValue wert;
-    private Closure actionBlock;
-    private int type;
+    public DlgValue(BigDecimal wert, String lbl, String lbleinheit) {
+        this(wert, null, null, lbl, lbleinheit, null, null, null, null);
+    }
 
-    private PnlUhrzeitDatum pnlUhrzeitDatum;
-
-    public DlgValue(ResValue wert, Closure actionBlock) {
-        super();
-        this.wert = wert;
-        this.actionBlock = actionBlock;
+    public DlgValue(BigDecimal wert1, BigDecimal wert2, BigDecimal wert3, String lbl1, String lbl1einheit, String lbl2, String lbl2einheit, String lbl3, String lbl3einheit) {
+        this.wert1 = wert1;
+        this.wert2 = wert2;
+        this.wert3 = wert3;
+        this.lbl1 = lbl1;
+        this.lbl2 = lbl2;
+        this.lbl3 = lbl3;
+        this.lbl1einheit = lbl1einheit;
+        this.lbl2einheit = lbl2einheit;
+        this.lbl3einheit = lbl3einheit;
         initComponents();
-        initDialog();
-        pack();
-        setVisible(true);
+        initPanel();
     }
 
-    private boolean saveOK() {
+    public void initPanel() {
+        setWert1Visible(wert1 != null);
+        setWert2Visible(wert2 != null);
+        setWert3Visible(wert3 != null);
 
-        PnlWerte123 pnl123 = tabWert.getSelectedComponent() instanceof PnlWerte123 ? (PnlWerte123) tabWert.getSelectedComponent() : null;
-
-        boolean wert1OK = type == ResValueTools.VOMIT || type == ResValueTools.STOOL || pnl123.getWert1() != null;
-        boolean wert2OK = type != ResValueTools.RR || pnl123.getWert2() != null && pnl123.getWert2().compareTo(BigDecimal.ZERO) > 0;
-        boolean wert3OK = type != ResValueTools.RR || pnl123.getWert3() != null && pnl123.getWert3().compareTo(BigDecimal.ZERO) > 0;
-        boolean bemerkungOK = (type != ResValueTools.VOMIT && type != ResValueTools.STOOL) || !txtBemerkung.getText().trim().isEmpty();
-
-        String ursache = "";
-        ursache += (wert1OK ? "" : "Der 1. Wert ist falsch");
-        ursache += (wert2OK ? "" : "Der 2. Wert ist falsch.");
-        ursache += (wert3OK ? "" : "Der 3. Wert ist falsch.");
-
-        ursache += (bemerkungOK ? "" : "Bei Stuhlgang oder Erbrechen müssen Sie <b>unbedingt</b> eine Bemerkung eintragen. ");
-
-        if (!ursache.isEmpty()) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("<html>" + ursache + "</html>", DisplayMessage.WARNING));
+        if (wert1 != null) {
+            lblWert1.setText(lbl1);
+            txtWert1.setText(wert1.toPlainString());
+            lblWert1Einheit.setText(lbl1einheit);
         }
-        return wert1OK & wert2OK & wert3OK & bemerkungOK;
 
-    }
-
-    @Override
-    public void dispose() {
-        actionBlock.execute(wert);
-        super.dispose();
-    }
-
-    private boolean save() {
-        if (!saveOK()) return false;
-        PnlWerte123 pnl123 = tabWert.getSelectedComponent() instanceof PnlWerte123 ? (PnlWerte123) tabWert.getSelectedComponent() : null;
-
-        wert.setPit(pnlUhrzeitDatum.getPIT());
-        wert.setText(txtBemerkung.getText().trim());
-        wert.setCdate(new Date());
-//        wert.setType(type);
-        wert.setWert(type == ResValueTools.VOMIT || type == ResValueTools.STOOL ? null : pnl123.getWert1());
-        wert.setValue2(type != ResValueTools.RR ? null : pnl123.getWert2());
-        wert.setValue3(type != ResValueTools.RR ? null : pnl123.getWert3());
-
-        return true;
-    }
-
-    private void initDialog() {
-
-        pnlUhrzeitDatum = new PnlUhrzeitDatum(new Date());
-        contentPanel.add(pnlUhrzeitDatum, CC.xy(3, 3));
-
-        for (int tabnum = 1; tabnum < ResValueTools.VALUES.length; tabnum++) {
-            if (tabnum == ResValueTools.RR) {
-                tabWert.addTab(ResValueTools.VALUES[ResValueTools.RR], new PnlWerte123(new BigDecimal(120), new BigDecimal(80), new BigDecimal(60), ResValueTools.RRSYS, ResValueTools.UNITS[ResValueTools.RR], ResValueTools.RRDIA, ResValueTools.UNITS[ResValueTools.RR], ResValueTools.VALUES[ResValueTools.PULSE], ResValueTools.UNITS[ResValueTools.PULSE]));
-            } else if (tabnum == ResValueTools.VOMIT || tabnum == ResValueTools.STOOL) {
-                JLabel lbl = new JLabel("Bemerkung nicht vergessen");
-                lbl.setHorizontalAlignment(SwingConstants.CENTER);
-                lbl.setFont(SYSConst.ARIAL20);
-                tabWert.addTab(ResValueTools.VALUES[tabnum], new JPanel(new VerticalLayout()).add(lbl));
-            } else {
-                tabWert.addTab(ResValueTools.VALUES[tabnum], new PnlWerte123(BigDecimal.ONE, ResValueTools.VALUES[tabnum], ResValueTools.UNITS[tabnum]));
-            }
+        if (wert2 != null) {
+            lblWert2.setText(lbl2);
+            txtWert2.setText(wert2.toPlainString());
+            lblWert2Einheit.setText(lbl2einheit);
         }
-//        jdcDatum.setDate(new Date());
-//        uhrzeit = new Time(new Date().getTime());
-//        txtUhrzeit.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(uhrzeit));
+
+        if (wert3 != null) {
+            lblWert3.setText(lbl3);
+            txtWert3.setText(wert3.toPlainString());
+            lblWert3Einheit.setText(lbl3einheit);
+        }
 
     }
 
-    private void tabWertStateChanged(ChangeEvent e) {
-        type = tabWert.getSelectedIndex() + 1;
+    public BigDecimal getWert1() {
+        return wert1;
     }
 
-    private void btnSaveActionPerformed(ActionEvent e) {
-        if (save()) {
-            dispose();
+    public BigDecimal getWert2() {
+        return wert2;
+    }
+
+    public BigDecimal getWert3() {
+        return wert3;
+    }
+
+    private void setWert1Visible(boolean visible) {
+        lblWert1.setVisible(visible);
+        txtWert1.setVisible(visible);
+        lblWert1Einheit.setVisible(visible);
+    }
+
+    private void setWert2Visible(boolean visible) {
+        lblWert2.setVisible(visible);
+        txtWert2.setVisible(visible);
+        lblWert2Einheit.setVisible(visible);
+    }
+
+    private void setWert3Visible(boolean visible) {
+        lblWert3.setVisible(visible);
+        txtWert3.setVisible(visible);
+        lblWert3Einheit.setVisible(visible);
+    }
+
+    private void txtWert1FocusLost(FocusEvent e) {
+        wert1 = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
+        if (wert1 != null){
+            ((JTextField) e.getSource()).setText(wert1.toPlainString());
         }
     }
 
-    private void btnCancelActionPerformed(ActionEvent e) {
-        wert = null;
-        dispose();
+    private void txtWert2FocusLost(FocusEvent e) {
+        wert2 = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
+        if (wert2 != null){
+            ((JTextField) e.getSource()).setText(wert2.toPlainString());
+        }
     }
 
+    private void txtWert3FocusLost(FocusEvent e) {
+        wert3 = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
+        if (wert3 != null){
+            ((JTextField) e.getSource()).setText(wert3.toPlainString());
+        }
+    }
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
-        contentPanel = new JPanel();
-        tabWert = new JTabbedPane();
-        scrollPane1 = new JScrollPane();
-        txtBemerkung = new JTextArea();
+        lblWert1 = new JLabel();
+        txtWert1 = new JTextField();
+        lblWert1Einheit = new JLabel();
+        lblWert2 = new JLabel();
+        txtWert2 = new JTextField();
+        lblWert2Einheit = new JLabel();
+        lblWert3 = new JLabel();
+        txtWert3 = new JTextField();
+        lblWert3Einheit = new JLabel();
         panel1 = new JPanel();
         btnCancel = new JButton();
-        btnSave = new JButton();
+        btnApply = new JButton();
 
         //======== this ========
         Container contentPane = getContentPane();
-        contentPane.setLayout(new BorderLayout());
+        contentPane.setLayout(new FormLayout(
+            "$rgap, $lcgap, default, $lcgap, default:grow, $lcgap, default, $lcgap, $rgap",
+            "$rgap, 5*($lgap, default)"));
 
-        //======== contentPanel ========
+        //---- lblWert1 ----
+        lblWert1.setText("text");
+        lblWert1.setFont(new Font("Arial", Font.PLAIN, 14));
+        contentPane.add(lblWert1, CC.xy(3, 3));
+
+        //---- txtWert1 ----
+        txtWert1.setFont(new Font("Arial", Font.PLAIN, 14));
+        txtWert1.setColumns(10);
+        txtWert1.setHorizontalAlignment(SwingConstants.TRAILING);
+        txtWert1.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                txtWert1FocusLost(e);
+            }
+        });
+        contentPane.add(txtWert1, CC.xy(5, 3));
+
+        //---- lblWert1Einheit ----
+        lblWert1Einheit.setText("text");
+        lblWert1Einheit.setFont(new Font("Arial", Font.PLAIN, 14));
+        contentPane.add(lblWert1Einheit, CC.xy(7, 3));
+
+        //---- lblWert2 ----
+        lblWert2.setText("text");
+        lblWert2.setFont(new Font("Arial", Font.PLAIN, 14));
+        contentPane.add(lblWert2, CC.xy(3, 5));
+
+        //---- txtWert2 ----
+        txtWert2.setFont(new Font("Arial", Font.PLAIN, 14));
+        txtWert2.setColumns(10);
+        txtWert2.setHorizontalAlignment(SwingConstants.TRAILING);
+        txtWert2.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                txtWert2FocusLost(e);
+            }
+        });
+        contentPane.add(txtWert2, CC.xy(5, 5));
+
+        //---- lblWert2Einheit ----
+        lblWert2Einheit.setText("text");
+        lblWert2Einheit.setFont(new Font("Arial", Font.PLAIN, 14));
+        contentPane.add(lblWert2Einheit, CC.xy(7, 5));
+
+        //---- lblWert3 ----
+        lblWert3.setText("text");
+        lblWert3.setFont(new Font("Arial", Font.PLAIN, 14));
+        contentPane.add(lblWert3, CC.xy(3, 7));
+
+        //---- txtWert3 ----
+        txtWert3.setFont(new Font("Arial", Font.PLAIN, 14));
+        txtWert3.setColumns(10);
+        txtWert3.setHorizontalAlignment(SwingConstants.TRAILING);
+        txtWert3.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                txtWert3FocusLost(e);
+            }
+        });
+        contentPane.add(txtWert3, CC.xy(5, 7));
+
+        //---- lblWert3Einheit ----
+        lblWert3Einheit.setText("text");
+        lblWert3Einheit.setFont(new Font("Arial", Font.PLAIN, 14));
+        contentPane.add(lblWert3Einheit, CC.xy(7, 7));
+
+        //======== panel1 ========
         {
-            contentPanel.setLayout(new FormLayout(
-                "14dlu, $lcgap, 184dlu, $lcgap, 14dlu",
-                "14dlu, $lgap, pref, $lgap, 5dlu, fill:132dlu:grow, $lgap, fill:43dlu:grow, $lgap, 23dlu, $lgap, 14dlu"));
+            panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
 
-            //======== tabWert ========
-            {
-                tabWert.setFont(new Font("Arial", Font.PLAIN, 12));
-                tabWert.setTabPlacement(SwingConstants.RIGHT);
-                tabWert.addChangeListener(new ChangeListener() {
-                    @Override
-                    public void stateChanged(ChangeEvent e) {
-                        tabWertStateChanged(e);
-                    }
-                });
-            }
-            contentPanel.add(tabWert, CC.xy(3, 6));
+            //---- btnCancel ----
+            btnCancel.setText(null);
+            btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
+            panel1.add(btnCancel);
 
-            //======== scrollPane1 ========
-            {
-                scrollPane1.setViewportView(txtBemerkung);
-            }
-            contentPanel.add(scrollPane1, CC.xy(3, 8, CC.DEFAULT, CC.FILL));
-
-            //======== panel1 ========
-            {
-                panel1.setLayout(new HorizontalLayout(5));
-
-                //---- btnCancel ----
-                btnCancel.setText(null);
-                btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-                btnCancel.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnCancelActionPerformed(e);
-                    }
-                });
-                panel1.add(btnCancel);
-
-                //---- btnSave ----
-                btnSave.setText(null);
-                btnSave.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-                btnSave.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnSaveActionPerformed(e);
-                    }
-                });
-                panel1.add(btnSave);
-            }
-            contentPanel.add(panel1, CC.xy(3, 10, CC.RIGHT, CC.DEFAULT));
+            //---- btnApply ----
+            btnApply.setText(null);
+            btnApply.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+            panel1.add(btnApply);
         }
-        contentPane.add(contentPanel, BorderLayout.NORTH);
+        contentPane.add(panel1, CC.xywh(3, 11, 5, 1, CC.RIGHT, CC.DEFAULT));
         pack();
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-    private JPanel contentPanel;
-    private JTabbedPane tabWert;
-    private JScrollPane scrollPane1;
-    private JTextArea txtBemerkung;
+    private JLabel lblWert1;
+    private JTextField txtWert1;
+    private JLabel lblWert1Einheit;
+    private JLabel lblWert2;
+    private JTextField txtWert2;
+    private JLabel lblWert2Einheit;
+    private JLabel lblWert3;
+    private JTextField txtWert3;
+    private JLabel lblWert3Einheit;
     private JPanel panel1;
     private JButton btnCancel;
-    private JButton btnSave;
+    private JButton btnApply;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }
