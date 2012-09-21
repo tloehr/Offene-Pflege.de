@@ -14,7 +14,7 @@ import entity.reports.NReport;
 import entity.reports.NReportTAGS;
 import entity.reports.NReportTAGSTools;
 import op.tools.MyJDialog;
-import op.tools.PnlUhrzeitDatum;
+import op.tools.PnlPIT;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
@@ -25,7 +25,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.Date;
 
 /**
  * @author Torsten Löhr
@@ -36,7 +35,7 @@ public class DlgReport extends MyJDialog {
     private OverlayTextField txtDauer;
     private DefaultOverlayable ovrDauer;
     private JLabel attentionIcon;
-    private PnlUhrzeitDatum pnlUhrzeitDatum;
+    private PnlPIT pnlPIT;
     private int defaultMinutes;
 
     public DlgReport(NReport nReport, Closure actionBlock) {
@@ -61,8 +60,8 @@ public class DlgReport extends MyJDialog {
             }
         }, nReport.getTags(), new GridLayout(0, 1)));
 
-        pnlUhrzeitDatum = new PnlUhrzeitDatum(nReport.getPit());
-        panel1.add(pnlUhrzeitDatum, CC.xywh(3, 3, 3, 1, CC.DEFAULT, CC.FILL));
+        pnlPIT = new PnlPIT(nReport.getPit());
+        panel1.add(pnlPIT, CC.xywh(3, 3, 3, 1, CC.DEFAULT, CC.FILL));
 
         txtBericht.setText(nReport.getText());
         defaultMinutes = nReport.getMinutes();
@@ -120,7 +119,7 @@ public class DlgReport extends MyJDialog {
     }
 
     private void btnApplyActionPerformed(ActionEvent e) {
-        nReport.setPit(pnlUhrzeitDatum.getPIT());
+        nReport.setPit(pnlPIT.getPIT());
         actionBlock.execute(nReport);
         dispose();
     }

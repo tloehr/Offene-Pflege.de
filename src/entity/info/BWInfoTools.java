@@ -510,7 +510,7 @@ public class BWInfoTools {
         if (gewicht == null) {
             result += "Die/der BW wurde noch nicht gewogen.";
         } else {
-            result += gewicht.getValue1().toPlainString() + " " + ResValueTools.UNITS[ResValueTools.WEIGHT] + " (" + df.format(gewicht.getPit()) + ")";
+            result += gewicht.getVal1().toPlainString() + " " + ResValueTools.UNITS[ResValueTools.WEIGHT] + " (" + df.format(gewicht.getPit()) + ")";
         }
         result += "</b></td></tr>";
 
@@ -519,7 +519,7 @@ public class BWInfoTools {
         if (groesse == null) {
             result += "Bisher wurde noch keine Körpergröße ermittelt.";
         } else {
-            result += groesse.getValue1().toPlainString() + " " + ResValueTools.UNITS[ResValueTools.HEIGHT] + " (" + df.format(groesse.getPit()) + ")";
+            result += groesse.getVal1().toPlainString() + " " + ResValueTools.UNITS[ResValueTools.HEIGHT] + " (" + df.format(groesse.getPit()) + ")";
         }
         result += "</b></td></tr>";
 
@@ -527,7 +527,7 @@ public class BWInfoTools {
         if (gewicht == null || groesse == null) {
             result += "Ein BMI kann noch nicht bestimmt werden.";
         } else {
-            BigDecimal bmi = gewicht.getValue1().divide(groesse.getValue1().pow(2), 2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal bmi = gewicht.getVal1().divide(groesse.getVal1().pow(2), 2, BigDecimal.ROUND_HALF_UP);
             result += bmi.toPlainString();
         }
         result += "</b></td></tr>";
@@ -545,7 +545,7 @@ public class BWInfoTools {
         if (bz == null) {
             result += "Bisher kein GLUCOSE Wert vorhanden.";
         } else {
-            result += bz.getValue1().toPlainString() + " " + ResValueTools.UNITS[ResValueTools.GLUCOSE] + " (" + df.format(bz.getPit()) + ")";
+            result += bz.getVal1().toPlainString() + " " + ResValueTools.UNITS[ResValueTools.GLUCOSE] + " (" + df.format(bz.getPit()) + ")";
         }
         result += "</b></td></tr>";
 

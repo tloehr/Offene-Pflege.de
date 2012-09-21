@@ -35,9 +35,10 @@ import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.values.ResValue;
 import entity.values.ResValueTools;
-import entity.values.ResValueType;
+import entity.values.ResValueTypes;
 import op.OPDE;
 import op.tools.*;
+import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
@@ -70,7 +71,7 @@ public class PnlValues extends NursingRecordsPanel {
     private CollapsiblePanes searchPanes;
     private JToggleButton tbShowReplaced;
 
-    private ArrayList<ResValueType> lstValueTypes;
+    private ArrayList<ResValueTypes> lstValueTypes;
     private HashMap<String, CollapsiblePane> cpMap;
     private HashMap<String, JPanel> contentmap;
     private HashMap<ResValue, JPanel> linemap;
@@ -102,8 +103,8 @@ public class PnlValues extends NursingRecordsPanel {
         valuecache = new HashMap<String, ArrayList<ResValue>>();
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT t FROM ResValueType t ORDER BY t.text");
-        lstValueTypes = new ArrayList<ResValueType>(query.getResultList());
+        Query query = em.createQuery("SELECT t FROM ResValueTypes t ORDER BY t.text");
+        lstValueTypes = new ArrayList<ResValueTypes>(query.getResultList());
         em.close();
 
         color1 = SYSConst.blue1;
@@ -200,7 +201,7 @@ public class PnlValues extends NursingRecordsPanel {
 
         } else {
 //
-            for (ResValueType vtype : lstValueTypes) {
+            for (ResValueTypes vtype : lstValueTypes) {
                 createCP4(vtype);
             }
 
@@ -210,7 +211,7 @@ public class PnlValues extends NursingRecordsPanel {
     }
 
 
-    private CollapsiblePane createCP4(final ResValueType vtype) {
+    private CollapsiblePane createCP4(final ResValueTypes vtype) {
         /***
          *                          _        ____ ____  _  _    ____     __    _           _____               __
          *       ___ _ __ ___  __ _| |_ ___ / ___|  _ \| || |  / /\ \   / /_ _| |_   _  __|_   _|   _ _ __   __\ \
@@ -248,15 +249,15 @@ public class PnlValues extends NursingRecordsPanel {
         cpType.setSlidingDirection(SwingConstants.SOUTH);
 
         /***
-         *      _____    _ _ _
-         *     | ____|__| (_) |_
-         *     |  _| / _` | | __|
-         *     | |__| (_| | | |_
-         *     |_____\__,_|_|\__|
+         *         _       _     _
+         *        / \   __| | __| |
+         *       / _ \ / _` |/ _` |
+         *      / ___ \ (_| | (_| |
+         *     /_/   \_\__,_|\__,_|
          *
          */
         final JButton btnAdd = new JButton(SYSConst.icon22add);
-        btnAdd.setPressedIcon(SYSConst.icon22edit1Pressed);
+        btnAdd.setPressedIcon(SYSConst.icon22addPressed);
         btnAdd.setAlignmentX(Component.RIGHT_ALIGNMENT);
         btnAdd.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnAdd.setContentAreaFilled(false);
@@ -265,8 +266,14 @@ public class PnlValues extends NursingRecordsPanel {
         btnAdd.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
+                new DlgValue(new ResValue(resident, vtype), new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        if (o != null){
 
-
+                        }
+                    }
+                });
             }
         });
         cptitle.getRight().add(btnAdd);
@@ -290,7 +297,7 @@ public class PnlValues extends NursingRecordsPanel {
     }
 
 
-    private JPanel createContentPanel4(final ResValueType vtype) {
+    private JPanel createContentPanel4(final ResValueTypes vtype) {
         JPanel pnlContent = new JPanel(new VerticalLayout());
         Pair<DateTime, DateTime> minmax = ResValueTools.getMinMax(resident, vtype);
 
@@ -305,7 +312,7 @@ public class PnlValues extends NursingRecordsPanel {
     }
 
 
-    private CollapsiblePane createCP4(final ResValueType vtype, final int year, DateMidnight min, DateMidnight max) {
+    private CollapsiblePane createCP4(final ResValueTypes vtype, final int year, DateMidnight min, DateMidnight max) {
         /***
          *                          _        ____ ____  _  _    ______           _     _            _       _       _ __
          *       ___ _ __ ___  __ _| |_ ___ / ___|  _ \| || |  / /  _ \ ___  ___(_) __| | ___ _ __ | |_    (_)_ __ | |\ \
@@ -432,7 +439,7 @@ public class PnlValues extends NursingRecordsPanel {
     }
 
 
-    private CollapsiblePane createCP4(final ResValueType vtype, final DateMidnight month) {
+    private CollapsiblePane createCP4(final ResValueTypes vtype, final DateMidnight month) {
         /***
          *                          _        ____ ____  _  _    ______           _     _            _       ____        _      _____ _              __
          *       ___ _ __ ___  __ _| |_ ___ / ___|  _ \| || |  / /  _ \ ___  ___(_) __| | ___ _ __ | |_    |  _ \  __ _| |_ __|_   _(_)_ __ ___   __\ \
@@ -524,7 +531,7 @@ public class PnlValues extends NursingRecordsPanel {
         return cpMonth;
     }
 
-    private JPanel createContentPanel4(final ResValueType vtype, DateMidnight month) {
+    private JPanel createContentPanel4(final ResValueTypes vtype, DateMidnight month) {
         final String key = vtype.getID() + ".xtypes." + monthFormatter.format(month.toDate()) + ".month";
 
         if (!contentmap.containsKey(key)) {
@@ -716,7 +723,7 @@ public class PnlValues extends NursingRecordsPanel {
     }
 
 
-    private Color getColor(ResValueType vtype, int level) {
+    private Color getColor(ResValueTypes vtype, int level) {
         if (lstValueTypes.indexOf(vtype) % 2 == 0) {
             return color1[level];
         } else {
@@ -833,7 +840,7 @@ public class PnlValues extends NursingRecordsPanel {
 //
 //                            switch (col) {
 //                                case TMWerte.COL_PIT: {
-//                                    editor = new PnlUhrzeitDatum(wert.getPit());
+//                                    editor = new PnlPIT(wert.getPit());
 //                                    break;
 //                                }
 //
@@ -880,12 +887,12 @@ public class PnlValues extends NursingRecordsPanel {
 //
 //                                        switch (col) {
 //                                            case TMWerte.COL_PIT: {
-//                                                newOne.setPit(((PnlUhrzeitDatum) editor).getPIT());
+//                                                newOne.setPit(((PnlPIT) editor).getPIT());
 //                                                break;
 //                                            }
 //                                            case TMWerte.COL_CONTENT: {
 //                                                DlgValue pnl123 = (DlgValue) editor;
-//                                                newOne.setWert(pnl123.getWert1());
+//                                                newOne.setWert(pnl123.getValue1());
 //                                                newOne.setValue2(pnl123.getValue2());
 //                                                newOne.setValue3(pnl123.getValue3());
 //                                                break;
@@ -1107,7 +1114,7 @@ public class PnlValues extends NursingRecordsPanel {
         cpsValues.removeAll();
         cpsValues.setLayout(new JideBoxLayout(cpsValues, JideBoxLayout.Y_AXIS));
 
-        for (ResValueType vtype : lstValueTypes) {
+        for (ResValueTypes vtype : lstValueTypes) {
 
             cpsValues.add(cpMap.get(vtype.getID() + ".xtypes"));
 

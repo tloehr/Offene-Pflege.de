@@ -366,7 +366,7 @@ public class ResValueTools {
      * @param resident
      * @return
      */
-    public static Pair<DateTime, DateTime> getMinMax(Resident resident, ResValueType vtype) {
+    public static Pair<DateTime, DateTime> getMinMax(Resident resident, ResValueTypes vtype) {
         Pair<DateTime, DateTime> result = null;
 
         EntityManager em = OPDE.createEM();
@@ -395,7 +395,7 @@ public class ResValueTools {
         return result;
     }
 
-    public static ArrayList<ResValue> getResValues(Resident resident, ResValueType vtype, DateTime month) {
+    public static ArrayList<ResValue> getResValues(Resident resident, ResValueTypes vtype, DateTime month) {
         DateTime from = month.dayOfMonth().withMinimumValue();
         DateTime to = month.dayOfMonth().withMaximumValue();
 
@@ -421,11 +421,11 @@ public class ResValueTools {
     public static String getValueAsHTML(ResValue rv) {
         String result = "";
         if (rv.getType().getValType() == RR) {
-            result += "<b>" + rv.getValue1() + "/" + rv.getValue2() + " " + ": " + rv.getValue3() + " " + rv.getType().getUnit() + "</b>";
+            result += "<b>" + rv.getVal1() + "/" + rv.getVal2() + " " + rv.getType().getUnit1() + " " + rv.getType().getLabel3() + ": " + rv.getVal3() + " " + rv.getType().getUnit3() + "</b>";
         } else if (rv.getType().getValType() == STOOL || rv.getType().getValType() == VOMIT) {
             result += "<i>" + OPDE.lang.getString("misc.msg.novalue") + "</i>";
         } else {
-            result += "<b>" + rv.getValue1() + " " + rv.getType().getUnit() + "</b>";
+            result += "<b>" + rv.getVal1() + " " + rv.getType().getUnit1() + "</b>";
         }
         return result;
     }

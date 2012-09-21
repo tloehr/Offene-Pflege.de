@@ -10,7 +10,7 @@ import java.util.Date;
 import javax.swing.*;
 import com.jgoodies.forms.factories.*;
 import com.jgoodies.forms.layout.*;
-import op.tools.PnlUhrzeitDatum;
+import op.tools.PnlPIT;
 import org.apache.commons.collections.Closure;
 
 /**
@@ -18,14 +18,14 @@ import org.apache.commons.collections.Closure;
  */
 public class PnlZeitpunkt extends JPanel {
     private Date date;
-    private PnlUhrzeitDatum pnlUhrzeitDatum;
+    private PnlPIT pnlPIT;
     private Closure actionBlock;
 
     public PnlZeitpunkt(Date date, Closure actionBlock) {
         this.date = date;
-        pnlUhrzeitDatum = new PnlUhrzeitDatum(date, new Date());
+        pnlPIT = new PnlPIT(date, new Date());
         this.actionBlock = actionBlock;
-        add(pnlUhrzeitDatum, CC.xy(3, 2));
+        add(pnlPIT, CC.xy(3, 2));
         initComponents();
     }
 
@@ -34,7 +34,7 @@ public class PnlZeitpunkt extends JPanel {
     }
 
     private void btnOKActionPerformed(ActionEvent e) {
-        actionBlock.execute(pnlUhrzeitDatum.getPIT());
+        actionBlock.execute(pnlPIT.getPIT());
     }
 
     private void initComponents() {

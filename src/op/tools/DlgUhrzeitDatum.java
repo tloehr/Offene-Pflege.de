@@ -19,7 +19,7 @@ import java.util.Date;
  */
 public class DlgUhrzeitDatum extends MyJDialog {
     private Closure actionBlock;
-    private PnlUhrzeitDatum pnlUhrzeitDatum;
+    private PnlPIT pnlPIT;
     private Date pit;
 
     public DlgUhrzeitDatum(String text, Closure actionBlock) {
@@ -39,12 +39,12 @@ public class DlgUhrzeitDatum extends MyJDialog {
     }
 
     private void initDialog() {
-         pnlUhrzeitDatum = new PnlUhrzeitDatum();
-         contentPanel.add(pnlUhrzeitDatum, CC.xy(1, 3));
+         pnlPIT = new PnlPIT();
+         contentPanel.add(pnlPIT, CC.xy(1, 3));
     }
 
     private void btnOKActionPerformed(ActionEvent e) {
-        pit = pnlUhrzeitDatum.getPIT();
+        pit = pnlPIT.getPIT();
         dispose();
     }
 

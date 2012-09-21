@@ -4,115 +4,131 @@
 
 package op.care.values;
 
+import java.awt.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jidesoft.swing.JideLabel;
+import entity.values.ResValue;
+import op.tools.MyJDialog;
+import op.tools.PnlPIT;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 
 /**
  * @author Torsten Löhr
  */
-public class DlgValue extends JDialog {
-    private BigDecimal wert1, wert2, wert3;
-    private String lbl1, lbl1einheit, lbl2, lbl2einheit, lbl3, lbl3einheit;
+public class DlgValue extends MyJDialog {
+    private ResValue resValue;
+    private Closure afterAction;
+    private PnlPIT pnlPIT;
 
-    public DlgValue(BigDecimal wert, String lbl, String lbleinheit) {
-        this(wert, null, null, lbl, lbleinheit, null, null, null, null);
-    }
-
-    public DlgValue(BigDecimal wert1, BigDecimal wert2, BigDecimal wert3, String lbl1, String lbl1einheit, String lbl2, String lbl2einheit, String lbl3, String lbl3einheit) {
-        this.wert1 = wert1;
-        this.wert2 = wert2;
-        this.wert3 = wert3;
-        this.lbl1 = lbl1;
-        this.lbl2 = lbl2;
-        this.lbl3 = lbl3;
-        this.lbl1einheit = lbl1einheit;
-        this.lbl2einheit = lbl2einheit;
-        this.lbl3einheit = lbl3einheit;
+    public DlgValue(ResValue resValue, Closure afterAction) {
+        this.resValue = resValue;
+        this.afterAction = afterAction;
         initComponents();
         initPanel();
     }
 
     public void initPanel() {
-        setWert1Visible(wert1 != null);
-        setWert2Visible(wert2 != null);
-        setWert3Visible(wert3 != null);
 
-        if (wert1 != null) {
-            lblWert1.setText(lbl1);
-            txtWert1.setText(wert1.toPlainString());
-            lblWert1Einheit.setText(lbl1einheit);
-        }
+        pnlPIT = new PnlPIT();
 
-        if (wert2 != null) {
-            lblWert2.setText(lbl2);
-            txtWert2.setText(wert2.toPlainString());
-            lblWert2Einheit.setText(lbl2einheit);
-        }
+        getContentPane().add(pnlPIT, CC.xywh(3, 1, 5, 1));
 
-        if (wert3 != null) {
-            lblWert3.setText(lbl3);
-            txtWert3.setText(wert3.toPlainString());
-            lblWert3Einheit.setText(lbl3einheit);
-        }
+        lblWert1.setVisible(resValue.getVal1() != null);
+        txtWert1.setVisible(resValue.getVal1() != null);
+        lblWert1Einheit.setVisible(resValue.getVal1() != null);
+        lblWert1.setText(resValue.getType().getLabel1());
+        lblWert1Einheit.setText(resValue.getType().getUnit1());
+        txtWert1.setText(NumberFormat.getNumberInstance().format(resValue.getVal1()));
 
-    }
+        lblWert2.setVisible(resValue.getVal2() != null);
+        txtWert2.setVisible(resValue.getVal3() != null);
+        lblWert2Einheit.setVisible(resValue.getVal2() != null);
+        lblWert2.setText(resValue.getType().getLabel2());
+        lblWert2Einheit.setText(resValue.getType().getUnit2());
+        txtWert2.setText(NumberFormat.getNumberInstance().format(resValue.getVal2()));
 
-    public BigDecimal getWert1() {
-        return wert1;
-    }
+        lblWert3.setVisible(resValue.getVal3() != null);
+        txtWert3.setVisible(resValue.getVal3() != null);
+        lblWert3Einheit.setVisible(resValue.getVal3() != null);
+        lblWert3.setText(resValue.getType().getLabel3());
+        lblWert3Einheit.setText(resValue.getType().getUnit3());
+        txtWert3.setText(NumberFormat.getNumberInstance().format(resValue.getVal3()));
 
-    public BigDecimal getWert2() {
-        return wert2;
-    }
-
-    public BigDecimal getWert3() {
-        return wert3;
-    }
-
-    private void setWert1Visible(boolean visible) {
-        lblWert1.setVisible(visible);
-        txtWert1.setVisible(visible);
-        lblWert1Einheit.setVisible(visible);
-    }
-
-    private void setWert2Visible(boolean visible) {
-        lblWert2.setVisible(visible);
-        txtWert2.setVisible(visible);
-        lblWert2Einheit.setVisible(visible);
-    }
-
-    private void setWert3Visible(boolean visible) {
-        lblWert3.setVisible(visible);
-        txtWert3.setVisible(visible);
-        lblWert3Einheit.setVisible(visible);
+        txtText.setText(SYSTools.catchNull(resValue.getText()));
     }
 
     private void txtWert1FocusLost(FocusEvent e) {
-        wert1 = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
-        if (wert1 != null){
-            ((JTextField) e.getSource()).setText(wert1.toPlainString());
+        BigDecimal bd = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
+        if (bd == null) {
+            ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(resValue.getVal1()));
         }
     }
 
     private void txtWert2FocusLost(FocusEvent e) {
-        wert2 = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
-        if (wert2 != null){
-            ((JTextField) e.getSource()).setText(wert2.toPlainString());
+        BigDecimal bd = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
+        if (bd == null) {
+            ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(resValue.getVal2()));
         }
     }
 
     private void txtWert3FocusLost(FocusEvent e) {
-        wert3 = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
-        if (wert3 != null){
-            ((JTextField) e.getSource()).setText(wert3.toPlainString());
+        BigDecimal bd = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
+        if (bd == null) {
+            ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(resValue.getVal3()));
         }
+    }
+
+    private boolean saveOK(){
+        boolean ok = true;
+
+        if (ok && resValue.getVal1() != null){
+            BigDecimal bd = SYSTools.parseDecimal(txtWert1.getText());
+            ok = bd != null;
+            resValue.setVal1(bd);
+        }
+
+        if (ok && resValue.getVal2() != null){
+            BigDecimal bd = SYSTools.parseDecimal(txtWert2.getText());
+            ok = bd != null;
+            resValue.setVal2(bd);
+        }
+
+        if (ok && resValue.getVal3() != null){
+            BigDecimal bd = SYSTools.parseDecimal(txtWert3.getText());
+            ok = bd != null;
+            resValue.setVal3(bd);
+        }
+
+        return ok;
+    }
+
+
+    private void btnApplyActionPerformed(ActionEvent e) {
+        if (saveOK()){
+            resValue.setText(txtText.getText().trim());
+            resValue.setPit(pnlPIT.getPIT());
+            dispose();
+        }
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        afterAction.execute(resValue);
+    }
+
+    private void btnCancelActionPerformed(ActionEvent e) {
+        resValue = null;
+
     }
 
     private void initComponents() {
@@ -126,6 +142,9 @@ public class DlgValue extends JDialog {
         lblWert3 = new JLabel();
         txtWert3 = new JTextField();
         lblWert3Einheit = new JLabel();
+        lblText = new JideLabel();
+        scrollPane1 = new JScrollPane();
+        txtText = new JTextArea();
         panel1 = new JPanel();
         btnCancel = new JButton();
         btnApply = new JButton();
@@ -133,13 +152,13 @@ public class DlgValue extends JDialog {
         //======== this ========
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "$rgap, $lcgap, default, $lcgap, default:grow, $lcgap, default, $lcgap, $rgap",
-            "$rgap, 5*($lgap, default)"));
+                "14dlu, $lcgap, default, $lcgap, 84dlu:grow, $lcgap, 55dlu, $lcgap, default, $lcgap, 14dlu",
+                "14dlu, 4*($lgap, default), $lgap, default:grow, $lgap, default, $lgap, 14dlu"));
 
         //---- lblWert1 ----
         lblWert1.setText("text");
         lblWert1.setFont(new Font("Arial", Font.PLAIN, 14));
-        contentPane.add(lblWert1, CC.xy(3, 3));
+        contentPane.add(lblWert1, CC.xy(3, 5));
 
         //---- txtWert1 ----
         txtWert1.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -151,17 +170,17 @@ public class DlgValue extends JDialog {
                 txtWert1FocusLost(e);
             }
         });
-        contentPane.add(txtWert1, CC.xy(5, 3));
+        contentPane.add(txtWert1, CC.xywh(5, 5, 3, 1));
 
         //---- lblWert1Einheit ----
         lblWert1Einheit.setText("text");
         lblWert1Einheit.setFont(new Font("Arial", Font.PLAIN, 14));
-        contentPane.add(lblWert1Einheit, CC.xy(7, 3));
+        contentPane.add(lblWert1Einheit, CC.xy(9, 5));
 
         //---- lblWert2 ----
         lblWert2.setText("text");
         lblWert2.setFont(new Font("Arial", Font.PLAIN, 14));
-        contentPane.add(lblWert2, CC.xy(3, 5));
+        contentPane.add(lblWert2, CC.xy(3, 7));
 
         //---- txtWert2 ----
         txtWert2.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -173,17 +192,17 @@ public class DlgValue extends JDialog {
                 txtWert2FocusLost(e);
             }
         });
-        contentPane.add(txtWert2, CC.xy(5, 5));
+        contentPane.add(txtWert2, CC.xywh(5, 7, 3, 1));
 
         //---- lblWert2Einheit ----
         lblWert2Einheit.setText("text");
         lblWert2Einheit.setFont(new Font("Arial", Font.PLAIN, 14));
-        contentPane.add(lblWert2Einheit, CC.xy(7, 5));
+        contentPane.add(lblWert2Einheit, CC.xy(9, 7));
 
         //---- lblWert3 ----
         lblWert3.setText("text");
         lblWert3.setFont(new Font("Arial", Font.PLAIN, 14));
-        contentPane.add(lblWert3, CC.xy(3, 7));
+        contentPane.add(lblWert3, CC.xy(3, 9));
 
         //---- txtWert3 ----
         txtWert3.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -195,12 +214,26 @@ public class DlgValue extends JDialog {
                 txtWert3FocusLost(e);
             }
         });
-        contentPane.add(txtWert3, CC.xy(5, 7));
+        contentPane.add(txtWert3, CC.xywh(5, 9, 3, 1));
 
         //---- lblWert3Einheit ----
         lblWert3Einheit.setText("text");
         lblWert3Einheit.setFont(new Font("Arial", Font.PLAIN, 14));
-        contentPane.add(lblWert3Einheit, CC.xy(7, 7));
+        contentPane.add(lblWert3Einheit, CC.xy(9, 9));
+
+        //---- lblText ----
+        lblText.setText("text");
+        lblText.setOrientation(1);
+        lblText.setFont(new Font("Arial", Font.PLAIN, 14));
+        lblText.setClockwise(false);
+        lblText.setHorizontalAlignment(SwingConstants.CENTER);
+        contentPane.add(lblText, CC.xywh(3, 11, 1, 3));
+
+        //======== scrollPane1 ========
+        {
+            scrollPane1.setViewportView(txtText);
+        }
+        contentPane.add(scrollPane1, CC.xywh(5, 11, 1, 3));
 
         //======== panel1 ========
         {
@@ -209,15 +242,27 @@ public class DlgValue extends JDialog {
             //---- btnCancel ----
             btnCancel.setText(null);
             btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
+            btnCancel.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnCancelActionPerformed(e);
+                }
+            });
             panel1.add(btnCancel);
 
             //---- btnApply ----
             btnApply.setText(null);
             btnApply.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+            btnApply.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnApplyActionPerformed(e);
+                }
+            });
             panel1.add(btnApply);
         }
-        contentPane.add(panel1, CC.xywh(3, 11, 5, 1, CC.RIGHT, CC.DEFAULT));
-        pack();
+        contentPane.add(panel1, CC.xywh(7, 13, 3, 1, CC.RIGHT, CC.DEFAULT));
+        setSize(435, 240);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
@@ -232,6 +277,9 @@ public class DlgValue extends JDialog {
     private JLabel lblWert3;
     private JTextField txtWert3;
     private JLabel lblWert3Einheit;
+    private JideLabel lblText;
+    private JScrollPane scrollPane1;
+    private JTextArea txtText;
     private JPanel panel1;
     private JButton btnCancel;
     private JButton btnApply;

@@ -56,7 +56,7 @@ public class DlgInfo extends MyJDialog {
     private BWInfo bwInfo;
     private Closure actionBlock;
     private JTextArea txtBemerkung;
-    private PnlUhrzeitDatum pnlUhrzeitDatum;
+    private PnlPIT pnlPIT;
 
     public DlgInfo(BWInfo bwInfo, Closure actionBlock) {
         super();
@@ -83,13 +83,13 @@ public class DlgInfo extends MyJDialog {
         txtBemerkung.setText(SYSTools.catchNull(bwInfo.getBemerkung()));
         contentPanel.add(new JScrollPane(getPanel()), CC.xywh(1, 1, 3, 1, CC.FILL, CC.FILL));
         if (bwInfo.getBwinfotyp().getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
-            pnlUhrzeitDatum = new PnlUhrzeitDatum();
+            pnlPIT = new PnlPIT();
             JLabel header = new JLabel(OPDE.lang.getString(internalClassID + ".singleincident"));
             header.setFont(SYSConst.ARIAL20);
             JPanel panel = new JPanel(new VerticalLayout(5));
             header.setHorizontalAlignment(SwingConstants.CENTER);
             panel.add(header);
-            panel.add(pnlUhrzeitDatum);
+            panel.add(pnlPIT);
             contentPanel.add(new JScrollPane(txtBemerkung), CC.xy(1, 3, CC.FILL, CC.FILL));
             contentPanel.add(panel, CC.xy(3, 3, CC.FILL, CC.FILL));
         } else {
@@ -106,9 +106,9 @@ public class DlgInfo extends MyJDialog {
 
     private void btnOKActionPerformed(ActionEvent e) {
 
-        if (pnlUhrzeitDatum != null) {
-            OPDE.debug(pnlUhrzeitDatum.getPIT());
-            bwInfo.setVon(pnlUhrzeitDatum.getPIT());
+        if (pnlPIT != null) {
+            OPDE.debug(pnlPIT.getPIT());
+            bwInfo.setVon(pnlPIT.getPIT());
         }
 
         try {

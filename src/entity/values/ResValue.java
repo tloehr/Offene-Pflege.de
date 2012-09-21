@@ -10,6 +10,7 @@ import entity.process.QProcess;
 import entity.process.QProcessElement;
 import entity.process.SYSVAL2PROCESS;
 import entity.system.Users;
+import op.OPDE;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -100,7 +101,7 @@ public class ResValue implements Serializable, QProcessElement, Cloneable {
     private Resident resident;
     @JoinColumn(name = "Type", referencedColumnName = "ID")
     @ManyToOne
-    private ResValueType vtype;
+    private ResValueTypes vtype;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "value")
     private Collection<SYSVAL2FILE> attachedFiles;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwerte")
@@ -118,11 +119,11 @@ public class ResValue implements Serializable, QProcessElement, Cloneable {
     public ResValue() {
     }
 
-    public ResValue(Resident resident, Users user, ResValueType vtype) {
-        this(new Date(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, "", new Date(), new Date(), vtype, null, null, null, user, resident);
+    public ResValue(Resident resident, ResValueTypes vtype) {
+        this(new Date(), vtype.getDefault1(), vtype.getDefault2(), vtype.getDefault3(), "", new Date(), new Date(), vtype, null, null, null, OPDE.getLogin().getUser(), resident);
     }
 
-    public ResValue(Date pit, BigDecimal val2, BigDecimal val3, BigDecimal val1, String text, Date createDate, Date editDate, ResValueType vtype, Users editedBy, ResValue replacedBy, ResValue replacementFor, Users user, Resident resident) {
+    public ResValue(Date pit, BigDecimal val1, BigDecimal val2, BigDecimal val3, String text, Date createDate, Date editDate, ResValueTypes vtype, Users editedBy, ResValue replacedBy, ResValue replacementFor, Users user, Resident resident) {
         this.pit = pit;
         this.val2 = val2;
         this.val3 = val3;
@@ -146,19 +147,35 @@ public class ResValue implements Serializable, QProcessElement, Cloneable {
         this.pit = pit;
     }
 
-    public BigDecimal getValue1() {
+    public BigDecimal getVal2() {
+        return val2;
+    }
+
+    public void setVal2(BigDecimal val2) {
+        this.val2 = val2;
+    }
+
+    public BigDecimal getVal3() {
+        return val3;
+    }
+
+    public void setVal3(BigDecimal val3) {
+        this.val3 = val3;
+    }
+
+    public BigDecimal getVal1() {
         return val1;
     }
 
-    public void setWert(BigDecimal wert) {
-        this.val1 = wert;
+    public void setVal1(BigDecimal val1) {
+        this.val1 = val1;
     }
 
-    public ResValueType getType() {
+    public ResValueTypes getType() {
         return vtype;
     }
 
-    public void setType(ResValueType type) {
+    public void setType(ResValueTypes type) {
         this.vtype = type;
     }
 
@@ -267,22 +284,6 @@ public class ResValue implements Serializable, QProcessElement, Cloneable {
 
     public void setResident(Resident resident) {
         this.resident = resident;
-    }
-
-    public BigDecimal getValue2() {
-        return val2;
-    }
-
-    public void setValue2(BigDecimal wert2) {
-        this.val2 = wert2;
-    }
-
-    public BigDecimal getValue3() {
-        return val3;
-    }
-
-    public void setValue3(BigDecimal wert3) {
-        this.val3 = wert3;
     }
 
     public Users getUser() {

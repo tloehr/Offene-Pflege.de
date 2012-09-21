@@ -66,11 +66,16 @@
         <class>entity.process.QProcess</class>
         <class>entity.values.ResValueType</class>
         <class>entity.values.ResValueType</class>
+        <class>entity.values.ResValueTypes</class>
         <properties>
             <property name="javax.persistence.jdbc.url" value="jdbc:mysql://srv0004:3306/opde"/>
             <property name="javax.persistence.jdbc.password" value="75r9qq8"/>
             <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
             <property name="javax.persistence.jdbc.user" value="opdeuser"/>
+            <property name="eclipselink.jdbc.url" value="jdbc:mysql://srv0004:3306/opde"/>
+            <property name="eclipselink.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+            <property name="eclipselink.jdbc.user" value="root"/>
+            <property name="eclipselink.jdbc.password" value="qrp2507te"/>
         </properties>
     </persistence-unit>
 </persistence>

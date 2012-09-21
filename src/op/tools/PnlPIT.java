@@ -23,20 +23,20 @@ import java.util.GregorianCalendar;
 /**
  * @author Torsten Löhr
  */
-public class PnlUhrzeitDatum extends JPanel {
+public class PnlPIT extends JPanel {
     private Time uhrzeit;
     private Date preset;
 
 
-    public PnlUhrzeitDatum() {
+    public PnlPIT() {
         this(new Date(), new Date());
     }
 
-    public PnlUhrzeitDatum(Date preset) {
+    public PnlPIT(Date preset) {
         this(preset, new Date());
     }
 
-    public PnlUhrzeitDatum(Date preset, Date max) {
+    public PnlPIT(Date preset, Date max) {
         initComponents();
         labelDatum.setText(OPDE.lang.getString("misc.msg.Date"));
         labelUhrzeit.setText(OPDE.lang.getString("misc.msg.Time.long"));
