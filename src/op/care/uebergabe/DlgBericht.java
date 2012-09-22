@@ -260,7 +260,7 @@ public class DlgBericht extends javax.swing.JDialog {
         EntityManager em = OPDE.createEM();
         try {
             em.getTransaction().begin();
-            Uebergabebuch bericht = new Uebergabebuch(SYSCalendar.addTime2Date(jdcDatum.getDate(), new Time(SYSCalendar.erkenneUhrzeit(txtTBUhrzeit.getText()).getTimeInMillis())), txtUebergabe.getText(), einrichtung, OPDE.getLogin().getUser());
+            Uebergabebuch bericht = new Uebergabebuch(SYSCalendar.addTime2Date(jdcDatum.getDate(), new Time(SYSCalendar.parseTime(txtTBUhrzeit.getText()).getTimeInMillis())), txtUebergabe.getText(), einrichtung, OPDE.getLogin().getUser());
             em.persist(bericht);
             // Der aktuelle User bestätigt direkt seinen eigenen Bericht.
             bericht.getUsersAcknowledged().add(new Uebergabe2User(bericht, OPDE.getLogin().getUser()));
@@ -290,7 +290,7 @@ public class DlgBericht extends javax.swing.JDialog {
         JTextField txt = (JTextField) evt.getComponent();
         String t = txt.getText();
         try {
-            GregorianCalendar gc = SYSCalendar.erkenneUhrzeit(t);
+            GregorianCalendar gc = SYSCalendar.parseTime(t);
             txt.setText(SYSCalendar.toGermanTime(gc));
         } catch (NumberFormatException nfe) {
             txt.setText(SYSCalendar.toGermanTime(new GregorianCalendar()));

@@ -431,7 +431,7 @@ public class FrmMain extends JFrame {
 
     private void btnVerlegungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerlegungActionPerformed
         if (currentBewohner != null) {
-            SYSFilesTools.print(SYSTools.htmlUmlautConversion(BWInfoTools.getUeberleitung(currentBewohner, true, true, true, true, true, true, true, true)), false);
+            SYSFilesTools.print(BWInfoTools.getUeberleitung(currentBewohner, true, true, true, true, true, true, true, true), false);
         } else {
             displayManager.addSubMessage(new DisplayMessage("Bitte wählen Sie zuerst eine(n) BewohnerIn aus.", 5));
         }

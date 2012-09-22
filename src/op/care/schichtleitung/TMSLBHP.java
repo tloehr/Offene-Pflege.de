@@ -143,7 +143,7 @@ public class TMSLBHP
                     ")) plan " +
                     filter +
                     " ORDER BY Soll, SZeit";
-            stmt = OPDE.getDb().db.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+//            stmt = OPDE.getDb().db.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             //Date d = new Date(new GregorianCalendar(2006,GregorianCalendar.AUGUST,11).getTimeInMillis());
             stmt.setString(1, currentBW);
             stmt.setDate(2, new java.sql.Date(datum.getTime()));

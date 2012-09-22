@@ -529,45 +529,16 @@ public class SYSCalendar {
     }
 
     /**
-     * Gibt den aktuellen Zeitstempel der Datenbank zurück, damit man von evtl. Uhr-Abweichungen
-     * des lokalen Maschine unabhängig ist.
-     *
-     * @return Zeitstempel
-     */
-    public static long nowDB() {
-        String sql = "SELECT now()";
-        long now = 0;
-        try {
-            Statement stmt = OPDE.getDb().db.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-            rs.first();
-            now = rs.getTimestamp(1).getTime();
-        } catch (SQLException ex) {
-//            new DlgException(ex);
-        }
-        return now;
-    }
-
-    /**
-     * Gibt die aktuelle Zeit als Date zurück. Es wird die Zeit der Datenbank verwendet.
-     *
-     * @return Zeitstempel
-     */
-    public static Date nowDBDate() {
-        return new Date(nowDB());
-    }
-
-    /**
      * erkennt Uhrzeitn im Format HH:MM[:SS]
      */
-    public static GregorianCalendar erkenneUhrzeit(String input) throws NumberFormatException {
-        return erkenneUhrzeit(input, new GregorianCalendar());
+    public static GregorianCalendar parseTime(String input) throws NumberFormatException {
+        return parseTime(input, new GregorianCalendar());
     }
 
     /**
      * erkennt Uhrzeiten im Format HH:MM und erstellt einen GregorianCalendar basierend auf ref
      */
-    public static GregorianCalendar erkenneUhrzeit(String input, GregorianCalendar gc)
+    public static GregorianCalendar parseTime(String input, GregorianCalendar gc)
             throws NumberFormatException {
         if (input == null || input.equals("")) {
             throw new NumberFormatException("leere Eingabe");
@@ -631,12 +602,12 @@ public class SYSCalendar {
         byte zeit;
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTimeInMillis(ts);
-        long fm = erkenneUhrzeit(OPDE.getProps().getProperty("FM"), gc).getTimeInMillis();
-        long mo = erkenneUhrzeit(OPDE.getProps().getProperty("MO"), gc).getTimeInMillis();
-        long mi = erkenneUhrzeit(OPDE.getProps().getProperty("MI"), gc).getTimeInMillis();
-        long nm = erkenneUhrzeit(OPDE.getProps().getProperty("NM"), gc).getTimeInMillis();
-        long ab = erkenneUhrzeit(OPDE.getProps().getProperty("AB"), gc).getTimeInMillis();
-        long na = erkenneUhrzeit(OPDE.getProps().getProperty("NA"), gc).getTimeInMillis();
+        long fm = parseTime(OPDE.getProps().getProperty("FM"), gc).getTimeInMillis();
+        long mo = parseTime(OPDE.getProps().getProperty("MO"), gc).getTimeInMillis();
+        long mi = parseTime(OPDE.getProps().getProperty("MI"), gc).getTimeInMillis();
+        long nm = parseTime(OPDE.getProps().getProperty("NM"), gc).getTimeInMillis();
+        long ab = parseTime(OPDE.getProps().getProperty("AB"), gc).getTimeInMillis();
+        long na = parseTime(OPDE.getProps().getProperty("NA"), gc).getTimeInMillis();
         if (fm <= ts && ts < mo) {
             zeit = SYSConst.FM;
         } else if (mo <= ts && ts < mi) {
@@ -767,7 +738,7 @@ public class SYSCalendar {
         result.add(z1.isEmpty() ? "" : OPDE.getProps().getProperty(z1));
 
         if (!z2.isEmpty()) {
-            GregorianCalendar gc = SYSCalendar.erkenneUhrzeit(OPDE.getProps().getProperty(z2));
+            GregorianCalendar gc = SYSCalendar.parseTime(OPDE.getProps().getProperty(z2));
             gc.add(GregorianCalendar.MINUTE, -1);
             result.add(SYSCalendar.toGermanTime(gc));
         } else {

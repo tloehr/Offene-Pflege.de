@@ -6,8 +6,10 @@ package op.tools;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import com.sun.org.apache.bcel.internal.generic.NEW;
 import com.toedter.calendar.JDateChooser;
 import op.OPDE;
+import org.joda.time.DateTime;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,7 +28,7 @@ import java.util.GregorianCalendar;
 public class PnlPIT extends JPanel {
     private Time uhrzeit;
     private Date preset;
-
+    private Date max;
 
     public PnlPIT() {
         this(new Date(), new Date());
@@ -37,6 +39,7 @@ public class PnlPIT extends JPanel {
     }
 
     public PnlPIT(Date preset, Date max) {
+        this.max = max;
         initComponents();
         labelDatum.setText(OPDE.lang.getString("misc.msg.Date"));
         labelUhrzeit.setText(OPDE.lang.getString("misc.msg.Time.long"));
@@ -67,13 +70,19 @@ public class PnlPIT extends JPanel {
     private void txtUhrzeitActionPerformed(ActionEvent e) {
         GregorianCalendar gc;
         try {
-            gc = SYSCalendar.erkenneUhrzeit(txtUhrzeit.getText());
+            gc = SYSCalendar.parseTime(txtUhrzeit.getText());
         } catch (NumberFormatException nfe) {
             gc = new GregorianCalendar();
             gc.setTime(preset);
         }
+
+        if (new DateTime(gc).isAfter(new DateTime(max))){
+            gc = new DateTime(max).toGregorianCalendar();
+        }
+
         txtUhrzeit.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(new Date(gc.getTimeInMillis())));
         uhrzeit = new Time(gc.getTimeInMillis());
+
     }
 
     private void txtUhrzeitFocusGained(FocusEvent e) {
@@ -89,8 +98,8 @@ public class PnlPIT extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "default, $lcgap, default:grow",
-            "16dlu, $lgap, 16dlu"));
+                "default, $lcgap, default:grow",
+                "16dlu, $lgap, 16dlu"));
 
         //---- labelDatum ----
         labelDatum.setText("Datum");

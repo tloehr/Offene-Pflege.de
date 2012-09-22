@@ -224,9 +224,9 @@ public class PnlSchichtleitung extends CleanablePanel {
         }
         String s = "<html><body>";
         s += "<h1>Auswertung für die Schichtleitung: " + sdf.format(jdcDatum.getDate()) + ", Schicht: " + sSchicht + "</h1>";
-        s += DBHandling.leereBHPs(schicht, jdcDatum.getDate(), le.getData());
-        s += DBHandling.keineTBs(jdcDatum.getDate(), le.getData());
-        s += DBHandling.geringeVorraete(le.getData());
+//        s += DBHandling.leereBHPs(schicht, jdcDatum.getDate(), le.getData());
+//        s += DBHandling.keineTBs(jdcDatum.getDate(), le.getData());
+//        s += DBHandling.geringeVorraete(le.getData());
         s += "</body></html>";
         return s;
     }

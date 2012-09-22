@@ -1395,8 +1395,7 @@ public class PnlPrescription extends NursingRecordsPanel {
             JideButton printPrescription = GUITools.createHyperlinkButton(internalClassID + ".print", SYSConst.icon22print2, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    String html = SYSTools.htmlUmlautConversion(PrescriptionTools.getPrescriptionsAsHTML(lstPrescriptions, true, true, false, tbClosed.isSelected()));
-                    SYSFilesTools.print(html, true);
+                    SYSFilesTools.print(PrescriptionTools.getPrescriptionsAsHTML(lstPrescriptions, true, true, false, tbClosed.isSelected()), true);
                 }
             });
             list.add(printPrescription);
@@ -1404,8 +1403,7 @@ public class PnlPrescription extends NursingRecordsPanel {
             JideButton printDaily = GUITools.createHyperlinkButton(internalClassID + ".printdailyplan", SYSConst.icon22print2, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    String html = SYSTools.htmlUmlautConversion(PrescriptionTools.getDailyPlanAsHTML(resident.getStation().getEinrichtung()));
-                    SYSFilesTools.print(html, true);
+                    SYSFilesTools.print(PrescriptionTools.getDailyPlanAsHTML(resident.getStation().getEinrichtung()), true);
                 }
             });
             list.add(printDaily);

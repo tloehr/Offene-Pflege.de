@@ -58,13 +58,13 @@ public class DlgLogin extends MyJDialog {
 
         this.actionBlock = actionBlock;
 
-        try {
-            if (OPDE.getDb() != null && !OPDE.getDb().db.isClosed()) {
-                OPDE.getDb().db.close();
-            }
-        } catch (SQLException se) {
-            System.out.println(se.getMessage());
-        }
+//        try {
+//            if (OPDE.getDb() != null && !OPDE.getDb().db.isClosed()) {
+//                OPDE.getDb().db.close();
+//            }
+//        } catch (SQLException se) {
+//            System.out.println(se.getMessage());
+//        }
 
         initComponents();
 

@@ -4,6 +4,7 @@
  */
 package entity.values;
 
+import entity.files.SYSNR2FILE;
 import entity.files.SYSVAL2FILE;
 import entity.info.Resident;
 import entity.process.QProcess;
@@ -11,6 +12,8 @@ import entity.process.QProcessElement;
 import entity.process.SYSVAL2PROCESS;
 import entity.system.Users;
 import op.OPDE;
+import org.apache.commons.collections.Closure;
+import org.apache.commons.collections.CollectionUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -24,24 +27,24 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "BWerte")
-@NamedQueries({
-        @NamedQuery(name = "BWerte.findAll", query = "SELECT b FROM ResValue b"),
-        /**
-         * Sucht Berichte für einen Bewohner mit bestimmten Markierungen
-         */
-        @NamedQuery(name = "BWerte.findByVorgang", query = " "
-                + " SELECT b FROM ResValue b "
-                + " JOIN b.attachedProcesses av"
-                + " JOIN av.vorgang v"
-                + " WHERE v = :process "),
-        @NamedQuery(name = "BWerte.findByBwid", query = "SELECT b FROM ResValue b WHERE b.id = :bwid"),
-        @NamedQuery(name = "BWerte.findByPit", query = "SELECT b FROM ResValue b WHERE b.pit = :pit"),
-        @NamedQuery(name = "BWerte.findByWert", query = "SELECT b FROM ResValue b WHERE b.val1 = :wert"),
-        @NamedQuery(name = "BWerte.findByReplacedBy", query = "SELECT b FROM ResValue b WHERE b.replacedBy = :replacedBy"),
-        @NamedQuery(name = "BWerte.findByReplacementFor", query = "SELECT b FROM ResValue b WHERE b.replacementFor = :replacementFor"),
-        @NamedQuery(name = "BWerte.findByCdate", query = "SELECT b FROM ResValue b WHERE b.createDate = :cdate"),
-        @NamedQuery(name = "BWerte.findByMdate", query = "SELECT b FROM ResValue b WHERE b.editDate = :mdate")})
-public class ResValue implements Serializable, QProcessElement, Cloneable {
+//@NamedQueries({
+//        @NamedQuery(name = "BWerte.findAll", query = "SELECT b FROM ResValue b"),
+//        /**
+//         * Sucht Berichte für einen Bewohner mit bestimmten Markierungen
+//         */
+//        @NamedQuery(name = "BWerte.findByVorgang", query = " "
+//                + " SELECT b FROM ResValue b "
+//                + " JOIN b.attachedProcesses av"
+//                + " JOIN av.vorgang v"
+//                + " WHERE v = :process "),
+//        @NamedQuery(name = "BWerte.findByBwid", query = "SELECT b FROM ResValue b WHERE b.id = :bwid"),
+//        @NamedQuery(name = "BWerte.findByPit", query = "SELECT b FROM ResValue b WHERE b.pit = :pit"),
+//        @NamedQuery(name = "BWerte.findByWert", query = "SELECT b FROM ResValue b WHERE b.val1 = :wert"),
+//        @NamedQuery(name = "BWerte.findByReplacedBy", query = "SELECT b FROM ResValue b WHERE b.replacedBy = :replacedBy"),
+//        @NamedQuery(name = "BWerte.findByReplacementFor", query = "SELECT b FROM ResValue b WHERE b.replacementFor = :replacementFor"),
+//        @NamedQuery(name = "BWerte.findByCdate", query = "SELECT b FROM ResValue b WHERE b.createDate = :cdate"),
+//        @NamedQuery(name = "BWerte.findByMdate", query = "SELECT b FROM ResValue b WHERE b.editDate = :mdate")})
+public class ResValue implements Serializable, QProcessElement, Cloneable, Comparable<ResValue> {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -105,7 +108,7 @@ public class ResValue implements Serializable, QProcessElement, Cloneable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "value")
     private Collection<SYSVAL2FILE> attachedFiles;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwerte")
-    private Collection<SYSVAL2PROCESS> attachedProcesses;
+    private Collection<SYSVAL2PROCESS> attachedProcessConnections;
 
 //    // ==
 //    // M:N Relationen
@@ -137,6 +140,10 @@ public class ResValue implements Serializable, QProcessElement, Cloneable {
         this.replacementFor = replacementFor;
         this.user = user;
         this.resident = resident;
+    }
+
+    public Long getId(){
+        return id;
     }
 
     public Date getPit() {
@@ -215,15 +222,15 @@ public class ResValue implements Serializable, QProcessElement, Cloneable {
         return createDate;
     }
 
-    public void setCdate(Date cdate) {
+    public void setCreateDate(Date cdate) {
         this.createDate = cdate;
     }
 
-    public Date getMdate() {
+    public Date getEditDate() {
         return editDate;
     }
 
-    public void setMdate(Date mdate) {
+    public void setEditDate(Date mdate) {
         this.editDate = mdate;
     }
 
@@ -232,16 +239,24 @@ public class ResValue implements Serializable, QProcessElement, Cloneable {
     }
 
     public Collection<SYSVAL2PROCESS> getAttachedQProcesses() {
-        return attachedProcesses;
+        return attachedProcessConnections;
     }
 
     @Override
     public ArrayList<QProcess> getAttachedProcesses() {
         ArrayList<QProcess> list = new ArrayList<QProcess>();
-        for (SYSVAL2PROCESS att : attachedProcesses) {
-            list.add(att.getVorgang());
+        for (SYSVAL2PROCESS att : attachedProcessConnections) {
+            list.add(att.getQProcess());
         }
         return list;
+    }
+
+    public Collection<SYSVAL2FILE> getAttachedFiles() {
+        return attachedFiles;
+    }
+
+    public Collection<SYSVAL2PROCESS> getAttachedProcessConnections() {
+        return attachedProcessConnections;
     }
 
     @Override
@@ -249,13 +264,13 @@ public class ResValue implements Serializable, QProcessElement, Cloneable {
         return resident;
     }
 
-    public boolean isWrongValues() {
-        if (vtype.getID() == ResValueTools.RR) {
-            return val1 == null || val2 == null || val3 == null;
-        } else {
-            return val1 == null;
-        }
-    }
+//    public boolean isWrongValues() {
+//        if (vtype.getID() == ResValueTools.RR) {
+//            return val1 == null || val2 == null || val3 == null;
+//        } else {
+//            return val1 == null;
+//        }
+//    }
 
     /**
      * @return
@@ -328,7 +343,27 @@ public class ResValue implements Serializable, QProcessElement, Cloneable {
 
     @Override
     public ResValue clone() {
-        return new ResValue(pit, val2, val3, val1, text, new Date(), new Date(), vtype, editedBy, replacedBy, replacementFor, user, resident);
+        final ResValue clonedValue = new ResValue(pit, val1, val2, val3, text, new Date(), new Date(), vtype, null, null, null, OPDE.getLogin().getUser(), resident);
+        CollectionUtils.forAllDo(attachedProcessConnections, new Closure() {
+            public void execute(Object o) {
+                SYSVAL2PROCESS oldAssignment = (SYSVAL2PROCESS) o;
+                clonedValue.attachedProcessConnections.add(new SYSVAL2PROCESS(oldAssignment.getQProcess(), clonedValue));
+            }
+        });
+
+        CollectionUtils.forAllDo(attachedFiles, new Closure() {
+            public void execute(Object o) {
+                SYSVAL2FILE oldAssignment = (SYSVAL2FILE) o;
+                clonedValue.attachedFiles.add(new SYSVAL2FILE(oldAssignment.getSysfile(), clonedValue, clonedValue.getUser(), clonedValue.getPit()));
+            }
+        });
+
+        return clonedValue;
+    }
+
+    @Override
+    public int compareTo(ResValue o) {
+        return pit.compareTo(o.getPit());
     }
 
     @Override

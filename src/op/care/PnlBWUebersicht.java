@@ -252,7 +252,7 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
         JideButton printButton = GUITools.createHyperlinkButton("Drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                SYSFilesTools.print(SYSTools.htmlUmlautConversion(BWInfoTools.getUeberleitung(bewohner, true, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, true)), true);
+                SYSFilesTools.print(BWInfoTools.getUeberleitung(bewohner, true, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, true), true);
             }
         });
         mypanel.add(printButton);

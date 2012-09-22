@@ -283,7 +283,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
             elements.add(att.getPrescription());
         }
         for (SYSVAL2PROCESS att : attachedResidentValues) {
-            elements.add(att.getBwerte());
+            elements.add(att.getResValue());
         }
 
 

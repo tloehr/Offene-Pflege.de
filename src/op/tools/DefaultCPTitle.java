@@ -18,13 +18,14 @@ import java.awt.event.MouseListener;
  */
 public class DefaultCPTitle {
     JPanel titlePanelleft, titlePanelright, titlePanel;
+    JideButton btnTitle;
 
     public DefaultCPTitle(String title, ActionListener actionListener) {
 
         titlePanelleft = new JPanel();
         titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
 
-        JideButton btnTitle = GUITools.createHyperlinkButton(title, null, null);
+        btnTitle = GUITools.createHyperlinkButton(title, null, null);
         btnTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
         btnTitle.addActionListener(actionListener);
 
@@ -64,5 +65,9 @@ public class DefaultCPTitle {
 
     public JPanel getMain() {
         return titlePanel;
+    }
+
+    public JideButton getButton(){
+        return btnTitle;
     }
 }

@@ -39,24 +39,16 @@ public class SYSVAL2PROCESS {
     }
 
     public SYSVAL2PROCESS(QProcess vorgang, ResValue bwerte) {
-        this.id = 0;
         this.vorgang = vorgang;
         this.bwerte = bwerte;
     }
 
-    public QProcess getVorgang() {
+    public QProcess getQProcess() {
         return vorgang;
     }
 
-    public void setVorgang(QProcess vorgang) {
-        this.vorgang = vorgang;
-    }
-
-    public ResValue getBwerte() {
+    public ResValue getResValue() {
         return bwerte;
     }
 
-    public void setBwerte(ResValue bwerte) {
-        this.bwerte = bwerte;
-    }
 }

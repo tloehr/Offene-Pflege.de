@@ -18,6 +18,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import java.math.BigDecimal;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -73,7 +74,7 @@ public class ResValueTools {
         if (showids) {
             result += "<br/><i>(" + bwert.getID() + ")</i>";
         }
-        return SYSTools.htmlUmlautConversion(colorize ? "<font " + color + " " + SYSConst.html_arial14 + ">" + result + "</font>" : result);
+        return (colorize ? "<font " + color + " " + SYSConst.html_arial14 + ">" + result + "</font>" : result);
     }
 
     /**
@@ -122,56 +123,23 @@ public class ResValueTools {
         return result;
     }
 
-    /**
-     * Rendert eine HTML Darstellung eines bestimmten Bewohner Wertes
-     *
-     * @param
-     * @param colorize
-     * @return
-     */
-//    public static String getAsHTML(ResValue bwert, boolean colorize) {
-//        String result = "";
-//        String color = "";
-//        if (colorize) {
-//            if (bwert.isReplaced() || bwert.isDeleted()) {
-//                color = SYSConst.html_lightslategrey;
-//            } else {
-//                color = OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(bwert.getPit())] + "_FGBHP");
-//            }
-//        }
-////        if (!bwert.getAttachedFiles().isEmpty()) {
-////            result += "<font color=\"green\">&#9679;</font>";
-////        }
-////        if (!bwert.getAttachedProcessConnections().isEmpty()) {
-////            result += "<font color=\"red\">&#9679;</font>";
-////        }
-//        DateFormat df = DateFormat.getDateTimeInstance();
-//        if (bwert.isDeleted()) {
-//            result += "<i>" + OPDE.lang.getString("misc.msg.thisentryhasbeendeleted") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(bwert.getMdate()) + OPDE.lang.getString("misc.msg.Bywhom") + " " + bwert.getEditedBy().getFullname() + "</i><br/>";
-//        }
-//        if (bwert.isReplacement() && !bwert.isReplaced()) {
-//            result += "<i>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(bwert.getCreateDate()) + "<br/>" + OPDE.lang.getString("misc.msg.originalentry") + ": " + bwert.getReplacementFor().getBwid() + "</i><br/>";
-//        }
-//        if (bwert.isReplaced()) {
-//            result += "<i>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(bwert.getCreateDate()) + OPDE.lang.getString("misc.msg.Bywhom") + " " + bwert.getEditedBy().getFullname();
-//            result += "<br/>" + OPDE.lang.getString("misc.msg.replaceentry") + ": " + bwert.getReplacedBy().getBwid() + "</i><br/>";
-//        }
-//
-//        if (bwert.getType() == RR) {
-//            result += "<b>" + bwert.getValue1() + "/" + bwert.getValue2() + " " + UNITS[RR] + " " + VALUES[PULSE] + ": " + bwert.getValue3() + " " + UNITS[PULSE] + "</b>";
-//        } else if (bwert.getType() == STOOL || bwert.getType() == VOMIT) {
-//            result += "<i>" + OPDE.lang.getString("misc.msg.novalue") + "</i>";
-//        } else {
-//            result += "<b>" + bwert.getValue1() + " " + UNITS[bwert.getType()] + "</b>";
-//        }
-//
-//        result += " (" + VALUES[bwert.getType()] + ")";
-//
-////        if (bwert.getText() != null && !bwert.getText().isEmpty()) {
-////            result += "<br/><b>Bemerkung:</b> " + bwert.getText();
-////        }
-//        return SYSTools.htmlUmlautConversion(colorize ? "<font " + color + " " + SYSConst.html_arial14 + ">" + result + "</font>" : result);
-//    }
+    public static String getInfoAsHTML(ResValue resValue) {
+        String result = "<div id=\"fonttext\">";
+
+        DateFormat df = DateFormat.getDateTimeInstance();
+        if (resValue.isDeleted()) {
+            result += OPDE.lang.getString("misc.msg.thisentryhasbeendeleted") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(resValue.getEditDate()) + " <br/>" + OPDE.lang.getString("misc.msg.Bywhom") + " " + resValue.getEditedBy().getFullname() + "<br/>";
+        }
+        if (resValue.isReplacement() && !resValue.isReplaced()) {
+            result += OPDE.lang.getString("misc.msg.thisEntryIsAReplacement") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(resValue.getCreateDate()) + "<br/>" + OPDE.lang.getString("misc.msg.originalentry") + ": " + resValue.getReplacementFor().getID() + "<br/>";
+        }
+        if (resValue.isReplaced()) {
+            result += OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(resValue.getCreateDate()) + "<br/>" + OPDE.lang.getString("misc.msg.Bywhom") + " " + resValue.getEditedBy().getFullname();
+            result += "<br/>" + OPDE.lang.getString("misc.msg.replaceentry") + ": " + resValue.getReplacedBy().getID() + "</i><br/>";
+        }
+
+        return result+"</div>";
+    }
 //
 //
 //    public static String getTitle(ResValue param) {
@@ -198,7 +166,7 @@ public class ResValueTools {
             }
             result = "<font " + color + " " + SYSConst.html_arial14 + ">" + "<b>" + OPDE.lang.getString("misc.msg.comment") + ":</b> " + wert.getText() + "</font>";
         }
-        return SYSTools.htmlUmlautConversion(result);
+        return result;
     }
 
 
@@ -235,7 +203,7 @@ public class ResValueTools {
 //                "window.print();" +
 //                "}</script></head><body>\n" + html + "\n" + SYSConst.html_report_footer + "</body></html>";
 
-        return SYSTools.htmlUmlautConversion(html);
+        return html;
     }
 
 
@@ -282,52 +250,52 @@ public class ResValueTools {
         return mywert;
     }
 
-    /**
-     * Führt die notwendigen Änderungen an den Entities durch, wenn ein Wert geändert wurde. Dazu gehört auch die
-     * Vorgänge umzubiegen. Der alte Wert verliert seine Vorgänge. Es werden auch die
-     * notwendigen Querverweise zwischen dem alten und dem neuen Wert erstellt.
-     *
-     * @param oldOne der Wert, der durch den <code>newOne</code> ersetzt werden soll.
-     * @param newOne siehe oben
-     * @return den neuen Wert.
-     */
-    public static ResValue changeWert(ResValue oldOne, ResValue newOne) {
-        EntityManager em = OPDE.createEM();
-        em.getTransaction().begin();
-        try {
-
-            oldOne = em.merge(oldOne);
-            newOne = em.merge(newOne);
-
-            em.lock(oldOne, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-
-            newOne.setReplacementFor(oldOne);
-            newOne.setUser(em.merge(OPDE.getLogin().getUser()));
-
-            oldOne.setEditedBy(em.merge(OPDE.getLogin().getUser()));
-            oldOne.setCdate(new Date());
-            oldOne.setReplacedBy(newOne);
-
-            // Vorgänge umbiegen
-            for (SYSVAL2PROCESS oldAssignment : oldOne.getAttachedQProcesses()) {
-                QProcess vorgang = oldAssignment.getVorgang();
-                em.lock(vorgang, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                SYSVAL2PROCESS newAssignment = em.merge(new SYSVAL2PROCESS(vorgang, newOne));
-                newOne.getAttachedQProcesses().add(newAssignment);
-                em.remove(oldAssignment);
-            }
-            oldOne.getAttachedQProcesses().clear();
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            OPDE.fatal(e);
-        } finally {
-            em.close();
-        }
-        return newOne;
-    }
+//    /**
+//     * Führt die notwendigen Änderungen an den Entities durch, wenn ein Wert geändert wurde. Dazu gehört auch die
+//     * Vorgänge umzubiegen. Der alte Wert verliert seine Vorgänge. Es werden auch die
+//     * notwendigen Querverweise zwischen dem alten und dem neuen Wert erstellt.
+//     *
+//     * @param oldOne der Wert, der durch den <code>newOne</code> ersetzt werden soll.
+//     * @param newOne siehe oben
+//     * @return den neuen Wert.
+//     */
+//    public static ResValue changeWert(ResValue oldOne, ResValue newOne) {
+//        EntityManager em = OPDE.createEM();
+//        em.getTransaction().begin();
+//        try {
+//
+//            oldOne = em.merge(oldOne);
+//            newOne = em.merge(newOne);
+//
+//            em.lock(oldOne, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+//
+//            newOne.setReplacementFor(oldOne);
+//            newOne.setUser(em.merge(OPDE.getLogin().getUser()));
+//
+//            oldOne.setEditedBy(em.merge(OPDE.getLogin().getUser()));
+//            oldOne.setCreateDate(new Date());
+//            oldOne.setReplacedBy(newOne);
+//
+//            // Vorgänge umbiegen
+//            for (SYSVAL2PROCESS oldAssignment : oldOne.getAttachedQProcesses()) {
+//                QProcess vorgang = oldAssignment.getQProcess();
+//                em.lock(vorgang, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+//                SYSVAL2PROCESS newAssignment = em.merge(new SYSVAL2PROCESS(vorgang, newOne));
+//                newOne.getAttachedQProcesses().add(newAssignment);
+//                em.remove(oldAssignment);
+//            }
+//            oldOne.getAttachedQProcesses().clear();
+//            em.getTransaction().commit();
+//        } catch (Exception e) {
+//            if (em.getTransaction().isActive()) {
+//                em.getTransaction().rollback();
+//            }
+//            OPDE.fatal(e);
+//        } finally {
+//            em.close();
+//        }
+//        return newOne;
+//    }
 
     public static boolean hatEinfuhren(Resident bewohner) {
         boolean result = false;
@@ -423,7 +391,7 @@ public class ResValueTools {
         if (rv.getType().getValType() == RR) {
             result += "<b>" + rv.getVal1() + "/" + rv.getVal2() + " " + rv.getType().getUnit1() + " " + rv.getType().getLabel3() + ": " + rv.getVal3() + " " + rv.getType().getUnit3() + "</b>";
         } else if (rv.getType().getValType() == STOOL || rv.getType().getValType() == VOMIT) {
-            result += "<i>" + OPDE.lang.getString("misc.msg.novalue") + "</i>";
+            result += "<i>" + SYSTools.catchNull(rv.getText(),"--") + "</i>";
         } else {
             result += "<b>" + rv.getVal1() + " " + rv.getType().getUnit1() + "</b>";
         }

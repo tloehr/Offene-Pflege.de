@@ -503,7 +503,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
     }
 
     @Override
-    public Object clone() {
+    public NReport clone() {
 
         final NReport clonedReport = new NReport(pit, editpit, text, minutes, user, resident, editedBy, null, null);
 

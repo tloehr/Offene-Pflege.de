@@ -458,25 +458,25 @@ public class SYSTools {
      * @param status Status = 1 aktive Benutzer. Status = 0 inaktive. Status = -1 alle
      * @return ComboBox aus ListElements mit den UKennungen in dem "Value" Attribut
      */
-    public static DefaultComboBoxModel getUserList(int status) {
-        HashMap where = new HashMap();
-        DefaultComboBoxModel result = new DefaultComboBoxModel();
-        if (status >= 0) {
-            where.put("Status", new Object[]{status, "="});
-        }
-        ResultSet rs = op.tools.DBHandling.getResultSet("OCUsers", new String[]{"UKennung", "Nachname", "Vorname"}, where, new String[]{"Nachname", "Vorname"});
-
-        result.addElement(new ListElement(toHTML("<i>alle</i>"), null));
-        try {
-            rs.beforeFirst();
-            while (rs.next()) {
-                String s = rs.getString("Nachname") + ", " + rs.getString("Vorname") + " (" + rs.getString("UKennung") + ")";
-                result.addElement(new ListElement(s, rs.getString("UKennung")));
-            }
-        } catch (SQLException exc) {
-        }
-        return result;
-    }
+//    public static DefaultComboBoxModel getUserList(int status) {
+//        HashMap where = new HashMap();
+//        DefaultComboBoxModel result = new DefaultComboBoxModel();
+//        if (status >= 0) {
+//            where.put("Status", new Object[]{status, "="});
+//        }
+//        ResultSet rs = op.tools.DBHandling.getResultSet("OCUsers", new String[]{"UKennung", "Nachname", "Vorname"}, where, new String[]{"Nachname", "Vorname"});
+//
+//        result.addElement(new ListElement(toHTML("<i>alle</i>"), null));
+//        try {
+//            rs.beforeFirst();
+//            while (rs.next()) {
+//                String s = rs.getString("Nachname") + ", " + rs.getString("Vorname") + " (" + rs.getString("UKennung") + ")";
+//                result.addElement(new ListElement(s, rs.getString("UKennung")));
+//            }
+//        } catch (SQLException exc) {
+//        }
+//        return result;
+//    }
 
     public static String anonymizeUser(String nachname, String vorname) {
         String result;
@@ -534,53 +534,53 @@ public class SYSTools {
 //        return result;
 //    }
 
-    /**
-     * @return die BWKennung des gewünschten Bewohners oder "" wenn die Suche nicht erfolgreich war.
-     */
-    @Deprecated
-    public static String findeBW(java.awt.Frame parent, String muster, boolean admin) {
-        String result = "";
-
-        HashMap where = new HashMap();
-        where.put("BWKennung", new Object[]{muster, "="});
-        if (!admin) {
-            where.put("adminonly", new Object[]{new Boolean(false), "="});
-        }
-
-        result = (String) DBHandling.getSingleValue("Bewohner", "BWKennung", where); //"BWKennung",muster);
-        if (result == null) { // das Muster war kein gültiger Primary Key, dann suchen wir eben nach Namen.
-            muster += "%"; // MySQL Wildcard
-            HashMap where1 = new HashMap();
-            where1.put("Nachname", new Object[]{muster, "like"});
-            if (!admin) {
-                where1.put("adminonly", new Object[]{new Boolean(false), "="});
-            }
-
-            ResultSet rs = DBHandling.getResultSet("Bewohner", new String[]{"BWKennung", "Nachname", "Vorname", "GebDatum", "BWKennung"}, where1);
-            DefaultListModel dlm = rs2lst(rs);
-            if (dlm.getSize() > 1) {
-//                DlgListSelector dlg = new DlgListSelector(parent, "Auswahlliste Bewohner", "Bitte wählen Sie eine(n) Bewohner(in) aus.", "Ihre Suche ergab mehrere Möglichkeiten. Welche(n) Bewohner(in) meinten Sie ?", dlm);
-                Object selection = null;
-                if (selection != null) {
-                    ListElement le = (ListElement) selection;
-                    result = le.getData();
-                } else {
-                    result = "";
-                }
-            } else if (dlm.getSize() == 1) {
-                try {
-                    rs.first();
-                    result = rs.getString("BWKennung");
-                } catch (SQLException ex) {
-//                    new DlgException(ex);
-                    ex.printStackTrace();
-                }
-            } else {
-                result = "";
-            }
-        }
-        return result;
-    }
+//    /**
+//     * @return die BWKennung des gewünschten Bewohners oder "" wenn die Suche nicht erfolgreich war.
+//     */
+//    @Deprecated
+//    public static String findeBW(java.awt.Frame parent, String muster, boolean admin) {
+//        String result = "";
+//
+//        HashMap where = new HashMap();
+//        where.put("BWKennung", new Object[]{muster, "="});
+//        if (!admin) {
+//            where.put("adminonly", new Object[]{new Boolean(false), "="});
+//        }
+//
+//        result = (String) DBHandling.getSingleValue("Bewohner", "BWKennung", where); //"BWKennung",muster);
+//        if (result == null) { // das Muster war kein gültiger Primary Key, dann suchen wir eben nach Namen.
+//            muster += "%"; // MySQL Wildcard
+//            HashMap where1 = new HashMap();
+//            where1.put("Nachname", new Object[]{muster, "like"});
+//            if (!admin) {
+//                where1.put("adminonly", new Object[]{new Boolean(false), "="});
+//            }
+//
+//            ResultSet rs = DBHandling.getResultSet("Bewohner", new String[]{"BWKennung", "Nachname", "Vorname", "GebDatum", "BWKennung"}, where1);
+//            DefaultListModel dlm = rs2lst(rs);
+//            if (dlm.getSize() > 1) {
+////                DlgListSelector dlg = new DlgListSelector(parent, "Auswahlliste Bewohner", "Bitte wählen Sie eine(n) Bewohner(in) aus.", "Ihre Suche ergab mehrere Möglichkeiten. Welche(n) Bewohner(in) meinten Sie ?", dlm);
+//                Object selection = null;
+//                if (selection != null) {
+//                    ListElement le = (ListElement) selection;
+//                    result = le.getData();
+//                } else {
+//                    result = "";
+//                }
+//            } else if (dlm.getSize() == 1) {
+//                try {
+//                    rs.first();
+//                    result = rs.getString("BWKennung");
+//                } catch (SQLException ex) {
+////                    new DlgException(ex);
+//                    ex.printStackTrace();
+//                }
+//            } else {
+//                result = "";
+//            }
+//        }
+//        return result;
+//    }
 
     public static void markAllTxt(JTextField jtf) {
         jtf.setSelectionStart(0);

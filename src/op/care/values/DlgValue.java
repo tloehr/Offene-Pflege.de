@@ -4,11 +4,11 @@
 
 package op.care.values;
 
-import java.awt.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.swing.JideLabel;
 import entity.values.ResValue;
+import op.OPDE;
 import op.tools.MyJDialog;
 import op.tools.PnlPIT;
 import op.tools.SYSTools;
@@ -16,6 +16,8 @@ import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.math.BigDecimal;
@@ -28,48 +30,66 @@ public class DlgValue extends MyJDialog {
     private ResValue resValue;
     private Closure afterAction;
     private PnlPIT pnlPIT;
+    private boolean editMode;
 
-    public DlgValue(ResValue resValue, Closure afterAction) {
+    public DlgValue(ResValue resValue, boolean editMode, Closure afterAction) {
+        super();
         this.resValue = resValue;
+        this.editMode = editMode;
         this.afterAction = afterAction;
         initComponents();
         initPanel();
+        setVisible(true);
+
     }
 
     public void initPanel() {
 
-        pnlPIT = new PnlPIT();
-
-        getContentPane().add(pnlPIT, CC.xywh(3, 1, 5, 1));
+        if (!editMode) {
+            pnlPIT = new PnlPIT();
+            panel2.add(pnlPIT);
+        }
 
         lblWert1.setVisible(resValue.getVal1() != null);
         txtWert1.setVisible(resValue.getVal1() != null);
         lblWert1Einheit.setVisible(resValue.getVal1() != null);
-        lblWert1.setText(resValue.getType().getLabel1());
-        lblWert1Einheit.setText(resValue.getType().getUnit1());
-        txtWert1.setText(NumberFormat.getNumberInstance().format(resValue.getVal1()));
+        if (resValue.getVal1() != null) {
+            lblWert1.setText(resValue.getType().getLabel1());
+            lblWert1Einheit.setText(resValue.getType().getUnit1());
+            txtWert1.setText(NumberFormat.getNumberInstance().format(resValue.getVal1()));
+        }
 
         lblWert2.setVisible(resValue.getVal2() != null);
         txtWert2.setVisible(resValue.getVal3() != null);
         lblWert2Einheit.setVisible(resValue.getVal2() != null);
-        lblWert2.setText(resValue.getType().getLabel2());
-        lblWert2Einheit.setText(resValue.getType().getUnit2());
-        txtWert2.setText(NumberFormat.getNumberInstance().format(resValue.getVal2()));
+        if (resValue.getVal2() != null) {
+            lblWert2.setText(resValue.getType().getLabel2());
+            lblWert2Einheit.setText(resValue.getType().getUnit2());
+            txtWert2.setText(NumberFormat.getNumberInstance().format(resValue.getVal2()));
+        }
 
         lblWert3.setVisible(resValue.getVal3() != null);
         txtWert3.setVisible(resValue.getVal3() != null);
         lblWert3Einheit.setVisible(resValue.getVal3() != null);
-        lblWert3.setText(resValue.getType().getLabel3());
-        lblWert3Einheit.setText(resValue.getType().getUnit3());
-        txtWert3.setText(NumberFormat.getNumberInstance().format(resValue.getVal3()));
+        if (resValue.getVal3() != null) {
+            lblWert3.setText(resValue.getType().getLabel3());
+            lblWert3Einheit.setText(resValue.getType().getUnit3());
+            txtWert3.setText(NumberFormat.getNumberInstance().format(resValue.getVal3()));
+        }
 
         txtText.setText(SYSTools.catchNull(resValue.getText()));
+        lblText.setText(OPDE.lang.getString("misc.msg.comment"));
+        lblNoValue.setText(OPDE.lang.getString("misc.msg.novaluesneeded"));
+        lblNoValue.setVisible(resValue.getVal1() == null && resValue.getVal2() == null && resValue.getVal3() == null);
+
     }
 
     private void txtWert1FocusLost(FocusEvent e) {
         BigDecimal bd = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
         if (bd == null) {
             ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(resValue.getVal1()));
+        } else {
+            ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(bd));
         }
     }
 
@@ -77,6 +97,8 @@ public class DlgValue extends MyJDialog {
         BigDecimal bd = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
         if (bd == null) {
             ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(resValue.getVal2()));
+        } else {
+            ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(bd));
         }
     }
 
@@ -84,25 +106,27 @@ public class DlgValue extends MyJDialog {
         BigDecimal bd = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
         if (bd == null) {
             ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(resValue.getVal3()));
+        } else {
+            ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(bd));
         }
     }
 
-    private boolean saveOK(){
+    private boolean saveOK() {
         boolean ok = true;
 
-        if (ok && resValue.getVal1() != null){
+        if (ok && resValue.getVal1() != null) {
             BigDecimal bd = SYSTools.parseDecimal(txtWert1.getText());
             ok = bd != null;
             resValue.setVal1(bd);
         }
 
-        if (ok && resValue.getVal2() != null){
+        if (ok && resValue.getVal2() != null) {
             BigDecimal bd = SYSTools.parseDecimal(txtWert2.getText());
             ok = bd != null;
             resValue.setVal2(bd);
         }
 
-        if (ok && resValue.getVal3() != null){
+        if (ok && resValue.getVal3() != null) {
             BigDecimal bd = SYSTools.parseDecimal(txtWert3.getText());
             ok = bd != null;
             resValue.setVal3(bd);
@@ -113,9 +137,11 @@ public class DlgValue extends MyJDialog {
 
 
     private void btnApplyActionPerformed(ActionEvent e) {
-        if (saveOK()){
+        if (saveOK()) {
             resValue.setText(txtText.getText().trim());
-            resValue.setPit(pnlPIT.getPIT());
+            if (pnlPIT != null) {
+                resValue.setPit(pnlPIT.getPIT());
+            }
             dispose();
         }
     }
@@ -128,11 +154,13 @@ public class DlgValue extends MyJDialog {
 
     private void btnCancelActionPerformed(ActionEvent e) {
         resValue = null;
-
+        dispose();
     }
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
+        panel4 = new JPanel();
+        panel2 = new JPanel();
         lblWert1 = new JLabel();
         txtWert1 = new JTextField();
         lblWert1Einheit = new JLabel();
@@ -145,6 +173,7 @@ public class DlgValue extends MyJDialog {
         lblText = new JideLabel();
         scrollPane1 = new JScrollPane();
         txtText = new JTextArea();
+        lblNoValue = new JLabel();
         panel1 = new JPanel();
         btnCancel = new JButton();
         btnApply = new JButton();
@@ -152,8 +181,21 @@ public class DlgValue extends MyJDialog {
         //======== this ========
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "14dlu, $lcgap, default, $lcgap, 84dlu:grow, $lcgap, 55dlu, $lcgap, default, $lcgap, 14dlu",
-                "14dlu, 4*($lgap, default), $lgap, default:grow, $lgap, default, $lgap, 14dlu"));
+                "14dlu, $lcgap, default, $lcgap, 84dlu:grow, $lcgap, 55dlu:grow, $lcgap, default, $lcgap, 14dlu",
+                "14dlu, $lgap, pref, 3*($lgap, default), 2*($lgap, fill:default:grow), $lgap, 14dlu"));
+
+        //======== panel4 ========
+        {
+            panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
+        }
+        contentPane.add(panel4, CC.xywh(1, 1, 11, 1, CC.FILL, CC.FILL));
+
+        //======== panel2 ========
+        {
+            panel2.setBackground(new Color(204, 204, 204));
+            panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
+        }
+        contentPane.add(panel2, CC.xywh(3, 3, 7, 1, CC.FILL, CC.FILL));
 
         //---- lblWert1 ----
         lblWert1.setText("text");
@@ -235,6 +277,10 @@ public class DlgValue extends MyJDialog {
         }
         contentPane.add(scrollPane1, CC.xywh(5, 11, 1, 3));
 
+        //---- lblNoValue ----
+        lblNoValue.setText("text");
+        contentPane.add(lblNoValue, CC.xywh(7, 11, 3, 1));
+
         //======== panel1 ========
         {
             panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
@@ -261,13 +307,15 @@ public class DlgValue extends MyJDialog {
             });
             panel1.add(btnApply);
         }
-        contentPane.add(panel1, CC.xywh(7, 13, 3, 1, CC.RIGHT, CC.DEFAULT));
-        setSize(435, 240);
+        contentPane.add(panel1, CC.xywh(7, 13, 3, 1, CC.RIGHT, CC.BOTTOM));
+        setSize(600, 320);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+    private JPanel panel4;
+    private JPanel panel2;
     private JLabel lblWert1;
     private JTextField txtWert1;
     private JLabel lblWert1Einheit;
@@ -280,6 +328,7 @@ public class DlgValue extends MyJDialog {
     private JideLabel lblText;
     private JScrollPane scrollPane1;
     private JTextArea txtText;
+    private JLabel lblNoValue;
     private JPanel panel1;
     private JButton btnCancel;
     private JButton btnApply;

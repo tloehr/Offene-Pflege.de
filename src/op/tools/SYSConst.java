@@ -219,11 +219,11 @@ public class SYSConst {
     public static final String html_div_open = "<div id=\"fonttext\">";
     public static final String html_div_close = "</div>";
 
-    public static final String html_report_footer = "<hr/>" +
-            html_fontface +
-            "<b>" + OPDE.lang.getString("misc.msg.endofreport") + "</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getFullname()) : "")
-            + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
-            + "<br/>http://www.offene-pflege.de</font>\n";
+//    public static final String html_report_footer = "<hr/>" +
+//            html_fontface +
+//            "<b>" + OPDE.lang.getString("misc.msg.endofreport") + "</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getFullname()) : "")
+//            + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
+//            + "<br/>http://www.offene-pflege.de</font>\n";
 
     public static final int SCROLL_TIME_FAST = 500; // for the sliding splitpanes
 
@@ -367,6 +367,7 @@ public class SYSConst {
     public static final Icon icon22edit1Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/edit1_pressed.png"));
     public static final Icon icon22editPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/kspread_pressed.png"));
     public static final Icon icon22empty = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/empty.png"));
+    public static final Icon icon22eraser = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/eraser.png"));
     public static final Icon icon22emptyPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/empty_pressed.png"));
     public static final Icon icon22give = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/hand-over.png"));
     public static final Icon icon22givePressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/hand-over_pressed.png"));

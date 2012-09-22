@@ -755,7 +755,7 @@ public class PnlBHP extends NursingRecordsPanel {
              *
              */
             final JButton btnInfo = new JButton(SYSConst.icon22info);
-            final JidePopup popupInfo = new JidePopup();
+
             btnInfo.setPressedIcon(SYSConst.icon22infoPressed);
             btnInfo.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnInfo.setContentAreaFilled(false);
@@ -764,10 +764,8 @@ public class PnlBHP extends NursingRecordsPanel {
             final JTextPane txt = new JTextPane();
             txt.setContentType("text/html");
             txt.setEditable(false);
-
+            final JidePopup popupInfo = new JidePopup();
             popupInfo.setMovable(false);
-//            popupInfo.getContentPane().setLayout(new BoxLayout(popupInfo.getContentPane(), BoxLayout.LINE_AXIS));
-//            popupInfo.getContentPane().add(new JScrollPane(txt));
             popupInfo.setContentPane(new JScrollPane(txt));
             popupInfo.removeExcludedComponent(txt);
             popupInfo.setDefaultFocusComponent(txt);

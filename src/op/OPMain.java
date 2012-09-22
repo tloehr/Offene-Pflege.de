@@ -257,17 +257,17 @@ public class OPMain extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        if (OPDE.getLogin() != null) {
-            // OPDE.getDb().doLogout();
-            try {
-                OPDE.getDb().db.close();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-                System.exit(1);
-            }
-        }
-
-        System.exit(0);
+//        if (OPDE.getLogin() != null) {
+//            // OPDE.getDb().doLogout();
+//            try {
+//                OPDE.getDb().db.close();
+//            } catch (SQLException ex) {
+//                ex.printStackTrace();
+//                System.exit(1);
+//            }
+//        }
+//
+//        System.exit(0);
 
 //        SYSHostsTools.shutdown(0);
 

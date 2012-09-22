@@ -74,8 +74,7 @@ public class OPDE {
 
     public static long uptime;
     public static ResourceBundle lang;
-    protected static Database db;
-    //    public static OPMain ocmain;
+
     public static FrmMain mainframe;
     protected static String url;
     protected static PrinterTypes printers;
@@ -773,9 +772,9 @@ public class OPDE {
     }
 
 
-    public static Database getDb() {
-        return db;
-    }
+//    public static Database getDb() {
+//        return db;
+//    }
 
     public static boolean isAdmin() {
         return UsersTools.isAdmin(login.getUser());

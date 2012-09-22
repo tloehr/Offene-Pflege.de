@@ -276,40 +276,40 @@ public class PrinterTypes {
      * @param html
      * @param addPrintJScript - Auf Wunsch kann an das HTML automatisch eine JScript Druckroutine angehangen werden.
      */
-    public static void print(Component parent, String html, boolean addPrintJScript) {
-        try {
-            // Create temp file.
-            File temp = File.createTempFile("kueche", ".html");
-
-            // Delete temp file when program exits.
-            temp.deleteOnExit();
-
-            if (addPrintJScript) {
-                html = "<html><head><script type=\"text/javascript\">"
-                        + "window.onload = function() {"
-                        + "window.print();"
-                        + "}</script>"
-                        + OPDE.getCSS()
-                        + "</head><body>" + SYSTools.htmlUmlautConversion(html)
-                        + "<hr/><span id=\"fonttext\"><b>Ende des Berichtes</b><br/>http://www.offene-pflege.de/component/content/article/3-informationen/16-kueche</span></body></html>";
-            } else {
-                html = "<html><head>" + OPDE.getCSS() + "</head><body>" + SYSTools.htmlUmlautConversion(html)
-                        + "<hr/><span id=\"fonttext\"><b>Ende des Berichtes</b><br/>http://www.offene-pflege.de/component/content/article/3-informationen/16-kueche</span></body></html>";
-            }
-
-            OPDE.debug(html);
-
-            // Write to temp file
-            BufferedWriter out = new BufferedWriter(new FileWriter(temp));
-            out.write(html);
-
-            out.close();
-            handleFile(parent, temp.getAbsolutePath(), Desktop.Action.OPEN);
-        } catch (IOException e) {
-            OPDE.fatal(e);
-        }
-
-    }
+//    public static void print(Component parent, String html, boolean addPrintJScript) {
+//        try {
+//            // Create temp file.
+//            File temp = File.createTempFile("kueche", ".html");
+//
+//            // Delete temp file when program exits.
+//            temp.deleteOnExit();
+//
+//            if (addPrintJScript) {
+//                html = "<html><head><script type=\"text/javascript\">"
+//                        + "window.onload = function() {"
+//                        + "window.print();"
+//                        + "}</script>"
+//                        + OPDE.getCSS()
+//                        + "</head><body>" + SYSTools.htmlUmlautConversion(html)
+//                        + "<hr/><span id=\"fonttext\"><b>Ende des Berichtes</b><br/>http://www.offene-pflege.de/component/content/article/3-informationen/16-kueche</span></body></html>";
+//            } else {
+//                html = "<html><head>" + OPDE.getCSS() + "</head><body>" + SYSTools.htmlUmlautConversion(html)
+//                        + "<hr/><span id=\"fonttext\"><b>Ende des Berichtes</b><br/>http://www.offene-pflege.de/component/content/article/3-informationen/16-kueche</span></body></html>";
+//            }
+//
+//            OPDE.debug(html);
+//
+//            // Write to temp file
+//            BufferedWriter out = new BufferedWriter(new FileWriter(temp));
+//            out.write(html);
+//
+//            out.close();
+//            handleFile(parent, temp.getAbsolutePath(), Desktop.Action.OPEN);
+//        } catch (IOException e) {
+//            OPDE.fatal(e);
+//        }
+//
+//    }
 
 
     public static void handleFile(Component parent, String filename, java.awt.Desktop.Action action) {

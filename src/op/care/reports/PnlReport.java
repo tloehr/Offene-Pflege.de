@@ -570,7 +570,7 @@ public class PnlReport extends NursingRecordsPanel {
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".notchangeable")));
                         return;
                     }
-                    new DlgReport((NReport) report.clone(), new Closure() {
+                    new DlgReport(report.clone(), new Closure() {
                         @Override
                         public void execute(Object result) {
                             if (result != null) {

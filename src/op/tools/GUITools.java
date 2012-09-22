@@ -19,12 +19,12 @@ import org.jdesktop.swing.animation.timing.sources.SwingTimerTimingSource;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
-import java.util.MissingResourceException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -40,7 +40,7 @@ public class GUITools {
         String title = SYSTools.catchNull(titleORlangbundle);
         try {
             title = OPDE.lang.getString(titleORlangbundle);
-        } catch (Exception e){
+        } catch (Exception e) {
             // ok, its not a langbundle key
         }
         final JideButton button = new JideButton(title, icon);
@@ -87,7 +87,7 @@ public class GUITools {
         String title = SYSTools.catchNull(titleORlangbundle);
         try {
             title = OPDE.lang.getString(titleORlangbundle);
-        } catch (Exception e){
+        } catch (Exception e) {
             // ok, its not a langbundle key
         }
 
@@ -360,5 +360,19 @@ public class GUITools {
         int green = (int) (destination.getGreen() * distance + source.getGreen() * (1 - distance));
         int blue = (int) (destination.getBlue() * distance + source.getBlue() * (1 - distance));
         return new Color(red, green, blue);
+    }
+
+    public static JidePopup getHTMLPopup(Component owner, String html) {
+        final JTextPane txt = new JTextPane();
+        txt.setContentType("text/html");
+        txt.setEditable(false);
+        final JidePopup popupInfo = new JidePopup();
+        popupInfo.setMovable(false);
+        popupInfo.setContentPane(new JScrollPane(txt));
+        popupInfo.removeExcludedComponent(txt);
+        popupInfo.setDefaultFocusComponent(txt);
+        popupInfo.setOwner(owner);
+        txt.setText(SYSTools.toHTML(html));
+        return popupInfo;
     }
 }
