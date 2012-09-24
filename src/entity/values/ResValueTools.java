@@ -4,8 +4,6 @@ package entity.values;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.nursingprocess.DFNTools;
-import entity.process.QProcess;
-import entity.process.SYSVAL2PROCESS;
 import op.OPDE;
 import op.care.values.PnlValues;
 import op.tools.Pair;
@@ -15,14 +13,11 @@ import op.tools.SYSTools;
 import org.joda.time.DateTime;
 
 import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -138,9 +133,10 @@ public class ResValueTools {
             result += "<br/>" + OPDE.lang.getString("misc.msg.replaceentry") + ": " + resValue.getReplacedBy().getID() + "</i><br/>";
         }
 
-        return result+"</div>";
+        return result + "</div>";
     }
-//
+
+    //
 //
 //    public static String getTitle(ResValue param) {
 //        String result = "";
@@ -170,132 +166,45 @@ public class ResValueTools {
     }
 
 
-    public static String getAsHTML(List<ResValue> bwerte) {
+    public static String getAsHTML(List<ResValue> resValues) {
 
-        if (bwerte.isEmpty()) {
+        if (resValues.isEmpty()) {
             return "<i>" + OPDE.lang.getString("misc.msg.emptyselection") + "</i>";
         }
 
         String html = "";
 
-        html += "<h1 id=\"fonth1\">" + OPDE.lang.getString(PnlValues.internalClassID) + " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getLabelText(bwerte.get(0).getResident()) + "</h1>";
+        html += "<h1 id=\"fonth1\">" + OPDE.lang.getString(PnlValues.internalClassID) + " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getLabelText(resValues.get(0).getResident()) + "</h1>";
 
         html += "<table  id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
                 "<th style=\"width:20%\">" + OPDE.lang.getString(PnlValues.internalClassID + ".tabheader1") +
                 "</th><th style=\"width:40%\">" + OPDE.lang.getString(PnlValues.internalClassID + ".tabheader2") + "</th>" +
                 "</th><th style=\"width:40%\">" + OPDE.lang.getString(PnlValues.internalClassID + ".tabheader3") + "</th></tr>\n";
 
-        for (ResValue wert : bwerte) {
+        for (ResValue resValue : resValues) {
             html += "<tr>";
-            html += "<td>" + getPITasHTML(wert, false, false) + "</td>";
-//            html += "<td>" + getAsHTML(wert, false) + "</td>";
-            html += "<td>" + getTextAsHTML(wert, false) + "</td>";
+            html += "<td>" + getPITasHTML(resValue, false, false) + "</td>";
+            html += "<td>" + getAsHTML(resValue) + "</td>";
+            html += "<td>" + getTextAsHTML(resValue, false) + "</td>";
             html += "</tr>\n";
         }
 
         html += "</table>\n";
 
-//        html = "<html><head>" +
-//                "<title>" + SYSTools.getWindowTitle("") + "</title>" +
-//                OPDE.getCSS() +
-//                "<script type=\"text/javascript\">" +
-//                "window.onload = function() {" +
-//                "window.print();" +
-//                "}</script></head><body>\n" + html + "\n" + SYSConst.html_report_footer + "</body></html>";
-
         return html;
     }
 
+    public static String getAsHTML(ResValue rv) {
+        String result = "";
 
-    /**
-     * setzt einen Bewohnerwert auf "gelöscht". Das heisst, er ist dann inaktiv. Es werden auch Datei und Vorgangs
-     * Zuordnungen entfernt.
-     *
-     * @param wert
-     * @return den geänderten und somit gelöschten Wert. Null bei Fehler.
-     */
-    public static ResValue deleteWert(ResValue wert) {
-        ResValue mywert = null;
-        EntityManager em = OPDE.createEM();
-        try {
-            em.getTransaction().begin();
+        result += getInfoAsHTML(rv);
 
-            mywert = em.merge(wert);
-            mywert.setDeletedBy(em.merge(OPDE.getLogin().getUser()));
+        result += getValueAsHTML(rv);
 
-//            // Datei Zuordnungen entfernen
-//            Iterator<SYSNR2FILE> files = bericht.getAttachedFiles().iterator();
-//            while (files.hasNext()) {
-//                SYSNR2FILE oldAssignment = files.next();
-//                em.remove(oldAssignment);
-//            }
-//            bericht.getAttachedFiles().clear();
+//             result += " (" + VALUES[rv.getType()] + ")";
 
-            // Vorgangszuordnungen entfernen
-            Iterator<SYSVAL2PROCESS> vorgaenge = mywert.getAttachedQProcesses().iterator();
-            while (vorgaenge.hasNext()) {
-                SYSVAL2PROCESS oldAssignment = vorgaenge.next();
-                em.remove(oldAssignment);
-            }
-            mywert.getAttachedQProcesses().clear();
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            OPDE.fatal(e);
-        } finally {
-            em.close();
-        }
-        return mywert;
+        return "<div = \"fonttext\">" + result + "</div>";
     }
-
-//    /**
-//     * Führt die notwendigen Änderungen an den Entities durch, wenn ein Wert geändert wurde. Dazu gehört auch die
-//     * Vorgänge umzubiegen. Der alte Wert verliert seine Vorgänge. Es werden auch die
-//     * notwendigen Querverweise zwischen dem alten und dem neuen Wert erstellt.
-//     *
-//     * @param oldOne der Wert, der durch den <code>newOne</code> ersetzt werden soll.
-//     * @param newOne siehe oben
-//     * @return den neuen Wert.
-//     */
-//    public static ResValue changeWert(ResValue oldOne, ResValue newOne) {
-//        EntityManager em = OPDE.createEM();
-//        em.getTransaction().begin();
-//        try {
-//
-//            oldOne = em.merge(oldOne);
-//            newOne = em.merge(newOne);
-//
-//            em.lock(oldOne, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-//
-//            newOne.setReplacementFor(oldOne);
-//            newOne.setUser(em.merge(OPDE.getLogin().getUser()));
-//
-//            oldOne.setEditedBy(em.merge(OPDE.getLogin().getUser()));
-//            oldOne.setCreateDate(new Date());
-//            oldOne.setReplacedBy(newOne);
-//
-//            // Vorgänge umbiegen
-//            for (SYSVAL2PROCESS oldAssignment : oldOne.getAttachedQProcesses()) {
-//                QProcess vorgang = oldAssignment.getQProcess();
-//                em.lock(vorgang, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-//                SYSVAL2PROCESS newAssignment = em.merge(new SYSVAL2PROCESS(vorgang, newOne));
-//                newOne.getAttachedQProcesses().add(newAssignment);
-//                em.remove(oldAssignment);
-//            }
-//            oldOne.getAttachedQProcesses().clear();
-//            em.getTransaction().commit();
-//        } catch (Exception e) {
-//            if (em.getTransaction().isActive()) {
-//                em.getTransaction().rollback();
-//            }
-//            OPDE.fatal(e);
-//        } finally {
-//            em.close();
-//        }
-//        return newOne;
-//    }
 
     public static boolean hatEinfuhren(Resident bewohner) {
         boolean result = false;
@@ -387,14 +296,15 @@ public class ResValueTools {
 
 
     public static String getValueAsHTML(ResValue rv) {
-        String result = "";
+        String result = (rv.isDeleted() || rv.isReplaced() ? "<s>" : "");
         if (rv.getType().getValType() == RR) {
             result += "<b>" + rv.getVal1() + "/" + rv.getVal2() + " " + rv.getType().getUnit1() + " " + rv.getType().getLabel3() + ": " + rv.getVal3() + " " + rv.getType().getUnit3() + "</b>";
         } else if (rv.getType().getValType() == STOOL || rv.getType().getValType() == VOMIT) {
-            result += "<i>" + SYSTools.catchNull(rv.getText(),"--") + "</i>";
+            result += "<i>" + SYSTools.catchNull(rv.getText(), "--") + "</i>";
         } else {
             result += "<b>" + rv.getVal1() + " " + rv.getType().getUnit1() + "</b>";
         }
+        result += (rv.isDeleted() || rv.isReplaced() ? "</s>" : "");
         return result;
     }
 

@@ -66,6 +66,7 @@ public class DisplayManager extends Thread {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
+                OPDE.debug("DisplayManager.setMainMessage");
                 lblMain.setText(message);
                 lblMain.setIcon(null);
             }
@@ -188,27 +189,32 @@ public class DisplayManager extends Thread {
     }
 
     private void processProgressBar() {
-        if (progressBarMessage != null) {  //  && zyklen/5%2 == 0 && zyklen % 5 == 0
-            if (progressBarMessage.getPercentage() < 0) {
-                if (!isIndeterminate) {
-                    isIndeterminate = true;
+//        OPDE.debug("DisplayManager.processProgressBar");
+        try {
+            if (progressBarMessage != null) {  //  && zyklen/5%2 == 0 && zyklen % 5 == 0
+                if (progressBarMessage.getPercentage() < 0) {
+                    if (!isIndeterminate) {
+                        isIndeterminate = true;
+                    }
+                } else {
+                    isIndeterminate = false;
+                    jp.setValue(progressBarMessage.getPercentage());
                 }
+
+                jp.setString(progressBarMessage.getRawMessage());
             } else {
+                if (jp.getValue() > 0) {
+                    jp.setValue(0);
+                    jp.setString(null);
+                }
                 isIndeterminate = false;
-                jp.setValue(progressBarMessage.getPercentage());
+
             }
 
-            jp.setString(progressBarMessage.getRawMessage());
-        } else {
-            if (jp.getValue() > 0) {
-                jp.setValue(0);
-                jp.setString(null);
-            }
-            isIndeterminate = false;
-
+            jp.setIndeterminate(isIndeterminate);
+        } catch (Exception e) {
+            OPDE.fatal(e);
         }
-
-        jp.setIndeterminate(isIndeterminate);
     }
 
     public static DisplayMessage getLockMessage() {
@@ -226,19 +232,21 @@ public class DisplayManager extends Thread {
 
     public void run() {
         while (!interrupted) {
-
-            lblMain.repaint();
-            lblSub.repaint();
-
-            processProgressBar();
-            processSubMessage();
-
             try {
+                lblMain.repaint();
+                lblSub.repaint();
+
+                processProgressBar();
+                processSubMessage();
+
+
                 zyklen++;
                 Thread.sleep(50);
             } catch (InterruptedException ie) {
                 interrupted = true;
                 System.out.println("DisplayManager interrupted!");
+            } catch (Exception e) {
+                OPDE.fatal(e);
             }
         }
     }

@@ -93,7 +93,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
     private Collection<SYSNP2PROCESS> attachedNursingProcesses;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
-    private Collection<SYSVAL2PROCESS> attachedResidentValues;
+    private Collection<SYSVAL2PROCESS> attachedResValueConnections;
 
     // ==
     // M:N Relationen
@@ -142,7 +142,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         this.attachedPrescriptionConnections = new ArrayList<SYSPRE2PROCESS>();
         this.attachedInfos = new ArrayList<SYSINF2PROCESS>();
         this.attachedNursingProcesses = new ArrayList<SYSNP2PROCESS>();
-        this.attachedResidentValues = new ArrayList<SYSVAL2PROCESS>();
+        this.attachedResValueConnections = new ArrayList<SYSVAL2PROCESS>();
     }
 
     public QProcess(String title, Resident resident, PCat pcat) {
@@ -155,7 +155,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         if (element instanceof NReport) {
             getAttachedNReportConnections().remove(element);
         } else if (element instanceof ResValue) {
-            getAttachedResidentValues().remove(element);
+            getAttachedResValueConnections().remove(element);
         } else if (element instanceof Prescription) {
             getAttachedPrescriptionConnections().remove(element);
         } else if (element instanceof BWInfo) {
@@ -191,8 +191,8 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         return attachedNursingProcesses;
     }
 
-    public Collection<SYSVAL2PROCESS> getAttachedResidentValues() {
-        return attachedResidentValues;
+    public Collection<SYSVAL2PROCESS> getAttachedResValueConnections() {
+        return attachedResValueConnections;
     }
 
     public Long getPkid() {
@@ -282,7 +282,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         for (SYSPRE2PROCESS att : attachedPrescriptionConnections) {
             elements.add(att.getPrescription());
         }
-        for (SYSVAL2PROCESS att : attachedResidentValues) {
+        for (SYSVAL2PROCESS att : attachedResValueConnections) {
             elements.add(att.getResValue());
         }
 

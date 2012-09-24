@@ -194,7 +194,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
     // 1:N Relationen
     // ==
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "verordnung")
-    private List<SYSPRE2FILE> attachedFiles;
+    private List<SYSPRE2FILE> attachedFilesConnections;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
     private List<SYSPRE2PROCESS> attachedProcessConnections;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
@@ -241,7 +241,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
 
     public Prescription(Resident resident) {
         this.resident = resident;
-        this.attachedFiles = new ArrayList<SYSPRE2FILE>();
+        this.attachedFilesConnections = new ArrayList<SYSPRE2FILE>();
         this.attachedProcessConnections = new ArrayList<SYSPRE2PROCESS>();
         this.pSchedule = new ArrayList<PrescriptionSchedule>();
         this.from = new Date();
@@ -249,14 +249,14 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         this.userON = OPDE.getLogin().getUser();
     }
 
-    public Prescription(Date from, Date to, boolean toEndOfPackage, long prescRelation, String text, boolean showOnDailyPlan, List<SYSPRE2FILE> attachedFiles, List<SYSPRE2PROCESS> attachedProcessConnections, Users userON, Users userOFF, Resident resident, Intervention intervention, TradeForm tradeform, Situations situation, Hospital hospitalON, Hospital hospitalOFF, Doc docON, Doc docOFF) {
+    public Prescription(Date from, Date to, boolean toEndOfPackage, long prescRelation, String text, boolean showOnDailyPlan, List<SYSPRE2FILE> attachedFilesConnections, List<SYSPRE2PROCESS> attachedProcessConnections, Users userON, Users userOFF, Resident resident, Intervention intervention, TradeForm tradeform, Situations situation, Hospital hospitalON, Hospital hospitalOFF, Doc docON, Doc docOFF) {
         this.from = from;
         this.to = to;
         this.toEndOfPackage = toEndOfPackage;
         this.prescRelation = prescRelation;
         this.text = text;
         this.showOnDailyPlan = showOnDailyPlan;
-        this.attachedFiles = attachedFiles;
+        this.attachedFilesConnections = attachedFilesConnections;
         this.attachedProcessConnections = attachedProcessConnections;
         this.userON = userON;
         this.userOFF = userOFF;
@@ -421,8 +421,8 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         return situation != null;
     }
 
-    public List<SYSPRE2FILE> getAttachedFiles() {
-        return attachedFiles;
+    public List<SYSPRE2FILE> getAttachedFilesConnections() {
+        return attachedFilesConnections;
     }
 
     public List<SYSPRE2PROCESS> getAttachedProcessConnections() {
@@ -490,7 +490,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         if (hospitalON != null ? !hospitalON.equals(that.hospitalON) : that.hospitalON != null) return false;
         if (userON != null ? !userON.equals(that.userON) : that.userON != null)
             return false;
-        if (attachedFiles != null ? !attachedFiles.equals(that.attachedFiles) : that.attachedFiles != null)
+        if (attachedFilesConnections != null ? !attachedFilesConnections.equals(that.attachedFilesConnections) : that.attachedFilesConnections != null)
             return false;
         if (attachedProcessConnections != null ? !attachedProcessConnections.equals(that.attachedProcessConnections) : that.attachedProcessConnections != null)
             return false;
@@ -517,7 +517,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         result = 31 * result + (int) (prescRelation ^ (prescRelation >>> 32));
         result = 31 * result + (text != null ? text.hashCode() : 0);
         result = 31 * result + (showOnDailyPlan ? 1 : 0);
-        result = 31 * result + (attachedFiles != null ? attachedFiles.hashCode() : 0);
+        result = 31 * result + (attachedFilesConnections != null ? attachedFilesConnections.hashCode() : 0);
         result = 31 * result + (attachedProcessConnections != null ? attachedProcessConnections.hashCode() : 0);
 
         result = 31 * result + (bhps != null ? bhps.hashCode() : 0);
@@ -536,7 +536,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
 
     @Override
     public Prescription clone() {
-        final Prescription copy = new Prescription(from, to, toEndOfPackage, prescRelation, text, showOnDailyPlan, attachedFiles, attachedProcessConnections, userON, userOFF, resident, intervention, tradeform, situation, hospitalON, hospitalOFF, docON, docOFF);
+        final Prescription copy = new Prescription(from, to, toEndOfPackage, prescRelation, text, showOnDailyPlan, attachedFilesConnections, attachedProcessConnections, userON, userOFF, resident, intervention, tradeform, situation, hospitalON, hospitalOFF, docON, docOFF);
 
         CollectionUtils.forAllDo(pSchedule, new Closure() {
             public void execute(Object o) {
@@ -574,7 +574,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
                 ", verKennung=" + prescRelation +
                 ", bemerkung='" + text + '\'' +
                 ", stellplan=" + showOnDailyPlan +
-                ", attachedFiles=" + attachedFiles +
+                ", attachedFiles=" + attachedFilesConnections +
                 ", attachedVorgaenge=" + attachedProcessConnections +
                 ", pSchedule=" + pSchedule +
                 ", bhps=" + bhps +

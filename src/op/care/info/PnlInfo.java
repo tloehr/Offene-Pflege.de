@@ -1026,8 +1026,8 @@ public class PnlInfo extends NursingRecordsPanel {
                 });
                 btnAttach.setEnabled(ersterBWInfo != null && !ersterBWInfo.isSingleIncident() && !ersterBWInfo.isNoConstraints() && !ersterBWInfo.isAbgesetzt() && !ersterBWInfo.isHeimaufnahme());
 
-                if (ersterBWInfo != null && !ersterBWInfo.isAbgesetzt() && !ersterBWInfo.isSingleIncident() && !ersterBWInfo.isNoConstraints() && ersterBWInfo.getAttachedFiles().size() > 0) {
-                    JLabel lblNum = new JLabel(Integer.toString(ersterBWInfo.getAttachedFiles().size()), SYSConst.icon16redStar, SwingConstants.CENTER);
+                if (ersterBWInfo != null && !ersterBWInfo.isAbgesetzt() && !ersterBWInfo.isSingleIncident() && !ersterBWInfo.isNoConstraints() && ersterBWInfo.getAttachedFilesConnections().size() > 0) {
+                    JLabel lblNum = new JLabel(Integer.toString(ersterBWInfo.getAttachedFilesConnections().size()), SYSConst.icon16redStar, SwingConstants.CENTER);
                     lblNum.setFont(SYSConst.ARIAL10BOLD);
                     lblNum.setForeground(Color.YELLOW);
                     lblNum.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -1326,8 +1326,8 @@ public class PnlInfo extends NursingRecordsPanel {
                             }
                         });
 
-                        if (innerBWInfo.getAttachedFiles().size() > 0) {
-                            JLabel lblNum = new JLabel(Integer.toString(innerBWInfo.getAttachedFiles().size()), SYSConst.icon16redStar, SwingConstants.CENTER);
+                        if (innerBWInfo.getAttachedFilesConnections().size() > 0) {
+                            JLabel lblNum = new JLabel(Integer.toString(innerBWInfo.getAttachedFilesConnections().size()), SYSConst.icon16redStar, SwingConstants.CENTER);
                             lblNum.setFont(SYSConst.ARIAL10BOLD);
                             lblNum.setForeground(Color.YELLOW);
                             lblNum.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -1339,7 +1339,7 @@ public class PnlInfo extends NursingRecordsPanel {
                             contentLineRight.add(btnAttach);
                         }
 
-                        btnAttach.setEnabled(innerBWInfo.isActiveNoConstraint() || innerBWInfo.getAttachedFiles().size() > 0);
+                        btnAttach.setEnabled(innerBWInfo.isActiveNoConstraint() || innerBWInfo.getAttachedFilesConnections().size() > 0);
                     }
 
                     contentLine.add(contentButton);

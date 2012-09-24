@@ -29,6 +29,7 @@ import entity.info.BWInfo;
 import entity.info.Resident;
 import entity.prescription.Prescription;
 import entity.reports.NReport;
+import entity.values.ResValue;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.SYSConst;
@@ -146,11 +147,15 @@ public class SYSFilesTools {
                             } else if (attachable instanceof Prescription) {
                                 SYSPRE2FILE link = em.merge(new SYSPRE2FILE(sysfile, (Prescription) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getVerAssignCollection().add(link);
-                                ((Prescription) attachable).getAttachedFiles().add(link);
+                                ((Prescription) attachable).getAttachedFilesConnections().add(link);
                             } else if (attachable instanceof BWInfo) {
                                 SYSINF2FILE link = em.merge(new SYSINF2FILE(sysfile, (BWInfo) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getBwiAssignCollection().add(link);
-                                ((BWInfo) attachable).getAttachedFiles().add(link);
+                                ((BWInfo) attachable).getAttachedFilesConnections().add(link);
+                            } else if (attachable instanceof ResValue) {
+                                SYSVAL2FILE link = em.merge(new SYSVAL2FILE(sysfile, (ResValue) attachable, OPDE.getLogin().getUser(), new Date()));
+                                sysfile.getValAssignCollection().add(link);
+                                ((ResValue) attachable).getAttachedFilesConnections().add(link);
                             }
                         }
                         successful.add(sysfile);

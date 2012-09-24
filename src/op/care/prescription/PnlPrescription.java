@@ -81,14 +81,14 @@ public class PnlPrescription extends NursingRecordsPanel {
 
     private Resident resident;
 
-    private ArrayList<Prescription> lstPrescriptions;
+    private ArrayList<Prescription> lstPrescriptions, lstVisiblePrescriptions; // <= the latter is only for the zebra pattern
     private HashMap<String, CollapsiblePane> cpMap;
 
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
     private JToggleButton tbClosed;
 
-    private Color[] demandColors, regularColors, archiveColors;
+    private Color[] demandColors, regularColors;
 
     /**
      * Creates new form PnlPrescription
@@ -104,9 +104,9 @@ public class PnlPrescription extends NursingRecordsPanel {
     private void initPanel() {
         demandColors = SYSConst.green2;
         regularColors = SYSConst.blue1;
-        archiveColors = SYSConst.greyscale;
         cpMap = new HashMap<String, CollapsiblePane>();
         lstPrescriptions = new ArrayList<Prescription>();
+        lstVisiblePrescriptions = new ArrayList<Prescription>();
         prepareSearchArea();
     }
 
@@ -133,6 +133,7 @@ public class PnlPrescription extends NursingRecordsPanel {
          */
         final boolean withworker = true;
         cpsPrescription.removeAll();
+        lstVisiblePrescriptions.clear();
         cpMap.clear();
 
 
@@ -669,8 +670,8 @@ public class PnlPrescription extends NursingRecordsPanel {
             });
 
             btnFiles.setEnabled(!prescription.isDiscontinued());
-            if (prescription.getAttachedFiles().size() > 0) {
-                JLabel lblNum = new JLabel(Integer.toString(prescription.getAttachedFiles().size()), SYSConst.icon16greenStar, SwingConstants.CENTER);
+            if (prescription.getAttachedFilesConnections().size() > 0) {
+                JLabel lblNum = new JLabel(Integer.toString(prescription.getAttachedFilesConnections().size()), SYSConst.icon16greenStar, SwingConstants.CENTER);
                 lblNum.setFont(SYSConst.ARIAL10BOLD);
                 lblNum.setForeground(Color.BLUE);
                 lblNum.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -801,15 +802,21 @@ public class PnlPrescription extends NursingRecordsPanel {
 
         cpPres.setHorizontalAlignment(SwingConstants.LEADING);
         cpPres.setOpaque(false);
-        cpPres.setBackground(getColor(prescription, SYSConst.medium4));
+
 
         return cpPres;
     }
 
-    private Color getColor(Prescription prescription, int level) {
-        if (prescription.isDiscontinued()) {
-            return archiveColors[level];
-        } else if (prescription.isOnDemand()) {
+    private Color getColor(Prescription prescription, int level, boolean odd) {
+        if (odd) {
+            level = Math.max(0, level - 2);
+        }
+
+//        if (prescription.isDiscontinued()) {
+//            level = Math.max(0, level - 3);
+//        }
+
+        if (prescription.isOnDemand()) {
             return demandColors[level];
         } else {
             return regularColors[level];
@@ -1416,12 +1423,20 @@ public class PnlPrescription extends NursingRecordsPanel {
         cpsPrescription.removeAll();
         cpsPrescription.setLayout(new JideBoxLayout(cpsPrescription, JideBoxLayout.Y_AXIS));
 
+        int i = 0;
+        // for the zebra coloring
         for (Prescription prescription : lstPrescriptions) {
             if (tbClosed.isSelected() || !prescription.isDiscontinued()) {
+                cpMap.get(prescription.getID() + ".xprescription").setBackground(getColor(prescription, SYSConst.medium1, i % 2 == 1));
                 cpsPrescription.add(cpMap.get(prescription.getID() + ".xprescription"));
+                i++;
+//                cpPres.setBackground(getColor(prescription, SYSConst.medium1));
             }
         }
-
+//
+//        for (Prescription prescription : lstVisiblePrescriptions) {
+//
+//        }
 
         cpsPrescription.addExpansion();
     }

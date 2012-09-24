@@ -217,7 +217,7 @@ public class NReportTools {
             result += "<br/><i>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(nReport.getEditpit()) + OPDE.lang.getString("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname();
             result += "<br/>" + OPDE.lang.getString("misc.msg.replaceentry") + ": " + nReport.getReplacedBy().getPbid() + "</i><br/>";
         }
-//        if (!nReport.getAttachedFiles().isEmpty()) {
+//        if (!nReport.getAttachedFilesConnections().isEmpty()) {
 //            result += "<font color=\"green\">&#9679;</font>";
 //        }
 //        if (!nReport.getAttachedProcessConnections().isEmpty()) {

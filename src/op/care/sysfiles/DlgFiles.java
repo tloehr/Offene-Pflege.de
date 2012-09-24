@@ -11,6 +11,7 @@ import entity.reports.NReport;
 import entity.files.SYSFiles;
 import entity.files.SYSFilesTools;
 import entity.info.BWInfo;
+import entity.values.ResValue;
 import op.OPDE;
 import op.system.FileDrop;
 import op.threads.DisplayMessage;
@@ -137,18 +138,21 @@ public class DlgFiles extends MyJDialog {
             Query query = em.createNamedQuery("SYSFiles.findByNReport", SYSFiles.class);
             query.setParameter("nReport", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
-            Collections.sort(files);
         } else if (attachable instanceof Prescription) {
             Query query = em.createNamedQuery("SYSFiles.findByVerordnung", SYSFiles.class);
             query.setParameter("verordnung", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
-            Collections.sort(files);
         } else if (attachable instanceof BWInfo) {
             Query query = em.createNamedQuery("SYSFiles.findByBWInfo", SYSFiles.class);
             query.setParameter("bwinfo", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
-            Collections.sort(files);
+
+        } else if (attachable instanceof ResValue) {
+            Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.valAssignCollection sf WHERE sf.value = :resval ");
+            query.setParameter("resval", attachable);
+            files = new ArrayList<SYSFiles>(query.getResultList());
         }
+        Collections.sort(files);
 
         em.close();
         return files;

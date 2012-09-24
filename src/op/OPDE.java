@@ -83,23 +83,17 @@ public class OPDE {
     protected static SortedProperties localProps;
     protected static Logger logger;
     public static HashMap[] anonymize = null;
-    // Diese listener List ist dazu da, dass wir immer
-    // wissen, welchen Fenstern wir bescheid sagen müssen, wenn
-    // der User sich abmeldet.
-    protected static EventListenerList listenerList = new EventListenerList();
+
     protected static HashMap<String, ActionListener> runningModules = new HashMap();
     protected static EntityManagerFactory emf;
     protected static AppInfo appInfo;
     protected static SYSLogin login;
-    //    protected static SYSHosts host;
-//    protected static BackgroundMonitor bm;
-    // Vielleicht später
-//    protected static ArrayList<ImageIcon> animationCache;
+
     protected static boolean animation = false;
     protected static boolean debug;
     protected static String opwd = "";
     protected static String css = "";
-//    public static Font arial14, arial28;
+
 
     /**
      * @return Das Arbeitsverzeichnis für OPDE.
@@ -115,10 +109,6 @@ public class OPDE {
     public static PrinterTypes getPrinters() {
         return printers;
     }
-
-//    public static ArrayList<ImageIcon> getAnimationCache() {
-//        return animationCache;
-//    }
 
     public static boolean isDebug() {
         return debug;

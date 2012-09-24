@@ -314,6 +314,8 @@ public class PrescriptionTools {
     public static String getShortDescription(Prescription prescription) {
         String result = "<font size=+1>";// = SYSConst.html_fontface;
 
+        result += prescription.isDiscontinued() ? "<s>" : "";
+
         if (!prescription.hasMed()) {
             result += prescription.getIntervention().getBezeichnung();
         } else {
@@ -340,6 +342,8 @@ public class PrescriptionTools {
         if (prescription.isOnDemand()) {
             result += "<br/><b><u>" + OPDE.lang.getString("misc.msg.ondemand") + ":</u> " + prescription.getSituation().getText() + "</b>";
         }
+
+        result += prescription.isDiscontinued() ? "</s>" : "";
 
         return result;
     }

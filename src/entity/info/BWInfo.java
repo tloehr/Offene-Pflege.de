@@ -52,7 +52,7 @@ import java.util.Properties;
         @NamedQuery(name = "BWInfo.findByBwinfoid", query = "SELECT b FROM BWInfo b WHERE b.bwinfoid = :bwinfoid"),
         @NamedQuery(name = "BWInfo.findByVorgang", query = " "
                 + " SELECT bw FROM BWInfo bw "
-                + " JOIN bw.attachedVorgaenge av"
+                + " JOIN bw.attachedProcessConnections av"
                 + " JOIN av.vorgang v"
                 + " WHERE v = :vorgang "),
         @NamedQuery(name = "BWInfo.findByVon", query = "SELECT b FROM BWInfo b WHERE b.von = :von"),
@@ -110,9 +110,9 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
     // 1:N Relationen
     // ==
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwinfo")
-    private Collection<SYSINF2FILE> attachedFiles;
+    private Collection<SYSINF2FILE> attachedFilesConnections;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwinfo")
-    private Collection<SYSINF2PROCESS> attachedVorgaenge;
+    private Collection<SYSINF2PROCESS> attachedProcessConnections;
 
 
     public BWInfo() {
@@ -136,8 +136,8 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
         this.bwinfotyp = bwinfotyp;
         this.angesetztDurch = OPDE.getLogin().getUser();
         this.bewohner = bewohner;
-        this.attachedFiles = new ArrayList<SYSINF2FILE>();
-        this.attachedVorgaenge = new ArrayList<SYSINF2PROCESS>();
+        this.attachedFilesConnections = new ArrayList<SYSINF2FILE>();
+        this.attachedProcessConnections = new ArrayList<SYSINF2PROCESS>();
     }
 
     public BWInfo(Date von, Date bis, String xml, String html, String properties, String bemerkung, BWInfoTyp bwinfotyp, Resident bewohner) {
@@ -151,8 +151,8 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
         this.angesetztDurch = OPDE.getLogin().getUser();
         this.abgesetztDurch = null;
         this.bewohner = bewohner;
-        this.attachedFiles = new ArrayList<SYSINF2FILE>();
-        this.attachedVorgaenge = new ArrayList<SYSINF2PROCESS>();
+        this.attachedFilesConnections = new ArrayList<SYSINF2FILE>();
+        this.attachedProcessConnections = new ArrayList<SYSINF2PROCESS>();
     }
 
     public Long getBwinfoid() {
@@ -204,6 +204,10 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
         return bwinfotyp.getBwinftyp().equalsIgnoreCase("hauf");
     }
 
+    public Collection<SYSINF2PROCESS> getAttachedProcessConnections() {
+        return attachedProcessConnections;
+    }
+
     public String getXml() {
         return xml;
     }
@@ -253,12 +257,12 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
     }
 
 
-    public Collection<SYSINF2FILE> getAttachedFiles() {
-        return attachedFiles;
+    public Collection<SYSINF2FILE> getAttachedFilesConnections() {
+        return attachedFilesConnections;
     }
 
     public Collection<SYSINF2PROCESS> getAttachedVorgaenge() {
-        return attachedVorgaenge;
+        return attachedProcessConnections;
     }
 
     @Override
@@ -306,7 +310,7 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
     @Override
     public ArrayList<QProcess> getAttachedProcesses() {
         ArrayList<QProcess> list = new ArrayList<QProcess>();
-        for (SYSINF2PROCESS att : attachedVorgaenge) {
+        for (SYSINF2PROCESS att : attachedProcessConnections) {
             list.add(att.getVorgang());
         }
         return list;

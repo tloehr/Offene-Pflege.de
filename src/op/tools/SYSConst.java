@@ -412,6 +412,7 @@ public class SYSConst {
     public static final Icon icon22todoPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/korganizer_todo_pressed.png"));
     public static final Icon icon22undo = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/undo.png"));
     public static final Icon icon22unlink = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/unlink.png"));
+    public static final Icon icon22edited = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/edited.png"));
     public static final Icon icon22unlinkPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/unlink_pressed.png"));
     public static final Icon icon22up = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/1uparrow.png"));
     public static final Icon icon22view = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/viewmag.png"));
@@ -427,8 +428,17 @@ public class SYSConst {
     public static final Icon icon48stop = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/bw/player_stop.png"));
     public static final Icon icon48take = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/take-over.png"));
     public static final Icon icon16byday = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/byday.png"));
-    public static final Icon icon22collapse = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/collapse.png"));
-    public static final Icon icon22expand = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/collapse_arrow.png"));
+    public static final Icon icon22collapse = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/collapse.png"));
+    public static final Icon icon22expand = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/expand.png"));
+    public static final Icon icon22ledRedOn = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ledred.png"));
+    public static final Icon icon22ledRedOff = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/leddarkred.png"));
+    public static final Icon icon22ledYellowOn = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ledyellow.png"));
+    public static final Icon icon22ledYellowOff = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/leddarkyellow.png"));
+    public static final Icon icon22ledGreenOn = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ledgreen.png"));
+    public static final Icon icon22ledGreenOff = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/leddarkgreen.png"));
+
+
+
 //    public static final Icon icon22collapsePressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/collapse_pressed.png"));
 //    public static final Icon icon22expandPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/collapse_arrow_pressed.png"));
 

@@ -17,9 +17,9 @@ import javax.persistence.*;
 @Table(name = "SYSVAL2PROCESS")
 @NamedQueries({
         @NamedQuery(name = "SYSVAL2PROCESS.findActiveAssignedVorgaengeByElement", query = " " +
-                " SELECT s.vorgang FROM SYSVAL2PROCESS s WHERE s.bwerte = :element AND s.vorgang.to = '9999-12-31 23:59:59' "),
+                " SELECT s.vorgang FROM SYSVAL2PROCESS s WHERE s.resValue = :element AND s.vorgang.to = '9999-12-31 23:59:59' "),
         @NamedQuery(name = "SYSVAL2PROCESS.findByElementAndVorgang", query = " " +
-                " SELECT s FROM SYSVAL2PROCESS s WHERE s.bwerte = :element AND s.vorgang = :process AND s.vorgang.to = '9999-12-31 23:59:59' ")
+                " SELECT s FROM SYSVAL2PROCESS s WHERE s.resValue = :element AND s.vorgang = :process AND s.vorgang.to = '9999-12-31 23:59:59' ")
 })
 public class SYSVAL2PROCESS {
     @Id
@@ -33,14 +33,14 @@ public class SYSVAL2PROCESS {
 
     @ManyToOne
     @JoinColumn(name = "BWID", referencedColumnName = "BWID")
-    private ResValue bwerte;
+    private ResValue resValue;
 
     protected SYSVAL2PROCESS() {
     }
 
-    public SYSVAL2PROCESS(QProcess vorgang, ResValue bwerte) {
+    public SYSVAL2PROCESS(QProcess vorgang, ResValue resValue) {
         this.vorgang = vorgang;
-        this.bwerte = bwerte;
+        this.resValue = resValue;
     }
 
     public QProcess getQProcess() {
@@ -48,7 +48,7 @@ public class SYSVAL2PROCESS {
     }
 
     public ResValue getResValue() {
-        return bwerte;
+        return resValue;
     }
 
 }

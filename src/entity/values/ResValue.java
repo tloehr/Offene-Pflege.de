@@ -4,7 +4,6 @@
  */
 package entity.values;
 
-import entity.files.SYSNR2FILE;
 import entity.files.SYSVAL2FILE;
 import entity.info.Resident;
 import entity.process.QProcess;
@@ -106,8 +105,8 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
     @ManyToOne
     private ResValueTypes vtype;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "value")
-    private Collection<SYSVAL2FILE> attachedFiles;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwerte")
+    private Collection<SYSVAL2FILE> attachedFilesConnections;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "resValue")
     private Collection<SYSVAL2PROCESS> attachedProcessConnections;
 
 //    // ==
@@ -142,7 +141,7 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
         this.resident = resident;
     }
 
-    public Long getId(){
+    public Long getId() {
         return id;
     }
 
@@ -238,10 +237,6 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
         return vtype.getID() == ResValueTools.VOMIT || vtype.getID() == ResValueTools.STOOL;
     }
 
-    public Collection<SYSVAL2PROCESS> getAttachedQProcesses() {
-        return attachedProcessConnections;
-    }
-
     @Override
     public ArrayList<QProcess> getAttachedProcesses() {
         ArrayList<QProcess> list = new ArrayList<QProcess>();
@@ -251,8 +246,8 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
         return list;
     }
 
-    public Collection<SYSVAL2FILE> getAttachedFiles() {
-        return attachedFiles;
+    public Collection<SYSVAL2FILE> getAttachedFilesConnections() {
+        return attachedFilesConnections;
     }
 
     public Collection<SYSVAL2PROCESS> getAttachedProcessConnections() {
@@ -281,6 +276,10 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
 
     public boolean isReplacement() {
         return replacementFor != null;
+    }
+
+    public boolean isArchived() {
+        return isReplaced() || isDeleted();
     }
 
     /**
@@ -351,10 +350,10 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
             }
         });
 
-        CollectionUtils.forAllDo(attachedFiles, new Closure() {
+        CollectionUtils.forAllDo(attachedFilesConnections, new Closure() {
             public void execute(Object o) {
                 SYSVAL2FILE oldAssignment = (SYSVAL2FILE) o;
-                clonedValue.attachedFiles.add(new SYSVAL2FILE(oldAssignment.getSysfile(), clonedValue, clonedValue.getUser(), clonedValue.getPit()));
+                clonedValue.attachedFilesConnections.add(new SYSVAL2FILE(oldAssignment.getSysfile(), clonedValue, clonedValue.getUser(), clonedValue.getPit()));
             }
         });
 
