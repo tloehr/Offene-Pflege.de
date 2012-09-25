@@ -31,12 +31,12 @@ public class DefaultCPTitle {
 
         titlePanelleft.add(btnTitle);
 
-
         titlePanelright = new JPanel();
         titlePanelright.setLayout(new BoxLayout(titlePanelright, BoxLayout.LINE_AXIS));
 
         titlePanelleft.setOpaque(false);
         titlePanelright.setOpaque(false);
+
         titlePanel = new JPanel();
         titlePanel.setOpaque(false);
 

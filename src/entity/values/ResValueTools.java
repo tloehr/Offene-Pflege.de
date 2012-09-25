@@ -236,9 +236,8 @@ public class ResValueTools {
         return result;
     }
 
-
     /**
-     * retrieves the first and the last entry in the allowance table.
+     * retrieves the PITs of the first and the last entry in the ResValue table.
      *
      * @param resident
      * @return

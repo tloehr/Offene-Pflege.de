@@ -214,7 +214,6 @@ public class MedStockTools {
     /**
      * Schliesst einen Bestand ab. Erzeugt dazu direkt eine passende Abschlussbuchung, die den Bestand auf null bringt.
      * <p/>
-     * <b>tested:</b> Test0002
      *
      * @param stock, der abzuschliessen ist.
      * @param text,  evtl. gewünschter Text für die Abschlussbuchung
@@ -376,7 +375,7 @@ public class MedStockTools {
         return result;
     }
 
-    public static String getASHTML(MedStock stock) {
+    public static String getAsHTML(MedStock stock) {
         String result = "";
 
         String htmlcolor = stock.isClosed() ? "gray" : "red";

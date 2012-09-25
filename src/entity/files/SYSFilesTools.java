@@ -143,7 +143,7 @@ public class SYSFilesTools {
                             if (attachable instanceof NReport) {
                                 SYSNR2FILE link = em.merge(new SYSNR2FILE(sysfile, (NReport) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getPbAssignCollection().add(link);
-                                ((NReport) attachable).getAttachedFiles().add(link);
+                                ((NReport) attachable).getAttachedFilesConnections().add(link);
                             } else if (attachable instanceof Prescription) {
                                 SYSPRE2FILE link = em.merge(new SYSPRE2FILE(sysfile, (Prescription) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getVerAssignCollection().add(link);

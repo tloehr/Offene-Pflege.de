@@ -104,7 +104,7 @@ public class PnlValues extends NursingRecordsPanel {
 
         initComponents();
         initPanel();
-//        prepareSearchArea();
+        prepareSearchArea();
         switchResident(resident);
         initPhase = false;
     }
@@ -124,6 +124,36 @@ public class PnlValues extends NursingRecordsPanel {
         color2 = SYSConst.greyscale;
 
     }
+
+    private void prepareSearchArea() {
+        searchPanes = new CollapsiblePanes();
+        searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
+        jspSearch.setViewportView(searchPanes);
+
+        JPanel mypanel = new JPanel();
+        mypanel.setLayout(new VerticalLayout(0));
+        mypanel.setBackground(Color.WHITE);
+
+        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
+        searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
+        searchPane.setCollapsible(false);
+
+        try {
+            searchPane.setCollapsed(false);
+        } catch (PropertyVetoException e) {
+            OPDE.error(e);
+        }
+
+//        GUITools.addAllComponents(mypanel, addCommands());
+//        GUITools.addAllComponents(mypanel, addFilters());
+
+        searchPane.setContentPane(mypanel);
+
+        searchPanes.add(searchPane);
+        searchPanes.addExpansion();
+
+    }
+
 
     /**
      * This method is called from within the constructor to
@@ -176,7 +206,10 @@ public class PnlValues extends NursingRecordsPanel {
 
         final boolean withworker = false;
         cpsValues.removeAll();
-        cpMap.clear();
+        cpsValues.removeAll();
+        contentmap.clear();
+        linemap.clear();
+        valuecache.clear();
 
 
         if (withworker) {
@@ -1061,286 +1094,14 @@ public class PnlValues extends NursingRecordsPanel {
 
     @Override
     public void cleanup() {
-        SYSTools.unregisterListeners(this);
+        cpsValues.removeAll();
+        cpMap.clear();
+        contentmap.clear();
+        linemap.clear();
+        valuecache.clear();
+        lstValueTypes.clear();
     }
 
-//    private void jspTblVWComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspTblVWComponentResized
-//        JViewport jv = (JViewport) tblVital.getParent();
-//        JScrollPane jsp = (JScrollPane) jv.getParent();
-//        Dimension dim = jsp.getSize();
-//        // Größe der Massnahmen Spalten ändern.
-//        int width = dim.width - 200; // größe - der fixen spalten
-//        TableColumnModel tcm1 = tblVital.getColumnModel();
-//
-//        // Zu Beginn der Applikation steht noch ein standardmodell drin.
-//        // das hat nur 4 Spalten. solange braucht sich dieser handler nicht
-//        // damit zu befassen.
-//        if (tcm1.getColumnCount() < 3) {
-//            return;
-//        }
-//
-//        tcm1.getColumn(0).setPreferredWidth(200);
-//        tcm1.getColumn(1).setPreferredWidth(width / 3 * 1);
-//        tcm1.getColumn(2).setPreferredWidth(width / 3 * 2);
-//
-//        tcm1.getColumn(0).setHeaderValue(OPDE.lang.getString(internalClassID + ".tabheader1"));
-//        tcm1.getColumn(1).setHeaderValue(OPDE.lang.getString(internalClassID + ".tabheader2"));
-//        tcm1.getColumn(2).setHeaderValue(OPDE.lang.getString(internalClassID + ".tabheader3"));
-//
-//
-//    }//GEN-LAST:event_jspTblVWComponentResized
-//
-//    private void reloadTable() {
-//        OPDE.getMainframe().setBlocked(true);
-//        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
-//        TableModel oldmodel = tblVital.getModel();
-//        tblVital.setModel(new DefaultTableModel());
-//        if (oldmodel != null && oldmodel instanceof TMWerte) {
-//            ((TMWerte) oldmodel).cleanup();
-//        }
-//
-//        SwingWorker worker = new SwingWorker() {
-//            TableModel model;
-//
-//            @Override
-//            protected Object doInBackground() throws Exception {
-//                model = new TMWerte(jdcVon.getDate(), resident, cmbAuswahl.getSelectedIndex(), tbShowReplaced.isSelected(), tbShowIDs.isSelected());
-//                return null;
-//            }
-//
-//            @Override
-//            protected void done() {
-//                OPDE.getDisplayManager().setProgressBarMessage(null);
-//                OPDE.getMainframe().setBlocked(false);
-//                tblVital.setModel(model);
-//                tblVital.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
-//                tblVital.getColumnModel().getColumn(1).setCellRenderer(new RNDHTML());
-//                tblVital.getColumnModel().getColumn(2).setCellRenderer(new RNDHTML());
-//                jspTblVW.dispatchEvent(new ComponentEvent(jspTblVW, ComponentEvent.COMPONENT_RESIZED));
-//            }
-//        };
-//        worker.execute();
-//    }
-//
-//    private void tblVitalMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblVitalMousePressed
-//
-//        Point p = evt.getPoint();
-//        Point p2 = evt.getPoint();
-//        // Convert a coordinate relative to a component's bounds to screen coordinates
-//        SwingUtilities.convertPointToScreen(p2, tblVital);
-//        final Point screenposition = p2;
-//
-//        ListSelectionModel lsm = tblVital.getSelectionModel();
-//
-//        boolean singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
-//
-//        final int row = tblVital.rowAtPoint(p);
-//        final int col = tblVital.columnAtPoint(p);
-//
-//        if (singleRowSelected) {
-//            lsm.setSelectionInterval(row, row);
-//        }
-//
-//        SYSTools.unregisterListeners(menu);
-//        menu = new JPopupMenu();
-//
-//        TMWerte tm = (TMWerte) tblVital.getModel();
-//        if (tm.getRowCount() > 0 && row > -1) {
-//            final ResValue wert = tm.getBWert(lsm.getLeadSelectionIndex());
-//            boolean bearbeitenMoeglich = !wert.isReplaced() && !wert.isDeleted() && singleRowSelected;
-//
-//            if (evt.isPopupTrigger()) {
-//
-//                if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
-//
-////                // KORRIGIEREN
-//                    JMenuItem itemPopupEdit = new JMenuItem(OPDE.lang.getString("misc.commands.edit"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/edit.png")));
-//                    itemPopupEdit.addActionListener(new java.awt.event.ActionListener() {
-//
-//                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-//
-//                            final JidePopup popup = new JidePopup();
-//                            popup.setMovable(false);
-//                            popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.PAGE_AXIS));
-//
-//                            final JComponent editor;
-//
-//                            switch (col) {
-//                                case TMWerte.COL_PIT: {
-//                                    editor = new PnlPIT(wert.getPit());
-//                                    break;
-//                                }
-//
-//                                case TMWerte.COL_CONTENT: {
-//
-//                                    if (wert.getType() == ResValueTools.RR) {
-//                                        editor = new DlgValue(wert.getValue1(), wert.getValue2(), wert.getValue3(), ResValueTools.RRSYS, ResValueTools.UNITS[ResValueTools.RR], ResValueTools.RRDIA, ResValueTools.UNITS[ResValueTools.RR], ResValueTools.VALUES[ResValueTools.PULSE], ResValueTools.UNITS[ResValueTools.PULSE]);
-//                                    } else if (wert.isWithoutValue()) {
-//                                        editor = null;
-//                                    } else {
-//                                        editor = new DlgValue(wert.getValue1(), ResValueTools.VALUES[wert.getType()], ResValueTools.UNITS[wert.getType()]);
-//                                    }
-//                                    break;
-//                                }
-//
-//                                case TMWerte.COL_COMMENT: {
-//                                    editor = new JTextArea(SYSTools.catchNull(wert.getText()), 10, 40);
-//                                    ((JTextArea) editor).setLineWrap(true);
-//                                    ((JTextArea) editor).setWrapStyleWord(true);
-//                                    ((JTextArea) editor).setEditable(true);
-//                                    break;
-//                                }
-//                                default: {
-//                                    editor = null;
-//                                }
-//                            }
-//
-//                            if (editor != null) {
-//
-//                                JScrollPane pnlEditor = new JScrollPane(editor);
-//
-//                                JPanel pnl = new JPanel(new BorderLayout(10, 10));
-//
-//                                pnl.add(pnlEditor, BorderLayout.CENTER);
-//
-//
-//                                final JButton saveButton = new JButton(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-//                                saveButton.addActionListener(new ActionListener() {
-//                                    @Override
-//                                    public void actionPerformed(ActionEvent actionEvent) {
-//
-//                                        ResValue newOne = wert.clone();
-//                                        popup.hidePopup();
-//
-//                                        switch (col) {
-//                                            case TMWerte.COL_PIT: {
-//                                                newOne.setPit(((PnlPIT) editor).getPIT());
-//                                                break;
-//                                            }
-//                                            case TMWerte.COL_CONTENT: {
-//                                                DlgValue pnl123 = (DlgValue) editor;
-//                                                newOne.setWert(pnl123.getValue1());
-//                                                newOne.setValue2(pnl123.getValue2());
-//                                                newOne.setValue3(pnl123.getValue3());
-//                                                break;
-//                                            }
-//                                            case TMWerte.COL_COMMENT: {
-//                                                newOne.setText(((JTextArea) editor).getText().trim());
-//                                                break;
-//                                            }
-//                                            default: {
-//                                                newOne = null;
-//                                            }
-//                                        }
-//
-//                                        if (newOne.isWrongValues()) {
-//                                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wrongentry"), DisplayMessage.WARNING));
-//                                        } else if (col == TMWerte.COL_COMMENT && newOne.getText().equals(wert.getText())) {
-//                                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.nochanges"), DisplayMessage.WARNING));
-//                                        } else {
-//                                            newOne = ResValueTools.changeWert(wert, newOne);
-//                                            reloadTable();
-//                                        }
-//                                    }
-//                                });
-//
-//                                saveButton.setHorizontalAlignment(SwingConstants.RIGHT);
-//
-//                                JPanel buttonPanel = new JPanel();
-//                                buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
-//                                buttonPanel.add(saveButton);
-//                                pnl.setBorder(new EmptyBorder(10, 10, 10, 10));
-//                                pnl.add(buttonPanel, BorderLayout.SOUTH);
-//
-//                                popup.setOwner(tblVital);
-//                                popup.removeExcludedComponent(tblVital);
-//                                popup.getContentPane().add(pnl);
-//
-//                                popup.setDefaultFocusComponent(editor);
-//                                popup.showPopup(screenposition.x, screenposition.y);
-//                            }
-//                        }
-//
-//                    });
-//                    menu.add(itemPopupEdit);
-//                    itemPopupEdit.setEnabled(bearbeitenMoeglich && (!wert.isWithoutValue() || col != TMWerte.COL_CONTENT));
-//                }
-//
-//
-//                // Löschen
-//                if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {
-//
-//
-//                    JMenuItem itemPopupDelete = new JMenuItem(OPDE.lang.getString("misc.commands.delete"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/trashcan_empty.png")));
-//                    itemPopupDelete.addActionListener(new java.awt.event.ActionListener()
-//
-//                    {
-//
-//                        public void actionPerformed
-//                                (java.awt.event.ActionEvent
-//                                         evt) {
-//                            new DlgYesNo(OPDE.lang.getString("misc.questions.delete"), new ImageIcon(getClass().getResource("/artwork/48x48/bw/trashcan_empty.png")), new Closure() {
-//                                @Override
-//                                public void execute(Object answer) {
-//                                    if (answer.equals(JOptionPane.YES_OPTION)) {
-//                                        ResValue mywert = ResValueTools.deleteWert(wert);
-//                                        ((TMWerte) tblVital.getModel()).setBWert(row, mywert);
-//
-//                                        if (!tbShowReplaced.isSelected()) {
-//                                            reloadTable();
-//                                        }
-//                                    }
-//                                }
-//                            });
-//                        }
-//                    }
-//
-//                    );
-//                    menu.add(itemPopupDelete);
-//                    itemPopupDelete.setEnabled(bearbeitenMoeglich);
-//                }
-//
-//                if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
-//                    JMenuItem itemPopupPrint = new JMenuItem("Markierte Werte drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")));
-//                    itemPopupPrint.addActionListener(new java.awt.event.ActionListener() {
-//
-//                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                            int[] sel = tblVital.getSelectedRows();
-//                            printWerte(sel);
-//                        }
-//                    });
-//                    menu.add(itemPopupPrint);
-//                }
-//            }
-//
-//
-////                if (!alreadyEdited && singleRowSelected) {
-////                    menu.add(new JSeparator());
-////                    // #0000003
-////                    menu.add(op.share.process.DBHandling.getVorgangContextMenu(parent, "ResValue", bwid, currentBW, fileActionListener));
-////
-////                    Query query = em.createNamedQuery("ResValue.findByBwid");
-////                    query.setParameter("bwid", bwid);
-////                    entity.values.ResValue bwert = (entity.values.ResValue) query.getSingleResult();
-////                    menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, bwert, fileActionListener));
-////
-////                    // #0000035
-////                    //menu.add(SYSFiles.getOPFilesContextMenu(parent, "ResValue", bwid, currentBW, tblVital, true, true, SYSFiles.CODE_BERICHTE, fileActionListener));
-////                }
-//
-//
-////                if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !alreadyEdited && singleRowSelected) {
-////                    menu.add(new JSeparator());
-////                    menu.add(QProcessTools.getVorgangContextMenu(parent, aktuellerWert, resident, standardActionListener));
-////                }
-//
-//
-//        }
-//
-//        menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
-//    }//GEN-LAST:event_tblVitalMousePressed
-//
-//
 //    private void prepareSearchArea() {
 //        searchPanes = new CollapsiblePanes();
 //        searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));

@@ -375,4 +375,47 @@ public class GUITools {
         txt.setText(SYSTools.toHTML(html));
         return popupInfo;
     }
+
+    public static void addExpandCollapseButtons(final CollapsiblePane cp, JPanel pane) {
+        final JButton btnExpandAll = new JButton(SYSConst.icon22expand);
+        btnExpandAll.setPressedIcon(SYSConst.icon22addPressed);
+        btnExpandAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnExpandAll.setContentAreaFilled(false);
+        btnExpandAll.setBorder(null);
+        btnExpandAll.setToolTipText(OPDE.lang.getString("misc.msg.expandall"));
+        btnExpandAll.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                try {
+                    GUITools.setCollapsed(cp, false);
+                } catch (PropertyVetoException e) {
+                    // bah!
+                }
+            }
+
+
+        });
+        pane.add(btnExpandAll);
+
+        final JButton btnCollapseAll = new JButton(SYSConst.icon22collapse);
+        btnCollapseAll.setPressedIcon(SYSConst.icon22addPressed);
+        btnCollapseAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnCollapseAll.setContentAreaFilled(false);
+        btnCollapseAll.setBorder(null);
+        btnCollapseAll.setToolTipText(OPDE.lang.getString("misc.msg.collapseall"));
+        btnCollapseAll.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                try {
+                    GUITools.setCollapsed(cp, true);
+                } catch (PropertyVetoException e) {
+                    // bah!
+                }
+            }
+
+
+        });
+        pane.add(btnCollapseAll);
+
+    }
 }

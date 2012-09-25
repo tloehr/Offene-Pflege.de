@@ -135,7 +135,7 @@ public class PnlPrescription extends NursingRecordsPanel {
         cpsPrescription.removeAll();
         lstVisiblePrescriptions.clear();
         cpMap.clear();
-
+        lstPrescriptions.clear();
 
         if (withworker) {
 
@@ -1212,7 +1212,10 @@ public class PnlPrescription extends NursingRecordsPanel {
 //    }//GEN-LAST:event_jspVerordnungComponentResized
 
     public void cleanup() {
-        SYSTools.unregisterListeners(this);
+        cpMap.clear();
+        cpsPrescription.removeAll();
+        lstPrescriptions.clear();
+        lstVisiblePrescriptions.clear();
     }
 
     private void prepareSearchArea() {

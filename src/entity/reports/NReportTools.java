@@ -8,11 +8,14 @@ import entity.EntityTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.nursingprocess.DFNTools;
+import entity.values.ResValue;
 import op.OPDE;
+import op.tools.Pair;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -44,6 +47,38 @@ public class NReportTools {
         return !nReport.isObsolete() && nReport.getUsersAcknowledged().isEmpty() && (OPDE.isAdmin() || nReport.getUser().equals(OPDE.getLogin().getUser()));
     }
 
+    /**
+     * retrieves the PITs of the first and the last entry in the ResValue table.
+     *
+     * @param resident
+     * @return
+     */
+    public static Pair<DateTime, DateTime> getMinMax(Resident resident) {
+        Pair<DateTime, DateTime> result = null;
+
+        EntityManager em = OPDE.createEM();
+        Query queryMin = em.createQuery("SELECT nr FROM NReport nr WHERE nr.resident = :resident ORDER BY nr.pit ASC ");
+        queryMin.setParameter("resident", resident);
+        queryMin.setMaxResults(1);
+
+        Query queryMax = em.createQuery("SELECT nr FROM NReport nr WHERE nr.resident = :resident ORDER BY nr.pit DESC ");
+        queryMax.setParameter("resident", resident);
+        queryMax.setMaxResults(1);
+
+        try {
+            ArrayList<NReport> min = new ArrayList<NReport>(queryMin.getResultList());
+            ArrayList<NReport> max = new ArrayList<NReport>(queryMax.getResultList());
+            if (min.isEmpty()) {
+                result = null;
+            } else {
+                result = new Pair<DateTime, DateTime>(new DateTime(min.get(0).getPit()), new DateTime(max.get(0).getPit()));
+            }
+
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+        return result;
+    }
 
     /**
      * Führt die notwendigen Änderungen an den Entities durch, wenn ein Bericht geändert wurde. Dazu gehört auch die Dateien
@@ -70,7 +105,7 @@ public class NReportTools {
 //        NReport target = new NReport(source.getResident());
 //        target.setMinutes(source.getMinutes());
 //        target.setEditedBy(source.getEditedBy());
-//        target.setEditpit(source.getEditpit());
+//        target.setEditpit(source.getEditDate());
 //        target.setPit(source.getPit());
 //        target.setReplacedBy(source.getReplacedBy());
 //        target.setReplacementFor(source.getReplacementFor());
@@ -139,7 +174,7 @@ public class NReportTools {
             html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>"
                     + "<th>Info</th><th>Text</th>\n</tr>";
             for (NReport bericht : berichte) {
-                if (!nurBesonderes || bericht.isBesonders()) {
+                if (!nurBesonderes || bericht.isSpecial()) {
                     ihavesomethingtoshow = true;
                     html += "<tr>";
                     html += "<td valign=\"top\">" + getDatumUndUser(bericht, false, false) + "</td>";
@@ -208,13 +243,13 @@ public class NReportTools {
         DateFormat df = DateFormat.getDateTimeInstance();
 
         if (nReport.isDeleted()) {
-            result += "<br/><i>" + OPDE.lang.getString("misc.msg.thisentryhasbeendeleted") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(nReport.getEditpit()) + OPDE.lang.getString("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname() + "</i><br/>";
+            result += "<br/><i>" + OPDE.lang.getString("misc.msg.thisentryhasbeendeleted") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(nReport.getEditDate()) + " <br/>" + OPDE.lang.getString("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname() + "</i><br/>";
         }
         if (nReport.isReplacement() && !nReport.isReplaced()) {
-            result += "<br/><i>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(nReport.getReplacementFor().getEditpit()) + "<br/>" + OPDE.lang.getString("misc.msg.originalentry") + ": " + nReport.getReplacementFor().getPbid() + "</i><br/>";
+            result += "<br/><i>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(nReport.getReplacementFor().getEditDate()) + " <br/>" + "<br/>" + OPDE.lang.getString("misc.msg.originalentry") + ": " + nReport.getReplacementFor().getPbid() + "</i><br/>";
         }
         if (nReport.isReplaced()) {
-            result += "<br/><i>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(nReport.getEditpit()) + OPDE.lang.getString("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname();
+            result += "<br/><i>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(nReport.getEditDate()) + " <br/>" + OPDE.lang.getString("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname();
             result += "<br/>" + OPDE.lang.getString("misc.msg.replaceentry") + ": " + nReport.getReplacedBy().getPbid() + "</i><br/>";
         }
 //        if (!nReport.getAttachedFilesConnections().isEmpty()) {
@@ -228,6 +263,24 @@ public class NReportTools {
 
         result += "<div/>";
         return result;
+    }
+
+
+    public static String getInfoAsHTML(NReport nReport) {
+        String result = "<div id=\"fonttext\">";
+
+        DateFormat df = DateFormat.getDateTimeInstance();
+        if (nReport.isDeleted()) {
+            result += "<br/><i>" + OPDE.lang.getString("misc.msg.thisentryhasbeendeleted") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(nReport.getEditDate()) + " <br/>" + OPDE.lang.getString("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname() + "</i><br/>";
+        }
+        if (nReport.isReplacement() && !nReport.isReplaced()) {
+            result += "<br/><i>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(nReport.getReplacementFor().getEditDate()) + " <br/>" + "<br/>" + OPDE.lang.getString("misc.msg.originalentry") + ": " + nReport.getReplacementFor().getPbid() + "</i><br/>";
+        }
+        if (nReport.isReplaced()) {
+            result += "<br/><i>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(nReport.getEditDate()) + " <br/>" + OPDE.lang.getString("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname();
+            result += "<br/>" + OPDE.lang.getString("misc.msg.replaceentry") + ": " + nReport.getReplacedBy().getPbid() + "</i><br/>";
+        }
+        return result + "</div>";
     }
 
 
@@ -456,15 +509,11 @@ public class NReportTools {
         return html.toString();
     }
 
-    /**
-     * @param resident
-     * @param startdate
-     * @param weeksback
-     * @return
-     */
-    public static ArrayList<NReport> getReports(Resident resident, Date startdate, int weeksback) {
+    public static ArrayList<NReport> getNReports(Resident resident, DateMidnight day) {
         EntityManager em = OPDE.createEM();
         ArrayList<NReport> list = null;
+        DateTime from = day.toDateTime();
+        DateTime to = day.plusDays(1).toDateTime().minusSeconds(1);
 
         try {
 
@@ -472,13 +521,13 @@ public class NReportTools {
                     " FROM NReport nr " +
                     " WHERE nr.resident = :resident " +
                     " AND nr.pit >= :from AND nr.pit <= :to " +
-                    " ORDER BY nr.pit ";
+                    " ORDER BY nr.pit ASC ";
 
             Query query = em.createQuery(jpql);
 
             query.setParameter("resident", resident);
-            query.setParameter("from", new DateMidnight(startdate).minusWeeks(weeksback).toDate());
-            query.setParameter("to", new DateMidnight(startdate).plusDays(1).toDateTime().minusSeconds(1).toDate());
+            query.setParameter("from", from.toDate());
+            query.setParameter("to", to.toDate());
 
             list = new ArrayList<NReport>(query.getResultList());
 
@@ -534,7 +583,7 @@ public class NReportTools {
 
             String jpql = " SELECT nr " +
                     " FROM NReport nr " +
-                    " JOIN nr.attachedFiles nraf " +
+                    " JOIN nr.attachedFilesConnections nraf " +
                     " WHERE nr.resident = :resident " +
                     " ORDER BY nr.pit ";
 

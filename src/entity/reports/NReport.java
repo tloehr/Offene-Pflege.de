@@ -218,7 +218,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
     @OneToOne
     private NReport replacementFor;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nReport")
-    private Collection<SYSNR2FILE> attachedFiles;
+    private Collection<SYSNR2FILE> attachedFilesConnections;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bericht")
     private Collection<PB2User> usersAcknowledged;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nreport")
@@ -248,7 +248,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         this.minutes = 3;
         this.resident = resident;
         this.user = OPDE.getLogin().getUser();
-        this.attachedFiles = new ArrayList<SYSNR2FILE>();
+        this.attachedFilesConnections = new ArrayList<SYSNR2FILE>();
         this.tags = new ArrayList<NReportTAGS>();
         this.attachedProcessConnections = new ArrayList<SYSNR2PROCESS>();
         this.usersAcknowledged = new ArrayList<PB2User>();
@@ -265,7 +265,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         this.editedBy = editedBy;
         this.replacedBy = replacedBy;
         this.replacementFor = replacementFor;
-        this.attachedFiles = new ArrayList<SYSNR2FILE>();
+        this.attachedFilesConnections = new ArrayList<SYSNR2FILE>();
         this.tags = new ArrayList<NReportTAGS>();
         this.attachedProcessConnections = new ArrayList<SYSNR2PROCESS>();
         this.usersAcknowledged = new ArrayList<PB2User>();
@@ -311,13 +311,10 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
      *
      * @return
      */
-    public Date getEditpit() {
+    public Date getEditDate() {
         return editpit;
     }
 
-    public void setEditpit(Date editpit) {
-        this.editpit = editpit;
-    }
 
     public String getText() {
         SYSTools.anonymizeText(resident.getNachnameNieAnonym(), text);
@@ -340,12 +337,12 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         return resident;
     }
 
-    public Collection<SYSNR2FILE> getAttachedFiles() {
-        return attachedFiles;
+    public void setEditDate(Date editpit) {
+        this.editpit = editpit;
     }
 
-    public void setAttachedFiles(Collection<SYSNR2FILE> attachedFiles) {
-        this.attachedFiles = attachedFiles;
+    public Collection<SYSNR2FILE> getAttachedFilesConnections() {
+        return attachedFilesConnections;
     }
 
     public void setDeletedBy(Users deletedBy) {
@@ -355,7 +352,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         replacementFor = null;
     }
 
-    public boolean isBesonders() {
+    public boolean isSpecial() {
         boolean found = false;
 
         Iterator<NReportTAGS> it = tags.iterator();
@@ -493,10 +490,6 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         return attachedProcessConnections;
     }
 
-    public void setAttachedProcessConnections(Collection<SYSNR2PROCESS> attachedProcessConnections) {
-        this.attachedProcessConnections = attachedProcessConnections;
-    }
-
     @Override
     public String getTitle() {
         return text;
@@ -520,10 +513,10 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
             }
         });
 
-        CollectionUtils.forAllDo(attachedFiles, new Closure() {
+        CollectionUtils.forAllDo(attachedFilesConnections, new Closure() {
             public void execute(Object o) {
                 SYSNR2FILE oldAssignment = (SYSNR2FILE) o;
-                clonedReport.attachedFiles.add(new SYSNR2FILE(oldAssignment.getSysfile(), clonedReport, clonedReport.getUser(), clonedReport.getPit()));
+                clonedReport.attachedFilesConnections.add(new SYSNR2FILE(oldAssignment.getSysfile(), clonedReport, clonedReport.getUser(), clonedReport.getPit()));
             }
         });
         return clonedReport;
