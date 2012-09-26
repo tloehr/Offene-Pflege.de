@@ -159,7 +159,7 @@ public class TMUebergabe
                                            result = "<font color=\"green\"><b>OK</b> ";
                                        }
 
-                    result = result + NReportTools.getAsHTML((NReport) bericht[LIST_BERICHT]) + "</font>";
+                    result = result + NReportTools.getAsHTML((NReport) bericht[LIST_BERICHT], null) + "</font>";
 //                    result = ;
                     break;
                 }

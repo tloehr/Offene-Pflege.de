@@ -39,9 +39,6 @@ import org.joda.time.format.DateTimeFormatter;
 
 import javax.swing.*;
 import java.awt.*;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Time;
 import java.text.DateFormat;
 import java.text.Format;
@@ -1429,26 +1426,28 @@ public class SYSCalendar {
      * @param year
      * @return Eine Hashmap, die je das Datum als Zeichenkette der Form "jjjj-mm-tt" enthält und dazu die Bezeichnung des Feiertags.
      */
-    public static HashMap getFeiertage(int year) {
+    public static HashMap<DateMidnight, String> getHollidays(int from, int to) {
 
-        HashMap hm = new HashMap();
+        HashMap<DateMidnight, String> hm = new HashMap<DateMidnight, String>();
 
-        // Feste Feiertage
-        hm.put(year + "-01-01", "Neujahrstag");
-        hm.put(year + "-05-01", "Maifeiertag");
-        hm.put(year + "-10-03", "Tag der Einheit");
-        hm.put(year + "-11-01", "Allerheiligen");
-        hm.put(year + "-12-25", "1. Weihnachtstag");
-        hm.put(year + "-12-26", "2. Weihnachtstag");
+        for (int year = from; year <= to; year++) {
+            // Feste Feiertage
+            hm.put(new DateMidnight(year, 1, 1), "Neujahrstag");
+            hm.put(new DateMidnight(year, 5, 1), "Maifeiertag");
+            hm.put(new DateMidnight(year, 10, 3), "Tag der Einheit");
+            hm.put(new DateMidnight(year, 11, 1), "Allerheiligen");
+            hm.put(new DateMidnight(year, 12, 25), "1. Weihnachtstag");
+            hm.put(new DateMidnight(year, 12, 26), "2. Weihnachtstag");
 
-        // Bewegliche Feiertage        
-        hm.put(toAnsi(Karfreitag(year)), "Karfreitag");
-        hm.put(toAnsi(Ostersonntag(year)), "Ostersonntag");
-        hm.put(toAnsi(Ostermontag(year)), "Ostermontag");
-        hm.put(toAnsi(ChristiHimmelfahrt(year)), "Christi Himmelfahrt");
-        hm.put(toAnsi(Pfingstsonntag(year)), "Pfingstsonntag");
-        hm.put(toAnsi(Pfingstmontag(year)), "Pfingstmontag");
-        hm.put(toAnsi(Fronleichnam(year)), "Fronleichnam");
+            // Bewegliche Feiertage
+            hm.put(new DateMidnight(Karfreitag(year)), "Karfreitag");
+            hm.put(new DateMidnight(Ostersonntag(year)), "Ostersonntag");
+            hm.put(new DateMidnight(Ostermontag(year)), "Ostermontag");
+            hm.put(new DateMidnight(ChristiHimmelfahrt(year)), "Christi Himmelfahrt");
+            hm.put(new DateMidnight(Pfingstsonntag(year)), "Pfingstsonntag");
+            hm.put(new DateMidnight(Pfingstmontag(year)), "Pfingstmontag");
+            hm.put(new DateMidnight(Fronleichnam(year)), "Fronleichnam");
+        }
 
         return hm;
     }

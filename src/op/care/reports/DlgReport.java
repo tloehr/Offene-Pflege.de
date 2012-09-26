@@ -72,6 +72,7 @@ public class DlgReport extends MyJDialog {
             public void focusGained(FocusEvent focusEvent) {
                 txtDauerFocusGained(focusEvent);
             }
+
             @Override
             public void focusLost(FocusEvent focusEvent) {
                 txtDauerFocusLost(focusEvent);
@@ -141,14 +142,14 @@ public class DlgReport extends MyJDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "default, default:grow, $lcgap, default",
-            "default, $lgap, fill:default:grow, $lgap, default"));
+                "default, default:grow, $lcgap, default",
+                "default, $lgap, fill:default:grow, $lgap, default"));
 
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                "$rgap, $lcgap, default, $lcgap, 177dlu:grow, $lcgap, 115dlu:grow, 0dlu, $rgap",
-                "0dlu, 2*($lgap, default), $lgap, fill:default:grow, $lgap, default, $lgap, $rgap"));
+                    "$rgap, $lcgap, default, $lcgap, 177dlu:grow, $lcgap, 115dlu:grow, 0dlu, $rgap",
+                    "0dlu, 2*($lgap, default), $lgap, fill:default:grow, $lgap, default, $lgap, $rgap"));
             panel1.add(pnlTags, CC.xywh(7, 3, 1, 5, CC.FILL, CC.FILL));
 
             //---- label3 ----

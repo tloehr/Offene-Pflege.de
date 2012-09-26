@@ -215,6 +215,38 @@ public class SYSTools {
         }
         result.append(str.substring(s));
         return result.toString();
+
+
+
+   // TODO: case ?
+
+//        public String replaceString(String input, String find, String replace, boolean casesensitive){
+// String input_case_adjusted = input;
+// if (casesensitive == false) {
+//  //For Case Insensitive searchs
+//  //Lowercase everything (but replace in the original string)
+//  input_case_adjusted = input.toLowerCase() ;
+//  find                = find.toLowerCase() ;
+// }
+//
+// int    startPosition = input_case_adjusted.indexOf(find);
+// String start         = "";
+// String end           = "";
+//
+// if (startPosition >= 0) {
+//  if (startPosition > 0) {
+//     start = input.substring(0, startPosition);
+//  }
+//  end = input.substring(startPosition + find.length());
+//
+//  return start + replace + end;
+// } else {
+//  return input;
+// }
+//}
+
+
+
     }
 
     /**
@@ -266,140 +298,6 @@ public class SYSTools {
         }
     }
 
-//    public static void setBWLabel(JLabel bwlabel, Bewohner bewohner) {
-//        setBWLabel(bwlabel, bewohner.getRID());
-//    }
-
-//    public static void setBWLabel(JLabel bwlabel, String currentBW) {
-//        HashMap bw = DBHandling.getBW(currentBW);
-//        String result = bw.get("nachname") + ", " + bw.get("vorname") + " (*" + SYSCalendar.printGermanStyle((Date) bw.get("gebdatum")) + ", ";
-//        result += SYSCalendar.calculateAge(SYSCalendar.toGC((Date) bw.get("gebdatum"))) + " Jahre) [" + currentBW + "]";
-//
-//        // Diese bwinfo5 ist für die besonderheiten bzgl. Vitalwerten. Da steht was über Allergien usw. drin.
-//        BWInfo bwinfo5 = new BWInfo(currentBW, SYSCalendar.today_date(), BWInfo.ART_ALLES, 8, false);
-//
-//        String tooltipvorab = "";
-//        // ======================== Besonderheiten =======================
-//        boolean besonderheiten = false;
-//        if (bwinfo5.getAttribute().size() > 0) {
-//            ArrayList attribs = bwinfo5.getAttribute();
-//            TMBWInfo tmbwi5 = new TMBWInfo(bwinfo5.getAttribute(), true, false, false);
-//            for (int i = 0; i < attribs.size(); i++) {
-//                besonderheiten = true;
-//                tooltipvorab += "<li>";
-//                tooltipvorab += SYSTools.unHTML2(tmbwi5.getValueAt(i, TMBWInfo.COL_HTML).toString());
-//                tooltipvorab += "</li>";
-//            }
-//        }
-//
-//        if (besonderheiten) {
-//            result += " <font color=\"blue\">&#9679;</font> ";
-//        }
-//        if (DBRetrieve.absentSince(currentBW) != null) {
-//            result += " &rarr; ";
-//        }
-//        if (op.share.process.DBHandling.hatVorgang(currentBW)) {
-//            result += " <font color=\"red\">&#9679;</font> ";
-//        }
-//        if (bwinfo5.isVerstorben()) {
-//            result += " <font color=\"black\">&dagger;</font> ";
-//        }
-//        if (bwinfo5.isAusgezogen()) {
-//            result += " &darr; ";
-//        }
-//
-//
-//        String tooltip = "<ul>";
-//
-//        bwlabel.setText(SYSTools.toHTML(result));
-//
-//        // =============== BVs ==============================
-//        ArrayList bwa1 = DBRetrieve.getLetztesBWAttribut(currentBW, "BV1");
-//        ArrayList bwa2 = DBRetrieve.getLetztesBWAttribut(currentBW, "BV2");
-//        if (bwa1 != null || bwa2 != null) {
-//            if (bwa1 != null && (bwa1.get(0).toString().equalsIgnoreCase("<unbeantwortet value=\"true\"/>") || ((Date) bwa1.get(2)).before(SYSCalendar.nowDBDate()))) {
-//                bwa1 = null;
-//            }
-//            if (bwa2 != null && (bwa2.get(0).toString().equalsIgnoreCase("<unbeantwortet value=\"true\"/>") || ((Date) bwa2.get(2)).before(SYSCalendar.nowDBDate()))) {
-//                bwa2 = null;
-//            }
-//            if (bwa1 != null) {
-//                // Etwas unorthodox mit dem Tokenizer einen XML Schnipsel zu zerschneiden. Geht aber. ;-)
-//                StringTokenizer st = new StringTokenizer(bwa1.get(0).toString(), "\"");
-//                st.nextToken();
-//                String pk = st.nextToken();
-//                HashMap hm = DBRetrieve.getSingleRecord("OCUsers", new String[]{"Nachname", "Vorname"}, "UKennung", pk);
-//                tooltip += "<li>BV1: " + hm.get("Nachname") + ", " + hm.get("Vorname") + "</li>";
-//            }
-//            if (bwa2 != null) {
-//                // Etwas unorthodox mit dem Tokenizer einen XML Schnipsel zu zerschneiden. Geht aber. ;-)
-//                StringTokenizer st = new StringTokenizer(bwa2.get(0).toString(), "\"");
-//                st.nextToken();
-//                String pk = st.nextToken();
-//                HashMap hm = DBRetrieve.getSingleRecord("OCUsers", new String[]{"Nachname", "Vorname"}, "UKennung", pk);
-//                tooltip += "<li>BV2: " + hm.get("Nachname") + ", " + hm.get("Vorname") + "</li>";
-//            }
-//
-//        } else {
-//            tooltip += "<li><i>kein BV zugeordnet</i></li>";
-//        }
-//
-//        BWInfo bwinfo1 = new BWInfo(currentBW, "HAUSARZT", SYSCalendar.nowDBDate());
-//        BWInfo bwinfo2 = new BWInfo(currentBW, "FACHARZT", SYSCalendar.nowDBDate());
-//        BWInfo bwinfo3 = new BWInfo(currentBW, "BETREUER1", SYSCalendar.nowDBDate());
-//        BWInfo bwinfo4 = new BWInfo(currentBW, "ANGEH", SYSCalendar.nowDBDate());
-//
-//        tooltip += tooltipvorab;
-//
-//        // ======================== Ärzte =======================
-//        if (bwinfo1.getAttribute().size() > 0) {
-//            TMBWInfo tmbwi1 = new TMBWInfo(bwinfo1.getAttribute(), true, false, false);
-//            tooltip += "<li>";
-//            tooltip += anonymizeString(SYSTools.unHTML2(tmbwi1.getValueAt(0, TMBWInfo.COL_HTML).toString()));
-//            tooltip += "</li>";
-//        }
-//
-//        if (bwinfo2.getAttribute().size() > 0) {
-//            TMBWInfo tmbwi2 = new TMBWInfo(bwinfo2.getAttribute(), true, false, false);
-//            tooltip += "<li>";
-//            tooltip += anonymizeString(SYSTools.unHTML2(tmbwi2.getValueAt(0, TMBWInfo.COL_HTML).toString()));
-//            tooltip += "</li>";
-//        }
-//
-//        // ======================= Betreuer ======================
-//        if (bwinfo3.getAttribute().size() > 0) {
-//            TMBWInfo tmbwi3 = new TMBWInfo(bwinfo3.getAttribute(), true, false, false);
-//            tooltip += "<li>";
-//            tooltip += anonymizeString(SYSTools.unHTML2(tmbwi3.getValueAt(0, TMBWInfo.COL_HTML).toString()));
-//            tooltip += "</li>";
-//        }
-//
-//        // ======================= Angehörige =====================
-//        if (bwinfo4.getAttribute().size() > 0) {
-//            TMBWInfo tmbwi4 = new TMBWInfo(bwinfo4.getAttribute(), true, false, false);
-//            tooltip += "<li>";
-//            tooltip += anonymizeString(SYSTools.unHTML2(tmbwi4.getValueAt(0, TMBWInfo.COL_HTML).toString()));
-//            tooltip += "</li>";
-//        }
-//
-//        bwlabel.setToolTipText(SYSTools.toHTML(tooltip + "</ul>"));
-//        bwinfo1.cleanup();
-//        bwinfo2.cleanup();
-//        bwinfo3.cleanup();
-//        bwinfo4.cleanup();
-//    }
-
-    //    public static String anonymizeUser(String ukennung) {
-//        String result = ukennung;
-//        if (OPDE.isAnonym()) {
-//            int len = ukennung.length();
-//            result = ukennung.substring(0, 2);
-//            for (int i = 2; i < len; i++) {
-//                result += "*";
-//            }
-//        }
-//        return result;
-//    }
     public static String anonymizeName(String in, int arrayindex) {
         String name = in;
         if (OPDE.isAnonym()) {
@@ -452,32 +350,6 @@ public class SYSTools {
         return nachname + ", " + vorname + " [" + bwkennung + "]";
     }
 
-    /**
-     * Erstellt eine ComboxBox mit den Namen der Benutzer.
-     *
-     * @param status Status = 1 aktive Benutzer. Status = 0 inaktive. Status = -1 alle
-     * @return ComboBox aus ListElements mit den UKennungen in dem "Value" Attribut
-     */
-//    public static DefaultComboBoxModel getUserList(int status) {
-//        HashMap where = new HashMap();
-//        DefaultComboBoxModel result = new DefaultComboBoxModel();
-//        if (status >= 0) {
-//            where.put("Status", new Object[]{status, "="});
-//        }
-//        ResultSet rs = op.tools.DBHandling.getResultSet("OCUsers", new String[]{"UKennung", "Nachname", "Vorname"}, where, new String[]{"Nachname", "Vorname"});
-//
-//        result.addElement(new ListElement(toHTML("<i>alle</i>"), null));
-//        try {
-//            rs.beforeFirst();
-//            while (rs.next()) {
-//                String s = rs.getString("Nachname") + ", " + rs.getString("Vorname") + " (" + rs.getString("UKennung") + ")";
-//                result.addElement(new ListElement(s, rs.getString("UKennung")));
-//            }
-//        } catch (SQLException exc) {
-//        }
-//        return result;
-//    }
-
     public static String anonymizeUser(String nachname, String vorname) {
         String result;
         if (OPDE.isAnonym()) {
@@ -498,89 +370,6 @@ public class SYSTools {
         return result;
     }
 
-//    public static String getBWLabel1(String currentBW) {
-//        HashMap bw = DBHandling.getBW(currentBW);
-//        String result = bw.get("nachname") + ", " + bw.get("vorname");
-//        return result;
-//    }
-//
-//    public static String getBWLabel2(String currentBW) {
-//        HashMap bw = DBHandling.getBW(currentBW);
-//        String result = "(*" + SYSCalendar.printGermanStyle((Date) bw.get("gebdatum")) + ") [" + currentBW + "]";
-//        return result;
-//    }
-
-
-//    public static String getBWLabel(String currentBW) {
-//        HashMap bw = DBHandling.getBW(currentBW);
-//        String result = bw.get("nachname") + ", " + bw.get("vorname") + " (*" + SYSCalendar.printGermanStyle((Date) bw.get("gebdatum")) + ", ";
-//
-//        Object[] obj = op.share.bwinfo.DBHandling.miniBWInfo(currentBW);
-////        boolean aufenthalt = (Boolean) obj[0];
-////        Date vonHauf = (Date) obj[1];;
-//        Date bisHauf = (Date) obj[2];
-//        boolean ausgezogen = (Boolean) obj[3];
-//        boolean verstorben = (Boolean) obj[4];
-//        if (verstorben) {
-//            // In dem Fall, wird das Alter bis zum Sterbedatum gerechnet.
-//            result += SYSCalendar.calculateAge(SYSCalendar.toGC((Date) bw.get("gebdatum")), SYSCalendar.toGC(bisHauf)) + " Jahre) [" + currentBW + "]";
-//            result += "  verstorben: " + SYSCalendar.printGermanStyle(bisHauf) + ", ";
-//        } else {
-//            if (ausgezogen) {
-//                result += "  ausgezogen: " + SYSCalendar.printGermanStyle(bisHauf) + ", ";
-//            }
-//            result += SYSCalendar.calculateAge(SYSCalendar.toGC((Date) bw.get("gebdatum"))) + " Jahre) [" + currentBW + "]";
-//        }
-//        return result;
-//    }
-
-//    /**
-//     * @return die BWKennung des gewünschten Bewohners oder "" wenn die Suche nicht erfolgreich war.
-//     */
-//    @Deprecated
-//    public static String findeBW(java.awt.Frame parent, String muster, boolean admin) {
-//        String result = "";
-//
-//        HashMap where = new HashMap();
-//        where.put("BWKennung", new Object[]{muster, "="});
-//        if (!admin) {
-//            where.put("adminonly", new Object[]{new Boolean(false), "="});
-//        }
-//
-//        result = (String) DBHandling.getSingleValue("Bewohner", "BWKennung", where); //"BWKennung",muster);
-//        if (result == null) { // das Muster war kein gültiger Primary Key, dann suchen wir eben nach Namen.
-//            muster += "%"; // MySQL Wildcard
-//            HashMap where1 = new HashMap();
-//            where1.put("Nachname", new Object[]{muster, "like"});
-//            if (!admin) {
-//                where1.put("adminonly", new Object[]{new Boolean(false), "="});
-//            }
-//
-//            ResultSet rs = DBHandling.getResultSet("Bewohner", new String[]{"BWKennung", "Nachname", "Vorname", "GebDatum", "BWKennung"}, where1);
-//            DefaultListModel dlm = rs2lst(rs);
-//            if (dlm.getSize() > 1) {
-////                DlgListSelector dlg = new DlgListSelector(parent, "Auswahlliste Bewohner", "Bitte wählen Sie eine(n) Bewohner(in) aus.", "Ihre Suche ergab mehrere Möglichkeiten. Welche(n) Bewohner(in) meinten Sie ?", dlm);
-//                Object selection = null;
-//                if (selection != null) {
-//                    ListElement le = (ListElement) selection;
-//                    result = le.getData();
-//                } else {
-//                    result = "";
-//                }
-//            } else if (dlm.getSize() == 1) {
-//                try {
-//                    rs.first();
-//                    result = rs.getString("BWKennung");
-//                } catch (SQLException ex) {
-////                    new DlgException(ex);
-//                    ex.printStackTrace();
-//                }
-//            } else {
-//                result = "";
-//            }
-//        }
-//        return result;
-//    }
 
     public static void markAllTxt(JTextField jtf) {
         jtf.setSelectionStart(0);

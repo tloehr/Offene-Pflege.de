@@ -725,7 +725,7 @@ public class BWInfoTools {
                     + " ORDER BY p.pit DESC ");
             query.setParameter("bewohner", bewohner);
             query.setParameter("von", new DateTime().toDateMidnight().minusDays(7).toDate());
-            result += NReportTools.getBerichteAsHTML(query.getResultList(), true, false);
+            result += NReportTools.getBerichteAsHTML(query.getResultList(), true, false, null,null);
             em.close();
 
         }

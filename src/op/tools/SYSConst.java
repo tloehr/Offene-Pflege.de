@@ -163,8 +163,17 @@ public class SYSConst {
             SYSTools.getColor("FF5353"), SYSTools.getColor("FF7373"),
             SYSTools.getColor("FF8E8E"), SYSTools.getColor("FFA4A4"),
             SYSTools.getColor("FFB5B5"), SYSTools.getColor("FFC8C8"),
-            SYSTools.getColor("FFEAEA"), SYSTools.getColor("E3E0FA"),
-            SYSTools.getColor("FFFDFD"), SYSTools.getColor("FFFFFF")
+            SYSTools.getColor("FFEAEA"), SYSTools.getColor("FFEAEA"),
+            SYSTools.getColor("FFFDFD"), SYSTools.getColor("FFFDFD")
+    };
+
+    public static Color[] orange1 = new Color[]{
+            SYSTools.getColor("FF800D"), SYSTools.getColor("FF9C42"),
+            SYSTools.getColor("FFAC62"), SYSTools.getColor("FFBD82"),
+            SYSTools.getColor("FFC895"), SYSTools.getColor("FFCEA2"),
+            SYSTools.getColor("FFD7B3"), SYSTools.getColor("FFE2C8"),
+            SYSTools.getColor("FFE6D0"), SYSTools.getColor("FFF1E6"),
+            SYSTools.getColor("FFF9F4"), SYSTools.getColor("FFF9F4")
     };
 
     public static Color[] green2 = new Color[]{
@@ -353,8 +362,8 @@ public class SYSConst {
     public static final Icon icon22cancelPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/cancel_pressed.png"));
     public static final Icon icon22changePeriod = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/reload_page.png"));
     public static final Icon icon22changePeriodPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/reload_page_pressed.png"));
-    public static final Icon icon22clock = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/clock.png"));
-    public static final Icon icon22clockPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/clock_pressed.png"));
+    public static final Icon icon22clock = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/clock.png"));
+    public static final Icon icon22clockPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/edit3_pressed.png"));
     public static final Icon icon22delete = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/editdelete.png"));
     public static final Icon icon22deletePressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/editdelete_pressed.png"));
     public static final Icon icon22deleteall = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/deleteall.png"));
@@ -410,6 +419,8 @@ public class SYSConst {
     public static final Icon icon22takePressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/take-over_pressed.png"));
     public static final Icon icon22todo = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/korganizer_todo.png"));
     public static final Icon icon22todoPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/korganizer_todo_pressed.png"));
+    public static final Icon icon22checkbox = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/checkbox.png"));
+    public static final Icon icon22checkboxPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/checkbox_pressed.png"));
     public static final Icon icon22undo = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/undo.png"));
     public static final Icon icon22unlink = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/unlink.png"));
     public static final Icon icon22edited = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/edited.png"));
