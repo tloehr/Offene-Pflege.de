@@ -4,8 +4,8 @@
  */
 package entity.nursingprocess;
 
+import entity.info.ResInfoCategory;
 import entity.system.Users;
-import entity.info.BWInfoKat;
 import entity.info.Resident;
 import entity.process.QProcess;
 import entity.process.QProcessElement;
@@ -91,7 +91,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
     private Resident resident;
     @JoinColumn(name = "BWIKID", referencedColumnName = "BWIKID")
     @ManyToOne
-    private BWInfoKat kategorie;
+    private ResInfoCategory kategorie;
 
     // ==
     // 1:N Relationen
@@ -209,11 +209,11 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
         this.resident = bewohner;
     }
 
-    public BWInfoKat getKategorie() {
+    public ResInfoCategory getKategorie() {
         return kategorie;
     }
 
-    public void setKategorie(BWInfoKat kategorie) {
+    public void setKategorie(ResInfoCategory kategorie) {
         this.kategorie = kategorie;
     }
 
@@ -304,7 +304,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
         return von.compareTo(nursingProcess.getVon());
     }
 
-    public NursingProcess(String stichwort, String situation, String ziel, Date von, Date bis, long planKennung, Date nKontrolle, Long version, Users angesetztDurch, Users abgesetztDurch, Resident bewohner, BWInfoKat kategorie, Collection<SYSNP2PROCESS> attachedVorgaenge, Collection<NPControl> kontrollen, List<InterventionSchedule> interventionSchedules) {
+    public NursingProcess(String stichwort, String situation, String ziel, Date von, Date bis, long planKennung, Date nKontrolle, Long version, Users angesetztDurch, Users abgesetztDurch, Resident bewohner, ResInfoCategory kategorie, Collection<SYSNP2PROCESS> attachedVorgaenge, Collection<NPControl> kontrollen, List<InterventionSchedule> interventionSchedules) {
         this.stichwort = stichwort;
         this.situation = situation;
         this.ziel = ziel;

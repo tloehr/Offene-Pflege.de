@@ -3,7 +3,7 @@ package op.tools;
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideButton;
-import entity.info.BWInfoTools;
+import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import op.OPDE;
@@ -202,11 +202,11 @@ public class GUITools {
 
     public static void setBWDisplay(Resident bewohner) {
         OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(bewohner));
-        if (BWInfoTools.isAbwesend(bewohner)) {
+        if (ResInfoTools.isAbwesend(bewohner)) {
             OPDE.getDisplayManager().setIconAway();
-        } else if (BWInfoTools.isVerstorben(bewohner)) {
+        } else if (ResInfoTools.isVerstorben(bewohner)) {
             OPDE.getDisplayManager().setIconDead();
-        } else if (BWInfoTools.isAusgezogen(bewohner)) {
+        } else if (ResInfoTools.isAusgezogen(bewohner)) {
             OPDE.getDisplayManager().setIconGone();
         }
     }

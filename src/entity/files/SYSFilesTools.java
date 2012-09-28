@@ -25,7 +25,7 @@
  */
 package entity.files;
 
-import entity.info.BWInfo;
+import entity.info.ResInfo;
 import entity.info.Resident;
 import entity.prescription.Prescription;
 import entity.reports.NReport;
@@ -121,8 +121,8 @@ public class SYSFilesTools {
             bw = ((NReport) attachable).getResident();
         } else if (attachable instanceof Prescription) {
             bw = ((Prescription) attachable).getResident();
-        } else if (attachable instanceof BWInfo) {
-            bw = ((BWInfo) attachable).getResident();
+        } else if (attachable instanceof ResInfo) {
+            bw = ((ResInfo) attachable).getResident();
         }
         return putFiles(files, bw, attachable);
     }
@@ -148,10 +148,10 @@ public class SYSFilesTools {
                                 SYSPRE2FILE link = em.merge(new SYSPRE2FILE(sysfile, (Prescription) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getVerAssignCollection().add(link);
                                 ((Prescription) attachable).getAttachedFilesConnections().add(link);
-                            } else if (attachable instanceof BWInfo) {
-                                SYSINF2FILE link = em.merge(new SYSINF2FILE(sysfile, (BWInfo) attachable, OPDE.getLogin().getUser(), new Date()));
+                            } else if (attachable instanceof ResInfo) {
+                                SYSINF2FILE link = em.merge(new SYSINF2FILE(sysfile, (ResInfo) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getBwiAssignCollection().add(link);
-                                ((BWInfo) attachable).getAttachedFilesConnections().add(link);
+                                ((ResInfo) attachable).getAttachedFilesConnections().add(link);
                             } else if (attachable instanceof ResValue) {
                                 SYSVAL2FILE link = em.merge(new SYSVAL2FILE(sysfile, (ResValue) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getValAssignCollection().add(link);

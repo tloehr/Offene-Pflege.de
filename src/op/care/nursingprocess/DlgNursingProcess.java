@@ -30,8 +30,8 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
 import com.toedter.calendar.JDateChooser;
-import entity.info.BWInfoKat;
-import entity.info.BWInfoKatTools;
+import entity.info.ResInfoCategory;
+import entity.info.ResInfoCategoryTools;
 import entity.nursingprocess.Intervention;
 import entity.nursingprocess.InterventionSchedule;
 import entity.nursingprocess.NursingProcess;
@@ -79,7 +79,7 @@ public class DlgNursingProcess extends MyJDialog {
     }
 
     private void initDialog() {
-        cmbKategorie.setModel(new DefaultComboBoxModel(BWInfoKatTools.getCategoriesForNursingProcess().toArray()));
+        cmbKategorie.setModel(new DefaultComboBoxModel(ResInfoCategoryTools.getCategoriesForNursingProcess().toArray()));
 
         txtStichwort.setText(planung.getStichwort());
         txtSituation.setText(planung.getSituation());
@@ -650,7 +650,7 @@ public class DlgNursingProcess extends MyJDialog {
         planung.setSituation(txtSituation.getText().trim());
         planung.setZiel(txtZiele.getText().trim());
         planung.setNKontrolle(jdcKontrolle.getDate());
-        planung.setKategorie((BWInfoKat) cmbKategorie.getSelectedItem());
+        planung.setKategorie((ResInfoCategory) cmbKategorie.getSelectedItem());
 
     }
 

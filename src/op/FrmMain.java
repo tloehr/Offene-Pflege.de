@@ -42,7 +42,7 @@ import com.jidesoft.wizard.WizardDialog;
 import entity.Stationen;
 import entity.StationenTools;
 import entity.files.SYSFilesTools;
-import entity.info.BWInfoTools;
+import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.system.SYSLoginTools;
@@ -431,7 +431,7 @@ public class FrmMain extends JFrame {
 
     private void btnVerlegungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerlegungActionPerformed
         if (currentBewohner != null) {
-            SYSFilesTools.print(BWInfoTools.getUeberleitung(currentBewohner, true, true, true, true, true, true, true, true), false);
+            SYSFilesTools.print(ResInfoTools.getUeberleitung(currentBewohner, true, true, true, true, true, true, true, true), false);
         } else {
             displayManager.addSubMessage(new DisplayMessage("Bitte wählen Sie zuerst eine(n) BewohnerIn aus.", 5));
         }

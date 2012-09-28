@@ -73,9 +73,9 @@ public class ResidentTools {
 //    }
 
     public static String getLabelText(Resident bewohner) {
-        boolean verstorben = BWInfoTools.isVerstorben(bewohner);
-        boolean ausgezogen = BWInfoTools.isVerstorben(bewohner);
-        BWInfo hauf = BWInfoTools.getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP("hauf"));
+        boolean verstorben = ResInfoTools.isVerstorben(bewohner);
+        boolean ausgezogen = ResInfoTools.isVerstorben(bewohner);
+        ResInfo hauf = ResInfoTools.getLastBWInfo(bewohner, ResInfoTypeTools.getByID("hauf"));
 
         DateFormat df = DateFormat.getDateInstance();
         String result = bewohner.getNachname() + ", " + bewohner.getVorname() + " (*" + df.format(bewohner.getGebDatum()) + "), ";
@@ -141,7 +141,7 @@ public class ResidentTools {
         // TODO: Die ganzen Operationen bei Sterben und Ausziehen müssen gemacht werden, wenn der REST fertig ist.
         PrescriptionTools.alleAbsetzen(em, bewohner);
         // Alle Planungen absetzen
-        BWInfoTools.alleAbsetzen(em, bewohner);
+        ResInfoTools.alleAbsetzen(em, bewohner);
         // Alle Bestände schließen
         // Alle nicht abgehakten BHPs und DFNs löschen
         // Alle Vorgänge schließen

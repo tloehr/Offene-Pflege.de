@@ -37,15 +37,15 @@ import java.util.*;
  * Time: 16:10
  * To change this template use File | Settings | File Templates.
  */
-public class BWInfoTools {
+public class ResInfoTools {
 
     /**
-     * Eine kompakte HTML Darstellung aus der aktuellen BWInfo
+     * Eine kompakte HTML Darstellung aus der aktuellen ResInfo
      * Inkl. Bemerkungsfeld.
      *
      * @param bwinfo
      */
-    public static String getHTML(BWInfo bwinfo) {
+    public static String getHTML(ResInfo bwinfo) {
         String html = "\n<h2 id=\"fonth2\" >" + bwinfo.getBwinfotyp().getBWInfoKurz() + "</h2>\n<div id=\"fonttext\">";
         DateFormat df = bwinfo.isSingleIncident() ? DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT) : DateFormat.getDateInstance();
         html += df.format(bwinfo.getVon()) + (bwinfo.isSingleIncident() ? " " : " &rarr;" + (bwinfo.getBis().equals(SYSConst.DATE_BIS_AUF_WEITERES) ? "|" : " " + df.format(bwinfo.getBis())));
@@ -59,63 +59,63 @@ public class BWInfoTools {
         return html;
     }
 
-    public static BWInfo getLastBWInfo(Resident bewohner, BWInfoTyp bwinfotyp) {
+    public static ResInfo getLastBWInfo(Resident bewohner, ResInfoType bwinfotyp) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("BWInfo.findByBewohnerByBWINFOTYP_DESC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.von DESC");
         query.setParameter("bewohner", bewohner);
         query.setParameter("bwinfotyp", bwinfotyp);
         query.setFirstResult(0);
         query.setMaxResults(1);
-        List<BWInfo> bwinfos = query.getResultList();
+        List<ResInfo> bwinfos = query.getResultList();
         em.close();
         return bwinfos.isEmpty() ? null : bwinfos.get(0);
     }
 
-    public static BWInfo getFirstBWInfo(Resident bewohner, BWInfoTyp bwinfotyp) {
+    public static ResInfo getFirstBWInfo(Resident bewohner, ResInfoType bwinfotyp) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("BWInfo.findByBewohnerByBWINFOTYP_DESC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.von DESC");
         query.setParameter("bewohner", bewohner);
         query.setParameter("bwinfotyp", bwinfotyp);
         query.setFirstResult(0);
         query.setMaxResults(1);
-        List<BWInfo> bwinfos = query.getResultList();
+        List<ResInfo> bwinfos = query.getResultList();
         em.close();
         return bwinfos.isEmpty() ? null : bwinfos.get(0);
     }
 
-    public static List<BWInfo> findByBewohnerUndTyp(Resident bewohner, BWInfoTyp typ) {
+    public static ArrayList<ResInfo> getByResidentAndType(Resident resident, ResInfoType type) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("BWInfo.findByBewohnerByBWINFOTYP_DESC");
-        query.setParameter("bewohner", bewohner);
-        query.setParameter("bwinfotyp", typ);
-        List<BWInfo> bwInfos = query.getResultList();
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.von DESC");
+        query.setParameter("bewohner", resident);
+        query.setParameter("bwinfotyp", type);
+        ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
         em.close();
-        return bwInfos;
+        return resInfos;
     }
 
-    public static List<BWInfo> getActiveBWInfosByBewohnerUndKatArt(Resident bewohner, int katart) {
+    public static ArrayList<ResInfo> getActiveBWInfosByBewohnerUndKatArt(Resident bewohner, int katart) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM BWInfo b WHERE b.bewohner = :bewohner AND b.von <= :von AND b.bis >= :bis AND b.bwinfotyp.bwInfokat.katArt = :katart ORDER BY b.von DESC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.bewohner = :bewohner AND b.von <= :von AND b.bis >= :bis AND b.bwinfotyp.resInfokat.katArt = :katart ORDER BY b.von DESC");
         query.setParameter("bewohner", bewohner);
         query.setParameter("katart", katart);
         query.setParameter("von", new Date());
         query.setParameter("bis", new Date());
-        List<BWInfo> bwInfos = query.getResultList();
+        ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
         em.close();
-        return bwInfos;
+        return resInfos;
     }
 
-    public static Pair<Date, Date> getMinMaxAusdehnung(BWInfo info, ArrayList<BWInfo> sortedInfoList) {
+    public static Pair<Date, Date> getMinMaxAusdehnung(ResInfo info, ArrayList<ResInfo> sortedInfoList) {
         Date min = null, max = null;
 
-        BWInfo firstHauf = getFirstBWInfo(info.getResident(), BWInfoTypTools.findByBWINFTYP(BWInfoTypTools.TYP_HEIMAUFNAHME));
+        ResInfo firstHauf = getFirstBWInfo(info.getResident(), ResInfoTypeTools.getByID(ResInfoTypeTools.TYP_HEIMAUFNAHME));
 //        min = firstHauf.getFrom();
 
-        if (info.getBwinfotyp().getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
+        if (info.getBwinfotyp().getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
             return new Pair<Date, Date>(null, null);
         }
 
-        if (info.getBwinfotyp().getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_NOCONSTRAINTS) {
+        if (info.getBwinfotyp().getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_NOCONSTRAINTS) {
             min = firstHauf.getVon();
             max = new Date();
             return new Pair<Date, Date>(min, max);
@@ -125,7 +125,7 @@ public class BWInfoTools {
             // Liste ist "verkehrt rum" sortiert. Daher ist das linke Element, das spätere.
             int pos = sortedInfoList.indexOf(info);
             try {
-                BWInfo leftElement = sortedInfoList.get(pos - 1);
+                ResInfo leftElement = sortedInfoList.get(pos - 1);
                 DateTime dtVon = new DateTime(leftElement.getVon());
                 max = dtVon.minusSeconds(1).toDate();
             } catch (IndexOutOfBoundsException e) {
@@ -133,7 +133,7 @@ public class BWInfoTools {
             }
 
             try {
-                BWInfo rightElement = sortedInfoList.get(pos + 1);
+                ResInfo rightElement = sortedInfoList.get(pos + 1);
                 DateTime dtBis = new DateTime(rightElement.getBis());
                 min = dtBis.plusSeconds(1).toDate();
             } catch (IndexOutOfBoundsException e) {
@@ -146,12 +146,12 @@ public class BWInfoTools {
 
 
     public static boolean isAusgezogen(Resident bewohner) {
-        BWInfo bwinfo_hauf = BWInfoTools.getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP("HAUF"));
+        ResInfo bwinfo_hauf = ResInfoTools.getLastBWInfo(bewohner, ResInfoTypeTools.getByID("HAUF"));
         return bwinfo_hauf == null || getContent(bwinfo_hauf).getProperty("hauf").equalsIgnoreCase("ausgezogen");
     }
 
     public static boolean isVerstorben(Resident bewohner) {
-        BWInfo bwinfo_hauf = BWInfoTools.getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP("HAUF"));
+        ResInfo bwinfo_hauf = ResInfoTools.getLastBWInfo(bewohner, ResInfoTypeTools.getByID("HAUF"));
         return bwinfo_hauf != null && getContent(bwinfo_hauf).getProperty("hauf").equalsIgnoreCase("verstorben");
     }
 
@@ -162,7 +162,7 @@ public class BWInfoTools {
      * @return Date of the departure. null if not away.
      */
     public static Date absentSince(Resident bewohner) {
-        BWInfo lastabsence = getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP(BWInfoTypTools.TYP_ABWESENHEIT));
+        ResInfo lastabsence = getLastBWInfo(bewohner, ResInfoTypeTools.getByID(ResInfoTypeTools.TYP_ABWESENHEIT));
         return lastabsence == null || lastabsence.isAbgesetzt() ? null : lastabsence.getVon();
     }
 
@@ -173,12 +173,12 @@ public class BWInfoTools {
 //    /**
 //     * @return Eine ArrayList aus Date[0..1] Arrays mit jeweils Von, Bis, die alle Heimaufenthalte des BW enthalten.
 //     */
-//    public static List<BWInfo> getHeimaufenthalte(Bewohner bewohner) {
-//        List<BWInfo> result = new Vector<BWInfo>();
+//    public static List<ResInfo> getHeimaufenthalte(Bewohner bewohner) {
+//        List<ResInfo> result = new Vector<ResInfo>();
 //        EntityManager em = OPDE.createEM();
 //        try {
 //            String jpql = "" +
-//                    " SELECT b FROM BWInfo b" +
+//                    " SELECT b FROM ResInfo b" +
 //                    " WHERE b.bwinfotyp.bwinftyp = 'hauf' AND b.bewohner = :bewohner " +
 //                    " ORDER BY b.von ";
 //            Query query = em.createQuery(jpql);
@@ -193,14 +193,14 @@ public class BWInfoTools {
 //    }
 
     /**
-     * Ermittelt für eine BWInfo eine passende HTML Darstellung. Diese Methode wird nur bei einer Neueingabe oder Änderung
-     * verwendet. BWInfo Beans speicher die HTML Darstellung aus Performance Gründen kurz nach Ihrer Entstehung ab.
+     * Ermittelt für eine ResInfo eine passende HTML Darstellung. Diese Methode wird nur bei einer Neueingabe oder Änderung
+     * verwendet. ResInfo Beans speicher die HTML Darstellung aus Performance Gründen kurz nach Ihrer Entstehung ab.
      *
-     * @param bwInfo
+     * @param resInfo
      * @return
      */
-    public static String getContentAsHTML(BWInfo bwInfo) {
-        ArrayList result = parseBWInfo(bwInfo);
+    public static String getContentAsHTML(ResInfo resInfo) {
+        ArrayList result = parseBWInfo(resInfo);
 
         DefaultMutableTreeNode struktur = (DefaultMutableTreeNode) result.get(0);
         Properties content = (Properties) result.get(1);
@@ -302,12 +302,12 @@ public class BWInfoTools {
         return found;
     }
 
-    public static ArrayList parseBWInfo(BWInfo bwInfo) {
+    public static ArrayList parseBWInfo(ResInfo resInfo) {
         HandlerStruktur s = new HandlerStruktur();
 
         try {
             // Erst Struktur...
-            String texts = "<?xml version=\"1.0\"?><xml>" + bwInfo.getBwinfotyp().getXml() + "</xml>";
+            String texts = "<?xml version=\"1.0\"?><xml>" + resInfo.getBwinfotyp().getXml() + "</xml>";
             XMLReader parser = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
             InputSource is = new org.xml.sax.InputSource(new java.io.BufferedReader(new java.io.StringReader(texts)));
             parser.setContentHandler(s);
@@ -322,7 +322,7 @@ public class BWInfoTools {
 
         Properties content = new Properties();
         try {
-            StringReader reader = new StringReader(bwInfo.getProperties());
+            StringReader reader = new StringReader(resInfo.getProperties());
             content.load(reader);
             reader.close();
         } catch (IOException ex) {
@@ -505,29 +505,29 @@ public class BWInfoTools {
          *      \____|_|  \___/| ||_/\___/_/  \____|\___| \_/\_/ |_|\___|_| |_|\__/_/  |____/|_|  |_|___|
          *                     |_|
          */
-        ResValue gewicht = ResValueTools.getLast(bewohner, ResValueTools.WEIGHT);
+        ResValue weight = ResValueTools.getLast(bewohner, ResValueTools.WEIGHT);
         result += "<tr><td valign=\"top\">Zuletzt bestimmtes Körpergewicht</td><td valign=\"top\"><b>";
-        if (gewicht == null) {
+        if (weight == null) {
             result += "Die/der BW wurde noch nicht gewogen.";
         } else {
-            result += gewicht.getVal1().toPlainString() + " " + ResValueTools.UNITS[ResValueTools.WEIGHT] + " (" + df.format(gewicht.getPit()) + ")";
+            result += weight.getVal1().toPlainString() + " " + weight.getType().getUnit1() + " (" + df.format(weight.getPit()) + ")";
         }
         result += "</b></td></tr>";
 
-        ResValue groesse = ResValueTools.getLast(bewohner, ResValueTools.HEIGHT);
+        ResValue height = ResValueTools.getLast(bewohner, ResValueTools.HEIGHT);
         result += "<tr><td valign=\"top\">Zuletzt bestimmte Körpergröße</td><td valign=\"top\"><b>";
-        if (groesse == null) {
+        if (height == null) {
             result += "Bisher wurde noch keine Körpergröße ermittelt.";
         } else {
-            result += groesse.getVal1().toPlainString() + " " + ResValueTools.UNITS[ResValueTools.HEIGHT] + " (" + df.format(groesse.getPit()) + ")";
+            result += height.getVal1().toPlainString() + " " + height.getType().getUnit1() + " (" + df.format(height.getPit()) + ")";
         }
         result += "</b></td></tr>";
 
         result += "<tr><td valign=\"top\">Somit letzter BMI</td><td valign=\"top\"><b>";
-        if (gewicht == null || groesse == null) {
+        if (weight == null || height == null) {
             result += "Ein BMI kann noch nicht bestimmt werden.";
         } else {
-            BigDecimal bmi = gewicht.getVal1().divide(groesse.getVal1().pow(2), 2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal bmi = weight.getVal1().divide(height.getVal1().pow(2), 2, BigDecimal.ROUND_HALF_UP);
             result += bmi.toPlainString();
         }
         result += "</b></td></tr>";
@@ -541,11 +541,11 @@ public class BWInfoTools {
          *
          */
         ResValue bz = ResValueTools.getLast(bewohner, ResValueTools.GLUCOSE);
-        result += "<tr><td valign=\"top\">Zuletzt gemessener GLUCOSE</td><td valign=\"top\"><b>";
+        result += "<tr><td valign=\"top\">Zuletzt gemessener BZ</td><td valign=\"top\"><b>";
         if (bz == null) {
-            result += "Bisher kein GLUCOSE Wert vorhanden.";
+            result += "Bisher kein BZ Wert vorhanden.";
         } else {
-            result += bz.getVal1().toPlainString() + " " + ResValueTools.UNITS[ResValueTools.GLUCOSE] + " (" + df.format(bz.getPit()) + ")";
+            result += bz.getVal1().toPlainString() + " " + bz.getType().getUnit1() + " (" + df.format(bz.getPit()) + ")";
         }
         result += "</b></td></tr>";
 
@@ -561,7 +561,7 @@ public class BWInfoTools {
 //        int trinkmin = 0;
 //        int trinkmax = 0;
 //        if (bilanz) {
-//            BWInfo bwinfo4 = new BWInfo(bwkennung, "CONTROL", SYSCalendar.nowDBDate());
+//            ResInfo bwinfo4 = new ResInfo(bwkennung, "CONTROL", SYSCalendar.nowDBDate());
 //            if (bwinfo4.getAttribute().size() > 0) {
 //                HashMap antwort = (HashMap) ((HashMap) bwinfo4.getAttribute().get(0)).get("antwort");
 //                bilanzdurchbwinfo = antwort.get("c.bilanz").toString().equalsIgnoreCase("true");
@@ -594,7 +594,7 @@ public class BWInfoTools {
          *     |_| |_/_/   \_\___/|_|
          *
          */
-        BWInfo bwinfo_hauf = BWInfoTools.getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP("HAUF"));
+        ResInfo bwinfo_hauf = ResInfoTools.getLastBWInfo(bewohner, ResInfoTypeTools.getByID("HAUF"));
         if (bwinfo_hauf != null) {
             result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.movein") + "</td><td valign=\"top\">";
             result += "<b>" + df.format(bwinfo_hauf.getVon()) + "</b>";
@@ -609,7 +609,7 @@ public class BWInfoTools {
          *     |_|   |____/
          *
          */
-        BWInfo bwinfo_pstf = BWInfoTools.getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP("PSTF"));
+        ResInfo bwinfo_pstf = ResInfoTools.getLastBWInfo(bewohner, ResInfoTypeTools.getByID("PSTF"));
         if (bwinfo_pstf != null) {
             result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.ps") + "</td><td valign=\"top\">";
             result += bwinfo_pstf.getHtml();
@@ -654,7 +654,7 @@ public class BWInfoTools {
          *     /_/   \_\_| |_|\__, |\___|_| |_|\___/|_|  |_|\__, |\___|
          *                    |___/                         |___/
          */
-        BWInfo bwinfo_angeh = BWInfoTools.getLastBWInfo(bewohner, BWInfoTypTools.findByBWINFTYP("ANGEH"));
+        ResInfo bwinfo_angeh = ResInfoTools.getLastBWInfo(bewohner, ResInfoTypeTools.getByID("ANGEH"));
         if (bwinfo_angeh != null) {
             result += "<tr id=\"fonttext\"><td valign=\"top\">" + OPDE.lang.getString("misc.msg.relatives") + "</td><td valign=\"top\">";
             result += bwinfo_angeh.getHtml();
@@ -872,10 +872,10 @@ public class BWInfoTools {
          *                                  |_|               |___/
          */
         if (grundpflege) {
-            List<BWInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(bewohner, BWInfoKatTools.GRUNDPFLEGE);
+            List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(bewohner, ResInfoCategoryTools.GRUNDPFLEGE);
             if (!bwinfos.isEmpty()) {
-                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getBwinfotyp().getBwInfokat().getBezeichnung() + "</h2><div id=\"fonttext\">";
-                for (BWInfo bwinfo : bwinfos) {
+                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getBwinfotyp().getResInfokat().getBezeichnung() + "</h2><div id=\"fonttext\">";
+                for (ResInfo bwinfo : bwinfos) {
                     result += "<b>" + bwinfo.getBwinfotyp().getBWInfoKurz() + "</b><br/>";
                     result += bwinfo.getHtml();
                 }
@@ -893,10 +893,10 @@ public class BWInfoTools {
          *
          */
         if (haut) {
-            List<BWInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(bewohner, BWInfoKatTools.HAUT);
+            List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(bewohner, ResInfoCategoryTools.HAUT);
             if (!bwinfos.isEmpty()) {
-                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getBwinfotyp().getBwInfokat().getBezeichnung() + "</h2><div id=\"fonttext\">";
-                for (BWInfo bwinfo : bwinfos) {
+                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getBwinfotyp().getResInfokat().getBezeichnung() + "</h2><div id=\"fonttext\">";
+                for (ResInfo bwinfo : bwinfos) {
                     result += "<b>" + bwinfo.getBwinfotyp().getBWInfoKurz() + "</b><br/>";
                     result += bwinfo.getHtml();
                 }
@@ -914,10 +914,10 @@ public class BWInfoTools {
          *
          */
         if (vital) {
-            List<BWInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(bewohner, BWInfoKatTools.VITAL);
+            List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(bewohner, ResInfoCategoryTools.VITAL);
             if (!bwinfos.isEmpty()) {
-                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getBwinfotyp().getBwInfokat().getBezeichnung() + "</h2><div id=\"fonttext\">";
-                for (BWInfo bwinfo : bwinfos) {
+                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getBwinfotyp().getResInfokat().getBezeichnung() + "</h2><div id=\"fonttext\">";
+                for (ResInfo bwinfo : bwinfos) {
                     result += "<b>" + bwinfo.getBwinfotyp().getBWInfoKurz() + "</b><br/>";
                     result += bwinfo.getHtml();
                 }
@@ -933,11 +933,11 @@ public class BWInfoTools {
     private static String getDiagnosen(Resident bewohner) {
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM BWInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp AND b.bis > :now ORDER BY b.von DESC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp AND b.bis > :now ORDER BY b.von DESC");
         query.setParameter("bewohner", bewohner);
-        query.setParameter("bwinfotyp", BWInfoTypTools.findByBWINFTYP(BWInfoTypTools.TYP_DIAGNOSE));
+        query.setParameter("bwinfotyp", ResInfoTypeTools.getByID(ResInfoTypeTools.TYP_DIAGNOSE));
         query.setParameter("now", new Date());
-        List<BWInfo> diags = query.getResultList();
+        List<ResInfo> diags = query.getResultList();
         em.close();
         Collections.sort(diags);
 
@@ -947,7 +947,7 @@ public class BWInfoTools {
             result += "<h2 id=\"fonth2\">" + OPDE.lang.getString("misc.msg.diags") + "</h2>";
             result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\">";
             result += "<tr><th>ICD</th><th>" + OPDE.lang.getString("misc.msg.diag") + "</th><th>" + OPDE.lang.getString("misc.msg.diag.side") + "</th><th>" + OPDE.lang.getString("misc.msg.diag.security") + "</th></tr>";
-            for (BWInfo diag : diags) {
+            for (ResInfo diag : diags) {
                 Properties props = getContent(diag);
                 result += "<tr><td>" + props.getProperty("icd") + "</td><td>" + props.getProperty("text") + "</td><td>" + props.getProperty("koerperseite") + "</td><td>" + props.getProperty("diagnosesicherheit") + "</td></tr>";
             }
@@ -958,10 +958,10 @@ public class BWInfoTools {
     }
 
 
-    public static void setContent(BWInfo bwinfo, Properties props) {
+    public static void setContent(ResInfo bwinfo, Properties props) {
         try {
             StringWriter writer = new StringWriter();
-            props.store(writer, "[" + bwinfo.getBwinfotyp().getBwinftyp() + "] " + bwinfo.getBwinfotyp().getBWInfoKurz());
+            props.store(writer, "[" + bwinfo.getBwinfotyp().getID() + "] " + bwinfo.getBwinfotyp().getBWInfoKurz());
             bwinfo.setProperties(writer.toString());
             writer.close();
         } catch (IOException ex) {
@@ -969,7 +969,7 @@ public class BWInfoTools {
         }
     }
 
-    public static Properties getContent(BWInfo bwinfo) {
+    public static Properties getContent(ResInfo bwinfo) {
         Properties props = new Properties();
         try {
             StringReader reader = new StringReader(bwinfo.getProperties());
@@ -982,12 +982,12 @@ public class BWInfoTools {
     }
 
     public static void alleAbsetzen(EntityManager em, Resident bewohner) throws Exception {
-        Query query = em.createQuery("SELECT b FROM BWInfo b WHERE b.bewohner = :bewohner AND b.bis >= :now");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.bewohner = :bewohner AND b.bis >= :now");
         query.setParameter("bewohner", bewohner);
         query.setParameter("now", new Date());
-        List<BWInfo> bwinfos = query.getResultList();
+        List<ResInfo> bwinfos = query.getResultList();
 
-        for (BWInfo info : bwinfos) {
+        for (ResInfo info : bwinfos) {
             em.lock(info, LockModeType.OPTIMISTIC);
             info.setBis(new Date());
             info.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));

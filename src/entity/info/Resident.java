@@ -85,7 +85,7 @@ public class Resident implements Serializable, Comparable<Resident> {
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bewohner")
 //    private Collection<Verordnung> verordnungCollection;
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bewohner")
-//    private Collection<BWInfo> bwinfoCollection;
+//    private Collection<ResInfo> bwinfoCollection;
 //
 //    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "bewohner")
 //    private Collection<NReport> pflegberichte;

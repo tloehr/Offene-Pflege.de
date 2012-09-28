@@ -1,6 +1,6 @@
 package entity.prescription;
 
-import entity.info.BWInfoTools;
+import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.system.SYSPropsTools;
 import op.OPDE;
@@ -556,7 +556,7 @@ public class BHPTools {
 //                                )
 //                );
 //
-        boolean residentAbsent = bhp.getResident().isActive() && BWInfoTools.absentSince(bhp.getResident()) != null;
+        boolean residentAbsent = bhp.getResident().isActive() && ResInfoTools.absentSince(bhp.getResident()) != null;
 
         boolean medTrouble = bhp.hasMed() && TradeFormTools.getInventory4TradeForm(bhp.getResident(), bhp.getTradeForm()) == null;
 

@@ -44,7 +44,7 @@ public class UebergabebuchTools {
         DateFormat df = DateFormat.getDateTimeInstance();
         //result += (flags.equals("") ? "" : "<b>" + flags + "</b><br/>");
 
-        result += SYSTools.replace(bericht.getText(), "\n", "<br/>");
+        result += SYSTools.replace(bericht.getText(), "\n", "<br/>", false);
         result = fonthead + result + "</font>";
         return result;
     }

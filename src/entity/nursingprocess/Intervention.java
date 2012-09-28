@@ -5,7 +5,7 @@
 
 package entity.nursingprocess;
 
-import entity.info.BWInfoKat;
+import entity.info.ResInfoCategory;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -43,7 +43,7 @@ public class Intervention implements Serializable {
 
     @JoinColumn(name = "BWIKID", referencedColumnName = "BWIKID")
     @ManyToOne
-    private BWInfoKat kategorie;
+    private ResInfoCategory kategorie;
 
     public Intervention() {
     }
@@ -52,7 +52,7 @@ public class Intervention implements Serializable {
         this.massID = massID;
     }
 
-    public Intervention(String bezeichnung, BigDecimal dauer, int massArt, BWInfoKat kategorie) {
+    public Intervention(String bezeichnung, BigDecimal dauer, int massArt, ResInfoCategory kategorie) {
         this.bezeichnung = bezeichnung;
         this.dauer = dauer;
         this.massArt = massArt;
@@ -92,11 +92,11 @@ public class Intervention implements Serializable {
         this.massArt = massArt;
     }
 
-    public BWInfoKat getKategorie() {
+    public ResInfoCategory getKategorie() {
         return kategorie;
     }
 
-    public void setKategorie(BWInfoKat kategorie) {
+    public void setKategorie(ResInfoCategory kategorie) {
         this.kategorie = kategorie;
     }
 

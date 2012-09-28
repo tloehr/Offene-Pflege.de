@@ -32,8 +32,8 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import entity.info.Resident;
-import entity.info.BWInfoKat;
-import entity.info.BWInfoKatTools;
+import entity.info.ResInfoCategory;
+import entity.info.ResInfoCategoryTools;
 import entity.nursingprocess.*;
 import entity.system.SYSPropsTools;
 import entity.system.Unique;
@@ -74,8 +74,8 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
 
     private HashMap<NursingProcess, CollapsiblePane> planungCollapsiblePaneMap;
-    private HashMap<BWInfoKat, java.util.List<NursingProcess>> planungen;
-    private java.util.List<BWInfoKat> kategorien;
+    private HashMap<ResInfoCategory, java.util.List<NursingProcess>> planungen;
+    private java.util.List<ResInfoCategory> kategorien;
 
     private JToggleButton tbInactive;
     private JXSearchField txtSearch;
@@ -102,9 +102,9 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
     private void initPanel() {
         planungCollapsiblePaneMap = new HashMap<NursingProcess, CollapsiblePane>();
-//        categoryCPMap = new HashMap<BWInfoKat, CollapsiblePane>();
-        planungen = new HashMap<BWInfoKat, java.util.List<NursingProcess>>();
-        kategorien = new ArrayList<BWInfoKat>();
+//        categoryCPMap = new HashMap<ResInfoCategory, CollapsiblePane>();
+        planungen = new HashMap<ResInfoCategory, java.util.List<NursingProcess>>();
+        kategorien = new ArrayList<ResInfoCategory>();
         prepareSearchArea();
     }
 
@@ -184,7 +184,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
                         if (kategorien.isEmpty()) {
                             // Elmininate empty categories
-                            for (final BWInfoKat kat : BWInfoKatTools.getKategorien()) {
+                            for (final ResInfoCategory kat : ResInfoCategoryTools.getAll()) {
                                 if (!NursingProcessTools.findByKategorieAndBewohner(bewohner, kat).isEmpty()) {
                                     kategorien.add(kat);
                                 }
@@ -192,7 +192,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                         }
 
                         cpPlan.setLayout(new JideBoxLayout(cpPlan, JideBoxLayout.Y_AXIS));
-                        for (BWInfoKat kat : kategorien) {
+                        for (ResInfoCategory kat : kategorien) {
                             progress++;
                             OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, kategorien.size()));
                             cpPlan.add(createCollapsiblePanesFor(kat));
@@ -221,16 +221,16 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
             if (kategorien.isEmpty()) {
                 // Elmininate empty categories
-                for (final BWInfoKat kat : BWInfoKatTools.getKategorien()) {
-                    if (!NursingProcessTools.findByKategorieAndBewohner(bewohner, kat).isEmpty()) {
-                        kategorien.add(kat);
+                for (final ResInfoCategory category : ResInfoCategoryTools.getAll()) {
+                    if (!NursingProcessTools.findByKategorieAndBewohner(bewohner, category).isEmpty()) {
+                        kategorien.add(category);
                     }
                 }
             }
 
             cpPlan.setLayout(new JideBoxLayout(cpPlan, JideBoxLayout.Y_AXIS));
-            for (BWInfoKat kat : kategorien) {
-                cpPlan.add(createCollapsiblePanesFor(kat));
+            for (ResInfoCategory category : kategorien) {
+                cpPlan.add(createCollapsiblePanesFor(category));
             }
             cpPlan.addExpansion();
         }
@@ -255,9 +255,9 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 //    }
 
 
-    private CollapsiblePane createCollapsiblePanesFor(final BWInfoKat kat) {
-        final CollapsiblePane katpane = new CollapsiblePane(kat.getBezeichnung());
-//        categoryCPMap.put(kat, katpane);
+    private CollapsiblePane createCollapsiblePanesFor(final ResInfoCategory category) {
+        final CollapsiblePane katpane = new CollapsiblePane(category.getBezeichnung());
+//        categoryCPMap.put(category, katpane);
 
         katpane.addMouseListener(new MouseAdapter() {
             @Override
@@ -267,7 +267,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                         katpane.setCollapsed(false);
                     } else {
                         // collapse all children
-                        for (NursingProcess planung : planungen.get(kat)) {
+                        for (NursingProcess planung : planungen.get(category)) {
                             planungCollapsiblePaneMap.get(planung).setCollapsed(true);
                         }
                         katpane.setCollapsed(true);
@@ -278,17 +278,17 @@ public class PnlNursingProcess extends NursingRecordsPanel {
             }
         });
         katpane.setSlidingDirection(SwingConstants.SOUTH);
-        katpane.setBackground(kat.getBackgroundHeader());
-        katpane.setForeground(kat.getForegroundHeader());
+        katpane.setBackground(category.getBackgroundHeader());
+        katpane.setForeground(category.getForegroundHeader());
         katpane.setOpaque(false);
         JPanel katPanel = new JPanel();
 
-        if (!planungen.containsKey(kat)) {
-            planungen.put(kat, NursingProcessTools.findByKategorieAndBewohner(bewohner, kat));
+        if (!planungen.containsKey(category)) {
+            planungen.put(category, NursingProcessTools.findByKategorieAndBewohner(bewohner, category));
         }
 
         katPanel.setLayout(new VerticalLayout());
-        for (NursingProcess planung : planungen.get(kat)) {
+        for (NursingProcess planung : planungen.get(category)) {
             CollapsiblePane panel = createPanelFor(planung);
             katPanel.add(panel);
             planungCollapsiblePaneMap.put(planung, panel);
@@ -803,8 +803,8 @@ public class PnlNursingProcess extends NursingRecordsPanel {
     }
 
     public void refreshDisplay() {
-        for (BWInfoKat kat : kategorien) {
-            for (NursingProcess planung : planungen.get(kat)) {
+        for (ResInfoCategory category : kategorien) {
+            for (NursingProcess planung : planungen.get(category)) {
                 planungCollapsiblePaneMap.get(planung).setVisible(tbInactive.isSelected() || !planung.isAbgesetzt());
             }
         }
@@ -882,7 +882,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
     private void addNursingProcessToDisplay(NursingProcess np) {
 //        private HashMap<NursingProcess, CollapsiblePane> planungCollapsiblePaneMap;
-//    private HashMap<BWInfoKat, java.util.List<NursingProcess>> planungen;
+//    private HashMap<ResInfoCategory, java.util.List<NursingProcess>> planungen;
 
         if (!planungen.containsKey(np.getKategorie())) {
             planungen.put(np.getKategorie(), new ArrayList<NursingProcess>());

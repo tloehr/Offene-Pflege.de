@@ -1,6 +1,6 @@
 package entity.process;
 
-import entity.info.BWInfo;
+import entity.info.ResInfo;
 
 import javax.persistence.*;
 
@@ -33,12 +33,12 @@ public class SYSINF2PROCESS {
 
     @ManyToOne
     @JoinColumn(name = "BWInfoID", referencedColumnName = "BWINFOID")
-    private BWInfo bwinfo;
+    private ResInfo bwinfo;
 
     protected SYSINF2PROCESS() {
     }
 
-    public SYSINF2PROCESS(QProcess vorgang, BWInfo bwinfo) {
+    public SYSINF2PROCESS(QProcess vorgang, ResInfo bwinfo) {
         this.id = 0;
         this.vorgang = vorgang;
         this.bwinfo = bwinfo;
@@ -52,11 +52,11 @@ public class SYSINF2PROCESS {
         this.vorgang = vorgang;
     }
 
-    public BWInfo getBwinfo() {
+    public ResInfo getBwinfo() {
         return bwinfo;
     }
 
-    public void setBwinfo(BWInfo bwinfo) {
+    public void setBwinfo(ResInfo bwinfo) {
         this.bwinfo = bwinfo;
     }
 }

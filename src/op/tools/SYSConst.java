@@ -176,6 +176,15 @@ public class SYSConst {
             SYSTools.getColor("FFF9F4"), SYSTools.getColor("FFF9F4")
     };
 
+    public static Color[] green1 = new Color[]{
+            SYSTools.getColor("1FCB4A"), SYSTools.getColor("27DE55"),
+            SYSTools.getColor("4AE371"), SYSTools.getColor("7CEB98"),
+            SYSTools.getColor("93EEAA"), SYSTools.getColor("A4F0B7"),
+            SYSTools.getColor("BDF4CB"), SYSTools.getColor("D6F8DE"),
+            SYSTools.getColor("E3FBE9"), SYSTools.getColor("E3FBE9"),
+            SYSTools.getColor("FAFEFB"), SYSTools.getColor("FFFFFF")
+    };
+
     public static Color[] green2 = new Color[]{
             SYSTools.getColor("4A9586"), SYSTools.getColor("5EAE9E"),
             SYSTools.getColor("74BAAC"), SYSTools.getColor("8DC7BB"),
@@ -371,6 +380,7 @@ public class SYSConst {
     public static final Icon icon22down = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/1downarrow.png"));
     public static final Icon icon22edit = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/kspread.png"));
     public static final Icon icon22edit3 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/edit3.png"));
+    public static final Icon icon22menu = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/menu.png"));
     public static final Icon icon22edit3Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/edit3_pressed.png"));
     public static final Icon icon22edit1 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/edit1.png"));
     public static final Icon icon22edit1Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/edit1_pressed.png"));

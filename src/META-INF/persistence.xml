@@ -35,9 +35,9 @@
         <class>entity.files.SYSNR2FILE</class>
         <class>entity.files.SYSVAL2FILE</class>
         <class>entity.files.SYSPRE2FILE</class>
-        <class>entity.info.BWInfo</class>
-        <class>entity.info.BWInfoKat</class>
-        <class>entity.info.BWInfoTyp</class>
+        <class>entity.info.ResInfo</class>
+        <class>entity.info.ResInfoCategory</class>
+        <class>entity.info.ResInfoType</class>
         <class>entity.info.BWInfoVorlagen</class>
         <class>entity.system.SYSGROUPS2ACL</class>
         <class>entity.system.SYSLogin</class>

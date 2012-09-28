@@ -12,199 +12,30 @@
       <object class="com.jformdesigner.model.FormLayoutManager"> 
        <class>javax.swing.BoxLayout</class> 
       </object> 
-      <void method="addEvent"> 
-       <object class="com.jformdesigner.model.FormEvent"> 
-        <string>java.awt.event.ComponentListener</string> 
-        <string>componentResized</string> 
-        <string>thisComponentResized</string> 
-        <boolean>true</boolean> 
-       </object> 
-      </void> 
       <void property="name"> 
        <string>this</string> 
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormContainer"> 
-        <string>javax.swing.JSplitPane</string> 
+        <string>javax.swing.JScrollPane</string> 
         <object class="com.jformdesigner.model.FormLayoutManager"> 
-         <class>javax.swing.JSplitPane</class> 
+         <class>javax.swing.JScrollPane</class> 
         </object> 
-        <void method="setProperty"> 
-         <string>oneTouchExpandable</string> 
-         <boolean>true</boolean> 
-        </void> 
         <void property="name"> 
-         <string>splitPane1</string> 
+         <string>jspInfo</string> 
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormContainer"> 
-          <string>com.jidesoft.swing.JideTabbedPane</string> 
+          <string>com.jidesoft.pane.CollapsiblePanes</string> 
           <object class="com.jformdesigner.model.FormLayoutManager"> 
-           <class>javax.swing.JTabbedPane</class> 
-          </object> 
-          <void method="setProperty"> 
-           <string>tabLayoutPolicy</string> 
-           <int>1</int> 
-          </void> 
-          <void method="setProperty"> 
-           <string>showIconsOnTab</string> 
-           <boolean>false</boolean> 
-          </void> 
-          <void method="setProperty"> 
-           <string>selectedTabFont</string> 
-           <object class="java.awt.Font"> 
-            <string>Arial</string> 
-            <int>1</int> 
-            <int>14</int> 
-           </object> 
-          </void> 
-          <void method="setProperty"> 
-           <string>font</string> 
-           <object class="java.awt.Font"> 
-            <string>Arial</string> 
+           <class>javax.swing.BoxLayout</class> 
+           <void method="setProperty"> 
+            <string>axis</string> 
             <int>0</int> 
-            <int>14</int> 
-           </object> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>javax.swing.event.ChangeListener</string> 
-            <string>stateChanged</string> 
-            <string>tabKatStateChanged</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
-          <void property="name"> 
-           <string>tabKat</string> 
-          </void> 
-         </object> 
-         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-          <class>java.lang.String</class> 
-          <void method="setProperty"> 
-           <string>value</string> 
-           <string>left</string> 
-          </void> 
-         </object> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormContainer"> 
-          <string>javax.swing.JPanel</string> 
-          <object class="com.jformdesigner.model.FormLayoutManager"> 
-           <class>java.awt.BorderLayout</class> 
+           </void> 
           </object> 
           <void property="name"> 
-           <string>panel1</string> 
-          </void> 
-          <void method="add"> 
-           <object class="com.jformdesigner.model.FormContainer"> 
-            <string>javax.swing.JScrollPane</string> 
-            <object class="com.jformdesigner.model.FormLayoutManager"> 
-             <class>javax.swing.JScrollPane</class> 
-            </object> 
-            <void property="name"> 
-             <string>scrollPane1</string> 
-            </void> 
-            <void method="add"> 
-             <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JTextPane</string> 
-              <void method="setProperty"> 
-               <string>editable</string> 
-               <boolean>false</boolean> 
-              </void> 
-              <void method="setProperty"> 
-               <string>contentType</string> 
-               <string>text/html</string> 
-              </void> 
-              <void property="name"> 
-               <string>txtHTML</string> 
-              </void> 
-              <void method="addEvent"> 
-               <object class="com.jformdesigner.model.FormEvent"> 
-                <string>java.beans.PropertyChangeListener</string> 
-                <string>propertyChange</string> 
-                <string>txtHTMLPropertyChange</string> 
-                <boolean>true</boolean> 
-                <string>text</string> 
-               </object> 
-              </void> 
-             </object> 
-            </void> 
-           </object> 
-           <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-            <class>java.lang.String</class> 
-            <void method="setProperty"> 
-             <string>value</string> 
-             <string>Center</string> 
-            </void> 
-           </object> 
-          </void> 
-          <void method="add"> 
-           <object class="com.jformdesigner.model.FormContainer"> 
-            <string>javax.swing.JPanel</string> 
-            <object class="com.jformdesigner.model.FormLayoutManager"> 
-             <class>javax.swing.BoxLayout</class> 
-             <void method="setProperty"> 
-              <string>axis</string> 
-              <int>2</int> 
-             </void> 
-            </object> 
-            <void property="name"> 
-             <string>panel2</string> 
-            </void> 
-            <void method="add"> 
-             <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JButton</string> 
-              <void method="setProperty"> 
-               <string>text</string> 
-               <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
-              </void> 
-              <void method="setProperty"> 
-               <string>icon</string> 
-               <object class="com.jformdesigner.model.SwingIcon"> 
-                <int>0</int> 
-                <string>/artwork/22x22/bw/printer.png</string> 
-               </object> 
-              </void> 
-              <void method="setProperty"> 
-               <string>borderPainted</string> 
-               <boolean>false</boolean> 
-              </void> 
-              <void method="setProperty"> 
-               <string>contentAreaFilled</string> 
-               <boolean>false</boolean> 
-              </void> 
-              <void method="setProperty"> 
-               <string>border</string> 
-               <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
-              </void> 
-              <void property="name"> 
-               <string>btnPrint</string> 
-              </void> 
-              <void method="addEvent"> 
-               <object class="com.jformdesigner.model.FormEvent"> 
-                <string>java.awt.event.ActionListener</string> 
-                <string>actionPerformed</string> 
-                <string>btnPrintActionPerformed</string> 
-                <boolean>true</boolean> 
-               </object> 
-              </void> 
-             </object> 
-            </void> 
-           </object> 
-           <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-            <class>java.lang.String</class> 
-            <void method="setProperty"> 
-             <string>value</string> 
-             <string>South</string> 
-            </void> 
-           </object> 
-          </void> 
-         </object> 
-         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-          <class>java.lang.String</class> 
-          <void method="setProperty"> 
-           <string>value</string> 
-           <string>right</string> 
+           <string>cpsInfo</string> 
           </void> 
          </object> 
         </void> 

@@ -4,9 +4,9 @@
  */
 package entity.process;
 
+import entity.info.ResInfo;
 import entity.values.ResValue;
 import entity.system.Users;
-import entity.info.BWInfo;
 import entity.info.Resident;
 import entity.nursingprocess.NursingProcess;
 import entity.prescription.Prescription;
@@ -107,7 +107,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
 //    @JoinTable(name = "SYSINF2PROCESS", joinColumns =
 //    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
 //    @JoinColumn(name = "BWInfoID"))
-//    private Collection<BWInfo> bwinfos;
+//    private Collection<ResInfo> bwinfos;
 //    @ManyToMany
 //    @JoinTable(name = "SYSNP2PROCESS", joinColumns =
 //    @JoinColumn(name = "VorgangID"), inverseJoinColumns =
@@ -158,7 +158,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
             getAttachedResValueConnections().remove(element);
         } else if (element instanceof Prescription) {
             getAttachedPrescriptionConnections().remove(element);
-        } else if (element instanceof BWInfo) {
+        } else if (element instanceof ResInfo) {
             getAttachedInfos().remove(element);
         } else if (element instanceof NursingProcess) {
             getAttachedNursingProcesses().remove(element);

@@ -48,9 +48,9 @@ public class DBHandling {
     public static String getAnonymSturz(int headertiefe, int monate) {
         StringBuilder html = new StringBuilder(1000);
         String sql = "" +
-                " SELECT count(*) Anzahl, bs.XML, bwi.Von FROM BWInfo bwi " +
+                " SELECT count(*) Anzahl, bs.XML, bwi.Von FROM ResInfo bwi " +
                 " INNER JOIN Bewohner bw ON bw.BWKennung = bwi.BWKennung " +
-                " LEFT OUTER JOIN BWInfo bs ON bwi.BWKennung = bs.BWKennung  " +
+                " LEFT OUTER JOIN ResInfo bs ON bwi.BWKennung = bs.BWKennung  " +
                 " WHERE bwi.BWINFTYP LIKE 'STURZPROT%' AND bs.BWINFTYP = 'STATION' AND " +
                 "   bs.von <= bwi.von AND bs.bis >= bwi.bis AND " +
                 "   bw.AdminOnly <> 2 AND bwi.Von >= ? " +
@@ -106,9 +106,9 @@ public class DBHandling {
         }
         String sql = "" +
                 " SELECT bs.XML, bwi.Von, bwi.BWKennung, bwi.BWINFOID " +
-                " FROM BWInfo bwi " +
+                " FROM ResInfo bwi " +
                 " INNER JOIN Bewohner bw ON bw.BWKennung = bwi.BWKennung " +
-                " LEFT OUTER JOIN BWInfo bs ON bwi.BWKennung = bs.BWKennung  " +
+                " LEFT OUTER JOIN ResInfo bs ON bwi.BWKennung = bs.BWKennung  " +
                 " WHERE bwi.BWINFTYP LIKE 'STURZPROT%' AND bs.BWINFTYP = 'STATION' AND " +
                 " bs.von <= bwi.von AND bs.bis >= bwi.bis AND " +
                 " bw.AdminOnly <> 2 " +
@@ -166,9 +166,9 @@ public class DBHandling {
 
                     html.append("<tr>");
                     String datum = sdf.format(rs.getDate("bwi.Von"));
-//                    BWInfo bwinfo = new BWInfo(rs.getLong("bwi.BWINFOID"));
+//                    ResInfo bwinfo = new ResInfo(rs.getLong("bwi.BWINFOID"));
 //                    ArrayList content = bwinfo.getAttribute();
-//                    HashMap attrib = (HashMap) content.get(0); // Diese BWInfo hat nur eine Zeile
+//                    HashMap attrib = (HashMap) content.get(0); // Diese ResInfo hat nur eine Zeile
                     //String bemerkung = SYSTools.catchNull(rs.getString("bwi.Bemerkung"), "<i>keine Bemerkung</i>");
                     html.append("<td>" + datum + "</td>");
 //                    html.append("<td>" + attrib.get("html").toString() + "</td>");
@@ -206,7 +206,7 @@ public class DBHandling {
 //        String sql = "" +
 //                " SELECT b.nachname, b.vorname, b.geschlecht, b.bwkennung, tb.Text, Date(tb.PIT) Datum, tb.UKennung, tb.Dauer " +
 //                " FROM Bewohner b " +
-//                " INNER JOIN BWInfo ba ON b.BWKennung = ba.BWKennung  " +
+//                " INNER JOIN ResInfo ba ON b.BWKennung = ba.BWKennung  " +
 //                " LEFT OUTER JOIN (" +
 //                "       SELECT BWKennung, UKennung, Text, PIT, Dauer FROM Tagesberichte WHERE Sozial > 0 " +
 //                "       AND Date(PIT) >= DATE_ADD(now(), INTERVAL ? WEEK) AND Date(PIT) <= Date(now()) " +
@@ -301,7 +301,7 @@ public class DBHandling {
                 " BW.BWKennung, Date(PIT) Datum, Wert " +
                 " FROM BWerte BW " +
                 " INNER JOIN Bewohner B ON BW.BWKennung = B.BWKennung " +
-                " INNER JOIN BWInfo ba ON B.BWKennung = ba.BWKennung  " +
+                " INNER JOIN ResInfo ba ON B.BWKennung = ba.BWKennung  " +
                 " WHERE ba.BWINFTYP = 'hauf' AND ba.von <= ? AND ba.bis >= ? AND B.AdminOnly <> 2 " +
                 " AND BW.XML = '<GEWICHT/>' AND Date(PIT) >= ? AND Date(PIT) <= ?" +
                 " ORDER BY B.Nachname, B.Vorname, Date(PIT) ";
@@ -456,7 +456,7 @@ public class DBHandling {
 //                " FROM ( " +
 //                "   SELECT CONCAT(b.nachname,', ',b.vorname) Name, b.BWKennung, ifnull(SUM(sdauer), 0) dauer " +
 //                "   FROM Bewohner b " +
-//                "   INNER JOIN BWInfo ba1 ON b.BWKennung = ba1.BWKennung " +
+//                "   INNER JOIN ResInfo ba1 ON b.BWKennung = ba1.BWKennung " +
 //                "   LEFT OUTER JOIN ( " +
 //                "       SELECT BWKennung, Date(PIT) Datum, UKennung, Text, Dauer sdauer FROM Tagesberichte " +
 //                "       WHERE Sozial=1 AND Date(PIT) >= DATE(?) AND Date(PIT) <= DATE(?) " +
@@ -473,7 +473,7 @@ public class DBHandling {
 //                " ) s INNER JOIN (" +
 //                "   SELECT CONCAT(b.nachname,', ',b.vorname) Name, b.BWKennung, ifnull(SUM(sdauer), 0) dauer " +
 //                "   FROM Bewohner b " +
-//                "   INNER JOIN BWInfo ba1 ON b.BWKennung = ba1.BWKennung " +
+//                "   INNER JOIN ResInfo ba1 ON b.BWKennung = ba1.BWKennung " +
 //                "   LEFT OUTER JOIN ( " +
 //                "       SELECT BWKennung, Date(PIT) Datum, UKennung, Text, Dauer sdauer FROM Tagesberichte  " +
 //                "       WHERE PEA=1 AND Date(PIT) >= DATE(?) AND Date(PIT) <= DATE(?)  " +
@@ -549,7 +549,7 @@ public class DBHandling {
         String sql = "" +
                 " SELECT CONCAT(b.nachname,', ',b.vorname) Name, b.BWKennung, v.VorID, v.Text " +
                 " FROM Bewohner b " +
-                " INNER JOIN BWInfo ba1 ON b.BWKennung = ba1.BWKennung  " +
+                " INNER JOIN ResInfo ba1 ON b.BWKennung = ba1.BWKennung  " +
                 " INNER JOIN MPVorrat v ON v.BWKennung = b.BWKennung " +
                 " INNER JOIN MPBestand best ON v.VorID = best.VorID " +
                 " INNER JOIN BHPVerordnung ver ON ver.DafID = best.DafID AND ver.BWKennung = b.BWKennung " +
@@ -781,7 +781,7 @@ public class DBHandling {
                         String bwlabel = "";//SYSTools.getBWLabel(bwkennung);
 
                         zieltrink = 0;
-//                        BWInfo bwinfo3 = new BWInfo(bwkennung, "ZIELTRINK", SYSCalendar.nowDBDate());
+//                        ResInfo bwinfo3 = new ResInfo(bwkennung, "ZIELTRINK", SYSCalendar.nowDBDate());
 //                        if (bwinfo3.getAttribute().size() > 0) {
 //                            HashMap antwort = (HashMap) ((HashMap) bwinfo3.getAttribute().get(0)).get("antwort");
 //                            zieltrink = Integer.parseInt(antwort.get("zieltrinkmenge").toString());
@@ -789,7 +789,7 @@ public class DBHandling {
 //                        bwinfo3.cleanup();
 //
 //                        bilanz = false;
-//                        BWInfo bwinfo4 = new BWInfo(bwkennung, "CONTROL", SYSCalendar.nowDBDate());
+//                        ResInfo bwinfo4 = new ResInfo(bwkennung, "CONTROL", SYSCalendar.nowDBDate());
 //                        if (bwinfo4.getAttribute().size() > 0) {
 //                            HashMap antwort = (HashMap) ((HashMap) bwinfo4.getAttribute().get(0)).get("antwort");
 //                            bilanz = antwort.get("c.bilanz").toString().equalsIgnoreCase("true");
@@ -1051,7 +1051,7 @@ public class DBHandling {
                 "  INNER JOIN PBericht_TAGS pt ON pt.PBTAGID = pbt.PBTAGID" +
                 "  WHERE ReplacedBy IS NULL AND pb.PIT > ? AND (pt.Kurzbezeichnung='Wun' OR pt.Kurzbezeichnung='BeaWun')" +
                 "  UNION " +
-                "  SELECT bwi.Von pit, bwi.BWInfoID pk, bwi.bwkennung, 'BWInfo' tbl, bwi.AnUKennung, bwi.BWINFTYP sort FROM BWInfo bwi " +
+                "  SELECT bwi.Von pit, bwi.BWInfoID pk, bwi.bwkennung, 'ResInfo' tbl, bwi.AnUKennung, bwi.BWINFTYP sort FROM ResInfo bwi " +
                 "  WHERE bwi.BWINFTYP LIKE 'WUND%' AND bwi.Von >= ? " +
                 " ) c " +
                 " INNER JOIN Bewohner bw ON bw.BWKennung = c.BWKennung " +
@@ -1114,9 +1114,9 @@ public class DBHandling {
                         NReport bericht = EntityTools.find(NReport.class, rs.getLong("c.pk"));
                         html.append("<td>" + NReportTools.getNReportAsHTML(bericht, false) + "</td>");
                     } else {
-//                        BWInfo bwinfo = new BWInfo(rs.getLong("c.pk"));
+//                        ResInfo bwinfo = new ResInfo(rs.getLong("c.pk"));
 //                        ArrayList content = bwinfo.getAttribute();
-//                        HashMap attrib = (HashMap) content.get(0); // Diese BWInfo hat nur eine Zeile
+//                        HashMap attrib = (HashMap) content.get(0); // Diese ResInfo hat nur eine Zeile
 //                        html.append("<td>" + "<b>" + attrib.get("bwinfokurz") + "</b><br/>" + attrib.get("html").toString() + "</td>");
                     }
                     html.append("</tr>");
@@ -1198,8 +1198,8 @@ public class DBHandling {
 
         String sql = "" +
                 " SELECT b.BWKennung, CONCAT(b.Nachname, ', ', b.Vorname, ' [', b.BWKennung, ']') name, BI2.XML FROM Bewohner B " +
-                " INNER JOIN BWInfo BI1 ON  B.BWKennung = BI1.BWKennung " +
-                " INNER JOIN BWInfo BI2 ON  B.BWKennung = BI2.BWKennung " +
+                " INNER JOIN ResInfo BI1 ON  B.BWKennung = BI1.BWKennung " +
+                " INNER JOIN ResInfo BI2 ON  B.BWKennung = BI2.BWKennung " +
                 " WHERE  " +
                 " BI1.BWINFTYP = 'hauf' AND " +
                 " BI1.von <= NOW() AND BI1.bis >= NOW() AND " +
@@ -1266,9 +1266,9 @@ public class DBHandling {
         // Für wen soll die Ausfuhr überwacht werden ?
 
         String sql = "" +
-                " SELECT bi.BWInfoID, b.nachname, b.vorname, b.Geschlecht, b.BWKennung FROM BWInfo bi " +
+                " SELECT bi.BWInfoID, b.nachname, b.vorname, b.Geschlecht, b.BWKennung FROM ResInfo bi " +
                 " INNER JOIN Bewohner b ON bi.BWKennung = b.BWKennung " +
-                " INNER JOIN BWInfo ba ON ba.BWKennung = bi.BWKennung " +
+                " INNER JOIN ResInfo ba ON ba.BWKennung = bi.BWKennung " +
                 " WHERE b.AdminOnly <> 2 AND bi.BWINFTYP='CONTROL' AND ba.BWINFTYP='HAUF' " +
                 " AND bi.XML LIKE '%<c.stuhl value=\"true\"/>%' " +
                 " and bi.von < now() and bi.bis > now() " +
@@ -1286,7 +1286,7 @@ public class DBHandling {
                 rs.beforeFirst();
                 while (rs.next()) {
                     Date last = new Date();//op.care.values.DBHandling.lastWert(rs.getString("b.BWKennung"), 1); //DlgVital.MODE_STUHLGANG);
-//                    BWInfo bwi = new BWInfo(rs.getLong("bi.BWInfoID"));
+//                    ResInfo bwi = new ResInfo(rs.getLong("bi.BWInfoID"));
 //                    HashMap antwort = (HashMap) ((HashMap) bwi.getAttribute().get(0)).get("antwort");
 //                    int tage = Integer.parseInt(antwort.get("c.stuhltage").toString());
 
@@ -1326,9 +1326,9 @@ public class DBHandling {
         // Für wen soll die Ausfuhr überwacht werden ?
 
         String sql = "" +
-                " SELECT bi.BWInfoID, b.nachname, b.vorname, b.Geschlecht, b.BWKennung FROM BWInfo bi " +
+                " SELECT bi.BWInfoID, b.nachname, b.vorname, b.Geschlecht, b.BWKennung FROM ResInfo bi " +
                 " INNER JOIN Bewohner b ON bi.BWKennung = b.BWKennung " +
-                " INNER JOIN BWInfo ba ON ba.BWKennung = bi.BWKennung " +
+                " INNER JOIN ResInfo ba ON ba.BWKennung = bi.BWKennung " +
                 " WHERE b.AdminOnly <> 2 AND bi.BWINFTYP='CONTROL' AND ba.BWINFTYP='HAUF' " +
                 " AND (bi.XML LIKE '%<c.einfuhr value=\"true\"/>%' OR  bi.XML LIKE '%<c.ueber value=\"true\"/>%') " +
                 " and bi.von < now() and bi.bis > now() " +
@@ -1347,7 +1347,7 @@ public class DBHandling {
                 while (rs.next()) {
 
                     //Date last = op.care.values.DBHandling.lastWert(rs.getString("b.BWKennung"), DlgVital.MODE_STUHLGANG);
-//                    BWInfo bwi = new BWInfo(rs.getLong("bi.BWInfoID"));
+//                    ResInfo bwi = new ResInfo(rs.getLong("bi.BWInfoID"));
 //                    HashMap antwort = (HashMap) ((HashMap) bwi.getAttribute().get(0)).get("antwort");
 //                    boolean minkontrolle = antwort.get("c.einfuhr").toString().equalsIgnoreCase("true");
 //                    boolean maxkontrolle = antwort.get("c.ueber").toString().equalsIgnoreCase("true");

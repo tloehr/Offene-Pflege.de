@@ -29,21 +29,21 @@ import java.util.List;
  */
 public class ResValueTools {
 
-    public static final int RR = 1;
-    public static final int PULSE = 2;
-    public static final int TEMP = 3;
-    public static final int GLUCOSE = 4;
-    public static final int WEIGHT = 5;
-    public static final int HEIGHT = 6;
-    public static final int BREATHING = 7;
-    public static final int QUICK = 8;
-    public static final int STOOL = 9;
-    public static final int VOMIT = 10;
-    public static final int LIQUIDBALANCE = 11;
+    public static final short RR = 1;
+    public static final short PULSE = 2;
+    public static final short TEMP = 3;
+    public static final short GLUCOSE = 4;
+    public static final short WEIGHT = 5;
+    public static final short HEIGHT = 6;
+    public static final short BREATHING = 7;
+    public static final short QUICK = 8;
+    public static final short STOOL = 9;
+    public static final short VOMIT = 10;
+    public static final short LIQUIDBALANCE = 11;
 
-    public static final String[] VALUES = new String[]{"UNKNOWN", "RR", "PULSE", "TEMP", "GLUCOSE", "WEIGHT", "HEIGHT", "BREATHING", "QUICK", "STOOL", "VOMIT", "LIQUIDBALANCE"};
+//    public static final String[] VALUES = new String[]{"UNKNOWN", "RR", "PULSE", "TEMP", "GLUCOSE", "WEIGHT", "HEIGHT", "BREATHING", "QUICK", "STOOL", "VOMIT", "LIQUIDBALANCE"};
 
-    public static final String[] UNITS = new String[]{"", "mmHg", "s/m", "°C", "mg/dl", "kg", "m", "A/m", "%", "", "", "ml"};
+//    public static final String[] UNITS = new String[]{"", "mmHg", "s/m", "°C", "mg/dl", "kg", "m", "A/m", "%", "", "", "ml"};
     public static final String RRSYS = "systolisch";
     public static final String RRDIA = "diatolisch";
 
@@ -91,25 +91,26 @@ public class ResValueTools {
     /**
      * Ermittelt den jeweils zuletzt eingetragenen Wert.
      *
-     * @param bewohner um den es geht
+     * @param resident um den es geht
      * @param type     des gesuchten Wertes
      * @return der Wert. <code>null</code>, wenn es keinen gibt.
      */
-    public static ResValue getLast(Resident bewohner, int type) {
+    public static ResValue getLast(Resident resident, short type) {
 
         ResValue result;
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(" " +
-                " SELECT b FROM ResValue b WHERE b.resident = :bewohner AND b.vtype = :type " +
+                " SELECT b FROM ResValue b WHERE b.resident = :bewohner AND b.vtype.valType = :type " +
                 " ORDER BY b.pit DESC ");
         query.setMaxResults(1);
-        query.setParameter("bewohner", bewohner);
+        query.setParameter("bewohner", resident);
         query.setParameter("type", type);
 
         try {
             result = (ResValue) query.getSingleResult();
         } catch (Exception e) {
+//            OPDE.fatal(e);
             result = null;
         } finally {
             em.close();
@@ -210,7 +211,7 @@ public class ResValueTools {
         boolean result = false;
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT SUM(b.val1) FROM ResValue b WHERE b.val1 > 0 AND b.replacedBy IS NULL AND b.resident = :bewohner AND b.vtype = :type AND b.pit >= :pit ");
+        Query query = em.createQuery("SELECT SUM(b.val1) FROM ResValue b WHERE b.val1 > 0 AND b.replacedBy IS NULL AND b.resident = :bewohner AND b.vtype.valType = :type AND b.pit >= :pit ");
         query.setParameter("bewohner", bewohner);
         query.setParameter("type", ResValueTools.LIQUIDBALANCE);
         query.setParameter("pit", new DateTime().minusWeeks(1).toDateMidnight().toDate());
@@ -225,7 +226,7 @@ public class ResValueTools {
         boolean result = false;
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT SUM(b.val1) FROM ResValue b WHERE b.val1 < 0 AND b.replacedBy IS NULL AND b.resident = :bewohner AND b.vtype = :type AND b.pit >= :pit ");
+        Query query = em.createQuery("SELECT SUM(b.val1) FROM ResValue b WHERE b.val1 < 0 AND b.replacedBy IS NULL AND b.resident = :bewohner AND b.vtype.valType = :type AND b.pit >= :pit ");
         query.setParameter("bewohner", bewohner);
         query.setParameter("type", ResValueTools.LIQUIDBALANCE);
         query.setParameter("pit", new DateTime().minusWeeks(1).toDateMidnight().toDate());

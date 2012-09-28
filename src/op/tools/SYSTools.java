@@ -198,54 +198,27 @@ public class SYSTools {
      * Tauscht Zeichen in einem String in bester Textverarbeitungsmanier ;-)<br/>
      * <b>Beispiel:</b> replace("AABBCC", "BB", "DD") = "AADDCC"
      *
-     * @param str     - Eingang
-     * @param pattern - Muster nach dem gesucht werden soll
+     * @param input   - Eingang
+     * @param find - Muster nach dem gesucht werden soll
      * @param replace - Ersatzzeichenkette
+     * @param ignoreCase
      * @return String mit Ersetzung
      */
-    public static String replace(String str, String pattern, String replace) {
+    public static String replace(String input, String find, String replace, boolean ignoreCase) {
         int s = 0;
         int e = 0;
+        String input_case_adjusted = ignoreCase ? input.toLowerCase() : input;
+        String find_case_adjusted = ignoreCase ? find.toLowerCase() : find;
+
         StringBuffer result = new StringBuffer();
 
-        while ((e = str.indexOf(pattern, s)) >= 0) {
-            result.append(str.substring(s, e));
+        while ((e = input_case_adjusted.indexOf(find_case_adjusted, s)) >= 0) {
+            result.append(input.substring(s, e));
             result.append(replace);
-            s = e + pattern.length();
+            s = e + find_case_adjusted.length();
         }
-        result.append(str.substring(s));
+        result.append(input.substring(s));
         return result.toString();
-
-
-
-   // TODO: case ?
-
-//        public String replaceString(String input, String find, String replace, boolean casesensitive){
-// String input_case_adjusted = input;
-// if (casesensitive == false) {
-//  //For Case Insensitive searchs
-//  //Lowercase everything (but replace in the original string)
-//  input_case_adjusted = input.toLowerCase() ;
-//  find                = find.toLowerCase() ;
-// }
-//
-// int    startPosition = input_case_adjusted.indexOf(find);
-// String start         = "";
-// String end           = "";
-//
-// if (startPosition >= 0) {
-//  if (startPosition > 0) {
-//     start = input.substring(0, startPosition);
-//  }
-//  end = input.substring(startPosition + find.length());
-//
-//  return start + replace + end;
-// } else {
-//  return input;
-// }
-//}
-
-
 
     }
 
@@ -960,10 +933,10 @@ public class SYSTools {
 
     public static String unHTML(String in) {
         String result = in;
-        result = SYSTools.replace(result, "<ul>", "");
-        result = SYSTools.replace(result, "</ul>", "");
+        result = SYSTools.replace(result, "<ul>", "", false);
+        result = SYSTools.replace(result, "</ul>", "", false);
         result = unHTML2(result);
-        result = SYSTools.replace(result, "</font>", "");
+        result = SYSTools.replace(result, "</font>", "", false);
         result = result.replaceAll("\\<font.*?\\>", "");
         result = result.replaceAll("&diams;", "");
         return result;
@@ -971,19 +944,19 @@ public class SYSTools {
 
     public static String escapeXML(String in) {
         String result = in;
-        result = SYSTools.replace(result, "\"", "&quot;");
-        result = SYSTools.replace(result, "<", "&lt;");
-        result = SYSTools.replace(result, ">", "&gt;");
-        result = SYSTools.replace(result, "&", "&amp;");
+        result = SYSTools.replace(result, "\"", "&quot;", false);
+        result = SYSTools.replace(result, "<", "&lt;", false);
+        result = SYSTools.replace(result, ">", "&gt;", false);
+        result = SYSTools.replace(result, "&", "&amp;", false);
         return result;
     }
 
     public static String unescapeXML(String in) {
         String result = in;
-        result = SYSTools.replace(result, "&quot;", "\"");
-        result = SYSTools.replace(result, "&lt;", "<");
-        result = SYSTools.replace(result, "&gt;", ">");
-        result = SYSTools.replace(result, "&amp;", "&");
+        result = SYSTools.replace(result, "&quot;", "\"", false);
+        result = SYSTools.replace(result, "&lt;", "<", false);
+        result = SYSTools.replace(result, "&gt;", ">", false);
+        result = SYSTools.replace(result, "&amp;", "&", false);
         return result;
     }
 
@@ -998,29 +971,29 @@ public class SYSTools {
             return null;
         }
         String result = in;
-        result = SYSTools.replace(result, "Ä", "&Auml;");
-        result = SYSTools.replace(result, "ä", "&auml;");
-        result = SYSTools.replace(result, "Ö", "&Ouml;");
-        result = SYSTools.replace(result, "ö", "&ouml;");
-        result = SYSTools.replace(result, "Ü", "&Uuml;");
-        result = SYSTools.replace(result, "ü", "&uuml;");
-        result = SYSTools.replace(result, "ß", "&szlig;");
+        result = SYSTools.replace(result, "Ä", "&Auml;", false);
+        result = SYSTools.replace(result, "ä", "&auml;", false);
+        result = SYSTools.replace(result, "Ö", "&Ouml;", false);
+        result = SYSTools.replace(result, "ö", "&ouml;", false);
+        result = SYSTools.replace(result, "Ü", "&Uuml;", false);
+        result = SYSTools.replace(result, "ü", "&uuml;", false);
+        result = SYSTools.replace(result, "ß", "&szlig;", false);
         return result;
     }
 
     public static String unHTML2(String in) {
         String result = in;
-        result = SYSTools.replace(result, "<html>", "");
-        result = SYSTools.replace(result, "</html>", "");
-        result = SYSTools.replace(result, "<body>", "");
-        result = SYSTools.replace(result, "</body>", "");
+        result = SYSTools.replace(result, "<html>", "", false);
+        result = SYSTools.replace(result, "</html>", "", false);
+        result = SYSTools.replace(result, "<body>", "", false);
+        result = SYSTools.replace(result, "</body>", "", false);
         return result;
     }
 
     public static String removeTags(String input, String tag) {
         String result = input;
-        result = SYSTools.replace(result, "<" + tag + ">", "");
-        result = SYSTools.replace(result, "</" + tag + ">", "");
+        result = SYSTools.replace(result, "<" + tag + ">", "", false);
+        result = SYSTools.replace(result, "</" + tag + ">", "", false);
         return result;
     }
 
@@ -1223,7 +1196,7 @@ public class SYSTools {
     public static String anonymizeText(String nachname, String text) {
         String result = text;
         if (OPDE.isAnonym() && !catchNull(nachname).equals("")) {
-            result = replace(text, nachname, "[anonym]");
+            result = replace(text, nachname, "[anonym]", false);
         }
         return result;
     }
@@ -1943,9 +1916,9 @@ public class SYSTools {
                     + "</body>";
         }
 
-        html = SYSTools.replace(html, "<opde-user-fullname/>", user.getFullname());
-        html = SYSTools.replace(html, "<opde-user-userid/>", user.getUID());
-        html = SYSTools.replace(html, "<opde-user-pw/>", password);
+        html = SYSTools.replace(html, "<opde-user-fullname/>", user.getFullname(), false);
+        html = SYSTools.replace(html, "<opde-user-userid/>", user.getUID(), false);
+        html = SYSTools.replace(html, "<opde-user-pw/>", password, false);
         html = SYSTools.htmlUmlautConversion(html);
 
 

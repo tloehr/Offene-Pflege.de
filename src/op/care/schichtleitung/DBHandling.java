@@ -60,12 +60,12 @@ public class DBHandling {
 //                " 	) AS t ON t.BHPPID = bhpp.BHPPID " +
 //                " INNER JOIN BHPVerordnung v ON bhpp.VerID = v.VerID  " +
 //                " INNER JOIN (" +
-//                " 	SELECT b1.BWKennung, b1.XML FROM BWInfo b1 " +
+//                " 	SELECT b1.BWKennung, b1.XML FROM ResInfo b1 " +
 //                "   WHERE BWINFTYP = 'station' AND von <= now() AND bis >= now()  " +
 //                "   AND XML IN ( " + f + " ) " +
 //                " ) AS station ON v.BWKennung = station.BWKennung " +
 //                " LEFT OUTER JOIN ( " +
-//                "          SELECT BWKennung, Von, Bis FROM BWInfo " +
+//                "          SELECT BWKennung, Von, Bis FROM ResInfo " +
 //                "          WHERE BWINFTYP = 'abwe' AND " +
 //                "          von <= now() AND bis >= now() " +
 //                "         ) AS abwe ON v.BWKennung = abwe.BWKennung " +
@@ -80,12 +80,12 @@ public class DBHandling {
 ////                " INNER JOIN BHPPlanung bhpp ON bhp.BHPPID = bhpp.BHPPID " +
 ////                " INNER JOIN BHPVerordnung v ON bhpp.VerID = v.VerID " +
 ////                "       INNER JOIN (" +
-////                "           SELECT b1.BWKennung, b1.XML FROM BWInfo b1" +
+////                "           SELECT b1.BWKennung, b1.XML FROM ResInfo b1" +
 ////                "           WHERE BWINFTYP = 'station' AND von <= now() AND bis >= now() " +
 ////                "           AND XML IN (" + f + ") " +
 ////                "           ) AS station ON v.BWKennung = station.BWKennung " +
 ////                " LEFT OUTER JOIN ( " +
-////                "       SELECT BWKennung, Von, Bis FROM BWInfo " +
+////                "       SELECT BWKennung, Von, Bis FROM ResInfo " +
 ////                "       WHERE BWINFTYP = 'abwe' AND " +
 ////                "       von <= now() AND bis >= now() " +
 ////                " ) AS abwe ON v.BWKennung = abwe.BWKennung " +
@@ -152,9 +152,9 @@ public class DBHandling {
 //        String sql = " " +
 //                " SELECT CONCAT(bw.nachname,', ',bw.vorname) bwname, bw.bwkennung, ifnull(tb.anz, 0) anzahl, ifnull(abwe.Von, '9999-12-31 23:59:59') abwesend " +
 //                " FROM Bewohner bw " +
-//                " INNER JOIN BWInfo ba ON bw.BWKennung = ba.BWKennung " +
+//                " INNER JOIN ResInfo ba ON bw.BWKennung = ba.BWKennung " +
 //                "       INNER JOIN (" +
-//                "           SELECT b1.BWKennung, b1.XML FROM BWInfo b1" +
+//                "           SELECT b1.BWKennung, b1.XML FROM ResInfo b1" +
 //                "           WHERE BWINFTYP = 'station' AND von <= now() AND bis >= now() " +
 //                "           AND XML IN (" + f + ") " +
 //                "           ) AS station ON bw.BWKennung = station.BWKennung " +
@@ -164,7 +164,7 @@ public class DBHandling {
 //                "       GROUP BY BWKennung " +
 //                " ) tb ON tb.BWKennung = bw.BWKennung " +
 //                " LEFT OUTER JOIN ( " +
-//                "       SELECT BWKennung, Von, Bis FROM BWInfo " +
+//                "       SELECT BWKennung, Von, Bis FROM ResInfo " +
 //                "       WHERE BWINFTYP = 'abwe' AND " +
 //                "       von <= ? AND bis >= ? " +
 //                " ) AS abwe ON bw.BWKennung = abwe.BWKennung " +
@@ -227,7 +227,7 @@ public class DBHandling {
 //                " LEFT OUTER JOIN MPFormen F ON D.FormID = F.FormID " +
 //                " LEFT OUTER JOIN Situationen S ON v.SitID = S.SitID " +
 //                "       INNER JOIN (" +
-//                "           SELECT b1.BWKennung, b1.XML FROM BWInfo b1" +
+//                "           SELECT b1.BWKennung, b1.XML FROM ResInfo b1" +
 //                "           WHERE BWINFTYP = 'station' AND von <= now() AND bis >= now() " +
 //                "           AND XML IN (" + f + ") " +
 //                "           ) AS station ON bw.BWKennung = station.BWKennung " +

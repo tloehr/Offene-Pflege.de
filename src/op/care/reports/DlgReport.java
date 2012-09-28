@@ -13,6 +13,7 @@ import com.jidesoft.swing.OverlayableUtils;
 import entity.reports.NReport;
 import entity.reports.NReportTAGS;
 import entity.reports.NReportTAGSTools;
+import op.OPDE;
 import op.tools.MyJDialog;
 import op.tools.PnlPIT;
 import op.tools.SYSTools;
@@ -121,6 +122,7 @@ public class DlgReport extends MyJDialog {
 
     private void btnApplyActionPerformed(ActionEvent e) {
         nReport.setPit(pnlPIT.getPIT());
+        nReport.setUser(OPDE.getLogin().getUser());
         actionBlock.execute(nReport);
         dispose();
     }

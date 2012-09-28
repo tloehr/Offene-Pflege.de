@@ -13,7 +13,7 @@ import java.util.List;
  * Time: 16:33
  * To change this template use File | Settings | File Templates.
  */
-public class BWInfoTypTools {
+public class ResInfoTypeTools {
 
     public static final int MODE_INTERVAL_BYSECOND = 0;
     public static final int MODE_INTERVAL_BYDAY = 1;
@@ -34,22 +34,22 @@ public class BWInfoTypTools {
     public static final String ABWE_TYP_HOLLIDAY = "HOLLIDAY";
     public static final String ABWE_TYP_OTHER = "OTHER";
 
-    public static BWInfoTyp findByBWINFTYP(String bwinftyp) {
+    public static ResInfoType getByID(String id) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("BWInfoTyp.findByBwinftyp");
-        query.setParameter("bwinftyp", bwinftyp);
-        List<BWInfoTyp> bwInfoTyps = query.getResultList();
+        Query query = em.createQuery("SELECT b FROM ResInfoType b WHERE b.bwinftyp = :bwinftyp");
+        query.setParameter("bwinftyp", id);
+        List<ResInfoType> resInfoTypes = query.getResultList();
         em.close();
-        return bwInfoTyps.isEmpty() ? null : bwInfoTyps.get(0);
+        return resInfoTypes.isEmpty() ? null : resInfoTypes.get(0);
     }
 
-    public static List<BWInfoTyp> findByKategorie(BWInfoKat kat) {
+    public static List<ResInfoType> getByCat(ResInfoCategory category) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("BWInfoTyp.findByKat");
-        query.setParameter("kat", kat);
-        List<BWInfoTyp> bwInfoTypen = query.getResultList();
+        Query query = em.createQuery("SELECT b FROM ResInfoType b WHERE b.resInfokat = :kat AND b.status >= 0 ORDER BY b.bWInfoKurz");
+        query.setParameter("kat", category);
+        List<ResInfoType> resInfoTypen = query.getResultList();
         em.close();
-        return bwInfoTypen;
+        return resInfoTypen;
     }
 
 }

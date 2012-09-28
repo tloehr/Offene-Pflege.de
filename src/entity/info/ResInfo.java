@@ -48,18 +48,18 @@ import java.util.Properties;
 @Entity
 @Table(name = "BWInfo")
 @NamedQueries({
-        @NamedQuery(name = "BWInfo.findAll", query = "SELECT b FROM BWInfo b"),
-        @NamedQuery(name = "BWInfo.findByBwinfoid", query = "SELECT b FROM BWInfo b WHERE b.bwinfoid = :bwinfoid"),
+        @NamedQuery(name = "BWInfo.findAll", query = "SELECT b FROM ResInfo b"),
+        @NamedQuery(name = "BWInfo.findByBwinfoid", query = "SELECT b FROM ResInfo b WHERE b.bwinfoid = :bwinfoid"),
         @NamedQuery(name = "BWInfo.findByVorgang", query = " "
-                + " SELECT bw FROM BWInfo bw "
+                + " SELECT bw FROM ResInfo bw "
                 + " JOIN bw.attachedProcessConnections av"
                 + " JOIN av.vorgang v"
                 + " WHERE v = :vorgang "),
-        @NamedQuery(name = "BWInfo.findByVon", query = "SELECT b FROM BWInfo b WHERE b.von = :von"),
-        @NamedQuery(name = "BWInfo.findByBewohnerByBWINFOTYP_DESC", query = "SELECT b FROM BWInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.von DESC"),
-        @NamedQuery(name = "BWInfo.findByBewohnerByBWINFOTYP_ASC", query = "SELECT b FROM BWInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.von ASC"),
-        @NamedQuery(name = "BWInfo.findByBis", query = "SELECT b FROM BWInfo b WHERE b.bis = :bis")})
-public class BWInfo implements Serializable, QProcessElement, Cloneable, Comparable<BWInfo> {
+        @NamedQuery(name = "BWInfo.findByVon", query = "SELECT b FROM ResInfo b WHERE b.von = :von"),
+//        @NamedQuery(name = "BWInfo.findByBewohnerByBWINFOTYP_DESC", query = "SELECT b FROM ResInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.von DESC"),
+        @NamedQuery(name = "BWInfo.findByBewohnerByBWINFOTYP_ASC", query = "SELECT b FROM ResInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.von ASC"),
+        @NamedQuery(name = "BWInfo.findByBis", query = "SELECT b FROM ResInfo b WHERE b.bis = :bis")})
+public class ResInfo implements Serializable, QProcessElement, Cloneable, Comparable<ResInfo> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -93,7 +93,7 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
     // ==
     @JoinColumn(name = "BWINFTYP", referencedColumnName = "BWINFTYP")
     @ManyToOne
-    private BWInfoTyp bwinfotyp;
+    private ResInfoType bwinfotyp;
     @JoinColumn(name = "AnUKennung", referencedColumnName = "UKennung")
     @ManyToOne
     private Users angesetztDurch;
@@ -115,17 +115,17 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
     private Collection<SYSINF2PROCESS> attachedProcessConnections;
 
 
-    public BWInfo() {
+    public ResInfo() {
     }
 
-    public BWInfo(BWInfoTyp bwinfotyp, Resident bewohner) {
+    public ResInfo(ResInfoType bwinfotyp, Resident bewohner) {
         this.properties = "";
         Date now = new Date();
 
-        if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
+        if (bwinfotyp.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
             this.von = now;
             this.bis = now;
-        } else if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_BYDAY) {
+        } else if (bwinfotyp.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYDAY) {
             this.von = new DateTime().toDateMidnight().toDate();
             this.bis = SYSConst.DATE_BIS_AUF_WEITERES;
         } else {
@@ -140,7 +140,7 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
         this.attachedProcessConnections = new ArrayList<SYSINF2PROCESS>();
     }
 
-    public BWInfo(Date von, Date bis, String xml, String html, String properties, String bemerkung, BWInfoTyp bwinfotyp, Resident bewohner) {
+    public ResInfo(Date von, Date bis, String xml, String html, String properties, String bemerkung, ResInfoType bwinfotyp, Resident bewohner) {
         this.von = von;
         this.bis = bis;
         this.xml = xml;
@@ -168,7 +168,7 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
         return bewohner;
     }
 
-    public BWInfoTyp getBwinfotyp() {
+    public ResInfoType getBwinfotyp() {
         return bwinfotyp;
     }
 
@@ -177,11 +177,11 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
     }
 
     public void setVon(Date von) {
-        if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_BYDAY) {
+        if (bwinfotyp.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYDAY) {
             von = new DateTime(von).toDateMidnight().toDate();
         }
         this.von = von;
-        if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
+        if (bwinfotyp.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
             this.bis = von;
         }
     }
@@ -191,17 +191,17 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
     }
 
     public void setBis(Date bis) {
-        if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_BYDAY) {
+        if (bwinfotyp.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYDAY) {
             bis = new DateTime(bis).toDateMidnight().plusDays(1).toDateTime().minusMinutes(1).toDate();
         }
         this.bis = bis;
-        if (bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
+        if (bwinfotyp.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
             this.von = bis;
         }
     }
 
     public boolean isHeimaufnahme() {
-        return bwinfotyp.getBwinftyp().equalsIgnoreCase("hauf");
+        return bwinfotyp.getID().equalsIgnoreCase("hauf");
     }
 
     public Collection<SYSINF2PROCESS> getAttachedProcessConnections() {
@@ -276,15 +276,15 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
      * @return
      */
     public boolean isAbgesetzt() {
-        return bwinfotyp.getIntervalMode() != BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS && bis.before(new Date());
+        return bwinfotyp.getIntervalMode() != ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS && bis.before(new Date());
     }
 
     public boolean isSingleIncident() {
-        return bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_SINGLE_INCIDENTS;
+        return bwinfotyp.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS;
     }
 
     public boolean isNoConstraints() {
-        return bwinfotyp.getIntervalMode() == BWInfoTypTools.MODE_INTERVAL_NOCONSTRAINTS;
+        return bwinfotyp.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_NOCONSTRAINTS;
     }
 
     public boolean isActiveNoConstraint() {
@@ -330,12 +330,12 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
     }
 
     @Override
-    public int compareTo(BWInfo bwInfo) {
-        if (bwInfo.getBwinfotyp().getStatus() == BWInfoTypTools.STATUS_NORMAL) {
+    public int compareTo(ResInfo resInfo) {
+        if (resInfo.getBwinfotyp().getStatus() == ResInfoTypeTools.STATUS_NORMAL) {
             return 0;
-        } else if (getBwinfotyp().getBwinftyp().equalsIgnoreCase(BWInfoTypTools.TYP_DIAGNOSE) || bwInfo.getBwinfotyp().getBwinftyp().equalsIgnoreCase(BWInfoTypTools.TYP_DIAGNOSE)) {
-            Properties thisProps = BWInfoTools.getContent(this);
-            Properties thatProps = BWInfoTools.getContent(bwInfo);
+        } else if (getBwinfotyp().getID().equalsIgnoreCase(ResInfoTypeTools.TYP_DIAGNOSE) || resInfo.getBwinfotyp().getID().equalsIgnoreCase(ResInfoTypeTools.TYP_DIAGNOSE)) {
+            Properties thisProps = ResInfoTools.getContent(this);
+            Properties thatProps = ResInfoTools.getContent(resInfo);
             String thisICD = thisProps.getProperty("icd");
             String thatICD = thatProps.getProperty("icd");
             return thisICD.compareTo(thatICD);
@@ -352,10 +352,10 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof BWInfo)) {
+        if (!(object instanceof ResInfo)) {
             return false;
         }
-        BWInfo other = (BWInfo) object;
+        ResInfo other = (ResInfo) object;
         if ((this.bwinfoid == null && other.bwinfoid != null) || (this.bwinfoid != null && !this.bwinfoid.equals(other.bwinfoid))) {
             return false;
         }
@@ -364,12 +364,12 @@ public class BWInfo implements Serializable, QProcessElement, Cloneable, Compara
 
 
     @Override
-    public BWInfo clone() {
-        return new BWInfo(von, bis, xml, html, properties, bemerkung, bwinfotyp, bewohner);
+    public ResInfo clone() {
+        return new ResInfo(von, bis, xml, html, properties, bemerkung, bwinfotyp, bewohner);
     }
 
     @Override
     public String toString() {
-        return "entity.info.BWInfo[bwinfoid=" + bwinfoid + "]";
+        return "entity.info.ResInfo[bwinfoid=" + bwinfoid + "]";
     }
 }

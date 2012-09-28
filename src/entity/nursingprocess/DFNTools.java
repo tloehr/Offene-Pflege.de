@@ -1,6 +1,6 @@
 package entity.nursingprocess;
 
-import entity.info.BWInfoTools;
+import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.system.SYSPropsTools;
 import op.OPDE;
@@ -560,7 +560,7 @@ public class DFNTools {
 
     public static boolean isChangeable(DFN dfn) {
         int DFN_MAX_MINUTES_TO_WITHDRAW = Integer.parseInt(OPDE.getProps().getProperty("dfn_max_minutes_to_withdraw"));
-        boolean residentAbsent = dfn.getResident().isActive() && BWInfoTools.absentSince(dfn.getResident()) != null;
+        boolean residentAbsent = dfn.getResident().isActive() && ResInfoTools.absentSince(dfn.getResident()) != null;
 
         return !residentAbsent && dfn.getResident().isActive() &&
                 (dfn.isOnDemand() || dfn.getNursingProcess().getBis().after(new Date())) && // prescription is active or it is unassigned

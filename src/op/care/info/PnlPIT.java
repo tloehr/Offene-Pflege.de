@@ -10,20 +10,19 @@ import java.util.Date;
 import javax.swing.*;
 import com.jgoodies.forms.factories.*;
 import com.jgoodies.forms.layout.*;
-import op.tools.PnlPIT;
 import org.apache.commons.collections.Closure;
 
 /**
  * @author Torsten Löhr
  */
-public class PnlZeitpunkt extends JPanel {
+public class PnlPIT extends JPanel {
     private Date date;
-    private PnlPIT pnlPIT;
+    private op.tools.PnlPIT pnlPIT;
     private Closure actionBlock;
 
-    public PnlZeitpunkt(Date date, Closure actionBlock) {
+    public PnlPIT(Date date, Closure actionBlock) {
         this.date = date;
-        pnlPIT = new PnlPIT(date, new Date());
+        pnlPIT = new op.tools.PnlPIT(date, new Date());
         this.actionBlock = actionBlock;
         add(pnlPIT, CC.xy(3, 2));
         initComponents();

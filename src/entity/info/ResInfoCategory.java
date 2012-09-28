@@ -17,16 +17,15 @@ import java.text.Collator;
  */
 @Entity
 @Table(name = "BWInfoKat")
-@NamedQueries({
-        @NamedQuery(name = "BWInfoKat.findAll", query = "SELECT b FROM BWInfoKat b"),
-        @NamedQuery(name = "BWInfoKat.findByBwikid", query = "SELECT b FROM BWInfoKat b WHERE b.bwikid = :bwikid"),
-        @NamedQuery(name = "BWInfoKat.findByBezeichnung", query = "SELECT b FROM BWInfoKat b WHERE b.bezeichnung = :bezeichnung"),
-        @NamedQuery(name = "BWInfoKat.findByKatArt", query = "SELECT b FROM BWInfoKat b WHERE b.katArt = :katArt"),
-        @NamedQuery(name = "BWInfoKat.findBySortierung", query = "SELECT b FROM BWInfoKat b WHERE b.sortierung = :sortierung")})
-public class BWInfoKat implements Serializable, Comparable {
+//@NamedQueries({
+//        @NamedQuery(name = "BWInfoKat.findAll", query = "SELECT b FROM ResInfoCategory b"),
+//        @NamedQuery(name = "BWInfoKat.findByBwikid", query = "SELECT b FROM ResInfoCategory b WHERE b.bwikid = :bwikid"),
+//        @NamedQuery(name = "BWInfoKat.findByBezeichnung", query = "SELECT b FROM ResInfoCategory b WHERE b.bezeichnung = :bezeichnung"),
+//        @NamedQuery(name = "BWInfoKat.findByKatArt", query = "SELECT b FROM ResInfoCategory b WHERE b.katArt = :katArt"),
+//        @NamedQuery(name = "BWInfoKat.findBySortierung", query = "SELECT b FROM ResInfoCategory b WHERE b.sortierung = :sortierung")})
+public class ResInfoCategory implements Serializable, Comparable {
     private static final long serialVersionUID = 1L;
     @Id
-    @Basic(optional = false)
     @Column(name = "BWIKID")
     private Long bwikid;
     @Column(name = "Bezeichnung")
@@ -45,19 +44,15 @@ public class BWInfoKat implements Serializable, Comparable {
     private String fgcontent;
 
 
-    public BWInfoKat() {
+    public ResInfoCategory() {
     }
 
-    public BWInfoKat(Long bwikid) {
+    public ResInfoCategory(Long bwikid) {
         this.bwikid = bwikid;
     }
 
-    public Long getBwikid() {
+    public Long getID() {
         return bwikid;
-    }
-
-    public void setBwikid(Long bwikid) {
-        this.bwikid = bwikid;
     }
 
     public String getBezeichnung() {
@@ -139,16 +134,16 @@ public class BWInfoKat implements Serializable, Comparable {
     public int compareTo(Object o) {
         final Collator collator = Collator.getInstance();
         collator.setStrength(Collator.SECONDARY);// a == A, a < Ä
-        return collator.compare(bezeichnung, ((BWInfoKat) o).getBezeichnung());
+        return collator.compare(bezeichnung, ((ResInfoCategory) o).getBezeichnung());
     }
 
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof BWInfoKat)) {
+        if (!(object instanceof ResInfoCategory)) {
             return false;
         }
-        BWInfoKat other = (BWInfoKat) object;
+        ResInfoCategory other = (ResInfoCategory) object;
         if ((this.bwikid == null && other.bwikid != null) || (this.bwikid != null && !this.bwikid.equals(other.bwikid))) {
             return false;
         }

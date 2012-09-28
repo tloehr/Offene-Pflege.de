@@ -25,7 +25,7 @@
  */
 package entity.files;
 
-import entity.info.BWInfo;
+import entity.info.ResInfo;
 import entity.system.Users;
 
 import javax.persistence.*;
@@ -53,7 +53,7 @@ public class SYSINF2FILE implements Serializable {
     private Date pit;
     @JoinColumn(name = "BWINFOID", referencedColumnName = "BWINFOID")
     @ManyToOne
-    private BWInfo bwinfo;
+    private ResInfo bwinfo;
     @JoinColumn(name = "FID", referencedColumnName = "OCFID")
     @ManyToOne
     private SYSFiles sysfile;
@@ -69,11 +69,11 @@ public class SYSINF2FILE implements Serializable {
         this.pit = pit;
     }
 
-    public BWInfo getBwinfo() {
+    public ResInfo getBwinfo() {
         return bwinfo;
     }
 
-    public void setBwinfo(BWInfo bwinfo) {
+    public void setBwinfo(ResInfo bwinfo) {
         this.bwinfo = bwinfo;
     }
 
@@ -97,7 +97,7 @@ public class SYSINF2FILE implements Serializable {
     public SYSINF2FILE() {
     }
 
-    public SYSINF2FILE(SYSFiles sysfile, BWInfo bwinfo, Users user, Date pit) {
+    public SYSINF2FILE(SYSFiles sysfile, ResInfo bwinfo, Users user, Date pit) {
         this.sysfile = sysfile;
         this.bwinfo = bwinfo;
         this.user = user;

@@ -2,7 +2,7 @@ package entity.nursingprocess;
 
 import entity.info.Resident;
 import entity.EntityTools;
-import entity.info.BWInfoKat;
+import entity.info.ResInfoCategory;
 import op.OPDE;
 import op.care.nursingprocess.PnlNursingProcess;
 import op.tools.SYSTools;
@@ -23,10 +23,10 @@ import java.util.List;
 public class NursingProcessTools {
     public static final String UNIQUEID = "__plankenn";
 
-    public static List<NursingProcess> findByKategorieAndBewohner(Resident bewohner, BWInfoKat kat) {
+    public static List<NursingProcess> findByKategorieAndBewohner(Resident bewohner, ResInfoCategory category) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT p FROM NursingProcess p WHERE p.resident = :bewohner AND p.kategorie = :kat ORDER BY p.stichwort, p.von");
-        query.setParameter("kat", kat);
+        query.setParameter("kat", category);
         query.setParameter("bewohner", bewohner);
         List<NursingProcess> planungen = query.getResultList();
         em.close();
@@ -72,8 +72,8 @@ public class NursingProcessTools {
             html += "<b>Am:</b> " + df.format(planung.getBis()) + "<br/>";
         }
 
-        html += "<h3 id=\"fonth3\">Situation</h3>" + SYSTools.replace(planung.getSituation(), "\n", "<br/>");
-        html += "<h3 id=\"fonth3\">Ziel(e):</h3>" + SYSTools.replace(planung.getZiel(), "\n", "<br/>");
+        html += "<h3 id=\"fonth3\">Situation</h3>" + SYSTools.replace(planung.getSituation(), "\n", "<br/>", false);
+        html += "<h3 id=\"fonth3\">Ziel(e):</h3>" + SYSTools.replace(planung.getZiel(), "\n", "<br/>", false);
 
         html += "<h3 id=\"fonth3\">" + OPDE.lang.getString(PnlNursingProcess.internalClassID + ".interventions") + "</h3>";
 

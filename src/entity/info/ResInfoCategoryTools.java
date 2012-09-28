@@ -19,7 +19,7 @@ import java.util.List;
  * Time: 14:21
  * To change this template use File | Settings | File Templates.
  */
-public class BWInfoKatTools {
+public class ResInfoCategoryTools {
 
     public static final int GRUNDPFLEGE = 100;
     public static final int HAUT = 110;
@@ -35,8 +35,8 @@ public class BWInfoKatTools {
                 String text;
                 if (o == null) {
                     text = SYSTools.toHTML("<i>Keine Auswahl</i>");
-                } else if (o instanceof BWInfoKat) {
-                    text = SYSTools.toHTML("<div id=\"fonttext\"><font color=\"#"+((BWInfoKat) o).getFgheader()+"\">"+((BWInfoKat) o).getBezeichnung()+"</font></div>");
+                } else if (o instanceof ResInfoCategory) {
+                    text = SYSTools.toHTML("<div id=\"fonttext\"><font color=\"#"+((ResInfoCategory) o).getFgheader()+"\">"+((ResInfoCategory) o).getBezeichnung()+"</font></div>");
                 } else {
                     text = o.toString();
                 }
@@ -48,11 +48,11 @@ public class BWInfoKatTools {
     /**
      * @return
      */
-    public static List<BWInfoKat> getCategoriesForNursingProcess() {
+    public static List<ResInfoCategory> getCategoriesForNursingProcess() {
         // katart below 1000 is accessible for everyone
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM BWInfoKat b WHERE b.katArt < 1000 AND b.sortierung >= 0");
-        List<BWInfoKat> result = query.getResultList();
+        Query query = em.createQuery("SELECT b FROM ResInfoCategory b WHERE b.katArt < 1000 AND b.sortierung >= 0");
+        List<ResInfoCategory> result = query.getResultList();
         em.close();
         Collections.sort(result);
         return result;
@@ -61,7 +61,7 @@ public class BWInfoKatTools {
     /**
      * @return
      */
-    public static List<BWInfoKat> getKategorien() {
+    public static List<ResInfoCategory> getAll() {
 
         String katart = "0";   // a little trick. 0 is always viable
 
@@ -70,8 +70,8 @@ public class BWInfoKatTools {
 
         // katart below 1000 is accessible for everyone
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM BWInfoKat b WHERE (b.katArt < 1000 OR b.katArt IN (" + katart + " )) AND b.sortierung >= 0");
-        List<BWInfoKat> result = query.getResultList();
+        Query query = em.createQuery("SELECT b FROM ResInfoCategory b WHERE (b.katArt < 1000 OR b.katArt IN (" + katart + " )) AND b.sortierung >= 0");
+        List<ResInfoCategory> result = query.getResultList();
         em.close();
         Collections.sort(result);
         return result;

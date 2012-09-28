@@ -4,10 +4,10 @@
  */
 package entity.process;
 
+import entity.info.ResInfo;
 import entity.values.ResValue;
 import entity.prescription.Prescription;
 import entity.system.Users;
-import entity.info.BWInfo;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.nursingprocess.NursingProcess;
@@ -73,7 +73,7 @@ public class QProcessTools {
         } else if (element instanceof Prescription) {
             query = em.createNamedQuery("SYSPRE2PROCESS.findByElementAndVorgang");
             elementBezeichnung = "Ärztliche Verordnung";
-        } else if (element instanceof BWInfo) {
+        } else if (element instanceof ResInfo) {
             query = em.createNamedQuery("SYSINF2PROCESS.findByElementAndVorgang");
             elementBezeichnung = "Bewohner Information";
         } else if (element instanceof NursingProcess) {
@@ -273,7 +273,7 @@ public class QProcessTools {
 //            complement = em.createNamedQuery("SYSBWerte2VORGANG.findActiveAssignedVorgaengeByElement");
 //        } else if (elementQ instanceof Prescription) {
 //            complement = em.createNamedQuery("SYSVER2VORGANG.findActiveAssignedVorgaengeByElement");
-//        } else if (elementQ instanceof BWInfo) {
+//        } else if (elementQ instanceof ResInfo) {
 //            complement = em.createNamedQuery("SYSBWI2VORGANG.findActiveAssignedVorgaengeByElement");
 //        } else if (elementQ instanceof NursingProcess) {
 //            complement = em.createNamedQuery("SYSPLAN2VORGANG.findActiveAssignedVorgaengeByElement");
@@ -319,7 +319,7 @@ public class QProcessTools {
 //            query = em.createNamedQuery("SYSBWerte2VORGANG.findActiveAssignedVorgaengeByElement");
 //        } else if (elementQ instanceof Prescription) {
 //            query = em.createNamedQuery("SYSVER2VORGANG.findActiveAssignedVorgaengeByElement");
-//        } else if (elementQ instanceof BWInfo) {
+//        } else if (elementQ instanceof ResInfo) {
 //            query = em.createNamedQuery("SYSBWI2VORGANG.findActiveAssignedVorgaengeByElement");
 //        } else if (elementQ instanceof NursingProcess) {
 //            query = em.createNamedQuery("SYSPLAN2VORGANG.findActiveAssignedVorgaengeByElement");

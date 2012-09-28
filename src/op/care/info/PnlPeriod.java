@@ -25,14 +25,14 @@ import java.util.Date;
 /**
  * @author Torsten Löhr
  */
-public class PnlZeitraum extends JPanel {
+public class PnlPeriod extends JPanel {
     private boolean ignore;
     private Date min, max, from, to;
     DateTime dtmin, dtmax;
     int maximum;
     private Closure actionBlock;
 
-    public PnlZeitraum(Date min, Date max, Date from, Date to, Closure actionBlock) {
+    public PnlPeriod(Date min, Date max, Date from, Date to, Closure actionBlock) {
         this.actionBlock = actionBlock;
         this.min = min;
         this.max = max;//new Date(Math.min(new Date().getTime(), max.getTime())); // max date is always today

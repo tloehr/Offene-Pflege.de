@@ -28,10 +28,10 @@ package op.care.info;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import entity.info.ResInfo;
 import entity.prescription.Hospital;
 import entity.prescription.*;
-import entity.info.BWInfo;
-import entity.info.BWInfoTools;
+import entity.info.ResInfoTools;
 import entity.info.ICD;
 import entity.prescription.HospitalTools;
 import op.OPDE;
@@ -60,13 +60,13 @@ public class DlgDiag extends MyJDialog {
 
     private ListSelectionListener lsl;
     private String text;
-    private BWInfo diag;
+    private ResInfo diag;
     private Closure actionBlock;
 
     /**
      * Creates new form DlgVorlage
      */
-    public DlgDiag(BWInfo diag, Closure actionBlock) {
+    public DlgDiag(ResInfo diag, Closure actionBlock) {
         super();
         this.diag = diag;
         this.actionBlock = actionBlock;
@@ -353,7 +353,7 @@ public class DlgDiag extends MyJDialog {
         html += OPDE.lang.getString("misc.msg.diag.side") + ": &lt;b&gt;" + cmbKoerper.getSelectedItem().toString() + "&lt;/b&gt;&lt;br/&gt;";
         html += OPDE.lang.getString("misc.msg.diag.security") + ": &lt;b&gt;" + cmbSicherheit.getSelectedItem().toString() + "&lt;/b&gt;";
 
-        BWInfoTools.setContent(diag, props);
+        ResInfoTools.setContent(diag, props);
         diag.setHtml(html);
 
     }

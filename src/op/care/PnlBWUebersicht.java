@@ -30,9 +30,9 @@ import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
-import entity.info.Resident;
 import entity.files.SYSFilesTools;
-import entity.info.BWInfoTools;
+import entity.info.ResInfoTools;
+import entity.info.Resident;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.reports.PnlReport;
@@ -129,7 +129,60 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     public void reloadDisplay() {
-        initPhase = true;
+
+        final boolean withworker = false;
+        if (withworker) {
+            initPhase = true;
+
+            OPDE.getMainframe().setBlocked(true);
+            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+
+            SwingWorker worker = new SwingWorker() {
+                String html = "";
+
+                @Override
+                protected Object doInBackground() throws Exception {
+                    html = SYSTools.toHTML(ResInfoTools.getUeberleitung(bewohner, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true));
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    txtUebersicht.setText(html);
+                    txtUebersicht.repaint();
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            jspHTML.getVerticalScrollBar().setValue(0);
+                        }
+                    });
+                    initPhase = false;
+                    OPDE.getDisplayManager().setProgressBarMessage(null);
+                    OPDE.getMainframe().setBlocked(false);
+                }
+            };
+            worker.execute();
+
+        } else {
+            initPhase = true;
+            OPDE.getMainframe().setBlocked(true);
+            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+            String html = SYSTools.toHTML(ResInfoTools.getUeberleitung(bewohner, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true));
+            txtUebersicht.setText(html);
+            txtUebersicht.repaint();
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    jspHTML.getVerticalScrollBar().setValue(0);
+                }
+            });
+
+            initPhase = false;
+            OPDE.getDisplayManager().setProgressBarMessage(null);
+            OPDE.getMainframe().setBlocked(false);
+        }
+
+
         OPDE.getMainframe().setBlocked(true);
         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
 
@@ -138,7 +191,7 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
 
             @Override
             protected Object doInBackground() throws Exception {
-                html = SYSTools.toHTML(BWInfoTools.getUeberleitung(bewohner, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true));
+                html = SYSTools.toHTML(ResInfoTools.getUeberleitung(bewohner, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true));
                 return null;
             }
 
@@ -146,12 +199,7 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
             protected void done() {
                 txtUebersicht.setText(html);
                 txtUebersicht.repaint();
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        jspHTML.getViewport().setViewPosition(new Point(0, 0));
-                    }
-                });
+                jspHTML.getVerticalScrollBar().setValue(0);
                 initPhase = false;
                 OPDE.getDisplayManager().setProgressBarMessage(null);
                 OPDE.getMainframe().setBlocked(false);
@@ -252,7 +300,7 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
         JideButton printButton = GUITools.createHyperlinkButton("Drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                SYSFilesTools.print(BWInfoTools.getUeberleitung(bewohner, true, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, true), true);
+                SYSFilesTools.print(ResInfoTools.getUeberleitung(bewohner, true, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, true), true);
             }
         });
         mypanel.add(printButton);

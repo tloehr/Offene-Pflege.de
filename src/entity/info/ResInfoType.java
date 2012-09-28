@@ -36,17 +36,16 @@ import java.util.Collection;
  */
 @Entity
 @Table(name = "BWInfoTyp")
-@NamedQueries({
-        @NamedQuery(name = "BWInfoTyp.findAll", query = "SELECT b FROM BWInfoTyp b"),
-        @NamedQuery(name = "BWInfoTyp.findByBwinftyp", query = "SELECT b FROM BWInfoTyp b WHERE b.bwinftyp = :bwinftyp"),
-        @NamedQuery(name = "BWInfoTyp.findByBWInfoKurz", query = "SELECT b FROM BWInfoTyp b WHERE b.bWInfoKurz = :bWInfoKurz"),
-        @NamedQuery(name = "BWInfoTyp.findByKat", query = "SELECT b FROM BWInfoTyp b WHERE b.bwInfokat = :kat AND b.status >= 0 ORDER BY b.bWInfoKurz"),
-        @NamedQuery(name = "BWInfoTyp.findByIntervalMode", query = "SELECT b FROM BWInfoTyp b WHERE b.intervalMode = :intervalMode")})
-public class BWInfoTyp implements Serializable {
+//@NamedQueries({
+//        @NamedQuery(name = "BWInfoTyp.findAll", query = "SELECT b FROM ResInfoType b"),
+//        @NamedQuery(name = "BWInfoTyp.findByBwinftyp", query = "SELECT b FROM ResInfoType b WHERE b.bwinftyp = :bwinftyp"),
+//        @NamedQuery(name = "BWInfoTyp.findByBWInfoKurz", query = "SELECT b FROM ResInfoType b WHERE b.bWInfoKurz = :bWInfoKurz"),
+//        @NamedQuery(name = "BWInfoTyp.findByKat", query = "SELECT b FROM ResInfoType b WHERE b.resInfokat = :kat AND b.status >= 0 ORDER BY b.bWInfoKurz"),
+//        @NamedQuery(name = "BWInfoTyp.findByIntervalMode", query = "SELECT b FROM ResInfoType b WHERE b.intervalMode = :intervalMode")})
+public class ResInfoType implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @Basic(optional = false)
     @Column(name = "BWINFTYP")
     private String bwinftyp;
     @Basic(optional = false)
@@ -69,21 +68,21 @@ public class BWInfoTyp implements Serializable {
     // ==
     @JoinColumn(name = "BWIKID", referencedColumnName = "BWIKID")
     @ManyToOne
-    private BWInfoKat bwInfokat;
+    private ResInfoCategory resInfokat;
 
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwinfotyp")
-    private Collection<BWInfo> bwInfoCollection;
+    private Collection<ResInfo> resInfoCollection;
 
-    public BWInfoTyp() {
+    public ResInfoType() {
     }
 
-    public BWInfoTyp(String bwinftyp) {
+    public ResInfoType(String bwinftyp) {
         this.bwinftyp = bwinftyp;
     }
 
 
-    public String getBwinftyp() {
+    public String getID() {
         return bwinftyp;
     }
 
@@ -115,12 +114,12 @@ public class BWInfoTyp implements Serializable {
         this.bWInfoLang = bWInfoLang;
     }
 
-    public BWInfoKat getBwInfokat() {
-        return bwInfokat;
+    public ResInfoCategory getResInfokat() {
+        return resInfokat;
     }
 
-    public void setBwInfokat(BWInfoKat bwInfokat) {
-        this.bwInfokat = bwInfokat;
+    public void setResInfokat(ResInfoCategory resInfokat) {
+        this.resInfokat = resInfokat;
     }
 
     public Integer getStatus() {
@@ -153,10 +152,10 @@ public class BWInfoTyp implements Serializable {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof BWInfoTyp)) {
+        if (!(object instanceof ResInfoType)) {
             return false;
         }
-        BWInfoTyp other = (BWInfoTyp) object;
+        ResInfoType other = (ResInfoType) object;
         if ((this.bwinftyp == null && other.bwinftyp != null) || (this.bwinftyp != null && !this.bwinftyp.equals(other.bwinftyp))) {
             OPDE.debug(this.bwinftyp + " != " + other.bwinftyp);
             return false;
@@ -166,6 +165,6 @@ public class BWInfoTyp implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.info.BWInfoTyp[bwinftyp=" + bwinftyp + "]";
+        return "entity.info.ResInfoType[bwinftyp=" + bwinftyp + "]";
     }
 }

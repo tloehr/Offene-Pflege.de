@@ -164,7 +164,7 @@ public class NReportTools {
      */
     public static String getNReportAsHTML(NReport nReport, boolean withResident) {
         String html = "";
-        String text = SYSTools.replace(nReport.getText(), "\n", "<br/>");
+        String text = SYSTools.replace(nReport.getText(), "\n", "<br/>", false);
 
         if (withResident) {
             html += "<b>Pflegebericht für " + ResidentTools.getLabelText(nReport.getResident()) + "</b>";
@@ -188,7 +188,7 @@ public class NReportTools {
 
         if (!berichte.isEmpty()) {
             html += "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.reports") + (withlongheader ? " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getLabelText(berichte.get(0).getResident()) : "") + "</h2>\n";
-            html += SYSTools.catchNull(subtitle).isEmpty() ? "" : "<h3>" + subtitle + "</h3>\n";
+            html += SYSTools.catchNull(subtitle).isEmpty() ? "" : "<h3 id=\"fonth3\" >" + subtitle + "</h3>\n";
             html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>"
                     + "<th>Info</th><th>Text</th>\n</tr>";
             for (NReport bericht : berichte) {
@@ -277,12 +277,9 @@ public class NReportTools {
 //            result += "<font color=\"red\">&#9679;</font>";
 //        }
 
-        String tmp = SYSTools.replace(nReport.getText(), "\n", "<br/>");
+        String tmp = SYSTools.replace(nReport.getText(), "\n", "<br/>", false);
         if (!SYSTools.catchNull(highlight).isEmpty()) {
-
-            tmp = tmp.replaceAll()
-
-            tmp = SYSTools.replace(tmp, highlight, "<FONT style=\"BACKGROUND-COLOR: yellow\">" + highlight + "</FONT>");
+            tmp = SYSTools.replace(tmp, highlight, "<font style=\"BACKGROUND-COLOR: yellow\">" + highlight + "</font>", true);
         }
 
         result += "<p>[" + nReport.getPbid() + "] " + tmp + "<p/>";
@@ -614,7 +611,13 @@ public class NReportTools {
             query.setParameter("from", from.toDate());
             query.setParameter("to", to.toDate());
 
+//            long a = System.currentTimeMillis();
+
             list = new ArrayList<NReport>(query.getResultList());
+
+//            long b = System.currentTimeMillis();
+
+//            OPDE.debug((b - a) + " ms");
 
         } catch (Exception se) {
             OPDE.fatal(se);

@@ -365,7 +365,7 @@ public class MedInventoryTools {
 //                " (CASE form.PackEinheit WHEN 1 THEN 'Stück' WHEN 2 THEN 'ml' WHEN 3 THEN 'l' WHEN 4 THEN 'mg' WHEN 5 THEN 'g' WHEN 6 THEN 'cm' WHEN 7 THEN 'm' ELSE '!FEHLER!' END) Bestandsmenge, " +
 //                " best.BestID, best.Anbruch " +
 //                " FROM Bewohner bw " +
-//                " INNER JOIN BWInfo ba ON bw.BWKennung = ba.BWKennung " +
+//                " INNER JOIN ResInfo ba ON bw.BWKennung = ba.BWKennung " +
 //                " INNER JOIN MPVorrat vor ON vor.BWKennung = bw.BWKennung " +
 //                " INNER JOIN MPBestand best ON vor.VorID = best.VorID " +
 //                " INNER JOIN MPDarreichung daf ON best.DafID = daf.DafID " +

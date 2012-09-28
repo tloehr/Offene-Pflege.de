@@ -149,7 +149,7 @@ public class Form {
 
                     // Hier wird ein Teil des Formulars ausgefüllt. Jeweils für ein Element und (wenn nötig) für eine weitere Zeile
                     // So werden Stück für Stück alle Platzhalter gegen die Werte erstetzt.
-                    myForm = SYSTools.replace(myForm, "$" + providedAttribKey + (line + 1) + "$", replacement);
+                    myForm = SYSTools.replace(myForm, "$" + providedAttribKey + (line + 1) + "$", replacement, false);
                 }
 
             }

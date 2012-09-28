@@ -7,10 +7,10 @@ package op.care.nursingprocess;
 import java.awt.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.info.BWInfoKatTools;
+import entity.info.ResInfoCategoryTools;
 import entity.nursingprocess.Intervention;
 import entity.nursingprocess.InterventionTools;
-import entity.info.BWInfoKat;
+import entity.info.ResInfoCategory;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.GUITools;
@@ -64,7 +64,7 @@ public class PnlSelectIntervention extends JPanel {
         });
 
         cmbArt.setModel(new DefaultComboBoxModel(new String[]{"Pflege","Verordungen"}));
-        cmbKategorie.setModel(new DefaultComboBoxModel(BWInfoKatTools.getCategoriesForNursingProcess().toArray()));
+        cmbKategorie.setModel(new DefaultComboBoxModel(ResInfoCategoryTools.getCategoriesForNursingProcess().toArray()));
     }
 
     private void txtSearchActionPerformed(ActionEvent e) {
@@ -77,7 +77,7 @@ public class PnlSelectIntervention extends JPanel {
 
     private void btnBackActionPerformed(ActionEvent e) {
         if (saveok()) {
-            Intervention intervention = new Intervention(txtBezeichnung.getText().trim(), new BigDecimal(dauer.doubleValue()), cmbArt.getSelectedIndex(), (BWInfoKat) cmbKategorie.getSelectedItem());
+            Intervention intervention = new Intervention(txtBezeichnung.getText().trim(), new BigDecimal(dauer.doubleValue()), cmbArt.getSelectedIndex(), (ResInfoCategory) cmbKategorie.getSelectedItem());
             lstInterventions.setModel(SYSTools.list2dlm(Arrays.asList(intervention)));
         }
         SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, SYSTools.SPEED_NORMAL);

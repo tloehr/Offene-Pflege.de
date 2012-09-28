@@ -6,11 +6,11 @@ package op.care.sysfiles;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import entity.info.ResInfo;
 import entity.prescription.Prescription;
 import entity.reports.NReport;
 import entity.files.SYSFiles;
 import entity.files.SYSFilesTools;
-import entity.info.BWInfo;
 import entity.values.ResValue;
 import op.OPDE;
 import op.system.FileDrop;
@@ -142,7 +142,7 @@ public class DlgFiles extends MyJDialog {
             Query query = em.createNamedQuery("SYSFiles.findByVerordnung", SYSFiles.class);
             query.setParameter("verordnung", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
-        } else if (attachable instanceof BWInfo) {
+        } else if (attachable instanceof ResInfo) {
             Query query = em.createNamedQuery("SYSFiles.findByBWInfo", SYSFiles.class);
             query.setParameter("bwinfo", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
