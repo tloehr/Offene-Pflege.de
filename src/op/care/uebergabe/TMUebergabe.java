@@ -57,7 +57,7 @@ public class TMUebergabe
     private ArrayList berichte;
 //    private ImageIcon iconOK, iconQuestion;
 
-    public TMUebergabe(Date datum, Einrichtungen einrichtung) {
+    public TMUebergabe(Date datum, Homes einrichtung) {
         super();
 
 //        iconOK = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/apply.png"));
@@ -113,14 +113,14 @@ public class TMUebergabe
         // bericht[LIST_BERICHT] enthält immer das Berichte Objekt (entweder Ubergabebuch oder NReport)
         // bericht[1] ist 1, wenn der aktuelle User den Bericht bestätigt hat. 0 sonst.
 
-        if (bericht[LIST_BERICHT] instanceof Uebergabebuch) {
+        if (bericht[LIST_BERICHT] instanceof Handovers) {
             switch (col) {
                 case COL_PIT: {
-                    result = UebergabebuchTools.getDatumUndUser((Uebergabebuch) bericht[LIST_BERICHT], false);
+                    result = HandoversTools.getDatumUndUser((Handovers) bericht[LIST_BERICHT], false);
                     break;
                 }
                 case COL_INFO: {
-                    result = UebergabebuchTools.getEinrichtungAsHTML((Uebergabebuch) bericht[LIST_BERICHT]);
+                    result = HandoversTools.getEinrichtungAsHTML((Handovers) bericht[LIST_BERICHT]);
                     break;
                 }
                 case COL_HTML: {
@@ -130,7 +130,7 @@ public class TMUebergabe
                         result = "<font color=\"green\"><b>OK</b> ";
                     }
 
-                    result = result + UebergabebuchTools.getAsHTML((Uebergabebuch) bericht[LIST_BERICHT]) + "</font>";
+                    result = result + HandoversTools.getAsHTML((Handovers) bericht[LIST_BERICHT]) + "</font>";
                     break;
                 }
                 case COL_ACKN: { // Vom aktuellen User bereits gesehen ?

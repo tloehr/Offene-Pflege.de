@@ -31,9 +31,9 @@ import java.awt.event.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import com.toedter.calendar.*;
-import entity.Einrichtungen;
-import entity.Uebergabe2User;
-import entity.Uebergabebuch;
+import entity.Homes;
+import entity.Handover2User;
+import entity.Handovers;
 import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
@@ -53,7 +53,7 @@ import java.util.GregorianCalendar;
  */
 public class DlgBericht extends javax.swing.JDialog {
 
-    private Einrichtungen einrichtung;
+    private Homes einrichtung;
     public static final String internalClassID = "nursingrecords.handover.newreport";
     private PnlUebergabe parent;
     private boolean logout = false;
@@ -61,7 +61,7 @@ public class DlgBericht extends javax.swing.JDialog {
     /**
      * Creates new form DlgReport
      */
-    public DlgBericht(PnlUebergabe parent, Einrichtungen einrichtung, Date datum) {
+    public DlgBericht(PnlUebergabe parent, Homes einrichtung, Date datum) {
         super(parent.getPflege(), false);
 //        ithis.parent = parent;
             this.einrichtung = einrichtung;
@@ -260,10 +260,10 @@ public class DlgBericht extends javax.swing.JDialog {
         EntityManager em = OPDE.createEM();
         try {
             em.getTransaction().begin();
-            Uebergabebuch bericht = new Uebergabebuch(SYSCalendar.addTime2Date(jdcDatum.getDate(), new Time(SYSCalendar.parseTime(txtTBUhrzeit.getText()).getTimeInMillis())), txtUebergabe.getText(), einrichtung, OPDE.getLogin().getUser());
+            Handovers bericht = new Handovers(SYSCalendar.addTime2Date(jdcDatum.getDate(), new Time(SYSCalendar.parseTime(txtTBUhrzeit.getText()).getTimeInMillis())), txtUebergabe.getText(), einrichtung, OPDE.getLogin().getUser());
             em.persist(bericht);
             // Der aktuelle User bestätigt direkt seinen eigenen Bericht.
-            bericht.getUsersAcknowledged().add(new Uebergabe2User(bericht, OPDE.getLogin().getUser()));
+            bericht.getUsersAcknowledged().add(new Handover2User(bericht, OPDE.getLogin().getUser()));
             em.merge(bericht);
             em.getTransaction().commit();
         } catch (Exception e) {

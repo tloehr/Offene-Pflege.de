@@ -278,14 +278,14 @@ public class PnlInfo extends NursingRecordsPanel {
         return cpCat;
     }
 
-    private Color getColor(ResInfoCategory category, int level) {
-
-        if (categories.indexOf(category) % 2 == 0) {
-            return demandColors[level];
-        } else {
-            return regularColors[level];
-        }
-    }
+//    private Color getColor(ResInfoCategory category, int level) {
+//
+//        if (categories.indexOf(category) % 2 == 0) {
+//            return demandColors[level];
+//        } else {
+//            return regularColors[level];
+//        }
+//    }
 
     private CollapsiblePane createCP4Type(final ResInfoType type) {
         /***
@@ -1534,6 +1534,7 @@ public class PnlInfo extends NursingRecordsPanel {
         reloadDisplay();
     }
 
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         jspInfo = new JScrollPane();
         cpsInfo = new CollapsiblePanes();
@@ -1552,8 +1553,7 @@ public class PnlInfo extends NursingRecordsPanel {
         }
         add(jspInfo);
         add(jspInfo);
-        // JFormDesigner - End of component initialization  //GEN-END:initComponents
-    }
+    }// </editor-fold>//GEN-END:initComponents
 
     private void buildPanel() {
         cpsInfo.removeAll();
@@ -1568,6 +1568,7 @@ public class PnlInfo extends NursingRecordsPanel {
         cpsInfo.addExpansion();
     }
 
+    // Variables declaration - do not modify//GEN-BEGIN:variables
     private JScrollPane jspInfo;
     private CollapsiblePanes cpsInfo;
     // JFormDesigner - End of variables declaration  //GEN-END:variables

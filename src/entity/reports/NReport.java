@@ -27,7 +27,7 @@ import java.util.Iterator;
  * @author tloehr
  */
 @Entity
-@Table(name = "Pflegeberichte")
+@Table(name = "NReports")
 @NamedQueries({
         @NamedQuery(name = "Pflegeberichte.findAll", query = "SELECT p FROM NReport p"),
         @NamedQuery(name = "Pflegeberichte.findByPbid", query = "SELECT p FROM NReport p WHERE p.pbid = :pbid"),
@@ -171,7 +171,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
 //            + " SELECT p.*, ifnull(p2u.num,0) num FROM NReport p "
 //            + " INNER JOIN Bewohner bw ON bw.BWKennung = p.BWKennung "
 //            + " INNER JOIN PB2TAGS tag ON tag.PBID = p.PBID "
-//            + " INNER JOIN Stationen stat ON stat.StatID = bw.StatID "
+//            + " INNER JOIN Station stat ON stat.StatID = bw.StatID "
 //            + " LEFT OUTER JOIN ( SELECT pbid, count(*) num FROM PB2User WHERE UKennung = :ukennung GROUP BY pbid, ukennung ) AS p2u ON p2u.PBID = p.PBID "
 //            + " WHERE "
 //            + "     stat.EKennung = 'wiedenhof' "
@@ -228,7 +228,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
     // M:N Relationen
     // ==
     @ManyToMany
-    @JoinTable(name = "PB2TAGS", joinColumns =
+    @JoinTable(name = "NR2TAGS", joinColumns =
     @JoinColumn(name = "PBID"), inverseJoinColumns =
     @JoinColumn(name = "PBTAGID"))
     private Collection<NReportTAGS> tags;

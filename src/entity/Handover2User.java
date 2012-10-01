@@ -18,34 +18,33 @@ import java.util.Date;
  * @author tloehr
  */
 @Entity
-@Table(name = "Uebergabe2User")
+@Table(name = "Handover2User")
 @NamedQueries({
-        @NamedQuery(name = "Uebergabe2User.findAll", query = "SELECT u FROM Uebergabe2User u"),
-        @NamedQuery(name = "Uebergabe2User.findByPkid", query = "SELECT u FROM Uebergabe2User u WHERE u.pkid = :pkid"),
-        @NamedQuery(name = "Uebergabe2User.findByPit", query = "SELECT u FROM Uebergabe2User u WHERE u.pit = :pit")})
-public class Uebergabe2User implements Serializable, Comparable<Uebergabe2User> {
+        @NamedQuery(name = "Uebergabe2User.findAll", query = "SELECT u FROM Handover2User u"),
+        @NamedQuery(name = "Uebergabe2User.findByPkid", query = "SELECT u FROM Handover2User u WHERE u.pkid = :pkid"),
+        @NamedQuery(name = "Uebergabe2User.findByPit", query = "SELECT u FROM Handover2User u WHERE u.pit = :pit")})
+public class Handover2User implements Serializable, Comparable<Handover2User> {
 
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "PKID")
     private Long pkid;
     @Basic(optional = false)
     @Column(name = "PIT")
     @Temporal(TemporalType.TIMESTAMP)
     private Date pit;
-    @JoinColumn(name = "UEBID", referencedColumnName = "UEBID")
+    @JoinColumn(name = "HID", referencedColumnName = "HID")
     @ManyToOne
-    private Uebergabebuch bericht;
+    private Handovers bericht;
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
     private Users user;
 
-    public Uebergabe2User() {
+    public Handover2User() {
     }
 
-    public Uebergabe2User(Uebergabebuch bericht, Users user) {
+    public Handover2User(Handovers bericht, Users user) {
         this.bericht = bericht;
         this.user = user;
         this.pit = new Date();
@@ -67,7 +66,7 @@ public class Uebergabe2User implements Serializable, Comparable<Uebergabe2User> 
         this.pit = pit;
     }
 
-    public Uebergabebuch getBericht() {
+    public Handovers getBericht() {
         return bericht;
     }
 
@@ -86,10 +85,10 @@ public class Uebergabe2User implements Serializable, Comparable<Uebergabe2User> 
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof Uebergabe2User)) {
+        if (!(object instanceof Handover2User)) {
             return false;
         }
-        Uebergabe2User other = (Uebergabe2User) object;
+        Handover2User other = (Handover2User) object;
         if ((this.pkid == null && other.pkid != null) || (this.pkid != null && !this.pkid.equals(other.pkid))) {
             return false;
         }
@@ -98,11 +97,11 @@ public class Uebergabe2User implements Serializable, Comparable<Uebergabe2User> 
 
     @Override
     public String toString() {
-        return "entity.Uebergabe2User[pkid=" + pkid + "]";
+        return "entity.Handover2User[pkid=" + pkid + "]";
     }
 
     @Override
-    public int compareTo(Uebergabe2User o) {
+    public int compareTo(Handover2User o) {
         return getUser().getFullname().compareTo(o.getUser().getFullname());
     }
 

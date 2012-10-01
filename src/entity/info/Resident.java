@@ -93,7 +93,7 @@ public class Resident implements Serializable, Comparable<Resident> {
     // Bewohner, die keiner Pflegestation zugeordnet sind, gelten als inaktiv.
     @JoinColumn(name = "StatID", referencedColumnName = "StatID")
     @ManyToOne
-    private Stationen station;
+    private Station station;
     @JoinColumn(name = "BV1UKennung", referencedColumnName = "UKennung")
     @ManyToOne
     private Users bv1;
@@ -145,11 +145,11 @@ public class Resident implements Serializable, Comparable<Resident> {
         this.nachname = nachname;
     }
 
-    public Stationen getStation() {
+    public Station getStation() {
         return station;
     }
 
-    public void setStation(Stationen station) {
+    public void setStation(Station station) {
         this.station = station;
     }
 

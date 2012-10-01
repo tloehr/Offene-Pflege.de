@@ -26,36 +26,6 @@
  */
 package op.controlling;
 
-import entity.reports.NReportTAGS;
-import entity.reports.NReportTools;
-import entity.Stationen;
-import entity.StationenTools;
-import entity.files.SYSFilesTools;
-import entity.prescription.MedStockTools;
-import entity.system.SYSPropsTools;
-import op.OPDE;
-import op.tools.SYSCalendar;
-import op.tools.SYSTools;
-
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.SoftBevelBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.*;
-import java.awt.event.*;
-import java.text.Format;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Vector;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  * @author tloehr
  */
@@ -224,9 +194,9 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
 //        cmbPEAMonat.setSelectedIndex(cmbPEAMonat.getModel().getSize() - 2); // Auf den letzten Eintrag setzen.
 //
 //        EntityManager em = OPDE.createEM();
-//        Query query1 = em.createNamedQuery("Stationen.findAllSorted");
-//        cmbStation.setModel(new DefaultComboBoxModel(new Vector<Stationen>(query1.getResultList())));
-//        cmbStation.setSelectedItem(StationenTools.getSpecialStation());
+//        Query query1 = em.createNamedQuery("Station.findAllSorted");
+//        cmbStation.setModel(new DefaultComboBoxModel(new Vector<Station>(query1.getResultList())));
+//        cmbStation.setSelectedItem(StationTools.getSpecialStation());
 //
 //        // Leeren Kopf vor die Liste setzen.
 ////        ListElement[] headtag = new ListElement[]{new ListElement("Keine Auswahl", "")};
@@ -370,7 +340,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
 //            pbPart.setValue(0);
 ////            String station = cmbStation.getSelectedItem().toString();
 ////            html.append(DBHandling.getMediKontrolle(station, 1));
-//            html.append(MedStockTools.getMediKontrolle(em, (Stationen) cmbStation.getSelectedItem(), 1));
+//            html.append(MedStockTools.getMediKontrolle(em, (Station) cmbStation.getSelectedItem(), 1));
 //            progress++;
 //            pbMain.setValue(progress);
 //        }

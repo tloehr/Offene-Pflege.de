@@ -15,21 +15,21 @@ import java.util.Date;
  * @author tloehr
  */
 @Entity
-@Table(name = "Uebergabebuch")
+@Table(name = "Handovers")
 @NamedQueries({
-        @NamedQuery(name = "Uebergabebuch.findAll", query = "SELECT u FROM Uebergabebuch u"),
-        @NamedQuery(name = "Uebergabebuch.findByUebid", query = "SELECT u FROM Uebergabebuch u WHERE u.uebid = :uebid"),
+        @NamedQuery(name = "Uebergabebuch.findAll", query = "SELECT u FROM Handovers u"),
+        @NamedQuery(name = "Uebergabebuch.findByUebid", query = "SELECT u FROM Handovers u WHERE u.hid = :uebid"),
         @NamedQuery(name = "Uebergabebuch.findByEinrichtungAndDatum", query = " "
-                + " SELECT u, count(ack) FROM Uebergabebuch u "
+                + " SELECT u, count(ack) FROM Handovers u "
                 + " LEFT JOIN u.usersAcknowledged ack "
                 + " WHERE u.pit >= :von AND u.pit <= :bis AND u.einrichtung = :einrichtung AND ack.user = :user "
                 + " GROUP BY u "
                 + " ORDER BY u.pit DESC "),
-        @NamedQuery(name = "Uebergabebuch.findByPit", query = "SELECT u FROM Uebergabebuch u WHERE u.pit = :pit")
+        @NamedQuery(name = "Uebergabebuch.findByPit", query = "SELECT u FROM Handovers u WHERE u.pit = :pit")
 })
 @SqlResultSetMappings({
-        @SqlResultSetMapping(name = "Uebergabebuch.findByEinrichtungAndDatumAndAckUserResultMapping", entities =
-        @EntityResult(entityClass = Uebergabebuch.class), columns =
+        @SqlResultSetMapping(name = "Handovers.findByEinrichtungAndDatumAndAckUserResultMapping", entities =
+        @EntityResult(entityClass = Handovers.class), columns =
         @ColumnResult(name = "num"))
 })
 @NamedNativeQueries({
@@ -49,16 +49,15 @@ import java.util.Date;
                 + "     u.EKennung = ? "
                 + "     AND u.PIT >= ? AND u.PIT <= ? "
                 + " GROUP BY u.UEBID "
-                + " ORDER BY u.PIT DESC", resultSetMapping = "Uebergabebuch.findByEinrichtungAndDatumAndAckUserResultMapping")
+                + " ORDER BY u.PIT DESC", resultSetMapping = "Handovers.findByEinrichtungAndDatumAndAckUserResultMapping")
 })
-public class Uebergabebuch implements Serializable {
+public class Handovers implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "UEBID")
-    private Long uebid;
+    @Column(name = "HID")
+    private Long hid;
     @Basic(optional = false)
     @Column(name = "PIT")
     @Temporal(TemporalType.TIMESTAMP)
@@ -66,19 +65,19 @@ public class Uebergabebuch implements Serializable {
     @Lob
     @Column(name = "Text")
     private String text;
-    @JoinColumn(name = "EKennung", referencedColumnName = "EKennung")
+    @JoinColumn(name = "EKennung", referencedColumnName = "EID")
     @ManyToOne
-    private Einrichtungen einrichtung;
+    private Homes einrichtung;
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
     private Users user;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bericht")
-    private Collection<Uebergabe2User> usersAcknowledged;
+    private Collection<Handover2User> usersAcknowledged;
 
-    public Uebergabebuch() {
+    public Handovers() {
     }
 
-    public Uebergabebuch(Date pit, String text, Einrichtungen einrichtung, Users user) {
+    public Handovers(Date pit, String text, Homes einrichtung, Users user) {
         this.pit = pit;
         this.text = text;
         this.einrichtung = einrichtung;
@@ -86,11 +85,11 @@ public class Uebergabebuch implements Serializable {
     }
 
     public Long getUebid() {
-        return uebid;
+        return hid;
     }
 
     public void setUebid(Long uebid) {
-        this.uebid = uebid;
+        this.hid = uebid;
     }
 
     public Date getPit() {
@@ -109,7 +108,7 @@ public class Uebergabebuch implements Serializable {
         this.text = text;
     }
 
-    public Einrichtungen getEinrichtung() {
+    public Homes getEinrichtung() {
         return einrichtung;
     }
 
@@ -117,7 +116,7 @@ public class Uebergabebuch implements Serializable {
         return user;
     }
 
-    public void setEinrichtung(Einrichtungen einrichtung) {
+    public void setEinrichtung(Homes einrichtung) {
         this.einrichtung = einrichtung;
     }
 
@@ -125,25 +124,25 @@ public class Uebergabebuch implements Serializable {
         this.user = user;
     }
 
-    public Collection<Uebergabe2User> getUsersAcknowledged() {
+    public Collection<Handover2User> getUsersAcknowledged() {
         return usersAcknowledged;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (uebid != null ? uebid.hashCode() : 0);
+        hash += (hid != null ? hid.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof Uebergabebuch)) {
+        if (!(object instanceof Handovers)) {
             return false;
         }
-        Uebergabebuch other = (Uebergabebuch) object;
-        if ((this.uebid == null && other.uebid != null) || (this.uebid != null && !this.uebid.equals(other.uebid))) {
+        Handovers other = (Handovers) object;
+        if ((this.hid == null && other.hid != null) || (this.hid != null && !this.hid.equals(other.hid))) {
             return false;
         }
         return true;
@@ -151,6 +150,6 @@ public class Uebergabebuch implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Uebergabebuch[uebid=" + uebid + "]";
+        return "entity.Handovers[uebid=" + hid + "]";
     }
 }

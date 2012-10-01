@@ -28,7 +28,7 @@
 package op.care.schichtleitung;
 
 import com.toedter.calendar.JDateChooser;
-import entity.EinrichtungenTools;
+import entity.HomesTools;
 import entity.files.SYSFilesTools;
 import op.tools.CleanablePanel;
 import op.tools.*;
@@ -60,7 +60,7 @@ public class PnlSchichtleitung extends CleanablePanel {
 
     public void initDialog() {
 
-        EinrichtungenTools.setComboBox(cmbEinrichtung);
+        HomesTools.setComboBox(cmbEinrichtung);
 
         // Stationsauswahl auf die richtige Station setzen, wenn vorhanden.
 //        String station = OPDE.getProps().getProperty("station");

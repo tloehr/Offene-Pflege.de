@@ -15,9 +15,9 @@ import java.text.SimpleDateFormat;
 /**
  * @author tloehr
  */
-public class UebergabebuchTools {
+public class HandoversTools {
 
-    public static String getDatumUndUser(Uebergabebuch bericht, boolean showIDs) {
+    public static String getDatumUndUser(Handovers bericht, boolean showIDs) {
         String result = "";
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
         result = sdf.format(bericht.getPit()) + "; " + bericht.getUser().getFullname();
@@ -27,7 +27,7 @@ public class UebergabebuchTools {
         return "<font " + getHTMLColor(bericht) + ">" + result + "</font>";
     }
 
-    private static String getHTMLColor(Uebergabebuch bericht) {
+    private static String getHTMLColor(Handovers bericht) {
         return OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(bericht.getPit())] + "_FGBHP");
     }
 
@@ -36,7 +36,7 @@ public class UebergabebuchTools {
      *
      * @return
      */
-    public static String getAsHTML(Uebergabebuch bericht) {
+    public static String getAsHTML(Handovers bericht) {
         String result = "";
 
         String fonthead = "<font " + getHTMLColor(bericht) + ">";
@@ -54,7 +54,7 @@ public class UebergabebuchTools {
      *
      * @return
      */
-    public static String getEinrichtungAsHTML(Uebergabebuch bericht) {
+    public static String getEinrichtungAsHTML(Handovers bericht) {
         String result = "";
 
         String fonthead = "<font " + getHTMLColor(bericht) + ">";

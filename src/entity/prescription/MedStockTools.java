@@ -1,6 +1,6 @@
 package entity.prescription;
 
-import entity.Stationen;
+import entity.Station;
 import entity.info.ResidentTools;
 import op.OPDE;
 import op.care.med.inventory.PnlInventory;
@@ -557,7 +557,7 @@ public class MedStockTools {
         return apv;
     }
 
-    public static String getMediKontrolle(EntityManager em, Stationen station, int headertiefe) {
+    public static String getMediKontrolle(EntityManager em, Station station, int headertiefe) {
         StringBuilder html = new StringBuilder(1000);
 
         String jpql = " " +

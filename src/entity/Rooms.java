@@ -6,7 +6,6 @@
 package entity;
 
 import java.io.Serializable;
-import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -23,34 +22,33 @@ import javax.persistence.Table;
  * @author tloehr
  */
 @Entity
-@Table(name = "Raeume")
+@Table(name = "Rooms")
 @NamedQueries({
-    @NamedQuery(name = "Raeume.findAll", query = "SELECT r FROM Raeume r"),
-    @NamedQuery(name = "Raeume.findByRaumID", query = "SELECT r FROM Raeume r WHERE r.raumID = :raumID"),
-    @NamedQuery(name = "Raeume.findByBezeichnung", query = "SELECT r FROM Raeume r WHERE r.bezeichnung = :bezeichnung"),
-    @NamedQuery(name = "Raeume.findByEtage", query = "SELECT r FROM Raeume r WHERE r.etage = :etage"),
-    @NamedQuery(name = "Raeume.findByEinzel", query = "SELECT r FROM Raeume r WHERE r.einzel = :einzel"),
-    @NamedQuery(name = "Raeume.findByBad", query = "SELECT r FROM Raeume r WHERE r.bad = :bad")})
-public class Raeume implements Serializable {
+    @NamedQuery(name = "Raeume.findAll", query = "SELECT r FROM Rooms r"),
+    @NamedQuery(name = "Raeume.findByRaumID", query = "SELECT r FROM Rooms r WHERE r.raumID = :raumID"),
+    @NamedQuery(name = "Raeume.findByBezeichnung", query = "SELECT r FROM Rooms r WHERE r.bezeichnung = :bezeichnung"),
+    @NamedQuery(name = "Raeume.findByEtage", query = "SELECT r FROM Rooms r WHERE r.etage = :etage"),
+    @NamedQuery(name = "Raeume.findByEinzel", query = "SELECT r FROM Rooms r WHERE r.einzel = :einzel"),
+    @NamedQuery(name = "Raeume.findByBad", query = "SELECT r FROM Rooms r WHERE r.bad = :bad")})
+public class Rooms implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "RaumID")
+    @Column(name = "RID")
     private Long raumID;
-    @Column(name = "Bezeichnung")
+    @Column(name = "Text")
     private String bezeichnung;
-    @Column(name = "Etage")
+    @Column(name = "Level")
     private Short etage;
-    @Column(name = "Einzel")
+    @Column(name = "Single")
     private Boolean einzel;
-    @Column(name = "Bad")
+    @Column(name = "Bath")
     private Boolean bad;
     @JoinColumn(name = "StatID", referencedColumnName = "StatID")
     @ManyToOne
-    private Stationen station;
+    private Station station;
 
-    public Raeume() {
+    public Rooms() {
     }
 
     public Long getRaumID() {
@@ -61,11 +59,11 @@ public class Raeume implements Serializable {
         this.raumID = raumID;
     }
 
-    public Stationen getStation() {
+    public Station getStation() {
         return station;
     }
 
-    public void setStation(Stationen station) {
+    public void setStation(Station station) {
         this.station = station;
     }
     
@@ -111,10 +109,10 @@ public class Raeume implements Serializable {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof Raeume)) {
+        if (!(object instanceof Rooms)) {
             return false;
         }
-        Raeume other = (Raeume) object;
+        Rooms other = (Rooms) object;
         if ((this.raumID == null && other.raumID != null) || (this.raumID != null && !this.raumID.equals(other.raumID))) {
             return false;
         }
@@ -123,7 +121,7 @@ public class Raeume implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Raeume[raumID=" + raumID + "]";
+        return "entity.Rooms[raumID=" + raumID + "]";
     }
 
 }

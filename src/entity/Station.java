@@ -28,30 +28,29 @@ import javax.persistence.Table;
  * @author tloehr
  */
 @Entity
-@Table(name = "Stationen")
+@Table(name = "Station")
 @NamedQueries({
-    @NamedQuery(name = "Stationen.findAllSorted", query = "SELECT s FROM Stationen s ORDER BY s.bezeichnung "),
-    @NamedQuery(name = "Stationen.findByStatID", query = "SELECT s FROM Stationen s WHERE s.statID = :statID"),
-    @NamedQuery(name = "Stationen.findByBezeichnung", query = "SELECT s FROM Stationen s WHERE s.bezeichnung = :bezeichnung")})
-public class Stationen implements Serializable {
+    @NamedQuery(name = "Stationen.findAllSorted", query = "SELECT s FROM Station s ORDER BY s.bezeichnung "),
+    @NamedQuery(name = "Stationen.findByStatID", query = "SELECT s FROM Station s WHERE s.statID = :statID"),
+    @NamedQuery(name = "Stationen.findByBezeichnung", query = "SELECT s FROM Station s WHERE s.bezeichnung = :bezeichnung")})
+public class Station implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "StatID")
     private Long statID;
     @Basic(optional = false)
-    @Column(name = "Bezeichnung")
+    @Column(name = "Name")
     private String bezeichnung;
-    @JoinColumn(name = "EKennung", referencedColumnName = "EKennung")
+    @JoinColumn(name = "EID", referencedColumnName = "EID")
     @ManyToOne
-    private Einrichtungen einrichtung;
+    private Homes einrichtung;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "station")
-    private Collection<Raeume> raeume;
+    private Collection<Rooms> rooms;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "station")
     private Collection<Resident> bewohnerAufDieserStation;
 
-    public Stationen() {
+    public Station() {
     }
 
     public Long getStatID() {
@@ -70,11 +69,11 @@ public class Stationen implements Serializable {
         this.bezeichnung = bezeichnung;
     }
 
-    public Einrichtungen getEinrichtung() {
+    public Homes getEinrichtung() {
         return einrichtung;
     }
 
-    public void setEinrichtung(Einrichtungen einrichtung) {
+    public void setEinrichtung(Homes einrichtung) {
         this.einrichtung = einrichtung;
     }
 
@@ -82,8 +81,8 @@ public class Stationen implements Serializable {
         return bewohnerAufDieserStation;
     }
 
-    public Collection<Raeume> getRaeume() {
-        return raeume;
+    public Collection<Rooms> getRooms() {
+        return rooms;
     }
 
     @Override
@@ -96,10 +95,10 @@ public class Stationen implements Serializable {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof Stationen)) {
+        if (!(object instanceof Station)) {
             return false;
         }
-        Stationen other = (Stationen) object;
+        Station other = (Station) object;
         if ((this.statID == null && other.statID != null) || (this.statID != null && !this.statID.equals(other.statID))) {
             return false;
         }

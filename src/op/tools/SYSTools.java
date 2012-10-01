@@ -93,6 +93,13 @@ public class SYSTools {
         w.setLocation(newX, newY);
     } // center
 
+    public static void showTimeDifference(long begin) {
+        if (OPDE.isDebug()) return;
+        final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+        ste[ste.length - 1].getMethodName(); //Thank you Tom Tresansky
+        OPDE.debug(ste[ste.length - 1 - 1].getMethodName() + ": " + (System.currentTimeMillis() - begin) + " ms");
+    }
+
     public static void centerOnParent(Component parent, Component child) {
 
         Dimension dimParent = parent.getSize();
@@ -198,9 +205,9 @@ public class SYSTools {
      * Tauscht Zeichen in einem String in bester Textverarbeitungsmanier ;-)<br/>
      * <b>Beispiel:</b> replace("AABBCC", "BB", "DD") = "AADDCC"
      *
-     * @param input   - Eingang
-     * @param find - Muster nach dem gesucht werden soll
-     * @param replace - Ersatzzeichenkette
+     * @param input      - Eingang
+     * @param find       - Muster nach dem gesucht werden soll
+     * @param replace    - Ersatzzeichenkette
      * @param ignoreCase
      * @return String mit Ersetzung
      */

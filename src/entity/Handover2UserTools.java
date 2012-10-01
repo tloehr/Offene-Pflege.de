@@ -14,10 +14,10 @@ import java.util.Iterator;
  *
  * @author tloehr
  */
-public class Uebergabe2UserTools {
- public static boolean containsUser(Collection<Uebergabe2User> list, Users user){
+public class Handover2UserTools {
+ public static boolean containsUser(Collection<Handover2User> list, Users user){
         boolean found = false;
-        Iterator<Uebergabe2User> it = list.iterator();
+        Iterator<Handover2User> it = list.iterator();
         while (!found && it.hasNext()){
             found = it.next().getUser().equals(user);
         }

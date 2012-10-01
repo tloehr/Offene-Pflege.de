@@ -21,11 +21,11 @@ import javax.persistence.Table;
  * @author tloehr
  */
 @Entity
-@Table(name = "PBericht_TAGS")
+@Table(name = "NReportTAGS")
 @NamedQueries({
     @NamedQuery(name = "PBerichtTAGS.findAll", query = "SELECT p FROM NReportTAGS p"),
     @NamedQuery(name = "PBerichtTAGS.findAllActive", query = "SELECT p FROM NReportTAGS p WHERE p.aktiv = TRUE ORDER BY p.besonders DESC, p.sort DESC, p.bezeichnung "),
-    @NamedQuery(name = "PBerichtTAGS.findByPbtagid", query = "SELECT p FROM NReportTAGS p WHERE p.pbtagid = :pbtagid"),
+    @NamedQuery(name = "PBerichtTAGS.findByPbtagid", query = "SELECT p FROM NReportTAGS p WHERE p.nrtagid = :pbtagid"),
     @NamedQuery(name = "PBerichtTAGS.findByBezeichnung", query = "SELECT p FROM NReportTAGS p WHERE p.bezeichnung = :bezeichnung"),
     @NamedQuery(name = "PBerichtTAGS.findByKurzbezeichnung", query = "SELECT p FROM NReportTAGS p WHERE p.kurzbezeichnung = :kurzbezeichnung"),
     @NamedQuery(name = "PBerichtTAGS.findByAktiv", query = "SELECT p FROM NReportTAGS p WHERE p.aktiv = :aktiv"),
@@ -38,9 +38,8 @@ public class NReportTAGS implements Serializable {
     public static final Color[] COLORS = new Color[]{Color.BLACK, Color.WHITE, Color.CYAN, Color.RED, Color.GREEN, Color.BLUE, Color.PINK, Color.MAGENTA, Color.YELLOW, Color.GRAY, Color.LIGHT_GRAY, Color.DARK_GRAY, Color.ORANGE};
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "PBTAGID")
-    private Long pbtagid;
+    private Long nrtagid;
     @Basic(optional = false)
     @Column(name = "Bezeichnung", length = 45)
     private String bezeichnung;
@@ -68,11 +67,11 @@ public class NReportTAGS implements Serializable {
     }
 
     public Long getPbtagid() {
-        return pbtagid;
+        return nrtagid;
     }
 
     public void setPbtagid(Long pbtagid) {
-        this.pbtagid = pbtagid;
+        this.nrtagid = pbtagid;
     }
 
     public String getBezeichnung() {
@@ -134,7 +133,7 @@ public class NReportTAGS implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (pbtagid != null ? pbtagid.hashCode() : 0);
+        hash += (nrtagid != null ? nrtagid.hashCode() : 0);
         return hash;
     }
 
@@ -145,7 +144,7 @@ public class NReportTAGS implements Serializable {
             return false;
         }
         NReportTAGS other = (NReportTAGS) object;
-        if ((this.pbtagid == null && other.pbtagid != null) || (this.pbtagid != null && !this.pbtagid.equals(other.pbtagid))) {
+        if ((this.nrtagid == null && other.nrtagid != null) || (this.nrtagid != null && !this.nrtagid.equals(other.nrtagid))) {
             return false;
         }
         return true;
@@ -153,6 +152,6 @@ public class NReportTAGS implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.reports.NReportTAGS[pbtagid=" + pbtagid + "]";
+        return "entity.reports.NReportTAGS[pbtagid=" + nrtagid + "]";
     }
 }

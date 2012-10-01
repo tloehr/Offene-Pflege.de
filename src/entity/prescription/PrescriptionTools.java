@@ -4,8 +4,8 @@
  */
 package entity.prescription;
 
-import entity.Einrichtungen;
-import entity.Stationen;
+import entity.Homes;
+import entity.Station;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import op.OPDE;
@@ -53,9 +53,9 @@ public class PrescriptionTools {
      * <li>Drucken des Hintergrundes einschalten</li>
      * <ul>
      *
-     * @param einrichtungen Die Einrichtung, für die der Stellplan erstellt werden soll. Sortiert nach den Stationen.
+     * @param homes Die Einrichtung, für die der Stellplan erstellt werden soll. Sortiert nach den Station.
      */
-    public static String getDailyPlanAsHTML(Einrichtungen einrichtungen) {
+    public static String getDailyPlanAsHTML(Homes homes) {
         EntityManager em = OPDE.createEM();
         String html = "";
 
@@ -80,7 +80,7 @@ public class PrescriptionTools {
                     " WHERE v.AnDatum < now() AND v.AbDatum > now() AND v.SitID IS NULL AND (v.DafID IS NOT NULL OR v.Stellplan IS TRUE) " +
                     " AND st.EKennung = ? AND ((best.Aus = '9999-12-31 23:59:59' AND best.Anbruch < '9999-12-31 23:59:59') OR (v.DafID IS NULL)) " +
                     " ORDER BY st.statid, CONCAT(bw.nachname,bw.vorname), bw.BWKennung, v.DafID IS NOT NULL, F.Stellplan, CONCAT( M.Bezeichnung, Ms.Bezeichnung)");
-            query.setParameter(1, einrichtungen.getEKennung());
+            query.setParameter(1, homes.getEKennung());
             html = getDailyPlan(query.getResultList());
 
         } catch (Exception e) {
@@ -216,7 +216,7 @@ public class PrescriptionTools {
             Object[] objects = (Object[]) it.next();
 
             Prescription verordnung = em.find(Prescription.class, ((BigInteger) objects[0]).longValue());
-            Stationen station = em.find(Stationen.class, ((BigInteger) objects[1]).longValue());
+            Station station = em.find(Station.class, ((BigInteger) objects[1]).longValue());
             PrescriptionSchedule planung = em.find(PrescriptionSchedule.class, ((BigInteger) objects[2]).longValue());
 
             BigInteger bestid = (BigInteger) objects[3];
@@ -657,7 +657,7 @@ public class PrescriptionTools {
             result += withheader ? "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.prescription") + (withlongheader ? " für " + ResidentTools.getLabelText(prescription.getResident()) : "") + "</h2>" : "";
 
 //            if (prescription.getResident().getStation() != null) {
-//                result += EinrichtungenTools.getAsText(prescription.getResident().getStation().getEinrichtung());
+//                result += HomesTools.getAsText(prescription.getResident().getStation().getEinrichtung());
 //            }
 
             result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +

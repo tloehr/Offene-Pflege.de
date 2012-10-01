@@ -11,7 +11,7 @@
         <class>entity.Betreuer</class>
         <class>entity.info.Resident</class>
         <class>entity.nursingprocess.DFN</class>
-        <class>entity.Einrichtungen</class>
+        <class>entity.Homes</class>
         <class>entity.system.Groups</class>
         <class>entity.info.ICD</class>
         <class>entity.KKasse</class>
@@ -25,10 +25,10 @@
         <class>entity.nursingprocess.NPControl</class>
         <class>entity.nursingprocess.NursingProcess</class>
         <class>entity.QSQuery</class>
-        <class>entity.Raeume</class>
-        <class>entity.Stationen</class>
-        <class>entity.Uebergabe2User</class>
-        <class>entity.Uebergabebuch</class>
+        <class>entity.Rooms</class>
+        <class>entity.Station</class>
+        <class>entity.Handover2User</class>
+        <class>entity.Handovers</class>
         <class>entity.system.Users</class>
         <class>entity.files.SYSFiles</class>
         <class>entity.files.SYSINF2FILE</class>

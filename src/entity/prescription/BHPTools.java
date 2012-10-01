@@ -75,6 +75,7 @@ public class BHPTools {
     }
 
     public static boolean hasBeenUsedAlready(Prescription prescription) {
+        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT bhp FROM BHP bhp WHERE bhp.prescription = :prescription AND bhp.status <> :status");
         query.setParameter("prescription", prescription);
@@ -82,6 +83,7 @@ public class BHPTools {
         query.setMaxResults(1);
         boolean used = query.getResultList().size() > 0;
         em.close();
+        SYSTools.showTimeDifference(begin);
         return used;
     }
 
@@ -103,6 +105,7 @@ public class BHPTools {
 
     public static Date getMinDatum(Resident bewohner) {
         Date date;
+        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM BHP b WHERE b.resident = :resident ORDER BY b.bhpid");
         query.setParameter("resident", bewohner);
@@ -113,6 +116,7 @@ public class BHPTools {
             date = new Date();
         }
         em.close();
+        SYSTools.showTimeDifference(begin);
         return date;
     }
 
@@ -401,7 +405,7 @@ public class BHPTools {
     public static ArrayList<BHP> getBHPsOnDemand(Resident resident, Date date) {
 
         List<Prescription> listPrescriptions = PrescriptionTools.getOnDemandPrescriptions(resident, date);
-
+        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
         ArrayList<BHP> listBHP = new ArrayList<BHP>();
 
@@ -446,6 +450,7 @@ public class BHPTools {
         } finally {
             em.close();
         }
+        SYSTools.showTimeDifference(begin);
         return listBHP;
     }
 
@@ -457,6 +462,7 @@ public class BHPTools {
      * @return
      */
     public static ArrayList<BHP> getBHPs(Resident resident, Date date) {
+        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
         ArrayList<BHP> listBHP = null;
 
@@ -481,6 +487,7 @@ public class BHPTools {
         } finally {
             em.close();
         }
+        SYSTools.showTimeDifference(begin);
         return listBHP;
     }
 

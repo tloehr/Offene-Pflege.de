@@ -39,8 +39,8 @@ import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideSplitPane;
 import com.jidesoft.wizard.WizardDialog;
-import entity.Stationen;
-import entity.StationenTools;
+import entity.Station;
+import entity.StationTools;
 import entity.files.SYSFilesTools;
 import entity.info.ResInfoTools;
 import entity.info.Resident;
@@ -539,9 +539,9 @@ public class FrmMain extends JFrame {
 
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("Stationen.findAllSorted");
-        ArrayList<Stationen> stationen = new ArrayList<Stationen>(query.getResultList());
+        ArrayList<Station> stationen = new ArrayList<Station>(query.getResultList());
         em.close();
-        for (Stationen station : stationen) {
+        for (Station station : stationen) {
             panesApps.add(addNursingRecords(station));
         }
 
@@ -574,7 +574,7 @@ public class FrmMain extends JFrame {
         return panel;
     }
 
-    private CollapsiblePane addNursingRecords(Stationen station) {
+    private CollapsiblePane addNursingRecords(Station station) {
         bwButtonMap = new HashMap<Resident, JideButton>();
 
         EntityManager em = OPDE.createEM();
@@ -590,7 +590,7 @@ public class FrmMain extends JFrame {
 
         CollapsiblePane mypane = new CollapsiblePane(station == null ? OPDE.lang.getString("misc.msg.Archive") : station.getBezeichnung());
         mypane.setFont(SYSConst.ARIAL14);
-        mypane.setEmphasized(station != null && station.equals(StationenTools.getSpecialStation()));
+        mypane.setEmphasized(station != null && station.equals(StationTools.getSpecialStation()));
 //        mypane.setSlidingDirection(SwingConstants.SOUTH);
         mypane.setStyle(CollapsiblePane.PLAIN_STYLE);
 

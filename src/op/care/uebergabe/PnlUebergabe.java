@@ -86,7 +86,7 @@ public class PnlUebergabe extends CleanablePanel {
 //        ocs = OPDE.getOCSec();
         initComponents();
 
-        EinrichtungenTools.setComboBox(cmbEinrichtung);
+        HomesTools.setComboBox(cmbEinrichtung);
         jdcDatum.setDate(SYSCalendar.today_date());
 
         this.initPhase = false;
@@ -379,7 +379,7 @@ public class PnlUebergabe extends CleanablePanel {
 
     private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
         btnNew.setEnabled(false);
-        new DlgBericht(this, (Einrichtungen) cmbEinrichtung.getSelectedItem(), jdcDatum.getDate());
+        new DlgBericht(this, (Homes) cmbEinrichtung.getSelectedItem(), jdcDatum.getDate());
     }//GEN-LAST:event_btnNewActionPerformed
 
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
@@ -443,9 +443,9 @@ public class PnlUebergabe extends CleanablePanel {
                     setProgressFromWorker(row);
                     Object[] bericht = (Object[]) berichte.get(row);
                     if (((Long) bericht[TMUebergabe.LIST_ACKNOWLEDGED]).longValue() == 0) { // aktueller User hat diesen Bericht noch nicht bestätigt.
-                        if (bericht[TMUebergabe.LIST_BERICHT] instanceof Uebergabebuch) {
-                            Uebergabebuch uebergabe = (Uebergabebuch) bericht[TMUebergabe.LIST_BERICHT];
-                            uebergabe.getUsersAcknowledged().add(new Uebergabe2User(uebergabe, OPDE.getLogin().getUser()));
+                        if (bericht[TMUebergabe.LIST_BERICHT] instanceof Handovers) {
+                            Handovers uebergabe = (Handovers) bericht[TMUebergabe.LIST_BERICHT];
+                            uebergabe.getUsersAcknowledged().add(new Handover2User(uebergabe, OPDE.getLogin().getUser()));
                             em.merge(uebergabe);
                         } else {
                             NReport pflegebericht = (NReport) bericht[TMUebergabe.LIST_BERICHT];
@@ -542,13 +542,13 @@ public class PnlUebergabe extends CleanablePanel {
             if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.USER1)) {
                 DateFormat df = DateFormat.getDateTimeInstance();
                 JMenu menuListAck = new JMenu("Bestätigungen");
-                if (bericht instanceof Uebergabebuch) {
-                    if (((Uebergabebuch) bericht).getUsersAcknowledged().isEmpty()) {
+                if (bericht instanceof Handovers) {
+                    if (((Handovers) bericht).getUsersAcknowledged().isEmpty()) {
                         menuListAck.add(new JMenuItem("bisher keine Bestätigungen"));
                     } else {
-                        Iterator<Uebergabe2User> it = ((Uebergabebuch) bericht).getUsersAcknowledged().iterator();
+                        Iterator<Handover2User> it = ((Handovers) bericht).getUsersAcknowledged().iterator();
                         while (it.hasNext()) {
-                            Uebergabe2User u2u = it.next();
+                            Handover2User u2u = it.next();
                             menuListAck.add(new JMenuItem(u2u.getUser().getFullname() + " <b>[" + df.format(u2u.getPit()) + "]</b>"));
                         }
                     }
@@ -634,7 +634,7 @@ public class PnlUebergabe extends CleanablePanel {
 //            sort = TMUebergabe.SORT_UHRZEIT;
 //        }
         if (pnlFilter.getSelectedIndex() == TAB_DATE) {
-            tblUebergabe.setModel(new TMUebergabe(jdcDatum.getDate(), (Einrichtungen) cmbEinrichtung.getSelectedItem()));
+            tblUebergabe.setModel(new TMUebergabe(jdcDatum.getDate(), (Homes) cmbEinrichtung.getSelectedItem()));
         } else {
 //            if (!txtSuche.getText().equals("")) {
 //                tblUebergabe.setModel(new TMUebergabe(le.getData(), txtSuche.getText(), sort));

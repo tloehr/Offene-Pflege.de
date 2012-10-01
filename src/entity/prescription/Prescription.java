@@ -97,7 +97,7 @@ import java.util.List;
 //@SqlResultSetMappings({
 //
 ////        @SqlResultSetMapping(name = "Verordnung.findAllForStellplanResultMapping",
-////                entities = {@EntityResult(entityClass = Verordnung.class), @EntityResult(entityClass = Stationen.class), @EntityResult(entityClass = VerordnungPlanung.class)},
+////                entities = {@EntityResult(entityClass = Verordnung.class), @EntityResult(entityClass = Station.class), @EntityResult(entityClass = VerordnungPlanung.class)},
 ////                columns = {@ColumnResult(name = "BestID"), @ColumnResult(name = "VorID"), @ColumnResult(name = "FormID"), @ColumnResult(name = "MedPID"), @ColumnResult(name = "M.Bezeichnung"), @ColumnResult(name = "Ms.Bezeichnung")
 ////                }
 ////        ),
