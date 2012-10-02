@@ -80,9 +80,9 @@ public class DlgInfo extends MyJDialog {
         txtBemerkung.setFont(SYSConst.ARIAL14);
         txtBemerkung.setWrapStyleWord(true);
         txtBemerkung.setLineWrap(true);
-        txtBemerkung.setText(SYSTools.catchNull(resInfo.getBemerkung()));
+        txtBemerkung.setText(SYSTools.catchNull(resInfo.getText()));
         contentPanel.add(new JScrollPane(getPanel()), CC.xywh(1, 1, 3, 1, CC.FILL, CC.FILL));
-        if (resInfo.getBwinfotyp().getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
+        if (resInfo.getResInfoType().getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
             pnlPIT = new op.tools.PnlPIT();
             JLabel header = new JLabel(OPDE.lang.getString(internalClassID + ".singleincident"));
             header.setFont(SYSConst.ARIAL20);
@@ -96,7 +96,7 @@ public class DlgInfo extends MyJDialog {
             contentPanel.add(new JScrollPane(txtBemerkung), CC.xywh(1, 3, 3, 1, CC.FILL, CC.FILL));
         }
 
-        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.createnew") + ": " + resInfo.getBwinfotyp().getBWInfoKurz(), 10));
+        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.createnew") + ": " + resInfo.getResInfoType().getBWInfoKurz(), 10));
     }
 
     private void btnCancelActionPerformed(ActionEvent e) {
@@ -108,12 +108,12 @@ public class DlgInfo extends MyJDialog {
 
         if (pnlPIT != null) {
             OPDE.debug(pnlPIT.getPIT());
-            resInfo.setVon(pnlPIT.getPIT());
+            resInfo.setFrom(pnlPIT.getPIT());
         }
 
         try {
             StringWriter writer = new StringWriter();
-            content.store(writer, "[" + resInfo.getBwinfotyp().getID() + "] " + resInfo.getBwinfotyp().getBWInfoKurz());
+            content.store(writer, "[" + resInfo.getResInfoType().getID() + "] " + resInfo.getResInfoType().getBWInfoKurz());
             resInfo.setProperties(writer.toString());
             OPDE.debug(writer.toString());
             writer.close();
@@ -121,7 +121,7 @@ public class DlgInfo extends MyJDialog {
             OPDE.fatal(e1);
         }
 
-        resInfo.setBemerkung(txtBemerkung.getText().trim());
+        resInfo.setText(txtBemerkung.getText().trim());
 
         dispose();
     }
@@ -210,7 +210,7 @@ public class DlgInfo extends MyJDialog {
 
         // Struktur...
         try {
-            String xmltext = "<?xml version=\"1.0\"?><structure>" + resInfo.getBwinfotyp().getXml() + "</structure>";
+            String xmltext = "<?xml version=\"1.0\"?><structure>" + resInfo.getResInfoType().getXml() + "</structure>";
             XMLReader parser = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
             InputSource is = new org.xml.sax.InputSource(new java.io.BufferedReader(new java.io.StringReader(xmltext)));
 

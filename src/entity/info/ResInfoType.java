@@ -114,7 +114,7 @@ public class ResInfoType implements Serializable {
         this.bWInfoLang = bWInfoLang;
     }
 
-    public ResInfoCategory getResInfokat() {
+    public ResInfoCategory getCategory() {
         return resInfokat;
     }
 

@@ -1,4 +1,4 @@
-package entity;
+package entity.info;
 
 import op.OPDE;
 import op.tools.SYSTools;
@@ -16,21 +16,21 @@ import java.io.Serializable;
 @Entity
 @Table(name = "Betreuer")
 @NamedQueries({
-        @NamedQuery(name = "Betreuer.findAll", query = "SELECT b FROM Betreuer b"),
-        @NamedQuery(name = "Betreuer.findAllActive", query = "SELECT b FROM Betreuer b WHERE b.status >= 0 ORDER BY b.name, b.vorname"),
-        @NamedQuery(name = "Betreuer.findByBetrID", query = "SELECT b FROM Betreuer b WHERE b.betrID = :betrID"),
-        @NamedQuery(name = "Betreuer.findByAnrede", query = "SELECT b FROM Betreuer b WHERE b.anrede = :anrede"),
-        @NamedQuery(name = "Betreuer.findByName", query = "SELECT b FROM Betreuer b WHERE b.name = :name"),
-        @NamedQuery(name = "Betreuer.findByVorname", query = "SELECT b FROM Betreuer b WHERE b.vorname = :vorname"),
-        @NamedQuery(name = "Betreuer.findByStrasse", query = "SELECT b FROM Betreuer b WHERE b.strasse = :strasse"),
-        @NamedQuery(name = "Betreuer.findByPlz", query = "SELECT b FROM Betreuer b WHERE b.plz = :plz"),
-        @NamedQuery(name = "Betreuer.findByOrt", query = "SELECT b FROM Betreuer b WHERE b.ort = :ort"),
-        @NamedQuery(name = "Betreuer.findByTel", query = "SELECT b FROM Betreuer b WHERE b.tel = :tel"),
-        @NamedQuery(name = "Betreuer.findByPrivat", query = "SELECT b FROM Betreuer b WHERE b.privat = :privat"),
-        @NamedQuery(name = "Betreuer.findByFax", query = "SELECT b FROM Betreuer b WHERE b.fax = :fax"),
-        @NamedQuery(name = "Betreuer.findByMobil", query = "SELECT b FROM Betreuer b WHERE b.mobil = :mobil"),
-        @NamedQuery(name = "Betreuer.findByEMail", query = "SELECT b FROM Betreuer b WHERE b.eMail = :eMail")})
-public class Betreuer implements Serializable {
+        @NamedQuery(name = "Betreuer.findAll", query = "SELECT b FROM LCustodian b"),
+        @NamedQuery(name = "Betreuer.findAllActive", query = "SELECT b FROM LCustodian b WHERE b.status >= 0 ORDER BY b.name, b.vorname"),
+        @NamedQuery(name = "Betreuer.findByBetrID", query = "SELECT b FROM LCustodian b WHERE b.betrID = :betrID"),
+        @NamedQuery(name = "Betreuer.findByAnrede", query = "SELECT b FROM LCustodian b WHERE b.anrede = :anrede"),
+        @NamedQuery(name = "Betreuer.findByName", query = "SELECT b FROM LCustodian b WHERE b.name = :name"),
+        @NamedQuery(name = "Betreuer.findByVorname", query = "SELECT b FROM LCustodian b WHERE b.vorname = :vorname"),
+        @NamedQuery(name = "Betreuer.findByStrasse", query = "SELECT b FROM LCustodian b WHERE b.strasse = :strasse"),
+        @NamedQuery(name = "Betreuer.findByPlz", query = "SELECT b FROM LCustodian b WHERE b.plz = :plz"),
+        @NamedQuery(name = "Betreuer.findByOrt", query = "SELECT b FROM LCustodian b WHERE b.ort = :ort"),
+        @NamedQuery(name = "Betreuer.findByTel", query = "SELECT b FROM LCustodian b WHERE b.tel = :tel"),
+        @NamedQuery(name = "Betreuer.findByPrivat", query = "SELECT b FROM LCustodian b WHERE b.privat = :privat"),
+        @NamedQuery(name = "Betreuer.findByFax", query = "SELECT b FROM LCustodian b WHERE b.fax = :fax"),
+        @NamedQuery(name = "Betreuer.findByMobil", query = "SELECT b FROM LCustodian b WHERE b.mobil = :mobil"),
+        @NamedQuery(name = "Betreuer.findByEMail", query = "SELECT b FROM LCustodian b WHERE b.eMail = :eMail")})
+public class LCustodian implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -71,7 +71,7 @@ public class Betreuer implements Serializable {
     @Column(name = "Status")
     private Integer status;
 
-    public Betreuer() {
+    public LCustodian() {
         this.anrede = "";
         this.name = "";
         this.vorname = "";
@@ -200,10 +200,10 @@ public class Betreuer implements Serializable {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof Betreuer)) {
+        if (!(object instanceof LCustodian)) {
             return false;
         }
-        Betreuer other = (Betreuer) object;
+        LCustodian other = (LCustodian) object;
         if ((this.betrID == null && other.betrID != null) || (this.betrID != null && !this.betrID.equals(other.betrID))) {
             return false;
         }
@@ -212,7 +212,7 @@ public class Betreuer implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.rest.Betreuer[betrID=" + betrID + "]";
+        return "entity.rest.LCustodian[betrID=" + betrID + "]";
     }
 
 }

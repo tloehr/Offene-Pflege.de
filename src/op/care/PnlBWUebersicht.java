@@ -142,7 +142,7 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
 
                 @Override
                 protected Object doInBackground() throws Exception {
-                    html = SYSTools.toHTML(ResInfoTools.getUeberleitung(bewohner, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true));
+                    html = SYSTools.toHTML(ResInfoTools.getTXReport(bewohner, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true));
                     return null;
                 }
 
@@ -167,7 +167,7 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
             initPhase = true;
             OPDE.getMainframe().setBlocked(true);
             OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
-            String html = SYSTools.toHTML(ResInfoTools.getUeberleitung(bewohner, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true));
+            String html = SYSTools.toHTML(ResInfoTools.getTXReport(bewohner, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true));
             txtUebersicht.setText(html);
             txtUebersicht.repaint();
             SwingUtilities.invokeLater(new Runnable() {
@@ -191,7 +191,7 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
 
             @Override
             protected Object doInBackground() throws Exception {
-                html = SYSTools.toHTML(ResInfoTools.getUeberleitung(bewohner, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true));
+                html = SYSTools.toHTML(ResInfoTools.getTXReport(bewohner, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true));
                 return null;
             }
 
@@ -300,7 +300,7 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
         JideButton printButton = GUITools.createHyperlinkButton("Drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                SYSFilesTools.print(ResInfoTools.getUeberleitung(bewohner, true, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, true), true);
+                SYSFilesTools.print(ResInfoTools.getTXReport(bewohner, true, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, true), true);
             }
         });
         mypanel.add(printButton);

@@ -14,7 +14,7 @@ import java.sql.Timestamp;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-public class Mitarbeiter {
+public class Staff {
     private String maKennung;
 
     @javax.persistence.Column(name = "MAKennung", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
@@ -92,7 +92,7 @@ public class Mitarbeiter {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Mitarbeiter that = (Mitarbeiter) o;
+        Staff that = (Staff) o;
 
         if (editor != null ? !editor.equals(that.editor) : that.editor != null) return false;
         if (gebDatum != null ? !gebDatum.equals(that.gebDatum) : that.gebDatum != null) return false;

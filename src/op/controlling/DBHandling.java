@@ -1411,7 +1411,7 @@ public class DBHandling {
      * Erstellt ein HTML Dokument mit dem folgenden Inhalt:
      * <ul>
      * <li>Aufstellung über Häufigkeit der Beschwerden auf Monate verteilt</li>
-     * <li>Aufstellung über Häufigkeit der Beschwerden auf Mitarbeiter verteilt</li>
+     * <li>Aufstellung über Häufigkeit der Beschwerden auf Staff verteilt</li>
      * <li>Aufstellung über Häufigkeit der Beschwerden auf Bewohner verteilt</li>
      * <li>Aufstellung über die Zeit zwischen öffnen und schließen in Tagen</li>
      * <li>Auflistung aller Beschwerden in einem bestimmten Zeitraum</li>

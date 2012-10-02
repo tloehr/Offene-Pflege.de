@@ -94,10 +94,11 @@ public class SYSTools {
     } // center
 
     public static void showTimeDifference(long begin) {
-        if (OPDE.isDebug()) return;
+        if (!OPDE.isDebug()) return;
         final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-        ste[ste.length - 1].getMethodName(); //Thank you Tom Tresansky
-        OPDE.debug(ste[ste.length - 1 - 1].getMethodName() + ": " + (System.currentTimeMillis() - begin) + " ms");
+
+
+        OPDE.debug(ste[2].toString() + ": " + (System.currentTimeMillis() - begin) + " ms");
     }
 
     public static void centerOnParent(Component parent, Component child) {

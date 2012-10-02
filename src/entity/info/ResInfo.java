@@ -25,11 +25,11 @@
  */
 package entity.info;
 
-import entity.system.Users;
 import entity.files.SYSINF2FILE;
 import entity.process.QProcess;
 import entity.process.QProcessElement;
 import entity.process.SYSINF2PROCESS;
+import entity.system.Users;
 import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -37,6 +37,7 @@ import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -47,18 +48,6 @@ import java.util.Properties;
  */
 @Entity
 @Table(name = "BWInfo")
-@NamedQueries({
-        @NamedQuery(name = "BWInfo.findAll", query = "SELECT b FROM ResInfo b"),
-        @NamedQuery(name = "BWInfo.findByBwinfoid", query = "SELECT b FROM ResInfo b WHERE b.bwinfoid = :bwinfoid"),
-        @NamedQuery(name = "BWInfo.findByVorgang", query = " "
-                + " SELECT bw FROM ResInfo bw "
-                + " JOIN bw.attachedProcessConnections av"
-                + " JOIN av.vorgang v"
-                + " WHERE v = :vorgang "),
-        @NamedQuery(name = "BWInfo.findByVon", query = "SELECT b FROM ResInfo b WHERE b.von = :von"),
-//        @NamedQuery(name = "BWInfo.findByBewohnerByBWINFOTYP_DESC", query = "SELECT b FROM ResInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.von DESC"),
-        @NamedQuery(name = "BWInfo.findByBewohnerByBWINFOTYP_ASC", query = "SELECT b FROM ResInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.von ASC"),
-        @NamedQuery(name = "BWInfo.findByBis", query = "SELECT b FROM ResInfo b WHERE b.bis = :bis")})
 public class ResInfo implements Serializable, QProcessElement, Cloneable, Comparable<ResInfo> {
     private static final long serialVersionUID = 1L;
     @Id
@@ -71,11 +60,11 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
     @Basic(optional = false)
     @Column(name = "Von")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date von;
+    private Date from;
     @Basic(optional = false)
     @Column(name = "Bis")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date bis;
+    private Date to;
     @Lob
     @Column(name = "XML")
     private String xml;
@@ -96,13 +85,13 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
     private ResInfoType bwinfotyp;
     @JoinColumn(name = "AnUKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users angesetztDurch;
+    private Users userON;
     @JoinColumn(name = "AbUKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users abgesetztDurch;
+    private Users userOFF;
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
-    private Resident bewohner;
+    private Resident resident;
     // ==
     // M:N Relationen
     // ==
@@ -118,91 +107,83 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
     public ResInfo() {
     }
 
-    public ResInfo(ResInfoType bwinfotyp, Resident bewohner) {
+    public ResInfo(ResInfoType bwinfotyp, Resident resident) {
         this.properties = "";
         Date now = new Date();
 
         if (bwinfotyp.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
-            this.von = now;
-            this.bis = now;
+            this.from = now;
+            this.to = now;
         } else if (bwinfotyp.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYDAY) {
-            this.von = new DateTime().toDateMidnight().toDate();
-            this.bis = SYSConst.DATE_BIS_AUF_WEITERES;
+            this.from = new DateTime().toDateMidnight().toDate();
+            this.to = SYSConst.DATE_BIS_AUF_WEITERES;
         } else {
-            this.von = now;
-            this.bis = SYSConst.DATE_BIS_AUF_WEITERES;
+            this.from = now;
+            this.to = SYSConst.DATE_BIS_AUF_WEITERES;
         }
 
         this.bwinfotyp = bwinfotyp;
-        this.angesetztDurch = OPDE.getLogin().getUser();
-        this.bewohner = bewohner;
+        this.userON = OPDE.getLogin().getUser();
+        this.resident = resident;
         this.attachedFilesConnections = new ArrayList<SYSINF2FILE>();
         this.attachedProcessConnections = new ArrayList<SYSINF2PROCESS>();
     }
 
-    public ResInfo(Date von, Date bis, String xml, String html, String properties, String bemerkung, ResInfoType bwinfotyp, Resident bewohner) {
-        this.von = von;
-        this.bis = bis;
+    public ResInfo(Date from, Date to, String xml, String html, String properties, String bemerkung, ResInfoType bwinfotyp, Resident resident) {
+        this.from = from;
+        this.to = to;
         this.xml = xml;
         this.html = html;
         this.properties = properties;
         this.bemerkung = bemerkung;
         this.bwinfotyp = bwinfotyp;
-        this.angesetztDurch = OPDE.getLogin().getUser();
-        this.abgesetztDurch = null;
-        this.bewohner = bewohner;
+        this.userON = OPDE.getLogin().getUser();
+        this.userOFF = null;
+        this.resident = resident;
         this.attachedFilesConnections = new ArrayList<SYSINF2FILE>();
         this.attachedProcessConnections = new ArrayList<SYSINF2PROCESS>();
     }
 
-    public Long getBwinfoid() {
-        return bwinfoid;
-    }
-
-    public void setBwinfoid(Long bwinfoid) {
-        this.bwinfoid = bwinfoid;
-    }
-
     @Override
     public Resident getResident() {
-        return bewohner;
+        return resident;
     }
 
-    public ResInfoType getBwinfotyp() {
+    public ResInfoType getResInfoType() {
         return bwinfotyp;
     }
 
     public Date getVon() {
-        return von;
+        return from;
     }
 
-    public void setVon(Date von) {
+    public void setFrom(Date from) {
         if (bwinfotyp.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYDAY) {
-            von = new DateTime(von).toDateMidnight().toDate();
+            from = new DateTime(from).toDateMidnight().toDate();
         }
-        this.von = von;
+        this.from = from;
         if (bwinfotyp.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
-            this.bis = von;
+            this.to = from;
         }
     }
 
-    public Date getBis() {
-        return bis;
+    public Date getTo() {
+        return to;
     }
 
-    public void setBis(Date bis) {
+    public void setTo(Date to) {
         if (bwinfotyp.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYDAY) {
-            bis = new DateTime(bis).toDateMidnight().plusDays(1).toDateTime().minusMinutes(1).toDate();
+            to = new DateTime(to).toDateMidnight().plusDays(1).toDateTime().minusMinutes(1).toDate();
         }
-        this.bis = bis;
+        this.to = to;
         if (bwinfotyp.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
-            this.von = bis;
+            this.from = to;
         }
     }
 
-    public boolean isHeimaufnahme() {
-        return bwinfotyp.getID().equalsIgnoreCase("hauf");
-    }
+//    public boolean isHeimaufnahme() {
+//        return bwinfotyp.getID().equalsIgnoreCase("hauf");
+//    }
 
     public Collection<SYSINF2PROCESS> getAttachedProcessConnections() {
         return attachedProcessConnections;
@@ -224,12 +205,12 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
         this.xml = xml;
     }
 
-    public String getBemerkung() {
+    public String getText() {
         return bemerkung;
     }
 
-    public void setBemerkung(String bemerkung) {
-        this.bemerkung = bemerkung;
+    public void setText(String text) {
+        this.bemerkung = text;
     }
 
     public String getProperties() {
@@ -240,20 +221,20 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
         this.properties = properties;
     }
 
-    public Users getAbgesetztDurch() {
-        return abgesetztDurch;
+    public Users getUserOFF() {
+        return userOFF;
     }
 
-    public void setAbgesetztDurch(Users abgesetztDurch) {
-        this.abgesetztDurch = abgesetztDurch;
+    public void setUserOFF(Users user) {
+        this.userOFF = user;
     }
 
-    public Users getAngesetztDurch() {
-        return angesetztDurch;
+    public Users getUserON() {
+        return userON;
     }
 
-    public void setAngesetztDurch(Users angesetztDurch) {
-        this.angesetztDurch = angesetztDurch;
+    public void setUserON(Users user) {
+        this.userON = user;
     }
 
 
@@ -267,7 +248,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
 
     @Override
     public long getPITInMillis() {
-        return von.getTime();
+        return from.getTime();
     }
 
     /**
@@ -275,8 +256,16 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
      *
      * @return
      */
-    public boolean isAbgesetzt() {
-        return bwinfotyp.getIntervalMode() != ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS && bis.before(new Date());
+    public boolean isClosed() {
+        return bwinfotyp.getIntervalMode() != ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS && to.before(new Date());
+    }
+
+    public boolean isBySecond() {
+        return bwinfotyp.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYSECOND;
+    }
+
+    public boolean isByDay() {
+        return bwinfotyp.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYDAY;
     }
 
     public boolean isSingleIncident() {
@@ -288,12 +277,12 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
     }
 
     public boolean isActiveNoConstraint() {
-        return isNoConstraints() && !isAbgesetzt();
+        return isNoConstraints() && !isClosed();
     }
 
     @Override
     public Users getUser() {
-        return angesetztDurch;
+        return userON;
     }
 
     @Override
@@ -303,15 +292,25 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
 
     @Override
     public String getPITAsHTML() {
-        // TODO: fehlt noch
-        return "<html>not yet</html>";
+        String result = "";
+        DateFormat df = isSingleIncident() || isBySecond() ? DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT) : DateFormat.getDateInstance();
+
+        if (isSingleIncident()) {
+            result += df.format(from);
+        } else if (isClosed()) {
+            result += df.format(from) + " &rarr; " + df.format(to);
+        } else {
+            result += df.format(from) + "&nbsp;&rarr;&nbsp;&raquo;&raquo;";
+        }
+
+        return result;
     }
 
     @Override
     public ArrayList<QProcess> getAttachedProcesses() {
         ArrayList<QProcess> list = new ArrayList<QProcess>();
         for (SYSINF2PROCESS att : attachedProcessConnections) {
-            list.add(att.getVorgang());
+            list.add(att.getQProcess());
         }
         return list;
     }
@@ -331,9 +330,9 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
 
     @Override
     public int compareTo(ResInfo resInfo) {
-        if (resInfo.getBwinfotyp().getStatus() == ResInfoTypeTools.STATUS_NORMAL) {
+        if (resInfo.getResInfoType().getStatus() == ResInfoTypeTools.STATUS_NORMAL) {
             return 0;
-        } else if (getBwinfotyp().getID().equalsIgnoreCase(ResInfoTypeTools.TYP_DIAGNOSE) || resInfo.getBwinfotyp().getID().equalsIgnoreCase(ResInfoTypeTools.TYP_DIAGNOSE)) {
+        } else if (getResInfoType().getID().equalsIgnoreCase(ResInfoTypeTools.TYP_DIAGNOSE) || resInfo.getResInfoType().getID().equalsIgnoreCase(ResInfoTypeTools.TYP_DIAGNOSE)) {
             Properties thisProps = ResInfoTools.getContent(this);
             Properties thatProps = ResInfoTools.getContent(resInfo);
             String thisICD = thisProps.getProperty("icd");
@@ -365,7 +364,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
 
     @Override
     public ResInfo clone() {
-        return new ResInfo(von, bis, xml, html, properties, bemerkung, bwinfotyp, bewohner);
+        return new ResInfo(from, to, xml, html, properties, bemerkung, bwinfotyp, resident);
     }
 
     @Override

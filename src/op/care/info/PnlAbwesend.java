@@ -123,7 +123,7 @@ public class PnlAbwesend extends JPanel {
 
         switch (tab1.getSelectedIndex()) {
             case TAB_KH: {
-                abwesenheit.setBemerkung(txtKH.getText().trim());
+                abwesenheit.setText(txtKH.getText().trim());
 
                 Hospital hospital = (Hospital) cmbKH.getSelectedItem();
                 if (hospital.getKhid() == null) {
@@ -138,13 +138,13 @@ public class PnlAbwesend extends JPanel {
                 break;
             }
             case TAB_HOLLIDAY: {
-                abwesenheit.setBemerkung(txtHolliday.getText().trim());
+                abwesenheit.setText(txtHolliday.getText().trim());
                 abwesenheit.setHtml("<div id=\"fonttext\"><i>" + OPDE.lang.getString("misc.msg.holliday") + "</i></div>");
                 props.put("type", ResInfoTypeTools.ABWE_TYP_HOLLIDAY);
                 break;
             }
             case TAB_OTHER: {
-                abwesenheit.setBemerkung(txtOther.getText().trim());
+                abwesenheit.setText(txtOther.getText().trim());
                 abwesenheit.setHtml("<div id=\"fonttext\"><i>" + OPDE.lang.getString("misc.msg.otherreasons") + "</i></div>");
                 props.put("type", ResInfoTypeTools.ABWE_TYP_OTHER);
                 break;
@@ -162,8 +162,8 @@ public class PnlAbwesend extends JPanel {
             OPDE.fatal(ex);
         }
 
-        abwesenheit.setVon(new Date());
-        abwesenheit.setBis(SYSConst.DATE_BIS_AUF_WEITERES);
+        abwesenheit.setFrom(new Date());
+        abwesenheit.setTo(SYSConst.DATE_BIS_AUF_WEITERES);
 
         actionBlock.execute(abwesenheit);
     }

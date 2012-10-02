@@ -87,7 +87,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
     private Collection<SYSPRE2PROCESS> attachedPrescriptionConnections;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
-    private Collection<SYSINF2PROCESS> attachedInfos;
+    private Collection<SYSINF2PROCESS> attachedResInfoConnections;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
     private Collection<SYSNP2PROCESS> attachedNursingProcesses;
@@ -140,7 +140,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         this.PReports.add(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_CREATE), PReportTools.PREPORT_TYPE_CREATE, this));
         this.attachedNReportConnections = new ArrayList<SYSNR2PROCESS>();
         this.attachedPrescriptionConnections = new ArrayList<SYSPRE2PROCESS>();
-        this.attachedInfos = new ArrayList<SYSINF2PROCESS>();
+        this.attachedResInfoConnections = new ArrayList<SYSINF2PROCESS>();
         this.attachedNursingProcesses = new ArrayList<SYSNP2PROCESS>();
         this.attachedResValueConnections = new ArrayList<SYSVAL2PROCESS>();
     }
@@ -159,7 +159,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         } else if (element instanceof Prescription) {
             getAttachedPrescriptionConnections().remove(element);
         } else if (element instanceof ResInfo) {
-            getAttachedInfos().remove(element);
+            getAttachedResInfoConnections().remove(element);
         } else if (element instanceof NursingProcess) {
             getAttachedNursingProcesses().remove(element);
         } else {
@@ -183,8 +183,8 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         return attachedPrescriptionConnections;
     }
 
-    public Collection<SYSINF2PROCESS> getAttachedInfos() {
-        return attachedInfos;
+    public Collection<SYSINF2PROCESS> getAttachedResInfoConnections() {
+        return attachedResInfoConnections;
     }
 
     public Collection<SYSNP2PROCESS> getAttachedNursingProcesses() {
@@ -276,8 +276,8 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         for (SYSNP2PROCESS att : attachedNursingProcesses) {
             elements.add(att.getNursingProcess());
         }
-        for (SYSINF2PROCESS att : attachedInfos) {
-            elements.add(att.getBwinfo());
+        for (SYSINF2PROCESS att : attachedResInfoConnections) {
+            elements.add(att.getResInfo());
         }
         for (SYSPRE2PROCESS att : attachedPrescriptionConnections) {
             elements.add(att.getPrescription());

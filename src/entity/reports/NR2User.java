@@ -3,9 +3,8 @@
  * and open the template in the editor.
  */
 
-package entity;
+package entity.reports;
 
-import entity.reports.NReport;
 import entity.system.Users;
 
 import javax.persistence.*;
@@ -20,16 +19,11 @@ import java.util.Date;
  * @author tloehr
  */
 @Entity
-@Table(name = "PB2User")
-@NamedQueries({
-        @NamedQuery(name = "PB2User.findAll", query = "SELECT p FROM PB2User p"),
-        @NamedQuery(name = "PB2User.findByPkid", query = "SELECT p FROM PB2User p WHERE p.pkid = :pkid"),
-        @NamedQuery(name = "PB2User.findByPit", query = "SELECT p FROM PB2User p WHERE p.pit = :pit")})
-public class PB2User implements Serializable, Comparable<PB2User> {
+@Table(name = "NR2User")
+public class NR2User implements Serializable, Comparable<NR2User> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "PKID")
     private Long pkid;
     @Basic(optional = false)
@@ -43,14 +37,14 @@ public class PB2User implements Serializable, Comparable<PB2User> {
     @ManyToOne
     private Users user;
 
-    public PB2User() {
+    public NR2User() {
     }
 
-    public PB2User(Long pkid) {
+    public NR2User(Long pkid) {
         this.pkid = pkid;
     }
 
-    public PB2User(NReport bericht, Users user) {
+    public NR2User(NReport bericht, Users user) {
         this.bericht = bericht;
         this.user = user;
         this.pit = new Date();
@@ -91,10 +85,10 @@ public class PB2User implements Serializable, Comparable<PB2User> {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof PB2User)) {
+        if (!(object instanceof NR2User)) {
             return false;
         }
-        PB2User other = (PB2User) object;
+        NR2User other = (NR2User) object;
         if ((this.pkid == null && other.pkid != null) || (this.pkid != null && !this.pkid.equals(other.pkid))) {
             return false;
         }
@@ -103,11 +97,11 @@ public class PB2User implements Serializable, Comparable<PB2User> {
 
     @Override
     public String toString() {
-        return "entity.PB2User[pkid=" + pkid + "]";
+        return "entity.reports.NR2User[pkid=" + pkid + "]";
     }
 
     @Override
-    public int compareTo(PB2User o) {
+    public int compareTo(NR2User o) {
         return getUser().getFullname().compareTo(o.getUser().getFullname());
     }
 

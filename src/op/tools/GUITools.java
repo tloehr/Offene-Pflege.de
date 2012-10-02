@@ -202,11 +202,11 @@ public class GUITools {
 
     public static void setBWDisplay(Resident bewohner) {
         OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(bewohner));
-        if (ResInfoTools.isAbwesend(bewohner)) {
+        if (ResInfoTools.isAway(bewohner)) {
             OPDE.getDisplayManager().setIconAway();
-        } else if (ResInfoTools.isVerstorben(bewohner)) {
+        } else if (ResInfoTools.isDead(bewohner)) {
             OPDE.getDisplayManager().setIconDead();
-        } else if (ResInfoTools.isAusgezogen(bewohner)) {
+        } else if (ResInfoTools.isGone(bewohner)) {
             OPDE.getDisplayManager().setIconGone();
         }
     }

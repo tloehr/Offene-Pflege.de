@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package entity;
+package entity.info;
 
 import java.io.Serializable;
 import javax.persistence.Basic;
@@ -23,16 +23,16 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "KKasse")
 @NamedQueries({
-    @NamedQuery(name = "KKasse.findAll", query = "SELECT k FROM KKasse k"),
-    @NamedQuery(name = "KKasse.findByKassID", query = "SELECT k FROM KKasse k WHERE k.kassID = :kassID"),
-    @NamedQuery(name = "KKasse.findByName", query = "SELECT k FROM KKasse k WHERE k.name = :name"),
-    @NamedQuery(name = "KKasse.findByStrasse", query = "SELECT k FROM KKasse k WHERE k.strasse = :strasse"),
-    @NamedQuery(name = "KKasse.findByPlz", query = "SELECT k FROM KKasse k WHERE k.plz = :plz"),
-    @NamedQuery(name = "KKasse.findByOrt", query = "SELECT k FROM KKasse k WHERE k.ort = :ort"),
-    @NamedQuery(name = "KKasse.findByTel", query = "SELECT k FROM KKasse k WHERE k.tel = :tel"),
-    @NamedQuery(name = "KKasse.findByFax", query = "SELECT k FROM KKasse k WHERE k.fax = :fax"),
-    @NamedQuery(name = "KKasse.findByKNr", query = "SELECT k FROM KKasse k WHERE k.kNr = :kNr")})
-public class KKasse implements Serializable {
+    @NamedQuery(name = "KKasse.findAll", query = "SELECT k FROM HInsurance k"),
+    @NamedQuery(name = "KKasse.findByKassID", query = "SELECT k FROM HInsurance k WHERE k.kassID = :kassID"),
+    @NamedQuery(name = "KKasse.findByName", query = "SELECT k FROM HInsurance k WHERE k.name = :name"),
+    @NamedQuery(name = "KKasse.findByStrasse", query = "SELECT k FROM HInsurance k WHERE k.strasse = :strasse"),
+    @NamedQuery(name = "KKasse.findByPlz", query = "SELECT k FROM HInsurance k WHERE k.plz = :plz"),
+    @NamedQuery(name = "KKasse.findByOrt", query = "SELECT k FROM HInsurance k WHERE k.ort = :ort"),
+    @NamedQuery(name = "KKasse.findByTel", query = "SELECT k FROM HInsurance k WHERE k.tel = :tel"),
+    @NamedQuery(name = "KKasse.findByFax", query = "SELECT k FROM HInsurance k WHERE k.fax = :fax"),
+    @NamedQuery(name = "KKasse.findByKNr", query = "SELECT k FROM HInsurance k WHERE k.kNr = :kNr")})
+public class HInsurance implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -61,14 +61,14 @@ public class KKasse implements Serializable {
     @Column(name = "KNr")
     private String kNr;
 
-    public KKasse() {
+    public HInsurance() {
     }
 
-    public KKasse(Long kassID) {
+    public HInsurance(Long kassID) {
         this.kassID = kassID;
     }
 
-    public KKasse(Long kassID, String name, String strasse, String plz, String ort, String tel, String fax, String kNr) {
+    public HInsurance(Long kassID, String name, String strasse, String plz, String ort, String tel, String fax, String kNr) {
         this.kassID = kassID;
         this.name = name;
         this.strasse = strasse;
@@ -153,10 +153,10 @@ public class KKasse implements Serializable {
     @Override
     public boolean equals(Object object) {
 
-        if (!(object instanceof KKasse)) {
+        if (!(object instanceof HInsurance)) {
             return false;
         }
-        KKasse other = (KKasse) object;
+        HInsurance other = (HInsurance) object;
         if ((this.kassID == null && other.kassID != null) || (this.kassID != null && !this.kassID.equals(other.kassID))) {
             return false;
         }
@@ -165,7 +165,7 @@ public class KKasse implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.rest.KKasse[kassID=" + kassID + "]";
+        return "entity.rest.HInsurance[kassID=" + kassID + "]";
     }
 
 }

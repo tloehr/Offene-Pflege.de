@@ -105,7 +105,7 @@ public class Resident implements Serializable, Comparable<Resident> {
     private Doc hausarzt;
     @JoinColumn(name = "BetrID1", referencedColumnName = "BetrID")
     @ManyToOne
-    private Betreuer betreuer1;
+    private LCustodian LCustodian1;
     @JoinColumn(name = "Editor", referencedColumnName = "UKennung")
     @ManyToOne
     private Users editor;
@@ -235,12 +235,12 @@ public class Resident implements Serializable, Comparable<Resident> {
         this.hausarzt = hausarzt;
     }
 
-    public Betreuer getBetreuer1() {
-        return betreuer1;
+    public LCustodian getLCustodian1() {
+        return LCustodian1;
     }
 
-    public void setBetreuer1(Betreuer betreuer1) {
-        this.betreuer1 = betreuer1;
+    public void setLCustodian1(LCustodian LCustodian1) {
+        this.LCustodian1 = LCustodian1;
     }
 
     @Override

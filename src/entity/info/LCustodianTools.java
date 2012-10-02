@@ -1,6 +1,5 @@
-package entity;
+package entity.info;
 
-import entity.Betreuer;
 import op.OPDE;
 import op.tools.SYSTools;
 
@@ -14,7 +13,7 @@ import java.awt.*;
  * Time: 13:53
  * To change this template use File | Settings | File Templates.
  */
-public class BetreuerTools {
+public class LCustodianTools {
 
     public static ListCellRenderer getBetreuerRenderer() {
         return new ListCellRenderer() {
@@ -23,9 +22,9 @@ public class BetreuerTools {
                 String text;
                 if (o == null) {
                     text = OPDE.lang.getString("misc.commands.>>noselection<<");
-                } else if (o instanceof Betreuer) {
-//                    text = ((Betreuer) o).getName() + ", " + ((Betreuer) o).getVorname() + ", " + ((Betreuer) o).getOrt();
-                    text = getFullName((Betreuer) o);
+                } else if (o instanceof LCustodian) {
+//                    text = ((LCustodian) o).getName() + ", " + ((LCustodian) o).getVorname() + ", " + ((LCustodian) o).getOrt();
+                    text = getFullName((LCustodian) o);
                 } else {
                     text = o.toString();
                 }
@@ -34,8 +33,8 @@ public class BetreuerTools {
         };
     }
 
-    public static String getFullName(Betreuer betreuer) {
-        return SYSTools.anonymizeString(betreuer.getAnrede() + " " + betreuer.getVorname() + " " + betreuer.getName());
+    public static String getFullName(LCustodian LCustodian) {
+        return SYSTools.anonymizeString(LCustodian.getAnrede() + " " + LCustodian.getVorname() + " " + LCustodian.getName());
     }
 
 }

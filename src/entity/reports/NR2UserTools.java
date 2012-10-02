@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package entity;
+package entity.reports;
 
 import entity.system.Users;
 
@@ -14,10 +14,10 @@ import java.util.Iterator;
  *
  * @author tloehr
  */
-public class PB2UserTools {
-    public static boolean containsUser(Collection<PB2User> list, Users user){
+public class NR2UserTools {
+    public static boolean containsUser(Collection<NR2User> list, Users user){
         boolean found = false;
-        Iterator<PB2User> it = list.iterator();
+        Iterator<NR2User> it = list.iterator();
         while (!found && it.hasNext()){
             found = it.next().getUser().equals(user);
         }

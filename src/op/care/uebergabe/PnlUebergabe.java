@@ -30,6 +30,7 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.toedter.calendar.JDateChooser;
 import entity.*;
+import entity.reports.NR2User;
 import entity.reports.NReport;
 import op.FrmMain;
 import op.OPDE;
@@ -449,7 +450,7 @@ public class PnlUebergabe extends CleanablePanel {
                             em.merge(uebergabe);
                         } else {
                             NReport pflegebericht = (NReport) bericht[TMUebergabe.LIST_BERICHT];
-                            pflegebericht.getUsersAcknowledged().add(new PB2User(pflegebericht, OPDE.getLogin().getUser()));
+                            pflegebericht.getUsersAcknowledged().add(new NR2User(pflegebericht, OPDE.getLogin().getUser()));
                             em.merge(pflegebericht);
                         }
                     }
@@ -556,11 +557,11 @@ public class PnlUebergabe extends CleanablePanel {
                     if (((NReport) bericht).getUsersAcknowledged().isEmpty()) {
                         menuListAck.add(new JMenuItem("bisher keine Bestätigungen"));
                     } else {
-                        ArrayList<PB2User> usersackn = new ArrayList<PB2User>(((NReport) bericht).getUsersAcknowledged());
+                        ArrayList<NR2User> usersackn = new ArrayList<NR2User>(((NReport) bericht).getUsersAcknowledged());
                         Collections.sort(usersackn);
-                        Iterator<PB2User> it = usersackn.iterator();
+                        Iterator<NR2User> it = usersackn.iterator();
                         while (it.hasNext()) {
-                            PB2User p2u = it.next();
+                            NR2User p2u = it.next();
                             menuListAck.add(new JMenuItem(HTMLTools.toHTML(p2u.getUser().getFullname() + " <b>[" + df.format(p2u.getPit()) + "]</b>")));
                         }
                     }

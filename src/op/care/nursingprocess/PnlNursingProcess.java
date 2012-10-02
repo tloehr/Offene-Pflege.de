@@ -278,8 +278,8 @@ public class PnlNursingProcess extends NursingRecordsPanel {
             }
         });
         katpane.setSlidingDirection(SwingConstants.SOUTH);
-        katpane.setBackground(category.getBackgroundHeader());
-        katpane.setForeground(category.getForegroundHeader());
+//        katpane.setBackground(category.getBackgroundHeader());
+//        katpane.setForeground(category.getForegroundHeader());
         katpane.setOpaque(false);
         JPanel katPanel = new JPanel();
 
@@ -793,8 +793,8 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
         panelForPlanung.setSlidingDirection(SwingConstants.SOUTH);
         panelForPlanung.setHorizontalAlignment(SwingConstants.LEADING);
-        panelForPlanung.setBackground(planung.isAbgesetzt() ? Color.lightGray : planung.getKategorie().getBackgroundContent());
-        panelForPlanung.setForeground(planung.isAbgesetzt() ? SYSConst.grey80 : planung.getKategorie().getForegroundContent());
+//        panelForPlanung.setBackground(planung.isClosed() ? Color.lightGray : planung.getKategorie().getBackgroundContent());
+//        panelForPlanung.setForeground(planung.isClosed() ? SYSConst.grey80 : planung.getKategorie().getForegroundContent());
         panelForPlanung.setOpaque(false);
 
         panelForPlanung.setVisible(tbInactive.isSelected() || !planung.isAbgesetzt());

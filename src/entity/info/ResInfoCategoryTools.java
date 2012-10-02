@@ -28,22 +28,22 @@ public class ResInfoCategoryTools {
     public static final int STAMMDATEN = 2000;
 
 
-    public static ListCellRenderer getRenderer() {
-        return new ListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-                String text;
-                if (o == null) {
-                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
-                } else if (o instanceof ResInfoCategory) {
-                    text = SYSTools.toHTML("<div id=\"fonttext\"><font color=\"#"+((ResInfoCategory) o).getFgheader()+"\">"+((ResInfoCategory) o).getBezeichnung()+"</font></div>");
-                } else {
-                    text = o.toString();
-                }
-                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
-            }
-        };
-    }
+//    public static ListCellRenderer getRenderer() {
+//        return new ListCellRenderer() {
+//            @Override
+//            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+//                String text;
+//                if (o == null) {
+//                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
+//                } else if (o instanceof ResInfoCategory) {
+//                    text = SYSTools.toHTML("<div id=\"fonttext\"><font color=\"#"+((ResInfoCategory) o).getFgheader()+"\">"+((ResInfoCategory) o).getBezeichnung()+"</font></div>");
+//                } else {
+//                    text = o.toString();
+//                }
+//                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+//            }
+//        };
+//    }
 
     /**
      * @return
@@ -62,7 +62,7 @@ public class ResInfoCategoryTools {
      * @return
      */
     public static List<ResInfoCategory> getAll() {
-
+        long begin = System.currentTimeMillis();
         String katart = "0";   // a little trick. 0 is always viable
 
         katart += OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlInfo.internalClassID, InternalClassACL.USER1) ? "," + STAMMDATEN : ""; // Stammdaten
@@ -73,6 +73,7 @@ public class ResInfoCategoryTools {
         Query query = em.createQuery("SELECT b FROM ResInfoCategory b WHERE (b.katArt < 1000 OR b.katArt IN (" + katart + " )) AND b.sortierung >= 0");
         List<ResInfoCategory> result = query.getResultList();
         em.close();
+        SYSTools.showTimeDifference(begin);
         Collections.sort(result);
         return result;
     }

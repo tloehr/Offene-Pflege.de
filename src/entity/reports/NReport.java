@@ -4,7 +4,6 @@
  */
 package entity.reports;
 
-import entity.PB2User;
 import entity.system.Users;
 import entity.files.SYSNR2FILE;
 import entity.info.Resident;
@@ -172,7 +171,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
 //            + " INNER JOIN Bewohner bw ON bw.BWKennung = p.BWKennung "
 //            + " INNER JOIN PB2TAGS tag ON tag.PBID = p.PBID "
 //            + " INNER JOIN Station stat ON stat.StatID = bw.StatID "
-//            + " LEFT OUTER JOIN ( SELECT pbid, count(*) num FROM PB2User WHERE UKennung = :ukennung GROUP BY pbid, ukennung ) AS p2u ON p2u.PBID = p.PBID "
+//            + " LEFT OUTER JOIN ( SELECT pbid, count(*) num FROM NR2User WHERE UKennung = :ukennung GROUP BY pbid, ukennung ) AS p2u ON p2u.PBID = p.PBID "
 //            + " WHERE "
 //            + "     stat.EKennung = 'wiedenhof' "
 //            + "     AND p.PIT >= '2010-05-16 00:00:00.0' AND p.PIT <= '2010-05-16 23:59:59.0' "
@@ -220,7 +219,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nReport")
     private Collection<SYSNR2FILE> attachedFilesConnections;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bericht")
-    private Collection<PB2User> usersAcknowledged;
+    private Collection<NR2User> usersAcknowledged;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nreport")
     private Collection<SYSNR2PROCESS> attachedProcessConnections;
 
@@ -251,7 +250,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         this.attachedFilesConnections = new ArrayList<SYSNR2FILE>();
         this.tags = new ArrayList<NReportTAGS>();
         this.attachedProcessConnections = new ArrayList<SYSNR2PROCESS>();
-        this.usersAcknowledged = new ArrayList<PB2User>();
+        this.usersAcknowledged = new ArrayList<NR2User>();
         this.version = 0l;
     }
 
@@ -268,7 +267,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         this.attachedFilesConnections = new ArrayList<SYSNR2FILE>();
         this.tags = new ArrayList<NReportTAGS>();
         this.attachedProcessConnections = new ArrayList<SYSNR2PROCESS>();
-        this.usersAcknowledged = new ArrayList<PB2User>();
+        this.usersAcknowledged = new ArrayList<NR2User>();
         this.version = 0l;
     }
 
@@ -280,7 +279,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         this.pbid = pbid;
     }
 
-    public Collection<PB2User> getUsersAcknowledged() {
+    public Collection<NR2User> getUsersAcknowledged() {
         return usersAcknowledged;
     }
 

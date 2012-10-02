@@ -44,19 +44,12 @@ public class SYSINF2PROCESS {
         this.bwinfo = bwinfo;
     }
 
-    public QProcess getVorgang() {
+    public QProcess getQProcess() {
         return vorgang;
     }
 
-    public void setVorgang(QProcess vorgang) {
-        this.vorgang = vorgang;
-    }
-
-    public ResInfo getBwinfo() {
+    public ResInfo getResInfo() {
         return bwinfo;
     }
 
-    public void setBwinfo(ResInfo bwinfo) {
-        this.bwinfo = bwinfo;
-    }
 }

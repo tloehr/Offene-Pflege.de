@@ -444,39 +444,8 @@ public class PnlReport extends NursingRecordsPanel {
 
                 @Override
                 protected void done() {
-                    // EXPAND THE LAST 2 WEEKS
-                    final String keyYear = Integer.toString(new DateTime().getYear()) + ".year";
-                    if (cpMap.containsKey(keyYear)) {
-                        try {
-                            cpMap.get(keyYear).setCollapsed(false);
-                        } catch (PropertyVetoException e) {
-                            // bah!
-                        }
-                    }
-                    final String keyMonth = monthFormatter.format(new Date()) + ".month";
-                    if (cpMap.containsKey(keyMonth)) {
-                        try {
-                            cpMap.get(keyMonth).setCollapsed(false);
-                        } catch (PropertyVetoException e) {
-                            // bah!
-                        }
-                    }
-                    final String keyThisWeek = weekFormater.format(new Date()) + ".week";
-                    if (cpMap.containsKey(keyThisWeek)) {
-                        try {
-                            GUITools.setCollapsed(cpMap.get(keyThisWeek), false);
-                        } catch (PropertyVetoException e) {
-                            // bah!
-                        }
-                    }
-                    final String keyLastWeek = weekFormater.format(new DateMidnight().minusWeeks(1).toDate()) + ".week";
-                    if (cpMap.containsKey(keyLastWeek)) {
-                        try {
-                            GUITools.setCollapsed(cpMap.get(keyLastWeek), false);
-                        } catch (PropertyVetoException e) {
-                            // bah!
-                        }
-                    }
+                    expandTheLast2Weeks();
+
                     buildPanel();
                     initPhase = false;
                     OPDE.getDisplayManager().setProgressBarMessage(null);
@@ -497,39 +466,7 @@ public class PnlReport extends NursingRecordsPanel {
                 }
             }
 
-            // EXPAND THE LAST 2 WEEKS
-            final String keyYear = Integer.toString(new DateTime().getYear()) + ".year";
-            if (cpMap.containsKey(keyYear)) {
-                try {
-                    cpMap.get(keyYear).setCollapsed(false);
-                } catch (PropertyVetoException e) {
-                    // bah!
-                }
-            }
-            final String keyMonth = monthFormatter.format(new Date()) + ".month";
-            if (cpMap.containsKey(keyMonth)) {
-                try {
-                    cpMap.get(keyMonth).setCollapsed(false);
-                } catch (PropertyVetoException e) {
-                    // bah!
-                }
-            }
-            final String keyThisWeek = weekFormater.format(new Date()) + ".week";
-            if (cpMap.containsKey(keyThisWeek)) {
-                try {
-                    GUITools.setCollapsed(cpMap.get(keyThisWeek), false);
-                } catch (PropertyVetoException e) {
-                    // bah!
-                }
-            }
-            final String keyLastWeek = weekFormater.format(new DateMidnight().minusWeeks(1).toDate()) + ".week";
-            if (cpMap.containsKey(keyLastWeek)) {
-                try {
-                    GUITools.setCollapsed(cpMap.get(keyLastWeek), false);
-                } catch (PropertyVetoException e) {
-                    // bah!
-                }
-            }
+            expandTheLast2Weeks();
 
 
 //            for (NReport report : reportList) {
@@ -944,7 +881,7 @@ public class PnlReport extends NursingRecordsPanel {
             if (tbShowReplaced.isSelected() || !nreport.isObsolete()) {
 
                 String title = "<html><table border=\"0\">" +
-                        "<tr align=\"top\">" +
+                        "<tr valign=\"top\">" +
                         "<td width=\"100\" align=\"left\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
                         " " + OPDE.lang.getString("misc.msg.Time.short") +
                         "<br/>" + nreport.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)") +
@@ -1569,6 +1506,58 @@ public class PnlReport extends NursingRecordsPanel {
             pnlMenu.add(btnProcess);
         }
         return pnlMenu;
+    }
+
+    private void expandTheLast2Weeks() {
+        final String keyYear = Integer.toString(new DateTime().getYear()) + ".year";
+        if (cpMap.containsKey(keyYear)) {
+            try {
+                cpMap.get(keyYear).setCollapsed(false);
+            } catch (PropertyVetoException e) {
+                // bah!
+            }
+        }
+        final String keyMonth = monthFormatter.format(new Date()) + ".month";
+        if (cpMap.containsKey(keyMonth)) {
+            try {
+                cpMap.get(keyMonth).setCollapsed(false);
+            } catch (PropertyVetoException e) {
+                // bah!
+            }
+        }
+        final String keyThisWeek = weekFormater.format(new Date()) + ".week";
+        if (cpMap.containsKey(keyThisWeek)) {
+            try {
+                GUITools.setCollapsed(cpMap.get(keyThisWeek), false);
+            } catch (PropertyVetoException e) {
+                // bah!
+            }
+        }
+
+        final String keyLastYear = Integer.toString(new DateMidnight().minusWeeks(1).getYear()) + ".year";
+        if (cpMap.containsKey(keyLastYear)) {
+            try {
+                cpMap.get(keyLastYear).setCollapsed(false);
+            } catch (PropertyVetoException e) {
+                // bah!
+            }
+        }
+        final String keyLastMonth = monthFormatter.format(new DateMidnight().minusWeeks(1).toDate()) + ".month";
+        if (cpMap.containsKey(keyLastMonth)) {
+            try {
+                cpMap.get(keyLastMonth).setCollapsed(false);
+            } catch (PropertyVetoException e) {
+                // bah!
+            }
+        }
+        final String keyLastWeek = weekFormater.format(new DateMidnight().minusWeeks(1).toDate()) + ".week";
+        if (cpMap.containsKey(keyLastWeek)) {
+            try {
+                GUITools.setCollapsed(cpMap.get(keyLastWeek), false);
+            } catch (PropertyVetoException e) {
+                // bah!
+            }
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

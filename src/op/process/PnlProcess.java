@@ -518,7 +518,7 @@ public class PnlProcess extends NursingRecordsPanel {
                                     for (SYSNP2PROCESS att : myProcess.getAttachedNursingProcesses()) {
                                         em.remove(att);
                                     }
-                                    for (SYSINF2PROCESS att : myProcess.getAttachedInfos()) {
+                                    for (SYSINF2PROCESS att : myProcess.getAttachedResInfoConnections()) {
                                         em.remove(att);
                                     }
                                     for (SYSPRE2PROCESS att : myProcess.getAttachedPrescriptionConnections()) {

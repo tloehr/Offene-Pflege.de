@@ -46,14 +46,14 @@ public class ResInfoTools {
      * @param bwinfo
      */
     public static String getHTML(ResInfo bwinfo) {
-        String html = "\n<h2 id=\"fonth2\" >" + bwinfo.getBwinfotyp().getBWInfoKurz() + "</h2>\n<div id=\"fonttext\">";
+        String html = "\n<h2 id=\"fonth2\" >" + bwinfo.getResInfoType().getBWInfoKurz() + "</h2>\n<div id=\"fonttext\">";
         DateFormat df = bwinfo.isSingleIncident() ? DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT) : DateFormat.getDateInstance();
-        html += df.format(bwinfo.getVon()) + (bwinfo.isSingleIncident() ? " " : " &rarr;" + (bwinfo.getBis().equals(SYSConst.DATE_BIS_AUF_WEITERES) ? "|" : " " + df.format(bwinfo.getBis())));
+        html += df.format(bwinfo.getVon()) + (bwinfo.isSingleIncident() ? " " : " &rarr;" + (bwinfo.getTo().equals(SYSConst.DATE_BIS_AUF_WEITERES) ? "|" : " " + df.format(bwinfo.getTo())));
         html += bwinfo.getHtml() + "</div>\n";
 
-        if (!SYSTools.catchNull(bwinfo.getBemerkung()).isEmpty()) {
+        if (!SYSTools.catchNull(bwinfo.getText()).isEmpty()) {
             html += "<p id=\"fonttext\" ><b><u>" + OPDE.lang.getString("misc.msg.comment") + ":</u></b></p>";
-            html += "<p id=\"fonttext\" >" + bwinfo.getBemerkung() + "</p>";
+            html += "<p id=\"fonttext\" >" + bwinfo.getText() + "</p>";
         }
 
         return html;
@@ -61,7 +61,7 @@ public class ResInfoTools {
 
     public static ResInfo getLastBWInfo(Resident bewohner, ResInfoType bwinfotyp) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.von DESC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.from DESC");
         query.setParameter("bewohner", bewohner);
         query.setParameter("bwinfotyp", bwinfotyp);
         query.setFirstResult(0);
@@ -73,7 +73,7 @@ public class ResInfoTools {
 
     public static ResInfo getFirstBWInfo(Resident bewohner, ResInfoType bwinfotyp) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.von DESC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.from DESC");
         query.setParameter("bewohner", bewohner);
         query.setParameter("bwinfotyp", bwinfotyp);
         query.setFirstResult(0);
@@ -84,24 +84,39 @@ public class ResInfoTools {
     }
 
     public static ArrayList<ResInfo> getByResidentAndType(Resident resident, ResInfoType type) {
+        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.von DESC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.from DESC");
         query.setParameter("bewohner", resident);
         query.setParameter("bwinfotyp", type);
         ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
         em.close();
+        SYSTools.showTimeDifference(begin);
+        return resInfos;
+    }
+
+    public static ArrayList<ResInfo> getAll(Resident resident) {
+        long begin = System.currentTimeMillis();
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner ORDER BY b.from DESC");
+        query.setParameter("bewohner", resident);
+        ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
+        em.close();
+        SYSTools.showTimeDifference(begin);
         return resInfos;
     }
 
     public static ArrayList<ResInfo> getActiveBWInfosByBewohnerUndKatArt(Resident bewohner, int katart) {
+        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.bewohner = :bewohner AND b.von <= :von AND b.bis >= :bis AND b.bwinfotyp.resInfokat.katArt = :katart ORDER BY b.von DESC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.from <= :from AND b.to >= :to AND b.bwinfotyp.resInfokat.katArt = :katart ORDER BY b.from DESC");
         query.setParameter("bewohner", bewohner);
         query.setParameter("katart", katart);
-        query.setParameter("von", new Date());
-        query.setParameter("bis", new Date());
+        query.setParameter("from", new Date());
+        query.setParameter("to", new Date());
         ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
         em.close();
+        SYSTools.showTimeDifference(begin);
         return resInfos;
     }
 
@@ -111,11 +126,11 @@ public class ResInfoTools {
         ResInfo firstHauf = getFirstBWInfo(info.getResident(), ResInfoTypeTools.getByID(ResInfoTypeTools.TYP_HEIMAUFNAHME));
 //        min = firstHauf.getFrom();
 
-        if (info.getBwinfotyp().getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
+        if (info.getResInfoType().getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
             return new Pair<Date, Date>(null, null);
         }
 
-        if (info.getBwinfotyp().getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_NOCONSTRAINTS) {
+        if (info.getResInfoType().getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_NOCONSTRAINTS) {
             min = firstHauf.getVon();
             max = new Date();
             return new Pair<Date, Date>(min, max);
@@ -134,7 +149,7 @@ public class ResInfoTools {
 
             try {
                 ResInfo rightElement = sortedInfoList.get(pos + 1);
-                DateTime dtBis = new DateTime(rightElement.getBis());
+                DateTime dtBis = new DateTime(rightElement.getTo());
                 min = dtBis.plusSeconds(1).toDate();
             } catch (IndexOutOfBoundsException e) {
                 min = firstHauf.getVon();
@@ -145,12 +160,12 @@ public class ResInfoTools {
     }
 
 
-    public static boolean isAusgezogen(Resident bewohner) {
+    public static boolean isGone(Resident bewohner) {
         ResInfo bwinfo_hauf = ResInfoTools.getLastBWInfo(bewohner, ResInfoTypeTools.getByID("HAUF"));
         return bwinfo_hauf == null || getContent(bwinfo_hauf).getProperty("hauf").equalsIgnoreCase("ausgezogen");
     }
 
-    public static boolean isVerstorben(Resident bewohner) {
+    public static boolean isDead(Resident bewohner) {
         ResInfo bwinfo_hauf = ResInfoTools.getLastBWInfo(bewohner, ResInfoTypeTools.getByID("HAUF"));
         return bwinfo_hauf != null && getContent(bwinfo_hauf).getProperty("hauf").equalsIgnoreCase("verstorben");
     }
@@ -163,10 +178,10 @@ public class ResInfoTools {
      */
     public static Date absentSince(Resident bewohner) {
         ResInfo lastabsence = getLastBWInfo(bewohner, ResInfoTypeTools.getByID(ResInfoTypeTools.TYP_ABWESENHEIT));
-        return lastabsence == null || lastabsence.isAbgesetzt() ? null : lastabsence.getVon();
+        return lastabsence == null || lastabsence.isClosed() ? null : lastabsence.getVon();
     }
 
-    public static boolean isAbwesend(Resident bewohner) {
+    public static boolean isAway(Resident bewohner) {
         return absentSince(bewohner) != null;
     }
 
@@ -307,7 +322,7 @@ public class ResInfoTools {
 
         try {
             // Erst Struktur...
-            String texts = "<?xml version=\"1.0\"?><xml>" + resInfo.getBwinfotyp().getXml() + "</xml>";
+            String texts = "<?xml version=\"1.0\"?><xml>" + resInfo.getResInfoType().getXml() + "</xml>";
             XMLReader parser = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
             InputSource is = new org.xml.sax.InputSource(new java.io.BufferedReader(new java.io.StringReader(texts)));
             parser.setContentHandler(s);
@@ -459,9 +474,9 @@ public class ResInfoTools {
     }
 
 
-    public static String getUeberleitung(Resident bewohner, boolean withlongheader,
-                                         boolean medi, boolean bilanz, boolean bericht,
-                                         boolean diag, boolean grundpflege, boolean haut, boolean vital) {
+    public static String getTXReport(Resident bewohner, boolean withlongheader,
+                                     boolean medi, boolean bilanz, boolean bericht,
+                                     boolean diag, boolean grundpflege, boolean haut, boolean vital) {
 
         /***
          *      _   _                _
@@ -623,11 +638,11 @@ public class ResInfoTools {
          *     |____/ \___|\__|_|  \___|\__,_|\___|_|
          *
          */
-        if (bewohner.getBetreuer1() != null) {
+        if (bewohner.getLCustodian1() != null) {
             result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.lg") + "</td><td valign=\"top\">";
-            result += BetreuerTools.getFullName(bewohner.getBetreuer1()) + ", " + bewohner.getBetreuer1().getStrasse();
-            result += ", " + bewohner.getBetreuer1().getPlz() + " " + bewohner.getBetreuer1().getOrt();
-            result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + bewohner.getBetreuer1().getTel() + ", " + OPDE.lang.getString("misc.msg.mobilephone") + ": " + bewohner.getBetreuer1().getMobil();
+            result += LCustodianTools.getFullName(bewohner.getLCustodian1()) + ", " + bewohner.getLCustodian1().getStrasse();
+            result += ", " + bewohner.getLCustodian1().getPlz() + " " + bewohner.getLCustodian1().getOrt();
+            result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + bewohner.getLCustodian1().getTel() + ", " + OPDE.lang.getString("misc.msg.mobilephone") + ": " + bewohner.getLCustodian1().getMobil();
 
             result += "</td></tr>";
         }
@@ -874,9 +889,9 @@ public class ResInfoTools {
         if (grundpflege) {
             List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(bewohner, ResInfoCategoryTools.GRUNDPFLEGE);
             if (!bwinfos.isEmpty()) {
-                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getBwinfotyp().getResInfokat().getBezeichnung() + "</h2><div id=\"fonttext\">";
+                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getCategory().getBezeichnung() + "</h2><div id=\"fonttext\">";
                 for (ResInfo bwinfo : bwinfos) {
-                    result += "<b>" + bwinfo.getBwinfotyp().getBWInfoKurz() + "</b><br/>";
+                    result += "<b>" + bwinfo.getResInfoType().getBWInfoKurz() + "</b><br/>";
                     result += bwinfo.getHtml();
                 }
                 result += "</div>";
@@ -895,9 +910,9 @@ public class ResInfoTools {
         if (haut) {
             List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(bewohner, ResInfoCategoryTools.HAUT);
             if (!bwinfos.isEmpty()) {
-                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getBwinfotyp().getResInfokat().getBezeichnung() + "</h2><div id=\"fonttext\">";
+                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getCategory().getBezeichnung() + "</h2><div id=\"fonttext\">";
                 for (ResInfo bwinfo : bwinfos) {
-                    result += "<b>" + bwinfo.getBwinfotyp().getBWInfoKurz() + "</b><br/>";
+                    result += "<b>" + bwinfo.getResInfoType().getBWInfoKurz() + "</b><br/>";
                     result += bwinfo.getHtml();
                 }
                 result += "</div>";
@@ -916,9 +931,9 @@ public class ResInfoTools {
         if (vital) {
             List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(bewohner, ResInfoCategoryTools.VITAL);
             if (!bwinfos.isEmpty()) {
-                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getBwinfotyp().getResInfokat().getBezeichnung() + "</h2><div id=\"fonttext\">";
+                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getCategory().getBezeichnung() + "</h2><div id=\"fonttext\">";
                 for (ResInfo bwinfo : bwinfos) {
-                    result += "<b>" + bwinfo.getBwinfotyp().getBWInfoKurz() + "</b><br/>";
+                    result += "<b>" + bwinfo.getResInfoType().getBWInfoKurz() + "</b><br/>";
                     result += bwinfo.getHtml();
                 }
                 result += "</div>";
@@ -933,7 +948,7 @@ public class ResInfoTools {
     private static String getDiagnosen(Resident bewohner) {
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.bewohner = :bewohner AND b.bwinfotyp = :bwinfotyp AND b.bis > :now ORDER BY b.von DESC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp = :bwinfotyp AND b.to > :now ORDER BY b.from DESC");
         query.setParameter("bewohner", bewohner);
         query.setParameter("bwinfotyp", ResInfoTypeTools.getByID(ResInfoTypeTools.TYP_DIAGNOSE));
         query.setParameter("now", new Date());
@@ -961,7 +976,7 @@ public class ResInfoTools {
     public static void setContent(ResInfo bwinfo, Properties props) {
         try {
             StringWriter writer = new StringWriter();
-            props.store(writer, "[" + bwinfo.getBwinfotyp().getID() + "] " + bwinfo.getBwinfotyp().getBWInfoKurz());
+            props.store(writer, "[" + bwinfo.getResInfoType().getID() + "] " + bwinfo.getResInfoType().getBWInfoKurz());
             bwinfo.setProperties(writer.toString());
             writer.close();
         } catch (IOException ex) {
@@ -981,16 +996,16 @@ public class ResInfoTools {
         return props;
     }
 
-    public static void alleAbsetzen(EntityManager em, Resident bewohner) throws Exception {
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.bewohner = :bewohner AND b.bis >= :now");
+    public static void closeAll(EntityManager em, Resident bewohner) throws Exception {
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.to >= :now");
         query.setParameter("bewohner", bewohner);
         query.setParameter("now", new Date());
         List<ResInfo> bwinfos = query.getResultList();
 
         for (ResInfo info : bwinfos) {
             em.lock(info, LockModeType.OPTIMISTIC);
-            info.setBis(new Date());
-            info.setAbgesetztDurch(em.merge(OPDE.getLogin().getUser()));
+            info.setTo(new Date());
+            info.setUserOFF(em.merge(OPDE.getLogin().getUser()));
         }
     }
 

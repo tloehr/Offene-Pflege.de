@@ -8,23 +8,22 @@
         <class>entity.prescription.Doc</class>
         <class>entity.values.ResValue</class>
         <class>entity.Allowance</class>
-        <class>entity.Betreuer</class>
+        <class>entity.info.LCustodian</class>
         <class>entity.info.Resident</class>
         <class>entity.nursingprocess.DFN</class>
         <class>entity.Homes</class>
         <class>entity.system.Groups</class>
         <class>entity.info.ICD</class>
-        <class>entity.KKasse</class>
+        <class>entity.info.HInsurance</class>
         <class>entity.prescription.Hospital</class>
         <class>entity.nursingprocess.InterventionSchedule</class>
         <class>entity.nursingprocess.Intervention</class>
-        <class>entity.Mitarbeiter</class>
-        <class>entity.PB2User</class>
+        <class>entity.Staff</class>
+        <class>entity.reports.NR2User</class>
         <class>entity.reports.NReportTAGS</class>
         <class>entity.reports.NReport</class>
         <class>entity.nursingprocess.NPControl</class>
         <class>entity.nursingprocess.NursingProcess</class>
-        <class>entity.QSQuery</class>
         <class>entity.Rooms</class>
         <class>entity.Station</class>
         <class>entity.Handover2User</class>
@@ -38,7 +37,6 @@
         <class>entity.info.ResInfo</class>
         <class>entity.info.ResInfoCategory</class>
         <class>entity.info.ResInfoType</class>
-        <class>entity.info.BWInfoVorlagen</class>
         <class>entity.system.SYSGROUPS2ACL</class>
         <class>entity.system.SYSLogin</class>
         <class>entity.system.SYSProps</class>

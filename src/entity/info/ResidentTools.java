@@ -73,21 +73,21 @@ public class ResidentTools {
 //    }
 
     public static String getLabelText(Resident bewohner) {
-        boolean verstorben = ResInfoTools.isVerstorben(bewohner);
-        boolean ausgezogen = ResInfoTools.isVerstorben(bewohner);
+        boolean verstorben = ResInfoTools.isDead(bewohner);
+        boolean ausgezogen = ResInfoTools.isDead(bewohner);
         ResInfo hauf = ResInfoTools.getLastBWInfo(bewohner, ResInfoTypeTools.getByID("hauf"));
 
         DateFormat df = DateFormat.getDateInstance();
         String result = bewohner.getNachname() + ", " + bewohner.getVorname() + " (*" + df.format(bewohner.getGebDatum()) + "), ";
 
         DateMidnight birthdate = new DateTime(bewohner.getGebDatum()).toDateMidnight();
-        DateTime refdate = verstorben ? new DateTime(hauf.getBis()) : new DateTime();
+        DateTime refdate = verstorben ? new DateTime(hauf.getTo()) : new DateTime();
         Years age = Years.yearsBetween(birthdate, refdate);
 
         result += age.getYears() + " " + OPDE.lang.getString("misc.msg.Years") + " [" + bewohner.getRID() + "]";
 
         if (verstorben || ausgezogen) {
-            result += "  " + (verstorben ? OPDE.lang.getString("misc.msg.late") : OPDE.lang.getString("misc.msg.movedout")) + ": " + df.format(hauf.getBis()) + ", ";
+            result += "  " + (verstorben ? OPDE.lang.getString("misc.msg.late") : OPDE.lang.getString("misc.msg.movedout")) + ": " + df.format(hauf.getTo()) + ", ";
         }
 
         return result;
@@ -141,7 +141,7 @@ public class ResidentTools {
         // TODO: Die ganzen Operationen bei Sterben und Ausziehen müssen gemacht werden, wenn der REST fertig ist.
         PrescriptionTools.alleAbsetzen(em, bewohner);
         // Alle Planungen absetzen
-        ResInfoTools.alleAbsetzen(em, bewohner);
+        ResInfoTools.closeAll(em, bewohner);
         // Alle Bestände schließen
         // Alle nicht abgehakten BHPs und DFNs löschen
         // Alle Vorgänge schließen

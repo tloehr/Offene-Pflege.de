@@ -6,7 +6,7 @@ package op.tools;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.Betreuer;
+import entity.info.LCustodian;
 import op.OPDE;
 
 import javax.swing.*;
@@ -18,10 +18,10 @@ import java.awt.event.FocusEvent;
  * @author Torsten Löhr
  */
 public class PnlEditBetreuer extends JPanel {
-    private Betreuer betreuer;
+    private LCustodian LCustodian;
 
-    public PnlEditBetreuer(Betreuer betreuer) {
-        this.betreuer = betreuer;
+    public PnlEditBetreuer(LCustodian LCustodian) {
+        this.LCustodian = LCustodian;
         initComponents();
         initPanel();
 
@@ -41,17 +41,17 @@ public class PnlEditBetreuer extends JPanel {
         lblMobil.setText(OPDE.lang.getString("misc.msg.mobilephone"));
         lblEMAIL.setText(OPDE.lang.getString("misc.msg.email"));
 
-        txtAnrede.setText(betreuer.getAnrede());
-        txtNachname.setText(betreuer.getName());
-        txtVorname.setText(betreuer.getVorname());
-        txtStrasse.setText(betreuer.getStrasse());
-        txtPLZ.setText(betreuer.getPlz());
-        txtOrt.setText(betreuer.getOrt());
-        txtTel.setText(betreuer.getTel());
-        txtPrivate.setText(betreuer.getPrivat());
-        txtFax.setText(betreuer.getFax());
-        txtMobil.setText(SYSTools.catchNull(betreuer.getOrt()));
-        txtEMAIL.setText(SYSTools.catchNull(betreuer.getEMail()));
+        txtAnrede.setText(LCustodian.getAnrede());
+        txtNachname.setText(LCustodian.getName());
+        txtVorname.setText(LCustodian.getVorname());
+        txtStrasse.setText(LCustodian.getStrasse());
+        txtPLZ.setText(LCustodian.getPlz());
+        txtOrt.setText(LCustodian.getOrt());
+        txtTel.setText(LCustodian.getTel());
+        txtPrivate.setText(LCustodian.getPrivat());
+        txtFax.setText(LCustodian.getFax());
+        txtMobil.setText(SYSTools.catchNull(LCustodian.getOrt()));
+        txtEMAIL.setText(SYSTools.catchNull(LCustodian.getEMail()));
 
         FocusAdapter fa = new FocusAdapter() {
             @Override
@@ -73,24 +73,24 @@ public class PnlEditBetreuer extends JPanel {
         txtEMAIL.addFocusListener(fa);
     }
 
-    public Betreuer getBetreuer(){
+    public LCustodian getLCustodian(){
         if (txtNachname.getText().isEmpty()){
             return null;
         }
 
-        betreuer.setAnrede(txtAnrede.getText().trim());
-        betreuer.setName(txtNachname.getText().trim());
-        betreuer.setVorname(txtVorname.getText().trim());
-        betreuer.setStrasse(txtStrasse.getText().trim());
-        betreuer.setPlz(txtPLZ.getText().trim());
-        betreuer.setOrt(txtOrt.getText().trim());
-        betreuer.setTel(txtTel.getText().trim());
-        betreuer.setPrivat(txtPrivate.getText().trim());
-        betreuer.setFax(txtFax.getText().trim());
-        betreuer.setMobil(txtMobil.getText().trim());
-        betreuer.setEMail(txtEMAIL.getText().trim());
+        LCustodian.setAnrede(txtAnrede.getText().trim());
+        LCustodian.setName(txtNachname.getText().trim());
+        LCustodian.setVorname(txtVorname.getText().trim());
+        LCustodian.setStrasse(txtStrasse.getText().trim());
+        LCustodian.setPlz(txtPLZ.getText().trim());
+        LCustodian.setOrt(txtOrt.getText().trim());
+        LCustodian.setTel(txtTel.getText().trim());
+        LCustodian.setPrivat(txtPrivate.getText().trim());
+        LCustodian.setFax(txtFax.getText().trim());
+        LCustodian.setMobil(txtMobil.getText().trim());
+        LCustodian.setEMail(txtEMAIL.getText().trim());
 
-        return betreuer;
+        return LCustodian;
     }
 
     private void initComponents() {
