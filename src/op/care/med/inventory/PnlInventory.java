@@ -519,7 +519,6 @@ public class PnlInventory extends NursingRecordsPanel {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 cpInventory.setContentPane(createContentPanel4(inventory, tbClosedStock.isSelected()));
-
                 try {
                     cpInventory.setCollapsed(false);
                 } catch (PropertyVetoException e1) {
@@ -1316,16 +1315,13 @@ public class PnlInventory extends NursingRecordsPanel {
         cpsInventory.removeAll();
         cpsInventory.setLayout(new JideBoxLayout(cpsInventory, JideBoxLayout.Y_AXIS));
 
-
         int i = 0;
         // for the zebra coloring
         for (MedInventory inventory : lstInventories) {
             cpsInventory.add(cpMap.get(inventory.getID() + ".xinventory"));
             cpMap.get(inventory.getID() + ".xinventory").getContentPane().revalidate();
             cpsInventory.revalidate();
-
         }
-
 
         cpsInventory.addExpansion();
     }

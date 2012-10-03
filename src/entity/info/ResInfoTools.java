@@ -109,7 +109,7 @@ public class ResInfoTools {
     public static ArrayList<ResInfo> getActiveBWInfosByBewohnerUndKatArt(Resident bewohner, int katart) {
         long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.from <= :from AND b.to >= :to AND b.bwinfotyp.resInfokat.katArt = :katart ORDER BY b.from DESC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.from <= :from AND b.to >= :to AND b.bwinfotyp.resInfoCat.katArt = :katart ORDER BY b.from DESC");
         query.setParameter("bewohner", bewohner);
         query.setParameter("katart", katart);
         query.setParameter("from", new Date());
@@ -889,7 +889,7 @@ public class ResInfoTools {
         if (grundpflege) {
             List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(bewohner, ResInfoCategoryTools.GRUNDPFLEGE);
             if (!bwinfos.isEmpty()) {
-                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getCategory().getBezeichnung() + "</h2><div id=\"fonttext\">";
+                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getResInfoCat().getBezeichnung() + "</h2><div id=\"fonttext\">";
                 for (ResInfo bwinfo : bwinfos) {
                     result += "<b>" + bwinfo.getResInfoType().getBWInfoKurz() + "</b><br/>";
                     result += bwinfo.getHtml();
@@ -910,7 +910,7 @@ public class ResInfoTools {
         if (haut) {
             List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(bewohner, ResInfoCategoryTools.HAUT);
             if (!bwinfos.isEmpty()) {
-                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getCategory().getBezeichnung() + "</h2><div id=\"fonttext\">";
+                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getResInfoCat().getBezeichnung() + "</h2><div id=\"fonttext\">";
                 for (ResInfo bwinfo : bwinfos) {
                     result += "<b>" + bwinfo.getResInfoType().getBWInfoKurz() + "</b><br/>";
                     result += bwinfo.getHtml();
@@ -931,7 +931,7 @@ public class ResInfoTools {
         if (vital) {
             List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(bewohner, ResInfoCategoryTools.VITAL);
             if (!bwinfos.isEmpty()) {
-                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getCategory().getBezeichnung() + "</h2><div id=\"fonttext\">";
+                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getResInfoCat().getBezeichnung() + "</h2><div id=\"fonttext\">";
                 for (ResInfo bwinfo : bwinfos) {
                     result += "<b>" + bwinfo.getResInfoType().getBWInfoKurz() + "</b><br/>";
                     result += bwinfo.getHtml();

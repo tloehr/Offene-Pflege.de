@@ -223,7 +223,9 @@ public class GUITools {
 
     public static void setCollapsed(Container root, boolean collapsed) throws PropertyVetoException {
         if (root instanceof CollapsiblePane) {
-            ((CollapsiblePane) root).setCollapsed(collapsed);
+            if (((CollapsiblePane) root).isCollapsible()) {
+                ((CollapsiblePane) root).setCollapsed(collapsed);
+            }
         }
         for (Component component : root.getComponents()) {
             if (component instanceof Container) {

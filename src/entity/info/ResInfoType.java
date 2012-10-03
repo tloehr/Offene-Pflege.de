@@ -68,7 +68,7 @@ public class ResInfoType implements Serializable {
     // ==
     @JoinColumn(name = "BWIKID", referencedColumnName = "BWIKID")
     @ManyToOne
-    private ResInfoCategory resInfokat;
+    private ResInfoCategory resInfoCat;
 
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bwinfotyp")
@@ -114,12 +114,12 @@ public class ResInfoType implements Serializable {
         this.bWInfoLang = bWInfoLang;
     }
 
-    public ResInfoCategory getCategory() {
-        return resInfokat;
+    public ResInfoCategory getResInfoCat() {
+        return resInfoCat;
     }
 
-    public void setResInfokat(ResInfoCategory resInfokat) {
-        this.resInfokat = resInfokat;
+    public void setResInfoCat(ResInfoCategory resInfoCat) {
+        this.resInfoCat = resInfoCat;
     }
 
     public Integer getStatus() {
