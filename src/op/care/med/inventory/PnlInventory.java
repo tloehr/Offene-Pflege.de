@@ -137,8 +137,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
     public void switchResident(Resident resident, MedInventory inventory) {
         this.resident = resident;
-        OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(resident));
-        OPDE.getDisplayManager().clearSubMessages();
+        GUITools.setBWDisplay(resident);
         if (inventory == null) {
             lstInventories = tbClosedInventory.isSelected() ? MedInventoryTools.getAll(resident) : MedInventoryTools.getAllActive(resident);
         } else {

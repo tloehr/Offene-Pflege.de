@@ -300,16 +300,16 @@ public class FrmMain extends JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                    "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
+                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                        "$rgap, $lcgap, pref, $lcgap, default:grow, 2*($lcgap, default), $lcgap, $rgap",
-                        "$rgap, $lgap, pref, $lgap, fill:11dlu, $lgap, fill:15dlu, $lgap, $rgap"));
+                    "$rgap, $lcgap, pref, $lcgap, default:grow, 2*($lcgap, default), $lcgap, $rgap",
+                    "$rgap, $lgap, pref, $lgap, fill:11dlu, $lgap, fill:15dlu, $lgap, $rgap"));
 
                 //---- lblMainMsg ----
                 lblMainMsg.setText("OPDE");
@@ -338,14 +338,14 @@ public class FrmMain extends JFrame {
                 pnlMainMessage.add(btnVerlegung, CC.xywh(3, 3, 1, 3));
 
                 //---- btnExit ----
-                btnExit.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/lock.png")));
+                btnExit.setIcon(new ImageIcon(getClass().getResource("/artwork/48x48/lock.png")));
                 btnExit.setBorder(null);
                 btnExit.setBorderPainted(false);
                 btnExit.setOpaque(false);
                 btnExit.setContentAreaFilled(false);
                 btnExit.setToolTipText("Abmelden");
                 btnExit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnExit.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/lock_pressed.png")));
+                btnExit.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/48x48/lock_pressed.png")));
                 btnExit.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {

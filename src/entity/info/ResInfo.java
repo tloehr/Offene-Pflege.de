@@ -153,7 +153,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
         return bwinfotyp;
     }
 
-    public Date getVon() {
+    public Date getFrom() {
         return from;
     }
 
@@ -298,9 +298,9 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
         if (isSingleIncident()) {
             result += df.format(from);
         } else if (isClosed()) {
-            result += df.format(from) + " &rarr; " + df.format(to);
+            result += df.format(from) + " &raquo; " + df.format(to);
         } else {
-            result += df.format(from) + "&nbsp;&rarr;&nbsp;&raquo;&raquo;";
+            result += df.format(from) + "&nbsp;&raquo;&raquo;";
         }
 
         return result;
@@ -332,7 +332,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
     public int compareTo(ResInfo resInfo) {
         if (resInfo.getResInfoType().getStatus() == ResInfoTypeTools.STATUS_NORMAL) {
             return 0;
-        } else if (getResInfoType().getID().equalsIgnoreCase(ResInfoTypeTools.TYP_DIAGNOSE) || resInfo.getResInfoType().getID().equalsIgnoreCase(ResInfoTypeTools.TYP_DIAGNOSE)) {
+        } else if (getResInfoType().getID().equalsIgnoreCase(ResInfoTypeTools.TYPE_DIAGNOSIS) || resInfo.getResInfoType().getID().equalsIgnoreCase(ResInfoTypeTools.TYPE_DIAGNOSIS)) {
             Properties thisProps = ResInfoTools.getContent(this);
             Properties thatProps = ResInfoTools.getContent(resInfo);
             String thisICD = thisProps.getProperty("icd");

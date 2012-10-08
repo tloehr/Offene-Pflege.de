@@ -184,7 +184,7 @@ public class PnlValues extends NursingRecordsPanel {
     @Override
     public void switchResident(Resident resident) {
         this.resident = resident;
-        OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(resident));
+        GUITools.setBWDisplay(resident);
         reloadDisplay();
     }
 

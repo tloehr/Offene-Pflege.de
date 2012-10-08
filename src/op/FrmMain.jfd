@@ -215,7 +215,7 @@
              <string>icon</string> 
              <object class="com.jformdesigner.model.SwingIcon"> 
               <int>0</int> 
-              <string>/artwork/22x22/bw/lock.png</string> 
+              <string>/artwork/48x48/lock.png</string> 
              </object> 
             </void> 
             <void method="setProperty"> 
@@ -246,7 +246,7 @@
              <string>pressedIcon</string> 
              <object class="com.jformdesigner.model.SwingIcon"> 
               <int>0</int> 
-              <string>/artwork/22x22/bw/lock_pressed.png</string> 
+              <string>/artwork/48x48/lock_pressed.png</string> 
              </object> 
             </void> 
             <void property="name"> 

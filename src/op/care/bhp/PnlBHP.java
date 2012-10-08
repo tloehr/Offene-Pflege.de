@@ -95,7 +95,7 @@ public class PnlBHP extends NursingRecordsPanel {
     public void switchResident(Resident bewohner) {
 
         this.resident = bewohner;
-        OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(bewohner));
+        GUITools.setBWDisplay(resident);
 
         initPhase = true;
         jdcDatum.setMinSelectableDate(DFNTools.getMinDatum(bewohner));

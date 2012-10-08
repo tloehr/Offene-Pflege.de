@@ -52,9 +52,9 @@ public class DisplayManager extends Thread {
         jp.setMaximum(100);
         lblMain = lblM;
         lblSub = lblS;
-        icondead = new ImageIcon(getClass().getResource("/artwork/22x22/cross1.png"));
-        iconaway = new ImageIcon(getClass().getResource("/artwork/22x22/person-away.png"));
-        icongone = new ImageIcon(getClass().getResource("/artwork/22x22/delete_user.png"));
+        icondead = SYSConst.icon22residentDied;
+        iconaway = SYSConst.icon22residentAbsent;
+        icongone = SYSConst.icon22residentGone;
 //        this.lblDB.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/db.png")));
         lblMain.setText(" ");
         lblSub.setText(" ");
@@ -81,15 +81,30 @@ public class DisplayManager extends Thread {
     }
 
     public void setIconDead() {
-        lblMain.setIcon(icondead);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                lblMain.setIcon(icondead);
+            }
+        });
     }
 
     public void setIconGone() {
-        lblMain.setIcon(icongone);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                lblMain.setIcon(icongone);
+            }
+        });
     }
 
     public void setIconAway() {
-        lblMain.setIcon(iconaway);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                lblMain.setIcon(iconaway);
+            }
+        });
     }
 
     public void setProgressBarMessage(DisplayMessage progressBarMessage) {
@@ -198,12 +213,14 @@ public class DisplayManager extends Thread {
                     }
                 } else {
                     isIndeterminate = false;
+                    OPDE.debug("jp.setValue(progressBarMessage.getPercentage())");
                     jp.setValue(progressBarMessage.getPercentage());
                 }
 
                 jp.setString(progressBarMessage.getRawMessage());
             } else {
                 if (jp.getValue() > 0) {
+                    OPDE.debug("jp.setValue(0)");
                     jp.setValue(0);
                     jp.setString(null);
                 }

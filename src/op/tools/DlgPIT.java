@@ -17,12 +17,12 @@ import java.util.Date;
 /**
  * @author Torsten Löhr
  */
-public class DlgUhrzeitDatum extends MyJDialog {
+public class DlgPIT extends MyJDialog {
     private Closure actionBlock;
     private PnlPIT pnlPIT;
     private Date pit;
 
-    public DlgUhrzeitDatum(String text, Closure actionBlock) {
+    public DlgPIT(String text, Closure actionBlock) {
         super();
         this.actionBlock = actionBlock;
         initComponents();

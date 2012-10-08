@@ -567,8 +567,8 @@ public class PnlProcess extends NursingRecordsPanel {
              *
              */
             if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
-                final JButton btnPrint = new JButton(SYSConst.icon22print);
-                btnPrint.setPressedIcon(SYSConst.icon22printPressed);
+                final JButton btnPrint = new JButton(SYSConst.icon22print2);
+                btnPrint.setPressedIcon(SYSConst.icon22print2Pressed);
                 btnPrint.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 btnPrint.setContentAreaFilled(false);
                 btnPrint.setBorder(null);

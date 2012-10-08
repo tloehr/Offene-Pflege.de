@@ -25,14 +25,14 @@ public class ResInfoTypeTools {
     public static final int STATUS_SYSTEM = 10;
     public static final int STATUS_INACTIVE_SYSTEM = -10;
 
-    public static final String TYP_DIAGNOSE = "DIAG";
-    public static final String TYP_HEIMAUFNAHME = "HAUF";
-    public static final String TYP_ABWESENHEIT = "ABWE1";
-    public static final String TYP_KH_AUFENTHALT = "KH";
+    public static final String TYPE_DIAGNOSIS = "DIAG";
+    public static final String TYPE_STAY = "HAUF";
+    public static final String TYPE_ABSENCE = "ABWE1";
+    public static final String TYPE_HOSPITAL_STAY = "KH";
 
-    public static final String ABWE_TYP_KH = "HOSPITAL";
-    public static final String ABWE_TYP_HOLLIDAY = "HOLLIDAY";
-    public static final String ABWE_TYP_OTHER = "OTHER";
+    public static final String TYPE_ABSENCE_HOSPITAL = "HOSPITAL";
+    public static final String TYPE_ABSENCE_HOLLIDAY = "HOLLIDAY";
+    public static final String TYPE_ABSENCE_OTHER = "OTHER";
 
     public static ResInfoType getByID(String id) {
         EntityManager em = OPDE.createEM();

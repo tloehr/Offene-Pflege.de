@@ -75,11 +75,11 @@ public class PnlAbwesend extends JPanel {
         props = ResInfoTools.getContent(abwesenheit);
 
         if (props.containsKey("type")) {
-            if (props.getProperty("type").equals(ResInfoTypeTools.ABWE_TYP_KH)) {
+            if (props.getProperty("type").equals(ResInfoTypeTools.TYPE_ABSENCE_HOSPITAL)) {
                 tab1.setSelectedIndex(TAB_KH);
-            } else if (props.getProperty("type").equals(ResInfoTypeTools.ABWE_TYP_HOLLIDAY)) {
+            } else if (props.getProperty("type").equals(ResInfoTypeTools.TYPE_ABSENCE_HOLLIDAY)) {
                 tab1.setSelectedIndex(TAB_HOLLIDAY);
-            } else if (props.getProperty("type").equals(ResInfoTypeTools.ABWE_TYP_OTHER)) {
+            } else if (props.getProperty("type").equals(ResInfoTypeTools.TYPE_ABSENCE_OTHER)) {
                 tab1.setSelectedIndex(TAB_OTHER);
             }
         } else {
@@ -133,20 +133,20 @@ public class PnlAbwesend extends JPanel {
                 abwesenheit.setHtml("<div id=\"fonttext\"><br/><b><u>" + OPDE.lang.getString("misc.msg.hospital") + "</u></b>" +
                         "<ul><li>" + HospitalTools.getFullName(hospital) + "</li></ul></div>");
 
-                props.put("type", ResInfoTypeTools.ABWE_TYP_KH);
+                props.put("type", ResInfoTypeTools.TYPE_ABSENCE_HOSPITAL);
                 props.put("khid", hospital.getKhid().toString());
                 break;
             }
             case TAB_HOLLIDAY: {
                 abwesenheit.setText(txtHolliday.getText().trim());
                 abwesenheit.setHtml("<div id=\"fonttext\"><i>" + OPDE.lang.getString("misc.msg.holliday") + "</i></div>");
-                props.put("type", ResInfoTypeTools.ABWE_TYP_HOLLIDAY);
+                props.put("type", ResInfoTypeTools.TYPE_ABSENCE_HOLLIDAY);
                 break;
             }
             case TAB_OTHER: {
                 abwesenheit.setText(txtOther.getText().trim());
                 abwesenheit.setHtml("<div id=\"fonttext\"><i>" + OPDE.lang.getString("misc.msg.otherreasons") + "</i></div>");
-                props.put("type", ResInfoTypeTools.ABWE_TYP_OTHER);
+                props.put("type", ResInfoTypeTools.TYPE_ABSENCE_OTHER);
                 break;
             }
             default: {

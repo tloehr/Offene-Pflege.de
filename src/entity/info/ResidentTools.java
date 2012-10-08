@@ -139,9 +139,10 @@ public class ResidentTools {
     public static void endOfStay(EntityManager em, Resident bewohner, Date enddate) throws Exception {
         em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
         // TODO: Die ganzen Operationen bei Sterben und Ausziehen müssen gemacht werden, wenn der REST fertig ist.
-        PrescriptionTools.alleAbsetzen(em, bewohner);
+        PrescriptionTools.closeAll(em, bewohner);
         // Alle Planungen absetzen
         ResInfoTools.closeAll(em, bewohner);
+
         // Alle Bestände schließen
         // Alle nicht abgehakten BHPs und DFNs löschen
         // Alle Vorgänge schließen

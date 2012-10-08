@@ -727,7 +727,7 @@ public class PrescriptionTools {
         BHPTools.cleanup(em, verordnung);
     }
 
-    public static void alleAbsetzen(EntityManager em, Resident resident) throws Exception {
+    public static void closeAll(EntityManager em, Resident resident) throws Exception {
         Query query = em.createQuery("SELECT b FROM Prescription b WHERE b.resident = :resident AND b.to >= :now");
         query.setParameter("resident", resident);
         query.setParameter("now", new Date());

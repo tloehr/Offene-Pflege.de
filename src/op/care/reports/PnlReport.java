@@ -209,7 +209,7 @@ public class PnlReport extends NursingRecordsPanel {
     @Override
     public void switchResident(Resident bewohner) {
         this.resident = bewohner;
-        OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(bewohner));
+        GUITools.setBWDisplay(resident);
 //        txtSearch.setText(null);
 //        firstReport = NReportTools.getFirstReport(resident);
 //        jdcVon.setMaxSelectableDate(new Date());

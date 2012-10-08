@@ -329,8 +329,8 @@ public class PnlAllowance extends CleanablePanel {
          *     |_|   |_|  |_|_| |_|\__|_| \_\___||___/_|\__,_|\___|_| |_|\__|
          *
          */
-        final JButton btnPrintResident = new JButton(SYSConst.icon22print);
-        btnPrintResident.setPressedIcon(SYSConst.icon22printPressed);
+        final JButton btnPrintResident = new JButton(SYSConst.icon22print2);
+        btnPrintResident.setPressedIcon(SYSConst.icon22print2Pressed);
         btnPrintResident.setAlignmentX(Component.RIGHT_ALIGNMENT);
         btnPrintResident.setContentAreaFilled(false);
         btnPrintResident.setBorder(null);
@@ -524,8 +524,8 @@ public class PnlAllowance extends CleanablePanel {
          *     |_|   |_|  |_|_| |_|\__||_|\___|\__,_|_|
          *
          */
-        final JButton btnPrintYear = new JButton(SYSConst.icon22print);
-        btnPrintYear.setPressedIcon(SYSConst.icon22printPressed);
+        final JButton btnPrintYear = new JButton(SYSConst.icon22print2);
+        btnPrintYear.setPressedIcon(SYSConst.icon22print2Pressed);
         btnPrintYear.setAlignmentX(Component.RIGHT_ALIGNMENT);
         btnPrintYear.setContentAreaFilled(false);
         btnPrintYear.setBorder(null);
@@ -714,8 +714,8 @@ public class PnlAllowance extends CleanablePanel {
          *     |_|   |_|  |_|_| |_|\__|_|  |_|\___/|_| |_|\__|_| |_|
          *
          */
-        final JButton btnPrintMonth = new JButton(SYSConst.icon22print);
-        btnPrintMonth.setPressedIcon(SYSConst.icon22printPressed);
+        final JButton btnPrintMonth = new JButton(SYSConst.icon22print2);
+        btnPrintMonth.setPressedIcon(SYSConst.icon22print2Pressed);
         btnPrintMonth.setAlignmentX(Component.RIGHT_ALIGNMENT);
         btnPrintMonth.setContentAreaFilled(false);
         btnPrintMonth.setBorder(null);
@@ -1112,8 +1112,8 @@ public class PnlAllowance extends CleanablePanel {
                  *     |_____\__,_|_|\__|
                  *
                  */
-                final JButton btnEdit = new JButton(SYSConst.icon22edit1);
-                btnEdit.setPressedIcon(SYSConst.icon22edit1Pressed);
+                final JButton btnEdit = new JButton(SYSConst.icon22edit3);
+                btnEdit.setPressedIcon(SYSConst.icon22edit3Pressed);
                 btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 btnEdit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 btnEdit.setContentAreaFilled(false);

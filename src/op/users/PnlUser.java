@@ -449,7 +449,7 @@ public class PnlUser extends CleanablePanel {
          *     |_.__/ \__|_| |_|_|   |_|  |_|_| |_|\__|
          *
          */
-        JideButton btnPrint = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.print"), SYSConst.icon22print, new ActionListener() {
+        JideButton btnPrint = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.print"), SYSConst.icon22print2, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
 

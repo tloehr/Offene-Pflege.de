@@ -30,7 +30,6 @@ import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import entity.info.Resident;
-import entity.info.ResidentTools;
 import entity.files.SYSFiles;
 import entity.files.SYSFilesTools;
 import op.OPDE;
@@ -62,19 +61,19 @@ import java.util.Collections;
 public class PnlFiles extends NursingRecordsPanel {
     public static final String internalClassID = "nursingrecords.files";
     private JPopupMenu menu;
-    private Resident bewohner;
+    private Resident resident;
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
 
     /**
      * Creates new form PnlFiles
      */
-    public PnlFiles(Resident bewohner, JScrollPane jspSearch) {
+    public PnlFiles(Resident resident, JScrollPane jspSearch) {
         initComponents();
         this.jspSearch = jspSearch;
 
         initPanel();
-        switchResident(bewohner);
+        switchResident(resident);
     }
 
 
@@ -90,9 +89,9 @@ public class PnlFiles extends NursingRecordsPanel {
     }
 
     @Override
-    public void switchResident(Resident bewohner) {
-        this.bewohner = bewohner;
-        OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(bewohner));
+    public void switchResident(Resident resident) {
+        this.resident = resident;
+        GUITools.setBWDisplay(resident);
         reloadTable();
     }
 
@@ -105,7 +104,7 @@ public class PnlFiles extends NursingRecordsPanel {
 
         EntityManager em = OPDE.createEM();
         Query query = em.createNamedQuery("SYSFiles.findByBWKennung", SYSFiles.class);
-        query.setParameter("bewohner", bewohner);
+        query.setParameter("bewohner", resident);
         ArrayList<SYSFiles> files = new ArrayList<SYSFiles>(query.getResultList());
         Collections.sort(files);
         em.close();
@@ -351,7 +350,7 @@ public class PnlFiles extends NursingRecordsPanel {
 
         mypanel.add(GUITools.getDropPanel(new FileDrop.Listener() {
             public void filesDropped(java.io.File[] files) {
-                java.util.List<SYSFiles> successful = SYSFilesTools.putFiles(files, bewohner);
+                java.util.List<SYSFiles> successful = SYSFilesTools.putFiles(files, resident);
                 if (!successful.isEmpty()) {
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage(successful.size() + " " + OPDE.lang.getString("misc.msg.Files") + " " + OPDE.lang.getString("misc.msg.added")));
                 }

@@ -3,6 +3,7 @@ package entity.info;
 import entity.*;
 import entity.prescription.DocTools;
 import entity.prescription.PrescriptionTools;
+import entity.reports.NReport;
 import entity.reports.NReportTools;
 import entity.values.ResValue;
 import entity.values.ResValueTools;
@@ -48,7 +49,7 @@ public class ResInfoTools {
     public static String getHTML(ResInfo bwinfo) {
         String html = "\n<h2 id=\"fonth2\" >" + bwinfo.getResInfoType().getBWInfoKurz() + "</h2>\n<div id=\"fonttext\">";
         DateFormat df = bwinfo.isSingleIncident() ? DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT) : DateFormat.getDateInstance();
-        html += df.format(bwinfo.getVon()) + (bwinfo.isSingleIncident() ? " " : " &rarr;" + (bwinfo.getTo().equals(SYSConst.DATE_BIS_AUF_WEITERES) ? "|" : " " + df.format(bwinfo.getTo())));
+        html += df.format(bwinfo.getFrom()) + (bwinfo.isSingleIncident() ? " " : " &rarr;" + (bwinfo.getTo().equals(SYSConst.DATE_BIS_AUF_WEITERES) ? "|" : " " + df.format(bwinfo.getTo())));
         html += bwinfo.getHtml() + "</div>\n";
 
         if (!SYSTools.catchNull(bwinfo.getText()).isEmpty()) {
@@ -120,10 +121,17 @@ public class ResInfoTools {
         return resInfos;
     }
 
-    public static Pair<Date, Date> getMinMaxAusdehnung(ResInfo info, ArrayList<ResInfo> sortedInfoList) {
+    /**
+     * calculates how much a given info can be period extended within a given sorted list of (other) infos including
+     * the given one.
+     * @param info
+     * @param sortedInfoList
+     * @return
+     */
+    public static Pair<Date, Date> getMinMaxExpansion(ResInfo info, ArrayList<ResInfo> sortedInfoList) {
         Date min = null, max = null;
 
-        ResInfo firstHauf = getFirstBWInfo(info.getResident(), ResInfoTypeTools.getByID(ResInfoTypeTools.TYP_HEIMAUFNAHME));
+        ResInfo firstHauf = getFirstBWInfo(info.getResident(), ResInfoTypeTools.getByID(ResInfoTypeTools.TYPE_STAY));
 //        min = firstHauf.getFrom();
 
         if (info.getResInfoType().getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
@@ -131,7 +139,7 @@ public class ResInfoTools {
         }
 
         if (info.getResInfoType().getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_NOCONSTRAINTS) {
-            min = firstHauf.getVon();
+            min = firstHauf.getFrom();
             max = new Date();
             return new Pair<Date, Date>(min, max);
         }
@@ -141,7 +149,7 @@ public class ResInfoTools {
             int pos = sortedInfoList.indexOf(info);
             try {
                 ResInfo leftElement = sortedInfoList.get(pos - 1);
-                DateTime dtVon = new DateTime(leftElement.getVon());
+                DateTime dtVon = new DateTime(leftElement.getFrom());
                 max = dtVon.minusSeconds(1).toDate();
             } catch (IndexOutOfBoundsException e) {
                 max = new Date();
@@ -152,7 +160,7 @@ public class ResInfoTools {
                 DateTime dtBis = new DateTime(rightElement.getTo());
                 min = dtBis.plusSeconds(1).toDate();
             } catch (IndexOutOfBoundsException e) {
-                min = firstHauf.getVon();
+                min = firstHauf.getFrom();
             }
         }
 
@@ -177,12 +185,16 @@ public class ResInfoTools {
      * @return Date of the departure. null if not away.
      */
     public static Date absentSince(Resident bewohner) {
-        ResInfo lastabsence = getLastBWInfo(bewohner, ResInfoTypeTools.getByID(ResInfoTypeTools.TYP_ABWESENHEIT));
-        return lastabsence == null || lastabsence.isClosed() ? null : lastabsence.getVon();
+        ResInfo lastabsence = getLastBWInfo(bewohner, ResInfoTypeTools.getByID(ResInfoTypeTools.TYPE_ABSENCE));
+        return lastabsence == null || lastabsence.isClosed() ? null : lastabsence.getFrom();
     }
 
     public static boolean isAway(Resident bewohner) {
         return absentSince(bewohner) != null;
+    }
+
+    public static boolean isChangeable(ResInfo resInfo) {
+        return resInfo.getResident().isActive() && (!resInfo.isClosed() || resInfo.isNoConstraints() || resInfo.isSingleIncident());
     }
 
 //    /**
@@ -612,7 +624,7 @@ public class ResInfoTools {
         ResInfo bwinfo_hauf = ResInfoTools.getLastBWInfo(bewohner, ResInfoTypeTools.getByID("HAUF"));
         if (bwinfo_hauf != null) {
             result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.movein") + "</td><td valign=\"top\">";
-            result += "<b>" + df.format(bwinfo_hauf.getVon()) + "</b>";
+            result += "<b>" + df.format(bwinfo_hauf.getFrom()) + "</b>";
             result += "</td></tr>";
         }
 
@@ -950,7 +962,7 @@ public class ResInfoTools {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp = :bwinfotyp AND b.to > :now ORDER BY b.from DESC");
         query.setParameter("bewohner", bewohner);
-        query.setParameter("bwinfotyp", ResInfoTypeTools.getByID(ResInfoTypeTools.TYP_DIAGNOSE));
+        query.setParameter("bwinfotyp", ResInfoTypeTools.getByID(ResInfoTypeTools.TYPE_DIAGNOSIS));
         query.setParameter("now", new Date());
         List<ResInfo> diags = query.getResultList();
         em.close();
