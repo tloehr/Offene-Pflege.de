@@ -28,51 +28,51 @@ import java.util.List;
 @Table(name = "Planung")
 @NamedQueries({
         @NamedQuery(name = "Planung.findAll", query = "SELECT p FROM NursingProcess p"),
-        @NamedQuery(name = "Planung.findByPlanID", query = "SELECT p FROM NursingProcess p WHERE p.planID = :planID"),
+        @NamedQuery(name = "Planung.findByPlanID", query = "SELECT p FROM NursingProcess p WHERE p.id = :planID"),
         @NamedQuery(name = "Planung.findByVorgang", query = " "
                 + " SELECT p FROM NursingProcess p "
-                + " JOIN p.attachedVorgaenge av"
+                + " JOIN p.attachedQProcessConnections av"
                 + " JOIN av.vorgang v"
                 + " WHERE v = :vorgang "),
-        @NamedQuery(name = "Planung.findByStichwort", query = "SELECT p FROM NursingProcess p WHERE p.stichwort = :stichwort"),
+        @NamedQuery(name = "Planung.findByStichwort", query = "SELECT p FROM NursingProcess p WHERE p.topic = :stichwort"),
         @NamedQuery(name = "Planung.findByVon", query = "SELECT p FROM NursingProcess p WHERE p.von = :von"),
-        @NamedQuery(name = "Planung.findByBis", query = "SELECT p FROM NursingProcess p WHERE p.bis = :bis"),
-        @NamedQuery(name = "Planung.findByPlanKennung", query = "SELECT p FROM NursingProcess p WHERE p.planKennung = :planKennung"),
-        @NamedQuery(name = "Planung.findByNKontrolle", query = "SELECT p FROM NursingProcess p WHERE p.nKontrolle = :nKontrolle")})
+        @NamedQuery(name = "Planung.findByBis", query = "SELECT p FROM NursingProcess p WHERE p.to = :bis"),
+        @NamedQuery(name = "Planung.findByPlanKennung", query = "SELECT p FROM NursingProcess p WHERE p.npseries = :planKennung"),
+        @NamedQuery(name = "Planung.findByNKontrolle", query = "SELECT p FROM NursingProcess p WHERE p.nextEval = :nKontrolle")})
 public class NursingProcess implements Serializable, QProcessElement, Comparable<NursingProcess>, Cloneable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PlanID")
-    private Long planID;
+    private Long id;
     @Basic(optional = false)
     @Column(name = "Stichwort")
-    private String stichwort;
+    private String topic;
     @Lob
     @Column(name = "Situation")
     private String situation;
     @Lob
     @Column(name = "Ziel")
-    private String ziel;
+    private String goal;
     //    @Basic(optional = false)
 //    @Column(name = "BWIKID")
 //    private long bwikid;
     @Basic(optional = false)
     @Column(name = "Von")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date von;
+    private Date from;
     @Basic(optional = false)
     @Column(name = "Bis")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date bis;
+    private Date to;
     @Basic(optional = false)
     @Column(name = "PlanKennung")
-    private long planKennung;
+    private long npseries;
     @Basic(optional = false)
     @Column(name = "NKontrolle")
     @Temporal(TemporalType.DATE)
-    private Date nKontrolle;
+    private Date nextEval;
     @Version
     @Column(name = "version")
     private Long version;
@@ -82,22 +82,22 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
     // ==
     @JoinColumn(name = "AnUKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users angesetztDurch;
+    private Users userON;
     @JoinColumn(name = "AbUKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users abgesetztDurch;
+    private Users userOFF;
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
     private Resident resident;
     @JoinColumn(name = "BWIKID", referencedColumnName = "BWIKID")
     @ManyToOne
-    private ResInfoCategory kategorie;
+    private ResInfoCategory category;
 
     // ==
     // 1:N Relationen
     // ==
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
-    private Collection<SYSNP2PROCESS> attachedVorgaenge;
+    private Collection<SYSNP2PROCESS> attachedQProcessConnections;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
     private Collection<NPControl> kontrollen;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
@@ -109,31 +109,30 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
 
     public NursingProcess(Resident bewohner) {
         this.resident = bewohner;
-        this.angesetztDurch = OPDE.getLogin().getUser();
+        this.userON = OPDE.getLogin().getUser();
         interventionSchedules = new ArrayList<InterventionSchedule>();
         kontrollen = new ArrayList<NPControl>();
-        attachedVorgaenge = new ArrayList<SYSNP2PROCESS>();
-        nKontrolle = new DateTime().plusWeeks(4).toDate();
-        von = new Date();
-        bis = SYSConst.DATE_BIS_AUF_WEITERES;
-        this.planKennung = -1l;
+        attachedQProcessConnections = new ArrayList<SYSNP2PROCESS>();
+        nextEval = new DateTime().plusWeeks(4).toDate();
+        from = new Date();
+        to = SYSConst.DATE_BIS_AUF_WEITERES;
+        this.npseries = -1l;
     }
 
-    public Long getPlanID() {
-        return planID;
+    @Override
+    public long getID() {
+        if (id == null){
+            return 0;
+        }
+        return id;
     }
 
-    public void setPlanID(Long planID) {
-        this.planID = planID;
+    public String getTopic() {
+        return topic;
     }
 
-
-    public String getStichwort() {
-        return stichwort;
-    }
-
-    public void setStichwort(String stichwort) {
-        this.stichwort = stichwort;
+    public void setTopic(String stichwort) {
+        this.topic = stichwort;
     }
 
     public String getSituation() {
@@ -144,61 +143,61 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
         this.situation = situation;
     }
 
-    public String getZiel() {
-        return ziel;
+    public String getGoal() {
+        return goal;
     }
 
-    public void setZiel(String ziel) {
-        this.ziel = ziel;
+    public void setGoal(String ziel) {
+        this.goal = ziel;
     }
 
-    public Date getVon() {
-        return von;
+    public Date getFrom() {
+        return from;
     }
 
-    public void setVon(Date von) {
-        this.von = von;
+    public void setFrom(Date von) {
+        this.from = von;
     }
 
-    public Date getBis() {
-        return bis;
+    public Date getTo() {
+        return to;
     }
 
-    public void setBis(Date bis) {
-        this.bis = bis;
+    public void setTo(Date bis) {
+        this.to = bis;
     }
 
 
-    public long getPlanKennung() {
-        return planKennung;
+    public long getNPSeries() {
+        return npseries;
     }
 
-    public void setPlanKennung(long planKennung) {
-        this.planKennung = planKennung;
+    public void setNPSeries(long planKennung) {
+        this.npseries = planKennung;
     }
 
-    public Date getNKontrolle() {
-        return nKontrolle;
+    public Date getNextEval() {
+        return nextEval;
     }
 
-    public void setNKontrolle(Date nKontrolle) {
-        this.nKontrolle = nKontrolle;
+    public void setNextEval(Date nKontrolle) {
+        this.nextEval = nKontrolle;
     }
 
-    public Users getAbgesetztDurch() {
-        return abgesetztDurch;
+    public Users getUserOFF() {
+        return userOFF;
     }
 
-    public void setAbgesetztDurch(Users abgesetztDurch) {
-        this.abgesetztDurch = abgesetztDurch;
+    public void setUserOFF(Users abgesetztDurch) {
+        this.userOFF = abgesetztDurch;
     }
 
-    public Users getAngesetztDurch() {
-        return angesetztDurch;
+    public Users getUserON() {
+        return userON;
     }
 
-    public void setAngesetztDurch(Users angesetztDurch) {
-        this.angesetztDurch = angesetztDurch;
+    public void setUserON(Users angesetztDurch) {
+        this.userON = angesetztDurch;
     }
 
     public Resident getResident() {
@@ -209,23 +208,23 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
         this.resident = bewohner;
     }
 
-    public ResInfoCategory getKategorie() {
-        return kategorie;
+    public ResInfoCategory getCategory() {
+        return category;
     }
 
-    public void setKategorie(ResInfoCategory kategorie) {
-        this.kategorie = kategorie;
+    public void setCategory(ResInfoCategory kategorie) {
+        this.category = kategorie;
     }
 
-    public Collection<SYSNP2PROCESS> getAttachedVorgaenge() {
-        return attachedVorgaenge;
+    public Collection<SYSNP2PROCESS> getAttachedQProcessConnections() {
+        return attachedQProcessConnections;
     }
 
-    public boolean isAbgesetzt() {
-        return bis.before(SYSConst.DATE_BIS_AUF_WEITERES);
+    public boolean isClosed() {
+        return to.before(SYSConst.DATE_BIS_AUF_WEITERES);
     }
 
-    public Collection<NPControl> getKontrollen() {
+    public Collection<NPControl> getEvaluations() {
         return kontrollen;
     }
 
@@ -235,12 +234,12 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
 
     @Override
     public String getTitle() {
-        return stichwort;
+        return topic;
     }
 
     @Override
     public long getPITInMillis() {
-        return von.getTime();
+        return from.getTime();
     }
 
     @Override
@@ -255,20 +254,20 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
         return "<html>not yet</html>";
     }
 
-    @Override
-    public long getID() {
-        return planID;
-    }
+//    @Override
+//    public long getID() {
+//        return id;
+//    }
 
     @Override
     public Users getUser() {
-        return angesetztDurch;
+        return userON;
     }
 
     @Override
     public ArrayList<QProcess> getAttachedProcesses() {
         ArrayList<QProcess> list = new ArrayList<QProcess>();
-        for (SYSNP2PROCESS att : attachedVorgaenge) {
+        for (SYSNP2PROCESS att : attachedQProcessConnections) {
             list.add(att.getVorgang());
         }
         return list;
@@ -278,7 +277,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (planID != null ? planID.hashCode() : 0);
+        hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
 
@@ -289,7 +288,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
             return false;
         }
         NursingProcess other = (NursingProcess) object;
-        if ((this.planID == null && other.planID != null) || (this.planID != null && !this.planID.equals(other.planID))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
         return true;
@@ -297,34 +296,34 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
 
     @Override
     public int compareTo(NursingProcess nursingProcess) {
-        if (stichwort.compareTo(nursingProcess.getStichwort()) != 0) {
-            return stichwort.compareTo(nursingProcess.getStichwort());
+        if (topic.compareTo(nursingProcess.getTopic()) != 0) {
+            return topic.compareTo(nursingProcess.getTopic());
         }
 
-        return von.compareTo(nursingProcess.getVon());
+        return from.compareTo(nursingProcess.getFrom());
     }
 
-    public NursingProcess(String stichwort, String situation, String ziel, Date von, Date bis, long planKennung, Date nKontrolle, Long version, Users angesetztDurch, Users abgesetztDurch, Resident bewohner, ResInfoCategory kategorie, Collection<SYSNP2PROCESS> attachedVorgaenge, Collection<NPControl> kontrollen, List<InterventionSchedule> interventionSchedules) {
-        this.stichwort = stichwort;
+    public NursingProcess(String topic, String situation, String goal, Date from, Date to, long npseries, Date nextEval, Long version, Users userON, Users userOFF, Resident bewohner, ResInfoCategory category, Collection<SYSNP2PROCESS> attachedQProcessConnections, Collection<NPControl> kontrollen, List<InterventionSchedule> interventionSchedules) {
+        this.topic = topic;
         this.situation = situation;
-        this.ziel = ziel;
-        this.von = von;
-        this.bis = bis;
-        this.planKennung = planKennung;
-        this.nKontrolle = nKontrolle;
+        this.goal = goal;
+        this.from = from;
+        this.to = to;
+        this.npseries = npseries;
+        this.nextEval = nextEval;
         this.version = version;
-        this.angesetztDurch = angesetztDurch;
-        this.abgesetztDurch = abgesetztDurch;
+        this.userON = userON;
+        this.userOFF = userOFF;
         this.resident = bewohner;
-        this.kategorie = kategorie;
-        this.attachedVorgaenge = attachedVorgaenge;
+        this.category = category;
+        this.attachedQProcessConnections = attachedQProcessConnections;
         this.kontrollen = kontrollen;
         this.interventionSchedules = interventionSchedules;
     }
 
     @Override
     public NursingProcess clone() {
-        NursingProcess myNewNP = new NursingProcess(stichwort, situation, ziel, von, bis, planKennung, nKontrolle, 0l, angesetztDurch, abgesetztDurch, resident, kategorie, new ArrayList<SYSNP2PROCESS>(), new ArrayList<NPControl>(), new ArrayList<InterventionSchedule>());
+        NursingProcess myNewNP = new NursingProcess(topic, situation, goal, from, to, npseries, nextEval, 0l, userON, userOFF, resident, category, new ArrayList<SYSNP2PROCESS>(), new ArrayList<NPControl>(), new ArrayList<InterventionSchedule>());
         for (InterventionSchedule is : interventionSchedules) {
             InterventionSchedule myIS = is.clone();
             myIS.setNursingProcess(myNewNP);
@@ -335,6 +334,6 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
 
     @Override
     public String toString() {
-        return "entity.nursingprocess.Planung[planID=" + planID + "]";
+        return "entity.nursingprocess.Planung[planID=" + id + "]";
     }
 }

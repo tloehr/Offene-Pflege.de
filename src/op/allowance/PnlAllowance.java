@@ -66,6 +66,7 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -396,12 +397,11 @@ public class PnlAllowance extends CleanablePanel {
 
     private JPanel createContentPanel4(final Resident resident) {
         JPanel pnlContent = new JPanel(new VerticalLayout());
-        // TODO: Fix this. what happens if there are not allowances at all yet ?
-        Pair<Allowance, Allowance> minmax = AllowanceTools.getMinMax(resident);
+        Pair<Date, Date> minmax = AllowanceTools.getMinMax(resident);
 
         if (minmax != null) {
-            DateMidnight start = new DateMidnight(minmax.getFirst().getDate()).dayOfMonth().withMinimumValue();
-            DateMidnight end = resident.isActive() ? new DateMidnight() : new DateMidnight(minmax.getSecond().getDate()).dayOfMonth().withMinimumValue();
+            DateMidnight start = new DateMidnight(minmax.getFirst()).dayOfMonth().withMinimumValue();
+            DateMidnight end = resident.isActive() ? new DateMidnight() : new DateMidnight(minmax.getSecond()).dayOfMonth().withMinimumValue();
             if (!resident.equals(currentResident)) {
                 OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(resident));
                 currentResident = resident;

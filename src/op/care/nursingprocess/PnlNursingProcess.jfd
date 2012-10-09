@@ -35,7 +35,7 @@
            </void> 
           </object> 
           <void property="name"> 
-           <string>cpPlan</string> 
+           <string>cpsPlan</string> 
           </void> 
          </object> 
         </void> 

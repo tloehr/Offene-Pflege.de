@@ -374,7 +374,7 @@ public class PnlProcess extends NursingRecordsPanel {
                                         }
                                         em.lock(myProcess, LockModeType.OPTIMISTIC);
 
-                                        PReport pReport = em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_CLOSE), PReportTools.PREPORT_TYPE_CLOSE, qProcess));
+                                        PReport pReport = em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_CLOSE), PReportTools.PREPORT_TYPE_CLOSE, myProcess));
 
                                         myProcess.setTo(new Date());
                                         myProcess.getPReports().add(pReport);

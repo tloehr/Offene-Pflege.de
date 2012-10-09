@@ -1,14 +1,16 @@
 package entity.info;
 
-import entity.*;
+import entity.HomesTools;
 import entity.prescription.DocTools;
 import entity.prescription.PrescriptionTools;
-import entity.reports.NReport;
 import entity.reports.NReportTools;
 import entity.values.ResValue;
 import entity.values.ResValueTools;
 import op.OPDE;
-import op.tools.*;
+import op.tools.InfoTreeNodeBean;
+import op.tools.Pair;
+import op.tools.RiskBean;
+import op.tools.SYSTools;
 import org.joda.time.DateTime;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -40,25 +42,25 @@ import java.util.*;
  */
 public class ResInfoTools {
 
-    /**
-     * Eine kompakte HTML Darstellung aus der aktuellen ResInfo
-     * Inkl. Bemerkungsfeld.
-     *
-     * @param bwinfo
-     */
-    public static String getHTML(ResInfo bwinfo) {
-        String html = "\n<h2 id=\"fonth2\" >" + bwinfo.getResInfoType().getBWInfoKurz() + "</h2>\n<div id=\"fonttext\">";
-        DateFormat df = bwinfo.isSingleIncident() ? DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT) : DateFormat.getDateInstance();
-        html += df.format(bwinfo.getFrom()) + (bwinfo.isSingleIncident() ? " " : " &rarr;" + (bwinfo.getTo().equals(SYSConst.DATE_BIS_AUF_WEITERES) ? "|" : " " + df.format(bwinfo.getTo())));
-        html += bwinfo.getHtml() + "</div>\n";
-
-        if (!SYSTools.catchNull(bwinfo.getText()).isEmpty()) {
-            html += "<p id=\"fonttext\" ><b><u>" + OPDE.lang.getString("misc.msg.comment") + ":</u></b></p>";
-            html += "<p id=\"fonttext\" >" + bwinfo.getText() + "</p>";
-        }
-
-        return html;
-    }
+//    /**
+//     * Eine kompakte HTML Darstellung aus der aktuellen ResInfo
+//     * Inkl. Bemerkungsfeld.
+//     *
+//     * @param bwinfo
+//     */
+//    public static String getHTML(ResInfo bwinfo) {
+//        String html = "\n<h2 id=\"fonth2\" >" + bwinfo.getResInfoType().getShortDescription() + "</h2>\n<div id=\"fonttext\">";
+//        DateFormat df = bwinfo.isSingleIncident() ? DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT) : DateFormat.getDateInstance();
+//        html += df.format(bwinfo.getFrom()) + (bwinfo.isSingleIncident() ? " " : " &rarr;" + (bwinfo.getTo().equals(SYSConst.DATE_BIS_AUF_WEITERES) ? "|" : " " + df.format(bwinfo.getTo())));
+//        html += bwinfo.getHtml() + "</div>\n";
+//
+//        if (!SYSTools.catchNull(bwinfo.getText()).isEmpty()) {
+//            html += "<p id=\"fonttext\" ><b><u>" + OPDE.lang.getString("misc.msg.comment") + ":</u></b></p>";
+//            html += "<p id=\"fonttext\" >" + bwinfo.getText() + "</p>";
+//        }
+//
+//        return html;
+//    }
 
     public static ResInfo getLastBWInfo(Resident bewohner, ResInfoType bwinfotyp) {
         EntityManager em = OPDE.createEM();
@@ -110,7 +112,7 @@ public class ResInfoTools {
     public static ArrayList<ResInfo> getActiveBWInfosByBewohnerUndKatArt(Resident bewohner, int katart) {
         long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.from <= :from AND b.to >= :to AND b.bwinfotyp.resInfoCat.katArt = :katart ORDER BY b.from DESC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.from <= :from AND b.to >= :to AND b.bwinfotyp.resInfoCat.catType = :katart ORDER BY b.from DESC");
         query.setParameter("bewohner", bewohner);
         query.setParameter("katart", katart);
         query.setParameter("from", new Date());
@@ -121,9 +123,32 @@ public class ResInfoTools {
         return resInfos;
     }
 
+    public static String getResInfosAsHTML(List<ResInfo> resInfos, boolean withClosed, boolean withlongheader, String subtitle) {
+        String html = "";
+
+        if (!resInfos.isEmpty()) {
+            html += "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.info") + (withlongheader ? " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getLabelText(resInfos.get(0).getResident()) : "") + "</h2>\n";
+            html += SYSTools.catchNull(subtitle).isEmpty() ? "" : "<h3 id=\"fonth3\" >" + subtitle + "</h3>\n";
+            html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>"
+                    + "<th>Info</th><th>Text</th>\n</tr>";
+            for (ResInfo resInfo : resInfos) {
+                if (withClosed || !resInfo.isClosed()) {
+                    html += "<tr>";
+                    html += "<td valign=\"top\">" + resInfo.getPITAsHTML() + "</td>";
+                    html += "<td valign=\"top\">" + resInfo.getHtml() + "</td>";
+                    html += "</tr>\n";
+                }
+            }
+            html += "</table>\n";
+        }
+
+        return html;
+    }
+
     /**
      * calculates how much a given info can be period extended within a given sorted list of (other) infos including
      * the given one.
+     *
      * @param info
      * @param sortedInfoList
      * @return
@@ -577,43 +602,6 @@ public class ResInfoTools {
         result += "</b></td></tr>";
 
         /***
-         *      ____  _ _                    _______ ___  ____   _____
-         *     | __ )(_) | __ _ _ __  ____  / /_   _/ _ \|  _ \ / _ \ \
-         *     |  _ \| | |/ _` | '_ \|_  / | |  | || | | | | | | | | | |
-         *     | |_) | | | (_| | | | |/ /  | |  | || |_| | |_| | |_| | |
-         *     |____/|_|_|\__,_|_| |_/___| | |  |_| \___/|____/ \___/| |
-         *                                  \_\                     /_/
-         */
-//        boolean bilanzdurchbwinfo = false;
-//        int trinkmin = 0;
-//        int trinkmax = 0;
-//        if (bilanz) {
-//            ResInfo bwinfo4 = new ResInfo(bwkennung, "CONTROL", SYSCalendar.nowDBDate());
-//            if (bwinfo4.getAttribute().size() > 0) {
-//                HashMap antwort = (HashMap) ((HashMap) bwinfo4.getAttribute().get(0)).get("antwort");
-//                bilanzdurchbwinfo = antwort.get("c.bilanz").toString().equalsIgnoreCase("true");
-//
-//                boolean minkontrolle = antwort.get("c.einfuhr").toString().equalsIgnoreCase("true");
-//                boolean maxkontrolle = antwort.get("c.ueber").toString().equalsIgnoreCase("true");
-//                if (minkontrolle || maxkontrolle) {
-//                    trinkmin = Integer.parseInt(antwort.get("c.einfmenge").toString());
-//                    trinkmax = Integer.parseInt(antwort.get("c.uebermenge").toString());
-//                    result += "<tr><td valign=\"top\">Trinkmenge</td><td valign=\"top\">";
-//                    if (minkontrolle) {
-//                        result += "Die Trinkmenge sollte nicht <b><u>unter</u> " + trinkmin + " ml in 24h</b> liegen.<br/>";
-//                    }
-//                    if (maxkontrolle) {
-//                        result += "Die Trinkmenge sollte nicht <b><u>über</u> " + trinkmax + " ml in 24h</b> liegen.";
-//                    }
-//                    result += "</td></tr>";
-//                }
-//            }
-//            bwinfo4.cleanup();
-//        }
-//        bilanzdurchbwinfo &= bilanz;
-
-
-        /***
          *      _   _    _   _   _ _____
          *     | | | |  / \ | | | |  ___|
          *     | |_| | / _ \| | | | |_
@@ -752,7 +740,7 @@ public class ResInfoTools {
                     + " ORDER BY p.pit DESC ");
             query.setParameter("bewohner", bewohner);
             query.setParameter("von", new DateTime().toDateMidnight().minusDays(7).toDate());
-            result += NReportTools.getBerichteAsHTML(query.getResultList(), true, false, null,null);
+            result += NReportTools.getReportsAsHTML(query.getResultList(), true, false, null, null);
             em.close();
 
         }
@@ -835,11 +823,11 @@ public class ResInfoTools {
             } else if (hateinfuhren) {
 
 
-                String s = " SELECT PIT, SUM(Wert) EINFUHR FROM ResValue "
-                        + "   WHERE ReplacedBy = 0 AND Wert > 0 AND BWKennung=? AND XML='<LIQUIDBALANCE/>' "
-                        + "   AND DATE(PIT) >= ADDDATE(DATE(now()), INTERVAL -7 DAY) "
-                        + "   Group By DATE(PIT) "
-                        + " ORDER BY PIT desc";
+//                String s = " SELECT PIT, SUM(Wert) EINFUHR FROM ResValue "
+//                        + "   WHERE ReplacedBy = 0 AND Wert > 0 AND BWKennung=? AND XML='<LIQUIDBALANCE/>' "
+//                        + "   AND DATE(PIT) >= ADDDATE(DATE(now()), INTERVAL -7 DAY) "
+//                        + "   Group By DATE(PIT) "
+//                        + " ORDER BY PIT desc";
 
 
                 EntityManager em = OPDE.createEM();
@@ -901,9 +889,9 @@ public class ResInfoTools {
         if (grundpflege) {
             List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(bewohner, ResInfoCategoryTools.GRUNDPFLEGE);
             if (!bwinfos.isEmpty()) {
-                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getResInfoCat().getBezeichnung() + "</h2><div id=\"fonttext\">";
+                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getResInfoCat().getText() + "</h2><div id=\"fonttext\">";
                 for (ResInfo bwinfo : bwinfos) {
-                    result += "<b>" + bwinfo.getResInfoType().getBWInfoKurz() + "</b><br/>";
+                    result += "<b>" + bwinfo.getResInfoType().getShortDescription() + "</b><br/>";
                     result += bwinfo.getHtml();
                 }
                 result += "</div>";
@@ -922,9 +910,9 @@ public class ResInfoTools {
         if (haut) {
             List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(bewohner, ResInfoCategoryTools.HAUT);
             if (!bwinfos.isEmpty()) {
-                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getResInfoCat().getBezeichnung() + "</h2><div id=\"fonttext\">";
+                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getResInfoCat().getText() + "</h2><div id=\"fonttext\">";
                 for (ResInfo bwinfo : bwinfos) {
-                    result += "<b>" + bwinfo.getResInfoType().getBWInfoKurz() + "</b><br/>";
+                    result += "<b>" + bwinfo.getResInfoType().getShortDescription() + "</b><br/>";
                     result += bwinfo.getHtml();
                 }
                 result += "</div>";
@@ -943,9 +931,9 @@ public class ResInfoTools {
         if (vital) {
             List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(bewohner, ResInfoCategoryTools.VITAL);
             if (!bwinfos.isEmpty()) {
-                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getResInfoCat().getBezeichnung() + "</h2><div id=\"fonttext\">";
+                result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getResInfoCat().getText() + "</h2><div id=\"fonttext\">";
                 for (ResInfo bwinfo : bwinfos) {
-                    result += "<b>" + bwinfo.getResInfoType().getBWInfoKurz() + "</b><br/>";
+                    result += "<b>" + bwinfo.getResInfoType().getShortDescription() + "</b><br/>";
                     result += bwinfo.getHtml();
                 }
                 result += "</div>";
@@ -988,7 +976,7 @@ public class ResInfoTools {
     public static void setContent(ResInfo bwinfo, Properties props) {
         try {
             StringWriter writer = new StringWriter();
-            props.store(writer, "[" + bwinfo.getResInfoType().getID() + "] " + bwinfo.getResInfoType().getBWInfoKurz());
+            props.store(writer, "[" + bwinfo.getResInfoType().getID() + "] " + bwinfo.getResInfoType().getShortDescription());
             bwinfo.setProperties(writer.toString());
             writer.close();
         } catch (IOException ex) {
@@ -1008,15 +996,15 @@ public class ResInfoTools {
         return props;
     }
 
-    public static void closeAll(EntityManager em, Resident bewohner) throws Exception {
+    public static void closeAll(EntityManager em, Resident bewohner, Date enddate) throws Exception {
         Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.to >= :now");
         query.setParameter("bewohner", bewohner);
-        query.setParameter("now", new Date());
+        query.setParameter("now", enddate);
         List<ResInfo> bwinfos = query.getResultList();
 
         for (ResInfo info : bwinfos) {
             em.lock(info, LockModeType.OPTIMISTIC);
-            info.setTo(new Date());
+            info.setTo(enddate);
             info.setUserOFF(em.merge(OPDE.getLogin().getUser()));
         }
     }

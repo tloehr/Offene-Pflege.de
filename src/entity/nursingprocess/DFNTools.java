@@ -97,7 +97,7 @@ public class DFNTools {
                     // das sind die mit Gültigkeit BAW oder Gültigkeit endet irgendwann in der Zukunft.
                     // Das heisst, wenn eine Planungen heute endet, dann wird sie dennoch eingetragen.
                     // Also alle, die bis EINSCHLIESSLICH heute gültig sind.
-                    " WHERE p.von <= :von AND p.bis >= :bis " +
+                    " WHERE p.von <= :von AND p.to >= :bis " +
                     // und nur diejenigen, deren Referenzdatum nicht in der Zukunft liegt.
                     " AND mt.lDatum <= :ldatum AND p.resident.adminonly <> 2 " +
                     " ORDER BY mt.termID ");
@@ -119,7 +119,7 @@ public class DFNTools {
             Query forceQuery = em.createQuery(" UPDATE DFN d "
                     + " SET d.soll = :now "
                     + " WHERE d.floating = TRUE AND d.status = :status AND d.soll < :now1 "
-                    + " AND d.nursingProcess.von < :now2 AND d.nursingProcess.bis > :now3 ");
+                    + " AND d.nursingProcess.von < :now2 AND d.nursingProcess.to > :now3 ");
             forceQuery.setParameter("now", targetdate.toDate());
             forceQuery.setParameter("now1", targetdate.toDate());
             forceQuery.setParameter("now2", targetdate.toDate());
@@ -198,7 +198,7 @@ public class DFNTools {
 //                OPDE.debug("==========================================");
 //                OPDE.debug("MassTermin: " + termin.getTermID());
 //                OPDE.debug("BWKennung: " + termin.getNursingProcess().getResident().getRID());
-//                OPDE.debug("PlanID: " + termin.getNursingProcess().getPlanID());
+//                OPDE.debug("PlanID: " + termin.getNursingProcess().getID());
 
                 boolean treffer = false;
                 DateMidnight ldatum = new DateMidnight(termin.getLDatum());
@@ -506,7 +506,7 @@ public class DFNTools {
     public static String getInterventionAsHTML(DFN dfn) {
         String result = SYSConst.html_div_open;
 
-        if (dfn.getNursingProcess() != null && dfn.getNursingProcess().isAbgesetzt()) {
+        if (dfn.getNursingProcess() != null && dfn.getNursingProcess().isClosed()) {
             result += "<s>";
         }
         result += "<b>" + dfn.getIntervention().getBezeichnung() + "</b>";
@@ -516,12 +516,12 @@ public class DFNTools {
         if (dfn.getNursingProcess() == null) { // on demand
             result += " " + OPDE.lang.getString(PnlDFN.internalClassID + ".ondemand");
         } else {
-            result += " <font color=\"blue\">(" + dfn.getNursingProcess().getKategorie().getBezeichnung() + "</font>)";
+            result += " <font color=\"blue\">(" + dfn.getNursingProcess().getCategory().getText() + "</font>)";
         }
 
         result += "</font>";
 
-        if (dfn.getNursingProcess() != null && dfn.getNursingProcess().isAbgesetzt()) {
+        if (dfn.getNursingProcess() != null && dfn.getNursingProcess().isClosed()) {
             result += "</s>";
         }
 
@@ -563,7 +563,7 @@ public class DFNTools {
         boolean residentAbsent = dfn.getResident().isActive() && ResInfoTools.absentSince(dfn.getResident()) != null;
 
         return !residentAbsent && dfn.getResident().isActive() &&
-                (dfn.isOnDemand() || dfn.getNursingProcess().getBis().after(new Date())) && // prescription is active or it is unassigned
+                (dfn.isOnDemand() || dfn.getNursingProcess().getTo().after(new Date())) && // prescription is active or it is unassigned
                 (dfn.getUser() == null ||
                         (dfn.getUser().equals(OPDE.getLogin().getUser()) &&
                                 Minutes.minutesBetween(new DateTime(dfn.getMdate()), new DateTime()).getMinutes() < DFN_MAX_MINUTES_TO_WITHDRAW));

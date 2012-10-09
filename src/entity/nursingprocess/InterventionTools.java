@@ -1,13 +1,21 @@
 package entity.nursingprocess;
 
 import entity.EntityTools;
+import entity.info.Resident;
+import entity.prescription.MedInventory;
+import entity.prescription.MedStock;
+import entity.prescription.MedStockTools;
+import entity.prescription.MedStockTransactionTools;
 import op.OPDE;
+import op.care.med.inventory.PnlInventory;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
+import java.util.Date;
 import java.util.List;
 
 /**

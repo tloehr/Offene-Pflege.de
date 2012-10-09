@@ -64,7 +64,7 @@ public class PnlSelectIntervention extends JPanel {
         });
 
         cmbArt.setModel(new DefaultComboBoxModel(new String[]{"Pflege","Verordungen"}));
-        cmbKategorie.setModel(new DefaultComboBoxModel(ResInfoCategoryTools.getCategoriesForNursingProcess().toArray()));
+        cmbKategorie.setModel(new DefaultComboBoxModel(ResInfoCategoryTools.getAll4NP().toArray()));
     }
 
     private void txtSearchActionPerformed(ActionEvent e) {

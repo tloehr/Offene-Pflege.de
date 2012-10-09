@@ -208,7 +208,7 @@ public class FrmCtrlMonitor extends javax.swing.JFrame {
 //            @Override
 //            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
 //
-//                return new DefaultListCellRenderer().getListCellRendererComponent(jList, ((NReportTAGS) o).getBezeichnung(), i, isSelected, cellHasFocus);
+//                return new DefaultListCellRenderer().getListCellRendererComponent(jList, ((NReportTAGS) o).getText(), i, isSelected, cellHasFocus);
 //            }
 //        });
 //        SYSPropsTools.restoreState(this.getClass().getName() + ":cmbTags", cmbTags);

@@ -144,7 +144,7 @@ public class PnlEval extends JPanel {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".datexx"), DisplayMessage.WARNING));
             return;
         }
-        np.setNKontrolle(jdcNextEval.getDate());
+        np.setNextEval(jdcNextEval.getDate());
         actionBlock.execute(new Pair<NursingProcess, String>(np, txtBemerkung.getText()));
     }//GEN-LAST:event_btnOKActionPerformed
 

@@ -98,7 +98,7 @@ public class ResInfoType implements Serializable {
         this.xml = xml;
     }
 
-    public String getBWInfoKurz() {
+    public String getShortDescription() {
         return bWInfoKurz;
     }
 
@@ -106,7 +106,7 @@ public class ResInfoType implements Serializable {
         this.bWInfoKurz = bWInfoKurz;
     }
 
-    public String getBWInfoLang() {
+    public String getLongDescription() {
         return bWInfoLang;
     }
 

@@ -41,7 +41,6 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Properties;
 
 /**
  * @author tloehr
@@ -296,11 +295,28 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
         DateFormat df = isSingleIncident() || isBySecond() ? DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT) : DateFormat.getDateInstance();
 
         if (isSingleIncident()) {
-            result += df.format(from);
+            result += df.format(from) +
+                    "<br/>" +
+                    userON.getFullname();
         } else if (isClosed()) {
-            result += df.format(from) + " &raquo; " + df.format(to);
+
+            result += "<table id=\"fonttext\" border=\"0\" cellspacing=\"0\">";
+            result += "<tr>";
+            result += "<td valign=\"top\">" + df.format(from) + "</td>";
+            result += "<td valign=\"top\">&raquo;</td>";
+            result += "<td valign=\"top\">" + df.format(to) + "</td>";
+            result += "</tr>\n";
+            result += "<tr>";
+            result += "<td valign=\"top\">" + userON.getFullname()+ "</td>";
+            result += "<td valign=\"top\">&raquo;</td>";
+            result += "<td valign=\"top\">" + userOFF.getFullname() + "</td>";
+            result += "</tr>\n";
+            result += "</table>\n";
+
         } else {
-            result += df.format(from) + "&nbsp;&raquo;&raquo;";
+            result += df.format(from) + "&nbsp;&raquo;&raquo;" +
+                    "<br/>" +
+                    userON.getFullname();
         }
 
         return result;
@@ -330,22 +346,23 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
 
     @Override
     public int compareTo(ResInfo resInfo) {
-        if (resInfo.getResInfoType().getStatus() == ResInfoTypeTools.STATUS_NORMAL) {
-            return 0;
-        } else if (getResInfoType().getID().equalsIgnoreCase(ResInfoTypeTools.TYPE_DIAGNOSIS) || resInfo.getResInfoType().getID().equalsIgnoreCase(ResInfoTypeTools.TYPE_DIAGNOSIS)) {
-            Properties thisProps = ResInfoTools.getContent(this);
-            Properties thatProps = ResInfoTools.getContent(resInfo);
-            String thisICD = thisProps.getProperty("icd");
-            String thatICD = thatProps.getProperty("icd");
-            return thisICD.compareTo(thatICD);
-        } else {
-            return 0;
-        }
+        return from.compareTo(resInfo.getFrom()) * -1;
+//        if (resInfo.getResInfoType().getStatus() == ResInfoTypeTools.STATUS_NORMAL) {
+//            return 0;
+//        } else if (getResInfoType().getID().equalsIgnoreCase(ResInfoTypeTools.TYPE_DIAGNOSIS) || resInfo.getResInfoType().getID().equalsIgnoreCase(ResInfoTypeTools.TYPE_DIAGNOSIS)) {
+//            Properties thisProps = ResInfoTools.getContent(this);
+//            Properties thatProps = ResInfoTools.getContent(resInfo);
+//            String thisICD = thisProps.getProperty("icd");
+//            String thatICD = thatProps.getProperty("icd");
+//            return thisICD.compareTo(thatICD);
+//        } else {
+//            return 0;
+//        }
     }
 
     @Override
     public String getTitle() {
-        return bwinfotyp.getBWInfoKurz();
+        return bwinfotyp.getShortDescription();
     }
 
     @Override

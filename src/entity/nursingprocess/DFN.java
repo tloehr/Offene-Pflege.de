@@ -322,7 +322,7 @@ public class DFN implements Serializable, Comparable<DFN> {
         }
         if (result == 0) {
             if (this.getNursingProcess() != null){
-                result = this.nursingProcess.getPlanID().compareTo(other.getNursingProcess().getPlanID());
+                result = this.nursingProcess.getID().compareTo(other.getNursingProcess().getID());
             }
         }
         if (result == 0) {

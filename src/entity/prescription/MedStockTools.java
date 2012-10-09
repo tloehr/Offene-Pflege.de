@@ -153,7 +153,7 @@ public class MedStockTools {
 //
 //        result = SYSPrint.EPL2_CLEAR_IMAGE_BUFFER;
 //        result += SYSPrint.EPL2_labelformat(57, 19, 3);
-//        result += SYSPrint.EPL2_print_ascii(5, 5, 0, SYSPrint.EPL2_FONT_7pt, 1, 1, false, DarreichungTools.toPrettyString(bestand.getTradeForm())); // bestand.getTradeForm().getMedProduct().getBezeichnung() + " " + bestand.getTradeForm().getSubtext())
+//        result += SYSPrint.EPL2_print_ascii(5, 5, 0, SYSPrint.EPL2_FONT_7pt, 1, 1, false, DarreichungTools.toPrettyString(bestand.getTradeForm())); // bestand.getTradeForm().getMedProduct().getText() + " " + bestand.getTradeForm().getSubtext())
 //        if (!SYSTools.catchNull(bestand.getPackage().getPzn()).equals("")) {
 //            result += SYSPrint.EPL2_print_ascii(5, 30, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, "PZN:" + bestand.getPackage().getPzn() + "  Datum:" + DateFormat.getDateInstance().format(bestand.getEin()) + " (" + bestand.getUser().getUID() + ")");
 //        }

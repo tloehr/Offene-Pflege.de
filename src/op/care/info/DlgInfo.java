@@ -96,7 +96,7 @@ public class DlgInfo extends MyJDialog {
             contentPanel.add(new JScrollPane(txtBemerkung), CC.xywh(1, 3, 3, 1, CC.FILL, CC.FILL));
         }
 
-        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.createnew") + ": " + resInfo.getResInfoType().getBWInfoKurz(), 10));
+        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.createnew") + ": " + resInfo.getResInfoType().getShortDescription(), 10));
     }
 
     private void btnCancelActionPerformed(ActionEvent e) {
@@ -113,7 +113,7 @@ public class DlgInfo extends MyJDialog {
 
         try {
             StringWriter writer = new StringWriter();
-            content.store(writer, "[" + resInfo.getResInfoType().getID() + "] " + resInfo.getResInfoType().getBWInfoKurz());
+            content.store(writer, "[" + resInfo.getResInfoType().getID() + "] " + resInfo.getResInfoType().getShortDescription());
             resInfo.setProperties(writer.toString());
             OPDE.debug(writer.toString());
             writer.close();

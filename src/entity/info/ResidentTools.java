@@ -5,7 +5,10 @@
 package entity.info;
 
 import entity.EntityTools;
+import entity.nursingprocess.NursingProcessTools;
+import entity.prescription.MedInventoryTools;
 import entity.prescription.PrescriptionTools;
+import entity.process.QProcessTools;
 import op.OPDE;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
@@ -134,18 +137,15 @@ public class ResidentTools {
      * end all open periods of any kind. Plans, Medication etc.
      *
      * @param em       as it is quite a complex operation, it runs within a surrounding EM to trigger rollbacks if necessary
-     * @param bewohner the resident in question
+     * @param resident the resident in question
      */
-    public static void endOfStay(EntityManager em, Resident bewohner, Date enddate) throws Exception {
-        em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-        // TODO: Die ganzen Operationen bei Sterben und Ausziehen müssen gemacht werden, wenn der REST fertig ist.
-        PrescriptionTools.closeAll(em, bewohner);
-        // Alle Planungen absetzen
-        ResInfoTools.closeAll(em, bewohner);
-
-        // Alle Bestände schließen
-        // Alle nicht abgehakten BHPs und DFNs löschen
-        // Alle Vorgänge schließen
+    public static void endOfStay(EntityManager em, Resident resident, Date enddate) throws Exception {
+        em.lock(em.merge(resident), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+        PrescriptionTools.closeAll(em, resident, enddate);
+        NursingProcessTools.closeAll(em, resident, enddate);
+        ResInfoTools.closeAll(em, resident, enddate);
+        MedInventoryTools.closeAll(em, resident, enddate);
+        QProcessTools.closeAll(em, resident, enddate);
     }
 
 

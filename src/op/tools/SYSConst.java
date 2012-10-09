@@ -167,6 +167,15 @@ public class SYSConst {
             SYSTools.getColor("FFFDFD"), SYSTools.getColor("FFFDFD")
     };
 
+    public static Color[] red2 = new Color[]{
+            SYSTools.getColor("B9264F"), SYSTools.getColor("D73E68"),
+            SYSTools.getColor("DD597D"), SYSTools.getColor("E37795"),
+            SYSTools.getColor("E994AB"), SYSTools.getColor("EDA9BC"),
+            SYSTools.getColor("F0B9C8"), SYSTools.getColor("F4CAD6"),
+            SYSTools.getColor("F8DAE2"), SYSTools.getColor("FAE7EC"),
+            SYSTools.getColor("FEFAFB"), SYSTools.getColor("FEFAFB")
+    };
+
     public static Color[] orange1 = new Color[]{
             SYSTools.getColor("FF800D"), SYSTools.getColor("FF9C42"),
             SYSTools.getColor("FFAC62"), SYSTools.getColor("FFBD82"),
@@ -458,8 +467,11 @@ public class SYSConst {
     public static final Icon icon22ledGreenOn = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ledgreen.png"));
     public static final Icon icon22ledGreenOff = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/leddarkgreen.png"));
     public static final Icon icon22ledOrangeOn = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ledorange.png"));
+    public static final Icon icon22ledOrangeOff = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/leddarkorange.png"));
     public static final Icon icon22ledPurpleOn = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ledpurple.png"));
-    public static final Icon icon22ledBlueOn = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ledblue.png"));
+    public static final Icon icon22ledPurpleOff = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/leddarkpurple.png"));
+    public static final Icon icon22ledBlueOn = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ledlightblue.png"));
+    public static final Icon icon22ledBlueOff = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/leddarkblue.png"));
 
 
 

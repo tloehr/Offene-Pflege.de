@@ -18,6 +18,7 @@ import org.joda.time.DateTime;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.awt.color.ColorSpace;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
@@ -185,7 +186,7 @@ public class NReportTools {
         return html;
     }
 
-    public static String getBerichteAsHTML(List<NReport> berichte, boolean specialsOnly, boolean withlongheader, String subtitle, String highlight) {
+    public static String getReportsAsHTML(List<NReport> berichte, boolean specialsOnly, boolean withlongheader, String subtitle, String highlight) {
         String html = "";
         boolean ihavesomethingtoshow = false;
 
@@ -217,7 +218,7 @@ public class NReportTools {
         if (nReport.isReplaced() || nReport.isDeleted()) {
             color = SYSConst.html_lightslategrey;
         } else {
-            color = OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(nReport.getPit())] + "_FGBHP");
+            color = "color=\"black\"";// OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(nReport.getPit())] + "_FGBHP");
         }
         return color;
     }

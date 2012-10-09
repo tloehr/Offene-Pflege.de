@@ -35,7 +35,6 @@ import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
 import entity.info.Resident;
-import entity.info.ResidentTools;
 import entity.nursingprocess.*;
 import op.OPDE;
 import op.care.nursingprocess.PnlSelectIntervention;
@@ -251,7 +250,7 @@ public class PnlDFN extends NursingRecordsPanel {
             for (DFN dfn : shiftMAPDFN.get(shift)) {
 //                OPDE.debug(bhp.getPrescription().getVerid());
 //                OPDE.debug(currentPrescription != null ? currentPrescription.getVerid() : "null");
-                if (currentNP == null || dfn.getNursingProcess().getPlanID().longValue() != currentNP.getPlanID().longValue()) {
+                if (currentNP == null || dfn.getNursingProcess().getID().longValue() != currentNP.getID().longValue()) {
                     if (currentNP != null) {
                         npPane.setContentPane(npPanel);
                         shiftOuterPanel.add(npPane);
@@ -260,7 +259,7 @@ public class PnlDFN extends NursingRecordsPanel {
                     npPanel = new JPanel();
                     npPanel.setLayout(new VerticalLayout());
 //                    npPanel.setBackground(dfn.getBG());
-                    npPane = new CollapsiblePane(SYSTools.toHTMLForScreen("<html>" + (currentNP.isAbgesetzt() ? "<s>" : "") + currentNP.getStichwort() + (currentNP.isAbgesetzt() ? "</s>" : "") + " (" + currentNP.getKategorie().getBezeichnung() + ")" + "</html>"));
+                    npPane = new CollapsiblePane(SYSTools.toHTMLForScreen("<html>" + (currentNP.isClosed() ? "<s>" : "") + currentNP.getTopic() + (currentNP.isClosed() ? "</s>" : "") + " (" + currentNP.getCategory().getText() + ")" + "</html>"));
                     npPane.setCollapsible(false);
                     npPane.setBackground(SYSCalendar.getBGSHIFT(shift).darker()); // a little darker
                     npPane.setForeground(SYSCalendar.getFGSHIFT(shift));
@@ -331,7 +330,7 @@ public class PnlDFN extends NursingRecordsPanel {
         final CollapsiblePane dfnPane = new CollapsiblePane();
 //        String fg = SYSConst.html_grey50;
 //        if (dfn.getNursingProcess() != null) {
-//            fg = "#" + dfn.getNursingProcess().getKategorie().getFgcontent();
+//            fg = "#" + dfn.getNursingProcess().getCategory().getFgcontent();
 //        }
 
         /***

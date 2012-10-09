@@ -237,8 +237,8 @@ public class AllowanceTools {
      * @param resident
      * @return
      */
-    public static Pair<Allowance, Allowance> getMinMax(Resident resident) {
-        Pair<Allowance, Allowance> result = null;
+    public static Pair<Date, Date> getMinMax(Resident resident) {
+        Pair<Date, Date> result = null;
 
         EntityManager em = OPDE.createEM();
         Query queryMin = em.createQuery("SELECT al FROM Allowance al WHERE al.resident = :resident ORDER BY al.date ASC ");
@@ -249,13 +249,19 @@ public class AllowanceTools {
         queryMax.setParameter("resident", resident);
         queryMax.setMaxResults(1);
 
-        try {
-            ArrayList<Allowance> min = new ArrayList<Allowance>(queryMin.getResultList());
-            ArrayList<Allowance> max = new ArrayList<Allowance>(queryMax.getResultList());
-            result = new Pair<Allowance, Allowance>(min.get(0), max.get(0));
-        } catch (Exception e) {
-            OPDE.fatal(e);
+        if (queryMax.getResultList().isEmpty()) { // if queryMax is empty, then queryMin must also be empty, too
+            result = new Pair<Date, Date>(new Date(), new Date());
+        } else {
+
+            try {
+                ArrayList<Allowance> min = new ArrayList<Allowance>(queryMin.getResultList());
+                ArrayList<Allowance> max = new ArrayList<Allowance>(queryMax.getResultList());
+                result = new Pair<Date, Date>(min.get(0).getDate(), max.get(0).getDate());
+            } catch (Exception e) {
+                OPDE.fatal(e);
+            }
         }
+        em.close();
         return result;
     }
 
@@ -263,7 +269,7 @@ public class AllowanceTools {
     public static String getOverallSumAsHTML(int monthsback) {
         DecimalFormat cf = new DecimalFormat("######.00");
         Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
-        String html = "<h1  align=\"center\" id=\"fonth1\">"+OPDE.lang.getString(PnlAllowance.internalClassID+".overallsum")+"</h1>";
+        String html = "<h1  align=\"center\" id=\"fonth1\">" + OPDE.lang.getString(PnlAllowance.internalClassID + ".overallsum") + "</h1>";
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT SUM(al.amount) FROM Allowance al WHERE al.date <= :end");
@@ -273,14 +279,14 @@ public class AllowanceTools {
 
         html += "<table>";
 
-        for (DateMidnight end = new DateMidnight().dayOfMonth().withMaximumValue(); end.isAfter(from); end = end.minusMonths(1)){
+        for (DateMidnight end = new DateMidnight().dayOfMonth().withMaximumValue(); end.isAfter(from); end = end.minusMonths(1)) {
             query.setParameter("end", end.toDate());
             BigDecimal bd = (BigDecimal) query.getSingleResult();
 
             String fonttext = end.getMonthOfYear() % 2 == 0 ? "fonttext" : "fonttextgray";
 
 
-            html += "<tr><td id=\""+fonttext+"\" width=\"300\" align=\"right\">"+monthFormatter.format(end.toDate())+"</td><td  id=\""+fonttext+"\"  width=\"100\" align=\"right\">"+cf.format(bd)+" &euro;</td></tr>";
+            html += "<tr><td id=\"" + fonttext + "\" width=\"300\" align=\"right\">" + monthFormatter.format(end.toDate()) + "</td><td  id=\"" + fonttext + "\"  width=\"100\" align=\"right\">" + cf.format(bd) + " &euro;</td></tr>";
         }
 
         html += "</table>";

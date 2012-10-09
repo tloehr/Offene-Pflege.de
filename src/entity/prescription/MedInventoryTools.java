@@ -2,6 +2,7 @@ package entity.prescription;
 
 import entity.info.Resident;
 import op.OPDE;
+import op.care.med.inventory.PnlInventory;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
@@ -13,10 +14,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.math.BigDecimal;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -356,6 +354,29 @@ public class MedInventoryTools {
         em.close();
 
         return result;
+    }
+
+     public static void closeAll(EntityManager em, Resident resident, Date enddate) throws Exception {
+        Query query = em.createQuery("SELECT i FROM MedInventory i WHERE i.resident = :resident AND i.to >= :now");
+        query.setParameter("resident", resident);
+        query.setParameter("now", enddate);
+        java.util.List<MedInventory> inventories = query.getResultList();
+
+        for (MedInventory inventory : inventories) {
+            MedInventory myInventory = em.merge(inventory);
+            em.lock(myInventory, LockModeType.OPTIMISTIC);
+
+            // close all stocks
+            for (MedStock stock : myInventory.getMedStocks()) {
+                if (!stock.isClosed()) {
+                    MedStock mystock = em.merge(stock);
+                    em.lock(mystock, LockModeType.OPTIMISTIC);
+                    MedStockTools.close(em, mystock, OPDE.lang.getString(PnlInventory.internalClassID + ".stock.msg.inventory_closed"), MedStockTransactionTools.STATE_EDIT_INVENTORY_CLOSED);
+                }
+            }
+            // close inventory
+            myInventory.setTo(enddate);
+        }
     }
 
     //    public static String getMediKontrolle(String station, int headertiefe) {

@@ -79,22 +79,22 @@ public class DlgNursingProcess extends MyJDialog {
     }
 
     private void initDialog() {
-        cmbKategorie.setModel(new DefaultComboBoxModel(ResInfoCategoryTools.getCategoriesForNursingProcess().toArray()));
+        cmbKategorie.setModel(new DefaultComboBoxModel(ResInfoCategoryTools.getAll4NP().toArray()));
 
-        txtStichwort.setText(planung.getStichwort());
+        txtStichwort.setText(planung.getTopic());
         txtSituation.setText(planung.getSituation());
-        txtZiele.setText(planung.getZiel());
-        jdcKontrolle.setDate(planung.getNKontrolle());
+        txtZiele.setText(planung.getGoal());
+        jdcKontrolle.setDate(planung.getNextEval());
         jdcKontrolle.setMinSelectableDate(new Date());
-        cmbKategorie.setSelectedItem(planung.getKategorie());
+        cmbKategorie.setSelectedItem(planung.getCategory());
         reloadInterventions();
 
         String mode = "new";
-        if (planung.getPlanID() != null) {
+        if (planung.getID() != 0) {
             mode = "edit";
-        } else if (planung.getPlanID() == null && planung.getPlanKennung() > -1) {
+        } else if (planung.getID() == 0 && planung.getNPSeries() > -1) {
             mode = "change";
-        } else if (planung.getPlanID() == null && planung.getPlanKennung() == -2) {
+        } else if (planung.getID() == 0 && planung.getNPSeries() == -2) {
             mode = "template";
         }
         OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + "." + mode), OPDE.START_OF_MODULE_TIME));
@@ -113,10 +113,10 @@ public class DlgNursingProcess extends MyJDialog {
     }
 
     private void reloadInterventions() {
-        tblPlanung.setModel(new TMPlanung(planung));
+        tblPlanung.setModel(new TMPlan(planung));
         tblPlanung.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        tblPlanung.getColumnModel().getColumn(TMPlanung.COL_TXT).setCellRenderer(new RNDHTML());
-        tblPlanung.getColumnModel().getColumn(TMPlanung.COL_TXT).setHeaderValue(OPDE.lang.getString(PnlNursingProcess.internalClassID + ".interventions"));
+        tblPlanung.getColumnModel().getColumn(TMPlan.COL_TXT).setCellRenderer(new RNDHTML());
+        tblPlanung.getColumnModel().getColumn(TMPlan.COL_TXT).setHeaderValue(OPDE.lang.getString(PnlNursingProcess.internalClassID + ".interventions"));
     }
 
     private void btnAddInterventionActionPerformed(ActionEvent e) {
@@ -481,10 +481,10 @@ public class DlgNursingProcess extends MyJDialog {
         itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 for (int row : tblPlanung.getSelectedRows()) {
-                    listInterventionSchedule2Remove.add(((TMPlanung) tblPlanung.getModel()).getInterventionSchedule(row));
-                    planung.getInterventionSchedule().remove(((TMPlanung) tblPlanung.getModel()).getInterventionSchedule(row));
+                    listInterventionSchedule2Remove.add(((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row));
+                    planung.getInterventionSchedule().remove(((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row));
                 }
-                ((TMPlanung) tblPlanung.getModel()).fireTableDataChanged();
+                ((TMPlan) tblPlanung.getModel()).fireTableDataChanged();
             }
         });
         menu.add(itemPopupDelete);
@@ -512,7 +512,7 @@ public class DlgNursingProcess extends MyJDialog {
                  * the CareProcess in question.
                  */
                 int row = tblPlanung.getSelectedRows()[0];
-                InterventionSchedule firstInterventionScheduleWillBeTemplate = ((TMPlanung) tblPlanung.getModel()).getInterventionSchedule(row);
+                InterventionSchedule firstInterventionScheduleWillBeTemplate = ((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row);
                 JPanel dlg = new PnlSchedule(firstInterventionScheduleWillBeTemplate, new Closure() {
                     @Override
                     public void execute(Object o) {
@@ -520,7 +520,7 @@ public class DlgNursingProcess extends MyJDialog {
                             InterventionSchedule template = (InterventionSchedule) o;
                             ArrayList<InterventionSchedule> listInterventionSchedule2Add = new ArrayList();
                             for (int row : tblPlanung.getSelectedRows()) {
-                                InterventionSchedule oldTermin = ((TMPlanung) tblPlanung.getModel()).getInterventionSchedule(row);
+                                InterventionSchedule oldTermin = ((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row);
                                 InterventionSchedule newTermin = template.clone();
                                 newTermin.setIntervention(oldTermin.getIntervention());
                                 listInterventionSchedule2Remove.add(oldTermin);
@@ -530,7 +530,7 @@ public class DlgNursingProcess extends MyJDialog {
                             planung.getInterventionSchedule().addAll(listInterventionSchedule2Add);
                             popup.hidePopup();
                             Collections.sort(planung.getInterventionSchedule());
-                            ((TMPlanung) tblPlanung.getModel()).fireTableDataChanged();
+                            ((TMPlan) tblPlanung.getModel()).fireTableDataChanged();
                         }
                     }
                 });
@@ -646,11 +646,11 @@ public class DlgNursingProcess extends MyJDialog {
 //    }
 //
     private void save() {
-        planung.setStichwort(txtStichwort.getText().trim());
+        planung.setTopic(txtStichwort.getText().trim());
         planung.setSituation(txtSituation.getText().trim());
-        planung.setZiel(txtZiele.getText().trim());
-        planung.setNKontrolle(jdcKontrolle.getDate());
-        planung.setKategorie((ResInfoCategory) cmbKategorie.getSelectedItem());
+        planung.setGoal(txtZiele.getText().trim());
+        planung.setNextEval(jdcKontrolle.getDate());
+        planung.setCategory((ResInfoCategory) cmbKategorie.getSelectedItem());
 
     }
 

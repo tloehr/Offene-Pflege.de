@@ -719,22 +719,26 @@ public class PrescriptionTools {
         return myPretty;
     }
 
-    public static void absetzen(EntityManager em, Prescription verordnung) throws Exception {
-        verordnung = em.merge(verordnung);
-        em.lock(verordnung, LockModeType.OPTIMISTIC);
-        verordnung.setTo(new Date());
-        verordnung.setUserOFF(em.merge(OPDE.getLogin().getUser()));
-        BHPTools.cleanup(em, verordnung);
-    }
+//    public static void absetzen(EntityManager em, Prescription verordnung) throws Exception {
+//        verordnung = em.merge(verordnung);
+//        em.lock(verordnung, LockModeType.OPTIMISTIC);
+//        verordnung.setTo(new Date());
+//        verordnung.setUserOFF(em.merge(OPDE.getLogin().getUser()));
+//        BHPTools.cleanup(em, verordnung);
+//    }
 
-    public static void closeAll(EntityManager em, Resident resident) throws Exception {
+    public static void closeAll(EntityManager em, Resident resident, Date enddate) throws Exception {
         Query query = em.createQuery("SELECT b FROM Prescription b WHERE b.resident = :resident AND b.to >= :now");
         query.setParameter("resident", resident);
-        query.setParameter("now", new Date());
+        query.setParameter("now", enddate);
         List<Prescription> verordnungen = query.getResultList();
 
         for (Prescription verordnung : verordnungen) {
-            absetzen(em, verordnung);
+            Prescription myp = em.merge(verordnung);
+            em.lock(myp, LockModeType.OPTIMISTIC);
+            myp.setTo(enddate);
+            myp.setUserOFF(em.merge(OPDE.getLogin().getUser()));
+            BHPTools.cleanup(em, myp);
         }
     }
 

@@ -44,11 +44,11 @@ import java.util.Collections;
 /**
  * @author tloehr
  */
-public class TMPlanung extends AbstractTableModel {
+public class TMPlan extends AbstractTableModel {
     public static final int COL_TXT = 0;
     private NursingProcess planung;
 
-    public TMPlanung(NursingProcess planung) {
+    public TMPlan(NursingProcess planung) {
         super();
         this.planung = planung;
         Collections.sort(planung.getInterventionSchedule());

@@ -99,7 +99,7 @@ public class PnlTemplate extends JPanel {
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean b1) {
                 if (o instanceof NursingProcess) {
                     NursingProcess np = (NursingProcess) o;
-                    setText("<html>" + (np.isAbgesetzt() ? "<s>" : "") + np.getStichwort() + (np.isAbgesetzt() ? "</s>" : "") + " (" + ResidentTools.getBWLabelTextKompakt(((NursingProcess) o).getResident()) + ")" + "</html>");
+                    setText("<html>" + (np.isClosed() ? "<s>" : "") + np.getTopic() + (np.isClosed() ? "</s>" : "") + " (" + ResidentTools.getBWLabelTextKompakt(((NursingProcess) o).getResident()) + ")" + "</html>");
                 }
                 setForeground(Color.black);
                 if (isSelected) {

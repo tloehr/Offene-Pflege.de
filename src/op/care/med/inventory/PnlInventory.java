@@ -409,7 +409,7 @@ public class PnlInventory extends NursingRecordsPanel {
                                     em.lock(myInventory.getResident(), LockModeType.OPTIMISTIC);
 
                                     // close all stocks
-                                    for (MedStock stock : inventory.getMedStocks()) {
+                                    for (MedStock stock : myInventory.getMedStocks()) {
                                         if (!stock.isClosed()) {
                                             MedStock mystock = em.merge(stock);
                                             em.lock(mystock, LockModeType.OPTIMISTIC);

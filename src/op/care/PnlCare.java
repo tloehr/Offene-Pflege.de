@@ -62,7 +62,7 @@ public class PnlCare extends NursingRecordsPanel {
             OPDE.lang.getString(internalClassID + ".tab11")
 //            OPDE.lang.getString(internalClassID + ".tab12")
     };
-    private Resident currentBewohner = null;
+    private Resident resident = null;
     private CollapsiblePanes searchPanes;
     private JScrollPane jspSearch;
     private NursingRecordsPanel previousPanel;
@@ -71,7 +71,7 @@ public class PnlCare extends NursingRecordsPanel {
         initPhase = true;
         initComponents();
         this.jspSearch = jspSearch;
-        currentBewohner = bewohner;
+        resident = bewohner;
         initPanel();
         initPhase = false;
         jtpPflegeakteStateChanged(null);
@@ -95,9 +95,9 @@ public class PnlCare extends NursingRecordsPanel {
     }
 
     @Override
-    public void switchResident(Resident bewohner) {
-        currentBewohner = bewohner;
-        ((NursingRecordsPanel) jtpPflegeakte.getSelectedComponent()).switchResident(bewohner);
+    public void switchResident(Resident resident) {
+        this.resident = resident;
+        ((NursingRecordsPanel) jtpPflegeakte.getSelectedComponent()).switchResident(resident);
     }
 
     @Override
@@ -119,72 +119,72 @@ public class PnlCare extends NursingRecordsPanel {
 
         switch (jtpPflegeakte.getSelectedIndex()) {
             case TAB_UEBERSICHT: {
-                previousPanel = new PnlBWUebersicht(currentBewohner, jspSearch);
+                previousPanel = new PnlBWUebersicht(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_UEBERSICHT, previousPanel);
                 jtpPflegeakte.setTitleAt(TAB_UEBERSICHT, "Übersicht");
                 break;
             }
             case TAB_PB: {
-                previousPanel = new PnlReport(currentBewohner, jspSearch);
+                previousPanel = new PnlReport(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_PB, previousPanel);
 
                 break;
             }
             case TAB_DFN: {
-                previousPanel = new PnlDFN(currentBewohner, jspSearch);
+                previousPanel = new PnlDFN(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_DFN, previousPanel);
 
                 break;
             }
             case TAB_VITAL: {
-                previousPanel = new PnlValues(currentBewohner, jspSearch);
+                previousPanel = new PnlValues(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_VITAL, previousPanel);
 
                 break;
             }
             case TAB_INFO: {
-                previousPanel = new PnlInfo(currentBewohner, jspSearch);
+                previousPanel = new PnlInfo(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_INFO, previousPanel);
 
                 break;
             }
             case TAB_BHP: {
-                previousPanel = new PnlBHP(currentBewohner, jspSearch);
+                previousPanel = new PnlBHP(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_BHP, previousPanel);
 
                 break;
             }
             case TAB_PPLANUNG: {
-                previousPanel = new PnlNursingProcess(currentBewohner, jspSearch);
+                previousPanel = new PnlNursingProcess(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_PPLANUNG, previousPanel);
 
                 break;
             }
             case TAB_VERORDNUNG: {
-                previousPanel = new PnlPrescription(currentBewohner, jspSearch);
+                previousPanel = new PnlPrescription(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_VERORDNUNG, previousPanel);
 
                 break;
             }
             case TAB_VORRAT: {
-                previousPanel = new PnlInventory(currentBewohner, jspSearch);
+                previousPanel = new PnlInventory(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_VORRAT, previousPanel);
 
                 break;
             }
             case TAB_VORGANG: {
-                previousPanel = new PnlProcess(currentBewohner, jspSearch);
+                previousPanel = new PnlProcess(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_VORGANG, previousPanel);
                 break;
             }
             case TAB_FILES: {
-                previousPanel = new PnlFiles(currentBewohner, jspSearch);
+                previousPanel = new PnlFiles(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_FILES, previousPanel);
 
                 break;
             }
 //            case TAB_CASH: {
-////                previousPanel = new PnlFiles(currentBewohner, jspSearch);
+////                previousPanel = new PnlFiles(resident, jspSearch);
 ////                jtpPflegeakte.setComponentAt(TAB_FILES, previousPanel);
 //
 //                break;

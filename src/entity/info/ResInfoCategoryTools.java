@@ -36,7 +36,7 @@ public class ResInfoCategoryTools {
 //                if (o == null) {
 //                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
 //                } else if (o instanceof ResInfoCategory) {
-//                    text = SYSTools.toHTML("<div id=\"fonttext\"><font color=\"#"+((ResInfoCategory) o).getFgheader()+"\">"+((ResInfoCategory) o).getBezeichnung()+"</font></div>");
+//                    text = SYSTools.toHTML("<div id=\"fonttext\"><font color=\"#"+((ResInfoCategory) o).getFgheader()+"\">"+((ResInfoCategory) o).getText()+"</font></div>");
 //                } else {
 //                    text = o.toString();
 //                }
@@ -48,20 +48,19 @@ public class ResInfoCategoryTools {
     /**
      * @return
      */
-    public static List<ResInfoCategory> getCategoriesForNursingProcess() {
+    public static List<ResInfoCategory> getAll4NP() {
         // katart below 1000 is accessible for everyone
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfoCategory b WHERE b.katArt < 1000 AND b.sortierung >= 0");
+        Query query = em.createQuery("SELECT b FROM ResInfoCategory b WHERE b.catType < 1000 AND b.sort >= 0 ORDER BY b.text");
         List<ResInfoCategory> result = query.getResultList();
         em.close();
-        Collections.sort(result);
         return result;
     }
 
     /**
      * @return
      */
-    public static List<ResInfoCategory> getAll() {
+    public static List<ResInfoCategory> getAll4ResInfo() {
         long begin = System.currentTimeMillis();
         String katart = "0";   // a little trick. 0 is always viable
 
@@ -70,11 +69,11 @@ public class ResInfoCategoryTools {
 
         // katart below 1000 is accessible for everyone
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfoCategory b WHERE (b.katArt < 1000 OR b.katArt IN (" + katart + " )) AND b.sortierung >= 0");
+        Query query = em.createQuery("SELECT DISTINCT b FROM ResInfoCategory b JOIN b.resInfoTypes t WHERE (b.catType < 1000 OR b.catType IN (" + katart + " )) AND b.sort >= 0 ORDER BY b.text ");
         List<ResInfoCategory> result = query.getResultList();
         em.close();
         SYSTools.showTimeDifference(begin);
-        Collections.sort(result);
+//        Collections.sort(result);
         return result;
     }
 

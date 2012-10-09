@@ -224,7 +224,7 @@ public class PnlValues extends NursingRecordsPanel {
 //                    int progress = -1;
 //                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, lstPrescriptions.size()));
 //
-//                    lstPrescriptions = PrescriptionTools.getAll(resident);
+//                    lstPrescriptions = PrescriptionTools.getAll4ResInfo(resident);
 //                    Collections.sort(lstPrescriptions);
 //
 //                    for (Prescription prescription : lstPrescriptions) {
