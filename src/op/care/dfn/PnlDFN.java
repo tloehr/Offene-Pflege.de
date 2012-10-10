@@ -250,7 +250,7 @@ public class PnlDFN extends NursingRecordsPanel {
             for (DFN dfn : shiftMAPDFN.get(shift)) {
 //                OPDE.debug(bhp.getPrescription().getVerid());
 //                OPDE.debug(currentPrescription != null ? currentPrescription.getVerid() : "null");
-                if (currentNP == null || dfn.getNursingProcess().getID().longValue() != currentNP.getID().longValue()) {
+                if (currentNP == null || dfn.getNursingProcess().getID() != currentNP.getID()) {
                     if (currentNP != null) {
                         npPane.setContentPane(npPanel);
                         shiftOuterPanel.add(npPane);

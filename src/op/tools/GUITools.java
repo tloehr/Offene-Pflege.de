@@ -49,6 +49,9 @@ public class GUITools {
 
         button.setOpaque(false);
         button.setHorizontalAlignment(SwingConstants.LEADING);
+        button.setVerticalAlignment(SwingConstants.TOP);
+        button.setVerticalTextPosition(SwingConstants.TOP);
+        button.setHorizontalTextPosition(SwingConstants.RIGHT);
 
         button.setRequestFocusEnabled(true);
         button.setFocusable(true);

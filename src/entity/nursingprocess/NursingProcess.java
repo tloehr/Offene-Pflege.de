@@ -5,17 +5,18 @@
 package entity.nursingprocess;
 
 import entity.info.ResInfoCategory;
-import entity.system.Users;
 import entity.info.Resident;
 import entity.process.QProcess;
 import entity.process.QProcessElement;
 import entity.process.SYSNP2PROCESS;
+import entity.system.Users;
 import op.OPDE;
 import op.tools.SYSConst;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -26,19 +27,19 @@ import java.util.List;
  */
 @Entity
 @Table(name = "Planung")
-@NamedQueries({
-        @NamedQuery(name = "Planung.findAll", query = "SELECT p FROM NursingProcess p"),
-        @NamedQuery(name = "Planung.findByPlanID", query = "SELECT p FROM NursingProcess p WHERE p.id = :planID"),
-        @NamedQuery(name = "Planung.findByVorgang", query = " "
-                + " SELECT p FROM NursingProcess p "
-                + " JOIN p.attachedQProcessConnections av"
-                + " JOIN av.vorgang v"
-                + " WHERE v = :vorgang "),
-        @NamedQuery(name = "Planung.findByStichwort", query = "SELECT p FROM NursingProcess p WHERE p.topic = :stichwort"),
-        @NamedQuery(name = "Planung.findByVon", query = "SELECT p FROM NursingProcess p WHERE p.von = :von"),
-        @NamedQuery(name = "Planung.findByBis", query = "SELECT p FROM NursingProcess p WHERE p.to = :bis"),
-        @NamedQuery(name = "Planung.findByPlanKennung", query = "SELECT p FROM NursingProcess p WHERE p.npseries = :planKennung"),
-        @NamedQuery(name = "Planung.findByNKontrolle", query = "SELECT p FROM NursingProcess p WHERE p.nextEval = :nKontrolle")})
+//@NamedQueries({
+//        @NamedQuery(name = "Planung.findAll", query = "SELECT p FROM NursingProcess p"),
+//        @NamedQuery(name = "Planung.findByPlanID", query = "SELECT p FROM NursingProcess p WHERE p.id = :planID"),
+//        @NamedQuery(name = "Planung.findByVorgang", query = " "
+//                + " SELECT p FROM NursingProcess p "
+//                + " JOIN p.attachedQProcessConnections av"
+//                + " JOIN av.vorgang v"
+//                + " WHERE v = :vorgang "),
+//        @NamedQuery(name = "Planung.findByStichwort", query = "SELECT p FROM NursingProcess p WHERE p.topic = :stichwort"),
+//        @NamedQuery(name = "Planung.findByVon", query = "SELECT p FROM NursingProcess p WHERE p.von = :von"),
+//        @NamedQuery(name = "Planung.findByBis", query = "SELECT p FROM NursingProcess p WHERE p.to = :bis"),
+//        @NamedQuery(name = "Planung.findByPlanKennung", query = "SELECT p FROM NursingProcess p WHERE p.npseries = :planKennung"),
+//        @NamedQuery(name = "Planung.findByNKontrolle", query = "SELECT p FROM NursingProcess p WHERE p.nextEval = :nKontrolle")})
 public class NursingProcess implements Serializable, QProcessElement, Comparable<NursingProcess>, Cloneable {
 
     private static final long serialVersionUID = 1L;
@@ -121,7 +122,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
 
     @Override
     public long getID() {
-        if (id == null){
+        if (id == null) {
             return 0;
         }
         return id;
@@ -244,14 +245,36 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
 
     @Override
     public String getContentAsHTML() {
-        // TODO: fehlt noch
-        return "<html>not yet</html>";
+        return NursingProcessTools.getAsHTML(this, false);
     }
 
     @Override
     public String getPITAsHTML() {
-        // TODO: fehlt noch
-        return "<html>not yet</html>";
+        String result = "";
+        DateFormat df = DateFormat.getDateInstance();
+
+        if (isClosed()) {
+
+            result += "<table id=\"fonttext\" border=\"0\" cellspacing=\"0\">";
+            result += "<tr>";
+            result += "<td valign=\"top\">" + df.format(from) + "</td>";
+            result += "<td valign=\"top\">&raquo;</td>";
+            result += "<td valign=\"top\">" + df.format(to) + "</td>";
+            result += "</tr>\n";
+            result += "<tr>";
+            result += "<td valign=\"top\">" + userON.getFullname() + "</td>";
+            result += "<td valign=\"top\">&raquo;</td>";
+            result += "<td valign=\"top\">" + userOFF.getFullname() + "</td>";
+            result += "</tr>\n";
+            result += "</table>\n";
+
+        } else {
+            result += df.format(from) + "&nbsp;&raquo;&raquo;" +
+                    "<br/>" +
+                    userON.getFullname();
+        }
+
+        return result;
     }
 
 //    @Override
@@ -295,12 +318,23 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
     }
 
     @Override
-    public int compareTo(NursingProcess nursingProcess) {
-        if (topic.compareTo(nursingProcess.getTopic()) != 0) {
-            return topic.compareTo(nursingProcess.getTopic());
+    public int compareTo(NursingProcess that) {
+        int result = 0;
+
+        if (!isClosed() && that.isClosed()) {
+            result = -1;
         }
 
-        return from.compareTo(nursingProcess.getFrom());
+        if (result == 0 && isClosed() && !that.isClosed()) {
+            result = 1;
+        }
+
+        if (result == 0 && topic.compareTo(that.getTopic()) != 0) {
+            result = topic.compareTo(that.getTopic());
+        }
+
+        result = from.compareTo(that.getFrom()) * -1;
+        return result;
     }
 
     public NursingProcess(String topic, String situation, String goal, Date from, Date to, long npseries, Date nextEval, Long version, Users userON, Users userOFF, Resident bewohner, ResInfoCategory category, Collection<SYSNP2PROCESS> attachedQProcessConnections, Collection<NPControl> kontrollen, List<InterventionSchedule> interventionSchedules) {

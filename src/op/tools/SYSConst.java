@@ -390,6 +390,9 @@ public class SYSConst {
     public static final Icon icon22edit = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/kspread.png"));
     public static final Icon icon22edit3 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/edit3.png"));
     public static final Icon icon22menu = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/menu.png"));
+    public static final Icon icon32menu = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/bw/menu.png"));
+    public static final Icon icon32Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/bw/pressed.png"));
+    public static final Icon icon22Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/pressed.png"));
     public static final Icon icon22edit3Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/edit3_pressed.png"));
 //    public static final Icon icon22edit1 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/edit1.png"));
 //    public static final Icon icon22edit1Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/edit1_pressed.png"));

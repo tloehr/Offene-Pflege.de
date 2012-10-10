@@ -1,11 +1,8 @@
 package entity.nursingprocess;
 
-import entity.info.ResInfo;
-import entity.info.Resident;
 import entity.EntityTools;
 import entity.info.ResInfoCategory;
-import entity.prescription.BHPTools;
-import entity.prescription.Prescription;
+import entity.info.Resident;
 import op.OPDE;
 import op.care.nursingprocess.PnlNursingProcess;
 import op.tools.SYSTools;
@@ -28,12 +25,12 @@ import java.util.List;
 public class NursingProcessTools {
     public static final String UNIQUEID = "__plankenn";
 
-    public static List<NursingProcess> findByKategorieAndBewohner(Resident bewohner, ResInfoCategory category) {
+    public static ArrayList<NursingProcess> getAll(Resident resident, ResInfoCategory cat) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT p FROM NursingProcess p WHERE p.resident = :bewohner AND p.category = :kat ORDER BY p.topic, p.from");
-        query.setParameter("kat", category);
-        query.setParameter("bewohner", bewohner);
-        List<NursingProcess> planungen = query.getResultList();
+        Query query = em.createQuery("SELECT p FROM NursingProcess p WHERE p.resident = :resident AND p.category = :cat ORDER BY p.topic, p.from");
+        query.setParameter("cat", cat);
+        query.setParameter("resident", resident);
+        ArrayList<NursingProcess> planungen = new ArrayList<NursingProcess>(query.getResultList());
         em.close();
         return planungen;
     }
@@ -53,8 +50,8 @@ public class NursingProcessTools {
     public static ArrayList<NursingProcess> getAll(Resident resident) {
         long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT p FROM NursingProcess p WHERE p.resident = :bewohner ");
-        query.setParameter("bewohner", resident);
+        Query query = em.createQuery("SELECT p FROM NursingProcess p WHERE p.resident = :resident ");
+        query.setParameter("resident", resident);
         ArrayList<NursingProcess> nursingProcesses = new ArrayList<NursingProcess>(query.getResultList());
         em.close();
         SYSTools.showTimeDifference(begin);
@@ -64,40 +61,47 @@ public class NursingProcessTools {
     /**
      * Gibt einen String zurück, der eine HTML Darstellung einer Pflegeplanung enthält.
      *
-     * @param planung
+     * @param np
      * @return
      */
-    public static String getAsHTML(NursingProcess planung, boolean withHeader) {
+    public static String getAsHTML(NursingProcess np, boolean withHeader) {
 
         String html = "";
         html += "<h2 id=\"fonth2\" >";
-        html += (withHeader ? OPDE.lang.getString(PnlNursingProcess.internalClassID) : "") + "&raquo;" + planung.getTopic() + "&laquo;";
+        html += (withHeader ? OPDE.lang.getString(PnlNursingProcess.internalClassID) : "") + "&raquo;" + np.getTopic() + "&laquo;";
         html += "</h2>";
 
         html += "<div id=\"fonttext\">";
 
-        html += withHeader ? "<b>Kategorie:</b> " + planung.getCategory().getText() + "<br/>" : "";
+        html += withHeader ? "<b>" + OPDE.lang.getString("misc.msg.category") + ":</b> " + np.getCategory().getText() + "<br/>" : "";
 
         DateFormat df = DateFormat.getDateInstance();
-        html += "<b>Prüfungstermin:</b> " + df.format(planung.getNextEval()) + "<br/>";
-        html += "<b>Erstellt von:</b> " + planung.getUserON().getFullname() + "  ";
-        html += "<b>Am:</b> " + df.format(planung.getFrom()) + "<br/>";
-        if (planung.isClosed()) {
-            html += "<b>Abgesetzt von:</b> " + planung.getUserOFF().getFullname() + "  ";
-            html += "<b>Am:</b> " + df.format(planung.getTo()) + "<br/>";
-        }
+        html += "<b>" + OPDE.lang.getString(PnlNursingProcess.internalClassID + ".pnleval.nextevaldate") + ":</b> " + df.format(np.getNextEval()) + "<br/>";
+//        html += "<b>"+OPDE.lang.getString("misc.msg.createdby")+":</b> " + planung.getUserON().getFullname() + "  ";
+//        html += "<b>"+OPDE.lang.getString("misc.msg.atchrono")+":</b> " + df.format(planung.getFrom()) + "<br/>";
+//        if (planung.isClosed()) {
+//            html += "<b>Abgesetzt von:</b> " + planung.getUserOFF().getFullname() + "  ";
+//            html += "<b>Am:</b> " + df.format(planung.getTo()) + "<br/>";
+//        }
 
-        html += "<h3 id=\"fonth3\">Situation</h3>" + SYSTools.replace(planung.getSituation(), "\n", "<br/>", false);
-        html += "<h3 id=\"fonth3\">Ziel(e):</h3>" + SYSTools.replace(planung.getGoal(), "\n", "<br/>", false);
+        html += "<h3 id=\"fonth3\">" + OPDE.lang.getString("misc.msg.Situation") + "</h3>" +
+                (np.isClosed() ? "<s>" : "") +
+                SYSTools.replace(np.getSituation(), "\n", "<br/>", false) +
+                (np.isClosed() ? "</s>" : "");
+
+        html += "<h3 id=\"fonth3\">" + OPDE.lang.getString("misc.msg.Goal[s]") + ":</h3>" +
+                (np.isClosed() ? "<s>" : "") +
+                SYSTools.replace(np.getGoal(), "\n", "<br/>", false) +
+                (np.isClosed() ? "</s>" : "");
 
         html += "<h3 id=\"fonth3\">" + OPDE.lang.getString(PnlNursingProcess.internalClassID + ".interventions") + "</h3>";
 
-        if (planung.getInterventionSchedule().isEmpty()) {
-            html += "<ul><li><b>Massnahmen fehlen !!!</b></li></ul>";
+        if (np.getInterventionSchedule().isEmpty()) {
+            html += "<ul><li><b>" + OPDE.lang.getString("misc.msg.MissingInterventions") + " !!!</b></li></ul>";
         } else {
             html += "<ul>";
 //            html += "<li><b>" + OPDE.lang.getString(PnlNursingProcess.internalClassID + ".interventions") + "</b></li><ul>";
-            for (InterventionSchedule interventionSchedule : planung.getInterventionSchedule()) {
+            for (InterventionSchedule interventionSchedule : np.getInterventionSchedule()) {
                 html += "<li>";
                 html += "<div id=\"fonttext\"><b>" + interventionSchedule.getIntervention().getBezeichnung() + "</b> (" + interventionSchedule.getDauer().toPlainString() + " " + OPDE.lang.getString("misc.msg.Minutes") + ")</div>";
                 html += InterventionScheduleTools.getTerminAsHTML(interventionSchedule);
@@ -107,10 +111,10 @@ public class NursingProcessTools {
         }
 
 
-        if (!planung.getEvaluations().isEmpty()) {
-            html += "<h3 id=\"fonth3\">Kontrolltermine</h3>";
+        if (!np.getEvaluations().isEmpty()) {
+            html += "<h3 id=\"fonth3\">" + OPDE.lang.getString("misc.msg.DateOfEvals") + "</h3>";
             html += "<ul>";
-            for (NPControl kontrolle : planung.getEvaluations()) {
+            for (NPControl kontrolle : np.getEvaluations()) {
                 html += "<li><div id=\"fonttext\">" + NPControlTools.getAsHTML(kontrolle) + "</div></li>";
             }
             html += "</ul>";

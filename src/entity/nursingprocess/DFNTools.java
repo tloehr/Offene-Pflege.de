@@ -326,11 +326,11 @@ public class DFNTools {
     }
 
 
-    public static long getNumDFNs(NursingProcess planung) {
+    public static long getNumDFNs(NursingProcess np) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT COUNT(dfn) FROM DFN dfn WHERE dfn.nursingProcess = :planung AND dfn.status <> :status");
-        query.setParameter("planung", planung);
-        query.setParameter("status", STATE_OPEN);
+        Query query = em.createQuery("SELECT COUNT(dfn) FROM DFN dfn WHERE dfn.nursingProcess = :np AND dfn.status <> :state");
+        query.setParameter("np", np);
+        query.setParameter("state", STATE_OPEN);
         long num = (Long) query.getSingleResult();
         em.close();
         return num;

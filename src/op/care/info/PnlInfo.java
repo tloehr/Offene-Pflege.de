@@ -288,8 +288,8 @@ public class PnlInfo extends NursingRecordsPanel {
          *     |_|  |_|\___|_| |_|\__,_|
          *
          */
-        final JButton btnMenu = new JButton(SYSConst.icon22menu);
-        btnMenu.setPressedIcon(SYSConst.icon22edit3Pressed);
+        final JButton btnMenu = new JButton(SYSConst.icon32menu);
+        btnMenu.setPressedIcon(SYSConst.icon32Pressed);
         btnMenu.setAlignmentX(Component.RIGHT_ALIGNMENT);
         btnMenu.setAlignmentY(Component.TOP_ALIGNMENT);
         btnMenu.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -797,15 +797,11 @@ public class PnlInfo extends NursingRecordsPanel {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (initPhase) return;
-                SYSPropsTools.storeState(internalClassID + ":tbInactive", tbInactive);
                 reloadDisplay();
             }
         });
         tbInactive.setHorizontalAlignment(SwingConstants.LEFT);
         list.add(tbInactive);
-        SYSPropsTools.restoreState(internalClassID + ":tbInactive", tbInactive);
-
-//        panelFilter.setContentPane(labelPanel);
 
         return list;
     }
