@@ -167,19 +167,24 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
             initPhase = true;
             OPDE.getMainframe().setBlocked(true);
             OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
-            String html = SYSTools.toHTML(ResInfoTools.getTXReport(bewohner, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true));
-            txtUebersicht.setText(html);
-            txtUebersicht.repaint();
+
+//            txtUebersicht.repaint();
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    jspHTML.getVerticalScrollBar().setValue(0);
+                    String html = SYSTools.toHTML(ResInfoTools.getTXReport(bewohner, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true));
+                    txtUebersicht.setText(html);
+//                    jspHTML.getVerticalScrollBar().setValue(0);
+
+                    GUITools.scroll2show(jspHTML, 0, null);
+
+                    initPhase = false;
+                    OPDE.getDisplayManager().setProgressBarMessage(null);
+                    OPDE.getMainframe().setBlocked(false);
                 }
             });
 
-            initPhase = false;
-            OPDE.getDisplayManager().setProgressBarMessage(null);
-            OPDE.getMainframe().setBlocked(false);
+
         }
 
 

@@ -28,7 +28,10 @@ package op.care.med.inventory;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.prescription.*;
+import entity.prescription.DosageFormTools;
+import entity.prescription.MedStock;
+import entity.prescription.MedStockTools;
+import entity.prescription.MedStockTransactionTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
@@ -76,7 +79,6 @@ public class DlgCloseStock extends MyJDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         jPanel1 = new JPanel();
-        jLabel1 = new JLabel();
         jScrollPane1 = new JScrollPane();
         txtInfo = new JTextPane();
         rbLeer = new JRadioButton();
@@ -103,13 +105,8 @@ public class DlgCloseStock extends MyJDialog {
         {
             jPanel1.setBorder(null);
             jPanel1.setLayout(new FormLayout(
-                "14dlu, $lcgap, 145dlu, $lcgap, 41dlu, $lcgap, 93dlu, $lcgap, 14dlu",
-                "14dlu, $lgap, default, $lgap, fill:70dlu:grow, 4*($lgap, fill:default), $lgap, $rgap, $lgap, fill:default, $lgap, $rgap, $lgap, default, $lgap, 14dlu"));
-
-            //---- jLabel1 ----
-            jLabel1.setFont(new Font("Arial", Font.PLAIN, 24));
-            jLabel1.setText("Bestand abschlie\u00dfen");
-            jPanel1.add(jLabel1, CC.xy(3, 3));
+                    "14dlu, $lcgap, 145dlu, $lcgap, 41dlu, $lcgap, 93dlu, $lcgap, 14dlu",
+                    "14dlu, $lgap, fill:70dlu:grow, 4*($lgap, fill:default), $lgap, $rgap, $lgap, fill:default, $lgap, $rgap, $lgap, default, $lgap, 14dlu"));
 
             //======== jScrollPane1 ========
             {
@@ -119,7 +116,7 @@ public class DlgCloseStock extends MyJDialog {
                 txtInfo.setFont(new Font("Arial", Font.PLAIN, 14));
                 jScrollPane1.setViewportView(txtInfo);
             }
-            jPanel1.add(jScrollPane1, CC.xywh(3, 5, 5, 1));
+            jPanel1.add(jScrollPane1, CC.xywh(3, 3, 5, 1));
 
             //---- rbLeer ----
             rbLeer.setSelected(true);
@@ -131,7 +128,7 @@ public class DlgCloseStock extends MyJDialog {
                     rbLeerActionPerformed(e);
                 }
             });
-            jPanel1.add(rbLeer, CC.xy(3, 7));
+            jPanel1.add(rbLeer, CC.xy(3, 5));
 
             //---- rbStellen ----
             rbStellen.setText("Beim Vorab Stellen haben Sie die letzten ");
@@ -142,7 +139,7 @@ public class DlgCloseStock extends MyJDialog {
                     rbStellenActionPerformed(e);
                 }
             });
-            jPanel1.add(rbStellen, CC.xywh(3, 9, 2, 1));
+            jPanel1.add(rbStellen, CC.xywh(3, 7, 2, 1));
 
             //---- txtLetzte ----
             txtLetzte.setText("jTextField1");
@@ -153,12 +150,12 @@ public class DlgCloseStock extends MyJDialog {
                     txtLetzteFocusLost(e);
                 }
             });
-            jPanel1.add(txtLetzte, CC.xy(5, 9));
+            jPanel1.add(txtLetzte, CC.xy(5, 7));
 
             //---- lblEinheiten ----
             lblEinheiten.setText("Einheiten verbraucht.");
             lblEinheiten.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel1.add(lblEinheiten, CC.xy(7, 9));
+            jPanel1.add(lblEinheiten, CC.xy(7, 7));
 
             //---- rbAbgelaufen ----
             rbAbgelaufen.setText("Die Packung ist abgelaufen oder wird nicht mehr ben\u00f6tigt. Bereit zur Entsorgung.");
@@ -169,19 +166,19 @@ public class DlgCloseStock extends MyJDialog {
                     rbAbgelaufenActionPerformed(e);
                 }
             });
-            jPanel1.add(rbAbgelaufen, CC.xywh(3, 11, 5, 1));
-            jPanel1.add(jSeparator1, CC.xywh(3, 15, 5, 1));
+            jPanel1.add(rbAbgelaufen, CC.xywh(3, 9, 5, 1));
+            jPanel1.add(jSeparator1, CC.xywh(3, 13, 5, 1));
 
             //---- jLabel2 ----
             jLabel2.setText("Als n\u00e4chstes Packung soll die Nummer");
             jLabel2.setFont(new Font("Arial", Font.PLAIN, 14));
             jLabel2.setHorizontalAlignment(SwingConstants.TRAILING);
-            jPanel1.add(jLabel2, CC.xy(3, 17));
+            jPanel1.add(jLabel2, CC.xy(3, 15));
 
             //---- jLabel3 ----
             jLabel3.setText("angebrochen werden.");
             jLabel3.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel1.add(jLabel3, CC.xy(7, 17));
+            jPanel1.add(jLabel3, CC.xy(7, 15));
 
             //---- rbGefallen ----
             rbGefallen.setText("<html>Die Packung ist <font color=\"red\">runter gefallen</font> oder <font color=\"red\">verschwunden</font> und muss ausgebucht werden.</html>");
@@ -192,14 +189,14 @@ public class DlgCloseStock extends MyJDialog {
                     rbGefallenActionPerformed(e);
                 }
             });
-            jPanel1.add(rbGefallen, CC.xywh(3, 13, 5, 1));
+            jPanel1.add(rbGefallen, CC.xywh(3, 11, 5, 1));
 
             //---- cmbBestID ----
-            cmbBestID.setModel(new DefaultComboBoxModel(new String[] {
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
+            cmbBestID.setModel(new DefaultComboBoxModel(new String[]{
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
             }));
             cmbBestID.setFont(new Font("Arial", Font.PLAIN, 14));
             cmbBestID.addItemListener(new ItemListener() {
@@ -208,7 +205,7 @@ public class DlgCloseStock extends MyJDialog {
                     cmbBestIDItemStateChanged(e);
                 }
             });
-            jPanel1.add(cmbBestID, CC.xy(5, 17));
+            jPanel1.add(cmbBestID, CC.xy(5, 15));
 
             //======== panel1 ========
             {
@@ -236,7 +233,7 @@ public class DlgCloseStock extends MyJDialog {
                 });
                 panel1.add(btnOk);
             }
-            jPanel1.add(panel1, CC.xy(7, 21, CC.RIGHT, CC.DEFAULT));
+            jPanel1.add(panel1, CC.xy(7, 19, CC.RIGHT, CC.DEFAULT));
         }
         contentPane.add(jPanel1);
         pack();
@@ -267,8 +264,6 @@ public class DlgCloseStock extends MyJDialog {
     }
 
     private void initDialog() {
-////        this.setTitle(SYSTools.getWindowTitle("Bestand abschließen"));
-
         String text = "Sie möchten den Bestand mit der Nummer <font color=\"red\"><b>" + bestand.getID() + "</b></font> abschließen.";
         text += "<br/>" + MedStockTools.getTextASHTML(bestand) + "</br>";
         text += "<br/>Bitte wählen Sie einen der drei folgenden Gründe für den Abschluss:";
@@ -369,7 +364,7 @@ public class DlgCloseStock extends MyJDialog {
                 OPDE.info(classname + ": Nächste Packung im Anbruch wird die Bestands Nr.: " + nextBest.getID() + " sein.");
 
             } else {
-                BigDecimal apv = bestand.getAPV();
+//                BigDecimal apv = bestand.getAPV();
 
                 if (rbGefallen.isSelected()) {
                     MedStockTools.close(em, bestand, "Packung ist runtergefallen.", MedStockTransactionTools.STATE_EDIT_EMPTY_BROKEN_OR_LOST);
@@ -379,7 +374,7 @@ public class DlgCloseStock extends MyJDialog {
                     OPDE.info(classname + ": Abgelaufen angeklickt.");
                 } else {
                     MedStockTools.close(em, bestand, "Korrekturbuchung zum Packungsabschluss", MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
-                    apv = MedStockTools.calcAPV(bestand);
+//                    apv = MedStockTools.calcAPV(bestand);
                     OPDE.info(classname + ": Packung ist nun leer angeklickt.");
                 }
             }
@@ -400,7 +395,6 @@ public class DlgCloseStock extends MyJDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel jPanel1;
-    private JLabel jLabel1;
     private JScrollPane jScrollPane1;
     private JTextPane txtInfo;
     private JRadioButton rbLeer;

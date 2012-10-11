@@ -30,23 +30,23 @@ import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
+import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import entity.files.SYSFilesTools;
 import entity.info.Resident;
-import entity.info.ResidentTools;
-import entity.prescription.BHPTools;
-import entity.prescription.Prescription;
-import entity.prescription.PrescriptionSchedule;
-import entity.prescription.PrescriptionTools;
+import entity.prescription.*;
 import entity.process.QProcess;
 import entity.process.QProcessElement;
 import entity.process.SYSPRE2PROCESS;
 import entity.system.SYSPropsTools;
 import entity.system.UniqueTools;
 import op.OPDE;
+import op.care.med.inventory.DlgCloseStock;
 import op.care.med.inventory.DlgNewStocks;
+import op.care.med.inventory.DlgOpenStock;
+import op.care.med.inventory.PnlInventory;
 import op.care.sysfiles.DlgFiles;
 import op.process.DlgProcessAssign;
 import op.system.InternalClassACL;
@@ -224,562 +224,39 @@ public class PnlPrescription extends NursingRecordsPanel {
         cpPres.setTitleLabelComponent(cptitle.getMain());
         cpPres.setSlidingDirection(SwingConstants.SOUTH);
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
 
-            final boolean prescriptionHasBeenUsedAlready = BHPTools.hasBeenUsedAlready(prescription);
+        /***
+         *      __  __
+         *     |  \/  | ___ _ __  _   _
+         *     | |\/| |/ _ \ '_ \| | | |
+         *     | |  | |  __/ | | | |_| |
+         *     |_|  |_|\___|_| |_|\__,_|
+         *
+         */
+        final JButton btnMenu = new JButton(SYSConst.icon32menu);
+        btnMenu.setPressedIcon(SYSConst.icon32Pressed);
+        btnMenu.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnMenu.setAlignmentY(Component.TOP_ALIGNMENT);
+        btnMenu.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnMenu.setContentAreaFilled(false);
+        btnMenu.setBorder(null);
+        btnMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JidePopup popup = new JidePopup();
+                popup.setMovable(false);
+                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                popup.setOwner(btnMenu);
+                popup.removeExcludedComponent(btnMenu);
+                JPanel pnl = getMenu(prescription);
+                popup.getContentPane().add(pnl);
+                popup.setDefaultFocusComponent(pnl);
 
-            /***
-             *       ____ _
-             *      / ___| |__   __ _ _ __   __ _  ___
-             *     | |   | '_ \ / _` | '_ \ / _` |/ _ \
-             *     | |___| | | | (_| | | | | (_| |  __/
-             *      \____|_| |_|\__,_|_| |_|\__, |\___|
-             *                              |___/
-             */
-            final JButton btnChange = new JButton(SYSConst.icon22playerPlay);
-            btnChange.setPressedIcon(SYSConst.icon22playerPlayPressed);
-            btnChange.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnChange.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btnChange.setContentAreaFilled(false);
-            btnChange.setBorder(null);
-            btnChange.setToolTipText(OPDE.lang.getString(internalClassID + ".btnChange.tooltip"));
-            btnChange.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-
-                    if (!prescriptionHasBeenUsedAlready) {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".cantchange.hasNeverBeenUsed"));
-                        return;
-                    }
-
-                    new DlgRegular(prescription.clone(), DlgRegular.MODE_CHANGE, new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            if (o != null) {
-
-                                Pair<Prescription, java.util.List<PrescriptionSchedule>> returnPackage = (Pair<Prescription, List<PrescriptionSchedule>>) o;
-
-                                EntityManager em = OPDE.createEM();
-                                try {
-
-
-                                    em.getTransaction().begin();
-                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                    Prescription newPrescription = em.merge(returnPackage.getFirst());
-                                    Prescription oldPrescription = em.merge(prescription);
-
-                                    em.lock(oldPrescription, LockModeType.OPTIMISTIC);
-
-                                    // Bei einer Veränderung, wird erst die alte Verordnung durch den ANsetzenden Doc ABgesetzt.
-                                    DateTime now = new DateTime();
-                                    oldPrescription.setTo(now.toDate());
-                                    oldPrescription.setUserOFF(em.merge(OPDE.getLogin().getUser()));
-                                    oldPrescription.setDocOFF(newPrescription.getDocON() == null ? null : em.merge(newPrescription.getDocON()));
-                                    oldPrescription.setHospitalOFF(newPrescription.getHospitalON() == null ? null : em.merge(newPrescription.getHospitalON()));
-
-                                    newPrescription.setFrom(now.plusSeconds(1).toDate());
-
-                                    BHPTools.cleanup(em, oldPrescription);
-                                    BHPTools.generate(em, newPrescription.getPrescriptionSchedule(), new DateMidnight(), false);
-
-                                    em.getTransaction().commit();
-
-                                    lstPrescriptions.remove(prescription);
-                                    lstPrescriptions.add(oldPrescription);
-                                    lstPrescriptions.add(newPrescription);
-                                    Collections.sort(lstPrescriptions);
-                                    final CollapsiblePane myCP = createCP4(newPrescription);
-                                    buildPanel();
-
-                                    SwingUtilities.invokeLater(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            GUITools.scroll2show(jspPrescription, myCP.getLocation().y - 100, new Closure() {
-                                                @Override
-                                                public void execute(Object o) {
-                                                    GUITools.flashBackground(myCP, Color.YELLOW, 2);
-                                                }
-                                            });
-                                        }
-                                    });
-
-                                } catch (OptimisticLockException ole) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    }
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                } catch (Exception e) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
-                                }
-                                buildPanel();
-                            }
-                        }
-                    });
-                }
-            });
-            btnChange.setEnabled(!prescription.isDiscontinued() && !prescription.isOnDemand());
-            cptitle.getRight().add(btnChange);
-
-            /***
-             *      ____  _                     _   _
-             *     |  _ \(_)___  ___ ___  _ __ | |_(_)_ __  _   _  ___
-             *     | | | | / __|/ __/ _ \| '_ \| __| | '_ \| | | |/ _ \
-             *     | |_| | \__ \ (_| (_) | | | | |_| | | | | |_| |  __/
-             *     |____/|_|___/\___\___/|_| |_|\__|_|_| |_|\__,_|\___|
-             *
-             */
-            final JButton btnDiscontinue = new JButton(SYSConst.icon22playerStop);
-            btnDiscontinue.setPressedIcon(SYSConst.icon22playerStopPressed);
-            btnDiscontinue.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnDiscontinue.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btnDiscontinue.setContentAreaFilled(false);
-            btnDiscontinue.setBorder(null);
-            btnDiscontinue.setToolTipText(OPDE.lang.getString(internalClassID + ".btnDiscontinue.tooltip"));
-            btnDiscontinue.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-
-                    if (!prescriptionHasBeenUsedAlready) {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".cantdiscontinue.hasNeverBeenUsed"));
-                        return;
-                    }
-
-                    new DlgDiscontinue(prescription, new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            if (o != null) {
-                                EntityManager em = OPDE.createEM();
-                                try {
-                                    em.getTransaction().begin();
-                                    Prescription myPrescription = (Prescription) em.merge(o);
-                                    em.lock(myPrescription.getResident(), LockModeType.OPTIMISTIC);
-                                    em.lock(myPrescription, LockModeType.OPTIMISTIC);
-                                    myPrescription.setTo(new Date());
-                                    if (!myPrescription.isOnDemand()) {
-                                        BHPTools.cleanup(em, myPrescription);
-                                    }
-                                    em.getTransaction().commit();
-
-                                    lstPrescriptions.remove(prescription);
-                                    lstPrescriptions.add(myPrescription);
-                                    Collections.sort(lstPrescriptions);
-                                    final CollapsiblePane myCP = createCP4(myPrescription);
-
-                                    if (!tbClosed.isSelected()) {
-                                        tbClosed.setSelected(true);
-                                    } else {
-                                        buildPanel();
-                                    }
-
-                                    SwingUtilities.invokeLater(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            GUITools.scroll2show(jspPrescription, myCP.getLocation().y - 100, new Closure() {
-                                                @Override
-                                                public void execute(Object o) {
-                                                    GUITools.flashBackground(myCP, Color.YELLOW, 2);
-                                                }
-                                            });
-                                        }
-                                    });
-
-                                } catch (OptimisticLockException ole) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    }
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                } catch (Exception e) {
-                                    em.getTransaction().rollback();
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
-                                }
-                            }
-                        }
-                    });
-                }
-            });
-            btnDiscontinue.setEnabled(!prescription.isDiscontinued());
-            cptitle.getRight().add(btnDiscontinue);
-
-
-            /***
-             *      _____    _ _ _
-             *     | ____|__| (_) |_
-             *     |  _| / _` | | __|
-             *     | |__| (_| | | |_
-             *     |_____\__,_|_|\__/
-             *
-             */
-            final JButton btnEdit = new JButton(SYSConst.icon22edit3);
-            btnEdit.setPressedIcon(SYSConst.icon22edit3Pressed);
-            btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnEdit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btnEdit.setContentAreaFilled(false);
-            btnEdit.setBorder(null);
-            btnEdit.setToolTipText(OPDE.lang.getString(internalClassID + ".btnEdit.tooltip"));
-            btnEdit.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-
-                    if (prescriptionHasBeenUsedAlready) {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".cantedit.hasBeenUsedAlready"));
-                        return;
-                    }
-
-                    if (prescription.isOnDemand()) {
-                        new DlgOnDemand(prescription, new Closure() {
-                            @Override
-                            public void execute(Object o) {
-                                if (o != null) {
-
-                                    EntityManager em = OPDE.createEM();
-                                    try {
-                                        em.getTransaction().begin();
-                                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                        Prescription myPrescription = em.merge((Prescription) o);
-                                        em.lock(myPrescription, LockModeType.OPTIMISTIC);
-
-                                        Query queryDELBHP = em.createQuery("DELETE FROM BHP bhp WHERE bhp.prescription = :prescription");
-                                        queryDELBHP.setParameter("prescription", myPrescription);
-                                        queryDELBHP.executeUpdate();
-
-                                        if (!myPrescription.isOnDemand()) {
-                                            BHPTools.generate(em, myPrescription.getPrescriptionSchedule(), new DateMidnight(), true);
-                                        }
-
-                                        em.getTransaction().commit();
-
-                                        lstPrescriptions.remove(prescription);
-                                        lstPrescriptions.add(myPrescription);
-                                        Collections.sort(lstPrescriptions);
-                                        final CollapsiblePane myCP = createCP4(myPrescription);
-                                        buildPanel();
-
-                                        SwingUtilities.invokeLater(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                GUITools.scroll2show(jspPrescription, myCP.getLocation().y - 100, new Closure() {
-                                                    @Override
-                                                    public void execute(Object o) {
-                                                        GUITools.flashBackground(myCP, Color.YELLOW, 2);
-                                                    }
-                                                });
-                                            }
-                                        });
-
-                                    } catch (OptimisticLockException ole) {
-                                        if (em.getTransaction().isActive()) {
-                                            em.getTransaction().rollback();
-                                        }
-                                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                            OPDE.getMainframe().emptyFrame();
-                                            OPDE.getMainframe().afterLogin();
-                                        }
-                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                    } catch (Exception e) {
-                                        if (em.getTransaction().isActive()) {
-                                            em.getTransaction().rollback();
-                                        }
-                                        OPDE.fatal(e);
-                                    } finally {
-                                        em.close();
-                                    }
-                                    buildPanel();
-                                }
-                            }
-                        });
-                    } else {
-                        new DlgRegular(prescription, DlgRegular.MODE_EDIT, new Closure() {
-                            @Override
-                            public void execute(Object o) {
-                                if (o != null) {
-
-                                    Pair<Prescription, java.util.List<PrescriptionSchedule>> returnPackage = (Pair<Prescription, List<PrescriptionSchedule>>) o;
-
-                                    EntityManager em = OPDE.createEM();
-                                    try {
-                                        em.getTransaction().begin();
-                                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                        Prescription myPrescription = em.merge(returnPackage.getFirst());
-                                        em.lock(myPrescription, LockModeType.OPTIMISTIC);
-
-                                        // delete whats not in the new prescription anymore
-                                        for (PrescriptionSchedule schedule : returnPackage.getSecond()) {
-                                            em.remove(em.merge(schedule));
-                                        }
-
-                                        em.getTransaction().commit();
-
-                                        lstPrescriptions.remove(prescription);
-                                        lstPrescriptions.add(myPrescription);
-                                        Collections.sort(lstPrescriptions);
-                                        final CollapsiblePane myCP = createCP4(myPrescription);
-                                        buildPanel();
-
-                                        SwingUtilities.invokeLater(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                GUITools.scroll2show(jspPrescription, myCP.getLocation().y - 100, new Closure() {
-                                                    @Override
-                                                    public void execute(Object o) {
-                                                        GUITools.flashBackground(myCP, Color.YELLOW, 2);
-                                                    }
-                                                });
-                                            }
-                                        });
-
-                                    } catch (OptimisticLockException ole) {
-                                        if (em.getTransaction().isActive()) {
-                                            em.getTransaction().rollback();
-                                        }
-                                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                            OPDE.getMainframe().emptyFrame();
-                                            OPDE.getMainframe().afterLogin();
-                                        }
-                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                    } catch (Exception e) {
-                                        if (em.getTransaction().isActive()) {
-                                            em.getTransaction().rollback();
-                                        }
-                                        OPDE.fatal(e);
-                                    } finally {
-                                        em.close();
-                                    }
-                                    buildPanel();
-                                }
-                            }
-                        });
-                    }
-                }
-
-            });
-            btnEdit.setEnabled(!prescription.isDiscontinued());
-            cptitle.getRight().add(btnEdit);
-
-            /***
-             *      ____       _      _
-             *     |  _ \  ___| | ___| |_ ___
-             *     | | | |/ _ \ |/ _ \ __/ _ \
-             *     | |_| |  __/ |  __/ ||  __/
-             *     |____/ \___|_|\___|\__\___|
-             *
-             */
-            final JButton btnDelete = new JButton(SYSConst.icon22delete);
-            btnDelete.setPressedIcon(SYSConst.icon22deletePressed);
-            btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnDelete.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btnDelete.setContentAreaFilled(false);
-            btnDelete.setBorder(null);
-            btnDelete.setToolTipText(OPDE.lang.getString(internalClassID + ".btnDelete.tooltip"));
-            btnDelete.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-
-                    new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<br/>" + PrescriptionTools.toPrettyString(prescription) + "</br>" + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
-                        @Override
-                        public void execute(Object answer) {
-                            if (answer.equals(JOptionPane.YES_OPTION)) {
-
-                                EntityManager em = OPDE.createEM();
-                                try {
-                                    em.getTransaction().begin();
-                                    Prescription myverordnung = em.merge(prescription);
-                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                    em.lock(myverordnung, LockModeType.OPTIMISTIC);
-                                    em.remove(myverordnung);
-                                    Query delQuery = em.createQuery("DELETE FROM BHP b WHERE b.prescription = :prescription");
-                                    delQuery.setParameter("prescription", myverordnung);
-                                    delQuery.executeUpdate();
-                                    em.getTransaction().commit();
-
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.Deleted") + ": " + PrescriptionTools.toPrettyString(myverordnung)));
-                                    lstPrescriptions.remove(prescription);
-                                    buildPanel();
-                                } catch (OptimisticLockException ole) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    }
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                } catch (Exception e) {
-                                    em.getTransaction().rollback();
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
-                                }
-                            }
-                        }
-                    });
-                }
-
-            });
-            btnDelete.setEnabled(!prescription.isDiscontinued() && (!prescriptionHasBeenUsedAlready || OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)));
-            cptitle.getRight().add(btnDelete);
-
-            /***
-             *      _     _         _____ _ _
-             *     | |__ | |_ _ __ |  ___(_) | ___  ___
-             *     | '_ \| __| '_ \| |_  | | |/ _ \/ __|
-             *     | |_) | |_| | | |  _| | | |  __/\__ \
-             *     |_.__/ \__|_| |_|_|   |_|_|\___||___/
-             *
-             */
-
-            final JButton btnFiles = new JButton(SYSConst.icon22attach);
-            btnFiles.setPressedIcon(SYSConst.icon22attachPressed);
-            btnFiles.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnFiles.setContentAreaFilled(false);
-            btnFiles.setBorder(null);
-            btnFiles.setToolTipText(OPDE.lang.getString("misc.btnfiles.tooltip"));
-            btnFiles.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgFiles(prescription, new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            EntityManager em = OPDE.createEM();
-                            Prescription myPrescription = em.merge(prescription);
-                            em.refresh(myPrescription);
-                            em.close();
-                            lstPrescriptions.remove(prescription);
-                            lstPrescriptions.add(myPrescription);
-                            Collections.sort(lstPrescriptions);
-                            final CollapsiblePane myCP = createCP4(myPrescription);
-                            buildPanel();
-                            GUITools.flashBackground(myCP, Color.YELLOW, 2);
-                        }
-                    });
-                }
-            });
-
-            btnFiles.setEnabled(!prescription.isDiscontinued());
-            if (prescription.getAttachedFilesConnections().size() > 0) {
-                JLabel lblNum = new JLabel(Integer.toString(prescription.getAttachedFilesConnections().size()), SYSConst.icon16greenStar, SwingConstants.CENTER);
-                lblNum.setFont(SYSConst.ARIAL10BOLD);
-                lblNum.setForeground(Color.BLUE);
-                lblNum.setHorizontalTextPosition(SwingConstants.CENTER);
-                DefaultOverlayable overlayableBtn = new DefaultOverlayable(btnFiles, lblNum, DefaultOverlayable.CENTER);
-                overlayableBtn.setOpaque(false);
-                cptitle.getRight().add(overlayableBtn);
-            } else {
-                cptitle.getRight().add(btnFiles);
+                GUITools.showPopup(popup, SwingConstants.WEST);
             }
-
-            /***
-             *      _     _         ____
-             *     | |__ | |_ _ __ |  _ \ _ __ ___   ___ ___  ___ ___
-             *     | '_ \| __| '_ \| |_) | '__/ _ \ / __/ _ \/ __/ __|
-             *     | |_) | |_| | | |  __/| | | (_) | (_|  __/\__ \__ \
-             *     |_.__/ \__|_| |_|_|   |_|  \___/ \___\___||___/___/
-             *
-             */
-            final JButton btnProcess = new JButton(SYSConst.icon22link);
-            btnProcess.setPressedIcon(SYSConst.icon22linkPressed);
-            btnProcess.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnProcess.setContentAreaFilled(false);
-            btnProcess.setBorder(null);
-            btnProcess.setToolTipText(OPDE.lang.getString("misc.btnprocess.tooltip"));
-            btnProcess.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgProcessAssign(prescription, new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            if (o == null) {
-                                return;
-                            }
-                            Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = (Pair<ArrayList<QProcess>, ArrayList<QProcess>>) o;
-
-                            ArrayList<QProcess> assigned = result.getFirst();
-                            ArrayList<QProcess> unassigned = result.getSecond();
-
-                            EntityManager em = OPDE.createEM();
-
-                            try {
-                                em.getTransaction().begin();
-
-                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                Prescription myPrescription = em.merge(prescription);
-                                em.lock(myPrescription, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-
-                                for (SYSPRE2PROCESS linkObject : myPrescription.getAttachedProcessConnections()) {
-                                    if (unassigned.contains(linkObject.getQProcess())) {
-                                        em.remove(em.merge(linkObject));
-                                    }
-                                }
-
-                                for (QProcess qProcess : assigned) {
-                                    List<QProcessElement> listElements = qProcess.getElements();
-                                    if (!listElements.contains(myPrescription)) {
-                                        QProcess myQProcess = em.merge(qProcess);
-                                        SYSPRE2PROCESS myLinkObject = em.merge(new SYSPRE2PROCESS(myQProcess, myPrescription));
-                                        qProcess.getAttachedPrescriptionConnections().add(myLinkObject);
-                                        myPrescription.getAttachedProcessConnections().add(myLinkObject);
-                                    }
-                                }
-
-                                em.getTransaction().commit();
-
-                                lstPrescriptions.remove(prescription);
-                                lstPrescriptions.add(myPrescription);
-                                Collections.sort(lstPrescriptions);
-                                final CollapsiblePane myCP = createCP4(myPrescription);
-                                buildPanel();
-                                GUITools.flashBackground(myCP, Color.YELLOW, 2);
-
-                            } catch (OptimisticLockException ole) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            } catch (Exception e) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
-                            }
-                        }
-                    });
-                }
-            });
-            btnProcess.setEnabled(!prescription.isDiscontinued());
-
-            if (!prescription.getAttachedProcessConnections().isEmpty()) {
-                JLabel lblNum = new JLabel(Integer.toString(prescription.getAttachedProcessConnections().size()), SYSConst.icon16redStar, SwingConstants.CENTER);
-                lblNum.setFont(SYSConst.ARIAL10BOLD);
-                lblNum.setForeground(Color.YELLOW);
-                lblNum.setHorizontalTextPosition(SwingConstants.CENTER);
-                DefaultOverlayable overlayableBtn = new DefaultOverlayable(btnProcess, lblNum, DefaultOverlayable.CENTER);
-                overlayableBtn.setOpaque(false);
-                cptitle.getRight().add(overlayableBtn);
-            } else {
-                cptitle.getRight().add(btnProcess);
-            }
-        }
-
+        });
+        btnMenu.setEnabled(!prescription.isDiscontinued());
+        cptitle.getRight().add(btnMenu);
 
         cpPres.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
@@ -1442,6 +919,596 @@ public class PnlPrescription extends NursingRecordsPanel {
 //        }
 
         cpsPrescription.addExpansion();
+    }
+
+
+    private JPanel getMenu(final Prescription prescription) {
+
+        JPanel pnlMenu = new JPanel(new VerticalLayout());
+
+
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+
+            final boolean prescriptionHasBeenUsedAlready = BHPTools.hasBeenUsedAlready(prescription);
+            final MedInventory inventory = TradeFormTools.getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm());
+            final MedStock stockInUse = MedStockTools.getStockInUse(inventory);
+
+            /***
+             *       ____ _
+             *      / ___| |__   __ _ _ __   __ _  ___
+             *     | |   | '_ \ / _` | '_ \ / _` |/ _ \
+             *     | |___| | | | (_| | | | | (_| |  __/
+             *      \____|_| |_|\__,_|_| |_|\__, |\___|
+             *                              |___/
+             */
+            final JButton btnChange = GUITools.createHyperlinkButton(internalClassID + ".btnChange.tooltip", SYSConst.icon22playerPlay, null);
+            btnChange.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnChange.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+
+                    if (!prescriptionHasBeenUsedAlready) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".cantchange.hasNeverBeenUsed"));
+                        return;
+                    }
+
+                    new DlgRegular(prescription.clone(), DlgRegular.MODE_CHANGE, new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            if (o != null) {
+
+                                Pair<Prescription, java.util.List<PrescriptionSchedule>> returnPackage = (Pair<Prescription, List<PrescriptionSchedule>>) o;
+
+                                EntityManager em = OPDE.createEM();
+                                try {
+
+
+                                    em.getTransaction().begin();
+                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                    Prescription newPrescription = em.merge(returnPackage.getFirst());
+                                    Prescription oldPrescription = em.merge(prescription);
+
+                                    em.lock(oldPrescription, LockModeType.OPTIMISTIC);
+
+                                    // Bei einer Veränderung, wird erst die alte Verordnung durch den ANsetzenden Doc ABgesetzt.
+                                    DateTime now = new DateTime();
+                                    oldPrescription.setTo(now.toDate());
+                                    oldPrescription.setUserOFF(em.merge(OPDE.getLogin().getUser()));
+                                    oldPrescription.setDocOFF(newPrescription.getDocON() == null ? null : em.merge(newPrescription.getDocON()));
+                                    oldPrescription.setHospitalOFF(newPrescription.getHospitalON() == null ? null : em.merge(newPrescription.getHospitalON()));
+
+                                    newPrescription.setFrom(now.plusSeconds(1).toDate());
+
+                                    BHPTools.cleanup(em, oldPrescription);
+                                    BHPTools.generate(em, newPrescription.getPrescriptionSchedule(), new DateMidnight(), false);
+
+                                    em.getTransaction().commit();
+
+                                    lstPrescriptions.remove(prescription);
+                                    lstPrescriptions.add(oldPrescription);
+                                    lstPrescriptions.add(newPrescription);
+                                    Collections.sort(lstPrescriptions);
+                                    final CollapsiblePane myCP = createCP4(newPrescription);
+                                    buildPanel();
+
+                                    SwingUtilities.invokeLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            GUITools.scroll2show(jspPrescription, myCP.getLocation().y - 100, new Closure() {
+                                                @Override
+                                                public void execute(Object o) {
+                                                    GUITools.flashBackground(myCP, Color.YELLOW, 2);
+                                                }
+                                            });
+                                        }
+                                    });
+
+                                } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+                                buildPanel();
+                            }
+                        }
+                    });
+                }
+            });
+            btnChange.setEnabled(!prescription.isDiscontinued() && !prescription.isOnDemand());
+            pnlMenu.add(btnChange);
+
+            /***
+             *      ____  _                     _   _
+             *     |  _ \(_)___  ___ ___  _ __ | |_(_)_ __  _   _  ___
+             *     | | | | / __|/ __/ _ \| '_ \| __| | '_ \| | | |/ _ \
+             *     | |_| | \__ \ (_| (_) | | | | |_| | | | | |_| |  __/
+             *     |____/|_|___/\___\___/|_| |_|\__|_|_| |_|\__,_|\___|
+             *
+             */
+            final JButton btnDiscontinue = GUITools.createHyperlinkButton(internalClassID + ".btnDiscontinue.tooltip", SYSConst.icon22playerStop, null);
+            btnDiscontinue.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnDiscontinue.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+
+                    if (!prescriptionHasBeenUsedAlready) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".cantdiscontinue.hasNeverBeenUsed"));
+                        return;
+                    }
+
+                    new DlgDiscontinue(prescription, new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            if (o != null) {
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    Prescription myPrescription = (Prescription) em.merge(o);
+                                    em.lock(myPrescription.getResident(), LockModeType.OPTIMISTIC);
+                                    em.lock(myPrescription, LockModeType.OPTIMISTIC);
+                                    myPrescription.setTo(new Date());
+                                    if (!myPrescription.isOnDemand()) {
+                                        BHPTools.cleanup(em, myPrescription);
+                                    }
+                                    em.getTransaction().commit();
+
+                                    lstPrescriptions.remove(prescription);
+                                    lstPrescriptions.add(myPrescription);
+                                    Collections.sort(lstPrescriptions);
+                                    final CollapsiblePane myCP = createCP4(myPrescription);
+
+                                    if (!tbClosed.isSelected()) {
+                                        tbClosed.setSelected(true);
+                                    } else {
+                                        buildPanel();
+                                    }
+
+                                    SwingUtilities.invokeLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            GUITools.scroll2show(jspPrescription, myCP.getLocation().y - 100, new Closure() {
+                                                @Override
+                                                public void execute(Object o) {
+                                                    GUITools.flashBackground(myCP, Color.YELLOW, 2);
+                                                }
+                                            });
+                                        }
+                                    });
+
+                                } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    em.getTransaction().rollback();
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+//            btnDiscontinue.setEnabled(!prescription.isDiscontinued());
+            pnlMenu.add(btnDiscontinue);
+
+
+            /***
+             *      _____    _ _ _
+             *     | ____|__| (_) |_
+             *     |  _| / _` | | __|
+             *     | |__| (_| | | |_
+             *     |_____\__,_|_|\__/
+             *
+             */
+            final JButton btnEdit = GUITools.createHyperlinkButton(internalClassID + ".btnEdit.tooltip", SYSConst.icon22edit3, null);
+            btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnEdit.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+
+                    if (prescriptionHasBeenUsedAlready) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".cantedit.hasBeenUsedAlready"));
+                        return;
+                    }
+
+                    if (prescription.isOnDemand()) {
+                        new DlgOnDemand(prescription, new Closure() {
+                            @Override
+                            public void execute(Object o) {
+                                if (o != null) {
+
+                                    EntityManager em = OPDE.createEM();
+                                    try {
+                                        em.getTransaction().begin();
+                                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                        Prescription myPrescription = em.merge((Prescription) o);
+                                        em.lock(myPrescription, LockModeType.OPTIMISTIC);
+
+                                        Query queryDELBHP = em.createQuery("DELETE FROM BHP bhp WHERE bhp.prescription = :prescription");
+                                        queryDELBHP.setParameter("prescription", myPrescription);
+                                        queryDELBHP.executeUpdate();
+
+                                        if (!myPrescription.isOnDemand()) {
+                                            BHPTools.generate(em, myPrescription.getPrescriptionSchedule(), new DateMidnight(), true);
+                                        }
+
+                                        em.getTransaction().commit();
+
+                                        lstPrescriptions.remove(prescription);
+                                        lstPrescriptions.add(myPrescription);
+                                        Collections.sort(lstPrescriptions);
+                                        final CollapsiblePane myCP = createCP4(myPrescription);
+                                        buildPanel();
+
+                                        SwingUtilities.invokeLater(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                GUITools.scroll2show(jspPrescription, myCP.getLocation().y - 100, new Closure() {
+                                                    @Override
+                                                    public void execute(Object o) {
+                                                        GUITools.flashBackground(myCP, Color.YELLOW, 2);
+                                                    }
+                                                });
+                                            }
+                                        });
+
+                                    } catch (OptimisticLockException ole) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                            OPDE.getMainframe().emptyFrame();
+                                            OPDE.getMainframe().afterLogin();
+                                        }
+                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                    } catch (Exception e) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        OPDE.fatal(e);
+                                    } finally {
+                                        em.close();
+                                    }
+                                    buildPanel();
+                                }
+                            }
+                        });
+                    } else {
+                        new DlgRegular(prescription, DlgRegular.MODE_EDIT, new Closure() {
+                            @Override
+                            public void execute(Object o) {
+                                if (o != null) {
+
+                                    Pair<Prescription, java.util.List<PrescriptionSchedule>> returnPackage = (Pair<Prescription, List<PrescriptionSchedule>>) o;
+
+                                    EntityManager em = OPDE.createEM();
+                                    try {
+                                        em.getTransaction().begin();
+                                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                        Prescription myPrescription = em.merge(returnPackage.getFirst());
+                                        em.lock(myPrescription, LockModeType.OPTIMISTIC);
+
+                                        // delete whats not in the new prescription anymore
+                                        for (PrescriptionSchedule schedule : returnPackage.getSecond()) {
+                                            em.remove(em.merge(schedule));
+                                        }
+
+                                        em.getTransaction().commit();
+
+                                        lstPrescriptions.remove(prescription);
+                                        lstPrescriptions.add(myPrescription);
+                                        Collections.sort(lstPrescriptions);
+                                        final CollapsiblePane myCP = createCP4(myPrescription);
+                                        buildPanel();
+
+                                        SwingUtilities.invokeLater(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                GUITools.scroll2show(jspPrescription, myCP.getLocation().y - 100, new Closure() {
+                                                    @Override
+                                                    public void execute(Object o) {
+                                                        GUITools.flashBackground(myCP, Color.YELLOW, 2);
+                                                    }
+                                                });
+                                            }
+                                        });
+
+                                    } catch (OptimisticLockException ole) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                            OPDE.getMainframe().emptyFrame();
+                                            OPDE.getMainframe().afterLogin();
+                                        }
+                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                    } catch (Exception e) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        OPDE.fatal(e);
+                                    } finally {
+                                        em.close();
+                                    }
+                                    buildPanel();
+                                }
+                            }
+                        });
+                    }
+                }
+
+            });
+            btnEdit.setEnabled(!prescription.isDiscontinued());
+            pnlMenu.add(btnEdit);
+
+            /***
+             *      ____       _      _
+             *     |  _ \  ___| | ___| |_ ___
+             *     | | | |/ _ \ |/ _ \ __/ _ \
+             *     | |_| |  __/ |  __/ ||  __/
+             *     |____/ \___|_|\___|\__\___|
+             *
+             */
+            final JButton btnDelete = GUITools.createHyperlinkButton(internalClassID + ".btnDelete.tooltip", SYSConst.icon22delete, null);
+            btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnDelete.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+
+                    new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<br/>" + PrescriptionTools.toPrettyString(prescription) + "</br>" + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
+                        @Override
+                        public void execute(Object answer) {
+                            if (answer.equals(JOptionPane.YES_OPTION)) {
+
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    Prescription myverordnung = em.merge(prescription);
+                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                    em.lock(myverordnung, LockModeType.OPTIMISTIC);
+                                    em.remove(myverordnung);
+                                    Query delQuery = em.createQuery("DELETE FROM BHP b WHERE b.prescription = :prescription");
+                                    delQuery.setParameter("prescription", myverordnung);
+                                    delQuery.executeUpdate();
+                                    em.getTransaction().commit();
+
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.Deleted") + ": " + PrescriptionTools.toPrettyString(myverordnung)));
+                                    lstPrescriptions.remove(prescription);
+                                    buildPanel();
+                                } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    em.getTransaction().rollback();
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+                            }
+                        }
+                    });
+                }
+
+            });
+            btnDelete.setEnabled(!prescription.isDiscontinued() && (!prescriptionHasBeenUsedAlready || OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)));
+            pnlMenu.add(btnDelete);
+
+            pnlMenu.add(new JSeparator());
+
+            /***
+             *       ____ _                ____  _             _
+             *      / ___| | ___  ___  ___/ ___|| |_ ___   ___| | __
+             *     | |   | |/ _ \/ __|/ _ \___ \| __/ _ \ / __| |/ /
+             *     | |___| | (_) \__ \  __/___) | || (_) | (__|   <
+             *      \____|_|\___/|___/\___|____/ \__\___/ \___|_|\_\
+             *
+             */
+            final JButton btnCloseStock = GUITools.createHyperlinkButton(PnlInventory.internalClassID + ".stock.btnout.tooltip", SYSConst.icon22ledRedOn, null);
+            btnCloseStock.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnCloseStock.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    new DlgCloseStock(stockInUse, new Closure() {
+                        @Override
+                        public void execute(Object o) {
+
+                        }
+                    });
+                }
+            });
+            btnCloseStock.setEnabled(inventory != null && stockInUse != null);
+            pnlMenu.add(btnCloseStock);
+
+            /***
+             *       ___                   ____  _             _
+             *      / _ \ _ __   ___ _ __ / ___|| |_ ___   ___| | __
+             *     | | | | '_ \ / _ \ '_ \\___ \| __/ _ \ / __| |/ /
+             *     | |_| | |_) |  __/ | | |___) | || (_) | (__|   <
+             *      \___/| .__/ \___|_| |_|____/ \__\___/ \___|_|\_\
+             *           |_|
+             */
+            final JButton btnOpenStock = GUITools.createHyperlinkButton(PnlInventory.internalClassID + ".stock.btnopen.tooltip", SYSConst.icon22ledGreenOn, null);
+            btnOpenStock.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnOpenStock.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    new DlgOpenStock(prescription.getTradeForm(), resident, new Closure() {
+                        @Override
+                        public void execute(Object o) {
+
+                        }
+                    });
+                }
+            });
+            btnOpenStock.setEnabled(inventory != null && stockInUse == null);
+            pnlMenu.add(btnOpenStock);
+
+            pnlMenu.add(new JSeparator());
+
+            /***
+             *      _     _         _____ _ _
+             *     | |__ | |_ _ __ |  ___(_) | ___  ___
+             *     | '_ \| __| '_ \| |_  | | |/ _ \/ __|
+             *     | |_) | |_| | | |  _| | | |  __/\__ \
+             *     |_.__/ \__|_| |_|_|   |_|_|\___||___/
+             *
+             */
+
+            final JButton btnFiles = GUITools.createHyperlinkButton("misc.btnfiles.tooltip", SYSConst.icon22attach, null);
+            btnFiles.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnFiles.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    new DlgFiles(prescription, new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            EntityManager em = OPDE.createEM();
+                            Prescription myPrescription = em.merge(prescription);
+                            em.refresh(myPrescription);
+                            em.close();
+                            lstPrescriptions.remove(prescription);
+                            lstPrescriptions.add(myPrescription);
+                            Collections.sort(lstPrescriptions);
+                            final CollapsiblePane myCP = createCP4(myPrescription);
+                            buildPanel();
+                            GUITools.flashBackground(myCP, Color.YELLOW, 2);
+                        }
+                    });
+                }
+            });
+
+            btnFiles.setEnabled(!prescription.isDiscontinued());
+            if (prescription.getAttachedFilesConnections().size() > 0) {
+                JLabel lblNum = new JLabel(Integer.toString(prescription.getAttachedFilesConnections().size()), SYSConst.icon16greenStar, SwingConstants.CENTER);
+                lblNum.setFont(SYSConst.ARIAL10BOLD);
+                lblNum.setForeground(Color.BLUE);
+                lblNum.setHorizontalTextPosition(SwingConstants.CENTER);
+                DefaultOverlayable overlayableBtn = new DefaultOverlayable(btnFiles, lblNum, DefaultOverlayable.SOUTH_EAST);
+                overlayableBtn.setOpaque(false);
+                pnlMenu.add(overlayableBtn);
+            } else {
+                pnlMenu.add(btnFiles);
+            }
+
+            /***
+             *      _     _         ____
+             *     | |__ | |_ _ __ |  _ \ _ __ ___   ___ ___  ___ ___
+             *     | '_ \| __| '_ \| |_) | '__/ _ \ / __/ _ \/ __/ __|
+             *     | |_) | |_| | | |  __/| | | (_) | (_|  __/\__ \__ \
+             *     |_.__/ \__|_| |_|_|   |_|  \___/ \___\___||___/___/
+             *
+             */
+            final JButton btnProcess = GUITools.createHyperlinkButton("misc.btnprocess.tooltip", SYSConst.icon22link, null);
+            btnProcess.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnProcess.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    new DlgProcessAssign(prescription, new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            if (o == null) {
+                                return;
+                            }
+                            Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = (Pair<ArrayList<QProcess>, ArrayList<QProcess>>) o;
+
+                            ArrayList<QProcess> assigned = result.getFirst();
+                            ArrayList<QProcess> unassigned = result.getSecond();
+
+                            EntityManager em = OPDE.createEM();
+
+                            try {
+                                em.getTransaction().begin();
+
+                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                Prescription myPrescription = em.merge(prescription);
+                                em.lock(myPrescription, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
+                                for (SYSPRE2PROCESS linkObject : myPrescription.getAttachedProcessConnections()) {
+                                    if (unassigned.contains(linkObject.getQProcess())) {
+                                        em.remove(em.merge(linkObject));
+                                    }
+                                }
+
+                                for (QProcess qProcess : assigned) {
+                                    List<QProcessElement> listElements = qProcess.getElements();
+                                    if (!listElements.contains(myPrescription)) {
+                                        QProcess myQProcess = em.merge(qProcess);
+                                        SYSPRE2PROCESS myLinkObject = em.merge(new SYSPRE2PROCESS(myQProcess, myPrescription));
+                                        qProcess.getAttachedPrescriptionConnections().add(myLinkObject);
+                                        myPrescription.getAttachedProcessConnections().add(myLinkObject);
+                                    }
+                                }
+
+                                em.getTransaction().commit();
+
+                                lstPrescriptions.remove(prescription);
+                                lstPrescriptions.add(myPrescription);
+                                Collections.sort(lstPrescriptions);
+                                final CollapsiblePane myCP = createCP4(myPrescription);
+                                buildPanel();
+                                GUITools.flashBackground(myCP, Color.YELLOW, 2);
+
+                            } catch (OptimisticLockException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+                            }
+                        }
+                    });
+                }
+            });
+            btnProcess.setEnabled(!prescription.isDiscontinued());
+
+            if (!prescription.getAttachedProcessConnections().isEmpty()) {
+                JLabel lblNum = new JLabel(Integer.toString(prescription.getAttachedProcessConnections().size()), SYSConst.icon16redStar, SwingConstants.CENTER);
+                lblNum.setFont(SYSConst.ARIAL10BOLD);
+                lblNum.setForeground(Color.YELLOW);
+                lblNum.setHorizontalTextPosition(SwingConstants.CENTER);
+                DefaultOverlayable overlayableBtn = new DefaultOverlayable(btnProcess, lblNum, DefaultOverlayable.SOUTH_EAST);
+                overlayableBtn.setOpaque(false);
+                pnlMenu.add(overlayableBtn);
+            } else {
+                pnlMenu.add(btnProcess);
+            }
+        }
+        return pnlMenu;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

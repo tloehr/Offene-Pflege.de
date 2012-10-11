@@ -35,7 +35,6 @@ import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import entity.info.ResInfoCategory;
 import entity.info.ResInfoCategoryTools;
-import entity.info.ResInfoTypeTools;
 import entity.info.Resident;
 import entity.nursingprocess.*;
 import entity.system.Unique;
@@ -50,7 +49,7 @@ import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
-import org.joda.time.Period;
+import org.joda.time.Days;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -78,11 +77,10 @@ public class PnlNursingProcess extends NursingRecordsPanel {
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
 
-
-    //    private HashMap<NursingProcess, CollapsiblePane> planungCollapsiblePaneMap;
     private HashMap<ResInfoCategory, ArrayList<NursingProcess>> valuecache;
     private java.util.List<ResInfoCategory> categories;
     private HashMap<String, CollapsiblePane> cpMap;
+    private HashMap<NursingProcess, JPanel> contenPanelMap;
     private ArrayList<NursingProcess> listNP;
 
     private JToggleButton tbInactive;
@@ -110,6 +108,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
         cpMap = new HashMap<String, CollapsiblePane>();
         valuecache = new HashMap<ResInfoCategory, ArrayList<NursingProcess>>();
         categories = ResInfoCategoryTools.getAll4NP();
+        contenPanelMap = new HashMap<NursingProcess, JPanel>();
         prepareSearchArea();
         color1 = SYSConst.red2;
         color2 = SYSConst.greyscale;
@@ -119,6 +118,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
     public void cleanup() {
         cpMap.clear();
         valuecache.clear();
+        contenPanelMap.clear();
         if (listNP != null) {
             listNP.clear();
         }
@@ -147,22 +147,22 @@ public class PnlNursingProcess extends NursingRecordsPanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jspPlanung = new JScrollPane();
+        jspNP = new JScrollPane();
         cpsPlan = new CollapsiblePanes();
 
         //======== this ========
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
-        //======== jspPlanung ========
+        //======== jspNP ========
         {
 
             //======== cpsPlan ========
             {
                 cpsPlan.setLayout(new BoxLayout(cpsPlan, BoxLayout.X_AXIS));
             }
-            jspPlanung.setViewportView(cpsPlan);
+            jspNP.setViewportView(cpsPlan);
         }
-        add(jspPlanung);
+        add(jspNP);
     }// </editor-fold>//GEN-END:initComponents
 
 
@@ -227,8 +227,6 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
         } else {
 
-//            cpsPlan.removeAll();
-
             if (valuecache.isEmpty()) {
                 for (NursingProcess np : listNP) {
                     if (!valuecache.containsKey(np.getCategory())) {
@@ -288,6 +286,9 @@ public class PnlNursingProcess extends NursingRecordsPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
+                    if (cpCat.isCollapsed() && !tbInactive.isSelected() && !isEmpty(cat) && containsOnlyClosedNPs(cat)) {
+                        tbInactive.setSelected(true);
+                    }
                     cpCat.setCollapsed(!cpCat.isCollapsed());
                 } catch (PropertyVetoException pve) {
                     // BAH!
@@ -295,7 +296,13 @@ public class PnlNursingProcess extends NursingRecordsPanel {
             }
         });
 
-        GUITools.addExpandCollapseButtons(cpCat, cptitle.getRight());
+        if (isEmpty(cat)) {
+            cptitle.getButton().setIcon(SYSConst.icon22ledBlueOff);
+        } else if (containsOnlyClosedNPs(cat)) {
+            cptitle.getButton().setIcon(SYSConst.icon22ledBlueOn);
+        } else {
+            cptitle.getButton().setIcon(getIcon(getMinimumNextEvalDays(cat)));
+        }
 
         cpCat.setTitleLabelComponent(cptitle.getMain());
         cpCat.setSlidingDirection(SwingConstants.SOUTH);
@@ -310,23 +317,31 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                 if (valuecache.containsKey(cat)) {
                     int i = 0; // for zebra pattern
                     for (NursingProcess np : valuecache.get(cat)) {
-                        JPanel pnl = createNPPanel(np);
-                        pnl.setBackground(i % 2 == 0 ? Color.WHITE : getColor(cat)[SYSConst.light3]);
-                        pnl.setOpaque(true);
-                        pnlContent.add(pnl);
-                        i++;
+                        if (tbInactive.isSelected() || !np.isClosed()) {
+                            JPanel pnl = createNPPanel(np);
+                            pnl.setBackground(i % 2 == 0 ? Color.WHITE : getColor(cat)[SYSConst.light3]);
+                            pnl.setOpaque(true);
+                            pnlContent.add(pnl);
+                            i++;
+                        }
                     }
                 }
                 cpCat.setContentPane(pnlContent);
             }
         });
 
-
         if (!cpCat.isCollapsed()) {
             JPanel pnlContent = new JPanel(new VerticalLayout());
             if (valuecache.containsKey(cat)) {
+                int i = 0; // for zebra pattern
                 for (NursingProcess np : valuecache.get(cat)) {
-                    pnlContent.add(createNPPanel(np));
+                    if (tbInactive.isSelected() || !np.isClosed()) {
+                        JPanel pnl = createNPPanel(np);
+                        pnl.setBackground(i % 2 == 0 ? Color.WHITE : getColor(cat)[SYSConst.light3]);
+                        pnl.setOpaque(true);
+                        pnlContent.add(pnl);
+                        i++;
+                    }
                 }
             }
             cpCat.setContentPane(pnlContent);
@@ -353,59 +368,62 @@ public class PnlNursingProcess extends NursingRecordsPanel {
          *      \___|_|  \___|\__,_|\__\___|\____|_|      |_|   |_| \_|_|
          *
          */
+        if (!contenPanelMap.containsKey(np)) {
+            String title = "<html><table border=\"0\">" +
+                    "<tr valign=\"top\">" +
+                    "<td width=\"280\" align=\"left\">" + np.getPITAsHTML() + "</td>" +
+                    "<td width=\"500\" align=\"left\">" +
+                    (np.isClosed() ? "<s>" : "") +
+                    np.getContentAsHTML() +
+                    (np.isClosed() ? "</s>" : "") +
+                    "</td>" +
+                    "</table>" +
+                    "</html>";
 
-        String title = "<html><table border=\"0\">" +
-                "<tr valign=\"top\">" +
-                "<td width=\"280\" align=\"left\">" + np.getPITAsHTML() + "</td>" +
-                "<td width=\"500\" align=\"left\">" +
-                (np.isClosed() ? "<s>" : "") +
-                np.getContentAsHTML() +
-                (np.isClosed() ? "</s>" : "") +
-                "</td>" +
-                "</table>" +
-                "</html>";
+            DefaultCPTitle cptitle = new DefaultCPTitle(title, null);
+            cptitle.getButton().setVerticalTextPosition(SwingConstants.TOP);
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, null);
+            /***
+             *      __  __
+             *     |  \/  | ___ _ __  _   _
+             *     | |\/| |/ _ \ '_ \| | | |
+             *     | |  | |  __/ | | | |_| |
+             *     |_|  |_|\___|_| |_|\__,_|
+             *
+             */
+            final JButton btnMenu = new JButton(SYSConst.icon32menu);
+            btnMenu.setPressedIcon(SYSConst.icon32Pressed);
+            btnMenu.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnMenu.setAlignmentY(Component.TOP_ALIGNMENT);
+            btnMenu.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            btnMenu.setContentAreaFilled(false);
+            btnMenu.setBorder(null);
+            btnMenu.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JidePopup popup = new JidePopup();
+                    popup.setMovable(false);
+                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                    popup.setOwner(btnMenu);
+                    popup.removeExcludedComponent(btnMenu);
+                    JPanel pnl = getMenu(np);
+                    popup.getContentPane().add(pnl);
+                    popup.setDefaultFocusComponent(pnl);
 
-        /***
-         *      __  __
-         *     |  \/  | ___ _ __  _   _
-         *     | |\/| |/ _ \ '_ \| | | |
-         *     | |  | |  __/ | | | |_| |
-         *     |_|  |_|\___|_| |_|\__,_|
-         *
-         */
-        final JButton btnMenu = new JButton(SYSConst.icon32menu);
-        btnMenu.setPressedIcon(SYSConst.icon32Pressed);
-        btnMenu.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        btnMenu.setAlignmentY(Component.TOP_ALIGNMENT);
-        btnMenu.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btnMenu.setContentAreaFilled(false);
-        btnMenu.setBorder(null);
-        btnMenu.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JidePopup popup = new JidePopup();
-                popup.setMovable(false);
-                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-                popup.setOwner(btnMenu);
-                popup.removeExcludedComponent(btnMenu);
-                JPanel pnl = getMenu(np);
-                popup.getContentPane().add(pnl);
-                popup.setDefaultFocusComponent(pnl);
-
-                GUITools.showPopup(popup, SwingConstants.WEST);
-            }
-        });
+                    GUITools.showPopup(popup, SwingConstants.WEST);
+                }
+            });
 
 
-        cptitle.getButton().setIcon(getIcon(np));
+            cptitle.getButton().setIcon(getIcon(np));
 
-        cptitle.getRight().add(btnMenu);
-        cptitle.getMain().setBackground(getColor(np.getCategory())[SYSConst.light2]);
-        cptitle.getMain().setOpaque(true);
+            cptitle.getRight().add(btnMenu);
+            cptitle.getMain().setBackground(getColor(np.getCategory())[SYSConst.light2]);
+            cptitle.getMain().setOpaque(true);
+            contenPanelMap.put(np, cptitle.getMain());
+        }
 
-        return cptitle.getMain();
+        return contenPanelMap.get(np);
     }
 
 //    public void refreshDisplay() {
@@ -419,19 +437,21 @@ public class PnlNursingProcess extends NursingRecordsPanel {
     private Icon getIcon(NursingProcess np) {
         DateTime nexteval = new DateTime(np.getNextEval());
         if (!np.isClosed()) {
-            Period period = new Period(nexteval, new DateTime());
-            if (period.getDays() > 7) {
-                return SYSConst.icon22ledGreenOn;
-            } else if (period.getDays() < 0) {
-                return SYSConst.icon22ledRedOn;
-            } else {
-                return SYSConst.icon22ledYellowOn;
-            }
+            return getIcon(Days.daysBetween(new DateTime(), nexteval).getDays());
         } else {
-            return SYSConst.icon22ledGreenOff;
+            return SYSConst.icon22ledBlueOn;
         }
     }
 
+    private Icon getIcon(int days2nextEvalDate) {
+        if (days2nextEvalDate > 7) {
+            return SYSConst.icon22ledGreenOn;
+        } else if (days2nextEvalDate < 0) {
+            return SYSConst.icon22ledRedOn;
+        } else {
+            return SYSConst.icon22ledYellowOn;
+        }
+    }
 
     private void prepareSearchArea() {
         searchPanes = new CollapsiblePanes();
@@ -476,22 +496,22 @@ public class PnlNursingProcess extends NursingRecordsPanel {
     private List<Component> addFilters() {
         List<Component> list = new ArrayList<Component>();
 
-        txtSearch = new JXSearchField(OPDE.lang.getString("misc.msg.searchphrase"));
-        txtSearch.setInstantSearchDelay(750);
-        txtSearch.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
-        list.add(txtSearch);
+//        txtSearch = new JXSearchField(OPDE.lang.getString("misc.msg.searchphrase"));
+//        txtSearch.setInstantSearchDelay(750);
+//        txtSearch.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//
+//            }
+//        });
+//        list.add(txtSearch);
 
         tbInactive = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".inactive"));
         tbInactive.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (initPhase) return;
-                buildPanel();
+                reloadDisplay();
             }
         });
         tbInactive.setHorizontalAlignment(SwingConstants.LEFT);
@@ -499,21 +519,21 @@ public class PnlNursingProcess extends NursingRecordsPanel {
         return list;
     }
 
-    private void addNursingProcessToDisplay(NursingProcess np) {
-//        private HashMap<NursingProcess, CollapsiblePane> planungCollapsiblePaneMap;
-//    private HashMap<ResInfoCategory, java.util.List<NursingProcess>> valuecache;
-
-        if (!valuecache.containsKey(np.getCategory())) {
-            valuecache.put(np.getCategory(), new ArrayList<NursingProcess>());
-        }
-        valuecache.get(np.getCategory()).add(np);
-        Collections.sort(valuecache.get(np.getCategory()));
-
-        if (!categories.contains(np.getCategory())) {
-            categories.add(np.getCategory());
-        }
-        Collections.sort(categories);
-    }
+//    private void addNursingProcessToDisplay(NursingProcess np) {
+////        private HashMap<NursingProcess, CollapsiblePane> planungCollapsiblePaneMap;
+////    private HashMap<ResInfoCategory, java.util.List<NursingProcess>> valuecache;
+//
+//        if (!valuecache.containsKey(np.getCategory())) {
+//            valuecache.put(np.getCategory(), new ArrayList<NursingProcess>());
+//        }
+//        valuecache.get(np.getCategory()).add(np);
+//        Collections.sort(valuecache.get(np.getCategory()));
+//
+//        if (!categories.contains(np.getCategory())) {
+//            categories.add(np.getCategory());
+//        }
+//        Collections.sort(categories);
+//    }
 
     private List<Component> addCommands() {
 
@@ -528,25 +548,44 @@ public class PnlNursingProcess extends NursingRecordsPanel {
          *
          */
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
-            JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
+            JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.new"), SYSConst.icon22add, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     new DlgNursingProcess(new NursingProcess(resident), new Closure() {
                         @Override
-                        public void execute(Object planung) {
-                            if (planung != null) {
+                        public void execute(Object np) {
+                            if (np != null) {
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();
                                     em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                                     Unique unique = UniqueTools.getNewUID(em, NursingProcessTools.UNIQUEID);
-                                    NursingProcess myplan = em.merge((NursingProcess) planung);
-                                    myplan.setNPSeries(unique.getUid());
-                                    DFNTools.generate(em, myplan.getInterventionSchedule(), new DateMidnight(), true);
+                                    final NursingProcess newNP = em.merge(((Pair<NursingProcess, ArrayList<InterventionSchedule>>) np).getFirst());
+                                    newNP.setNPSeries(unique.getUid());
+                                    DFNTools.generate(em, newNP.getInterventionSchedule(), new DateMidnight(), true);
                                     em.getTransaction().commit();
-                                    addNursingProcessToDisplay(myplan);
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getSuccessMessage(myplan.getTopic(), "entered"));
-                                    reloadDisplay();
+
+                                    // Refresh Display
+                                    if (!valuecache.containsKey(newNP.getCategory())) {
+                                        valuecache.put(newNP.getCategory(), new ArrayList<NursingProcess>());
+                                    }
+                                    valuecache.get(newNP.getCategory()).add(newNP);
+                                    Collections.sort(valuecache.get(newNP.getCategory()));
+                                    createCP4(newNP.getCategory());
+                                    buildPanel();
+
+                                    SwingUtilities.invokeLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            expandCat(newNP.getCategory());
+                                            GUITools.scroll2show(jspNP, contenPanelMap.get(newNP).getLocation().y, new Closure() {
+                                                @Override
+                                                public void execute(Object o) {
+                                                    GUITools.flashBackground(contenPanelMap.get(newNP), Color.YELLOW, 2);
+                                                }
+                                            });
+                                        }
+                                    });
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -579,7 +618,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
              *     |_| \_|\___| \_/\_/   | |  |_|\___|_| |_| |_| .__/|_|\__,_|\__\___| |
              *                            \_\                  |_|                  /_/
              */
-            final JideButton addTemplate = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.newfromtemplate"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), null);
+            final JideButton addTemplate = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.newfromtemplate"), SYSConst.icon22add, null);
             addTemplate.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -604,20 +643,39 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
                                 new DlgNursingProcess(template, new Closure() {
                                     @Override
-                                    public void execute(Object planung) {
-                                        if (planung != null) {
+                                    public void execute(Object np) {
+                                        if (np != null) {
                                             EntityManager em = OPDE.createEM();
                                             try {
                                                 em.getTransaction().begin();
                                                 em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                                                 Unique unique = UniqueTools.getNewUID(em, NursingProcessTools.UNIQUEID);
-                                                NursingProcess myplan = em.merge((NursingProcess) planung);
-                                                myplan.setNPSeries(unique.getUid());
-                                                DFNTools.generate(em, myplan.getInterventionSchedule(), new DateMidnight(), true);
+                                                final NursingProcess newNP = em.merge(((Pair<NursingProcess, ArrayList<InterventionSchedule>>) np).getFirst());
+                                                newNP.setNPSeries(unique.getUid());
+                                                DFNTools.generate(em, newNP.getInterventionSchedule(), new DateMidnight(), true);
                                                 em.getTransaction().commit();
-                                                addNursingProcessToDisplay(myplan);
-                                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getSuccessMessage(myplan.getTopic(), "entered"));
-                                                reloadDisplay();
+
+                                                // Refresh Display
+                                                if (!valuecache.containsKey(newNP.getCategory())) {
+                                                    valuecache.put(newNP.getCategory(), new ArrayList<NursingProcess>());
+                                                }
+                                                valuecache.get(newNP.getCategory()).add(newNP);
+                                                Collections.sort(valuecache.get(newNP.getCategory()));
+                                                createCP4(newNP.getCategory());
+                                                buildPanel();
+
+                                                SwingUtilities.invokeLater(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        expandCat(newNP.getCategory());
+                                                        GUITools.scroll2show(jspNP, contenPanelMap.get(newNP).getLocation().y, new Closure() {
+                                                            @Override
+                                                            public void execute(Object o) {
+                                                                GUITools.flashBackground(contenPanelMap.get(newNP), Color.YELLOW, 2);
+                                                            }
+                                                        });
+                                                    }
+                                                });
                                             } catch (OptimisticLockException ole) {
                                                 if (em.getTransaction().isActive()) {
                                                     em.getTransaction().rollback();
@@ -658,10 +716,45 @@ public class PnlNursingProcess extends NursingRecordsPanel {
             list.add(addTemplate);
         }
 
+        final JideButton btnExpandAll = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.msg.expandall"), SYSConst.icon22expand, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                try {
+                    GUITools.setCollapsed(cpsPlan, false);
+                } catch (PropertyVetoException e) {
+                    // bah!
+                }
+            }
+        });
+        list.add(btnExpandAll);
+
+        final JideButton btnCollapseAll = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.msg.collapseall"), SYSConst.icon22collapse, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                try {
+                    GUITools.setCollapsed(cpsPlan, true);
+                } catch (PropertyVetoException e) {
+                    // bah!
+                }
+            }
+        });
+        list.add(btnCollapseAll);
 
         return list;
     }
 
+
+    private void expandCat(final ResInfoCategory cat) {
+        // expand the category if necessary
+        final String keyCat = cat.getID() + ".xcategory";
+        if (cpMap.get(keyCat).isCollapsed()) {
+            try {
+                cpMap.get(keyCat).setCollapsed(false);
+            } catch (PropertyVetoException e) {
+                // Bah!
+            }
+        }
+    }
 
     private JPanel getMenu(final NursingProcess np) {
 
@@ -719,12 +812,16 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     // Create new DFNs according to plan
                                     DFNTools.generate(em, myNewNP.getInterventionSchedule(), new DateMidnight(), true);
                                     em.getTransaction().commit();
+
                                     // Refresh Display
                                     valuecache.get(np.getCategory()).remove(np);
-                                    valuecache.get(np.getCategory()).add(myOldNP);
-                                    addNursingProcessToDisplay(myNewNP);
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getSuccessMessage(np.getTopic(), "changed"));
-                                    reloadDisplay();
+                                    contenPanelMap.remove(np);
+                                    valuecache.get(myOldNP.getCategory()).add(myOldNP);
+                                    valuecache.get(myNewNP.getCategory()).add(myNewNP);
+                                    Collections.sort(valuecache.get(myNewNP.getCategory()));
+                                    createCP4(myNewNP.getCategory());
+                                    buildPanel();
+                                    GUITools.flashBackground(contenPanelMap.get(myNewNP), Color.YELLOW, 2);
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -777,7 +874,11 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();
+                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+
                                     NursingProcess myOldNP = em.merge(np);
+                                    em.lock(myOldNP, LockModeType.OPTIMISTIC);
+
                                     myOldNP.setUserOFF(em.merge(OPDE.getLogin().getUser()));
                                     myOldNP.setTo(new Date());
                                     NPControl lastValidation = em.merge(new NPControl(o.toString(), myOldNP));
@@ -789,13 +890,18 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     delQuery.setParameter("status", DFNTools.STATE_OPEN);
                                     delQuery.executeUpdate();
 
+                                    em.getTransaction().commit();
+
                                     // Refresh Display
                                     valuecache.get(np.getCategory()).remove(np);
-                                    valuecache.get(np.getCategory()).add(myOldNP);
+                                    contenPanelMap.remove(np);
+                                    valuecache.get(myOldNP.getCategory()).add(myOldNP);
                                     Collections.sort(valuecache.get(myOldNP.getCategory()));
 
-                                    em.lock(myOldNP, LockModeType.OPTIMISTIC);
-                                    em.getTransaction().commit();
+                                    createCP4(myOldNP.getCategory());
+                                    buildPanel();
+//                                    GUITools.flashBackground(contenPanelMap.get(myOldNP), Color.YELLOW, 2);
+
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -850,16 +956,16 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                 public void actionPerformed(ActionEvent actionEvent) {
                     new DlgNursingProcess(np, new Closure() {
                         @Override
-                        public void execute(Object np) {
+                        public void execute(Object o) {
                             if (np != null) {
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();
                                     em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                    NursingProcess mynp = em.merge(((Pair<NursingProcess, ArrayList<InterventionSchedule>>) np).getFirst());
+                                    NursingProcess mynp = em.merge(((Pair<NursingProcess, ArrayList<InterventionSchedule>>) o).getFirst());
                                     em.lock(mynp, LockModeType.OPTIMISTIC);
                                     // Schedules to delete
-                                    for (InterventionSchedule is : ((Pair<NursingProcess, ArrayList<InterventionSchedule>>) np).getSecond()) {
+                                    for (InterventionSchedule is : ((Pair<NursingProcess, ArrayList<InterventionSchedule>>) o).getSecond()) {
                                         em.remove(em.merge(is));
                                     }
                                     // No unused DFNs to delete
@@ -869,9 +975,17 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     // Create new DFNs according to plan
                                     DFNTools.generate(em, mynp.getInterventionSchedule(), new DateMidnight(), true);
                                     em.getTransaction().commit();
+
+                                    // Refresh Display
+                                    valuecache.get(np.getCategory()).remove(np);
+                                    contenPanelMap.remove(np);
+                                    valuecache.get(mynp.getCategory()).add(mynp);
                                     Collections.sort(valuecache.get(mynp.getCategory()));
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getSuccessMessage(mynp.getTopic(), "edited"));
-                                    reloadDisplay();
+
+                                    createCP4(mynp.getCategory());
+                                    buildPanel();
+                                    GUITools.flashBackground(contenPanelMap.get(mynp), Color.YELLOW, 2);
+
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -920,7 +1034,9 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();
+                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                                     NursingProcess myOldNP = em.merge(np);
+                                    em.lock(myOldNP, LockModeType.OPTIMISTIC);
 
                                     // DFNs to delete
                                     Query delQuery = em.createQuery("DELETE FROM DFN dfn WHERE dfn.nursingProcess = :nursingprocess AND dfn.status = :status ");
@@ -930,6 +1046,14 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
                                     em.remove(myOldNP);
                                     em.getTransaction().commit();
+
+                                    // Refresh Display
+                                    valuecache.get(np.getCategory()).remove(np);
+                                    contenPanelMap.remove(np);
+                                    buildPanel();
+
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getSuccessMessage(np.getTopic(), "deleted"));
+
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -947,10 +1071,6 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                 } finally {
                                     em.close();
                                 }
-
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getSuccessMessage(np.getTopic(), "deleted"));
-                                // TODO: das reicht nicht. muss wohl mehr gemacht werden. die gelöschten bleiben stehen
-                                reloadDisplay();
                             }
                         }
                     });
@@ -969,81 +1089,114 @@ public class PnlNursingProcess extends NursingRecordsPanel {
          *     |____/ \__|_| |_|_____| \_/ \__,_|_|
          *
          */
-        final JButton btnEval = GUITools.createHyperlinkButton(internalClassID + ".btneval.tooltip", SYSConst.icon22redo, null);
-        btnEval.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        btnEval.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                final JidePopup popup = new JidePopup();
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+            final JButton btnEval = GUITools.createHyperlinkButton(internalClassID + ".btneval.tooltip", SYSConst.icon22redo, null);
+            btnEval.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnEval.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    final JidePopup popup = new JidePopup();
 
-                JPanel dlg = new PnlEval(np, new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        if (o != null) {
-                            popup.hidePopup();
+                    JPanel dlg = new PnlEval(np, new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            if (o != null) {
+                                popup.hidePopup();
 
-                            Pair<NursingProcess, String> result = (Pair<NursingProcess, String>) o;
+                                Pair<NursingProcess, String> result = (Pair<NursingProcess, String>) o;
 
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
-                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
 
-                                NursingProcess evaluatedNP = em.merge(result.getFirst());
-                                em.lock(evaluatedNP, LockModeType.OPTIMISTIC);
+                                    NursingProcess evaluatedNP = em.merge(result.getFirst());
+                                    em.lock(evaluatedNP, LockModeType.OPTIMISTIC);
 
-                                NPControl newEvaluation = em.merge(new NPControl(result.getSecond(), evaluatedNP));
-                                evaluatedNP.getEvaluations().add(newEvaluation);
+                                    NPControl newEvaluation = em.merge(new NPControl(result.getSecond(), evaluatedNP));
+                                    evaluatedNP.getEvaluations().add(newEvaluation);
 
-                                // Refresh Display
-                                valuecache.get(np.getCategory()).remove(np);
-                                valuecache.get(np.getCategory()).add(evaluatedNP);
-                                Collections.sort(valuecache.get(np.getCategory()));
+                                    em.getTransaction().commit();
 
-                                em.getTransaction().commit();
-                            } catch (OptimisticLockException ole) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
+                                    // Refresh Display
+                                    valuecache.get(np.getCategory()).remove(np);
+                                    contenPanelMap.remove(np);
+                                    valuecache.get(evaluatedNP.getCategory()).add(evaluatedNP);
+                                    Collections.sort(valuecache.get(evaluatedNP.getCategory()));
+
+                                    createCP4(evaluatedNP.getCategory());
+                                    buildPanel();
+                                    GUITools.flashBackground(contenPanelMap.get(evaluatedNP), Color.YELLOW, 2);
+
+                                } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
                                 }
-                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            } catch (Exception e) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
+
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".success.neweval")));
+                                reloadDisplay();
                             }
-
-                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".success.neweval")));
-                            reloadDisplay();
                         }
-                    }
-                });
+                    });
 
-                popup.setMovable(false);
-                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-                popup.getContentPane().add(dlg);
-                popup.setOwner(btnEval);
-                popup.removeExcludedComponent(btnEval);
-                popup.setDefaultFocusComponent(dlg);
+                    popup.setMovable(false);
+                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                    popup.getContentPane().add(dlg);
+                    popup.setOwner(btnEval);
+                    popup.removeExcludedComponent(btnEval);
+                    popup.setDefaultFocusComponent(dlg);
 
-                GUITools.showPopup(popup, SwingConstants.WEST);
-            }
-        });
-        btnEval.setEnabled(!np.isClosed());
-        pnlMenu.add(btnEval);
+                    GUITools.showPopup(popup, SwingConstants.WEST);
+                }
+            });
 
+            btnEval.setEnabled(!np.isClosed());
+            pnlMenu.add(btnEval);
+        }
         return pnlMenu;
     }
 
 
+    private boolean isEmpty(final ResInfoCategory cat) {
+        return !valuecache.containsKey(cat) || valuecache.get(cat).isEmpty();
+    }
+
+    private boolean containsOnlyClosedNPs(final ResInfoCategory cat) {
+        boolean containsOnlyClosedNPs = true;
+        for (NursingProcess np : valuecache.get(cat)) {
+            containsOnlyClosedNPs = np.isClosed();
+            if (!containsOnlyClosedNPs) {
+                break;
+            }
+        }
+        return containsOnlyClosedNPs;
+    }
+
+    private int getMinimumNextEvalDays(final ResInfoCategory cat) {
+        int days = Integer.MAX_VALUE;
+        for (NursingProcess np : valuecache.get(cat)) {
+            if (!np.isClosed())
+                days = Math.min(Days.daysBetween(new DateTime(), new DateTime(np.getNextEval())).getDays(), days);
+        }
+        return days;
+    }
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JScrollPane jspPlanung;
+    private JScrollPane jspNP;
     private CollapsiblePanes cpsPlan;
     // End of variables declaration//GEN-END:variables
 }

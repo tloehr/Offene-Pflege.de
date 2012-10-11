@@ -46,7 +46,7 @@ import java.util.Date;
                 + " SELECT u.*, ifnull(u2u.num, 0) num FROM Uebergabebuch u "
                 + " LEFT OUTER JOIN ( SELECT uebid, count(*) num FROM Uebergabe2User WHERE UKennung=? GROUP BY uebid, UKennung) as u2u ON u2u.UEBID = u.UEBID "
                 + " WHERE "
-                + "     u.EKennung = ? "
+                + "     u.EID = ? "
                 + "     AND u.PIT >= ? AND u.PIT <= ? "
                 + " GROUP BY u.UEBID "
                 + " ORDER BY u.PIT DESC", resultSetMapping = "Handovers.findByEinrichtungAndDatumAndAckUserResultMapping")

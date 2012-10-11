@@ -6,13 +6,10 @@ package entity;
 
 import java.io.Serializable;
 import java.util.Collection;
-import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -22,28 +19,27 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "Homes")
-@NamedQueries({
-    @NamedQuery(name = "Einrichtungen.findAll", query = "SELECT e FROM Homes e ORDER BY e.eKennung "),
-    @NamedQuery(name = "Einrichtungen.findByEKennung", query = "SELECT e FROM Homes e WHERE e.eKennung = :eKennung"),
-    @NamedQuery(name = "Einrichtungen.findByBezeichnung", query = "SELECT e FROM Homes e WHERE e.bezeichnung = :bezeichnung"),
-    @NamedQuery(name = "Einrichtungen.findByStrasse", query = "SELECT e FROM Homes e WHERE e.strasse = :strasse"),
-    @NamedQuery(name = "Einrichtungen.findByPlz", query = "SELECT e FROM Homes e WHERE e.plz = :plz"),
-    @NamedQuery(name = "Einrichtungen.findByOrt", query = "SELECT e FROM Homes e WHERE e.ort = :ort"),
-    @NamedQuery(name = "Einrichtungen.findByTel", query = "SELECT e FROM Homes e WHERE e.tel = :tel"),
-    @NamedQuery(name = "Einrichtungen.findByFax", query = "SELECT e FROM Homes e WHERE e.fax = :fax")})
+//@NamedQueries({
+//    @NamedQuery(name = "Einrichtungen.findAll", query = "SELECT e FROM Homes e ORDER BY e.eKennung "),
+//    @NamedQuery(name = "Einrichtungen.findByEKennung", query = "SELECT e FROM Homes e WHERE e.eKennung = :eKennung"),
+//    @NamedQuery(name = "Einrichtungen.findByBezeichnung", query = "SELECT e FROM Homes e WHERE e.bezeichnung = :bezeichnung"),
+//    @NamedQuery(name = "Einrichtungen.findByStrasse", query = "SELECT e FROM Homes e WHERE e.strasse = :strasse"),
+//    @NamedQuery(name = "Einrichtungen.findByPlz", query = "SELECT e FROM Homes e WHERE e.plz = :plz"),
+//    @NamedQuery(name = "Einrichtungen.findByOrt", query = "SELECT e FROM Homes e WHERE e.ort = :ort"),
+//    @NamedQuery(name = "Einrichtungen.findByTel", query = "SELECT e FROM Homes e WHERE e.tel = :tel"),
+//    @NamedQuery(name = "Einrichtungen.findByFax", query = "SELECT e FROM Homes e WHERE e.fax = :fax")})
 public class Homes implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @Basic(optional = false)
     @Column(name = "EID")
-    private String eKennung;
+    private String eid;
     @Column(name = "Name")
     private String bezeichnung;
     @Column(name = "Str")
     private String strasse;
     @Column(name = "ZIP")
-    private String plz;
+    private String zip;
     @Column(name = "City")
     private String ort;
     @Column(name = "Tel")
@@ -51,27 +47,15 @@ public class Homes implements Serializable {
     @Column(name = "Fax")
     private String fax;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "einrichtung")
-    private Collection<Handovers> uebergabeberichte;
+    private Collection<Handovers> handovers;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "einrichtung")
     private Collection<Station> station;
 
     public Homes() {
     }
 
-    public Collection<Station> getStation() {
-        return station;
-    }
-
-    public Collection<Handovers> getUebergabeberichte() {
-        return uebergabeberichte;
-    }
-
-    public String getEKennung() {
-        return eKennung;
-    }
-
-    public void setEKennung(String eKennung) {
-        this.eKennung = eKennung;
+    public String getEID() {
+        return eid;
     }
 
     public String getBezeichnung() {
@@ -90,13 +74,10 @@ public class Homes implements Serializable {
         this.strasse = strasse;
     }
 
-    public String getPlz() {
-        return plz;
+    public String getZIP() {
+        return zip;
     }
 
-    public void setPlz(String plz) {
-        this.plz = plz;
-    }
 
     public String getOrt() {
         return ort;
@@ -125,7 +106,7 @@ public class Homes implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (eKennung != null ? eKennung.hashCode() : 0);
+        hash += (eid != null ? eid.hashCode() : 0);
         return hash;
     }
 
@@ -136,7 +117,7 @@ public class Homes implements Serializable {
             return false;
         }
         Homes other = (Homes) object;
-        if ((this.eKennung == null && other.eKennung != null) || (this.eKennung != null && !this.eKennung.equals(other.eKennung))) {
+        if ((this.eid == null && other.eid != null) || (this.eid != null && !this.eid.equals(other.eid))) {
             return false;
         }
         return true;

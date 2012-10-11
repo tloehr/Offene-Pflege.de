@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_31" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_33" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void property="contentType"> 
    <string>form/swing</string> 
@@ -38,7 +38,7 @@
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
-          <string>14dlu, linegap, default, linegap, fill:70dlu:grow, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, relgap, linegap, fill:default, linegap, relgap, linegap, default, linegap, 14dlu</string> 
+          <string>14dlu, linegap, fill:70dlu:grow, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, relgap, linegap, fill:default, linegap, relgap, linegap, default, linegap, 14dlu</string> 
          </void> 
         </object> 
         <void method="setProperty"> 
@@ -47,37 +47,6 @@
         </void> 
         <void property="name"> 
          <string>jPanel1</string> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JLabel</string> 
-          <void method="setProperty"> 
-           <string>font</string> 
-           <object class="java.awt.Font"> 
-            <string>Arial</string> 
-            <int>0</int> 
-            <int>24</int> 
-           </object> 
-          </void> 
-          <void method="setProperty"> 
-           <string>text</string> 
-           <string>Bestand abschließen</string> 
-          </void> 
-          <void property="name"> 
-           <string>jLabel1</string> 
-          </void> 
-         </object> 
-         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-          <class>com.jgoodies.forms.layout.CellConstraints</class> 
-          <void method="setProperty"> 
-           <string>gridX</string> 
-           <int>3</int> 
-          </void> 
-          <void method="setProperty"> 
-           <string>gridY</string> 
-           <int>3</int> 
-          </void> 
-         </object> 
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormContainer"> 
@@ -117,7 +86,7 @@
           </void> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>5</int> 
+           <int>3</int> 
           </void> 
           <void method="setProperty"> 
            <string>gridWidth</string> 
@@ -166,7 +135,7 @@
           </void> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>7</int> 
+           <int>5</int> 
           </void> 
          </object> 
         </void> 
@@ -207,7 +176,7 @@
           </void> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>9</int> 
+           <int>7</int> 
           </void> 
           <void method="setProperty"> 
            <string>gridWidth</string> 
@@ -246,7 +215,7 @@
           </void> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>9</int> 
+           <int>7</int> 
           </void> 
          </object> 
         </void> 
@@ -273,7 +242,7 @@
           </void> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>9</int> 
+           <int>7</int> 
           </void> 
          </object> 
         </void> 
@@ -314,7 +283,7 @@
           </void> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>11</int> 
+           <int>9</int> 
           </void> 
           <void method="setProperty"> 
            <string>gridWidth</string> 
@@ -337,7 +306,7 @@
           </void> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>15</int> 
+           <int>13</int> 
           </void> 
           <void method="setProperty"> 
            <string>gridWidth</string> 
@@ -372,7 +341,7 @@
           </void> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>17</int> 
+           <int>15</int> 
           </void> 
          </object> 
         </void> 
@@ -399,7 +368,7 @@
           </void> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>17</int> 
+           <int>15</int> 
           </void> 
          </object> 
         </void> 
@@ -440,7 +409,7 @@
           </void> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>13</int> 
+           <int>11</int> 
           </void> 
           <void method="setProperty"> 
            <string>gridWidth</string> 
@@ -495,7 +464,7 @@
           </void> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>17</int> 
+           <int>15</int> 
           </void> 
          </object> 
         </void> 
@@ -571,7 +540,7 @@
           </void> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>21</int> 
+           <int>19</int> 
           </void> 
           <void method="setProperty"> 
            <string>hAlign</string> 

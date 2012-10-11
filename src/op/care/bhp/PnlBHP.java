@@ -273,7 +273,7 @@ public class PnlBHP extends NursingRecordsPanel {
          *      \___|_|  \___|\__,_|\__\___|\____|_|      |_|  \___/|_| |_|____/ \___|_| |_| |_|\__,_|_| |_|\__,_|
          *
          */
-        String title = OPDE.lang.getString(internalClassID + ".ondemand");
+        String title = "<html><font size=+1><b>" + OPDE.lang.getString(internalClassID + ".ondemand") + "</b></font></html>";
 
         final CollapsiblePane mainPane = new CollapsiblePane(title);
         mainPane.setSlidingDirection(SwingConstants.SOUTH);
@@ -333,7 +333,7 @@ public class PnlBHP extends NursingRecordsPanel {
          *      \___|_|  \___|\__,_|\__\___|\____|_|      |_|
          *
          */
-        String title = GUITools.getLocalizedMessages(BHPTools.SHIFT_TEXT)[shift];
+        String title = "<html><font size=+1><b>" + GUITools.getLocalizedMessages(DFNTools.SHIFT_TEXT)[shift] + "</b></font></html>";
 
         final CollapsiblePane prPane = new CollapsiblePane(title);
         prPane.setSlidingDirection(SwingConstants.SOUTH);

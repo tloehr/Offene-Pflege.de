@@ -49,9 +49,9 @@ public class GUITools {
 
         button.setOpaque(false);
         button.setHorizontalAlignment(SwingConstants.LEADING);
-        button.setVerticalAlignment(SwingConstants.TOP);
-        button.setVerticalTextPosition(SwingConstants.TOP);
-        button.setHorizontalTextPosition(SwingConstants.RIGHT);
+//        button.setVerticalAlignment(SwingConstants.TOP);
+//        button.setVerticalTextPosition(SwingConstants.TOP);
+//        button.setHorizontalTextPosition(SwingConstants.RIGHT);
 
         button.setRequestFocusEnabled(true);
         button.setFocusable(true);
@@ -267,7 +267,8 @@ public class GUITools {
 
             @Override
             public void end(Animator source) {
-                what2doAfterwards.execute(null);
+                if (what2doAfterwards != null)
+                    what2doAfterwards.execute(null);
             }
         }).build();
         animator.start();
@@ -304,7 +305,8 @@ public class GUITools {
             @Override
             public void end(Animator source) {
                 component.repaint();
-                what2doAfterwards.execute(null);
+                if (what2doAfterwards != null)
+                    what2doAfterwards.execute(null);
             }
         }).build();
         animator.start();
@@ -381,7 +383,7 @@ public class GUITools {
         return popupInfo;
     }
 
-    public static void addExpandCollapseButtons(final CollapsiblePane cp, JPanel pane) {
+    public static void addExpandCollapseButtons(final Container cp, JPanel pane) {
         final JButton btnExpandAll = new JButton(SYSConst.icon22expand);
         btnExpandAll.setPressedIcon(SYSConst.icon22addPressed);
         btnExpandAll.setAlignmentX(Component.RIGHT_ALIGNMENT);

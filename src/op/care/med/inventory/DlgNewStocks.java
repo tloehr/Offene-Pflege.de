@@ -388,7 +388,7 @@ public class DlgNewStocks extends MyJDialog {
                 panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
 
                 //---- btnClose ----
-                btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/shutdown.png")));
+                btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/player_eject.png")));
                 btnClose.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 btnClose.addActionListener(new ActionListener() {
                     @Override

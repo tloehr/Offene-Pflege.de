@@ -103,9 +103,10 @@ public class PnlDFN extends NursingRecordsPanel {
     @Override
     public void cleanup() {
         jdcDatum.cleanup();
-//        involvedNPs.clear();
         cpDFN.removeAll();
         dfnCollapsiblePaneHashMap.clear();
+        shiftMAPDFN.clear();
+        shiftMAPpane.clear();
         SYSTools.unregisterListeners(this);
     }
 
@@ -126,7 +127,6 @@ public class PnlDFN extends NursingRecordsPanel {
         initPhase = false;
 
         reloadDisplay();
-
     }
 
 
@@ -234,7 +234,7 @@ public class PnlDFN extends NursingRecordsPanel {
     }
 
     private CollapsiblePane createCP4Shift(Byte shift) {
-        String title = GUITools.getLocalizedMessages(DFNTools.SHIFT_TEXT)[shift];
+        String title = "<html><font size=+1><b>" + GUITools.getLocalizedMessages(DFNTools.SHIFT_TEXT)[shift] + "</b></font></html>";
         final CollapsiblePane mainPane = new CollapsiblePane(title);
         mainPane.setSlidingDirection(SwingConstants.SOUTH);
         mainPane.setBackground(SYSCalendar.getBGSHIFT(shift));
@@ -259,10 +259,10 @@ public class PnlDFN extends NursingRecordsPanel {
                     npPanel = new JPanel();
                     npPanel.setLayout(new VerticalLayout());
 //                    npPanel.setBackground(dfn.getBG());
-                    npPane = new CollapsiblePane(SYSTools.toHTMLForScreen("<html>" + (currentNP.isClosed() ? "<s>" : "") + currentNP.getTopic() + (currentNP.isClosed() ? "</s>" : "") + " (" + currentNP.getCategory().getText() + ")" + "</html>"));
+                    npPane = new CollapsiblePane("<html><font size=+1>" + (currentNP.isClosed() ? "<s>" : "") + currentNP.getTopic() + (currentNP.isClosed() ? "</s>" : "") + " (" + currentNP.getCategory().getText() + ")" + "</font></html>");
                     npPane.setCollapsible(false);
                     npPane.setBackground(SYSCalendar.getBGSHIFT(shift).darker()); // a little darker
-                    npPane.setForeground(SYSCalendar.getFGSHIFT(shift));
+                    npPane.setForeground(Color.WHITE);
                     npPane.setOpaque(false);
                 }
 
@@ -299,7 +299,7 @@ public class PnlDFN extends NursingRecordsPanel {
          *      \___|_|  \___|\__,_|\__\___|\____|_|      |_|
          *
          */
-        String title = OPDE.lang.getString(internalClassID + ".ondemand");
+        String title = "<html><font size=+1><b>" + OPDE.lang.getString(internalClassID + ".ondemand") + "</b></font></html>";
 
         final CollapsiblePane npPane = new CollapsiblePane(title);
         npPane.setSlidingDirection(SwingConstants.SOUTH);
@@ -328,10 +328,6 @@ public class PnlDFN extends NursingRecordsPanel {
 
     private CollapsiblePane createCP4(final DFN dfn) {
         final CollapsiblePane dfnPane = new CollapsiblePane();
-//        String fg = SYSConst.html_grey50;
-//        if (dfn.getNursingProcess() != null) {
-//            fg = "#" + dfn.getNursingProcess().getCategory().getFgcontent();
-//        }
 
         /***
          *      _   _ _____    _    ____  _____ ____
@@ -667,7 +663,7 @@ public class PnlDFN extends NursingRecordsPanel {
                         }
                     });
 
-                    menu.show(btnMinutes, 0,btnMinutes.getHeight());
+                    menu.show(btnMinutes, 0, btnMinutes.getHeight());
                 }
             });
             btnMinutes.setEnabled(dfn.getStatus() != DFNTools.STATE_OPEN);

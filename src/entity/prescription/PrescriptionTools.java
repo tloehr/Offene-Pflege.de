@@ -65,7 +65,7 @@ public class PrescriptionTools {
                     " FROM BHPVerordnung v " +
                     " INNER JOIN Bewohner bw ON v.BWKennung = bw.BWKennung  " +
                     " INNER JOIN Massnahmen Ms ON Ms.MassID = v.MassID " +
-                    " INNER JOIN Stationen st ON bw.StatID = st.StatID  " +
+                    " INNER JOIN Station st ON bw.StatID = st.StatID  " +
                     " LEFT OUTER JOIN MPDarreichung D ON v.DafID = D.DafID " +
                     " LEFT OUTER JOIN BHPPlanung bhp ON bhp.VerID = v.VerID " +
                     " LEFT OUTER JOIN MProdukte M ON M.MedPID = D.MedPID " +
@@ -78,9 +78,9 @@ public class PrescriptionTools {
                     " LEFT OUTER JOIN MPVorrat vor ON vor.VorID = vorr.VorID" +
                     " LEFT OUTER JOIN MPBestand best ON best.VorID = vor.VorID" +
                     " WHERE v.AnDatum < now() AND v.AbDatum > now() AND v.SitID IS NULL AND (v.DafID IS NOT NULL OR v.Stellplan IS TRUE) " +
-                    " AND st.EKennung = ? AND ((best.Aus = '9999-12-31 23:59:59' AND best.Anbruch < '9999-12-31 23:59:59') OR (v.DafID IS NULL)) " +
+                    " AND st.EID = ? AND ((best.Aus = '9999-12-31 23:59:59' AND best.Anbruch < '9999-12-31 23:59:59') OR (v.DafID IS NULL)) " +
                     " ORDER BY st.statid, CONCAT(bw.nachname,bw.vorname), bw.BWKennung, v.DafID IS NOT NULL, F.Stellplan, CONCAT( M.Bezeichnung, Ms.Bezeichnung)");
-            query.setParameter(1, homes.getEKennung());
+            query.setParameter(1, homes.getEID());
             html = getDailyPlan(query.getResultList());
 
         } catch (Exception e) {
@@ -223,7 +223,7 @@ public class PrescriptionTools {
             //Vorrat wäre objects[4]
             BigInteger formid = (BigInteger) objects[5];
 
-            OPDE.debug(verordnung);
+//            OPDE.debug(verordnung);
 
 
             boolean stationsWechsel = statid != station.getStatID();

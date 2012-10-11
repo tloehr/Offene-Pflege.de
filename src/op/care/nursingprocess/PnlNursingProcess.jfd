@@ -22,7 +22,7 @@
          <class>javax.swing.JScrollPane</class> 
         </object> 
         <void property="name"> 
-         <string>jspPlanung</string> 
+         <string>jspNP</string> 
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormContainer"> 

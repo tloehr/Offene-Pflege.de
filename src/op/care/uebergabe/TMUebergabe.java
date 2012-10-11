@@ -65,13 +65,13 @@ public class TMUebergabe
         EntityManager em = OPDE.createEM();
         Query queryUB = em.createNamedQuery("Uebergabebuch.findByEinrichtungAndDatumAndAckUser");
         queryUB.setParameter(1, OPDE.getLogin().getUser().getUID());
-        queryUB.setParameter(2, einrichtung.getEKennung());
+        queryUB.setParameter(2, einrichtung.getEID());
         queryUB.setParameter(3, new Date(SYSCalendar.startOfDay(datum)));
         queryUB.setParameter(4, new Date(SYSCalendar.endOfDay(datum)));
 
         Query queryPB = em.createNamedQuery("Pflegeberichte.findByEinrichtungAndDatumAndAckUser");
         queryPB.setParameter(1, OPDE.getLogin().getUser().getUID());
-        queryPB.setParameter(2, einrichtung.getEKennung());
+        queryPB.setParameter(2, einrichtung.getEID());
         queryPB.setParameter(3, new Date(SYSCalendar.startOfDay(datum)));
         queryPB.setParameter(4, new Date(SYSCalendar.endOfDay(datum)));
 
