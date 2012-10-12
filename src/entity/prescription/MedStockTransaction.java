@@ -10,14 +10,14 @@ import java.util.Date;
 
 @Entity
 @Table(name = "MPBuchung")
-@NamedQueries({
-        @NamedQuery(name = "MedStockTransaction.findAll", query = "SELECT m FROM MedStockTransaction m"),
-        @NamedQuery(name = "MedStockTransaction.findByBuchID", query = "SELECT m FROM MedStockTransaction m WHERE m.ID = :buchID"),
-        @NamedQuery(name = "MedStockTransaction.findByBestand", query = "SELECT m FROM MedStockTransaction m WHERE m.stock = :bestand ORDER BY m.pit"),
-        @NamedQuery(name = "MedStockTransaction.findByMenge", query = "SELECT m FROM MedStockTransaction m WHERE m.amount = :menge"),
-        @NamedQuery(name = "MedStockTransaction.findByText", query = "SELECT m FROM MedStockTransaction m WHERE m.text = :text"),
-        @NamedQuery(name = "MedStockTransaction.findByStatus", query = "SELECT m FROM MedStockTransaction m WHERE m.state = :status"),
-        @NamedQuery(name = "MedStockTransaction.findByPit", query = "SELECT m FROM MedStockTransaction m WHERE m.pit = :pit")})
+//@NamedQueries({
+//        @NamedQuery(name = "MedStockTransaction.findAll", query = "SELECT m FROM MedStockTransaction m"),
+//        @NamedQuery(name = "MedStockTransaction.findByBuchID", query = "SELECT m FROM MedStockTransaction m WHERE m.ID = :buchID"),
+//        @NamedQuery(name = "MedStockTransaction.findByBestand", query = "SELECT m FROM MedStockTransaction m WHERE m.stock = :bestand ORDER BY m.pit"),
+//        @NamedQuery(name = "MedStockTransaction.findByMenge", query = "SELECT m FROM MedStockTransaction m WHERE m.amount = :menge"),
+//        @NamedQuery(name = "MedStockTransaction.findByText", query = "SELECT m FROM MedStockTransaction m WHERE m.text = :text"),
+//        @NamedQuery(name = "MedStockTransaction.findByStatus", query = "SELECT m FROM MedStockTransaction m WHERE m.state = :status"),
+//        @NamedQuery(name = "MedStockTransaction.findByPit", query = "SELECT m FROM MedStockTransaction m WHERE m.pit = :pit")})
 public class MedStockTransaction implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

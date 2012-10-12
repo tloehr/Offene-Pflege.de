@@ -113,7 +113,7 @@ public class DlgNewStocks extends MyJDialog {
             String pzn = MedPackageTools.parsePZN(txtMedSuche.getText());
             if (pzn != null) { // Hier sucht man nach einer PZN. Im Barcode ist das führende 'ß' enthalten.
                 EntityManager em = OPDE.createEM();
-                Query query = em.createNamedQuery("MedPackung.findByPzn");
+                Query query = em.createQuery("SELECT m FROM MedPackage m WHERE m.pzn = :pzn");
                 query.setParameter("pzn", pzn);
                 try {
                     aPackage = (MedPackage) query.getSingleResult();
@@ -493,7 +493,7 @@ public class DlgNewStocks extends MyJDialog {
             inventory.getMedStocks().add(bestand);
 
             if (MedStockTools.getStockInUse(inventory) == null) {
-                MedInventoryTools.anbrechenNaechste(inventory);
+                MedInventoryTools.openNext(inventory);
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Neuer Vorrat wurde direkt angebrochen", 2));
             }
 

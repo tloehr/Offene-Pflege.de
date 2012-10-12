@@ -16,13 +16,13 @@ import java.math.BigDecimal;
  */
 @Entity
 @Table(name = "Massnahmen")
-@NamedQueries({
-        @NamedQuery(name = "Massnahmen.findAll", query = "SELECT m FROM Intervention m"),
-        @NamedQuery(name = "Massnahmen.findByMassID", query = "SELECT m FROM Intervention m WHERE m.massID = :massID"),
-        @NamedQuery(name = "Massnahmen.findByBezeichnung", query = "SELECT m FROM Intervention m WHERE m.bezeichnung = :bezeichnung"),
-        @NamedQuery(name = "Massnahmen.findByDauer", query = "SELECT m FROM Intervention m WHERE m.dauer = :dauer"),
-        @NamedQuery(name = "Massnahmen.findByMassArt", query = "SELECT m FROM Intervention m WHERE m.massArt = :massArt"),
-        @NamedQuery(name = "Massnahmen.findByAktiv", query = "SELECT m FROM Intervention m WHERE m.aktiv = :aktiv")})
+//@NamedQueries({
+//        @NamedQuery(name = "Massnahmen.findAll", query = "SELECT m FROM Intervention m"),
+//        @NamedQuery(name = "Massnahmen.findByMassID", query = "SELECT m FROM Intervention m WHERE m.massID = :massID"),
+//        @NamedQuery(name = "Massnahmen.findByBezeichnung", query = "SELECT m FROM Intervention m WHERE m.bezeichnung = :bezeichnung"),
+//        @NamedQuery(name = "Massnahmen.findByDauer", query = "SELECT m FROM Intervention m WHERE m.dauer = :dauer"),
+//        @NamedQuery(name = "Massnahmen.findByMassArt", query = "SELECT m FROM Intervention m WHERE m.massArt = :massArt"),
+//        @NamedQuery(name = "Massnahmen.findByAktiv", query = "SELECT m FROM Intervention m WHERE m.aktiv = :aktiv")})
 public class Intervention implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

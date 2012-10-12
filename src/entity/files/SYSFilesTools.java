@@ -93,7 +93,7 @@ public class SYSFilesTools {
         SYSFiles sysfile = null;
 
         String md5 = SYSTools.getMD5Checksum(file);
-        Query query = em.createNamedQuery("SYSFiles.findByMd5");
+        Query query = em.createQuery("SELECT s FROM SYSFiles s WHERE s.md5 = :md5");
         query.setParameter("md5", md5);
 
         // Gibts die Datei schon ?

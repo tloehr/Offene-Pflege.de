@@ -200,7 +200,7 @@ public class SYSPrint {
 //            if (OPDE.getProps().containsKey("defaultprinter")) {
 //                defaultPrinter = OPDE.getProps().getProperty("defaultprinter");
 //            }
-////            HashMap einrichtung = op.tools.DBRetrieve.getEinrichtung();
+////            HashMap einrichtung = op.tools.DBRetrieve.getHome();
 ////            String ein = einrichtung.get("Bezeichnung").toString() + ", "
 ////                    + einrichtung.get("Strasse").toString() + ", "
 ////                    + einrichtung.get("PLZ").toString() + " " + einrichtung.get("Ort").toString() + ", "

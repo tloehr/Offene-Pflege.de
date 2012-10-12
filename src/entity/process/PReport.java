@@ -18,15 +18,15 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "VBericht")
-@NamedQueries({
-        @NamedQuery(name = "VBericht.findAll", query = "SELECT v FROM PReport v"),
-        @NamedQuery(name = "VBericht.findByVbid", query = "SELECT v FROM PReport v WHERE v.vbid = :vbid"),
-        @NamedQuery(name = "VBericht.findByPit", query = "SELECT v FROM PReport v WHERE v.pit = :pit"),
-        @NamedQuery(name = "VBericht.findByArt", query = "SELECT v FROM PReport v WHERE v.art = :art"),
-        @NamedQuery(name = "VBericht.findByVorgang", query = "SELECT v FROM PReport v WHERE v.qProcess = :vorgang "),
-        // 0 heisst nur normale Berichte.
-        // PREPORT_TYPE_USER = 0;
-        @NamedQuery(name = "VBericht.findByVorgangOhneSystem", query = "SELECT v FROM PReport v WHERE v.qProcess = :vorgang AND v.art = 0")})
+//@NamedQueries({
+//        @NamedQuery(name = "VBericht.findAll", query = "SELECT v FROM PReport v"),
+//        @NamedQuery(name = "VBericht.findByVbid", query = "SELECT v FROM PReport v WHERE v.vbid = :vbid"),
+//        @NamedQuery(name = "VBericht.findByPit", query = "SELECT v FROM PReport v WHERE v.pit = :pit"),
+//        @NamedQuery(name = "VBericht.findByArt", query = "SELECT v FROM PReport v WHERE v.art = :art"),
+//        @NamedQuery(name = "VBericht.findByVorgang", query = "SELECT v FROM PReport v WHERE v.qProcess = :vorgang "),
+//        // 0 heisst nur normale Berichte.
+//        // PREPORT_TYPE_USER = 0;
+//        @NamedQuery(name = "VBericht.findByVorgangOhneSystem", query = "SELECT v FROM PReport v WHERE v.qProcess = :vorgang AND v.art = 0")})
 public class PReport implements Serializable, QProcessElement {
 
     private static final long serialVersionUID = 1L;

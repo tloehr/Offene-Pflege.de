@@ -135,15 +135,24 @@ public class DlgFiles extends MyJDialog {
         ArrayList<SYSFiles> files = null;
         EntityManager em = OPDE.createEM();
         if (attachable instanceof NReport) {
-            Query query = em.createNamedQuery("SYSFiles.findByNReport", SYSFiles.class);
+            Query query = em.createQuery(" SELECT s "
+                + " FROM SYSFiles s "
+                + " JOIN s.pbAssignCollection sf "
+                + " WHERE sf.nReport = :nReport ");
             query.setParameter("nReport", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
         } else if (attachable instanceof Prescription) {
-            Query query = em.createNamedQuery("SYSFiles.findByVerordnung", SYSFiles.class);
+            Query query = em.createQuery(" SELECT s "
+                + " FROM SYSFiles s "
+                + " JOIN s.verAssignCollection sf "
+                + " WHERE sf.verordnung = :verordnung ");
             query.setParameter("verordnung", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
         } else if (attachable instanceof ResInfo) {
-            Query query = em.createNamedQuery("SYSFiles.findByBWInfo", SYSFiles.class);
+            Query query = em.createQuery(" SELECT s "
+                + " FROM SYSFiles s "
+                + " JOIN s.bwiAssignCollection sf "
+                + " WHERE sf.bwinfo = :bwinfo ");
             query.setParameter("bwinfo", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
 

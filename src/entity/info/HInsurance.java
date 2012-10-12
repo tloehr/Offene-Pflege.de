@@ -22,16 +22,16 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "KKasse")
-@NamedQueries({
-    @NamedQuery(name = "KKasse.findAll", query = "SELECT k FROM HInsurance k"),
-    @NamedQuery(name = "KKasse.findByKassID", query = "SELECT k FROM HInsurance k WHERE k.kassID = :kassID"),
-    @NamedQuery(name = "KKasse.findByName", query = "SELECT k FROM HInsurance k WHERE k.name = :name"),
-    @NamedQuery(name = "KKasse.findByStrasse", query = "SELECT k FROM HInsurance k WHERE k.strasse = :strasse"),
-    @NamedQuery(name = "KKasse.findByPlz", query = "SELECT k FROM HInsurance k WHERE k.plz = :plz"),
-    @NamedQuery(name = "KKasse.findByOrt", query = "SELECT k FROM HInsurance k WHERE k.ort = :ort"),
-    @NamedQuery(name = "KKasse.findByTel", query = "SELECT k FROM HInsurance k WHERE k.tel = :tel"),
-    @NamedQuery(name = "KKasse.findByFax", query = "SELECT k FROM HInsurance k WHERE k.fax = :fax"),
-    @NamedQuery(name = "KKasse.findByKNr", query = "SELECT k FROM HInsurance k WHERE k.kNr = :kNr")})
+//@NamedQueries({
+//    @NamedQuery(name = "KKasse.findAll", query = "SELECT k FROM HInsurance k"),
+//    @NamedQuery(name = "KKasse.findByKassID", query = "SELECT k FROM HInsurance k WHERE k.kassID = :kassID"),
+//    @NamedQuery(name = "KKasse.findByName", query = "SELECT k FROM HInsurance k WHERE k.name = :name"),
+//    @NamedQuery(name = "KKasse.findByStrasse", query = "SELECT k FROM HInsurance k WHERE k.strasse = :strasse"),
+//    @NamedQuery(name = "KKasse.findByPlz", query = "SELECT k FROM HInsurance k WHERE k.plz = :plz"),
+//    @NamedQuery(name = "KKasse.findByOrt", query = "SELECT k FROM HInsurance k WHERE k.ort = :ort"),
+//    @NamedQuery(name = "KKasse.findByTel", query = "SELECT k FROM HInsurance k WHERE k.tel = :tel"),
+//    @NamedQuery(name = "KKasse.findByFax", query = "SELECT k FROM HInsurance k WHERE k.fax = :fax"),
+//    @NamedQuery(name = "KKasse.findByKNr", query = "SELECT k FROM HInsurance k WHERE k.kNr = :kNr")})
 public class HInsurance implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

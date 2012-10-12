@@ -33,12 +33,11 @@ import entity.prescription.MedStock;
 import entity.prescription.MedStockTools;
 import entity.prescription.MedStockTransactionTools;
 import op.OPDE;
-import op.threads.DisplayMessage;
+import op.threads.DisplayManager;
 import op.tools.MyJDialog;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
-import org.eclipse.persistence.exceptions.OptimisticLockException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -54,16 +53,17 @@ import java.math.BigDecimal;
 public class DlgCloseStock extends MyJDialog {
 
 
-    private MedStock bestand;
+    private MedStock medStock;
     private Closure actionBlock;
+    public static final String internalClassID = "nursingrecords.prescription.dlgCloseStock";
 
     /**
      * Creates new form DlgBestandAnbruch
      */
-    public DlgCloseStock(MedStock bestand, Closure actionBlock) {
+    public DlgCloseStock(MedStock medStock, Closure actionBlock) {
         super();
         this.actionBlock = actionBlock;
-        this.bestand = bestand;
+        this.medStock = medStock;
         initComponents();
         initDialog();
         setVisible(true);
@@ -252,20 +252,20 @@ public class DlgCloseStock extends MyJDialog {
     }//GEN-LAST:event_rbAbgelaufenActionPerformed
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-        bestand = null;
+        medStock = null;
         dispose();
     }//GEN-LAST:event_btnCloseActionPerformed
 
     @Override
     public void dispose() {
-        actionBlock.execute(bestand);
+        actionBlock.execute(medStock);
         SYSTools.unregisterListeners(this);
         super.dispose();
     }
 
     private void initDialog() {
-        String text = "Sie möchten den Bestand mit der Nummer <font color=\"red\"><b>" + bestand.getID() + "</b></font> abschließen.";
-        text += "<br/>" + MedStockTools.getTextASHTML(bestand) + "</br>";
+        String text = "Sie möchten den Bestand mit der Nummer <font color=\"red\"><b>" + medStock.getID() + "</b></font> abschließen.";
+        text += "<br/>" + MedStockTools.getTextASHTML(medStock) + "</br>";
         text += "<br/>Bitte wählen Sie einen der drei folgenden Gründe für den Abschluss:";
         txtInfo.setContentType("text/html");
         txtInfo.setText(SYSTools.toHTML(text));
@@ -275,7 +275,7 @@ public class DlgCloseStock extends MyJDialog {
                 " SELECT b FROM MedStock b " +
                 " WHERE b.inventory = :vorrat AND b.out = :aus AND b.opened = :anbruch " +
                 " ORDER BY b.in, b.id "); // Geht davon aus, dass die PKs immer fortlaufend, automatisch vergeben werden.
-        query.setParameter("vorrat", bestand.getInventory());
+        query.setParameter("vorrat", medStock.getInventory());
         query.setParameter("aus", SYSConst.DATE_BIS_AUF_WEITERES);
         query.setParameter("anbruch", SYSConst.DATE_BIS_AUF_WEITERES);
         DefaultComboBoxModel dcbm = new DefaultComboBoxModel(query.getResultList().toArray());
@@ -293,11 +293,11 @@ public class DlgCloseStock extends MyJDialog {
         int index = Math.min(2, cmbBestID.getItemCount());
         cmbBestID.setSelectedIndex(index - 1);
 
-        lblEinheiten.setText(DosageFormTools.EINHEIT[bestand.getTradeForm().getDosageForm().getPackUnit()] + " verbraucht");
+        lblEinheiten.setText(DosageFormTools.EINHEIT[medStock.getTradeForm().getDosageForm().getPackUnit()] + " verbraucht");
         txtLetzte.setText("");
         txtLetzte.setEnabled(false);
         // Das mit dem Vorabstellen nur bei Formen, die auf Stück basieren also APV = 1
-        rbStellen.setEnabled(bestand.getTradeForm().getDosageForm().getState() == DosageFormTools.APV1);
+        rbStellen.setEnabled(medStock.getTradeForm().getDosageForm().getState() == DosageFormTools.APV1);
     }
 
     private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
@@ -338,50 +338,55 @@ public class DlgCloseStock extends MyJDialog {
     }//GEN-LAST:event_rbGefallenActionPerformed
 
     private void save() {
-        String classname = this.getClass().getName() + ".save()";
         EntityManager em = OPDE.createEM();
         try {
             em.getTransaction().begin();
 
-            bestand = em.merge(bestand);
-            em.lock(bestand, LockModeType.OPTIMISTIC);
+            final MedStock myStock = em.merge(medStock);
+            em.lock(myStock, LockModeType.OPTIMISTIC);
+            em.lock(em.merge(myStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
 
-            OPDE.info("Bestands Nr. " + bestand.getID() + " wird abgeschlossen");
-            OPDE.info("UKennung: " + OPDE.getLogin().getUser().getUID());
+            OPDE.important("Bestands Nr. " + myStock.getID() + " wird abgeschlossen");
+            OPDE.important("UID: " + OPDE.getLogin().getUser().getUID());
 
             MedStock nextBest = null;
             if (cmbBestID.getSelectedIndex() > 0) {
                 nextBest = em.merge((MedStock) cmbBestID.getSelectedItem());
                 em.lock(nextBest, LockModeType.OPTIMISTIC);
+                myStock.setNextStock(nextBest);
             }
 
             if (rbStellen.isSelected()) {
-                bestand.setNextStock(nextBest);
                 BigDecimal inhalt = new BigDecimal(Double.parseDouble(txtLetzte.getText().replace(",", ".")));
-                MedStockTools.setzeBestandAuf(em, bestand, inhalt, "Korrekturbuchung zum Packungsabschluss", MedStockTransactionTools.STATE_EDIT_EMPTY_SOON);
+                MedStockTools.setStockTo(em, myStock, inhalt, "Korrekturbuchung zum Packungsabschluss", MedStockTransactionTools.STATE_EDIT_EMPTY_SOON);
 
-                OPDE.info(classname + ": Vorabstellen angeklickt. Es sind noch " + inhalt + " in der Packung.");
-                OPDE.info(classname + ": Nächste Packung im Anbruch wird die Bestands Nr.: " + nextBest.getID() + " sein.");
-
+                OPDE.important(internalClassID + ": Vorabstellen angeklickt. Es sind noch " + inhalt + " in der Packung.");
+                OPDE.important(internalClassID + ": Nächste Packung im Anbruch wird die Bestands Nr.: " + nextBest.getID() + " sein.");
             } else {
-//                BigDecimal apv = bestand.getAPV();
-
                 if (rbGefallen.isSelected()) {
-                    MedStockTools.close(em, bestand, "Packung ist runtergefallen.", MedStockTransactionTools.STATE_EDIT_EMPTY_BROKEN_OR_LOST);
-                    OPDE.info(classname + ": Runtergefallen angeklickt.");
+                    MedStockTools.close(em, myStock, "Packung ist runtergefallen.", MedStockTransactionTools.STATE_EDIT_EMPTY_BROKEN_OR_LOST);
+                    OPDE.important(internalClassID + ": Runtergefallen angeklickt.");
                 } else if (rbAbgelaufen.isSelected()) {
-                    MedStockTools.close(em, bestand, "Packung ist abgelaufen.", MedStockTransactionTools.STATE_EDIT_EMPTY_PASS_EXPIRY);
-                    OPDE.info(classname + ": Abgelaufen angeklickt.");
+                    MedStockTools.close(em, myStock, "Packung ist abgelaufen.", MedStockTransactionTools.STATE_EDIT_EMPTY_PAST_EXPIRY);
+                    OPDE.important(internalClassID + ": Abgelaufen angeklickt.");
                 } else {
-                    MedStockTools.close(em, bestand, "Korrekturbuchung zum Packungsabschluss", MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
-//                    apv = MedStockTools.calcAPV(bestand);
-                    OPDE.info(classname + ": Packung ist nun leer angeklickt.");
+                    MedStockTools.close(em, myStock, "Korrekturbuchung zum Packungsabschluss", MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
+                    OPDE.important(internalClassID + ": Packung ist nun leer angeklickt.");
                 }
             }
             em.getTransaction().commit();
-        } catch (OptimisticLockException ole) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Verordnung oder Bestand wurden zwischenzeitlich von jemand anderem verändert", DisplayMessage.IMMEDIATELY, 4));
-            em.getTransaction().rollback();
+
+            medStock = myStock;
+
+        } catch (javax.persistence.OptimisticLockException ole) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                OPDE.getMainframe().emptyFrame();
+                OPDE.getMainframe().afterLogin();
+            }
+            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -390,6 +395,7 @@ public class DlgCloseStock extends MyJDialog {
         } finally {
             em.close();
         }
+
         dispose();
     }
 

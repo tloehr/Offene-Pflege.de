@@ -44,7 +44,7 @@ public class PnlHersteller extends JPanel {
 
     private void initPanel() {
         EntityManager em = OPDE.createEM();
-        Query query2 = em.createNamedQuery("MedHersteller.findAll");
+        Query query2 = em.createQuery("SELECT m FROM MedFactory m ORDER BY m.firma, m.ort");
         lstHersteller.setModel(new DefaultComboBoxModel(query2.getResultList().toArray(new MedFactory[]{})));
         lstHersteller.setCellRenderer(MedFactoryTools.getHerstellerRenderer(0));
         em.close();

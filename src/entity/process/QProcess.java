@@ -25,18 +25,18 @@ import java.util.*;
  */
 @Entity
 @Table(name = "Vorgaenge")
-@NamedQueries({
-        @NamedQuery(name = "QProcess.findAll", query = "SELECT v FROM QProcess v "),
-        @NamedQuery(name = "QProcess.findAllActiveSorted", query = "SELECT v FROM QProcess v WHERE v.to = '9999-12-31 23:59:59' ORDER BY v.title"),
-        @NamedQuery(name = "QProcess.findByVorgangID", query = "SELECT v FROM QProcess v WHERE v.pkid = :vorgangID"),
-        @NamedQuery(name = "QProcess.findByTitel", query = "SELECT v FROM QProcess v WHERE v.title = :titel"),
-        @NamedQuery(name = "QProcess.findActiveByBesitzer", query = "SELECT v FROM QProcess v WHERE v.owner = :besitzer AND v.to = '9999-12-31 23:59:59' ORDER BY v.title"),
-        @NamedQuery(name = "QProcess.findInactiveByBesitzer", query = "SELECT v FROM QProcess v WHERE v.owner = :besitzer AND v.to < '9999-12-31 23:59:59' ORDER BY v.title"),
-        @NamedQuery(name = "QProcess.findActiveByBewohner", query = "SELECT v FROM QProcess v WHERE v.resident = :bewohner AND v.to = '9999-12-31 23:59:59' ORDER BY v.title"),
-        @NamedQuery(name = "QProcess.findActiveRunningOut", query = "SELECT v FROM QProcess v WHERE v.to = '9999-12-31 23:59:59' AND v.revision <= :wv ORDER BY v.revision"),
-        @NamedQuery(name = "QProcess.findByVon", query = "SELECT v FROM QProcess v WHERE v.from = :from"),
-        @NamedQuery(name = "QProcess.findByWv", query = "SELECT v FROM QProcess v WHERE v.revision = :wv"),
-        @NamedQuery(name = "QProcess.findByBis", query = "SELECT v FROM QProcess v WHERE v.to = :bis")})
+//@NamedQueries({
+//        @NamedQuery(name = "QProcess.findAll", query = "SELECT v FROM QProcess v "),
+//        @NamedQuery(name = "QProcess.findAllActiveSorted", query = "SELECT v FROM QProcess v WHERE v.to = '9999-12-31 23:59:59' ORDER BY v.title"),
+//        @NamedQuery(name = "QProcess.findByVorgangID", query = "SELECT v FROM QProcess v WHERE v.pkid = :vorgangID"),
+//        @NamedQuery(name = "QProcess.findByTitel", query = "SELECT v FROM QProcess v WHERE v.title = :titel"),
+//        @NamedQuery(name = "QProcess.findActiveByBesitzer", query = "SELECT v FROM QProcess v WHERE v.owner = :besitzer AND v.to = '9999-12-31 23:59:59' ORDER BY v.title"),
+//        @NamedQuery(name = "QProcess.findInactiveByBesitzer", query = "SELECT v FROM QProcess v WHERE v.owner = :besitzer AND v.to < '9999-12-31 23:59:59' ORDER BY v.title"),
+//        @NamedQuery(name = "QProcess.findActiveByBewohner", query = "SELECT v FROM QProcess v WHERE v.resident = :bewohner AND v.to = '9999-12-31 23:59:59' ORDER BY v.title"),
+//        @NamedQuery(name = "QProcess.findActiveRunningOut", query = "SELECT v FROM QProcess v WHERE v.to = '9999-12-31 23:59:59' AND v.revision <= :wv ORDER BY v.revision"),
+//        @NamedQuery(name = "QProcess.findByVon", query = "SELECT v FROM QProcess v WHERE v.from = :from"),
+//        @NamedQuery(name = "QProcess.findByWv", query = "SELECT v FROM QProcess v WHERE v.revision = :wv"),
+//        @NamedQuery(name = "QProcess.findByBis", query = "SELECT v FROM QProcess v WHERE v.to = :bis")})
 public class QProcess implements Serializable, Comparable<QProcess> {
 
     private static final long serialVersionUID = 1L;

@@ -21,6 +21,7 @@ import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -78,21 +79,21 @@ import java.util.List;
  */
 @Entity
 @Table(name = "BHPVerordnung")
-@NamedQueries({
-        @NamedQuery(name = "Verordnung.findAll", query = "SELECT b FROM Prescription b"),
-        @NamedQuery(name = "Verordnung.findByVerID", query = "SELECT b FROM Prescription b WHERE b.id = :verid"),
-        @NamedQuery(name = "Verordnung.findByAnDatum", query = "SELECT b FROM Prescription b WHERE b.from = :from"),
-        @NamedQuery(name = "Verordnung.findByVorgang", query = " "
-                + " SELECT ve FROM Prescription ve "
-                + " JOIN ve.attachedProcessConnections av"
-                + " JOIN av.qProcess v"
-                + " WHERE v = :vorgang "),
-        @NamedQuery(name = "Verordnung.findByAbDatum", query = "SELECT b FROM Prescription b WHERE b.to = :to"),
-        @NamedQuery(name = "Verordnung.findByBisPackEnde", query = "SELECT b FROM Prescription b WHERE b.toEndOfPackage = :bisPackEnde"),
-        @NamedQuery(name = "Verordnung.findByVerKennung", query = "SELECT b FROM Prescription b WHERE b.prescRelation = :verKennung"),
-        @NamedQuery(name = "Verordnung.findByStellplan", query = "SELECT b FROM Prescription b WHERE b.showOnDailyPlan = :stellplan")
-
-})
+//@NamedQueries({
+//        @NamedQuery(name = "Verordnung.findAll", query = "SELECT b FROM Prescription b"),
+//        @NamedQuery(name = "Verordnung.findByVerID", query = "SELECT b FROM Prescription b WHERE b.id = :verid"),
+//        @NamedQuery(name = "Verordnung.findByAnDatum", query = "SELECT b FROM Prescription b WHERE b.from = :from"),
+//        @NamedQuery(name = "Verordnung.findByVorgang", query = " "
+//                + " SELECT ve FROM Prescription ve "
+//                + " JOIN ve.attachedProcessConnections av"
+//                + " JOIN av.qProcess v"
+//                + " WHERE v = :vorgang "),
+//        @NamedQuery(name = "Verordnung.findByAbDatum", query = "SELECT b FROM Prescription b WHERE b.to = :to"),
+//        @NamedQuery(name = "Verordnung.findByBisPackEnde", query = "SELECT b FROM Prescription b WHERE b.toEndOfPackage = :bisPackEnde"),
+//        @NamedQuery(name = "Verordnung.findByVerKennung", query = "SELECT b FROM Prescription b WHERE b.prescRelation = :verKennung"),
+//        @NamedQuery(name = "Verordnung.findByStellplan", query = "SELECT b FROM Prescription b WHERE b.showOnDailyPlan = :stellplan")
+//
+//})
 
 //@SqlResultSetMappings({
 //
@@ -409,7 +410,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         this.resident = resident;
     }
 
-    public boolean isDiscontinued() {
+    public boolean isClosed() {
         return new DateTime(to).isBeforeNow();
     }
 
@@ -455,14 +456,50 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
 
     @Override
     public String getContentAsHTML() {
-        // TODO: fehlt noch
-        return "<html>not yet</html>";
+        return PrescriptionTools.getPrescriptionAsHTML(this, false, false, true);
     }
 
     @Override
     public String getPITAsHTML() {
-        // TODO: fehlt noch
-        return "<html>not yet</html>";
+        String result = "";
+        DateFormat df = DateFormat.getDateInstance();
+
+        if (isClosed()) {
+
+            result += "<table id=\"fonttext\" border=\"0\" cellspacing=\"0\">";
+            result += "<tr>";
+            result += "<td valign=\"top\">" + df.format(from) + "</td>";
+            result += "<td valign=\"top\">&raquo;</td>";
+            result += "<td valign=\"top\">" + df.format(to) + "</td>";
+            result += "</tr>\n";
+            result += "<tr>";
+            result += "<td valign=\"top\">" + userON.getFullname() + "</td>";
+            result += "<td valign=\"top\">&raquo;</td>";
+            result += "<td valign=\"top\">" + userOFF.getFullname() + "</td>";
+            result += "</tr>\n";
+            if (docON != null || docOFF != null) {
+                result += "<tr>";
+                result += "<td valign=\"top\">" + DocTools.getFullName(docON) + "</td>";
+                result += "<td valign=\"top\">&raquo;</td>";
+                result += "<td valign=\"top\">" + DocTools.getFullName(docOFF) + "</td>";
+                result += "</tr>\n";
+            }
+            if (hospitalON != null || hospitalOFF != null) {
+                result += "<tr>";
+                result += "<td valign=\"top\">" + HospitalTools.getFullName(hospitalON) + "</td>";
+                result += "<td valign=\"top\">&raquo;</td>";
+                result += "<td valign=\"top\">" + HospitalTools.getFullName(hospitalOFF) + "</td>";
+                result += "</tr>\n";
+            }
+            result += "</table>\n";
+
+        } else {
+            result += df.format(from) + "&nbsp;&raquo;&raquo;" +
+                    "<br/>" +
+                    userON.getFullname();
+        }
+
+        return result;
     }
 
     @Override
@@ -549,7 +586,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
 
     @Override
     public int compareTo(Prescription them) {
-//        int result = ((Boolean) isDiscontinued()).compareTo(them.isDiscontinued()) * -1;
+//        int result = ((Boolean) isClosed()).compareTo(them.isClosed()) * -1;
         int result = ((Boolean) isOnDemand()).compareTo(them.isOnDemand()) * -1;
 //        if (result == 0) {
 //            result = ((Boolean) isOnDemand()).compareTo(them.isOnDemand()) * -1;

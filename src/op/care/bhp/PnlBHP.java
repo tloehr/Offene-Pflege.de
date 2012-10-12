@@ -36,7 +36,6 @@ import com.jidesoft.swing.JideButton;
 import com.jidesoft.utils.ColorUtils;
 import com.toedter.calendar.JDateChooser;
 import entity.info.Resident;
-import entity.info.ResidentTools;
 import entity.nursingprocess.DFNTools;
 import entity.prescription.*;
 import op.OPDE;
@@ -416,7 +415,7 @@ public class PnlBHP extends NursingRecordsPanel {
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
 
 
-            if (!bhp.getPrescription().isDiscontinued()) {
+            if (!bhp.getPrescription().isClosed()) {
 
 
                 /***

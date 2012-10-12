@@ -14,44 +14,44 @@ import java.util.List;
 
 @Entity
 @Table(name = "MPVorrat")
-@NamedQueries({
-        @NamedQuery(name = "MedInventory.findAll", query = "SELECT m FROM MedInventory m"),
-        @NamedQuery(name = "MedInventory.findByVorID", query = "SELECT m FROM MedInventory m WHERE m.id = :vorID"),
-        @NamedQuery(name = "MedInventory.findByText", query = "SELECT m FROM MedInventory m WHERE m.text = :text"),
-        @NamedQuery(name = "MedInventory.findByVon", query = "SELECT m FROM MedInventory m WHERE m.from = :von"),
-        @NamedQuery(name = "MedInventory.findByBis", query = "SELECT m FROM MedInventory m WHERE m.to = :bis"),
-        @NamedQuery(name = "MedInventory.getSumme", query = " " +
-                " SELECT SUM(buch.amount) FROM MedInventory vor JOIN vor.medStocks best JOIN best.stockTransaction buch WHERE vor = :vorrat "),
-//        @NamedQuery(name = "MedInventory.findActiveByBewohnerAndDarreichung", query = " " +
-//                " SELECT DISTINCT inv FROM MedInventory inv " +
-//                " JOIN inv.medStocks stock " +
-//                " WHERE inv.resident = :resident AND stock.tradeform = :tradeform " +
-//                " AND inv.bis = " + SYSConst.MYSQL_DATETIME_BIS_AUF_WEITERES),
-        @NamedQuery(name = "MedInventory.findByBewohnerMitBestand", query = " " +
-                " SELECT best.inventory, SUM(buch.amount) FROM MedStock best " +
-                " JOIN best.stockTransaction buch " +
-                " WHERE best.inventory.resident = :bewohner AND best.inventory.to = '9999-12-31 23:59:59' " +
-                " GROUP BY best.inventory ")
-})
-
-@NamedNativeQueries({
-        // Das hier ist eine Liste aller Verordnungen eines Bewohners.
-        // Durch Joins werden die zugehörigen Vorräte und aktuellen Bestände
-        // beigefügt.
-        @NamedNativeQuery(name = "MedInventory.findVorraeteMitSummen", query = " " +
-                " SELECT DISTINCT v.VorID, b.saldo" +
-                " FROM MPVorrat v " +
-                " LEFT OUTER JOIN (" +
-                "       SELECT best.VorID, sum(buch.Menge) saldo FROM MPBestand best " +
-                "       INNER JOIN MPVorrat v ON v.VorID = best.VorID " +
-                "       INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
-                "       WHERE v.BWKennung=? " + // Diese Zeile ist eigentlich nicht nötig. Beschleunigt aber ungemein.
-                "       GROUP BY best.VorID" +
-                " ) b ON b.VorID = v.VorID" +
-                " WHERE v.BWKennung=? " +
-                " AND ( ? = 1 OR v.Bis = '9999-12-31 23:59:59' ) " +
-                " ORDER BY v.Text ")
-})
+//@NamedQueries({
+//        @NamedQuery(name = "MedInventory.findAll", query = "SELECT m FROM MedInventory m"),
+//        @NamedQuery(name = "MedInventory.findByVorID", query = "SELECT m FROM MedInventory m WHERE m.id = :vorID"),
+//        @NamedQuery(name = "MedInventory.findByText", query = "SELECT m FROM MedInventory m WHERE m.text = :text"),
+//        @NamedQuery(name = "MedInventory.findByVon", query = "SELECT m FROM MedInventory m WHERE m.from = :von"),
+//        @NamedQuery(name = "MedInventory.findByBis", query = "SELECT m FROM MedInventory m WHERE m.to = :bis"),
+//        @NamedQuery(name = "MedInventory.getSumme", query = " " +
+//                " SELECT SUM(buch.amount) FROM MedInventory vor JOIN vor.medStocks best JOIN best.stockTransaction buch WHERE vor = :vorrat "),
+////        @NamedQuery(name = "MedInventory.findActiveByBewohnerAndDarreichung", query = " " +
+////                " SELECT DISTINCT inv FROM MedInventory inv " +
+////                " JOIN inv.medStocks stock " +
+////                " WHERE inv.resident = :resident AND stock.tradeform = :tradeform " +
+////                " AND inv.bis = " + SYSConst.MYSQL_DATETIME_BIS_AUF_WEITERES),
+//        @NamedQuery(name = "MedInventory.findByBewohnerMitBestand", query = " " +
+//                " SELECT best.inventory, SUM(buch.amount) FROM MedStock best " +
+//                " JOIN best.stockTransaction buch " +
+//                " WHERE best.inventory.resident = :bewohner AND best.inventory.to = '9999-12-31 23:59:59' " +
+//                " GROUP BY best.inventory ")
+//})
+//
+//@NamedNativeQueries({
+//        // Das hier ist eine Liste aller Verordnungen eines Bewohners.
+//        // Durch Joins werden die zugehörigen Vorräte und aktuellen Bestände
+//        // beigefügt.
+//        @NamedNativeQuery(name = "MedInventory.findVorraeteMitSummen", query = " " +
+//                " SELECT DISTINCT v.VorID, b.saldo" +
+//                " FROM MPVorrat v " +
+//                " LEFT OUTER JOIN (" +
+//                "       SELECT best.VorID, sum(buch.Menge) saldo FROM MPBestand best " +
+//                "       INNER JOIN MPVorrat v ON v.VorID = best.VorID " +
+//                "       INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
+//                "       WHERE v.BWKennung=? " + // Diese Zeile ist eigentlich nicht nötig. Beschleunigt aber ungemein.
+//                "       GROUP BY best.VorID" +
+//                " ) b ON b.VorID = v.VorID" +
+//                " WHERE v.BWKennung=? " +
+//                " AND ( ? = 1 OR v.Bis = '9999-12-31 23:59:59' ) " +
+//                " ORDER BY v.Text ")
+//})
 //
 //@SqlResultSetMappings({
 //        @SqlResultSetMapping(name = "MedInventory.findVorraeteMitSummenResultMapping",

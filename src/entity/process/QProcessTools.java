@@ -66,19 +66,19 @@ public class QProcessTools {
         String elementBezeichnung = "";
         Query query = null;
         if (element instanceof NReport) {
-            query = em.createNamedQuery("SYSNR2PROCESS.findByElementAndVorgang");
+            query = em.createQuery("SELECT s FROM SYSNR2PROCESS s WHERE s.nreport = :element AND s.qProcess = :process AND s.qProcess.to = '9999-12-31 23:59:59'");
             elementBezeichnung = "Pflegebericht";
         } else if (element instanceof ResValue) {
-            query = em.createNamedQuery("SYSVAL2PROCESS.findByElementAndVorgang");
+            query = em.createQuery("SELECT s FROM SYSVAL2PROCESS s WHERE s.resValue = :element AND s.vorgang = :process AND s.vorgang.to = '9999-12-31 23:59:59'");
             elementBezeichnung = "Bewohner Wert";
         } else if (element instanceof Prescription) {
-            query = em.createNamedQuery("SYSPRE2PROCESS.findByElementAndVorgang");
+            query = em.createQuery("SELECT s FROM SYSPRE2PROCESS s WHERE s.prescription = :element AND s.qProcess = :process AND s.qProcess.to = '9999-12-31 23:59:59'");
             elementBezeichnung = "Ärztliche Verordnung";
         } else if (element instanceof ResInfo) {
-            query = em.createNamedQuery("SYSINF2PROCESS.findByElementAndVorgang");
+            query = em.createQuery("SELECT s FROM SYSINF2PROCESS s WHERE s.bwinfo = :element AND s.vorgang = :process AND s.vorgang.to = '9999-12-31 23:59:59'");
             elementBezeichnung = "Bewohner Information";
         } else if (element instanceof NursingProcess) {
-            query = em.createNamedQuery("SYSNP2PROCESS.findByElementAndVorgang");
+            query = em.createQuery("SELECT s FROM SYSNP2PROCESS s WHERE s.nursingProcess = :element AND s.vorgang = :process AND s.vorgang.to = '9999-12-31 23:59:59'");
             elementBezeichnung = "Pflegeplanung";
         } else {
 

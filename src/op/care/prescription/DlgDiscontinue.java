@@ -180,11 +180,11 @@ public class DlgDiscontinue extends MyJDialog {
 
     private void fillCMBs() {
         EntityManager em = OPDE.createEM();
-        Query queryArzt = em.createNamedQuery("Arzt.findAll");
+        Query queryArzt = em.createQuery("SELECT a FROM Doc a ORDER BY a.name, a.vorname");
         java.util.List<Doc> listAerzte = queryArzt.getResultList();
         listAerzte.add(0, null);
 
-        Query queryKH = em.createNamedQuery("Krankenhaus.findAll");
+        Query queryKH = em.createQuery("SELECT k FROM Hospital k ORDER BY k.name");
         java.util.List<Hospital> listKH = queryKH.getResultList();
         listKH.add(0, null);
 

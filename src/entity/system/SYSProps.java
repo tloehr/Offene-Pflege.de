@@ -13,14 +13,14 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "SYSProps")
-@NamedQueries({
-    @NamedQuery(name = "SYSProps.findAll", query = "SELECT s FROM SYSProps s"),
-    @NamedQuery(name = "SYSProps.findBySyspid", query = "SELECT s FROM SYSProps s WHERE s.syspid = :syspid"),
-    @NamedQuery(name = "SYSProps.findByKey", query = "SELECT s FROM SYSProps s WHERE s.key = :key"),
-    @NamedQuery(name = "SYSProps.findByKeyAndUser", query = "SELECT s FROM SYSProps s WHERE s.key = :key AND s.user = :user "),
-    @NamedQuery(name = "SYSProps.findByValue", query = "SELECT s FROM SYSProps s WHERE s.value = :value"),
-    @NamedQuery(name = "SYSProps.findAllWOUsers", query = "SELECT s FROM SYSProps s WHERE s.user IS NULL"),
-    @NamedQuery(name = "SYSProps.findByUser", query = "SELECT s FROM SYSProps s WHERE s.user = :user ")})
+//@NamedQueries({
+//    @NamedQuery(name = "SYSProps.findAll", query = "SELECT s FROM SYSProps s"),
+//    @NamedQuery(name = "SYSProps.findBySyspid", query = "SELECT s FROM SYSProps s WHERE s.syspid = :syspid"),
+//    @NamedQuery(name = "SYSProps.findByKey", query = "SELECT s FROM SYSProps s WHERE s.key = :key"),
+//    @NamedQuery(name = "SYSProps.findByKeyAndUser", query = "SELECT s FROM SYSProps s WHERE s.key = :key AND s.user = :user "),
+//    @NamedQuery(name = "SYSProps.findByValue", query = "SELECT s FROM SYSProps s WHERE s.value = :value"),
+//    @NamedQuery(name = "SYSProps.findAllWOUsers", query = "SELECT s FROM SYSProps s WHERE s.user IS NULL"),
+//    @NamedQuery(name = "SYSProps.findByUser", query = "SELECT s FROM SYSProps s WHERE s.user = :user ")})
 public class SYSProps implements Serializable {
 
     private static final long serialVersionUID = 1L;

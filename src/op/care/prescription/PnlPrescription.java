@@ -88,7 +88,7 @@ public class PnlPrescription extends NursingRecordsPanel {
     private CollapsiblePanes searchPanes;
     private JToggleButton tbClosed;
 
-    private Color[] demandColors, regularColors;
+    private Color[] color1, color2;
 
     /**
      * Creates new form PnlPrescription
@@ -102,8 +102,8 @@ public class PnlPrescription extends NursingRecordsPanel {
     }
 
     private void initPanel() {
-        demandColors = SYSConst.green2;
-        regularColors = SYSConst.blue1;
+        color1 = SYSConst.greyscale;
+        color2 = SYSConst.blue1;
         cpMap = new HashMap<String, CollapsiblePane>();
         lstPrescriptions = new ArrayList<Prescription>();
         lstVisiblePrescriptions = new ArrayList<Prescription>();
@@ -202,14 +202,27 @@ public class PnlPrescription extends NursingRecordsPanel {
         }
         final CollapsiblePane cpPres = cpMap.get(key);
 
+
         String title = "<html><table border=\"0\">" +
-                "<tr>" +
-                "<td width=\"450\" align=\"left\">" +
-                PrescriptionTools.getShortDescription(prescription) + "</td>" +
-                "<td width=\"300\" align=\"left\">" + PrescriptionTools.getDose(prescription) + "</td>" +
-                "</tr>" +
+                "<tr valign=\"top\">" +
+                "<td width=\"280\" align=\"left\">" + prescription.getPITAsHTML() + "</td>" +
+                "<td width=\"500\" align=\"left\">" +
+                PrescriptionTools.getShortDescription(prescription) +
+                PrescriptionTools.getDose(prescription) +
+                "<br/>" +
+                "</td>" +
                 "</table>" +
                 "</html>";
+
+
+//        String title = "<html><table border=\"0\">" +
+//                "<tr>" +
+//                "<td width=\"450\" align=\"left\">" +
+//                PrescriptionTools.getShortDescription(prescription) + "</td>" +
+//                "<td width=\"300\" align=\"left\">" + PrescriptionTools.getDose(prescription) + "</td>" +
+//                "</tr>" +
+//                "</table>" +
+//                "</html>";
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
             @Override
@@ -221,9 +234,10 @@ public class PnlPrescription extends NursingRecordsPanel {
                 }
             }
         });
+        cptitle.getButton().setIcon(getIcon(prescription));
+
         cpPres.setTitleLabelComponent(cptitle.getMain());
         cpPres.setSlidingDirection(SwingConstants.SOUTH);
-
 
         /***
          *      __  __
@@ -255,7 +269,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                 GUITools.showPopup(popup, SwingConstants.WEST);
             }
         });
-        btnMenu.setEnabled(!prescription.isDiscontinued());
+        btnMenu.setEnabled(!prescription.isClosed());
         cptitle.getRight().add(btnMenu);
 
         cpPres.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
@@ -284,19 +298,52 @@ public class PnlPrescription extends NursingRecordsPanel {
         return cpPres;
     }
 
-    private Color getColor(Prescription prescription, int level, boolean odd) {
-        if (odd) {
-            level = Math.max(0, level - 2);
-        }
+    private Icon getIcon(Prescription mypres) {
+        Icon icon;
 
-//        if (prescription.isDiscontinued()) {
+        if (mypres.isClosed()) {
+            icon = SYSConst.icon22ledBlueOff;
+        } else if (mypres.isOnDemand()) {
+            icon = SYSConst.icon22ledPurpleOff;
+            if (mypres.hasMed()) {
+                MedInventory inventory = TradeFormTools.getInventory4TradeForm(mypres.getResident(), mypres.getTradeForm());
+                MedStock stockInUse = MedStockTools.getStockInUse(inventory);
+                if (stockInUse == null) {
+                    icon = SYSConst.icon22ledRedOn;
+                } else {
+                    icon = SYSConst.icon22ledPurpleOn;
+                }
+            }
+        } else {
+            icon = SYSConst.icon22ledGreenOff;
+            if (mypres.hasMed()) {
+                MedInventory inventory = TradeFormTools.getInventory4TradeForm(mypres.getResident(), mypres.getTradeForm());
+                MedStock stockInUse = MedStockTools.getStockInUse(inventory);
+                if (stockInUse == null) {
+                    icon = SYSConst.icon22ledRedOn;
+                } else {
+                    icon = SYSConst.icon22ledGreenOn;
+                }
+            }
+        }
+        return icon;
+    }
+
+
+    private Color getColor(int level, boolean odd) {
+//        if (odd) {
+//            level = Math.max(0, level - 2);
+//        }
+
+
+//        if (prescription.isClosed()) {
 //            level = Math.max(0, level - 3);
 //        }
 
-        if (prescription.isOnDemand()) {
-            return demandColors[level];
+        if (odd) {
+            return color1[level];
         } else {
-            return regularColors[level];
+            return color2[level];
         }
     }
 
@@ -348,8 +395,8 @@ public class PnlPrescription extends NursingRecordsPanel {
 //
 //            long num = BHPTools.getNumBHPs(selectedVerordnung);
 //            boolean editAllowed = !readOnly && num == 0;
-//            boolean changeAllowed = !readOnly && !selectedVerordnung.isOnDemand() && !selectedVerordnung.isDiscontinued() && num > 0;
-//            boolean absetzenAllowed = !readOnly && !selectedVerordnung.isDiscontinued();
+//            boolean changeAllowed = !readOnly && !selectedVerordnung.isOnDemand() && !selectedVerordnung.isClosed() && num > 0;
+//            boolean absetzenAllowed = !readOnly && !selectedVerordnung.isClosed();
 //            boolean deleteAllowed = !readOnly && num == 0;
 //
 //            SYSTools.unregisterListeners(menu);
@@ -586,8 +633,8 @@ public class PnlPrescription extends NursingRecordsPanel {
 //                menu.add(new JSeparator());
 //
 //                final MedStock bestandImAnbruch = MedStockTools.getStockInUse(TradeFormTools.getInventory4TradeForm(resident, selectedVerordnung.getTradeForm()));
-//                boolean bestandAbschliessenAllowed = !readOnly && !selectedVerordnung.isDiscontinued() && bestandImAnbruch != null && !bestandImAnbruch.hashNext2Open();
-//                boolean bestandAnbrechenAllowed = !readOnly && !selectedVerordnung.isDiscontinued() && bestandImAnbruch == null;
+//                boolean bestandAbschliessenAllowed = !readOnly && !selectedVerordnung.isClosed() && bestandImAnbruch != null && !bestandImAnbruch.hasNext2Open();
+//                boolean bestandAnbrechenAllowed = !readOnly && !selectedVerordnung.isClosed() && bestandImAnbruch == null;
 //
 //                JMenuItem itemPopupCloseBestand = new JMenuItem("Bestand abschließen");
 //                itemPopupCloseBestand.addActionListener(new java.awt.event.ActionListener() {
@@ -606,7 +653,7 @@ public class PnlPrescription extends NursingRecordsPanel {
 //                menu.add(itemPopupCloseBestand);
 //                itemPopupCloseBestand.setEnabled(bestandAbschliessenAllowed && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
 //
-//                JMenuItem itemPopupOpenBestand = new JMenuItem("Bestand anbrechen");
+//                JMenuItem itemPopupOpenBestand = new JMenuItem("Bestand open");
 //                itemPopupOpenBestand.addActionListener(new java.awt.event.ActionListener() {
 //
 //                    public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -635,12 +682,12 @@ public class PnlPrescription extends NursingRecordsPanel {
 //            });
 //            menu.add(itemPopupPrint);
 //
-////            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !prescription.isDiscontinued() && singleRowSelected) {
+////            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !prescription.isClosed() && singleRowSelected) {
 ////                menu.add(new JSeparator());
 ////                menu.add(SYSFilesTools.getSYSFilesContextMenu(parent, prescription, standardActionListener));
 ////            }
 ////
-////            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !prescription.isDiscontinued() && singleRowSelected) {
+////            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !prescription.isClosed() && singleRowSelected) {
 ////                menu.add(new JSeparator());
 ////                menu.add(QProcessTools.getVorgangContextMenu(parent, prescription, resident, standardActionListener));
 ////            }
@@ -669,24 +716,7 @@ public class PnlPrescription extends NursingRecordsPanel {
 //
 //            menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
 //        }
-//    }//GEN-LAST:event_tblVerordnungMousePressed
 
-//    private void jspVerordnungComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspVerordnungComponentResized
-//
-//        JScrollPane jsp = (JScrollPane) evt.getComponent();
-//        Dimension dim = jsp.getSize();
-//
-//        TableColumnModel tcm1 = tblVerordnung.getColumnModel();
-//
-//        if (tcm1.getColumnCount() > 0) {
-//            tcm1.getColumn(TMVerordnung.COL_MSSN).setPreferredWidth(dim.width / 3);  // 1/5 tel der Gesamtbreite
-//            tcm1.getColumn(TMVerordnung.COL_Dosis).setPreferredWidth(dim.width / 3);  // 3/5 tel der Gesamtbreite
-//            tcm1.getColumn(TMVerordnung.COL_Hinweis).setPreferredWidth(dim.width / 3);  // 1/5 tel der Gesamtbreite
-//            tcm1.getColumn(0).setHeaderValue("Medikament / Massnahme");
-//            tcm1.getColumn(1).setHeaderValue("Dosierung / Häufigkeit");
-//            tcm1.getColumn(2).setHeaderValue("Hinweise");
-//        }
-//    }//GEN-LAST:event_jspVerordnungComponentResized
 
     public void cleanup() {
         cpMap.clear();
@@ -801,8 +831,8 @@ public class PnlPrescription extends NursingRecordsPanel {
                     });
                 }
             });
-            addRegular.setBackground(regularColors[SYSConst.medium4]);
-            addRegular.setOpaque(true);
+//            addRegular.setBackground(regularColors[SYSConst.medium4]);
+//            addRegular.setOpaque(true);
             list.add(addRegular);
         }
 
@@ -863,8 +893,8 @@ public class PnlPrescription extends NursingRecordsPanel {
                     });
                 }
             });
-            addNewOnDemand.setBackground(demandColors[SYSConst.medium4]);
-            addNewOnDemand.setOpaque(true);
+//            addNewOnDemand.setBackground(demandColors[SYSConst.medium4]);
+//            addNewOnDemand.setOpaque(true);
             list.add(addNewOnDemand);
         }
 
@@ -873,6 +903,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     new DlgNewStocks(resident);
+                    reload();
                 }
             });
             list.add(buchenButton);
@@ -890,7 +921,7 @@ public class PnlPrescription extends NursingRecordsPanel {
             JideButton printDaily = GUITools.createHyperlinkButton(internalClassID + ".printdailyplan", SYSConst.icon22print2, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    SYSFilesTools.print(PrescriptionTools.getDailyPlanAsHTML(resident.getStation().getEinrichtung()), true);
+                    SYSFilesTools.print(PrescriptionTools.getDailyPlanAsHTML(resident.getStation().getHome()), true);
                 }
             });
             list.add(printDaily);
@@ -906,18 +937,12 @@ public class PnlPrescription extends NursingRecordsPanel {
         int i = 0;
         // for the zebra coloring
         for (Prescription prescription : lstPrescriptions) {
-            if (tbClosed.isSelected() || !prescription.isDiscontinued()) {
-                cpMap.get(prescription.getID() + ".xprescription").setBackground(getColor(prescription, SYSConst.medium1, i % 2 == 1));
+            if (tbClosed.isSelected() || !prescription.isClosed()) {
+                cpMap.get(prescription.getID() + ".xprescription").setBackground(getColor(SYSConst.medium1, i % 2 == 1));
                 cpsPrescription.add(cpMap.get(prescription.getID() + ".xprescription"));
                 i++;
-//                cpPres.setBackground(getColor(prescription, SYSConst.medium1));
             }
         }
-//
-//        for (Prescription prescription : lstVisiblePrescriptions) {
-//
-//        }
-
         cpsPrescription.addExpansion();
     }
 
@@ -1026,20 +1051,20 @@ public class PnlPrescription extends NursingRecordsPanel {
                     });
                 }
             });
-            btnChange.setEnabled(!prescription.isDiscontinued() && !prescription.isOnDemand());
+            btnChange.setEnabled(!prescription.isClosed() && !prescription.isOnDemand());
             pnlMenu.add(btnChange);
 
             /***
-             *      ____  _                     _   _
-             *     |  _ \(_)___  ___ ___  _ __ | |_(_)_ __  _   _  ___
-             *     | | | | / __|/ __/ _ \| '_ \| __| | '_ \| | | |/ _ \
-             *     | |_| | \__ \ (_| (_) | | | | |_| | | | | |_| |  __/
-             *     |____/|_|___/\___\___/|_| |_|\__|_|_| |_|\__,_|\___|
-             *
+             *      ____  _
+             *     / ___|| |_ ___  _ __
+             *     \___ \| __/ _ \| '_ \
+             *      ___) | || (_) | |_) |
+             *     |____/ \__\___/| .__/
+             *                    |_|
              */
-            final JButton btnDiscontinue = GUITools.createHyperlinkButton(internalClassID + ".btnDiscontinue.tooltip", SYSConst.icon22playerStop, null);
-            btnDiscontinue.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnDiscontinue.addActionListener(new ActionListener() {
+            final JButton btnStop = GUITools.createHyperlinkButton(internalClassID + ".btnStop.tooltip", SYSConst.icon22playerStop, null);
+            btnStop.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnStop.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
 
@@ -1107,8 +1132,8 @@ public class PnlPrescription extends NursingRecordsPanel {
                     });
                 }
             });
-//            btnDiscontinue.setEnabled(!prescription.isDiscontinued());
-            pnlMenu.add(btnDiscontinue);
+//            btnDiscontinue.setEnabled(!prescription.isClosed());
+            pnlMenu.add(btnStop);
 
 
             /***
@@ -1257,7 +1282,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                 }
 
             });
-            btnEdit.setEnabled(!prescription.isDiscontinued());
+            btnEdit.setEnabled(!prescription.isClosed());
             pnlMenu.add(btnEdit);
 
             /***
@@ -1315,7 +1340,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                 }
 
             });
-            btnDelete.setEnabled(!prescription.isDiscontinued() && (!prescriptionHasBeenUsedAlready || OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)));
+            btnDelete.setEnabled(!prescription.isClosed() && (!prescriptionHasBeenUsedAlready || OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)));
             pnlMenu.add(btnDelete);
 
             pnlMenu.add(new JSeparator());
@@ -1336,7 +1361,17 @@ public class PnlPrescription extends NursingRecordsPanel {
                     new DlgCloseStock(stockInUse, new Closure() {
                         @Override
                         public void execute(Object o) {
+                            if (o != null) {
 
+                                // The prescription itself is not changed but the stock in question,
+                                // this information is requested by a single DB request every time
+                                // the CP is created for that particular prescription.
+                                // A new call to the createCP4 method will reuse the old
+                                // CollapsiblePane and set a new TextContent to it.
+                                // Now with the MedStock information.
+                                final CollapsiblePane myCP = createCP4(prescription);
+                                GUITools.flashBackground(myCP, Color.YELLOW, 2);
+                            }
                         }
                     });
                 }
@@ -1402,7 +1437,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                 }
             });
 
-            btnFiles.setEnabled(!prescription.isDiscontinued());
+            btnFiles.setEnabled(!prescription.isClosed());
             if (prescription.getAttachedFilesConnections().size() > 0) {
                 JLabel lblNum = new JLabel(Integer.toString(prescription.getAttachedFilesConnections().size()), SYSConst.icon16greenStar, SwingConstants.CENTER);
                 lblNum.setFont(SYSConst.ARIAL10BOLD);
@@ -1494,7 +1529,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                     });
                 }
             });
-            btnProcess.setEnabled(!prescription.isDiscontinued());
+            btnProcess.setEnabled(!prescription.isClosed());
 
             if (!prescription.getAttachedProcessConnections().isEmpty()) {
                 JLabel lblNum = new JLabel(Integer.toString(prescription.getAttachedProcessConnections().size()), SYSConst.icon16redStar, SwingConstants.CENTER);

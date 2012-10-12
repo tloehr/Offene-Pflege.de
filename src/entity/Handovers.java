@@ -16,41 +16,41 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "Handovers")
-@NamedQueries({
-        @NamedQuery(name = "Uebergabebuch.findAll", query = "SELECT u FROM Handovers u"),
-        @NamedQuery(name = "Uebergabebuch.findByUebid", query = "SELECT u FROM Handovers u WHERE u.hid = :uebid"),
-        @NamedQuery(name = "Uebergabebuch.findByEinrichtungAndDatum", query = " "
-                + " SELECT u, count(ack) FROM Handovers u "
-                + " LEFT JOIN u.usersAcknowledged ack "
-                + " WHERE u.pit >= :von AND u.pit <= :bis AND u.einrichtung = :einrichtung AND ack.user = :user "
-                + " GROUP BY u "
-                + " ORDER BY u.pit DESC "),
-        @NamedQuery(name = "Uebergabebuch.findByPit", query = "SELECT u FROM Handovers u WHERE u.pit = :pit")
-})
-@SqlResultSetMappings({
-        @SqlResultSetMapping(name = "Handovers.findByEinrichtungAndDatumAndAckUserResultMapping", entities =
-        @EntityResult(entityClass = Handovers.class), columns =
-        @ColumnResult(name = "num"))
-})
-@NamedNativeQueries({
-        /**
-         * Diese Query ist eine native Query. Ich habe keinen anderen Weg gefunden auf SubSelects zu JOINen.
-         * Das Ergebnis ist eine Liste aller Einrichtungsbezogenen Ubergabebuch Einträge mit einer
-         * Angabe, ob ein bestimmter User diese bereits zur Kenntnis genommen hat oder nicht.
-         * Durch eine passende SQLResultSetMap ist das Ergebnis ein 2 wertiges Array aus Objekten. Das erste
-         * Objekt ist immer der Uebergabebericht, das zweiter ist ein Long Wert, der das count Ergebnis
-         * des Joins enthält.
-         *
-         */
-        @NamedNativeQuery(name = "Uebergabebuch.findByEinrichtungAndDatumAndAckUser", query = ""
-                + " SELECT u.*, ifnull(u2u.num, 0) num FROM Uebergabebuch u "
-                + " LEFT OUTER JOIN ( SELECT uebid, count(*) num FROM Uebergabe2User WHERE UKennung=? GROUP BY uebid, UKennung) as u2u ON u2u.UEBID = u.UEBID "
-                + " WHERE "
-                + "     u.EID = ? "
-                + "     AND u.PIT >= ? AND u.PIT <= ? "
-                + " GROUP BY u.UEBID "
-                + " ORDER BY u.PIT DESC", resultSetMapping = "Handovers.findByEinrichtungAndDatumAndAckUserResultMapping")
-})
+//@NamedQueries({
+//        @NamedQuery(name = "Uebergabebuch.findAll", query = "SELECT u FROM Handovers u"),
+//        @NamedQuery(name = "Uebergabebuch.findByUebid", query = "SELECT u FROM Handovers u WHERE u.hid = :uebid"),
+//        @NamedQuery(name = "Uebergabebuch.findByEinrichtungAndDatum", query = " "
+//                + " SELECT u, count(ack) FROM Handovers u "
+//                + " LEFT JOIN u.usersAcknowledged ack "
+//                + " WHERE u.pit >= :von AND u.pit <= :bis AND u.einrichtung = :einrichtung AND ack.user = :user "
+//                + " GROUP BY u "
+//                + " ORDER BY u.pit DESC "),
+//        @NamedQuery(name = "Uebergabebuch.findByPit", query = "SELECT u FROM Handovers u WHERE u.pit = :pit")
+//})
+//@SqlResultSetMappings({
+//        @SqlResultSetMapping(name = "Handovers.findByEinrichtungAndDatumAndAckUserResultMapping", entities =
+//        @EntityResult(entityClass = Handovers.class), columns =
+//        @ColumnResult(name = "num"))
+//})
+//@NamedNativeQueries({
+//        /**
+//         * Diese Query ist eine native Query. Ich habe keinen anderen Weg gefunden auf SubSelects zu JOINen.
+//         * Das Ergebnis ist eine Liste aller Einrichtungsbezogenen Ubergabebuch Einträge mit einer
+//         * Angabe, ob ein bestimmter User diese bereits zur Kenntnis genommen hat oder nicht.
+//         * Durch eine passende SQLResultSetMap ist das Ergebnis ein 2 wertiges Array aus Objekten. Das erste
+//         * Objekt ist immer der Uebergabebericht, das zweiter ist ein Long Wert, der das count Ergebnis
+//         * des Joins enthält.
+//         *
+//         */
+//        @NamedNativeQuery(name = "Uebergabebuch.findByEinrichtungAndDatumAndAckUser", query = ""
+//                + " SELECT u.*, ifnull(u2u.num, 0) num FROM Uebergabebuch u "
+//                + " LEFT OUTER JOIN ( SELECT uebid, count(*) num FROM Uebergabe2User WHERE UKennung=? GROUP BY uebid, UKennung) as u2u ON u2u.UEBID = u.UEBID "
+//                + " WHERE "
+//                + "     u.EID = ? "
+//                + "     AND u.PIT >= ? AND u.PIT <= ? "
+//                + " GROUP BY u.UEBID "
+//                + " ORDER BY u.PIT DESC", resultSetMapping = "Handovers.findByEinrichtungAndDatumAndAckUserResultMapping")
+//})
 public class Handovers implements Serializable {
 
     private static final long serialVersionUID = 1L;

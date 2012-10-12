@@ -14,11 +14,11 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "UNIQUEID")
-@NamedQueries({
-    @NamedQuery(name = "Uniqueid.findAll", query = "SELECT u FROM Unique u"),
-    @NamedQuery(name = "Uniqueid.findByUniqid", query = "SELECT u FROM Unique u WHERE u.uniqid = :uniqid"),
-    @NamedQuery(name = "Uniqueid.findByUid", query = "SELECT u FROM Unique u WHERE u.uid = :uid"),
-    @NamedQuery(name = "Uniqueid.findByPrefix", query = "SELECT u FROM Unique u WHERE u.prefix = :prefix")})
+//@NamedQueries({
+//    @NamedQuery(name = "Uniqueid.findAll", query = "SELECT u FROM Unique u"),
+//    @NamedQuery(name = "Uniqueid.findByUniqid", query = "SELECT u FROM Unique u WHERE u.uniqid = :uniqid"),
+//    @NamedQuery(name = "Uniqueid.findByUid", query = "SELECT u FROM Unique u WHERE u.uid = :uid"),
+//    @NamedQuery(name = "Uniqueid.findByPrefix", query = "SELECT u FROM Unique u WHERE u.prefix = :prefix")})
 public class Unique implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

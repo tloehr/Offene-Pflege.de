@@ -130,7 +130,8 @@ public class AppInfo {
         boolean allowed = true;
         if (!OPDE.isAdmin()) {
             EntityManager em = OPDE.createEM();
-            Query query = em.createNamedQuery("IntClasses.findByUserAndClassnameAndACL");
+            Query query = em.createQuery("SELECT i FROM SYSGROUPS2ACL i "
+                    + "WHERE i.internalClassID = :internalClassID AND :user MEMBER OF i.groups.members AND EXISTS (SELECT a FROM Acl a WHERE a.acl = :shortacl)");
             query.setParameter("user", OPDE.getLogin().getUser());
             query.setParameter("internalClassID", internalClassID);
             query.setParameter("shortacl", acl);

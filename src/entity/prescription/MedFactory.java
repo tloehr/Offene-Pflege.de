@@ -5,17 +5,17 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "MPHersteller")
-@NamedQueries({
-    @NamedQuery(name = "MedHersteller.findAll", query = "SELECT m FROM MedFactory m ORDER BY m.firma, m.ort"),
-    @NamedQuery(name = "MedHersteller.findByMphid", query = "SELECT m FROM MedFactory m WHERE m.mphid = :mphid"),
-    @NamedQuery(name = "MedHersteller.findByFirma", query = "SELECT m FROM MedFactory m WHERE m.firma = :firma"),
-    @NamedQuery(name = "MedHersteller.findByStrasse", query = "SELECT m FROM MedFactory m WHERE m.strasse = :strasse"),
-    @NamedQuery(name = "MedHersteller.findByPlz", query = "SELECT m FROM MedFactory m WHERE m.plz = :plz"),
-    @NamedQuery(name = "MedHersteller.findByOrt", query = "SELECT m FROM MedFactory m WHERE m.ort = :ort"),
-    @NamedQuery(name = "MedHersteller.findByTel", query = "SELECT m FROM MedFactory m WHERE m.tel = :tel"),
-    @NamedQuery(name = "MedHersteller.findByFax", query = "SELECT m FROM MedFactory m WHERE m.fax = :fax"),
-    @NamedQuery(name = "MedHersteller.findByWww", query = "SELECT m FROM MedFactory m WHERE m.www = :www")
-    })
+//@NamedQueries({
+//    @NamedQuery(name = "MedHersteller.findAll", query = "SELECT m FROM MedFactory m ORDER BY m.firma, m.ort"),
+//    @NamedQuery(name = "MedHersteller.findByMphid", query = "SELECT m FROM MedFactory m WHERE m.mphid = :mphid"),
+//    @NamedQuery(name = "MedHersteller.findByFirma", query = "SELECT m FROM MedFactory m WHERE m.firma = :firma"),
+//    @NamedQuery(name = "MedHersteller.findByStrasse", query = "SELECT m FROM MedFactory m WHERE m.strasse = :strasse"),
+//    @NamedQuery(name = "MedHersteller.findByPlz", query = "SELECT m FROM MedFactory m WHERE m.plz = :plz"),
+//    @NamedQuery(name = "MedHersteller.findByOrt", query = "SELECT m FROM MedFactory m WHERE m.ort = :ort"),
+//    @NamedQuery(name = "MedHersteller.findByTel", query = "SELECT m FROM MedFactory m WHERE m.tel = :tel"),
+//    @NamedQuery(name = "MedHersteller.findByFax", query = "SELECT m FROM MedFactory m WHERE m.fax = :fax"),
+//    @NamedQuery(name = "MedHersteller.findByWww", query = "SELECT m FROM MedFactory m WHERE m.www = :www")
+//    })
 public class MedFactory implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

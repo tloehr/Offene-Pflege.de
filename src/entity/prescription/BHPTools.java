@@ -546,7 +546,7 @@ public class BHPTools {
 //                //          )
 //                //      )
 //                !abwesend &&
-//                        !bhp.getPrescription().isDiscontinued()
+//                        !bhp.getPrescription().isClosed()
 //                        // Offener Status geht immer
 //                        && (
 //                        bhp.getState() == BHPTools.STATE_OPEN
@@ -568,7 +568,7 @@ public class BHPTools {
         boolean medTrouble = bhp.hasMed() && TradeFormTools.getInventory4TradeForm(bhp.getResident(), bhp.getTradeForm()) == null;
 
         return !residentAbsent && bhp.getResident().isActive() &&
-                !bhp.getPrescription().isDiscontinued() &&
+                !bhp.getPrescription().isClosed() &&
                 !medTrouble &&
                 (bhp.getUser() == null ||
                         (bhp.getUser().equals(OPDE.getLogin().getUser()) &&

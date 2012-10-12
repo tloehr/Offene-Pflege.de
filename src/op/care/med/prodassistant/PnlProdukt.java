@@ -49,7 +49,7 @@ public class PnlProdukt extends JPanel {
 
     private void txtProdActionPerformed(ActionEvent e) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("MedProdukte.findByBezeichnungLike");
+        Query query = em.createQuery("SELECT m FROM MedProducts m WHERE m.bezeichnung LIKE :bezeichnung ORDER BY m.bezeichnung");
         query.setParameter("bezeichnung", "%" + txtProd.getText().trim() + "%");
         listProd = query.getResultList();
         em.close();

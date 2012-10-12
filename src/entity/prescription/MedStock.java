@@ -13,46 +13,46 @@ import java.util.Date;
 
 @Entity
 @Table(name = "MPBestand")
-@NamedQueries({
-        @NamedQuery(name = "MedStock.findAll", query = "SELECT m FROM MedStock m"),
-        @NamedQuery(name = "MedStock.findByBestID", query = "SELECT m FROM MedStock m WHERE m.id = :bestID"),
-        @NamedQuery(name = "MedStock.findByEin", query = "SELECT m FROM MedStock m WHERE m.in = :ein"),
-        @NamedQuery(name = "MedStock.findByAnbruch", query = "SELECT m FROM MedStock m WHERE m.opened = :anbruch"),
-        @NamedQuery(name = "MedStock.findByAus", query = "SELECT m FROM MedStock m WHERE m.out = :aus"),
-        @NamedQuery(name = "MedStock.findByText", query = "SELECT m FROM MedStock m WHERE m.text = :text"),
-        @NamedQuery(name = "MedStock.findByApv", query = "SELECT m FROM MedStock m WHERE m.apv = :apv"),
-        @NamedQuery(name = "MedStock.findByDarreichungAndBewohnerImAnbruch", query = " " +
-                " SELECT b FROM MedStock b WHERE b.inventory.resident = :bewohner AND b.tradeform = :darreichung " +
-                " AND b.opened < '9999-12-31 23:59:59' AND b.out = '9999-12-31 23:59:59'"),
-        @NamedQuery(name = "MedStock.findByVorratImAnbruch", query = " " +
-                " SELECT b FROM MedStock b WHERE b.inventory = :vorrat " +
-                " AND b.opened < '9999-12-31 23:59:59' AND b.out = '9999-12-31 23:59:59'"),
-        @NamedQuery(name = "MedStock.findByBewohnerImAnbruchMitSalden", query = " " +
-                " SELECT best, SUM(buch.amount) FROM MedStock best" +
-                " JOIN best.stockTransaction buch" +
-                " WHERE best.inventory.resident = :bewohner AND best.out = '9999-12-31 23:59:59' " +
-                " AND best.opened < '9999-12-31 23:59:59' " +
-                " GROUP BY best ")
-})
-
-@NamedNativeQueries({
-        // Das hier ist eine Liste aller Verordnungen eines Bewohners.
-        // Durch Joins werden die zugehörigen Vorräte und aktuellen Bestände
-        // beigefügt.
-        @NamedNativeQuery(name = "MedStock.findByVorratMitRestsumme", query = " " +
-                " SELECT best.BestID, sum.saldo " +
-                " FROM MPBestand best " +
-                " LEFT OUTER JOIN " +
-                "      ( " +
-                "        SELECT best.BestID, sum(buch.Menge) saldo FROM MPBestand best " +
-                "        INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
-                "        WHERE best.VorID=? " + // Diese Zeile ist eigentlich nicht nötig. Beschleunigt aber ungemein.
-                "        GROUP BY best.BestID " +
-                "      ) sum ON sum.BestID = best.BestID " +
-                " WHERE best.VorID = ? " +
-                " AND ( ? = 1 OR best.Aus = '9999-12-31 23:59:59' ) " +
-                " ORDER BY best.ein, best.anbruch ")
-})
+//@NamedQueries({
+//        @NamedQuery(name = "MedStock.findAll", query = "SELECT m FROM MedStock m"),
+//        @NamedQuery(name = "MedStock.findByBestID", query = "SELECT m FROM MedStock m WHERE m.id = :bestID"),
+//        @NamedQuery(name = "MedStock.findByEin", query = "SELECT m FROM MedStock m WHERE m.in = :ein"),
+//        @NamedQuery(name = "MedStock.findByAnbruch", query = "SELECT m FROM MedStock m WHERE m.opened = :anbruch"),
+//        @NamedQuery(name = "MedStock.findByAus", query = "SELECT m FROM MedStock m WHERE m.out = :aus"),
+//        @NamedQuery(name = "MedStock.findByText", query = "SELECT m FROM MedStock m WHERE m.text = :text"),
+//        @NamedQuery(name = "MedStock.findByApv", query = "SELECT m FROM MedStock m WHERE m.apv = :apv"),
+//        @NamedQuery(name = "MedStock.findByDarreichungAndBewohnerImAnbruch", query = " " +
+//                " SELECT b FROM MedStock b WHERE b.inventory.resident = :bewohner AND b.tradeform = :darreichung " +
+//                " AND b.opened < '9999-12-31 23:59:59' AND b.out = '9999-12-31 23:59:59'"),
+//        @NamedQuery(name = "MedStock.findByVorratImAnbruch", query = " " +
+//                " SELECT b FROM MedStock b WHERE b.inventory = :vorrat " +
+//                " AND b.opened < '9999-12-31 23:59:59' AND b.out = '9999-12-31 23:59:59'"),
+//        @NamedQuery(name = "MedStock.findByBewohnerImAnbruchMitSalden", query = " " +
+//                " SELECT best, SUM(buch.amount) FROM MedStock best" +
+//                " JOIN best.stockTransaction buch" +
+//                " WHERE best.inventory.resident = :bewohner AND best.out = '9999-12-31 23:59:59' " +
+//                " AND best.opened < '9999-12-31 23:59:59' " +
+//                " GROUP BY best ")
+//})
+//
+//@NamedNativeQueries({
+//        // Das hier ist eine Liste aller Verordnungen eines Bewohners.
+//        // Durch Joins werden die zugehörigen Vorräte und aktuellen Bestände
+//        // beigefügt.
+//        @NamedNativeQuery(name = "MedStock.findByVorratMitRestsumme", query = " " +
+//                " SELECT best.BestID, sum.saldo " +
+//                " FROM MPBestand best " +
+//                " LEFT OUTER JOIN " +
+//                "      ( " +
+//                "        SELECT best.BestID, sum(buch.Menge) saldo FROM MPBestand best " +
+//                "        INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
+//                "        WHERE best.VorID=? " + // Diese Zeile ist eigentlich nicht nötig. Beschleunigt aber ungemein.
+//                "        GROUP BY best.BestID " +
+//                "      ) sum ON sum.BestID = best.BestID " +
+//                " WHERE best.VorID = ? " +
+//                " AND ( ? = 1 OR best.Aus = '9999-12-31 23:59:59' ) " +
+//                " ORDER BY best.ein, best.anbruch ")
+//})
 
 public class MedStock implements Serializable, Comparable<MedStock> {
     private static final long serialVersionUID = 1L;
@@ -201,7 +201,7 @@ public class MedStock implements Serializable, Comparable<MedStock> {
         return inventory;
     }
 
-    public boolean hashNext2Open() {
+    public boolean hasNext2Open() {
         return nextStock != null;
     }
 

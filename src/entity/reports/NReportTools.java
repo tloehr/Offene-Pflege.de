@@ -7,7 +7,6 @@ package entity.reports;
 import entity.EntityTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
-import entity.nursingprocess.DFNTools;
 import op.OPDE;
 import op.tools.Pair;
 import op.tools.SYSCalendar;
@@ -18,7 +17,6 @@ import org.joda.time.DateTime;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import java.awt.color.ColorSpace;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
@@ -32,7 +30,9 @@ public class NReportTools {
 
     public static NReport getFirstReport(Resident resident) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("Pflegeberichte.findAllByBewohner");
+        Query query = em.createQuery("SELECT p FROM NReport p "
+                + " WHERE p.resident = :bewohner "
+                + " ORDER BY p.pit");
         query.setParameter("bewohner", resident);
         query.setFirstResult(0);
         query.setMaxResults(1);
@@ -343,7 +343,23 @@ public class NReportTools {
 //                " ) a ON a.BWKennung = b.BWKennung " +
 //                " WHERE b.StatID IS NOT NULL AND b.adminonly <> 2 " +
 //                " ORDER BY b.BWKennung, a.pit ";
-        Query query = em.createNamedQuery("Pflegeberichte.findBVAktivitaet");
+        Query query = em.createNativeQuery(" SELECT b.*, a.PBID mypbid " +
+                " FROM Bewohner b " +
+                " LEFT OUTER JOIN ( " +
+                "    SELECT pb.* FROM Pflegeberichte pb " +
+                "    LEFT OUTER JOIN PB2TAGS pbt ON pbt.PBID = pb.PBID " +
+                "    LEFT OUTER JOIN PBericht_TAGS pbtags ON pbt.PBTAGID = pbtags.PBTAGID " +
+                "    WHERE pb.PIT > ? AND pbtags.Kurzbezeichnung = 'BV'" +
+                " ) a ON a.BWKennung = b.BWKennung " +
+                " WHERE b.StatID IS NOT NULL AND b.adminonly <> 2 " +
+                " ORDER BY b.BWKennung, a.pit ");
+
+
+        // TODO: SQLMapping
+//                @SqlResultSetMapping(name = "NReport.findBVAktivitaetResultMapping", entities =
+//        @EntityResult(entityClass = Resident.class), columns =
+//        @ColumnResult(name = "mypbid"))
+
         query.setParameter(1, SYSCalendar.addField(new Date(SYSCalendar.startOfDay()), bvwochen * -1, GregorianCalendar.WEEK_OF_MONTH));
 
 //        Query query2 = em.createQuery("SELECT b FROM Bewohner b LEFT JOIN b.pflegberichte pb WHERE pb IS NULL ");
@@ -482,8 +498,30 @@ public class NReportTools {
             Date von = new Date(SYSCalendar.bom(monat).getTime());
             Date bis = new Date(SYSCalendar.eom(monat).getTime());
 //            int daysinmonth = SYSCalendar.eom(SYSCalendar.toGC(monat));
+            // TODO: SQLMapping
 
-            Query query = em.createNamedQuery("Pflegeberichte.findSozialZeiten");
+//                    @SqlResultSetMapping(name = "NReport.findSozialZeitenResultMapping", entities =
+//        @EntityResult(entityClass = Resident.class), columns =
+//                {@ColumnResult(name = "sdauer"), @ColumnResult(name = "peadauer")})
+
+            Query query = em.createNativeQuery(" SELECT b.*, ifnull(soz.dauer,0) sdauer, ifnull(pea.dauer,0) peadauer FROM Bewohner b " +
+                    " LEFT OUTER JOIN (" +
+                    "                  SELECT p.BWKennung, ifnull(SUM(p.Dauer), 0) dauer " +
+                    "                  FROM NReports p" +
+                    "                  INNER JOIN PB2TAGS pb ON p.PBID = pb.PBID" +
+                    "                  INNER JOIN PBericht_TAGS pt ON pt.PBTAGID = pb.PBTAGID" +
+                    "                  WHERE pt.Kurzbezeichnung='soz' AND Date(PIT) >= DATE(?) AND Date(PIT) <= DATE(?) " +
+                    "                  GROUP BY BWKennung " +
+                    " ) soz ON soz.BWKennung = b.BWKennung" +
+                    " LEFT OUTER JOIN (" +
+                    "                  SELECT p.BWKennung, ifnull(SUM(p.Dauer), 0) dauer " +
+                    "                  FROM NReports p" +
+                    "                  INNER JOIN PB2TAGS pb ON p.PBID = pb.PBID" +
+                    "                  INNER JOIN PBericht_TAGS pt ON pt.PBTAGID = pb.PBTAGID" +
+                    "                  WHERE pt.Kurzbezeichnung='pea' AND Date(PIT) >= DATE(?) AND Date(PIT) <= DATE(?) " +
+                    "                  GROUP BY BWKennung " +
+                    " ) pea ON pea.BWKennung = b.BWKennung" +
+                    " WHERE b.StatID IS NOT NULL ");
             query.setParameter(1, von);
             query.setParameter(2, bis);
             query.setParameter(3, von);

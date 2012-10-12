@@ -17,11 +17,11 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "PlanKontrolle")
-@NamedQueries({
-        @NamedQuery(name = "PlanKontrolle.findAll", query = "SELECT p FROM NPControl p"),
-        @NamedQuery(name = "PlanKontrolle.findByPKonID", query = "SELECT p FROM NPControl p WHERE p.pKonID = :pKonID"),
-        @NamedQuery(name = "PlanKontrolle.findByDatum", query = "SELECT p FROM NPControl p WHERE p.datum = :datum"),
-        @NamedQuery(name = "PlanKontrolle.findByAbschluss", query = "SELECT p FROM NPControl p WHERE p.abschluss = :abschluss")})
+//@NamedQueries({
+//        @NamedQuery(name = "PlanKontrolle.findAll", query = "SELECT p FROM NPControl p"),
+//        @NamedQuery(name = "PlanKontrolle.findByPKonID", query = "SELECT p FROM NPControl p WHERE p.pKonID = :pKonID"),
+//        @NamedQuery(name = "PlanKontrolle.findByDatum", query = "SELECT p FROM NPControl p WHERE p.datum = :datum"),
+//        @NamedQuery(name = "PlanKontrolle.findByAbschluss", query = "SELECT p FROM NPControl p WHERE p.abschluss = :abschluss")})
 public class NPControl implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

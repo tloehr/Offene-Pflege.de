@@ -92,11 +92,11 @@ public class DlgDiag extends MyJDialog {
 
     private void fillCMBs() {
         EntityManager em = OPDE.createEM();
-        Query queryArzt = em.createNamedQuery("Arzt.findAllActive");
+        Query queryArzt = em.createQuery("SELECT a FROM Doc a WHERE a.status >= 0 ORDER BY a.name, a.vorname");
         java.util.List<Doc> listAerzte = queryArzt.getResultList();
         listAerzte.add(0, null);
 
-        Query queryKH = em.createNamedQuery("Krankenhaus.findAllActive");
+        Query queryKH = em.createQuery("SELECT k FROM Hospital k WHERE k.status >= 0 ORDER BY k.name");
         java.util.List<Hospital> listKH = queryKH.getResultList();
         listKH.add(0, null);
         em.close();

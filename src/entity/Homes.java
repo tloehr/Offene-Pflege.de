@@ -48,7 +48,7 @@ public class Homes implements Serializable {
     private String fax;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "einrichtung")
     private Collection<Handovers> handovers;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "einrichtung")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "home")
     private Collection<Station> station;
 
     public Homes() {

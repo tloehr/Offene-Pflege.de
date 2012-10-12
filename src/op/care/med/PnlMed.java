@@ -142,7 +142,7 @@ public class PnlMed extends CleanablePanel {
             lstPraep.setModel(new DefaultListModel());
         } else {
             EntityManager em = OPDE.createEM();
-            Query query = em.createNamedQuery("MedProdukte.findByBezeichnungLike");
+            Query query = em.createQuery("SELECT m FROM MedProducts m WHERE m.bezeichnung LIKE :bezeichnung ORDER BY m.bezeichnung");
             query.setParameter("bezeichnung", "%" + txtSuche.getText() + "%");
             lstPraep.setModel(SYSTools.list2dlm(query.getResultList()));
             em.close();
@@ -265,7 +265,7 @@ public class PnlMed extends CleanablePanel {
         java.util.List result = new ArrayList();
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("Darreichung.findByMedProdukt");
+        Query query = em.createQuery("SELECT m FROM TradeForm m WHERE m.medProduct = :medProdukt ORDER BY m.dosageForm.preparation");
         query.setParameter("medProdukt", produkt);
 
         java.util.List<TradeForm> listDAF = query.getResultList();

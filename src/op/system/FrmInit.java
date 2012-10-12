@@ -94,7 +94,7 @@ public class FrmInit extends JFrame {
      * @return ja oder nein
      */
     private boolean schemaKorrekt() {
-        Query query = em.createNamedQuery("SYSProps.findByKey");
+        Query query = em.createQuery("SELECT s FROM SYSProps s WHERE s.key = :key");
         query.setParameter("key", "DBSCHEMA");
         SYSProps dbschema = (SYSProps) query.getSingleResult();
 

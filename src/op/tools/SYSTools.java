@@ -1213,58 +1213,58 @@ public class SYSTools {
 //        return newListModel(namedQuery, null);
 //    }
 
-    public static DefaultListModel newListModel(String namedQuery, Object[]... params) {
-        EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery(namedQuery);
-        if (params != null) {
-            for (Object[] param : params) {
-                query.setParameter(param[0].toString(), param[1]);
-            }
-        }
-
-        DefaultListModel lmodel = newListModel(query.getResultList());
-
-        em.close();
-
-        return lmodel;
-    }
-
-    public static DefaultListModel newListModel(List list) {
-        DefaultListModel listModel = new DefaultListModel();
-        if (list != null) {
-            Iterator it = list.iterator();
-            while (it.hasNext()) {
-                listModel.addElement(it.next());
-            }
-        }
-        return listModel;
-    }
-
-    public static DefaultComboBoxModel newComboboxModel(String namedQuery, Object[]... params) {
-        EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery(namedQuery);
-        if (params != null) {
-            for (Object[] param : params) {
-                query.setParameter(param[0].toString(), param[1]);
-            }
-        }
-        DefaultComboBoxModel lcombo = newComboboxModel(query.getResultList());
-
-        em.close();
-
-        return lcombo;
-    }
-
-    public static DefaultComboBoxModel newComboboxModel(List list) {
-        DefaultComboBoxModel model = new DefaultComboBoxModel();
-        if (list != null) {
-            Iterator it = list.iterator();
-            while (it.hasNext()) {
-                model.addElement(it.next());
-            }
-        }
-        return model;
-    }
+//    public static DefaultListModel newListModel(String namedQuery, Object[]... params) {
+//        EntityManager em = OPDE.createEM();
+//        Query query = em.createQuery(namedQuery);
+//        if (params != null) {
+//            for (Object[] param : params) {
+//                query.setParameter(param[0].toString(), param[1]);
+//            }
+//        }
+//
+//        DefaultListModel lmodel = newListModel(query.getResultList());
+//
+//        em.close();
+//
+//        return lmodel;
+//    }
+//
+//    public static DefaultListModel newListModel(List list) {
+//        DefaultListModel listModel = new DefaultListModel();
+//        if (list != null) {
+//            Iterator it = list.iterator();
+//            while (it.hasNext()) {
+//                listModel.addElement(it.next());
+//            }
+//        }
+//        return listModel;
+//    }
+//
+//    public static DefaultComboBoxModel newComboboxModel(String namedQuery, Object[]... params) {
+//        EntityManager em = OPDE.createEM();
+//        Query query = em.createQuery(namedQuery);
+//        if (params != null) {
+//            for (Object[] param : params) {
+//                query.setParameter(param[0].toString(), param[1]);
+//            }
+//        }
+//        DefaultComboBoxModel lcombo = newComboboxModel(query.getResultList());
+//
+//        em.close();
+//
+//        return lcombo;
+//    }
+//
+//    public static DefaultComboBoxModel newComboboxModel(List list) {
+//        DefaultComboBoxModel model = new DefaultComboBoxModel();
+//        if (list != null) {
+//            Iterator it = list.iterator();
+//            while (it.hasNext()) {
+//                model.addElement(it.next());
+//            }
+//        }
+//        return model;
+//    }
 
     /**
      * Erstellt eine UKennung. Prüft aber <b>nicht</b> danach, ob die schon

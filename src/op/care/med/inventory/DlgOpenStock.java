@@ -26,23 +26,28 @@
  */
 package op.care.med.inventory;
 
-import java.awt.event.*;
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-import javax.swing.*;
-
-import com.jgoodies.forms.factories.*;
-import com.jgoodies.forms.layout.*;
-
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
 import entity.info.Resident;
 import entity.prescription.*;
 import op.OPDE;
+import op.threads.DisplayManager;
 import op.tools.MyJDialog;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
+import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
+import javax.persistence.Query;
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * @author tloehr
@@ -51,7 +56,7 @@ public class DlgOpenStock extends MyJDialog {
 
     private MedInventory inventory;
     private Closure actionBlock;
-    private MedStock bestand;
+    private MedStock medStock;
 
     /**
      * Creates new form DlgOpenStock
@@ -59,7 +64,7 @@ public class DlgOpenStock extends MyJDialog {
     public DlgOpenStock(TradeForm darreichung, Resident bewohner, Closure actionBlock) {
         super();
         this.inventory = TradeFormTools.getInventory4TradeForm(bewohner, darreichung);
-        this.bestand = null;
+        this.medStock = null;
         this.actionBlock = actionBlock;
         initComponents();
         initDialog();
@@ -86,19 +91,19 @@ public class DlgOpenStock extends MyJDialog {
         setResizable(false);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "4*(default, $lcgap), default",
-            "default, 2*($lgap, fill:default), $lgap, default"));
+                "4*(default, $lcgap), default",
+                "default, 2*($lgap, fill:default), $lgap, default"));
 
         //---- jLabel2 ----
         jLabel2.setText("Die Packung mit der Nummer:");
         contentPane.add(jLabel2, CC.xy(3, 3));
 
         //---- cmbBestID ----
-        cmbBestID.setModel(new DefaultComboBoxModel(new String[] {
-            "Item 1",
-            "Item 2",
-            "Item 3",
-            "Item 4"
+        cmbBestID.setModel(new DefaultComboBoxModel(new String[]{
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
         }));
         cmbBestID.addItemListener(new ItemListener() {
             @Override
@@ -109,7 +114,7 @@ public class DlgOpenStock extends MyJDialog {
         contentPane.add(cmbBestID, CC.xy(5, 3));
 
         //---- jLabel3 ----
-        jLabel3.setText("anbrechen.");
+        jLabel3.setText("open.");
         contentPane.add(jLabel3, CC.xy(7, 3));
 
         //======== panel1 ========
@@ -143,22 +148,51 @@ public class DlgOpenStock extends MyJDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
+        medStock = null;
         dispose();
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
-        //String classname = this.getName() + ".btnOKActionPerformed()";
         if (cmbBestID.getSelectedIndex() > 0) {
-            bestand = (MedStock) cmbBestID.getSelectedItem();
-//            MedStockTools.anbrechen(bestand);
+            EntityManager em = OPDE.createEM();
+            try {
+                em.getTransaction().begin();
+                medStock = (MedStock) cmbBestID.getSelectedItem();
+                em.lock(medStock, LockModeType.OPTIMISTIC);
+                em.lock(em.merge(medStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
+
+                medStock.setOpened(new Date());
+                BigDecimal apv = MedStockTools.calcAPV(medStock);
+                if (apv.equals(BigDecimal.ZERO)) {
+                    apv = BigDecimal.ONE;
+                }
+                medStock.setAPV(apv);
+
+                em.getTransaction().commit();
+            } catch (javax.persistence.OptimisticLockException ole) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                    OPDE.getMainframe().emptyFrame();
+                    OPDE.getMainframe().afterLogin();
+                }
+                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+            } catch (Exception e) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                OPDE.fatal(e);
+            } finally {
+                em.close();
+            }
         }
         dispose();
     }//GEN-LAST:event_btnOKActionPerformed
 
     @Override
     public void dispose() {
-        actionBlock.execute(bestand);
-        SYSTools.unregisterListeners(this);
+        actionBlock.execute(medStock);
         super.dispose();
     }
 

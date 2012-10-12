@@ -439,7 +439,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
         if (!np.isClosed()) {
             return getIcon(Days.daysBetween(new DateTime(), nexteval).getDays());
         } else {
-            return SYSConst.icon22ledBlueOn;
+            return SYSConst.icon22ledBlueOff;
         }
     }
 
@@ -536,7 +536,6 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 //    }
 
     private List<Component> addCommands() {
-
         List<Component> list = new ArrayList<Component>();
 
         /***

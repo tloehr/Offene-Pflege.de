@@ -538,7 +538,7 @@ public class FrmMain extends JFrame {
         panesApps.add(addApps());
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("Stationen.findAllSorted");
+        Query query = em.createQuery("SELECT s FROM Station s ORDER BY s.bezeichnung");
         ArrayList<Station> stationen = new ArrayList<Station>(query.getResultList());
         em.close();
         for (Station station : stationen) {

@@ -16,15 +16,15 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "IntClasses")
-@NamedQueries({
-    @NamedQuery(name = "IntClasses.findAll", query = "SELECT i FROM SYSGROUPS2ACL i"),
-    @NamedQuery(name = "IntClasses.findByIcid", query = "SELECT i FROM SYSGROUPS2ACL i WHERE i.icid = :icid"),
-    @NamedQuery(name = "IntClasses.findByUserAndClassnameAndACL", query = " "
-    + "SELECT i FROM SYSGROUPS2ACL i "
-    + "WHERE i.internalClassID = :internalClassID AND :user MEMBER OF i.groups.members AND EXISTS (SELECT a FROM Acl a WHERE a.acl = :shortacl)"  ),
-    @NamedQuery(name = "IntClasses.findByGroup", query = " "
-    + "SELECT i FROM SYSGROUPS2ACL i WHERE i.groups = :gruppe "),
-    @NamedQuery(name = "IntClasses.findByClassname", query = "SELECT i FROM SYSGROUPS2ACL i WHERE i.internalClassID = :classname")})
+//@NamedQueries({
+//    @NamedQuery(name = "IntClasses.findAll", query = "SELECT i FROM SYSGROUPS2ACL i"),
+//    @NamedQuery(name = "IntClasses.findByIcid", query = "SELECT i FROM SYSGROUPS2ACL i WHERE i.icid = :icid"),
+//    @NamedQuery(name = "IntClasses.findByUserAndClassnameAndACL", query = " "
+//    + "SELECT i FROM SYSGROUPS2ACL i "
+//    + "WHERE i.internalClassID = :internalClassID AND :user MEMBER OF i.groups.members AND EXISTS (SELECT a FROM Acl a WHERE a.acl = :shortacl)"  ),
+//    @NamedQuery(name = "IntClasses.findByGroup", query = " "
+//    + "SELECT i FROM SYSGROUPS2ACL i WHERE i.groups = :gruppe "),
+//    @NamedQuery(name = "IntClasses.findByClassname", query = "SELECT i FROM SYSGROUPS2ACL i WHERE i.internalClassID = :classname")})
 public class SYSGROUPS2ACL implements Serializable {
 
     private static final long serialVersionUID = 1L;

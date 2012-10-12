@@ -25,13 +25,13 @@ import op.OPDE;
  */
 @Entity
 @Table(name = "ACL")
-@NamedQueries({
-    @NamedQuery(name = "Acl.findAll", query = "SELECT a FROM Acl a"),
-    @NamedQuery(name = "Acl.findByAclid", query = "SELECT a FROM Acl a WHERE a.aclid = :aclid"),
-    @NamedQuery(name = "Acl.findByAclidAndSHORTACL", query = " "
-    + " SELECT a FROM Acl a "
-    + " WHERE a.intclass.internalClassID = :classname AND a.acl = :shortacl AND a.intclass.groups = :gruppe"),
-    @NamedQuery(name = "Acl.findByAcl", query = "SELECT a FROM Acl a WHERE a.acl = :acl")})
+//@NamedQueries({
+//    @NamedQuery(name = "Acl.findAll", query = "SELECT a FROM Acl a"),
+//    @NamedQuery(name = "Acl.findByAclid", query = "SELECT a FROM Acl a WHERE a.aclid = :aclid"),
+//    @NamedQuery(name = "Acl.findByAclidAndSHORTACL", query = " "
+//    + " SELECT a FROM Acl a "
+//    + " WHERE a.intclass.internalClassID = :classname AND a.acl = :shortacl AND a.intclass.groups = :gruppe"),
+//    @NamedQuery(name = "Acl.findByAcl", query = "SELECT a FROM Acl a WHERE a.acl = :acl")})
 public class Acl implements Serializable, Comparable<Acl> {
 
     private static final long serialVersionUID = 1L;

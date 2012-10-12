@@ -33,15 +33,15 @@ public class HomesTools {
      */
     public static void setComboBox(JComboBox cmb) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("Einrichtungen.findAll");
+        Query query = em.createQuery("SELECT e FROM Homes e ORDER BY e.eid");
         cmb.setModel(new DefaultComboBoxModel(new Vector<Homes>(query.getResultList())));
 
         long statid = OPDE.getLocalProps().containsKey("station") ? Long.parseLong(OPDE.getLocalProps().getProperty("station")) : 1l;
 
-        Query query2 = em.createNamedQuery("Stationen.findByStatID");
+        Query query2 = em.createQuery("SELECT s FROM Station s WHERE s.statID = :statID");
         query2.setParameter("statID", statid);
         Station station = (Station) query2.getSingleResult();
         em.close();
-        cmb.setSelectedItem(station.getEinrichtung());
+        cmb.setSelectedItem(station.getHome());
     }
 }

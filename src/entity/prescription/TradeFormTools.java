@@ -204,7 +204,7 @@ public class TradeFormTools {
         // 2. Alle äquivalenten Formen dazu finden
         List<DosageForm> aehnlicheFormen;
         if (meineForm.getSameAs() != 0) {
-            Query query = em.createNamedQuery("MedFormen.findByEquiv");
+            Query query = em.createQuery("SELECT m FROM DosageForm m WHERE m.sameAs = :equiv");
             query.setParameter("equiv", meineForm.getSameAs());
             aehnlicheFormen = query.getResultList();
         } else {

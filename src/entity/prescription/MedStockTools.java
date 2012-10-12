@@ -98,13 +98,13 @@ public class MedStockTools {
 //     * @param bestand
 //     * @return der geänderte Bestand. Direkt persistiert und committed.
 //     */
-//    public static MedBestand anbrechen(EntityManager em, MedBestand bestand) throws Exception {
+//    public static MedBestand open(EntityManager em, MedBestand bestand) throws Exception {
 //        BigDecimal apv;
 //        MedBestand result = null;
 //
 //        apv = getAPV4(bestand);
 //
-//        result = anbrechen(em, bestand, apv);
+//        result = open(em, bestand, apv);
 //
 //        return result;
 //    }
@@ -115,7 +115,7 @@ public class MedStockTools {
      * @param stock
      * @return
      */
-    public static void anbrechen(MedStock stock, BigDecimal apv) throws Exception {
+    public static void open(MedStock stock, BigDecimal apv) throws Exception {
         if (apv == null) {
             throw new NullPointerException("apv must not be null");
         }
@@ -128,7 +128,7 @@ public class MedStockTools {
         stock.setAPV(apv);
     }
 
-    public static HashMap getBestand4Printing(MedStock bestand) {
+    public static HashMap getStock4Printing(MedStock bestand) {
         OPDE.debug("BestandID: " + bestand.getID());
 
         HashMap hm = new HashMap();
@@ -227,10 +227,17 @@ public class MedStockTools {
         finalTX.setText(text);
         stock.getStockTransaction().add(finalTX);
         stock.setOut(new Date());
-        stock.setNextStock(null);
+//        stock.setNextStock(null);
 
-        if (stock.hashNext2Open()) {
-            MedStockTools.anbrechen(stock.getNextStock(), calcAPV(stock));
+        if (stock.hasNext2Open()) {
+            stock.setOpened(new Date());
+            BigDecimal apv = calcAPV(stock);
+            if (apv.equals(BigDecimal.ZERO)) {
+                apv = BigDecimal.ONE;
+            }
+            stock.setAPV(apv);
+
+//            MedStockTools.open(stock.getNextStock(), calcAPV(stock));
             OPDE.debug("NextStock: " + stock.getNextStock().getID() + " will be opened now");
         } else {
 
@@ -338,7 +345,7 @@ public class MedStockTools {
      * @return die Korrektur Buchung
      * @throws Exception
      */
-    public static MedStockTransaction setzeBestandAuf(EntityManager em, MedStock bestand, BigDecimal soll, String text, short status) throws Exception {
+    public static MedStockTransaction setStockTo(EntityManager em, MedStock bestand, BigDecimal soll, String text, short status) throws Exception {
         MedStockTransaction result = null;
         bestand = em.merge(bestand);
 
@@ -390,7 +397,7 @@ public class MedStockTools {
 
         result += ", APV: " + NumberFormat.getNumberInstance().format(stock.getAPV());
 
-        if (stock.hashNext2Open()) {
+        if (stock.hasNext2Open()) {
             result += ", <b>" + OPDE.lang.getString(PnlInventory.internalClassID + ".nextstock") + ": " + stock.getNextStock().getID() + "</b>";
         }
 

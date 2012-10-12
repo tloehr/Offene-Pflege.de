@@ -18,7 +18,7 @@
         <class>entity.prescription.Hospital</class>
         <class>entity.nursingprocess.InterventionSchedule</class>
         <class>entity.nursingprocess.Intervention</class>
-        <class>entity.Staff</class>
+
         <class>entity.reports.NR2User</class>
         <class>entity.reports.NReportTAGS</class>
         <class>entity.reports.NReport</class>

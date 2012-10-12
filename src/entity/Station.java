@@ -29,10 +29,10 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "Station")
-@NamedQueries({
-    @NamedQuery(name = "Stationen.findAllSorted", query = "SELECT s FROM Station s ORDER BY s.bezeichnung "),
-    @NamedQuery(name = "Stationen.findByStatID", query = "SELECT s FROM Station s WHERE s.statID = :statID"),
-    @NamedQuery(name = "Stationen.findByBezeichnung", query = "SELECT s FROM Station s WHERE s.bezeichnung = :bezeichnung")})
+//@NamedQueries({
+//    @NamedQuery(name = "Stationen.findAllSorted", query = "SELECT s FROM Station s ORDER BY s.bezeichnung "),
+//    @NamedQuery(name = "Stationen.findByStatID", query = "SELECT s FROM Station s WHERE s.statID = :statID"),
+//    @NamedQuery(name = "Stationen.findByBezeichnung", query = "SELECT s FROM Station s WHERE s.bezeichnung = :bezeichnung")})
 public class Station implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -44,7 +44,7 @@ public class Station implements Serializable {
     private String bezeichnung;
     @JoinColumn(name = "EID", referencedColumnName = "EID")
     @ManyToOne
-    private Homes einrichtung;
+    private Homes home;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "station")
     private Collection<Rooms> rooms;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "station")
@@ -69,12 +69,12 @@ public class Station implements Serializable {
         this.bezeichnung = bezeichnung;
     }
 
-    public Homes getEinrichtung() {
-        return einrichtung;
+    public Homes getHome() {
+        return home;
     }
 
     public void setEinrichtung(Homes einrichtung) {
-        this.einrichtung = einrichtung;
+        this.home = einrichtung;
     }
 
     public Collection<Resident> getBewohnerAufDieserStation() {

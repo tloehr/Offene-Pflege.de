@@ -37,9 +37,9 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "SYSINF2FILE")
-@NamedQueries({
-        @NamedQuery(name = "SYSINF2FILE.findAll", query = "SELECT s FROM SYSINF2FILE s"),
-        @NamedQuery(name = "SYSINF2FILE.findById", query = "SELECT s FROM SYSINF2FILE s WHERE s.id = :id")})
+//@NamedQueries({
+//        @NamedQuery(name = "SYSINF2FILE.findAll", query = "SELECT s FROM SYSINF2FILE s"),
+//        @NamedQuery(name = "SYSINF2FILE.findById", query = "SELECT s FROM SYSINF2FILE s WHERE s.id = :id")})
 public class SYSINF2FILE implements Serializable {
 
     private static final long serialVersionUID = 1L;

@@ -25,13 +25,13 @@ import javax.persistence.TemporalType;
  */
 @Entity
 @Table(name = "Fortbildungen")
-@NamedQueries({
-    @NamedQuery(name = "Fortbildungen.findAll", query = "SELECT f FROM Fortbildungen f"),
-    @NamedQuery(name = "Fortbildungen.findById", query = "SELECT f FROM Fortbildungen f WHERE f.id = :id"),
-    @NamedQuery(name = "Fortbildungen.findByTitel", query = "SELECT f FROM Fortbildungen f WHERE f.titel = :titel"),
-    @NamedQuery(name = "Fortbildungen.findByDatum", query = "SELECT f FROM Fortbildungen f WHERE f.datum = :datum"),
-    @NamedQuery(name = "Fortbildungen.findByIntern", query = "SELECT f FROM Fortbildungen f WHERE f.intern = :intern"),
-    @NamedQuery(name = "Fortbildungen.findByUrl", query = "SELECT f FROM Fortbildungen f WHERE f.url = :url")})
+//@NamedQueries({
+//    @NamedQuery(name = "Fortbildungen.findAll", query = "SELECT f FROM Fortbildungen f"),
+//    @NamedQuery(name = "Fortbildungen.findById", query = "SELECT f FROM Fortbildungen f WHERE f.id = :id"),
+//    @NamedQuery(name = "Fortbildungen.findByTitel", query = "SELECT f FROM Fortbildungen f WHERE f.titel = :titel"),
+//    @NamedQuery(name = "Fortbildungen.findByDatum", query = "SELECT f FROM Fortbildungen f WHERE f.datum = :datum"),
+//    @NamedQuery(name = "Fortbildungen.findByIntern", query = "SELECT f FROM Fortbildungen f WHERE f.intern = :intern"),
+//    @NamedQuery(name = "Fortbildungen.findByUrl", query = "SELECT f FROM Fortbildungen f WHERE f.url = :url")})
 public class Fortbildungen implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

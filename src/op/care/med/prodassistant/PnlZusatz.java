@@ -62,7 +62,7 @@ public class PnlZusatz extends JPanel {
         lstDaf.setVisible(!produkt.getDarreichungen().isEmpty());
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("MedFormen.findAll");
+        Query query = em.createQuery("SELECT m FROM TradeForm m");
 
         java.util.List listFormen = query.getResultList();
         Collections.sort(listFormen, new Comparator<Object>() {

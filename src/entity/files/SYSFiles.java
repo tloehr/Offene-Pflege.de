@@ -38,36 +38,36 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "SYSFiles")
-@NamedQueries({
-        @NamedQuery(name = "SYSFiles.findAll", query = "SELECT s FROM SYSFiles s"),
-        @NamedQuery(name = "SYSFiles.findByOcfid", query = "SELECT s FROM SYSFiles s WHERE s.ocfid = :ocfid"),
-        @NamedQuery(name = "SYSFiles.findByBWKennung", query = "SELECT s FROM SYSFiles s WHERE s.resident = :bewohner"),
-        @NamedQuery(name = "SYSFiles.findByFilename", query = "SELECT s FROM SYSFiles s WHERE s.filename = :filename"),
-        @NamedQuery(name = "SYSFiles.findByMd5", query = "SELECT s FROM SYSFiles s WHERE s.md5 = :md5"),
-        @NamedQuery(name = "SYSFiles.findByFiledate", query = "SELECT s FROM SYSFiles s WHERE s.filedate = :filedate"),
-        @NamedQuery(name = "SYSFiles.findByFilesize", query = "SELECT s FROM SYSFiles s WHERE s.filesize = :filesize"),
-        @NamedQuery(name = "SYSFiles.findByPit", query = "SELECT s FROM SYSFiles s WHERE s.pit = :pit"),
-//        @NamedQuery(name = "SYSFiles.findByBWKennung2VER", query = ""
-//                + " SELECT s"
+//@NamedQueries({
+//        @NamedQuery(name = "SYSFiles.findAll", query = "SELECT s FROM SYSFiles s"),
+//        @NamedQuery(name = "SYSFiles.findByOcfid", query = "SELECT s FROM SYSFiles s WHERE s.ocfid = :ocfid"),
+//        @NamedQuery(name = "SYSFiles.findByBWKennung", query = "SELECT s FROM SYSFiles s WHERE s.resident = :bewohner"),
+//        @NamedQuery(name = "SYSFiles.findByFilename", query = "SELECT s FROM SYSFiles s WHERE s.filename = :filename"),
+//        @NamedQuery(name = "SYSFiles.findByMd5", query = "SELECT s FROM SYSFiles s WHERE s.md5 = :md5"),
+//        @NamedQuery(name = "SYSFiles.findByFiledate", query = "SELECT s FROM SYSFiles s WHERE s.filedate = :filedate"),
+//        @NamedQuery(name = "SYSFiles.findByFilesize", query = "SELECT s FROM SYSFiles s WHERE s.filesize = :filesize"),
+//        @NamedQuery(name = "SYSFiles.findByPit", query = "SELECT s FROM SYSFiles s WHERE s.pit = :pit"),
+////        @NamedQuery(name = "SYSFiles.findByBWKennung2VER", query = ""
+////                + " SELECT s"
+////                + " FROM SYSFiles s "
+////                + " JOIN s.verAssignCollection sf "
+////                + " WHERE sf.prescription = :prescription"),
+//        @NamedQuery(name = "SYSFiles.findByNReport", query = ""
+//                + " SELECT s "
+//                + " FROM SYSFiles s "
+//                + " JOIN s.pbAssignCollection sf "
+//                + " WHERE sf.nReport = :nReport "),
+//        @NamedQuery(name = "SYSFiles.findByBWInfo", query = ""
+//                + " SELECT s "
+//                + " FROM SYSFiles s "
+//                + " JOIN s.bwiAssignCollection sf "
+//                + " WHERE sf.bwinfo = :bwinfo "),
+//        @NamedQuery(name = "SYSFiles.findByVerordnung", query = ""
+//                + " SELECT s "
 //                + " FROM SYSFiles s "
 //                + " JOIN s.verAssignCollection sf "
-//                + " WHERE sf.prescription = :prescription"),
-        @NamedQuery(name = "SYSFiles.findByNReport", query = ""
-                + " SELECT s "
-                + " FROM SYSFiles s "
-                + " JOIN s.pbAssignCollection sf "
-                + " WHERE sf.nReport = :nReport "),
-        @NamedQuery(name = "SYSFiles.findByBWInfo", query = ""
-                + " SELECT s "
-                + " FROM SYSFiles s "
-                + " JOIN s.bwiAssignCollection sf "
-                + " WHERE sf.bwinfo = :bwinfo "),
-        @NamedQuery(name = "SYSFiles.findByVerordnung", query = ""
-                + " SELECT s "
-                + " FROM SYSFiles s "
-                + " JOIN s.verAssignCollection sf "
-                + " WHERE sf.verordnung = :verordnung ")
-})
+//                + " WHERE sf.verordnung = :verordnung ")
+//})
 public class SYSFiles implements Serializable, Comparable {
 
     private static final long serialVersionUID = 1L;

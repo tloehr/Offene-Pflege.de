@@ -413,6 +413,7 @@ public class PnlInventory extends NursingRecordsPanel {
                                         if (!stock.isClosed()) {
                                             MedStock mystock = em.merge(stock);
                                             em.lock(mystock, LockModeType.OPTIMISTIC);
+                                            mystock.setNextStock(null);
                                             MedStockTools.close(em, mystock, OPDE.lang.getString(internalClassID + ".stock.msg.inventory_closed"), MedStockTransactionTools.STATE_EDIT_INVENTORY_CLOSED);
                                         }
                                     }
@@ -831,6 +832,7 @@ public class PnlInventory extends NursingRecordsPanel {
                             em.lock(myStock, LockModeType.OPTIMISTIC);
                             em.lock(em.merge(myStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
                             em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
+                            myStock.setNextStock(null);
                             MedStockTools.close(em, myStock, "", MedStockTransactionTools.STATE_EDIT_STOCK_CLOSED);
                             em.getTransaction().commit();
                             int index = lstInventories.indexOf(myStock.getInventory());

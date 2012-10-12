@@ -63,7 +63,7 @@ public class PnlNewProdukt extends javax.swing.JDialog {
         txtBezeichnung.setText(template);
 
         EntityManager em = OPDE.createEM();
-        Query query2 = em.createNamedQuery("MedHersteller.findAll");
+        Query query2 = em.createQuery("SELECT m FROM MedFactory m ORDER BY m.firma, m.ort");
         cmbHersteller.setModel(new DefaultComboBoxModel(query2.getResultList().toArray(new MedFactory[]{})));
         cmbHersteller.setRenderer(MedFactoryTools.getHerstellerRenderer(0));
         em.close();
@@ -153,7 +153,7 @@ public class PnlNewProdukt extends javax.swing.JDialog {
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("MedProdukte.findByBezeichnung");
+        Query query = em.createQuery("SELECT m FROM MedProducts m WHERE m.bezeichnung = :bezeichnung");
         query.setParameter("bezeichnung", txtBezeichnung.getText());
         java.util.List<MedProducts> list = query.getResultList();
         em.close();

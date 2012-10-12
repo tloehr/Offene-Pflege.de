@@ -15,12 +15,12 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "SYSVAL2PROCESS")
-@NamedQueries({
-        @NamedQuery(name = "SYSVAL2PROCESS.findActiveAssignedVorgaengeByElement", query = " " +
-                " SELECT s.vorgang FROM SYSVAL2PROCESS s WHERE s.resValue = :element AND s.vorgang.to = '9999-12-31 23:59:59' "),
-        @NamedQuery(name = "SYSVAL2PROCESS.findByElementAndVorgang", query = " " +
-                " SELECT s FROM SYSVAL2PROCESS s WHERE s.resValue = :element AND s.vorgang = :process AND s.vorgang.to = '9999-12-31 23:59:59' ")
-})
+//@NamedQueries({
+//        @NamedQuery(name = "SYSVAL2PROCESS.findActiveAssignedVorgaengeByElement", query = " " +
+//                " SELECT s.vorgang FROM SYSVAL2PROCESS s WHERE s.resValue = :element AND s.vorgang.to = '9999-12-31 23:59:59' "),
+//        @NamedQuery(name = "SYSVAL2PROCESS.findByElementAndVorgang", query = " " +
+//                " SELECT s FROM SYSVAL2PROCESS s WHERE s.resValue = :element AND s.vorgang = :process AND s.vorgang.to = '9999-12-31 23:59:59' ")
+//})
 public class SYSVAL2PROCESS {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -19,11 +19,11 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "Taschengeld")
-@NamedQueries({
-        @NamedQuery(name = "Taschengeld.findAll", query = "SELECT t FROM Allowance t"),
-        @NamedQuery(name = "Taschengeld.findByTgid", query = "SELECT t FROM Allowance t WHERE t.id = :tgid"),
-        @NamedQuery(name = "Taschengeld.findByBelegDatum", query = "SELECT t FROM Allowance t WHERE t.date = :belegDatum"),
-        @NamedQuery(name = "Taschengeld.findByBelegtext", query = "SELECT t FROM Allowance t WHERE t.text = :belegtext")})
+//@NamedQueries({
+//        @NamedQuery(name = "Taschengeld.findAll", query = "SELECT t FROM Allowance t"),
+//        @NamedQuery(name = "Taschengeld.findByTgid", query = "SELECT t FROM Allowance t WHERE t.id = :tgid"),
+//        @NamedQuery(name = "Taschengeld.findByBelegDatum", query = "SELECT t FROM Allowance t WHERE t.date = :belegDatum"),
+//        @NamedQuery(name = "Taschengeld.findByBelegtext", query = "SELECT t FROM Allowance t WHERE t.text = :belegtext")})
 public class Allowance implements Serializable, Comparable<Allowance> {
     private static final long serialVersionUID = 1L;
     @Id

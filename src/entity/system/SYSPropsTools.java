@@ -20,13 +20,13 @@ import java.util.Properties;
 public class SYSPropsTools {
 
     public static void storeProp(EntityManager em, String key, String value, Users user) throws Exception {
-        String namedQuery = "SYSProps.findByKeyAndUser";
+        String jpql = "SELECT s FROM SYSProps s WHERE s.key = :key AND s.user = :user";
 
         if (user == null) {
-            namedQuery = "SYSProps.findByKey";
+            jpql = "SELECT s FROM SYSProps s WHERE s.key = :key";
         }
 
-        Query query = em.createNamedQuery(namedQuery);
+        Query query = em.createQuery(jpql);
         query.setParameter("key", key);
 
         if (user != null) {
@@ -106,13 +106,13 @@ public class SYSPropsTools {
      */
     public static Properties loadProps(Users user) {
         EntityManager em = OPDE.createEM();
-        String namedQuery = "SYSProps.findByUser";
+        String jpql = "SELECT s FROM SYSProps s WHERE s.user = :user";
 
         if (user == null) {
-            namedQuery = "SYSProps.findAllWOUsers";
+            jpql = "SELECT s FROM SYSProps s WHERE s.user IS NULL";
         }
 
-        Query query = em.createNamedQuery(namedQuery);
+        Query query = em.createQuery(jpql);
 
         if (user != null) {
             query.setParameter("user", user);

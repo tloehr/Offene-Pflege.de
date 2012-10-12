@@ -50,7 +50,7 @@ public class DlgDAF extends javax.swing.JDialog {
         initComponents();
         this.darreichung = darreichung;
         EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("MedFormen.findAll");
+        Query query = em.createQuery("SELECT m FROM DosageForm m ORDER BY m.preparation, m.usageText");
         cmbForm.setModel(new DefaultComboBoxModel(query.getResultList().toArray(new DosageForm[]{})));
         cmbForm.setRenderer(DosageFormTools.getRenderer(0));
         em.close();

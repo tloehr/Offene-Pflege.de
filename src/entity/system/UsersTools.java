@@ -61,7 +61,7 @@ public class UsersTools {
 
     public static boolean isAdmin(Users user) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("Groups.findByUserAndAdmin");
+        Query query = em.createQuery("SELECT g FROM Groups g WHERE g.gid = 'admin' AND :user MEMBER OF g.members");
         query.setParameter("user", user);
         boolean admin = query.getResultList().size() > 0;
 //        OPDE.debug("Benutzer ist " + (admin ? "" : "kein") + " Admin");
@@ -94,7 +94,7 @@ public class UsersTools {
         EntityManager em = OPDE.createEM();
         Users user = null;
         try {
-            Query query = em.createNamedQuery("Users.findForLogin");
+            Query query = em.createQuery("SELECT o FROM Users o WHERE o.uid = :uKennung AND o.md5pw = :md5pw");
             query.setParameter("uKennung", username);
             query.setParameter("md5pw", SYSTools.hashword(password));
             user = (Users) query.getSingleResult();

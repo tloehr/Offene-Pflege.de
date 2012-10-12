@@ -166,7 +166,7 @@ public class PrintProcessor extends Thread {
 //            } else {
 //                printableObject = element.getForm().getForm(VorratTools.getVorrat4Printing(inventory));
 //            }
-            printableObject = element.getForm().getFormtext(MedStockTools.getBestand4Printing(bestand));
+            printableObject = element.getForm().getFormtext(MedStockTools.getStock4Printing(bestand));
         }
         return printableObject;
     }

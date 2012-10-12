@@ -28,17 +28,16 @@ import javax.persistence.TemporalType;
  */
 @Entity
 @Table(name = "SYSLogin")
-@NamedQueries({
-    @NamedQuery(name = "SYSLogin.findAll", query = "SELECT s FROM SYSLogin s"),
-    @NamedQuery(name = "SYSLogin.findByLoginID", query = "SELECT s FROM SYSLogin s WHERE s.loginID = :loginID"),
-    @NamedQuery(name = "SYSLogin.findByLogin", query = "SELECT s FROM SYSLogin s WHERE s.login = :login"),
-//    @NamedQuery(name = "SYSLogin.findByHost", query = "SELECT s FROM SYSLogin s WHERE s.host = :host"),
-    @NamedQuery(name = "SYSLogin.findByLogout", query = "SELECT s FROM SYSLogin s WHERE s.logout = :logout")})
+//@NamedQueries({
+//    @NamedQuery(name = "SYSLogin.findAll", query = "SELECT s FROM SYSLogin s"),
+//    @NamedQuery(name = "SYSLogin.findByLoginID", query = "SELECT s FROM SYSLogin s WHERE s.loginID = :loginID"),
+//    @NamedQuery(name = "SYSLogin.findByLogin", query = "SELECT s FROM SYSLogin s WHERE s.login = :login"),
+////    @NamedQuery(name = "SYSLogin.findByHost", query = "SELECT s FROM SYSLogin s WHERE s.host = :host"),
+//    @NamedQuery(name = "SYSLogin.findByLogout", query = "SELECT s FROM SYSLogin s WHERE s.logout = :logout")})
 public class SYSLogin implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "LoginID")
     private Long loginID;
     @Basic(optional = false)

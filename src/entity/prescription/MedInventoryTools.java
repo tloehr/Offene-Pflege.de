@@ -93,8 +93,8 @@ public class MedInventoryTools {
      * Bucht eine Menge aus einem Vorrat aus, ggf. zugehörig zu einer BHP. Übersteigt die Entnahme-Menge den
      * Restbestband, dann wird entweder
      * <ul>
-     * <li>wenn der nächste Bestand <b>nicht</b> bekannt ist (<code>bestand.hashNext2Open() = <b>false</b></code>) &rarr; der Bestand trotzdem weiter gebucht. Bis ins negative.</li>
-     * <li>wenn der nächste Bestand <b>doch schon</b> bekannt ist (<code>bestand.hashNext2Open() = <b>true</b></code>)  &rarr; ein neuer Bestand wird angebrochen.</li>
+     * <li>wenn der nächste Bestand <b>nicht</b> bekannt ist (<code>bestand.hasNext2Open() = <b>false</b></code>) &rarr; der Bestand trotzdem weiter gebucht. Bis ins negative.</li>
+     * <li>wenn der nächste Bestand <b>doch schon</b> bekannt ist (<code>bestand.hasNext2Open() = <b>true</b></code>)  &rarr; ein neuer Bestand wird angebrochen.</li>
      * </ul>
      * Ist <b>keine</b> Packung im Anbruch, dann wird eine Exception geworfen. Das kann aber eingentlich nicht passieren. Es sei denn jemand hat von Hand
      * an den Datenbank rumgespielt.
@@ -174,7 +174,7 @@ public class MedInventoryTools {
              * erst mal auf und nehmen den Rest aus der nächsten.
              *
              */
-            if (bestand.hashNext2Open() && restsumme.compareTo(wunschmenge) <= 0) {
+            if (bestand.hasNext2Open() && restsumme.compareTo(wunschmenge) <= 0) {
                 entnahme = restsumme;
             }
 
@@ -189,7 +189,7 @@ public class MedInventoryTools {
              * So lange keine neue Packung bekannt nehmen wir immer weiter aus dieser hier.
              * Selbst wenn die dann ins Minus läuft.
              */
-            if (bestand.hashNext2Open()) {
+            if (bestand.hasNext2Open()) {
                 if (restsumme.compareTo(wunschmenge) <= 0) { // ist nicht mehr genug in der Packung, bzw. die Packung wird jetzt leer.
 
                     MedStock naechsterBestand = em.merge(bestand.getNextStock());
@@ -283,7 +283,7 @@ public class MedInventoryTools {
      * @param inventory
      * @return der neu angebrochene Bestand. null, wenns nicht geklappt hat.
      */
-    public static MedStock anbrechenNaechste(MedInventory inventory) {
+    public static MedStock openNext(MedInventory inventory) {
         MedStock result = null;
 
 
@@ -371,6 +371,7 @@ public class MedInventoryTools {
                 if (!stock.isClosed()) {
                     MedStock mystock = em.merge(stock);
                     em.lock(mystock, LockModeType.OPTIMISTIC);
+                    mystock.setNextStock(null);
                     MedStockTools.close(em, mystock, OPDE.lang.getString(PnlInventory.internalClassID + ".stock.msg.inventory_closed"), MedStockTransactionTools.STATE_EDIT_INVENTORY_CLOSED);
                 }
             }

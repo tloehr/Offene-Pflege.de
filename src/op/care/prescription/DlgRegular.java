@@ -576,7 +576,7 @@ public class DlgRegular extends MyJDialog {
         } else {
             rbEndOfPackage.setEnabled(false);
         }
-//        if (prescription.isDiscontinued()) {
+//        if (prescription.isClosed()) {
 //            rbDate.setSelected(true);
 //            jdcAB.setDate(prescription.getTo());
 //        } else {
@@ -713,7 +713,7 @@ public class DlgRegular extends MyJDialog {
             return;
         }
 
-//        if (prescription.isDiscontinued() && new DateMidnight(jdcAB.getDate()).isBefore(new DateMidnight())) {
+//        if (prescription.isClosed() && new DateMidnight(jdcAB.getDate()).isBefore(new DateMidnight())) {
 //            JOptionPane.showMessageDialog(tblDosis, "Verordnung wurde bereits abgesetzt. Sie können diese nicht mehr ändern.");
 //            return;
 //        }

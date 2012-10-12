@@ -103,7 +103,7 @@ public class PnlFiles extends NursingRecordsPanel {
     void reloadTable() {
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("SYSFiles.findByBWKennung", SYSFiles.class);
+        Query query = em.createQuery("SELECT s FROM SYSFiles s WHERE s.resident = :bewohner");
         query.setParameter("bewohner", resident);
         ArrayList<SYSFiles> files = new ArrayList<SYSFiles>(query.getResultList());
         Collections.sort(files);

@@ -314,7 +314,7 @@ public class PrescriptionTools {
     public static String getShortDescription(Prescription prescription) {
         String result = "<font size=+1>";// = SYSConst.html_fontface;
 
-        result += prescription.isDiscontinued() ? "<s>" : "";
+        result += prescription.isClosed() ? "<s>" : "";
 
         if (!prescription.hasMed()) {
             result += prescription.getIntervention().getBezeichnung();
@@ -343,7 +343,7 @@ public class PrescriptionTools {
             result += "<br/><b><u>" + OPDE.lang.getString("misc.msg.ondemand") + ":</u> " + prescription.getSituation().getText() + "</b>";
         }
 
-        result += prescription.isDiscontinued() ? "</s>" : "";
+        result += prescription.isClosed() ? "</s>" : "";
 
         return result;
     }
@@ -351,7 +351,7 @@ public class PrescriptionTools {
     public static String getPrescriptionAsText2(Prescription verordnung) {
         String result = "<div id=\"fonttext\">";// = SYSConst.html_fontface;
 
-        if (verordnung.isDiscontinued()) {
+        if (verordnung.isClosed()) {
             result += "<s>"; // Abgesetzte
         }
         if (!verordnung.hasMed()) {
@@ -386,7 +386,7 @@ public class PrescriptionTools {
 
 
         }
-        if (verordnung.isDiscontinued()) {
+        if (verordnung.isClosed()) {
             result += "</s>"; // Abgesetzte
         }
 
@@ -396,7 +396,7 @@ public class PrescriptionTools {
     public static String getPrescriptionAsShortText(Prescription verordnung) {
         String result = "";
 
-        if (verordnung.isDiscontinued()) {
+        if (verordnung.isClosed()) {
             result += "<s>"; // Abgesetzte
         }
         if (!verordnung.hasMed()) {
@@ -409,7 +409,7 @@ public class PrescriptionTools {
 
 
         }
-        if (verordnung.isDiscontinued()) {
+        if (verordnung.isClosed()) {
             result += "</s>"; // Abgesetzte
         }
 
@@ -454,7 +454,7 @@ public class PrescriptionTools {
         if (verordnung.isLimited()) {
             String datum = DateFormat.getDateInstance().format(verordnung.getTo());
 
-            result += "<font color=\"" + (verordnung.isDiscontinued() ? "red" : "lime") + "\">" + datum + "; ";
+            result += "<font color=\"" + (verordnung.isClosed() ? "red" : "lime") + "\">" + datum + "; ";
 
             result += verordnung.getHospitalOFF() != null ? verordnung.getHospitalOFF().getName() : "";
 
@@ -508,7 +508,7 @@ public class PrescriptionTools {
             if (prescription.isTillEndOfPackage()) {
                 result += "nur bis Packungs Ende<br/>";
             }
-            if (!prescription.isDiscontinued()) {
+            if (!prescription.isClosed()) {
                 if (stockInUse != null) {
                     EntityManager em = OPDE.createEM();
 
@@ -523,13 +523,11 @@ public class PrescriptionTools {
                         em.close();
                     }
 
-
                     if (invSum != null && invSum.compareTo(BigDecimal.ZERO) > 0) {
                         result += "<b><u>Vorrat:</u> <font color=\"green\">" + invSum.setScale(2, BigDecimal.ROUND_UP) + " " +
                                 SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getPackUnit()] +
                                 "</font></b>";
                         if (!stockInUse.getTradeForm().getDosageForm().isAPV1()) {
-
                             BigDecimal anwmenge = invSum.multiply(stockInUse.getAPV());
 
                             result += " <i>entspricht " + anwmenge.setScale(2, BigDecimal.ROUND_UP) + " " +
@@ -657,7 +655,7 @@ public class PrescriptionTools {
             result += withheader ? "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.prescription") + (withlongheader ? " für " + ResidentTools.getLabelText(prescription.getResident()) : "") + "</h2>" : "";
 
 //            if (prescription.getResident().getStation() != null) {
-//                result += HomesTools.getAsText(prescription.getResident().getStation().getEinrichtung());
+//                result += HomesTools.getAsText(prescription.getResident().getStation().getHome());
 //            }
 
             result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
@@ -665,7 +663,7 @@ public class PrescriptionTools {
 
             for (Prescription myprescription : list) {
 
-                if (withDiscontinued || !myprescription.isDiscontinued()) {
+                if (withDiscontinued || !myprescription.isClosed()) {
 
                     result += "<tr>";
                     result += "<td valign=\"top\">" + getShortDescription(myprescription) + "</td>";
@@ -673,7 +671,7 @@ public class PrescriptionTools {
                     result += getRemark(myprescription) + "</td>";
                     result += "<td valign=\"top\">" + getON(myprescription);
 
-                    if (myprescription.isDiscontinued()) {
+                    if (myprescription.isClosed()) {
                         result += getOFF(myprescription);
                     }
 
@@ -698,7 +696,7 @@ public class PrescriptionTools {
      */
     public static int getNumVerodnungenMitGleicherKennung(Prescription verordnung) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("Verordnung.findByVerKennung");
+        Query query = em.createQuery("SELECT b FROM Prescription b WHERE b.prescRelation = :verKennung");
         query.setParameter("verKennung", verordnung.getRelation());
         int num = query.getResultList().size();
         em.close();

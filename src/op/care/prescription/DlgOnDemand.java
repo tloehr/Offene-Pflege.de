@@ -713,6 +713,7 @@ public class DlgOnDemand extends MyJDialog {
 
         String reason = "";
         reason += (OnOK ? "" : "Die Informationen zum <b>an</b>setzenden <b>Arzt</b> oder <b>KH</b> sind unvollständig. ");
+        reason += (OffOK ? "" : "Sie müssen sagen, wie lange diese Verordnung vorraussichtlich gelten wird. ");
         reason += (medOK ? "" : "Die <b>Medikamentenangabe</b> ist falsch. ");
         reason += (sitOK ? "" : "Sie haben keine <b>Situation</b> angegeben. ");
         reason += (intervOK ? "" : "Die Angaben über die <b>Massnahmen</b> sind falsch. ");
@@ -721,7 +722,7 @@ public class DlgOnDemand extends MyJDialog {
         if (!reason.isEmpty()) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(reason, DisplayMessage.WARNING));
         }
-        return OnOK & OffOK & medOK & intervOK & doseOK;
+        return OnOK & OffOK & medOK & intervOK & doseOK & sitOK;
     }
 
     private void btnSaveActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed

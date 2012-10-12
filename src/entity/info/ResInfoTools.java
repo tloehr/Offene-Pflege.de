@@ -545,7 +545,7 @@ public class ResInfoTools {
          */
         if (withlongheader) {
             if (bewohner.getStation() != null) {
-                result += "<tr><td valign=\"top\">BewohnerIn wohnt im</td><td valign=\"top\"><b>" + HomesTools.getAsText(bewohner.getStation().getEinrichtung()) + "</b></td></tr>";
+                result += "<tr><td valign=\"top\">BewohnerIn wohnt im</td><td valign=\"top\"><b>" + HomesTools.getAsText(bewohner.getStation().getHome()) + "</b></td></tr>";
             }
         }
 

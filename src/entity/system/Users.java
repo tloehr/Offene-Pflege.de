@@ -42,19 +42,19 @@ import java.util.Collection;
  */
 @Entity
 @Table(name = "OCUsers")
-@NamedQueries({
-        @NamedQuery(name = "Users.findAll", query = "SELECT o FROM Users o"),
-        @NamedQuery(name = "Users.findAllSorted", query = "SELECT o FROM Users o ORDER BY o.nachname, o.vorname "),
-        @NamedQuery(name = "Users.findByUKennung", query = "SELECT o FROM Users o WHERE o.uid = :uKennung"),
-        @NamedQuery(name = "Users.findForLogin", query = "SELECT o FROM Users o WHERE o.uid = :uKennung AND o.md5pw = :md5pw"),
-        @NamedQuery(name = "Users.findByVorname", query = "SELECT o FROM Users o WHERE o.vorname = :vorname"),
-        @NamedQuery(name = "Users.findByNachname", query = "SELECT o FROM Users o WHERE o.nachname = :nachname"),
-        @NamedQuery(name = "Users.findByStatusSorted", query = "SELECT o FROM Users o WHERE o.status = :status ORDER BY o.nachname, o.vorname"),
-        @NamedQuery(name = "Users.findAllMembers", query = "SELECT o FROM Users o "
-                + " WHERE :group MEMBER OF o.groups ORDER BY o.nachname, o.vorname "),
-        @NamedQuery(name = "Users.findAllNonMembers", query = "SELECT o FROM Users o "
-                + " WHERE :group NOT MEMBER OF o.groups ORDER BY o.nachname, o.vorname "),
-        @NamedQuery(name = "Users.findByEMail", query = "SELECT o FROM Users o WHERE o.eMail = :eMail")})
+//@NamedQueries({
+//        @NamedQuery(name = "Users.findAll", query = "SELECT o FROM Users o"),
+//        @NamedQuery(name = "Users.findAllSorted", query = "SELECT o FROM Users o ORDER BY o.nachname, o.vorname "),
+//        @NamedQuery(name = "Users.findByUKennung", query = "SELECT o FROM Users o WHERE o.uid = :uKennung"),
+//        @NamedQuery(name = "Users.findForLogin", query = "SELECT o FROM Users o WHERE o.uid = :uKennung AND o.md5pw = :md5pw"),
+//        @NamedQuery(name = "Users.findByVorname", query = "SELECT o FROM Users o WHERE o.vorname = :vorname"),
+//        @NamedQuery(name = "Users.findByNachname", query = "SELECT o FROM Users o WHERE o.nachname = :nachname"),
+//        @NamedQuery(name = "Users.findByStatusSorted", query = "SELECT o FROM Users o WHERE o.status = :status ORDER BY o.nachname, o.vorname"),
+//        @NamedQuery(name = "Users.findAllMembers", query = "SELECT o FROM Users o "
+//                + " WHERE :group MEMBER OF o.groups ORDER BY o.nachname, o.vorname "),
+//        @NamedQuery(name = "Users.findAllNonMembers", query = "SELECT o FROM Users o "
+//                + " WHERE :group NOT MEMBER OF o.groups ORDER BY o.nachname, o.vorname "),
+//        @NamedQuery(name = "Users.findByEMail", query = "SELECT o FROM Users o WHERE o.eMail = :eMail")})
 public class Users implements Serializable, Comparable<Users> {
     private static final long serialVersionUID = 1L;
     @Id

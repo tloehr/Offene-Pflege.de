@@ -63,13 +63,39 @@ public class TMUebergabe
 //        iconOK = new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/apply.png"));
 
         EntityManager em = OPDE.createEM();
-        Query queryUB = em.createNamedQuery("Uebergabebuch.findByEinrichtungAndDatumAndAckUser");
+
+        // TODO: SQLMAPPING
+//                 @SqlResultSetMapping(name = "Handovers.findByEinrichtungAndDatumAndAckUserResultMapping", entities =
+//        @EntityResult(entityClass = Handovers.class), columns =
+//        @ColumnResult(name = "num"))
+        Query queryUB = em.createNativeQuery(" SELECT u.*, ifnull(u2u.num, 0) num FROM Uebergabebuch u "
+                + " LEFT OUTER JOIN ( SELECT uebid, count(*) num FROM Uebergabe2User WHERE UKennung=? GROUP BY uebid, UKennung) as u2u ON u2u.UEBID = u.UEBID "
+                + " WHERE "
+                + "     u.EID = ? "
+                + "     AND u.PIT >= ? AND u.PIT <= ? "
+                + " GROUP BY u.UEBID "
+                + " ORDER BY u.PIT DESC");
         queryUB.setParameter(1, OPDE.getLogin().getUser().getUID());
         queryUB.setParameter(2, einrichtung.getEID());
         queryUB.setParameter(3, new Date(SYSCalendar.startOfDay(datum)));
         queryUB.setParameter(4, new Date(SYSCalendar.endOfDay(datum)));
 
-        Query queryPB = em.createNamedQuery("Pflegeberichte.findByEinrichtungAndDatumAndAckUser");
+//                @SqlResultSetMapping(name = "NReport.findByEinrichtungAndDatumAndAckUserResultMapping", entities =
+//        @EntityResult(entityClass = NReport.class), columns =
+//        @ColumnResult(name = "num")),
+
+        Query queryPB = em.createNativeQuery(" SELECT p.*, ifnull(p2u.num, 0) num FROM Pflegeberichte p "
+                + " INNER JOIN Bewohner bw ON bw.BWKennung = p.BWKennung "
+                + " INNER JOIN PB2TAGS tag ON tag.PBID = p.PBID "
+                + " INNER JOIN Station stat ON stat.StatID = bw.StatID "
+                + " LEFT OUTER JOIN ( SELECT pbid, count(*) num FROM PB2User WHERE UKennung = ? GROUP BY pbid, ukennung ) AS p2u ON p2u.PBID = p.PBID "
+                + " WHERE "
+                + "     stat.EID = ? "
+                + "     AND p.PIT >= ? AND p.PIT <= ? "
+                + "     AND tag.PBTAGID = 1 "
+                + "     AND p.editBy IS NULL "
+                + " GROUP BY p.PBID "
+                + " ORDER BY p.PIT DESC");
         queryPB.setParameter(1, OPDE.getLogin().getUser().getUID());
         queryPB.setParameter(2, einrichtung.getEID());
         queryPB.setParameter(3, new Date(SYSCalendar.startOfDay(datum)));

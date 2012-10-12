@@ -269,7 +269,7 @@ public class PnlReport extends NursingRecordsPanel {
 
         EntityManager em = OPDE.createEM();
         MouseAdapter ma = GUITools.getHyperlinkStyleMouseAdapter();
-        Query query = em.createNamedQuery("PBerichtTAGS.findAllActive");
+        Query query = em.createQuery("SELECT p FROM NReportTAGS p WHERE p.aktiv = TRUE ORDER BY p.besonders DESC, p.sort DESC, p.bezeichnung");
         DefaultComboBoxModel dcbm = new DefaultComboBoxModel(query.getResultList().toArray());
         em.close();
 

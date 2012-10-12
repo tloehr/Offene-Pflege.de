@@ -41,17 +41,17 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "Bewohner")
-@NamedQueries({
-        @NamedQuery(name = "Resident.findAll", query = "SELECT b FROM Resident b"),
-        @NamedQuery(name = "Resident.findAllActiveSorted", query = " SELECT b FROM Resident b WHERE b.station IS NOT NULL ORDER BY b.nachname, b.vorname "),
-        @NamedQuery(name = "Resident.findAllActiveSortedByStationen", query = "SELECT b FROM Resident b WHERE b.station IS NOT NULL ORDER BY b.station.bezeichnung, b.nachname, b.vorname"),
-        @NamedQuery(name = "Resident.findByBWKennung", query = "SELECT b FROM Resident b WHERE b.bWKennung = :bWKennung"),
-        @NamedQuery(name = "Resident.findByNachname", query = "SELECT b FROM Resident b WHERE b.nachname like :nachname ORDER BY b.nachname, b.vorname"),
-        @NamedQuery(name = "Resident.findByVorname", query = "SELECT b FROM Resident b WHERE b.vorname = :vorname"),
-        @NamedQuery(name = "Resident.findByGeschlecht", query = "SELECT b FROM Resident b WHERE b.geschlecht = :geschlecht"),
-        @NamedQuery(name = "Resident.findByGebDatum", query = "SELECT b FROM Resident b WHERE b.gebDatum = :gebDatum"),
-        @NamedQuery(name = "Resident.findByEditor", query = "SELECT b FROM Resident b WHERE b.editor = :editor"),
-        @NamedQuery(name = "Resident.findByAdminonly", query = "SELECT b FROM Resident b WHERE b.adminonly = :adminonly")})
+//@NamedQueries({
+//        @NamedQuery(name = "Resident.findAll", query = "SELECT b FROM Resident b"),
+//        @NamedQuery(name = "Resident.findAllActiveSorted", query = " SELECT b FROM Resident b WHERE b.station IS NOT NULL ORDER BY b.nachname, b.vorname "),
+//        @NamedQuery(name = "Resident.findAllActiveSortedByStationen", query = "SELECT b FROM Resident b WHERE b.station IS NOT NULL ORDER BY b.station.bezeichnung, b.nachname, b.vorname"),
+//        @NamedQuery(name = "Resident.findByBWKennung", query = "SELECT b FROM Resident b WHERE b.bWKennung = :bWKennung"),
+//        @NamedQuery(name = "Resident.findByNachname", query = "SELECT b FROM Resident b WHERE b.nachname like :nachname ORDER BY b.nachname, b.vorname"),
+//        @NamedQuery(name = "Resident.findByVorname", query = "SELECT b FROM Resident b WHERE b.vorname = :vorname"),
+//        @NamedQuery(name = "Resident.findByGeschlecht", query = "SELECT b FROM Resident b WHERE b.geschlecht = :geschlecht"),
+//        @NamedQuery(name = "Resident.findByGebDatum", query = "SELECT b FROM Resident b WHERE b.gebDatum = :gebDatum"),
+//        @NamedQuery(name = "Resident.findByEditor", query = "SELECT b FROM Resident b WHERE b.editor = :editor"),
+//        @NamedQuery(name = "Resident.findByAdminonly", query = "SELECT b FROM Resident b WHERE b.adminonly = :adminonly")})
 public class Resident implements Serializable, Comparable<Resident> {
     private static final long serialVersionUID = 1L;
     @Id

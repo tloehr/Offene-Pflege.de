@@ -47,7 +47,7 @@ public class DlgProcess extends MyJDialog {
         cmbPCat.setSelectedIndex(0);
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createNamedQuery("Resident.findAllActiveSorted");
+        Query query = em.createQuery("SELECT b FROM Resident b WHERE b.station IS NOT NULL ORDER BY b.nachname, b.vorname");
         cmbResident.setRenderer(new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {

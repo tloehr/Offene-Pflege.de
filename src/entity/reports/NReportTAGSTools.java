@@ -61,7 +61,7 @@ public class NReportTAGSTools {
     public static JPanel createCheckBoxPanelForTags(ItemListener listener, Collection<NReportTAGS> preselect, LayoutManager layout) {
         EntityManager em = OPDE.createEM();
         MouseAdapter ma = GUITools.getHyperlinkStyleMouseAdapter();
-        Query query = em.createNamedQuery("PBerichtTAGS.findAllActive");
+        Query query = em.createQuery("SELECT p FROM NReportTAGS p WHERE p.aktiv = TRUE ORDER BY p.besonders DESC, p.sort DESC, p.bezeichnung");
         ArrayList<NReportTAGS> tags = new ArrayList(query.getResultList());
         JPanel panel = new JPanel(layout);
         for (NReportTAGS tag : tags) {

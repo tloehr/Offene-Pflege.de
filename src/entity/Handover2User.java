@@ -19,10 +19,10 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "Handover2User")
-@NamedQueries({
-        @NamedQuery(name = "Uebergabe2User.findAll", query = "SELECT u FROM Handover2User u"),
-        @NamedQuery(name = "Uebergabe2User.findByPkid", query = "SELECT u FROM Handover2User u WHERE u.pkid = :pkid"),
-        @NamedQuery(name = "Uebergabe2User.findByPit", query = "SELECT u FROM Handover2User u WHERE u.pit = :pit")})
+//@NamedQueries({
+//        @NamedQuery(name = "Uebergabe2User.findAll", query = "SELECT u FROM Handover2User u"),
+//        @NamedQuery(name = "Uebergabe2User.findByPkid", query = "SELECT u FROM Handover2User u WHERE u.pkid = :pkid"),
+//        @NamedQuery(name = "Uebergabe2User.findByPit", query = "SELECT u FROM Handover2User u WHERE u.pit = :pit")})
 public class Handover2User implements Serializable, Comparable<Handover2User> {
 
     private static final long serialVersionUID = 1L;
