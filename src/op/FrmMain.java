@@ -236,6 +236,10 @@ public class FrmMain extends JFrame {
         }
     }
 
+    private void btnHelpActionPerformed(ActionEvent e) {
+        // TODO add your code here
+    }
+
     public void afterLogin() {
 
         prepareSearchArea();
@@ -277,6 +281,7 @@ public class FrmMain extends JFrame {
         btnVerlegung = new JButton();
         btnExit = new JButton();
         lblSubMsg = new FadingLabel();
+        btnHelp = new JButton();
         pbMsg = new JProgressBar();
         btnReload = new JButton();
         splitPaneLeft = new JideSplitPane();
@@ -308,8 +313,8 @@ public class FrmMain extends JFrame {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                    "$rgap, $lcgap, pref, $lcgap, default:grow, 2*($lcgap, default), $lcgap, $rgap",
-                    "$rgap, $lgap, pref, $lgap, fill:11dlu, $lgap, fill:15dlu, $lgap, $rgap"));
+                    "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
+                    "0dlu, $lgap, pref, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
 
                 //---- lblMainMsg ----
                 lblMainMsg.setText("OPDE");
@@ -321,14 +326,14 @@ public class FrmMain extends JFrame {
                 pnlMainMessage.add(lblMainMsg, CC.xy(5, 3));
 
                 //---- btnVerlegung ----
-                btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/48x48/ambulance2.png")));
+                btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2.png")));
                 btnVerlegung.setBorder(null);
                 btnVerlegung.setBorderPainted(false);
                 btnVerlegung.setContentAreaFilled(false);
                 btnVerlegung.setSelectedIcon(null);
                 btnVerlegung.setToolTipText("Verlegungsbericht drucken");
                 btnVerlegung.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnVerlegung.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/48x48/ambulance2_pressed.png")));
+                btnVerlegung.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2_pressed.png")));
                 btnVerlegung.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -338,21 +343,21 @@ public class FrmMain extends JFrame {
                 pnlMainMessage.add(btnVerlegung, CC.xywh(3, 3, 1, 3));
 
                 //---- btnExit ----
-                btnExit.setIcon(new ImageIcon(getClass().getResource("/artwork/48x48/lock.png")));
+                btnExit.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/lock.png")));
                 btnExit.setBorder(null);
                 btnExit.setBorderPainted(false);
                 btnExit.setOpaque(false);
                 btnExit.setContentAreaFilled(false);
                 btnExit.setToolTipText("Abmelden");
                 btnExit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnExit.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/48x48/lock_pressed.png")));
+                btnExit.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/lock_pressed.png")));
                 btnExit.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         btnExitActionPerformed(e);
                     }
                 });
-                pnlMainMessage.add(btnExit, CC.xywh(9, 3, 1, 3));
+                pnlMainMessage.add(btnExit, CC.xywh(7, 3, 1, 3));
 
                 //---- lblSubMsg ----
                 lblSubMsg.setText("OPDE");
@@ -361,28 +366,43 @@ public class FrmMain extends JFrame {
                 lblSubMsg.setHorizontalAlignment(SwingConstants.CENTER);
                 pnlMainMessage.add(lblSubMsg, CC.xy(5, 5));
 
+                //---- btnHelp ----
+                btnHelp.setText(null);
+                btnHelp.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/help.png")));
+                btnHelp.setBorderPainted(false);
+                btnHelp.setContentAreaFilled(false);
+                btnHelp.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/help_pressed.png")));
+                btnHelp.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnHelp.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnHelpActionPerformed(e);
+                    }
+                });
+                pnlMainMessage.add(btnHelp, CC.xy(3, 7));
+
                 //---- pbMsg ----
                 pbMsg.setValue(50);
                 pbMsg.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 12));
                 pbMsg.setForeground(new Color(105, 80, 69));
-                pnlMainMessage.add(pbMsg, CC.xywh(5, 7, 3, 1, CC.FILL, CC.DEFAULT));
+                pnlMainMessage.add(pbMsg, CC.xy(5, 7, CC.FILL, CC.DEFAULT));
 
                 //---- btnReload ----
-                btnReload.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/reload.png")));
+                btnReload.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/reload.png")));
                 btnReload.setBorder(null);
                 btnReload.setBorderPainted(false);
                 btnReload.setOpaque(false);
                 btnReload.setContentAreaFilled(false);
                 btnReload.setToolTipText("Ansicht aktualisieren");
                 btnReload.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnReload.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/reload_pressed.png")));
+                btnReload.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/reload_pressed.png")));
                 btnReload.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         btnReloadActionPerformed(e);
                     }
                 });
-                pnlMainMessage.add(btnReload, CC.xy(9, 7));
+                pnlMainMessage.add(btnReload, CC.xy(7, 7));
             }
             pnlMain.add(pnlMainMessage, CC.xywh(3, 2, 4, 1));
 
@@ -770,13 +790,6 @@ public class FrmMain extends JFrame {
 
         labelUSER.setText("--");
 
-        try {
-            OPDE.closeDB();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            System.exit(1);
-        }
-
         SYSLoginTools.logout();
 
         System.gc();
@@ -792,6 +805,7 @@ public class FrmMain extends JFrame {
     private JButton btnVerlegung;
     private JButton btnExit;
     private FadingLabel lblSubMsg;
+    private JButton btnHelp;
     private JProgressBar pbMsg;
     private JButton btnReload;
     private JideSplitPane splitPaneLeft;

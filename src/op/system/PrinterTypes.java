@@ -85,7 +85,7 @@ public class PrinterTypes {
         initTags();
         try {
             XMLReader parser = XMLReaderFactory.createXMLReader();
-            InputSource is = new InputSource(new FileInputStream(new File(OPDE.getOpwd() + System.getProperty("file.separator") + CONFIGFILE)));
+            InputSource is = new InputSource(new FileInputStream(new File(OPDE.getOPWD() + System.getProperty("file.separator") + CONFIGFILE)));
             XMLHandler xml = new XMLHandler();
             parser.setContentHandler(xml);
             parser.parse(is);

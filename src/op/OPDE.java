@@ -84,7 +84,6 @@ public class OPDE {
     protected static Logger logger;
     public static HashMap[] anonymize = null;
 
-    protected static HashMap<String, ActionListener> runningModules = new HashMap();
     protected static EntityManagerFactory emf;
     protected static AppInfo appInfo;
     protected static SYSLogin login;
@@ -98,7 +97,7 @@ public class OPDE {
     /**
      * @return Das Arbeitsverzeichnis für OPDE.
      */
-    public static String getOpwd() {
+    public static String getOPWD() {
         return opwd;
     }
 
@@ -158,71 +157,13 @@ public class OPDE {
         OPDE.getProps().putAll(OPDE.getLocalProps());
     }
 
-//    public static boolean addNewModule(String internalClassID, ActionListener listener) {
-//        boolean success = false;
-//        if (!runningModules.containsKey(internalClassID)) {
-//            listenerList.add(ActionListener.class, listener);
-//            runningModules.put(internalClassID, listener);
-//            success = true;
-//            OPDE.debug("Modul " + internalClassID + " hinzugefügt.");
-//        }
-//        return success;
-//    }
-//
-//    public static void removeModule(String internalClassID) {
-//        listenerList.remove(ActionListener.class, runningModules.get(internalClassID));
-//        runningModules.remove(internalClassID);
-//        OPDE.debug("Modul " + internalClassID + " entfernt.");
-//    }
-//
-//    public static void notifyAboutLogout() {
-//        Object[] listeners = listenerList.getListenerList();
-//        // Each listener occupies two elements - the first is the listener class
-//        // and the second is the listener instance
-//        for (int i = 0; i < listeners.length; i += 2) {
-//            ((ActionListener) listeners[i + 1]).actionPerformed(new ActionEvent(OPDE.class, 1, "LOGOUT"));
-//        }
-//        clearModules();
-//    }
-//
-//    protected static void clearModules() {
-//        Iterator<String> keys = runningModules.keySet().iterator();
-//        while (keys.hasNext()) {
-//            listenerList.remove(ActionListener.class, runningModules.get(keys.next()));
-//        }
-//        runningModules.clear();
-//        listenerList = new EventListenerList();
-//    }
-
     public static Logger getLogger() {
         return logger;
-    }
-
-    /**
-     * Diese initDB() Methode wird verschwinden, sobald ich ganz auf JPA umgestellt habe.
-     *
-     * @throws SQLException
-     */
-    @Deprecated
-    public static void initDB() throws Exception {
-//        if (db != null) return;
-//        String dbuser = localProps.getProperty("javax.persistence.jdbc.user");
-//        String dbpw = localProps.getProperty("javax.persistence.jdbc.password");
-//        String hostkey = OPDE.getLocalProps().getProperty("hostkey");
-//        // Passwort entschlüsseln
-//        DesEncrypter desEncrypter = new DesEncrypter(hostkey);
-//        db = new Database(url, dbuser, desEncrypter.decrypt(dbpw).toCharArray());
     }
 
     public static void warn(Object message) {
         logger.warn(message);
         SyslogTools.warn(message.toString());
-    }
-
-    @Deprecated
-    public static void closeDB() throws SQLException {
-//        db.db.close();
-//        db = null;
     }
 
     public static void info(Object message) {
@@ -760,11 +701,6 @@ public class OPDE {
         }
         return success;
     }
-
-
-//    public static Database getDb() {
-//        return db;
-//    }
 
     public static boolean isAdmin() {
         return UsersTools.isAdmin(login.getUser());

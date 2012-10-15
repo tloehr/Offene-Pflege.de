@@ -7,10 +7,7 @@ import entity.reports.NReportTools;
 import entity.values.ResValue;
 import entity.values.ResValueTools;
 import op.OPDE;
-import op.tools.InfoTreeNodeBean;
-import op.tools.Pair;
-import op.tools.RiskBean;
-import op.tools.SYSTools;
+import op.tools.*;
 import org.joda.time.DateTime;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -123,19 +120,22 @@ public class ResInfoTools {
         return resInfos;
     }
 
-    public static String getResInfosAsHTML(List<ResInfo> resInfos, boolean withClosed, boolean withlongheader, String subtitle) {
+    public static String getResInfosAsHTML(List<ResInfo> resInfos, boolean withClosed) {
         String html = "";
 
         if (!resInfos.isEmpty()) {
-            html += "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.info") + (withlongheader ? " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getLabelText(resInfos.get(0).getResident()) : "") + "</h2>\n";
-            html += SYSTools.catchNull(subtitle).isEmpty() ? "" : "<h3 id=\"fonth3\" >" + subtitle + "</h3>\n";
+//            html += (withlongheader ? " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getLabelText(resInfos.get(0).getResident()) : "") + "</h2>\n";
             html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>"
                     + "<th>Info</th><th>Text</th>\n</tr>";
             for (ResInfo resInfo : resInfos) {
                 if (withClosed || !resInfo.isClosed()) {
                     html += "<tr>";
-                    html += "<td valign=\"top\">" + resInfo.getPITAsHTML() + "</td>";
-                    html += "<td valign=\"top\">" + resInfo.getHtml() + "</td>";
+                    html += "<td valign=\"top\">" + resInfo.getPITAsHTML();
+                    html += resInfo.isClosed() ? "<br/>" + SYSConst.html_22x22_StopSign : "";
+                    html += "</td>";
+                    html += "<td valign=\"top\">" + resInfo.getHtml();
+                    html += !SYSTools.catchNull(resInfo.getText()).isEmpty() ? "<p>" + OPDE.lang.getString("misc.msg.comment") + ": " + resInfo.getText() + "</p>" : "";
+                    html += "</td>";
                     html += "</tr>\n";
                 }
             }

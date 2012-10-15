@@ -40,8 +40,6 @@ import org.pushingpixels.trident.Timeline;
 import org.pushingpixels.trident.callback.TimelineCallback;
 import org.pushingpixels.trident.callback.TimelineCallbackAdapter;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableCellRenderer;
@@ -1905,7 +1903,7 @@ public class SYSTools {
         String html;
 
         try {
-            html = SYSTools.readFileAsString(OPDE.getOpwd() + System.getProperty("file.separator") + "newuser.html");
+            html = SYSTools.readFileAsString(OPDE.getOPWD() + System.getProperty("file.separator") + "newuser.html");
         } catch (IOException ie) {
             html = "<body>"
                     + "<h1>Access to Offene-Pflege.de (OPDE)</h1>"

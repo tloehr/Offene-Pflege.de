@@ -25,9 +25,8 @@
  * 
  */
 
-package op.care.schichtleitung;
+package op.care.supervisor;
 
-import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;

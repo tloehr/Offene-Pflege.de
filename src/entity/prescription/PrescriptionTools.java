@@ -56,6 +56,7 @@ public class PrescriptionTools {
      * @param homes Die Einrichtung, für die der Stellplan erstellt werden soll. Sortiert nach den Station.
      */
     public static String getDailyPlanAsHTML(Homes homes) {
+        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
         String html = "";
 
@@ -81,11 +82,12 @@ public class PrescriptionTools {
                     " AND st.EID = ? AND ((best.Aus = '9999-12-31 23:59:59' AND best.Anbruch < '9999-12-31 23:59:59') OR (v.DafID IS NULL)) " +
                     " ORDER BY st.statid, CONCAT(bw.nachname,bw.vorname), bw.BWKennung, v.DafID IS NOT NULL, F.Stellplan, CONCAT( M.Bezeichnung, Ms.Bezeichnung)");
             query.setParameter(1, homes.getEID());
-            html = getDailyPlan(query.getResultList());
-
+            html = getDailyPlan(em, query.getResultList());
+            em.close();
         } catch (Exception e) {
             OPDE.fatal(e);
         }
+        SYSTools.showTimeDifference(begin);
         return html;
     }
 
@@ -187,8 +189,7 @@ public class PrescriptionTools {
 //        return ((Long) query.getSingleResult()).longValue() > 0;
 //    }
 
-    private static String getDailyPlan(List data) {
-
+    private static String getDailyPlan(EntityManager em, List data) {
         int STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO = Integer.parseInt(OPDE.getProps().getProperty("stellplan_pagebreak_after_element_no"));
 
         int elementNumber = 1;
@@ -208,8 +209,6 @@ public class PrescriptionTools {
         long statid = 0;
 
         Iterator it = data.iterator();
-
-        EntityManager em = OPDE.createEM();
 
         while (it.hasNext()) {
 
@@ -301,8 +300,6 @@ public class PrescriptionTools {
 
             pagebreak = elementNumber > STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
         }
-
-        em.close();
 
         html += "</table>"
                 + "</body>";
@@ -581,6 +578,7 @@ public class PrescriptionTools {
      * Darreichungen für dieselbe Verordnung verwendet werden. Der Trick ist der Join über zwei Spalten in der Zeile mit "MPBestand"
      */
     public static List<Prescription> getPrescriptionsByInventory(MedInventory inventory) {
+        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
 
         List<BigInteger> list = null;
@@ -599,11 +597,12 @@ public class PrescriptionTools {
             }
         }
         em.close();
-
+        SYSTools.showTimeDifference(begin);
         return result;
     }
 
     public static ArrayList<Prescription> getAll(Resident resident) {
+        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
 
         ArrayList<Prescription> result = null;
@@ -612,7 +611,7 @@ public class PrescriptionTools {
         result = new ArrayList<Prescription>(query.getResultList());
 
         em.close();
-
+        SYSTools.showTimeDifference(begin);
         return result;
     }
 
@@ -622,6 +621,7 @@ public class PrescriptionTools {
      * Darreichungen für dieselbe Verordnung verwendet werden. Der Trick ist der Join über zwei Spalten in der Zeile mit "MPBestand"
      */
     public static List<Prescription> getOnDemandPrescriptions(Resident resident, Date date) {
+        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
 
 //        List<Prescription> list = null;

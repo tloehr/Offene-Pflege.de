@@ -17,7 +17,6 @@ import entity.info.*;
 import entity.process.QProcess;
 import entity.process.QProcessElement;
 import entity.process.SYSINF2PROCESS;
-import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.sysfiles.DlgFiles;
 import op.process.DlgProcessAssign;
@@ -55,7 +54,7 @@ public class PnlInfo extends NursingRecordsPanel {
 
     private HashMap<String, CollapsiblePane> cpMap;
     private HashMap<ResInfoType, ArrayList<ResInfo>> valuecache;
-    private HashMap<ResInfoCategory, List<ResInfoType>> bwinfotypen;
+    //    private HashMap<ResInfoCategory, List<ResInfoType>> bwinfotypen;
     private List<ResInfoCategory> categories;
     private ArrayList<ResInfo> listInfo;
 
@@ -79,7 +78,7 @@ public class PnlInfo extends NursingRecordsPanel {
 
     private void initPanel() {
 
-        bwinfotypen = new HashMap<ResInfoCategory, List<ResInfoType>>();
+//        bwinfotypen = new HashMap<ResInfoCategory, List<ResInfoType>>();
         valuecache = new HashMap<ResInfoType, ArrayList<ResInfo>>();
         cpMap = new HashMap<String, CollapsiblePane>();
         prepareSearchArea();
@@ -314,6 +313,7 @@ public class PnlInfo extends NursingRecordsPanel {
         cptitle.getRight().add(btnMenu);
         cptitle.getMain().setBackground(getColor(resInfo.getResInfoType().getResInfoCat())[SYSConst.light2]);
         cptitle.getMain().setOpaque(true);
+        cptitle.getButton().setIcon(resInfo.isClosed() ? SYSConst.icon22stopSign : null);
 
         return cptitle.getMain();
     }
@@ -450,7 +450,7 @@ public class PnlInfo extends NursingRecordsPanel {
             btnPrint.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    SYSFilesTools.print(ResInfoTools.getResInfosAsHTML(valuecache.get(type), tbInactive.isSelected(), true, type.getShortDescription()), true);
+//                    SYSFilesTools.print(ResInfoTools.getResInfosAsHTML(valuecache.get(type), tbInactive.isSelected(), true, type.getShortDescription()), true);
                 }
             });
             cptitle.getRight().add(btnPrint);
@@ -786,7 +786,52 @@ public class PnlInfo extends NursingRecordsPanel {
             list.add(btnBWisBack);
         }
 
+        /***
+         *      ____       _       _
+         *     |  _ \ _ __(_)_ __ | |_
+         *     | |_) | '__| | '_ \| __|
+         *     |  __/| |  | | | | | |_
+         *     |_|   |_|  |_|_| |_|\__|
+         *
+         */
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
+            final JButton btnPrint = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.print"), SYSConst.icon22print2, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+//                    Collections.sort(listInfo);
+                    String html = "";
+                    html += "<h1 id=\"fonth1\" >" + OPDE.lang.getString("nursingrecords.info");
+                    html += " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getLabelText(resident) + "</h1>\n";
+
+                    for (ResInfoCategory cat : categories) {
+                        html += "<h2 id=\"fonth2\" >" + cat.getText() + "</h2>\n";
+                        for (ResInfoType type : ResInfoTypeTools.getByCat(cat)) {
+                            if (valuecache.containsKey(type) && !valuecache.get(type).isEmpty() && (tbInactive.isSelected() || !containsOnlyClosedInfos(type))) {
+                                html += "<h3 id=\"fonth3\" >" + type.getShortDescription() + "</h3>\n";
+                                html += ResInfoTools.getResInfosAsHTML(valuecache.get(type), tbInactive.isSelected());
+                            }
+                        }
+                    }
+                    SYSFilesTools.print(html, true);
+                }
+            });
+            btnPrint.setAlignmentX(Component.RIGHT_ALIGNMENT);
+
+            list.add(btnPrint);
+        }
+
         return list;
+    }
+
+    private boolean containsOnlyClosedInfos(final ResInfoType type) {
+        boolean containsOnlyClosedInfos = true;
+        for (ResInfo info : valuecache.get(type)) {
+            containsOnlyClosedInfos = info.isClosed();
+            if (!containsOnlyClosedInfos) {
+                break;
+            }
+        }
+        return containsOnlyClosedInfos;
     }
 
     private List<Component> addFilters() {
@@ -807,19 +852,19 @@ public class PnlInfo extends NursingRecordsPanel {
     }
 
     private Icon getIcon(ResInfoType type) {
-        boolean empty = !valuecache.containsKey(type) || valuecache.get(type).isEmpty();
+//        boolean empty = !valuecache.containsKey(type) || valuecache.get(type).isEmpty();
 
         if (type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
-            return empty ? SYSConst.icon22ledRedOff : SYSConst.icon22ledRedOn;
+            return SYSConst.icon22singleIncident;
         }
         if (type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYDAY) {
-            return empty ? SYSConst.icon22ledBlueOff : SYSConst.icon22ledBlueOn;
+            return SYSConst.icon22intervalByDay;
         }
         if (type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_NOCONSTRAINTS) {
-            return empty ? SYSConst.icon22ledPurpleOff : SYSConst.icon22ledPurpleOn;
+            return SYSConst.icon22intervalNoConstraints;
         }
 
-        return empty ? SYSConst.icon22ledOrangeOff : SYSConst.icon22ledOrangeOn;
+        return SYSConst.icon22intervalBySecond;
     }
 
     private String getTooltip(ResInfoType type) {
@@ -1377,7 +1422,7 @@ public class PnlInfo extends NursingRecordsPanel {
 
     @Override
     public void cleanup() {
-        bwinfotypen.clear();
+//        bwinfotypen.clear();
 //        categories.clear();
         cpMap.clear();
         cpsInfo.removeAll();

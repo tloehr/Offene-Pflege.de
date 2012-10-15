@@ -13,11 +13,11 @@
        <class>com.jgoodies.forms.layout.FormLayout</class> 
        <void method="setProperty"> 
         <string>$columnSpecs</string> 
-        <string>default, labelcompgap, default, labelcompgap, default, labelcompgap, default, labelcompgap, default</string> 
+        <string>default, labelcompgap, default:grow, labelcompgap, default, labelcompgap, default:grow, labelcompgap, default</string> 
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
-        <string>default, linegap, fill:default, linegap, fill:default, linegap, default</string> 
+        <string>default, linegap, fill:default, linegap, fill:36dlu, linegap, default</string> 
        </void> 
       </object> 
       <void method="setProperty"> 
@@ -28,6 +28,10 @@
        <string>resizable</string> 
        <boolean>false</boolean> 
       </void> 
+      <void method="setProperty"> 
+       <string>$sizePolicy</string> 
+       <int>1</int> 
+      </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormComponent"> 
         <string>javax.swing.JLabel</string> 
@@ -35,8 +39,16 @@
          <string>text</string> 
          <string>Die Packung mit der Nummer:</string> 
         </void> 
+        <void method="setProperty"> 
+         <string>font</string> 
+         <object id="Font0" class="java.awt.Font"> 
+          <string>Arial</string> 
+          <int>0</int> 
+          <int>14</int> 
+         </object> 
+        </void> 
         <void property="name"> 
-         <string>jLabel2</string> 
+         <string>lbl1</string> 
         </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -74,6 +86,10 @@
           </void> 
          </object> 
         </void> 
+        <void method="setProperty"> 
+         <string>font</string> 
+         <object idref="Font0"/> 
+        </void> 
         <void property="name"> 
          <string>cmbBestID</string> 
         </void> 
@@ -105,8 +121,12 @@
          <string>text</string> 
          <string>anbrechen.</string> 
         </void> 
+        <void method="setProperty"> 
+         <string>font</string> 
+         <object idref="Font0"/> 
+        </void> 
         <void property="name"> 
-         <string>jLabel3</string> 
+         <string>lbl2</string> 
         </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -163,10 +183,6 @@
             <string>/artwork/22x22/apply.png</string> 
            </object> 
           </void> 
-          <void method="setProperty"> 
-           <string>enabled</string> 
-           <boolean>false</boolean> 
-          </void> 
           <void property="name"> 
            <string>btnOK</string> 
           </void> 
@@ -191,6 +207,10 @@
          <string>gridY</string> 
          <int>5</int> 
         </void> 
+        <void method="setProperty"> 
+         <string>vAlign</string> 
+         <object class="com.jgoodies.forms.layout.CellConstraints" field="BOTTOM"/> 
+        </void> 
        </object> 
       </void> 
       <void property="name"> 
@@ -203,7 +223,7 @@
        <string>size</string> 
        <object class="java.awt.Dimension"> 
         <int>455</int> 
-        <int>145</int> 
+        <int>165</int> 
        </object> 
       </void> 
       <void method="setProperty"> 

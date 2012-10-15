@@ -690,7 +690,7 @@ public class DlgNewStocks extends MyJDialog {
                 inventory = TradeFormTools.getInventory4TradeForm(bewohner, darreichung);
 
                 if (inventory == null) {
-                    vorraete = TradeFormTools.getPassendeVorraeteZurDarreichung(bewohner, darreichung);
+                    vorraete = TradeFormTools.getSuitableInventoriesForThisTradeForm(bewohner, darreichung);
                 } else {
                     vorraete.add(inventory);
                 }

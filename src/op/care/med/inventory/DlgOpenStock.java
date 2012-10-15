@@ -61,13 +61,14 @@ public class DlgOpenStock extends MyJDialog {
     /**
      * Creates new form DlgOpenStock
      */
-    public DlgOpenStock(TradeForm darreichung, Resident bewohner, Closure actionBlock) {
+    public DlgOpenStock(TradeForm darreichung, Resident resident, Closure actionBlock) {
         super();
-        this.inventory = TradeFormTools.getInventory4TradeForm(bewohner, darreichung);
+        this.inventory = TradeFormTools.getInventory4TradeForm(resident, darreichung);
         this.medStock = null;
         this.actionBlock = actionBlock;
         initComponents();
         initDialog();
+        setVisible(true);
     }
 
     /**
@@ -79,9 +80,9 @@ public class DlgOpenStock extends MyJDialog {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jLabel2 = new JLabel();
+        lbl1 = new JLabel();
         cmbBestID = new JComboBox();
-        jLabel3 = new JLabel();
+        lbl2 = new JLabel();
         panel1 = new JPanel();
         btnClose = new JButton();
         btnOK = new JButton();
@@ -91,20 +92,22 @@ public class DlgOpenStock extends MyJDialog {
         setResizable(false);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "4*(default, $lcgap), default",
-                "default, 2*($lgap, fill:default), $lgap, default"));
+            "default, $lcgap, default:grow, $lcgap, default, $lcgap, default:grow, $lcgap, default",
+            "default, $lgap, fill:default, $lgap, fill:36dlu, $lgap, default"));
 
-        //---- jLabel2 ----
-        jLabel2.setText("Die Packung mit der Nummer:");
-        contentPane.add(jLabel2, CC.xy(3, 3));
+        //---- lbl1 ----
+        lbl1.setText("Die Packung mit der Nummer:");
+        lbl1.setFont(new Font("Arial", Font.PLAIN, 14));
+        contentPane.add(lbl1, CC.xy(3, 3));
 
         //---- cmbBestID ----
-        cmbBestID.setModel(new DefaultComboBoxModel(new String[]{
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
+        cmbBestID.setModel(new DefaultComboBoxModel(new String[] {
+            "Item 1",
+            "Item 2",
+            "Item 3",
+            "Item 4"
         }));
+        cmbBestID.setFont(new Font("Arial", Font.PLAIN, 14));
         cmbBestID.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -113,9 +116,10 @@ public class DlgOpenStock extends MyJDialog {
         });
         contentPane.add(cmbBestID, CC.xy(5, 3));
 
-        //---- jLabel3 ----
-        jLabel3.setText("open.");
-        contentPane.add(jLabel3, CC.xy(7, 3));
+        //---- lbl2 ----
+        lbl2.setText("anbrechen.");
+        lbl2.setFont(new Font("Arial", Font.PLAIN, 14));
+        contentPane.add(lbl2, CC.xy(7, 3));
 
         //======== panel1 ========
         {
@@ -133,7 +137,6 @@ public class DlgOpenStock extends MyJDialog {
 
             //---- btnOK ----
             btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-            btnOK.setEnabled(false);
             btnOK.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -142,8 +145,8 @@ public class DlgOpenStock extends MyJDialog {
             });
             panel1.add(btnOK);
         }
-        contentPane.add(panel1, CC.xy(7, 5));
-        pack();
+        contentPane.add(panel1, CC.xy(7, 5, CC.DEFAULT, CC.BOTTOM));
+        setSize(455, 165);
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
@@ -157,7 +160,7 @@ public class DlgOpenStock extends MyJDialog {
             EntityManager em = OPDE.createEM();
             try {
                 em.getTransaction().begin();
-                medStock = (MedStock) cmbBestID.getSelectedItem();
+                medStock = em.merge((MedStock) cmbBestID.getSelectedItem());
                 em.lock(medStock, LockModeType.OPTIMISTIC);
                 em.lock(em.merge(medStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
 
@@ -186,8 +189,8 @@ public class DlgOpenStock extends MyJDialog {
             } finally {
                 em.close();
             }
+            dispose();
         }
-        dispose();
     }//GEN-LAST:event_btnOKActionPerformed
 
     @Override
@@ -197,7 +200,6 @@ public class DlgOpenStock extends MyJDialog {
     }
 
     private void initDialog() {
-
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(" " +
                 " SELECT b FROM MedStock b " +
@@ -207,7 +209,7 @@ public class DlgOpenStock extends MyJDialog {
         query.setParameter("aus", SYSConst.DATE_BIS_AUF_WEITERES);
         query.setParameter("anbruch", SYSConst.DATE_BIS_AUF_WEITERES);
         DefaultComboBoxModel dcbm = new DefaultComboBoxModel(query.getResultList().toArray());
-        dcbm.insertElementAt("keine", 0);
+        dcbm.insertElementAt(OPDE.lang.getString("misc.msg.none"), 0);
         cmbBestID.setModel(dcbm);
         cmbBestID.setRenderer(MedStockTools.getBestandOnlyIDRenderer());
 
@@ -221,13 +223,12 @@ public class DlgOpenStock extends MyJDialog {
         } else {
             cmbBestID.setToolTipText(SYSTools.toHTML(MedStockTools.getTextASHTML((MedStock) cmbBestID.getSelectedItem())));
         }
-        btnOK.setEnabled(cmbBestID.getSelectedIndex() > 0);
     }//GEN-LAST:event_cmbBestIDItemStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JLabel jLabel2;
+    private JLabel lbl1;
     private JComboBox cmbBestID;
-    private JLabel jLabel3;
+    private JLabel lbl2;
     private JPanel panel1;
     private JButton btnClose;
     private JButton btnOK;

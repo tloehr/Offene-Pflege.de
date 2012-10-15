@@ -25,7 +25,7 @@
  * 
  */
 
-package op.care.schichtleitung;
+package op.care.supervisor;
 
 import com.toedter.calendar.JDateChooser;
 import entity.HomesTools;
@@ -175,7 +175,7 @@ public class PnlSchichtleitung extends CleanablePanel {
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
         try {
             // Create temp file.
-            File temp = File.createTempFile("schichtleitung", ".html");
+            File temp = File.createTempFile("supervisor", ".html");
 
             // Delete temp file when program exits.
             temp.deleteOnExit();

@@ -21,7 +21,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.net.InetAddress;
 import java.util.UUID;
 
 /**
@@ -103,8 +102,8 @@ public class FrmInit extends JFrame {
 
     private void btnSaveActionPerformed(ActionEvent e) {
         // Legt bei Bedarf die nötigen Arbeitsverzeichnisse an
-        if (!new File(OPDE.getOpwd()).exists()) {
-            new File(OPDE.getOpwd()).mkdir();
+        if (!new File(OPDE.getOPWD()).exists()) {
+            new File(OPDE.getOPWD()).mkdir();
         }
         if (!new File(OPDE.getOPCache()).exists()) {
             new File(OPDE.getOPCache()).mkdir();
@@ -130,7 +129,7 @@ public class FrmInit extends JFrame {
 
             defaultProps.put("javax.persistence.jdbc.password", cryptpw);
 
-            FileOutputStream out = new FileOutputStream(new File(OPDE.getOpwd() + System.getProperty("file.separator") + "local.properties"));
+            FileOutputStream out = new FileOutputStream(new File(OPDE.getOPWD() + System.getProperty("file.separator") + "local.properties"));
             defaultProps.store(out, "Lokale Einstellungen für Offene-Pflege.de");
             out.close();
 

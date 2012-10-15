@@ -116,13 +116,13 @@ public class TradeFormTools {
     }
 
     /**
-     * Die genaue Erläuterung zu dieser Methode befindet sich in der Methode <code>getPassendeVorraeteZurDarreichung</code>.
+     * Die genaue Erläuterung zu dieser Methode befindet sich in der Methode <code>getSuitableInventoriesForThisTradeForm</code>.
      * Sie implementiert Punkt 1 der dort beschriebenen 2 Antworten.
      *
      * @param bewohner
      * @param tradeform
      * @return Wenn die Darreichung zu einem früheren Zeitpunkt schonmal zugeordnet war, dann wird dieser Vorrat zurück gegeben. Ansonsten <code>null</code>.
-     * @see #getPassendeVorraeteZurDarreichung(entity.info.Resident, TradeForm)
+     * @see #getSuitableInventoriesForThisTradeForm(entity.info.Resident, TradeForm)
      */
     public static MedInventory getInventory4TradeForm(Resident bewohner, TradeForm tradeform) {
         MedInventory result = null;
@@ -193,7 +193,7 @@ public class TradeFormTools {
      * @return
      * @see #getInventory4TradeForm(entity.info.Resident, TradeForm)
      */
-    public static List<MedInventory> getPassendeVorraeteZurDarreichung(Resident resident, TradeForm tradeform) {
+    public static List<MedInventory> getSuitableInventoriesForThisTradeForm(Resident resident, TradeForm tradeform) {
         // TODO: das muss noch getestet werden
         EntityManager em = OPDE.createEM();
         List<MedInventory> liste;

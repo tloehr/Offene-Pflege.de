@@ -24,19 +24,7 @@
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  * 
  */
-package op.care.schichtleitung;
-
-import op.OPDE;
-
-import op.tools.SYSCalendar;
-import op.tools.SYSConst;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
+package op.care.supervisor;
 
 /**
  * @author root

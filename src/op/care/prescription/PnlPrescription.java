@@ -69,6 +69,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.List;
 
@@ -214,16 +215,6 @@ public class PnlPrescription extends NursingRecordsPanel {
                 "</table>" +
                 "</html>";
 
-
-//        String title = "<html><table border=\"0\">" +
-//                "<tr>" +
-//                "<td width=\"450\" align=\"left\">" +
-//                PrescriptionTools.getShortDescription(prescription) + "</td>" +
-//                "<td width=\"300\" align=\"left\">" + PrescriptionTools.getDose(prescription) + "</td>" +
-//                "</tr>" +
-//                "</table>" +
-//                "</html>";
-
         DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -311,7 +302,11 @@ public class PnlPrescription extends NursingRecordsPanel {
                 if (stockInUse == null) {
                     icon = SYSConst.icon22ledRedOn;
                 } else {
-                    icon = SYSConst.icon22ledPurpleOn;
+                    if (MedStockTools.getSum(stockInUse).compareTo(BigDecimal.ZERO) <= 0) {
+                        icon = SYSConst.icon22ledYellowOn;
+                    } else {
+                        icon = SYSConst.icon22ledPurpleOn;
+                    }
                 }
             }
         } else {
@@ -322,7 +317,11 @@ public class PnlPrescription extends NursingRecordsPanel {
                 if (stockInUse == null) {
                     icon = SYSConst.icon22ledRedOn;
                 } else {
-                    icon = SYSConst.icon22ledGreenOn;
+                    if (MedStockTools.getSum(stockInUse).compareTo(BigDecimal.ZERO) <= 0) {
+                        icon = SYSConst.icon22ledYellowOn;
+                    } else {
+                        icon = SYSConst.icon22ledGreenOn;
+                    }
                 }
             }
         }
@@ -831,8 +830,6 @@ public class PnlPrescription extends NursingRecordsPanel {
                     });
                 }
             });
-//            addRegular.setBackground(regularColors[SYSConst.medium4]);
-//            addRegular.setOpaque(true);
             list.add(addRegular);
         }
 
@@ -893,8 +890,6 @@ public class PnlPrescription extends NursingRecordsPanel {
                     });
                 }
             });
-//            addNewOnDemand.setBackground(demandColors[SYSConst.medium4]);
-//            addNewOnDemand.setOpaque(true);
             list.add(addNewOnDemand);
         }
 
@@ -1362,7 +1357,6 @@ public class PnlPrescription extends NursingRecordsPanel {
                         @Override
                         public void execute(Object o) {
                             if (o != null) {
-
                                 // The prescription itself is not changed but the stock in question,
                                 // this information is requested by a single DB request every time
                                 // the CP is created for that particular prescription.
@@ -1395,7 +1389,10 @@ public class PnlPrescription extends NursingRecordsPanel {
                     new DlgOpenStock(prescription.getTradeForm(), resident, new Closure() {
                         @Override
                         public void execute(Object o) {
-
+                            if (o != null) {
+                                final CollapsiblePane myCP = createCP4(prescription);
+                                GUITools.flashBackground(myCP, Color.YELLOW, 2);
+                            }
                         }
                     });
                 }

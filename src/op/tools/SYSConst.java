@@ -63,6 +63,8 @@ public class SYSConst {
     public static Color melonrindgreen = new Color(223, 255, 165);
     public static Color orangered = new Color(255, 36, 0);
     public static Color sun3 = new Color(153, 153, 204);
+
+    public static String html_22x22_StopSign = "<img src=\""+OPDE.getOPWD()+ System.getProperty("file.separator")+ "artwork/22x22/stop.png\" border=\"0\">";
     public static String html_darkgreen = "color=\"#007600\"";
     public static String html_darkred = "color=\"#bd0000\"";
     public static String html_gold7 = "color=\"#ffaa00\"";
@@ -476,6 +478,12 @@ public class SYSConst {
     public static final Icon icon22ledBlueOn = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ledlightblue.png"));
     public static final Icon icon22ledBlueOff = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/leddarkblue.png"));
 
+    public static final Icon icon22singleIncident = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/single-incident.png"));
+    public static final Icon icon22intervalByDay = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/by-day.png"));
+    public static final Icon icon22intervalBySecond = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/by-second.png"));
+    public static final Icon icon22intervalNoConstraints = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/no-constraints.png"));
+    public static final Icon icon22nothing = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/nothing.png"));
+    public static final Icon icon22stopSign = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/stop.png"));
 
 
 //    public static final Icon icon22collapsePressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/collapse_pressed.png"));
