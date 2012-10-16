@@ -36,6 +36,7 @@ import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import entity.files.SYSFilesTools;
 import entity.files.SYSNR2FILE;
+import entity.info.ResInfo;
 import entity.info.Resident;
 import entity.process.QProcess;
 import entity.process.QProcessElement;
@@ -135,7 +136,7 @@ public class PnlReport extends NursingRecordsPanel {
         jspSearch.setViewportView(searchPanes);
 
         JPanel mypanel = new JPanel();
-        mypanel.setLayout(new VerticalLayout(3));
+        mypanel.setLayout(new VerticalLayout());
         mypanel.setBackground(Color.WHITE);
 
         CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
@@ -161,12 +162,7 @@ public class PnlReport extends NursingRecordsPanel {
 
     @Override
     public void reload() {
-//        if (tbFilesOnly.isSelected()) {
-//            reloadDisplay(NReportTools.getReportsWithFilesOnly(resident));
-//        } else {
-//            reloadDisplay(NReportTools.getNReports4Day(resident, new DateMidnight()));
-//        }
-
+        reloadDisplay();
     }
 
     /**
@@ -215,18 +211,6 @@ public class PnlReport extends NursingRecordsPanel {
 //        jdcVon.setMinSelectableDate(firstReport.getPit());
         reloadDisplay();
     }
-
-//
-//
-//            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT) && !alreadyEdited && singleRowSelected) {
-////                menu.add(new JSeparator());
-//                menu.add(QProcessTools.getVorgangContextMenu(new JFrame(), bericht, resident, standardActionListener));
-//            }
-//
-//            menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
-//        }
-//    }//GEN-LAST:event_tblTBMousePressed
-
 
     private java.util.List<Component> addFilters() {
         java.util.List<Component> list = new ArrayList<Component>();

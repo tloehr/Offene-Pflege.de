@@ -26,8 +26,8 @@
         <class>entity.nursingprocess.NursingProcess</class>
         <class>entity.Rooms</class>
         <class>entity.Station</class>
-        <class>entity.Handover2User</class>
-        <class>entity.Handovers</class>
+        <class>entity.reports.Handover2User</class>
+        <class>entity.reports.Handovers</class>
         <class>entity.system.Users</class>
         <class>entity.files.SYSFiles</class>
         <class>entity.files.SYSINF2FILE</class>

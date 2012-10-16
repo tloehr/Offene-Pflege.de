@@ -238,8 +238,8 @@ public class PnlPrescription extends NursingRecordsPanel {
          *     |_|  |_|\___|_| |_|\__,_|
          *
          */
-        final JButton btnMenu = new JButton(SYSConst.icon32menu);
-        btnMenu.setPressedIcon(SYSConst.icon32Pressed);
+        final JButton btnMenu = new JButton(SYSConst.icon22menu);
+        btnMenu.setPressedIcon(SYSConst.icon22Pressed);
         btnMenu.setAlignmentX(Component.RIGHT_ALIGNMENT);
         btnMenu.setAlignmentY(Component.TOP_ALIGNMENT);
         btnMenu.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -260,7 +260,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                 GUITools.showPopup(popup, SwingConstants.WEST);
             }
         });
-        btnMenu.setEnabled(!prescription.isClosed());
+//        btnMenu.setEnabled(!prescription.isClosed());
         cptitle.getRight().add(btnMenu);
 
         cpPres.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
@@ -293,9 +293,9 @@ public class PnlPrescription extends NursingRecordsPanel {
         Icon icon;
 
         if (mypres.isClosed()) {
-            icon = SYSConst.icon22ledBlueOff;
+            icon = SYSConst.icon22stopSign;
         } else if (mypres.isOnDemand()) {
-            icon = SYSConst.icon22ledPurpleOff;
+            icon = null;
             if (mypres.hasMed()) {
                 MedInventory inventory = TradeFormTools.getInventory4TradeForm(mypres.getResident(), mypres.getTradeForm());
                 MedStock stockInUse = MedStockTools.getStockInUse(inventory);
@@ -305,12 +305,12 @@ public class PnlPrescription extends NursingRecordsPanel {
                     if (MedStockTools.getSum(stockInUse).compareTo(BigDecimal.ZERO) <= 0) {
                         icon = SYSConst.icon22ledYellowOn;
                     } else {
-                        icon = SYSConst.icon22ledPurpleOn;
+                        icon = null;
                     }
                 }
             }
         } else {
-            icon = SYSConst.icon22ledGreenOff;
+            icon = null;
             if (mypres.hasMed()) {
                 MedInventory inventory = TradeFormTools.getInventory4TradeForm(mypres.getResident(), mypres.getTradeForm());
                 MedStock stockInUse = MedStockTools.getStockInUse(inventory);
@@ -320,7 +320,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                     if (MedStockTools.getSum(stockInUse).compareTo(BigDecimal.ZERO) <= 0) {
                         icon = SYSConst.icon22ledYellowOn;
                     } else {
-                        icon = SYSConst.icon22ledGreenOn;
+                        icon = null;
                     }
                 }
             }
@@ -1127,7 +1127,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                     });
                 }
             });
-//            btnDiscontinue.setEnabled(!prescription.isClosed());
+            btnStop.setEnabled(!prescription.isClosed());
             pnlMenu.add(btnStop);
 
 
@@ -1416,25 +1416,29 @@ public class PnlPrescription extends NursingRecordsPanel {
             btnFiles.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgFiles(prescription, new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            EntityManager em = OPDE.createEM();
-                            Prescription myPrescription = em.merge(prescription);
-                            em.refresh(myPrescription);
-                            em.close();
-                            lstPrescriptions.remove(prescription);
-                            lstPrescriptions.add(myPrescription);
-                            Collections.sort(lstPrescriptions);
-                            final CollapsiblePane myCP = createCP4(myPrescription);
-                            buildPanel();
-                            GUITools.flashBackground(myCP, Color.YELLOW, 2);
-                        }
-                    });
+                    Closure closure = null;
+                    if (!prescription.isClosed()) {
+                        closure = new Closure() {
+                            @Override
+                            public void execute(Object o) {
+                                EntityManager em = OPDE.createEM();
+                                Prescription myPrescription = em.merge(prescription);
+                                em.refresh(myPrescription);
+                                em.close();
+                                lstPrescriptions.remove(prescription);
+                                lstPrescriptions.add(myPrescription);
+                                Collections.sort(lstPrescriptions);
+                                final CollapsiblePane myCP = createCP4(myPrescription);
+                                buildPanel();
+                                GUITools.flashBackground(myCP, Color.YELLOW, 2);
+                            }
+                        };
+                    }
+                    new DlgFiles(prescription, closure);
                 }
             });
 
-            btnFiles.setEnabled(!prescription.isClosed());
+//            btnFiles.setEnabled(!prescription.isClosed());
             if (prescription.getAttachedFilesConnections().size() > 0) {
                 JLabel lblNum = new JLabel(Integer.toString(prescription.getAttachedFilesConnections().size()), SYSConst.icon16greenStar, SwingConstants.CENTER);
                 lblNum.setFont(SYSConst.ARIAL10BOLD);

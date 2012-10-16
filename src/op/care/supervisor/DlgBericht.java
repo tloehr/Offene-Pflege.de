@@ -24,7 +24,7 @@
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  * 
  */
-package op.care.uebergabe;
+package op.care.supervisor;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -32,8 +32,8 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 import com.toedter.calendar.*;
 import entity.Homes;
-import entity.Handover2User;
-import entity.Handovers;
+import entity.reports.Handover2User;
+import entity.reports.Handovers;
 import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
@@ -55,13 +55,13 @@ public class DlgBericht extends javax.swing.JDialog {
 
     private Homes einrichtung;
     public static final String internalClassID = "nursingrecords.handover.newreport";
-    private PnlUebergabe parent;
+    private PnlHandover parent;
     private boolean logout = false;
 
     /**
      * Creates new form DlgReport
      */
-    public DlgBericht(PnlUebergabe parent, Homes einrichtung, Date datum) {
+    public DlgBericht(PnlHandover parent, Homes einrichtung, Date datum) {
         super(parent.getPflege(), false);
 //        ithis.parent = parent;
             this.einrichtung = einrichtung;

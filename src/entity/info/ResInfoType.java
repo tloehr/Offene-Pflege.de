@@ -62,6 +62,9 @@ public class ResInfoType implements Serializable {
     private Integer status;
     @Column(name = "IntervalMode")
     private Short intervalMode;
+    @Version
+    @Column(name = "version")
+    private Long version;
 
     // ==
     // N:1 Relationen

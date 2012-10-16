@@ -24,9 +24,11 @@
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  * 
  */
-package op.care.uebergabe;
+package op.care.supervisor;
 
 import entity.*;
+import entity.reports.Handovers;
+import entity.reports.HandoversTools;
 import entity.reports.NReport;
 import entity.reports.NReportTools;
 import op.OPDE;

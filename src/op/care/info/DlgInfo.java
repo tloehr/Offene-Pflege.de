@@ -107,7 +107,7 @@ public class DlgInfo extends MyJDialog {
     private void btnOKActionPerformed(ActionEvent e) {
 
         if (pnlPIT != null) {
-            OPDE.debug(pnlPIT.getPIT());
+//            OPDE.debug(pnlPIT.getPIT());
             resInfo.setFrom(pnlPIT.getPIT());
         }
 
@@ -115,7 +115,7 @@ public class DlgInfo extends MyJDialog {
             StringWriter writer = new StringWriter();
             content.store(writer, "[" + resInfo.getResInfoType().getID() + "] " + resInfo.getResInfoType().getShortDescription());
             resInfo.setProperties(writer.toString());
-            OPDE.debug(writer.toString());
+//            OPDE.debug(writer.toString());
             writer.close();
         } catch (IOException e1) {
             OPDE.fatal(e1);
@@ -241,7 +241,7 @@ public class DlgInfo extends MyJDialog {
         BigDecimal scalesum = BigDecimal.ZERO;
 
         for (String bgName : scaleButtonGroups) {
-            OPDE.debug(components.toString());
+//            OPDE.debug(components.toString());
             ButtonGroup bg = (ButtonGroup) components.get(bgName);
             Enumeration e = bg.getElements();
             boolean found = false;
@@ -282,7 +282,7 @@ public class DlgInfo extends MyJDialog {
             OPDE.fatal(ex);
         }
 
-        OPDE.debug(content.toString());
+//        OPDE.debug(content.toString());
 
         for (Object key : components.keySet()) {
             Object entry = components.get(key);

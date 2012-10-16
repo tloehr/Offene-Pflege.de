@@ -33,7 +33,7 @@ public class NR2User implements Serializable, Comparable<NR2User> {
     @JoinColumn(name = "PBID", referencedColumnName = "PBID")
     @ManyToOne
     private NReport bericht;
-    @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
+    @JoinColumn(name = "UKennung", referencedColumnName = "UID")
     @ManyToOne
     private Users user;
 

@@ -1,0 +1,984 @@
+/*
+ * OffenePflege
+ * Copyright (C) 2006-2012 Torsten Löhr
+ * This program is free software; you can redistribute it and/or modify it under the terms of the 
+ * GNU General Public License V2 as published by the Free Software Foundation
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even 
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General 
+ * Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with this program; if not, write to 
+ * the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ * www.offene-pflege.de
+ * ------------------------ 
+ * Auf deutsch (freie Übersetzung. Rechtlich gilt die englische Version)
+ * Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU General Public License, 
+ * wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, gemäß Version 2 der Lizenz.
+ *
+ * Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber 
+ * OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN 
+ * BESTIMMTEN ZWECK. Details finden Sie in der GNU General Public License.
+ *
+ * Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, 
+ * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
+ * 
+ */
+package op.care.supervisor;
+
+import com.jidesoft.pane.CollapsiblePane;
+import com.jidesoft.pane.CollapsiblePanes;
+import com.jidesoft.pane.event.CollapsiblePaneAdapter;
+import com.jidesoft.pane.event.CollapsiblePaneEvent;
+import com.jidesoft.popup.JidePopup;
+import com.jidesoft.swing.JideBoxLayout;
+import com.jidesoft.swing.JideButton;
+import entity.files.SYSFilesTools;
+import entity.info.Resident;
+import entity.reports.Handovers;
+import entity.reports.NReport;
+import entity.reports.NReportTAGS;
+import entity.reports.NReportTools;
+import op.FrmMain;
+import op.OPDE;
+import op.tools.*;
+import org.jdesktop.swingx.VerticalLayout;
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyVetoException;
+import java.text.DateFormat;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+/**
+ * <I>20.06.2007 - WishID:43</I>
+ *
+ * @author tloehr
+ */
+public class PnlHandover extends NursingRecordsPanel {
+    public static final String internalClassID = "nursingrecords.handover";
+
+    private JScrollPane jspSearch;
+    private CollapsiblePanes searchPanes;
+
+    private HashMap<String, CollapsiblePane> cpMap;
+    private HashMap<String, JPanel> contentmap;
+    private HashMap<String, ArrayList<Handovers>> cacheHO;
+    private HashMap<String, ArrayList<NReport>> cacheNR;
+    private HashMap<NReport, JPanel> linemap;
+    HashMap<DateMidnight, String> hollidays;
+
+    private JToggleButton tbInactive;
+    private JideButton btnBWDied, btnBWMovedOut, btnBWisAway, btnBWisBack;
+    private Color[] color1, color2;
+
+    private final int TAB_DATE = 0;
+    private final int TAB_SEARCH = 1;
+    private ListSelectionListener lsl;
+    private boolean initPhase;
+    private long selectedTBID = 0;
+    private FrmMain pflege;
+    private String classname;
+    //    private OCSec ocs;
+    private javax.swing.JFrame parent;
+    private JPopupMenu menu;
+
+    Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
+    Format weekFormater = new SimpleDateFormat("w yyyy");
+    Format dayFormat = new SimpleDateFormat("EEEE, dd.MM.yyyy");
+
+
+    /**
+     * Creates new form PnlHandover
+     */
+    public PnlHandover(FrmMain pflege) {
+        this.pflege = pflege;
+        this.initPhase = true;
+        this.classname = this.getClass().getName();
+        this.parent = pflege;
+//        ocs = OPDE.getOCSec();
+        initComponents();
+        initPanel();
+//        HomesTools.setComboBox(cmbEinrichtung);
+//        jdcDatum.setDate(SYSCalendar.today_date());
+
+        this.initPhase = false;
+        reloadDisplay();
+    }
+
+    public FrmMain getPflege() {
+        return pflege;
+    }
+
+    @Override
+    public void reload() {
+        reloadDisplay();
+    }
+
+    private void initPanel() {
+
+    }
+
+    @Override
+    public void switchResident(Resident resident) {
+    }
+
+    /**
+     * This method is called from within the constructor to
+     * initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is
+     * always regenerated by the Form Editor.
+     */
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+        jspHandover = new JScrollPane();
+        cpsHandover = new CollapsiblePanes();
+
+        //======== this ========
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+
+        //======== jspHandover ========
+        {
+
+            //======== cpsHandover ========
+            {
+                cpsHandover.setLayout(new BoxLayout(cpsHandover, BoxLayout.X_AXIS));
+            }
+            jspHandover.setViewportView(cpsHandover);
+        }
+        add(jspHandover);
+    }// </editor-fold>//GEN-END:initComponents
+
+//    private void tblUebergabePropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_tblUebergabePropertyChange
+//    }//GEN-LAST:event_tblUebergabePropertyChange
+//
+//    private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
+//        btnNew.setEnabled(false);
+//        new DlgBericht(this, (Homes) cmbEinrichtung.getSelectedItem(), jdcDatum.getDate());
+//    }//GEN-LAST:event_btnNewActionPerformed
+//
+//    private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
+////        OPDE.ocmain.lockOC();
+//    }//GEN-LAST:event_btnLogoutActionPerformed
+//
+//    private void btnConfirmAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmAllActionPerformed
+//        TMUebergabe tm = (TMUebergabe) tblUebergabe.getModel();
+//        if (tm.getRowCount() > 0) {
+//            ConfirmWorker work = new ConfirmWorker(tm.getBerichte());
+//            btnConfirmAll.setEnabled(false);
+//            work.start();
+//        }
+//    }//GEN-LAST:event_btnConfirmAllActionPerformed
+//
+//    /**
+//     * Innere Hilfsklasse. Mit ihrer Hilfe erscheint ein kleines Fenster mit einem Progressbar,
+//     * während die Bestätigungsprozedur abläuft. Dieses Fenster kann man abbrechen,
+//     * dann werden auch die bisherigen Bestätigung zurück gerollt.
+//     */
+//    class ConfirmWorker extends Thread {
+//
+//        private ArrayList berichte;
+//        private ProgressMonitor pm;
+//
+//        public ConfirmWorker(ArrayList berichte) {
+//            super();
+//            this.berichte = berichte;
+//            pm = new ProgressMonitor(pflege, "Bitte warten", "Protokoll wird bestätigt.", 0, berichte.size());
+//            pm.setMillisToDecideToPopup(0);
+//            pm.setMillisToPopup(0);
+//        }
+//
+//        public void run() {
+//            confirm();
+//        }
+//
+//        private void setProgressFromWorker(final int progress) {
+//            try {
+//                javax.swing.SwingUtilities.invokeAndWait(new Runnable() {
+//
+//                    public void run() {
+//                        pm.setProgress(progress);
+//                    }
+//                });
+//            } catch (Exception e) {
+//                // oh well.
+//            }
+//        }
+//
+//        private void confirm() {
+//            int max = berichte.size();
+//
+//
+//            EntityManager em = OPDE.createEM();
+//
+//
+//            try {
+//                em.getTransaction().begin();
+//                for (int row = 0; row < max; row++) {
+//                    setProgressFromWorker(row);
+//                    Object[] bericht = (Object[]) berichte.get(row);
+//                    if (((Long) bericht[TMUebergabe.LIST_ACKNOWLEDGED]).longValue() == 0) { // aktueller User hat diesen Bericht noch nicht bestätigt.
+//                        if (bericht[TMUebergabe.LIST_BERICHT] instanceof Handovers) {
+//                            Handovers uebergabe = (Handovers) bericht[TMUebergabe.LIST_BERICHT];
+//                            uebergabe.getUsersAcknowledged().add(new Handover2User(uebergabe, OPDE.getLogin().getUser()));
+//                            em.merge(uebergabe);
+//                        } else {
+//                            NReport pflegebericht = (NReport) bericht[TMUebergabe.LIST_BERICHT];
+//                            pflegebericht.getUsersAcknowledged().add(new NR2User(pflegebericht, OPDE.getLogin().getUser()));
+//                            em.merge(pflegebericht);
+//                        }
+//                    }
+//                    if (pm.isCanceled()) {
+//                        throw new Exception("Bestätigung abgebrochen.");
+//                    }
+//                }
+//                em.getTransaction().commit();
+//            } catch (Exception e) {
+//                em.getTransaction().rollback();
+//            } finally {
+//                em.close();
+//            }
+//            btnConfirmAll.setEnabled(true);
+//            reloadTable();
+//            pm.setProgress(max);
+//            //pm.close();
+//            try {
+//                Thread.currentThread().sleep(500);
+//            } catch (Exception e) {
+//            }
+//        }
+//    }
+
+
+    private void prepareSearchArea() {
+
+        searchPanes = new CollapsiblePanes();
+        searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
+        jspSearch.setViewportView(searchPanes);
+
+        JPanel mypanel = new JPanel();
+        mypanel.setLayout(new VerticalLayout());
+        mypanel.setBackground(Color.WHITE);
+
+        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
+        searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
+        searchPane.setCollapsible(false);
+
+        try {
+            searchPane.setCollapsed(false);
+        } catch (PropertyVetoException e) {
+            OPDE.error(e);
+        }
+
+//        GUITools.addAllComponents(mypanel, addCommands());
+//        GUITools.addAllComponents(mypanel, addFilters());
+
+        searchPane.setContentPane(mypanel);
+
+        searchPanes.add(searchPane);
+        searchPanes.addExpansion();
+
+
+    }
+
+
+//    private void jspUebergabeComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspUebergabeComponentResized
+//        JScrollPane jsp = (JScrollPane) evt.getComponent();
+//        Dimension dim = jsp.getSize();
+//        // Größe der Text Spalten im DFN ändern.
+//        // Summe der fixen Spalten  = 175 + ein bisschen
+//        int textWidth = dim.width - 200 - 200 - 50;
+//        TableColumnModel tcm1 = tblUebergabe.getColumnModel();
+//        if (tcm1.getColumnCount() < 3) {
+//            return;
+//        }
+//
+//        tcm1.getColumn(TMUebergabe.COL_PIT).setPreferredWidth(200);
+//        tcm1.getColumn(TMUebergabe.COL_INFO).setPreferredWidth(200);
+//        tcm1.getColumn(TMUebergabe.COL_HTML).setPreferredWidth(textWidth);
+////        tcm1.getColumn(TMUebergabe.COL_ACKN).setPreferredWidth(50);
+//
+//        tcm1.getColumn(TMUebergabe.COL_PIT).setHeaderValue("Datum");
+//        tcm1.getColumn(TMUebergabe.COL_INFO).setHeaderValue("Info");
+//        tcm1.getColumn(TMUebergabe.COL_HTML).setHeaderValue("Bericht");
+////        tcm1.getColumn(TMUebergabe.COL_ACKN).setHeaderValue("Gesehen");
+//
+//    }//GEN-LAST:event_jspUebergabeComponentResized
+
+//    private void cmbEinrichtungItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbEinrichtungItemStateChanged
+//        if (initPhase) {
+//            return;
+//        }
+//        reloadTable();
+//    }//GEN-LAST:event_cmbEinrichtungItemStateChanged
+//
+//    private void jdcDatumPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jdcDatumPropertyChange
+//        if (initPhase) {
+//            return;
+//        }
+//        if (!evt.getPropertyName().equals("date")) {
+//            return;
+//        }
+//        SYSCalendar.checkJDC((JDateChooser) evt.getSource());
+//        reloadTable();
+//    }//GEN-LAST:event_jdcDatumPropertyChange
+//
+//    private void tblUebergabeMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblUebergabeMousePressed
+//        Point p = evt.getPoint();
+//        ListSelectionModel lsm = tblUebergabe.getSelectionModel();
+//
+//        int row = tblUebergabe.rowAtPoint(p);
+//        lsm.setSelectionInterval(row, row);
+//
+//        Object bericht = tblUebergabe.getModel().getValueAt(lsm.getLeadSelectionIndex(), TMUebergabe.COL_BERICHT);
+//
+//        if (evt.isPopupTrigger()) {
+//
+////            JMenuItem itemPopupPrint = new JMenuItem("Markierte Berichte drucken");
+////            itemPopupPrint.addActionListener(new java.awt.event.ActionListener() {
+////
+////                public void actionPerformed(java.awt.event.ActionEvent evt) {
+////                    int[] sel = tblTB.getSelectedRows();
+////                    printBericht(sel);
+////                }
+////            });
+////            menu.add(itemPopupPrint);
+//
+////            itemPopupEdit.setEnabled(OPDE.internalClasses.userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
+//
+//            menu = new JPopupMenu();
+//            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.USER1)) {
+//                DateFormat df = DateFormat.getDateTimeInstance();
+//                JMenu menuListAck = new JMenu("Bestätigungen");
+//                if (bericht instanceof Handovers) {
+//                    if (((Handovers) bericht).getUsersAcknowledged().isEmpty()) {
+//                        menuListAck.add(new JMenuItem("bisher keine Bestätigungen"));
+//                    } else {
+//                        Iterator<Handover2User> it = ((Handovers) bericht).getUsersAcknowledged().iterator();
+//                        while (it.hasNext()) {
+//                            Handover2User u2u = it.next();
+//                            menuListAck.add(new JMenuItem(u2u.getUser().getFullname() + " <b>[" + df.format(u2u.getPit()) + "]</b>"));
+//                        }
+//                    }
+//                } else {
+//                    if (((NReport) bericht).getUsersAcknowledged().isEmpty()) {
+//                        menuListAck.add(new JMenuItem("bisher keine Bestätigungen"));
+//                    } else {
+//                        ArrayList<NR2User> usersackn = new ArrayList<NR2User>(((NReport) bericht).getUsersAcknowledged());
+//                        Collections.sort(usersackn);
+//                        Iterator<NR2User> it = usersackn.iterator();
+//                        while (it.hasNext()) {
+//                            NR2User p2u = it.next();
+//                            menuListAck.add(new JMenuItem(HTMLTools.toHTML(p2u.getUser().getFullname() + " <b>[" + df.format(p2u.getPit()) + "]</b>")));
+//                        }
+//                    }
+//                }
+//                menu.add(menuListAck);
+//            }
+//
+//            menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
+//        }
+//    }//GEN-LAST:event_tblUebergabeMousePressed
+
+//    private void btnTodayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTodayActionPerformed
+//        jdcDatum.setDate(new Date());
+//    }//GEN-LAST:event_btnTodayActionPerformed
+//
+//    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+//        jdcDatum.setDate(SYSCalendar.addDate(jdcDatum.getDate(), -1));
+//    }//GEN-LAST:event_btnBackActionPerformed
+//
+//    private void btnLastLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLastLoginActionPerformed
+//        // Der Tag der letzten Abmeldung
+//        //jdcDatum.setDate(SYSLoginTools.getPreviousLogin(OPDE.getLogin()).getLogout());
+//
+//        // Hier muss erst die Infratstruktur für die neue anmeldung rein.
+//        // Wir brauchen eine HOSTS tabelle, die dann auf Logins verweist.
+//        // die logins wiederum müssen die internal classes auflisten, die gerade offen sind
+//        // der Proof of Life muss sich auf den Host beziehen.
+//        // die collision domains müssen mit in die internalClasses mit rein.
+//        // die Host kennung kann durch die localproperties überschrieben werden.
+//        // die Zuordnung welche Maschine welche Station anzeigen soll, findet über die Hosts statt.
+//
+//    }//GEN-LAST:event_btnLastLoginActionPerformed
+//
+//    private void txtSuche1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSuche1ActionPerformed
+////        if (!txtSuche.equals("")) {
+////            reloadTable();
+////        }
+//    }//GEN-LAST:event_txtSuche1ActionPerformed
+//
+//    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
+////        if (!txtSuche.equals("")) {
+////            reloadTable();
+////        }
+//    }//GEN-LAST:event_btnSearchActionPerformed
+//
+//    private void pnlFilterStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_pnlFilterStateChanged
+//        if (pnlFilter.getSelectedIndex() == TAB_SEARCH) {
+//            //txtSuche.requestFocus();
+//
+//
+//        }
+//    }//GEN-LAST:event_pnlFilterStateChanged
+
+    @Override
+    public void cleanup() {
+        contentmap.clear();
+        cpMap.clear();
+        cpsHandover.removeAll();
+        linemap.clear();
+        cacheHO.clear();
+        cacheNR.clear();
+        hollidays.clear();
+    }
+
+
+    private void reloadDisplay() {
+        /***
+         *               _                 _ ____  _           _
+         *      _ __ ___| | ___   __ _  __| |  _ \(_)___ _ __ | | __ _ _   _
+         *     | '__/ _ \ |/ _ \ / _` |/ _` | | | | / __| '_ \| |/ _` | | | |
+         *     | | |  __/ | (_) | (_| | (_| | |_| | \__ \ |_) | | (_| | |_| |
+         *     |_|  \___|_|\___/ \__,_|\__,_|____/|_|___/ .__/|_|\__,_|\__, |
+         *                                              |_|            |___/
+         */
+
+        contentmap.clear();
+        cpMap.clear();
+        linemap.clear();
+        cacheHO.clear();
+        cacheNR.clear();
+
+        final boolean withworker = false;
+        if (withworker) {
+//            initPhase = true;
+//
+//            OPDE.getMainframe().setBlocked(true);
+//            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+//
+//            SwingWorker worker = new SwingWorker() {
+//
+//                @Override
+//                protected Object doInBackground() throws Exception {
+//
+//                    Pair<DateTime, DateTime> minmax = NReportTools.getMinMax(resident);
+//                    hollidays = SYSCalendar.getHollidays(minmax.getFirst().getYear(), minmax.getSecond().getYear());
+//
+//                    if (minmax != null) {
+//                        DateMidnight start = minmax.getFirst().toDateMidnight().dayOfMonth().withMinimumValue();
+//                        DateMidnight end = resident.isActive() ? new DateMidnight() : minmax.getSecond().toDateMidnight().dayOfMonth().withMinimumValue();
+//                        for (int year = end.getYear(); year >= start.getYear(); year--) {
+//                            createCP4Year(year, start, end);
+//                        }
+//                    }
+//
+//                    return null;
+//                }
+//
+//                @Override
+//                protected void done() {
+//                    expandTheLast2Weeks();
+//
+//                    buildPanel();
+//                    initPhase = false;
+//                    OPDE.getDisplayManager().setProgressBarMessage(null);
+//                    OPDE.getMainframe().setBlocked(false);
+//                }
+//            };
+//            worker.execute();
+
+        } else {
+            initPhase = true;
+            Pair<DateTime, DateTime> minmax = NReportTools.getMinMax();
+            hollidays = SYSCalendar.getHollidays(minmax.getFirst().getYear(), minmax.getSecond().getYear());
+            if (minmax != null) {
+                DateMidnight start = minmax.getFirst().toDateMidnight().dayOfMonth().withMinimumValue();
+                DateMidnight end = new DateMidnight();
+                for (int year = end.getYear(); year >= start.getYear(); year--) {
+                    createCP4Year(year, start, end);
+                }
+            }
+
+//            expandTheLast2Weeks();
+
+
+//            for (NReport report : reportList) {
+//                DateMidnight dateMidnight = new DateMidnight(report.getPit());
+//                if (!dayMap.containsKey(dateMidnight)) {
+//                    dayMap.put(dateMidnight, new ArrayList<NReport>());
+//                }
+//                dayMap.get(dateMidnight).add(report);
+//                reportMap.put(report, createCP4Month(report));
+//            }
+
+            buildPanel();
+            initPhase = false;
+        }
+
+    }
+
+    private CollapsiblePane createCP4Year(final int year, DateMidnight min, DateMidnight max) {
+        /***
+         *                          _        ____ ____     __             __   _______    _    ____
+         *       ___ _ __ ___  __ _| |_ ___ / ___|  _ \   / _| ___  _ __  \ \ / / ____|  / \  |  _ \
+         *      / __| '__/ _ \/ _` | __/ _ \ |   | |_) | | |_ / _ \| '__|  \ V /|  _|   / _ \ | |_) |
+         *     | (__| | |  __/ (_| | ||  __/ |___|  __/  |  _| (_) | |      | | | |___ / ___ \|  _ <
+         *      \___|_|  \___|\__,_|\__\___|\____|_|     |_|  \___/|_|      |_| |_____/_/   \_\_| \_\
+         *
+         */
+
+        final DateMidnight start = new DateMidnight(year, 1, 1).isBefore(min.dayOfMonth().withMinimumValue()) ? min.dayOfMonth().withMinimumValue() : new DateMidnight(year, 1, 1);
+        final DateMidnight end = new DateMidnight(year, 12, 31).isAfter(max.dayOfMonth().withMaximumValue()) ? max.dayOfMonth().withMaximumValue() : new DateMidnight(year, 12, 31);
+
+        final String keyYear = Integer.toString(year) + ".year";
+        if (!cpMap.containsKey(keyYear)) {
+            cpMap.put(keyYear, new CollapsiblePane());
+            try {
+                cpMap.get(keyYear).setCollapsed(true);
+            } catch (PropertyVetoException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+
+        }
+
+        final CollapsiblePane cpYear = cpMap.get(keyYear);
+
+
+        String title = "<html><font size=+1>" +
+                "<b>" + Integer.toString(year) + "</b>" +
+                "</font></html>";
+
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    cpYear.setCollapsed(!cpYear.isCollapsed());
+                } catch (PropertyVetoException pve) {
+                    // BAH!
+                }
+            }
+        });
+
+
+        cpYear.setTitleLabelComponent(cptitle.getMain());
+        cpYear.setSlidingDirection(SwingConstants.SOUTH);
+        cpYear.setBackground(SYSConst.orange1[SYSConst.medium3]);
+        cpYear.setOpaque(true);
+
+        /***
+         *           _ _      _            _
+         *       ___| (_) ___| | _____  __| |   ___  _ __    _   _  ___  __ _ _ __
+         *      / __| | |/ __| |/ / _ \/ _` |  / _ \| '_ \  | | | |/ _ \/ _` | '__|
+         *     | (__| | | (__|   <  __/ (_| | | (_) | | | | | |_| |  __/ (_| | |
+         *      \___|_|_|\___|_|\_\___|\__,_|  \___/|_| |_|  \__, |\___|\__,_|_|
+         *                                                   |___/
+         */
+        cpYear.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+            @Override
+            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+                JPanel pnlContent = new JPanel(new VerticalLayout());
+
+                // somebody clicked on the year
+                for (DateMidnight month = end; month.compareTo(start) >= 0; month = month.minusMonths(1)) {
+                    pnlContent.add(createCP4Month(month));
+                }
+
+                cpYear.setContentPane(pnlContent);
+
+            }
+        });
+//        cpYear.setBackground(getColor(vtype, SYSConst.light4));
+
+        if (!cpYear.isCollapsed()) {
+            JPanel pnlContent = new JPanel(new VerticalLayout());
+
+            for (DateMidnight month = end; month.compareTo(start) >= 0; month = month.minusMonths(1)) {
+                pnlContent.add(createCP4Month(month));
+            }
+
+            cpYear.setContentPane(pnlContent);
+            cpYear.setOpaque(false);
+        }
+
+        cpYear.setHorizontalAlignment(SwingConstants.LEADING);
+        cpYear.setOpaque(false);
+
+        return cpYear;
+    }
+
+    private JPanel createWeekContentPanel4(DateMidnight week) {
+        JPanel pnlWeek = new JPanel(new VerticalLayout());
+
+        pnlWeek.setOpaque(false);
+
+        DateMidnight now = new DateMidnight();
+
+        boolean sameWeek = now.dayOfWeek().withMaximumValue().equals(week.dayOfWeek().withMaximumValue());
+
+        final DateMidnight start = sameWeek ? now : week.dayOfWeek().withMaximumValue();
+        final DateMidnight end = week.dayOfWeek().withMinimumValue();
+
+        for (DateMidnight day = start; end.compareTo(day) <= 0; day = day.minusDays(1)) {
+            pnlWeek.add(createCP4Day(day));
+        }
+
+        return pnlWeek;
+    }
+
+
+    private CollapsiblePane createCP4Day(final DateMidnight day) {
+        final String key = DateFormat.getDateInstance().format(day.toDate());
+        if (!cpMap.containsKey(key)) {
+            cpMap.put(key, new CollapsiblePane());
+//            cpMap.get(key).setStyle(CollapsiblePane.PLAIN_STYLE);
+            try {
+                cpMap.get(key).setCollapsed(true);
+            } catch (PropertyVetoException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+        }
+        final CollapsiblePane cpDay = cpMap.get(key);
+        String titleDay = "<html><font size=+1>" +
+                dayFormat.format(day.toDate()) +
+                SYSTools.catchNull(hollidays.get(day), " (", ")") +
+                "</font></html>";
+        final DefaultCPTitle titleCPDay = new DefaultCPTitle(titleDay, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    cpDay.setCollapsed(!cpDay.isCollapsed());
+                } catch (PropertyVetoException pve) {
+                    // BAH!
+                }
+            }
+        });
+
+        final JButton btnPrintDay = new JButton(SYSConst.icon22print2);
+        btnPrintDay.setPressedIcon(SYSConst.icon22print2Pressed);
+        btnPrintDay.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnPrintDay.setContentAreaFilled(false);
+        btnPrintDay.setBorder(null);
+        btnPrintDay.setToolTipText(OPDE.lang.getString("misc.tooltips.btnprintday"));
+        btnPrintDay.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Day(resident, day), false, true, null, null), true);
+            }
+        });
+        titleCPDay.getRight().add(btnPrintDay);
+
+        cpDay.setTitleLabelComponent(titleCPDay.getMain());
+        cpDay.setSlidingDirection(SwingConstants.SOUTH);
+
+        if (hollidays.containsKey(day)) {
+            cpDay.setBackground(SYSConst.red1[SYSConst.medium1]);
+        } else if (day.getDayOfWeek() == DateTimeConstants.SATURDAY || day.getDayOfWeek() == DateTimeConstants.SUNDAY) {
+            cpDay.setBackground(SYSConst.red1[SYSConst.light3]);
+        } else {
+            cpDay.setBackground(SYSConst.orange1[SYSConst.light3]);
+        }
+        cpDay.setOpaque(true);
+
+        cpDay.setHorizontalAlignment(SwingConstants.LEADING);
+        cpDay.setStyle(CollapsiblePane.PLAIN_STYLE);
+        cpDay.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+            @Override
+            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+                cpDay.setContentPane(createContentPanel4Day(day));
+            }
+        });
+
+        if (!cpDay.isCollapsed()) {
+            cpDay.setContentPane(createContentPanel4Day(day));
+        }
+
+        return cpDay;
+    }
+
+     private CollapsiblePane createCP4Week(final DateMidnight week) {
+        final String key = weekFormater.format(week.toDate()) + ".week";
+        if (!cpMap.containsKey(key)) {
+            cpMap.put(key, new CollapsiblePane());
+            try {
+                cpMap.get(key).setCollapsed(true);
+            } catch (PropertyVetoException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+
+        }
+        final CollapsiblePane cpWeek = cpMap.get(key);
+
+        String title = "<html><font size=+1><b>" +
+                DateFormat.getDateInstance(DateFormat.SHORT).format(week.dayOfWeek().withMaximumValue().toDate()) + " - " +
+                DateFormat.getDateInstance(DateFormat.SHORT).format(week.dayOfWeek().withMinimumValue().toDate()) +
+                " (" +
+                OPDE.lang.getString("misc.msg.weekinyear") +
+                week.getWeekOfWeekyear() +
+                ")" +
+                "</b>" +
+                "</font></html>";
+
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    cpWeek.setCollapsed(!cpWeek.isCollapsed());
+                } catch (PropertyVetoException pve) {
+                    // BAH!
+                }
+            }
+        });
+
+        GUITools.addExpandCollapseButtons(cpWeek, cptitle.getRight());
+
+        final JButton btnPrintWeek = new JButton(SYSConst.icon22print2);
+        btnPrintWeek.setPressedIcon(SYSConst.icon22print2Pressed);
+        btnPrintWeek.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnPrintWeek.setContentAreaFilled(false);
+        btnPrintWeek.setBorder(null);
+        btnPrintWeek.setToolTipText(OPDE.lang.getString("misc.tooltips.btnprintweek"));
+        btnPrintWeek.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Week(resident, week), false, true, null, null), true);
+            }
+        });
+        cptitle.getRight().add(btnPrintWeek);
+
+        cpWeek.setTitleLabelComponent(cptitle.getMain());
+        cpWeek.setSlidingDirection(SwingConstants.SOUTH);
+
+        cpWeek.setBackground(SYSConst.orange1[SYSConst.medium1]);
+        cpWeek.setOpaque(false);
+        cpWeek.setHorizontalAlignment(SwingConstants.LEADING);
+
+        cpWeek.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+            @Override
+            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+                cpWeek.setContentPane(createWeekContentPanel4(week));
+            }
+        });
+
+        if (!cpWeek.isCollapsed()) {
+            cpWeek.setContentPane(createWeekContentPanel4(week));
+        }
+
+
+        return cpWeek;
+    }
+
+    private JPanel createContentPanel4Day(DateMidnight day) {
+//        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage("misc.msg.wait", progress, progressMax));
+//        progress++;
+
+        final String key = DateFormat.getDateInstance().format(day.toDate());
+        if (contentmap.containsKey(key)) {
+            return contentmap.get(key);
+        }
+        final JPanel dayPanel = new JPanel(new VerticalLayout());
+        dayPanel.setOpaque(false);
+        if (!valuecache.containsKey(key)) {
+            if (cmbTags.getSelectedIndex() > 0) {
+                valuecache.put(key, NReportTools.getNReports4Tags(resident, day, (NReportTAGS) cmbTags.getSelectedItem()));
+            } else {
+                valuecache.put(key, NReportTools.getNReports4Day(resident, day));
+            }
+        }
+
+        int i = 0; // for zebra pattern
+        for (final NReport nreport : valuecache.get(key)) {
+
+            if (tbShowReplaced.isSelected() || !nreport.isObsolete()) {
+
+                String title = "<html><table border=\"0\">" +
+                        "<tr valign=\"top\">" +
+                        "<td width=\"100\" align=\"left\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
+                        " " + OPDE.lang.getString("misc.msg.Time.short") +
+                        "<br/>" + nreport.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)") +
+                        "</td>" +
+                        "<td width=\"100\" align=\"left\">" + SYSTools.catchNull(NReportTools.getTagsAsHTML(nreport), " [", "]") + "</td>" +
+                        "<td width=\"350\" align=\"left\">" +
+                        (nreport.isObsolete() ? "<s>" : "") +
+                        nreport.getText() +
+                        (nreport.isObsolete() ? "</s>" : "") +
+                        "</td>" +
+                        "<td width=\"200\" align=\"left\">" + nreport.getUser().getFullname() + "</td>" +
+                        "</tr>" +
+                        "</table>" +
+                        "</html>";
+
+                final DefaultCPTitle pnlSingle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), null);
+                if (nreport.isObsolete()) {
+                    pnlSingle.getButton().setIcon(SYSConst.icon22eraser);
+                    pnlSingle.getButton().addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            GUITools.showPopup(GUITools.getHTMLPopup(pnlSingle.getButton(), NReportTools.getInfoAsHTML(nreport)), SwingConstants.NORTH);
+                        }
+                    });
+                }
+                if (nreport.isReplacement()) {
+                    pnlSingle.getButton().setIcon(SYSConst.icon22edited);
+                    pnlSingle.getButton().addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            GUITools.showPopup(GUITools.getHTMLPopup(pnlSingle.getButton(), NReportTools.getInfoAsHTML(nreport)), SwingConstants.NORTH);
+                        }
+                    });
+                }
+
+                /***
+                 *      __  __
+                 *     |  \/  | ___ _ __  _   _
+                 *     | |\/| |/ _ \ '_ \| | | |
+                 *     | |  | |  __/ | | | |_| |
+                 *     |_|  |_|\___|_| |_|\__,_|
+                 *
+                 */
+                final JButton btnMenu = new JButton(SYSConst.icon32menu);
+                btnMenu.setPressedIcon(SYSConst.icon32Pressed);
+                btnMenu.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                btnMenu.setAlignmentY(Component.TOP_ALIGNMENT);
+                btnMenu.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnMenu.setContentAreaFilled(false);
+                btnMenu.setBorder(null);
+                btnMenu.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        JidePopup popup = new JidePopup();
+                        popup.setMovable(false);
+                        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                        popup.setOwner(btnMenu);
+                        popup.removeExcludedComponent(btnMenu);
+                        JPanel pnl = getMenu(nreport);
+                        popup.getContentPane().add(pnl);
+                        popup.setDefaultFocusComponent(pnl);
+
+                        GUITools.showPopup(popup, SwingConstants.WEST);
+                    }
+                });
+                btnMenu.setEnabled(!nreport.isObsolete());
+                pnlSingle.getRight().add(btnMenu);
+
+                JPanel zebra = new JPanel();
+                zebra.setLayout(new BoxLayout(zebra, BoxLayout.LINE_AXIS));
+                zebra.setOpaque(true);
+                if (i % 2 == 0) {
+                    zebra.setBackground(SYSConst.orange1[SYSConst.light2]);
+                } else {
+                    zebra.setBackground(Color.WHITE);
+                }
+                zebra.add(pnlSingle.getMain());
+                i++;
+
+                dayPanel.add(zebra);
+                linemap.put(nreport, pnlSingle.getMain());
+            }
+        }
+        contentmap.put(key, dayPanel);
+        return dayPanel;
+    }
+
+//    public void reloadTable() {
+//        btnNew.setEnabled(true);
+//        // Tagesbericht Liste aktualisieren
+//        ListSelectionModel lsm = tblUebergabe.getSelectionModel();
+//        if (lsl != null) {
+//            lsm.removeListSelectionListener(lsl);
+//
+//        }
+//        lsl = new HandleSelections();
+//
+//        int sort = TMUebergabe.SORT_NAME;
+////        if (rbSortUhrzeit.isSelected()) {
+////            sort = TMUebergabe.SORT_UHRZEIT;
+////        }
+//        if (pnlFilter.getSelectedIndex() == TAB_DATE) {
+//            tblUebergabe.setModel(new TMUebergabe(jdcDatum.getDate(), (Homes) cmbEinrichtung.getSelectedItem()));
+//        } else {
+////            if (!txtSuche.getText().equals("")) {
+////                tblUebergabe.setModel(new TMUebergabe(le.getData(), txtSuche.getText(), sort));
+////            }
+//        }
+//
+//        // Sonst wird der Listenaufbau sehr langsam.
+//        // tblTB.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+//        tblUebergabe.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+//        lsm.addListSelectionListener(lsl);
+//
+//        jspUebergabe.dispatchEvent(new ComponentEvent(jspUebergabe, ComponentEvent.COMPONENT_RESIZED));
+//
+//        tblUebergabe.getColumnModel().getColumn(TMUebergabe.COL_PIT).setCellRenderer(new RNDHTML());
+//
+//        tblUebergabe.getColumnModel().getColumn(TMUebergabe.COL_INFO).setCellRenderer(new RNDHTML());
+//        tblUebergabe.getColumnModel().getColumn(TMUebergabe.COL_HTML).setCellRenderer(new RNDHTML());
+////        tblUebergabe.getColumnModel().getColumn(TMUebergabe.COL_ACKN).setCellRenderer(new RNDUbergabe());
+//
+
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private JScrollPane jspHandover;
+    private CollapsiblePanes cpsHandover;
+    // End of variables declaration//GEN-END:variables
+
+//    class HandleSelections implements ListSelectionListener {
+//
+//        public void valueChanged(ListSelectionEvent lse) {
+//            // Erst reagieren wenn der Auswahl-Vorgang abgeschlossen ist.
+//            TableModel tm = tblUebergabe.getModel();
+//            if (!lse.getValueIsAdjusting()) {
+//                DefaultListSelectionModel lsm = (DefaultListSelectionModel) lse.getSource();
+//                btnConfirmAll.setEnabled(true);
+////                selectedTBID = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMUebergabe.COL_TBID)).longValue();
+////                long qsuid = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMUebergabe.COL_QSUID)).longValue();
+////                btnConfirm.setEnabled(!lsm.isSelectionEmpty() && qsuid == 0);
+//                //btnInfo.setEnabled(ocs.mayEnabled(classname, "btnInfo", !lsm.isSelectionEmpty()));
+//
+//
+//            }
+//        }
+//    }
+//    private boolean mayEnabled(String sjc, boolean desiredState){
+//        HashMap hm = new HashMap();
+//        
+//        if (OPDE.ocgroups.containsKey("admin") || OPDE.ocgroups.containsKey("pdl")) {
+//            hm.put(sjc+".enabled",new Boolean(true));
+//        } else {
+//            hm.put(sjc+".enabled",new Boolean(false));
+//        }
+//        
+//        // Ohne Eintrag gilt die Erlaubnis als erteilt (!containskey)
+//        boolean access = !hm.containsKey(sjc+".enabled") || ((Boolean) hm.get(sjc+".enabled")).booleanValue();
+//        
+//        return (desiredState && access);
+//    }
+
+
+    private void buildPanel() {
+        cpsHandover.removeAll();
+        cpsHandover.setLayout(new JideBoxLayout(cpsHandover, JideBoxLayout.Y_AXIS));
+
+        Pair<DateTime, DateTime> minmax = NReportTools.getMinMax();
+        if (minmax != null) {
+            DateMidnight start = minmax.getFirst().toDateMidnight().dayOfMonth().withMinimumValue();
+            DateMidnight end = new DateMidnight();
+
+            for (int year = end.getYear(); year >= start.getYear(); year--) {
+                final String keyYear = Integer.toString(year) + ".year";
+                cpsHandover.add(cpMap.get(keyYear));
+            }
+        }
+
+        cpsHandover.addExpansion();
+    }
+}

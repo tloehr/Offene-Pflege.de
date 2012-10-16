@@ -27,6 +27,11 @@
 
 package op.care.supervisor;
 
+import java.awt.event.*;
+import java.beans.*;
+import javax.swing.*;
+import javax.swing.GroupLayout;
+import javax.swing.LayoutStyle;
 import com.toedter.calendar.JDateChooser;
 import entity.HomesTools;
 import entity.files.SYSFilesTools;
@@ -86,89 +91,116 @@ public class PnlSchichtleitung extends CleanablePanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        jToolBar1 = new JToolBar();
+        btnPrint = new JButton();
+        jdcDatum = new JDateChooser();
+        cmbEinrichtung = new JComboBox();
+        cmbSchicht = new JComboBox();
+        jspHTML = new JScrollPane();
+        txtHTML = new JTextPane();
+        btnReload = new JButton();
+        jSeparator1 = new JSeparator();
 
-        jSeparator1 = new javax.swing.JSeparator();
-        jToolBar1 = new javax.swing.JToolBar();
-        btnPrint = new javax.swing.JButton();
-        jdcDatum = new com.toedter.calendar.JDateChooser();
-        cmbEinrichtung = new javax.swing.JComboBox();
-        cmbSchicht = new javax.swing.JComboBox();
-        jspHTML = new javax.swing.JScrollPane();
-        txtHTML = new javax.swing.JTextPane();
-        btnReload = new javax.swing.JButton();
+        //======== this ========
 
-        jToolBar1.setFloatable(false);
+        //======== jToolBar1 ========
+        {
+            jToolBar1.setFloatable(false);
 
-        btnPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/printer.png"))); // NOI18N
-        btnPrint.setText("Drucken");
-        btnPrint.setEnabled(false);
-        btnPrint.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnPrintActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnPrint);
+            //---- btnPrint ----
+            btnPrint.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/printer.png")));
+            btnPrint.setText("Drucken");
+            btnPrint.setEnabled(false);
+            btnPrint.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnPrintActionPerformed(e);
+                }
+            });
+            jToolBar1.add(btnPrint);
+        }
 
-        jdcDatum.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                jdcDatumPropertyChange(evt);
-            }
-        });
-
-        cmbEinrichtung.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
-        cmbEinrichtung.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbEinrichtungItemStateChanged(evt);
-            }
-        });
-
-        cmbSchicht.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"Alles", "Nacht, morgens", "Früh", "Spät", "Nacht, abends"}));
-        cmbSchicht.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                cmbSchichtItemStateChanged(evt);
+        //---- jdcDatum ----
+        jdcDatum.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent e) {
+                jdcDatumPropertyChange(e);
             }
         });
 
-        jspHTML.setViewportView(txtHTML);
+        //---- cmbEinrichtung ----
+        cmbEinrichtung.setModel(new DefaultComboBoxModel(new String[] {
+            "Item 1",
+            "Item 2",
+            "Item 3",
+            "Item 4"
+        }));
+        cmbEinrichtung.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                cmbEinrichtungItemStateChanged(e);
+            }
+        });
 
-        btnReload.setBackground(new java.awt.Color(255, 255, 255));
-        btnReload.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/16x16/reload.png"))); // NOI18N
+        //---- cmbSchicht ----
+        cmbSchicht.setModel(new DefaultComboBoxModel(new String[] {
+            "Alles",
+            "Nacht, morgens",
+            "Fr\u00fch",
+            "Sp\u00e4t",
+            "Nacht, abends"
+        }));
+        cmbSchicht.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                cmbSchichtItemStateChanged(e);
+            }
+        });
+
+        //======== jspHTML ========
+        {
+            jspHTML.setViewportView(txtHTML);
+        }
+
+        //---- btnReload ----
+        btnReload.setBackground(Color.white);
+        btnReload.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/reload.png")));
         btnReload.setBorderPainted(false);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
+        GroupLayout layout = new GroupLayout(this);
+        setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jdcDatum, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cmbEinrichtung, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cmbSchicht, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnReload, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(97, Short.MAX_VALUE))
-                        .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 787, Short.MAX_VALUE)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jspHTML, javax.swing.GroupLayout.DEFAULT_SIZE, 747, Short.MAX_VALUE)
-                                .addContainerGap())
+            layout.createParallelGroup()
+                .addGroup(layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jdcDatum, GroupLayout.PREFERRED_SIZE, 219, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(cmbEinrichtung, GroupLayout.PREFERRED_SIZE, 256, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(cmbSchicht, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(btnReload, GroupLayout.PREFERRED_SIZE, 28, GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(560, Short.MAX_VALUE))
+                .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 1205, Short.MAX_VALUE)
+                .addGroup(layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jspHTML, GroupLayout.DEFAULT_SIZE, 1183, Short.MAX_VALUE)
+                    .addContainerGap())
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(19, 19, 19)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                                .addComponent(cmbEinrichtung, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addComponent(cmbSchicht, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addComponent(btnReload))
-                                        .addComponent(jdcDatum, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jspHTML, javax.swing.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE)
-                                .addContainerGap())
+            layout.createParallelGroup()
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addGap(19, 19, 19)
+                    .addGroup(layout.createParallelGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(cmbEinrichtung, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cmbSchicht, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnReload))
+                        .addComponent(jdcDatum, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jspHTML, GroupLayout.DEFAULT_SIZE, 420, Short.MAX_VALUE)
+                    .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -236,15 +268,15 @@ public class PnlSchichtleitung extends CleanablePanel {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnPrint;
-    private javax.swing.JButton btnReload;
-    private javax.swing.JComboBox cmbEinrichtung;
-    private javax.swing.JComboBox cmbSchicht;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JToolBar jToolBar1;
-    private com.toedter.calendar.JDateChooser jdcDatum;
-    private javax.swing.JScrollPane jspHTML;
-    private javax.swing.JTextPane txtHTML;
+    private JToolBar jToolBar1;
+    private JButton btnPrint;
+    private JDateChooser jdcDatum;
+    private JComboBox cmbEinrichtung;
+    private JComboBox cmbSchicht;
+    private JScrollPane jspHTML;
+    private JTextPane txtHTML;
+    private JButton btnReload;
+    private JSeparator jSeparator1;
     // End of variables declaration//GEN-END:variables
 
 }

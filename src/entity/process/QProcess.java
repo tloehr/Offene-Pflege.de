@@ -314,6 +314,10 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         return !isClosed() && revision.before(new DateMidnight().plusDays(6).toDateTime().minusSeconds(1).toDate());
     }
 
+    public boolean isRevisionPastDue() {
+        return !isClosed() && new DateTime(revision).isAfterNow();
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;

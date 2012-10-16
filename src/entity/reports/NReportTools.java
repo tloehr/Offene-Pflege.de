@@ -48,7 +48,58 @@ public class NReportTools {
     }
 
     /**
-     * retrieves the PITs of the first and the last entry in the ResValue table.
+     * retrieves the PITs of the first and the last entries in the NReports and Handovers table.
+     * The values are combined, so that the maximum span is calculated.
+     *
+     * @return
+     */
+    public static Pair<DateTime, DateTime> getMinMax() {
+        long begin = System.currentTimeMillis();
+        Pair<DateTime, DateTime> result = null;
+
+        EntityManager em = OPDE.createEM();
+        Query queryMin1 = em.createQuery("SELECT nr FROM NReport nr ORDER BY nr.pit ASC ");
+        queryMin1.setMaxResults(1);
+
+        Query queryMax1 = em.createQuery("SELECT nr FROM NReport nr ORDER BY nr.pit DESC ");
+        queryMax1.setMaxResults(1);
+
+        Query queryMin2 = em.createQuery("SELECT ho FROM Handovers ho ORDER BY ho.pit ASC ");
+        queryMin2.setMaxResults(1);
+
+        Query queryMax2 = em.createQuery("SELECT ho FROM Handovers ho ORDER BY ho.pit DESC ");
+        queryMax2.setMaxResults(1);
+
+        try {
+            ArrayList<NReport> min1 = new ArrayList<NReport>(queryMin1.getResultList());
+            ArrayList<NReport> max1 = new ArrayList<NReport>(queryMax1.getResultList());
+            ArrayList<Handovers> min2 = new ArrayList<Handovers>(queryMin2.getResultList());
+            ArrayList<Handovers> max2 = new ArrayList<Handovers>(queryMax2.getResultList());
+
+            if (min1.isEmpty() && min2.isEmpty()) {
+                result = null;
+            } else {
+                if (min1 == null) {
+                    result = new Pair<DateTime, DateTime>(new DateTime(min2.get(0).getPit()), new DateTime(max2.get(0).getPit()));
+                } else if (min2 == null) {
+                    result = new Pair<DateTime, DateTime>(new DateTime(min1.get(0).getPit()), new DateTime(max1.get(0).getPit()));
+                } else {
+                    DateTime min3 = new DateTime(Math.min(min1.get(0).getPit().getTime(), min2.get(0).getPit().getTime()));
+                    DateTime max3 = new DateTime(Math.max(max1.get(0).getPit().getTime(), max2.get(0).getPit().getTime()));
+                    result = new Pair<DateTime, DateTime>(min3, max3);
+                }
+            }
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+
+        em.close();
+        SYSTools.showTimeDifference(begin);
+        return result;
+    }
+
+    /**
+     * retrieves the PITs of the first and the last entry in the NReports table.
      *
      * @param resident
      * @return

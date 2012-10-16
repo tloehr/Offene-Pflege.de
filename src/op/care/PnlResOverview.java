@@ -50,7 +50,7 @@ import java.beans.PropertyVetoException;
 /**
  * @author tloehr
  */
-public class PnlBWUebersicht extends NursingRecordsPanel {
+public class PnlResOverview extends NursingRecordsPanel {
     public static final String internalClassID = "nursingrecords.overview";
 
     private Resident bewohner;
@@ -62,9 +62,9 @@ public class PnlBWUebersicht extends NursingRecordsPanel {
     private boolean initPhase = false;
 
     /**
-     * Creates new form PnlBWUebersicht
+     * Creates new form PnlResOverview
      */
-    public PnlBWUebersicht(Resident bewohner, JScrollPane jspSearch) {
+    public PnlResOverview(Resident bewohner, JScrollPane jspSearch) {
         initComponents();
         this.jspSearch = jspSearch;
         initPanel();

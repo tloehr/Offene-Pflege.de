@@ -119,7 +119,7 @@ public class PnlCare extends NursingRecordsPanel {
 
         switch (jtpPflegeakte.getSelectedIndex()) {
             case TAB_UEBERSICHT: {
-                previousPanel = new PnlBWUebersicht(resident, jspSearch);
+                previousPanel = new PnlResOverview(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_UEBERSICHT, previousPanel);
                 jtpPflegeakte.setTitleAt(TAB_UEBERSICHT, "Übersicht");
                 break;

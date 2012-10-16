@@ -29,7 +29,7 @@ public class PnlPIT extends JPanel {
     private Time uhrzeit;
     private Date preset;
     private Date max;
-
+    //TODO: Catch entries that are way too old
     public PnlPIT() {
         this(new Date(), new Date());
     }
@@ -49,15 +49,6 @@ public class PnlPIT extends JPanel {
         uhrzeit = new Time(preset.getTime());
         txtUhrzeit.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(uhrzeit));
     }
-
-    public Time getUhrzeit() {
-        return uhrzeit;
-    }
-
-    public Date getDatum() {
-        return jdcDatum.getDate();
-    }
-
 
     public Date getPIT() {
         return SYSCalendar.addTime2Date(jdcDatum.getDate(), uhrzeit);

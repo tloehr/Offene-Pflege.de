@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity;
+package entity.reports;
 
 import entity.system.Users;
 
@@ -37,7 +37,7 @@ public class Handover2User implements Serializable, Comparable<Handover2User> {
     @JoinColumn(name = "HID", referencedColumnName = "HID")
     @ManyToOne
     private Handovers bericht;
-    @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
+    @JoinColumn(name = "UKennung", referencedColumnName = "UID")
     @ManyToOne
     private Users user;
 
@@ -97,7 +97,7 @@ public class Handover2User implements Serializable, Comparable<Handover2User> {
 
     @Override
     public String toString() {
-        return "entity.Handover2User[pkid=" + pkid + "]";
+        return "entity.reports.Handover2User[pkid=" + pkid + "]";
     }
 
     @Override

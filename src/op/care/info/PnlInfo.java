@@ -47,7 +47,6 @@ import java.util.List;
 public class PnlInfo extends NursingRecordsPanel {
     public static final String internalClassID = "nursingrecords.info";
 
-    //    private final int MAX_HTML_LENGTH = 80;
     private Resident resident;
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
@@ -92,8 +91,18 @@ public class PnlInfo extends NursingRecordsPanel {
     }
 
     @Override
-    public void switchResident(Resident resident) {
-        this.resident = resident;
+    public void switchResident(Resident res) {
+        this.resident = res;
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                btnBWDied.setEnabled(resident.isActive());
+                btnBWMovedOut.setEnabled(resident.isActive());
+                btnBWisAway.setEnabled(resident.isActive() && !isAway());
+                btnBWisBack.setEnabled(resident.isActive() && isAway());
+            }
+        });
+
         GUITools.setBWDisplay(resident);
         reload();
     }
@@ -256,16 +265,8 @@ public class PnlInfo extends NursingRecordsPanel {
         return cpCat;
     }
 
-//    private Color getColor(ResInfoCategory category, int level) {
-//
-//        if (categories.indexOf(category) % 2 == 0) {
-//            return demandColors[level];
-//        } else {
-//            return regularColors[level];
-//        }
-//    }
-
     private JPanel createInfoPanel(final ResInfo resInfo) {
+//        OPDE.debug(resInfo.getResInfoType().getShortDescription());
         String title = "<html><table border=\"0\">" +
                 "<tr valign=\"top\">" +
                 "<td width=\"280\" align=\"left\">" + resInfo.getPITAsHTML() + "</td>" +
@@ -273,7 +274,7 @@ public class PnlInfo extends NursingRecordsPanel {
                 (resInfo.isClosed() ? "<s>" : "") +
                 resInfo.getHtml() +
                 (resInfo.isClosed() ? "</s>" : "") +
-                (resInfo.getText().trim().isEmpty() ? "" : "<b>" + OPDE.lang.getString("misc.msg.comment") + ": </b><p>" + resInfo.getText().trim() + "</p>") +
+                (SYSTools.catchNull(resInfo.getText()).trim().isEmpty() ? "" : "<b>" + OPDE.lang.getString("misc.msg.comment") + ": </b><p>" + resInfo.getText().trim() + "</p>") +
                 "</td>" +
                 "</table>" +
                 "</html>";
@@ -287,8 +288,8 @@ public class PnlInfo extends NursingRecordsPanel {
          *     |_|  |_|\___|_| |_|\__,_|
          *
          */
-        final JButton btnMenu = new JButton(SYSConst.icon32menu);
-        btnMenu.setPressedIcon(SYSConst.icon32Pressed);
+        final JButton btnMenu = new JButton(SYSConst.icon22menu);
+        btnMenu.setPressedIcon(SYSConst.icon22Pressed);
         btnMenu.setAlignmentX(Component.RIGHT_ALIGNMENT);
         btnMenu.setAlignmentY(Component.TOP_ALIGNMENT);
         btnMenu.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -314,6 +315,7 @@ public class PnlInfo extends NursingRecordsPanel {
         cptitle.getMain().setBackground(getColor(resInfo.getResInfoType().getResInfoCat())[SYSConst.light2]);
         cptitle.getMain().setOpaque(true);
         cptitle.getButton().setIcon(resInfo.isClosed() ? SYSConst.icon22stopSign : null);
+        cptitle.getButton().setVerticalTextPosition(SwingConstants.TOP);
 
         return cptitle.getMain();
     }
@@ -378,6 +380,14 @@ public class PnlInfo extends NursingRecordsPanel {
             }
         });
 
+        /***
+         *         _       _     _
+         *        / \   __| | __| |
+         *       / _ \ / _` |/ _` |
+         *      / ___ \ (_| | (_| |
+         *     /_/   \_\__,_|\__,_|
+         *
+         */
         final JButton btnAdd = new JButton(SYSConst.icon22add);
         btnAdd.setPressedIcon(SYSConst.icon22addPressed);
         btnAdd.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -396,6 +406,8 @@ public class PnlInfo extends NursingRecordsPanel {
                             try {
                                 em.getTransaction().begin();
                                 em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                // so that no conflicts can occur if another user enters a new info at the same time
+                                em.lock(em.merge(type), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
                                 ResInfo newinfo = em.merge((ResInfo) o);
                                 newinfo.setHtml(ResInfoTools.getContentAsHTML(newinfo));
                                 em.getTransaction().commit();
@@ -436,7 +448,7 @@ public class PnlInfo extends NursingRecordsPanel {
 
             }
         });
-        btnAdd.setEnabled(type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_NOCONSTRAINTS || type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS || !valuecache.containsKey(type) || valuecache.get(type).isEmpty());
+        btnAdd.setEnabled(type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_NOCONSTRAINTS || type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS || !valuecache.containsKey(type) || valuecache.get(type).isEmpty() || containsOnlyClosedInfos(type));
         cptitle.getRight().add(btnAdd);
 
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
@@ -498,7 +510,7 @@ public class PnlInfo extends NursingRecordsPanel {
         jspSearch.setViewportView(searchPanes);
 
         JPanel mypanel = new JPanel();
-        mypanel.setLayout(new VerticalLayout(5));
+        mypanel.setLayout(new VerticalLayout());
         mypanel.setBackground(Color.WHITE);
 
         CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
@@ -750,11 +762,12 @@ public class PnlInfo extends NursingRecordsPanel {
                     try {
                         em.getTransaction().begin();
                         em.lock(em.merge(resident), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                        ResInfo lastabsence = getLastAbsence();
+                        ResInfo lastabsence = em.merge(getLastAbsence());
                         em.lock(lastabsence, LockModeType.OPTIMISTIC);
                         lastabsence.setTo(new Date());
                         lastabsence.setUserOFF(em.merge(OPDE.getLogin().getUser()));
                         em.getTransaction().commit();
+
                         btnBWisAway.setEnabled(true);
                         btnBWisBack.setEnabled(false);
 
@@ -785,6 +798,30 @@ public class PnlInfo extends NursingRecordsPanel {
             btnBWisBack.setEnabled(resident.isActive() && isAway());
             list.add(btnBWisBack);
         }
+
+        final JideButton btnExpandAll = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.msg.expandall"), SYSConst.icon22expand, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                try {
+                    GUITools.setCollapsed(cpsInfo, false);
+                } catch (PropertyVetoException e) {
+                    // bah!
+                }
+            }
+        });
+        list.add(btnExpandAll);
+
+        final JideButton btnCollapseAll = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.msg.collapseall"), SYSConst.icon22collapse, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                try {
+                    GUITools.setCollapsed(cpsInfo, true);
+                } catch (PropertyVetoException e) {
+                    // bah!
+                }
+            }
+        });
+        list.add(btnCollapseAll);
 
         /***
          *      ____       _       _
@@ -931,6 +968,8 @@ public class PnlInfo extends NursingRecordsPanel {
                                     ResInfo oldinfo = em.merge(resInfo);
                                     ResInfo newinfo = em.merge((ResInfo) o);
                                     em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                    // so that no conflicts can occur if another user enters a new info at the same time
+                                    em.lock(em.merge(resInfo.getResInfoType()), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
                                     em.lock(oldinfo, LockModeType.OPTIMISTIC);
 
                                     newinfo.setHtml(ResInfoTools.getContentAsHTML(newinfo));
@@ -1089,9 +1128,12 @@ public class PnlInfo extends NursingRecordsPanel {
                     });
                 }
             });
-            btnEdit.setEnabled(ResInfoTools.isChangeable(resInfo));
+            // Only active ones can be edited, and only by the same user that started it or the admin.
+            btnEdit.setEnabled(ResInfoTools.isChangeable(resInfo) && (OPDE.isAdmin() || resInfo.getUserON().equals(OPDE.getLogin().getUser())));
             pnlMenu.add(btnEdit);
         }
+
+//        btnDelete.setEnabled(!prescription.isClosed() && (!prescriptionHasBeenUsedAlready || OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)));
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {
             /***
              *      ____       _      _
@@ -1286,27 +1328,31 @@ public class PnlInfo extends NursingRecordsPanel {
             btnFiles.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgFiles(resInfo, new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            EntityManager em = OPDE.createEM();
-                            final ResInfo myInfo = em.merge(resInfo);
-                            em.refresh(myInfo);
-                            em.close();
+                    // If the closure is null, only attached files can be viewed but no new ones can be attached.
+                    Closure closure = null;
+                    if (!resInfo.isClosed()) {
+                        closure = new Closure() {
+                            @Override
+                            public void execute(Object o) {
+                                EntityManager em = OPDE.createEM();
+                                final ResInfo myInfo = em.merge(resInfo);
+                                em.refresh(myInfo);
+                                em.close();
 
-                            valuecache.get(resInfo.getResInfoType()).remove(resInfo);
-                            valuecache.get(myInfo.getResInfoType()).add(myInfo);
-                            Collections.sort(valuecache.get(myInfo.getResInfoType()));
-                            createInfoPanel(myInfo);
+                                valuecache.get(resInfo.getResInfoType()).remove(resInfo);
+                                valuecache.get(myInfo.getResInfoType()).add(myInfo);
+                                Collections.sort(valuecache.get(myInfo.getResInfoType()));
+                                createInfoPanel(myInfo);
 
-                            buildPanel();
-//                        GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-                        }
-                    });
+                                buildPanel();
+                            }
+                        };
+                    }
+                    new DlgFiles(resInfo, closure);
                 }
             });
 
-            btnFiles.setEnabled(ResInfoTools.isChangeable(resInfo));
+//            btnFiles.setEnabled(ResInfoTools.isChangeable(resInfo));
             if (!resInfo.getAttachedFilesConnections().isEmpty()) {
                 JLabel lblNum = new JLabel(Integer.toString(resInfo.getAttachedFilesConnections().size()), SYSConst.icon16greenStar, SwingConstants.CENTER);
                 lblNum.setFont(SYSConst.ARIAL14BOLD);

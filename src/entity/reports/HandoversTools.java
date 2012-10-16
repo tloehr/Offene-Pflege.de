@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity;
+package entity.reports;
 
 import entity.nursingprocess.DFNTools;
 import op.OPDE;

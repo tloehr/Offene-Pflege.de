@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package entity;
+package entity.reports;
 
+import entity.Homes;
 import entity.system.Users;
 
 import javax.persistence.*;
@@ -52,7 +53,6 @@ import java.util.Date;
 //                + " ORDER BY u.PIT DESC", resultSetMapping = "Handovers.findByEinrichtungAndDatumAndAckUserResultMapping")
 //})
 public class Handovers implements Serializable {
-
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,7 +68,7 @@ public class Handovers implements Serializable {
     @JoinColumn(name = "EKennung", referencedColumnName = "EID")
     @ManyToOne
     private Homes einrichtung;
-    @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
+    @JoinColumn(name = "UKennung", referencedColumnName = "UID")
     @ManyToOne
     private Users user;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bericht")
@@ -150,6 +150,6 @@ public class Handovers implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Handovers[uebid=" + hid + "]";
+        return "entity.reports.Handovers[uebid=" + hid + "]";
     }
 }

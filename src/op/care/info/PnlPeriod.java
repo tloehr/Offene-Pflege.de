@@ -8,7 +8,6 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.swing.RangeSlider;
 import com.toedter.calendar.JDateChooser;
-import op.OPDE;
 import op.tools.Pair;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateTime;
@@ -65,7 +64,21 @@ public class PnlPeriod extends JPanel {
     }
 
     private void btnOKActionPerformed(ActionEvent e) {
-        actionBlock.execute(new Pair<Date, Date>(jdcVon.getDate(), jdcBis.getDate()));
+
+        if (jdcVon.getDate() != null && jdcBis.getDate() != null) {
+
+            DateTime from = new DateTime(jdcVon.getDate());
+            DateTime to = new DateTime(jdcBis.getDate());
+
+            if (dtmin.isAfter(from) || dtmax.isBefore(to)) {
+                actionBlock.execute(null);
+            } else {
+                actionBlock.execute(new Pair<Date, Date>(jdcVon.getDate(), jdcBis.getDate()));
+            }
+
+        } else {
+            actionBlock.execute(null);
+        }
     }
 
     private void btnCancelActionPerformed(ActionEvent e) {
@@ -91,8 +104,8 @@ public class PnlPeriod extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "2*(default, $lcgap), 62dlu, $lcgap, default:grow, $lcgap, 62dlu, 2*($lcgap, default)",
-            "4*(default, $lgap), default"));
+                "2*(default, $lcgap), 62dlu, $lcgap, default:grow, $lcgap, 62dlu, 2*($lcgap, default)",
+                "4*(default, $lgap), default"));
 
         //======== panel1 ========
         {
@@ -271,8 +284,8 @@ public class PnlPeriod extends JPanel {
 
     private void initPanel() {
         ignore = true;
-        OPDE.debug("min " + min + " max " + max);
-        OPDE.debug("from " + from + " to " + to);
+//        OPDE.debug("min " + min + " max " + max);
+//        OPDE.debug("from " + from + " to " + to);
 
         slider.setRangeDraggable(false);
         jdcVon.setMinSelectableDate(min);
@@ -308,7 +321,7 @@ public class PnlPeriod extends JPanel {
         if (e.getPropertyName().equals("highValue")) {
             int val = (Integer) e.getNewValue();
             if (val < slider.getMaximum()) {
-                jdcBis.setDate(dtmin.plusDays(val+1).toDateMidnight().toDateTime().minusSeconds(1).toDate()); // Innerhalb der Grenzen enden alle Tage immer um 23:59:59.
+                jdcBis.setDate(dtmin.plusDays(val + 1).toDateMidnight().toDateTime().minusSeconds(1).toDate()); // Innerhalb der Grenzen enden alle Tage immer um 23:59:59.
             } else {
                 jdcBis.setDate(max); // Ansonsten genau an der Grenze
             }
