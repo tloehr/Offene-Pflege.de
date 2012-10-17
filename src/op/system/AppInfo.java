@@ -7,6 +7,7 @@ package op.system;
 import op.OPDE;
 import op.tools.SYSTools;
 import op.tools.SortedProperties;
+import org.joda.time.format.DateTimeFormat;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -18,10 +19,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Properties;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Die AppInfo dient dazu Informationen bzgl. der Module innerhalb von OPDE
@@ -218,7 +218,15 @@ public class AppInfo {
                 }
             } else if (environment.equalsIgnoreCase("properties")) {
                 if (tagName.equalsIgnoreCase("property")) {
-                    defaultProperties.put(attributes.getValue("key"), attributes.getValue("value"));
+                    SimpleDateFormat sdf = null;
+                    if (attributes.getValue("format") != null){
+                        sdf = new SimpleDateFormat(attributes.getValue("format"));
+                    }
+                    if (attributes.getValue("value").equals("##now##")){
+                        defaultProperties.put(attributes.getValue("key"), sdf.format(new Date()));
+                    } else {
+                        defaultProperties.put(attributes.getValue("key"), attributes.getValue("value"));
+                    }
                 }
             }
         }

@@ -65,10 +65,10 @@ public class Handovers implements Serializable {
     @Lob
     @Column(name = "Text")
     private String text;
-    @JoinColumn(name = "EKennung", referencedColumnName = "EID")
+    @JoinColumn(name = "EID", referencedColumnName = "EID")
     @ManyToOne
-    private Homes einrichtung;
-    @JoinColumn(name = "UKennung", referencedColumnName = "UID")
+    private Homes home;
+    @JoinColumn(name = "UID", referencedColumnName = "UKennung")
     @ManyToOne
     private Users user;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bericht")
@@ -77,10 +77,10 @@ public class Handovers implements Serializable {
     public Handovers() {
     }
 
-    public Handovers(Date pit, String text, Homes einrichtung, Users user) {
+    public Handovers(Date pit, String text, Homes home, Users user) {
         this.pit = pit;
         this.text = text;
-        this.einrichtung = einrichtung;
+        this.home = home;
         this.user = user;
     }
 
@@ -108,16 +108,12 @@ public class Handovers implements Serializable {
         this.text = text;
     }
 
-    public Homes getEinrichtung() {
-        return einrichtung;
+    public Homes getHome() {
+        return home;
     }
 
     public Users getUser() {
         return user;
-    }
-
-    public void setEinrichtung(Homes einrichtung) {
-        this.einrichtung = einrichtung;
     }
 
     public void setUser(Users user) {

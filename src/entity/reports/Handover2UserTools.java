@@ -17,9 +17,9 @@ import java.util.Iterator;
 public class Handover2UserTools {
  public static boolean containsUser(Collection<Handover2User> list, Users user){
         boolean found = false;
-        Iterator<Handover2User> it = list.iterator();
-        while (!found && it.hasNext()){
-            found = it.next().getUser().equals(user);
+        for (Handover2User conn : list) {
+            found = conn.getUser().equals(user);
+            if (found) break;
         }
         return found;
     }

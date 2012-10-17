@@ -37,7 +37,7 @@ public class Handover2User implements Serializable, Comparable<Handover2User> {
     @JoinColumn(name = "HID", referencedColumnName = "HID")
     @ManyToOne
     private Handovers bericht;
-    @JoinColumn(name = "UKennung", referencedColumnName = "UID")
+    @JoinColumn(name = "UID", referencedColumnName = "UKennung")
     @ManyToOne
     private Users user;
 

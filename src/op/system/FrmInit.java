@@ -114,7 +114,6 @@ public class FrmInit extends JFrame {
         dispose();
     }
 
-
     private void saveLocalProps() {
         try {
 

@@ -62,7 +62,7 @@ public class DlgBericht extends javax.swing.JDialog {
      * Creates new form DlgReport
      */
     public DlgBericht(PnlHandover parent, Homes einrichtung, Date datum) {
-        super(parent.getPflege(), false);
+//        super(parent.getPflege(), false);
 //        ithis.parent = parent;
             this.einrichtung = einrichtung;
             initComponents();
@@ -279,7 +279,7 @@ public class DlgBericht extends javax.swing.JDialog {
     public void dispose() {
 
 //        OPDE.removeModule(internalClassID);
-        parent.reloadTable();
+//        parent.reloadTable();
 
         jdcDatum.cleanup();
         SYSTools.unregisterListeners(this);

@@ -11,15 +11,14 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
- *
  * @author tloehr
  */
 public class NR2UserTools {
-    public static boolean containsUser(Collection<NR2User> list, Users user){
+    public static boolean containsUser(Collection<NR2User> list, Users user) {
         boolean found = false;
-        Iterator<NR2User> it = list.iterator();
-        while (!found && it.hasNext()){
-            found = it.next().getUser().equals(user);
+        for (NR2User conn : list) {
+            found = conn.getUser().equals(user);
+            if (found) break;
         }
         return found;
     }

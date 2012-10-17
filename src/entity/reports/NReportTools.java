@@ -5,6 +5,7 @@
 package entity.reports;
 
 import entity.EntityTools;
+import entity.Homes;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import op.OPDE;
@@ -741,6 +742,44 @@ public class NReportTools {
 
             query.setParameter("resident", resident);
             query.setParameter("search", EntityTools.getMySQLsearchPattern(search));
+
+            list = new ArrayList<NReport>(query.getResultList());
+
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+        return list;
+    }
+
+    /**
+     * retrieves all NReports for a certain day which have been assigned with the Tags Nr. 1 (Handover) and Nr. 2 (Emergency)
+     * @param day
+     * @return
+     */
+    public static ArrayList<NReport> getNReports4Handover(DateMidnight day, Homes home) {
+        DateTime from = day.toDateTime();
+        DateTime to = day.plusDays(1).toDateTime().minusSeconds(1);
+        EntityManager em = OPDE.createEM();
+        ArrayList<NReport> list = null;
+
+        try {
+
+            String jpql = " SELECT nr " +
+                    " FROM NReport nr " +
+                    " JOIN nr.tags t " +
+                    " WHERE " +
+                    " nr.pit >= :from AND nr.pit <= :to AND (t.nrtagid = 1 OR t.nrtagid = 2) " +
+                    " AND nr.resident.station.home = :home " +
+                    " AND nr.replacedBy IS NULL AND nr.editedBy IS NULL " +
+                    " ORDER BY nr.pit ASC ";
+
+            Query query = em.createQuery(jpql);
+
+            query.setParameter("from", from.toDate());
+            query.setParameter("to", to.toDate());
+            query.setParameter("home", home);
 
             list = new ArrayList<NReport>(query.getResultList());
 

@@ -48,6 +48,7 @@ import entity.info.ResidentTools;
 import entity.system.SYSLoginTools;
 import entity.system.SYSPropsTools;
 import op.allowance.PnlAllowance;
+import op.care.supervisor.PnlHandover;
 import op.residents.bwassistant.AddBWWizard;
 import op.care.PnlCare;
 import op.care.info.PnlInfo;
@@ -590,6 +591,8 @@ public class FrmMain extends JFrame {
             panel = new PnlMed(jspSearch);
         } else if (classname.equals("op.users.PnlUser")) {
             panel = new PnlUser(jspSearch);
+        } else if (classname.equals("op.care.supervisor.PnlHandover")) {
+            panel = new PnlHandover(jspSearch);
         }
         return panel;
     }

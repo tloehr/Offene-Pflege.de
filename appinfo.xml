@@ -79,6 +79,12 @@
                javaclass="op.users.PnlUser" icon="usergroup.png">
             <execute langbundle="appinfo.default.acl.execute"/>
         </class>
+        <class name="nursingrecords.handover" short="Dienstübergabe"
+               long="Hier wird die Dienstübergabe behandelt" main="true"
+               javaclass="op.care.supervisor.PnlHandover" icon="groupevent.png">
+            <execute langbundle="appinfo.default.acl.execute"/>
+            <insert langbundle="appinfo.default.acl.update"/>
+        </class>
         <class name="nursingrecords.info" short="Pflegeakte/Informationen"
                long="Hier können Informationen zu den BewohnerInnen eingegeben werden."
                javaclass="op.care.info.PnlInfo">
@@ -132,7 +138,6 @@
         <property key="ON_DEMAND_BGSHIFT" value="D1D17A"/>
         <property key="ON_DEMAND_FGBHP" value="D1D17A"/>
         <property key="ON_DEMAND_BGBHP" value="EEEECE"/>
-
     </properties>
 
 </app>

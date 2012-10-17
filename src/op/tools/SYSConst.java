@@ -373,6 +373,7 @@ public class SYSConst {
     public static final Icon icon22ambulance2 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ambulance2.png"));
     public static final Icon icon22ambulance2Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ambulance2_pressed.png"));
     public static final Icon icon22apply = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/apply.png"));
+    public static final Icon icon16apply = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/apply.png"));
     public static final Icon icon22applyPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/apply_pressed.png"));
     public static final Icon icon22attach = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/attach.png"));
     public static final Icon icon22attachPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/attach_pressed.png"));
@@ -471,13 +472,15 @@ public class SYSConst {
     public static final Icon icon22ledYellowOff = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/leddarkyellow.png"));
     public static final Icon icon22ledGreenOn = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ledgreen.png"));
     public static final Icon icon22ledGreenOff = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/leddarkgreen.png"));
+    public static final Icon icon16ledGreenOn = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/ledgreen.png"));
+    public static final Icon icon163ledGreenOn = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/3ledlightgreen.png"));
+    public static final Icon icon16ledGreenOff = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/leddarkgreen.png"));
     public static final Icon icon22ledOrangeOn = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ledorange.png"));
     public static final Icon icon22ledOrangeOff = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/leddarkorange.png"));
     public static final Icon icon22ledPurpleOn = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ledpurple.png"));
     public static final Icon icon22ledPurpleOff = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/leddarkpurple.png"));
     public static final Icon icon22ledBlueOn = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ledlightblue.png"));
     public static final Icon icon22ledBlueOff = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/leddarkblue.png"));
-
     public static final Icon icon22singleIncident = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/single-incident.png"));
     public static final Icon icon22intervalByDay = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/by-day.png"));
     public static final Icon icon22intervalBySecond = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/by-second.png"));
