@@ -31,22 +31,26 @@ import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.swing.JideBoxLayout;
-import com.sun.xml.internal.bind.v2.TODO;
-import com.toedter.calendar.JDateChooser;
+import com.jidesoft.swing.JideButton;
 import entity.Homes;
 import entity.HomesTools;
+import entity.files.SYSFilesTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.reports.*;
 import op.OPDE;
+import op.system.InternalClassACL;
 import op.threads.DisplayManager;
+import op.threads.DisplayMessage;
 import op.tools.*;
+import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import java.awt.*;
@@ -54,14 +58,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -84,7 +86,7 @@ public class PnlHandover extends NursingRecordsPanel {
     private HashMap<Handovers, JPanel> linemapHO;
     HashMap<DateMidnight, String> hollidays;
     private JComboBox cmbHomes;
-    private JDateChooser jdcDay;
+//    private JDateChooser jdcDay;
 
 //    private Color[] color1, color2;
 
@@ -156,7 +158,7 @@ public class PnlHandover extends NursingRecordsPanel {
 //
 //    private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
 //        btnNew.setEnabled(false);
-//        new DlgBericht(this, (Homes) cmbEinrichtung.getSelectedItem(), jdcDatum.getDate());
+//        new DlgHOReport(this, (Homes) cmbEinrichtung.getSelectedItem(), jdcDatum.getDate());
 //    }//GEN-LAST:event_btnNewActionPerformed
 //
 //    private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
@@ -272,7 +274,7 @@ public class PnlHandover extends NursingRecordsPanel {
             OPDE.error(e);
         }
 
-//        GUITools.addAllComponents(mypanel, addCommands());
+        GUITools.addAllComponents(mypanel, addCommands());
         GUITools.addAllComponents(mypanel, addFilters());
 
         searchPane.setContentPane(mypanel);
@@ -389,20 +391,7 @@ public class PnlHandover extends NursingRecordsPanel {
 //    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
 //        jdcDatum.setDate(SYSCalendar.addDate(jdcDatum.getDate(), -1));
 //    }//GEN-LAST:event_btnBackActionPerformed
-//
-//    private void btnLastLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLastLoginActionPerformed
-//        // Der Tag der letzten Abmeldung
-//        //jdcDatum.setDate(SYSLoginTools.getPreviousLogin(OPDE.getLogin()).getLogout());
-//
-//        // Hier muss erst die Infratstruktur für die neue anmeldung rein.
-//        // Wir brauchen eine HOSTS tabelle, die dann auf Logins verweist.
-//        // die logins wiederum müssen die internal classes auflisten, die gerade offen sind
-//        // der Proof of Life muss sich auf den Host beziehen.
-//        // die collision domains müssen mit in die internalClasses mit rein.
-//        // die Host kennung kann durch die localproperties überschrieben werden.
-//        // die Zuordnung welche Maschine welche Station anzeigen soll, findet über die Hosts statt.
-//
-//    }//GEN-LAST:event_btnLastLoginActionPerformed
+
 //
 //    private void txtSuche1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSuche1ActionPerformed
 ////        if (!txtSuche.equals("")) {
@@ -504,7 +493,7 @@ public class PnlHandover extends NursingRecordsPanel {
                 }
             }
 
-//            expandTheLast2Weeks();
+            expandDay(new DateMidnight());
 
 
 //            for (NReport report : reportList) {
@@ -519,6 +508,34 @@ public class PnlHandover extends NursingRecordsPanel {
             buildPanel();
         }
 
+    }
+
+
+    private void expandDay(DateMidnight day) {
+        final String keyYear = Integer.toString(day.getYear()) + ".year";
+        if (cpMap.containsKey(keyYear) && cpMap.get(keyYear).isCollapsed()) {
+            try {
+                cpMap.get(keyYear).setCollapsed(false);
+            } catch (PropertyVetoException e) {
+                // bah!
+            }
+        }
+        final String keyMonth = monthFormatter.format(day.toDate()) + ".month";
+        if (cpMap.containsKey(keyMonth) && cpMap.get(keyMonth).isCollapsed()) {
+            try {
+                cpMap.get(keyMonth).setCollapsed(false);
+            } catch (PropertyVetoException e) {
+                // bah!
+            }
+        }
+        final String keyDay = DateFormat.getDateInstance().format(day.toDate());
+        if (cpMap.containsKey(keyDay) && cpMap.get(keyDay).isCollapsed()) {
+            try {
+                cpMap.get(keyDay).setCollapsed(false);
+            } catch (PropertyVetoException e) {
+                // bah!
+            }
+        }
     }
 
     private CollapsiblePane createCP4Year(final int year, DateMidnight min, DateMidnight max) {
@@ -724,13 +741,69 @@ public class PnlHandover extends NursingRecordsPanel {
 
         final JButton btnAcknowledge = new JButton(SYSConst.icon163ledGreenOn);
         btnAcknowledge.setAlignmentX(Component.RIGHT_ALIGNMENT);
-//        btnPrintDay.setContentAreaFilled(false);
-//        btnPrintDay.setBorder(null);
         btnAcknowledge.setToolTipText(OPDE.lang.getString(internalClassID + ".tooltips.btnAcknowledge"));
         btnAcknowledge.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
+                EntityManager em = OPDE.createEM();
+                try {
+                    em.getTransaction().begin();
+                    if (cacheHO.containsKey(key)) {
+                        ArrayList<Handovers> listHO = new ArrayList<Handovers>(cacheHO.get(key));
+                        for (final Handovers ho : listHO) {
+                            if (!Handover2UserTools.containsUser(ho.getUsersAcknowledged(), OPDE.getLogin().getUser())) {
+                                Handovers myHO = em.merge(ho);
+                                em.lock(myHO, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                Handover2User connObj = em.merge(new Handover2User(myHO, em.merge(OPDE.getLogin().getUser())));
+                                myHO.getUsersAcknowledged().add(connObj);
 
+                                cacheHO.get(key).remove(ho);
+                                cacheHO.get(key).add(myHO);
+                                linemapHO.remove(ho);
+                                final String keyDay = DateFormat.getDateInstance().format(ho.getPit());
+                                contentmap.remove(keyDay);
+                            }
+                        }
+                        Collections.sort(cacheHO.get(key));
+                    }
+                    if (cacheNR.containsKey(key)) {
+                        ArrayList<NReport> listNR = new ArrayList<NReport>(cacheNR.get(key));
+                        for (final NReport nreport : listNR) {
+                            if (!NR2UserTools.containsUser(nreport.getUsersAcknowledged(), OPDE.getLogin().getUser())) {
+                                NReport myNR = em.merge(nreport);
+                                em.lock(myNR, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                NR2User connObj = em.merge(new NR2User(myNR, em.merge(OPDE.getLogin().getUser())));
+                                myNR.getUsersAcknowledged().add(connObj);
+
+                                cacheNR.get(key).remove(nreport);
+                                cacheNR.get(key).add(myNR);
+                                linemapNR.remove(nreport);
+                                final String keyDay = DateFormat.getDateInstance().format(nreport.getPit());
+                                contentmap.remove(keyDay);
+                            }
+                        }
+                        Collections.sort(cacheNR.get(key));
+                    }
+                    em.getTransaction().commit();
+                    createCP4Day(day);
+                    buildPanel();
+                } catch (OptimisticLockException ole) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                        OPDE.getMainframe().emptyFrame();
+                        OPDE.getMainframe().afterLogin();
+                    }
+                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                } catch (Exception e) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.fatal(e);
+                } finally {
+                    em.close();
+                }
             }
         });
         titleCPDay.getRight().add(btnAcknowledge);
@@ -752,323 +825,258 @@ public class PnlHandover extends NursingRecordsPanel {
         cpDay.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                cpDay.setContentPane(createContentPanel4Day(day));
+                createContentPanel4Day(day, cpDay);
+                btnAcknowledge.setEnabled(true);
+            }
+
+            @Override
+            public void paneCollapsed(CollapsiblePaneEvent collapsiblePaneEvent) {
+                btnAcknowledge.setEnabled(false);
             }
         });
 
+        btnAcknowledge.setEnabled(!cpDay.isCollapsed());
         if (!cpDay.isCollapsed()) {
-            cpDay.setContentPane(createContentPanel4Day(day));
+            createContentPanel4Day(day, cpDay);
         }
 
         return cpDay;
     }
 
 
-    private JPanel createContentPanel4Day(final DateMidnight day) {
-//        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage("misc.msg.wait", progress, progressMax));
-//        progress++;
+    private void createContentPanel4Day(final DateMidnight day, final CollapsiblePane cpDay) {
 
         final String key = DateFormat.getDateInstance().format(day.toDate());
         if (contentmap.containsKey(key)) {
-            return contentmap.get(key);
-        }
-        final JPanel dayPanel = new JPanel(new VerticalLayout());
-        dayPanel.setOpaque(false);
-        if (!cacheHO.containsKey(key)) {
-            cacheHO.put(key, HandoversTools.getBy(day, (Homes) cmbHomes.getSelectedItem()));
-        }
-        if (!cacheNR.containsKey(key)) {
-            cacheNR.put(key, NReportTools.getNReports4Handover(day, (Homes) cmbHomes.getSelectedItem()));
-        }
+            cpDay.setContentPane(contentmap.get(key));
+        } else {
 
-        int i = 0; // for zebra pattern
-        for (final Handovers handover : cacheHO.get(key)) {
-            if (!linemapHO.containsKey(handover)) {
-                String title = "<html><table border=\"0\">" +
-                        "<tr valign=\"top\">" +
-                        "<td width=\"100\" align=\"left\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(handover.getPit()) +
-                        " " + OPDE.lang.getString("misc.msg.Time.short") +
-                        "</td>" +
-                        "<td width=\"350\" align=\"left\">" +
-                        handover.getText() +
-                        "</td>" +
-                        "<td width=\"200\" align=\"center\">" + OPDE.lang.getString(internalClassID + ".handoversreport") + "</td>" +
-                        "<td width=\"200\" align=\"left\">" + handover.getUser().getFullname() + "</td>" +
-                        "</tr>" +
-                        "</table>" +
-                        "</html>";
+//        OPDE.getMainframe().setBlocked(true);
+            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
 
-                final DefaultCPTitle pnlSingle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent evt) {
-                        if (handover.getUsersAcknowledged().contains(OPDE.getLogin().getUser())) {
-                            return;
-                        }
-                        EntityManager em = OPDE.createEM();
-                        try {
-                            em.getTransaction().begin();
-                            Handovers myHO = em.merge(handover);
-                            Handover2User connObj = em.merge(new Handover2User(myHO, em.merge(OPDE.getLogin().getUser())));
-                            myHO.getUsersAcknowledged().add(connObj);
-                            em.getTransaction().commit();
-                            cacheHO.get(key).remove(handover);
-                            cacheHO.get(key).add(myHO);
-                            linemapHO.remove(handover);
-                            createCP4Day(day);
-                            buildPanel();
-                        } catch (OptimisticLockException ole) {
-                            if (em.getTransaction().isActive()) {
-                                em.getTransaction().rollback();
-                            }
-                            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                OPDE.getMainframe().emptyFrame();
-                                OPDE.getMainframe().afterLogin();
-                            }
-                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                        } catch (Exception e) {
-                            if (em.getTransaction().isActive()) {
-                                em.getTransaction().rollback();
-                            }
-                            OPDE.fatal(e);
-                        } finally {
-                            em.close();
-                        }
+            SwingWorker worker = new SwingWorker() {
+
+                @Override
+                protected Object doInBackground() throws Exception {
+
+                    final JPanel dayPanel = new JPanel(new VerticalLayout());
+                    dayPanel.setOpaque(false);
+                    if (!cacheHO.containsKey(key)) {
+                        cacheHO.put(key, HandoversTools.getBy(day, (Homes) cmbHomes.getSelectedItem()));
                     }
-                });
-
-//                /***
-//                 *      __  __
-//                 *     |  \/  | ___ _ __  _   _
-//                 *     | |\/| |/ _ \ '_ \| | | |
-//                 *     | |  | |  __/ | | | |_| |
-//                 *     |_|  |_|\___|_| |_|\__,_|
-//                 *
-//                 */
-//                final JButton btnMenu = new JButton(SYSConst.icon32menu);
-//                btnMenu.setPressedIcon(SYSConst.icon32Pressed);
-//                btnMenu.setAlignmentX(Component.RIGHT_ALIGNMENT);
-//                btnMenu.setAlignmentY(Component.TOP_ALIGNMENT);
-//                btnMenu.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-//                btnMenu.setContentAreaFilled(false);
-//                btnMenu.setBorder(null);
-//                btnMenu.addActionListener(new ActionListener() {
-//                    @Override
-//                    public void actionPerformed(ActionEvent e) {
-//                        JidePopup popup = new JidePopup();
-//                        popup.setMovable(false);
-//                        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-//                        popup.setOwner(btnMenu);
-//                        popup.removeExcludedComponent(btnMenu);
-//                        JPanel pnl = getMenu(nreport);
-//                        popup.getContentPane().add(pnl);
-//                        popup.setDefaultFocusComponent(pnl);
-//
-//                        GUITools.showPopup(popup, SwingConstants.WEST);
-//                    }
-//                });
-//                btnMenu.setEnabled(!nreport.isObsolete());
-//                pnlSingle.getRight().add(btnMenu);
-
-                pnlSingle.getButton().setIcon(Handover2UserTools.containsUser(handover.getUsersAcknowledged(), OPDE.getLogin().getUser()) ? SYSConst.icon16ledGreenOn : SYSConst.icon16ledGreenOff);
-                linemapHO.put(handover, pnlSingle.getMain());
-            }
-            JPanel zebra = new JPanel();
-            zebra.setLayout(new BoxLayout(zebra, BoxLayout.LINE_AXIS));
-            zebra.setOpaque(true);
-            if (i % 2 == 0) {
-                zebra.setBackground(SYSConst.orange1[SYSConst.light2]);
-            } else {
-                zebra.setBackground(Color.WHITE);
-            }
-            zebra.add(linemapHO.get(handover));
-            i++;
-            dayPanel.add(zebra);
-        }
-        for (final NReport nreport : cacheNR.get(key)) {
-            if (!linemapNR.containsKey(nreport)) {
-                String title = "<html><table border=\"0\">" +
-                        "<tr valign=\"top\">" +
-                        "<td width=\"100\" align=\"left\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
-                        " " + OPDE.lang.getString("misc.msg.Time.short") +
-                        "</td>" +
-                        "<td width=\"350\" align=\"left\">" +
-                        nreport.getText() +
-                        "<td width=\"200\" align=\"left\">" + ResidentTools.getBWLabelTextKompakt(nreport.getResident()) + "</td>" +
-                        "</td>" +
-                        "<td width=\"200\" align=\"left\">" + nreport.getUser().getFullname() + "</td>" +
-                        "</tr>" +
-                        "</table>" +
-                        "</html>";
-
-                final DefaultCPTitle pnlSingle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent evt) {
-                        if (NR2UserTools.containsUser(nreport.getUsersAcknowledged(), OPDE.getLogin().getUser())) {
-                            return;
-                        }
-                        EntityManager em = OPDE.createEM();
-                        try {
-                            em.getTransaction().begin();
-                            NReport myNR = em.merge(nreport);
-                            NR2User connObj = em.merge(new NR2User(myNR, em.merge(OPDE.getLogin().getUser())));
-                            myNR.getUsersAcknowledged().add(connObj);
-                            em.getTransaction().commit();
-
-                            //TODO: SORTS
-                            cacheNR.get(key).remove(nreport);
-                            cacheNR.get(key).add(myNR);
-                            linemapNR.remove(nreport);
-                            final String keyDay = DateFormat.getDateInstance().format(nreport.getPit());
-                            contentmap.remove(keyDay);
-                            createCP4Day(day);
-                            buildPanel();
-                        } catch (OptimisticLockException ole) {
-                            if (em.getTransaction().isActive()) {
-                                em.getTransaction().rollback();
-                            }
-                            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                OPDE.getMainframe().emptyFrame();
-                                OPDE.getMainframe().afterLogin();
-                            }
-                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                        } catch (Exception e) {
-                            if (em.getTransaction().isActive()) {
-                                em.getTransaction().rollback();
-                            }
-                            OPDE.fatal(e);
-                        } finally {
-                            em.close();
-                        }
+                    if (!cacheNR.containsKey(key)) {
+                        cacheNR.put(key, NReportTools.getNReports4Handover(day, (Homes) cmbHomes.getSelectedItem()));
                     }
-                });
 
-//                /***
-//                 *      __  __
-//                 *     |  \/  | ___ _ __  _   _
-//                 *     | |\/| |/ _ \ '_ \| | | |
-//                 *     | |  | |  __/ | | | |_| |
-//                 *     |_|  |_|\___|_| |_|\__,_|
-//                 *
-//                 */
-//                final JButton btnMenu = new JButton(SYSConst.icon32menu);
-//                btnMenu.setPressedIcon(SYSConst.icon32Pressed);
-//                btnMenu.setAlignmentX(Component.RIGHT_ALIGNMENT);
-//                btnMenu.setAlignmentY(Component.TOP_ALIGNMENT);
-//                btnMenu.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-//                btnMenu.setContentAreaFilled(false);
-//                btnMenu.setBorder(null);
-//                btnMenu.addActionListener(new ActionListener() {
-//                    @Override
-//                    public void actionPerformed(ActionEvent e) {
-//                        JidePopup popup = new JidePopup();
-//                        popup.setMovable(false);
-//                        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-//                        popup.setOwner(btnMenu);
-//                        popup.removeExcludedComponent(btnMenu);
-//                        JPanel pnl = getMenu(nreport);
-//                        popup.getContentPane().add(pnl);
-//                        popup.setDefaultFocusComponent(pnl);
-//
-//                        GUITools.showPopup(popup, SwingConstants.WEST);
-//                    }
-//                });
-//                btnMenu.setEnabled(!nreport.isObsolete());
-//                pnlSingle.getRight().add(btnMenu);
+                    int max = cacheHO.get(key).size() + cacheNR.get(key).size();
+                    int i = 0; // for zebra pattern and progress
+                    for (final Handovers handover : cacheHO.get(key)) {
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), i, max));
+                        if (!linemapHO.containsKey(handover)) {
+                            String title = "<html><table border=\"0\">" +
+                                    "<tr valign=\"top\">" +
+                                    "<td width=\"100\" align=\"left\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(handover.getPit()) +
+                                    " " + OPDE.lang.getString("misc.msg.Time.short") +
+                                    "</td>" +
+                                    "<td width=\"350\" align=\"left\">" +
+                                    handover.getText() +
+                                    "</td>" +
+                                    "<td width=\"200\" align=\"center\">" + OPDE.lang.getString(internalClassID + ".handoversreport") + "</td>" +
+                                    "<td width=\"200\" align=\"left\">" + handover.getUser().getFullname() + "</td>" +
+                                    "</tr>" +
+                                    "</table>" +
+                                    "</html>";
 
-                pnlSingle.getButton().setIcon(NR2UserTools.containsUser(nreport.getUsersAcknowledged(), OPDE.getLogin().getUser()) ? SYSConst.icon16ledGreenOn : SYSConst.icon16ledGreenOff);
-                linemapNR.put(nreport, pnlSingle.getMain());
-            }
-            JPanel zebra = new JPanel();
-            zebra.setLayout(new BoxLayout(zebra, BoxLayout.LINE_AXIS));
-            zebra.setOpaque(true);
-            if (i % 2 == 0) {
-                zebra.setBackground(SYSConst.orange1[SYSConst.light2]);
-            } else {
-                zebra.setBackground(Color.WHITE);
-            }
-            zebra.add(linemapNR.get(nreport));
-            i++;
+                            final DefaultCPTitle pnlSingle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent evt) {
+                                    if (handover.getUsersAcknowledged().contains(OPDE.getLogin().getUser())) {
+                                        return;
+                                    }
+                                    EntityManager em = OPDE.createEM();
+                                    try {
+                                        em.getTransaction().begin();
+                                        Handovers myHO = em.merge(handover);
+                                        Handover2User connObj = em.merge(new Handover2User(myHO, em.merge(OPDE.getLogin().getUser())));
+                                        myHO.getUsersAcknowledged().add(connObj);
+                                        em.getTransaction().commit();
+                                        cacheHO.get(key).remove(handover);
+                                        cacheHO.get(key).add(myHO);
+                                        Collections.sort(cacheHO.get(key));
+                                        linemapHO.remove(handover);
+                                        createCP4Day(day);
 
-            dayPanel.add(zebra);
+                                        final String keyDay = DateFormat.getDateInstance().format(handover.getPit());
+                                        contentmap.remove(keyDay);
+
+                                        buildPanel();
+                                    } catch (OptimisticLockException ole) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                            OPDE.getMainframe().emptyFrame();
+                                            OPDE.getMainframe().afterLogin();
+                                        }
+                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                    } catch (Exception e) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        OPDE.fatal(e);
+                                    } finally {
+                                        em.close();
+                                    }
+                                }
+                            });
+
+                            final JButton btnInfo = new JButton(SYSConst.icon22info);
+                            btnInfo.setPressedIcon(SYSConst.icon22infoPressed);
+                            btnInfo.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                            btnInfo.setAlignmentY(Component.TOP_ALIGNMENT);
+                            btnInfo.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                            btnInfo.setContentAreaFilled(false);
+                            btnInfo.setBorder(null);
+                            btnInfo.addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    SYSFilesTools.print(Handover2UserTools.getAsHTML(handover), false);
+                                }
+                            });
+                            pnlSingle.getRight().add(btnInfo);
+
+                            pnlSingle.getButton().setIcon(Handover2UserTools.containsUser(handover.getUsersAcknowledged(), OPDE.getLogin().getUser()) ? SYSConst.icon16ledGreenOn : SYSConst.icon16ledGreenOff);
+                            pnlSingle.getButton().setVerticalTextPosition(SwingConstants.TOP);
+                            linemapHO.put(handover, pnlSingle.getMain());
+                        }
+                        JPanel zebra = new JPanel();
+                        zebra.setLayout(new BoxLayout(zebra, BoxLayout.LINE_AXIS));
+                        zebra.setOpaque(true);
+                        if (i % 2 == 0) {
+                            zebra.setBackground(SYSConst.orange1[SYSConst.light2]);
+                        } else {
+                            zebra.setBackground(Color.WHITE);
+                        }
+                        zebra.add(linemapHO.get(handover));
+                        i++;
+                        dayPanel.add(zebra);
+                    }
+                    for (final NReport nreport : cacheNR.get(key)) {
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), i, max));
+                        if (!linemapNR.containsKey(nreport)) {
+                            String title = "<html><table border=\"0\">" +
+                                    "<tr valign=\"top\">" +
+                                    "<td width=\"100\" align=\"left\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
+                                    " " + OPDE.lang.getString("misc.msg.Time.short") +
+                                    "</td>" +
+                                    "<td width=\"350\" align=\"left\">" +
+                                    nreport.getText() +
+                                    "<td width=\"200\" align=\"left\">" + ResidentTools.getBWLabelTextKompakt(nreport.getResident()) + "</td>" +
+                                    "</td>" +
+                                    "<td width=\"200\" align=\"left\">" + nreport.getUser().getFullname() + "</td>" +
+                                    "</tr>" +
+                                    "</table>" +
+                                    "</html>";
+
+                            final DefaultCPTitle pnlSingle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent evt) {
+                                    if (NR2UserTools.containsUser(nreport.getUsersAcknowledged(), OPDE.getLogin().getUser())) {
+                                        return;
+                                    }
+                                    EntityManager em = OPDE.createEM();
+                                    try {
+                                        em.getTransaction().begin();
+                                        NReport myNR = em.merge(nreport);
+                                        NR2User connObj = em.merge(new NR2User(myNR, em.merge(OPDE.getLogin().getUser())));
+                                        myNR.getUsersAcknowledged().add(connObj);
+                                        em.getTransaction().commit();
+
+                                        cacheNR.get(key).remove(nreport);
+                                        cacheNR.get(key).add(myNR);
+                                        Collections.sort(cacheNR.get(key));
+                                        linemapNR.remove(nreport);
+                                        final String keyDay = DateFormat.getDateInstance().format(nreport.getPit());
+                                        contentmap.remove(keyDay);
+                                        createCP4Day(day);
+                                        buildPanel();
+                                    } catch (OptimisticLockException ole) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                            OPDE.getMainframe().emptyFrame();
+                                            OPDE.getMainframe().afterLogin();
+                                        }
+                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                    } catch (Exception e) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        OPDE.fatal(e);
+                                    } finally {
+                                        em.close();
+                                    }
+                                }
+                            });
+
+                            final JButton btnInfo = new JButton(SYSConst.icon22info);
+                            btnInfo.setPressedIcon(SYSConst.icon22infoPressed);
+                            btnInfo.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                            btnInfo.setAlignmentY(Component.TOP_ALIGNMENT);
+                            btnInfo.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                            btnInfo.setContentAreaFilled(false);
+                            btnInfo.setBorder(null);
+                            btnInfo.addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    SYSFilesTools.print(NR2UserTools.getAsHTML(nreport), false);
+                                }
+                            });
+                            pnlSingle.getRight().add(btnInfo);
+
+                            pnlSingle.getButton().setIcon(NR2UserTools.containsUser(nreport.getUsersAcknowledged(), OPDE.getLogin().getUser()) ? SYSConst.icon16ledGreenOn : SYSConst.icon16ledGreenOff);
+                            pnlSingle.getButton().setVerticalTextPosition(SwingConstants.TOP);
+                            linemapNR.put(nreport, pnlSingle.getMain());
+                        }
+                        JPanel zebra = new JPanel();
+                        zebra.setLayout(new BoxLayout(zebra, BoxLayout.LINE_AXIS));
+                        zebra.setOpaque(true);
+                        if (i % 2 == 0) {
+                            zebra.setBackground(SYSConst.orange1[SYSConst.light2]);
+                        } else {
+                            zebra.setBackground(Color.WHITE);
+                        }
+                        zebra.add(linemapNR.get(nreport));
+                        i++;
+
+                        dayPanel.add(zebra);
+                    }
+                    contentmap.put(key, dayPanel);
+                    cpDay.setContentPane(contentmap.get(key));
+//                return dayPanel;
+
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+
+
+                    OPDE.getDisplayManager().setProgressBarMessage(null);
+                    OPDE.getMainframe().setBlocked(false);
+                }
+            };
+            worker.execute();
+
         }
-        contentmap.put(key, dayPanel);
-        return dayPanel;
     }
-
-//    public void reloadTable() {
-//        btnNew.setEnabled(true);
-//        // Tagesbericht Liste aktualisieren
-//        ListSelectionModel lsm = tblUebergabe.getSelectionModel();
-//        if (lsl != null) {
-//            lsm.removeListSelectionListener(lsl);
-//
-//        }
-//        lsl = new HandleSelections();
-//
-//        int sort = TMUebergabe.SORT_NAME;
-////        if (rbSortUhrzeit.isSelected()) {
-////            sort = TMUebergabe.SORT_UHRZEIT;
-////        }
-//        if (pnlFilter.getSelectedIndex() == TAB_DATE) {
-//            tblUebergabe.setModel(new TMUebergabe(jdcDatum.getDate(), (Homes) cmbEinrichtung.getSelectedItem()));
-//        } else {
-////            if (!txtSuche.getText().equals("")) {
-////                tblUebergabe.setModel(new TMUebergabe(le.getData(), txtSuche.getText(), sort));
-////            }
-//        }
-//
-//        // Sonst wird der Listenaufbau sehr langsam.
-//        // tblTB.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-//        tblUebergabe.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-//        lsm.addListSelectionListener(lsl);
-//
-//        jspUebergabe.dispatchEvent(new ComponentEvent(jspUebergabe, ComponentEvent.COMPONENT_RESIZED));
-//
-//        tblUebergabe.getColumnModel().getColumn(TMUebergabe.COL_PIT).setCellRenderer(new RNDHTML());
-//
-//        tblUebergabe.getColumnModel().getColumn(TMUebergabe.COL_INFO).setCellRenderer(new RNDHTML());
-//        tblUebergabe.getColumnModel().getColumn(TMUebergabe.COL_HTML).setCellRenderer(new RNDHTML());
-////        tblUebergabe.getColumnModel().getColumn(TMUebergabe.COL_ACKN).setCellRenderer(new RNDUbergabe());
-//
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JScrollPane jspHandover;
     private CollapsiblePanes cpsHandover;
     // End of variables declaration//GEN-END:variables
-
-//    class HandleSelections implements ListSelectionListener {
-//
-//        public void valueChanged(ListSelectionEvent lse) {
-//            // Erst reagieren wenn der Auswahl-Vorgang abgeschlossen ist.
-//            TableModel tm = tblUebergabe.getModel();
-//            if (!lse.getValueIsAdjusting()) {
-//                DefaultListSelectionModel lsm = (DefaultListSelectionModel) lse.getSource();
-//                btnConfirmAll.setEnabled(true);
-////                selectedTBID = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMUebergabe.COL_TBID)).longValue();
-////                long qsuid = ((Long) tm.getValueAt(lsm.getLeadSelectionIndex(), TMUebergabe.COL_QSUID)).longValue();
-////                btnConfirm.setEnabled(!lsm.isSelectionEmpty() && qsuid == 0);
-//                //btnInfo.setEnabled(ocs.mayEnabled(classname, "btnInfo", !lsm.isSelectionEmpty()));
-//
-//
-//            }
-//        }
-//    }
-//    private boolean mayEnabled(String sjc, boolean desiredState){
-//        HashMap hm = new HashMap();
-//        
-//        if (OPDE.ocgroups.containsKey("admin") || OPDE.ocgroups.containsKey("pdl")) {
-//            hm.put(sjc+".enabled",new Boolean(true));
-//        } else {
-//            hm.put(sjc+".enabled",new Boolean(false));
-//        }
-//        
-//        // Ohne Eintrag gilt die Erlaubnis als erteilt (!containskey)
-//        boolean access = !hm.containsKey(sjc+".enabled") || ((Boolean) hm.get(sjc+".enabled")).booleanValue();
-//        
-//        return (desiredState && access);
-//    }
-
 
     private void buildPanel() {
         cpsHandover.removeAll();
@@ -1092,120 +1100,85 @@ public class PnlHandover extends NursingRecordsPanel {
     private java.util.List<Component> addCommands() {
         java.util.List<Component> list = new ArrayList<Component>();
 
-//        /***
-//         *      _   _
-//         *     | \ | | _____      __
-//         *     |  \| |/ _ \ \ /\ / /
-//         *     | |\  |  __/\ V  V /
-//         *     |_| \_|\___| \_/\_/
-//         *
-//         */
-//        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
-//            JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent actionEvent) {
-//                    new DlgReport(new NReport(resident), new Closure() {
-//                        @Override
-//                        public void execute(Object report) {
-//                            if (report != null) {
-//                                EntityManager em = OPDE.createEM();
-//                                try {
-//                                    em.getTransaction().begin();
-//                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-//                                    final NReport myReport = (NReport) em.merge(report);
-//                                    em.getTransaction().commit();
-//
-//                                    final String keyDay = DateFormat.getDateInstance().format(myReport.getPit());
-//                                    contentmap.remove(keyDay);
-//                                    if (valuecache.containsKey(keyDay)) {
-//                                        valuecache.get(keyDay).add(myReport);
-//                                        Collections.sort(valuecache.get(keyDay));
-//                                    }
-//                                    createCP4Day(new DateMidnight(myReport.getPit()));
-//                                    expandDay(new DateMidnight(myReport.getPit()));
-//
-//                                    buildPanel();
-//                                    GUITools.scroll2show(jspReports, cpMap.get(keyDay), cpsReports, new Closure() {
-//                                        @Override
-//                                        public void execute(Object o) {
-//                                            GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-//                                        }
-//                                    });
-//                                } catch (OptimisticLockException ole) {
-//                                    if (em.getTransaction().isActive()) {
-//                                        em.getTransaction().rollback();
-//                                    }
-//                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-//                                        OPDE.getMainframe().emptyFrame();
-//                                        OPDE.getMainframe().afterLogin();
-//                                    }
-//                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-//                                } catch (Exception e) {
-//                                    if (em.getTransaction().isActive()) {
-//                                        em.getTransaction().rollback();
-//                                    }
-//                                    OPDE.fatal(e);
-//                                } finally {
-//                                    em.close();
-//                                }
-//                            }
-//                        }
-//                    });
-//                }
-//            });
-//            list.add(addButton);
-//
-//
-//        }
+        /***
+         *      _   _
+         *     | \ | | _____      __
+         *     |  \| |/ _ \ \ /\ / /
+         *     | |\  |  __/\ V  V /
+         *     |_| \_|\___| \_/\_/
+         *
+         */
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
+            JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".btnadd.tooltip"), SYSConst.icon22add, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    new DlgHOReport(new Handovers((Homes) cmbHomes.getSelectedItem()), new Closure() {
+                        @Override
+                        public void execute(Object report) {
+                            if (report != null) {
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    final Handovers myHO = em.merge((Handovers) report);
+                                    myHO.getUsersAcknowledged().add(em.merge(new Handover2User(myHO, OPDE.getLogin().getUser())));
+                                    em.getTransaction().commit();
+
+                                    DateMidnight day = new DateMidnight(myHO.getPit());
+
+                                    final String key = DateFormat.getDateInstance().format(myHO.getPit());
+                                    if (!cacheHO.containsKey(key)) {
+                                        cacheHO.put(key, HandoversTools.getBy(day, (Homes) cmbHomes.getSelectedItem()));
+                                    } else {
+                                        cacheHO.get(key).add(myHO);
+                                        Collections.sort(cacheHO.get(key));
+                                    }
+
+                                    createCP4Day(day);
+                                    contentmap.remove(key);
+
+                                    expandDay(day);
+
+                                    buildPanel();
+                                    GUITools.scroll2show(jspHandover, cpMap.get(key), cpsHandover, new Closure() {
+                                        @Override
+                                        public void execute(Object o) {
+                                            GUITools.flashBackground(linemapHO.get(myHO), Color.YELLOW, 2);
+                                        }
+                                    });
+                                } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+            list.add(addButton);
+
+
+        }
         return list;
     }
 
     private List<Component> addFilters() {
         List<Component> list = new ArrayList<Component>();
 
-//        txtSearch = new JXSearchField(OPDE.lang.getString("misc.msg.searchphrase"));
-//        txtSearch.setFont(SYSConst.ARIAL14);
-//        txtSearch.setInstantSearchDelay(750);
-//        txtSearch.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                if (SYSTools.catchNull(txtSearch.getText()).trim().length() > 3) {
-//                    SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Search(resident, txtSearch.getText().trim()), false, true, OPDE.lang.getString("misc.msg.searchresults") + ": &quot;" + txtSearch.getText().trim() + "&quot;", txtSearch.getText().trim()), false);
-//                }
-//            }
-//        });
-//
-//        list.add(txtSearch);
-
-        jdcDay = new JDateChooser(new Date());
-        jdcDay.setBackground(Color.WHITE);
-        jdcDay.setFont(SYSConst.ARIAL14);
-        jdcDay.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (!evt.getPropertyName().equals("date")) {
-                    return;
-                }
-                reloadDisplay();
-            }
-        });
-        list.add(jdcDay);
-//
-//        JPanel buttonPanel = new JPanel();
-//        buttonPanel.setBackground(Color.WHITE);
-//        buttonPanel.setLayout(new HorizontalLayout(5));
-//        buttonPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
-//
-//        EntityManager em = OPDE.createEM();
-//        MouseAdapter ma = GUITools.getHyperlinkStyleMouseAdapter();
-//        Query query = em.createQuery("SELECT p FROM NReportTAGS p WHERE p.aktiv = TRUE ORDER BY p.besonders DESC, p.sort DESC, p.bezeichnung");
-//        DefaultComboBoxModel dcbm = new DefaultComboBoxModel(query.getResultList().toArray());
-//        em.close();
-
-//        dcbm.insertElementAt(OPDE.lang.getString("misc.commands.noselection"), 0);
         cmbHomes = new JComboBox();
         cmbHomes.setFont(SYSConst.ARIAL14);
-//        cmbHomes.setRenderer(NReportTAGSTools.getPBerichtTAGSRenderer());
         HomesTools.setComboBox(cmbHomes);
         cmbHomes.addItemListener(new ItemListener() {
             @Override

@@ -17,10 +17,7 @@ import org.apache.commons.collections.CollectionUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * @author tloehr
@@ -219,7 +216,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nReport")
     private Collection<SYSNR2FILE> attachedFilesConnections;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bericht")
-    private Collection<NR2User> usersAcknowledged;
+    private List<NR2User> usersAcknowledged;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nreport")
     private Collection<SYSNR2PROCESS> attachedProcessConnections;
 
@@ -279,7 +276,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         this.pbid = pbid;
     }
 
-    public Collection<NR2User> getUsersAcknowledged() {
+    public List<NR2User> getUsersAcknowledged() {
         return usersAcknowledged;
     }
 
@@ -528,7 +525,6 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
 
     @Override
     public int compareTo(NReport other) {
-        int result = this.getPit().compareTo(other.getPit());
-        return result;
+        return pit.compareTo(other.getPit());
     }
 }

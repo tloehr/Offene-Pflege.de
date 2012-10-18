@@ -66,7 +66,7 @@ public class Handover2User implements Serializable, Comparable<Handover2User> {
         this.pit = pit;
     }
 
-    public Handovers getBericht() {
+    public Handovers getHandover() {
         return bericht;
     }
 
@@ -102,7 +102,7 @@ public class Handover2User implements Serializable, Comparable<Handover2User> {
 
     @Override
     public int compareTo(Handover2User o) {
-        return getUser().getFullname().compareTo(o.getUser().getFullname());
+        return pit.compareTo(o.getPit()); //getUser().getFullname().compareTo(o.getUser().getFullname());
     }
 
 

@@ -28,24 +28,26 @@ import java.util.GregorianCalendar;
 public class PnlPIT extends JPanel {
     private Time uhrzeit;
     private Date preset;
-    private Date max;
+    private Date max, min;
     //TODO: Catch entries that are way too old
     public PnlPIT() {
-        this(new Date(), new Date());
+        this(new Date(), new Date(), SYSConst.DATE_VON_ANFANG_AN);
     }
 
     public PnlPIT(Date preset) {
-        this(preset, new Date());
+        this(preset, new Date(), SYSConst.DATE_VON_ANFANG_AN);
     }
 
-    public PnlPIT(Date preset, Date max) {
+    public PnlPIT(Date preset, Date max, Date min) {
         this.max = max;
+        this.min = min;
         initComponents();
         labelDatum.setText(OPDE.lang.getString("misc.msg.Date"));
         labelUhrzeit.setText(OPDE.lang.getString("misc.msg.Time.long"));
         this.preset = preset;
         jdcDatum.setDate(preset);
         jdcDatum.setMaxSelectableDate(max == null ? SYSConst.DATE_BIS_AUF_WEITERES : max);
+        jdcDatum.setMinSelectableDate(min == null ? SYSConst.DATE_VON_ANFANG_AN : min);
         uhrzeit = new Time(preset.getTime());
         txtUhrzeit.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(uhrzeit));
     }
@@ -69,6 +71,10 @@ public class PnlPIT extends JPanel {
 
         if (new DateTime(gc).isAfter(new DateTime(max))){
             gc = new DateTime(max).toGregorianCalendar();
+        }
+
+        if (new DateTime(gc).isBefore(new DateTime(min))){
+            gc = new DateTime(min).toGregorianCalendar();
         }
 
         txtUhrzeit.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(new Date(gc.getTimeInMillis())));

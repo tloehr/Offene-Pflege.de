@@ -7,13 +7,13 @@ package op.allowance;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.Allowance;
-import entity.info.Resident;
-import entity.info.ResidentTools;
+import entity.info.*;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
+import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 
 import javax.swing.*;
@@ -37,6 +37,7 @@ public class PnlTX extends JPanel {
     private Allowance tx;
     private Closure afterChange;
     DecimalFormat cf = new DecimalFormat("######.00");
+    DateMidnight min;
 
     public PnlTX(Allowance tx, Closure afterChange) {
         super();
@@ -58,6 +59,11 @@ public class PnlTX extends JPanel {
             dt = new DateTime();
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.futuredate")));
         }
+        if (dt.isBefore(min)) {
+            dt = new DateTime();
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.DateTooOld")));
+        }
+
         ((JTextField) evt.getSource()).setText(DateFormat.getDateInstance().format(dt.toDate()));
     }
 
@@ -125,8 +131,8 @@ public class PnlTX extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "default, $lcgap, pref, $lcgap, 161dlu, $lcgap, default",
-                "default, $lgap, pref, 4*($lgap, default)"));
+            "default, $lcgap, pref, $lcgap, 161dlu, $lcgap, default",
+            "default, $lgap, pref, 4*($lgap, default)"));
 
         //---- lblResident ----
         lblResident.setText("text");
@@ -155,7 +161,6 @@ public class PnlTX extends JPanel {
             public void focusGained(FocusEvent e) {
                 txtDateFocusGained(e);
             }
-
             @Override
             public void focusLost(FocusEvent e) {
                 txtDateFocusLost(e);
@@ -181,7 +186,6 @@ public class PnlTX extends JPanel {
             public void focusGained(FocusEvent e) {
                 txtTextFocusGained(e);
             }
-
             @Override
             public void focusLost(FocusEvent e) {
                 txtTextFocusLost(e);
@@ -207,7 +211,6 @@ public class PnlTX extends JPanel {
             public void focusGained(FocusEvent e) {
                 txtCashFocusGained(e);
             }
-
             @Override
             public void focusLost(FocusEvent e) {
                 txtCashFocusLost(e);
@@ -246,8 +249,10 @@ public class PnlTX extends JPanel {
             cmbResident.setEnabled(false);
         }
 
-        txtDate.requestFocus();
+        ResInfo firstStay = ResInfoTools.getFirstResinfo(tx.getResident(), ResInfoTypeTools.getByID(ResInfoTypeTools.TYPE_STAY));
+        min = firstStay == null ? new DateMidnight().dayOfMonth().withMinimumValue() : new DateMidnight(firstStay.getFrom());
 
+        txtDate.requestFocus();
     }
 
     private BigDecimal checkCash(String text, BigDecimal defaultAmount) {

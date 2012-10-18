@@ -345,45 +345,45 @@ public class PrescriptionTools {
         return result;
     }
 
-    public static String getPrescriptionAsText2(Prescription verordnung) {
+    public static String getLongDescription(Prescription presription) {
         String result = "<div id=\"fonttext\">";// = SYSConst.html_fontface;
 
-        if (verordnung.isClosed()) {
+        if (presription.isClosed()) {
             result += "<s>"; // Abgesetzte
         }
-        if (!verordnung.hasMed()) {
-            result += verordnung.getIntervention().getBezeichnung();
+        if (!presription.hasMed()) {
+            result += presription.getIntervention().getBezeichnung();
         } else {
 
-            MedInventory inventory = TradeFormTools.getInventory4TradeForm(verordnung.getResident(), verordnung.getTradeForm());
+            MedInventory inventory = TradeFormTools.getInventory4TradeForm(presription.getResident(), presription.getTradeForm());
             MedStock stockInUse = MedStockTools.getStockInUse(inventory);
 
             if (stockInUse != null) {
                 // If the current prescription defers from the original one (different provider of the medication as in the beginning)
-                if (!stockInUse.getTradeForm().equals(verordnung.getTradeForm())) {
+                if (!stockInUse.getTradeForm().equals(presription.getTradeForm())) {
                     result += "<b>" + stockInUse.getTradeForm().getMedProduct().getBezeichnung() +
                             (stockInUse.getTradeForm().getSubtext().isEmpty() ? "" : " " + stockInUse.getTradeForm().getSubtext()) + "</b>" +
                             (stockInUse.getTradeForm().getDosageForm().getPreparation().isEmpty() ? "" : " " + stockInUse.getTradeForm().getDosageForm().getPreparation()) + " " +
                             (stockInUse.getTradeForm().getDosageForm().getUsageTex().isEmpty() ? SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getUsageUnit()] : stockInUse.getTradeForm().getDosageForm().getUsageTex());
-                    result += " <i>(" + OPDE.lang.getString(PnlPrescription.internalClassID + ".originalprescription") + ": " + verordnung.getTradeForm().getMedProduct().getBezeichnung();
+                    result += " <i>(" + OPDE.lang.getString(PnlPrescription.internalClassID + ".originalprescription") + ": " + presription.getTradeForm().getMedProduct().getBezeichnung();
                     result += (stockInUse.getTradeForm().getSubtext().isEmpty() ? "" : " " + stockInUse.getTradeForm().getSubtext()) + ")</i>";
                 } else {
                     // No, the resident still gets the orginal stuff
-                    result += "<b>" + verordnung.getTradeForm().getMedProduct().getBezeichnung()
+                    result += "<b>" + presription.getTradeForm().getMedProduct().getBezeichnung()
                             + (stockInUse.getTradeForm().getSubtext().isEmpty() ? "" : " " + stockInUse.getTradeForm().getSubtext()) + "</b>" +
                             (stockInUse.getTradeForm().getDosageForm().getPreparation().isEmpty() ? "" : " " + stockInUse.getTradeForm().getDosageForm().getPreparation()) + " " +
-                            (verordnung.getTradeForm().getDosageForm().getUsageTex().isEmpty() ? SYSConst.UNITS[verordnung.getTradeForm().getDosageForm().getUsageUnit()] : verordnung.getTradeForm().getDosageForm().getUsageTex());
+                            (presription.getTradeForm().getDosageForm().getUsageTex().isEmpty() ? SYSConst.UNITS[presription.getTradeForm().getDosageForm().getUsageUnit()] : presription.getTradeForm().getDosageForm().getUsageTex());
                 }
             } else {
-                result += "<b>" + verordnung.getTradeForm().getMedProduct().getBezeichnung()
-                        + (verordnung.getTradeForm().getSubtext().isEmpty() ? "" : " " + verordnung.getTradeForm().getSubtext()) + "</b>" +
-                        (verordnung.getTradeForm().getDosageForm().getPreparation().isEmpty() ? "" : " " + verordnung.getTradeForm().getDosageForm().getPreparation()) + " " +
-                        (verordnung.getTradeForm().getDosageForm().getUsageTex().isEmpty() ? SYSConst.UNITS[verordnung.getTradeForm().getDosageForm().getUsageUnit()] : verordnung.getTradeForm().getDosageForm().getUsageTex());
+                result += "<b>" + presription.getTradeForm().getMedProduct().getBezeichnung()
+                        + (presription.getTradeForm().getSubtext().isEmpty() ? "" : " " + presription.getTradeForm().getSubtext()) + "</b>" +
+                        (presription.getTradeForm().getDosageForm().getPreparation().isEmpty() ? "" : " " + presription.getTradeForm().getDosageForm().getPreparation()) + " " +
+                        (presription.getTradeForm().getDosageForm().getUsageTex().isEmpty() ? SYSConst.UNITS[presription.getTradeForm().getDosageForm().getUsageUnit()] : presription.getTradeForm().getDosageForm().getUsageTex());
             }
 
 
         }
-        if (verordnung.isClosed()) {
+        if (presription.isClosed()) {
             result += "</s>"; // Abgesetzte
         }
 
@@ -654,19 +654,15 @@ public class PrescriptionTools {
             Prescription prescription = list.get(0);
             result += withheader ? "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.prescription") + (withlongheader ? " für " + ResidentTools.getLabelText(prescription.getResident()) : "") + "</h2>" : "";
 
-//            if (prescription.getResident().getStation() != null) {
-//                result += HomesTools.getAsText(prescription.getResident().getStation().getHome());
-//            }
-
             result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
-                    "<th >Medikament/Massnahme</th><th >Dosierung / Hinweise</th><th >Angesetzt</th></tr>";
+                    "<th>Medikament/Massnahme</th><th>Dosierung / Hinweise</th><th >Angesetzt</th></tr>";
 
             for (Prescription myprescription : list) {
 
                 if (withDiscontinued || !myprescription.isClosed()) {
 
                     result += "<tr>";
-                    result += "<td valign=\"top\">" + getShortDescription(myprescription) + "</td>";
+                    result += "<td valign=\"top\">" + getLongDescription(myprescription) + "</td>";
                     result += "<td valign=\"top\">" + getDose(myprescription, withmed) + "<br/>";
                     result += getRemark(myprescription) + "</td>";
                     result += "<td valign=\"top\">" + getON(myprescription);
@@ -687,21 +683,21 @@ public class PrescriptionTools {
         return result;
     }
 
-    /**
-     * Ermittelt die Anzahl der Verordnungen, die zu dieser Verordnung gemäß der VerordnungKennung gehören.
-     * Verordnung, die über die Zeit mehrfach geändert werden, hängen über die VerordnungsKennung aneinander.
-     *
-     * @param verordnung
-     * @return Anzahl der Verordnungen, die zu dieser gehören.e
-     */
-    public static int getNumVerodnungenMitGleicherKennung(Prescription verordnung) {
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM Prescription b WHERE b.prescRelation = :verKennung");
-        query.setParameter("verKennung", verordnung.getRelation());
-        int num = query.getResultList().size();
-        em.close();
-        return num;
-    }
+//    /**
+//     * Ermittelt die Anzahl der Verordnungen, die zu dieser Verordnung gemäß der VerordnungKennung gehören.
+//     * Verordnung, die über die Zeit mehrfach geändert werden, hängen über die VerordnungsKennung aneinander.
+//     *
+//     * @param verordnung
+//     * @return Anzahl der Verordnungen, die zu dieser gehören.e
+//     */
+//    public static int getNumVerodnungenMitGleicherKennung(Prescription verordnung) {
+//        EntityManager em = OPDE.createEM();
+//        Query query = em.createQuery("SELECT b FROM Prescription b WHERE b.prescRelation = :verKennung");
+//        query.setParameter("verKennung", verordnung.getRelation());
+//        int num = query.getResultList().size();
+//        em.close();
+//        return num;
+//    }
 
     public static String toPrettyString(Prescription verordnung) {
         String myPretty = "";

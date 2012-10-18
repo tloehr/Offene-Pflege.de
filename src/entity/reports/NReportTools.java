@@ -137,12 +137,14 @@ public class NReportTools {
     }
 
 
-    public static int getNumReports(Resident resident) {
+    public static int getNum(Resident resident, DateMidnight day) {
         int num = 0;
 
         EntityManager em = OPDE.createEM();
-        Query queryMin = em.createQuery("SELECT COUNT(nr) FROM NReport nr WHERE nr.resident = :resident ");
+        Query queryMin = em.createQuery("SELECT COUNT(nr) FROM NReport nr WHERE nr.resident = :resident AND nr.pit >= :start AND nr.pit <= :end");
         queryMin.setParameter("resident", resident);
+        queryMin.setParameter("start", day.toDate());
+        queryMin.setParameter("end", day.plusDays(1).toDateTime().minusSeconds(1).toDate());
 
         try {
             num = (Integer) queryMin.getSingleResult();
@@ -463,83 +465,83 @@ public class NReportTools {
     }
 
 
-    /**
-     * Durchsucht die NReport nach einem oder mehreren Suchbegriffen
-     */
-    public static String getBerichteASHTML(EntityManager em, String suche, NReportTAGS tag, int headertiefe, int monate) {
-        StringBuilder html = new StringBuilder(1000);
-        String where = "";
-        String htmlbeschreibung = "";
-        String jpql = "";
-        String order = " ORDER BY p.bewohner.bWKennung, p.pit ";
-
-        if (suche.trim().isEmpty() && tag == null) {
-            html.append("<h" + headertiefe + ">");
-            html.append("Berichtsuche nicht möglich.");
-            html.append("</h" + headertiefe + ">");
-        } else {
-            jpql = "SELECT p FROM NReport p JOIN p.tags t WHERE p.pit >= :date AND t = :tag";
-
-            if (!suche.trim().isEmpty()) {
-                where = " AND p.text like :search ";
-                htmlbeschreibung += "Suchbegriff: '" + suche + "'<br/>";
-            }
-
-            if (tag != null) {
-                // Suchausdruck vorbereiten.
-                where += " AND t = :tag ";
-                htmlbeschreibung += "Markierung: '" + tag.getBezeichnung() + "'<br/>";
-            }
-
-//            String sql = "" +
-//                    " SELECT b.nachname, b.vorname, b.geschlecht, b.bwkennung, tb.Text, tb.PIT, tb.UKennung " +
-//                    " FROM Tagesberichte tb " +
-//                    " INNER JOIN Bewohner b ON tb.BWKennung = b.BWKennung " +
-//                    " WHERE Date(tb.PIT) >= DATE_ADD(now(), INTERVAL ? MONTH) " +
-//                    " AND " + where +
-//                    " b.AdminOnly <> 2 " +
-//                    " ORDER BY b.BWKennung, tb.PIT ";
-
-            try {
-                Query query = em.createQuery(jpql + where + order);
-                if (!suche.trim().isEmpty()) {
-                    query.setParameter("search", "%" + suche + "%");
-                }
-                if (tag != null) {
-                    query.setParameter("tag", tag);
-                }
-
-                query.setParameter("date", SYSCalendar.addField(new Date(), monate * -1, GregorianCalendar.MONTH));
-                List<NReport> list = query.getResultList();
-                html.append("<h" + headertiefe + ">");
-                html.append("Suchergebnisse in den Berichten der letzten " + monate + " Monate");
-                html.append("</h" + headertiefe + ">");
-                html.append(htmlbeschreibung);
-
-                if (!list.isEmpty()) {
-                    DateFormat df = DateFormat.getDateTimeInstance();
-                    html.append("<table border=\"1\"><tr>" +
-                            "<th>BewohnerIn</th><th>Datum/Uhrzeit</th><th>Text</th><th>UKennung</th></tr>");
-                    for (NReport bericht : list) {
-                        html.append("<tr>");
-
-                        html.append("<td>" + ResidentTools.getBWLabel1(bericht.getResident()) + "</td>");
-                        html.append("<td>" + df.format(bericht.getPit()) + "</td>");
-                        html.append("<td>" + bericht.getText() + "</td>");
-                        html.append("<td>" + bericht.getUser().getUID() + "</td>");
-                        html.append("</tr>");
-                    }
-                    html.append("</table>");
-                } else {
-                    html.append("<br/>keine Treffer gefunden...");
-                }
-            } catch (Exception e) {
-                OPDE.fatal(e);
-            }
-        }
-
-        return html.toString();
-    }
+//    /**
+//     * Durchsucht die NReport nach einem oder mehreren Suchbegriffen
+//     */
+//    public static String getBerichteASHTML(EntityManager em, String suche, NReportTAGS tag, int headertiefe, int monate) {
+//        StringBuilder html = new StringBuilder(1000);
+//        String where = "";
+//        String htmlbeschreibung = "";
+//        String jpql = "";
+//        String order = " ORDER BY p.bewohner.bWKennung, p.pit ";
+//
+//        if (suche.trim().isEmpty() && tag == null) {
+//            html.append("<h" + headertiefe + ">");
+//            html.append("Berichtsuche nicht möglich.");
+//            html.append("</h" + headertiefe + ">");
+//        } else {
+//            jpql = "SELECT p FROM NReport p JOIN p.tags t WHERE p.pit >= :date AND t = :tag";
+//
+//            if (!suche.trim().isEmpty()) {
+//                where = " AND p.text like :search ";
+//                htmlbeschreibung += "Suchbegriff: '" + suche + "'<br/>";
+//            }
+//
+//            if (tag != null) {
+//                // Suchausdruck vorbereiten.
+//                where += " AND t = :tag ";
+//                htmlbeschreibung += "Markierung: '" + tag.getBezeichnung() + "'<br/>";
+//            }
+//
+////            String sql = "" +
+////                    " SELECT b.nachname, b.vorname, b.geschlecht, b.bwkennung, tb.Text, tb.PIT, tb.UKennung " +
+////                    " FROM Tagesberichte tb " +
+////                    " INNER JOIN Bewohner b ON tb.BWKennung = b.BWKennung " +
+////                    " WHERE Date(tb.PIT) >= DATE_ADD(now(), INTERVAL ? MONTH) " +
+////                    " AND " + where +
+////                    " b.AdminOnly <> 2 " +
+////                    " ORDER BY b.BWKennung, tb.PIT ";
+//
+//            try {
+//                Query query = em.createQuery(jpql + where + order);
+//                if (!suche.trim().isEmpty()) {
+//                    query.setParameter("search", "%" + suche + "%");
+//                }
+//                if (tag != null) {
+//                    query.setParameter("tag", tag);
+//                }
+//
+//                query.setParameter("date", SYSCalendar.addField(new Date(), monate * -1, GregorianCalendar.MONTH));
+//                List<NReport> list = query.getResultList();
+//                html.append("<h" + headertiefe + ">");
+//                html.append("Suchergebnisse in den Berichten der letzten " + monate + " Monate");
+//                html.append("</h" + headertiefe + ">");
+//                html.append(htmlbeschreibung);
+//
+//                if (!list.isEmpty()) {
+//                    DateFormat df = DateFormat.getDateTimeInstance();
+//                    html.append("<table border=\"1\"><tr>" +
+//                            "<th>BewohnerIn</th><th>Datum/Uhrzeit</th><th>Text</th><th>UKennung</th></tr>");
+//                    for (NReport bericht : list) {
+//                        html.append("<tr>");
+//
+//                        html.append("<td>" + ResidentTools.getBWLabel1(bericht.getResident()) + "</td>");
+//                        html.append("<td>" + df.format(bericht.getPit()) + "</td>");
+//                        html.append("<td>" + bericht.getText() + "</td>");
+//                        html.append("<td>" + bericht.getUser().getUID() + "</td>");
+//                        html.append("</tr>");
+//                    }
+//                    html.append("</table>");
+//                } else {
+//                    html.append("<br/>keine Treffer gefunden...");
+//                }
+//            } catch (Exception e) {
+//                OPDE.fatal(e);
+//            }
+//        }
+//
+//        return html.toString();
+//    }
 
     public static String getSozialZeiten(EntityManager em, int headertiefe, Date monat) {
         StringBuilder html = new StringBuilder(1000);

@@ -73,21 +73,25 @@ public class HandoversTools {
         return list;
     }
 
-    /**
-     * gibt eine HTML Darstellung des Berichtes zurück.
-     *
-     * @return
-     */
-    public static String getAsHTML(Handovers bericht) {
+     public static String getAsHTML(Handovers handover) {
+        String result = "<div id=\"fonttext\">";
+
+        result += getDateAndUser(handover);
+
+//        DateFormat df = DateFormat.getDateTimeInstance();
+
+        String tmp = SYSTools.replace(handover.getText(), "\n", "<br/>", false);
+
+        result += "<p>" + tmp + "<p/>";
+
+        result += "<div/>";
+        return result;
+    }
+
+     public static String getDateAndUser(Handovers handover) {
         String result = "";
-
-        String fonthead = "<font " + getHTMLColor(bericht) + ">";
-
-        DateFormat df = DateFormat.getDateTimeInstance();
-        //result += (flags.equals("") ? "" : "<b>" + flags + "</b><br/>");
-
-        result += SYSTools.replace(bericht.getText(), "\n", "<br/>", false);
-        result = fonthead + result + "</font>";
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
+        result = sdf.format(handover.getPit()) + "; " + handover.getUser().getFullname();
         return result;
     }
 
@@ -96,7 +100,7 @@ public class HandoversTools {
      *
      * @return
      */
-    public static String getEinrichtungAsHTML(Handovers bericht) {
+    public static String getHomeAsHTML(Handovers bericht) {
         String result = "";
 
         String fonthead = "<font " + getHTMLColor(bericht) + ">";

@@ -6,11 +6,13 @@ package entity.reports;
 
 import entity.Homes;
 import entity.system.Users;
+import op.OPDE;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author tloehr
@@ -52,12 +54,15 @@ import java.util.Date;
 //                + " GROUP BY u.UEBID "
 //                + " ORDER BY u.PIT DESC", resultSetMapping = "Handovers.findByEinrichtungAndDatumAndAckUserResultMapping")
 //})
-public class Handovers implements Serializable {
+public class Handovers implements Serializable, Comparable<Handovers> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "HID")
     private Long hid;
+    @Version
+    @Column(name = "version")
+    private Long version;
     @Basic(optional = false)
     @Column(name = "PIT")
     @Temporal(TemporalType.TIMESTAMP)
@@ -72,16 +77,17 @@ public class Handovers implements Serializable {
     @ManyToOne
     private Users user;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bericht")
-    private Collection<Handover2User> usersAcknowledged;
+    private List<Handover2User> usersAcknowledged;
 
     public Handovers() {
     }
 
-    public Handovers(Date pit, String text, Homes home, Users user) {
-        this.pit = pit;
-        this.text = text;
+    public Handovers(Homes home) {
+        this.pit = new Date();
+        this.text = null;
         this.home = home;
-        this.user = user;
+        this.user = OPDE.getLogin().getUser();
+        this.usersAcknowledged = new ArrayList<Handover2User>();
     }
 
     public Long getUebid() {
@@ -112,6 +118,10 @@ public class Handovers implements Serializable {
         return home;
     }
 
+    public void setHome(Homes home) {
+        this.home = home;
+    }
+
     public Users getUser() {
         return user;
     }
@@ -120,7 +130,7 @@ public class Handovers implements Serializable {
         this.user = user;
     }
 
-    public Collection<Handover2User> getUsersAcknowledged() {
+    public List<Handover2User> getUsersAcknowledged() {
         return usersAcknowledged;
     }
 
@@ -142,6 +152,11 @@ public class Handovers implements Serializable {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public int compareTo(Handovers o) {
+        return pit.compareTo(o.getPit());
     }
 
     @Override

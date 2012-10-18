@@ -78,7 +78,7 @@ public class ResidentTools {
     public static String getLabelText(Resident bewohner) {
         boolean verstorben = ResInfoTools.isDead(bewohner);
         boolean ausgezogen = ResInfoTools.isDead(bewohner);
-        ResInfo hauf = ResInfoTools.getLastBWInfo(bewohner, ResInfoTypeTools.getByID("hauf"));
+        ResInfo hauf = ResInfoTools.getLastResinfo(bewohner, ResInfoTypeTools.getByID("hauf"));
 
         DateFormat df = DateFormat.getDateInstance();
         String result = bewohner.getNachname() + ", " + bewohner.getVorname() + " (*" + df.format(bewohner.getGebDatum()) + "), ";

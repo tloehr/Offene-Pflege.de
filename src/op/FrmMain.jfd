@@ -417,6 +417,10 @@
              <string>gridX</string> 
              <int>5</int> 
             </void> 
+            <void method="setProperty"> 
+             <string>vAlign</string> 
+             <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
+            </void> 
            </object> 
           </void> 
           <void method="add"> 

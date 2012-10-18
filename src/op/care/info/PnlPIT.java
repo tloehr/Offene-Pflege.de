@@ -22,7 +22,7 @@ public class PnlPIT extends JPanel {
 
     public PnlPIT(Date date, Closure actionBlock) {
         this.date = date;
-        pnlPIT = new op.tools.PnlPIT(date, new Date());
+        pnlPIT = new op.tools.PnlPIT(date);
         this.actionBlock = actionBlock;
         add(pnlPIT, CC.xy(3, 2));
         initComponents();

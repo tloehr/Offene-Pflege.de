@@ -59,7 +59,7 @@ public class ResInfoTools {
 //        return html;
 //    }
 
-    public static ResInfo getLastBWInfo(Resident bewohner, ResInfoType bwinfotyp) {
+    public static ResInfo getLastResinfo(Resident bewohner, ResInfoType bwinfotyp) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.from DESC");
         query.setParameter("bewohner", bewohner);
@@ -71,11 +71,11 @@ public class ResInfoTools {
         return bwinfos.isEmpty() ? null : bwinfos.get(0);
     }
 
-    public static ResInfo getFirstBWInfo(Resident bewohner, ResInfoType bwinfotyp) {
+    public static ResInfo getFirstResinfo(Resident resident, ResInfoType resInfoType) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.from DESC");
-        query.setParameter("bewohner", bewohner);
-        query.setParameter("bwinfotyp", bwinfotyp);
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :resident AND b.bwinfotyp = :resInfoType ORDER BY b.from DESC");
+        query.setParameter("resident", resident);
+        query.setParameter("resInfoType", resInfoType);
         query.setFirstResult(0);
         query.setMaxResults(1);
         List<ResInfo> bwinfos = query.getResultList();
@@ -156,7 +156,7 @@ public class ResInfoTools {
     public static Pair<Date, Date> getMinMaxExpansion(ResInfo info, ArrayList<ResInfo> sortedInfoList) {
         Date min = null, max = null;
 
-        ResInfo firstHauf = getFirstBWInfo(info.getResident(), ResInfoTypeTools.getByID(ResInfoTypeTools.TYPE_STAY));
+        ResInfo firstHauf = getFirstResinfo(info.getResident(), ResInfoTypeTools.getByID(ResInfoTypeTools.TYPE_STAY));
 //        min = firstHauf.getFrom();
 
         if (info.getResInfoType().getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
@@ -194,12 +194,12 @@ public class ResInfoTools {
 
 
     public static boolean isGone(Resident bewohner) {
-        ResInfo bwinfo_hauf = ResInfoTools.getLastBWInfo(bewohner, ResInfoTypeTools.getByID("HAUF"));
+        ResInfo bwinfo_hauf = ResInfoTools.getLastResinfo(bewohner, ResInfoTypeTools.getByID("HAUF"));
         return bwinfo_hauf == null || getContent(bwinfo_hauf).getProperty("hauf").equalsIgnoreCase("ausgezogen");
     }
 
     public static boolean isDead(Resident bewohner) {
-        ResInfo bwinfo_hauf = ResInfoTools.getLastBWInfo(bewohner, ResInfoTypeTools.getByID("HAUF"));
+        ResInfo bwinfo_hauf = ResInfoTools.getLastResinfo(bewohner, ResInfoTypeTools.getByID("HAUF"));
         return bwinfo_hauf != null && getContent(bwinfo_hauf).getProperty("hauf").equalsIgnoreCase("verstorben");
     }
 
@@ -210,7 +210,7 @@ public class ResInfoTools {
      * @return Date of the departure. null if not away.
      */
     public static Date absentSince(Resident bewohner) {
-        ResInfo lastabsence = getLastBWInfo(bewohner, ResInfoTypeTools.getByID(ResInfoTypeTools.TYPE_ABSENCE));
+        ResInfo lastabsence = getLastResinfo(bewohner, ResInfoTypeTools.getByID(ResInfoTypeTools.TYPE_ABSENCE));
         return lastabsence == null || lastabsence.isClosed() ? null : lastabsence.getFrom();
     }
 
@@ -609,7 +609,7 @@ public class ResInfoTools {
          *     |_| |_/_/   \_\___/|_|
          *
          */
-        ResInfo bwinfo_hauf = ResInfoTools.getLastBWInfo(bewohner, ResInfoTypeTools.getByID("HAUF"));
+        ResInfo bwinfo_hauf = ResInfoTools.getLastResinfo(bewohner, ResInfoTypeTools.getByID("HAUF"));
         if (bwinfo_hauf != null) {
             result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.movein") + "</td><td valign=\"top\">";
             result += "<b>" + df.format(bwinfo_hauf.getFrom()) + "</b>";
@@ -624,7 +624,7 @@ public class ResInfoTools {
          *     |_|   |____/
          *
          */
-        ResInfo bwinfo_pstf = ResInfoTools.getLastBWInfo(bewohner, ResInfoTypeTools.getByID("PSTF"));
+        ResInfo bwinfo_pstf = ResInfoTools.getLastResinfo(bewohner, ResInfoTypeTools.getByID("PSTF"));
         if (bwinfo_pstf != null) {
             result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.ps") + "</td><td valign=\"top\">";
             result += bwinfo_pstf.getHtml();
@@ -669,7 +669,7 @@ public class ResInfoTools {
          *     /_/   \_\_| |_|\__, |\___|_| |_|\___/|_|  |_|\__, |\___|
          *                    |___/                         |___/
          */
-        ResInfo bwinfo_angeh = ResInfoTools.getLastBWInfo(bewohner, ResInfoTypeTools.getByID("ANGEH"));
+        ResInfo bwinfo_angeh = ResInfoTools.getLastResinfo(bewohner, ResInfoTypeTools.getByID("ANGEH"));
         if (bwinfo_angeh != null) {
             result += "<tr id=\"fonttext\"><td valign=\"top\">" + OPDE.lang.getString("misc.msg.relatives") + "</td><td valign=\"top\">";
             result += bwinfo_angeh.getHtml();

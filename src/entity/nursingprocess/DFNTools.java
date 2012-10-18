@@ -175,7 +175,6 @@ public class DFNTools {
 
         BigDecimal row = BigDecimal.ZERO;
 
-//        System.out.println("------------------------------------------");
         System.out.println(OPDE.lang.getString(internalClassID) + " " + OPDE.lang.getString(internalClassID + ".generationForDate") + ": " + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()));
         System.out.println(OPDE.lang.getString(internalClassID + ".progress"));
 

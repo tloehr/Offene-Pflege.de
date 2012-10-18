@@ -386,7 +386,7 @@ public class FrmMain extends JFrame {
                 pbMsg.setValue(50);
                 pbMsg.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 12));
                 pbMsg.setForeground(new Color(105, 80, 69));
-                pnlMainMessage.add(pbMsg, CC.xy(5, 7, CC.FILL, CC.DEFAULT));
+                pnlMainMessage.add(pbMsg, CC.xy(5, 7, CC.FILL, CC.FILL));
 
                 //---- btnReload ----
                 btnReload.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/reload.png")));

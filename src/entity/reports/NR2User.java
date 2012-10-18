@@ -102,7 +102,7 @@ public class NR2User implements Serializable, Comparable<NR2User> {
 
     @Override
     public int compareTo(NR2User o) {
-        return getUser().getFullname().compareTo(o.getUser().getFullname());
+        return pit.compareTo(o.getPit());
     }
 
 

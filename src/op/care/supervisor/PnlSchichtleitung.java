@@ -32,18 +32,28 @@ import java.beans.*;
 import javax.swing.*;
 import javax.swing.GroupLayout;
 import javax.swing.LayoutStyle;
+
+import com.mysql.jdbc.ResultSetInternalMethods;
 import com.toedter.calendar.JDateChooser;
 import entity.HomesTools;
 import entity.files.SYSFilesTools;
+import entity.info.*;
+import entity.reports.NReportTools;
+import op.OPDE;
 import op.tools.CleanablePanel;
 import op.tools.*;
+import org.joda.time.DateMidnight;
 
 import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 
 /**
  * @author tloehr
@@ -265,6 +275,29 @@ public class PnlSchichtleitung extends CleanablePanel {
 
     private void reloadDisplay() {
         txtHTML.setText(getAuswertung());
+    }
+
+
+    private String getSupervision(DateMidnight day){
+        HashMap<Resident, Date> mapAbsentSince = new HashMap<Resident, Date>();
+        ArrayList<Resident> listAllActiveResidents = ResidentTools.getAllActive();
+        String html = "";
+        html += "<h2>"+"Bewohner[innen] ohne Pflegebericht"+"</h2>";
+        String htmlul1 = "";
+        for (Resident resident : listAllActiveResidents){
+            Date absentSince = ResInfoTools.absentSince(resident);
+            if (absentSince != null){
+                mapAbsentSince.put(resident, absentSince);
+            }
+
+            int num = NReportTools.getNum(resident, day);
+            if (num == 0){
+                htmlul1 += "<li>"+ResidentTools.getFullName(resident);
+                htmlul1 += OPDE.lang.getString("misc.msg.ResidentAbsentSince") + ": " + DateFormat.getDateInstance().format(mapAbsentSince.get(resident));
+
+            }
+        }
+        return html;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

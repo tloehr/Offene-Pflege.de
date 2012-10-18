@@ -970,7 +970,6 @@ public class PnlReport extends NursingRecordsPanel {
     }
 
     private void expandDay(DateMidnight day) {
-        // EXPAND THE LAST 2 WEEKS
         final String keyYear = Integer.toString(day.getYear()) + ".year";
         if (cpMap.containsKey(keyYear) && cpMap.get(keyYear).isCollapsed()) {
             try {

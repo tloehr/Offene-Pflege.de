@@ -64,7 +64,10 @@ public class SYSConst {
     public static Color orangered = new Color(255, 36, 0);
     public static Color sun3 = new Color(153, 153, 204);
 
-    public static String html_22x22_StopSign = "<img src=\""+OPDE.getOPWD()+ System.getProperty("file.separator")+ "artwork/22x22/stop.png\" border=\"0\">";
+    public static String html_22x22_StopSign = "<img src=\""+OPDE.getOPWD()+"/artwork/22x22/stop.png\" border=\"0\">";
+    public static String html_22x22_Eraser = "<img src=\""+OPDE.getOPWD()+"/artwork/22x22/eraser.png\" border=\"0\">";
+    public static String html_22x22_Edited = "<img src=\""+OPDE.getOPWD()+"/artwork/22x22/edited.png\" border=\"0\">";
+
     public static String html_darkgreen = "color=\"#007600\"";
     public static String html_darkred = "color=\"#bd0000\"";
     public static String html_gold7 = "color=\"#ffaa00\"";
@@ -358,9 +361,9 @@ public class SYSConst {
         return hm;
     }
 
-    public static final Icon icon16bysecond = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/bysecond.png"));
+//    public static final Icon icon16bysecond = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/bysecond.png"));
     public static final Icon icon16exec = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/exec.png"));
-    public static final Icon icon16pit = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/pointintime.png"));
+//    public static final Icon icon16pit = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/pointintime.png"));
     public static final Icon icon16redStar = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/redstar.png"));
     public static final Icon icon16greenStar = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/greenstar.png"));
     public static final Icon icon16unlink = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/unlink.png"));
@@ -463,7 +466,7 @@ public class SYSConst {
     public static final Icon icon48play = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/bw/player_play.png"));
     public static final Icon icon48stop = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/bw/player_stop.png"));
     public static final Icon icon48take = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/take-over.png"));
-    public static final Icon icon16byday = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/byday.png"));
+//    public static final Icon icon16byday = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/byday.png"));
     public static final Icon icon22collapse = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/collapse.png"));
     public static final Icon icon22expand = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/expand.png"));
     public static final Icon icon22ledRedOn = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ledred.png"));
