@@ -454,8 +454,8 @@ public class SYSConst {
     public static final Icon icon22edited = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/edited.png"));
     public static final Icon icon22unlinkPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/unlink_pressed.png"));
     public static final Icon icon22up = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/1uparrow.png"));
-    public static final Icon icon22view = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/viewmag.png"));
-    public static final Icon icon22viewPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/viewmag-selected.png"));
+//    public static final Icon icon22view = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/viewmag.png"));
+//    public static final Icon icon22viewPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/viewmag-selected.png"));
     public static final Icon icon32ambulance2 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/ambulance2.png"));
     public static final Icon icon32ambulance2Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/ambulance2_pressed.png"));
     public static final Icon icon48ambulance2 = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/ambulance2.png"));
@@ -490,7 +490,8 @@ public class SYSConst {
     public static final Icon icon22intervalNoConstraints = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/no-constraints.png"));
     public static final Icon icon22nothing = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/nothing.png"));
     public static final Icon icon22stopSign = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/stop.png"));
-
+    public static final Icon icon22magnify1 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/magnify1.png"));
+    public static final Icon icon22home = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/home.png"));
 
 //    public static final Icon icon22collapsePressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/collapse_pressed.png"));
 //    public static final Icon icon22expandPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/collapse_arrow_pressed.png"));

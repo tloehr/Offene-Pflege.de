@@ -5,6 +5,7 @@
 package entity.info;
 
 import entity.EntityTools;
+import entity.Homes;
 import entity.nursingprocess.NursingProcessTools;
 import entity.prescription.MedInventoryTools;
 import entity.prescription.PrescriptionTools;
@@ -148,6 +149,14 @@ public class ResidentTools {
         QProcessTools.closeAll(em, resident, enddate);
     }
 
+    public static ArrayList<Resident> getAllActive(Homes homes) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM Resident b WHERE b.station IS NOT NULL AND b.station.home = :home ORDER BY b.nachname, b.vorname");
+        query.setParameter("home", homes);
+        ArrayList<Resident> list = new ArrayList<Resident>(query.getResultList());
+        em.close();
+        return list;
+    }
 
     public static ArrayList<Resident> getAllActive() {
         EntityManager em = OPDE.createEM();

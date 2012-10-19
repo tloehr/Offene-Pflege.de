@@ -248,6 +248,11 @@ public class MedInventoryTools {
         return bestand;
     }
 
+    /**
+     *
+     * @param inventory
+     * @return returns the currently opened stock of an inventory. <b>null</b>, if there are no open stocks.
+     */
     public static MedStock getCurrentOpened(MedInventory inventory) {
         MedStock stock = null;
         if (!inventory.getMedStocks().isEmpty()) {

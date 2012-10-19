@@ -1,5 +1,6 @@
 package entity.prescription;
 
+import entity.Homes;
 import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.system.SYSPropsTools;
@@ -40,6 +41,8 @@ public class BHPTools {
     public static final byte SHIFT_LATE = 2;
     public static final byte SHIFT_VERY_LATE = 3;
 
+    public static final Byte[] SHIFTS = new Byte[]{SHIFT_VERY_EARLY, SHIFT_EARLY, SHIFT_LATE, SHIFT_VERY_LATE};
+
     public static final String[] SHIFT_KEY_TEXT = new String[]{"VERY_EARLY", "EARLY", "LATE", "VERY_LATE"};
     public static final String[] SHIFT_TEXT = new String[]{PnlBHP.internalClassID + ".shift.veryearly", PnlBHP.internalClassID + ".shift.early", PnlBHP.internalClassID + ".shift.late", PnlBHP.internalClassID + ".shift.verylate"};
     public static final String[] TIMEIDTEXTLONG = new String[]{"misc.msg.Time.long", "misc.msg.earlyinthemorning.long", "misc.msg.morning.long", "misc.msg.noon.long", "misc.msg.afternoon.long", "misc.msg.evening.long", "misc.msg.lateatnight.long"};
@@ -53,16 +56,16 @@ public class BHPTools {
     public static final byte BYTE_EVENING = 5;
     public static final byte BYTE_LATE_AT_NIGHT = 6;
 
-    public static final String STRING_TIMEOFDAY = "UZ";
-    public static final String STRING_EARLY_IN_THE_MORNING = "FM";
-    public static final String STRING_MORNING = "MO";
-    public static final String STRING_NOON = "MI";
-    public static final String STRING_AFTERNOON = "NM";
-    public static final String STRING_EVENING = "AB";
-    public static final String STRING_LATE_AT_NIGHT = "NA";
-
-
-    public static final String[] SOLLZEITTEXT = new String[]{"Uhrzeit", "NachtMo", "Morgens", "Mittags", "Nachmittags", "Abends", "NachtAb"};
+//    public static final String STRING_TIMEOFDAY = "UZ";
+//    public static final String STRING_EARLY_IN_THE_MORNING = "FM";
+//    public static final String STRING_MORNING = "MO";
+//    public static final String STRING_NOON = "MI";
+//    public static final String STRING_AFTERNOON = "NM";
+//    public static final String STRING_EVENING = "AB";
+//    public static final String STRING_LATE_AT_NIGHT = "NA";
+//
+//
+//    public static final String[] SOLLZEITTEXT = new String[]{"Uhrzeit", "NachtMo", "Morgens", "Mittags", "Nachmittags", "Abends", "NachtAb"};
 
     public static long getNumBHPs(Prescription prescription) {
         EntityManager em = OPDE.createEM();
@@ -478,6 +481,43 @@ public class BHPTools {
             query.setParameter("resident", resident);
             query.setParameter("von", new DateTime(date).toDateMidnight().toDate());
             query.setParameter("bis", new DateTime(date).toDateMidnight().plusDays(1).toDateTime().minusSeconds(1).toDate());
+
+            listBHP = new ArrayList<BHP>(query.getResultList());
+            Collections.sort(listBHP);
+
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+        SYSTools.showTimeDifference(begin);
+        return listBHP;
+    }
+
+    /**
+     *
+     *
+     * @param date
+     * @return
+     */
+    public static ArrayList<BHP> getOpenBHPs(DateMidnight date, Homes home) {
+        long begin = System.currentTimeMillis();
+        EntityManager em = OPDE.createEM();
+        ArrayList<BHP> listBHP = null;
+
+        try {
+            String jpql = " " +
+                    " SELECT bhp " +
+                    " FROM BHP bhp " +
+                    " WHERE bhp.prescription.situation IS NULL AND bhp.status = :state " +
+                    " AND bhp.resident.station.home = :home " +
+                    " AND bhp.soll >= :from AND bhp.soll <= :to ";
+
+            Query query = em.createQuery(jpql);
+            query.setParameter("state", STATE_OPEN);
+            query.setParameter("home", home);
+            query.setParameter("from",date.toDate());
+            query.setParameter("to", date.plusDays(1).toDateTime().minusSeconds(1).toDate());
 
             listBHP = new ArrayList<BHP>(query.getResultList());
             Collections.sort(listBHP);

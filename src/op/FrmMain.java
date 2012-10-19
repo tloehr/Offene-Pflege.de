@@ -48,12 +48,12 @@ import entity.info.ResidentTools;
 import entity.system.SYSLoginTools;
 import entity.system.SYSPropsTools;
 import op.allowance.PnlAllowance;
-import op.care.supervisor.PnlHandover;
-import op.residents.bwassistant.AddBWWizard;
 import op.care.PnlCare;
 import op.care.info.PnlInfo;
 import op.care.med.PnlMed;
+import op.care.supervisor.PnlHandover;
 import op.process.PnlProcess;
+import op.residents.bwassistant.AddBWWizard;
 import op.system.DlgLogin;
 import op.system.InternalClass;
 import op.system.InternalClassACL;
@@ -62,6 +62,7 @@ import op.threads.DisplayMessage;
 import op.threads.PrintProcessor;
 import op.tools.*;
 import op.users.PnlUser;
+import op.welcome.PnlWelcome;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 
@@ -74,7 +75,6 @@ import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
-import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -111,6 +111,7 @@ public class FrmMain extends JFrame {
     private CollapsiblePanes panesSearch, panesApps;
     private Closure bwchange;
     private HashMap<Resident, JideButton> bwButtonMap;
+    private JideButton homeButton;
 //    private MouseListener blockingListener;
 
 
@@ -179,7 +180,6 @@ public class FrmMain extends JFrame {
         final MemoryStatusBarItem gc = new MemoryStatusBarItem();
         gc.setFont(new Font("Arial", Font.PLAIN, 14));
         statusBar.add(gc, JideBoxLayout.FLEXIBLE);
-
         initPhase = false;
 
     }
@@ -258,12 +258,13 @@ public class FrmMain extends JFrame {
                 }
                 splitPaneLeft.setDividerLocation(0, SYSTools.getDividerInAbsolutePosition(splitPaneLeft, pos));
                 initPhase = false;
+                homeButton.doClick();
             }
         };
 
         SwingUtilities.invokeLater(runnable);
 
-        displayManager.setMainMessage("Willkommen bei Offene-Pflege.de");
+//        displayManager.setMainMessage("Willkommen bei Offene-Pflege.de");
 //        displayManager.addSubMessage(new DisplayMessage("Wählen Sie eine(n) BewohnerIn aus oder das gewünschten Programm.", 2));
 
     }
@@ -306,16 +307,16 @@ public class FrmMain extends JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                    "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                    "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
-                    "0dlu, $lgap, pref, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
+                        "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
+                        "0dlu, $lgap, pref, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
 
                 //---- lblMainMsg ----
                 lblMainMsg.setText("OPDE");
@@ -499,6 +500,7 @@ public class FrmMain extends JFrame {
             mypanel.add(addbw);
         }
 
+
         for (InternalClass ic : OPDE.getAppInfo().getMainClasses()) {
 
             if (OPDE.getAppInfo().userHasAccessLevelForThisClass(ic.getInternalClassID(), InternalClassACL.EXECUTE)) {
@@ -546,6 +548,13 @@ public class FrmMain extends JFrame {
         return mypane;
     }
 
+    public void clearPreviousProgbutton() {
+        if (previousProgButton != null) {
+            previousProgButton.setBackground(Color.WHITE);
+            previousProgButton.setOpaque(false);
+        }
+    }
+
     private void prepareSearchArea() {
 
         panesSearch = new CollapsiblePanes();
@@ -556,7 +565,25 @@ public class FrmMain extends JFrame {
         panesApps.setLayout(new JideBoxLayout(panesApps, JideBoxLayout.Y_AXIS));
 
 //        panesApps.add(addCommandNewBW());
-        panesApps.add(addApps());
+//        panesApps.add(addApps());
+
+        homeButton = GUITools.createHyperlinkButton(OPDE.lang.getString(PnlWelcome.internalClassID), SYSConst.icon22home, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (previousProgButton != null) {
+                    previousProgButton.setBackground(Color.WHITE);
+                    previousProgButton.setOpaque(false);
+                }
+                previousProgButton = (JideButton) actionEvent.getSource();
+                previousProgButton.setBackground(Color.YELLOW);
+                previousProgButton.setOpaque(true);
+
+                displayManager.setMainMessage(OPDE.lang.getString(PnlWelcome.internalClassID));
+                displayManager.addSubMessage(new DisplayMessage(OPDE.lang.getString(PnlWelcome.internalClassID+".longDescription"), 5));
+                setPanelTo(new PnlWelcome(jspSearch));
+            }
+        });
+        panesApps.add(homeButton);
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT s FROM Station s ORDER BY s.bezeichnung");
@@ -580,7 +607,7 @@ public class FrmMain extends JFrame {
 
     }
 
-    private CleanablePanel loadPanel(String classname) {
+    public CleanablePanel loadPanel(String classname) {
         CleanablePanel panel = null;
         currentBewohner = null;
         if (classname.equals("op.allowance.PnlAllowance")) {
@@ -593,6 +620,8 @@ public class FrmMain extends JFrame {
             panel = new PnlUser(jspSearch);
         } else if (classname.equals("op.care.supervisor.PnlHandover")) {
             panel = new PnlHandover(jspSearch);
+        } else if (classname.equals("op.welcome.PnlWelcome")) {
+            panel = new PnlWelcome(jspSearch);
         }
         return panel;
     }
@@ -750,7 +779,7 @@ public class FrmMain extends JFrame {
         return point;
     }
 
-    private void setPanelTo(CleanablePanel pnl) {
+    public void setPanelTo(CleanablePanel pnl) {
         if (currentVisiblePanel != null) {
             pnlCard.remove(currentVisiblePanel);
         }

@@ -27,24 +27,25 @@
 
 package op.care.supervisor;
 
-import java.awt.event.*;
-import java.beans.*;
-import javax.swing.*;
-import javax.swing.GroupLayout;
-import javax.swing.LayoutStyle;
-
-import com.mysql.jdbc.ResultSetInternalMethods;
 import com.toedter.calendar.JDateChooser;
 import entity.HomesTools;
 import entity.files.SYSFilesTools;
-import entity.info.*;
+import entity.info.ResInfoTools;
+import entity.info.Resident;
+import entity.info.ResidentTools;
 import entity.reports.NReportTools;
 import op.OPDE;
-import op.tools.CleanablePanel;
 import op.tools.*;
 import org.joda.time.DateMidnight;
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -88,9 +89,9 @@ public class PnlSchichtleitung extends CleanablePanel {
         reloadDisplay();
     }
 
-     @Override
+    @Override
     public void reload() {
-         reloadDisplay();
+        reloadDisplay();
     }
 
     /**
@@ -139,11 +140,11 @@ public class PnlSchichtleitung extends CleanablePanel {
         });
 
         //---- cmbEinrichtung ----
-        cmbEinrichtung.setModel(new DefaultComboBoxModel(new String[] {
-            "Item 1",
-            "Item 2",
-            "Item 3",
-            "Item 4"
+        cmbEinrichtung.setModel(new DefaultComboBoxModel(new String[]{
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
         }));
         cmbEinrichtung.addItemListener(new ItemListener() {
             @Override
@@ -153,12 +154,12 @@ public class PnlSchichtleitung extends CleanablePanel {
         });
 
         //---- cmbSchicht ----
-        cmbSchicht.setModel(new DefaultComboBoxModel(new String[] {
-            "Alles",
-            "Nacht, morgens",
-            "Fr\u00fch",
-            "Sp\u00e4t",
-            "Nacht, abends"
+        cmbSchicht.setModel(new DefaultComboBoxModel(new String[]{
+                "Alles",
+                "Nacht, morgens",
+                "Fr\u00fch",
+                "Sp\u00e4t",
+                "Nacht, abends"
         }));
         cmbSchicht.addItemListener(new ItemListener() {
             @Override
@@ -180,37 +181,37 @@ public class PnlSchichtleitung extends CleanablePanel {
         GroupLayout layout = new GroupLayout(this);
         setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup()
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jdcDatum, GroupLayout.PREFERRED_SIZE, 219, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(cmbEinrichtung, GroupLayout.PREFERRED_SIZE, 256, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(cmbSchicht, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(btnReload, GroupLayout.PREFERRED_SIZE, 28, GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(560, Short.MAX_VALUE))
-                .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 1205, Short.MAX_VALUE)
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jspHTML, GroupLayout.DEFAULT_SIZE, 1183, Short.MAX_VALUE)
-                    .addContainerGap())
+                layout.createParallelGroup()
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jdcDatum, GroupLayout.PREFERRED_SIZE, 219, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cmbEinrichtung, GroupLayout.PREFERRED_SIZE, 256, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cmbSchicht, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnReload, GroupLayout.PREFERRED_SIZE, 28, GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(560, Short.MAX_VALUE))
+                        .addComponent(jToolBar1, GroupLayout.DEFAULT_SIZE, 1205, Short.MAX_VALUE)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jspHTML, GroupLayout.DEFAULT_SIZE, 1183, Short.MAX_VALUE)
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup()
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addGap(19, 19, 19)
-                    .addGroup(layout.createParallelGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(cmbEinrichtung, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(cmbSchicht, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnReload))
-                        .addComponent(jdcDatum, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE))
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jspHTML, GroupLayout.DEFAULT_SIZE, 420, Short.MAX_VALUE)
-                    .addContainerGap())
+                layout.createParallelGroup()
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(jToolBar1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addGap(19, 19, 19)
+                                .addGroup(layout.createParallelGroup()
+                                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                .addComponent(cmbEinrichtung, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(cmbSchicht, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(btnReload))
+                                        .addComponent(jdcDatum, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jspHTML, GroupLayout.DEFAULT_SIZE, 420, Short.MAX_VALUE)
+                                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -278,27 +279,6 @@ public class PnlSchichtleitung extends CleanablePanel {
     }
 
 
-    private String getSupervision(DateMidnight day){
-        HashMap<Resident, Date> mapAbsentSince = new HashMap<Resident, Date>();
-        ArrayList<Resident> listAllActiveResidents = ResidentTools.getAllActive();
-        String html = "";
-        html += "<h2>"+"Bewohner[innen] ohne Pflegebericht"+"</h2>";
-        String htmlul1 = "";
-        for (Resident resident : listAllActiveResidents){
-            Date absentSince = ResInfoTools.absentSince(resident);
-            if (absentSince != null){
-                mapAbsentSince.put(resident, absentSince);
-            }
-
-            int num = NReportTools.getNum(resident, day);
-            if (num == 0){
-                htmlul1 += "<li>"+ResidentTools.getFullName(resident);
-                htmlul1 += OPDE.lang.getString("misc.msg.ResidentAbsentSince") + ": " + DateFormat.getDateInstance().format(mapAbsentSince.get(resident));
-
-            }
-        }
-        return html;
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JToolBar jToolBar1;

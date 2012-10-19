@@ -137,8 +137,8 @@ public class NReportTools {
     }
 
 
-    public static int getNum(Resident resident, DateMidnight day) {
-        int num = 0;
+    public static long getNum(Resident resident, DateMidnight day) {
+        long num = 0;
 
         EntityManager em = OPDE.createEM();
         Query queryMin = em.createQuery("SELECT COUNT(nr) FROM NReport nr WHERE nr.resident = :resident AND nr.pit >= :start AND nr.pit <= :end");
@@ -147,7 +147,7 @@ public class NReportTools {
         queryMin.setParameter("end", day.plusDays(1).toDateTime().minusSeconds(1).toDate());
 
         try {
-            num = (Integer) queryMin.getSingleResult();
+            num = (Long) queryMin.getSingleResult();
         } catch (Exception e) {
             OPDE.fatal(e);
         }

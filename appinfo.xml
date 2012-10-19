@@ -24,6 +24,11 @@
             <delete langbundle="appinfo.default.acl.delete"/>
             <insert langbundle="appinfo.default.acl.insert"/>
         </class>
+        <class name="opde.welcome" short="Startseite"
+               long="Willkommen bei Offene-Pflege.de" main="true"
+               javaclass="op.welcome.PnlWelcome" icon="home.png">
+            <execute langbundle="appinfo.default.acl.execute"/>
+        </class>
         <class name="nursingrecords.prescription" short="Pflegeakte/Verordnungen"
                long="Dieses Modul gehört zur Pflegedokumentation. Es ermöglicht die Verwaltung von ärztlichen Verordnungen.">
             <insert langbundle="appinfo.default.acl.insert"/>
@@ -81,7 +86,7 @@
         </class>
         <class name="nursingrecords.handover" short="Dienstübergabe"
                long="Hier wird die Dienstübergabe behandelt" main="true"
-               javaclass="op.care.supervisor.PnlHandover" icon="groupevent.png">
+               javaclass="op.care.supervisor.PnlHandover" icon="meeting.png">
             <execute langbundle="appinfo.default.acl.execute"/>
             <insert langbundle="appinfo.default.acl.update"/>
         </class>

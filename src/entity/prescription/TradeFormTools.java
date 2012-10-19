@@ -53,31 +53,31 @@ public class TradeFormTools {
     }
 
 
-    public static String toPrettyString(TradeForm darreichung) {
-        String zubereitung = SYSTools.catchNull(darreichung.getDosageForm().getPreparation());
-        String anwtext = SYSTools.catchNull(darreichung.getDosageForm().getUsageTex());
-        String zusatz = SYSTools.catchNull(darreichung.getSubtext());
+    public static String toPrettyString(TradeForm tradeForm) {
+        String zubereitung = SYSTools.catchNull(tradeForm.getDosageForm().getPreparation());
+        String anwtext = SYSTools.catchNull(tradeForm.getDosageForm().getUsageTex());
+        String zusatz = SYSTools.catchNull(tradeForm.getSubtext());
 
-        String text = darreichung.getMedProduct().getBezeichnung();
+        String text = tradeForm.getMedProduct().getBezeichnung();
         text += zusatz.isEmpty() ? "" : ", " + zusatz;
         text += zubereitung.isEmpty() ? " " : " " + zubereitung + ", ";
-        text += anwtext.isEmpty() ? DosageFormTools.EINHEIT[darreichung.getDosageForm().getUsageUnit()] : anwtext;
+        text += anwtext.isEmpty() ? DosageFormTools.EINHEIT[tradeForm.getDosageForm().getUsageUnit()] : anwtext;
         return text;
     }
 
-    public static String toPrettyStringMedium(TradeForm darreichung) {
-        String zubereitung = SYSTools.catchNull(darreichung.getDosageForm().getPreparation());
-        String anwtext = SYSTools.catchNull(darreichung.getDosageForm().getUsageTex());
-        String zusatz = SYSTools.catchNull(darreichung.getSubtext());
+    public static String toPrettyStringMedium(TradeForm tradeForm) {
+        String zubereitung = SYSTools.catchNull(tradeForm.getDosageForm().getPreparation());
+        String anwtext = SYSTools.catchNull(tradeForm.getDosageForm().getUsageTex());
+        String zusatz = SYSTools.catchNull(tradeForm.getSubtext());
 
         String text = zusatz;
         text += zubereitung.isEmpty() ? " " : " " + zubereitung + ", ";
-        text += anwtext.isEmpty() ? DosageFormTools.EINHEIT[darreichung.getDosageForm().getUsageUnit()] : anwtext;
+        text += anwtext.isEmpty() ? DosageFormTools.EINHEIT[tradeForm.getDosageForm().getUsageUnit()] : anwtext;
         return text;
     }
 
-    public static String getPackUnit(TradeForm darreichung) {
-        return DosageFormTools.EINHEIT[darreichung.getDosageForm().getPackUnit()];
+    public static String getPackUnit(TradeForm tradeForm) {
+        return DosageFormTools.EINHEIT[tradeForm.getDosageForm().getPackUnit()];
     }
 
 

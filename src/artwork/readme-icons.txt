@@ -18,3 +18,5 @@ Lots of different icons and symbols taken from www.wpclipart.com. This material 
 -- medicine[0-4].png (modification of http://www.wpclipart.com/medical/pills/box_of_medicine.png.html)
 -- edit3.png (modification of http://www.wpclipart.com/education/supplies/pencils/stubby_pencils/Pencil_stylized_blue_T.png)
 -- print2.png (modification of http://www.wpclipart.com/computer/printer/printer_icon.png.html)
+-- meeting.png (modification of http://www.wpclipart.com/office/people/office_people/meeting_T.png)
+-- magnify1.png (modification of  http://www.wpclipart.com/tools/magnifying_glass/magnifying_glass_256_T.png)

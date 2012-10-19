@@ -212,6 +212,16 @@ public class QProcessTools {
         return list;
     }
 
+    public static List<QProcess> getActiveProcesses4(Users owner) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT qp FROM QProcess qp WHERE qp.to = :baw AND qp.owner = :owner");
+        query.setParameter("owner", owner);
+        query.setParameter("baw", SYSConst.DATE_BIS_AUF_WEITERES);
+        ArrayList<QProcess> list = new ArrayList<QProcess>(query.getResultList());
+        em.close();
+        return list;
+    }
+
     public static void closeAll(EntityManager em, Resident resident, Date enddate) throws Exception {
         Query query = em.createQuery("SELECT qp FROM QProcess qp WHERE qp.resident = :resident AND qp.to >= :now");
         query.setParameter("resident", resident);

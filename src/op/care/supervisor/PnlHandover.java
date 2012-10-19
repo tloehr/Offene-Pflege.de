@@ -153,107 +153,6 @@ public class PnlHandover extends NursingRecordsPanel {
         add(jspHandover);
     }// </editor-fold>//GEN-END:initComponents
 
-//    private void tblUebergabePropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_tblUebergabePropertyChange
-//    }//GEN-LAST:event_tblUebergabePropertyChange
-//
-//    private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
-//        btnNew.setEnabled(false);
-//        new DlgHOReport(this, (Homes) cmbEinrichtung.getSelectedItem(), jdcDatum.getDate());
-//    }//GEN-LAST:event_btnNewActionPerformed
-//
-//    private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
-////        OPDE.ocmain.lockOC();
-//    }//GEN-LAST:event_btnLogoutActionPerformed
-//
-//    private void btnConfirmAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmAllActionPerformed
-//        TMUebergabe tm = (TMUebergabe) tblUebergabe.getModel();
-//        if (tm.getRowCount() > 0) {
-//            ConfirmWorker work = new ConfirmWorker(tm.getBerichte());
-//            btnConfirmAll.setEnabled(false);
-//            work.start();
-//        }
-//    }//GEN-LAST:event_btnConfirmAllActionPerformed
-//
-//    /**
-//     * Innere Hilfsklasse. Mit ihrer Hilfe erscheint ein kleines Fenster mit einem Progressbar,
-//     * während die Bestätigungsprozedur abläuft. Dieses Fenster kann man abbrechen,
-//     * dann werden auch die bisherigen Bestätigung zurück gerollt.
-//     */
-//    class ConfirmWorker extends Thread {
-//
-//        private ArrayList berichte;
-//        private ProgressMonitor pm;
-//
-//        public ConfirmWorker(ArrayList berichte) {
-//            super();
-//            this.berichte = berichte;
-//            pm = new ProgressMonitor(pflege, "Bitte warten", "Protokoll wird bestätigt.", 0, berichte.size());
-//            pm.setMillisToDecideToPopup(0);
-//            pm.setMillisToPopup(0);
-//        }
-//
-//        public void run() {
-//            confirm();
-//        }
-//
-//        private void setProgressFromWorker(final int progress) {
-//            try {
-//                javax.swing.SwingUtilities.invokeAndWait(new Runnable() {
-//
-//                    public void run() {
-//                        pm.setProgress(progress);
-//                    }
-//                });
-//            } catch (Exception e) {
-//                // oh well.
-//            }
-//        }
-//
-//        private void confirm() {
-//            int max = berichte.size();
-//
-//
-//            EntityManager em = OPDE.createEM();
-//
-//
-//            try {
-//                em.getTransaction().begin();
-//                for (int row = 0; row < max; row++) {
-//                    setProgressFromWorker(row);
-//                    Object[] bericht = (Object[]) berichte.get(row);
-//                    if (((Long) bericht[TMUebergabe.LIST_ACKNOWLEDGED]).longValue() == 0) { // aktueller User hat diesen Bericht noch nicht bestätigt.
-//                        if (bericht[TMUebergabe.LIST_BERICHT] instanceof Handovers) {
-//                            Handovers uebergabe = (Handovers) bericht[TMUebergabe.LIST_BERICHT];
-//                            uebergabe.getUsersAcknowledged().add(new Handover2User(uebergabe, OPDE.getLogin().getUser()));
-//                            em.merge(uebergabe);
-//                        } else {
-//                            NReport pflegebericht = (NReport) bericht[TMUebergabe.LIST_BERICHT];
-//                            pflegebericht.getUsersAcknowledged().add(new NR2User(pflegebericht, OPDE.getLogin().getUser()));
-//                            em.merge(pflegebericht);
-//                        }
-//                    }
-//                    if (pm.isCanceled()) {
-//                        throw new Exception("Bestätigung abgebrochen.");
-//                    }
-//                }
-//                em.getTransaction().commit();
-//            } catch (Exception e) {
-//                em.getTransaction().rollback();
-//            } finally {
-//                em.close();
-//            }
-//            btnConfirmAll.setEnabled(true);
-//            reloadTable();
-//            pm.setProgress(max);
-//            //pm.close();
-//            try {
-//                Thread.currentThread().sleep(500);
-//            } catch (Exception e) {
-//            }
-//        }
-//    }
-
-
     private void prepareSearchArea() {
 
         searchPanes = new CollapsiblePanes();
@@ -284,134 +183,6 @@ public class PnlHandover extends NursingRecordsPanel {
 
 
     }
-
-
-//    private void jspUebergabeComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspUebergabeComponentResized
-//        JScrollPane jsp = (JScrollPane) evt.getComponent();
-//        Dimension dim = jsp.getSize();
-//        // Größe der Text Spalten im DFN ändern.
-//        // Summe der fixen Spalten  = 175 + ein bisschen
-//        int textWidth = dim.width - 200 - 200 - 50;
-//        TableColumnModel tcm1 = tblUebergabe.getColumnModel();
-//        if (tcm1.getColumnCount() < 3) {
-//            return;
-//        }
-//
-//        tcm1.getColumn(TMUebergabe.COL_PIT).setPreferredWidth(200);
-//        tcm1.getColumn(TMUebergabe.COL_INFO).setPreferredWidth(200);
-//        tcm1.getColumn(TMUebergabe.COL_HTML).setPreferredWidth(textWidth);
-////        tcm1.getColumn(TMUebergabe.COL_ACKN).setPreferredWidth(50);
-//
-//        tcm1.getColumn(TMUebergabe.COL_PIT).setHeaderValue("Datum");
-//        tcm1.getColumn(TMUebergabe.COL_INFO).setHeaderValue("Info");
-//        tcm1.getColumn(TMUebergabe.COL_HTML).setHeaderValue("Bericht");
-////        tcm1.getColumn(TMUebergabe.COL_ACKN).setHeaderValue("Gesehen");
-//
-//    }//GEN-LAST:event_jspUebergabeComponentResized
-
-//    private void cmbEinrichtungItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbEinrichtungItemStateChanged
-//        if (initPhase) {
-//            return;
-//        }
-//        reloadTable();
-//    }//GEN-LAST:event_cmbEinrichtungItemStateChanged
-//
-//    private void jdcDatumPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jdcDatumPropertyChange
-//        if (initPhase) {
-//            return;
-//        }
-//        if (!evt.getPropertyName().equals("date")) {
-//            return;
-//        }
-//        SYSCalendar.checkJDC((JDateChooser) evt.getSource());
-//        reloadTable();
-//    }//GEN-LAST:event_jdcDatumPropertyChange
-//
-//    private void tblUebergabeMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblUebergabeMousePressed
-//        Point p = evt.getPoint();
-//        ListSelectionModel lsm = tblUebergabe.getSelectionModel();
-//
-//        int row = tblUebergabe.rowAtPoint(p);
-//        lsm.setSelectionInterval(row, row);
-//
-//        Object bericht = tblUebergabe.getModel().getValueAt(lsm.getLeadSelectionIndex(), TMUebergabe.COL_BERICHT);
-//
-//        if (evt.isPopupTrigger()) {
-//
-////            JMenuItem itemPopupPrint = new JMenuItem("Markierte Berichte drucken");
-////            itemPopupPrint.addActionListener(new java.awt.event.ActionListener() {
-////
-////                public void actionPerformed(java.awt.event.ActionEvent evt) {
-////                    int[] sel = tblTB.getSelectedRows();
-////                    printBericht(sel);
-////                }
-////            });
-////            menu.add(itemPopupPrint);
-//
-////            itemPopupEdit.setEnabled(OPDE.internalClasses.userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE));
-//
-//            menu = new JPopupMenu();
-//            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.USER1)) {
-//                DateFormat df = DateFormat.getDateTimeInstance();
-//                JMenu menuListAck = new JMenu("Bestätigungen");
-//                if (bericht instanceof Handovers) {
-//                    if (((Handovers) bericht).getUsersAcknowledged().isEmpty()) {
-//                        menuListAck.add(new JMenuItem("bisher keine Bestätigungen"));
-//                    } else {
-//                        Iterator<Handover2User> it = ((Handovers) bericht).getUsersAcknowledged().iterator();
-//                        while (it.hasNext()) {
-//                            Handover2User u2u = it.next();
-//                            menuListAck.add(new JMenuItem(u2u.getUser().getFullname() + " <b>[" + df.format(u2u.getPit()) + "]</b>"));
-//                        }
-//                    }
-//                } else {
-//                    if (((NReport) bericht).getUsersAcknowledged().isEmpty()) {
-//                        menuListAck.add(new JMenuItem("bisher keine Bestätigungen"));
-//                    } else {
-//                        ArrayList<NR2User> usersackn = new ArrayList<NR2User>(((NReport) bericht).getUsersAcknowledged());
-//                        Collections.sort(usersackn);
-//                        Iterator<NR2User> it = usersackn.iterator();
-//                        while (it.hasNext()) {
-//                            NR2User p2u = it.next();
-//                            menuListAck.add(new JMenuItem(HTMLTools.toHTML(p2u.getUser().getFullname() + " <b>[" + df.format(p2u.getPit()) + "]</b>")));
-//                        }
-//                    }
-//                }
-//                menu.add(menuListAck);
-//            }
-//
-//            menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
-//        }
-//    }//GEN-LAST:event_tblUebergabeMousePressed
-
-//    private void btnTodayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTodayActionPerformed
-//        jdcDatum.setDate(new Date());
-//    }//GEN-LAST:event_btnTodayActionPerformed
-//
-//    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
-//        jdcDatum.setDate(SYSCalendar.addDate(jdcDatum.getDate(), -1));
-//    }//GEN-LAST:event_btnBackActionPerformed
-
-//
-//    private void txtSuche1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSuche1ActionPerformed
-////        if (!txtSuche.equals("")) {
-////            reloadTable();
-////        }
-//    }//GEN-LAST:event_txtSuche1ActionPerformed
-//
-//    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
-////        if (!txtSuche.equals("")) {
-////            reloadTable();
-////        }
-//    }//GEN-LAST:event_btnSearchActionPerformed
-//
-//    private void pnlFilterStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_pnlFilterStateChanged
-//        if (pnlFilter.getSelectedIndex() == TAB_SEARCH) {
-//            //txtSuche.requestFocus();
-//
-//
-//        }
-//    }//GEN-LAST:event_pnlFilterStateChanged
 
     @Override
     public void cleanup() {
@@ -494,16 +265,6 @@ public class PnlHandover extends NursingRecordsPanel {
             }
 
             expandDay(new DateMidnight());
-
-
-//            for (NReport report : reportList) {
-//                DateMidnight dateMidnight = new DateMidnight(report.getPit());
-//                if (!dayMap.containsKey(dateMidnight)) {
-//                    dayMap.put(dateMidnight, new ArrayList<NReport>());
-//                }
-//                dayMap.get(dateMidnight).add(report);
-//                reportMap.put(report, createCP4Month(report));
-//            }
 
             buildPanel();
         }
@@ -1062,7 +823,6 @@ public class PnlHandover extends NursingRecordsPanel {
                 @Override
                 protected void done() {
 
-
                     OPDE.getDisplayManager().setProgressBarMessage(null);
                     OPDE.getMainframe().setBlocked(false);
                 }
@@ -1109,7 +869,7 @@ public class PnlHandover extends NursingRecordsPanel {
          *
          */
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
-            JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".btnadd.tooltip"), SYSConst.icon22add, new ActionListener() {
+            JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".tooltips.btnadd"), SYSConst.icon22add, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     new DlgHOReport(new Handovers((Homes) cmbHomes.getSelectedItem()), new Closure() {
@@ -1168,11 +928,41 @@ public class PnlHandover extends NursingRecordsPanel {
                 }
             });
             list.add(addButton);
-
-
         }
+
+        final JideButton btnControllingToday = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".tooltips.btnControllingToday"), SYSConst.icon22magnify1, null);
+        btnControllingToday.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                btnControllingToday.setEnabled(false);
+                HandoversTools.printSupervision(new DateMidnight(), (Homes) cmbHomes.getSelectedItem(), new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        btnControllingToday.setEnabled(true);
+                    }
+                });
+            }
+        });
+        list.add(btnControllingToday);
+
+        final JideButton btnControllingYesterday = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".tooltips.btnControllingToday"), SYSConst.icon22magnify1, null);
+        btnControllingYesterday.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                btnControllingYesterday.setEnabled(false);
+                HandoversTools.printSupervision(new DateMidnight().minusDays(1), (Homes) cmbHomes.getSelectedItem(), new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        btnControllingYesterday.setEnabled(true);
+                    }
+                });
+            }
+        });
+        list.add(btnControllingYesterday);
+
         return list;
     }
+
 
     private List<Component> addFilters() {
         List<Component> list = new ArrayList<Component>();
