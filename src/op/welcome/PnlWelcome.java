@@ -10,18 +10,24 @@ import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
+import com.jidesoft.wizard.WizardDialog;
+import entity.info.ResInfoTools;
+import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.process.QProcess;
 import entity.process.QProcessTools;
 import op.OPDE;
+import op.care.PnlCare;
+import op.care.info.PnlInfo;
 import op.process.PnlProcess;
+import op.residents.bwassistant.AddBWWizard;
 import op.system.InternalClass;
 import op.system.InternalClassACL;
-import op.tools.CleanablePanel;
-import op.tools.DefaultCPTitle;
-import op.tools.GUITools;
-import op.tools.SYSConst;
+import op.tools.*;
+import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
+import org.joda.time.DateMidnight;
+import org.joda.time.Years;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,6 +35,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 
 /**
@@ -39,6 +46,8 @@ public class PnlWelcome extends CleanablePanel {
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
     private java.util.List<QProcess> processList;
+    private java.util.List<Resident> birthdayList;
+    private final int BIRTHDAY = 4;
 
     public PnlWelcome(JScrollPane jspSearch) {
         this.jspSearch = jspSearch;
@@ -61,45 +70,12 @@ public class PnlWelcome extends CleanablePanel {
         addApps();
         prepareSearchArea();
         processList = QProcessTools.getActiveProcesses4(OPDE.getLogin().getUser());
+        birthdayList = ResidentTools.getAllWithBirthdayIn(BIRTHDAY);
         Collections.sort(processList);
     }
 
 
     private void addApps() {
-
-//        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlInfo.internalClassID, InternalClassACL.MANAGER)) { // => ACLMATRIX
-//            JideButton addbw = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".addbw"), SYSConst.icon22addbw, null);
-////            final MyJDialog dlg = new MyJDialog();
-//            addbw.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
-//            addbw.setAlignmentX(Component.LEFT_ALIGNMENT);
-//            addbw.addActionListener(new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent actionEvent) {
-//                    final MyJDialog dlg = new MyJDialog();
-//                    WizardDialog wizard = new AddBWWizard(new Closure() {
-//                        @Override
-//                        public void execute(Object o) {
-//                            dlg.dispose();
-//                            jspSearch.removeAll();
-//                            jspSearch = null;
-//                            jspApps.removeAll();
-//                            jspApps = null;
-//                            panesSearch.removeAll();
-//                            panesSearch = null;
-//                            panesApps.removeAll();
-//                            panesApps = null;
-//                            splitPaneLeft.removeAll();
-//                            prepareSearchArea();
-//                        }
-//                    }).getWizard();
-//                    dlg.setContentPane(wizard.getContentPane());
-//                    dlg.pack();
-//                    dlg.setSize(new Dimension(800, 550));
-//                    dlg.setVisible(true);
-//                }
-//            });
-//            mypanel.add(addbw);
-//        }
 
         Collections.sort(OPDE.getAppInfo().getMainClasses());
         for (InternalClass ic : OPDE.getAppInfo().getMainClasses()) {
@@ -170,38 +146,76 @@ public class PnlWelcome extends CleanablePanel {
             cpsWelcome.add(cp);
         }
 
-        cpsWelcome.addExpansion();
+        if (!birthdayList.isEmpty()) {
+            String title = "<html><font size=+1>" +
+                    OPDE.lang.getString(internalClassID + ".birthdayNext") + " " + BIRTHDAY + " " + OPDE.lang.getString("misc.msg.Days") +
+                    "</font></html>";
+            CollapsiblePane cp = new CollapsiblePane(title);
+            JPanel pnlContent = new JPanel(new VerticalLayout());
+            Collections.sort(birthdayList);
+            for (Resident resident : birthdayList) {
+                pnlContent.add(createCP4Birthdays(resident).getMain());
+            }
+            cp.setContentPane(pnlContent);
+            cpsWelcome.add(cp);
+        }
 
+        cpsWelcome.addExpansion();
 
     }
 
-    private DefaultCPTitle createCP4(final QProcess qProcess) {
-//        final CollapsiblePane cp = new CollapsiblePane();
+    private DefaultCPTitle createCP4Birthdays(final Resident resident) {
+        DateMidnight birthdate = new DateMidnight(resident.getBirthday());
+        Years age = Years.yearsBetween(birthdate, new DateMidnight());
 
+        DateMidnight birthdayNext = new DateMidnight(new DateMidnight().getYear(), birthdate.getMonthOfYear(), birthdate.getDayOfMonth());
 
         String title = "<html><table border=\"0\">" +
-                    "<tr valign=\"top\">" +
-                    "<td width=\"280\" align=\"left\">" + np.getPITAsHTML() + "</td>" +
-                    "<td width=\"500\" align=\"left\">" +
-                    (np.isClosed() ? "<s>" : "") +
-                    np.getContentAsHTML() +
-                    (np.isClosed() ? "</s>" : "") +
-                    "</td>" +
-                    "</table>" +
-                    "</html>";
+                "<tr valign=\"top\">" +
+                "<td width=\"100\" align=\"left\">" + DateFormat.getDateInstance().format(birthdayNext.toDate()) + "</td>" +
+                "<td width=\"400\" align=\"left\">" +
+                "<b>" + ResidentTools.getBWLabelTextKompakt(resident) + "</b> " + OPDE.lang.getString("misc.msg.becomes") + " " + (age.getYears() + 1) + " " + OPDE.lang.getString("misc.msg.Years") +
+                "</td>" +
+                "</tr>" +
+                "</table>" +
+                "</html>";
 
-        String title = "<html><font size=+1>" +
-                qProcess.getTitle() +
-                " <b>" +
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OPDE.getMainframe().clearPreviousProgbutton();
+                OPDE.getMainframe().setPanelTo(new PnlCare(resident, jspSearch));
+            }
+        });
+//        cptitle.getButton().setCursor(null);
+
+        if (ResInfoTools.isAway(resident)) {
+            cptitle.getButton().setIcon(SYSConst.icon22residentAbsent);
+            cptitle.getButton().setVerticalTextPosition(SwingConstants.TOP);
+        }
+
+        return cptitle;
+    }
+
+    private DefaultCPTitle createCP4(final QProcess qProcess) {
+
+        String title = "<html><table border=\"0\">" +
+                "<tr valign=\"top\">" +
+                "<td width=\"100\" align=\"left\">" + qProcess.getPITAsHTML() + "</td>" +
+                "<td width=\"100\" align=\"left\">" + " <b>" +
                 (qProcess.isCommon() ?
                         "" :
                         ResidentTools.getBWLabelTextKompakt(qProcess.getResident())) +
-                "</b>, " +
-                "[" +
-                DateFormat.getDateInstance(DateFormat.SHORT).format(qProcess.getFrom()) + "&rarr;" +
-                (qProcess.isClosed() ? DateFormat.getDateInstance(DateFormat.SHORT).format(qProcess.getTo()) : "|") +
-                "]" +
-                "</font></html>";
+                "</b>, "
+                + "</td>" +
+                "<td width=\"400\" align=\"left\">" +
+                (qProcess.isClosed() ? "<s>" : "") +
+                qProcess.getTitle() +
+                (qProcess.isClosed() ? "</s>" : "") +
+                "</td>" +
+                "</tr>" +
+                "</table>" +
+                "</html>";
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
             @Override
@@ -216,112 +230,14 @@ public class PnlWelcome extends CleanablePanel {
         } else if (qProcess.isRevisionDue()) {
             cptitle.getButton().setIcon(SYSConst.icon22ledYellowOn);
         } else if (qProcess.isClosed()) {
-            cptitle.getButton().setIcon(SYSConst.icon22ledBlueOn);
+            cptitle.getButton().setIcon(SYSConst.icon22stopSign);
         } else {
             cptitle.getButton().setIcon(SYSConst.icon22ledGreenOn);
         }
-
-
-//        /***
-//         *      _     _         ____       _       _
-//         *     | |__ | |_ _ __ |  _ \ _ __(_)_ __ | |_
-//         *     | '_ \| __| '_ \| |_) | '__| | '_ \| __|
-//         *     | |_) | |_| | | |  __/| |  | | | | | |_
-//         *     |_.__/ \__|_| |_|_|   |_|  |_|_| |_|\__|
-//         *
-//         */
-//        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
-//            final JButton btnPrint = new JButton(SYSConst.icon22print2);
-//            btnPrint.setPressedIcon(SYSConst.icon22print2Pressed);
-//            btnPrint.setAlignmentX(Component.RIGHT_ALIGNMENT);
-//            btnPrint.setContentAreaFilled(false);
-//            btnPrint.setBorder(null);
-//            btnPrint.setToolTipText(OPDE.lang.getString(internalClassID + ".btnrevision.tooltip"));
-//            btnPrint.addActionListener(new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent actionEvent) {
-//                    String html = QProcessTools.getAsHTML(qProcess);
-//                    html += QProcessTools.getElementsAsHTML(qProcess, tbSystem.isSelected());
-//                    SYSFilesTools.print(html, true);
-//                }
-//            });
-//            cptitle.getRight().add(btnPrint);
-//        }
-//
-//        /***
-//         *      __  __
-//         *     |  \/  | ___ _ __  _   _
-//         *     | |\/| |/ _ \ '_ \| | | |
-//         *     | |  | |  __/ | | | |_| |
-//         *     |_|  |_|\___|_| |_|\__,_|
-//         *
-//         */
-//        final JButton btnMenu = new JButton(SYSConst.icon22menu);
-//        btnMenu.setPressedIcon(SYSConst.icon22Pressed);
-//        btnMenu.setAlignmentX(Component.RIGHT_ALIGNMENT);
-//        btnMenu.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-//        btnMenu.setContentAreaFilled(false);
-//        btnMenu.setBorder(null);
-//        btnMenu.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                JidePopup popup = new JidePopup();
-//                popup.setMovable(false);
-//                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-//                popup.setOwner(btnMenu);
-//                popup.removeExcludedComponent(btnMenu);
-//                JPanel pnl = getMenu(qProcess);
-//                popup.getContentPane().add(pnl);
-//                popup.setDefaultFocusComponent(pnl);
-//
-//                GUITools.showPopup(popup, SwingConstants.WEST);
-//            }
-//        });
-//        btnMenu.setEnabled(!qProcess.isClosed());
-//        cptitle.getRight().add(btnMenu);
-
-//        cp.addCollapsiblePaneListener(new
-//                CollapsiblePaneAdapter() {
-//                    @Override
-//                    public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-////                        cp.setContentPane(createContentPanel4(qProcess));
-////                        cp.setOpaque(false);
-//                    }
-//                }
-//
-//        );
-//        cp.setBackground(QProcessTools.getBG1(qProcess));
-//
-//
-//        cp.setHorizontalAlignment(SwingConstants.LEADING);
-//        cp.setOpaque(false);
+        cptitle.getButton().setVerticalTextPosition(SwingConstants.TOP);
 
         return cptitle;
     }
-
-//    private JPanel createContentPanel4(final QProcess qProcess) {
-//        JTextPane contentPane = new JTextPane();
-//        contentPane.setContentType("text/html");
-//        contentPane.setEditable(false);
-//        contentPane.setText(SYSTools.toHTML(QProcessTools.getAsHTML(qProcess)));
-//
-//        JPanel elementPanel = new JPanel();
-//        elementPanel.setLayout(new VerticalLayout());
-//        elementPanel.add(contentPane);
-//
-//        for (final QProcessElement element : qProcess.getElements()) {
-//            if (tbSystem.isSelected() || !(element instanceof PReport) || !((PReport) element).isSystem()) {
-//                final CollapsiblePane cpElement = createCP4(element, qProcess);
-//                if (element instanceof PReport && ((PReport) element).isSystem()) {
-//                    cpElement.setIcon(SYSConst.icon16exec);
-//                }
-//                cpElement.setBackground(QProcessTools.getBG2(qProcess));
-//                elementMap.put(element, cpElement);
-//                elementPanel.add(elementMap.get(element));
-//            }
-//        }
-//        return elementPanel;
-//    }
 
     private void prepareSearchArea() {
 
@@ -343,7 +259,8 @@ public class PnlWelcome extends CleanablePanel {
             OPDE.error(e);
         }
 
-//        GUITools.addAllComponents(mypanel, addCommands());
+
+        GUITools.addAllComponents(mypanel, addCommands());
 //        GUITools.addAllComponents(mypanel, addFilters());
 
         searchPane.setContentPane(mypanel);
@@ -368,8 +285,8 @@ public class PnlWelcome extends CleanablePanel {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                "default:grow, $lcgap, default",
-                "default:grow"));
+                    "default:grow, $lcgap, default",
+                    "default:grow"));
 
             //======== scrollPane1 ========
             {
@@ -398,8 +315,46 @@ public class PnlWelcome extends CleanablePanel {
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
-    private void buildPanel(boolean collapseAll) {
 
+    private java.util.List<Component> addCommands() {
+        java.util.List<Component> list = new ArrayList<Component>();
+
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlInfo.internalClassID, InternalClassACL.MANAGER)) { // => ACLMATRIX
+            JideButton addbw = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".addbw"), SYSConst.icon22addbw, null);
+//            final MyJDialog dlg = new MyJDialog();
+            addbw.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
+            addbw.setAlignmentX(Component.LEFT_ALIGNMENT);
+            addbw.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    final MyJDialog dlg = new MyJDialog();
+                    WizardDialog wizard = new AddBWWizard(new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            dlg.dispose();
+//                            jspSearch.removeAll();
+//                            jspSearch = null;
+//                            jspApps.removeAll();
+//                            jspApps = null;
+//                            panesSearch.removeAll();
+//                            panesSearch = null;
+//                            panesApps.removeAll();
+//                            panesApps = null;
+//                            splitPaneLeft.removeAll();
+//                            prepareSearchArea();
+                        }
+                    }).getWizard();
+                    dlg.setContentPane(wizard.getContentPane());
+                    dlg.pack();
+                    dlg.setSize(new Dimension(800, 550));
+                    dlg.setVisible(true);
+                }
+            });
+            list.add(addbw);
+        }
+
+
+        return list;
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables

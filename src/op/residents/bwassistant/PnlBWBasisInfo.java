@@ -75,7 +75,7 @@ public class PnlBWBasisInfo extends JPanel {
         // Check if this resident has already been entered before.
         if (complete) {
             EntityManager em = OPDE.createEM();
-            Query query = em.createQuery("SELECT b FROM Resident b WHERE b.nachname = :nachname AND b.vorname = :vorname AND b.gebDatum = :gebdatum AND b.geschlecht = :geschlecht ");
+            Query query = em.createQuery("SELECT b FROM Resident b WHERE b.name = :nachname AND b.firstname = :vorname AND b.birthday = :gebdatum AND b.gender = :geschlecht ");
             query.setParameter("nachname", nachname);
             query.setParameter("vorname", vorname);
             query.setParameter("gebdatum", gebdatum);

@@ -308,4 +308,152 @@ public class ResValueTools {
         return result;
     }
 
+
+//        public static String getNoStool(int headertiefe) {
+//        StringBuilder html = new StringBuilder(1000);
+//
+//        // Für wen soll die Ausfuhr überwacht werden ?
+//
+//        String sql = "" +
+//                " SELECT bi.BWInfoID, b.nachname, b.vorname, b.Geschlecht, b.BWKennung FROM ResInfo bi " +
+//                " INNER JOIN Bewohner b ON bi.BWKennung = b.BWKennung " +
+//                " INNER JOIN ResInfo ba ON ba.BWKennung = bi.BWKennung " +
+//                " WHERE b.AdminOnly <> 2 AND bi.BWINFTYP='CONTROL' AND ba.BWINFTYP='HAUF' " +
+//                " AND bi.XML LIKE '%<c.stuhl value=\"true\"/>%' " +
+//                " and bi.von < now() and bi.bis > now() " +
+//                " AND ba.von <= NOW() AND ba.bis >= NOW()" +
+//                " ORDER BY nachname, vorname ";
+//
+//        try {
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+//            ResultSet rs = stmt.executeQuery();
+//
+//            DateFormat df = DateFormat.getDateInstance();
+//
+//            if (rs.first()) {
+//
+//                rs.beforeFirst();
+//                while (rs.next()) {
+//                    Date last = new Date();//op.care.values.DBHandling.lastWert(rs.getString("b.BWKennung"), 1); //DlgVital.MODE_STUHLGANG);
+////                    ResInfo bwi = new ResInfo(rs.getLong("bi.BWInfoID"));
+////                    HashMap antwort = (HashMap) ((HashMap) bwi.getAttribute().get(0)).get("antwort");
+////                    int tage = Integer.parseInt(antwort.get("c.stuhltage").toString());
+//
+////                    Date grenze = SYSCalendar.addDate(new Date(), tage * -1);
+//
+////                    if (last.before(grenze)) {
+////
+////                        if (html.length() == 0) {
+////                            html.append("<h" + headertiefe + ">");
+////                            html.append("Bewohner ohne Stuhlgang");
+////                            html.append("</h" + headertiefe + ">");
+////                            html.append("<table border=\"1\"><tr>" +
+////                                    "<th>BewohnerIn</th><th>Letzter Stuhlgang</th><th>Tage bis Alarm</th></tr>");
+////                        }
+////
+////                        html.append("<tr>");
+////                        String name = SYSTools.anonymizeBW(rs.getString("Nachname"), rs.getString("Vorname"), rs.getString("BWKennung"), rs.getInt("geschlecht"));
+////                        html.append("<td>" + name + "</td>");
+////                        html.append("<td>" + df.format(last) + "</td>");
+////                        html.append("<td>" + tage + "</td>");
+////                        html.append("</tr>");
+////                    }
+//
+//                }
+//
+//                html.append("</table>");
+//            }
+//        } catch (SQLException sQLException) {
+//            // new DlgException(sQLException);
+//        }
+//        return html.toString();
+//    }
+//
+//    public static String getAlarmEinfuhr(int headertiefe) {
+//        StringBuilder html = new StringBuilder(1000);
+//
+//        // Für wen soll die Ausfuhr überwacht werden ?
+//
+//        String sql = "" +
+//                " SELECT bi.BWInfoID, b.nachname, b.vorname, b.Geschlecht, b.BWKennung FROM ResInfo bi " +
+//                " INNER JOIN Bewohner b ON bi.BWKennung = b.BWKennung " +
+//                " INNER JOIN ResInfo ba ON ba.BWKennung = bi.BWKennung " +
+//                " WHERE b.AdminOnly <> 2 AND bi.BWINFTYP='CONTROL' AND ba.BWINFTYP='HAUF' " +
+//                " AND (bi.XML LIKE '%<c.einfuhr value=\"true\"/>%' OR  bi.XML LIKE '%<c.ueber value=\"true\"/>%') " +
+//                " and bi.von < now() and bi.bis > now() " +
+//                " AND ba.von <= NOW() AND ba.bis >= NOW()" +
+//                " ORDER BY nachname, vorname ";
+//
+//        try {
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+//            ResultSet rs = stmt.executeQuery();
+//
+//            DateFormat df = DateFormat.getDateInstance();
+//
+//            if (rs.first()) {
+//
+//                rs.beforeFirst();
+//                while (rs.next()) {
+//
+//                    //Date last = op.care.values.DBHandling.lastWert(rs.getString("b.BWKennung"), DlgVital.MODE_STUHLGANG);
+////                    ResInfo bwi = new ResInfo(rs.getLong("bi.BWInfoID"));
+////                    HashMap antwort = (HashMap) ((HashMap) bwi.getAttribute().get(0)).get("antwort");
+////                    boolean minkontrolle = antwort.get("c.einfuhr").toString().equalsIgnoreCase("true");
+////                    boolean maxkontrolle = antwort.get("c.ueber").toString().equalsIgnoreCase("true");
+////                    int tage = Integer.parseInt(antwort.get("c.einftage").toString());
+////                    int minmenge = Integer.parseInt(antwort.get("c.einfmenge").toString());
+////                    int maxmenge = Integer.parseInt(antwort.get("c.uebermenge").toString());
+////                    if (!minkontrolle) {
+////                        minmenge = -1000000; // Klein genug um im SQL Ausdruck ignoriert zu werden.
+////                    }
+////                    if (!maxkontrolle) {
+////                        maxmenge = 1000000; // Groß genug um im SQL Ausdruck ignoriert zu werden.
+////                    }
+////
+////                    String s = " SELECT * FROM (" +
+////                            "       SELECT PIT, SUM(Wert) EINFUHR FROM ResValue " +
+////                            "       WHERE ReplacedBy = 0 AND Wert > 0 AND BWKennung=? AND XML='<LIQUIDBALANCE/>' " +
+////                            "       AND DATE(PIT) >= ADDDATE(DATE(now()), INTERVAL ? DAY) " +
+////                            "       Group By DATE(PIT) " +
+////                            "       ORDER BY PIT desc " +
+////                            " ) a" +
+////                            " WHERE a.EINFUHR < ? OR a.Einfuhr > ? ";
+////                    PreparedStatement stmt1 = OPDE.getDb().db.prepareStatement(s);
+////                    stmt1.setString(1, rs.getString("b.BWKennung"));
+////                    stmt1.setInt(2, tage * -1);
+////                    stmt1.setInt(3, minmenge);
+////                    stmt1.setInt(4, maxmenge);
+////
+////                    ResultSet rs1 = stmt1.executeQuery();
+////                    if (rs1.first()) {
+////                        rs1.beforeFirst();
+////                        while (rs1.next()) {
+////
+////                            if (html.length() == 0) {
+////                                html.append("<h" + headertiefe + ">");
+////                                html.append("Bewohner mit zu geringer / zu hoher Einfuhr");
+////                                html.append("</h" + headertiefe + ">");
+////                                html.append("<table border=\"1\"><tr>" +
+////                                        "<th>BewohnerIn</th><th>Datum</th><th>Einfuhr (ml)</th><th>Bemerkung</th></tr>");
+////                            }
+////                            html.append("<tr>");
+////                            String name = SYSTools.anonymizeBW(rs.getString("Nachname"), rs.getString("Vorname"), rs.getString("BWKennung"), rs.getInt("geschlecht"));
+////                            html.append("<td>" + name + "</td>");
+////                            html.append("<td>" + df.format(rs1.getDate("PIT")) + "</td>");
+////                            html.append("<td>" + rs1.getString("Einfuhr") + "</td>");
+////                            html.append("<td>" + (rs1.getDouble("Einfuhr") < minmenge ? "Einfuhr zu niedrig" : "Einfuhr zu hoch") + "</td>");
+////                            html.append("</tr>");
+////                        }
+////                    }
+//                }
+//                if (html.length() > 0) {
+//                    html.append("</table>");
+//                }
+//            }
+//        } catch (SQLException sQLException) {
+//            // new DlgException(sQLException);
+//        }
+//        return html.toString();
+//    }
+
 }

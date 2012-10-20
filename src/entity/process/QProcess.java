@@ -5,12 +5,12 @@
 package entity.process;
 
 import entity.info.ResInfo;
-import entity.values.ResValue;
-import entity.system.Users;
 import entity.info.Resident;
 import entity.nursingprocess.NursingProcess;
 import entity.prescription.Prescription;
 import entity.reports.NReport;
+import entity.system.Users;
+import entity.values.ResValue;
 import op.OPDE;
 import op.tools.SYSConst;
 import org.joda.time.DateMidnight;
@@ -18,6 +18,7 @@ import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.text.DateFormat;
 import java.util.*;
 
 /**
@@ -296,6 +297,33 @@ public class QProcess implements Serializable, Comparable<QProcess> {
             }
         });
         return elements;
+    }
+
+    public String getPITAsHTML() {
+        String result = "";
+        DateFormat df = DateFormat.getDateInstance();
+
+        if (isClosed()) {
+
+            result += "<table id=\"fonttext\" border=\"0\" cellspacing=\"0\">";
+            result += "<tr>";
+            result += "<td valign=\"top\">" + df.format(from) + "</td>";
+            result += "<td valign=\"top\">&raquo;</td>";
+            result += "<td valign=\"top\">" + df.format(to) + "</td>";
+            result += "</tr>\n";
+            result += "<tr>";
+            result += "<td valign=\"top\">" + creator.getFullname() + "</td>";
+            result += "<td valign=\"top\">&raquo;</td>";
+            result += "<td valign=\"top\">" + owner.getFullname() + "</td>";
+            result += "</tr>\n";
+            result += "</table>\n";
+
+        } else {
+            result += df.format(from) + "&nbsp;&raquo;&raquo;" +
+                    "<br/>" +
+                    owner.getFullname();
+        }
+        return result;
     }
 
     public Collection<PReport> getPReports() {

@@ -686,11 +686,11 @@ public class ResInfoTools {
          *     |_| |_|\__,_|\__,_|___/\__,_|_|  /___|\__|
          *
          */
-        if (bewohner.getHausarzt() != null) {
+        if (bewohner.getDoc() != null) {
             result += "<h2 id=\"fonth2\">" + OPDE.lang.getString("misc.msg.gp") + "</h2>";
-            result += "<div id=\"fonttext\">" + DocTools.getFullName(bewohner.getHausarzt()) + ", " + bewohner.getHausarzt().getStrasse();
-            result += ", " + bewohner.getHausarzt().getPlz() + " " + bewohner.getHausarzt().getOrt();
-            result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + bewohner.getHausarzt().getTel() + ", " + OPDE.lang.getString("misc.msg.fax") + ": " + bewohner.getHausarzt().getFax();
+            result += "<div id=\"fonttext\">" + DocTools.getFullName(bewohner.getDoc()) + ", " + bewohner.getDoc().getStrasse();
+            result += ", " + bewohner.getDoc().getPlz() + " " + bewohner.getDoc().getOrt();
+            result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + bewohner.getDoc().getTel() + ", " + OPDE.lang.getString("misc.msg.fax") + ": " + bewohner.getDoc().getFax();
             result += "</div>";
         }
 

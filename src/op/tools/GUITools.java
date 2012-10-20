@@ -242,75 +242,90 @@ public class GUITools {
         final int start = jsp.getVerticalScrollBar().getValue();
         end = Math.max(0, end);
         end = Math.min(jsp.getVerticalScrollBar().getMaximum(), end);
-        final int distance = end - start;
 
+        if (OPDE.isAnimation()) {
+            final int distance = end - start;
+            final TimingSource ts = new SwingTimerTimingSource();
+            Animator.setDefaultTimingSource(ts);
+            ts.init();
 
-        final TimingSource ts = new SwingTimerTimingSource();
-        Animator.setDefaultTimingSource(ts);
-        ts.init();
+            Animator animator = new Animator.Builder().setInterpolator(new AccelerationInterpolator(0.15f, 0.8f)).setDuration(500, TimeUnit.MILLISECONDS).setStartDirection(Animator.Direction.FORWARD).addTarget(new TimingTargetAdapter() {
+                @Override
+                public void begin(Animator source) {
+                }
 
-        Animator animator = new Animator.Builder().setInterpolator(new AccelerationInterpolator(0.15f, 0.8f)).setDuration(500, TimeUnit.MILLISECONDS).setStartDirection(Animator.Direction.FORWARD).addTarget(new TimingTargetAdapter() {
-            @Override
-            public void begin(Animator source) {
-            }
+                @Override
+                public void timingEvent(Animator animator, double fraction) {
+                    final BigDecimal value = new BigDecimal(start).add(new BigDecimal(fraction).multiply(new BigDecimal(distance)));
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            jsp.getVerticalScrollBar().setValue(value.intValue());
+                        }
+                    });
+                }
 
-            @Override
-            public void timingEvent(Animator animator, double fraction) {
-                final BigDecimal value = new BigDecimal(start).add(new BigDecimal(fraction).multiply(new BigDecimal(distance)));
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        jsp.getVerticalScrollBar().setValue(value.intValue());
-                    }
-                });
-            }
-
-            @Override
-            public void end(Animator source) {
-                if (what2doAfterwards != null)
-                    what2doAfterwards.execute(null);
-            }
-        }).build();
-        animator.start();
-
+                @Override
+                public void end(Animator source) {
+                    if (what2doAfterwards != null)
+                        what2doAfterwards.execute(null);
+                }
+            }).build();
+            animator.start();
+        } else {
+            final int myend = end;
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    jsp.getVerticalScrollBar().setValue(myend);
+                }
+            });
+        }
 //        jsp.getVerticalScrollBar().setValue(Math.min(SwingUtilities.convertPoint(component, component.getLocation(), container).y, jsp.getVerticalScrollBar().getMaximum()));
     }
 
     public static void scroll2show(final JScrollPane jsp, final Component component, Container container, final Closure what2doAfterwards) {
-
         final int start = jsp.getVerticalScrollBar().getValue();
         final int end = SwingUtilities.convertPoint(component, component.getLocation(), container).y;
-        final int distance = end - start;
+        if (OPDE.isAnimation()) {
+            final int distance = end - start;
+            final TimingSource ts = new SwingTimerTimingSource();
+            Animator.setDefaultTimingSource(ts);
+            ts.init();
 
-        final TimingSource ts = new SwingTimerTimingSource();
-        Animator.setDefaultTimingSource(ts);
-        ts.init();
+            Animator animator = new Animator.Builder().setInterpolator(new AccelerationInterpolator(0.15f, 0.8f)).setDuration(750, TimeUnit.MILLISECONDS).setStartDirection(Animator.Direction.FORWARD).addTarget(new TimingTargetAdapter() {
+                @Override
+                public void begin(Animator source) {
+                }
 
-        Animator animator = new Animator.Builder().setInterpolator(new AccelerationInterpolator(0.15f, 0.8f)).setDuration(750, TimeUnit.MILLISECONDS).setStartDirection(Animator.Direction.FORWARD).addTarget(new TimingTargetAdapter() {
-            @Override
-            public void begin(Animator source) {
-            }
+                @Override
+                public void timingEvent(Animator animator, double fraction) {
+                    final BigDecimal value = new BigDecimal(start).add(new BigDecimal(fraction).multiply(new BigDecimal(distance)));
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            jsp.getVerticalScrollBar().setValue(value.intValue());
+                        }
+                    });
+                }
 
-            @Override
-            public void timingEvent(Animator animator, double fraction) {
-                final BigDecimal value = new BigDecimal(start).add(new BigDecimal(fraction).multiply(new BigDecimal(distance)));
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        jsp.getVerticalScrollBar().setValue(value.intValue());
-                    }
-                });
-            }
-
-            @Override
-            public void end(Animator source) {
-                component.repaint();
-                if (what2doAfterwards != null)
-                    what2doAfterwards.execute(null);
-            }
-        }).build();
-        animator.start();
-
+                @Override
+                public void end(Animator source) {
+                    component.repaint();
+                    if (what2doAfterwards != null)
+                        what2doAfterwards.execute(null);
+                }
+            }).build();
+            animator.start();
+        } else {
+            final int myend = end;
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    jsp.getVerticalScrollBar().setValue(myend);
+                }
+            });
+        }
 //        jsp.getVerticalScrollBar().setValue(Math.min(SwingUtilities.convertPoint(component, component.getLocation(), container).y, jsp.getVerticalScrollBar().getMaximum()));
     }
 

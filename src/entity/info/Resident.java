@@ -25,7 +25,8 @@
  */
 package entity.info;
 
-import entity.*;
+import entity.Allowance;
+import entity.Station;
 import entity.prescription.Doc;
 import entity.system.Users;
 import op.OPDE;
@@ -56,29 +57,32 @@ public class Resident implements Serializable, Comparable<Resident> {
     private static final long serialVersionUID = 1L;
     @Id
     @Column(name = "BWKennung")
-    private String bWKennung;
+    private String rid;
     @Basic(optional = false)
     @Column(name = "Nachname")
-    private String nachname;
+    private String name;
     @Basic(optional = false)
     @Column(name = "Vorname")
-    private String vorname;
+    private String firstname;
     @Basic(optional = false)
     @Column(name = "Geschlecht")
-    private int geschlecht;
+    private int gender;
     @Basic(optional = false)
     @Column(name = "GebDatum")
     @Temporal(TemporalType.DATE)
-    private Date gebDatum;
+    private Date birthday;
     @Version
     @Column(name = "version")
     private Long version;
     @Basic(optional = false)
     @Column(name = "adminonly")
     private short adminonly;
+    @Basic(optional = false)
+    @Column(name = "controlling")
+    private String controlling;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "resident")
-    private Collection<Allowance> konto;
+    private Collection<Allowance> allowance;
 
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bewohner")
 //    private Collection<NReport> pflegeberichteCollection;
@@ -113,36 +117,44 @@ public class Resident implements Serializable, Comparable<Resident> {
     public Resident() {
     }
 
-    public Resident(String nachname, String vorname, int geschlecht, Date gebDatum) {
-        this.bWKennung = null;
-        this.nachname = nachname;
-        this.vorname = vorname;
-        this.geschlecht = geschlecht;
-        this.gebDatum = gebDatum;
+    public Resident(String name, String firstname, int gender, Date birthday) {
+        this.rid = null;
+        this.name = name;
+        this.firstname = firstname;
+        this.gender = gender;
+        this.birthday = birthday;
         this.editor = OPDE.getLogin().getUser();
         this.adminonly = 0;
     }
 
     public String getRID() {
-        return bWKennung;
+        return rid;
     }
 
     public void setRID(String bWKennung) {
-        if (this.bWKennung == null) {
-            this.bWKennung = bWKennung;
+        if (this.rid == null) {
+            this.rid = bWKennung;
         }
     }
 
     public String getNachnameNieAnonym() {
-        return nachname;
+        return name;
     }
 
-    public String getNachname() {
-        return SYSTools.anonymizeName(nachname, SYSTools.INDEX_NACHNAME);
+    public String getName() {
+        return SYSTools.anonymizeName(name, SYSTools.INDEX_NACHNAME);
+    }
+
+    public String getControlling() {
+        return controlling;
+    }
+
+    public void setControlling(String controlling) {
+        this.controlling = controlling;
     }
 
     public void setNachname(String nachname) {
-        this.nachname = nachname;
+        this.name = nachname;
     }
 
     public Station getStation() {
@@ -163,16 +175,16 @@ public class Resident implements Serializable, Comparable<Resident> {
     }
 
     public String getVorname() {
-        int index = (geschlecht == ResidentTools.GESCHLECHT_MAENNLICH ? SYSTools.INDEX_VORNAME_MANN : SYSTools.INDEX_VORNAME_FRAU);
-        return SYSTools.anonymizeName(vorname, index);
+        int index = (gender == ResidentTools.GESCHLECHT_MAENNLICH ? SYSTools.INDEX_VORNAME_MANN : SYSTools.INDEX_VORNAME_FRAU);
+        return SYSTools.anonymizeName(firstname, index);
     }
 
     public String getVornameNieAnonym() {
-        return vorname;
+        return firstname;
     }
 
     public void setVorname(String vorname) {
-        this.vorname = vorname;
+        this.firstname = vorname;
     }
 
     public Users getEditor() {
@@ -183,20 +195,20 @@ public class Resident implements Serializable, Comparable<Resident> {
         this.editor = editor;
     }
 
-    public int getGeschlecht() {
-        return geschlecht;
+    public int getGender() {
+        return gender;
     }
 
     public void setGeschlecht(int geschlecht) {
-        this.geschlecht = geschlecht;
+        this.gender = geschlecht;
     }
 
-    public Date getGebDatum() {
-        return gebDatum;
+    public Date getBirthday() {
+        return birthday;
     }
 
     public void setGebDatum(Date gebDatum) {
-        this.gebDatum = gebDatum;
+        this.birthday = gebDatum;
     }
 
     public short getAdminonly() {
@@ -208,7 +220,7 @@ public class Resident implements Serializable, Comparable<Resident> {
     }
 
     public Collection<Allowance> getKonto() {
-        return konto;
+        return allowance;
     }
 
     public Users getBv1() {
@@ -227,11 +239,11 @@ public class Resident implements Serializable, Comparable<Resident> {
         this.bv2 = bv2;
     }
 
-    public Doc getHausarzt() {
+    public Doc getDoc() {
         return hausarzt;
     }
 
-    public void setHausarzt(Doc hausarzt) {
+    public void setDoc(Doc hausarzt) {
         this.hausarzt = hausarzt;
     }
 
@@ -246,7 +258,7 @@ public class Resident implements Serializable, Comparable<Resident> {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (bWKennung != null ? bWKennung.hashCode() : 0);
+        hash += (rid != null ? rid.hashCode() : 0);
         return hash;
     }
 
@@ -257,7 +269,7 @@ public class Resident implements Serializable, Comparable<Resident> {
             return false;
         }
         Resident other = (Resident) object;
-        if ((this.bWKennung == null && other.bWKennung != null) || (this.bWKennung != null && !this.bWKennung.equals(other.bWKennung))) {
+        if ((this.rid == null && other.rid != null) || (this.rid != null && !this.rid.equals(other.rid))) {
             return false;
         }
         return true;
@@ -270,6 +282,6 @@ public class Resident implements Serializable, Comparable<Resident> {
 
     @Override
     public String toString() {
-        return getNachname() + ", " + getVorname() + " [" + bWKennung + "]";
+        return getName() + ", " + getVorname() + " [" + rid + "]";
     }
 }

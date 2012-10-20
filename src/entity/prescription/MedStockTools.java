@@ -141,7 +141,7 @@ public class MedStockTools {
         hm.put("bestand.userkurz", bestand.getUser().getUID());
         hm.put("bestand.userlang", bestand.getUser().getFullname());
         hm.put("bestand.inventory.bewohnername", ResidentTools.getBWLabel1(bestand.getInventory().getResident()));
-        hm.put("bestand.inventory.bewohnergebdatum", bestand.getInventory().getResident().getGebDatum());
+        hm.put("bestand.inventory.bewohnergebdatum", bestand.getInventory().getResident().getBirthday());
         hm.put("bestand.inventory.bewohnerkennung", bestand.getInventory().getResident().getRID());
 
         return hm;
@@ -571,7 +571,7 @@ public class MedStockTools {
                 " SELECT b FROM MedStock b " +
                 " WHERE b.inventory.resident.station = :station AND b.inventory.resident.adminonly <> 2 " +
                 " AND b.opened < :anbruch AND b.out = " + SYSConst.MYSQL_DATETIME_BIS_AUF_WEITERES +
-                " ORDER BY b.inventory.resident.nachname, b.inventory.resident.vorname, b.inventory.text, b.opened ";
+                " ORDER BY b.inventory.resident.name, b.inventory.resident.firstname, b.inventory.text, b.opened ";
 
         Query query = em.createQuery(jpql);
         query.setParameter("anbruch", new Date());

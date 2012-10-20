@@ -35,29 +35,29 @@ public class ResidentTools {
 
     public static Resident findByBWKennung(String bwkennung) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM Resident b WHERE b.bWKennung = :bWKennung");
+        Query query = em.createQuery("SELECT b FROM Resident b WHERE b.rid = :bWKennung");
         query.setParameter("bWKennung", bwkennung);
         Resident bewohner = (Resident) query.getSingleResult();
         em.close();
         return bewohner;
     }
 
-    public static JLabel getBWLabel(Resident bewohner) {
-        JLabel lblBW = new JLabel();
-        setBWLabel(lblBW, bewohner);
-        return lblBW;
-    }
+//    public static JLabel getBWLabel(Resident bewohner) {
+//        JLabel lblBW = new JLabel();
+//        setBWLabel(lblBW, bewohner);
+//        return lblBW;
+//    }
 
     public static String getBWLabel1(Resident bewohner) {
-        return bewohner.getNachname() + ", " + bewohner.getVorname();
+        return bewohner.getName() + ", " + bewohner.getVorname();
     }
 
-    public static String getBWLabel2(Resident bewohner) {
-        return "(*" + DateFormat.getDateInstance().format(bewohner.getGebDatum()) + ") [" + bewohner.getRID() + "]";
+    public static String getBWLabelWithBDay(Resident bewohner) {
+        return "(*" + DateFormat.getDateInstance().format(bewohner.getBirthday()) + ") [" + bewohner.getRID() + "]";
     }
 
     public static String getBWLabelTextKompakt(Resident bewohner) {
-        return bewohner.getNachname() + ", " + bewohner.getVorname() + " [" + bewohner.getRID() + "]";
+        return bewohner.getName() + ", " + bewohner.getVorname() + " [" + bewohner.getRID() + "]";
     }
 
 
@@ -69,11 +69,11 @@ public class ResidentTools {
     }
 
     public static String getFullName(Resident bewohner) {
-        return ANREDE[bewohner.getGeschlecht()] + " " + bewohner.getVorname() + " " + bewohner.getNachname();
+        return ANREDE[bewohner.getGender()] + " " + bewohner.getVorname() + " " + bewohner.getName();
     }
 
 //    public static boolean isWeiblich(Bewohner bewohner) {
-//        return bewohner.getGeschlecht() == GESCHLECHT_WEIBLICH;
+//        return bewohner.getGender() == GESCHLECHT_WEIBLICH;
 //    }
 
     public static String getLabelText(Resident bewohner) {
@@ -82,12 +82,11 @@ public class ResidentTools {
         ResInfo hauf = ResInfoTools.getLastResinfo(bewohner, ResInfoTypeTools.getByID("hauf"));
 
         DateFormat df = DateFormat.getDateInstance();
-        String result = bewohner.getNachname() + ", " + bewohner.getVorname() + " (*" + df.format(bewohner.getGebDatum()) + "), ";
+        String result = bewohner.getName() + ", " + bewohner.getVorname() + " (*" + df.format(bewohner.getBirthday()) + "), ";
 
-        DateMidnight birthdate = new DateTime(bewohner.getGebDatum()).toDateMidnight();
+        DateMidnight birthdate = new DateTime(bewohner.getBirthday()).toDateMidnight();
         DateTime refdate = verstorben ? new DateTime(hauf.getTo()) : new DateTime();
         Years age = Years.yearsBetween(birthdate, refdate);
-
         result += age.getYears() + " " + OPDE.lang.getString("misc.msg.Years") + " [" + bewohner.getRID() + "]";
 
         if (verstorben || ausgezogen) {
@@ -99,6 +98,7 @@ public class ResidentTools {
 
     /**
      * creates a list of fitting residents by the given pattern
+     *
      * @param pattern
      * @return
      */
@@ -110,7 +110,7 @@ public class ResidentTools {
             pattern += "%"; // MySQL Wildcard
             EntityManager em = OPDE.createEM();
 
-            Query query = em.createQuery("SELECT b FROM Resident b WHERE b.nachname like :nachname ORDER BY b.nachname, b.vorname");
+            Query query = em.createQuery("SELECT b FROM Resident b WHERE b.name like :nachname ORDER BY b.name, b.firstname");
             query.setParameter("nachname", pattern);
             lstResult = new ArrayList<Resident>(query.getResultList());
         } else {
@@ -151,7 +151,7 @@ public class ResidentTools {
 
     public static ArrayList<Resident> getAllActive(Homes homes) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM Resident b WHERE b.station IS NOT NULL AND b.station.home = :home ORDER BY b.nachname, b.vorname");
+        Query query = em.createQuery("SELECT b FROM Resident b WHERE b.station IS NOT NULL AND b.station.home = :home ORDER BY b.name, b.firstname");
         query.setParameter("home", homes);
         ArrayList<Resident> list = new ArrayList<Resident>(query.getResultList());
         em.close();
@@ -160,7 +160,7 @@ public class ResidentTools {
 
     public static ArrayList<Resident> getAllActive() {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM Resident b WHERE b.station IS NOT NULL ORDER BY b.nachname, b.vorname");
+        Query query = em.createQuery("SELECT b FROM Resident b WHERE b.station IS NOT NULL ORDER BY b.name, b.firstname");
         ArrayList<Resident> list = new ArrayList<Resident>(query.getResultList());
         em.close();
         return list;
@@ -168,12 +168,31 @@ public class ResidentTools {
 
     public static ArrayList<Resident> getAllInactive() {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM Resident b WHERE b.station IS NULL ORDER BY b.nachname, b.vorname");
+        Query query = em.createQuery("SELECT b FROM Resident b WHERE b.station IS NULL ORDER BY b.name, b.firstname");
         ArrayList<Resident> list = new ArrayList<Resident>(query.getResultList());
         em.close();
         return list;
     }
 
+    public static ArrayList<Resident> getAllWithBirthdayIn(int days) {
+        ArrayList<Resident> list = getAllActive();
+        ArrayList<Resident> result = new ArrayList<Resident>();
+
+        for (Resident resident : list) {
+            DateMidnight birthday = new DateMidnight(resident.getBirthday());
+            DateMidnight now = new DateMidnight();
+            if (
+                    now.getDayOfYear() <= birthday.getDayOfYear() && now.getDayOfYear() + days >= birthday.getDayOfYear()
+                            ||
+                            now.getDayOfYear() <= birthday.getDayOfYear() + 365 && now.getDayOfYear() + days >= birthday.getDayOfYear() + 365
+                    ) {
+                result.add(resident);
+            }
+        }
+        list.clear();
+
+        return result;
+    }
 
 
 }

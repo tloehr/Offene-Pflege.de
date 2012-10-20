@@ -459,94 +459,94 @@ public class FrmMain extends JFrame {
         }
     }//GEN-LAST:event_btnVerlegungActionPerformed
 
-    private CollapsiblePane addApps() {
-        JPanel mypanel = new JPanel(new VerticalLayout());
-        mypanel.setBackground(Color.WHITE);
-        final CollapsiblePane mypane = new CollapsiblePane(OPDE.lang.getString(internalClassID + ".Apps"));
-        mypane.setFont(SYSConst.ARIAL14);
-
-        // Darf neue Bewohner anlegen
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlInfo.internalClassID, InternalClassACL.MANAGER)) { // => ACLMATRIX
-            JideButton addbw = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".addbw"), SYSConst.icon22addbw, null);
-//            final MyJDialog dlg = new MyJDialog();
-            addbw.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
-            addbw.setAlignmentX(Component.LEFT_ALIGNMENT);
-            addbw.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    final MyJDialog dlg = new MyJDialog();
-                    WizardDialog wizard = new AddBWWizard(new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            dlg.dispose();
-                            jspSearch.removeAll();
-                            jspSearch = null;
-                            jspApps.removeAll();
-                            jspApps = null;
-                            panesSearch.removeAll();
-                            panesSearch = null;
-                            panesApps.removeAll();
-                            panesApps = null;
-                            splitPaneLeft.removeAll();
-                            prepareSearchArea();
-                        }
-                    }).getWizard();
-                    dlg.setContentPane(wizard.getContentPane());
-                    dlg.pack();
-                    dlg.setSize(new Dimension(800, 550));
-                    dlg.setVisible(true);
-                }
-            });
-            mypanel.add(addbw);
-        }
-
-
-        for (InternalClass ic : OPDE.getAppInfo().getMainClasses()) {
-
-            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(ic.getInternalClassID(), InternalClassACL.EXECUTE)) {
-
-                final String shortDescription = ic.getShortDescription();
-                final String longDescription = ic.getLongDescription();
-                final String javaclass = ic.getJavaclass();
-
-                Icon icon = null;
-                try {
-                    icon = new ImageIcon(getClass().getResource("/artwork/22x22/" + ic.getIconname()));
-                } catch (Exception e) {
-
-                }
-
-                JideButton progButton = GUITools.createHyperlinkButton(shortDescription, icon, new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
-
-                        if (previousProgButton != null) {
-                            previousProgButton.setBackground(Color.WHITE);
-                            previousProgButton.setOpaque(false);
-                        }
-                        previousProgButton = (JideButton) actionEvent.getSource();
-                        previousProgButton.setBackground(Color.YELLOW);
-                        previousProgButton.setOpaque(true);
-
-                        displayManager.setMainMessage(shortDescription);
-                        displayManager.addSubMessage(new DisplayMessage(longDescription, 5));
-                        setPanelTo(loadPanel(javaclass));
-
-                    }
-                });
-
-                progButton.setToolTipText(longDescription);
-
-                mypanel.add(progButton);
-            }
-        }
-//        mypane.setSlidingDirection(SwingConstants.SOUTH);
-        mypane.setStyle(CollapsiblePane.PLAIN_STYLE);
-        mypane.setContentPane(mypanel);
-//        panesApps.add(mypane);
-//        panesApps.setBackground(mypane.getBackground());
-        return mypane;
-    }
+//    private CollapsiblePane addApps() {
+//        JPanel mypanel = new JPanel(new VerticalLayout());
+//        mypanel.setBackground(Color.WHITE);
+//        final CollapsiblePane mypane = new CollapsiblePane(OPDE.lang.getString(internalClassID + ".Apps"));
+//        mypane.setFont(SYSConst.ARIAL14);
+//
+//        // Darf neue Bewohner anlegen
+//        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlInfo.internalClassID, InternalClassACL.MANAGER)) { // => ACLMATRIX
+//            JideButton addbw = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".addbw"), SYSConst.icon22addbw, null);
+////            final MyJDialog dlg = new MyJDialog();
+//            addbw.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
+//            addbw.setAlignmentX(Component.LEFT_ALIGNMENT);
+//            addbw.addActionListener(new ActionListener() {
+//                @Override
+//                public void actionPerformed(ActionEvent actionEvent) {
+//                    final MyJDialog dlg = new MyJDialog();
+//                    WizardDialog wizard = new AddBWWizard(new Closure() {
+//                        @Override
+//                        public void execute(Object o) {
+//                            dlg.dispose();
+//                            jspSearch.removeAll();
+//                            jspSearch = null;
+//                            jspApps.removeAll();
+//                            jspApps = null;
+//                            panesSearch.removeAll();
+//                            panesSearch = null;
+//                            panesApps.removeAll();
+//                            panesApps = null;
+//                            splitPaneLeft.removeAll();
+//                            prepareSearchArea();
+//                        }
+//                    }).getWizard();
+//                    dlg.setContentPane(wizard.getContentPane());
+//                    dlg.pack();
+//                    dlg.setSize(new Dimension(800, 550));
+//                    dlg.setVisible(true);
+//                }
+//            });
+//            mypanel.add(addbw);
+//        }
+//
+//
+//        for (InternalClass ic : OPDE.getAppInfo().getMainClasses()) {
+//
+//            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(ic.getInternalClassID(), InternalClassACL.EXECUTE)) {
+//
+//                final String shortDescription = ic.getShortDescription();
+//                final String longDescription = ic.getLongDescription();
+//                final String javaclass = ic.getJavaclass();
+//
+//                Icon icon = null;
+//                try {
+//                    icon = new ImageIcon(getClass().getResource("/artwork/22x22/" + ic.getIconname()));
+//                } catch (Exception e) {
+//
+//                }
+//
+//                JideButton progButton = GUITools.createHyperlinkButton(shortDescription, icon, new ActionListener() {
+//                    @Override
+//                    public void actionPerformed(ActionEvent actionEvent) {
+//
+//                        if (previousProgButton != null) {
+//                            previousProgButton.setBackground(Color.WHITE);
+//                            previousProgButton.setOpaque(false);
+//                        }
+//                        previousProgButton = (JideButton) actionEvent.getSource();
+//                        previousProgButton.setBackground(Color.YELLOW);
+//                        previousProgButton.setOpaque(true);
+//
+//                        displayManager.setMainMessage(shortDescription);
+//                        displayManager.addSubMessage(new DisplayMessage(longDescription, 5));
+//                        setPanelTo(loadPanel(javaclass));
+//
+//                    }
+//                });
+//
+//                progButton.setToolTipText(longDescription);
+//
+//                mypanel.add(progButton);
+//            }
+//        }
+////        mypane.setSlidingDirection(SwingConstants.SOUTH);
+//        mypane.setStyle(CollapsiblePane.PLAIN_STYLE);
+//        mypane.setContentPane(mypanel);
+////        panesApps.add(mypane);
+////        panesApps.setBackground(mypane.getBackground());
+//        return mypane;
+//    }
 
     public void clearPreviousProgbutton() {
         if (previousProgButton != null) {
@@ -632,9 +632,9 @@ public class FrmMain extends JFrame {
         EntityManager em = OPDE.createEM();
         Query query;
         if (station == null) {
-            query = em.createQuery("SELECT b FROM Resident b WHERE b.station IS NULL ORDER BY b.nachname, b.vorname");
+            query = em.createQuery("SELECT b FROM Resident b WHERE b.station IS NULL ORDER BY b.name, b.firstname");
         } else {
-            query = em.createQuery("SELECT b FROM Resident b WHERE b.station = :station ORDER BY b.nachname, b.vorname");
+            query = em.createQuery("SELECT b FROM Resident b WHERE b.station = :station ORDER BY b.name, b.firstname");
             query.setParameter("station", station);
         }
         ArrayList<Resident> bewohnerliste = new ArrayList<Resident>(query.getResultList());
@@ -685,9 +685,9 @@ public class FrmMain extends JFrame {
                 }
             };
 
-            String titel = innerbewohner.getNachname() + ", " + innerbewohner.getVorname() + " [" + innerbewohner.getRID() + "]";
+            String titel = innerbewohner.getName() + ", " + innerbewohner.getVorname() + " [" + innerbewohner.getRID() + "]";
             JideButton button = GUITools.createHyperlinkButton(titel, null, actionListener);
-            button.setForegroundOfState(ThemePainter.STATE_DEFAULT, innerbewohner.getGeschlecht() == ResidentTools.GESCHLECHT_WEIBLICH ? Color.red : Color.blue);
+            button.setForegroundOfState(ThemePainter.STATE_DEFAULT, innerbewohner.getGender() == ResidentTools.GESCHLECHT_WEIBLICH ? Color.red : Color.blue);
             button.setBackground(Color.WHITE);
 //            button.putClientProperty("bewohner", innerbewohner);
 
@@ -699,34 +699,34 @@ public class FrmMain extends JFrame {
         return mypane;
     }
 
-    public void change2Bewohner(Resident bw) {
-        if (previousProgButton != null) {
-            previousProgButton.setBackground(Color.WHITE);
-            previousProgButton.setOpaque(false);
-        }
-        currentBewohner = bw;
-
-        previousProgButton = bwButtonMap.get(bw);
-        previousProgButton.setBackground(Color.YELLOW);
-        previousProgButton.setOpaque(true);
-
-
-        List<Component> list = findPathForComponent(panesApps, previousProgButton);
-
-        if (list != null && !list.isEmpty()) {
-            for (Component comp : list) {
-                if (comp instanceof CollapsiblePane) {
-                    try {
-                        ((CollapsiblePane) comp).setCollapsed(false);
-                        previousProgButton.scrollRectToVisible(previousProgButton.getBounds());
-                    } catch (PropertyVetoException e) {
-                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                    }
-                    break;
-                }
-            }
-        }
-    }
+//    public void change2Bewohner(Resident bw) {
+//        if (previousProgButton != null) {
+//            previousProgButton.setBackground(Color.WHITE);
+//            previousProgButton.setOpaque(false);
+//        }
+//        currentBewohner = bw;
+//
+//        previousProgButton = bwButtonMap.get(bw);
+//        previousProgButton.setBackground(Color.YELLOW);
+//        previousProgButton.setOpaque(true);
+//
+//
+//        List<Component> list = findPathForComponent(panesApps, previousProgButton);
+//
+//        if (list != null && !list.isEmpty()) {
+//            for (Component comp : list) {
+//                if (comp instanceof CollapsiblePane) {
+//                    try {
+//                        ((CollapsiblePane) comp).setCollapsed(false);
+//                        previousProgButton.scrollRectToVisible(previousProgButton.getBounds());
+//                    } catch (PropertyVetoException e) {
+//                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//                    }
+//                    break;
+//                }
+//            }
+//        }
+//    }
 
 
     private java.util.List<Component> findPathForComponent(Container container, Component comp) {

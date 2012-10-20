@@ -111,7 +111,7 @@ public class AddBWWizard {
             em.getTransaction().begin();
 
 
-            String prefix = bewohner.getNachname().substring(0, 1) + bewohner.getVorname().substring(0, 1);
+            String prefix = bewohner.getName().substring(0, 1) + bewohner.getVorname().substring(0, 1);
             prefix = prefix.toUpperCase();
 
             Unique unique = UniqueTools.getNewUID(em, prefix);
@@ -252,7 +252,7 @@ public class AddBWWizard {
                 @Override
                 public void execute(Object o) {
                     if (o != null) {
-                        bewohner.setHausarzt((Doc) o);
+                        bewohner.setDoc((Doc) o);
                     }
                     setupWizardButtons();
                 }
@@ -274,7 +274,7 @@ public class AddBWWizard {
             super.setupWizardButtons();
 
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
-            fireButtonEvent(bewohner == null || bewohner.getHausarzt() == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(bewohner == null || bewohner.getDoc() == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
             fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
@@ -416,9 +416,9 @@ public class AddBWWizard {
             result += OPDE.lang.getString(internalClassID + ".page7.summaryline2") + "<br/>";
             result += "<ul>";
             result += "<li>" + ResidentTools.getFullName(bewohner) + "</li>";
-            result += "<li>" + OPDE.lang.getString("misc.msg.dob") + ": " + DateFormat.getDateInstance().format(bewohner.getGebDatum()) + "</li>";
+            result += "<li>" + OPDE.lang.getString("misc.msg.dob") + ": " + DateFormat.getDateInstance().format(bewohner.getBirthday()) + "</li>";
             result += "<li>" + OPDE.lang.getString("misc.msg.bv") + ": " + bewohner.getBv1().getFullname() + "</li>";
-            result += "<li>" + OPDE.lang.getString("misc.msg.gp") + ": " + DocTools.getFullName(bewohner.getHausarzt()) + "</li>";
+            result += "<li>" + OPDE.lang.getString("misc.msg.gp") + ": " + DocTools.getFullName(bewohner.getDoc()) + "</li>";
             result += "<li>" + OPDE.lang.getString("misc.msg.lg") + ": " + LCustodianTools.getFullName(bewohner.getLCustodian1()) + "</li>";
 
             result += "<li>" + OPDE.lang.getString("misc.msg.movein") + ": " + DateFormat.getDateInstance().format(bwinfo_hauf.getFrom()) + "</li>";

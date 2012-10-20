@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<java version="1.6.0_33" class="java.beans.XMLDecoder"> 
+ <object class="com.jformdesigner.model.FormModel"> 
+  <void property="contentType"> 
+   <string>form/swing</string> 
+  </void> 
+  <void property="root"> 
+   <object class="com.jformdesigner.model.FormRoot"> 
+    <void method="add"> 
+     <object class="com.jformdesigner.model.FormWindow"> 
+      <string>javax.swing.JDialog</string> 
+      <object class="com.jformdesigner.model.FormLayoutManager"> 
+       <class>javax.swing.BoxLayout</class> 
+       <void method="setProperty"> 
+        <string>axis</string> 
+        <int>0</int> 
+       </void> 
+      </object> 
+      <void method="setProperty"> 
+       <string>$sizePolicy</string> 
+       <int>1</int> 
+      </void> 
+      <void method="add"> 
+       <object class="com.jformdesigner.model.FormContainer"> 
+        <string>javax.swing.JPanel</string> 
+        <object class="com.jformdesigner.model.FormLayoutManager"> 
+         <class>com.jgoodies.forms.layout.FormLayout</class> 
+         <void method="setProperty"> 
+          <string>$columnSpecs</string> 
+          <string>13dlu, labelcompgap, default:grow, labelcompgap, 13dlu</string> 
+         </void> 
+         <void method="setProperty"> 
+          <string>$rowSpecs</string> 
+          <string>13dlu, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, pargap, default, linegap, 13dlu</string> 
+         </void> 
+        </object> 
+        <void property="name"> 
+         <string>panel1</string> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JLabel</string> 
+          <void method="setProperty"> 
+           <string>text</string> 
+           <string>tage ohne stuhlgang</string> 
+          </void> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object id="Font0" class="java.awt.Font"> 
+            <string>Arial</string> 
+            <int>0</int> 
+            <int>14</int> 
+           </object> 
+          </void> 
+          <void property="name"> 
+           <string>lblDayStool</string> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jgoodies.forms.layout.CellConstraints</class> 
+          <void method="setProperty"> 
+           <string>gridX</string> 
+           <int>3</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridY</string> 
+           <int>5</int> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JTextField</string> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object idref="Font0"/> 
+          </void> 
+          <void property="name"> 
+           <string>txtStoolDays</string> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jgoodies.forms.layout.CellConstraints</class> 
+          <void method="setProperty"> 
+           <string>gridX</string> 
+           <int>3</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridY</string> 
+           <int>7</int> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JSeparator</string> 
+          <void property="name"> 
+           <string>separator1</string> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jgoodies.forms.layout.CellConstraints</class> 
+          <void method="setProperty"> 
+           <string>gridX</string> 
+           <int>3</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridY</string> 
+           <int>9</int> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JLabel</string> 
+          <void method="setProperty"> 
+           <string>text</string> 
+           <string>min menge in 24h</string> 
+          </void> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object idref="Font0"/> 
+          </void> 
+          <void property="name"> 
+           <string>lblMin</string> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jgoodies.forms.layout.CellConstraints</class> 
+          <void method="setProperty"> 
+           <string>gridX</string> 
+           <int>3</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridY</string> 
+           <int>15</int> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JTextField</string> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object idref="Font0"/> 
+          </void> 
+          <void property="name"> 
+           <string>txtLowIn</string> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jgoodies.forms.layout.CellConstraints</class> 
+          <void method="setProperty"> 
+           <string>gridX</string> 
+           <int>3</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridY</string> 
+           <int>17</int> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JLabel</string> 
+          <void method="setProperty"> 
+           <string>text</string> 
+           <string>max menge in 24h</string> 
+          </void> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object idref="Font0"/> 
+          </void> 
+          <void property="name"> 
+           <string>lblMax</string> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jgoodies.forms.layout.CellConstraints</class> 
+          <void method="setProperty"> 
+           <string>gridX</string> 
+           <int>3</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridY</string> 
+           <int>21</int> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JTextField</string> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object idref="Font0"/> 
+          </void> 
+          <void property="name"> 
+           <string>txtHighIn</string> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jgoodies.forms.layout.CellConstraints</class> 
+          <void method="setProperty"> 
+           <string>gridX</string> 
+           <int>3</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridY</string> 
+           <int>23</int> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JLabel</string> 
+          <void method="setProperty"> 
+           <string>text</string> 
+           <string>kontrollzeitraum tage</string> 
+          </void> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object idref="Font0"/> 
+          </void> 
+          <void property="name"> 
+           <string>lblDaysDrink</string> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jgoodies.forms.layout.CellConstraints</class> 
+          <void method="setProperty"> 
+           <string>gridX</string> 
+           <int>3</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridY</string> 
+           <int>25</int> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JTextField</string> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object idref="Font0"/> 
+          </void> 
+          <void property="name"> 
+           <string>txtDaysDrink</string> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jgoodies.forms.layout.CellConstraints</class> 
+          <void method="setProperty"> 
+           <string>gridX</string> 
+           <int>3</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridY</string> 
+           <int>27</int> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormContainer"> 
+          <string>javax.swing.JPanel</string> 
+          <object class="com.jformdesigner.model.FormLayoutManager"> 
+           <class>javax.swing.BoxLayout</class> 
+           <void method="setProperty"> 
+            <string>axis</string> 
+            <int>0</int> 
+           </void> 
+          </object> 
+          <void property="name"> 
+           <string>panel2</string> 
+          </void> 
+          <void method="add"> 
+           <object class="com.jformdesigner.model.FormComponent"> 
+            <string>javax.swing.JButton</string> 
+            <void method="setProperty"> 
+             <string>text</string> 
+             <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+            </void> 
+            <void method="setProperty"> 
+             <string>icon</string> 
+             <object class="com.jformdesigner.model.SwingIcon"> 
+              <int>0</int> 
+              <string>/artwork/22x22/cancel.png</string> 
+             </object> 
+            </void> 
+            <void property="name"> 
+             <string>btnCancel</string> 
+            </void> 
+            <void method="addEvent"> 
+             <object class="com.jformdesigner.model.FormEvent"> 
+              <string>java.awt.event.ActionListener</string> 
+              <string>actionPerformed</string> 
+              <string>btnCancelActionPerformed</string> 
+              <boolean>true</boolean> 
+             </object> 
+            </void> 
+           </object> 
+          </void> 
+          <void method="add"> 
+           <object class="com.jformdesigner.model.FormComponent"> 
+            <string>javax.swing.JButton</string> 
+            <void method="setProperty"> 
+             <string>text</string> 
+             <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+            </void> 
+            <void method="setProperty"> 
+             <string>icon</string> 
+             <object class="com.jformdesigner.model.SwingIcon"> 
+              <int>0</int> 
+              <string>/artwork/22x22/apply.png</string> 
+             </object> 
+            </void> 
+            <void property="name"> 
+             <string>btnApply</string> 
+            </void> 
+            <void method="addEvent"> 
+             <object class="com.jformdesigner.model.FormEvent"> 
+              <string>java.awt.event.ActionListener</string> 
+              <string>actionPerformed</string> 
+              <string>btnApplyActionPerformed</string> 
+              <boolean>true</boolean> 
+             </object> 
+            </void> 
+           </object> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jgoodies.forms.layout.CellConstraints</class> 
+          <void method="setProperty"> 
+           <string>gridX</string> 
+           <int>3</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridY</string> 
+           <int>29</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>hAlign</string> 
+           <object class="com.jgoodies.forms.layout.CellConstraints" field="RIGHT"/> 
+          </void> 
+         </object> 
+        </void> 
+       </object> 
+      </void> 
+      <void property="name"> 
+       <string>this</string> 
+      </void> 
+     </object> 
+     <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+      <null/> 
+      <void method="setProperty"> 
+       <string>location</string> 
+       <object class="java.awt.Point"> 
+        <int>0</int> 
+        <int>0</int> 
+       </object> 
+      </void> 
+      <void method="setProperty"> 
+       <string>size</string> 
+       <object class="java.awt.Dimension"> 
+        <int>540</int> 
+        <int>440</int> 
+       </object> 
+      </void> 
+     </object> 
+    </void> 
+   </object> 
+  </void> 
+ </object> 
+</java> 

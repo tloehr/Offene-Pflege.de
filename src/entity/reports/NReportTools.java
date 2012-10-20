@@ -366,7 +366,7 @@ public class NReportTools {
 
     public static String getBewohnerName(NReport bericht) {
         String result = "";
-        result = bericht.getResident().getNachname() + ", " + bericht.getResident().getVorname();
+        result = bericht.getResident().getName() + ", " + bericht.getResident().getVorname();
         return "<font " + getHTMLColor(bericht) + SYSConst.html_arial14 + ">" + result + "</font>";
     }
 

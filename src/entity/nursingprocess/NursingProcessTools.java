@@ -37,7 +37,7 @@ public class NursingProcessTools {
 
     public static List<NursingProcess> getTemplates(String topic, boolean includeInactives) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT p FROM NursingProcess p WHERE p.topic like :topic " + (includeInactives ? "" : " AND p.to > :now ") + " ORDER BY p.topic, p.resident.bWKennung, p.from");
+        Query query = em.createQuery("SELECT p FROM NursingProcess p WHERE p.topic like :topic " + (includeInactives ? "" : " AND p.to > :now ") + " ORDER BY p.topic, p.resident.rid, p.from");
         query.setParameter("topic", EntityTools.getMySQLsearchPattern(topic));
         if (!includeInactives) {
             query.setParameter("now", new Date());

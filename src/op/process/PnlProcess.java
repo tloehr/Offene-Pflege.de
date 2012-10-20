@@ -188,18 +188,36 @@ public class PnlProcess extends NursingRecordsPanel {
     private CollapsiblePane createCP4(final QProcess qProcess) {
         final CollapsiblePane cp = new CollapsiblePane();
 
-        String title = "<html><font size=+1>" +
-                SYSTools.left(qProcess.getTitle(), MAX_TEXT_LENGTH) +
-                " <b>" +
+//        String title = "<html><font size=+1>" +
+//                SYSTools.left(qProcess.getTitle(), MAX_TEXT_LENGTH) +
+//                " <b>" +
+//                (qProcess.isCommon() ?
+//                        "" :
+//                        ResidentTools.getBWLabelTextKompakt(qProcess.getResident())) +
+//                "</b>, " +
+//                "[" +
+//                DateFormat.getDateInstance(DateFormat.SHORT).format(qProcess.getFrom()) + "&rarr;" +
+//                (qProcess.isClosed() ? DateFormat.getDateInstance(DateFormat.SHORT).format(qProcess.getTo()) : "|") +
+//                "]" +
+//                "</font></html>";
+
+        String title = "<html><table border=\"0\">" +
+                "<tr valign=\"top\">" +
+                "<td width=\"100\" align=\"left\">" + qProcess.getPITAsHTML() + "</td>" +
+                "<td width=\"100\" align=\"left\">" + " <b>" +
                 (qProcess.isCommon() ?
                         "" :
                         ResidentTools.getBWLabelTextKompakt(qProcess.getResident())) +
-                "</b>, " +
-                "[" +
-                DateFormat.getDateInstance(DateFormat.SHORT).format(qProcess.getFrom()) + "&rarr;" +
-                (qProcess.isClosed() ? DateFormat.getDateInstance(DateFormat.SHORT).format(qProcess.getTo()) : "|") +
-                "]" +
-                "</font></html>";
+                "</b>, "
+                + "</td>" +
+                "<td width=\"400\" align=\"left\">" +
+                (qProcess.isClosed() ? "<s>" : "") +
+                qProcess.getTitle() +
+                (qProcess.isClosed() ? "</s>" : "") +
+                "</td>" +
+                "</tr>" +
+                "</table>" +
+                "</html>";
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
             @Override

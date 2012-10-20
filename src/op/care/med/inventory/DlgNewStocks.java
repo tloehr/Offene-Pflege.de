@@ -620,7 +620,7 @@ public class DlgNewStocks extends MyJDialog {
 
             if (dcbm.getSize() == 0) { // Vielleicht Suche nach Nachname
 
-                Query query = em.createQuery(" SELECT b FROM Resident b WHERE b.station IS NOT NULL AND b.nachname like :nachname ORDER BY b.nachname, b.vorname ");
+                Query query = em.createQuery(" SELECT b FROM Resident b WHERE b.station IS NOT NULL AND b.name like :nachname ORDER BY b.name, b.firstname ");
                 query.setParameter("nachname", txtBWSuche.getText().trim() + "%");
                 java.util.List<Resident> listbw = query.getResultList();
 

@@ -32,17 +32,19 @@ import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.JideBoxLayout;
+import com.jidesoft.swing.JideButton;
 import entity.files.SYSFilesTools;
 import entity.files.SYSVAL2FILE;
 import entity.info.Resident;
-import entity.info.ResidentTools;
 import entity.process.QProcess;
 import entity.process.QProcessElement;
 import entity.process.SYSVAL2PROCESS;
+import entity.reports.NReport;
 import entity.values.ResValue;
 import entity.values.ResValueTools;
 import entity.values.ResValueTypes;
 import op.OPDE;
+import op.care.reports.DlgReport;
 import op.care.sysfiles.DlgFiles;
 import op.process.DlgProcessAssign;
 import op.threads.DisplayManager;
@@ -144,7 +146,7 @@ public class PnlValues extends NursingRecordsPanel {
             OPDE.error(e);
         }
 
-//        GUITools.addAllComponents(mypanel, addCommands());
+        GUITools.addAllComponents(mypanel, addCommands());
 //        GUITools.addAllComponents(mypanel, addFilters());
 
         searchPane.setContentPane(mypanel);
@@ -154,6 +156,24 @@ public class PnlValues extends NursingRecordsPanel {
 
     }
 
+    private java.util.List<Component> addCommands() {
+        java.util.List<Component> list = new ArrayList<Component>();
+
+
+
+        JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID+".btnControlling.tooltip"), SYSConst.icon22magnify1, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                  new DlgValueControl(resident);
+            }
+        });
+        list.add(addButton);
+
+
+
+
+        return list;
+    }
 
     /**
      * This method is called from within the constructor to
