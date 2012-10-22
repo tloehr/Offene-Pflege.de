@@ -39,12 +39,10 @@ import entity.info.Resident;
 import entity.process.QProcess;
 import entity.process.QProcessElement;
 import entity.process.SYSVAL2PROCESS;
-import entity.reports.NReport;
 import entity.values.ResValue;
 import entity.values.ResValueTools;
 import entity.values.ResValueTypes;
 import op.OPDE;
-import op.care.reports.DlgReport;
 import op.care.sysfiles.DlgFiles;
 import op.process.DlgProcessAssign;
 import op.threads.DisplayManager;
@@ -66,10 +64,7 @@ import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * @author tloehr
@@ -159,17 +154,46 @@ public class PnlValues extends NursingRecordsPanel {
     private java.util.List<Component> addCommands() {
         java.util.List<Component> list = new ArrayList<Component>();
 
-
-
-        JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID+".btnControlling.tooltip"), SYSConst.icon22magnify1, new ActionListener() {
+        JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".btnControlling.tooltip"), SYSConst.icon22magnify1, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                  new DlgValueControl(resident);
+                new DlgValueControl(resident, new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        if (o != null) {
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                Resident myResident = em.merge(resident);
+                                em.lock(myResident, LockModeType.OPTIMISTIC);
+                                myResident.setControlling((Properties) o);
+                                em.getTransaction().commit();
+
+                                resident = myResident;
+                            } catch (OptimisticLockException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+                            }
+
+                        }
+                    }
+                });
             }
         });
         list.add(addButton);
-
-
 
 
         return list;

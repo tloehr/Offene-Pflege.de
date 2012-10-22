@@ -285,8 +285,8 @@ public class PnlWelcome extends CleanablePanel {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                    "default:grow, $lcgap, default",
-                    "default:grow"));
+                "default:grow, $lcgap, default",
+                "default:grow"));
 
             //======== scrollPane1 ========
             {
@@ -305,7 +305,7 @@ public class PnlWelcome extends CleanablePanel {
 
                 //---- label1 ----
                 label1.setText(null);
-                label1.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/home.png")));
+                label1.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/OPDE-blue.png")));
                 label1.setHorizontalAlignment(SwingConstants.TRAILING);
                 pnlApps.add(label1);
             }
@@ -332,16 +332,6 @@ public class PnlWelcome extends CleanablePanel {
                         @Override
                         public void execute(Object o) {
                             dlg.dispose();
-//                            jspSearch.removeAll();
-//                            jspSearch = null;
-//                            jspApps.removeAll();
-//                            jspApps = null;
-//                            panesSearch.removeAll();
-//                            panesSearch = null;
-//                            panesApps.removeAll();
-//                            panesApps = null;
-//                            splitPaneLeft.removeAll();
-//                            prepareSearchArea();
                         }
                     }).getWizard();
                     dlg.setContentPane(wizard.getContentPane());

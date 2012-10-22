@@ -645,8 +645,8 @@ public class DlgRegular extends MyJDialog {
         boolean doseOK = tblDosis.getModel().getRowCount() > 0;
 
         String reason = "";
-        reason += (OnOK ? "" : "Die Informationen zum <b>an</b>setzenden <b>Doc</b> oder KH sind unvollständig. ");
-        reason += (OffOK ? "" : "Die Informationen zum <b>ab</b>setzenden <b>Doc</b> oder KH sind unvollständig. ");
+        reason += (OnOK ? "" : "Die Informationen zum <b>an</b>setzenden <b>Arzt</b> oder KH sind unvollständig. ");
+        reason += (OffOK ? "" : "Die Informationen zum <b>ab</b>setzenden <b>Arzt</b> oder KH sind unvollständig. ");
         reason += (medOK ? "" : "Die <b>Medikamentenangabe</b> ist falsch. ");
         reason += (intervOK ? "" : "Die Angaben über die <b>Massnahmen</b> sind falsch. ");
         reason += (doseOK ? "" : "Sie müssen mindestens eine <b>Dosierung</b> angegeben. ");

@@ -703,7 +703,7 @@ public class ResInfoTools {
          *                    |___/
          */
         if (diag) {
-            result += getDiagnosen(bewohner);
+            result += getDiags(bewohner);
         }
 
         /***
@@ -945,7 +945,7 @@ public class ResInfoTools {
         return result;
     }
 
-    private static String getDiagnosen(Resident bewohner) {
+    private static String getDiags(Resident bewohner) {
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp = :bwinfotyp AND b.to > :now ORDER BY b.from DESC");

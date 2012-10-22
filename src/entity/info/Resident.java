@@ -33,9 +33,13 @@ import op.OPDE;
 import op.tools.SYSTools;
 
 import javax.persistence.*;
+import java.io.IOException;
 import java.io.Serializable;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Properties;
 
 /**
  * @author tloehr
@@ -125,6 +129,7 @@ public class Resident implements Serializable, Comparable<Resident> {
         this.birthday = birthday;
         this.editor = OPDE.getLogin().getUser();
         this.adminonly = 0;
+        this.controlling = null;
     }
 
     public String getRID() {
@@ -145,12 +150,29 @@ public class Resident implements Serializable, Comparable<Resident> {
         return SYSTools.anonymizeName(name, SYSTools.INDEX_NACHNAME);
     }
 
-    public String getControlling() {
-        return controlling;
+    public void setControlling(Properties props) {
+        try {
+            StringWriter writer = new StringWriter();
+            props.store(writer, null);
+            controlling = writer.toString();
+            writer.close();
+        } catch (IOException ex) {
+            OPDE.fatal(ex);
+        }
     }
 
-    public void setControlling(String controlling) {
-        this.controlling = controlling;
+    public Properties getControlling() {
+        Properties props = new Properties();
+        if (controlling != null) {
+            try {
+                StringReader reader = new StringReader(controlling);
+                props.load(reader);
+                reader.close();
+            } catch (IOException ex) {
+                OPDE.fatal(ex);
+            }
+        }
+        return props;
     }
 
     public void setNachname(String nachname) {

@@ -19,9 +19,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.swing.*;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Properties;
 
 /**
  * @author tloehr

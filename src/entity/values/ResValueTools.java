@@ -309,65 +309,83 @@ public class ResValueTools {
     }
 
 
-//        public static String getNoStool(int headertiefe) {
-//        StringBuilder html = new StringBuilder(1000);
+
+
+        public static String getNoStool(int headertiefe) {
+        StringBuilder html = new StringBuilder(1000);
+
+        // Für wen soll die Ausfuhr überwacht werden ?
+
+            tbStool.setSelected(props.containsKey(KEY_STOOLDAYS) && !props.getProperty(KEY_STOOLDAYS).equals("off"));
+        tbBalance.setSelected(props.containsKey(KEY_BALANCE) && !props.getProperty(KEY_BALANCE).equals("off"));
+        tbLowIn.setSelected(props.containsKey(KEY_LOWIN) && !props.getProperty(KEY_LOWIN).equals("off"));
+        tbHighIn.setSelected(props.containsKey(KEY_HIGHIN) && !props.getProperty(KEY_HIGHIN).equals("off"));
+        boolean drinkon = tbBalance.isSelected() || tbLowIn.isSelected() || tbHighIn.isSelected();
+        txtDaysDrink.setEnabled(drinkon);
+        txtStoolDays.setText(tbStool.isSelected() ? props.getProperty(KEY_STOOLDAYS) : "");
+        txtStoolDays.setEnabled(tbStool.isSelected());
+        txtLowIn.setText(tbLowIn.isSelected() ? props.getProperty(KEY_LOWIN) : "");
+        txtLowIn.setEnabled(tbLowIn.isSelected());
+        txtHighIn.setText(tbHighIn.isSelected() ? props.getProperty(KEY_HIGHIN) : "");
+        txtHighIn.setEnabled(tbHighIn.isSelected());
+        txtDaysDrink.setText(drinkon ? props.getProperty(KEY_DAYSDRINK) : "");
+        txtDaysDrink.setEnabled(drinkon);
+
+
+        String sql = "" +
+                " SELECT bi.BWInfoID, b.nachname, b.vorname, b.Geschlecht, b.BWKennung FROM ResInfo bi " +
+                " INNER JOIN Bewohner b ON bi.BWKennung = b.BWKennung " +
+                " INNER JOIN ResInfo ba ON ba.BWKennung = bi.BWKennung " +
+                " WHERE b.AdminOnly <> 2 AND bi.BWINFTYP='CONTROL' AND ba.BWINFTYP='HAUF' " +
+                " AND bi.XML LIKE '%<c.stuhl value=\"true\"/>%' " +
+                " and bi.von < now() and bi.bis > now() " +
+                " AND ba.von <= NOW() AND ba.bis >= NOW()" +
+                " ORDER BY nachname, vorname ";
+
+        try {
+            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+
+            DateFormat df = DateFormat.getDateInstance();
+
+            if (rs.first()) {
+
+                rs.beforeFirst();
+                while (rs.next()) {
+                    Date last = new Date();//op.care.values.DBHandling.lastWert(rs.getString("b.BWKennung"), 1); //DlgVital.MODE_STUHLGANG);
+//                    ResInfo bwi = new ResInfo(rs.getLong("bi.BWInfoID"));
+//                    HashMap antwort = (HashMap) ((HashMap) bwi.getAttribute().get(0)).get("antwort");
+//                    int tage = Integer.parseInt(antwort.get("c.stuhltage").toString());
+
+//                    Date grenze = SYSCalendar.addDate(new Date(), tage * -1);
+
+//                    if (last.before(grenze)) {
 //
-//        // Für wen soll die Ausfuhr überwacht werden ?
+//                        if (html.length() == 0) {
+//                            html.append("<h" + headertiefe + ">");
+//                            html.append("Bewohner ohne Stuhlgang");
+//                            html.append("</h" + headertiefe + ">");
+//                            html.append("<table border=\"1\"><tr>" +
+//                                    "<th>BewohnerIn</th><th>Letzter Stuhlgang</th><th>Tage bis Alarm</th></tr>");
+//                        }
 //
-//        String sql = "" +
-//                " SELECT bi.BWInfoID, b.nachname, b.vorname, b.Geschlecht, b.BWKennung FROM ResInfo bi " +
-//                " INNER JOIN Bewohner b ON bi.BWKennung = b.BWKennung " +
-//                " INNER JOIN ResInfo ba ON ba.BWKennung = bi.BWKennung " +
-//                " WHERE b.AdminOnly <> 2 AND bi.BWINFTYP='CONTROL' AND ba.BWINFTYP='HAUF' " +
-//                " AND bi.XML LIKE '%<c.stuhl value=\"true\"/>%' " +
-//                " and bi.von < now() and bi.bis > now() " +
-//                " AND ba.von <= NOW() AND ba.bis >= NOW()" +
-//                " ORDER BY nachname, vorname ";
-//
-//        try {
-//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-//            ResultSet rs = stmt.executeQuery();
-//
-//            DateFormat df = DateFormat.getDateInstance();
-//
-//            if (rs.first()) {
-//
-//                rs.beforeFirst();
-//                while (rs.next()) {
-//                    Date last = new Date();//op.care.values.DBHandling.lastWert(rs.getString("b.BWKennung"), 1); //DlgVital.MODE_STUHLGANG);
-////                    ResInfo bwi = new ResInfo(rs.getLong("bi.BWInfoID"));
-////                    HashMap antwort = (HashMap) ((HashMap) bwi.getAttribute().get(0)).get("antwort");
-////                    int tage = Integer.parseInt(antwort.get("c.stuhltage").toString());
-//
-////                    Date grenze = SYSCalendar.addDate(new Date(), tage * -1);
-//
-////                    if (last.before(grenze)) {
-////
-////                        if (html.length() == 0) {
-////                            html.append("<h" + headertiefe + ">");
-////                            html.append("Bewohner ohne Stuhlgang");
-////                            html.append("</h" + headertiefe + ">");
-////                            html.append("<table border=\"1\"><tr>" +
-////                                    "<th>BewohnerIn</th><th>Letzter Stuhlgang</th><th>Tage bis Alarm</th></tr>");
-////                        }
-////
-////                        html.append("<tr>");
-////                        String name = SYSTools.anonymizeBW(rs.getString("Nachname"), rs.getString("Vorname"), rs.getString("BWKennung"), rs.getInt("geschlecht"));
-////                        html.append("<td>" + name + "</td>");
-////                        html.append("<td>" + df.format(last) + "</td>");
-////                        html.append("<td>" + tage + "</td>");
-////                        html.append("</tr>");
-////                    }
-//
-//                }
-//
-//                html.append("</table>");
-//            }
-//        } catch (SQLException sQLException) {
-//            // new DlgException(sQLException);
-//        }
-//        return html.toString();
-//    }
+//                        html.append("<tr>");
+//                        String name = SYSTools.anonymizeBW(rs.getString("Nachname"), rs.getString("Vorname"), rs.getString("BWKennung"), rs.getInt("geschlecht"));
+//                        html.append("<td>" + name + "</td>");
+//                        html.append("<td>" + df.format(last) + "</td>");
+//                        html.append("<td>" + tage + "</td>");
+//                        html.append("</tr>");
+//                    }
+
+                }
+
+                html.append("</table>");
+            }
+        } catch (SQLException sQLException) {
+            // new DlgException(sQLException);
+        }
+        return html.toString();
+    }
 //
 //    public static String getAlarmEinfuhr(int headertiefe) {
 //        StringBuilder html = new StringBuilder(1000);

@@ -27,6 +27,7 @@ package op.system;
 
 import com.jgoodies.forms.factories.*;
 import com.jgoodies.forms.layout.*;
+import com.jidesoft.swing.*;
 import entity.system.SYSLoginTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
@@ -41,11 +42,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import org.jdesktop.swingx.*;
 
 /**
  * @author __USER__
  */
 public class DlgLogin extends MyJDialog {
+
     private Closure actionBlock;
 
     private void btnExitActionPerformed(ActionEvent e) {
@@ -79,6 +82,7 @@ public class DlgLogin extends MyJDialog {
         }
         txtUsername.setText(defaultlogin);
         txtPassword.setText(defaultpw);
+        lblUsernamePassword.setText(OPDE.lang.getString("misc.msg.username")+"/"+OPDE.lang.getString("misc.msg.password"));
 
 //        try {
 //            linkOPDE.setURI(new URI("http://www.offene-pflege.de"));
@@ -131,15 +135,12 @@ public class DlgLogin extends MyJDialog {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jPanel1 = new JPanel();
-        jLabel2 = new JLabel();
-        txtUsername = new JTextField();
-        jLabel1 = new JLabel();
-        txtPassword = new JPasswordField();
         jPanel2 = new JPanel();
-        btnAbout = new JButton();
-        jLabel4 = new JLabel();
         lblOPDE = new JLabel();
+        btnAbout = new JButton();
+        lblUsernamePassword = new JLabel();
+        txtUsername = new JTextField();
+        txtPassword = new JPasswordField();
         panel1 = new JPanel();
         btnExit = new JButton();
         hSpacer1 = new JPanel(null);
@@ -151,72 +152,23 @@ public class DlgLogin extends MyJDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "18dlu, default, $lcgap, 18dlu",
-            "18dlu, $lgap, 48dlu, 2*($lgap, fill:default), $lgap, 18dlu"));
-
-        //======== jPanel1 ========
-        {
-            jPanel1.setBorder(new EmptyBorder(5, 5, 5, 5));
-            jPanel1.setOpaque(false);
-            jPanel1.setLayout(new FormLayout(
-                "default, $lcgap, default:grow",
-                "fill:default, $lgap, fill:default"));
-
-            //---- jLabel2 ----
-            jLabel2.setText("Benutzername");
-            jLabel2.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel1.add(jLabel2, CC.xy(1, 1));
-
-            //---- txtUsername ----
-            txtUsername.setFont(new Font("Arial", Font.PLAIN, 14));
-            txtUsername.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    txtUsernameActionPerformed(e);
-                }
-            });
-            txtUsername.addFocusListener(new FocusAdapter() {
-                @Override
-                public void focusGained(FocusEvent e) {
-                    txtUsernameFocusGained(e);
-                }
-            });
-            jPanel1.add(txtUsername, CC.xy(3, 1));
-
-            //---- jLabel1 ----
-            jLabel1.setText("Passwort");
-            jLabel1.setPreferredSize(new Dimension(4, 19));
-            jLabel1.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel1.add(jLabel1, CC.xy(1, 3));
-
-            //---- txtPassword ----
-            txtPassword.setFont(new Font("Arial", Font.PLAIN, 14));
-            txtPassword.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    txtPasswordActionPerformed(e);
-                }
-            });
-            txtPassword.addFocusListener(new FocusAdapter() {
-                @Override
-                public void focusGained(FocusEvent e) {
-                    txtPasswordFocusGained(e);
-                }
-            });
-            jPanel1.add(txtPassword, CC.xy(3, 3));
-        }
-        contentPane.add(jPanel1, CC.xy(2, 5));
+            "13dlu, default, $lcgap, 13dlu",
+            "13dlu, $lgap, fill:48dlu:grow, $lgap, default, $lgap, 13dlu"));
 
         //======== jPanel2 ========
         {
             jPanel2.setBorder(new EmptyBorder(5, 5, 5, 5));
             jPanel2.setOpaque(false);
-            jPanel2.setLayout(new FormLayout(
-                "default, $lcgap, default",
-                "fill:default:grow, $lgap, fill:default:grow"));
+            jPanel2.setLayout(new VerticalLayout(10));
+
+            //---- lblOPDE ----
+            lblOPDE.setText("Offene-Pflege.de");
+            lblOPDE.setFont(new Font("Arial", Font.PLAIN, 24));
+            lblOPDE.setHorizontalAlignment(SwingConstants.CENTER);
+            jPanel2.add(lblOPDE);
 
             //---- btnAbout ----
-            btnAbout.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/opde-metal.png")));
+            btnAbout.setIcon(new ImageIcon(getClass().getResource("/artwork/256x256/opde-blue.png")));
             btnAbout.setToolTipText("\u00dcber Offene-Pflege.de...");
             btnAbout.setBorderPainted(false);
             btnAbout.setBorder(null);
@@ -229,21 +181,46 @@ public class DlgLogin extends MyJDialog {
                     btnAboutActionPerformed(e);
                 }
             });
-            jPanel2.add(btnAbout, CC.xywh(1, 1, 1, 3));
+            jPanel2.add(btnAbout);
 
-            //---- jLabel4 ----
-            jLabel4.setFont(new Font("Arial", Font.PLAIN, 13));
-            jLabel4.setHorizontalAlignment(SwingConstants.CENTER);
-            jLabel4.setText("So viel Pflege wie m\u00f6glich, so viel Technik wie n\u00f6tig. ");
-            jPanel2.add(jLabel4, CC.xy(3, 3));
+            //---- lblUsernamePassword ----
+            lblUsernamePassword.setText("text");
+            lblUsernamePassword.setFont(new Font("Arial", Font.PLAIN, 18));
+            jPanel2.add(lblUsernamePassword);
 
-            //---- lblOPDE ----
-            lblOPDE.setText("Offene-Pflege.de");
-            lblOPDE.setFont(new Font("Arial", Font.PLAIN, 24));
-            lblOPDE.setHorizontalAlignment(SwingConstants.CENTER);
-            jPanel2.add(lblOPDE, CC.xy(3, 1));
+            //---- txtUsername ----
+            txtUsername.setFont(new Font("Arial", Font.PLAIN, 18));
+            txtUsername.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    txtUsernameActionPerformed(e);
+                }
+            });
+            txtUsername.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusGained(FocusEvent e) {
+                    txtUsernameFocusGained(e);
+                }
+            });
+            jPanel2.add(txtUsername);
+
+            //---- txtPassword ----
+            txtPassword.setFont(new Font("Arial", Font.PLAIN, 18));
+            txtPassword.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    txtPasswordActionPerformed(e);
+                }
+            });
+            txtPassword.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusGained(FocusEvent e) {
+                    txtPasswordFocusGained(e);
+                }
+            });
+            jPanel2.add(txtPassword);
         }
-        contentPane.add(jPanel2, CC.xy(2, 3));
+        contentPane.add(jPanel2, CC.xy(2, 3, CC.FILL, CC.DEFAULT));
 
         //======== panel1 ========
         {
@@ -271,8 +248,8 @@ public class DlgLogin extends MyJDialog {
             });
             panel1.add(btnLogin);
         }
-        contentPane.add(panel1, CC.xy(2, 7, CC.RIGHT, CC.DEFAULT));
-        pack();
+        contentPane.add(panel1, CC.xy(2, 5, CC.RIGHT, CC.DEFAULT));
+        setSize(335, 540);
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
@@ -430,15 +407,12 @@ public class DlgLogin extends MyJDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JPanel jPanel1;
-    private JLabel jLabel2;
-    private JTextField txtUsername;
-    private JLabel jLabel1;
-    private JPasswordField txtPassword;
     private JPanel jPanel2;
-    private JButton btnAbout;
-    private JLabel jLabel4;
     private JLabel lblOPDE;
+    private JButton btnAbout;
+    private JLabel lblUsernamePassword;
+    private JTextField txtUsername;
+    private JPasswordField txtPassword;
     private JPanel panel1;
     private JButton btnExit;
     private JPanel hSpacer1;
