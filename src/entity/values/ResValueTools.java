@@ -10,6 +10,7 @@ import op.tools.Pair;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 
 import javax.persistence.EntityManager;
@@ -18,7 +19,9 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,7 +46,7 @@ public class ResValueTools {
 
 //    public static final String[] VALUES = new String[]{"UNKNOWN", "RR", "PULSE", "TEMP", "GLUCOSE", "WEIGHT", "HEIGHT", "BREATHING", "QUICK", "STOOL", "VOMIT", "LIQUIDBALANCE"};
 
-//    public static final String[] UNITS = new String[]{"", "mmHg", "s/m", "°C", "mg/dl", "kg", "m", "A/m", "%", "", "", "ml"};
+    //    public static final String[] UNITS = new String[]{"", "mmHg", "s/m", "°C", "mg/dl", "kg", "m", "A/m", "%", "", "", "ml"};
     public static final String RRSYS = "systolisch";
     public static final String RRDIA = "diatolisch";
 
@@ -101,7 +104,7 @@ public class ResValueTools {
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(" " +
-                " SELECT b FROM ResValue b WHERE b.resident = :bewohner AND b.vtype.valType = :type " +
+                " SELECT b FROM ResValue b WHERE b.resident = :bewohner AND b.replacedBy IS NULL AND b.vtype.valType = :type " +
                 " ORDER BY b.pit DESC ");
         query.setMaxResults(1);
         query.setParameter("bewohner", resident);
@@ -110,7 +113,6 @@ public class ResValueTools {
         try {
             result = (ResValue) query.getSingleResult();
         } catch (Exception e) {
-//            OPDE.fatal(e);
             result = null;
         } finally {
             em.close();
@@ -294,7 +296,6 @@ public class ResValueTools {
         return list;
     }
 
-
     public static String getValueAsHTML(ResValue rv) {
         String result = (rv.isDeleted() || rv.isReplaced() ? "<s>" : "");
         if (rv.getType().getValType() == RR) {
@@ -308,170 +309,195 @@ public class ResValueTools {
         return result;
     }
 
+    public static HashMap<DateMidnight, BigDecimal> getLiquidBalance(Resident resident, DateMidnight from) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("" +
+                " SELECT rv FROM ResValue rv " +
+                " WHERE rv.resident = :resident " +
+                " AND rv.vtype.valType = :valType" +
+                " AND rv.pit >= :from" +
+                " ORDER BY rv.pit DESC ");
+        query.setParameter("resident", resident);
+        query.setParameter("valType", LIQUIDBALANCE);
+        query.setParameter("from", from.toDate());
+        ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
+        em.close();
+
+        HashMap<DateMidnight, BigDecimal> hm = new HashMap<DateMidnight, BigDecimal>();
+        for (DateMidnight day = from; day.compareTo(new DateMidnight()) <= 0; day = day.plusDays(1)) {
+            hm.put(day, BigDecimal.ZERO);
+        }
+
+        for (ResValue val : list) {
+            BigDecimal bd = hm.get(new DateMidnight(val.getPit()));
+            hm.put(new DateMidnight(val.getPit()), bd.add(val.getVal1()));
+        }
+
+        return hm;
+    }
+
+    public static HashMap<DateMidnight, BigDecimal> getLiquidBalance(Resident resident, DateMidnight from) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("" +
+                " SELECT rv FROM ResValue rv " +
+                " WHERE rv.resident = :resident " +
+                " AND rv.vtype.valType = :valType" +
+                " AND rv.pit >= :from" +
+                " ORDER BY rv.pit DESC ");
+        query.setParameter("resident", resident);
+        query.setParameter("valType", LIQUIDBALANCE);
+        query.setParameter("from", from.toDate());
+        ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
+        em.close();
+
+        HashMap<DateMidnight, BigDecimal> hm = new HashMap<DateMidnight, BigDecimal>();
+        for (DateMidnight day = from; day.compareTo(new DateMidnight()) <= 0; day = day.plusDays(1)) {
+            hm.put(day, BigDecimal.ZERO);
+        }
+
+        for (ResValue val : list) {
+            BigDecimal bd = hm.get(new DateMidnight(val.getPit()));
+            hm.put(new DateMidnight(val.getPit()), bd.add(val.getVal1()));
+        }
+
+        return hm;
+    }
 
 
+    /**
+     * returns a list of triples of {Resident, ResValue, int} for residents which havent had a stool in the last int days.
+     * The ResValue denotes the last stool, if there was any. NULL otherwise.
+     *
+     * @return
+     */
+    public static ArrayList<Object[]> getNoStool() {
+//
+//            tbStool.setSelected(props.containsKey(KEY_STOOLDAYS) && !props.getProperty(KEY_STOOLDAYS).equals("off"));
+//        tbBalance.setSelected(props.containsKey(KEY_BALANCE) && !props.getProperty(KEY_BALANCE).equals("off"));
+//        tbLowIn.setSelected(props.containsKey(KEY_LOWIN) && !props.getProperty(KEY_LOWIN).equals("off"));
+//        tbHighIn.setSelected(props.containsKey(KEY_HIGHIN) && !props.getProperty(KEY_HIGHIN).equals("off"));
+//        boolean drinkon = tbBalance.isSelected() || tbLowIn.isSelected() || tbHighIn.isSelected();
+//        txtDaysDrink.setEnabled(drinkon);
+//        txtStoolDays.setText(tbStool.isSelected() ? props.getProperty(KEY_STOOLDAYS) : "");
+//        txtStoolDays.setEnabled(tbStool.isSelected());
+//        txtLowIn.setText(tbLowIn.isSelected() ? props.getProperty(KEY_LOWIN) : "");
+//        txtLowIn.setEnabled(tbLowIn.isSelected());
+//        txtHighIn.setText(tbHighIn.isSelected() ? props.getProperty(KEY_HIGHIN) : "");
+//        txtHighIn.setEnabled(tbHighIn.isSelected());
+//        txtDaysDrink.setText(drinkon ? props.getProperty(KEY_DAYSDRINK) : "");
+//        txtDaysDrink.setEnabled(drinkon);
 
-        public static String getNoStool(int headertiefe) {
-        StringBuilder html = new StringBuilder(1000);
+        ArrayList<Resident> listResident = ResidentTools.getAllActive();
+        ArrayList<Object[]> result = new ArrayList<Object[]>();
 
-        // Für wen soll die Ausfuhr überwacht werden ?
+        DateTime now = new DateTime();
 
-            tbStool.setSelected(props.containsKey(KEY_STOOLDAYS) && !props.getProperty(KEY_STOOLDAYS).equals("off"));
-        tbBalance.setSelected(props.containsKey(KEY_BALANCE) && !props.getProperty(KEY_BALANCE).equals("off"));
-        tbLowIn.setSelected(props.containsKey(KEY_LOWIN) && !props.getProperty(KEY_LOWIN).equals("off"));
-        tbHighIn.setSelected(props.containsKey(KEY_HIGHIN) && !props.getProperty(KEY_HIGHIN).equals("off"));
-        boolean drinkon = tbBalance.isSelected() || tbLowIn.isSelected() || tbHighIn.isSelected();
-        txtDaysDrink.setEnabled(drinkon);
-        txtStoolDays.setText(tbStool.isSelected() ? props.getProperty(KEY_STOOLDAYS) : "");
-        txtStoolDays.setEnabled(tbStool.isSelected());
-        txtLowIn.setText(tbLowIn.isSelected() ? props.getProperty(KEY_LOWIN) : "");
-        txtLowIn.setEnabled(tbLowIn.isSelected());
-        txtHighIn.setText(tbHighIn.isSelected() ? props.getProperty(KEY_HIGHIN) : "");
-        txtHighIn.setEnabled(tbHighIn.isSelected());
-        txtDaysDrink.setText(drinkon ? props.getProperty(KEY_DAYSDRINK) : "");
-        txtDaysDrink.setEnabled(drinkon);
+        for (Resident resident : listResident) {
+            Properties controlling = resident.getControlling();
+            if (controlling.containsKey(ResidentTools.KEY_STOOLDAYS) && !controlling.getProperty(ResidentTools.KEY_STOOLDAYS).equals("off")) {
+                int days = Integer.parseInt(controlling.getProperty(ResidentTools.KEY_STOOLDAYS));
+                ResValue lastStool = getLast(resident, STOOL);
+
+                if (lastStool == null || lastStool.getPit().before(now.minusDays(days).toDate())) {
+                    result.add(new Object[]{resident, lastStool, days});
+                }
+            }
+        }
+
+        listResident.clear();
+        return result;
+    }
+
+    public static ArrayList<Object[]> getHighLowIn() {
+
+        ArrayList<Resident> listResident = ResidentTools.getAllActive();
+        ArrayList<Object[]> result = new ArrayList<Object[]>();
 
 
-        String sql = "" +
-                " SELECT bi.BWInfoID, b.nachname, b.vorname, b.Geschlecht, b.BWKennung FROM ResInfo bi " +
-                " INNER JOIN Bewohner b ON bi.BWKennung = b.BWKennung " +
-                " INNER JOIN ResInfo ba ON ba.BWKennung = bi.BWKennung " +
-                " WHERE b.AdminOnly <> 2 AND bi.BWINFTYP='CONTROL' AND ba.BWINFTYP='HAUF' " +
-                " AND bi.XML LIKE '%<c.stuhl value=\"true\"/>%' " +
-                " and bi.von < now() and bi.bis > now() " +
-                " AND ba.von <= NOW() AND ba.bis >= NOW()" +
-                " ORDER BY nachname, vorname ";
+        DateMidnight now = new DateMidnight();
 
-        try {
-            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery();
+        for (Resident resident : listResident) {
+            ArrayList<Pair<DateMidnight, BigDecimal>> violatingValues = new ArrayList<Pair<DateMidnight, BigDecimal>>();
+            Properties controlling = resident.getControlling();
+            int days = Integer.parseInt(controlling.getProperty(ResidentTools.KEY_DAYSDRINK));
 
-            DateFormat df = DateFormat.getDateInstance();
+//            HashMap<DateMidnight, BigDecimal> balance = null;
+            if ((controlling.containsKey(ResidentTools.KEY_LOWIN) && !controlling.getProperty(ResidentTools.KEY_LOWIN).equals("off")) ||
+                    (controlling.containsKey(ResidentTools.KEY_HIGHIN) && !controlling.getProperty(ResidentTools.KEY_HIGHIN).equals("off"))) {
+                HashMap<DateMidnight, BigDecimal> balance = getLiquidBalance(resident, now.minusDays(days));
+                if (!balance.isEmpty()) {
+                    for (DateMidnight day = now.minusDays(days); day.compareTo(new DateMidnight()) <= 0; day = day.plusDays(1)) {
+                        if (balance.get(day).compareTo(new BigDecimal(controlling.getProperty(ResidentTools.KEY_LOWIN))) < 0) {
+                            violatingValues.add(new Pair<DateMidnight, BigDecimal>(day, balance.get(day)));
+                        }
+                        if (balance.get(day).compareTo(new BigDecimal(controlling.getProperty(ResidentTools.KEY_HIGHIN))) > 0) {
+                            violatingValues.add(new Pair<DateMidnight, BigDecimal>(day, balance.get(day)));
+                        }
+                    }
+                }
+            }
 
-            if (rs.first()) {
+            if (!violatingValues.isEmpty()){
+                result.add(new Object[]{resident, violatingValues});
+            }
+        }
 
-                rs.beforeFirst();
-                while (rs.next()) {
-                    Date last = new Date();//op.care.values.DBHandling.lastWert(rs.getString("b.BWKennung"), 1); //DlgVital.MODE_STUHLGANG);
+        listResident.clear();
+
+
+        //Date last = op.care.values.DBHandling.lastWert(rs.getString("b.BWKennung"), DlgVital.MODE_STUHLGANG);
 //                    ResInfo bwi = new ResInfo(rs.getLong("bi.BWInfoID"));
 //                    HashMap antwort = (HashMap) ((HashMap) bwi.getAttribute().get(0)).get("antwort");
-//                    int tage = Integer.parseInt(antwort.get("c.stuhltage").toString());
-
-//                    Date grenze = SYSCalendar.addDate(new Date(), tage * -1);
-
-//                    if (last.before(grenze)) {
+//                    boolean minkontrolle = antwort.get("c.einfuhr").toString().equalsIgnoreCase("true");
+//                    boolean maxkontrolle = antwort.get("c.ueber").toString().equalsIgnoreCase("true");
+//                    int tage = Integer.parseInt(antwort.get("c.einftage").toString());
+//                    int minmenge = Integer.parseInt(antwort.get("c.einfmenge").toString());
+//                    int maxmenge = Integer.parseInt(antwort.get("c.uebermenge").toString());
+//                    if (!minkontrolle) {
+//                        minmenge = -1000000; // Klein genug um im SQL Ausdruck ignoriert zu werden.
+//                    }
+//                    if (!maxkontrolle) {
+//                        maxmenge = 1000000; // Groß genug um im SQL Ausdruck ignoriert zu werden.
+//                    }
 //
-//                        if (html.length() == 0) {
-//                            html.append("<h" + headertiefe + ">");
-//                            html.append("Bewohner ohne Stuhlgang");
-//                            html.append("</h" + headertiefe + ">");
-//                            html.append("<table border=\"1\"><tr>" +
-//                                    "<th>BewohnerIn</th><th>Letzter Stuhlgang</th><th>Tage bis Alarm</th></tr>");
+//                    String s = " SELECT * FROM (" +
+//                            "       SELECT PIT, SUM(Wert) EINFUHR FROM ResValue " +
+//                            "       WHERE ReplacedBy = 0 AND Wert > 0 AND BWKennung=? AND XML='<LIQUIDBALANCE/>' " +
+//                            "       AND DATE(PIT) >= ADDDATE(DATE(now()), INTERVAL ? DAY) " +
+//                            "       Group By DATE(PIT) " +
+//                            "       ORDER BY PIT desc " +
+//                            " ) a" +
+//                            " WHERE a.EINFUHR < ? OR a.Einfuhr > ? ";
+//                    PreparedStatement stmt1 = OPDE.getDb().db.prepareStatement(s);
+//                    stmt1.setString(1, rs.getString("b.BWKennung"));
+//                    stmt1.setInt(2, tage * -1);
+//                    stmt1.setInt(3, minmenge);
+//                    stmt1.setInt(4, maxmenge);
+//
+//                    ResultSet rs1 = stmt1.executeQuery();
+//                    if (rs1.first()) {
+//                        rs1.beforeFirst();
+//                        while (rs1.next()) {
+//
+//                            if (html.length() == 0) {
+//                                html.append("<h" + headertiefe + ">");
+//                                html.append("Bewohner mit zu geringer / zu hoher Einfuhr");
+//                                html.append("</h" + headertiefe + ">");
+//                                html.append("<table border=\"1\"><tr>" +
+//                                        "<th>BewohnerIn</th><th>Datum</th><th>Einfuhr (ml)</th><th>Bemerkung</th></tr>");
+//                            }
+//                            html.append("<tr>");
+//                            String name = SYSTools.anonymizeBW(rs.getString("Nachname"), rs.getString("Vorname"), rs.getString("BWKennung"), rs.getInt("geschlecht"));
+//                            html.append("<td>" + name + "</td>");
+//                            html.append("<td>" + df.format(rs1.getDate("PIT")) + "</td>");
+//                            html.append("<td>" + rs1.getString("Einfuhr") + "</td>");
+//                            html.append("<td>" + (rs1.getDouble("Einfuhr") < minmenge ? "Einfuhr zu niedrig" : "Einfuhr zu hoch") + "</td>");
+//                            html.append("</tr>");
 //                        }
-//
-//                        html.append("<tr>");
-//                        String name = SYSTools.anonymizeBW(rs.getString("Nachname"), rs.getString("Vorname"), rs.getString("BWKennung"), rs.getInt("geschlecht"));
-//                        html.append("<td>" + name + "</td>");
-//                        html.append("<td>" + df.format(last) + "</td>");
-//                        html.append("<td>" + tage + "</td>");
-//                        html.append("</tr>");
 //                    }
 
-                }
+        return result;
 
-                html.append("</table>");
-            }
-        } catch (SQLException sQLException) {
-            // new DlgException(sQLException);
-        }
-        return html.toString();
     }
-//
-//    public static String getAlarmEinfuhr(int headertiefe) {
-//        StringBuilder html = new StringBuilder(1000);
-//
-//        // Für wen soll die Ausfuhr überwacht werden ?
-//
-//        String sql = "" +
-//                " SELECT bi.BWInfoID, b.nachname, b.vorname, b.Geschlecht, b.BWKennung FROM ResInfo bi " +
-//                " INNER JOIN Bewohner b ON bi.BWKennung = b.BWKennung " +
-//                " INNER JOIN ResInfo ba ON ba.BWKennung = bi.BWKennung " +
-//                " WHERE b.AdminOnly <> 2 AND bi.BWINFTYP='CONTROL' AND ba.BWINFTYP='HAUF' " +
-//                " AND (bi.XML LIKE '%<c.einfuhr value=\"true\"/>%' OR  bi.XML LIKE '%<c.ueber value=\"true\"/>%') " +
-//                " and bi.von < now() and bi.bis > now() " +
-//                " AND ba.von <= NOW() AND ba.bis >= NOW()" +
-//                " ORDER BY nachname, vorname ";
-//
-//        try {
-//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-//            ResultSet rs = stmt.executeQuery();
-//
-//            DateFormat df = DateFormat.getDateInstance();
-//
-//            if (rs.first()) {
-//
-//                rs.beforeFirst();
-//                while (rs.next()) {
-//
-//                    //Date last = op.care.values.DBHandling.lastWert(rs.getString("b.BWKennung"), DlgVital.MODE_STUHLGANG);
-////                    ResInfo bwi = new ResInfo(rs.getLong("bi.BWInfoID"));
-////                    HashMap antwort = (HashMap) ((HashMap) bwi.getAttribute().get(0)).get("antwort");
-////                    boolean minkontrolle = antwort.get("c.einfuhr").toString().equalsIgnoreCase("true");
-////                    boolean maxkontrolle = antwort.get("c.ueber").toString().equalsIgnoreCase("true");
-////                    int tage = Integer.parseInt(antwort.get("c.einftage").toString());
-////                    int minmenge = Integer.parseInt(antwort.get("c.einfmenge").toString());
-////                    int maxmenge = Integer.parseInt(antwort.get("c.uebermenge").toString());
-////                    if (!minkontrolle) {
-////                        minmenge = -1000000; // Klein genug um im SQL Ausdruck ignoriert zu werden.
-////                    }
-////                    if (!maxkontrolle) {
-////                        maxmenge = 1000000; // Groß genug um im SQL Ausdruck ignoriert zu werden.
-////                    }
-////
-////                    String s = " SELECT * FROM (" +
-////                            "       SELECT PIT, SUM(Wert) EINFUHR FROM ResValue " +
-////                            "       WHERE ReplacedBy = 0 AND Wert > 0 AND BWKennung=? AND XML='<LIQUIDBALANCE/>' " +
-////                            "       AND DATE(PIT) >= ADDDATE(DATE(now()), INTERVAL ? DAY) " +
-////                            "       Group By DATE(PIT) " +
-////                            "       ORDER BY PIT desc " +
-////                            " ) a" +
-////                            " WHERE a.EINFUHR < ? OR a.Einfuhr > ? ";
-////                    PreparedStatement stmt1 = OPDE.getDb().db.prepareStatement(s);
-////                    stmt1.setString(1, rs.getString("b.BWKennung"));
-////                    stmt1.setInt(2, tage * -1);
-////                    stmt1.setInt(3, minmenge);
-////                    stmt1.setInt(4, maxmenge);
-////
-////                    ResultSet rs1 = stmt1.executeQuery();
-////                    if (rs1.first()) {
-////                        rs1.beforeFirst();
-////                        while (rs1.next()) {
-////
-////                            if (html.length() == 0) {
-////                                html.append("<h" + headertiefe + ">");
-////                                html.append("Bewohner mit zu geringer / zu hoher Einfuhr");
-////                                html.append("</h" + headertiefe + ">");
-////                                html.append("<table border=\"1\"><tr>" +
-////                                        "<th>BewohnerIn</th><th>Datum</th><th>Einfuhr (ml)</th><th>Bemerkung</th></tr>");
-////                            }
-////                            html.append("<tr>");
-////                            String name = SYSTools.anonymizeBW(rs.getString("Nachname"), rs.getString("Vorname"), rs.getString("BWKennung"), rs.getInt("geschlecht"));
-////                            html.append("<td>" + name + "</td>");
-////                            html.append("<td>" + df.format(rs1.getDate("PIT")) + "</td>");
-////                            html.append("<td>" + rs1.getString("Einfuhr") + "</td>");
-////                            html.append("<td>" + (rs1.getDouble("Einfuhr") < minmenge ? "Einfuhr zu niedrig" : "Einfuhr zu hoch") + "</td>");
-////                            html.append("</tr>");
-////                        }
-////                    }
-//                }
-//                if (html.length() > 0) {
-//                    html.append("</table>");
-//                }
-//            }
-//        } catch (SQLException sQLException) {
-//            // new DlgException(sQLException);
-//        }
-//        return html.toString();
-//    }
 
 }

@@ -7,6 +7,7 @@ package op.care.values;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.info.Resident;
+import entity.info.ResidentTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.GUITools;
@@ -28,11 +29,8 @@ public class DlgValueControl extends MyJDialog {
     private JToggleButton tbStool, tbBalance, tbLowIn, tbHighIn;
     Properties props = null;
 
-    final String KEY_STOOLDAYS = "stooldays";
-    final String KEY_BALANCE = "liquidbalance";
-    final String KEY_LOWIN = "lowin";
-    final String KEY_HIGHIN = "highin";
-    final String KEY_DAYSDRINK = "daysdrink";
+
+
     private Closure afterAction;
 
     public DlgValueControl(Resident resident, Closure afterAction) {
@@ -76,19 +74,19 @@ public class DlgValueControl extends MyJDialog {
         lblMin.setText(OPDE.lang.getString(internalClassID + ".lblMin.tooltip"));
         lblMax.setText(OPDE.lang.getString(internalClassID + ".lblMax.tooltip"));
 
-        tbStool.setSelected(props.containsKey(KEY_STOOLDAYS) && !props.getProperty(KEY_STOOLDAYS).equals("off"));
-        tbBalance.setSelected(props.containsKey(KEY_BALANCE) && !props.getProperty(KEY_BALANCE).equals("off"));
-        tbLowIn.setSelected(props.containsKey(KEY_LOWIN) && !props.getProperty(KEY_LOWIN).equals("off"));
-        tbHighIn.setSelected(props.containsKey(KEY_HIGHIN) && !props.getProperty(KEY_HIGHIN).equals("off"));
+        tbStool.setSelected(props.containsKey(ResidentTools.KEY_STOOLDAYS) && !props.getProperty(ResidentTools.KEY_STOOLDAYS).equals("off"));
+        tbBalance.setSelected(props.containsKey(ResidentTools.KEY_BALANCE) && !props.getProperty(ResidentTools.KEY_BALANCE).equals("off"));
+        tbLowIn.setSelected(props.containsKey(ResidentTools.KEY_LOWIN) && !props.getProperty(ResidentTools.KEY_LOWIN).equals("off"));
+        tbHighIn.setSelected(props.containsKey(ResidentTools.KEY_HIGHIN) && !props.getProperty(ResidentTools.KEY_HIGHIN).equals("off"));
         boolean drinkon = tbBalance.isSelected() || tbLowIn.isSelected() || tbHighIn.isSelected();
         txtDaysDrink.setEnabled(drinkon);
-        txtStoolDays.setText(tbStool.isSelected() ? props.getProperty(KEY_STOOLDAYS) : "");
+        txtStoolDays.setText(tbStool.isSelected() ? props.getProperty(ResidentTools.KEY_STOOLDAYS) : "");
         txtStoolDays.setEnabled(tbStool.isSelected());
-        txtLowIn.setText(tbLowIn.isSelected() ? props.getProperty(KEY_LOWIN) : "");
+        txtLowIn.setText(tbLowIn.isSelected() ? props.getProperty(ResidentTools.KEY_LOWIN) : "");
         txtLowIn.setEnabled(tbLowIn.isSelected());
-        txtHighIn.setText(tbHighIn.isSelected() ? props.getProperty(KEY_HIGHIN) : "");
+        txtHighIn.setText(tbHighIn.isSelected() ? props.getProperty(ResidentTools.KEY_HIGHIN) : "");
         txtHighIn.setEnabled(tbHighIn.isSelected());
-        txtDaysDrink.setText(drinkon ? props.getProperty(KEY_DAYSDRINK) : "");
+        txtDaysDrink.setText(drinkon ? props.getProperty(ResidentTools.KEY_DAYSDRINK) : "");
         txtDaysDrink.setEnabled(drinkon);
 
         tbStool.addItemListener(new ItemListener() {
@@ -161,11 +159,11 @@ public class DlgValueControl extends MyJDialog {
 
     private void save() {
         boolean drinkon = tbBalance.isSelected() || tbLowIn.isSelected() || tbHighIn.isSelected();
-        props.setProperty(KEY_STOOLDAYS, tbStool.isSelected() ? txtStoolDays.getText() : "off");
-        props.setProperty(KEY_BALANCE, tbBalance.isSelected() ? "on" : "off");
-        props.setProperty(KEY_LOWIN, tbLowIn.isSelected() ? txtLowIn.getText() : "off");
-        props.setProperty(KEY_HIGHIN, tbHighIn.isSelected() ? txtHighIn.getText() : "off");
-        props.setProperty(KEY_DAYSDRINK, drinkon ? txtDaysDrink.getText() : "off");
+        props.setProperty(ResidentTools.KEY_STOOLDAYS, tbStool.isSelected() ? txtStoolDays.getText() : "off");
+        props.setProperty(ResidentTools.KEY_BALANCE, tbBalance.isSelected() ? "on" : "off");
+        props.setProperty(ResidentTools.KEY_LOWIN, tbLowIn.isSelected() ? txtLowIn.getText() : "off");
+        props.setProperty(ResidentTools.KEY_HIGHIN, tbHighIn.isSelected() ? txtHighIn.getText() : "off");
+        props.setProperty(ResidentTools.KEY_DAYSDRINK, drinkon ? txtDaysDrink.getText() : "off");
     }
 
     private void txtStoolDaysFocusLost(FocusEvent e) {

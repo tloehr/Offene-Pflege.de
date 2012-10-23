@@ -19,13 +19,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.swing.*;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Properties;
 
 /**
  * @author tloehr
@@ -36,6 +32,12 @@ public class ResidentTools {
     public static final int GESCHLECHT_WEIBLICH = 2;
     public static final String GESCHLECHT[] = {"", OPDE.lang.getString("misc.msg.male"), OPDE.lang.getString("misc.msg.female")};
     public static final String ANREDE[] = {"", OPDE.lang.getString("misc.msg.termofaddress.mr"), OPDE.lang.getString("misc.msg.termofaddress.mrs")};
+
+    public static final String KEY_STOOLDAYS = "stooldays";
+    public static final String KEY_BALANCE = "liquidbalance";
+    public static final String KEY_LOWIN = "lowin";
+    public static final String KEY_HIGHIN = "highin";
+    public static final String KEY_DAYSDRINK = "daysdrink";
 
     public static Resident findByBWKennung(String bwkennung) {
         EntityManager em = OPDE.createEM();
