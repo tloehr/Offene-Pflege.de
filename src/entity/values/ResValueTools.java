@@ -249,12 +249,12 @@ public class ResValueTools {
         Pair<DateTime, DateTime> result = null;
 
         EntityManager em = OPDE.createEM();
-        Query queryMin = em.createQuery("SELECT rv FROM ResValue rv WHERE rv.resident = :resident AND rv.vtype = :vtype ORDER BY rv.pit ASC ");
+        Query queryMin = em.createQuery("SELECT rv FROM ResValue rv WHERE rv.resident = :resident AND rv.replacedBy IS NULL AND rv.vtype = :vtype ORDER BY rv.pit ASC ");
         queryMin.setParameter("resident", resident);
         queryMin.setParameter("vtype", vtype);
         queryMin.setMaxResults(1);
 
-        Query queryMax = em.createQuery("SELECT rv FROM ResValue rv WHERE rv.resident = :resident AND rv.vtype = :vtype ORDER BY rv.pit DESC ");
+        Query queryMax = em.createQuery("SELECT rv FROM ResValue rv WHERE rv.resident = :resident AND rv.replacedBy IS NULL AND rv.vtype = :vtype ORDER BY rv.pit DESC ");
         queryMax.setParameter("resident", resident);
         queryMax.setParameter("vtype", vtype);
         queryMax.setMaxResults(1);
@@ -282,6 +282,7 @@ public class ResValueTools {
         Query query = em.createQuery("" +
                 " SELECT rv FROM ResValue rv " +
                 " WHERE rv.resident = :resident " +
+                " AND rv.replacedBy IS NULL " +
                 " AND rv.vtype = :vtype" +
                 " AND rv.pit >= :from" +
                 " AND rv.pit <= :to" +
@@ -314,6 +315,7 @@ public class ResValueTools {
         Query query = em.createQuery("" +
                 " SELECT rv FROM ResValue rv " +
                 " WHERE rv.resident = :resident " +
+                " AND rv.replacedBy IS NULL " +
                 " AND rv.vtype.valType = :valType" +
                 " AND rv.pit >= :from" +
                 " ORDER BY rv.pit DESC ");
@@ -336,12 +338,43 @@ public class ResValueTools {
         return hm;
     }
 
-    public static HashMap<DateMidnight, BigDecimal> getLiquidBalance(Resident resident, DateMidnight from) {
+    public static HashMap<DateMidnight, BigDecimal> getLiquidIn(Resident resident, DateMidnight from) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("" +
                 " SELECT rv FROM ResValue rv " +
                 " WHERE rv.resident = :resident " +
-                " AND rv.vtype.valType = :valType" +
+                " AND rv.replacedBy IS NULL " +
+                " AND rv.vtype.valType = :valType " +
+                " AND rv.val1 > 0 " +
+                " AND rv.pit >= :from" +
+                " ORDER BY rv.pit DESC ");
+        query.setParameter("resident", resident);
+        query.setParameter("valType", LIQUIDBALANCE);
+        query.setParameter("from", from.toDate());
+        ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
+        em.close();
+
+        HashMap<DateMidnight, BigDecimal> hm = new HashMap<DateMidnight, BigDecimal>();
+        for (DateMidnight day = from; day.compareTo(new DateMidnight()) <= 0; day = day.plusDays(1)) {
+            hm.put(day, BigDecimal.ZERO);
+        }
+
+        for (ResValue val : list) {
+            BigDecimal bd = hm.get(new DateMidnight(val.getPit()));
+            hm.put(new DateMidnight(val.getPit()), bd.add(val.getVal1()));
+        }
+
+        return hm;
+    }
+
+    public static HashMap<DateMidnight, BigDecimal> getLiquidOut(Resident resident, DateMidnight from) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("" +
+                " SELECT rv FROM ResValue rv " +
+                " WHERE rv.resident = :resident " +
+                " AND rv.replacedBy IS NULL " +
+                " AND rv.vtype.valType = :valType " +
+                " AND rv.val1 < 0 " +
                 " AND rv.pit >= :from" +
                 " ORDER BY rv.pit DESC ");
         query.setParameter("resident", resident);
@@ -419,19 +452,20 @@ public class ResValueTools {
         for (Resident resident : listResident) {
             ArrayList<Pair<DateMidnight, BigDecimal>> violatingValues = new ArrayList<Pair<DateMidnight, BigDecimal>>();
             Properties controlling = resident.getControlling();
-            int days = Integer.parseInt(controlling.getProperty(ResidentTools.KEY_DAYSDRINK));
+
 
 //            HashMap<DateMidnight, BigDecimal> balance = null;
             if ((controlling.containsKey(ResidentTools.KEY_LOWIN) && !controlling.getProperty(ResidentTools.KEY_LOWIN).equals("off")) ||
                     (controlling.containsKey(ResidentTools.KEY_HIGHIN) && !controlling.getProperty(ResidentTools.KEY_HIGHIN).equals("off"))) {
-                HashMap<DateMidnight, BigDecimal> balance = getLiquidBalance(resident, now.minusDays(days));
-                if (!balance.isEmpty()) {
+                int days = Integer.parseInt(controlling.getProperty(ResidentTools.KEY_DAYSDRINK));
+                HashMap<DateMidnight, BigDecimal> in = getLiquidIn(resident, now.minusDays(days));
+                if (!in.isEmpty()) {
                     for (DateMidnight day = now.minusDays(days); day.compareTo(new DateMidnight()) <= 0; day = day.plusDays(1)) {
-                        if (balance.get(day).compareTo(new BigDecimal(controlling.getProperty(ResidentTools.KEY_LOWIN))) < 0) {
-                            violatingValues.add(new Pair<DateMidnight, BigDecimal>(day, balance.get(day)));
+                        if (in.get(day).compareTo(new BigDecimal(controlling.getProperty(ResidentTools.KEY_LOWIN))) < 0) {
+                            violatingValues.add(new Pair<DateMidnight, BigDecimal>(day, in.get(day)));
                         }
-                        if (balance.get(day).compareTo(new BigDecimal(controlling.getProperty(ResidentTools.KEY_HIGHIN))) > 0) {
-                            violatingValues.add(new Pair<DateMidnight, BigDecimal>(day, balance.get(day)));
+                        if (in.get(day).compareTo(new BigDecimal(controlling.getProperty(ResidentTools.KEY_HIGHIN))) > 0) {
+                            violatingValues.add(new Pair<DateMidnight, BigDecimal>(day, in.get(day)));
                         }
                     }
                 }

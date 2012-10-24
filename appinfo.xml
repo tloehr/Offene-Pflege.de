@@ -17,6 +17,11 @@
 
             Main Classes werden im Hauptprogramm angeboten, neben den Pflegeakten. Sofern der Benutzer die EXECUTE Rechte dafür hat.
         -->
+        <class name="opde.controlling" short="Controlling"
+               long="Hier können verschiedene Abfragen für das Controlling gemacht werden." main="true"
+               javaclass="op.controlling.PnlControlling" icon="kfind.png">
+            <execute langbundle="appinfo.default.acl.execute"/>
+        </class>
         <class name="admin.residents.cash" short="Barbeträge"
                long="Dieses Programm dient der Verwaltung der sog. Taschengelder der BewohnerInnen" main="true"
                javaclass="op.allowance.PnlAllowance" icon="coins.png">

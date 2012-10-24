@@ -52,6 +52,7 @@ import op.care.PnlCare;
 import op.care.info.PnlInfo;
 import op.care.med.PnlMed;
 import op.care.supervisor.PnlHandover;
+import op.controlling.PnlControlling;
 import op.process.PnlProcess;
 import op.residents.bwassistant.AddBWWizard;
 import op.system.DlgLogin;
@@ -622,6 +623,8 @@ public class FrmMain extends JFrame {
             panel = new PnlHandover(jspSearch);
         } else if (classname.equals("op.welcome.PnlWelcome")) {
             panel = new PnlWelcome(jspSearch);
+        } else if (classname.equals("op.controlling.PnlControlling")) {
+            panel = new PnlControlling(jspSearch);
         }
         return panel;
     }
@@ -782,13 +785,12 @@ public class FrmMain extends JFrame {
     public void setPanelTo(CleanablePanel pnl) {
         if (currentVisiblePanel != null) {
             pnlCard.remove(currentVisiblePanel);
+            currentVisiblePanel.cleanup();
         }
 
         currentVisiblePanel = pnl;
-//        pnlMain.add(currentVisiblePanel, CC.xywh(5, 4, 2, 2, CC.FILL, CC.FILL));
         pnlCard.add("cardContent", currentVisiblePanel);
         ((CardLayout) pnlCard.getLayout()).show(pnlCard, "cardContent");
-
     }
 
     public void dispose() {

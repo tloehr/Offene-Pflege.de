@@ -376,7 +376,7 @@ public class NReportTools {
      * @param bvwochen
      * @return
      */
-    public static String getBVBerichte(EntityManager em, int headertiefe, int bvwochen) {
+    public static String getBVActivities(DateMidnight from) {
         StringBuilder html = new StringBuilder(1000);
 //        String jpql = "" +
 //                " SELECT  b, pb " +
