@@ -19,10 +19,7 @@ import org.jdesktop.swing.animation.timing.sources.SwingTimerTimingSource;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
 import java.util.concurrent.TimeUnit;
@@ -61,6 +58,33 @@ public class GUITools {
             button.addActionListener(actionListener);
         }
         return button;
+    }
+
+    public static JTextField createIntegerTextField(final int min, final int max, final int init){
+        final JTextField txt = new JTextField(Integer.toString(init), 10);
+        txt.setFont(SYSConst.ARIAL14);
+        txt.setHorizontalAlignment(SwingConstants.RIGHT);
+        txt.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                txt.selectAll();
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                int i = 0;
+                try {
+                    i = Integer.parseInt(txt.getText());
+                } catch (NumberFormatException e1) {
+                    txt.setText(Integer.toString(init));
+                }
+
+                if (min > i || i > max){
+                    txt.setText(Integer.toString(init));
+                }
+            }
+        });
+        return txt;
     }
 
     public static void addAllComponents(JPanel panel, java.util.List<Component> componentList) {

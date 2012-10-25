@@ -242,11 +242,35 @@ public class SYSConst {
     public static final int ZEIT_FRUEH = 1;
     public static final int ZEIT_SPAET = 2;
     public static final int ZEIT_NACHT_AB = 3;
-    public static final String ZEIT[] = {"Alles", "Nacht, morgens", "Früh", "Spät", "Nacht, abends"};
+//    public static final String ZEIT[] = {"Alles", "Nacht, morgens", "Früh", "Spät", "Nacht, abends"};
 
 
     public static final String html_arial14 = "face=\"" + ARIAL14.getFamily() + "\"";
     public static final String html_fontface = "<font " + html_arial14 + " >";
+    public static final String html_h1_open = "<h1 id=\"fonth1\" >";
+    public static final String html_h1_close = "</h1>";
+    public static final String html_h2_open = "<h2 id=\"fonth2\" >";
+    public static final String html_h2_close = "</h2>";
+    public static final String html_h3_open = "<h3 id=\"fonth3\" >";
+    public static final String html_h3_close = "</h3>";
+    public static String html_table_th(String content){
+        return "<th>"+content+"</t1>\n";
+    }
+    public static String html_table_td(String content){
+        return "<td>"+content+"</td>\n";
+    }
+    public static String html_table_tr(String content){
+        return "<tr>"+content+"</tr>\n";
+    }
+    public static String html_bold(String content){
+        return "<b>"+content+"</b>";
+    }
+    public static String html_paragraph(String content){
+        return "<p>\n"+content+"</p>\n";
+    }
+    public static String html_div(String content){
+        return "<div id=\"fonttext\">\n"+content+"</div>\n";
+    }
 
     public static final String html_div_open = "<div id=\"fonttext\">";
     public static final String html_div_close = "</div>";

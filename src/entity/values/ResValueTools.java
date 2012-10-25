@@ -310,7 +310,8 @@ public class ResValueTools {
         return result;
     }
 
-    public static HashMap<DateMidnight, BigDecimal> getLiquidBalance(Resident resident, DateMidnight from) {
+    public static HashMap<DateMidnight, Pair<BigDecimal, BigDecimal>> getLiquidBalance(Resident resident, DateMidnight from, DateMidnight to) {
+        // First BD is for the influx, second for the outflow
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("" +
                 " SELECT rv FROM ResValue rv " +
@@ -318,23 +319,33 @@ public class ResValueTools {
                 " AND rv.replacedBy IS NULL " +
                 " AND rv.vtype.valType = :valType" +
                 " AND rv.pit >= :from" +
+                " AND rv.pit <= :to" +
                 " ORDER BY rv.pit DESC ");
         query.setParameter("resident", resident);
         query.setParameter("valType", LIQUIDBALANCE);
         query.setParameter("from", from.toDate());
+        query.setParameter("from", to.plusDays(1).toDateTime().minusSeconds(1).toDate());
         ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
         em.close();
 
-        HashMap<DateMidnight, BigDecimal> hm = new HashMap<DateMidnight, BigDecimal>();
+        // init with dates. so that there are now "empty" days
+        HashMap<DateMidnight, Pair<BigDecimal, BigDecimal>> hm = new HashMap<DateMidnight, Pair<BigDecimal, BigDecimal>>();
         for (DateMidnight day = from; day.compareTo(new DateMidnight()) <= 0; day = day.plusDays(1)) {
-            hm.put(day, BigDecimal.ZERO);
+            hm.put(day, new Pair<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO));
         }
 
         for (ResValue val : list) {
-            BigDecimal bd = hm.get(new DateMidnight(val.getPit()));
-            hm.put(new DateMidnight(val.getPit()), bd.add(val.getVal1()));
+            Pair<BigDecimal, BigDecimal> pair = hm.get(new DateMidnight(val.getPit()));
+            BigDecimal influx = pair.getFirst();
+            BigDecimal outflow = pair.getSecond();
+            if (val.getVal1().compareTo(BigDecimal.ZERO) < 0){
+                outflow = outflow.add(val.getVal1().abs());
+            } else {
+                influx = influx.add(val.getVal1());
+            }
+            hm.put(new DateMidnight(val.getPit()), new Pair<BigDecimal, BigDecimal>(influx, outflow));
         }
-
+             // TODO: Hier gehts weiter. HTML Umgebung dafür schreiben
         return hm;
     }
 

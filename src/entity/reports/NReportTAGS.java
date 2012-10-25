@@ -51,7 +51,7 @@ public class NReportTAGS implements Serializable {
     private boolean aktiv;
     @Basic(optional = false)
     @Column(name = "System")
-    private boolean system;
+    private int system;
     @Column(name = "Besonders")
     private boolean besonders;
     @Basic(optional = false)
@@ -110,11 +110,11 @@ public class NReportTAGS implements Serializable {
         this.aktiv = aktiv;
     }
 
-    public boolean getSystem() {
+    public int getSystem() {
         return system;
     }
 
-    public void setSystem(boolean system) {
+    public void setSystem(int system) {
         this.system = system;
     }
 

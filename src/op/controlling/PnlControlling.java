@@ -33,19 +33,24 @@ import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.swing.JideBoxLayout;
 import entity.files.SYSFilesTools;
 import entity.reports.NReportTools;
+import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.tools.CleanablePanel;
 import op.tools.DefaultCPTitle;
 import op.tools.GUITools;
+import op.tools.SYSCalendar;
 import org.jdesktop.swingx.VerticalLayout;
+import org.joda.time.DateMidnight;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 
 /**
  * @author tloehr
@@ -53,6 +58,7 @@ import java.beans.PropertyVetoException;
 public class PnlControlling extends CleanablePanel {
     public static final String internalClassID = "opde.controlling";
     private JScrollPane jspSearch;
+    Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
 
     // Variables declaration - do not modify
 //GEN-BEGIN:variables
@@ -78,7 +84,9 @@ public class PnlControlling extends CleanablePanel {
 //        initForm();
 //        o = new Object[]{pbPart, lblProgress, isCancelled};
 //        setTitle(SYSTools.getWindowTitle("Controlling Cockpit"));
-        setVisible(true);
+        initComponents();
+        initPanel();
+        reloadDisplay();
     }
 
     private void initPanel() {
@@ -94,14 +102,10 @@ public class PnlControlling extends CleanablePanel {
          *     |_|  \___|_|\___/ \__,_|\__,_|____/|_|___/ .__/|_|\__,_|\__, |
          *                                              |_|            |___/
          */
-
         cpsControlling.removeAll();
         cpsControlling.setLayout(new JideBoxLayout(cpsControlling, JideBoxLayout.Y_AXIS));
-
         cpsControlling.add(createCP4Orga());
-
         cpsControlling.addExpansion();
-
     }
 
 
@@ -127,7 +131,7 @@ public class PnlControlling extends CleanablePanel {
         cpOrga.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                cpOrga.setContentPane(createContentPanel4Orga();
+                cpOrga.setContentPane(createContentPanel4Orga());
             }
         });
 
@@ -145,18 +149,56 @@ public class PnlControlling extends CleanablePanel {
     private JPanel createContentPanel4Orga() {
         JPanel pnlContent = new JPanel(new VerticalLayout());
 
-
-        pnlContent.add(GUITools.createHyperlinkButton(internalClassID + ".orga.bvactivities", null, new ActionListener() {
+        /***
+         *      ______     ___        _   _       _ _   _
+         *     | __ ) \   / / \   ___| |_(_)_   _(_) |_(_) ___  ___
+         *     |  _ \\ \ / / _ \ / __| __| \ \ / / | __| |/ _ \/ __|
+         *     | |_) |\ V / ___ \ (__| |_| |\ V /| | |_| |  __/\__ \
+         *     |____/  \_/_/   \_\___|\__|_| \_/ |_|\__|_|\___||___/
+         *
+         */
+        JPanel pnlBV = new JPanel(new BorderLayout());
+        final JButton btnBVActivities = GUITools.createHyperlinkButton(internalClassID + ".orga.bvactivities", null, null);
+        int bvWeeksBack;
+        try {
+            bvWeeksBack = Integer.parseInt(OPDE.getProps().getProperty(internalClassID + "::bvactivitiesWeeksBack"));
+        } catch (NumberFormatException nfe) {
+            bvWeeksBack = 7;
+        }
+        final JTextField txtBVWeeksBack = GUITools.createIntegerTextField(1, 52, bvWeeksBack);
+        txtBVWeeksBack.setToolTipText(OPDE.lang.getString("misc.msg.weeksback"));
+        btnBVActivities.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-//            pbPart.setValue(0);
-//            int bvwochen = Integer.parseInt(spinBVWochen.getValue().toString());
-            SYSFilesTools.print(NReportTools.getBVBerichte(em, 1, bvwochen));
-//            progress++;
-//            pbMain.setValue(progress);
-//        }
+                SYSFilesTools.print(NReportTools.getBVActivites(new DateMidnight().minusWeeks(Integer.parseInt(txtBVWeeksBack.getText()))), false);
+                SYSPropsTools.storeProp(internalClassID + "::bvactivitiesWeeksBack", txtBVWeeksBack.getText(), OPDE.getLogin().getUser());
             }
-        }));
+        });
+        pnlBV.add(btnBVActivities, BorderLayout.WEST);
+        pnlBV.add(txtBVWeeksBack, BorderLayout.EAST);
+        pnlContent.add(pnlBV);
+
+        JPanel pnlLiquidBalance = new JPanel(new BorderLayout());
+        final JButton btnLiquidBalance = GUITools.createHyperlinkButton(internalClassID + ".orga.bvactivities", null, null);
+        JComboBox cmbLiquidBalanceMonth = new JComboBox(SYSCalendar.createMonthList(new DateMidnight().minusYears(1), new DateMidnight()));
+        btnLiquidBalance.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SYSFilesTools.print(NReportTools.getBVActivites(new DateMidnight().minusWeeks(Integer.parseInt(txtBVWeeksBack.getText()))), false);
+            }
+        });
+        cmbLiquidBalanceMonth.setRenderer(new ListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                return new DefaultListCellRenderer().getListCellRendererComponent(list, monthFormatter.format(((DateMidnight) value).toDate()), index, isSelected, cellHasFocus);
+            }
+        });
+        cmbLiquidBalanceMonth.setSelectedIndex(cmbLiquidBalanceMonth.getItemCount()-2);
+
+        pnlLiquidBalance.add(btnLiquidBalance, BorderLayout.WEST);
+        pnlLiquidBalance.add(cmbLiquidBalanceMonth, BorderLayout.EAST);
+        pnlContent.add(pnlLiquidBalance);
+
 
         return pnlContent;
     }
@@ -815,131 +857,4 @@ public class PnlControlling extends CleanablePanel {
 //
 
 
-    private void cbBVAktivitaetActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
-
-    private void cbNichtAbgehakteBHPsActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
-
-    private void cbPlanungActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
-
-    private void cbVerordnungenOhneAnbruchActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
-
-    private void spinBHPTageStateChanged(ChangeEvent e) {
-        // TODO add your code here
-    }
-
-    private void spinBVWochenStateChanged(ChangeEvent e) {
-        // TODO add your code here
-    }
-
-    private void spinPlanungenTageStateChanged(ChangeEvent e) {
-        // TODO add your code here
-    }
-
-    private void cbGeringeVorraeteActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
-
-    private void spinVorratProzentStateChanged(ChangeEvent e) {
-        // TODO add your code here
-    }
-
-    private void cbBerichteActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
-
-    private void txtBerichteFocusLost(FocusEvent e) {
-        // TODO add your code here
-    }
-
-    private void spinBerichteMonateStateChanged(ChangeEvent e) {
-        // TODO add your code here
-    }
-
-    private void cbInkoActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
-
-    private void cbBeschwerdenActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
-
-    private void spinBeschwerdenMonateStateChanged(ChangeEvent e) {
-        // TODO add your code here
-    }
-
-    private void cmbTagsItemStateChanged(ItemEvent e) {
-        // TODO add your code here
-    }
-
-    private void cbBilanzActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
-
-    private void cbGewichtActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
-
-    private void spinGewichtMonateStateChanged(ChangeEvent e) {
-        // TODO add your code here
-    }
-
-    private void cbMediControlActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
-
-    private void cmbStationItemStateChanged(ItemEvent e) {
-        // TODO add your code here
-    }
-
-    private void cbWundenActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
-
-    private void spinWundenMonateStateChanged(ChangeEvent e) {
-        // TODO add your code here
-    }
-
-    private void cbSozialBerichteActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
-
-    private void spinSozialWochenStateChanged(ChangeEvent e) {
-        // TODO add your code here
-    }
-
-    private void cbSozialZeitenActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
-
-    private void cbSturzAnonymActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
-
-    private void spinSturzAMonateStateChanged(ChangeEvent e) {
-        // TODO add your code here
-    }
-
-    private void cbSturzActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
-
-    private void spinSturzMonateStateChanged(ChangeEvent e) {
-        // TODO add your code here
-    }
-
-    private void btnPrintActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
-
-    private void btnStopActionPerformed(ActionEvent e) {
-        // TODO add your code here
-    }
 }

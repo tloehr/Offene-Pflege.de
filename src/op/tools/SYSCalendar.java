@@ -1110,24 +1110,10 @@ public class SYSCalendar {
      * @param start Beginn der Liste
      * @param end Ende der Liste
      */
-    public static DefaultComboBoxModel createMonthList(Date start, Date end) {
-        start = bom(start);
-        end = bom(end);
+    public static DefaultComboBoxModel createMonthList(DateMidnight start, DateMidnight end) {
         DefaultComboBoxModel dcbm = new DefaultComboBoxModel();
-        if (start.compareTo(end) > 0) {
-            dcbm = null;
-        } else {
-            Date runner = start;
-            do {
-//                Format formatter;
-//                formatter = new SimpleDateFormat("MMMM yyyy");
-//                dcbm.addElement(new ListElement(formatter.format(runner), runner.clone()));
-//                //System.out.println(printGermanStyle(runner) + ", " + runner.compareTo(end) + ", " + formatter.format(runner));
-                dcbm.addElement(runner.clone());
-                runner = addField(runner, 1, GregorianCalendar.MONTH);
-
-            } while (runner.compareTo(end) <= 0);
-
+        for (DateMidnight month = start; month.compareTo(end) <= 0; month = month.plusMonths(1)){
+            dcbm.addElement(month);
         }
         return dcbm;
     }

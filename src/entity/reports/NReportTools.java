@@ -9,6 +9,7 @@ import entity.Homes;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import op.OPDE;
+import op.controlling.PnlControlling;
 import op.tools.Pair;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
@@ -19,10 +20,12 @@ import org.joda.time.DateTime;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author tloehr
@@ -364,104 +367,86 @@ public class NReportTools {
     }
 
 
-    public static String getBewohnerName(NReport bericht) {
-        String result = "";
-        result = bericht.getResident().getName() + ", " + bericht.getResident().getVorname();
-        return "<font " + getHTMLColor(bericht) + SYSConst.html_arial14 + ">" + result + "</font>";
+    public static String getBVActivites(DateMidnight from) {
+        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT);
+        ArrayList<Resident> listResidents = ResidentTools.getAllActive();
+        StringBuilder html = new StringBuilder(1000);
+
+        html.append(SYSConst.html_h1_open + OPDE.lang.getString(PnlControlling.internalClassID + ".orga.bvactivities") + SYSConst.html_h1_close);
+
+        for (Resident resident : listResidents) {
+            ArrayList<NReport> listReports = getBVActivities(resident, from);
+
+            html.append(SYSConst.html_h2_open + ResidentTools.getBWLabelTextKompakt(resident) + SYSConst.html_h2_close);
+
+            if (resident.getBv1() == null) {
+                html.append(SYSConst.html_div(SYSConst.html_bold(OPDE.lang.getString(PnlControlling.internalClassID + ".orga.bvactivities.nobv"))));
+            } else {
+                html.append(SYSConst.html_div(SYSConst.html_bold(OPDE.lang.getString("misc.msg.bv")) + ": " + resident.getBv1().getFullname()));
+            }
+
+            if (listReports.isEmpty()) {
+                SYSConst.html_bold(OPDE.lang.getString("misc.msg.nodata"));
+            } else {
+                html.append("<table  id=\"fonttext\" border=\"1\">" +
+                        SYSConst.html_table_tr(
+                                SYSConst.html_table_th(OPDE.lang.getString("misc.msg.Date")) +
+                                        SYSConst.html_table_th(OPDE.lang.getString("misc.msg.Text")) +
+                                        SYSConst.html_table_th(OPDE.lang.getString("misc.msg.user"))
+                        ));
+
+                for (NReport nReport : listReports) {
+                    html.append(SYSConst.html_table_tr(
+                            SYSConst.html_table_td(df.format(nReport.getPit())) +
+                                    SYSConst.html_table_td(SYSConst.html_paragraph(nReport.getText())) +
+                                    SYSConst.html_table_td(nReport.getUser().getFullname())
+                    ));
+                }
+                html.append("</table>");
+            }
+        }
+        return html.toString();
     }
 
-    /**
-     * @param em
-     * @param headertiefe
-     * @param bvwochen
-     * @return
-     */
-    public static String getBVActivities(DateMidnight from) {
-        StringBuilder html = new StringBuilder(1000);
-//        String jpql = "" +
-//                " SELECT  b, pb " +
-//                " FROM Bewohner b " +
-//                " LEFT JOIN b.pflegberichte pb " +
-//                " LEFT JOIN pb.tags pbt " +
-//                " WHERE pb.pit >= :datum AND pbt.kurzbezeichnung = 'BV' AND b.station IS NOT NULL AND b.adminonly <> 2 " +
-//                " ORDER BY b.bWKennung, pb.pit ";
+    public static ArrayList<NReport> getBVActivities(Resident resident, DateMidnight from) {
 
+        EntityManager em = OPDE.createEM();
+        ArrayList<NReport> list = null;
 
-//        String sql = " SELECT b.*, a.PBID " +
-//                " FROM Bewohner b " +
-//                " LEFT OUTER JOIN ( " +
-//                "    SELECT pb.* FROM NReport pb " +
-//                "    LEFT OUTER JOIN PB2TAGS pbt ON pbt.PBID = pb.PBID " +
-//                "    LEFT OUTER JOIN PBericht_TAGS pbtags ON pbt.PBTAGID = pbtags.PBTAGID " +
-//                "    WHERE pb.PIT > ? AND pbtags.Kurzbezeichnung = 'BV'" +
-//                " ) a ON a.BWKennung = b.BWKennung " +
-//                " WHERE b.StatID IS NOT NULL AND b.adminonly <> 2 " +
-//                " ORDER BY b.BWKennung, a.pit ";
-        Query query = em.createNativeQuery(" SELECT b.*, a.PBID mypbid " +
-                " FROM Bewohner b " +
-                " LEFT OUTER JOIN ( " +
-                "    SELECT pb.* FROM Pflegeberichte pb " +
-                "    LEFT OUTER JOIN PB2TAGS pbt ON pbt.PBID = pb.PBID " +
-                "    LEFT OUTER JOIN PBericht_TAGS pbtags ON pbt.PBTAGID = pbtags.PBTAGID " +
-                "    WHERE pb.PIT > ? AND pbtags.Kurzbezeichnung = 'BV'" +
-                " ) a ON a.BWKennung = b.BWKennung " +
-                " WHERE b.StatID IS NOT NULL AND b.adminonly <> 2 " +
-                " ORDER BY b.BWKennung, a.pit ");
+        try {
 
+            String jpql = " SELECT nr " +
+                    " FROM NReport nr " +
+                    " JOIN nr.tags tg " +
+                    " WHERE " +
+                    " nr.resident = :resident " +
+                    " AND nr.pit >= :from " +
+                    " AND tg.system = :bv " +
+                    " AND nr.replacedBy IS NULL " +
+//                    " AND nr.resident.station IS NOT NULL " +
+//                    " AND nr.resident.adminonly <> 2 " +
+                    " ORDER BY nr.pit ";
 
-        // TODO: SQLMapping
-//                @SqlResultSetMapping(name = "NReport.findBVAktivitaetResultMapping", entities =
-//        @EntityResult(entityClass = Resident.class), columns =
-//        @ColumnResult(name = "mypbid"))
+            Query query = em.createQuery(jpql);
+            query.setParameter("resident", resident);
+            query.setParameter("from", from.toDate());
+            query.setParameter("bv", NReportTAGSTools.TYPE_SYS_BV);
 
-        query.setParameter(1, SYSCalendar.addField(new Date(SYSCalendar.startOfDay()), bvwochen * -1, GregorianCalendar.WEEK_OF_MONTH));
+            list = new ArrayList<NReport>(query.getResultList());
 
-//        Query query2 = em.createQuery("SELECT b FROM Bewohner b LEFT JOIN b.pflegberichte pb WHERE pb IS NULL ");
-//        query.setParameter("datum", SYSCalendar.addField(new Date(SYSCalendar.startOfDay()), bvwochen * -1, GregorianCalendar.WEEK_OF_MONTH));
-
-
-        List<Object[]> list = query.getResultList();
-        DateFormat df = DateFormat.getDateInstance();
-        html.append("<h" + headertiefe + ">");
-        html.append("Berichte der BV-Tätigkeiten");
-        html.append("</h" + headertiefe + ">");
-        html.append("<table border=\"1\"><tr>" +
-                "<th>BewohnerIn</th><th>Datum</th><th>Text</th><th>UKennung</th><th>BV</th></tr>");
-
-        for (Object[] paar : list) {
-            Resident bewohner = (Resident) paar[0];
-            BigInteger pbid = (BigInteger) paar[1];
-
-            // Bei Bedarf den Pflegebericht "einsammeln"
-            NReport bericht = pbid == null ? null : em.find(NReport.class, pbid.longValue());
-
-            html.append("<tr>");
-
-            html.append("<td>" + ResidentTools.getBWLabel1(bewohner) + "</td>");
-            if (bericht == null) {
-                html.append("<td align=\"center\">--</td>");
-                html.append("<td><b>Keine BV Aktivitäten gefunden.</b></td>");
-                html.append("<td align=\"center\">--</td>");
-            } else {
-                html.append("<td>" + df.format(bericht.getPit()) + "</td>");
-                html.append("<td>" + bericht.getText() + "</td>");
-                html.append("<td>" + bericht.getUser().getUID() + "</td>");
-            }
-            if (bewohner.getBv1() == null) {
-                html.append("<td><b>kein BV zugeordnet</b></td>");
-            } else {
-                html.append("<td>" + bewohner.getBv1().getUID() + "</td>");
-            }
-            html.append("</tr>");
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
         }
-        html.append("</table>");
+
 
 //        if (rs.first()) {
 
 //        }
 
 
-        return html.toString();
+        return list;
     }
 
 
@@ -757,6 +742,7 @@ public class NReportTools {
 
     /**
      * retrieves all NReports for a certain day which have been assigned with the Tags Nr. 1 (Handover) and Nr. 2 (Emergency)
+     *
      * @param day
      * @return
      */
@@ -772,7 +758,7 @@ public class NReportTools {
                     " FROM NReport nr " +
                     " JOIN nr.tags t " +
                     " WHERE " +
-                    " nr.pit >= :from AND nr.pit <= :to AND (t.nrtagid = 1 OR t.nrtagid = 2) " +
+                    " nr.pit >= :from AND nr.pit <= :to AND (t.system = :handover OR t.nrtagid = :emergency) " +
                     " AND nr.resident.station.home = :home " +
                     " AND nr.replacedBy IS NULL AND nr.editedBy IS NULL " +
                     " ORDER BY nr.pit ASC ";
@@ -782,6 +768,8 @@ public class NReportTools {
             query.setParameter("from", from.toDate());
             query.setParameter("to", to.toDate());
             query.setParameter("home", home);
+            query.setParameter("handover", NReportTAGSTools.TYPE_SYS_HANDOVER);
+            query.setParameter("emergency", NReportTAGSTools.TYPE_SYS_EMERGENCY);
 
             list = new ArrayList<NReport>(query.getResultList());
 

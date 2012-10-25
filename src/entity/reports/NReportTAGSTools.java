@@ -29,6 +29,12 @@ import java.util.Iterator;
  */
 public class NReportTAGSTools {
 
+    public static final int TYPE_USER = 0;
+    public static final int TYPE_SYS_HANDOVER = 1;
+    public static final int TYPE_SYS_EMERGENCY = 2;
+    public static final int TYPE_SYS_UBV = 3;
+    public static final int TYPE_SYS_BV = 4;
+
     public static ListCellRenderer getPBerichtTAGSRenderer() {
 //        final int v = verbosity;
         return new ListCellRenderer() {
