@@ -27,6 +27,10 @@
 package op.tools;
 
 import com.toedter.calendar.JDateChooser;
+import entity.info.ResInfo;
+import entity.info.ResInfoTools;
+import entity.info.ResInfoTypeTools;
+import entity.info.Resident;
 import entity.nursingprocess.DFNTools;
 import entity.prescription.BHPTools;
 import op.OPDE;
@@ -431,6 +435,16 @@ public class SYSCalendar {
         }
 
         return new GregorianCalendar(jahr, monat - 1, tag, 0, 0, 0);
+    }
+
+    public static boolean isDateSane(Resident resident, Date date){
+        DateMidnight d = new DateMidnight(date);
+        if (d.isAfterNow()){
+            return false;
+        }
+        ResInfo firstStay = ResInfoTools.getFirstResinfo(resident, ResInfoTypeTools.getByID(ResInfoTypeTools.TYPE_STAY));
+        DateMidnight min = firstStay == null ? new DateMidnight().dayOfMonth().withMinimumValue() : new DateMidnight(firstStay.getFrom());
+        return new DateMidnight(date).isAfter(min);
     }
 
 
@@ -1409,7 +1423,6 @@ public class SYSCalendar {
     /**
      * Sucht alle Feiertage in einem Jahr zusammen.
      *
-     * @param year
      * @return Eine Hashmap, die je das Datum als Zeichenkette der Form "jjjj-mm-tt" enthält und dazu die Bezeichnung des Feiertags.
      */
     public static HashMap<DateMidnight, String> getHollidays(int from, int to) {

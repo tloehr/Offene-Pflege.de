@@ -34,11 +34,11 @@ import com.jidesoft.swing.JideBoxLayout;
 import entity.files.SYSFilesTools;
 import entity.reports.NReportTools;
 import entity.system.SYSPropsTools;
+import entity.values.ResValueTools;
 import op.OPDE;
-import op.tools.CleanablePanel;
-import op.tools.DefaultCPTitle;
-import op.tools.GUITools;
-import op.tools.SYSCalendar;
+import op.threads.DisplayMessage;
+import op.tools.*;
+import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
 
@@ -46,8 +46,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -178,13 +176,44 @@ public class PnlControlling extends CleanablePanel {
         pnlBV.add(txtBVWeeksBack, BorderLayout.EAST);
         pnlContent.add(pnlBV);
 
+        /***
+         *      _ _             _     _   _           _
+         *     | (_) __ _ _   _(_) __| | | |__   __ _| | __ _ _ __   ___ ___
+         *     | | |/ _` | | | | |/ _` | | '_ \ / _` | |/ _` | '_ \ / __/ _ \
+         *     | | | (_| | |_| | | (_| | | |_) | (_| | | (_| | | | | (_|  __/
+         *     |_|_|\__, |\__,_|_|\__,_| |_.__/ \__,_|_|\__,_|_| |_|\___\___|
+         *             |_|
+         */
         JPanel pnlLiquidBalance = new JPanel(new BorderLayout());
-        final JButton btnLiquidBalance = GUITools.createHyperlinkButton(internalClassID + ".orga.bvactivities", null, null);
-        JComboBox cmbLiquidBalanceMonth = new JComboBox(SYSCalendar.createMonthList(new DateMidnight().minusYears(1), new DateMidnight()));
+        final JButton btnLiquidBalance = GUITools.createHyperlinkButton(internalClassID + ".nutrition.liquidbalance", null, null);
+        final JComboBox cmbLiquidBalanceMonth = new JComboBox(SYSCalendar.createMonthList(new DateMidnight().minusYears(1), new DateMidnight()));
         btnLiquidBalance.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SYSFilesTools.print(NReportTools.getBVActivites(new DateMidnight().minusWeeks(Integer.parseInt(txtBVWeeksBack.getText()))), false);
+//                btnLiquidBalance.setEnabled(false);
+                OPDE.getMainframe().setBlocked(true);
+                SwingWorker worker = new SwingWorker() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        DateMidnight month = (DateMidnight) cmbLiquidBalanceMonth.getSelectedItem();
+                        SYSFilesTools.print(ResValueTools.getLiquidBalance(month, new Closure() {
+                            @Override
+                            public void execute(Object o) {
+                                Pair<Integer, Integer> progress = (Pair<Integer, Integer>) o;
+                                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress.getFirst(), progress.getSecond()));
+                            }
+                        }), false);
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        OPDE.getDisplayManager().setProgressBarMessage(null);
+                        OPDE.getMainframe().setBlocked(false);
+//                        btnLiquidBalance.setEnabled(true);
+                    }
+                };
+                worker.execute();
             }
         });
         cmbLiquidBalanceMonth.setRenderer(new ListCellRenderer() {
@@ -193,8 +222,7 @@ public class PnlControlling extends CleanablePanel {
                 return new DefaultListCellRenderer().getListCellRendererComponent(list, monthFormatter.format(((DateMidnight) value).toDate()), index, isSelected, cellHasFocus);
             }
         });
-        cmbLiquidBalanceMonth.setSelectedIndex(cmbLiquidBalanceMonth.getItemCount()-2);
-
+        cmbLiquidBalanceMonth.setSelectedIndex(cmbLiquidBalanceMonth.getItemCount() - 2);
         pnlLiquidBalance.add(btnLiquidBalance, BorderLayout.WEST);
         pnlLiquidBalance.add(cmbLiquidBalanceMonth, BorderLayout.EAST);
         pnlContent.add(pnlLiquidBalance);

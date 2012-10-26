@@ -36,6 +36,7 @@ public class ResidentTools {
     public static final String KEY_STOOLDAYS = "stooldays";
     public static final String KEY_BALANCE = "liquidbalance";
     public static final String KEY_LOWIN = "lowin";
+    public static final String KEY_TARGETIN = "targetin";
     public static final String KEY_HIGHIN = "highin";
     public static final String KEY_DAYSDRINK = "daysdrink";
 
@@ -165,6 +166,7 @@ public class ResidentTools {
     }
 
     public static ArrayList<Resident> getAllActive() {
+        //TODO: We surely need also a getAllActive(DateMidnight month).
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM Resident b WHERE b.station IS NOT NULL ORDER BY b.name, b.firstname");
         ArrayList<Resident> list = new ArrayList<Resident>(query.getResultList());

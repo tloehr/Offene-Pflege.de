@@ -6,22 +6,23 @@ import entity.info.ResidentTools;
 import entity.nursingprocess.DFNTools;
 import op.OPDE;
 import op.care.values.PnlValues;
+import op.controlling.PnlControlling;
 import op.tools.Pair;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DateFormat;
+import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -310,7 +311,196 @@ public class ResValueTools {
         return result;
     }
 
-    public static HashMap<DateMidnight, Pair<BigDecimal, BigDecimal>> getLiquidBalance(Resident resident, DateMidnight from, DateMidnight to) {
+    public static String getLiquidBalance(DateMidnight month, Closure progress) {
+        //TODO: getAllActive(DateMidnight month)
+        ArrayList<Resident> listResidents = ResidentTools.getAllActive();
+        Format monthFormmatter = new SimpleDateFormat("MMMM yyyy");
+        DateTime from = month.dayOfMonth().withMinimumValue().toDateTime();
+        DateTime to = month.dayOfMonth().withMaximumValue().plusDays(1).toDateTime().minusSeconds(1);
+
+        int p = -1;
+        boolean isCancelled = false;
+
+        progress.execute(new Pair<Integer, Integer>(p, listResidents.size()));
+
+//        BigDecimal sum = BigDecimal.ZERO;
+
+        StringBuilder html = new StringBuilder(1000);
+//        String sqlVormonat = "" +
+//                " SELECT avg(ein.EINFUHR) Einfuhr, ifnull(avg(aus.AUSFUHR), 0) Ausfuhr, ifnull(sum(ein.EINFUHR)+sum(aus.AUSFUHR), 0) BILANZ FROM " +
+//                " (" +
+//                "   SELECT Pit, Date(PIT), bw.BWKennung, SUM(Wert) AUSFUHR FROM BWerte bw" +
+//                "   WHERE ReplacedBy = 0 AND Wert < 0 AND bw.BWKennung = ? AND XML='<BILANZ/>' AND Date(PIT) >= DATE(?) AND Date(PIT) <= DATE(?)" +
+//                "   GROUP BY bw.BWKennung, Date(PIT) " +
+//                " ) aus " +
+//                " RIGHT OUTER JOIN " +
+//                " (" +
+//                "   SELECT Pit, Date(PIT), bw.BWKennung, SUM(Wert) EINFUHR FROM BWerte bw " +
+//                "   WHERE ReplacedBy = 0 AND Wert > 0 AND bw.BWKennung = ? AND XML='<BILANZ/>' AND Date(PIT) >= DATE(?) AND Date(PIT) <= DATE(?) " +
+//                "   GROUP BY bw.BWKennung, Date(PIT) " +
+//                " ) ein " +
+//                " ON aus.BWKennung = ein.BWKennung AND Date(aus.PIT) = Date(ein.PIT) " +
+//                " INNER JOIN Bewohner b ON ein.BWKennung = b.BWKennung " +
+//                " GROUP BY b.BWKennung ";
+//        String sql = "" +
+//                " SELECT ein.BWKennung, DATE_FORMAT(ein.PIT, '%d.%c.%Y') Datum, ein.Einfuhr, ifnull(aus.AUSFUHR, 0) Ausfuhr, ifnull((ein.EINFUHR+aus.AUSFUHR), 0) BILANZ FROM " +
+//                " ( " +
+//                "   SELECT PIT, bw.BWKennung, SUM(Wert) AUSFUHR FROM BWerte bw " +
+//                "   INNER JOIN Bewohner b ON b.BWKennung = bw.BWKennung " +
+//                "   WHERE ReplacedBy = 0 AND Wert < 0 AND AdminOnly <> 2 AND XML='<BILANZ/>' AND Date(PIT) >= DATE(?) AND Date(PIT) <= DATE(?) " +
+//                "   GROUP BY bw.BWKennung, Date(PIT) " +
+//                " ) aus " +
+//                " RIGHT OUTER JOIN " +
+//                " (" +
+//                "   SELECT PIT, bw.BWKennung, SUM(Wert) EINFUHR FROM BWerte bw " +
+//                "   INNER JOIN Bewohner b ON b.BWKennung = bw.BWKennung " +
+//                "   WHERE ReplacedBy = 0 AND Wert > 0 AND AdminOnly <> 2 AND XML='<BILANZ/>' AND Date(PIT) >= DATE(?) AND Date(PIT) <= DATE(?) " +
+//                "   GROUP BY bw.BWKennung, Date(PIT) " +
+//                " ) ein " +
+//                " ON aus.BWKennung = ein.BWKennung AND Date(aus.PIT) = Date(ein.PIT)" +
+//                " INNER JOIN Bewohner b ON ein.BWKennung = b.BWKennung " +
+//                " ORDER BY ein.BWKennung, Date(ein.PIT) ";
+
+
+//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
+//            PreparedStatement stmtVormonat = OPDE.getDb().db.prepareStatement(sqlVormonat);
+//            stmt.setDate(1, new java.sql.Date(SYSCalendar.bom(monat).getTime()));
+//            stmt.setDate(2, new java.sql.Date(SYSCalendar.eom(monat).getTime()));
+//            stmt.setDate(3, new java.sql.Date(SYSCalendar.bom(monat).getTime()));
+//            stmt.setDate(4, new java.sql.Date(SYSCalendar.eom(monat).getTime()));
+//
+//            // BWKennung wird in der Schleife gesetzt.
+//            stmtVormonat.setDate(2, new java.sql.Date(SYSCalendar.bom(vormonat).getTime()));
+//            stmtVormonat.setDate(3, new java.sql.Date(SYSCalendar.eom(vormonat).getTime()));
+//            stmtVormonat.setDate(5, new java.sql.Date(SYSCalendar.bom(vormonat).getTime()));
+//            stmtVormonat.setDate(6, new java.sql.Date(SYSCalendar.eom(vormonat).getTime()));
+
+//            ResultSet rs = stmt.executeQuery();
+
+
+        html.append(SYSConst.html_h1(OPDE.lang.getString(PnlControlling.internalClassID + ".nutrition.liquidbalance")));
+        html.append(SYSConst.html_h2(monthFormmatter.format(month.toDate())));
+
+        p = 0;
+        for (Resident resident : listResidents) {
+            p++;
+            progress.execute(new Pair<Integer, Integer>(p, listResidents.size()));
+            Properties controlling = resident.getControlling();
+            if (controlling.containsKey(ResidentTools.KEY_BALANCE) && controlling.getProperty(ResidentTools.KEY_BALANCE).equals("on")) {
+                BigDecimal targetIn = SYSTools.parseBigDecimal(controlling.getProperty(ResidentTools.KEY_TARGETIN));
+
+                html.append(SYSConst.html_h3(ResidentTools.getBWLabelTextKompakt(resident)));
+                html.append(SYSConst.html_div(SYSConst.html_bold(OPDE.lang.getString("misc.msg.targetDrink")) + ": " + targetIn.setScale(2, RoundingMode.HALF_UP).toString() + " ml"));
+
+                HashMap<DateMidnight, Pair<BigDecimal, BigDecimal>> balanceMap = getLiquidBalancePerDay(resident, from.toDateMidnight(), to.toDateMidnight());
+
+//                BigDecimal balance = BigDecimal.ZERO;
+
+//                if (rs.getRow() > 1) {
+//                    avgEin = avgEin / rows;
+//                    avgAus = avgAus / rows;
+//
+//                    avgEin = Math.round(avgEin * 100d) / 100d;
+//                    avgAus = Math.round(avgAus * 100d) / 100d;
+//                    //String.format(prev, arg1)
+//
+//
+//                    html.append("<tr><td></td><td>" + df.format(monat) + "</td><td>&Oslash; " + avgEin + "</td><td>&Oslash; " + avgAus + "</td><td>&Sigma; " + sumBilanz + "</td></tr>");
+//
+//                    // Vormonat berechnen
+//                    stmtVormonat.setString(1, prev);
+//                    stmtVormonat.setString(4, prev);
+//                    ResultSet rsVormonat = stmtVormonat.executeQuery();
+//
+//                    if (rsVormonat.first()) {
+//                        double avgEinVor = SYSTools.roundScale2(rsVormonat.getDouble("Einfuhr"));
+//                        double avgAusVor = SYSTools.roundScale2(rsVormonat.getDouble("Ausfuhr"));
+//                        double sumBilanzVor = SYSTools.roundScale2(rsVormonat.getDouble("Bilanz"));
+//                        html.append("<tr><td></td><td>" + df.format(vormonat) + "</td><td>&Oslash; " + avgEinVor + "</td><td>&Oslash; " + avgAusVor + "</td><td>&Sigma; " + sumBilanzVor + "</td></tr>");
+//                    }
+//
+//                    rsVormonat.close();
+//
+//                    html.append("</table>");
+//                    avgEin = 0;
+//                    avgAus = 0;
+//                    sumBilanz = 0;
+//                    rows = 0;
+//                }
+
+                ArrayList<DateMidnight> listDays = new ArrayList<DateMidnight>(balanceMap.keySet());
+                Collections.sort(listDays);
+
+                StringBuilder table = new StringBuilder(1000);
+                table.append(SYSConst.html_table_tr(
+                        SYSConst.html_table_th(OPDE.lang.getString("misc.msg.Date")) +
+                                SYSConst.html_table_th(OPDE.lang.getString("misc.msg.ingestion")) +
+                                SYSConst.html_table_th(OPDE.lang.getString("misc.msg.egestion")) +
+                                SYSConst.html_table_th(OPDE.lang.getString("misc.msg.balance"))
+                ));
+                for (DateMidnight day : listDays) {
+                    BigDecimal linesum = balanceMap.get(day).getFirst().add(balanceMap.get(day).getSecond());
+                    table.append(SYSConst.html_table_tr(
+                            SYSConst.html_table_td(DateFormat.getDateInstance().format(day.toDate())) +
+                                    SYSConst.html_table_td(balanceMap.get(day).getFirst().setScale(2, RoundingMode.HALF_UP).toString()) +
+                                    SYSConst.html_table_td(balanceMap.get(day).getSecond().setScale(2, RoundingMode.HALF_UP).toString()) +
+                                    SYSConst.html_table_td(linesum.setScale(2, RoundingMode.HALF_UP).toString())
+                    ));
+
+                }
+//                BigDecimal avgIn = BigDecimal.ZERO;
+//                BigDecimal avgOut = BigDecimal.ZERO;
+
+
+                html.append(SYSConst.html_table(table.toString(), "1"));
+            }
+
+//
+//            for (int i = 1; i <= count; i++) {
+//                html.append("<td>");
+//                html.append(rs.getString(i));
+//                html.append("</td>");
+//            }
+//            if (zieltrink > 0) {
+//                html.append("<td>" + (rs.getDouble("Einfuhr") - zieltrink) + "</td>");
+//            }
+//            avgEin += rs.getDouble("Einfuhr");
+//            avgAus += rs.getDouble("Ausfuhr");
+//            sumBilanz += rs.getDouble("Bilanz");
+//
+//            html.append("</tr>");
+//            isCancelled = (Boolean) o[2];
+        }
+//        avgEin = avgEin / rows;
+//        avgAus = avgAus / rows;
+//        avgEin = Math.round(avgEin * 100d) / 100d;
+//        avgAus = Math.round(avgAus * 100d) / 100d;
+//        html.append("<tr><td></td><td></td><td>&Oslash; " + avgEin + "</td><td>&Oslash; " + avgAus + "</td><td>&Sigma; " + sumBilanz + "</td></tr>");
+//        // Vormonat berechnen
+//        stmtVormonat.setString(1, bwkennung);
+//        stmtVormonat.setString(4, bwkennung);
+//        ResultSet rsVormonat = stmtVormonat.executeQuery();
+//
+//        if (rsVormonat.first()) {
+//            double avgEinVor = SYSTools.roundScale2(rsVormonat.getDouble("Einfuhr"));
+//            double avgAusVor = SYSTools.roundScale2(rsVormonat.getDouble("Ausfuhr"));
+//            double sumBilanzVor = SYSTools.roundScale2(rsVormonat.getDouble("Bilanz"));
+//            html.append("<tr><td></td><td>" + df.format(vormonat) + "</td><td>&Oslash; " + avgEinVor + "</td><td>&Oslash; " + avgAusVor + "</td><td>&Sigma; " + sumBilanzVor + "</td></tr>");
+//        }
+//
+//        rsVormonat.close();
+//        html.append("</table>");
+//
+//
+//        isCancelled = (Boolean) o[2];
+//        String s = "";
+//        if (!isCancelled) {
+//            s = html.toString();
+//        }
+        return html.toString();
+    }
+
+    public static HashMap<DateMidnight, Pair<BigDecimal, BigDecimal>> getLiquidBalancePerDay(Resident resident, DateMidnight from, DateMidnight to) {
         // First BD is for the influx, second for the outflow
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("" +
@@ -324,29 +514,55 @@ public class ResValueTools {
         query.setParameter("resident", resident);
         query.setParameter("valType", LIQUIDBALANCE);
         query.setParameter("from", from.toDate());
-        query.setParameter("from", to.plusDays(1).toDateTime().minusSeconds(1).toDate());
-        ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
+        query.setParameter("to", to.plusDays(1).toDateTime().minusSeconds(1).toDate());
+        ArrayList<ResValue> list = null;
+        list = new ArrayList<ResValue>(query.getResultList());
         em.close();
 
         // init with dates. so that there are now "empty" days
         HashMap<DateMidnight, Pair<BigDecimal, BigDecimal>> hm = new HashMap<DateMidnight, Pair<BigDecimal, BigDecimal>>();
-        for (DateMidnight day = from; day.compareTo(new DateMidnight()) <= 0; day = day.plusDays(1)) {
+        for (DateMidnight day = from; day.compareTo(to) <= 0; day = day.plusDays(1)) {
             hm.put(day, new Pair<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO));
         }
 
         for (ResValue val : list) {
             Pair<BigDecimal, BigDecimal> pair = hm.get(new DateMidnight(val.getPit()));
-            BigDecimal influx = pair.getFirst();
-            BigDecimal outflow = pair.getSecond();
-            if (val.getVal1().compareTo(BigDecimal.ZERO) < 0){
-                outflow = outflow.add(val.getVal1().abs());
+            BigDecimal ingestion = pair.getFirst();
+            BigDecimal egestion = pair.getSecond();
+            if (val.getVal1().compareTo(BigDecimal.ZERO) < 0) {
+                egestion = egestion.add(val.getVal1().abs());
             } else {
-                influx = influx.add(val.getVal1());
+                ingestion = ingestion.add(val.getVal1());
             }
-            hm.put(new DateMidnight(val.getPit()), new Pair<BigDecimal, BigDecimal>(influx, outflow));
+            hm.put(new DateMidnight(val.getPit()), new Pair<BigDecimal, BigDecimal>(ingestion, egestion));
         }
-             // TODO: Hier gehts weiter. HTML Umgebung dafür schreiben
+
         return hm;
+    }
+
+    public static BigDecimal getAvgIn(Resident resident, DateMidnight month) {
+        DateTime from = month.dayOfMonth().withMinimumValue().toDateTime();
+        DateTime to = month.dayOfMonth().withMaximumValue().plusDays(1).toDateTime().minusSeconds(1);
+
+        // First BD is for the influx, second for the outflow
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("" +
+                " SELECT AVG(rv.val1) FROM ResValue rv " +
+                " WHERE rv.resident = :resident " +
+                " AND rv.replacedBy IS NULL " +
+                " AND rv.vtype.valType = :valType" +
+                " AND rv.val1 >= 0 " +
+                " AND rv.pit >= :from" +
+                " AND rv.pit <= :to" +
+                " ORDER BY rv.pit DESC ");
+        query.setParameter("resident", resident);
+        query.setParameter("valType", LIQUIDBALANCE);
+        query.setParameter("from", from.toDate());
+        query.setParameter("from", to.plusDays(1).toDateTime().minusSeconds(1).toDate());
+        BigDecimal avg = (BigDecimal) query.getSingleResult();
+        em.close();
+
+        return avg == null ? BigDecimal.ZERO : avg;
     }
 
     public static HashMap<DateMidnight, BigDecimal> getLiquidIn(Resident resident, DateMidnight from) {
@@ -415,21 +631,6 @@ public class ResValueTools {
      * @return
      */
     public static ArrayList<Object[]> getNoStool() {
-//
-//            tbStool.setSelected(props.containsKey(KEY_STOOLDAYS) && !props.getProperty(KEY_STOOLDAYS).equals("off"));
-//        tbBalance.setSelected(props.containsKey(KEY_BALANCE) && !props.getProperty(KEY_BALANCE).equals("off"));
-//        tbLowIn.setSelected(props.containsKey(KEY_LOWIN) && !props.getProperty(KEY_LOWIN).equals("off"));
-//        tbHighIn.setSelected(props.containsKey(KEY_HIGHIN) && !props.getProperty(KEY_HIGHIN).equals("off"));
-//        boolean drinkon = tbBalance.isSelected() || tbLowIn.isSelected() || tbHighIn.isSelected();
-//        txtDaysDrink.setEnabled(drinkon);
-//        txtStoolDays.setText(tbStool.isSelected() ? props.getProperty(KEY_STOOLDAYS) : "");
-//        txtStoolDays.setEnabled(tbStool.isSelected());
-//        txtLowIn.setText(tbLowIn.isSelected() ? props.getProperty(KEY_LOWIN) : "");
-//        txtLowIn.setEnabled(tbLowIn.isSelected());
-//        txtHighIn.setText(tbHighIn.isSelected() ? props.getProperty(KEY_HIGHIN) : "");
-//        txtHighIn.setEnabled(tbHighIn.isSelected());
-//        txtDaysDrink.setText(drinkon ? props.getProperty(KEY_DAYSDRINK) : "");
-//        txtDaysDrink.setEnabled(drinkon);
 
         ArrayList<Resident> listResident = ResidentTools.getAllActive();
         ArrayList<Object[]> result = new ArrayList<Object[]>();
@@ -482,7 +683,7 @@ public class ResValueTools {
                 }
             }
 
-            if (!violatingValues.isEmpty()){
+            if (!violatingValues.isEmpty()) {
                 result.add(new Object[]{resident, violatingValues});
             }
         }

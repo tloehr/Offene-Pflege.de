@@ -388,7 +388,7 @@ public class NReportTools {
             if (listReports.isEmpty()) {
                 SYSConst.html_bold(OPDE.lang.getString("misc.msg.nodata"));
             } else {
-                html.append("<table  id=\"fonttext\" border=\"1\">" +
+                html.append("<table id=\"fonttext\" border=\"1\">" +
                         SYSConst.html_table_tr(
                                 SYSConst.html_table_th(OPDE.lang.getString("misc.msg.Date")) +
                                         SYSConst.html_table_th(OPDE.lang.getString("misc.msg.Text")) +

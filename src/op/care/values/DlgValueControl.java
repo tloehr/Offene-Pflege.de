@@ -19,6 +19,7 @@ import org.apache.commons.collections.Closure;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.math.BigDecimal;
 import java.util.Properties;
 
 /**
@@ -67,7 +68,7 @@ public class DlgValueControl extends MyJDialog {
         tbHighIn = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".tbHighIn.tooltip"));
         tbHighIn.setHorizontalAlignment(SwingConstants.LEFT);
         tbHighIn.setFont(SYSConst.ARIAL14BOLD);
-        panel1.add(tbHighIn, CC.xy(3, 19));
+        panel1.add(tbHighIn, CC.xy(3, 15));
 
         lblDaysDrink.setText(OPDE.lang.getString(internalClassID + ".lblDaysDrink.tooltip"));
         lblDayStool.setText(OPDE.lang.getString(internalClassID + ".lblDayStool.tooltip"));
@@ -84,6 +85,8 @@ public class DlgValueControl extends MyJDialog {
         txtStoolDays.setEnabled(tbStool.isSelected());
         txtLowIn.setText(tbLowIn.isSelected() ? props.getProperty(ResidentTools.KEY_LOWIN) : "");
         txtLowIn.setEnabled(tbLowIn.isSelected());
+        txtTargetIn.setText(tbBalance.isSelected() ? props.getProperty(ResidentTools.KEY_TARGETIN) : "");
+        txtTargetIn.setEnabled(tbBalance.isSelected());
         txtHighIn.setText(tbHighIn.isSelected() ? props.getProperty(ResidentTools.KEY_HIGHIN) : "");
         txtHighIn.setEnabled(tbHighIn.isSelected());
         txtDaysDrink.setText(drinkon ? props.getProperty(ResidentTools.KEY_DAYSDRINK) : "");
@@ -100,6 +103,8 @@ public class DlgValueControl extends MyJDialog {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
                 setTxtDaysDrink();
+                txtTargetIn.setText(itemEvent.getStateChange() == ItemEvent.SELECTED ? "1400" : "");
+                txtTargetIn.setEnabled(tbBalance.isSelected());
             }
         });
         tbLowIn.addItemListener(new ItemListener() {
@@ -139,16 +144,25 @@ public class DlgValueControl extends MyJDialog {
     private boolean saveOK() {
         boolean drinkon = tbBalance.isSelected() || tbLowIn.isSelected() || tbHighIn.isSelected();
 
+        BigDecimal highin = SYSTools.parseDecimal(txtHighIn.getText());
+        BigDecimal targetin = SYSTools.parseDecimal(txtTargetIn.getText());
+        BigDecimal lowin = SYSTools.parseDecimal(txtLowIn.getText());
+
         boolean stoolOK = !tbStool.isSelected() || SYSTools.parseDecimal(txtStoolDays.getText()) != null;
-        boolean highinOK = !tbHighIn.isSelected() || SYSTools.parseDecimal(txtHighIn.getText()) != null;
-        boolean lowinOK = !tbLowIn.isSelected() || SYSTools.parseDecimal(txtLowIn.getText()) != null;
+        boolean highinOK = !tbHighIn.isSelected() || highin != null;
+        boolean targetinOK = !tbBalance.isSelected() || targetin != null;
+        boolean lowinOK = !tbLowIn.isSelected() || lowin != null;
         boolean daysOK = !drinkon || SYSTools.parseDecimal(txtDaysDrink.getText()) != null;
+
+        boolean sanityOK = aLESSb(lowin, targetin) && aLESSb(lowin, highin) && aLESSb(targetin, highin);
 
         String reason = "";
         reason += (stoolOK ? "" : OPDE.lang.getString(internalClassID + ".stoolXX"));
         reason += (highinOK ? "" : OPDE.lang.getString(internalClassID + ".highinXX"));
         reason += (lowinOK ? "" : OPDE.lang.getString(internalClassID + ".lowinXX"));
         reason += (daysOK ? "" : OPDE.lang.getString(internalClassID + ".daysdrinkXX"));
+        reason += (sanityOK ? "" : OPDE.lang.getString(internalClassID + ".sanityXX"));
+        reason += (targetinOK ? "" : OPDE.lang.getString(internalClassID + ".targetinXX"));
 
         if (!reason.isEmpty()) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(reason, DisplayMessage.WARNING));
@@ -157,11 +171,19 @@ public class DlgValueControl extends MyJDialog {
 
     }
 
+    private boolean aLESSb(BigDecimal a, BigDecimal b){
+        if (a == null || b == null){
+            return true;
+        }
+        return a.compareTo(b) < 0;
+    }
+
     private void save() {
         boolean drinkon = tbBalance.isSelected() || tbLowIn.isSelected() || tbHighIn.isSelected();
         props.setProperty(ResidentTools.KEY_STOOLDAYS, tbStool.isSelected() ? txtStoolDays.getText() : "off");
         props.setProperty(ResidentTools.KEY_BALANCE, tbBalance.isSelected() ? "on" : "off");
         props.setProperty(ResidentTools.KEY_LOWIN, tbLowIn.isSelected() ? txtLowIn.getText() : "off");
+        props.setProperty(ResidentTools.KEY_TARGETIN, tbBalance.isSelected() ? txtTargetIn.getText() : "off");
         props.setProperty(ResidentTools.KEY_HIGHIN, tbHighIn.isSelected() ? txtHighIn.getText() : "off");
         props.setProperty(ResidentTools.KEY_DAYSDRINK, drinkon ? txtDaysDrink.getText() : "off");
     }
@@ -182,14 +204,21 @@ public class DlgValueControl extends MyJDialog {
         txtDaysDrink.setText(SYSTools.parseDecimal(txtDaysDrink.getText()).toString());
     }
 
+    private void txtTargetInFocusLost(FocusEvent e) {
+        txtTargetIn.setText(SYSTools.parseDecimal(txtTargetIn.getText()).toString());
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         panel1 = new JPanel();
         lblDayStool = new JLabel();
         txtStoolDays = new JTextField();
         separator1 = new JSeparator();
+        separator2 = new JSeparator();
         lblMin = new JLabel();
         txtLowIn = new JTextField();
+        lblTarget = new JLabel();
+        txtTargetIn = new JTextField();
         lblMax = new JLabel();
         txtHighIn = new JTextField();
         lblDaysDrink = new JLabel();
@@ -206,7 +235,7 @@ public class DlgValueControl extends MyJDialog {
         {
             panel1.setLayout(new FormLayout(
                 "13dlu, $lcgap, default:grow, $lcgap, 13dlu",
-                "13dlu, 13*($lgap, default), $pgap, default, $lgap, 13dlu"));
+                "13dlu, 16*($lgap, default), $pgap, default, $lgap, 13dlu"));
 
             //---- lblDayStool ----
             lblDayStool.setText("tage ohne stuhlgang");
@@ -224,11 +253,12 @@ public class DlgValueControl extends MyJDialog {
             });
             panel1.add(txtStoolDays, CC.xy(3, 7));
             panel1.add(separator1, CC.xy(3, 9));
+            panel1.add(separator2, CC.xy(3, 17));
 
             //---- lblMin ----
             lblMin.setText("min menge in 24h");
             lblMin.setFont(new Font("Arial", Font.PLAIN, 14));
-            panel1.add(lblMin, CC.xy(3, 15));
+            panel1.add(lblMin, CC.xy(3, 19));
 
             //---- txtLowIn ----
             txtLowIn.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -239,12 +269,28 @@ public class DlgValueControl extends MyJDialog {
                     txtLowInFocusLost(e);
                 }
             });
-            panel1.add(txtLowIn, CC.xy(3, 17));
+            panel1.add(txtLowIn, CC.xy(3, 21));
+
+            //---- lblTarget ----
+            lblTarget.setText("zieltrink menge in 24h");
+            lblTarget.setFont(new Font("Arial", Font.PLAIN, 14));
+            panel1.add(lblTarget, CC.xy(3, 23));
+
+            //---- txtTargetIn ----
+            txtTargetIn.setFont(new Font("Arial", Font.PLAIN, 14));
+            txtTargetIn.setEnabled(false);
+            txtTargetIn.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusLost(FocusEvent e) {
+                    txtTargetInFocusLost(e);
+                }
+            });
+            panel1.add(txtTargetIn, CC.xy(3, 25));
 
             //---- lblMax ----
             lblMax.setText("max menge in 24h");
             lblMax.setFont(new Font("Arial", Font.PLAIN, 14));
-            panel1.add(lblMax, CC.xy(3, 21));
+            panel1.add(lblMax, CC.xy(3, 27));
 
             //---- txtHighIn ----
             txtHighIn.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -255,12 +301,12 @@ public class DlgValueControl extends MyJDialog {
                     txtHighInFocusLost(e);
                 }
             });
-            panel1.add(txtHighIn, CC.xy(3, 23));
+            panel1.add(txtHighIn, CC.xy(3, 29));
 
             //---- lblDaysDrink ----
             lblDaysDrink.setText("kontrollzeitraum tage");
             lblDaysDrink.setFont(new Font("Arial", Font.PLAIN, 14));
-            panel1.add(lblDaysDrink, CC.xy(3, 25));
+            panel1.add(lblDaysDrink, CC.xy(3, 31));
 
             //---- txtDaysDrink ----
             txtDaysDrink.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -271,7 +317,7 @@ public class DlgValueControl extends MyJDialog {
                     txtDaysDrinkFocusLost(e);
                 }
             });
-            panel1.add(txtDaysDrink, CC.xy(3, 27));
+            panel1.add(txtDaysDrink, CC.xy(3, 33));
 
             //======== panel2 ========
             {
@@ -299,10 +345,10 @@ public class DlgValueControl extends MyJDialog {
                 });
                 panel2.add(btnApply);
             }
-            panel1.add(panel2, CC.xy(3, 29, CC.RIGHT, CC.DEFAULT));
+            panel1.add(panel2, CC.xy(3, 35, CC.RIGHT, CC.DEFAULT));
         }
         contentPane.add(panel1);
-        setSize(540, 440);
+        setSize(540, 665);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
@@ -312,8 +358,11 @@ public class DlgValueControl extends MyJDialog {
     private JLabel lblDayStool;
     private JTextField txtStoolDays;
     private JSeparator separator1;
+    private JSeparator separator2;
     private JLabel lblMin;
     private JTextField txtLowIn;
+    private JLabel lblTarget;
+    private JTextField txtTargetIn;
     private JLabel lblMax;
     private JTextField txtHighIn;
     private JLabel lblDaysDrink;

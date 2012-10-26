@@ -257,7 +257,7 @@ public class SYSConst {
         return "<th>"+content+"</t1>\n";
     }
     public static String html_table_td(String content){
-        return "<td>"+content+"</td>\n";
+        return "<td "++">"+content+"</td>\n";
     }
     public static String html_table_tr(String content){
         return "<tr>"+content+"</tr>\n";
@@ -270,6 +270,18 @@ public class SYSConst {
     }
     public static String html_div(String content){
         return "<div id=\"fonttext\">\n"+content+"</div>\n";
+    }
+    public static String html_h1(String content){
+        return "<h1 id=\"fonth1\" >"+content+"</h1>\n";
+    }
+    public static String html_h2(String content){
+        return "<h2 id=\"fonth2\" >"+content+"</h2>\n";
+    }
+    public static String html_h3(String content){
+        return "<h3 id=\"fonth2\" >"+content+"</h3>\n";
+    }
+    public static String html_table(String content, String border){
+        return "<table id=\"fonttext\" border=\""+border+"\">"+content+"</table>\n";
     }
 
     public static final String html_div_open = "<div id=\"fonttext\">";

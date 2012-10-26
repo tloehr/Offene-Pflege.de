@@ -748,7 +748,7 @@ public class PnlValues extends NursingRecordsPanel {
                     });
                 }
                 if (resValue.isReplacement()) {
-                    pnlTitle.getButton().setIcon(SYSConst.icon22infoblue);
+                    pnlTitle.getButton().setIcon(SYSConst.icon22edited);
                     pnlTitle.getButton().addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
