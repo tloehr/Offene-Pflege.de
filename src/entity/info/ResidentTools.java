@@ -10,6 +10,7 @@ import entity.nursingprocess.NursingProcessTools;
 import entity.prescription.MedInventoryTools;
 import entity.prescription.PrescriptionTools;
 import entity.process.QProcessTools;
+import entity.values.ResValueTools;
 import op.OPDE;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
@@ -166,9 +167,34 @@ public class ResidentTools {
     }
 
     public static ArrayList<Resident> getAllActive() {
-        //TODO: We surely need also a getAllActive(DateMidnight month).
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM Resident b WHERE b.station IS NOT NULL ORDER BY b.name, b.firstname");
+        ArrayList<Resident> list = new ArrayList<Resident>(query.getResultList());
+        em.close();
+        return list;
+    }
+
+    /**
+     * retrieves a list of all residents who were staying in the home during that particular
+     * month. They are also included if they have left or arrived in that time period.
+     * @param month
+     * @return
+     */
+    public static ArrayList<Resident> getAllActive(DateMidnight month) {
+        DateTime from = month.dayOfMonth().withMinimumValue().toDateTime();
+        DateTime to = month.dayOfMonth().withMaximumValue().plusDays(1).toDateTime().minusSeconds(1);
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery(" " +
+                " SELECT b FROM Resident b " +
+                " JOIN b.resInfoCollection rinfo" +
+                " WHERE rinfo.bwinfotyp.bwinftyp = :type " +
+                " AND ((rinfo.from <= :from AND rinfo.to >= :from) OR " +
+                " (rinfo.from <= :to AND rinfo.to >= :to) OR " +
+                " (rinfo.from > :from AND rinfo.to < :to)) " +
+                " ORDER BY b.name, b.firstname");
+        query.setParameter("type", ResInfoTypeTools.TYPE_STAY);
+        query.setParameter("from", from.toDate());
+        query.setParameter("to", to.toDate());
         ArrayList<Resident> list = new ArrayList<Resident>(query.getResultList());
         em.close();
         return list;

@@ -254,34 +254,37 @@ public class SYSConst {
     public static final String html_h3_open = "<h3 id=\"fonth3\" >";
     public static final String html_h3_close = "</h3>";
     public static String html_table_th(String content){
-        return "<th>"+content+"</t1>\n";
+        return "<th>"+SYSTools.xx(content)+"</t1>\n";
+    }
+    public static String html_table_td(String content, String align){
+        return "<td "+SYSTools.catchNull(align,"align=\"","\"")+">"+SYSTools.xx(content)+"</td>\n";
     }
     public static String html_table_td(String content){
-        return "<td "++">"+content+"</td>\n";
+        return html_table_td(content, null);
     }
     public static String html_table_tr(String content){
-        return "<tr>"+content+"</tr>\n";
+        return "<tr>"+SYSTools.xx(content)+"</tr>\n";
     }
     public static String html_bold(String content){
-        return "<b>"+content+"</b>";
+        return "<b>"+SYSTools.xx(content)+"</b>";
     }
     public static String html_paragraph(String content){
-        return "<p>\n"+content+"</p>\n";
+        return "<p>\n"+SYSTools.xx(content)+"</p>\n";
     }
     public static String html_div(String content){
-        return "<div id=\"fonttext\">\n"+content+"</div>\n";
+        return "<div id=\"fonttext\">\n"+SYSTools.xx(content)+"</div>\n";
     }
     public static String html_h1(String content){
-        return "<h1 id=\"fonth1\" >"+content+"</h1>\n";
+        return "<h1 id=\"fonth1\" >"+SYSTools.xx(content)+"</h1>\n";
     }
     public static String html_h2(String content){
-        return "<h2 id=\"fonth2\" >"+content+"</h2>\n";
+        return "<h2 id=\"fonth2\" >"+SYSTools.xx(content)+"</h2>\n";
     }
     public static String html_h3(String content){
-        return "<h3 id=\"fonth2\" >"+content+"</h3>\n";
+        return "<h3 id=\"fonth2\" >"+SYSTools.xx(content)+"</h3>\n";
     }
     public static String html_table(String content, String border){
-        return "<table id=\"fonttext\" border=\""+border+"\">"+content+"</table>\n";
+        return "<table id=\"fonttext\" border=\""+border+"\">"+SYSTools.xx(content)+"</table>\n";
     }
 
     public static final String html_div_open = "<div id=\"fonttext\">";

@@ -6,6 +6,7 @@ import entity.prescription.PrescriptionTools;
 import entity.reports.NReportTools;
 import entity.values.ResValue;
 import entity.values.ResValueTools;
+import entity.values.ResValueTypesTools;
 import op.OPDE;
 import op.tools.*;
 import org.joda.time.DateTime;
@@ -557,7 +558,7 @@ public class ResInfoTools {
          *      \____|_|  \___/| ||_/\___/_/  \____|\___| \_/\_/ |_|\___|_| |_|\__/_/  |____/|_|  |_|___|
          *                     |_|
          */
-        ResValue weight = ResValueTools.getLast(bewohner, ResValueTools.WEIGHT);
+        ResValue weight = ResValueTools.getLast(bewohner, ResValueTypesTools.WEIGHT);
         result += "<tr><td valign=\"top\">Zuletzt bestimmtes Körpergewicht</td><td valign=\"top\"><b>";
         if (weight == null) {
             result += "Die/der BW wurde noch nicht gewogen.";
@@ -566,7 +567,7 @@ public class ResInfoTools {
         }
         result += "</b></td></tr>";
 
-        ResValue height = ResValueTools.getLast(bewohner, ResValueTools.HEIGHT);
+        ResValue height = ResValueTools.getLast(bewohner, ResValueTypesTools.HEIGHT);
         result += "<tr><td valign=\"top\">Zuletzt bestimmte Körpergröße</td><td valign=\"top\"><b>";
         if (height == null) {
             result += "Bisher wurde noch keine Körpergröße ermittelt.";
@@ -592,7 +593,7 @@ public class ResInfoTools {
          *     |____/____|
          *
          */
-        ResValue bz = ResValueTools.getLast(bewohner, ResValueTools.GLUCOSE);
+        ResValue bz = ResValueTools.getLast(bewohner, ResValueTypesTools.GLUCOSE);
         result += "<tr><td valign=\"top\">Zuletzt gemessener BZ</td><td valign=\"top\"><b>";
         if (bz == null) {
             result += "Bisher kein BZ Wert vorhanden.";
@@ -781,10 +782,10 @@ public class ResInfoTools {
                         + "ORDER BY aus.PIT desc";
                 Query query = em.createNativeQuery(sql);
                 query.setParameter(1, bewohner.getRID());
-                query.setParameter(2, ResValueTools.LIQUIDBALANCE);
+                query.setParameter(2, ResValueTypesTools.LIQUIDBALANCE);
                 query.setParameter(3, new DateTime().minusWeeks(1).toDateMidnight().toDate());
                 query.setParameter(4, bewohner.getRID());
-                query.setParameter(5, ResValueTools.LIQUIDBALANCE);
+                query.setParameter(5, ResValueTypesTools.LIQUIDBALANCE);
                 query.setParameter(6, new DateTime().minusWeeks(1).toDateMidnight().toDate());
 
                 List<Object[]> list = query.getResultList();
@@ -839,7 +840,7 @@ public class ResInfoTools {
 
                 Query query = em.createNativeQuery(sql);
                 query.setParameter(1, bewohner.getRID());
-                query.setParameter(2, ResValueTools.LIQUIDBALANCE);
+                query.setParameter(2, ResValueTypesTools.LIQUIDBALANCE);
                 query.setParameter(3, new DateTime().minusWeeks(1).toDateMidnight().toDate());
                 List<Object[]> list = query.getResultList();
                 em.close();

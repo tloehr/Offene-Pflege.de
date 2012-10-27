@@ -33,17 +33,6 @@ import java.util.*;
  */
 public class ResValueTools {
 
-    public static final short RR = 1;
-    public static final short PULSE = 2;
-    public static final short TEMP = 3;
-    public static final short GLUCOSE = 4;
-    public static final short WEIGHT = 5;
-    public static final short HEIGHT = 6;
-    public static final short BREATHING = 7;
-    public static final short QUICK = 8;
-    public static final short STOOL = 9;
-    public static final short VOMIT = 10;
-    public static final short LIQUIDBALANCE = 11;
 
 //    public static final String[] VALUES = new String[]{"UNKNOWN", "RR", "PULSE", "TEMP", "GLUCOSE", "WEIGHT", "HEIGHT", "BREATHING", "QUICK", "STOOL", "VOMIT", "LIQUIDBALANCE"};
 
@@ -216,7 +205,7 @@ public class ResValueTools {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT SUM(b.val1) FROM ResValue b WHERE b.val1 > 0 AND b.replacedBy IS NULL AND b.resident = :bewohner AND b.vtype.valType = :type AND b.pit >= :pit ");
         query.setParameter("bewohner", bewohner);
-        query.setParameter("type", ResValueTools.LIQUIDBALANCE);
+        query.setParameter("type", ResValueTypesTools.LIQUIDBALANCE);
         query.setParameter("pit", new DateTime().minusWeeks(1).toDateMidnight().toDate());
 
         BigDecimal sumwert = (BigDecimal) query.getSingleResult();
@@ -231,7 +220,7 @@ public class ResValueTools {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT SUM(b.val1) FROM ResValue b WHERE b.val1 < 0 AND b.replacedBy IS NULL AND b.resident = :bewohner AND b.vtype.valType = :type AND b.pit >= :pit ");
         query.setParameter("bewohner", bewohner);
-        query.setParameter("type", ResValueTools.LIQUIDBALANCE);
+        query.setParameter("type", ResValueTypesTools.LIQUIDBALANCE);
         query.setParameter("pit", new DateTime().minusWeeks(1).toDateMidnight().toDate());
 
         BigDecimal sumwert = (BigDecimal) query.getSingleResult();
@@ -300,9 +289,9 @@ public class ResValueTools {
 
     public static String getValueAsHTML(ResValue rv) {
         String result = (rv.isDeleted() || rv.isReplaced() ? "<s>" : "");
-        if (rv.getType().getValType() == RR) {
+        if (rv.getType().getValType() == ResValueTypesTools.RR) {
             result += "<b>" + rv.getVal1() + "/" + rv.getVal2() + " " + rv.getType().getUnit1() + " " + rv.getType().getLabel3() + ": " + rv.getVal3() + " " + rv.getType().getUnit3() + "</b>";
-        } else if (rv.getType().getValType() == STOOL || rv.getType().getValType() == VOMIT) {
+        } else if (rv.getType().getValType() == ResValueTypesTools.STOOL || rv.getType().getValType() == ResValueTypesTools.VOMIT) {
             result += "<i>" + SYSTools.catchNull(rv.getText(), "--") + "</i>";
         } else {
             result += "<b>" + rv.getVal1() + " " + rv.getType().getUnit1() + "</b>";
@@ -312,15 +301,12 @@ public class ResValueTools {
     }
 
     public static String getLiquidBalance(DateMidnight month, Closure progress) {
-        //TODO: getAllActive(DateMidnight month)
-        ArrayList<Resident> listResidents = ResidentTools.getAllActive();
+        ArrayList<Resident> listResidents = ResidentTools.getAllActive(month);
         Format monthFormmatter = new SimpleDateFormat("MMMM yyyy");
         DateTime from = month.dayOfMonth().withMinimumValue().toDateTime();
         DateTime to = month.dayOfMonth().withMaximumValue().plusDays(1).toDateTime().minusSeconds(1);
 
         int p = -1;
-        boolean isCancelled = false;
-
         progress.execute(new Pair<Integer, Integer>(p, listResidents.size()));
 
 //        BigDecimal sum = BigDecimal.ZERO;
@@ -441,10 +427,10 @@ public class ResValueTools {
                 for (DateMidnight day : listDays) {
                     BigDecimal linesum = balanceMap.get(day).getFirst().add(balanceMap.get(day).getSecond());
                     table.append(SYSConst.html_table_tr(
-                            SYSConst.html_table_td(DateFormat.getDateInstance().format(day.toDate())) +
-                                    SYSConst.html_table_td(balanceMap.get(day).getFirst().setScale(2, RoundingMode.HALF_UP).toString()) +
-                                    SYSConst.html_table_td(balanceMap.get(day).getSecond().setScale(2, RoundingMode.HALF_UP).toString()) +
-                                    SYSConst.html_table_td(linesum.setScale(2, RoundingMode.HALF_UP).toString())
+                            SYSConst.html_table_td(DateFormat.getDateInstance().format(day.toDate()), null) +
+                                    SYSConst.html_table_td(balanceMap.get(day).getFirst().setScale(2, RoundingMode.HALF_UP).toString(), "right") +
+                                    SYSConst.html_table_td(balanceMap.get(day).getSecond().setScale(2, RoundingMode.HALF_UP).toString(), "right") +
+                                    SYSConst.html_table_td(linesum.setScale(2, RoundingMode.HALF_UP).toString(), "right")
                     ));
 
                 }
@@ -500,6 +486,183 @@ public class ResValueTools {
         return html.toString();
     }
 
+
+    public static String getWeightStats(int monthsback, Closure progress) {
+        int p = -1;
+        progress.execute(new Pair<Integer, Integer>(p, 100));
+
+        // TODO: hier gehts weiter. mögliche exception hier!!
+
+        DateMidnight from = new DateMidnight().minusMonths(monthsback).dayOfMonth().withMinimumValue();
+        EntityManager em = OPDE.createEM();
+        DateFormat df = DateFormat.getDateInstance();
+
+        String jpql = " " +
+                " SELECT rv " +
+                " FROM ResValue rv " +
+                " WHERE rv.vtype.valType = :valType " +
+                " AND rv.resident.adminonly <> 2 " +
+                " AND rv.pit >= :from " +
+                " ORDER BY rv.resident, rv.pit ";
+
+        Query query = em.createQuery(jpql);
+        query.setParameter("valType", ResValueTypesTools.WEIGHT);
+        query.setParameter("from", from.toDate());
+
+        ArrayList<ResValue> listVal = new ArrayList<ResValue>(query.getResultList());
+
+        StringBuffer html = new StringBuffer(1000);
+
+        HashMap<Resident, ArrayList<ResValue>> listData = new HashMap<Resident, ArrayList<ResValue>>();
+        for (ResValue val : listVal) {
+            if (!listData.containsKey(val.getResident())) {
+                listData.put(val.getResident(), new ArrayList<ResValue>());
+            }
+            listData.get(val.getResident()).add(val);
+        }
+
+        ArrayList<Resident> listResidents = new ArrayList<Resident>(listData.keySet());
+        Collections.sort(listResidents);
+
+        html.append(SYSConst.html_h1(OPDE.lang.getString(PnlControlling.internalClassID + ".nutrition.weightstats")));
+        html.append(SYSConst.html_h2(OPDE.lang.getString("misc.msg.analysis") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
+
+        ResValueTypes heightType = ResValueTypesTools.getType(ResValueTypesTools.HEIGHT);
+        ResValueTypes weightType = ResValueTypesTools.getType(ResValueTypesTools.WEIGHT);
+        p = 0;
+
+        for (Resident resident : listResidents) {
+            progress.execute(new Pair<Integer, Integer>(p, listResidents.size()));
+            p++;
+
+            html.append(SYSConst.html_h3(ResidentTools.getBWLabelTextKompakt(resident)));
+
+            ResValue height = getLast(resident, ResValueTypesTools.HEIGHT);
+
+            html.append(
+                    SYSConst.html_div(
+                            heightType.getText() + ": " + (height == null ? OPDE.lang.getString("misc.msg.noentryyet") : OPDE.lang.getString(PnlControlling.internalClassID + ".nutrition.weightstats") + " " + heightType.getUnit1())
+                    )
+            );
+
+
+            BigDecimal prevWeight = null;
+            //double gewichtProzent = 0d;
+            BigDecimal bmiPlusMinus = BigDecimal.ZERO;
+            //double bmiProzent = 0d;
+            BigDecimal prevBMI = null;
+//            BigDecimal prevWeight = BigDecimal.ZERO;
+//                    double gr = 0d;
+//                    double startGewicht = 0d;
+//                    double startBMI = 0d;
+//                    double gewicht = 0d;
+//            BigDecimal bmi = BigDecimal.ZERO;
+
+            StringBuffer table = new StringBuffer(1000);
+            // "<tr><th>Datum</th><th>Gewicht</th><th>+-(%)</th><th>BMI</th><th>+-(%)</th></tr>"
+            table.append(SYSConst.html_table_tr(
+                    SYSConst.html_table_th("misc.msg.Date") +
+                            SYSConst.html_table_th(weightType.getText()) +
+                            SYSConst.html_table_th("+-") +
+                            SYSConst.html_table_th("BMI") +
+                            SYSConst.html_table_th("+-")
+            ));
+
+            for (ResValue weight : listData.get(resident)) {
+
+                BigDecimal bmi = height == null ? null : weight.getVal1().divide(height.getVal1().pow(2));
+
+                BigDecimal divWeight = prevWeight == null ? null : weight.getVal1().subtract(prevWeight);
+                BigDecimal divBMI = prevBMI == null ? null : bmi.subtract(prevBMI);
+
+                table.append(SYSConst.html_table_tr(
+                        SYSConst.html_table_td(df.format(weight.getPit())) +
+                                SYSConst.html_table_td(weight.getVal1().setScale(2, RoundingMode.HALF_UP).toString()) +
+                                SYSConst.html_table_td(SYSTools.catchNull(divWeight, "--")) +
+                                SYSConst.html_table_td(SYSTools.catchNull(bmi, "--")) +
+                                SYSConst.html_table_td(SYSTools.catchNull(divBMI, "--"))
+                ));
+
+                prevBMI = bmi;
+                prevWeight = weight.getVal1();
+
+//                if (!prev.equalsIgnoreCase(bwkennung)) {
+//                    prev = bwkennung;
+//                    if (rs.getRow() > 1) {
+//                        double bpm = bmi - startBMI;
+//                        double gpm = gewicht - startGewicht;
+//                        bpm = Math.round(bpm * 100d) / 100d;
+//                        gpm = Math.round(gpm * 100d) / 100d;
+//
+//                        s += "<tr><td>gesamter Zeitraum</td><td></td><td>" + gpm + " kg</td>";
+//                        s += "<td></td><td>" + bpm + "</td></tr>";
+//                        s += "</table>";
+//                    }
+//
+//                    String bwlabel = "";//SYSTools.getBWLabel(bwkennung);
+//
+//                    if (lbl != null) {
+//                        lbl.setText("Gewichtstatistik: " + bwlabel);
+//                    }
+//                    s += "<h" + (headertiefe + 2) + ">" + bwlabel + "</h" + (headertiefe + 2) + "> ";
+
+
+            }
+
+
+            html.append(SYSConst.html_table(table.toString(), "1"));
+
+//            gewicht = rs.getDouble("Wert");
+//            if (gr > 0) {
+//                bmi = gewicht / (gr * gr);
+//                bmi = Math.round(bmi * 100d) / 100d;
+//                bmiPlusMinus = bmi - prevBMI;
+//                bmiPlusMinus = Math.round(bmiPlusMinus * 100d) / 100d;
+//            } else {
+//                bmi = -1d;
+//            }
+//            gewichtPlusMinus = gewicht - prevGewicht;
+//            gewichtPlusMinus = Math.round(gewichtPlusMinus * 100d) / 100d;
+//
+//            if (bmi > 0) {
+//                if (prevBMI == 0d) {
+//                    s += "<tr><td>" + df.format(rs.getDate("Datum")) + "</td><td>" + gewicht + " kg</td><td>--</td>";
+//                    s += "<td>" + bmi + "</td><td>--</td></tr>";
+//                } else {
+//                    s += "<tr><td>" + df.format(rs.getDate("Datum")) + "</td><td>" + gewicht + " kg</td><td>" + gewichtPlusMinus + " kg</td>";
+//                    s += "<td>" + bmi + "</td><td>" + bmiPlusMinus + "</td></tr>";
+//                }
+//                prevGewicht = gewicht;
+//                prevBMI = bmi;
+//            } else {
+//                s += "<tr><td>" + df.format(rs.getDate("Datum")) + "</td><td>" + gewicht + " kg</td><td>" + gewichtPlusMinus + " kg</td>";
+//                s += "<td>??</td><td>?? </td></tr>";
+//            }
+//            isCancelled = (Boolean) o[2];
+//        }
+//        double bpm = bmi - startBMI;
+//        double gpm = gewicht - startGewicht;
+//        bpm = Math.round(bpm * 100d) / 100d;
+//        gpm = Math.round(gpm * 100d) / 100d;
+//
+//        s += "<tr><td>gesamter Zeitraum</td><td></td><td>" + gpm + " kg</td>";
+//        s += "<td></td><td>" + bpm + "</td></tr>";
+//        s += "</table>";
+//
+//
+//        isCancelled = (Boolean) o[2];
+//        if (isCancelled)
+//
+//        {
+//            s = "";
+//        }
+
+
+
+        }
+        return html.toString();
+    }
+
     public static HashMap<DateMidnight, Pair<BigDecimal, BigDecimal>> getLiquidBalancePerDay(Resident resident, DateMidnight from, DateMidnight to) {
         // First BD is for the influx, second for the outflow
         EntityManager em = OPDE.createEM();
@@ -512,7 +675,7 @@ public class ResValueTools {
                 " AND rv.pit <= :to" +
                 " ORDER BY rv.pit DESC ");
         query.setParameter("resident", resident);
-        query.setParameter("valType", LIQUIDBALANCE);
+        query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
         query.setParameter("from", from.toDate());
         query.setParameter("to", to.plusDays(1).toDateTime().minusSeconds(1).toDate());
         ArrayList<ResValue> list = null;
@@ -556,7 +719,7 @@ public class ResValueTools {
                 " AND rv.pit <= :to" +
                 " ORDER BY rv.pit DESC ");
         query.setParameter("resident", resident);
-        query.setParameter("valType", LIQUIDBALANCE);
+        query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
         query.setParameter("from", from.toDate());
         query.setParameter("from", to.plusDays(1).toDateTime().minusSeconds(1).toDate());
         BigDecimal avg = (BigDecimal) query.getSingleResult();
@@ -576,7 +739,7 @@ public class ResValueTools {
                 " AND rv.pit >= :from" +
                 " ORDER BY rv.pit DESC ");
         query.setParameter("resident", resident);
-        query.setParameter("valType", LIQUIDBALANCE);
+        query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
         query.setParameter("from", from.toDate());
         ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
         em.close();
@@ -605,7 +768,7 @@ public class ResValueTools {
                 " AND rv.pit >= :from" +
                 " ORDER BY rv.pit DESC ");
         query.setParameter("resident", resident);
-        query.setParameter("valType", LIQUIDBALANCE);
+        query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
         query.setParameter("from", from.toDate());
         ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
         em.close();
@@ -641,7 +804,7 @@ public class ResValueTools {
             Properties controlling = resident.getControlling();
             if (controlling.containsKey(ResidentTools.KEY_STOOLDAYS) && !controlling.getProperty(ResidentTools.KEY_STOOLDAYS).equals("off")) {
                 int days = Integer.parseInt(controlling.getProperty(ResidentTools.KEY_STOOLDAYS));
-                ResValue lastStool = getLast(resident, STOOL);
+                ResValue lastStool = getLast(resident, ResValueTypesTools.STOOL);
 
                 if (lastStool == null || lastStool.getPit().before(now.minusDays(days).toDate())) {
                     result.add(new Object[]{resident, lastStool, days});

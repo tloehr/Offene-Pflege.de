@@ -14,6 +14,7 @@ import op.tools.Pair;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 
@@ -367,14 +368,21 @@ public class NReportTools {
     }
 
 
-    public static String getBVActivites(DateMidnight from) {
+    public static String getBVActivites(DateMidnight from, Closure progress) {
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT);
         ArrayList<Resident> listResidents = ResidentTools.getAllActive();
         StringBuilder html = new StringBuilder(1000);
 
+        int p = -1;
+        progress.execute(new Pair<Integer, Integer>(p, listResidents.size()));
+
         html.append(SYSConst.html_h1_open + OPDE.lang.getString(PnlControlling.internalClassID + ".orga.bvactivities") + SYSConst.html_h1_close);
 
+        p = 0;
         for (Resident resident : listResidents) {
+            p++;
+            progress.execute(new Pair<Integer, Integer>(p, listResidents.size()));
+
             ArrayList<NReport> listReports = getBVActivities(resident, from);
 
             html.append(SYSConst.html_h2_open + ResidentTools.getBWLabelTextKompakt(resident) + SYSConst.html_h2_close);
@@ -386,7 +394,7 @@ public class NReportTools {
             }
 
             if (listReports.isEmpty()) {
-                SYSConst.html_bold(OPDE.lang.getString("misc.msg.nodata"));
+                html.append(SYSConst.html_div(SYSConst.html_bold(OPDE.lang.getString("misc.msg.nodata"))));
             } else {
                 html.append("<table id=\"fonttext\" border=\"1\">" +
                         SYSConst.html_table_tr(
@@ -397,9 +405,9 @@ public class NReportTools {
 
                 for (NReport nReport : listReports) {
                     html.append(SYSConst.html_table_tr(
-                            SYSConst.html_table_td(df.format(nReport.getPit())) +
-                                    SYSConst.html_table_td(SYSConst.html_paragraph(nReport.getText())) +
-                                    SYSConst.html_table_td(nReport.getUser().getFullname())
+                            SYSConst.html_table_td(df.format(nReport.getPit()), null) +
+                                    SYSConst.html_table_td(SYSConst.html_paragraph(nReport.getText()), null) +
+                                    SYSConst.html_table_td(nReport.getUser().getFullname(), null)
                     ));
                 }
                 html.append("</table>");

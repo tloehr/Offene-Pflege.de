@@ -234,7 +234,7 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
     }
 
     public boolean isWithoutValue() {
-        return vtype.getID() == ResValueTools.VOMIT || vtype.getID() == ResValueTools.STOOL;
+        return vtype.getID() == ResValueTypesTools.VOMIT || vtype.getID() == ResValueTypesTools.STOOL;
     }
 
     @Override

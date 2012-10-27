@@ -57,6 +57,7 @@ public class PnlControlling extends CleanablePanel {
     public static final String internalClassID = "opde.controlling";
     private JScrollPane jspSearch;
     Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
+    private Closure progressClosure;
 
     // Variables declaration - do not modify
 //GEN-BEGIN:variables
@@ -76,12 +77,13 @@ public class PnlControlling extends CleanablePanel {
      */
     public PnlControlling(JScrollPane jspSearch) {
         this.jspSearch = jspSearch;
-//        parent = this;
-//        isCancelled = false;
-//        initComponents();
-//        initForm();
-//        o = new Object[]{pbPart, lblProgress, isCancelled};
-//        setTitle(SYSTools.getWindowTitle("Controlling Cockpit"));
+        progressClosure = new Closure() {
+            @Override
+            public void execute(Object o) {
+                Pair<Integer, Integer> progress = (Pair<Integer, Integer>) o;
+                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress.getFirst(), progress.getSecond()));
+            }
+        };
         initComponents();
         initPanel();
         reloadDisplay();
@@ -168,8 +170,23 @@ public class PnlControlling extends CleanablePanel {
         btnBVActivities.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SYSFilesTools.print(NReportTools.getBVActivites(new DateMidnight().minusWeeks(Integer.parseInt(txtBVWeeksBack.getText()))), false);
-                SYSPropsTools.storeProp(internalClassID + "::bvactivitiesWeeksBack", txtBVWeeksBack.getText(), OPDE.getLogin().getUser());
+
+                OPDE.getMainframe().setBlocked(true);
+                SwingWorker worker = new SwingWorker() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        SYSPropsTools.storeProp(internalClassID + "::bvactivitiesWeeksBack", txtBVWeeksBack.getText(), OPDE.getLogin().getUser());
+                        SYSFilesTools.print(NReportTools.getBVActivites(new DateMidnight().minusWeeks(Integer.parseInt(txtBVWeeksBack.getText())), progressClosure), false);
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        OPDE.getDisplayManager().setProgressBarMessage(null);
+                        OPDE.getMainframe().setBlocked(false);
+                    }
+                };
+                worker.execute();
             }
         });
         pnlBV.add(btnBVActivities, BorderLayout.WEST);
@@ -190,19 +207,12 @@ public class PnlControlling extends CleanablePanel {
         btnLiquidBalance.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-//                btnLiquidBalance.setEnabled(false);
                 OPDE.getMainframe().setBlocked(true);
                 SwingWorker worker = new SwingWorker() {
                     @Override
                     protected Object doInBackground() throws Exception {
                         DateMidnight month = (DateMidnight) cmbLiquidBalanceMonth.getSelectedItem();
-                        SYSFilesTools.print(ResValueTools.getLiquidBalance(month, new Closure() {
-                            @Override
-                            public void execute(Object o) {
-                                Pair<Integer, Integer> progress = (Pair<Integer, Integer>) o;
-                                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress.getFirst(), progress.getSecond()));
-                            }
-                        }), false);
+                        SYSFilesTools.print(ResValueTools.getLiquidBalance(month, progressClosure), false);
                         return null;
                     }
 
@@ -210,7 +220,6 @@ public class PnlControlling extends CleanablePanel {
                     protected void done() {
                         OPDE.getDisplayManager().setProgressBarMessage(null);
                         OPDE.getMainframe().setBlocked(false);
-//                        btnLiquidBalance.setEnabled(true);
                     }
                 };
                 worker.execute();
@@ -227,6 +236,49 @@ public class PnlControlling extends CleanablePanel {
         pnlLiquidBalance.add(cmbLiquidBalanceMonth, BorderLayout.EAST);
         pnlContent.add(pnlLiquidBalance);
 
+        /***
+         *                   _       _     _         _        _   _     _   _
+         *     __      _____(_) __ _| |__ | |_   ___| |_ __ _| |_(_)___| |_(_) ___ ___
+         *     \ \ /\ / / _ \ |/ _` | '_ \| __| / __| __/ _` | __| / __| __| |/ __/ __|
+         *      \ V  V /  __/ | (_| | | | | |_  \__ \ || (_| | |_| \__ \ |_| | (__\__ \
+         *       \_/\_/ \___|_|\__, |_| |_|\__| |___/\__\__,_|\__|_|___/\__|_|\___|___/
+         *                     |___/
+         */
+        JPanel pnlWeight = new JPanel(new BorderLayout());
+        final JButton btnWeightStats = GUITools.createHyperlinkButton(internalClassID + ".nutrition.weightstats", null, null);
+        int wsMonthsBack;
+        try {
+            wsMonthsBack = Integer.parseInt(OPDE.getProps().getProperty(internalClassID + "::wsMonthsBack"));
+        } catch (NumberFormatException nfe) {
+            wsMonthsBack = 7;
+        }
+        final JTextField txtWSMonthsBack = GUITools.createIntegerTextField(1, 24, wsMonthsBack);
+        txtWSMonthsBack.setToolTipText(OPDE.lang.getString("misc.msg.monthsback"));
+        btnWeightStats.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                OPDE.getMainframe().setBlocked(true);
+                SwingWorker worker = new SwingWorker() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        SYSPropsTools.storeProp(internalClassID + "::wsMonthsBack", txtWSMonthsBack.getText(), OPDE.getLogin().getUser());
+                        SYSFilesTools.print(ResValueTools.getWeightStats(Integer.parseInt(txtWSMonthsBack.getText()), progressClosure), false);
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        OPDE.getDisplayManager().setProgressBarMessage(null);
+                        OPDE.getMainframe().setBlocked(false);
+                    }
+                };
+                worker.execute();
+            }
+        });
+        pnlWeight.add(btnWeightStats, BorderLayout.WEST);
+        pnlWeight.add(txtWSMonthsBack, BorderLayout.EAST);
+        pnlContent.add(pnlWeight);
 
         return pnlContent;
     }

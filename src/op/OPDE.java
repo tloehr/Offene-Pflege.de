@@ -39,6 +39,7 @@ import op.threads.PrintProcessor;
 import op.tools.*;
 import org.apache.commons.cli.*;
 import org.apache.log4j.*;
+import org.eclipse.persistence.logging.JavaLog;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -548,7 +549,7 @@ public class OPDE {
             // Turn of JPA Cache
             jpaProps.put("eclipselink.cache.shared.default", "false");
             jpaProps.put("eclipselink.session.customizer", "op.system.JPAEclipseLinkSessionCustomizer");
-//            jpaProps.put("eclipselink.logging.level", JavaLog.OFF_LABEL);
+//            jpaProps.put("eclipselink.logging.level", JavaLog.FINE_LABEL);
             emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
 
             /***
