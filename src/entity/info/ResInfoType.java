@@ -58,8 +58,8 @@ public class ResInfoType implements Serializable {
     @Lob
     @Column(name = "BWInfoLang")
     private String bWInfoLang;
-    @Column(name = "Status")
-    private Integer status;
+    @Column(name = "type")
+    private Integer type;
     @Column(name = "IntervalMode")
     private Short intervalMode;
     @Version
@@ -125,12 +125,8 @@ public class ResInfoType implements Serializable {
         this.resInfoCat = resInfoCat;
     }
 
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
+    public Integer getType() {
+        return type;
     }
 
     public Short getIntervalMode() {
@@ -142,7 +138,7 @@ public class ResInfoType implements Serializable {
     }
 
     public boolean isObsolete(){
-        return status < 0;
+        return type < 0;
     }
 
     @Override

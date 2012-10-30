@@ -6,7 +6,6 @@ package op.tools;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import com.sun.org.apache.bcel.internal.generic.NEW;
 import com.toedter.calendar.JDateChooser;
 import op.OPDE;
 import org.joda.time.DateTime;
@@ -31,11 +30,11 @@ public class PnlPIT extends JPanel {
     private Date max, min;
     //TODO: Catch entries that are way too old
     public PnlPIT() {
-        this(new Date(), new Date(), SYSConst.DATE_VON_ANFANG_AN);
+        this(new Date(), new Date(), SYSConst.DATE_VERY_BEGINNING);
     }
 
     public PnlPIT(Date preset) {
-        this(preset, new Date(), SYSConst.DATE_VON_ANFANG_AN);
+        this(preset, new Date(), SYSConst.DATE_VERY_BEGINNING);
     }
 
     public PnlPIT(Date preset, Date max, Date min) {
@@ -46,8 +45,8 @@ public class PnlPIT extends JPanel {
         labelUhrzeit.setText(OPDE.lang.getString("misc.msg.Time.long"));
         this.preset = preset;
         jdcDatum.setDate(preset);
-        jdcDatum.setMaxSelectableDate(max == null ? SYSConst.DATE_BIS_AUF_WEITERES : max);
-        jdcDatum.setMinSelectableDate(min == null ? SYSConst.DATE_VON_ANFANG_AN : min);
+        jdcDatum.setMaxSelectableDate(max == null ? SYSConst.DATE_UNTIL_FURTHER_NOTICE : max);
+        jdcDatum.setMinSelectableDate(min == null ? SYSConst.DATE_VERY_BEGINNING : min);
         uhrzeit = new Time(preset.getTime());
         txtUhrzeit.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(uhrzeit));
     }

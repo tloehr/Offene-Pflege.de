@@ -309,60 +309,7 @@ public class ResValueTools {
         int p = -1;
         progress.execute(new Pair<Integer, Integer>(p, listResidents.size()));
 
-//        BigDecimal sum = BigDecimal.ZERO;
-
         StringBuilder html = new StringBuilder(1000);
-//        String sqlVormonat = "" +
-//                " SELECT avg(ein.EINFUHR) Einfuhr, ifnull(avg(aus.AUSFUHR), 0) Ausfuhr, ifnull(sum(ein.EINFUHR)+sum(aus.AUSFUHR), 0) BILANZ FROM " +
-//                " (" +
-//                "   SELECT Pit, Date(PIT), bw.BWKennung, SUM(Wert) AUSFUHR FROM BWerte bw" +
-//                "   WHERE ReplacedBy = 0 AND Wert < 0 AND bw.BWKennung = ? AND XML='<BILANZ/>' AND Date(PIT) >= DATE(?) AND Date(PIT) <= DATE(?)" +
-//                "   GROUP BY bw.BWKennung, Date(PIT) " +
-//                " ) aus " +
-//                " RIGHT OUTER JOIN " +
-//                " (" +
-//                "   SELECT Pit, Date(PIT), bw.BWKennung, SUM(Wert) EINFUHR FROM BWerte bw " +
-//                "   WHERE ReplacedBy = 0 AND Wert > 0 AND bw.BWKennung = ? AND XML='<BILANZ/>' AND Date(PIT) >= DATE(?) AND Date(PIT) <= DATE(?) " +
-//                "   GROUP BY bw.BWKennung, Date(PIT) " +
-//                " ) ein " +
-//                " ON aus.BWKennung = ein.BWKennung AND Date(aus.PIT) = Date(ein.PIT) " +
-//                " INNER JOIN Bewohner b ON ein.BWKennung = b.BWKennung " +
-//                " GROUP BY b.BWKennung ";
-//        String sql = "" +
-//                " SELECT ein.BWKennung, DATE_FORMAT(ein.PIT, '%d.%c.%Y') Datum, ein.Einfuhr, ifnull(aus.AUSFUHR, 0) Ausfuhr, ifnull((ein.EINFUHR+aus.AUSFUHR), 0) BILANZ FROM " +
-//                " ( " +
-//                "   SELECT PIT, bw.BWKennung, SUM(Wert) AUSFUHR FROM BWerte bw " +
-//                "   INNER JOIN Bewohner b ON b.BWKennung = bw.BWKennung " +
-//                "   WHERE ReplacedBy = 0 AND Wert < 0 AND AdminOnly <> 2 AND XML='<BILANZ/>' AND Date(PIT) >= DATE(?) AND Date(PIT) <= DATE(?) " +
-//                "   GROUP BY bw.BWKennung, Date(PIT) " +
-//                " ) aus " +
-//                " RIGHT OUTER JOIN " +
-//                " (" +
-//                "   SELECT PIT, bw.BWKennung, SUM(Wert) EINFUHR FROM BWerte bw " +
-//                "   INNER JOIN Bewohner b ON b.BWKennung = bw.BWKennung " +
-//                "   WHERE ReplacedBy = 0 AND Wert > 0 AND AdminOnly <> 2 AND XML='<BILANZ/>' AND Date(PIT) >= DATE(?) AND Date(PIT) <= DATE(?) " +
-//                "   GROUP BY bw.BWKennung, Date(PIT) " +
-//                " ) ein " +
-//                " ON aus.BWKennung = ein.BWKennung AND Date(aus.PIT) = Date(ein.PIT)" +
-//                " INNER JOIN Bewohner b ON ein.BWKennung = b.BWKennung " +
-//                " ORDER BY ein.BWKennung, Date(ein.PIT) ";
-
-
-//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-//            PreparedStatement stmtVormonat = OPDE.getDb().db.prepareStatement(sqlVormonat);
-//            stmt.setDate(1, new java.sql.Date(SYSCalendar.bom(monat).getTime()));
-//            stmt.setDate(2, new java.sql.Date(SYSCalendar.eom(monat).getTime()));
-//            stmt.setDate(3, new java.sql.Date(SYSCalendar.bom(monat).getTime()));
-//            stmt.setDate(4, new java.sql.Date(SYSCalendar.eom(monat).getTime()));
-//
-//            // BWKennung wird in der Schleife gesetzt.
-//            stmtVormonat.setDate(2, new java.sql.Date(SYSCalendar.bom(vormonat).getTime()));
-//            stmtVormonat.setDate(3, new java.sql.Date(SYSCalendar.eom(vormonat).getTime()));
-//            stmtVormonat.setDate(5, new java.sql.Date(SYSCalendar.bom(vormonat).getTime()));
-//            stmtVormonat.setDate(6, new java.sql.Date(SYSCalendar.eom(vormonat).getTime()));
-
-//            ResultSet rs = stmt.executeQuery();
-
 
         html.append(SYSConst.html_h1(OPDE.lang.getString(PnlControlling.internalClassID + ".nutrition.liquidbalance")));
         html.append(SYSConst.html_h2(monthFormmatter.format(month.toDate())));
@@ -379,40 +326,6 @@ public class ResValueTools {
                 html.append(SYSConst.html_div(SYSConst.html_bold(OPDE.lang.getString("misc.msg.targetDrink")) + ": " + targetIn.setScale(2, RoundingMode.HALF_UP).toString() + " ml"));
 
                 HashMap<DateMidnight, Pair<BigDecimal, BigDecimal>> balanceMap = getLiquidBalancePerDay(resident, from.toDateMidnight(), to.toDateMidnight());
-
-//                BigDecimal balance = BigDecimal.ZERO;
-
-//                if (rs.getRow() > 1) {
-//                    avgEin = avgEin / rows;
-//                    avgAus = avgAus / rows;
-//
-//                    avgEin = Math.round(avgEin * 100d) / 100d;
-//                    avgAus = Math.round(avgAus * 100d) / 100d;
-//                    //String.format(prev, arg1)
-//
-//
-//                    html.append("<tr><td></td><td>" + df.format(monat) + "</td><td>&Oslash; " + avgEin + "</td><td>&Oslash; " + avgAus + "</td><td>&Sigma; " + sumBilanz + "</td></tr>");
-//
-//                    // Vormonat berechnen
-//                    stmtVormonat.setString(1, prev);
-//                    stmtVormonat.setString(4, prev);
-//                    ResultSet rsVormonat = stmtVormonat.executeQuery();
-//
-//                    if (rsVormonat.first()) {
-//                        double avgEinVor = SYSTools.roundScale2(rsVormonat.getDouble("Einfuhr"));
-//                        double avgAusVor = SYSTools.roundScale2(rsVormonat.getDouble("Ausfuhr"));
-//                        double sumBilanzVor = SYSTools.roundScale2(rsVormonat.getDouble("Bilanz"));
-//                        html.append("<tr><td></td><td>" + df.format(vormonat) + "</td><td>&Oslash; " + avgEinVor + "</td><td>&Oslash; " + avgAusVor + "</td><td>&Sigma; " + sumBilanzVor + "</td></tr>");
-//                    }
-//
-//                    rsVormonat.close();
-//
-//                    html.append("</table>");
-//                    avgEin = 0;
-//                    avgAus = 0;
-//                    sumBilanz = 0;
-//                    rows = 0;
-//                }
 
                 ArrayList<DateMidnight> listDays = new ArrayList<DateMidnight>(balanceMap.keySet());
                 Collections.sort(listDays);
@@ -434,64 +347,25 @@ public class ResValueTools {
                     ));
 
                 }
-//                BigDecimal avgIn = BigDecimal.ZERO;
-//                BigDecimal avgOut = BigDecimal.ZERO;
-
 
                 html.append(SYSConst.html_table(table.toString(), "1"));
             }
-
-//
-//            for (int i = 1; i <= count; i++) {
-//                html.append("<td>");
-//                html.append(rs.getString(i));
-//                html.append("</td>");
-//            }
-//            if (zieltrink > 0) {
-//                html.append("<td>" + (rs.getDouble("Einfuhr") - zieltrink) + "</td>");
-//            }
-//            avgEin += rs.getDouble("Einfuhr");
-//            avgAus += rs.getDouble("Ausfuhr");
-//            sumBilanz += rs.getDouble("Bilanz");
-//
-//            html.append("</tr>");
-//            isCancelled = (Boolean) o[2];
         }
-//        avgEin = avgEin / rows;
-//        avgAus = avgAus / rows;
-//        avgEin = Math.round(avgEin * 100d) / 100d;
-//        avgAus = Math.round(avgAus * 100d) / 100d;
-//        html.append("<tr><td></td><td></td><td>&Oslash; " + avgEin + "</td><td>&Oslash; " + avgAus + "</td><td>&Sigma; " + sumBilanz + "</td></tr>");
-//        // Vormonat berechnen
-//        stmtVormonat.setString(1, bwkennung);
-//        stmtVormonat.setString(4, bwkennung);
-//        ResultSet rsVormonat = stmtVormonat.executeQuery();
-//
-//        if (rsVormonat.first()) {
-//            double avgEinVor = SYSTools.roundScale2(rsVormonat.getDouble("Einfuhr"));
-//            double avgAusVor = SYSTools.roundScale2(rsVormonat.getDouble("Ausfuhr"));
-//            double sumBilanzVor = SYSTools.roundScale2(rsVormonat.getDouble("Bilanz"));
-//            html.append("<tr><td></td><td>" + df.format(vormonat) + "</td><td>&Oslash; " + avgEinVor + "</td><td>&Oslash; " + avgAusVor + "</td><td>&Sigma; " + sumBilanzVor + "</td></tr>");
-//        }
-//
-//        rsVormonat.close();
-//        html.append("</table>");
-//
-//
-//        isCancelled = (Boolean) o[2];
-//        String s = "";
-//        if (!isCancelled) {
-//            s = html.toString();
-//        }
+
         return html.toString();
     }
 
-
+    /**
+     * creates a combined weight and bmi statistics for the given period in html. bmi is only calculated if there is a height available for the particular resident.
+     *
+     * @param monthsback number of months from now on. starts always at the beginning of that month.
+     * @param progress
+     * @return
+     */
     public static String getWeightStats(int monthsback, Closure progress) {
+        StringBuffer html = new StringBuffer(1000);
         int p = -1;
         progress.execute(new Pair<Integer, Integer>(p, 100));
-
-        // TODO: hier gehts weiter. mögliche exception hier!!
 
         DateMidnight from = new DateMidnight().minusMonths(monthsback).dayOfMonth().withMinimumValue();
         EntityManager em = OPDE.createEM();
@@ -503,15 +377,14 @@ public class ResValueTools {
                 " WHERE rv.vtype.valType = :valType " +
                 " AND rv.resident.adminonly <> 2 " +
                 " AND rv.pit >= :from " +
-                " ORDER BY rv.resident, rv.pit ";
+                " ORDER BY rv.resident.name, rv.resident.firstname, rv.pit ";
+
 
         Query query = em.createQuery(jpql);
         query.setParameter("valType", ResValueTypesTools.WEIGHT);
         query.setParameter("from", from.toDate());
-
         ArrayList<ResValue> listVal = new ArrayList<ResValue>(query.getResultList());
-
-        StringBuffer html = new StringBuffer(1000);
+        em.close();
 
         HashMap<Resident, ArrayList<ResValue>> listData = new HashMap<Resident, ArrayList<ResValue>>();
         for (ResValue val : listVal) {
@@ -541,28 +414,20 @@ public class ResValueTools {
 
             html.append(
                     SYSConst.html_div(
-                            heightType.getText() + ": " + (height == null ? OPDE.lang.getString("misc.msg.noentryyet") : OPDE.lang.getString(PnlControlling.internalClassID + ".nutrition.weightstats") + " " + heightType.getUnit1())
+                            heightType.getText() + ": " + (height == null ? OPDE.lang.getString("misc.msg.noentryyet") : height.getVal1().setScale(2, RoundingMode.HALF_UP).toString() + " " + heightType.getUnit1())
                     )
             );
 
 
             BigDecimal prevWeight = null;
-            //double gewichtProzent = 0d;
-            BigDecimal bmiPlusMinus = BigDecimal.ZERO;
-            //double bmiProzent = 0d;
             BigDecimal prevBMI = null;
-//            BigDecimal prevWeight = BigDecimal.ZERO;
-//                    double gr = 0d;
-//                    double startGewicht = 0d;
-//                    double startBMI = 0d;
-//                    double gewicht = 0d;
-//            BigDecimal bmi = BigDecimal.ZERO;
 
             StringBuffer table = new StringBuffer(1000);
-            // "<tr><th>Datum</th><th>Gewicht</th><th>+-(%)</th><th>BMI</th><th>+-(%)</th></tr>"
+
             table.append(SYSConst.html_table_tr(
                     SYSConst.html_table_th("misc.msg.Date") +
                             SYSConst.html_table_th(weightType.getText()) +
+                            SYSConst.html_table_th("misc.msg.comment") +
                             SYSConst.html_table_th("+-") +
                             SYSConst.html_table_th("BMI") +
                             SYSConst.html_table_th("+-")
@@ -570,96 +435,45 @@ public class ResValueTools {
 
             for (ResValue weight : listData.get(resident)) {
 
-                BigDecimal bmi = height == null ? null : weight.getVal1().divide(height.getVal1().pow(2));
+                BigDecimal bmi = height == null ? null : weight.getVal1().divide(height.getVal1().pow(2), 2, RoundingMode.HALF_UP);
 
                 BigDecimal divWeight = prevWeight == null ? null : weight.getVal1().subtract(prevWeight);
                 BigDecimal divBMI = prevBMI == null ? null : bmi.subtract(prevBMI);
 
                 table.append(SYSConst.html_table_tr(
                         SYSConst.html_table_td(df.format(weight.getPit())) +
-                                SYSConst.html_table_td(weight.getVal1().setScale(2, RoundingMode.HALF_UP).toString()) +
-                                SYSConst.html_table_td(SYSTools.catchNull(divWeight, "--")) +
-                                SYSConst.html_table_td(SYSTools.catchNull(bmi, "--")) +
-                                SYSConst.html_table_td(SYSTools.catchNull(divBMI, "--"))
+                                SYSConst.html_table_td(weight.getVal1().setScale(2, RoundingMode.HALF_UP).toString(), "right") +
+                                SYSConst.html_table_td(SYSTools.catchNull(weight.getText(), "--"), weight.getText() == null ? "center" : "left") +
+                                SYSConst.html_table_td(SYSTools.catchNull(divWeight, "--"), divWeight == null ? "center" : "right") +
+                                SYSConst.html_table_td(SYSTools.catchNull(bmi, "--"), bmi == null ? "center" : "right") +
+                                SYSConst.html_table_td(SYSTools.catchNull(divBMI, "--"), divBMI == null ? "center" : "right")
                 ));
 
                 prevBMI = bmi;
                 prevWeight = weight.getVal1();
 
-//                if (!prev.equalsIgnoreCase(bwkennung)) {
-//                    prev = bwkennung;
-//                    if (rs.getRow() > 1) {
-//                        double bpm = bmi - startBMI;
-//                        double gpm = gewicht - startGewicht;
-//                        bpm = Math.round(bpm * 100d) / 100d;
-//                        gpm = Math.round(gpm * 100d) / 100d;
-//
-//                        s += "<tr><td>gesamter Zeitraum</td><td></td><td>" + gpm + " kg</td>";
-//                        s += "<td></td><td>" + bpm + "</td></tr>";
-//                        s += "</table>";
-//                    }
-//
-//                    String bwlabel = "";//SYSTools.getBWLabel(bwkennung);
-//
-//                    if (lbl != null) {
-//                        lbl.setText("Gewichtstatistik: " + bwlabel);
-//                    }
-//                    s += "<h" + (headertiefe + 2) + ">" + bwlabel + "</h" + (headertiefe + 2) + "> ";
-
-
             }
 
+            // Stats over the whole analysis period
+            ResValue firstValue = listData.get(resident).get(0);
+            BigDecimal firstBMI = height == null ? null : firstValue.getVal1().divide(height.getVal1().pow(2), 2, RoundingMode.HALF_UP);
+            BigDecimal divWeight = prevWeight.subtract(firstValue.getVal1());
+            BigDecimal divBMI = firstBMI == null || prevBMI == null ? null : prevBMI.subtract(firstBMI);
+
+
+            table.append(SYSConst.html_table_tr(
+                    SYSConst.html_table_th("misc.msg.completePeriod") +
+                            SYSConst.html_table_th("--", "center") +
+                            SYSConst.html_table_th("--", "center") +
+                            SYSConst.html_table_th(SYSTools.catchNull(divWeight, "--"), divWeight == null ? "center" : "right") +
+                            SYSConst.html_table_th("--", "center") +
+                            SYSConst.html_table_th(SYSTools.catchNull(divBMI, "--"), divBMI == null ? "center" : "right")
+            ));
 
             html.append(SYSConst.html_table(table.toString(), "1"));
 
-//            gewicht = rs.getDouble("Wert");
-//            if (gr > 0) {
-//                bmi = gewicht / (gr * gr);
-//                bmi = Math.round(bmi * 100d) / 100d;
-//                bmiPlusMinus = bmi - prevBMI;
-//                bmiPlusMinus = Math.round(bmiPlusMinus * 100d) / 100d;
-//            } else {
-//                bmi = -1d;
-//            }
-//            gewichtPlusMinus = gewicht - prevGewicht;
-//            gewichtPlusMinus = Math.round(gewichtPlusMinus * 100d) / 100d;
-//
-//            if (bmi > 0) {
-//                if (prevBMI == 0d) {
-//                    s += "<tr><td>" + df.format(rs.getDate("Datum")) + "</td><td>" + gewicht + " kg</td><td>--</td>";
-//                    s += "<td>" + bmi + "</td><td>--</td></tr>";
-//                } else {
-//                    s += "<tr><td>" + df.format(rs.getDate("Datum")) + "</td><td>" + gewicht + " kg</td><td>" + gewichtPlusMinus + " kg</td>";
-//                    s += "<td>" + bmi + "</td><td>" + bmiPlusMinus + "</td></tr>";
-//                }
-//                prevGewicht = gewicht;
-//                prevBMI = bmi;
-//            } else {
-//                s += "<tr><td>" + df.format(rs.getDate("Datum")) + "</td><td>" + gewicht + " kg</td><td>" + gewichtPlusMinus + " kg</td>";
-//                s += "<td>??</td><td>?? </td></tr>";
-//            }
-//            isCancelled = (Boolean) o[2];
-//        }
-//        double bpm = bmi - startBMI;
-//        double gpm = gewicht - startGewicht;
-//        bpm = Math.round(bpm * 100d) / 100d;
-//        gpm = Math.round(gpm * 100d) / 100d;
-//
-//        s += "<tr><td>gesamter Zeitraum</td><td></td><td>" + gpm + " kg</td>";
-//        s += "<td></td><td>" + bpm + "</td></tr>";
-//        s += "</table>";
-//
-//
-//        isCancelled = (Boolean) o[2];
-//        if (isCancelled)
-//
-//        {
-//            s = "";
-//        }
-
-
-
         }
+
         return html.toString();
     }
 

@@ -696,11 +696,11 @@ public class DlgRegular extends MyJDialog {
             prescription.setUserOFF(OPDE.getLogin().getUser());
             prescription.setHospitalOFF(prescription.getHospitalON());
             prescription.setDocOFF(prescription.getDocON());
-            prescription.setTo(SYSConst.DATE_BIS_AUF_WEITERES);
+            prescription.setTo(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
         } else {
             prescription.setHospitalOFF(null);
             prescription.setDocOFF(null);
-            prescription.setTo(SYSConst.DATE_BIS_AUF_WEITERES);
+            prescription.setTo(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
         }
         prescription.setTillEndOfPackage(rbEndOfPackage.isSelected());
 

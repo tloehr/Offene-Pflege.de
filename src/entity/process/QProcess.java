@@ -132,7 +132,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         this.title = "";
         this.from = new Date();
         this.revision = new DateTime(new Date()).plusWeeks(2).toDate();
-        this.to = SYSConst.DATE_BIS_AUF_WEITERES;
+        this.to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
         this.creator = OPDE.getLogin().getUser();
         this.owner = OPDE.getLogin().getUser();
         this.resident = resident;
@@ -331,7 +331,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
     }
 
     public boolean isClosed() {
-        return !to.equals(SYSConst.DATE_BIS_AUF_WEITERES);
+        return !to.equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
     }
 
     public boolean isCommon() {

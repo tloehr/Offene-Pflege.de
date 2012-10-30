@@ -33,7 +33,6 @@ import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import entity.info.Resident;
-import entity.info.ResidentTools;
 import entity.prescription.*;
 import entity.system.SYSPropsTools;
 import op.OPDE;
@@ -902,7 +901,7 @@ public class PnlInventory extends NursingRecordsPanel {
                                 em.lock(myStock, LockModeType.OPTIMISTIC);
                                 em.lock(em.merge(myStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
                                 em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
-                                myStock.setOut(SYSConst.DATE_BIS_AUF_WEITERES);
+                                myStock.setOut(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
                             } else {
                                 /***
                                  *       ___
@@ -985,8 +984,8 @@ public class PnlInventory extends NursingRecordsPanel {
                             em.lock(myStock, LockModeType.OPTIMISTIC);
                             em.lock(em.merge(myStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
                             em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
-                            myStock.setOut(SYSConst.DATE_BIS_AUF_WEITERES);
-                            myStock.setOpened(SYSConst.DATE_BIS_AUF_WEITERES);
+                            myStock.setOut(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+                            myStock.setOpened(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
                             em.getTransaction().commit();
                             int index = lstInventories.indexOf(myStock.getInventory());
                             lstInventories.get(index).getMedStocks().remove(stock);

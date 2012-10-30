@@ -82,8 +82,8 @@ public class PnlInfo extends NursingRecordsPanel {
         cpMap = new HashMap<String, CollapsiblePane>();
         prepareSearchArea();
 
-        typeAbsence = ResInfoTypeTools.getByID(ResInfoTypeTools.TYPE_ABSENCE);
-        typeStartOfStay = ResInfoTypeTools.getByID(ResInfoTypeTools.TYPE_STAY);
+        typeAbsence = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ABSENCE);
+        typeStartOfStay = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY);
         categories = ResInfoCategoryTools.getAll4ResInfo();
 
         color1 = SYSConst.green1;
@@ -440,7 +440,7 @@ public class PnlInfo extends NursingRecordsPanel {
                     }
                 };
 
-                if (type.getID().equalsIgnoreCase(ResInfoTypeTools.TYPE_DIAGNOSIS)) {
+                if (type.getType().intValue() == ResInfoTypeTools.TYPE_DIAGNOSIS) {
                     new DlgDiag(new ResInfo(type, resident), closure);
                 } else {
                     new DlgInfo(new ResInfo(type, resident), closure);

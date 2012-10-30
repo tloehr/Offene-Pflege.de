@@ -34,6 +34,10 @@ public class NReportTAGSTools {
     public static final int TYPE_SYS_EMERGENCY = 2;
     public static final int TYPE_SYS_UBV = 3;
     public static final int TYPE_SYS_BV = 4;
+    public static final int TYPE_SYS_WOUNDS = 5;
+    public static final int TYPE_SYS_FALLS = 6;
+    public static final int TYPE_SYS_PAIN = 7;
+    public static final int TYPE_SYS_SOCIAL = 8;
 
     public static ListCellRenderer getPBerichtTAGSRenderer() {
 //        final int v = verbosity;
@@ -100,5 +104,15 @@ public class NReportTAGSTools {
         }
         return yes;
     }
+
+    public static NReportTAGS getByShortDescription(String s){
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT p FROM NReportTAGS p WHERE p.kurzbezeichnung = :short ");
+        query.setParameter("short", s);
+        ArrayList<NReportTAGS> tags = new ArrayList(query.getResultList());
+        em.close();
+        return tags.get(0);
+    }
+
 
 }

@@ -31,7 +31,15 @@ import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.swing.JideBoxLayout;
+import entity.Station;
+import entity.StationTools;
 import entity.files.SYSFilesTools;
+import entity.info.ResInfoTypeTools;
+import entity.info.Resident;
+import entity.info.ResidentTools;
+import entity.prescription.MedStockTools;
+import entity.process.QProcessElement;
+import entity.reports.NReportTAGSTools;
 import entity.reports.NReportTools;
 import entity.system.SYSPropsTools;
 import entity.values.ResValueTools;
@@ -42,13 +50,17 @@ import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
+import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author tloehr
@@ -113,7 +125,7 @@ public class PnlControlling extends CleanablePanel {
         final CollapsiblePane cpOrga = new CollapsiblePane();
 
         String title = "<html><font size=+1>" +
-                OPDE.lang.getString(internalClassID + ".orga") +
+                OPDE.lang.getString(internalClassID) + //OPDE.lang.getString(internalClassID + ".orga") +
                 "</font></html>";
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
@@ -257,7 +269,6 @@ public class PnlControlling extends CleanablePanel {
         btnWeightStats.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
                 OPDE.getMainframe().setBlocked(true);
                 SwingWorker worker = new SwingWorker() {
                     @Override
@@ -280,6 +291,129 @@ public class PnlControlling extends CleanablePanel {
         pnlWeight.add(txtWSMonthsBack, BorderLayout.EAST);
         pnlContent.add(pnlWeight);
 
+        /***
+         *      ____                      ____            _             _   _     _     _
+         *     |  _ \ _ __ _   _  __ _   / ___|___  _ __ | |_ _ __ ___ | | | |   (_)___| |_
+         *     | | | | '__| | | |/ _` | | |   / _ \| '_ \| __| '__/ _ \| | | |   | / __| __|
+         *     | |_| | |  | |_| | (_| | | |__| (_) | | | | |_| | | (_) | | | |___| \__ \ |_
+         *     |____/|_|   \__,_|\__, |  \____\___/|_| |_|\__|_|  \___/|_| |_____|_|___/\__|
+         *                       |___/
+         */
+        JPanel pnlDrugControl = new JPanel(new BorderLayout());
+        final JButton btnDrugControl = GUITools.createHyperlinkButton(internalClassID + ".drugs.controllist", null, null);
+        final JComboBox cmbStation = new JComboBox(StationTools.getAll4Combobox());
+        btnDrugControl.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OPDE.getMainframe().setBlocked(true);
+                SwingWorker worker = new SwingWorker() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        SYSFilesTools.print(MedStockTools.getListForMedControl((Station) cmbStation.getSelectedItem(), progressClosure), false);
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        OPDE.getDisplayManager().setProgressBarMessage(null);
+                        OPDE.getMainframe().setBlocked(false);
+                    }
+                };
+                worker.execute();
+            }
+        });
+        pnlDrugControl.add(btnDrugControl, BorderLayout.WEST);
+        pnlDrugControl.add(cmbStation, BorderLayout.EAST);
+        pnlContent.add(pnlDrugControl);
+
+        /***
+         *     __        __                    _
+         *     \ \      / /__  _   _ _ __   __| |___
+         *      \ \ /\ / / _ \| | | | '_ \ / _` / __|
+         *       \ V  V / (_) | |_| | | | | (_| \__ \
+         *        \_/\_/ \___/ \__,_|_| |_|\__,_|___/
+         *
+         */
+        JPanel pnlWounds = new JPanel(new BorderLayout());
+        final JButton btnWounds = GUITools.createHyperlinkButton(internalClassID + ".nursing.wounds", null, null);
+        int woundsMonthsBack;
+        try {
+            woundsMonthsBack = Integer.parseInt(OPDE.getProps().getProperty(internalClassID + "::woundsMonthsBack"));
+        } catch (NumberFormatException nfe) {
+            woundsMonthsBack = 7;
+        }
+        final JTextField txtWoundsMonthsBack = GUITools.createIntegerTextField(1, 12, woundsMonthsBack);
+        txtWoundsMonthsBack.setToolTipText(OPDE.lang.getString("misc.msg.monthsback"));
+
+        btnWounds.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OPDE.getMainframe().setBlocked(true);
+                SwingWorker worker = new SwingWorker() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        SYSPropsTools.storeProp(internalClassID + "::woundsMonthsBack", txtWoundsMonthsBack.getText(), OPDE.getLogin().getUser());
+                        SYSFilesTools.print(getWounds(Integer.parseInt(txtWoundsMonthsBack.getText()), progressClosure), false);
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        OPDE.getDisplayManager().setProgressBarMessage(null);
+                        OPDE.getMainframe().setBlocked(false);
+                    }
+                };
+                worker.execute();
+            }
+        });
+        pnlWounds.add(btnWounds, BorderLayout.WEST);
+        pnlWounds.add(txtWoundsMonthsBack, BorderLayout.EAST);
+        pnlContent.add(pnlWounds);
+
+
+        /***
+         *      ____             _       _   _____ _
+         *     / ___|  ___   ___(_) __ _| | |_   _(_)_ __ ___   ___  ___
+         *     \___ \ / _ \ / __| |/ _` | |   | | | | '_ ` _ \ / _ \/ __|
+         *      ___) | (_) | (__| | (_| | |   | | | | | | | | |  __/\__ \
+         *     |____/ \___/ \___|_|\__,_|_|   |_| |_|_| |_| |_|\___||___/
+         *
+         */
+        JPanel pblSocialTimes = new JPanel(new BorderLayout());
+        final JButton btnSocialTimes = GUITools.createHyperlinkButton(internalClassID + ".nursing.social", null, null);
+        final JComboBox cmbSocialTimes = new JComboBox(SYSCalendar.createMonthList(new DateMidnight().minusYears(1), new DateMidnight()));
+        btnSocialTimes.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OPDE.getMainframe().setBlocked(true);
+                SwingWorker worker = new SwingWorker() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        DateMidnight month = (DateMidnight) cmbSocialTimes.getSelectedItem();
+                        SYSFilesTools.print(NReportTools.getTimes4SocialReports(month, progressClosure), false);
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        OPDE.getDisplayManager().setProgressBarMessage(null);
+                        OPDE.getMainframe().setBlocked(false);
+                    }
+                };
+                worker.execute();
+            }
+        });
+        cmbSocialTimes.setRenderer(new ListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                return new DefaultListCellRenderer().getListCellRendererComponent(list, monthFormatter.format(((DateMidnight) value).toDate()), index, isSelected, cellHasFocus);
+            }
+        });
+        cmbSocialTimes.setSelectedIndex(cmbSocialTimes.getItemCount() - 2);
+        pblSocialTimes.add(btnSocialTimes, BorderLayout.WEST);
+        pblSocialTimes.add(cmbSocialTimes, BorderLayout.EAST);
+        pnlContent.add(pblSocialTimes);
+
         return pnlContent;
     }
 
@@ -293,424 +427,8 @@ public class PnlControlling extends CleanablePanel {
         reloadDisplay();
     }
 
-    //
-//    private void initForm() {
-//        SYSPropsTools.restoreState(this.getClass().getName() + "::cbBVAktivitaet", cbBVAktivitaet);
-//        SYSPropsTools.restoreState(this.getClass().getName() + "::cbSozialBerichte", cbSozialBerichte);
-//        SYSPropsTools.restoreState(this.getClass().getName() + "::cbGewicht", cbGewicht);
-//        SYSPropsTools.restoreState(this.getClass().getName() + "::cbBilanz", cbBilanz);
-//        SYSPropsTools.restoreState(this.getClass().getName() + "::cbNichtAbgehakteBHPs", cbNichtAbgehakteBHPs);
-//        SYSPropsTools.restoreState(this.getClass().getName() + "::cbPlanung", cbPlanung);
-//        SYSPropsTools.restoreState(this.getClass().getName() + "::cbVerordnungenOhneAnbruch", cbVerordnungenOhneAnbruch);
-//        SYSPropsTools.restoreState(this.getClass().getName() + "::cbSozialZeiten", cbSozialZeiten);
-//        SYSPropsTools.restoreState(this.getClass().getName() + "::cbGeringeVorraete", cbGeringeVorraete);
-//        SYSPropsTools.restoreState(this.getClass().getName() + "::cbMediControl", cbMediControl);
-//        SYSPropsTools.restoreState(this.getClass().getName() + "::cbSturzAnonym", cbSturzAnonym);
-//        SYSPropsTools.restoreState(this.getClass().getName() + "::cbSturz", cbSturz);
-//        SYSPropsTools.restoreState(this.getClass().getName() + "::cbBerichte", cbBerichte);
-//        SYSPropsTools.restoreState(this.getClass().getName() + "::cbWunden", cbWunden);
-//        SYSPropsTools.restoreState(this.getClass().getName() + "::cbInko", cbInko);
-//        SYSPropsTools.restoreState(this.getClass().getName() + "::cbBeschwerden", cbBeschwerden);
-//        jbs = new JCheckBox[]{cbBVAktivitaet, cbBilanz, cbGewicht, cbGeringeVorraete, cbNichtAbgehakteBHPs, cbPlanung,
-//                cbSozialBerichte, cbSozialZeiten, cbVerordnungenOhneAnbruch, cbMediControl, cbSturzAnonym,
-//                cbSturz, cbBerichte, cbWunden, cbInko, cbBeschwerden
-//        };
-//        btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
-//
-//        // Standardeinstellung für die Spinners wieder herstellen.
-//        int bhptage;
-//        int planungentage;
-//        int bvwochen;
-//        int gewichtmonate;
-//        int sozialmonate;
-//        int sozialzeitenwochen;
-//        int vorratprozent;
-//        int sturzamonate;
-//        int sturzmonate;
-//        int berichtemonate;
-//        int wundenmonate;
-//        int beschwerdenmonate;
-//        try {
-//            planungentage = Integer.parseInt(OPDE.getProps().getProperty(this.getClass().getName() + "::spinPlanungenTage"));
-//        } catch (NumberFormatException nfe) {
-//            planungentage = 7;
-//        }
-//        try {
-//            bhptage = Integer.parseInt(OPDE.getProps().getProperty(this.getClass().getName() + "::spinBHPTage"));
-//        } catch (NumberFormatException nfe) {
-//            bhptage = 7;
-//        }
-//        try {
-//            bvwochen = Integer.parseInt(OPDE.getProps().getProperty(this.getClass().getName() + "::spinBVWochen"));
-//        } catch (NumberFormatException nfe) {
-//            bvwochen = 1;
-//        }
-//        try {
-//            gewichtmonate = Integer.parseInt(OPDE.getProps().getProperty(this.getClass().getName() + "::spinGewichtMonate"));
-//        } catch (NumberFormatException nfe) {
-//            gewichtmonate = 6;
-//        }
-//        try {
-//            sozialmonate = Integer.parseInt(OPDE.getProps().getProperty(this.getClass().getName() + "::spinSozialMonate"));
-//        } catch (NumberFormatException nfe) {
-//            sozialmonate = 1;
-//        }
-//        try {
-//            sozialzeitenwochen = Integer.parseInt(OPDE.getProps().getProperty(this.getClass().getName() + "::spinSozialZeitenWochen"));
-//        } catch (NumberFormatException nfe) {
-//            sozialzeitenwochen = 1;
-//        }
-//        try {
-//            sturzamonate = Integer.parseInt(OPDE.getProps().getProperty(this.getClass().getName() + "::spinSturzAMonate"));
-//        } catch (NumberFormatException nfe) {
-//            sturzamonate = 6;
-//        }
-//        try {
-//            sturzmonate = Integer.parseInt(OPDE.getProps().getProperty(this.getClass().getName() + "::spinSturzMonate"));
-//        } catch (NumberFormatException nfe) {
-//            sturzmonate = 6;
-//        }
-//        try {
-//            vorratprozent = Integer.parseInt(OPDE.getProps().getProperty(this.getClass().getName() + "::spinVorratProzent"));
-//        } catch (NumberFormatException nfe) {
-//            vorratprozent = 20;
-//        }
-//        try {
-//            berichtemonate = Integer.parseInt(OPDE.getProps().getProperty(this.getClass().getName() + "::spinBerichteMonate"));
-//        } catch (NumberFormatException nfe) {
-//            berichtemonate = 1;
-//        }
-//        try {
-//            wundenmonate = Integer.parseInt(OPDE.getProps().getProperty(this.getClass().getName() + "::spinWundenMonate"));
-//        } catch (NumberFormatException nfe) {
-//            wundenmonate = 1;
-//        }
-//        try {
-//            beschwerdenmonate = Integer.parseInt(OPDE.getProps().getProperty(this.getClass().getName() + "::spinBeschwerdenMonate"));
-//        } catch (NumberFormatException nfe) {
-//            beschwerdenmonate = 5;
-//        }
-//
-//        spinBHPTage.setModel(new SpinnerNumberModel(bhptage, 1, 500, 1));
-//        spinPlanungenTage.setModel(new SpinnerNumberModel(planungentage, 1, 500, 1));
-//        spinBVWochen.setModel(new SpinnerNumberModel(bvwochen, 1, 52, 1));
-//        spinBerichteMonate.setModel(new SpinnerNumberModel(berichtemonate, 1, 12, 1));
-//        spinWundenMonate.setModel(new SpinnerNumberModel(wundenmonate, 1, 12, 1));
-//        spinGewichtMonate.setModel(new SpinnerNumberModel(gewichtmonate, 1, 12, 1));
-//        spinSozialMonate.setModel(new SpinnerNumberModel(sozialmonate, 1, 12, 1));
-//        //spinSozialZeitenWochen.setModel(new SpinnerNumberModel(sozialzeitenwochen, 1, 52, 1));
-//        spinVorratProzent.setModel(new SpinnerNumberModel(vorratprozent, 0, 90, 5));
-//        spinSturzAMonate.setModel(new SpinnerNumberModel(sturzamonate, 1, 12, 1));
-//        spinSturzMonate.setModel(new SpinnerNumberModel(sturzmonate, 1, 12, 1));
-//        spinBeschwerdenMonate.setModel(new SpinnerNumberModel(beschwerdenmonate, 1, 12, 1));
-//
-//        Date von = SYSCalendar.bom(SYSCalendar.addField(new Date(), -3, GregorianCalendar.YEAR));
-//        Date bis = SYSCalendar.eom(new Date());
-//
-////        DefaultComboBoxModel monthmodel1 = SYSCalendar.createMonthList(von, bis);
-////        DefaultComboBoxModel monthmodel2 = SYSCalendar.createMonthList(von, bis);
-//
-//        cmbBilanzMonat.setModel(SYSCalendar.createMonthList(von, bis));
-//        cmbBilanzMonat.setRenderer(new ListCellRenderer() {
-//            Format formatter = new SimpleDateFormat("MMMM yyyy");
-//
-//            @Override
-//            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-//                String text = formatter.format(o);
-//                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
-//            }
-//        });
-//
-//        cmbBilanzMonat.setSelectedIndex(cmbBilanzMonat.getModel().getSize() - 2); // Auf den letzten Eintrag setzen.
-//
-//        cmbPEAMonat.setModel(SYSCalendar.createMonthList(von, bis));
-//        cmbPEAMonat.setRenderer(new ListCellRenderer() {
-//            Format formatter = new SimpleDateFormat("MMMM yyyy");
-//
-//            @Override
-//            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-//                String text = formatter.format(o);
-//                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
-//            }
-//        });
-//        cmbPEAMonat.setSelectedIndex(cmbPEAMonat.getModel().getSize() - 2); // Auf den letzten Eintrag setzen.
-//
-//        EntityManager em = OPDE.createEM();
-//        Query query1 = em.createNamedQuery("Station.findAllSorted");
-//        cmbStation.setModel(new DefaultComboBoxModel(new Vector<Station>(query1.getResultList())));
-//        cmbStation.setSelectedItem(StationTools.getSpecialStation());
-//
-//        // Leeren Kopf vor die Liste setzen.
-////        ListElement[] headtag = new ListElement[]{new ListElement("Keine Auswahl", "")};
-//
-//
-//        Query query = em.createNamedQuery("PBerichtTAGS.findAllActive");
-//        cmbTags.setModel(SYSTools.lst2cmb(SYSTools.list2dlm(query.getResultList())));
-//        cmbTags.setRenderer(new ListCellRenderer() {
-//            @Override
-//            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-//
-//                return new DefaultListCellRenderer().getListCellRendererComponent(jList, ((NReportTAGS) o).getText(), i, isSelected, cellHasFocus);
-//            }
-//        });
-//        SYSPropsTools.restoreState(this.getClass().getName() + ":cmbTags", cmbTags);
-//        em.close();
-//
-//        txtBerichte.setText(SYSTools.catchNull(OPDE.getProps().getProperty(this.getClass().getName() + "::txtBerichte")));
-//
-//    }
-//
-//    private void cleanup() {
-//        SYSTools.unregisterListeners(this);
-//    }
-//
-//    private int anzahlGewuenschterAuswertungen() {
-//        int num = 0;
-//        for (int i = 0; i < jbs.length; i++) {
-//            if (jbs[i].isSelected()) {
-//                num++;
-//            }
-//        }
-//        return num;
-//    }
-//
-//    private String createHTML() {
-//
-//        StringBuilder html = new StringBuilder(1000);
-//        html.append("<div id=\"fonttext\">");
-//
-//        int progress = 0;
-//        EntityManager em = OPDE.createEM();
-//        pbMain.setMaximum(anzahlGewuenschterAuswertungen());
-//        pbMain.setMinimum(0);
-//        pbPart.setMinimum(0);
-////
-////        if (html.length() > 0) {
-////            html.append("<p style=\"page-break-before: always\"/>");
-////        }
-//
-//        // ======================== MEDIZINISCH ========================
-//        if (!isCancelled && cbBilanz.isSelected()) {
-//            if (html.length() > 0) {
-//                html.append("<p style=\"page-break-before: always\"/>");
-//            }
-//            lblProgress.setText("Ein-/Ausfuhr/Bilanz");
-//            pbPart.setValue(0);
-//            Date monat = (Date) cmbBilanzMonat.getSelectedItem();
-//            html.append(DBHandling.getBilanzen(1, monat, o));
-//            progress++;
-//            pbMain.setValue(progress);
-//        }
-//
-//        if (!isCancelled && cbGewicht.isSelected()) {
-//            if (html.length() > 0) {
-//                html.append("<p style=\"page-break-before: always\"/>");
-//            }
-//            lblProgress.setText("Gewichtstatistik");
-//            pbPart.setValue(0);
-//            int gewichtmonate = Integer.parseInt(spinGewichtMonate.getValue().toString());
-//            html.append(DBHandling.getGewichtsverlauf(gewichtmonate, 1, o));
-//            progress++;
-//            pbMain.setValue(progress);
-//        }
-//
-//        // ORGANISATORISCH
-//        if (!isCancelled && cbBVAktivitaet.isSelected()) {
-//            if (html.length() > 0) {
-//                html.append("<p style=\"page-break-before: always\"/>");
-//            }
-//            lblProgress.setText("BV Aktivitäten");
-//            pbPart.setValue(0);
-//            int bvwochen = Integer.parseInt(spinBVWochen.getValue().toString());
-//            html.append(NReportTools.getBVBerichte(em, 1, bvwochen));
-//            progress++;
-//            pbMain.setValue(progress);
-//        }
-//
-//        if (!isCancelled && cbNichtAbgehakteBHPs.isSelected()) {
-//            if (html.length() > 0) {
-//                html.append("<p style=\"page-break-before: always\"/>");
-//            }
-//            lblProgress.setText("Nicht abgehakte BHPs");
-//            pbPart.setValue(0);
-//            int bhptage = Integer.parseInt(spinBHPTage.getValue().toString());
-//            html.append(DBHandling.getNichtAbgehakteBHPs(1, bhptage));
-//            progress++;
-//            pbMain.setValue(progress);
-//        }
-//
-//        if (!isCancelled && cbPlanung.isSelected()) {
-//            if (html.length() > 0) {
-//                html.append("<p style=\"page-break-before: always\"/>");
-//            }
-//            lblProgress.setText("Planungen, die bald enden / abgelaufen sind");
-//            pbPart.setValue(0);
-//            int tage = Integer.parseInt(spinPlanungenTage.getValue().toString());
-//            html.append(DBHandling.getAblaufendePlanungen(1, tage));
-//            progress++;
-//            pbMain.setValue(progress);
-//        }
-//
-//        if (!isCancelled && cbVerordnungenOhneAnbruch.isSelected()) {
-////            if (html.length() > 0) {
-////                html.append("<p style=\"page-break-before: always\"/>");
-////            }
-//            lblProgress.setText("Verordnungen ohne Medikamente im Anbruch");
-//            pbPart.setValue(0);
-//            html.append(DBHandling.getAktiveVorraeteOhneBestandImAnbruch(1));
-//            progress++;
-//            pbMain.setValue(progress);
-//        }
-//
-//        if (!isCancelled && cbGeringeVorraete.isSelected()) {
-//            if (html.length() > 0) {
-//                html.append("<p style=\"page-break-before: always\"/>");
-//            }
-//            lblProgress.setText("Medikamenten Bestandsermittlung");
-//            pbPart.setValue(0);
-//            double prozent = Double.parseDouble(spinVorratProzent.getValue().toString());
-//            html.append(DBHandling.getGeringeVorraete(1, prozent, o));
-//            progress++;
-//        }
-//        pbMain.setValue(progress);
-//
-//        if (!isCancelled && cbMediControl.isSelected()) {
-////            if (html.length() > 0) {
-////                html.append("<p style=\"page-break-before: always\"/>");
-////            }
-//            lblProgress.setText("Medikamenten Kontroll Liste");
-//            pbPart.setValue(0);
-////            String station = cmbStation.getSelectedItem().toString();
-////            html.append(DBHandling.getMediKontrolle(station, 1));
-//            html.append(MedStockTools.getMediKontrolle(em, (Station) cmbStation.getSelectedItem(), 1));
-//            progress++;
-//            pbMain.setValue(progress);
-//        }
-//
-//        if (!isCancelled && cbBerichte.isSelected()) {
-//
-//            if (html.length() > 0) {
-//                html.append("<p style=\"page-break-before: always\"/>");
-//            }
-//            lblProgress.setText("NReport durchsuchen");
-//            pbPart.setValue(0);
-//            int berichtemonate = Integer.parseInt(spinBerichteMonate.getValue().toString());
-////            html.append(DBHandling.getBerichte(txtBerichte.getText(), (ListElement) cmbTags.getSelectedItem(), 1, berichtemonate, o));
-//            html.append(NReportTools.getBerichteASHTML(em, txtBerichte.getText(), (NReportTAGS) cmbTags.getSelectedItem(), 1, berichtemonate));
-//            progress++;
-//            pbMain.setValue(progress);
-//        }
-//
-//        if (!isCancelled && cbInko.isSelected()) {
-//            if (html.length() > 0) {
-//                html.append("<p style=\"page-break-before: always\"/>");
-//            }
-//            lblProgress.setText("Inkontinenz-Liste");
-//            pbPart.setValue(0);
-//            html.append(DBHandling.getInkontinenz(1));
-//            progress++;
-//            pbMain.setValue(progress);
-//        }
-//
-//        if (!isCancelled && cbWunden.isSelected()) {
-//            if (html.length() > 0) {
-//                html.append("<p style=\"page-break-before: always\"/>");
-//            }
-//            lblProgress.setText("Wund-Liste");
-//            pbPart.setValue(0);
-//            int wundenmonat = Integer.parseInt(spinWundenMonate.getValue().toString());
-//            html.append(DBHandling.getWunden(1, wundenmonat, o));
-//            progress++;
-//            pbMain.setValue(progress);
-//        }
-//
-//        if (!isCancelled && cbBeschwerden.isSelected()) {
-//            if (html.length() > 0) {
-//                html.append("<p style=\"page-break-before: always\"/>");
-//            }
-//            lblProgress.setText("Auswertung Beschwerden");
-//            pbPart.setValue(0);
-//            int beschwerdenmonat = Integer.parseInt(spinBeschwerdenMonate.getValue().toString());
-//            html.append(DBHandling.getBeschwerdeAuswertung(1, beschwerdenmonat));
-//            progress++;
-//            pbMain.setValue(progress);
-//        }
-//
-//        // SOZIALES
-//        if (!isCancelled && cbSozialBerichte.isSelected()) {
-//            if (html.length() > 0) {
-//                html.append("<p style=\"page-break-before: always\"/>");
-//            }
-//            lblProgress.setText("Berichte Sozialer Dienst");
-//            pbPart.setValue(0);
-//            int sozialmonate = Integer.parseInt(spinSozialMonate.getValue().toString());
-//            Query query = em.createNamedQuery("PBerichtTAGS.findByKurzbezeichnung");
-//            query.setParameter("kurzbezeichnung", "soz");
-//            NReportTAGS sozTag = (NReportTAGS) query.getSingleResult();
-//
-//            html.append(NReportTools.getBerichteASHTML(em, "", sozTag, 1, sozialmonate));
-////            html.append(DBHandling.getSozialBerichte("", "", 1, sozialmonate));
-//            progress++;
-//            pbMain.setValue(progress);
-//        }
-//
-//        if (!isCancelled && cbSozialZeiten.isSelected()) {
-//            if (html.length() > 0) {
-//                html.append("<p style=\"page-break-before: always\"/>");
-//            }
-//            lblProgress.setText("Zeiten Sozialer Dienst");
-//            pbPart.setValue(0);
-//            Date monat = (Date) cmbPEAMonat.getSelectedItem();
-////            html.append(DBHandling.getSozialZeiten(1, monat));
-//            html.append(NReportTools.getSozialZeiten(em, 1, monat));
-//            progress++;
-//            pbMain.setValue(progress);
-//        }
-//
-//        // Statistik
-//        if (!isCancelled && cbSturzAnonym.isSelected()) {
-//            if (html.length() > 0) {
-//                html.append("<p style=\"page-break-before: always\"/>");
-//            }
-//            lblProgress.setText("Sturzstatistik anonym");
-//            pbPart.setValue(0);
-//            int sturzmonate = Integer.parseInt(spinSturzAMonate.getValue().toString());
-//            html.append(DBHandling.getAnonymSturz(1, sturzmonate));
-//            progress++;
-//            pbMain.setValue(progress);
-//        }
-//        if (!isCancelled && cbSturz.isSelected()) {
-//            if (html.length() > 0) {
-//                html.append("<p style=\"page-break-before: always\"/>");
-//            }
-//            lblProgress.setText("Sturzstatistik Bewohnerbezogen");
-//            pbPart.setValue(0);
-//            int sturzmonate = Integer.parseInt(spinSturzMonate.getValue().toString());
-//            html.append(DBHandling.getBWSturz(1, sturzmonate, o));
-//            progress++;
-//            pbMain.setValue(progress);
-//        }
-//
-//        em.close();
-//
-//        pbMain.setValue(0);
-//        pbPart.setValue(0);
-//        lblProgress.setText(" ");
-//
-//        String result = "";
-//        if (!isCancelled) {
-//            html.append("</div>");
-//            result = html.toString();
-//        }
-//        return result;
-//    }
-//
-//    public void dispose() {
-//        cleanup();
-//        super.dispose();
-//    }
-//
-//    /**
+
+    //    /**
 //     * This method is called from within the constructor to
 //     * initialize the form.
 //     * WARNING: Do NOT modify this code. The content of this method is
@@ -735,206 +453,86 @@ public class PnlControlling extends CleanablePanel {
         }
         add(scrollPane1);
     }// </editor-fold>//GEN-END:initComponents
-//
-//    private void cbBVAktivitaetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbBVAktivitaetActionPerformed
-//        SYSPropsTools.storeState(this.getClass().getName() + "::cbBVAktivitaet", cbBVAktivitaet);
-//        btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
-//    }//GEN-LAST:event_cbBVAktivitaetActionPerformed
-//
-//    private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
-//
-//        //String result = "";
-//
-//        SwingWorker<String, Void> worker = new SwingWorker<String, Void>() {
-//
-//            protected String doInBackground() throws Exception {
-//                String s = createHTML();
-//                return s;
-//            }
-//
-//            @Override
-//            protected void done() {
-//                try {
-//                    String get = SYSTools.catchNull(get());
-////                    String result = SYSTools.htmlUmlautConversion(SYSTools.catchNull(get()));
-//                    if (!SYSTools.catchNull(get).isEmpty()) {
-//                        SYSFilesTools.print(get, false);
-//                    }
-//                    btnPrint.setEnabled(true);
-//                    btnStop.setEnabled(false);
-//                    isCancelled = false;
-//                    o[2] = isCancelled;
-//                } catch (InterruptedException ex) {
-//                    Logger.getLogger(PnlControlling.class.getName()).log(Level.SEVERE, null, ex);
-//                } catch (ExecutionException ex) {
-//                    Logger.getLogger(PnlControlling.class.getName()).log(Level.SEVERE, null, ex);
-//                }
-//            }
-//        };
-//        btnPrint.setEnabled(false);
-//        btnStop.setEnabled(true);
-//        worker.execute();
-//
-//    }//GEN-LAST:event_btnPrintActionPerformed
-//
-//    private void cbSozialBerichteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbSozialBerichteActionPerformed
-//        SYSPropsTools.storeState(this.getClass().getName() + "::cbSozialBerichte", cbSozialBerichte);
-//        btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
-//    }//GEN-LAST:event_cbSozialBerichteActionPerformed
-//
-//    private void spinBVWochenStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinBVWochenStateChanged
-//        spinBVWochen.setToolTipText("In den letzten " + spinBVWochen.getValue().toString() + " Wochen");
-//        SYSPropsTools.storeProp(this.getClass().getName() + "::spinBVWochen", spinBVWochen.getValue().toString(), OPDE.getLogin().getUser());
-//        //SYSTools.putProps(this.getClass().getName() + "::spinBVWochen", spinBVWochen.getValue().toString(), false, "");
-//    }//GEN-LAST:event_spinBVWochenStateChanged
-//
-//    private void spinBHPTageStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinBHPTageStateChanged
-//        spinBHPTage.setToolTipText("In den letzten " + spinBHPTage.getValue().toString() + " Tagen");
-//        SYSPropsTools.storeProp(this.getClass().getName() + "::spinBHPTage", spinBHPTage.getValue().toString(), OPDE.getLogin().getUser());
-//        //SYSTools.putProps(this.getClass().getName() + "::spinBHPTage", spinBHPTage.getValue().toString(), false, "");
-//    }//GEN-LAST:event_spinBHPTageStateChanged
-//
-//    private void spinSozialWochenStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinSozialWochenStateChanged
-//        spinSozialMonate.setToolTipText("In den letzten " + spinSozialMonate.getValue().toString() + " Monaten");
-//        SYSPropsTools.storeProp(this.getClass().getName() + "::spinSozialMonate", spinSozialMonate.getValue().toString(), OPDE.getLogin().getUser());
-//        //SYSTools.putProps(this.getClass().getName() + "::spinSozialWochen", spinBHPTage.getValue().toString(), false, "");
-//    }//GEN-LAST:event_spinSozialWochenStateChanged
-//
-//    private void spinGewichtMonateStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinGewichtMonateStateChanged
-//        spinGewichtMonate.setToolTipText("In den letzten " + spinGewichtMonate.getValue().toString() + " Monate");
-//        SYSPropsTools.storeProp(this.getClass().getName() + "::spinGewichtMonate", spinGewichtMonate.getValue().toString(), OPDE.getLogin().getUser());
-//        //SYSTools.putProps(this.getClass().getName() + "::spinGewichtMonate", spinGewichtMonate.getValue().toString(), false, "");
-//    }//GEN-LAST:event_spinGewichtMonateStateChanged
-//
-//    private void cbNichtAbgehakteBHPsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbNichtAbgehakteBHPsActionPerformed
-//        SYSPropsTools.storeState(this.getClass().getName() + "::cbNichtAbgehakteBHPs", cbNichtAbgehakteBHPs);
-//        btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
-//    }//GEN-LAST:event_cbNichtAbgehakteBHPsActionPerformed
-//
-//    private void cbPlanungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbPlanungActionPerformed
-//        SYSPropsTools.storeState(this.getClass().getName() + "::cbPlanung", cbPlanung);
-//        btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
-//    }//GEN-LAST:event_cbPlanungActionPerformed
-//
-//    private void cbVerordnungenOhneAnbruchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbVerordnungenOhneAnbruchActionPerformed
-//        SYSPropsTools.storeState(this.getClass().getName() + "::cbVerordnungenOhneAnbruch", cbVerordnungenOhneAnbruch);
-//        btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
-//    }//GEN-LAST:event_cbVerordnungenOhneAnbruchActionPerformed
-//
-//    private void cbBilanzActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbBilanzActionPerformed
-//        SYSPropsTools.storeState(this.getClass().getName() + "::cbBilanz", cbBilanz);
-//        btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
-//    }//GEN-LAST:event_cbBilanzActionPerformed
-//
-//    private void cbGewichtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbGewichtActionPerformed
-//        SYSPropsTools.storeState(this.getClass().getName() + "::cbGewicht", cbGewicht);
-//        btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
-//    }//GEN-LAST:event_cbGewichtActionPerformed
-//
-//    private void btnStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStopActionPerformed
-//        isCancelled = true;
-//        o[2] = isCancelled;
-//    }//GEN-LAST:event_btnStopActionPerformed
-//
-//    private void cbSozialZeitenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbSozialZeitenActionPerformed
-//        SYSPropsTools.storeState(this.getClass().getName() + "::cbSozialZeiten", cbSozialZeiten);
-//        btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
-//    }//GEN-LAST:event_cbSozialZeitenActionPerformed
-//
-//    private void spinPlanungenTageStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinPlanungenTageStateChanged
-//        spinPlanungenTage.setToolTipText("In den letzten " + spinPlanungenTage.getValue().toString() + " Tagen");
-//        SYSPropsTools.storeProp(this.getClass().getName() + "::spinPlanungenTage", spinPlanungenTage.getValue().toString(), OPDE.getLogin().getUser());
-//        //SYSTools.putProps(this.getClass().getName() + "::spinPlanungenTage", spinPlanungenTage.getValue().toString(), false, "");
-//    }//GEN-LAST:event_spinPlanungenTageStateChanged
-//
-//    private void spinVorratProzentStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinVorratProzentStateChanged
-//        spinVorratProzent.setToolTipText("In den letzten " + spinVorratProzent.getValue().toString() + " Tagen");
-//        SYSPropsTools.storeProp(this.getClass().getName() + "::spinVorratProzent", spinVorratProzent.getValue().toString(), OPDE.getLogin().getUser());
-//        //SYSTools.putProps(this.getClass().getName() + "::spinVorratProzent", spinVorratProzent.getValue().toString(), false, "");
-//    }//GEN-LAST:event_spinVorratProzentStateChanged
-//
-//    private void cbGeringeVorraeteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbGeringeVorraeteActionPerformed
-//        SYSPropsTools.storeState(this.getClass().getName() + "::cbGeringeVorraete", cbGeringeVorraete);
-//        btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
-//    }//GEN-LAST:event_cbGeringeVorraeteActionPerformed
-//
-//    private void cbMediControlActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbMediControlActionPerformed
-//        SYSPropsTools.storeState(this.getClass().getName() + "::cbMediControl", cbMediControl);
-//        btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
-//    }//GEN-LAST:event_cbMediControlActionPerformed
-//
-//    private void cmbStationItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbStationItemStateChanged
-//        SYSPropsTools.storeState(this.getClass().getName() + "::cmbStation", cmbStation);
-//    }//GEN-LAST:event_cmbStationItemStateChanged
-//
-//    private void spinSturzAMonateStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinSturzAMonateStateChanged
-//        spinSturzAMonate.setToolTipText("In den letzten " + spinSturzAMonate.getValue().toString() + " Monaten");
-//        SYSPropsTools.storeProp(this.getClass().getName() + "::spinSturzAMonate", spinSturzAMonate.getValue().toString(), OPDE.getLogin().getUser());
-//        //SYSTools.putProps(this.getClass().getName() + "::spinSturzAMonate", spinSturzAMonate.getValue().toString(), false, "");
-//    }//GEN-LAST:event_spinSturzAMonateStateChanged
-//
-//    private void cbSturzAnonymActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbSturzAnonymActionPerformed
-//        SYSPropsTools.storeState(this.getClass().getName() + "::cbSturzAnonym", cbSturzAnonym);
-//        btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
-//    }//GEN-LAST:event_cbSturzAnonymActionPerformed
-//
-//    private void spinSturzMonateStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinSturzMonateStateChanged
-//        spinSturzMonate.setToolTipText("In den letzten " + spinSturzMonate.getValue().toString() + " Monaten");
-//        SYSPropsTools.storeProp(this.getClass().getName() + "::spinSturzMonate", spinSturzMonate.getValue().toString(), OPDE.getLogin().getUser());
-//        //SYSTools.putProps(this.getClass().getName() + "::spinSturzMonate", spinSturzMonate.getValue().toString(), false, "");
-//    }//GEN-LAST:event_spinSturzMonateStateChanged
-//
-//    private void cbSturzActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbSturzActionPerformed
-//        SYSPropsTools.storeState(this.getClass().getName() + "::cbSturz", cbSturz);
-//        btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
-//    }//GEN-LAST:event_cbSturzActionPerformed
-//
-//    private void cbBerichteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbBerichteActionPerformed
-//        SYSPropsTools.storeState(this.getClass().getName() + "::cbBerichte", cbBerichte);
-//        btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
-//    }//GEN-LAST:event_cbBerichteActionPerformed
-//
-//    private void txtBerichteFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtBerichteFocusLost
-//        SYSPropsTools.storeProp(this.getClass().getName() + "::txtBerichte", txtBerichte.getText(), OPDE.getLogin().getUser());
-//        //SYSTools.putProps(this.getClass().getName() + "::txtBerichte", txtBerichte.getText(), false, "");
-//    }//GEN-LAST:event_txtBerichteFocusLost
-//
-//    private void spinBerichteMonateStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinBerichteMonateStateChanged
-//        SYSPropsTools.storeProp(this.getClass().getName() + "::spinBerichteMonate", spinBerichteMonate.getValue().toString(), OPDE.getLogin().getUser());
-//        //SYSTools.putProps(this.getClass().getName() + "::spinBerichteMonate", spinBerichteMonate.getValue().toString(), false, "");
-//    }//GEN-LAST:event_spinBerichteMonateStateChanged
-//
-//    private void cbWundenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbWundenActionPerformed
-//        SYSPropsTools.storeState(this.getClass().getName() + "::cbWunden", cbWunden);
-//        btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
-//    }//GEN-LAST:event_cbWundenActionPerformed
-//
-//    private void spinWundenMonateStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinWundenMonateStateChanged
-//        SYSPropsTools.storeProp(this.getClass().getName() + "::spinWundenMonate", spinWundenMonate.getValue().toString(), OPDE.getLogin().getUser());
-//        //SYSTools.putProps(this.getClass().getName() + "::spinWundenMonate", spinWundenMonate.getValue().toString(), false, "");
-//    }//GEN-LAST:event_spinWundenMonateStateChanged
-//
-//    private void cbInkoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbInkoActionPerformed
-//        SYSPropsTools.storeState(this.getClass().getName() + "::cbInko", cbInko);
-//        btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
-//    }//GEN-LAST:event_cbInkoActionPerformed
-//
-//    private void cbBeschwerdenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbBeschwerdenActionPerformed
-//        SYSPropsTools.storeState(this.getClass().getName() + "::cbBeschwerden", cbBeschwerden);
-//        btnPrint.setEnabled(anzahlGewuenschterAuswertungen() > 0);
-//    }//GEN-LAST:event_cbBeschwerdenActionPerformed
-//
-//    private void spinBeschwerdenMonateStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinBeschwerdenMonateStateChanged
-//        SYSPropsTools.storeProp(this.getClass().getName() + "::spinBeschwerdenMonate", spinBeschwerdenMonate.getValue().toString(), OPDE.getLogin().getUser());
-//        //SYSTools.putProps(this.getClass().getName() + "::spinBeschwerdenMonate", spinBeschwerdenMonate.getValue().toString(), false, "");
-//    }//GEN-LAST:event_spinBeschwerdenMonateStateChanged
-//
-//    private void cmbTagsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbTagsItemStateChanged
-//        SYSPropsTools.storeState(this.getClass().getName() + "::cmbTags", cmbTags);
-//    }//GEN-LAST:event_cmbTagsItemStateChanged
-//
 
-//
+
+    public static String getWounds(int monthsback, Closure progress) {
+        StringBuilder html = new StringBuilder(1000);
+
+        int p = -1;
+        progress.execute(new Pair<Integer, Integer>(p, 100));
+
+        DateMidnight from = new DateMidnight().minusMonths(monthsback).dayOfMonth().withMinimumValue();
+        EntityManager em = OPDE.createEM();
+        DateFormat df = DateFormat.getDateInstance();
+
+        String jpql1 = " SELECT b FROM ResInfo b WHERE b.from > :from AND b.resident.adminonly <> 2 AND b.bwinfotyp.type = :type ORDER BY b.resident.rid, b.from DESC ";
+        Query query1 = em.createQuery(jpql1);
+        query1.setParameter("type", ResInfoTypeTools.TYPE_WOUNDS);
+        query1.setParameter("from", from.toDate());
+        ArrayList<QProcessElement> listVal = new ArrayList<QProcessElement>(query1.getResultList());
+
+        String jpql2 = " " +
+                " SELECT n FROM NReport n " +
+                " JOIN n.tags t " +
+                " WHERE n.pit > :from " +
+                " AND n.resident.adminonly <> 2 " +
+                " AND n.replacedBy IS NULL " +
+                " AND t.system = :tagsystem " +
+                " ORDER BY n.resident.rid, n.pit DESC ";
+        Query query2 = em.createQuery(jpql2);
+        query2.setParameter("tagsystem", NReportTAGSTools.TYPE_SYS_WOUNDS);
+        query2.setParameter("from", from.toDate());
+        listVal.addAll(new ArrayList<QProcessElement>(query2.getResultList()));
+
+        em.close();
+
+        HashMap<Resident, ArrayList<QProcessElement>> listData = new HashMap<Resident, ArrayList<QProcessElement>>();
+        for (QProcessElement element : listVal) {
+            if (!listData.containsKey(element.getResident())) {
+                listData.put(element.getResident(), new ArrayList<QProcessElement>());
+            }
+            listData.get(element.getResident()).add(element);
+        }
+
+        ArrayList<Resident> listResident = new ArrayList<Resident>(listData.keySet());
+        Collections.sort(listResident);
+
+        html.append(SYSConst.html_h1(OPDE.lang.getString(PnlControlling.internalClassID + ".nursing.wounds") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
+//        html.append(SYSConst.html_h2(OPDE.lang.getString("misc.msg.analysis") + ": " + );
+
+        p = 0;
+
+        for (Resident resident : listResident) {
+            progress.execute(new Pair<Integer, Integer>(p, listResident.size()));
+            p++;
+
+            html.append(SYSConst.html_h2(ResidentTools.getBWLabelTextKompakt(resident)));
+
+            StringBuffer table = new StringBuffer(1000);
+
+            table.append(SYSConst.html_table_tr(
+                    SYSConst.html_table_th("misc.msg.Date") +
+                            SYSConst.html_table_th("misc.msg.details")
+            ));
+
+            Collections.sort(listData.get(resident), new Comparator<QProcessElement>() {
+                @Override
+                public int compare(QProcessElement o1, QProcessElement o2) {
+                    return new Long(o1.getPITInMillis()).compareTo(new Long(o2.getPITInMillis())) * -1;
+                }
+            });
+
+            for (QProcessElement element : listData.get(resident)) {
+                table.append(SYSConst.html_table_tr(
+                        SYSConst.html_table_td(element.getPITAsHTML(), "left", "top") +
+                                SYSConst.html_table_td(element.getContentAsHTML())
+                ));
+            }
+
+            html.append(SYSConst.html_table(table.toString(), "1"));
+        }
+        return html.toString();
+    }
 
 
 }

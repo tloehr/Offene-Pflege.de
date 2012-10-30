@@ -25,10 +25,15 @@ public class ResInfoTypeTools {
     public static final int STATUS_SYSTEM = 10;
     public static final int STATUS_INACTIVE_SYSTEM = -10;
 
-    public static final String TYPE_DIAGNOSIS = "DIAG";
-    public static final String TYPE_STAY = "HAUF";
-    public static final String TYPE_ABSENCE = "ABWE1";
-    public static final String TYPE_HOSPITAL_STAY = "KH";
+    public static final int TYPE_DIAGNOSIS = 50;
+    public static final int TYPE_STAY = 100;
+
+//    public static final String TYPE_HOSPITAL_STAY = "KH";
+
+    public static final int TYPE_OLD = -1;
+    public static final int TYPE_WOUNDS = 20;
+    public static final int TYPE_FALL = 30; // Sturz
+    public static final int TYPE_ABSENCE = 10;
 
     public static final String TYPE_ABSENCE_HOSPITAL = "HOSPITAL";
     public static final String TYPE_ABSENCE_HOLLIDAY = "HOLLIDAY";
@@ -43,9 +48,18 @@ public class ResInfoTypeTools {
         return resInfoTypes.isEmpty() ? null : resInfoTypes.get(0);
     }
 
+    public static ResInfoType getByType(int type) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM ResInfoType b WHERE b.type = :type");
+        query.setParameter("type", type);
+        List<ResInfoType> resInfoTypes = query.getResultList();
+        em.close();
+        return resInfoTypes.isEmpty() ? null : resInfoTypes.get(0);
+    }
+
     public static List<ResInfoType> getByCat(ResInfoCategory category) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfoType b WHERE b.resInfoCat = :cat AND b.status >= 0 ORDER BY b.bWInfoKurz, b.bwinftyp");
+        Query query = em.createQuery("SELECT b FROM ResInfoType b WHERE b.resInfoCat = :cat AND b.type >= 0 ORDER BY b.bWInfoKurz, b.bwinftyp");
         query.setParameter("cat", category);
         List<ResInfoType> resInfoTypen = query.getResultList();
         em.close();

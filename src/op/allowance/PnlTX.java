@@ -249,7 +249,7 @@ public class PnlTX extends JPanel {
             cmbResident.setEnabled(false);
         }
 
-        ResInfo firstStay = ResInfoTools.getFirstResinfo(tx.getResident(), ResInfoTypeTools.getByID(ResInfoTypeTools.TYPE_STAY));
+        ResInfo firstStay = ResInfoTools.getFirstResinfo(tx.getResident(), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
         min = firstStay == null ? new DateMidnight().dayOfMonth().withMinimumValue() : new DateMidnight(firstStay.getFrom());
 
         txtDate.requestFocus();

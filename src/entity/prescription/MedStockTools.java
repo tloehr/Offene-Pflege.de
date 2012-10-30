@@ -4,8 +4,11 @@ import entity.Station;
 import entity.info.ResidentTools;
 import op.OPDE;
 import op.care.med.inventory.PnlInventory;
+import op.controlling.PnlControlling;
+import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -564,50 +567,79 @@ public class MedStockTools {
         return apv;
     }
 
-    public static String getMediKontrolle(EntityManager em, Station station, int headertiefe) {
+    public static String getListForMedControl(Station station, Closure progress) {
         StringBuilder html = new StringBuilder(1000);
+        int p = -1;
+        progress.execute(new Pair<Integer, Integer>(p, 100));
 
+        EntityManager em = OPDE.createEM();
         String jpql = " " +
                 " SELECT b FROM MedStock b " +
                 " WHERE b.inventory.resident.station = :station AND b.inventory.resident.adminonly <> 2 " +
-                " AND b.opened < :anbruch AND b.out = " + SYSConst.MYSQL_DATETIME_BIS_AUF_WEITERES +
+                " AND b.opened < :opened AND b.out = :tfn " +
                 " ORDER BY b.inventory.resident.name, b.inventory.resident.firstname, b.inventory.text, b.opened ";
 
         Query query = em.createQuery(jpql);
-        query.setParameter("anbruch", new Date());
+        query.setParameter("opened", new Date());
+        query.setParameter("tfn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
         query.setParameter("station", station);
         List<MedStock> list = query.getResultList();
+        em.close();
 
+        StringBuilder table = new StringBuilder(1000);
         DateFormat df = DateFormat.getDateInstance();
-        if (!list.isEmpty())
-            html.append("<h" + headertiefe + ">");
-        html.append("Liste zur Medikamentenkontrolle");
-        html.append("</h" + headertiefe + ">");
-        html.append("<h" + (headertiefe + 1) + ">");
-        html.append("Legende");
-        html.append("</h" + (headertiefe + 1) + ">");
-        html.append("#1 - Medikament abgelaufen<br/>");
-        html.append("#2 - Packung nicht beschriftet<br/>");
-        html.append("#3 - Packung beschädigt<br/>");
-        html.append("#4 - Anbruchsdatum nicht vermerkt<br/>");
-        html.append("#5 - Medikament ist nicht verordnet<br/>");
-        html.append("#6 - Mehr als 1 Blister im Anbruch<br/>");
-        html.append("#7 - Mehr als 1 Tablette geteilt<br/>");
-        html.append("#8 - falsche Bestandsnummer im Anbruch<br/><br/>");
 
-        html.append("<table border=\"1\"><tr>" +
-                "<th>BewohnerIn</th><th>BestNr</th><th>Präparat</th><th>Anbruch</th><th>#1</th><th>#2</th><th>#3</th><th>#4</th><th>#5</th><th>#6</th><th>#7</th><th>#8</th></tr>");
 
+        html.append(SYSConst.html_h1(PnlControlling.internalClassID + ".drugs.controllist"));
+        html.append(SYSConst.html_h2(OPDE.lang.getString("misc.msg.subdivision") + ": " + station.getBezeichnung()));
+        html.append(SYSConst.html_h3(PnlControlling.internalClassID + ".drugs.controllist.key"));
+        html.append(SYSConst.html_ul(
+                SYSConst.html_li(PnlControlling.internalClassID + ".drugs.controllist.key.1") +
+                        SYSConst.html_li(PnlControlling.internalClassID + ".drugs.controllist.key.2") +
+                        SYSConst.html_li(PnlControlling.internalClassID + ".drugs.controllist.key.3") +
+                        SYSConst.html_li(PnlControlling.internalClassID + ".drugs.controllist.key.4") +
+                        SYSConst.html_li(PnlControlling.internalClassID + ".drugs.controllist.key.5") +
+                        SYSConst.html_li(PnlControlling.internalClassID + ".drugs.controllist.key.6") +
+                        SYSConst.html_li(PnlControlling.internalClassID + ".drugs.controllist.key.7") +
+                        SYSConst.html_li(PnlControlling.internalClassID + ".drugs.controllist.key.8")
+        ));
+
+        table.append(SYSConst.html_table_tr(
+                SYSConst.html_table_th("misc.msg.resident") +
+                        SYSConst.html_table_th(PnlInventory.internalClassID + ".search.stockid") +
+                        SYSConst.html_table_th("misc.msg.medication") +
+                        SYSConst.html_table_th("misc.msg.opened") +
+                        SYSConst.html_table_th("#1") +
+                        SYSConst.html_table_th("#2") +
+                        SYSConst.html_table_th("#3") +
+                        SYSConst.html_table_th("#4") +
+                        SYSConst.html_table_th("#5") +
+                        SYSConst.html_table_th("#6") +
+                        SYSConst.html_table_th("#7") +
+                        SYSConst.html_table_th("#8")
+        ));
+
+        p = 0;
         for (MedStock bestand : list) {
-            html.append("<tr>");
-            html.append("<td>" + ResidentTools.getBWLabelTextKompakt(bestand.getInventory().getResident()) + "</td>");
-            html.append("<td>" + bestand.getID() + "</td>");
-            html.append("<td>" + TradeFormTools.toPrettyString(bestand.getTradeForm()) + "</td>");
-            html.append("<td>" + df.format(bestand.getOpened()) + "</td>");
-            html.append("<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>");
-            html.append("</tr>");
+            progress.execute(new Pair<Integer, Integer>(p, list.size()));
+            p++;
+
+            table.append(SYSConst.html_table_tr(
+                    SYSConst.html_table_td(ResidentTools.getBWLabelTextKompakt(bestand.getInventory().getResident())) +
+                            SYSConst.html_table_td(bestand.getID().toString()) +
+                            SYSConst.html_table_td(TradeFormTools.toPrettyString(bestand.getTradeForm())) +
+                            SYSConst.html_table_td(df.format(bestand.getOpened())) +
+                            SYSConst.html_table_td("&nbsp;") +
+                            SYSConst.html_table_td("&nbsp;") +
+                            SYSConst.html_table_td("&nbsp;") +
+                            SYSConst.html_table_td("&nbsp;") +
+                            SYSConst.html_table_td("&nbsp;") +
+                            SYSConst.html_table_td("&nbsp;") +
+                            SYSConst.html_table_td("&nbsp;") +
+                            SYSConst.html_table_td("&nbsp;")
+            ));
         }
-        html.append("</table>");
+        html.append(SYSConst.html_table(table.toString(), "1"));
         return html.toString();
     }
 }

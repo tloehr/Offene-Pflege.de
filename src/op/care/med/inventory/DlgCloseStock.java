@@ -276,8 +276,8 @@ public class DlgCloseStock extends MyJDialog {
                 " WHERE b.inventory = :vorrat AND b.out = :aus AND b.opened = :anbruch " +
                 " ORDER BY b.in, b.id "); // Geht davon aus, dass die PKs immer fortlaufend, automatisch vergeben werden.
         query.setParameter("vorrat", medStock.getInventory());
-        query.setParameter("aus", SYSConst.DATE_BIS_AUF_WEITERES);
-        query.setParameter("anbruch", SYSConst.DATE_BIS_AUF_WEITERES);
+        query.setParameter("aus", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+        query.setParameter("anbruch", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
         DefaultComboBoxModel dcbm = new DefaultComboBoxModel(query.getResultList().toArray());
         dcbm.insertElementAt("keine", 0);
         cmbBestID.setModel(dcbm);

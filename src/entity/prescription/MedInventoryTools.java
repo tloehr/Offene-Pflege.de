@@ -296,7 +296,7 @@ public class MedInventoryTools {
         Collections.sort(list);
 
         for (MedStock bestand : list) {
-            if (bestand.getOut().equals(SYSConst.DATE_BIS_AUF_WEITERES) && bestand.getOpened().equals(SYSConst.DATE_BIS_AUF_WEITERES)) {
+            if (bestand.getOut().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE) && bestand.getOpened().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE)) {
                 BigDecimal apv = MedStockTools.getAPV4(bestand);
                 bestand.setOpened(new Date());
                 bestand.setAPV(apv);
@@ -340,7 +340,7 @@ public class MedInventoryTools {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT inv FROM MedInventory inv WHERE inv.resident = :resident AND inv.to = :to ORDER BY inv.text");
         query.setParameter("resident", resident);
-        query.setParameter("to", SYSConst.DATE_BIS_AUF_WEITERES);
+        query.setParameter("to", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
 
         result = new ArrayList<MedInventory>(query.getResultList());
         em.close();

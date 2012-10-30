@@ -159,7 +159,7 @@ public class QProcessTools {
     public static List<QProcess> getProcessesRunningOutIn(int days) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT qp FROM QProcess qp WHERE qp.to = :tfn AND qp.revision <= :revisiondate ");
-        query.setParameter("tfn", SYSConst.DATE_BIS_AUF_WEITERES);
+        query.setParameter("tfn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
         query.setParameter("revisiondate", new DateMidnight().plusDays(days + 1).toDateTime().minusSeconds(1).toDate());
         ArrayList<QProcess> list = new ArrayList<QProcess>(query.getResultList());
         em.close();
@@ -169,7 +169,7 @@ public class QProcessTools {
     public static List<QProcess> getAllActive() {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT qp FROM QProcess qp WHERE qp.to = :tfn ");
-        query.setParameter("tfn", SYSConst.DATE_BIS_AUF_WEITERES);
+        query.setParameter("tfn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
         ArrayList<QProcess> list = new ArrayList<QProcess>(query.getResultList());
         em.close();
         return list;
@@ -197,7 +197,7 @@ public class QProcessTools {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT qp FROM QProcess qp WHERE qp.to = :tfn AND qp.resident = :resident");
         query.setParameter("resident", resident);
-        query.setParameter("tfn", SYSConst.DATE_BIS_AUF_WEITERES);
+        query.setParameter("tfn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
         ArrayList<QProcess> list = new ArrayList<QProcess>(query.getResultList());
         em.close();
         return list;
@@ -216,7 +216,7 @@ public class QProcessTools {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT qp FROM QProcess qp WHERE qp.to = :baw AND qp.owner = :owner");
         query.setParameter("owner", owner);
-        query.setParameter("baw", SYSConst.DATE_BIS_AUF_WEITERES);
+        query.setParameter("baw", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
         ArrayList<QProcess> list = new ArrayList<QProcess>(query.getResultList());
         em.close();
         return list;

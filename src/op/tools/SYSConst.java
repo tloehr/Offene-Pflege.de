@@ -30,7 +30,6 @@ import op.OPDE;
 
 import javax.swing.*;
 import java.awt.*;
-import java.text.DateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -64,9 +63,9 @@ public class SYSConst {
     public static Color orangered = new Color(255, 36, 0);
     public static Color sun3 = new Color(153, 153, 204);
 
-    public static String html_22x22_StopSign = "<img src=\""+OPDE.getOPWD()+"/artwork/22x22/stop.png\" border=\"0\">";
-    public static String html_22x22_Eraser = "<img src=\""+OPDE.getOPWD()+"/artwork/22x22/eraser.png\" border=\"0\">";
-    public static String html_22x22_Edited = "<img src=\""+OPDE.getOPWD()+"/artwork/22x22/edited.png\" border=\"0\">";
+    public static String html_22x22_StopSign = "<img src=\"" + OPDE.getOPWD() + "/artwork/22x22/stop.png\" border=\"0\">";
+    public static String html_22x22_Eraser = "<img src=\"" + OPDE.getOPWD() + "/artwork/22x22/eraser.png\" border=\"0\">";
+    public static String html_22x22_Edited = "<img src=\"" + OPDE.getOPWD() + "/artwork/22x22/edited.png\" border=\"0\">";
 
     public static String html_darkgreen = "color=\"#007600\"";
     public static String html_darkred = "color=\"#bd0000\"";
@@ -106,7 +105,7 @@ public class SYSConst {
     public static Color thistle2 = new Color(0xe9, 0xcf, 0xEC);
     public static Color thistle3 = new Color(0xc6, 0xae, 0xc7);
     public static Color thistle4 = new Color(0x80, 0x6d, 0x7E);
-//    public static Color yellow1 = new Color(0xFF, 0xFF, 0x00);
+    //    public static Color yellow1 = new Color(0xFF, 0xFF, 0x00);
     public static Color yellow2 = new Color(0xEE, 0xEE, 0x00);
     public static Color yellow3 = new Color(0xCD, 0xCD, 0x00);
     public static Color yellow4 = new Color(0x8B, 0x8B, 0x00);
@@ -214,16 +213,16 @@ public class SYSConst {
 
     //Gray50  	747170
     public static char eurosymbol = '\u20AC';
-    public static final GregorianCalendar VON_ANFANG_AN = new GregorianCalendar(1970, GregorianCalendar.JANUARY, 1, 0, 0, 0);
-    public static final GregorianCalendar BIS_AUF_WEITERES = new GregorianCalendar(9999, GregorianCalendar.DECEMBER, 31, 23, 59, 59);
-    public static final GregorianCalendar BIS_AUF_WEITERES_WO_TIME = new GregorianCalendar(9999, GregorianCalendar.DECEMBER, 31, 0, 0, 0);
-    public static final Date DATE_VON_ANFANG_AN = new Date(VON_ANFANG_AN.getTimeInMillis());
-    public static final Date DATE_BIS_AUF_WEITERES = new Date(BIS_AUF_WEITERES.getTimeInMillis());
-    public static final Date DATE_BIS_AUF_WEITERES_WO_TIME = new Date(BIS_AUF_WEITERES_WO_TIME.getTimeInMillis());
-    //    public static final Timestamp TS_VON_ANFANG_AN = new Timestamp(VON_ANFANG_AN.getTimeInMillis());
-//    public static final Timestamp TS_BIS_AUF_WEITERES = new Timestamp(BIS_AUF_WEITERES.getTimeInMillis());
-    public static final String MYSQL_DATETIME_VON_ANFANG_AN = "'1000-01-01 00:00:00'";
-    public static final String MYSQL_DATETIME_BIS_AUF_WEITERES = "'9999-12-31 23:59:59'";
+    public static final GregorianCalendar VERY_BEGINNING = new GregorianCalendar(1970, GregorianCalendar.JANUARY, 1, 0, 0, 0);
+    public static final GregorianCalendar UNTIL_FURTHER_NOTICE = new GregorianCalendar(9999, GregorianCalendar.DECEMBER, 31, 23, 59, 59);
+    //    public static final GregorianCalendar BIS_AUF_WEITERES_WO_TIME = new GregorianCalendar(9999, GregorianCalendar.DECEMBER, 31, 0, 0, 0);
+    public static final Date DATE_VERY_BEGINNING = new Date(VERY_BEGINNING.getTimeInMillis());
+    public static final Date DATE_UNTIL_FURTHER_NOTICE = new Date(UNTIL_FURTHER_NOTICE.getTimeInMillis());
+//    public static final Date DATE_BIS_AUF_WEITERES_WO_TIME = new Date(BIS_AUF_WEITERES_WO_TIME.getTimeInMillis());
+    //    public static final Timestamp TS_VON_ANFANG_AN = new Timestamp(VERY_BEGINNING.getTimeInMillis());
+//    public static final Timestamp TS_BIS_AUF_WEITERES = new Timestamp(UNTIL_FURTHER_NOTICE.getTimeInMillis());
+//    public static final String MYSQL_DATETIME_VON_ANFANG_AN = "'1000-01-01 00:00:00'";
+//    public static final String MYSQL_DATETIME_BIS_AUF_WEITERES = "'9999-12-31 23:59:59'";
 //    public static final int GESCHLECHT_MAENNLICH = 1;
 //    public static final int GESCHLECHT_WEIBLICH = 2;
 
@@ -253,38 +252,77 @@ public class SYSConst {
     public static final String html_h2_close = "</h2>";
     public static final String html_h3_open = "<h3 id=\"fonth3\" >";
     public static final String html_h3_close = "</h3>";
-    public static String html_table_th(String content){
-        return "<th>"+SYSTools.xx(content)+"</t1>\n";
+
+    public static String html_ul(String content) {
+        return "<ul id=\"fonttext\">\n" + SYSTools.xx(content) + "</ul>\n";
     }
-    public static String html_table_td(String content, String align){
-        return "<td "+SYSTools.catchNull(align,"align=\"","\"")+">"+SYSTools.xx(content)+"</td>\n";
+
+    public static String html_ol(String content) {
+        return "<ol id=\"fonttext\">\n" + SYSTools.xx(content) + "</ol>\n";
     }
-    public static String html_table_td(String content){
+
+    public static String html_li(String content) {
+        return "<li>" + SYSTools.xx(content) + "</li>\n";
+    }
+
+    public static String html_table_th(String content, String align) {
+        return "<th " + SYSTools.catchNull(align, "align=\"", "\"") + ">" + SYSTools.xx(content) + "</th>\n";
+    }
+
+    public static String html_table_th(String content) {
+        return "<th>" + SYSTools.xx(content) + "</th>\n";
+    }
+
+    public static String html_table_td(String content, String align) {
+        return "<td " + SYSTools.catchNull(align, "align=\"", "\"") + ">" + SYSTools.xx(content) + "</td>\n";
+    }
+
+    public static String html_table_td(String content, String align, String valign) {
+        return "<td " + SYSTools.catchNull(align, "align=\"", "\"") + " " + SYSTools.catchNull(valign, "valign=\"", "\"") + ">" + SYSTools.xx(content) + "</td>\n";
+    }
+
+    public static String html_table_td(String content) {
         return html_table_td(content, null);
     }
-    public static String html_table_tr(String content){
-        return "<tr>"+SYSTools.xx(content)+"</tr>\n";
+
+    public static String html_table_td(String content, boolean bold) {
+        return html_table_td((bold ? "<b>" : "") + content + (bold ? "</b>" : ""), null);
     }
-    public static String html_bold(String content){
-        return "<b>"+SYSTools.xx(content)+"</b>";
+
+    public static String html_table_tr(String content) {
+        return "<tr>" + SYSTools.xx(content) + "</tr>\n";
     }
-    public static String html_paragraph(String content){
-        return "<p>\n"+SYSTools.xx(content)+"</p>\n";
+
+    public static String html_table_tr(String content, boolean highlight) {
+        return "<tr " + (highlight ? "id=\"fonttextgray\"" : "") + ">" + SYSTools.xx(content) + "</tr>\n";
     }
-    public static String html_div(String content){
-        return "<div id=\"fonttext\">\n"+SYSTools.xx(content)+"</div>\n";
+
+    public static String html_bold(String content) {
+        return "<b>" + SYSTools.xx(content) + "</b>";
     }
-    public static String html_h1(String content){
-        return "<h1 id=\"fonth1\" >"+SYSTools.xx(content)+"</h1>\n";
+
+    public static String html_paragraph(String content) {
+        return "<p id=\"fonttext\">\n" + SYSTools.xx(content) + "</p>\n";
     }
-    public static String html_h2(String content){
-        return "<h2 id=\"fonth2\" >"+SYSTools.xx(content)+"</h2>\n";
+
+    public static String html_div(String content) {
+        return "<div id=\"fonttext\">\n" + SYSTools.xx(content) + "</div>\n";
     }
-    public static String html_h3(String content){
-        return "<h3 id=\"fonth2\" >"+SYSTools.xx(content)+"</h3>\n";
+
+    public static String html_h1(String content) {
+        return "<h1 id=\"fonth1\" >" + SYSTools.xx(content) + "</h1>\n";
     }
-    public static String html_table(String content, String border){
-        return "<table id=\"fonttext\" border=\""+border+"\">"+SYSTools.xx(content)+"</table>\n";
+
+    public static String html_h2(String content) {
+        return "<h2 id=\"fonth2\" >" + SYSTools.xx(content) + "</h2>\n";
+    }
+
+    public static String html_h3(String content) {
+        return "<h3 id=\"fonth3\" >" + SYSTools.xx(content) + "</h3>\n";
+    }
+
+    public static String html_table(String content, String border) {
+        return "<table id=\"fonttext\" border=\"" + border + "\">" + SYSTools.xx(content) + "</table>\n";
     }
 
     public static final String html_div_open = "<div id=\"fonttext\">";
@@ -400,9 +438,9 @@ public class SYSConst {
         return hm;
     }
 
-//    public static final Icon icon16bysecond = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/bysecond.png"));
+    //    public static final Icon icon16bysecond = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/bysecond.png"));
     public static final Icon icon16exec = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/exec.png"));
-//    public static final Icon icon16pit = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/pointintime.png"));
+    //    public static final Icon icon16pit = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/pointintime.png"));
     public static final Icon icon16redStar = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/redstar.png"));
     public static final Icon icon16greenStar = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/greenstar.png"));
     public static final Icon icon16unlink = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/unlink.png"));
@@ -439,7 +477,7 @@ public class SYSConst {
     public static final Icon icon32Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/bw/pressed.png"));
     public static final Icon icon22Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/pressed.png"));
     public static final Icon icon22edit3Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/edit3_pressed.png"));
-//    public static final Icon icon22edit1 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/edit1.png"));
+    //    public static final Icon icon22edit1 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/edit1.png"));
 //    public static final Icon icon22edit1Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/edit1_pressed.png"));
     public static final Icon icon22editPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/kspread_pressed.png"));
     public static final Icon icon22empty = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/empty.png"));
@@ -466,7 +504,7 @@ public class SYSConst {
     public static final Icon icon22playerStartPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_start_pressed.png"));
     public static final Icon icon22playerStop = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_stop.png"));
     public static final Icon icon22playerStopPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_stop_pressed.png"));
-//    public static final Icon icon22print = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/printer1.png"));
+    //    public static final Icon icon22print = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/printer1.png"));
 //    public static final Icon icon22printPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/printer1_pressed.png"));
     public static final Icon icon22print2 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/printer2.png"));
     public static final Icon icon22print2Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/printer2_pressed.png"));
@@ -493,7 +531,7 @@ public class SYSConst {
     public static final Icon icon22edited = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/edited.png"));
     public static final Icon icon22unlinkPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/unlink_pressed.png"));
     public static final Icon icon22up = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/1uparrow.png"));
-//    public static final Icon icon22view = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/viewmag.png"));
+    //    public static final Icon icon22view = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/viewmag.png"));
 //    public static final Icon icon22viewPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/viewmag-selected.png"));
     public static final Icon icon32ambulance2 = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/ambulance2.png"));
     public static final Icon icon32ambulance2Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/ambulance2_pressed.png"));
@@ -505,7 +543,7 @@ public class SYSConst {
     public static final Icon icon48play = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/bw/player_play.png"));
     public static final Icon icon48stop = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/bw/player_stop.png"));
     public static final Icon icon48take = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/take-over.png"));
-//    public static final Icon icon16byday = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/byday.png"));
+    //    public static final Icon icon16byday = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/byday.png"));
     public static final Icon icon22collapse = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/collapse.png"));
     public static final Icon icon22expand = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/expand.png"));
     public static final Icon icon22ledRedOn = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ledred.png"));

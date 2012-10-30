@@ -158,10 +158,10 @@ public class SYSCalendar {
         Date d = new Date(gc.getTimeInMillis());
         //result =  gc.get(GregorianCalendar.DAY_OF_MONTH) + "." + (gc.get(GregorianCalendar.MONTH)+1) + "." + gc.get(GregorianCalendar.YEAR);
         result = formatter.format(d);
-        if (gc.equals(SYSConst.BIS_AUF_WEITERES)) {
+        if (gc.equals(SYSConst.UNTIL_FURTHER_NOTICE)) {
             result = "bis auf weiteres";
         }
-        if (gc.equals(SYSConst.VON_ANFANG_AN)) {
+        if (gc.equals(SYSConst.VERY_BEGINNING)) {
             result = "von anfang an";
         }
         return (result);
@@ -177,44 +177,44 @@ public class SYSCalendar {
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTime(d);
         result = formatter.format(d);
-        if (gc.equals(SYSConst.BIS_AUF_WEITERES)) {
+        if (gc.equals(SYSConst.UNTIL_FURTHER_NOTICE)) {
             result = "bis auf weiteres";
         }
-        if (gc.equals(SYSConst.VON_ANFANG_AN)) {
+        if (gc.equals(SYSConst.VERY_BEGINNING)) {
             result = "von anfang an";
         }
         return (result);
     }
 
-    public static String printGermanStyleShort(Date d) {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yy");
-        String result;
-        GregorianCalendar gc = new GregorianCalendar();
-        gc.setTime(d);
-        result = formatter.format(d);
-        if (gc.equals(SYSConst.BIS_AUF_WEITERES_WO_TIME)) {
-            result = "==>";
-        }
-        if (gc.equals(SYSConst.VON_ANFANG_AN)) {
-            result = "|<=";
-        }
-        if (sameDay(gc, new GregorianCalendar()) == 0) {
-            result = "heute";
-        }
-        GregorianCalendar heute = new GregorianCalendar();
-        GregorianCalendar morgen = (GregorianCalendar) heute.clone();
-        morgen.add(GregorianCalendar.DATE, +1);
-        GregorianCalendar gestern = (GregorianCalendar) heute.clone();
-        gestern.add(GregorianCalendar.DATE, -1);
-
-        if (sameDay(gc, gestern) == 0) {
-            result = "gestern";
-        }
-        if (sameDay(gc, morgen) == 0) {
-            result = "morgen";
-        }
-        return (result);
-    }
+//    public static String printGermanStyleShort(Date d) {
+//        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yy");
+//        String result;
+//        GregorianCalendar gc = new GregorianCalendar();
+//        gc.setTime(d);
+//        result = formatter.format(d);
+//        if (gc.equals(SYSConst.BIS_AUF_WEITERES_WO_TIME)) {
+//            result = "==>";
+//        }
+//        if (gc.equals(SYSConst.VERY_BEGINNING)) {
+//            result = "|<=";
+//        }
+//        if (sameDay(gc, new GregorianCalendar()) == 0) {
+//            result = "heute";
+//        }
+//        GregorianCalendar heute = new GregorianCalendar();
+//        GregorianCalendar morgen = (GregorianCalendar) heute.clone();
+//        morgen.add(GregorianCalendar.DATE, +1);
+//        GregorianCalendar gestern = (GregorianCalendar) heute.clone();
+//        gestern.add(GregorianCalendar.DATE, -1);
+//
+//        if (sameDay(gc, gestern) == 0) {
+//            result = "gestern";
+//        }
+//        if (sameDay(gc, morgen) == 0) {
+//            result = "morgen";
+//        }
+//        return (result);
+//    }
 
     public static GregorianCalendar toGC(Date d) {
         GregorianCalendar gc = new GregorianCalendar();
@@ -442,7 +442,7 @@ public class SYSCalendar {
         if (d.isAfterNow()){
             return false;
         }
-        ResInfo firstStay = ResInfoTools.getFirstResinfo(resident, ResInfoTypeTools.getByID(ResInfoTypeTools.TYPE_STAY));
+        ResInfo firstStay = ResInfoTools.getFirstResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
         DateMidnight min = firstStay == null ? new DateMidnight().dayOfMonth().withMinimumValue() : new DateMidnight(firstStay.getFrom());
         return new DateMidnight(date).isAfter(min);
     }

@@ -8,7 +8,6 @@ import op.tools.SYSConst;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -103,7 +102,7 @@ public class MedInventory implements Serializable, Comparable<MedInventory> {
         this.text = text;
         this.user = OPDE.getLogin().getUser();
         this.from = new Date();
-        this.to = SYSConst.DATE_BIS_AUF_WEITERES;
+        this.to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
         this.medStocks = new ArrayList<MedStock>();
     }
 
@@ -136,7 +135,7 @@ public class MedInventory implements Serializable, Comparable<MedInventory> {
     }
 
     public boolean isClosed(){
-        return to.before(SYSConst.DATE_BIS_AUF_WEITERES);
+        return to.before(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
     }
 
 

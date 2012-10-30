@@ -894,7 +894,7 @@ public class PnlProcess extends NursingRecordsPanel {
                                         }
                                         em.lock(myProcess, LockModeType.OPTIMISTIC);
                                         PReport pReport = em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_REOPEN), PReportTools.PREPORT_TYPE_REOPEN, qProcess));
-                                        myProcess.setTo(SYSConst.DATE_BIS_AUF_WEITERES);
+                                        myProcess.setTo(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
                                         myProcess.getPReports().add(pReport);
                                         em.getTransaction().commit();
                                         processList.remove(qProcess);

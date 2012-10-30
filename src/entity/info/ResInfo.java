@@ -115,10 +115,10 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
             this.to = now;
         } else if (bwinfotyp.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYDAY) {
             this.from = new DateTime().toDateMidnight().toDate();
-            this.to = SYSConst.DATE_BIS_AUF_WEITERES;
+            this.to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
         } else {
             this.from = now;
-            this.to = SYSConst.DATE_BIS_AUF_WEITERES;
+            this.to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
         }
 
         this.bwinfotyp = bwinfotyp;
@@ -347,7 +347,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
     @Override
     public int compareTo(ResInfo resInfo) {
         return from.compareTo(resInfo.getFrom()) * -1;
-//        if (resInfo.getResInfoType().getStatus() == ResInfoTypeTools.STATUS_NORMAL) {
+//        if (resInfo.getResInfoType().getType() == ResInfoTypeTools.STATUS_NORMAL) {
 //            return 0;
 //        } else if (getResInfoType().getID().equalsIgnoreCase(ResInfoTypeTools.TYPE_DIAGNOSIS) || resInfo.getResInfoType().getID().equalsIgnoreCase(ResInfoTypeTools.TYPE_DIAGNOSIS)) {
 //            Properties thisProps = ResInfoTools.getContent(this);

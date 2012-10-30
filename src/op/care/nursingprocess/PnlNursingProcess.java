@@ -635,7 +635,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                 NursingProcess template = ((NursingProcess) o).clone();
                                 template.setNPSeries(-2); // so the next dialog knows thats a template
                                 template.setResident(resident);
-                                template.setTo(SYSConst.DATE_BIS_AUF_WEITERES);
+                                template.setTo(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
                                 template.setUserOFF(null);
                                 template.setUserON(OPDE.getLogin().getUser());
                                 template.setNextEval(new DateTime().plusWeeks(4).toDate());
@@ -775,7 +775,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     NursingProcess template = np.clone();
-                    template.setTo(SYSConst.DATE_BIS_AUF_WEITERES);
+                    template.setTo(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
                     template.setUserOFF(null);
                     template.setUserON(OPDE.getLogin().getUser());
                     template.setNextEval(new DateTime().plusWeeks(4).toDate());

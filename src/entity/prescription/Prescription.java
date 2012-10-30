@@ -246,7 +246,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         this.attachedProcessConnections = new ArrayList<SYSPRE2PROCESS>();
         this.pSchedule = new ArrayList<PrescriptionSchedule>();
         this.from = new Date();
-        this.to = SYSConst.DATE_BIS_AUF_WEITERES;
+        this.to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
         this.userON = OPDE.getLogin().getUser();
     }
 
@@ -415,7 +415,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
     }
 
     public boolean isLimited() {
-        return to.before(SYSConst.DATE_BIS_AUF_WEITERES);
+        return to.before(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
     }
 
     public boolean isOnDemand() {

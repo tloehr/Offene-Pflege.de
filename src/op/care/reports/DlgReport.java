@@ -64,7 +64,7 @@ public class DlgReport extends MyJDialog {
                 }
             }
         }, nReport.getTags(), new GridLayout(0, 1)));
-        ResInfo firstStay = ResInfoTools.getFirstResinfo(nReport.getResident(), ResInfoTypeTools.getByID(ResInfoTypeTools.TYPE_STAY));
+        ResInfo firstStay = ResInfoTools.getFirstResinfo(nReport.getResident(), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
         pnlPIT = new PnlPIT(nReport.getPit(), new Date(), firstStay == null ? new Date() : firstStay.getFrom());
         panel1.add(pnlPIT, CC.xywh(3, 3, 3, 1, CC.DEFAULT, CC.FILL));
 

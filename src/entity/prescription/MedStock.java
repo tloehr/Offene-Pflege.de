@@ -92,8 +92,8 @@ public class MedStock implements Serializable, Comparable<MedStock> {
         this.aPackage = aPackage;
         this.text = text;
         this.in = new Date();
-        this.opened = SYSConst.DATE_BIS_AUF_WEITERES;
-        this.out = SYSConst.DATE_BIS_AUF_WEITERES;
+        this.opened = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
+        this.out = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
         this.user = OPDE.getLogin().getUser();
         this.stockTransaction = new ArrayList<MedStockTransaction>();
 
@@ -230,14 +230,14 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     }
 
     public boolean isOpened() {
-        return opened.before(SYSConst.DATE_BIS_AUF_WEITERES) && !isClosed();
+        return opened.before(SYSConst.DATE_UNTIL_FURTHER_NOTICE) && !isClosed();
     }
 
     /*
     * <b>tested:</b> Test0002
     */
     public boolean isClosed() {
-        return out.before(SYSConst.DATE_BIS_AUF_WEITERES);
+        return out.before(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
     }
 
     public boolean hasPackage() {

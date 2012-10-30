@@ -116,7 +116,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
         attachedQProcessConnections = new ArrayList<SYSNP2PROCESS>();
         nextEval = new DateTime().plusWeeks(4).toDate();
         from = new Date();
-        to = SYSConst.DATE_BIS_AUF_WEITERES;
+        to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
         this.npseries = -1l;
     }
 
@@ -222,7 +222,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
     }
 
     public boolean isClosed() {
-        return to.before(SYSConst.DATE_BIS_AUF_WEITERES);
+        return to.before(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
     }
 
     public Collection<NPControl> getEvaluations() {

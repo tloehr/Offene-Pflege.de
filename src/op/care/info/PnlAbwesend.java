@@ -163,7 +163,7 @@ public class PnlAbwesend extends JPanel {
         }
 
         abwesenheit.setFrom(new Date());
-        abwesenheit.setTo(SYSConst.DATE_BIS_AUF_WEITERES);
+        abwesenheit.setTo(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
 
         actionBlock.execute(abwesenheit);
     }

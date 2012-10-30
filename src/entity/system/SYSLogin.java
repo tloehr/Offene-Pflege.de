@@ -15,8 +15,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -65,7 +63,7 @@ public class SYSLogin implements Serializable {
 //        this.host = OPDE.getHost();
         this.user = user;
         this.login = new Date();
-        this.logout = op.tools.SYSConst.DATE_BIS_AUF_WEITERES;
+        this.logout = op.tools.SYSConst.DATE_UNTIL_FURTHER_NOTICE;
     }
 
     public Users getUser() {

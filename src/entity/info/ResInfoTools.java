@@ -40,26 +40,6 @@ import java.util.*;
  */
 public class ResInfoTools {
 
-//    /**
-//     * Eine kompakte HTML Darstellung aus der aktuellen ResInfo
-//     * Inkl. Bemerkungsfeld.
-//     *
-//     * @param bwinfo
-//     */
-//    public static String getHTML(ResInfo bwinfo) {
-//        String html = "\n<h2 id=\"fonth2\" >" + bwinfo.getResInfoType().getShortDescription() + "</h2>\n<div id=\"fonttext\">";
-//        DateFormat df = bwinfo.isSingleIncident() ? DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT) : DateFormat.getDateInstance();
-//        html += df.format(bwinfo.getFrom()) + (bwinfo.isSingleIncident() ? " " : " &rarr;" + (bwinfo.getTo().equals(SYSConst.DATE_BIS_AUF_WEITERES) ? "|" : " " + df.format(bwinfo.getTo())));
-//        html += bwinfo.getHtml() + "</div>\n";
-//
-//        if (!SYSTools.catchNull(bwinfo.getText()).isEmpty()) {
-//            html += "<p id=\"fonttext\" ><b><u>" + OPDE.lang.getString("misc.msg.comment") + ":</u></b></p>";
-//            html += "<p id=\"fonttext\" >" + bwinfo.getText() + "</p>";
-//        }
-//
-//        return html;
-//    }
-
     public static ResInfo getLastResinfo(Resident bewohner, ResInfoType bwinfotyp) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.from DESC");
@@ -157,7 +137,7 @@ public class ResInfoTools {
     public static Pair<Date, Date> getMinMaxExpansion(ResInfo info, ArrayList<ResInfo> sortedInfoList) {
         Date min = null, max = null;
 
-        ResInfo firstHauf = getFirstResinfo(info.getResident(), ResInfoTypeTools.getByID(ResInfoTypeTools.TYPE_STAY));
+        ResInfo firstHauf = getFirstResinfo(info.getResident(), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
 //        min = firstHauf.getFrom();
 
         if (info.getResInfoType().getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
@@ -211,7 +191,7 @@ public class ResInfoTools {
      * @return Date of the departure. null if not away.
      */
     public static Date absentSince(Resident bewohner) {
-        ResInfo lastabsence = getLastResinfo(bewohner, ResInfoTypeTools.getByID(ResInfoTypeTools.TYPE_ABSENCE));
+        ResInfo lastabsence = getLastResinfo(bewohner, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ABSENCE));
         return lastabsence == null || lastabsence.isClosed() ? null : lastabsence.getFrom();
     }
 
@@ -222,28 +202,6 @@ public class ResInfoTools {
     public static boolean isChangeable(ResInfo resInfo) {
         return resInfo.getResident().isActive() && (!resInfo.isClosed() || resInfo.isNoConstraints() || resInfo.isSingleIncident());
     }
-
-//    /**
-//     * @return Eine ArrayList aus Date[0..1] Arrays mit jeweils Von, Bis, die alle Heimaufenthalte des BW enthalten.
-//     */
-//    public static List<ResInfo> getHeimaufenthalte(Bewohner bewohner) {
-//        List<ResInfo> result = new Vector<ResInfo>();
-//        EntityManager em = OPDE.createEM();
-//        try {
-//            String jpql = "" +
-//                    " SELECT b FROM ResInfo b" +
-//                    " WHERE b.bwinfotyp.bwinftyp = 'hauf' AND b.bewohner = :bewohner " +
-//                    " ORDER BY b.von ";
-//            Query query = em.createQuery(jpql);
-//            query.setParameter("bewohner", bewohner);
-//            result = query.getResultList();
-//        } catch (Exception e) {
-//            OPDE.fatal(e);
-//        } finally {
-//            em.close();
-//        }
-//        return result;
-//    }
 
     /**
      * Ermittelt für eine ResInfo eine passende HTML Darstellung. Diese Methode wird nur bei einer Neueingabe oder Änderung
@@ -951,7 +909,7 @@ public class ResInfoTools {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp = :bwinfotyp AND b.to > :now ORDER BY b.from DESC");
         query.setParameter("bewohner", bewohner);
-        query.setParameter("bwinfotyp", ResInfoTypeTools.getByID(ResInfoTypeTools.TYPE_DIAGNOSIS));
+        query.setParameter("bwinfotyp", ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_DIAGNOSIS));
         query.setParameter("now", new Date());
         List<ResInfo> diags = query.getResultList();
         em.close();
