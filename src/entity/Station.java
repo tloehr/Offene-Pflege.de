@@ -18,8 +18,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -41,7 +39,7 @@ public class Station implements Serializable {
     private Long statID;
     @Basic(optional = false)
     @Column(name = "Name")
-    private String bezeichnung;
+    private String name;
     @JoinColumn(name = "EID", referencedColumnName = "EID")
     @ManyToOne
     private Homes home;
@@ -53,6 +51,10 @@ public class Station implements Serializable {
     public Station() {
     }
 
+    public Station(String name) {
+        this.name = name;
+    }
+
     public Long getStatID() {
         return statID;
     }
@@ -61,12 +63,12 @@ public class Station implements Serializable {
         this.statID = statID;
     }
 
-    public String getBezeichnung() {
-        return bezeichnung;
+    public String getName() {
+        return name;
     }
 
     public void setBezeichnung(String bezeichnung) {
-        this.bezeichnung = bezeichnung;
+        this.name = bezeichnung;
     }
 
     public Homes getHome() {
@@ -107,7 +109,7 @@ public class Station implements Serializable {
 
     @Override
     public String toString() {
-        return bezeichnung;
+        return name;
     }
 
 }

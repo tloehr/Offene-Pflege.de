@@ -13,9 +13,12 @@ import entity.reports.NReport;
 import entity.system.Users;
 import entity.values.ResValue;
 import op.OPDE;
+import op.controlling.PnlControlling;
 import op.process.PnlProcess;
+import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
@@ -25,8 +28,8 @@ import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import java.awt.*;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -235,6 +238,138 @@ public class QProcessTools {
             myProcess.setTo(enddate);
             myProcess.getPReports().add(pReport);
         }
+    }
+
+
+    /**
+     * Erstellt ein HTML Dokument mit dem folgenden Inhalt:
+     * <ul>
+     * <li>Aufstellung über Häufigkeit der Beschwerden auf Monate verteilt</li>
+     * <li>Aufstellung über Häufigkeit der Beschwerden auf Staff verteilt</li>
+     * <li>Aufstellung über Häufigkeit der Beschwerden auf Bewohner verteilt</li>
+     * <li>Aufstellung über die Zeit zwischen öffnen und schließen in Tagen</li>
+     * <li>Auflistung aller Beschwerden in einem bestimmten Zeitraum</li>
+     * </ul>
+     *
+     * @return
+     */
+    public static String getComplaintsAnalysis(int monthsback, Closure progress) {
+        StringBuilder html = new StringBuilder(1000);
+        StringBuffer table;
+
+        DateMidnight from = new DateMidnight().minusMonths(monthsback).dayOfMonth().withMinimumValue();
+        EntityManager em = OPDE.createEM();
+        DateFormat df = DateFormat.getDateInstance();
+        SimpleDateFormat monthFormatter = new SimpleDateFormat("MMMM yyyy");
+        int p = -1;
+        progress.execute(new Pair<Integer, Integer>(p, 100));
+
+        String jpql1 = " " +
+                " SELECT qp " +
+                " FROM QProcess qp " +
+                " WHERE qp.pcat.type = :pcat " +
+                " AND qp.from >= :from ";
+
+        Query query1 = em.createQuery(jpql1);
+        query1.setParameter("pcat", PCatTools.PCAT_TYPE_COMPLAINT);
+        query1.setParameter("from", from.toDate());
+        ArrayList<QProcess> listData = new ArrayList<QProcess>(query1.getResultList());
+
+        html.append(SYSConst.html_h1(PnlControlling.internalClassID + ".orga.complaints"));
+        html.append(SYSConst.html_h2(OPDE.lang.getString("misc.msg.analysis") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
+
+        // By Month
+        HashMap<DateMidnight, Integer> monthMap = new HashMap<DateMidnight, Integer>();
+        HashMap<Users, Integer> userMap = new HashMap<Users, Integer>();
+        HashMap<Resident, Integer> residentMap = new HashMap<Resident, Integer>();
+        for (QProcess qp : listData) {
+            DateMidnight currentMonth = new DateMidnight(qp.getFrom()).dayOfMonth().withMinimumValue();
+            if (!monthMap.containsKey(currentMonth)) {
+                monthMap.put(currentMonth, 0);
+            }
+            monthMap.put(currentMonth, monthMap.get(currentMonth) + 1);
+            if (!userMap.containsKey(qp.getCreator())) {
+                userMap.put(qp.getCreator(), 0);
+            }
+            userMap.put(qp.getCreator(), userMap.get(qp.getCreator()) + 1);
+            if (!residentMap.containsKey(qp.getCreator())) {
+                residentMap.put(qp.getResident(), 0);
+            }
+            residentMap.put(qp.getResident(), residentMap.get(qp.getResident()) + 1);
+        }
+        ArrayList<DateMidnight> listMonth = new ArrayList<DateMidnight>(monthMap.keySet());
+        Collections.sort(listMonth);
+        ArrayList<Users> listUsers = new ArrayList<Users>(userMap.keySet());
+        Collections.sort(listUsers);
+        ArrayList<Resident> listResidents = new ArrayList<Resident>(residentMap.keySet());
+        Collections.sort(listResidents);
+
+        em.close();
+
+        html.append(SYSConst.html_h3(PnlControlling.internalClassID + ".orga.complaints.byMonth"));
+        table = new StringBuffer(1000);
+        table.append(SYSConst.html_table_tr(
+                SYSConst.html_table_th("misc.msg.Number") +
+                        SYSConst.html_table_th("misc.msg.month")
+        ));
+        for (DateMidnight currentMonth : listMonth) {
+            table.append(SYSConst.html_table_tr(
+                    SYSConst.html_table_td(new Integer(monthMap.get(currentMonth)).toString(), "right") +
+                            SYSConst.html_table_td(monthFormatter.format(currentMonth.toDate()))
+            ));
+        }
+        html.append(SYSConst.html_table(table.toString(), "1"));
+
+        html.append(SYSConst.html_h3(PnlControlling.internalClassID + ".orga.complaints.byEmployees"));
+        table = new StringBuffer(1000);
+        table.append(SYSConst.html_table_tr(
+                SYSConst.html_table_th("misc.msg.Number") +
+                        SYSConst.html_table_th("misc.msg.Users")
+        ));
+        for (Users user : listUsers) {
+            table.append(SYSConst.html_table_tr(
+                    SYSConst.html_table_td(new Integer(userMap.get(user)).toString(), "right") +
+                            SYSConst.html_table_td(user.getFullname())
+            ));
+        }
+        html.append(SYSConst.html_table(table.toString(), "1"));
+
+        html.append(SYSConst.html_h3(PnlControlling.internalClassID + ".orga.complaints.byResidents"));
+        table = new StringBuffer(1000);
+        table.append(SYSConst.html_table_tr(
+                SYSConst.html_table_th("misc.msg.Number") +
+                        SYSConst.html_table_th("misc.msg.resident")
+        ));
+        for (Resident resident : listResidents) {
+            table.append(SYSConst.html_table_tr(
+                    SYSConst.html_table_td(new Integer(residentMap.get(resident)).toString(), "right") +
+                            SYSConst.html_table_td(ResidentTools.getTextCompact(resident))
+            ));
+        }
+        html.append(SYSConst.html_table(table.toString(), "1"));
+
+        html.append(SYSConst.html_h3(PnlControlling.internalClassID + ".orga.complaints.complete"));
+        table = new StringBuffer(1000);
+        table.append(SYSConst.html_table_tr(
+                SYSConst.html_table_th("misc.msg.title") +
+                        SYSConst.html_table_th("misc.msg.period") +
+                        SYSConst.html_table_th("misc.msg.resident")
+        ));
+        for (QProcess qp : listData) {
+            table.append(SYSConst.html_table_tr(
+                    SYSConst.html_table_td(qp.getTitle()) +
+                            SYSConst.html_table_td(qp.getPITAsHTML()) +
+                            SYSConst.html_table_td(ResidentTools.getTextCompact(qp.getResident()))
+            ));
+        }
+        html.append(SYSConst.html_table(table.toString(), "1"));
+
+        monthMap.clear();
+        listData.clear();
+        listMonth.clear();
+
+        return html.toString();
+
     }
 
 

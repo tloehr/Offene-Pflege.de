@@ -732,7 +732,7 @@ public class PnlHandover extends NursingRecordsPanel {
                                     "</td>" +
                                     "<td width=\"350\" align=\"left\">" +
                                     nreport.getText() +
-                                    "<td width=\"200\" align=\"left\">" + ResidentTools.getBWLabelTextKompakt(nreport.getResident()) + "</td>" +
+                                    "<td width=\"200\" align=\"left\">" + ResidentTools.getTextCompact(nreport.getResident()) + "</td>" +
                                     "</td>" +
                                     "<td width=\"200\" align=\"left\">" + nreport.getUser().getFullname() + "</td>" +
                                     "</tr>" +

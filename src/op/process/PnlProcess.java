@@ -193,7 +193,7 @@ public class PnlProcess extends NursingRecordsPanel {
 //                " <b>" +
 //                (qProcess.isCommon() ?
 //                        "" :
-//                        ResidentTools.getBWLabelTextKompakt(qProcess.getResident())) +
+//                        ResidentTools.getTextCompact(qProcess.getResident())) +
 //                "</b>, " +
 //                "[" +
 //                DateFormat.getDateInstance(DateFormat.SHORT).format(qProcess.getFrom()) + "&rarr;" +
@@ -207,7 +207,7 @@ public class PnlProcess extends NursingRecordsPanel {
                 "<td width=\"100\" align=\"left\">" + " <b>" +
                 (qProcess.isCommon() ?
                         "" :
-                        ResidentTools.getBWLabelTextKompakt(qProcess.getResident())) +
+                        ResidentTools.getTextCompact(qProcess.getResident())) +
                 "</b>, "
                 + "</td>" +
                 "<td width=\"400\" align=\"left\">" +

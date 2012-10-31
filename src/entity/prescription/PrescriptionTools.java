@@ -238,7 +238,7 @@ public class PrescriptionTools {
                     html += "</table>";
                     html += "<h1 align=\"center\" id=\"fonth1\" style=\"page-break-before:always\">";
                 }
-                html += header + " (" + station.getBezeichnung() + ")" + "</h1>";
+                html += header + " (" + station.getName() + ")" + "</h1>";
                 html += "<div align=\"center\" id=\"fontsmall\">Stellpläne <u>nur einen Tag</u> lang benutzen! Danach <u>müssen sie vernichtet</u> werden.</div>";
                 statid = station.getStatID();
             }

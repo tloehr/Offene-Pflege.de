@@ -38,7 +38,6 @@ import com.jidesoft.status.TimeStatusBarItem;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideSplitPane;
-import com.jidesoft.wizard.WizardDialog;
 import entity.Station;
 import entity.StationTools;
 import entity.files.SYSFilesTools;
@@ -54,9 +53,7 @@ import op.care.med.PnlMed;
 import op.care.supervisor.PnlHandover;
 import op.controlling.PnlControlling;
 import op.process.PnlProcess;
-import op.residents.bwassistant.AddBWWizard;
 import op.system.DlgLogin;
-import op.system.InternalClass;
 import op.system.InternalClassACL;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
@@ -80,7 +77,6 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * @author __USER__
@@ -587,7 +583,7 @@ public class FrmMain extends JFrame {
         panesApps.add(homeButton);
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT s FROM Station s ORDER BY s.bezeichnung");
+        Query query = em.createQuery("SELECT s FROM Station s ORDER BY s.name");
         ArrayList<Station> stationen = new ArrayList<Station>(query.getResultList());
         em.close();
         for (Station station : stationen) {
@@ -643,7 +639,7 @@ public class FrmMain extends JFrame {
         ArrayList<Resident> bewohnerliste = new ArrayList<Resident>(query.getResultList());
         em.close();
 
-        CollapsiblePane mypane = new CollapsiblePane(station == null ? OPDE.lang.getString("misc.msg.Archive") : station.getBezeichnung());
+        CollapsiblePane mypane = new CollapsiblePane(station == null ? OPDE.lang.getString("misc.msg.Archive") : station.getName());
         mypane.setFont(SYSConst.ARIAL14);
         mypane.setEmphasized(station != null && station.equals(StationTools.getSpecialStation()));
 //        mypane.setSlidingDirection(SwingConstants.SOUTH);

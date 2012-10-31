@@ -64,7 +64,7 @@ public class ResidentTools {
         return "(*" + DateFormat.getDateInstance().format(bewohner.getBirthday()) + ") [" + bewohner.getRID() + "]";
     }
 
-    public static String getBWLabelTextKompakt(Resident bewohner) {
+    public static String getTextCompact(Resident bewohner) {
         return bewohner.getName() + ", " + bewohner.getVorname() + " [" + bewohner.getRID() + "]";
     }
 

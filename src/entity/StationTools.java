@@ -19,7 +19,7 @@ public class StationTools {
 
     public static DefaultComboBoxModel getAll4Combobox() {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT s FROM Station s ORDER BY s.bezeichnung ");
+        Query query = em.createQuery("SELECT s FROM Station s ORDER BY s.name ");
         DefaultComboBoxModel result = new DefaultComboBoxModel(new Vector<Station>(query.getResultList()));
         em.close();
         return result;

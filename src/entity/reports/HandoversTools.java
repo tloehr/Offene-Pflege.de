@@ -167,7 +167,7 @@ public class HandoversTools {
 
                     long num = NReportTools.getNum(resident, day);
                     if (num == 0) {
-                        htmlul1 += "<li>" + ResidentTools.getBWLabelTextKompakt(resident);
+                        htmlul1 += "<li>" + ResidentTools.getTextCompact(resident);
                         if (mapAbsentSince.containsKey(resident)) {
                             htmlul1 += OPDE.lang.getString("misc.msg.ResidentAbsentSince") + ": " + DateFormat.getDateInstance().format(mapAbsentSince.get(resident));
                         }
@@ -221,7 +221,7 @@ public class HandoversTools {
                     html += "<h3 id=\"fonth3\">" + OPDE.lang.getString("misc.msg.noEntries") + "...</h3>";
                 } else {
                     for (Resident resident : bhpStats.keySet()) {
-                        html += "<h3 id=\"fonth3\">" + ResidentTools.getBWLabelTextKompakt(resident);
+                        html += "<h3 id=\"fonth3\">" + ResidentTools.getTextCompact(resident);
                         if (mapAbsentSince.containsKey(resident)) {
                             htmlul1 += OPDE.lang.getString("misc.msg.ResidentAbsentSince") + ": " + DateFormat.getDateInstance().format(mapAbsentSince.get(resident));
                         }
@@ -271,7 +271,7 @@ public class HandoversTools {
                         }
                     }
                     if (!htmlul2.isEmpty()) {
-                        htmlul3 += "<li>" + ResidentTools.getBWLabelTextKompakt(resident) + "<ul>" + htmlul2 + "</ul></li>";
+                        htmlul3 += "<li>" + ResidentTools.getTextCompact(resident) + "<ul>" + htmlul2 + "</ul></li>";
                     }
                 }
 

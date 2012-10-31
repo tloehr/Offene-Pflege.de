@@ -301,7 +301,7 @@ public class PnlWelcome extends CleanablePanel {
         String title = "<html><table border=\"0\">" +
                 "<tr valign=\"top\">" +
                 "<td width=\"200\" align=\"left\">" +
-                "<b>" + ResidentTools.getBWLabelTextKompakt(resident) + "</b></td>" +
+                "<b>" + ResidentTools.getTextCompact(resident) + "</b></td>" +
                 "<td width=\"200\" align=\"left\">" + OPDE.lang.getString(internalClassID + ".lastStool") + ": " +
                 (lastStool == null ? OPDE.lang.getString("misc.msg.noentryyet") : DateFormat.getDateInstance().format(lastStool.getPit())) + "</td>" +
                 "<td width=\"200\" align=\"left\">" + OPDE.lang.getString(internalClassID + ".controlPeriod") + ": " +
@@ -345,7 +345,7 @@ public class PnlWelcome extends CleanablePanel {
 
         String title = "<html><table border=\"0\">" +
                 "<td width=\"450\" align=\"left\">" +
-                "<b>" + ResidentTools.getBWLabelTextKompakt(resident) + "</b></td>" +
+                "<b>" + ResidentTools.getTextCompact(resident) + "</b></td>" +
                 "</td>";
 
         title += "<tr><td>";
@@ -405,7 +405,7 @@ public class PnlWelcome extends CleanablePanel {
                 "<tr valign=\"top\">" +
                 "<td width=\"100\" align=\"left\">" + DateFormat.getDateInstance().format(birthdayNext.toDate()) + "</td>" +
                 "<td width=\"400\" align=\"left\">" +
-                "<b>" + ResidentTools.getBWLabelTextKompakt(resident) + "</b> " + OPDE.lang.getString("misc.msg.becomes") + " " + (age.getYears() + 1) + " " + OPDE.lang.getString("misc.msg.Years") +
+                "<b>" + ResidentTools.getTextCompact(resident) + "</b> " + OPDE.lang.getString("misc.msg.becomes") + " " + (age.getYears() + 1) + " " + OPDE.lang.getString("misc.msg.Years") +
                 "</td>" +
                 "</tr>" +
                 "</table>" +
@@ -436,7 +436,7 @@ public class PnlWelcome extends CleanablePanel {
                 "<td width=\"100\" align=\"left\">" + " <b>" +
                 (qProcess.isCommon() ?
                         "" :
-                        ResidentTools.getBWLabelTextKompakt(qProcess.getResident())) +
+                        ResidentTools.getTextCompact(qProcess.getResident())) +
                 "</b>, "
                 + "</td>" +
                 "<td width=\"400\" align=\"left\">" +

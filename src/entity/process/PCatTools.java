@@ -21,12 +21,12 @@ import java.util.List;
  */
 public class PCatTools {
 
-    public static final int PCAT_ART_MISC = 0;
-    public static final int PCAT_ART_CARE = 1;
-    public static final int PCAT_ART_BHP = 2;
-    public static final int PCAT_ART_SOCIAL = 3;
-    public static final int PCAT_ART_ADMIN = 4;
-    public static final int PCAT_ART_COMPLAINT = 5;
+    public static final int PCAT_TYPE_MISC = 0;
+    public static final int PCAT_TYPE_CARE = 1;
+    public static final int PCAT_TYPE_BHP = 2;
+    public static final int PCAT_TYPE_SOCIAL = 3;
+    public static final int PCAT_TYPE_ADMIN = 4;
+    public static final int PCAT_TYPE_COMPLAINT = 5;
 
 
 

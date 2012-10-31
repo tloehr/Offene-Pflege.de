@@ -41,7 +41,7 @@ public class PnlHAUF extends JPanel {
         lblStation.setText(OPDE.lang.getString("misc.msg.subdivision"));
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT s FROM Station s ORDER BY s.bezeichnung");
+        Query query = em.createQuery("SELECT s FROM Station s ORDER BY s.name");
         cmbStation.setModel(SYSTools.list2cmb(query.getResultList()));
         em.close();
 

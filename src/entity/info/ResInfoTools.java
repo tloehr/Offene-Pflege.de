@@ -1,14 +1,20 @@
 package entity.info;
 
 import entity.HomesTools;
+import entity.Station;
 import entity.prescription.DocTools;
 import entity.prescription.PrescriptionTools;
+import entity.process.QProcessElement;
+import entity.reports.NReportTAGSTools;
 import entity.reports.NReportTools;
 import entity.values.ResValue;
 import entity.values.ResValueTools;
 import entity.values.ResValueTypesTools;
 import op.OPDE;
+import op.controlling.PnlControlling;
 import op.tools.*;
+import org.apache.commons.collections.Closure;
+import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -29,6 +35,7 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -905,7 +912,6 @@ public class ResInfoTools {
     }
 
     private static String getDiags(Resident bewohner) {
-
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp = :bwinfotyp AND b.to > :now ORDER BY b.from DESC");
         query.setParameter("bewohner", bewohner);
@@ -953,6 +959,196 @@ public class ResInfoTools {
             OPDE.fatal(ex);
         }
         return props;
+    }
+
+    public static String getFallsAnonymous(int monthsback, Closure progress) {
+        StringBuilder html = new StringBuilder(1000);
+        DateMidnight from = new DateMidnight().minusMonths(monthsback).dayOfMonth().withMinimumValue();
+        EntityManager em = OPDE.createEM();
+        DateFormat df = DateFormat.getDateInstance();
+        SimpleDateFormat monthFormatter = new SimpleDateFormat("MMMM yyyy");
+        int p = -1;
+        progress.execute(new Pair<Integer, Integer>(p, 100));
+
+        String jpql = " " +
+                " SELECT ri " +
+                " FROM ResInfo ri " +
+                " WHERE ri.bwinfotyp.type = :type " +
+                " AND ri.resident.adminonly <> 2 " +
+                " AND ri.from >= :from ";
+
+        Query query = em.createQuery(jpql);
+        query.setParameter("type", ResInfoTypeTools.TYPE_FALL);
+        query.setParameter("from", from.toDate());
+        ArrayList<ResInfo> listData = new ArrayList<ResInfo>(query.getResultList());
+
+        Query query1 = em.createQuery("SELECT s FROM Station s ORDER BY s.name ");
+        ArrayList<Station> listStation = new ArrayList<Station>(query1.getResultList());
+
+        em.close();
+
+        Station exResident = new Station(OPDE.lang.getString(PnlControlling.internalClassID + ".nursing.falls.exResidents"));
+
+        // Init Maps
+        HashMap<DateMidnight, HashMap<Station, Integer>> statMap = new HashMap<DateMidnight, HashMap<Station, Integer>>();
+        for (DateMidnight month = from; month.compareTo(new DateMidnight().dayOfMonth().withMinimumValue()) <= 0; month = month.plusMonths(1)) {
+            statMap.put(month, new HashMap<Station, Integer>());
+            for (Station station : listStation) {
+                statMap.get(month).put(station, 0);
+            }
+            statMap.get(month).put(exResident, 0);
+        }
+
+        p = 0;
+        // Calculate Stats
+        for (ResInfo ri : listData) {
+            p++;
+            progress.execute(new Pair<Integer, Integer>(p, listData.size()));
+            DateMidnight currentMonth = new DateMidnight(ri.getFrom()).dayOfMonth().withMinimumValue();
+            Station station = ri.getResident().getStation() == null ? exResident : ri.getResident().getStation();
+            int numFalls = statMap.get(currentMonth).get(station) + 1;
+            statMap.get(currentMonth).put(station, numFalls);
+        }
+
+        ArrayList<DateMidnight> listMonths = new ArrayList<DateMidnight>(statMap.keySet());
+        Collections.sort(listMonths);
+
+        html.append(SYSConst.html_h1(PnlControlling.internalClassID + ".nursing.falls.anonymous"));
+        html.append(SYSConst.html_h2(OPDE.lang.getString("misc.msg.analysis") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
+
+        StringBuffer table = new StringBuffer(1000);
+        table.append(SYSConst.html_table_tr(
+                SYSConst.html_table_th("misc.msg.month") +
+                        SYSConst.html_table_th("misc.msg.subdivision") +
+                        SYSConst.html_table_th(PnlControlling.internalClassID + ".nursing.falls.fallCount")
+        ));
+
+        listStation.add(exResident);
+
+        int zebra = 0;
+        for (DateMidnight currentMonth : listMonths) {
+            zebra++;
+            for (Station station : listStation) {
+                table.append(SYSConst.html_table_tr(
+                        SYSConst.html_table_td(monthFormatter.format(currentMonth.toDate())) +
+                                SYSConst.html_table_td(station.getName()) +
+                                SYSConst.html_table_td(statMap.get(currentMonth).get(station).toString(), "right")
+                        , zebra % 2 == 0   // <= highlight
+                ));
+            }
+        }
+
+        html.append(SYSConst.html_table(table.toString(), "1"));
+
+        statMap.clear();
+        listData.clear();
+        listStation.clear();
+
+        return html.toString();
+    }
+
+
+    public static String getFallsByResidents(int monthsback, Closure progress) {
+        StringBuilder html = new StringBuilder(1000);
+        DateMidnight from = new DateMidnight().minusMonths(monthsback).dayOfMonth().withMinimumValue();
+        EntityManager em = OPDE.createEM();
+        DateFormat df = DateFormat.getDateInstance();
+        SimpleDateFormat monthFormatter = new SimpleDateFormat("MMMM yyyy");
+        int p = -1;
+        progress.execute(new Pair<Integer, Integer>(p, 100));
+
+        String jpql1 = " " +
+                " SELECT ri " +
+                " FROM ResInfo ri " +
+                " WHERE ri.bwinfotyp.type = :type " +
+                " AND ri.resident.adminonly <> 2 " +
+                " AND ri.from >= :from ";
+
+        Query query1 = em.createQuery(jpql1);
+        query1.setParameter("type", ResInfoTypeTools.TYPE_FALL);
+        query1.setParameter("from", from.toDate());
+        ArrayList<QProcessElement> listData = new ArrayList<QProcessElement>(query1.getResultList());
+
+        String jpql2 = " " +
+                " SELECT n FROM NReport n " +
+                " JOIN n.tags t " +
+                " WHERE n.pit > :from " +
+                " AND n.resident.adminonly <> 2 " +
+                " AND n.replacedBy IS NULL " +
+                " AND t.system = :tagsystem " +
+                " ORDER BY n.resident.rid, n.pit DESC ";
+        Query query2 = em.createQuery(jpql2);
+        query2.setParameter("tagsystem", NReportTAGSTools.TYPE_SYS_FALLS);
+        query2.setParameter("from", from.toDate());
+        listData.addAll(new ArrayList<QProcessElement>(query2.getResultList()));
+
+        p = 0;
+        HashMap<Resident, ArrayList<QProcessElement>> dataMap = new HashMap<Resident, ArrayList<QProcessElement>>();
+        for (QProcessElement element : listData) {
+            p++;
+            progress.execute(new Pair<Integer, Integer>(p, listData.size()));
+            if (!dataMap.containsKey(element.getResident())) {
+                dataMap.put(element.getResident(), new ArrayList<QProcessElement>());
+            }
+            dataMap.get(element.getResident()).add(element);
+        }
+
+        ArrayList<Resident> listResident = new ArrayList<Resident>(dataMap.keySet());
+        Collections.sort(listResident);
+
+        em.close();
+
+        html.append(SYSConst.html_h1(PnlControlling.internalClassID + ".nursing.falls.byResident"));
+        html.append(SYSConst.html_h2(OPDE.lang.getString("misc.msg.analysis") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
+
+        p = 0;
+        for (Resident resident : listResident) {
+            int fallCount = 0;
+
+            progress.execute(new Pair<Integer, Integer>(p, listResident.size()));
+            p++;
+
+            html.append(SYSConst.html_h2(ResidentTools.getTextCompact(resident)));
+
+            StringBuffer table = new StringBuffer(1000);
+
+            table.append(SYSConst.html_table_tr(
+                    SYSConst.html_table_th("misc.msg.Date") +
+                            SYSConst.html_table_th("misc.msg.details")
+            ));
+
+            Collections.sort(dataMap.get(resident), new Comparator<QProcessElement>() {
+                @Override
+                public int compare(QProcessElement o1, QProcessElement o2) {
+                    return new Long(o1.getPITInMillis()).compareTo(new Long(o2.getPITInMillis())) * -1;
+                }
+            });
+
+            for (QProcessElement element : dataMap.get(resident)) {
+                if (element instanceof ResInfo) {
+                    fallCount++;
+                }
+
+                table.append(SYSConst.html_table_tr(
+                        SYSConst.html_table_td(element.getPITAsHTML(), "left", "top") +
+                                SYSConst.html_table_td(element.getContentAsHTML())
+                ));
+            }
+
+            table.append(SYSConst.html_table_tr(
+                    SYSConst.html_table_th(PnlControlling.internalClassID + ".nursing.falls.fallCount") +
+                            SYSConst.html_table_th(new Integer(fallCount).toString())
+            ));
+
+            html.append(SYSConst.html_table(table.toString(), "1"));
+        }
+
+
+        dataMap.clear();
+        listData.clear();
+        listResident.clear();
+
+        return html.toString();
     }
 
     public static void closeAll(EntityManager em, Resident bewohner, Date enddate) throws Exception {

@@ -1,6 +1,7 @@
 package entity.prescription;
 
 import entity.Station;
+import entity.info.Resident;
 import entity.info.ResidentTools;
 import op.OPDE;
 import op.care.med.inventory.PnlInventory;
@@ -571,6 +572,7 @@ public class MedStockTools {
         StringBuilder html = new StringBuilder(1000);
         int p = -1;
         progress.execute(new Pair<Integer, Integer>(p, 100));
+        Resident prevResident = null;
 
         EntityManager em = OPDE.createEM();
         String jpql = " " +
@@ -589,9 +591,8 @@ public class MedStockTools {
         StringBuilder table = new StringBuilder(1000);
         DateFormat df = DateFormat.getDateInstance();
 
-
         html.append(SYSConst.html_h1(PnlControlling.internalClassID + ".drugs.controllist"));
-        html.append(SYSConst.html_h2(OPDE.lang.getString("misc.msg.subdivision") + ": " + station.getBezeichnung()));
+        html.append(SYSConst.html_h2(OPDE.lang.getString("misc.msg.subdivision") + ": " + station.getName()));
         html.append(SYSConst.html_h3(PnlControlling.internalClassID + ".drugs.controllist.key"));
         html.append(SYSConst.html_ul(
                 SYSConst.html_li(PnlControlling.internalClassID + ".drugs.controllist.key.1") +
@@ -620,12 +621,18 @@ public class MedStockTools {
         ));
 
         p = 0;
+        int zebra = 0;
         for (MedStock bestand : list) {
             progress.execute(new Pair<Integer, Integer>(p, list.size()));
             p++;
 
+            if (prevResident != bestand.getInventory().getResident()) {
+                zebra++;
+                prevResident = bestand.getInventory().getResident();
+            }
+
             table.append(SYSConst.html_table_tr(
-                    SYSConst.html_table_td(ResidentTools.getBWLabelTextKompakt(bestand.getInventory().getResident())) +
+                    SYSConst.html_table_td(ResidentTools.getTextCompact(bestand.getInventory().getResident())) +
                             SYSConst.html_table_td(bestand.getID().toString()) +
                             SYSConst.html_table_td(TradeFormTools.toPrettyString(bestand.getTradeForm())) +
                             SYSConst.html_table_td(df.format(bestand.getOpened())) +
@@ -637,7 +644,7 @@ public class MedStockTools {
                             SYSConst.html_table_td("&nbsp;") +
                             SYSConst.html_table_td("&nbsp;") +
                             SYSConst.html_table_td("&nbsp;")
-            ));
+                    , zebra % 2 == 0));
         }
         html.append(SYSConst.html_table(table.toString(), "1"));
         return html.toString();

@@ -322,7 +322,7 @@ public class ResValueTools {
             if (controlling.containsKey(ResidentTools.KEY_BALANCE) && controlling.getProperty(ResidentTools.KEY_BALANCE).equals("on")) {
                 BigDecimal targetIn = SYSTools.parseBigDecimal(controlling.getProperty(ResidentTools.KEY_TARGETIN));
 
-                html.append(SYSConst.html_h3(ResidentTools.getBWLabelTextKompakt(resident)));
+                html.append(SYSConst.html_h3(ResidentTools.getTextCompact(resident)));
                 html.append(SYSConst.html_div(SYSConst.html_bold(OPDE.lang.getString("misc.msg.targetDrink")) + ": " + targetIn.setScale(2, RoundingMode.HALF_UP).toString() + " ml"));
 
                 HashMap<DateMidnight, Pair<BigDecimal, BigDecimal>> balanceMap = getLiquidBalancePerDay(resident, from.toDateMidnight(), to.toDateMidnight());
@@ -408,7 +408,7 @@ public class ResValueTools {
             progress.execute(new Pair<Integer, Integer>(p, listResidents.size()));
             p++;
 
-            html.append(SYSConst.html_h3(ResidentTools.getBWLabelTextKompakt(resident)));
+            html.append(SYSConst.html_h3(ResidentTools.getTextCompact(resident)));
 
             ResValue height = getLast(resident, ResValueTypesTools.HEIGHT);
 

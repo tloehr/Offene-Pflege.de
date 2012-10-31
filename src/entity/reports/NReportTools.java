@@ -382,7 +382,7 @@ public class NReportTools {
 
             ArrayList<NReport> listReports = getBVActivities(resident, from);
 
-            html.append(SYSConst.html_h2_open + ResidentTools.getBWLabelTextKompakt(resident) + SYSConst.html_h2_close);
+            html.append(SYSConst.html_h2_open + ResidentTools.getTextCompact(resident) + SYSConst.html_h2_close);
 
             if (resident.getBv1() == null) {
                 html.append(SYSConst.html_div(SYSConst.html_bold(OPDE.lang.getString(PnlControlling.internalClassID + ".orga.bvactivities.nobv"))));
@@ -527,7 +527,7 @@ public class NReportTools {
             boolean highlight = socialtime.equals(BigDecimal.ZERO) || peatime.equals(BigDecimal.ZERO);
 
             table.append(SYSConst.html_table_tr(
-                    SYSConst.html_table_td(ResidentTools.getBWLabelTextKompakt(resident)) +
+                    SYSConst.html_table_td(ResidentTools.getTextCompact(resident)) +
                             SYSConst.html_table_td(socialtime.toString(), socialtime.equals(BigDecimal.ZERO)) +
                             SYSConst.html_table_td(socialtime.divide(new BigDecimal(60), 2, BigDecimal.ROUND_HALF_UP).toString(), socialtime.equals(BigDecimal.ZERO)) +
                             SYSConst.html_table_td(socialtime.divide(new BigDecimal(60), 2, BigDecimal.ROUND_HALF_UP).divide(daysinmonth, 2, BigDecimal.ROUND_HALF_UP).toString(), socialtime.equals(BigDecimal.ZERO)) +

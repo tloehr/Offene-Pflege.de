@@ -24,7 +24,7 @@ public class PCat implements Serializable {
     private String text;
     @Basic(optional = false)
     @Column(name = "Art")
-    private short art;
+    private short type;
 
     public PCat() {
     }
@@ -41,12 +41,12 @@ public class PCat implements Serializable {
         this.text = text;
     }
 
-    public short getArt() {
-        return art;
+    public short getType() {
+        return type;
     }
 
-    public void setArt(short art) {
-        this.art = art;
+    public void setType(short type) {
+        this.type = type;
     }
 
     @Override
@@ -56,7 +56,7 @@ public class PCat implements Serializable {
 
         PCat pCat = (PCat) o;
 
-        if (art != pCat.art) return false;
+        if (type != pCat.type) return false;
         if (id != null ? !id.equals(pCat.id) : pCat.id != null) return false;
         if (text != null ? !text.equals(pCat.text) : pCat.text != null) return false;
 
@@ -67,7 +67,7 @@ public class PCat implements Serializable {
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (text != null ? text.hashCode() : 0);
-        result = 31 * result + (int) art;
+        result = 31 * result + (int) type;
         return result;
     }
 

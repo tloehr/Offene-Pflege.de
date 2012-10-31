@@ -121,7 +121,7 @@ public class AddBWWizard {
             bewohner = em.merge(bewohner);
             bwinfo_hauf = em.merge(bwinfo_hauf);
             em.getTransaction().commit();
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ResidentTools.getBWLabelTextKompakt(bewohner) + " " + OPDE.lang.getString("misc.msg.entrysuccessful"), 6));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ResidentTools.getTextCompact(bewohner) + " " + OPDE.lang.getString("misc.msg.entrysuccessful"), 6));
             finishAction.execute(bewohner);
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
@@ -422,7 +422,7 @@ public class AddBWWizard {
             result += "<li>" + OPDE.lang.getString("misc.msg.lg") + ": " + LCustodianTools.getFullName(bewohner.getLCustodian1()) + "</li>";
 
             result += "<li>" + OPDE.lang.getString("misc.msg.movein") + ": " + DateFormat.getDateInstance().format(bwinfo_hauf.getFrom()) + "</li>";
-            result += "<li>" + OPDE.lang.getString("misc.msg.subdivision") + ": " + bewohner.getStation().getBezeichnung() + "</li>";
+            result += "<li>" + OPDE.lang.getString("misc.msg.subdivision") + ": " + bewohner.getStation().getName() + "</li>";
 
             result += "</ul>";
 

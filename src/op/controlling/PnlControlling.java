@@ -34,11 +34,13 @@ import com.jidesoft.swing.JideBoxLayout;
 import entity.Station;
 import entity.StationTools;
 import entity.files.SYSFilesTools;
+import entity.info.ResInfoTools;
 import entity.info.ResInfoTypeTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.prescription.MedStockTools;
 import entity.process.QProcessElement;
+import entity.process.QProcessTools;
 import entity.reports.NReportTAGSTools;
 import entity.reports.NReportTools;
 import entity.system.SYSPropsTools;
@@ -117,6 +119,9 @@ public class PnlControlling extends CleanablePanel {
         cpsControlling.removeAll();
         cpsControlling.setLayout(new JideBoxLayout(cpsControlling, JideBoxLayout.Y_AXIS));
         cpsControlling.add(createCP4Orga());
+        cpsControlling.add(createCP4Nursing());
+        cpsControlling.add(createCP4Nutrition());
+        cpsControlling.add(createCP4Drugs());
         cpsControlling.addExpansion();
     }
 
@@ -125,7 +130,7 @@ public class PnlControlling extends CleanablePanel {
         final CollapsiblePane cpOrga = new CollapsiblePane();
 
         String title = "<html><font size=+1>" +
-                OPDE.lang.getString(internalClassID) + //OPDE.lang.getString(internalClassID + ".orga") +
+                OPDE.lang.getString(internalClassID + ".orga") +
                 "</font></html>";
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
@@ -149,6 +154,117 @@ public class PnlControlling extends CleanablePanel {
 
         if (!cpOrga.isCollapsed()) {
             cpOrga.setContentPane(createContentPanel4Orga());
+        }
+
+        cpOrga.setHorizontalAlignment(SwingConstants.LEADING);
+//        cpOrga.setOpaque(false);
+//        cpOrga.setBackground(getColor(vtype, SYSConst.medium1));
+
+        return cpOrga;
+    }
+
+    private CollapsiblePane createCP4Nutrition() {
+        final CollapsiblePane cpOrga = new CollapsiblePane();
+
+        String title = "<html><font size=+1>" +
+                OPDE.lang.getString(internalClassID + ".nutrition") +
+                "</font></html>";
+
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    cpOrga.setCollapsed(!cpOrga.isCollapsed());
+                } catch (PropertyVetoException pve) {
+                    // BAH!
+                }
+            }
+        });
+        cpOrga.setTitleLabelComponent(cptitle.getMain());
+        cpOrga.setSlidingDirection(SwingConstants.SOUTH);
+        cpOrga.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+            @Override
+            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+                cpOrga.setContentPane(createContentPanel4Nutrition());
+            }
+        });
+
+        if (!cpOrga.isCollapsed()) {
+            cpOrga.setContentPane(createContentPanel4Nutrition());
+        }
+
+        cpOrga.setHorizontalAlignment(SwingConstants.LEADING);
+//        cpOrga.setOpaque(false);
+//        cpOrga.setBackground(getColor(vtype, SYSConst.medium1));
+
+        return cpOrga;
+    }
+
+    private CollapsiblePane createCP4Drugs() {
+        final CollapsiblePane cpOrga = new CollapsiblePane();
+
+        String title = "<html><font size=+1>" +
+                OPDE.lang.getString(internalClassID + ".drugs") +
+                "</font></html>";
+
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    cpOrga.setCollapsed(!cpOrga.isCollapsed());
+                } catch (PropertyVetoException pve) {
+                    // BAH!
+                }
+            }
+        });
+        cpOrga.setTitleLabelComponent(cptitle.getMain());
+        cpOrga.setSlidingDirection(SwingConstants.SOUTH);
+        cpOrga.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+            @Override
+            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+                cpOrga.setContentPane(createContentPanel4Drugs());
+            }
+        });
+
+        if (!cpOrga.isCollapsed()) {
+            cpOrga.setContentPane(createContentPanel4Drugs());
+        }
+
+        cpOrga.setHorizontalAlignment(SwingConstants.LEADING);
+//        cpOrga.setOpaque(false);
+//        cpOrga.setBackground(getColor(vtype, SYSConst.medium1));
+
+        return cpOrga;
+    }
+
+    private CollapsiblePane createCP4Nursing() {
+        final CollapsiblePane cpOrga = new CollapsiblePane();
+
+        String title = "<html><font size=+1>" +
+                OPDE.lang.getString(internalClassID + ".nursing") +
+                "</font></html>";
+
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    cpOrga.setCollapsed(!cpOrga.isCollapsed());
+                } catch (PropertyVetoException pve) {
+                    // BAH!
+                }
+            }
+        });
+        cpOrga.setTitleLabelComponent(cptitle.getMain());
+        cpOrga.setSlidingDirection(SwingConstants.SOUTH);
+        cpOrga.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+            @Override
+            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+                cpOrga.setContentPane(createContentPanel4Nursing());
+            }
+        });
+
+        if (!cpOrga.isCollapsed()) {
+            cpOrga.setContentPane(createContentPanel4Nursing());
         }
 
         cpOrga.setHorizontalAlignment(SwingConstants.LEADING);
@@ -205,76 +321,35 @@ public class PnlControlling extends CleanablePanel {
         pnlBV.add(txtBVWeeksBack, BorderLayout.EAST);
         pnlContent.add(pnlBV);
 
-        /***
-         *      _ _             _     _   _           _
-         *     | (_) __ _ _   _(_) __| | | |__   __ _| | __ _ _ __   ___ ___
-         *     | | |/ _` | | | | |/ _` | | '_ \ / _` | |/ _` | '_ \ / __/ _ \
-         *     | | | (_| | |_| | | (_| | | |_) | (_| | | (_| | | | | (_|  __/
-         *     |_|_|\__, |\__,_|_|\__,_| |_.__/ \__,_|_|\__,_|_| |_|\___\___|
-         *             |_|
-         */
-        JPanel pnlLiquidBalance = new JPanel(new BorderLayout());
-        final JButton btnLiquidBalance = GUITools.createHyperlinkButton(internalClassID + ".nutrition.liquidbalance", null, null);
-        final JComboBox cmbLiquidBalanceMonth = new JComboBox(SYSCalendar.createMonthList(new DateMidnight().minusYears(1), new DateMidnight()));
-        btnLiquidBalance.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                OPDE.getMainframe().setBlocked(true);
-                SwingWorker worker = new SwingWorker() {
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        DateMidnight month = (DateMidnight) cmbLiquidBalanceMonth.getSelectedItem();
-                        SYSFilesTools.print(ResValueTools.getLiquidBalance(month, progressClosure), false);
-                        return null;
-                    }
-
-                    @Override
-                    protected void done() {
-                        OPDE.getDisplayManager().setProgressBarMessage(null);
-                        OPDE.getMainframe().setBlocked(false);
-                    }
-                };
-                worker.execute();
-            }
-        });
-        cmbLiquidBalanceMonth.setRenderer(new ListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                return new DefaultListCellRenderer().getListCellRendererComponent(list, monthFormatter.format(((DateMidnight) value).toDate()), index, isSelected, cellHasFocus);
-            }
-        });
-        cmbLiquidBalanceMonth.setSelectedIndex(cmbLiquidBalanceMonth.getItemCount() - 2);
-        pnlLiquidBalance.add(btnLiquidBalance, BorderLayout.WEST);
-        pnlLiquidBalance.add(cmbLiquidBalanceMonth, BorderLayout.EAST);
-        pnlContent.add(pnlLiquidBalance);
 
         /***
-         *                   _       _     _         _        _   _     _   _
-         *     __      _____(_) __ _| |__ | |_   ___| |_ __ _| |_(_)___| |_(_) ___ ___
-         *     \ \ /\ / / _ \ |/ _` | '_ \| __| / __| __/ _` | __| / __| __| |/ __/ __|
-         *      \ V  V /  __/ | (_| | | | | |_  \__ \ || (_| | |_| \__ \ |_| | (__\__ \
-         *       \_/\_/ \___|_|\__, |_| |_|\__| |___/\__\__,_|\__|_|___/\__|_|\___|___/
-         *                     |___/
+         *                                _       _       _
+         *       ___ ___  _ __ ___  _ __ | | __ _(_)_ __ | |_ ___
+         *      / __/ _ \| '_ ` _ \| '_ \| |/ _` | | '_ \| __/ __|
+         *     | (_| (_) | | | | | | |_) | | (_| | | | | | |_\__ \
+         *      \___\___/|_| |_| |_| .__/|_|\__,_|_|_| |_|\__|___/
+         *                         |_|
          */
-        JPanel pnlWeight = new JPanel(new BorderLayout());
-        final JButton btnWeightStats = GUITools.createHyperlinkButton(internalClassID + ".nutrition.weightstats", null, null);
-        int wsMonthsBack;
+        JPanel pnlComplaints = new JPanel(new BorderLayout());
+        final JButton btnComplaints = GUITools.createHyperlinkButton(internalClassID + ".orga.complaints", null, null);
+        int complaintsMonthBack;
         try {
-            wsMonthsBack = Integer.parseInt(OPDE.getProps().getProperty(internalClassID + "::wsMonthsBack"));
+            complaintsMonthBack = Integer.parseInt(OPDE.getProps().getProperty(internalClassID + "::complaintsMonthBack"));
         } catch (NumberFormatException nfe) {
-            wsMonthsBack = 7;
+            complaintsMonthBack = 7;
         }
-        final JTextField txtWSMonthsBack = GUITools.createIntegerTextField(1, 24, wsMonthsBack);
-        txtWSMonthsBack.setToolTipText(OPDE.lang.getString("misc.msg.monthsback"));
-        btnWeightStats.addActionListener(new ActionListener() {
+        final JTextField txtComplaintsMonthsBack = GUITools.createIntegerTextField(1, 12, complaintsMonthBack);
+        txtComplaintsMonthsBack.setToolTipText(OPDE.lang.getString("misc.msg.monthsback"));
+
+        btnComplaints.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 OPDE.getMainframe().setBlocked(true);
                 SwingWorker worker = new SwingWorker() {
                     @Override
                     protected Object doInBackground() throws Exception {
-                        SYSPropsTools.storeProp(internalClassID + "::wsMonthsBack", txtWSMonthsBack.getText(), OPDE.getLogin().getUser());
-                        SYSFilesTools.print(ResValueTools.getWeightStats(Integer.parseInt(txtWSMonthsBack.getText()), progressClosure), false);
+                        SYSPropsTools.storeProp(internalClassID + "::complaintsMonthBack", txtComplaintsMonthsBack.getText(), OPDE.getLogin().getUser());
+                        SYSFilesTools.print(QProcessTools.getComplaintsAnalysis(Integer.parseInt(txtComplaintsMonthsBack.getText()), progressClosure), false);
                         return null;
                     }
 
@@ -287,44 +362,16 @@ public class PnlControlling extends CleanablePanel {
                 worker.execute();
             }
         });
-        pnlWeight.add(btnWeightStats, BorderLayout.WEST);
-        pnlWeight.add(txtWSMonthsBack, BorderLayout.EAST);
-        pnlContent.add(pnlWeight);
+        pnlComplaints.add(btnComplaints, BorderLayout.WEST);
+        pnlComplaints.add(txtComplaintsMonthsBack, BorderLayout.EAST);
+        pnlContent.add(pnlComplaints);
 
-        /***
-         *      ____                      ____            _             _   _     _     _
-         *     |  _ \ _ __ _   _  __ _   / ___|___  _ __ | |_ _ __ ___ | | | |   (_)___| |_
-         *     | | | | '__| | | |/ _` | | |   / _ \| '_ \| __| '__/ _ \| | | |   | / __| __|
-         *     | |_| | |  | |_| | (_| | | |__| (_) | | | | |_| | | (_) | | | |___| \__ \ |_
-         *     |____/|_|   \__,_|\__, |  \____\___/|_| |_|\__|_|  \___/|_| |_____|_|___/\__|
-         *                       |___/
-         */
-        JPanel pnlDrugControl = new JPanel(new BorderLayout());
-        final JButton btnDrugControl = GUITools.createHyperlinkButton(internalClassID + ".drugs.controllist", null, null);
-        final JComboBox cmbStation = new JComboBox(StationTools.getAll4Combobox());
-        btnDrugControl.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                OPDE.getMainframe().setBlocked(true);
-                SwingWorker worker = new SwingWorker() {
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        SYSFilesTools.print(MedStockTools.getListForMedControl((Station) cmbStation.getSelectedItem(), progressClosure), false);
-                        return null;
-                    }
+        return pnlContent;
+    }
 
-                    @Override
-                    protected void done() {
-                        OPDE.getDisplayManager().setProgressBarMessage(null);
-                        OPDE.getMainframe().setBlocked(false);
-                    }
-                };
-                worker.execute();
-            }
-        });
-        pnlDrugControl.add(btnDrugControl, BorderLayout.WEST);
-        pnlDrugControl.add(cmbStation, BorderLayout.EAST);
-        pnlContent.add(pnlDrugControl);
+    private JPanel createContentPanel4Nursing() {
+        JPanel pnlContent = new JPanel(new VerticalLayout());
+
 
         /***
          *     __        __                    _
@@ -413,6 +460,232 @@ public class PnlControlling extends CleanablePanel {
         pblSocialTimes.add(btnSocialTimes, BorderLayout.WEST);
         pblSocialTimes.add(cmbSocialTimes, BorderLayout.EAST);
         pnlContent.add(pblSocialTimes);
+
+        /***
+         *      _____     _ _          _
+         *     |  ___|_ _| | |___     / \   _ __   ___  _ __  _   _ _ __ ___   ___  _   _ ___
+         *     | |_ / _` | | / __|   / _ \ | '_ \ / _ \| '_ \| | | | '_ ` _ \ / _ \| | | / __|
+         *     |  _| (_| | | \__ \  / ___ \| | | | (_) | | | | |_| | | | | | | (_) | |_| \__ \
+         *     |_|  \__,_|_|_|___/ /_/   \_\_| |_|\___/|_| |_|\__, |_| |_| |_|\___/ \__,_|___/
+         *                                                    |___/
+         */
+        JPanel pnlFallsAnon = new JPanel(new BorderLayout());
+        final JButton btnFallsAnon = GUITools.createHyperlinkButton(internalClassID + ".nursing.falls.anonymous", null, null);
+        int fallsMonthsBack;
+        try {
+            fallsMonthsBack = Integer.parseInt(OPDE.getProps().getProperty(internalClassID + "::fallsMonthsBack"));
+        } catch (NumberFormatException nfe) {
+            fallsMonthsBack = 7;
+        }
+        final JTextField txtFallsMonthsBack = GUITools.createIntegerTextField(1, 12, fallsMonthsBack);
+        txtFallsMonthsBack.setToolTipText(OPDE.lang.getString("misc.msg.monthsback"));
+
+        btnFallsAnon.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OPDE.getMainframe().setBlocked(true);
+                SwingWorker worker = new SwingWorker() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        SYSPropsTools.storeProp(internalClassID + "::fallsMonthsBack", txtFallsMonthsBack.getText(), OPDE.getLogin().getUser());
+                        SYSFilesTools.print(ResInfoTools.getFallsAnonymous(Integer.parseInt(txtFallsMonthsBack.getText()), progressClosure), false);
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        OPDE.getDisplayManager().setProgressBarMessage(null);
+                        OPDE.getMainframe().setBlocked(false);
+                    }
+                };
+                worker.execute();
+            }
+        });
+        pnlFallsAnon.add(btnFallsAnon, BorderLayout.WEST);
+        pnlFallsAnon.add(txtFallsMonthsBack, BorderLayout.EAST);
+        pnlContent.add(pnlFallsAnon);
+
+        /***
+         *      _____     _ _       _           ____           _     _            _
+         *     |  ___|_ _| | |___  | |__  _   _|  _ \ ___  ___(_) __| | ___ _ __ | |_
+         *     | |_ / _` | | / __| | '_ \| | | | |_) / _ \/ __| |/ _` |/ _ \ '_ \| __|
+         *     |  _| (_| | | \__ \ | |_) | |_| |  _ <  __/\__ \ | (_| |  __/ | | | |_
+         *     |_|  \__,_|_|_|___/ |_.__/ \__, |_| \_\___||___/_|\__,_|\___|_| |_|\__|
+         *                                |___/
+         */
+        JPanel pnlFallsRes = new JPanel(new BorderLayout());
+        final JButton btnFallsRes = GUITools.createHyperlinkButton(internalClassID + ".nursing.falls.byResident", null, null);
+        int fallsResMonthsBack;
+        try {
+            fallsResMonthsBack = Integer.parseInt(OPDE.getProps().getProperty(internalClassID + "::fallsResMonthsBack"));
+        } catch (NumberFormatException nfe) {
+            fallsResMonthsBack = 7;
+        }
+        final JTextField txtResFallsMonthsBack = GUITools.createIntegerTextField(1, 12, fallsResMonthsBack);
+        txtResFallsMonthsBack.setToolTipText(OPDE.lang.getString("misc.msg.monthsback"));
+
+        btnFallsRes.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OPDE.getMainframe().setBlocked(true);
+                SwingWorker worker = new SwingWorker() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        SYSPropsTools.storeProp(internalClassID + "::fallsResMonthsBack", txtResFallsMonthsBack.getText(), OPDE.getLogin().getUser());
+                        SYSFilesTools.print(ResInfoTools.getFallsByResidents(Integer.parseInt(txtResFallsMonthsBack.getText()), progressClosure), false);
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        OPDE.getDisplayManager().setProgressBarMessage(null);
+                        OPDE.getMainframe().setBlocked(false);
+                    }
+                };
+                worker.execute();
+            }
+        });
+        pnlFallsRes.add(btnFallsRes, BorderLayout.WEST);
+        pnlFallsRes.add(txtResFallsMonthsBack, BorderLayout.EAST);
+        pnlContent.add(pnlFallsRes);
+
+
+        return pnlContent;
+    }
+
+    private JPanel createContentPanel4Drugs() {
+        JPanel pnlContent = new JPanel(new VerticalLayout());
+
+
+        /***
+         *      ____                      ____            _             _   _     _     _
+         *     |  _ \ _ __ _   _  __ _   / ___|___  _ __ | |_ _ __ ___ | | | |   (_)___| |_
+         *     | | | | '__| | | |/ _` | | |   / _ \| '_ \| __| '__/ _ \| | | |   | / __| __|
+         *     | |_| | |  | |_| | (_| | | |__| (_) | | | | |_| | | (_) | | | |___| \__ \ |_
+         *     |____/|_|   \__,_|\__, |  \____\___/|_| |_|\__|_|  \___/|_| |_____|_|___/\__|
+         *                       |___/
+         */
+        JPanel pnlDrugControl = new JPanel(new BorderLayout());
+        final JButton btnDrugControl = GUITools.createHyperlinkButton(internalClassID + ".drugs.controllist", null, null);
+        final JComboBox cmbStation = new JComboBox(StationTools.getAll4Combobox());
+        btnDrugControl.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OPDE.getMainframe().setBlocked(true);
+                SwingWorker worker = new SwingWorker() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        SYSFilesTools.print(MedStockTools.getListForMedControl((Station) cmbStation.getSelectedItem(), progressClosure), false);
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        OPDE.getDisplayManager().setProgressBarMessage(null);
+                        OPDE.getMainframe().setBlocked(false);
+                    }
+                };
+                worker.execute();
+            }
+        });
+        pnlDrugControl.add(btnDrugControl, BorderLayout.WEST);
+        pnlDrugControl.add(cmbStation, BorderLayout.EAST);
+        pnlContent.add(pnlDrugControl);
+
+
+        return pnlContent;
+    }
+
+    private JPanel createContentPanel4Nutrition() {
+        JPanel pnlContent = new JPanel(new VerticalLayout());
+
+
+        /***
+         *      _ _             _     _   _           _
+         *     | (_) __ _ _   _(_) __| | | |__   __ _| | __ _ _ __   ___ ___
+         *     | | |/ _` | | | | |/ _` | | '_ \ / _` | |/ _` | '_ \ / __/ _ \
+         *     | | | (_| | |_| | | (_| | | |_) | (_| | | (_| | | | | (_|  __/
+         *     |_|_|\__, |\__,_|_|\__,_| |_.__/ \__,_|_|\__,_|_| |_|\___\___|
+         *             |_|
+         */
+        JPanel pnlLiquidBalance = new JPanel(new BorderLayout());
+        final JButton btnLiquidBalance = GUITools.createHyperlinkButton(internalClassID + ".nutrition.liquidbalance", null, null);
+        final JComboBox cmbLiquidBalanceMonth = new JComboBox(SYSCalendar.createMonthList(new DateMidnight().minusYears(1), new DateMidnight()));
+        btnLiquidBalance.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OPDE.getMainframe().setBlocked(true);
+                SwingWorker worker = new SwingWorker() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        DateMidnight month = (DateMidnight) cmbLiquidBalanceMonth.getSelectedItem();
+                        SYSFilesTools.print(ResValueTools.getLiquidBalance(month, progressClosure), false);
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        OPDE.getDisplayManager().setProgressBarMessage(null);
+                        OPDE.getMainframe().setBlocked(false);
+                    }
+                };
+                worker.execute();
+            }
+        });
+        cmbLiquidBalanceMonth.setRenderer(new ListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                return new DefaultListCellRenderer().getListCellRendererComponent(list, monthFormatter.format(((DateMidnight) value).toDate()), index, isSelected, cellHasFocus);
+            }
+        });
+        cmbLiquidBalanceMonth.setSelectedIndex(cmbLiquidBalanceMonth.getItemCount() - 2);
+        pnlLiquidBalance.add(btnLiquidBalance, BorderLayout.WEST);
+        pnlLiquidBalance.add(cmbLiquidBalanceMonth, BorderLayout.EAST);
+        pnlContent.add(pnlLiquidBalance);
+
+        /***
+         *                   _       _     _         _        _   _     _   _
+         *     __      _____(_) __ _| |__ | |_   ___| |_ __ _| |_(_)___| |_(_) ___ ___
+         *     \ \ /\ / / _ \ |/ _` | '_ \| __| / __| __/ _` | __| / __| __| |/ __/ __|
+         *      \ V  V /  __/ | (_| | | | | |_  \__ \ || (_| | |_| \__ \ |_| | (__\__ \
+         *       \_/\_/ \___|_|\__, |_| |_|\__| |___/\__\__,_|\__|_|___/\__|_|\___|___/
+         *                     |___/
+         */
+        JPanel pnlWeight = new JPanel(new BorderLayout());
+        final JButton btnWeightStats = GUITools.createHyperlinkButton(internalClassID + ".nutrition.weightstats", null, null);
+        int wsMonthsBack;
+        try {
+            wsMonthsBack = Integer.parseInt(OPDE.getProps().getProperty(internalClassID + "::wsMonthsBack"));
+        } catch (NumberFormatException nfe) {
+            wsMonthsBack = 7;
+        }
+        final JTextField txtWSMonthsBack = GUITools.createIntegerTextField(1, 24, wsMonthsBack);
+        txtWSMonthsBack.setToolTipText(OPDE.lang.getString("misc.msg.monthsback"));
+        btnWeightStats.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OPDE.getMainframe().setBlocked(true);
+                SwingWorker worker = new SwingWorker() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        SYSPropsTools.storeProp(internalClassID + "::wsMonthsBack", txtWSMonthsBack.getText(), OPDE.getLogin().getUser());
+                        SYSFilesTools.print(ResValueTools.getWeightStats(Integer.parseInt(txtWSMonthsBack.getText()), progressClosure), false);
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        OPDE.getDisplayManager().setProgressBarMessage(null);
+                        OPDE.getMainframe().setBlocked(false);
+                    }
+                };
+                worker.execute();
+            }
+        });
+        pnlWeight.add(btnWeightStats, BorderLayout.WEST);
+        pnlWeight.add(txtWSMonthsBack, BorderLayout.EAST);
+        pnlContent.add(pnlWeight);
+
 
         return pnlContent;
     }
@@ -506,7 +779,7 @@ public class PnlControlling extends CleanablePanel {
             progress.execute(new Pair<Integer, Integer>(p, listResident.size()));
             p++;
 
-            html.append(SYSConst.html_h2(ResidentTools.getBWLabelTextKompakt(resident)));
+            html.append(SYSConst.html_h2(ResidentTools.getTextCompact(resident)));
 
             StringBuffer table = new StringBuffer(1000);
 
