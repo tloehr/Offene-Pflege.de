@@ -70,19 +70,19 @@ public class QProcessTools {
         Query query = null;
         if (element instanceof NReport) {
             query = em.createQuery("SELECT s FROM SYSNR2PROCESS s WHERE s.nreport = :element AND s.qProcess = :process AND s.qProcess.to = '9999-12-31 23:59:59'");
-            elementBezeichnung = "Pflegebericht";
+            elementBezeichnung = "SYSNR2PROCESS";
         } else if (element instanceof ResValue) {
             query = em.createQuery("SELECT s FROM SYSVAL2PROCESS s WHERE s.resValue = :element AND s.vorgang = :process AND s.vorgang.to = '9999-12-31 23:59:59'");
-            elementBezeichnung = "Bewohner Wert";
+            elementBezeichnung = "SYSVAL2PROCESS";
         } else if (element instanceof Prescription) {
             query = em.createQuery("SELECT s FROM SYSPRE2PROCESS s WHERE s.prescription = :element AND s.qProcess = :process AND s.qProcess.to = '9999-12-31 23:59:59'");
-            elementBezeichnung = "Ärztliche Verordnung";
+            elementBezeichnung = "SYSPRE2PROCESS";
         } else if (element instanceof ResInfo) {
             query = em.createQuery("SELECT s FROM SYSINF2PROCESS s WHERE s.bwinfo = :element AND s.vorgang = :process AND s.vorgang.to = '9999-12-31 23:59:59'");
-            elementBezeichnung = "Bewohner Information";
+            elementBezeichnung = "SYSINF2PROCESS";
         } else if (element instanceof NursingProcess) {
             query = em.createQuery("SELECT s FROM SYSNP2PROCESS s WHERE s.nursingProcess = :element AND s.vorgang = :process AND s.vorgang.to = '9999-12-31 23:59:59'");
-            elementBezeichnung = "Pflegeplanung";
+            elementBezeichnung = "SYSNP2PROCESS";
         } else {
 
         }
@@ -90,7 +90,7 @@ public class QProcessTools {
         query.setParameter("element", element);
         query.setParameter("process", qProcess);
 
-        QProcessElement connectionObject = (QProcessElement) query.getSingleResult();
+        Object connectionObject = query.getSingleResult();
         em.remove(connectionObject);
         qProcess.removeElement(element);
 
@@ -114,20 +114,32 @@ public class QProcessTools {
             html += "&nbsp;&nbsp;<b>" + OPDE.lang.getString("misc.msg.to") + ":</b> " + DateFormat.getDateInstance().format(qProcess.getTo());
         }
 
-        DateMidnight revision = new DateMidnight(qProcess.getRevision());
-        if (revision.isAfterNow()) {
-            int daysBetween = Days.daysBetween(new DateTime(), revision).getDays();
+//        DateMidnight revision = new DateMidnight(qProcess.getRevision());
 
-            if (daysBetween > 7) {
-                html += "<font " + SYSConst.html_darkgreen + ">";
-            } else if (daysBetween == 0) {
-                html += "<font " + SYSConst.html_gold7 + ">";
-            } else {
-                html += "<font " + SYSConst.html_darkorange + ">";
-            }
-        } else {
+
+        if (qProcess.isRevisionPastDue()) {
             html += "<font " + SYSConst.html_darkred + ">";
+        } else if (qProcess.isRevisionDue()) {
+            html += "<font " + SYSConst.html_gold7 + ">";
+        } else if (qProcess.isClosed()) {
+             html += "<font " + SYSConst.grey80 + ">";
+        } else {
+             html += "<font " + SYSConst.html_darkgreen + ">";
         }
+//
+//        if (revision.isAfterNow()) {
+//            int daysBetween = Days.daysBetween(new DateTime(), revision).getDays();
+//
+//            if (qProcess.idaysBetween > 7) {
+//                html += "<font " + SYSConst.html_darkgreen + ">";
+//            } else if (daysBetween == 0) {
+//                html += "<font " + SYSConst.html_gold7 + ">";
+//            } else {
+//                html += "<font " + SYSConst.html_darkorange + ">";
+//            }
+//        } else {
+//            html += "<font " + SYSConst.html_darkred + ">";
+//        }
         html += "&nbsp;&nbsp;<b>" + OPDE.lang.getString(PnlProcess.internalClassID + ".revision") + ":</b> ";
         html += DateFormat.getDateInstance().format(qProcess.getRevision()) + "</font>";
         html += "<br/><b>" + OPDE.lang.getString(PnlProcess.internalClassID + ".createdby") + ":</b> " + qProcess.getCreator().getFullname();

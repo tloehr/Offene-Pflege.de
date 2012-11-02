@@ -343,7 +343,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
     }
 
     public boolean isRevisionPastDue() {
-        return !isClosed() && new DateTime(revision).isAfterNow();
+        return !isClosed() && new DateTime(revision).isBeforeNow();
     }
 
     @Override

@@ -144,7 +144,7 @@ public class MedStockTools {
         hm.put("bestand.eingang", bestand.getEin());
         hm.put("bestand.userkurz", bestand.getUser().getUID());
         hm.put("bestand.userlang", bestand.getUser().getFullname());
-        hm.put("bestand.inventory.bewohnername", ResidentTools.getBWLabel1(bestand.getInventory().getResident()));
+        hm.put("bestand.inventory.bewohnername", ResidentTools.getNameAndFirstname(bestand.getInventory().getResident()));
         hm.put("bestand.inventory.bewohnergebdatum", bestand.getInventory().getResident().getBirthday());
         hm.put("bestand.inventory.bewohnerkennung", bestand.getInventory().getResident().getRID());
 
@@ -163,7 +163,7 @@ public class MedStockTools {
 //        }
 //
 //        result += SYSPrint.EPL2_print_ascii(5, 55, 0, SYSPrint.EPL2_FONT_12pt, 2, 2, true, Long.toString(bestand.getID()));
-//        result += SYSPrint.EPL2_print_ascii(5, 107, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, BewohnerTools.getBWLabel1(bestand.getInventory().getResident()));
+//        result += SYSPrint.EPL2_print_ascii(5, 107, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, BewohnerTools.getNameAndFirstname(bestand.getInventory().getResident()));
 //        result += SYSPrint.EPL2_print_ascii(5, 122, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, BewohnerTools.getBWLabel2(bestand.getInventory().getResident()));
 //
 //        result += SYSPrint.EPL2_PRINT;

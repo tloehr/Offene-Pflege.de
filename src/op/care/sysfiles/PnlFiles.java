@@ -34,12 +34,9 @@ import entity.files.SYSFiles;
 import entity.files.SYSFilesTools;
 import op.OPDE;
 import op.system.InternalClassACL;
-import op.tools.DlgYesNo;
+import op.tools.*;
 import op.system.FileDrop;
 import op.threads.DisplayMessage;
-import op.tools.GUITools;
-import op.tools.NursingRecordsPanel;
-import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 import tablerenderer.RNDHTML;
@@ -216,7 +213,7 @@ public class PnlFiles extends NursingRecordsPanel {
 
             if (col == TMSYSFiles.COL_DESCRIPTION && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
 
-                final JMenuItem itemPopupEdit = new JMenuItem(OPDE.lang.getString("misc.commands.edit"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/edit.png")));
+                final JMenuItem itemPopupEdit = new JMenuItem(OPDE.lang.getString("misc.commands.edit"), SYSConst.icon22edit3);
                 itemPopupEdit.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
 
@@ -230,7 +227,7 @@ public class PnlFiles extends NursingRecordsPanel {
                         ((JTextArea) editor).setEditable(true);
 
                         popup.getContentPane().add(new JScrollPane(editor));
-                        final JButton saveButton = new JButton(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+                        final JButton saveButton = new JButton(SYSConst.icon22apply);
                         saveButton.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent actionEvent) {
@@ -277,7 +274,7 @@ public class PnlFiles extends NursingRecordsPanel {
 
 
             if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {
-                JMenuItem itemPopupDelete = new JMenuItem(OPDE.lang.getString("misc.commands.delete"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/trashcan_empty.png")));
+                JMenuItem itemPopupDelete = new JMenuItem(OPDE.lang.getString("misc.commands.delete"), SYSConst.icon22delete);
                 itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
 
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -298,9 +295,7 @@ public class PnlFiles extends NursingRecordsPanel {
 
             menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
         } else {
-            if (evt.getClickCount() == 2 && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT)) { // DoppelClick
-                SYSFilesTools.handleFile(sysfile, Desktop.Action.OPEN);
-            }
+            SYSFilesTools.handleFile(sysfile, Desktop.Action.OPEN);
         }
 
 
@@ -323,7 +318,7 @@ public class PnlFiles extends NursingRecordsPanel {
         searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
         jspSearch.setViewportView(searchPanes);
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
             searchPanes.add(addCommands());
         }
 //        searchPanes.add(addFilters());

@@ -123,6 +123,7 @@ public class PnlUser extends CleanablePanel {
         contentMap = new HashMap<String, JPanel>();
         cpMap = new HashMap<String, CollapsiblePane>();
         usermap = new HashMap<String, Users>();
+        OPDE.getDisplayManager().setMainMessage(OPDE.getAppInfo().getInternalClasses().get(internalClassID).getShortDescription());
         prepareSearchArea();
     }
 
@@ -368,6 +369,12 @@ public class PnlUser extends CleanablePanel {
                             try {
                                 em.getTransaction().begin();
                                 Users user = em.merge((Users) o);
+                                // Put everyone into >>everyone<<
+                                Groups everyone = em.find(Groups.class, "everyone");
+                                em.lock(everyone, LockModeType.OPTIMISTIC);
+                                user.getGroups().add(everyone);
+                                everyone.getMembers().add(user);
+
                                 em.getTransaction().commit();
                                 lstUsers.add(user);
                                 reloadDisplay();

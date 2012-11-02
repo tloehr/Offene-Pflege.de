@@ -1,8 +1,6 @@
 package entity.process;
 
-import entity.prescription.DosageForm;
 import op.OPDE;
-import op.process.PnlProcess;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
@@ -10,7 +8,6 @@ import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -28,7 +25,22 @@ public class PCatTools {
     public static final int PCAT_TYPE_ADMIN = 4;
     public static final int PCAT_TYPE_COMPLAINT = 5;
 
-
+    public static ListCellRenderer getRenderer() {
+        return new ListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                String text;
+                if (o == null) {
+                    text = SYSTools.toHTMLForScreen(OPDE.lang.getString("misc.commands.>>noselection<<"));
+                } else if (o instanceof PCat) {
+                    text = o.toString();
+                } else {
+                    text = o.toString();
+                }
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+            }
+        };
+    }
 
     public static ArrayList<PCat> getPCats() {
         EntityManager em = OPDE.createEM();

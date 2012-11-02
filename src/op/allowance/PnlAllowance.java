@@ -322,29 +322,31 @@ public class PnlAllowance extends CleanablePanel {
         });
         titlePanelright.add(btnCollapseAll);
 
-        /***
-         *      ____       _       _   ____           _     _            _
-         *     |  _ \ _ __(_)_ __ | |_|  _ \ ___  ___(_) __| | ___ _ __ | |_
-         *     | |_) | '__| | '_ \| __| |_) / _ \/ __| |/ _` |/ _ \ '_ \| __|
-         *     |  __/| |  | | | | | |_|  _ <  __/\__ \ | (_| |  __/ | | | |_
-         *     |_|   |_|  |_|_| |_|\__|_| \_\___||___/_|\__,_|\___|_| |_|\__|
-         *
-         */
-        final JButton btnPrintResident = new JButton(SYSConst.icon22print2);
-        btnPrintResident.setPressedIcon(SYSConst.icon22print2Pressed);
-        btnPrintResident.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        btnPrintResident.setContentAreaFilled(false);
-        btnPrintResident.setBorder(null);
-        btnPrintResident.setToolTipText(OPDE.lang.getString(internalClassID + ".btnprintresident.tooltip"));
-        btnPrintResident.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                SYSFilesTools.print(AllowanceTools.getAsHTML(AllowanceTools.getAll(resident), BigDecimal.ZERO, currentResident), true);
-            }
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
+            /***
+             *      ____       _       _   ____           _     _            _
+             *     |  _ \ _ __(_)_ __ | |_|  _ \ ___  ___(_) __| | ___ _ __ | |_
+             *     | |_) | '__| | '_ \| __| |_) / _ \/ __| |/ _` |/ _ \ '_ \| __|
+             *     |  __/| |  | | | | | |_|  _ <  __/\__ \ | (_| |  __/ | | | |_
+             *     |_|   |_|  |_|_| |_|\__|_| \_\___||___/_|\__,_|\___|_| |_|\__|
+             *
+             */
+            final JButton btnPrintResident = new JButton(SYSConst.icon22print2);
+            btnPrintResident.setPressedIcon(SYSConst.icon22print2Pressed);
+            btnPrintResident.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnPrintResident.setContentAreaFilled(false);
+            btnPrintResident.setBorder(null);
+            btnPrintResident.setToolTipText(OPDE.lang.getString(internalClassID + ".btnprintresident.tooltip"));
+            btnPrintResident.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    SYSFilesTools.print(AllowanceTools.getAsHTML(AllowanceTools.getAll(resident), BigDecimal.ZERO, currentResident), true);
+                }
 
 
-        });
-        titlePanelright.add(btnPrintResident);
+            });
+            titlePanelright.add(btnPrintResident);
+        }
 
         titlePanelleft.setOpaque(false);
         titlePanelright.setOpaque(false);
@@ -1104,161 +1106,164 @@ public class PnlAllowance extends CleanablePanel {
                         "</font></html>");
                 singlePaneLeft.add(lblSingle);
 
-                /***
-                 *      _____    _ _ _
-                 *     | ____|__| (_) |_
-                 *     |  _| / _` | | __|
-                 *     | |__| (_| | | |_
-                 *     |_____\__,_|_|\__|
-                 *
-                 */
-                final JButton btnEdit = new JButton(SYSConst.icon22edit3);
-                btnEdit.setPressedIcon(SYSConst.icon22edit3Pressed);
-                btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                btnEdit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnEdit.setContentAreaFilled(false);
-                btnEdit.setBorder(null);
-                btnEdit.setToolTipText(OPDE.lang.getString(internalClassID + ".btnedit.tooltip"));
-                btnEdit.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
+                if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+                    /***
+                     *      _____    _ _ _
+                     *     | ____|__| (_) |_
+                     *     |  _| / _` | | __|
+                     *     | |__| (_| | | |_
+                     *     |_____\__,_|_|\__|
+                     *
+                     */
+                    final JButton btnEdit = new JButton(SYSConst.icon22edit3);
+                    btnEdit.setPressedIcon(SYSConst.icon22edit3Pressed);
+                    btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                    btnEdit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    btnEdit.setContentAreaFilled(false);
+                    btnEdit.setBorder(null);
+                    btnEdit.setToolTipText(OPDE.lang.getString(internalClassID + ".btnedit.tooltip"));
+                    btnEdit.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent actionEvent) {
 
-                        final JidePopup popupTX = new JidePopup();
-                        popupTX.setMovable(false);
-                        PnlTX pnlTX = new PnlTX(allowance, new Closure() {
-                            @Override
-                            public void execute(Object o) {
-                                OPDE.debug(o);
-                                if (o != null) {
+                            final JidePopup popupTX = new JidePopup();
+                            popupTX.setMovable(false);
+                            PnlTX pnlTX = new PnlTX(allowance, new Closure() {
+                                @Override
+                                public void execute(Object o) {
+                                    OPDE.debug(o);
+                                    if (o != null) {
 
-                                    EntityManager em = OPDE.createEM();
-                                    try {
-                                        em.getTransaction().begin();
-                                        Allowance myAllowance = em.merge((Allowance) o);
-                                        em.lock(em.merge(myAllowance.getResident()), LockModeType.OPTIMISTIC);
-                                        em.lock(myAllowance, LockModeType.OPTIMISTIC);
-                                        em.getTransaction().commit();
-
-                                        DateTime txDate = new DateTime(myAllowance.getDate());
-
-                                        final String keyMonth = myAllowance.getResident().getRID() + "-" + txDate.getYear() + "-" + txDate.getMonthOfYear();
-                                        contentmap.remove(keyMonth);
-                                        cpMap.remove(keyMonth);
-                                        cashmap.get(keyMonth).remove(allowance);
-                                        cashmap.get(keyMonth).add(myAllowance);
-                                        Collections.sort(cashmap.get(keyMonth));
-                                        createCP4(myAllowance.getResident());
-
+                                        EntityManager em = OPDE.createEM();
                                         try {
-                                            cpMap.get(keyMonth).setCollapsed(false);
-                                        } catch (PropertyVetoException e) {
-                                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                                            em.getTransaction().begin();
+                                            Allowance myAllowance = em.merge((Allowance) o);
+                                            em.lock(em.merge(myAllowance.getResident()), LockModeType.OPTIMISTIC);
+                                            em.lock(myAllowance, LockModeType.OPTIMISTIC);
+                                            em.getTransaction().commit();
+
+                                            DateTime txDate = new DateTime(myAllowance.getDate());
+
+                                            final String keyMonth = myAllowance.getResident().getRID() + "-" + txDate.getYear() + "-" + txDate.getMonthOfYear();
+                                            contentmap.remove(keyMonth);
+                                            cpMap.remove(keyMonth);
+                                            cashmap.get(keyMonth).remove(allowance);
+                                            cashmap.get(keyMonth).add(myAllowance);
+                                            Collections.sort(cashmap.get(keyMonth));
+                                            createCP4(myAllowance.getResident());
+
+                                            try {
+                                                cpMap.get(keyMonth).setCollapsed(false);
+                                            } catch (PropertyVetoException e) {
+                                                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                                            }
+
+                                            buildPanel();
+                                        } catch (OptimisticLockException ole) {
+                                            if (em.getTransaction().isActive()) {
+                                                em.getTransaction().rollback();
+                                            }
+                                            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                                OPDE.getMainframe().emptyFrame();
+                                                OPDE.getMainframe().afterLogin();
+                                            }
+                                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                        } catch (Exception e) {
+                                            if (em.getTransaction().isActive()) {
+                                                em.getTransaction().rollback();
+                                            }
+                                            OPDE.fatal(e);
+                                        } finally {
+                                            em.close();
                                         }
 
-                                        buildPanel();
-                                    } catch (OptimisticLockException ole) {
-                                        if (em.getTransaction().isActive()) {
-                                            em.getTransaction().rollback();
-                                        }
-                                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                            OPDE.getMainframe().emptyFrame();
-                                            OPDE.getMainframe().afterLogin();
-                                        }
-                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                    } catch (Exception e) {
-                                        if (em.getTransaction().isActive()) {
-                                            em.getTransaction().rollback();
-                                        }
-                                        OPDE.fatal(e);
-                                    } finally {
-                                        em.close();
-                                    }
-
-                                }
-                            }
-                        });
-                        popupTX.setContentPane(pnlTX);
-                        popupTX.removeExcludedComponent(pnlTX);
-                        popupTX.setDefaultFocusComponent(pnlTX);
-
-                        popupTX.setOwner(btnEdit);
-                        GUITools.showPopup(popupTX, SwingConstants.WEST);
-
-                    }
-                });
-                singlePaneRight.add(btnEdit);
-
-                /***
-                 *      ____       _      _
-                 *     |  _ \  ___| | ___| |_ ___
-                 *     | | | |/ _ \ |/ _ \ __/ _ \
-                 *     | |_| |  __/ |  __/ ||  __/
-                 *     |____/ \___|_|\___|\__\___|
-                 *
-                 */
-                final JButton btnDelete = new JButton(SYSConst.icon22delete);
-                btnDelete.setPressedIcon(SYSConst.icon22deletePressed);
-                btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                btnDelete.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnDelete.setContentAreaFilled(false);
-                btnDelete.setBorder(null);
-                btnDelete.setToolTipText(OPDE.lang.getString(internalClassID + ".btndelete.tooltip"));
-                btnDelete.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
-                        new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<br/><i>" + allowance.getText() + "&nbsp;" + cf.format(allowance.getAmount()) + "</i><br/>" + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
-                            @Override
-                            public void execute(Object answer) {
-                                if (answer.equals(JOptionPane.YES_OPTION)) {
-                                    EntityManager em = OPDE.createEM();
-                                    try {
-                                        em.getTransaction().begin();
-                                        Allowance myAllowance = em.merge(allowance);
-                                        em.lock(em.merge(myAllowance.getResident()), LockModeType.OPTIMISTIC);
-                                        em.remove(myAllowance);
-                                        em.getTransaction().commit();
-
-                                        DateTime txDate = new DateTime(myAllowance.getDate());
-                                        final String keyMonth = myAllowance.getResident().getRID() + "-" + txDate.getYear() + "-" + txDate.getMonthOfYear();
-
-                                        contentmap.remove(keyMonth);
-                                        cpMap.remove(keyMonth);
-                                        cashmap.get(keyMonth).remove(myAllowance);
-                                        createCP4(myAllowance.getResident());
-
-                                        try {
-                                            cpMap.get(keyMonth).setCollapsed(false);
-                                        } catch (PropertyVetoException e) {
-                                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                                        }
-
-                                        buildPanel();
-                                    } catch (OptimisticLockException ole) {
-                                        if (em.getTransaction().isActive()) {
-                                            em.getTransaction().rollback();
-                                        }
-                                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                            OPDE.getMainframe().emptyFrame();
-                                            OPDE.getMainframe().afterLogin();
-                                        }
-                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                    } catch (Exception e) {
-                                        if (em.getTransaction().isActive()) {
-                                            em.getTransaction().rollback();
-                                        }
-                                        OPDE.fatal(e);
-                                    } finally {
-                                        em.close();
                                     }
                                 }
-                            }
-                        });
+                            });
+                            popupTX.setContentPane(pnlTX);
+                            popupTX.removeExcludedComponent(pnlTX);
+                            popupTX.setDefaultFocusComponent(pnlTX);
+
+                            popupTX.setOwner(btnEdit);
+                            GUITools.showPopup(popupTX, SwingConstants.WEST);
+
+                        }
+                    });
+                    singlePaneRight.add(btnEdit);
+                }
+
+                if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {
+                    /***
+                     *      ____       _      _
+                     *     |  _ \  ___| | ___| |_ ___
+                     *     | | | |/ _ \ |/ _ \ __/ _ \
+                     *     | |_| |  __/ |  __/ ||  __/
+                     *     |____/ \___|_|\___|\__\___|
+                     *
+                     */
+                    final JButton btnDelete = new JButton(SYSConst.icon22delete);
+                    btnDelete.setPressedIcon(SYSConst.icon22deletePressed);
+                    btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                    btnDelete.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    btnDelete.setContentAreaFilled(false);
+                    btnDelete.setBorder(null);
+                    btnDelete.setToolTipText(OPDE.lang.getString(internalClassID + ".btndelete.tooltip"));
+                    btnDelete.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent actionEvent) {
+                            new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<br/><i>" + allowance.getText() + "&nbsp;" + cf.format(allowance.getAmount()) + "</i><br/>" + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
+                                @Override
+                                public void execute(Object answer) {
+                                    if (answer.equals(JOptionPane.YES_OPTION)) {
+                                        EntityManager em = OPDE.createEM();
+                                        try {
+                                            em.getTransaction().begin();
+                                            Allowance myAllowance = em.merge(allowance);
+                                            em.lock(em.merge(myAllowance.getResident()), LockModeType.OPTIMISTIC);
+                                            em.remove(myAllowance);
+                                            em.getTransaction().commit();
+
+                                            DateTime txDate = new DateTime(myAllowance.getDate());
+                                            final String keyMonth = myAllowance.getResident().getRID() + "-" + txDate.getYear() + "-" + txDate.getMonthOfYear();
+
+                                            contentmap.remove(keyMonth);
+                                            cpMap.remove(keyMonth);
+                                            cashmap.get(keyMonth).remove(myAllowance);
+                                            createCP4(myAllowance.getResident());
+
+                                            try {
+                                                cpMap.get(keyMonth).setCollapsed(false);
+                                            } catch (PropertyVetoException e) {
+                                                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                                            }
+
+                                            buildPanel();
+                                        } catch (OptimisticLockException ole) {
+                                            if (em.getTransaction().isActive()) {
+                                                em.getTransaction().rollback();
+                                            }
+                                            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                                OPDE.getMainframe().emptyFrame();
+                                                OPDE.getMainframe().afterLogin();
+                                            }
+                                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                        } catch (Exception e) {
+                                            if (em.getTransaction().isActive()) {
+                                                em.getTransaction().rollback();
+                                            }
+                                            OPDE.fatal(e);
+                                        } finally {
+                                            em.close();
+                                        }
+                                    }
+                                }
+                            });
 
 
-                    }
-                });
-                singlePaneRight.add(btnDelete);
-
+                        }
+                    });
+                    singlePaneRight.add(btnDelete);
+                }
                 pnlMonth.add(singlePaneBoth);
                 linemap.put(allowance, singlePaneBoth);
 

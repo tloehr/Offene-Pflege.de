@@ -90,6 +90,7 @@ public class PnlProcess extends NursingRecordsPanel {
         this.resident = null;
         initComponents();
         initPanel();
+        OPDE.getDisplayManager().setMainMessage(OPDE.getAppInfo().getInternalClasses().get(internalClassID).getShortDescription());
         processList = QProcessTools.getProcesses4(OPDE.getLogin().getUser());
         reloadDisplay();
         initPhase = false;
@@ -118,18 +119,12 @@ public class PnlProcess extends NursingRecordsPanel {
          *                                              |_|            |___/
          */
         initPhase = true;
-//        dfnCollapsiblePaneHashMap.clear();
-//        if (shiftMAPDFN != null) {
-//            for (Byte key : shiftMAPDFN.keySet()) {
-//                shiftMAPDFN.get(key).clear();
-//            }
-//        }
-//        if (shiftMAPpane != null) {
-//            for (Byte key : shiftMAPpane.keySet()) {
-//                shiftMAPpane.get(key).removeAll();
-//            }
-//            shiftMAPpane.clear();
-//        }
+
+        qProcessCollapsiblePaneHashMap.clear();
+        qProcess2ElementMap.clear();
+        qProcessMap.clear();
+        elementMap.clear();
+
         final boolean withworker = false;
         if (withworker) {
 
@@ -178,7 +173,6 @@ public class PnlProcess extends NursingRecordsPanel {
             for (QProcess qProcess : processList) {
                 qProcessMap.put(qProcess, createCP4(qProcess));
             }
-
             buildPanel();
         }
         initPhase = false;
@@ -242,7 +236,7 @@ public class PnlProcess extends NursingRecordsPanel {
         } else if (qProcess.isRevisionDue()) {
             cptitle.getButton().setIcon(SYSConst.icon22ledYellowOn);
         } else if (qProcess.isClosed()) {
-            cptitle.getButton().setIcon(SYSConst.icon22ledBlueOn);
+            cptitle.getButton().setIcon(SYSConst.icon22stopSign);
         } else {
             cptitle.getButton().setIcon(SYSConst.icon22ledGreenOn);
         }
@@ -475,9 +469,11 @@ public class PnlProcess extends NursingRecordsPanel {
 
     @Override
     public void cleanup() {
+        cpProcess.removeAll();
         qProcessCollapsiblePaneHashMap.clear();
         qProcess2ElementMap.clear();
         qProcessMap.clear();
+        elementMap.clear();
         processList.clear();
     }
 
@@ -523,13 +519,27 @@ public class PnlProcess extends NursingRecordsPanel {
         java.util.List<Component> list = new ArrayList<Component>();
 
         if (resident == null) {
-            JComboBox cmbBW = new JComboBox(SYSTools.list2cmb(ResidentTools.getAllActive()));
+            final JComboBox cmbUser = new JComboBox();
+            final JComboBox cmbPCat = new JComboBox();
+            DefaultComboBoxModel dcbm = SYSTools.list2cmb(ResidentTools.getAllActive());
+            dcbm.insertElementAt(null, 0);
+            final JComboBox cmbBW = new JComboBox(dcbm);
+            cmbBW.setRenderer(ResidentTools.getRenderer());
             cmbBW.setFont(SYSConst.ARIAL14);
+            cmbBW.setSelectedIndex(0);
             cmbBW.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent itemEvent) {
                     if (initPhase || itemEvent.getStateChange() != ItemEvent.SELECTED) return;
+                    initPhase = true;
+                    if (cmbUser.getModel().getSize() > 0) {
+                        cmbUser.setSelectedIndex(0);
+                    }
+                    if (cmbPCat.getModel().getSize() > 0) {
+                        cmbPCat.setSelectedIndex(0);
+                    }
                     processList = QProcessTools.getProcesses4((Resident) itemEvent.getItem());
+                    initPhase = false;
                     reloadDisplay();
                 }
             });
@@ -537,25 +547,43 @@ public class PnlProcess extends NursingRecordsPanel {
 
 
             if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)) {
-                final JComboBox cmbUser = new JComboBox(SYSTools.list2cmb(UsersTools.getUsers(false)));
+                DefaultComboBoxModel dcbm1 = SYSTools.list2cmb(UsersTools.getUsers(false));
+                cmbUser.setModel(dcbm1);
+                dcbm1.insertElementAt(null, 0);
                 cmbUser.setRenderer(UsersTools.getUserRenderer());
                 cmbUser.setFont(SYSConst.ARIAL14);
+                cmbUser.setSelectedIndex(0);
                 cmbUser.addItemListener(new ItemListener() {
                     @Override
                     public void itemStateChanged(ItemEvent itemEvent) {
                         if (initPhase || itemEvent.getStateChange() != ItemEvent.SELECTED) return;
+                        initPhase = true;
+                        cmbBW.setSelectedIndex(0);
+                        if (cmbPCat.getModel().getSize() > 0) {
+                            cmbPCat.setSelectedIndex(0);
+                        }
+                        initPhase = false;
                         processList = QProcessTools.getProcesses4((Users) itemEvent.getItem());
                         reloadDisplay();
                     }
                 });
                 list.add(cmbUser);
-
-                JComboBox cmbPCat = new JComboBox(SYSTools.list2cmb(PCatTools.getPCats()));
+                DefaultComboBoxModel dcbm2 = SYSTools.list2cmb(PCatTools.getPCats());
+                dcbm2.insertElementAt(null, 0);
+                cmbPCat.setModel(dcbm2);
+                cmbPCat.setRenderer(PCatTools.getRenderer());
                 cmbPCat.setFont(SYSConst.ARIAL14);
+                cmbPCat.setSelectedIndex(0);
                 cmbPCat.addItemListener(new ItemListener() {
                     @Override
                     public void itemStateChanged(ItemEvent itemEvent) {
                         if (initPhase || itemEvent.getStateChange() != ItemEvent.SELECTED) return;
+                        initPhase = true;
+                        cmbBW.setSelectedIndex(0);
+                        if (cmbUser.getModel().getSize() > 0) {
+                            cmbUser.setSelectedIndex(0);
+                        }
+                        initPhase = false;
                         processList = QProcessTools.getProcesses4((PCat) itemEvent.getItem());
                         reloadDisplay();
                     }
@@ -566,6 +594,15 @@ public class PnlProcess extends NursingRecordsPanel {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         processList = QProcessTools.getAllActive();
+                        initPhase = true;
+                        cmbBW.setSelectedIndex(0);
+                        if (cmbUser.getModel().getSize() > 0) {
+                            cmbUser.setSelectedIndex(0);
+                        }
+                        if (cmbPCat.getModel().getSize() > 0) {
+                            cmbPCat.setSelectedIndex(0);
+                        }
+                        initPhase = false;
                         reloadDisplay();
                     }
                 });
@@ -575,6 +612,15 @@ public class PnlProcess extends NursingRecordsPanel {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         processList = QProcessTools.getProcessesRunningOutIn(5);
+                        initPhase = true;
+                        cmbBW.setSelectedIndex(0);
+                        if (cmbUser.getModel().getSize() > 0) {
+                            cmbUser.setSelectedIndex(0);
+                        }
+                        if (cmbPCat.getModel().getSize() > 0) {
+                            cmbPCat.setSelectedIndex(0);
+                        }
+                        initPhase = false;
                         reloadDisplay();
                     }
                 });
@@ -584,6 +630,15 @@ public class PnlProcess extends NursingRecordsPanel {
             final JideButton btnMyProcesses = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".btnmyprocesses"), SYSConst.icon22myself, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    initPhase = true;
+                    cmbBW.setSelectedIndex(0);
+                    if (cmbUser.getModel().getSize() > 0) {
+                        cmbUser.setSelectedIndex(0);
+                    }
+                    if (cmbPCat.getModel().getSize() > 0) {
+                        cmbPCat.setSelectedIndex(0);
+                    }
+                    initPhase = false;
                     processList = QProcessTools.getProcesses4(OPDE.getLogin().getUser());
                     reloadDisplay();
                 }
@@ -638,12 +693,14 @@ public class PnlProcess extends NursingRecordsPanel {
         buildPanel(true);
     }
 
-    private void buildPanel(boolean collapseAll) {
+    private void buildPanel(final boolean collapseAll) {
         cpProcess.removeAll();
         cpProcess.setLayout(new JideBoxLayout(cpProcess, JideBoxLayout.Y_AXIS));
         Collections.sort(processList);
+        boolean empty = true;
         for (QProcess process : processList) {
             if (tbClosed.isSelected() || !process.isClosed()) {
+                empty = false;
                 CollapsiblePane cp = qProcessMap.get(process);
                 cpProcess.add(cp);
                 try {
@@ -653,7 +710,11 @@ public class PnlProcess extends NursingRecordsPanel {
                 }
             }
         }
-
+        if (empty) {
+            CollapsiblePane emptyPane = new CollapsiblePane(OPDE.lang.getString("misc.msg.nodata"));
+            emptyPane.setCollapsible(false);
+            cpProcess.add(emptyPane);
+        }
         cpProcess.addExpansion();
     }
 
@@ -669,7 +730,7 @@ public class PnlProcess extends NursingRecordsPanel {
          *     |____/ \__|_| |_/_/   \_\__,_|\__,_|
          *
          */
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
             final JideButton btnAdd = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".btnadd"), SYSConst.icon22add, null);
             btnAdd.addActionListener(new ActionListener() {
                 @Override
@@ -926,10 +987,12 @@ public class PnlProcess extends NursingRecordsPanel {
                         });
                     }
                 });
-                btnReopen.setEnabled(OPDE.isAdmin());
+                btnReopen.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER));
                 pnlMenu.add(btnReopen);
             }
 
+        }
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {
             /***
              *      _     _         ____       _      _
              *     | |__ | |_ _ __ |  _ \  ___| | ___| |_ ___
@@ -1003,9 +1066,9 @@ public class PnlProcess extends NursingRecordsPanel {
                     });
                 }
             });
-            btnDelete.setEnabled(OPDE.isAdmin());
             pnlMenu.add(btnDelete);
-
+        }
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
             /***
              *      _     _         ____            _     _
              *     | |__ | |_ _ __ |  _ \ _____   _(_)___(_) ___  _ __
@@ -1023,9 +1086,9 @@ public class PnlProcess extends NursingRecordsPanel {
                     final JidePopup popup = new JidePopup();
                     popup.setMovable(false);
                     popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-                    final JButton btnSave = new JButton(SYSConst.icon22apply);
+                    final JButton btnSave = new JButton(SYSConst.icon16apply);
                     final JDateChooser editor = new JDateChooser(new DateMidnight().plusWeeks(2).toDate());
-                    editor.setFont(SYSConst.ARIAL20);
+                    editor.setFont(SYSConst.ARIAL14);
                     editor.setMinSelectableDate(new DateMidnight().plusDays(1).toDate());
                     btnSave.addActionListener(new ActionListener() {
                         @Override
@@ -1049,6 +1112,8 @@ public class PnlProcess extends NursingRecordsPanel {
                                 myProcess.getPReports().add(pReport);
                                 em.getTransaction().commit();
                                 qProcessMap.remove(qProcess);
+                                processList.remove(qProcess);
+                                processList.add(myProcess);
                                 qProcessMap.put(myProcess, createCP4(myProcess));
                                 try {
                                     qProcessMap.get(myProcess).setCollapsed(false);

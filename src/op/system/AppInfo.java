@@ -4,10 +4,11 @@
  */
 package op.system;
 
+import entity.system.Acl;
+import entity.system.SYSGROUPS2ACL;
 import op.OPDE;
 import op.tools.SYSTools;
 import op.tools.SortedProperties;
-import org.joda.time.format.DateTimeFormat;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -16,10 +17,10 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -131,11 +132,23 @@ public class AppInfo {
         if (!OPDE.isAdmin()) {
             EntityManager em = OPDE.createEM();
             Query query = em.createQuery("SELECT i FROM SYSGROUPS2ACL i "
-                    + "WHERE i.internalClassID = :internalClassID AND :user MEMBER OF i.groups.members AND EXISTS (SELECT a FROM Acl a WHERE a.acl = :shortacl)");
+                    + "WHERE i.internalClassID = :internalClassID AND :user MEMBER OF i.groups.members ");
             query.setParameter("user", OPDE.getLogin().getUser());
             query.setParameter("internalClassID", internalClassID);
-            query.setParameter("shortacl", acl);
-            allowed = !query.getResultList().isEmpty();
+
+
+            try {
+                allowed = false;
+                SYSGROUPS2ACL sgAcl = (SYSGROUPS2ACL) query.getSingleResult();
+                for (Acl aclsForGroup : sgAcl.getAclCollection()) {
+                    if (aclsForGroup.getAcl() == acl) {
+                        allowed = true;
+                        break;
+                    }
+                }
+            } catch (NoResultException e) {
+                allowed = false;
+            }
             em.close();
         }
         return allowed;
@@ -219,10 +232,10 @@ public class AppInfo {
             } else if (environment.equalsIgnoreCase("properties")) {
                 if (tagName.equalsIgnoreCase("property")) {
                     SimpleDateFormat sdf = null;
-                    if (attributes.getValue("format") != null){
+                    if (attributes.getValue("format") != null) {
                         sdf = new SimpleDateFormat(attributes.getValue("format"));
                     }
-                    if (attributes.getValue("value").equals("##now##")){
+                    if (attributes.getValue("value").equals("##now##")) {
                         defaultProperties.put(attributes.getValue("key"), sdf.format(new Date()));
                     } else {
                         defaultProperties.put(attributes.getValue("key"), attributes.getValue("value"));

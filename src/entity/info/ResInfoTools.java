@@ -480,6 +480,7 @@ public class ResInfoTools {
     public static String getTXReport(Resident bewohner, boolean withlongheader,
                                      boolean medi, boolean bilanz, boolean bericht,
                                      boolean diag, boolean grundpflege, boolean haut, boolean vital) {
+        //todo: bilanzen, berichte und medis kommen nicht
 
         /***
          *      _   _                _

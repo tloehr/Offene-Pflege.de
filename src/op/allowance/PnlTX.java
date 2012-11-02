@@ -227,7 +227,7 @@ public class PnlTX extends JPanel {
     }
 
     private void initPanel() {
-        lblResident.setText(OPDE.lang.getString(internalClassID + ".lblresident"));
+        lblResident.setText(OPDE.lang.getString("misc.msg.resident"));
         lblDate.setText(OPDE.lang.getString(internalClassID + ".lbldate"));
         lblText.setText(OPDE.lang.getString(internalClassID + ".lbltext"));
         lblCash.setText(OPDE.lang.getString(internalClassID + ".lblcash"));

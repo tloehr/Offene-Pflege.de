@@ -421,7 +421,7 @@ public class PnlPrescription extends NursingRecordsPanel {
     private java.util.List<Component> addCommands() {
         java.util.List<Component> list = new ArrayList<Component>();
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
             JideButton addRegular = GUITools.createHyperlinkButton(internalClassID + ".btnNewRegular", SYSConst.icon22add, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -480,7 +480,7 @@ public class PnlPrescription extends NursingRecordsPanel {
             list.add(addRegular);
         }
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
             JideButton addNewOnDemand = GUITools.createHyperlinkButton(internalClassID + ".btnNewOnDemand", SYSConst.icon22add, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -982,7 +982,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                 }
 
             });
-            btnDelete.setEnabled(!prescription.isClosed() && (!prescriptionHasBeenUsedAlready || OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)));
+            btnDelete.setEnabled(!prescription.isClosed() && (!prescriptionHasBeenUsedAlready || OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)));
             pnlMenu.add(btnDelete);
 
             pnlMenu.add(new JSeparator());

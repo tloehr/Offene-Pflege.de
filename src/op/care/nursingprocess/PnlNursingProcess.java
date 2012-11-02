@@ -546,7 +546,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
          *     |_| \_|\___| \_/\_/
          *
          */
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
             JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.new"), SYSConst.icon22add, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {

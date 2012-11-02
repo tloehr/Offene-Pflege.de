@@ -53,9 +53,7 @@ public class DlgProcess extends MyJDialog {
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                 String text;
                 if (o == null) {
-                    text = SYSTools.toHTML("<i>" + OPDE.lang.getString(PnlProcess.internalClassID + ".commonprocess") + "</i>");
-                } else if (o instanceof PCat) {
-                    text = ((PCat) o).getText();
+                    text = SYSTools.toHTMLForScreen("<i>" + OPDE.lang.getString(PnlProcess.internalClassID + ".commonprocess") + "</i>");
                 } else {
                     text = o.toString();
                 }

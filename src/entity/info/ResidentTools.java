@@ -7,11 +7,13 @@ package entity.info;
 import entity.EntityTools;
 import entity.Homes;
 import entity.nursingprocess.NursingProcessTools;
+import entity.prescription.DosageForm;
 import entity.prescription.MedInventoryTools;
 import entity.prescription.PrescriptionTools;
 import entity.process.QProcessTools;
 import entity.values.ResValueTools;
 import op.OPDE;
+import op.tools.SYSTools;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.Years;
@@ -20,6 +22,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.swing.*;
+import java.awt.*;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -56,7 +59,24 @@ public class ResidentTools {
 //        return lblBW;
 //    }
 
-    public static String getBWLabel1(Resident bewohner) {
+    public static ListCellRenderer getRenderer() {
+        return new ListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                String text;
+                if (o == null) {
+                    text = SYSTools.toHTMLForScreen(OPDE.lang.getString("misc.commands.>>noselection<<"));
+                } else if (o instanceof Resident) {
+                    text = o.toString();
+                } else {
+                    text = o.toString();
+                }
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+            }
+        };
+    }
+
+    public static String getNameAndFirstname(Resident bewohner) {
         return bewohner.getName() + ", " + bewohner.getVorname();
     }
 

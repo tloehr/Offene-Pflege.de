@@ -93,8 +93,7 @@ public class PnlEditMemberships extends JPanel {
                 }
             });
             add(cbGroup);
-
-
+            cbGroup.setEnabled(!group.isEveryone());
         }
 
 
