@@ -567,7 +567,7 @@ public class PnlControlling extends CleanablePanel {
          */
         JPanel pnlDrugControl = new JPanel(new BorderLayout());
         final JButton btnDrugControl = GUITools.createHyperlinkButton(internalClassID + ".drugs.controllist", null, null);
-        final JComboBox cmbStation = new JComboBox(StationTools.getAll4Combobox());
+        final JComboBox cmbStation = new JComboBox(StationTools.getAll4Combobox(false));
         btnDrugControl.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

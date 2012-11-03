@@ -550,7 +550,7 @@ public class PnlProcess extends NursingRecordsPanel {
                 DefaultComboBoxModel dcbm1 = SYSTools.list2cmb(UsersTools.getUsers(false));
                 cmbUser.setModel(dcbm1);
                 dcbm1.insertElementAt(null, 0);
-                cmbUser.setRenderer(UsersTools.getUserRenderer());
+                cmbUser.setRenderer(UsersTools.getRenderer());
                 cmbUser.setFont(SYSConst.ARIAL14);
                 cmbUser.setSelectedIndex(0);
                 cmbUser.addItemListener(new ItemListener() {
@@ -1183,7 +1183,7 @@ public class PnlProcess extends NursingRecordsPanel {
                         final JButton btnSave = new JButton(SYSConst.icon22apply);
                         final JList editor = new JList(SYSTools.list2dlm(UsersTools.getUsers(false)));
                         editor.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-                        editor.setCellRenderer(UsersTools.getUserRenderer());
+                        editor.setCellRenderer(UsersTools.getRenderer());
                         btnSave.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent evt) {

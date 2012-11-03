@@ -16,7 +16,7 @@ public class ICDTools {
 //                if (o == null) {
 //                    text = OPDE.lang.getString("misc.commands.>>noselection<<");
 //                } else if (o instanceof ICD) {
-////                    text = ((Doc) o).getName() + ", " + ((Doc) o).getVorname() + ", " + ((Doc) o).getOrt();
+////                    text = ((Doc) o).getName() + ", " + ((Doc) o).getFirstname() + ", " + ((Doc) o).getOrt();
 //                    text = getFullName((Doc) o);
 //                } else {
 //                    text = o.toString();
@@ -28,6 +28,6 @@ public class ICDTools {
 
 
 //    public static String getFullText(ICD icd) {
-//        return icd.getIcd10() + " " + SYSTools.catchNull(arzt.getTitel(), "", " ") + arzt.getVorname() + " " + arzt.getName();
+//        return icd.getIcd10() + " " + SYSTools.catchNull(arzt.getTitel(), "", " ") + arzt.getFirstname() + " " + arzt.getName();
 //    }
 }

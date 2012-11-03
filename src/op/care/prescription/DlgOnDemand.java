@@ -826,7 +826,7 @@ public class DlgOnDemand extends MyJDialog {
         em.close();
 
         cmbDocON.setModel(new DefaultComboBoxModel(listAerzte.toArray()));
-        cmbDocON.setRenderer(DocTools.getArztRenderer());
+        cmbDocON.setRenderer(DocTools.getRenderer());
         cmbDocON.setSelectedIndex(0);
 
         cmbHospitalON.setModel(new DefaultComboBoxModel(listKH.toArray()));

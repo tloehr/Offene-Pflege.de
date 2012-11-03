@@ -130,7 +130,7 @@ public class PnlResOverview extends NursingRecordsPanel {
 
     public void reloadDisplay() {
 
-        final boolean withworker = false;
+        final boolean withworker = true;
         if (withworker) {
             initPhase = true;
 
@@ -153,7 +153,7 @@ public class PnlResOverview extends NursingRecordsPanel {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            jspHTML.getVerticalScrollBar().setValue(0);
+                            GUITools.scroll2show(jspHTML, 0, null);
                         }
                     });
                     initPhase = false;

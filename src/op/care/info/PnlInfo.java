@@ -12,6 +12,7 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
+import com.jidesoft.wizard.WizardDialog;
 import entity.files.SYSFilesTools;
 import entity.info.*;
 import entity.process.QProcess;
@@ -20,6 +21,8 @@ import entity.process.SYSINF2PROCESS;
 import op.OPDE;
 import op.care.sysfiles.DlgFiles;
 import op.process.DlgProcessAssign;
+import op.residents.DlgEditResidentBaseData;
+import op.residents.bwassistant.AddBWWizard;
 import op.system.InternalClassACL;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
@@ -537,6 +540,78 @@ public class PnlInfo extends NursingRecordsPanel {
         List<Component> list = new ArrayList<Component>();
 
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)) {
+            /***
+             *                          ____           _     _            _
+             *      _ __   _____      _|  _ \ ___  ___(_) __| | ___ _ __ | |_
+             *     | '_ \ / _ \ \ /\ / / |_) / _ \/ __| |/ _` |/ _ \ '_ \| __|
+             *     | | | |  __/\ V  V /|  _ <  __/\__ \ | (_| |  __/ | | | |_
+             *     |_| |_|\___| \_/\_/ |_| \_\___||___/_|\__,_|\___|_| |_|\__|
+             *
+             */
+            JideButton addRes = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".addbw"), SYSConst.icon22addbw, null);
+            addRes.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
+            addRes.setAlignmentX(Component.LEFT_ALIGNMENT);
+            addRes.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    final MyJDialog dlg = new MyJDialog();
+                    WizardDialog wizard = new AddBWWizard(new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            dlg.dispose();
+                        }
+                    }).getWizard();
+                    dlg.setContentPane(wizard.getContentPane());
+                    dlg.pack();
+                    dlg.setSize(new Dimension(800, 550));
+                    dlg.setVisible(true);
+                }
+            });
+            list.add(addRes);
+
+            JideButton editRes = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".editbw"), SYSConst.icon22edit3, null);
+            editRes.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
+            editRes.setAlignmentX(Component.LEFT_ALIGNMENT);
+            editRes.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    new DlgEditResidentBaseData(resident, new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            if (o != null) {
+                                EntityManager em = OPDE.createEM();
+
+                                try {
+                                    em.getTransaction().begin();
+                                    Resident myResident = em.merge((Resident) o);
+                                    em.lock(em.merge(myResident), LockModeType.OPTIMISTIC);
+                                    em.getTransaction().commit();
+                                    resident = myResident;
+                                    GUITools.setBWDisplay(resident);
+                                } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+            list.add(editRes);
+
             /***
              *      _       ____                 _
              *     (_)___  |  _ \  ___  __ _  __| |

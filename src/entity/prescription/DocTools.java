@@ -3,8 +3,11 @@ package entity.prescription;
 import op.OPDE;
 import op.tools.SYSTools;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA.
@@ -15,7 +18,7 @@ import java.awt.*;
  */
 public class DocTools {
 
-    public static ListCellRenderer getArztRenderer() {
+    public static ListCellRenderer getRenderer() {
         return new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
@@ -23,7 +26,7 @@ public class DocTools {
                 if (o == null) {
                     text = OPDE.lang.getString("misc.commands.>>noselection<<");
                 } else if (o instanceof Doc) {
-//                    text = ((Doc) o).getName() + ", " + ((Doc) o).getVorname() + ", " + ((Doc) o).getOrt();
+//                    text = ((Doc) o).getName() + ", " + ((Doc) o).getFirstname() + ", " + ((Doc) o).getOrt();
                     text = getFullName((Doc) o);
                 } else {
                     text = o.toString();
@@ -34,11 +37,21 @@ public class DocTools {
     }
 
     public static String getFullName(Doc doc) {
-        if (doc != null){
-        return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitel(), "", " ") + doc.getVorname() + " " + doc.getName();
+        if (doc != null) {
+            return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitel(), "", " ") + doc.getVorname() + " " + doc.getName();
         } else {
             return "";
         }
     }
 
+
+    public static ArrayList<Doc> getAllActive() {
+        EntityManager em = OPDE.createEM();
+        Query queryArzt = em.createQuery("SELECT a FROM Doc a WHERE a.status >= 0 ORDER BY a.name, a.vorname");
+        ArrayList<Doc> listAerzte = new ArrayList<Doc>(queryArzt.getResultList());
+        em.close();
+
+        return listAerzte;
+
+    }
 }

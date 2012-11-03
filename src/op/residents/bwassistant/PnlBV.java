@@ -40,7 +40,7 @@ public class PnlBV extends JPanel {
         em.close();
         listUsers.add(0, null);
         cmbBV.setModel(SYSTools.list2cmb(listUsers));
-        cmbBV.setRenderer(UsersTools.getUserRenderer());
+        cmbBV.setRenderer(UsersTools.getRenderer());
     }
 
     private void cmbBVItemStateChanged(ItemEvent e) {

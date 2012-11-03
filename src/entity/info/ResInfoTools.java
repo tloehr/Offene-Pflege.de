@@ -576,6 +576,7 @@ public class ResInfoTools {
          *     |_| |_/_/   \_\___/|_|
          *
          */
+        // TODO: "HAUF" ersetzen
         ResInfo bwinfo_hauf = ResInfoTools.getLastResinfo(bewohner, ResInfoTypeTools.getByID("HAUF"));
         if (bwinfo_hauf != null) {
             result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.movein") + "</td><td valign=\"top\">";
@@ -591,6 +592,7 @@ public class ResInfoTools {
          *     |_|   |____/
          *
          */
+        // TODO: "PSTF" ersetzen
         ResInfo bwinfo_pstf = ResInfoTools.getLastResinfo(bewohner, ResInfoTypeTools.getByID("PSTF"));
         if (bwinfo_pstf != null) {
             result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.ps") + "</td><td valign=\"top\">";
@@ -606,7 +608,7 @@ public class ResInfoTools {
          *
          */
         if (bewohner.getLCustodian1() != null) {
-            result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.lg") + "</td><td valign=\"top\">";
+            result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.lc") + "</td><td valign=\"top\">";
             result += LCustodianTools.getFullName(bewohner.getLCustodian1()) + ", " + bewohner.getLCustodian1().getStrasse();
             result += ", " + bewohner.getLCustodian1().getPlz() + " " + bewohner.getLCustodian1().getOrt();
             result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + bewohner.getLCustodian1().getTel() + ", " + OPDE.lang.getString("misc.msg.mobilephone") + ": " + bewohner.getLCustodian1().getMobil();
@@ -622,9 +624,9 @@ public class ResInfoTools {
          *     |____/  \_/
          *
          */
-        if (bewohner.getBv1() != null) {
-            result += "<tr id=\"fonttext\"><td valign=\"top\">" + OPDE.lang.getString("misc.msg.bv") + "</td><td valign=\"top\">";
-            result += bewohner.getBv1().getFullname();
+        if (bewohner.getPN1() != null) {
+            result += "<tr id=\"fonttext\"><td valign=\"top\">" + OPDE.lang.getString("misc.msg.primaryNurse") + "</td><td valign=\"top\">";
+            result += bewohner.getPN1().getFullname();
             result += "</td></tr>";
         }
 
@@ -636,6 +638,7 @@ public class ResInfoTools {
          *     /_/   \_\_| |_|\__, |\___|_| |_|\___/|_|  |_|\__, |\___|
          *                    |___/                         |___/
          */
+        // TODO: "ANGEH" ersetzen
         ResInfo bwinfo_angeh = ResInfoTools.getLastResinfo(bewohner, ResInfoTypeTools.getByID("ANGEH"));
         if (bwinfo_angeh != null) {
             result += "<tr id=\"fonttext\"><td valign=\"top\">" + OPDE.lang.getString("misc.msg.relatives") + "</td><td valign=\"top\">";
@@ -653,11 +656,11 @@ public class ResInfoTools {
          *     |_| |_|\__,_|\__,_|___/\__,_|_|  /___|\__|
          *
          */
-        if (bewohner.getDoc() != null) {
+        if (bewohner.getGP() != null) {
             result += "<h2 id=\"fonth2\">" + OPDE.lang.getString("misc.msg.gp") + "</h2>";
-            result += "<div id=\"fonttext\">" + DocTools.getFullName(bewohner.getDoc()) + ", " + bewohner.getDoc().getStrasse();
-            result += ", " + bewohner.getDoc().getPlz() + " " + bewohner.getDoc().getOrt();
-            result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + bewohner.getDoc().getTel() + ", " + OPDE.lang.getString("misc.msg.fax") + ": " + bewohner.getDoc().getFax();
+            result += "<div id=\"fonttext\">" + DocTools.getFullName(bewohner.getGP()) + ", " + bewohner.getGP().getStrasse();
+            result += ", " + bewohner.getGP().getPlz() + " " + bewohner.getGP().getOrt();
+            result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + bewohner.getGP().getTel() + ", " + OPDE.lang.getString("misc.msg.fax") + ": " + bewohner.getGP().getFax();
             result += "</div>";
         }
 

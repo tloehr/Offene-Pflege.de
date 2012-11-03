@@ -53,8 +53,8 @@ public class AddBWWizard {
         AbstractWizardPage page1 = new WelcomePage(OPDE.lang.getString(internalClassID + ".page1.title"), OPDE.lang.getString(internalClassID + ".page1.description"));
         AbstractWizardPage page2 = new BasisInfoPage(OPDE.lang.getString(PnlBWBasisInfo.internalClassID + ".title"), OPDE.lang.getString(PnlBWBasisInfo.internalClassID + ".description"));
         AbstractWizardPage page3 = new BVPage(OPDE.lang.getString(PnlBV.internalClassID + ".title"), OPDE.lang.getString(PnlBV.internalClassID + ".description"));
-        AbstractWizardPage page4 = new HausarztPage(OPDE.lang.getString(PnlHausarzt.internalClassID + ".title"), OPDE.lang.getString(PnlHausarzt.internalClassID + ".description"));
-        AbstractWizardPage page5 = new BetreuerPage(OPDE.lang.getString(PnlBetreuer.internalClassID + ".title"), OPDE.lang.getString(PnlBetreuer.internalClassID + ".description"));
+        AbstractWizardPage page4 = new HausarztPage(OPDE.lang.getString(PnlGP.internalClassID + ".title"), OPDE.lang.getString(PnlGP.internalClassID + ".description"));
+        AbstractWizardPage page5 = new BetreuerPage(OPDE.lang.getString(PnlLC.internalClassID + ".title"), OPDE.lang.getString(PnlLC.internalClassID + ".description"));
         AbstractWizardPage page6 = new HaufPage(OPDE.lang.getString(PnlHAUF.internalClassID + ".title"), OPDE.lang.getString(PnlHAUF.internalClassID + ".description"));
         AbstractWizardPage page7 = new CompletionPage(OPDE.lang.getString(internalClassID + ".page7.title"), OPDE.lang.getString(internalClassID + ".page7.description"));
 
@@ -111,7 +111,7 @@ public class AddBWWizard {
             em.getTransaction().begin();
 
 
-            String prefix = bewohner.getName().substring(0, 1) + bewohner.getVorname().substring(0, 1);
+            String prefix = bewohner.getName().substring(0, 1) + bewohner.getFirstname().substring(0, 1);
             prefix = prefix.toUpperCase();
 
             Unique unique = UniqueTools.getNewUID(em, prefix);
@@ -224,7 +224,7 @@ public class AddBWWizard {
             super.setupWizardButtons();
 
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
-            fireButtonEvent(bewohner == null || bewohner.getBv1() == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(bewohner == null || bewohner.getPN1() == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
             fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
@@ -235,7 +235,7 @@ public class AddBWWizard {
             addComponent(new PnlBV(new Closure() {
                 @Override
                 public void execute(Object o) {
-                    bewohner.setBv1((Users) o);
+                    bewohner.setPN1((Users) o);
                     setupWizardButtons();
                 }
             }), true);
@@ -243,16 +243,16 @@ public class AddBWWizard {
     }
 
     private class HausarztPage extends DefaultWizardPage {
-        private PnlHausarzt pnlHausarzt;
+        private PnlGP pnlGP;
         private boolean alreadyexecute = false;
 
         public HausarztPage(String title, String description) {
             super(title, description);
-            pnlHausarzt = new PnlHausarzt(new Closure() {
+            pnlGP = new PnlGP(new Closure() {
                 @Override
                 public void execute(Object o) {
                     if (o != null) {
-                        bewohner.setDoc((Doc) o);
+                        bewohner.setGP((Doc) o);
                     }
                     setupWizardButtons();
                 }
@@ -262,7 +262,7 @@ public class AddBWWizard {
                 public void pageEventFired(PageEvent pageEvent) {
                     if (!alreadyexecute && pageEvent.getID() == PageEvent.PAGE_OPENED) {
                         alreadyexecute = true;
-                        pnlHausarzt.initSplitPanel();
+                        pnlGP.initSplitPanel();
                     }
                 }
             });
@@ -274,7 +274,7 @@ public class AddBWWizard {
             super.setupWizardButtons();
 
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
-            fireButtonEvent(bewohner == null || bewohner.getDoc() == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(bewohner == null || bewohner.getGP() == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
             fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
@@ -282,18 +282,18 @@ public class AddBWWizard {
         @Override
         protected void initContentPane() {
             super.initContentPane();
-            addComponent(pnlHausarzt, true);
+            addComponent(pnlGP, true);
         }
     }
 
 
     private class BetreuerPage extends DefaultWizardPage {
-        private PnlBetreuer pnlBetreuer;
+        private PnlLC pnlLC;
         private boolean alreadyexecute = false;
 
         public BetreuerPage(String title, String description) {
             super(title, description);
-            pnlBetreuer = new PnlBetreuer(new Closure() {
+            pnlLC = new PnlLC(new Closure() {
                 @Override
                 public void execute(Object o) {
                     bewohner.setLCustodian1((LCustodian) o);
@@ -305,7 +305,7 @@ public class AddBWWizard {
                 public void pageEventFired(PageEvent pageEvent) {
                     if (!alreadyexecute && pageEvent.getID() == PageEvent.PAGE_OPENED) {
                         alreadyexecute = true;
-                        pnlBetreuer.initSplitPanel();
+                        pnlLC.initSplitPanel();
                     }
                 }
             });
@@ -325,7 +325,7 @@ public class AddBWWizard {
         @Override
         protected void initContentPane() {
             super.initContentPane();
-            addComponent(pnlBetreuer, true);
+            addComponent(pnlLC, true);
         }
     }
 
@@ -416,10 +416,10 @@ public class AddBWWizard {
             result += OPDE.lang.getString(internalClassID + ".page7.summaryline2") + "<br/>";
             result += "<ul>";
             result += "<li>" + ResidentTools.getFullName(bewohner) + "</li>";
-            result += "<li>" + OPDE.lang.getString("misc.msg.dob") + ": " + DateFormat.getDateInstance().format(bewohner.getBirthday()) + "</li>";
-            result += "<li>" + OPDE.lang.getString("misc.msg.bv") + ": " + bewohner.getBv1().getFullname() + "</li>";
-            result += "<li>" + OPDE.lang.getString("misc.msg.gp") + ": " + DocTools.getFullName(bewohner.getDoc()) + "</li>";
-            result += "<li>" + OPDE.lang.getString("misc.msg.lg") + ": " + LCustodianTools.getFullName(bewohner.getLCustodian1()) + "</li>";
+            result += "<li>" + OPDE.lang.getString("misc.msg.dob") + ": " + DateFormat.getDateInstance().format(bewohner.getDOB()) + "</li>";
+            result += "<li>" + OPDE.lang.getString("misc.msg.primaryNurse") + ": " + bewohner.getPN1().getFullname() + "</li>";
+            result += "<li>" + OPDE.lang.getString("misc.msg.gp") + ": " + DocTools.getFullName(bewohner.getGP()) + "</li>";
+            result += "<li>" + OPDE.lang.getString("misc.msg.lc") + ": " + LCustodianTools.getFullName(bewohner.getLCustodian1()) + "</li>";
 
             result += "<li>" + OPDE.lang.getString("misc.msg.movein") + ": " + DateFormat.getDateInstance().format(bwinfo_hauf.getFrom()) + "</li>";
             result += "<li>" + OPDE.lang.getString("misc.msg.subdivision") + ": " + bewohner.getStation().getName() + "</li>";

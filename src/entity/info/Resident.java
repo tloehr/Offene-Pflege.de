@@ -26,6 +26,7 @@
 package entity.info;
 
 import entity.Allowance;
+import entity.Rooms;
 import entity.Station;
 import entity.prescription.Doc;
 import entity.system.Users;
@@ -74,7 +75,7 @@ public class Resident implements Serializable, Comparable<Resident> {
     @Basic(optional = false)
     @Column(name = "GebDatum")
     @Temporal(TemporalType.DATE)
-    private Date birthday;
+    private Date dob;
     @Version
     @Column(name = "version")
     private Long version;
@@ -104,29 +105,32 @@ public class Resident implements Serializable, Comparable<Resident> {
     private Station station;
     @JoinColumn(name = "BV1UKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users bv1;
+    private Users pn1;
     @JoinColumn(name = "BV2UKennung", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users bv2;
+    private Users pn2;
     @JoinColumn(name = "ArztID", referencedColumnName = "ArztID")
     @ManyToOne
-    private Doc hausarzt;
+    private Doc gp;
     @JoinColumn(name = "BetrID1", referencedColumnName = "BetrID")
     @ManyToOne
     private LCustodian LCustodian1;
     @JoinColumn(name = "Editor", referencedColumnName = "UKennung")
     @ManyToOne
     private Users editor;
+    @JoinColumn(name = "raumid", referencedColumnName = "RID")
+    @ManyToOne
+    private Rooms room;
 
     public Resident() {
     }
 
-    public Resident(String name, String firstname, int gender, Date birthday) {
+    public Resident(String name, String firstname, int gender, Date dob) {
         this.rid = null;
         this.name = name;
         this.firstname = firstname;
         this.gender = gender;
-        this.birthday = birthday;
+        this.dob = dob;
         this.editor = OPDE.getLogin().getUser();
         this.adminonly = 0;
         this.controlling = null;
@@ -142,8 +146,16 @@ public class Resident implements Serializable, Comparable<Resident> {
         }
     }
 
-    public String getNachnameNieAnonym() {
+    public String getNameNeverAnonymous() {
         return name;
+    }
+
+    public Rooms getRoom() {
+        return room;
+    }
+
+    public void setRoom(Rooms room) {
+        this.room = room;
     }
 
     public String getName() {
@@ -175,7 +187,7 @@ public class Resident implements Serializable, Comparable<Resident> {
         return props;
     }
 
-    public void setNachname(String nachname) {
+    public void setName(String nachname) {
         this.name = nachname;
     }
 
@@ -196,16 +208,16 @@ public class Resident implements Serializable, Comparable<Resident> {
         return station != null;
     }
 
-    public String getVorname() {
-        int index = (gender == ResidentTools.GESCHLECHT_MAENNLICH ? SYSTools.INDEX_VORNAME_MANN : SYSTools.INDEX_VORNAME_FRAU);
+    public String getFirstname() {
+        int index = (gender == ResidentTools.MALE ? SYSTools.INDEX_VORNAME_MANN : SYSTools.INDEX_VORNAME_FRAU);
         return SYSTools.anonymizeName(firstname, index);
     }
 
-    public String getVornameNieAnonym() {
+    public String getFirstnameNeverAnonymous() {
         return firstname;
     }
 
-    public void setVorname(String vorname) {
+    public void setFirstname(String vorname) {
         this.firstname = vorname;
     }
 
@@ -221,16 +233,16 @@ public class Resident implements Serializable, Comparable<Resident> {
         return gender;
     }
 
-    public void setGeschlecht(int geschlecht) {
+    public void setGender(int geschlecht) {
         this.gender = geschlecht;
     }
 
-    public Date getBirthday() {
-        return birthday;
+    public Date getDOB() {
+        return dob;
     }
 
-    public void setGebDatum(Date gebDatum) {
-        this.birthday = gebDatum;
+    public void setDOB(Date gebDatum) {
+        this.dob = gebDatum;
     }
 
     public short getAdminonly() {
@@ -245,28 +257,28 @@ public class Resident implements Serializable, Comparable<Resident> {
         return allowance;
     }
 
-    public Users getBv1() {
-        return bv1;
+    public Users getPN1() {
+        return pn1;
     }
 
-    public void setBv1(Users bv1) {
-        this.bv1 = bv1;
+    public void setPN1(Users bv1) {
+        this.pn1 = bv1;
     }
 
-    public Users getBv2() {
-        return bv2;
+    public Users getPN2() {
+        return pn2;
     }
 
-    public void setBv2(Users bv2) {
-        this.bv2 = bv2;
+    public void setPN2(Users bv2) {
+        this.pn2 = bv2;
     }
 
-    public Doc getDoc() {
-        return hausarzt;
+    public Doc getGP() {
+        return gp;
     }
 
-    public void setDoc(Doc hausarzt) {
-        this.hausarzt = hausarzt;
+    public void setGP(Doc gp) {
+        this.gp = gp;
     }
 
     public LCustodian getLCustodian1() {
@@ -304,6 +316,6 @@ public class Resident implements Serializable, Comparable<Resident> {
 
     @Override
     public String toString() {
-        return getName() + ", " + getVorname() + " [" + rid + "]";
+        return getName() + ", " + getFirstname() + " [" + rid + "]";
     }
 }

@@ -7,11 +7,9 @@ package entity.info;
 import entity.EntityTools;
 import entity.Homes;
 import entity.nursingprocess.NursingProcessTools;
-import entity.prescription.DosageForm;
 import entity.prescription.MedInventoryTools;
 import entity.prescription.PrescriptionTools;
 import entity.process.QProcessTools;
-import entity.values.ResValueTools;
 import op.OPDE;
 import op.tools.SYSTools;
 import org.joda.time.DateMidnight;
@@ -32,8 +30,8 @@ import java.util.Date;
  */
 public class ResidentTools {
 
-    public static final int GESCHLECHT_MAENNLICH = 1;
-    public static final int GESCHLECHT_WEIBLICH = 2;
+    public static final int MALE = 1;
+    public static final int FEMALE = 2;
     public static final String GESCHLECHT[] = {"", OPDE.lang.getString("misc.msg.male"), OPDE.lang.getString("misc.msg.female")};
     public static final String ANREDE[] = {"", OPDE.lang.getString("misc.msg.termofaddress.mr"), OPDE.lang.getString("misc.msg.termofaddress.mrs")};
 
@@ -43,6 +41,9 @@ public class ResidentTools {
     public static final String KEY_TARGETIN = "targetin";
     public static final String KEY_HIGHIN = "highin";
     public static final String KEY_DAYSDRINK = "daysdrink";
+
+    public static final short ADMINONLY = 2;
+    public static final short NORMAL = 0;
 
     public static Resident findByBWKennung(String bwkennung) {
         EntityManager em = OPDE.createEM();
@@ -77,15 +78,15 @@ public class ResidentTools {
     }
 
     public static String getNameAndFirstname(Resident bewohner) {
-        return bewohner.getName() + ", " + bewohner.getVorname();
+        return bewohner.getName() + ", " + bewohner.getFirstname();
     }
 
     public static String getBWLabelWithBDay(Resident bewohner) {
-        return "(*" + DateFormat.getDateInstance().format(bewohner.getBirthday()) + ") [" + bewohner.getRID() + "]";
+        return "(*" + DateFormat.getDateInstance().format(bewohner.getDOB()) + ") [" + bewohner.getRID() + "]";
     }
 
     public static String getTextCompact(Resident bewohner) {
-        return bewohner.getName() + ", " + bewohner.getVorname() + " [" + bewohner.getRID() + "]";
+        return bewohner.getName() + ", " + bewohner.getFirstname() + " [" + bewohner.getRID() + "]";
     }
 
 
@@ -97,11 +98,11 @@ public class ResidentTools {
     }
 
     public static String getFullName(Resident bewohner) {
-        return ANREDE[bewohner.getGender()] + " " + bewohner.getVorname() + " " + bewohner.getName();
+        return ANREDE[bewohner.getGender()] + " " + bewohner.getFirstname() + " " + bewohner.getName();
     }
 
 //    public static boolean isWeiblich(Bewohner bewohner) {
-//        return bewohner.getGender() == GESCHLECHT_WEIBLICH;
+//        return bewohner.getGender() == FEMALE;
 //    }
 
     public static String getLabelText(Resident bewohner) {
@@ -110,9 +111,9 @@ public class ResidentTools {
         ResInfo hauf = ResInfoTools.getLastResinfo(bewohner, ResInfoTypeTools.getByID("hauf"));
 
         DateFormat df = DateFormat.getDateInstance();
-        String result = bewohner.getName() + ", " + bewohner.getVorname() + " (*" + df.format(bewohner.getBirthday()) + "), ";
+        String result = bewohner.getName() + ", " + bewohner.getFirstname() + " (*" + df.format(bewohner.getDOB()) + "), ";
 
-        DateMidnight birthdate = new DateTime(bewohner.getBirthday()).toDateMidnight();
+        DateMidnight birthdate = new DateTime(bewohner.getDOB()).toDateMidnight();
         DateTime refdate = verstorben ? new DateTime(hauf.getTo()) : new DateTime();
         Years age = Years.yearsBetween(birthdate, refdate);
         result += age.getYears() + " " + OPDE.lang.getString("misc.msg.Years") + " [" + bewohner.getRID() + "]";
@@ -233,7 +234,7 @@ public class ResidentTools {
         ArrayList<Resident> result = new ArrayList<Resident>();
 
         for (Resident resident : list) {
-            DateMidnight birthday = new DateMidnight(resident.getBirthday());
+            DateMidnight birthday = new DateMidnight(resident.getDOB());
             DateMidnight now = new DateMidnight();
             if (
                     now.getDayOfYear() <= birthday.getDayOfYear() && now.getDayOfYear() + days >= birthday.getDayOfYear()

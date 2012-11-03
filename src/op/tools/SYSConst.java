@@ -223,8 +223,8 @@ public class SYSConst {
 //    public static final Timestamp TS_BIS_AUF_WEITERES = new Timestamp(UNTIL_FURTHER_NOTICE.getTimeInMillis());
 //    public static final String MYSQL_DATETIME_VON_ANFANG_AN = "'1000-01-01 00:00:00'";
 //    public static final String MYSQL_DATETIME_BIS_AUF_WEITERES = "'9999-12-31 23:59:59'";
-//    public static final int GESCHLECHT_MAENNLICH = 1;
-//    public static final int GESCHLECHT_WEIBLICH = 2;
+//    public static final int MALE = 1;
+//    public static final int FEMALE = 2;
 
     public static final String UNITS[] = {"", OPDE.lang.getString("misc.msg.piece"), "ml", "l", "mg", "g", "cm", "m"}; // Für AnwEinheit, PackEinheit, Dimension
 

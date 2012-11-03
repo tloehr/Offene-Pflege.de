@@ -80,9 +80,23 @@ public class SYSTools {
     public static final int SPEED_NORMAL = 500;
     public static final int SPEED_SLOW = 700;
 
-    /**
-     *
-     */
+
+    public static ListCellRenderer getDefaultRenderer() {
+        return new ListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                String text;
+                if (o == null) {
+                    text = OPDE.lang.getString("misc.commands.>>noselection<<");
+                } else {
+                    text = o.toString();
+                }
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+            }
+        };
+    }
+
+
     public static void center(java.awt.Window w) {
         Dimension us = w.getSize();
         Dimension them = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
@@ -1966,11 +1980,11 @@ public class SYSTools {
      * @param message
      * @return replaced message or the original message if there is no appropriate language key.
      */
-    public static String xx(String message){
+    public static String xx(String message) {
         String title = SYSTools.catchNull(message);
         try {
             title = OPDE.lang.getString(message);
-        } catch (Exception e){
+        } catch (Exception e) {
             // ok, its not a langbundle key
         }
         return title;

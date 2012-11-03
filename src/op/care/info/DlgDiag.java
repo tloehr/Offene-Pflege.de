@@ -102,7 +102,7 @@ public class DlgDiag extends MyJDialog {
         em.close();
 
         cmbArzt.setModel(new DefaultComboBoxModel(listAerzte.toArray()));
-        cmbArzt.setRenderer(DocTools.getArztRenderer());
+        cmbArzt.setRenderer(DocTools.getRenderer());
         cmbArzt.setSelectedIndex(0);
 
         cmbKH.setModel(new DefaultComboBoxModel(listKH.toArray()));

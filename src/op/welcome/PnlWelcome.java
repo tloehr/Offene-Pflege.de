@@ -396,7 +396,7 @@ public class PnlWelcome extends CleanablePanel {
     }
 
     private DefaultCPTitle createCP4Birthdays(final Resident resident) {
-        DateMidnight birthdate = new DateMidnight(resident.getBirthday());
+        DateMidnight birthdate = new DateMidnight(resident.getDOB());
         Years age = Years.yearsBetween(birthdate, new DateMidnight());
 
         DateMidnight birthdayNext = new DateMidnight(new DateMidnight().getYear(), birthdate.getMonthOfYear(), birthdate.getDayOfMonth());

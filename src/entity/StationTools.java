@@ -10,17 +10,19 @@ import op.OPDE;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
-import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * @author tloehr
  */
 public class StationTools {
 
-    public static DefaultComboBoxModel getAll4Combobox() {
+    public static DefaultComboBoxModel getAll4Combobox(boolean withNullElement) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT s FROM Station s ORDER BY s.name ");
-        DefaultComboBoxModel result = new DefaultComboBoxModel(new Vector<Station>(query.getResultList()));
+        ArrayList<Station> listStat = new ArrayList<Station>(query.getResultList());
+        if (withNullElement) listStat.add(0, null);
+        DefaultComboBoxModel result = new DefaultComboBoxModel(listStat.toArray());
         em.close();
         return result;
     }

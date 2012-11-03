@@ -13,11 +13,11 @@
        <class>com.jgoodies.forms.layout.FormLayout</class> 
        <void method="setProperty"> 
         <string>$columnSpecs</string> 
-        <string>default, labelcompgap, default:grow</string> 
+        <string>13dlu, labelcompgap, default, labelcompgap, 139dlu, labelcompgap, 13dlu</string> 
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
-        <string>default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default</string> 
+        <string>13dlu, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, 13dlu</string> 
        </void> 
       </object> 
       <void property="name"> 
@@ -46,11 +46,11 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>1</int> 
+         <int>3</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>1</int> 
+         <int>3</int> 
         </void> 
        </object> 
       </void> 
@@ -69,11 +69,11 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>3</int> 
+         <int>5</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>1</int> 
+         <int>3</int> 
         </void> 
        </object> 
       </void> 
@@ -96,11 +96,11 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>1</int> 
+         <int>3</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>3</int> 
+         <int>5</int> 
         </void> 
        </object> 
       </void> 
@@ -119,11 +119,11 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>3</int> 
+         <int>5</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>3</int> 
+         <int>5</int> 
         </void> 
        </object> 
       </void> 
@@ -146,11 +146,11 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>1</int> 
+         <int>3</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>5</int> 
+         <int>7</int> 
         </void> 
        </object> 
       </void> 
@@ -169,11 +169,11 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>3</int> 
+         <int>5</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>5</int> 
+         <int>7</int> 
         </void> 
        </object> 
       </void> 
@@ -196,11 +196,11 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>1</int> 
+         <int>3</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>7</int> 
+         <int>9</int> 
         </void> 
        </object> 
       </void> 
@@ -219,11 +219,11 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>3</int> 
+         <int>5</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>7</int> 
+         <int>9</int> 
         </void> 
        </object> 
       </void> 
@@ -246,11 +246,11 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>1</int> 
+         <int>3</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>9</int> 
+         <int>11</int> 
         </void> 
        </object> 
       </void> 
@@ -269,11 +269,11 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>3</int> 
+         <int>5</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>9</int> 
+         <int>11</int> 
         </void> 
        </object> 
       </void> 
@@ -296,11 +296,11 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>1</int> 
+         <int>3</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>11</int> 
+         <int>13</int> 
         </void> 
        </object> 
       </void> 
@@ -319,11 +319,11 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>3</int> 
+         <int>5</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>11</int> 
+         <int>13</int> 
         </void> 
        </object> 
       </void> 
@@ -346,11 +346,11 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>1</int> 
+         <int>3</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>13</int> 
+         <int>15</int> 
         </void> 
        </object> 
       </void> 
@@ -369,11 +369,11 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>3</int> 
+         <int>5</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>13</int> 
+         <int>15</int> 
         </void> 
        </object> 
       </void> 
@@ -400,11 +400,11 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>1</int> 
+         <int>3</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>15</int> 
+         <int>17</int> 
         </void> 
        </object> 
       </void> 
@@ -423,11 +423,11 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>3</int> 
+         <int>5</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>15</int> 
+         <int>17</int> 
         </void> 
        </object> 
       </void> 
@@ -450,7 +450,11 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>17</int> 
+         <int>19</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>3</int> 
         </void> 
        </object> 
       </void> 
@@ -469,11 +473,11 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>3</int> 
+         <int>5</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>17</int> 
+         <int>19</int> 
         </void> 
        </object> 
       </void> 
@@ -496,7 +500,11 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>19</int> 
+         <int>21</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>3</int> 
         </void> 
        </object> 
       </void> 
@@ -515,11 +523,11 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>3</int> 
+         <int>5</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>19</int> 
+         <int>21</int> 
         </void> 
        </object> 
       </void> 
@@ -542,7 +550,11 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>21</int> 
+         <int>23</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>3</int> 
         </void> 
        </object> 
       </void> 
@@ -561,11 +573,11 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>3</int> 
+         <int>5</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>21</int> 
+         <int>23</int> 
         </void> 
        </object> 
       </void> 

@@ -189,7 +189,7 @@ public class DlgDiscontinue extends MyJDialog {
         listKH.add(0, null);
 
         cmbArztAb.setModel(new DefaultComboBoxModel(listAerzte.toArray()));
-        cmbArztAb.setRenderer(DocTools.getArztRenderer());
+        cmbArztAb.setRenderer(DocTools.getRenderer());
         cmbArztAb.setSelectedIndex(0);
 
         cmbKHAb.setModel(new DefaultComboBoxModel(listKH.toArray()));

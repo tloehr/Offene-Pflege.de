@@ -6,50 +6,46 @@ package op.residents.bwassistant;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.info.LCustodian;
-import entity.info.LCustodianTools;
-import op.OPDE;
-import op.tools.PnlEditBetreuer;
+import entity.prescription.Doc;
+import entity.prescription.DocTools;
+import op.residents.PnlEditGP;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
 
 /**
  * @author Torsten Löhr
  */
-public class PnlBetreuer extends JPanel {
-    public static final String internalClassID = "opde.admin.bw.wizard.page5";
+public class PnlGP extends JPanel {
+    public static final String internalClassID = "opde.admin.bw.wizard.page4";
     private double split1Pos;
     private Closure validate;
-    private PnlEditBetreuer pnlEditBetreuer;
+    private PnlEditGP pnlEditGP;
 
 
-    public PnlBetreuer(Closure validate) {
+    public PnlGP(Closure validate) {
         this.validate = validate;
         initComponents();
         initPanel();
     }
 
     private void initPanel() {
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM LCustodian b WHERE b.status >= 0 ORDER BY b.name, b.vorname");
-        java.util.List<LCustodian> listLCustodian = query.getResultList();
-        em.close();
-        listLCustodian.add(0, null);
+        ArrayList<Doc> listGPs = DocTools.getAllActive();
 
-        pnlEditBetreuer = new PnlEditBetreuer(new LCustodian());
-        pnlRight.add(pnlEditBetreuer, 0);
+        listGPs.add(0, null);
 
-        cmbBetreuer.setModel(new DefaultComboBoxModel(listLCustodian.toArray()));
-        cmbBetreuer.setRenderer(LCustodianTools.getBetreuerRenderer());
+        pnlEditGP = new PnlEditGP(new Doc());
+        pnlRight.add(pnlEditGP, 0);
+
+        cmbArzt.setModel(new DefaultComboBoxModel(listGPs.toArray()));
+        cmbArzt.setRenderer(DocTools.getRenderer());
 
     }
 
@@ -62,10 +58,10 @@ public class PnlBetreuer extends JPanel {
     }
 
     private void btnOKActionPerformed(ActionEvent e) {
-        LCustodian newLCustodian = pnlEditBetreuer.getLCustodian();
-        if (newLCustodian != null) {
-            cmbBetreuer.setModel(new DefaultComboBoxModel(new LCustodian[]{newLCustodian}));
-            validate.execute(newLCustodian);
+        Doc newDoc = pnlEditGP.getDoc();
+        if (newDoc != null) {
+            cmbArzt.setModel(new DefaultComboBoxModel(new Doc[]{newDoc}));
+            validate.execute(newDoc);
         }
         split1Pos = SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, SYSConst.SCROLL_TIME_FAST);
     }
@@ -74,15 +70,15 @@ public class PnlBetreuer extends JPanel {
         split1Pos = SYSTools.showSide(split1, SYSTools.RIGHT_LOWER_SIDE, SYSConst.SCROLL_TIME_FAST);
     }
 
-    private void cmbBetreuerItemStateChanged(ItemEvent e) {
-        validate.execute(cmbBetreuer.getSelectedItem());
+    private void cmbArztItemStateChanged(ItemEvent e) {
+        validate.execute(cmbArzt.getSelectedItem());
     }
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         split1 = new JSplitPane();
         panel1 = new JPanel();
-        cmbBetreuer = new JComboBox();
+        cmbArzt = new JComboBox();
         btnAdd = new JButton();
         pnlRight = new JPanel();
         panel2 = new JPanel();
@@ -96,7 +92,7 @@ public class PnlBetreuer extends JPanel {
 
         //======== split1 ========
         {
-            split1.setDividerLocation(400);
+            split1.setDividerLocation(100);
             split1.setDividerSize(1);
             split1.setDoubleBuffered(true);
             split1.setEnabled(false);
@@ -107,14 +103,14 @@ public class PnlBetreuer extends JPanel {
                     "default:grow, $lcgap, default",
                     "2*(default, $lgap), default"));
 
-                //---- cmbBetreuer ----
-                cmbBetreuer.addItemListener(new ItemListener() {
+                //---- cmbArzt ----
+                cmbArzt.addItemListener(new ItemListener() {
                     @Override
                     public void itemStateChanged(ItemEvent e) {
-                        cmbBetreuerItemStateChanged(e);
+                        cmbArztItemStateChanged(e);
                     }
                 });
-                panel1.add(cmbBetreuer, CC.xy(1, 3));
+                panel1.add(cmbArzt, CC.xy(1, 3));
 
                 //---- btnAdd ----
                 btnAdd.setText(null);
@@ -173,7 +169,7 @@ public class PnlBetreuer extends JPanel {
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JSplitPane split1;
     private JPanel panel1;
-    private JComboBox cmbBetreuer;
+    private JComboBox cmbArzt;
     private JButton btnAdd;
     private JPanel pnlRight;
     private JPanel panel2;

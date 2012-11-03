@@ -684,9 +684,9 @@ public class FrmMain extends JFrame {
                 }
             };
 
-            String titel = innerbewohner.getName() + ", " + innerbewohner.getVorname() + " [" + innerbewohner.getRID() + "]";
+            String titel = innerbewohner.getName() + ", " + innerbewohner.getFirstname() + " [" + innerbewohner.getRID() + "]";
             JideButton button = GUITools.createHyperlinkButton(titel, null, actionListener);
-            button.setForegroundOfState(ThemePainter.STATE_DEFAULT, innerbewohner.getGender() == ResidentTools.GESCHLECHT_WEIBLICH ? Color.red : Color.blue);
+            button.setForegroundOfState(ThemePainter.STATE_DEFAULT, innerbewohner.getGender() == ResidentTools.FEMALE ? Color.red : Color.blue);
             button.setBackground(Color.WHITE);
 //            button.putClientProperty("bewohner", innerbewohner);
 

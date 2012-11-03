@@ -437,14 +437,25 @@ public class SYSCalendar {
         return new GregorianCalendar(jahr, monat - 1, tag, 0, 0, 0);
     }
 
-    public static boolean isDateSane(Resident resident, Date date){
+    public static boolean isDateSane(Resident resident, Date date) {
         DateMidnight d = new DateMidnight(date);
-        if (d.isAfterNow()){
+        if (d.isAfterNow()) {
             return false;
         }
         ResInfo firstStay = ResInfoTools.getFirstResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
         DateMidnight min = firstStay == null ? new DateMidnight().dayOfMonth().withMinimumValue() : new DateMidnight(firstStay.getFrom());
         return new DateMidnight(date).isAfter(min);
+    }
+
+    public static boolean isBirthdaySane(Date date) {
+        if (date == null) return false;
+        int maxage = 120;
+        int minage = 15;
+        DateMidnight min = new DateMidnight().minusYears(minage);
+        DateMidnight max = new DateMidnight().minusYears(maxage);
+        DateMidnight d = new DateMidnight(date);
+
+        return d.isAfter(max) && d.isBefore(min);
     }
 
 
@@ -1126,7 +1137,7 @@ public class SYSCalendar {
      */
     public static DefaultComboBoxModel createMonthList(DateMidnight start, DateMidnight end) {
         DefaultComboBoxModel dcbm = new DefaultComboBoxModel();
-        for (DateMidnight month = start; month.compareTo(end) <= 0; month = month.plusMonths(1)){
+        for (DateMidnight month = start; month.compareTo(end) <= 0; month = month.plusMonths(1)) {
             dcbm.addElement(month);
         }
         return dcbm;

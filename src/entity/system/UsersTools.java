@@ -41,8 +41,7 @@ public class UsersTools {
 
     }
 
-    public static ListCellRenderer
-    getUserRenderer() {
+    public static ListCellRenderer getRenderer() {
         return new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {

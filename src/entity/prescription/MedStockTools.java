@@ -145,7 +145,7 @@ public class MedStockTools {
         hm.put("bestand.userkurz", bestand.getUser().getUID());
         hm.put("bestand.userlang", bestand.getUser().getFullname());
         hm.put("bestand.inventory.bewohnername", ResidentTools.getNameAndFirstname(bestand.getInventory().getResident()));
-        hm.put("bestand.inventory.bewohnergebdatum", bestand.getInventory().getResident().getBirthday());
+        hm.put("bestand.inventory.bewohnergebdatum", bestand.getInventory().getResident().getDOB());
         hm.put("bestand.inventory.bewohnerkennung", bestand.getInventory().getResident().getRID());
 
         return hm;

@@ -384,10 +384,10 @@ public class NReportTools {
 
             html.append(SYSConst.html_h2_open + ResidentTools.getTextCompact(resident) + SYSConst.html_h2_close);
 
-            if (resident.getBv1() == null) {
+            if (resident.getPN1() == null) {
                 html.append(SYSConst.html_div(SYSConst.html_bold(OPDE.lang.getString(PnlControlling.internalClassID + ".orga.bvactivities.nobv"))));
             } else {
-                html.append(SYSConst.html_div(SYSConst.html_bold(OPDE.lang.getString("misc.msg.bv")) + ": " + resident.getBv1().getFullname()));
+                html.append(SYSConst.html_div(SYSConst.html_bold(OPDE.lang.getString("misc.msg.primaryNurse")) + ": " + resident.getPN1().getFullname()));
             }
 
             if (listReports.isEmpty()) {

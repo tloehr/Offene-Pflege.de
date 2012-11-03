@@ -5,20 +5,12 @@
 
 package entity;
 
+import op.OPDE;
+
+import javax.persistence.*;
 import java.io.Serializable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
 
 /**
- *
  * @author tloehr
  */
 @Entity
@@ -35,15 +27,15 @@ public class Rooms implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "RID")
-    private Long raumID;
+    private Long roomID;
     @Column(name = "Text")
-    private String bezeichnung;
+    private String text;
     @Column(name = "Level")
-    private Short etage;
+    private Short level;
     @Column(name = "Single")
-    private Boolean einzel;
+    private Boolean single;
     @Column(name = "Bath")
-    private Boolean bad;
+    private Boolean bath;
     @JoinColumn(name = "StatID", referencedColumnName = "StatID")
     @ManyToOne
     private Station station;
@@ -51,12 +43,37 @@ public class Rooms implements Serializable {
     public Rooms() {
     }
 
-    public Long getRaumID() {
-        return raumID;
+
+    public Long getRoomID() {
+        return roomID;
     }
 
-    public void setRaumID(Long raumID) {
-        this.raumID = raumID;
+    public void setRoomID(Long roomID) {
+        this.roomID = roomID;
+    }
+
+    public Short getLevel() {
+        return level;
+    }
+
+    public void setLevel(Short level) {
+        this.level = level;
+    }
+
+    public Boolean getSingle() {
+        return single;
+    }
+
+    public void setSingle(Boolean single) {
+        this.single = single;
+    }
+
+    public Boolean getBath() {
+        return bath;
+    }
+
+    public void setBath(Boolean bath) {
+        this.bath = bath;
     }
 
     public Station getStation() {
@@ -66,43 +83,16 @@ public class Rooms implements Serializable {
     public void setStation(Station station) {
         this.station = station;
     }
-    
-    public String getBezeichnung() {
-        return bezeichnung;
+
+    public String getText() {
+        return text;
     }
 
-    public void setBezeichnung(String bezeichnung) {
-        this.bezeichnung = bezeichnung;
-    }
-
-    public Short getEtage() {
-        return etage;
-    }
-
-    public void setEtage(Short etage) {
-        this.etage = etage;
-    }
-
-    public Boolean getEinzel() {
-        return einzel;
-    }
-
-    public void setEinzel(Boolean einzel) {
-        this.einzel = einzel;
-    }
-
-    public Boolean getBad() {
-        return bad;
-    }
-
-    public void setBad(Boolean bad) {
-        this.bad = bad;
-    }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (raumID != null ? raumID.hashCode() : 0);
+        hash += (roomID != null ? roomID.hashCode() : 0);
         return hash;
     }
 
@@ -113,7 +103,7 @@ public class Rooms implements Serializable {
             return false;
         }
         Rooms other = (Rooms) object;
-        if ((this.raumID == null && other.raumID != null) || (this.raumID != null && !this.raumID.equals(other.raumID))) {
+        if ((this.roomID == null && other.roomID != null) || (this.roomID != null && !this.roomID.equals(other.roomID))) {
             return false;
         }
         return true;
@@ -121,7 +111,7 @@ public class Rooms implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Rooms[raumID=" + raumID + "]";
+        return OPDE.lang.getString("misc.msg.room") + " " + text + ", " + station.getName() + ", " + station.getHome().getBezeichnung();
     }
 
 }

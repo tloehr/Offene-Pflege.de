@@ -313,7 +313,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
 
 
     public String getText() {
-        SYSTools.anonymizeText(resident.getNachnameNieAnonym(), text);
+        SYSTools.anonymizeText(resident.getNameNeverAnonymous(), text);
         return text;
     }
 
