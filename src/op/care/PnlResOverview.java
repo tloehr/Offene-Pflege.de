@@ -228,39 +228,39 @@ public class PnlResOverview extends NursingRecordsPanel {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (initPhase) return;
-                SYSPropsTools.storeState(internalClassID + ":tbMedi", tbMedi);
+//                SYSPropsTools.storeState(internalClassID + ":tbMedi", tbMedi);
                 reloadDisplay();
             }
         });
         tbMedi.setHorizontalAlignment(SwingConstants.LEFT);
         labelPanel.add(tbMedi);
-        SYSPropsTools.restoreState(internalClassID + ":tbMedi", tbMedi);
+//        SYSPropsTools.restoreState(internalClassID + ":tbMedi", tbMedi);
 
         tbBerichte = GUITools.getNiceToggleButton(OPDE.lang.getString(PnlReport.internalClassID));
         tbBerichte.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (initPhase) return;
-                SYSPropsTools.storeState(internalClassID + ":tbBerichte", tbBerichte);
+//                SYSPropsTools.storeState(internalClassID + ":tbBerichte", tbBerichte);
                 reloadDisplay();
             }
         });
         tbBerichte.setHorizontalAlignment(SwingConstants.LEFT);
         labelPanel.add(tbBerichte);
-        SYSPropsTools.restoreState(internalClassID + ":tbBerichte", tbBerichte);
+//        SYSPropsTools.restoreState(internalClassID + ":tbBerichte", tbBerichte);
 
         tbBilanz = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.msg.liquid.result"));
         tbBilanz.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (initPhase) return;
-                SYSPropsTools.storeState(internalClassID + ":tbBilanz", tbBilanz);
+//                SYSPropsTools.storeState(internalClassID + ":tbBilanz", tbBilanz);
                 reloadDisplay();
             }
         });
         tbBilanz.setHorizontalAlignment(SwingConstants.LEFT);
         labelPanel.add(tbBilanz);
-        SYSPropsTools.restoreState(internalClassID + ":tbBilanz", tbBilanz);
+//        SYSPropsTools.restoreState(internalClassID + ":tbBilanz", tbBilanz);
 
 //        tbBWInfo = GUITools.getNiceToggleButton(OPDE.lang.getString(PnlInfo.internalClassID));
 //        tbBWInfo.addItemListener(new ItemListener() {

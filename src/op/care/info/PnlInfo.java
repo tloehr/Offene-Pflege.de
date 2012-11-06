@@ -415,6 +415,9 @@ public class PnlInfo extends NursingRecordsPanel {
                                 newinfo.setHtml(ResInfoTools.getContentAsHTML(newinfo));
                                 em.getTransaction().commit();
 
+                                if (!valuecache.containsKey(newinfo.getResInfoType())){
+                                    valuecache.put(newinfo.getResInfoType(), new ArrayList<ResInfo>());
+                                }
                                 valuecache.get(newinfo.getResInfoType()).add(newinfo);
                                 Collections.sort(valuecache.get(newinfo.getResInfoType()));
                                 createCP4Type(newinfo.getResInfoType());
@@ -874,29 +877,29 @@ public class PnlInfo extends NursingRecordsPanel {
             list.add(btnBWisBack);
         }
 
-        final JideButton btnExpandAll = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.msg.expandall"), SYSConst.icon22expand, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                try {
-                    GUITools.setCollapsed(cpsInfo, false);
-                } catch (PropertyVetoException e) {
-                    // bah!
-                }
-            }
-        });
-        list.add(btnExpandAll);
-
-        final JideButton btnCollapseAll = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.msg.collapseall"), SYSConst.icon22collapse, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                try {
-                    GUITools.setCollapsed(cpsInfo, true);
-                } catch (PropertyVetoException e) {
-                    // bah!
-                }
-            }
-        });
-        list.add(btnCollapseAll);
+//        final JideButton btnExpandAll = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.msg.expandall"), SYSConst.icon22expand, new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent actionEvent) {
+//                try {
+//                    GUITools.setCollapsed(cpsInfo, false);
+//                } catch (PropertyVetoException e) {
+//                    // bah!
+//                }
+//            }
+//        });
+//        list.add(btnExpandAll);
+//
+//        final JideButton btnCollapseAll = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.msg.collapseall"), SYSConst.icon22collapse, new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent actionEvent) {
+//                try {
+//                    GUITools.setCollapsed(cpsInfo, true);
+//                } catch (PropertyVetoException e) {
+//                    // bah!
+//                }
+//            }
+//        });
+//        list.add(btnCollapseAll);
 
         /***
          *      ____       _       _
@@ -1345,6 +1348,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                         Pair<Date, Date> period = (Pair<Date, Date>) o;
                                         editinfo.setFrom(period.getFirst());
                                         editinfo.setTo(period.getSecond());
+                                        editinfo.setUserOFF(editinfo.getTo().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE) ? null : em.merge(OPDE.getLogin().getUser()));
                                         em.getTransaction().commit();
 
                                         valuecache.get(resInfo.getResInfoType()).remove(resInfo);
@@ -1398,7 +1402,7 @@ public class PnlInfo extends NursingRecordsPanel {
              *     |_.__/ \__|_| |_|_|   |_|_|\___||___/
              *
              */
-            final JButton btnFiles = GUITools.createHyperlinkButton("misc.btnfiles.tooltip", SYSConst.icon22attach, null);
+            final JButton btnFiles = GUITools.createHyperlinkButton(resInfo.isClosed() ? "misc.btnfiles.tooltip.closed" : "misc.btnfiles.tooltip", SYSConst.icon22attach, null);
             btnFiles.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnFiles.addActionListener(new ActionListener() {
                 @Override

@@ -30,11 +30,11 @@ public class PnlPIT extends JPanel {
     private Date max, min;
     //TODO: Catch entries that are way too old
     public PnlPIT() {
-        this(new Date(), new Date(), SYSConst.DATE_VERY_BEGINNING);
+        this(new Date(), new Date(), SYSConst.DATE_THE_VERY_BEGINNING);
     }
 
     public PnlPIT(Date preset) {
-        this(preset, new Date(), SYSConst.DATE_VERY_BEGINNING);
+        this(preset, new Date(), SYSConst.DATE_THE_VERY_BEGINNING);
     }
 
     public PnlPIT(Date preset, Date max, Date min) {
@@ -46,7 +46,7 @@ public class PnlPIT extends JPanel {
         this.preset = preset;
         jdcDatum.setDate(preset);
         jdcDatum.setMaxSelectableDate(max == null ? SYSConst.DATE_UNTIL_FURTHER_NOTICE : max);
-        jdcDatum.setMinSelectableDate(min == null ? SYSConst.DATE_VERY_BEGINNING : min);
+        jdcDatum.setMinSelectableDate(min == null ? SYSConst.DATE_THE_VERY_BEGINNING : min);
         uhrzeit = new Time(preset.getTime());
         txtUhrzeit.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(uhrzeit));
     }

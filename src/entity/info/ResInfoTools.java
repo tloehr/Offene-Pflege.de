@@ -153,7 +153,7 @@ public class ResInfoTools {
 
         if (info.getResInfoType().getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_NOCONSTRAINTS) {
             min = firstHauf.getFrom();
-            max = new Date();
+            max = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
             return new Pair<Date, Date>(min, max);
         }
 
@@ -165,7 +165,7 @@ public class ResInfoTools {
                 DateTime dtVon = new DateTime(leftElement.getFrom());
                 max = dtVon.minusSeconds(1).toDate();
             } catch (IndexOutOfBoundsException e) {
-                max = new Date();
+                max = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
             }
 
             try {
@@ -478,7 +478,7 @@ public class ResInfoTools {
 
 
     public static String getTXReport(Resident bewohner, boolean withlongheader,
-                                     boolean medi, boolean bilanz, boolean bericht,
+                                     boolean medi, boolean bilanz, boolean withNReports,
                                      boolean diag, boolean grundpflege, boolean haut, boolean vital) {
         //todo: bilanzen, berichte und medis kommen nicht
 
@@ -696,14 +696,14 @@ public class ResInfoTools {
         }
 
         /***
-         *      ____            _      _     _
-         *     | __ )  ___ _ __(_) ___| |__ | |_ ___
-         *     |  _ \ / _ \ '__| |/ __| '_ \| __/ _ \
-         *     | |_) |  __/ |  | | (__| | | | ||  __/
-         *     |____/ \___|_|  |_|\___|_| |_|\__\___|
-         *
+         *      _   _ ____                       _
+         *     | \ | |  _ \ ___ _ __   ___  _ __| |_ ___
+         *     |  \| | |_) / _ \ '_ \ / _ \| '__| __/ __|
+         *     | |\  |  _ <  __/ |_) | (_) | |  | |_\__ \
+         *     |_| \_|_| \_\___| .__/ \___/|_|   \__|___/
+         *                     |_|
          */
-        if (bericht) {
+        if (withNReports) {
             EntityManager em = OPDE.createEM();
             Query query = em.createQuery("SELECT p FROM NReport p "
                     + " WHERE p.resident = :bewohner AND p.pit >= :von "

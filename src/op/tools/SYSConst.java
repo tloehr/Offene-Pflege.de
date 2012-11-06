@@ -216,7 +216,7 @@ public class SYSConst {
     public static final GregorianCalendar VERY_BEGINNING = new GregorianCalendar(1970, GregorianCalendar.JANUARY, 1, 0, 0, 0);
     public static final GregorianCalendar UNTIL_FURTHER_NOTICE = new GregorianCalendar(9999, GregorianCalendar.DECEMBER, 31, 23, 59, 59);
     //    public static final GregorianCalendar BIS_AUF_WEITERES_WO_TIME = new GregorianCalendar(9999, GregorianCalendar.DECEMBER, 31, 0, 0, 0);
-    public static final Date DATE_VERY_BEGINNING = new Date(VERY_BEGINNING.getTimeInMillis());
+    public static final Date DATE_THE_VERY_BEGINNING = new Date(VERY_BEGINNING.getTimeInMillis());
     public static final Date DATE_UNTIL_FURTHER_NOTICE = new Date(UNTIL_FURTHER_NOTICE.getTimeInMillis());
 //    public static final Date DATE_BIS_AUF_WEITERES_WO_TIME = new Date(BIS_AUF_WEITERES_WO_TIME.getTimeInMillis());
     //    public static final Timestamp TS_VON_ANFANG_AN = new Timestamp(VERY_BEGINNING.getTimeInMillis());

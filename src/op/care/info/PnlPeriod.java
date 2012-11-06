@@ -8,7 +8,10 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.swing.RangeSlider;
 import com.toedter.calendar.JDateChooser;
+import op.OPDE;
+import op.tools.GUITools;
 import op.tools.Pair;
+import op.tools.SYSConst;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
@@ -17,6 +20,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Date;
@@ -29,9 +34,14 @@ public class PnlPeriod extends JPanel {
     private Date min, max, from, to;
     DateTime dtmin, dtmax;
     int maximum;
+    private boolean fromTheVeryBeginning;
+    private boolean untilFurtherNotice;
+    private JToggleButton tbTVB, tbUFN;
     private Closure actionBlock;
 
     public PnlPeriod(Date min, Date max, Date from, Date to, Closure actionBlock) {
+        this.fromTheVeryBeginning = from.equals(SYSConst.DATE_THE_VERY_BEGINNING);
+        this.untilFurtherNotice = to.equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
         this.actionBlock = actionBlock;
         this.min = min;
         this.max = max;//new Date(Math.min(new Date().getTime(), max.getTime())); // max date is always today
@@ -65,16 +75,24 @@ public class PnlPeriod extends JPanel {
 
     private void btnOKActionPerformed(ActionEvent e) {
 
-        if (jdcVon.getDate() != null && jdcBis.getDate() != null) {
+        Date from = tbTVB.isSelected() ? SYSConst.DATE_THE_VERY_BEGINNING : jdcVon.getDate();
+        Date to = tbUFN.isSelected() ? SYSConst.DATE_UNTIL_FURTHER_NOTICE : jdcBis.getDate();
 
-            DateTime from = new DateTime(jdcVon.getDate());
-            DateTime to = new DateTime(jdcBis.getDate());
+        if (from != null && to != null) {
 
-            if (dtmin.isAfter(from) || dtmax.isBefore(to)) {
+            DateTime dtFrom = new DateTime(from);
+            DateTime dtTo = new DateTime(to);
+
+            if (dtmin.isAfter(dtFrom) || dtmax.isBefore(dtTo)) {
                 actionBlock.execute(null);
             } else {
-                actionBlock.execute(new Pair<Date, Date>(jdcVon.getDate(), jdcBis.getDate()));
+                actionBlock.execute(new Pair<Date, Date>(from, to));
             }
+
+            OPDE.debug("accepted min: " + dtmin);
+            OPDE.debug("current from: " + dtFrom);
+            OPDE.debug("current to: " + dtTo);
+            OPDE.debug("accepted max: " + dtmax);
 
         } else {
             actionBlock.execute(null);
@@ -98,6 +116,8 @@ public class PnlPeriod extends JPanel {
         btnBackTo = new JButton();
         btnFwdTo = new JButton();
         btnMax = new JButton();
+        pnlTVB = new JPanel();
+        pnlUFN = new JPanel();
         panel3 = new JPanel();
         btnCancel = new JButton();
         btnOK = new JButton();
@@ -105,7 +125,7 @@ public class PnlPeriod extends JPanel {
         //======== this ========
         setLayout(new FormLayout(
                 "2*(default, $lcgap), 62dlu, $lcgap, default:grow, $lcgap, 62dlu, 2*($lcgap, default)",
-                "4*(default, $lgap), default"));
+                "2*(default, $lgap), default, 6dlu, default, $lgap, default"));
 
         //======== panel1 ========
         {
@@ -249,6 +269,18 @@ public class PnlPeriod extends JPanel {
         }
         add(panel2, CC.xy(11, 3));
 
+        //======== pnlTVB ========
+        {
+            pnlTVB.setLayout(new BoxLayout(pnlTVB, BoxLayout.X_AXIS));
+        }
+        add(pnlTVB, CC.xywh(3, 5, 3, 1, CC.DEFAULT, CC.FILL));
+
+        //======== pnlUFN ========
+        {
+            pnlUFN.setLayout(new BoxLayout(pnlUFN, BoxLayout.X_AXIS));
+        }
+        add(pnlUFN, CC.xywh(9, 5, 3, 1, CC.DEFAULT, CC.FILL));
+
         //======== panel3 ========
         {
             panel3.setLayout(new BoxLayout(panel3, BoxLayout.LINE_AXIS));
@@ -287,29 +319,70 @@ public class PnlPeriod extends JPanel {
 //        OPDE.debug("min " + min + " max " + max);
 //        OPDE.debug("from " + from + " to " + to);
 
+        final Date myMax = max.equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE) ? new Date() : max;
+
         slider.setRangeDraggable(false);
         jdcVon.setMinSelectableDate(min);
         jdcVon.setMaxSelectableDate(to);
         jdcVon.setDate(from);
-        jdcBis.setMaxSelectableDate(max);
+        jdcBis.setMaxSelectableDate(myMax);
         jdcBis.setMinSelectableDate(from);
         jdcBis.setDate(to);
 
-        maximum = Days.daysBetween(new DateTime(min), new DateTime(max)).getDays();
+        maximum = Days.daysBetween(new DateTime(min), new DateTime(myMax)).getDays();
 
         int low = Days.daysBetween(new DateTime(min), new DateTime(from)).getDays();
         int high = Days.daysBetween(new DateTime(min), new DateTime(to)).getDays();
+
+        tbTVB = GUITools.getNiceToggleButton("misc.msg.fromTheVeryBeginning");
+        tbUFN = GUITools.getNiceToggleButton("misc.msg.untilFurtherNotice");
+
+        tbTVB.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                btnMin.setEnabled(!tbTVB.isSelected());
+                btnBackFrom.setEnabled(!tbTVB.isSelected());
+                btnFwdFrom.setEnabled(!tbTVB.isSelected());
+                jdcVon.setEnabled(!tbTVB.isSelected());
+                if (e.getStateChange() != ItemEvent.SELECTED){
+                    jdcVon.setDate(min);
+                }
+            }
+        });
+
+        tbUFN.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                btnMax.setEnabled(!tbUFN.isSelected());
+                btnFwdTo.setEnabled(!tbUFN.isSelected());
+                btnBackTo.setEnabled(!tbUFN.isSelected());
+                jdcBis.setEnabled(!tbUFN.isSelected());
+                if (e.getStateChange() != ItemEvent.SELECTED){
+                    jdcBis.setDate(myMax);
+                }
+            }
+        });
+
+        tbTVB.setSelected(fromTheVeryBeginning);
+        tbUFN.setSelected(untilFurtherNotice);
+
+        tbTVB.setEnabled(min.equals(SYSConst.DATE_THE_VERY_BEGINNING));
+        tbUFN.setEnabled(max.equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE));
+
+        pnlTVB.add(tbTVB);
+        pnlUFN.add(tbUFN);
 
         slider.setMinimum(0);
         slider.setMaximum(maximum);
         slider.setLowValue(low);
         slider.setHighValue(high);
+
         ignore = false;
     }
 
     private void sliderPropertyChange(PropertyChangeEvent e) {
         ignore = true;
-        if (e.getPropertyName().equals("lowValue")) {
+        if (e.getPropertyName().equals("lowValue") && !tbTVB.isSelected()) {
             int val = (Integer) e.getNewValue();
 
             if (val > slider.getMinimum()) {
@@ -318,7 +391,7 @@ public class PnlPeriod extends JPanel {
                 jdcVon.setDate(min); // Ansonsten genau an der Grenze
             }
         }
-        if (e.getPropertyName().equals("highValue")) {
+        if (e.getPropertyName().equals("highValue") && !tbUFN.isSelected()) {
             int val = (Integer) e.getNewValue();
             if (val < slider.getMaximum()) {
                 jdcBis.setDate(dtmin.plusDays(val + 1).toDateMidnight().toDateTime().minusSeconds(1).toDate()); // Innerhalb der Grenzen enden alle Tage immer um 23:59:59.
@@ -348,10 +421,6 @@ public class PnlPeriod extends JPanel {
         slider.setLowValue(0);
     }
 
-    private void btnBackActionPerformed(ActionEvent e) {
-
-
-    }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JPanel panel1;
@@ -365,6 +434,8 @@ public class PnlPeriod extends JPanel {
     private JButton btnBackTo;
     private JButton btnFwdTo;
     private JButton btnMax;
+    private JPanel pnlTVB;
+    private JPanel pnlUFN;
     private JPanel panel3;
     private JButton btnCancel;
     private JButton btnOK;

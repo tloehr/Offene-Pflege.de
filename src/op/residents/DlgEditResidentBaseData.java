@@ -361,8 +361,8 @@ public class DlgEditResidentBaseData extends MyJDialog {
         //======== this ========
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "13dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default, $lcgap, 13dlu",
-                "13dlu, 12*($lgap, default), $lgap, 13dlu"));
+            "13dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default, $lcgap, 13dlu",
+            "13dlu, 12*($lgap, default), $lgap, 13dlu"));
 
         //---- lblName ----
         lblName.setText("text");
