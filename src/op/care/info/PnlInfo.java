@@ -68,6 +68,11 @@ public class PnlInfo extends NursingRecordsPanel {
 
     private boolean initPhase;
 
+    @Override
+    public String getInternalClassID() {
+        return internalClassID;
+    }
+
     public PnlInfo(Resident resident, JScrollPane jspSearch) {
         initPhase = true;
         this.jspSearch = jspSearch;

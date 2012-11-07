@@ -118,6 +118,11 @@ public class PnlRegelDosis extends CleanablePanel {
         spinMonat.setValue(1);
     }
 
+    @Override
+    public String getInternalClassID() {
+        return null;
+    }
+
 
     private void initPanel() {
 

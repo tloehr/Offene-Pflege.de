@@ -91,6 +91,11 @@ public class PnlBHP extends NursingRecordsPanel {
     }
 
     @Override
+    public String getInternalClassID() {
+        return internalClassID;
+    }
+
+    @Override
     public void switchResident(Resident bewohner) {
 
         this.resident = bewohner;

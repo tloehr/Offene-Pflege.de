@@ -93,6 +93,12 @@ public class PnlAllowance extends CleanablePanel {
     private HashMap<String, JPanel> contentmap;
     private HashMap<Allowance, JPanel> linemap;
 
+
+    @Override
+    public String getInternalClassID() {
+        return internalClassID;
+    }
+
     public PnlAllowance(JScrollPane jspSearch) {
         super();
         this.jspSearch = jspSearch;

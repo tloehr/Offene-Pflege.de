@@ -48,23 +48,24 @@ public class PnlTX extends JPanel {
     }
 
     private void txtDateFocusLost(FocusEvent evt) {
-        DateTime dt;
-        try {
-            dt = new DateTime(SYSCalendar.parseDate(((JTextField) evt.getSource()).getText()));
-        } catch (NumberFormatException ex) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wrongdate")));
-            dt = new DateTime();
-        }
-        if (dt.isAfterNow()) {
-            dt = new DateTime();
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.futuredate")));
-        }
-        if (dt.isBefore(min)) {
-            dt = new DateTime();
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.DateTooOld")));
-        }
-
-        ((JTextField) evt.getSource()).setText(DateFormat.getDateInstance().format(dt.toDate()));
+//        DateTime dt;
+//        try {
+//            dt = new DateTime(SYSCalendar.parseDate(((JTextField) evt.getSource()).getText()));
+//        } catch (NumberFormatException ex) {
+//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wrongdate")));
+//            dt = new DateTime();
+//        }
+//        if (dt.isAfterNow()) {
+//            dt = new DateTime();
+//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.futuredate")));
+//        }
+//        if (dt.isBefore(min)) {
+//            dt = new DateTime();
+//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.DateTooOld")));
+//        }
+//
+//        ((JTextField) evt.getSource()).setText(DateFormat.getDateInstance().format(dt.toDate()));
+        SYSCalendar.handleDateFocusLost(evt, min.toDateTime());
     }
 
     private void txtDateFocusGained(FocusEvent e) {

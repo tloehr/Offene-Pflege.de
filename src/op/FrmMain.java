@@ -73,6 +73,7 @@ import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
+import java.net.URI;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -120,6 +121,8 @@ public class FrmMain extends JFrame {
         currentBewohner = null;
         lblWait.setText(OPDE.lang.getString("misc.msg.wait"));
         lblWait.setVisible(false);
+
+        btnHelp.setToolTipText(OPDE.lang.getString(internalClassID+".btnHelp.tooltip"));
 
         if (OPDE.isDebug()) {
             setSize(1366, 768);
@@ -226,6 +229,7 @@ public class FrmMain extends JFrame {
         if (currentVisiblePanel != null) {
             currentVisiblePanel.reload();
         }
+
     }
 
     private void splitPaneLeftPropertyChange(PropertyChangeEvent e) {
@@ -235,7 +239,16 @@ public class FrmMain extends JFrame {
     }
 
     private void btnHelpActionPerformed(ActionEvent e) {
-        // TODO add your code here
+        if (currentVisiblePanel != null && Desktop.isDesktopSupported() && currentVisiblePanel.getInternalClassID() != null && OPDE.lang.containsKey(currentVisiblePanel.getInternalClassID() + ".helpurl")) {
+            try {
+                URI uri = new URI(OPDE.lang.getString(currentVisiblePanel.getInternalClassID() + ".helpurl"));
+                Desktop.getDesktop().browse(uri);
+            } catch (Exception ex) {
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".noHelpAvailable"));
+            }
+        } else {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".noHelpAvailable"));
+        }
     }
 
     public void afterLogin() {
@@ -276,7 +289,7 @@ public class FrmMain extends JFrame {
     private void initComponents() {
         pnlMain = new JPanel();
         pnlMainMessage = new JPanel();
-        lblMainMsg = new FadingLabel();
+        lblMainMsg = new JLabel();
         btnVerlegung = new JButton();
         btnExit = new JButton();
         lblSubMsg = new FadingLabel();
@@ -304,16 +317,16 @@ public class FrmMain extends JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                    "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
+                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                        "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
-                        "0dlu, $lgap, pref, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
+                    "0dlu, $lgap, pref, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
 
                 //---- lblMainMsg ----
                 lblMainMsg.setText("OPDE");
@@ -456,94 +469,6 @@ public class FrmMain extends JFrame {
         }
     }//GEN-LAST:event_btnVerlegungActionPerformed
 
-//    private CollapsiblePane addApps() {
-//        JPanel mypanel = new JPanel(new VerticalLayout());
-//        mypanel.setBackground(Color.WHITE);
-//        final CollapsiblePane mypane = new CollapsiblePane(OPDE.lang.getString(internalClassID + ".Apps"));
-//        mypane.setFont(SYSConst.ARIAL14);
-//
-//        // Darf neue Bewohner anlegen
-//        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlInfo.internalClassID, InternalClassACL.MANAGER)) { // => ACLMATRIX
-//            JideButton addbw = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".addbw"), SYSConst.icon22addbw, null);
-////            final MyJDialog dlg = new MyJDialog();
-//            addbw.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
-//            addbw.setAlignmentX(Component.LEFT_ALIGNMENT);
-//            addbw.addActionListener(new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent actionEvent) {
-//                    final MyJDialog dlg = new MyJDialog();
-//                    WizardDialog wizard = new AddBWWizard(new Closure() {
-//                        @Override
-//                        public void execute(Object o) {
-//                            dlg.dispose();
-//                            jspSearch.removeAll();
-//                            jspSearch = null;
-//                            jspApps.removeAll();
-//                            jspApps = null;
-//                            panesSearch.removeAll();
-//                            panesSearch = null;
-//                            panesApps.removeAll();
-//                            panesApps = null;
-//                            splitPaneLeft.removeAll();
-//                            prepareSearchArea();
-//                        }
-//                    }).getWizard();
-//                    dlg.setContentPane(wizard.getContentPane());
-//                    dlg.pack();
-//                    dlg.setSize(new Dimension(800, 550));
-//                    dlg.setVisible(true);
-//                }
-//            });
-//            mypanel.add(addbw);
-//        }
-//
-//
-//        for (InternalClass ic : OPDE.getAppInfo().getMainClasses()) {
-//
-//            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(ic.getInternalClassID(), InternalClassACL.EXECUTE)) {
-//
-//                final String shortDescription = ic.getShortDescription();
-//                final String longDescription = ic.getLongDescription();
-//                final String javaclass = ic.getJavaclass();
-//
-//                Icon icon = null;
-//                try {
-//                    icon = new ImageIcon(getClass().getResource("/artwork/22x22/" + ic.getIconname()));
-//                } catch (Exception e) {
-//
-//                }
-//
-//                JideButton progButton = GUITools.createHyperlinkButton(shortDescription, icon, new ActionListener() {
-//                    @Override
-//                    public void actionPerformed(ActionEvent actionEvent) {
-//
-//                        if (previousProgButton != null) {
-//                            previousProgButton.setBackground(Color.WHITE);
-//                            previousProgButton.setOpaque(false);
-//                        }
-//                        previousProgButton = (JideButton) actionEvent.getSource();
-//                        previousProgButton.setBackground(Color.YELLOW);
-//                        previousProgButton.setOpaque(true);
-//
-//                        displayManager.setMainMessage(shortDescription);
-//                        displayManager.addSubMessage(new DisplayMessage(longDescription, 5));
-//                        setPanelTo(loadPanel(javaclass));
-//
-//                    }
-//                });
-//
-//                progButton.setToolTipText(longDescription);
-//
-//                mypanel.add(progButton);
-//            }
-//        }
-////        mypane.setSlidingDirection(SwingConstants.SOUTH);
-//        mypane.setStyle(CollapsiblePane.PLAIN_STYLE);
-//        mypane.setContentPane(mypanel);
-////        panesApps.add(mypane);
-////        panesApps.setBackground(mypane.getBackground());
-//        return mypane;
-//    }
 
     public void clearPreviousProgbutton() {
         if (previousProgButton != null) {
@@ -576,7 +501,7 @@ public class FrmMain extends JFrame {
                 previousProgButton.setOpaque(true);
 
                 displayManager.setMainMessage(OPDE.lang.getString(PnlWelcome.internalClassID));
-                displayManager.addSubMessage(new DisplayMessage(OPDE.lang.getString(PnlWelcome.internalClassID+".longDescription"), 5));
+                displayManager.addSubMessage(new DisplayMessage(OPDE.lang.getString(PnlWelcome.internalClassID + ".longDescription"), 5));
                 setPanelTo(new PnlWelcome(jspSearch));
             }
         });
@@ -831,7 +756,7 @@ public class FrmMain extends JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel pnlMain;
     private JPanel pnlMainMessage;
-    private FadingLabel lblMainMsg;
+    private JLabel lblMainMsg;
     private JButton btnVerlegung;
     private JButton btnExit;
     private FadingLabel lblSubMsg;

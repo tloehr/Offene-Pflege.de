@@ -90,6 +90,11 @@ public class PnlDFN extends NursingRecordsPanel {
         switchResident(resident);
     }
 
+    @Override
+    public String getInternalClassID() {
+        return internalClassID;
+    }
+
     private void initPanel() {
         shiftMAPpane = new HashMap<Byte, CollapsiblePane>();
         shiftMAPDFN = new HashMap<Byte, ArrayList<DFN>>();

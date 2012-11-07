@@ -254,7 +254,7 @@ public class NReportTools {
                 if (!specialsOnly || bericht.isSpecial()) {
                     ihavesomethingtoshow = true;
                     html += "<tr>";
-                    html += "<td valign=\"top\">" + getDatumUndUser(bericht, false, false) + "</td>";
+                    html += "<td valign=\"top\">" + getDateAndUser(bericht, false, false) + "</td>";
                     html += "<td valign=\"top\">" + getAsHTML(bericht, highlight) + "</td>";
                     html += "</tr>\n";
                 }
@@ -292,15 +292,16 @@ public class NReportTools {
         return result;
     }
 
-    public static String getDatumUndUser(NReport bericht, boolean showIDs, boolean showMinutes) {
+    public static String getDateAndUser(NReport nReport, boolean showIDs, boolean showMinutes) {
         String result = "";
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
-        result = sdf.format(bericht.getPit()) + "; " + bericht.getUser().getFullname();
-        if (showMinutes && !bericht.isDeleted() && !bericht.isReplaced()) {
-            result += "<br/>" + OPDE.lang.getString("misc.msg.Effort") + ": " + bericht.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)");
+        result = sdf.format(nReport.getPit()) + "; " + nReport.getUser().getFullname();
+        if (showMinutes && !nReport.isDeleted() && !nReport.isReplaced()) {
+            result += "<br/>" + OPDE.lang.getString("misc.msg.Effort") + ": " + nReport.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)");
         }
+        result += SYSTools.catchNull(getTagsAsHTML(nReport), "<br/>[", "]") + " ";
         if (showIDs) {
-            result += "<br/><i>(" + bericht.getPbid() + ")</i>";
+            result += "<br/><i>(" + nReport.getPbid() + ")</i>";
         }
         return result;
     }
@@ -313,9 +314,9 @@ public class NReportTools {
     public static String getAsHTML(NReport nReport, String highlight) {
         String result = "<div id=\"fonttext\">";
 
-        result += getDatumUndUser(nReport, false, true);
+//        result += getDateAndUser(nReport, false, true);
 
-        result += SYSTools.catchNull(getTagsAsHTML(nReport), " [", "]") + " ";
+//        result += SYSTools.catchNull(getTagsAsHTML(nReport), " [", "]") + " ";
 
         DateFormat df = DateFormat.getDateTimeInstance();
 
@@ -341,7 +342,7 @@ public class NReportTools {
             tmp = SYSTools.replace(tmp, highlight, "<font style=\"BACKGROUND-COLOR: yellow\">" + highlight + "</font>", true);
         }
 
-        result += "<p>[" + nReport.getPbid() + "] " + tmp + "<p/>";
+        result += "<p>" + tmp + "<p/>";
 
         result += "<div/>";
         return result;
@@ -615,7 +616,7 @@ public class NReportTools {
                     " FROM NReport nr " +
                     " WHERE nr.resident = :resident " +
                     " AND nr.pit >= :from AND nr.pit <= :to " +
-                    " ORDER BY nr.pit ASC ";
+                    " ORDER BY nr.pit DESC ";
 
             Query query = em.createQuery(jpql);
 

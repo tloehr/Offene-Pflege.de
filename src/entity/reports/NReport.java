@@ -240,6 +240,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
 
     public NReport(Resident resident) {
         this.pit = new Date();
+        this.editpit = new Date();
         this.text = "";
         this.minutes = 3;
         this.resident = resident;
@@ -525,6 +526,6 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
 
     @Override
     public int compareTo(NReport other) {
-        return pit.compareTo(other.getPit());
+        return pit.compareTo(other.getPit()) * -1;
     }
 }

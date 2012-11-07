@@ -13,11 +13,11 @@
        <class>com.jgoodies.forms.layout.FormLayout</class> 
        <void method="setProperty"> 
         <string>$columnSpecs</string> 
-        <string>default, default:grow, labelcompgap, default</string> 
+        <string>13dlu, default:grow, labelcompgap, 13dlu</string> 
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
-        <string>default, linegap, fill:default:grow, linegap, default</string> 
+        <string>13dlu, linegap, fill:default:grow, linegap, 13dlu</string> 
        </void> 
       </object> 
       <void method="setProperty"> 

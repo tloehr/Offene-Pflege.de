@@ -152,6 +152,11 @@ public class PnlValues extends NursingRecordsPanel {
 
     }
 
+    @Override
+    public String getInternalClassID() {
+        return internalClassID;
+    }
+
     private java.util.List<Component> addCommands() {
         java.util.List<Component> list = new ArrayList<Component>();
 

@@ -93,6 +93,12 @@
             <execute langbundle="appinfo.default.acl.execute"/>
             <insert langbundle="appinfo.default.acl.update"/>
         </class>
+        <class name="nursingrecords.inventory" short="Medikamentenbestände"
+               long="Dies ist die Bestandsveraltung für Medikamente">
+            <manager langbundle="appinfo.default.acl.manager"/>
+            <insert langbundle="appinfo.default.acl.insert"/>
+            <delete langbundle="appinfo.default.acl.delete"/>
+        </class>
         <class name="nursingrecords.info" short="Pflegeakte/Informationen"
                long="Hier können Informationen zu den BewohnerInnen eingegeben werden."
                javaclass="op.care.info.PnlInfo">

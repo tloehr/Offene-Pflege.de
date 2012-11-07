@@ -87,7 +87,7 @@
           </void> 
           <void method="add"> 
            <object class="com.jformdesigner.model.FormComponent"> 
-            <string>op.tools.FadingLabel</string> 
+            <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
              <string>OPDE</string> 

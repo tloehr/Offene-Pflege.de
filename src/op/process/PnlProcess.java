@@ -319,6 +319,10 @@ public class PnlProcess extends NursingRecordsPanel {
         return cp;
     }
 
+    @Override
+    public String getInternalClassID() {
+        return internalClassID;
+    }
 
     private JPanel createContentPanel4(final QProcess qProcess) {
         JTextPane contentPane = new JTextPane();

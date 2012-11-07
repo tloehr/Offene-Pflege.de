@@ -24,7 +24,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * @author Torsten Löhr
@@ -46,8 +45,7 @@ public class DlgProcess extends MyJDialog {
         cmbPCat.setModel(SYSTools.list2cmb(PCatTools.getPCats()));
         cmbPCat.setSelectedIndex(0);
 
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM Resident b WHERE b.station IS NOT NULL ORDER BY b.name, b.firstname");
+
         cmbResident.setRenderer(new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
@@ -60,10 +58,16 @@ public class DlgProcess extends MyJDialog {
                 return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
             }
         });
-        ArrayList<Resident> listResident = new ArrayList<Resident>(query.getResultList());
-        listResident.add(0, null);
-        cmbResident.setModel(SYSTools.list2cmb(listResident));
-        em.close();
+        if (qProcess.isCommon()) {
+            EntityManager em = OPDE.createEM();
+            Query query = em.createQuery("SELECT b FROM Resident b WHERE b.station IS NOT NULL ORDER BY b.name, b.firstname");
+            ArrayList<Resident> listResident = new ArrayList<Resident>(query.getResultList());
+            listResident.add(0, null);
+            cmbResident.setModel(SYSTools.list2cmb(listResident));
+            em.close();
+        } else {
+            cmbResident.setModel(new DefaultComboBoxModel(new Resident[]{qProcess.getResident()}));
+        }
 
         jdcWV.setDate(qProcess.getRevision());
         jdcWV.setMinSelectableDate(new DateTime().plusDays(1).toDate());

@@ -86,6 +86,12 @@ public class PnlControlling extends CleanablePanel {
 //    Object[] o = null;
 //
 
+
+    @Override
+    public String getInternalClassID() {
+        return internalClassID;
+    }
+
     /**
      * Creates new form PnlControlling
      */

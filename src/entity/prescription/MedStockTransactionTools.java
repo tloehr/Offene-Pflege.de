@@ -17,6 +17,8 @@ public class MedStockTransactionTools {
     public static final short STATE_EDIT_EMPTY_BROKEN_OR_LOST = 6;
     public static final short STATE_EDIT_STOCK_CLOSED = 7;
     public static final short STATE_EDIT_INVENTORY_CLOSED = 8;
+    public static final short STATE_CANCELLED = 9;
+    public static final short STATE_CANCEL_REC = 10;
 
 
 

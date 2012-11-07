@@ -36,10 +36,13 @@ import com.jidesoft.swing.JideButton;
 import com.jidesoft.wizard.WizardDialog;
 import entity.prescription.*;
 import op.OPDE;
-import op.care.med.prodassistant.MedProductWizard;
 import op.care.med.inventory.DlgNewStocks;
+import op.care.med.prodassistant.MedProductWizard;
 import op.system.InternalClassACL;
-import op.tools.*;
+import op.tools.CleanablePanel;
+import op.tools.GUITools;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
@@ -54,7 +57,10 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
@@ -133,6 +139,11 @@ public class PnlMed extends CleanablePanel {
             createTree();
         }
     }//GEN-LAST:event_lstPraepValueChanged
+
+    @Override
+    public String getInternalClassID() {
+        return internalClassID;
+    }
 
     private void txtSucheActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSucheActionPerformed
 //        treeMed.setCellRenderer(new DefaultTreeCellRenderer());

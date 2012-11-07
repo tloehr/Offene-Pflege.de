@@ -17,6 +17,7 @@ import entity.reports.NReport;
 import entity.reports.NReportTAGS;
 import entity.reports.NReportTAGSTools;
 import op.OPDE;
+import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
 import op.tools.PnlPIT;
 import op.tools.SYSTools;
@@ -125,6 +126,10 @@ public class DlgReport extends MyJDialog {
     }
 
     private void btnApplyActionPerformed(ActionEvent e) {
+        if (nReport.getText().trim().isEmpty()){
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.emptyentry")));
+            return;
+        }
         nReport.setPit(pnlPIT.getPIT());
         nReport.setUser(OPDE.getLogin().getUser());
         actionBlock.execute(nReport);
@@ -148,8 +153,8 @@ public class DlgReport extends MyJDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "default, default:grow, $lcgap, default",
-            "default, $lgap, fill:default:grow, $lgap, default"));
+            "13dlu, default:grow, $lcgap, 13dlu",
+            "13dlu, $lgap, fill:default:grow, $lgap, 13dlu"));
 
         //======== panel1 ========
         {

@@ -39,6 +39,7 @@ import op.care.reports.PnlReport;
 import op.threads.DisplayMessage;
 import op.tools.GUITools;
 import op.tools.NursingRecordsPanel;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.jdesktop.swingx.VerticalLayout;
 
@@ -60,6 +61,11 @@ public class PnlResOverview extends NursingRecordsPanel {
     private ItemListener itemListener;
     private MouseAdapter mouseAdapter;
     private boolean initPhase = false;
+
+    @Override
+    public String getInternalClassID() {
+        return internalClassID;
+    }
 
     /**
      * Creates new form PnlResOverview
@@ -302,7 +308,7 @@ public class PnlResOverview extends NursingRecordsPanel {
         mypanel.setLayout(new VerticalLayout(5));
         mypanel.setBackground(Color.WHITE);
 
-        JideButton printButton = GUITools.createHyperlinkButton("Drucken", new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer.png")), new ActionListener() {
+        JideButton printButton = GUITools.createHyperlinkButton("Drucken", SYSConst.icon22print2, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 SYSFilesTools.print(ResInfoTools.getTXReport(bewohner, true, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, true), true);

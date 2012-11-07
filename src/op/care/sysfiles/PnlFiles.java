@@ -97,6 +97,11 @@ public class PnlFiles extends NursingRecordsPanel {
         reloadTable();
     }
 
+    @Override
+    public String getInternalClassID() {
+        return internalClassID;
+    }
+
     void reloadTable() {
 
         EntityManager em = OPDE.createEM();

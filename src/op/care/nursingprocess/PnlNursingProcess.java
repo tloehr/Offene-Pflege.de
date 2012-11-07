@@ -166,6 +166,12 @@ public class PnlNursingProcess extends NursingRecordsPanel {
     }// </editor-fold>//GEN-END:initComponents
 
 
+
+    @Override
+    public String getInternalClassID() {
+        return internalClassID;
+    }
+
     private void reloadDisplay() {
         /***
          *               _                 _ ____  _           _

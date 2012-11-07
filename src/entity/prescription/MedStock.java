@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "MPBestand")
@@ -156,7 +157,7 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     // 1:N Relationen
     // ==
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "stock")
-    private Collection<MedStockTransaction> stockTransaction;
+    private List<MedStockTransaction> stockTransaction;
 
     // N:1 Relationen
     @JoinColumn(name = "MPID", referencedColumnName = "MPID")
@@ -184,7 +185,7 @@ public class MedStock implements Serializable, Comparable<MedStock> {
         this.user = user;
     }
 
-    public Collection<MedStockTransaction> getStockTransaction() {
+    public List<MedStockTransaction> getStockTransaction() {
         return stockTransaction;
     }
 

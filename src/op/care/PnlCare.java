@@ -77,6 +77,10 @@ public class PnlCare extends NursingRecordsPanel {
         jtpPflegeakteStateChanged(null);
     }
 
+    @Override
+    public String getInternalClassID() {
+        return ((CleanablePanel) jtpPflegeakte.getSelectedComponent()).getInternalClassID();
+    }
 
     @Override
     public void cleanup() {

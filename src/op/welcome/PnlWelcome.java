@@ -129,6 +129,11 @@ public class PnlWelcome extends CleanablePanel {
         }
     }
 
+    @Override
+    public String getInternalClassID() {
+        return internalClassID;
+    }
+
     private void reloadDisplay() {
         /***
          *               _                 _ ____  _           _

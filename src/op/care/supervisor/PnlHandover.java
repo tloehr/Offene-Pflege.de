@@ -197,6 +197,10 @@ public class PnlHandover extends NursingRecordsPanel {
         hollidays.clear();
     }
 
+    @Override
+    public String getInternalClassID() {
+        return internalClassID;
+    }
 
     private void reloadDisplay() {
         /***

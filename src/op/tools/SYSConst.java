@@ -541,6 +541,7 @@ public class SYSConst {
     public static final Icon icon48give = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/hand-over.png"));
     public static final Icon icon48kgetdock = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/kget_dock.png"));
     public static final Icon icon48play = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/bw/player_play.png"));
+    public static final Icon icon48undo = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/bw/undo.png"));
     public static final Icon icon48stop = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/bw/player_stop.png"));
     public static final Icon icon48take = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/take-over.png"));
     //    public static final Icon icon16byday = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/byday.png"));

@@ -6,8 +6,8 @@ package op.tools;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import com.toedter.calendar.JDateChooser;
 import op.OPDE;
+import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 
 import javax.swing.*;
@@ -28,7 +28,7 @@ public class PnlPIT extends JPanel {
     private Time uhrzeit;
     private Date preset;
     private Date max, min;
-    //TODO: Catch entries that are way too old
+
     public PnlPIT() {
         this(new Date(), new Date(), SYSConst.DATE_THE_VERY_BEGINNING);
     }
@@ -44,15 +44,27 @@ public class PnlPIT extends JPanel {
         labelDatum.setText(OPDE.lang.getString("misc.msg.Date"));
         labelUhrzeit.setText(OPDE.lang.getString("misc.msg.Time.long"));
         this.preset = preset;
-        jdcDatum.setDate(preset);
-        jdcDatum.setMaxSelectableDate(max == null ? SYSConst.DATE_UNTIL_FURTHER_NOTICE : max);
-        jdcDatum.setMinSelectableDate(min == null ? SYSConst.DATE_THE_VERY_BEGINNING : min);
+
+
+        txtDate.setText(DateFormat.getDateInstance().format(preset));
+
+//        jdcDatum.setDate(preset);
+//        jdcDatum.setMaxSelectableDate(max == null ? SYSConst.DATE_UNTIL_FURTHER_NOTICE : max);
+//        jdcDatum.setMinSelectableDate(min == null ? SYSConst.DATE_THE_VERY_BEGINNING : min);
         uhrzeit = new Time(preset.getTime());
         txtUhrzeit.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(uhrzeit));
     }
 
     public Date getPIT() {
-        return SYSCalendar.addTime2Date(jdcDatum.getDate(), uhrzeit);
+        DateMidnight day;
+        try {
+            day = new DateMidnight(SYSCalendar.parseDate(txtDate.getText()));
+        } catch (NumberFormatException ex) {
+            day = new DateMidnight();
+        }
+
+        DateTime time = new DateTime(uhrzeit);
+        return day.toDateTime().plusHours(time.getHourOfDay()).plusMinutes(time.getMinuteOfHour()).plusSeconds(time.getSecondOfMinute()).toDate();
     }
 
     private void txtUhrzeitFocusLost(FocusEvent e) {
@@ -68,11 +80,11 @@ public class PnlPIT extends JPanel {
             gc.setTime(preset);
         }
 
-        if (new DateTime(gc).isAfter(new DateTime(max))){
+        if (new DateTime(gc).isAfter(new DateTime(max))) {
             gc = new DateTime(max).toGregorianCalendar();
         }
 
-        if (new DateTime(gc).isBefore(new DateTime(min))){
+        if (new DateTime(gc).isBefore(new DateTime(min))) {
             gc = new DateTime(min).toGregorianCalendar();
         }
 
@@ -82,13 +94,25 @@ public class PnlPIT extends JPanel {
     }
 
     private void txtUhrzeitFocusGained(FocusEvent e) {
-        SYSTools.markAllTxt(txtUhrzeit);
+        txtUhrzeit.selectAll();
+    }
+
+    private void txtDateFocusLost(FocusEvent evt) {
+        SYSCalendar.handleDateFocusLost(evt, new DateTime(min));
+    }
+
+    private void txtDateFocusGained(FocusEvent e) {
+        txtDate.selectAll();
+    }
+
+    private void txtDateActionPerformed(ActionEvent e) {
+        txtUhrzeit.requestFocus();
     }
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         labelDatum = new JLabel();
-        jdcDatum = new JDateChooser();
+        txtDate = new JTextField();
         txtUhrzeit = new JTextField();
         labelUhrzeit = new JLabel();
 
@@ -102,9 +126,26 @@ public class PnlPIT extends JPanel {
         labelDatum.setFont(new Font("Arial", Font.PLAIN, 14));
         add(labelDatum, CC.xy(1, 1));
 
-        //---- jdcDatum ----
-        jdcDatum.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(jdcDatum, CC.xy(3, 1));
+        //---- txtDate ----
+        txtDate.setFont(new Font("Arial", Font.PLAIN, 14));
+        txtDate.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                txtDateFocusGained(e);
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                txtDateFocusLost(e);
+            }
+        });
+        txtDate.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                txtDateActionPerformed(e);
+            }
+        });
+        add(txtDate, CC.xy(3, 1));
 
         //---- txtUhrzeit ----
         txtUhrzeit.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -113,6 +154,7 @@ public class PnlPIT extends JPanel {
             public void focusGained(FocusEvent e) {
                 txtUhrzeitFocusGained(e);
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 txtUhrzeitFocusLost(e);
@@ -135,7 +177,7 @@ public class PnlPIT extends JPanel {
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JLabel labelDatum;
-    private JDateChooser jdcDatum;
+    private JTextField txtDate;
     private JTextField txtUhrzeit;
     private JLabel labelUhrzeit;
     // JFormDesigner - End of variables declaration  //GEN-END:variables

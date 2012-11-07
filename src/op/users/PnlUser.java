@@ -198,6 +198,11 @@ public class PnlUser extends CleanablePanel {
         initPhase = false;
     }
 
+    @Override
+    public String getInternalClassID() {
+        return internalClassID;
+    }
+
 
     @Override
     public void cleanup() {

@@ -25,7 +25,8 @@ public class DisplayManager extends Thread {
     public static final String internalClassID = "opde.displaymanager";
     private boolean interrupted, dbAction;
     private JProgressBar jp;
-    private FadingLabel lblMain, lblSub;
+    private JLabel lblMain;
+    private FadingLabel lblSub;
     private List<DisplayMessage> messageQ, oldMessages;
     private DisplayMessage progressBarMessage, currentSubMessage;
     private long zyklen = 0, pbIntermediateZyklen = 0;
@@ -40,7 +41,7 @@ public class DisplayManager extends Thread {
     /**
      * Creates a new instance of HeapStat
      */
-    public DisplayManager(JProgressBar p, FadingLabel lblM, FadingLabel lblS) {
+    public DisplayManager(JProgressBar p, JLabel lblM, FadingLabel lblS) {
         super();
         setName("DisplayManager");
         interrupted = false;

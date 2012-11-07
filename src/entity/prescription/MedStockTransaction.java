@@ -18,7 +18,7 @@ import java.util.Date;
 //        @NamedQuery(name = "MedStockTransaction.findByText", query = "SELECT m FROM MedStockTransaction m WHERE m.text = :text"),
 //        @NamedQuery(name = "MedStockTransaction.findByStatus", query = "SELECT m FROM MedStockTransaction m WHERE m.state = :status"),
 //        @NamedQuery(name = "MedStockTransaction.findByPit", query = "SELECT m FROM MedStockTransaction m WHERE m.pit = :pit")})
-public class MedStockTransaction implements Serializable {
+public class MedStockTransaction implements Serializable, Comparable<MedStockTransaction> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -123,6 +123,10 @@ public class MedStockTransaction implements Serializable {
         return bhp;
     }
 
+    public boolean isPartOfCancelPair(){
+        return state == MedStockTransactionTools.STATE_CANCEL_REC || state == MedStockTransactionTools.STATE_CANCELLED;
+    }
+
 //    public void setBhp(BHP bhp) {
 //        this.bhp = bhp;
 //    }
@@ -173,6 +177,11 @@ public class MedStockTransaction implements Serializable {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public int compareTo(MedStockTransaction that) {
+        return this.getPit().compareTo(that.getPit());
     }
 
     @Override

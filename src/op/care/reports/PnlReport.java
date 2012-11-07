@@ -102,6 +102,11 @@ public class PnlReport extends NursingRecordsPanel {
 
     HashMap<DateMidnight, String> hollidays;
 
+    @Override
+    public String getInternalClassID() {
+        return internalClassID;
+    }
+
     /**
      * Creates new form PnlReport
      */
@@ -161,6 +166,7 @@ public class PnlReport extends NursingRecordsPanel {
 
     @Override
     public void reload() {
+        GUITools.setBWDisplay(resident);
         reloadDisplay();
     }
 
@@ -203,7 +209,7 @@ public class PnlReport extends NursingRecordsPanel {
     @Override
     public void switchResident(Resident bewohner) {
         this.resident = bewohner;
-        GUITools.setBWDisplay(resident);
+
 //        txtSearch.setText(null);
 //        firstReport = NReportTools.getFirstReport(resident);
 //        jdcVon.setMaxSelectableDate(new Date());
@@ -338,22 +344,27 @@ public class PnlReport extends NursingRecordsPanel {
                                     final NReport myReport = (NReport) em.merge(report);
                                     em.getTransaction().commit();
 
-                                    final String keyDay = DateFormat.getDateInstance().format(myReport.getPit());
-                                    contentmap.remove(keyDay);
-                                    if (valuecache.containsKey(keyDay)) {
-                                        valuecache.get(keyDay).add(myReport);
-                                        Collections.sort(valuecache.get(keyDay));
-                                    }
-                                    createCP4Day(new DateMidnight(myReport.getPit()));
-                                    expandDay(new DateMidnight(myReport.getPit()));
-
-                                    buildPanel();
-                                    GUITools.scroll2show(jspReports, cpMap.get(keyDay), cpsReports, new Closure() {
-                                        @Override
-                                        public void execute(Object o) {
-                                            GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
+                                    final String keyYear = Integer.toString(new DateTime(myReport.getPit()).getYear()) + ".year";
+                                    if (!cpMap.containsKey(keyYear)) {
+                                        reloadDisplay();
+                                    } else {
+                                        final String keyDay = DateFormat.getDateInstance().format(myReport.getPit());
+                                        contentmap.remove(keyDay);
+                                        if (valuecache.containsKey(keyDay)) {
+                                            valuecache.get(keyDay).add(myReport);
+                                            Collections.sort(valuecache.get(keyDay));
                                         }
-                                    });
+                                        createCP4Day(new DateMidnight(myReport.getPit()));
+                                        expandDay(new DateMidnight(myReport.getPit()));
+
+                                        buildPanel();
+                                        GUITools.scroll2show(jspReports, cpMap.get(keyDay), cpsReports, new Closure() {
+                                            @Override
+                                            public void execute(Object o) {
+                                                GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
+                                            }
+                                        });
+                                    }
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -361,8 +372,9 @@ public class PnlReport extends NursingRecordsPanel {
                                     if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
                                         OPDE.getMainframe().emptyFrame();
                                         OPDE.getMainframe().afterLogin();
+                                    } else {
+                                        reloadDisplay(true);
                                     }
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                                 } catch (Exception e) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -384,6 +396,10 @@ public class PnlReport extends NursingRecordsPanel {
     }
 
     private void reloadDisplay() {
+        reloadDisplay(false);
+    }
+
+    private void reloadDisplay(final boolean lockmessageAfterwards) {
         /***
          *               _                 _ ____  _           _
          *      _ __ ___| | ___   __ _  __| |  _ \(_)___ _ __ | | __ _ _   _
@@ -410,6 +426,8 @@ public class PnlReport extends NursingRecordsPanel {
                 @Override
                 protected Object doInBackground() throws Exception {
 
+                    GUITools.setBWDisplay(resident);
+
                     Pair<DateTime, DateTime> minmax = NReportTools.getMinMax(resident);
                     hollidays = SYSCalendar.getHollidays(minmax.getFirst().getYear(), minmax.getSecond().getYear());
 
@@ -432,6 +450,7 @@ public class PnlReport extends NursingRecordsPanel {
                     initPhase = false;
                     OPDE.getDisplayManager().setProgressBarMessage(null);
                     OPDE.getMainframe().setBlocked(false);
+                    if (lockmessageAfterwards) OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                 }
             };
             worker.execute();
@@ -873,7 +892,7 @@ public class PnlReport extends NursingRecordsPanel {
                         "<br/>" + nreport.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)") +
                         "</td>" +
                         "<td width=\"100\" align=\"left\">" + SYSTools.catchNull(NReportTools.getTagsAsHTML(nreport), " [", "]") + "</td>" +
-                        "<td width=\"350\" align=\"left\">" +
+                        "<td width=\"400\" align=\"left\">" +
                         (nreport.isObsolete() ? "<s>" : "") +
                         nreport.getText() +
                         (nreport.isObsolete() ? "</s>" : "") +
@@ -892,8 +911,7 @@ public class PnlReport extends NursingRecordsPanel {
                             GUITools.showPopup(GUITools.getHTMLPopup(pnlSingle.getButton(), NReportTools.getInfoAsHTML(nreport)), SwingConstants.NORTH);
                         }
                     });
-                }
-                if (nreport.isReplacement()) {
+                } else if (nreport.isReplacement()) {
                     pnlSingle.getButton().setIcon(SYSConst.icon22edited);
                     pnlSingle.getButton().addActionListener(new ActionListener() {
                         @Override
@@ -1089,8 +1107,9 @@ public class PnlReport extends NursingRecordsPanel {
                                     if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
                                         OPDE.getMainframe().emptyFrame();
                                         OPDE.getMainframe().afterLogin();
+                                    } else {
+                                        reloadDisplay(true);
                                     }
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                                 } catch (Exception e) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -1162,8 +1181,9 @@ public class PnlReport extends NursingRecordsPanel {
                                     if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
                                         OPDE.getMainframe().emptyFrame();
                                         OPDE.getMainframe().afterLogin();
+                                    } else {
+                                        reloadDisplay(true);
                                     }
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                                 } catch (Exception e) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -1207,7 +1227,7 @@ public class PnlReport extends NursingRecordsPanel {
                                 em.getTransaction().begin();
                                 em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                                 final NReport myReport = em.merge(nreport);
-                                em.lock(myReport, LockModeType.OPTIMISTIC);
+                                em.lock(myReport, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
                                 if (itemEvent.getStateChange() == ItemEvent.DESELECTED) {
                                     myReport.getTags().remove(tag);
@@ -1236,8 +1256,9 @@ public class PnlReport extends NursingRecordsPanel {
                                 if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
                                     OPDE.getMainframe().emptyFrame();
                                     OPDE.getMainframe().afterLogin();
+                                } else {
+                                    reloadDisplay(true);
                                 }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                             } catch (Exception e) {
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
@@ -1317,8 +1338,9 @@ public class PnlReport extends NursingRecordsPanel {
                                 if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
                                     OPDE.getMainframe().emptyFrame();
                                     OPDE.getMainframe().afterLogin();
+                                } else {
+                                    reloadDisplay(true);
                                 }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                             } catch (Exception e) {
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
@@ -1462,8 +1484,9 @@ public class PnlReport extends NursingRecordsPanel {
                                 if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
                                     OPDE.getMainframe().emptyFrame();
                                     OPDE.getMainframe().afterLogin();
+                                } else {
+                                    reloadDisplay(true);
                                 }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                             } catch (Exception e) {
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();

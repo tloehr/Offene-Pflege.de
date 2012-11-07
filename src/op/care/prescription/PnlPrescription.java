@@ -182,6 +182,11 @@ public class PnlPrescription extends NursingRecordsPanel {
 
     }
 
+    @Override
+    public String getInternalClassID() {
+        return internalClassID;
+    }
+
 
     private CollapsiblePane createCP4(final Prescription prescription) {
         /***

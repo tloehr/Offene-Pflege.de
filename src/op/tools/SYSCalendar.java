@@ -34,6 +34,7 @@ import entity.info.Resident;
 import entity.nursingprocess.DFNTools;
 import entity.prescription.BHPTools;
 import op.OPDE;
+import op.threads.DisplayMessage;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
@@ -43,6 +44,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.FocusEvent;
 import java.sql.Time;
 import java.text.DateFormat;
 import java.text.Format;
@@ -456,6 +458,26 @@ public class SYSCalendar {
         DateMidnight d = new DateMidnight(date);
 
         return d.isAfter(max) && d.isBefore(min);
+    }
+
+    public static void handleDateFocusLost(FocusEvent evt, DateTime min){
+        DateTime dt;
+        try {
+            dt = new DateTime(parseDate(((JTextField) evt.getSource()).getText()));
+        } catch (NumberFormatException ex) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wrongdate")));
+            dt = new DateTime();
+        }
+        if (dt.isAfterNow()) {
+            dt = new DateTime();
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.futuredate")));
+        }
+        if (dt.isBefore(min)) {
+            dt = new DateTime();
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.DateTooOld")));
+        }
+
+        ((JTextField) evt.getSource()).setText(DateFormat.getDateInstance().format(dt.toDate()));
     }
 
 

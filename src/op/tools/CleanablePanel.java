@@ -33,4 +33,5 @@ package op.tools;
 public abstract class CleanablePanel extends javax.swing.JPanel {
     public abstract void cleanup();
     public abstract void reload();
+    public abstract String getInternalClassID();
 }
