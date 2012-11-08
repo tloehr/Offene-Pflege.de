@@ -281,14 +281,14 @@
       <void method="setProperty"> 
        <string>location</string> 
        <object class="java.awt.Point"> 
-        <int>0</int> 
+        <int>15</int> 
         <int>0</int> 
        </object> 
       </void> 
       <void method="setProperty"> 
        <string>size</string> 
        <object class="java.awt.Dimension"> 
-        <int>730</int> 
+        <int>865</int> 
         <int>455</int> 
        </object> 
       </void> 

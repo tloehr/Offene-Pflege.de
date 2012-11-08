@@ -600,18 +600,22 @@ public class ResInfoTools {
             result += "</td></tr>";
         }
         /***
-         *      ____       _
-         *     | __ )  ___| |_ _ __ ___ _   _  ___ _ __
-         *     |  _ \ / _ \ __| '__/ _ \ | | |/ _ \ '__|
-         *     | |_) |  __/ |_| | |  __/ |_| |  __/ |
-         *     |____/ \___|\__|_|  \___|\__,_|\___|_|
-         *
+         *      _                     _    ____          _            _ _
+         *     | |    ___  __ _  __ _| |  / ___|   _ ___| |_ ___   __| (_) __ _ _ __
+         *     | |   / _ \/ _` |/ _` | | | |  | | | / __| __/ _ \ / _` | |/ _` | '_ \
+         *     | |__|  __/ (_| | (_| | | | |__| |_| \__ \ || (_) | (_| | | (_| | | | |
+         *     |_____\___|\__, |\__,_|_|  \____\__,_|___/\__\___/ \__,_|_|\__,_|_| |_|
+         *                |___/
          */
         if (bewohner.getLCustodian1() != null) {
             result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.lc") + "</td><td valign=\"top\">";
-            result += LCustodianTools.getFullName(bewohner.getLCustodian1()) + ", " + bewohner.getLCustodian1().getStrasse();
-            result += ", " + bewohner.getLCustodian1().getPlz() + " " + bewohner.getLCustodian1().getOrt();
-            result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + bewohner.getLCustodian1().getTel() + ", " + OPDE.lang.getString("misc.msg.mobilephone") + ": " + bewohner.getLCustodian1().getMobil();
+            result += LCustodianTools.getFullName(bewohner.getLCustodian1());
+
+            if (!OPDE.isAnonym()) {
+                result += ", " + bewohner.getLCustodian1().getStrasse();
+                result += ", " + bewohner.getLCustodian1().getPlz() + " " + bewohner.getLCustodian1().getOrt();
+                result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + bewohner.getLCustodian1().getTel() + ", " + OPDE.lang.getString("misc.msg.mobilephone") + ": " + bewohner.getLCustodian1().getMobil();
+            }
 
             result += "</td></tr>";
         }

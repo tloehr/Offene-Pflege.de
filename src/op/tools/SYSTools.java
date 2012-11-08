@@ -69,9 +69,9 @@ import java.util.regex.Pattern;
 
 public class SYSTools {
 
-    public static final int INDEX_NACHNAME = 0;
-    public static final int INDEX_VORNAME_FRAU = 1;
-    public static final int INDEX_VORNAME_MANN = 2;
+    public static final int INDEX_LASTNAME = 0;
+    public static final int INDEX_FIRSTNAME_FEMALE = 1;
+    public static final int INDEX_FIRSTNAME_MALE = 2;
 
     public static final boolean LEFT_UPPER_SIDE = false;
     public static final boolean RIGHT_LOWER_SIDE = true;
@@ -330,28 +330,28 @@ public class SYSTools {
 
     }
 
-    public static String anonymizeBW(String nachname, String vorname, String bwkennung, int geschlecht) {
+//    public static String anonymizeBW(String nachname, String vorname, String bwkennung, int geschlecht) {
+//
+//        if (OPDE.isAnonym()) {
+//            nachname = anonymizeName(nachname, INDEX_LASTNAME);
+//            if (geschlecht == 2) {
+//                vorname = anonymizeName(vorname, INDEX_FIRSTNAME_FEMALE);
+//            } else {
+//                vorname = anonymizeName(vorname, INDEX_FIRSTNAME_MALE);
+//            }
+//        }
+//        return nachname + ", " + vorname + " [" + bwkennung + "]";
+//    }
 
-        if (OPDE.isAnonym()) {
-            nachname = anonymizeName(nachname, INDEX_NACHNAME);
-            if (geschlecht == 2) {
-                vorname = anonymizeName(vorname, INDEX_VORNAME_FRAU);
-            } else {
-                vorname = anonymizeName(vorname, INDEX_VORNAME_MANN);
-            }
-        }
-        return nachname + ", " + vorname + " [" + bwkennung + "]";
-    }
-
-    public static String anonymizeUser(String nachname, String vorname) {
-        String result;
-        if (OPDE.isAnonym()) {
-            result = nachname.substring(0, 1) + "***, " + vorname.substring(0, 1) + "***";
-        } else {
-            result = nachname + ", " + vorname;
-        }
-        return result;
-    }
+//    public static String anonymizeUser(String nachname, String vorname) {
+//        String result;
+//        if (OPDE.isAnonym()) {
+//            result = nachname.substring(0, 1) + "***, " + vorname.substring(0, 1) + "***";
+//        } else {
+//            result = nachname + ", " + vorname;
+//        }
+//        return result;
+//    }
 
     public static String anonymizeUser(String name) {
         String result;

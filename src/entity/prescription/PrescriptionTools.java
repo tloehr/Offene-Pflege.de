@@ -438,7 +438,7 @@ public class PrescriptionTools {
             if (verordnung.getHospitalON() != null) {
                 result += " <i>" + OPDE.lang.getString("misc.msg.confirmedby") + ":</i> ";
             }
-            result += verordnung.getDocON().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getDocON().getName(), SYSTools.INDEX_NACHNAME);
+            result += verordnung.getDocON().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getDocON().getName(), SYSTools.INDEX_LASTNAME);
         }
         result += "; " + verordnung.getUserON().getFullname() + "</font>";
 
@@ -459,7 +459,7 @@ public class PrescriptionTools {
                 if (verordnung.getHospitalOFF() != null) {
                     result += " <i>" + OPDE.lang.getString("misc.msg.confirmedby") + ":</i> ";
                 }
-                result += verordnung.getDocOFF().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getDocOFF().getName(), SYSTools.INDEX_NACHNAME);
+                result += verordnung.getDocOFF().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getDocOFF().getName(), SYSTools.INDEX_LASTNAME);
             }
             result += "; " + verordnung.getUserOFF().getFullname() + "</font>";
 

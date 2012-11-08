@@ -554,7 +554,7 @@ public class PnlUser extends CleanablePanel {
                 try {
                     em.getTransaction().begin();
                     Users myUser = em.merge(usermap.get(user.getUID()));
-                    String newpw = SYSTools.generatePassword(myUser.getVorname(), myUser.getNachname());
+                    String newpw = SYSTools.generatePassword(myUser.getVorname(), myUser.getName());
                     em.lock(myUser, LockModeType.OPTIMISTIC);
                     myUser.setMd5pw(SYSTools.hashword(newpw));
                     em.getTransaction().commit();

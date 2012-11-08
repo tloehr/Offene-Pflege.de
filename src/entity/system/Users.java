@@ -121,15 +121,15 @@ public class Users implements Serializable, Comparable<Users> {
     }
 
     public String getVorname() {
-        return SYSTools.anonymizeUser(vorname);
+        return SYSTools.anonymizeName(vorname, SYSTools.INDEX_FIRSTNAME_FEMALE);
     }
 
     public void setVorname(String vorname) {
         this.vorname = vorname;
     }
 
-    public String getNachname() {
-        return SYSTools.anonymizeUser(nachname);
+    public String getName() {
+        return SYSTools.anonymizeName(nachname, SYSTools.INDEX_LASTNAME);
     }
 
     public void setNachname(String nachname) {
@@ -208,6 +208,6 @@ public class Users implements Serializable, Comparable<Users> {
     }
 
     public String getFullname() {
-        return getNachname() + ", " + getVorname();
+        return getName() + ", " + getVorname();
     }
 }

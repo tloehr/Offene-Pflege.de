@@ -50,6 +50,8 @@ public class DlgReport extends MyJDialog {
         this.actionBlock = actionBlock;
         initComponents();
         initDialog();
+//        pack();
+        setVisible(true);
     }
 
     private void initDialog() {
@@ -90,7 +92,6 @@ public class DlgReport extends MyJDialog {
         panel1.add(ovrDauer, CC.xy(5, 5));
 
         txtBericht.requestFocus();
-        setVisible(true);
     }
 
     private void txtDauerFocusGained(FocusEvent e) {
@@ -210,7 +211,7 @@ public class DlgReport extends MyJDialog {
             panel1.add(panel2, CC.xywh(3, 9, 5, 1, CC.RIGHT, CC.FILL));
         }
         contentPane.add(panel1, CC.xy(2, 3));
-        setSize(730, 455);
+        setSize(865, 455);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }

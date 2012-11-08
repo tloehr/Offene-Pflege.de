@@ -159,7 +159,7 @@ public class Resident implements Serializable, Comparable<Resident> {
     }
 
     public String getName() {
-        return SYSTools.anonymizeName(name, SYSTools.INDEX_NACHNAME);
+        return SYSTools.anonymizeName(name, SYSTools.INDEX_LASTNAME);
     }
 
     public void setControlling(Properties props) {
@@ -209,7 +209,7 @@ public class Resident implements Serializable, Comparable<Resident> {
     }
 
     public String getFirstname() {
-        int index = (gender == ResidentTools.MALE ? SYSTools.INDEX_VORNAME_MANN : SYSTools.INDEX_VORNAME_FRAU);
+        int index = (gender == ResidentTools.MALE ? SYSTools.INDEX_FIRSTNAME_MALE : SYSTools.INDEX_FIRSTNAME_FEMALE);
         return SYSTools.anonymizeName(firstname, index);
     }
 
