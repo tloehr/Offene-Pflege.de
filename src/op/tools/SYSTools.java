@@ -36,6 +36,7 @@ import org.jdesktop.core.animation.timing.TimingSource;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
 import org.jdesktop.core.animation.timing.interpolators.AccelerationInterpolator;
 import org.jdesktop.swing.animation.timing.sources.SwingTimerTimingSource;
+import org.joda.time.DateTime;
 import org.pushingpixels.trident.Timeline;
 import org.pushingpixels.trident.callback.TimelineCallback;
 import org.pushingpixels.trident.callback.TimelineCallbackAdapter;
@@ -312,19 +313,10 @@ public class SYSTools {
     public static Date anonymizeDate(Date in) {
         Date result = in;
         if (OPDE.isAnonym()) {
-            GregorianCalendar gc = SYSCalendar.toGC(in);
-            // Plus oder Minus. Wird zufällig entschieden.
-            boolean plus = (gc.get(GregorianCalendar.DAY_OF_MONTH) % 2) == 0;
-            GregorianCalendar gcnow = new GregorianCalendar();
-
-            if (plus) {
-                gc.add(GregorianCalendar.DAY_OF_YEAR, gcnow.get(GregorianCalendar.DAY_OF_YEAR));
-                gc.add(GregorianCalendar.YEAR, gcnow.get(GregorianCalendar.MONTH));
-            } else {
-                gc.add(GregorianCalendar.DAY_OF_YEAR, gcnow.get(GregorianCalendar.DAY_OF_YEAR) * -1);
-                gc.add(GregorianCalendar.YEAR, gcnow.get(GregorianCalendar.MONTH) * -1);
-            }
-            result = new Date(gc.getTimeInMillis());
+            Random rnd = new Random(System.nanoTime());
+            DateTime dt = new DateTime(in);
+            int factor = rnd.nextBoolean() ? -1 : 1;
+            result = dt.plusDays(rnd.nextInt(300)*factor).plusYears(rnd.nextInt(5)*factor).toDate();
         }
         return result;
 

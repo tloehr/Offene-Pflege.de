@@ -24,158 +24,9 @@ import java.util.*;
  */
 @Entity
 @Table(name = "NReports")
-//@NamedQueries({
-//        @NamedQuery(name = "Pflegeberichte.findAll", query = "SELECT p FROM NReport p"),
-//        @NamedQuery(name = "Pflegeberichte.findByPbid", query = "SELECT p FROM NReport p WHERE p.pbid = :pbid"),
-//        @NamedQuery(name = "Pflegeberichte.findFirst", query = "SELECT p FROM NReport p WHERE p.pbid = :pbid"),
-//
-////        @NamedQuery(name = "NReport.findByBewohnerWithinPeriod", query = " "
-////                + " SELECT p FROM NReport p "
-////                + " WHERE p.bewohner = :bewohner AND p.pit >= :von AND p.pit <= :bis "
-////                + " ORDER BY p.pit DESC "),
-//        /**
-//         * Ermittelt NReport eines Bewohner innerhalb eines bestimmten Zeitraums.
-//         * Nur die als Besonders markiert sind.
-//         */
-//        @NamedQuery(name = "Pflegeberichte.findAllByBewohner", query = " "
-//                + " SELECT p FROM NReport p "
-//                + " WHERE p.resident = :bewohner "
-//                + " ORDER BY p.pit "),
-//        /**
-//         * Sucht Berichte für einen Bewohner mit einem bestimmten Suchbegriff.
-//         */
-//        @NamedQuery(name = "Pflegeberichte.findByBewohnerAndSearchText", query = " "
-//                + " SELECT p FROM NReport p "
-//                + " WHERE p.resident = :bewohner "
-//                + " AND p.text like :search "
-//                + " ORDER BY p.pit DESC "),
-//        /**
-//         * Sucht Berichte für einen Bewohner mit einem bestimmten Suchbegriff.
-//         * Lässt die geänderten jedoch weg.
-//         */
-//        @NamedQuery(name = "Pflegeberichte.findByBewohnerAndSearchTextWithoutEdits", query = " "
-//                + " SELECT p FROM NReport p "
-//                + " WHERE p.resident = :bewohner "
-//                + " AND p.text like :search "
-//                + " AND p.editedBy is null "
-//                + " ORDER BY p.pit DESC "),
-////        /**
-////         * Sucht Berichte für einen Bewohner mit bestimmten Markierungen
-////         */
-////        @NamedQuery(name = "NReport.findByBewohnerAndTagsWithoutEdits", query = " "
-////                + " SELECT p FROM NReport p "
-////                + " WHERE p.bewohner = :bewohner "
-////                + " AND p.tags IN (SELECT p1.tags FROM NReportTAGS t JOIN t.pflegeberichte p1 WHERE p1=p and t.pbtagid IN (1,5,7,9))"
-////                + " AND p.editedBy is null "
-////                + " ORDER BY p.pit DESC "),
-//        /**
-//         * Sucht Berichte für einen Bewohner mit bestimmten Markierungen
-//         */
-//        @NamedQuery(name = "Pflegeberichte.findByVorgang", query = " "
-//                + " SELECT p FROM NReport p "
-//                + " JOIN p.attachedProcessConnections av"
-//                + " JOIN av.qProcess v"
-//                + " WHERE v = :vorgang "),
-//        /**
-//         * Ermittelt NReport eines Bewohner innerhalb eines bestimmten Zeitraums. Diesmal aber ohne
-//         * die gelöschten und geänderten.
-//         */
-//        @NamedQuery(name = "Pflegeberichte.findByBewohnerWithinPeriodWithoutEdits", query = " "
-//                + " SELECT p FROM NReport p "
-//                + " WHERE p.resident = :bewohner AND p.pit >= :von AND p.pit <= :bis "
-//                + " AND p.editedBy is null "
-//                + " ORDER BY p.pit DESC ")
-//})
-//@SqlResultSetMappings({
-//        @SqlResultSetMapping(name = "NReport.findByEinrichtungAndDatumAndAckUserResultMapping", entities =
-//        @EntityResult(entityClass = NReport.class), columns =
-//        @ColumnResult(name = "num")),
-//        @SqlResultSetMapping(name = "NReport.findBVAktivitaetResultMapping", entities =
-//        @EntityResult(entityClass = Resident.class), columns =
-//        @ColumnResult(name = "mypbid")),
-//        @SqlResultSetMapping(name = "NReport.findSozialZeitenResultMapping", entities =
-//        @EntityResult(entityClass = Resident.class), columns =
-//                {@ColumnResult(name = "sdauer"), @ColumnResult(name = "peadauer")})
-//})
-//@NamedNativeQueries({
-//        /**
-//         * Diese Query ist eine native Query. Ich habe keinen anderen Weg gefunden auf SubSelects zu JOINen.
-//         * Das Ergebnis ist eine Liste aller Einrichtungsbezogenen NReport mit einer
-//         * Angabe, ob ein bestimmter User diese bereits zur Kenntnis genommen hat oder nicht.
-//         * Durch eine passende SQLResultSetMap ist das Ergebnis ein 2 wertiges Array aus Objekten. Das erste
-//         * Objekt ist immer der Pflegebericht, das zweiter ist ein Long Wert, der das count Ergebnis
-//         * des Joins enthält.
-//         *
-//         */
-//        @NamedNativeQuery(name = "Pflegeberichte.findByEinrichtungAndDatumAndAckUser", query = ""
-//                + " SELECT p.*, ifnull(p2u.num, 0) num FROM Pflegeberichte p "
-//                + " INNER JOIN Bewohner bw ON bw.BWKennung = p.BWKennung "
-//                + " INNER JOIN PB2TAGS tag ON tag.PBID = p.PBID "
-//                + " INNER JOIN Station stat ON stat.StatID = bw.StatID "
-//                + " LEFT OUTER JOIN ( SELECT pbid, count(*) num FROM PB2User WHERE UKennung = ? GROUP BY pbid, ukennung ) AS p2u ON p2u.PBID = p.PBID "
-//                + " WHERE "
-//                + "     stat.EID = ? "
-//                + "     AND p.PIT >= ? AND p.PIT <= ? "
-//                + "     AND tag.PBTAGID = 1 "
-//                + "     AND p.editBy IS NULL "
-//                + " GROUP BY p.PBID "
-//                + " ORDER BY p.PIT DESC", resultSetMapping = "NReport.findByEinrichtungAndDatumAndAckUserResultMapping"),
-//        /**
-//         * Diese Query sucht alle Aktivitäten der BVs anhand der erstellten (oder auch nicht erstellten) NReport
-//         * seit dem angegebenen Datum heraus.
-//         */
-//        @NamedNativeQuery(name = "Pflegeberichte.findBVAktivitaet", query = ""
-//                + " SELECT b.*, a.PBID mypbid " +
-//                " FROM Bewohner b " +
-//                " LEFT OUTER JOIN ( " +
-//                "    SELECT pb.* FROM Pflegeberichte pb " +
-//                "    LEFT OUTER JOIN PB2TAGS pbt ON pbt.PBID = pb.PBID " +
-//                "    LEFT OUTER JOIN PBericht_TAGS pbtags ON pbt.PBTAGID = pbtags.PBTAGID " +
-//                "    WHERE pb.PIT > ? AND pbtags.Kurzbezeichnung = 'BV'" +
-//                " ) a ON a.BWKennung = b.BWKennung " +
-//                " WHERE b.StatID IS NOT NULL AND b.adminonly <> 2 " +
-//                " ORDER BY b.BWKennung, a.pit ", resultSetMapping = "NReport.findBVAktivitaetResultMapping"),
-//        /**
-//         * Diese Query sucht alle Aktivitäten der BVs anhand der erstellten (oder auch nicht erstellten) NReport
-//         * seit dem angegebenen Datum heraus.
-//         */
-//        @NamedNativeQuery(name = "Pflegeberichte.findSozialZeiten", query = ""
-//                + " SELECT b.*, ifnull(soz.dauer,0) sdauer, ifnull(pea.dauer,0) peadauer FROM Bewohner b " +
-//                " LEFT OUTER JOIN (" +
-//                "                  SELECT p.BWKennung, ifnull(SUM(p.Dauer), 0) dauer " +
-//                "                  FROM Pflegeberichte p" +
-//                "                  INNER JOIN PB2TAGS pb ON p.PBID = pb.PBID" +
-//                "                  INNER JOIN PBericht_TAGS pt ON pt.PBTAGID = pb.PBTAGID" +
-//                "                  WHERE pt.Kurzbezeichnung='soz' AND Date(PIT) >= DATE(?) AND Date(PIT) <= DATE(?) " +
-//                "                  GROUP BY BWKennung " +
-//                " ) soz ON soz.BWKennung = b.BWKennung" +
-//                " LEFT OUTER JOIN (" +
-//                "                  SELECT p.BWKennung, ifnull(SUM(p.Dauer), 0) dauer " +
-//                "                  FROM Pflegeberichte p" +
-//                "                  INNER JOIN PB2TAGS pb ON p.PBID = pb.PBID" +
-//                "                  INNER JOIN PBericht_TAGS pt ON pt.PBTAGID = pb.PBTAGID" +
-//                "                  WHERE pt.Kurzbezeichnung='pea' AND Date(PIT) >= DATE(?) AND Date(PIT) <= DATE(?) " +
-//                "                  GROUP BY BWKennung " +
-//                " ) pea ON pea.BWKennung = b.BWKennung" +
-//                " WHERE b.StatID IS NOT NULL ", resultSetMapping = "NReport.findSozialZeitenResultMapping")
-//})
+
 public class NReport implements Serializable, QProcessElement, Comparable<NReport>, Cloneable {
-    /*
-     * Native Queries
-     */
-//    public static String NativeFindByEinrichtungAndDatum = " "
-//            + " SELECT p.*, ifnull(p2u.num,0) num FROM NReport p "
-//            + " INNER JOIN Bewohner bw ON bw.BWKennung = p.BWKennung "
-//            + " INNER JOIN PB2TAGS tag ON tag.PBID = p.PBID "
-//            + " INNER JOIN Station stat ON stat.StatID = bw.StatID "
-//            + " LEFT OUTER JOIN ( SELECT pbid, count(*) num FROM NR2User WHERE UKennung = :ukennung GROUP BY pbid, ukennung ) AS p2u ON p2u.PBID = p.PBID "
-//            + " WHERE "
-//            + "     stat.EKennung = 'wiedenhof' "
-//            + "     AND p.PIT >= '2010-05-16 00:00:00.0' AND p.PIT <= '2010-05-16 23:59:59.0' "
-//            + "     AND tag.PBTAGID = 1 "
-//            + "     AND p.editBy IS NULL "
-//            + "     GROUP BY p.PBID "
-//            + " ORDER BY p.PIT DESC";
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -240,7 +91,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
 
     public NReport(Resident resident) {
         this.pit = new Date();
-        this.editpit = new Date();
+        this.editpit = this.pit;
         this.text = "";
         this.minutes = 3;
         this.resident = resident;
@@ -252,7 +103,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         this.version = 0l;
     }
 
-    public NReport(Date pit, Date editpit, String text, int minutes, Users user, Resident resident, Users editedBy, NReport replacedBy, NReport replacementFor) {
+    private NReport(Date pit, Date editpit, String text, int minutes, Users user, Resident resident, Users editedBy, NReport replacedBy, NReport replacementFor) {
         this.pit = pit;
         this.editpit = editpit;
         this.text = text;

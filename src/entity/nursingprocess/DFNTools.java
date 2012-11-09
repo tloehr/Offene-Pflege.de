@@ -336,6 +336,46 @@ public class DFNTools {
     }
 
 
+//    /**
+//     * retrieves a list of BHPs for a given resident for a given day. Only regular prescriptions are used (not OnDemand)
+//     *
+//     * @param resident
+//     * @param date
+//     * @return
+//     */
+//    public static ArrayList<DFN> getDFNs(Resident resident, NursingProcess np, DateMidnight date) {
+//        EntityManager em = OPDE.createEM();
+//        ArrayList<DFN> listDFN = null;
+//
+//        try {
+//
+//            String jpql = " SELECT dfn " +
+//                    " FROM DFN dfn " +
+//                    " WHERE dfn.resident = :resident " +
+//                    " AND dfn.nursingProcess = :np " +
+//                    " AND dfn.soll >= :von AND dfn.soll <= :bis " +
+//                    " ORDER BY dfn.sZeit, dfn.soll, dfn.intervention.bezeichnung, dfn.dfnid ";
+//
+//            Query query = em.createQuery(jpql);
+//
+//            query.setParameter("resident", resident);
+//            query.setParameter("np", np);
+//            query.setParameter("von", date.toDate());
+//            query.setParameter("bis", date.plusDays(1).toDateTime().minusSeconds(1).toDate());
+//
+//            listDFN = new ArrayList<DFN>(query.getResultList());
+////            Collections.sort(listDFN);
+//
+//        } catch (Exception se) {
+//            OPDE.fatal(se);
+//        } finally {
+//            em.close();
+//        }
+//        return listDFN;
+//    }
+
+
+
     /**
      * retrieves a list of BHPs for a given resident for a given day. Only regular prescriptions are used (not OnDemand)
      *
@@ -352,7 +392,8 @@ public class DFNTools {
             String jpql = " SELECT dfn " +
                     " FROM DFN dfn " +
                     " WHERE dfn.resident = :resident " +
-                    " AND dfn.soll >= :von AND dfn.soll <= :bis ";
+                    " AND dfn.soll >= :von AND dfn.soll <= :bis " +
+                    " ORDER BY dfn.nursingProcess.id, dfn.sZeit, dfn.soll, dfn.intervention.bezeichnung, dfn.dfnid ";
 
             Query query = em.createQuery(jpql);
 
@@ -361,7 +402,7 @@ public class DFNTools {
             query.setParameter("bis", new DateTime(date).toDateMidnight().plusDays(1).toDateTime().minusSeconds(1).toDate());
 
             listDFN = new ArrayList<DFN>(query.getResultList());
-            Collections.sort(listDFN);
+//            Collections.sort(listDFN);
 
         } catch (Exception se) {
             OPDE.fatal(se);

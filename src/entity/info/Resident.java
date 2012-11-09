@@ -238,7 +238,7 @@ public class Resident implements Serializable, Comparable<Resident> {
     }
 
     public Date getDOB() {
-        return dob;
+        return SYSTools.anonymizeDate(dob);
     }
 
     public void setDOB(Date gebDatum) {

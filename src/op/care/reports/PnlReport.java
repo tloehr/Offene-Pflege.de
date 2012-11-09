@@ -122,7 +122,6 @@ public class PnlReport extends NursingRecordsPanel {
 
         switchResident(resident);
 
-
     }
 
     private void initPanel() {
@@ -905,21 +904,15 @@ public class PnlReport extends NursingRecordsPanel {
                 final DefaultCPTitle pnlSingle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), null);
                 if (nreport.isObsolete()) {
                     pnlSingle.getButton().setIcon(SYSConst.icon22eraser);
-                    pnlSingle.getButton().addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            GUITools.showPopup(GUITools.getHTMLPopup(pnlSingle.getButton(), NReportTools.getInfoAsHTML(nreport)), SwingConstants.NORTH);
-                        }
-                    });
                 } else if (nreport.isReplacement()) {
                     pnlSingle.getButton().setIcon(SYSConst.icon22edited);
-                    pnlSingle.getButton().addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            GUITools.showPopup(GUITools.getHTMLPopup(pnlSingle.getButton(), NReportTools.getInfoAsHTML(nreport)), SwingConstants.NORTH);
-                        }
-                    });
                 }
+                pnlSingle.getButton().addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        GUITools.showPopup(GUITools.getHTMLPopup(pnlSingle.getButton(), NReportTools.getInfoAsHTML(nreport)), SwingConstants.NORTH);
+                    }
+                });
 
                 /***
                  *      __  __

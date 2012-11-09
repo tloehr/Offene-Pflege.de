@@ -26,7 +26,7 @@ import java.util.Date;
 //        @NamedQuery(name = "Dfn.findByErforderlich", query = "SELECT d FROM DFN d WHERE d.floating = :erforderlich"),
 //        @NamedQuery(name = "Dfn.findByDauer", query = "SELECT d FROM DFN d WHERE d.dauer = :dauer"),
 //        @NamedQuery(name = "Dfn.findByMdate", query = "SELECT d FROM DFN d WHERE d.mdate = :mdate")})
-public class DFN implements Serializable, Comparable<DFN> {
+public class DFN implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -314,7 +314,7 @@ public class DFN implements Serializable, Comparable<DFN> {
         return "entity.rest.Dfn[dfnid=" + dfnid + "]";
     }
 
-    @Override
+//    @Override
     public int compareTo(DFN other) {
         int result = this.getShift().compareTo(other.getShift());
         if (result == 0) {

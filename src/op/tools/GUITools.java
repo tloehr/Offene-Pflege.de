@@ -236,6 +236,7 @@ public class GUITools {
         } else if (ResInfoTools.isGone(bewohner)) {
             OPDE.getDisplayManager().setIconGone();
         }
+        OPDE.getDisplayManager().clearSubMessages();
     }
 
     public static String[] getLocalizedMessages(String[] languagekeys) {

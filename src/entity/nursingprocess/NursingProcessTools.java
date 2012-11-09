@@ -5,6 +5,7 @@ import entity.info.ResInfoCategory;
 import entity.info.Resident;
 import op.OPDE;
 import op.care.nursingprocess.PnlNursingProcess;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
@@ -51,6 +52,18 @@ public class NursingProcessTools {
         long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT p FROM NursingProcess p WHERE p.resident = :resident ");
+        query.setParameter("resident", resident);
+        ArrayList<NursingProcess> nursingProcesses = new ArrayList<NursingProcess>(query.getResultList());
+        em.close();
+        SYSTools.showTimeDifference(begin);
+        return nursingProcesses;
+    }
+
+    public static ArrayList<NursingProcess> getAllActive(Resident resident) {
+        long begin = System.currentTimeMillis();
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT p FROM NursingProcess p WHERE p.resident = :resident AND p.to = :ufn ORDER BY p.topic ");
+        query.setParameter("ufn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
         query.setParameter("resident", resident);
         ArrayList<NursingProcess> nursingProcesses = new ArrayList<NursingProcess>(query.getResultList());
         em.close();

@@ -206,33 +206,32 @@ public class DisplayManager extends Thread {
 
     private void processProgressBar() {
 //        OPDE.debug("DisplayManager.processProgressBar");
-        try {
-            if (progressBarMessage != null) {  //  && zyklen/5%2 == 0 && zyklen % 5 == 0
-                if (progressBarMessage.getPercentage() < 0) {
-                    if (!isIndeterminate) {
-                        isIndeterminate = true;
-                    }
-                } else {
-                    isIndeterminate = false;
-                    OPDE.debug("jp.setValue(progressBarMessage.getPercentage())");
-                    jp.setValue(progressBarMessage.getPercentage());
-                }
 
-                jp.setString(progressBarMessage.getRawMessage());
+        if (progressBarMessage != null) {  //  && zyklen/5%2 == 0 && zyklen % 5 == 0
+            if (progressBarMessage.getPercentage() < 0) {
+                if (!isIndeterminate) {
+                    isIndeterminate = true;
+                }
             } else {
-                if (jp.getValue() > 0) {
-                    OPDE.debug("jp.setValue(0)");
-                    jp.setValue(0);
-                    jp.setString(null);
-                }
                 isIndeterminate = false;
-
+                OPDE.debug("jp.setValue(progressBarMessage.getPercentage())");
+                jp.setValue(progressBarMessage.getPercentage());
             }
 
-            jp.setIndeterminate(isIndeterminate);
-        } catch (Exception e) {
-            OPDE.fatal(e);
+            jp.setString(progressBarMessage.getRawMessage());
+        } else {
+            if (jp.getValue() > 0) {
+                OPDE.debug("jp.setValue(0)");
+                jp.setValue(0);
+                jp.setString(null);
+            }
+            isIndeterminate = false;
+
         }
+
+        // Exception ?
+//            jp.setIndeterminate(isIndeterminate);
+
     }
 
     public static DisplayMessage getLockMessage() {
