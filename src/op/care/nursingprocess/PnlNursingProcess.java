@@ -83,7 +83,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
     private HashMap<NursingProcess, JPanel> contenPanelMap;
     private ArrayList<NursingProcess> listNP;
 
-    private JToggleButton tbInactive;
+//    private JToggleButton tbInactive;
     private JXSearchField txtSearch;
 
     private Color[] color1, color2;
@@ -292,9 +292,9 @@ public class PnlNursingProcess extends NursingRecordsPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    if (cpCat.isCollapsed() && !tbInactive.isSelected() && !isEmpty(cat) && containsOnlyClosedNPs(cat)) {
-                        tbInactive.setSelected(true);
-                    }
+//                    if (cpCat.isCollapsed() && !tbInactive.isSelected()  && !isEmpty(cat) && containsOnlyClosedNPs(cat)) {
+//                        tbInactive.setSelected(true);
+//                    }
                     cpCat.setCollapsed(!cpCat.isCollapsed());
                 } catch (PropertyVetoException pve) {
                     // BAH!
@@ -303,9 +303,9 @@ public class PnlNursingProcess extends NursingRecordsPanel {
         });
 
         if (isEmpty(cat)) {
-            cptitle.getButton().setIcon(SYSConst.icon22ledBlueOff);
+            cptitle.getButton().setIcon(SYSConst.icon22nothing);
         } else if (containsOnlyClosedNPs(cat)) {
-            cptitle.getButton().setIcon(SYSConst.icon22ledBlueOn);
+            cptitle.getButton().setIcon(SYSConst.icon22stopSign);
         } else {
             cptitle.getButton().setIcon(getIcon(getMinimumNextEvalDays(cat)));
         }
@@ -323,13 +323,13 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                 if (valuecache.containsKey(cat)) {
                     int i = 0; // for zebra pattern
                     for (NursingProcess np : valuecache.get(cat)) {
-                        if (tbInactive.isSelected() || !np.isClosed()) {
+//                        if (!np.isClosed()) { // tbInactive.isSelected() ||
                             JPanel pnl = createNPPanel(np);
                             pnl.setBackground(i % 2 == 0 ? Color.WHITE : getColor(cat)[SYSConst.light3]);
                             pnl.setOpaque(true);
                             pnlContent.add(pnl);
                             i++;
-                        }
+//                        }
                     }
                 }
                 cpCat.setContentPane(pnlContent);
@@ -341,13 +341,13 @@ public class PnlNursingProcess extends NursingRecordsPanel {
             if (valuecache.containsKey(cat)) {
                 int i = 0; // for zebra pattern
                 for (NursingProcess np : valuecache.get(cat)) {
-                    if (tbInactive.isSelected() || !np.isClosed()) {
+//                    if (!np.isClosed()) { // tbInactive.isSelected() ||
                         JPanel pnl = createNPPanel(np);
                         pnl.setBackground(i % 2 == 0 ? Color.WHITE : getColor(cat)[SYSConst.light3]);
                         pnl.setOpaque(true);
                         pnlContent.add(pnl);
                         i++;
-                    }
+//                    }
                 }
             }
             cpCat.setContentPane(pnlContent);
@@ -389,6 +389,8 @@ public class PnlNursingProcess extends NursingRecordsPanel {
             DefaultCPTitle cptitle = new DefaultCPTitle(title, null);
             cptitle.getButton().setVerticalTextPosition(SwingConstants.TOP);
 
+            // todo: hier muss print rein
+
             /***
              *      __  __
              *     |  \/  | ___ _ __  _   _
@@ -397,8 +399,8 @@ public class PnlNursingProcess extends NursingRecordsPanel {
              *     |_|  |_|\___|_| |_|\__,_|
              *
              */
-            final JButton btnMenu = new JButton(SYSConst.icon32menu);
-            btnMenu.setPressedIcon(SYSConst.icon32Pressed);
+            final JButton btnMenu = new JButton(SYSConst.icon22menu);
+            btnMenu.setPressedIcon(SYSConst.icon22Pressed);
             btnMenu.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnMenu.setAlignmentY(Component.TOP_ALIGNMENT);
             btnMenu.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -445,7 +447,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
         if (!np.isClosed()) {
             return getIcon(Days.daysBetween(new DateTime(), nexteval).getDays());
         } else {
-            return SYSConst.icon22ledBlueOff;
+            return SYSConst.icon22stopSign;
         }
     }
 
@@ -479,7 +481,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
         }
 
         GUITools.addAllComponents(mypanel, addCommands());
-        GUITools.addAllComponents(mypanel, addFilters());
+//        GUITools.addAllComponents(mypanel, addFilters());
 
         searchPane.setContentPane(mypanel);
 
@@ -512,16 +514,16 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 //        });
 //        list.add(txtSearch);
 
-        tbInactive = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".inactive"));
-        tbInactive.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (initPhase) return;
-                reloadDisplay();
-            }
-        });
-        tbInactive.setHorizontalAlignment(SwingConstants.LEFT);
-        list.add(tbInactive);
+//        tbInactive = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".inactive"));
+//        tbInactive.addItemListener(new ItemListener() {
+//            @Override
+//            public void itemStateChanged(ItemEvent e) {
+//                if (initPhase) return;
+//                reloadDisplay();
+//            }
+//        });
+//        tbInactive.setHorizontalAlignment(SwingConstants.LEFT);
+//        list.add(tbInactive);
         return list;
     }
 
@@ -1027,7 +1029,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
          *
          */
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {  // => ACL_MATRIX
-            JButton btnDelete = GUITools.createHyperlinkButton(internalClassID + ".btnedit.tooltip", SYSConst.icon22delete, null);
+            JButton btnDelete = GUITools.createHyperlinkButton(internalClassID + ".btndelete.tooltip", SYSConst.icon22delete, null);
             btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnDelete.addActionListener(new ActionListener() {
                 @Override

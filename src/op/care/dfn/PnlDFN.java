@@ -173,21 +173,29 @@ public class PnlDFN extends NursingRecordsPanel {
                     int progress = 0;
                     OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 100));
 
-                    ArrayList<DFN> listDFNs = DFNTools.getDFNs(resident, jdcDatum.getDate());
-                    ArrayList<NursingProcess> listNPs = new ArrayList<NursingProcess>();
-                    for (DFN dfn : listDFNs) {
-                        if (!listNPs.contains(dfn.getNursingProcess()){
-                            listNPs.add(dfn.getNursingProcess());
-                        }
-                    }
-                    Collections.sort(listNPs);
 
+                    ArrayList<DFN> listDFNs = DFNTools.getDFNs(resident, jdcDatum.getDate());
+                    // First get a sorted list of all NursingProcesses involved.
+                    // Sort the DFNs to their NPs
+                    HashMap<NursingProcess, ArrayList<DFN>> mapNP2DFN = new HashMap<NursingProcess, ArrayList<DFN>>();
+                    for (DFN dfn : listDFNs) {
+                        if (!mapNP2DFN.containsKey(dfn.getNursingProcess())){
+                            mapNP2DFN.put(dfn.getNursingProcess(), new ArrayList<DFN>());
+                        }
+                        mapNP2DFN.get(dfn.getNursingProcess()).add(dfn);
+                    }
+//                    Collections.sort(listNPs);
+
+                    // Then sort the DFNs to their shifts as well
+                    ArrayList<NursingProcess> listNPs = new ArrayList<NursingProcess>(mapNP2DFN.keySet());
+                    Collections.sort(listNPs);
                     for (NursingProcess np : listNPs) {
-                        for (DFN dfn :) {
+                        for (DFN dfn : mapNP2DFN.get(np)) {
                             mapShift2DFN.get(dfn.getShift()).add(dfn);
                         }
                     }
 
+                    // now build the CollapsiblePanes
                     for (Byte shift : new Byte[]{DFNTools.SHIFT_ON_DEMAND, DFNTools.SHIFT_VERY_EARLY, DFNTools.SHIFT_EARLY, DFNTools.SHIFT_LATE, DFNTools.SHIFT_VERY_LATE}) {
                         shiftMAPpane.put(shift, createCP4(shift));
                         try {
@@ -215,12 +223,12 @@ public class PnlDFN extends NursingRecordsPanel {
         } else {
 
             for (NursingProcess np : NursingProcessTools.getAllActive(resident)) {
-                for (DFN dfn : DFNTools.getDFNs(resident, np, new DateMidnight(jdcDatum.getDate()))) {
+                for (DFN dfn : DFNTools.getDFNs(resident,  jdcDatum.getDate())) {
                     mapShift2DFN.get(dfn.getShift()).add(dfn);
                 }
             }
 
-            ArrayList<DFN> listOnDemandDFNs = DFNTools.getDFNs(resident, null, new DateMidnight(jdcDatum.getDate()));
+            ArrayList<DFN> listOnDemandDFNs = DFNTools.getDFNs(resident, jdcDatum.getDate());
             if (!listOnDemandDFNs.isEmpty()) {
                 mapShift2DFN.put(DFNTools.SHIFT_ON_DEMAND, listOnDemandDFNs);
             }
