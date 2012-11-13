@@ -3,6 +3,7 @@ package entity.nursingprocess;
 import entity.EntityTools;
 import entity.info.ResInfoCategory;
 import entity.info.Resident;
+import entity.info.ResidentTools;
 import op.OPDE;
 import op.care.nursingprocess.PnlNursingProcess;
 import op.tools.SYSConst;
@@ -77,12 +78,10 @@ public class NursingProcessTools {
      * @param np
      * @return
      */
-    public static String getAsHTML(NursingProcess np, boolean withHeader) {
+    public static String getAsHTML(NursingProcess np, boolean withHeader, boolean withDetails) {
+        String html = SYSConst.html_h2((withHeader ? OPDE.lang.getString(PnlNursingProcess.internalClassID) + " " + OPDE.lang.getString("misc.msg.for") + " (" + ResidentTools.getTextCompact(np.getResident()) + ")" : "") + "&nbsp;&raquo;" + np.getTopic() + "&laquo");
 
-        String html = "";
-        html += "<h2 id=\"fonth2\" >";
-        html += (withHeader ? OPDE.lang.getString(PnlNursingProcess.internalClassID) : "") + "&raquo;" + np.getTopic() + "&laquo;";
-        html += "</h2>";
+        html += withDetails && np.isClosed() ? SYSConst.html_22x22_StopSign : "";
 
         html += "<div id=\"fonttext\">";
 
@@ -90,30 +89,29 @@ public class NursingProcessTools {
 
         DateFormat df = DateFormat.getDateInstance();
         html += "<b>" + OPDE.lang.getString(PnlNursingProcess.internalClassID + ".pnleval.nextevaldate") + ":</b> " + df.format(np.getNextEval()) + "<br/>";
-//        html += "<b>"+OPDE.lang.getString("misc.msg.createdby")+":</b> " + planung.getUserON().getFullname() + "  ";
-//        html += "<b>"+OPDE.lang.getString("misc.msg.atchrono")+":</b> " + df.format(planung.getFrom()) + "<br/>";
-//        if (planung.isClosed()) {
-//            html += "<b>Abgesetzt von:</b> " + planung.getUserOFF().getFullname() + "  ";
-//            html += "<b>Am:</b> " + df.format(planung.getTo()) + "<br/>";
-//        }
 
-        html += "<h3 id=\"fonth3\">" + OPDE.lang.getString("misc.msg.Situation") + "</h3>" +
-                (np.isClosed() ? "<s>" : "") +
-                SYSTools.replace(np.getSituation(), "\n", "<br/>", false) +
-                (np.isClosed() ? "</s>" : "");
+        if (withDetails) {
+            html += SYSConst.html_bold("misc.msg.createdby") + ": " + np.getUserON().getFullname() + " ";
+            html += SYSConst.html_bold("misc.msg.atchrono") + ": " + df.format(np.getFrom());
+            if (np.isClosed()) {
+                html += "<br/>";
+                html += SYSConst.html_bold("misc.msg.closedBy") + ": " + np.getUserOFF().getFullname() + " ";
+                html += SYSConst.html_bold("misc.msg.atchrono") + ": " + df.format(np.getTo());
+            }
+        }
 
-        html += "<h3 id=\"fonth3\">" + OPDE.lang.getString("misc.msg.Goal[s]") + ":</h3>" +
-                (np.isClosed() ? "<s>" : "") +
-                SYSTools.replace(np.getGoal(), "\n", "<br/>", false) +
-                (np.isClosed() ? "</s>" : "");
+        html += SYSConst.html_h3("misc.msg.Situation") +
+                SYSTools.replace(np.getSituation(), "\n", "<br/>", false);
 
-        html += "<h3 id=\"fonth3\">" + OPDE.lang.getString(PnlNursingProcess.internalClassID + ".interventions") + "</h3>";
+        html += SYSConst.html_h3("misc.msg.Goal[s]") +
+                SYSTools.replace(np.getGoal(), "\n", "<br/>", false);
+
+        html += SYSConst.html_h3(PnlNursingProcess.internalClassID + ".interventions");
 
         if (np.getInterventionSchedule().isEmpty()) {
             html += "<ul><li><b>" + OPDE.lang.getString("misc.msg.MissingInterventions") + " !!!</b></li></ul>";
         } else {
             html += "<ul>";
-//            html += "<li><b>" + OPDE.lang.getString(PnlNursingProcess.internalClassID + ".interventions") + "</b></li><ul>";
             for (InterventionSchedule interventionSchedule : np.getInterventionSchedule()) {
                 html += "<li>";
                 html += "<div id=\"fonttext\"><b>" + interventionSchedule.getIntervention().getBezeichnung() + "</b> (" + interventionSchedule.getDauer().toPlainString() + " " + OPDE.lang.getString("misc.msg.Minutes") + ")</div>";
@@ -125,7 +123,7 @@ public class NursingProcessTools {
 
 
         if (!np.getEvaluations().isEmpty()) {
-            html += "<h3 id=\"fonth3\">" + OPDE.lang.getString("misc.msg.DateOfEvals") + "</h3>";
+            html += SYSConst.html_h3(OPDE.lang.getString("misc.msg.DateOfEvals"));
             html += "<ul>";
             for (NPControl kontrolle : np.getEvaluations()) {
                 html += "<li><div id=\"fonttext\">" + NPControlTools.getAsHTML(kontrolle) + "</div></li>";

@@ -245,7 +245,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
 
     @Override
     public String getContentAsHTML() {
-        return NursingProcessTools.getAsHTML(this, false);
+        return NursingProcessTools.getAsHTML(this, false, false);
     }
 
     @Override

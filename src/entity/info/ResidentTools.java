@@ -89,7 +89,6 @@ public class ResidentTools {
         return bewohner.getName() + ", " + bewohner.getFirstname() + " [" + bewohner.getRID() + "]";
     }
 
-
     public static void setBWLabel(JLabel lblBW, Resident bewohner) {
         lblBW.setFont(new java.awt.Font("Dialog", 1, 18));
         lblBW.setHorizontalAlignment(SwingConstants.LEADING);

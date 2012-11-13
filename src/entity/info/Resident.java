@@ -137,6 +137,10 @@ public class Resident implements Serializable, Comparable<Resident> {
     }
 
     public String getRID() {
+        return SYSTools.anonymizeRID(rid);
+    }
+
+    public String getRIDNeverAnonymous() {
         return rid;
     }
 

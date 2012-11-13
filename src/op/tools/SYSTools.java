@@ -302,6 +302,19 @@ public class SYSTools {
         return name;
     }
 
+    public static String anonymizeRID(String in) {
+        String rid = in;
+        if (OPDE.isAnonym()) {
+            Random rnd = new Random(System.currentTimeMillis());
+
+            char c1 = (char) (65 + rnd.nextInt(25));
+            char c2 = (char) (65 + rnd.nextInt(25));
+
+            rid = new String(new char[]{c1, c2}) + rnd.nextInt(9);
+        }
+        return rid;
+    }
+
     public static String anonymizeString(String in) {
         String out = "[" + OPDE.lang.getString("misc.msg.anon") + "]";
         if (!OPDE.isAnonym()) {
@@ -316,7 +329,7 @@ public class SYSTools {
             Random rnd = new Random(System.nanoTime());
             DateTime dt = new DateTime(in);
             int factor = rnd.nextBoolean() ? -1 : 1;
-            result = dt.plusDays(rnd.nextInt(300)*factor).plusYears(rnd.nextInt(5)*factor).toDate();
+            result = dt.plusDays(rnd.nextInt(300) * factor).plusYears(rnd.nextInt(5) * factor).toDate();
         }
         return result;
 
@@ -989,7 +1002,8 @@ public class SYSTools {
         result = SYSTools.replace(result, "ö", "&ouml;", false);
         result = SYSTools.replace(result, "Ü", "&Uuml;", false);
         result = SYSTools.replace(result, "ü", "&uuml;", false);
-        result = SYSTools.replace(result, "ß", "&szlig;", false);
+        result = SYSTools.replace(result, "ß", "&szlig;", false); //&deg;
+        result = SYSTools.replace(result, "°", "&deg;", false);
         return result;
     }
 

@@ -253,7 +253,7 @@ public class PrescriptionTools {
 
             // Wenn der Bewohnername sich in der Liste ändert, muss
             // einmal die Überschrift drüber gesetzt werden.
-            boolean bewohnerWechsel = !bwkennung.equalsIgnoreCase(verordnung.getResident().getRID());
+            boolean bewohnerWechsel = !bwkennung.equalsIgnoreCase(verordnung.getResident().getRIDNeverAnonymous());
 
             if (pagebreak || stationsWechsel || bewohnerWechsel) {
                 // Falls zufällig ein weiterer Header (der 2 Elemente hoch ist) einen Pagebreak auslösen WÜRDE
@@ -267,7 +267,7 @@ public class PrescriptionTools {
                     html += "</table>";
                 }
 
-                bwkennung = verordnung.getResident().getRID();
+                bwkennung = verordnung.getResident().getRIDNeverAnonymous();
 
                 html += "<h2 id=\"fonth2\" " +
                         (pagebreak ? "style=\"page-break-before:always\">" : ">") +

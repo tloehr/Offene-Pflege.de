@@ -33,6 +33,7 @@ import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
+import entity.files.SYSFilesTools;
 import entity.info.ResInfoCategory;
 import entity.info.ResInfoCategoryTools;
 import entity.info.Resident;
@@ -59,8 +60,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.util.*;
@@ -83,7 +82,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
     private HashMap<NursingProcess, JPanel> contenPanelMap;
     private ArrayList<NursingProcess> listNP;
 
-//    private JToggleButton tbInactive;
+    //    private JToggleButton tbInactive;
     private JXSearchField txtSearch;
 
     private Color[] color1, color2;
@@ -164,7 +163,6 @@ public class PnlNursingProcess extends NursingRecordsPanel {
         }
         add(jspNP);
     }// </editor-fold>//GEN-END:initComponents
-
 
 
     @Override
@@ -324,11 +322,11 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                     int i = 0; // for zebra pattern
                     for (NursingProcess np : valuecache.get(cat)) {
 //                        if (!np.isClosed()) { // tbInactive.isSelected() ||
-                            JPanel pnl = createNPPanel(np);
-                            pnl.setBackground(i % 2 == 0 ? Color.WHITE : getColor(cat)[SYSConst.light3]);
-                            pnl.setOpaque(true);
-                            pnlContent.add(pnl);
-                            i++;
+                        JPanel pnl = createNPPanel(np);
+                        pnl.setBackground(i % 2 == 0 ? Color.WHITE : getColor(cat)[SYSConst.light3]);
+                        pnl.setOpaque(true);
+                        pnlContent.add(pnl);
+                        i++;
 //                        }
                     }
                 }
@@ -342,11 +340,11 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                 int i = 0; // for zebra pattern
                 for (NursingProcess np : valuecache.get(cat)) {
 //                    if (!np.isClosed()) { // tbInactive.isSelected() ||
-                        JPanel pnl = createNPPanel(np);
-                        pnl.setBackground(i % 2 == 0 ? Color.WHITE : getColor(cat)[SYSConst.light3]);
-                        pnl.setOpaque(true);
-                        pnlContent.add(pnl);
-                        i++;
+                    JPanel pnl = createNPPanel(np);
+                    pnl.setBackground(i % 2 == 0 ? Color.WHITE : getColor(cat)[SYSConst.light3]);
+                    pnl.setOpaque(true);
+                    pnlContent.add(pnl);
+                    i++;
 //                    }
                 }
             }
@@ -388,8 +386,6 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
             DefaultCPTitle cptitle = new DefaultCPTitle(title, null);
             cptitle.getButton().setVerticalTextPosition(SwingConstants.TOP);
-
-            // todo: hier muss print rein
 
             /***
              *      __  __
@@ -643,6 +639,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                 NursingProcess template = ((NursingProcess) o).clone();
                                 template.setNPSeries(-2); // so the next dialog knows thats a template
                                 template.setResident(resident);
+                                template.setFrom(new Date());
                                 template.setTo(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
                                 template.setUserOFF(null);
                                 template.setUserON(OPDE.getLogin().getUser());
@@ -767,6 +764,28 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
         final JPanel pnlMenu = new JPanel(new VerticalLayout());
         long numDFNs = DFNTools.getNumDFNs(np);
+
+        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
+            /***
+             *      _     _         ____       _       _
+             *     | |__ | |_ _ __ |  _ \ _ __(_)_ __ | |_
+             *     | '_ \| __| '_ \| |_) | '__| | '_ \| __|
+             *     | |_) | |_| | | |  __/| |  | | | | | |_
+             *     |_.__/ \__|_| |_|_|   |_|  |_|_| |_|\__|
+             *
+             */
+            JButton btnPrint = GUITools.createHyperlinkButton("misc.commands.print", SYSConst.icon22print2, null);
+            btnPrint.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnPrint.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    SYSFilesTools.print(NursingProcessTools.getAsHTML(np, true, true), true);
+                }
+            });
+            pnlMenu.add(btnPrint);
+            pnlMenu.add(new JSeparator());
+        }
+
 
         if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
             /***
@@ -1046,9 +1065,9 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     em.lock(myOldNP, LockModeType.OPTIMISTIC);
 
                                     // DFNs to delete
-                                    Query delQuery = em.createQuery("DELETE FROM DFN dfn WHERE dfn.nursingProcess = :nursingprocess AND dfn.status = :status ");
+                                    Query delQuery = em.createQuery("DELETE FROM DFN dfn WHERE dfn.nursingProcess = :nursingprocess ");
                                     delQuery.setParameter("nursingprocess", myOldNP);
-                                    delQuery.setParameter("status", DFNTools.STATE_OPEN);
+//                                    delQuery.setParameter("status", DFNTools.STATE_OPEN);
                                     delQuery.executeUpdate();
 
                                     em.remove(myOldNP);
