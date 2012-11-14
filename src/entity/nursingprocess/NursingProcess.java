@@ -12,6 +12,7 @@ import entity.process.SYSNP2PROCESS;
 import entity.system.Users;
 import op.OPDE;
 import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
@@ -245,7 +246,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
 
     @Override
     public String getContentAsHTML() {
-        return NursingProcessTools.getAsHTML(this, false, false);
+        return NursingProcessTools.getAsHTML(this, false, false, false);
     }
 
     @Override
@@ -273,6 +274,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
                     "<br/>" +
                     userON.getFullname();
         }
+        result += "<br/>[" + getID() + "]";
 
         return result;
     }
@@ -319,21 +321,29 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
 
     @Override
     public int compareTo(NursingProcess that) {
-        int result = 0;
 
-        if (!isClosed() && that.isClosed()) {
-            result = -1;
+        int result = SYSTools.nullCompare(this, that);
+        try {
+            if (result == 0 && !isClosed() && that.isClosed()) {
+                result = -1;
+            }
+
+            if (result == 0 && isClosed() && !that.isClosed()) {
+                result = 1;
+            }
+
+            if (result == 0 && topic.compareTo(that.getTopic()) != 0) {
+                result = topic.compareTo(that.getTopic());
+            }
+
+            if (result == 0) {
+                result = from.compareTo(that.getFrom()) * -1;
+            }
+        } catch (NullPointerException n) {
+            OPDE.error(n);
+            result = 0;
         }
 
-        if (result == 0 && isClosed() && !that.isClosed()) {
-            result = 1;
-        }
-
-        if (result == 0 && topic.compareTo(that.getTopic()) != 0) {
-            result = topic.compareTo(that.getTopic());
-        }
-
-        result = from.compareTo(that.getFrom()) * -1;
         return result;
     }
 

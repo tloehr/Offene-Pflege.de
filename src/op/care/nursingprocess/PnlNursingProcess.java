@@ -779,7 +779,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
             btnPrint.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    SYSFilesTools.print(NursingProcessTools.getAsHTML(np, true, true), true);
+                    SYSFilesTools.print(NursingProcessTools.getAsHTML(np, true, true, true), true);
                 }
             });
             pnlMenu.add(btnPrint);
@@ -830,7 +830,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     myNewNP.setFrom(new DateTime(myOldNP.getTo()).plusSeconds(1).toDate());
 
                                     // DFNs to delete
-                                    Query delQuery = em.createQuery("DELETE FROM DFN dfn WHERE dfn.nursingProcess = :nursingprocess AND dfn.status = :status ");
+                                    Query delQuery = em.createQuery("DELETE FROM DFN dfn WHERE dfn.nursingProcess = :nursingprocess AND dfn.state = :status ");
                                     delQuery.setParameter("nursingprocess", myOldNP);
                                     delQuery.setParameter("status", DFNTools.STATE_OPEN);
                                     delQuery.executeUpdate();
@@ -911,7 +911,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     myOldNP.getEvaluations().add(lastValidation);
 
                                     // DFNs to delete
-                                    Query delQuery = em.createQuery("DELETE FROM DFN dfn WHERE dfn.nursingProcess = :nursingprocess AND dfn.status = :status ");
+                                    Query delQuery = em.createQuery("DELETE FROM DFN dfn WHERE dfn.nursingProcess = :nursingprocess AND dfn.state = :status ");
                                     delQuery.setParameter("nursingprocess", myOldNP);
                                     delQuery.setParameter("status", DFNTools.STATE_OPEN);
                                     delQuery.executeUpdate();

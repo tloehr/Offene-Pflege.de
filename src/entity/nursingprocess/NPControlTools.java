@@ -1,5 +1,8 @@
 package entity.nursingprocess;
 
+import op.OPDE;
+import op.care.nursingprocess.PnlNursingProcess;
+
 import java.text.DateFormat;
 
 /**
@@ -11,14 +14,14 @@ import java.text.DateFormat;
  */
 public class NPControlTools {
 
-    public static String getAsHTML(NPControl kontrolle) {
+    public static String getAsHTML(NPControl npcontrol) {
         String result = "";
         DateFormat df = DateFormat.getDateInstance();
-        result += "<b>" + df.format(kontrolle.getDatum()) + "</b>; <u>"+kontrolle.getUser().getFullname()+"</u>; "+kontrolle.getBemerkung() ;
+        result += "<b>" + df.format(npcontrol.getDatum()) + "</b>; <u>"+npcontrol.getUser().getFullname()+"</u>; "+npcontrol.getBemerkung() ;
 //        result += "<p><b>Durchgeführt von:</b> " + kontrolle.getUser().getFullname() + "</p>";
 //        result += "<p><b>Ergebnis:</b> " + kontrolle.getText() + "</p>";
-        if (kontrolle.isAbschluss()) {
-            result += "<u>Die Pflegeplanung wurde mit dieser Kontrolle geändert bzw. abgeschlossen</u>";
+        if (npcontrol.isAbschluss()) {
+            result += "<br/><b>"+ OPDE.lang.getString(PnlNursingProcess.internalClassID+".isClosedAfterThisNPControl")+"</b>";
         }
 
         return result;

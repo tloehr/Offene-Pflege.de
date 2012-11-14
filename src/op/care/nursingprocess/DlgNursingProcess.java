@@ -554,7 +554,7 @@ public class DlgNursingProcess extends MyJDialog {
 
     //    private void saveTEMPLATE() {
 //        HashMap hm = new HashMap();
-//        hm.put("BWKennung", bewohner.getRID());
+//        hm.put("BWKennung", bewohner.getRIDAnonymous());
 //        hm.put("Stichwort", txtStichwort.getText());
 //        hm.put("Situation", txtSituation.getText());
 //        hm.put("Ziel", txtZiele.getText());
@@ -600,7 +600,7 @@ public class DlgNursingProcess extends MyJDialog {
 //    private void saveCHANGE() {
 //        // Daten für die NEUE Planung
 //        HashMap hm = new HashMap();
-//        hm.put("BWKennung", bewohner.getRID());
+//        hm.put("BWKennung", bewohner.getRIDAnonymous());
 //        hm.put("Stichwort", txtStichwort.getText());
 //        hm.put("Situation", txtSituation.getText());
 //        hm.put("Ziel", txtZiele.getText());

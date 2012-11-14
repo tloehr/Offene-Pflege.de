@@ -67,7 +67,7 @@ public class DisplayManager extends Thread {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                OPDE.debug("DisplayManager.setMainMessage");
+//                OPDE.debug("DisplayManager.setMainMessage");
                 lblMain.setText(message);
                 lblMain.setIcon(null);
             }
@@ -214,14 +214,14 @@ public class DisplayManager extends Thread {
                 }
             } else {
                 isIndeterminate = false;
-                OPDE.debug("jp.setValue(progressBarMessage.getPercentage())");
+//                OPDE.debug("jp.setValue(progressBarMessage.getPercentage())");
                 jp.setValue(progressBarMessage.getPercentage());
             }
 
             jp.setString(progressBarMessage.getRawMessage());
         } else {
             if (jp.getValue() > 0) {
-                OPDE.debug("jp.setValue(0)");
+//                OPDE.debug("jp.setValue(0)");
                 jp.setValue(0);
                 jp.setString(null);
             }

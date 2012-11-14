@@ -136,17 +136,17 @@ public class Resident implements Serializable, Comparable<Resident> {
         this.controlling = null;
     }
 
-    public String getRID() {
+    public String getRIDAnonymous() {
         return SYSTools.anonymizeRID(rid);
     }
 
-    public String getRIDNeverAnonymous() {
+    public String getRID() {
         return rid;
     }
 
-    public void setRID(String bWKennung) {
+    public void setRID(String rid) {
         if (this.rid == null) {
-            this.rid = bWKennung;
+            this.rid = rid;
         }
     }
 

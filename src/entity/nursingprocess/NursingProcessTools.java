@@ -78,17 +78,19 @@ public class NursingProcessTools {
      * @param np
      * @return
      */
-    public static String getAsHTML(NursingProcess np, boolean withHeader, boolean withDetails) {
+    public static String getAsHTML(NursingProcess np, boolean withHeader, boolean withDetails, boolean withIcon) {
         String html = SYSConst.html_h2((withHeader ? OPDE.lang.getString(PnlNursingProcess.internalClassID) + " " + OPDE.lang.getString("misc.msg.for") + " (" + ResidentTools.getTextCompact(np.getResident()) + ")" : "") + "&nbsp;&raquo;" + np.getTopic() + "&laquo");
 
-        html += withDetails && np.isClosed() ? SYSConst.html_22x22_StopSign : "";
+        html += withIcon && np.isClosed() ? SYSConst.html_22x22_StopSign : "";
 
         html += "<div id=\"fonttext\">";
 
         html += withHeader ? "<b>" + OPDE.lang.getString("misc.msg.category") + ":</b> " + np.getCategory().getText() + "<br/>" : "";
 
         DateFormat df = DateFormat.getDateInstance();
-        html += "<b>" + OPDE.lang.getString(PnlNursingProcess.internalClassID + ".pnleval.nextevaldate") + ":</b> " + df.format(np.getNextEval()) + "<br/>";
+        if (!np.isClosed()) {
+            html += "<b>" + OPDE.lang.getString(PnlNursingProcess.internalClassID + ".pnleval.nextevaldate") + ":</b> " + df.format(np.getNextEval()) + "<br/>";
+        }
 
         if (withDetails) {
             html += SYSConst.html_bold("misc.msg.createdby") + ": " + np.getUserON().getFullname() + " ";
@@ -125,8 +127,8 @@ public class NursingProcessTools {
         if (!np.getEvaluations().isEmpty()) {
             html += SYSConst.html_h3(OPDE.lang.getString("misc.msg.DateOfEvals"));
             html += "<ul>";
-            for (NPControl kontrolle : np.getEvaluations()) {
-                html += "<li><div id=\"fonttext\">" + NPControlTools.getAsHTML(kontrolle) + "</div></li>";
+            for (NPControl npControl : np.getEvaluations()) {
+                html += "<li><div id=\"fonttext\">" + NPControlTools.getAsHTML(npControl) + "</div></li>";
             }
             html += "</ul>";
         }

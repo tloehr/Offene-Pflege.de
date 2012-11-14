@@ -754,10 +754,10 @@ public class ResInfoTools {
                         + "ON DATE(aus.PIT) = DATE(ein.PIT) "
                         + "ORDER BY aus.PIT desc";
                 Query query = em.createNativeQuery(sql);
-                query.setParameter(1, bewohner.getRIDNeverAnonymous());
+                query.setParameter(1, bewohner.getRID());
                 query.setParameter(2, ResValueTypesTools.LIQUIDBALANCE);
                 query.setParameter(3, new DateTime().minusWeeks(1).toDateMidnight().toDate());
-                query.setParameter(4, bewohner.getRIDNeverAnonymous());
+                query.setParameter(4, bewohner.getRID());
                 query.setParameter(5, ResValueTypesTools.LIQUIDBALANCE);
                 query.setParameter(6, new DateTime().minusWeeks(1).toDateMidnight().toDate());
 
@@ -812,7 +812,7 @@ public class ResInfoTools {
                         + " ORDER BY PIT desc";
 
                 Query query = em.createNativeQuery(sql);
-                query.setParameter(1, bewohner.getRIDNeverAnonymous());
+                query.setParameter(1, bewohner.getRID());
                 query.setParameter(2, ResValueTypesTools.LIQUIDBALANCE);
                 query.setParameter(3, new DateTime().minusWeeks(1).toDateMidnight().toDate());
                 List<Object[]> list = query.getResultList();

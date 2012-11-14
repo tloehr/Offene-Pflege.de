@@ -1,7 +1,7 @@
 package entity.nursingprocess;
 
-import entity.system.Users;
 import entity.info.Resident;
+import entity.system.Users;
 import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
@@ -26,7 +26,7 @@ import java.util.Date;
 //        @NamedQuery(name = "Dfn.findByErforderlich", query = "SELECT d FROM DFN d WHERE d.floating = :erforderlich"),
 //        @NamedQuery(name = "Dfn.findByDauer", query = "SELECT d FROM DFN d WHERE d.dauer = :dauer"),
 //        @NamedQuery(name = "Dfn.findByMdate", query = "SELECT d FROM DFN d WHERE d.mdate = :mdate")})
-public class DFN implements Serializable {
+public class DFN implements Serializable, Comparable<DFN> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,7 +49,7 @@ public class DFN implements Serializable {
     private Byte iZeit;
     @Basic(optional = false)
     @Column(name = "Status")
-    private Byte status;
+    private Byte state;
     @Basic(optional = false)
     @Column(name = "Erforderlich")
     private boolean floating;
@@ -117,7 +117,7 @@ public class DFN implements Serializable {
         this.ist = now;
         this.iZeit = this.sZeit;
         this.version = 0l;
-        this.status = DFNTools.STATE_DONE;
+        this.state = DFNTools.STATE_DONE;
         this.user = OPDE.getLogin().getUser();
         this.resident = resident;
         this.mdate = now;
@@ -135,7 +135,7 @@ public class DFN implements Serializable {
         this.soll = soll;
         this.version = 0l;
         this.sZeit = sZeit;
-        this.status = DFNTools.STATE_OPEN;
+        this.state = DFNTools.STATE_OPEN;
         this.mdate = new Date();
         this.stDatum = new Date();
     }
@@ -176,12 +176,12 @@ public class DFN implements Serializable {
         return soll;
     }
 
-    public Byte getStatus() {
-        return status;
+    public Byte getState() {
+        return state;
     }
 
-    public void setStatus(Byte status) {
-        this.status = status;
+    public void setState(Byte state) {
+        this.state = state;
     }
 
     // SOll-IST   Target Actual
@@ -211,6 +211,10 @@ public class DFN implements Serializable {
 
     public void setStDatum(Date stDatum) {
         this.stDatum = stDatum;
+    }
+
+    public boolean isOpen() {
+        return state == DFNTools.STATE_OPEN;
     }
 
     public boolean isFloating() {
@@ -314,24 +318,26 @@ public class DFN implements Serializable {
         return "entity.rest.Dfn[dfnid=" + dfnid + "]";
     }
 
-//    @Override
+    @Override
     public int compareTo(DFN other) {
-        int result = this.getShift().compareTo(other.getShift());
+//        int result = this.getShift().compareTo(other.getShift());
+        int result = 0;
         if (result == 0) {
             result = SYSTools.nullCompare(this.nursingProcess, other.getNursingProcess());
         }
-        if (result == 0) {
-            if (this.getNursingProcess() != null){
-                result = dfnid.compareTo(new Long(getNursingProcess().getID()));
-            }
+        if (result == 0 && this.nursingProcess != null) {
+            result = new Long(this.nursingProcess.getID()).compareTo(new Long(other.getNursingProcess().getID()));
         }
+//        if (result == 0) {
+//            if (this.getNursingProcess() != null){
+//                result = dfnid.compareTo(new Long(getNursingProcess().getID()));
+//            }
+//        }
         if (result == 0) {
             result = sZeit.compareTo(other.getSollZeit());
         }
-        if (result == 0) {
-            if (sZeit == DFNTools.BYTE_TIMEOFDAY) {
-                result = soll.compareTo(other.getSoll());
-            }
+        if (result == 0 && sZeit == DFNTools.BYTE_TIMEOFDAY) {
+            result = soll.compareTo(other.getSoll());
         }
         if (result == 0) {
             result = intervention.getBezeichnung().compareTo(other.getIntervention().getBezeichnung());

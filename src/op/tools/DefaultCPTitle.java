@@ -17,10 +17,15 @@ import java.awt.event.MouseListener;
  * To change this template use File | Settings | File Templates.
  */
 public class DefaultCPTitle {
-    JPanel titlePanelleft, titlePanelright, titlePanel;
+    JPanel titlePanelleft, titlePanelright, titlePanel, additionalIconPanel;
     JideButton btnTitle;
 
+
     public DefaultCPTitle(String title, ActionListener actionListener) {
+
+        additionalIconPanel = new JPanel();
+        additionalIconPanel.setLayout(new BoxLayout(additionalIconPanel, BoxLayout.LINE_AXIS));
+        additionalIconPanel.setOpaque(false);
 
         titlePanelleft = new JPanel();
         titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
@@ -29,6 +34,7 @@ public class DefaultCPTitle {
         btnTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
         btnTitle.addActionListener(actionListener);
 
+        titlePanelleft.add(additionalIconPanel);
         titlePanelleft.add(btnTitle);
 
         titlePanelright = new JPanel();
@@ -54,6 +60,9 @@ public class DefaultCPTitle {
 
     }
 
+    public JPanel getAdditionalIconPanel() {
+        return additionalIconPanel;
+    }
 
     public JPanel getLeft() {
         return titlePanelleft;

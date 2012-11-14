@@ -82,11 +82,11 @@ public class ResidentTools {
     }
 
     public static String getBWLabelWithBDay(Resident bewohner) {
-        return "(*" + DateFormat.getDateInstance().format(bewohner.getDOB()) + ") [" + bewohner.getRID() + "]";
+        return "(*" + DateFormat.getDateInstance().format(bewohner.getDOB()) + ") [" + bewohner.getRIDAnonymous() + "]";
     }
 
     public static String getTextCompact(Resident bewohner) {
-        return bewohner.getName() + ", " + bewohner.getFirstname() + " [" + bewohner.getRID() + "]";
+        return bewohner.getName() + ", " + bewohner.getFirstname() + " [" + bewohner.getRIDAnonymous() + "]";
     }
 
     public static void setBWLabel(JLabel lblBW, Resident bewohner) {
@@ -115,7 +115,7 @@ public class ResidentTools {
         DateMidnight birthdate = new DateTime(bewohner.getDOB()).toDateMidnight();
         DateTime refdate = verstorben ? new DateTime(hauf.getTo()) : new DateTime();
         Years age = Years.yearsBetween(birthdate, refdate);
-        result += age.getYears() + " " + OPDE.lang.getString("misc.msg.Years") + " [" + bewohner.getRID() + "]";
+        result += age.getYears() + " " + OPDE.lang.getString("misc.msg.Years") + " [" + bewohner.getRIDAnonymous() + "]";
 
         if (verstorben || ausgezogen) {
             result += "  " + (verstorben ? OPDE.lang.getString("misc.msg.late") : OPDE.lang.getString("misc.msg.movedout")) + ": " + df.format(hauf.getTo()) + ", ";

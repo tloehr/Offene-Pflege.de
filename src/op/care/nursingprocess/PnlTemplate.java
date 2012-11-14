@@ -60,7 +60,7 @@ public class PnlTemplate extends JPanel {
                     JTextPane txtHTML = new JTextPane();
                     txtHTML.setEditable(false);
                     txtHTML.setContentType("text/html");
-                    txtHTML.setText(SYSTools.toHTML(NursingProcessTools.getAsHTML((NursingProcess) lstTemplates.getSelectedValue(), true, false)));
+                    txtHTML.setText(SYSTools.toHTML(NursingProcessTools.getAsHTML((NursingProcess) lstTemplates.getSelectedValue(), true, false, false)));
                     JPanel content = new JPanel();
                     content.setLayout(new BoxLayout(content, BoxLayout.LINE_AXIS));
                     content.add(new JScrollPane(txtHTML));

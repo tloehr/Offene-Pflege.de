@@ -241,7 +241,7 @@ public class PnlAllowance extends CleanablePanel {
          *      \___|_|  \___|\__,_|\__\___|\____|_|      |_| | ||_| \_\___||___/_|\__,_|\___|_| |_|\__| |
          *                                                     \_\                                    /_/
          */
-        final String key = resident.getRIDNeverAnonymous();
+        final String key = resident.getRID();
         if (!cpMap.containsKey(key)) {
             cpMap.put(key, new CollapsiblePane());
             try {
@@ -434,7 +434,7 @@ public class PnlAllowance extends CleanablePanel {
         final DateMidnight start = new DateMidnight(year, 1, 1).isBefore(min.dayOfMonth().withMinimumValue()) ? min.dayOfMonth().withMinimumValue() : new DateMidnight(year, 1, 1);
         final DateMidnight end = new DateMidnight(year, 12, 31).isAfter(max.dayOfMonth().withMaximumValue()) ? max.dayOfMonth().withMaximumValue() : new DateMidnight(year, 12, 31);
 
-        final String key = resident.getRIDNeverAnonymous() + "-" + Integer.toString(year);
+        final String key = resident.getRID() + "-" + Integer.toString(year);
         if (!cpMap.containsKey(key)) {
             cpMap.put(key, new CollapsiblePane());
             try {
@@ -625,7 +625,7 @@ public class PnlAllowance extends CleanablePanel {
          *      \___|_|  \___|\__,_|\__\___|\____|_|      |_| | ||_| \_\___||___/_|\__,_|\___|_| |_|\__( ) |____/ \__,_|\__\___||_| |_|_| |_| |_|\___| |
          *                                                     \_\                                     |/                                           /_/
          */
-        final String key = resident.getRIDNeverAnonymous() + "-" + month.getYear() + "-" + month.getMonthOfYear();
+        final String key = resident.getRID() + "-" + month.getYear() + "-" + month.getMonthOfYear();
         if (!cpMap.containsKey(key)) {
             cpMap.put(key, new CollapsiblePane());
             try {
@@ -931,9 +931,9 @@ public class PnlAllowance extends CleanablePanel {
 
                         DateTime txDate = new DateTime(myAllowance.getDate());
 
-                        final String keyResident = myAllowance.getResident().getRIDNeverAnonymous();
-                        final String keyYear = myAllowance.getResident().getRIDNeverAnonymous() + "-" + txDate.getYear();
-                        final String keyMonth = myAllowance.getResident().getRIDNeverAnonymous() + "-" + txDate.getYear() + "-" + txDate.getMonthOfYear();
+                        final String keyResident = myAllowance.getResident().getRID();
+                        final String keyYear = myAllowance.getResident().getRID() + "-" + txDate.getYear();
+                        final String keyMonth = myAllowance.getResident().getRID() + "-" + txDate.getYear() + "-" + txDate.getMonthOfYear();
 
                         if (!lstResidents.contains(myAllowance.getResident())) {
                             lstResidents.add(myAllowance.getResident());
@@ -1029,14 +1029,14 @@ public class PnlAllowance extends CleanablePanel {
         cpsCash.setLayout(new JideBoxLayout(cpsCash, JideBoxLayout.Y_AXIS));
 
         for (Resident resident : lstResidents) {
-            cpsCash.add(cpMap.get(resident.getRIDNeverAnonymous()));
+            cpsCash.add(cpMap.get(resident.getRID()));
         }
 
         cpsCash.addExpansion();
     }
 
     private JPanel createContentPanel4(final Resident resident, BigDecimal carry, DateMidnight month) {
-        final String key = resident.getRIDNeverAnonymous() + "-" + month.getYear() + "-" + month.getMonthOfYear();
+        final String key = resident.getRID() + "-" + month.getYear() + "-" + month.getMonthOfYear();
 
         if (!contentmap.containsKey(key)) {
 
@@ -1150,7 +1150,7 @@ public class PnlAllowance extends CleanablePanel {
 
                                             DateTime txDate = new DateTime(myAllowance.getDate());
 
-                                            final String keyMonth = myAllowance.getResident().getRIDNeverAnonymous() + "-" + txDate.getYear() + "-" + txDate.getMonthOfYear();
+                                            final String keyMonth = myAllowance.getResident().getRID() + "-" + txDate.getYear() + "-" + txDate.getMonthOfYear();
                                             contentmap.remove(keyMonth);
                                             cpMap.remove(keyMonth);
                                             cashmap.get(keyMonth).remove(allowance);
@@ -1230,7 +1230,7 @@ public class PnlAllowance extends CleanablePanel {
                                             em.getTransaction().commit();
 
                                             DateTime txDate = new DateTime(myAllowance.getDate());
-                                            final String keyMonth = myAllowance.getResident().getRIDNeverAnonymous() + "-" + txDate.getYear() + "-" + txDate.getMonthOfYear();
+                                            final String keyMonth = myAllowance.getResident().getRID() + "-" + txDate.getYear() + "-" + txDate.getMonthOfYear();
 
                                             contentmap.remove(keyMonth);
                                             cpMap.remove(keyMonth);

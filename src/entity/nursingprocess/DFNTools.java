@@ -19,7 +19,6 @@ import javax.swing.*;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -118,17 +117,15 @@ public class DFNTools {
 
             Query forceQuery = em.createQuery(" UPDATE DFN d "
                     + " SET d.soll = :now "
-                    + " WHERE d.floating = TRUE AND d.status = :status AND d.soll < :now1 "
-                    + " AND d.nursingProcess.from < :now2 AND d.nursingProcess.to > :now3 ");
+                    + " WHERE d.floating = TRUE AND d.state = :state AND d.soll < :now "
+                    + " AND d.nursingProcess.from < :now AND d.nursingProcess.to > :now ");
             forceQuery.setParameter("now", targetdate.toDate());
-            forceQuery.setParameter("now1", targetdate.toDate());
-            forceQuery.setParameter("now2", targetdate.toDate());
-            forceQuery.setParameter("now3", targetdate.toDate());
-            forceQuery.setParameter("status", DFNTools.STATE_OPEN);
+//            forceQuery.setParameter("now1", targetdate.toDate());
+//            forceQuery.setParameter("now2", targetdate.toDate());
+//            forceQuery.setParameter("now3", targetdate.toDate());
+            forceQuery.setParameter("state", DFNTools.STATE_OPEN);
 
-            // Die nicht beachteten zu erzwingenden müssen noch auf das heutige Datum umgetragen werden.
-            // Das erfolgt unabhängig von dem eingegebenen Stichtag.
-            // Nur bei uneingeschränkten Imports.
+            // Those DFNs which habe to be processed but weren't yet, have to be transferred to the current day.
             int affectedOldDFNs = forceQuery.executeUpdate();
 
             OPDE.important(em, OPDE.lang.getString(internalClassID) + " " + OPDE.lang.getString(internalClassID + ".completed") + ": " + DateFormat.getDateInstance().format(targetdate.toDate()) + " " + OPDE.lang.getString(internalClassID + ".numCreatedEntities") + ": " + numdfn);
@@ -196,7 +193,7 @@ public class DFNTools {
 //                OPDE.debug("Fortschritt Vorgang: " + ((float) row / maxrows) * 100 + "%");
 //                OPDE.debug("==========================================");
 //                OPDE.debug("MassTermin: " + termin.getTermID());
-//                OPDE.debug("BWKennung: " + termin.getNursingProcess().getResident().getRID());
+//                OPDE.debug("BWKennung: " + termin.getNursingProcess().getResident().getRIDAnonymous());
 //                OPDE.debug("PlanID: " + termin.getNursingProcess().getID());
 
                 boolean treffer = false;
@@ -327,7 +324,7 @@ public class DFNTools {
 
     public static long getNumDFNs(NursingProcess np) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT COUNT(dfn) FROM DFN dfn WHERE dfn.nursingProcess = :np AND dfn.status <> :state");
+        Query query = em.createQuery("SELECT COUNT(dfn) FROM DFN dfn WHERE dfn.nursingProcess = :np AND dfn.state <> :state");
         query.setParameter("np", np);
         query.setParameter("state", STATE_OPEN);
         long num = (Long) query.getSingleResult();
@@ -375,7 +372,6 @@ public class DFNTools {
 //    }
 
 
-
     /**
      * retrieves a list of BHPs for a given resident for a given day. Only regular prescriptions are used (not OnDemand)
      *
@@ -392,8 +388,9 @@ public class DFNTools {
             String jpql = " SELECT dfn " +
                     " FROM DFN dfn " +
                     " WHERE dfn.resident = :resident " +
-                    " AND dfn.soll >= :von AND dfn.soll <= :bis " +
-                    " ORDER BY dfn.nursingProcess.id, dfn.sZeit, dfn.soll, dfn.intervention.bezeichnung, dfn.dfnid ";
+                    " AND dfn.soll >= :von AND dfn.soll <= :bis ";
+
+//                    " ORDER BY dfn.nursingProcess.id, dfn.sZeit, dfn.soll, dfn.intervention.bezeichnung, dfn.dfnid ";
 
             Query query = em.createQuery(jpql);
 
@@ -439,16 +436,46 @@ public class DFNTools {
     }
 
     public static Icon getIcon(DFN dfn) {
-        if (dfn.getStatus() == STATE_DONE) {
+        if (dfn.getState() == STATE_DONE) {
             return SYSConst.icon22apply;
         }
-        if (dfn.getStatus() == STATE_OPEN) {
-            return SYSConst.icon22empty;
+        if (dfn.getState() == STATE_OPEN) {
+            return null;
         }
-        if (dfn.getStatus() == STATE_REFUSED) {
+        if (dfn.getState() == STATE_REFUSED) {
             return SYSConst.icon22cancel;
         }
         return null;
+    }
+
+    public static Icon getFloatingIcon(DFN dfn) {
+        if (!dfn.isFloating()) return null;
+        DateMidnight start = new DateMidnight(dfn.getStDatum());
+        DateMidnight stop = dfn.getIst() != null ? new DateMidnight(dfn.getIst()) : new DateMidnight();
+
+        Icon icon;
+
+        if (Days.daysBetween(start, stop).getDays() > 14){
+            if (dfn.isOpen()){
+                icon = SYSConst.icon22ledPurpleOn;
+            } else {
+                icon = SYSConst.icon22ledPurpleOff;
+            }
+        } else if (Days.daysBetween(start, stop).getDays() > 7){
+            if (dfn.isOpen()){
+                icon = SYSConst.icon22ledOrangeOn;
+            } else {
+                icon = SYSConst.icon22ledOrangeOff;
+            }
+        } else {
+            if (dfn.isOpen()){
+                icon = SYSConst.icon22ledBlueOn;
+            } else {
+                icon = SYSConst.icon22ledBlueOff;
+            }
+        }
+
+        return icon;
     }
 
     public static String getScheduleText(DFN dfn, String prefix, String postfix) {
