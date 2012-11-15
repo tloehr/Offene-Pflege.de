@@ -36,7 +36,7 @@ public class NPControl implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date datum;
     @Column(name = "Abschluss")
-    private Boolean abschluss;
+    private Boolean lastValidation;
 
     @JoinColumn(name = "PlanID", referencedColumnName = "PlanID")
     @ManyToOne
@@ -51,7 +51,7 @@ public class NPControl implements Serializable {
 
     public NPControl(String bemerkung, NursingProcess nursingProcess) {
         this.bemerkung = bemerkung;
-        this.abschluss = true;
+        this.lastValidation = false;
         this.nursingProcess = nursingProcess;
         this.user = OPDE.getLogin().getUser();
         this.datum = new Date();
@@ -81,12 +81,12 @@ public class NPControl implements Serializable {
         this.datum = datum;
     }
 
-    public Boolean isAbschluss() {
-        return abschluss;
+    public Boolean isLastValidation() {
+        return lastValidation;
     }
 
-    public void setAbschluss(Boolean abschluss) {
-        this.abschluss = abschluss;
+    public void setLastValidation(Boolean lastValidation) {
+        this.lastValidation = lastValidation;
     }
 
     public NursingProcess getNursingProcess() {

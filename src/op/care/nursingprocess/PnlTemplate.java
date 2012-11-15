@@ -63,12 +63,20 @@ public class PnlTemplate extends JPanel {
                     txtHTML.setText(SYSTools.toHTML(NursingProcessTools.getAsHTML((NursingProcess) lstTemplates.getSelectedValue(), true, false, false)));
                     JPanel content = new JPanel();
                     content.setLayout(new BoxLayout(content, BoxLayout.LINE_AXIS));
-                    content.add(new JScrollPane(txtHTML));
+                    final JScrollPane jsp = new JScrollPane(txtHTML);
+                    content.add(jsp);
                     content.setPreferredSize(scrollTemplates.getParent().getPreferredSize());
                     popup.getContentPane().add(content);
                     popup.setOwner(scrollTemplates.getParent());
                     popup.removeExcludedComponent(scrollTemplates);
                     popup.setTransient(true);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            GUITools.scroll2show(jsp, 0, null);
+                        }
+                    });
+
                     GUITools.showPopup(popup, SwingConstants.EAST);
                 }
             }

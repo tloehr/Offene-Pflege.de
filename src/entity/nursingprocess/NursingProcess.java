@@ -321,7 +321,6 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
 
     @Override
     public int compareTo(NursingProcess that) {
-
         int result = SYSTools.nullCompare(this, that);
         try {
             if (result == 0 && !isClosed() && that.isClosed()) {

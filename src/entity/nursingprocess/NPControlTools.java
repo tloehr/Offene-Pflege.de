@@ -20,7 +20,7 @@ public class NPControlTools {
         result += "<b>" + df.format(npcontrol.getDatum()) + "</b>; <u>"+npcontrol.getUser().getFullname()+"</u>; "+npcontrol.getBemerkung() ;
 //        result += "<p><b>Durchgeführt von:</b> " + kontrolle.getUser().getFullname() + "</p>";
 //        result += "<p><b>Ergebnis:</b> " + kontrolle.getText() + "</p>";
-        if (npcontrol.isAbschluss()) {
+        if (npcontrol.isLastValidation()) {
             result += "<br/><b>"+ OPDE.lang.getString(PnlNursingProcess.internalClassID+".isClosedAfterThisNPControl")+"</b>";
         }
 

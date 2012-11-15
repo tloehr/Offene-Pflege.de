@@ -38,8 +38,10 @@ import org.joda.time.DateTime;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Date;
 
 /**
  * @author tloehr
@@ -47,24 +49,33 @@ import java.awt.event.ActionListener;
 public class PnlEval extends JPanel {
     public static final String internalClassID = "nursingrecords.nursingprocess.pnleval";
     private Closure actionBlock;
+    private boolean disableDate;
     private NursingProcess np;
 
     /**
      * Creates new form DlgDiscontinue
      */
-    public PnlEval(NursingProcess np, Closure actionBlock) {
+    public PnlEval(NursingProcess np, Closure actionBlock, boolean disableDate) {
         this.np = np;
         this.actionBlock = actionBlock;
+        this.disableDate = disableDate;
         initComponents();
         initPanel();
     }
 
     private void initPanel() {
-        pnlReason.setBorder(new TitledBorder(OPDE.lang.getString(internalClassID + ".title")));
-        lblNextEval.setText(OPDE.lang.getString(internalClassID + ".nextevaldate") + ": ");
-        jdcNextEval.setDate(new DateTime().plusWeeks(4).toDate());
-        jdcNextEval.setMinSelectableDate(new DateTime().plusDays(1).toDate());
-        jdcNextEval.setMaxSelectableDate(new DateTime().plusYears(1).toDate());
+        pnlReason.setBorder(new TitledBorder(OPDE.lang.getString(internalClassID + (disableDate ? ".title4close" : ".title4change"))));
+
+        if (disableDate) {
+            lblNextEval.setVisible(false);
+            jdcNextEval.setVisible(false);
+        } else {
+            lblNextEval.setText(OPDE.lang.getString(internalClassID + ".nextevaldate") + ": ");
+            jdcNextEval.setDate(new DateTime().plusWeeks(4).toDate());
+            jdcNextEval.setMinSelectableDate(new DateTime().plusDays(1).toDate());
+            jdcNextEval.setMaxSelectableDate(new DateTime().plusYears(1).toDate());
+        }
+        setPreferredSize(new Dimension(525, 250));
     }
 
     /**
@@ -91,7 +102,9 @@ public class PnlEval extends JPanel {
 
         //======== pnlReason ========
         {
-            pnlReason.setBorder(new TitledBorder("text"));
+            pnlReason.setBorder(new TitledBorder(null, "text", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION,
+                    new Font("Arial", Font.PLAIN, 14)));
+            pnlReason.setFont(new Font("Arial", Font.PLAIN, 14));
             pnlReason.setLayout(new BoxLayout(pnlReason, BoxLayout.X_AXIS));
 
             //======== jScrollPane1 ========
@@ -100,6 +113,7 @@ public class PnlEval extends JPanel {
                 //---- txtBemerkung ----
                 txtBemerkung.setColumns(20);
                 txtBemerkung.setRows(5);
+                txtBemerkung.setFont(new Font("Arial", Font.PLAIN, 14));
                 jScrollPane1.setViewportView(txtBemerkung);
             }
             pnlReason.add(jScrollPane1);
@@ -112,7 +126,11 @@ public class PnlEval extends JPanel {
 
             //---- lblNextEval ----
             lblNextEval.setText("text ");
+            lblNextEval.setFont(new Font("Arial", Font.PLAIN, 14));
             panel2.add(lblNextEval);
+
+            //---- jdcNextEval ----
+            jdcNextEval.setFont(new Font("Arial", Font.PLAIN, 14));
             panel2.add(jdcNextEval);
         }
         add(panel2, CC.xy(2, 5, CC.FILL, CC.DEFAULT));
@@ -140,11 +158,11 @@ public class PnlEval extends JPanel {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".textxx"), DisplayMessage.WARNING));
             return;
         }
-        if (jdcNextEval.getDate() == null) {
+        if (!disableDate && jdcNextEval.getDate() == null) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".datexx"), DisplayMessage.WARNING));
             return;
         }
-        np.setNextEval(jdcNextEval.getDate());
+        np.setNextEval(disableDate ? new Date() : jdcNextEval.getDate());
         actionBlock.execute(new Pair<NursingProcess, String>(np, txtBemerkung.getText()));
     }//GEN-LAST:event_btnOKActionPerformed
 

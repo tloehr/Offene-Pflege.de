@@ -44,6 +44,7 @@ public class SYSConst {
     public static final Font ARIAL14 = new Font("Arial", Font.PLAIN, 14);
     public static final Font ARIAL14BOLD = new Font("Arial", Font.BOLD, 14);
     public static final Font ARIAL20 = new Font("Arial", Font.PLAIN, 20);
+    public static final Font ARIAL18BOLD = new Font("Arial", Font.BOLD, 18);
     public static final Font ARIAL20BOLD = new Font("Arial", Font.BOLD, 20);
     public static final Font ARIAL28 = new Font("Arial", Font.PLAIN, 28);
 
@@ -443,6 +444,8 @@ public class SYSConst {
     //    public static final Icon icon16pit = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/bw/pointintime.png"));
     public static final Icon icon16redStar = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/redstar.png"));
     public static final Icon icon16greenStar = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/greenstar.png"));
+    public static final Icon icon22redStar = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/redstar.png"));
+    public static final Icon icon22greenStar = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/greenstar.png"));
     public static final Icon icon16unlink = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/unlink.png"));
     public static final Icon icon16unlinkPressed = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/unlink_pressed.png"));
     public static final Icon icon22add = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/add.png"));

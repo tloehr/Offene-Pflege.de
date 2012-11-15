@@ -32,7 +32,24 @@
         <void method="setProperty"> 
          <string>border</string> 
          <object class="javax.swing.border.TitledBorder"> 
+          <null/> 
           <string>text</string> 
+          <int>4</int> 
+          <int>0</int> 
+          <object class="java.awt.Font"> 
+           <string>Arial</string> 
+           <int>0</int> 
+           <int>14</int> 
+          </object> 
+          <null/> 
+         </object> 
+        </void> 
+        <void method="setProperty"> 
+         <string>font</string> 
+         <object id="Font0" class="java.awt.Font"> 
+          <string>Arial</string> 
+          <int>0</int> 
+          <int>14</int> 
          </object> 
         </void> 
         <void property="name"> 
@@ -57,6 +74,10 @@
             <void method="setProperty"> 
              <string>rows</string> 
              <int>5</int> 
+            </void> 
+            <void method="setProperty"> 
+             <string>font</string> 
+             <object idref="Font0"/> 
             </void> 
             <void property="name"> 
              <string>txtBemerkung</string> 
@@ -102,6 +123,10 @@
            <string>text</string> 
            <string>text </string> 
           </void> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object idref="Font0"/> 
+          </void> 
           <void property="name"> 
            <string>lblNextEval</string> 
           </void> 
@@ -110,6 +135,10 @@
         <void method="add"> 
          <object class="com.jformdesigner.model.FormComponent"> 
           <string>com.toedter.calendar.JDateChooser</string> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object idref="Font0"/> 
+          </void> 
           <void property="name"> 
            <string>jdcNextEval</string> 
           </void> 
@@ -195,8 +224,8 @@
       <void method="setProperty"> 
        <string>size</string> 
        <object class="java.awt.Dimension"> 
-        <int>470</int> 
-        <int>290</int> 
+        <int>625</int> 
+        <int>350</int> 
        </object> 
       </void> 
       <void method="setProperty"> 

@@ -914,6 +914,57 @@ public class PnlReport extends NursingRecordsPanel {
                     }
                 });
 
+                if (!nreport.getAttachedFilesConnections().isEmpty()) {
+                    /***
+                     *      _     _         _____ _ _
+                     *     | |__ | |_ _ __ |  ___(_) | ___  ___
+                     *     | '_ \| __| '_ \| |_  | | |/ _ \/ __|
+                     *     | |_) | |_| | | |  _| | | |  __/\__ \
+                     *     |_.__/ \__|_| |_|_|   |_|_|\___||___/
+                     *
+                     */
+                    final JButton btnFiles = new JButton(Integer.toString(nreport.getAttachedFilesConnections().size()), SYSConst.icon22greenStar);
+                    btnFiles.setHorizontalTextPosition(SwingUtilities.CENTER);
+                    btnFiles.setFont(SYSConst.ARIAL18BOLD);
+                    btnFiles.setPressedIcon(SYSConst.icon22Pressed);
+                    btnFiles.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                    btnFiles.setAlignmentY(Component.TOP_ALIGNMENT);
+                    btnFiles.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    btnFiles.setContentAreaFilled(false);
+                    btnFiles.setBorder(null);
+                    btnFiles.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent actionEvent) {
+                            new DlgFiles(nreport, new Closure() {
+                                @Override
+                                public void execute(Object o) {
+                                    EntityManager em = OPDE.createEM();
+                                    final NReport myReport = em.merge(nreport);
+                                    em.refresh(myReport);
+                                    em.close();
+
+                                    final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
+
+                                    contentmap.remove(keyNewDay);
+                                    linemap.remove(nreport);
+
+                                    valuecache.get(keyNewDay).remove(nreport);
+                                    valuecache.get(keyNewDay).add(myReport);
+                                    Collections.sort(valuecache.get(keyNewDay));
+
+                                    createCP4Day(new DateMidnight(myReport.getPit()));
+
+                                    buildPanel();
+                                    GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
+                                }
+                            });
+                        }
+                    });
+                    pnlSingle.getRight().add(btnFiles);
+                }
+
+                // TODO: btnFiles
+
                 /***
                  *      __  __
                  *     |  \/  | ___ _ __  _   _
@@ -1390,20 +1441,18 @@ public class PnlReport extends NursingRecordsPanel {
                     });
                 }
             });
-
-//        btnFiles.setEnabled(!nreport.isObsolete());
-            if (!nreport.getAttachedFilesConnections().isEmpty()) {
-                JLabel lblNum = new JLabel(Integer.toString(nreport.getAttachedFilesConnections().size()), SYSConst.icon16greenStar, SwingConstants.CENTER);
-                lblNum.setFont(SYSConst.ARIAL14BOLD);
-                lblNum.setForeground(Color.BLACK);
-                lblNum.setHorizontalTextPosition(SwingConstants.CENTER);
-                DefaultOverlayable overlayableBtn = new DefaultOverlayable(btnFiles, lblNum, DefaultOverlayable.SOUTH_EAST);
-                overlayableBtn.setOpaque(false);
-                pnlMenu.add(overlayableBtn);
-            } else {
-                pnlMenu.add(btnFiles);
-            }
-
+            pnlMenu.add(btnFiles);
+//if (!nreport.getAttachedFilesConnections().isEmpty()) {
+//                JLabel lblNum = new JLabel(Integer.toString(nreport.getAttachedFilesConnections().size()), SYSConst.icon16greenStar, SwingConstants.CENTER);
+//                lblNum.setFont(SYSConst.ARIAL14BOLD);
+//                lblNum.setForeground(Color.BLACK);
+//                lblNum.setHorizontalTextPosition(SwingConstants.CENTER);
+//                DefaultOverlayable overlayableBtn = new DefaultOverlayable(btnFiles, lblNum, DefaultOverlayable.SOUTH_EAST);
+//                overlayableBtn.setOpaque(false);
+//                pnlMenu.add(overlayableBtn);
+//            } else {
+//                pnlMenu.add(btnFiles);
+//            }
 
             /***
              *      _     _         ____

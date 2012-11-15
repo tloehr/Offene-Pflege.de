@@ -127,7 +127,26 @@ public class PnlNursingProcess extends NursingRecordsPanel {
     public void reload() {
         cleanup();
         listNP = NursingProcessTools.getAll(resident);
-        Collections.sort(listNP);
+        Collections.sort(listNP, new Comparator<NursingProcess>() {
+            @Override
+            public int compare(NursingProcess o1, NursingProcess o2) {
+                int result = 0;
+
+                if (result == 0 && !o1.isClosed() && o2.isClosed()) {
+                    result = -1;
+                }
+
+                if (result == 0 && o1.isClosed() && !o2.isClosed()) {
+                    result = 1;
+                }
+
+                if (result == 0) {
+                    result = o1.getFrom().compareTo(o2.getFrom()) * -1;
+                }
+
+                return result;
+            }
+        });
         reloadDisplay();
     }
 
@@ -824,16 +843,11 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     myOldNP.setUserOFF(em.merge(OPDE.getLogin().getUser()));
                                     myOldNP.setTo(new DateTime().minusSeconds(1).toDate());
                                     NPControl lastValidation = em.merge(new NPControl(myNewNP.getSituation(), myOldNP));
+                                    lastValidation.setLastValidation(true);
                                     myOldNP.getEvaluations().add(lastValidation);
 
                                     // Starts 1 second after the old one stopped
                                     myNewNP.setFrom(new DateTime(myOldNP.getTo()).plusSeconds(1).toDate());
-
-                                    // DFNs to delete
-                                    Query delQuery = em.createQuery("DELETE FROM DFN dfn WHERE dfn.nursingProcess = :nursingprocess AND dfn.state = :status ");
-                                    delQuery.setParameter("nursingprocess", myOldNP);
-                                    delQuery.setParameter("status", DFNTools.STATE_OPEN);
-                                    delQuery.executeUpdate();
 
                                     // Create new DFNs according to plan
                                     DFNTools.generate(em, myNewNP.getInterventionSchedule(), new DateMidnight(), true);
@@ -897,6 +911,8 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                             if (o != null) {
                                 popup.hidePopup();
 
+                                Pair<NursingProcess, String> result = (Pair<NursingProcess, String>) o;
+
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();
@@ -907,14 +923,9 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
                                     myOldNP.setUserOFF(em.merge(OPDE.getLogin().getUser()));
                                     myOldNP.setTo(new Date());
-                                    NPControl lastValidation = em.merge(new NPControl(o.toString(), myOldNP));
+                                    NPControl lastValidation = em.merge(new NPControl(result.getSecond(), myOldNP));
+                                    lastValidation.setLastValidation(true);
                                     myOldNP.getEvaluations().add(lastValidation);
-
-                                    // DFNs to delete
-                                    Query delQuery = em.createQuery("DELETE FROM DFN dfn WHERE dfn.nursingProcess = :nursingprocess AND dfn.state = :status ");
-                                    delQuery.setParameter("nursingprocess", myOldNP);
-                                    delQuery.setParameter("status", DFNTools.STATE_OPEN);
-                                    delQuery.executeUpdate();
 
                                     em.getTransaction().commit();
 
@@ -950,7 +961,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                 reloadDisplay();
                             }
                         }
-                    });
+                    }, true);
 
                     popup.setMovable(false);
                     popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
@@ -1053,7 +1064,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
             btnDelete.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<b>" + np.getTopic() + "</b>" + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
+                    new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<br/><b>" + np.getTopic() + "</b><br/>" + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
                         @Override
                         public void execute(Object o) {
                             if (o.equals(JOptionPane.YES_OPTION)) {
@@ -1073,9 +1084,12 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     em.remove(myOldNP);
                                     em.getTransaction().commit();
 
+
                                     // Refresh Display
                                     valuecache.get(np.getCategory()).remove(np);
                                     contenPanelMap.remove(np);
+
+                                    createCP4(myOldNP.getCategory());
                                     buildPanel();
 
                                     OPDE.getDisplayManager().addSubMessage(DisplayManager.getSuccessMessage(np.getTopic(), "deleted"));
@@ -1176,7 +1190,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                 reloadDisplay();
                             }
                         }
-                    });
+                    }, false);
 
                     popup.setMovable(false);
                     popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
@@ -1185,7 +1199,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                     popup.removeExcludedComponent(btnEval);
                     popup.setDefaultFocusComponent(dlg);
 
-                    GUITools.showPopup(popup, SwingConstants.WEST);
+                    GUITools.showPopup(popup, SwingConstants.NORTH_WEST);
                 }
             });
 
