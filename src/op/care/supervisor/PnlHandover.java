@@ -872,7 +872,7 @@ public class PnlHandover extends NursingRecordsPanel {
          *     |_| \_|\___| \_/\_/
          *
          */
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
             JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".tooltips.btnadd"), SYSConst.icon22add, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {

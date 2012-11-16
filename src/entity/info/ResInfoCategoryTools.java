@@ -7,9 +7,6 @@ import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import javax.swing.*;
-import java.awt.*;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -64,8 +61,8 @@ public class ResInfoCategoryTools {
         long begin = System.currentTimeMillis();
         String katart = "0";   // a little trick. 0 is always viable
 
-        katart += OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlInfo.internalClassID, InternalClassACL.USER1) ? "," + STAMMDATEN : ""; // Stammdaten
-        katart += OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlInfo.internalClassID, InternalClassACL.USER2) ? "," + VERWALTUNG : ""; // Verwaltung
+        katart += OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, PnlInfo.internalClassID) ? "," + STAMMDATEN : ""; // Stammdaten
+        katart += OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER2, PnlInfo.internalClassID) ? "," + VERWALTUNG : ""; // Verwaltung
 
         // katart below 1000 is accessible for everyone
         EntityManager em = OPDE.createEM();

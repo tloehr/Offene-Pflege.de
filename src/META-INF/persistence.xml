@@ -18,7 +18,6 @@
         <class>entity.prescription.Hospital</class>
         <class>entity.nursingprocess.InterventionSchedule</class>
         <class>entity.nursingprocess.Intervention</class>
-
         <class>entity.reports.NR2User</class>
         <class>entity.reports.NReportTAGS</class>
         <class>entity.reports.NReport</class>
@@ -34,6 +33,7 @@
         <class>entity.files.SYSNR2FILE</class>
         <class>entity.files.SYSVAL2FILE</class>
         <class>entity.files.SYSPRE2FILE</class>
+        <class>entity.files.SYSNP2FILE</class>
         <class>entity.info.ResInfo</class>
         <class>entity.info.ResInfoCategory</class>
         <class>entity.info.ResInfoType</class>

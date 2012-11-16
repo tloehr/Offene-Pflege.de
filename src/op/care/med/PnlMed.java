@@ -418,7 +418,7 @@ public class PnlMed extends CleanablePanel {
         }
 
 
-//        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
+//        if (OPDE.getAppInfo().isAllowedTo(internalClassID, InternalClassACL.INSERT)) {
 //            JideButton addButton = GUITools.createHyperlinkButton("Neues Medikament", new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
 //                @Override
 //                public void actionPerformed(ActionEvent actionEvent) {
@@ -427,7 +427,7 @@ public class PnlMed extends CleanablePanel {
 //            mypanel.add(addButton);
 //        }
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
             final JideButton addButton = GUITools.createHyperlinkButton("Medikamenten-Assistent", new ImageIcon(getClass().getResource("/artwork/22x22/wizard.png")), null);
 
             addButton.addActionListener(new ActionListener() {
@@ -471,7 +471,7 @@ public class PnlMed extends CleanablePanel {
             mypanel.add(addButton);
         }
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
             JideButton buchenButton = GUITools.createHyperlinkButton("Medikamente einbuchen", new ImageIcon(getClass().getResource("/artwork/22x22/shetaddrow.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {

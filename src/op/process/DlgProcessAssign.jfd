@@ -280,14 +280,6 @@
           <void property="name"> 
            <string>listUnassigned</string> 
           </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.MouseListener</string> 
-            <string>mouseClicked</string> 
-            <string>listUnassignedMouseClicked</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
          </object> 
         </void> 
        </object> 

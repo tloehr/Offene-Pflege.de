@@ -90,7 +90,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
     private Collection<SYSINF2PROCESS> attachedResInfoConnections;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "qProcess")
     private Collection<SYSNP2PROCESS> attachedNursingProcesses;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
@@ -162,7 +162,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         } else if (element instanceof ResInfo) {
             getAttachedResInfoConnections().remove(element);
         } else if (element instanceof NursingProcess) {
-            getAttachedNursingProcesses().remove(element);
+            getAttachedNursingProcessesConnections().remove(element);
         } else {
 
         }
@@ -188,7 +188,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         return attachedResInfoConnections;
     }
 
-    public Collection<SYSNP2PROCESS> getAttachedNursingProcesses() {
+    public Collection<SYSNP2PROCESS> getAttachedNursingProcessesConnections() {
         return attachedNursingProcesses;
     }
 

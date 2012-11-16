@@ -27,6 +27,7 @@ package entity.files;
 
 import entity.info.ResInfo;
 import entity.info.Resident;
+import entity.nursingprocess.NursingProcess;
 import entity.prescription.Prescription;
 import entity.reports.NReport;
 import entity.values.ResValue;
@@ -123,6 +124,10 @@ public class SYSFilesTools {
             bw = ((Prescription) attachable).getResident();
         } else if (attachable instanceof ResInfo) {
             bw = ((ResInfo) attachable).getResident();
+        } else if (attachable instanceof ResValue) {
+            bw = ((ResValue) attachable).getResident();
+        } else if (attachable instanceof NursingProcess) {
+            bw = ((NursingProcess) attachable).getResident();
         }
         return putFiles(files, bw, attachable);
     }
@@ -156,6 +161,10 @@ public class SYSFilesTools {
                                 SYSVAL2FILE link = em.merge(new SYSVAL2FILE(sysfile, (ResValue) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getValAssignCollection().add(link);
                                 ((ResValue) attachable).getAttachedFilesConnections().add(link);
+                            } else if (attachable instanceof NursingProcess) {
+                                SYSNP2FILE link = em.merge(new SYSNP2FILE(sysfile, (NursingProcess) attachable, OPDE.getLogin().getUser(), new Date()));
+                                sysfile.getNpAssignCollection().add(link);
+                                ((NursingProcess) attachable).getAttachedFilesConnections().add(link);
                             }
                         }
                         successful.add(sysfile);

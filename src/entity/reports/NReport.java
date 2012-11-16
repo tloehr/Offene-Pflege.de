@@ -250,6 +250,10 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         return editedBy != null && replacedBy == null && replacementFor == null;
     }
 
+    /**
+     *
+     * @return true if and only if the report is deleted or replaced
+     */
     public boolean isObsolete() {
         return isDeleted() || isReplaced();
     }
@@ -334,7 +338,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         return list;
     }
 
-    public Collection<SYSNR2PROCESS> getAttachedProcessConnections() {
+    public Collection<SYSNR2PROCESS> getAttachedQProcessConnections() {
         return attachedProcessConnections;
     }
 

@@ -123,11 +123,12 @@ public class AppInfo {
      * Die DB Tabelle "ACL" enthält zuordnungen der jeweiligen ACLs zu Gruppen. Anhand dieser Einträge wird ermittelt, ob
      * eine Operation erlaubt ist oder nicht. Natürlich darf ein Admin immer alles.
      *
-     * @param internalClassID - Interne Klassenname, wie in appinfo.properties vereinbart. Nicht zu verwechseln mit den Java Klassennamen.
+     *
      * @param acl
+     * @param internalClassID - Interne Klassenname, wie in appinfo.properties vereinbart. Nicht zu verwechseln mit den Java Klassennamen.
      * @return
      */
-    public boolean userHasAccessLevelForThisClass(String internalClassID, short acl) {
+    public boolean isAllowedTo(short acl, String internalClassID) {
         boolean allowed = true;
         if (!OPDE.isAdmin()) {
             EntityManager em = OPDE.createEM();

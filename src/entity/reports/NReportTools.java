@@ -333,7 +333,7 @@ public class NReportTools {
 //        if (!nReport.getAttachedFilesConnections().isEmpty()) {
 //            result += "<font color=\"green\">&#9679;</font>";
 //        }
-//        if (!nReport.getAttachedProcessConnections().isEmpty()) {
+//        if (!nReport.getAttachedQProcessConnections().isEmpty()) {
 //            result += "<font color=\"red\">&#9679;</font>";
 //        }
 

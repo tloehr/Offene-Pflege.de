@@ -133,6 +133,7 @@ public class PnlDFN extends NursingRecordsPanel {
 
         initPhase = true;
         jdcDate.setMinSelectableDate(DFNTools.getMinDatum(bewohner));
+        jdcDate.setMaxSelectableDate(new Date());
         jdcDate.setDate(new Date());
         initPhase = false;
 
@@ -360,7 +361,7 @@ public class PnlDFN extends NursingRecordsPanel {
             cptitle.getButton().setToolTipText(OPDE.lang.getString(internalClassID + ".enforced.tooltip") + ": " + DateFormat.getDateInstance().format(dfn.getStDatum()));
         }
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE) && (dfn.isOnDemand() || !dfn.getNursingProcess().isClosed())) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) && (dfn.isOnDemand() || !dfn.getNursingProcess().isClosed())) {
             /***
              *      _     _            _                _
              *     | |__ | |_ _ __    / \   _ __  _ __ | |_   _
@@ -763,17 +764,7 @@ public class PnlDFN extends NursingRecordsPanel {
         jdcDate.setFont(new Font("Arial", Font.PLAIN, 14));
 
         jdcDate.setBackground(Color.WHITE);
-        jdcDate.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (initPhase) {
-                    return;
-                }
-                if (evt.getPropertyName().equals("date")) {
-                    reloadDisplay();
-                }
-            }
-        });
+
         list.add(jdcDate);
 
         JPanel buttonPanel = new JPanel();
@@ -781,7 +772,7 @@ public class PnlDFN extends NursingRecordsPanel {
         buttonPanel.setLayout(new HorizontalLayout(5));
         buttonPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
 
-        JButton homeButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_start.png")));
+        final JButton homeButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_start.png")));
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -795,7 +786,7 @@ public class PnlDFN extends NursingRecordsPanel {
         homeButton.setContentAreaFilled(false);
         homeButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        JButton backButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_back.png")));
+        final JButton backButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_back.png")));
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -810,7 +801,7 @@ public class PnlDFN extends NursingRecordsPanel {
         backButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
 
-        JButton fwdButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_play.png")));
+        final JButton fwdButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_play.png")));
         fwdButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -824,7 +815,7 @@ public class PnlDFN extends NursingRecordsPanel {
         fwdButton.setContentAreaFilled(false);
         fwdButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        JButton endButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_end.png")));
+        final JButton endButton = new JButton(new ImageIcon(getClass().getResource("/artwork/32x32/bw/player_end.png")));
         endButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -846,6 +837,27 @@ public class PnlDFN extends NursingRecordsPanel {
 
         list.add(buttonPanel);
 
+        jdcDate.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (initPhase) {
+                    return;
+                }
+//                DateMidnight now = new DateMidnight();
+                DateMidnight selected = new DateMidnight(jdcDate.getDate());
+                DateMidnight min = new DateMidnight(jdcDate.getMinSelectableDate());
+                DateMidnight max = new DateMidnight(jdcDate.getMaxSelectableDate());
+                fwdButton.setEnabled(selected.isBefore(max));
+                backButton.setEnabled(selected.isAfter(min));
+
+                if (evt.getPropertyName().equals("date")) {
+                    reloadDisplay();
+                }
+            }
+        });
+
+        fwdButton.setEnabled(false);
+
         return list;
     }
 
@@ -862,7 +874,7 @@ public class PnlDFN extends NursingRecordsPanel {
          *     |_.__/ \__|_| |_/_/   \_\__,_|\__,_|
          *
          */
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
 
             final JideButton btnAdd = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".btnadd"), SYSConst.icon22add, null);
             btnAdd.addActionListener(new ActionListener() {

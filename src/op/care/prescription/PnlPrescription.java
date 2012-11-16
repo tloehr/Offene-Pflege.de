@@ -426,7 +426,7 @@ public class PnlPrescription extends NursingRecordsPanel {
     private java.util.List<Component> addCommands() {
         java.util.List<Component> list = new ArrayList<Component>();
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             JideButton addRegular = GUITools.createHyperlinkButton(internalClassID + ".btnNewRegular", SYSConst.icon22add, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -485,7 +485,7 @@ public class PnlPrescription extends NursingRecordsPanel {
             list.add(addRegular);
         }
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             JideButton addNewOnDemand = GUITools.createHyperlinkButton(internalClassID + ".btnNewOnDemand", SYSConst.icon22add, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -545,7 +545,7 @@ public class PnlPrescription extends NursingRecordsPanel {
             list.add(addNewOnDemand);
         }
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             JideButton buchenButton = GUITools.createHyperlinkButton(internalClassID + ".newstocks", new ImageIcon(getClass().getResource("/artwork/22x22/shetaddrow.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -556,7 +556,7 @@ public class PnlPrescription extends NursingRecordsPanel {
             list.add(buchenButton);
         }
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
             JideButton printPrescription = GUITools.createHyperlinkButton(internalClassID + ".print", SYSConst.icon22print2, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -599,7 +599,7 @@ public class PnlPrescription extends NursingRecordsPanel {
         JPanel pnlMenu = new JPanel(new VerticalLayout());
 
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
 
             final boolean prescriptionHasBeenUsedAlready = BHPTools.hasBeenUsedAlready(prescription);
             final MedInventory inventory = TradeFormTools.getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm());
@@ -987,7 +987,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                 }
 
             });
-            btnDelete.setEnabled(!prescription.isClosed() && (!prescriptionHasBeenUsedAlready || OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)));
+            btnDelete.setEnabled(!prescription.isClosed() && (!prescriptionHasBeenUsedAlready || OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, internalClassID)));
             pnlMenu.add(btnDelete);
 
             pnlMenu.add(new JSeparator());

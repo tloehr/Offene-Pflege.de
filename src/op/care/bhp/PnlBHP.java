@@ -417,7 +417,7 @@ public class PnlBHP extends NursingRecordsPanel {
         titlePanelright.setLayout(new BoxLayout(titlePanelright, BoxLayout.LINE_AXIS));
 
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             if (!bhp.getPrescription().isClosed()) {
 
 

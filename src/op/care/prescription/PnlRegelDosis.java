@@ -51,6 +51,9 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import org.jdesktop.swingx.*;
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
 
 /**
  * @author tloehr
@@ -123,6 +126,10 @@ public class PnlRegelDosis extends CleanablePanel {
         return null;
     }
 
+    private void txtLDateFocusLost(FocusEvent evt) {
+        SYSCalendar.handleDateFocusLost(evt, new DateTime());
+    }
+
 
     private void initPanel() {
 
@@ -186,8 +193,13 @@ public class PnlRegelDosis extends CleanablePanel {
             tabWdh.setSelectedIndex(TAB_MONTHLY);
         }
 
-        jdcLDatum.setMinSelectableDate(new Date());
-        jdcLDatum.setDate(new Date(Math.max(schedule.getLDatum().getTime(), SYSCalendar.startOfDay())));
+//        jdcLDatum.setMinSelectableDate(new Date());
+//        jdcLDatum.setDate(new Date(Math.max(schedule.getLDatum().getTime(), SYSCalendar.startOfDay())));
+
+        DateMidnight scheduleLDate = new DateMidnight(schedule.getLDatum());
+        DateMidnight today = new DateMidnight();
+        DateMidnight ldate = new DateMidnight(Math.max(scheduleLDate.getMillis(), today.getMillis()));
+        txtLDate.setText(DateFormat.getDateInstance().format(ldate.toDate()));
 
         txtNachtMo.setText(schedule.getNachtMo().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
         txtMorgens.setText(schedule.getMorgens().setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
@@ -291,8 +303,8 @@ public class PnlRegelDosis extends CleanablePanel {
         spinMonatTag = new JSpinner();
         cmbTag = new JComboBox();
         panel2 = new JPanel();
-        jLabel13 = new JLabel();
-        jdcLDatum = new JDateChooser();
+        lblLDate = new JLabel();
+        txtLDate = new JTextField();
         btnSave = new JButton();
 
         //======== this ========
@@ -837,14 +849,19 @@ public class PnlRegelDosis extends CleanablePanel {
             {
                 panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
 
-                //---- jLabel13 ----
-                jLabel13.setText("Erst einplanen ab dem");
-                jLabel13.setFont(new Font("Arial", Font.PLAIN, 14));
-                panel2.add(jLabel13);
+                //---- lblLDate ----
+                lblLDate.setText("Erst einplanen ab dem ");
+                lblLDate.setFont(new Font("Arial", Font.PLAIN, 14));
+                panel2.add(lblLDate);
 
-                //---- jdcLDatum ----
-                jdcLDatum.setFont(new Font("Arial", Font.PLAIN, 14));
-                panel2.add(jdcLDatum);
+                //---- txtLDate ----
+                txtLDate.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtLDateFocusLost(e);
+                    }
+                });
+                panel2.add(txtLDate);
             }
             panelMain.add(panel2, CC.xy(3, 7));
 
@@ -866,7 +883,7 @@ public class PnlRegelDosis extends CleanablePanel {
     public void cleanup() {
         SYSTools.unregisterListeners(this);
 //        jdcLDatum.removePropertyChangeListener(jdcpcl);
-        jdcLDatum.cleanup();
+//        jdcLDatum.cleanup();
     }
 
     private void cbSonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbSonActionPerformed
@@ -973,7 +990,14 @@ public class PnlRegelDosis extends CleanablePanel {
         schedule.setTaeglich(tabWdh.getSelectedIndex() == TAB_DAILY ? Short.parseShort(spinTaeglich.getValue().toString()) : (short) 0);
         schedule.setWoechentlich(tabWdh.getSelectedIndex() == TAB_WEEKLY ? Short.parseShort(spinWoche.getValue().toString()) : (short) 0);
         schedule.setMonatlich(tabWdh.getSelectedIndex() == TAB_MONTHLY ? Short.parseShort(spinMonat.getValue().toString()) : (short) 0);
-        schedule.setLDatum(jdcLDatum.getDate());
+
+        DateMidnight day;
+        try {
+            day = new DateMidnight(SYSCalendar.parseDate(txtLDate.getText()));
+        } catch (NumberFormatException ex) {
+            day = new DateMidnight();
+        }
+        schedule.setLDatum(day.toDate());
 
         schedule.setMon(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbMon.isSelected() ? (short) 1 : (short) 0);
         schedule.setDie(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbDie.isSelected() ? (short) 1 : (short) 0);
@@ -1123,8 +1147,8 @@ public class PnlRegelDosis extends CleanablePanel {
     private JSpinner spinMonatTag;
     private JComboBox cmbTag;
     private JPanel panel2;
-    private JLabel jLabel13;
-    private JDateChooser jdcLDatum;
+    private JLabel lblLDate;
+    private JTextField txtLDate;
     private JButton btnSave;
     // End of variables declaration//GEN-END:variables
 }

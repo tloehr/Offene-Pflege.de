@@ -494,6 +494,22 @@ public class DFNTools {
         return prefix + text + postfix;
     }
 
+    /**
+     * Tells if a certain DFN is changeable (can be clicked in the daily list).
+     * <p>
+     * The following criteria have to be met:
+     * <ul>
+     * <li>The resident must be active</li>
+     * <li>The resident must not be absent</li>
+     * <li>the dfn is either <b>on demand</b> or the connected nursingprocess must be active</li>
+     * <li>there is no owning user assigned or its the same user that is currently logged in and the time period of the last change does not exceed DFN_MAX_MINUTES_TO_WITHDRAW</li>
+     * </ul>
+     * </p>
+     *
+     * <p>Note: DFN_MAX_MINUTES_TO_WITHDRAW is a system parameter which can be changed in the system settings and is stored as a system property with the key &quot;dfn_max_minutes_to_withdraw&quot;</p>
+     * @param dfn
+     * @return
+     */
     public static boolean isChangeable(DFN dfn) {
         int DFN_MAX_MINUTES_TO_WITHDRAW = Integer.parseInt(OPDE.getProps().getProperty("dfn_max_minutes_to_withdraw"));
         boolean residentAbsent = dfn.getResident().isActive() && ResInfoTools.absentSince(dfn.getResident()) != null;

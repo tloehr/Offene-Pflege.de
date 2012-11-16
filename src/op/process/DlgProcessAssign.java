@@ -64,10 +64,6 @@ public class DlgProcessAssign extends MyJDialog {
         cmbPCat.setModel(SYSTools.list2cmb(PCatTools.getPCats()));
     }
 
-    private void listUnassignedMouseClicked(MouseEvent e) {
-        // TODO add your code here
-    }
-
     private void btnRightActionPerformed(ActionEvent e) {
         if (listAssigned.getSelectedValue() == null) {
             return;
@@ -211,12 +207,6 @@ public class DlgProcessAssign extends MyJDialog {
             //---- listUnassigned ----
             listUnassigned.setFont(new Font("Arial", Font.PLAIN, 14));
             listUnassigned.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            listUnassigned.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    listUnassignedMouseClicked(e);
-                }
-            });
             scrollPane2.setViewportView(listUnassigned);
         }
         contentPane.add(scrollPane2, CC.xy(7, 5));

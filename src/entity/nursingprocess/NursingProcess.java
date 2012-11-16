@@ -4,6 +4,7 @@
  */
 package entity.nursingprocess;
 
+import entity.files.SYSNP2FILE;
 import entity.info.ResInfoCategory;
 import entity.info.Resident;
 import entity.process.QProcess;
@@ -99,21 +100,22 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
     // 1:N Relationen
     // ==
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
+    private Collection<SYSNP2FILE> attachedFilesConnections;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
     private Collection<SYSNP2PROCESS> attachedQProcessConnections;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
-    private Collection<NPControl> kontrollen;
+    private Collection<NPControl> npControls;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
-//    @OrderBy("intervention.bezeichnung ASC")
     private List<InterventionSchedule> interventionSchedules;
 
     public NursingProcess() {
     }
 
-    public NursingProcess(Resident bewohner) {
-        this.resident = bewohner;
+    public NursingProcess(Resident resident) {
+        this.resident = resident;
         this.userON = OPDE.getLogin().getUser();
         interventionSchedules = new ArrayList<InterventionSchedule>();
-        kontrollen = new ArrayList<NPControl>();
+        npControls = new ArrayList<NPControl>();
         attachedQProcessConnections = new ArrayList<SYSNP2PROCESS>();
         nextEval = new DateTime().plusWeeks(4).toDate();
         from = new Date();
@@ -143,6 +145,10 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
 
     public void setSituation(String situation) {
         this.situation = situation;
+    }
+
+    public Collection<SYSNP2FILE> getAttachedFilesConnections() {
+        return attachedFilesConnections;
     }
 
     public String getGoal() {
@@ -227,7 +233,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
     }
 
     public Collection<NPControl> getEvaluations() {
-        return kontrollen;
+        return npControls;
     }
 
     public List<InterventionSchedule> getInterventionSchedule() {
@@ -293,7 +299,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
     public ArrayList<QProcess> getAttachedProcesses() {
         ArrayList<QProcess> list = new ArrayList<QProcess>();
         for (SYSNP2PROCESS att : attachedQProcessConnections) {
-            list.add(att.getVorgang());
+            list.add(att.getQProcess());
         }
         return list;
     }
@@ -346,7 +352,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
         return result;
     }
 
-    public NursingProcess(String topic, String situation, String goal, Date from, Date to, long npseries, Date nextEval, Long version, Users userON, Users userOFF, Resident bewohner, ResInfoCategory category, Collection<SYSNP2PROCESS> attachedQProcessConnections, Collection<NPControl> kontrollen, List<InterventionSchedule> interventionSchedules) {
+    public NursingProcess(String topic, String situation, String goal, Date from, Date to, long npseries, Date nextEval, Long version, Users userON, Users userOFF, Resident bewohner, ResInfoCategory category, Collection<SYSNP2PROCESS> attachedQProcessConnections, Collection<NPControl> npControls, List<InterventionSchedule> interventionSchedules) {
         this.topic = topic;
         this.situation = situation;
         this.goal = goal;
@@ -360,7 +366,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
         this.resident = bewohner;
         this.category = category;
         this.attachedQProcessConnections = attachedQProcessConnections;
-        this.kontrollen = kontrollen;
+        this.npControls = npControls;
         this.interventionSchedules = interventionSchedules;
     }
 

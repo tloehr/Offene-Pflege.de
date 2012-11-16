@@ -213,10 +213,10 @@ public class PnlFiles extends NursingRecordsPanel {
                 }
             });
             menu.add(itemPopupShow);
-//            itemPopupShow.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.SELECT));
+//            itemPopupShow.setEnabled(OPDE.getAppInfo().isAllowedTo(internalClassID, InternalClassACL.SELECT));
 
 
-            if (col == TMSYSFiles.COL_DESCRIPTION && OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+            if (col == TMSYSFiles.COL_DESCRIPTION && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
 
                 final JMenuItem itemPopupEdit = new JMenuItem(OPDE.lang.getString("misc.commands.edit"), SYSConst.icon22edit3);
                 itemPopupEdit.addActionListener(new java.awt.event.ActionListener() {
@@ -278,7 +278,7 @@ public class PnlFiles extends NursingRecordsPanel {
             }
 
 
-            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {
+            if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, internalClassID)) {
                 JMenuItem itemPopupDelete = new JMenuItem(OPDE.lang.getString("misc.commands.delete"), SYSConst.icon22delete);
                 itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
 
@@ -323,7 +323,7 @@ public class PnlFiles extends NursingRecordsPanel {
         searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
         jspSearch.setViewportView(searchPanes);
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             searchPanes.add(addCommands());
         }
 //        searchPanes.add(addFilters());

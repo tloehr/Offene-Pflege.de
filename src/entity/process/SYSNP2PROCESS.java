@@ -15,12 +15,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "SYSNP2PROCESS")
-//@NamedQueries({
-//        @NamedQuery(name = "SYSNP2PROCESS.findActiveAssignedVorgaengeByElement", query = " " +
-//                " SELECT s.vorgang FROM SYSNP2PROCESS s WHERE s.nursingProcess = :element AND s.vorgang.to = '9999-12-31 23:59:59' "),
-//        @NamedQuery(name = "SYSNP2PROCESS.findByElementAndVorgang", query = " " +
-//                " SELECT s FROM SYSNP2PROCESS s WHERE s.nursingProcess = :element AND s.vorgang = :process AND s.vorgang.to = '9999-12-31 23:59:59' ")
-//})
+
 public class SYSNP2PROCESS {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +24,7 @@ public class SYSNP2PROCESS {
 
     @ManyToOne
     @JoinColumn(name = "VorgangID", referencedColumnName = "VorgangID")
-    private QProcess vorgang;
+    private QProcess qProcess;
 
     @ManyToOne
     @JoinColumn(name = "PlanID", referencedColumnName = "PlanID")
@@ -38,18 +33,18 @@ public class SYSNP2PROCESS {
     protected SYSNP2PROCESS() {
     }
 
-    public SYSNP2PROCESS(QProcess vorgang, NursingProcess nursingProcess) {
+    public SYSNP2PROCESS(QProcess qProcess, NursingProcess nursingProcess) {
         this.id = 0;
-        this.vorgang = vorgang;
+        this.qProcess = qProcess;
         this.nursingProcess = nursingProcess;
     }
 
-    public QProcess getVorgang() {
-        return vorgang;
+    public QProcess getQProcess() {
+        return qProcess;
     }
 
-    public void setVorgang(QProcess vorgang) {
-        this.vorgang = vorgang;
+    public void setQProcess(QProcess qProcess) {
+        this.qProcess = qProcess;
     }
 
     public NursingProcess getNursingProcess() {

@@ -516,7 +516,7 @@ public class FrmMain extends JFrame {
         }
 
         // Darf auf das Archiv zugreifen
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlInfo.internalClassID, InternalClassACL.ARCHIVE)) { // => ACLMATRIX
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, PnlInfo.internalClassID)) { // => ACLMATRIX
             panesApps.add(addNursingRecords(null));
         }
 

@@ -26,6 +26,7 @@
 package entity.files;
 
 import entity.info.Resident;
+import entity.process.SYSNP2PROCESS;
 import entity.system.Users;
 
 import javax.persistence.*;
@@ -73,7 +74,6 @@ public class SYSFiles implements Serializable, Comparable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "OCFID")
     private Long ocfid;
     @Version
@@ -115,6 +115,8 @@ public class SYSFiles implements Serializable, Comparable {
     private Collection<SYSPRE2FILE> verAssignCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
     private Collection<SYSVAL2FILE> valAssignCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
+    private Collection<SYSNP2FILE> npAssignCollection;
 
     public SYSFiles() {
     }
@@ -157,6 +159,10 @@ public class SYSFiles implements Serializable, Comparable {
 
     public Collection<SYSPRE2FILE> getVerAssignCollection() {
         return verAssignCollection;
+    }
+
+    public Collection<SYSNP2FILE> getNpAssignCollection() {
+        return npAssignCollection;
     }
 
     public Long getOcfid() {

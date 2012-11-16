@@ -224,7 +224,7 @@ public class PnlInventory extends NursingRecordsPanel {
     private java.util.List<Component> addCommands() {
         java.util.List<Component> list = new ArrayList<Component>();
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.INSERT)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
             JideButton buchenButton = GUITools.createHyperlinkButton(internalClassID + ".newstocks", SYSConst.icon22add, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -381,7 +381,7 @@ public class PnlInventory extends NursingRecordsPanel {
         cpInventory.setTitleLabelComponent(cptitle.getMain());
         cpInventory.setSlidingDirection(SwingConstants.SOUTH);
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)) {
             /***
              *       ____ _                ___                      _
              *      / ___| | ___  ___  ___|_ _|_ ____   _____ _ __ | |_ ___  _ __ _   _
@@ -456,7 +456,7 @@ public class PnlInventory extends NursingRecordsPanel {
             btnCloseInventory.setEnabled(!inventory.isClosed());
             cptitle.getRight().add(btnCloseInventory);
         }
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, internalClassID)) {
             /***
              *      ____       _ ___                      _
              *     |  _ \  ___| |_ _|_ ____   _____ _ __ | |_ ___  _ __ _   _
@@ -663,7 +663,7 @@ public class PnlInventory extends NursingRecordsPanel {
 //            btnPrintLabel.setEnabled(stock.isClosed() && openedStock == null);
             cptitle.getRight().add(btnPrintLabel);
 
-            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {
+            if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, internalClassID)) {
                 /***
                  *      ____       _   ____  _             _
                  *     |  _ \  ___| | / ___|| |_ ___   ___| | __
@@ -1155,7 +1155,7 @@ public class PnlInventory extends NursingRecordsPanel {
 //                pnlTitle.getLeft().addMouseListener();
 
 
-                if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {
+                if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, internalClassID)) {
                     /***
                      *      ____       _ _______  __
                      *     |  _ \  ___| |_   _\ \/ /
@@ -1367,7 +1367,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
             if (stock != null) {
                 if (!resident.equals(stock.getInventory().getResident())) {
-                    if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlInfo.internalClassID, InternalClassACL.ARCHIVE)) { // => ACLMATRIX
+                    if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, PnlInfo.internalClassID)) { // => ACLMATRIX
                         switchResident(stock.getInventory().getResident(), stock.getInventory());
                     } else {
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.noarchiveaccess"));

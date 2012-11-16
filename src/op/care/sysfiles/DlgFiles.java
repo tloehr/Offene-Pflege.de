@@ -7,6 +7,7 @@ package op.care.sysfiles;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.info.ResInfo;
+import entity.nursingprocess.NursingProcess;
 import entity.prescription.Prescription;
 import entity.reports.NReport;
 import entity.files.SYSFiles;
@@ -155,10 +156,13 @@ public class DlgFiles extends MyJDialog {
                 + " WHERE sf.bwinfo = :bwinfo ");
             query.setParameter("bwinfo", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
-
         } else if (attachable instanceof ResValue) {
             Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.valAssignCollection sf WHERE sf.value = :resval ");
             query.setParameter("resval", attachable);
+            files = new ArrayList<SYSFiles>(query.getResultList());
+        } else if (attachable instanceof NursingProcess) {
+            Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.npAssignCollection sf WHERE sf.nursingProcess = :np ");
+            query.setParameter("np", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
         }
         Collections.sort(files);

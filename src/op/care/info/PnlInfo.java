@@ -462,7 +462,7 @@ public class PnlInfo extends NursingRecordsPanel {
         btnAdd.setEnabled(type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_NOCONSTRAINTS || type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS || !valuecache.containsKey(type) || valuecache.get(type).isEmpty() || containsOnlyClosedInfos(type));
         cptitle.getRight().add(btnAdd);
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
             final JButton btnPrint = new JButton(SYSConst.icon22print2);
             btnPrint.setPressedIcon(SYSConst.icon22print2Pressed);
             btnPrint.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -547,7 +547,7 @@ public class PnlInfo extends NursingRecordsPanel {
 
         List<Component> list = new ArrayList<Component>();
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)) {
             /***
              *                          ____           _     _            _
              *      _ __   _____      _|  _ \ ___  ___(_) __| | ___ _ __ | |_
@@ -759,7 +759,7 @@ public class PnlInfo extends NursingRecordsPanel {
             list.add(btnBWMovedOut);
         }
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             /***
              *      _          _
              *     (_)___     / \__      ____ _ _   _
@@ -914,7 +914,7 @@ public class PnlInfo extends NursingRecordsPanel {
          *     |_|   |_|  |_|_| |_|\__|
          *
          */
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
             final JButton btnPrint = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.print"), SYSConst.icon22print2, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -1027,7 +1027,7 @@ public class PnlInfo extends NursingRecordsPanel {
 
         final JPanel pnlMenu = new JPanel(new VerticalLayout());
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             /***
              *       ____ _
              *      / ___| |__   __ _ _ __   __ _  ___
@@ -1216,8 +1216,8 @@ public class PnlInfo extends NursingRecordsPanel {
             pnlMenu.add(btnEdit);
         }
 
-//        btnDelete.setEnabled(!prescription.isClosed() && (!prescriptionHasBeenUsedAlready || OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)));
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {
+//        btnDelete.setEnabled(!prescription.isClosed() && (!prescriptionHasBeenUsedAlready || OPDE.getAppInfo().isAllowedTo(internalClassID, InternalClassACL.MANAGER)));
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, internalClassID)) {
             /***
              *      ____       _      _
              *     |  _ \  ___| | ___| |_ ___
@@ -1271,7 +1271,7 @@ public class PnlInfo extends NursingRecordsPanel {
             });
             pnlMenu.add(btnDelete);
         }
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             /***
              *      ____           _           _
              *     |  _ \ ___ _ __(_) ___   __| |

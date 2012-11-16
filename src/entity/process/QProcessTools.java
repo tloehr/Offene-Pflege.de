@@ -81,7 +81,7 @@ public class QProcessTools {
             query = em.createQuery("SELECT s FROM SYSINF2PROCESS s WHERE s.bwinfo = :element AND s.vorgang = :process AND s.vorgang.to = '9999-12-31 23:59:59'");
             elementBezeichnung = "SYSINF2PROCESS";
         } else if (element instanceof NursingProcess) {
-            query = em.createQuery("SELECT s FROM SYSNP2PROCESS s WHERE s.nursingProcess = :element AND s.vorgang = :process AND s.vorgang.to = '9999-12-31 23:59:59'");
+            query = em.createQuery("SELECT s FROM SYSNP2PROCESS s WHERE s.nursingProcess = :element AND s.qProcess = :process AND s.qProcess.to = '9999-12-31 23:59:59'");
             elementBezeichnung = "SYSNP2PROCESS";
         } else {
 

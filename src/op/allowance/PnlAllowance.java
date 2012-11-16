@@ -328,7 +328,7 @@ public class PnlAllowance extends CleanablePanel {
         });
         titlePanelright.add(btnCollapseAll);
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
             /***
              *      ____       _       _   ____           _     _            _
              *     |  _ \ _ __(_)_ __ | |_|  _ \ ___  ___(_) __| | ___ _ __ | |_
@@ -1003,7 +1003,7 @@ public class PnlAllowance extends CleanablePanel {
         });
         list.add(btnNewTX);
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)) {
             final JideButton btnPrintStat = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".printstat"), SYSConst.icon22calc, null);
             btnPrintStat.addActionListener(new ActionListener() {
                 @Override
@@ -1112,7 +1112,7 @@ public class PnlAllowance extends CleanablePanel {
                         "</font></html>");
                 singlePaneLeft.add(lblSingle);
 
-                if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+                if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
                     /***
                      *      _____    _ _ _
                      *     | ____|__| (_) |_
@@ -1198,7 +1198,7 @@ public class PnlAllowance extends CleanablePanel {
                     singlePaneRight.add(btnEdit);
                 }
 
-                if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {
+                if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, internalClassID)) {
                     /***
                      *      ____       _      _
                      *     |  _ \  ___| | ___| |_ ___

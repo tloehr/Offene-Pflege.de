@@ -344,7 +344,7 @@ public class PnlValues extends NursingRecordsPanel {
         cpType.setTitleLabelComponent(cptitle.getMain());
         cpType.setSlidingDirection(SwingConstants.SOUTH);
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             /***
              *         _       _     _
              *        / \   __| | __| |
@@ -548,7 +548,7 @@ public class PnlValues extends NursingRecordsPanel {
         });
         cptitle.getRight().add(btnCollapseAll);
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
             /***
              *      ____       _       _ __   __
              *     |  _ \ _ __(_)_ __ | |\ \ / /__  __ _ _ __
@@ -666,7 +666,7 @@ public class PnlValues extends NursingRecordsPanel {
             }
         });
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
             /***
              *      ____       _       _   __  __             _   _
              *     |  _ \ _ __(_)_ __ | |_|  \/  | ___  _ __ | |_| |__
@@ -766,7 +766,7 @@ public class PnlValues extends NursingRecordsPanel {
                     });
                 }
 
-                if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+                if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
                     /***
                      *      _____    _ _ _
                      *     | ____|__| (_) |_
@@ -1208,7 +1208,7 @@ public class PnlValues extends NursingRecordsPanel {
 //    private java.util.List<Component> addCommands() {
 //        java.util.List<Component> list = new ArrayList<Component>();
 //
-//        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+//        if (OPDE.getAppInfo().isAllowedTo(internalClassID, InternalClassACL.UPDATE)) {
 //            JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.new"), SYSConst.icon22add, new ActionListener() {
 //                @Override
 //                public void actionPerformed(ActionEvent actionEvent) {
@@ -1239,7 +1239,7 @@ public class PnlValues extends NursingRecordsPanel {
 //            list.add(addButton);
 //        }
 //
-//        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
+//        if (OPDE.getAppInfo().isAllowedTo(internalClassID, InternalClassACL.PRINT)) {
 //            JideButton printButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.print"), SYSConst.icon22print2, new ActionListener() {
 //                @Override
 //                public void actionPerformed(ActionEvent actionEvent) {

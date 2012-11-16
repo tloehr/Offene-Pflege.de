@@ -233,9 +233,9 @@ public class PnlCare extends NursingRecordsPanel {
         for (int i = 0; i < tabs.length; i++) {
             jtpPflegeakte.add(tabs[i], new JPanel());
         }
-//        jtpPflegeakte.setEnabledAt(TAB_PB, OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlReport.internalClassID, InternalClassACL.EXECUTE));
-//        jtpPflegeakte.setEnabledAt(TAB_FILES, OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlFiles.internalClassID, InternalClassACL.EXECUTE));
-//        jtpPflegeakte.setEnabledAt(TAB_CASH, OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlAllowance.internalClassID, InternalClassACL.EXECUTE));
+//        jtpPflegeakte.setEnabledAt(TAB_PB, OPDE.getAppInfo().isAllowedTo(PnlReport.internalClassID, InternalClassACL.EXECUTE));
+//        jtpPflegeakte.setEnabledAt(TAB_FILES, OPDE.getAppInfo().isAllowedTo(PnlFiles.internalClassID, InternalClassACL.EXECUTE));
+//        jtpPflegeakte.setEnabledAt(TAB_CASH, OPDE.getAppInfo().isAllowedTo(PnlAllowance.internalClassID, InternalClassACL.EXECUTE));
     }
 
 //    private void print(String html) {

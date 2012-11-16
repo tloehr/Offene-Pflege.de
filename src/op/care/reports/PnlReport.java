@@ -31,7 +31,6 @@ import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
-import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import entity.files.SYSFilesTools;
@@ -328,7 +327,7 @@ public class PnlReport extends NursingRecordsPanel {
          *     |_| \_|\___| \_/\_/
          *
          */
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -611,7 +610,7 @@ public class PnlReport extends NursingRecordsPanel {
             }
         });
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
             /***
              *      ____       _       _   __  __             _   _
              *     |  _ \ _ __(_)_ __ | |_|  \/  | ___  _ __ | |_| |__
@@ -723,7 +722,7 @@ public class PnlReport extends NursingRecordsPanel {
 
         GUITools.addExpandCollapseButtons(cpWeek, cptitle.getRight());
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
             final JButton btnPrintWeek = new JButton(SYSConst.icon22print2);
             btnPrintWeek.setPressedIcon(SYSConst.icon22print2Pressed);
             btnPrintWeek.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -817,7 +816,7 @@ public class PnlReport extends NursingRecordsPanel {
             }
         });
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
             final JButton btnPrintDay = new JButton(SYSConst.icon22print2);
             btnPrintDay.setPressedIcon(SYSConst.icon22print2Pressed);
             btnPrintDay.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -924,6 +923,8 @@ public class PnlReport extends NursingRecordsPanel {
                      *
                      */
                     final JButton btnFiles = new JButton(Integer.toString(nreport.getAttachedFilesConnections().size()), SYSConst.icon22greenStar);
+                    btnFiles.setToolTipText(OPDE.lang.getString("misc.btnfiles.tooltip"));
+                    btnFiles.setForeground(Color.BLUE);
                     btnFiles.setHorizontalTextPosition(SwingUtilities.CENTER);
                     btnFiles.setFont(SYSConst.ARIAL18BOLD);
                     btnFiles.setPressedIcon(SYSConst.icon22Pressed);
@@ -932,10 +933,11 @@ public class PnlReport extends NursingRecordsPanel {
                     btnFiles.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     btnFiles.setContentAreaFilled(false);
                     btnFiles.setBorder(null);
+
                     btnFiles.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent actionEvent) {
-                            new DlgFiles(nreport, new Closure() {
+                            Closure fileHandleClosure = OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) ? null : new Closure() {
                                 @Override
                                 public void execute(Object o) {
                                     EntityManager em = OPDE.createEM();
@@ -957,13 +959,115 @@ public class PnlReport extends NursingRecordsPanel {
                                     buildPanel();
                                     GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
                                 }
-                            });
+                            };
+                            new DlgFiles(nreport, fileHandleClosure);
                         }
                     });
                     pnlSingle.getRight().add(btnFiles);
                 }
 
-                // TODO: btnFiles
+
+                if (!nreport.getAttachedQProcessConnections().isEmpty()) {
+                    /***
+                     *      _     _         ____
+                     *     | |__ | |_ _ __ |  _ \ _ __ ___   ___ ___  ___ ___
+                     *     | '_ \| __| '_ \| |_) | '__/ _ \ / __/ _ \/ __/ __|
+                     *     | |_) | |_| | | |  __/| | | (_) | (_|  __/\__ \__ \
+                     *     |_.__/ \__|_| |_|_|   |_|  \___/ \___\___||___/___/
+                     *
+                     */
+                    final JButton btnProcess = new JButton(Integer.toString(nreport.getAttachedQProcessConnections().size()), SYSConst.icon22redStar);
+                    btnProcess.setToolTipText(OPDE.lang.getString("misc.btnprocess.tooltip"));
+                    btnProcess.setForeground(Color.YELLOW);
+                    btnProcess.setHorizontalTextPosition(SwingUtilities.CENTER);
+                    btnProcess.setFont(SYSConst.ARIAL18BOLD);
+                    btnProcess.setPressedIcon(SYSConst.icon22Pressed);
+                    btnProcess.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                    btnProcess.setAlignmentY(Component.TOP_ALIGNMENT);
+                    btnProcess.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    btnProcess.setContentAreaFilled(false);
+                    btnProcess.setBorder(null);
+                    btnProcess.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent actionEvent) {
+                            new DlgProcessAssign(nreport, new Closure() {
+                                @Override
+                                public void execute(Object o) {
+                                    if (o == null) {
+                                        return;
+                                    }
+                                    Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = (Pair<ArrayList<QProcess>, ArrayList<QProcess>>) o;
+
+                                    ArrayList<QProcess> assigned = result.getFirst();
+                                    ArrayList<QProcess> unassigned = result.getSecond();
+
+                                    EntityManager em = OPDE.createEM();
+
+                                    try {
+                                        em.getTransaction().begin();
+
+                                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                        NReport myReport = em.merge(nreport);
+                                        em.lock(myReport, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
+
+                                        for (SYSNR2PROCESS linkObject : myReport.getAttachedQProcessConnections()) {
+                                            if (unassigned.contains(linkObject.getQProcess())) {
+                                                em.remove(em.merge(linkObject));
+                                            }
+                                        }
+
+                                        for (QProcess qProcess : assigned) {
+                                            java.util.List<QProcessElement> listElements = qProcess.getElements();
+                                            if (!listElements.contains(myReport)) {
+                                                QProcess myQProcess = em.merge(qProcess);
+                                                SYSNR2PROCESS myLinkObject = em.merge(new SYSNR2PROCESS(myQProcess, myReport));
+                                                qProcess.getAttachedNReportConnections().add(myLinkObject);
+                                                myReport.getAttachedQProcessConnections().add(myLinkObject);
+                                            }
+                                        }
+
+                                        em.getTransaction().commit();
+
+                                        final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
+
+                                        contentmap.remove(keyNewDay);
+                                        linemap.remove(nreport);
+
+                                        valuecache.get(keyNewDay).remove(nreport);
+                                        valuecache.get(keyNewDay).add(myReport);
+                                        Collections.sort(valuecache.get(keyNewDay));
+
+                                        createCP4Day(new DateMidnight(myReport.getPit()));
+
+                                        buildPanel();
+                                        GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
+                                    } catch (OptimisticLockException ole) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                            OPDE.getMainframe().emptyFrame();
+                                            OPDE.getMainframe().afterLogin();
+                                        } else {
+                                            reloadDisplay(true);
+                                        }
+                                    } catch (Exception e) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        OPDE.fatal(e);
+                                    } finally {
+                                        em.close();
+                                    }
+
+                                }
+                            });
+                        }
+                    });
+                    btnProcess.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
+                    pnlSingle.getRight().add(btnProcess);
+                }
 
                 /***
                  *      __  __
@@ -1074,7 +1178,7 @@ public class PnlReport extends NursingRecordsPanel {
 
         JPanel pnlMenu = new JPanel(new VerticalLayout());
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             /***
              *      _____    _ _ _
              *     | ____|__| (_) |_
@@ -1106,10 +1210,10 @@ public class PnlReport extends NursingRecordsPanel {
                                         em.remove(oldAssignment);
                                     }
                                     oldReport.getAttachedFilesConnections().clear();
-                                    for (SYSNR2PROCESS oldAssignment : oldReport.getAttachedProcessConnections()) {
+                                    for (SYSNR2PROCESS oldAssignment : oldReport.getAttachedQProcessConnections()) {
                                         em.remove(oldAssignment);
                                     }
-                                    oldReport.getAttachedProcessConnections().clear();
+                                    oldReport.getAttachedQProcessConnections().clear();
 
                                     oldReport.setEditedBy(em.merge(OPDE.getLogin().getUser()));
                                     oldReport.setEditDate(new Date());
@@ -1197,10 +1301,10 @@ public class PnlReport extends NursingRecordsPanel {
                                         em.remove(oldAssignment);
                                     }
                                     delReport.getAttachedFilesConnections().clear();
-                                    for (SYSNR2PROCESS oldAssignment : delReport.getAttachedProcessConnections()) {
+                                    for (SYSNR2PROCESS oldAssignment : delReport.getAttachedQProcessConnections()) {
                                         em.remove(oldAssignment);
                                     }
-                                    delReport.getAttachedProcessConnections().clear();
+                                    delReport.getAttachedQProcessConnections().clear();
                                     em.getTransaction().commit();
 
                                     final String keyDay = DateFormat.getDateInstance().format(delReport.getPit());
@@ -1399,9 +1503,9 @@ public class PnlReport extends NursingRecordsPanel {
                     menu.show(btnMinutes, 0, btnMinutes.getHeight());
                 }
             });
-//        btnMinutes.setEnabled(!nreport.isObsolete());
             pnlMenu.add(btnMinutes);
 
+            pnlMenu.add(new JSeparator());
 
             /***
              *      _     _         _____ _ _
@@ -1416,7 +1520,7 @@ public class PnlReport extends NursingRecordsPanel {
             btnFiles.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgFiles(nreport, new Closure() {
+                    Closure fileHandleClosure = nreport.isObsolete() ? null : new Closure() {
                         @Override
                         public void execute(Object o) {
                             EntityManager em = OPDE.createEM();
@@ -1438,21 +1542,13 @@ public class PnlReport extends NursingRecordsPanel {
                             buildPanel();
                             GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
                         }
-                    });
+                    };
+                    new DlgFiles(nreport, fileHandleClosure);
                 }
             });
+
             pnlMenu.add(btnFiles);
-//if (!nreport.getAttachedFilesConnections().isEmpty()) {
-//                JLabel lblNum = new JLabel(Integer.toString(nreport.getAttachedFilesConnections().size()), SYSConst.icon16greenStar, SwingConstants.CENTER);
-//                lblNum.setFont(SYSConst.ARIAL14BOLD);
-//                lblNum.setForeground(Color.BLACK);
-//                lblNum.setHorizontalTextPosition(SwingConstants.CENTER);
-//                DefaultOverlayable overlayableBtn = new DefaultOverlayable(btnFiles, lblNum, DefaultOverlayable.SOUTH_EAST);
-//                overlayableBtn.setOpaque(false);
-//                pnlMenu.add(overlayableBtn);
-//            } else {
-//                pnlMenu.add(btnFiles);
-//            }
+
 
             /***
              *      _     _         ____
@@ -1488,7 +1584,7 @@ public class PnlReport extends NursingRecordsPanel {
                                 em.lock(myReport, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
 
-                                for (SYSNR2PROCESS linkObject : myReport.getAttachedProcessConnections()) {
+                                for (SYSNR2PROCESS linkObject : myReport.getAttachedQProcessConnections()) {
                                     if (unassigned.contains(linkObject.getQProcess())) {
                                         em.remove(em.merge(linkObject));
                                     }
@@ -1500,7 +1596,7 @@ public class PnlReport extends NursingRecordsPanel {
                                         QProcess myQProcess = em.merge(qProcess);
                                         SYSNR2PROCESS myLinkObject = em.merge(new SYSNR2PROCESS(myQProcess, myReport));
                                         qProcess.getAttachedNReportConnections().add(myLinkObject);
-                                        myReport.getAttachedProcessConnections().add(myLinkObject);
+                                        myReport.getAttachedQProcessConnections().add(myLinkObject);
                                     }
                                 }
 
@@ -1542,18 +1638,8 @@ public class PnlReport extends NursingRecordsPanel {
                     });
                 }
             });
+            pnlMenu.add(btnProcess);
 
-            if (!nreport.getAttachedProcessConnections().isEmpty()) {
-                JLabel lblNum = new JLabel(Integer.toString(nreport.getAttachedProcessConnections().size()), SYSConst.icon16redStar, SwingConstants.CENTER);
-                lblNum.setFont(SYSConst.ARIAL14BOLD);
-                lblNum.setForeground(Color.YELLOW);
-                lblNum.setHorizontalTextPosition(SwingConstants.CENTER);
-                DefaultOverlayable overlayableBtn = new DefaultOverlayable(btnProcess, lblNum, DefaultOverlayable.SOUTH_EAST);
-                overlayableBtn.setOpaque(false);
-                pnlMenu.add(overlayableBtn);
-            } else {
-                pnlMenu.add(btnProcess);
-            }
         }
         return pnlMenu;
     }

@@ -250,7 +250,7 @@ public class PnlProcess extends NursingRecordsPanel {
          *     |_.__/ \__|_| |_|_|   |_|  |_|_| |_|\__|
          *
          */
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
             final JButton btnPrint = new JButton(SYSConst.icon22print2);
             btnPrint.setPressedIcon(SYSConst.icon22print2Pressed);
             btnPrint.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -550,7 +550,7 @@ public class PnlProcess extends NursingRecordsPanel {
             list.add(cmbBW);
 
 
-            if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER)) {
+            if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)) {
                 DefaultComboBoxModel dcbm1 = SYSTools.list2cmb(UsersTools.getUsers(false));
                 cmbUser.setModel(dcbm1);
                 dcbm1.insertElementAt(null, 0);
@@ -734,7 +734,7 @@ public class PnlProcess extends NursingRecordsPanel {
          *     |____/ \__|_| |_/_/   \_\__,_|\__,_|
          *
          */
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             final JideButton btnAdd = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".btnadd"), SYSConst.icon22add, null);
             btnAdd.addActionListener(new ActionListener() {
                 @Override
@@ -771,7 +771,7 @@ public class PnlProcess extends NursingRecordsPanel {
     private JPanel getMenu(final QProcess qProcess) {
         final JPanel pnlMenu = new JPanel(new VerticalLayout());
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
 
             /***
              *      _     _            _       _     _ ____  ____                       _
@@ -867,7 +867,7 @@ public class PnlProcess extends NursingRecordsPanel {
         }
 
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             if (!qProcess.isClosed()) {
                 /***
                  *      _     _          ____ _
@@ -991,12 +991,12 @@ public class PnlProcess extends NursingRecordsPanel {
                         });
                     }
                 });
-                btnReopen.setEnabled(OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.MANAGER));
+                btnReopen.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID));
                 pnlMenu.add(btnReopen);
             }
 
         }
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, internalClassID)) {
             /***
              *      _     _         ____       _      _
              *     | |__ | |_ _ __ |  _ \  ___| | ___| |_ ___
@@ -1031,7 +1031,7 @@ public class PnlProcess extends NursingRecordsPanel {
                                     for (SYSNR2PROCESS att : myProcess.getAttachedNReportConnections()) {
                                         em.remove(att);
                                     }
-                                    for (SYSNP2PROCESS att : myProcess.getAttachedNursingProcesses()) {
+                                    for (SYSNP2PROCESS att : myProcess.getAttachedNursingProcessesConnections()) {
                                         em.remove(att);
                                     }
                                     for (SYSINF2PROCESS att : myProcess.getAttachedResInfoConnections()) {
@@ -1072,7 +1072,7 @@ public class PnlProcess extends NursingRecordsPanel {
             });
             pnlMenu.add(btnDelete);
         }
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             /***
              *      _     _         ____            _     _
              *     | |__ | |_ _ __ |  _ \ _____   _(_)___(_) ___  _ __

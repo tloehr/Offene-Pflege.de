@@ -90,7 +90,7 @@ public class PnlWelcome extends CleanablePanel {
         Collections.sort(OPDE.getAppInfo().getMainClasses());
         for (InternalClass ic : OPDE.getAppInfo().getMainClasses()) {
 
-            if (!ic.getInternalClassID().equals(PnlWelcome.internalClassID) && OPDE.getAppInfo().userHasAccessLevelForThisClass(ic.getInternalClassID(), InternalClassACL.EXECUTE)) {
+            if (!ic.getInternalClassID().equals(PnlWelcome.internalClassID) && OPDE.getAppInfo().isAllowedTo(InternalClassACL.EXECUTE, ic.getInternalClassID())) {
 
                 final String shortDescription = ic.getShortDescription();
                 final String longDescription = ic.getLongDescription();
@@ -555,7 +555,7 @@ public class PnlWelcome extends CleanablePanel {
     private java.util.List<Component> addCommands() {
         java.util.List<Component> list = new ArrayList<Component>();
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(PnlInfo.internalClassID, InternalClassACL.MANAGER)) { // => ACLMATRIX
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlInfo.internalClassID)) { // => ACLMATRIX
             JideButton addbw = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".addbw"), SYSConst.icon22addbw, null);
 //            final MyJDialog dlg = new MyJDialog();
             addbw.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());

@@ -38,9 +38,14 @@ import entity.info.ResInfoCategory;
 import entity.info.ResInfoCategoryTools;
 import entity.info.Resident;
 import entity.nursingprocess.*;
+import entity.process.QProcess;
+import entity.process.QProcessElement;
+import entity.process.SYSNP2PROCESS;
 import entity.system.Unique;
 import entity.system.UniqueTools;
 import op.OPDE;
+import op.care.sysfiles.DlgFiles;
+import op.process.DlgProcessAssign;
 import op.system.InternalClassACL;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
@@ -406,6 +411,151 @@ public class PnlNursingProcess extends NursingRecordsPanel {
             DefaultCPTitle cptitle = new DefaultCPTitle(title, null);
             cptitle.getButton().setVerticalTextPosition(SwingConstants.TOP);
 
+
+            if (!np.getAttachedFilesConnections().isEmpty()) {
+                /***
+                 *      _     _         _____ _ _
+                 *     | |__ | |_ _ __ |  ___(_) | ___  ___
+                 *     | '_ \| __| '_ \| |_  | | |/ _ \/ __|
+                 *     | |_) | |_| | | |  _| | | |  __/\__ \
+                 *     |_.__/ \__|_| |_|_|   |_|_|\___||___/
+                 *
+                 */
+                final JButton btnFiles = new JButton(Integer.toString(np.getAttachedFilesConnections().size()), SYSConst.icon22greenStar);
+                btnFiles.setToolTipText(OPDE.lang.getString("misc.btnfiles.tooltip"));
+                btnFiles.setForeground(Color.BLUE);
+                btnFiles.setHorizontalTextPosition(SwingUtilities.CENTER);
+                btnFiles.setFont(SYSConst.ARIAL18BOLD);
+                btnFiles.setPressedIcon(SYSConst.icon22Pressed);
+                btnFiles.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                btnFiles.setAlignmentY(Component.TOP_ALIGNMENT);
+                btnFiles.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnFiles.setContentAreaFilled(false);
+                btnFiles.setBorder(null);
+                btnFiles.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        Closure fileHandleClosure = np.isClosed() ? null : new Closure() {
+                            @Override
+                            public void execute(Object o) {
+                                EntityManager em = OPDE.createEM();
+                                final NursingProcess myNP = em.merge(np);
+                                em.refresh(myNP);
+                                em.close();
+                                // Refresh Display
+                                valuecache.get(np.getCategory()).remove(np);
+                                contenPanelMap.remove(np);
+                                valuecache.get(myNP.getCategory()).add(myNP);
+                                Collections.sort(valuecache.get(myNP.getCategory()));
+
+                                createCP4(myNP.getCategory());
+                                buildPanel();
+                            }
+                        };
+                        new DlgFiles(np, fileHandleClosure);
+                    }
+                });
+                cptitle.getRight().add(btnFiles);
+            }
+
+            if (!np.getAttachedQProcessConnections().isEmpty()) {
+                /***
+                 *      _     _         ____
+                 *     | |__ | |_ _ __ |  _ \ _ __ ___   ___ ___  ___ ___
+                 *     | '_ \| __| '_ \| |_) | '__/ _ \ / __/ _ \/ __/ __|
+                 *     | |_) | |_| | | |  __/| | | (_) | (_|  __/\__ \__ \
+                 *     |_.__/ \__|_| |_|_|   |_|  \___/ \___\___||___/___/
+                 *
+                 */
+                final JButton btnProcess = new JButton(Integer.toString(np.getAttachedQProcessConnections().size()), SYSConst.icon22redStar);
+                btnProcess.setToolTipText(OPDE.lang.getString("misc.btnprocess.tooltip"));
+                btnProcess.setForeground(Color.YELLOW);
+                btnProcess.setHorizontalTextPosition(SwingUtilities.CENTER);
+                btnProcess.setFont(SYSConst.ARIAL18BOLD);
+                btnProcess.setPressedIcon(SYSConst.icon22Pressed);
+                btnProcess.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                btnProcess.setAlignmentY(Component.TOP_ALIGNMENT);
+                btnProcess.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnProcess.setContentAreaFilled(false);
+                btnProcess.setBorder(null);
+                btnProcess.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        new DlgProcessAssign(np, new Closure() {
+                            @Override
+                            public void execute(Object o) {
+                                if (o == null) {
+                                    return;
+                                }
+                                Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = (Pair<ArrayList<QProcess>, ArrayList<QProcess>>) o;
+
+                                ArrayList<QProcess> assigned = result.getFirst();
+                                ArrayList<QProcess> unassigned = result.getSecond();
+
+                                EntityManager em = OPDE.createEM();
+
+                                try {
+                                    em.getTransaction().begin();
+
+                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                    final NursingProcess myNP = em.merge(np);
+                                    em.lock(myNP, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
+                                    for (SYSNP2PROCESS linkObject : myNP.getAttachedQProcessConnections()) {
+                                        if (unassigned.contains(linkObject.getQProcess())) {
+                                            em.remove(em.merge(linkObject));
+                                        }
+                                    }
+
+                                    for (QProcess qProcess : assigned) {
+                                        java.util.List<QProcessElement> listElements = qProcess.getElements();
+                                        if (!listElements.contains(myNP)) {
+                                            QProcess myQProcess = em.merge(qProcess);
+                                            SYSNP2PROCESS myLinkObject = em.merge(new SYSNP2PROCESS(myQProcess, myNP));
+                                            qProcess.getAttachedNursingProcessesConnections().add(myLinkObject);
+                                            myNP.getAttachedQProcessConnections().add(myLinkObject);
+                                        }
+                                    }
+
+                                    em.getTransaction().commit();
+
+                                    // Refresh Display
+                                    valuecache.get(np.getCategory()).remove(np);
+                                    contenPanelMap.remove(np);
+                                    valuecache.get(myNP.getCategory()).add(myNP);
+                                    Collections.sort(valuecache.get(myNP.getCategory()));
+
+                                    createCP4(myNP.getCategory());
+                                    buildPanel();
+
+                                } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    } else {
+                                        reloadDisplay();
+                                    }
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+
+                            }
+                        });
+                    }
+                });
+                btnProcess.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
+                cptitle.getRight().add(btnProcess);
+            }
+
+
             /***
              *      __  __
              *     |  \/  | ___ _ __  _   _
@@ -569,7 +719,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
          *     |_| \_|\___| \_/\_/
          *
          */
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.new"), SYSConst.icon22add, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -784,7 +934,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
         final JPanel pnlMenu = new JPanel(new VerticalLayout());
         long numDFNs = DFNTools.getNumDFNs(np);
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.PRINT)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
             /***
              *      _     _         ____       _       _
              *     | |__ | |_ _ __ |  _ \ _ __(_)_ __ | |_
@@ -806,7 +956,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
         }
 
 
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             /***
              *       ____ _
              *      / ___| |__   __ _ _ __   __ _  ___
@@ -1058,7 +1208,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
          *     |____/ \__,_|\__|\__\___/|_| |_| |____/ \___|_|\___|\__\___|
          *
          */
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.DELETE)) {  // => ACL_MATRIX
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, internalClassID)) {  // => ACL_MATRIX
             JButton btnDelete = GUITools.createHyperlinkButton(internalClassID + ".btndelete.tooltip", SYSConst.icon22delete, null);
             btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnDelete.addActionListener(new ActionListener() {
@@ -1129,7 +1279,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
          *     |____/ \__|_| |_|_____| \_/ \__,_|_|
          *
          */
-        if (OPDE.getAppInfo().userHasAccessLevelForThisClass(internalClassID, InternalClassACL.UPDATE)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             final JButton btnEval = GUITools.createHyperlinkButton(internalClassID + ".btneval.tooltip", SYSConst.icon22redo, null);
             btnEval.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnEval.addActionListener(new ActionListener() {
@@ -1205,6 +1355,133 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
             btnEval.setEnabled(!np.isClosed());
             pnlMenu.add(btnEval);
+
+
+            pnlMenu.add(new JSeparator());
+
+            /***
+             *      _     _         _____ _ _
+             *     | |__ | |_ _ __ |  ___(_) | ___  ___
+             *     | '_ \| __| '_ \| |_  | | |/ _ \/ __|
+             *     | |_) | |_| | | |  _| | | |  __/\__ \
+             *     |_.__/ \__|_| |_|_|   |_|_|\___||___/
+             *
+             */
+            final JButton btnFiles = GUITools.createHyperlinkButton("misc.btnfiles.tooltip", SYSConst.icon22attach, null);
+            btnFiles.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnFiles.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    Closure fileHandleClosure = np.isClosed() ? null : new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            EntityManager em = OPDE.createEM();
+                            final NursingProcess myNP = em.merge(np);
+                            em.refresh(myNP);
+                            em.close();
+                            // Refresh Display
+                            valuecache.get(np.getCategory()).remove(np);
+                            contenPanelMap.remove(np);
+                            valuecache.get(myNP.getCategory()).add(myNP);
+                            Collections.sort(valuecache.get(myNP.getCategory()));
+
+                            createCP4(myNP.getCategory());
+                            buildPanel();
+                        }
+                    };
+                    new DlgFiles(np, fileHandleClosure);
+                }
+            });
+
+            pnlMenu.add(btnFiles);
+
+
+            /***
+             *      _     _         ____
+             *     | |__ | |_ _ __ |  _ \ _ __ ___   ___ ___  ___ ___
+             *     | '_ \| __| '_ \| |_) | '__/ _ \ / __/ _ \/ __/ __|
+             *     | |_) | |_| | | |  __/| | | (_) | (_|  __/\__ \__ \
+             *     |_.__/ \__|_| |_|_|   |_|  \___/ \___\___||___/___/
+             *
+             */
+            final JButton btnProcess = GUITools.createHyperlinkButton("misc.btnprocess.tooltip", SYSConst.icon22link, null);
+            btnProcess.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnProcess.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    new DlgProcessAssign(np, new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            if (o == null) {
+                                return;
+                            }
+                            Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = (Pair<ArrayList<QProcess>, ArrayList<QProcess>>) o;
+
+                            ArrayList<QProcess> assigned = result.getFirst();
+                            ArrayList<QProcess> unassigned = result.getSecond();
+
+                            EntityManager em = OPDE.createEM();
+
+                            try {
+                                em.getTransaction().begin();
+
+                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                final NursingProcess myNP = em.merge(np);
+                                em.lock(myNP, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
+                                for (SYSNP2PROCESS linkObject : myNP.getAttachedQProcessConnections()) {
+                                    if (unassigned.contains(linkObject.getQProcess())) {
+                                        em.remove(em.merge(linkObject));
+                                    }
+                                }
+
+                                for (QProcess qProcess : assigned) {
+                                    java.util.List<QProcessElement> listElements = qProcess.getElements();
+                                    if (!listElements.contains(myNP)) {
+                                        QProcess myQProcess = em.merge(qProcess);
+                                        SYSNP2PROCESS myLinkObject = em.merge(new SYSNP2PROCESS(myQProcess, myNP));
+                                        qProcess.getAttachedNursingProcessesConnections().add(myLinkObject);
+                                        myNP.getAttachedQProcessConnections().add(myLinkObject);
+                                    }
+                                }
+
+                                em.getTransaction().commit();
+
+                                // Refresh Display
+                                valuecache.get(np.getCategory()).remove(np);
+                                contenPanelMap.remove(np);
+                                valuecache.get(myNP.getCategory()).add(myNP);
+                                Collections.sort(valuecache.get(myNP.getCategory()));
+
+                                createCP4(myNP.getCategory());
+                                buildPanel();
+
+                            } catch (OptimisticLockException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                } else {
+                                    reloadDisplay();
+                                }
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+                            }
+
+                        }
+                    });
+                }
+            });
+            btnProcess.setEnabled(!np.isClosed());
+            pnlMenu.add(btnProcess);
+
         }
         return pnlMenu;
     }

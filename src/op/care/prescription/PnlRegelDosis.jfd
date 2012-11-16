@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_31" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_33" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void property="contentType"> 
    <string>form/swing</string> 
@@ -2208,30 +2208,34 @@
             <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>Erst einplanen ab dem</string> 
+             <string>Erst einplanen ab dem </string> 
             </void> 
             <void method="setProperty"> 
              <string>font</string> 
-             <object id="Font6" class="java.awt.Font"> 
+             <object class="java.awt.Font"> 
               <string>Arial</string> 
               <int>0</int> 
               <int>14</int> 
              </object> 
             </void> 
             <void property="name"> 
-             <string>jLabel13</string> 
+             <string>lblLDate</string> 
             </void> 
            </object> 
           </void> 
           <void method="add"> 
            <object class="com.jformdesigner.model.FormComponent"> 
-            <string>com.toedter.calendar.JDateChooser</string> 
-            <void method="setProperty"> 
-             <string>font</string> 
-             <object idref="Font6"/> 
-            </void> 
+            <string>javax.swing.JTextField</string> 
             <void property="name"> 
-             <string>jdcLDatum</string> 
+             <string>txtLDate</string> 
+            </void> 
+            <void method="addEvent"> 
+             <object class="com.jformdesigner.model.FormEvent"> 
+              <string>java.awt.event.FocusListener</string> 
+              <string>focusLost</string> 
+              <string>txtLDateFocusLost</string> 
+              <boolean>true</boolean> 
+             </object> 
             </void> 
            </object> 
           </void> 
