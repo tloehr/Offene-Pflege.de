@@ -565,13 +565,13 @@ public class PnlPrescription extends NursingRecordsPanel {
             });
             list.add(printPrescription);
 
-            JideButton printDaily = GUITools.createHyperlinkButton(internalClassID + ".printdailyplan", SYSConst.icon22print2, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    SYSFilesTools.print(PrescriptionTools.getDailyPlanAsHTML(resident.getStation().getHome()), true);
-                }
-            });
-            list.add(printDaily);
+//            JideButton printDaily = GUITools.createHyperlinkButton(internalClassID + ".printdailyplan", SYSConst.icon22print2, new ActionListener() {
+//                @Override
+//                public void actionPerformed(ActionEvent actionEvent) {
+//                    SYSFilesTools.print(PrescriptionTools.getDailyPlanAsHTML(resident.getStation().getHome()), true);
+//                }
+//            });
+//            list.add(printDaily);
         }
 
         return list;

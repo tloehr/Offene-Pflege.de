@@ -1,5 +1,6 @@
 package entity.prescription;
 
+import op.OPDE;
 import op.tools.HTMLTools;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
@@ -38,13 +39,12 @@ public class PrescriptionScheduleTools {
     }
 
     /**
-     *
-     * @param planung um die es geht
+     * @param planung       um die es geht
      * @param writeTaeglich hiermit kann man festlegen, ob bei den Dosierungen, die jeden Tag gegeben werden sollen, das Wort <i>täglich</i> in die Wiederholungsspalte geschrieben wird oder nicht.
      * @return
      */
     public static String getWiederholung(PrescriptionSchedule planung, boolean writeTaeglich) {
-        String result = "<div id=\"fonttext\">";
+        String result = "";
 
         if (planung.isTaeglich()) {
             if (planung.getTaeglich() > 1) {
@@ -60,13 +60,19 @@ public class PrescriptionScheduleTools {
                 result += "alle " + planung.getWoechentlich() + " Wochen ";
             }
 
-            result += (planung.getMon() > 0 ? "Mon " : "");
-            result += (planung.getDie() > 0 ? "Die " : "");
-            result += (planung.getMit() > 0 ? "Mit " : "");
-            result += (planung.getDon() > 0 ? "Don " : "");
-            result += (planung.getFre() > 0 ? "Fre " : "");
-            result += (planung.getSam() > 0 ? "Sam " : "");
-            result += (planung.getSon() > 0 ? "Son " : "");
+            String daylist = "";
+
+            daylist += (planung.getMon() > 0 ? OPDE.lang.getString("misc.msg.monday").substring(0, 3) + ", " : "");
+            daylist += (planung.getDie() > 0 ? OPDE.lang.getString("misc.msg.tuesday").substring(0, 3) + ", " : "");
+            daylist += (planung.getMit() > 0 ? OPDE.lang.getString("misc.msg.wednesday").substring(0, 3) + ", " : "");
+            daylist += (planung.getDon() > 0 ? OPDE.lang.getString("misc.msg.thursday").substring(0, 3) + ", " : "");
+            daylist += (planung.getFre() > 0 ? OPDE.lang.getString("misc.msg.friday").substring(0, 3) + ", " : "");
+            daylist += (planung.getSam() > 0 ? OPDE.lang.getString("misc.msg.saturday").substring(0, 3) + ", " : "");
+            daylist += (planung.getSon() > 0 ? OPDE.lang.getString("misc.msg.sunday").substring(0, 3) + ", " : "");
+
+            if (!daylist.isEmpty()) {
+                result += "{" + daylist.substring(0, daylist.length() - 2) + "}";
+            }
 
             result += "</b>";
         } else if (planung.isMonatlich()) {
@@ -78,19 +84,19 @@ public class PrescriptionScheduleTools {
             }
 
             if (planung.getTagNum() > 0) {
-                result += "jeweils am " + planung.getTagNum() + ". des Monats";
+                result += "am " + planung.getTagNum() + ". des Monats";
             } else {
                 int wtag = 0;
                 String tag = "";
 
                 // In diesem fall kann immer nur ein Wochentag >0 sein. Daher klappt das so.
-                tag += (planung.getMon() > 0 ? "Montag" : "");
-                tag += (planung.getDie() > 0 ? "Dienstag" : "");
-                tag += (planung.getMit() > 0 ? "Mittwoch" : "");
-                tag += (planung.getDon() > 0 ? "Donnerstag" : "");
-                tag += (planung.getFre() > 0 ? "Freitag" : "");
-                tag += (planung.getSam() > 0 ? "Samstag" : "");
-                tag += (planung.getSon() > 0 ? "Sonntag" : "");
+                tag += (planung.getMon() > 0 ? OPDE.lang.getString("misc.msg.monday") : "");
+                tag += (planung.getDie() > 0 ? OPDE.lang.getString("misc.msg.tuesday") : "");
+                tag += (planung.getMit() > 0 ? OPDE.lang.getString("misc.msg.wednesday") : "");
+                tag += (planung.getDon() > 0 ? OPDE.lang.getString("misc.msg.thursday") : "");
+                tag += (planung.getFre() > 0 ? OPDE.lang.getString("misc.msg.friday") : "");
+                tag += (planung.getSam() > 0 ? OPDE.lang.getString("misc.msg.saturday") : "");
+                tag += (planung.getSon() > 0 ? OPDE.lang.getString("misc.msg.sunday") : "");
 
                 wtag += planung.getMon();
                 wtag += planung.getDie();
@@ -100,7 +106,7 @@ public class PrescriptionScheduleTools {
                 wtag += planung.getSam();
                 wtag += planung.getSon();
 
-                result += "jeweils am " + wtag + ". " + tag + " des Monats";
+                result += "am " + wtag + ". " + tag + " des Monats";
             }
             result += "</b>";
         } else {
@@ -117,7 +123,7 @@ public class PrescriptionScheduleTools {
             result += df.format(planung.getLDatum());
         }
 
-        return result + "</div>";
+        return result.isEmpty() ? "" : "<div id=\"fonttext\">" + result + "</div>";
     }
 
     public static String getDoseAsHTML(PrescriptionSchedule planung, PrescriptionSchedule vorherigePlanung, boolean singleUsageOnly) {
@@ -224,7 +230,6 @@ public class PrescriptionScheduleTools {
 
         return result.equals("") ? "&nbsp;" : result;
     }
-
 
 
 }

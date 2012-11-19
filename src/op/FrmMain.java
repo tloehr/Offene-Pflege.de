@@ -44,6 +44,7 @@ import entity.files.SYSFilesTools;
 import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
+import entity.prescription.PrescriptionTools;
 import entity.system.SYSLoginTools;
 import entity.system.SYSPropsTools;
 import op.allowance.PnlAllowance;
@@ -550,7 +551,7 @@ public class FrmMain extends JFrame {
         return panel;
     }
 
-    private CollapsiblePane addNursingRecords(Station station) {
+    private CollapsiblePane addNursingRecords(final Station station) {
         bwButtonMap = new HashMap<Resident, JideButton>();
 
         EntityManager em = OPDE.createEM();
@@ -580,8 +581,19 @@ public class FrmMain extends JFrame {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
-        for (final Resident innerbewohner : bewohnerliste) {
+        if (!bewohnerliste.isEmpty() && station != null){
+            String titel = "";
+            JideButton button = GUITools.createHyperlinkButton(internalClassID+".printdailyplan", SYSConst.icon22print2, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    SYSFilesTools.print(PrescriptionTools.getDailyPlanAsHTML(station), true);
+                }
+            });
+            button.setBackground(Color.WHITE);
+            labelPanel.add(button);
+        }
 
+        for (final Resident innerbewohner : bewohnerliste) {
             ActionListener actionListener = new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {

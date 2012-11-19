@@ -1002,8 +1002,9 @@ public class SYSTools {
         result = SYSTools.replace(result, "ö", "&ouml;", false);
         result = SYSTools.replace(result, "Ü", "&Uuml;", false);
         result = SYSTools.replace(result, "ü", "&uuml;", false);
-        result = SYSTools.replace(result, "ß", "&szlig;", false); //&deg;
-        result = SYSTools.replace(result, "°", "&deg;", false);
+        result = SYSTools.replace(result, "ß", "&szlig;", false);
+        result = SYSTools.replace(result, "°", "&deg;", false); //&deg;
+        result = SYSTools.replace(result, "µ", "&micro;", false); //micro
         return result;
     }
 

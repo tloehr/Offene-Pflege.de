@@ -4,7 +4,6 @@
  */
 package entity.prescription;
 
-import entity.Homes;
 import entity.Station;
 import entity.info.Resident;
 import entity.info.ResidentTools;
@@ -40,7 +39,7 @@ public class PrescriptionTools {
      * Nach einem Pagebreak wird der Name des aktuellen Bewohner nocheinmal wiederholt.
      * <p/>
      * Ein Mac OS Safari druckt mit diesen Werten sehr gut.
-     * Beim Firefox sollten die Ränder wie folgt eingestellt werden:
+     * Beim Firefox (about:config) sollten die Ränder wie folgt eingestellt werden:
      * <ul>
      * <li>print.print_margin_bottom = 0.3</li>
      * <li>print.print_margin_left = 0.1</li>
@@ -53,20 +52,20 @@ public class PrescriptionTools {
      * <li>Drucken des Hintergrundes einschalten</li>
      * <ul>
      *
-     * @param homes Die Einrichtung, für die der Stellplan erstellt werden soll. Sortiert nach den Station.
+     * @param station Die Station, für die der Stellplan erstellt werden soll. Sortiert nach den Station.
      */
-    public static String getDailyPlanAsHTML(Homes homes) {
+    public static String getDailyPlanAsHTML(Station station) {
         long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
         String html = "";
 
         try {
             Query query = em.createNativeQuery("" +
-                    " SELECT v.VerID, st.StatID, bhp.BHPPID, best.BestID, vor.VorID, F.FormID, M.MedPID, M.Bezeichnung, Ms.Bezeichnung " +
+                    " SELECT v.VerID, bhp.BHPPID, best.BestID, vor.VorID, F.FormID, M.MedPID, M.Bezeichnung, Ms.Bezeichnung " +
                     " FROM BHPVerordnung v " +
                     " INNER JOIN Bewohner bw ON v.BWKennung = bw.BWKennung  " +
                     " INNER JOIN Massnahmen Ms ON Ms.MassID = v.MassID " +
-                    " INNER JOIN Station st ON bw.StatID = st.StatID  " +
+//                    " INNER JOIN Station st ON bw.StatID = st.StatID  " +
                     " LEFT OUTER JOIN MPDarreichung D ON v.DafID = D.DafID " +
                     " LEFT OUTER JOIN BHPPlanung bhp ON bhp.VerID = v.VerID " +
                     " LEFT OUTER JOIN MProdukte M ON M.MedPID = D.MedPID " +
@@ -79,10 +78,10 @@ public class PrescriptionTools {
                     " LEFT OUTER JOIN MPVorrat vor ON vor.VorID = vorr.VorID" +
                     " LEFT OUTER JOIN MPBestand best ON best.VorID = vor.VorID" +
                     " WHERE v.AnDatum < now() AND v.AbDatum > now() AND v.SitID IS NULL AND (v.DafID IS NOT NULL OR v.Stellplan IS TRUE) " +
-                    " AND st.EID = ? AND ((best.Aus = '9999-12-31 23:59:59' AND best.Anbruch < '9999-12-31 23:59:59') OR (v.DafID IS NULL)) " +
-                    " ORDER BY st.statid, CONCAT(bw.nachname,bw.vorname), bw.BWKennung, v.DafID IS NOT NULL, F.Stellplan, CONCAT( M.Bezeichnung, Ms.Bezeichnung)");
-            query.setParameter(1, homes.getEID());
-            html = getDailyPlan(em, query.getResultList());
+                    " AND bw.StatID = ? AND ((best.Aus = '9999-12-31 23:59:59' AND best.Anbruch < '9999-12-31 23:59:59') OR (v.DafID IS NULL)) " +
+                    " ORDER BY CONCAT(bw.nachname,bw.vorname), bw.BWKennung, v.DafID IS NOT NULL, F.Stellplan, CONCAT( M.Bezeichnung, Ms.Bezeichnung)");
+            query.setParameter(1, station.getStatID());
+            html = getDailyPlan(em, station, query.getResultList());
             em.close();
         } catch (Exception e) {
             OPDE.fatal(e);
@@ -189,7 +188,7 @@ public class PrescriptionTools {
 //        return ((Long) query.getSingleResult()).longValue() > 0;
 //    }
 
-    private static String getDailyPlan(EntityManager em, List data) {
+    private static String getDailyPlan(EntityManager em, Station station, List data) {
         int STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO = Integer.parseInt(OPDE.getProps().getProperty("stellplan_pagebreak_after_element_no"));
 
         int elementNumber = 1;
@@ -197,52 +196,28 @@ public class PrescriptionTools {
 
         String header = "Stellplan für den " + DateFormat.getDateInstance().format(new Date());
 
-        String html = "<html>"
-                + "<head>"
-                + "<title>" + header + "</title>"
-                + OPDE.getCSS()
-                + HTMLTools.JSCRIPT_PRINT
-                + "</head>"
-                + "<body>";
+//        String html = "<html>"
+//                + "<head>"
+//                + "<title>" + header + "</title>"
+//                + OPDE.getCSS()
+//                + HTMLTools.JSCRIPT_PRINT
+//                + "</head>"
+//                + "<body>";
 
         String bwkennung = "";
-        long statid = 0;
 
         Iterator it = data.iterator();
 
+        String html = "<h1 align=\"center\" id=\"fonth1\">" + header + " (" + station.getName() + ")" + "</h1>";
+        html += "<div align=\"center\" id=\"fontsmall\">Stellpläne <u>nur einen Tag</u> lang benutzen! Danach <u>müssen sie vernichtet</u> werden.</div>";
+
+
         while (it.hasNext()) {
-
             Object[] objects = (Object[]) it.next();
-
             Prescription verordnung = em.find(Prescription.class, ((BigInteger) objects[0]).longValue());
-            Station station = em.find(Station.class, ((BigInteger) objects[1]).longValue());
-            PrescriptionSchedule planung = em.find(PrescriptionSchedule.class, ((BigInteger) objects[2]).longValue());
-
-            BigInteger bestid = (BigInteger) objects[3];
-            //Vorrat wäre objects[4]
-            BigInteger formid = (BigInteger) objects[5];
-
-//            OPDE.debug(verordnung);
-
-
-            boolean stationsWechsel = statid != station.getStatID();
-
-            // Wenn der Plan für eine ganze Einrichtung gedruckt wird, dann beginnt eine
-            // neue Station immer auf einer neuen Seite.
-            if (stationsWechsel) {
-                elementNumber = 1;
-                // Beim ersten Mal nur ein H1 Header. Sonst mit Seitenwechsel.
-                if (statid == 0) {
-                    html += "<h1 align=\"center\" id=\"fonth1\">";
-                } else {
-                    html += "</table>";
-                    html += "<h1 align=\"center\" id=\"fonth1\" style=\"page-break-before:always\">";
-                }
-                html += header + " (" + station.getName() + ")" + "</h1>";
-                html += "<div align=\"center\" id=\"fontsmall\">Stellpläne <u>nur einen Tag</u> lang benutzen! Danach <u>müssen sie vernichtet</u> werden.</div>";
-                statid = station.getStatID();
-            }
-
+            PrescriptionSchedule planung = em.find(PrescriptionSchedule.class, ((BigInteger) objects[1]).longValue());
+            BigInteger bestid = (BigInteger) objects[2];
+            BigInteger formid = (BigInteger) objects[4];
 
             // Alle Formen, die nicht abzählbar sind, werden grau hinterlegt. Also Tropfen, Spritzen etc.
             boolean grau = false;
@@ -255,7 +230,7 @@ public class PrescriptionTools {
             // einmal die Überschrift drüber gesetzt werden.
             boolean bewohnerWechsel = !bwkennung.equalsIgnoreCase(verordnung.getResident().getRID());
 
-            if (pagebreak || stationsWechsel || bewohnerWechsel) {
+            if (pagebreak || bewohnerWechsel) {
                 // Falls zufällig ein weiterer Header (der 2 Elemente hoch ist) einen Pagebreak auslösen WÜRDE
                 // müssen wir hier schonmal vorsorglich den Seitenumbruch machen.
                 // 2 Zeilen rechne ich nochdrauf, damit die Tabelle mindestens 2 Zeilen hat, bevor der Seitenumbruch kommt.
@@ -275,7 +250,7 @@ public class PrescriptionTools {
                         + ResidentTools.getLabelText(verordnung.getResident())
                         + "</h2>";
                 html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>"
-                        + "<th>Präparat / Massnahme</th><th>FM</th><th>MO</th><th>MI</th><th>NM</th><th>AB</th><th>NA</th><th>Bemerkungen</th></tr>";
+                        + "<th>Präparat / Massnahme</th><th>FM</th><th>MO</th><th>MI</th><th>NM</th><th>AB</th><th>NA</th><th>Bemerkungen</th></tr>\n";
                 elementNumber += 2;
 
                 if (pagebreak) {
@@ -285,17 +260,17 @@ public class PrescriptionTools {
             }
 
 
-            html += "<tr " + (grau ? "id=\"fonttextgrau\">" : ">");
+            html += "<tr style=\"page-break-before:avoid\" " + (grau ? "id=\"fonttextgrau\">" : ">\n");
             html += "<td width=\"300\" >" + (verordnung.hasMed() ? "<b>" + TradeFormTools.toPrettyString(verordnung.getTradeForm()) + "</b>" : verordnung.getIntervention().getBezeichnung());
-            html += (bestid != null ? "<br/><i>Bestand im Anbruch Nr.: " + bestid + "</i>" : "") + "</td>";
-            html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getNachtMo()) + "</td>";
-            html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getMorgens()) + "</td>";
-            html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getMittags()) + "</td>";
-            html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getNachmittags()) + "</td>";
-            html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getAbends()) + "</td>";
-            html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getNachtAb()) + "</td>";
-            html += "<td width=\"300\" >" + PrescriptionScheduleTools.getHinweis(planung, false) + "</td>";
-            html += "</tr>";
+            html += (bestid != null ? "<br/><i>Bestand im Anbruch Nr.: " + bestid + "</i>" : "") + "</td>\n";
+            html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getNachtMo()) + "</td>\n";
+            html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getMorgens()) + "</td>\n";
+            html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getMittags()) + "</td>\n";
+            html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getNachmittags()) + "</td>\n";
+            html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getAbends()) + "</td>\n";
+            html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getNachtAb()) + "</td>\n";
+            html += "<td width=\"300\" >" + PrescriptionScheduleTools.getHinweis(planung, false) + "</td>\n";
+            html += "</tr>\n\n";
             elementNumber += 1;
 
             pagebreak = elementNumber > STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
