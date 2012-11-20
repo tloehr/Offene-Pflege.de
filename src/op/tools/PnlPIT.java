@@ -98,7 +98,7 @@ public class PnlPIT extends JPanel {
     }
 
     private void txtDateFocusLost(FocusEvent evt) {
-        SYSCalendar.handleDateFocusLost(evt, new DateTime(min));
+        SYSCalendar.handleDateFocusLost(evt, new DateMidnight(min), new DateMidnight(max));
     }
 
     private void txtDateFocusGained(FocusEvent e) {

@@ -183,7 +183,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
     private boolean toEndOfPackage;
     @Basic(optional = false)
     @Column(name = "VerKennung")
-    private long prescRelation;
+    private long relation;
     @Lob
     @Column(name = "Bemerkung")
     private String text;
@@ -250,11 +250,11 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         this.userON = OPDE.getLogin().getUser();
     }
 
-    public Prescription(Date from, Date to, boolean toEndOfPackage, long prescRelation, String text, boolean showOnDailyPlan, List<SYSPRE2FILE> attachedFilesConnections, List<SYSPRE2PROCESS> attachedProcessConnections, Users userON, Users userOFF, Resident resident, Intervention intervention, TradeForm tradeform, Situations situation, Hospital hospitalON, Hospital hospitalOFF, Doc docON, Doc docOFF) {
+    public Prescription(Date from, Date to, boolean toEndOfPackage, long relation, String text, boolean showOnDailyPlan, List<SYSPRE2FILE> attachedFilesConnections, List<SYSPRE2PROCESS> attachedProcessConnections, Users userON, Users userOFF, Resident resident, Intervention intervention, TradeForm tradeform, Situations situation, Hospital hospitalON, Hospital hospitalOFF, Doc docON, Doc docOFF) {
         this.from = from;
         this.to = to;
         this.toEndOfPackage = toEndOfPackage;
-        this.prescRelation = prescRelation;
+        this.relation = relation;
         this.text = text;
         this.showOnDailyPlan = showOnDailyPlan;
         this.attachedFilesConnections = attachedFilesConnections;
@@ -329,11 +329,11 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
     }
 
     public long getRelation() {
-        return prescRelation;
+        return relation;
     }
 
     public void setRelation(long verKennung) {
-        this.prescRelation = verKennung;
+        this.relation = verKennung;
     }
 
     public String getText() {
@@ -456,7 +456,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
 
     @Override
     public String getContentAsHTML() {
-        return PrescriptionTools.getPrescriptionAsHTML(this, false, false, true);
+        return PrescriptionTools.getPrescriptionAsHTML(this, false, false, true, false);
     }
 
     @Override
@@ -468,9 +468,9 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
 
             result += "<table id=\"fonttext\" border=\"0\" cellspacing=\"0\">";
             result += "<tr>";
-            result += "<td valign=\"top\">" + df.format(from) + "</td>";
+            result += "<td valign=\"top\"><b>" + df.format(from) + "</b></td>";
             result += "<td valign=\"top\">&raquo;</td>";
-            result += "<td valign=\"top\">" + df.format(to) + "</td>";
+            result += "<td valign=\"top\"><b>" + df.format(to) + "</b></td>";
             result += "</tr>\n";
             result += "<tr>";
             result += "<td valign=\"top\">" + userON.getFullname() + "</td>";
@@ -494,10 +494,20 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
             result += "</table>\n";
 
         } else {
-            result += df.format(from) + "&nbsp;&raquo;&raquo;" +
+            result += SYSConst.html_bold(df.format(from)) + "&nbsp;&raquo;&raquo;" +
                     "<br/>" +
                     userON.getFullname();
+            if (docON != null) {
+                result += "<br/>";
+                result += DocTools.getFullName(docON);
+            }
+            if (hospitalON != null) {
+                result += "<br/>";
+                result += HospitalTools.getFullName(hospitalON);
+            }
         }
+
+        result += "<br>" + "[" + id + "]";
 
         return result;
     }
@@ -516,7 +526,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
 
         if (toEndOfPackage != that.toEndOfPackage) return false;
         if (showOnDailyPlan != that.showOnDailyPlan) return false;
-        if (prescRelation != that.prescRelation) return false;
+        if (relation != that.relation) return false;
         if (docOFF != null ? !docOFF.equals(that.docOFF) : that.docOFF != null) return false;
         if (to != null ? !to.equals(that.to) : that.to != null) return false;
         if (hospitalOFF != null ? !hospitalOFF.equals(that.hospitalOFF) : that.hospitalOFF != null) return false;
@@ -551,7 +561,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         result = 31 * result + (from != null ? from.hashCode() : 0);
         result = 31 * result + (to != null ? to.hashCode() : 0);
         result = 31 * result + (toEndOfPackage ? 1 : 0);
-        result = 31 * result + (int) (prescRelation ^ (prescRelation >>> 32));
+        result = 31 * result + (int) (relation ^ (relation >>> 32));
         result = 31 * result + (text != null ? text.hashCode() : 0);
         result = 31 * result + (showOnDailyPlan ? 1 : 0);
         result = 31 * result + (attachedFilesConnections != null ? attachedFilesConnections.hashCode() : 0);
@@ -573,7 +583,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
 
     @Override
     public Prescription clone() {
-        final Prescription copy = new Prescription(from, to, toEndOfPackage, prescRelation, text, showOnDailyPlan, attachedFilesConnections, attachedProcessConnections, userON, userOFF, resident, intervention, tradeform, situation, hospitalON, hospitalOFF, docON, docOFF);
+        final Prescription copy = new Prescription(from, to, toEndOfPackage, relation, text, showOnDailyPlan, attachedFilesConnections, attachedProcessConnections, userON, userOFF, resident, intervention, tradeform, situation, hospitalON, hospitalOFF, docON, docOFF);
 
         CollectionUtils.forAllDo(pSchedule, new Closure() {
             public void execute(Object o) {
@@ -588,14 +598,22 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
     public int compareTo(Prescription them) {
 //        int result = ((Boolean) isClosed()).compareTo(them.isClosed()) * -1;
         int result = ((Boolean) isOnDemand()).compareTo(them.isOnDemand()) * -1;
-//        if (result == 0) {
-//            result = ((Boolean) isOnDemand()).compareTo(them.isOnDemand()) * -1;
-//        }
         if (result == 0) {
             result = ((Boolean) hasMed()).compareTo(them.hasMed());
         }
         if (result == 0) {
-            result = PrescriptionTools.getShortDescription(this).compareTo(PrescriptionTools.getShortDescription(them));
+            String mytitle = hasMed() ? getTradeForm().getMedProduct().getBezeichnung() : getIntervention().getBezeichnung();
+            String thattitle = hasMed() ? them.getTradeForm().getMedProduct().getBezeichnung() : them.getIntervention().getBezeichnung();
+            result = mytitle.compareTo(thattitle);
+        }
+        if (result == 0) {
+            result = new Long(relation).compareTo(them.getRelation());
+        }
+        if (result == 0) {
+            result = ((Boolean) isClosed()).compareTo(them.isClosed());
+        }
+        if (result == 0) {
+            result = from.compareTo(them.getFrom()) * -1;
         }
         return result;
     }
@@ -608,7 +626,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
                 ", anDatum=" + from +
                 ", abDatum=" + to +
                 ", bisPackEnde=" + toEndOfPackage +
-                ", verKennung=" + prescRelation +
+                ", verKennung=" + relation +
                 ", bemerkung='" + text + '\'' +
                 ", stellplan=" + showOnDailyPlan +
                 ", attachedFiles=" + attachedFilesConnections +

@@ -1036,7 +1036,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
                 }
             });
-            btnChange.setEnabled(!np.isClosed());
+            btnChange.setEnabled(!np.isClosed() && numDFNs != 0);
             pnlMenu.add(btnChange);
 
             /***
@@ -1123,7 +1123,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                     GUITools.showPopup(popup, SwingConstants.WEST);
                 }
             });
-            btnStop.setEnabled(!np.isClosed());
+            btnStop.setEnabled(!np.isClosed() && numDFNs != 0);
             pnlMenu.add(btnStop);
 
 

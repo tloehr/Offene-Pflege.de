@@ -250,8 +250,6 @@ public class PnlDFN extends NursingRecordsPanel {
             JPanel shiftOuterPanel = new JPanel();
             shiftOuterPanel.setLayout(new VerticalLayout());
             for (DFN dfn : mapShift2DFN.get(shift)) {
-//                OPDE.debug(bhp.getPrescription().getVerid());
-//                OPDE.debug(currentPrescription != null ? currentPrescription.getVerid() : "null");
                 if (currentNP == null || dfn.getNursingProcess().getID() != currentNP.getID()) {
                     if (currentNP != null) {
                         npPane.setContentPane(npPanel);
@@ -260,7 +258,6 @@ public class PnlDFN extends NursingRecordsPanel {
                     currentNP = dfn.getNursingProcess();
                     npPanel = new JPanel();
                     npPanel.setLayout(new VerticalLayout());
-//                    npPanel.setBackground(dfn.getBG());
                     npPane = new CollapsiblePane("<html><font size=+1>" + currentNP.getTopic() + " (" + currentNP.getCategory().getText() + ")" + "</font></html>", currentNP.isClosed() ? SYSConst.icon22stopSign : null);
                     npPane.setCollapsible(false);
                     npPane.setBackground(SYSCalendar.getBGSHIFT(shift).darker()); // a little darker

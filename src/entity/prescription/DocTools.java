@@ -40,7 +40,7 @@ public class DocTools {
         if (doc != null) {
             return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitel(), "", " ") + doc.getVorname() + " " + doc.getName();
         } else {
-            return "";
+            return "--";
         }
     }
 

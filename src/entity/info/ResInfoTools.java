@@ -695,7 +695,7 @@ public class ResInfoTools {
             query.setParameter("now", new Date());
             List listeVerordnungen = query.getResultList();
             Collections.sort(listeVerordnungen);
-            result += PrescriptionTools.getPrescriptionsAsHTML(listeVerordnungen, true, false, false, false);
+            result += PrescriptionTools.getPrescriptionsAsHTML(listeVerordnungen, true, false, false, false, false);
             em.close();
         }
 

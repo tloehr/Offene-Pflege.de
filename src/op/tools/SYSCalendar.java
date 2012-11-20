@@ -439,6 +439,14 @@ public class SYSCalendar {
         return new GregorianCalendar(jahr, monat - 1, tag, 0, 0, 0);
     }
 
+    /**
+     * A date is "sane", when it is after the start of the first stay of the resident. When there is no stay yet,
+     * then its must not before now. It must also never be in future.
+     *
+     * @param resident
+     * @param date
+     * @return
+     */
     public static boolean isDateSane(Resident resident, Date date) {
         DateMidnight d = new DateMidnight(date);
         if (d.isAfterNow()) {
@@ -449,6 +457,12 @@ public class SYSCalendar {
         return new DateMidnight(date).isAfter(min);
     }
 
+    /**
+     * A "sane" birthday is not older than 120 years and not younger than 15 years.
+     *
+     * @param date
+     * @return
+     */
     public static boolean isBirthdaySane(Date date) {
         if (date == null) return false;
         int maxage = 120;
@@ -460,15 +474,18 @@ public class SYSCalendar {
         return d.isAfter(max) && d.isBefore(min);
     }
 
-    public static void handleDateFocusLost(FocusEvent evt, DateTime min){
+    public static void handleDateFocusLost(FocusEvent evt, DateMidnight min, DateMidnight max) {
         DateTime dt;
+        if (max == null) {
+            max = new DateMidnight();
+        }
         try {
             dt = new DateTime(parseDate(((JTextField) evt.getSource()).getText()));
         } catch (NumberFormatException ex) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wrongdate")));
             dt = new DateTime();
         }
-        if (dt.isAfterNow()) {
+        if (dt.isAfter(max)) {
             dt = new DateTime();
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.futuredate")));
         }

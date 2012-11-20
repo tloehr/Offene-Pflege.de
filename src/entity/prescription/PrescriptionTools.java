@@ -286,14 +286,15 @@ public class PrescriptionTools {
     public static String getShortDescription(Prescription prescription) {
         String result = "<font size=+1>";// = SYSConst.html_fontface;
 
-        result += prescription.isClosed() ? "<s>" : "";
+//        result += prescription.isClosed() ? "<s>" : "";
 
         if (!prescription.hasMed()) {
             result += prescription.getIntervention().getBezeichnung();
         } else {
 
             MedInventory inventory = TradeFormTools.getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm());
-            MedStock stockInUse = MedStockTools.getStockInUse(inventory);
+
+            MedStock stockInUse = prescription.isClosed() ? null : MedStockTools.getStockInUse(inventory);
 
             if (stockInUse != null) {
                 result += "<b>" + prescription.getTradeForm().getMedProduct().getBezeichnung()
@@ -311,11 +312,11 @@ public class PrescriptionTools {
 
         result += "</font>";
 
-        if (prescription.isOnDemand()) {
-            result += "<br/><b><u>" + OPDE.lang.getString("misc.msg.ondemand") + ":</u> " + prescription.getSituation().getText() + "</b>";
-        }
+//        if (prescription.isOnDemand()) {
+//            result += "<br/><b><u>" + OPDE.lang.getString("misc.msg.ondemand") + ":</u> " + prescription.getSituation().getText() + "</b>";
+//        }
 
-        result += prescription.isClosed() ? "</s>" : "";
+//        result += prescription.isClosed() ? "</s>" : "";
 
         return result;
     }
@@ -323,9 +324,9 @@ public class PrescriptionTools {
     public static String getLongDescription(Prescription presription) {
         String result = "<div id=\"fonttext\">";// = SYSConst.html_fontface;
 
-        if (presription.isClosed()) {
-            result += "<s>"; // Abgesetzte
-        }
+//        if (presription.isClosed()) {
+//            result += "<s>"; // Abgesetzte
+//        }
         if (!presription.hasMed()) {
             result += presription.getIntervention().getBezeichnung();
         } else {
@@ -358,9 +359,9 @@ public class PrescriptionTools {
 
 
         }
-        if (presription.isClosed()) {
-            result += "</s>"; // Abgesetzte
-        }
+//        if (presription.isClosed()) {
+//            result += "</s>"; // Abgesetzte
+//        }
 
         return result + "</div>";
     }
@@ -473,7 +474,15 @@ public class PrescriptionTools {
             result += "<i>Noch keine Dosierung / Anwendungsinformationen verfügbar</i><br/>";
         }
 
-        if (showInventory && prescription.hasMed()) {
+        result += showInventory ? getInventoryInformationAsHTML(prescription) : "";
+
+        return result;
+    }
+
+
+    public static String getInventoryInformationAsHTML(final Prescription prescription) {
+        String result = "";
+        if (!prescription.isClosed() && prescription.hasMed()) {
             MedInventory inventory = TradeFormTools.getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm());
             MedStock stockInUse = MedStockTools.getStockInUse(inventory);
 
@@ -539,12 +548,6 @@ public class PrescriptionTools {
             }
 
         }
-
-
-//        long timeend = System.currentTimeMillis();
-
-//        OPDE.debug("time end: " + (timeend - timestart) + " millis");
-
         return result;
     }
 
@@ -613,16 +616,16 @@ public class PrescriptionTools {
         return list;
     }
 
-    public static String getPrescriptionAsHTML(Prescription prescription, boolean withheader, boolean withlongheader, boolean withmed) {
+    public static String getPrescriptionAsHTML(Prescription prescription, boolean withheader, boolean withlongheader, boolean withmed, boolean withIcon) {
         ArrayList<Prescription> single = new ArrayList<Prescription>();
         single.add(prescription);
-        return getPrescriptionsAsHTML(single, withheader, withlongheader, withmed, true);
+        return getPrescriptionsAsHTML(single, withheader, withlongheader, withmed, true, withIcon);
     }
 
     /**
      * Gibt eine HTML Darstellung der Verordungen zurück, die in dem übergebenen TableModel enthalten sind.
      */
-    public static String getPrescriptionsAsHTML(List<Prescription> list, boolean withheader, boolean withlongheader, boolean withmed, boolean withDiscontinued) {
+    public static String getPrescriptionsAsHTML(List<Prescription> list, boolean withheader, boolean withlongheader, boolean withmed, boolean withDiscontinued, boolean withIcon) {
         String result = "";
 
         if (!list.isEmpty()) {
@@ -637,14 +640,16 @@ public class PrescriptionTools {
                 if (withDiscontinued || !myprescription.isClosed()) {
 
                     result += "<tr>";
-                    result += "<td valign=\"top\">" + getLongDescription(myprescription) + "</td>";
+                    result += "<td valign=\"top\">" + (withIcon && myprescription.isClosed() ? SYSConst.html_22x22_StopSign : "") + getLongDescription(myprescription) + "</td>";
                     result += "<td valign=\"top\">" + getDose(myprescription, withmed) + "<br/>";
                     result += getRemark(myprescription) + "</td>";
-                    result += "<td valign=\"top\">" + getON(myprescription);
+                    result += "<td valign=\"top\">" + myprescription.getPITAsHTML();
 
-                    if (myprescription.isClosed()) {
-                        result += getOFF(myprescription);
-                    }
+//                    if (myprescription.isClosed()) {
+//                        result += getOFF(myprescription);
+//                    }
+//
+//
 
                     result += "</td>";
                     result += "</tr>";

@@ -43,7 +43,7 @@ public class PrescriptionScheduleTools {
      * @param writeTaeglich hiermit kann man festlegen, ob bei den Dosierungen, die jeden Tag gegeben werden sollen, das Wort <i>täglich</i> in die Wiederholungsspalte geschrieben wird oder nicht.
      * @return
      */
-    public static String getWiederholung(PrescriptionSchedule planung, boolean writeTaeglich) {
+    public static String getRepeatPattern(PrescriptionSchedule planung, boolean writeTaeglich) {
         String result = "";
 
         if (planung.isTaeglich()) {
@@ -163,7 +163,7 @@ public class PrescriptionScheduleTools {
                     "      <td align=\"center\">" + getValueAsString(planung.getNachmittags()) + "</td>" +
                     "      <td align=\"center\">" + getValueAsString(planung.getAbends()) + "</td>" +
                     "      <td align=\"center\">" + getValueAsString(planung.getNachtAb()) + "</td>" +
-                    "      <td>" + getWiederholung(planung, true) + "</td>" +
+                    "      <td>" + getRepeatPattern(planung, true) + "</td>" +
                     "    </tr>";
             if (singleUsageOnly) {
                 result += "</table>";
@@ -190,7 +190,7 @@ public class PrescriptionScheduleTools {
             result += "    <tr>" +
                     "      <td align=\"center\">" + sdf.format(planung.getUhrzeit()) + " Uhr</td>" +
                     "      <td align=\"center\">" + planung.getUhrzeitDosis().toPlainString() + "</td>" +
-                    "      <td>" + getWiederholung(planung, true) + "</td>" +
+                    "      <td>" + getRepeatPattern(planung, true) + "</td>" +
                     "    </tr>";
             if (singleUsageOnly) {
                 result += "</table>";
@@ -218,7 +218,7 @@ public class PrescriptionScheduleTools {
             result += "<br/>";
         }
 
-        String wiederholung = getWiederholung(planung, writeTaeglich);
+        String wiederholung = getRepeatPattern(planung, writeTaeglich);
         result += wiederholung;
 
         if (!SYSTools.catchNull(planung.getPrescription().getText()).isEmpty()) {

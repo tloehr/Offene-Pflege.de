@@ -60,7 +60,7 @@ public class GUITools {
         return button;
     }
 
-    public static JTextField createIntegerTextField(final int min, final int max, final int init){
+    public static JTextField createIntegerTextField(final int min, final int max, final int init) {
         final JTextField txt = new JTextField(Integer.toString(init), 10);
         txt.setFont(SYSConst.ARIAL14);
         txt.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -79,7 +79,7 @@ public class GUITools {
                     txt.setText(Integer.toString(init));
                 }
 
-                if (min > i || i > max){
+                if (min > i || i > max) {
                     txt.setText(Integer.toString(init));
                 }
             }
@@ -265,6 +265,9 @@ public class GUITools {
 
     public static void scroll2show(final JScrollPane jsp, int end, final Closure what2doAfterwards) {
         final int start = jsp.getVerticalScrollBar().getValue();
+        OPDE.debug("scroll2show: trying to move from " + start);
+        OPDE.debug("scroll2show: trying to move to " + end);
+
         end = Math.max(0, end);
         end = Math.min(jsp.getVerticalScrollBar().getMaximum(), end);
 

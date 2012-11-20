@@ -50,6 +50,7 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.math.BigDecimal;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -120,6 +121,10 @@ public class PnlSchedule extends JPanel {
         }
     }
 
+    private void txtLDateFocusLost(FocusEvent evt) {
+        SYSCalendar.handleDateFocusLost(evt, new DateMidnight(), new DateMidnight().plusWeeks(4));
+    }
+
 
     private void initPanel() {
 
@@ -185,8 +190,7 @@ public class PnlSchedule extends JPanel {
             tabWdh.setSelectedIndex(TAB_MONTHLY);
         }
 
-        jdcLDatum.setMinSelectableDate(new Date());
-        jdcLDatum.setDate(new Date(Math.max(is.getLDatum().getTime(), new DateMidnight().getMillis())));
+        txtLDate.setText(DateFormat.getDateInstance().format(new Date(Math.max(is.getLDatum().getTime(), new DateMidnight().getMillis()))));
 
         txtNachtMo.setText(is.getNachtMo().toString());
         txtMorgens.setText(is.getMorgens().toString());
@@ -295,7 +299,7 @@ public class PnlSchedule extends JPanel {
         cmbTag = new JComboBox();
         panel2 = new JPanel();
         jLabel13 = new JLabel();
-        jdcLDatum = new JDateChooser();
+        txtLDate = new JTextField();
         lblMinutes = new JLabel();
         txtMinutes = new JTextField();
         pnlBemerkung = new JPanel();
@@ -853,9 +857,15 @@ public class PnlSchedule extends JPanel {
                 jLabel13.setFont(new Font("Arial", Font.PLAIN, 14));
                 panel2.add(jLabel13, CC.xy(1, 1));
 
-                //---- jdcLDatum ----
-                jdcLDatum.setFont(new Font("Arial", Font.PLAIN, 14));
-                panel2.add(jdcLDatum, CC.xy(3, 1));
+                //---- txtLDate ----
+                txtLDate.setFont(new Font("Arial", Font.PLAIN, 14));
+                txtLDate.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtLDateFocusLost(e);
+                    }
+                });
+                panel2.add(txtLDate, CC.xy(3, 1));
 
                 //---- lblMinutes ----
                 lblMinutes.setText("text");
@@ -1014,7 +1024,15 @@ public class PnlSchedule extends JPanel {
         is.setTaeglich(tabWdh.getSelectedIndex() == TAB_DAILY ? Short.parseShort(spinTaeglich.getValue().toString()) : (short) 0);
         is.setWoechentlich(tabWdh.getSelectedIndex() == TAB_WEEKLY ? Short.parseShort(spinWoche.getValue().toString()) : (short) 0);
         is.setMonatlich(tabWdh.getSelectedIndex() == TAB_MONTHLY ? Short.parseShort(spinMonat.getValue().toString()) : (short) 0);
-        is.setLDatum(jdcLDatum.getDate());
+
+
+        DateMidnight day;
+        try {
+            day = new DateMidnight(SYSCalendar.parseDate(txtLDate.getText()));
+        } catch (NumberFormatException ex) {
+            day = new DateMidnight();
+        }
+        is.setLDatum(day.toDate());
 
         is.setMon(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbMon.isSelected() ? (short) 1 : (short) 0);
         is.setDie(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbDie.isSelected() ? (short) 1 : (short) 0);
@@ -1173,7 +1191,7 @@ public class PnlSchedule extends JPanel {
     private JComboBox cmbTag;
     private JPanel panel2;
     private JLabel jLabel13;
-    private JDateChooser jdcLDatum;
+    private JTextField txtLDate;
     private JLabel lblMinutes;
     private JTextField txtMinutes;
     private JPanel pnlBemerkung;

@@ -30,7 +30,6 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.wizard.WizardDialog;
-import com.toedter.calendar.JDateChooser;
 import entity.nursingprocess.Intervention;
 import entity.nursingprocess.InterventionTools;
 import entity.prescription.*;
@@ -53,6 +52,7 @@ import javax.swing.event.CaretListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -177,21 +177,25 @@ public class DlgRegular extends MyJDialog {
 
     private void rbActiveItemStateChanged(ItemEvent e) {
         if (e.getStateChange() == ItemEvent.SELECTED) {
-            jdcAB.setDate(null);
+            txtTo.setText("");
         }
     }
 
     private void rbDateItemStateChanged(ItemEvent e) {
-        jdcAB.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+        txtTo.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
         if (e.getStateChange() == ItemEvent.SELECTED) {
-            jdcAB.setDate(new Date());
+            txtTo.setText(DateFormat.getDateInstance().format(new Date()));
         }
     }
 
     private void rbEndOfPackageItemStateChanged(ItemEvent e) {
         if (e.getStateChange() == ItemEvent.SELECTED) {
-            jdcAB.setDate(null);
+            txtTo.setText("");
         }
+    }
+
+    private void txtToFocusLost(FocusEvent evt) {
+        SYSCalendar.handleDateFocusLost(evt, new DateMidnight(), new DateMidnight().plusYears(1));
     }
 
     private void txtMassActionPerformed(ActionEvent e) {
@@ -223,7 +227,7 @@ public class DlgRegular extends MyJDialog {
         pnlOFF = new JPanel();
         rbActive = new JRadioButton();
         rbDate = new JRadioButton();
-        jdcAB = new JDateChooser();
+        txtTo = new JTextField();
         rbEndOfPackage = new JRadioButton();
         jScrollPane3 = new JScrollPane();
         txtBemerkung = new JTextPane();
@@ -241,15 +245,15 @@ public class DlgRegular extends MyJDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "$rgap, $lcgap, default, $lcgap, default:grow, $lcgap, $rgap",
-            "$rgap, $lgap, fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
+                "$rgap, $lcgap, default, $lcgap, default:grow, $lcgap, $rgap",
+                "$rgap, $lgap, fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
 
         //======== jPanel1 ========
         {
             jPanel1.setBorder(null);
             jPanel1.setLayout(new FormLayout(
-                "68dlu, $lcgap, 284dlu, $lcgap, pref",
-                "2*(16dlu, $lgap), default, $lgap, fill:default:grow"));
+                    "68dlu, $lcgap, 284dlu, $lcgap, pref",
+                    "2*(16dlu, $lgap), default, $lgap, fill:default:grow"));
 
             //---- txtMed ----
             txtMed.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -270,11 +274,11 @@ public class DlgRegular extends MyJDialog {
             jPanel1.add(txtMed, CC.xy(1, 1));
 
             //---- cmbMed ----
-            cmbMed.setModel(new DefaultComboBoxModel(new String[] {
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
+            cmbMed.setModel(new DefaultComboBoxModel(new String[]{
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
             }));
             cmbMed.setFont(new Font("Arial", Font.PLAIN, 14));
             cmbMed.addItemListener(new ItemListener() {
@@ -308,11 +312,11 @@ public class DlgRegular extends MyJDialog {
             jPanel1.add(panel4, CC.xy(5, 1));
 
             //---- cmbIntervention ----
-            cmbIntervention.setModel(new DefaultComboBoxModel(new String[] {
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
+            cmbIntervention.setModel(new DefaultComboBoxModel(new String[]{
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
             }));
             cmbIntervention.setFont(new Font("Arial", Font.PLAIN, 14));
             jPanel1.add(cmbIntervention, CC.xywh(3, 3, 3, 1));
@@ -331,11 +335,11 @@ public class DlgRegular extends MyJDialog {
             //======== jPanel8 ========
             {
                 jPanel8.setBorder(new TitledBorder(null, "Dosis / H\u00e4ufigkeit", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION,
-                    new Font("Arial", Font.PLAIN, 14)));
+                        new Font("Arial", Font.PLAIN, 14)));
                 jPanel8.setFont(new Font("Arial", Font.PLAIN, 14));
                 jPanel8.setLayout(new FormLayout(
-                    "default:grow",
-                    "fill:default:grow, $lgap, pref"));
+                        "default:grow",
+                        "fill:default:grow, $lgap, pref"));
 
                 //======== jspDosis ========
                 {
@@ -343,15 +347,15 @@ public class DlgRegular extends MyJDialog {
 
                     //---- tblDosis ----
                     tblDosis.setModel(new DefaultTableModel(
-                        new Object[][] {
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                        },
-                        new String[] {
-                            "Title 1", "Title 2", "Title 3", "Title 4"
-                        }
+                            new Object[][]{
+                                    {null, null, null, null},
+                                    {null, null, null, null},
+                                    {null, null, null, null},
+                                    {null, null, null, null},
+                            },
+                            new String[]{
+                                    "Title 1", "Title 2", "Title 3", "Title 4"
+                            }
                     ));
                     tblDosis.setSurrendersFocusOnKeystroke(true);
                     tblDosis.setToolTipText(null);
@@ -403,15 +407,15 @@ public class DlgRegular extends MyJDialog {
         {
             jPanel3.setBorder(null);
             jPanel3.setLayout(new FormLayout(
-                "149dlu",
-                "3*(fill:default, $lgap), fill:default:grow"));
+                    "149dlu",
+                    "3*(fill:default, $lgap), fill:default:grow"));
 
             //======== pnlOFF ========
             {
                 pnlOFF.setBorder(new TitledBorder("Absetzung"));
                 pnlOFF.setLayout(new FormLayout(
-                    "pref, 86dlu:grow",
-                    "2*(fill:17dlu, $lgap), fill:17dlu"));
+                        "pref, 86dlu:grow",
+                        "2*(fill:17dlu, $lgap), fill:17dlu"));
 
                 //---- rbActive ----
                 rbActive.setText("text");
@@ -434,9 +438,14 @@ public class DlgRegular extends MyJDialog {
                 });
                 pnlOFF.add(rbDate, CC.xy(1, 3));
 
-                //---- jdcAB ----
-                jdcAB.setEnabled(false);
-                pnlOFF.add(jdcAB, CC.xy(2, 3));
+                //---- txtTo ----
+                txtTo.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtToFocusLost(e);
+                    }
+                });
+                pnlOFF.add(txtTo, CC.xy(2, 3));
 
                 //---- rbEndOfPackage ----
                 rbEndOfPackage.setText("text");
@@ -472,24 +481,24 @@ public class DlgRegular extends MyJDialog {
             {
                 pnlON.setBorder(new TitledBorder("Ansetzung"));
                 pnlON.setLayout(new FormLayout(
-                    "119dlu:grow",
-                    "17dlu, $lgap, fill:17dlu"));
+                        "119dlu:grow",
+                        "17dlu, $lgap, fill:17dlu"));
 
                 //---- cmbDocON ----
-                cmbDocON.setModel(new DefaultComboBoxModel(new String[] {
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+                cmbDocON.setModel(new DefaultComboBoxModel(new String[]{
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                        "Item 4"
                 }));
                 pnlON.add(cmbDocON, CC.xy(1, 1));
 
                 //---- cmbHospitalON ----
-                cmbHospitalON.setModel(new DefaultComboBoxModel(new String[] {
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+                cmbHospitalON.setModel(new DefaultComboBoxModel(new String[]{
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                        "Item 4"
                 }));
                 pnlON.add(cmbHospitalON, CC.xy(1, 3));
             }
@@ -543,7 +552,7 @@ public class DlgRegular extends MyJDialog {
         rbEndOfPackage.setText(OPDE.lang.getString(PnlPrescription.internalClassID + ".dlgRegular.rbEndOfPackage"));
 
         txtMed.setText("");
-        jdcAB.setMinSelectableDate(new Date());
+//        jdcAB.setMinSelectableDate(new Date());
 
         cmbMed.setRenderer(TradeFormTools.getDarreichungRenderer(TradeFormTools.LONG));
         cmbDocON.setSelectedItem(prescription.getDocON());
@@ -638,8 +647,16 @@ public class DlgRegular extends MyJDialog {
 
     private boolean saveOK() {
         if (ignoreEvent) return false;
+
+        DateMidnight day;
+        try {
+            day = new DateMidnight(SYSCalendar.parseDate(txtTo.getText()));
+        } catch (NumberFormatException ex) {
+            day = null;
+        }
+
         boolean OnOK = (cmbDocON.getSelectedIndex() > 0 || cmbHospitalON.getSelectedIndex() > 0);
-        boolean OffOK = !rbDate.isSelected() || jdcAB.getDate() != null;
+        boolean OffOK = !rbDate.isSelected() || day != null;
         boolean medOK = cmbMed.getModel().getSize() == 0 || cmbMed.getSelectedItem() != null;
         boolean intervOK = cmbIntervention.getSelectedItem() != null;
         boolean doseOK = tblDosis.getModel().getRowCount() > 0;
@@ -669,7 +686,6 @@ public class DlgRegular extends MyJDialog {
     @Override
     public void dispose() {
         actionBlock.execute(returnPackage);
-        jdcAB.cleanup();
         SYSTools.unregisterListeners(this);
         super.dispose();
     }
@@ -690,13 +706,20 @@ public class DlgRegular extends MyJDialog {
         prescription.setUserON(OPDE.getLogin().getUser());
         prescription.setDocON((Doc) cmbDocON.getSelectedItem());
 
-        prescription.setFrom(new DateMidnight().toDate());
+        prescription.setFrom(new Date());
         if (rbDate.isSelected()) {
-            prescription.setTo(new DateMidnight(jdcAB.getDate()).plusDays(1).toDateTime().minusSeconds(1).toDate());
+
+            DateMidnight day = null;
+            try {
+                day = new DateMidnight(SYSCalendar.parseDate(txtTo.getText()));
+            } catch (NumberFormatException ex) {
+                OPDE.fatal(ex);
+            }
+
+            prescription.setTo(day.plusDays(1).toDateTime().minusSeconds(1).toDate());
             prescription.setUserOFF(OPDE.getLogin().getUser());
             prescription.setHospitalOFF(prescription.getHospitalON());
             prescription.setDocOFF(prescription.getDocON());
-            prescription.setTo(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
         } else {
             prescription.setHospitalOFF(null);
             prescription.setDocOFF(null);
@@ -843,7 +866,7 @@ public class DlgRegular extends MyJDialog {
     private JPanel pnlOFF;
     private JRadioButton rbActive;
     private JRadioButton rbDate;
-    private JDateChooser jdcAB;
+    private JTextField txtTo;
     private JRadioButton rbEndOfPackage;
     private JScrollPane jScrollPane3;
     private JTextPane txtBemerkung;

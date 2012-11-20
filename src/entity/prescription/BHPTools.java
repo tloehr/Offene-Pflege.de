@@ -3,6 +3,7 @@ package entity.prescription;
 import entity.Homes;
 import entity.info.ResInfoTools;
 import entity.info.Resident;
+import entity.nursingprocess.DFN;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.bhp.PnlBHP;
@@ -558,7 +559,7 @@ public class BHPTools {
             return SYSConst.icon22apply;
         }
         if (bhp.getStatus() == STATE_OPEN) {
-            return SYSConst.icon22empty;
+            return null;
         }
         if (bhp.getStatus() == STATE_REFUSED) {
             return SYSConst.icon22cancel;
@@ -567,6 +568,22 @@ public class BHPTools {
             return SYSConst.icon22deleteall;
         }
         return null;
+    }
+
+
+    public static Icon getWarningIcon(BHP bhp, MedStock stock) {
+        if (!bhp.hasMed()) return null;
+
+        Icon icon = null;
+        BigDecimal sum = stock == null ? BigDecimal.ZERO : MedStockTools.getSum(stock);
+
+        if (stock == null){
+            icon = SYSConst.icon22ledRedOn;
+        } else if (sum.compareTo(BigDecimal.ZERO) <= 0){
+            icon = SYSConst.icon22ledYellowOn;
+        }
+
+        return icon;
     }
 
     public static boolean isChangeable(BHP bhp) {

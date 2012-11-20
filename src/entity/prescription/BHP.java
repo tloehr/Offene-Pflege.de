@@ -1,7 +1,7 @@
 package entity.prescription;
 
-import entity.system.Users;
 import entity.info.Resident;
+import entity.system.Users;
 import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
@@ -375,9 +375,7 @@ public class BHP implements Serializable, Comparable<BHP> {
         if (result == 0) {
             result = SYSTools.nullCompare(this.getTradeForm(), that.getTradeForm());
         }
-        if (result == 0) {
-            result = sZeit.compareTo(that.getSollZeit());
-        }
+
         if (result == 0) {
             if (prescription.hasMed()) {
                 result = TradeFormTools.toPrettyString(prescription.getTradeForm()).compareTo(TradeFormTools.toPrettyString(that.getPrescription().getTradeForm()));
@@ -386,8 +384,11 @@ public class BHP implements Serializable, Comparable<BHP> {
             }
         }
         if (result == 0) {
-            result = nanotime.compareTo(that.nanotime);
+            result = sZeit.compareTo(that.getSollZeit());
         }
+//        if (result == 0) {
+//            result = nanotime.compareTo(that.nanotime);
+//        }
         if (result == 0) {
             bhpid.compareTo(that.bhpid);
         }

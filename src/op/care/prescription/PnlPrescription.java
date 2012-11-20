@@ -28,8 +28,6 @@ package op.care.prescription;
 
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
-import com.jidesoft.pane.event.CollapsiblePaneAdapter;
-import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.JideBoxLayout;
@@ -40,7 +38,6 @@ import entity.prescription.*;
 import entity.process.QProcess;
 import entity.process.QProcessElement;
 import entity.process.SYSPRE2PROCESS;
-import entity.system.SYSPropsTools;
 import entity.system.UniqueTools;
 import op.OPDE;
 import op.care.med.inventory.DlgCloseStock;
@@ -212,24 +209,21 @@ public class PnlPrescription extends NursingRecordsPanel {
         String title = "<html><table border=\"0\">" +
                 "<tr valign=\"top\">" +
                 "<td width=\"280\" align=\"left\">" + prescription.getPITAsHTML() + "</td>" +
-                "<td width=\"500\" align=\"left\">" +
+                "<td width=\"380\" align=\"left\">" +
                 PrescriptionTools.getShortDescription(prescription) +
                 PrescriptionTools.getDose(prescription) +
-                "<br/>" +
+                PrescriptionTools.getInventoryInformationAsHTML(prescription) +
+                "</td>" +
+                "<td width=\"200\" align=\"left\">" +
+                PrescriptionTools.getRemark(prescription) +
                 "</td>" +
                 "</table>" +
                 "</html>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    cpPres.setCollapsed(!cpPres.isCollapsed());
-                } catch (PropertyVetoException pve) {
-                    // BAH!
-                }
-            }
-        });
+//        String title2 = "";
+
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, null);
+        cpPres.setCollapsible(false);
         cptitle.getButton().setIcon(getIcon(prescription));
 
         cpPres.setTitleLabelComponent(cptitle.getMain());
@@ -268,24 +262,24 @@ public class PnlPrescription extends NursingRecordsPanel {
 //        btnMenu.setEnabled(!prescription.isClosed());
         cptitle.getRight().add(btnMenu);
 
-        cpPres.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
-            @Override
-            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                JTextPane txt = new JTextPane();
-                txt.setContentType("text/html");
-                txt.setEditable(false);
-                txt.setText(SYSTools.toHTML(PrescriptionTools.getPrescriptionAsHTML(prescription, false, false, true)));
-                cpPres.setContentPane(txt);
-            }
-        });
+//        cpPres.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+//            @Override
+//            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+//                JTextPane txt = new JTextPane();
+//                txt.setContentType("text/html");
+//                txt.setEditable(false);
+//                txt.setText(SYSTools.toHTML(PrescriptionTools.getPrescriptionAsHTML(prescription, false, false, true)));
+//                cpPres.setContentPane(txt);
+//            }
+//        });
 
-        if (!cpPres.isCollapsed()) {
-            JTextPane txt = new JTextPane();
-            txt.setContentType("text/html");
-            txt.setEditable(false);
-            txt.setText(SYSTools.toHTML(PrescriptionTools.getPrescriptionAsHTML(prescription, false, false, true)));
-            cpPres.setContentPane(txt);
-        }
+//        if (!cpPres.isCollapsed()) {
+//            JTextPane txt = new JTextPane();
+//            txt.setContentType("text/html");
+//            txt.setEditable(false);
+//            txt.setText(SYSTools.toHTML(PrescriptionTools.getPrescriptionAsHTML(prescription, false, false, true)));
+//            cpPres.setContentPane(txt);
+//        }
 
         cpPres.setHorizontalAlignment(SwingConstants.LEADING);
         cpPres.setOpaque(false);
@@ -409,11 +403,11 @@ public class PnlPrescription extends NursingRecordsPanel {
         java.util.List<Component> list = new ArrayList<Component>();
 
         tbClosed = GUITools.getNiceToggleButton(internalClassID + ".showclosed");
-        SYSPropsTools.restoreState(internalClassID + ":tbClosed", tbClosed);
+//        SYSPropsTools.restoreState(internalClassID + ":tbClosed", tbClosed);
         tbClosed.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                SYSPropsTools.storeState(internalClassID + ":tbClosed", tbClosed);
+//                SYSPropsTools.storeState(internalClassID + ":tbClosed", tbClosed);
                 buildPanel();
             }
         });
@@ -560,7 +554,7 @@ public class PnlPrescription extends NursingRecordsPanel {
             JideButton printPrescription = GUITools.createHyperlinkButton(internalClassID + ".print", SYSConst.icon22print2, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    SYSFilesTools.print(PrescriptionTools.getPrescriptionsAsHTML(lstPrescriptions, true, true, false, tbClosed.isSelected()), true);
+                    SYSFilesTools.print(PrescriptionTools.getPrescriptionsAsHTML(lstPrescriptions, true, true, false, tbClosed.isSelected(), true), true);
                 }
             });
             list.add(printPrescription);
@@ -597,14 +591,11 @@ public class PnlPrescription extends NursingRecordsPanel {
     private JPanel getMenu(final Prescription prescription) {
 
         JPanel pnlMenu = new JPanel(new VerticalLayout());
-
+        long numBHPs = BHPTools.getNumBHPs(prescription);
+        final MedInventory inventory = TradeFormTools.getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm());
+        final MedStock stockInUse = MedStockTools.getStockInUse(inventory);
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
-
-            final boolean prescriptionHasBeenUsedAlready = BHPTools.hasBeenUsedAlready(prescription);
-            final MedInventory inventory = TradeFormTools.getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm());
-            final MedStock stockInUse = MedStockTools.getStockInUse(inventory);
-
             /***
              *       ____ _
              *      / ___| |__   __ _ _ __   __ _  ___
@@ -618,12 +609,6 @@ public class PnlPrescription extends NursingRecordsPanel {
             btnChange.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-
-                    if (!prescriptionHasBeenUsedAlready) {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".cantchange.hasNeverBeenUsed"));
-                        return;
-                    }
-
                     new DlgRegular(prescription.clone(), DlgRegular.MODE_CHANGE, new Closure() {
                         @Override
                         public void execute(Object o) {
@@ -698,7 +683,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                     });
                 }
             });
-            btnChange.setEnabled(!prescription.isClosed() && !prescription.isOnDemand());
+            btnChange.setEnabled(!prescription.isClosed() && !prescription.isOnDemand() && numBHPs != 0);
             pnlMenu.add(btnChange);
 
             /***
@@ -714,12 +699,6 @@ public class PnlPrescription extends NursingRecordsPanel {
             btnStop.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-
-                    if (!prescriptionHasBeenUsedAlready) {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".cantdiscontinue.hasNeverBeenUsed"));
-                        return;
-                    }
-
                     new DlgDiscontinue(prescription, new Closure() {
                         @Override
                         public void execute(Object o) {
@@ -779,7 +758,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                     });
                 }
             });
-            btnStop.setEnabled(!prescription.isClosed());
+            btnStop.setEnabled(!prescription.isClosed() && numBHPs != 0);
             pnlMenu.add(btnStop);
 
 
@@ -796,12 +775,6 @@ public class PnlPrescription extends NursingRecordsPanel {
             btnEdit.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-
-                    if (prescriptionHasBeenUsedAlready) {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".cantedit.hasBeenUsedAlready"));
-                        return;
-                    }
-
                     if (prescription.isOnDemand()) {
                         new DlgOnDemand(prescription, new Closure() {
                             @Override
@@ -929,9 +902,10 @@ public class PnlPrescription extends NursingRecordsPanel {
                 }
 
             });
-            btnEdit.setEnabled(!prescription.isClosed());
+            btnEdit.setEnabled(!prescription.isClosed() && numBHPs == 0);
             pnlMenu.add(btnEdit);
-
+        }
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, internalClassID)) {
             /***
              *      ____       _      _
              *     |  _ \  ___| | ___| |_ ___
@@ -987,9 +961,10 @@ public class PnlPrescription extends NursingRecordsPanel {
                 }
 
             });
-            btnDelete.setEnabled(!prescription.isClosed() && (!prescriptionHasBeenUsedAlready || OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, internalClassID)));
+            btnDelete.setEnabled(numBHPs == 0 && !prescription.isClosed());
             pnlMenu.add(btnDelete);
-
+        }
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             pnlMenu.add(new JSeparator());
 
             /***
@@ -1090,7 +1065,6 @@ public class PnlPrescription extends NursingRecordsPanel {
                 }
             });
 
-//            btnFiles.setEnabled(!prescription.isClosed());
             if (prescription.getAttachedFilesConnections().size() > 0) {
                 JLabel lblNum = new JLabel(Integer.toString(prescription.getAttachedFilesConnections().size()), SYSConst.icon16greenStar, SwingConstants.CENTER);
                 lblNum.setFont(SYSConst.ARIAL10BOLD);

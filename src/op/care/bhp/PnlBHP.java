@@ -74,6 +74,7 @@ public class PnlBHP extends NursingRecordsPanel {
     private HashMap<BHP, CollapsiblePane> bhpCollapsiblePaneHashMap;
     private HashMap<Byte, ArrayList<BHP>> shiftMAPBHP;
     private HashMap<Byte, CollapsiblePane> shiftMAPpane;
+    private HashMap<Prescription, MedStock> mapPrescription2Stock;
     private int MAX_TEXT_LENGTH = 65;
 
     private JScrollPane jspSearch;
@@ -113,6 +114,7 @@ public class PnlBHP extends NursingRecordsPanel {
         bhpCollapsiblePaneHashMap = new HashMap<BHP, CollapsiblePane>();
         shiftMAPpane = new HashMap<Byte, CollapsiblePane>();
         shiftMAPBHP = new HashMap<Byte, ArrayList<BHP>>();
+        mapPrescription2Stock = new HashMap<Prescription, MedStock>();
         prepareSearchArea();
     }
 
@@ -120,6 +122,10 @@ public class PnlBHP extends NursingRecordsPanel {
     @Override
     public void cleanup() {
         jdcDatum.cleanup();
+        shiftMAPBHP.clear();
+        shiftMAPpane.clear();
+        mapPrescription2Stock.clear();
+        bhpCollapsiblePaneHashMap.clear();
         SYSTools.unregisterListeners(this);
     }
 
@@ -145,6 +151,7 @@ public class PnlBHP extends NursingRecordsPanel {
             OPDE.getMainframe().setBlocked(true);
             OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
 
+            mapPrescription2Stock.clear();
             bhpCollapsiblePaneHashMap.clear();
             if (shiftMAPBHP != null) {
                 for (Byte key : shiftMAPBHP.keySet()) {
@@ -367,39 +374,28 @@ public class PnlBHP extends NursingRecordsPanel {
     private CollapsiblePane createCPFor(final BHP bhp) {
         final CollapsiblePane bhpPane = new CollapsiblePane();
 
-        /***
-         *      _   _ _____    _    ____  _____ ____
-         *     | | | | ____|  / \  |  _ \| ____|  _ \
-         *     | |_| |  _|   / _ \ | | | |  _| | |_) |
-         *     |  _  | |___ / ___ \| |_| | |___|  _ <
-         *     |_| |_|_____/_/   \_\____/|_____|_| \_\
-         *
-         */
-
         JPanel titlePanelleft = new JPanel();
         titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
 
-        /***
-         *      _     _       _    _           _   _                _   _                _
-         *     | |   (_)_ __ | | _| |__  _   _| |_| |_ ___  _ __   | | | | ___  __ _  __| | ___ _ __
-         *     | |   | | '_ \| |/ / '_ \| | | | __| __/ _ \| '_ \  | |_| |/ _ \/ _` |/ _` |/ _ \ '__|
-         *     | |___| | | | |   <| |_) | |_| | |_| || (_) | | | | |  _  |  __/ (_| | (_| |  __/ |
-         *     |_____|_|_| |_|_|\_\_.__/ \__,_|\__|\__\___/|_| |_| |_| |_|\___|\__,_|\__,_|\___|_|
-         *
-         */
-        JideButton btnBHP = GUITools.createHyperlinkButton("<html><font size=+1>" +
+//        JideButton btnBHP = GUITools.createHyperlinkButton(, BHPTools.getIcon(bhp), null);
+
+        // it is expensive to search for stocks. hence the cache map
+        MedStock stock = mapPrescription2Stock.get(bhp.getPrescription());
+        if (bhp.hasMed() && stock == null) {
+            stock = MedStockTools.getStockInUse(TradeFormTools.getInventory4TradeForm(resident, bhp.getTradeForm()));
+            mapPrescription2Stock.put(bhp.getPrescription(), stock);
+        }
+
+
+        String title = "<html><font size=+1>" +
                 SYSTools.left(PrescriptionTools.getPrescriptionAsShortText(bhp.getPrescriptionSchedule().getPrescription()), MAX_TEXT_LENGTH) +
                 (bhp.hasMed() ? ", <b>" + SYSTools.getAsHTML(bhp.getDosis()) +
                         " " + DosageFormTools.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
                 BHPTools.getScheduleText(bhp, ", ", "") +
                 (bhp.getUser() != null ? ", <i>" + bhp.getUser().getUID() + "</i>" : "") +
-                "</font></html>", BHPTools.getIcon(bhp), null);
+                "</font></html>";
 
-//        title.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
-        btnBHP.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-
-        btnBHP.addActionListener(new ActionListener() {
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 try {
@@ -410,11 +406,14 @@ public class PnlBHP extends NursingRecordsPanel {
             }
         });
 
-        titlePanelleft.add(btnBHP);
 
+        JLabel icon1 = new JLabel(BHPTools.getIcon(bhp));
+        icon1.setOpaque(false);
+        JLabel icon2 = new JLabel(BHPTools.getWarningIcon(bhp, stock));
+        icon2.setOpaque(false);
+//        cptitle.getButton().setIcon(BHPTools.getIcon(bhp));
 
-        JPanel titlePanelright = new JPanel();
-        titlePanelright.setLayout(new BoxLayout(titlePanelright, BoxLayout.LINE_AXIS));
+        cptitle.getAdditionalIconPanel().add(icon2);
 
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
@@ -498,8 +497,9 @@ public class PnlBHP extends NursingRecordsPanel {
                         }
                     }
                 });
-                btnApply.setEnabled(bhp.getStatus() == BHPTools.STATE_OPEN);
-                titlePanelright.add(btnApply);
+                // TODO: hier gehts weiter
+                btnApply.setEnabled(bhp.getStatus() == BHPTools.STATE_OPEN && mapPrescription2Stock.containsKey(bhp.getPrescription()));
+                cptitle.getRight().add(btnApply);
 
 
                 /***
@@ -575,7 +575,7 @@ public class PnlBHP extends NursingRecordsPanel {
                     }
                 });
                 btnRefuse.setEnabled(!bhp.isOnDemand() && bhp.getStatus() == BHPTools.STATE_OPEN);
-                titlePanelright.add(btnRefuse);
+                cptitle.getRight().add(btnRefuse);
 
                 /***
                  *      _     _         ____       __                ____  _                       _
@@ -618,7 +618,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                     if (inventory != null) {
                                         MedInventoryTools.takeFrom(em, em.merge(inventory), myBHP.getDosis(), true, myBHP);
                                     } else {
-                                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID+".NoInventory"));
+                                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".NoInventory"));
                                     }
                                 }
 
@@ -659,7 +659,7 @@ public class PnlBHP extends NursingRecordsPanel {
                     }
                 });
                 btnRefuseDiscard.setEnabled(!bhp.isOnDemand() && bhp.hasMed() && bhp.getStatus() == BHPTools.STATE_OPEN);
-                titlePanelright.add(btnRefuseDiscard);
+                cptitle.getRight().add(btnRefuseDiscard);
 
 
                 /***
@@ -744,7 +744,7 @@ public class PnlBHP extends NursingRecordsPanel {
                     }
                 });
                 btnEmpty.setEnabled(bhp.getStatus() != BHPTools.STATE_OPEN);
-                titlePanelright.add(btnEmpty);
+                cptitle.getRight().add(btnEmpty);
             }
 
 
@@ -783,39 +783,33 @@ public class PnlBHP extends NursingRecordsPanel {
             });
 
             btnInfo.setEnabled(!SYSTools.catchNull(bhp.getPrescription().getText()).isEmpty());
-            titlePanelright.add(btnInfo);
+            cptitle.getRight().add(btnInfo);
 
         }
 
 
-        titlePanelleft.setOpaque(false);
-        titlePanelright.setOpaque(false);
-        JPanel titlePanel = new JPanel();
-        titlePanel.setOpaque(false);
+//        titlePanelleft.setOpaque(false);
+//        titlePanelright.setOpaque(false);
+//        JPanel titlePanel = new JPanel();
+//        titlePanel.setOpaque(false);
+//
+//        titlePanel.setLayout(new GridBagLayout());
+//        ((GridBagLayout) titlePanel.getLayout()).columnWidths = new int[]{0, 80};
+//        ((GridBagLayout) titlePanel.getLayout()).columnWeights = new double[]{1.0, 1.0};
+//
+//        titlePanel.add(titlePanelleft, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+//                GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
+//                new Insets(0, 0, 0, 5), 0, 0));
+//
+//        titlePanel.add(titlePanelright, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+//                GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+//                new Insets(0, 0, 0, 0), 0, 0));
 
-        titlePanel.setLayout(new GridBagLayout());
-        ((GridBagLayout) titlePanel.getLayout()).columnWidths = new int[]{0, 80};
-        ((GridBagLayout) titlePanel.getLayout()).columnWeights = new double[]{1.0, 1.0};
 
-        titlePanel.add(titlePanelleft, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
-                new Insets(0, 0, 0, 5), 0, 0));
-
-        titlePanel.add(titlePanelright, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-                GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-                new Insets(0, 0, 0, 0), 0, 0));
-
-        bhpPane.setTitleLabelComponent(titlePanel);
+        bhpPane.setTitleLabelComponent(cptitle.getMain());
         bhpPane.setSlidingDirection(SwingConstants.SOUTH);
 //        OPDE.debug("Dimension: " + dfnPane.getPreferredSize());
 
-        /***
-         *       ___ ___  _  _ _____ ___ _  _ _____
-         *      / __/ _ \| \| |_   _| __| \| |_   _|
-         *     | (_| (_) | .` | | | | _|| .` | | |
-         *      \___\___/|_|\_| |_| |___|_|\_| |_|
-         *
-         */
 
         final JTextPane contentPane = new JTextPane();
         contentPane.setEditable(false);
@@ -833,7 +827,7 @@ public class PnlBHP extends NursingRecordsPanel {
         bhpPane.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                contentPane.setText(SYSTools.toHTML(PrescriptionTools.getPrescriptionAsHTML(bhp.getPrescription(), false, false, true)));
+                contentPane.setText(SYSTools.toHTML(PrescriptionTools.getPrescriptionAsHTML(bhp.getPrescription(), false, false, true, false)));
             }
         });
 

@@ -54,7 +54,7 @@ public class InterventionScheduleTools {
                         "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.repeat.short") + "</th>" +
                         "   </tr>";
             }
-            String wdh = getWiederholung(termin);
+            String wdh = getRepeatPattern(termin);
 
             result += "    <tr>" +
                     "      <td align=\"center\">" + (termin.getNachtMo() > 0 ? termin.getNachtMo() : "--") + "</td>" +
@@ -75,7 +75,7 @@ public class InterventionScheduleTools {
                         "   </tr>";
             }
 
-            String wdh = getWiederholung(termin);
+            String wdh = getRepeatPattern(termin);
             result += "    <tr>" +
                     "      <td align=\"center\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(termin.getUhrzeit()) + " Uhr</td>" +
                     "      <td align=\"center\">" + termin.getUhrzeitAnzahl() + "</td>" +
@@ -96,96 +96,127 @@ public class InterventionScheduleTools {
         return result;
     }
 
-    public static String getWiederholung(InterventionSchedule termin) {
+    public static String getRepeatPattern(InterventionSchedule schedule) {
         String result = "";
 
-        if (termin.isTaeglich()) {
-            if (termin.getTaeglich() > 1) {
-                result += "alle " + termin.getTaeglich() + " Tage";
+        if (schedule.isTaeglich()) {
+            if (schedule.getTaeglich() > 1) {
+                result += "alle " + schedule.getTaeglich() + " Tage";
             } else {
                 result += "jeden Tag";
             }
-        } else if (termin.isWoechentlich()) {
-            if (termin.getWoechentlich() == 1) {
+        } else if (schedule.isWoechentlich()) {
+            if (schedule.getWoechentlich() == 1) {
                 result += "jede Woche ";
             } else {
-                result += "alle " + termin.getWoechentlich() + " Wochen ";
+                result += "alle " + schedule.getWoechentlich() + " Wochen ";
             }
 
-            if (termin.getMon() > 0) {
-                result += "Mon ";
-            }
-            if (termin.getDie() > 0) {
-                result += "Die ";
-            }
-            if (termin.getMit() > 0) {
-                result += "Mit ";
-            }
-            if (termin.getDon() > 0) {
-                result += "Don ";
-            }
-            if (termin.getFre() > 0) {
-                result += "Fre ";
-            }
-            if (termin.getSam() > 0) {
-                result += "Sam ";
-            }
-            if (termin.getSon() > 0) {
-                result += "Son ";
+           String daylist = "";
+
+            daylist += (schedule.getMon() > 0 ? OPDE.lang.getString("misc.msg.monday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getDie() > 0 ? OPDE.lang.getString("misc.msg.tuesday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getMit() > 0 ? OPDE.lang.getString("misc.msg.wednesday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getDon() > 0 ? OPDE.lang.getString("misc.msg.thursday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getFre() > 0 ? OPDE.lang.getString("misc.msg.friday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getSam() > 0 ? OPDE.lang.getString("misc.msg.saturday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getSon() > 0 ? OPDE.lang.getString("misc.msg.sunday").substring(0, 3) + ", " : "");
+
+            if (!daylist.isEmpty()) {
+                result += "{" + daylist.substring(0, daylist.length() - 2) + "}";
             }
 
-        } else if (termin.isMonatlich()) {
-            if (termin.getMonatlich() == 1) {
+//            if (termin.getMon() > 0) {
+//                result += "Mon ";
+//            }
+//            if (termin.getDie() > 0) {
+//                result += "Die ";
+//            }
+//            if (termin.getMit() > 0) {
+//                result += "Mit ";
+//            }
+//            if (termin.getDon() > 0) {
+//                result += "Don ";
+//            }
+//            if (termin.getFre() > 0) {
+//                result += "Fre ";
+//            }
+//            if (termin.getSam() > 0) {
+//                result += "Sam ";
+//            }
+//            if (termin.getSon() > 0) {
+//                result += "Son ";
+//            }
+
+        } else if (schedule.isMonatlich()) {
+            if (schedule.getMonatlich() == 1) {
                 result += "jeden Monat ";
             } else {
-                result += "alle " + termin.getMonatlich() + " Monate ";
+                result += "alle " + schedule.getMonatlich() + " Monate ";
             }
 
-            if (termin.getTagNum() > 0) {
-                result += "jeweils am " + termin.getTagNum() + ". des Monats";
+            if (schedule.getTagNum() > 0) {
+                result += "jeweils am " + schedule.getTagNum() + ". des Monats";
             } else {
-
                 int wtag = 0;
                 String tag = "";
-                if (termin.getMon() > 0) {
-                    tag += "Montag ";
-                    wtag = termin.getMon();
-                }
-                if (termin.getDie() > 0) {
-                    tag += "Dienstag ";
-                    wtag = termin.getDie();
-                }
-                if (termin.getMit() > 0) {
-                    tag += "Mittwoch ";
-                    wtag = termin.getMit();
-                }
-                if (termin.getDon() > 0) {
-                    tag += "Donnerstag ";
-                    wtag = termin.getDon();
-                }
-                if (termin.getFre() > 0) {
-                    tag += "Freitag ";
-                    wtag = termin.getFre();
-                }
-                if (termin.getSam() > 0) {
-                    tag += "Samstag ";
-                    wtag = termin.getSam();
-                }
-                if (termin.getSon() > 0) {
-                    tag += "Sonntag ";
-                    wtag = termin.getSon();
-                }
+
+                                tag += (schedule.getMon() > 0 ? OPDE.lang.getString("misc.msg.monday") : "");
+                tag += (schedule.getDie() > 0 ? OPDE.lang.getString("misc.msg.tuesday") : "");
+                tag += (schedule.getMit() > 0 ? OPDE.lang.getString("misc.msg.wednesday") : "");
+                tag += (schedule.getDon() > 0 ? OPDE.lang.getString("misc.msg.thursday") : "");
+                tag += (schedule.getFre() > 0 ? OPDE.lang.getString("misc.msg.friday") : "");
+                tag += (schedule.getSam() > 0 ? OPDE.lang.getString("misc.msg.saturday") : "");
+                tag += (schedule.getSon() > 0 ? OPDE.lang.getString("misc.msg.sunday") : "");
+
+                // In this case, only one of the below can be >0. So this will work.
+                wtag += schedule.getMon();
+                wtag += schedule.getDie();
+                wtag += schedule.getMit();
+                wtag += schedule.getDon();
+                wtag += schedule.getFre();
+                wtag += schedule.getSam();
+                wtag += schedule.getSon();
+
+//                if (termin.getMon() > 0) {
+//                    tag += "Montag ";
+//                    wtag = termin.getMon();
+//                }
+//                if (termin.getDie() > 0) {
+//                    tag += "Dienstag ";
+//                    wtag = termin.getDie();
+//                }
+//                if (termin.getMit() > 0) {
+//                    tag += "Mittwoch ";
+//                    wtag = termin.getMit();
+//                }
+//                if (termin.getDon() > 0) {
+//                    tag += "Donnerstag ";
+//                    wtag = termin.getDon();
+//                }
+//                if (termin.getFre() > 0) {
+//                    tag += "Freitag ";
+//                    wtag = termin.getFre();
+//                }
+//                if (termin.getSam() > 0) {
+//                    tag += "Samstag ";
+//                    wtag = termin.getSam();
+//                }
+//                if (termin.getSon() > 0) {
+//                    tag += "Sonntag ";
+//                    wtag = termin.getSon();
+//                }
                 result += "jeweils am " + wtag + ". " + tag + " des Monats";
             }
         } else {
             result = "";
         }
 
-        DateMidnight ldatum = new DateTime(termin.getLDatum()).toDateMidnight();
+        DateMidnight ldatum = new DateTime(schedule.getLDatum()).toDateMidnight();
         DateMidnight today = new DateMidnight();
 
         if (ldatum.compareTo(today) > 0) { // Die erste Ausführung liegt in der Zukunft
-            result += "<br/>erst ab: " + DateFormat.getDateInstance().format(termin.getLDatum());
+            result += "<br/>erst ab: " + DateFormat.getDateInstance().format(schedule.getLDatum());
         }
 
         return result;

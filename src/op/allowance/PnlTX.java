@@ -65,7 +65,7 @@ public class PnlTX extends JPanel {
 //        }
 //
 //        ((JTextField) evt.getSource()).setText(DateFormat.getDateInstance().format(dt.toDate()));
-        SYSCalendar.handleDateFocusLost(evt, min.toDateTime());
+        SYSCalendar.handleDateFocusLost(evt, min, new DateMidnight());
     }
 
     private void txtDateFocusGained(FocusEvent e) {

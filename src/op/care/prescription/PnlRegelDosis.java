@@ -127,7 +127,7 @@ public class PnlRegelDosis extends CleanablePanel {
     }
 
     private void txtLDateFocusLost(FocusEvent evt) {
-        SYSCalendar.handleDateFocusLost(evt, new DateTime());
+        SYSCalendar.handleDateFocusLost(evt, new DateMidnight(), new DateMidnight().plusWeeks(4));
     }
 
 
@@ -218,13 +218,10 @@ public class PnlRegelDosis extends CleanablePanel {
         Date now = null;
         if (schedule.getUhrzeitDosis().compareTo(BigDecimal.ZERO) > 0) {
             splitRegularPos = 0.0d;
-//            currentSelectedTime = nursingprocess.getUhrzeit();
             now = schedule.getUhrzeit();
-//            cmbUhrzeit.setSelectedItem(currentSelectedTime);
         } else {
             now = new Date();
             splitRegularPos = 1.0d;
-//            currentSelectedTime = null;
         }
 
         for (Date zeit : timelist) {
