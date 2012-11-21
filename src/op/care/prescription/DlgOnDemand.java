@@ -768,12 +768,12 @@ public class DlgOnDemand extends MyJDialog {
         schedule.setLDatum(new Date());
 
         schedule.setMon((short) 0);
-        schedule.setDie((short) 0);
-        schedule.setMit((short) 0);
-        schedule.setDon((short) 0);
-        schedule.setFre((short) 0);
-        schedule.setSam((short) 0);
-        schedule.setSon((short) 0);
+        schedule.setTue((short) 0);
+        schedule.setWed((short) 0);
+        schedule.setThu((short) 0);
+        schedule.setFri((short) 0);
+        schedule.setSat((short) 0);
+        schedule.setSun((short) 0);
 
         schedule.setTagNum((short) 0);
 

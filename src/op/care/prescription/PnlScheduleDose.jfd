@@ -138,7 +138,7 @@
                <int>2</int> 
               </void> 
               <void property="name"> 
-               <string>jLabel6</string> 
+               <string>lblVeryEarly</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -186,7 +186,7 @@
                <int>2</int> 
               </void> 
               <void property="name"> 
-               <string>jLabel1</string> 
+               <string>lblMorning</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -230,7 +230,7 @@
                <int>2</int> 
               </void> 
               <void property="name"> 
-               <string>jLabel2</string> 
+               <string>lblNoon</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -274,7 +274,7 @@
                <int>2</int> 
               </void> 
               <void property="name"> 
-               <string>jLabel11</string> 
+               <string>lblAfternoon</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -318,7 +318,7 @@
                <int>2</int> 
               </void> 
               <void property="name"> 
-               <string>jLabel3</string> 
+               <string>lblEvening</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -353,7 +353,7 @@
                <int>2</int> 
               </void> 
               <void property="name"> 
-               <string>jLabel4</string> 
+               <string>lblVeryLate</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -380,15 +380,7 @@
                <object idref="Font0"/> 
               </void> 
               <void property="name"> 
-               <string>txtNachtMo</string> 
-              </void> 
-              <void method="addEvent"> 
-               <object class="com.jformdesigner.model.FormEvent"> 
-                <string>java.awt.event.ActionListener</string> 
-                <string>actionPerformed</string> 
-                <string>txtNachtMoActionPerformed</string> 
-                <boolean>true</boolean> 
-               </object> 
+               <string>txtVeryEarly</string> 
               </void> 
               <void method="addEvent"> 
                <object class="com.jformdesigner.model.FormEvent"> 
@@ -423,15 +415,7 @@
                <object idref="Font0"/> 
               </void> 
               <void property="name"> 
-               <string>txtMorgens</string> 
-              </void> 
-              <void method="addEvent"> 
-               <object class="com.jformdesigner.model.FormEvent"> 
-                <string>java.awt.event.ActionListener</string> 
-                <string>actionPerformed</string> 
-                <string>txtMorgensActionPerformed</string> 
-                <boolean>true</boolean> 
-               </object> 
+               <string>txtMorning</string> 
               </void> 
               <void method="addEvent"> 
                <object class="com.jformdesigner.model.FormEvent"> 
@@ -470,15 +454,7 @@
                <object idref="Font0"/> 
               </void> 
               <void property="name"> 
-               <string>txtMittags</string> 
-              </void> 
-              <void method="addEvent"> 
-               <object class="com.jformdesigner.model.FormEvent"> 
-                <string>java.awt.event.ActionListener</string> 
-                <string>actionPerformed</string> 
-                <string>txtMittagsActionPerformed</string> 
-                <boolean>true</boolean> 
-               </object> 
+               <string>txtNoon</string> 
               </void> 
               <void method="addEvent"> 
                <object class="com.jformdesigner.model.FormEvent"> 
@@ -517,15 +493,7 @@
                <object idref="Font0"/> 
               </void> 
               <void property="name"> 
-               <string>txtNachmittags</string> 
-              </void> 
-              <void method="addEvent"> 
-               <object class="com.jformdesigner.model.FormEvent"> 
-                <string>java.awt.event.ActionListener</string> 
-                <string>actionPerformed</string> 
-                <string>txtNachmittagsActionPerformed</string> 
-                <boolean>true</boolean> 
-               </object> 
+               <string>txtAfternoon</string> 
               </void> 
               <void method="addEvent"> 
                <object class="com.jformdesigner.model.FormEvent"> 
@@ -564,15 +532,7 @@
                <object idref="Font0"/> 
               </void> 
               <void property="name"> 
-               <string>txtAbends</string> 
-              </void> 
-              <void method="addEvent"> 
-               <object class="com.jformdesigner.model.FormEvent"> 
-                <string>java.awt.event.ActionListener</string> 
-                <string>actionPerformed</string> 
-                <string>txtAbendsActionPerformed</string> 
-                <boolean>true</boolean> 
-               </object> 
+               <string>txtEvening</string> 
               </void> 
               <void method="addEvent"> 
                <object class="com.jformdesigner.model.FormEvent"> 
@@ -611,15 +571,7 @@
                <object idref="Font0"/> 
               </void> 
               <void property="name"> 
-               <string>txtNachtAb</string> 
-              </void> 
-              <void method="addEvent"> 
-               <object class="com.jformdesigner.model.FormEvent"> 
-                <string>java.awt.event.ActionListener</string> 
-                <string>actionPerformed</string> 
-                <string>txtNachtAbActionPerformed</string> 
-                <boolean>true</boolean> 
-               </object> 
+               <string>txtVeryLate</string> 
               </void> 
               <void method="addEvent"> 
                <object class="com.jformdesigner.model.FormEvent"> 
@@ -734,7 +686,7 @@
                <int>2</int> 
               </void> 
               <void property="name"> 
-               <string>lblUhrzeit</string> 
+               <string>lblTimeDose</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -795,15 +747,7 @@
                <object idref="Font0"/> 
               </void> 
               <void property="name"> 
-               <string>txtUhrzeit</string> 
-              </void> 
-              <void method="addEvent"> 
-               <object class="com.jformdesigner.model.FormEvent"> 
-                <string>java.awt.event.ActionListener</string> 
-                <string>actionPerformed</string> 
-                <string>txtUhrzeitActionPerformed</string> 
-                <boolean>true</boolean> 
-               </object> 
+               <string>txtTimeDose</string> 
               </void> 
               <void method="addEvent"> 
                <object class="com.jformdesigner.model.FormEvent"> 
@@ -925,7 +869,7 @@
                </object> 
               </void> 
               <void property="name"> 
-               <string>label3</string> 
+               <string>lblEvery1</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -942,7 +886,7 @@
             </void> 
             <void method="add"> 
              <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JSpinner</string> 
+              <string>javax.swing.JTextField</string> 
               <void method="setProperty"> 
                <string>font</string> 
                <object id="Font3" class="java.awt.Font"> 
@@ -951,16 +895,16 @@
                 <int>14</int> 
                </object> 
               </void> 
-              <void method="setProperty"> 
-               <string>model</string> 
-               <object class="javax.swing.SpinnerNumberModel"> 
-                <void property="value"> 
-                 <int>1</int> 
-                </void> 
-               </object> 
-              </void> 
               <void property="name"> 
-               <string>spinTaeglich</string> 
+               <string>txtEveryDay</string> 
+              </void> 
+              <void method="addEvent"> 
+               <object class="com.jformdesigner.model.FormEvent"> 
+                <string>java.awt.event.FocusListener</string> 
+                <string>focusLost</string> 
+                <string>txtEveryDayFocusLost</string> 
+                <boolean>true</boolean> 
+               </object> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -987,7 +931,7 @@
                <object idref="Font3"/> 
               </void> 
               <void property="name"> 
-               <string>jLabel7</string> 
+               <string>lblDays</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1004,13 +948,29 @@
             </void> 
             <void method="add"> 
              <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JButton</string> 
+              <string>com.jidesoft.swing.JideButton</string> 
               <void method="setProperty"> 
                <string>text</string> 
                <string>Jeden Tag</string> 
               </void> 
+              <void method="setProperty"> 
+               <string>buttonStyle</string> 
+               <int>3</int> 
+              </void> 
+              <void method="setProperty"> 
+               <string>font</string> 
+               <object class="java.awt.Font"> 
+                <string>Arial</string> 
+                <int>1</int> 
+                <int>14</int> 
+               </object> 
+              </void> 
+              <void method="setProperty"> 
+               <string>foreground</string> 
+               <object class="java.awt.Color" field="blue"/> 
+              </void> 
               <void property="name"> 
-               <string>btnJedenTag</string> 
+               <string>btnEveryDay</string> 
               </void> 
               <void method="addEvent"> 
                <object class="com.jformdesigner.model.FormEvent"> 
@@ -1057,7 +1017,7 @@
              </void> 
              <void method="setProperty"> 
               <string>$rowSpecs</string> 
-              <string>unrelgap, linegap, default, linegap, pref, default:grow, linegap, relgap</string> 
+              <string>unrelgap, linegap, default, linegap, pref, linegap, default:grow, linegap, relgap</string> 
              </void> 
             </object> 
             <void method="setProperty"> 
@@ -1074,7 +1034,7 @@
                <class>com.jgoodies.forms.layout.FormLayout</class> 
                <void method="setProperty"> 
                 <string>$columnSpecs</string> 
-                <string>default, relgap, 40dlu, relgap, default, default, labelcompgap, default, labelcompgap</string> 
+                <string>default, relgap, 40dlu, relgap, default, default</string> 
                </void> 
                <void method="setProperty"> 
                 <string>$rowSpecs</string> 
@@ -1083,49 +1043,6 @@
               </object> 
               <void property="name"> 
                <string>panel3</string> 
-              </void> 
-              <void method="add"> 
-               <object class="com.jformdesigner.model.FormComponent"> 
-                <string>javax.swing.JButton</string> 
-                <void method="setProperty"> 
-                 <string>text</string> 
-                 <string>Jede Woche</string> 
-                </void> 
-                <void method="setProperty"> 
-                 <string>font</string> 
-                 <object id="Font4" class="java.awt.Font"> 
-                  <string>Arial</string> 
-                  <int>0</int> 
-                  <int>14</int> 
-                 </object> 
-                </void> 
-                <void property="name"> 
-                 <string>btnJedeWoche</string> 
-                </void> 
-                <void method="addEvent"> 
-                 <object class="com.jformdesigner.model.FormEvent"> 
-                  <string>java.awt.event.ActionListener</string> 
-                  <string>actionPerformed</string> 
-                  <string>btnJedeWocheActionPerformed</string> 
-                  <boolean>true</boolean> 
-                 </object> 
-                </void> 
-               </object> 
-               <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-                <class>com.jgoodies.forms.layout.CellConstraints</class> 
-                <void method="setProperty"> 
-                 <string>gridY</string> 
-                 <int>3</int> 
-                </void> 
-                <void method="setProperty"> 
-                 <string>gridWidth</string> 
-                 <int>3</int> 
-                </void> 
-                <void method="setProperty"> 
-                 <string>gridX</string> 
-                 <int>3</int> 
-                </void> 
-               </object> 
               </void> 
               <void method="add"> 
                <object class="com.jformdesigner.model.FormComponent"> 
@@ -1139,7 +1056,7 @@
                  <object idref="Font2"/> 
                 </void> 
                 <void property="name"> 
-                 <string>label2</string> 
+                 <string>lblEvery2</string> 
                 </void> 
                </object> 
                <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1156,9 +1073,17 @@
               </void> 
               <void method="add"> 
                <object class="com.jformdesigner.model.FormComponent"> 
-                <string>javax.swing.JSpinner</string> 
+                <string>javax.swing.JTextField</string> 
                 <void property="name"> 
-                 <string>spinWoche</string> 
+                 <string>txtEveryWeek</string> 
+                </void> 
+                <void method="addEvent"> 
+                 <object class="com.jformdesigner.model.FormEvent"> 
+                  <string>java.awt.event.FocusListener</string> 
+                  <string>focusLost</string> 
+                  <string>txtEveryWeekFocusLost</string> 
+                  <boolean>true</boolean> 
+                 </object> 
                 </void> 
                </object> 
                <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1182,7 +1107,11 @@
                 </void> 
                 <void method="setProperty"> 
                  <string>font</string> 
-                 <object idref="Font4"/> 
+                 <object class="java.awt.Font"> 
+                  <string>Arial</string> 
+                  <int>0</int> 
+                  <int>14</int> 
+                 </object> 
                 </void> 
                 <void property="name"> 
                  <string>jLabel8</string> 
@@ -1197,6 +1126,53 @@
                 <void method="setProperty"> 
                  <string>gridY</string> 
                  <int>1</int> 
+                </void> 
+               </object> 
+              </void> 
+              <void method="add"> 
+               <object class="com.jformdesigner.model.FormComponent"> 
+                <string>com.jidesoft.swing.JideButton</string> 
+                <void method="setProperty"> 
+                 <string>text</string> 
+                 <string>Jede Woche</string> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>font</string> 
+                 <object class="java.awt.Font"> 
+                  <string>Arial</string> 
+                  <int>1</int> 
+                  <int>14</int> 
+                 </object> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>buttonStyle</string> 
+                 <int>3</int> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>foreground</string> 
+                 <object class="java.awt.Color" field="blue"/> 
+                </void> 
+                <void property="name"> 
+                 <string>btnEveryWeek</string> 
+                </void> 
+                <void method="addEvent"> 
+                 <object class="com.jformdesigner.model.FormEvent"> 
+                  <string>java.awt.event.ActionListener</string> 
+                  <string>actionPerformed</string> 
+                  <string>btnJedeWocheActionPerformed</string> 
+                  <boolean>true</boolean> 
+                 </object> 
+                </void> 
+               </object> 
+               <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+                <class>com.jgoodies.forms.layout.CellConstraints</class> 
+                <void method="setProperty"> 
+                 <string>gridWidth</string> 
+                 <int>5</int> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>gridY</string> 
+                 <int>3</int> 
                 </void> 
                </object> 
               </void> 
@@ -1241,7 +1217,7 @@
                <int>2</int> 
               </void> 
               <void property="name"> 
-               <string>lblUhrzeit2</string> 
+               <string>lblMon</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1288,7 +1264,7 @@
                <int>2</int> 
               </void> 
               <void property="name"> 
-               <string>lblUhrzeit3</string> 
+               <string>lblTue</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1335,7 +1311,7 @@
                <int>2</int> 
               </void> 
               <void property="name"> 
-               <string>lblUhrzeit4</string> 
+               <string>lblWed</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1382,7 +1358,7 @@
                <int>2</int> 
               </void> 
               <void property="name"> 
-               <string>lblUhrzeit5</string> 
+               <string>lblThu</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1429,7 +1405,7 @@
                <int>2</int> 
               </void> 
               <void property="name"> 
-               <string>lblUhrzeit6</string> 
+               <string>lblFri</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1476,7 +1452,7 @@
                <int>2</int> 
               </void> 
               <void property="name"> 
-               <string>lblUhrzeit7</string> 
+               <string>lblSat</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1523,7 +1499,7 @@
                <int>2</int> 
               </void> 
               <void property="name"> 
-               <string>lblUhrzeit8</string> 
+               <string>lblSun</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1583,7 +1559,7 @@
               <class>com.jgoodies.forms.layout.CellConstraints</class> 
               <void method="setProperty"> 
                <string>gridY</string> 
-               <int>6</int> 
+               <int>7</int> 
               </void> 
               <void method="setProperty"> 
                <string>hAlign</string> 
@@ -1617,13 +1593,13 @@
                </object> 
               </void> 
               <void property="name"> 
-               <string>cbDie</string> 
+               <string>cbTue</string> 
               </void> 
               <void method="addEvent"> 
                <object class="com.jformdesigner.model.FormEvent"> 
                 <string>java.awt.event.ActionListener</string> 
                 <string>actionPerformed</string> 
-                <string>cbDieActionPerformed</string> 
+                <string>cbTueActionPerformed</string> 
                 <boolean>true</boolean> 
                </object> 
               </void> 
@@ -1636,7 +1612,7 @@
               </void> 
               <void method="setProperty"> 
                <string>gridY</string> 
-               <int>6</int> 
+               <int>7</int> 
               </void> 
               <void method="setProperty"> 
                <string>hAlign</string> 
@@ -1666,13 +1642,13 @@
                </object> 
               </void> 
               <void property="name"> 
-               <string>cbMit</string> 
+               <string>cbWed</string> 
               </void> 
               <void method="addEvent"> 
                <object class="com.jformdesigner.model.FormEvent"> 
                 <string>java.awt.event.ActionListener</string> 
                 <string>actionPerformed</string> 
-                <string>cbMitActionPerformed</string> 
+                <string>cbWedActionPerformed</string> 
                 <boolean>true</boolean> 
                </object> 
               </void> 
@@ -1685,7 +1661,7 @@
               </void> 
               <void method="setProperty"> 
                <string>gridY</string> 
-               <int>6</int> 
+               <int>7</int> 
               </void> 
               <void method="setProperty"> 
                <string>hAlign</string> 
@@ -1715,13 +1691,13 @@
                </object> 
               </void> 
               <void property="name"> 
-               <string>cbDon</string> 
+               <string>cbThu</string> 
               </void> 
               <void method="addEvent"> 
                <object class="com.jformdesigner.model.FormEvent"> 
                 <string>java.awt.event.ActionListener</string> 
                 <string>actionPerformed</string> 
-                <string>cbDonActionPerformed</string> 
+                <string>cbThuActionPerformed</string> 
                 <boolean>true</boolean> 
                </object> 
               </void> 
@@ -1734,7 +1710,7 @@
               </void> 
               <void method="setProperty"> 
                <string>gridY</string> 
-               <int>6</int> 
+               <int>7</int> 
               </void> 
               <void method="setProperty"> 
                <string>hAlign</string> 
@@ -1764,13 +1740,13 @@
                </object> 
               </void> 
               <void property="name"> 
-               <string>cbFre</string> 
+               <string>cbFri</string> 
               </void> 
               <void method="addEvent"> 
                <object class="com.jformdesigner.model.FormEvent"> 
                 <string>java.awt.event.ActionListener</string> 
                 <string>actionPerformed</string> 
-                <string>cbFreActionPerformed</string> 
+                <string>cbFriActionPerformed</string> 
                 <boolean>true</boolean> 
                </object> 
               </void> 
@@ -1783,7 +1759,7 @@
               </void> 
               <void method="setProperty"> 
                <string>gridY</string> 
-               <int>6</int> 
+               <int>7</int> 
               </void> 
               <void method="setProperty"> 
                <string>hAlign</string> 
@@ -1813,13 +1789,13 @@
                </object> 
               </void> 
               <void property="name"> 
-               <string>cbSam</string> 
+               <string>cbSat</string> 
               </void> 
               <void method="addEvent"> 
                <object class="com.jformdesigner.model.FormEvent"> 
                 <string>java.awt.event.ActionListener</string> 
                 <string>actionPerformed</string> 
-                <string>cbSamActionPerformed</string> 
+                <string>cbSatActionPerformed</string> 
                 <boolean>true</boolean> 
                </object> 
               </void> 
@@ -1832,7 +1808,7 @@
               </void> 
               <void method="setProperty"> 
                <string>gridY</string> 
-               <int>6</int> 
+               <int>7</int> 
               </void> 
               <void method="setProperty"> 
                <string>hAlign</string> 
@@ -1862,13 +1838,13 @@
                </object> 
               </void> 
               <void property="name"> 
-               <string>cbSon</string> 
+               <string>cbSun</string> 
               </void> 
               <void method="addEvent"> 
                <object class="com.jformdesigner.model.FormEvent"> 
                 <string>java.awt.event.ActionListener</string> 
                 <string>actionPerformed</string> 
-                <string>cbSonActionPerformed</string> 
+                <string>cbSunActionPerformed</string> 
                 <boolean>true</boolean> 
                </object> 
               </void> 
@@ -1881,7 +1857,7 @@
               </void> 
               <void method="setProperty"> 
                <string>gridY</string> 
-               <int>6</int> 
+               <int>7</int> 
               </void> 
               <void method="setProperty"> 
                <string>hAlign</string> 
@@ -1905,11 +1881,11 @@
              <class>com.jgoodies.forms.layout.FormLayout</class> 
              <void method="setProperty"> 
               <string>$columnSpecs</string> 
-              <string>default, labelcompgap, pref, labelcompgap, 40dlu, labelcompgap, pref, labelcompgap, 61dlu</string> 
+              <string>default, labelcompgap, pref, labelcompgap, 40dlu, labelcompgap, pref, labelcompgap, 61dlu, labelcompgap, default</string> 
              </void> 
              <void method="setProperty"> 
               <string>$rowSpecs</string> 
-              <string>default, linegap, default, linegap, default, linegap, default</string> 
+              <string>default, linegap, default, linegap, default</string> 
              </void> 
             </object> 
             <void method="setProperty"> 
@@ -1935,7 +1911,7 @@
                <int>11</int> 
               </void> 
               <void property="name"> 
-               <string>label4</string> 
+               <string>lblEach</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1952,17 +1928,25 @@
             </void> 
             <void method="add"> 
              <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JSpinner</string> 
+              <string>javax.swing.JTextField</string> 
               <void method="setProperty"> 
                <string>font</string> 
-               <object id="Font5" class="java.awt.Font"> 
+               <object id="Font4" class="java.awt.Font"> 
                 <string>Arial</string> 
                 <int>0</int> 
                 <int>14</int> 
                </object> 
               </void> 
               <void property="name"> 
-               <string>spinMonat</string> 
+               <string>txtEveryMonth</string> 
+              </void> 
+              <void method="addEvent"> 
+               <object class="com.jformdesigner.model.FormEvent"> 
+                <string>java.awt.event.FocusListener</string> 
+                <string>focusLost</string> 
+                <string>txtEveryMonthFocusLost</string> 
+                <boolean>true</boolean> 
+               </object> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1989,7 +1973,7 @@
                <object idref="Font2"/> 
               </void> 
               <void property="name"> 
-               <string>label6</string> 
+               <string>lblMonth</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -2006,17 +1990,29 @@
             </void> 
             <void method="add"> 
              <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JButton</string> 
+              <string>com.jidesoft.swing.JideButton</string> 
               <void method="setProperty"> 
                <string>text</string> 
                <string>Jeden Monat</string> 
               </void> 
               <void method="setProperty"> 
                <string>font</string> 
-               <object idref="Font4"/> 
+               <object class="java.awt.Font"> 
+                <string>Arial</string> 
+                <int>1</int> 
+                <int>14</int> 
+               </object> 
+              </void> 
+              <void method="setProperty"> 
+               <string>buttonStyle</string> 
+               <int>3</int> 
+              </void> 
+              <void method="setProperty"> 
+               <string>foreground</string> 
+               <object class="java.awt.Color" field="blue"/> 
               </void> 
               <void property="name"> 
-               <string>btnJedenMonat</string> 
+               <string>btnEveryMonth</string> 
               </void> 
               <void method="addEvent"> 
                <object class="com.jformdesigner.model.FormEvent"> 
@@ -2031,15 +2027,11 @@
               <class>com.jgoodies.forms.layout.CellConstraints</class> 
               <void method="setProperty"> 
                <string>gridY</string> 
-               <int>5</int> 
-              </void> 
-              <void method="setProperty"> 
-               <string>gridWidth</string> 
-               <int>5</int> 
+               <int>3</int> 
               </void> 
               <void method="setProperty"> 
                <string>gridX</string> 
-               <int>3</int> 
+               <int>9</int> 
               </void> 
              </object> 
             </void> 
@@ -2066,7 +2058,7 @@
               <class>com.jgoodies.forms.layout.CellConstraints</class> 
               <void method="setProperty"> 
                <string>gridY</string> 
-               <int>7</int> 
+               <int>5</int> 
               </void> 
               <void method="setProperty"> 
                <string>gridX</string> 
@@ -2076,19 +2068,19 @@
             </void> 
             <void method="add"> 
              <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JSpinner</string> 
+              <string>javax.swing.JTextField</string> 
               <void method="setProperty"> 
                <string>font</string> 
-               <object idref="Font5"/> 
+               <object idref="Font4"/> 
               </void> 
               <void property="name"> 
-               <string>spinMonatTag</string> 
+               <string>txtEveryWDayOfMonth</string> 
               </void> 
               <void method="addEvent"> 
                <object class="com.jformdesigner.model.FormEvent"> 
-                <string>javax.swing.event.ChangeListener</string> 
-                <string>stateChanged</string> 
-                <string>spinMonatTagStateChanged</string> 
+                <string>java.awt.event.FocusListener</string> 
+                <string>focusLost</string> 
+                <string>txtEveryWDayOfMonthFocusLost</string> 
                 <boolean>true</boolean> 
                </object> 
               </void> 
@@ -2097,7 +2089,7 @@
               <class>com.jgoodies.forms.layout.CellConstraints</class> 
               <void method="setProperty"> 
                <string>gridY</string> 
-               <int>7</int> 
+               <int>5</int> 
               </void> 
               <void method="setProperty"> 
                <string>gridX</string> 
@@ -2109,50 +2101,18 @@
              <object class="com.jformdesigner.model.FormComponent"> 
               <string>javax.swing.JComboBox</string> 
               <void method="setProperty"> 
-               <string>model</string> 
-               <object class="javax.swing.DefaultComboBoxModel"> 
-                <void property="selectedItem"> 
-                 <string>Tag des Monats</string> 
-                </void> 
-                <void method="addElement"> 
-                 <string>Tag des Monats</string> 
-                </void> 
-                <void method="addElement"> 
-                 <string>Montag</string> 
-                </void> 
-                <void method="addElement"> 
-                 <string>Dienstag</string> 
-                </void> 
-                <void method="addElement"> 
-                 <string>Mittwoch</string> 
-                </void> 
-                <void method="addElement"> 
-                 <string>Donnerstag</string> 
-                </void> 
-                <void method="addElement"> 
-                 <string>Freitag</string> 
-                </void> 
-                <void method="addElement"> 
-                 <string>Samstag</string> 
-                </void> 
-                <void method="addElement"> 
-                 <string>Sonntag</string> 
-                </void> 
-               </object> 
-              </void> 
-              <void method="setProperty"> 
                <string>font</string> 
-               <object idref="Font5"/> 
+               <object idref="Font4"/> 
               </void> 
               <void property="name"> 
-               <string>cmbTag</string> 
+               <string>cmbWDay</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
               <class>com.jgoodies.forms.layout.CellConstraints</class> 
               <void method="setProperty"> 
                <string>gridY</string> 
-               <int>7</int> 
+               <int>5</int> 
               </void> 
               <void method="setProperty"> 
                <string>gridX</string> 

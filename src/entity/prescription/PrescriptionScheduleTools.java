@@ -63,12 +63,12 @@ public class PrescriptionScheduleTools {
             String daylist = "";
 
             daylist += (planung.getMon() > 0 ? OPDE.lang.getString("misc.msg.monday").substring(0, 3) + ", " : "");
-            daylist += (planung.getDie() > 0 ? OPDE.lang.getString("misc.msg.tuesday").substring(0, 3) + ", " : "");
-            daylist += (planung.getMit() > 0 ? OPDE.lang.getString("misc.msg.wednesday").substring(0, 3) + ", " : "");
-            daylist += (planung.getDon() > 0 ? OPDE.lang.getString("misc.msg.thursday").substring(0, 3) + ", " : "");
-            daylist += (planung.getFre() > 0 ? OPDE.lang.getString("misc.msg.friday").substring(0, 3) + ", " : "");
-            daylist += (planung.getSam() > 0 ? OPDE.lang.getString("misc.msg.saturday").substring(0, 3) + ", " : "");
-            daylist += (planung.getSon() > 0 ? OPDE.lang.getString("misc.msg.sunday").substring(0, 3) + ", " : "");
+            daylist += (planung.getTue() > 0 ? OPDE.lang.getString("misc.msg.tuesday").substring(0, 3) + ", " : "");
+            daylist += (planung.getWed() > 0 ? OPDE.lang.getString("misc.msg.wednesday").substring(0, 3) + ", " : "");
+            daylist += (planung.getThu() > 0 ? OPDE.lang.getString("misc.msg.thursday").substring(0, 3) + ", " : "");
+            daylist += (planung.getFri() > 0 ? OPDE.lang.getString("misc.msg.friday").substring(0, 3) + ", " : "");
+            daylist += (planung.getSat() > 0 ? OPDE.lang.getString("misc.msg.saturday").substring(0, 3) + ", " : "");
+            daylist += (planung.getSun() > 0 ? OPDE.lang.getString("misc.msg.sunday").substring(0, 3) + ", " : "");
 
             if (!daylist.isEmpty()) {
                 result += "{" + daylist.substring(0, daylist.length() - 2) + "}";
@@ -91,20 +91,20 @@ public class PrescriptionScheduleTools {
 
                 // In diesem fall kann immer nur ein Wochentag >0 sein. Daher klappt das so.
                 tag += (planung.getMon() > 0 ? OPDE.lang.getString("misc.msg.monday") : "");
-                tag += (planung.getDie() > 0 ? OPDE.lang.getString("misc.msg.tuesday") : "");
-                tag += (planung.getMit() > 0 ? OPDE.lang.getString("misc.msg.wednesday") : "");
-                tag += (planung.getDon() > 0 ? OPDE.lang.getString("misc.msg.thursday") : "");
-                tag += (planung.getFre() > 0 ? OPDE.lang.getString("misc.msg.friday") : "");
-                tag += (planung.getSam() > 0 ? OPDE.lang.getString("misc.msg.saturday") : "");
-                tag += (planung.getSon() > 0 ? OPDE.lang.getString("misc.msg.sunday") : "");
+                tag += (planung.getTue() > 0 ? OPDE.lang.getString("misc.msg.tuesday") : "");
+                tag += (planung.getWed() > 0 ? OPDE.lang.getString("misc.msg.wednesday") : "");
+                tag += (planung.getThu() > 0 ? OPDE.lang.getString("misc.msg.thursday") : "");
+                tag += (planung.getFri() > 0 ? OPDE.lang.getString("misc.msg.friday") : "");
+                tag += (planung.getSat() > 0 ? OPDE.lang.getString("misc.msg.saturday") : "");
+                tag += (planung.getSun() > 0 ? OPDE.lang.getString("misc.msg.sunday") : "");
 
                 wtag += planung.getMon();
-                wtag += planung.getDie();
-                wtag += planung.getMit();
-                wtag += planung.getDon();
-                wtag += planung.getFre();
-                wtag += planung.getSam();
-                wtag += planung.getSon();
+                wtag += planung.getTue();
+                wtag += planung.getWed();
+                wtag += planung.getThu();
+                wtag += planung.getFri();
+                wtag += planung.getSat();
+                wtag += planung.getSun();
 
                 result += "am " + wtag + ". " + tag + " des Monats";
             }

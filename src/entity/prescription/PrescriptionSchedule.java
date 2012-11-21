@@ -303,51 +303,51 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
         this.mon = mon;
     }
 
-    public Short getDie() {
+    public Short getTue() {
         return die;
     }
 
-    public void setDie(Short die) {
+    public void setTue(Short die) {
         this.die = die;
     }
 
-    public Short getMit() {
+    public Short getWed() {
         return mit;
     }
 
-    public void setMit(Short mit) {
+    public void setWed(Short mit) {
         this.mit = mit;
     }
 
-    public Short getDon() {
+    public Short getThu() {
         return don;
     }
 
-    public void setDon(Short don) {
+    public void setThu(Short don) {
         this.don = don;
     }
 
-    public Short getFre() {
+    public Short getFri() {
         return fre;
     }
 
-    public void setFre(Short fre) {
+    public void setFri(Short fre) {
         this.fre = fre;
     }
 
-    public Short getSam() {
+    public Short getSat() {
         return sam;
     }
 
-    public void setSam(Short sam) {
+    public void setSat(Short sam) {
         this.sam = sam;
     }
 
-    public Short getSon() {
+    public Short getSun() {
         return son;
     }
 
-    public void setSon(Short son) {
+    public void setSun(Short son) {
         this.son = son;
     }
 

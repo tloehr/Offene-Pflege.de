@@ -129,22 +129,22 @@ public class InterventionScheduleTools {
 //            if (termin.getMon() > 0) {
 //                result += "Mon ";
 //            }
-//            if (termin.getDie() > 0) {
+//            if (termin.getTue() > 0) {
 //                result += "Die ";
 //            }
-//            if (termin.getMit() > 0) {
+//            if (termin.getWed() > 0) {
 //                result += "Mit ";
 //            }
-//            if (termin.getDon() > 0) {
+//            if (termin.getThu() > 0) {
 //                result += "Don ";
 //            }
-//            if (termin.getFre() > 0) {
+//            if (termin.getFri() > 0) {
 //                result += "Fre ";
 //            }
-//            if (termin.getSam() > 0) {
+//            if (termin.getSat() > 0) {
 //                result += "Sam ";
 //            }
-//            if (termin.getSon() > 0) {
+//            if (termin.getSun() > 0) {
 //                result += "Son ";
 //            }
 
@@ -182,29 +182,29 @@ public class InterventionScheduleTools {
 //                    tag += "Montag ";
 //                    wtag = termin.getMon();
 //                }
-//                if (termin.getDie() > 0) {
+//                if (termin.getTue() > 0) {
 //                    tag += "Dienstag ";
-//                    wtag = termin.getDie();
+//                    wtag = termin.getTue();
 //                }
-//                if (termin.getMit() > 0) {
+//                if (termin.getWed() > 0) {
 //                    tag += "Mittwoch ";
-//                    wtag = termin.getMit();
+//                    wtag = termin.getWed();
 //                }
-//                if (termin.getDon() > 0) {
+//                if (termin.getThu() > 0) {
 //                    tag += "Donnerstag ";
-//                    wtag = termin.getDon();
+//                    wtag = termin.getThu();
 //                }
-//                if (termin.getFre() > 0) {
+//                if (termin.getFri() > 0) {
 //                    tag += "Freitag ";
-//                    wtag = termin.getFre();
+//                    wtag = termin.getFri();
 //                }
-//                if (termin.getSam() > 0) {
+//                if (termin.getSat() > 0) {
 //                    tag += "Samstag ";
-//                    wtag = termin.getSam();
+//                    wtag = termin.getSat();
 //                }
-//                if (termin.getSon() > 0) {
+//                if (termin.getSun() > 0) {
 //                    tag += "Sonntag ";
-//                    wtag = termin.getSon();
+//                    wtag = termin.getSun();
 //                }
                 result += "jeweils am " + wtag + ". " + tag + " des Monats";
             }

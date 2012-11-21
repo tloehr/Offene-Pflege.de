@@ -31,11 +31,13 @@ import entity.files.SYSFilesTools;
 import entity.system.SYSPropsTools;
 import entity.system.Users;
 import op.OPDE;
+import op.threads.DisplayMessage;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.TimingSource;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
 import org.jdesktop.core.animation.timing.interpolators.AccelerationInterpolator;
 import org.jdesktop.swing.animation.timing.sources.SwingTimerTimingSource;
+import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.pushingpixels.trident.Timeline;
 import org.pushingpixels.trident.callback.TimelineCallback;
@@ -50,6 +52,7 @@ import javax.swing.text.JTextComponent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
 import java.io.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
@@ -60,6 +63,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -112,6 +116,26 @@ public class SYSTools {
 
 
         OPDE.debug(ste[2].toString() + ": " + (System.currentTimeMillis() - begin) + " ms");
+    }
+
+    public static void handleIntegerFocusLost(FocusEvent evt, int min, int max, int def) {
+        int myInt;
+        try {
+            myInt = Integer.parseInt(((JTextField) evt.getSource()).getText());
+        } catch (NumberFormatException ex) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wrongentry")));
+            myInt = def;
+        }
+        if (myInt < min) {
+            myInt = min;
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.entryTooSmall")));
+        }
+        if (myInt > max) {
+            myInt = max;
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.entryTooBig")));
+        }
+
+        ((JTextField) evt.getSource()).setText(Integer.toString(myInt));
     }
 
     public static void centerOnParent(Component parent, Component child) {
