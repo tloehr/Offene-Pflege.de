@@ -166,10 +166,10 @@ public class MedProductWizard {
             addText("Drücken Sie auf WEITER, wenn's los gehen soll.", SYSConst.ARIAL14);
         }
 
-//        @Override
-//        public Image getGraphic() {
-//            return getLeftGraphic("/artwork/aspecton1.png");
-//        }
+        @Override
+        public Image getGraphic() {
+            return getLeftGraphic("/artwork/other/medicine0.png");
+        }
 
         @Override
         public void setupWizardButtons() {
@@ -213,10 +213,10 @@ public class MedProductWizard {
             fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
 
-//        @Override
-//        public Image getGraphic() {
-//            return getLeftGraphic("/artwork/aspecton1.png");
-//        }
+        @Override
+        public Image getGraphic() {
+            return getLeftGraphic("/artwork/other/medicine1.png");
+        }
 
         @Override
         protected void initContentPane() {

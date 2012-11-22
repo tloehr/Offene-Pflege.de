@@ -142,7 +142,7 @@ public class PnlScheduleDose extends CleanablePanel {
 
     private void txtEveryWDayOfMonthFocusLost(FocusEvent e) {
         if (cmbWDay.getSelectedIndex() == 0) {
-            SYSTools.handleIntegerFocusLost(e, monthlyModel[MIN], monthlyModel[MAX], monthlyModel[DEFAULT]);
+            SYSTools.handleIntegerFocusLost(e, perMonthModel[MIN], perMonthModel[MAX], perMonthModel[DEFAULT]);
         } else {
             SYSTools.handleIntegerFocusLost(e, weekdayModel[MIN], weekdayModel[MAX], weekdayModel[DEFAULT]);
         }
@@ -156,8 +156,40 @@ public class PnlScheduleDose extends CleanablePanel {
         SYSTools.handleIntegerFocusLost(e, dailyModel[MIN], dailyModel[MAX], dailyModel[DEFAULT]);
     }
 
+    private void txtDoubleFocusLost(FocusEvent e) {
+        SYSTools.handleBigDecimalFocusLost(e, BigDecimal.ZERO, new BigDecimal(10000), BigDecimal.ONE);
+    }
+
+    private void txtActionPerformed(ActionEvent e) {
+        if (e.getSource().equals(txtVeryEarly)) {
+            txtMorning.requestFocus();
+        } else if (e.getSource().equals(txtMorning)) {
+            txtNoon.requestFocus();
+        } else if (e.getSource().equals(txtNoon)) {
+            txtAfternoon.requestFocus();
+        } else if (e.getSource().equals(txtAfternoon)) {
+            txtEvening.requestFocus();
+        } else if (e.getSource().equals(txtEvening)) {
+            txtVeryLate.requestFocus();
+        } else if (e.getSource().equals(txtVeryLate)) {
+            txtVeryEarly.requestFocus();
+        }
+    }
 
     private void initPanel() {
+
+        tabWdh.setTitleAt(0, OPDE.lang.getString("misc.msg.daily"));
+        tabWdh.setTitleAt(1, OPDE.lang.getString("misc.msg.weekly"));
+        tabWdh.setTitleAt(2, OPDE.lang.getString("misc.msg.monthly"));
+
+        lblLDate.setText(OPDE.lang.getString(internalClassID + ".lblLDate") + " ");
+        lblOnThe.setText(OPDE.lang.getString(internalClassID + ".lblOnThe"));
+        lblMonth.setText(OPDE.lang.getString("misc.msg.months"));
+        lblEach.setText(OPDE.lang.getString("misc.msg.every"));
+        lblEvery1.setText(OPDE.lang.getString("misc.msg.every"));
+        lblEvery2.setText(OPDE.lang.getString("misc.msg.every"));
+        lblWeeksAt.setText(OPDE.lang.getString("misc.msg.weeks") + " " + OPDE.lang.getString("misc.msg.atchrono"));
+        lblDays.setText(OPDE.lang.getString("misc.msg.Days2"));
 
         ArrayList<Date> timelist = SYSCalendar.getTimeList();
         cmbUhrzeit.setModel(new DefaultComboBoxModel(timelist.toArray()));
@@ -182,9 +214,15 @@ public class PnlScheduleDose extends CleanablePanel {
         lblEvening.setText(OPDE.lang.getString("misc.msg.evening.long"));
         lblVeryLate.setText(OPDE.lang.getString("misc.msg.lateatnight.long"));
 
-        lblEvery1.setText(OPDE.lang.getString("misc.msg.every"));
-        lblEvery2.setText(OPDE.lang.getString("misc.msg.every"));
-        lblEach.setText(OPDE.lang.getString("misc.msg.each"));
+        txtEveryDay.setText("1");
+        txtEveryWeek.setText("1");
+        txtEveryMonth.setText("1");
+        txtEveryWDayOfMonth.setText("1");
+
+//        txtEveryDay.setText(schedule.getTaeglich().toString());
+//        txtEveryWeek.setText(schedule.getWoechentlich().toString());
+//        txtEveryMonth.setText(schedule.getMonatlich().toString());
+//        txtEveryWDayOfMonth.setText(schedule.getTagNum().toString());
 
         tabWdh.setSelectedIndex(TAB_DAILY);
 
@@ -312,7 +350,7 @@ public class PnlScheduleDose extends CleanablePanel {
         panel3 = new JPanel();
         lblEvery2 = new JLabel();
         txtEveryWeek = new JTextField();
-        jLabel8 = new JLabel();
+        lblWeeksAt = new JLabel();
         btnEveryWeek = new JideButton();
         lblMon = new JideLabel();
         lblTue = new JideLabel();
@@ -333,7 +371,7 @@ public class PnlScheduleDose extends CleanablePanel {
         txtEveryMonth = new JTextField();
         lblMonth = new JLabel();
         btnEveryMonth = new JideButton();
-        label5 = new JLabel();
+        lblOnThe = new JLabel();
         txtEveryWDayOfMonth = new JTextField();
         cmbWDay = new JComboBox();
         panel2 = new JPanel();
@@ -354,14 +392,14 @@ public class PnlScheduleDose extends CleanablePanel {
                 }
             });
             panelMain.setLayout(new FormLayout(
-                "$rgap, $lcgap, 223dlu, $lcgap, $rgap",
-                "$rgap, 2*($lgap, pref), 2*($lgap, default), $lgap, $rgap"));
+                    "$rgap, $lcgap, 223dlu, $lcgap, $rgap",
+                    "$rgap, 2*($lgap, pref), 2*($lgap, default), $lgap, $rgap"));
 
             //======== splitRegular ========
             {
                 splitRegular.setDividerSize(0);
                 splitRegular.setEnabled(false);
-                splitRegular.setDividerLocation(30);
+                splitRegular.setDividerLocation(300);
                 splitRegular.setDoubleBuffered(true);
 
                 //======== pnlTageszeit ========
@@ -369,8 +407,8 @@ public class PnlScheduleDose extends CleanablePanel {
                     pnlTageszeit.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlTageszeit.setBorder(new EtchedBorder());
                     pnlTageszeit.setLayout(new FormLayout(
-                        "6*(28dlu, $lcgap), default",
-                        "fill:default, $lgap, fill:default"));
+                            "6*(28dlu, $lcgap), default",
+                            "fill:default, $lgap, fill:default"));
 
                     //---- lblVeryEarly ----
                     lblVeryEarly.setText("Nachts, fr\u00fch morgens");
@@ -433,6 +471,17 @@ public class PnlScheduleDose extends CleanablePanel {
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
+
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            txtDoubleFocusLost(e);
+                        }
+                    });
+                    txtVeryEarly.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            txtActionPerformed(e);
+                        }
                     });
                     pnlTageszeit.add(txtVeryEarly, CC.xy(1, 3));
 
@@ -444,6 +493,17 @@ public class PnlScheduleDose extends CleanablePanel {
                         @Override
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
+                        }
+
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            txtDoubleFocusLost(e);
+                        }
+                    });
+                    txtMorning.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            txtActionPerformed(e);
                         }
                     });
                     pnlTageszeit.add(txtMorning, CC.xy(3, 3));
@@ -457,6 +517,17 @@ public class PnlScheduleDose extends CleanablePanel {
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
+
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            txtDoubleFocusLost(e);
+                        }
+                    });
+                    txtNoon.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            txtActionPerformed(e);
+                        }
                     });
                     pnlTageszeit.add(txtNoon, CC.xy(5, 3));
 
@@ -468,6 +539,17 @@ public class PnlScheduleDose extends CleanablePanel {
                         @Override
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
+                        }
+
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            txtDoubleFocusLost(e);
+                        }
+                    });
+                    txtAfternoon.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            txtActionPerformed(e);
                         }
                     });
                     pnlTageszeit.add(txtAfternoon, CC.xy(7, 3));
@@ -481,6 +563,17 @@ public class PnlScheduleDose extends CleanablePanel {
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
+
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            txtDoubleFocusLost(e);
+                        }
+                    });
+                    txtEvening.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            txtActionPerformed(e);
+                        }
                     });
                     pnlTageszeit.add(txtEvening, CC.xy(9, 3));
 
@@ -492,6 +585,17 @@ public class PnlScheduleDose extends CleanablePanel {
                         @Override
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
+                        }
+
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            txtDoubleFocusLost(e);
+                        }
+                    });
+                    txtVeryLate.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            txtActionPerformed(e);
                         }
                     });
                     pnlTageszeit.add(txtVeryLate, CC.xy(11, 3));
@@ -512,8 +616,8 @@ public class PnlScheduleDose extends CleanablePanel {
                 {
                     pnlUhrzeit.setBorder(new EtchedBorder());
                     pnlUhrzeit.setLayout(new FormLayout(
-                        "default, $ugap, 28dlu, $ugap, pref",
-                        "default:grow, $rgap, default"));
+                            "default, $ugap, 28dlu, $ugap, pref",
+                            "default:grow, $rgap, default"));
 
                     //---- lblTimeDose ----
                     lblTimeDose.setText("Dosis zur Uhrzeit");
@@ -542,6 +646,11 @@ public class PnlScheduleDose extends CleanablePanel {
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
+
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            txtDoubleFocusLost(e);
+                        }
                     });
                     pnlUhrzeit.add(txtTimeDose, CC.xy(3, 3));
 
@@ -565,8 +674,8 @@ public class PnlScheduleDose extends CleanablePanel {
                 {
                     pnlDaily.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlDaily.setLayout(new FormLayout(
-                        "2*(default), $rgap, $lcgap, 40dlu, $rgap, default",
-                        "default, $lgap, pref, $lgap, default"));
+                            "2*(default), $rgap, $lcgap, 40dlu, $rgap, default",
+                            "default, $lgap, pref, $lgap, default"));
 
                     //---- lblEvery1 ----
                     lblEvery1.setText("alle");
@@ -608,14 +717,14 @@ public class PnlScheduleDose extends CleanablePanel {
                 {
                     pnlWeekly.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlWeekly.setLayout(new FormLayout(
-                        "default, 7*(13dlu), $lcgap, default:grow",
-                        "$ugap, $lgap, default, $lgap, pref, $lgap, default:grow, $lgap, $rgap"));
+                            "default, 7*(13dlu), $lcgap, default:grow",
+                            "$ugap, $lgap, default, $lgap, pref, $lgap, default:grow, $lgap, $rgap"));
 
                     //======== panel3 ========
                     {
                         panel3.setLayout(new FormLayout(
-                            "default, $rgap, 40dlu, $rgap, 2*(default)",
-                            "default:grow, $lgap, default"));
+                                "default, $rgap, 40dlu, $rgap, 2*(default)",
+                                "default:grow, $lgap, default"));
 
                         //---- lblEvery2 ----
                         lblEvery2.setText("alle");
@@ -631,10 +740,10 @@ public class PnlScheduleDose extends CleanablePanel {
                         });
                         panel3.add(txtEveryWeek, CC.xy(3, 1));
 
-                        //---- jLabel8 ----
-                        jLabel8.setText("Wochen am");
-                        jLabel8.setFont(new Font("Arial", Font.PLAIN, 14));
-                        panel3.add(jLabel8, CC.xy(5, 1));
+                        //---- lblWeeksAt ----
+                        lblWeeksAt.setText("Wochen am");
+                        lblWeeksAt.setFont(new Font("Arial", Font.PLAIN, 14));
+                        panel3.add(lblWeeksAt, CC.xy(5, 1));
 
                         //---- btnEveryWeek ----
                         btnEveryWeek.setText("Jede Woche");
@@ -710,6 +819,7 @@ public class PnlScheduleDose extends CleanablePanel {
                     //---- cbMon ----
                     cbMon.setBorder(BorderFactory.createEmptyBorder());
                     cbMon.setMargin(new Insets(0, 0, 0, 0));
+                    cbMon.setSelected(true);
                     cbMon.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -791,8 +901,8 @@ public class PnlScheduleDose extends CleanablePanel {
                 {
                     pnlMonthly.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlMonthly.setLayout(new FormLayout(
-                        "default, $lcgap, pref, $lcgap, 40dlu, $lcgap, pref, $lcgap, 61dlu, $lcgap, default",
-                        "2*(default, $lgap), default"));
+                            "default, $lcgap, pref, $lcgap, 40dlu, $lcgap, pref, $lcgap, 61dlu, $lcgap, default",
+                            "2*(default, $lgap), default"));
 
                     //---- lblEach ----
                     lblEach.setText("jeden");
@@ -828,11 +938,11 @@ public class PnlScheduleDose extends CleanablePanel {
                     });
                     pnlMonthly.add(btnEveryMonth, CC.xy(9, 3));
 
-                    //---- label5 ----
-                    label5.setText("jeweils am");
-                    label5.setFont(new Font("Arial", Font.PLAIN, 14));
-                    label5.setHorizontalAlignment(SwingConstants.TRAILING);
-                    pnlMonthly.add(label5, CC.xy(3, 5));
+                    //---- lblOnThe ----
+                    lblOnThe.setText("jeweils am");
+                    lblOnThe.setFont(new Font("Arial", Font.PLAIN, 14));
+                    lblOnThe.setHorizontalAlignment(SwingConstants.TRAILING);
+                    pnlMonthly.add(lblOnThe, CC.xy(3, 5));
 
                     //---- txtEveryWDayOfMonth ----
                     txtEveryWDayOfMonth.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -944,27 +1054,6 @@ public class PnlScheduleDose extends CleanablePanel {
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
     }//GEN-LAST:event_cbMonActionPerformed
-
-    private void spinMonatWTagStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinMonatWTagStateChanged
-//
-//        int monat = Integer.parseInt(spinMonat.getValue().toString());
-//        if (monat == 0) {
-//            spinMonat.setValue(1);
-//        }
-
-    }//GEN-LAST:event_spinMonatWTagStateChanged
-
-    private void spinMonatTagStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_spinMonatTagStateChanged
-
-//        int wert = Integer.parseInt(spinMonat.getValue().toString());
-
-//        if (wert > 5) {
-//            if (cmbTag.getSelectedIndex() > 0) { // Einstellung steht auf Wochentag. Das passt nicht zum Wert > 5.
-//                cmbTag.setSelectedIndex(0);
-//            }
-//        }
-
-    }//GEN-LAST:event_spinMonatTagStateChanged
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         try {
@@ -1106,7 +1195,7 @@ public class PnlScheduleDose extends CleanablePanel {
     private JPanel panel3;
     private JLabel lblEvery2;
     private JTextField txtEveryWeek;
-    private JLabel jLabel8;
+    private JLabel lblWeeksAt;
     private JideButton btnEveryWeek;
     private JideLabel lblMon;
     private JideLabel lblTue;
@@ -1127,7 +1216,7 @@ public class PnlScheduleDose extends CleanablePanel {
     private JTextField txtEveryMonth;
     private JLabel lblMonth;
     private JideButton btnEveryMonth;
-    private JLabel label5;
+    private JLabel lblOnThe;
     private JTextField txtEveryWDayOfMonth;
     private JComboBox cmbWDay;
     private JPanel panel2;

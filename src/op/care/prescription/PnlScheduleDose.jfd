@@ -72,7 +72,7 @@
           </void> 
           <void method="setProperty"> 
            <string>dividerLocation</string> 
-           <int>30</int> 
+           <int>300</int> 
           </void> 
           <void method="setProperty"> 
            <string>doubleBuffered</string> 
@@ -390,6 +390,22 @@
                 <boolean>true</boolean> 
                </object> 
               </void> 
+              <void method="addEvent"> 
+               <object class="com.jformdesigner.model.FormEvent"> 
+                <string>java.awt.event.FocusListener</string> 
+                <string>focusLost</string> 
+                <string>txtDoubleFocusLost</string> 
+                <boolean>true</boolean> 
+               </object> 
+              </void> 
+              <void method="addEvent"> 
+               <object class="com.jformdesigner.model.FormEvent"> 
+                <string>java.awt.event.ActionListener</string> 
+                <string>actionPerformed</string> 
+                <string>txtActionPerformed</string> 
+                <boolean>true</boolean> 
+               </object> 
+              </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
               <class>com.jgoodies.forms.layout.CellConstraints</class> 
@@ -422,6 +438,22 @@
                 <string>java.awt.event.FocusListener</string> 
                 <string>focusGained</string> 
                 <string>txtFocusGained</string> 
+                <boolean>true</boolean> 
+               </object> 
+              </void> 
+              <void method="addEvent"> 
+               <object class="com.jformdesigner.model.FormEvent"> 
+                <string>java.awt.event.FocusListener</string> 
+                <string>focusLost</string> 
+                <string>txtDoubleFocusLost</string> 
+                <boolean>true</boolean> 
+               </object> 
+              </void> 
+              <void method="addEvent"> 
+               <object class="com.jformdesigner.model.FormEvent"> 
+                <string>java.awt.event.ActionListener</string> 
+                <string>actionPerformed</string> 
+                <string>txtActionPerformed</string> 
                 <boolean>true</boolean> 
                </object> 
               </void> 
@@ -464,6 +496,22 @@
                 <boolean>true</boolean> 
                </object> 
               </void> 
+              <void method="addEvent"> 
+               <object class="com.jformdesigner.model.FormEvent"> 
+                <string>java.awt.event.ActionListener</string> 
+                <string>actionPerformed</string> 
+                <string>txtActionPerformed</string> 
+                <boolean>true</boolean> 
+               </object> 
+              </void> 
+              <void method="addEvent"> 
+               <object class="com.jformdesigner.model.FormEvent"> 
+                <string>java.awt.event.FocusListener</string> 
+                <string>focusLost</string> 
+                <string>txtDoubleFocusLost</string> 
+                <boolean>true</boolean> 
+               </object> 
+              </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
               <class>com.jgoodies.forms.layout.CellConstraints</class> 
@@ -500,6 +548,22 @@
                 <string>java.awt.event.FocusListener</string> 
                 <string>focusGained</string> 
                 <string>txtFocusGained</string> 
+                <boolean>true</boolean> 
+               </object> 
+              </void> 
+              <void method="addEvent"> 
+               <object class="com.jformdesigner.model.FormEvent"> 
+                <string>java.awt.event.ActionListener</string> 
+                <string>actionPerformed</string> 
+                <string>txtActionPerformed</string> 
+                <boolean>true</boolean> 
+               </object> 
+              </void> 
+              <void method="addEvent"> 
+               <object class="com.jformdesigner.model.FormEvent"> 
+                <string>java.awt.event.FocusListener</string> 
+                <string>focusLost</string> 
+                <string>txtDoubleFocusLost</string> 
                 <boolean>true</boolean> 
                </object> 
               </void> 
@@ -542,6 +606,22 @@
                 <boolean>true</boolean> 
                </object> 
               </void> 
+              <void method="addEvent"> 
+               <object class="com.jformdesigner.model.FormEvent"> 
+                <string>java.awt.event.ActionListener</string> 
+                <string>actionPerformed</string> 
+                <string>txtActionPerformed</string> 
+                <boolean>true</boolean> 
+               </object> 
+              </void> 
+              <void method="addEvent"> 
+               <object class="com.jformdesigner.model.FormEvent"> 
+                <string>java.awt.event.FocusListener</string> 
+                <string>focusLost</string> 
+                <string>txtDoubleFocusLost</string> 
+                <boolean>true</boolean> 
+               </object> 
+              </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
               <class>com.jgoodies.forms.layout.CellConstraints</class> 
@@ -578,6 +658,22 @@
                 <string>java.awt.event.FocusListener</string> 
                 <string>focusGained</string> 
                 <string>txtFocusGained</string> 
+                <boolean>true</boolean> 
+               </object> 
+              </void> 
+              <void method="addEvent"> 
+               <object class="com.jformdesigner.model.FormEvent"> 
+                <string>java.awt.event.ActionListener</string> 
+                <string>actionPerformed</string> 
+                <string>txtActionPerformed</string> 
+                <boolean>true</boolean> 
+               </object> 
+              </void> 
+              <void method="addEvent"> 
+               <object class="com.jformdesigner.model.FormEvent"> 
+                <string>java.awt.event.FocusListener</string> 
+                <string>focusLost</string> 
+                <string>txtDoubleFocusLost</string> 
                 <boolean>true</boolean> 
                </object> 
               </void> 
@@ -754,6 +850,14 @@
                 <string>java.awt.event.FocusListener</string> 
                 <string>focusGained</string> 
                 <string>txtFocusGained</string> 
+                <boolean>true</boolean> 
+               </object> 
+              </void> 
+              <void method="addEvent"> 
+               <object class="com.jformdesigner.model.FormEvent"> 
+                <string>java.awt.event.FocusListener</string> 
+                <string>focusLost</string> 
+                <string>txtDoubleFocusLost</string> 
                 <boolean>true</boolean> 
                </object> 
               </void> 
@@ -1114,7 +1218,7 @@
                  </object> 
                 </void> 
                 <void property="name"> 
-                 <string>jLabel8</string> 
+                 <string>lblWeeksAt</string> 
                 </void> 
                </object> 
                <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1542,6 +1646,10 @@
                 <int>0</int> 
                 <int>0</int> 
                </object> 
+              </void> 
+              <void method="setProperty"> 
+               <string>selected</string> 
+               <boolean>true</boolean> 
               </void> 
               <void property="name"> 
                <string>cbMon</string> 
@@ -2051,7 +2159,7 @@
                <int>11</int> 
               </void> 
               <void property="name"> 
-               <string>label5</string> 
+               <string>lblOnThe</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 

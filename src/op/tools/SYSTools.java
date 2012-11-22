@@ -58,6 +58,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
@@ -136,6 +137,26 @@ public class SYSTools {
         }
 
         ((JTextField) evt.getSource()).setText(Integer.toString(myInt));
+    }
+
+    public static void handleBigDecimalFocusLost(FocusEvent evt, BigDecimal min, BigDecimal max, BigDecimal def) {
+        BigDecimal myBD;
+        try {
+            myBD = BigDecimal.valueOf(Double.parseDouble(((JTextField) evt.getSource()).getText().replaceAll(",", "\\.")));
+        } catch (NumberFormatException ex) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wrongentry")));
+            myBD = def;
+        }
+        if (myBD.compareTo(min) < 0) {
+            myBD = min;
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.entryTooSmall")));
+        }
+        if (myBD.compareTo(max) > 0) {
+            myBD = max;
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.entryTooBig")));
+        }
+
+        ((JTextField) evt.getSource()).setText(myBD.setScale(2, RoundingMode.HALF_UP).toString());
     }
 
     public static void centerOnParent(Component parent, Component child) {
