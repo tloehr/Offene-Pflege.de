@@ -52,7 +52,7 @@ public class MedProductWizard {
         createWizard();
     }
 
-    private void createWizard(){
+    private void createWizard() {
         wizard = new WizardDialog(OPDE.getMainframe(), false);
         PageList model = new PageList();
 
@@ -95,6 +95,7 @@ public class MedProductWizard {
     }
 
     private Image getLeftGraphic(String iconname) {
+        // TODO: Die Graphic sieht schrecklick aus
         JLabel lbl = new JLabel(new ImageIcon(getClass().getResource(iconname)));
         lbl.setSize(lbl.getPreferredSize());
         lbl.doLayout();
@@ -146,30 +147,39 @@ public class MedProductWizard {
 
         public WelcomePage(String title, String description) {
             super(title, description);
-            setLeftPaneItems(LEFTPANE_GRAPHIC);
+            setLeftPaneItems(LEFTPANE_EMPTY);
         }
 
         @Override
         protected void initContentPane() {
             super.initContentPane();
 
+            JPanel main = new JPanel(new BorderLayout(5,5));
+
             JTextPane txt = new JTextPane();
             txt.setEditable(false);
             txt.setContentType("text/html");
             txt.setOpaque(false);
             txt.setText("<html><font face=\"" + SYSConst.ARIAL14.getFamily() + "\">" +
-                    OPDE.lang.getString(internalClassID + ".welcome.html") +
+                    OPDE.lang.getString(internalClassID + ".welcome") +
                     "</font></html>");
 
-            addComponent(txt, true);
-            addSpace();
-            addText("Drücken Sie auf WEITER, wenn's los gehen soll.", SYSConst.ARIAL14);
+            main.add(BorderLayout.CENTER, txt);
+//            addComponent(txt);
+//            addComponent(new JSeparator());
+            JLabel gfx = new JLabel(SYSConst.gfx259x203medic0);
+//            JPanel pnl = new JPanel();
+//            pnl.add(gfx);
+            main.add(BorderLayout.EAST, gfx);
+            addComponent(main, true);
+//            addSpace();
+            addText(OPDE.lang.getString(internalClassID + ".continue"), SYSConst.ARIAL14);
         }
 
-        @Override
-        public Image getGraphic() {
-            return getLeftGraphic("/artwork/other/medicine0.png");
-        }
+//        @Override
+//        public Image getGraphic() {
+//            return getLeftGraphic("/artwork/other/medicine0.png");
+//        }
 
         @Override
         public void setupWizardButtons() {
@@ -213,10 +223,10 @@ public class MedProductWizard {
             fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
 
-        @Override
-        public Image getGraphic() {
-            return getLeftGraphic("/artwork/other/medicine1.png");
-        }
+//        @Override
+//        public Image getGraphic() {
+//            return getLeftGraphic("/artwork/other/medicine1.png");
+//        }
 
         @Override
         protected void initContentPane() {

@@ -37,6 +37,7 @@ import com.jidesoft.wizard.WizardDialog;
 import entity.prescription.*;
 import op.OPDE;
 import op.care.med.inventory.DlgNewStocks;
+import op.care.med.inventory.PnlInventory;
 import op.care.med.prodassistant.MedProductWizard;
 import op.system.InternalClassACL;
 import op.tools.CleanablePanel;
@@ -428,7 +429,7 @@ public class PnlMed extends CleanablePanel {
 //        }
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
-            final JideButton addButton = GUITools.createHyperlinkButton("Medikamenten-Assistent", new ImageIcon(getClass().getResource("/artwork/22x22/wizard.png")), null);
+            final JideButton addButton = GUITools.createHyperlinkButton(internalClassID + ".wizard", SYSConst.icon22wizard, null);
 
             addButton.addActionListener(new ActionListener() {
                 @Override
@@ -459,12 +460,13 @@ public class PnlMed extends CleanablePanel {
                     popup.addPropertyChangeListener("visible", new PropertyChangeListener() {
                         @Override
                         public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-                            OPDE.debug("popup property: " + propertyChangeEvent.getPropertyName() + " value: " + propertyChangeEvent.getNewValue() + " compCount: " + popup.getContentPane().getComponentCount());
+//                            OPDE.debug("popup property: " + propertyChangeEvent.getPropertyName() + " value: " + propertyChangeEvent.getNewValue() + " compCount: " + popup.getContentPane().getComponentCount());
                             popup.getContentPane().getComponentCount();
                         }
                     });
 
-                    popup.showPopup(new Insets(-5, 0, -5, 0), addButton);
+//                    popup.showPopup(new Insets(-5, 0, -5, 0), addButton);
+                    GUITools.showPopup(popup, SwingConstants.NORTH_EAST);
                 }
             });
 
@@ -472,7 +474,7 @@ public class PnlMed extends CleanablePanel {
         }
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
-            JideButton buchenButton = GUITools.createHyperlinkButton("Medikamente einbuchen", new ImageIcon(getClass().getResource("/artwork/22x22/shetaddrow.png")), new ActionListener() {
+            JideButton buchenButton = GUITools.createHyperlinkButton(PnlInventory.internalClassID + ".newstocks", new ImageIcon(getClass().getResource("/artwork/22x22/shetaddrow.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     new DlgNewStocks(null);

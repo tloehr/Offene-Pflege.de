@@ -573,7 +573,10 @@ public class SYSConst {
     public static final Icon icon22stopSign = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/stop.png"));
     public static final Icon icon22magnify1 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/magnify1.png"));
     public static final Icon icon22home = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/home.png"));
+    public static final Icon icon22wizard = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/wizard.png"));
 
+    public static final Icon gfx259x203medic0 = new ImageIcon(SYSConst.class.getResource("/artwork/other/medicine0.png"));
+    //
 //    public static final Icon icon22collapsePressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/collapse_pressed.png"));
 //    public static final Icon icon22expandPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/collapse_arrow_pressed.png"));
 

@@ -392,8 +392,8 @@ public class PnlScheduleDose extends CleanablePanel {
                 }
             });
             panelMain.setLayout(new FormLayout(
-                    "$rgap, $lcgap, 223dlu, $lcgap, $rgap",
-                    "$rgap, 2*($lgap, pref), 2*($lgap, default), $lgap, $rgap"));
+                "$rgap, $lcgap, 223dlu, $lcgap, $rgap",
+                "$rgap, 2*($lgap, pref), 2*($lgap, default), $lgap, $rgap"));
 
             //======== splitRegular ========
             {
@@ -407,8 +407,8 @@ public class PnlScheduleDose extends CleanablePanel {
                     pnlTageszeit.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlTageszeit.setBorder(new EtchedBorder());
                     pnlTageszeit.setLayout(new FormLayout(
-                            "6*(28dlu, $lcgap), default",
-                            "fill:default, $lgap, fill:default"));
+                        "6*(28dlu, $lcgap), default",
+                        "fill:default, $lgap, fill:default"));
 
                     //---- lblVeryEarly ----
                     lblVeryEarly.setText("Nachts, fr\u00fch morgens");
@@ -471,7 +471,6 @@ public class PnlScheduleDose extends CleanablePanel {
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
-
                         @Override
                         public void focusLost(FocusEvent e) {
                             txtDoubleFocusLost(e);
@@ -494,7 +493,6 @@ public class PnlScheduleDose extends CleanablePanel {
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
-
                         @Override
                         public void focusLost(FocusEvent e) {
                             txtDoubleFocusLost(e);
@@ -517,7 +515,6 @@ public class PnlScheduleDose extends CleanablePanel {
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
-
                         @Override
                         public void focusLost(FocusEvent e) {
                             txtDoubleFocusLost(e);
@@ -540,7 +537,6 @@ public class PnlScheduleDose extends CleanablePanel {
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
-
                         @Override
                         public void focusLost(FocusEvent e) {
                             txtDoubleFocusLost(e);
@@ -563,7 +559,6 @@ public class PnlScheduleDose extends CleanablePanel {
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
-
                         @Override
                         public void focusLost(FocusEvent e) {
                             txtDoubleFocusLost(e);
@@ -586,7 +581,6 @@ public class PnlScheduleDose extends CleanablePanel {
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
-
                         @Override
                         public void focusLost(FocusEvent e) {
                             txtDoubleFocusLost(e);
@@ -616,8 +610,8 @@ public class PnlScheduleDose extends CleanablePanel {
                 {
                     pnlUhrzeit.setBorder(new EtchedBorder());
                     pnlUhrzeit.setLayout(new FormLayout(
-                            "default, $ugap, 28dlu, $ugap, pref",
-                            "default:grow, $rgap, default"));
+                        "default, $ugap, 28dlu, $ugap, pref",
+                        "default:grow, $rgap, default"));
 
                     //---- lblTimeDose ----
                     lblTimeDose.setText("Dosis zur Uhrzeit");
@@ -646,7 +640,6 @@ public class PnlScheduleDose extends CleanablePanel {
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
-
                         @Override
                         public void focusLost(FocusEvent e) {
                             txtDoubleFocusLost(e);
@@ -674,8 +667,8 @@ public class PnlScheduleDose extends CleanablePanel {
                 {
                     pnlDaily.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlDaily.setLayout(new FormLayout(
-                            "2*(default), $rgap, $lcgap, 40dlu, $rgap, default",
-                            "default, $lgap, pref, $lgap, default"));
+                        "2*(default), $rgap, $lcgap, 40dlu, $rgap, default",
+                        "default, $lgap, pref, $lgap, default"));
 
                     //---- lblEvery1 ----
                     lblEvery1.setText("alle");
@@ -717,14 +710,14 @@ public class PnlScheduleDose extends CleanablePanel {
                 {
                     pnlWeekly.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlWeekly.setLayout(new FormLayout(
-                            "default, 7*(13dlu), $lcgap, default:grow",
-                            "$ugap, $lgap, default, $lgap, pref, $lgap, default:grow, $lgap, $rgap"));
+                        "default, 7*(13dlu), $lcgap, default:grow",
+                        "$ugap, $lgap, default, $lgap, pref, $lgap, default:grow, $lgap, $rgap"));
 
                     //======== panel3 ========
                     {
                         panel3.setLayout(new FormLayout(
-                                "default, $rgap, 40dlu, $rgap, 2*(default)",
-                                "default:grow, $lgap, default"));
+                            "default, $rgap, 40dlu, $rgap, 2*(default)",
+                            "default:grow, $lgap, default"));
 
                         //---- lblEvery2 ----
                         lblEvery2.setText("alle");
@@ -901,8 +894,8 @@ public class PnlScheduleDose extends CleanablePanel {
                 {
                     pnlMonthly.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlMonthly.setLayout(new FormLayout(
-                            "default, $lcgap, pref, $lcgap, 40dlu, $lcgap, pref, $lcgap, 61dlu, $lcgap, default",
-                            "2*(default, $lgap), default"));
+                        "default, $lcgap, pref, $lcgap, 40dlu, $lcgap, pref, $lcgap, 61dlu, $lcgap, default",
+                        "2*(default, $lgap), default"));
 
                     //---- lblEach ----
                     lblEach.setText("jeden");
