@@ -155,7 +155,7 @@ public class DlgNewStocks extends MyJDialog {
         form1 = etiprinter.getForms().get(OPDE.getProps().getProperty("etiform1"));
 
         menge = null;
-        cmbMProdukt.setRenderer(TradeFormTools.getDarreichungRenderer(TradeFormTools.LONG));
+        cmbMProdukt.setRenderer(TradeFormTools.gerRenderer(TradeFormTools.LONG));
 
         attentionIconVorrat = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.ATTENTION));
         infoIconVorrat = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.INFO));

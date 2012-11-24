@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_31" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_33" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void property="contentType"> 
    <string>form/swing</string> 
@@ -13,11 +13,11 @@
        <class>com.jgoodies.forms.layout.FormLayout</class> 
        <void method="setProperty"> 
         <string>$columnSpecs</string> 
-        <string>default, labelcompgap, default:grow, labelcompgap, default</string> 
+        <string>default, labelcompgap, default, labelcompgap, default:grow, labelcompgap, default</string> 
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
-        <string>default, linegap, default, linegap, default, relgap, pref, 14dlu, default, linegap, default:grow, linegap, default</string> 
+        <string>default, linegap, default, linegap, default, relgap, pref, pref, linegap, default:grow, linegap, default</string> 
        </void> 
       </object> 
       <void property="name"> 
@@ -64,6 +64,10 @@
          <string>gridY</string> 
          <int>3</int> 
         </void> 
+        <void method="setProperty"> 
+         <string>gridWidth</string> 
+         <int>3</int> 
+        </void> 
        </object> 
       </void> 
       <void method="add"> 
@@ -98,6 +102,10 @@
         <void method="setProperty"> 
          <string>gridY</string> 
          <int>5</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridWidth</string> 
+         <int>3</int> 
         </void> 
        </object> 
       </void> 
@@ -185,11 +193,65 @@
          <string>hAlign</string> 
          <object class="com.jgoodies.forms.layout.CellConstraints" field="RIGHT"/> 
         </void> 
+        <void method="setProperty"> 
+         <string>gridWidth</string> 
+         <int>3</int> 
+        </void> 
        </object> 
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormComponent"> 
         <string>javax.swing.JLabel</string> 
+        <void method="setProperty"> 
+         <string>text</string> 
+         <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+        </void> 
+        <void method="setProperty"> 
+         <string>icon</string> 
+         <object class="com.jformdesigner.model.SwingIcon"> 
+          <int>0</int> 
+          <string>/artwork/other/medicine2.png</string> 
+         </object> 
+        </void> 
+        <void method="setProperty"> 
+         <string>font</string> 
+         <object class="java.awt.Font"> 
+          <string>Arial</string> 
+          <int>0</int> 
+          <int>18</int> 
+         </object> 
+        </void> 
+        <void property="name"> 
+         <string>lbl1</string> 
+        </void> 
+       </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>3</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>8</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>hAlign</string> 
+         <object class="com.jgoodies.forms.layout.CellConstraints" field="CENTER"/> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridHeight</string> 
+         <int>3</int> 
+        </void> 
+       </object> 
+      </void> 
+      <void method="add"> 
+       <object class="com.jformdesigner.model.FormComponent"> 
+        <string>javax.swing.JLabel</string> 
+        <void method="setProperty"> 
+         <string>text</string> 
+         <string>text</string> 
+        </void> 
         <void method="setProperty"> 
          <string>font</string> 
          <object class="java.awt.Font"> 
@@ -198,10 +260,6 @@
           <int>14</int> 
          </object> 
         </void> 
-        <void method="setProperty"> 
-         <string>text</string> 
-         <string>Es gibt bereits Darreichungsformen. Ist es eins von diesen ?</string> 
-        </void> 
         <void property="name"> 
          <string>lblMsg</string> 
         </void> 
@@ -209,11 +267,15 @@
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
-         <string>gridY</string> 
-         <int>9</int> 
+         <string>gridX</string> 
+         <int>3</int> 
         </void> 
         <void method="setProperty"> 
-         <string>gridX</string> 
+         <string>gridY</string> 
+         <int>8</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridWidth</string> 
          <int>3</int> 
         </void> 
        </object> 
@@ -260,11 +322,11 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>3</int> 
+         <int>5</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>11</int> 
+         <int>10</int> 
         </void> 
         <void method="setProperty"> 
          <string>vAlign</string> 
@@ -286,7 +348,7 @@
        <string>size</string> 
        <object class="java.awt.Dimension"> 
         <int>630</int> 
-        <int>300</int> 
+        <int>500</int> 
        </object> 
       </void> 
      </object> 

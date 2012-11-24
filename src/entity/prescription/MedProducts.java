@@ -17,26 +17,25 @@ public class MedProducts implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "MedPID")
     private Long medPID;
     @Basic(optional = false)
     @Column(name = "Bezeichnung")
-    private String bezeichnung;
+    private String text;
 
     public MedProducts() {
     }
 
-    public MedProducts(MedFactory factory, String bezeichnung) {
+    public MedProducts(MedFactory factory, String text) {
         this.factory = factory;
-        this.bezeichnung = bezeichnung;
-        this.darreichungen = new ArrayList<TradeForm>();
+        this.text = text;
+        this.tradeForms = new ArrayList<TradeForm>();
     }
 
-    public MedProducts(String bezeichnung) {
+    public MedProducts(String text) {
         this.factory = null;
-        this.bezeichnung = bezeichnung;
-        this.darreichungen = new ArrayList<TradeForm>();
+        this.text = text;
+        this.tradeForms = new ArrayList<TradeForm>();
     }
 
     public Long getMedPID() {
@@ -49,11 +48,11 @@ public class MedProducts implements Serializable {
 
 
     public String getBezeichnung() {
-        return bezeichnung;
+        return text;
     }
 
     public void setBezeichnung(String bezeichnung) {
-        this.bezeichnung = bezeichnung;
+        this.text = bezeichnung;
     }
 
     public MedFactory getFactory() {
@@ -64,8 +63,8 @@ public class MedProducts implements Serializable {
         this.factory = factory;
     }
 
-    public Collection<TradeForm> getDarreichungen() {
-        return darreichungen;
+    public Collection<TradeForm> getTradeforms() {
+        return tradeForms;
     }
 
     @JoinColumn(name = "MPHID", referencedColumnName = "MPHID")
@@ -80,7 +79,7 @@ public class MedProducts implements Serializable {
     }
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "medProduct")
-    private Collection<TradeForm> darreichungen;
+    private Collection<TradeForm> tradeForms;
 
     @Override
     public boolean equals(Object object) {

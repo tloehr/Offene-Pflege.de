@@ -25,14 +25,14 @@ import java.awt.event.ActionListener;
 /**
  * @author Torsten Löhr
  */
-public class DlgHersteller extends JPanel {
+public class DlgACME extends JPanel {
     private Closure actionBlock;
     private MedFactory factory;
     private JLabel attentionIconFirma, attentionIconOrt;
     private OverlayTextField txtFirma, txtOrt;
     private DefaultOverlayable ovrFirma, ovrOrt;
 
-    public DlgHersteller(Closure actionBlock) {
+    public DlgACME(Closure actionBlock) {
         super();
         this.actionBlock = actionBlock;
         initComponents();

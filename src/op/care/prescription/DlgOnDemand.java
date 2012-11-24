@@ -611,7 +611,7 @@ public class DlgOnDemand extends MyJDialog {
         txtMed.setText("");
         jdcAB.setMinSelectableDate(new Date());
 
-        cmbMed.setRenderer(TradeFormTools.getDarreichungRenderer(TradeFormTools.LONG));
+        cmbMed.setRenderer(TradeFormTools.gerRenderer(TradeFormTools.LONG));
 
         cmbMed.setModel(new DefaultComboBoxModel());
         cmbDocON.setSelectedItem(prescription.getDocON());

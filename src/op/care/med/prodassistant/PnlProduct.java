@@ -25,13 +25,14 @@ import java.awt.event.ActionListener;
 /**
  * @author Torsten Löhr
  */
-public class PnlProdukt extends JPanel {
+public class PnlProduct extends JPanel {
+    public static final String internalClassID = MedProductWizard.internalClassID+".product";
     private java.util.List listProd;
     private MedProducts produkt;
     private Closure validate;
     private String template;
 
-    public PnlProdukt(Closure validate, String template) {
+    public PnlProduct(Closure validate, String template) {
         produkt = null;
         this.validate = validate;
         this.template = template;
@@ -42,6 +43,7 @@ public class PnlProdukt extends JPanel {
 
     private void initPanel() {
         lblProdMsg.setVisible(false);
+        lblProdMsg.setText(OPDE.lang.getString(internalClassID+".existingProducts"));
         jsp1.setVisible(false);
         lstProd.setVisible(false);
         txtProd.setText(template);
@@ -49,7 +51,7 @@ public class PnlProdukt extends JPanel {
 
     private void txtProdActionPerformed(ActionEvent e) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT m FROM MedProducts m WHERE m.bezeichnung LIKE :bezeichnung ORDER BY m.bezeichnung");
+        Query query = em.createQuery("SELECT m FROM MedProducts m WHERE m.text LIKE :bezeichnung ORDER BY m.text");
         query.setParameter("bezeichnung", "%" + txtProd.getText().trim() + "%");
         listProd = query.getResultList();
         em.close();
@@ -66,7 +68,7 @@ public class PnlProdukt extends JPanel {
                 lblProdMsg.setVisible(true);
                 jsp1.setVisible(true);
                 lstProd.setVisible(true);
-                listProd.add(0, "<html><b>Nein, keins von diesen</b></html>");
+                listProd.add(0, "<html><b>" + OPDE.lang.getString("misc.msg.noneOfThem") + "</b></html>");
                 DefaultListModel lmProd;
                 lmProd = SYSTools.list2dlm(listProd);
                 lstProd.setModel(lmProd);
@@ -95,6 +97,7 @@ public class PnlProdukt extends JPanel {
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         txtProd = new JXSearchField();
+        label1 = new JLabel();
         lblProdMsg = new JLabel();
         jsp1 = new JScrollPane();
         lstProd = new JList();
@@ -102,7 +105,7 @@ public class PnlProdukt extends JPanel {
         //======== this ========
         setPreferredSize(new Dimension(610, 198));
         setLayout(new FormLayout(
-                "default, $lcgap, default:grow, $lcgap, default",
+                "2*(default, $lcgap), default:grow, $lcgap, default",
                 "2*(default), $ugap, default, $lgap, default:grow, $lgap, default"));
 
         //---- txtProd ----
@@ -115,13 +118,18 @@ public class PnlProdukt extends JPanel {
                 txtProdActionPerformed(e);
             }
         });
-        add(txtProd, CC.xy(3, 2));
+        add(txtProd, CC.xywh(3, 2, 3, 1));
+
+        //---- label1 ----
+        label1.setText(null);
+        label1.setIcon(new ImageIcon(getClass().getResource("/artwork/other/medicine1.png")));
+        add(label1, CC.xywh(3, 4, 1, 3, CC.CENTER, CC.DEFAULT));
 
         //---- lblProdMsg ----
         lblProdMsg.setFont(new Font("Arial", Font.PLAIN, 14));
         lblProdMsg.setText("Es gibt bereits Medis, die so \u00e4hnlich heissen. Ist es eins von diesen ?");
         lblProdMsg.setHorizontalAlignment(SwingConstants.CENTER);
-        add(lblProdMsg, CC.xy(3, 4));
+        add(lblProdMsg, CC.xy(5, 4));
 
         //======== jsp1 ========
         {
@@ -138,12 +146,13 @@ public class PnlProdukt extends JPanel {
             });
             jsp1.setViewportView(lstProd);
         }
-        add(jsp1, CC.xy(3, 6, CC.DEFAULT, CC.FILL));
+        add(jsp1, CC.xy(5, 6, CC.DEFAULT, CC.FILL));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JXSearchField txtProd;
+    private JLabel label1;
     private JLabel lblProdMsg;
     private JScrollPane jsp1;
     private JList lstProd;

@@ -27,7 +27,8 @@ import java.math.BigDecimal;
 /**
  * @author Torsten Löhr
  */
-public class PnlPackung extends JPanel {
+public class PnlPackage extends JPanel {
+    public static final String internalClassID = MedProductWizard.internalClassID+".package";
     String pzn;
     BigDecimal inhalt;
     private TradeForm darreichung;
@@ -35,7 +36,7 @@ public class PnlPackung extends JPanel {
     private Closure validate;
     private String template;
 
-    public PnlPackung(Closure validate, String template) {
+    public PnlPackage(Closure validate, String template) {
         pzn = null;
         inhalt = null;
         aPackage = null;
@@ -55,7 +56,7 @@ public class PnlPackung extends JPanel {
     }
 
     public void setLabelEinheit(String text){
-        lblEinheit.setText(text);
+        lblUnit.setText(text);
     }
 
     private void txtPZNActionPerformed(ActionEvent e) {
@@ -90,7 +91,8 @@ public class PnlPackung extends JPanel {
         panel1 = new JPanel();
         label3 = new JLabel();
         txtInhalt = new JTextField();
-        lblEinheit = new JLabel();
+        lblUnit = new JLabel();
+        label1 = new JLabel();
 
         //======== this ========
         setLayout(new FormLayout(
@@ -133,12 +135,17 @@ public class PnlPackung extends JPanel {
             });
             panel1.add(txtInhalt);
 
-            //---- lblEinheit ----
-            lblEinheit.setText("g Gel");
-            lblEinheit.setFont(new Font("Arial", Font.PLAIN, 14));
-            panel1.add(lblEinheit);
+            //---- lblUnit ----
+            lblUnit.setText("g Gel");
+            lblUnit.setFont(new Font("Arial", Font.PLAIN, 14));
+            panel1.add(lblUnit);
         }
         add(panel1, CC.xy(3, 7, CC.LEFT, CC.DEFAULT));
+
+        //---- label1 ----
+        label1.setText(null);
+        label1.setIcon(new ImageIcon(getClass().getResource("/artwork/other/medicine3.png")));
+        add(label1, CC.xy(3, 9, CC.CENTER, CC.DEFAULT));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
@@ -164,6 +171,7 @@ public class PnlPackung extends JPanel {
     private JPanel panel1;
     private JLabel label3;
     private JTextField txtInhalt;
-    private JLabel lblEinheit;
+    private JLabel lblUnit;
+    private JLabel label1;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

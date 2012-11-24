@@ -153,7 +153,7 @@ public class PnlNewProdukt extends javax.swing.JDialog {
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT m FROM MedProducts m WHERE m.bezeichnung = :bezeichnung");
+        Query query = em.createQuery("SELECT m FROM MedProducts m WHERE m.text = :bezeichnung");
         query.setParameter("bezeichnung", txtBezeichnung.getText());
         java.util.List<MedProducts> list = query.getResultList();
         em.close();

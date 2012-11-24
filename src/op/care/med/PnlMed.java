@@ -154,7 +154,7 @@ public class PnlMed extends CleanablePanel {
             lstPraep.setModel(new DefaultListModel());
         } else {
             EntityManager em = OPDE.createEM();
-            Query query = em.createQuery("SELECT m FROM MedProducts m WHERE m.bezeichnung LIKE :bezeichnung ORDER BY m.bezeichnung");
+            Query query = em.createQuery("SELECT m FROM MedProducts m WHERE m.text LIKE :bezeichnung ORDER BY m.text");
             query.setParameter("bezeichnung", "%" + txtSuche.getText() + "%");
             lstPraep.setModel(SYSTools.list2dlm(query.getResultList()));
             em.close();
@@ -429,7 +429,7 @@ public class PnlMed extends CleanablePanel {
 //        }
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
-            final JideButton addButton = GUITools.createHyperlinkButton(internalClassID + ".wizard", SYSConst.icon22wizard, null);
+            final JideButton addButton = GUITools.createHyperlinkButton(MedProductWizard.internalClassID, SYSConst.icon22wizard, null);
 
             addButton.addActionListener(new ActionListener() {
                 @Override
@@ -455,7 +455,7 @@ public class PnlMed extends CleanablePanel {
                     popup.getContentPane().add(wizard.getContentPane());
                     popup.setOwner(addButton);
                     popup.removeExcludedComponent(addButton);
-                    popup.setTransient(true);
+                    popup.setTransient(false);
                     popup.setDefaultFocusComponent(wizard.getContentPane());
                     popup.addPropertyChangeListener("visible", new PropertyChangeListener() {
                         @Override
@@ -474,7 +474,7 @@ public class PnlMed extends CleanablePanel {
         }
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
-            JideButton buchenButton = GUITools.createHyperlinkButton(PnlInventory.internalClassID + ".newstocks", new ImageIcon(getClass().getResource("/artwork/22x22/shetaddrow.png")), new ActionListener() {
+            JideButton buchenButton = GUITools.createHyperlinkButton(PnlInventory.internalClassID + ".newstocks", SYSConst.icon22addrow, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     new DlgNewStocks(null);

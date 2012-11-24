@@ -30,101 +30,110 @@ import java.util.Comparator;
 /**
  * @author Torsten Löhr
  */
-public class PnlZusatz extends JPanel {
-    private MedProducts produkt;
-    private TradeForm darreichung;
-    private DosageForm form;
+public class PnlSubtext extends JPanel {
+    private MedProducts product;
+    private TradeForm tradeForm;
+    private DosageForm dosageForm;
     private Closure validate;
     private boolean ignoreEvent = false;
 
-    public PnlZusatz(Closure validate, MedProducts produkt) {
-        OPDE.debug("CONSTRUCTOR PNLZUSATZ");
+    public static final String internalClassID = MedProductWizard.internalClassID + ".subtext";
+
+    public PnlSubtext(Closure validate, MedProducts product) {
         this.validate = validate;
-        this.produkt = produkt;
+        this.product = product;
         initComponents();
         initPanel();
     }
 
-    public void setProdukt(MedProducts produkt) {
-        this.produkt = produkt;
+    public void setProduct(MedProducts product) {
+        this.product = product;
     }
 
     private void initPanel() {
-        if (!produkt.getDarreichungen().isEmpty()) {
-            ArrayList model = new ArrayList(produkt.getDarreichungen());
-            model.add(0, "<html><b>Nein, keins von diesen</b></html>");
+        if (!product.getTradeforms().isEmpty()) {
+            ArrayList model = new ArrayList(product.getTradeforms());
+            model.add(0, "<html><b>" + OPDE.lang.getString("misc.msg.noneOfThem") + "</b></html>");
             DefaultListModel lmDaf = SYSTools.list2dlm(model);
             lstDaf.setModel(lmDaf);
-            lstDaf.setCellRenderer(TradeFormTools.getDarreichungRenderer(TradeFormTools.LONG));
+            lstDaf.setCellRenderer(TradeFormTools.gerRenderer(TradeFormTools.LONG));
         }
-        lblMsg.setVisible(!produkt.getDarreichungen().isEmpty());
-        jsp1.setVisible(!produkt.getDarreichungen().isEmpty());
-        lstDaf.setVisible(!produkt.getDarreichungen().isEmpty());
+        lblMsg.setText(OPDE.lang.getString(internalClassID + ".existingTradeforms"));
+        lblMsg.setVisible(!product.getTradeforms().isEmpty());
+        jsp1.setVisible(!product.getTradeforms().isEmpty());
+        lstDaf.setVisible(!product.getTradeforms().isEmpty());
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT m FROM TradeForm m");
+        Query query = em.createQuery(" SELECT m FROM DosageForm m ");
+//        query.setParameter("product", product);
 
-        java.util.List listFormen = query.getResultList();
-        Collections.sort(listFormen, new Comparator<Object>() {
+        java.util.List listDosageForm = query.getResultList();
+        Collections.sort(listDosageForm, new Comparator<Object>() {
             @Override
             public int compare(Object us, Object them) {
                 return DosageFormTools.toPrettyString((DosageForm) us).compareTo(DosageFormTools.toPrettyString((DosageForm) them));
             }
         });
 
-        cmbFormen.setModel(SYSTools.list2cmb(listFormen));
+        cmbFormen.setModel(SYSTools.list2cmb(listDosageForm));
         cmbFormen.setRenderer(DosageFormTools.getRenderer(0));
         em.close();
 
-        form = (DosageForm) cmbFormen.getSelectedItem();
-        lblAPV.setVisible(!form.isAPV1());
-        lblPV.setVisible(!form.isAPV1());
-        txtA.setVisible(!form.isAPV1());
+        dosageForm = (DosageForm) cmbFormen.getSelectedItem();
+        lblAPV.setVisible(!dosageForm.isAPV1());
+        lblPV.setVisible(!dosageForm.isAPV1());
+        txtA.setVisible(!dosageForm.isAPV1());
 
-        darreichung = new TradeForm(produkt, "", form);
-        validate.execute(darreichung);
+        tradeForm = new TradeForm(product, "", dosageForm);
+        validate.execute(tradeForm);
     }
 
     private void txtZusatzActionPerformed(ActionEvent e) {
         cmbFormen.setEnabled(true);
-        darreichung = new TradeForm(produkt, txtZusatz.getText().trim(), form);
-        validate.execute(darreichung);
-        if (lstDaf.isVisible() && lstDaf.getSelectedIndex() != 0){
+        tradeForm = new TradeForm(product, txtZusatz.getText().trim(), dosageForm);
+        validate.execute(tradeForm);
+        if (lstDaf.isVisible() && lstDaf.getSelectedIndex() != 0) {
+            ignoreEvent = true;
             lstDaf.setSelectedIndex(0);
+            ignoreEvent = false;
         }
     }
 
     private void lstDafValueChanged(ListSelectionEvent e) {
-        if (ignoreEvent){
+        if (ignoreEvent) {
             return;
         }
         if (!e.getValueIsAdjusting()) {
             if (lstDaf.getSelectedIndex() > 0) {
-                ignoreEvent = true;
-                darreichung = (TradeForm) lstDaf.getSelectedValue();
+//                ignoreEvent = true;
+                tradeForm = (TradeForm) lstDaf.getSelectedValue();
                 txtZusatz.setText(null);
                 cmbFormen.setEnabled(false);
-                validate.execute(darreichung);
-                ignoreEvent = false;
+//                ignoreEvent = false;
+            } else {
+                cmbFormen.setEnabled(true);
+                tradeForm = new TradeForm(product, txtZusatz.getText().trim(), dosageForm);
             }
+            validate.execute(tradeForm);
         }
     }
 
     private void cmbFormenItemStateChanged(ItemEvent e) {
-        form = (DosageForm) cmbFormen.getSelectedItem();
+        if (e.getStateChange() != ItemEvent.SELECTED) return;
 
-        lblAPV.setVisible(!form.isAPV1());
-        lblPV.setVisible(!form.isAPV1());
-        txtA.setVisible(!form.isAPV1());
+        dosageForm = (DosageForm) cmbFormen.getSelectedItem();
 
-        if (!form.isAPV1()) {
+        lblAPV.setVisible(!dosageForm.isAPV1());
+        lblPV.setVisible(!dosageForm.isAPV1());
+        txtA.setVisible(!dosageForm.isAPV1());
+
+        if (!dosageForm.isAPV1()) {
             txtA.setText("1");
-            lblPV.setText(" " + form.getUsageTex() + " entsprechen 1 " + DosageFormTools.EINHEIT[form.getPackUnit()]);
+            lblPV.setText(" " + dosageForm.getUsageTex() + " " + OPDE.lang.getString("misc.msg.equalTo") + " 1 " + DosageFormTools.EINHEIT[dosageForm.getPackUnit()]);
         }
 
-        darreichung = new TradeForm(produkt, txtZusatz.getText().trim(), form);
-
-        validate.execute(darreichung);
+        tradeForm = new TradeForm(product, txtZusatz.getText().trim(), dosageForm);
+        validate.execute(tradeForm);
     }
 
     private void initComponents() {
@@ -135,14 +144,15 @@ public class PnlZusatz extends JPanel {
         lblAPV = new JLabel();
         txtA = new JTextField();
         lblPV = new JLabel();
+        lbl1 = new JLabel();
         lblMsg = new JLabel();
         jsp1 = new JScrollPane();
         lstDaf = new JList();
 
         //======== this ========
         setLayout(new FormLayout(
-            "default, $lcgap, default:grow, $lcgap, default",
-            "2*(default, $lgap), default, $rgap, pref, 14dlu, default, $lgap, default:grow, $lgap, default"));
+                "2*(default, $lcgap), default:grow, $lcgap, default",
+                "2*(default, $lgap), default, $rgap, 2*(pref), $lgap, default:grow, $lgap, default"));
 
         //---- txtZusatz ----
         txtZusatz.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -154,7 +164,7 @@ public class PnlZusatz extends JPanel {
                 txtZusatzActionPerformed(e);
             }
         });
-        add(txtZusatz, CC.xy(3, 3));
+        add(txtZusatz, CC.xywh(3, 3, 3, 1));
 
         //---- cmbFormen ----
         cmbFormen.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -164,7 +174,7 @@ public class PnlZusatz extends JPanel {
                 cmbFormenItemStateChanged(e);
             }
         });
-        add(cmbFormen, CC.xy(3, 5));
+        add(cmbFormen, CC.xywh(3, 5, 3, 1));
 
         //======== panel1 ========
         {
@@ -185,12 +195,18 @@ public class PnlZusatz extends JPanel {
             lblPV.setFont(new Font("Arial", Font.PLAIN, 14));
             panel1.add(lblPV);
         }
-        add(panel1, CC.xy(3, 7, CC.RIGHT, CC.DEFAULT));
+        add(panel1, CC.xywh(3, 7, 3, 1, CC.RIGHT, CC.DEFAULT));
+
+        //---- lbl1 ----
+        lbl1.setText(null);
+        lbl1.setIcon(new ImageIcon(getClass().getResource("/artwork/other/medicine2.png")));
+        lbl1.setFont(new Font("Arial", Font.PLAIN, 18));
+        add(lbl1, CC.xywh(3, 8, 1, 3, CC.CENTER, CC.DEFAULT));
 
         //---- lblMsg ----
+        lblMsg.setText("text");
         lblMsg.setFont(new Font("Arial", Font.PLAIN, 14));
-        lblMsg.setText("Es gibt bereits Darreichungsformen. Ist es eins von diesen ?");
-        add(lblMsg, CC.xy(3, 9));
+        add(lblMsg, CC.xywh(3, 8, 3, 1));
 
         //======== jsp1 ========
         {
@@ -206,7 +222,7 @@ public class PnlZusatz extends JPanel {
             });
             jsp1.setViewportView(lstDaf);
         }
-        add(jsp1, CC.xy(3, 11, CC.DEFAULT, CC.FILL));
+        add(jsp1, CC.xy(5, 10, CC.DEFAULT, CC.FILL));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
@@ -217,6 +233,7 @@ public class PnlZusatz extends JPanel {
     private JLabel lblAPV;
     private JTextField txtA;
     private JLabel lblPV;
+    private JLabel lbl1;
     private JLabel lblMsg;
     private JScrollPane jsp1;
     private JList lstDaf;

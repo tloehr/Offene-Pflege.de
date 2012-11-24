@@ -27,7 +27,7 @@ public class TradeFormTools {
     public static final int MEDIUM = 1;
     public static final int LONG = 2;
 
-    public static ListCellRenderer getDarreichungRenderer(int verbosity) {
+    public static ListCellRenderer gerRenderer(int verbosity) {
         final int v = verbosity;
         return new ListCellRenderer() {
             @Override
@@ -86,8 +86,8 @@ public class TradeFormTools {
 
         Query query = em.createQuery(" " +
                 " SELECT d FROM TradeForm d " +
-                " WHERE d.medProduct.bezeichnung like :suche" +
-                " ORDER BY d.medProduct.bezeichnung, d.subtext, d.dosageForm.preparation ");
+                " WHERE d.medProduct.text like :suche" +
+                " ORDER BY d.medProduct.text, d.subtext, d.dosageForm.preparation ");
 
         query.setParameter("suche", suche);
 
@@ -103,8 +103,8 @@ public class TradeFormTools {
 
         Query query = em.createQuery(" " +
                 " SELECT d FROM TradeForm d " +
-                " WHERE d.medProduct.bezeichnung like :suche" +
-                " ORDER BY d.medProduct.bezeichnung, d.subtext, d.dosageForm.preparation ");
+                " WHERE d.medProduct.text like :suche" +
+                " ORDER BY d.medProduct.text, d.subtext, d.dosageForm.preparation ");
 
         query.setParameter("suche", suche);
 

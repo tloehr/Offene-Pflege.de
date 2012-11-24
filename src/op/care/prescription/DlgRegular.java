@@ -554,7 +554,7 @@ public class DlgRegular extends MyJDialog {
         txtMed.setText("");
 //        jdcAB.setMinSelectableDate(new Date());
 
-        cmbMed.setRenderer(TradeFormTools.getDarreichungRenderer(TradeFormTools.LONG));
+        cmbMed.setRenderer(TradeFormTools.gerRenderer(TradeFormTools.LONG));
         cmbDocON.setSelectedItem(prescription.getDocON());
         cmbHospitalON.setSelectedItem(prescription.getHospitalON());
         cmbMed.setModel(new DefaultComboBoxModel());

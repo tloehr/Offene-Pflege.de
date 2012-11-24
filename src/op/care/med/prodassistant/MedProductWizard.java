@@ -6,13 +6,13 @@ import entity.prescription.*;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
 import javax.persistence.EntityManager;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.image.BufferedImage;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,18 +26,18 @@ public class MedProductWizard {
     public static final String internalClassID = "opde.medication.medproduct.wizard";
 
     private WizardDialog wizard;
-    private MedProducts produkt;
-    private TradeForm darreichung;
+    private MedProducts product;
+    private TradeForm tradeform;
     private MedPackage aPackage;
-    private MedFactory factory;
+    private MedFactory acme;
     private Closure finishAction;
     private String pzntemplate = null, prodtemplate = null;
 
     private final int PAGE_WELCOME = 0;
-    private final int PAGE_PRODUKT = 1;
-    private final int PAGE_ZUSATZ = 2;
-    private final int PAGE_PACKUNG = 3;
-    private final int PAGE_HERSTELLER = 4;
+    private final int PAGE_PRODUCT = 1;
+    private final int PAGE_SUBTEXT = 2;
+    private final int PAGE_PACKAGE = 3;
+    private final int PAGE_ACME = 4;
     private final int PAGE_COMPLETION = 5;
 
     public MedProductWizard(Closure finishAction, String template) {
@@ -56,15 +56,18 @@ public class MedProductWizard {
         wizard = new WizardDialog(OPDE.getMainframe(), false);
         PageList model = new PageList();
 
-        AbstractWizardPage page1 = new WelcomePage("Assistent zur Eingabe von Medizin-Produkten",
-                "Dieser Assistent ermöglicht es Ihnen auf einfache Weise neue Medizinprodukte in die Datenbank von OPDE einzugeben.");
-        AbstractWizardPage page2 = new ProduktPage("Produkteingabe", "Geben Sie hier zunächst den Produktnamen ohne irgendwelche Zusätze ein. Also besonders keine Angaben wie '10mg' oder 'retard'.");
-        AbstractWizardPage page3 = new ZusatzPage("Zusatzbezeichnungen und Darreichungsformen",
-                "Geben Sie jetzt evtl. vorhandene Zusatzbezeichnungen ein. Das können z.B. sein '10mg', 'retard', 'forte' etc. Häufig handelt es sich um Angaben zur Stärke oder Wirkstoffentfaltung. " +
-                        "Ebenso müssen Sie hier die Darreichungsform auswählen.");
-        AbstractWizardPage page4 = new PackungPage("Packung", "Geben Sie hier eine Verpackung für dieses Medikament ein.");
-        AbstractWizardPage page5 = new HerstellerPage("Hersteller", "Wählen Sie einen Hersteller aus der Liste aus, oder geben Sie einen neuen ein.");
-        AbstractWizardPage page6 = new CompletionPage("Zusammenfassung", "Bitte prüfen Sie hier Ihre Eingaben.");
+        AbstractWizardPage page1 = new WelcomePage(OPDE.lang.getString(internalClassID + ".page1.title"),
+                OPDE.lang.getString(internalClassID + ".page1.description"));
+        AbstractWizardPage page2 = new ProductPage(OPDE.lang.getString(internalClassID + ".page2.title"),
+                OPDE.lang.getString(internalClassID + ".page2.description"));
+        AbstractWizardPage page3 = new SubtextPage(OPDE.lang.getString(internalClassID + ".page3.title"),
+                OPDE.lang.getString(internalClassID + ".page3.description"));
+        AbstractWizardPage page4 = new PackagePage(OPDE.lang.getString(internalClassID + ".page4.title"),
+                OPDE.lang.getString(internalClassID + ".page4.description"));
+        AbstractWizardPage page5 = new ACMEPage(OPDE.lang.getString(internalClassID + ".page5.title"),
+                OPDE.lang.getString(internalClassID + ".page5.description"));
+        AbstractWizardPage page6 = new CompletionPage(OPDE.lang.getString(internalClassID + ".page6.title"),
+                OPDE.lang.getString(internalClassID + ".page6.description"));
 
         model.append(page1);
         model.append(page2);
@@ -94,21 +97,6 @@ public class MedProductWizard {
         wizard.pack();
     }
 
-    private Image getLeftGraphic(String iconname) {
-        // TODO: Die Graphic sieht schrecklick aus
-        JLabel lbl = new JLabel(new ImageIcon(getClass().getResource(iconname)));
-        lbl.setSize(lbl.getPreferredSize());
-        lbl.doLayout();
-        GraphicsConfiguration gfxConfig =
-                GraphicsEnvironment.getLocalGraphicsEnvironment()
-                        .getDefaultScreenDevice()
-                        .getDefaultConfiguration();
-        BufferedImage image =
-                gfxConfig.createCompatibleImage(lbl.getWidth(), lbl.getHeight());
-        lbl.paint(image.getGraphics());
-        return image;
-    }
-
     public WizardDialog getWizard() {
         return wizard;
     }
@@ -117,21 +105,21 @@ public class MedProductWizard {
         EntityManager em = OPDE.createEM();
         try {
             em.getTransaction().begin();
-            produkt = em.merge(produkt);
-            darreichung = em.merge(darreichung);
+            product = em.merge(product);
+            tradeform = em.merge(tradeform);
             aPackage = em.merge(aPackage);
-            if (factory != null) {
-                factory = em.merge(factory);
+            if (acme != null) {
+                acme = em.merge(acme);
             }
 
-            if (!produkt.getDarreichungen().contains(darreichung)) {
-                produkt.getDarreichungen().add(darreichung);
+            if (!product.getTradeforms().contains(tradeform)) {
+                product.getTradeforms().add(tradeform);
             }
 
-            darreichung.getPackages().add(aPackage);
+            tradeform.getPackages().add(aPackage);
 
             em.getTransaction().commit();
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(produkt.getBezeichnung() + ", " + TradeFormTools.toPrettyString(darreichung) + ", " + MedPackageTools.toPrettyString(aPackage) + " erfolgreich eingetragen", 6));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(product.getBezeichnung() + ", " + TradeFormTools.toPrettyString(tradeform) + ", " + MedPackageTools.toPrettyString(aPackage) + " " + OPDE.lang.getString("misc.msg.entrysuccessful")));
             finishAction.execute(aPackage);
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
@@ -154,32 +142,22 @@ public class MedProductWizard {
         protected void initContentPane() {
             super.initContentPane();
 
-            JPanel main = new JPanel(new BorderLayout(5,5));
+            JPanel main = new JPanel(new BorderLayout(5, 5));
 
             JTextPane txt = new JTextPane();
             txt.setEditable(false);
             txt.setContentType("text/html");
             txt.setOpaque(false);
-            txt.setText("<html><font face=\"" + SYSConst.ARIAL14.getFamily() + "\">" +
+            txt.setText("<html>" + SYSConst.html_fontface +
                     OPDE.lang.getString(internalClassID + ".welcome") +
                     "</font></html>");
 
             main.add(BorderLayout.CENTER, txt);
-//            addComponent(txt);
-//            addComponent(new JSeparator());
             JLabel gfx = new JLabel(SYSConst.gfx259x203medic0);
-//            JPanel pnl = new JPanel();
-//            pnl.add(gfx);
             main.add(BorderLayout.EAST, gfx);
             addComponent(main, true);
-//            addSpace();
-            addText(OPDE.lang.getString(internalClassID + ".continue"), SYSConst.ARIAL14);
+            addText(OPDE.lang.getString("opde.wizards.buttontext.letsgo"), SYSConst.ARIAL14);
         }
-
-//        @Override
-//        public Image getGraphic() {
-//            return getLeftGraphic("/artwork/other/medicine0.png");
-//        }
 
         @Override
         public void setupWizardButtons() {
@@ -195,22 +173,11 @@ public class MedProductWizard {
         }
     }
 
-    private class ProduktPage extends DefaultWizardPage {
+    private class ProductPage extends DefaultWizardPage {
 
-        public ProduktPage(String title, String description) {
+        public ProductPage(String title, String description) {
             super(title, description);
-            setLeftPaneItems(LEFTPANE_GRAPHIC);
-
-//            addPageListener(new PageListener() {
-//                @Override
-//                public void pageEventFired(PageEvent pageEvent) {
-//                    if (pageEvent.getGID() == PageEvent.PAGE_CLOSING) {
-//                        OPDE.debug(pageEvent.getSource());
-//                    } else if (pageEvent.getGID() == PageEvent.PAGE_OPENED) {
-//                        OPDE.debug("ProduktPage OPENDED");
-//                    }
-//                }
-//            });
+            setLeftPaneItems(LEFTPANE_STEPS);
         }
 
         @Override
@@ -218,23 +185,18 @@ public class MedProductWizard {
             super.setupWizardButtons();
 
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
-            fireButtonEvent(produkt == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(product == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
             fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
 
-//        @Override
-//        public Image getGraphic() {
-//            return getLeftGraphic("/artwork/other/medicine1.png");
-//        }
-
         @Override
         protected void initContentPane() {
             super.initContentPane();
-            addComponent(new PnlProdukt(new Closure() {
+            addComponent(new PnlProduct(new Closure() {
                 @Override
                 public void execute(Object o) {
-                    produkt = (MedProducts) o;
+                    product = (MedProducts) o;
                     setupWizardButtons();
                 }
             }, prodtemplate), true);
@@ -243,36 +205,31 @@ public class MedProductWizard {
 
     }
 
-    private class ZusatzPage extends DefaultWizardPage {
-        private PnlZusatz pnlZusatz;
+    private class SubtextPage extends DefaultWizardPage {
+        private PnlSubtext pnlSubtext;
 
-        public ZusatzPage(String title, String description) {
+        public SubtextPage(String title, String description) {
             super(title, description);
-            setLeftPaneItems(LEFTPANE_GRAPHIC);
+            setLeftPaneItems(LEFTPANE_STEPS);
             addPageListener(new PageListener() {
                 @Override
                 public void pageEventFired(PageEvent pageEvent) {
                     if (pageEvent.getID() == PageEvent.PAGE_CLOSING) {
                         OPDE.debug(pageEvent.getSource());
                     } else if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
-                        OPDE.debug("ZusatzPage OPENDED");
-//                        darreichung = null;
-                        pnlZusatz.setProdukt(produkt);
+                        OPDE.debug("SubtextPage OPENDED");
+//                        tradeform = null;
+                        pnlSubtext.setProduct(product);
                     }
                 }
             });
         }
 
         @Override
-        public Image getGraphic() {
-            return getLeftGraphic("/artwork/aspecton1.png");
-        }
-
-        @Override
         public void setupWizardButtons() {
             super.setupWizardButtons();
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
-            fireButtonEvent(darreichung == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(tradeform == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
             fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
@@ -280,23 +237,25 @@ public class MedProductWizard {
         @Override
         protected void initContentPane() {
             super.initContentPane();
-            pnlZusatz = new PnlZusatz(new Closure() {
+            pnlSubtext = new PnlSubtext(new Closure() {
                 @Override
                 public void execute(Object o) {
-                    darreichung = (TradeForm) o;
+                    tradeform = (TradeForm) o;
+
+                    OPDE.debug(SYSTools.catchNull(tradeform.getID(), "null") + ": " + TradeFormTools.toPrettyString(tradeform));
                     setupWizardButtons();
                 }
-            }, produkt);
-            addComponent(pnlZusatz, true);
+            }, product);
+            addComponent(pnlSubtext, true);
         }
     }
 
-    private class PackungPage extends DefaultWizardPage {
-        private PnlPackung pnlPackung;
+    private class PackagePage extends DefaultWizardPage {
+        private PnlPackage pnlPackage;
 
-        public PackungPage(String title, String description) {
+        public PackagePage(String title, String description) {
             super(title, description);
-            pnlPackung = new PnlPackung(new Closure() {
+            pnlPackage = new PnlPackage(new Closure() {
                 @Override
                 public void execute(Object o) {
                     aPackage = (MedPackage) o;
@@ -311,20 +270,14 @@ public class MedProductWizard {
                     if (pageEvent.getID() == PageEvent.PAGE_CLOSING) {
                         OPDE.debug(pageEvent.getSource());
                     } else if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
-                        OPDE.debug("PackungPage OPENDED");
+                        OPDE.debug("PackagePage OPENDED");
 //                        aPackage = null;
-                        pnlPackung.setLabelEinheit(DosageFormTools.toPrettyStringPackung(darreichung.getDosageForm()));
-                        pnlPackung.setDarreichung(darreichung);
+                        pnlPackage.setLabelEinheit(DosageFormTools.toPrettyStringPackung(tradeform.getDosageForm()));
+                        pnlPackage.setDarreichung(tradeform);
                     }
                 }
             });
         }
-
-
-//        @Override
-//        public Image getGraphic() {
-//            return getLeftGraphic("/artwork/aspecton1.png");
-//        }
 
         @Override
         public void setupWizardButtons() {
@@ -339,22 +292,22 @@ public class MedProductWizard {
         @Override
         protected void initContentPane() {
             super.initContentPane();
-            addComponent(pnlPackung, true);
+            addComponent(pnlPackage, true);
         }
 
         private void updateNextPage() {
-            if (produkt.getFactory() != null) {
+            if (product.getFactory() != null) {
                 getOwner().setNextPage(getOwner().getPageList().getPage(PAGE_COMPLETION));
             } else {
-                getOwner().setNextPage(getOwner().getPageList().getPage(PAGE_HERSTELLER));
+                getOwner().setNextPage(getOwner().getPageList().getPage(PAGE_ACME));
             }
         }
     }
 
-    private class HerstellerPage extends DefaultWizardPage {
-        private PnlHersteller pnlHersteller;
+    private class ACMEPage extends DefaultWizardPage {
+        private PnlACME pnlACME;
 
-        public HerstellerPage(String title, String description) {
+        public ACMEPage(String title, String description) {
             super(title, description);
             setLeftPaneItems(LEFTPANE_GRAPHIC);
             addPageListener(new PageListener() {
@@ -363,25 +316,20 @@ public class MedProductWizard {
                     if (pageEvent.getID() == PageEvent.PAGE_CLOSING) {
                         OPDE.debug(pageEvent.getSource());
                     } else if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
-                        OPDE.debug("HerstellerPage OPENDED");
-//                        factory = null;
-                        pnlHersteller.setProdukt(produkt);
+                        OPDE.debug("ACMEPage OPENDED");
+//                        acme = null;
+                        pnlACME.setProdukt(product);
 //                        setupWizardButtons();
                     }
                 }
             });
         }
 
-//        @Override
-//        public Image getGraphic() {
-//            return getLeftGraphic("/artwork/aspecton1.png");
-//        }
-
         @Override
         public void setupWizardButtons() {
             super.setupWizardButtons();
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
-            fireButtonEvent(factory == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(acme == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
             fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
@@ -389,19 +337,21 @@ public class MedProductWizard {
         @Override
         protected void initContentPane() {
             super.initContentPane();
-            pnlHersteller = new PnlHersteller(new Closure() {
+            pnlACME = new PnlACME(new Closure() {
                 @Override
                 public void execute(Object o) {
-                    factory = (MedFactory) o;
+                    acme = (MedFactory) o;
                     setupWizardButtons();
                 }
-            }, produkt, wizard);
-            addComponent(pnlHersteller, true);
+            }, product, wizard);
+            addComponent(pnlACME, true);
         }
 
     }
 
     private class CompletionPage extends CompletionWizardPage {
+        JTextPane txt;
+
         public CompletionPage(String title, String description) {
             super(title, description);
             setLeftPaneItems(LEFTPANE_GRAPHIC);
@@ -409,7 +359,9 @@ public class MedProductWizard {
                 @Override
                 public void pageEventFired(PageEvent pageEvent) {
                     if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
-                        OPDE.debug("CompletionPage OPENDED");
+                        txt.setText("<html>"+SYSConst.html_fontface +
+                                check() +
+                                "</font></html>");
                     }
                 }
             });
@@ -418,19 +370,13 @@ public class MedProductWizard {
         @Override
         protected void initContentPane() {
             super.initContentPane();
-
-            JTextPane txt = new JTextPane();
+            txt = new JTextPane();
             txt.setEditable(false);
             txt.setContentType("text/html");
             txt.setOpaque(false);
-            txt.setText("<html><font face=\"" + SYSConst.ARIAL14.getFamily() + "\">" +
-                    check() +
-                    "</font>" +
-                    "</html>");
-
             addComponent(txt, true);
             addSpace();
-            addText("Drücken Sie auf WEITER, wenn's los gehen soll.", SYSConst.ARIAL14);
+            addText(OPDE.lang.getString("opde.wizards.buttontext.letsgo"), SYSConst.ARIAL14);
         }
 
         @Override
@@ -440,20 +386,19 @@ public class MedProductWizard {
         }
 
         private String check() {
-            String result = "<b>" + OPDE.lang.getString(internalClassID + ".summaryline1") + "</b><br/>";
-            result += OPDE.lang.getString(internalClassID + ".summaryline2") + "<br/>";
+            String result = "<b>" + OPDE.lang.getString(internalClassID + ".page6.summaryline1") + "</b><br/>";
+            result += OPDE.lang.getString(internalClassID + ".page6.summaryline2") + "<br/>";
             result += "<ul>";
-            result += "<li>Medikament: <b>" + produkt.getBezeichnung() + "</b>" + (produkt.getMedPID() == null ? " <i>wird neu erstellt</i>" : " <i>gab es schon</i>") + "</li>";
-            result += "<li>Zusatzbezeichnung und Darreichungsform: <b>" + TradeFormTools.toPrettyStringMedium(darreichung) + "</b>" + (darreichung.getID() == null ? " <i>wird neu erstellt</i>" : " <i>gab es schon</i>") + "</li>";
-            result += "<li>Es wird eine <b>neue</b> Packung eingetragen: <b>" + MedPackageTools.toPrettyString(aPackage) + "</b></li>";
+            result += "<li>" + OPDE.lang.getString("misc.msg.drug") + ": <b>" + product.getBezeichnung() + "</b>" + (product.getMedPID() == null ? " <i>" + OPDE.lang.getString("misc.msg.willBeCreated") + "</i>" : " <i>" + OPDE.lang.getString("misc.msg.alreadyExits") + "</i>") + "</li>";
+            result += "<li>" + OPDE.lang.getString(internalClassID + ".page3.title") + ": <b>" + TradeFormTools.toPrettyStringMedium(tradeform) + "</b>" + (tradeform.getID() == null ? " <i>" + OPDE.lang.getString("misc.msg.willBeCreated") + "</i>" : " <i>" + OPDE.lang.getString("misc.msg.alreadyExits") + "</i>") + "</li>";
+            result += "<li>" + OPDE.lang.getString(internalClassID + ".page6.newPackageWillBeCreated") + ": <b>" + MedPackageTools.toPrettyString(aPackage) + "</b></li>";
 
-            MedFactory displayFactory = factory == null ? produkt.getFactory() : factory;
-            result += "<li>Hersteller: <b>" + displayFactory.getFirma() + ", " + displayFactory.getOrt() + "</b>" + (displayFactory.getMphid() == null ? " <i>wird neu erstellt</i>" : " <i>gab es schon</i>") + "</li>";
+            MedFactory displayFactory = acme == null ? product.getFactory() : acme;
+            result += "<li>" + OPDE.lang.getString(internalClassID + ".page5.title") + ": <b>" + displayFactory.getFirma() + ", " + displayFactory.getOrt() + "</b>" + (displayFactory.getMphid() == null ? " <i>" + OPDE.lang.getString("misc.msg.willBeCreated") + "</i>" : " <i>" + OPDE.lang.getString("misc.msg.alreadyExits") + "</i>") + "</li>";
 
             result += "</ul>";
 
-            result += "<p>";
-            result += "Wenn Sie sicher sind, dann bestätigen Sie nun die Eingaben. Ansonsten gehen Sie einfach zurück und korrigieren das Nötige.</p>" +
+            result += "<p>" + OPDE.lang.getString(internalClassID + ".page6.summaryline1") + "</p>" +
                     "</font>";
             return result;
         }

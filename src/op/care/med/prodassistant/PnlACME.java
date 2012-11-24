@@ -25,12 +25,12 @@ import java.awt.event.ActionListener;
 /**
  * @author Torsten Löhr
  */
-public class PnlHersteller extends JPanel {
+public class PnlACME extends JPanel {
     private MedProducts produkt;
     private Closure validate;
     private Dialog parent;
 
-    public PnlHersteller(Closure validate, MedProducts produkt, Dialog parent) {
+    public PnlACME(Closure validate, MedProducts produkt, Dialog parent) {
         this.validate = validate;
         this.produkt = produkt;
         this.parent = parent;
@@ -53,7 +53,7 @@ public class PnlHersteller extends JPanel {
     private void btnAddActionPerformed(ActionEvent e) {
         final JidePopup popup = new JidePopup();
 
-        DlgHersteller dlg = new DlgHersteller(new Closure() {
+        DlgACME dlg = new DlgACME(new Closure() {
             @Override
             public void execute(Object o) {
                 if (o != null) {
@@ -83,14 +83,20 @@ public class PnlHersteller extends JPanel {
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
+        label1 = new JLabel();
         scrollPane1 = new JScrollPane();
         lstHersteller = new JList();
         btnAdd = new JButton();
 
         //======== this ========
         setLayout(new FormLayout(
-            "default, $lcgap, default:grow, $lcgap, default",
+            "2*(default, $lcgap), default:grow, $lcgap, default",
             "default, $lgap, default:grow, 2*($lgap, default)"));
+
+        //---- label1 ----
+        label1.setText(null);
+        label1.setIcon(new ImageIcon(getClass().getResource("/artwork/other/medicine-acme.png")));
+        add(label1, CC.xy(3, 3));
 
         //======== scrollPane1 ========
         {
@@ -105,7 +111,7 @@ public class PnlHersteller extends JPanel {
             });
             scrollPane1.setViewportView(lstHersteller);
         }
-        add(scrollPane1, CC.xy(3, 3, CC.DEFAULT, CC.FILL));
+        add(scrollPane1, CC.xy(5, 3, CC.DEFAULT, CC.FILL));
 
         //---- btnAdd ----
         btnAdd.setText(null);
@@ -120,11 +126,12 @@ public class PnlHersteller extends JPanel {
                 btnAddActionPerformed(e);
             }
         });
-        add(btnAdd, CC.xy(3, 5, CC.LEFT, CC.DEFAULT));
+        add(btnAdd, CC.xy(5, 5, CC.LEFT, CC.DEFAULT));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+    private JLabel label1;
     private JScrollPane scrollPane1;
     private JList lstHersteller;
     private JButton btnAdd;
