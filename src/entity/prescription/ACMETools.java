@@ -12,7 +12,7 @@ import java.awt.*;
  * Time: 15:43
  * To change this template use File | Settings | File Templates.
  */
-public class MedFactoryTools {
+public class ACMETools {
     public static ListCellRenderer getHerstellerRenderer(int maxlen) {
         final int max = maxlen;
         return new ListCellRenderer() {
@@ -21,8 +21,8 @@ public class MedFactoryTools {
                 String text;
                 if (o == null) {
                     text = SYSTools.toHTML("<i>Keine Auswahl</i>");
-                } else if (o instanceof MedFactory) {
-                    text = ((MedFactory) o).getFirma() + SYSTools.catchNull(((MedFactory) o).getOrt(), ", ", "");
+                } else if (o instanceof ACME) {
+                    text = toPrettyStringShort((ACME) o);
                 } else {
                     text = o.toString();
                 }
@@ -32,5 +32,9 @@ public class MedFactoryTools {
                 return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
             }
         };
+    }
+
+    public static String toPrettyStringShort(ACME acme) {
+        return acme.getName() + SYSTools.catchNull(acme.getCity(), ", ", "");
     }
 }

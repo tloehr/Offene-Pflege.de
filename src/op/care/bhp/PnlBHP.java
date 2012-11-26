@@ -99,6 +99,8 @@ public class PnlBHP extends NursingRecordsPanel {
     @Override
     public void switchResident(Resident bewohner) {
 
+        //TODO: Check BHP. Kann man nicht abhaken ?? Sowieso noch prüfen, es wird immer die Schicht geschlossen, wenn man sie abhakt und sie zur Zeit nicht aktiv ist.
+
         this.resident = bewohner;
         GUITools.setBWDisplay(resident);
 

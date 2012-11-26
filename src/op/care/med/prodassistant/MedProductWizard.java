@@ -29,7 +29,7 @@ public class MedProductWizard {
     private MedProducts product;
     private TradeForm tradeform;
     private MedPackage aPackage;
-    private MedFactory acme;
+    private ACME acme;
     private Closure finishAction;
     private String pzntemplate = null, prodtemplate = null;
 
@@ -296,7 +296,7 @@ public class MedProductWizard {
         }
 
         private void updateNextPage() {
-            if (product.getFactory() != null) {
+            if (product.getACME() != null) {
                 getOwner().setNextPage(getOwner().getPageList().getPage(PAGE_COMPLETION));
             } else {
                 getOwner().setNextPage(getOwner().getPageList().getPage(PAGE_ACME));
@@ -340,7 +340,7 @@ public class MedProductWizard {
             pnlACME = new PnlACME(new Closure() {
                 @Override
                 public void execute(Object o) {
-                    acme = (MedFactory) o;
+                    acme = (ACME) o;
                     setupWizardButtons();
                 }
             }, product, wizard);
@@ -393,8 +393,8 @@ public class MedProductWizard {
             result += "<li>" + OPDE.lang.getString(internalClassID + ".page3.title") + ": <b>" + TradeFormTools.toPrettyStringMedium(tradeform) + "</b>" + (tradeform.getID() == null ? " <i>" + OPDE.lang.getString("misc.msg.willBeCreated") + "</i>" : " <i>" + OPDE.lang.getString("misc.msg.alreadyExits") + "</i>") + "</li>";
             result += "<li>" + OPDE.lang.getString(internalClassID + ".page6.newPackageWillBeCreated") + ": <b>" + MedPackageTools.toPrettyString(aPackage) + "</b></li>";
 
-            MedFactory displayFactory = acme == null ? product.getFactory() : acme;
-            result += "<li>" + OPDE.lang.getString(internalClassID + ".page5.title") + ": <b>" + displayFactory.getFirma() + ", " + displayFactory.getOrt() + "</b>" + (displayFactory.getMphid() == null ? " <i>" + OPDE.lang.getString("misc.msg.willBeCreated") + "</i>" : " <i>" + OPDE.lang.getString("misc.msg.alreadyExits") + "</i>") + "</li>";
+            ACME displayFactory = acme == null ? product.getACME() : acme;
+            result += "<li>" + OPDE.lang.getString(internalClassID + ".page5.title") + ": <b>" + displayFactory.getName() + ", " + displayFactory.getCity() + "</b>" + (displayFactory.getMphid() == null ? " <i>" + OPDE.lang.getString("misc.msg.willBeCreated") + "</i>" : " <i>" + OPDE.lang.getString("misc.msg.alreadyExits") + "</i>") + "</li>";
 
             result += "</ul>";
 

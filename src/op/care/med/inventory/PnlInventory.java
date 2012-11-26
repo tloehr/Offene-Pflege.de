@@ -98,12 +98,13 @@ public class PnlInventory extends NursingRecordsPanel {
 
     private ArrayList<MedInventory> lstInventories;
     private HashMap<String, CollapsiblePane> cpMap;
+    private HashMap<String, JToggleButton> mapKey2ClosedToggleButton;
     private HashMap<String, JPanel> contentmap;
     private HashMap<MedStockTransaction, JPanel> linemap;
 
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
-    private JToggleButton tbClosedInventory, tbLastAddedClosedStock; // <= only for search function
+    private JToggleButton tbClosedInventory; // <= only for search function
     private Color[] color1, color2;
 
     /**
@@ -122,6 +123,7 @@ public class PnlInventory extends NursingRecordsPanel {
         cpMap = new HashMap<String, CollapsiblePane>();
         contentmap = new HashMap<String, JPanel>();
         lstInventories = new ArrayList<MedInventory>();
+        mapKey2ClosedToggleButton = new HashMap<String, JToggleButton>();
         color1 = SYSConst.yellow1;
         color2 = SYSConst.greyscale;
 
@@ -152,8 +154,7 @@ public class PnlInventory extends NursingRecordsPanel {
         cpMap.clear();
         contentmap.clear();
         lstInventories.clear();
-//        invsummap.clear();
-//        stocksummap.clear();
+        mapKey2ClosedToggleButton.clear();
         cpsInventory.removeAll();
         linemap.clear();
     }
@@ -262,13 +263,12 @@ public class PnlInventory extends NursingRecordsPanel {
          *     |_|  \___|_|\___/ \__,_|\__,_|____/|_|___/ .__/|_|\__,_|\__, |
          *                                              |_|            |___/
          */
-
-
         final boolean withworker = true;
         cpsInventory.removeAll();
         cpMap.clear();
         contentmap.clear();
         linemap.clear();
+        mapKey2ClosedToggleButton.clear();
 
         if (withworker) {
 
@@ -533,7 +533,10 @@ public class PnlInventory extends NursingRecordsPanel {
 
             }
         });
-        tbLastAddedClosedStock = tbClosedStock;
+//        tbLastAddedClosedStock = tbClosedStock;
+
+        mapKey2ClosedToggleButton.put(key, tbClosedStock);
+
         cptitle.getRight().add(tbClosedStock);
 
 
@@ -1366,6 +1369,7 @@ public class PnlInventory extends NursingRecordsPanel {
             em.close();
 
             if (stock != null) {
+                String key = stock.getInventory().getID() + ".xinventory";
                 if (!resident.equals(stock.getInventory().getResident())) {
                     if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, PnlInfo.internalClassID)) { // => ACLMATRIX
                         switchResident(stock.getInventory().getResident(), stock.getInventory());
@@ -1374,11 +1378,25 @@ public class PnlInventory extends NursingRecordsPanel {
                     }
 
                 } else {
-                    lstInventories.clear();
-                    lstInventories.add(stock.getInventory());
-                    reloadDisplay();
+
+
+//                    lstInventories.clear();
+//                    lstInventories.add(stock.getInventory());
+//                    reloadDisplay();
+
+                    CollapsiblePane myCP = cpMap.get(key);
+
+                    if (myCP.isCollapsed()) {
+                        try {
+                            myCP.setCollapsed(false);
+                        } catch (PropertyVetoException e) {
+                            // bah!
+                        }
+                    }
+
+
                 }
-                tbLastAddedClosedStock.setSelected(true);
+                mapKey2ClosedToggleButton.get(key).setSelected(true);
 
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
@@ -1387,7 +1405,7 @@ public class PnlInventory extends NursingRecordsPanel {
                         GUITools.scroll2show(jspInventory, cpMap.get(stock.getID() + ".xstock").getLocation().y, new Closure() {
                             @Override
                             public void execute(Object o) {
-                                GUITools.flashBackground(cpMap.get(stock.getID() + ".xstock"), Color.YELLOW, 2);
+                                GUITools.flashBackground(cpMap.get(stock.getID() + ".xstock"), Color.RED, 2);
                             }
                         });
                     }

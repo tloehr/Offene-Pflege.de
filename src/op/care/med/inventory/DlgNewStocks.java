@@ -41,10 +41,7 @@ import op.system.Form;
 import op.system.PrinterType;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
-import op.tools.MyJDialog;
-import op.tools.PrintListElement;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
+import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
 
@@ -69,8 +66,8 @@ public class DlgNewStocks extends MyJDialog {
 
     private BigDecimal menge;
     private MedPackage aPackage;
-    private TradeForm darreichung;
-    private Resident bewohner;
+    private TradeForm tradeForm;
+    private Resident resident;
     private MedInventory inventory;
 
     private OverlayComboBox cmbVorrat, cmbBW;
@@ -85,9 +82,9 @@ public class DlgNewStocks extends MyJDialog {
     private PrinterType etiprinter;
     private Form form1;
 
-    public DlgNewStocks(Resident bewohner) {
+    public DlgNewStocks(Resident resident) {
         super();
-        this.bewohner = bewohner;
+        this.resident = resident;
         initComponents();
         initDialog();
     }
@@ -102,7 +99,7 @@ public class DlgNewStocks extends MyJDialog {
         if (txtMedSuche.getText().trim().isEmpty()) {
             cmbMProdukt.setModel(new DefaultComboBoxModel());
             cmbPackung.setModel(new DefaultComboBoxModel());
-            darreichung = null;
+            tradeForm = null;
             aPackage = null;
             initCmbVorrat();
 
@@ -117,9 +114,9 @@ public class DlgNewStocks extends MyJDialog {
                 query.setParameter("pzn", pzn);
                 try {
                     aPackage = (MedPackage) query.getSingleResult();
-                    darreichung = aPackage.getTradeForm();
-                    cmbMProdukt.setModel(new DefaultComboBoxModel(new TradeForm[]{darreichung}));
-                    cmbMProdukt.getModel().setSelectedItem(darreichung);
+                    tradeForm = aPackage.getTradeForm();
+                    cmbMProdukt.setModel(new DefaultComboBoxModel(new TradeForm[]{tradeForm}));
+                    cmbMProdukt.getModel().setSelectedItem(tradeForm);
                 } catch (NoResultException nre) {
                     cmbMProdukt.setModel(new DefaultComboBoxModel());
                     OPDE.debug(nre);
@@ -155,7 +152,7 @@ public class DlgNewStocks extends MyJDialog {
         form1 = etiprinter.getForms().get(OPDE.getProps().getProperty("etiform1"));
 
         menge = null;
-        cmbMProdukt.setRenderer(TradeFormTools.gerRenderer(TradeFormTools.LONG));
+        cmbMProdukt.setRenderer(TradeFormTools.getRenderer(TradeFormTools.LONG));
 
         attentionIconVorrat = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.ATTENTION));
         infoIconVorrat = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.INFO));
@@ -185,12 +182,12 @@ public class DlgNewStocks extends MyJDialog {
         ovrBW = new DefaultOverlayable(cmbBW);
         mainPane.add(ovrBW, CC.xywh(7, 15, 2, 1));
 
-        if (bewohner == null) {
+        if (resident == null) {
             ovrBW.addOverlayComponent(attentionIconBW, DefaultOverlayable.SOUTH_WEST);
             attentionIconBW.setToolTipText("<html>Keine(n) BewohnerIn ausgewählt.<html>");
         } else {
             txtBWSuche.setEnabled(false);
-            cmbBW.setModel(new DefaultComboBoxModel(new Resident[]{bewohner}));
+            cmbBW.setModel(new DefaultComboBoxModel(new Resident[]{resident}));
         }
 
         attentionIconMenge = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.ATTENTION));
@@ -432,7 +429,7 @@ public class DlgNewStocks extends MyJDialog {
         if (ignoreEvent || (evt != null && evt.getStateChange() != ItemEvent.SELECTED)) {
             return;
         }
-        bewohner = (Resident) cmbBW.getSelectedItem();
+        resident = (Resident) cmbBW.getSelectedItem();
         OPDE.debug("cmbPackungItemStateChanged: " + cmbBW.getSelectedItem());
         initCmbVorrat();
         setApply();
@@ -441,10 +438,10 @@ public class DlgNewStocks extends MyJDialog {
     private void btnApplyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApplyActionPerformed
         String text = "";
 
-        if (bewohner == null) {
+        if (resident == null) {
             text += "Keine(n) BewohnerIn ausgewählt. ";
         }
-        if (darreichung == null) {
+        if (tradeForm == null) {
             text += "Kein Medikament ausgewählt. ";
         }
         if (menge == null && aPackage == null) {
@@ -472,7 +469,7 @@ public class DlgNewStocks extends MyJDialog {
         try {
             em.getTransaction().begin();
 
-            em.lock(em.merge(bewohner), LockModeType.OPTIMISTIC);
+            em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
 
             // Wenn die aPackage null ist, dann ist eine Sonderpackung
             if (aPackage != null) {
@@ -482,14 +479,14 @@ public class DlgNewStocks extends MyJDialog {
                 }
             }
 
-            darreichung = em.merge(darreichung);
+            tradeForm = em.merge(tradeForm);
             inventory = em.merge(inventory);
 
-            if (inventory.getID() == null) { // neuen Vorrat anlegen
-                inventory.setText(darreichung.getMedProduct().getBezeichnung());
+            if (inventory.getID() == null) { // create a new MedInvetory.
+                inventory.setText(TradeFormTools.toPrettyString(tradeForm) + "; " + ACMETools.toPrettyStringShort(tradeForm.getMedProduct().getACME()));
             }
 
-            MedStock bestand = em.merge(MedInventoryTools.addTo(inventory, aPackage, darreichung, txtBemerkung.getText(), menge));
+            MedStock bestand = em.merge(MedInventoryTools.addTo(inventory, aPackage, tradeForm, txtBemerkung.getText(), menge));
             inventory.getMedStocks().add(bestand);
 
             if (MedStockTools.getStockInUse(inventory) == null) {
@@ -557,7 +554,9 @@ public class DlgNewStocks extends MyJDialog {
             }
         });
 
-        popup.showPopup(new Insets(-5, wizard.getPreferredSize().width * -1 - 200, -5, -100), btnMed);
+        GUITools.showPopup(popup, SwingConstants.WEST);
+
+//        popup.showPopup(new Insets(-5, wizard.getPreferredSize().width * -1 - 200, -5, -100), btnMed);
 
 
     }//GEN-LAST:event_btnMedActionPerformed
@@ -607,14 +606,14 @@ public class DlgNewStocks extends MyJDialog {
 
         if (txtBWSuche.getText().isEmpty()) {
             cmbBW.setModel(new DefaultComboBoxModel());
-            bewohner = null;
+            resident = null;
         } else {
             DefaultComboBoxModel dcbm = new DefaultComboBoxModel();
             EntityManager em = OPDE.createEM();
             if (txtBWSuche.getText().trim().length() == 3) { // Könnte eine Suche nach der Kennung sein
-                bewohner = em.find(Resident.class, txtBWSuche.getText().trim());
-                if (bewohner != null) {
-                    dcbm = new DefaultComboBoxModel(new Resident[]{bewohner});
+                resident = em.find(Resident.class, txtBWSuche.getText().trim());
+                if (resident != null) {
+                    dcbm = new DefaultComboBoxModel(new Resident[]{resident});
                 }
             }
 
@@ -630,10 +629,10 @@ public class DlgNewStocks extends MyJDialog {
             if (dcbm.getSize() > 0) {
                 cmbBW.setModel(dcbm);
                 cmbBW.setSelectedIndex(0);
-                bewohner = (Resident) cmbBW.getSelectedItem();
+                resident = (Resident) cmbBW.getSelectedItem();
             } else {
                 cmbBW.setModel(new DefaultComboBoxModel());
-                bewohner = null;
+                resident = null;
             }
             em.close();
         }
@@ -641,7 +640,7 @@ public class DlgNewStocks extends MyJDialog {
         if (ovrBW.getOverlayComponents().length > 0) {
             ovrBW.removeOverlayComponent(ovrBW.getOverlayComponents()[0]);
         }
-        if (bewohner == null) {
+        if (resident == null) {
             ovrBW.addOverlayComponent(attentionIconBW, DefaultOverlayable.SOUTH_WEST);
             attentionIconBW.setToolTipText("<html>Keine(n) BewohnerIn ausgewählt.<html>");
         }
@@ -675,22 +674,22 @@ public class DlgNewStocks extends MyJDialog {
             ovrVorrat.removeOverlayComponent(ovrVorrat.getOverlayComponents()[0]);
         }
 
-        if (bewohner != null) {
+        if (resident != null) {
 //            ovrVorrat.removeOverlayComponent(ovrVorrat.getOverlayComponents()[0]);
 //            ovrVorrat.addOverlayComponent(questionIconVorrat, DefaultOverlayable.SOUTH_WEST);
 //
 
 
             cmbVorrat.setRenderer(MedInventoryTools.getInventoryRenderer());
-            if (darreichung == null) {
+            if (tradeForm == null) {
                 cmbVorrat.setModel(new DefaultComboBoxModel());
                 inventory = null;
             } else {
                 List<MedInventory> vorraete = new ArrayList<MedInventory>();
-                inventory = TradeFormTools.getInventory4TradeForm(bewohner, darreichung);
+                inventory = TradeFormTools.getInventory4TradeForm(resident, tradeForm);
 
                 if (inventory == null) {
-                    vorraete = TradeFormTools.getSuitableInventoriesForThisTradeForm(bewohner, darreichung);
+                    vorraete = TradeFormTools.getSuitableInventoriesForThisTradeForm(resident, tradeForm);
                 } else {
                     vorraete.add(inventory);
                 }
@@ -698,10 +697,10 @@ public class DlgNewStocks extends MyJDialog {
             }
 
 //            ovrVorrat.removeOverlayComponent(ovrVorrat.getOverlayComponents()[0]);
-            if (darreichung != null) {
+            if (tradeForm != null) {
                 if (inventory == null) {
                     DefaultComboBoxModel dcbm = (DefaultComboBoxModel) cmbVorrat.getModel();
-                    dcbm.insertElementAt(new MedInventory(bewohner, "<AUTOMATISCH>"), 0);
+                    dcbm.insertElementAt(new MedInventory(resident, "<AUTOMATISCH>"), 0);
                     cmbVorrat.setSelectedIndex(0);
 
                     if (dcbm.getSize() > 1) {
@@ -728,10 +727,10 @@ public class DlgNewStocks extends MyJDialog {
             return;
         }
 
-        darreichung = (TradeForm) cmbMProdukt.getSelectedItem();
+        tradeForm = (TradeForm) cmbMProdukt.getSelectedItem();
 
-        if (darreichung != null) {
-            DefaultComboBoxModel dcbm = new DefaultComboBoxModel(darreichung.getPackages().toArray());
+        if (tradeForm != null) {
+            DefaultComboBoxModel dcbm = new DefaultComboBoxModel(tradeForm.getPackages().toArray());
             dcbm.insertElementAt("<Sonderpackung>", 0);
             cmbPackung.setModel(dcbm);
             cmbPackung.setRenderer(MedPackageTools.getMedPackungRenderer());

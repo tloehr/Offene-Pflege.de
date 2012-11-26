@@ -26,7 +26,7 @@ public class DocTools {
                 if (o == null) {
                     text = OPDE.lang.getString("misc.commands.>>noselection<<");
                 } else if (o instanceof Doc) {
-//                    text = ((Doc) o).getName() + ", " + ((Doc) o).getFirstname() + ", " + ((Doc) o).getOrt();
+//                    text = ((Doc) o).getName() + ", " + ((Doc) o).getFirstname() + ", " + ((Doc) o).getCity();
                     text = getFullName((Doc) o);
                 } else {
                     text = o.toString();

@@ -322,7 +322,7 @@ public class PnlMed extends CleanablePanel {
             if (node.getUserObject() instanceof MedProducts) {
                 component.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/info.png")));
                 MedProducts myprod = (MedProducts) node.getUserObject();
-                component.setText(myprod.getBezeichnung() + ", " + myprod.getFactory().getFirma() + ", " + myprod.getFactory().getOrt());
+                component.setText(myprod.getBezeichnung() + ", " + myprod.getACME().getName() + ", " + myprod.getACME().getCity());
             } else if (node.getUserObject() instanceof TradeForm) {
                 component.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/medical.png")));
                 component.setText(TradeFormTools.toPrettyStringMedium((TradeForm) node.getUserObject()));

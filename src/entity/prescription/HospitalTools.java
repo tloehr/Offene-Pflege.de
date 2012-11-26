@@ -38,7 +38,7 @@ public class HospitalTools {
 
         String string = kh.getName() + SYSTools.catchNull(kh.getOrt(), ", ", "");
 //        string += SYSTools.catchNull(kh.getTel(), OPDE.lang.getString("misc.msg.phone") + ": ", " ") + SYSTools.catchNull(kh.getFax(), OPDE.lang.getString("misc.msg.fax") + ": ", " ");
-//        String string = kh.getName() + ", " + SYSTools.catchNull(kh.getStrasse(), "", ", ") + SYSTools.catchNull(kh.getPlz(), "", " ") + SYSTools.catchNull(kh.getOrt(), "", ", ");
+//        String string = kh.getName() + ", " + SYSTools.catchNull(kh.getStreet(), "", ", ") + SYSTools.catchNull(kh.getPlz(), "", " ") + SYSTools.catchNull(kh.getCity(), "", ", ");
 //        string += SYSTools.catchNull(kh.getTel(), OPDE.lang.getString("misc.msg.phone") + ": ", " ") + SYSTools.catchNull(kh.getFax(), OPDE.lang.getString("misc.msg.fax") + ": ", " ");
         return string;
     }

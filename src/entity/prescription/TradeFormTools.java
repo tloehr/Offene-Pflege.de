@@ -27,7 +27,7 @@ public class TradeFormTools {
     public static final int MEDIUM = 1;
     public static final int LONG = 2;
 
-    public static ListCellRenderer gerRenderer(int verbosity) {
+    public static ListCellRenderer getRenderer(int verbosity) {
         final int v = verbosity;
         return new ListCellRenderer() {
             @Override
@@ -54,25 +54,25 @@ public class TradeFormTools {
 
 
     public static String toPrettyString(TradeForm tradeForm) {
-        String zubereitung = SYSTools.catchNull(tradeForm.getDosageForm().getPreparation());
-        String anwtext = SYSTools.catchNull(tradeForm.getDosageForm().getUsageTex());
-        String zusatz = SYSTools.catchNull(tradeForm.getSubtext());
+        String preparation = SYSTools.catchNull(tradeForm.getDosageForm().getPreparation());
+        String usageText = SYSTools.catchNull(tradeForm.getDosageForm().getUsageText());
+        String subtext = SYSTools.catchNull(tradeForm.getSubtext());
 
         String text = tradeForm.getMedProduct().getBezeichnung();
-        text += zusatz.isEmpty() ? "" : ", " + zusatz;
-        text += zubereitung.isEmpty() ? " " : " " + zubereitung + ", ";
-        text += anwtext.isEmpty() ? DosageFormTools.EINHEIT[tradeForm.getDosageForm().getUsageUnit()] : anwtext;
+        text += subtext.isEmpty() ? "" : " " + subtext;
+        text += preparation.isEmpty() ? " " : ", " + preparation + ", ";
+        text += usageText.isEmpty() ? DosageFormTools.EINHEIT[tradeForm.getDosageForm().getUsageUnit()] : usageText;
         return text;
     }
 
     public static String toPrettyStringMedium(TradeForm tradeForm) {
-        String zubereitung = SYSTools.catchNull(tradeForm.getDosageForm().getPreparation());
-        String anwtext = SYSTools.catchNull(tradeForm.getDosageForm().getUsageTex());
-        String zusatz = SYSTools.catchNull(tradeForm.getSubtext());
+        String preparation = SYSTools.catchNull(tradeForm.getDosageForm().getPreparation());
+        String usageText = SYSTools.catchNull(tradeForm.getDosageForm().getUsageText());
+        String subtext = SYSTools.catchNull(tradeForm.getSubtext());
 
-        String text = zusatz;
-        text += zubereitung.isEmpty() ? " " : " " + zubereitung + ", ";
-        text += anwtext.isEmpty() ? DosageFormTools.EINHEIT[tradeForm.getDosageForm().getUsageUnit()] : anwtext;
+        String text = subtext;
+        text += preparation.isEmpty() ? " " : " " + preparation + ", ";
+        text += usageText.isEmpty() ? DosageFormTools.EINHEIT[tradeForm.getDosageForm().getUsageUnit()] : usageText;
         return text;
     }
 

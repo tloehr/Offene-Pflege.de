@@ -47,7 +47,7 @@
         <class>entity.prescription.MedStock</class>
         <class>entity.prescription.MedStockTransaction</class>
         <class>entity.prescription.DosageForm</class>
-        <class>entity.prescription.MedFactory</class>
+        <class>entity.prescription.ACME</class>
         <class>entity.prescription.MedPackage</class>
         <class>entity.prescription.MedProducts</class>
         <class>entity.prescription.MedInventory</class>

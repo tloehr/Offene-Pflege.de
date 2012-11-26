@@ -11,7 +11,7 @@ import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.OverlayTextField;
 import com.jidesoft.swing.OverlayableIconsFactory;
 import com.jidesoft.swing.OverlayableUtils;
-import entity.prescription.MedFactory;
+import entity.prescription.ACME;
 import op.tools.SYSConst;
 import org.apache.commons.collections.Closure;
 
@@ -27,7 +27,7 @@ import java.awt.event.ActionListener;
  */
 public class DlgACME extends JPanel {
     private Closure actionBlock;
-    private MedFactory factory;
+    private ACME factory;
     private JLabel attentionIconFirma, attentionIconOrt;
     private OverlayTextField txtFirma, txtOrt;
     private DefaultOverlayable ovrFirma, ovrOrt;
@@ -74,7 +74,7 @@ public class DlgACME extends JPanel {
         if (txtFirma.getText().trim().isEmpty() || txtOrt.getText().trim().isEmpty()) {
             factory = null;
         } else {
-            factory = new MedFactory(txtFirma.getText().trim(), txtStrasse.getText().trim(), txtPLZ.getText().trim(), txtOrt.getText().trim(), txtTel.getText().trim(), txtFax.getText().trim(), txtWWW.getText().trim());
+            factory = new ACME(txtFirma.getText().trim(), txtStrasse.getText().trim(), txtPLZ.getText().trim(), txtOrt.getText().trim(), txtTel.getText().trim(), txtFax.getText().trim(), txtWWW.getText().trim());
         }
         actionBlock.execute(factory);
     }

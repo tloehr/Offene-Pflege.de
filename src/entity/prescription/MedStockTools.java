@@ -378,7 +378,7 @@ public class MedStockTools {
             result += "PZN: " + bestand.getPackage().getPzn() + ", ";
             result += MedPackageTools.GROESSE[bestand.getPackage().getSize()] + ", " + bestand.getPackage().getContent() + " " + DosageFormTools.EINHEIT[bestand.getTradeForm().getDosageForm().getPackUnit()] + " ";
             String zubereitung = SYSTools.catchNull(bestand.getTradeForm().getDosageForm().getPreparation());
-            String anwtext = SYSTools.catchNull(bestand.getTradeForm().getDosageForm().getUsageTex());
+            String anwtext = SYSTools.catchNull(bestand.getTradeForm().getDosageForm().getUsageText());
             result += zubereitung.equals("") ? anwtext : (anwtext.equals("") ? zubereitung : zubereitung + ", " + anwtext);
             result += "</b></font>";
         }

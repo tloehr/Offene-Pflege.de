@@ -26,14 +26,14 @@ public class MedProducts implements Serializable {
     public MedProducts() {
     }
 
-    public MedProducts(MedFactory factory, String text) {
-        this.factory = factory;
+    public MedProducts(ACME acme, String text) {
+        this.acme = acme;
         this.text = text;
         this.tradeForms = new ArrayList<TradeForm>();
     }
 
     public MedProducts(String text) {
-        this.factory = null;
+        this.acme = null;
         this.text = text;
         this.tradeForms = new ArrayList<TradeForm>();
     }
@@ -55,12 +55,12 @@ public class MedProducts implements Serializable {
         this.text = bezeichnung;
     }
 
-    public MedFactory getFactory() {
-        return factory;
+    public ACME getACME() {
+        return acme;
     }
 
-    public void setFactory(MedFactory factory) {
-        this.factory = factory;
+    public void setACME(ACME acme) {
+        this.acme = acme;
     }
 
     public Collection<TradeForm> getTradeforms() {
@@ -69,7 +69,7 @@ public class MedProducts implements Serializable {
 
     @JoinColumn(name = "MPHID", referencedColumnName = "MPHID")
     @ManyToOne
-    private MedFactory factory;
+    private ACME acme;
 
     @Override
     public int hashCode() {

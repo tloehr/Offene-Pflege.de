@@ -7,8 +7,8 @@ package op.care.med.prodassistant;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
-import entity.prescription.MedFactory;
-import entity.prescription.MedFactoryTools;
+import entity.prescription.ACME;
+import entity.prescription.ACMETools;
 import entity.prescription.MedProducts;
 import op.OPDE;
 import org.apache.commons.collections.Closure;
@@ -44,9 +44,9 @@ public class PnlACME extends JPanel {
 
     private void initPanel() {
         EntityManager em = OPDE.createEM();
-        Query query2 = em.createQuery("SELECT m FROM MedFactory m ORDER BY m.firma, m.ort");
-        lstHersteller.setModel(new DefaultComboBoxModel(query2.getResultList().toArray(new MedFactory[]{})));
-        lstHersteller.setCellRenderer(MedFactoryTools.getHerstellerRenderer(0));
+        Query query2 = em.createQuery("SELECT m FROM ACME m ORDER BY m.name, m.city");
+        lstHersteller.setModel(new DefaultComboBoxModel(query2.getResultList().toArray(new ACME[]{})));
+        lstHersteller.setCellRenderer(ACMETools.getHerstellerRenderer(0));
         em.close();
     }
 
@@ -57,7 +57,7 @@ public class PnlACME extends JPanel {
             @Override
             public void execute(Object o) {
                 if (o != null) {
-                    lstHersteller.setModel(new DefaultComboBoxModel(new MedFactory[]{(MedFactory) o}));
+                    lstHersteller.setModel(new DefaultComboBoxModel(new ACME[]{(ACME) o}));
                     lstHersteller.setSelectedIndex(0);
                     popup.hidePopup();
                 }
@@ -77,7 +77,7 @@ public class PnlACME extends JPanel {
     }
 
     private void lstHerstellerValueChanged(ListSelectionEvent e) {
-        produkt.setFactory((MedFactory) lstHersteller.getSelectedValue());
+        produkt.setACME((ACME) lstHersteller.getSelectedValue());
         validate.execute(lstHersteller.getSelectedValue());
     }
 

@@ -26,7 +26,7 @@ public class LCustodianTools {
                 if (o == null) {
                     text = OPDE.lang.getString("misc.commands.>>noselection<<");
                 } else if (o instanceof LCustodian) {
-//                    text = ((LCustodian) o).getName() + ", " + ((LCustodian) o).getFirstname() + ", " + ((LCustodian) o).getOrt();
+//                    text = ((LCustodian) o).getName() + ", " + ((LCustodian) o).getFirstname() + ", " + ((LCustodian) o).getCity();
                     text = getFullName((LCustodian) o);
                 } else {
                     text = o.toString();

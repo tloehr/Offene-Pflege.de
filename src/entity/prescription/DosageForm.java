@@ -55,7 +55,7 @@ public class DosageForm implements Serializable {
         return preparation;
     }
 
-    public String getUsageTex() {
+    public String getUsageText() {
         return usageText;
     }
 

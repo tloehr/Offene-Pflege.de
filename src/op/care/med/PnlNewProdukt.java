@@ -63,13 +63,13 @@ public class PnlNewProdukt extends javax.swing.JDialog {
         txtBezeichnung.setText(template);
 
         EntityManager em = OPDE.createEM();
-        Query query2 = em.createQuery("SELECT m FROM MedFactory m ORDER BY m.firma, m.ort");
-        cmbHersteller.setModel(new DefaultComboBoxModel(query2.getResultList().toArray(new MedFactory[]{})));
-        cmbHersteller.setRenderer(MedFactoryTools.getHerstellerRenderer(0));
+        Query query2 = em.createQuery("SELECT m FROM ACME m ORDER BY m.name, m.city");
+        cmbHersteller.setModel(new DefaultComboBoxModel(query2.getResultList().toArray(new ACME[]{})));
+        cmbHersteller.setRenderer(ACMETools.getHerstellerRenderer(0));
         em.close();
 
         if (produkt != null){
-            cmbHersteller.setSelectedItem(produkt.getFactory());
+            cmbHersteller.setSelectedItem(produkt.getACME());
         }
 
         setVisible(true);
@@ -159,7 +159,7 @@ public class PnlNewProdukt extends javax.swing.JDialog {
         em.close();
 
         if (list.isEmpty()) {
-            MedFactory factory = (MedFactory) cmbHersteller.getSelectedItem();
+            ACME factory = (ACME) cmbHersteller.getSelectedItem();
             produkt = new MedProducts(factory, txtBezeichnung.getText());
             EntityTools.persist(produkt);
             dispose();

@@ -56,7 +56,7 @@ public class PnlSubtext extends JPanel {
             model.add(0, "<html><b>" + OPDE.lang.getString("misc.msg.noneOfThem") + "</b></html>");
             DefaultListModel lmDaf = SYSTools.list2dlm(model);
             lstDaf.setModel(lmDaf);
-            lstDaf.setCellRenderer(TradeFormTools.gerRenderer(TradeFormTools.LONG));
+            lstDaf.setCellRenderer(TradeFormTools.getRenderer(TradeFormTools.LONG));
         }
         lblMsg.setText(OPDE.lang.getString(internalClassID + ".existingTradeforms"));
         lblMsg.setVisible(!product.getTradeforms().isEmpty());
@@ -129,7 +129,7 @@ public class PnlSubtext extends JPanel {
 
         if (!dosageForm.isAPV1()) {
             txtA.setText("1");
-            lblPV.setText(" " + dosageForm.getUsageTex() + " " + OPDE.lang.getString("misc.msg.equalTo") + " 1 " + DosageFormTools.EINHEIT[dosageForm.getPackUnit()]);
+            lblPV.setText(" " + dosageForm.getUsageText() + " " + OPDE.lang.getString("misc.msg.equalTo") + " 1 " + DosageFormTools.EINHEIT[dosageForm.getPackUnit()]);
         }
 
         tradeForm = new TradeForm(product, txtZusatz.getText().trim(), dosageForm);
@@ -151,8 +151,8 @@ public class PnlSubtext extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "2*(default, $lcgap), default:grow, $lcgap, default",
-                "2*(default, $lgap), default, $rgap, 2*(pref), $lgap, default:grow, $lgap, default"));
+            "2*(default, $lcgap), default:grow, $lcgap, default",
+            "2*(default, $lgap), default, $rgap, 2*(pref), $lgap, default:grow, $lgap, default"));
 
         //---- txtZusatz ----
         txtZusatz.setFont(new Font("Arial", Font.PLAIN, 14));

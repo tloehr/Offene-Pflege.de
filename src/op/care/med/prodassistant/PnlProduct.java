@@ -4,6 +4,7 @@
 
 package op.care.med.prodassistant;
 
+import java.awt.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.prescription.MedProducts;
@@ -94,6 +95,12 @@ public class PnlProduct extends JPanel {
         }
     }
 
+    private void lstProdMouseClicked(MouseEvent e) {
+        // TODO: double click goes forth in wizard.
+    }
+
+
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         txtProd = new JXSearchField();
@@ -105,8 +112,8 @@ public class PnlProduct extends JPanel {
         //======== this ========
         setPreferredSize(new Dimension(610, 198));
         setLayout(new FormLayout(
-                "2*(default, $lcgap), default:grow, $lcgap, default",
-                "2*(default), $ugap, default, $lgap, default:grow, $lgap, default"));
+            "2*(default, $lcgap), default:grow, $lcgap, default",
+            "2*(default), $ugap, default, $lgap, default:grow, $lgap, default"));
 
         //---- txtProd ----
         txtProd.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -142,6 +149,12 @@ public class PnlProduct extends JPanel {
                 @Override
                 public void valueChanged(ListSelectionEvent e) {
                     lstProdValueChanged(e);
+                }
+            });
+            lstProd.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    lstProdMouseClicked(e);
                 }
             });
             jsp1.setViewportView(lstProd);
