@@ -593,7 +593,7 @@ public class MedStockTools {
 
         html.append(SYSConst.html_h1(PnlControlling.internalClassID + ".drugs.controllist"));
         html.append(SYSConst.html_h2(OPDE.lang.getString("misc.msg.subdivision") + ": " + station.getName()));
-        html.append(SYSConst.html_h3(PnlControlling.internalClassID + ".drugs.controllist.key"));
+        html.append(SYSConst.html_h3("misc.msg.key"));
         html.append(SYSConst.html_ul(
                 SYSConst.html_li(PnlControlling.internalClassID + ".drugs.controllist.key.1") +
                         SYSConst.html_li(PnlControlling.internalClassID + ".drugs.controllist.key.2") +

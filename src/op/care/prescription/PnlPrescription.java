@@ -391,12 +391,24 @@ public class PnlPrescription extends NursingRecordsPanel {
 
         GUITools.addAllComponents(mypanel, addCommands());
         GUITools.addAllComponents(mypanel, addFilters());
+        GUITools.addAllComponents(mypanel, addKey());
 
         searchPane.setContentPane(mypanel);
 
         searchPanes.add(searchPane);
         searchPanes.addExpansion();
 
+    }
+
+    private java.util.List<Component> addKey() {
+        java.util.List<Component> list = new ArrayList<Component>();
+        list.add(new JSeparator());
+        list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22stopSign, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription3"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
+
+        return list;
     }
 
     private java.util.List<Component> addFilters() {
@@ -788,13 +800,14 @@ public class PnlPrescription extends NursingRecordsPanel {
                                         Prescription myPrescription = em.merge((Prescription) o);
                                         em.lock(myPrescription, LockModeType.OPTIMISTIC);
 
-                                        Query queryDELBHP = em.createQuery("DELETE FROM BHP bhp WHERE bhp.prescription = :prescription");
-                                        queryDELBHP.setParameter("prescription", myPrescription);
-                                        queryDELBHP.executeUpdate();
+                                        // there cant be any BHPs
+//                                        Query queryDELBHP = em.createQuery("DELETE FROM BHP bhp WHERE bhp.prescription = :prescription");
+//                                        queryDELBHP.setParameter("prescription", myPrescription);
+//                                        queryDELBHP.executeUpdate();
 
-                                        if (!myPrescription.isOnDemand()) {
-                                            BHPTools.generate(em, myPrescription.getPrescriptionSchedule(), new DateMidnight(), true);
-                                        }
+//                                        if (!myPrescription.isOnDemand()) {
+//                                            BHPTools.generate(em, myPrescription.getPrescriptionSchedule(), new DateMidnight(), true);
+//                                        }
 
                                         em.getTransaction().commit();
 
@@ -855,6 +868,14 @@ public class PnlPrescription extends NursingRecordsPanel {
                                         // delete whats not in the new prescription anymore
                                         for (PrescriptionSchedule schedule : returnPackage.getSecond()) {
                                             em.remove(em.merge(schedule));
+                                        }
+
+                                        Query queryDELBHP = em.createQuery("DELETE FROM BHP bhp WHERE bhp.prescription = :prescription");
+                                        queryDELBHP.setParameter("prescription", myPrescription);
+                                        queryDELBHP.executeUpdate();
+
+                                        if (!myPrescription.isOnDemand()) {
+                                            BHPTools.generate(em, myPrescription.getPrescriptionSchedule(), new DateMidnight(), true);
                                         }
 
                                         em.getTransaction().commit();

@@ -368,77 +368,6 @@ public class SYSCalendar {
         return days;
     } // getDaysBetween()
 
-    public static GregorianCalendar erkenneDatum(String input) throws NumberFormatException {
-        if (input == null || input.equals("")) {
-            throw new NumberFormatException("leere Eingabe");
-        }
-        if (input.indexOf(".") + input.indexOf(",") + input.indexOf("-") == -3) {
-            input += "."; // er war zu faul auch nur einen punkt anzuhängen.
-        }
-        StringTokenizer st = new StringTokenizer(input, ",.-");
-        if (st.countTokens() == 1) { // Vielleicht fehlen ja nur die Monats- und Jahresangaben. Dann hängen wir sie einach an.
-            input += (SYSCalendar.today().get(GregorianCalendar.MONTH) + 1) + "." + SYSCalendar.today().get(GregorianCalendar.YEAR);
-            st = new StringTokenizer(input, ",.-"); // dann nochmal aufteilen...
-        }
-        if (st.countTokens() == 2) { // Vielleicht fehlt ja nur die Jahresangabe. Dann hängen wir es einfach an.
-
-            if (!input.trim().substring(input.length() - 1).equals(".") && !input.trim().substring(input.length() - 1).equals(",")) {
-                input += "."; // er war zu faul den letzten Punkt anzuhängen.
-            }
-            input += SYSCalendar.today().get(GregorianCalendar.YEAR);
-            st = new StringTokenizer(input, ",.-"); // dann nochmal aufteilen...
-        }
-        if (st.countTokens() != 3) {
-            throw new NumberFormatException("falsches Format");
-        }
-        String sTag = st.nextToken();
-        String sMonat = st.nextToken();
-        String sJahr = st.nextToken();
-        int tag, monat, jahr;
-        // Hier ist das Jahr 2010 Problem
-        GregorianCalendar now = new GregorianCalendar();
-        int decade = (now.get(GregorianCalendar.YEAR) / 10) * 10;
-        int century = (now.get(GregorianCalendar.YEAR) / 100) * 100;
-
-        try {
-            tag = Integer.parseInt(sTag);
-        } catch (NumberFormatException nfe) {
-            throw new NumberFormatException("tag");
-        }
-        try {
-            monat = Integer.parseInt(sMonat);
-        } catch (NumberFormatException nfe) {
-            throw new NumberFormatException("monat");
-        }
-        try {
-            jahr = Integer.parseInt(sJahr);
-        } catch (NumberFormatException nfe) {
-            throw new NumberFormatException("jahr");
-        }
-
-        if (jahr < 0) {
-            throw new NumberFormatException("jahr");
-        }
-        if (jahr > 9999) {
-            throw new NumberFormatException("jahr");
-        }
-        if (jahr < 10) {
-            jahr += decade;
-        }
-        if (jahr < 100) {
-            jahr += century;
-        }
-        if (monat < 1 || monat > 12) {
-            throw new NumberFormatException("monat");
-        }
-
-        if (tag < 1 || tag > eom(new GregorianCalendar(jahr, monat - 1, 1))) {
-            throw new NumberFormatException("monat");
-        }
-
-        return new GregorianCalendar(jahr, monat - 1, tag, 0, 0, 0);
-    }
-
     /**
      * A date is "sane", when it is after the start of the first stay of the resident. When there is no stay yet,
      * then its must not before now. It must also never be in future.
@@ -525,7 +454,8 @@ public class SYSCalendar {
         String sMonat = st.nextToken();
         String sJahr = st.nextToken();
         int tag, monat, jahr;
-        // Hier ist das Jahr 2010 Problem
+
+        // Year 2010 Problem
         GregorianCalendar now = new GregorianCalendar();
         int decade = (now.get(GregorianCalendar.YEAR) / 10) * 10;
         int century = (now.get(GregorianCalendar.YEAR) / 100) * 100;
@@ -566,7 +496,7 @@ public class SYSCalendar {
             throw new NumberFormatException("month");
         }
 
-        return new Date(new GregorianCalendar(jahr, monat - 1, tag, 0, 0, 0).getTimeInMillis());
+        return new DateMidnight(jahr, monat, tag).toDate();
     }
 
     /**

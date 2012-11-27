@@ -535,7 +535,7 @@ public class DlgNewStocks extends MyJDialog {
                 popup.hidePopup();
 
             }
-        }, (pzn == null ? pzn : txtMedSuche.getText().trim())).getWizard();
+        }).getWizard();
 
         popup.setMovable(false);
         popup.setPreferredSize((new Dimension(800, 450)));

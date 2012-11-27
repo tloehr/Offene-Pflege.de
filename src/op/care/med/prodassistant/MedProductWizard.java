@@ -40,15 +40,15 @@ public class MedProductWizard {
     private final int PAGE_ACME = 4;
     private final int PAGE_COMPLETION = 5;
 
-    public MedProductWizard(Closure finishAction, String template) {
+    public MedProductWizard(Closure finishAction) {
         this.finishAction = finishAction;
-
-        if (template != null) {
-            pzntemplate = MedPackageTools.parsePZN(template);
-            if (pzntemplate == null) {
-                prodtemplate = template.trim();
-            }
-        }
+//
+//        if (template != null) {
+//            pzntemplate = MedPackageTools.parsePZN(template);
+//            if (pzntemplate == null) {
+//                prodtemplate = template.trim();
+//            }
+//        }
         createWizard();
     }
 

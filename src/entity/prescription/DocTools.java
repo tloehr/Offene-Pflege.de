@@ -38,7 +38,7 @@ public class DocTools {
 
     public static String getFullName(Doc doc) {
         if (doc != null) {
-            return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitel(), "", " ") + doc.getVorname() + " " + doc.getName();
+            return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitle(), "", " ") + doc.getName() + " " + doc.getFirstname() + ", " + doc.getCity() ;
         } else {
             return "--";
         }

@@ -206,7 +206,7 @@
              </object> 
             </void> 
             <void property="name"> 
-             <string>btnMed</string> 
+             <string>btnMedWizard</string> 
             </void> 
             <void method="addEvent"> 
              <object class="com.jformdesigner.model.FormEvent"> 
@@ -572,7 +572,7 @@
             <string>javax.swing.JTextField</string> 
             <void method="setProperty"> 
              <string>horizontalAlignment</string> 
-             <int>4</int> 
+             <int>0</int> 
             </void> 
             <void method="setProperty"> 
              <string>text</string> 
@@ -594,6 +594,14 @@
               <string>java.awt.event.FocusListener</string> 
               <string>focusGained</string> 
               <string>txtMaxTimesFocusGained</string> 
+              <boolean>true</boolean> 
+             </object> 
+            </void> 
+            <void method="addEvent"> 
+             <object class="com.jformdesigner.model.FormEvent"> 
+              <string>java.awt.event.FocusListener</string> 
+              <string>focusLost</string> 
+              <string>txtMaxTimesFocusLost</string> 
               <boolean>true</boolean> 
              </object> 
             </void> 
@@ -638,7 +646,7 @@
             <string>javax.swing.JTextField</string> 
             <void method="setProperty"> 
              <string>horizontalAlignment</string> 
-             <int>4</int> 
+             <int>0</int> 
             </void> 
             <void method="setProperty"> 
              <string>text</string> 
@@ -652,6 +660,22 @@
               <string>java.awt.event.FocusListener</string> 
               <string>focusGained</string> 
               <string>txtEDosisFocusGained</string> 
+              <boolean>true</boolean> 
+             </object> 
+            </void> 
+            <void method="addEvent"> 
+             <object class="com.jformdesigner.model.FormEvent"> 
+              <string>java.awt.event.FocusListener</string> 
+              <string>focusLost</string> 
+              <string>txtEDosisFocusLost</string> 
+              <boolean>true</boolean> 
+             </object> 
+            </void> 
+            <void method="addEvent"> 
+             <object class="com.jformdesigner.model.FormEvent"> 
+              <string>java.awt.event.ActionListener</string> 
+              <string>actionPerformed</string> 
+              <string>txtEDosisActionPerformed</string> 
               <boolean>true</boolean> 
              </object> 
             </void> 
@@ -717,7 +741,7 @@
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
-          <string>fill:default, linegap, fill:default, linegap, fill:default, linegap, fill:default:grow</string> 
+          <string>fill:default, linegap, fill:default, linegap, fill:default, linegap, fill:100dlu:grow</string> 
          </void> 
         </object> 
         <void method="setProperty"> 
@@ -762,6 +786,10 @@
              <object id="FormReference0" class="com.jformdesigner.model.FormReference"> 
               <string>bgMedikament</string> 
              </object> 
+            </void> 
+            <void method="setProperty"> 
+             <string>selected</string> 
+             <boolean>true</boolean> 
             </void> 
             <void property="name"> 
              <string>rbActive</string> 
@@ -820,13 +848,29 @@
           </void> 
           <void method="add"> 
            <object class="com.jformdesigner.model.FormComponent"> 
-            <string>com.toedter.calendar.JDateChooser</string> 
+            <string>javax.swing.JTextField</string> 
             <void method="setProperty"> 
              <string>enabled</string> 
              <boolean>false</boolean> 
             </void> 
+            <void method="setProperty"> 
+             <string>font</string> 
+             <object class="java.awt.Font"> 
+              <string>Arial</string> 
+              <int>0</int> 
+              <int>14</int> 
+             </object> 
+            </void> 
             <void property="name"> 
-             <string>jdcAB</string> 
+             <string>txtOFF</string> 
+            </void> 
+            <void method="addEvent"> 
+             <object class="com.jformdesigner.model.FormEvent"> 
+              <string>java.awt.event.FocusListener</string> 
+              <string>focusLost</string> 
+              <string>txtOFFFocusLost</string> 
+              <boolean>true</boolean> 
+             </object> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1124,7 +1168,7 @@
        <string>size</string> 
        <object class="java.awt.Dimension"> 
         <int>805</int> 
-        <int>445</int> 
+        <int>475</int> 
        </object> 
       </void> 
       <void method="setProperty"> 

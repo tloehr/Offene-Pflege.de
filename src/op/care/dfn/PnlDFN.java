@@ -325,6 +325,16 @@ public class PnlDFN extends NursingRecordsPanel {
         return npPane;
     }
 
+    private java.util.List<Component> addKey() {
+        java.util.List<Component> list = new ArrayList<Component>();
+        list.add(new JSeparator());
+        list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22ledBlueOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22ledOrangeOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription3"), SYSConst.icon22ledPurpleOn, SwingConstants.LEADING));
+        return list;
+    }
+
     private CollapsiblePane createCP4(final DFN dfn) {
         final CollapsiblePane dfnPane = new CollapsiblePane();
 
@@ -746,6 +756,7 @@ public class PnlDFN extends NursingRecordsPanel {
 
         GUITools.addAllComponents(mypanel, addCommands());
         GUITools.addAllComponents(mypanel, addFilters());
+        GUITools.addAllComponents(mypanel, addKey());
 
         searchPane.setContentPane(mypanel);
 
@@ -877,7 +888,7 @@ public class PnlDFN extends NursingRecordsPanel {
             btnAdd.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    if (!resident.isActive()){
+                    if (!resident.isActive()) {
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
                         return;
                     }

@@ -41,9 +41,7 @@ import com.jidesoft.swing.JideSplitPane;
 import entity.Station;
 import entity.StationTools;
 import entity.files.SYSFilesTools;
-import entity.info.ResInfoTools;
-import entity.info.Resident;
-import entity.info.ResidentTools;
+import entity.info.*;
 import entity.prescription.PrescriptionTools;
 import entity.system.SYSLoginTools;
 import entity.system.SYSPropsTools;
@@ -63,6 +61,7 @@ import op.tools.*;
 import op.users.PnlUser;
 import op.welcome.PnlWelcome;
 import org.apache.commons.collections.Closure;
+import org.jdesktop.swingx.*;
 import org.jdesktop.swingx.VerticalLayout;
 
 import javax.persistence.EntityManager;
@@ -77,7 +76,6 @@ import java.beans.PropertyVetoException;
 import java.net.URI;
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -111,6 +109,7 @@ public class FrmMain extends JFrame {
     private Closure bwchange;
     private HashMap<Resident, JideButton> bwButtonMap;
     private JideButton homeButton;
+    private ResInfoType biohazard;
 //    private MouseListener blockingListener;
 
 
@@ -123,7 +122,7 @@ public class FrmMain extends JFrame {
         lblWait.setText(OPDE.lang.getString("misc.msg.wait"));
         lblWait.setVisible(false);
 
-        btnHelp.setToolTipText(OPDE.lang.getString(internalClassID+".btnHelp.tooltip"));
+        btnHelp.setToolTipText(OPDE.lang.getString(internalClassID + ".btnHelp.tooltip"));
 
         if (OPDE.isDebug()) {
             setSize(1366, 768);
@@ -134,7 +133,7 @@ public class FrmMain extends JFrame {
 
         setTitle(SYSTools.getWindowTitle(""));
 
-        displayManager = new DisplayManager(pbMsg, lblMainMsg, lblSubMsg);
+        displayManager = new DisplayManager(pbMsg, lblMainMsg, lblSubMsg, pnlIcons);
         displayManager.start();
 
         printProcessor = new PrintProcessor();
@@ -148,19 +147,7 @@ public class FrmMain extends JFrame {
             }
         };
 
-//        blockingListener = new MouseAdapter() {
-//            @Override
-//            public void mouseClicked(MouseEvent mouseEvent) {
-//                OPDE.debug("PING");
-//                mouseEvent.consume();
-//            }
-//
-//            @Override
-//            public void mousePressed(MouseEvent mouseEvent) {
-//                OPDE.debug("PING");
-//                mouseEvent.consume();
-//            }
-//        };
+        biohazard = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_BIOHAZARD);
 
         // StatusBar Setup
         final LabelStatusBarItem label = new LabelStatusBarItem("Line");
@@ -290,8 +277,10 @@ public class FrmMain extends JFrame {
     private void initComponents() {
         pnlMain = new JPanel();
         pnlMainMessage = new JPanel();
-        lblMainMsg = new JLabel();
         btnVerlegung = new JButton();
+        panel1 = new JPanel();
+        pnlIcons = new JPanel();
+        lblMainMsg = new JLabel();
         btnExit = new JButton();
         lblSubMsg = new FadingLabel();
         btnHelp = new JButton();
@@ -329,24 +318,15 @@ public class FrmMain extends JFrame {
                     "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
                     "0dlu, $lgap, pref, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
 
-                //---- lblMainMsg ----
-                lblMainMsg.setText("OPDE");
-                lblMainMsg.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 22));
-                lblMainMsg.setForeground(new Color(105, 80, 69));
-                lblMainMsg.setHorizontalAlignment(SwingConstants.CENTER);
-                lblMainMsg.setIcon(null);
-                lblMainMsg.setHorizontalTextPosition(SwingConstants.LEADING);
-                pnlMainMessage.add(lblMainMsg, CC.xy(5, 3));
-
                 //---- btnVerlegung ----
                 btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2.png")));
                 btnVerlegung.setBorder(null);
                 btnVerlegung.setBorderPainted(false);
-                btnVerlegung.setContentAreaFilled(false);
                 btnVerlegung.setSelectedIcon(null);
                 btnVerlegung.setToolTipText("Verlegungsbericht drucken");
                 btnVerlegung.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 btnVerlegung.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2_pressed.png")));
+                btnVerlegung.setContentAreaFilled(false);
                 btnVerlegung.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -354,6 +334,29 @@ public class FrmMain extends JFrame {
                     }
                 });
                 pnlMainMessage.add(btnVerlegung, CC.xywh(3, 3, 1, 3));
+
+                //======== panel1 ========
+                {
+                    panel1.setOpaque(false);
+                    panel1.setLayout(new BoxLayout(panel1, BoxLayout.LINE_AXIS));
+
+                    //======== pnlIcons ========
+                    {
+                        pnlIcons.setOpaque(false);
+                        pnlIcons.setLayout(new BoxLayout(pnlIcons, BoxLayout.LINE_AXIS));
+                    }
+                    panel1.add(pnlIcons);
+
+                    //---- lblMainMsg ----
+                    lblMainMsg.setText("OPDE");
+                    lblMainMsg.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 22));
+                    lblMainMsg.setForeground(new Color(105, 80, 69));
+                    lblMainMsg.setHorizontalAlignment(SwingConstants.CENTER);
+                    lblMainMsg.setIcon(null);
+                    lblMainMsg.setHorizontalTextPosition(SwingConstants.LEADING);
+                    panel1.add(lblMainMsg);
+                }
+                pnlMainMessage.add(panel1, CC.xy(5, 3, CC.CENTER, CC.DEFAULT));
 
                 //---- btnExit ----
                 btnExit.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/lock.png")));
@@ -464,7 +467,7 @@ public class FrmMain extends JFrame {
 
     private void btnVerlegungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerlegungActionPerformed
         if (currentBewohner != null) {
-            SYSFilesTools.print(ResInfoTools.getTXReport(currentBewohner, true, true, true, true, true, true, true, true), false);
+            SYSFilesTools.print(ResInfoTools.getTXReport(currentBewohner, true, true, true, true, true, true, true, true, true), false);
         } else {
             displayManager.addSubMessage(new DisplayMessage("Bitte wählen Sie zuerst eine(n) BewohnerIn aus.", 5));
         }
@@ -581,9 +584,9 @@ public class FrmMain extends JFrame {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
-        if (!bewohnerliste.isEmpty() && station != null){
+        if (!bewohnerliste.isEmpty() && station != null) {
             String titel = "";
-            JideButton button = GUITools.createHyperlinkButton(internalClassID+".printdailyplan", SYSConst.icon22print2, new ActionListener() {
+            JideButton button = GUITools.createHyperlinkButton(internalClassID + ".printdailyplan", SYSConst.icon22print2, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     SYSFilesTools.print(PrescriptionTools.getDailyPlanAsHTML(station), true);
@@ -593,11 +596,11 @@ public class FrmMain extends JFrame {
             labelPanel.add(button);
         }
 
-        for (final Resident innerbewohner : bewohnerliste) {
+        for (final Resident resident : bewohnerliste) {
             ActionListener actionListener = new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    if (currentBewohner != innerbewohner) {
+                    if (currentBewohner != resident) {
 
                         if (previousProgButton != null) {
                             previousProgButton.setBackground(Color.WHITE);
@@ -608,27 +611,34 @@ public class FrmMain extends JFrame {
                         previousProgButton.setBackground(Color.YELLOW);
                         previousProgButton.setOpaque(true);
 
-                        currentBewohner = innerbewohner;
+                        currentBewohner = resident;
 
 //                        ((NursingRecordsPanel) currentVisiblePanel).switchResident(innerbewohner);
                         if (currentVisiblePanel instanceof PnlCare) {
-                            ((NursingRecordsPanel) currentVisiblePanel).switchResident(innerbewohner);
+                            ((NursingRecordsPanel) currentVisiblePanel).switchResident(resident);
                         } else {
-                            setPanelTo(new PnlCare(innerbewohner, jspSearch));
+                            setPanelTo(new PnlCare(resident, jspSearch));
                         }
 
                     }
                 }
             };
 
-            String titel = innerbewohner.getName() + ", " + innerbewohner.getFirstname() + " [" + innerbewohner.getRIDAnonymous() + "]";
+            String titel = resident.getName() + ", " + resident.getFirstname() + " [" + resident.getRIDAnonymous() + "]";
             JideButton button = GUITools.createHyperlinkButton(titel, null, actionListener);
-            button.setForegroundOfState(ThemePainter.STATE_DEFAULT, innerbewohner.getGender() == ResidentTools.FEMALE ? Color.red : Color.blue);
+            button.setForegroundOfState(ThemePainter.STATE_DEFAULT, resident.getGender() == ResidentTools.FEMALE ? Color.red : Color.blue);
             button.setBackground(Color.WHITE);
+
+            if (station != null){
+                if (ResInfoTools.getLastResinfo(resident, biohazard) != null){
+                    button.setIcon(SYSConst.icon22biohazard);
+                }
+            }
+
 //            button.putClientProperty("bewohner", innerbewohner);
 
             labelPanel.add(button);
-            bwButtonMap.put(innerbewohner, button);
+            bwButtonMap.put(resident, button);
         }
 
         mypane.setContentPane(labelPanel);
@@ -665,28 +675,28 @@ public class FrmMain extends JFrame {
 //    }
 
 
-    private java.util.List<Component> findPathForComponent(Container container, Component comp) {
-        java.util.List<Component> result = null;
-
-        java.util.List<Component> containerList = Arrays.asList(container.getComponents());
-
-        for (Component component : containerList) {
-            if (component.equals(comp)) { // ANKER
-                result = new ArrayList<Component>();
-                result.add(comp);
-                break;
-            } else {
-                if (component instanceof Container) {
-                    result = findPathForComponent((Container) component, comp);
-                    if (result != null) {
-                        result.add(component);
-                        break;
-                    }
-                }
-            }
-        }
-        return result;
-    }
+//    private java.util.List<Component> findPathForComponent(Container container, Component comp) {
+//        java.util.List<Component> result = null;
+//
+//        java.util.List<Component> containerList = Arrays.asList(container.getComponents());
+//
+//        for (Component component : containerList) {
+//            if (component.equals(comp)) { // ANKER
+//                result = new ArrayList<Component>();
+//                result.add(comp);
+//                break;
+//            } else {
+//                if (component instanceof Container) {
+//                    result = findPathForComponent((Container) component, comp);
+//                    if (result != null) {
+//                        result.add(component);
+//                        break;
+//                    }
+//                }
+//            }
+//        }
+//        return result;
+//    }
 
     public void setBlocked(boolean blocked) {
         if (blocked) {
@@ -768,8 +778,10 @@ public class FrmMain extends JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel pnlMain;
     private JPanel pnlMainMessage;
-    private JLabel lblMainMsg;
     private JButton btnVerlegung;
+    private JPanel panel1;
+    private JPanel pnlIcons;
+    private JLabel lblMainMsg;
     private JButton btnExit;
     private FadingLabel lblSubMsg;
     private JButton btnHelp;

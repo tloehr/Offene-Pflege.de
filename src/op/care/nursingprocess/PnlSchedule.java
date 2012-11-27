@@ -125,6 +125,10 @@ public class PnlSchedule extends JPanel {
         SYSCalendar.handleDateFocusLost(evt, new DateMidnight(), new DateMidnight().plusWeeks(4));
     }
 
+    private void txtIntegerFocusLost(FocusEvent e) {
+        SYSTools.handleIntegerFocusLost(e, 0, 10, 1);
+    }
+
 
     private void initPanel() {
 
@@ -405,6 +409,10 @@ public class PnlSchedule extends JPanel {
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            txtIntegerFocusLost(e);
+                        }
                     });
                     pnlTageszeit.add(txtNachtMo, CC.xy(1, 3));
 
@@ -422,6 +430,10 @@ public class PnlSchedule extends JPanel {
                         @Override
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
+                        }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            txtIntegerFocusLost(e);
                         }
                     });
                     pnlTageszeit.add(txtMorgens, CC.xy(3, 3));
@@ -441,6 +453,10 @@ public class PnlSchedule extends JPanel {
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            txtIntegerFocusLost(e);
+                        }
                     });
                     pnlTageszeit.add(txtMittags, CC.xy(5, 3));
 
@@ -458,6 +474,10 @@ public class PnlSchedule extends JPanel {
                         @Override
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
+                        }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            txtIntegerFocusLost(e);
                         }
                     });
                     pnlTageszeit.add(txtNachmittags, CC.xy(7, 3));
@@ -477,6 +497,10 @@ public class PnlSchedule extends JPanel {
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
                         }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            txtIntegerFocusLost(e);
+                        }
                     });
                     pnlTageszeit.add(txtAbends, CC.xy(9, 3));
 
@@ -494,6 +518,10 @@ public class PnlSchedule extends JPanel {
                         @Override
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
+                        }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            txtIntegerFocusLost(e);
                         }
                     });
                     pnlTageszeit.add(txtNachtAb, CC.xy(11, 3));
@@ -550,6 +578,10 @@ public class PnlSchedule extends JPanel {
                         @Override
                         public void focusGained(FocusEvent e) {
                             txtFocusGained(e);
+                        }
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                            txtIntegerFocusLost(e);
                         }
                     });
                     pnlUhrzeit.add(txtUhrzeit, CC.xy(3, 3));

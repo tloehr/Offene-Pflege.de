@@ -579,19 +579,14 @@ public class DlgRegular extends MyJDialog {
         cmbMed.setEnabled(editMode != MODE_CHANGE);
         txtMed.setEnabled(editMode != MODE_CHANGE);
 
+        // TODO: Calc Medi here
+        // hide the endOfPackage completely
         if (cmbMed.getSelectedItem() != null) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(TradeFormTools.toPrettyString((TradeForm) cmbMed.getSelectedItem())));
             rbEndOfPackage.setEnabled(true);
         } else {
             rbEndOfPackage.setEnabled(false);
         }
-//        if (prescription.isClosed()) {
-//            rbDate.setSelected(true);
-//            jdcAB.setDate(prescription.getTo());
-//        } else {
-//
-//        }
-//
 
         ignoreEvent = false;
         txtMed.requestFocus();
@@ -617,7 +612,7 @@ public class DlgRegular extends MyJDialog {
                 }
                 popup.hidePopup();
             }
-        }, (pzn == null ? pzn : txtMed.getText().trim())).getWizard();
+        }).getWizard();
 
         popup.setMovable(false);
         popup.setPreferredSize((new Dimension(800, 450)));

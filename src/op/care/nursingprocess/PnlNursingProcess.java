@@ -607,6 +607,18 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 //        }
 //    }
 
+    private java.util.List<Component> addKey() {
+        java.util.List<Component> list = new ArrayList<Component>();
+        list.add(new JSeparator());
+        list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22stopSign, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription3"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription4"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
+
+        return list;
+    }
+
     private Icon getIcon(NursingProcess np) {
         DateTime nexteval = new DateTime(np.getNextEval());
         if (!np.isClosed()) {
@@ -646,6 +658,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
         }
 
         GUITools.addAllComponents(mypanel, addCommands());
+        GUITools.addAllComponents(mypanel, addKey());
 //        GUITools.addAllComponents(mypanel, addFilters());
 
         searchPane.setContentPane(mypanel);

@@ -490,6 +490,7 @@ public class PrescriptionTools {
                 result += "nur bis Packungs Ende<br/>";
             }
             if (!prescription.isClosed()) {
+                // TODO: Calc Medi here
                 if (stockInUse != null) {
                     EntityManager em = OPDE.createEM();
 

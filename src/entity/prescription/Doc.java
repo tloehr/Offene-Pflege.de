@@ -103,12 +103,12 @@ public class Doc implements Serializable {
         this.anrede = anrede;
     }
 
-    public String getTitel() {
+    public String getTitle() {
         return titel;
     }
 
-    public void setTitel(String titel) {
-        this.titel = titel;
+    public void setTitle(String title) {
+        this.titel = title;
     }
 
     public String getName() {
@@ -119,39 +119,39 @@ public class Doc implements Serializable {
         this.name = name;
     }
 
-    public String getVorname() {
+    public String getFirstname() {
         return vorname;
     }
 
-    public void setVorname(String vorname) {
+    public void setFirstname(String vorname) {
         this.vorname = vorname;
     }
 
-    public String getStrasse() {
+    public String getStreet() {
         return strasse;
     }
 
-    public void setStrasse(String strasse) {
+    public void setStreet(String strasse) {
         this.strasse = strasse;
     }
 
-    public Integer getStatus() {
+    public Integer getState() {
         return status;
     }
 
-    public void setStatus(Integer status) {
+    public void setState(Integer status) {
         this.status = status;
     }
 
-    public String getPlz() {
+    public String getZIP() {
         return plz;
     }
 
-    public void setPlz(String plz) {
-        this.plz = plz;
+    public void setZIP(String zip) {
+        this.plz = zip;
     }
 
-    public String getOrt() {
+    public String getCity() {
         return ort;
     }
 
@@ -175,11 +175,11 @@ public class Doc implements Serializable {
         this.fax = fax;
     }
 
-    public String getMobil() {
+    public String getMobile() {
         return mobil;
     }
 
-    public void setMobil(String mobil) {
+    public void setMobile(String mobil) {
         this.mobil = mobil;
     }
 

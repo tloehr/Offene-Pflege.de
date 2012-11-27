@@ -28,6 +28,6 @@ public class ICDTools {
 
 
 //    public static String getFullText(ICD icd) {
-//        return icd.getIcd10() + " " + SYSTools.catchNull(arzt.getTitel(), "", " ") + arzt.getFirstname() + " " + arzt.getName();
+//        return icd.getIcd10() + " " + SYSTools.catchNull(arzt.getTitle(), "", " ") + arzt.getFirstname() + " " + arzt.getName();
 //    }
 }

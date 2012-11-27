@@ -227,13 +227,15 @@ public class GUITools {
         return dropPanel;
     }
 
-    public static void setBWDisplay(Resident bewohner) {
-        OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(bewohner));
-        if (ResInfoTools.isAway(bewohner)) {
+    public static void setBWDisplay(Resident resident) {
+        OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(resident));
+        OPDE.getDisplayManager().setIconBiohazard(ResInfoTools.isBiohazard(resident));
+
+        if (ResInfoTools.isAway(resident)) {
             OPDE.getDisplayManager().setIconAway();
-        } else if (ResInfoTools.isDead(bewohner)) {
+        } else if (ResInfoTools.isDead(resident)) {
             OPDE.getDisplayManager().setIconDead();
-        } else if (ResInfoTools.isGone(bewohner)) {
+        } else if (ResInfoTools.isGone(resident)) {
             OPDE.getDisplayManager().setIconGone();
         }
         OPDE.getDisplayManager().clearSubMessages();

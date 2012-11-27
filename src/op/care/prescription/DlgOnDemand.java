@@ -30,7 +30,6 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.wizard.WizardDialog;
-import com.toedter.calendar.JDateChooser;
 import entity.nursingprocess.Intervention;
 import entity.nursingprocess.InterventionTools;
 import entity.prescription.*;
@@ -54,6 +53,8 @@ import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -84,6 +85,9 @@ public class DlgOnDemand extends MyJDialog {
         // OnDemand prescriptions have exactly ONE schedule
         if (prescription.getPrescriptionSchedule().isEmpty()) {
             PrescriptionSchedule schedule = new PrescriptionSchedule(prescription);
+            schedule.setMorgens(BigDecimal.ZERO);
+            schedule.setMaxAnzahl(1);
+            schedule.setMaxEDosis(BigDecimal.ONE);
             schedule.setPrescription(prescription);
             prescription.getPrescriptionSchedule().add(schedule);
         }
@@ -125,9 +129,9 @@ public class DlgOnDemand extends MyJDialog {
     }
 
     private void btnSituationActionPerformed(ActionEvent e) {
-        if (cmbSit.getModel().getSize() != 0) {
-            return;
-        }
+//        if (cmbSit.getModel().getSize() != 0) {
+//            return;
+//        }
 
         final JidePopup popup = new JidePopup();
         popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
@@ -208,14 +212,14 @@ public class DlgOnDemand extends MyJDialog {
 
     private void rbActiveItemStateChanged(ItemEvent e) {
         if (e.getStateChange() == ItemEvent.SELECTED) {
-            jdcAB.setDate(null);
+            txtOFF.setText(null);
         }
     }
 
     private void rbDateItemStateChanged(ItemEvent e) {
-        jdcAB.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+        txtOFF.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
         if (e.getStateChange() == ItemEvent.SELECTED) {
-            jdcAB.setDate(new Date());
+            txtOFF.setText(DateFormat.getDateInstance().format(new Date()));
         }
     }
 
@@ -229,6 +233,22 @@ public class DlgOnDemand extends MyJDialog {
 
     private void txtEDosisFocusGained(FocusEvent e) {
         SYSTools.markAllTxt((JTextField) e.getSource());
+    }
+
+    private void txtOFFFocusLost(FocusEvent evt) {
+        SYSCalendar.handleDateFocusLost(evt, new DateMidnight(), new DateMidnight().plusYears(1));
+    }
+
+    private void txtMaxTimesFocusLost(FocusEvent e) {
+        SYSTools.handleIntegerFocusLost(e, 1, 20, 1);
+    }
+
+    private void txtEDosisFocusLost(FocusEvent e) {
+        SYSTools.handleBigDecimalFocusLost(e, BigDecimal.ONE, new BigDecimal(1000), BigDecimal.ONE);
+    }
+
+    private void txtEDosisActionPerformed(ActionEvent e) {
+        txtMaxTimes.requestFocus();
     }
 
     private void txtMassActionPerformed(ActionEvent e) {
@@ -247,7 +267,7 @@ public class DlgOnDemand extends MyJDialog {
         txtMed = new JXSearchField();
         cmbMed = new JComboBox();
         panel4 = new JPanel();
-        btnMed = new JButton();
+        btnMedWizard = new JButton();
         cmbIntervention = new JComboBox();
         txtSit = new JXSearchField();
         cmbSit = new JComboBox();
@@ -265,7 +285,7 @@ public class DlgOnDemand extends MyJDialog {
         pnlOFF = new JPanel();
         rbActive = new JRadioButton();
         rbDate = new JRadioButton();
-        jdcAB = new JDateChooser();
+        txtOFF = new JTextField();
         jScrollPane3 = new JScrollPane();
         txtBemerkung = new JTextPane();
         lblText = new JLabel();
@@ -330,21 +350,21 @@ public class DlgOnDemand extends MyJDialog {
             {
                 panel4.setLayout(new BoxLayout(panel4, BoxLayout.LINE_AXIS));
 
-                //---- btnMed ----
-                btnMed.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
-                btnMed.setBorderPainted(false);
-                btnMed.setBorder(null);
-                btnMed.setContentAreaFilled(false);
-                btnMed.setToolTipText("Neues Medikament eintragen");
-                btnMed.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnMed.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png")));
-                btnMed.addActionListener(new ActionListener() {
+                //---- btnMedWizard ----
+                btnMedWizard.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
+                btnMedWizard.setBorderPainted(false);
+                btnMedWizard.setBorder(null);
+                btnMedWizard.setContentAreaFilled(false);
+                btnMedWizard.setToolTipText("Neues Medikament eintragen");
+                btnMedWizard.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnMedWizard.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png")));
+                btnMedWizard.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         btnMedActionPerformed(e);
                     }
                 });
-                panel4.add(btnMed);
+                panel4.add(btnMedWizard);
             }
             jPanel1.add(panel4, CC.xy(5, 1));
 
@@ -443,7 +463,7 @@ public class DlgOnDemand extends MyJDialog {
                 jPanel2.add(lblMaxPerDay, CC.xy(1, 2));
 
                 //---- txtMaxTimes ----
-                txtMaxTimes.setHorizontalAlignment(SwingConstants.RIGHT);
+                txtMaxTimes.setHorizontalAlignment(SwingConstants.CENTER);
                 txtMaxTimes.setText("1");
                 txtMaxTimes.addActionListener(new ActionListener() {
                     @Override
@@ -456,6 +476,10 @@ public class DlgOnDemand extends MyJDialog {
                     public void focusGained(FocusEvent e) {
                         txtMaxTimesFocusGained(e);
                     }
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtMaxTimesFocusLost(e);
+                    }
                 });
                 jPanel2.add(txtMaxTimes, CC.xy(3, 2));
 
@@ -464,12 +488,22 @@ public class DlgOnDemand extends MyJDialog {
                 jPanel2.add(lblX, CC.xy(5, 2));
 
                 //---- txtEDosis ----
-                txtEDosis.setHorizontalAlignment(SwingConstants.RIGHT);
+                txtEDosis.setHorizontalAlignment(SwingConstants.CENTER);
                 txtEDosis.setText("1.0");
                 txtEDosis.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusGained(FocusEvent e) {
                         txtEDosisFocusGained(e);
+                    }
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtEDosisFocusLost(e);
+                    }
+                });
+                txtEDosis.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        txtEDosisActionPerformed(e);
                     }
                 });
                 jPanel2.add(txtEDosis, CC.xy(7, 2));
@@ -483,7 +517,7 @@ public class DlgOnDemand extends MyJDialog {
             jPanel3.setBorder(null);
             jPanel3.setLayout(new FormLayout(
                 "149dlu",
-                "3*(fill:default, $lgap), fill:default:grow"));
+                "3*(fill:default, $lgap), fill:100dlu:grow"));
 
             //======== pnlOFF ========
             {
@@ -494,6 +528,7 @@ public class DlgOnDemand extends MyJDialog {
 
                 //---- rbActive ----
                 rbActive.setText("text");
+                rbActive.setSelected(true);
                 rbActive.addItemListener(new ItemListener() {
                     @Override
                     public void itemStateChanged(ItemEvent e) {
@@ -512,9 +547,16 @@ public class DlgOnDemand extends MyJDialog {
                 });
                 pnlOFF.add(rbDate, CC.xy(1, 3));
 
-                //---- jdcAB ----
-                jdcAB.setEnabled(false);
-                pnlOFF.add(jdcAB, CC.xy(2, 3));
+                //---- txtOFF ----
+                txtOFF.setEnabled(false);
+                txtOFF.setFont(new Font("Arial", Font.PLAIN, 14));
+                txtOFF.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtOFFFocusLost(e);
+                    }
+                });
+                pnlOFF.add(txtOFF, CC.xy(2, 3));
             }
             jPanel3.add(pnlOFF, CC.xy(1, 3));
 
@@ -592,7 +634,7 @@ public class DlgOnDemand extends MyJDialog {
             panel1.add(btnSave);
         }
         contentPane.add(panel1, CC.xy(5, 5, CC.RIGHT, CC.DEFAULT));
-        setSize(805, 445);
+        setSize(805, 475);
         setLocationRelativeTo(getOwner());
 
         //---- bgMedikament ----
@@ -609,7 +651,6 @@ public class DlgOnDemand extends MyJDialog {
         rbActive.setText(OPDE.lang.getString(PnlPrescription.internalClassID + ".dlgOnDemand.rbActive"));
 
         txtMed.setText("");
-        jdcAB.setMinSelectableDate(new Date());
 
         cmbMed.setRenderer(TradeFormTools.getRenderer(TradeFormTools.LONG));
 
@@ -633,12 +674,7 @@ public class DlgOnDemand extends MyJDialog {
         txtSit.setText("");
 
         txtMaxTimes.setText(NumberFormat.getNumberInstance().format(schedule.getMaxAnzahl()));
-        txtEDosis.setText(NumberFormat.getNumberInstance().format(schedule.getMaxEDosis()));
-
-//        txtMed.setEnabled(editMode != MODE_CHANGE);
-//        cmbMed.setEnabled(editMode != MODE_CHANGE);
-//        txtSit.setEnabled(editMode != MODE_CHANGE);
-//        cmbSit.setEnabled(editMode != MODE_CHANGE);
+        txtEDosis.setText(schedule.getMaxEDosis().setScale(2, RoundingMode.HALF_UP).toString());
 
         ignoreEvent = false;
 
@@ -653,7 +689,7 @@ public class DlgOnDemand extends MyJDialog {
 
     private void btnMedActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnMedActionPerformed
 
-        String pzn = MedPackageTools.parsePZN(txtMed.getText());
+//        String pzan = MedPackageTools.parsePZN(txtMed.getText());
         final JidePopup popup = new JidePopup();
 
         WizardDialog wizard = new MedProductWizard(new Closure() {
@@ -665,19 +701,19 @@ public class DlgOnDemand extends MyJDialog {
                 }
                 popup.hidePopup();
             }
-        }, (pzn == null ? pzn : txtMed.getText().trim())).getWizard();
+        }).getWizard();
 
         popup.setMovable(false);
         popup.setPreferredSize((new Dimension(800, 450)));
         popup.setResizable(false);
         popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
         popup.getContentPane().add(wizard.getContentPane());
-        popup.setOwner(btnMed);
-        popup.removeExcludedComponent(btnMed);
+        popup.setOwner(btnMedWizard);
+        popup.removeExcludedComponent(btnMedWizard);
         popup.setTransient(true);
         popup.setDefaultFocusComponent(wizard.getContentPane());
 
-        popup.showPopup(new Insets(-5, wizard.getPreferredSize().width * -1 - 200, -5, -100), btnMed);
+        popup.showPopup(new Insets(-5, wizard.getPreferredSize().width * -1 - 200, -5, -100), btnMedWizard);
 
     }//GEN-LAST:event_btnMedActionPerformed
 
@@ -693,7 +729,7 @@ public class DlgOnDemand extends MyJDialog {
     private boolean saveOK() {
         if (ignoreEvent) return false;
         boolean OnOK = (cmbDocON.getSelectedIndex() > 0 || cmbHospitalON.getSelectedIndex() > 0);
-        boolean OffOK = rbActive.isSelected() || jdcAB.getDate() != null;
+//        boolean OffOK = rbActive.isSelected() || jdcAB.getDate() != null;
         boolean sitOK = cmbSit.getSelectedItem() != null;
         boolean medOK = cmbMed.getModel().getSize() == 0 || cmbMed.getSelectedItem() != null;
         boolean intervOK = cmbIntervention.getSelectedItem() != null;
@@ -713,7 +749,7 @@ public class DlgOnDemand extends MyJDialog {
 
         String reason = "";
         reason += (OnOK ? "" : "Die Informationen zum <b>an</b>setzenden <b>Arzt</b> oder <b>KH</b> sind unvollständig. ");
-        reason += (OffOK ? "" : "Sie müssen sagen, wie lange diese Verordnung vorraussichtlich gelten wird. ");
+//        reason += (OffOK ? "" : "Sie müssen sagen, wie lange diese Verordnung vorraussichtlich gelten wird. ");
         reason += (medOK ? "" : "Die <b>Medikamentenangabe</b> ist falsch. ");
         reason += (sitOK ? "" : "Sie haben keine <b>Situation</b> angegeben. ");
         reason += (intervOK ? "" : "Die Angaben über die <b>Massnahmen</b> sind falsch. ");
@@ -722,7 +758,7 @@ public class DlgOnDemand extends MyJDialog {
         if (!reason.isEmpty()) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(reason, DisplayMessage.WARNING));
         }
-        return OnOK & OffOK & medOK & intervOK & doseOK & sitOK;
+        return OnOK & medOK & intervOK & doseOK & sitOK;
     }
 
     private void btnSaveActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
@@ -734,7 +770,6 @@ public class DlgOnDemand extends MyJDialog {
     @Override
     public void dispose() {
         actionBlock.execute(prescription);
-        jdcAB.cleanup();
         SYSTools.unregisterListeners(this);
         super.dispose();
     }
@@ -791,7 +826,7 @@ public class DlgOnDemand extends MyJDialog {
 
         prescription.setFrom(new DateMidnight().toDate());
         if (rbDate.isSelected()) {
-            prescription.setTo(new DateMidnight(jdcAB.getDate()).plusDays(1).toDateTime().minusSeconds(1).toDate());
+            prescription.setTo(new DateMidnight(SYSCalendar.parseDate(txtOFF.getText())).plusDays(1).toDateTime().minusSeconds(1).toDate());
             prescription.setUserOFF(OPDE.getLogin().getUser());
             prescription.setHospitalOFF(prescription.getHospitalON());
             prescription.setDocOFF(prescription.getDocON());
@@ -839,7 +874,7 @@ public class DlgOnDemand extends MyJDialog {
     private JXSearchField txtMed;
     private JComboBox cmbMed;
     private JPanel panel4;
-    private JButton btnMed;
+    private JButton btnMedWizard;
     private JComboBox cmbIntervention;
     private JXSearchField txtSit;
     private JComboBox cmbSit;
@@ -857,7 +892,7 @@ public class DlgOnDemand extends MyJDialog {
     private JPanel pnlOFF;
     private JRadioButton rbActive;
     private JRadioButton rbDate;
-    private JDateChooser jdcAB;
+    private JTextField txtOFF;
     private JScrollPane jScrollPane3;
     private JTextPane txtBemerkung;
     private JLabel lblText;

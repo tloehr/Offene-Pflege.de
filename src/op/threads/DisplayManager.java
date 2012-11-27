@@ -32,17 +32,20 @@ public class DisplayManager extends Thread {
     private long zyklen = 0, pbIntermediateZyklen = 0;
     private final Color defaultColor = new Color(105, 80, 69);
     private long dbZyklenRest = 0;
-    private Icon icon1, icon2, icondead, iconaway, icongone;
+    private Icon icon1, icon2, icondead, iconaway, icongone, iconbiohazard;
     private SwingWorker worker;
     private boolean isIndeterminate = false;
+    private JPanel pnlIcons;
+    private JLabel lblBiohazard;
 
 //    private DateFormat df;
 
     /**
      * Creates a new instance of HeapStat
      */
-    public DisplayManager(JProgressBar p, JLabel lblM, FadingLabel lblS) {
+    public DisplayManager(JProgressBar p, JLabel lblM, FadingLabel lblS, JPanel pnlIcons) {
         super();
+        this.pnlIcons = pnlIcons;
         setName("DisplayManager");
         interrupted = false;
         dbAction = false;
@@ -56,6 +59,14 @@ public class DisplayManager extends Thread {
         icondead = SYSConst.icon22residentDied;
         iconaway = SYSConst.icon22residentAbsent;
         icongone = SYSConst.icon22residentGone;
+        iconbiohazard = SYSConst.icon22biohazard;
+
+        lblBiohazard = new JLabel(iconbiohazard);
+        lblBiohazard.setVisible(false);
+        lblBiohazard.setOpaque(false);
+
+        pnlIcons.add(lblBiohazard);
+
 //        this.lblDB.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/db.png")));
         lblMain.setText(" ");
         lblSub.setText(" ");
@@ -95,6 +106,15 @@ public class DisplayManager extends Thread {
             @Override
             public void run() {
                 lblMain.setIcon(icongone);
+            }
+        });
+    }
+
+    public void setIconBiohazard(final boolean visible) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                lblBiohazard.setVisible(visible);
             }
         });
     }

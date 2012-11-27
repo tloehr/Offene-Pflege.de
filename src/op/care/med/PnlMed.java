@@ -445,7 +445,7 @@ public class PnlMed extends CleanablePanel {
                             popup.hidePopup();
                             // keine Maßnahme nötig
                         }
-                    }, null).getWizard();
+                    }).getWizard();
 
 
                     popup.setMovable(false);

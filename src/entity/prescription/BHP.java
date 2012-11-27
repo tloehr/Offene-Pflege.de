@@ -1,6 +1,7 @@
 package entity.prescription;
 
 import entity.info.Resident;
+import entity.nursingprocess.DFNTools;
 import entity.system.Users;
 import op.OPDE;
 import op.tools.SYSCalendar;
@@ -109,7 +110,7 @@ public class BHP implements Serializable, Comparable<BHP> {
     @Column(name = "Dosis")
     private BigDecimal dosis;
     @Column(name = "Status")
-    private Byte status;
+    private Byte state;
     @Lob
     @Column(name = "Bemerkung")
     private String bemerkung;
@@ -149,7 +150,7 @@ public class BHP implements Serializable, Comparable<BHP> {
         this.nanotime = System.nanoTime();
         this.sZeit = sZeit;
         this.dosis = dosis;
-        this.status = BHPTools.STATE_OPEN;
+        this.state = BHPTools.STATE_OPEN;
         this.mdate = new Date();
         stockTransaction = new ArrayList<MedStockTransaction>();
     }
@@ -239,11 +240,11 @@ public class BHP implements Serializable, Comparable<BHP> {
     }
 
     public Byte getStatus() {
-        return status;
+        return state;
     }
 
     public void setStatus(Byte status) {
-        this.status = status;
+        this.state = status;
     }
 
     public BigDecimal getDosis() {
@@ -252,6 +253,10 @@ public class BHP implements Serializable, Comparable<BHP> {
 
     public boolean hasMed() {
         return prescription.getTradeForm() != null;
+    }
+
+     public boolean isOpen() {
+        return state == BHPTools.STATE_OPEN;
     }
 
     public String getFGHTML() {

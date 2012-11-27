@@ -59,6 +59,7 @@ public class ResInfoTools {
         return bwinfos.isEmpty() ? null : bwinfos.get(0);
     }
 
+
     public static ResInfo getFirstResinfo(Resident resident, ResInfoType resInfoType) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :resident AND b.bwinfotyp = :resInfoType ORDER BY b.from DESC");
@@ -181,13 +182,13 @@ public class ResInfoTools {
     }
 
 
-    public static boolean isGone(Resident bewohner) {
-        ResInfo bwinfo_hauf = ResInfoTools.getLastResinfo(bewohner, ResInfoTypeTools.getByID("HAUF"));
+    public static boolean isGone(Resident resident) {
+        ResInfo bwinfo_hauf = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByID("HAUF"));
         return bwinfo_hauf == null || getContent(bwinfo_hauf).getProperty("hauf").equalsIgnoreCase("ausgezogen");
     }
 
-    public static boolean isDead(Resident bewohner) {
-        ResInfo bwinfo_hauf = ResInfoTools.getLastResinfo(bewohner, ResInfoTypeTools.getByID("HAUF"));
+    public static boolean isDead(Resident resident) {
+        ResInfo bwinfo_hauf = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByID("HAUF"));
         return bwinfo_hauf != null && getContent(bwinfo_hauf).getProperty("hauf").equalsIgnoreCase("verstorben");
     }
 
@@ -197,13 +198,18 @@ public class ResInfoTools {
      *
      * @return Date of the departure. null if not away.
      */
-    public static Date absentSince(Resident bewohner) {
-        ResInfo lastabsence = getLastResinfo(bewohner, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ABSENCE));
+    public static Date absentSince(Resident resident) {
+        ResInfo lastabsence = getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ABSENCE));
         return lastabsence == null || lastabsence.isClosed() ? null : lastabsence.getFrom();
     }
 
-    public static boolean isAway(Resident bewohner) {
-        return absentSince(bewohner) != null;
+    public static boolean isAway(Resident resident) {
+        return absentSince(resident) != null;
+    }
+    
+    public static boolean isBiohazard(Resident resident){
+        ResInfo biohazard = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_BIOHAZARD));
+        return biohazard != null;
     }
 
     public static boolean isChangeable(ResInfo resInfo) {
@@ -477,9 +483,9 @@ public class ResInfoTools {
     }
 
 
-    public static String getTXReport(Resident bewohner, boolean withlongheader,
+    public static String getTXReport(Resident resident, boolean withlongheader,
                                      boolean medi, boolean bilanz, boolean withNReports,
-                                     boolean diag, boolean grundpflege, boolean haut, boolean vital) {
+                                     boolean diag, boolean grundpflege, boolean haut, boolean vital, boolean withHTMLIcons) {
         //todo: bilanzen, berichte und medis kommen nicht
 
         /***
@@ -494,7 +500,7 @@ public class ResInfoTools {
 
         DateFormat df = DateFormat.getDateInstance();
         if (withlongheader) {
-            result += "<h2 id=\"fonth2\">" + ResidentTools.getLabelText(bewohner) + "</h2>";
+            result += "<h2 id=\"fonth2\">" + ResidentTools.getLabelText(resident) + "</h2>";
         }
         result += "<table id=\"fonttext\"  border=\"1\" cellspacing=\"0\">";
 
@@ -511,8 +517,8 @@ public class ResInfoTools {
          *                                                      |___/
          */
         if (withlongheader) {
-            if (bewohner.getStation() != null) {
-                result += "<tr><td valign=\"top\">BewohnerIn wohnt im</td><td valign=\"top\"><b>" + HomesTools.getAsText(bewohner.getStation().getHome()) + "</b></td></tr>";
+            if (resident.getStation() != null) {
+                result += "<tr><td valign=\"top\">BewohnerIn wohnt im</td><td valign=\"top\"><b>" + HomesTools.getAsText(resident.getStation().getHome()) + "</b></td></tr>";
             }
         }
 
@@ -524,7 +530,7 @@ public class ResInfoTools {
          *      \____|_|  \___/| ||_/\___/_/  \____|\___| \_/\_/ |_|\___|_| |_|\__/_/  |____/|_|  |_|___|
          *                     |_|
          */
-        ResValue weight = ResValueTools.getLast(bewohner, ResValueTypesTools.WEIGHT);
+        ResValue weight = ResValueTools.getLast(resident, ResValueTypesTools.WEIGHT);
         result += "<tr><td valign=\"top\">Zuletzt bestimmtes Körpergewicht</td><td valign=\"top\"><b>";
         if (weight == null) {
             result += "Die/der BW wurde noch nicht gewogen.";
@@ -533,7 +539,7 @@ public class ResInfoTools {
         }
         result += "</b></td></tr>";
 
-        ResValue height = ResValueTools.getLast(bewohner, ResValueTypesTools.HEIGHT);
+        ResValue height = ResValueTools.getLast(resident, ResValueTypesTools.HEIGHT);
         result += "<tr><td valign=\"top\">Zuletzt bestimmte Körpergröße</td><td valign=\"top\"><b>";
         if (height == null) {
             result += "Bisher wurde noch keine Körpergröße ermittelt.";
@@ -559,7 +565,7 @@ public class ResInfoTools {
          *     |____/____|
          *
          */
-        ResValue bz = ResValueTools.getLast(bewohner, ResValueTypesTools.GLUCOSE);
+        ResValue bz = ResValueTools.getLast(resident, ResValueTypesTools.GLUCOSE);
         result += "<tr><td valign=\"top\">Zuletzt gemessener BZ</td><td valign=\"top\"><b>";
         if (bz == null) {
             result += "Bisher kein BZ Wert vorhanden.";
@@ -577,7 +583,7 @@ public class ResInfoTools {
          *
          */
         // TODO: "HAUF" ersetzen
-        ResInfo bwinfo_hauf = ResInfoTools.getLastResinfo(bewohner, ResInfoTypeTools.getByID("HAUF"));
+        ResInfo bwinfo_hauf = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByID("HAUF"));
         if (bwinfo_hauf != null) {
             result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.movein") + "</td><td valign=\"top\">";
             result += "<b>" + df.format(bwinfo_hauf.getFrom()) + "</b>";
@@ -593,7 +599,7 @@ public class ResInfoTools {
          *
          */
         // TODO: "PSTF" ersetzen
-        ResInfo bwinfo_pstf = ResInfoTools.getLastResinfo(bewohner, ResInfoTypeTools.getByID("PSTF"));
+        ResInfo bwinfo_pstf = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByID("PSTF"));
         if (bwinfo_pstf != null) {
             result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.ps") + "</td><td valign=\"top\">";
             result += bwinfo_pstf.getHtml();
@@ -607,14 +613,14 @@ public class ResInfoTools {
          *     |_____\___|\__, |\__,_|_|  \____\__,_|___/\__\___/ \__,_|_|\__,_|_| |_|
          *                |___/
          */
-        if (bewohner.getLCustodian1() != null) {
+        if (resident.getLCustodian1() != null) {
             result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.lc") + "</td><td valign=\"top\">";
-            result += LCustodianTools.getFullName(bewohner.getLCustodian1());
+            result += LCustodianTools.getFullName(resident.getLCustodian1());
 
             if (!OPDE.isAnonym()) {
-                result += ", " + bewohner.getLCustodian1().getStrasse();
-                result += ", " + bewohner.getLCustodian1().getPlz() + " " + bewohner.getLCustodian1().getOrt();
-                result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + bewohner.getLCustodian1().getTel() + ", " + OPDE.lang.getString("misc.msg.mobilephone") + ": " + bewohner.getLCustodian1().getMobil();
+                result += ", " + resident.getLCustodian1().getStrasse();
+                result += ", " + resident.getLCustodian1().getPlz() + " " + resident.getLCustodian1().getOrt();
+                result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + resident.getLCustodian1().getTel() + ", " + OPDE.lang.getString("misc.msg.mobilephone") + ": " + resident.getLCustodian1().getMobil();
             }
 
             result += "</td></tr>";
@@ -628,9 +634,9 @@ public class ResInfoTools {
          *     |____/  \_/
          *
          */
-        if (bewohner.getPN1() != null) {
+        if (resident.getPN1() != null) {
             result += "<tr id=\"fonttext\"><td valign=\"top\">" + OPDE.lang.getString("misc.msg.primaryNurse") + "</td><td valign=\"top\">";
-            result += bewohner.getPN1().getFullname();
+            result += resident.getPN1().getFullname();
             result += "</td></tr>";
         }
 
@@ -643,7 +649,7 @@ public class ResInfoTools {
          *                    |___/                         |___/
          */
         // TODO: "ANGEH" ersetzen
-        ResInfo bwinfo_angeh = ResInfoTools.getLastResinfo(bewohner, ResInfoTypeTools.getByID("ANGEH"));
+        ResInfo bwinfo_angeh = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByID("ANGEH"));
         if (bwinfo_angeh != null) {
             result += "<tr id=\"fonttext\"><td valign=\"top\">" + OPDE.lang.getString("misc.msg.relatives") + "</td><td valign=\"top\">";
             result += bwinfo_angeh.getHtml();
@@ -660,11 +666,11 @@ public class ResInfoTools {
          *     |_| |_|\__,_|\__,_|___/\__,_|_|  /___|\__|
          *
          */
-        if (bewohner.getGP() != null) {
+        if (resident.getGP() != null) {
             result += "<h2 id=\"fonth2\">" + OPDE.lang.getString("misc.msg.gp") + "</h2>";
-            result += "<div id=\"fonttext\">" + DocTools.getFullName(bewohner.getGP()) + ", " + bewohner.getGP().getStrasse();
-            result += ", " + bewohner.getGP().getPlz() + " " + bewohner.getGP().getOrt();
-            result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + bewohner.getGP().getTel() + ", " + OPDE.lang.getString("misc.msg.fax") + ": " + bewohner.getGP().getFax();
+            result += "<div id=\"fonttext\">" + DocTools.getFullName(resident.getGP()) + ", " + resident.getGP().getStreet();
+            result += ", " + resident.getGP().getZIP() + " " + resident.getGP().getCity();
+            result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + resident.getGP().getTel() + ", " + OPDE.lang.getString("misc.msg.fax") + ": " + resident.getGP().getFax();
             result += "</div>";
         }
 
@@ -677,7 +683,7 @@ public class ResInfoTools {
          *                    |___/
          */
         if (diag) {
-            result += getDiags(bewohner);
+            result += getDiags(resident);
         }
 
         /***
@@ -691,7 +697,7 @@ public class ResInfoTools {
         if (medi) {
             EntityManager em = OPDE.createEM();
             Query query = em.createQuery("SELECT b FROM Prescription b WHERE b.resident = :resident AND b.to > :now ");
-            query.setParameter("resident", bewohner);
+            query.setParameter("resident", resident);
             query.setParameter("now", new Date());
             List listeVerordnungen = query.getResultList();
             Collections.sort(listeVerordnungen);
@@ -712,7 +718,7 @@ public class ResInfoTools {
             Query query = em.createQuery("SELECT p FROM NReport p "
                     + " WHERE p.resident = :bewohner AND p.pit >= :von "
                     + " ORDER BY p.pit DESC ");
-            query.setParameter("bewohner", bewohner);
+            query.setParameter("bewohner", resident);
             query.setParameter("von", new DateTime().toDateMidnight().minusDays(7).toDate());
             result += NReportTools.getReportsAsHTML(query.getResultList(), true, false, null, null);
             em.close();
@@ -731,8 +737,8 @@ public class ResInfoTools {
             BigDecimal trinkmin = BigDecimal.ZERO;
             BigDecimal trinkmax = BigDecimal.ZERO;
 
-            boolean hateinfuhren = ResValueTools.hatEinfuhren(bewohner);
-            boolean hatausfuhren = ResValueTools.hatAusfuhren(bewohner);
+            boolean hateinfuhren = ResValueTools.hatEinfuhren(resident);
+            boolean hatausfuhren = ResValueTools.hatAusfuhren(resident);
             result += hateinfuhren || hatausfuhren ? "<h2 id=\"fonth2\">" + OPDE.lang.getString("misc.msg.liquid.result") + "</h2>" : "";
 
             if (hatausfuhren) {
@@ -754,10 +760,10 @@ public class ResInfoTools {
                         + "ON DATE(aus.PIT) = DATE(ein.PIT) "
                         + "ORDER BY aus.PIT desc";
                 Query query = em.createNativeQuery(sql);
-                query.setParameter(1, bewohner.getRID());
+                query.setParameter(1, resident.getRID());
                 query.setParameter(2, ResValueTypesTools.LIQUIDBALANCE);
                 query.setParameter(3, new DateTime().minusWeeks(1).toDateMidnight().toDate());
-                query.setParameter(4, bewohner.getRID());
+                query.setParameter(4, resident.getRID());
                 query.setParameter(5, ResValueTypesTools.LIQUIDBALANCE);
                 query.setParameter(6, new DateTime().minusWeeks(1).toDateMidnight().toDate());
 
@@ -812,7 +818,7 @@ public class ResInfoTools {
                         + " ORDER BY PIT desc";
 
                 Query query = em.createNativeQuery(sql);
-                query.setParameter(1, bewohner.getRID());
+                query.setParameter(1, resident.getRID());
                 query.setParameter(2, ResValueTypesTools.LIQUIDBALANCE);
                 query.setParameter(3, new DateTime().minusWeeks(1).toDateMidnight().toDate());
                 List<Object[]> list = query.getResultList();
@@ -861,7 +867,7 @@ public class ResInfoTools {
          *                                  |_|               |___/
          */
         if (grundpflege) {
-            List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(bewohner, ResInfoCategoryTools.GRUNDPFLEGE);
+            List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(resident, ResInfoCategoryTools.GRUNDPFLEGE);
             if (!bwinfos.isEmpty()) {
                 result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getResInfoCat().getText() + "</h2><div id=\"fonttext\">";
                 for (ResInfo bwinfo : bwinfos) {
@@ -882,7 +888,7 @@ public class ResInfoTools {
          *
          */
         if (haut) {
-            List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(bewohner, ResInfoCategoryTools.HAUT);
+            List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(resident, ResInfoCategoryTools.HAUT);
             if (!bwinfos.isEmpty()) {
                 result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getResInfoCat().getText() + "</h2><div id=\"fonttext\">";
                 for (ResInfo bwinfo : bwinfos) {
@@ -895,6 +901,21 @@ public class ResInfoTools {
         }
 
         /***
+         *      _     _       _                            _
+         *     | |__ (_) ___ | |__   __ _ ______ _ _ __ __| |
+         *     | '_ \| |/ _ \| '_ \ / _` |_  / _` | '__/ _` |
+         *     | |_) | | (_) | | | | (_| |/ / (_| | | | (_| |
+         *     |_.__/|_|\___/|_| |_|\__,_/___\__,_|_|  \__,_|
+         *
+         */
+        ResInfo biohazard = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_BIOHAZARD));
+        if (biohazard != null) {
+            result += SYSConst.html_h2("misc.msg.biohazard");
+            result += withHTMLIcons ? SYSConst.html_100x100_biohazard : "";
+            result += getCompactHTML(biohazard);
+        }
+
+        /***
          *     __     ___ _        _
          *     \ \   / (_) |_ __ _| |
          *      \ \ / /| | __/ _` | |
@@ -903,7 +924,7 @@ public class ResInfoTools {
          *
          */
         if (vital) {
-            List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(bewohner, ResInfoCategoryTools.VITAL);
+            List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(resident, ResInfoCategoryTools.VITAL);
             if (!bwinfos.isEmpty()) {
                 result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getResInfoCat().getText() + "</h2><div id=\"fonttext\">";
                 for (ResInfo bwinfo : bwinfos) {
@@ -1170,6 +1191,14 @@ public class ResInfoTools {
             info.setTo(enddate);
             info.setUserOFF(em.merge(OPDE.getLogin().getUser()));
         }
+    }
+
+    public static String getCompactHTML(ResInfo resInfo) {
+        String result = SYSConst.html_div(resInfo.getHtml());
+        if (!SYSTools.catchNull(resInfo.getText()).isEmpty()) {
+            result += SYSConst.html_paragraph(SYSConst.html_bold(OPDE.lang.getString("misc.msg.comment")) + ":<br/>" + resInfo.getText().trim());
+        }
+        return result;
     }
 
 }

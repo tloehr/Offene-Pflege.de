@@ -966,6 +966,7 @@ public class PnlScheduleDose extends CleanablePanel {
                 panel2.add(lblLDate);
 
                 //---- txtLDate ----
+                txtLDate.setFont(new Font("Arial", Font.PLAIN, 14));
                 txtLDate.addFocusListener(new FocusAdapter() {
                     @Override
                     public void focusLost(FocusEvent e) {

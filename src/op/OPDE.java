@@ -39,7 +39,6 @@ import op.threads.PrintProcessor;
 import op.tools.*;
 import org.apache.commons.cli.*;
 import org.apache.log4j.*;
-import org.eclipse.persistence.logging.JavaLog;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -53,11 +52,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.swing.*;
-import javax.swing.event.EventListenerList;
-import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.InetAddress;
-import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.*;
 
@@ -71,7 +67,8 @@ public class OPDE {
     public static final int ERROR_TIME = 4;
     public static final int START_OF_MODULE_TIME = 6;
 
-    public static final boolean CALC_MEDI = true;
+    public static final boolean CALC_MEDI_APV1 = true;
+    public static final boolean CALC_MEDI_OTHER = true;
 
     public static long uptime;
     public static ResourceBundle lang;
@@ -125,8 +122,12 @@ public class OPDE {
     /**
      * @return zeigt an, ob die Medikamente gerechnet werden sollen oder nicht.
      */
-    public static boolean isCalcMedi() {
-        return CALC_MEDI;
+    public static boolean isCalcMediAPV1() {
+        return CALC_MEDI_APV1;
+    }
+
+    public static boolean isCalcMediOther() {
+        return CALC_MEDI_OTHER;
     }
 
     public static boolean isAnonym() {

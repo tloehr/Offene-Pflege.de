@@ -41,15 +41,15 @@ public class PnlEditGP extends JPanel {
         lblEMAIL.setText(OPDE.lang.getString("misc.msg.email"));
 
         txtAnrede.setText(doc.getAnrede());
-        txtTitel.setText(doc.getTitel());
+        txtTitel.setText(doc.getTitle());
         txtNachname.setText(doc.getName());
-        txtVorname.setText(doc.getVorname());
-        txtStrasse.setText(doc.getStrasse());
-        txtPLZ.setText(doc.getPlz());
-        txtOrt.setText(doc.getOrt());
+        txtVorname.setText(doc.getFirstname());
+        txtStrasse.setText(doc.getStreet());
+        txtPLZ.setText(doc.getZIP());
+        txtOrt.setText(doc.getCity());
         txtTel.setText(doc.getTel());
         txtFax.setText(doc.getFax());
-        txtMobil.setText(SYSTools.catchNull(doc.getOrt()));
+        txtMobil.setText(SYSTools.catchNull(doc.getCity()));
         txtEMAIL.setText(SYSTools.catchNull(doc.getEMail()));
 
         FocusAdapter fa = new FocusAdapter() {
@@ -79,15 +79,15 @@ public class PnlEditGP extends JPanel {
         }
 
         doc.setAnrede(txtAnrede.getText().trim());
-        doc.setTitel(txtTitel.getText().trim());
+        doc.setTitle(txtTitel.getText().trim());
         doc.setName(txtNachname.getText().trim());
-        doc.setVorname(txtVorname.getText().trim());
-        doc.setStrasse(txtStrasse.getText().trim());
-        doc.setPlz(txtPLZ.getText().trim());
+        doc.setFirstname(txtVorname.getText().trim());
+        doc.setStreet(txtStrasse.getText().trim());
+        doc.setZIP(txtPLZ.getText().trim());
         doc.setOrt(txtOrt.getText().trim());
         doc.setTel(txtTel.getText().trim());
         doc.setFax(txtFax.getText().trim());
-        doc.setMobil(txtMobil.getText().trim());
+        doc.setMobile(txtMobil.getText().trim());
         doc.setEMail(txtEMAIL.getText().trim());
 
         return doc;

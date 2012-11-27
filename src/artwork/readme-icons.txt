@@ -20,3 +20,4 @@ Lots of different icons and symbols taken from www.wpclipart.com. This material 
 -- print2.png (modification of http://www.wpclipart.com/computer/printer/printer_icon.png.html)
 -- meeting.png (modification of http://www.wpclipart.com/office/people/office_people/meeting_T.png)
 -- magnify1.png (modification of  http://www.wpclipart.com/tools/magnifying_glass/magnifying_glass_256_T.png)
+-- biohazard.png (http://www.wpclipart.com/smiley/best_smiley_set/smiley_biohazard_T.png)

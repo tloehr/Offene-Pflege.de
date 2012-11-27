@@ -536,11 +536,26 @@ public class PnlInfo extends NursingRecordsPanel {
 
         GUITools.addAllComponents(mypanel, addCommands());
         GUITools.addAllComponents(mypanel, addFilters());
+        GUITools.addAllComponents(mypanel, addKey());
 
         searchPane.setContentPane(mypanel);
 
         searchPanes.add(searchPane);
         searchPanes.addExpansion();
+    }
+
+    private java.util.List<Component> addKey() {
+        java.util.List<Component> list = new ArrayList<Component>();
+        list.add(new JSeparator());
+        list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22stopSign, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22singleIncident, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription3"), SYSConst.icon22intervalByDay, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription4"), SYSConst.icon22intervalBySecond, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription5"), SYSConst.icon22intervalNoConstraints, SwingConstants.LEADING));
+
+
+        return list;
     }
 
     private List<Component> addCommands() {

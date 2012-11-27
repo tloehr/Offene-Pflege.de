@@ -3,7 +3,6 @@ package entity.prescription;
 import entity.Homes;
 import entity.info.ResInfoTools;
 import entity.info.Resident;
-import entity.nursingprocess.DFN;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.bhp.PnlBHP;
@@ -70,7 +69,7 @@ public class BHPTools {
 
     public static long getNumBHPs(Prescription prescription) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT COUNT(bhp) FROM BHP bhp WHERE bhp.prescription = :prescription AND bhp.status <> :status");
+        Query query = em.createQuery("SELECT COUNT(bhp) FROM BHP bhp WHERE bhp.prescription = :prescription AND bhp.state <> :status");
         query.setParameter("prescription", prescription);
         query.setParameter("status", STATE_OPEN);
         long num = (Long) query.getSingleResult();
@@ -81,7 +80,7 @@ public class BHPTools {
     public static boolean hasBeenUsedAlready(Prescription prescription) {
         long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT bhp FROM BHP bhp WHERE bhp.prescription = :prescription AND bhp.status <> :status");
+        Query query = em.createQuery("SELECT bhp FROM BHP bhp WHERE bhp.prescription = :prescription AND bhp.state <> :status");
         query.setParameter("prescription", prescription);
         query.setParameter("status", STATE_OPEN);
         query.setMaxResults(1);
@@ -99,9 +98,10 @@ public class BHPTools {
                 if (result == 0) {
                     result = o1.getPrescription().compareTo(o2.getPrescription());
                 }
-                if (result == 0) {
-                    result = o1.getStatus().compareTo(o2.getStatus());
-                }
+//                if (result == 0) {
+//                    result = o1.getState().compareTo(o2.getState());
+//                }
+
                 return result;
             }
         };
@@ -496,8 +496,6 @@ public class BHPTools {
     }
 
     /**
-     *
-     *
      * @param date
      * @return
      */
@@ -510,14 +508,14 @@ public class BHPTools {
             String jpql = " " +
                     " SELECT bhp " +
                     " FROM BHP bhp " +
-                    " WHERE bhp.prescription.situation IS NULL AND bhp.status = :state " +
+                    " WHERE bhp.prescription.situation IS NULL AND bhp.state = :state " +
                     " AND bhp.resident.station.home = :home " +
                     " AND bhp.soll >= :from AND bhp.soll <= :to ";
 
             Query query = em.createQuery(jpql);
             query.setParameter("state", STATE_OPEN);
             query.setParameter("home", home);
-            query.setParameter("from",date.toDate());
+            query.setParameter("from", date.toDate());
             query.setParameter("to", date.plusDays(1).toDateTime().minusSeconds(1).toDate());
 
             listBHP = new ArrayList<BHP>(query.getResultList());
@@ -536,7 +534,7 @@ public class BHPTools {
         String text = "";
         if (!bhp.isOnDemand()) {
             if (bhp.getSollZeit() == BYTE_TIMEOFDAY) {
-                text += DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getSoll());
+                text += "<font color=\"blue\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getSoll()) + " " + OPDE.lang.getString("misc.msg.Time.short") + "</font>";
             } else {
                 String[] msg = GUITools.getLocalizedMessages(TIMEIDTEXTLONG);
                 text += msg[bhp.getSollZeit()];
@@ -577,9 +575,9 @@ public class BHPTools {
         Icon icon = null;
         BigDecimal sum = stock == null ? BigDecimal.ZERO : MedStockTools.getSum(stock);
 
-        if (stock == null){
+        if (stock == null) {
             icon = SYSConst.icon22ledRedOn;
-        } else if (sum.compareTo(BigDecimal.ZERO) <= 0){
+        } else if (sum.compareTo(BigDecimal.ZERO) <= 0) {
             icon = SYSConst.icon22ledYellowOn;
         }
 

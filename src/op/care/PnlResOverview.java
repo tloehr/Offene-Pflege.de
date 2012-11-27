@@ -148,7 +148,7 @@ public class PnlResOverview extends NursingRecordsPanel {
 
                 @Override
                 protected Object doInBackground() throws Exception {
-                    html = SYSTools.toHTML(ResInfoTools.getTXReport(bewohner, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true));
+                    html = SYSTools.toHTML(ResInfoTools.getTXReport(bewohner, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true, false));
                     return null;
                 }
 
@@ -178,7 +178,7 @@ public class PnlResOverview extends NursingRecordsPanel {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    String html = SYSTools.toHTML(ResInfoTools.getTXReport(bewohner, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true));
+                    String html = SYSTools.toHTML(ResInfoTools.getTXReport(bewohner, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true, false));
                     txtUebersicht.setText(html);
 //                    jspHTML.getVerticalScrollBar().setValue(0);
 
@@ -202,7 +202,7 @@ public class PnlResOverview extends NursingRecordsPanel {
 
             @Override
             protected Object doInBackground() throws Exception {
-                html = SYSTools.toHTML(ResInfoTools.getTXReport(bewohner, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true));
+                html = SYSTools.toHTML(ResInfoTools.getTXReport(bewohner, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true, false));
                 return null;
             }
 
@@ -311,7 +311,7 @@ public class PnlResOverview extends NursingRecordsPanel {
         JideButton printButton = GUITools.createHyperlinkButton("Drucken", SYSConst.icon22print2, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                SYSFilesTools.print(ResInfoTools.getTXReport(bewohner, true, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, true), true);
+                SYSFilesTools.print(ResInfoTools.getTXReport(bewohner, true, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, true, true), true);
             }
         });
         mypanel.add(printButton);
