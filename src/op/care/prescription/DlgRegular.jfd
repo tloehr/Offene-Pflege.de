@@ -290,7 +290,7 @@
            <string>Massnahmen</string> 
           </void> 
           <void property="name"> 
-           <string>txtMass</string> 
+           <string>txtIntervention</string> 
           </void> 
           <void method="addEvent"> 
            <object class="com.jformdesigner.model.FormEvent"> 

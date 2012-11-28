@@ -188,37 +188,37 @@ public class BHPTools {
     }
 
 
-    /**
-     * Löscht alle <b>heutigen</b> nicht <b>abgehakten</b> BHPs für eine bestimmte Verordnung <b>ab</b> ab dem aktuellen Zeitpunkt.
-     * Es wird die aktuelle Schicht (bzw. Zeit) ermittelt. Bei BHPs,
-     * die sich auf eine bestimmte Uhrzeit beziehen, werden nur diejenigen gelöscht, die <b>größer gleich</b> der aktuellen Uhrzeit sind sind.
-     *
-     * @param em           EntityManager, in dessen Kontext das hier ablaufen soll.
-     * @param prescription um die es geht.
-     */
-    public static void cleanup(EntityManager em, Prescription prescription) throws Exception {
-
-        Date now = new Date();
-
-        int sollZeit = SYSCalendar.ermittleZeit(now.getTime());
-        Query query = em.createQuery("SELECT b FROM BHP b WHERE b.prescription = :prescription AND b.soll >= :bofday AND b.soll <= :eofday");
-
-        DateMidnight bofday = new DateMidnight();
-        DateTime eofday = new DateMidnight().toDateTime().plusDays(1).minusSeconds(1).toDateTime();
-
-        query.setParameter("prescription", prescription);
-        query.setParameter("bofday", bofday.toDate());
-        query.setParameter("eofday", eofday.toDate());
-
-        List<BHP> bhps = query.getResultList();
-
-        for (BHP bhp : bhps) {
-            if (bhp.getSollZeit() > sollZeit || (bhp.getSollZeit() == 0 && SYSCalendar.compareTime(bhp.getSoll(), now) >= 0)) {
-                em.remove(bhp);
-            }
-        }
-
-    }
+//    /**
+//     * Löscht alle <b>heutigen</b> nicht <b>abgehakten</b> BHPs für eine bestimmte Verordnung <b>ab</b> ab dem aktuellen Zeitpunkt.
+//     * Es wird die aktuelle Schicht (bzw. Zeit) ermittelt. Bei BHPs,
+//     * die sich auf eine bestimmte Uhrzeit beziehen, werden nur diejenigen gelöscht, die <b>größer gleich</b> der aktuellen Uhrzeit sind sind.
+//     *
+//     * @param em           EntityManager, in dessen Kontext das hier ablaufen soll.
+//     * @param prescription um die es geht.
+//     */
+//    public static void cleanup(EntityManager em, Prescription prescription) throws Exception {
+//
+//        Date now = new Date();
+//
+//        int sollZeit = SYSCalendar.ermittleZeit(now.getTime());
+//        Query query = em.createQuery("SELECT b FROM BHP b WHERE b.prescription = :prescription AND b.soll >= :bofday AND b.soll <= :eofday");
+//
+//        DateMidnight bofday = new DateMidnight();
+//        DateTime eofday = new DateMidnight().toDateTime().plusDays(1).minusSeconds(1).toDateTime();
+//
+//        query.setParameter("prescription", prescription);
+//        query.setParameter("bofday", bofday.toDate());
+//        query.setParameter("eofday", eofday.toDate());
+//
+//        List<BHP> bhps = query.getResultList();
+//
+//        for (BHP bhp : bhps) {
+//            if (bhp.getSollZeit() > sollZeit || (bhp.getSollZeit() == 0 && SYSCalendar.compareTime(bhp.getSoll(), now) >= 0)) {
+//                em.remove(bhp);
+//            }
+//        }
+//
+//    }
 
     /**
      * Hiermit werden alle BHP Einträge erzeugt, die sich aus den Verordnungen in der zugehörigen Liste ergeben. Die Liste wird aber vorher

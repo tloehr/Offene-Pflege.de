@@ -130,7 +130,7 @@ public class DlgRegular extends MyJDialog {
         if (txtMed.getText().isEmpty()) {
             cmbMed.setModel(new DefaultComboBoxModel());
             cmbIntervention.setEnabled(true);
-            txtMass.setEnabled(true);
+            txtIntervention.setEnabled(true);
             cbDailyPlan.setEnabled(true);
             cbDailyPlan.setSelected(false);
             rbEndOfPackage.setEnabled(false);
@@ -166,7 +166,7 @@ public class DlgRegular extends MyJDialog {
                 cmbMed.setToolTipText("");
                 cmbIntervention.setSelectedIndex(-1);
                 cmbIntervention.setEnabled(true);
-                txtMass.setEnabled(true);
+                txtIntervention.setEnabled(true);
                 cbDailyPlan.setEnabled(true);
                 cbDailyPlan.setSelected(false);
                 OPDE.getDisplayManager().clearSubMessages();
@@ -199,7 +199,7 @@ public class DlgRegular extends MyJDialog {
     }
 
     private void txtMassActionPerformed(ActionEvent e) {
-        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.TYPE_PRESCRIPTION, txtMass.getText()).toArray()));
+        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.TYPE_PRESCRIPTION, txtIntervention.getText()).toArray()));
     }
 
     /**
@@ -216,7 +216,7 @@ public class DlgRegular extends MyJDialog {
         panel4 = new JPanel();
         btnMed = new JButton();
         cmbIntervention = new JComboBox();
-        txtMass = new JXSearchField();
+        txtIntervention = new JXSearchField();
         jPanel8 = new JPanel();
         jspDosis = new JScrollPane();
         tblDosis = new JTable();
@@ -321,16 +321,16 @@ public class DlgRegular extends MyJDialog {
             cmbIntervention.setFont(new Font("Arial", Font.PLAIN, 14));
             jPanel1.add(cmbIntervention, CC.xywh(3, 3, 3, 1));
 
-            //---- txtMass ----
-            txtMass.setFont(new Font("Arial", Font.PLAIN, 14));
-            txtMass.setPrompt("Massnahmen");
-            txtMass.addActionListener(new ActionListener() {
+            //---- txtIntervention ----
+            txtIntervention.setFont(new Font("Arial", Font.PLAIN, 14));
+            txtIntervention.setPrompt("Massnahmen");
+            txtIntervention.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     txtMassActionPerformed(e);
                 }
             });
-            jPanel1.add(txtMass, CC.xy(1, 3));
+            jPanel1.add(txtIntervention, CC.xy(1, 3));
 
             //======== jPanel8 ========
             {
@@ -571,13 +571,15 @@ public class DlgRegular extends MyJDialog {
         cmbIntervention.setRenderer(InterventionTools.getMassnahmenRenderer());
         cmbIntervention.setEnabled(cmbMed.getModel().getSize() == 0);
         cmbIntervention.setSelectedItem(prescription.getIntervention());
-        txtMass.setEnabled(cmbMed.getModel().getSize() == 0);
+        txtIntervention.setEnabled(cmbMed.getModel().getSize() == 0);
 
         cbDailyPlan.setEnabled(cmbMed.getModel().getSize() == 0);
         cbDailyPlan.setSelected(prescription.isOnDailyPlan());
 
         cmbMed.setEnabled(editMode != MODE_CHANGE);
         txtMed.setEnabled(editMode != MODE_CHANGE);
+        cmbIntervention.setEnabled(editMode != MODE_CHANGE);
+        txtIntervention.setEnabled(editMode != MODE_CHANGE);
 
         // TODO: Calc Medi here
         // hide the endOfPackage completely
@@ -633,8 +635,8 @@ public class DlgRegular extends MyJDialog {
         cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.TYPE_PRESCRIPTION).toArray()));
         cmbIntervention.setSelectedItem(((TradeForm) cmbMed.getSelectedItem()).getDosageForm().getIntervention());
         cmbIntervention.setEnabled(false);
-        txtMass.setText(null);
-        txtMass.setEnabled(false);
+        txtIntervention.setText(null);
+        txtIntervention.setEnabled(false);
         cbDailyPlan.setEnabled(false);
         cbDailyPlan.setSelected(false);
     }//GEN-LAST:event_cmbMedItemStateChanged
@@ -850,7 +852,7 @@ public class DlgRegular extends MyJDialog {
     private JPanel panel4;
     private JButton btnMed;
     private JComboBox cmbIntervention;
-    private JXSearchField txtMass;
+    private JXSearchField txtIntervention;
     private JPanel jPanel8;
     private JScrollPane jspDosis;
     private JTable tblDosis;

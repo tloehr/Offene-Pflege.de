@@ -64,7 +64,7 @@ public class DosageFormTools {
         return (SYSTools.catchNull(form.getPreparation()).isEmpty() ? form.getUsageText() : form.getPreparation() + ", " + form.getUsageText());
     }
 
-    public static String toPrettyStringPackung(DosageForm form) {
+    public static String getPackageText(DosageForm form) {
         String result = "";
         if (SYSTools.catchNull(form.getPreparation()).isEmpty()) {
             result = EINHEIT[form.getPackUnit()] + " " + form.getUsageText();

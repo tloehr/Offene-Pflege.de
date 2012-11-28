@@ -185,6 +185,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
         GUITools.addAllComponents(mypanel, addCommands());
         GUITools.addAllComponents(mypanel, addFilters());
+        GUITools.addAllComponents(mypanel, addKey());
 
         searchPane.setContentPane(mypanel);
 
@@ -218,6 +219,17 @@ public class PnlInventory extends NursingRecordsPanel {
             }
         });
         list.add(tbClosedInventory);
+
+        return list;
+    }
+
+     private java.util.List<Component> addKey() {
+        java.util.List<Component> list = new ArrayList<Component>();
+        list.add(new JSeparator());
+        list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription3"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
 
         return list;
     }
@@ -357,14 +369,13 @@ public class PnlInventory extends NursingRecordsPanel {
                 "<tr>" +
 
                 "<td width=\"520\" align=\"left\"><font size=+1>" +
-                (inventory.isClosed() ? "<s>" : "") +
+//                (inventory.isClosed() ? "<s>" : "") +
                 inventory.getText() + "</font></td>" +
-                (inventory.isClosed() ? "</s>" : "") +
-                "<td width=\"200\" align=\"right\"><font size=+1>" + NumberFormat.getNumberInstance().format(sumInventory) + " " + DosageFormTools.getUsageText(MedInventoryTools.getForm(inventory)) + "</font></td>" +
+//                (inventory.isClosed() ? "</s>" : "") +
+                "<td width=\"200\" align=\"right\"><font size=+1>" + NumberFormat.getNumberInstance().format(sumInventory) + " " + DosageFormTools.getPackageText(MedInventoryTools.getForm(inventory)) + "</font></td>" +
 
                 "</tr>" +
                 "</table>" +
-
 
                 "</html>";
 
@@ -380,6 +391,8 @@ public class PnlInventory extends NursingRecordsPanel {
         });
         cpInventory.setTitleLabelComponent(cptitle.getMain());
         cpInventory.setSlidingDirection(SwingConstants.SOUTH);
+        cptitle.getButton().setIcon(inventory.isClosed() ? SYSConst.icon22stopSign : null);
+
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)) {
             /***
@@ -614,7 +627,7 @@ public class PnlInventory extends NursingRecordsPanel {
                 "<tr>" +
                 (stock.isClosed() ? "<s>" : "") +
                 "<td width=\"600\" align=\"left\">" + MedStockTools.getAsHTML(stock) + "</td>" +
-                "<td width=\"200\" align=\"right\">" + NumberFormat.getNumberInstance().format(sumStock) + " " + DosageFormTools.getUsageText(MedInventoryTools.getForm(stock.getInventory())) + "</td>" +
+                "<td width=\"200\" align=\"right\">" + NumberFormat.getNumberInstance().format(sumStock) + " " + DosageFormTools.getPackageText(MedInventoryTools.getForm(stock.getInventory())) + "</td>" +
                 (stock.isClosed() ? "</s>" : "") +
                 "</tr>" +
                 "</table>" +
@@ -1128,10 +1141,9 @@ public class PnlInventory extends NursingRecordsPanel {
             btnAddTX.setEnabled(!stock.isClosed());
             pnlTX.add(btnAddTX);
 
-            BigDecimal rowsum = BigDecimal.ZERO;
+            BigDecimal rowsum = MedStockTools.getSum(stock);
             Collections.sort(stock.getStockTransaction());
             for (final MedStockTransaction tx : stock.getStockTransaction()) {
-                rowsum = rowsum.add(tx.getAmount());
 
                 String title = "<html><table border=\"0\">" +
                         "<tr>" +
@@ -1152,6 +1164,8 @@ public class PnlInventory extends NursingRecordsPanel {
                         "</table>" +
 
                         "</font></html>";
+
+                rowsum = rowsum.subtract(tx.getAmount());
 
                 final DefaultCPTitle pnlTitle = new DefaultCPTitle(title, null);
 

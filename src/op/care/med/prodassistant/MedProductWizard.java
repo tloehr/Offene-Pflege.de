@@ -272,7 +272,7 @@ public class MedProductWizard {
                     } else if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
                         OPDE.debug("PackagePage OPENDED");
 //                        aPackage = null;
-                        pnlPackage.setLabelEinheit(DosageFormTools.toPrettyStringPackung(tradeform.getDosageForm()));
+                        pnlPackage.setLabelEinheit(DosageFormTools.getPackageText(tradeform.getDosageForm()));
                         pnlPackage.setDarreichung(tradeform);
                     }
                 }

@@ -33,6 +33,7 @@ import entity.prescription.MedStock;
 import entity.prescription.MedStockTools;
 import entity.prescription.MedStockTransactionTools;
 import op.OPDE;
+import op.care.prescription.PnlPrescription;
 import op.threads.DisplayManager;
 import op.tools.MyJDialog;
 import op.tools.SYSConst;
@@ -55,7 +56,7 @@ public class DlgCloseStock extends MyJDialog {
 
     private MedStock medStock;
     private Closure actionBlock;
-    public static final String internalClassID = "nursingrecords.prescription.dlgCloseStock";
+    public static final String internalClassID = PnlPrescription.internalClassID + ".dlgCloseStock";
 
     /**
      * Creates new form DlgBestandAnbruch
@@ -264,22 +265,23 @@ public class DlgCloseStock extends MyJDialog {
     }
 
     private void initDialog() {
-        String text = "Sie möchten den Bestand mit der Nummer <font color=\"red\"><b>" + medStock.getID() + "</b></font> abschließen.";
+        String text = OPDE.lang.getString(internalClassID + ".youWantToClose1a") + medStock.getID() + OPDE.lang.getString(internalClassID + ".youWantToClose1b");
         text += "<br/>" + MedStockTools.getTextASHTML(medStock) + "</br>";
-        text += "<br/>Bitte wählen Sie einen der drei folgenden Gründe für den Abschluss:";
+        text += "<br/>" + OPDE.lang.getString(internalClassID + ".chooseAReason") + ":";
         txtInfo.setContentType("text/html");
-        txtInfo.setText(SYSTools.toHTML(text));
+        txtInfo.setText(SYSTools.toHTML(SYSConst.html_div(text)));
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(" " +
                 " SELECT b FROM MedStock b " +
-                " WHERE b.inventory = :vorrat AND b.out = :aus AND b.opened = :anbruch " +
-                " ORDER BY b.in, b.id "); // Geht davon aus, dass die PKs immer fortlaufend, automatisch vergeben werden.
-        query.setParameter("vorrat", medStock.getInventory());
-        query.setParameter("aus", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
-        query.setParameter("anbruch", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+                " WHERE b.inventory = :inventory AND b.out = :out AND b.opened = :opened " +
+                " ORDER BY b.in, b.id ");
+
+        query.setParameter("inventory", medStock.getInventory());
+        query.setParameter("out", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+        query.setParameter("opened", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
         DefaultComboBoxModel dcbm = new DefaultComboBoxModel(query.getResultList().toArray());
-        dcbm.insertElementAt("keine", 0);
+        dcbm.insertElementAt(OPDE.lang.getString("misc.msg.none"), 0);
         cmbBestID.setModel(dcbm);
         cmbBestID.setRenderer(new ListCellRenderer() {
             @Override
@@ -293,7 +295,7 @@ public class DlgCloseStock extends MyJDialog {
         int index = Math.min(2, cmbBestID.getItemCount());
         cmbBestID.setSelectedIndex(index - 1);
 
-        lblEinheiten.setText(DosageFormTools.EINHEIT[medStock.getTradeForm().getDosageForm().getPackUnit()] + " verbraucht");
+        lblEinheiten.setText(DosageFormTools.EINHEIT[medStock.getTradeForm().getDosageForm().getPackUnit()] + " " + OPDE.lang.getString("misc.msg.usedup"));
         txtLetzte.setText("");
         txtLetzte.setEnabled(false);
         // Das mit dem Vorabstellen nur bei Formen, die auf Stück basieren also APV = 1
@@ -345,35 +347,36 @@ public class DlgCloseStock extends MyJDialog {
             final MedStock myStock = em.merge(medStock);
             em.lock(myStock, LockModeType.OPTIMISTIC);
             em.lock(em.merge(myStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
+            em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
 
-            OPDE.important("Bestands Nr. " + myStock.getID() + " wird abgeschlossen");
+            OPDE.important("StockID: " + myStock.getID() + " " + OPDE.lang.getString("misc.msg.closed"));
             OPDE.important("UID: " + OPDE.getLogin().getUser().getUID());
 
             MedStock nextBest = null;
             if (cmbBestID.getSelectedIndex() > 0) {
                 nextBest = em.merge((MedStock) cmbBestID.getSelectedItem());
+                OPDE.important(OPDE.lang.getString(internalClassID + ".LOG.STATE_EDIT_EMPTY_SOON1") + ": " + nextBest.getID());
                 em.lock(nextBest, LockModeType.OPTIMISTIC);
                 myStock.setNextStock(nextBest);
             }
 
             if (rbStellen.isSelected()) {
                 BigDecimal inhalt = new BigDecimal(Double.parseDouble(txtLetzte.getText().replace(",", ".")));
-                MedStockTools.setStockTo(em, myStock, inhalt, "Korrekturbuchung zum Packungsabschluss", MedStockTransactionTools.STATE_EDIT_EMPTY_SOON);
-
-                OPDE.important(internalClassID + ": Vorabstellen angeklickt. Es sind noch " + inhalt + " in der Packung.");
-                OPDE.important(internalClassID + ": Nächste Packung im Anbruch wird die Bestands Nr.: " + nextBest.getID() + " sein.");
+                MedStockTools.setStockTo(em, myStock, inhalt, OPDE.lang.getString(internalClassID + ".TX.STATE_EDIT_EMPTY_SOON"), MedStockTransactionTools.STATE_EDIT_EMPTY_SOON);
+                OPDE.important(OPDE.lang.getString(internalClassID + ".LOG.STATE_EDIT_EMPTY_SOON1") + ": " + inhalt);
             } else {
                 if (rbGefallen.isSelected()) {
-                    MedStockTools.close(em, myStock, "Packung ist runtergefallen.", MedStockTransactionTools.STATE_EDIT_EMPTY_BROKEN_OR_LOST);
-                    OPDE.important(internalClassID + ": Runtergefallen angeklickt.");
+                    MedStockTools.close(em, myStock, OPDE.lang.getString(internalClassID + ".TX.STATE_EDIT_EMPTY_BROKEN_OR_LOST"), MedStockTransactionTools.STATE_EDIT_EMPTY_BROKEN_OR_LOST);
+                    OPDE.important(OPDE.lang.getString(internalClassID + ".LOG.STATE_EDIT_EMPTY_BROKEN_OR_LOST"));
                 } else if (rbAbgelaufen.isSelected()) {
-                    MedStockTools.close(em, myStock, "Packung ist abgelaufen.", MedStockTransactionTools.STATE_EDIT_EMPTY_PAST_EXPIRY);
-                    OPDE.important(internalClassID + ": Abgelaufen angeklickt.");
+                    MedStockTools.close(em, myStock, OPDE.lang.getString(internalClassID + ".TX.STATE_EDIT_EMPTY_PAST_EXPIRY"), MedStockTransactionTools.STATE_EDIT_EMPTY_PAST_EXPIRY);
+                    OPDE.important(OPDE.lang.getString(internalClassID + ".LOG.STATE_EDIT_EMPTY_PAST_EXPIRY"));
                 } else {
-                    MedStockTools.close(em, myStock, "Korrekturbuchung zum Packungsabschluss", MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
-                    OPDE.important(internalClassID + ": Packung ist nun leer angeklickt.");
+                    MedStockTools.close(em, myStock, OPDE.lang.getString(internalClassID + ".TX.STATE_EDIT_EMPTY_NOW"), MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
+                    OPDE.important(OPDE.lang.getString(internalClassID + ".LOG.STATE_EDIT_EMPTY_NOW"));
                 }
             }
+
             em.getTransaction().commit();
 
             medStock = myStock;

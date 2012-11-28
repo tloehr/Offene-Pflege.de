@@ -119,18 +119,18 @@ public class MedStockTools {
      * @param stock
      * @return
      */
-    public static void open(MedStock stock, BigDecimal apv) throws Exception {
-        if (apv == null) {
-            throw new NullPointerException("apv must not be null");
-        }
-
-        stock.setOpened(new Date());
-        if (apv.equals(BigDecimal.ZERO)) {
-            // Das hier verhindert Division by Zero Exceptions.
-            apv = BigDecimal.ONE;
-        }
-        stock.setAPV(apv);
-    }
+//    public static void open(MedStock stock, BigDecimal apv) throws Exception {
+//        if (apv == null) {
+//            throw new NullPointerException("apv must not be null");
+//        }
+//
+//        stock.setOpened(new Date());
+//        if (apv.equals(BigDecimal.ZERO)) {
+//            // Das hier verhindert Division by Zero Exceptions.
+//            apv = BigDecimal.ONE;
+//        }
+//        stock.setAPV(apv);
+//    }
 
     public static HashMap getStock4Printing(MedStock bestand) {
         OPDE.debug("BestandID: " + bestand.getID());
@@ -234,14 +234,14 @@ public class MedStockTools {
 //        stock.setNextStock(null);
 
         if (stock.hasNext2Open()) {
-            stock.setOpened(new Date());
+            MedStock nextStock = stock.getNextStock();
+            nextStock.setOpened(new Date());
             BigDecimal apv = calcAPV(stock);
             if (apv.equals(BigDecimal.ZERO)) {
                 apv = BigDecimal.ONE;
             }
-            stock.setAPV(apv);
+            nextStock.setAPV(apv);
 
-//            MedStockTools.open(stock.getNextStock(), calcAPV(stock));
             OPDE.debug("NextStock: " + stock.getNextStock().getID() + " will be opened now");
         } else {
 
@@ -258,7 +258,6 @@ public class MedStockTools {
                         verordnung.setUserOFF(em.merge(OPDE.getLogin().getUser()));
                         verordnung.setDocOFF(verordnung.getDocON());
                         verordnung.setHospitalOFF(verordnung.getHospitalON());
-                        BHPTools.cleanup(em, verordnung);
                     }
                 }
             }
@@ -276,14 +275,19 @@ public class MedStockTools {
         return result;
     }
 
+
+
     /**
      * @param stock, für den das Verhältnis neu berechnet werden soll.
      */
     public static BigDecimal calcAPV(MedStock stock) throws Exception {
 
+
+        // TODO: das mit dem calcAPV musst du nochmal durchdenken.
+
         BigDecimal apvNeu = BigDecimal.ONE;
 
-        if (stock.getTradeForm().getDosageForm().getState() != DosageFormTools.APV1) {
+        if (!stock.getTradeForm().getDosageForm().isAPV1()) {
 
             // Menge in der Packung (in der Packungseinheit). Also das, was wirklich in der Packung am Anfang
             // drin war. Meist das, was auf der Packung steht.
@@ -375,7 +379,7 @@ public class MedStockTools {
         result += "<font color=\"blue\"><b>" + bestand.getTradeForm().getMedProduct().getBezeichnung() + " " + bestand.getTradeForm().getSubtext() + ", ";
 
         if (!SYSTools.catchNull(bestand.getPackage().getPzn()).equals("")) {
-            result += "PZN: " + bestand.getPackage().getPzn() + ", ";
+            result += OPDE.lang.getString("misc.msg.PZN")+ ": " + bestand.getPackage().getPzn() + ", ";
             result += MedPackageTools.GROESSE[bestand.getPackage().getSize()] + ", " + bestand.getPackage().getContent() + " " + DosageFormTools.EINHEIT[bestand.getTradeForm().getDosageForm().getPackUnit()] + " ";
             String zubereitung = SYSTools.catchNull(bestand.getTradeForm().getDosageForm().getPreparation());
             String anwtext = SYSTools.catchNull(bestand.getTradeForm().getDosageForm().getUsageText());
@@ -488,14 +492,14 @@ public class MedStockTools {
     /**
      * Ermittelt für einen bestimmten Bestand ein passendes APV.
      */
-    public static BigDecimal getAPV4(MedStock bestand) {
+    public static BigDecimal getAPV4(MedStock stock) {
 
         BigDecimal apv = BigDecimal.ONE;
 
-        if (bestand.getTradeForm().getDosageForm().getState() == DosageFormTools.APV_PER_BW) {
-            apv = getAPV4(bestand.getInventory());
-        } else if (bestand.getTradeForm().getDosageForm().getState() == DosageFormTools.APV_PER_DAF) {
-            apv = getAPV4(bestand.getTradeForm());
+        if (stock.getTradeForm().getDosageForm().getState() == DosageFormTools.APV_PER_BW) {
+            apv = getAPV4(stock.getInventory());
+        } else if (stock.getTradeForm().getDosageForm().getState() == DosageFormTools.APV_PER_DAF) {
+            apv = getAPV4(stock.getTradeForm());
         }
 
         return apv;

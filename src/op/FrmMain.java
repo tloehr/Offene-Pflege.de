@@ -109,7 +109,7 @@ public class FrmMain extends JFrame {
     private Closure bwchange;
     private HashMap<Resident, JideButton> bwButtonMap;
     private JideButton homeButton;
-    private ResInfoType biohazard;
+//    private ResInfoType biohazard;
 //    private MouseListener blockingListener;
 
 
@@ -147,7 +147,7 @@ public class FrmMain extends JFrame {
             }
         };
 
-        biohazard = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_BIOHAZARD);
+//        biohazard = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_BIOHAZARD);
 
         // StatusBar Setup
         final LabelStatusBarItem label = new LabelStatusBarItem("Line");
@@ -629,11 +629,11 @@ public class FrmMain extends JFrame {
             button.setForegroundOfState(ThemePainter.STATE_DEFAULT, resident.getGender() == ResidentTools.FEMALE ? Color.red : Color.blue);
             button.setBackground(Color.WHITE);
 
-            if (station != null){
-                if (ResInfoTools.getLastResinfo(resident, biohazard) != null){
-                    button.setIcon(SYSConst.icon22biohazard);
-                }
-            }
+//            if (station != null){
+//                if (ResInfoTools.getLastResinfo(resident, biohazard) != null){
+//                    button.setIcon(SYSConst.icon22biohazard);
+//                }
+//            }
 
 //            button.putClientProperty("bewohner", innerbewohner);
 

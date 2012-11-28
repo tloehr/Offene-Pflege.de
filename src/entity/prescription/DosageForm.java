@@ -46,7 +46,7 @@ public class DosageForm implements Serializable {
     private short state;
     @Basic(optional = false)
     @Column(name = "Equiv")
-    private int sameAs;
+    private int equivalent;
 
     public DosageForm() {
     }
@@ -87,7 +87,7 @@ public class DosageForm implements Serializable {
     }
 
     public int getSameAs() {
-        return sameAs;
+        return equivalent;
     }
     public boolean isAPV1(){
         return usageUnit == packUnit;
@@ -134,7 +134,7 @@ public class DosageForm implements Serializable {
                 ", packUnit=" + packUnit +
                 ", dailyPlan=" + dailyPlan +
                 ", state=" + state +
-                ", sameAs=" + sameAs +
+                ", sameAs=" + equivalent +
                 ", intervention=" + intervention +
                 '}';
     }

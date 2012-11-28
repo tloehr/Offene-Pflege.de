@@ -223,7 +223,7 @@ public class PnlResOverview extends NursingRecordsPanel {
 
         JPanel labelPanel = new JPanel();
         labelPanel.setBackground(Color.WHITE);
-        labelPanel.setLayout(new VerticalLayout(5));
+        labelPanel.setLayout(new VerticalLayout(3));
 
         CollapsiblePane panelFilter = new CollapsiblePane(OPDE.lang.getString("misc.msg.Filter"));
         panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
@@ -305,7 +305,7 @@ public class PnlResOverview extends NursingRecordsPanel {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
         JPanel mypanel = new JPanel();
-        mypanel.setLayout(new VerticalLayout(5));
+        mypanel.setLayout(new VerticalLayout(3));
         mypanel.setBackground(Color.WHITE);
 
         JideButton printButton = GUITools.createHyperlinkButton("Drucken", SYSConst.icon22print2, new ActionListener() {

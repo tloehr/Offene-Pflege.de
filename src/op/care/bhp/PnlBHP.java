@@ -414,10 +414,16 @@ public class PnlBHP extends NursingRecordsPanel {
         icon1.setOpaque(false);
         JLabel icon2 = new JLabel(BHPTools.getWarningIcon(bhp, stock));
         icon2.setOpaque(false);
-//        cptitle.getButton().setIcon(BHPTools.getIcon(bhp));
+
 
         cptitle.getAdditionalIconPanel().add(icon1);
         cptitle.getAdditionalIconPanel().add(icon2);
+
+        if (bhp.getPrescription().isClosed()) {
+            JLabel icon3 = new JLabel(SYSConst.icon22stopSign);
+            icon3.setOpaque(false);
+            cptitle.getAdditionalIconPanel().add(icon3);
+        }
 
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {

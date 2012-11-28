@@ -67,7 +67,7 @@ public class SYSConst {
     public static String html_22x22_StopSign = "<img src=\"" + OPDE.getOPWD() + "/artwork/22x22/stop.png\" border=\"0\">";
     public static String html_22x22_Eraser = "<img src=\"" + OPDE.getOPWD() + "/artwork/22x22/eraser.png\" border=\"0\">";
     public static String html_22x22_Edited = "<img src=\"" + OPDE.getOPWD() + "/artwork/22x22/edited.png\" border=\"0\">";
-    public static String html_100x100_biohazard = "<img src=\"" + OPDE.getOPWD() + "/artwork/other/biohazard.png\" border=\"0\">";
+    public static String html_100x100_biohazard = "<img src=\"" + OPDE.getOPWD() + "/artwork/48x48/biohazard.png\" border=\"0\">";
 
     public static String html_darkgreen = "color=\"#007600\"";
     public static String html_darkred = "color=\"#bd0000\"";

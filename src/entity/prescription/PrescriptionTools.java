@@ -369,9 +369,9 @@ public class PrescriptionTools {
     public static String getPrescriptionAsShortText(Prescription verordnung) {
         String result = "";
 
-        if (verordnung.isClosed()) {
-            result += "<s>"; // Abgesetzte
-        }
+//        if (verordnung.isClosed()) {
+//            result += "<s>"; // Abgesetzte
+//        }
         if (!verordnung.hasMed()) {
             result += verordnung.getIntervention().getBezeichnung();
         } else {
@@ -382,9 +382,9 @@ public class PrescriptionTools {
 
 
         }
-        if (verordnung.isClosed()) {
-            result += "</s>"; // Abgesetzte
-        }
+//        if (verordnung.isClosed()) {
+//            result += "</s>"; // Abgesetzte
+//        }
 
         return result;
     }
@@ -713,7 +713,7 @@ public class PrescriptionTools {
             em.lock(myp, LockModeType.OPTIMISTIC);
             myp.setTo(enddate);
             myp.setUserOFF(em.merge(OPDE.getLogin().getUser()));
-            BHPTools.cleanup(em, myp);
+//            BHPTools.cleanup(em, myp);
         }
     }
 

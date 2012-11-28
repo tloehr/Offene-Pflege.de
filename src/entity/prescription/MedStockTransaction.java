@@ -23,7 +23,7 @@ public class MedStockTransaction implements Serializable, Comparable<MedStockTra
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "BuchID")
-    private Long ID;
+    private Long id;
     @Version
     @Column(name = "version")
     private Long version;
@@ -84,7 +84,7 @@ public class MedStockTransaction implements Serializable, Comparable<MedStockTra
     }
 
     public Long getID() {
-        return ID;
+        return id;
     }
 
     public BigDecimal getAmount() {
@@ -123,7 +123,7 @@ public class MedStockTransaction implements Serializable, Comparable<MedStockTra
         return bhp;
     }
 
-    public boolean isPartOfCancelPair(){
+    public boolean isPartOfCancelPair() {
         return state == MedStockTransactionTools.STATE_CANCEL_REC || state == MedStockTransactionTools.STATE_CANCELLED;
     }
 
@@ -162,18 +162,17 @@ public class MedStockTransaction implements Serializable, Comparable<MedStockTra
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (ID != null ? ID.hashCode() : 0);
+        hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
-
         if (!(object instanceof MedStockTransaction)) {
             return false;
         }
         MedStockTransaction other = (MedStockTransaction) object;
-        if ((this.ID == null && other.ID != null) || (this.ID != null && !this.ID.equals(other.ID))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
         return true;
@@ -181,13 +180,13 @@ public class MedStockTransaction implements Serializable, Comparable<MedStockTra
 
     @Override
     public int compareTo(MedStockTransaction that) {
-        return this.getPit().compareTo(that.getPit());
+        return this.getPit().compareTo(that.getPit()) * -1;
     }
 
     @Override
     public String toString() {
         return "MedStockTransaction{" +
-                "buchID=" + ID +
+                "buchID=" + id +
                 '}';
     }
 }

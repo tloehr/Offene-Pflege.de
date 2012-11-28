@@ -583,7 +583,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
 
     @Override
     public Prescription clone() {
-        final Prescription copy = new Prescription(from, to, toEndOfPackage, relation, text, showOnDailyPlan, attachedFilesConnections, attachedProcessConnections, userON, userOFF, resident, intervention, tradeform, situation, hospitalON, hospitalOFF, docON, docOFF);
+        final Prescription copy = new Prescription(from, to, toEndOfPackage, relation, text, showOnDailyPlan, attachedFilesConnections, attachedProcessConnections, OPDE.getLogin().getUser(), userOFF, resident, intervention, tradeform, situation, hospitalON, hospitalOFF, docON, docOFF);
 
         CollectionUtils.forAllDo(pSchedule, new Closure() {
             public void execute(Object o) {
