@@ -14,7 +14,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.math.BigDecimal;
 import java.text.DateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -114,11 +117,8 @@ public class MedInventoryTools {
 
         if (anweinheit) { // Umrechnung der Anwendungs Menge in die Packungs-Menge.
             MedStock bestand = MedStockTools.getStockInUse(inventory);
-            BigDecimal apv = bestand.getAPV();
+            BigDecimal apv = bestand.getUPR();
 
-            if (apv.equals(BigDecimal.ZERO)) {
-                apv = BigDecimal.ONE;
-            }
             menge = menge.divide(apv, 4, BigDecimal.ROUND_UP);
         }
 
@@ -128,32 +128,30 @@ public class MedInventoryTools {
     }
 
 
-//    /**
-//     * Die Rückgabe eines Vorrats bezieht sich auf eine BHP für die die Buchungen zurückgerechnet werden
-//     * sollen.
-//     * <ol>
-//     * <li>Zuerst werden alle Buchungen zu einer BHPID herausgesucht.</li>
-//     * <li>Gibt es mehr als eine, dann wurde f¸r die Buchung ein P?ckchen aufgebraucht und ein neues angefangen. In diesem Fall wird die Ausf¸hrung abgelehnt.</li>
-//     * <li>Es werden alle zugeh?rigen Buchungen zu dieser BHPID gel?scht.</li>
-//     * </ol>
-//     *
-//     * @param em  der EntityManager der verwendet wird
-//     * @param bhp die BHP, die zurück genommen wird.
-//     * @result true bei Erfolg, false sonst.
-//     */
-//    public static void rueckgabeVorrat(EntityManager em, BHP bhp) throws Exception {
-//
-//        Query delQuery = em.createQuery("DELETE FROM MedStockTransaction b WHERE b.bhp = :bhp");
-//        delQuery.setParameter("bhp", bhp);
-//
-//        // Das hier passiert, wenn bei der Entnahme mehr als ein Bestand betroffen ist.
-//        // Dann kann man das nicht mehr rückgängig machen. Und es wird eine Exception geworfen.
-//        if (delQuery.executeUpdate() > 1) { // es gibt genau eine Buchung.
-//            throw new Exception("Rueckgabe Vorrat");
-//        }
-//
-//    }
+    /**
+     * Bricht von allen geschlossenen das nächste (im Sinne des Einbuchdatums) an. Funktioniert nur bei Vorräten, die z.Zt. keine
+     * angebrochenen Bestände haben.
+     *
+     * @param inventory
+     * @return der neu angebrochene Bestand. null, wenns nicht geklappt hat.
+     */
+    public static MedStock openNext(MedInventory inventory) {
+        MedStock result = null;
 
+        java.util.List<MedStock> list = new ArrayList(inventory.getMedStocks());
+        Collections.sort(list);
+
+        for (MedStock medStock : list) {
+            if (medStock.getOut().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE) && medStock.getOpened().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE)) {
+                medStock.setOpened(new Date());
+                medStock.setUPR(MedStockTools.calcProspectiveUPR(medStock));
+                result = medStock;
+                break;
+            }
+        }
+
+        return result;
+    }
 
     public static void takeFrom(EntityManager em, MedInventory inventory, BigDecimal wunschmenge, BHP bhp) throws Exception {
         MedStock bestand = em.merge(MedStockTools.getStockInUse(inventory));
@@ -225,7 +223,7 @@ public class MedInventoryTools {
         MedStock bestand = null;
         if (menge.compareTo(BigDecimal.ZERO) > 0) {
             bestand = new MedStock(inventory, darreichung, aPackage, text);
-            bestand.setAPV(MedStockTools.getAPV4(bestand));
+//            bestand.setUPR(MedStockTools.calcProspectiveUPR(bestand));
             MedStockTransaction buchung = new MedStockTransaction(bestand, menge);
             bestand.getStockTransaction().add(buchung);
         }
@@ -249,7 +247,6 @@ public class MedInventoryTools {
     }
 
     /**
-     *
      * @param inventory
      * @return returns the currently opened stock of an inventory. <b>null</b>, if there are no open stocks.
      */
@@ -264,48 +261,6 @@ public class MedInventoryTools {
             }
         }
         return stock;
-    }
-
-//    public static MedStock getNaechsteNichtAbgeschlossene(MedInventory inventory) {
-//        MedStock bestand = null;
-//        if (!inventory.getMedStocks().isEmpty()) {
-//            MedStock[] bestaende = inventory.getMedStocks().toArray(new MedStock[0]);
-//            Arrays.sort(bestaende); // nach Einbuchung
-//            for (MedStock myBestand : bestaende) {
-//                if (!myBestand.isClosed()) {
-//                    bestand = myBestand;
-//                    break;
-//                }
-//            }
-//        }
-//        return bestand;
-//    }
-
-    /**
-     * Bricht von allen geschlossenen das nächste (im Sinne des Einbuchdatums) an. Funktioniert nur bei Vorräten, die z.Zt. keine
-     * angebrochenen Bestände haben.
-     *
-     * @param inventory
-     * @return der neu angebrochene Bestand. null, wenns nicht geklappt hat.
-     */
-    public static MedStock openNext(MedInventory inventory) {
-        MedStock result = null;
-
-
-        java.util.List<MedStock> list = new ArrayList(inventory.getMedStocks());
-        Collections.sort(list);
-
-        for (MedStock bestand : list) {
-            if (bestand.getOut().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE) && bestand.getOpened().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE)) {
-                BigDecimal apv = MedStockTools.getAPV4(bestand);
-                bestand.setOpened(new Date());
-                bestand.setAPV(apv);
-                result = bestand;
-                break;
-            }
-        }
-
-        return result;
     }
 
     public static DosageForm getForm(MedInventory inventory) {
@@ -328,7 +283,7 @@ public class MedInventoryTools {
             em.close();
         } catch (NoResultException nre) {
             form = null;
-        } catch (Exception e){
+        } catch (Exception e) {
             OPDE.fatal(e);
         }
         return form;
@@ -361,7 +316,7 @@ public class MedInventoryTools {
         return result;
     }
 
-     public static void closeAll(EntityManager em, Resident resident, Date enddate) throws Exception {
+    public static void closeAll(EntityManager em, Resident resident, Date enddate) throws Exception {
         Query query = em.createQuery("SELECT i FROM MedInventory i WHERE i.resident = :resident AND i.to >= :now");
         query.setParameter("resident", resident);
         query.setParameter("now", enddate);
@@ -384,72 +339,4 @@ public class MedInventoryTools {
             myInventory.setTo(enddate);
         }
     }
-
-    //    public static String getMediKontrolle(String station, int headertiefe) {
-//        StringBuilder html = new StringBuilder(1000);
-//        String sql = "" +
-//                " SELECT bw.nachname, bw.vorname, bw.geschlecht, bw.bwkennung, prod.Bezeichnung, daf.Zusatz, form.Zubereitung, form.AnwText, " +
-//                " (CASE form.PackEinheit WHEN 1 THEN 'Stück' WHEN 2 THEN 'ml' WHEN 3 THEN 'l' WHEN 4 THEN 'mg' WHEN 5 THEN 'g' WHEN 6 THEN 'cm' WHEN 7 THEN 'm' ELSE '!FEHLER!' END) Bestandsmenge, " +
-//                " best.BestID, best.Anbruch " +
-//                " FROM Bewohner bw " +
-//                " INNER JOIN ResInfo ba ON bw.BWKennung = ba.BWKennung " +
-//                " INNER JOIN MPVorrat vor ON vor.BWKennung = bw.BWKennung " +
-//                " INNER JOIN MPBestand best ON vor.VorID = best.VorID " +
-//                " INNER JOIN MPDarreichung daf ON best.DafID = daf.DafID " +
-//                " INNER JOIN MProdukte prod ON prod.MedPID = daf.MedPID " +
-//                " INNER JOIN MPFormen form ON form.FormID = daf.FormID " +
-//                " WHERE ba.BWINFTYP = 'station' and ba.von < now() and ba.bis > now() and ba.XML = '<station value=\"" + station + "\"/>' " +
-//                " AND best.Anbruch < now() and best.Aus = '9999-12-31 23:59:59' AND adminonly <> 2 " +
-//                " ORDER BY bw.Nachname, bw.Vorname, vor.Text, best.Anbruch ";
-//
-//        try {
-//            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sql);
-//            ResultSet rs = stmt.executeQuery();
-//            DateFormat df = DateFormat.getDateInstance();
-//            if (rs.first()) {
-//                html.append("<h" + headertiefe + ">");
-//                html.append("Liste zur Medikamentenkontrolle");
-//                html.append("</h" + headertiefe + ">");
-//                html.append("<h" + (headertiefe + 1) + ">");
-//                html.append("Legende");
-//                html.append("</h" + (headertiefe + 1) + ">");
-//                html.append("#1 - Medikament abgelaufen<br/>");
-//                html.append("#2 - Packung nicht beschriftet<br/>");
-//                html.append("#3 - Packung beschädigt<br/>");
-//                html.append("#4 - Anbruchsdatum nicht vermerkt<br/>");
-//                html.append("#5 - Medikament ist nicht verordnet<br/>");
-//                html.append("#6 - Mehr als 1 Blister im Anbruch<br/>");
-//                html.append("#7 - Mehr als 1 Tablette geteilt<br/><br/>");
-//
-//                html.append("<table border=\"1\"><tr>" +
-//                        "<th>BewohnerIn</th><th>BestNr</th><th>Präparat</th><th>Anbruch</th><th>#1</th><th>#2</th><th>#3</th><th>#4</th><th>#5</th><th>#6</th><th>#7</th></tr>");
-//                rs.beforeFirst();
-//                while (rs.next()) {
-//                    html.append("<tr>");
-//                    String name = SYSTools.anonymizeBW(rs.getString("Nachname"), rs.getString("Vorname"), rs.getString("BWKennung"), rs.getInt("geschlecht"));
-//                    //String name = rs.getString("BWName");
-//                    String bez = rs.getString("Bezeichnung");
-//                    String zusatz = rs.getString("Zusatz");
-//                    String zubereitung = rs.getString("Zubereitung");
-//                    String anwtext = rs.getString("AnwText");
-//                    //String bestmng = rs.getString("Bestandsmenge");
-//                    long bestid = rs.getLong("BestID");
-//                    Date datum = rs.getDate("Anbruch");
-//                    String praep = bez + SYSTools.catchNull(zusatz, " ", "") + SYSTools.catchNull(zubereitung, ", ", "") + SYSTools.catchNull(anwtext, ", ", "");
-//                    html.append("<td>" + name + "</td>");
-//                    html.append("<td>" + bestid + "</td>");
-//                    html.append("<td>" + praep + "</td>");
-//                    html.append("<td>" + df.format(datum) + "</td>");
-//                    html.append("<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>");
-//                    html.append("</tr>");
-//                }
-//                html.append("</table>");
-//            }
-//
-//        } catch (SQLException sQLException) {
-//            // new DlgException(sQLException);
-//        }
-//        return html.toString();
-//    }
-
 }

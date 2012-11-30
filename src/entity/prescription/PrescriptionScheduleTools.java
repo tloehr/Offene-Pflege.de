@@ -3,6 +3,7 @@ package entity.prescription;
 import op.OPDE;
 import op.tools.HTMLTools;
 import op.tools.SYSCalendar;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import java.math.BigDecimal;
@@ -208,13 +209,13 @@ public class PrescriptionScheduleTools {
         // Handelt es sich hierbei vielleicht um Uhrzeit oder Bedarf ?
         if (planung.verwendetMaximalDosis()) {
             result += "Maximale Tagesdosis: ";
-            result += planung.getMaxAnzahl() + "x " + HTMLTools.printDouble(planung.getMaxEDosis()) + " " + DosageFormTools.EINHEIT[planung.getPrescription().getTradeForm().getDosageForm().getUsageUnit()];
+            result += planung.getMaxAnzahl() + "x " + HTMLTools.printDouble(planung.getMaxEDosis()) + " " + SYSConst.UNITS[planung.getPrescription().getTradeForm().getDosageForm().getUsageUnit()];
             result += "<br/>";
         } else if (planung.verwendetUhrzeit()) {
 
             result += "<b><u>" + DateFormat.getTimeInstance(DateFormat.SHORT).format(planung.getUhrzeit()) + " Uhr</u></b> ";
             result += HTMLTools.printDouble(planung.getUhrzeitDosis());
-            result += planung.getPrescription().hasMed() ? " " + DosageFormTools.EINHEIT[planung.getPrescription().getTradeForm().getDosageForm().getUsageUnit()] : "x";
+            result += planung.getPrescription().hasMed() ? " " + SYSConst.UNITS[planung.getPrescription().getTradeForm().getDosageForm().getUsageUnit()] : "x";
             result += "<br/>";
         }
 

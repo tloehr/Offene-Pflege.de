@@ -939,7 +939,7 @@ public class PnlInventory extends NursingRecordsPanel {
                                 em.lock(em.merge(myStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
                                 em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
                                 myStock.setOpened(new Date());
-                                myStock.setAPV(MedStockTools.getAPV4(myStock));
+                                myStock.setUPR(MedStockTools.calcProspectiveUPR(myStock));
                             }
                             em.getTransaction().commit();
                             int index = lstInventories.indexOf(myStock.getInventory());

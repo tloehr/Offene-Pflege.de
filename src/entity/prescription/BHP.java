@@ -247,7 +247,7 @@ public class BHP implements Serializable, Comparable<BHP> {
         this.state = status;
     }
 
-    public BigDecimal getDosis() {
+    public BigDecimal getDose() {
         return dosis;
     }
 

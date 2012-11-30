@@ -106,8 +106,8 @@ public class DlgCloseStock extends MyJDialog {
         {
             jPanel1.setBorder(null);
             jPanel1.setLayout(new FormLayout(
-                    "14dlu, $lcgap, 145dlu, $lcgap, 41dlu, $lcgap, 93dlu, $lcgap, 14dlu",
-                    "14dlu, $lgap, fill:70dlu:grow, 4*($lgap, fill:default), $lgap, $rgap, $lgap, fill:default, $lgap, $rgap, $lgap, default, $lgap, 14dlu"));
+                "14dlu, $lcgap, 145dlu, $lcgap, 41dlu, $lcgap, 93dlu, $lcgap, 14dlu",
+                "14dlu, $lgap, fill:70dlu:grow, 4*($lgap, fill:default), $lgap, $rgap, $lgap, fill:default, $lgap, $rgap, $lgap, default, $lgap, 14dlu"));
 
             //======== jScrollPane1 ========
             {
@@ -193,11 +193,11 @@ public class DlgCloseStock extends MyJDialog {
             jPanel1.add(rbGefallen, CC.xywh(3, 11, 5, 1));
 
             //---- cmbBestID ----
-            cmbBestID.setModel(new DefaultComboBoxModel(new String[]{
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+            cmbBestID.setModel(new DefaultComboBoxModel(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
             }));
             cmbBestID.setFont(new Font("Arial", Font.PLAIN, 14));
             cmbBestID.addItemListener(new ItemListener() {
@@ -295,11 +295,11 @@ public class DlgCloseStock extends MyJDialog {
         int index = Math.min(2, cmbBestID.getItemCount());
         cmbBestID.setSelectedIndex(index - 1);
 
-        lblEinheiten.setText(DosageFormTools.EINHEIT[medStock.getTradeForm().getDosageForm().getPackUnit()] + " " + OPDE.lang.getString("misc.msg.usedup"));
+        lblEinheiten.setText(SYSConst.UNITS[medStock.getTradeForm().getDosageForm().getPackUnit()] + " " + OPDE.lang.getString("misc.msg.usedup"));
         txtLetzte.setText("");
         txtLetzte.setEnabled(false);
         // Das mit dem Vorabstellen nur bei Formen, die auf Stück basieren also APV = 1
-        rbStellen.setEnabled(medStock.getTradeForm().getDosageForm().getState() == DosageFormTools.APV1);
+        rbStellen.setEnabled(medStock.getTradeForm().getDosageForm().getState() == DosageFormTools.UPR1);
     }
 
     private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed

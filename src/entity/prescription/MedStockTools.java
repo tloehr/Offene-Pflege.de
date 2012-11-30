@@ -17,12 +17,10 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.NumberFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -106,30 +104,11 @@ public class MedStockTools {
 //        BigDecimal apv;
 //        MedBestand result = null;
 //
-//        apv = getAPV4(bestand);
+//        apv = calcProspectiveUPR(bestand);
 //
 //        result = open(em, bestand, apv);
 //
 //        return result;
-//    }
-
-    /**
-     * Bricht einen Bestand an.
-     *
-     * @param stock
-     * @return
-     */
-//    public static void open(MedStock stock, BigDecimal apv) throws Exception {
-//        if (apv == null) {
-//            throw new NullPointerException("apv must not be null");
-//        }
-//
-//        stock.setOpened(new Date());
-//        if (apv.equals(BigDecimal.ZERO)) {
-//            // Das hier verhindert Division by Zero Exceptions.
-//            apv = BigDecimal.ONE;
-//        }
-//        stock.setAPV(apv);
 //    }
 
     public static HashMap getStock4Printing(MedStock bestand) {
@@ -141,7 +120,7 @@ public class MedStockTools {
         String pzn = bestand.getPackage().getPzn() == null ? "??" : bestand.getPackage().getPzn();
         hm.put("bestand.packung.pzn", pzn);
         hm.put("bestand.bestid", bestand.getID());
-        hm.put("bestand.eingang", bestand.getEin());
+        hm.put("bestand.eingang", bestand.getIN());
         hm.put("bestand.userkurz", bestand.getUser().getUID());
         hm.put("bestand.userlang", bestand.getUser().getFullname());
         hm.put("bestand.inventory.bewohnername", ResidentTools.getNameAndFirstname(bestand.getInventory().getResident()));
@@ -159,7 +138,7 @@ public class MedStockTools {
 //        result += SYSPrint.EPL2_labelformat(57, 19, 3);
 //        result += SYSPrint.EPL2_print_ascii(5, 5, 0, SYSPrint.EPL2_FONT_7pt, 1, 1, false, DarreichungTools.toPrettyString(bestand.getTradeForm())); // bestand.getTradeForm().getMedProduct().getText() + " " + bestand.getTradeForm().getSubtext())
 //        if (!SYSTools.catchNull(bestand.getPackage().getPzn()).equals("")) {
-//            result += SYSPrint.EPL2_print_ascii(5, 30, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, "PZN:" + bestand.getPackage().getPzn() + "  Datum:" + DateFormat.getDateInstance().format(bestand.getEin()) + " (" + bestand.getUser().getUID() + ")");
+//            result += SYSPrint.EPL2_print_ascii(5, 30, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, "PZN:" + bestand.getPackage().getPzn() + "  Datum:" + DateFormat.getDateInstance().format(bestand.getIN()) + " (" + bestand.getUser().getUID() + ")");
 //        }
 //
 //        result += SYSPrint.EPL2_print_ascii(5, 55, 0, SYSPrint.EPL2_FONT_12pt, 2, 2, true, Long.toString(bestand.getID()));
@@ -183,9 +162,24 @@ public class MedStockTools {
 
     public static BigDecimal getSum(MedStock bestand) {
         BigDecimal result = BigDecimal.ZERO;
-
         for (MedStockTransaction buchung : bestand.getStockTransaction()) {
             result = result.add(buchung.getAmount());
+        }
+        return result;
+    }
+
+    /**
+     * gets the sum of doses in the BHP (note: this figure is in usage unit)
+     *
+     * @param medStock
+     * @return
+     */
+    public static BigDecimal getSumOfDosesInBHP(MedStock medStock) {
+        BigDecimal result = BigDecimal.ZERO;
+        for (MedStockTransaction tx : medStock.getStockTransaction()) {
+            if (!tx.isPartOfCancelPair() && tx.isBHP()) {
+                result = result.add(tx.getBhp().getDose());
+            }
         }
         return result;
     }
@@ -231,16 +225,14 @@ public class MedStockTools {
         finalTX.setText(text);
         stock.getStockTransaction().add(finalTX);
         stock.setOut(new Date());
+        stock.setUPR(calcEffectiveUPR(stock));
 //        stock.setNextStock(null);
 
         if (stock.hasNext2Open()) {
             MedStock nextStock = stock.getNextStock();
             nextStock.setOpened(new Date());
-            BigDecimal apv = calcAPV(stock);
-            if (apv.equals(BigDecimal.ZERO)) {
-                apv = BigDecimal.ONE;
-            }
-            nextStock.setAPV(apv);
+            BigDecimal upr = calcEffectiveUPR(stock).add(calcProspectiveUPR(stock)).divide(new BigDecimal(2), RoundingMode.HALF_UP);
+            nextStock.setUPR(upr);
 
             OPDE.debug("NextStock: " + stock.getNextStock().getID() + " will be opened now");
         } else {
@@ -250,21 +242,21 @@ public class MedStockTools {
             if (MedInventoryTools.getNextToOpen(stock.getInventory()) == null) {
                 // No ??
                 // Are there any prescriptions that needs to be closed now, because of the empty package ?
-                for (Prescription verordnung : PrescriptionTools.getPrescriptionsByInventory(stock.getInventory())) {
-                    if (verordnung.isTillEndOfPackage()) {
-                        verordnung = em.merge(verordnung);
-                        em.lock(verordnung, LockModeType.OPTIMISTIC);
-                        verordnung.setTo(new Date());
-                        verordnung.setUserOFF(em.merge(OPDE.getLogin().getUser()));
-                        verordnung.setDocOFF(verordnung.getDocON());
-                        verordnung.setHospitalOFF(verordnung.getHospitalON());
+                for (Prescription prescription : PrescriptionTools.getPrescriptionsByInventory(stock.getInventory())) {
+                    if (prescription.isTillEndOfPackage()) {
+                        prescription = em.merge(prescription);
+                        em.lock(prescription, LockModeType.OPTIMISTIC);
+                        prescription.setTo(new Date());
+                        prescription.setUserOFF(em.merge(OPDE.getLogin().getUser()));
+                        prescription.setDocOFF(prescription.getDocON());
+                        prescription.setHospitalOFF(prescription.getHospitalON());
                     }
                 }
             }
         }
     }
 
-    private static MedStockTransaction getAnfangsBuchung(MedStock bestand) {
+    private static MedStockTransaction getStartTX(MedStock bestand) {
         MedStockTransaction result = null;
         for (MedStockTransaction buchung : bestand.getStockTransaction()) {
             if (buchung.getState() == MedStockTransactionTools.STATE_CREDIT) {
@@ -276,69 +268,86 @@ public class MedStockTools {
     }
 
 
-
     /**
-     * @param stock, für den das Verhältnis neu berechnet werden soll.
+     * This method calculates the effective UPR as it transpired during the lifetime of that particular medstock.
+     * It is vital, that this calculation is only done, when a package is empty. Otherwise the estimation
+     * of the UPR is wrong.
+     *
+     * @param medstock, für den das Verhältnis neu berechnet werden soll.
      */
-    public static BigDecimal calcAPV(MedStock stock) throws Exception {
+    public static BigDecimal calcEffectiveUPR(MedStock medstock) throws Exception {
+        if (medstock.getTradeForm().getDosageForm().isUPR1()) {
+            return BigDecimal.ONE;
+        }
+
+        OPDE.debug("<--- calcEffectiveUPR ");
+        OPDE.debug("MedStock ID: " + medstock.getID());
+
+        // this is the amount of content, which was in that package before it was opened
+        // package unit
+        BigDecimal startContent = getStartTX(medstock).getAmount();
+
+        // usage unit
+        BigDecimal sumOfAllAplications = getSumOfDosesInBHP(medstock);
+
+        // Die Gaben aus der BHP sind immer in der Anwendungseinheit. Teilt man diese durch das
+        // verwendete APV, erhält man das was rechnerisch in der Packung drin gewesen
+        // sein soll. Das kann natürlich von dem realen Inhalt abweichen. Klebt noch was an
+        // der Flaschenwand oder wurde was verworfen. Das APV steht ja für Anzahl der Anwendung im
+        // Verhaltnis zur Packungseinheit 1. Wurden 100 Tropfen gegeben, bei einem APV von 20(:1)
+        // Dann ergibt das einen rechnerischen Flascheninhalt von 5 ml.
+
+        // The doses of the applications which have been calculated by the BHPs are always in
+        // the unit of the usage.
+        // When a package is empty, we know two things for sure:
+        // 1. The startContent has been completely used up
+        // 2. the sum of all applications (theoreticalSum) is what we could really get out of the bottle
+        //
+        // hence the effective UPR must have been
+        //
+        //          the startContent in the package unit
+        //          --------------------------------------------
+        //          the sum of all applications in the usage unit
+        //
+        BigDecimal effectiveUPR = startContent.divide(sumOfAllAplications, 4, BigDecimal.ROUND_UP);
+
+        // Nimmt man den realen Inhalt und teil ihn durch den rechnerischen, dann gibt es drei Möglichkeiten
+        // 1. Es wurde mehr gegeben als in der Packung drin war. Dann muss das ursprüngliche APV zu gross gewesen
+        // sein. Die Division von realem Inhalt durch rechnerischem Inhalt ist kleiner 1 und somit wird auch
+        // das apvNeu kleiner als das apvAlt.
+        // 2. Es wurde genau so viel gegeben wie drin war. Dann war das apvAlt genau richtig. Der Divisor ist
+        // dann 1 und apvNeu ist gleich apvAlt.
+        // 3. Es wurde weniger gegeben als drin war. Dann war apvAlt zu klein und der Divisor (real durch rechnerisch) wird größer 0 und
+        // der apvNeu wird größer als der apvAlt.
 
 
-        // TODO: das mit dem calcAPV musst du nochmal durchdenken.
+        BigDecimal newUPR;
+        if (medstock.isReplaceUPR()) {
+            newUPR = effectiveUPR;
+            OPDE.debug("the UPR shall be replaced");
+        } else {
+            // The UPR which was assumed when this stock was stored
+            BigDecimal oldUPR = medstock.getUPR();
 
-        BigDecimal apvNeu = BigDecimal.ONE;
+            // if the deviation was too high (usually more than 20%), then the new UPR is discarded
+            BigDecimal maxDeviation = new BigDecimal(Double.parseDouble(OPDE.getProps().getProperty("apv_korridor"))).divide(BigDecimal.valueOf(100), 4, BigDecimal.ROUND_UP);
+            BigDecimal deviation = oldUPR.divide(effectiveUPR).subtract(new BigDecimal(100)).abs();
 
-        if (!stock.getTradeForm().getDosageForm().isAPV1()) {
-
-            // Menge in der Packung (in der Packungseinheit). Also das, was wirklich in der Packung am Anfang
-            // drin war. Meist das, was auf der Packung steht.
-            BigDecimal inhaltZuBeginn = getAnfangsBuchung(stock).getAmount();
-
-            // Das APV, das bei diesem Bestand angenommen wurde.
-            BigDecimal apvAlt = stock.getAPV();
-
-            // Zur Verhinderung von Division durch 0
-            if (apvAlt.equals(BigDecimal.ZERO)) {
-                apvAlt = BigDecimal.ONE;
-            }
-
-            BigDecimal summeBHPDosis = getSum(stock);
-
-            // Die Gaben aus der BHP sind immer in der Anwendungseinheit. Teilt man diese durch das
-            // verwendete APV, erhält man das was rechnerisch in der Packung drin gewesen
-            // sein soll. Das kann natürlich von dem realen Inhalt abweichen. Klebt noch was an
-            // der Flaschenwand oder wurde was verworfen. Das APV steht ja für Anzahl der Anwendung im
-            // Verhaltnis zur Packungseinheit 1. Wurden 100 Tropfen gegeben, bei einem APV von 20(:1)
-            // Dann ergibt das einen rechnerischen Flascheninhalt von 5 ml.
-            BigDecimal inhaltRechnerisch = summeBHPDosis.divide(apvAlt, 4, BigDecimal.ROUND_UP);
-            // Zur Verhinderung von Division durch 0
-            if (inhaltRechnerisch.equals(BigDecimal.ZERO)) {
-                inhaltRechnerisch = inhaltZuBeginn;
-            }
-
-            // Nimmt man den realen Inhalt und teil ihn durch den rechnerischen, dann gibt es drei Möglichkeiten
-            // 1. Es wurde mehr gegeben als in der Packung drin war. Dann muss das ursprüngliche APV zu gross gewesen
-            // sein. Die Division von realem Inhalt durch rechnerischem Inhalt ist kleiner 1 und somit wird auch
-            // das apvNeu kleiner als das apvAlt.
-            // 2. Es wurde genau so viel gegeben wie drin war. Dann war das apvAlt genau richtig. Der Divisor ist
-            // dann 1 und apvNeu ist gleich apvAlt.
-            // 3. Es wurde weniger gegeben als drin war. Dann war apvAlt zu klein und der Divisor (real durch rechnerisch) wird größer 0 und
-            // der apvNeu wird größer als der apvAlt.
-            apvNeu = inhaltZuBeginn.divide(inhaltRechnerisch, 4, BigDecimal.ROUND_UP).multiply(apvAlt);
-
-
-            // Zu große APV Abweichungen verhindern. Alle außerhalb eines 20% Korridors wird ignoriert.
-            BigDecimal apvkorridor = new BigDecimal(Double.parseDouble(OPDE.getProps().getProperty("apv_korridor"))).divide(BigDecimal.valueOf(100), 4, BigDecimal.ROUND_UP);
-            BigDecimal halbeBreite = apvAlt.multiply(apvkorridor);
-            BigDecimal korridorUnten = apvAlt.subtract(halbeBreite);
-            BigDecimal korridorOben = apvAlt.add(halbeBreite);
+            OPDE.debug("the deviation was: " + deviation);
 
             // Liegt der neue apv AUSSERHALB des maximalen Korridors, so wird er verworfen
-            if (apvAlt.compareTo(korridorUnten) < 0 || korridorOben.compareTo(apvNeu) < 0) {
-                apvNeu = apvAlt;
+            if (deviation.compareTo(maxDeviation) > 0) {
+                newUPR = oldUPR;
+            } else {
+                newUPR = effectiveUPR;
             }
-
         }
-        return apvNeu;
+
+        OPDE.debug("old UPR: " + medstock.getUPR());
+        OPDE.debug("effective UPR: " + effectiveUPR);
+        OPDE.debug("new UPR: " + newUPR);
+        OPDE.debug("calcEffectiveUPR --->");
+        return newUPR.compareTo(BigDecimal.ZERO) > 0 ? newUPR : BigDecimal.ONE;
     }
 
     /**
@@ -353,6 +362,7 @@ public class MedStockTools {
      * @return die Korrektur Buchung
      * @throws Exception
      */
+
     public static MedStockTransaction setStockTo(EntityManager em, MedStock bestand, BigDecimal soll, String text, short status) throws Exception {
         MedStockTransaction result = null;
         bestand = em.merge(bestand);
@@ -379,8 +389,8 @@ public class MedStockTools {
         result += "<font color=\"blue\"><b>" + bestand.getTradeForm().getMedProduct().getBezeichnung() + " " + bestand.getTradeForm().getSubtext() + ", ";
 
         if (!SYSTools.catchNull(bestand.getPackage().getPzn()).equals("")) {
-            result += OPDE.lang.getString("misc.msg.PZN")+ ": " + bestand.getPackage().getPzn() + ", ";
-            result += MedPackageTools.GROESSE[bestand.getPackage().getSize()] + ", " + bestand.getPackage().getContent() + " " + DosageFormTools.EINHEIT[bestand.getTradeForm().getDosageForm().getPackUnit()] + " ";
+            result += OPDE.lang.getString("misc.msg.PZN") + ": " + bestand.getPackage().getPzn() + ", ";
+            result += MedPackageTools.GROESSE[bestand.getPackage().getSize()] + ", " + bestand.getPackage().getContent() + " " + SYSConst.UNITS[bestand.getTradeForm().getDosageForm().getPackUnit()] + " ";
             String zubereitung = SYSTools.catchNull(bestand.getTradeForm().getDosageForm().getPreparation());
             String anwtext = SYSTools.catchNull(bestand.getTradeForm().getDosageForm().getUsageText());
             result += zubereitung.equals("") ? anwtext : (anwtext.equals("") ? zubereitung : zubereitung + ", " + anwtext);
@@ -403,7 +413,7 @@ public class MedStockTools {
             result += ", " + MedPackageTools.toPrettyString(stock.getPackage());
         }
 
-        result += ", APV: " + NumberFormat.getNumberInstance().format(stock.getAPV());
+        result += ", APV: " + NumberFormat.getNumberInstance().format(stock.getUPR()) + " " + (stock.isReplaceUPR() ? "wird bei abschluss ersetzt" : "");
 
         if (stock.hasNext2Open()) {
             result += ", <b>" + OPDE.lang.getString(PnlInventory.internalClassID + ".nextstock") + ": " + stock.getNextStock().getID() + "</b>";
@@ -411,7 +421,7 @@ public class MedStockTools {
 
         DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
 
-        result += "&nbsp;<font color=\"blue\">Eingang: " + df.format(stock.getEin()) + "</font>";
+        result += "&nbsp;<font color=\"blue\">Eingang: " + df.format(stock.getIN()) + "</font>";
         if (stock.isOpened()) {
             result += "&nbsp;<font color=\"green\">Anbruch: " + df.format(stock.getOpened()) + "</font>";
             if (stock.isClosed()) {
@@ -424,7 +434,6 @@ public class MedStockTools {
 
     }
 
-
     public static String getCompactHTML(MedStock stock) {
         String result = "";
         result += "<b>" + stock.getID() + "</b>&nbsp;";
@@ -434,142 +443,80 @@ public class MedStockTools {
             result += ", " + MedPackageTools.toPrettyString(stock.getPackage());
         }
 
-        result += ", APV: " + NumberFormat.getNumberInstance().format(stock.getAPV());
+        result += ", APV: " + NumberFormat.getNumberInstance().format(stock.getUPR()) + " " + (stock.isReplaceUPR() ? "wird bei abschluss ersetzt" : "");
         return result;
     }
 
-
-//    /**
-//     * Setzt für einen Bestand <b>alle</b> Buchungen zurück, bis auf die Anfangsbuchung.
-//     *
-//     * @param bestand
-//     */
-//    public static void zuruecksetzen(MedBestand bestand) {
-//        EntityManager em = OPDE.createEM();
-//        try {
-//            em.getTransaction().begin();
-//            bestand = em.merge(bestand);
-//            em.lock(bestand, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-//            Query query = em.createQuery("DELETE FROM MedStockTransaction b WHERE b.bestand = :bestand AND b.status <> :notStatus ");
-//            query.setParameter("bestand", bestand);
-//            query.setParameter("notStatus", MedStockTransactionTools.STATE_CREDIT);
-//            query.executeUpdate();
-//            em.getTransaction().commit();
-//        } catch (OptimisticLockException ole) {
-//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Wurde zwischenzeitlich von jemand anderem geändert.", DisplayMessage.IMMEDIATELY, OPDE.getErrorMessageTime()));
-//            em.getTransaction().rollback();
-//        } catch (Exception ex) {
-//            if (em.getTransaction().isActive()) {
-//                em.getTransaction().rollback();
-//            }
-//            OPDE.fatal(ex);
-//        } finally {
-//            em.close();
-//        }
-//    }
-
-//    public static boolean hasAbgesetzteBestaende(BHP bhp) {
-//        boolean result = false;
-//
-//        EntityManager em = OPDE.createEM();
-//
-//        try {
-//            Query query = em.createQuery(" " +
-//                    " SELECT b FROM MedBestand b " +
-//                    " JOIN b.buchungen bu " +
-//                    " WHERE bu.bhp = :bhp " +
-//                    " AND b.aus < '9999-12-31 23:59:59'");
-//            query.setParameter("bhp", bhp);
-//            result = !query.getResultList().isEmpty();
-//        } catch (Exception ex) {
-//            OPDE.fatal(ex);
-//        } finally {
-//            em.close();
-//        }
-//        return result;
-//    }
+    public static MedStock getPreviousStock(MedStock fromThisOne) {
+        MedInventory inventory = fromThisOne.getInventory();
+        Collections.sort(inventory.getMedStocks());
+        int index = inventory.getMedStocks().indexOf(fromThisOne);
+        MedStock previous = null;
+        if (index > 0) {
+            previous = inventory.getMedStocks().get(index - 1);
+        }
+        return previous;
+    }
 
     /**
-     * Ermittelt für einen bestimmten Bestand ein passendes APV.
+     * calculates a starting UPR for a newly opened stock
      */
-    public static BigDecimal getAPV4(MedStock stock) {
-
-        BigDecimal apv = BigDecimal.ONE;
-
-        if (stock.getTradeForm().getDosageForm().getState() == DosageFormTools.APV_PER_BW) {
-            apv = getAPV4(stock.getInventory());
-        } else if (stock.getTradeForm().getDosageForm().getState() == DosageFormTools.APV_PER_DAF) {
-            apv = getAPV4(stock.getTradeForm());
+    public static BigDecimal calcProspectiveUPR(MedStock stock) {
+        OPDE.debug("<--- calcProspectiveUPR");
+        OPDE.debug("MedStock ID: " + stock.getID());
+        BigDecimal upr = BigDecimal.ONE;
+        if (stock.getTradeForm().getDosageForm().getState() == DosageFormTools.UPR_BY_RESIDENT) {
+            OPDE.debug("UPR_BY_RESIDENT");
+            upr = calcProspectiveUPR(stock.getInventory());
+        } else if (stock.getTradeForm().getDosageForm().getState() == DosageFormTools.UPR_BY_TRADEFORM) {
+            OPDE.debug("UPR_BY_TRADEFORM");
+            upr = calcProspectiveUPR(stock.getTradeForm());
+        } else {
+            OPDE.debug("UPR1");
         }
-
-        return apv;
+        OPDE.debug("upr: " + upr);
+        OPDE.debug("calcProspectiveUPR --->");
+        return upr;
     }
 
-    public static BigDecimal getAPV4(MedInventory inventory) {
-        BigDecimal apv;
-
-        if (!inventory.getMedStocks().isEmpty()) {
-            apv = BigDecimal.ZERO;
-            for (MedStock bestand : inventory.getMedStocks()) {
-                apv.add(bestand.getAPV());
-            }
-            // Arithmetisches Mittel
-            apv = apv.divide(new BigDecimal(inventory.getMedStocks().size()), BigDecimal.ROUND_UP);
-        } else {
-            apv = BigDecimal.ONE;
+    private static BigDecimal calcProspectiveUPR(MedInventory inventory) {
+        BigDecimal upr = null;
+        EntityManager em = OPDE.createEM();
+        try {
+            Query query = em.createQuery("SELECT AVG(s.upr) FROM MedStock s WHERE s.inventory = :inventory");
+            query.setParameter("inventory", inventory);
+            upr = (BigDecimal) query.getSingleResult();
+        } catch (NoResultException nre) {
+            upr = null;
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        } finally {
+            em.close();
         }
-
-//
-//        EntityManager em = OPDE.createEM();
-//        BigDecimal result = null;
-//
-//        try {
-//            Query query = em.createQuery("SELECT AVG(b.apv) FROM MedBestand b WHERE b.inventory = :inventory");
-//            query.setParameter("inventory", inventory);
-//            result = (BigDecimal) query.getSingleResult();
-//        } catch (NoResultException nre) {
-//            result = BigDecimal.ONE; // Im Zweifel ist das 1
-//        } catch (Exception e) {
-//            OPDE.fatal(e);
-//        } finally {
-//            em.close();
-//        }
-        return apv;
+        return upr;
     }
 
-    public static BigDecimal getAPV4(TradeForm darreichung) {
-
-        BigDecimal apv = null;
-
-        if (!darreichung.getMedStocks().isEmpty()) {
-            apv = BigDecimal.ZERO;
-            for (MedStock bestand : darreichung.getMedStocks()) {
-                apv.add(bestand.getAPV());
-            }
-            // Arithmetisches Mittel
-            apv = apv.divide(new BigDecimal(darreichung.getMedStocks().size()), BigDecimal.ROUND_UP);
-        } else {
-            // Im Zweifel ist das 1
-            apv = BigDecimal.ONE;
+    /**
+     * calculates the average of all
+     *
+     * @param tradeForm
+     * @return
+     */
+    private static BigDecimal calcProspectiveUPR(TradeForm tradeForm) {
+        EntityManager em = OPDE.createEM();
+        BigDecimal upr = null;
+        try {
+            Query query = em.createQuery("SELECT AVG(s.upr) FROM MedStock s WHERE s.tradeform = :tradeform");
+            query.setParameter("tradeform", tradeForm);
+            upr = (BigDecimal) query.getSingleResult();
+        } catch (NoResultException nre) {
+            upr = null;
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        } finally {
+            em.close();
         }
-
-//        EntityManager em = OPDE.createEM();
-//        BigDecimal result = null;
-//
-//
-//
-//        try {
-//            Query query = em.createQuery("SELECT AVG(b.apv) FROM MedBestand b WHERE b.darreichung = :darreichung");
-//            query.setParameter("darreichung", darreichung);
-//            result = (BigDecimal) query.getSingleResult();
-//        } catch (NoResultException nre) {
-//            result = BigDecimal.ONE; // Im Zweifel ist das 1
-//        } catch (Exception e) {
-//            OPDE.fatal(e);
-//        } finally {
-//            em.close();
-//        }
-        return apv;
+        return upr;
     }
 
     public static String getListForMedControl(Station station, Closure progress) {

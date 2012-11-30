@@ -8,6 +8,7 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.prescription.*;
 import op.OPDE;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.HorizontalLayout;
@@ -80,9 +81,9 @@ public class PnlSubtext extends JPanel {
         em.close();
 
         dosageForm = (DosageForm) cmbFormen.getSelectedItem();
-        lblAPV.setVisible(!dosageForm.isAPV1());
-        lblPV.setVisible(!dosageForm.isAPV1());
-        txtA.setVisible(!dosageForm.isAPV1());
+        lblAPV.setVisible(!dosageForm.isUPR1());
+        lblPV.setVisible(!dosageForm.isUPR1());
+        txtA.setVisible(!dosageForm.isUPR1());
 
         tradeForm = new TradeForm(product, "", dosageForm);
         validate.execute(tradeForm);
@@ -123,13 +124,13 @@ public class PnlSubtext extends JPanel {
 
         dosageForm = (DosageForm) cmbFormen.getSelectedItem();
 
-        lblAPV.setVisible(!dosageForm.isAPV1());
-        lblPV.setVisible(!dosageForm.isAPV1());
-        txtA.setVisible(!dosageForm.isAPV1());
+        lblAPV.setVisible(!dosageForm.isUPR1());
+        lblPV.setVisible(!dosageForm.isUPR1());
+        txtA.setVisible(!dosageForm.isUPR1());
 
-        if (!dosageForm.isAPV1()) {
+        if (!dosageForm.isUPR1()) {
             txtA.setText("1");
-            lblPV.setText(" " + dosageForm.getUsageText() + " " + OPDE.lang.getString("misc.msg.equalTo") + " 1 " + DosageFormTools.EINHEIT[dosageForm.getPackUnit()]);
+            lblPV.setText(" " + dosageForm.getUsageText() + " " + OPDE.lang.getString("misc.msg.equalTo") + " 1 " + SYSConst.UNITS[dosageForm.getPackUnit()]);
         }
 
         tradeForm = new TradeForm(product, txtZusatz.getText().trim(), dosageForm);

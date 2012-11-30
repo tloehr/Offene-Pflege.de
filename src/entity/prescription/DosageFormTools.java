@@ -15,11 +15,11 @@ import java.awt.*;
  * To change this template use File | Settings | File Templates.
  */
 public class DosageFormTools {
-    public static final int APV1 = 0;
-    public static final int APV_PER_DAF = 1;
-    public static final int APV_PER_BW = 2;
+    public static final short UPR1 = 0;
+    public static final short UPR_BY_TRADEFORM = 1;
+    public static final short UPR_BY_RESIDENT = 2;
 
-    public static final String EINHEIT[] = {"", "Stück", "ml", "l", "mg", "g", "cm", "m"}; // Für AnwEinheit, PackEinheit, Dimension
+//    public static final String UNIT[] = {"", "Stück", "ml", "l", "mg", "g", "cm", "m"}; // Für AnwEinheit, PackEinheit, Dimension
 
     /**
      * @param maxlen maximale Zeichenlänge pro Zeile. maxlen < 1 heisst egal.
@@ -67,9 +67,9 @@ public class DosageFormTools {
     public static String getPackageText(DosageForm form) {
         String result = "";
         if (SYSTools.catchNull(form.getPreparation()).isEmpty()) {
-            result = EINHEIT[form.getPackUnit()] + " " + form.getUsageText();
+            result = SYSConst.UNITS[form.getPackUnit()] + " " + form.getUsageText();
         } else {
-            result = EINHEIT[form.getPackUnit()] + " " + form.getPreparation();
+            result = SYSConst.UNITS[form.getPackUnit()] + " " + form.getPreparation();
         }
 
         return result;

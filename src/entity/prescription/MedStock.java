@@ -8,7 +8,6 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -80,13 +79,13 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     private String text;
     @Basic(optional = false)
     @Column(name = "APV")
-    private BigDecimal apv;
+    private BigDecimal upr;
 
     public MedStock() {
     }
 
     public MedStock(MedInventory inventory, TradeForm tradeform, MedPackage aPackage, String text) {
-        this.apv = BigDecimal.ONE;
+        this.upr = null;
 
         this.inventory = inventory;
         this.tradeform = tradeform;
@@ -99,18 +98,17 @@ public class MedStock implements Serializable, Comparable<MedStock> {
         this.stockTransaction = new ArrayList<MedStockTransaction>();
 
         this.nextStock = null;
-
     }
 
     public Long getID() {
         return id;
     }
 
-    public Date getEin() {
+    public Date getIN() {
         return in;
     }
 
-    public void setEin(Date ein) {
+    public void setIN(Date ein) {
         this.in = ein;
     }
 
@@ -138,12 +136,39 @@ public class MedStock implements Serializable, Comparable<MedStock> {
         this.text = text;
     }
 
-    public BigDecimal getAPV() {
-        return apv;
+    /**
+     * UPR stands for usage-package-ratio. It denotes the ratio between the unit of the packaging and the unit of the usage.
+     * For instance: a liquid drug is usually delivered in bottles. lets say this bottle contains 20 ml. But the prescription
+     * by the GP is: 20 drops in the evening. Therefore we need to know which ratio to use in order to calculate the amount
+     * of liquid used, when somebody applies 20 drops. How much ml is that ?
+     * As a rule of thumb some of You may have learned, that a watery solution can make 20 drops out of 1 ml. But this
+     * is only a rough approximation. In OPDE the system calculates the average amount of the usage time of a certain
+     * drug. In our example a watery solution would have an UPR of 20.
+     *
+     * Depending on the DosageForm there are three possible ways of handling the UPR.
+     * <ol>
+     *     <li>UPR1 meaning the ratio is exactly ONE. That is the most common case. One entity taken out of the box is calculated exactly as one entity applied to the resident. This ratio is constant.</li>
+     *     <li>UPR_BY_TRADEFORM. DosageForms like drop applied liquids have the same UPR throughout all members of the same tradeform set. The size of a drop does not vary between the several dispensers for the product.</li>
+     *     <li>UPR_BY_RESIDENT is mainly used when we are dealing with ointments. The amount of ointment used per treatment varies greatly according to the specific diagnose or body measures.</li>
+     * </ol>
+     *
+     * The former list is respected during the calculation of the UPRs.
+     *
+     * @return
+     */
+    public BigDecimal getUPR() {
+        if (upr == null){
+            return BigDecimal.ONE;
+        }
+        return upr;
     }
 
-    public void setAPV(BigDecimal apv) {
-        this.apv = apv;
+    public boolean isReplaceUPR(){
+        return upr == null;
+    }
+
+    public void setUPR(BigDecimal upr) {
+        this.upr = upr;
     }
 
     // ==
@@ -267,7 +292,7 @@ public class MedStock implements Serializable, Comparable<MedStock> {
 
     @Override
     public int compareTo(MedStock o) {
-        int result = this.in.compareTo(o.getEin());
+        int result = this.in.compareTo(o.getIN());
         if (result == 0) {
             result = this.id.compareTo(o.getID());
         }

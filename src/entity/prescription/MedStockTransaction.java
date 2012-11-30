@@ -123,6 +123,10 @@ public class MedStockTransaction implements Serializable, Comparable<MedStockTra
         return bhp;
     }
 
+    public boolean isBHP(){
+        return bhp != null;
+    }
+
     public boolean isPartOfCancelPair() {
         return state == MedStockTransactionTools.STATE_CANCEL_REC || state == MedStockTransactionTools.STATE_CANCELLED;
     }

@@ -61,7 +61,7 @@ public class TradeFormTools {
         String text = tradeForm.getMedProduct().getBezeichnung();
         text += subtext.isEmpty() ? "" : " " + subtext;
         text += preparation.isEmpty() ? " " : ", " + preparation + ", ";
-        text += usageText.isEmpty() ? DosageFormTools.EINHEIT[tradeForm.getDosageForm().getUsageUnit()] : usageText;
+        text += usageText.isEmpty() ? SYSConst.UNITS[tradeForm.getDosageForm().getUsageUnit()] : usageText;
         return text;
     }
 
@@ -72,12 +72,12 @@ public class TradeFormTools {
 
         String text = subtext;
         text += preparation.isEmpty() ? " " : " " + preparation + ", ";
-        text += usageText.isEmpty() ? DosageFormTools.EINHEIT[tradeForm.getDosageForm().getUsageUnit()] : usageText;
+        text += usageText.isEmpty() ? SYSConst.UNITS[tradeForm.getDosageForm().getUsageUnit()] : usageText;
         return text;
     }
 
     public static String getPackUnit(TradeForm tradeForm) {
-        return DosageFormTools.EINHEIT[tradeForm.getDosageForm().getPackUnit()];
+        return SYSConst.UNITS[tradeForm.getDosageForm().getPackUnit()];
     }
 
 

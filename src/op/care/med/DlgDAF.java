@@ -59,19 +59,19 @@ public class DlgDAF extends javax.swing.JDialog {
         if (editMode) {
 
 //            //HashMap daf = DBRetrieve.getSingleRecord("MPDarreichung", new String[]{"Zusatz", "FormID"}, "DafID", dafid);
-////            double apv = op.care.med.DBHandling.getAPV4(dafid, "");
+////            double apv = op.care.med.DBHandling.getUPR4(dafid, "");
 ////            long thisFormID = ((BigInteger) daf.get("FormID")).longValue();
 //
-//            apv = APVTools.getAPV4(darreichung);
+//            apv = APVTools.getUPR4(darreichung);
 //            if (apv == null) {
 //                apv = new APV(BigDecimal.ONE, false, null, darreichung);
 //            }
 //
-//            if (darreichung.getDosageForm().getState() == MedFormenTools.APV1) {
+//            if (darreichung.getDosageForm().getState() == MedFormenTools.UPR1) {
 //                txtAPV.setText("1");
 //                txtAPV.setEnabled(false);
 //            } else {
-//                txtAPV.setText(apv.getAPV4().setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+//                txtAPV.setText(apv.getUPR4().setScale(2, BigDecimal.ROUND_HALF_UP).toString());
 //                txtAPV.setEnabled(true);
 //            }
 
@@ -243,7 +243,7 @@ public class DlgDAF extends javax.swing.JDialog {
 //                apv = em.merge(apv);
             } else {
                 em.persist(darreichung);
-//                apv.setTauschen(darreichung.getDosageForm().getState() == MedFormenTools.APV_PER_DAF);
+//                apv.setTauschen(darreichung.getDosageForm().getState() == MedFormenTools.UPR_BY_TRADEFORM);
 //                em.persist(apv);
             }
             em.getTransaction().commit();
@@ -261,8 +261,8 @@ public class DlgDAF extends javax.swing.JDialog {
 //        lblAnw.setText(MedFormenTools.UNITS[form.getUsageUnit()]);
 //        lblPack.setText(MedFormenTools.UNITS[form.getPackUnit()]);
 //        txtAPV.setText("1");
-//        txtAPV.setEnabled(form.getState() != MedFormenTools.APV1);
-//        apv.setAPV(BigDecimal.ONE);
+//        txtAPV.setEnabled(form.getState() != MedFormenTools.UPR1);
+//        apv.setUPR(BigDecimal.ONE);
     }//GEN-LAST:event_cmbFormItemStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

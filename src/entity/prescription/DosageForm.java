@@ -7,16 +7,6 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "MPFormen")
-//@NamedQueries({
-//    @NamedQuery(name = "MedFormen.findAll", query = "SELECT m FROM DosageForm m ORDER BY m.preparation, m.usageText "),
-//    @NamedQuery(name = "MedFormen.findByFormID", query = "SELECT m FROM DosageForm m WHERE m.id = :formID"),
-//    @NamedQuery(name = "MedFormen.findByZubereitung", query = "SELECT m FROM DosageForm m WHERE m.preparation = :zubereitung"),
-//    @NamedQuery(name = "MedFormen.findByAnwText", query = "SELECT m FROM DosageForm m WHERE m.usageText = :anwText"),
-//    @NamedQuery(name = "MedFormen.findByAnwEinheit", query = "SELECT m FROM DosageForm m WHERE m.usageUnit = :anwEinheit"),
-//    @NamedQuery(name = "MedFormen.findByPackEinheit", query = "SELECT m FROM DosageForm m WHERE m.packUnit = :packEinheit"),
-//    @NamedQuery(name = "MedFormen.findByStellplan", query = "SELECT m FROM DosageForm m WHERE m.dailyPlan = :stellplan"),
-//    @NamedQuery(name = "MedFormen.findByStatus", query = "SELECT m FROM DosageForm m WHERE m.state = :status"),
-//    @NamedQuery(name = "MedFormen.findByEquiv", query = "SELECT m FROM DosageForm m WHERE m.sameAs = :equiv")})
 /**
  *
  */
@@ -89,8 +79,9 @@ public class DosageForm implements Serializable {
     public int getSameAs() {
         return equivalent;
     }
-    public boolean isAPV1(){
-        return usageUnit == packUnit;
+
+    public boolean isUPR1(){
+        return state == DosageFormTools.UPR1;
     }
 
     public Intervention getIntervention() {

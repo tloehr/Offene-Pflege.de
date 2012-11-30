@@ -392,7 +392,7 @@ public class PnlBHP extends NursingRecordsPanel {
 
         String title = "<html><font size=+1>" +
                 SYSTools.left(PrescriptionTools.getPrescriptionAsShortText(bhp.getPrescriptionSchedule().getPrescription()), MAX_TEXT_LENGTH) +
-                (bhp.hasMed() ? ", <b>" + SYSTools.getAsHTML(bhp.getDosis()) +
+                (bhp.hasMed() ? ", <b>" + SYSTools.getAsHTML(bhp.getDose()) +
                         " " + DosageFormTools.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
                 BHPTools.getScheduleText(bhp, ", ", "") +
                 (bhp.getUser() != null ? ", <i>" + bhp.getUser().getUID() + "</i>" : "") +
@@ -471,7 +471,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 // TODO: Calc Medi here
                                 if (myBHP.hasMed()) {
                                     MedInventory inventory = TradeFormTools.getInventory4TradeForm(resident, myBHP.getTradeForm());
-                                    MedInventoryTools.takeFrom(em, em.merge(inventory), myBHP.getDosis(), true, myBHP);
+                                    MedInventoryTools.takeFrom(em, em.merge(inventory), myBHP.getDose(), true, myBHP);
                                 }
 
                                 mapBHP2Pane.put(myBHP, createCP4(myBHP));
@@ -633,7 +633,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 if (myBHP.hasMed()) {
                                     MedInventory inventory = TradeFormTools.getInventory4TradeForm(resident, myBHP.getTradeForm());
                                     if (inventory != null) {
-                                        MedInventoryTools.takeFrom(em, em.merge(inventory), myBHP.getDosis(), true, myBHP);
+                                        MedInventoryTools.takeFrom(em, em.merge(inventory), myBHP.getDose(), true, myBHP);
                                     } else {
                                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".NoInventory"));
                                     }

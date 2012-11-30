@@ -98,15 +98,15 @@ public class Misc {
 //
 //                if (formstatus == op.care.med.DBHandling.FORMSTATUS_APV_PER_BW) {
 //                    op.care.med.DBHandling.addAPV(dafid, bwkennung, apvNeu);
-//                    OPDE.info("FormStatus APV_PER_BW. APVneu: " + apvNeu);
+//                    OPDE.info("FormStatus UPR_BY_RESIDENT. APVneu: " + apvNeu);
 //                } else {
 //                    HashMap hm2 = new HashMap();
 //                    hm2.put("BWKennung", new Object[]{"", "="});
 //                    hm2.put("DafID", new Object[]{dafid, "="});
 //                    //boolean tauschen = (Boolean) DBRetrieve.getSingleValue("MPAPV", "Tauschen", hm2);
 //                    hm2.clear();
-//                    op.care.med.DBHandling.setAPV(dafid, (apvAlt + apvNeu) / 2, false); // der DafID APV wird durch den Mittelwert aus altem und neuem APV ersetzt.
-//                    OPDE.info("FormStatus APV_PER_DAF. APValt: " + apvAlt + "  APVneu: " + (apvAlt + apvNeu) / 2);
+//                    op.care.med.DBHandling.setUPR(dafid, (apvAlt + apvNeu) / 2, false); // der DafID APV wird durch den Mittelwert aus altem und neuem APV ersetzt.
+//                    OPDE.info("FormStatus UPR_BY_TRADEFORM. APValt: " + apvAlt + "  APVneu: " + (apvAlt + apvNeu) / 2);
 //                }
 //            } else {
 //                OPDE.debug("inhaltRechnersich = 0, BestID: " + bestid + " DafID: " + dafid);
