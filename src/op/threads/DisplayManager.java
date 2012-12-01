@@ -4,14 +4,11 @@ import entity.system.SyslogTools;
 import op.OPDE;
 import op.tools.FadingLabel;
 import op.tools.SYSConst;
-import op.tools.SYSTools;
 
 import javax.swing.*;
 import java.awt.*;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -36,7 +33,7 @@ public class DisplayManager extends Thread {
     private SwingWorker worker;
     private boolean isIndeterminate = false;
     private JPanel pnlIcons;
-    private JLabel lblBiohazard;
+    private JLabel lblBiohazard, lblDiabetes, lblAllergy, lblWarning;
 
 //    private DateFormat df;
 
@@ -64,8 +61,20 @@ public class DisplayManager extends Thread {
         lblBiohazard = new JLabel(iconbiohazard);
         lblBiohazard.setVisible(false);
         lblBiohazard.setOpaque(false);
+        lblWarning = new JLabel(SYSConst.icon22warning);
+        lblWarning.setVisible(true);
+        lblWarning.setOpaque(false);
+        lblAllergy = new JLabel(SYSConst.icon22allergy);
+        lblAllergy.setVisible(true);
+        lblAllergy.setOpaque(false);
+        lblDiabetes = new JLabel(SYSConst.icon22diabetes);
+        lblDiabetes.setVisible(true);
+        lblDiabetes.setOpaque(false);
 
+        pnlIcons.add(lblWarning);
         pnlIcons.add(lblBiohazard);
+        pnlIcons.add(lblDiabetes);
+        pnlIcons.add(lblAllergy);
 
 //        this.lblDB.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/db.png")));
         lblMain.setText(" ");
@@ -74,13 +83,18 @@ public class DisplayManager extends Thread {
         oldMessages = new ArrayList<DisplayMessage>();
     }
 
-    public void setMainMessage(final String message) {
+    public void setMainMessage(String message) {
+        setMainMessage(message, null);
+    }
+
+    public void setMainMessage(final String message, final String tooltip) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
 //                OPDE.debug("DisplayManager.setMainMessage");
                 lblMain.setText(message);
                 lblMain.setIcon(null);
+                lblMain.setToolTipText(tooltip);
             }
         });
     }
@@ -110,11 +124,12 @@ public class DisplayManager extends Thread {
         });
     }
 
-    public void setIconBiohazard(final boolean visible) {
+    public void setIconBiohazard(final String tooltip) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                lblBiohazard.setVisible(visible);
+                lblBiohazard.setVisible(tooltip != null && !tooltip.isEmpty());
+                lblBiohazard.setToolTipText(tooltip);
             }
         });
     }
@@ -126,6 +141,11 @@ public class DisplayManager extends Thread {
                 lblMain.setIcon(iconaway);
             }
         });
+    }
+
+    public void clearAllIcons() {
+        lblMain.setIcon(null);
+        lblBiohazard.setVisible(false);
     }
 
     public void setProgressBarMessage(DisplayMessage progressBarMessage) {
@@ -193,7 +213,7 @@ public class DisplayManager extends Thread {
             currentSubMessage = nextMessage;
             currentSubMessage.setProcessed(System.currentTimeMillis());
             lblSub.setText(currentSubMessage.getMessage());
-            lblMain.setToolTipText(SYSTools.toHTML(SYSConst.html_div_open + "<b>" + OPDE.lang.getString(internalClassID + ".lastmessage") + ":&nbsp;</b><p>" + DateFormat.getDateTimeInstance().format(new Date()) + "</p><p>" + currentSubMessage.getRawMessage() + "</p>" + SYSConst.html_div_close));
+//            lblMain.setToolTipText(SYSTools.toHTML(SYSConst.html_div_open + "<b>" + OPDE.lang.getString(internalClassID + ".lastmessage") + ":&nbsp;</b><p>" + DateFormat.getDateTimeInstance().format(new Date()) + "</p><p>" + currentSubMessage.getRawMessage() + "</p>" + SYSConst.html_div_close));
             if (currentSubMessage.getPriority() == DisplayMessage.IMMEDIATELY) {
                 SyslogTools.addLog("[" + currentSubMessage.getClassname() + "] " + currentSubMessage.getMessage(), SyslogTools.ERROR);
             }

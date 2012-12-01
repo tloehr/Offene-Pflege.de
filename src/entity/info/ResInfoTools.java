@@ -206,8 +206,8 @@ public class ResInfoTools {
     public static boolean isAway(Resident resident) {
         return absentSince(resident) != null;
     }
-    
-    public static boolean isBiohazard(Resident resident){
+
+    public static boolean isBiohazard(Resident resident) {
         ResInfo biohazard = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_BIOHAZARD));
         return biohazard != null;
     }
@@ -483,26 +483,10 @@ public class ResInfoTools {
     }
 
 
-    public static String getTXReport(Resident resident, boolean withlongheader,
-                                     boolean medi, boolean bilanz, boolean withNReports,
-                                     boolean diag, boolean grundpflege, boolean haut, boolean vital, boolean withHTMLIcons) {
-        //todo: bilanzen, berichte und medis kommen nicht
+    public static String getTXReportHeader(Resident resident, boolean withlongheader) {
+        String result = "";
 
-        /***
-         *      _   _                _
-         *     | | | | ___  __ _  __| | ___ _ __
-         *     | |_| |/ _ \/ _` |/ _` |/ _ \ '__|
-         *     |  _  |  __/ (_| | (_| |  __/ |
-         *     |_| |_|\___|\__,_|\__,_|\___|_|
-         *
-         */
-        String result = "<h1 id=\"fonth1\">Pflegeinformationen</h1>";
-
-        DateFormat df = DateFormat.getDateInstance();
-        if (withlongheader) {
-            result += "<h2 id=\"fonth2\">" + ResidentTools.getLabelText(resident) + "</h2>";
-        }
-        result += "<table id=\"fonttext\"  border=\"1\" cellspacing=\"0\">";
+        result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\">";
 
 //        if (print) {
 //            result += "<tr><td valign=\"top\">Gedruckt:</td><td valign=\"top\"><b>" + df.format(new Date()) + " (" + OPDE.getLogin().getUser().getFullname() + ")</b></td></tr>";
@@ -521,7 +505,6 @@ public class ResInfoTools {
                 result += "<tr><td valign=\"top\">BewohnerIn wohnt im</td><td valign=\"top\"><b>" + HomesTools.getAsText(resident.getStation().getHome()) + "</b></td></tr>";
             }
         }
-
         /***
          *       ____     _   _  ___         ______               _      _     _      ______  __  __ ___
          *      / ___|_ _(_)_(_)/ _ \ ___   / / ___| _____      _(_) ___| |__ | |_   / / __ )|  \/  |_ _|
@@ -535,7 +518,7 @@ public class ResInfoTools {
         if (weight == null) {
             result += "Die/der BW wurde noch nicht gewogen.";
         } else {
-            result += weight.getVal1().toPlainString() + " " + weight.getType().getUnit1() + " (" + df.format(weight.getPit()) + ")";
+            result += weight.getVal1().toPlainString() + " " + weight.getType().getUnit1() + " (" + DateFormat.getDateInstance().format(weight.getPit()) + ")";
         }
         result += "</b></td></tr>";
 
@@ -544,7 +527,7 @@ public class ResInfoTools {
         if (height == null) {
             result += "Bisher wurde noch keine Körpergröße ermittelt.";
         } else {
-            result += height.getVal1().toPlainString() + " " + height.getType().getUnit1() + " (" + df.format(height.getPit()) + ")";
+            result += height.getVal1().toPlainString() + " " + height.getType().getUnit1() + " (" + DateFormat.getDateInstance().format(height.getPit()) + ")";
         }
         result += "</b></td></tr>";
 
@@ -570,7 +553,7 @@ public class ResInfoTools {
         if (bz == null) {
             result += "Bisher kein BZ Wert vorhanden.";
         } else {
-            result += bz.getVal1().toPlainString() + " " + bz.getType().getUnit1() + " (" + df.format(bz.getPit()) + ")";
+            result += bz.getVal1().toPlainString() + " " + bz.getType().getUnit1() + " (" + DateFormat.getDateInstance().format(bz.getPit()) + ")";
         }
         result += "</b></td></tr>";
 
@@ -586,7 +569,7 @@ public class ResInfoTools {
         ResInfo bwinfo_hauf = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByID("HAUF"));
         if (bwinfo_hauf != null) {
             result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.movein") + "</td><td valign=\"top\">";
-            result += "<b>" + df.format(bwinfo_hauf.getFrom()) + "</b>";
+            result += "<b>" + DateFormat.getDateInstance().format(bwinfo_hauf.getFrom()) + "</b>";
             result += "</td></tr>";
         }
 
@@ -673,6 +656,30 @@ public class ResInfoTools {
             result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + resident.getGP().getTel() + ", " + OPDE.lang.getString("misc.msg.fax") + ": " + resident.getGP().getFax();
             result += "</div>";
         }
+        return result;
+    }
+
+
+    public static String getTXReport(Resident resident, boolean withlongheader,
+                                     boolean medi, boolean bilanz, boolean withNReports,
+                                     boolean diag, boolean grundpflege, boolean haut, boolean vital, boolean withHTMLIcons) {
+        /***
+         *      _   _                _
+         *     | | | | ___  __ _  __| | ___ _ __
+         *     | |_| |/ _ \/ _` |/ _` |/ _ \ '__|
+         *     |  _  |  __/ (_| | (_| |  __/ |
+         *     |_| |_|\___|\__,_|\__,_|\___|_|
+         *
+         */
+        String result = "<h1 id=\"fonth1\">Pflegeinformationen</h1>";
+
+        DateFormat df = DateFormat.getDateInstance();
+        if (withlongheader) {
+            result += "<h2 id=\"fonth2\">" + ResidentTools.getLabelText(resident) + "</h2>";
+        }
+
+
+        result += getTXReportHeader(resident, withlongheader);
 
         /***
          *      ____  _

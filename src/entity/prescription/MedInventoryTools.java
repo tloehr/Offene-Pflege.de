@@ -2,6 +2,7 @@ package entity.prescription;
 
 import entity.info.Resident;
 import op.OPDE;
+import op.care.med.inventory.DlgCloseStock;
 import op.care.med.inventory.PnlInventory;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -196,7 +197,7 @@ public class MedInventoryTools {
                     // Es war mehr gewünscht, als die angebrochene Packung hergegeben hat.
                     // Bzw. die Packung wurde mit dieser Gabe geleert.
                     // Dann müssen wird erstmal den alten Bestand abschließen.
-                    MedStockTools.close(em, bestand, "Automatischer Abschluss bei leerer Packung", MedStockTransactionTools.STATE_EDIT_EMPTY_SOON);
+                    MedStockTools.close(em, bestand, OPDE.lang.getString(DlgCloseStock.internalClassID + ".TX.AUTOCLOSED_EMPTY_PACKAGE"), MedStockTransactionTools.STATE_EDIT_EMPTY_SOON);
                 }
 
                 if (wunschmenge.compareTo(entnahme) > 0) { // Sind wir hier fertig, oder müssen wir noch mehr ausbuchen.
@@ -332,7 +333,7 @@ public class MedInventoryTools {
                     MedStock mystock = em.merge(stock);
                     em.lock(mystock, LockModeType.OPTIMISTIC);
                     mystock.setNextStock(null);
-                    MedStockTools.close(em, mystock, OPDE.lang.getString(PnlInventory.internalClassID + ".stock.msg.inventory_closed"), MedStockTransactionTools.STATE_EDIT_INVENTORY_CLOSED);
+                    MedStockTools.close(em, mystock, OPDE.lang.getString(PnlInventory.internalClassID + ".stock.msg.allinvetories.closed"), MedStockTransactionTools.STATE_EDIT_INVENTORY_CLOSED);
                 }
             }
             // close inventory

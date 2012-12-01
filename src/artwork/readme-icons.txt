@@ -22,3 +22,6 @@ Lots of different icons and symbols taken from www.wpclipart.com. This material 
 -- magnify1.png (modification of  http://www.wpclipart.com/tools/magnifying_glass/magnifying_glass_256_T.png)
 -- biohazard.png (http://www.wpclipart.com/smiley/best_smiley_set/smiley_biohazard_T.png)
 -- diabetes.png (modification of http://www.wpclipart.com/medical/anatomy/blood/blood_drop_T.png and http://openclipart.org/detail/169880/pointer-by-frankes)
+-- allergy.png (http://www.wpclipart.com/smiley/assorted_smiley/assorted_3/smiley_sneeze_T.png)
+-- warning.png (http://openclipart.org/detail/48349/warning-sign-by-palomaironique)
+

@@ -789,6 +789,10 @@ public class PnlPrescription extends NursingRecordsPanel {
                                         Prescription myPrescription = em.merge((Prescription) o);
                                         em.lock(myPrescription, LockModeType.OPTIMISTIC);
 
+                                        Query queryDELBHP = em.createQuery("DELETE FROM BHP bhp WHERE bhp.prescription = :prescription");
+                                        queryDELBHP.setParameter("prescription", myPrescription);
+                                        queryDELBHP.executeUpdate();
+
                                         em.getTransaction().commit();
 
                                         lstPrescriptions.remove(prescription);
@@ -854,9 +858,9 @@ public class PnlPrescription extends NursingRecordsPanel {
                                         queryDELBHP.setParameter("prescription", myPrescription);
                                         queryDELBHP.executeUpdate();
 
-                                        if (!myPrescription.isOnDemand()) {
-                                            BHPTools.generate(em, myPrescription.getPrescriptionSchedule(), new DateMidnight(), true);
-                                        }
+//                                        if (!myPrescription.isOnDemand()) {
+                                        BHPTools.generate(em, myPrescription.getPrescriptionSchedule(), new DateMidnight(), true);
+//                                        }
 
                                         em.getTransaction().commit();
 
@@ -933,6 +937,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                                     em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                                     em.lock(myverordnung, LockModeType.OPTIMISTIC);
                                     em.remove(myverordnung);
+
                                     Query delQuery = em.createQuery("DELETE FROM BHP b WHERE b.prescription = :prescription");
                                     delQuery.setParameter("prescription", myverordnung);
                                     delQuery.executeUpdate();

@@ -61,7 +61,6 @@ import op.tools.*;
 import op.users.PnlUser;
 import op.welcome.PnlWelcome;
 import org.apache.commons.collections.Closure;
-import org.jdesktop.swingx.*;
 import org.jdesktop.swingx.VerticalLayout;
 
 import javax.persistence.EntityManager;
@@ -100,7 +99,7 @@ public class FrmMain extends JFrame {
     }
 
     private CleanablePanel currentVisiblePanel;
-    private Resident currentBewohner;
+    private Resident currentResident;
     private JideButton previousProgButton;
     private DlgLogin dlgLogin;
     private LabelStatusBarItem labelUSER;
@@ -118,7 +117,7 @@ public class FrmMain extends JFrame {
         initComponents();
 
         currentVisiblePanel = null;
-        currentBewohner = null;
+        currentResident = null;
         lblWait.setText(OPDE.lang.getString("misc.msg.wait"));
         lblWait.setVisible(false);
 
@@ -126,7 +125,6 @@ public class FrmMain extends JFrame {
 
         if (OPDE.isDebug()) {
             setSize(1366, 768);
-            //setSize(1280, 1024);
         } else {
             this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
@@ -143,7 +141,7 @@ public class FrmMain extends JFrame {
         bwchange = new Closure() {
             @Override
             public void execute(Object o) {
-                currentBewohner = (Resident) o;
+                currentResident = (Resident) o;
             }
         };
 
@@ -462,12 +460,12 @@ public class FrmMain extends JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
 //    private void jtpMainStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jtpMainStateChanged
-////        reloadDisplay(currentBewohner);
+////        reloadDisplay(currentResident);
 //    }//GEN-LAST:event_jtpMainStateChanged
 
     private void btnVerlegungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerlegungActionPerformed
-        if (currentBewohner != null) {
-            SYSFilesTools.print(ResInfoTools.getTXReport(currentBewohner, true, true, true, true, true, true, true, true, true), false);
+        if (currentResident != null) {
+            SYSFilesTools.print(ResInfoTools.getTXReport(currentResident, true, true, true, true, true, true, true, true, true), false);
         } else {
             displayManager.addSubMessage(new DisplayMessage("Bitte wählen Sie zuerst eine(n) BewohnerIn aus.", 5));
         }
@@ -500,12 +498,13 @@ public class FrmMain extends JFrame {
                     previousProgButton.setBackground(Color.WHITE);
                     previousProgButton.setOpaque(false);
                 }
+                currentResident = null;
                 previousProgButton = (JideButton) actionEvent.getSource();
                 previousProgButton.setBackground(Color.YELLOW);
                 previousProgButton.setOpaque(true);
-
                 displayManager.setMainMessage(OPDE.lang.getString(PnlWelcome.internalClassID));
                 displayManager.addSubMessage(new DisplayMessage(OPDE.lang.getString(PnlWelcome.internalClassID + ".longDescription"), 5));
+                displayManager.clearAllIcons();
                 setPanelTo(new PnlWelcome(jspSearch));
             }
         });
@@ -535,7 +534,7 @@ public class FrmMain extends JFrame {
 
     public CleanablePanel loadPanel(String classname) {
         CleanablePanel panel = null;
-        currentBewohner = null;
+        currentResident = null;
         if (classname.equals("op.allowance.PnlAllowance")) {
             panel = new PnlAllowance(jspSearch);
         } else if (classname.equals("op.process.PnlProcess")) {
@@ -600,7 +599,7 @@ public class FrmMain extends JFrame {
             ActionListener actionListener = new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    if (currentBewohner != resident) {
+                    if (currentResident != resident) {
 
                         if (previousProgButton != null) {
                             previousProgButton.setBackground(Color.WHITE);
@@ -611,7 +610,7 @@ public class FrmMain extends JFrame {
                         previousProgButton.setBackground(Color.YELLOW);
                         previousProgButton.setOpaque(true);
 
-                        currentBewohner = resident;
+                        currentResident = resident;
 
 //                        ((NursingRecordsPanel) currentVisiblePanel).switchResident(innerbewohner);
                         if (currentVisiblePanel instanceof PnlCare) {
@@ -650,7 +649,7 @@ public class FrmMain extends JFrame {
 //            previousProgButton.setBackground(Color.WHITE);
 //            previousProgButton.setOpaque(false);
 //        }
-//        currentBewohner = bw;
+//        currentResident = bw;
 //
 //        previousProgButton = bwButtonMap.get(bw);
 //        previousProgButton.setBackground(Color.YELLOW);

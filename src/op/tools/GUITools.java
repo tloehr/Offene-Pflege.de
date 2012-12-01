@@ -3,9 +3,7 @@ package op.tools;
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideButton;
-import entity.info.ResInfoTools;
-import entity.info.Resident;
-import entity.info.ResidentTools;
+import entity.info.*;
 import op.OPDE;
 import op.care.sysfiles.PnlFiles;
 import op.system.FileDrop;
@@ -228,8 +226,11 @@ public class GUITools {
     }
 
     public static void setBWDisplay(Resident resident) {
-        OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(resident));
-        OPDE.getDisplayManager().setIconBiohazard(ResInfoTools.isBiohazard(resident));
+        OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(resident), SYSTools.toHTML(ResInfoTools.getTXReportHeader(resident, false)));
+        // result += getTXReportHeader(resident, withlongheader);
+        ResInfo biohazard = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_BIOHAZARD));
+        OPDE.getDisplayManager().setIconBiohazard(biohazard == null ? null : SYSTools.toHTML(SYSConst.html_div(biohazard.getHtml())));
+
 
         if (ResInfoTools.isAway(resident)) {
             OPDE.getDisplayManager().setIconAway();

@@ -89,12 +89,12 @@ public class ResidentTools {
         return bewohner.getName() + ", " + bewohner.getFirstname() + " [" + bewohner.getRIDAnonymous() + "]";
     }
 
-    public static void setBWLabel(JLabel lblBW, Resident bewohner) {
-        lblBW.setFont(new java.awt.Font("Dialog", 1, 18));
-        lblBW.setHorizontalAlignment(SwingConstants.LEADING);
-        lblBW.setForeground(new java.awt.Color(255, 51, 0));
-        lblBW.setText(getLabelText(bewohner));
-    }
+//    public static void setBWLabel(JLabel lblBW, Resident bewohner) {
+//        lblBW.setFont(new java.awt.Font("Dialog", 1, 18));
+//        lblBW.setHorizontalAlignment(SwingConstants.LEADING);
+//        lblBW.setForeground(new java.awt.Color(255, 51, 0));
+//        lblBW.setText(getLabelText(bewohner));
+//    }
 
     public static String getFullName(Resident bewohner) {
         return ANREDE[bewohner.getGender()] + " " + bewohner.getFirstname() + " " + bewohner.getName();

@@ -210,39 +210,41 @@ public class MedStockTools {
     }
 
     /**
-     * Schliesst einen Bestand ab. Erzeugt dazu direkt eine passende Abschlussbuchung, die den Bestand auf null bringt.
-     * <p/>
+     * This method closes the given MedStock. It forces the current balance to zero by adding a system MedStockTransaction
+     * to the existing list of TXs.
      *
-     * @param stock, der abzuschliessen ist.
-     * @param text,  evtl. gewünschter Text für die Abschlussbuchung
-     * @param state, für die Abschlussbuchung
+     * @param em       persistence context to be used
+     * @param medStock to be closed
+     * @param text     for the closing TX
+     * @param state    of the closing TX
      * @return Falls die Neuberechung gewünscht war, steht hier das geänderte, bzw. neu erstelle APV Objekt. null andernfalls.
      * @throws Exception
      */
-    public static void close(EntityManager em, MedStock stock, String text, short state) throws Exception {
-        BigDecimal stocksum = getSum(stock);
-        MedStockTransaction finalTX = new MedStockTransaction(stock, stocksum.negate(), state);
+    public static void close(EntityManager em, MedStock medStock, String text, short state) throws Exception {
+        BigDecimal stocksum = getSum(medStock);
+        MedStockTransaction finalTX = new MedStockTransaction(medStock, stocksum.negate(), state);
         finalTX.setText(text);
-        stock.getStockTransaction().add(finalTX);
-        stock.setOut(new Date());
-        stock.setUPR(calcEffectiveUPR(stock));
-//        stock.setNextStock(null);
-
-        if (stock.hasNext2Open()) {
-            MedStock nextStock = stock.getNextStock();
+        medStock.getStockTransaction().add(finalTX);
+        medStock.setOut(new Date());
+        medStock.setUPR(calcEffectiveUPR(medStock));
+        if (medStock.hasNext2Open()) {
+            MedStock nextStock = medStock.getNextStock();
             nextStock.setOpened(new Date());
-            BigDecimal upr = calcEffectiveUPR(stock).add(calcProspectiveUPR(stock)).divide(new BigDecimal(2), RoundingMode.HALF_UP);
+            // The new UPR is the arithmetic mean of the old UPRs and the effective UPR for this package.
+            // The prospective UPR uses a SQL AVG function over all persisted entities, therefore the old
+            // UPR for the current medStock is also included, even though we just calculated a new
+            // effective UPR. As we are speaking of an arithmetic mean, this does not have any impact on the whole process.
+            BigDecimal upr = calcEffectiveUPR(medStock).add(calcProspectiveUPR(medStock)).divide(new BigDecimal(2), RoundingMode.HALF_UP);
             nextStock.setUPR(upr);
 
-            OPDE.debug("NextStock: " + stock.getNextStock().getID() + " will be opened now");
+            OPDE.debug("NextStock: " + medStock.getNextStock().getID() + " will be opened now");
         } else {
-
             // Nothing to open next ?
             // Are there still stocks in this inventory ?
-            if (MedInventoryTools.getNextToOpen(stock.getInventory()) == null) {
+            if (MedInventoryTools.getNextToOpen(medStock.getInventory()) == null) {
                 // No ??
                 // Are there any prescriptions that needs to be closed now, because of the empty package ?
-                for (Prescription prescription : PrescriptionTools.getPrescriptionsByInventory(stock.getInventory())) {
+                for (Prescription prescription : PrescriptionTools.getPrescriptionsByInventory(medStock.getInventory())) {
                     if (prescription.isTillEndOfPackage()) {
                         prescription = em.merge(prescription);
                         em.lock(prescription, LockModeType.OPTIMISTIC);

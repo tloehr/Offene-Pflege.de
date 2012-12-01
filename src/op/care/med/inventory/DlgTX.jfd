@@ -17,7 +17,7 @@
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
-        <string>default, linegap, 40dlu, linegap, fill:default, linegap, fill:default, linegap, default</string> 
+        <string>default, linegap, default, linegap, fill:default, linegap, fill:default, linegap, default</string> 
        </void> 
       </object> 
       <void method="add"> 
@@ -56,20 +56,17 @@
        </object> 
       </void> 
       <void method="add"> 
-       <object class="com.jformdesigner.model.FormContainer"> 
-        <string>javax.swing.JScrollPane</string> 
-        <object class="com.jformdesigner.model.FormLayoutManager"> 
-         <class>javax.swing.JScrollPane</class> 
-        </object> 
+       <object class="com.jformdesigner.model.FormComponent"> 
+        <string>javax.swing.JTextField</string> 
         <void property="name"> 
-         <string>scrollPane1</string> 
+         <string>txtText</string> 
         </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JTextArea</string> 
-          <void property="name"> 
-           <string>txtText</string> 
-          </void> 
+        <void method="addEvent"> 
+         <object class="com.jformdesigner.model.FormEvent"> 
+          <string>java.awt.event.ActionListener</string> 
+          <string>actionPerformed</string> 
+          <string>txtTextActionPerformed</string> 
+          <boolean>true</boolean> 
          </object> 
         </void> 
        </object> 
@@ -82,10 +79,6 @@
         <void method="setProperty"> 
          <string>gridY</string> 
          <int>3</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>vAlign</string> 
-         <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
         </void> 
         <void method="setProperty"> 
          <string>gridWidth</string> 
@@ -109,7 +102,7 @@
          <object idref="Font0"/> 
         </void> 
         <void property="name"> 
-         <string>txtMenge</string> 
+         <string>txtValue</string> 
         </void> 
         <void method="addEvent"> 
          <object class="com.jformdesigner.model.FormEvent"> 
@@ -124,6 +117,14 @@
           <string>java.awt.event.FocusListener</string> 
           <string>focusGained</string> 
           <string>txtMengeFocusGained</string> 
+          <boolean>true</boolean> 
+         </object> 
+        </void> 
+        <void method="addEvent"> 
+         <object class="com.jformdesigner.model.FormEvent"> 
+          <string>java.awt.event.ActionListener</string> 
+          <string>actionPerformed</string> 
+          <string>txtValueActionPerformed</string> 
           <boolean>true</boolean> 
          </object> 
         </void> 
@@ -283,7 +284,7 @@
       <void method="setProperty"> 
        <string>size</string> 
        <object class="java.awt.Dimension"> 
-        <int>500</int> 
+        <int>550</int> 
         <int>205</int> 
        </object> 
       </void> 

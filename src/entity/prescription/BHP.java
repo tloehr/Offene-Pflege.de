@@ -137,6 +137,7 @@ public class BHP implements Serializable, Comparable<BHP> {
         this.version = 0l;
         this.nanotime = System.nanoTime();
         this.mdate = new Date();
+        this.dauer = 0;
     }
 
     public BHP(PrescriptionSchedule prescriptionSchedule, Date soll, Byte sZeit, BigDecimal dosis) {
@@ -153,6 +154,7 @@ public class BHP implements Serializable, Comparable<BHP> {
         this.state = BHPTools.STATE_OPEN;
         this.mdate = new Date();
         stockTransaction = new ArrayList<MedStockTransaction>();
+        this.dauer = 0;
     }
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bhp")

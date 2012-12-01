@@ -223,7 +223,7 @@ public class PnlInventory extends NursingRecordsPanel {
         return list;
     }
 
-     private java.util.List<Component> addKey() {
+    private java.util.List<Component> addKey() {
         java.util.List<Component> list = new ArrayList<Component>();
         list.add(new JSeparator());
         list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
@@ -369,9 +369,7 @@ public class PnlInventory extends NursingRecordsPanel {
                 "<tr>" +
 
                 "<td width=\"520\" align=\"left\"><font size=+1>" +
-//                (inventory.isClosed() ? "<s>" : "") +
                 inventory.getText() + "</font></td>" +
-//                (inventory.isClosed() ? "</s>" : "") +
                 "<td width=\"200\" align=\"right\"><font size=+1>" + NumberFormat.getNumberInstance().format(sumInventory) + " " + DosageFormTools.getPackageText(MedInventoryTools.getForm(inventory)) + "</font></td>" +
 
                 "</tr>" +
@@ -766,12 +764,12 @@ public class PnlInventory extends NursingRecordsPanel {
         }
 
         cpStock.setHorizontalAlignment(SwingConstants.LEADING);
-        cpStock.setOpaque(false);
-        cpStock.setBackground(getColor(SYSConst.light3, lstInventories.indexOf(stock.getInventory()) % 2 != 0));
-        cpStock.revalidate();
-        for (Component comp : cpStock.getComponents()) {
-            OPDE.debug(comp.getLocation());
-        }
+//        cpStock.setOpaque(false);
+//        cpStock.setBackground(getColor(SYSConst.light3, lstInventories.indexOf(stock.getInventory()) % 2 != 0));
+////        cpStock.revalidate();
+//        for (Component comp : cpStock.getComponents()) {
+//            OPDE.debug(comp.getLocation());
+//        }
 
         return cpStock;
     }
@@ -855,7 +853,7 @@ public class PnlInventory extends NursingRecordsPanel {
                             em.lock(em.merge(myStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
                             em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
                             myStock.setNextStock(null);
-                            MedStockTools.close(em, myStock, "", MedStockTransactionTools.STATE_EDIT_STOCK_CLOSED);
+                            MedStockTools.close(em, myStock, OPDE.lang.getString(internalClassID + ".stockpanel.STATE_EDIT_STOCK_CLOSED"), MedStockTransactionTools.STATE_EDIT_STOCK_CLOSED);
                             em.getTransaction().commit();
                             int index = lstInventories.indexOf(myStock.getInventory());
                             lstInventories.get(index).getMedStocks().remove(stock);
@@ -987,12 +985,12 @@ public class PnlInventory extends NursingRecordsPanel {
                     if (ignoreEvent) return;
                     if (ie.getStateChange() == ItemEvent.SELECTED) {
                         /***
-                         *       ____ _                                    _
-                         *      / ___| | ___  ___  ___    __ _  __ _  __ _(_)_ __
-                         *     | |   | |/ _ \/ __|/ _ \  / _` |/ _` |/ _` | | '_ \
-                         *     | |___| | (_) \__ \  __/ | (_| | (_| | (_| | | | | |
-                         *      \____|_|\___/|___/\___|  \__,_|\__, |\__,_|_|_| |_|
-                         *                                     |___/
+                         *                      _                                                  _
+                         *      _ __ ___   __ _| | _____   _ __   _____      __   __ _  __ _  __ _(_)_ __
+                         *     | '_ ` _ \ / _` | |/ / _ \ | '_ \ / _ \ \ /\ / /  / _` |/ _` |/ _` | | '_ \
+                         *     | | | | | | (_| |   <  __/ | | | |  __/\ V  V /  | (_| | (_| | (_| | | | | |
+                         *     |_| |_| |_|\__,_|_|\_\___| |_| |_|\___| \_/\_/    \__,_|\__, |\__,_|_|_| |_|
+                         *                                                             |___/
                          */
                         if (!stock.isOpened()) {
                             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".stockpanel.stockIsNotOpen2"));

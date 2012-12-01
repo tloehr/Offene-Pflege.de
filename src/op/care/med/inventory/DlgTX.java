@@ -66,13 +66,21 @@ public class DlgTX extends MyJDialog {
     }
 
     private void txtMengeFocusGained(FocusEvent e) {
-        SYSTools.markAllTxt(txtMenge);
+        SYSTools.markAllTxt(txtValue);
     }
 
     @Override
     public void dispose() {
         super.dispose();
         actionBlock.execute(tx);
+    }
+
+    private void txtTextActionPerformed(ActionEvent e) {
+        txtValue.requestFocus();
+    }
+
+    private void txtValueActionPerformed(ActionEvent e) {
+        txtText.requestFocus();
     }
 
     private void initDialog() {
@@ -87,7 +95,7 @@ public class DlgTX extends MyJDialog {
             packgroesse = BigDecimal.valueOf(Double.MAX_VALUE);
         }
 
-        txtMenge.setText(NumberFormat.getNumberInstance().format(tx.getAmount()));
+        txtValue.setText(NumberFormat.getNumberInstance().format(tx.getAmount()));
         setVisible(true);
     }
 
@@ -100,9 +108,8 @@ public class DlgTX extends MyJDialog {
     // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
     private void initComponents() {
         lblText = new JLabel();
-        scrollPane1 = new JScrollPane();
-        txtText = new JTextArea();
-        txtMenge = new JTextField();
+        txtText = new JTextField();
+        txtValue = new JTextField();
         lblValue = new JLabel();
         lblUnit = new JLabel();
         panel1 = new JPanel();
@@ -112,37 +119,46 @@ public class DlgTX extends MyJDialog {
         //======== this ========
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "default, $lcgap, default, $ugap, 141dlu:grow, $rgap, default, $lcgap, default",
-                "default, $lgap, 40dlu, 2*($lgap, fill:default), $lgap, default"));
+            "default, $lcgap, default, $ugap, 141dlu:grow, $rgap, default, $lcgap, default",
+            "2*(default, $lgap), 2*(fill:default, $lgap), default"));
 
         //---- lblText ----
         lblText.setText("Buchungstext");
         lblText.setFont(new Font("Arial", Font.PLAIN, 14));
         contentPane.add(lblText, CC.xy(3, 3, CC.DEFAULT, CC.TOP));
 
-        //======== scrollPane1 ========
-        {
-            scrollPane1.setViewportView(txtText);
-        }
-        contentPane.add(scrollPane1, CC.xywh(5, 3, 3, 1, CC.DEFAULT, CC.FILL));
+        //---- txtText ----
+        txtText.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                txtTextActionPerformed(e);
+            }
+        });
+        contentPane.add(txtText, CC.xywh(5, 3, 3, 1));
 
-        //---- txtMenge ----
-        txtMenge.setHorizontalAlignment(SwingConstants.RIGHT);
-        txtMenge.setText("jTextField1");
-        txtMenge.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtMenge.addCaretListener(new CaretListener() {
+        //---- txtValue ----
+        txtValue.setHorizontalAlignment(SwingConstants.RIGHT);
+        txtValue.setText("jTextField1");
+        txtValue.setFont(new Font("Arial", Font.PLAIN, 14));
+        txtValue.addCaretListener(new CaretListener() {
             @Override
             public void caretUpdate(CaretEvent e) {
                 txtMengeCaretUpdate(e);
             }
         });
-        txtMenge.addFocusListener(new FocusAdapter() {
+        txtValue.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
                 txtMengeFocusGained(e);
             }
         });
-        contentPane.add(txtMenge, CC.xy(5, 5));
+        txtValue.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                txtValueActionPerformed(e);
+            }
+        });
+        contentPane.add(txtValue, CC.xy(5, 5));
 
         //---- lblValue ----
         lblValue.setText("Menge");
@@ -214,9 +230,8 @@ public class DlgTX extends MyJDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JLabel lblText;
-    private JScrollPane scrollPane1;
-    private JTextArea txtText;
-    private JTextField txtMenge;
+    private JTextField txtText;
+    private JTextField txtValue;
     private JLabel lblValue;
     private JLabel lblUnit;
     private JPanel panel1;

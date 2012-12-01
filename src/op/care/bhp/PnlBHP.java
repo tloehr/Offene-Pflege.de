@@ -104,6 +104,7 @@ public class PnlBHP extends NursingRecordsPanel {
         initPhase = true;
         jdcDatum.setMinSelectableDate(DFNTools.getMinDatum(bewohner));
         jdcDatum.setDate(new Date());
+        jdcDatum.setMaxSelectableDate(new Date());
         initPhase = false;
 
         reloadDisplay();
