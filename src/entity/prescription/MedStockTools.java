@@ -10,6 +10,7 @@ import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
+import org.joda.time.DateTime;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -225,11 +226,12 @@ public class MedStockTools {
         MedStockTransaction finalTX = new MedStockTransaction(medStock, stocksum.negate(), state);
         finalTX.setText(text);
         medStock.getStockTransaction().add(finalTX);
-        medStock.setOut(new Date());
+        DateTime now = new DateTime();
+        medStock.setOut(now.toDate());
         medStock.setUPR(calcEffectiveUPR(medStock));
         if (medStock.hasNext2Open()) {
             MedStock nextStock = medStock.getNextStock();
-            nextStock.setOpened(new Date());
+            nextStock.setOpened(now.plusSeconds(1).toDate());
             // The new UPR is the arithmetic mean of the old UPRs and the effective UPR for this package.
             // The prospective UPR uses a SQL AVG function over all persisted entities, therefore the old
             // UPR for the current medStock is also included, even though we just calculated a new
@@ -245,7 +247,7 @@ public class MedStockTools {
                 // No ??
                 // Are there any prescriptions that needs to be closed now, because of the empty package ?
                 for (Prescription prescription : PrescriptionTools.getPrescriptionsByInventory(medStock.getInventory())) {
-                    if (prescription.isTillEndOfPackage()) {
+                    if (prescription.isUntilEndOfPackage()) {
                         prescription = em.merge(prescription);
                         em.lock(prescription, LockModeType.OPTIMISTIC);
                         prescription.setTo(new Date());

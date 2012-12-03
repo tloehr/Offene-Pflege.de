@@ -559,7 +559,7 @@ public class DlgRegular extends MyJDialog {
         cmbHospitalON.setSelectedItem(prescription.getHospitalON());
         cmbMed.setModel(new DefaultComboBoxModel());
 
-        rbEndOfPackage.setSelected(prescription.isTillEndOfPackage());
+        rbEndOfPackage.setSelected(prescription.isUntilEndOfPackage());
 
         txtBemerkung.setText(SYSTools.catchNull(prescription.getText()));
 
@@ -722,7 +722,7 @@ public class DlgRegular extends MyJDialog {
             prescription.setDocOFF(null);
             prescription.setTo(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
         }
-        prescription.setTillEndOfPackage(rbEndOfPackage.isSelected());
+        prescription.setUntilEndOfPackage(rbEndOfPackage.isSelected());
 
         return true;
     }

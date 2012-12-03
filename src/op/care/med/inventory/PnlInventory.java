@@ -242,6 +242,7 @@ public class PnlInventory extends NursingRecordsPanel {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     new DlgNewStocks(resident);
+                    reload();
                 }
             });
             list.add(buchenButton);

@@ -320,11 +320,11 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         this.docOFF = abDoc;
     }
 
-    public boolean isTillEndOfPackage() {
+    public boolean isUntilEndOfPackage() {
         return toEndOfPackage;
     }
 
-    public void setTillEndOfPackage(boolean tillEndOfPackage) {
+    public void setUntilEndOfPackage(boolean tillEndOfPackage) {
         this.toEndOfPackage = tillEndOfPackage;
     }
 

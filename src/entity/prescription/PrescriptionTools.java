@@ -486,8 +486,8 @@ public class PrescriptionTools {
             MedInventory inventory = TradeFormTools.getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm());
             MedStock stockInUse = MedStockTools.getStockInUse(inventory);
 
-            if (prescription.isTillEndOfPackage()) {
-                result += "nur bis Packungs Ende<br/>";
+            if (prescription.isUntilEndOfPackage()) {
+                result += "<b>"+OPDE.lang.getString("misc.msg.onlyUntilEndOfPackage")+"</b><br/>";
             }
             if (!prescription.isClosed()) {
                 // TODO: Calc Medi here

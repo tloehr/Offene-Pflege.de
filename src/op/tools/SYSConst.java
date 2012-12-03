@@ -67,7 +67,10 @@ public class SYSConst {
     public static String html_22x22_StopSign = "<img src=\"" + OPDE.getOPWD() + "/artwork/22x22/stop.png\" border=\"0\">";
     public static String html_22x22_Eraser = "<img src=\"" + OPDE.getOPWD() + "/artwork/22x22/eraser.png\" border=\"0\">";
     public static String html_22x22_Edited = "<img src=\"" + OPDE.getOPWD() + "/artwork/22x22/edited.png\" border=\"0\">";
-    public static String html_100x100_biohazard = "<img src=\"" + OPDE.getOPWD() + "/artwork/48x48/biohazard.png\" border=\"0\">";
+    public static String html_48x48_biohazard = "<img src=\"" + OPDE.getOPWD() + "/artwork/48x48/biohazard.png\" border=\"0\">";
+    public static String html_48x48_warning = "<img src=\"" + OPDE.getOPWD() + "/artwork/48x48/warning.png\" border=\"0\">";
+    public static String html_48x48_diabetes = "<img src=\"" + OPDE.getOPWD() + "/artwork/48x48/diabetes.png\" border=\"0\">";
+    public static String html_48x48_allergy = "<img src=\"" + OPDE.getOPWD() + "/artwork/48x48/allergy.png\" border=\"0\">";
 
     public static String html_darkgreen = "color=\"#007600\"";
     public static String html_darkred = "color=\"#bd0000\"";
@@ -468,6 +471,7 @@ public class SYSConst {
     public static final Icon icon22changePeriod = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/reload_page.png"));
     public static final Icon icon22changePeriodPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/reload_page_pressed.png"));
     public static final Icon icon22clock = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/clock.png"));
+    public static final Icon icon22clock1 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/clock.png"));
     public static final Icon icon22clockPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/edit3_pressed.png"));
     public static final Icon icon22delete = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/editdelete.png"));
     public static final Icon icon22deletePressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/editdelete_pressed.png"));
@@ -577,6 +581,7 @@ public class SYSConst {
     public static final Icon icon22wizard = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/wizard.png"));
     public static final Icon icon22addrow = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/shetaddrow.png"));
     public static final Icon icon22biohazard = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/biohazard.png"));
+    public static final Icon icon48biohazard = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/biohazard.png"));
     public static final Icon icon22diabetes = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/diabetes.png"));
     public static final Icon icon22warning = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/warning.png"));
     public static final Icon icon22allergy = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/allergy.png"));

@@ -221,14 +221,14 @@ public class MedInventoryTools {
      * @throws Exception
      */
     public static MedStock addTo(MedInventory inventory, MedPackage aPackage, TradeForm darreichung, String text, BigDecimal menge) {
-        MedStock bestand = null;
+        MedStock stock = null;
         if (menge.compareTo(BigDecimal.ZERO) > 0) {
-            bestand = new MedStock(inventory, darreichung, aPackage, text);
-//            bestand.setUPR(MedStockTools.calcProspectiveUPR(bestand));
-            MedStockTransaction buchung = new MedStockTransaction(bestand, menge);
-            bestand.getStockTransaction().add(buchung);
+            stock = new MedStock(inventory, darreichung, aPackage, text);
+            stock.setUPR(MedStockTools.calcProspectiveUPR(stock));
+            MedStockTransaction buchung = new MedStockTransaction(stock, menge);
+            stock.getStockTransaction().add(buchung);
         }
-        return bestand;
+        return stock;
     }
 
 

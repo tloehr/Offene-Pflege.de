@@ -236,6 +236,10 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
         this.userON = user;
     }
 
+    public boolean isCurrentlyValid(){
+        Date now = new Date();
+        return from.compareTo(now) <= 0 && to.compareTo(now) >= 0;
+    }
 
     public Collection<SYSINF2FILE> getAttachedFilesConnections() {
         return attachedFilesConnections;

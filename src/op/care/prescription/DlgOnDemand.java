@@ -836,7 +836,7 @@ public class DlgOnDemand extends MyJDialog {
             prescription.setDocOFF(null);
             prescription.setTo(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
         }
-        prescription.setTillEndOfPackage(false);
+        prescription.setUntilEndOfPackage(false);
 
         prescription.getPrescriptionSchedule().clear();
         prescription.getPrescriptionSchedule().add(schedule);

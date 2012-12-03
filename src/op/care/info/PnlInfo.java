@@ -549,8 +549,8 @@ public class PnlInfo extends NursingRecordsPanel {
         list.add(new JSeparator());
         list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
         list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22stopSign, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22singleIncident, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription3"), SYSConst.icon22intervalByDay, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22clock1, SwingConstants.LEADING));
+//        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription3"), SYSConst.icon22intervalByDay, SwingConstants.LEADING));
         list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription4"), SYSConst.icon22intervalBySecond, SwingConstants.LEADING));
         list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription5"), SYSConst.icon22intervalNoConstraints, SwingConstants.LEADING));
 
@@ -972,16 +972,16 @@ public class PnlInfo extends NursingRecordsPanel {
     private List<Component> addFilters() {
         List<Component> list = new ArrayList<Component>();
 
-        tbInactive = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".inactive"));
-        tbInactive.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (initPhase) return;
-                reloadDisplay();
-            }
-        });
-        tbInactive.setHorizontalAlignment(SwingConstants.LEFT);
-        list.add(tbInactive);
+//        tbInactive = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".inactive"));
+//        tbInactive.addItemListener(new ItemListener() {
+//            @Override
+//            public void itemStateChanged(ItemEvent e) {
+//                if (initPhase) return;
+//                reloadDisplay();
+//            }
+//        });
+//        tbInactive.setHorizontalAlignment(SwingConstants.LEFT);
+//        list.add(tbInactive);
 
         return list;
     }
@@ -990,7 +990,7 @@ public class PnlInfo extends NursingRecordsPanel {
 //        boolean empty = !valuecache.containsKey(type) || valuecache.get(type).isEmpty();
 
         if (type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
-            return SYSConst.icon22singleIncident;
+            return SYSConst.icon22clock1;
         }
         if (type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYDAY) {
             return SYSConst.icon22intervalByDay;

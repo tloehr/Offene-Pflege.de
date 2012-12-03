@@ -142,14 +142,14 @@ public class DlgInfo extends MyJDialog {
         {
             dialogPane.setBorder(Borders.DIALOG_BORDER);
             dialogPane.setLayout(new FormLayout(
-                    "default:grow",
-                    "fill:default:grow, $rgap, fill:default"));
+                "default:grow",
+                "fill:default:grow, $rgap, fill:default"));
 
             //======== contentPanel ========
             {
                 contentPanel.setLayout(new FormLayout(
-                        "default:grow, $lcgap, 133dlu",
-                        "fill:default:grow, $lgap, 90dlu"));
+                    "default:grow, $lcgap, 133dlu",
+                    "fill:default:grow, $lgap, 90dlu"));
             }
             dialogPane.add(contentPanel, CC.xy(1, 1));
 
@@ -552,13 +552,13 @@ public class DlgInfo extends MyJDialog {
                 j.setText(defaultText);
                 content.put(groupname, defaultText);
             }
-            // ---------------------- Trenner --------------------------------
+            // ---------------------- Separators --------------------------------
             if (tagName.equalsIgnoreCase("separator")) {
                 //groupname = attributes.getValue("name");
                 //JLabel jl = new JLabel(new javax.swing.ImageIcon(getClass().getResource(attributes.getValue("image"))));
                 outerpanel.add("p hfill", new JSeparator());
             }
-            // ---------------------- Bildlabels --------------------------------
+            // ---------------------- Imagelabels --------------------------------
             if (tagName.equalsIgnoreCase("imagelabel")) {
                 groupname = attributes.getValue("name");
                 JLabel jl = new JLabel(new javax.swing.ImageIcon(getClass().getResource(attributes.getValue("image"))));

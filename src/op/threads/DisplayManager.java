@@ -62,13 +62,13 @@ public class DisplayManager extends Thread {
         lblBiohazard.setVisible(false);
         lblBiohazard.setOpaque(false);
         lblWarning = new JLabel(SYSConst.icon22warning);
-        lblWarning.setVisible(true);
+        lblWarning.setVisible(false);
         lblWarning.setOpaque(false);
         lblAllergy = new JLabel(SYSConst.icon22allergy);
-        lblAllergy.setVisible(true);
+        lblAllergy.setVisible(false);
         lblAllergy.setOpaque(false);
         lblDiabetes = new JLabel(SYSConst.icon22diabetes);
-        lblDiabetes.setVisible(true);
+        lblDiabetes.setVisible(false);
         lblDiabetes.setOpaque(false);
 
         pnlIcons.add(lblWarning);
@@ -130,6 +130,36 @@ public class DisplayManager extends Thread {
             public void run() {
                 lblBiohazard.setVisible(tooltip != null && !tooltip.isEmpty());
                 lblBiohazard.setToolTipText(tooltip);
+            }
+        });
+    }
+
+    public void setIconWarning(final String tooltip) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                lblWarning.setVisible(tooltip != null && !tooltip.isEmpty());
+                lblWarning.setToolTipText(tooltip);
+            }
+        });
+    }
+
+    public void setIconAllergy(final String tooltip) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                lblAllergy.setVisible(tooltip != null && !tooltip.isEmpty());
+                lblAllergy.setToolTipText(tooltip);
+            }
+        });
+    }
+
+     public void setIconDiabetes(final String tooltip) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                lblDiabetes.setVisible(tooltip != null && !tooltip.isEmpty());
+                lblDiabetes.setToolTipText(tooltip);
             }
         });
     }

@@ -908,18 +908,39 @@ public class ResInfoTools {
         }
 
         /***
-         *      _     _       _                            _
-         *     | |__ (_) ___ | |__   __ _ ______ _ _ __ __| |
-         *     | '_ \| |/ _ \| '_ \ / _` |_  / _` | '__/ _` |
-         *     | |_) | | (_) | | | | (_| |/ / (_| | | | (_| |
-         *     |_.__/|_|\___/|_| |_|\__,_/___\__,_|_|  \__,_|
-         *
+         *      ____                  _       _  __        __               _
+         *     / ___| _ __   ___  ___(_) __ _| | \ \      / /_ _ _ __ _ __ (_)_ __   __ _ ___
+         *     \___ \| '_ \ / _ \/ __| |/ _` | |  \ \ /\ / / _` | '__| '_ \| | '_ \ / _` / __|
+         *      ___) | |_) |  __/ (__| | (_| | |   \ V  V / (_| | |  | | | | | | | | (_| \__ \
+         *     |____/| .__/ \___|\___|_|\__,_|_|    \_/\_/ \__,_|_|  |_| |_|_|_| |_|\__, |___/
+         *           |_|                                                            |___/
          */
         ResInfo biohazard = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_BIOHAZARD));
-        if (biohazard != null) {
+        if (biohazard != null && biohazard.isCurrentlyValid()) {
             result += SYSConst.html_h2("misc.msg.biohazard");
-            result += withHTMLIcons ? SYSConst.html_100x100_biohazard : "";
+            result += withHTMLIcons ? SYSConst.html_48x48_biohazard : "";
             result += getCompactHTML(biohazard);
+        }
+
+        ResInfo diabetes = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_DIABETES));
+        if (diabetes != null && diabetes.isCurrentlyValid()) {
+            result += SYSConst.html_h2("misc.msg.diabetes");
+            result += withHTMLIcons ? SYSConst.html_48x48_diabetes : "";
+            result += getCompactHTML(diabetes);
+        }
+
+        ResInfo warning = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_WARNING));
+        if (warning != null && warning.isCurrentlyValid()) {
+            result += SYSConst.html_h2("misc.msg.warning");
+            result += withHTMLIcons ? SYSConst.html_48x48_warning : "";
+            result += getCompactHTML(warning);
+        }
+
+        ResInfo allergy = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ALLERGY));
+        if (allergy != null && allergy.isCurrentlyValid()) {
+            result += SYSConst.html_h2("misc.msg.allergy");
+            result += withHTMLIcons ? SYSConst.html_48x48_allergy : "";
+            result += getCompactHTML(allergy);
         }
 
         /***
