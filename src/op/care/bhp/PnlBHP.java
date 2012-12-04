@@ -472,7 +472,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 // TODO: Calc Medi here
                                 if (myBHP.hasMed()) {
                                     MedInventory inventory = TradeFormTools.getInventory4TradeForm(resident, myBHP.getTradeForm());
-                                    MedInventoryTools.takeFrom(em, em.merge(inventory), myBHP.getDose(), true, myBHP);
+                                    MedInventoryTools.withdraw(em, em.merge(inventory), myBHP.getDose(), myBHP);
                                 }
 
                                 mapBHP2Pane.put(myBHP, createCP4(myBHP));
@@ -634,7 +634,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 if (myBHP.hasMed()) {
                                     MedInventory inventory = TradeFormTools.getInventory4TradeForm(resident, myBHP.getTradeForm());
                                     if (inventory != null) {
-                                        MedInventoryTools.takeFrom(em, em.merge(inventory), myBHP.getDose(), true, myBHP);
+                                        MedInventoryTools.withdraw(em, em.merge(inventory), myBHP.getDose(), myBHP);
                                     } else {
                                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".NoInventory"));
                                     }

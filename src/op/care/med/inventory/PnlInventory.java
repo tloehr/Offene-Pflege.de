@@ -779,8 +779,8 @@ public class PnlInventory extends NursingRecordsPanel {
      * This inner class is responsible for the three led controls to open, close, reactivate or reclose a given stock.
      */
     private class StockPanel extends JPanel {
-        boolean selRed, selGreen, selYellow;
-        JRadioButton red, green, yellow;
+        boolean selRed, selGreen, selYellow, selOrange;
+        JRadioButton red, green, yellow, orange;
         MedStock stock;
         boolean ignoreEvent = false;
 
@@ -790,6 +790,7 @@ public class PnlInventory extends NursingRecordsPanel {
             final String key = stock.getID() + ".xstock";
             final ButtonGroup bg = new ButtonGroup();
             setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+
             red = new JRadioButton(SYSConst.icon22ledRedOff);
             red.setSelectedIcon(SYSConst.icon22ledRedOn);
             selRed = stock.isClosed();
@@ -800,9 +801,19 @@ public class PnlInventory extends NursingRecordsPanel {
             red.setOpaque(false);
             bg.add(red);
 
+            orange = new JRadioButton(SYSConst.icon22ledOrangeOff);
+            orange.setSelectedIcon(SYSConst.icon22ledOrangeOn);
+            selOrange = stock.isToBeClosedSoon();
+            orange.setSelected(selOrange);
+            orange.setContentAreaFilled(false);
+            orange.setBorderPainted(false);
+            orange.setBorder(null);
+            orange.setOpaque(false);
+            bg.add(orange);
+
             yellow = new JRadioButton(SYSConst.icon22ledYellowOff);
             yellow.setSelectedIcon(SYSConst.icon22ledYellowOn);
-            selYellow = stock.isOpened();
+            selYellow = stock.isOpened() && !stock.isToBeClosedSoon();
             yellow.setSelected(selYellow);
             yellow.setContentAreaFilled(false);
             yellow.setBorderPainted(false);
@@ -855,6 +866,7 @@ public class PnlInventory extends NursingRecordsPanel {
                             em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
                             myStock.setNextStock(null);
                             MedStockTools.close(em, myStock, OPDE.lang.getString(internalClassID + ".stockpanel.STATE_EDIT_STOCK_CLOSED"), MedStockTransactionTools.STATE_EDIT_STOCK_CLOSED);
+                            myStock.setState(MedStockTools.STATE_NOTHING);
                             em.getTransaction().commit();
                             int index = lstInventories.indexOf(myStock.getInventory());
                             lstInventories.get(index).getMedStocks().remove(stock);
@@ -881,6 +893,69 @@ public class PnlInventory extends NursingRecordsPanel {
                         }
 
                         selRed = true;
+                        selOrange = false;
+                        selYellow = false;
+                        selGreen = false;
+                    }
+                }
+            });
+            /***
+             *
+             *       ___  _ __ __ _ _ __   __ _  ___
+             *      / _ \| '__/ _` | '_ \ / _` |/ _ \
+             *     | (_) | | | (_| | | | | (_| |  __/
+             *      \___/|_|  \__,_|_| |_|\__, |\___|
+             *                            |___/
+             */
+            orange.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent ie) {
+                    if (ignoreEvent) return;
+                    if (ie.getStateChange() == ItemEvent.SELECTED) {
+                        if (!stock.isOpened() || stock.isToBeClosedSoon()) {
+                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".stockpanel.stockIsNotOpen1"));
+                            reset();
+                            return;
+                        }
+
+                        MedStock next2BeOpened = MedInventoryTools.getNextToOpen(stock.getInventory());
+
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+                            MedStock myStock = em.merge(stock);
+                            em.lock(myStock, LockModeType.OPTIMISTIC);
+                            em.lock(em.merge(myStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
+                            em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
+                            myStock.setNextStock(next2BeOpened);
+                            myStock.setState(MedStockTools.STATE_WILL_BE_CLOSED_SOON);
+                            em.getTransaction().commit();
+                            int index = lstInventories.indexOf(myStock.getInventory());
+                            lstInventories.get(index).getMedStocks().remove(stock);
+                            lstInventories.get(index).getMedStocks().add(myStock);
+                            contentmap.remove(key);
+                            createCP4(myStock.getInventory());
+                            buildPanel();
+                        } catch (OptimisticLockException ole) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                OPDE.getMainframe().emptyFrame();
+                                OPDE.getMainframe().afterLogin();
+                            }
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
+                        }
+
+                        selRed = false;
+                        selOrange = true;
                         selYellow = false;
                         selGreen = false;
                     }
@@ -899,47 +974,49 @@ public class PnlInventory extends NursingRecordsPanel {
                 public void itemStateChanged(ItemEvent ie) {
                     if (ignoreEvent) return;
                     if (ie.getStateChange() == ItemEvent.SELECTED) {
-                        MedStock openedStock = MedInventoryTools.getCurrentOpened(stock.getInventory());
-                        if (openedStock != null) {
-                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".stockpanel.anotherStockIsOpened"));
-                            reset();
-                            return;
+                        if (!stock.isToBeClosedSoon()) {
+                            MedStock openedStock = MedInventoryTools.getCurrentOpened(stock.getInventory());
+                            if (openedStock != null) {
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".stockpanel.anotherStockIsOpened"));
+                                reset();
+                                return;
+                            }
                         }
 
                         EntityManager em = OPDE.createEM();
                         try {
                             em.getTransaction().begin();
-                            MedStock myStock;
-                            if (stock.isClosed()) {
-                                /***
-                                 *      ____                 _   _            _
-                                 *     |  _ \ ___  __ _  ___| |_(_)_   ____ _| |_ ___
-                                 *     | |_) / _ \/ _` |/ __| __| \ \ / / _` | __/ _ \
-                                 *     |  _ <  __/ (_| | (__| |_| |\ V / (_| | ||  __/
-                                 *     |_| \_\___|\__,_|\___|\__|_| \_/ \__,_|\__\___|
-                                 *
-                                 */
-                                myStock = em.merge(stock);
-                                em.lock(myStock, LockModeType.OPTIMISTIC);
-                                em.lock(em.merge(myStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
-                                em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
-                                myStock.setOut(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
-                            } else {
-                                /***
-                                 *       ___
-                                 *      / _ \ _ __   ___ _ __
-                                 *     | | | | '_ \ / _ \ '_ \
-                                 *     | |_| | |_) |  __/ | | |
-                                 *      \___/| .__/ \___|_| |_|
-                                 *           |_|
-                                 */
-                                myStock = em.merge(stock);
-                                em.lock(myStock, LockModeType.OPTIMISTIC);
-                                em.lock(em.merge(myStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
-                                em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
-                                myStock.setOpened(new Date());
-                                myStock.setUPR(MedStockTools.calcProspectiveUPR(myStock));
+                            MedStock myStock = em.merge(stock);
+                            em.lock(myStock, LockModeType.OPTIMISTIC);
+                            em.lock(em.merge(myStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
+                            em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
+
+                            if (!stock.isToBeClosedSoon()) {
+                                if (stock.isClosed()) {
+                                    /***
+                                     *      ____                 _   _            _
+                                     *     |  _ \ ___  __ _  ___| |_(_)_   ____ _| |_ ___
+                                     *     | |_) / _ \/ _` |/ __| __| \ \ / / _` | __/ _ \
+                                     *     |  _ <  __/ (_| | (__| |_| |\ V / (_| | ||  __/
+                                     *     |_| \_\___|\__,_|\___|\__|_| \_/ \__,_|\__\___|
+                                     *
+                                     */
+                                    myStock.setOut(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+                                } else {
+                                    /***
+                                     *       ___
+                                     *      / _ \ _ __   ___ _ __
+                                     *     | | | | '_ \ / _ \ '_ \
+                                     *     | |_| | |_) |  __/ | | |
+                                     *      \___/| .__/ \___|_| |_|
+                                     *           |_|
+                                     */
+                                    myStock.setOpened(new Date());
+                                    myStock.setUPR(MedStockTools.calcProspectiveUPR(myStock));
+                                }
                             }
+                            myStock.setState(MedStockTools.STATE_NOTHING);
+                            myStock.setNextStock(null);
                             em.getTransaction().commit();
                             int index = lstInventories.indexOf(myStock.getInventory());
                             lstInventories.get(index).getMedStocks().remove(stock);
@@ -967,6 +1044,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
 
                         selRed = false;
+                        selOrange = false;
                         selYellow = true;
                         selGreen = false;
                     }
@@ -1008,6 +1086,7 @@ public class PnlInventory extends NursingRecordsPanel {
                             em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
                             myStock.setOut(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
                             myStock.setOpened(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+                            myStock.setState(MedStockTools.STATE_NOTHING);
                             em.getTransaction().commit();
                             int index = lstInventories.indexOf(myStock.getInventory());
                             lstInventories.get(index).getMedStocks().remove(stock);
@@ -1034,6 +1113,7 @@ public class PnlInventory extends NursingRecordsPanel {
                         }
 
                         selRed = false;
+                        selOrange = false;
                         selYellow = false;
                         selGreen = true;
                     }
@@ -1042,6 +1122,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
             add(green);
             add(yellow);
+            add(orange);
             add(red);
             setOpaque(false);
         }
@@ -1049,6 +1130,7 @@ public class PnlInventory extends NursingRecordsPanel {
         void reset() {
             ignoreEvent = true;
             red.setSelected(selRed);
+            orange.setSelected(selOrange);
             yellow.setSelected(selYellow);
             green.setSelected(selGreen);
             ignoreEvent = false;

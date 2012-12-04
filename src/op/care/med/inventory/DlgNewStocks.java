@@ -486,8 +486,8 @@ public class DlgNewStocks extends MyJDialog {
                 inventory.setText(TradeFormTools.toPrettyString(tradeForm) + "; " + ACMETools.toPrettyStringShort(tradeForm.getMedProduct().getACME()));
             }
 
-            MedStock bestand = em.merge(MedInventoryTools.addTo(inventory, aPackage, tradeForm, txtBemerkung.getText(), menge));
-            inventory.getMedStocks().add(bestand);
+            MedStock newStock = em.merge(MedInventoryTools.addTo(inventory, aPackage, tradeForm, txtBemerkung.getText(), menge));
+            inventory.getMedStocks().add(newStock);
 
             if (MedStockTools.getStockInUse(inventory) == null) {
                 MedInventoryTools.openNext(inventory);
@@ -497,10 +497,10 @@ public class DlgNewStocks extends MyJDialog {
             em.getTransaction().commit();
 
             if (btnPrint.isSelected()) {
-                OPDE.getPrintProcessor().addPrintJob(new PrintListElement(bestand, etiprinter, form1, OPDE.getProps().getProperty("etiprinter1")));
+                OPDE.getPrintProcessor().addPrintJob(new PrintListElement(newStock, etiprinter, form1, OPDE.getProps().getProperty("etiprinter1")));
             }
 
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bestand Nr." + bestand.getID() + " wurde eingebucht", 2));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bestand Nr." + newStock.getID() + " wurde eingebucht", 2));
         } catch (OptimisticLockException ole) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();

@@ -53,7 +53,6 @@ import java.math.BigDecimal;
  */
 public class DlgCloseStock extends MyJDialog {
 
-
     private MedStock medStock;
     private Closure actionBlock;
     public static final String internalClassID = PnlPrescription.internalClassID + ".dlgCloseStock";
@@ -363,6 +362,7 @@ public class DlgCloseStock extends MyJDialog {
             if (rbStellen.isSelected()) {
                 BigDecimal inhalt = new BigDecimal(Double.parseDouble(txtLetzte.getText().replace(",", ".")));
                 MedStockTools.setStockTo(em, myStock, inhalt, OPDE.lang.getString(internalClassID + ".TX.STATE_EDIT_EMPTY_SOON"), MedStockTransactionTools.STATE_EDIT_EMPTY_SOON);
+                myStock.setState(MedStockTools.STATE_WILL_BE_CLOSED_SOON);
                 OPDE.important(OPDE.lang.getString(internalClassID + ".LOG.STATE_EDIT_EMPTY_SOON1") + ": " + inhalt);
             } else {
                 if (rbGefallen.isSelected()) {

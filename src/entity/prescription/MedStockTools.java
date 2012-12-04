@@ -33,13 +33,16 @@ import java.util.*;
 public class MedStockTools {
 //    public static boolean apvNeuberechnung = true;
 
+    public static final int STATE_NOTHING = 0;
+    public static final int STATE_WILL_BE_CLOSED_SOON = 10;
+
     public static ListCellRenderer getBestandOnlyIDRenderer() {
         return new ListCellRenderer() {
             @Override
             public java.awt.Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                 String text;
                 if (o == null) {
-                    text = "<i>Keine Auswahl</i>";//SYSTools.toHTML("<i>Keine Auswahl</i>");
+                    text = "<i>Keine Auswahl</i>"; //SYSTools.toHTML("<i>Keine Auswahl</i>");
                 } else if (o instanceof MedStock) {
                     text = ((MedStock) o).getID().toString();
                 } else {
@@ -193,7 +196,7 @@ public class MedStockTools {
      */
     public static BigDecimal getSum(EntityManager em, MedStock stock) throws Exception {
         BigDecimal result;
-
+        OPDE.debug("BestID: "+stock.getID());
         Query query = em.createQuery(" " +
                 " SELECT SUM(tx.amount) " +
                 " FROM MedStock st " +
@@ -214,30 +217,37 @@ public class MedStockTools {
      * This method closes the given MedStock. It forces the current balance to zero by adding a system MedStockTransaction
      * to the existing list of TXs.
      *
+     * If there is a next package to be used, it will be opened.
+     *
+     * If there are prescription (valid until the end of this package) there will be closed, too, unless
+     * there are still unused packages in this inventory.
+     *
+     *
      * @param em       persistence context to be used
      * @param medStock to be closed
      * @param text     for the closing TX
      * @param state    of the closing TX
-     * @return Falls die Neuberechung gewünscht war, steht hier das geänderte, bzw. neu erstelle APV Objekt. null andernfalls.
+     * @return if there is a nextStock to be opened after this one, it will be returned here. NULL otherwise.
      * @throws Exception
      */
-    public static void close(EntityManager em, MedStock medStock, String text, short state) throws Exception {
+    public static MedStock close(EntityManager em, MedStock medStock, String text, short state) throws Exception {
+        MedStock nextStock = null;
         BigDecimal stocksum = getSum(medStock);
         MedStockTransaction finalTX = new MedStockTransaction(medStock, stocksum.negate(), state);
         finalTX.setText(text);
         medStock.getStockTransaction().add(finalTX);
+        medStock.setState(MedStockTools.STATE_NOTHING);
         DateTime now = new DateTime();
         medStock.setOut(now.toDate());
-        medStock.setUPR(calcEffectiveUPR(medStock));
+
         if (medStock.hasNext2Open()) {
-            MedStock nextStock = medStock.getNextStock();
+            nextStock = medStock.getNextStock();
             nextStock.setOpened(now.plusSeconds(1).toDate());
             // The new UPR is the arithmetic mean of the old UPRs and the effective UPR for this package.
             // The prospective UPR uses a SQL AVG function over all persisted entities, therefore the old
             // UPR for the current medStock is also included, even though we just calculated a new
             // effective UPR. As we are speaking of an arithmetic mean, this does not have any impact on the whole process.
-            BigDecimal upr = calcEffectiveUPR(medStock).add(calcProspectiveUPR(medStock)).divide(new BigDecimal(2), RoundingMode.HALF_UP);
-            nextStock.setUPR(upr);
+            nextStock.setUPR(medStock.getTradeForm().getDosageForm().isUPR1() ? BigDecimal.ONE : calcEffectiveUPR(medStock).add(calcProspectiveUPR(medStock)).divide(new BigDecimal(2), RoundingMode.HALF_UP));
 
             OPDE.debug("NextStock: " + medStock.getNextStock().getID() + " will be opened now");
         } else {
@@ -258,6 +268,7 @@ public class MedStockTools {
                 }
             }
         }
+        return nextStock;
     }
 
     private static MedStockTransaction getStartTX(MedStock bestand) {
@@ -417,10 +428,12 @@ public class MedStockTools {
             result += ", " + MedPackageTools.toPrettyString(stock.getPackage());
         }
 
-        result += ", APV: " + NumberFormat.getNumberInstance().format(stock.getUPR()) + " " + (stock.isReplaceUPR() ? "wird bei abschluss ersetzt" : "");
+        result += ", APV: " + NumberFormat.getNumberInstance().format(stock.getUPR()) + " " + (stock.isReplaceUPR() ? OPDE.lang.getString(PnlInventory.internalClassID+".UPRwillBeReplaced") : "");
 
         if (stock.hasNext2Open()) {
             result += ", <b>" + OPDE.lang.getString(PnlInventory.internalClassID + ".nextstock") + ": " + stock.getNextStock().getID() + "</b>";
+        } else if (stock.isToBeClosedSoon()) {
+            result += ", <b>" + OPDE.lang.getString(PnlInventory.internalClassID + ".stockWillBeClosedSoon") + "</b>";
         }
 
         DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);

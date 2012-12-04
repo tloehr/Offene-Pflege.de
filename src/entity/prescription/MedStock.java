@@ -80,6 +80,9 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     @Basic(optional = false)
     @Column(name = "APV")
     private BigDecimal upr;
+    @Basic(optional = false)
+    @Column(name = "state")
+    private Integer state;
 
     public MedStock() {
     }
@@ -96,7 +99,7 @@ public class MedStock implements Serializable, Comparable<MedStock> {
         this.out = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
         this.user = OPDE.getLogin().getUser();
         this.stockTransaction = new ArrayList<MedStockTransaction>();
-
+        this.state = MedStockTools.STATE_NOTHING;
         this.nextStock = null;
     }
 
@@ -112,8 +115,20 @@ public class MedStock implements Serializable, Comparable<MedStock> {
         this.in = ein;
     }
 
+    public Integer getState() {
+        return state;
+    }
+
+    public void setState(Integer state) {
+        this.state = state;
+    }
+
     public Date getOpened() {
         return opened;
+    }
+
+    public boolean isToBeClosedSoon(){
+        return state == MedStockTools.STATE_WILL_BE_CLOSED_SOON;
     }
 
     public void setOpened(Date anbruch) {
@@ -252,16 +267,13 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     }
 
     public boolean isNew() {
-        return !isOpened() && !isClosed();
+        return opened.equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE) && out.equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
     }
 
     public boolean isOpened() {
-        return opened.before(SYSConst.DATE_UNTIL_FURTHER_NOTICE) && !isClosed();
+        return opened.before(SYSConst.DATE_UNTIL_FURTHER_NOTICE) && out.equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
     }
 
-    /*
-    * <b>tested:</b> Test0002
-    */
     public boolean isClosed() {
         return out.before(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
     }

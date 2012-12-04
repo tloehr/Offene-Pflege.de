@@ -1003,7 +1003,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                     });
                 }
             });
-            btnCloseStock.setEnabled(inventory != null && stockInUse != null);
+            btnCloseStock.setEnabled(inventory != null && stockInUse != null && !stockInUse.isToBeClosedSoon());
             pnlMenu.add(btnCloseStock);
 
             /***
