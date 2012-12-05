@@ -16,7 +16,6 @@ import java.awt.*;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 
@@ -115,7 +114,7 @@ public class MedInventoryTools {
         MedStock stock = MedStockTools.getStockInUse(inventory);
 
         if (!stock.getTradeForm().getDosageForm().isUPR1()){
-            quantity = quantity.divide(stock.getUPR(), 4, BigDecimal.ROUND_UP);
+            quantity = quantity.divide(UPRTools.getUPR(stock).getUpr(), 4, BigDecimal.ROUND_UP);
         }
 
         OPDE.debug("withdraw/5: menge: " + quantity);
@@ -139,7 +138,8 @@ public class MedInventoryTools {
         for (MedStock medStock : list) {
             if (medStock.getOut().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE) && medStock.getOpened().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE)) {
                 medStock.setOpened(new Date());
-                medStock.setUPR(MedStockTools.calcProspectiveUPR(medStock));
+                // TODO:HERE
+//                medStock.setUPR(UPRTools.getUPR(UPRTools.getEstimatedUPR(medStock)));
                 result = medStock;
                 break;
             }
@@ -282,7 +282,8 @@ public class MedInventoryTools {
         MedStock stock = null;
         if (menge.compareTo(BigDecimal.ZERO) > 0) {
             stock = new MedStock(inventory, darreichung, aPackage, text);
-            stock.setUPR(MedStockTools.calcProspectiveUPR(stock));
+            //TODO: HERE
+//            stock.setUPR(UPRTools.getUPR(UPRTools.getEstimatedUPR(stock)));
             MedStockTransaction buchung = new MedStockTransaction(stock, menge);
             stock.getStockTransaction().add(buchung);
         }

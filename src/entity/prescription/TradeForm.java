@@ -73,6 +73,7 @@ public class TradeForm implements Serializable {
     @ManyToOne
     private DosageForm dosageForm;
 
+
     public MedProducts getMedProduct() {
         return medProduct;
     }

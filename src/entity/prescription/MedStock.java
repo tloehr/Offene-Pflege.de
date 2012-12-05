@@ -77,9 +77,9 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     private Date out;
     @Column(name = "Text")
     private String text;
-    @Basic(optional = false)
-    @Column(name = "APV")
-    private BigDecimal upr;
+//    @Basic(optional = false)
+//    @Column(name = "APV")
+//    private BigDecimal upr;
     @Basic(optional = false)
     @Column(name = "state")
     private Integer state;
@@ -88,8 +88,7 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     }
 
     public MedStock(MedInventory inventory, TradeForm tradeform, MedPackage aPackage, String text) {
-        this.upr = null;
-
+//        this.upr = BigDecimal.ONE; // This one will always change, when the package is opened.
         this.inventory = inventory;
         this.tradeform = tradeform;
         this.aPackage = aPackage;
@@ -151,40 +150,19 @@ public class MedStock implements Serializable, Comparable<MedStock> {
         this.text = text;
     }
 
-    /**
-     * UPR stands for usage-package-ratio. It denotes the ratio between the unit of the packaging and the unit of the usage.
-     * For instance: a liquid drug is usually delivered in bottles. lets say this bottle contains 20 ml. But the prescription
-     * by the GP is: 20 drops in the evening. Therefore we need to know which ratio to use in order to calculate the amount
-     * of liquid used, when somebody applies 20 drops. How much ml is that ?
-     * As a rule of thumb some of You may have learned, that a watery solution can make 20 drops out of 1 ml. But this
-     * is only a rough approximation. In OPDE the system calculates the average amount of the usage time of a certain
-     * drug. In our example a watery solution would have an UPR of 20.
-     *
-     * Depending on the DosageForm there are three possible ways of handling the UPR.
-     * <ol>
-     *     <li>UPR1 meaning the ratio is exactly ONE. That is the most common case. One entity taken out of the box is calculated exactly as one entity applied to the resident. This ratio is constant.</li>
-     *     <li>UPR_BY_TRADEFORM. DosageForms like drop applied liquids have the same UPR throughout all members of the same tradeform set. The size of a drop does not vary between the several dispensers for the product.</li>
-     *     <li>UPR_BY_RESIDENT is mainly used when we are dealing with ointments. The amount of ointment used per treatment varies greatly according to the specific diagnose or body measures.</li>
-     * </ol>
-     *
-     * The former list is respected during the calculation of the UPRs.
-     *
-     * @return
-     */
-    public BigDecimal getUPR() {
-        if (upr == null){
-            return BigDecimal.ONE;
-        }
-        return upr;
-    }
-
-    public boolean isReplaceUPR(){
-        return upr == null;
-    }
-
-    public void setUPR(BigDecimal upr) {
-        this.upr = upr;
-    }
+//    /**
+//     * This is the UPR as it was used from the beginning of this stock throughout its lifetime.
+//     * It does not change automatically anymore. Only by manual intervention.
+//     *
+//     * @return
+//     */
+//    public BigDecimal getUPR() {
+//        return upr;
+//    }
+//
+//    public void setUPR(BigDecimal upr) {
+//        this.upr = upr;
+//    }
 
     // ==
     // 1:1 Relationen
@@ -216,6 +194,13 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     @ManyToOne
     private Users user;
 
+    @JoinColumn(name = "BestID", referencedColumnName = "StockID")
+    @OneToOne
+    private UPR upr;
+
+    public UPR getUPR() {
+        return upr;
+    }
 
     public Users getUser() {
         return user;

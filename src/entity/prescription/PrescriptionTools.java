@@ -506,15 +506,16 @@ public class PrescriptionTools {
                     }
 
                     if (invSum != null && invSum.compareTo(BigDecimal.ZERO) > 0) {
+                        UPR uprInUse =  UPRTools.getUPR(stockInUse);
                         result += "<b><u>Vorrat:</u> <font color=\"green\">" + invSum.setScale(2, BigDecimal.ROUND_UP) + " " +
                                 SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getPackUnit()] +
                                 "</font></b>";
                         if (!stockInUse.getTradeForm().getDosageForm().isUPR1()) {
-                            BigDecimal anwmenge = invSum.multiply(stockInUse.getUPR());
+                            BigDecimal anwmenge = invSum.multiply(uprInUse.getUpr());
 
                             result += " <i>entspricht " + anwmenge.setScale(2, BigDecimal.ROUND_UP) + " " +
                                     DosageFormTools.getUsageText(stockInUse.getTradeForm().getDosageForm());
-                            result += " (bei einem APV von " + stockInUse.getUPR().setScale(2, BigDecimal.ROUND_UP) + " zu 1)";
+                            result += " (bei einem APV von " + uprInUse.getUpr().setScale(2, BigDecimal.ROUND_UP) + " zu 1)";
                             result += "</i>";
                         }
 
@@ -524,7 +525,7 @@ public class PrescriptionTools {
                             result += "<br/>Restmenge im Anbruch: <b><font color=\"green\">" + stockSum.setScale(2, BigDecimal.ROUND_UP) + " " +
                                     SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getPackUnit()] + "</font></b>";
                             if (!stockInUse.getTradeForm().getDosageForm().isUPR1()) {
-                                BigDecimal usage = stockSum.multiply(stockInUse.getUPR());
+                                BigDecimal usage = stockSum.multiply(uprInUse.getUpr());
 
                                 result += " <i>entspricht " + usage.setScale(2, BigDecimal.ROUND_UP) + " " +
                                         DosageFormTools.getUsageText(stockInUse.getTradeForm().getDosageForm()) + "</i>";

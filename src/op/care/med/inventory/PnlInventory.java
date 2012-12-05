@@ -1012,7 +1012,8 @@ public class PnlInventory extends NursingRecordsPanel {
                                      *           |_|
                                      */
                                     myStock.setOpened(new Date());
-                                    myStock.setUPR(MedStockTools.calcProspectiveUPR(myStock));
+                                    // TODO: HERE
+//                                    myStock.setUPR(UPRTools.getUPR(UPRTools.getEstimatedUPR(myStock)));
                                 }
                             }
                             myStock.setState(MedStockTools.STATE_NOTHING);
@@ -1086,6 +1087,8 @@ public class PnlInventory extends NursingRecordsPanel {
                             em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
                             myStock.setOut(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
                             myStock.setOpened(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+// TODO: HERE
+//                            myStock.setUPR(BigDecimal.ONE);
                             myStock.setState(MedStockTools.STATE_NOTHING);
                             em.getTransaction().commit();
                             int index = lstInventories.indexOf(myStock.getInventory());

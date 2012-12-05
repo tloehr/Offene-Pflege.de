@@ -18,7 +18,6 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.*;
@@ -108,7 +107,7 @@ public class MedStockTools {
 //        BigDecimal apv;
 //        MedBestand result = null;
 //
-//        apv = calcProspectiveUPR(bestand);
+//        apv = getEstimatedUPR(bestand);
 //
 //        result = open(em, bestand, apv);
 //
@@ -196,7 +195,7 @@ public class MedStockTools {
      */
     public static BigDecimal getSum(EntityManager em, MedStock stock) throws Exception {
         BigDecimal result;
-        OPDE.debug("BestID: "+stock.getID());
+        OPDE.debug("BestID: " + stock.getID());
         Query query = em.createQuery(" " +
                 " SELECT SUM(tx.amount) " +
                 " FROM MedStock st " +
@@ -216,12 +215,11 @@ public class MedStockTools {
     /**
      * This method closes the given MedStock. It forces the current balance to zero by adding a system MedStockTransaction
      * to the existing list of TXs.
-     *
+     * <p/>
      * If there is a next package to be used, it will be opened.
-     *
+     * <p/>
      * If there are prescription (valid until the end of this package) there will be closed, too, unless
      * there are still unused packages in this inventory.
-     *
      *
      * @param em       persistence context to be used
      * @param medStock to be closed
@@ -247,7 +245,9 @@ public class MedStockTools {
             // The prospective UPR uses a SQL AVG function over all persisted entities, therefore the old
             // UPR for the current medStock is also included, even though we just calculated a new
             // effective UPR. As we are speaking of an arithmetic mean, this does not have any impact on the whole process.
-            nextStock.setUPR(medStock.getTradeForm().getDosageForm().isUPR1() ? BigDecimal.ONE : calcEffectiveUPR(medStock).add(calcProspectiveUPR(medStock)).divide(new BigDecimal(2), RoundingMode.HALF_UP));
+
+            //TODO: HERE
+//            nextStock.setUPR(UPRTools.getUPR(UPRTools.recalculateUPR(medStock)));
 
             OPDE.debug("NextStock: " + medStock.getNextStock().getID() + " will be opened now");
         } else {
@@ -271,7 +271,7 @@ public class MedStockTools {
         return nextStock;
     }
 
-    private static MedStockTransaction getStartTX(MedStock bestand) {
+    public static MedStockTransaction getStartTX(MedStock bestand) {
         MedStockTransaction result = null;
         for (MedStockTransaction buchung : bestand.getStockTransaction()) {
             if (buchung.getState() == MedStockTransactionTools.STATE_CREDIT) {
@@ -282,88 +282,6 @@ public class MedStockTools {
         return result;
     }
 
-
-    /**
-     * This method calculates the effective UPR as it transpired during the lifetime of that particular medstock.
-     * It is vital, that this calculation is only done, when a package is empty. Otherwise the estimation
-     * of the UPR is wrong.
-     *
-     * @param medstock, für den das Verhältnis neu berechnet werden soll.
-     */
-    public static BigDecimal calcEffectiveUPR(MedStock medstock) throws Exception {
-        if (medstock.getTradeForm().getDosageForm().isUPR1()) {
-            return BigDecimal.ONE;
-        }
-
-        OPDE.debug("<--- calcEffectiveUPR ");
-        OPDE.debug("MedStock ID: " + medstock.getID());
-
-        // this is the amount of content, which was in that package before it was opened
-        // package unit
-        BigDecimal startContent = getStartTX(medstock).getAmount();
-
-        // usage unit
-        BigDecimal sumOfAllAplications = getSumOfDosesInBHP(medstock);
-
-        // Die Gaben aus der BHP sind immer in der Anwendungseinheit. Teilt man diese durch das
-        // verwendete APV, erhält man das was rechnerisch in der Packung drin gewesen
-        // sein soll. Das kann natürlich von dem realen Inhalt abweichen. Klebt noch was an
-        // der Flaschenwand oder wurde was verworfen. Das APV steht ja für Anzahl der Anwendung im
-        // Verhaltnis zur Packungseinheit 1. Wurden 100 Tropfen gegeben, bei einem APV von 20(:1)
-        // Dann ergibt das einen rechnerischen Flascheninhalt von 5 ml.
-
-        // The doses of the applications which have been calculated by the BHPs are always in
-        // the unit of the usage.
-        // When a package is empty, we know two things for sure:
-        // 1. The startContent has been completely used up
-        // 2. the sum of all applications (theoreticalSum) is what we could really get out of the bottle
-        //
-        // hence the effective UPR must have been
-        //
-        //          the startContent in the package unit
-        //          --------------------------------------------
-        //          the sum of all applications in the usage unit
-        //
-        BigDecimal effectiveUPR = startContent.divide(sumOfAllAplications, 4, BigDecimal.ROUND_UP);
-
-        // Nimmt man den realen Inhalt und teil ihn durch den rechnerischen, dann gibt es drei Möglichkeiten
-        // 1. Es wurde mehr gegeben als in der Packung drin war. Dann muss das ursprüngliche APV zu gross gewesen
-        // sein. Die Division von realem Inhalt durch rechnerischem Inhalt ist kleiner 1 und somit wird auch
-        // das apvNeu kleiner als das apvAlt.
-        // 2. Es wurde genau so viel gegeben wie drin war. Dann war das apvAlt genau richtig. Der Divisor ist
-        // dann 1 und apvNeu ist gleich apvAlt.
-        // 3. Es wurde weniger gegeben als drin war. Dann war apvAlt zu klein und der Divisor (real durch rechnerisch) wird größer 0 und
-        // der apvNeu wird größer als der apvAlt.
-
-
-        BigDecimal newUPR;
-        if (medstock.isReplaceUPR()) {
-            newUPR = effectiveUPR;
-            OPDE.debug("the UPR shall be replaced");
-        } else {
-            // The UPR which was assumed when this stock was stored
-            BigDecimal oldUPR = medstock.getUPR();
-
-            // if the deviation was too high (usually more than 20%), then the new UPR is discarded
-            BigDecimal maxDeviation = new BigDecimal(Double.parseDouble(OPDE.getProps().getProperty("apv_korridor"))).divide(BigDecimal.valueOf(100), 4, BigDecimal.ROUND_UP);
-            BigDecimal deviation = oldUPR.divide(effectiveUPR).subtract(new BigDecimal(100)).abs();
-
-            OPDE.debug("the deviation was: " + deviation);
-
-            // Liegt der neue apv AUSSERHALB des maximalen Korridors, so wird er verworfen
-            if (deviation.compareTo(maxDeviation) > 0) {
-                newUPR = oldUPR;
-            } else {
-                newUPR = effectiveUPR;
-            }
-        }
-
-        OPDE.debug("old UPR: " + medstock.getUPR());
-        OPDE.debug("effective UPR: " + effectiveUPR);
-        OPDE.debug("new UPR: " + newUPR);
-        OPDE.debug("calcEffectiveUPR --->");
-        return newUPR.compareTo(BigDecimal.ZERO) > 0 ? newUPR : BigDecimal.ONE;
-    }
 
     /**
      * Diese Methode bucht auf einen Bestand immer genau soviel drauf oder runter, damit er auf
@@ -428,7 +346,7 @@ public class MedStockTools {
             result += ", " + MedPackageTools.toPrettyString(stock.getPackage());
         }
 
-        result += ", APV: " + NumberFormat.getNumberInstance().format(stock.getUPR()) + " " + (stock.isReplaceUPR() ? OPDE.lang.getString(PnlInventory.internalClassID+".UPRwillBeReplaced") : "");
+        result += ", APV: " + NumberFormat.getNumberInstance().format(UPRTools.getUPR(stock.getUPR())) + " " + (UPRTools.isDummyUPR(stock) ? OPDE.lang.getString(PnlInventory.internalClassID + ".UPRwillBeReplaced") : "");
 
         if (stock.hasNext2Open()) {
             result += ", <b>" + OPDE.lang.getString(PnlInventory.internalClassID + ".nextstock") + ": " + stock.getNextStock().getID() + "</b>";
@@ -459,9 +377,16 @@ public class MedStockTools {
         if (stock.hasPackage()) {
             result += ", " + MedPackageTools.toPrettyString(stock.getPackage());
         }
-
-        result += ", APV: " + NumberFormat.getNumberInstance().format(stock.getUPR()) + " " + (stock.isReplaceUPR() ? "wird bei abschluss ersetzt" : "");
+       result += ", APV: " + NumberFormat.getNumberInstance().format(UPRTools.getUPR(stock.getUPR())) + " " + (UPRTools.isDummyUPR(stock) ? OPDE.lang.getString(PnlInventory.internalClassID + ".UPRwillBeReplaced") : "");
         return result;
+    }
+
+    public static void open(EntityManager em, MedStock stock) {
+        MedStock myStock = em.merge(stock);
+        myStock.setOpened(new Date());
+        if (!myStock.getTradeForm().getDosageForm().isUPR1()){
+            myStock.getUPR().setUpr(UPRTools.getEstimatedUPR(stock));
+        }
     }
 
     public static MedStock getPreviousStock(MedStock fromThisOne) {
@@ -473,67 +398,6 @@ public class MedStockTools {
             previous = inventory.getMedStocks().get(index - 1);
         }
         return previous;
-    }
-
-    /**
-     * calculates a starting UPR for a newly opened stock
-     */
-    public static BigDecimal calcProspectiveUPR(MedStock stock) {
-        OPDE.debug("<--- calcProspectiveUPR");
-        OPDE.debug("MedStock ID: " + stock.getID());
-        BigDecimal upr = BigDecimal.ONE;
-        if (stock.getTradeForm().getDosageForm().getState() == DosageFormTools.UPR_BY_RESIDENT) {
-            OPDE.debug("UPR_BY_RESIDENT");
-            upr = calcProspectiveUPR(stock.getInventory());
-        } else if (stock.getTradeForm().getDosageForm().getState() == DosageFormTools.UPR_BY_TRADEFORM) {
-            OPDE.debug("UPR_BY_TRADEFORM");
-            upr = calcProspectiveUPR(stock.getTradeForm());
-        } else {
-            OPDE.debug("UPR1");
-        }
-        OPDE.debug("upr: " + upr);
-        OPDE.debug("calcProspectiveUPR --->");
-        return upr;
-    }
-
-    private static BigDecimal calcProspectiveUPR(MedInventory inventory) {
-        BigDecimal upr = null;
-        EntityManager em = OPDE.createEM();
-        try {
-            Query query = em.createQuery("SELECT AVG(s.upr) FROM MedStock s WHERE s.inventory = :inventory");
-            query.setParameter("inventory", inventory);
-            upr = (BigDecimal) query.getSingleResult();
-        } catch (NoResultException nre) {
-            upr = null;
-        } catch (Exception e) {
-            OPDE.fatal(e);
-        } finally {
-            em.close();
-        }
-        return upr;
-    }
-
-    /**
-     * calculates the average of all
-     *
-     * @param tradeForm
-     * @return
-     */
-    private static BigDecimal calcProspectiveUPR(TradeForm tradeForm) {
-        EntityManager em = OPDE.createEM();
-        BigDecimal upr = null;
-        try {
-            Query query = em.createQuery("SELECT AVG(s.upr) FROM MedStock s WHERE s.tradeform = :tradeform");
-            query.setParameter("tradeform", tradeForm);
-            upr = (BigDecimal) query.getSingleResult();
-        } catch (NoResultException nre) {
-            upr = null;
-        } catch (Exception e) {
-            OPDE.fatal(e);
-        } finally {
-            em.close();
-        }
-        return upr;
     }
 
     public static String getListForMedControl(Station station, Closure progress) {

@@ -165,11 +165,8 @@ public class DlgOpenStock extends MyJDialog {
                 em.lock(em.merge(medStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
 
                 medStock.setOpened(new Date());
-                BigDecimal apv = MedStockTools.calcEffectiveUPR(medStock);
-                if (apv.equals(BigDecimal.ZERO)) {
-                    apv = BigDecimal.ONE;
-                }
-                medStock.setUPR(apv);
+                // TODO: HERE
+//                medStock.setUPR(UPRTools.getUPR(UPRTools.recalculateUPR(medStock)));
 
                 em.getTransaction().commit();
             } catch (javax.persistence.OptimisticLockException ole) {

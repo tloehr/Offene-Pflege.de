@@ -62,6 +62,7 @@ public class DosageForm implements Serializable {
      * Da kann man festlegen, was auf dem Plan zusammenstehen soll.
      * Z.B. für Tropfen oder so. 1 sind hier Tropfen, 2 Spritzen. Der Fantasie sind keine Grenzen gesetzt.
      * Die Vorlage ist so eingestellt, dass alles über 0 grau hinterlegt wird.
+     *
      * @return
      */
     public short getDailyPlan() {
@@ -80,8 +81,16 @@ public class DosageForm implements Serializable {
         return equivalent;
     }
 
-    public boolean isUPR1(){
+    public boolean isUPR1() {
         return state == DosageFormTools.UPR1;
+    }
+
+    public boolean isUPRbyResident() {
+        return state == DosageFormTools.UPR_BY_RESIDENT;
+    }
+
+    public boolean isUPRbyTradeForm() {
+        return state == DosageFormTools.UPR_BY_TRADEFORM;
     }
 
     public Intervention getIntervention() {
