@@ -13,46 +13,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "MPBestand")
-//@NamedQueries({
-//        @NamedQuery(name = "MedStock.findAll", query = "SELECT m FROM MedStock m"),
-//        @NamedQuery(name = "MedStock.findByBestID", query = "SELECT m FROM MedStock m WHERE m.id = :bestID"),
-//        @NamedQuery(name = "MedStock.findByEin", query = "SELECT m FROM MedStock m WHERE m.in = :ein"),
-//        @NamedQuery(name = "MedStock.findByAnbruch", query = "SELECT m FROM MedStock m WHERE m.opened = :anbruch"),
-//        @NamedQuery(name = "MedStock.findByAus", query = "SELECT m FROM MedStock m WHERE m.out = :aus"),
-//        @NamedQuery(name = "MedStock.findByText", query = "SELECT m FROM MedStock m WHERE m.text = :text"),
-//        @NamedQuery(name = "MedStock.findByApv", query = "SELECT m FROM MedStock m WHERE m.apv = :apv"),
-//        @NamedQuery(name = "MedStock.findByDarreichungAndBewohnerImAnbruch", query = " " +
-//                " SELECT b FROM MedStock b WHERE b.inventory.resident = :bewohner AND b.tradeform = :darreichung " +
-//                " AND b.opened < '9999-12-31 23:59:59' AND b.out = '9999-12-31 23:59:59'"),
-//        @NamedQuery(name = "MedStock.findByVorratImAnbruch", query = " " +
-//                " SELECT b FROM MedStock b WHERE b.inventory = :vorrat " +
-//                " AND b.opened < '9999-12-31 23:59:59' AND b.out = '9999-12-31 23:59:59'"),
-//        @NamedQuery(name = "MedStock.findByBewohnerImAnbruchMitSalden", query = " " +
-//                " SELECT best, SUM(buch.amount) FROM MedStock best" +
-//                " JOIN best.stockTransaction buch" +
-//                " WHERE best.inventory.resident = :bewohner AND best.out = '9999-12-31 23:59:59' " +
-//                " AND best.opened < '9999-12-31 23:59:59' " +
-//                " GROUP BY best ")
-//})
-//
-//@NamedNativeQueries({
-//        // Das hier ist eine Liste aller Verordnungen eines Bewohners.
-//        // Durch Joins werden die zugehörigen Vorräte und aktuellen Bestände
-//        // beigefügt.
-//        @NamedNativeQuery(name = "MedStock.findByVorratMitRestsumme", query = " " +
-//                " SELECT best.BestID, sum.saldo " +
-//                " FROM MPBestand best " +
-//                " LEFT OUTER JOIN " +
-//                "      ( " +
-//                "        SELECT best.BestID, sum(buch.Menge) saldo FROM MPBestand best " +
-//                "        INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
-//                "        WHERE best.VorID=? " + // Diese Zeile ist eigentlich nicht nötig. Beschleunigt aber ungemein.
-//                "        GROUP BY best.BestID " +
-//                "      ) sum ON sum.BestID = best.BestID " +
-//                " WHERE best.VorID = ? " +
-//                " AND ( ? = 1 OR best.Aus = '9999-12-31 23:59:59' ) " +
-//                " ORDER BY best.ein, best.anbruch ")
-//})
 
 public class MedStock implements Serializable, Comparable<MedStock> {
     private static final long serialVersionUID = 1L;
@@ -77,18 +37,26 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     private Date out;
     @Column(name = "Text")
     private String text;
-//    @Basic(optional = false)
-//    @Column(name = "APV")
-//    private BigDecimal upr;
     @Basic(optional = false)
     @Column(name = "state")
     private Integer state;
+    @Basic(optional = false)
+    @Column(name = "UPR")
+    private BigDecimal upr;
+    @Basic(optional = false)
+    @Column(name = "UPReff")
+    private BigDecimal uprEffective;
+    @Basic(optional = false)
+    @Column(name = "DummyUPR")
+    private Boolean uprDummy;
 
     public MedStock() {
     }
 
-    public MedStock(MedInventory inventory, TradeForm tradeform, MedPackage aPackage, String text) {
-//        this.upr = BigDecimal.ONE; // This one will always change, when the package is opened.
+    public MedStock(MedInventory inventory, TradeForm tradeform, MedPackage aPackage, String text, BigDecimal upr) {
+        this.upr = upr == null ? BigDecimal.ONE : upr;
+        this.uprEffective = this.upr;
+        this.uprDummy = upr == null;
         this.inventory = inventory;
         this.tradeform = tradeform;
         this.aPackage = aPackage;
@@ -126,7 +94,7 @@ public class MedStock implements Serializable, Comparable<MedStock> {
         return opened;
     }
 
-    public boolean isToBeClosedSoon(){
+    public boolean isToBeClosedSoon() {
         return state == MedStockTools.STATE_WILL_BE_CLOSED_SOON;
     }
 
@@ -150,19 +118,39 @@ public class MedStock implements Serializable, Comparable<MedStock> {
         this.text = text;
     }
 
-//    /**
-//     * This is the UPR as it was used from the beginning of this stock throughout its lifetime.
-//     * It does not change automatically anymore. Only by manual intervention.
-//     *
-//     * @return
-//     */
-//    public BigDecimal getUPR() {
-//        return upr;
-//    }
-//
-//    public void setUPR(BigDecimal upr) {
-//        this.upr = upr;
-//    }
+    public BigDecimal getUPR() {
+        return upr;
+    }
+
+    public void setUPR(BigDecimal upr) {
+        this.uprEffective = upr;
+
+        if (uprDummy) {
+            this.upr = upr;
+            this.uprDummy = false;
+            return;
+        }
+
+        // if the deviation was too high (usually more than 20%), then the new UPR is discarded
+        BigDecimal maxDeviation = new BigDecimal(Double.parseDouble(OPDE.getProps().getProperty("apv_korridor")));
+        BigDecimal deviation = getUPR().divide(upr, 4, BigDecimal.ROUND_HALF_UP).subtract(new BigDecimal(100)).abs();
+        OPDE.debug("the deviation was: " + deviation + "%");
+
+        // if the deviation is below the limit, then the new UPR will be accepted.
+        // it must also be greater than 0
+        if (deviation.compareTo(maxDeviation) <= 0 && upr.compareTo(BigDecimal.ZERO) > 0) {
+            this.upr = upr;
+            this.uprDummy = false;
+        }
+    }
+
+    public BigDecimal getUPREffective() {
+        return uprEffective;
+    }
+
+    public boolean isDummyUPR() {
+        return uprDummy;
+    }
 
     // ==
     // 1:1 Relationen
@@ -193,14 +181,6 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
     private Users user;
-
-    @JoinColumn(name = "BestID", referencedColumnName = "StockID")
-    @OneToOne
-    private UPR upr;
-
-    public UPR getUPR() {
-        return upr;
-    }
 
     public Users getUser() {
         return user;

@@ -165,8 +165,6 @@ public class DlgOpenStock extends MyJDialog {
                 em.lock(em.merge(medStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
 
                 medStock.setOpened(new Date());
-                // TODO: HERE
-//                medStock.setUPR(UPRTools.getUPR(UPRTools.recalculateUPR(medStock)));
 
                 em.getTransaction().commit();
             } catch (javax.persistence.OptimisticLockException ole) {

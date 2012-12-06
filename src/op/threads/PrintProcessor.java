@@ -42,7 +42,7 @@ public class PrintProcessor extends Thread {
 
     public PrintProcessor() {
         super();
-        preparedPrintJobs = new HashMap<String,ArrayList<PrintListElement>>();
+        preparedPrintJobs = new HashMap<String, ArrayList<PrintListElement>>();
         setName("PrintProcessor");
         interrupted = false;
         printQueue = new ArrayList();
@@ -88,7 +88,7 @@ public class PrintProcessor extends Thread {
                             OPDE.getPrinters().print(getPrintableObject(thisElement), thisElement.getPrintername(), DocFlavor.SERVICE_FORMATTED.PRINTABLE);
 
 //                            pb.setValue(progressbar);
-                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage("Drucke Nr. " + progressbar, progressbar, printQueue.size()));
+                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.printing") + " " + OPDE.lang.getString("misc.msg.number") + " " + progressbar, progressbar, printQueue.size()));
 //                            OPDE.debug("Drucke Nr. " + progressbar);
                             progressbar++;
 
@@ -119,9 +119,14 @@ public class PrintProcessor extends Thread {
                             printjob = printerType.getReset();
 
                             for (PrintListElement printListElement : printListElements) {
-                                printjob += getPrintableObject(printListElement);
+                                Object printableObject = getPrintableObject(printListElement);
+                                if (printableObject != null) {
+                                    printjob += getPrintableObject(printListElement);
+                                } else {
+                                    OPDE.error("invalid printer object. can't print a NULL value. please check printers.xml for typos");
+                                }
 
-                                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage("Drucke Nr. " + progressbar, progressbar, printQueue.size()));
+                                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.printing") + " " + OPDE.lang.getString("misc.msg.number") + " " + progressbar, progressbar, printQueue.size()));
 
                                 progressbar++;
 
@@ -134,7 +139,7 @@ public class PrintProcessor extends Thread {
                                 encoded = printjob.getBytes(printerType.getEncoding());
                                 OPDE.getPrinters().print(encoded, printername, flavor);
 
-                                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage("Drucke Nr. " + progressbar, progressbar, printQueue.size()));
+                                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.printing") + " " + OPDE.lang.getString("misc.msg.number") + " " + progressbar, progressbar, printQueue.size()));
 
                                 progressbar++;
 
@@ -160,12 +165,13 @@ public class PrintProcessor extends Thread {
         Object printableObject = null;
         if (element.getObject() instanceof MedStock) {
             MedStock bestand = (MedStock) element.getObject();
-            OPDE.debug("PrintProcessor druckt BestID: " + bestand.getID());
+            OPDE.debug("PrintProcessor prints StockID: " + bestand.getID());
 //            if (element.getPrinter().isPageprinter()) {
 //                printableObject = new TKLabel(VorratTools.getVorrat4Printing(inventory));
 //            } else {
 //                printableObject = element.getForm().getForm(VorratTools.getVorrat4Printing(inventory));
 //            }
+
             printableObject = element.getForm().getFormtext(MedStockTools.getStock4Printing(bestand));
         }
         return printableObject;

@@ -127,6 +127,7 @@ public class PnlPackage extends JPanel {
             //---- txtInhalt ----
             txtInhalt.setFont(new Font("Arial", Font.PLAIN, 14));
             txtInhalt.setColumns(10);
+            txtInhalt.setHorizontalAlignment(SwingConstants.TRAILING);
             txtInhalt.addCaretListener(new CaretListener() {
                 @Override
                 public void caretUpdate(CaretEvent e) {

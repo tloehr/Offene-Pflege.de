@@ -621,28 +621,6 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
     @Override
     public String toString() {
         return "Prescription{" +
-                "verid=" + id +
-                ", version=" + version +
-                ", anDatum=" + from +
-                ", abDatum=" + to +
-                ", bisPackEnde=" + toEndOfPackage +
-                ", verKennung=" + relation +
-                ", bemerkung='" + text + '\'' +
-                ", stellplan=" + showOnDailyPlan +
-                ", attachedFiles=" + attachedFilesConnections +
-                ", attachedVorgaenge=" + attachedProcessConnections +
-                ", pSchedule=" + pSchedule +
-                ", bhps=" + bhps +
-                ", angesetztDurch=" + userON +
-                ", abgesetztDurch=" + userOFF +
-                ", resident=" + resident +
-                ", massnahme=" + intervention +
-                ", tradeform=" + tradeform +
-                ", situation=" + situation +
-                ", anKH=" + hospitalON +
-                ", abKH=" + hospitalOFF +
-                ", anArzt=" + docON +
-                ", abArzt=" + docOFF +
-                '}';
+                "verid=" + id ;
     }
 }

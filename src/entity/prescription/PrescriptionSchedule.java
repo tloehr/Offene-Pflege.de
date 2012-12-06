@@ -12,35 +12,7 @@ import java.util.GregorianCalendar;
 
 @Entity
 @Table(name = "BHPPlanung")
-//@NamedQueries({
-//        @NamedQuery(name = "PrescriptionSchedule.findAll", query = "SELECT b FROM PrescriptionSchedule b"),
-//        @NamedQuery(name = "PrescriptionSchedule.findByBhppid", query = "SELECT b FROM PrescriptionSchedule b WHERE b.bhppid = :bhppid"),
-//        @NamedQuery(name = "PrescriptionSchedule.findByNachtMo", query = "SELECT b FROM PrescriptionSchedule b WHERE b.nachtMo = :nachtMo"),
-//        @NamedQuery(name = "PrescriptionSchedule.findByMorgens", query = "SELECT b FROM PrescriptionSchedule b WHERE b.morgens = :morgens"),
-//        @NamedQuery(name = "PrescriptionSchedule.findByMittags", query = "SELECT b FROM PrescriptionSchedule b WHERE b.mittags = :mittags"),
-//        @NamedQuery(name = "PrescriptionSchedule.findByNachmittags", query = "SELECT b FROM PrescriptionSchedule b WHERE b.nachmittags = :nachmittags"),
-//        @NamedQuery(name = "PrescriptionSchedule.findByAbends", query = "SELECT b FROM PrescriptionSchedule b WHERE b.abends = :abends"),
-//        @NamedQuery(name = "PrescriptionSchedule.findByNachtAb", query = "SELECT b FROM PrescriptionSchedule b WHERE b.nachtAb = :nachtAb"),
-//        @NamedQuery(name = "PrescriptionSchedule.findByUhrzeitDosis", query = "SELECT b FROM PrescriptionSchedule b WHERE b.uhrzeitDosis = :uhrzeitDosis"),
-//        @NamedQuery(name = "PrescriptionSchedule.findByUhrzeit", query = "SELECT b FROM PrescriptionSchedule b WHERE b.uhrzeit = :uhrzeit"),
-//        @NamedQuery(name = "PrescriptionSchedule.findByMaxAnzahl", query = "SELECT b FROM PrescriptionSchedule b WHERE b.maxAnzahl = :maxAnzahl"),
-//        @NamedQuery(name = "PrescriptionSchedule.findByMaxEDosis", query = "SELECT b FROM PrescriptionSchedule b WHERE b.maxEDosis = :maxEDosis"),
-//        @NamedQuery(name = "PrescriptionSchedule.findByTaeglich", query = "SELECT b FROM PrescriptionSchedule b WHERE b.taeglich = :taeglich"),
-//        @NamedQuery(name = "PrescriptionSchedule.findByWoechentlich", query = "SELECT b FROM PrescriptionSchedule b WHERE b.woechentlich = :woechentlich"),
-//        @NamedQuery(name = "PrescriptionSchedule.findByMonatlich", query = "SELECT b FROM PrescriptionSchedule b WHERE b.monatlich = :monatlich"),
-//        @NamedQuery(name = "PrescriptionSchedule.findByTagNum", query = "SELECT b FROM PrescriptionSchedule b WHERE b.tagNum = :tagNum"),
-//        @NamedQuery(name = "PrescriptionSchedule.findByMon", query = "SELECT b FROM PrescriptionSchedule b WHERE b.mon = :mon"),
-//        @NamedQuery(name = "PrescriptionSchedule.findByDie", query = "SELECT b FROM PrescriptionSchedule b WHERE b.die = :die"),
-//        @NamedQuery(name = "PrescriptionSchedule.findByMit", query = "SELECT b FROM PrescriptionSchedule b WHERE b.mit = :mit"),
-//        @NamedQuery(name = "PrescriptionSchedule.findByDon", query = "SELECT b FROM PrescriptionSchedule b WHERE b.don = :don"),
-//        @NamedQuery(name = "PrescriptionSchedule.findByFre", query = "SELECT b FROM PrescriptionSchedule b WHERE b.fre = :fre"),
-//        @NamedQuery(name = "PrescriptionSchedule.findBySam", query = "SELECT b FROM PrescriptionSchedule b WHERE b.sam = :sam"),
-//        @NamedQuery(name = "PrescriptionSchedule.findBySon", query = "SELECT b FROM PrescriptionSchedule b WHERE b.son = :son"),
-//        @NamedQuery(name = "PrescriptionSchedule.findByLDatum", query = "SELECT b FROM PrescriptionSchedule b WHERE b.lDatum = :lDatum"),
-//        @NamedQuery(name = "PrescriptionSchedule.findByprescriptionSorted", query = " " +
-//                " SELECT vp FROM PrescriptionSchedule vp WHERE vp.prescription = :prescription " +
-//                " ORDER BY vp.uhrzeit, vp.nachtMo, vp.morgens, vp.mittags, vp.nachmittags, vp.abends, vp.nachtAb ")
-//})
+
 public class PrescriptionSchedule implements Serializable, Cloneable, Comparable<PrescriptionSchedule> {
     private static final long serialVersionUID = 1L;
     @Id

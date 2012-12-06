@@ -63,7 +63,6 @@
         <class>entity.process.PCat</class>
         <class>entity.process.QProcess</class>
         <class>entity.values.ResValueTypes</class>
-        <class>entity.prescription.UPR</class>
         <properties>
             <property name="javax.persistence.jdbc.url" value="jdbc:mysql://srv0004:3306/opde"/>
             <property name="javax.persistence.jdbc.password" value="75r9qq8"/>

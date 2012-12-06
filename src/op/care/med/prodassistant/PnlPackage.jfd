@@ -133,6 +133,10 @@
            <string>columns</string> 
            <int>10</int> 
           </void> 
+          <void method="setProperty"> 
+           <string>horizontalAlignment</string> 
+           <int>11</int> 
+          </void> 
           <void property="name"> 
            <string>txtInhalt</string> 
           </void> 

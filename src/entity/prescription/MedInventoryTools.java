@@ -114,7 +114,7 @@ public class MedInventoryTools {
         MedStock stock = MedStockTools.getStockInUse(inventory);
 
         if (!stock.getTradeForm().getDosageForm().isUPR1()){
-            quantity = quantity.divide(UPRTools.getUPR(stock).getUpr(), 4, BigDecimal.ROUND_UP);
+            quantity = quantity.divide(stock.getUPR(), 4, BigDecimal.ROUND_UP);
         }
 
         OPDE.debug("withdraw/5: menge: " + quantity);
@@ -138,8 +138,6 @@ public class MedInventoryTools {
         for (MedStock medStock : list) {
             if (medStock.getOut().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE) && medStock.getOpened().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE)) {
                 medStock.setOpened(new Date());
-                // TODO:HERE
-//                medStock.setUPR(UPRTools.getUPR(UPRTools.getEstimatedUPR(medStock)));
                 result = medStock;
                 break;
             }
@@ -181,7 +179,6 @@ public class MedInventoryTools {
         em.lock(stock, LockModeType.OPTIMISTIC);
 
         OPDE.debug("withdraw/4: MedStock: " + stock);
-        // stock != null
 
         BigDecimal stockSum = MedStockTools.getSum(stock); // wieviel der angebrochene Bestand noch hergibt.
 
@@ -272,18 +269,17 @@ public class MedInventoryTools {
      *
      * @param inventory
      * @param aPackage
-     * @param darreichung
+     * @param tradeForm
      * @param text
      * @param menge
      * @return
      * @throws Exception
      */
-    public static MedStock addTo(MedInventory inventory, MedPackage aPackage, TradeForm darreichung, String text, BigDecimal menge) {
+    public static MedStock addTo(MedInventory inventory, MedPackage aPackage, TradeForm tradeForm, String text, BigDecimal menge) {
         MedStock stock = null;
         if (menge.compareTo(BigDecimal.ZERO) > 0) {
-            stock = new MedStock(inventory, darreichung, aPackage, text);
-            //TODO: HERE
-//            stock.setUPR(UPRTools.getUPR(UPRTools.getEstimatedUPR(stock)));
+            BigDecimal estimatedUPR = MedStockTools.getEstimatedUPR(tradeForm, inventory.getResident());
+            stock = new MedStock(inventory, tradeForm, aPackage, text, estimatedUPR);
             MedStockTransaction buchung = new MedStockTransaction(stock, menge);
             stock.getStockTransaction().add(buchung);
         }

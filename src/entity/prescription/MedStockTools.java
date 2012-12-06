@@ -115,20 +115,20 @@ public class MedStockTools {
 //    }
 
     public static HashMap getStock4Printing(MedStock bestand) {
-        OPDE.debug("BestandID: " + bestand.getID());
+        OPDE.debug("StockID: " + bestand.getID());
 
         HashMap hm = new HashMap();
-        hm.put("bestand.darreichung", TradeFormTools.toPrettyString(bestand.getTradeForm()));
+        hm.put("medstock.tradeform", TradeFormTools.toPrettyString(bestand.getTradeForm()));
 
         String pzn = bestand.getPackage().getPzn() == null ? "??" : bestand.getPackage().getPzn();
-        hm.put("bestand.packung.pzn", pzn);
-        hm.put("bestand.bestid", bestand.getID());
-        hm.put("bestand.eingang", bestand.getIN());
-        hm.put("bestand.userkurz", bestand.getUser().getUID());
-        hm.put("bestand.userlang", bestand.getUser().getFullname());
-        hm.put("bestand.inventory.bewohnername", ResidentTools.getNameAndFirstname(bestand.getInventory().getResident()));
-        hm.put("bestand.inventory.bewohnergebdatum", bestand.getInventory().getResident().getDOB());
-        hm.put("bestand.inventory.bewohnerkennung", bestand.getInventory().getResident().getRIDAnonymous());
+        hm.put("medstock.package.pzn", pzn);
+        hm.put("medstock.id", bestand.getID());
+        hm.put("medstock.in", bestand.getIN());
+        hm.put("medstock.usershort", bestand.getUser().getUID());
+        hm.put("medstock.userlong", bestand.getUser().getFullname());
+        hm.put("medstock.inventory.resident.name", ResidentTools.getNameAndFirstname(bestand.getInventory().getResident()));
+        hm.put("medstock.inventory.resident.dob", bestand.getInventory().getResident().getDOB());
+        hm.put("medstock.inventory.resident.id", bestand.getInventory().getResident().getRIDAnonymous());
 
         return hm;
     }
@@ -237,18 +237,11 @@ public class MedStockTools {
         medStock.setState(MedStockTools.STATE_NOTHING);
         DateTime now = new DateTime();
         medStock.setOut(now.toDate());
+        medStock.setUPR(getEffectiveUPR(medStock));
 
         if (medStock.hasNext2Open()) {
             nextStock = medStock.getNextStock();
             nextStock.setOpened(now.plusSeconds(1).toDate());
-            // The new UPR is the arithmetic mean of the old UPRs and the effective UPR for this package.
-            // The prospective UPR uses a SQL AVG function over all persisted entities, therefore the old
-            // UPR for the current medStock is also included, even though we just calculated a new
-            // effective UPR. As we are speaking of an arithmetic mean, this does not have any impact on the whole process.
-
-            //TODO: HERE
-//            nextStock.setUPR(UPRTools.getUPR(UPRTools.recalculateUPR(medStock)));
-
             OPDE.debug("NextStock: " + medStock.getNextStock().getID() + " will be opened now");
         } else {
             // Nothing to open next ?
@@ -346,7 +339,7 @@ public class MedStockTools {
             result += ", " + MedPackageTools.toPrettyString(stock.getPackage());
         }
 
-        result += ", APV: " + NumberFormat.getNumberInstance().format(UPRTools.getUPR(stock.getUPR())) + " " + (UPRTools.isDummyUPR(stock) ? OPDE.lang.getString(PnlInventory.internalClassID + ".UPRwillBeReplaced") : "");
+        result += ", APV: " + NumberFormat.getNumberInstance().format(stock.getUPR()) + " " + (stock.isDummyUPR() ? OPDE.lang.getString(PnlInventory.internalClassID + ".UPRwillBeReplaced") : "");
 
         if (stock.hasNext2Open()) {
             result += ", <b>" + OPDE.lang.getString(PnlInventory.internalClassID + ".nextstock") + ": " + stock.getNextStock().getID() + "</b>";
@@ -377,16 +370,13 @@ public class MedStockTools {
         if (stock.hasPackage()) {
             result += ", " + MedPackageTools.toPrettyString(stock.getPackage());
         }
-       result += ", APV: " + NumberFormat.getNumberInstance().format(UPRTools.getUPR(stock.getUPR())) + " " + (UPRTools.isDummyUPR(stock) ? OPDE.lang.getString(PnlInventory.internalClassID + ".UPRwillBeReplaced") : "");
+        result += ", APV: " + NumberFormat.getNumberInstance().format(stock.getUPR()) + " " + (stock.isDummyUPR() ? OPDE.lang.getString(PnlInventory.internalClassID + ".UPRwillBeReplaced") : "");
         return result;
     }
 
     public static void open(EntityManager em, MedStock stock) {
         MedStock myStock = em.merge(stock);
         myStock.setOpened(new Date());
-        if (!myStock.getTradeForm().getDosageForm().isUPR1()){
-            myStock.getUPR().setUpr(UPRTools.getEstimatedUPR(stock));
-        }
     }
 
     public static MedStock getPreviousStock(MedStock fromThisOne) {
@@ -480,5 +470,169 @@ public class MedStockTools {
         }
         html.append(SYSConst.html_table(table.toString(), "1"));
         return html.toString();
+    }
+
+
+//    public static BigDecimal getEstimatedUPR(MedStock stock) {
+//        OPDE.debug("<--- getEstimatedUPR");
+//        OPDE.debug("MedStock ID: " + stock.getID());
+////        BigDecimal bdUPR = BigDecimal.ONE;
+//
+//        UPR upr = null;
+//        BigDecimal bdUPR = null;
+//
+//        if (!stock.getTradeForm().getDosageForm().isUPR1()) {
+//            EntityManager em = OPDE.createEM();
+//            Query query = null;
+//            if (stock.getTradeForm().getDosageForm().getState() == DosageFormTools.UPR_BY_RESIDENT) {
+//                OPDE.debug("UPR_BY_RESIDENT");
+//                String jpql = "SELECT AVG(upr.upr) FROM UPR upr WHERE upr.tradeform = :tradeform AND upr.resident = :resident ";
+//                query = em.createQuery(jpql);
+//                query.setParameter("tradeform", stock.getTradeForm());
+//                query.setParameter("resident", stock.getInventory().getResident());
+//            } else {
+//                OPDE.debug("UPR_BY_TRADEFORM");
+//                String jpql = "SELECT AVG(upr.upr) FROM UPR upr WHERE upr.tradeform = :tradeform ";
+//                query = em.createQuery(jpql);
+//                query.setParameter("tradeform", stock.getTradeForm());
+//            }
+//
+//            try {
+//                bdUPR = (BigDecimal) query.getSingleResult();
+//                if (bdUPR == null) {
+//                    bdUPR = BigDecimal.ONE;
+//                    upr = new UPR(bdUPR, stock);
+//                    upr.setDummy(true);
+//                    upr.setUpr(BigDecimal.ONE);
+//                }
+//            } catch (Exception exc) {
+//                OPDE.fatal(exc);
+//            }
+//
+//            em.close();
+//        } else {
+//            OPDE.debug("UPR1");
+//            bdUPR = BigDecimal.ONE;
+//        }
+////        OPDE.debug("upr: " + bdUPR);
+//        OPDE.debug("getEstimatedUPR --->");
+//        return bdUPR;
+//    }
+
+
+    /**
+     * This method calculates the effective UPR as it transpired during the lifetime of that particular medstock.
+     * It is vital, that this calculation is only done, when a package is empty. Otherwise the estimation
+     * of the UPR is wrong.
+     *
+     * @param medstock, für den das Verhältnis neu berechnet werden soll.
+     */
+    public static BigDecimal getEffectiveUPR(MedStock medstock) {
+        if (medstock.getTradeForm().getDosageForm().isUPR1()) {
+            return BigDecimal.ONE;
+        }
+
+//        BigDecimal resultUPR = medstock.getUPR();
+
+        OPDE.debug("<--- recalculateUPR ");
+        OPDE.debug("MedStock ID: " + medstock.getID());
+
+        // this is the amount of content, which was in that package before it was opened
+        // package unit
+        BigDecimal startContent = MedStockTools.getStartTX(medstock).getAmount();
+
+        // usage unit
+        BigDecimal sumOfAllAplications = MedStockTools.getSumOfDosesInBHP(medstock);
+
+        // Die Gaben aus der BHP sind immer in der Anwendungseinheit. Teilt man diese durch das
+        // verwendete APV, erhält man das was rechnerisch in der Packung drin gewesen
+        // sein soll. Das kann natürlich von dem realen Inhalt abweichen. Klebt noch was an
+        // der Flaschenwand oder wurde was verworfen. Das APV steht ja für Anzahl der Anwendung im
+        // Verhaltnis zur Packungseinheit 1. Wurden 100 Tropfen gegeben, bei einem APV von 20(:1)
+        // Dann ergibt das einen rechnerischen Flascheninhalt von 5 ml.
+
+        // The doses of the applications which have been calculated by the BHPs are always in
+        // the unit of the usage.
+        // When a package is empty, we know two things for sure:
+        // 1. The startContent has been completely used up
+        // 2. the sum of all applications (theoreticalSum) is what we could really get out of the bottle
+        //
+        // hence the effective UPR must have been
+        //
+        //                          the startContent in the package unit
+        //    effective UPR   =     --------------------------------------------
+        //                          the sum of all applications in the usage unit
+        //
+        BigDecimal effectiveUPR = startContent.divide(sumOfAllAplications, 4, BigDecimal.ROUND_UP);
+
+        // Nimmt man den realen Inhalt und teil ihn durch den rechnerischen, dann gibt es drei Möglichkeiten
+        // 1. Es wurde mehr gegeben als in der Packung drin war. Dann muss das ursprüngliche APV zu gross gewesen
+        // sein. Die Division von realem Inhalt durch rechnerischem Inhalt ist kleiner 1 und somit wird auch
+        // das apvNeu kleiner als das apvAlt.
+        // 2. Es wurde genau so viel gegeben wie drin war. Dann war das apvAlt genau richtig. Der Divisor ist
+        // dann 1 und apvNeu ist gleich apvAlt.
+        // 3. Es wurde weniger gegeben als drin war. Dann war apvAlt zu klein und der Divisor (real durch rechnerisch) wird größer 0 und
+        // der apvNeu wird größer als der apvAlt.
+
+        return effectiveUPR;
+    }
+
+    /**
+     * calculates a starting UPR for a newly opened stock. If there is no UPR yet, it creates a new one and marks it as dummy,
+     * so it will be replaced by the first calculated result, when this package is closed.
+     * For DosageForms with type UPR1, there is no calculation at all. Those are always 1 constantly.
+     *
+     */
+    public static BigDecimal getEstimatedUPR(TradeForm tradeForm, Resident resident) {
+        OPDE.debug("<--- calcProspectiveUPR");
+        BigDecimal upr;
+        if (tradeForm.getDosageForm().getState() == DosageFormTools.UPR_BY_RESIDENT) {
+            OPDE.debug("UPR_BY_RESIDENT");
+            upr = getEstimatedUPR_BY_RESIDENT(tradeForm, resident);
+        } else if (tradeForm.getDosageForm().getState() == DosageFormTools.UPR_BY_TRADEFORM) {
+            OPDE.debug("UPR_BY_TRADEFORM");
+            upr = getEstimatedUPR_BY_TRADEFORM(tradeForm);
+        } else {
+            OPDE.debug("UPR1");
+            upr = BigDecimal.ONE;
+        }
+        OPDE.debug("upr: " + upr);
+        OPDE.debug("calcProspectiveUPR --->");
+        return upr;
+    }
+
+    private static BigDecimal getEstimatedUPR_BY_TRADEFORM(TradeForm tradeForm) {
+        BigDecimal upr = null;
+        EntityManager em = OPDE.createEM();
+        try {
+            Query query = em.createQuery("SELECT AVG(s.upr) FROM MedStock s WHERE s.tradeform = :tradeform AND s.uprDummy = FALSE ");
+            query.setParameter("tradeform", tradeForm);
+            upr = (BigDecimal) query.getSingleResult();
+        } catch (NoResultException nre) {
+            upr = null;
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        } finally {
+            em.close();
+        }
+        return upr;
+    }
+
+    private static BigDecimal getEstimatedUPR_BY_RESIDENT(TradeForm tradeForm, Resident resident) {
+        BigDecimal upr = null;
+        EntityManager em = OPDE.createEM();
+        try {
+            Query query = em.createQuery("SELECT AVG(s.upr) FROM MedStock s WHERE s.tradeform = :tradeform AND s.inventory.resident = :resident AND s.uprDummy = FALSE ");
+            query.setParameter("tradeform", tradeForm);
+            query.setParameter("resident", resident);
+            upr = (BigDecimal) query.getSingleResult();
+        } catch (NoResultException nre) {
+            upr = null;
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        } finally {
+            em.close();
+        }
+        return upr;
     }
 }

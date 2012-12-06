@@ -81,9 +81,6 @@ public class PnlSubtext extends JPanel {
         em.close();
 
         dosageForm = (DosageForm) cmbFormen.getSelectedItem();
-        lblAPV.setVisible(!dosageForm.isUPR1());
-        lblPV.setVisible(!dosageForm.isUPR1());
-        txtA.setVisible(!dosageForm.isUPR1());
 
         tradeForm = new TradeForm(product, "", dosageForm);
         validate.execute(tradeForm);
@@ -124,15 +121,6 @@ public class PnlSubtext extends JPanel {
 
         dosageForm = (DosageForm) cmbFormen.getSelectedItem();
 
-        lblAPV.setVisible(!dosageForm.isUPR1());
-        lblPV.setVisible(!dosageForm.isUPR1());
-        txtA.setVisible(!dosageForm.isUPR1());
-
-        if (!dosageForm.isUPR1()) {
-            txtA.setText("1");
-            lblPV.setText(" " + dosageForm.getUsageText() + " " + OPDE.lang.getString("misc.msg.equalTo") + " 1 " + SYSConst.UNITS[dosageForm.getPackUnit()]);
-        }
-
         tradeForm = new TradeForm(product, txtZusatz.getText().trim(), dosageForm);
         validate.execute(tradeForm);
     }
@@ -141,10 +129,6 @@ public class PnlSubtext extends JPanel {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         txtZusatz = new JXSearchField();
         cmbFormen = new JComboBox();
-        panel1 = new JPanel();
-        lblAPV = new JLabel();
-        txtA = new JTextField();
-        lblPV = new JLabel();
         lbl1 = new JLabel();
         lblMsg = new JLabel();
         jsp1 = new JScrollPane();
@@ -153,7 +137,7 @@ public class PnlSubtext extends JPanel {
         //======== this ========
         setLayout(new FormLayout(
             "2*(default, $lcgap), default:grow, $lcgap, default",
-            "2*(default, $lgap), default, $rgap, 2*(pref), $lgap, default:grow, $lgap, default"));
+            "2*(default, $lgap), default, $rgap, pref, $lgap, default:grow, $lgap, default"));
 
         //---- txtZusatz ----
         txtZusatz.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -177,37 +161,17 @@ public class PnlSubtext extends JPanel {
         });
         add(cmbFormen, CC.xywh(3, 5, 3, 1));
 
-        //======== panel1 ========
-        {
-            panel1.setLayout(new HorizontalLayout(10));
-
-            //---- lblAPV ----
-            lblAPV.setText("Verh\u00e4ltnis zwischen Anwendung und Packung:");
-            lblAPV.setFont(new Font("Arial", Font.PLAIN, 14));
-            panel1.add(lblAPV);
-
-            //---- txtA ----
-            txtA.setColumns(10);
-            txtA.setFont(new Font("Arial", Font.PLAIN, 14));
-            panel1.add(txtA);
-
-            //---- lblPV ----
-            lblPV.setText("x entspricht 1 g");
-            lblPV.setFont(new Font("Arial", Font.PLAIN, 14));
-            panel1.add(lblPV);
-        }
-        add(panel1, CC.xywh(3, 7, 3, 1, CC.RIGHT, CC.DEFAULT));
-
         //---- lbl1 ----
         lbl1.setText(null);
         lbl1.setIcon(new ImageIcon(getClass().getResource("/artwork/other/medicine2.png")));
         lbl1.setFont(new Font("Arial", Font.PLAIN, 18));
-        add(lbl1, CC.xywh(3, 8, 1, 3, CC.CENTER, CC.DEFAULT));
+        add(lbl1, CC.xy(3, 9, CC.CENTER, CC.FILL));
 
         //---- lblMsg ----
         lblMsg.setText("text");
         lblMsg.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(lblMsg, CC.xywh(3, 8, 3, 1));
+        lblMsg.setHorizontalAlignment(SwingConstants.RIGHT);
+        add(lblMsg, CC.xywh(3, 7, 3, 1));
 
         //======== jsp1 ========
         {
@@ -223,17 +187,13 @@ public class PnlSubtext extends JPanel {
             });
             jsp1.setViewportView(lstDaf);
         }
-        add(jsp1, CC.xy(5, 10, CC.DEFAULT, CC.FILL));
+        add(jsp1, CC.xy(5, 9, CC.DEFAULT, CC.FILL));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JXSearchField txtZusatz;
     private JComboBox cmbFormen;
-    private JPanel panel1;
-    private JLabel lblAPV;
-    private JTextField txtA;
-    private JLabel lblPV;
     private JLabel lbl1;
     private JLabel lblMsg;
     private JScrollPane jsp1;
