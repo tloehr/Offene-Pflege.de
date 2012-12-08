@@ -990,14 +990,28 @@ public class PnlPrescription extends NursingRecordsPanel {
                         @Override
                         public void execute(Object o) {
                             if (o != null) {
-                                // The prescription itself is not changed but the stock in question,
+                                // The prescription itself is not changed, but the stock in question.
                                 // this information is requested by a single DB request every time
                                 // the CP is created for that particular prescription.
                                 // A new call to the createCP4 method will reuse the old
                                 // CollapsiblePane and set a new TextContent to it.
                                 // Now with the MedStock information.
-                                final CollapsiblePane myCP = createCP4(prescription);
-                                GUITools.flashBackground(myCP, Color.YELLOW, 2);
+
+                                // If this current stock was valid until the end of package
+                                // it needs to be reread here.
+                                if (prescription.isUntilEndOfPackage()){
+                                    EntityManager em = OPDE.createEM();
+                                    Prescription myPrescription = em.merge(prescription);
+                                    em.refresh(myPrescription);
+                                    lstPrescriptions.remove(prescription);
+                                    lstPrescriptions.add(myPrescription);
+                                    Collections.sort(lstPrescriptions);
+                                    final CollapsiblePane myCP = createCP4(myPrescription);
+                                } else {
+                                    final CollapsiblePane myCP = createCP4(prescription);
+                                    GUITools.flashBackground(myCP, Color.YELLOW, 2);
+                                }
+                                buildPanel();
                             }
                         }
                     });

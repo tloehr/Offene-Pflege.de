@@ -276,7 +276,7 @@ public class PnlInventory extends NursingRecordsPanel {
          *     |_|  \___|_|\___/ \__,_|\__,_|____/|_|___/ .__/|_|\__,_|\__, |
          *                                              |_|            |___/
          */
-        final boolean withworker = true;
+        final boolean withworker = false;
         cpsInventory.removeAll();
         cpMap.clear();
         contentmap.clear();
