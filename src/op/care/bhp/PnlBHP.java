@@ -80,9 +80,6 @@ public class PnlBHP extends NursingRecordsPanel {
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
     private JDateChooser jdcDatum;
-    private JComboBox cmbSchicht;
-
-    private JideButton addButton;
 
     public PnlBHP(Resident resident, JScrollPane jspSearch) {
         initComponents();
@@ -379,17 +376,11 @@ public class PnlBHP extends NursingRecordsPanel {
         JPanel titlePanelleft = new JPanel();
         titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
 
-//        JideButton btnBHP = GUITools.createHyperlinkButton(, BHPTools.getIcon(bhp), null);
-
-        // it is expensive to search for stocks. hence the cache map
-
-
         MedStock stock = mapPrescription2Stock.get(bhp.getPrescription());
         if (bhp.hasMed() && stock == null) {
             stock = MedStockTools.getStockInUse(TradeFormTools.getInventory4TradeForm(resident, bhp.getTradeForm()));
             mapPrescription2Stock.put(bhp.getPrescription(), stock);
         }
-
 
         String title = "<html><font size=+1>" +
                 SYSTools.left(PrescriptionTools.getPrescriptionAsShortText(bhp.getPrescriptionSchedule().getPrescription()), MAX_TEXT_LENGTH) +
@@ -473,6 +464,10 @@ public class PnlBHP extends NursingRecordsPanel {
                                 if (myBHP.hasMed()) {
                                     MedInventory inventory = TradeFormTools.getInventory4TradeForm(resident, myBHP.getTradeForm());
                                     MedInventoryTools.withdraw(em, em.merge(inventory), myBHP.getDose(), myBHP);
+
+                                    // Was the prescription closed during this withdraw ?
+
+
                                 }
 
                                 mapBHP2Pane.put(myBHP, createCP4(myBHP));

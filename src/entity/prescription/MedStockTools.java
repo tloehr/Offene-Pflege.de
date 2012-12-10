@@ -195,7 +195,7 @@ public class MedStockTools {
      */
     public static BigDecimal getSum(EntityManager em, MedStock stock) throws Exception {
         BigDecimal result;
-        OPDE.debug("BestID: " + stock.getID());
+//        OPDE.debug("BestID: " + stock.getID());
         Query query = em.createQuery(" " +
                 " SELECT SUM(tx.amount) " +
                 " FROM MedStock st " +

@@ -570,7 +570,7 @@ public class BHPTools {
 
 
     public static Icon getWarningIcon(BHP bhp, MedStock stock) {
-        if (!bhp.hasMed()) return null;
+        if (!bhp.hasMed() || bhp.getPrescription().isClosed()) return null;
 
         Icon icon = null;
         BigDecimal sum = stock == null ? BigDecimal.ZERO : MedStockTools.getSum(stock);
