@@ -32,7 +32,6 @@ import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
-import com.jidesoft.swing.JideButton;
 import com.jidesoft.utils.ColorUtils;
 import com.toedter.calendar.JDateChooser;
 import entity.info.Resident;
@@ -461,28 +460,32 @@ public class PnlBHP extends NursingRecordsPanel {
                                 myBHP.setMDate(new Date());
 
                                 // TODO: Calc Medi here
+                                Prescription involvedPresciption = null;
                                 if (myBHP.hasMed()) {
                                     MedInventory inventory = TradeFormTools.getInventory4TradeForm(resident, myBHP.getTradeForm());
                                     MedInventoryTools.withdraw(em, em.merge(inventory), myBHP.getDose(), myBHP);
-
                                     // Was the prescription closed during this withdraw ?
-
-
-                                }
-
-                                mapBHP2Pane.put(myBHP, createCP4(myBHP));
-                                int position = mapShift2BHP.get(myBHP.getShift()).indexOf(myBHP);
-                                mapShift2BHP.get(myBHP.getShift()).remove(position);
-                                mapShift2BHP.get(myBHP.getShift()).add(position, myBHP);
-                                if (myBHP.isOnDemand()) {
-                                    Collections.sort(mapShift2BHP.get(myBHP.getShift()), BHPTools.getOnDemandComparator());
-                                } else {
-                                    Collections.sort(mapShift2BHP.get(myBHP.getShift()));
+                                    involvedPresciption = em.find(Prescription.class, myBHP.getPrescription().getID());
                                 }
                                 em.getTransaction().commit();
 
-                                mapShift2Pane.put(bhp.getShift(), createCP4(bhp.getShift()));
-                                buildPanel(false);
+
+                                if (involvedPresciption.isClosed()) {
+                                    reload();
+                                } else {
+                                    mapBHP2Pane.put(myBHP, createCP4(myBHP));
+                                    int position = mapShift2BHP.get(myBHP.getShift()).indexOf(myBHP);
+                                    mapShift2BHP.get(myBHP.getShift()).remove(position);
+                                    mapShift2BHP.get(myBHP.getShift()).add(position, myBHP);
+                                    if (myBHP.isOnDemand()) {
+                                        Collections.sort(mapShift2BHP.get(myBHP.getShift()), BHPTools.getOnDemandComparator());
+                                    } else {
+                                        Collections.sort(mapShift2BHP.get(myBHP.getShift()));
+                                    }
+
+                                    mapShift2Pane.put(bhp.getShift(), createCP4(bhp.getShift()));
+                                    buildPanel(false);
+                                }
                             } catch (OptimisticLockException ole) {
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();

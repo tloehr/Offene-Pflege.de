@@ -324,7 +324,7 @@ public class MedInventoryTools {
 
             EntityManager em = OPDE.createEM();
 
-            OPDE.debug("MedInventoryTools.getForm: inventory: " + inventory.getID());
+//            OPDE.debug("MedInventoryTools.getForm: inventory: " + inventory.getID());
 
             Query query = em.createQuery(" " +
                     " SELECT tf.dosageForm FROM MedInventory i " +

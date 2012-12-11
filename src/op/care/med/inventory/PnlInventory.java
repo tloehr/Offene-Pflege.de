@@ -648,6 +648,7 @@ public class PnlInventory extends NursingRecordsPanel {
         cpStock.setTitleLabelComponent(cptitle.getMain());
         cpStock.setSlidingDirection(SwingConstants.SOUTH);
 
+
         cptitle.getRight().add(new StockPanel(stock));
 
 
@@ -813,7 +814,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
             yellow = new JRadioButton(SYSConst.icon22ledYellowOff);
             yellow.setSelectedIcon(SYSConst.icon22ledYellowOn);
-            selYellow = stock.isOpened() && !stock.isToBeClosedSoon();
+            selYellow = stock.isOpened();
             yellow.setSelected(selYellow);
             yellow.setContentAreaFilled(false);
             yellow.setBorderPainted(false);
@@ -842,6 +843,7 @@ public class PnlInventory extends NursingRecordsPanel {
                 @Override
                 public void itemStateChanged(ItemEvent ie) {
                     if (ignoreEvent) return;
+                    if (!OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) return;
                     if (ie.getStateChange() == ItemEvent.SELECTED) {
                         /***
                          *       ____ _
@@ -973,6 +975,7 @@ public class PnlInventory extends NursingRecordsPanel {
                 @Override
                 public void itemStateChanged(ItemEvent ie) {
                     if (ignoreEvent) return;
+                    if (!OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) return;
                     if (ie.getStateChange() == ItemEvent.SELECTED) {
                         if (!stock.isToBeClosedSoon()) {
                             MedStock openedStock = MedInventoryTools.getCurrentOpened(stock.getInventory());
@@ -1061,6 +1064,7 @@ public class PnlInventory extends NursingRecordsPanel {
                 @Override
                 public void itemStateChanged(ItemEvent ie) {
                     if (ignoreEvent) return;
+                    if (!OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) return;
                     if (ie.getStateChange() == ItemEvent.SELECTED) {
                         /***
                          *                      _                                                  _
@@ -1156,7 +1160,7 @@ public class PnlInventory extends NursingRecordsPanel {
              *     /_/   \_\__,_|\__,_| |_| /_/\_\
              *
              */
-            JideButton btnAddTX = GUITools.createHyperlinkButton(internalClassID + ".newmedstocktx", SYSConst.icon22add, new ActionListener() {
+            JideButton btnAddTX = GUITools.createHyperlinkButton(internalClassID + ".newmedstocktx", SYSConst.icon22addrow, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     new DlgTX(new MedStockTransaction(stock, BigDecimal.ONE, MedStockTransactionTools.STATE_EDIT_MANUAL), new Closure() {

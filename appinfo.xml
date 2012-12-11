@@ -96,6 +96,7 @@
         <class name="nursingrecords.inventory" short="Medikamentenbestände"
                long="Dies ist die Bestandsveraltung für Medikamente">
             <manager langbundle="appinfo.default.acl.manager"/>
+            <update langbundle="appinfo.default.acl.update"/>
             <insert langbundle="appinfo.default.acl.insert"/>
             <delete langbundle="appinfo.default.acl.delete"/>
         </class>
