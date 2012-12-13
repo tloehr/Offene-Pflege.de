@@ -238,7 +238,7 @@ public class PnlInventory extends NursingRecordsPanel {
         java.util.List<Component> list = new ArrayList<Component>();
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
-            JideButton buchenButton = GUITools.createHyperlinkButton(internalClassID + ".newstocks", SYSConst.icon22add, new ActionListener() {
+            JideButton buchenButton = GUITools.createHyperlinkButton(internalClassID + ".newstocks", SYSConst.icon22addrow, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     new DlgNewStocks(resident);
@@ -1160,7 +1160,7 @@ public class PnlInventory extends NursingRecordsPanel {
              *     /_/   \_\__,_|\__,_| |_| /_/\_\
              *
              */
-            JideButton btnAddTX = GUITools.createHyperlinkButton(internalClassID + ".newmedstocktx", SYSConst.icon22addrow, new ActionListener() {
+            JideButton btnAddTX = GUITools.createHyperlinkButton(internalClassID + ".newmedstocktx", SYSConst.icon22add, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     new DlgTX(new MedStockTransaction(stock, BigDecimal.ONE, MedStockTransactionTools.STATE_EDIT_MANUAL), new Closure() {

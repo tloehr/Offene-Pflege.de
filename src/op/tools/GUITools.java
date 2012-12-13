@@ -368,6 +368,7 @@ public class GUITools {
 
 
     public static void flashBackground(final JComponent component, final Color flashcolor, int repeatTimes) {
+        if (component == null) return; // this prevents NULL pointer exceptions when quickly switching the residents after the entry
         final Color originalColor = component.getBackground();
         final TimingSource ts = new SwingTimerTimingSource();
         Animator.setDefaultTimingSource(ts);

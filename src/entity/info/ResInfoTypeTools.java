@@ -70,4 +70,12 @@ public class ResInfoTypeTools {
         return resInfoTypen;
     }
 
+    public static List<ResInfoType> getAllActive() {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM ResInfoType b WHERE b.type >= 0 ");
+        List<ResInfoType> resInfoTypen = query.getResultList();
+        em.close();
+        return resInfoTypen;
+    }
+
 }

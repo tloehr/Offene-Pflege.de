@@ -28,7 +28,9 @@ import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
+import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
+import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 
 import javax.persistence.EntityManager;
@@ -38,8 +40,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
 import java.util.*;
 import java.util.List;
@@ -50,23 +50,23 @@ import java.util.List;
 public class PnlInfo extends NursingRecordsPanel {
     public static final String internalClassID = "nursingrecords.info";
 
+    private JXSearchField txtSearch;
     private Resident resident;
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
 
-    private HashMap<String, CollapsiblePane> cpMap;
-    private HashMap<ResInfoType, ArrayList<ResInfo>> valuecache;
-    //    private HashMap<ResInfoCategory, List<ResInfoType>> bwinfotypen;
-    private List<ResInfoCategory> categories;
+    private HashMap<String, CollapsiblePane> mapKey2CP;
+    private HashMap<ResInfoType, ArrayList<ResInfo>> mapType2InfoList;
+    private List<ResInfoCategory> listCategories;
     private ArrayList<ResInfo> listInfo;
+    private HashMap<ResInfo, JPanel> mapInfo2Panel;
 
-    private JToggleButton tbInactive;
     private JideButton btnBWDied, btnBWMovedOut, btnBWisAway, btnBWisBack;
     private Color[] color1, color2;
 
     private ResInfoType typeAbsence, typeStartOfStay;
 
-    private boolean initPhase;
+//    private boolean initPhase;
 
     @Override
     public String getInternalClassID() {
@@ -74,25 +74,26 @@ public class PnlInfo extends NursingRecordsPanel {
     }
 
     public PnlInfo(Resident resident, JScrollPane jspSearch) {
-        initPhase = true;
+//        initPhase = true;
         this.jspSearch = jspSearch;
         this.resident = resident;
         initComponents();
         initPanel();
         switchResident(resident);
-        initPhase = false;
+//        initPhase = false;
     }
 
     private void initPanel() {
 
 //        bwinfotypen = new HashMap<ResInfoCategory, List<ResInfoType>>();
-        valuecache = new HashMap<ResInfoType, ArrayList<ResInfo>>();
-        cpMap = new HashMap<String, CollapsiblePane>();
+        mapType2InfoList = new HashMap<ResInfoType, ArrayList<ResInfo>>();
+        mapKey2CP = new HashMap<String, CollapsiblePane>();
+        mapInfo2Panel = new HashMap<ResInfo, JPanel>();
         prepareSearchArea();
 
         typeAbsence = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ABSENCE);
         typeStartOfStay = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY);
-        categories = ResInfoCategoryTools.getAll4ResInfo();
+        listCategories = ResInfoCategoryTools.getAll4ResInfo();
 
         color1 = SYSConst.green1;
         color2 = SYSConst.greyscale;
@@ -124,7 +125,7 @@ public class PnlInfo extends NursingRecordsPanel {
          *     |_|  \___|_|\___/ \__,_|\__,_|____/|_|___/ .__/|_|\__,_|\__, |
          *                                              |_|            |___/
          */
-        initPhase = true;
+//        initPhase = true;
 
         final boolean withworker = false;
         if (withworker) {
@@ -147,23 +148,23 @@ public class PnlInfo extends NursingRecordsPanel {
 //                    try {
 //                        int progress = 0;
 //
-//                        // Eliminate empty categories
-//                        categories = new ArrayList<ResInfoCategory>();
+//                        // Eliminate empty listCategories
+//                        listCategories = new ArrayList<ResInfoCategory>();
 //                        for (final ResInfoCategory kat : ResInfoCategoryTools.getAll4ResInfo()) {
 //                            if (!ResInfoTypeTools.getByCat(kat).isEmpty()) {
-//                                categories.add(kat);
+//                                listCategories.add(kat);
 //                            }
 //                        }
 //
 //                        // create tabs
-//                        for (final ResInfoCategory kat : categories) {
+//                        for (final ResInfoCategory kat : listCategories) {
 //                            progress++;
-//                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, categories.size()));
+//                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, listCategories.size()));
 //
 //                            if (!ResInfoTypeTools.getByCat(kat).isEmpty()) {
 //                                tabKat.addTab(kat.getText(), new JScrollPane(createCollapsiblePanesFor(kat)));
 //                            } else {
-//                                categories.remove(kat);
+//                                listCategories.remove(kat);
 //                            }
 //                        }
 //                    } catch (Exception e) {
@@ -189,21 +190,21 @@ public class PnlInfo extends NursingRecordsPanel {
 //            worker.execute();
 
         } else {
-            if (valuecache.isEmpty()) {
+            if (mapType2InfoList.isEmpty()) {
                 for (ResInfo resInfo : listInfo) {
-                    if (!valuecache.containsKey(resInfo.getResInfoType())) {
-                        valuecache.put(resInfo.getResInfoType(), new ArrayList<ResInfo>());
+                    if (!mapType2InfoList.containsKey(resInfo.getResInfoType())) {
+                        mapType2InfoList.put(resInfo.getResInfoType(), new ArrayList<ResInfo>());
                     }
-                    valuecache.get(resInfo.getResInfoType()).add(resInfo);
+                    mapType2InfoList.get(resInfo.getResInfoType()).add(resInfo);
                 }
             }
 
-            for (ResInfoCategory cat : categories) {
+            for (ResInfoCategory cat : listCategories) {
                 createCP4Cat(cat);
             }
             buildPanel();
         }
-        initPhase = false;
+//        initPhase = false;
 
     }
 
@@ -217,16 +218,16 @@ public class PnlInfo extends NursingRecordsPanel {
          *                                                                          |___/            |___/
          */
         final String keyCat = cat.getID() + ".xcategory";
-        if (!cpMap.containsKey(keyCat)) {
-            cpMap.put(keyCat, new CollapsiblePane());
+        if (!mapKey2CP.containsKey(keyCat)) {
+            mapKey2CP.put(keyCat, new CollapsiblePane());
             try {
-                cpMap.get(keyCat).setCollapsed(true);
+                mapKey2CP.get(keyCat).setCollapsed(true);
             } catch (PropertyVetoException e) {
                 // Bah!
             }
 
         }
-        final CollapsiblePane cpCat = cpMap.get(keyCat);
+        final CollapsiblePane cpCat = mapKey2CP.get(keyCat);
 
         String title = "<html><font size=+1><b>" +
                 cat.getText() +
@@ -274,14 +275,11 @@ public class PnlInfo extends NursingRecordsPanel {
     }
 
     private JPanel createInfoPanel(final ResInfo resInfo) {
-//        OPDE.debug(resInfo.getResInfoType().getShortDescription());
         String title = "<html><table border=\"0\">" +
                 "<tr valign=\"top\">" +
                 "<td width=\"280\" align=\"left\">" + resInfo.getPITAsHTML() + "</td>" +
                 "<td width=\"500\" align=\"left\">" +
-                (resInfo.isClosed() ? "<s>" : "") +
                 resInfo.getHtml() +
-                (resInfo.isClosed() ? "</s>" : "") +
                 (SYSTools.catchNull(resInfo.getText()).trim().isEmpty() ? "" : "<b>" + OPDE.lang.getString("misc.msg.comment") + ": </b><p>" + resInfo.getText().trim() + "</p>") +
                 "</td>" +
                 "</table>" +
@@ -325,28 +323,29 @@ public class PnlInfo extends NursingRecordsPanel {
         cptitle.getButton().setIcon(resInfo.isClosed() ? SYSConst.icon22stopSign : null);
         cptitle.getButton().setVerticalTextPosition(SwingConstants.TOP);
 
+        mapInfo2Panel.put(resInfo, cptitle.getMain());
+
         return cptitle.getMain();
     }
 
-    private JPanel createContentPanel4Type(final ResInfoType type, boolean closed2) {
+    private JPanel createContentPanel4Type(final ResInfoType type) {
         final JPanel infoPanel = new JPanel(new VerticalLayout());
         infoPanel.setOpaque(false);
 
-        if (!valuecache.containsKey(type)) {
-            valuecache.put(type, ResInfoTools.getByResidentAndType(resident, type));
+        if (!mapType2InfoList.containsKey(type)) {
+            mapType2InfoList.put(type, ResInfoTools.getByResidentAndType(resident, type));
         }
 
         int i = 0; // for zebra pattern
-        for (final ResInfo resInfo : valuecache.get(type)) {
-            if (closed2 || !resInfo.isClosed()) {
-                JPanel cp = createInfoPanel(resInfo);
-                if (i % 2 == 0) {
-                    cp.setBackground(Color.WHITE);
-                }
-                i++;
-                infoPanel.add(cp);
+        for (final ResInfo resInfo : mapType2InfoList.get(type)) {
+            JPanel cp = createInfoPanel(resInfo);
+            if (i % 2 == 0) {
+                cp.setBackground(Color.WHITE);
             }
+            i++;
+            infoPanel.add(cp);
         }
+
         return infoPanel;
     }
 
@@ -361,16 +360,16 @@ public class PnlInfo extends NursingRecordsPanel {
          *                                                            |___/|_|
          */
         final String keyType = type.getID() + ".xtype";
-        if (!cpMap.containsKey(keyType)) {
-            cpMap.put(keyType, new CollapsiblePane());
+        if (!mapKey2CP.containsKey(keyType)) {
+            mapKey2CP.put(keyType, new CollapsiblePane());
             try {
-                cpMap.get(keyType).setCollapsed(true);
+                mapKey2CP.get(keyType).setCollapsed(true);
             } catch (PropertyVetoException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
 
         }
-        final CollapsiblePane cpType = cpMap.get(keyType);
+        final CollapsiblePane cpType = mapKey2CP.get(keyType);
 
         String title = "<html><font size=+1>" +
                 type.getShortDescription() +
@@ -416,16 +415,31 @@ public class PnlInfo extends NursingRecordsPanel {
                                 em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                                 // so that no conflicts can occur if another user enters a new info at the same time
                                 em.lock(em.merge(type), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                                ResInfo newinfo = em.merge((ResInfo) o);
+                                final ResInfo newinfo = em.merge((ResInfo) o);
                                 newinfo.setHtml(ResInfoTools.getContentAsHTML(newinfo));
                                 em.getTransaction().commit();
 
-                                if (!valuecache.containsKey(newinfo.getResInfoType())){
-                                    valuecache.put(newinfo.getResInfoType(), new ArrayList<ResInfo>());
+                                if (!mapType2InfoList.containsKey(newinfo.getResInfoType())) {
+                                    mapType2InfoList.put(newinfo.getResInfoType(), new ArrayList<ResInfo>());
                                 }
-                                valuecache.get(newinfo.getResInfoType()).add(newinfo);
-                                Collections.sort(valuecache.get(newinfo.getResInfoType()));
+                                mapType2InfoList.get(newinfo.getResInfoType()).add(newinfo);
+                                Collections.sort(mapType2InfoList.get(newinfo.getResInfoType()));
                                 createCP4Type(newinfo.getResInfoType());
+
+                                if (mapKey2CP.get(keyType).isCollapsed()) {
+//                                    final String keyType = type.getID() + ".xtype";
+                                    try {
+                                        mapKey2CP.get(keyType).setCollapsed(false);
+                                    } catch (PropertyVetoException e1) {
+                                        // BAH!
+                                    }
+                                }
+                                GUITools.scroll2show(jspInfo, mapKey2CP.get(keyType), cpsInfo, new Closure() {
+                                    @Override
+                                    public void execute(Object o) {
+                                        GUITools.flashBackground(mapInfo2Panel.get(newinfo), Color.YELLOW, 2);
+                                    }
+                                });
                                 buildPanel();
 
                             } catch (OptimisticLockException ole) {
@@ -459,7 +473,8 @@ public class PnlInfo extends NursingRecordsPanel {
 
             }
         });
-        btnAdd.setEnabled(type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_NOCONSTRAINTS || type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS || !valuecache.containsKey(type) || valuecache.get(type).isEmpty() || containsOnlyClosedInfos(type));
+        btnAdd.setEnabled(type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_NOCONSTRAINTS || type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS || !mapType2InfoList.containsKey(type) || mapType2InfoList.get(type).isEmpty() || containsOnlyClosedInfos(type));
+
         cptitle.getRight().add(btnAdd);
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
@@ -473,28 +488,30 @@ public class PnlInfo extends NursingRecordsPanel {
             btnPrint.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-//                    SYSFilesTools.print(ResInfoTools.getResInfosAsHTML(valuecache.get(type), tbInactive.isSelected(), true, type.getShortDescription()), true);
+//                    SYSFilesTools.print(ResInfoTools.getResInfosAsHTML(mapType2InfoList.get(type), tbInactive.isSelected(), true, type.getShortDescription()), true);
                 }
             });
             cptitle.getRight().add(btnPrint);
-            btnPrint.setEnabled(valuecache.containsKey(type) && !valuecache.get(type).isEmpty());
+            btnPrint.setEnabled(mapType2InfoList.containsKey(type) && !mapType2InfoList.get(type).isEmpty());
         }
 
 
         cpType.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                cpType.setContentPane(createContentPanel4Type(type, tbInactive.isSelected()));
+                cpType.setContentPane(createContentPanel4Type(type));
             }
         });
 
-//        cpType.setCollapsible(valuecache.containsKey(type) && !valuecache.get(type).isEmpty());
+//        cpType.setCollapsible(mapType2InfoList.containsKey(type) && !mapType2InfoList.get(type).isEmpty());
 
         if (!cpType.isCollapsed()) {
-            cpType.setContentPane(createContentPanel4Type(type, tbInactive.isSelected()));
+            cpType.setContentPane(createContentPanel4Type(type));
         }
 
-        cptitle.getButton().setIcon(getIcon(type));
+        cptitle.getButton().setIcon(getContentIcon(type));
+
+
         cptitle.getButton().setToolTipText(getTooltip(type));
 
         cpType.setTitleLabelComponent(cptitle.getMain());
@@ -508,7 +525,7 @@ public class PnlInfo extends NursingRecordsPanel {
 
 
     private Color[] getColor(ResInfoCategory cat) {
-        if (categories.indexOf(cat) % 2 == 0) {
+        if (listCategories.indexOf(cat) % 2 == 0) {
             return color1;
         } else {
             return color2;
@@ -519,6 +536,20 @@ public class PnlInfo extends NursingRecordsPanel {
         searchPanes = new CollapsiblePanes();
         searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
         jspSearch.setViewportView(searchPanes);
+
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID) || OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) || OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
+            JPanel cmdPanel = new JPanel();
+            CollapsiblePane commandPane = new CollapsiblePane(OPDE.lang.getString(internalClassID + ".commands.n.print"));
+            cmdPanel.setLayout(new VerticalLayout());
+            GUITools.addAllComponents(cmdPanel, addCommands());
+            commandPane.setContentPane(cmdPanel);
+            searchPanes.add(commandPane);
+            try {
+                commandPane.setCollapsed(true);
+            } catch (PropertyVetoException e) {
+                //BAH!
+            }
+        }
 
         JPanel mypanel = new JPanel();
         mypanel.setLayout(new VerticalLayout());
@@ -534,7 +565,7 @@ public class PnlInfo extends NursingRecordsPanel {
             OPDE.error(e);
         }
 
-        GUITools.addAllComponents(mypanel, addCommands());
+
         GUITools.addAllComponents(mypanel, addFilters());
         GUITools.addAllComponents(mypanel, addKey());
 
@@ -549,10 +580,11 @@ public class PnlInfo extends NursingRecordsPanel {
         list.add(new JSeparator());
         list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
         list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22stopSign, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22clock1, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22infogreen2, SwingConstants.LEADING));
+//        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22clock1, SwingConstants.LEADING));
 //        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription3"), SYSConst.icon22intervalByDay, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription4"), SYSConst.icon22intervalBySecond, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription5"), SYSConst.icon22intervalNoConstraints, SwingConstants.LEADING));
+//        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription4"), SYSConst.icon22intervalBySecond, SwingConstants.LEADING));
+//        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription5"), SYSConst.icon22intervalNoConstraints, SwingConstants.LEADING));
 
 
         return list;
@@ -801,11 +833,11 @@ public class PnlInfo extends NursingRecordsPanel {
                                     btnBWisAway.setEnabled(false);
                                     btnBWisBack.setEnabled(true);
 
-                                    if (!valuecache.containsKey(typeAbsence)) {
-                                        valuecache.put(typeAbsence, new ArrayList<ResInfo>());
+                                    if (!mapType2InfoList.containsKey(typeAbsence)) {
+                                        mapType2InfoList.put(typeAbsence, new ArrayList<ResInfo>());
                                     }
-                                    valuecache.get(typeAbsence).add(absence);
-                                    Collections.sort(valuecache.get(typeAbsence));
+                                    mapType2InfoList.get(typeAbsence).add(absence);
+                                    Collections.sort(mapType2InfoList.get(typeAbsence));
                                     createCP4Type(typeAbsence);
                                     buildPanel();
 
@@ -869,9 +901,9 @@ public class PnlInfo extends NursingRecordsPanel {
                         btnBWisAway.setEnabled(true);
                         btnBWisBack.setEnabled(false);
 
-                        valuecache.get(typeAbsence).remove(lastabsence);
-                        valuecache.get(typeAbsence).add(lastabsence);
-                        Collections.sort(valuecache.get(typeAbsence));
+                        mapType2InfoList.get(typeAbsence).remove(lastabsence);
+                        mapType2InfoList.get(typeAbsence).add(lastabsence);
+                        Collections.sort(mapType2InfoList.get(typeAbsence));
                         createCP4Type(typeAbsence);
                         buildPanel();
 
@@ -938,12 +970,12 @@ public class PnlInfo extends NursingRecordsPanel {
                     html += "<h1 id=\"fonth1\" >" + OPDE.lang.getString("nursingrecords.info");
                     html += " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getLabelText(resident) + "</h1>\n";
 
-                    for (ResInfoCategory cat : categories) {
+                    for (ResInfoCategory cat : listCategories) {
                         html += "<h2 id=\"fonth2\" >" + cat.getText() + "</h2>\n";
                         for (ResInfoType type : ResInfoTypeTools.getByCat(cat)) {
-                            if (valuecache.containsKey(type) && !valuecache.get(type).isEmpty() && (tbInactive.isSelected() || !containsOnlyClosedInfos(type))) {
+                            if (mapType2InfoList.containsKey(type) && !mapType2InfoList.get(type).isEmpty()) {
                                 html += "<h3 id=\"fonth3\" >" + type.getShortDescription() + "</h3>\n";
-                                html += ResInfoTools.getResInfosAsHTML(valuecache.get(type), tbInactive.isSelected());
+                                html += ResInfoTools.getResInfosAsHTML(mapType2InfoList.get(type), true);
                             }
                         }
                     }
@@ -958,9 +990,21 @@ public class PnlInfo extends NursingRecordsPanel {
         return list;
     }
 
+
+//    private boolean containsOnlyEmptyInfos(final ResInfoType type) {
+//        boolean containsOnlyEmptyInfos = true;
+//        for (ResInfo info : mapType2InfoList.get(type)) {
+//            containsOnlyEmptyInfos = info.isClosed();
+//            if (!containsOnlyEmptyInfos) {
+//                break;
+//            }
+//        }
+//        return containsOnlyEmptyInfos;
+//    }
+
     private boolean containsOnlyClosedInfos(final ResInfoType type) {
         boolean containsOnlyClosedInfos = true;
-        for (ResInfo info : valuecache.get(type)) {
+        for (ResInfo info : mapType2InfoList.get(type)) {
             containsOnlyClosedInfos = info.isClosed();
             if (!containsOnlyClosedInfos) {
                 break;
@@ -969,8 +1013,78 @@ public class PnlInfo extends NursingRecordsPanel {
         return containsOnlyClosedInfos;
     }
 
+    private HashSet<ResInfoType> search(String pattern) {
+        pattern = pattern.toLowerCase();
+        HashSet<ResInfoType> hits = new HashSet<ResInfoType>();
+        for (ResInfo info : listInfo) {
+            if (!hits.contains(info.getResInfoType())) {
+                boolean hit = false;
+                if (!hit) hit = SYSTools.catchNull(info.getText()).toLowerCase().indexOf(pattern) > 0;
+                if (!hit) hit = SYSTools.catchNull(info.getHtml()).toLowerCase().indexOf(pattern) > 0;
+                if (!hit) hit = SYSTools.catchNull(info.getProperties()).toLowerCase().indexOf(pattern) > 0;
+                if (!hit)
+                    hit = SYSTools.catchNull(info.getResInfoType().getShortDescription()).toLowerCase().indexOf(pattern) > 0;
+                if (!hit)
+                    hit = SYSTools.catchNull(info.getResInfoType().getLongDescription()).toLowerCase().indexOf(pattern) > 0;
+                if (hit) hits.add(info.getResInfoType());
+            }
+        }
+        for (ResInfoType type : ResInfoTypeTools.getAllActive()) {
+            if (!hits.contains(type)) {
+                boolean hit = false;
+                hit = SYSTools.catchNull(type.getShortDescription()).toLowerCase().indexOf(pattern) > 0;
+                if (!hit)
+                    hit = SYSTools.catchNull(type.getLongDescription()).toLowerCase().indexOf(pattern) > 0;
+                if (hit) hits.add(type);
+            }
+        }
+        return hits;
+    }
+
+
     private List<Component> addFilters() {
         List<Component> list = new ArrayList<Component>();
+
+        txtSearch = new JXSearchField(OPDE.lang.getString("misc.msg.searchphrase"));
+        txtSearch.setFont(SYSConst.ARIAL14);
+        txtSearch.setInstantSearchDelay(750);
+        txtSearch.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (SYSTools.catchNull(txtSearch.getText()).trim().length() > 3) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                boolean found = false;
+                                GUITools.setCollapsed(cpsInfo, true);
+                                for (ResInfoType type : new ArrayList<ResInfoType>(search(txtSearch.getText().trim()))) {
+                                    found = true;
+                                    final String keyCat = type.getResInfoCat().getID() + ".xcategory";
+                                    final String keyType = type.getID() + ".xtype";
+                                    if (!mapKey2CP.containsKey(keyType)) {
+                                        createCP4Type(type);
+                                        mapKey2CP.get(keyType).setCollapsed(false);
+                                    }
+                                    if (mapKey2CP.get(keyCat).isCollapsed()) {
+                                        mapKey2CP.get(keyCat).setCollapsed(false);
+                                    }
+                                }
+                                if (!found) {
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.searchempty"));
+                                }
+                            } catch (PropertyVetoException e1) {
+                                // bah!
+                            }
+                        }
+                    });
+
+
+                }
+            }
+        });
+
+        list.add(txtSearch);
 
 //        tbInactive = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".inactive"));
 //        tbInactive.addItemListener(new ItemListener() {
@@ -986,49 +1100,60 @@ public class PnlInfo extends NursingRecordsPanel {
         return list;
     }
 
-    private Icon getIcon(ResInfoType type) {
-//        boolean empty = !valuecache.containsKey(type) || valuecache.get(type).isEmpty();
-
-        if (type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
-            return SYSConst.icon22clock1;
+    private Icon getContentIcon(ResInfoType type) {
+        boolean empty = !mapType2InfoList.containsKey(type) || mapType2InfoList.get(type).isEmpty();
+        if (empty) {
+            return null;
         }
-        if (type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYDAY) {
-            return SYSConst.icon22intervalByDay;
+        if (containsOnlyClosedInfos(type)) {
+            return SYSConst.icon22stopSign;
         }
-        if (type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_NOCONSTRAINTS) {
-            return SYSConst.icon22intervalNoConstraints;
-        }
-
-        return SYSConst.icon22intervalBySecond;
+        return SYSConst.icon22infogreen2;
     }
+
+//    private Icon getIcon(ResInfoType type) {
+////        boolean empty = !mapType2InfoList.containsKey(type) || mapType2InfoList.get(type).isEmpty();
+//
+//        if (type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
+//            return SYSConst.icon22clock1;
+//        }
+//        if (type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYDAY) {
+//            return SYSConst.icon22intervalByDay;
+//        }
+//        if (type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_NOCONSTRAINTS) {
+//            return SYSConst.icon22intervalNoConstraints;
+//        }
+//
+//        return SYSConst.icon22intervalBySecond;
+//    }
 
     private String getTooltip(ResInfoType type) {
         if (type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
-            return OPDE.lang.getString(internalClassID + ".interval_single_incidents");
+            return OPDE.lang.getString(internalClassID + ".dlg.interval_single_incidents");
         }
         if (type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYDAY) {
-            return OPDE.lang.getString(internalClassID + ".interval_byday");
+            return OPDE.lang.getString(internalClassID + ".dlg.interval_byday");
         }
         if (type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_NOCONSTRAINTS) {
-            return OPDE.lang.getString(internalClassID + ".interval_noconstraints");
+            return OPDE.lang.getString(internalClassID + ".dlg.interval_noconstraints");
         }
-        return OPDE.lang.getString(internalClassID + ".interval_bysecond");
+        return OPDE.lang.getString(internalClassID + ".dlg.interval_bysecond");
     }
 
     private ResInfo getLastAbsence() {
         ResInfo lastAbsence = null;
-        if (valuecache.containsKey(typeAbsence) && !valuecache.get(typeAbsence).isEmpty()) {
-            int size = valuecache.get(typeAbsence).size();
-            lastAbsence = valuecache.get(typeAbsence).get(size - 1);
+        if (mapType2InfoList.containsKey(typeAbsence) && !mapType2InfoList.get(typeAbsence).isEmpty()) {
+            int size = mapType2InfoList.get(typeAbsence).size();
+            lastAbsence = mapType2InfoList.get(typeAbsence).get(size - 1);
         }
         return lastAbsence;
     }
 
     private ResInfo getLastStay() {
         ResInfo lastStay = null;
-        if (valuecache.containsKey(typeStartOfStay) && !valuecache.get(typeStartOfStay).isEmpty()) {
-            int size = valuecache.get(typeStartOfStay).size();
-            lastStay = valuecache.get(typeStartOfStay).get(size - 1);
+        if (mapType2InfoList.containsKey(typeStartOfStay) && !mapType2InfoList.get(typeStartOfStay).isEmpty()) {
+            int size = mapType2InfoList.get(typeStartOfStay).size();
+            lastStay = mapType2InfoList.get(typeStartOfStay).get(size - 1);
         }
         return lastStay;
     }
@@ -1079,10 +1204,10 @@ public class PnlInfo extends NursingRecordsPanel {
 
                                     em.getTransaction().commit();
 
-                                    valuecache.get(resInfo.getResInfoType()).remove(resInfo);
-                                    valuecache.get(oldinfo.getResInfoType()).add(oldinfo);
-                                    valuecache.get(newinfo.getResInfoType()).add(newinfo);
-                                    Collections.sort(valuecache.get(newinfo.getResInfoType()));
+                                    mapType2InfoList.get(resInfo.getResInfoType()).remove(resInfo);
+                                    mapType2InfoList.get(oldinfo.getResInfoType()).add(oldinfo);
+                                    mapType2InfoList.get(newinfo.getResInfoType()).add(newinfo);
+                                    Collections.sort(mapType2InfoList.get(newinfo.getResInfoType()));
                                     CollapsiblePane myCP = createCP4Type(newinfo.getResInfoType());
                                     buildPanel();
                                     GUITools.flashBackground(myCP, Color.YELLOW, 2);
@@ -1139,9 +1264,9 @@ public class PnlInfo extends NursingRecordsPanel {
                                     newinfo.setUserOFF(em.merge(OPDE.getLogin().getUser()));
                                     em.getTransaction().commit();
 
-                                    valuecache.get(resInfo.getResInfoType()).remove(resInfo);
-                                    valuecache.get(newinfo.getResInfoType()).add(newinfo);
-                                    Collections.sort(valuecache.get(newinfo.getResInfoType()));
+                                    mapType2InfoList.get(resInfo.getResInfoType()).remove(resInfo);
+                                    mapType2InfoList.get(newinfo.getResInfoType()).add(newinfo);
+                                    Collections.sort(mapType2InfoList.get(newinfo.getResInfoType()));
                                     CollapsiblePane myCP = createCP4Type(newinfo.getResInfoType());
                                     buildPanel();
 
@@ -1198,9 +1323,9 @@ public class PnlInfo extends NursingRecordsPanel {
                                     editinfo.setUserON(em.merge(OPDE.getLogin().getUser()));
                                     em.getTransaction().commit();
 
-                                    valuecache.get(resInfo.getResInfoType()).remove(resInfo);
-                                    valuecache.get(editinfo.getResInfoType()).add(editinfo);
-                                    Collections.sort(valuecache.get(editinfo.getResInfoType()));
+                                    mapType2InfoList.get(resInfo.getResInfoType()).remove(resInfo);
+                                    mapType2InfoList.get(editinfo.getResInfoType()).add(editinfo);
+                                    Collections.sort(mapType2InfoList.get(editinfo.getResInfoType()));
                                     CollapsiblePane myCP = createCP4Type(editinfo.getResInfoType());
                                     buildPanel();
                                     GUITools.flashBackground(myCP, Color.YELLOW, 2);
@@ -1227,7 +1352,9 @@ public class PnlInfo extends NursingRecordsPanel {
                 }
             });
             // Only active ones can be edited, and only by the same user that started it or the admin.
-            btnEdit.setEnabled(ResInfoTools.isChangeable(resInfo) && (OPDE.isAdmin() || resInfo.getUserON().equals(OPDE.getLogin().getUser())));
+            btnEdit.setEnabled(ResInfoTools.isEditable(resInfo) && (OPDE.isAdmin() ||
+                    (resInfo.getUserON().equals(OPDE.getLogin().getUser()) && new DateMidnight(resInfo.getFrom()).equals(new DateMidnight()))  // The same user only on the same day.
+            ));
             pnlMenu.add(btnEdit);
         }
 
@@ -1259,7 +1386,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                     em.remove(newinfo);
                                     em.getTransaction().commit();
 
-                                    valuecache.get(resInfo.getResInfoType()).remove(resInfo);
+                                    mapType2InfoList.get(resInfo.getResInfoType()).remove(resInfo);
                                     createCP4Type(newinfo.getResInfoType());
                                     buildPanel();
                                 } catch (OptimisticLockException ole) {
@@ -1318,9 +1445,9 @@ public class PnlInfo extends NursingRecordsPanel {
                                         editinfo.setTo(date);
                                         em.getTransaction().commit();
 
-                                        valuecache.get(resInfo.getResInfoType()).remove(resInfo);
-                                        valuecache.get(editinfo.getResInfoType()).add(editinfo);
-                                        Collections.sort(valuecache.get(editinfo.getResInfoType()));
+                                        mapType2InfoList.get(resInfo.getResInfoType()).remove(resInfo);
+                                        mapType2InfoList.get(editinfo.getResInfoType()).add(editinfo);
+                                        Collections.sort(mapType2InfoList.get(editinfo.getResInfoType()));
                                         createCP4Type(editinfo.getResInfoType());
                                         buildPanel();
                                     } catch (OptimisticLockException ole) {
@@ -1353,7 +1480,7 @@ public class PnlInfo extends NursingRecordsPanel {
                         GUITools.showPopup(popup, SwingConstants.WEST);
                     } else {
                         final JidePopup popup = new JidePopup();
-                        Pair<Date, Date> expansion = ResInfoTools.getMinMaxExpansion(resInfo, valuecache.get(resInfo.getResInfoType()));
+                        Pair<Date, Date> expansion = ResInfoTools.getMinMaxExpansion(resInfo, mapType2InfoList.get(resInfo.getResInfoType()));
                         PnlPeriod pnlPeriod = new PnlPeriod(expansion.getFirst(), expansion.getSecond(), resInfo.getFrom(), resInfo.getTo(), new Closure() {
                             @Override
                             public void execute(Object o) {
@@ -1371,9 +1498,9 @@ public class PnlInfo extends NursingRecordsPanel {
                                         editinfo.setUserOFF(editinfo.getTo().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE) ? null : em.merge(OPDE.getLogin().getUser()));
                                         em.getTransaction().commit();
 
-                                        valuecache.get(resInfo.getResInfoType()).remove(resInfo);
-                                        valuecache.get(editinfo.getResInfoType()).add(editinfo);
-                                        Collections.sort(valuecache.get(editinfo.getResInfoType()));
+                                        mapType2InfoList.get(resInfo.getResInfoType()).remove(resInfo);
+                                        mapType2InfoList.get(editinfo.getResInfoType()).add(editinfo);
+                                        Collections.sort(mapType2InfoList.get(editinfo.getResInfoType()));
                                         createCP4Type(editinfo.getResInfoType());
                                         buildPanel();
                                     } catch (OptimisticLockException ole) {
@@ -1410,7 +1537,11 @@ public class PnlInfo extends NursingRecordsPanel {
 
                 }
             });
-            btnChangePeriod.setEnabled(!resInfo.isClosed() && !resInfo.isSingleIncident());
+            btnChangePeriod.setEnabled(ResInfoTools.isEditable(resInfo) && !resInfo.isSingleIncident()
+                    && (OPDE.isAdmin() ||
+                    (resInfo.getUserON().equals(OPDE.getLogin().getUser()) && new DateMidnight(resInfo.getFrom()).equals(new DateMidnight()))  // The same user only on the same day.
+            ));
+//            btnChangePeriod.setEnabled(!resInfo.isClosed() && !resInfo.isSingleIncident());
             pnlMenu.add(btnChangePeriod);
 
 
@@ -1438,9 +1569,9 @@ public class PnlInfo extends NursingRecordsPanel {
                                 em.refresh(myInfo);
                                 em.close();
 
-                                valuecache.get(resInfo.getResInfoType()).remove(resInfo);
-                                valuecache.get(myInfo.getResInfoType()).add(myInfo);
-                                Collections.sort(valuecache.get(myInfo.getResInfoType()));
+                                mapType2InfoList.get(resInfo.getResInfoType()).remove(resInfo);
+                                mapType2InfoList.get(myInfo.getResInfoType()).add(myInfo);
+                                Collections.sort(mapType2InfoList.get(myInfo.getResInfoType()));
                                 createInfoPanel(myInfo);
 
                                 buildPanel();
@@ -1451,7 +1582,7 @@ public class PnlInfo extends NursingRecordsPanel {
                 }
             });
 
-//            btnFiles.setEnabled(ResInfoTools.isChangeable(resInfo));
+//            btnFiles.setEnabled(ResInfoTools.isEditable(resInfo));
             if (!resInfo.getAttachedFilesConnections().isEmpty()) {
                 JLabel lblNum = new JLabel(Integer.toString(resInfo.getAttachedFilesConnections().size()), SYSConst.icon16greenStar, SwingConstants.CENTER);
                 lblNum.setFont(SYSConst.ARIAL14BOLD);
@@ -1516,9 +1647,9 @@ public class PnlInfo extends NursingRecordsPanel {
 
                                 em.getTransaction().commit();
 
-                                valuecache.get(resInfo.getResInfoType()).remove(resInfo);
-                                valuecache.get(myInfo.getResInfoType()).add(myInfo);
-                                Collections.sort(valuecache.get(myInfo.getResInfoType()));
+                                mapType2InfoList.get(resInfo.getResInfoType()).remove(resInfo);
+                                mapType2InfoList.get(myInfo.getResInfoType()).add(myInfo);
+                                Collections.sort(mapType2InfoList.get(myInfo.getResInfoType()));
 
                                 createInfoPanel(myInfo);
 
@@ -1546,7 +1677,7 @@ public class PnlInfo extends NursingRecordsPanel {
                     });
                 }
             });
-            btnProcess.setEnabled(ResInfoTools.isChangeable(resInfo));
+            btnProcess.setEnabled(ResInfoTools.isEditable(resInfo));
 
             if (!resInfo.getAttachedProcessConnections().isEmpty()) {
                 JLabel lblNum = new JLabel(Integer.toString(resInfo.getAttachedProcessConnections().size()), SYSConst.icon16redStar, SwingConstants.CENTER);
@@ -1567,11 +1698,10 @@ public class PnlInfo extends NursingRecordsPanel {
 
     @Override
     public void cleanup() {
-//        bwinfotypen.clear();
-//        categories.clear();
-        cpMap.clear();
+        mapKey2CP.clear();
+        mapInfo2Panel.clear();
         cpsInfo.removeAll();
-        valuecache.clear();
+        mapType2InfoList.clear();
         if (listInfo != null) {
             listInfo.clear();
         }
@@ -1608,8 +1738,8 @@ public class PnlInfo extends NursingRecordsPanel {
     private void buildPanel() {
         cpsInfo.removeAll();
         cpsInfo.setLayout(new JideBoxLayout(cpsInfo, JideBoxLayout.Y_AXIS));
-        for (ResInfoCategory cat : categories) {
-            cpsInfo.add(cpMap.get(cat.getID() + ".xcategory"));
+        for (ResInfoCategory cat : listCategories) {
+            cpsInfo.add(mapKey2CP.get(cat.getID() + ".xcategory"));
         }
         cpsInfo.addExpansion();
     }

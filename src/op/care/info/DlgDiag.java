@@ -37,6 +37,7 @@ import entity.prescription.HospitalTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.HorizontalLayout;
@@ -81,6 +82,8 @@ public class DlgDiag extends MyJDialog {
         lblDiagBy.setText(OPDE.lang.getString(internalClassID + ".by"));
         lblSide.setText(OPDE.lang.getString("misc.msg.diag.side"));
         lblSecurity.setText(OPDE.lang.getString("misc.msg.diag.security"));
+        lblInterval.setText(OPDE.lang.getString(PnlInfo.internalClassID+".dlg.interval_noconstraints"));
+        lblInterval.setIcon(SYSConst.icon22intervalNoConstraints);
         reloadTable();
         OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID), 10));
     }
@@ -148,6 +151,7 @@ public class DlgDiag extends MyJDialog {
         cmbSicherheit = new JComboBox();
         jScrollPane1 = new JScrollPane();
         txtBemerkung = new JTextArea();
+        lblInterval = new JLabel();
         panel1 = new JPanel();
         btnCancel = new JButton();
         btnOK = new JButton();
@@ -256,6 +260,10 @@ public class DlgDiag extends MyJDialog {
                 jScrollPane1.setViewportView(txtBemerkung);
             }
             jPanel1.add(jScrollPane1, CC.xywh(3, 11, 7, 1));
+
+            //---- lblInterval ----
+            lblInterval.setText("text");
+            jPanel1.add(lblInterval, CC.xywh(3, 13, 5, 1));
 
             //======== panel1 ========
             {
@@ -394,6 +402,7 @@ public class DlgDiag extends MyJDialog {
     private JComboBox cmbSicherheit;
     private JScrollPane jScrollPane1;
     private JTextArea txtBemerkung;
+    private JLabel lblInterval;
     private JPanel panel1;
     private JButton btnCancel;
     private JButton btnOK;

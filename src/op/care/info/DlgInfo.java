@@ -81,7 +81,21 @@ public class DlgInfo extends MyJDialog {
         txtBemerkung.setWrapStyleWord(true);
         txtBemerkung.setLineWrap(true);
         txtBemerkung.setText(SYSTools.catchNull(resInfo.getText()));
-        contentPanel.add(new JScrollPane(getPanel()), CC.xywh(1, 1, 3, 1, CC.FILL, CC.FILL));
+        if (resInfo.getResInfoType().getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
+            lblInterval.setIcon(SYSConst.icon22clock1);
+            lblInterval.setText(OPDE.lang.getString(internalClassID + ".interval_single_incidents"));
+        } else if (resInfo.getResInfoType().getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYDAY) {
+            lblInterval.setIcon(SYSConst.icon22intervalByDay);
+            lblInterval.setText(OPDE.lang.getString(internalClassID + ".interval_byday"));
+        } else if (resInfo.getResInfoType().getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYSECOND) {
+            lblInterval.setIcon(SYSConst.icon22intervalBySecond);
+            lblInterval.setText(OPDE.lang.getString(internalClassID + ".interval_bysecond"));
+        } else {
+            lblInterval.setIcon(SYSConst.icon22intervalNoConstraints);
+            lblInterval.setText(OPDE.lang.getString(internalClassID + ".interval_noconstraints"));
+        }
+        lblShort.setText(resInfo.getResInfoType().getShortDescription());
+        contentPanel.add(new JScrollPane(getPanel()), CC.xywh(1, 3, 3, 1, CC.FILL, CC.FILL));
         if (resInfo.getResInfoType().getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
             pnlPIT = new op.tools.PnlPIT();
             JLabel header = new JLabel(OPDE.lang.getString(internalClassID + ".singleincident"));
@@ -90,13 +104,13 @@ public class DlgInfo extends MyJDialog {
             header.setHorizontalAlignment(SwingConstants.CENTER);
             panel.add(header);
             panel.add(pnlPIT);
-            contentPanel.add(new JScrollPane(txtBemerkung), CC.xy(1, 3, CC.FILL, CC.FILL));
+            contentPanel.add(new JScrollPane(txtBemerkung), CC.xy(1, 7, CC.FILL, CC.FILL));
             contentPanel.add(panel, CC.xy(3, 3, CC.FILL, CC.FILL));
         } else {
-            contentPanel.add(new JScrollPane(txtBemerkung), CC.xywh(1, 3, 3, 1, CC.FILL, CC.FILL));
+            contentPanel.add(new JScrollPane(txtBemerkung), CC.xywh(1, 7, 3, 1, CC.FILL, CC.FILL));
         }
 
-        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.createnew") + ": " + resInfo.getResInfoType().getShortDescription(), 10));
+//        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.createnew") + ": " + resInfo.getResInfoType().getShortDescription(), 2));
     }
 
     private void btnCancelActionPerformed(ActionEvent e) {
@@ -107,7 +121,6 @@ public class DlgInfo extends MyJDialog {
     private void btnOKActionPerformed(ActionEvent e) {
 
         if (pnlPIT != null) {
-//            OPDE.debug(pnlPIT.getPIT());
             resInfo.setFrom(pnlPIT.getPIT());
         }
 
@@ -130,6 +143,8 @@ public class DlgInfo extends MyJDialog {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         dialogPane = new JPanel();
         contentPanel = new JPanel();
+        lblShort = new JLabel();
+        lblInterval = new JLabel();
         buttonBar = new JPanel();
         btnCancel = new JButton();
         btnOK = new JButton();
@@ -149,7 +164,18 @@ public class DlgInfo extends MyJDialog {
             {
                 contentPanel.setLayout(new FormLayout(
                     "default:grow, $lcgap, 133dlu",
-                    "fill:default:grow, $lgap, 90dlu"));
+                    "default, $lgap, fill:default:grow, $lgap, default, $lgap, 90dlu"));
+
+                //---- lblShort ----
+                lblShort.setText("text");
+                lblShort.setFont(new Font("Arial", Font.PLAIN, 20));
+                lblShort.setHorizontalAlignment(SwingConstants.CENTER);
+                contentPanel.add(lblShort, CC.xywh(1, 1, 3, 1));
+
+                //---- lblInterval ----
+                lblInterval.setText("text");
+                lblInterval.setFont(new Font("Arial", Font.PLAIN, 14));
+                contentPanel.add(lblInterval, CC.xywh(1, 5, 3, 1));
             }
             dialogPane.add(contentPanel, CC.xy(1, 1));
 
@@ -193,6 +219,8 @@ public class DlgInfo extends MyJDialog {
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JPanel dialogPane;
     private JPanel contentPanel;
+    private JLabel lblShort;
+    private JLabel lblInterval;
     private JPanel buttonBar;
     private JButton btnCancel;
     private JButton btnOK;

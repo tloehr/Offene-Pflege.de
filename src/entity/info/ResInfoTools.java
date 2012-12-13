@@ -212,7 +212,7 @@ public class ResInfoTools {
         return biohazard != null;
     }
 
-    public static boolean isChangeable(ResInfo resInfo) {
+    public static boolean isEditable(ResInfo resInfo) {
         return resInfo.getResident().isActive() && (!resInfo.isClosed() || resInfo.isNoConstraints() || resInfo.isSingleIncident());
     }
 
