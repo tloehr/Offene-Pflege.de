@@ -484,7 +484,7 @@ public class PnlProcess extends NursingRecordsPanel {
     @Override
     public void switchResident(Resident resident) {
         this.resident = resident;
-        GUITools.setBWDisplay(resident);
+        GUITools.setResidentDisplay(resident);
         processList = QProcessTools.getProcesses4(resident);
         reloadDisplay();
     }

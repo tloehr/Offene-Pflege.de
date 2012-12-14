@@ -112,7 +112,7 @@ public class PnlInfo extends NursingRecordsPanel {
             }
         });
 
-        GUITools.setBWDisplay(resident);
+        GUITools.setResidentDisplay(resident);
         reload();
     }
 
@@ -320,8 +320,9 @@ public class PnlInfo extends NursingRecordsPanel {
         cptitle.getRight().add(btnMenu);
         cptitle.getMain().setBackground(getColor(resInfo.getResInfoType().getResInfoCat())[SYSConst.light2]);
         cptitle.getMain().setOpaque(true);
-        cptitle.getButton().setIcon(resInfo.isClosed() ? SYSConst.icon22stopSign : null);
         cptitle.getButton().setVerticalTextPosition(SwingConstants.TOP);
+
+        if (resInfo.isClosed()) cptitle.getAdditionalIconPanel().add(new JLabel(SYSConst.icon22stopSign));
 
         mapInfo2Panel.put(resInfo, cptitle.getMain());
 
@@ -416,7 +417,9 @@ public class PnlInfo extends NursingRecordsPanel {
                                 // so that no conflicts can occur if another user enters a new info at the same time
                                 em.lock(em.merge(type), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
                                 final ResInfo newinfo = em.merge((ResInfo) o);
-                                newinfo.setHtml(ResInfoTools.getContentAsHTML(newinfo));
+                                if (newinfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS) {
+                                    newinfo.setHtml(ResInfoTools.getContentAsHTML(newinfo));
+                                }
                                 em.getTransaction().commit();
 
                                 if (!mapType2InfoList.containsKey(newinfo.getResInfoType())) {
@@ -425,6 +428,10 @@ public class PnlInfo extends NursingRecordsPanel {
                                 mapType2InfoList.get(newinfo.getResInfoType()).add(newinfo);
                                 Collections.sort(mapType2InfoList.get(newinfo.getResInfoType()));
                                 createCP4Type(newinfo.getResInfoType());
+
+                                if (newinfo.getResInfoType().isAlertType()) {
+                                    GUITools.setResidentDisplay(resident);
+                                }
 
                                 if (mapKey2CP.get(keyType).isCollapsed()) {
 //                                    final String keyType = type.getID() + ".xtype";
@@ -488,7 +495,18 @@ public class PnlInfo extends NursingRecordsPanel {
             btnPrint.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-//                    SYSFilesTools.print(ResInfoTools.getResInfosAsHTML(mapType2InfoList.get(type), tbInactive.isSelected(), true, type.getShortDescription()), true);
+                    if (mapType2InfoList.containsKey(type) && !mapType2InfoList.get(type).isEmpty()) {
+                        String html = "";
+                        html += "<h3 id=\"fonth3\" >" + type.getShortDescription() + "</h3>\n";
+
+                        html += type.getType() == ResInfoTypeTools.TYPE_BIOHAZARD ? SYSConst.html_48x48_biohazard : "";
+                        html += type.getType() == ResInfoTypeTools.TYPE_DIABETES ? SYSConst.html_48x48_diabetes : "";
+                        html += type.getType() == ResInfoTypeTools.TYPE_ALLERGY ? SYSConst.html_48x48_allergy : "";
+                        html += type.getType() == ResInfoTypeTools.TYPE_WARNING ? SYSConst.html_48x48_warning : "";
+
+                        html += ResInfoTools.getResInfosAsHTML(mapType2InfoList.get(type), true);
+                        SYSFilesTools.print(html, true);
+                    }
                 }
             });
             cptitle.getRight().add(btnPrint);
@@ -509,7 +527,24 @@ public class PnlInfo extends NursingRecordsPanel {
             cpType.setContentPane(createContentPanel4Type(type));
         }
 
-        cptitle.getButton().setIcon(getContentIcon(type));
+
+        boolean empty = !mapType2InfoList.containsKey(type) || mapType2InfoList.get(type).isEmpty();
+        if (!empty) {
+            if (containsOnlyClosedInfos(type))
+                cptitle.getAdditionalIconPanel().add(new JLabel(SYSConst.icon22stopSign));
+            else
+                cptitle.getAdditionalIconPanel().add(new JLabel(SYSConst.icon22infogreen2));
+        }
+
+
+        if (type.getType() == ResInfoTypeTools.TYPE_ALLERGY)
+            cptitle.getAdditionalIconPanel().add(new JLabel(SYSConst.icon22allergy));
+        if (type.getType() == ResInfoTypeTools.TYPE_DIABETES)
+            cptitle.getAdditionalIconPanel().add(new JLabel(SYSConst.icon22diabetes));
+        if (type.getType() == ResInfoTypeTools.TYPE_BIOHAZARD)
+            cptitle.getAdditionalIconPanel().add(new JLabel(SYSConst.icon22biohazard));
+        if (type.getType() == ResInfoTypeTools.TYPE_WARNING)
+            cptitle.getAdditionalIconPanel().add(new JLabel(SYSConst.icon22warning));
 
 
         cptitle.getButton().setToolTipText(getTooltip(type));
@@ -537,6 +572,15 @@ public class PnlInfo extends NursingRecordsPanel {
         searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
         jspSearch.setViewportView(searchPanes);
 
+        JPanel mypanel = new JPanel();
+        mypanel.setLayout(new VerticalLayout());
+        mypanel.setBackground(Color.WHITE);
+
+        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
+        searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
+        searchPane.setCollapsible(false);
+
+
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID) || OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) || OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
             JPanel cmdPanel = new JPanel();
             CollapsiblePane commandPane = new CollapsiblePane(OPDE.lang.getString(internalClassID + ".commands.n.print"));
@@ -551,13 +595,46 @@ public class PnlInfo extends NursingRecordsPanel {
             }
         }
 
-        JPanel mypanel = new JPanel();
-        mypanel.setLayout(new VerticalLayout());
-        mypanel.setBackground(Color.WHITE);
+        /***
+         *      ____       _       _
+         *     |  _ \ _ __(_)_ __ | |_
+         *     | |_) | '__| | '_ \| __|
+         *     |  __/| |  | | | | | |_
+         *     |_|   |_|  |_|_| |_|\__|
+         *
+         */
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
+            final JButton btnPrint = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.print"), SYSConst.icon22print2, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+//                    Collections.sort(listInfo);
+                    String html = "";
+                    html += "<h1 id=\"fonth1\" >" + OPDE.lang.getString("nursingrecords.info");
+                    html += " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getLabelText(resident) + "</h1>\n";
 
-        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
-        searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
-        searchPane.setCollapsible(false);
+                    for (ResInfoCategory cat : listCategories) {
+                        html += "<h2 id=\"fonth2\" >" + cat.getText() + "</h2>\n";
+                        for (ResInfoType type : ResInfoTypeTools.getByCat(cat)) {
+                            if (mapType2InfoList.containsKey(type) && !mapType2InfoList.get(type).isEmpty()) {
+                                html += "<h3 id=\"fonth3\" >" + type.getShortDescription() + "</h3>\n";
+
+                                html += type.getType() == ResInfoTypeTools.TYPE_BIOHAZARD ? SYSConst.html_48x48_biohazard : "";
+                                html += type.getType() == ResInfoTypeTools.TYPE_DIABETES ? SYSConst.html_48x48_diabetes : "";
+                                html += type.getType() == ResInfoTypeTools.TYPE_ALLERGY ? SYSConst.html_48x48_allergy : "";
+                                html += type.getType() == ResInfoTypeTools.TYPE_WARNING ? SYSConst.html_48x48_warning : "";
+
+                                html += ResInfoTools.getResInfosAsHTML(mapType2InfoList.get(type), true);
+                            }
+                        }
+                    }
+                    SYSFilesTools.print(html, true);
+                }
+            });
+            btnPrint.setAlignmentX(Component.RIGHT_ALIGNMENT);
+
+            mypanel.add(btnPrint);
+        }
+
 
         try {
             searchPane.setCollapsed(false);
@@ -642,7 +719,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                     em.lock(em.merge(myResident), LockModeType.OPTIMISTIC);
                                     em.getTransaction().commit();
                                     resident = myResident;
-                                    GUITools.setBWDisplay(resident);
+                                    GUITools.setResidentDisplay(resident);
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -709,7 +786,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                     btnBWisAway.setEnabled(false);
                                     btnBWisBack.setEnabled(false);
 //                                    reloadDisplay();
-                                    GUITools.setBWDisplay(resident);
+                                    GUITools.setResidentDisplay(resident);
                                     OPDE.getMainframe().emptyFrame();
                                     OPDE.getMainframe().afterLogin();
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".msg.isdeadnow"), 5));
@@ -776,7 +853,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                     btnBWisAway.setEnabled(false);
                                     btnBWisBack.setEnabled(false);
 
-                                    GUITools.setBWDisplay(resident);
+                                    GUITools.setResidentDisplay(resident);
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".msg.hasgonenow"), 5));
                                     OPDE.getMainframe().emptyFrame();
                                     OPDE.getMainframe().afterLogin();
@@ -841,7 +918,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                     createCP4Type(typeAbsence);
                                     buildPanel();
 
-                                    GUITools.setBWDisplay(resident);
+                                    GUITools.setResidentDisplay(resident);
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".msg.isawaynow")));
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
@@ -907,7 +984,7 @@ public class PnlInfo extends NursingRecordsPanel {
                         createCP4Type(typeAbsence);
                         buildPanel();
 
-                        GUITools.setBWDisplay(resident);
+                        GUITools.setResidentDisplay(resident);
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".msg.isbacknow")));
                     } catch (OptimisticLockException ole) {
                         OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
@@ -953,39 +1030,6 @@ public class PnlInfo extends NursingRecordsPanel {
 //        });
 //        list.add(btnCollapseAll);
 
-        /***
-         *      ____       _       _
-         *     |  _ \ _ __(_)_ __ | |_
-         *     | |_) | '__| | '_ \| __|
-         *     |  __/| |  | | | | | |_
-         *     |_|   |_|  |_|_| |_|\__|
-         *
-         */
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
-            final JButton btnPrint = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.print"), SYSConst.icon22print2, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-//                    Collections.sort(listInfo);
-                    String html = "";
-                    html += "<h1 id=\"fonth1\" >" + OPDE.lang.getString("nursingrecords.info");
-                    html += " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getLabelText(resident) + "</h1>\n";
-
-                    for (ResInfoCategory cat : listCategories) {
-                        html += "<h2 id=\"fonth2\" >" + cat.getText() + "</h2>\n";
-                        for (ResInfoType type : ResInfoTypeTools.getByCat(cat)) {
-                            if (mapType2InfoList.containsKey(type) && !mapType2InfoList.get(type).isEmpty()) {
-                                html += "<h3 id=\"fonth3\" >" + type.getShortDescription() + "</h3>\n";
-                                html += ResInfoTools.getResInfosAsHTML(mapType2InfoList.get(type), true);
-                            }
-                        }
-                    }
-                    SYSFilesTools.print(html, true);
-                }
-            });
-            btnPrint.setAlignmentX(Component.RIGHT_ALIGNMENT);
-
-            list.add(btnPrint);
-        }
 
         return list;
     }

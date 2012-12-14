@@ -25,19 +25,19 @@ public class ResInfoTypeTools {
     public static final int STATUS_SYSTEM = 10;
     public static final int STATUS_INACTIVE_SYSTEM = -10;
 
+    public static final int TYPE_ABSENCE = 10;
+    public static final int TYPE_ALLERGY = 97;
+    public static final int TYPE_BIOHAZARD = 99;
+    public static final int TYPE_DIABETES = 98;
     public static final int TYPE_DIAGNOSIS = 50;
+    public static final int TYPE_FALL = 30; // Sturz
+    public static final int TYPE_OLD = -1;
     public static final int TYPE_STAY = 100;
     public static final int TYPE_WARNING = 96;
-    public static final int TYPE_ALLERGY = 97;
-    public static final int TYPE_DIABETES = 98;
-    public static final int TYPE_BIOHAZARD = 99;
+    public static final int TYPE_WOUNDS = 20;
+
 
 //    public static final String TYPE_HOSPITAL_STAY = "KH";
-
-    public static final int TYPE_OLD = -1;
-    public static final int TYPE_WOUNDS = 20;
-    public static final int TYPE_FALL = 30; // Sturz
-    public static final int TYPE_ABSENCE = 10;
 
     public static final String TYPE_ABSENCE_HOSPITAL = "HOSPITAL";
     public static final String TYPE_ABSENCE_HOLLIDAY = "HOLLIDAY";

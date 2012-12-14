@@ -467,7 +467,7 @@ public class FrmMain extends JFrame {
         if (currentResident != null) {
             SYSFilesTools.print(ResInfoTools.getTXReport(currentResident, true, true, true, true, true, true, true, true, true), false);
         } else {
-            displayManager.addSubMessage(new DisplayMessage("Bitte wählen Sie zuerst eine(n) BewohnerIn aus.", 5));
+            displayManager.addSubMessage(new DisplayMessage("misc.msg.choose.a.resident.first"));
         }
     }//GEN-LAST:event_btnVerlegungActionPerformed
 

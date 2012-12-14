@@ -28,11 +28,12 @@ package op.care.info;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.info.ResInfo;
-import entity.prescription.Hospital;
-import entity.prescription.*;
-import entity.info.ResInfoTools;
 import entity.info.ICD;
+import entity.info.ResInfo;
+import entity.info.ResInfoTools;
+import entity.prescription.Doc;
+import entity.prescription.DocTools;
+import entity.prescription.Hospital;
 import entity.prescription.HospitalTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
@@ -82,7 +83,7 @@ public class DlgDiag extends MyJDialog {
         lblDiagBy.setText(OPDE.lang.getString(internalClassID + ".by"));
         lblSide.setText(OPDE.lang.getString("misc.msg.diag.side"));
         lblSecurity.setText(OPDE.lang.getString("misc.msg.diag.security"));
-        lblInterval.setText(OPDE.lang.getString(PnlInfo.internalClassID+".dlg.interval_noconstraints"));
+        lblInterval.setText(OPDE.lang.getString(PnlInfo.internalClassID + ".dlg.interval_noconstraints"));
         lblInterval.setIcon(SYSConst.icon22intervalNoConstraints);
         reloadTable();
         OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID), 10));
@@ -164,8 +165,8 @@ public class DlgDiag extends MyJDialog {
         {
             jPanel1.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
             jPanel1.setLayout(new FormLayout(
-                "default, 2*($lcgap, default:grow), $ugap, 2*(default:grow, $lcgap), default",
-                "default, $lgap, fill:default, $lgap, fill:104dlu:grow, 2*($lgap, fill:default), $lgap, fill:89dlu:grow, $ugap, default, $lgap, default"));
+                    "default, 2*($lcgap, default:grow), $ugap, 2*(default:grow, $lcgap), default",
+                    "default, $lgap, fill:default, $lgap, fill:104dlu:grow, $lgap, fill:default, $lgap, default, $lgap, fill:default, $lgap, fill:89dlu:grow, $ugap, default, $lgap, default"));
 
             //---- txtSuche ----
             txtSuche.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -194,61 +195,61 @@ public class DlgDiag extends MyJDialog {
             //======== panel2 ========
             {
                 panel2.setLayout(new FormLayout(
-                    "default:grow, $rgap, default:grow",
-                    "default:grow"));
+                        "default:grow, $rgap, default:grow",
+                        "default:grow"));
 
                 //---- cmbArzt ----
-                cmbArzt.setModel(new DefaultComboBoxModel(new String[] {
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+                cmbArzt.setModel(new DefaultComboBoxModel(new String[]{
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                        "Item 4"
                 }));
                 cmbArzt.setFont(new Font("Arial", Font.PLAIN, 14));
-                panel2.add(cmbArzt, CC.xy(1, 1));
+                panel2.add(cmbArzt, CC.xywh(1, 1, 3, 1));
+            }
+            jPanel1.add(panel2, CC.xywh(5, 7, 5, 1));
 
-                //---- cmbKH ----
-                cmbKH.setModel(new DefaultComboBoxModel(new String[] {
+            //---- cmbKH ----
+            cmbKH.setModel(new DefaultComboBoxModel(new String[]{
                     "Item 1",
                     "Item 2",
                     "Item 3",
                     "Item 4"
-                }));
-                cmbKH.setFont(new Font("Arial", Font.PLAIN, 14));
-                panel2.add(cmbKH, CC.xy(3, 1));
-            }
-            jPanel1.add(panel2, CC.xywh(5, 7, 5, 1));
+            }));
+            cmbKH.setFont(new Font("Arial", Font.PLAIN, 14));
+            jPanel1.add(cmbKH, CC.xywh(5, 9, 5, 1));
 
             //---- lblSecurity ----
             lblSecurity.setText("Diagnosesicherheit:");
             lblSecurity.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel1.add(lblSecurity, CC.xy(7, 9));
+            jPanel1.add(lblSecurity, CC.xy(7, 11));
 
             //---- lblSide ----
             lblSide.setText("K\u00f6rperseite:");
             lblSide.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel1.add(lblSide, CC.xy(3, 9, CC.RIGHT, CC.DEFAULT));
+            jPanel1.add(lblSide, CC.xy(3, 11, CC.RIGHT, CC.DEFAULT));
 
             //---- cmbKoerper ----
-            cmbKoerper.setModel(new DefaultComboBoxModel(new String[] {
-                "Nicht festgelegt",
-                "links",
-                "rechts",
-                "beidseitig"
+            cmbKoerper.setModel(new DefaultComboBoxModel(new String[]{
+                    "Nicht festgelegt",
+                    "links",
+                    "rechts",
+                    "beidseitig"
             }));
             cmbKoerper.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel1.add(cmbKoerper, CC.xy(5, 9));
+            jPanel1.add(cmbKoerper, CC.xy(5, 11));
 
             //---- cmbSicherheit ----
-            cmbSicherheit.setModel(new DefaultComboBoxModel(new String[] {
-                "Nicht festgelegt",
-                "gesichert",
-                "Verdacht auf",
-                "Ausschlu\u00df von",
-                "Zustand nach"
+            cmbSicherheit.setModel(new DefaultComboBoxModel(new String[]{
+                    "Nicht festgelegt",
+                    "gesichert",
+                    "Verdacht auf",
+                    "Ausschlu\u00df von",
+                    "Zustand nach"
             }));
             cmbSicherheit.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel1.add(cmbSicherheit, CC.xy(9, 9));
+            jPanel1.add(cmbSicherheit, CC.xy(9, 11));
 
             //======== jScrollPane1 ========
             {
@@ -259,11 +260,11 @@ public class DlgDiag extends MyJDialog {
                 txtBemerkung.setFont(new Font("Arial", Font.PLAIN, 14));
                 jScrollPane1.setViewportView(txtBemerkung);
             }
-            jPanel1.add(jScrollPane1, CC.xywh(3, 11, 7, 1));
+            jPanel1.add(jScrollPane1, CC.xywh(3, 13, 7, 1));
 
             //---- lblInterval ----
             lblInterval.setText("text");
-            jPanel1.add(lblInterval, CC.xywh(3, 13, 5, 1));
+            jPanel1.add(lblInterval, CC.xywh(3, 15, 5, 1));
 
             //======== panel1 ========
             {
@@ -291,10 +292,10 @@ public class DlgDiag extends MyJDialog {
                 });
                 panel1.add(btnOK);
             }
-            jPanel1.add(panel1, CC.xy(9, 13));
+            jPanel1.add(panel1, CC.xy(9, 15));
         }
         contentPane.add(jPanel1, BorderLayout.CENTER);
-        setSize(600, 520);
+        setSize(600, 565);
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
@@ -347,22 +348,23 @@ public class DlgDiag extends MyJDialog {
         props.put("khid", kh == null ? "null" : kh.getKhid().toString());
 
         String html = "";
-        html += "&lt;br/&gt;&lt;b&gt;" + icd.getText() + "&lt;/b&gt;&lt;br/&gt;";
+        html += "<br/>" + SYSConst.html_bold(icd.getICD10() + ": " + icd.getText()) + "<br/>";
         html += OPDE.lang.getString(internalClassID + ".by") + ": ";
         if (kh != null) {
-            html += "&lt;b&gt;" + HospitalTools.getFullName(kh) + "&lt;/b&gt;";
+            html += SYSConst.html_bold(HospitalTools.getFullName(kh));
         }
         if (doc != null) {
             if (kh != null) {
-                html += "&lt;br/&gt;" + OPDE.lang.getString("misc.msg.confirmedby") + ": ";
+                html += "<br/>" + OPDE.lang.getString("misc.msg.confirmedby") + ": ";
             }
-            html += "&lt;b&gt;" + DocTools.getFullName(doc) + "&lt;/b&gt;" + " &lt;br/&gt;";
+            html += SYSConst.html_bold(DocTools.getFullName(doc)) + "<br/>";
         }
-        html += OPDE.lang.getString("misc.msg.diag.side") + ": &lt;b&gt;" + cmbKoerper.getSelectedItem().toString() + "&lt;/b&gt;&lt;br/&gt;";
-        html += OPDE.lang.getString("misc.msg.diag.security") + ": &lt;b&gt;" + cmbSicherheit.getSelectedItem().toString() + "&lt;/b&gt;";
+        html += OPDE.lang.getString("misc.msg.diag.side") + ": " + SYSConst.html_bold(cmbKoerper.getSelectedItem().toString()) + "<br/>";
+        html += OPDE.lang.getString("misc.msg.diag.security") + ": " + SYSConst.html_bold(cmbSicherheit.getSelectedItem().toString()) + "<br/>";
 
         ResInfoTools.setContent(diag, props);
         diag.setHtml(html);
+        diag.setText(txtBemerkung.getText().trim());
 
     }
 

@@ -137,7 +137,11 @@ public class ResInfoType implements Serializable {
         this.intervalMode = intervalMode;
     }
 
-    public boolean isObsolete(){
+    public boolean isAlertType() {
+        return type == ResInfoTypeTools.TYPE_ALLERGY || type == ResInfoTypeTools.TYPE_BIOHAZARD || type == ResInfoTypeTools.TYPE_DIABETES || type == ResInfoTypeTools.TYPE_WARNING;
+    }
+
+    public boolean isObsolete() {
         return type < 0;
     }
 

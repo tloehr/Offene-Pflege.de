@@ -121,7 +121,7 @@ public class PnlDFN extends NursingRecordsPanel {
 
     @Override
     public void reload() {
-        GUITools.setBWDisplay(resident);
+        GUITools.setResidentDisplay(resident);
         reloadDisplay();
     }
 
@@ -129,7 +129,7 @@ public class PnlDFN extends NursingRecordsPanel {
     @Override
     public void switchResident(Resident bewohner) {
         this.resident = bewohner;
-        GUITools.setBWDisplay(resident);
+        GUITools.setResidentDisplay(resident);
 
         initPhase = true;
         jdcDate.setMinSelectableDate(DFNTools.getMinDatum(bewohner));

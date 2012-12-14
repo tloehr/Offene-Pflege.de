@@ -314,6 +314,9 @@ public class SYSFilesTools {
      * Diese Methode ermittelt zu einer gebenen Datei und einer gewünschten Aktion das passende Anzeigeprogramm.
      * Falls die Desktop API nicht passendes hat, werdne die lokal definierten Anzeigeprogramme verwendet.
      *
+     * Bei Linux müssen dafür unbedingt die Gnome Libraries installiert sein.
+     * apt-get install libgnome2-0
+     *
      * @param file
      * @param action
      */

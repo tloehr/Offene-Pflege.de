@@ -33,7 +33,6 @@ import com.jidesoft.swing.JideButton;
 import entity.files.SYSFilesTools;
 import entity.info.ResInfoTools;
 import entity.info.Resident;
-import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.reports.PnlReport;
 import op.threads.DisplayMessage;
@@ -106,7 +105,7 @@ public class PnlResOverview extends NursingRecordsPanel {
     @Override
     public void switchResident(Resident bewohner) {
         this.bewohner = bewohner;
-        GUITools.setBWDisplay(bewohner);
+        GUITools.setResidentDisplay(bewohner);
         reloadDisplay();
     }
 

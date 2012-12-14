@@ -111,7 +111,7 @@ public class PnlPrescription extends NursingRecordsPanel {
     @Override
     public void switchResident(Resident resident) {
         this.resident = resident;
-        GUITools.setBWDisplay(resident);
+        GUITools.setResidentDisplay(resident);
         reloadDisplay();
     }
 

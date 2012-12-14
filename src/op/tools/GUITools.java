@@ -225,7 +225,7 @@ public class GUITools {
         return dropPanel;
     }
 
-    public static void setBWDisplay(Resident resident) {
+    public static void setResidentDisplay(Resident resident) {
         OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(resident), SYSTools.toHTML(ResInfoTools.getTXReportHeader(resident, false)));
         // result += getTXReportHeader(resident, withlongheader);
         ResInfo biohazard = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_BIOHAZARD));

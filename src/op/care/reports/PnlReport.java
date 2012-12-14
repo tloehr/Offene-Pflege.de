@@ -164,7 +164,7 @@ public class PnlReport extends NursingRecordsPanel {
 
     @Override
     public void reload() {
-        GUITools.setBWDisplay(resident);
+        GUITools.setResidentDisplay(resident);
         reloadDisplay();
     }
 
@@ -424,7 +424,7 @@ public class PnlReport extends NursingRecordsPanel {
                 @Override
                 protected Object doInBackground() throws Exception {
 
-                    GUITools.setBWDisplay(resident);
+                    GUITools.setResidentDisplay(resident);
 
                     Pair<DateTime, DateTime> minmax = NReportTools.getMinMax(resident);
                     hollidays = SYSCalendar.getHollidays(minmax.getFirst().getYear(), minmax.getSecond().getYear());
