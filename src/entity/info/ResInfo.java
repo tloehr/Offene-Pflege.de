@@ -184,7 +184,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
 //        return bwinfotyp.getID().equalsIgnoreCase("hauf");
 //    }
 
-    public Collection<SYSINF2PROCESS> getAttachedProcessConnections() {
+    public Collection<SYSINF2PROCESS> getAttachedQProcessConnections() {
         return attachedProcessConnections;
     }
 

@@ -213,7 +213,7 @@ public class ResInfoTools {
     }
 
     public static boolean isEditable(ResInfo resInfo) {
-        return resInfo.getResident().isActive() && (!resInfo.isClosed() || resInfo.isNoConstraints() || resInfo.isSingleIncident());
+        return resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && resInfo.getResident().isActive() && (!resInfo.isClosed() || resInfo.isNoConstraints() || resInfo.isSingleIncident());
     }
 
     /**

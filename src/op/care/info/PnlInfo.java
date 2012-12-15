@@ -200,7 +200,7 @@ public class PnlInfo extends NursingRecordsPanel {
             }
 
             for (ResInfoCategory cat : listCategories) {
-                createCP4Cat(cat);
+                createCP4(cat);
             }
             buildPanel();
         }
@@ -208,7 +208,7 @@ public class PnlInfo extends NursingRecordsPanel {
 
     }
 
-    private CollapsiblePane createCP4Cat(final ResInfoCategory cat) {
+    private CollapsiblePane createCP4(final ResInfoCategory cat) {
         /***
          *                          _        ____ ____  _  _      ____      _
          *       ___ _ __ ___  __ _| |_ ___ / ___|  _ \| || |    / ___|__ _| |_ ___  __ _  ___  _ __ _   _
@@ -257,7 +257,7 @@ public class PnlInfo extends NursingRecordsPanel {
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
                 JPanel pnlContent = new JPanel(new VerticalLayout());
                 for (ResInfoType type : ResInfoTypeTools.getByCat(cat)) {
-                    pnlContent.add(createCP4Type(type));
+                    pnlContent.add(createCP4(type));
                 }
                 cpCat.setContentPane(pnlContent);
             }
@@ -266,7 +266,7 @@ public class PnlInfo extends NursingRecordsPanel {
         if (!cpCat.isCollapsed()) {
             JPanel pnlContent = new JPanel(new VerticalLayout());
             for (ResInfoType type : ResInfoTypeTools.getByCat(cat)) {
-                pnlContent.add(createCP4Type(type));
+                pnlContent.add(createCP4(type));
             }
             cpCat.setContentPane(pnlContent);
         }
@@ -274,7 +274,7 @@ public class PnlInfo extends NursingRecordsPanel {
         return cpCat;
     }
 
-    private JPanel createInfoPanel(final ResInfo resInfo) {
+    private JPanel createPanel(final ResInfo resInfo) {
         String title = "<html><table border=\"0\">" +
                 "<tr valign=\"top\">" +
                 "<td width=\"280\" align=\"left\">" + resInfo.getPITAsHTML() + "</td>" +
@@ -285,6 +285,152 @@ public class PnlInfo extends NursingRecordsPanel {
                 "</table>" +
                 "</html>";
         DefaultCPTitle cptitle = new DefaultCPTitle(title, null);
+
+        if (!resInfo.getAttachedFilesConnections().isEmpty()) {
+            OPDE.debug("erstelle grünen stern");
+            /***
+             *      _     _         _____ _ _
+             *     | |__ | |_ _ __ |  ___(_) | ___  ___
+             *     | '_ \| __| '_ \| |_  | | |/ _ \/ __|
+             *     | |_) | |_| | | |  _| | | |  __/\__ \
+             *     |_.__/ \__|_| |_|_|   |_|_|\___||___/
+             *
+             */
+            final JButton btnFiles = new JButton(Integer.toString(resInfo.getAttachedFilesConnections().size()), SYSConst.icon22greenStar);
+            btnFiles.setToolTipText(OPDE.lang.getString("misc.btnfiles.tooltip"));
+            btnFiles.setForeground(Color.BLUE);
+            btnFiles.setHorizontalTextPosition(SwingUtilities.CENTER);
+            btnFiles.setFont(SYSConst.ARIAL18BOLD);
+            btnFiles.setPressedIcon(SYSConst.icon22Pressed);
+            btnFiles.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnFiles.setAlignmentY(Component.TOP_ALIGNMENT);
+            btnFiles.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            btnFiles.setContentAreaFilled(false);
+            btnFiles.setBorder(null);
+
+            btnFiles.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    Closure fileHandleClosure = new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            EntityManager em = OPDE.createEM();
+                            final ResInfo myInfo = em.merge(resInfo);
+                            em.refresh(myInfo);
+                            em.close();
+
+
+                            mapType2InfoList.get(resInfo.getResInfoType()).remove(resInfo);
+                            mapType2InfoList.get(myInfo.getResInfoType()).add(myInfo);
+                            Collections.sort(mapType2InfoList.get(myInfo.getResInfoType()));
+                            final CollapsiblePane myCP = createCP4(myInfo.getResInfoType());
+                            buildPanel();
+
+                            // TODO: KNOWN_ISSUE: After attaching a file the green star appears only after the CP has been collapsed and expanded again.
+                        }
+                    };
+                    new DlgFiles(resInfo, fileHandleClosure);
+                }
+            });
+            cptitle.getRight().add(btnFiles);
+        }
+
+
+        if (!resInfo.getAttachedQProcessConnections().isEmpty()) {
+            /***
+             *      _     _         ____
+             *     | |__ | |_ _ __ |  _ \ _ __ ___   ___ ___  ___ ___
+             *     | '_ \| __| '_ \| |_) | '__/ _ \ / __/ _ \/ __/ __|
+             *     | |_) | |_| | | |  __/| | | (_) | (_|  __/\__ \__ \
+             *     |_.__/ \__|_| |_|_|   |_|  \___/ \___\___||___/___/
+             *
+             */
+            final JButton btnProcess = new JButton(Integer.toString(resInfo.getAttachedQProcessConnections().size()), SYSConst.icon22redStar);
+            btnProcess.setToolTipText(OPDE.lang.getString("misc.btnprocess.tooltip"));
+            btnProcess.setForeground(Color.YELLOW);
+            btnProcess.setHorizontalTextPosition(SwingUtilities.CENTER);
+            btnProcess.setFont(SYSConst.ARIAL18BOLD);
+            btnProcess.setPressedIcon(SYSConst.icon22Pressed);
+            btnProcess.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnProcess.setAlignmentY(Component.TOP_ALIGNMENT);
+            btnProcess.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            btnProcess.setContentAreaFilled(false);
+            btnProcess.setBorder(null);
+            btnProcess.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    new DlgProcessAssign(resInfo, new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            if (o == null) {
+                                return;
+                            }
+                            Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = (Pair<ArrayList<QProcess>, ArrayList<QProcess>>) o;
+
+                            ArrayList<QProcess> assigned = result.getFirst();
+                            ArrayList<QProcess> unassigned = result.getSecond();
+
+                            EntityManager em = OPDE.createEM();
+
+                            try {
+                                em.getTransaction().begin();
+
+                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                ResInfo myInfo = em.merge(resInfo);
+                                em.lock(myInfo, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
+
+                                for (SYSINF2PROCESS linkObject : myInfo.getAttachedQProcessConnections()) {
+                                    if (unassigned.contains(linkObject.getQProcess())) {
+                                        em.remove(em.merge(linkObject));
+                                    }
+                                }
+
+                                for (QProcess qProcess : assigned) {
+                                    java.util.List<QProcessElement> listElements = qProcess.getElements();
+                                    if (!listElements.contains(myInfo)) {
+                                        QProcess myQProcess = em.merge(qProcess);
+                                        SYSINF2PROCESS myLinkObject = em.merge(new SYSINF2PROCESS(myQProcess, myInfo));
+                                        qProcess.getAttachedResInfoConnections().add(myLinkObject);
+                                        myInfo.getAttachedQProcessConnections().add(myLinkObject);
+                                    }
+                                }
+
+                                em.getTransaction().commit();
+
+                                mapType2InfoList.get(resInfo.getResInfoType()).remove(resInfo);
+                                mapType2InfoList.get(myInfo.getResInfoType()).add(myInfo);
+                                Collections.sort(mapType2InfoList.get(myInfo.getResInfoType()));
+                                final CollapsiblePane myCP = createCP4(myInfo.getResInfoType());
+                                buildPanel();
+
+
+                            } catch (OptimisticLockException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                } else {
+                                    reloadDisplay();
+                                }
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+                            }
+
+                        }
+                    });
+                }
+            });
+            btnProcess.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
+            cptitle.getRight().add(btnProcess);
+        }
 
         /***
          *      __  __
@@ -329,7 +475,7 @@ public class PnlInfo extends NursingRecordsPanel {
         return cptitle.getMain();
     }
 
-    private JPanel createContentPanel4Type(final ResInfoType type) {
+    private JPanel createPanel(final ResInfoType type) {
         final JPanel infoPanel = new JPanel(new VerticalLayout());
         infoPanel.setOpaque(false);
 
@@ -339,7 +485,7 @@ public class PnlInfo extends NursingRecordsPanel {
 
         int i = 0; // for zebra pattern
         for (final ResInfo resInfo : mapType2InfoList.get(type)) {
-            JPanel cp = createInfoPanel(resInfo);
+            JPanel cp = createPanel(resInfo);
             if (i % 2 == 0) {
                 cp.setBackground(Color.WHITE);
             }
@@ -351,7 +497,7 @@ public class PnlInfo extends NursingRecordsPanel {
     }
 
 
-    private CollapsiblePane createCP4Type(final ResInfoType type) {
+    private CollapsiblePane createCP4(final ResInfoType type) {
         /***
          *                          _        ____ ____  _  _     _____
          *       ___ _ __ ___  __ _| |_ ___ / ___|  _ \| || |   |_   _|   _ _ __   ___
@@ -427,7 +573,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                 }
                                 mapType2InfoList.get(newinfo.getResInfoType()).add(newinfo);
                                 Collections.sort(mapType2InfoList.get(newinfo.getResInfoType()));
-                                createCP4Type(newinfo.getResInfoType());
+                                createCP4(newinfo.getResInfoType());
 
                                 if (newinfo.getResInfoType().isAlertType()) {
                                     GUITools.setResidentDisplay(resident);
@@ -517,14 +663,14 @@ public class PnlInfo extends NursingRecordsPanel {
         cpType.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                cpType.setContentPane(createContentPanel4Type(type));
+                cpType.setContentPane(createPanel(type));
             }
         });
 
 //        cpType.setCollapsible(mapType2InfoList.containsKey(type) && !mapType2InfoList.get(type).isEmpty());
 
         if (!cpType.isCollapsed()) {
-            cpType.setContentPane(createContentPanel4Type(type));
+            cpType.setContentPane(createPanel(type));
         }
 
 
@@ -583,7 +729,7 @@ public class PnlInfo extends NursingRecordsPanel {
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID) || OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) || OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
             JPanel cmdPanel = new JPanel();
-            CollapsiblePane commandPane = new CollapsiblePane(OPDE.lang.getString(internalClassID + ".commands.n.print"));
+            CollapsiblePane commandPane = new CollapsiblePane(OPDE.lang.getString(internalClassID + ".functions"));
             cmdPanel.setLayout(new VerticalLayout());
             GUITools.addAllComponents(cmdPanel, addCommands());
             commandPane.setContentPane(cmdPanel);
@@ -915,7 +1061,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                     }
                                     mapType2InfoList.get(typeAbsence).add(absence);
                                     Collections.sort(mapType2InfoList.get(typeAbsence));
-                                    createCP4Type(typeAbsence);
+                                    createCP4(typeAbsence);
                                     buildPanel();
 
                                     GUITools.setResidentDisplay(resident);
@@ -981,7 +1127,7 @@ public class PnlInfo extends NursingRecordsPanel {
                         mapType2InfoList.get(typeAbsence).remove(lastabsence);
                         mapType2InfoList.get(typeAbsence).add(lastabsence);
                         Collections.sort(mapType2InfoList.get(typeAbsence));
-                        createCP4Type(typeAbsence);
+                        createCP4(typeAbsence);
                         buildPanel();
 
                         GUITools.setResidentDisplay(resident);
@@ -1107,7 +1253,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                     final String keyCat = type.getResInfoCat().getID() + ".xcategory";
                                     final String keyType = type.getID() + ".xtype";
                                     if (!mapKey2CP.containsKey(keyType)) {
-                                        createCP4Type(type);
+                                        createCP4(type);
                                         mapKey2CP.get(keyType).setCollapsed(false);
                                     }
                                     if (mapKey2CP.get(keyCat).isCollapsed()) {
@@ -1252,7 +1398,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                     mapType2InfoList.get(oldinfo.getResInfoType()).add(oldinfo);
                                     mapType2InfoList.get(newinfo.getResInfoType()).add(newinfo);
                                     Collections.sort(mapType2InfoList.get(newinfo.getResInfoType()));
-                                    CollapsiblePane myCP = createCP4Type(newinfo.getResInfoType());
+                                    CollapsiblePane myCP = createCP4(newinfo.getResInfoType());
                                     buildPanel();
                                     GUITools.flashBackground(myCP, Color.YELLOW, 2);
                                 } catch (OptimisticLockException ole) {
@@ -1277,7 +1423,7 @@ public class PnlInfo extends NursingRecordsPanel {
                     });
                 }
             });
-            btnChange.setEnabled(!resInfo.isClosed() && !resInfo.isSingleIncident() && !resInfo.isNoConstraints());
+            btnChange.setEnabled(resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && !resInfo.isClosed() && !resInfo.isSingleIncident() && !resInfo.isNoConstraints());
             pnlMenu.add(btnChange);
 
 
@@ -1311,7 +1457,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                     mapType2InfoList.get(resInfo.getResInfoType()).remove(resInfo);
                                     mapType2InfoList.get(newinfo.getResInfoType()).add(newinfo);
                                     Collections.sort(mapType2InfoList.get(newinfo.getResInfoType()));
-                                    CollapsiblePane myCP = createCP4Type(newinfo.getResInfoType());
+                                    CollapsiblePane myCP = createCP4(newinfo.getResInfoType());
                                     buildPanel();
 
                                     GUITools.flashBackground(myCP, Color.YELLOW, 2);
@@ -1370,9 +1516,10 @@ public class PnlInfo extends NursingRecordsPanel {
                                     mapType2InfoList.get(resInfo.getResInfoType()).remove(resInfo);
                                     mapType2InfoList.get(editinfo.getResInfoType()).add(editinfo);
                                     Collections.sort(mapType2InfoList.get(editinfo.getResInfoType()));
-                                    CollapsiblePane myCP = createCP4Type(editinfo.getResInfoType());
+                                    CollapsiblePane myCP = createCP4(editinfo.getResInfoType());
                                     buildPanel();
-                                    GUITools.flashBackground(myCP, Color.YELLOW, 2);
+
+                                    GUITools.flashBackground(mapInfo2Panel.get(editinfo), Color.YELLOW, 2);
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -1431,7 +1578,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                     em.getTransaction().commit();
 
                                     mapType2InfoList.get(resInfo.getResInfoType()).remove(resInfo);
-                                    createCP4Type(newinfo.getResInfoType());
+                                    createCP4(newinfo.getResInfoType());
                                     buildPanel();
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
@@ -1492,7 +1639,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                         mapType2InfoList.get(resInfo.getResInfoType()).remove(resInfo);
                                         mapType2InfoList.get(editinfo.getResInfoType()).add(editinfo);
                                         Collections.sort(mapType2InfoList.get(editinfo.getResInfoType()));
-                                        createCP4Type(editinfo.getResInfoType());
+                                        createCP4(editinfo.getResInfoType());
                                         buildPanel();
                                     } catch (OptimisticLockException ole) {
                                         if (em.getTransaction().isActive()) {
@@ -1545,7 +1692,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                         mapType2InfoList.get(resInfo.getResInfoType()).remove(resInfo);
                                         mapType2InfoList.get(editinfo.getResInfoType()).add(editinfo);
                                         Collections.sort(mapType2InfoList.get(editinfo.getResInfoType()));
-                                        createCP4Type(editinfo.getResInfoType());
+                                        createCP4(editinfo.getResInfoType());
                                         buildPanel();
                                     } catch (OptimisticLockException ole) {
                                         if (em.getTransaction().isActive()) {
@@ -1588,6 +1735,7 @@ public class PnlInfo extends NursingRecordsPanel {
 //            btnChangePeriod.setEnabled(!resInfo.isClosed() && !resInfo.isSingleIncident());
             pnlMenu.add(btnChangePeriod);
 
+            pnlMenu.add(new JSeparator());
 
             /***
              *      _     _         _____ _ _
@@ -1616,7 +1764,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                 mapType2InfoList.get(resInfo.getResInfoType()).remove(resInfo);
                                 mapType2InfoList.get(myInfo.getResInfoType()).add(myInfo);
                                 Collections.sort(mapType2InfoList.get(myInfo.getResInfoType()));
-                                createInfoPanel(myInfo);
+                                createPanel(myInfo);
 
                                 buildPanel();
                             }
@@ -1625,19 +1773,7 @@ public class PnlInfo extends NursingRecordsPanel {
                     new DlgFiles(resInfo, closure);
                 }
             });
-
-//            btnFiles.setEnabled(ResInfoTools.isEditable(resInfo));
-            if (!resInfo.getAttachedFilesConnections().isEmpty()) {
-                JLabel lblNum = new JLabel(Integer.toString(resInfo.getAttachedFilesConnections().size()), SYSConst.icon16greenStar, SwingConstants.CENTER);
-                lblNum.setFont(SYSConst.ARIAL14BOLD);
-                lblNum.setForeground(Color.BLACK);
-                lblNum.setHorizontalTextPosition(SwingConstants.CENTER);
-                DefaultOverlayable overlayableBtn = new DefaultOverlayable(btnFiles, lblNum, DefaultOverlayable.SOUTH_EAST);
-                overlayableBtn.setOpaque(false);
-                pnlMenu.add(overlayableBtn);
-            } else {
-                pnlMenu.add(btnFiles);
-            }
+            pnlMenu.add(btnFiles);
 
 
             /***
@@ -1673,7 +1809,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                 final ResInfo myInfo = em.merge(resInfo);
                                 em.lock(myInfo, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-                                for (SYSINF2PROCESS linkObject : myInfo.getAttachedProcessConnections()) {
+                                for (SYSINF2PROCESS linkObject : myInfo.getAttachedQProcessConnections()) {
                                     if (unassigned.contains(linkObject.getQProcess())) {
                                         em.remove(em.merge(linkObject));
                                     }
@@ -1685,7 +1821,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                         QProcess myQProcess = em.merge(qProcess);
                                         SYSINF2PROCESS myLinkObject = em.merge(new SYSINF2PROCESS(myQProcess, myInfo));
                                         qProcess.getAttachedResInfoConnections().add(myLinkObject);
-                                        myInfo.getAttachedProcessConnections().add(myLinkObject);
+                                        myInfo.getAttachedQProcessConnections().add(myLinkObject);
                                     }
                                 }
 
@@ -1695,7 +1831,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                 mapType2InfoList.get(myInfo.getResInfoType()).add(myInfo);
                                 Collections.sort(mapType2InfoList.get(myInfo.getResInfoType()));
 
-                                createInfoPanel(myInfo);
+                                createPanel(myInfo);
 
                                 buildPanel();
 //                            GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
@@ -1723,8 +1859,8 @@ public class PnlInfo extends NursingRecordsPanel {
             });
             btnProcess.setEnabled(ResInfoTools.isEditable(resInfo));
 
-            if (!resInfo.getAttachedProcessConnections().isEmpty()) {
-                JLabel lblNum = new JLabel(Integer.toString(resInfo.getAttachedProcessConnections().size()), SYSConst.icon16redStar, SwingConstants.CENTER);
+            if (!resInfo.getAttachedQProcessConnections().isEmpty()) {
+                JLabel lblNum = new JLabel(Integer.toString(resInfo.getAttachedQProcessConnections().size()), SYSConst.icon16redStar, SwingConstants.CENTER);
                 lblNum.setFont(SYSConst.ARIAL14BOLD);
                 lblNum.setForeground(Color.YELLOW);
                 lblNum.setHorizontalTextPosition(SwingConstants.CENTER);

@@ -165,8 +165,8 @@ public class DlgDiag extends MyJDialog {
         {
             jPanel1.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
             jPanel1.setLayout(new FormLayout(
-                    "default, 2*($lcgap, default:grow), $ugap, 2*(default:grow, $lcgap), default",
-                    "default, $lgap, fill:default, $lgap, fill:104dlu:grow, $lgap, fill:default, $lgap, default, $lgap, fill:default, $lgap, fill:89dlu:grow, $ugap, default, $lgap, default"));
+                "default, 2*($lcgap, default:grow), $ugap, 2*(default:grow, $lcgap), default",
+                "default, $lgap, fill:default, $lgap, fill:104dlu:grow, $lgap, fill:default, $lgap, default, $lgap, fill:default, $lgap, fill:89dlu:grow, $ugap, default, $lgap, default"));
 
             //---- txtSuche ----
             txtSuche.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -195,15 +195,15 @@ public class DlgDiag extends MyJDialog {
             //======== panel2 ========
             {
                 panel2.setLayout(new FormLayout(
-                        "default:grow, $rgap, default:grow",
-                        "default:grow"));
+                    "default:grow, $rgap, default:grow",
+                    "default:grow"));
 
                 //---- cmbArzt ----
-                cmbArzt.setModel(new DefaultComboBoxModel(new String[]{
-                        "Item 1",
-                        "Item 2",
-                        "Item 3",
-                        "Item 4"
+                cmbArzt.setModel(new DefaultComboBoxModel(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
                 }));
                 cmbArzt.setFont(new Font("Arial", Font.PLAIN, 14));
                 panel2.add(cmbArzt, CC.xywh(1, 1, 3, 1));
@@ -211,11 +211,11 @@ public class DlgDiag extends MyJDialog {
             jPanel1.add(panel2, CC.xywh(5, 7, 5, 1));
 
             //---- cmbKH ----
-            cmbKH.setModel(new DefaultComboBoxModel(new String[]{
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+            cmbKH.setModel(new DefaultComboBoxModel(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
             }));
             cmbKH.setFont(new Font("Arial", Font.PLAIN, 14));
             jPanel1.add(cmbKH, CC.xywh(5, 9, 5, 1));
@@ -231,22 +231,22 @@ public class DlgDiag extends MyJDialog {
             jPanel1.add(lblSide, CC.xy(3, 11, CC.RIGHT, CC.DEFAULT));
 
             //---- cmbKoerper ----
-            cmbKoerper.setModel(new DefaultComboBoxModel(new String[]{
-                    "Nicht festgelegt",
-                    "links",
-                    "rechts",
-                    "beidseitig"
+            cmbKoerper.setModel(new DefaultComboBoxModel(new String[] {
+                "Nicht festgelegt",
+                "links",
+                "rechts",
+                "beidseitig"
             }));
             cmbKoerper.setFont(new Font("Arial", Font.PLAIN, 14));
             jPanel1.add(cmbKoerper, CC.xy(5, 11));
 
             //---- cmbSicherheit ----
-            cmbSicherheit.setModel(new DefaultComboBoxModel(new String[]{
-                    "Nicht festgelegt",
-                    "gesichert",
-                    "Verdacht auf",
-                    "Ausschlu\u00df von",
-                    "Zustand nach"
+            cmbSicherheit.setModel(new DefaultComboBoxModel(new String[] {
+                "Nicht festgelegt",
+                "gesichert",
+                "Verdacht auf",
+                "Ausschlu\u00df von",
+                "Zustand nach"
             }));
             cmbSicherheit.setFont(new Font("Arial", Font.PLAIN, 14));
             jPanel1.add(cmbSicherheit, CC.xy(9, 11));
