@@ -158,7 +158,7 @@ public class DlgEditResidentBaseData extends MyJDialog {
             dob = null;
         }
         if (!SYSCalendar.isBirthdaySane(dob)) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".datumxx"), DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".dobXX"), DisplayMessage.WARNING));
             return false;
         }
 

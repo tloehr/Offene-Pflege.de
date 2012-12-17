@@ -115,6 +115,9 @@ public class PnlAllowance extends CleanablePanel {
         cashmap = new HashMap<String, ArrayList<Allowance>>();
         contentmap = new HashMap<String, JPanel>();
         linemap = new HashMap<Allowance, JPanel>();
+
+        lstResidents = ResidentTools.getAllActive();
+        currentResident = null;
     }
 
     @Override
@@ -288,45 +291,45 @@ public class PnlAllowance extends CleanablePanel {
         JPanel titlePanelright = new JPanel();
         titlePanelright.setLayout(new BoxLayout(titlePanelright, BoxLayout.LINE_AXIS));
 
-        final JButton btnExpandAll = new JButton(SYSConst.icon22expand);
-        btnExpandAll.setPressedIcon(SYSConst.icon22addPressed);
-        btnExpandAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        btnExpandAll.setContentAreaFilled(false);
-        btnExpandAll.setBorder(null);
-        btnExpandAll.setToolTipText(OPDE.lang.getString("misc.msg.expandall"));
-        btnExpandAll.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                try {
-                    GUITools.setCollapsed(cpResident, false);
-                } catch (PropertyVetoException e) {
-                    // bah!
-                }
-            }
-
-
-        });
-        titlePanelright.add(btnExpandAll);
-
-        final JButton btnCollapseAll = new JButton(SYSConst.icon22collapse);
-        btnCollapseAll.setPressedIcon(SYSConst.icon22addPressed);
-        btnCollapseAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        btnCollapseAll.setContentAreaFilled(false);
-        btnCollapseAll.setBorder(null);
-        btnCollapseAll.setToolTipText(OPDE.lang.getString("misc.msg.collapseall"));
-        btnCollapseAll.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                try {
-                    GUITools.setCollapsed(cpResident, true);
-                } catch (PropertyVetoException e) {
-                    // bah!
-                }
-            }
-
-
-        });
-        titlePanelright.add(btnCollapseAll);
+//        final JButton btnExpandAll = new JButton(SYSConst.icon22expand);
+//        btnExpandAll.setPressedIcon(SYSConst.icon22addPressed);
+//        btnExpandAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
+//        btnExpandAll.setContentAreaFilled(false);
+//        btnExpandAll.setBorder(null);
+//        btnExpandAll.setToolTipText(OPDE.lang.getString("misc.msg.expandall"));
+//        btnExpandAll.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent actionEvent) {
+//                try {
+//                    GUITools.setCollapsed(cpResident, false);
+//                } catch (PropertyVetoException e) {
+//                    // bah!
+//                }
+//            }
+//
+//
+//        });
+//        titlePanelright.add(btnExpandAll);
+//
+//        final JButton btnCollapseAll = new JButton(SYSConst.icon22collapse);
+//        btnCollapseAll.setPressedIcon(SYSConst.icon22addPressed);
+//        btnCollapseAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
+//        btnCollapseAll.setContentAreaFilled(false);
+//        btnCollapseAll.setBorder(null);
+//        btnCollapseAll.setToolTipText(OPDE.lang.getString("misc.msg.collapseall"));
+//        btnCollapseAll.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent actionEvent) {
+//                try {
+//                    GUITools.setCollapsed(cpResident, true);
+//                } catch (PropertyVetoException e) {
+//                    // bah!
+//                }
+//            }
+//
+//
+//        });
+//        titlePanelright.add(btnCollapseAll);
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
             /***
@@ -453,7 +456,7 @@ public class PnlAllowance extends CleanablePanel {
         JideButton btnYear = GUITools.createHyperlinkButton("<html><table border=\"0\">" +
                 "<tr>" +
 
-                "<td width=\"520\" align=\"left\">" + Integer.toString(year) + "</td>" +
+                "<td width=\"520\" align=\"left\"><font size=+1>" + Integer.toString(year) + "</font></td>" +
                 "<td width=\"200\" align=\"right\">" +
                 (carry.compareTo(BigDecimal.ZERO) < 0 ? "<font color=\"red\">" : "") +
                 cf.format(carry) +
@@ -483,45 +486,45 @@ public class PnlAllowance extends CleanablePanel {
         JPanel titlePanelright = new JPanel();
         titlePanelright.setLayout(new BoxLayout(titlePanelright, BoxLayout.LINE_AXIS));
 
-        final JButton btnExpandAll = new JButton(SYSConst.icon22expand);
-        btnExpandAll.setPressedIcon(SYSConst.icon22addPressed);
-        btnExpandAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        btnExpandAll.setContentAreaFilled(false);
-        btnExpandAll.setBorder(null);
-        btnExpandAll.setToolTipText(OPDE.lang.getString("misc.msg.expandall"));
-        btnExpandAll.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                try {
-                    GUITools.setCollapsed(cpYear, false);
-                } catch (PropertyVetoException e) {
-                    // bah!
-                }
-            }
-
-
-        });
-        titlePanelright.add(btnExpandAll);
-
-        final JButton btnCollapseAll = new JButton(SYSConst.icon22collapse);
-        btnCollapseAll.setPressedIcon(SYSConst.icon22addPressed);
-        btnCollapseAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        btnCollapseAll.setContentAreaFilled(false);
-        btnCollapseAll.setBorder(null);
-        btnCollapseAll.setToolTipText(OPDE.lang.getString("misc.msg.collapseall"));
-        btnCollapseAll.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                try {
-                    GUITools.setCollapsed(cpYear, true);
-                } catch (PropertyVetoException e) {
-                    // bah!
-                }
-            }
-
-
-        });
-        titlePanelright.add(btnCollapseAll);
+//        final JButton btnExpandAll = new JButton(SYSConst.icon22expand);
+//        btnExpandAll.setPressedIcon(SYSConst.icon22addPressed);
+//        btnExpandAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
+//        btnExpandAll.setContentAreaFilled(false);
+//        btnExpandAll.setBorder(null);
+//        btnExpandAll.setToolTipText(OPDE.lang.getString("misc.msg.expandall"));
+//        btnExpandAll.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent actionEvent) {
+//                try {
+//                    GUITools.setCollapsed(cpYear, false);
+//                } catch (PropertyVetoException e) {
+//                    // bah!
+//                }
+//            }
+//
+//
+//        });
+//        titlePanelright.add(btnExpandAll);
+//
+//        final JButton btnCollapseAll = new JButton(SYSConst.icon22collapse);
+//        btnCollapseAll.setPressedIcon(SYSConst.icon22addPressed);
+//        btnCollapseAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
+//        btnCollapseAll.setContentAreaFilled(false);
+//        btnCollapseAll.setBorder(null);
+//        btnCollapseAll.setToolTipText(OPDE.lang.getString("misc.msg.collapseall"));
+//        btnCollapseAll.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent actionEvent) {
+//                try {
+//                    GUITools.setCollapsed(cpYear, true);
+//                } catch (PropertyVetoException e) {
+//                    // bah!
+//                }
+//            }
+//
+//
+//        });
+//        titlePanelright.add(btnCollapseAll);
 
 
         /***
@@ -674,45 +677,45 @@ public class PnlAllowance extends CleanablePanel {
         titlePanelright.setLayout(new BoxLayout(titlePanelright, BoxLayout.LINE_AXIS));
 
 
-        final JButton btnExpandAll = new JButton(SYSConst.icon22expand);
-        btnExpandAll.setPressedIcon(SYSConst.icon22addPressed);
-        btnExpandAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        btnExpandAll.setContentAreaFilled(false);
-        btnExpandAll.setBorder(null);
-        btnExpandAll.setToolTipText(OPDE.lang.getString("misc.msg.expandall"));
-        btnExpandAll.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                try {
-                    GUITools.setCollapsed(cpMonth, false);
-                } catch (PropertyVetoException e) {
-                    // bah!
-                }
-            }
-
-
-        });
-        titlePanelright.add(btnExpandAll);
-
-        final JButton btnCollapseAll = new JButton(SYSConst.icon22collapse);
-        btnCollapseAll.setPressedIcon(SYSConst.icon22addPressed);
-        btnCollapseAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        btnCollapseAll.setContentAreaFilled(false);
-        btnCollapseAll.setBorder(null);
-        btnCollapseAll.setToolTipText(OPDE.lang.getString("misc.msg.collapseall"));
-        btnCollapseAll.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                try {
-                    GUITools.setCollapsed(cpMonth, true);
-                } catch (PropertyVetoException e) {
-                    // bah!
-                }
-            }
-
-
-        });
-        titlePanelright.add(btnCollapseAll);
+//        final JButton btnExpandAll = new JButton(SYSConst.icon22expand);
+//        btnExpandAll.setPressedIcon(SYSConst.icon22addPressed);
+//        btnExpandAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
+//        btnExpandAll.setContentAreaFilled(false);
+//        btnExpandAll.setBorder(null);
+//        btnExpandAll.setToolTipText(OPDE.lang.getString("misc.msg.expandall"));
+//        btnExpandAll.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent actionEvent) {
+//                try {
+//                    GUITools.setCollapsed(cpMonth, false);
+//                } catch (PropertyVetoException e) {
+//                    // bah!
+//                }
+//            }
+//
+//
+//        });
+//        titlePanelright.add(btnExpandAll);
+//
+//        final JButton btnCollapseAll = new JButton(SYSConst.icon22collapse);
+//        btnCollapseAll.setPressedIcon(SYSConst.icon22addPressed);
+//        btnCollapseAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
+//        btnCollapseAll.setContentAreaFilled(false);
+//        btnCollapseAll.setBorder(null);
+//        btnCollapseAll.setToolTipText(OPDE.lang.getString("misc.msg.collapseall"));
+//        btnCollapseAll.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent actionEvent) {
+//                try {
+//                    GUITools.setCollapsed(cpMonth, true);
+//                } catch (PropertyVetoException e) {
+//                    // bah!
+//                }
+//            }
+//
+//
+//        });
+//        titlePanelright.add(btnCollapseAll);
 
         /***
          *      ____       _       _   __  __             _   _

@@ -72,6 +72,14 @@
           <boolean>true</boolean> 
          </object> 
         </void> 
+        <void method="addEvent"> 
+         <object class="com.jformdesigner.model.FormEvent"> 
+          <string>java.awt.event.ActionListener</string> 
+          <string>actionPerformed</string> 
+          <string>txtNachnameActionPerformed</string> 
+          <boolean>true</boolean> 
+         </object> 
+        </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
@@ -134,6 +142,14 @@
           <boolean>true</boolean> 
          </object> 
         </void> 
+        <void method="addEvent"> 
+         <object class="com.jformdesigner.model.FormEvent"> 
+          <string>java.awt.event.ActionListener</string> 
+          <string>actionPerformed</string> 
+          <string>txtVornameActionPerformed</string> 
+          <boolean>true</boolean> 
+         </object> 
+        </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
@@ -180,7 +196,7 @@
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormComponent"> 
-        <string>com.toedter.calendar.JDateChooser</string> 
+        <string>javax.swing.JTextField</string> 
         <void method="setProperty"> 
          <string>font</string> 
          <object class="java.awt.Font"> 
@@ -190,15 +206,22 @@
          </object> 
         </void> 
         <void property="name"> 
-         <string>jdcDOB</string> 
+         <string>txtDOB</string> 
         </void> 
         <void method="addEvent"> 
          <object class="com.jformdesigner.model.FormEvent"> 
-          <string>java.beans.PropertyChangeListener</string> 
-          <string>propertyChange</string> 
-          <string>jdcDOBPropertyChange</string> 
+          <string>java.awt.event.FocusListener</string> 
+          <string>focusLost</string> 
+          <string>txtDOBFocusLost</string> 
           <boolean>true</boolean> 
-          <string>date</string> 
+         </object> 
+        </void> 
+        <void method="addEvent"> 
+         <object class="com.jformdesigner.model.FormEvent"> 
+          <string>java.awt.event.ActionListener</string> 
+          <string>actionPerformed</string> 
+          <string>txtDOBActionPerformed</string> 
+          <boolean>true</boolean> 
          </object> 
         </void> 
        </object> 

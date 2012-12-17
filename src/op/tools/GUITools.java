@@ -322,6 +322,7 @@ public class GUITools {
     }
 
     public static void scroll2show(final JScrollPane jsp, final Component component, Container container, final Closure what2doAfterwards) {
+        if (component == null) return; // this prevents NULL pointer exceptions when quickly switching the residents after the entry
         final int start = jsp.getVerticalScrollBar().getValue();
         final int end = SwingUtilities.convertPoint(component, component.getLocation(), container).y;
         if (OPDE.isAnimation()) {

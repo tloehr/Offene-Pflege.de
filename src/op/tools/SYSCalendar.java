@@ -394,6 +394,7 @@ public class SYSCalendar {
      */
     public static boolean isBirthdaySane(Date date) {
         if (date == null) return false;
+        //TODO: those min and max values must not be hardcoded in future
         int maxage = 120;
         int minage = 15;
         DateMidnight min = new DateMidnight().minusYears(minage);

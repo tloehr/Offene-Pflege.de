@@ -804,11 +804,6 @@ public class PnlInfo extends NursingRecordsPanel {
         list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
         list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22stopSign, SwingConstants.LEADING));
         list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22infogreen2, SwingConstants.LEADING));
-//        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22clock1, SwingConstants.LEADING));
-//        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription3"), SYSConst.icon22intervalByDay, SwingConstants.LEADING));
-//        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription4"), SYSConst.icon22intervalBySecond, SwingConstants.LEADING));
-//        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription5"), SYSConst.icon22intervalNoConstraints, SwingConstants.LEADING));
-
 
         return list;
     }

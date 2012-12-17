@@ -4,12 +4,13 @@
 
 package op.residents.bwassistant;
 
+import java.awt.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import com.toedter.calendar.JDateChooser;
 import entity.info.Resident;
 import op.OPDE;
 import op.threads.DisplayMessage;
+import op.tools.SYSCalendar;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
@@ -24,7 +25,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.text.DateFormat;
 import java.util.Date;
 
 /**
@@ -51,22 +52,15 @@ public class PnlBWBasisInfo extends JPanel {
         lblGebdatum.setText(OPDE.lang.getString("misc.msg.dob"));
         lblGeschlecht.setText(OPDE.lang.getString("misc.msg.gender"));
         cmbGender.setModel(new DefaultComboBoxModel(new String[]{OPDE.lang.getString("misc.msg.male"), OPDE.lang.getString("misc.msg.female")}));
-        jdcDOB.setMaxSelectableDate(new Date());
-        jdcDOB.setDate(new Date());
-        gebdatum = jdcDOB.getDate();
+        txtDOB.setText(DateFormat.getDateInstance().format(new Date()));
+
+        gebdatum = null;
     }
 
     private void jdcDOBPropertyChange(PropertyChangeEvent e) {
-        gebdatum = jdcDOB.getDate();
-        if (jdcDOB.getDate() != null) {
-            DateMidnight birthdate = new DateTime(jdcDOB.getDate()).toDateMidnight();
-            DateTime now = new DateTime();
-            Years age = Years.yearsBetween(birthdate, now);
-            lblAge.setText(age.getYears() + " " + OPDE.lang.getString("misc.msg.Years"));
-            gebdatum = birthdate.toDate();
-        }
-        check();
+
     }
+
 
     private void check() {
         boolean complete = !vorname.isEmpty() && !nachname.isEmpty() && gebdatum != null;
@@ -105,6 +99,44 @@ public class PnlBWBasisInfo extends JPanel {
         check();
     }
 
+    private void txtDOBFocusLost(FocusEvent e) {
+        gebdatum = null;
+        try {
+            gebdatum = SYSCalendar.parseDate(txtDOB.getText());
+            if (!SYSCalendar.isBirthdaySane(gebdatum)) {
+                gebdatum = null;
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".dobXX"), DisplayMessage.WARNING));
+            } else {
+                txtDOB.setText(DateFormat.getDateInstance().format(gebdatum));
+            }
+        } catch (NumberFormatException e1) {
+            gebdatum = null;
+            txtDOB.setText(DateFormat.getDateInstance().format(new Date()));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".dobXX"), DisplayMessage.WARNING));
+        }
+
+        if (gebdatum != null && SYSCalendar.isBirthdaySane(gebdatum)) {
+            DateMidnight birthdate = new DateTime(gebdatum).toDateMidnight();
+            DateTime now = new DateTime();
+            Years age = Years.yearsBetween(birthdate, now);
+            lblAge.setText(age.getYears() + " " + OPDE.lang.getString("misc.msg.Years"));
+            gebdatum = birthdate.toDate();
+        }
+        check();
+    }
+
+    private void txtNachnameActionPerformed(ActionEvent e) {
+        txtVorname.requestFocus();
+    }
+
+    private void txtVornameActionPerformed(ActionEvent e) {
+        txtDOB.requestFocus();
+    }
+
+    private void txtDOBActionPerformed(ActionEvent e) {
+        txtNachname.requestFocus();
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         lblName = new JLabel();
@@ -112,7 +144,7 @@ public class PnlBWBasisInfo extends JPanel {
         lblVorname = new JLabel();
         txtVorname = new JTextField();
         lblGebdatum = new JLabel();
-        jdcDOB = new JDateChooser();
+        txtDOB = new JTextField();
         lblAge = new JLabel();
         lblGeschlecht = new JLabel();
         cmbGender = new JComboBox();
@@ -135,6 +167,12 @@ public class PnlBWBasisInfo extends JPanel {
                 txtNachnameFocusLost(e);
             }
         });
+        txtNachname.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                txtNachnameActionPerformed(e);
+            }
+        });
         add(txtNachname, CC.xywh(5, 3, 3, 1));
 
         //---- lblVorname ----
@@ -150,6 +188,12 @@ public class PnlBWBasisInfo extends JPanel {
                 txtVornameFocusLost(e);
             }
         });
+        txtVorname.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                txtVornameActionPerformed(e);
+            }
+        });
         add(txtVorname, CC.xywh(5, 5, 3, 1));
 
         //---- lblGebdatum ----
@@ -157,15 +201,21 @@ public class PnlBWBasisInfo extends JPanel {
         lblGebdatum.setFont(new Font("Arial", Font.PLAIN, 14));
         add(lblGebdatum, CC.xy(3, 7));
 
-        //---- jdcDOB ----
-        jdcDOB.setFont(new Font("Arial", Font.PLAIN, 14));
-        jdcDOB.addPropertyChangeListener("date", new PropertyChangeListener() {
+        //---- txtDOB ----
+        txtDOB.setFont(new Font("Arial", Font.PLAIN, 14));
+        txtDOB.addFocusListener(new FocusAdapter() {
             @Override
-            public void propertyChange(PropertyChangeEvent e) {
-                jdcDOBPropertyChange(e);
+            public void focusLost(FocusEvent e) {
+                txtDOBFocusLost(e);
             }
         });
-        add(jdcDOB, CC.xy(5, 7));
+        txtDOB.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                txtDOBActionPerformed(e);
+            }
+        });
+        add(txtDOB, CC.xy(5, 7));
 
         //---- lblAge ----
         lblAge.setText("text");
@@ -195,7 +245,7 @@ public class PnlBWBasisInfo extends JPanel {
     private JLabel lblVorname;
     private JTextField txtVorname;
     private JLabel lblGebdatum;
-    private JDateChooser jdcDOB;
+    private JTextField txtDOB;
     private JLabel lblAge;
     private JLabel lblGeschlecht;
     private JComboBox cmbGender;

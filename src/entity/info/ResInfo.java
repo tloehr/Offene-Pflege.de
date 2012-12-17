@@ -106,14 +106,14 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
     public ResInfo() {
     }
 
-    public ResInfo(ResInfoType bwinfotyp, Resident resident) {
-        this.properties = "";
+    public ResInfo(ResInfoType resInfoType, Resident resident) {
+
         Date now = new Date();
 
-        if (bwinfotyp.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
+        if (resInfoType.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
             this.from = now;
             this.to = now;
-        } else if (bwinfotyp.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYDAY) {
+        } else if (resInfoType.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYDAY) {
             this.from = new DateTime().toDateMidnight().toDate();
             this.to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
         } else {
@@ -121,7 +121,13 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
             this.to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
         }
 
-        this.bwinfotyp = bwinfotyp;
+        this.properties = "";
+        if (resInfoType.getType() == ResInfoTypeTools.TYPE_STAY){
+            this.properties = "hauf=";
+            this.html = "<ul></ul>";
+        }
+
+        this.bwinfotyp = resInfoType;
         this.userON = OPDE.getLogin().getUser();
         this.resident = resident;
         this.attachedFilesConnections = new ArrayList<SYSINF2FILE>();

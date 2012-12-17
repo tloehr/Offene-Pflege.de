@@ -2,7 +2,7 @@ package op.residents.bwassistant;
 
 import com.jidesoft.dialog.*;
 import com.jidesoft.wizard.*;
-import entity.*;
+import entity.Station;
 import entity.info.*;
 import entity.prescription.Doc;
 import entity.prescription.DocTools;
@@ -18,9 +18,7 @@ import org.apache.commons.collections.Closure;
 
 import javax.persistence.EntityManager;
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.image.BufferedImage;
 import java.text.DateFormat;
 import java.util.Date;
 
@@ -87,19 +85,19 @@ public class AddBWWizard {
         wizard.pack();
     }
 
-    private Image getLeftGraphic(String iconname) {
-        JLabel lbl = new JLabel(new ImageIcon(getClass().getResource(iconname)));
-        lbl.setSize(lbl.getPreferredSize());
-        lbl.doLayout();
-        GraphicsConfiguration gfxConfig =
-                GraphicsEnvironment.getLocalGraphicsEnvironment()
-                        .getDefaultScreenDevice()
-                        .getDefaultConfiguration();
-        BufferedImage image =
-                gfxConfig.createCompatibleImage(lbl.getWidth(), lbl.getHeight());
-        lbl.paint(image.getGraphics());
-        return image;
-    }
+//    private Image getLeftGraphic(String iconname) {
+//        JLabel lbl = new JLabel(new ImageIcon(getClass().getResource(iconname)));
+//        lbl.setSize(lbl.getPreferredSize());
+//        lbl.doLayout();
+//        GraphicsConfiguration gfxConfig =
+//                GraphicsEnvironment.getLocalGraphicsEnvironment()
+//                        .getDefaultScreenDevice()
+//                        .getDefaultConfiguration();
+//        BufferedImage image =
+//                gfxConfig.createCompatibleImage(lbl.getWidth(), lbl.getHeight());
+//        lbl.paint(image.getGraphics());
+//        return image;
+//    }
 
     public WizardDialog getWizard() {
         return wizard;
@@ -177,9 +175,17 @@ public class AddBWWizard {
     }
 
     private class BasisInfoPage extends DefaultWizardPage {
+//        boolean alreadyexecute = false;
 
         public BasisInfoPage(String title, String description) {
             super(title, description);
+            addPageListener(new PageListener() {
+                @Override
+                public void pageEventFired(PageEvent pageEvent) {
+                    if (pageEvent.getID() != PageEvent.PAGE_OPENED) return;
+                    setupWizardButtons();
+                }
+            });
         }
 
         @Override
@@ -191,11 +197,6 @@ public class AddBWWizard {
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
             fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
-
-//        @Override
-//        public Image getGraphic() {
-//            return getLeftGraphic("/artwork/aspecton1.png");
-//        }
 
         @Override
         protected void initContentPane() {
@@ -213,10 +214,18 @@ public class AddBWWizard {
     }
 
     private class BVPage extends DefaultWizardPage {
+//         boolean alreadyexecute = false;
 
         public BVPage(String title, String description) {
             super(title, description);
-            setupWizardButtons();
+            addPageListener(new PageListener() {
+                @Override
+                public void pageEventFired(PageEvent pageEvent) {
+                    if (pageEvent.getID() != PageEvent.PAGE_OPENED) return;
+                    setupWizardButtons();
+//                    alreadyexecute = true;
+                }
+            });
         }
 
         @Override
@@ -244,7 +253,7 @@ public class AddBWWizard {
 
     private class HausarztPage extends DefaultWizardPage {
         private PnlGP pnlGP;
-        private boolean alreadyexecute = false;
+//        private boolean alreadyexecute = false;
 
         public HausarztPage(String title, String description) {
             super(title, description);
@@ -260,13 +269,10 @@ public class AddBWWizard {
             addPageListener(new PageListener() {
                 @Override
                 public void pageEventFired(PageEvent pageEvent) {
-                    if (!alreadyexecute && pageEvent.getID() == PageEvent.PAGE_OPENED) {
-                        alreadyexecute = true;
-                        pnlGP.initSplitPanel();
-                    }
+                    if (pageEvent.getID() != PageEvent.PAGE_OPENED) return;
+                    setupWizardButtons();
                 }
             });
-            setupWizardButtons();
         }
 
         @Override
@@ -289,7 +295,7 @@ public class AddBWWizard {
 
     private class BetreuerPage extends DefaultWizardPage {
         private PnlLC pnlLC;
-        private boolean alreadyexecute = false;
+//        private boolean alreadyexecute = false;
 
         public BetreuerPage(String title, String description) {
             super(title, description);
@@ -303,10 +309,8 @@ public class AddBWWizard {
             addPageListener(new PageListener() {
                 @Override
                 public void pageEventFired(PageEvent pageEvent) {
-                    if (!alreadyexecute && pageEvent.getID() == PageEvent.PAGE_OPENED) {
-                        alreadyexecute = true;
-                        pnlLC.initSplitPanel();
-                    }
+                    if (pageEvent.getID() != PageEvent.PAGE_OPENED) return;
+                    setupWizardButtons();
                 }
             });
             setupWizardButtons();
@@ -334,6 +338,13 @@ public class AddBWWizard {
 
         public HaufPage(String title, String description) {
             super(title, description);
+            addPageListener(new PageListener() {
+                @Override
+                public void pageEventFired(PageEvent pageEvent) {
+                    if (pageEvent.getID() != PageEvent.PAGE_OPENED) return;
+                    setupWizardButtons();
+                }
+            });
         }
 
         @Override
@@ -360,7 +371,7 @@ public class AddBWWizard {
                     Date hauf = ((Pair<Date, Station>) o).getFirst();
                     Station station = ((Pair<Date, Station>) o).getSecond();
                     if (hauf != null) {
-                        bwinfo_hauf = new ResInfo(ResInfoTypeTools.getByID("HAUF"), bewohner);
+                        bwinfo_hauf = new ResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY), bewohner);
                         bwinfo_hauf.setFrom(hauf);
                     } else {
                         bwinfo_hauf = null;
@@ -376,6 +387,13 @@ public class AddBWWizard {
     private class CompletionPage extends CompletionWizardPage {
         public CompletionPage(String title, String description) {
             super(title, description);
+            addPageListener(new PageListener() {
+                @Override
+                public void pageEventFired(PageEvent pageEvent) {
+                    if (pageEvent.getID() != PageEvent.PAGE_OPENED) return;
+                    setupWizardButtons();
+                }
+            });
 //            setLeftPaneItems(LEFTPANE_GRAPHIC);
 //            addPageListener(new PageListener() {
 //                @Override
@@ -395,7 +413,7 @@ public class AddBWWizard {
             txt.setEditable(false);
             txt.setContentType("text/html");
             txt.setOpaque(false);
-            txt.setText(SYSTools.toHTMLForScreen(check()));
+            txt.setText(SYSTools.toHTML(SYSConst.html_div(check())));
 
             addComponent(txt, true);
             addSpace();

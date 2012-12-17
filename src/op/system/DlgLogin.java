@@ -167,7 +167,7 @@ public class DlgLogin extends MyJDialog {
             jPanel2.add(lblOPDE);
 
             //---- btnAbout ----
-            btnAbout.setIcon(new ImageIcon(getClass().getResource("/artwork/256x256/opde-blue.png")));
+            btnAbout.setIcon(new ImageIcon(getClass().getResource("/artwork/256x256/opde-logo.png")));
             btnAbout.setToolTipText("\u00dcber Offene-Pflege.de...");
             btnAbout.setBorderPainted(false);
             btnAbout.setBorder(null);
