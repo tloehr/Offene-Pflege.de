@@ -27,7 +27,6 @@ package op.system;
 
 import com.jgoodies.forms.factories.*;
 import com.jgoodies.forms.layout.*;
-import com.jidesoft.swing.*;
 import entity.system.SYSLoginTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
@@ -41,7 +40,7 @@ import java.awt.event.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.SQLException;
+
 import org.jdesktop.swingx.*;
 
 /**
