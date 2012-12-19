@@ -186,10 +186,6 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
         }
     }
 
-//    public boolean isHeimaufnahme() {
-//        return bwinfotyp.getID().equalsIgnoreCase("hauf");
-//    }
-
     public Collection<SYSINF2PROCESS> getAttachedQProcessConnections() {
         return attachedProcessConnections;
     }

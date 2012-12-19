@@ -25,23 +25,25 @@
  */
 package op.system;
 
-import com.jgoodies.forms.factories.*;
-import com.jgoodies.forms.layout.*;
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
 import entity.system.SYSLoginTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
 import org.apache.commons.collections.Closure;
+import org.jdesktop.swingx.VerticalLayout;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import org.jdesktop.swingx.*;
 
 /**
  * @author __USER__
@@ -60,14 +62,6 @@ public class DlgLogin extends MyJDialog {
 
         this.actionBlock = actionBlock;
 
-//        try {
-//            if (OPDE.getDb() != null && !OPDE.getDb().db.isClosed()) {
-//                OPDE.getDb().db.close();
-//            }
-//        } catch (SQLException se) {
-//            System.out.println(se.getMessage());
-//        }
-
         initComponents();
 
         String defaultlogin = "";
@@ -81,50 +75,13 @@ public class DlgLogin extends MyJDialog {
         }
         txtUsername.setText(defaultlogin);
         txtPassword.setText(defaultpw);
-        lblUsernamePassword.setText(OPDE.lang.getString("misc.msg.username")+"/"+OPDE.lang.getString("misc.msg.password"));
-
-//        try {
-//            linkOPDE.setURI(new URI("http://www.offene-pflege.de"));
-//            linkOPDE.setText("Offene-Pflege.de");
-//        } catch (URISyntaxException ex) {
-//            new DlgException(ex);
-//        }
+        lblUsernamePassword.setText(OPDE.lang.getString("misc.msg.username") + "/" + OPDE.lang.getString("misc.msg.password"));
 
         txtUsername.requestFocus();
 
         setVisible(true);
 
     }
-
-
-//    private void animateLogo() {
-//        thread = new Thread() {
-//
-//            public void run() {
-//
-//                int maxIconsNum = 85;
-//
-//                try {
-//                    int i = 0;
-//                    while (true) {
-//                        if (i == OPDE.getAnimationCache().size()) {
-//                            OPDE.getAnimationCache().add(new ImageIcon(getClass().getResource("/artwork/animation/opde-" + (i + 1) + ".png")));
-//                        }
-//                        btnAbout.setIcon(OPDE.getAnimationCache().get(i));
-//
-//                        Thread.sleep(55);
-//                        if (i == maxIconsNum) {
-//                            i = 0;
-//                        } else {
-//                            i++;
-//                        }
-//                    }
-//                } catch (InterruptedException e) {
-//                }
-//            }
-//        };
-//        thread.start();
-//    }
 
     /**
      * This method is called from within the constructor to
@@ -151,8 +108,8 @@ public class DlgLogin extends MyJDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "13dlu, default, $lcgap, 13dlu",
-            "13dlu, $lgap, fill:48dlu:grow, $lgap, default, $lgap, 13dlu"));
+                "13dlu, default, $lcgap, 13dlu",
+                "13dlu, $lgap, fill:48dlu:grow, $lgap, default, $lgap, 13dlu"));
 
         //======== jPanel2 ========
         {
@@ -278,20 +235,13 @@ public class DlgLogin extends MyJDialog {
 
     private void DoLogin(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DoLogin
         String username = txtUsername.getText().trim();
-//            char[] password = txtPassword.getPassword();
 
         try {
-
-//            OPDE.initDB();
-
-            // Hier wird erst geprüft, ob Username und Passwort stimmen.
             registerLogin();
             if (OPDE.getLogin() == null) {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Benutzername oder Passwort falsch.", 2));
                 OPDE.info("Falsches Passwort eingegeben.");
             } else {
-
-//                OPDE.newOCSec();
 
                 OPDE.initProps();
 
@@ -320,89 +270,12 @@ public class DlgLogin extends MyJDialog {
             }
         }
     }//GEN-LAST:event_btnAboutActionPerformed
-//
-//    @Override
-//    public void setVisible(boolean b) {
-//
-//        super.setVisible(b);    //To change body of overridden methods use File | Settings | File Templates.
-//    }
 
-    /**
-     * Trägt ein DlgLogin ein. Es werden alte, zerstörte DlgLogin Reste ebenfalls entfernt und zwar nach dem folgendem Muster:
-     * <p/>
-     * <li>	Es wird nach DlgLogin Einträgen gesucht, bei denen LOGOUT auf BAW steht. Das bedeutet, dass sie bei der letzten Anmeldung nicht ordnungsgemäß
-     * abgeschlossen wurden. Bei diesen Records wird Logout auf LPOL gesetzt. Was ja auch halbwegs der Wahrheit entspricht. Die Sitzung war beendet
-     * als die Station abstürzte und das wiederum war kurz nach dem letzten Lebenszeichen.</li>
-     * <p/>
-     * <li> Alle WorkingOn Einträge dieser (kaputten) LoginID werden auf LPOL gesetzt. Liegt LPOL allerdings weniger als <b>2 Minuten zurück</b>, dann wird
-     * der Eintrag verweigert. Dann läuft wohl noch eine andere Sitzung.</li>
-     *
-     * @return true, wenn die Anmeldung erlaubt ist, false, wenn man noch warten muss.
-     */
     private void registerLogin() {
-        //long loginid;
         String username = txtUsername.getText().trim();
         String password = new String(txtPassword.getPassword());
 
         OPDE.setLogin(SYSLoginTools.login(username, password));
-//
-//        try {
-//
-//
-//            // Gibt es noch laufende Sitzungen, die sich innerhalb der vergangenen 2 Minuten als
-//            // lebendig gemeldet haben ?
-////            String sqlRunningSessions = "SELECT OCLoginID FROM OCLogin "
-////                    + "WHERE UKennung=? AND IP=? AND Logout='9999-12-31 23:59:59' AND DATE_ADD(LPOL,INTERVAL 2 MINUTE) > now()";
-////            PreparedStatement stmt = OPDE.getDb().db.prepareStatement(sqlRunningSessions);
-////            stmt.setString(1, username);
-////            stmt.setString(2, OPDE.getProps().getProperty("ip"));
-////            ResultSet rsRunningSessions = stmt.executeQuery();
-//
-////            if (!rsRunningSessions.first()) { // Die Luft ist rein.... Schnell anmelden ;-)
-////                String sqlNewSession = "INSERT INTO OCLogin (UKennung, HOST, IP, Login, LPOL, Logout) VALUES (?, ?, ?, NOW(), NOW(), '9999-12-31 23:59:59')";
-////                PreparedStatement stmtNewSession = OPDE.getDb().db.prepareStatement(sqlNewSession);
-////                stmtNewSession.setString(1, username);
-////                stmtNewSession.setString(2, OPDE.getLocalProps().getProperty("hostname"));
-////                stmtNewSession.setString(3, OPDE.getLocalProps().getProperty("ip"));
-////                stmtNewSession.executeUpdate();
-////
-////                loginid = OPDE.getDb().getLastInsertedID();
-//
-//            // Aufräumen
-//            // Zuerst OCWorkingOn von alten Trümmer Einträgen befreien.
-////                String sqlWOCleanupSession = "UPDATE OCWorkingOn SET Finish=NOW()  WHERE OCLoginID IN ( SELECT OCLoginID FROM OCLogin WHERE Logout='9999-12-31 23:59:59' AND DATE_ADD(LPOL,INTERVAL 3 MINUTE) <= now() )";
-////                PreparedStatement stmtWOCleanupSession = OPDE.getDb().db.prepareStatement(sqlWOCleanupSession);
-////                stmtWOCleanupSession.executeUpdate();
-////
-////                // OCMessages löschen, die von toten Logins stammen. Damit ein evtl. BHPImport nicht ewig darauf wartet.
-////                String sqlMessageCleanupSession = "DELETE FROM OCMessage WHERE Receiver IN ( SELECT OCLoginID FROM OCLogin WHERE Logout='9999-12-31 23:59:59' AND DATE_ADD(LPOL,INTERVAL 3 MINUTE) <= now() )";
-////                PreparedStatement stmtMessageCleanupSession = OPDE.getDb().db.prepareStatement(sqlMessageCleanupSession);
-////                stmtMessageCleanupSession.executeUpdate();
-//
-////            // Dann Verordnungen zur BHP, die aus alten Trümmersitzungen stammen löschen.
-////            String sqlBHPCleanupSession = "DELETE FROM BHPPlanung WHERE tmp IN ( SELECT l.LoginID FROM SYSLogin l INNER JOIN SYSHosts h ON l.HostID = h.HostID WHERE l.Logout='9999-12-31 23:59:59' AND DATE_ADD(h.LPOL,INTERVAL 3 MINUTE) <= now() )";
-////            PreparedStatement stmtBHPCleanupSession = OPDE.getDb().db.prepareStatement(sqlBHPCleanupSession);
-////            stmtBHPCleanupSession.executeUpdate();
-////
-////            // Dann InterventionSchedulee löschen, die aus alten Trümmersitzungen stammen löschen.
-////            String sqlInterventionScheduleCleanupSession = "DELETE FROM InterventionSchedule WHERE tmp IN ( SELECT l.LoginID FROM SYSLogin l INNER JOIN SYSHosts h ON l.HostID = h.HostID WHERE l.Logout='9999-12-31 23:59:59' AND DATE_ADD(h.LPOL,INTERVAL 3 MINUTE) <= now() )";
-////            PreparedStatement stmtInterventionScheduleCleanupSession = OPDE.getDb().db.prepareStatement(sqlInterventionScheduleCleanupSession);
-////            stmtInterventionScheduleCleanupSession.executeUpdate();
-//
-//            // Dann OCLogin bereinigen.
-////            String sqlCleanupSession = "UPDATE SYSLogin l INNER JOIN SYSHosts h ON l.HostID = h.HostID SET l.Logout=LPOL WHERE l.Logout='9999-12-31 23:59:59' AND DATE_ADD(h.LPOL,INTERVAL 3 MINUTE) <= now()";
-////            PreparedStatement stmtCleanupSession = OPDE.getDb().db.prepareStatement(sqlCleanupSession);
-////            stmtCleanupSession.executeUpdate();
-//
-////            } else {
-////                JOptionPane.showMessageDialog(this, "Sie sind bereits an diesem Computer angemeldet.\n\nFalls Sie den Rechner gerade neu gestartet haben,\ndann warten Sie ca. 1 Minute und versuchen es dann nochmal.", "Anmeldefehler", JOptionPane.INFORMATION_MESSAGE);
-////                loginid = 0;
-////            }
-//        } // try
-//        catch (Exception se) {
-//            OPDE.fatal(se);
-//        } // catch
-        //return (loginid);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

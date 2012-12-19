@@ -43,6 +43,11 @@ public class ResInfoTypeTools {
     public static final String TYPE_ABSENCE_HOLLIDAY = "HOLLIDAY";
     public static final String TYPE_ABSENCE_OTHER = "OTHER";
 
+    public static final String STAY_KEY = "stay";
+    public static final String STAY_VALUE_PRESENT = "";
+    public static final String STAY_VALUE_DEAD = "dead";
+    public static final String STAY_VALUE_LEFT = "left";
+
     public static ResInfoType getByID(String id) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM ResInfoType b WHERE b.bwinftyp = :bwinftyp");

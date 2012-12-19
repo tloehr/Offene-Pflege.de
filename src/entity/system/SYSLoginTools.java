@@ -43,7 +43,6 @@ public class SYSLoginTools {
         login.setLogout(new Date());
         try {
             em.getTransaction().begin();
-//            SYSRunningClassesTools.endAllModules(login);
             login = em.merge(login);
             em.getTransaction().commit();
             OPDE.setLogin(login);
@@ -54,10 +53,4 @@ public class SYSLoginTools {
         }
     }
 
-
-
-
-//    public static SYSLogin getPreviousLogin(SYSLogin login) {
-//        return login;
-//    }
 }

@@ -853,7 +853,6 @@ public class PnlInfo extends NursingRecordsPanel {
                         public void execute(Object o) {
                             if (o != null) {
                                 EntityManager em = OPDE.createEM();
-
                                 try {
                                     em.getTransaction().begin();
                                     Resident myResident = em.merge((Resident) o);
@@ -910,17 +909,8 @@ public class PnlInfo extends NursingRecordsPanel {
                                     em.getTransaction().begin();
                                     em.lock(em.merge(resident), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
                                     resident.setStation(null);
-                                    ResInfo stay = em.merge(getLastStay());
-                                    em.lock(stay, LockModeType.OPTIMISTIC);
 
-                                    stay.setTo(dod);
-                                    stay.setUserOFF(em.merge(OPDE.getLogin().getUser()));
-
-                                    Properties props = ResInfoTools.getContent(stay);
-                                    props.setProperty("hauf", "verstorben");
-                                    ResInfoTools.setContent(stay, props);
-
-                                    ResidentTools.endOfStay(em, em.merge(resident), dod);
+                                    ResidentTools.endOfStay(em, em.merge(resident), dod, ResInfoTypeTools.STAY_VALUE_DEAD);
                                     em.getTransaction().commit();
                                     btnBWDied.setEnabled(false);
                                     btnBWMovedOut.setEnabled(false);

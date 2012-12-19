@@ -105,20 +105,20 @@ public class ResidentTools {
 //    }
 
     public static String getLabelText(Resident bewohner) {
-        boolean verstorben = ResInfoTools.isDead(bewohner);
-        boolean ausgezogen = ResInfoTools.isDead(bewohner);
-        ResInfo hauf = ResInfoTools.getLastResinfo(bewohner, ResInfoTypeTools.getByID("hauf"));
+        boolean dead = ResInfoTools.isDead(bewohner);
+        boolean left = ResInfoTools.isDead(bewohner);
+        ResInfo stay = ResInfoTools.getLastResinfo(bewohner, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
 
         DateFormat df = DateFormat.getDateInstance();
         String result = bewohner.getName() + ", " + bewohner.getFirstname() + " (*" + df.format(bewohner.getDOB()) + "), ";
 
         DateMidnight birthdate = new DateTime(bewohner.getDOB()).toDateMidnight();
-        DateTime refdate = verstorben ? new DateTime(hauf.getTo()) : new DateTime();
+        DateTime refdate = dead ? new DateTime(stay.getTo()) : new DateTime();
         Years age = Years.yearsBetween(birthdate, refdate);
         result += age.getYears() + " " + OPDE.lang.getString("misc.msg.Years") + " [" + bewohner.getRIDAnonymous() + "]";
 
-        if (verstorben || ausgezogen) {
-            result += "  " + (verstorben ? OPDE.lang.getString("misc.msg.late") : OPDE.lang.getString("misc.msg.movedout")) + ": " + df.format(hauf.getTo()) + ", ";
+        if (dead || left) {
+            result += "  " + (dead ? OPDE.lang.getString("misc.msg.late") : OPDE.lang.getString("misc.msg.movedout")) + ": " + df.format(stay.getTo()) + ", ";
         }
 
         return result;
@@ -168,11 +168,11 @@ public class ResidentTools {
      * @param em       as it is quite a complex operation, it runs within a surrounding EM to trigger rollbacks if necessary
      * @param resident the resident in question
      */
-    public static void endOfStay(EntityManager em, Resident resident, Date enddate) throws Exception {
-        em.lock(em.merge(resident), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+    public static void endOfStay(EntityManager em, Resident resident, Date enddate, String reason) throws Exception {
+//        em.lock(em.merge(resident), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
         PrescriptionTools.closeAll(em, resident, enddate);
         NursingProcessTools.closeAll(em, resident, enddate);
-        ResInfoTools.closeAll(em, resident, enddate);
+        ResInfoTools.closeAll(em, resident, enddate, reason);
         MedInventoryTools.closeAll(em, resident, enddate);
         QProcessTools.closeAll(em, resident, enddate);
     }

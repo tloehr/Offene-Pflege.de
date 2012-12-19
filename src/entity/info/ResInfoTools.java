@@ -183,13 +183,13 @@ public class ResInfoTools {
 
 
     public static boolean isGone(Resident resident) {
-        ResInfo bwinfo_hauf = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByID("HAUF"));
-        return bwinfo_hauf == null || getContent(bwinfo_hauf).getProperty("hauf").equalsIgnoreCase("ausgezogen");
+        ResInfo bwinfo_hauf = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
+        return bwinfo_hauf == null || getContent(bwinfo_hauf).getProperty(ResInfoTypeTools.STAY_KEY).equalsIgnoreCase(ResInfoTypeTools.STAY_VALUE_LEFT);
     }
 
     public static boolean isDead(Resident resident) {
-        ResInfo bwinfo_hauf = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByID("HAUF"));
-        return bwinfo_hauf != null && getContent(bwinfo_hauf).getProperty("hauf").equalsIgnoreCase("verstorben");
+        ResInfo bwinfo_hauf = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
+        return bwinfo_hauf != null && getContent(bwinfo_hauf).getProperty(ResInfoTypeTools.STAY_KEY).equalsIgnoreCase(ResInfoTypeTools.STAY_VALUE_DEAD);
     }
 
 
@@ -251,6 +251,7 @@ public class ResInfoTools {
                             html += "<li><b>" + infonode.getLabel() + "</b></li>";
                         } else {
                             if (!value.equalsIgnoreCase("tnz")) {
+                                OPDE.debug(infonode.getName().equalsIgnoreCase("hauf"));
                                 if (!infonode.getName().equalsIgnoreCase("hauf") && (infonode.getTagName().equalsIgnoreCase("optiongroup") || infonode.getTagName().equalsIgnoreCase("scalegroup") || infonode.getTagName().equalsIgnoreCase("combobox"))) {
                                     InfoTreeNodeBean thisNode = null;
                                     try {
@@ -566,7 +567,7 @@ public class ResInfoTools {
          *
          */
         // TODO: "HAUF" ersetzen
-        ResInfo bwinfo_hauf = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByID("HAUF"));
+        ResInfo bwinfo_hauf = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
         if (bwinfo_hauf != null) {
             result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.movein") + "</td><td valign=\"top\">";
             result += "<b>" + DateFormat.getDateInstance().format(bwinfo_hauf.getFrom()) + "</b>";
@@ -1208,7 +1209,7 @@ public class ResInfoTools {
         return html.toString();
     }
 
-    public static void closeAll(EntityManager em, Resident bewohner, Date enddate) throws Exception {
+    public static void closeAll(EntityManager em, Resident bewohner, Date enddate, String TYPE_) throws Exception {
         Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.to >= :now");
         query.setParameter("bewohner", bewohner);
         query.setParameter("now", enddate);
@@ -1218,6 +1219,21 @@ public class ResInfoTools {
             em.lock(info, LockModeType.OPTIMISTIC);
             info.setTo(enddate);
             info.setUserOFF(em.merge(OPDE.getLogin().getUser()));
+
+
+//ResInfo stay = em.merge(getLastStay());
+//                                    em.lock(stay, LockModeType.OPTIMISTIC);
+//
+//                                    stay.setTo(enddate);
+//                                    stay.setUserOFF(em.merge(OPDE.getLogin().getUser()));
+//
+//                                    Properties props = ResInfoTools.getContent(stay);
+//                                    props.setProperty("hauf", "verstorben");
+//                                    ResInfoTools.setContent(stay, props);
+
+
+
+
         }
     }
 

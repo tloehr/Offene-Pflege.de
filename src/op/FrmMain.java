@@ -167,7 +167,11 @@ public class FrmMain extends JFrame {
         gc.setFont(new Font("Arial", Font.PLAIN, 14));
         statusBar.add(gc, JideBoxLayout.FLEXIBLE);
         initPhase = false;
+    }
 
+    public void completeRefresh(){
+        emptyFrame();
+        afterLogin();
     }
 
 

@@ -129,7 +129,7 @@ public class PnlLC extends JPanel {
         final JidePopup popupGP = createPopup(new PnlEditLC(new LCustodian()));
         popupGP.setOwner(btnAdd);
         popupGP.setMovable(false);
-        GUITools.showPopup(popupGP, SwingConstants.SOUTH_WEST);
+        GUITools.showPopup(popupGP, SwingConstants.WEST);
     }
 
     private void cmbBetreuerItemStateChanged(ItemEvent e) {

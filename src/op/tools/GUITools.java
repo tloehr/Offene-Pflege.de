@@ -149,10 +149,10 @@ public class GUITools {
      * @param location where to show the popup in relation to the <code>reference</code>. Use the SwingConstants above.
      */
     public static void showPopup(JidePopup popup, int location, boolean keepOnScreen) {
+
         Container content = popup.getContentPane();
-        Point p2 = new Point(popup.getOwner().getX(), popup.getOwner().getY());
-        SwingUtilities.convertPointToScreen(p2, popup.getOwner());
-        final Point screenposition = p2;
+
+        final Point screenposition = new Point(popup.getOwner().getLocationOnScreen().x, popup.getOwner().getLocationOnScreen().y);
 
         int x = screenposition.x;
         int y = screenposition.y;
@@ -160,12 +160,12 @@ public class GUITools {
         switch (location) {
             case SwingConstants.SOUTH_WEST: {
                 x = screenposition.x - content.getPreferredSize().width;
-                y = screenposition.y + popup.getOwner().getPreferredSize().height;
+                y = screenposition.y;
                 break;
             }
             case SwingConstants.SOUTH_EAST: {
                 x = screenposition.x + popup.getOwner().getPreferredSize().width;
-                y = screenposition.y + popup.getOwner().getPreferredSize().height;
+                y = screenposition.y;
                 break;
             }
             case SwingConstants.NORTH_EAST: {
@@ -180,12 +180,12 @@ public class GUITools {
             }
             case SwingConstants.EAST: {
                 x = screenposition.x + popup.getOwner().getPreferredSize().width;
-                y = screenposition.y;
+                y = screenposition.y - (popup.getOwner().getPreferredSize().height / 2);
                 break;
             }
             case SwingConstants.WEST: {
                 x = screenposition.x - content.getPreferredSize().width;
-                y = screenposition.y;
+                y = screenposition.y - (popup.getOwner().getPreferredSize().height / 2);
                 break;
             }
             case SwingConstants.NORTH: {
@@ -322,7 +322,8 @@ public class GUITools {
     }
 
     public static void scroll2show(final JScrollPane jsp, final Component component, Container container, final Closure what2doAfterwards) {
-        if (component == null) return; // this prevents NULL pointer exceptions when quickly switching the residents after the entry
+        if (component == null)
+            return; // this prevents NULL pointer exceptions when quickly switching the residents after the entry
         final int start = jsp.getVerticalScrollBar().getValue();
         final int end = SwingUtilities.convertPoint(component, component.getLocation(), container).y;
         if (OPDE.isAnimation()) {
@@ -369,7 +370,8 @@ public class GUITools {
 
 
     public static void flashBackground(final JComponent component, final Color flashcolor, int repeatTimes) {
-        if (component == null) return; // this prevents NULL pointer exceptions when quickly switching the residents after the entry
+        if (component == null)
+            return; // this prevents NULL pointer exceptions when quickly switching the residents after the entry
         final Color originalColor = component.getBackground();
         final TimingSource ts = new SwingTimerTimingSource();
         Animator.setDefaultTimingSource(ts);

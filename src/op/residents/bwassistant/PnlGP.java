@@ -80,7 +80,7 @@ public class PnlGP extends JPanel {
         final JidePopup popupGP = createPopup(new PnlEditGP(new Doc()));
         popupGP.setOwner(btnAdd);
         popupGP.setMovable(false);
-        GUITools.showPopup(popupGP, SwingConstants.SOUTH_WEST);
+        GUITools.showPopup(popupGP, SwingConstants.WEST);
     }
 
     private void cmbArztItemStateChanged(ItemEvent e) {
