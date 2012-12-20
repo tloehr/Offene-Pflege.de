@@ -1209,9 +1209,9 @@ public class ResInfoTools {
         return html.toString();
     }
 
-    public static void closeAll(EntityManager em, Resident bewohner, Date enddate, String TYPE_) throws Exception {
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.to >= :now");
-        query.setParameter("bewohner", bewohner);
+    public static void closeAll(EntityManager em, Resident resident, Date enddate, String reason) throws Exception {
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :resident AND b.to >= :now");
+        query.setParameter("resident", resident);
         query.setParameter("now", enddate);
         List<ResInfo> bwinfos = query.getResultList();
 
@@ -1220,20 +1220,11 @@ public class ResInfoTools {
             info.setTo(enddate);
             info.setUserOFF(em.merge(OPDE.getLogin().getUser()));
 
-
-//ResInfo stay = em.merge(getLastStay());
-//                                    em.lock(stay, LockModeType.OPTIMISTIC);
-//
-//                                    stay.setTo(enddate);
-//                                    stay.setUserOFF(em.merge(OPDE.getLogin().getUser()));
-//
-//                                    Properties props = ResInfoTools.getContent(stay);
-//                                    props.setProperty("hauf", "verstorben");
-//                                    ResInfoTools.setContent(stay, props);
-
-
-
-
+            if (info.getResInfoType().getType() == ResInfoTypeTools.TYPE_STAY) {
+                Properties props = ResInfoTools.getContent(info);
+                props.setProperty(ResInfoTypeTools.STAY_KEY, reason);
+                ResInfoTools.setContent(info, props);
+            }
         }
     }
 

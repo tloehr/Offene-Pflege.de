@@ -22,6 +22,11 @@
                javaclass="op.controlling.PnlControlling" icon="kfind.png">
             <execute langbundle="appinfo.default.acl.execute"/>
         </class>
+        <class name="opde.config" short="Einstellungen"
+               long="Systemeinstellungen" main="true"
+               javaclass="op.system.PnlConfigs" icon="configure.png">
+            <execute langbundle="appinfo.default.acl.execute"/>
+        </class>
         <class name="admin.residents.cash" short="Barbeträge"
                long="Dieses Programm dient der Verwaltung der sog. Taschengelder der BewohnerInnen" main="true"
                javaclass="op.allowance.PnlAllowance" icon="coins.png">

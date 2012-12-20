@@ -174,7 +174,7 @@ public class TradeFormTools {
      * </p>
      * Trotzdem muss dieses neue Präparat ebenfalls mit auf den Vorrat, der für die Verordnung verwendet wird,
      * draufgebucht werden. Das einzige auf dem OPDE hier besteht ist, dass die beiden Präparate dieselbe bzw.
-     * eine äquivalente Form haben.So können mit der Zeit die Vorräte Bestände mit ganz unterschiedlichen Darreichungen besessen haben.
+     * eine äquivalente PrinterForm haben.So können mit der Zeit die Vorräte Bestände mit ganz unterschiedlichen Darreichungen besessen haben.
      * <p/>
      * Bei der täglichen Arbeit, besonders bei dem Einbuchen von neuen Medikamenten stellt sich aber immer wieder die
      * Frage: <b>auf welchen Vorrat muss ich dieses Produkt buchen ? Wozu gehört es ?</b>
@@ -184,8 +184,8 @@ public class TradeFormTools {
      * Die Antwort kann ganz unterschiedlich ausfallen:
      * <ol>
      * <li>Wenn eine Darreichung zu <b>einem früheren Zeitpunkt</b> schonmal zu einem Vorrat zugeordnet war, <b>dann wird diese jetzt wieder</b> zugeordnet. Fall erledigt.</li>
-     * <li>Trifft Punkt 1 nicht zu, dann suchen wir alle Vorräte, die Darreichungen enthalten mit einer passenden Form. Passend heisst hier entweder dieselbe Form oder eine
-     * äquivalente Form (z.B. Tabletten sind zu Dragees gleichwertig wie zu Filmtabletten etc.).</li>
+     * <li>Trifft Punkt 1 nicht zu, dann suchen wir alle Vorräte, die Darreichungen enthalten mit einer passenden PrinterForm. Passend heisst hier entweder dieselbe PrinterForm oder eine
+     * äquivalente PrinterForm (z.B. Tabletten sind zu Dragees gleichwertig wie zu Filmtabletten etc.).</li>
      * </ol>
      *
      * @param resident
@@ -198,7 +198,7 @@ public class TradeFormTools {
         EntityManager em = OPDE.createEM();
         List<MedInventory> liste;
 
-        // 1. Form der gesuchten darreichung bestimmen.
+        // 1. PrinterForm der gesuchten darreichung bestimmen.
         DosageForm meineForm = tradeform.getDosageForm();
 
         // 2. Alle äquivalenten Formen dazu finden

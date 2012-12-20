@@ -33,7 +33,7 @@ import entity.prescription.BHPTools;
 import entity.system.*;
 import op.system.AppInfo;
 import op.system.FrmInit;
-import op.system.PrinterTypes;
+import op.system.LogicalPrinters;
 import op.threads.DisplayManager;
 import op.threads.PrintProcessor;
 import op.tools.*;
@@ -75,7 +75,7 @@ public class OPDE {
 
     public static FrmMain mainframe;
     protected static String url;
-    protected static PrinterTypes printers;
+    protected static LogicalPrinters printers;
     protected static Properties props;
     protected static boolean anonym;
     protected static SortedProperties localProps;
@@ -103,7 +103,7 @@ public class OPDE {
         return opwd + System.getProperty("file.separator") + "cache";
     }
 
-    public static PrinterTypes getPrinters() {
+    public static LogicalPrinters getLogicalPrinters() {
         return printers;
     }
 
@@ -284,7 +284,7 @@ public class OPDE {
     public static void saveLocalProps() {
         try {
             FileOutputStream out = new FileOutputStream(new File(opwd + System.getProperty("file.separator") + "local.properties"));
-            localProps.store(out, "Lokale Einstellungen für Offene-Pflege.de");
+            localProps.store(out, "Settings Offene-Pflege.de");
             out.close();
         } catch (Exception ex) {
             fatal(ex);
@@ -488,7 +488,7 @@ public class OPDE {
          *     |_|_| |_|_|\__| | .__/|_|  |_|_| |_|\__\___|_|  |___/
          *                     |_|
          */
-        printers = new PrinterTypes();
+        printers = new LogicalPrinters();
 
         /***
          *      _                 _   _                 _                                   _   _

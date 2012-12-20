@@ -907,9 +907,8 @@ public class PnlInfo extends NursingRecordsPanel {
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();
-                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                                     resident.setStation(null);
-
                                     ResidentTools.endOfStay(em, em.merge(resident), dod, ResInfoTypeTools.STAY_VALUE_DEAD);
                                     em.getTransaction().commit();
                                     btnBWDied.setEnabled(false);
@@ -965,18 +964,18 @@ public class PnlInfo extends NursingRecordsPanel {
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();
-                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                                     resident.setStation(null);
-                                    ResInfo stay = em.merge(getLastStay());
-                                    em.lock(stay, LockModeType.OPTIMISTIC);
-                                    stay.setTo(dod);
-                                    stay.setUserOFF(em.merge(OPDE.getLogin().getUser()));
+//                                    ResInfo stay = em.merge(getLastStay());
+//                                    em.lock(stay, LockModeType.OPTIMISTIC);
+//                                    stay.setTo(dod);
+//                                    stay.setUserOFF(em.merge(OPDE.getLogin().getUser()));
+//
+//                                    Properties props = ResInfoTools.getContent(stay);
+//                                    props.setProperty("hauf", "ausgezogen");
+//                                    ResInfoTools.setContent(stay, props);
 
-                                    Properties props = ResInfoTools.getContent(stay);
-                                    props.setProperty("hauf", "ausgezogen");
-                                    ResInfoTools.setContent(stay, props);
-
-                                    ResidentTools.endOfStay(em, em.merge(resident), dod);
+                                    ResidentTools.endOfStay(em, em.merge(resident), dod, ResInfoTypeTools.STAY_VALUE_LEFT);
                                     em.getTransaction().commit();
 
                                     btnBWDied.setEnabled(false);

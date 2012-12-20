@@ -1,8 +1,8 @@
 package op.tools;
 
 import entity.prescription.MedStock;
-import op.system.Form;
-import op.system.PrinterType;
+import op.system.PrinterForm;
+import op.system.LogicalPrinter;
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,9 +13,9 @@ import op.system.PrinterType;
  */
 public class PrintListElement implements Comparable {
 
-    private PrinterType printer;
+    private LogicalPrinter printer;
     private String printername; // Name des Druckers innerhalb des Betriebssystems.
-    private Form form;
+    private PrinterForm printerForm;
 
     @Override
     public int compareTo(Object o) {
@@ -31,10 +31,10 @@ public class PrintListElement implements Comparable {
         return object;
     }
 
-    public PrintListElement(Object object, PrinterType printer, Form form, String printername) {
+    public PrintListElement(Object object, LogicalPrinter printer, PrinterForm printerForm, String printername) {
         this.object = object;
         this.printer = printer;
-        this.form = form;
+        this.printerForm = printerForm;
         this.printername = printername;
     }
 
@@ -43,12 +43,12 @@ public class PrintListElement implements Comparable {
         return printername;
     }
 
-    public PrinterType getPrinter() {
+    public LogicalPrinter getPrinter() {
         return printer;
     }
 
-    public Form getForm() {
-        return form;
+    public PrinterForm getPrinterForm() {
+        return printerForm;
     }
 
     Object object;

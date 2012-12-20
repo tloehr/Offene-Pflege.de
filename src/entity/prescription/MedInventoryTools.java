@@ -83,8 +83,9 @@ public class MedInventoryTools {
     public static BigDecimal getSum(EntityManager em, MedInventory inventory) throws Exception {
 //        long timeStart = System.currentTimeMillis();
         BigDecimal result = BigDecimal.ZERO;
-        for (MedStock bestand : inventory.getMedStocks()) {
-            BigDecimal summe = MedStockTools.getSum(em, bestand);
+        for (MedStock stock : inventory.getMedStocks()) {
+            OPDE.debug(stock.getID());
+            BigDecimal summe = MedStockTools.getSum(em, stock);
             result = result.add(summe);
         }
 //        long time2 = System.currentTimeMillis();
@@ -324,7 +325,7 @@ public class MedInventoryTools {
 
             EntityManager em = OPDE.createEM();
 
-//            OPDE.debug("MedInventoryTools.getForm: inventory: " + inventory.getID());
+//            OPDE.debug("MedInventoryTools.getPrinterForm: inventory: " + inventory.getID());
 
             Query query = em.createQuery(" " +
                     " SELECT tf.dosageForm FROM MedInventory i " +

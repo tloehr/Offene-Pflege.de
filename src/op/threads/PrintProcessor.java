@@ -2,8 +2,9 @@ package op.threads;
 
 import entity.prescription.MedStock;
 import entity.prescription.MedStockTools;
+import entity.system.SYSPropsTools;
 import op.OPDE;
-import op.system.PrinterType;
+import op.system.LogicalPrinter;
 import op.tools.PrintListElement;
 
 import javax.print.DocFlavor;
@@ -19,10 +20,10 @@ import java.util.List;
  * bedienen wir uns hier einer nebenläufigen Programierung.
  */
 public class PrintProcessor extends Thread {
+
     private boolean interrupted;
     private List<PrintListElement> printQueue;
     HashMap<String, ArrayList<PrintListElement>> preparedPrintJobs;
-//    JProgressBar pb;
 
     public void addPrintJobs(List<PrintListElement> jobs) {
         printQueue.addAll(jobs);
@@ -34,6 +35,14 @@ public class PrintProcessor extends Thread {
 
     public boolean isInterrupted() {
         return interrupted;
+    }
+
+    public boolean isWorking(){
+//        boolean working = OPDE.getProps().containsKey(SYSPropsTools.KEY_PHYSICAL_PRINTER);
+//        working = working && OPDE.getLogicalPrinters().getPrintService(OPDE.getProps().getProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER)) != null;
+//        working = working && OPDE.getProps().containsKey(SYSPropsTools.KEY_LOGICAL_PRINTER) && OPDE.getLogicalPrinters().getTypesMap().containsKey(OPDE.getProps().getProperty(SYSPropsTools.KEY_LOGICAL_PRINTER));
+//        working = working && OPDE.getProps().containsKey(SYSPropsTools.KEY_MEDSTOCK_LABEL) && OPDE.getLogicalPrinters().getTypesMap().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_LOGICAL_PRINTER)).getForms().containsKey(SYSPropsTools.KEY_MEDSTOCK_LABEL);
+        return true;
     }
 
     public boolean isIdle() {
@@ -54,7 +63,7 @@ public class PrintProcessor extends Thread {
                 if (!printQueue.isEmpty()) {
                     String currentPrinterName = "";
                     String combinedPrintJob = "";
-                    PrinterType currentPrinterType = null;
+                    LogicalPrinter currentPrinterType = null;
                     int size = printQueue.size();
 
                     int progressbar = 1;
@@ -85,7 +94,7 @@ public class PrintProcessor extends Thread {
                         //
                         if (!thisElement.getPrinter().isCombinePrintjobs()) {
 
-                            OPDE.getPrinters().print(getPrintableObject(thisElement), thisElement.getPrintername(), DocFlavor.SERVICE_FORMATTED.PRINTABLE);
+                            OPDE.getLogicalPrinters().print(getPrintableObject(thisElement), thisElement.getPrintername(), DocFlavor.SERVICE_FORMATTED.PRINTABLE);
 
 //                            pb.setValue(progressbar);
                             OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.printing") + " " + OPDE.lang.getString("misc.msg.number") + " " + progressbar, progressbar, printQueue.size()));
@@ -109,7 +118,7 @@ public class PrintProcessor extends Thread {
                         byte[] encoded = null;
                         DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
                         String printername = "";
-                        PrinterType printerType = null;
+                        LogicalPrinter printerType = null;
                         String printjob = "";
 
                         Collection<ArrayList<PrintListElement>> collection = preparedPrintJobs.values();
@@ -137,7 +146,7 @@ public class PrintProcessor extends Thread {
 
                             try {
                                 encoded = printjob.getBytes(printerType.getEncoding());
-                                OPDE.getPrinters().print(encoded, printername, flavor);
+                                OPDE.getLogicalPrinters().print(encoded, printername, flavor);
 
                                 OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.printing") + " " + OPDE.lang.getString("misc.msg.number") + " " + progressbar, progressbar, printQueue.size()));
 
@@ -166,13 +175,8 @@ public class PrintProcessor extends Thread {
         if (element.getObject() instanceof MedStock) {
             MedStock bestand = (MedStock) element.getObject();
             OPDE.debug("PrintProcessor prints StockID: " + bestand.getID());
-//            if (element.getPrinter().isPageprinter()) {
-//                printableObject = new TKLabel(VorratTools.getVorrat4Printing(inventory));
-//            } else {
-//                printableObject = element.getForm().getForm(VorratTools.getVorrat4Printing(inventory));
-//            }
 
-            printableObject = element.getForm().getFormtext(MedStockTools.getStock4Printing(bestand));
+            printableObject = element.getPrinterForm().getFormtext(MedStockTools.getStock4Printing(bestand));
         }
         return printableObject;
     }

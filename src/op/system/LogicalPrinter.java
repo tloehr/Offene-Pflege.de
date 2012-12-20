@@ -13,7 +13,7 @@ import java.util.HashMap;
  *
  * @author tloehr
  */
-public class PrinterType {
+public class LogicalPrinter {
     private String name;
     private String label;
     private String reset;
@@ -31,13 +31,13 @@ public class PrinterType {
     }
 
     private String type;
-    private HashMap<String,Form> forms;
+    private HashMap<String,PrinterForm> forms;
 
     public String getFooter() {
         return footer;
     }
 
-    public PrinterType(String name, String label, String type, String encoding, String pageprinter) {
+    public LogicalPrinter(String name, String label, String type, String encoding, String pageprinter) {
         this.name = name;
         this.label = label;
         this.type = type;
@@ -67,11 +67,11 @@ public class PrinterType {
         this.reset = reset;
     }
 
-    public HashMap<String,Form> getForms() {
+    public HashMap<String,PrinterForm> getForms() {
         return forms;
     }
 
-    public void setForms(HashMap<String,Form> forms) {
+    public void setForms(HashMap<String,PrinterForm> forms) {
         this.forms = forms;
     }
 

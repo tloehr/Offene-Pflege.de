@@ -16,7 +16,7 @@ import java.util.Iterator;
 /**
  * @author tloehr
  */
-public class Form {
+public class PrinterForm {
     private String name, label;
     private String form, encoding;
     //private HashMap attributes;
@@ -28,7 +28,7 @@ public class Form {
     private final int CENTER = 2;
     private final int RIGHT = 3;
 
-    public Form(String name, String label, HashMap elemAttributes, String encoding) {
+    public PrinterForm(String name, String label, HashMap elemAttributes, String encoding) {
         this.name = name;
         this.label = label;
         this.elemAttributes = elemAttributes;

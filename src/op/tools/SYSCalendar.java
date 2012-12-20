@@ -88,7 +88,7 @@ public class SYSCalendar {
 
 
     /**
-     * Generiert ein Array aus Uhrzeiten in der Form {"17:00","17:15"...}
+     * Generiert ein Array aus Uhrzeiten in der PrinterForm {"17:00","17:15"...}
      * Der verwendete Datentyp ist Time.
      */
     public static ArrayList fillUhrzeiten() {
@@ -103,7 +103,7 @@ public class SYSCalendar {
 
 
     /**
-     * Generiert ein Array aus Uhrzeiten in der Form {"17:00","17:15"...}
+     * Generiert ein Array aus Uhrzeiten in der PrinterForm {"17:00","17:15"...}
      * Der verwendete Datentyp ist GregorianCalendar
      */
     public static ArrayList<Date> getTimeList() {
@@ -1404,7 +1404,7 @@ public class SYSCalendar {
     /**
      * Sucht alle Feiertage in einem Jahr zusammen.
      *
-     * @return Eine Hashmap, die je das Datum als Zeichenkette der Form "jjjj-mm-tt" enthält und dazu die Bezeichnung des Feiertags.
+     * @return Eine Hashmap, die je das Datum als Zeichenkette der PrinterForm "jjjj-mm-tt" enthält und dazu die Bezeichnung des Feiertags.
      */
     public static HashMap<DateMidnight, String> getHollidays(int from, int to) {
 

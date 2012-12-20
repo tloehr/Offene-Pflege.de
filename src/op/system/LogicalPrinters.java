@@ -6,6 +6,7 @@ package op.system;
 
 import op.OPDE;
 import op.tools.SYSTools;
+import org.eclipse.persistence.annotations.Array;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -17,19 +18,19 @@ import javax.print.*;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.standard.MediaSizeName;
-import javax.swing.*;
-import java.awt.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
  * Diese Klasse befasst sich mit der Handhabung der speziellen Drucker für Etiketten und Kassenbons.
- * Sie enthält auch den XML Parser, der die Drucker und Vorlagen Konfigurationsdatei %workdir%/printers.xml einliest.
+ * Sie enthält auch den XML Parser, der die Drucker und Vorlagen Konfigurationsdatei %workdir%/mapName2Printer.xml einliest.
  *
  * @author tloehr
  */
-public class PrinterTypes {
+public class LogicalPrinters {
 
     public static final String ESCPOS_INIT_PRINTER = new String(new char[]{27, 40});
     public static final String ESCPOS_DOUBLE_HEIGHT_ON = new String(new char[]{27, 33, 16});
@@ -48,14 +49,15 @@ public class PrinterTypes {
     public static final String ESCPOS_CHARACTER_TABLE_PC850 = new String(new char[]{27, 116, 2});
     public static final String ESCPOS_FULL_CUT = new String(new char[]{29, 86, 65});
     public static final String ESCPOS_PARTIAL_CUT = new String(new char[]{29, 86, 66});
-    public static final int DRUCK_KEIN_DRUCK = 0;
-    public static final int DRUCK_ETI1 = 1;
-    public static final int DRUCK_ETI2 = 2;
-    public static final int DRUCK_BON1 = 3;
-    public static final int DRUCK_BON2 = 4;
-    public static final int DRUCK_LASER = 5;
+    //    public static final int DRUCK_KEIN_DRUCK = 0;
+//    public static final int DRUCK_ETI1 = 1;
+//    public static final int DRUCK_ETI2 = 2;
+//    public static final int DRUCK_BON1 = 3;
+//    public static final int DRUCK_BON2 = 4;
+//    public static final int DRUCK_LASER = 5;
     //public static int[] drucker
-    private HashMap<String, PrinterType> printers;
+    private HashMap<String, LogicalPrinter> mapName2Printer;
+    private ArrayList<LogicalPrinter> printers;
     private final String CONFIGFILE = "printers.xml";
     private HashMap tags;
 
@@ -66,13 +68,13 @@ public class PrinterTypes {
 //
 //    private HashBean[] printerTypeArray;
 
-    public HashMap<String, PrinterType> getPrinters() {
-        return printers;
+    public HashMap<String, LogicalPrinter> getTypesMap() {
+        return mapName2Printer;
     }
 
 //    public Printer getPrinter(String type) {
 //        Printer p = null;
-//        Iterator<Printer> it = printers.iterator();
+//        Iterator<Printer> it = mapName2Printer.iterator();
 //        boolean found = false;
 //        while (!found && it.hasNext()) {
 //            p = it.next();
@@ -81,8 +83,9 @@ public class PrinterTypes {
 //        return (!found ? null : p);
 //    }
 
-    public PrinterTypes() {
+    public LogicalPrinters() {
         initTags();
+        printers = new ArrayList<LogicalPrinter>();
         try {
             XMLReader parser = XMLReaderFactory.createXMLReader();
             InputSource is = new InputSource(new FileInputStream(new File(OPDE.getOPWD() + System.getProperty("file.separator") + CONFIGFILE)));
@@ -98,9 +101,9 @@ public class PrinterTypes {
 
     private class XMLHandler extends DefaultHandler {
 
-        PrinterType printer = null;
-        HashMap<String, Form> forms = null;
-        Form form = null;
+        LogicalPrinter printer = null;
+        HashMap<String, PrinterForm> forms = null;
+        PrinterForm printerForm = null;
         String reset = null;
         String formtext = null;
         String line = null;
@@ -108,7 +111,7 @@ public class PrinterTypes {
 
         @Override
         public void startDocument() throws SAXException {
-            printers = new HashMap();
+            mapName2Printer = new HashMap();
         }
 
         @Override
@@ -124,16 +127,16 @@ public class PrinterTypes {
             String label = attributes.getValue("label");
             //Main.logger.debug("startElement: " + this.toString() + ": " + tagName + "    name: " + name);
             if (tagName.equalsIgnoreCase("printer")) {
-                printer = new PrinterType(attributes.getValue("name"), attributes.getValue("label"), attributes.getValue("type"), attributes.getValue("encoding"), attributes.getValue("pageprinter"));
+                printer = new LogicalPrinter(attributes.getValue("name"), attributes.getValue("label"), attributes.getValue("type"), attributes.getValue("encoding"), attributes.getValue("pageprinter"));
             } else if (tagName.equalsIgnoreCase("reset")) {
                 reset = "";
             } else if (tagName.equalsIgnoreCase("cr")) {
                 line += System.getProperty("line.separator");
             } else if (tagName.equalsIgnoreCase("forms")) {
-                forms = new HashMap<String, Form>();
+                forms = new HashMap<String, PrinterForm>();
             } else if (tagName.equalsIgnoreCase("form")) {
                 elemAttributes = new HashMap();
-                form = new Form(name, label, elemAttributes, printer.getEncoding());
+                printerForm = new PrinterForm(name, label, elemAttributes, printer.getEncoding());
                 formtext = "";
             } else if (tagName.equalsIgnoreCase("line")) {
                 line = "";
@@ -172,14 +175,15 @@ public class PrinterTypes {
                 printer.setReset(reset);
                 reset = null;
             } else if (localName.equalsIgnoreCase("form")) {
-                form.setFormtext(formtext);
-                forms.put(form.getName(), form);
-                form = null;
+                printerForm.setFormtext(formtext);
+                forms.put(printerForm.getName(), printerForm);
+                printerForm = null;
             } else if (localName.equalsIgnoreCase("forms")) {
                 printer.setForms(forms);
                 forms = null;
             } else if (localName.equalsIgnoreCase("printer")) {
-                printers.put(printer.getName(), printer);
+                mapName2Printer.put(printer.getName(), printer);
+                printers.add(printer);
                 printer = null;
             } else if (localName.equalsIgnoreCase("line")) {
                 if (reset != null) {
@@ -214,58 +218,38 @@ public class PrinterTypes {
         tags.put("EscposPartialCut", ESCPOS_PARTIAL_CUT);
     }
 
+    public ArrayList<LogicalPrinter> getPrinterList() {
+        return printers;
+    }
 
     /**
      *
      */
     public void print(Object printData, String printer, DocFlavor flavor) {
-
-        // Set print attributes:
         PrintRequestAttributeSet aset = new HashPrintRequestAttributeSet();
         aset.add(MediaSizeName.ISO_A4);
 
         try {
-            DocPrintJob pj = getPrintService(printer).createPrintJob();
-            Doc doc = new SimpleDoc(printData, flavor, null);
-            pj.print(doc, aset);
+            PrintService ps = getPrintService(printer);
+            if (ps != null) {
+                Doc doc = new SimpleDoc(printData, flavor, null);
+                ps.createPrintJob().print(doc, aset);
+            }
         } catch (PrintException pe) {
             OPDE.fatal(pe);
         }
     }
 
-    public PrintService getPrintService(String printername) throws PrintException {
-
-        PrintService ps = null;
-
-//        if (psprinter) {
-//            ps = postscript;
-//        } else {
-//            ps = label;
-//        }
-
-        if (ps == null) {
-
-            PrintService[] prservices = PrintServiceLookup.lookupPrintServices(null, null);
-            int idxPrintService = -1;
-            for (int i = 0; i < prservices.length; i++) {
-                OPDE.debug("  " + i + ":  " + prservices[i]);
-                if (prservices[i].getName().equals(printername)) {
-                    idxPrintService = i;
-                }
+    public PrintService getPrintService(String printername) {
+        PrintService result = null;
+        PrintService[] prservices = PrintServiceLookup.lookupPrintServices(null, null);
+        for (PrintService printService : prservices) {
+            if (printService.getName().equalsIgnoreCase(printername)) {
+                result = printService;
+                break;
             }
-            if (idxPrintService < 0) {
-                throw new PrintException("Service for " + printername + " not found.");
-            }
-            ps = prservices[idxPrintService];
         }
-
-//        if (psprinter) {
-//            postscript = ps;
-//        } else {
-//            label = ps;
-//        }
-
-        return ps;
+        return result;
     }
 
     /**
@@ -312,47 +296,45 @@ public class PrinterTypes {
 //    }
 
 
-    public static void handleFile(Component parent, String filename, java.awt.Desktop.Action action) {
-        Desktop desktop = null;
-        if (parent == null) {
-            parent = new Frame();
-        }
-
-        if (SYSTools.getLocalDefinedApp(filename) != null) {
-            try {
-                Runtime.getRuntime().exec(SYSTools.getLocalDefinedApp(filename));
-            } catch (IOException ex) {
-                OPDE.getLogger().error(ex);
-            }
-        } else {
-
-            if (Desktop.isDesktopSupported()) {
-                desktop = Desktop.getDesktop();
-                if (action == Desktop.Action.OPEN && desktop.isSupported(Desktop.Action.OPEN)) {
-                    try {
-                        desktop.open(new File(filename));
-                    } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(parent, "Datei \n" + filename + "\nkonnte nicht angezeigt werden.)",
-                                "Kein Anzeigeprogramm vorhanden", JOptionPane.INFORMATION_MESSAGE);
-                    }
-                } else if (action == Desktop.Action.PRINT && desktop.isSupported(Desktop.Action.PRINT)) {
-                    try {
-                        desktop.print(new File(filename));
-                    } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(parent, "Datei \n" + filename + "\nkonnte nicht gedruckt werden.)",
-                                "Kein Druckprogramm vorhanden", JOptionPane.INFORMATION_MESSAGE);
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(parent, "Datei \n" + filename + "\nkonnte nicht bearbeitet werden.)",
-                            "Keine passende Anwendung vorhanden", JOptionPane.INFORMATION_MESSAGE);
-                }
-            } else {
-                JOptionPane.showMessageDialog(parent, "JAVA Desktop Unterstützung nicht vorhanden", "JAVA Desktop API", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
-
-
+//    public static void handleFile(Component parent, String filename, java.awt.Desktop.Action action) {
+//        Desktop desktop = null;
+//        if (parent == null) {
+//            parent = new Frame();
+//        }
+//
+//        if (SYSTools.getLocalDefinedApp(filename) != null) {
+//            try {
+//                Runtime.getRuntime().exec(SYSTools.getLocalDefinedApp(filename));
+//            } catch (IOException ex) {
+//                OPDE.getLogger().error(ex);
+//            }
+//        } else {
+//
+//            if (Desktop.isDesktopSupported()) {
+//                desktop = Desktop.getDesktop();
+//                if (action == Desktop.Action.OPEN && desktop.isSupported(Desktop.Action.OPEN)) {
+//                    try {
+//                        desktop.open(new File(filename));
+//                    } catch (IOException ex) {
+//                        JOptionPane.showMessageDialog(parent, "Datei \n" + filename + "\nkonnte nicht angezeigt werden.)",
+//                                "Kein Anzeigeprogramm vorhanden", JOptionPane.INFORMATION_MESSAGE);
+//                    }
+//                } else if (action == Desktop.Action.PRINT && desktop.isSupported(Desktop.Action.PRINT)) {
+//                    try {
+//                        desktop.print(new File(filename));
+//                    } catch (IOException ex) {
+//                        JOptionPane.showMessageDialog(parent, "Datei \n" + filename + "\nkonnte nicht gedruckt werden.)",
+//                                "Kein Druckprogramm vorhanden", JOptionPane.INFORMATION_MESSAGE);
+//                    }
+//                } else {
+//                    JOptionPane.showMessageDialog(parent, "Datei \n" + filename + "\nkonnte nicht bearbeitet werden.)",
+//                            "Keine passende Anwendung vorhanden", JOptionPane.INFORMATION_MESSAGE);
+//                }
+//            } else {
+//                JOptionPane.showMessageDialog(parent, "JAVA Desktop Unterstützung nicht vorhanden", "JAVA Desktop API", JOptionPane.ERROR_MESSAGE);
+//            }
+//        }
+//    }
 
 
 //    private static void printPrintServiceAttributesAndDocFlavors(PrintService prserv) {

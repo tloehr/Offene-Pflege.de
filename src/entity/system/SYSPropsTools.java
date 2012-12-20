@@ -19,6 +19,10 @@ import java.util.Properties;
  */
 public class SYSPropsTools {
 
+    public static final String KEY_PHYSICAL_PRINTER = "printer.physical.name";
+    public static final String KEY_LOGICAL_PRINTER = "printer.logical.name";
+    public static final String KEY_MEDSTOCK_LABEL = "printer.medstock.label.name";
+
     public static void storeProp(EntityManager em, String key, String value, Users user) throws Exception {
         String jpql = "SELECT s FROM SYSProps s WHERE s.key = :key AND s.user = :user";
 
