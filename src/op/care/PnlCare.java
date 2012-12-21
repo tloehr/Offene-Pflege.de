@@ -210,8 +210,8 @@ public class PnlCare extends NursingRecordsPanel {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                    "default:grow",
-                    "default:grow"));
+                "default:grow",
+                "default:grow"));
 
             //======== jtpPflegeakte ========
             {

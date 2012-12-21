@@ -278,7 +278,7 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
         return replacementFor != null;
     }
 
-    public boolean isArchived() {
+    public boolean isObsolete() {
         return isReplaced() || isDeleted();
     }
 

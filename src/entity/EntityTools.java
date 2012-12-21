@@ -112,22 +112,21 @@ public class EntityTools {
         return success;
     }
 
-//    public static boolean refresh(Object entity) {
+    public static <T> T refresh(T entity) {
 //        boolean success = false;
-//        EntityManager em = OPDE.createEM();
-//        try {
-//            em.getTransaction().begin();
-//            em.refresh(entity);
-//            em.getTransaction().commit();
+//        T refreshedEntity;
+
+        EntityManager em = OPDE.createEM();
+        try {
+            em.refresh(em.merge(entity));
 //            success = true;
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            em.getTransaction().rollback();
-//        } finally {
-//            em.close();
-//        }
-//        return success;
-//    }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            em.close();
+        }
+        return entity;
+    }
 
     /**
      * Erzeugt einen String, der die PrimärSchlüssel durch komma getrennt enthält.

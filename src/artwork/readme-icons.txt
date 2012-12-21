@@ -1,4 +1,4 @@
-Most of the icons in OPDE have been taken from several iconsets of the KDE project:
+Most of the icons in OPDE have been taken fromTemplate several iconsets of the KDE project:
 - CrystalClear (Icon Theme by Everaldo.com Design Studio)
 - CrystalSVG (Icon Theme by Everaldo.com Design Studio)
 - KDE Crystal Diamond 2 (www.paolinoland.it)
@@ -10,7 +10,7 @@ On/Off Icons by Jelle Elferink (www.jt11.nl). Used with his kind permission.
 - cb-off.png
 - cb-on.png
 
-Lots of different icons and symbols taken from www.wpclipart.com. This material is PD.
+Lots of different icons and symbols taken fromTemplate www.wpclipart.com. This material is PD.
 -- ambulance1.png (http://www.wpclipart.com/transportation/ambulance/ambulance_sketch.png.html)
 -- ambulance2.png (http://www.wpclipart.com/medical/medical_clip_art/ambulance.png.html)
 -- collapse.png (http://www.webdesignerdepot.com via FindIcons.com)

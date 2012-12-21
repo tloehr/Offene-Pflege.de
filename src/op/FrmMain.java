@@ -571,7 +571,7 @@ public class FrmMain extends JFrame {
             query = em.createQuery("SELECT b FROM Resident b WHERE b.station = :station ORDER BY b.name, b.firstname");
             query.setParameter("station", station);
         }
-        ArrayList<Resident> bewohnerliste = new ArrayList<Resident>(query.getResultList());
+        ArrayList<Resident> residentList = new ArrayList<Resident>(query.getResultList());
         em.close();
 
         CollapsiblePane mypane = new CollapsiblePane(station == null ? OPDE.lang.getString("misc.msg.Archive") : station.getName());
@@ -590,7 +590,7 @@ public class FrmMain extends JFrame {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
-        if (!bewohnerliste.isEmpty() && station != null) {
+        if (!residentList.isEmpty() && station != null) {
             String titel = "";
             JideButton button = GUITools.createHyperlinkButton(internalClassID + ".printdailyplan", SYSConst.icon22print2, new ActionListener() {
                 @Override
@@ -602,7 +602,7 @@ public class FrmMain extends JFrame {
             labelPanel.add(button);
         }
 
-        for (final Resident resident : bewohnerliste) {
+        for (final Resident resident : residentList) {
             ActionListener actionListener = new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {

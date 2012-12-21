@@ -31,7 +31,7 @@ import java.util.Date;
  */
 public class PnlPeriod extends JPanel {
     private boolean ignore;
-    private Date min, max, from, to;
+    private Date min, max, fromTemplate, toTemplate;
     DateTime dtmin, dtmax;
     int maximum;
     private boolean fromTheVeryBeginning;
@@ -39,14 +39,14 @@ public class PnlPeriod extends JPanel {
     private JToggleButton tbTVB, tbUFN;
     private Closure actionBlock;
 
-    public PnlPeriod(Date min, Date max, Date from, Date to, Closure actionBlock) {
-        this.fromTheVeryBeginning = from.equals(SYSConst.DATE_THE_VERY_BEGINNING);
-        this.untilFurtherNotice = to.equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+    public PnlPeriod(Date min, Date max, Date fromTemplate, Date toTemplate, Closure actionBlock) {
+        this.fromTheVeryBeginning = fromTemplate.equals(SYSConst.DATE_THE_VERY_BEGINNING);
+        this.untilFurtherNotice = toTemplate.equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
         this.actionBlock = actionBlock;
         this.min = min;
         this.max = max;//new Date(Math.min(new Date().getTime(), max.getTime())); // max date is always today
-        this.from = from;
-        this.to = to;
+        this.fromTemplate = fromTemplate;
+        this.toTemplate = toTemplate;
         dtmin = new DateTime(this.min);
         dtmax = new DateTime(this.max);
         initComponents();
@@ -90,8 +90,8 @@ public class PnlPeriod extends JPanel {
             }
 
             OPDE.debug("accepted min: " + dtmin);
-            OPDE.debug("current from: " + dtFrom);
-            OPDE.debug("current to: " + dtTo);
+            OPDE.debug("current fromTemplate: " + dtFrom);
+            OPDE.debug("current toTemplate: " + dtTo);
             OPDE.debug("accepted max: " + dtmax);
 
         } else {
@@ -124,8 +124,8 @@ public class PnlPeriod extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "2*(default, $lcgap), 62dlu, $lcgap, default:grow, $lcgap, 62dlu, 2*($lcgap, default)",
-                "2*(default, $lgap), default, 6dlu, default, $lgap, default"));
+            "2*(default, $lcgap), 62dlu, $lcgap, default:grow, $lcgap, 62dlu, 2*($lcgap, default)",
+            "2*(default, $lgap), default, 6dlu, default, $lgap, default"));
 
         //======== panel1 ========
         {
@@ -317,22 +317,22 @@ public class PnlPeriod extends JPanel {
     private void initPanel() {
         ignore = true;
 //        OPDE.debug("min " + min + " max " + max);
-//        OPDE.debug("from " + from + " to " + to);
+//        OPDE.debug("fromTemplate " + fromTemplate + " toTemplate " + toTemplate);
 
         final Date myMax = max.equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE) ? new Date() : max;
 
         slider.setRangeDraggable(false);
         jdcVon.setMinSelectableDate(min);
-        jdcVon.setMaxSelectableDate(to);
-        jdcVon.setDate(from);
+        jdcVon.setMaxSelectableDate(toTemplate);
+        jdcVon.setDate(fromTemplate);
         jdcBis.setMaxSelectableDate(myMax);
-        jdcBis.setMinSelectableDate(from);
-        jdcBis.setDate(to);
+        jdcBis.setMinSelectableDate(fromTemplate);
+        jdcBis.setDate(toTemplate);
 
         maximum = Days.daysBetween(new DateTime(min), new DateTime(myMax)).getDays();
 
-        int low = Days.daysBetween(new DateTime(min), new DateTime(from)).getDays();
-        int high = Days.daysBetween(new DateTime(min), new DateTime(to)).getDays();
+        int low = Days.daysBetween(new DateTime(min), new DateTime(fromTemplate)).getDays();
+        int high = Days.daysBetween(new DateTime(min), new DateTime(toTemplate)).getDays();
 
         tbTVB = GUITools.getNiceToggleButton("misc.msg.fromTheVeryBeginning");
         tbUFN = GUITools.getNiceToggleButton("misc.msg.untilFurtherNotice");

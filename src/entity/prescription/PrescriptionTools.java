@@ -487,7 +487,7 @@ public class PrescriptionTools {
             MedStock stockInUse = MedStockTools.getStockInUse(inventory);
 
             if (prescription.isUntilEndOfPackage()) {
-                result += "<b>"+OPDE.lang.getString("misc.msg.onlyUntilEndOfPackage")+"</b><br/>";
+                result += "<b>" + OPDE.lang.getString("misc.msg.onlyUntilEndOfPackage") + "</b><br/>";
             }
             if (!prescription.isClosed()) {
                 // TODO: Calc Medi here
@@ -515,7 +515,7 @@ public class PrescriptionTools {
                             result += " entspricht " + anwmenge.setScale(2, BigDecimal.ROUND_UP) + " " +
                                     DosageFormTools.getUsageText(stockInUse.getTradeForm().getDosageForm());
                             result += " (bei einem APV von " + stockInUse.getUPR().setScale(2, BigDecimal.ROUND_UP) + " zu 1";
-                            if (stockInUse.isDummyUPR()){
+                            if (stockInUse.isDummyUPR()) {
                                 result += ", dieses APV ist nur vorläufig";
                             }
                             result += ")";
@@ -563,8 +563,9 @@ public class PrescriptionTools {
         long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
 
-        List<BigInteger> list = null;
-        List<Prescription> result = null;
+        List<BigInteger> list;
+        List<Prescription> result = new ArrayList<Prescription>();
+
         Query query = em.createNativeQuery(" SELECT DISTINCT ver.VerID FROM BHPVerordnung ver " +
                 " INNER JOIN MPVorrat v ON v.BWKennung = ver.BWKennung " + // Verbindung über Bewohner
                 " INNER JOIN MPBestand b ON ver.DafID = b.DafID AND v.VorID = b.VorID " + // Verbindung über Bestand zur Darreichung UND dem Vorrat
@@ -572,12 +573,10 @@ public class PrescriptionTools {
         query.setParameter(1, inventory.getID());
         list = query.getResultList();
 
-        if (!list.isEmpty()) {
-            result = new ArrayList<Prescription>(list.size());
-            for (BigInteger verid : list) {
-                result.add(em.find(Prescription.class, verid.longValue()));
-            }
+        for (BigInteger verid : list) {
+            result.add(em.find(Prescription.class, verid.longValue()));
         }
+
         em.close();
         SYSTools.showTimeDifference(begin);
         return result;
@@ -603,7 +602,7 @@ public class PrescriptionTools {
      * Darreichungen für dieselbe Verordnung verwendet werden. Der Trick ist der Join über zwei Spalten in der Zeile mit "MPBestand"
      */
     public static List<Prescription> getOnDemandPrescriptions(Resident resident, Date date) {
-        long begin = System.currentTimeMillis();
+//        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
 
 //        List<Prescription> list = null;

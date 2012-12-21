@@ -52,29 +52,6 @@ public class MedStockTools {
         };
     }
 
-//    public static MedBestand findByVerordnungImAnbruch(Verordnung prescription) {
-//        EntityManager em = OPDE.createEM();
-//        Query query = em.createNamedQuery("MedBestand.findByDarreichungAndBewohnerImAnbruch");
-//        query.setParameter("bewohner", prescription.getResident());
-//        query.setParameter("darreichung", prescription.getTradeForm());
-//
-//        MedBestand result = null;
-//
-//        try {
-//            result = (MedBestand) query.getSingleResult();
-//        } catch (NoResultException nre) {
-//            result = null;
-//        } catch (Exception e) {
-//            OPDE.fatal(e);
-//            System.exit(1);
-//        } finally {
-//            em.close();
-//        }
-//
-//        return result;
-//    }
-
-
     /**
      * Sucht aus den den Beständen des Vorrats den angebrochenen heraus.
      *
@@ -563,7 +540,8 @@ public class MedStockTools {
         //    effective UPR   =     --------------------------------------------
         //                          the sum of all applications in the usage unit
         //
-        BigDecimal effectiveUPR = startContent.divide(sumOfAllAplications, 4, BigDecimal.ROUND_UP);
+        // This prevents a DIV BY ZERO error, if the MedStock in question has never been used.
+        BigDecimal effectiveUPR = sumOfAllAplications.equals(BigDecimal.ZERO) ? medstock.getUPR() : startContent.divide(sumOfAllAplications, 4, BigDecimal.ROUND_UP);
 
         // Nimmt man den realen Inhalt und teil ihn durch den rechnerischen, dann gibt es drei Möglichkeiten
         // 1. Es wurde mehr gegeben als in der Packung drin war. Dann muss das ursprüngliche APV zu gross gewesen
