@@ -34,6 +34,7 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
+import entity.EntityTools;
 import entity.info.Resident;
 import entity.nursingprocess.*;
 import op.OPDE;
@@ -127,12 +128,12 @@ public class PnlDFN extends NursingRecordsPanel {
 
 
     @Override
-    public void switchResident(Resident bewohner) {
-        this.resident = bewohner;
+    public void switchResident(Resident res) {
+        this.resident = EntityTools.find(Resident.class, res.getRID());
         GUITools.setResidentDisplay(resident);
 
         initPhase = true;
-        jdcDate.setMinSelectableDate(DFNTools.getMinDatum(bewohner));
+        jdcDate.setMinSelectableDate(DFNTools.getMinDatum(resident));
         jdcDate.setMaxSelectableDate(new Date());
         jdcDate.setDate(new Date());
         initPhase = false;

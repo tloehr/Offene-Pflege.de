@@ -32,6 +32,7 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
+import entity.EntityTools;
 import entity.files.SYSFilesTools;
 import entity.info.Resident;
 import entity.prescription.*;
@@ -109,8 +110,8 @@ public class PnlPrescription extends NursingRecordsPanel {
     }
 
     @Override
-    public void switchResident(Resident resident) {
-        this.resident = resident;
+    public void switchResident(Resident res) {
+        this.resident = EntityTools.find(Resident.class, res.getRID());
         GUITools.setResidentDisplay(resident);
         reloadDisplay();
     }

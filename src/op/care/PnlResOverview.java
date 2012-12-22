@@ -30,6 +30,7 @@ import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
+import entity.EntityTools;
 import entity.files.SYSFilesTools;
 import entity.info.ResInfoTools;
 import entity.info.Resident;
@@ -53,7 +54,7 @@ import java.beans.PropertyVetoException;
 public class PnlResOverview extends NursingRecordsPanel {
     public static final String internalClassID = "nursingrecords.overview";
 
-    private Resident bewohner;
+    private Resident resident;
     private CollapsiblePanes searchPanes;
     private JScrollPane jspSearch;
     private JToggleButton tbMedi, tbBilanz, tbBerichte;
@@ -69,12 +70,12 @@ public class PnlResOverview extends NursingRecordsPanel {
     /**
      * Creates new form PnlResOverview
      */
-    public PnlResOverview(Resident bewohner, JScrollPane jspSearch) {
+    public PnlResOverview(Resident resident, JScrollPane jspSearch) {
         initComponents();
         this.jspSearch = jspSearch;
         initPanel();
         prepareSearchArea();
-        switchResident(bewohner);
+        switchResident(resident);
     }
 
     private void initPanel() {
@@ -103,9 +104,9 @@ public class PnlResOverview extends NursingRecordsPanel {
 
 
     @Override
-    public void switchResident(Resident bewohner) {
-        this.bewohner = bewohner;
-        GUITools.setResidentDisplay(bewohner);
+    public void switchResident(Resident res) {
+        this.resident = EntityTools.find(Resident.class, res.getRID());
+        GUITools.setResidentDisplay(resident);
         reloadDisplay();
     }
 
@@ -147,7 +148,7 @@ public class PnlResOverview extends NursingRecordsPanel {
 
                 @Override
                 protected Object doInBackground() throws Exception {
-                    html = SYSTools.toHTML(ResInfoTools.getTXReport(bewohner, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true, false));
+                    html = SYSTools.toHTML(ResInfoTools.getTXReport(resident, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true, false));
                     return null;
                 }
 
@@ -177,7 +178,7 @@ public class PnlResOverview extends NursingRecordsPanel {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    String html = SYSTools.toHTML(ResInfoTools.getTXReport(bewohner, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true, false));
+                    String html = SYSTools.toHTML(ResInfoTools.getTXReport(resident, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true, false));
                     txtUebersicht.setText(html);
 //                    jspHTML.getVerticalScrollBar().setValue(0);
 
@@ -201,7 +202,7 @@ public class PnlResOverview extends NursingRecordsPanel {
 
             @Override
             protected Object doInBackground() throws Exception {
-                html = SYSTools.toHTML(ResInfoTools.getTXReport(bewohner, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true, false));
+                html = SYSTools.toHTML(ResInfoTools.getTXReport(resident, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, false, true, false));
                 return null;
             }
 
@@ -310,7 +311,7 @@ public class PnlResOverview extends NursingRecordsPanel {
         JideButton printButton = GUITools.createHyperlinkButton("Drucken", SYSConst.icon22print2, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                SYSFilesTools.print(ResInfoTools.getTXReport(bewohner, true, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, true, true), true);
+                SYSFilesTools.print(ResInfoTools.getTXReport(resident, true, false, tbMedi.isSelected(), tbBilanz.isSelected(), tbBerichte.isSelected(), true, false, true, true), true);
             }
         });
         mypanel.add(printButton);

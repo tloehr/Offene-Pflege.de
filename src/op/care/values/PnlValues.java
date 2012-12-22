@@ -31,7 +31,6 @@ import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
-import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import entity.files.SYSFilesTools;
@@ -788,35 +787,33 @@ public class PnlValues extends NursingRecordsPanel {
                     btnFiles.setContentAreaFilled(false);
                     btnFiles.setBorder(null);
 
-//                                   btnFiles.addActionListener(new ActionListener() {
-//                                       @Override
-//                                       public void actionPerformed(ActionEvent actionEvent) {
-//                                           Closure fileHandleClosure = OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) ? null : new Closure() {
-//                                               @Override
-//                                               public void execute(Object o) {
-//                                                   EntityManager em = OPDE.createEM();
-//                                                   final NReport myReport = em.merge(nreport);
-//                                                   em.refresh(myReport);
-//                                                   em.close();
-//
-//                                                   final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
-//
-//                                                   contentmap.remove(keyNewDay);
-//                                                   linemap.remove(nreport);
-//
-//                                                   valuecache.get(keyNewDay).remove(nreport);
-//                                                   valuecache.get(keyNewDay).add(myReport);
-//                                                   Collections.sort(valuecache.get(keyNewDay));
-//
-//                                                   createCP4Day(new DateMidnight(myReport.getPit()));
-//
-//                                                   buildPanel();
-//                                                   GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-//                                               }
-//                                           };
-//                                           new DlgFiles(nreport, fileHandleClosure);
-//                                       }
-//                                   });
+                    btnFiles.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent actionEvent) {
+                            new DlgFiles(resValue, new Closure() {
+                                @Override
+                                public void execute(Object o) {
+                                    EntityManager em = OPDE.createEM();
+                                    ResValue myValue = em.merge(resValue);
+                                    em.refresh(myValue);
+                                    em.close();
+
+                                    DateTime dt = new DateTime(myValue.getPit());
+                                    final String keyMonth = vtype.getID() + ".xtypes." + monthFormatter.format(dt.toDate()) + ".month";
+
+                                    valuecache.get(keyMonth).remove(resValue);
+                                    valuecache.get(keyMonth).add(myValue);
+                                    Collections.sort(valuecache.get(keyMonth));
+
+                                    contentmap.remove(keyMonth);
+
+                                    createCP4(vtype, dt.toDateMidnight());
+                                    buildPanel();
+                                    GUITools.flashBackground(contentmap.get(keyMonth), Color.YELLOW, 2);
+                                }
+                            });
+                        }
+                    });
                     pnlTitle.getRight().add(btnFiles);
                 }
 
@@ -841,84 +838,81 @@ public class PnlValues extends NursingRecordsPanel {
                     btnProcess.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     btnProcess.setContentAreaFilled(false);
                     btnProcess.setBorder(null);
-//                                   btnProcess.addActionListener(new ActionListener() {
-//                                       @Override
-//                                       public void actionPerformed(ActionEvent actionEvent) {
-//                                           new DlgProcessAssign(nreport, new Closure() {
-//                                               @Override
-//                                               public void execute(Object o) {
-//                                                   if (o == null) {
-//                                                       return;
-//                                                   }
-//                                                   Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = (Pair<ArrayList<QProcess>, ArrayList<QProcess>>) o;
-//
-//                                                   ArrayList<QProcess> assigned = result.getFirst();
-//                                                   ArrayList<QProcess> unassigned = result.getSecond();
-//
-//                                                   EntityManager em = OPDE.createEM();
-//
-//                                                   try {
-//                                                       em.getTransaction().begin();
-//
-//                                                       em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-//                                                       NReport myReport = em.merge(nreport);
-//                                                       em.lock(myReport, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-//
-//
-//                                                       for (SYSNR2PROCESS linkObject : myReport.getAttachedQProcessConnections()) {
-//                                                           if (unassigned.contains(linkObject.getQProcess())) {
-//                                                               em.remove(em.merge(linkObject));
-//                                                           }
-//                                                       }
-//
-//                                                       for (QProcess qProcess : assigned) {
-//                                                           java.util.List<QProcessElement> listElements = qProcess.getElements();
-//                                                           if (!listElements.contains(myReport)) {
-//                                                               QProcess myQProcess = em.merge(qProcess);
-//                                                               SYSNR2PROCESS myLinkObject = em.merge(new SYSNR2PROCESS(myQProcess, myReport));
-//                                                               qProcess.getAttachedNReportConnections().add(myLinkObject);
-//                                                               myReport.getAttachedQProcessConnections().add(myLinkObject);
-//                                                           }
-//                                                       }
-//
-//                                                       em.getTransaction().commit();
-//
-//                                                       final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
-//
-//                                                       contentmap.remove(keyNewDay);
-//                                                       linemap.remove(nreport);
-//
-//                                                       valuecache.get(keyNewDay).remove(nreport);
-//                                                       valuecache.get(keyNewDay).add(myReport);
-//                                                       Collections.sort(valuecache.get(keyNewDay));
-//
-//                                                       createCP4Day(new DateMidnight(myReport.getPit()));
-//
-//                                                       buildPanel();
-//                                                       GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-//                                                   } catch (OptimisticLockException ole) {
-//                                                       if (em.getTransaction().isActive()) {
-//                                                           em.getTransaction().rollback();
-//                                                       }
-//                                                       if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-//                                                           OPDE.getMainframe().emptyFrame();
-//                                                           OPDE.getMainframe().afterLogin();
-//                                                       } else {
-//                                                           reloadDisplay(true);
-//                                                       }
-//                                                   } catch (Exception e) {
-//                                                       if (em.getTransaction().isActive()) {
-//                                                           em.getTransaction().rollback();
-//                                                       }
-//                                                       OPDE.fatal(e);
-//                                                   } finally {
-//                                                       em.close();
-//                                                   }
-//
-//                                               }
-//                                           });
-//                                       }
-//                                   });
+                    btnProcess.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent actionEvent) {
+                            new DlgProcessAssign(resValue, new Closure() {
+                                @Override
+                                public void execute(Object o) {
+                                    if (o == null) {
+                                        return;
+                                    }
+                                    Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = (Pair<ArrayList<QProcess>, ArrayList<QProcess>>) o;
+
+                                    ArrayList<QProcess> assigned = result.getFirst();
+                                    ArrayList<QProcess> unassigned = result.getSecond();
+
+                                    EntityManager em = OPDE.createEM();
+
+                                    try {
+                                        em.getTransaction().begin();
+
+                                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                        ResValue myValue = em.merge(resValue);
+                                        em.lock(myValue, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
+                                        for (SYSVAL2PROCESS linkObject : resValue.getAttachedProcessConnections()) {
+                                            if (unassigned.contains(linkObject.getQProcess())) {
+                                                em.remove(em.merge(linkObject));
+                                            }
+                                        }
+
+                                        for (QProcess qProcess : assigned) {
+                                            java.util.List<QProcessElement> listElements = qProcess.getElements();
+                                            if (!listElements.contains(myValue)) {
+                                                QProcess myQProcess = em.merge(qProcess);
+                                                SYSVAL2PROCESS myLinkObject = em.merge(new SYSVAL2PROCESS(myQProcess, myValue));
+                                                qProcess.getAttachedResValueConnections().add(myLinkObject);
+                                                myValue.getAttachedProcessConnections().add(myLinkObject);
+                                            }
+                                        }
+
+                                        em.getTransaction().commit();
+
+                                        DateTime dt = new DateTime(myValue.getPit());
+                                        final String keyMonth = vtype.getID() + ".xtypes." + monthFormatter.format(dt.toDate()) + ".month";
+
+                                        valuecache.get(keyMonth).remove(resValue);
+                                        valuecache.get(keyMonth).add(myValue);
+                                        Collections.sort(valuecache.get(keyMonth));
+
+                                        contentmap.remove(keyMonth);
+
+                                        createCP4(vtype, dt.toDateMidnight());
+                                        buildPanel();
+                                        GUITools.flashBackground(contentmap.get(keyMonth), Color.YELLOW, 2);
+
+                                    } catch (OptimisticLockException ole) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                            OPDE.getMainframe().emptyFrame();
+                                            OPDE.getMainframe().afterLogin();
+                                        }
+                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                    } catch (Exception e) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        OPDE.fatal(e);
+                                    } finally {
+                                        em.close();
+                                    }
+                                }
+                            });
+                        }
+                    });
                     btnProcess.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
                     pnlTitle.getRight().add(btnProcess);
                 }
@@ -1330,17 +1324,6 @@ public class PnlValues extends NursingRecordsPanel {
             });
             btnFiles.setEnabled(!resValue.isObsolete());
 
-            if (!resValue.getAttachedFilesConnections().isEmpty()) {
-                JLabel lblNum = new JLabel(Integer.toString(resValue.getAttachedFilesConnections().size()), SYSConst.icon16greenStar, SwingConstants.CENTER);
-                lblNum.setFont(SYSConst.ARIAL10BOLD);
-                lblNum.setForeground(Color.BLUE);
-                lblNum.setHorizontalTextPosition(SwingConstants.CENTER);
-                DefaultOverlayable overlayableBtn = new DefaultOverlayable(btnFiles, lblNum, DefaultOverlayable.CENTER);
-                overlayableBtn.setOpaque(false);
-                pnlMenu.add(overlayableBtn);
-            } else {
-                pnlMenu.add(btnFiles);
-            }
 
             /***
              *      _     _         ____
@@ -1429,17 +1412,6 @@ public class PnlValues extends NursingRecordsPanel {
             });
             btnProcess.setEnabled(!resValue.isObsolete());
 
-            if (!resValue.getAttachedProcessConnections().isEmpty()) {
-                JLabel lblNum = new JLabel(Integer.toString(resValue.getAttachedProcessConnections().size()), SYSConst.icon16redStar, SwingConstants.CENTER);
-                lblNum.setFont(SYSConst.ARIAL10BOLD);
-                lblNum.setForeground(Color.YELLOW);
-                lblNum.setHorizontalTextPosition(SwingConstants.CENTER);
-                DefaultOverlayable overlayableBtn = new DefaultOverlayable(btnProcess, lblNum, DefaultOverlayable.CENTER);
-                overlayableBtn.setOpaque(false);
-                pnlMenu.add(overlayableBtn);
-            } else {
-                pnlMenu.add(btnProcess);
-            }
         }
         return pnlMenu;
     }

@@ -7,6 +7,7 @@ package op.care;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.pane.CollapsiblePanes;
+import entity.EntityTools;
 import entity.info.Resident;
 import entity.files.SYSFilesTools;
 import op.OPDE;
@@ -99,8 +100,8 @@ public class PnlCare extends NursingRecordsPanel {
     }
 
     @Override
-    public void switchResident(Resident resident) {
-        this.resident = resident;
+    public void switchResident(Resident res) {
+        this.resident = EntityTools.find(Resident.class, res.getRID());
         ((NursingRecordsPanel) jtpPflegeakte.getSelectedComponent()).switchResident(resident);
     }
 

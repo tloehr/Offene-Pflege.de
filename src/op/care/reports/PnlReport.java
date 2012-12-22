@@ -33,6 +33,7 @@ import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
+import entity.EntityTools;
 import entity.files.SYSFilesTools;
 import entity.files.SYSNR2FILE;
 import entity.info.Resident;
@@ -205,8 +206,8 @@ public class PnlReport extends NursingRecordsPanel {
     }
 
     @Override
-    public void switchResident(Resident bewohner) {
-        this.resident = bewohner;
+    public void switchResident(Resident res) {
+        this.resident = EntityTools.find(Resident.class, res.getRID());
 
 //        txtSearch.setText(null);
 //        firstReport = NReportTools.getFirstReport(resident);

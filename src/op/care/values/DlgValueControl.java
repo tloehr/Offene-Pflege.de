@@ -348,7 +348,7 @@ public class DlgValueControl extends MyJDialog {
             panel1.add(panel2, CC.xy(3, 35, CC.RIGHT, CC.DEFAULT));
         }
         contentPane.add(panel1);
-        setSize(540, 665);
+        setSize(540, 515);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }

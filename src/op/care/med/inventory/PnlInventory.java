@@ -32,6 +32,7 @@ import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
+import entity.EntityTools;
 import entity.info.Resident;
 import entity.prescription.*;
 import entity.system.SYSPropsTools;
@@ -136,8 +137,8 @@ public class PnlInventory extends NursingRecordsPanel {
         switchResident(resident, null);
     }
 
-    public void switchResident(Resident resident, MedInventory inventory) {
-        this.resident = resident;
+    public void switchResident(Resident res, MedInventory inventory) {
+        this.resident = EntityTools.find(Resident.class, res.getRID());
         GUITools.setResidentDisplay(resident);
         if (inventory == null) {
             lstInventories = tbClosedInventory.isSelected() ? MedInventoryTools.getAll(resident) : MedInventoryTools.getAllActive(resident);

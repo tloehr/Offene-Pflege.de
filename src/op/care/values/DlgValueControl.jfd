@@ -492,7 +492,7 @@
        <string>size</string> 
        <object class="java.awt.Dimension"> 
         <int>540</int> 
-        <int>665</int> 
+        <int>515</int> 
        </object> 
       </void> 
      </object> 

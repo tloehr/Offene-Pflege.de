@@ -29,6 +29,7 @@ import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
+import entity.EntityTools;
 import entity.info.Resident;
 import entity.files.SYSFiles;
 import entity.files.SYSFilesTools;
@@ -86,8 +87,8 @@ public class PnlFiles extends NursingRecordsPanel {
     }
 
     @Override
-    public void switchResident(Resident resident) {
-        this.resident = resident;
+    public void switchResident(Resident res) {
+        this.resident = EntityTools.find(Resident.class, res.getRID());
         GUITools.setResidentDisplay(resident);
         reloadTable();
     }
