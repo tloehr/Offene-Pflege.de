@@ -125,6 +125,10 @@ public class ResValueTools {
             result += OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(resValue.getCreateDate()) + "<br/>" + OPDE.lang.getString("misc.msg.Bywhom") + " " + resValue.getEditedBy().getFullname();
             result += "<br/>" + OPDE.lang.getString("misc.msg.replaceentry") + ": " + resValue.getReplacedBy().getID() + "</i><br/>";
         }
+        if (!resValue.getText().trim().isEmpty()) {
+            result += "<br/>" + SYSConst.html_bold("misc.msg.comment") + ":";
+            result += SYSConst.html_paragraph(resValue.getText().trim());
+        }
 
         return result + "</div>";
     }
@@ -162,12 +166,12 @@ public class ResValueTools {
     public static String getAsHTML(List<ResValue> resValues) {
 
         if (resValues.isEmpty()) {
-            return "<i>" + OPDE.lang.getString("misc.msg.emptyselection") + "</i>";
+            return SYSConst.html_italic("misc.msg.noentryyet");
         }
 
         String html = "";
 
-        html += "<h1 id=\"fonth1\">" + OPDE.lang.getString(PnlValues.internalClassID) + " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getLabelText(resValues.get(0).getResident()) + "</h1>";
+        html += SYSConst.html_h1(OPDE.lang.getString(PnlValues.internalClassID) + " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getLabelText(resValues.get(0).getResident()));
 
         html += "<table  id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
                 "<th style=\"width:20%\">" + OPDE.lang.getString(PnlValues.internalClassID + ".tabheader1") +
@@ -176,7 +180,11 @@ public class ResValueTools {
 
         for (ResValue resValue : resValues) {
             html += "<tr>";
-            html += "<td>" + getPITasHTML(resValue, false, false) + "</td>";
+            html += "<td>";
+            html += resValue.isReplaced() ? SYSConst.html_22x22_Eraser + "&nbsp;" : "";
+            html += resValue.isReplacement() ? SYSConst.html_22x22_Edited + "&nbsp;" : "";
+            html += getPITasHTML(resValue, false, false);
+            html += "</td>";
             html += "<td>" + getAsHTML(resValue) + "</td>";
             html += "<td>" + getTextAsHTML(resValue, false) + "</td>";
             html += "</tr>\n";
@@ -239,12 +247,12 @@ public class ResValueTools {
         Pair<DateTime, DateTime> result = null;
 
         EntityManager em = OPDE.createEM();
-        Query queryMin = em.createQuery("SELECT rv FROM ResValue rv WHERE rv.resident = :resident AND rv.replacedBy IS NULL AND rv.vtype = :vtype ORDER BY rv.pit ASC ");
+        Query queryMin = em.createQuery("SELECT rv FROM ResValue rv WHERE rv.resident = :resident AND rv.vtype = :vtype ORDER BY rv.pit ASC ");
         queryMin.setParameter("resident", resident);
         queryMin.setParameter("vtype", vtype);
         queryMin.setMaxResults(1);
 
-        Query queryMax = em.createQuery("SELECT rv FROM ResValue rv WHERE rv.resident = :resident AND rv.replacedBy IS NULL AND rv.vtype = :vtype ORDER BY rv.pit DESC ");
+        Query queryMax = em.createQuery("SELECT rv FROM ResValue rv WHERE rv.resident = :resident AND rv.vtype = :vtype ORDER BY rv.pit DESC ");
         queryMax.setParameter("resident", resident);
         queryMax.setParameter("vtype", vtype);
         queryMax.setMaxResults(1);
@@ -264,15 +272,54 @@ public class ResValueTools {
         return result;
     }
 
-    public static ArrayList<ResValue> getResValues(Resident resident, ResValueTypes vtype, DateTime month) {
-        DateTime from = month.dayOfMonth().withMinimumValue();
-        DateTime to = month.dayOfMonth().withMaximumValue();
+    public static ArrayList<ResValue> getResValues(Resident resident, ResValueTypes vtype) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("" +
+                " SELECT rv FROM ResValue rv " +
+                " WHERE rv.resident = :resident " +
+                " AND rv.vtype = :vtype" +
+                " ORDER BY rv.pit DESC ");
+        query.setParameter("resident", resident);
+        query.setParameter("vtype", vtype);
+        ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
+        em.close();
+
+        return list;
+    }
+
+//    public static ArrayList<ResValue> getResValues(Resident resident, ResValueTypes vtype, DateTime month) {
+//        DateTime from = month.dayOfMonth().withMinimumValue();
+//        DateTime to = month.dayOfMonth().withMaximumValue();
+//
+//        EntityManager em = OPDE.createEM();
+//        Query query = em.createQuery("" +
+//                " SELECT rv FROM ResValue rv " +
+//                " WHERE rv.resident = :resident " +
+//                " AND rv.replacedBy IS NULL " +
+//                " AND rv.vtype = :vtype" +
+//                " AND rv.pit >= :from" +
+//                " AND rv.pit <= :to" +
+//                " ORDER BY rv.pit DESC ");
+//        query.setParameter("resident", resident);
+//        query.setParameter("vtype", vtype);
+//        query.setParameter("from", from.toDate());
+//        query.setParameter("to", to.toDate());
+//        ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
+//        em.close();
+//
+//        return list;
+//    }
+
+    public static ArrayList<ResValue> getResValues(Resident resident, ResValueTypes vtype, int year) {
+
+        DateTime theYear = new DateTime(year, 1, 1, 0, 0, 0);
+        DateTime from = theYear.dayOfYear().withMinimumValue();
+        DateTime to = theYear.dayOfYear().withMaximumValue();
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("" +
                 " SELECT rv FROM ResValue rv " +
                 " WHERE rv.resident = :resident " +
-                " AND rv.replacedBy IS NULL " +
                 " AND rv.vtype = :vtype" +
                 " AND rv.pit >= :from" +
                 " AND rv.pit <= :to" +
@@ -667,57 +714,6 @@ public class ResValueTools {
 
         listResident.clear();
 
-
-        //Date last = op.care.values.DBHandling.lastWert(rs.getString("b.BWKennung"), DlgVital.MODE_STUHLGANG);
-//                    ResInfo bwi = new ResInfo(rs.getLong("bi.BWInfoID"));
-//                    HashMap antwort = (HashMap) ((HashMap) bwi.getAttribute().get(0)).get("antwort");
-//                    boolean minkontrolle = antwort.get("c.einfuhr").toString().equalsIgnoreCase("true");
-//                    boolean maxkontrolle = antwort.get("c.ueber").toString().equalsIgnoreCase("true");
-//                    int tage = Integer.parseInt(antwort.get("c.einftage").toString());
-//                    int minmenge = Integer.parseInt(antwort.get("c.einfmenge").toString());
-//                    int maxmenge = Integer.parseInt(antwort.get("c.uebermenge").toString());
-//                    if (!minkontrolle) {
-//                        minmenge = -1000000; // Klein genug um im SQL Ausdruck ignoriert zu werden.
-//                    }
-//                    if (!maxkontrolle) {
-//                        maxmenge = 1000000; // Groß genug um im SQL Ausdruck ignoriert zu werden.
-//                    }
-//
-//                    String s = " SELECT * FROM (" +
-//                            "       SELECT PIT, SUM(Wert) EINFUHR FROM ResValue " +
-//                            "       WHERE ReplacedBy = 0 AND Wert > 0 AND BWKennung=? AND XML='<LIQUIDBALANCE/>' " +
-//                            "       AND DATE(PIT) >= ADDDATE(DATE(now()), INTERVAL ? DAY) " +
-//                            "       Group By DATE(PIT) " +
-//                            "       ORDER BY PIT desc " +
-//                            " ) a" +
-//                            " WHERE a.EINFUHR < ? OR a.Einfuhr > ? ";
-//                    PreparedStatement stmt1 = OPDE.getDb().db.prepareStatement(s);
-//                    stmt1.setString(1, rs.getString("b.BWKennung"));
-//                    stmt1.setInt(2, tage * -1);
-//                    stmt1.setInt(3, minmenge);
-//                    stmt1.setInt(4, maxmenge);
-//
-//                    ResultSet rs1 = stmt1.executeQuery();
-//                    if (rs1.first()) {
-//                        rs1.beforeFirst();
-//                        while (rs1.next()) {
-//
-//                            if (html.length() == 0) {
-//                                html.append("<h" + headertiefe + ">");
-//                                html.append("Bewohner mit zu geringer / zu hoher Einfuhr");
-//                                html.append("</h" + headertiefe + ">");
-//                                html.append("<table border=\"1\"><tr>" +
-//                                        "<th>BewohnerIn</th><th>Datum</th><th>Einfuhr (ml)</th><th>Bemerkung</th></tr>");
-//                            }
-//                            html.append("<tr>");
-//                            String name = SYSTools.anonymizeBW(rs.getString("Nachname"), rs.getString("Vorname"), rs.getString("BWKennung"), rs.getInt("geschlecht"));
-//                            html.append("<td>" + name + "</td>");
-//                            html.append("<td>" + df.format(rs1.getDate("PIT")) + "</td>");
-//                            html.append("<td>" + rs1.getString("Einfuhr") + "</td>");
-//                            html.append("<td>" + (rs1.getDouble("Einfuhr") < minmenge ? "Einfuhr zu niedrig" : "Einfuhr zu hoch") + "</td>");
-//                            html.append("</tr>");
-//                        }
-//                    }
 
         return result;
 

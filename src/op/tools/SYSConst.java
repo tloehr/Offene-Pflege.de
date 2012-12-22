@@ -306,6 +306,10 @@ public class SYSConst {
         return "<b>" + SYSTools.xx(content) + "</b>";
     }
 
+    public static String html_italic(String content) {
+            return "<i>" + SYSTools.xx(content) + "</i>";
+        }
+
     public static String html_paragraph(String content) {
         return "<p id=\"fonttext\">\n" + SYSTools.xx(content) + "</p>\n";
     }

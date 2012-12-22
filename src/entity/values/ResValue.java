@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 
 /**
  * @author tloehr
@@ -139,6 +140,9 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
         this.replacementFor = replacementFor;
         this.user = user;
         this.resident = resident;
+        this.attachedFilesConnections = new ArrayList<SYSVAL2FILE>();
+        this.attachedProcessConnections = new ArrayList<SYSVAL2PROCESS>();
+
     }
 
     public Long getId() {
@@ -362,7 +366,7 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
 
     @Override
     public int compareTo(ResValue o) {
-        return pit.compareTo(o.getPit());
+        return pit.compareTo(o.getPit()) * -1;
     }
 
     @Override

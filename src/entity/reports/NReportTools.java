@@ -241,29 +241,32 @@ public class NReportTools {
         return html;
     }
 
-    public static String getReportsAsHTML(List<NReport> berichte, boolean specialsOnly, boolean withlongheader, String subtitle, String highlight) {
+    public static String getReportsAsHTML(List<NReport> nReports, boolean specialsOnly, boolean withlongheader, String subtitle, String highlight) {
         String html = "";
         boolean ihavesomethingtoshow = false;
 
-        if (!berichte.isEmpty()) {
-            html += "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.reports") + (withlongheader ? " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getLabelText(berichte.get(0).getResident()) : "") + "</h2>\n";
+        if (!nReports.isEmpty()) {
+            html += "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.reports") + (withlongheader ? " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getLabelText(nReports.get(0).getResident()) : "") + "</h2>\n";
             html += SYSTools.catchNull(subtitle).isEmpty() ? "" : "<h3 id=\"fonth3\" >" + subtitle + "</h3>\n";
             html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>"
                     + "<th>Info</th><th>Text</th>\n</tr>";
-            for (NReport bericht : berichte) {
-                if (!specialsOnly || bericht.isSpecial()) {
+            for (NReport nReport : nReports) {
+                if (!specialsOnly || nReport.isSpecial()) {
                     ihavesomethingtoshow = true;
                     html += "<tr>";
-                    html += "<td valign=\"top\">" + getDateAndUser(bericht, false, false) + "</td>";
-                    html += "<td valign=\"top\">" + getAsHTML(bericht, highlight) + "</td>";
+                    html += "<td valign=\"top\">" + getDateAndUser(nReport, false, false);
+                    html += nReport.isReplaced() ? SYSConst.html_22x22_Eraser : "";
+                    html += nReport.isReplacement() ? SYSConst.html_22x22_Edited : "";
+                    html += "</td>";
+                    html += "<td valign=\"top\">" + getAsHTML(nReport, highlight) + "</td>";
                     html += "</tr>\n";
                 }
             }
             html += "</table>\n";
         }
 
-        if (berichte.isEmpty() || !ihavesomethingtoshow) {
-            html = "";
+        if (nReports.isEmpty() || !ihavesomethingtoshow) {
+            html = SYSConst.html_italic("misc.msg.noentryyet");
         }
         return html;
     }
