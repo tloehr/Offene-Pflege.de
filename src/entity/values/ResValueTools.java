@@ -60,7 +60,7 @@ public class ResValueTools {
         }
         String result = sdf.format(bwert.getPit()) + "; " + bwert.getUser().getFullname();
         if (showids) {
-            result += "<br/><i>(" + bwert.getID() + ")</i>";
+            result += "<br/><i>[" + bwert.getID() + "]</i>";
         }
         return (colorize ? "<font " + color + " " + SYSConst.html_arial14 + ">" + result + "</font>" : result);
     }
@@ -183,7 +183,7 @@ public class ResValueTools {
             html += "<td>";
             html += resValue.isReplaced() ? SYSConst.html_22x22_Eraser + "&nbsp;" : "";
             html += resValue.isReplacement() ? SYSConst.html_22x22_Edited + "&nbsp;" : "";
-            html += getPITasHTML(resValue, false, false);
+            html += getPITasHTML(resValue, true, false);
             html += "</td>";
             html += "<td>" + getAsHTML(resValue) + "</td>";
             html += "<td>" + getTextAsHTML(resValue, false) + "</td>";

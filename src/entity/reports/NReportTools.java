@@ -254,7 +254,7 @@ public class NReportTools {
                 if (!specialsOnly || nReport.isSpecial()) {
                     ihavesomethingtoshow = true;
                     html += "<tr>";
-                    html += "<td valign=\"top\">" + getDateAndUser(nReport, false, false);
+                    html += "<td valign=\"top\">" + getDateAndUser(nReport, true, false);
                     html += nReport.isReplaced() ? SYSConst.html_22x22_Eraser : "";
                     html += nReport.isReplacement() ? SYSConst.html_22x22_Edited : "";
                     html += "</td>";
@@ -304,7 +304,7 @@ public class NReportTools {
         }
         result += SYSTools.catchNull(getTagsAsHTML(nReport), "<br/>[", "]") + " ";
         if (showIDs) {
-            result += "<br/><i>(" + nReport.getPbid() + ")</i>";
+            result += "<br/><i>[" + nReport.getPbid() + "]</i>";
         }
         return result;
     }
