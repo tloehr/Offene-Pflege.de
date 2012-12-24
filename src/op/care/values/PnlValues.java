@@ -693,7 +693,7 @@ public class PnlValues extends NursingRecordsPanel {
                 pnlTitle.getAdditionalIconPanel().add(new JLabel(SYSConst.icon22edited));
             }
             if (!resValue.getText().trim().isEmpty()) {
-                pnlTitle.getAdditionalIconPanel().add(new JLabel(SYSConst.icon22infoblue));
+                pnlTitle.getAdditionalIconPanel().add(new JLabel(SYSConst.icon22info));
             }
             if (pnlTitle.getAdditionalIconPanel().getComponentCount() > 0) {
                 pnlTitle.getButton().addActionListener(new ActionListener() {

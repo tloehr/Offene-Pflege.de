@@ -163,7 +163,7 @@ public class ResValueTools {
     }
 
 
-    public static String getAsHTML(List<ResValue> resValues) {
+    public static String getAsHTML(List<ResValue> resValues, ResValueTypes vtype) {
 
         if (resValues.isEmpty()) {
             return SYSConst.html_italic("misc.msg.noentryyet");
@@ -172,6 +172,7 @@ public class ResValueTools {
         String html = "";
 
         html += SYSConst.html_h1(OPDE.lang.getString(PnlValues.internalClassID) + " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getLabelText(resValues.get(0).getResident()));
+        html += SYSConst.html_h2(vtype.getValType());
 
         html += "<table  id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
                 "<th style=\"width:20%\">" + OPDE.lang.getString(PnlValues.internalClassID + ".tabheader1") +
