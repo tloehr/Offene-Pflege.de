@@ -19,9 +19,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DateFormat;
-import java.text.Format;
-import java.text.SimpleDateFormat;
+import java.text.*;
 import java.util.*;
 
 /**
@@ -63,6 +61,17 @@ public class ResValueTools {
             result += "<br/><i>[" + bwert.getID() + "]</i>";
         }
         return (colorize ? "<font " + color + " " + SYSConst.html_arial14 + ">" + result + "</font>" : result);
+    }
+
+
+    public static ArrayList<Integer> getYearsWithValues(Resident resident, ResValueTypes type) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNativeQuery("SELECT DISTINCT(YEAR(PIT)) j FROM BWerte WHERE BWKennung = ? AND TYPE = ? ORDER BY j DESC");
+        query.setParameter(1, resident.getRID());
+        query.setParameter(2, type.getValType());
+        ArrayList<Integer> result = new ArrayList<Integer>(query.getResultList());
+        em.close();
+        return result;
     }
 
     /**
@@ -171,8 +180,8 @@ public class ResValueTools {
 
         String html = "";
 
-        html += SYSConst.html_h1(OPDE.lang.getString(PnlValues.internalClassID) + " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getLabelText(resValues.get(0).getResident()));
-        html += SYSConst.html_h2(vtype.getValType());
+        html += SYSConst.html_h1(vtype.getText());
+        html += SYSConst.html_h2(ResidentTools.getLabelText(resValues.get(0).getResident()));
 
         html += "<table  id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
                 "<th style=\"width:20%\">" + OPDE.lang.getString(PnlValues.internalClassID + ".tabheader1") +
@@ -337,12 +346,13 @@ public class ResValueTools {
 
     public static String getValueAsHTML(ResValue rv) {
         String result = (rv.isDeleted() || rv.isReplaced() ? "<s>" : "");
+        NumberFormat dcf = DecimalFormat.getNumberInstance();
         if (rv.getType().getValType() == ResValueTypesTools.RR) {
-            result += "<b>" + rv.getVal1() + "/" + rv.getVal2() + " " + rv.getType().getUnit1() + " " + rv.getType().getLabel3() + ": " + rv.getVal3() + " " + rv.getType().getUnit3() + "</b>";
+            result += "<b>" + dcf.format(rv.getVal1()) + "/" + dcf.format(rv.getVal2()) + " " + rv.getType().getUnit1() + " " + rv.getType().getLabel3() + ": " + dcf.format(rv.getVal3()) + " " + rv.getType().getUnit3() + "</b>";
         } else if (rv.getType().getValType() == ResValueTypesTools.STOOL || rv.getType().getValType() == ResValueTypesTools.VOMIT) {
             result += "<i>" + SYSTools.catchNull(rv.getText(), "--") + "</i>";
         } else {
-            result += "<b>" + rv.getVal1() + " " + rv.getType().getUnit1() + "</b>";
+            result += "<b>" + dcf.format(rv.getVal1()) + " " + rv.getType().getUnit1() + "</b>";
         }
         result += (rv.isDeleted() || rv.isReplaced() ? "</s>" : "");
         return result;

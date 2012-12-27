@@ -291,13 +291,11 @@ public class PrescriptionTools {
         if (!prescription.hasMed()) {
             result += prescription.getIntervention().getBezeichnung();
         } else {
-
             MedInventory inventory = TradeFormTools.getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm());
-
             MedStock stockInUse = prescription.isClosed() ? null : MedStockTools.getStockInUse(inventory);
 
             if (stockInUse != null) {
-                result += "<b>" + prescription.getTradeForm().getMedProduct().getBezeichnung()
+                result += "<b>" + stockInUse.getTradeForm().getMedProduct().getBezeichnung()
                         + (stockInUse.getTradeForm().getSubtext().isEmpty() ? "" : " " + stockInUse.getTradeForm().getSubtext()) + "</b>" +
                         (stockInUse.getTradeForm().getDosageForm().getPreparation().isEmpty() ? "" : " " + stockInUse.getTradeForm().getDosageForm().getPreparation()) + " " +
                         (prescription.getTradeForm().getDosageForm().getUsageText().isEmpty() ? SYSConst.UNITS[prescription.getTradeForm().getDosageForm().getUsageUnit()] : prescription.getTradeForm().getDosageForm().getUsageText());
@@ -321,12 +319,28 @@ public class PrescriptionTools {
         return result;
     }
 
+    public static String getOriginalPrescription(Prescription presription) {
+        String result = "";
+
+        if (presription.hasMed()) {
+
+            MedInventory inventory = TradeFormTools.getInventory4TradeForm(presription.getResident(), presription.getTradeForm());
+            MedStock stockInUse = MedStockTools.getStockInUse(inventory);
+
+            if (stockInUse != null) {
+                // If the current prescription defers from the original one (different provider of the medication as in the beginning)
+                if (!stockInUse.getTradeForm().equals(presription.getTradeForm())) {
+                    result += SYSConst.html_bold(OPDE.lang.getString(PnlPrescription.internalClassID + ".originalprescription")) + ": " + presription.getTradeForm().getMedProduct().getBezeichnung();
+                    result += (stockInUse.getTradeForm().getSubtext().isEmpty() ? "" : " " + stockInUse.getTradeForm().getSubtext());
+                }
+            }
+        }
+        return result.isEmpty() ? "" : SYSConst.html_div(result) + "<br/>";
+    }
+
     public static String getLongDescription(Prescription presription) {
         String result = "<div id=\"fonttext\">";// = SYSConst.html_fontface;
 
-//        if (presription.isClosed()) {
-//            result += "<s>"; // Abgesetzte
-//        }
         if (!presription.hasMed()) {
             result += presription.getIntervention().getBezeichnung();
         } else {
@@ -359,10 +373,6 @@ public class PrescriptionTools {
 
 
         }
-//        if (presription.isClosed()) {
-//            result += "</s>"; // Abgesetzte
-//        }
-
         return result + "</div>";
     }
 
@@ -583,7 +593,7 @@ public class PrescriptionTools {
     }
 
     public static ArrayList<Prescription> getAll(Resident resident) {
-        long begin = System.currentTimeMillis();
+//        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
 
         ArrayList<Prescription> result = null;
@@ -592,7 +602,7 @@ public class PrescriptionTools {
         result = new ArrayList<Prescription>(query.getResultList());
 
         em.close();
-        SYSTools.showTimeDifference(begin);
+//        SYSTools.showTimeDifference(begin);
         return result;
     }
 
@@ -602,20 +612,16 @@ public class PrescriptionTools {
      * Darreichungen für dieselbe Verordnung verwendet werden. Der Trick ist der Join über zwei Spalten in der Zeile mit "MPBestand"
      */
     public static List<Prescription> getOnDemandPrescriptions(Resident resident, Date date) {
-//        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
 
-//        List<Prescription> list = null;
         Query query = em.createQuery("SELECT p FROM Prescription p WHERE p.resident = :resident AND p.situation IS NOT NULL AND p.from <= :from AND p.to >= :to ORDER BY p.situation.text, p.id");
         query.setParameter("resident", resident);
         query.setParameter("from", new DateTime(date).toDateMidnight().toDate());
         query.setParameter("to", new DateTime(date).toDateMidnight().plusDays(1).toDateTime().minusSeconds(1).toDate());
 
         List<Prescription> list = query.getResultList();
-//        Collections.sort(list);
 
         em.close();
-
         return list;
     }
 
