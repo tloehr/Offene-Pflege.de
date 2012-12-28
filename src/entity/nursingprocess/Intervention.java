@@ -37,13 +37,13 @@ public class Intervention implements Serializable {
     private BigDecimal dauer;
     @Basic(optional = false)
     @Column(name = "MassArt")
-    private int massArt;
+    private int interventionType;
     @Column(name = "Aktiv")
     private Boolean aktiv;
 
     @JoinColumn(name = "BWIKID", referencedColumnName = "BWIKID")
     @ManyToOne
-    private ResInfoCategory kategorie;
+    private ResInfoCategory category;
 
     public Intervention() {
     }
@@ -52,11 +52,11 @@ public class Intervention implements Serializable {
         this.massID = massID;
     }
 
-    public Intervention(String bezeichnung, BigDecimal dauer, int massArt, ResInfoCategory kategorie) {
+    public Intervention(String bezeichnung, BigDecimal dauer, int interventionType, ResInfoCategory category) {
         this.bezeichnung = bezeichnung;
         this.dauer = dauer;
-        this.massArt = massArt;
-        this.kategorie = kategorie;
+        this.interventionType = interventionType;
+        this.category = category;
         this.aktiv = true;
     }
 
@@ -84,20 +84,20 @@ public class Intervention implements Serializable {
         this.dauer = dauer;
     }
 
-    public int getMassArt() {
-        return massArt;
+    public int getInterventionType() {
+        return interventionType;
     }
 
-    public void setMassArt(int massArt) {
-        this.massArt = massArt;
+    public void setInterventionType(int massArt) {
+        this.interventionType = massArt;
     }
 
-    public ResInfoCategory getKategorie() {
-        return kategorie;
+    public ResInfoCategory getCategory() {
+        return category;
     }
 
-    public void setKategorie(ResInfoCategory kategorie) {
-        this.kategorie = kategorie;
+    public void setCategory(ResInfoCategory kategorie) {
+        this.category = kategorie;
     }
 
     public Boolean getAktiv() {

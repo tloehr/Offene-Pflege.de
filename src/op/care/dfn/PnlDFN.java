@@ -799,6 +799,11 @@ public class PnlDFN extends NursingRecordsPanel {
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
+                DateMidnight current = new DateMidnight(jdcDate.getDate());
+                DateMidnight min = new DateMidnight(jdcDate.getMinSelectableDate());
+                if (current.equals(min)) {
+                    return;
+                }
                 jdcDate.setDate(SYSCalendar.addDate(jdcDate.getDate(), -1));
             }
         });
@@ -814,6 +819,10 @@ public class PnlDFN extends NursingRecordsPanel {
         fwdButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
+                DateMidnight current = new DateMidnight(jdcDate.getDate());
+                if (current.equals(new DateMidnight())) {
+                    return;
+                }
                 jdcDate.setDate(SYSCalendar.addDate(jdcDate.getDate(), 1));
             }
         });
@@ -856,8 +865,8 @@ public class PnlDFN extends NursingRecordsPanel {
                 DateMidnight selected = new DateMidnight(jdcDate.getDate());
                 DateMidnight min = new DateMidnight(jdcDate.getMinSelectableDate());
                 DateMidnight max = new DateMidnight(jdcDate.getMaxSelectableDate());
-                fwdButton.setEnabled(selected.isBefore(max));
-                backButton.setEnabled(selected.isAfter(min));
+//                fwdButton.setEnabled(selected.isBefore(max));
+//                backButton.setEnabled(selected.isAfter(min));
 
                 if (evt.getPropertyName().equals("date")) {
                     reloadDisplay();
@@ -865,7 +874,7 @@ public class PnlDFN extends NursingRecordsPanel {
             }
         });
 
-        fwdButton.setEnabled(false);
+//        fwdButton.setEnabled(false);
 
         return list;
     }

@@ -1,6 +1,7 @@
 package entity.nursingprocess;
 
 import entity.EntityTools;
+import entity.info.ResInfoCategory;
 import entity.info.Resident;
 import entity.prescription.MedInventory;
 import entity.prescription.MedStock;
@@ -57,7 +58,7 @@ public class InterventionTools {
         EntityManager em = OPDE.createEM();
 
         Query query = em.createQuery(" " +
-                " SELECT m FROM Intervention m WHERE m.aktiv = TRUE AND m.massArt = :art " +
+                " SELECT m FROM Intervention m WHERE m.aktiv = TRUE AND m.interventionType = :art " +
                 (SYSTools.catchNull(suche).isEmpty() ? "" : " AND m.bezeichnung like :suche ") +
                 " ORDER BY m.bezeichnung "
         );
@@ -73,6 +74,24 @@ public class InterventionTools {
 
         return list;
     }
+
+    public static List<Intervention> findMassnahmenBy(ResInfoCategory category) {
+
+            EntityManager em = OPDE.createEM();
+
+            Query query = em.createQuery(" " +
+                    " SELECT m FROM Intervention m WHERE m.aktiv = TRUE AND m.category = :cat " +
+                    " ORDER BY m.bezeichnung "
+            );
+
+            query.setParameter("cat", category);
+
+            List<Intervention> list = query.getResultList();
+
+            em.close();
+
+            return list;
+        }
 
 
 }

@@ -45,6 +45,7 @@ import op.threads.DisplayMessage;
 import op.tools.*;
 import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.VerticalLayout;
+import org.joda.time.DateMidnight;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -475,7 +476,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                     reload();
                                 } else {
                                     mapBHP2Pane.put(myBHP, createCP4(myBHP));
-                                    int position = mapShift2BHP.get(myBHP.getShift()).indexOf(myBHP);
+                                    int position = mapShift2BHP.get(myBHP.getShift()).indexOf(bhp);
                                     mapShift2BHP.get(myBHP.getShift()).remove(position);
                                     mapShift2BHP.get(myBHP.getShift()).add(position, myBHP);
                                     if (myBHP.isOnDemand()) {
@@ -484,7 +485,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                         Collections.sort(mapShift2BHP.get(myBHP.getShift()));
                                     }
 
-                                    mapShift2Pane.put(bhp.getShift(), createCP4(bhp.getShift()));
+                                    mapShift2Pane.put(myBHP.getShift(), createCP4(myBHP.getShift()));
                                     buildPanel(false);
                                 }
                             } catch (OptimisticLockException ole) {
@@ -554,8 +555,8 @@ public class PnlBHP extends NursingRecordsPanel {
                                 myBHP.setMDate(new Date());
 
                                 mapBHP2Pane.put(myBHP, createCP4(myBHP));
-                                int position = mapShift2BHP.get(myBHP.getShift()).indexOf(myBHP);
-                                mapShift2BHP.get(bhp.getShift()).remove(myBHP);
+                                int position = mapShift2BHP.get(myBHP.getShift()).indexOf(bhp);
+                                mapShift2BHP.get(bhp.getShift()).remove(position);
                                 mapShift2BHP.get(bhp.getShift()).add(position, myBHP);
                                 if (myBHP.isOnDemand()) {
                                     Collections.sort(mapShift2BHP.get(myBHP.getShift()), BHPTools.getOnDemandComparator());
@@ -564,7 +565,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 }
 
                                 em.getTransaction().commit();
-                                mapShift2Pane.put(bhp.getShift(), createCP4(bhp.getShift()));
+                                mapShift2Pane.put(myBHP.getShift(), createCP4(myBHP.getShift()));
                                 buildPanel(false);
                             } catch (OptimisticLockException ole) {
                                 if (em.getTransaction().isActive()) {
@@ -640,8 +641,8 @@ public class PnlBHP extends NursingRecordsPanel {
                                 }
 
                                 mapBHP2Pane.put(myBHP, createCP4(myBHP));
-                                int position = mapShift2BHP.get(myBHP.getShift()).indexOf(myBHP);
-                                mapShift2BHP.get(bhp.getShift()).remove(myBHP);
+                                int position = mapShift2BHP.get(myBHP.getShift()).indexOf(bhp);
+                                mapShift2BHP.get(bhp.getShift()).remove(position);
                                 mapShift2BHP.get(bhp.getShift()).add(position, myBHP);
                                 if (myBHP.isOnDemand()) {
                                     Collections.sort(mapShift2BHP.get(myBHP.getShift()), BHPTools.getOnDemandComparator());
@@ -650,7 +651,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 }
 
                                 em.getTransaction().commit();
-                                mapShift2Pane.put(bhp.getShift(), createCP4(bhp.getShift()));
+                                mapShift2Pane.put(myBHP.getShift(), createCP4(myBHP.getShift()));
                                 buildPanel(false);
                             } catch (OptimisticLockException ole) {
                                 if (em.getTransaction().isActive()) {
@@ -729,8 +730,8 @@ public class PnlBHP extends NursingRecordsPanel {
                                 }
 
                                 mapBHP2Pane.put(myBHP, createCP4(myBHP));
-                                int position = mapShift2BHP.get(myBHP.getShift()).indexOf(myBHP);
-                                mapShift2BHP.get(bhp.getShift()).remove(myBHP);
+                                int position = mapShift2BHP.get(myBHP.getShift()).indexOf(bhp);
+                                mapShift2BHP.get(bhp.getShift()).remove(position);
                                 mapShift2BHP.get(bhp.getShift()).add(position, myBHP);
                                 if (myBHP.isOnDemand()) {
                                     Collections.sort(mapShift2BHP.get(myBHP.getShift()), BHPTools.getOnDemandComparator());
@@ -739,7 +740,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 }
 
                                 em.getTransaction().commit();
-                                mapShift2Pane.put(bhp.getShift(), createCP4(bhp.getShift()));
+                                mapShift2Pane.put(myBHP.getShift(), createCP4(myBHP.getShift()));
                                 buildPanel(false);
                             } catch (OptimisticLockException ole) {
                                 if (em.getTransaction().isActive()) {
@@ -962,6 +963,11 @@ public class PnlBHP extends NursingRecordsPanel {
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
+                DateMidnight current = new DateMidnight(jdcDatum.getDate());
+                DateMidnight min = new DateMidnight(jdcDatum.getMinSelectableDate());
+                if (current.equals(min)) {
+                    return;
+                }
                 jdcDatum.setDate(SYSCalendar.addDate(jdcDatum.getDate(), -1));
             }
         });
@@ -977,6 +983,10 @@ public class PnlBHP extends NursingRecordsPanel {
         fwdButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
+                DateMidnight current = new DateMidnight(jdcDatum.getDate());
+                if (current.equals(new DateMidnight())) {
+                    return;
+                }
                 jdcDatum.setDate(SYSCalendar.addDate(jdcDatum.getDate(), 1));
             }
         });

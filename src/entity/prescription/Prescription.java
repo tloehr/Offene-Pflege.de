@@ -79,88 +79,6 @@ import java.util.List;
  */
 @Entity
 @Table(name = "BHPVerordnung")
-//@NamedQueries({
-//        @NamedQuery(name = "Verordnung.findAll", query = "SELECT b FROM Prescription b"),
-//        @NamedQuery(name = "Verordnung.findByVerID", query = "SELECT b FROM Prescription b WHERE b.id = :verid"),
-//        @NamedQuery(name = "Verordnung.findByAnDatum", query = "SELECT b FROM Prescription b WHERE b.from = :from"),
-//        @NamedQuery(name = "Verordnung.findByVorgang", query = " "
-//                + " SELECT ve FROM Prescription ve "
-//                + " JOIN ve.attachedProcessConnections av"
-//                + " JOIN av.qProcess v"
-//                + " WHERE v = :vorgang "),
-//        @NamedQuery(name = "Verordnung.findByAbDatum", query = "SELECT b FROM Prescription b WHERE b.to = :to"),
-//        @NamedQuery(name = "Verordnung.findByBisPackEnde", query = "SELECT b FROM Prescription b WHERE b.toEndOfPackage = :bisPackEnde"),
-//        @NamedQuery(name = "Verordnung.findByVerKennung", query = "SELECT b FROM Prescription b WHERE b.prescRelation = :verKennung"),
-//        @NamedQuery(name = "Verordnung.findByStellplan", query = "SELECT b FROM Prescription b WHERE b.showOnDailyPlan = :stellplan")
-//
-//})
-
-//@SqlResultSetMappings({
-//
-////        @SqlResultSetMapping(name = "Verordnung.findAllForStellplanResultMapping",
-////                entities = {@EntityResult(entityClass = Verordnung.class), @EntityResult(entityClass = Station.class), @EntityResult(entityClass = VerordnungPlanung.class)},
-////                columns = {@ColumnResult(name = "BestID"), @ColumnResult(name = "VorID"), @ColumnResult(name = "FormID"), @ColumnResult(name = "MedPID"), @ColumnResult(name = "M.Bezeichnung"), @ColumnResult(name = "Ms.Bezeichnung")
-////                }
-////        ),
-//        @SqlResultSetMapping(name = "Verordnung.findByBewohnerMitVorraetenResultMapping",
-//                entities = @EntityResult(entityClass = Prescription.class),
-//                columns = {@ColumnResult(name = "VorID"), @ColumnResult(name = "saldo"), @ColumnResult(name = "BestID"), @ColumnResult(name = "summe")}
-//        ),
-//        @SqlResultSetMapping(name = "Verordnung.findAllBedarfResultMapping",
-//                entities = {@EntityResult(entityClass = Prescription.class), @EntityResult(entityClass = Situations.class), @EntityResult(entityClass = PrescriptionSchedule.class)},
-//                columns = {@ColumnResult(name = "vor.Saldo"), @ColumnResult(name = "bisher.tagesdosis"), @ColumnResult(name = "bestand.APV"), @ColumnResult(name = "bestand.Summe"),
-//                        @ColumnResult(name = "bestand.BestID")
-//                }
-//        )
-//})
-
-//@NamedNativeQueries({
-//        // Das hier ist eine Liste aller Verordnungen eines Bewohners.
-//        // Durch Joins werden die zugehörigen Vorräte und aktuellen Bestände
-//        // beigefügt.
-//        @NamedNativeQuery(name = "Verordnung.findByBewohnerMitVorraeten", query = " " +
-//                " SELECT v.*, vor.VorID, vor.saldo, bestand.BestID, bestand.summe, M.Bezeichnung mptext, Ms.Bezeichnung mssntext " +
-//                " FROM BHPVerordnung v " +
-//                // Die drei folgenden Joins brauche ich nur für die Sortierung in der ORDER BY Klause
-//                " INNER JOIN Massnahmen Ms ON Ms.MassID = v.MassID " +
-//                " LEFT OUTER JOIN MPDarreichung D ON v.DafID = D.DafID " +
-//                " LEFT OUTER JOIN MProdukte M ON M.MedPID = D.MedPID" +
-//                // Das hier gibt eine Liste aller Vorräte eines Bewohners. Jedem Vorrat
-//                // wird mindestens eine DafID zugeordnet. Das können auch mehr sein, die stehen
-//                // dann in verschiedenen Zeilen. Das bedeutet ganz einfach, dass einem Vorrat
-//                // ja unterschiedliche DAFs mal zugeordnet worden sind. Und hier stehen jetzt einfach
-//                // alle gültigen Kombinationen aus DAF und VOR inkl. der Salden, die jemals vorgekommen sind.
-//                // Für den entsprechenden Bewohner natürlich. Wenn man das nun über die DAF mit der Verordnung joined,
-//                // dann erhält man zwingend den passenden Vorrat, wenn es denn einen gibt.
-//                " LEFT OUTER JOIN " +
-//                " ( " +
-//                "   SELECT DISTINCT a.VorID, b.DafID, a.saldo FROM ( " +
-//                "       SELECT best.VorID, sum(buch.Menge) saldo FROM MPBestand best " +
-//                "       INNER JOIN MPBuchung buch ON buch.BestID = best.BestID " +
-//                "       INNER JOIN MPVorrat vor1 ON best.VorID = vor1.VorID" +
-//                "       WHERE vor1.BWKennung = ? AND vor1.Bis = '9999-12-31 23:59:59'" +
-//                "       GROUP BY best.VorID" +
-//                "   ) a  " +
-//                "   INNER JOIN (" +
-//                "       SELECT best.VorID, best.DafID FROM MPBestand best " +
-//                "   ) b ON a.VorID = b.VorID " +
-//                " ) vor ON vor.DafID = v.DafID " +
-//                // Dieses Join fügt diejenigen Bestände hinzu, die zur Zeit im Anbruch sind
-//                " LEFT OUTER JOIN " +
-//                " ( " +
-//                "   SELECT best1.*, SUM(buch1.Menge) summe " +
-//                "   FROM MPBestand best1 " +
-//                "   INNER JOIN MPBuchung buch1 ON buch1.BestID = best1.BestID " +
-//                "   WHERE best1.Aus = '9999-12-31 23:59:59' AND best1.Anbruch < now() " +
-//                "   GROUP BY best1.BestID" +
-//                " ) bestand ON bestand.VorID = vor.VorID " +
-//                " WHERE v.BWKennung = ? " +
-//                // Wenn man als 3. Parameter eine 1 übergibt, dann werden alle
-//                // Verordungen angezeigt, wenn nicht, dann nur die aktuellen.
-//                " AND (1=? OR date(v.AbDatum) >= current_date())" +
-//                " ORDER BY v.SitID IS NULL, v.DafID IS NOT NULL, ifnull(mptext, mssntext) ", resultSetMapping = "Verordnung.findByBewohnerMitVorraetenResultMapping"),
-//
-//})
 
 public class Prescription implements Serializable, QProcessElement, Cloneable, Comparable<Prescription> {
     private static final long serialVersionUID = 1L;
@@ -200,8 +118,8 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
     private List<SYSPRE2PROCESS> attachedProcessConnections;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
     private List<PrescriptionSchedule> pSchedule;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
-    private List<BHP> bhps;
+//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
+//    private List<BHP> bhps;
     // ==
     // N:1 Relationen
     // ==
@@ -542,7 +460,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         if (attachedProcessConnections != null ? !attachedProcessConnections.equals(that.attachedProcessConnections) : that.attachedProcessConnections != null)
             return false;
         if (text != null ? !text.equals(that.text) : that.text != null) return false;
-        if (bhps != null ? !bhps.equals(that.bhps) : that.bhps != null) return false;
+//        if (bhps != null ? !bhps.equals(that.bhps) : that.bhps != null) return false;
         if (intervention != null ? !intervention.equals(that.intervention) : that.intervention != null) return false;
 
         if (resident != null ? !resident.equals(that.resident) : that.resident != null) return false;
@@ -567,7 +485,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         result = 31 * result + (attachedFilesConnections != null ? attachedFilesConnections.hashCode() : 0);
         result = 31 * result + (attachedProcessConnections != null ? attachedProcessConnections.hashCode() : 0);
 
-        result = 31 * result + (bhps != null ? bhps.hashCode() : 0);
+//        result = 31 * result + (bhps != null ? bhps.hashCode() : 0);
         result = 31 * result + (userON != null ? userON.hashCode() : 0);
         result = 31 * result + (userOFF != null ? userOFF.hashCode() : 0);
         result = 31 * result + (resident != null ? resident.hashCode() : 0);

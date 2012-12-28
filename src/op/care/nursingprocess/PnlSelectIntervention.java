@@ -35,7 +35,7 @@ import java.util.Arrays;
  * @author Torsten Löhr
  */
 public class PnlSelectIntervention extends JPanel {
-    public static final String internalClassID = "nursingrecords.nursingprocess.pnlselectinterventions";
+    public static final String internalClassID = PnlNursingProcess.internalClassID+".pnlselectinterventions";
     private Closure actionBlock;
     private JToggleButton tbAktiv;
     Number dauer = BigDecimal.TEN;
@@ -65,10 +65,14 @@ public class PnlSelectIntervention extends JPanel {
 
         cmbArt.setModel(new DefaultComboBoxModel(new String[]{"Pflege","Verordungen"}));
         cmbKategorie.setModel(new DefaultComboBoxModel(ResInfoCategoryTools.getAll4NP().toArray()));
+        cmbCategory.setModel(new DefaultComboBoxModel(ResInfoCategoryTools.getAll4NP().toArray()));
+        cmbCategory.setSelectedItem(null);
     }
 
     private void txtSearchActionPerformed(ActionEvent e) {
+        if (txtSearch.getText().isEmpty()) return;
         lstInterventions.setModel(SYSTools.list2dlm(InterventionTools.findMassnahmenBy(InterventionTools.TYPE_CARE, txtSearch.getText())));
+        cmbCategory.setSelectedItem(null);
     }
 
     private void btnAddActionPerformed(ActionEvent e) {
@@ -110,12 +114,20 @@ public class PnlSelectIntervention extends JPanel {
         }
     }
 
+    private void cmbCategoryItemStateChanged(ItemEvent e) {
+        if (e.getStateChange() == ItemEvent.SELECTED && e.getItem() != null){
+            txtSearch.setText(null);
+            lstInterventions.setModel(SYSTools.list2dlm(InterventionTools.findMassnahmenBy((ResInfoCategory) e.getItem())));
+        }
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         panel1 = new JPanel();
         split1 = new JSplitPane();
         panel2 = new JPanel();
         txtSearch = new JXSearchField();
+        cmbCategory = new JComboBox();
         scrollPane1 = new JScrollPane();
         lstInterventions = new JList();
         panel3 = new JPanel();
@@ -144,7 +156,7 @@ public class PnlSelectIntervention extends JPanel {
 
             //======== split1 ========
             {
-                split1.setDividerLocation(300);
+                split1.setDividerLocation(500);
                 split1.setDividerSize(1);
                 split1.setEnabled(false);
 
@@ -152,7 +164,7 @@ public class PnlSelectIntervention extends JPanel {
                 {
                     panel2.setLayout(new FormLayout(
                         "default:grow",
-                        "default, $lgap, default:grow, $lgap, default"));
+                        "2*(default, $lgap), default:grow, $lgap, default"));
 
                     //---- txtSearch ----
                     txtSearch.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -163,6 +175,15 @@ public class PnlSelectIntervention extends JPanel {
                         }
                     });
                     panel2.add(txtSearch, CC.xy(1, 1));
+
+                    //---- cmbCategory ----
+                    cmbCategory.addItemListener(new ItemListener() {
+                        @Override
+                        public void itemStateChanged(ItemEvent e) {
+                            cmbCategoryItemStateChanged(e);
+                        }
+                    });
+                    panel2.add(cmbCategory, CC.xy(1, 3));
 
                     //======== scrollPane1 ========
                     {
@@ -177,7 +198,7 @@ public class PnlSelectIntervention extends JPanel {
                         });
                         scrollPane1.setViewportView(lstInterventions);
                     }
-                    panel2.add(scrollPane1, CC.xy(1, 3, CC.FILL, CC.FILL));
+                    panel2.add(scrollPane1, CC.xy(1, 5, CC.FILL, CC.FILL));
 
                     //======== panel3 ========
                     {
@@ -211,7 +232,7 @@ public class PnlSelectIntervention extends JPanel {
                         });
                         panel3.add(btnAdd);
                     }
-                    panel2.add(panel3, CC.xy(1, 5, CC.FILL, CC.DEFAULT));
+                    panel2.add(panel3, CC.xy(1, 7, CC.FILL, CC.DEFAULT));
                 }
                 split1.setLeftComponent(panel2);
 
@@ -309,6 +330,7 @@ public class PnlSelectIntervention extends JPanel {
     private JSplitPane split1;
     private JPanel panel2;
     private JXSearchField txtSearch;
+    private JComboBox cmbCategory;
     private JScrollPane scrollPane1;
     private JList lstInterventions;
     private JPanel panel3;

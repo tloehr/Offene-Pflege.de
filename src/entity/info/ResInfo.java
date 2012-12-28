@@ -46,7 +46,7 @@ import java.util.Date;
  * @author tloehr
  */
 @Entity
-@Table(name = "BWInfo")
+@Table(name = "BWinfo")
 public class ResInfo implements Serializable, QProcessElement, Cloneable, Comparable<ResInfo> {
     private static final long serialVersionUID = 1L;
     @Id
