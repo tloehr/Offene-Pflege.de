@@ -3,6 +3,7 @@ package entity.prescription;
 import entity.EntityTools;
 import entity.info.Resident;
 import op.OPDE;
+import op.care.prescription.PnlPrescription;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
@@ -64,6 +65,35 @@ public class TradeFormTools {
         text += usageText.isEmpty() ? SYSConst.UNITS[tradeForm.getDosageForm().getUsageUnit()] : usageText;
         return text;
     }
+
+    public static String toPrettyHTML(TradeForm tradeForm) {
+        String preparation = SYSTools.catchNull(tradeForm.getDosageForm().getPreparation());
+        String usageText = SYSTools.catchNull(tradeForm.getDosageForm().getUsageText());
+        String subtext = SYSTools.catchNull(tradeForm.getSubtext());
+        String text = tradeForm.getMedProduct().getBezeichnung();
+        text += subtext.isEmpty() ? "" : " " + subtext;
+        text = SYSConst.html_bold(text);
+        text += preparation.isEmpty() ? " " : ", " + preparation + ", ";
+        text += usageText.isEmpty() ? SYSConst.UNITS[tradeForm.getDosageForm().getUsageUnit()] : usageText;
+        return text;
+    }
+
+    public static String toPrettyHTMLalternative(TradeForm alternative) {
+        String text = "";
+        if (alternative != null) {
+            String altPreparation = SYSTools.catchNull(alternative.getDosageForm().getPreparation());
+            String altUsageText = SYSTools.catchNull(alternative.getDosageForm().getUsageText());
+            String altSubtext = SYSTools.catchNull(alternative.getSubtext());
+            text += "(" + SYSConst.html_italic("&nbsp;" + OPDE.lang.getString(PnlPrescription.internalClassID + ".originalprescription") + ": " + alternative.getMedProduct().getBezeichnung() + (altSubtext.isEmpty() ? "" : " " + altSubtext));
+            text += altPreparation.isEmpty() ? " " : ", " + altPreparation + ", ";
+            text += altUsageText.isEmpty() ? SYSConst.UNITS[alternative.getDosageForm().getUsageUnit()] : altUsageText;
+            text += ")";
+        }
+
+
+        return text;
+    }
+
 
     public static String toPrettyStringMedium(TradeForm tradeForm) {
         String preparation = SYSTools.catchNull(tradeForm.getDosageForm().getPreparation());

@@ -75,23 +75,29 @@ public class MedPackage implements Serializable {
     }
 
     @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MedPackage that = (MedPackage) o;
+
+        if (groesse != null ? !groesse.equals(that.groesse) : that.groesse != null) return false;
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (inhalt != null ? !inhalt.equals(that.inhalt) : that.inhalt != null) return false;
+        if (pzn != null ? !pzn.equals(that.pzn) : that.pzn != null) return false;
+        if (tradeForm != null ? !tradeForm.equals(that.tradeForm) : that.tradeForm != null) return false;
+
+        return true;
     }
 
     @Override
-    public boolean equals(Object object) {
-
-        if (!(object instanceof MedPackage)) {
-            return false;
-        }
-        MedPackage other = (MedPackage) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (pzn != null ? pzn.hashCode() : 0);
+        result = 31 * result + (groesse != null ? groesse.hashCode() : 0);
+        result = 31 * result + (inhalt != null ? inhalt.hashCode() : 0);
+        result = 31 * result + (tradeForm != null ? tradeForm.hashCode() : 0);
+        return result;
     }
 
     @Override

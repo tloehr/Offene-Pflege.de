@@ -65,23 +65,27 @@ public class Situations implements Serializable {
     }
 
     @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (sitID != null ? sitID.hashCode() : 0);
-        return hash;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Situations that = (Situations) o;
+
+        if (kategorie != null ? !kategorie.equals(that.kategorie) : that.kategorie != null) return false;
+        if (sitID != null ? !sitID.equals(that.sitID) : that.sitID != null) return false;
+        if (text != null ? !text.equals(that.text) : that.text != null) return false;
+        if (uKategorie != null ? !uKategorie.equals(that.uKategorie) : that.uKategorie != null) return false;
+
+        return true;
     }
 
     @Override
-    public boolean equals(Object object) {
-
-        if (!(object instanceof Situations)) {
-            return false;
-        }
-        Situations other = (Situations) object;
-        if ((this.sitID == null && other.sitID != null) || (this.sitID != null && !this.sitID.equals(other.sitID))) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        int result = sitID != null ? sitID.hashCode() : 0;
+        result = 31 * result + (kategorie != null ? kategorie.hashCode() : 0);
+        result = 31 * result + (uKategorie != null ? uKategorie.hashCode() : 0);
+        result = 31 * result + (text != null ? text.hashCode() : 0);
+        return result;
     }
 
     @Override

@@ -59,6 +59,17 @@ public class ResInfoTools {
         return bwinfos.isEmpty() ? null : bwinfos.get(0);
     }
 
+    public static ArrayList<ResInfoCategory> getCategories(ArrayList<ResInfo> listInfos){
+        ArrayList<ResInfoCategory> result = new ArrayList<ResInfoCategory>();
+        for (ResInfo resInfo : listInfos){
+            if (!result.contains(resInfo.getResInfoType().getResInfoCat())){
+                 result.add(resInfo.getResInfoType().getResInfoCat());
+            }
+        }
+        Collections.sort(result);
+        return result;
+    }
+
 
     public static ResInfo getFirstResinfo(Resident resident, ResInfoType resInfoType) {
         EntityManager em = OPDE.createEM();

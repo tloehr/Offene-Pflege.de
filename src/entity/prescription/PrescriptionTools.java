@@ -8,7 +8,6 @@ import entity.Station;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import op.OPDE;
-import op.care.prescription.PnlPrescription;
 import op.tools.HTMLTools;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -330,12 +329,11 @@ public class PrescriptionTools {
             if (stockInUse != null) {
                 // If the current prescription defers from the original one (different provider of the medication as in the beginning)
                 if (!stockInUse.getTradeForm().equals(presription.getTradeForm())) {
-                    result += SYSConst.html_bold(OPDE.lang.getString(PnlPrescription.internalClassID + ".originalprescription")) + ": " + presription.getTradeForm().getMedProduct().getBezeichnung();
-                    result += (stockInUse.getTradeForm().getSubtext().isEmpty() ? "" : " " + stockInUse.getTradeForm().getSubtext());
+                    result = TradeFormTools.toPrettyHTMLalternative(presription.getTradeForm());
                 }
             }
         }
-        return result.isEmpty() ? "" : SYSConst.html_div(result) + "<br/>";
+        return (result.isEmpty() ? "" : SYSConst.html_div(result) + "<br/>");
     }
 
     public static String getLongDescription(Prescription presription) {
@@ -351,24 +349,27 @@ public class PrescriptionTools {
             if (stockInUse != null) {
                 // If the current prescription defers from the original one (different provider of the medication as in the beginning)
                 if (!stockInUse.getTradeForm().equals(presription.getTradeForm())) {
-                    result += "<b>" + stockInUse.getTradeForm().getMedProduct().getBezeichnung() +
-                            (stockInUse.getTradeForm().getSubtext().isEmpty() ? "" : " " + stockInUse.getTradeForm().getSubtext()) + "</b>" +
-                            (stockInUse.getTradeForm().getDosageForm().getPreparation().isEmpty() ? "" : " " + stockInUse.getTradeForm().getDosageForm().getPreparation()) + " " +
-                            (stockInUse.getTradeForm().getDosageForm().getUsageText().isEmpty() ? SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getUsageUnit()] : stockInUse.getTradeForm().getDosageForm().getUsageText());
-                    result += " <i>(" + OPDE.lang.getString(PnlPrescription.internalClassID + ".originalprescription") + ": " + presription.getTradeForm().getMedProduct().getBezeichnung();
-                    result += (stockInUse.getTradeForm().getSubtext().isEmpty() ? "" : " " + stockInUse.getTradeForm().getSubtext()) + ")</i>";
+
+                    result = TradeFormTools.toPrettyHTML(stockInUse.getTradeForm()) + TradeFormTools.toPrettyHTMLalternative(presription.getTradeForm());
+
+//                    result += "<b>" + stockInUse.getTradeForm().getMedProduct().getBezeichnung() +
+//                            (stockInUse.getTradeForm().getSubtext().isEmpty() ? "" : " " + stockInUse.getTradeForm().getSubtext()) + "</b>" +
+//                            (stockInUse.getTradeForm().getDosageForm().getPreparation().isEmpty() ? "" : " " + stockInUse.getTradeForm().getDosageForm().getPreparation()) + " " +
+//                            (stockInUse.getTradeForm().getDosageForm().getUsageText().isEmpty() ? SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getUsageUnit()] : stockInUse.getTradeForm().getDosageForm().getUsageText());
+//                    result += " <i>(" + OPDE.lang.getString(PnlPrescription.internalClassID + ".originalprescription") + ": " + presription.getTradeForm().getMedProduct().getBezeichnung();
+//                    result += (stockInUse.getTradeForm().getSubtext().isEmpty() ? "" : " " + stockInUse.getTradeForm().getSubtext()) + ")</i>";
                 } else {
+
+                    result = TradeFormTools.toPrettyHTML(presription.getTradeForm());
+
                     // No, the resident still gets the orginal stuff
-                    result += "<b>" + presription.getTradeForm().getMedProduct().getBezeichnung()
-                            + (stockInUse.getTradeForm().getSubtext().isEmpty() ? "" : " " + stockInUse.getTradeForm().getSubtext()) + "</b>" +
-                            (stockInUse.getTradeForm().getDosageForm().getPreparation().isEmpty() ? "" : " " + stockInUse.getTradeForm().getDosageForm().getPreparation()) + " " +
-                            (presription.getTradeForm().getDosageForm().getUsageText().isEmpty() ? SYSConst.UNITS[presription.getTradeForm().getDosageForm().getUsageUnit()] : presription.getTradeForm().getDosageForm().getUsageText());
+//                    result += "<b>" + presription.getTradeForm().getMedProduct().getBezeichnung()
+//                            + (stockInUse.getTradeForm().getSubtext().isEmpty() ? "" : " " + stockInUse.getTradeForm().getSubtext()) + "</b>" +
+//                            (stockInUse.getTradeForm().getDosageForm().getPreparation().isEmpty() ? "" : " " + stockInUse.getTradeForm().getDosageForm().getPreparation()) + " " +
+//                            (presription.getTradeForm().getDosageForm().getUsageText().isEmpty() ? SYSConst.UNITS[presription.getTradeForm().getDosageForm().getUsageUnit()] : presription.getTradeForm().getDosageForm().getUsageText());
                 }
             } else {
-                result += "<b>" + presription.getTradeForm().getMedProduct().getBezeichnung()
-                        + (presription.getTradeForm().getSubtext().isEmpty() ? "" : " " + presription.getTradeForm().getSubtext()) + "</b>" +
-                        (presription.getTradeForm().getDosageForm().getPreparation().isEmpty() ? "" : " " + presription.getTradeForm().getDosageForm().getPreparation()) + " " +
-                        (presription.getTradeForm().getDosageForm().getUsageText().isEmpty() ? SYSConst.UNITS[presription.getTradeForm().getDosageForm().getUsageUnit()] : presription.getTradeForm().getDosageForm().getUsageText());
+                result = TradeFormTools.toPrettyHTML(presription.getTradeForm());
             }
 
 

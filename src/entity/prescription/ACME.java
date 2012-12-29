@@ -115,25 +115,36 @@ public class ACME implements Serializable {
         this.www = www;
     }
 
-
     @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (mphid != null ? mphid.hashCode() : 0);
-        return hash;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ACME acme = (ACME) o;
+
+        if (city != null ? !city.equals(acme.city) : acme.city != null) return false;
+        if (fax != null ? !fax.equals(acme.fax) : acme.fax != null) return false;
+        if (mphid != null ? !mphid.equals(acme.mphid) : acme.mphid != null) return false;
+        if (name != null ? !name.equals(acme.name) : acme.name != null) return false;
+        if (street != null ? !street.equals(acme.street) : acme.street != null) return false;
+        if (tel != null ? !tel.equals(acme.tel) : acme.tel != null) return false;
+        if (www != null ? !www.equals(acme.www) : acme.www != null) return false;
+        if (zipcode != null ? !zipcode.equals(acme.zipcode) : acme.zipcode != null) return false;
+
+        return true;
     }
 
     @Override
-    public boolean equals(Object object) {
-
-        if (!(object instanceof ACME)) {
-            return false;
-        }
-        ACME other = (ACME) object;
-        if ((this.mphid == null && other.mphid != null) || (this.mphid != null && !this.mphid.equals(other.mphid))) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        int result = mphid != null ? mphid.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (street != null ? street.hashCode() : 0);
+        result = 31 * result + (zipcode != null ? zipcode.hashCode() : 0);
+        result = 31 * result + (city != null ? city.hashCode() : 0);
+        result = 31 * result + (tel != null ? tel.hashCode() : 0);
+        result = 31 * result + (fax != null ? fax.hashCode() : 0);
+        result = 31 * result + (www != null ? www.hashCode() : 0);
+        return result;
     }
 
     @Override

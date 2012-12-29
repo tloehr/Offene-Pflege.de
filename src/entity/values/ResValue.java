@@ -11,6 +11,8 @@ import entity.process.QProcessElement;
 import entity.process.SYSVAL2PROCESS;
 import entity.system.Users;
 import op.OPDE;
+import op.care.prescription.PnlPrescription;
+import op.care.values.PnlValues;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
 
@@ -319,7 +321,7 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
 
     @Override
     public String getContentAsHTML() {
-        return "";
+        return ResValueTools.getAsHTML(this);
     }
 
     @Override
@@ -341,7 +343,7 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
 
     @Override
     public String getTitle() {
-        return "";
+        return OPDE.lang.getString(PnlValues.internalClassID)+ ": " + vtype.getText();
     }
 
     @Override

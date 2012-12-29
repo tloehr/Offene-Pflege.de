@@ -114,9 +114,9 @@ public class PnlDFN extends NursingRecordsPanel {
     public void cleanup() {
         jdcDate.cleanup();
         cpDFN.removeAll();
-        mapDFN2Pane.clear();
-        mapShift2DFN.clear();
-        mapShift2Pane.clear();
+        SYSTools.clear(mapDFN2Pane);
+        SYSTools.clear(mapShift2DFN);
+        SYSTools.clear(mapShift2Pane);
         SYSTools.unregisterListeners(this);
     }
 

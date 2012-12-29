@@ -30,14 +30,14 @@ import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import entity.EntityTools;
-import entity.info.Resident;
 import entity.files.SYSFiles;
 import entity.files.SYSFilesTools;
+import entity.info.Resident;
 import op.OPDE;
-import op.system.InternalClassACL;
-import op.tools.*;
 import op.system.FileDrop;
+import op.system.InternalClassACL;
 import op.threads.DisplayMessage;
+import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 import tablerenderer.RNDHTML;
@@ -288,8 +288,10 @@ public class PnlFiles extends NursingRecordsPanel {
                         new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<br/><b>" + sysfile.getFilename() + "</b><br/>" + OPDE.lang.getString("misc.questions.delete2"), new ImageIcon(getClass().getResource("/artwork/48x48/bw/trashcan_empty.png")), new Closure() {
                             @Override
                             public void execute(Object o) {
-                                SYSFilesTools.deleteFile(sysfile);
-                                reloadTable();
+                                if (o.equals(JOptionPane.YES_OPTION)) {
+                                    SYSFilesTools.deleteFile(sysfile);
+                                    reloadTable();
+                                }
                             }
                         });
 
@@ -300,7 +302,7 @@ public class PnlFiles extends NursingRecordsPanel {
             }
 
             menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
-        } else {
+        } else if (evt.getClickCount() == 2) {
             SYSFilesTools.handleFile(sysfile, Desktop.Action.OPEN);
         }
 

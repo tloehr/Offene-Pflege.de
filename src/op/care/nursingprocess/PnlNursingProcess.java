@@ -39,9 +39,7 @@ import entity.info.ResInfoCategory;
 import entity.info.ResInfoCategoryTools;
 import entity.info.Resident;
 import entity.nursingprocess.*;
-import entity.process.QProcess;
-import entity.process.QProcessElement;
-import entity.process.SYSNP2PROCESS;
+import entity.process.*;
 import entity.system.Unique;
 import entity.system.UniqueTools;
 import op.OPDE;
@@ -52,7 +50,6 @@ import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
-import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
@@ -76,7 +73,6 @@ import java.util.List;
  */
 public class PnlNursingProcess extends NursingRecordsPanel {
     public static final String internalClassID = "nursingrecords.nursingprocess";
-    private boolean initPhase;
 
     private Resident resident;
     private JScrollPane jspSearch;
@@ -88,21 +84,16 @@ public class PnlNursingProcess extends NursingRecordsPanel {
     private HashMap<NursingProcess, JPanel> contenPanelMap;
     private ArrayList<NursingProcess> listNP;
 
-    //    private JToggleButton tbInactive;
-    private JXSearchField txtSearch;
-
     private Color[] color1, color2;
 
     /**
      * Creates new form PnlNursingProcess
      */
     public PnlNursingProcess(Resident resident, JScrollPane jspSearch) {
-        initPhase = true;
         this.jspSearch = jspSearch;
 
         initComponents();
         initPanel();
-        initPhase = false;
 
         switchResident(resident);
 
@@ -121,12 +112,10 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
     @Override
     public void cleanup() {
-        cpMap.clear();
-        valuecache.clear();
-        contenPanelMap.clear();
-        if (listNP != null) {
-            listNP.clear();
-        }
+        SYSTools.clear(cpMap);
+        SYSTools.clear(valuecache);
+        SYSTools.clear(contenPanelMap);
+        SYSTools.clear(listNP);
     }
 
     @Override
@@ -204,7 +193,6 @@ public class PnlNursingProcess extends NursingRecordsPanel {
          *     |_|  \___|_|\___/ \__,_|\__,_|____/|_|___/ .__/|_|\__,_|\__, |
          *                                              |_|            |___/
          */
-        initPhase = true;
 
         final boolean withworker = false;
         if (withworker) {
@@ -271,7 +259,6 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
             buildPanel();
         }
-        initPhase = false;
 
     }
 
@@ -326,7 +313,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
         });
 
         if (isEmpty(cat)) {
-            cptitle.getButton().setIcon(SYSConst.icon22nothing);
+            cptitle.getButton().setIcon(SYSConst.icon22ledGreenOff);
         } else if (containsOnlyClosedNPs(cat)) {
             cptitle.getButton().setIcon(SYSConst.icon22stopSign);
         } else {
@@ -502,17 +489,23 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     final NursingProcess myNP = em.merge(np);
                                     em.lock(myNP, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-                                    for (SYSNP2PROCESS linkObject : myNP.getAttachedQProcessConnections()) {
+                                    ArrayList<SYSNP2PROCESS> attached = new ArrayList<SYSNP2PROCESS>(myNP.getAttachedQProcessConnections());
+                                    for (SYSNP2PROCESS linkObject : attached) {
                                         if (unassigned.contains(linkObject.getQProcess())) {
-                                            em.remove(em.merge(linkObject));
+                                            linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
+                                            linkObject.getNursingProcess().getAttachedQProcessConnections().remove(linkObject);
+                                            em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myNP.getTitle() + " ID: " + myNP.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                            em.remove(linkObject);
                                         }
                                     }
+                                    attached.clear();
 
                                     for (QProcess qProcess : assigned) {
                                         java.util.List<QProcessElement> listElements = qProcess.getElements();
                                         if (!listElements.contains(myNP)) {
                                             QProcess myQProcess = em.merge(qProcess);
                                             SYSNP2PROCESS myLinkObject = em.merge(new SYSNP2PROCESS(myQProcess, myNP));
+                                            em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myNP.getTitle() + " ID: " + myNP.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
                                             qProcess.getAttachedNursingProcessesConnections().add(myLinkObject);
                                             myNP.getAttachedQProcessConnections().add(myLinkObject);
                                         }
@@ -588,7 +581,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                 }
             });
 
-
+            btnMenu.setEnabled(!np.isClosed());
             cptitle.getButton().setIcon(getIcon(np));
 
             cptitle.getRight().add(btnMenu);
@@ -616,6 +609,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
         list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
         list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription3"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
         list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription4"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription5"), SYSConst.icon22ledGreenOff, SwingConstants.LEADING));
 
         return list;
     }
@@ -737,6 +731,10 @@ public class PnlNursingProcess extends NursingRecordsPanel {
             JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.new"), SYSConst.icon22add, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
+                    if (!resident.isActive()) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
+                        return;
+                    }
                     new DlgNursingProcess(new NursingProcess(resident), new Closure() {
                         @Override
                         public void execute(Object np) {
@@ -808,7 +806,10 @@ public class PnlNursingProcess extends NursingRecordsPanel {
             addTemplate.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-
+                    if (!resident.isActive()) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
+                        return;
+                    }
                     final JidePopup popup = new JidePopup();
 
                     // first a template is selected
@@ -1443,17 +1444,23 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                 final NursingProcess myNP = em.merge(np);
                                 em.lock(myNP, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-                                for (SYSNP2PROCESS linkObject : myNP.getAttachedQProcessConnections()) {
+                                ArrayList<SYSNP2PROCESS> attached = new ArrayList<SYSNP2PROCESS>(myNP.getAttachedQProcessConnections());
+                                for (SYSNP2PROCESS linkObject : attached) {
                                     if (unassigned.contains(linkObject.getQProcess())) {
-                                        em.remove(em.merge(linkObject));
+                                        linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
+                                        linkObject.getNursingProcess().getAttachedQProcessConnections().remove(linkObject);
+                                        em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myNP.getTitle() + " ID: " + myNP.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                        em.remove(linkObject);
                                     }
                                 }
+                                attached.clear();
 
                                 for (QProcess qProcess : assigned) {
                                     java.util.List<QProcessElement> listElements = qProcess.getElements();
                                     if (!listElements.contains(myNP)) {
                                         QProcess myQProcess = em.merge(qProcess);
                                         SYSNP2PROCESS myLinkObject = em.merge(new SYSNP2PROCESS(myQProcess, myNP));
+                                        em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myNP.getTitle() + " ID: " + myNP.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
                                         qProcess.getAttachedNursingProcessesConnections().add(myLinkObject);
                                         myNP.getAttachedQProcessConnections().add(myLinkObject);
                                     }

@@ -16,6 +16,7 @@ public class PReportTools {
 
     public static final short PREPORT_TYPE_USER = 0;
     public static final short PREPORT_TYPE_ASSIGN_ELEMENT = 1;
+    public static final String PREPORT_TEXT_ASSIGN_ELEMENT = PnlProcess.internalClassID+".preport.text.assign";
     public static final short PREPORT_TYPE_REMOVE_ELEMENT = 2;
     public static final String PREPORT_TEXT_REMOVE_ELEMENT = PnlProcess.internalClassID+".preport.text.remove";
     public static final short PREPORT_TYPE_SET_OWNERSHIP = 3;

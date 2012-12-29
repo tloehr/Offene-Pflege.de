@@ -104,25 +104,38 @@ public class DosageForm implements Serializable {
 
 
     @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
-    }
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-    @Override
-    public boolean equals(Object object) {
+        DosageForm that = (DosageForm) o;
 
-        if (!(object instanceof DosageForm)) {
-            return false;
-        }
-        DosageForm other = (DosageForm) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
+        if (dailyPlan != that.dailyPlan) return false;
+        if (equivalent != that.equivalent) return false;
+        if (packUnit != that.packUnit) return false;
+        if (state != that.state) return false;
+        if (usageUnit != that.usageUnit) return false;
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (intervention != null ? !intervention.equals(that.intervention) : that.intervention != null) return false;
+        if (preparation != null ? !preparation.equals(that.preparation) : that.preparation != null) return false;
+        if (usageText != null ? !usageText.equals(that.usageText) : that.usageText != null) return false;
+
         return true;
     }
 
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (preparation != null ? preparation.hashCode() : 0);
+        result = 31 * result + (usageText != null ? usageText.hashCode() : 0);
+        result = 31 * result + (int) usageUnit;
+        result = 31 * result + (int) packUnit;
+        result = 31 * result + (int) dailyPlan;
+        result = 31 * result + (int) state;
+        result = 31 * result + equivalent;
+        result = 31 * result + (intervention != null ? intervention.hashCode() : 0);
+        return result;
+    }
 
     @Override
     public String toString() {

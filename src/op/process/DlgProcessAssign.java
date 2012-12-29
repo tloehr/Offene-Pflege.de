@@ -71,7 +71,7 @@ public class DlgProcessAssign extends MyJDialog {
         QProcess txProcess = (QProcess) listAssigned.getSelectedValue();
         assigned.remove(txProcess);
         listAssigned.setModel(SYSTools.list2dlm(assigned));
-        if (txProcess.getPkid() != null) {
+        if (txProcess.getPkid() != null) { // only put it to the unassigned list, if its persisted already
             unassigned.add(txProcess);
             Collections.sort(unassigned);
             listUnassigned.setModel(SYSTools.list2dlm(unassigned));

@@ -191,24 +191,47 @@ public class Doc implements Serializable {
         this.eMail = eMail;
     }
 
+
     @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (arztID != null ? arztID.hashCode() : 0);
-        return hash;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Doc doc = (Doc) o;
+
+        if (anrede != null ? !anrede.equals(doc.anrede) : doc.anrede != null) return false;
+        if (arztID != null ? !arztID.equals(doc.arztID) : doc.arztID != null) return false;
+        if (eMail != null ? !eMail.equals(doc.eMail) : doc.eMail != null) return false;
+        if (fax != null ? !fax.equals(doc.fax) : doc.fax != null) return false;
+        if (mobil != null ? !mobil.equals(doc.mobil) : doc.mobil != null) return false;
+        if (name != null ? !name.equals(doc.name) : doc.name != null) return false;
+        if (ort != null ? !ort.equals(doc.ort) : doc.ort != null) return false;
+        if (plz != null ? !plz.equals(doc.plz) : doc.plz != null) return false;
+        if (status != null ? !status.equals(doc.status) : doc.status != null) return false;
+        if (strasse != null ? !strasse.equals(doc.strasse) : doc.strasse != null) return false;
+        if (tel != null ? !tel.equals(doc.tel) : doc.tel != null) return false;
+        if (titel != null ? !titel.equals(doc.titel) : doc.titel != null) return false;
+        if (vorname != null ? !vorname.equals(doc.vorname) : doc.vorname != null) return false;
+
+        return true;
     }
 
     @Override
-    public boolean equals(Object object) {
-
-        if (!(object instanceof Doc)) {
-            return false;
-        }
-        Doc other = (Doc) object;
-        if ((this.arztID == null && other.arztID != null) || (this.arztID != null && !this.arztID.equals(other.arztID))) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        int result = arztID != null ? arztID.hashCode() : 0;
+        result = 31 * result + (anrede != null ? anrede.hashCode() : 0);
+        result = 31 * result + (titel != null ? titel.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (vorname != null ? vorname.hashCode() : 0);
+        result = 31 * result + (strasse != null ? strasse.hashCode() : 0);
+        result = 31 * result + (plz != null ? plz.hashCode() : 0);
+        result = 31 * result + (ort != null ? ort.hashCode() : 0);
+        result = 31 * result + (tel != null ? tel.hashCode() : 0);
+        result = 31 * result + (fax != null ? fax.hashCode() : 0);
+        result = 31 * result + (mobil != null ? mobil.hashCode() : 0);
+        result = 31 * result + (eMail != null ? eMail.hashCode() : 0);
+        result = 31 * result + (status != null ? status.hashCode() : 0);
+        return result;
     }
 
     @Override

@@ -36,9 +36,7 @@ import com.jidesoft.swing.JideButton;
 import entity.files.SYSFilesTools;
 import entity.files.SYSVAL2FILE;
 import entity.info.Resident;
-import entity.process.QProcess;
-import entity.process.QProcessElement;
-import entity.process.SYSVAL2PROCESS;
+import entity.process.*;
 import entity.values.ResValue;
 import entity.values.ResValueTools;
 import entity.values.ResValueTypes;
@@ -47,6 +45,7 @@ import op.care.sysfiles.DlgFiles;
 import op.process.DlgProcessAssign;
 import op.system.InternalClassACL;
 import op.threads.DisplayManager;
+import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
@@ -149,8 +148,8 @@ public class PnlValues extends NursingRecordsPanel {
         java.util.List<Component> list = new ArrayList<Component>();
         list.add(new JSeparator());
         list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22empty, SwingConstants.LEADING));
-
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22ledGreenOff, SwingConstants.LEADING));
         return list;
     }
 
@@ -160,6 +159,10 @@ public class PnlValues extends NursingRecordsPanel {
         JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".btnControlling.tooltip"), SYSConst.icon22magnify1, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
+                if (!resident.isActive()) {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
+                    return;
+                }
                 new DlgValueControl(resident, new Closure() {
                     @Override
                     public void execute(Object o) {
@@ -197,7 +200,6 @@ public class PnlValues extends NursingRecordsPanel {
             }
         });
         list.add(addButton);
-
 
         return list;
     }
@@ -427,6 +429,7 @@ public class PnlValues extends NursingRecordsPanel {
                 }
             });
             cptitle.getRight().add(btnAdd);
+            btnAdd.setEnabled(resident.isActive());
         }
         cpType.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
@@ -439,9 +442,10 @@ public class PnlValues extends NursingRecordsPanel {
             cpType.setContentPane(createContentPanel4(vtype));
         }
 
-        if (ResValueTools.getYearsWithValues(resident, vtype).isEmpty()) {
-            cptitle.getButton().setIcon(SYSConst.icon22empty);
-            cptitle.getButton().setToolTipText(OPDE.lang.getString("misc.msg.noentryyet"));
+        if (!ResValueTools.getYearsWithValues(resident, vtype).isEmpty()) {
+            cptitle.getButton().setIcon(SYSConst.icon22ledGreenOn);
+        } else {
+            cptitle.getButton().setIcon(SYSConst.icon22ledGreenOff);
         }
 
         cpType.setHorizontalAlignment(SwingConstants.LEADING);
@@ -688,17 +692,23 @@ public class PnlValues extends NursingRecordsPanel {
                                     ResValue myValue = em.merge(resValue);
                                     em.lock(myValue, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-                                    for (SYSVAL2PROCESS linkObject : resValue.getAttachedProcessConnections()) {
+                                    ArrayList<SYSVAL2PROCESS> attached = new ArrayList<SYSVAL2PROCESS>(resValue.getAttachedProcessConnections());
+                                    for (SYSVAL2PROCESS linkObject : attached) {
                                         if (unassigned.contains(linkObject.getQProcess())) {
-                                            em.remove(em.merge(linkObject));
+                                            linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
+                                            linkObject.getResValue().getAttachedProcessConnections().remove(linkObject);
+                                            em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myValue.getTitle() + " ID: " + myValue.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                            em.remove(linkObject);
                                         }
                                     }
+                                    attached.clear();
 
                                     for (QProcess qProcess : assigned) {
                                         java.util.List<QProcessElement> listElements = qProcess.getElements();
                                         if (!listElements.contains(myValue)) {
                                             QProcess myQProcess = em.merge(qProcess);
                                             SYSVAL2PROCESS myLinkObject = em.merge(new SYSVAL2PROCESS(myQProcess, myValue));
+                                            em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myValue.getTitle() + " ID: " + myValue.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
                                             qProcess.getAttachedResValueConnections().add(myLinkObject);
                                             myValue.getAttachedProcessConnections().add(myLinkObject);
                                         }
@@ -791,9 +801,9 @@ public class PnlValues extends NursingRecordsPanel {
     @Override
     public void cleanup() {
         cpsValues.removeAll();
-        cpMap.clear();
-        linemap.clear();
-        lstValueTypes.clear();
+        SYSTools.clear(cpMap);
+        SYSTools.clear(linemap);
+        SYSTools.clear(lstValueTypes);
     }
 
     private void buildPanel() {
@@ -862,24 +872,17 @@ public class PnlValues extends NursingRecordsPanel {
                                     DateTime dt = new DateTime(newValue.getPit());
                                     final String keyType = vtype.getID() + ".xtypes";
                                     final String keyYear = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
-//                                    final String keyMonth = vtype.getID() + ".xtypes." + monthFormatter.format(dt.toDate()) + ".month";
 
                                     mapType2Values.get(keyYear).remove(resValue);
                                     mapType2Values.get(keyYear).add(oldValue);
                                     mapType2Values.get(keyYear).add(newValue);
                                     Collections.sort(mapType2Values.get(keyYear));
-//                                    valuecache.get(keyMonth).remove(resValue);
-//                                    valuecache.get(keyMonth).add(oldValue);
-//                                    valuecache.get(keyMonth).add(newValue);
-//                                    Collections.sort(valuecache.get(keyMonth));
 
-//                                    contentmap.remove(keyMonth);
                                     createCP4(vtype, dt.getYear());
 
                                     try {
                                         cpMap.get(keyType).setCollapsed(false);
                                         cpMap.get(keyYear).setCollapsed(false);
-//                                        cpMap.get(keyMonth).setCollapsed(false);
                                     } catch (PropertyVetoException e) {
                                         e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                                     }
@@ -962,19 +965,11 @@ public class PnlValues extends NursingRecordsPanel {
                                     DateTime dt = new DateTime(myValue.getPit());
                                     final String keyType = vtype.getID() + ".xtypes";
                                     final String keyYear = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
-//                                    final String keyMonth = vtype.getID() + ".xtypes." + monthFormatter.format(dt.toDate()) + ".month";
-
 
                                     mapType2Values.get(keyYear).remove(resValue);
                                     mapType2Values.get(keyYear).add(myValue);
                                     Collections.sort(mapType2Values.get(keyYear));
                                     createCP4(vtype, dt.getYear());
-//                                    valuecache.get(keyMonth).remove(resValue);
-//                                    valuecache.get(keyMonth).add(myValue);
-//                                    Collections.sort(valuecache.get(keyMonth));
-//
-//                                    contentmap.remove(keyMonth);
-//                                    createCP4(vtype, dt.toDateMidnight());
 
                                     try {
                                         cpMap.get(keyType).setCollapsed(false);
@@ -1084,17 +1079,23 @@ public class PnlValues extends NursingRecordsPanel {
                                 ResValue myValue = em.merge(resValue);
                                 em.lock(myValue, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-                                for (SYSVAL2PROCESS linkObject : resValue.getAttachedProcessConnections()) {
+                                ArrayList<SYSVAL2PROCESS> attached = new ArrayList<SYSVAL2PROCESS>(resValue.getAttachedProcessConnections());
+                                for (SYSVAL2PROCESS linkObject : attached) {
                                     if (unassigned.contains(linkObject.getQProcess())) {
-                                        em.remove(em.merge(linkObject));
+                                        linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
+                                        linkObject.getResValue().getAttachedProcessConnections().remove(linkObject);
+                                        em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myValue.getTitle() + " ID: " + myValue.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                        em.remove(linkObject);
                                     }
                                 }
+                                attached.clear();
 
                                 for (QProcess qProcess : assigned) {
                                     java.util.List<QProcessElement> listElements = qProcess.getElements();
                                     if (!listElements.contains(myValue)) {
                                         QProcess myQProcess = em.merge(qProcess);
                                         SYSVAL2PROCESS myLinkObject = em.merge(new SYSVAL2PROCESS(myQProcess, myValue));
+                                        em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myValue.getTitle() + " ID: " + myValue.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
                                         qProcess.getAttachedResValueConnections().add(myLinkObject);
                                         myValue.getAttachedProcessConnections().add(myLinkObject);
                                     }

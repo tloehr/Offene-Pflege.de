@@ -13,6 +13,8 @@ import entity.process.QProcessElement;
 import entity.process.SYSPRE2PROCESS;
 import entity.system.Users;
 import op.OPDE;
+import op.care.nursingprocess.PnlNursingProcess;
+import op.care.prescription.PnlPrescription;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
@@ -118,7 +120,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
     private List<SYSPRE2PROCESS> attachedProcessConnections;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
     private List<PrescriptionSchedule> pSchedule;
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
+    //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
 //    private List<BHP> bhps;
     // ==
     // N:1 Relationen
@@ -317,7 +319,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
 
     @Override
     public String getTitle() {
-        return PrescriptionTools.getPrescriptionAsShortText(this);
+        return OPDE.lang.getString(PnlPrescription.internalClassID) + ": " + PrescriptionTools.getPrescriptionAsShortText(this);
     }
 
     public Resident getResident() {
@@ -460,7 +462,6 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         if (attachedProcessConnections != null ? !attachedProcessConnections.equals(that.attachedProcessConnections) : that.attachedProcessConnections != null)
             return false;
         if (text != null ? !text.equals(that.text) : that.text != null) return false;
-//        if (bhps != null ? !bhps.equals(that.bhps) : that.bhps != null) return false;
         if (intervention != null ? !intervention.equals(that.intervention) : that.intervention != null) return false;
 
         if (resident != null ? !resident.equals(that.resident) : that.resident != null) return false;
@@ -484,8 +485,6 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         result = 31 * result + (showOnDailyPlan ? 1 : 0);
         result = 31 * result + (attachedFilesConnections != null ? attachedFilesConnections.hashCode() : 0);
         result = 31 * result + (attachedProcessConnections != null ? attachedProcessConnections.hashCode() : 0);
-
-//        result = 31 * result + (bhps != null ? bhps.hashCode() : 0);
         result = 31 * result + (userON != null ? userON.hashCode() : 0);
         result = 31 * result + (userOFF != null ? userOFF.hashCode() : 0);
         result = 31 * result + (resident != null ? resident.hashCode() : 0);
@@ -539,6 +538,6 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
     @Override
     public String toString() {
         return "Prescription{" +
-                "verid=" + id ;
+                "verid=" + id;
     }
 }

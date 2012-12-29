@@ -38,9 +38,9 @@ import entity.prescription.*;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.info.PnlInfo;
-import op.system.PrinterForm;
 import op.system.InternalClassACL;
 import op.system.LogicalPrinter;
+import op.system.PrinterForm;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
@@ -152,12 +152,12 @@ public class PnlInventory extends NursingRecordsPanel {
 
     @Override
     public void cleanup() {
-        cpMap.clear();
-        contentmap.clear();
-        lstInventories.clear();
-        mapKey2ClosedToggleButton.clear();
+        SYSTools.clear(cpMap);
+        SYSTools.clear(contentmap);
+        SYSTools.clear(lstInventories);
+        SYSTools.clear(mapKey2ClosedToggleButton);
         cpsInventory.removeAll();
-        linemap.clear();
+        SYSTools.clear(linemap);
     }
 
     @Override
@@ -242,6 +242,10 @@ public class PnlInventory extends NursingRecordsPanel {
             JideButton buchenButton = GUITools.createHyperlinkButton(internalClassID + ".newstocks", SYSConst.icon22addrow, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
+                    if (!resident.isActive()) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
+                        return;
+                    }
                     new DlgNewStocks(resident);
                     reload();
                 }

@@ -159,23 +159,35 @@ public class MedInventory implements Serializable, Comparable<MedInventory> {
     private Users user;
 
     @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MedInventory that = (MedInventory) o;
+
+        if (from != null ? !from.equals(that.from) : that.from != null) return false;
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+//        if (medStocks != null ? !medStocks.equals(that.medStocks) : that.medStocks != null) return false;
+        if (resident != null ? !resident.equals(that.resident) : that.resident != null) return false;
+        if (text != null ? !text.equals(that.text) : that.text != null) return false;
+        if (to != null ? !to.equals(that.to) : that.to != null) return false;
+        if (user != null ? !user.equals(that.user) : that.user != null) return false;
+        if (version != null ? !version.equals(that.version) : that.version != null) return false;
+
+        return true;
     }
 
     @Override
-    public boolean equals(Object object) {
-
-        if (!(object instanceof MedInventory)) {
-            return false;
-        }
-        MedInventory other = (MedInventory) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (text != null ? text.hashCode() : 0);
+        result = 31 * result + (from != null ? from.hashCode() : 0);
+        result = 31 * result + (to != null ? to.hashCode() : 0);
+//        result = 31 * result + (medStocks != null ? medStocks.hashCode() : 0);
+        result = 31 * result + (resident != null ? resident.hashCode() : 0);
+        result = 31 * result + (user != null ? user.hashCode() : 0);
+        return result;
     }
 
     @Override

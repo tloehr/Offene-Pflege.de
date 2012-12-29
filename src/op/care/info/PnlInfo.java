@@ -16,9 +16,7 @@ import com.jidesoft.wizard.WizardDialog;
 import entity.EntityTools;
 import entity.files.SYSFilesTools;
 import entity.info.*;
-import entity.process.QProcess;
-import entity.process.QProcessElement;
-import entity.process.SYSINF2PROCESS;
+import entity.process.*;
 import op.OPDE;
 import op.care.sysfiles.DlgFiles;
 import op.process.DlgProcessAssign;
@@ -61,6 +59,7 @@ public class PnlInfo extends NursingRecordsPanel {
     private List<ResInfoCategory> listCategories;
     private ArrayList<ResInfo> listInfo;
     private HashMap<ResInfo, JPanel> mapInfo2Panel;
+    private ArrayList<ResInfoCategory> listOfCategoriesWithContent;
 
     private JideButton btnResDied, btnResMovedOut, btnResIsAway, btnResIsBack;
     private Color[] color1, color2;
@@ -90,6 +89,7 @@ public class PnlInfo extends NursingRecordsPanel {
         mapType2InfoList = new HashMap<ResInfoType, ArrayList<ResInfo>>();
         mapKey2CP = new HashMap<String, CollapsiblePane>();
         mapInfo2Panel = new HashMap<ResInfo, JPanel>();
+        listOfCategoriesWithContent = new ArrayList<ResInfoCategory>();
         prepareSearchArea();
 
         typeAbsence = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ABSENCE);
@@ -254,6 +254,12 @@ public class PnlInfo extends NursingRecordsPanel {
         cpCat.setOpaque(true);
         cpCat.setHorizontalAlignment(SwingConstants.LEADING);
 
+        if (listOfCategoriesWithContent.contains(cat)) {
+            cptitle.getButton().setIcon(SYSConst.icon22ledGreenOn);
+        } else {
+            cptitle.getButton().setIcon(SYSConst.icon22ledGreenOff);
+        }
+
         cpCat.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
@@ -288,6 +294,7 @@ public class PnlInfo extends NursingRecordsPanel {
                 "</html>";
         DefaultCPTitle cptitle = new DefaultCPTitle(title, null);
 
+        // TODO: Known Bug. After attaching a file or a process the screen refresh doesnt work.
         if (!resInfo.getAttachedFilesConnections().isEmpty()) {
             OPDE.debug("erstelle grünen stern");
             /***
@@ -381,18 +388,23 @@ public class PnlInfo extends NursingRecordsPanel {
                                 ResInfo myInfo = em.merge(resInfo);
                                 em.lock(myInfo, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-
-                                for (SYSINF2PROCESS linkObject : myInfo.getAttachedQProcessConnections()) {
+                                ArrayList<SYSINF2PROCESS> attached = new ArrayList<SYSINF2PROCESS>(myInfo.getAttachedQProcessConnections());
+                                for (SYSINF2PROCESS linkObject : attached) {
                                     if (unassigned.contains(linkObject.getQProcess())) {
-                                        em.remove(em.merge(linkObject));
+                                        linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
+                                        linkObject.getResInfo().getAttachedQProcessConnections().remove(linkObject);
+                                        em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myInfo.getTitle() + " ID: " + myInfo.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                        em.remove(linkObject);
                                     }
                                 }
+                                attached.clear();
 
                                 for (QProcess qProcess : assigned) {
                                     java.util.List<QProcessElement> listElements = qProcess.getElements();
                                     if (!listElements.contains(myInfo)) {
                                         QProcess myQProcess = em.merge(qProcess);
                                         SYSINF2PROCESS myLinkObject = em.merge(new SYSINF2PROCESS(myQProcess, myInfo));
+                                        em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myInfo.getTitle() + " ID: " + myInfo.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
                                         qProcess.getAttachedResInfoConnections().add(myLinkObject);
                                         myInfo.getAttachedQProcessConnections().add(myLinkObject);
                                     }
@@ -808,6 +820,8 @@ public class PnlInfo extends NursingRecordsPanel {
         list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
         list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22stopSign, SwingConstants.LEADING));
         list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22infogreen2, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription3"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription4"), SYSConst.icon22ledGreenOff, SwingConstants.LEADING));
 
         return list;
     }
@@ -852,6 +866,10 @@ public class PnlInfo extends NursingRecordsPanel {
             editRes.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
+                    if (!resident.isActive()) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
+                        return;
+                    }
                     new DlgEditResidentBaseData(resident, new Closure() {
                         @Override
                         public void execute(Object o) {
@@ -1801,17 +1819,23 @@ public class PnlInfo extends NursingRecordsPanel {
                                 final ResInfo myInfo = em.merge(resInfo);
                                 em.lock(myInfo, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-                                for (SYSINF2PROCESS linkObject : myInfo.getAttachedQProcessConnections()) {
+                                ArrayList<SYSINF2PROCESS> attached = new ArrayList<SYSINF2PROCESS>(myInfo.getAttachedQProcessConnections());
+                                for (SYSINF2PROCESS linkObject : attached) {
                                     if (unassigned.contains(linkObject.getQProcess())) {
-                                        em.remove(em.merge(linkObject));
+                                        linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
+                                        linkObject.getResInfo().getAttachedQProcessConnections().remove(linkObject);
+                                        em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myInfo.getTitle() + " ID: " + myInfo.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                        em.remove(linkObject);
                                     }
                                 }
+                                attached.clear();
 
                                 for (QProcess qProcess : assigned) {
                                     java.util.List<QProcessElement> listElements = qProcess.getElements();
                                     if (!listElements.contains(myInfo)) {
                                         QProcess myQProcess = em.merge(qProcess);
                                         SYSINF2PROCESS myLinkObject = em.merge(new SYSINF2PROCESS(myQProcess, myInfo));
+                                        em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myInfo.getTitle() + " ID: " + myInfo.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
                                         qProcess.getAttachedResInfoConnections().add(myLinkObject);
                                         myInfo.getAttachedQProcessConnections().add(myLinkObject);
                                     }
@@ -1870,19 +1894,19 @@ public class PnlInfo extends NursingRecordsPanel {
 
     @Override
     public void cleanup() {
-        mapKey2CP.clear();
-        mapInfo2Panel.clear();
+        SYSTools.clear(mapKey2CP);
+        SYSTools.clear(mapInfo2Panel);
         cpsInfo.removeAll();
-        mapType2InfoList.clear();
-        if (listInfo != null) {
-            listInfo.clear();
-        }
+        SYSTools.clear(mapType2InfoList);
+        SYSTools.clear(listOfCategoriesWithContent);
+        SYSTools.clear(listInfo);
     }
 
     @Override
     public void reload() {
         cleanup();
         listInfo = ResInfoTools.getAll(resident);
+        listOfCategoriesWithContent = ResInfoTools.getCategories(listInfo);
         reloadDisplay();
     }
 

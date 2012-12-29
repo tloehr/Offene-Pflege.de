@@ -248,23 +248,53 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     }
 
     @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MedStock medStock = (MedStock) o;
+
+        if (aPackage != null ? !aPackage.equals(medStock.aPackage) : medStock.aPackage != null) return false;
+        if (id != null ? !id.equals(medStock.id) : medStock.id != null) return false;
+        if (in != null ? !in.equals(medStock.in) : medStock.in != null) return false;
+        if (inventory != null ? !inventory.equals(medStock.inventory) : medStock.inventory != null) return false;
+        if (nextStock != null ? !nextStock.equals(medStock.nextStock) : medStock.nextStock != null) return false;
+        if (opened != null ? !opened.equals(medStock.opened) : medStock.opened != null) return false;
+        if (out != null ? !out.equals(medStock.out) : medStock.out != null) return false;
+        if (state != null ? !state.equals(medStock.state) : medStock.state != null) return false;
+//        if (stockTransaction != null ? !stockTransaction.equals(medStock.stockTransaction) : medStock.stockTransaction != null)
+//            return false;
+        if (text != null ? !text.equals(medStock.text) : medStock.text != null) return false;
+        if (tradeform != null ? !tradeform.equals(medStock.tradeform) : medStock.tradeform != null) return false;
+        if (upr != null ? !upr.equals(medStock.upr) : medStock.upr != null) return false;
+        if (uprDummy != null ? !uprDummy.equals(medStock.uprDummy) : medStock.uprDummy != null) return false;
+        if (uprEffective != null ? !uprEffective.equals(medStock.uprEffective) : medStock.uprEffective != null)
+            return false;
+        if (user != null ? !user.equals(medStock.user) : medStock.user != null) return false;
+        if (version != null ? !version.equals(medStock.version) : medStock.version != null) return false;
+
+        return true;
     }
 
     @Override
-    public boolean equals(Object object) {
-
-        if (!(object instanceof MedStock)) {
-            return false;
-        }
-        MedStock other = (MedStock) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (in != null ? in.hashCode() : 0);
+        result = 31 * result + (opened != null ? opened.hashCode() : 0);
+        result = 31 * result + (out != null ? out.hashCode() : 0);
+        result = 31 * result + (text != null ? text.hashCode() : 0);
+        result = 31 * result + (state != null ? state.hashCode() : 0);
+        result = 31 * result + (upr != null ? upr.hashCode() : 0);
+        result = 31 * result + (uprEffective != null ? uprEffective.hashCode() : 0);
+        result = 31 * result + (uprDummy != null ? uprDummy.hashCode() : 0);
+        result = 31 * result + (nextStock != null ? nextStock.hashCode() : 0);
+//        result = 31 * result + (stockTransaction != null ? stockTransaction.hashCode() : 0);
+        result = 31 * result + (aPackage != null ? aPackage.hashCode() : 0);
+        result = 31 * result + (inventory != null ? inventory.hashCode() : 0);
+        result = 31 * result + (tradeform != null ? tradeform.hashCode() : 0);
+        result = 31 * result + (user != null ? user.hashCode() : 0);
+        return result;
     }
 
     @Override

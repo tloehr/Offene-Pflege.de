@@ -700,8 +700,6 @@ public class ResValueTools {
             ArrayList<Pair<DateMidnight, BigDecimal>> violatingValues = new ArrayList<Pair<DateMidnight, BigDecimal>>();
             Properties controlling = resident.getControlling();
 
-
-//            HashMap<DateMidnight, BigDecimal> balance = null;
             if ((controlling.containsKey(ResidentTools.KEY_LOWIN) && !controlling.getProperty(ResidentTools.KEY_LOWIN).equals("off")) ||
                     (controlling.containsKey(ResidentTools.KEY_HIGHIN) && !controlling.getProperty(ResidentTools.KEY_HIGHIN).equals("off"))) {
                 int days = Integer.parseInt(controlling.getProperty(ResidentTools.KEY_DAYSDRINK));

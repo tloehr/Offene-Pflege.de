@@ -470,7 +470,7 @@ public class FrmMain extends JFrame {
 
     private void btnVerlegungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerlegungActionPerformed
         if (currentResident != null) {
-            SYSFilesTools.print(ResInfoTools.getTXReport(currentResident, true, true, true, true, true, true, true, true, true), false);
+            SYSFilesTools.print(ResInfoTools.getTXReport(currentResident, true, true, true, true, true, true, true, true, true), true);
         } else {
             displayManager.addSubMessage(new DisplayMessage("misc.msg.choose.a.resident.first"));
         }

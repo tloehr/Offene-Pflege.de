@@ -399,10 +399,10 @@ public class BHP implements Serializable, Comparable<BHP> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) {
-            if (o != null) {
-                OPDE.debug("not instance of BHP " + o.toString());
-            }
-            OPDE.debug("i am a bhp with id: " + bhpid);
+//            if (o != null) {
+//                OPDE.debug("not instance of BHP " + o.toString());
+//            }
+//            OPDE.debug("i am a bhp with id: " + bhpid);
             return false;
         }
 
@@ -423,8 +423,8 @@ public class BHP implements Serializable, Comparable<BHP> {
         if (sZeit != null ? !sZeit.equals(bhp.sZeit) : bhp.sZeit != null) return false;
         if (soll != null ? !soll.equals(bhp.soll) : bhp.soll != null) return false;
         if (state != null ? !state.equals(bhp.state) : bhp.state != null) return false;
-        if (stockTransaction != null ? !stockTransaction.equals(bhp.stockTransaction) : bhp.stockTransaction != null)
-            return false;
+//        if (stockTransaction != null ? !stockTransaction.equals(bhp.stockTransaction) : bhp.stockTransaction != null)
+//            return false;
         if (tradeform != null ? !tradeform.equals(bhp.tradeform) : bhp.tradeform != null) return false;
         if (user != null ? !user.equals(bhp.user) : bhp.user != null) return false;
         if (version != null ? !version.equals(bhp.version) : bhp.version != null) return false;
@@ -446,7 +446,7 @@ public class BHP implements Serializable, Comparable<BHP> {
         result = 31 * result + (mdate != null ? mdate.hashCode() : 0);
         result = 31 * result + (dauer != null ? dauer.hashCode() : 0);
         result = 31 * result + (nanotime != null ? nanotime.hashCode() : 0);
-        result = 31 * result + (stockTransaction != null ? stockTransaction.hashCode() : 0);
+//        result = 31 * result + (stockTransaction != null ? stockTransaction.hashCode() : 0);
         result = 31 * result + (prescriptionSchedule != null ? prescriptionSchedule.hashCode() : 0);
         result = 31 * result + (prescription != null ? prescription.hashCode() : 0);
         result = 31 * result + (resident != null ? resident.hashCode() : 0);

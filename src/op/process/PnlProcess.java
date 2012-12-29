@@ -25,7 +25,6 @@ import entity.process.*;
 import entity.system.Users;
 import entity.system.UsersTools;
 import op.OPDE;
-import op.events.TaskPaneContentChangedListener;
 import op.system.InternalClassACL;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
@@ -33,7 +32,6 @@ import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
-import org.pushingpixels.trident.Timeline;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -70,9 +68,6 @@ public class PnlProcess extends NursingRecordsPanel {
     private HashMap<QProcessElement, CollapsiblePane> elementMap;
     private List<QProcess> processList;
     private int MAX_TEXT_LENGTH = 65;
-
-    private TaskPaneContentChangedListener taskPaneContentChangedListener;
-    private Timeline textmessageTL;
 
     public PnlProcess(Resident resident, JScrollPane jspSearch) {
         initPhase = true;
@@ -182,19 +177,6 @@ public class PnlProcess extends NursingRecordsPanel {
     private CollapsiblePane createCP4(final QProcess qProcess) {
         final CollapsiblePane cp = new CollapsiblePane();
 
-//        String title = "<html><font size=+1>" +
-//                SYSTools.left(qProcess.getTitle(), MAX_TEXT_LENGTH) +
-//                " <b>" +
-//                (qProcess.isCommon() ?
-//                        "" :
-//                        ResidentTools.getTextCompact(qProcess.getResident())) +
-//                "</b>, " +
-//                "[" +
-//                DateFormat.getDateInstance(DateFormat.SHORT).format(qProcess.getFrom()) + "&rarr;" +
-//                (qProcess.isClosed() ? DateFormat.getDateInstance(DateFormat.SHORT).format(qProcess.getTo()) : "|") +
-//                "]" +
-//                "</font></html>";
-
         String title = "<html><table border=\"0\">" +
                 "<tr valign=\"top\">" +
                 "<td width=\"100\" align=\"left\">" + qProcess.getPITAsHTML() + "</td>" +
@@ -301,13 +283,13 @@ public class PnlProcess extends NursingRecordsPanel {
         cptitle.getRight().add(btnMenu);
 
         cp.addCollapsiblePaneListener(new
-                CollapsiblePaneAdapter() {
-                    @Override
-                    public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                        cp.setContentPane(createContentPanel4(qProcess));
-                        cp.setOpaque(false);
-                    }
-                }
+                                              CollapsiblePaneAdapter() {
+                                                  @Override
+                                                  public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+                                                      cp.setContentPane(createContentPanel4(qProcess));
+                                                      cp.setOpaque(false);
+                                                  }
+                                              }
 
         );
         cp.setBackground(QProcessTools.getBG1(qProcess));
@@ -474,11 +456,11 @@ public class PnlProcess extends NursingRecordsPanel {
     @Override
     public void cleanup() {
         cpProcess.removeAll();
-        qProcessCollapsiblePaneHashMap.clear();
-        qProcess2ElementMap.clear();
-        qProcessMap.clear();
-        elementMap.clear();
-        processList.clear();
+        SYSTools.clear(qProcessCollapsiblePaneHashMap);
+        SYSTools.clear(qProcess2ElementMap);
+        SYSTools.clear(qProcessMap);
+        SYSTools.clear(elementMap);
+        SYSTools.clear(processList);
     }
 
     @Override
@@ -742,6 +724,10 @@ public class PnlProcess extends NursingRecordsPanel {
                     new DlgProcess(new QProcess(resident), new Closure() {
                         @Override
                         public void execute(Object o) {
+                            if (!resident.isActive()) {
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
+                                return;
+                            }
                             if (o != null) {
                                 EntityManager em = OPDE.createEM();
                                 try {
@@ -762,7 +748,7 @@ public class PnlProcess extends NursingRecordsPanel {
                 }
             });
             list.add(btnAdd);
-
+            btnAdd.setEnabled(resident.isActive());
         }
 
         return list;

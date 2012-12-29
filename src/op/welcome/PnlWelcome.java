@@ -65,13 +65,15 @@ public class PnlWelcome extends CleanablePanel {
         reloadDisplay();
     }
 
+
     @Override
     public void cleanup() {
         cpsWelcome.removeAll();
-        processList.clear();
-        birthdayList.clear();
-        noStoolList.clear();
-        violatingLiquidValues.clear();
+
+        SYSTools.clear(processList);
+        SYSTools.clear(birthdayList);
+        SYSTools.clear(noStoolList);
+        SYSTools.clear(violatingLiquidValues);
     }
 
     @Override

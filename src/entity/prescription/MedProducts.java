@@ -71,32 +71,36 @@ public class MedProducts implements Serializable {
     @ManyToOne
     private ACME acme;
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (medPID != null ? medPID.hashCode() : 0);
-        return hash;
-    }
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "medProduct")
     private Collection<TradeForm> tradeForms;
 
-    @Override
-    public boolean equals(Object object) {
-
-        if (!(object instanceof MedProducts)) {
-            return false;
-        }
-        MedProducts other = (MedProducts) object;
-        if ((this.medPID == null && other.medPID != null) || (this.medPID != null && !this.medPID.equals(other.medPID))) {
-            return false;
-        }
-        return true;
-    }
 
     @Override
     public String toString() {
         return "entity.rest.MedProducts[medPID=" + medPID + "]";
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MedProducts that = (MedProducts) o;
+
+        if (acme != null ? !acme.equals(that.acme) : that.acme != null) return false;
+        if (medPID != null ? !medPID.equals(that.medPID) : that.medPID != null) return false;
+        if (text != null ? !text.equals(that.text) : that.text != null) return false;
+//        if (tradeForms != null ? !tradeForms.equals(that.tradeForms) : that.tradeForms != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = medPID != null ? medPID.hashCode() : 0;
+        result = 31 * result + (text != null ? text.hashCode() : 0);
+        result = 31 * result + (acme != null ? acme.hashCode() : 0);
+//        result = 31 * result + (tradeForms != null ? tradeForms.hashCode() : 0);
+        return result;
+    }
 }

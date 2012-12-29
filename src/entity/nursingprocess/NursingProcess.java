@@ -12,6 +12,8 @@ import entity.process.QProcessElement;
 import entity.process.SYSNP2PROCESS;
 import entity.system.Users;
 import op.OPDE;
+import op.care.nursingprocess.PnlNursingProcess;
+import op.care.prescription.PnlPrescription;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.joda.time.DateTime;
@@ -242,7 +244,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
 
     @Override
     public String getTitle() {
-        return topic;
+        return OPDE.lang.getString(PnlNursingProcess.internalClassID)+ ": " + topic;
     }
 
     @Override

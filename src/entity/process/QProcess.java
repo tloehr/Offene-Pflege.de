@@ -172,13 +172,13 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         return attachedNReportConnections;
     }
 
-    public ArrayList<NReport> getAttachedNReports() {
-        ArrayList<NReport> list = new ArrayList<NReport>();
-        for (SYSNR2PROCESS att : attachedNReportConnections) {
-            list.add(att.getNReport());
-        }
-        return list;
-    }
+//    public ArrayList<NReport> getAttachedNReports() {
+//        ArrayList<NReport> list = new ArrayList<NReport>();
+//        for (SYSNR2PROCESS att : attachedNReportConnections) {
+//            list.add(att.getNReport());
+//        }
+//        return list;
+//    }
 
     public Collection<SYSPRE2PROCESS> getAttachedPrescriptionConnections() {
         return attachedPrescriptionConnections;

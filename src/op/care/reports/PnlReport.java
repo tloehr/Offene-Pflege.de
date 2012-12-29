@@ -37,9 +37,7 @@ import entity.EntityTools;
 import entity.files.SYSFilesTools;
 import entity.files.SYSNR2FILE;
 import entity.info.Resident;
-import entity.process.QProcess;
-import entity.process.QProcessElement;
-import entity.process.SYSNR2PROCESS;
+import entity.process.*;
 import entity.reports.NReport;
 import entity.reports.NReportTAGS;
 import entity.reports.NReportTAGSTools;
@@ -197,12 +195,12 @@ public class PnlReport extends NursingRecordsPanel {
 
     @Override
     public void cleanup() {
-        contentmap.clear();
-        cpMap.clear();
+        SYSTools.clear(contentmap);
+        SYSTools.clear(cpMap);
         cpsReports.removeAll();
-        linemap.clear();
-        valuecache.clear();
-        hollidays.clear();
+        SYSTools.clear(linemap);
+        SYSTools.clear(valuecache);
+        SYSTools.clear(hollidays);
     }
 
     @Override
@@ -332,6 +330,10 @@ public class PnlReport extends NursingRecordsPanel {
             JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
+                    if (!resident.isActive()) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
+                        return;
+                    }
                     new DlgReport(new NReport(resident), new Closure() {
                         @Override
                         public void execute(Object report) {
@@ -388,8 +390,6 @@ public class PnlReport extends NursingRecordsPanel {
                 }
             });
             list.add(addButton);
-
-
         }
         return list;
     }
@@ -1011,18 +1011,24 @@ public class PnlReport extends NursingRecordsPanel {
                                         NReport myReport = em.merge(nreport);
                                         em.lock(myReport, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-
-                                        for (SYSNR2PROCESS linkObject : myReport.getAttachedQProcessConnections()) {
+                                        ArrayList<SYSNR2PROCESS> attached = new ArrayList<SYSNR2PROCESS>(myReport.getAttachedQProcessConnections());
+                                        for (SYSNR2PROCESS linkObject : attached) {
                                             if (unassigned.contains(linkObject.getQProcess())) {
-                                                em.remove(em.merge(linkObject));
+                                                linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
+                                                linkObject.getNReport().getAttachedQProcessConnections().remove(linkObject);
+                                                em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+
+                                                em.remove(linkObject);
                                             }
                                         }
+                                        attached.clear();
 
                                         for (QProcess qProcess : assigned) {
                                             java.util.List<QProcessElement> listElements = qProcess.getElements();
                                             if (!listElements.contains(myReport)) {
                                                 QProcess myQProcess = em.merge(qProcess);
                                                 SYSNR2PROCESS myLinkObject = em.merge(new SYSNR2PROCESS(myQProcess, myReport));
+                                                em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
                                                 qProcess.getAttachedNReportConnections().add(myLinkObject);
                                                 myReport.getAttachedQProcessConnections().add(myLinkObject);
                                             }
@@ -1584,18 +1590,23 @@ public class PnlReport extends NursingRecordsPanel {
                                 NReport myReport = em.merge(nreport);
                                 em.lock(myReport, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-
-                                for (SYSNR2PROCESS linkObject : myReport.getAttachedQProcessConnections()) {
+                                ArrayList<SYSNR2PROCESS> attached = new ArrayList<SYSNR2PROCESS>(myReport.getAttachedQProcessConnections());
+                                for (SYSNR2PROCESS linkObject : attached) {
                                     if (unassigned.contains(linkObject.getQProcess())) {
-                                        em.remove(em.merge(linkObject));
+                                        linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
+                                        linkObject.getNReport().getAttachedQProcessConnections().remove(linkObject);
+                                        em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                        em.remove(linkObject);
                                     }
                                 }
+                                attached.clear();
 
                                 for (QProcess qProcess : assigned) {
                                     java.util.List<QProcessElement> listElements = qProcess.getElements();
                                     if (!listElements.contains(myReport)) {
                                         QProcess myQProcess = em.merge(qProcess);
                                         SYSNR2PROCESS myLinkObject = em.merge(new SYSNR2PROCESS(myQProcess, myReport));
+                                        em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
                                         qProcess.getAttachedNReportConnections().add(myLinkObject);
                                         myReport.getAttachedQProcessConnections().add(myLinkObject);
                                     }

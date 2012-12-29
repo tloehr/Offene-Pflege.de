@@ -4,12 +4,12 @@
  */
 package entity.reports;
 
-import entity.system.Users;
 import entity.files.SYSNR2FILE;
 import entity.info.Resident;
 import entity.process.QProcess;
 import entity.process.QProcessElement;
 import entity.process.SYSNR2PROCESS;
+import entity.system.Users;
 import op.OPDE;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
@@ -251,7 +251,6 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
     }
 
     /**
-     *
      * @return true if and only if the report is deleted or replaced
      */
     public boolean isObsolete() {
@@ -344,7 +343,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
 
     @Override
     public String getTitle() {
-        return text;
+        return OPDE.lang.getString("misc.msg.report") + ": " + text;
     }
 
     @Override

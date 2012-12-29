@@ -19,7 +19,6 @@ public class Hospital implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "KHID")
     private Long khid;
     @Basic(optional = false)
@@ -113,23 +112,35 @@ public class Hospital implements Serializable {
     }
 
     @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (khid != null ? khid.hashCode() : 0);
-        return hash;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Hospital hospital = (Hospital) o;
+
+        if (fax != null ? !fax.equals(hospital.fax) : hospital.fax != null) return false;
+        if (khid != null ? !khid.equals(hospital.khid) : hospital.khid != null) return false;
+        if (name != null ? !name.equals(hospital.name) : hospital.name != null) return false;
+        if (ort != null ? !ort.equals(hospital.ort) : hospital.ort != null) return false;
+        if (plz != null ? !plz.equals(hospital.plz) : hospital.plz != null) return false;
+        if (status != null ? !status.equals(hospital.status) : hospital.status != null) return false;
+        if (strasse != null ? !strasse.equals(hospital.strasse) : hospital.strasse != null) return false;
+        if (tel != null ? !tel.equals(hospital.tel) : hospital.tel != null) return false;
+
+        return true;
     }
 
     @Override
-    public boolean equals(Object object) {
-
-        if (!(object instanceof Hospital)) {
-            return false;
-        }
-        Hospital other = (Hospital) object;
-        if ((this.khid == null && other.khid != null) || (this.khid != null && !this.khid.equals(other.khid))) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        int result = khid != null ? khid.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (strasse != null ? strasse.hashCode() : 0);
+        result = 31 * result + (plz != null ? plz.hashCode() : 0);
+        result = 31 * result + (ort != null ? ort.hashCode() : 0);
+        result = 31 * result + (tel != null ? tel.hashCode() : 0);
+        result = 31 * result + (fax != null ? fax.hashCode() : 0);
+        result = 31 * result + (status != null ? status.hashCode() : 0);
+        return result;
     }
 
     @Override

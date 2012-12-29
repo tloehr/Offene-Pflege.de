@@ -46,7 +46,7 @@ public class NReportTools {
 
     public static boolean isChangeable(NReport nReport) {
 //        OPDE.debug(nReport.getPbid());
-        return !nReport.isObsolete() && nReport.getUsersAcknowledged().isEmpty() && (OPDE.isAdmin() || nReport.getUser().equals(OPDE.getLogin().getUser()));
+        return !nReport.isObsolete() && nReport.getResident().isActive() && nReport.getUsersAcknowledged().isEmpty() && (OPDE.isAdmin() || nReport.getUser().equals(OPDE.getLogin().getUser()));
     }
 
     /**
@@ -266,7 +266,7 @@ public class NReportTools {
         }
 
         if (nReports.isEmpty() || !ihavesomethingtoshow) {
-            html = SYSConst.html_italic("misc.msg.noentryyet");
+            html = ""; //SYSConst.html_italic("misc.msg.noentryyet");
         }
         return html;
     }

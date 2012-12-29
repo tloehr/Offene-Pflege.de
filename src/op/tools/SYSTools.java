@@ -37,7 +37,6 @@ import org.jdesktop.core.animation.timing.TimingSource;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
 import org.jdesktop.core.animation.timing.interpolators.AccelerationInterpolator;
 import org.jdesktop.swing.animation.timing.sources.SwingTimerTimingSource;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.pushingpixels.trident.Timeline;
 import org.pushingpixels.trident.callback.TimelineCallback;
@@ -64,7 +63,6 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -102,6 +100,17 @@ public class SYSTools {
         };
     }
 
+    public static void clear(Collection coll) {
+        if (coll != null) {
+            coll.clear();
+        }
+    }
+
+    public static void clear(Map map) {
+        if (map != null) {
+            map.clear();
+        }
+    }
 
     public static void center(java.awt.Window w) {
         Dimension us = w.getSize();

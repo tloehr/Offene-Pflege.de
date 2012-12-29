@@ -56,17 +56,6 @@ public class BHPTools {
     public static final byte BYTE_EVENING = 5;
     public static final byte BYTE_LATE_AT_NIGHT = 6;
 
-//    public static final String STRING_TIMEOFDAY = "UZ";
-//    public static final String STRING_EARLY_IN_THE_MORNING = "FM";
-//    public static final String STRING_MORNING = "MO";
-//    public static final String STRING_NOON = "MI";
-//    public static final String STRING_AFTERNOON = "NM";
-//    public static final String STRING_EVENING = "AB";
-//    public static final String STRING_LATE_AT_NIGHT = "NA";
-//
-//
-//    public static final String[] SOLLZEITTEXT = new String[]{"Uhrzeit", "NachtMo", "Morgens", "Mittags", "Nachmittags", "Abends", "NachtAb"};
-
     public static long getNumBHPs(Prescription prescription) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT COUNT(bhp) FROM BHP bhp WHERE bhp.prescription = :prescription AND bhp.state <> :status");
@@ -187,39 +176,6 @@ public class BHPTools {
         return numbhp;
     }
 
-
-//    /**
-//     * Löscht alle <b>heutigen</b> nicht <b>abgehakten</b> BHPs für eine bestimmte Verordnung <b>ab</b> ab dem aktuellen Zeitpunkt.
-//     * Es wird die aktuelle Schicht (bzw. Zeit) ermittelt. Bei BHPs,
-//     * die sich auf eine bestimmte Uhrzeit beziehen, werden nur diejenigen gelöscht, die <b>größer gleich</b> der aktuellen Uhrzeit sind sind.
-//     *
-//     * @param em           EntityManager, in dessen Kontext das hier ablaufen soll.
-//     * @param prescription um die es geht.
-//     */
-//    public static void cleanup(EntityManager em, Prescription prescription) throws Exception {
-//
-//        Date now = new Date();
-//
-//        int sollZeit = SYSCalendar.ermittleZeit(now.getTime());
-//        Query query = em.createQuery("SELECT b FROM BHP b WHERE b.prescription = :prescription AND b.soll >= :bofday AND b.soll <= :eofday");
-//
-//        DateMidnight bofday = new DateMidnight();
-//        DateTime eofday = new DateMidnight().toDateTime().plusDays(1).minusSeconds(1).toDateTime();
-//
-//        query.setParameter("prescription", prescription);
-//        query.setParameter("bofday", bofday.toDate());
-//        query.setParameter("eofday", eofday.toDate());
-//
-//        List<BHP> bhps = query.getResultList();
-//
-//        for (BHP bhp : bhps) {
-//            if (bhp.getSollZeit() > sollZeit || (bhp.getSollZeit() == 0 && SYSCalendar.compareTime(bhp.getSoll(), now) >= 0)) {
-//                em.remove(bhp);
-//            }
-//        }
-//
-//    }
-
     /**
      * Hiermit werden alle BHP Einträge erzeugt, die sich aus den Verordnungen in der zugehörigen Liste ergeben. Die Liste wird aber vorher
      * noch darauf geprüft, ob sie auch wirklich an dem besagten targetdate passt. Dabei gilt:
@@ -255,7 +211,6 @@ public class BHPTools {
 
         BigDecimal row = BigDecimal.ZERO;
 
-//        OPDE.debug("MaxRows: " + maxrows);
         System.out.println("------------------------------------------");
         System.out.println(OPDE.lang.getString(internalClassID) + " " + OPDE.lang.getString(internalClassID + ".generationForDate") + ": " + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()));
         System.out.println(OPDE.lang.getString(internalClassID + ".progress"));
@@ -271,20 +226,8 @@ public class BHPTools {
 
             if (!SYSCalendar.isInFuture(pSchedule.getLDatum()) && (pSchedule.isTaeglich() || pSchedule.isPassenderWochentag(targetdate.toDate()) || pSchedule.isPassenderTagImMonat(targetdate.toDate()))) {
 
-
-//                OPDE.debug(row.divide(maxrows, BigDecimal.ROUND_UP).multiply(new BigDecimal(100)).toPlainString());
-//                OPDE.debug("Generate BHPs Progress: " + ((float) row / maxrows) * 100 + "%");
-//                OPDE.debug("==========================================");
-//                OPDE.debug("BHPPID: " + pSchedule.getBhppid());
-//                OPDE.debug("BWKennung: " + pSchedule.getPrescription().getResident().getRIDAnonymous());
-//                OPDE.debug("VerID: " + pSchedule.getPrescription().getVerid());
-
-
                 boolean treffer = false;
                 DateMidnight ldatum = new DateMidnight(pSchedule.getLDatum());
-
-//                OPDE.debug("LDatum: " + DateFormat.getDateTimeInstance().format(pSchedule.getLDatum()));
-//                OPDE.debug("targetdate: " + DateFormat.getDateTimeInstance().format(targetdate.toDate()));
 
                 // Genaue Ermittlung der Treffer
                 // =============================
@@ -293,7 +236,6 @@ public class BHPTools {
                     // Dann wird das LDatum solange um die gewünschte Tagesanzahl erhöht, bis
                     // der targetdate getroffen wurde oder überschritten ist.
                     while (Days.daysBetween(ldatum, targetdate).getDays() > 0) {
-//                        OPDE.debug("ldatum liegt vor dem targetdate. Addiere tage: " + pSchedule.getTaeglich());
                         ldatum = ldatum.plusDays(pSchedule.getTaeglich());
                     }
                     // Mich interssiert nur der Treffer, also die Punktlandung auf dem targetdate
@@ -301,7 +243,6 @@ public class BHPTools {
                 } else if (pSchedule.isWoechentlich()) {
 //                    OPDE.debug("Eine wöchentliche pSchedule");
                     while (Weeks.weeksBetween(ldatum, targetdate).getWeeks() > 0) {
-//                        OPDE.debug("ldatum liegt vor dem targetdate. Addiere Wochen: " + pSchedule.getWoechentlich());
                         ldatum = ldatum.plusWeeks(pSchedule.getWoechentlich());
                     }
                     // Ein Treffer ist es dann, wenn das Referenzdatum gleich dem targetdate ist ODER es zumindest in der selben Kalenderwoche liegt.
@@ -310,16 +251,12 @@ public class BHPTools {
                 } else if (pSchedule.isMonatlich()) {
 //                    OPDE.debug("Eine monatliche pSchedule");
                     while (Months.monthsBetween(ldatum, targetdate).getMonths() > 0) {
-//                        OPDE.debug("ldatum liegt vor dem targetdate. Addiere Monate: " + pSchedule.getMonatlich());
                         ldatum = ldatum.plusMonths(pSchedule.getMonatlich());
                     }
                     // Ein Treffer ist es dann, wenn das Referenzdatum gleich dem targetdate ist ODER es zumindest im selben Monat desselben Jahres liegt.
                     // Da bei der Vorauswahl durch die Datenbank nur passende Wochentage oder Tage im Monat überhaupt zugelassen wurden, muss das somit der richtige sein.
                     treffer = Months.monthsBetween(ldatum, targetdate).getMonths() == 0;
                 }
-
-//                OPDE.debug("LDatum jetzt: " + DateFormat.getDateTimeInstance().format(ldatum.toDate()));
-//                OPDE.debug("Treffer ? : " + Boolean.toString(treffer));
 
                 // Es wird immer erst eine Schicht später eingetragen. Damit man nicht mit bereits
                 // abgelaufenen Zeitpunkten arbeitet.
@@ -334,33 +271,26 @@ public class BHPTools {
 
                 if (treffer) {
                     if (erstAbFM && pSchedule.getNachtMo().compareTo(BigDecimal.ZERO) > 0) {
-                        //OPDE.debug(bhp);
-//                        OPDE.debug("SYSConst.FM, " + pSchedule.getNachtMo());
                         em.merge(new BHP(pSchedule, targetdate.toDate(), BYTE_EARLY_IN_THE_MORNING, pSchedule.getNachtMo()));
                         numbhp++;
                     }
                     if (erstAbMO && pSchedule.getMorgens().compareTo(BigDecimal.ZERO) > 0) {
-//                        OPDE.debug("SYSConst.MO, " + pSchedule.getMorgens());
                         em.merge(new BHP(pSchedule, targetdate.toDate(), BYTE_MORNING, pSchedule.getMorgens()));
                         numbhp++;
                     }
                     if (erstAbMI && pSchedule.getMittags().compareTo(BigDecimal.ZERO) > 0) {
-//                        OPDE.debug("SYSConst.MI, " + pSchedule.getMittags());
                         em.merge(new BHP(pSchedule, targetdate.toDate(), BYTE_NOON, pSchedule.getMittags()));
                         numbhp++;
                     }
                     if (erstAbNM && pSchedule.getNachmittags().compareTo(BigDecimal.ZERO) > 0) {
-//                        OPDE.debug("SYSConst.NM, " + pSchedule.getNachmittags());
                         em.merge(new BHP(pSchedule, targetdate.toDate(), BYTE_AFTERNOON, pSchedule.getNachmittags()));
                         numbhp++;
                     }
                     if (erstAbAB && pSchedule.getAbends().compareTo(BigDecimal.ZERO) > 0) {
-//                        OPDE.debug("SYSConst.AB, " + pSchedule.getAbends());
                         em.merge(new BHP(pSchedule, targetdate.toDate(), BYTE_EVENING, pSchedule.getAbends()));
                         numbhp++;
                     }
                     if (erstAbNA && pSchedule.getNachtAb().compareTo(BigDecimal.ZERO) > 0) {
-//                        OPDE.debug("SYSConst.NA, " + pSchedule.getNachtAb());
                         em.merge(new BHP(pSchedule, targetdate.toDate(), BYTE_LATE_AT_NIGHT, pSchedule.getNachtAb()));
                         numbhp++;
                     }
@@ -368,7 +298,6 @@ public class BHPTools {
                         DateTime timeofday = new DateTime(pSchedule.getUhrzeit());
                         Period period = new Period(timeofday.getHourOfDay(), timeofday.getMinuteOfHour(), timeofday.getSecondOfMinute(), timeofday.getMillisOfSecond());
                         Date newTargetdate = targetdate.toDateTime().plus(period).toDate();
-//                        OPDE.debug("SYSConst.UZ, " + pSchedule.getUhrzeitDosis() + ", " + DateFormat.getDateTimeInstance().format(newTargetdate));
                         em.merge(new BHP(pSchedule, newTargetdate, SYSConst.UZ, pSchedule.getUhrzeitDosis()));
                         numbhp++;
                     }
@@ -377,20 +306,9 @@ public class BHPTools {
                     pSchedule.setLDatum(targetdate.toDate());
 
                 }
-            } else {
-//                OPDE.debug("///////////////////////////////////////////////////////////");
-//                OPDE.debug("Folgende pSchedule wurde nicht angenommen: " + pSchedule);
             }
         }
 
-
-//                OPDE.debug("Generate BHPs Progress: " + ((float) row / maxrows) * 100 + "%");
-//                OPDE.debug("==========================================");
-//                OPDE.debug("BHPPID: " + pSchedule.getBhppid());
-//                OPDE.debug("BWKennung: " + pSchedule.getPrescription().getResident().getRIDAnonymous());
-//                OPDE.debug("VerID: " + pSchedule.getPrescription().getVerid());
-
-//        OPDE.debug("Erzeugte BHPs: " + numbhp);
         System.out.println();
         System.out.println(OPDE.lang.getString(internalClassID + ".numCreatedEntities") + " [" + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()) + "]: " + numbhp);
         System.out.println("------------------------------------------");
@@ -586,40 +504,7 @@ public class BHPTools {
 
     public static boolean isChangeable(BHP bhp) {
         int BHP_MAX_MINUTES_TO_WITHDRAW = Integer.parseInt(OPDE.getProps().getProperty("bhp_max_minutes_to_withdraw"));
-        //        boolean changeable =
-//                // Diese Kontrolle stellt sicher, dass ein User nur seine eigenen Einträge und das auch nur
-//                // eine halbe Stunde lang bearbeiten kann.
-//                // Ausserdem kann man nur dann etwas geben, wenn es
-//                //      a) eine Massnahmen ohne Medikation ist
-//                //      ODER
-//                //      (
-//                //          b) ein angebrochener Bestand vorhanden ist
-//                //          UND
-//                //          c)  das häkchen NICHT gesetzt ist oder wenn es gesetzt ist, kann man es
-//                //              nur dann wieder wegnehmen, wenn es derselbe Benutzer FRüH GENUG tut.
-//                //              Und auch nur dann, wenn nicht mehrere Packungen beim Ausbuchen betroffen waren.
-//                //          )
-//                //      )
-//                !abwesend &&
-//                        !bhp.getPrescription().isClosed()
-//                        // Offener Status geht immer
-//                        && (
-//                        bhp.getState() == BHPTools.STATE_OPEN
-//                                // Nicht mehr offen ?
-//                                // Dann nur wenn derselbe Benutzer dass wieder rückgängig machen will
-//                                ||
-//                                (bhp.getUser().equals(OPDE.getLogin().getUser())
-//                                        // und es noch früh genug ist (30 Minuten)
-//                                        && SYSCalendar.earlyEnough(bhp.getMDate().getTime(), BHP_MAX_MINUTES_TO_WITHDRAW)
-//                                        // und kein abgesetzter Bestand beteiligt ist. Das verhindert einfach, dass bei
-//                                        // eine Rückgabe eines Vorrates verhindert wird, wenn bei Abhaken eine Packung leer wurde und direkt eine neue
-//                                        // angebrochen wurde.
-//                                        && !bhp.isClosedStockInvolved()
-//                                )
-//                );
-//
         boolean residentAbsent = bhp.getResident().isActive() && ResInfoTools.absentSince(bhp.getResident()) != null;
-
         boolean medTrouble = bhp.hasMed() && TradeFormTools.getInventory4TradeForm(bhp.getResident(), bhp.getTradeForm()) == null;
 
         return !residentAbsent && bhp.getResident().isActive() &&

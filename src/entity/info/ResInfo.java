@@ -31,6 +31,7 @@ import entity.process.QProcessElement;
 import entity.process.SYSINF2PROCESS;
 import entity.system.Users;
 import op.OPDE;
+import op.care.info.PnlInfo;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.joda.time.DateTime;
@@ -122,7 +123,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
         }
 
         this.properties = "";
-        if (resInfoType.getType() == ResInfoTypeTools.TYPE_STAY){
+        if (resInfoType.getType() == ResInfoTypeTools.TYPE_STAY) {
             this.properties = "hauf=";
             this.html = "<ul></ul>";
         }
@@ -238,7 +239,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
         this.userON = user;
     }
 
-    public boolean isCurrentlyValid(){
+    public boolean isCurrentlyValid() {
         Date now = new Date();
         return from.compareTo(now) <= 0 && to.compareTo(now) >= 0;
     }
@@ -313,7 +314,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
             result += "<td valign=\"top\">" + df.format(to) + "</td>";
             result += "</tr>\n";
             result += "<tr>";
-            result += "<td valign=\"top\">" + userON.getFullname()+ "</td>";
+            result += "<td valign=\"top\">" + userON.getFullname() + "</td>";
             result += "<td valign=\"top\">&raquo;</td>";
             result += "<td valign=\"top\">" + userOFF.getFullname() + "</td>";
             result += "</tr>\n";
@@ -368,7 +369,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
 
     @Override
     public String getTitle() {
-        return bwinfotyp.getShortDescription();
+        return OPDE.lang.getString(PnlInfo.internalClassID) + ": " + bwinfotyp.getShortDescription();
     }
 
     @Override
