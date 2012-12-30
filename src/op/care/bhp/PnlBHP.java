@@ -471,8 +471,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 }
                                 em.getTransaction().commit();
 
-                                // TODO: Null Pointer Exception
-                                if (involvedPresciption.isClosed()) {
+                                if (involvedPresciption != null && involvedPresciption.isClosed()) {
                                     reload();
                                 } else {
                                     mapBHP2Pane.put(myBHP, createCP4(myBHP));

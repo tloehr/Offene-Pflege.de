@@ -294,7 +294,6 @@ public class PnlInfo extends NursingRecordsPanel {
                 "</html>";
         DefaultCPTitle cptitle = new DefaultCPTitle(title, null);
 
-        // TODO: Known Bug. After attaching a file or a process the screen refresh doesnt work.
         if (!resInfo.getAttachedFilesConnections().isEmpty()) {
             OPDE.debug("erstelle grünen stern");
             /***

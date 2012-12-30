@@ -37,8 +37,8 @@ import entity.prescription.*;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.med.prodassistant.MedProductWizard;
-import op.system.PrinterForm;
 import op.system.LogicalPrinter;
+import op.system.PrinterForm;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
@@ -139,9 +139,7 @@ public class DlgNewStocks extends MyJDialog {
     }
 
     private void btnPrintItemStateChanged(ItemEvent e) {
-        if (ignoreEvent) {
-            return;
-        }
+        if (ignoreEvent) return;
         SYSPropsTools.storeState(this.getClass().getName() + "::btnPrint", btnPrint);
     }
 
@@ -149,8 +147,14 @@ public class DlgNewStocks extends MyJDialog {
         ignoreEvent = true;
 
         logicalPrinter = OPDE.getLogicalPrinters().getTypesMap().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_LOGICAL_PRINTER));
-        // TODO: NULL POINTER EXCEPTION
-        printForm = logicalPrinter.getForms().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL));
+        if (logicalPrinter != null && OPDE.getPrintProcessor().isWorking()) {
+            printForm = logicalPrinter.getForms().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL));
+            btnPrint.setEnabled(true);
+            SYSPropsTools.restoreState(this.getClass().getName() + "::btnPrint", btnPrint);
+        } else {
+            btnPrint.setSelected(false);
+        }
+
 
         menge = null;
         cmbMProdukt.setRenderer(TradeFormTools.getRenderer(TradeFormTools.LONG));
@@ -210,9 +214,6 @@ public class DlgNewStocks extends MyJDialog {
         ovrMenge = new DefaultOverlayable(txtMenge);
         mainPane.add(ovrMenge, CC.xywh(5, 9, 4, 1));
 
-        btnPrint.setEnabled(OPDE.getPrintProcessor().isWorking());
-        SYSPropsTools.restoreState(this.getClass().getName() + "::btnPrint", btnPrint);
-
         ignoreEvent = false;
         setVisible(true);
     }
@@ -255,8 +256,8 @@ public class DlgNewStocks extends MyJDialog {
         //======== mainPane ========
         {
             mainPane.setLayout(new FormLayout(
-                    "14dlu, $lcgap, default, $lcgap, 39dlu, $lcgap, default:grow, $lcgap, 14dlu",
-                    "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
+                "14dlu, $lcgap, default, $lcgap, 39dlu, $lcgap, default:grow, $lcgap, 14dlu",
+                "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
 
             //---- jLabel1 ----
             jLabel1.setText("PZN oder Suchbegriff");
@@ -300,7 +301,7 @@ public class DlgNewStocks extends MyJDialog {
             mainPane.add(jLabel3, CC.xy(3, 5));
 
             //---- cmbMProdukt ----
-            cmbMProdukt.setModel(new DefaultComboBoxModel(new String[]{
+            cmbMProdukt.setModel(new DefaultComboBoxModel(new String[] {
 
             }));
             cmbMProdukt.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -343,7 +344,7 @@ public class DlgNewStocks extends MyJDialog {
             mainPane.add(jLabel6, CC.xy(3, 7));
 
             //---- cmbPackung ----
-            cmbPackung.setModel(new DefaultComboBoxModel(new String[]{
+            cmbPackung.setModel(new DefaultComboBoxModel(new String[] {
 
             }));
             cmbPackung.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -374,6 +375,7 @@ public class DlgNewStocks extends MyJDialog {
             btnPrint.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer-on.png")));
             btnPrint.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer-off.png")));
             btnPrint.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            btnPrint.setEnabled(false);
             btnPrint.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent e) {

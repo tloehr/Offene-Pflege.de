@@ -29,6 +29,7 @@ public class PnlConfigs extends CleanablePanel {
     public PnlConfigs(JScrollPane jspSearch) {
         jspSearch.setViewportView(new JPanel());
         initComponents();
+        // TODO: results in NPE under linux
         initPanel();
     }
 
