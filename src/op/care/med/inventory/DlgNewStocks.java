@@ -149,6 +149,7 @@ public class DlgNewStocks extends MyJDialog {
         ignoreEvent = true;
 
         logicalPrinter = OPDE.getLogicalPrinters().getTypesMap().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_LOGICAL_PRINTER));
+        // TODO: NULL POINTER EXCEPTION
         printForm = logicalPrinter.getForms().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL));
 
         menge = null;
