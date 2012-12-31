@@ -443,6 +443,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                         new DlgFiles(np, fileHandleClosure);
                     }
                 });
+                btnFiles.setEnabled(OPDE.isFTPworking());
                 cptitle.getRight().add(btnFiles);
             }
 
@@ -1407,7 +1408,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                     new DlgFiles(np, fileHandleClosure);
                 }
             });
-
+            btnFiles.setEnabled(OPDE.isFTPworking());
             pnlMenu.add(btnFiles);
 
 

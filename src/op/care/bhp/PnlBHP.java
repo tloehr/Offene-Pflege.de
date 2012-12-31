@@ -471,7 +471,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 }
                                 em.getTransaction().commit();
 
-                                if (involvedPresciption != null && involvedPresciption.isClosed()) {
+                                if (!myBHP.hasMed() && involvedPresciption.isClosed()) {
                                     reload();
                                 } else {
                                     mapBHP2Pane.put(myBHP, createCP4(myBHP));

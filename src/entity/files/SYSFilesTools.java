@@ -32,6 +32,7 @@ import entity.prescription.Prescription;
 import entity.reports.NReport;
 import entity.values.ResValue;
 import op.OPDE;
+import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -39,6 +40,8 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
+import javax.persistence.OptimisticLockException;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
@@ -90,30 +93,40 @@ public class SYSFilesTools {
      * @param file File Obkjekt der zu speichernden Datei
      * @return EB der neuen Datei. null bei Fehler.
      */
-    public static SYSFiles putFile(EntityManager em, FTPClient ftp, File file, Resident bewohner) throws Exception {
+    private static SYSFiles putFile(EntityManager em, FTPClient ftp, File file, Resident resident) throws Exception {
         SYSFiles sysfile = null;
 
         String md5 = SYSTools.getMD5Checksum(file);
         Query query = em.createQuery("SELECT s FROM SYSFiles s WHERE s.md5 = :md5");
         query.setParameter("md5", md5);
 
+        ArrayList<SYSFiles> alreadyExistingFiles = new ArrayList<SYSFiles>(query.getResultList());
+
         // Gibts die Datei schon ?
-        if (query.getResultList().isEmpty()) { // nein, noch nicht
-            long ts = file.lastModified();
-            sysfile = em.merge(new SYSFiles(file.getName(), md5, new Date(ts), file.length(), OPDE.getLogin().getUser(), bewohner));
+        if (alreadyExistingFiles.isEmpty()) { // nein, noch nicht
+            sysfile = em.merge(new SYSFiles(file.getName(), md5, new Date(file.lastModified()), file.length(), OPDE.getLogin().getUser(), resident));
             FileInputStream fis = new FileInputStream(file);
             ftp.storeFile(sysfile.getRemoteFilename(), fis);
+            OPDE.info("STORING FILE TO FTPSERVER: " + sysfile.getFilename() + " (" + sysfile.getMd5() + ")");
             fis.close();
         } else { // Ansonsten die bestehende Datei zurückgeben
-            sysfile = (SYSFiles) query.getSingleResult();
-
+            // Does the User own this file already ?
+            for (SYSFiles mySYSfile : alreadyExistingFiles) {
+                if (mySYSfile.getResident().equals(resident)) {
+                    sysfile = mySYSfile;
+                    break;
+                }
+            }
+            if (sysfile == null) {
+                sysfile = em.merge(new SYSFiles(file.getName(), md5, new Date(file.lastModified()), file.length(), OPDE.getLogin().getUser(), resident));
+            }
         }
 
         return sysfile;
     }
 
-    public static List<SYSFiles> putFiles(File[] files, Resident bewohner) {
-        return putFiles(files, bewohner, null);
+    public static List<SYSFiles> putFiles(File[] files, Resident resident) {
+        return putFiles(files, resident, null);
     }
 
     public static List<SYSFiles> putFiles(File[] files, Object attachable) {
@@ -132,7 +145,7 @@ public class SYSFilesTools {
         return putFiles(files, bw, attachable);
     }
 
-    public static List<SYSFiles> putFiles(File[] files, Resident bewohner, Object attachable) {
+    public static List<SYSFiles> putFiles(File[] files, Resident resident, Object attachable) {
 
         ArrayList<SYSFiles> successful = new ArrayList<SYSFiles>(files.length);
         FTPClient ftp = getFTPClient();
@@ -141,9 +154,10 @@ public class SYSFilesTools {
             EntityManager em = OPDE.createEM();
             try {
                 em.getTransaction().begin();
+                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                 for (File file : files) {
                     if (file.isFile()) { // prevents exceptions if somebody has the bright idea to include directories.
-                        SYSFiles sysfile = putFile(em, ftp, file, bewohner);
+                        SYSFiles sysfile = putFile(em, ftp, file, resident);
                         if (attachable != null) {
                             if (attachable instanceof NReport) {
                                 SYSNR2FILE link = em.merge(new SYSNR2FILE(sysfile, (NReport) attachable, OPDE.getLogin().getUser(), new Date()));
@@ -169,23 +183,40 @@ public class SYSFilesTools {
                         }
                         successful.add(sysfile);
                     }
-                    if (successful.size() != files.length){
+                    if (successful.size() != files.length) {
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.nodirectories")));
                     }
                 }
                 em.getTransaction().commit();
+            } catch (OptimisticLockException ole) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                    OPDE.getMainframe().emptyFrame();
+                    OPDE.getMainframe().afterLogin();
+                }
+                // Bereits gespeicherte wieder löschen
+//                for (SYSFiles sysfile : successful) {
+//                    try {
+//                        ftp.deleteFile(sysfile.getRemoteFilename());
+//                    } catch (IOException e) {
+//                        OPDE.fatal(e);
+//                    }
+//                }
+                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
             } catch (Exception ex) {
                 if (em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
                 }
                 // Bereits gespeicherte wieder löschen
-                for (SYSFiles sysfile : successful) {
-                    try {
-                        ftp.deleteFile(sysfile.getRemoteFilename());
-                    } catch (IOException e) {
-                        OPDE.fatal(e);
-                    }
-                }
+//                for (SYSFiles sysfile : successful) {
+//                    try {
+//                        ftp.deleteFile(sysfile.getRemoteFilename());
+//                    } catch (IOException e) {
+//                        OPDE.fatal(e);
+//                    }
+//                }
                 OPDE.fatal(ex);
             } finally {
                 em.close();
@@ -255,9 +286,28 @@ public class SYSFilesTools {
 
         try {
             em.getTransaction().begin();
+            em.lock(em.merge(sysfile.getResident()), LockModeType.OPTIMISTIC);
             em.remove(em.merge(sysfile));
             em.getTransaction().commit();
             success = true;
+        } catch (OptimisticLockException ole) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                OPDE.getMainframe().emptyFrame();
+                OPDE.getMainframe().afterLogin();
+            }
+            // Bereits gespeicherte wieder löschen
+            //                for (SYSFiles sysfile : successful) {
+            //                    try {
+            //                        ftp.deleteFile(sysfile.getRemoteFilename());
+            //                    } catch (IOException e) {
+            //                        OPDE.fatal(e);
+            //                    }
+            //                }
+            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+            success = false;
         } catch (Exception ex) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -267,11 +317,12 @@ public class SYSFilesTools {
             em.close();
         }
 
-        if (success) {
+        if (success && getConnectedFiles(sysfile.getMd5()).isEmpty()) {
             try {
                 FTPClient ftp = getFTPClient();
                 ftp.deleteFile(sysfile.getRemoteFilename());
                 ftp.disconnect();
+                OPDE.info("DELETING FILE FROM FTPSERVER: " + sysfile.getFilename() + " (" + sysfile.getMd5() + ")");
             } catch (Exception e) {
                 OPDE.error(e);
                 success = false;
@@ -279,6 +330,17 @@ public class SYSFilesTools {
         }
 
         return success;
+    }
+
+
+    private static ArrayList<SYSFiles> getConnectedFiles(String md5) {
+        ArrayList<SYSFiles> result = null;
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT s FROM SYSFiles s WHERE s.md5 = :md5");
+        query.setParameter("md5", md5);
+        result = new ArrayList<SYSFiles>(query.getResultList());
+        em.close();
+        return result;
     }
 
     /**
@@ -313,7 +375,7 @@ public class SYSFilesTools {
     /**
      * Diese Methode ermittelt zu einer gebenen Datei und einer gewünschten Aktion das passende Anzeigeprogramm.
      * Falls die Desktop API nicht passendes hat, werdne die lokal definierten Anzeigeprogramme verwendet.
-     *
+     * <p/>
      * Bei Linux müssen dafür unbedingt die Gnome Libraries installiert sein.
      * apt-get install libgnome2-0
      *
@@ -374,14 +436,14 @@ public class SYSFilesTools {
 //        return itemPopupAttach;
 //    }
 
-    public static FTPClient getFTPClient() {
+    private static FTPClient getFTPClient() {
         FTPClient ftp = new FTPClient();
         try {
             ftp.connect(OPDE.getProps().getProperty("FTPServer"), Integer.parseInt(OPDE.getProps().getProperty("FTPPort")));
             ftp.login(OPDE.getProps().getProperty("FTPUser"), OPDE.getProps().getProperty("FTPPassword"));
             ftp.changeWorkingDirectory(OPDE.getProps().getProperty("FTPWorkingDirectory"));
             ftp.setFileType(FTP.BINARY_FILE_TYPE);
-        } catch (IOException e) {
+        } catch (Exception e) {
             OPDE.error(e);
             ftp = null;
         }

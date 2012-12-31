@@ -18,6 +18,7 @@ import javax.print.PrintServiceLookup;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.print.PrinterGraphics;
 
 /**
  * @author Torsten Löhr
@@ -29,17 +30,15 @@ public class PnlConfigs extends CleanablePanel {
     public PnlConfigs(JScrollPane jspSearch) {
         jspSearch.setViewportView(new JPanel());
         initComponents();
-        // TODO: results in NPE under linux
         initPanel();
     }
 
     private void btnTestLabelActionPerformed(ActionEvent e) {
-        LogicalPrinter localPrinter = OPDE.getLogicalPrinters().getTypesMap().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_LOGICAL_PRINTER));
+        LogicalPrinter localPrinter = OPDE.getLogicalPrinters().getMapName2LogicalPrinter().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_LOGICAL_PRINTER));
         PrinterForm printerForm1 = localPrinter.getForms().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL));
 
         OPDE.getPrintProcessor().addPrintJob(new PrintListElement(testStock, localPrinter, printerForm1, OPDE.getProps().getProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER)));
     }
-
 
 
     private void txtStockIDFocusLost(FocusEvent e) {
@@ -60,6 +59,30 @@ public class PnlConfigs extends CleanablePanel {
         btnTestLabel.requestFocus();
     }
 
+    private void btnSaveActionPerformed(ActionEvent e) {
+
+        PrintService printService = (PrintService) cmbPhysicalPrinters.getSelectedItem();
+        if (printService != null) {
+            OPDE.getProps().setProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER, printService.getName());
+            OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER, printService.getName());
+        }
+
+        LogicalPrinter logicalPrinter = (LogicalPrinter) cmbLogicalPrinters.getSelectedItem();
+        if (logicalPrinter != null) {
+            OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_LOGICAL_PRINTER, logicalPrinter.getName());
+            OPDE.getProps().setProperty(SYSPropsTools.KEY_LOGICAL_PRINTER, logicalPrinter.getName());
+        }
+
+        PrinterForm form = (PrinterForm) cmbForm.getSelectedItem();
+        if (form != null){
+            OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL, ((PrinterForm) cmbForm.getSelectedItem()).getName());
+            OPDE.getProps().setProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL, ((PrinterForm) cmbForm.getSelectedItem()).getName());
+        }
+
+        OPDE.saveLocalProps();
+
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         lblPrinters = new JLabel();
@@ -70,11 +93,12 @@ public class PnlConfigs extends CleanablePanel {
         txtStockID = new JTextField();
         hSpacer1 = new JPanel(null);
         btnTestLabel = new JButton();
+        btnSave = new JButton();
 
         //======== this ========
         setLayout(new FormLayout(
-            "default, $lcgap, default:grow, $lcgap, default",
-            "6*(default, $lgap), default"));
+                "default, $lcgap, default:grow, $lcgap, default",
+                "6*(default, $lgap), default:grow"));
 
         //---- lblPrinters ----
         lblPrinters.setText("Etiketten-Drucker");
@@ -117,6 +141,16 @@ public class PnlConfigs extends CleanablePanel {
             panel1.add(btnTestLabel);
         }
         add(panel1, CC.xy(3, 11));
+
+        //---- btnSave ----
+        btnSave.setText("Save");
+        btnSave.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnSaveActionPerformed(e);
+            }
+        });
+        add(btnSave, CC.xy(3, 13, CC.RIGHT, CC.BOTTOM));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
@@ -138,83 +172,114 @@ public class PnlConfigs extends CleanablePanel {
     private void initPanel() {
         testStock = null;
 
+        cmbPhysicalPrinters.setModel(new DefaultComboBoxModel());
+        cmbForm.setModel(new DefaultComboBoxModel());
+        cmbLogicalPrinters.setModel(new DefaultComboBoxModel());
+
         PrintService[] prservices = PrintServiceLookup.lookupPrintServices(null, null);
 
-        cmbPhysicalPrinters.setModel(new DefaultComboBoxModel(prservices));
-        if (OPDE.getProps().containsKey(SYSPropsTools.KEY_PHYSICAL_PRINTER) && OPDE.getLogicalPrinters().getPrintService(OPDE.getProps().getProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER)) != null) {
-            cmbPhysicalPrinters.setSelectedItem(OPDE.getLogicalPrinters().getPrintService(OPDE.getProps().getProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER)));
-        }
+        if (prservices != null) {
 
-        cmbLogicalPrinters.setModel(new DefaultComboBoxModel(OPDE.getLogicalPrinters().getPrinterList().toArray()));
-        if (OPDE.getProps().containsKey(SYSPropsTools.KEY_LOGICAL_PRINTER) && OPDE.getLogicalPrinters().getTypesMap().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_LOGICAL_PRINTER)) != null) {
-            LogicalPrinter logicalPrinter = OPDE.getLogicalPrinters().getTypesMap().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_LOGICAL_PRINTER));
-            cmbLogicalPrinters.setSelectedItem(logicalPrinter);
+            cmbPhysicalPrinters.setModel(new DefaultComboBoxModel(prservices));
 
-            cmbForm.setModel(new DefaultComboBoxModel(logicalPrinter.getForms().values().toArray()));
-            if (OPDE.getProps().containsKey(SYSPropsTools.KEY_MEDSTOCK_LABEL) && logicalPrinter.getForms().containsKey(OPDE.getProps().getProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL))) {
+            cmbPhysicalPrinters.setRenderer(new ListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                    if (o == null)
+                        return new DefaultListCellRenderer().getListCellRendererComponent(jList, OPDE.lang.getString("misc.msg.error"), i, isSelected, cellHasFocus);
+                    return new DefaultListCellRenderer().getListCellRendererComponent(jList, ((PrintService) o).getName(), i, isSelected, cellHasFocus);
+                }
+            });
+            cmbLogicalPrinters.setRenderer(new ListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                    if (o == null)
+                        return new DefaultListCellRenderer().getListCellRendererComponent(jList, OPDE.lang.getString("misc.msg.error"), i, isSelected, cellHasFocus);
+                    return new DefaultListCellRenderer().getListCellRendererComponent(jList, ((LogicalPrinter) o).getLabel(), i, isSelected, cellHasFocus);
+                }
+            });
+            cmbForm.setRenderer(new ListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                    if (o == null)
+                        return new DefaultListCellRenderer().getListCellRendererComponent(jList, OPDE.lang.getString("misc.msg.error"), i, isSelected, cellHasFocus);
+                    return new DefaultListCellRenderer().getListCellRendererComponent(jList, ((PrinterForm) o).getLabel(), i, isSelected, cellHasFocus);
+                }
+            });
+
+            cmbPhysicalPrinters.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    if (e.getStateChange() == ItemEvent.SELECTED) {
+                        PrintService printService = (PrintService) cmbPhysicalPrinters.getSelectedItem();
+                        OPDE.getProps().setProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER, printService.getName());
+                        OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER, printService.getName());
+                    }
+                }
+            });
+
+            cmbLogicalPrinters.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    if (e.getStateChange() == ItemEvent.SELECTED) {
+                        LogicalPrinter logicalPrinter = (LogicalPrinter) cmbLogicalPrinters.getSelectedItem();
+                        cmbForm.setModel(new DefaultComboBoxModel(logicalPrinter.getForms().values().toArray()));
+                        if (OPDE.getProps().containsKey(SYSPropsTools.KEY_MEDSTOCK_LABEL) && logicalPrinter.getForms().containsKey(OPDE.getProps().getProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL))) {
+                            cmbForm.setSelectedItem(logicalPrinter.getForms().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL)));
+                        }
+                        OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_LOGICAL_PRINTER, logicalPrinter.getName());
+                        OPDE.getProps().setProperty(SYSPropsTools.KEY_LOGICAL_PRINTER, logicalPrinter.getName());
+                        OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL, ((PrinterForm) cmbForm.getSelectedItem()).getName());
+                        OPDE.getProps().setProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL, ((PrinterForm) cmbForm.getSelectedItem()).getName());
+                    }
+                }
+            });
+
+            cmbForm.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    if (e.getStateChange() == ItemEvent.SELECTED) {
+                        OPDE.getProps().setProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL, ((PrinterForm) cmbForm.getSelectedItem()).getName());
+                        OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL, ((PrinterForm) cmbForm.getSelectedItem()).getName());
+                    }
+                }
+            });
+
+            if (OPDE.getPrintProcessor().isWorking()) {
+                cmbLogicalPrinters.setModel(new DefaultComboBoxModel(OPDE.getLogicalPrinters().getLogicalPrintersList().toArray()));
+                LogicalPrinter logicalPrinter = OPDE.getLogicalPrinters().getMapName2LogicalPrinter().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_LOGICAL_PRINTER));
+                cmbLogicalPrinters.setSelectedItem(logicalPrinter);
+
+                cmbForm.setModel(new DefaultComboBoxModel(logicalPrinter.getForms().values().toArray()));
                 cmbForm.setSelectedItem(logicalPrinter.getForms().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL)));
             }
-        } else {
-            cmbForm.setModel(new DefaultComboBoxModel());
+            if (OPDE.getProps().containsKey(SYSPropsTools.KEY_PHYSICAL_PRINTER) && OPDE.getLogicalPrinters().getPrintService(OPDE.getProps().getProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER)) != null) {
+                cmbPhysicalPrinters.setSelectedItem(OPDE.getLogicalPrinters().getPrintService(OPDE.getProps().getProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER)));
+            }
+
+
+            if (!OPDE.getLogicalPrinters().getLogicalPrintersList().isEmpty()) {
+                cmbLogicalPrinters.setModel(new DefaultComboBoxModel(OPDE.getLogicalPrinters().getLogicalPrintersList().toArray()));
+                LogicalPrinter logicalPrinter = OPDE.getLogicalPrinters().getMapName2LogicalPrinter().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_LOGICAL_PRINTER));
+                if (logicalPrinter == null) logicalPrinter = OPDE.getLogicalPrinters().getLogicalPrintersList().get(0);
+
+                cmbLogicalPrinters.setSelectedItem(logicalPrinter);
+
+                cmbForm.setModel(new DefaultComboBoxModel(logicalPrinter.getForms().values().toArray()));
+                if (OPDE.getProps().containsKey(SYSPropsTools.KEY_MEDSTOCK_LABEL) && logicalPrinter.getForms().containsKey(OPDE.getProps().getProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL))) {
+                    cmbForm.setSelectedItem(logicalPrinter.getForms().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL)));
+                } else {
+                    cmbForm.setSelectedIndex(0);
+                }
+            }
         }
 
-        cmbPhysicalPrinters.setRenderer(new ListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-                return new DefaultListCellRenderer().getListCellRendererComponent(jList, ((PrintService) o).getName(), i, isSelected, cellHasFocus);
-            }
-        });
-        cmbLogicalPrinters.setRenderer(new ListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-                return new DefaultListCellRenderer().getListCellRendererComponent(jList, ((LogicalPrinter) o).getLabel(), i, isSelected, cellHasFocus);
-            }
-        });
-        cmbForm.setRenderer(new ListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-                return new DefaultListCellRenderer().getListCellRendererComponent(jList, ((PrinterForm) o).getLabel(), i, isSelected, cellHasFocus);
-            }
-        });
-
-        cmbPhysicalPrinters.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    PrintService printService = (PrintService) cmbPhysicalPrinters.getSelectedItem();
-                    OPDE.getProps().setProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER, printService.getName());
-                    OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER, printService.getName());
-                }
-            }
-        });
-
-        cmbLogicalPrinters.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    LogicalPrinter logicalPrinter = (LogicalPrinter) cmbLogicalPrinters.getSelectedItem();
-                    cmbForm.setModel(new DefaultComboBoxModel(logicalPrinter.getForms().values().toArray()));
-                    if (OPDE.getProps().containsKey(SYSPropsTools.KEY_MEDSTOCK_LABEL) && logicalPrinter.getForms().containsKey(OPDE.getProps().getProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL))) {
-                        cmbForm.setSelectedItem(logicalPrinter.getForms().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL)));
-                    }
-                    OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_LOGICAL_PRINTER, logicalPrinter.getName());
-                    OPDE.getProps().setProperty(SYSPropsTools.KEY_LOGICAL_PRINTER, logicalPrinter.getName());
-                    OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL, ((PrinterForm) cmbForm.getSelectedItem()).getName());
-                    OPDE.getProps().setProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL, ((PrinterForm) cmbForm.getSelectedItem()).getName());
-                }
-            }
-        });
-
-        cmbForm.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    OPDE.getProps().setProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL, ((PrinterForm) cmbForm.getSelectedItem()).getName());
-                    OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL, ((PrinterForm) cmbForm.getSelectedItem()).getName());
-                }
-            }
-        });
-
+        txtStockID.setEnabled(prservices != null);
+        btnTestLabel.setEnabled(prservices != null);
+        cmbForm.setEnabled(prservices != null);
+        cmbLogicalPrinters.setEnabled(prservices != null);
+        cmbPhysicalPrinters.setEnabled(prservices != null);
+        btnSave.setEnabled(prservices != null);
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
@@ -226,5 +291,6 @@ public class PnlConfigs extends CleanablePanel {
     private JTextField txtStockID;
     private JPanel hSpacer1;
     private JButton btnTestLabel;
+    private JButton btnSave;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

@@ -91,6 +91,8 @@ public class OPDE {
     protected static String opwd = "";
     protected static String css = "";
 
+    protected static boolean FTPisWORKING = false;
+
 
     /**
      * @return Das Arbeitsverzeichnis für OPDE.
@@ -144,6 +146,14 @@ public class OPDE {
 
     public static EntityManagerFactory getEMF() {
         return emf;
+    }
+
+    public static boolean isFTPworking() {
+        return FTPisWORKING;
+    }
+
+    public static void setFTPworking(boolean FTPisWORKING) {
+        OPDE.FTPisWORKING = FTPisWORKING;
     }
 
     public static String getUrl() {
@@ -648,7 +658,6 @@ public class OPDE {
             Lm.verifyLicense("Torsten Loehr", "Open-Pflege.de", "G9F4JW:Bm44t62pqLzp5woAD4OCSUAr2");
             WizardStyle.setStyle(WizardStyle.JAVA_STYLE);
             // JideSoft
-
 
             /***
              *      _____               __  __       _        ____

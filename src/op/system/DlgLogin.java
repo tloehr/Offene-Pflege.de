@@ -27,6 +27,7 @@ package op.system;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import entity.files.SYSFilesTools;
 import entity.system.SYSLoginTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
@@ -239,15 +240,12 @@ public class DlgLogin extends MyJDialog {
         try {
             registerLogin();
             if (OPDE.getLogin() == null) {
-                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Benutzername oder Passwort falsch.", 2));
-                OPDE.info("Falsches Passwort eingegeben.");
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.usernameOrPasswordWrong"));
+                OPDE.info(OPDE.lang.getString("misc.msg.usernameOrPasswordWrong") + ": " + username + "  " + OPDE.lang.getString("misc.msg.triedPassword") + ": " + new String(txtPassword.getPassword()));
             } else {
-
                 OPDE.initProps();
-
-                OPDE.info("Anmeldung erfolgt: UKennung: " + username);
-                OPDE.info("LoginID: " + OPDE.getLogin().getUser().getUID());
-
+                OPDE.info("Login: " + username + "  LoginID: " + OPDE.getLogin().getLoginID());
+                OPDE.setFTPworking(SYSFilesTools.isFTPServerReady());
                 dispose();
             }
 

@@ -5,6 +5,7 @@ import entity.prescription.MedStockTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.system.LogicalPrinter;
+import op.system.PrinterForm;
 import op.tools.PrintListElement;
 
 import javax.print.DocFlavor;
@@ -37,12 +38,31 @@ public class PrintProcessor extends Thread {
         return interrupted;
     }
 
-    public boolean isWorking(){
-//        boolean working = OPDE.getProps().containsKey(SYSPropsTools.KEY_PHYSICAL_PRINTER);
-//        working = working && OPDE.getLogicalPrinters().getPrintService(OPDE.getProps().getProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER)) != null;
-//        working = working && OPDE.getProps().containsKey(SYSPropsTools.KEY_LOGICAL_PRINTER) && OPDE.getLogicalPrinters().getTypesMap().containsKey(OPDE.getProps().getProperty(SYSPropsTools.KEY_LOGICAL_PRINTER));
-//        working = working && OPDE.getProps().containsKey(SYSPropsTools.KEY_MEDSTOCK_LABEL) && OPDE.getLogicalPrinters().getTypesMap().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_LOGICAL_PRINTER)).getForms().containsKey(SYSPropsTools.KEY_MEDSTOCK_LABEL);
-        return true;
+    public boolean isWorking() {
+        boolean working = !OPDE.getLogicalPrinters().getLogicalPrintersList().isEmpty();
+        working &= OPDE.getProps().containsKey(SYSPropsTools.KEY_PHYSICAL_PRINTER);
+        working &= OPDE.getLogicalPrinters().getPrintService(OPDE.getProps().getProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER)) != null;
+        working &= OPDE.getProps().containsKey(SYSPropsTools.KEY_LOGICAL_PRINTER) && OPDE.getLogicalPrinters().getMapName2LogicalPrinter().containsKey(OPDE.getProps().getProperty(SYSPropsTools.KEY_LOGICAL_PRINTER));
+        working &= OPDE.getProps().containsKey(SYSPropsTools.KEY_MEDSTOCK_LABEL) && OPDE.getLogicalPrinters().getMapName2LogicalPrinter().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_LOGICAL_PRINTER)).getForms().containsKey(OPDE.getLocalProps().getProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL));
+        return working;
+    }
+
+    public LogicalPrinter getSelectedLogicalPrinter() {
+        LogicalPrinter logicalPrinter = null;
+        if (isWorking()) {
+            logicalPrinter = OPDE.getLogicalPrinters().getMapName2LogicalPrinter().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_LOGICAL_PRINTER));
+        }
+        return logicalPrinter;
+    }
+
+    public PrinterForm getSelectedForm() {
+        PrinterForm printerForm = null;
+        LogicalPrinter logicalPrinter = getSelectedLogicalPrinter();
+        if (logicalPrinter != null) {
+            printerForm = logicalPrinter.getForms().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL));
+        }
+        return printerForm;
+
     }
 
     public boolean isIdle() {
@@ -61,9 +81,6 @@ public class PrintProcessor extends Thread {
         while (!interrupted) {
             try {
                 if (!printQueue.isEmpty()) {
-                    String currentPrinterName = "";
-                    String combinedPrintJob = "";
-                    LogicalPrinter currentPrinterType = null;
                     int size = printQueue.size();
 
                     int progressbar = 1;

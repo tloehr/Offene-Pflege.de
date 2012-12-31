@@ -146,15 +146,15 @@ public class DlgNewStocks extends MyJDialog {
     private void initDialog() {
         ignoreEvent = true;
 
-        logicalPrinter = OPDE.getLogicalPrinters().getTypesMap().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_LOGICAL_PRINTER));
-        if (logicalPrinter != null && OPDE.getPrintProcessor().isWorking()) {
-            printForm = logicalPrinter.getForms().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL));
+        logicalPrinter = OPDE.getPrintProcessor().getSelectedLogicalPrinter();
+        printForm = OPDE.getPrintProcessor().getSelectedForm();
+
+        if (logicalPrinter != null && printForm != null) {
             btnPrint.setEnabled(true);
             SYSPropsTools.restoreState(this.getClass().getName() + "::btnPrint", btnPrint);
         } else {
             btnPrint.setSelected(false);
         }
-
 
         menge = null;
         cmbMProdukt.setRenderer(TradeFormTools.getRenderer(TradeFormTools.LONG));
@@ -256,8 +256,8 @@ public class DlgNewStocks extends MyJDialog {
         //======== mainPane ========
         {
             mainPane.setLayout(new FormLayout(
-                "14dlu, $lcgap, default, $lcgap, 39dlu, $lcgap, default:grow, $lcgap, 14dlu",
-                "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
+                    "14dlu, $lcgap, default, $lcgap, 39dlu, $lcgap, default:grow, $lcgap, 14dlu",
+                    "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
 
             //---- jLabel1 ----
             jLabel1.setText("PZN oder Suchbegriff");
@@ -301,7 +301,7 @@ public class DlgNewStocks extends MyJDialog {
             mainPane.add(jLabel3, CC.xy(3, 5));
 
             //---- cmbMProdukt ----
-            cmbMProdukt.setModel(new DefaultComboBoxModel(new String[] {
+            cmbMProdukt.setModel(new DefaultComboBoxModel(new String[]{
 
             }));
             cmbMProdukt.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -344,7 +344,7 @@ public class DlgNewStocks extends MyJDialog {
             mainPane.add(jLabel6, CC.xy(3, 7));
 
             //---- cmbPackung ----
-            cmbPackung.setModel(new DefaultComboBoxModel(new String[] {
+            cmbPackung.setModel(new DefaultComboBoxModel(new String[]{
 
             }));
             cmbPackung.setFont(new Font("Arial", Font.PLAIN, 14));

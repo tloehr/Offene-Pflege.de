@@ -645,6 +645,7 @@ public class PnlValues extends NursingRecordsPanel {
                         });
                     }
                 });
+                btnFiles.setEnabled(OPDE.isFTPworking());
                 pnlTitle.getRight().add(btnFiles);
             }
 
@@ -1043,7 +1044,7 @@ public class PnlValues extends NursingRecordsPanel {
                     });
                 }
             });
-            btnFiles.setEnabled(!resValue.isObsolete());
+            btnFiles.setEnabled(!resValue.isObsolete() && OPDE.isFTPworking());
             pnlMenu.add(btnFiles);
 
             /***

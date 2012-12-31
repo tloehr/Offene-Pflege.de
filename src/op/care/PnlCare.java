@@ -94,7 +94,7 @@ public class PnlCare extends NursingRecordsPanel {
             jtpPflegeakte.setComponentAt(i, null);
         }
 
-        jtpPflegeakte.setEnabledAt(TAB_FILES, SYSFilesTools.isFTPServerReady());
+        jtpPflegeakte.setEnabledAt(TAB_FILES, OPDE.isFTPworking());
 //        jtpPflegeakte.setEnabledAt(TAB_VORRAT, OPDE.isCalcMedi());
 
     }

@@ -224,7 +224,6 @@ public class TradeFormTools {
      * @see #getInventory4TradeForm(entity.info.Resident, TradeForm)
      */
     public static List<MedInventory> getSuitableInventoriesForThisTradeForm(Resident resident, TradeForm tradeform) {
-        // TODO: das muss noch getestet werden
         EntityManager em = OPDE.createEM();
         List<MedInventory> liste;
 

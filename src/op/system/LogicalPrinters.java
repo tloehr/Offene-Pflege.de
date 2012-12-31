@@ -6,7 +6,6 @@ package op.system;
 
 import op.OPDE;
 import op.tools.SYSTools;
-import org.eclipse.persistence.annotations.Array;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -26,7 +25,7 @@ import java.util.HashMap;
 
 /**
  * Diese Klasse befasst sich mit der Handhabung der speziellen Drucker für Etiketten und Kassenbons.
- * Sie enthält auch den XML Parser, der die Drucker und Vorlagen Konfigurationsdatei %workdir%/mapName2Printer.xml einliest.
+ * Sie enthält auch den XML Parser, der die Drucker und Vorlagen Konfigurationsdatei %workdir%/mapName2LogicalPrinter.xml einliest.
  *
  * @author tloehr
  */
@@ -49,53 +48,34 @@ public class LogicalPrinters {
     public static final String ESCPOS_CHARACTER_TABLE_PC850 = new String(new char[]{27, 116, 2});
     public static final String ESCPOS_FULL_CUT = new String(new char[]{29, 86, 65});
     public static final String ESCPOS_PARTIAL_CUT = new String(new char[]{29, 86, 66});
-    //    public static final int DRUCK_KEIN_DRUCK = 0;
-//    public static final int DRUCK_ETI1 = 1;
-//    public static final int DRUCK_ETI2 = 2;
-//    public static final int DRUCK_BON1 = 3;
-//    public static final int DRUCK_BON2 = 4;
-//    public static final int DRUCK_LASER = 5;
-    //public static int[] drucker
-    private HashMap<String, LogicalPrinter> mapName2Printer;
+
+    private HashMap<String, LogicalPrinter> mapName2LogicalPrinter;
     private ArrayList<LogicalPrinter> printers;
     private final String CONFIGFILE = "printers.xml";
     private HashMap tags;
 
 
-//    public HashBean[] getPrinterTypeArray() {
-//        return printerTypeArray;
-//    }
-//
-//    private HashBean[] printerTypeArray;
-
-    public HashMap<String, LogicalPrinter> getTypesMap() {
-        return mapName2Printer;
+    public HashMap<String, LogicalPrinter> getMapName2LogicalPrinter() {
+        return mapName2LogicalPrinter;
     }
-
-//    public Printer getPrinter(String type) {
-//        Printer p = null;
-//        Iterator<Printer> it = mapName2Printer.iterator();
-//        boolean found = false;
-//        while (!found && it.hasNext()) {
-//            p = it.next();
-//            found = p.getType().equals(type);
-//        }
-//        return (!found ? null : p);
-//    }
 
     public LogicalPrinters() {
         initTags();
         printers = new ArrayList<LogicalPrinter>();
-        try {
-            XMLReader parser = XMLReaderFactory.createXMLReader();
-            InputSource is = new InputSource(new FileInputStream(new File(OPDE.getOPWD() + System.getProperty("file.separator") + CONFIGFILE)));
-            XMLHandler xml = new XMLHandler();
-            parser.setContentHandler(xml);
-            parser.parse(is);
-        } catch (SAXException sAXException) {
-            OPDE.fatal(sAXException);
-        } catch (IOException iOException) {
-            OPDE.fatal(iOException);
+        mapName2LogicalPrinter = new HashMap<String, LogicalPrinter>();
+        File configfile = new File(OPDE.getOPWD() + System.getProperty("file.separator") + CONFIGFILE);
+        if (configfile.exists()) {
+            try {
+                XMLReader parser = XMLReaderFactory.createXMLReader();
+                InputSource is = new InputSource(new FileInputStream(configfile));
+                XMLHandler xml = new XMLHandler();
+                parser.setContentHandler(xml);
+                parser.parse(is);
+            } catch (SAXException sAXException) {
+                OPDE.fatal(sAXException);
+            } catch (IOException iOException) {
+                OPDE.fatal(iOException);
+            }
         }
     }
 
@@ -111,7 +91,7 @@ public class LogicalPrinters {
 
         @Override
         public void startDocument() throws SAXException {
-            mapName2Printer = new HashMap();
+//            mapName2LogicalPrinter = new HashMap();
         }
 
         @Override
@@ -182,7 +162,7 @@ public class LogicalPrinters {
                 printer.setForms(forms);
                 forms = null;
             } else if (localName.equalsIgnoreCase("printer")) {
-                mapName2Printer.put(printer.getName(), printer);
+                mapName2LogicalPrinter.put(printer.getName(), printer);
                 printers.add(printer);
                 printer = null;
             } else if (localName.equalsIgnoreCase("line")) {
@@ -218,7 +198,7 @@ public class LogicalPrinters {
         tags.put("EscposPartialCut", ESCPOS_PARTIAL_CUT);
     }
 
-    public ArrayList<LogicalPrinter> getPrinterList() {
+    public ArrayList<LogicalPrinter> getLogicalPrintersList() {
         return printers;
     }
 
@@ -243,6 +223,7 @@ public class LogicalPrinters {
     public PrintService getPrintService(String printername) {
         PrintService result = null;
         PrintService[] prservices = PrintServiceLookup.lookupPrintServices(null, null);
+        if (prservices == null) return null;
         for (PrintService printService : prservices) {
             if (printService.getName().equalsIgnoreCase(printername)) {
                 result = printService;
@@ -252,108 +233,4 @@ public class LogicalPrinters {
         return result;
     }
 
-    /**
-     * Standard Druck Routine. Nimmt einen HTML Text entgegen und öffnet den lokal installierten Browser damit.
-     * Erstellt temporäre Dateien im temp Verzeichnis kueche<irgendwas>.html
-     *
-     * @param parent
-     * @param html
-     * @param addPrintJScript - Auf Wunsch kann an das HTML automatisch eine JScript Druckroutine angehangen werden.
-     */
-//    public static void print(Component parent, String html, boolean addPrintJScript) {
-//        try {
-//            // Create temp file.
-//            File temp = File.createTempFile("kueche", ".html");
-//
-//            // Delete temp file when program exits.
-//            temp.deleteOnExit();
-//
-//            if (addPrintJScript) {
-//                html = "<html><head><script type=\"text/javascript\">"
-//                        + "window.onload = function() {"
-//                        + "window.print();"
-//                        + "}</script>"
-//                        + OPDE.getCSS()
-//                        + "</head><body>" + SYSTools.htmlUmlautConversion(html)
-//                        + "<hr/><span id=\"fonttext\"><b>Ende des Berichtes</b><br/>http://www.offene-pflege.de/component/content/article/3-informationen/16-kueche</span></body></html>";
-//            } else {
-//                html = "<html><head>" + OPDE.getCSS() + "</head><body>" + SYSTools.htmlUmlautConversion(html)
-//                        + "<hr/><span id=\"fonttext\"><b>Ende des Berichtes</b><br/>http://www.offene-pflege.de/component/content/article/3-informationen/16-kueche</span></body></html>";
-//            }
-//
-//            OPDE.debug(html);
-//
-//            // Write to temp file
-//            BufferedWriter out = new BufferedWriter(new FileWriter(temp));
-//            out.write(html);
-//
-//            out.close();
-//            handleFile(parent, temp.getAbsolutePath(), Desktop.Action.OPEN);
-//        } catch (IOException e) {
-//            OPDE.fatal(e);
-//        }
-//
-//    }
-
-
-//    public static void handleFile(Component parent, String filename, java.awt.Desktop.Action action) {
-//        Desktop desktop = null;
-//        if (parent == null) {
-//            parent = new Frame();
-//        }
-//
-//        if (SYSTools.getLocalDefinedApp(filename) != null) {
-//            try {
-//                Runtime.getRuntime().exec(SYSTools.getLocalDefinedApp(filename));
-//            } catch (IOException ex) {
-//                OPDE.getLogger().error(ex);
-//            }
-//        } else {
-//
-//            if (Desktop.isDesktopSupported()) {
-//                desktop = Desktop.getDesktop();
-//                if (action == Desktop.Action.OPEN && desktop.isSupported(Desktop.Action.OPEN)) {
-//                    try {
-//                        desktop.open(new File(filename));
-//                    } catch (IOException ex) {
-//                        JOptionPane.showMessageDialog(parent, "Datei \n" + filename + "\nkonnte nicht angezeigt werden.)",
-//                                "Kein Anzeigeprogramm vorhanden", JOptionPane.INFORMATION_MESSAGE);
-//                    }
-//                } else if (action == Desktop.Action.PRINT && desktop.isSupported(Desktop.Action.PRINT)) {
-//                    try {
-//                        desktop.print(new File(filename));
-//                    } catch (IOException ex) {
-//                        JOptionPane.showMessageDialog(parent, "Datei \n" + filename + "\nkonnte nicht gedruckt werden.)",
-//                                "Kein Druckprogramm vorhanden", JOptionPane.INFORMATION_MESSAGE);
-//                    }
-//                } else {
-//                    JOptionPane.showMessageDialog(parent, "Datei \n" + filename + "\nkonnte nicht bearbeitet werden.)",
-//                            "Keine passende Anwendung vorhanden", JOptionPane.INFORMATION_MESSAGE);
-//                }
-//            } else {
-//                JOptionPane.showMessageDialog(parent, "JAVA Desktop Unterstützung nicht vorhanden", "JAVA Desktop API", JOptionPane.ERROR_MESSAGE);
-//            }
-//        }
-//    }
-
-
-//    private static void printPrintServiceAttributesAndDocFlavors(PrintService prserv) {
-//        String s1 = null, s2;
-//        Attribute[] prattr = prserv.getAttributes().toArray();
-//        DocFlavor[] prdfl = prserv.getSupportedDocFlavors();
-//        if (null != prattr && 0 < prattr.length) {
-//            for (int i = 0; i < prattr.length; i++) {
-//                Main.Main.logger.debug("      PrintService-Attribute[" + i + "]: " + prattr[i].getName() + " = " + prattr[i]);
-//            }
-//        }
-//        if (null != prdfl && 0 < prdfl.length) {
-//            for (int i = 0; i < prdfl.length; i++) {
-//                s2 = prdfl[i].getMimeType();
-//                if (null != s2 && !s2.equals(s1)) {
-//                    Main.Main.logger.debug("      PrintService-DocFlavor-Mime[" + i + "]: " + s2);
-//                }
-//                s1 = s2;
-//            }
-//        }
-//    }
 }

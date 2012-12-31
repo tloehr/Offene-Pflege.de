@@ -964,6 +964,7 @@ public class PnlReport extends NursingRecordsPanel {
                             new DlgFiles(nreport, fileHandleClosure);
                         }
                     });
+                    btnFiles.setEnabled(OPDE.isFTPworking());
                     pnlSingle.getRight().add(btnFiles);
                 }
 
@@ -1553,7 +1554,7 @@ public class PnlReport extends NursingRecordsPanel {
                     new DlgFiles(nreport, fileHandleClosure);
                 }
             });
-
+            btnFiles.setEnabled(OPDE.isFTPworking());
             pnlMenu.add(btnFiles);
 
 

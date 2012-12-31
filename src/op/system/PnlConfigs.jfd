@@ -17,7 +17,7 @@
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
-        <string>default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default</string> 
+        <string>default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default:grow</string> 
        </void> 
       </object> 
       <void property="name"> 
@@ -190,6 +190,45 @@
         <void method="setProperty"> 
          <string>gridY</string> 
          <int>11</int> 
+        </void> 
+       </object> 
+      </void> 
+      <void method="add"> 
+       <object class="com.jformdesigner.model.FormComponent"> 
+        <string>javax.swing.JButton</string> 
+        <void method="setProperty"> 
+         <string>text</string> 
+         <string>Save</string> 
+        </void> 
+        <void property="name"> 
+         <string>btnSave</string> 
+        </void> 
+        <void method="addEvent"> 
+         <object class="com.jformdesigner.model.FormEvent"> 
+          <string>java.awt.event.ActionListener</string> 
+          <string>actionPerformed</string> 
+          <string>btnSaveActionPerformed</string> 
+          <boolean>true</boolean> 
+         </object> 
+        </void> 
+       </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>3</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>13</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>hAlign</string> 
+         <object class="com.jgoodies.forms.layout.CellConstraints" field="RIGHT"/> 
+        </void> 
+        <void method="setProperty"> 
+         <string>vAlign</string> 
+         <object class="com.jgoodies.forms.layout.CellConstraints" field="BOTTOM"/> 
         </void> 
        </object> 
       </void> 

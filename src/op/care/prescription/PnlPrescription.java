@@ -272,6 +272,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                     new DlgFiles(prescription, fileHandleClosure);
                 }
             });
+            btnFiles.setEnabled(OPDE.isFTPworking());
             cptitle.getRight().add(btnFiles);
         }
 
@@ -1221,6 +1222,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                             }
                         };
                     }
+                    btnFiles.setEnabled(OPDE.isFTPworking());
                     new DlgFiles(prescription, closure);
                 }
             });
