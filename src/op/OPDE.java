@@ -35,6 +35,7 @@ import op.system.AppInfo;
 import op.system.FrmInit;
 import op.system.LogicalPrinters;
 import op.threads.DisplayManager;
+import op.threads.DisplayMessage;
 import op.threads.PrintProcessor;
 import op.tools.*;
 import org.apache.commons.cli.*;
@@ -154,6 +155,9 @@ public class OPDE {
 
     public static void setFTPworking(boolean FTPisWORKING) {
         OPDE.FTPisWORKING = FTPisWORKING;
+        if (!OPDE.FTPisWORKING){
+            getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.ftpNotWorking"));
+        }
     }
 
     public static String getUrl() {

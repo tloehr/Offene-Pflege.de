@@ -18,6 +18,7 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
+import entity.EntityTools;
 import entity.files.SYSFilesTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
@@ -62,10 +63,12 @@ public class PnlProcess extends NursingRecordsPanel {
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
 
-    private HashMap<QProcess, CollapsiblePane> qProcessCollapsiblePaneHashMap;
-    private HashMap<QProcess, ArrayList<QProcessElement>> qProcess2ElementMap;
-    private HashMap<QProcess, CollapsiblePane> qProcessMap;
-    private HashMap<QProcessElement, CollapsiblePane> elementMap;
+    private HashMap<Integer, CollapsiblePane> mapCP;
+//    private HashMap<QProcess, CollapsiblePane> mapProcess2CP;
+//    private HashMap<QProcess, ArrayList<QProcessElement>> qProcess2ElementMap;
+//    private HashMap<QProcess, CollapsiblePane> qProcessMap;
+//    private HashMap<QProcessElement, CollapsiblePane> elementMap;
+
     private List<QProcess> processList;
     private int MAX_TEXT_LENGTH = 65;
 
@@ -92,16 +95,23 @@ public class PnlProcess extends NursingRecordsPanel {
     }
 
     private void initPanel() {
-        qProcessCollapsiblePaneHashMap = new HashMap<QProcess, CollapsiblePane>();
-        qProcess2ElementMap = new HashMap<QProcess, ArrayList<QProcessElement>>();
-        qProcessMap = new HashMap<QProcess, CollapsiblePane>();
-        elementMap = new HashMap<QProcessElement, CollapsiblePane>();
+        mapCP = new HashMap<Integer, CollapsiblePane>();
+//        mapProcess2CP = new HashMap<QProcess, CollapsiblePane>();
+//        qProcess2ElementMap = new HashMap<QProcess, ArrayList<QProcessElement>>();
+//        qProcessMap = new HashMap<QProcess, CollapsiblePane>();
+//        elementMap = new HashMap<QProcessElement, CollapsiblePane>();
         prepareSearchArea();
     }
 
     @Override
     public void reload() {
-        reloadDisplay();
+        if (resident != null){
+            switchResident(resident);
+        } else {
+            processList = QProcessTools.getProcesses4(OPDE.getLogin().getUser());
+            reloadDisplay();
+        }
+
     }
 
     private void reloadDisplay() {
@@ -115,10 +125,12 @@ public class PnlProcess extends NursingRecordsPanel {
          */
         initPhase = true;
 
-        qProcessCollapsiblePaneHashMap.clear();
-        qProcess2ElementMap.clear();
-        qProcessMap.clear();
-        elementMap.clear();
+//        mapProcess2CP.clear();
+//        qProcess2ElementMap.clear();
+//        qProcessMap.clear();
+//        elementMap.clear();
+
+        mapCP.clear();
 
         final boolean withworker = false;
         if (withworker) {
@@ -166,7 +178,8 @@ public class PnlProcess extends NursingRecordsPanel {
 
         } else {
             for (QProcess qProcess : processList) {
-                qProcessMap.put(qProcess, createCP4(qProcess));
+                createCP4(qProcess);
+//                qProcessMap.put(qProcess, createCP4(qProcess));
             }
             buildPanel();
         }
@@ -175,7 +188,17 @@ public class PnlProcess extends NursingRecordsPanel {
 
 
     private CollapsiblePane createCP4(final QProcess qProcess) {
-        final CollapsiblePane cp = new CollapsiblePane();
+
+        if (!mapCP.containsKey(qProcess.hashCode())) {
+            mapCP.put(qProcess.hashCode(), new CollapsiblePane());
+            //            cpMap.get(key).setStyle(CollapsiblePane.PLAIN_STYLE);
+            try {
+                mapCP.get(qProcess.hashCode()).setCollapsed(true);
+            } catch (PropertyVetoException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+        }
+        final CollapsiblePane cp = mapCP.get(qProcess.hashCode());
 
         String title = "<html><table border=\"0\">" +
                 "<tr valign=\"top\">" +
@@ -206,7 +229,7 @@ public class PnlProcess extends NursingRecordsPanel {
             }
         });
 
-        GUITools.addExpandCollapseButtons(cp, cptitle.getRight());
+//        GUITools.addExpandCollapseButtons(cp, cptitle.getRight());
 
         cp.setTitleLabelComponent(cptitle.getMain());
         cp.setSlidingDirection(SwingConstants.SOUTH);
@@ -279,17 +302,16 @@ public class PnlProcess extends NursingRecordsPanel {
                 GUITools.showPopup(popup, SwingConstants.WEST);
             }
         });
-        btnMenu.setEnabled(!qProcess.isClosed());
+//        btnMenu.setEnabled(!qProcess.isClosed());
         cptitle.getRight().add(btnMenu);
 
-        cp.addCollapsiblePaneListener(new
-                                              CollapsiblePaneAdapter() {
-                                                  @Override
-                                                  public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                                                      cp.setContentPane(createContentPanel4(qProcess));
-                                                      cp.setOpaque(false);
-                                                  }
-                                              }
+        cp.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+            @Override
+            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+                cp.setContentPane(createContentPanel4(qProcess));
+                cp.setOpaque(false);
+            }
+        }
 
         );
         cp.setBackground(QProcessTools.getBG1(qProcess));
@@ -316,6 +338,102 @@ public class PnlProcess extends NursingRecordsPanel {
         elementPanel.setLayout(new VerticalLayout());
         elementPanel.add(contentPane);
 
+
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
+
+            /***
+             *      _     _            _       _     _ ____  ____                       _
+             *     | |__ | |_ _ __    / \   __| | __| |  _ \|  _ \ ___ _ __   ___  _ __| |_
+             *     | '_ \| __| '_ \  / _ \ / _` |/ _` | |_) | |_) / _ \ '_ \ / _ \| '__| __|
+             *     | |_) | |_| | | |/ ___ \ (_| | (_| |  __/|  _ <  __/ |_) | (_) | |  | |_
+             *     |_.__/ \__|_| |_/_/   \_\__,_|\__,_|_|   |_| \_\___| .__/ \___/|_|   \__|
+             *                                                        |_|
+             */
+            final JButton btnAddPReport = GUITools.createHyperlinkButton(internalClassID + ".btnaddpreport.tooltip", SYSConst.icon22add, null);
+            btnAddPReport.setBackground(QProcessTools.getBG2(qProcess));
+            btnAddPReport.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnAddPReport.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    final JidePopup popup = new JidePopup();
+                    popup.setMovable(false);
+                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.PAGE_AXIS));
+                    final JButton btnSave = new JButton(SYSConst.icon22apply);
+                    final JTextArea editor = new JTextArea("", 10, 40);
+                    btnSave.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent evt) {
+
+                            if (editor.getText().trim().isEmpty()) {
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.emptyentry")));
+                                return;
+                            }
+
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                QProcess myProcess = em.merge(qProcess);
+                                if (!myProcess.isCommon()) {
+                                    em.lock(em.merge(myProcess.getResident()), LockModeType.OPTIMISTIC);
+                                }
+                                em.lock(myProcess, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                PReport pReport = em.merge(new PReport(editor.getText().trim(), PReportTools.PREPORT_TYPE_USER, myProcess));
+                                myProcess.getPReports().add(pReport);
+
+                                em.getTransaction().commit();
+
+                                processList.remove(qProcess);
+                                processList.add(myProcess);
+                                Collections.sort(processList);
+
+                                mapCP.remove(qProcess.hashCode());
+                                createCP4(myProcess);
+
+                                buildPanel();
+                            } catch (OptimisticLockException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+                            }
+                        }
+                    });
+
+                    editor.setLineWrap(true);
+                    editor.setWrapStyleWord(true);
+                    editor.setEditable(true);
+                    JScrollPane jspEditor = new JScrollPane(editor);
+                    JPanel pnl = new JPanel(new BorderLayout(10, 10));
+
+                    pnl.add(jspEditor, BorderLayout.CENTER);
+                    JPanel buttonPanel = new JPanel();
+                    buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
+                    buttonPanel.add(btnSave);
+                    pnl.setBorder(new EmptyBorder(10, 10, 10, 10));
+                    pnl.add(buttonPanel, BorderLayout.SOUTH);
+
+                    popup.setOwner(btnAddPReport);
+                    popup.getContentPane().add(pnl);
+
+                    popup.setDefaultFocusComponent(editor);
+                    GUITools.showPopup(popup, SwingUtilities.WEST);
+                }
+            });
+            btnAddPReport.setEnabled(!qProcess.isClosed());
+            elementPanel.add(btnAddPReport);
+        }
+
         for (final QProcessElement element : qProcess.getElements()) {
             if (tbSystem.isSelected() || !(element instanceof PReport) || !((PReport) element).isSystem()) {
                 final CollapsiblePane cpElement = createCP4(element, qProcess);
@@ -323,8 +441,8 @@ public class PnlProcess extends NursingRecordsPanel {
                     cpElement.setIcon(SYSConst.icon16exec);
                 }
                 cpElement.setBackground(QProcessTools.getBG2(qProcess));
-                elementMap.put(element, cpElement);
-                elementPanel.add(elementMap.get(element));
+//                elementMap.put(element, cpElement);
+                elementPanel.add(cpElement);
             }
         }
         return elementPanel;
@@ -334,17 +452,36 @@ public class PnlProcess extends NursingRecordsPanel {
     private CollapsiblePane createCP4(final QProcessElement element, final QProcess qProcess) {
         String elementTitle = "[" + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(new Date(element.getPITInMillis())) + "] " + SYSTools.left(element.getTitle(), MAX_TEXT_LENGTH);
         elementTitle += " [" + element.getUser().getUID() + "]";
-        final CollapsiblePane cpElement = new CollapsiblePane(elementTitle);
-        try {
-            cpElement.setCollapsed(true);
-        } catch (PropertyVetoException e) {
-            OPDE.debug(e);
+
+//        try {
+//            cpElement.setCollapsed(true);
+//        } catch (PropertyVetoException e) {
+//            OPDE.debug(e);
+//        }
+
+        if (!mapCP.containsKey(element.hashCode())) {
+            mapCP.put(element.hashCode(), new CollapsiblePane(elementTitle));
+            //            cpMap.get(key).setStyle(CollapsiblePane.PLAIN_STYLE);
+            try {
+                mapCP.get(element.hashCode()).setCollapsed(true);
+            } catch (PropertyVetoException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
         }
+        final CollapsiblePane cpElement = mapCP.get(element.hashCode());
+        cpElement.setTitle(elementTitle);
 
         JPanel btnPanel = new JPanel();
         btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.LINE_AXIS));
 
-
+        /***
+         *      _   _       _     _       _
+         *     | | | |_ __ | |   (_)_ __ | | __
+         *     | | | | '_ \| |   | | '_ \| |/ /
+         *     | |_| | | | | |___| | | | |   <
+         *      \___/|_| |_|_____|_|_| |_|_|\_\
+         *
+         */
         final JButton btnUnlink = new JButton(SYSConst.icon16unlink);
         btnUnlink.setPressedIcon(SYSConst.icon16unlinkPressed);
         btnUnlink.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -365,14 +502,28 @@ public class PnlProcess extends NursingRecordsPanel {
                                 if (!qProcess.isCommon()) {
                                     em.lock(em.merge(qProcess.getResident()), LockModeType.OPTIMISTIC);
                                 }
+
+                                QProcessElement myElement = em.merge(element);
+                                QProcess myProcess = em.merge(qProcess);
+
                                 if (element instanceof PReport) {
-                                    PReport pReport = (PReport) em.merge(element);
-                                    em.remove(pReport);
-                                    qProcess.getPReports().remove(pReport);
+                                    em.remove(myElement);
+                                    myProcess.getPReports().remove(myElement);
                                 } else {
-                                    QProcessTools.removeElementFromProcess(em, element, qProcess);
+                                    QProcessTools.removeElementFromProcess(em, myElement, myProcess);
+
                                 }
                                 em.getTransaction().commit();
+
+                                processList.remove(qProcess);
+                                processList.add(myProcess);
+                                Collections.sort(processList);
+
+                                mapCP.remove(qProcess.hashCode());
+                                createCP4(myProcess);
+
+                                buildPanel();
+
                             } catch (OptimisticLockException ole) {
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
@@ -390,14 +541,7 @@ public class PnlProcess extends NursingRecordsPanel {
                             } finally {
                                 em.close();
                             }
-                            qProcessMap.put(qProcess, createCP4(qProcess));
 
-                            try {
-                                qProcessMap.get(qProcess).setCollapsed(false);
-                            } catch (PropertyVetoException e) {
-
-                            }
-                            buildPanel();
                         }
                     }
                 });
@@ -431,8 +575,7 @@ public class PnlProcess extends NursingRecordsPanel {
      * always regenerated by the PrinterForm Editor.
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents
-    () {
+    private void initComponents() {
         jspProcess = new JScrollPane();
         cpProcess = new CollapsiblePanes();
 
@@ -456,16 +599,16 @@ public class PnlProcess extends NursingRecordsPanel {
     @Override
     public void cleanup() {
         cpProcess.removeAll();
-        SYSTools.clear(qProcessCollapsiblePaneHashMap);
-        SYSTools.clear(qProcess2ElementMap);
-        SYSTools.clear(qProcessMap);
-        SYSTools.clear(elementMap);
+//        SYSTools.clear(mapProcess2CP);
+//        SYSTools.clear(qProcess2ElementMap);
+//        SYSTools.clear(qProcessMap);
+//        SYSTools.clear(elementMap);
         SYSTools.clear(processList);
     }
 
     @Override
-    public void switchResident(Resident resident) {
-        this.resident = resident;
+    public void switchResident(Resident res) {
+        this.resident = EntityTools.find(Resident.class, res.getRID());
         GUITools.setResidentDisplay(resident);
         processList = QProcessTools.getProcesses4(resident);
         reloadDisplay();
@@ -675,11 +818,11 @@ public class PnlProcess extends NursingRecordsPanel {
     }
 
 
-    private void buildPanel() {
-        buildPanel(true);
-    }
+//    private void buildPanel() {
+//        buildPanel(true);
+//    }
 
-    private void buildPanel(final boolean collapseAll) {
+    private void buildPanel() {
         cpProcess.removeAll();
         cpProcess.setLayout(new JideBoxLayout(cpProcess, JideBoxLayout.Y_AXIS));
         Collections.sort(processList);
@@ -687,13 +830,13 @@ public class PnlProcess extends NursingRecordsPanel {
         for (QProcess process : processList) {
             if (tbClosed.isSelected() || !process.isClosed()) {
                 empty = false;
-                CollapsiblePane cp = qProcessMap.get(process);
+                CollapsiblePane cp = mapCP.get(process.hashCode());
                 cpProcess.add(cp);
-                try {
-                    cp.setCollapsed(collapseAll);
-                } catch (PropertyVetoException e) {
-
-                }
+//                try {
+//                    cp.setCollapsed(collapseAll);
+//                } catch (PropertyVetoException e) {
+//
+//                }
             }
         }
         if (empty) {
@@ -724,7 +867,7 @@ public class PnlProcess extends NursingRecordsPanel {
                     new DlgProcess(new QProcess(resident), new Closure() {
                         @Override
                         public void execute(Object o) {
-                            if (!resident.isActive()) {
+                            if (resident != null && !resident.isActive()) {
                                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.cantChangeInactiveResident"));
                                 return;
                             }
@@ -735,7 +878,8 @@ public class PnlProcess extends NursingRecordsPanel {
                                     QProcess qProcess = em.merge((QProcess) o);
                                     em.getTransaction().commit();
                                     processList.add(qProcess);
-                                    qProcessMap.put(qProcess, createCP4(qProcess));
+                                    Collections.sort(processList);
+                                    createCP4(qProcess);
                                     buildPanel();
                                 } catch (Exception e) {
                                     em.getTransaction().rollback();
@@ -748,7 +892,7 @@ public class PnlProcess extends NursingRecordsPanel {
                 }
             });
             list.add(btnAdd);
-            btnAdd.setEnabled(resident.isActive());
+            btnAdd.setEnabled(resident == null || resident.isActive());
         }
 
         return list;
@@ -756,102 +900,6 @@ public class PnlProcess extends NursingRecordsPanel {
 
     private JPanel getMenu(final QProcess qProcess) {
         final JPanel pnlMenu = new JPanel(new VerticalLayout());
-
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
-
-            /***
-             *      _     _            _       _     _ ____  ____                       _
-             *     | |__ | |_ _ __    / \   __| | __| |  _ \|  _ \ ___ _ __   ___  _ __| |_
-             *     | '_ \| __| '_ \  / _ \ / _` |/ _` | |_) | |_) / _ \ '_ \ / _ \| '__| __|
-             *     | |_) | |_| | | |/ ___ \ (_| | (_| |  __/|  _ <  __/ |_) | (_) | |  | |_
-             *     |_.__/ \__|_| |_/_/   \_\__,_|\__,_|_|   |_| \_\___| .__/ \___/|_|   \__|
-             *                                                        |_|
-             */
-            final JButton btnAddPReport = GUITools.createHyperlinkButton(internalClassID + ".btnaddpreport.tooltip", SYSConst.icon22add, null);
-            btnAddPReport.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnAddPReport.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    final JidePopup popup = new JidePopup();
-                    popup.setMovable(false);
-                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.PAGE_AXIS));
-                    final JButton btnSave = new JButton(SYSConst.icon22apply);
-                    final JTextArea editor = new JTextArea("", 10, 40);
-                    btnSave.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent evt) {
-
-                            if (editor.getText().trim().isEmpty()) {
-                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.emptyentry")));
-                                return;
-                            }
-
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
-                                QProcess myProcess = em.merge(qProcess);
-                                if (!myProcess.isCommon()) {
-                                    em.lock(em.merge(myProcess.getResident()), LockModeType.OPTIMISTIC);
-                                }
-                                em.lock(myProcess, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                                PReport pReport = em.merge(new PReport(editor.getText().trim(), PReportTools.PREPORT_TYPE_USER, myProcess));
-                                myProcess.getPReports().add(pReport);
-
-                                em.getTransaction().commit();
-
-                                qProcessMap.remove(qProcess);
-                                qProcessMap.put(myProcess, createCP4(myProcess));
-                                try {
-                                    qProcessMap.get(myProcess).setCollapsed(false);
-                                } catch (PropertyVetoException e) {
-
-                                }
-                                buildPanel();
-                            } catch (OptimisticLockException ole) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            } catch (Exception e) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
-                            }
-                        }
-                    });
-
-                    editor.setLineWrap(true);
-                    editor.setWrapStyleWord(true);
-                    editor.setEditable(true);
-                    JScrollPane jspEditor = new JScrollPane(editor);
-                    JPanel pnl = new JPanel(new BorderLayout(10, 10));
-
-                    pnl.add(jspEditor, BorderLayout.CENTER);
-                    JPanel buttonPanel = new JPanel();
-                    buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
-                    buttonPanel.add(btnSave);
-                    pnl.setBorder(new EmptyBorder(10, 10, 10, 10));
-                    pnl.add(buttonPanel, BorderLayout.SOUTH);
-
-                    popup.setOwner(btnAddPReport);
-                    popup.getContentPane().add(pnl);
-
-                    popup.setDefaultFocusComponent(editor);
-                    GUITools.showPopup(popup, SwingUtilities.WEST);
-                }
-            });
-            btnAddPReport.setEnabled(!qProcess.isClosed());
-            pnlMenu.add(btnAddPReport);
-
-        }
-
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             if (!qProcess.isClosed()) {
@@ -889,9 +937,8 @@ public class PnlProcess extends NursingRecordsPanel {
                                         em.getTransaction().commit();
                                         processList.remove(qProcess);
                                         processList.add(myProcess);
-//                                        Collections.sort(processList);
-                                        qProcessMap.remove(qProcess);
-                                        qProcessMap.put(myProcess, createCP4(myProcess));
+                                        mapCP.remove(qProcess.hashCode());
+                                        createCP4(myProcess);
                                         buildPanel();
                                     } catch (OptimisticLockException ole) {
                                         if (em.getTransaction().isActive()) {
@@ -951,9 +998,8 @@ public class PnlProcess extends NursingRecordsPanel {
                                         processList.remove(qProcess);
                                         myProcess.setOwner(em.merge(OPDE.getLogin().getUser()));
                                         processList.add(myProcess);
-//                                        Collections.sort(processList);
-                                        qProcessMap.remove(qProcess);
-                                        qProcessMap.put(myProcess, createCP4(myProcess));
+                                        mapCP.remove(qProcess.hashCode());
+                                        createCP4(myProcess);
                                         buildPanel();
                                     } catch (OptimisticLockException ole) {
                                         if (em.getTransaction().isActive()) {
@@ -1032,7 +1078,7 @@ public class PnlProcess extends NursingRecordsPanel {
 
                                     em.getTransaction().commit();
                                     processList.remove(qProcess);
-                                    qProcessMap.remove(qProcess);
+                                    mapCP.remove(qProcess.hashCode());
                                     buildPanel();
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
@@ -1101,15 +1147,13 @@ public class PnlProcess extends NursingRecordsPanel {
                                 myProcess.setRevision(editor.getDate());
                                 myProcess.getPReports().add(pReport);
                                 em.getTransaction().commit();
-                                qProcessMap.remove(qProcess);
+
                                 processList.remove(qProcess);
                                 processList.add(myProcess);
-                                qProcessMap.put(myProcess, createCP4(myProcess));
-                                try {
-                                    qProcessMap.get(myProcess).setCollapsed(false);
-                                } catch (PropertyVetoException e) {
 
-                                }
+                                mapCP.remove(qProcess.hashCode());
+                                createCP4(myProcess);
+
                                 buildPanel();
                             } catch (OptimisticLockException ole) {
                                 if (em.getTransaction().isActive()) {
@@ -1199,9 +1243,10 @@ public class PnlProcess extends NursingRecordsPanel {
 
                                     processList.remove(qProcess);
                                     processList.add(myProcess);
-//                                    Collections.sort(processList);
-                                    qProcessMap.remove(qProcess);
-                                    qProcessMap.put(myProcess, createCP4(myProcess));
+                                    Collections.sort(processList);
+
+                                    mapCP.remove(qProcess.hashCode());
+                                    createCP4(myProcess);
                                     buildPanel();
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
@@ -1276,9 +1321,10 @@ public class PnlProcess extends NursingRecordsPanel {
                                         em.getTransaction().commit();
                                         processList.remove(qProcess);
                                         processList.add(myProcess);
-//                                        Collections.sort(processList);
-                                        qProcessMap.remove(qProcess);
-                                        qProcessMap.put(myProcess, createCP4(myProcess));
+                                        Collections.sort(processList);
+
+                                        mapCP.remove(qProcess.hashCode());
+                                        createCP4(myProcess);
                                         buildPanel();
                                     } catch (OptimisticLockException ole) {
                                         if (em.getTransaction().isActive()) {

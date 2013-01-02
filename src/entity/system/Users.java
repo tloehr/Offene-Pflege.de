@@ -160,12 +160,12 @@ public class Users implements Serializable, Comparable<Users> {
         this.eMail = eMail;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (uid != null ? uid.hashCode() : 0);
-        return hash;
-    }
+//    @Override
+//    public int hashCode() {
+//        int hash = 0;
+//        hash += (uid != null ? uid.hashCode() : 0);
+//        return hash;
+//    }
 
     public Collection<Groups> getGroups() {
         return groups;
@@ -189,18 +189,51 @@ public class Users implements Serializable, Comparable<Users> {
         return toString().compareTo(o.toString());
     }
 
-    @Override
-    public boolean equals(Object object) {
+//    @Override
+//    public boolean equals(Object object) {
+//
+//        if (!(object instanceof Users)) {
+//            return false;
+//        }
+//        Users other = (Users) object;
+//        if ((this.uid == null && other.uid != null) || (this.uid != null && !this.uid.equals(other.uid))) {
+//            return false;
+//        }
+//        return true;
+//    }
 
-        if (!(object instanceof Users)) {
-            return false;
-        }
-        Users other = (Users) object;
-        if ((this.uid == null && other.uid != null) || (this.uid != null && !this.uid.equals(other.uid))) {
-            return false;
-        }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Users users = (Users) o;
+
+        if (eMail != null ? !eMail.equals(users.eMail) : users.eMail != null) return false;
+        if (logins != null ? !logins.equals(users.logins) : users.logins != null) return false;
+        if (md5pw != null ? !md5pw.equals(users.md5pw) : users.md5pw != null) return false;
+        if (nachname != null ? !nachname.equals(users.nachname) : users.nachname != null) return false;
+        if (status != null ? !status.equals(users.status) : users.status != null) return false;
+        if (version != null ? !version.equals(users.version) : users.version != null) return false;
+        if (vorname != null ? !vorname.equals(users.vorname) : users.vorname != null) return false;
+
         return true;
     }
+
+    @Override
+    public int hashCode() {
+        int result = uid != null ? uid.hashCode() : 0;
+        result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (vorname != null ? vorname.hashCode() : 0);
+        result = 31 * result + (nachname != null ? nachname.hashCode() : 0);
+        result = 31 * result + (status != null ? status.hashCode() : 0);
+        result = 31 * result + (md5pw != null ? md5pw.hashCode() : 0);
+        result = 31 * result + (eMail != null ? eMail.hashCode() : 0);
+        return result;
+    }
+
+
 
     @Override
     public String toString() {

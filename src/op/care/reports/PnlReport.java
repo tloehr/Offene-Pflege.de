@@ -268,8 +268,11 @@ public class PnlReport extends NursingRecordsPanel {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
                 if (initPhase || itemEvent.getStateChange() != ItemEvent.SELECTED) return;
-//                SYSPropsTools.storeState(internalClassID + ":cmbTags", cmbTags);
-                reloadDisplay();
+//                reloadDisplay();
+
+
+                SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Tags(resident, (NReportTAGS) cmbTags.getSelectedItem()), false, true, null, null), true);
+
             }
         });
         list.add(cmbTags);
@@ -299,18 +302,18 @@ public class PnlReport extends NursingRecordsPanel {
         list.add(tbShowReplaced);
         tbShowReplaced.setHorizontalAlignment(SwingConstants.LEFT);
 
-        JideButton resetButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.resetFilter"), SYSConst.icon22undo, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                initPhase = true;
-                cmbTags.setSelectedIndex(0);
-                tbShowReplaced.setSelected(false);
-                txtSearch.setText(null);
-                initPhase = false;
-                reloadDisplay();
-            }
-        });
-        list.add(resetButton);
+//        JideButton resetButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.resetFilter"), SYSConst.icon22undo, new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent actionEvent) {
+//                initPhase = true;
+//                cmbTags.setSelectedIndex(0);
+//                tbShowReplaced.setSelected(false);
+//                txtSearch.setText(null);
+//                initPhase = false;
+//                reloadDisplay();
+//            }
+//        });
+//        list.add(resetButton);
 
         return list;
     }
@@ -872,11 +875,13 @@ public class PnlReport extends NursingRecordsPanel {
         final JPanel dayPanel = new JPanel(new VerticalLayout());
         dayPanel.setOpaque(false);
         if (!valuecache.containsKey(key)) {
-            if (cmbTags.getSelectedIndex() > 0) {
-                valuecache.put(key, NReportTools.getNReports4Tags(resident, day, (NReportTAGS) cmbTags.getSelectedItem()));
-            } else {
-                valuecache.put(key, NReportTools.getNReports4Day(resident, day));
-            }
+//            if (cmbTags.getSelectedIndex() > 0) {
+//                valuecache.put(key, NReportTools.getNReports4Tags(resident, day, (NReportTAGS) cmbTags.getSelectedItem()));
+//            } else {
+//                valuecache.put(key, NReportTools.getNReports4Day(resident, day));
+//            }
+
+            valuecache.put(key, NReportTools.getNReports4Day(resident, day));
         }
 
         int i = 0; // for zebra pattern

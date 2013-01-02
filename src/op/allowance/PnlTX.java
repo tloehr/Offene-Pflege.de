@@ -235,7 +235,6 @@ public class PnlTX extends JPanel {
         txtDate.setText(DateFormat.getDateInstance().format(tx.getDate()));
         txtCash.setText(cf.format(tx.getAmount()));
         txtText.setText(tx.getText());
-        cmbResident.setModel(SYSTools.list2cmb(ResidentTools.getAllActive()));
         txtText.setText(OPDE.lang.getString(internalClassID + ".txtText"));
 
 //        Vector<Component> traversalOrder = new Vector<Component>();
@@ -246,8 +245,12 @@ public class PnlTX extends JPanel {
 //        setFocusTraversalPolicy(new MyOwnFocusTraversalPolicy(traversalOrder));
 
         if (tx.getResident() != null) {
-            cmbResident.setSelectedItem(tx.getResident());
+            cmbResident.setModel(new DefaultComboBoxModel(new Resident[]{tx.getResident()}));
+//            cmbResident.setSelectedItem(tx.getResident());
             cmbResident.setEnabled(false);
+        } else {
+            cmbResident.setModel(SYSTools.list2cmb(ResidentTools.getAllActive()));
+            cmbResident.setEnabled(true);
         }
 
         ResInfo firstStay = ResInfoTools.getFirstResinfo(tx.getResident(), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));

@@ -20,8 +20,6 @@ import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.joda.time.Days;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -66,23 +64,18 @@ public class QProcessTools {
     }
 
     public static void removeElementFromProcess(EntityManager em, QProcessElement element, QProcess qProcess) {
-        String elementBezeichnung = "";
+
         Query query = null;
         if (element instanceof NReport) {
             query = em.createQuery("SELECT s FROM SYSNR2PROCESS s WHERE s.nreport = :element AND s.qProcess = :process AND s.qProcess.to = '9999-12-31 23:59:59'");
-            elementBezeichnung = "SYSNR2PROCESS";
         } else if (element instanceof ResValue) {
-            query = em.createQuery("SELECT s FROM SYSVAL2PROCESS s WHERE s.resValue = :element AND s.vorgang = :process AND s.vorgang.to = '9999-12-31 23:59:59'");
-            elementBezeichnung = "SYSVAL2PROCESS";
+            query = em.createQuery("SELECT s FROM SYSVAL2PROCESS s WHERE s.resValue = :element AND s.qProcess = :process AND s.qProcess.to = '9999-12-31 23:59:59'");
         } else if (element instanceof Prescription) {
             query = em.createQuery("SELECT s FROM SYSPRE2PROCESS s WHERE s.prescription = :element AND s.qProcess = :process AND s.qProcess.to = '9999-12-31 23:59:59'");
-            elementBezeichnung = "SYSPRE2PROCESS";
         } else if (element instanceof ResInfo) {
-            query = em.createQuery("SELECT s FROM SYSINF2PROCESS s WHERE s.bwinfo = :element AND s.vorgang = :process AND s.vorgang.to = '9999-12-31 23:59:59'");
-            elementBezeichnung = "SYSINF2PROCESS";
+            query = em.createQuery("SELECT s FROM SYSINF2PROCESS s WHERE s.bwinfo = :element AND s.qProcess = :process AND s.qProcess.to = '9999-12-31 23:59:59'");
         } else if (element instanceof NursingProcess) {
             query = em.createQuery("SELECT s FROM SYSNP2PROCESS s WHERE s.nursingProcess = :element AND s.qProcess = :process AND s.qProcess.to = '9999-12-31 23:59:59'");
-            elementBezeichnung = "SYSNP2PROCESS";
         } else {
 
         }
@@ -91,11 +84,46 @@ public class QProcessTools {
         query.setParameter("process", qProcess);
 
         Object connectionObject = query.getSingleResult();
+
+//        if (element instanceof NReport) {
+//            ((NReport) element).getAttachedQProcessConnections().remove(connectionObject);
+//        } else if (element instanceof ResValue) {
+//            ((ResValue) element).getAttachedProcessConnections().remove(connectionObject);
+//        } else if (element instanceof Prescription) {
+//            ((Prescription) element).getAttachedProcessConnections().remove(connectionObject);
+//        } else if (element instanceof ResInfo) {
+//            ((ResInfo) element).getAttachedQProcessConnections().remove(connectionObject);
+//        } else if (element instanceof NursingProcess) {
+//            ((NursingProcess) element).getAttachedQProcessConnections().remove(connectionObject);
+//        } else {
+//
+//        }
+
+        qProcess.removeElement(element, connectionObject);
+
         em.remove(connectionObject);
-        qProcess.removeElement(element);
 
-        qProcess.getPReports().add(em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + elementBezeichnung + " ID: " + element.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, qProcess)));
+        qProcess.getPReports().add(em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + QProcessTools.getNameOfElement(element) + " ID: " + element.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, qProcess)));
 
+    }
+
+    public static String getNameOfElement(QProcessElement element) {
+        String elementBezeichnung = "";
+
+        if (element instanceof NReport) {
+            elementBezeichnung = "SYSNR2PROCESS";
+        } else if (element instanceof ResValue) {
+            elementBezeichnung = "SYSVAL2PROCESS";
+        } else if (element instanceof Prescription) {
+            elementBezeichnung = "SYSPRE2PROCESS";
+        } else if (element instanceof ResInfo) {
+            elementBezeichnung = "SYSINF2PROCESS";
+        } else if (element instanceof NursingProcess) {
+            elementBezeichnung = "SYSNP2PROCESS";
+        } else {
+
+        }
+        return elementBezeichnung;
     }
 
     public static String getAsHTML(QProcess qProcess) {
@@ -122,9 +150,9 @@ public class QProcessTools {
         } else if (qProcess.isRevisionDue()) {
             html += "<font " + SYSConst.html_gold7 + ">";
         } else if (qProcess.isClosed()) {
-             html += "<font " + SYSConst.grey80 + ">";
+            html += "<font " + SYSConst.grey80 + ">";
         } else {
-             html += "<font " + SYSConst.html_darkgreen + ">";
+            html += "<font " + SYSConst.html_darkgreen + ">";
         }
 //
 //        if (revision.isAfterNow()) {

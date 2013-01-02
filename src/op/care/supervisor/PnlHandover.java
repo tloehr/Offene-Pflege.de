@@ -897,6 +897,7 @@ public class PnlHandover extends NursingRecordsPanel {
                                         Collections.sort(cacheHO.get(key));
                                     }
 
+                                    // TODO: Bei einer Neueingabe erscheint nichts in der bestehenden Liste.
                                     createCP4Day(day);
                                     contentmap.remove(key);
 
@@ -949,7 +950,7 @@ public class PnlHandover extends NursingRecordsPanel {
         });
         list.add(btnControllingToday);
 
-        final JideButton btnControllingYesterday = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".tooltips.btnControllingToday"), SYSConst.icon22magnify1, null);
+        final JideButton btnControllingYesterday = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".tooltips.btnControllingYesterday"), SYSConst.icon22magnify1, null);
         btnControllingYesterday.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {

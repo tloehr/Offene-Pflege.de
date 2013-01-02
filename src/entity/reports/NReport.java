@@ -287,12 +287,45 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         this.user = user;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        NReport nReport = (NReport) o;
+
+        if (minutes != nReport.minutes) return false;
+//        if (editedBy != null ? !editedBy.equals(nReport.editedBy) : nReport.editedBy != null) return false;
+        if (editpit != null ? !editpit.equals(nReport.editpit) : nReport.editpit != null) return false;
+        if (pbid != null ? !pbid.equals(nReport.pbid) : nReport.pbid != null) return false;
+        if (pit != null ? !pit.equals(nReport.pit) : nReport.pit != null) return false;
+//        if (replacedBy != null ? !replacedBy.equals(nReport.replacedBy) : nReport.replacedBy != null) return false;
+//        if (replacementFor != null ? !replacementFor.equals(nReport.replacementFor) : nReport.replacementFor != null)
+//            return false;
+        if (resident != null ? !resident.equals(nReport.resident) : nReport.resident != null) return false;
+        if (tags != null ? !tags.equals(nReport.tags) : nReport.tags != null) return false;
+        if (text != null ? !text.equals(nReport.text) : nReport.text != null) return false;
+        if (user != null ? !user.equals(nReport.user) : nReport.user != null) return false;
+        if (version != null ? !version.equals(nReport.version) : nReport.version != null) return false;
+
+        return true;
+    }
 
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (pbid != null ? pbid.hashCode() : 0);
-        return hash;
+        int result = pbid != null ? pbid.hashCode() : 0;
+        result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (pit != null ? pit.hashCode() : 0);
+        result = 31 * result + (editpit != null ? editpit.hashCode() : 0);
+        result = 31 * result + (text != null ? text.hashCode() : 0);
+        result = 31 * result + minutes;
+        result = 31 * result + (user != null ? user.hashCode() : 0);
+        result = 31 * result + (resident != null ? resident.hashCode() : 0);
+//        result = 31 * result + (editedBy != null ? editedBy.hashCode() : 0);
+//        result = 31 * result + (replacedBy != null ? replacedBy.hashCode() : 0);
+//        result = 31 * result + (replacementFor != null ? replacementFor.hashCode() : 0);
+        result = 31 * result + (tags != null ? tags.hashCode() : 0);
+        return result;
     }
 
     @Override
@@ -310,18 +343,6 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         return pbid;
     }
 
-    @Override
-    public boolean equals(Object object) {
-
-        if (!(object instanceof NReport)) {
-            return false;
-        }
-        NReport other = (NReport) object;
-        if ((this.pbid == null && other.pbid != null) || (this.pbid != null && !this.pbid.equals(other.pbid))) {
-            return false;
-        }
-        return true;
-    }
 
     @Override
     public String toString() {

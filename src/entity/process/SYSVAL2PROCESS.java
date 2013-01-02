@@ -29,7 +29,7 @@ public class SYSVAL2PROCESS {
 
     @ManyToOne
     @JoinColumn(name = "VorgangID", referencedColumnName = "VorgangID")
-    private QProcess vorgang;
+    private QProcess qProcess;
 
     @ManyToOne
     @JoinColumn(name = "BWID", referencedColumnName = "BWID")
@@ -38,13 +38,13 @@ public class SYSVAL2PROCESS {
     protected SYSVAL2PROCESS() {
     }
 
-    public SYSVAL2PROCESS(QProcess vorgang, ResValue resValue) {
-        this.vorgang = vorgang;
+    public SYSVAL2PROCESS(QProcess qProcess, ResValue resValue) {
+        this.qProcess = qProcess;
         this.resValue = resValue;
     }
 
     public QProcess getQProcess() {
-        return vorgang;
+        return qProcess;
     }
 
     public ResValue getResValue() {

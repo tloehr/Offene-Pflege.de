@@ -154,7 +154,7 @@ public class DisplayManager extends Thread {
         });
     }
 
-     public void setIconDiabetes(final String tooltip) {
+    public void setIconDiabetes(final String tooltip) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -238,16 +238,16 @@ public class DisplayManager extends Thread {
         DisplayMessage nextMessage = messageQ.isEmpty() ? null : messageQ.get(0);
 
         if (nextMessage != null) {
-            pbIntermediateZyklen = 0;
-            messageQ.remove(0); // remove head
-            currentSubMessage = nextMessage;
-            currentSubMessage.setProcessed(System.currentTimeMillis());
-            lblSub.setText(currentSubMessage.getMessage());
-//            lblMain.setToolTipText(SYSTools.toHTML(SYSConst.html_div_open + "<b>" + OPDE.lang.getString(internalClassID + ".lastmessage") + ":&nbsp;</b><p>" + DateFormat.getDateTimeInstance().format(new Date()) + "</p><p>" + currentSubMessage.getRawMessage() + "</p>" + SYSConst.html_div_close));
-            if (currentSubMessage.getPriority() == DisplayMessage.IMMEDIATELY) {
-                SyslogTools.addLog("[" + currentSubMessage.getClassname() + "] " + currentSubMessage.getMessage(), SyslogTools.ERROR);
+            if (currentSubMessage == null || nextMessage.getPriority() == DisplayMessage.IMMEDIATELY || currentSubMessage.isObsolete()) {
+                pbIntermediateZyklen = 0;
+                messageQ.remove(0); // remove head
+                currentSubMessage = nextMessage;
+                currentSubMessage.setProcessed(System.currentTimeMillis());
+                lblSub.setText(currentSubMessage.getMessage());
+                if (currentSubMessage.getPriority() == DisplayMessage.IMMEDIATELY) {
+                    SyslogTools.addLog("[" + currentSubMessage.getClassname() + "] " + currentSubMessage.getMessage(), SyslogTools.ERROR);
+                }
             }
-
         } else {
             pbIntermediateZyklen++;
             if (currentSubMessage == null || currentSubMessage.isObsolete()) {

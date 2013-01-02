@@ -410,6 +410,106 @@ public class PnlAllowance extends CleanablePanel {
         JPanel pnlContent = new JPanel(new VerticalLayout());
         Pair<Date, Date> minmax = AllowanceTools.getMinMax(resident);
 
+
+        /***
+         *      _____       _              _______  __
+         *     | ____|_ __ | |_ ___ _ __  |_   _\ \/ /___
+         *     |  _| | '_ \| __/ _ \ '__|   | |  \  // __|
+         *     | |___| | | | ||  __/ |      | |  /  \\__ \
+         *     |_____|_| |_|\__\___|_|      |_| /_/\_\___/
+         *
+         */
+        final JidePopup popupTX = new JidePopup();
+        popupTX.setMovable(false);
+        PnlTX pnlTX = new PnlTX(new Allowance(resident), new Closure() {
+            @Override
+            public void execute(Object o) {
+                OPDE.debug(o);
+                if (o != null) {
+
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        final Allowance myAllowance = em.merge((Allowance) o);
+                        em.lock(em.merge(myAllowance.getResident()), LockModeType.OPTIMISTIC);
+                        em.getTransaction().commit();
+
+                        DateTime txDate = new DateTime(myAllowance.getDate());
+
+                        final String keyResident = myAllowance.getResident().getRID();
+                        final String keyYear = myAllowance.getResident().getRID() + "-" + txDate.getYear();
+                        final String keyMonth = myAllowance.getResident().getRID() + "-" + txDate.getYear() + "-" + txDate.getMonthOfYear();
+
+                        if (!lstResidents.contains(myAllowance.getResident())) {
+                            lstResidents.add(myAllowance.getResident());
+                            Collections.sort(lstResidents);
+                        }
+
+                        if (!cashmap.containsKey(keyMonth)) {
+                            cashmap.put(keyMonth, AllowanceTools.getMonth(myAllowance.getResident(), myAllowance.getDate()));
+                        } else {
+                            cashmap.get(keyMonth).add(myAllowance);
+                            Collections.sort(cashmap.get(keyMonth));
+                        }
+
+                        contentmap.remove(keyMonth);
+
+                        createCP4(myAllowance.getResident());
+
+                        try {
+                            cpMap.get(keyResident).setCollapsed(false);
+                            cpMap.get(keyYear).setCollapsed(false);
+                            cpMap.get(keyMonth).setCollapsed(false);
+                        } catch (PropertyVetoException e) {
+                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                        }
+
+                        buildPanel();
+
+                        GUITools.scroll2show(jspCash, cpMap.get(keyMonth), cpsCash, new Closure() {
+                            @Override
+                            public void execute(Object o) {
+                                GUITools.flashBackground(linemap.get(myAllowance), Color.YELLOW, 2);
+                            }
+                        });
+
+                    } catch (OptimisticLockException ole) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    } catch (Exception e) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                    }
+
+                }
+            }
+        });
+        popupTX.setContentPane(pnlTX);
+        popupTX.removeExcludedComponent(pnlTX);
+        popupTX.setDefaultFocusComponent(pnlTX);
+
+        final JideButton btnNewTX = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".enterTXs"), SYSConst.icon22add, null);
+        btnNewTX.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                popupTX.setOwner(btnNewTX);
+                GUITools.showPopup(popupTX, SwingConstants.NORTH_EAST);
+            }
+        });
+        btnNewTX.setBackground(getBG(resident, 9));
+        btnNewTX.setOpaque(true);
+        pnlContent.add(btnNewTX);
+
         if (minmax != null) {
             DateMidnight start = new DateMidnight(minmax.getFirst()).dayOfMonth().withMinimumValue();
             DateMidnight end = resident.isActive() ? new DateMidnight() : new DateMidnight(minmax.getSecond()).dayOfMonth().withMinimumValue();
@@ -878,7 +978,7 @@ public class PnlAllowance extends CleanablePanel {
         });
         list.add(btnAllActiveResidents);
 
-        final JideButton btnAllInactiveResidents = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".showallactiveresidents"), SYSConst.icon22residentInactive, null);
+        final JideButton btnAllInactiveResidents = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".showallinactiveresidents"), SYSConst.icon22residentInactive, null);
         btnAllInactiveResidents.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {

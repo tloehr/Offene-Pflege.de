@@ -87,13 +87,13 @@ public class QProcess implements Serializable, Comparable<QProcess> {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "qProcess")
     private Collection<SYSPRE2PROCESS> attachedPrescriptionConnections;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "qProcess")
     private Collection<SYSINF2PROCESS> attachedResInfoConnections;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "qProcess")
     private Collection<SYSNP2PROCESS> attachedNursingProcesses;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "vorgang")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "qProcess")
     private Collection<SYSVAL2PROCESS> attachedResValueConnections;
 
     // ==
@@ -152,17 +152,17 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         this.pcat = pcat;
     }
 
-    public void removeElement(QProcessElement element) {
+    public void removeElement(QProcessElement element, Object connectionObject) {
         if (element instanceof NReport) {
-            getAttachedNReportConnections().remove(element);
+            getAttachedNReportConnections().remove(connectionObject);
         } else if (element instanceof ResValue) {
-            getAttachedResValueConnections().remove(element);
+            getAttachedResValueConnections().remove(connectionObject);
         } else if (element instanceof Prescription) {
-            getAttachedPrescriptionConnections().remove(element);
+            getAttachedPrescriptionConnections().remove(connectionObject);
         } else if (element instanceof ResInfo) {
-            getAttachedResInfoConnections().remove(element);
+            getAttachedResInfoConnections().remove(connectionObject);
         } else if (element instanceof NursingProcess) {
-            getAttachedNursingProcessesConnections().remove(element);
+            getAttachedNursingProcessesConnections().remove(connectionObject);
         } else {
 
         }
@@ -293,7 +293,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         Collections.sort(elements, new Comparator<QProcessElement>() {
             @Override
             public int compare(QProcessElement o1, QProcessElement o2) {
-                return new Long(o1.getPITInMillis()).compareTo(o2.getPITInMillis());
+                return new Long(o1.getPITInMillis()).compareTo(o2.getPITInMillis()) * -1;
             }
         });
         return elements;

@@ -344,12 +344,6 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
         return bwinfoid;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (bwinfoid != null ? bwinfoid.hashCode() : 0);
-        return hash;
-    }
 
     @Override
     public int compareTo(ResInfo resInfo) {
@@ -373,18 +367,44 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
     }
 
     @Override
-    public boolean equals(Object object) {
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        if (!(object instanceof ResInfo)) {
-            return false;
-        }
-        ResInfo other = (ResInfo) object;
-        if ((this.bwinfoid == null && other.bwinfoid != null) || (this.bwinfoid != null && !this.bwinfoid.equals(other.bwinfoid))) {
-            return false;
-        }
+        ResInfo resInfo = (ResInfo) o;
+
+        if (bemerkung != null ? !bemerkung.equals(resInfo.bemerkung) : resInfo.bemerkung != null) return false;
+        if (bwinfoid != null ? !bwinfoid.equals(resInfo.bwinfoid) : resInfo.bwinfoid != null) return false;
+        if (bwinfotyp != null ? !bwinfotyp.equals(resInfo.bwinfotyp) : resInfo.bwinfotyp != null) return false;
+        if (from != null ? !from.equals(resInfo.from) : resInfo.from != null) return false;
+        if (html != null ? !html.equals(resInfo.html) : resInfo.html != null) return false;
+        if (properties != null ? !properties.equals(resInfo.properties) : resInfo.properties != null) return false;
+        if (resident != null ? !resident.equals(resInfo.resident) : resInfo.resident != null) return false;
+        if (to != null ? !to.equals(resInfo.to) : resInfo.to != null) return false;
+        if (userOFF != null ? !userOFF.equals(resInfo.userOFF) : resInfo.userOFF != null) return false;
+        if (userON != null ? !userON.equals(resInfo.userON) : resInfo.userON != null) return false;
+        if (version != null ? !version.equals(resInfo.version) : resInfo.version != null) return false;
+        if (xml != null ? !xml.equals(resInfo.xml) : resInfo.xml != null) return false;
+
         return true;
     }
 
+    @Override
+    public int hashCode() {
+        int result = bwinfoid != null ? bwinfoid.hashCode() : 0;
+        result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (from != null ? from.hashCode() : 0);
+        result = 31 * result + (to != null ? to.hashCode() : 0);
+        result = 31 * result + (xml != null ? xml.hashCode() : 0);
+        result = 31 * result + (html != null ? html.hashCode() : 0);
+        result = 31 * result + (properties != null ? properties.hashCode() : 0);
+        result = 31 * result + (bemerkung != null ? bemerkung.hashCode() : 0);
+        result = 31 * result + (bwinfotyp != null ? bwinfotyp.hashCode() : 0);
+        result = 31 * result + (userON != null ? userON.hashCode() : 0);
+        result = 31 * result + (userOFF != null ? userOFF.hashCode() : 0);
+        result = 31 * result + (resident != null ? resident.hashCode() : 0);
+        return result;
+    }
 
     @Override
     public ResInfo clone() {

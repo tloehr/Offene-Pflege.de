@@ -720,9 +720,9 @@ public class NReportTools {
         return list;
     }
 
-    public static ArrayList<NReport> getNReports4Tags(Resident resident, DateMidnight day, NReportTAGS tag) {
-        DateTime from = day.toDateTime();
-        DateTime to = day.plusDays(1).toDateTime().minusSeconds(1);
+    public static ArrayList<NReport> getNReports4Tags(Resident resident, NReportTAGS tag) {
+//        DateTime from = day.toDateTime();
+//        DateTime to = day.plusDays(1).toDateTime().minusSeconds(1);
         EntityManager em = OPDE.createEM();
         ArrayList<NReport> list = null;
 
@@ -732,15 +732,16 @@ public class NReportTools {
                     " FROM NReport nr " +
                     " JOIN nr.tags t " +
                     " WHERE nr.resident = :resident " +
-                    " AND nr.pit >= :from AND nr.pit <= :to AND t = :tag " +
+                    " AND t = :tag " +
+//                    " AND nr.pit >= :from AND nr.pit <= :to  " +
                     " ORDER BY nr.pit ASC ";
 
             Query query = em.createQuery(jpql);
 
             query.setParameter("resident", resident);
             query.setParameter("tag", tag);
-            query.setParameter("from", from.toDate());
-            query.setParameter("to", to.toDate());
+//            query.setParameter("from", from.toDate());
+//            query.setParameter("to", to.toDate());
 
             list = new ArrayList<NReport>(query.getResultList());
 

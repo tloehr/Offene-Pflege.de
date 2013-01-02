@@ -306,26 +306,69 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
         return list;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        NursingProcess that = (NursingProcess) o;
+
+        if (npseries != that.npseries) return false;
+        if (category != null ? !category.equals(that.category) : that.category != null) return false;
+        if (from != null ? !from.equals(that.from) : that.from != null) return false;
+        if (goal != null ? !goal.equals(that.goal) : that.goal != null) return false;
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (nextEval != null ? !nextEval.equals(that.nextEval) : that.nextEval != null) return false;
+        if (npControls != null ? !npControls.equals(that.npControls) : that.npControls != null) return false;
+        if (resident != null ? !resident.equals(that.resident) : that.resident != null) return false;
+        if (situation != null ? !situation.equals(that.situation) : that.situation != null) return false;
+        if (to != null ? !to.equals(that.to) : that.to != null) return false;
+        if (topic != null ? !topic.equals(that.topic) : that.topic != null) return false;
+        if (userOFF != null ? !userOFF.equals(that.userOFF) : that.userOFF != null) return false;
+        if (userON != null ? !userON.equals(that.userON) : that.userON != null) return false;
+        if (version != null ? !version.equals(that.version) : that.version != null) return false;
+
+        return true;
+    }
 
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (topic != null ? topic.hashCode() : 0);
+        result = 31 * result + (situation != null ? situation.hashCode() : 0);
+        result = 31 * result + (goal != null ? goal.hashCode() : 0);
+        result = 31 * result + (from != null ? from.hashCode() : 0);
+        result = 31 * result + (to != null ? to.hashCode() : 0);
+        result = 31 * result + (int) (npseries ^ (npseries >>> 32));
+        result = 31 * result + (nextEval != null ? nextEval.hashCode() : 0);
+        result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (userON != null ? userON.hashCode() : 0);
+        result = 31 * result + (userOFF != null ? userOFF.hashCode() : 0);
+        result = 31 * result + (resident != null ? resident.hashCode() : 0);
+        result = 31 * result + (category != null ? category.hashCode() : 0);
+        result = 31 * result + (npControls != null ? npControls.hashCode() : 0);
+        return result;
     }
 
-    @Override
-    public boolean equals(Object object) {
-
-        if (!(object instanceof NursingProcess)) {
-            return false;
-        }
-        NursingProcess other = (NursingProcess) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
+    //    @Override
+//    public int hashCode() {
+//        int hash = 0;
+//        hash += (id != null ? id.hashCode() : 0);
+//        return hash;
+//    }
+//
+//    @Override
+//    public boolean equals(Object object) {
+//
+//        if (!(object instanceof NursingProcess)) {
+//            return false;
+//        }
+//        NursingProcess other = (NursingProcess) object;
+//        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+//            return false;
+//        }
+//        return true;
+//    }
 
     @Override
     public int compareTo(NursingProcess that) {

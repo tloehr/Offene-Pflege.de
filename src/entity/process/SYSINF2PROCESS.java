@@ -29,7 +29,7 @@ public class SYSINF2PROCESS {
 
     @ManyToOne
     @JoinColumn(name = "VorgangID", referencedColumnName = "VorgangID")
-    private QProcess vorgang;
+    private QProcess qProcess;
 
     @ManyToOne
     @JoinColumn(name = "BWInfoID", referencedColumnName = "BWINFOID")
@@ -38,14 +38,14 @@ public class SYSINF2PROCESS {
     protected SYSINF2PROCESS() {
     }
 
-    public SYSINF2PROCESS(QProcess vorgang, ResInfo bwinfo) {
+    public SYSINF2PROCESS(QProcess qProcess, ResInfo bwinfo) {
         this.id = 0;
-        this.vorgang = vorgang;
+        this.qProcess = qProcess;
         this.bwinfo = bwinfo;
     }
 
     public QProcess getQProcess() {
-        return vorgang;
+        return qProcess;
     }
 
     public ResInfo getResInfo() {
