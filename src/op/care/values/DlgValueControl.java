@@ -40,6 +40,7 @@ public class DlgValueControl extends MyJDialog {
         props = resident.getControlling();
         initComponents();
         initDialog();
+        pack();
         setVisible(true);
     }
 

@@ -64,10 +64,6 @@ public class PnlProcess extends NursingRecordsPanel {
     private CollapsiblePanes searchPanes;
 
     private HashMap<Integer, CollapsiblePane> mapCP;
-//    private HashMap<QProcess, CollapsiblePane> mapProcess2CP;
-//    private HashMap<QProcess, ArrayList<QProcessElement>> qProcess2ElementMap;
-//    private HashMap<QProcess, CollapsiblePane> qProcessMap;
-//    private HashMap<QProcessElement, CollapsiblePane> elementMap;
 
     private List<QProcess> processList;
     private int MAX_TEXT_LENGTH = 65;
@@ -105,7 +101,7 @@ public class PnlProcess extends NursingRecordsPanel {
 
     @Override
     public void reload() {
-        if (resident != null){
+        if (resident != null) {
             switchResident(resident);
         } else {
             processList = QProcessTools.getProcesses4(OPDE.getLogin().getUser());
@@ -191,7 +187,6 @@ public class PnlProcess extends NursingRecordsPanel {
 
         if (!mapCP.containsKey(qProcess.hashCode())) {
             mapCP.put(qProcess.hashCode(), new CollapsiblePane());
-            //            cpMap.get(key).setStyle(CollapsiblePane.PLAIN_STYLE);
             try {
                 mapCP.get(qProcess.hashCode()).setCollapsed(true);
             } catch (PropertyVetoException e) {
@@ -311,11 +306,13 @@ public class PnlProcess extends NursingRecordsPanel {
                 cp.setContentPane(createContentPanel4(qProcess));
                 cp.setOpaque(false);
             }
-        }
-
-        );
+        });
         cp.setBackground(QProcessTools.getBG1(qProcess));
 
+        if (!cp.isCollapsed()) {
+            cp.setContentPane(createContentPanel4(qProcess));
+            cp.setOpaque(false);
+        }
 
         cp.setHorizontalAlignment(SwingConstants.LEADING);
         cp.setOpaque(false);
@@ -386,7 +383,7 @@ public class PnlProcess extends NursingRecordsPanel {
                                 processList.add(myProcess);
                                 Collections.sort(processList);
 
-                                mapCP.remove(qProcess.hashCode());
+//                                mapCP.remove(qProcess.hashCode());
                                 createCP4(myProcess);
 
                                 buildPanel();
@@ -487,6 +484,7 @@ public class PnlProcess extends NursingRecordsPanel {
         btnUnlink.setAlignmentX(Component.RIGHT_ALIGNMENT);
         btnUnlink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnUnlink.setContentAreaFilled(false);
+        btnUnlink.setOpaque(false);
         btnUnlink.setBorder(null);
         btnUnlink.setToolTipText(OPDE.lang.getString(internalClassID + ".btnunlink.tooltip"));
         btnUnlink.addActionListener(new ActionListener() {
@@ -506,9 +504,11 @@ public class PnlProcess extends NursingRecordsPanel {
                                 QProcessElement myElement = em.merge(element);
                                 QProcess myProcess = em.merge(qProcess);
 
+                                em.lock(myProcess, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
                                 if (element instanceof PReport) {
-                                    em.remove(myElement);
                                     myProcess.getPReports().remove(myElement);
+                                    em.remove(myElement);
                                 } else {
                                     QProcessTools.removeElementFromProcess(em, myElement, myProcess);
 
@@ -516,10 +516,10 @@ public class PnlProcess extends NursingRecordsPanel {
                                 em.getTransaction().commit();
 
                                 processList.remove(qProcess);
+                                em.refresh(myProcess);
                                 processList.add(myProcess);
                                 Collections.sort(processList);
 
-                                mapCP.remove(qProcess.hashCode());
                                 createCP4(myProcess);
 
                                 buildPanel();
@@ -788,7 +788,7 @@ public class PnlProcess extends NursingRecordsPanel {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
                 if (initPhase) return;
-                buildPanel();
+                reloadDisplay();
             }
         });
         tbClosed.setHorizontalAlignment(SwingConstants.LEFT);
@@ -808,7 +808,7 @@ public class PnlProcess extends NursingRecordsPanel {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
                 if (initPhase) return;
-                buildPanel();
+                reloadDisplay();
             }
         });
         tbSystem.setHorizontalAlignment(SwingConstants.LEFT);
@@ -936,6 +936,7 @@ public class PnlProcess extends NursingRecordsPanel {
                                         myProcess.getPReports().add(pReport);
                                         em.getTransaction().commit();
                                         processList.remove(qProcess);
+                                        em.refresh(myProcess);
                                         processList.add(myProcess);
                                         mapCP.remove(qProcess.hashCode());
                                         createCP4(myProcess);
@@ -997,6 +998,7 @@ public class PnlProcess extends NursingRecordsPanel {
                                         em.getTransaction().commit();
                                         processList.remove(qProcess);
                                         myProcess.setOwner(em.merge(OPDE.getLogin().getUser()));
+                                        em.refresh(myProcess);
                                         processList.add(myProcess);
                                         mapCP.remove(qProcess.hashCode());
                                         createCP4(myProcess);
@@ -1055,8 +1057,6 @@ public class PnlProcess extends NursingRecordsPanel {
                                     }
                                     em.lock(myProcess, LockModeType.OPTIMISTIC);
 
-                                    em.remove(myProcess);
-
                                     for (PReport report : myProcess.getPReports()) {
                                         em.remove(report);
                                     }
@@ -1075,6 +1075,8 @@ public class PnlProcess extends NursingRecordsPanel {
                                     for (SYSVAL2PROCESS att : myProcess.getAttachedResValueConnections()) {
                                         em.remove(att);
                                     }
+
+                                    em.remove(myProcess);
 
                                     em.getTransaction().commit();
                                     processList.remove(qProcess);
@@ -1149,9 +1151,9 @@ public class PnlProcess extends NursingRecordsPanel {
                                 em.getTransaction().commit();
 
                                 processList.remove(qProcess);
+                                em.refresh(myProcess);
                                 processList.add(myProcess);
 
-                                mapCP.remove(qProcess.hashCode());
                                 createCP4(myProcess);
 
                                 buildPanel();
@@ -1235,17 +1237,19 @@ public class PnlProcess extends NursingRecordsPanel {
                                     if (!myProcess.isCommon()) {
                                         em.lock(em.merge(myProcess.getResident()), LockModeType.OPTIMISTIC);
                                     }
-                                    em.lock(myProcess, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                    em.lock(myProcess, LockModeType.OPTIMISTIC);
+
                                     PReport pReport = em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_SET_OWNERSHIP) + ": " + handOverTo.getFullname(), PReportTools.PREPORT_TYPE_SET_OWNERSHIP, myProcess));
+                                    myProcess.setOwner(handOverTo);
                                     myProcess.getPReports().add(pReport);
-                                    myProcess.setOwner(em.merge(handOverTo));
                                     em.getTransaction().commit();
 
                                     processList.remove(qProcess);
+                                    em.refresh(myProcess);
                                     processList.add(myProcess);
+
                                     Collections.sort(processList);
 
-                                    mapCP.remove(qProcess.hashCode());
                                     createCP4(myProcess);
                                     buildPanel();
                                 } catch (OptimisticLockException ole) {
@@ -1314,16 +1318,16 @@ public class PnlProcess extends NursingRecordsPanel {
                                             em.lock(em.merge(myProcess.getResident()), LockModeType.OPTIMISTIC);
                                         }
                                         em.lock(myProcess, LockModeType.OPTIMISTIC);
-                                        PReport pReport = em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_SET_OWNERSHIP) + ": " + OPDE.getLogin().getUser().getFullname(), PReportTools.PREPORT_TYPE_SET_OWNERSHIP, qProcess));
-                                        myProcess.setOwner(em.merge(OPDE.getLogin().getUser()));
+                                        PReport pReport = em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_TAKE_OWNERSHIP) + ": " + OPDE.getLogin().getUser().getFullname(), PReportTools.PREPORT_TYPE_TAKE_OWNERSHIP, myProcess));
                                         myProcess.getPReports().add(pReport);
                                         myProcess.setOwner(em.merge(OPDE.getLogin().getUser()));
                                         em.getTransaction().commit();
                                         processList.remove(qProcess);
+
+                                        em.refresh(myProcess);
                                         processList.add(myProcess);
                                         Collections.sort(processList);
 
-                                        mapCP.remove(qProcess.hashCode());
                                         createCP4(myProcess);
                                         buildPanel();
                                     } catch (OptimisticLockException ole) {

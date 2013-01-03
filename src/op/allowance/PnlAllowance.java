@@ -256,10 +256,8 @@ public class PnlAllowance extends CleanablePanel {
         }
         final CollapsiblePane cpResident = cpMap.get(key);
 
-        JPanel titlePanelleft = new JPanel();
-        titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
         BigDecimal sumOverall = AllowanceTools.getSUM(resident);
-        JideButton btnResident = GUITools.createHyperlinkButton("<html><table border=\"0\">" +
+        String title = "<html><table border=\"0\">" +
                 "<tr>" +
 
                 "<td width=\"520\" align=\"left\"><font size=+1>" + resident.toString() + "</font></td>" +
@@ -271,65 +269,20 @@ public class PnlAllowance extends CleanablePanel {
                 "</table>" +
 
 
-                "</html>", (resident.isActive() ? SYSConst.icon22residentActive : SYSConst.icon22residentInactive), null);
+                "</html>";
+        //, (resident.isActive() ? SYSConst.icon22residentActive : SYSConst.icon22residentInactive), null);
 
-        btnResident.setAlignmentX(Component.LEFT_ALIGNMENT);
-        btnResident.addActionListener(new ActionListener() {
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent actionEvent) {
+            public void actionPerformed(ActionEvent e) {
                 try {
                     cpResident.setCollapsed(!cpResident.isCollapsed());
-                } catch (PropertyVetoException e) {
-                    OPDE.error(e);
+                } catch (PropertyVetoException pve) {
+                    // BAH!
                 }
             }
         });
 
-        titlePanelleft.add(btnResident);
-
-
-        JPanel titlePanelright = new JPanel();
-        titlePanelright.setLayout(new BoxLayout(titlePanelright, BoxLayout.LINE_AXIS));
-
-//        final JButton btnExpandAll = new JButton(SYSConst.icon22expand);
-//        btnExpandAll.setPressedIcon(SYSConst.icon22addPressed);
-//        btnExpandAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
-//        btnExpandAll.setContentAreaFilled(false);
-//        btnExpandAll.setBorder(null);
-//        btnExpandAll.setToolTipText(OPDE.lang.getString("misc.msg.expandall"));
-//        btnExpandAll.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent actionEvent) {
-//                try {
-//                    GUITools.setCollapsed(cpResident, false);
-//                } catch (PropertyVetoException e) {
-//                    // bah!
-//                }
-//            }
-//
-//
-//        });
-//        titlePanelright.add(btnExpandAll);
-//
-//        final JButton btnCollapseAll = new JButton(SYSConst.icon22collapse);
-//        btnCollapseAll.setPressedIcon(SYSConst.icon22addPressed);
-//        btnCollapseAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
-//        btnCollapseAll.setContentAreaFilled(false);
-//        btnCollapseAll.setBorder(null);
-//        btnCollapseAll.setToolTipText(OPDE.lang.getString("misc.msg.collapseall"));
-//        btnCollapseAll.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent actionEvent) {
-//                try {
-//                    GUITools.setCollapsed(cpResident, true);
-//                } catch (PropertyVetoException e) {
-//                    // bah!
-//                }
-//            }
-//
-//
-//        });
-//        titlePanelright.add(btnCollapseAll);
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
             /***
@@ -354,27 +307,10 @@ public class PnlAllowance extends CleanablePanel {
 
 
             });
-            titlePanelright.add(btnPrintResident);
+            cptitle.getRight().add(btnPrintResident);
         }
 
-        titlePanelleft.setOpaque(false);
-        titlePanelright.setOpaque(false);
-        JPanel titlePanel = new JPanel();
-        titlePanel.setOpaque(false);
-
-        titlePanel.setLayout(new GridBagLayout());
-        ((GridBagLayout) titlePanel.getLayout()).columnWidths = new int[]{0, 80};
-        ((GridBagLayout) titlePanel.getLayout()).columnWeights = new double[]{1.0, 1.0};
-
-        titlePanel.add(titlePanelleft, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
-                new Insets(0, 0, 0, 5), 0, 0));
-
-        titlePanel.add(titlePanelright, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-                GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-                new Insets(0, 0, 0, 0), 0, 0));
-
-        cpResident.setTitleLabelComponent(titlePanel);
+        cpResident.setTitleLabelComponent(cptitle.getMain());
         cpResident.setSlidingDirection(SwingConstants.SOUTH);
 
 
@@ -547,13 +483,13 @@ public class PnlAllowance extends CleanablePanel {
             }
 
         }
+
         final CollapsiblePane cpYear = cpMap.get(key);
-        JPanel titlePanelleft = new JPanel();
-        titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
+
         DateTime to = new DateTime(year, 1, 1, 0, 0).dayOfYear().withMaximumValue();
         final BigDecimal carry = AllowanceTools.getSUM(resident, to);
 
-        JideButton btnYear = GUITools.createHyperlinkButton("<html><table border=\"0\">" +
+        String title = "<html><table border=\"0\">" +
                 "<tr>" +
 
                 "<td width=\"520\" align=\"left\"><font size=+1>" + Integer.toString(year) + "</font></td>" +
@@ -567,65 +503,18 @@ public class PnlAllowance extends CleanablePanel {
                 "</table>" +
 
 
-                "</font></html>", null, null);
+                "</font></html>";
 
-        btnYear.setAlignmentX(Component.LEFT_ALIGNMENT);
-        btnYear.addActionListener(new ActionListener() {
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent actionEvent) {
+            public void actionPerformed(ActionEvent e) {
                 try {
                     cpYear.setCollapsed(!cpYear.isCollapsed());
-                } catch (PropertyVetoException e) {
-                    OPDE.error(e);
+                } catch (PropertyVetoException pve) {
+                    // BAH!
                 }
             }
         });
-
-        titlePanelleft.add(btnYear);
-
-        JPanel titlePanelright = new JPanel();
-        titlePanelright.setLayout(new BoxLayout(titlePanelright, BoxLayout.LINE_AXIS));
-
-//        final JButton btnExpandAll = new JButton(SYSConst.icon22expand);
-//        btnExpandAll.setPressedIcon(SYSConst.icon22addPressed);
-//        btnExpandAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
-//        btnExpandAll.setContentAreaFilled(false);
-//        btnExpandAll.setBorder(null);
-//        btnExpandAll.setToolTipText(OPDE.lang.getString("misc.msg.expandall"));
-//        btnExpandAll.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent actionEvent) {
-//                try {
-//                    GUITools.setCollapsed(cpYear, false);
-//                } catch (PropertyVetoException e) {
-//                    // bah!
-//                }
-//            }
-//
-//
-//        });
-//        titlePanelright.add(btnExpandAll);
-//
-//        final JButton btnCollapseAll = new JButton(SYSConst.icon22collapse);
-//        btnCollapseAll.setPressedIcon(SYSConst.icon22addPressed);
-//        btnCollapseAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
-//        btnCollapseAll.setContentAreaFilled(false);
-//        btnCollapseAll.setBorder(null);
-//        btnCollapseAll.setToolTipText(OPDE.lang.getString("misc.msg.collapseall"));
-//        btnCollapseAll.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent actionEvent) {
-//                try {
-//                    GUITools.setCollapsed(cpYear, true);
-//                } catch (PropertyVetoException e) {
-//                    // bah!
-//                }
-//            }
-//
-//
-//        });
-//        titlePanelright.add(btnCollapseAll);
-
 
         /***
          *      ____       _       _ __   __
@@ -649,29 +538,12 @@ public class PnlAllowance extends CleanablePanel {
 
 
         });
-        titlePanelright.add(btnPrintYear);
+        cptitle.getRight().add(btnPrintYear);
 
-
-        titlePanelleft.setOpaque(false);
-        titlePanelright.setOpaque(false);
-        JPanel titlePanel = new JPanel();
-        titlePanel.setOpaque(false);
-
-        titlePanel.setLayout(new GridBagLayout());
-        ((GridBagLayout) titlePanel.getLayout()).columnWidths = new int[]{0, 80};
-        ((GridBagLayout) titlePanel.getLayout()).columnWeights = new double[]{1.0, 1.0};
-
-        titlePanel.add(titlePanelleft, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
-                new Insets(0, 0, 0, 5), 0, 0));
-
-        titlePanel.add(titlePanelright, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-                GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-                new Insets(0, 0, 0, 0), 0, 0));
-
-        cpYear.setTitleLabelComponent(titlePanel);
+        cpYear.setTitleLabelComponent(cptitle.getMain());
         cpYear.setSlidingDirection(SwingConstants.SOUTH);
-
+        cpYear.setBackground(SYSConst.orange1[SYSConst.medium3]);
+        cpYear.setOpaque(true);
 
         /***
          *           _ _      _            _
@@ -740,11 +612,9 @@ public class PnlAllowance extends CleanablePanel {
         }
         final CollapsiblePane cpMonth = cpMap.get(key);
 
-        JPanel titlePanelleft = new JPanel();
-        titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
         final DateTime to = new DateTime(month).dayOfMonth().withMaximumValue();
         final BigDecimal carry = AllowanceTools.getSUM(resident, to);
-        JideButton btnMonth = GUITools.createHyperlinkButton("<html><table border=\"0\">" +
+        String title = "<html><table border=\"0\">" +
                 "<tr>" +
 
                 "<td width=\"520\" align=\"left\">" + monthFormatter.format(month.toDate()) + "</td>" +
@@ -757,65 +627,18 @@ public class PnlAllowance extends CleanablePanel {
                 "</table>" +
 
 
-                "</font></html>", null, null);
+                "</font></html>";
 
-        btnMonth.setAlignmentX(Component.LEFT_ALIGNMENT);
-        btnMonth.addActionListener(new ActionListener() {
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent actionEvent) {
+            public void actionPerformed(ActionEvent e) {
                 try {
                     cpMonth.setCollapsed(!cpMonth.isCollapsed());
-                } catch (PropertyVetoException e) {
-                    OPDE.error(e);
+                } catch (PropertyVetoException pve) {
+                    // BAH!
                 }
             }
         });
-
-        titlePanelleft.add(btnMonth);
-
-        JPanel titlePanelright = new JPanel();
-        titlePanelright.setLayout(new BoxLayout(titlePanelright, BoxLayout.LINE_AXIS));
-
-
-//        final JButton btnExpandAll = new JButton(SYSConst.icon22expand);
-//        btnExpandAll.setPressedIcon(SYSConst.icon22addPressed);
-//        btnExpandAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
-//        btnExpandAll.setContentAreaFilled(false);
-//        btnExpandAll.setBorder(null);
-//        btnExpandAll.setToolTipText(OPDE.lang.getString("misc.msg.expandall"));
-//        btnExpandAll.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent actionEvent) {
-//                try {
-//                    GUITools.setCollapsed(cpMonth, false);
-//                } catch (PropertyVetoException e) {
-//                    // bah!
-//                }
-//            }
-//
-//
-//        });
-//        titlePanelright.add(btnExpandAll);
-//
-//        final JButton btnCollapseAll = new JButton(SYSConst.icon22collapse);
-//        btnCollapseAll.setPressedIcon(SYSConst.icon22addPressed);
-//        btnCollapseAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
-//        btnCollapseAll.setContentAreaFilled(false);
-//        btnCollapseAll.setBorder(null);
-//        btnCollapseAll.setToolTipText(OPDE.lang.getString("misc.msg.collapseall"));
-//        btnCollapseAll.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent actionEvent) {
-//                try {
-//                    GUITools.setCollapsed(cpMonth, true);
-//                } catch (PropertyVetoException e) {
-//                    // bah!
-//                }
-//            }
-//
-//
-//        });
-//        titlePanelright.add(btnCollapseAll);
 
         /***
          *      ____       _       _   __  __             _   _
@@ -834,33 +657,16 @@ public class PnlAllowance extends CleanablePanel {
         btnPrintMonth.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-
                 if (!cashmap.containsKey(key)) {
                     cashmap.put(key, AllowanceTools.getMonth(resident, month.toDate()));
                 }
                 SYSFilesTools.print(AllowanceTools.getAsHTML(cashmap.get(key), carry, currentResident), true);
             }
         });
-        titlePanelright.add(btnPrintMonth);
 
-        titlePanelleft.setOpaque(false);
-        titlePanelright.setOpaque(false);
-        JPanel titlePanel = new JPanel();
-        titlePanel.setOpaque(false);
+        cptitle.getRight().add(btnPrintMonth);
 
-        titlePanel.setLayout(new GridBagLayout());
-        ((GridBagLayout) titlePanel.getLayout()).columnWidths = new int[]{0, 80};
-        ((GridBagLayout) titlePanel.getLayout()).columnWeights = new double[]{1.0, 1.0};
-
-        titlePanel.add(titlePanelleft, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
-                new Insets(0, 0, 0, 5), 0, 0));
-
-        titlePanel.add(titlePanelright, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-                GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-                new Insets(0, 0, 0, 0), 0, 0));
-
-        cpMonth.setTitleLabelComponent(titlePanel);
+        cpMonth.setTitleLabelComponent(cptitle.getMain());
         cpMonth.setSlidingDirection(SwingConstants.SOUTH);
 
         cpMonth.setBackground(getBG(resident, 10));
@@ -1172,30 +978,7 @@ public class PnlAllowance extends CleanablePanel {
 
             for (final Allowance allowance : cashmap.get(key)) {
 
-                JPanel singlePaneLeft = new JPanel();
-                singlePaneLeft.setLayout(new BoxLayout(singlePaneLeft, BoxLayout.LINE_AXIS));
-                JPanel singlePaneRight = new JPanel();
-                singlePaneRight.setLayout(new BoxLayout(singlePaneRight, BoxLayout.LINE_AXIS));
-
-                singlePaneLeft.setOpaque(false);
-                singlePaneRight.setOpaque(false);
-                JPanel singlePaneBoth = new JPanel();
-                singlePaneBoth.setOpaque(false);
-
-                singlePaneBoth.setLayout(new GridBagLayout());
-                ((GridBagLayout) singlePaneBoth.getLayout()).columnWidths = new int[]{0, 80};
-                ((GridBagLayout) singlePaneBoth.getLayout()).columnWeights = new double[]{1.0, 1.0};
-
-                singlePaneBoth.add(singlePaneLeft, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-                        GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
-                        new Insets(0, 0, 0, 5), 0, 0));
-
-                singlePaneBoth.add(singlePaneRight, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-                        GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-                        new Insets(0, 0, 0, 0), 0, 0));
-
-
-                JLabel lblSingle = new JLabel("<html><table border=\"0\">" +
+                String title = "<html><table border=\"0\">" +
                         "<tr>" +
                         "<td width=\"130\" align=\"left\">" + DateFormat.getDateInstance().format(allowance.getDate()) + "</td>" +
                         "<td width=\"400\" align=\"left\">" + allowance.getText() + "</td>" +
@@ -1212,8 +995,14 @@ public class PnlAllowance extends CleanablePanel {
                         "</tr>" +
                         "</table>" +
 
-                        "</font></html>");
-                singlePaneLeft.add(lblSingle);
+                        "</font></html>";
+
+                DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+
+                    }
+                });
 
                 if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
                     /***
@@ -1240,7 +1029,7 @@ public class PnlAllowance extends CleanablePanel {
                             PnlTX pnlTX = new PnlTX(allowance, new Closure() {
                                 @Override
                                 public void execute(Object o) {
-                                    OPDE.debug(o);
+
                                     if (o != null) {
 
                                         EntityManager em = OPDE.createEM();
@@ -1298,7 +1087,7 @@ public class PnlAllowance extends CleanablePanel {
 
                         }
                     });
-                    singlePaneRight.add(btnEdit);
+                    cptitle.getRight().add(btnEdit);
                 }
 
                 if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, internalClassID)) {
@@ -1371,10 +1160,10 @@ public class PnlAllowance extends CleanablePanel {
 
                         }
                     });
-                    singlePaneRight.add(btnDelete);
+                    cptitle.getRight().add(btnDelete);
                 }
-                pnlMonth.add(singlePaneBoth);
-                linemap.put(allowance, singlePaneBoth);
+                pnlMonth.add(cptitle.getMain());
+                linemap.put(allowance, cptitle.getMain());
 
                 rowsum = rowsum.subtract(allowance.getAmount());
             }

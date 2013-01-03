@@ -67,7 +67,7 @@ public class HandoversTools {
                     " WHERE " +
                     " ho.pit >= :from AND ho.pit <= :to " +
                     " AND ho.home = :home " +
-                    " ORDER BY ho.pit ASC ";
+                    " ORDER BY ho.pit DESC ";
 
             Query query = em.createQuery(jpql);
 

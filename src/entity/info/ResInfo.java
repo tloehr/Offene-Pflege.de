@@ -124,7 +124,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
 
         this.properties = "";
         if (resInfoType.getType() == ResInfoTypeTools.TYPE_STAY) {
-            this.properties = "hauf=";
+            this.properties = ResInfoTypeTools.STAY_KEY + "=";
             this.html = "<ul></ul>";
         }
 

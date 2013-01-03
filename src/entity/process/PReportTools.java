@@ -24,12 +24,14 @@ public class PReportTools {
     public static final String PREPORT_TEXT_CREATE = PnlProcess.internalClassID+".preport.text.create";
     public static final short PREPORT_TYPE_CLOSE = 5;
     public static final String PREPORT_TEXT_SET_OWNERSHIP = PnlProcess.internalClassID+".preport.text.setowner";
+    public static final String PREPORT_TEXT_TAKE_OWNERSHIP = PnlProcess.internalClassID+".preport.text.takeowner";
     public static final String PREPORT_TEXT_REOPEN = PnlProcess.internalClassID+".preport.text.reopen";
     public static final String PREPORT_TEXT_CLOSE = PnlProcess.internalClassID+".preport.text.close";
     public static final String PREPORT_TEXT_WV = PnlProcess.internalClassID+".preport.text.revision";
     public static final short PREPORT_TYPE_REOPEN = 6;
     public static final short PREPORT_TYPE_EDIT = 7;
     public static final short PREPORT_TYPE_WV = 8;
+    public static final short PREPORT_TYPE_TAKE_OWNERSHIP = 9;
     public static final String[] PREPORT_TYPES = {"Benutzerbericht", "SYS Zuordnung Element", "SYS Entfernung Element", "SYS Eigentümer geändert", "SYS Vorgang erstellt", "SYS Vorgang geschlossen", "SYS Vorgang wieder geöffnet", "SYS Vorgang bearbeitet", "SYS Wiedervorlage gesetzt"};
     public static final String[] PREPORT_TEXTS = new String[]{"misc.msg.Time.long", "misc.msg.earlyinthemorning.long", "misc.msg.morning.long", "misc.msg.noon.long", "misc.msg.afternoon.long", "misc.msg.evening.long", "misc.msg.lateatnight.long"};
 

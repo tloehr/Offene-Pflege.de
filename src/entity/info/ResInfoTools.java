@@ -262,7 +262,7 @@ public class ResInfoTools {
                             html += "<li><b>" + infonode.getLabel() + "</b></li>";
                         } else {
                             if (!value.equalsIgnoreCase("tnz")) {
-                                OPDE.debug(infonode.getName().equalsIgnoreCase("hauf"));
+                                OPDE.debug(infonode.getName());
                                 if (!infonode.getName().equalsIgnoreCase("hauf") && (infonode.getTagName().equalsIgnoreCase("optiongroup") || infonode.getTagName().equalsIgnoreCase("scalegroup") || infonode.getTagName().equalsIgnoreCase("combobox"))) {
                                     InfoTreeNodeBean thisNode = null;
                                     try {
@@ -500,10 +500,6 @@ public class ResInfoTools {
 
         result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\">";
 
-//        if (print) {
-//            result += "<tr><td valign=\"top\">Gedruckt:</td><td valign=\"top\"><b>" + df.format(new Date()) + " (" + OPDE.getLogin().getUser().getFullname() + ")</b></td></tr>";
-//        }
-
         /***
          *      _____ _            _      _     _
          *     | ____(_)_ __  _ __(_) ___| |__ | |_ _   _ _ __   __ _
@@ -577,7 +573,6 @@ public class ResInfoTools {
          *     |_| |_/_/   \_\___/|_|
          *
          */
-        // TODO: "HAUF" ersetzen
         ResInfo bwinfo_hauf = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
         if (bwinfo_hauf != null) {
             result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.movein") + "</td><td valign=\"top\">";

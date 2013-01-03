@@ -85,19 +85,6 @@ public class AddBWWizard {
         wizard.pack();
     }
 
-//    private Image getLeftGraphic(String iconname) {
-//        JLabel lbl = new JLabel(new ImageIcon(getClass().getResource(iconname)));
-//        lbl.setSize(lbl.getPreferredSize());
-//        lbl.doLayout();
-//        GraphicsConfiguration gfxConfig =
-//                GraphicsEnvironment.getLocalGraphicsEnvironment()
-//                        .getDefaultScreenDevice()
-//                        .getDefaultConfiguration();
-//        BufferedImage image =
-//                gfxConfig.createCompatibleImage(lbl.getWidth(), lbl.getHeight());
-//        lbl.paint(image.getGraphics());
-//        return image;
-//    }
 
     public WizardDialog getWizard() {
         return wizard;
@@ -135,7 +122,6 @@ public class AddBWWizard {
 
         public WelcomePage(String title, String description) {
             super(title, description);
-//            setLeftPaneItems(LEFTPANE_GRAPHIC);
         }
 
         @Override
@@ -357,10 +343,6 @@ public class AddBWWizard {
             fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
 
-//        @Override
-//        public Image getGraphic() {
-//            return getLeftGraphic("/artwork/aspecton1.png");
-//        }
 
         @Override
         protected void initContentPane() {
@@ -394,15 +376,7 @@ public class AddBWWizard {
                     setupWizardButtons();
                 }
             });
-//            setLeftPaneItems(LEFTPANE_GRAPHIC);
-//            addPageListener(new PageListener() {
-//                @Override
-//                public void pageEventFired(PageEvent pageEvent) {
-//                    if (pageEvent.getGID() == PageEvent.PAGE_OPENED) {
-//                        OPDE.debug("CompletionPage OPENDED");
-//                    }
-//                }
-//            });
+
         }
 
         @Override
@@ -417,7 +391,7 @@ public class AddBWWizard {
 
             addComponent(txt, true);
             addSpace();
-//            addText("Drücken Sie auf FERTIG, wenn's los gehen soll.", SYSConst.ARIAL14);
+
         }
 
         @Override

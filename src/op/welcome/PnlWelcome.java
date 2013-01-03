@@ -570,6 +570,7 @@ public class PnlWelcome extends CleanablePanel {
                         @Override
                         public void execute(Object o) {
                             dlg.dispose();
+                            OPDE.getMainframe().completeRefresh();
                         }
                     }).getWizard();
                     dlg.setContentPane(wizard.getContentPane());

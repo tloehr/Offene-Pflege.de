@@ -382,11 +382,11 @@ public class PnlValues extends NursingRecordsPanel {
                                     mapType2Values.get(keyYear).add(myValue);
                                     Collections.sort(mapType2Values.get(keyYear));
 
-                                    cptitle.getButton().setIcon(null); // remove any "empty" icon
-                                    cptitle.getButton().setToolTipText(null); // remove any commentary
+                                    cptitle.getButton().setIcon(SYSConst.icon22ledGreenOn);
+//                                    cptitle.getButton().setToolTipText(null); // remove any commentary
 
                                     createCP4(vtype, dt.getYear());
-                                    cpMap.get(keyType).setIcon(null);
+//                                    cpMap.get(keyType).setIcon(SYSConst.icon22ledGreenOn);
 
                                     try {
                                         cpMap.get(keyType).setCollapsed(false);

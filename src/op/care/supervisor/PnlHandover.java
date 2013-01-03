@@ -120,6 +120,7 @@ public class PnlHandover extends NursingRecordsPanel {
         linemapHO = new HashMap<Handovers, JPanel>();
         cacheHO = new HashMap<String, ArrayList<Handovers>>();
         cacheNR = new HashMap<String, ArrayList<NReport>>();
+        OPDE.getDisplayManager().setMainMessage(OPDE.lang.getString(internalClassID));
         prepareSearchArea();
     }
 
@@ -373,7 +374,6 @@ public class PnlHandover extends NursingRecordsPanel {
 
             }
         });
-//        cpYear.setBackground(getColor(vtype, SYSConst.light4));
 
         if (!cpYear.isCollapsed()) {
             JPanel pnlContent = new JPanel(new VerticalLayout());
@@ -610,13 +610,11 @@ public class PnlHandover extends NursingRecordsPanel {
 
 
     private void createContentPanel4Day(final DateMidnight day, final CollapsiblePane cpDay) {
-
         final String key = DateFormat.getDateInstance().format(day.toDate());
         if (contentmap.containsKey(key)) {
             cpDay.setContentPane(contentmap.get(key));
         } else {
 
-//        OPDE.getMainframe().setBlocked(true);
             OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
 
             SwingWorker worker = new SwingWorker() {
@@ -643,11 +641,11 @@ public class PnlHandover extends NursingRecordsPanel {
                                     "<td width=\"100\" align=\"left\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(handover.getPit()) +
                                     " " + OPDE.lang.getString("misc.msg.Time.short") +
                                     "</td>" +
-                                    "<td width=\"350\" align=\"left\">" +
+                                    "<td width=\"400\" align=\"left\">" +
                                     handover.getText() +
                                     "</td>" +
-                                    "<td width=\"200\" align=\"center\">" + OPDE.lang.getString(internalClassID + ".handoversreport") + "</td>" +
-                                    "<td width=\"200\" align=\"left\">" + handover.getUser().getFullname() + "</td>" +
+                                    "<td width=\"100\" align=\"center\">" + OPDE.lang.getString(internalClassID + ".handoversreport") + "</td>" +
+                                    "<td width=\"100\" align=\"left\">" + handover.getUser().getFullname() + "</td>" +
                                     "</tr>" +
                                     "</table>" +
                                     "</html>";
@@ -729,19 +727,22 @@ public class PnlHandover extends NursingRecordsPanel {
                     for (final NReport nreport : cacheNR.get(key)) {
                         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), i, max));
                         if (!linemapNR.containsKey(nreport)) {
+
                             String title = "<html><table border=\"0\">" +
                                     "<tr valign=\"top\">" +
                                     "<td width=\"100\" align=\"left\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
                                     " " + OPDE.lang.getString("misc.msg.Time.short") +
+                                    "<br/>" + nreport.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)") +
                                     "</td>" +
-                                    "<td width=\"350\" align=\"left\">" +
+                                    "<td width=\"400\" align=\"left\">" +
                                     nreport.getText() +
-                                    "<td width=\"200\" align=\"left\">" + ResidentTools.getTextCompact(nreport.getResident()) + "</td>" +
                                     "</td>" +
-                                    "<td width=\"200\" align=\"left\">" + nreport.getUser().getFullname() + "</td>" +
+                                    "<td width=\"100\" align=\"left\">" + ResidentTools.getTextCompact(nreport.getResident()) + "</td>" +
+                                    "<td width=\"100\" align=\"left\">" + nreport.getUser().getFullname() + "</td>" +
                                     "</tr>" +
                                     "</table>" +
                                     "</html>";
+
 
                             final DefaultCPTitle pnlSingle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), new ActionListener() {
                                 @Override
@@ -897,10 +898,8 @@ public class PnlHandover extends NursingRecordsPanel {
                                         Collections.sort(cacheHO.get(key));
                                     }
 
-                                    // TODO: Bei einer Neueingabe erscheint nichts in der bestehenden Liste.
-                                    createCP4Day(day);
                                     contentmap.remove(key);
-
+                                    createCP4Day(day);
                                     expandDay(day);
 
                                     buildPanel();

@@ -66,26 +66,20 @@ public class PnlInfo extends NursingRecordsPanel {
 
     private ResInfoType typeAbsence, typeStartOfStay;
 
-//    private boolean initPhase;
-
     @Override
     public String getInternalClassID() {
         return internalClassID;
     }
 
     public PnlInfo(Resident resident, JScrollPane jspSearch) {
-//        initPhase = true;
         this.jspSearch = jspSearch;
         this.resident = resident;
         initComponents();
         initPanel();
         switchResident(resident);
-//        initPhase = false;
     }
 
     private void initPanel() {
-
-//        bwinfotypen = new HashMap<ResInfoCategory, List<ResInfoType>>();
         mapType2InfoList = new HashMap<ResInfoType, ArrayList<ResInfo>>();
         mapKey2CP = new HashMap<String, CollapsiblePane>();
         mapInfo2Panel = new HashMap<ResInfo, JPanel>();
@@ -937,10 +931,8 @@ public class PnlInfo extends NursingRecordsPanel {
                                     btnResMovedOut.setEnabled(false);
                                     btnResIsAway.setEnabled(false);
                                     btnResIsBack.setEnabled(false);
-//                                    reloadDisplay();
-//                                    GUITools.setResidentDisplay(resident);
+
                                     OPDE.getMainframe().completeRefresh();
-//                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".msg.isdeadnow"), 5));
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -966,6 +958,8 @@ public class PnlInfo extends NursingRecordsPanel {
             btnResDied.setEnabled(resident.isActive());
             list.add(btnResDied);
 
+
+            //TODO: We need a MOVED IN AGAIN
             /***
              *                                   _               _
              *      _ __ ___   _____   _____  __| |   ___  _   _| |_
@@ -987,14 +981,6 @@ public class PnlInfo extends NursingRecordsPanel {
                                     em.getTransaction().begin();
                                     em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                                     resident.setStation(null);
-//                                    ResInfo stay = em.merge(getLastStay());
-//                                    em.lock(stay, LockModeType.OPTIMISTIC);
-//                                    stay.setTo(dod);
-//                                    stay.setUserOFF(em.merge(OPDE.getLogin().getUser()));
-//
-//                                    Properties props = ResInfoTools.getContent(stay);
-//                                    props.setProperty("hauf", "ausgezogen");
-//                                    ResInfoTools.setContent(stay, props);
 
                                     ResidentTools.endOfStay(em, em.merge(resident), dod, ResInfoTypeTools.STAY_VALUE_LEFT);
                                     em.getTransaction().commit();
@@ -1004,8 +990,6 @@ public class PnlInfo extends NursingRecordsPanel {
                                     btnResIsAway.setEnabled(false);
                                     btnResIsBack.setEnabled(false);
 
-//                                    GUITools.setResidentDisplay(resident);
-//                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".msg.hasgonenow"), 5));
                                     OPDE.getMainframe().completeRefresh();
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
@@ -1162,45 +1146,8 @@ public class PnlInfo extends NursingRecordsPanel {
             list.add(btnResIsBack);
         }
 
-//        final JideButton btnExpandAll = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.msg.expandall"), SYSConst.icon22expand, new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent actionEvent) {
-//                try {
-//                    GUITools.setCollapsed(cpsInfo, false);
-//                } catch (PropertyVetoException e) {
-//                    // bah!
-//                }
-//            }
-//        });
-//        list.add(btnExpandAll);
-//
-//        final JideButton btnCollapseAll = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.msg.collapseall"), SYSConst.icon22collapse, new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent actionEvent) {
-//                try {
-//                    GUITools.setCollapsed(cpsInfo, true);
-//                } catch (PropertyVetoException e) {
-//                    // bah!
-//                }
-//            }
-//        });
-//        list.add(btnCollapseAll);
-
-
         return list;
     }
-
-
-//    private boolean containsOnlyEmptyInfos(final ResInfoType type) {
-//        boolean containsOnlyEmptyInfos = true;
-//        for (ResInfo info : mapType2InfoList.get(type)) {
-//            containsOnlyEmptyInfos = info.isClosed();
-//            if (!containsOnlyEmptyInfos) {
-//                break;
-//            }
-//        }
-//        return containsOnlyEmptyInfos;
-//    }
 
     private boolean containsOnlyClosedInfos(final ResInfoType type) {
         boolean containsOnlyClosedInfos = true;
@@ -1286,17 +1233,6 @@ public class PnlInfo extends NursingRecordsPanel {
 
         list.add(txtSearch);
 
-//        tbInactive = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".inactive"));
-//        tbInactive.addItemListener(new ItemListener() {
-//            @Override
-//            public void itemStateChanged(ItemEvent e) {
-//                if (initPhase) return;
-//                reloadDisplay();
-//            }
-//        });
-//        tbInactive.setHorizontalAlignment(SwingConstants.LEFT);
-//        list.add(tbInactive);
-
         return list;
     }
 
@@ -1311,21 +1247,6 @@ public class PnlInfo extends NursingRecordsPanel {
         return SYSConst.icon22infogreen2;
     }
 
-//    private Icon getIcon(ResInfoType type) {
-////        boolean empty = !mapType2InfoList.containsKey(type) || mapType2InfoList.get(type).isEmpty();
-//
-//        if (type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
-//            return SYSConst.icon22clock1;
-//        }
-//        if (type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_BYDAY) {
-//            return SYSConst.icon22intervalByDay;
-//        }
-//        if (type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_NOCONSTRAINTS) {
-//            return SYSConst.icon22intervalNoConstraints;
-//        }
-//
-//        return SYSConst.icon22intervalBySecond;
-//    }
 
     private String getTooltip(ResInfoType type) {
         if (type.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
@@ -1340,14 +1261,6 @@ public class PnlInfo extends NursingRecordsPanel {
         return OPDE.lang.getString(internalClassID + ".dlg.interval_bysecond");
     }
 
-//    private ResInfo getLastAbsence() {
-//        ResInfo lastAbsence = null;
-//        if (mapType2InfoList.containsKey(typeAbsence) && !mapType2InfoList.get(typeAbsence).isEmpty()) {
-//            int size = mapType2InfoList.get(typeAbsence).size();
-//            lastAbsence = mapType2InfoList.get(typeAbsence).get(size - 1);
-//        }
-//        return lastAbsence;
-//    }
 
     private ResInfo getLastStay() {
         ResInfo lastStay = null;

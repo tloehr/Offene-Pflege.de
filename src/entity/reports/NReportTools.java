@@ -700,7 +700,7 @@ public class NReportTools {
                     " nr.pit >= :from AND nr.pit <= :to AND (t.system = :handover OR t.nrtagid = :emergency) " +
                     " AND nr.resident.station.home = :home " +
                     " AND nr.replacedBy IS NULL AND nr.editedBy IS NULL " +
-                    " ORDER BY nr.pit ASC ";
+                    " ORDER BY nr.pit DESC ";
 
             Query query = em.createQuery(jpql);
 

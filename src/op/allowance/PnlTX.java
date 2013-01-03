@@ -48,23 +48,6 @@ public class PnlTX extends JPanel {
     }
 
     private void txtDateFocusLost(FocusEvent evt) {
-//        DateTime dt;
-//        try {
-//            dt = new DateTime(SYSCalendar.parseDate(((JTextField) evt.getSource()).getText()));
-//        } catch (NumberFormatException ex) {
-//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wrongdate")));
-//            dt = new DateTime();
-//        }
-//        if (dt.isAfterNow()) {
-//            dt = new DateTime();
-//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.futuredate")));
-//        }
-//        if (dt.isBefore(min)) {
-//            dt = new DateTime();
-//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.DateTooOld")));
-//        }
-//
-//        ((JTextField) evt.getSource()).setText(DateFormat.getDateInstance().format(dt.toDate()));
         SYSCalendar.handleDateFocusLost(evt, min, new DateMidnight());
     }
 
@@ -234,19 +217,14 @@ public class PnlTX extends JPanel {
         lblCash.setText(OPDE.lang.getString(internalClassID + ".lblcash"));
         txtDate.setText(DateFormat.getDateInstance().format(tx.getDate()));
         txtCash.setText(cf.format(tx.getAmount()));
-        txtText.setText(tx.getText());
-        txtText.setText(OPDE.lang.getString(internalClassID + ".txtText"));
-
-//        Vector<Component> traversalOrder = new Vector<Component>();
-//        traversalOrder.add(cmbResident);
-//        traversalOrder.add(txtDate);
-//        traversalOrder.add(txtText);
-//        traversalOrder.add(txtCash);
-//        setFocusTraversalPolicy(new MyOwnFocusTraversalPolicy(traversalOrder));
+        if (tx.getId() == null){
+            txtText.setText(OPDE.lang.getString(internalClassID + ".txtText"));
+        } else {
+            txtText.setText(tx.getText());
+        }
 
         if (tx.getResident() != null) {
             cmbResident.setModel(new DefaultComboBoxModel(new Resident[]{tx.getResident()}));
-//            cmbResident.setSelectedItem(tx.getResident());
             cmbResident.setEnabled(false);
         } else {
             cmbResident.setModel(SYSTools.list2cmb(ResidentTools.getAllActive()));
@@ -272,47 +250,6 @@ public class PnlTX extends JPanel {
         }
         return myamount;
     }
-
-
-//    /**
-//     * http://docs.oracle.com/javase/tutorial/displayCode.html?code=http://docs.oracle.com/javase/tutorial/uiswing/examples/misc/FocusTraversalDemoProject/src/misc/FocusTraversalDemo.java
-//     */
-//    public static class MyOwnFocusTraversalPolicy
-//            extends FocusTraversalPolicy {
-//        Vector<Component> order;
-//
-//        public MyOwnFocusTraversalPolicy(Vector<Component> order) {
-//            this.order = new Vector<Component>(order.size());
-//            this.order.addAll(order);
-//        }
-//
-//        public Component getComponentAfter(Container focusCycleRoot,
-//                                           Component aComponent) {
-//            int idx = (order.indexOf(aComponent) + 1) % order.size();
-//            return order.get(idx);
-//        }
-//
-//        public Component getComponentBefore(Container focusCycleRoot,
-//                                            Component aComponent) {
-//            int idx = order.indexOf(aComponent) - 1;
-//            if (idx < 0) {
-//                idx = order.size() - 1;
-//            }
-//            return order.get(idx);
-//        }
-//
-//        public Component getDefaultComponent(Container focusCycleRoot) {
-//            return order.get(0);
-//        }
-//
-//        public Component getLastComponent(Container focusCycleRoot) {
-//            return order.lastElement();
-//        }
-//
-//        public Component getFirstComponent(Container focusCycleRoot) {
-//            return order.get(0);
-//        }
-//    }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JLabel lblResident;
