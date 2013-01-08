@@ -460,7 +460,7 @@ public class BHPTools {
         } else {
 
             if (bhp.getStatus() == STATE_DONE) {
-                text += DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getSoll()) + " " + OPDE.lang.getString("misc.msg.Time.short");
+                text += DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getIst()) + " " + OPDE.lang.getString("misc.msg.Time.short");
             } else {
                 text += "--";
             }

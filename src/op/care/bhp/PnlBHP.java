@@ -36,7 +36,6 @@ import com.jidesoft.utils.ColorUtils;
 import com.toedter.calendar.JDateChooser;
 import entity.EntityTools;
 import entity.info.Resident;
-import entity.nursingprocess.DFNTools;
 import entity.prescription.*;
 import op.OPDE;
 import op.system.InternalClassACL;
@@ -100,7 +99,7 @@ public class PnlBHP extends NursingRecordsPanel {
         GUITools.setResidentDisplay(resident);
 
         initPhase = true;
-        jdcDatum.setMinSelectableDate(DFNTools.getMinDatum(resident));
+        jdcDatum.setMinSelectableDate(BHPTools.getMinDatum(resident));
         jdcDatum.setDate(new Date());
         jdcDatum.setMaxSelectableDate(new Date());
         initPhase = false;
@@ -292,7 +291,6 @@ public class PnlBHP extends NursingRecordsPanel {
         mainPane.setForeground(SYSCalendar.getFGSHIFT(BHPTools.SHIFT_ON_DEMAND));
         mainPane.setOpaque(false);
 
-
         if (!mapShift2BHP.get(BHPTools.SHIFT_ON_DEMAND).isEmpty()) {
             Prescription currentPrescription = null;
             CollapsiblePane sitPane = null;
@@ -300,12 +298,9 @@ public class PnlBHP extends NursingRecordsPanel {
             JPanel sitOuterPanel = new JPanel();
             sitOuterPanel.setLayout(new VerticalLayout());
             for (BHP bhp : mapShift2BHP.get(BHPTools.SHIFT_ON_DEMAND)) {
-//                OPDE.debug(bhp.getPrescription().getVerid());
-//                OPDE.debug(currentPrescription != null ? currentPrescription.getVerid() : "null");
                 if (currentPrescription == null || bhp.getPrescription().getID() != currentPrescription.getID()) {
                     if (currentPrescription != null) {
                         sitPane.setContentPane(sitPanel);
-//                        prPane.add(sitPane);
                         sitOuterPanel.add(sitPane);
                     }
                     currentPrescription = bhp.getPrescription();
@@ -344,7 +339,7 @@ public class PnlBHP extends NursingRecordsPanel {
          *      \___|_|  \___|\__,_|\__\___|\____|_|      |_|
          *
          */
-        String title = "<html><font size=+1><b>" + GUITools.getLocalizedMessages(DFNTools.SHIFT_TEXT)[shift] + "</b></font></html>";
+        String title = "<html><font size=+1><b>" + GUITools.getLocalizedMessages(BHPTools.SHIFT_TEXT)[shift] + "</b></font></html>";
 
         final CollapsiblePane prPane = new CollapsiblePane(title);
         prPane.setSlidingDirection(SwingConstants.SOUTH);

@@ -580,7 +580,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                                     em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                                     Prescription myPrescription = em.merge(returnPackage.getFirst());
                                     myPrescription.setRelation(UniqueTools.getNewUID(em, "__verkenn").getUid());
-                                    BHPTools.generate(em, myPrescription.getPrescriptionSchedule(), new DateMidnight(), false);
+                                    BHPTools.generate(em, myPrescription.getPrescriptionSchedule(), new DateMidnight(), true);
                                     em.getTransaction().commit();
 
                                     lstPrescriptions.add(myPrescription);
@@ -790,7 +790,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                                     newPrescription.setFrom(now.plusSeconds(1).toDate());
 
                                     // create new BHPs according to the prescription
-                                    BHPTools.generate(em, newPrescription.getPrescriptionSchedule(), new DateMidnight(), false);
+                                    BHPTools.generate(em, newPrescription.getPrescriptionSchedule(), new DateMidnight(), true);
                                     em.getTransaction().commit();
 
                                     lstPrescriptions.remove(prescription);
@@ -999,9 +999,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                                         queryDELBHP.setParameter("prescription", myPrescription);
                                         queryDELBHP.executeUpdate();
 
-//                                        if (!myPrescription.isOnDemand()) {
                                         BHPTools.generate(em, myPrescription.getPrescriptionSchedule(), new DateMidnight(), true);
-//                                        }
 
                                         em.getTransaction().commit();
 

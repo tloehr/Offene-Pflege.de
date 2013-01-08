@@ -34,6 +34,8 @@ public class PnlConfigs extends CleanablePanel {
     }
 
     private void btnTestLabelActionPerformed(ActionEvent e) {
+
+        // TODO: Sicherstellen, dass vorher die Config gesichert wurde
         LogicalPrinter localPrinter = OPDE.getLogicalPrinters().getMapName2LogicalPrinter().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_LOGICAL_PRINTER));
         PrinterForm printerForm1 = localPrinter.getForms().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL));
 

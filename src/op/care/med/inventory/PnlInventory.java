@@ -100,7 +100,7 @@ public class PnlInventory extends NursingRecordsPanel {
     private ArrayList<MedInventory> lstInventories;
     private HashMap<String, CollapsiblePane> cpMap;
     private HashMap<String, JToggleButton> mapKey2ClosedToggleButton;
-    private HashMap<String, JPanel> contentmap;
+//    private HashMap<String, JPanel> contentmap;
     private HashMap<MedStockTransaction, JPanel> linemap;
 
     private JScrollPane jspSearch;
@@ -122,7 +122,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
     private void initPanel() {
         cpMap = new HashMap<String, CollapsiblePane>();
-        contentmap = new HashMap<String, JPanel>();
+//        contentmap = new HashMap<String, JPanel>();
         lstInventories = new ArrayList<MedInventory>();
         mapKey2ClosedToggleButton = new HashMap<String, JToggleButton>();
         color1 = SYSConst.yellow1;
@@ -153,7 +153,7 @@ public class PnlInventory extends NursingRecordsPanel {
     @Override
     public void cleanup() {
         SYSTools.clear(cpMap);
-        SYSTools.clear(contentmap);
+//        SYSTools.clear(contentmap);
         SYSTools.clear(lstInventories);
         SYSTools.clear(mapKey2ClosedToggleButton);
         cpsInventory.removeAll();
@@ -253,16 +253,6 @@ public class PnlInventory extends NursingRecordsPanel {
             list.add(buchenButton);
         }
 
-//        final JideButton btnPrintStat = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".printresident"), SYSConst.icon22print, null);
-//        btnPrintStat.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent actionEvent) {
-//
-//
-//            }
-//        });
-//        list.add(btnPrintStat);
-
         return list;
     }
 
@@ -284,7 +274,7 @@ public class PnlInventory extends NursingRecordsPanel {
         final boolean withworker = false;
         cpsInventory.removeAll();
         cpMap.clear();
-        contentmap.clear();
+//        contentmap.clear();
         linemap.clear();
         mapKey2ClosedToggleButton.clear();
 
@@ -323,11 +313,7 @@ public class PnlInventory extends NursingRecordsPanel {
             for (MedInventory inventory : lstInventories) {
                 createCP4(inventory);
             }
-//            if (currentResident != null) {
-//                OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(currentResident));
-//            } else {
-//                OPDE.getDisplayManager().setMainMessage(OPDE.lang.getString(internalClassID));
-//            }
+
             buildPanel();
         }
 
@@ -541,6 +527,7 @@ public class PnlInventory extends NursingRecordsPanel {
         tbClosedStock.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
+
                 cpInventory.setContentPane(createContentPanel4(inventory, tbClosedStock.isSelected()));
                 try {
                     cpInventory.setCollapsed(false);
@@ -557,14 +544,6 @@ public class PnlInventory extends NursingRecordsPanel {
         cptitle.getRight().add(tbClosedStock);
 
 
-        /***
-         *                                 _ _      _            _                 _                      _
-         *      _   _ ___  ___ _ __    ___| (_) ___| | _____  __| |   ___  _ __   (_)_ ____   _____ _ __ | |_ ___  _ __ _   _
-         *     | | | / __|/ _ \ '__|  / __| | |/ __| |/ / _ \/ _` |  / _ \| '_ \  | | '_ \ \ / / _ \ '_ \| __/ _ \| '__| | | |
-         *     | |_| \__ \  __/ |    | (__| | | (__|   <  __/ (_| | | (_) | | | | | | | | \ V /  __/ | | | || (_) | |  | |_| |
-         *      \__,_|___/\___|_|     \___|_|_|\___|_|\_\___|\__,_|  \___/|_| |_| |_|_| |_|\_/ \___|_| |_|\__\___/|_|   \__, |
-         *                                                                                                              |___/
-         */
         cpInventory.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
@@ -616,6 +595,11 @@ public class PnlInventory extends NursingRecordsPanel {
 
         }
         final CollapsiblePane cpStock = cpMap.get(key);
+//        try {
+//            cpStock.setCollapsed(true);
+//        } catch (PropertyVetoException e) {
+//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//        }
 
 
         BigDecimal sumStock = BigDecimal.ZERO;
@@ -718,7 +702,7 @@ public class PnlInventory extends NursingRecordsPanel {
                                         lstInventories.get(index).getMedStocks().remove(myStock);
                                         em.remove(myStock);
                                         em.getTransaction().commit();
-                                        contentmap.remove(key);
+//                                        contentmap.remove(key);
                                         cpMap.remove(key);
                                         createCP4(myStock.getInventory());
                                         buildPanel();
@@ -878,7 +862,7 @@ public class PnlInventory extends NursingRecordsPanel {
                             int index = lstInventories.indexOf(myStock.getInventory());
                             lstInventories.get(index).getMedStocks().remove(stock);
                             lstInventories.get(index).getMedStocks().add(myStock);
-                            contentmap.remove(key);
+//                            contentmap.remove(key);
                             createCP4(myStock.getInventory());
                             buildPanel();
                         } catch (OptimisticLockException ole) {
@@ -1028,7 +1012,7 @@ public class PnlInventory extends NursingRecordsPanel {
                             int index = lstInventories.indexOf(myStock.getInventory());
                             lstInventories.get(index).getMedStocks().remove(stock);
                             lstInventories.get(index).getMedStocks().add(myStock);
-                            contentmap.remove(key);
+//                            contentmap.remove(key);
                             createCP4(myStock.getInventory());
                             buildPanel();
                         } catch (OptimisticLockException ole) {
@@ -1099,7 +1083,7 @@ public class PnlInventory extends NursingRecordsPanel {
                             int index = lstInventories.indexOf(myStock.getInventory());
                             lstInventories.get(index).getMedStocks().remove(stock);
                             lstInventories.get(index).getMedStocks().add(myStock);
-                            contentmap.remove(key);
+//                            contentmap.remove(key);
                             createCP4(myStock.getInventory());
                             buildPanel();
                         } catch (OptimisticLockException ole) {
@@ -1147,9 +1131,9 @@ public class PnlInventory extends NursingRecordsPanel {
 
 
     private JPanel createContentPanel4(final MedStock stock) {
-        final String key = stock.getID() + ".xstock";
+//        final String key = stock.getID() + ".xstock";
 
-        if (!contentmap.containsKey(key)) {
+//        if (!contentmap.containsKey(key)) {
 
             final JPanel pnlTX = new JPanel(new VerticalLayout());
 //            pnlTX.setLayout(new BoxLayout(pnlTX, BoxLayout.PAGE_AXIS));
@@ -1187,7 +1171,7 @@ public class PnlInventory extends NursingRecordsPanel {
                                     lstInventories.get(indexInventory).getMedStocks().remove(stock);
                                     lstInventories.get(indexInventory).getMedStocks().add(indexStock, myStock);
                                     em.getTransaction().commit();
-                                    contentmap.remove(key);
+//                                    contentmap.remove(key);
                                     createCP4(myStock.getInventory());
 
                                     buildPanel();
@@ -1301,7 +1285,7 @@ public class PnlInventory extends NursingRecordsPanel {
                                             lstInventories.get(indexInventory).getMedStocks().remove(stock);
                                             lstInventories.get(indexInventory).getMedStocks().add(indexStock, myStock);
 
-                                            contentmap.remove(key);
+//                                            contentmap.remove(key);
                                             linemap.remove(myTX);
 
                                             createCP4(myStock.getInventory());
@@ -1364,6 +1348,9 @@ public class PnlInventory extends NursingRecordsPanel {
                                         em.getTransaction().begin();
                                         MedStock myStock = em.merge(stock);
                                         final MedStockTransaction myOldTX = em.merge(tx);
+
+                                        // TODO: wird doppelt eingefuegt
+
                                         myOldTX.setState(MedStockTransactionTools.STATE_CANCELLED);
                                         final MedStockTransaction myNewTX = new MedStockTransaction(myStock, myOldTX.getAmount().negate(), MedStockTransactionTools.STATE_CANCEL_REC);
                                         myOldTX.setText(OPDE.lang.getString("misc.msg.reversedBy") + ": " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(myNewTX.getPit()));
@@ -1382,7 +1369,6 @@ public class PnlInventory extends NursingRecordsPanel {
                                         lstInventories.get(indexInventory).getMedStocks().remove(stock);
                                         lstInventories.get(indexInventory).getMedStocks().add(indexStock, myStock);
 
-                                        contentmap.remove(key);
                                         linemap.remove(tx);
                                         createCP4(myStock.getInventory());
                                         buildPanel();
@@ -1428,10 +1414,10 @@ public class PnlInventory extends NursingRecordsPanel {
 
 //            lblBOM.setBackground(getBG(resident, 11));
 
-            contentmap.put(key, pnlTX);
-        }
+//            contentmap.put(key, pnlTX);
 
-        return contentmap.get(key);
+
+        return pnlTX;
     }
 
     /**

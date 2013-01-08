@@ -4,6 +4,7 @@ import entity.system.SyslogTools;
 import op.OPDE;
 import op.tools.FadingLabel;
 import op.tools.SYSConst;
+import op.tools.SYSTools;
 
 import javax.swing.*;
 import java.awt.*;
@@ -101,6 +102,10 @@ public class DisplayManager extends Thread {
 
     public void clearAllMessages() {
         setMainMessage(" ");
+        setIconBiohazard(null);
+        setIconDiabetes(null);
+        setIconWarning(null);
+        setIconAllergy(null);
         messageQ.clear();
         oldMessages.clear();
         processSubMessage();

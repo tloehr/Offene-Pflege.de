@@ -132,7 +132,7 @@ public class AppInfo {
         boolean allowed = true;
         if (!OPDE.isAdmin()) {
             EntityManager em = OPDE.createEM();
-            Query query = em.createQuery("SELECT i FROM SYSGROUPS2ACL i "
+            Query query = em.createQuery("SELECT DISTINCT i FROM SYSGROUPS2ACL i "
                     + "WHERE i.internalClassID = :internalClassID AND :user MEMBER OF i.groups.members ");
             query.setParameter("user", OPDE.getLogin().getUser());
             query.setParameter("internalClassID", internalClassID);
@@ -140,8 +140,14 @@ public class AppInfo {
 
             try {
                 allowed = false;
-                SYSGROUPS2ACL sgAcl = (SYSGROUPS2ACL) query.getSingleResult();
-                for (Acl aclsForGroup : sgAcl.getAclCollection()) {
+                ArrayList<SYSGROUPS2ACL> listGROUPS = new ArrayList<SYSGROUPS2ACL>(query.getResultList());
+
+                ArrayList<Acl> listAllowed = new ArrayList<Acl>();
+                for (SYSGROUPS2ACL sgAcl : listGROUPS){
+                    listAllowed.addAll(sgAcl.getAclCollection());
+                }
+
+                for (Acl aclsForGroup : listAllowed) {
                     if (aclsForGroup.getAcl() == acl) {
                         allowed = true;
                         break;
