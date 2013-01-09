@@ -10,14 +10,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "MPBuchung")
-//@NamedQueries({
-//        @NamedQuery(name = "MedStockTransaction.findAll", query = "SELECT m FROM MedStockTransaction m"),
-//        @NamedQuery(name = "MedStockTransaction.findByBuchID", query = "SELECT m FROM MedStockTransaction m WHERE m.ID = :buchID"),
-//        @NamedQuery(name = "MedStockTransaction.findByBestand", query = "SELECT m FROM MedStockTransaction m WHERE m.stock = :bestand ORDER BY m.pit"),
-//        @NamedQuery(name = "MedStockTransaction.findByMenge", query = "SELECT m FROM MedStockTransaction m WHERE m.amount = :menge"),
-//        @NamedQuery(name = "MedStockTransaction.findByText", query = "SELECT m FROM MedStockTransaction m WHERE m.text = :text"),
-//        @NamedQuery(name = "MedStockTransaction.findByStatus", query = "SELECT m FROM MedStockTransaction m WHERE m.state = :status"),
-//        @NamedQuery(name = "MedStockTransaction.findByPit", query = "SELECT m FROM MedStockTransaction m WHERE m.pit = :pit")})
+
 public class MedStockTransaction implements Serializable, Comparable<MedStockTransaction> {
     private static final long serialVersionUID = 1L;
     @Id
@@ -110,7 +103,7 @@ public class MedStockTransaction implements Serializable, Comparable<MedStockTra
         return bhp;
     }
 
-    public boolean isBHP(){
+    public boolean isBHP() {
         return bhp != null;
     }
 
@@ -142,26 +135,26 @@ public class MedStockTransaction implements Serializable, Comparable<MedStockTra
     //OWNER
     private Users user;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        MedStockTransaction that = (MedStockTransaction) o;
-
-        if (state != that.state) return false;
-        if (amount != null ? !amount.equals(that.amount) : that.amount != null) return false;
-        if (bhp != null ? !bhp.equals(that.bhp) : that.bhp != null) return false;
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (pit != null ? !pit.equals(that.pit) : that.pit != null) return false;
-        if (stock != null ? !stock.equals(that.stock) : that.stock != null) return false;
-        if (text != null ? !text.equals(that.text) : that.text != null) return false;
-        if (user != null ? !user.equals(that.user) : that.user != null) return false;
-        if (version != null ? !version.equals(that.version) : that.version != null) return false;
-
-        return true;
-    }
-
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//
+//        MedStockTransaction that = (MedStockTransaction) o;
+//
+//        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+//        if (state != that.state) return false;
+//        if (amount != null ? !amount.equals(that.amount) : that.amount != null) return false;
+//        if (bhp != null ? !bhp.equals(that.bhp) : that.bhp != null) return false;
+//        if (pit != null ? !pit.equals(that.pit) : that.pit != null) return false;
+//        if (stock != null ? !stock.equals(that.stock) : that.stock != null) return false;
+//        if (text != null ? !text.equals(that.text) : that.text != null) return false;
+//        if (user != null ? !user.equals(that.user) : that.user != null) return false;
+//        if (version != null ? !version.equals(that.version) : that.version != null) return false;
+//
+//        return true;
+//    }
+//
     @Override
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
@@ -175,6 +168,29 @@ public class MedStockTransaction implements Serializable, Comparable<MedStockTra
         result = 31 * result + (user != null ? user.hashCode() : 0);
         return result;
     }
+
+//    @Override
+//    public int hashCode() {
+//        int hash = 0;
+//        hash += (id != null ? id.hashCode() : 0);
+//        return hash;
+//    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+
+        if (!(object instanceof MedStockTransaction)) {
+            return false;
+        }
+        MedStockTransaction other = (MedStockTransaction) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
+
 
     @Override
     public int compareTo(MedStockTransaction that) {

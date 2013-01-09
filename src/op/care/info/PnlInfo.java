@@ -660,7 +660,7 @@ public class PnlInfo extends NursingRecordsPanel {
                         html += type.getType() == ResInfoTypeTools.TYPE_ALLERGY ? SYSConst.html_48x48_allergy : "";
                         html += type.getType() == ResInfoTypeTools.TYPE_WARNING ? SYSConst.html_48x48_warning : "";
 
-                        html += ResInfoTools.getResInfosAsHTML(mapType2InfoList.get(type), true);
+                        html += ResInfoTools.getResInfosAsHTML(mapType2InfoList.get(type), true, null);
                         SYSFilesTools.print(html, true);
                     }
                 }
@@ -779,7 +779,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                 html += type.getType() == ResInfoTypeTools.TYPE_ALLERGY ? SYSConst.html_48x48_allergy : "";
                                 html += type.getType() == ResInfoTypeTools.TYPE_WARNING ? SYSConst.html_48x48_warning : "";
 
-                                html += ResInfoTools.getResInfosAsHTML(mapType2InfoList.get(type), true);
+                                html += ResInfoTools.getResInfosAsHTML(mapType2InfoList.get(type), true, null);
                             }
                         }
                     }
@@ -1160,34 +1160,51 @@ public class PnlInfo extends NursingRecordsPanel {
         return containsOnlyClosedInfos;
     }
 
-    private HashSet<ResInfoType> search(String pattern) {
+//    private HashSet<ResInfoType> search(String pattern) {
+//        pattern = pattern.toLowerCase();
+//        HashSet<ResInfoType> hits = new HashSet<ResInfoType>();
+//        for (ResInfo info : listInfo) {
+//            if (!hits.contains(info.getResInfoType())) {
+//                boolean hit = false;
+//                if (!hit) hit = SYSTools.catchNull(info.getText()).toLowerCase().indexOf(pattern) > 0;
+//                if (!hit) hit = SYSTools.catchNull(info.getHtml()).toLowerCase().indexOf(pattern) > 0;
+//                if (!hit) hit = SYSTools.catchNull(info.getProperties()).toLowerCase().indexOf(pattern) > 0;
+//                if (!hit)
+//                    hit = SYSTools.catchNull(info.getResInfoType().getShortDescription()).toLowerCase().indexOf(pattern) > 0;
+//                if (!hit)
+//                    hit = SYSTools.catchNull(info.getResInfoType().getLongDescription()).toLowerCase().indexOf(pattern) > 0;
+//                if (hit) hits.add(info.getResInfoType());
+//            }
+//        }
+//        for (ResInfoType type : ResInfoTypeTools.getAllActive()) {
+//            if (!hits.contains(type)) {
+////                boolean hit = false;
+//                boolean hit = SYSTools.catchNull(type.getShortDescription()).toLowerCase().indexOf(pattern) > 0;
+//                if (!hit)
+//                    hit = SYSTools.catchNull(type.getLongDescription()).toLowerCase().indexOf(pattern) > 0;
+//                if (hit) hits.add(type);
+//            }
+//        }
+//        return hits;
+//    }
+
+
+    private ArrayList<ResInfo> search(String pattern) {
         pattern = pattern.toLowerCase();
-        HashSet<ResInfoType> hits = new HashSet<ResInfoType>();
+        ArrayList<ResInfo> hits = new ArrayList<ResInfo>();
         for (ResInfo info : listInfo) {
-            if (!hits.contains(info.getResInfoType())) {
-                boolean hit = false;
-                if (!hit) hit = SYSTools.catchNull(info.getText()).toLowerCase().indexOf(pattern) > 0;
-                if (!hit) hit = SYSTools.catchNull(info.getHtml()).toLowerCase().indexOf(pattern) > 0;
-                if (!hit) hit = SYSTools.catchNull(info.getProperties()).toLowerCase().indexOf(pattern) > 0;
-                if (!hit)
-                    hit = SYSTools.catchNull(info.getResInfoType().getShortDescription()).toLowerCase().indexOf(pattern) > 0;
-                if (!hit)
-                    hit = SYSTools.catchNull(info.getResInfoType().getLongDescription()).toLowerCase().indexOf(pattern) > 0;
-                if (hit) hits.add(info.getResInfoType());
-            }
-        }
-        for (ResInfoType type : ResInfoTypeTools.getAllActive()) {
-            if (!hits.contains(type)) {
-                boolean hit = false;
-                hit = SYSTools.catchNull(type.getShortDescription()).toLowerCase().indexOf(pattern) > 0;
-                if (!hit)
-                    hit = SYSTools.catchNull(type.getLongDescription()).toLowerCase().indexOf(pattern) > 0;
-                if (hit) hits.add(type);
-            }
+            boolean hit = false;
+            if (!hit) hit = SYSTools.catchNull(info.getText()).toLowerCase().indexOf(pattern) > 0;
+            if (!hit) hit = SYSTools.catchNull(info.getHtml()).toLowerCase().indexOf(pattern) > 0;
+            if (!hit) hit = SYSTools.catchNull(info.getProperties()).toLowerCase().indexOf(pattern) > 0;
+            if (!hit)
+                hit = SYSTools.catchNull(info.getResInfoType().getShortDescription()).toLowerCase().indexOf(pattern) > 0;
+            if (!hit)
+                hit = SYSTools.catchNull(info.getResInfoType().getLongDescription()).toLowerCase().indexOf(pattern) > 0;
+            if (hit) hits.add(info);
         }
         return hits;
     }
-
 
     private List<Component> addFilters() {
         List<Component> list = new ArrayList<Component>();
@@ -1199,37 +1216,18 @@ public class PnlInfo extends NursingRecordsPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (SYSTools.catchNull(txtSearch.getText()).trim().length() > 3) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                boolean found = false;
-                                GUITools.setCollapsed(cpsInfo, true);
-                                for (ResInfoType type : new ArrayList<ResInfoType>(search(txtSearch.getText().trim()))) {
-                                    found = true;
-                                    final String keyCat = type.getResInfoCat().getID() + ".xcategory";
-                                    final String keyType = type.getID() + ".xtype";
-                                    if (!mapKey2CP.containsKey(keyType)) {
-                                        createCP4(type);
-                                        mapKey2CP.get(keyType).setCollapsed(false);
-                                    }
-                                    if (mapKey2CP.get(keyCat).isCollapsed()) {
-                                        mapKey2CP.get(keyCat).setCollapsed(false);
-                                    }
-                                }
-                                if (!found) {
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.searchempty"));
-                                }
-                            } catch (PropertyVetoException e1) {
-                                // bah!
-                            }
-                        }
-                    });
 
+                    ArrayList<ResInfo> searchResults = search(txtSearch.getText().trim());
 
+                    if (searchResults.isEmpty()) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.searchempty"));
+                    } else {
+                        SYSFilesTools.print(ResInfoTools.getResInfosAsHTML(searchResults, true, txtSearch.getText().trim()), false);
+                    }
                 }
             }
         });
+
 
         list.add(txtSearch);
 

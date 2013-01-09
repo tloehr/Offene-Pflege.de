@@ -46,37 +46,12 @@ public class ResInfoCategory implements Serializable, Comparable {
         return text;
     }
 
-//    @Override
-//    public int hashCode() {
-//        int hash = 0;
-//        hash += (id != null ? id.hashCode() : 0);
-//        return hash;
-//    }
 
     @Override
     public int compareTo(Object o) {
+        if (o == null || getClass() != o.getClass()) return 1;
         return id.compareTo(((ResInfoCategory) o).getID());
-//        OPDE.debug("START");
-//        OPDE.debug(text + " <> "+((ResInfoCategory) o).getText());
-//        OPDE.debug(text.compareTo(((ResInfoCategory) o).getText()));
-//        OPDE.debug("READY");
-//        return text.compareTo(((ResInfoCategory) o).getText());
-//        final Collator collator = Collator.getInstance();
-//        collator.setStrength(Collator.SECONDARY);// a == A, a < Ä
-//        return collator.compare(bezeichnung, ((ResInfoCategory) o).getText());
     }
-
-//    @Override
-//    public boolean equals(Object object) {
-//        if (!(object instanceof ResInfoCategory)) {
-//            return false;
-//        }
-//        ResInfoCategory other = (ResInfoCategory) object;
-//        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-//            return false;
-//        }
-//        return true;
-//    }
 
 
     @Override

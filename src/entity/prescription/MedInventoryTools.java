@@ -84,7 +84,7 @@ public class MedInventoryTools {
 //        long timeStart = System.currentTimeMillis();
         BigDecimal result = BigDecimal.ZERO;
         for (MedStock stock : inventory.getMedStocks()) {
-            OPDE.debug(stock.getID());
+//            OPDE.debug(stock.getID());
             BigDecimal summe = MedStockTools.getSum(em, stock);
             result = result.add(summe);
         }

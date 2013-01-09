@@ -59,11 +59,11 @@ public class ResInfoTools {
         return bwinfos.isEmpty() ? null : bwinfos.get(0);
     }
 
-    public static ArrayList<ResInfoCategory> getCategories(ArrayList<ResInfo> listInfos){
+    public static ArrayList<ResInfoCategory> getCategories(ArrayList<ResInfo> listInfos) {
         ArrayList<ResInfoCategory> result = new ArrayList<ResInfoCategory>();
-        for (ResInfo resInfo : listInfos){
-            if (!result.contains(resInfo.getResInfoType().getResInfoCat())){
-                 result.add(resInfo.getResInfoType().getResInfoCat());
+        for (ResInfo resInfo : listInfos) {
+            if (!result.contains(resInfo.getResInfoType().getResInfoCat())) {
+                result.add(resInfo.getResInfoType().getResInfoCat());
             }
         }
         Collections.sort(result);
@@ -120,16 +120,18 @@ public class ResInfoTools {
         return resInfos;
     }
 
-    public static String getResInfosAsHTML(List<ResInfo> resInfos, boolean withClosed) {
+    public static String getResInfosAsHTML(List<ResInfo> resInfos, boolean withClosed, String highlight) {
         String html = "";
 
         if (!resInfos.isEmpty()) {
 //            html += (withlongheader ? " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getLabelText(resInfos.get(0).getResident()) : "") + "</h2>\n";
             html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>"
-                    + "<th>Info</th><th>Text</th>\n</tr>";
+                    + "<th>Typ</th><th>Info</th><th>Text</th>\n</tr>";
             for (ResInfo resInfo : resInfos) {
                 if (withClosed || !resInfo.isClosed()) {
                     html += "<tr>";
+                    html += "<td valign=\"top\">" + resInfo.getResInfoType().getShortDescription();
+                    html += "</td>";
                     html += "<td valign=\"top\">" + resInfo.getPITAsHTML();
                     html += resInfo.isClosed() ? "<br/>" + SYSConst.html_22x22_StopSign : "";
                     html += "</td>";
@@ -140,6 +142,10 @@ public class ResInfoTools {
                 }
             }
             html += "</table>\n";
+        }
+
+        if (!SYSTools.catchNull(highlight).isEmpty()) {
+            html = SYSTools.replace(html, highlight, "<font style=\"BACKGROUND-COLOR: yellow\">" + highlight + "</font>", true);
         }
 
         return html;

@@ -100,7 +100,7 @@ public class PnlInventory extends NursingRecordsPanel {
     private ArrayList<MedInventory> lstInventories;
     private HashMap<String, CollapsiblePane> cpMap;
     private HashMap<String, JToggleButton> mapKey2ClosedToggleButton;
-//    private HashMap<String, JPanel> contentmap;
+    //    private HashMap<String, JPanel> contentmap;
     private HashMap<MedStockTransaction, JPanel> linemap;
 
     private JScrollPane jspSearch;
@@ -702,7 +702,7 @@ public class PnlInventory extends NursingRecordsPanel {
                                         lstInventories.get(index).getMedStocks().remove(myStock);
                                         em.remove(myStock);
                                         em.getTransaction().commit();
-//                                        contentmap.remove(key);
+
                                         cpMap.remove(key);
                                         createCP4(myStock.getInventory());
                                         buildPanel();
@@ -757,10 +757,7 @@ public class PnlInventory extends NursingRecordsPanel {
         cpStock.setHorizontalAlignment(SwingConstants.LEADING);
         cpStock.setOpaque(false);
         cpStock.setBackground(getColor(SYSConst.light3, lstInventories.indexOf(stock.getInventory()) % 2 != 0));
-////        cpStock.revalidate();
-//        for (Component comp : cpStock.getComponents()) {
-//            OPDE.debug(comp.getLocation());
-//        }
+
 
         return cpStock;
     }
@@ -1012,7 +1009,7 @@ public class PnlInventory extends NursingRecordsPanel {
                             int index = lstInventories.indexOf(myStock.getInventory());
                             lstInventories.get(index).getMedStocks().remove(stock);
                             lstInventories.get(index).getMedStocks().add(myStock);
-//                            contentmap.remove(key);
+
                             createCP4(myStock.getInventory());
                             buildPanel();
                         } catch (OptimisticLockException ole) {
@@ -1083,7 +1080,7 @@ public class PnlInventory extends NursingRecordsPanel {
                             int index = lstInventories.indexOf(myStock.getInventory());
                             lstInventories.get(index).getMedStocks().remove(stock);
                             lstInventories.get(index).getMedStocks().add(myStock);
-//                            contentmap.remove(key);
+                            // contentmap.remove(key);
                             createCP4(myStock.getInventory());
                             buildPanel();
                         } catch (OptimisticLockException ole) {
@@ -1135,233 +1132,152 @@ public class PnlInventory extends NursingRecordsPanel {
 
 //        if (!contentmap.containsKey(key)) {
 
-            final JPanel pnlTX = new JPanel(new VerticalLayout());
+        final JPanel pnlTX = new JPanel(new VerticalLayout());
 //            pnlTX.setLayout(new BoxLayout(pnlTX, BoxLayout.PAGE_AXIS));
 
-            pnlTX.setOpaque(false);
-            pnlTX.setBackground(getColor(SYSConst.light1, lstInventories.indexOf(stock.getInventory()) % 2 != 0));
+        pnlTX.setOpaque(false);
+        pnlTX.setBackground(getColor(SYSConst.light1, lstInventories.indexOf(stock.getInventory()) % 2 != 0));
 
-            /***
-             *         _       _     _ _______  __
-             *        / \   __| | __| |_   _\ \/ /
-             *       / _ \ / _` |/ _` | | |  \  /
-             *      / ___ \ (_| | (_| | | |  /  \
-             *     /_/   \_\__,_|\__,_| |_| /_/\_\
-             *
-             */
-            JideButton btnAddTX = GUITools.createHyperlinkButton(internalClassID + ".newmedstocktx", SYSConst.icon22add, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    new DlgTX(new MedStockTransaction(stock, BigDecimal.ONE, MedStockTransactionTools.STATE_EDIT_MANUAL), new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            if (o != null) {
-                                EntityManager em = OPDE.createEM();
-                                try {
-                                    em.getTransaction().begin();
+        /***
+         *         _       _     _ _______  __
+         *        / \   __| | __| |_   _\ \/ /
+         *       / _ \ / _` |/ _` | | |  \  /
+         *      / ___ \ (_| | (_| | | |  /  \
+         *     /_/   \_\__,_|\__,_| |_| /_/\_\
+         *
+         */
+        JideButton btnAddTX = GUITools.createHyperlinkButton(internalClassID + ".newmedstocktx", SYSConst.icon22add, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new DlgTX(new MedStockTransaction(stock, BigDecimal.ONE, MedStockTransactionTools.STATE_EDIT_MANUAL), new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        if (o != null) {
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
 
-                                    final MedStockTransaction myTX = (MedStockTransaction) em.merge(o);
-                                    MedStock myStock = em.merge(stock);
-                                    myStock.getStockTransaction().add(myTX);
-                                    em.lock(myStock, LockModeType.OPTIMISTIC);
-                                    em.lock(myStock.getInventory(), LockModeType.OPTIMISTIC);
-                                    em.lock(em.merge(myTX.getStock().getInventory().getResident()), LockModeType.OPTIMISTIC);
-                                    int indexInventory = lstInventories.indexOf(stock.getInventory());
-                                    int indexStock = lstInventories.get(indexInventory).getMedStocks().indexOf(stock);
-                                    lstInventories.get(indexInventory).getMedStocks().remove(stock);
-                                    lstInventories.get(indexInventory).getMedStocks().add(indexStock, myStock);
-                                    em.getTransaction().commit();
-//                                    contentmap.remove(key);
-                                    createCP4(myStock.getInventory());
+                                final MedStockTransaction myTX = (MedStockTransaction) em.merge(o);
+                                MedStock myStock = em.merge(stock);
+                                myStock.getStockTransaction().add(myTX);
+                                em.lock(myStock, LockModeType.OPTIMISTIC);
+                                em.lock(myStock.getInventory(), LockModeType.OPTIMISTIC);
+                                em.lock(em.merge(myTX.getStock().getInventory().getResident()), LockModeType.OPTIMISTIC);
+                                int indexInventory = lstInventories.indexOf(stock.getInventory());
+                                int indexStock = lstInventories.get(indexInventory).getMedStocks().indexOf(stock);
+                                lstInventories.get(indexInventory).getMedStocks().remove(stock);
+                                lstInventories.get(indexInventory).getMedStocks().add(indexStock, myStock);
+                                em.getTransaction().commit();
 
-                                    buildPanel();
+                                createCP4(myStock.getInventory());
 
-                                    SwingUtilities.invokeLater(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            GUITools.scroll2show(jspInventory, linemap.get(myTX).getLocation().y, new Closure() {
-                                                @Override
-                                                public void execute(Object o) {
-                                                    GUITools.flashBackground(linemap.get(myTX), Color.YELLOW, 2);
-                                                }
-                                            });
-                                        }
-                                    });
+                                buildPanel();
 
-                                } catch (OptimisticLockException ole) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        GUITools.scroll2show(jspInventory, linemap.get(myTX).getLocation().y, new Closure() {
+                                            @Override
+                                            public void execute(Object o) {
+                                                GUITools.flashBackground(linemap.get(myTX), Color.YELLOW, 2);
+                                            }
+                                        });
                                     }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    }
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                } catch (Exception e) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
+                                });
+
+                            } catch (OptimisticLockException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
                                 }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
                             }
                         }
-                    });
-                }
-            });
-            btnAddTX.setEnabled(!stock.isClosed());
-            pnlTX.add(btnAddTX);
+                    }
+                });
+            }
+        });
+        btnAddTX.setEnabled(!stock.isClosed());
+        pnlTX.add(btnAddTX);
 
-            BigDecimal rowsum = MedStockTools.getSum(stock);
-            Collections.sort(stock.getStockTransaction());
-            for (final MedStockTransaction tx : stock.getStockTransaction()) {
+        BigDecimal rowsum = MedStockTools.getSum(stock);
+        Collections.sort(stock.getStockTransaction());
+        for (final MedStockTransaction tx : stock.getStockTransaction()) {
 
-                String title = "<html><table border=\"0\">" +
-                        "<tr>" +
-                        "<td width=\"130\" align=\"left\">" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(tx.getPit()) + "</td>" +
-                        "<td width=\"200\" align=\"center\">" + SYSTools.catchNull(tx.getText(), "--") + "</td>" +
-                        "<td width=\"100\" align=\"right\">" +
-                        NumberFormat.getNumberInstance().format(tx.getAmount()) +
-                        "</td>" +
-                        "<td width=\"100\" align=\"right\">" +
-                        (rowsum.compareTo(BigDecimal.ZERO) < 0 ? "<font color=\"red\">" : "") +
-                        NumberFormat.getNumberInstance().format(rowsum) +
-                        (rowsum.compareTo(BigDecimal.ZERO) < 0 ? "</font>" : "") +
-                        "</td>" +
-                        "<td width=\"100\" align=\"left\">" +
-                        tx.getUser().getUID() +
-                        "</td>" +
-                        "</tr>" +
-                        "</table>" +
+            String title = "<html><table border=\"0\">" +
+                    "<tr>" +
+                    "<td width=\"130\" align=\"left\">" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(tx.getPit())
+                    + "<br/>[" + tx.getID() + "]"
+                    + "</td>" +
+                    "<td width=\"200\" align=\"center\">" + SYSTools.catchNull(tx.getText(), "--") + "</td>" +
+                    "<td width=\"100\" align=\"right\">" +
+                    NumberFormat.getNumberInstance().format(tx.getAmount()) +
+                    "</td>" +
+                    "<td width=\"100\" align=\"right\">" +
+                    (rowsum.compareTo(BigDecimal.ZERO) < 0 ? "<font color=\"red\">" : "") +
+                    NumberFormat.getNumberInstance().format(rowsum) +
+                    (rowsum.compareTo(BigDecimal.ZERO) < 0 ? "</font>" : "") +
+                    "</td>" +
+                    "<td width=\"100\" align=\"left\">" +
+                    tx.getUser().getUID() +
+                    "</td>" +
+                    "</tr>" +
+                    "</table>" +
 
-                        "</font></html>";
+                    "</font></html>";
 
-                rowsum = rowsum.subtract(tx.getAmount());
+            rowsum = rowsum.subtract(tx.getAmount());
 
-                final DefaultCPTitle pnlTitle = new DefaultCPTitle(title, null);
+            final DefaultCPTitle pnlTitle = new DefaultCPTitle(title, null);
 
 //                pnlTitle.getLeft().addMouseListener();
 
 
-                if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, internalClassID)) {
-                    /***
-                     *      ____       _ _______  __
-                     *     |  _ \  ___| |_   _\ \/ /
-                     *     | | | |/ _ \ | | |  \  /
-                     *     | |_| |  __/ | | |  /  \
-                     *     |____/ \___|_| |_| /_/\_\
-                     *
-                     */
-                    final JButton btnDelTX = new JButton(SYSConst.icon22delete);
-                    btnDelTX.setPressedIcon(SYSConst.icon22deletePressed);
-                    btnDelTX.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                    btnDelTX.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    btnDelTX.setContentAreaFilled(false);
-                    btnDelTX.setBorder(null);
-                    btnDelTX.setToolTipText(OPDE.lang.getString(internalClassID + ".tx.btndelete.tooltip"));
-                    btnDelTX.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent actionEvent) {
-                            new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<br/><i>" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(tx.getPit()) +
-                                    "&nbsp;" + tx.getUser().getUID() + "</i><br/>" + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
-                                @Override
-                                public void execute(Object answer) {
-                                    if (answer.equals(JOptionPane.YES_OPTION)) {
-                                        EntityManager em = OPDE.createEM();
-                                        try {
-                                            em.getTransaction().begin();
-                                            MedStockTransaction myTX = em.merge(tx);
-                                            MedStock myStock = em.merge(stock);
-                                            em.lock(em.merge(myTX.getStock().getInventory().getResident()), LockModeType.OPTIMISTIC);
-                                            em.lock(myStock, LockModeType.OPTIMISTIC);
-                                            em.lock(myStock.getInventory(), LockModeType.OPTIMISTIC);
-                                            em.remove(myTX);
-                                            myStock.getStockTransaction().remove(myTX);
-                                            em.getTransaction().commit();
-
-                                            int indexInventory = lstInventories.indexOf(stock.getInventory());
-                                            int indexStock = lstInventories.get(indexInventory).getMedStocks().indexOf(stock);
-                                            lstInventories.get(indexInventory).getMedStocks().remove(stock);
-                                            lstInventories.get(indexInventory).getMedStocks().add(indexStock, myStock);
-
-//                                            contentmap.remove(key);
-                                            linemap.remove(myTX);
-
-                                            createCP4(myStock.getInventory());
-
-                                            buildPanel();
-                                        } catch (OptimisticLockException ole) {
-                                            if (em.getTransaction().isActive()) {
-                                                em.getTransaction().rollback();
-                                            }
-                                            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                                OPDE.getMainframe().emptyFrame();
-                                                OPDE.getMainframe().afterLogin();
-                                            }
-                                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                        } catch (Exception e) {
-                                            if (em.getTransaction().isActive()) {
-                                                em.getTransaction().rollback();
-                                            }
-                                            OPDE.fatal(e);
-                                        } finally {
-                                            em.close();
-                                        }
-                                    }
-                                }
-                            });
-
-
-                        }
-                    });
-                    btnDelTX.setEnabled(!stock.isClosed() && (tx.getState() == MedStockTransactionTools.STATE_DEBIT || tx.getState() == MedStockTransactionTools.STATE_EDIT_MANUAL));
-                    pnlTitle.getRight().add(btnDelTX);
-                }
-
-
+            if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, internalClassID)) {
                 /***
-                 *      _   _           _         _______  __
-                 *     | | | |_ __   __| | ___   |_   _\ \/ /
-                 *     | | | | '_ \ / _` |/ _ \    | |  \  /
-                 *     | |_| | | | | (_| | (_) |   | |  /  \
-                 *      \___/|_| |_|\__,_|\___/    |_| /_/\_\
+                 *      ____       _ _______  __
+                 *     |  _ \  ___| |_   _\ \/ /
+                 *     | | | |/ _ \ | | |  \  /
+                 *     | |_| |  __/ | | |  /  \
+                 *     |____/ \___|_| |_| /_/\_\
                  *
                  */
-                final JButton btnUndoTX = new JButton(SYSConst.icon22undo);
-                btnUndoTX.setPressedIcon(SYSConst.icon22Pressed);
-                btnUndoTX.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                btnUndoTX.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnUndoTX.setContentAreaFilled(false);
-                btnUndoTX.setBorder(null);
-                btnUndoTX.setToolTipText(OPDE.lang.getString(internalClassID + ".tx.btnUndoTX.tooltip"));
-                btnUndoTX.addActionListener(new ActionListener() {
+                final JButton btnDelTX = new JButton(SYSConst.icon22delete);
+                btnDelTX.setPressedIcon(SYSConst.icon22deletePressed);
+                btnDelTX.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                btnDelTX.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnDelTX.setContentAreaFilled(false);
+                btnDelTX.setBorder(null);
+                btnDelTX.setToolTipText(OPDE.lang.getString(internalClassID + ".tx.btndelete.tooltip"));
+                btnDelTX.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        new DlgYesNo(OPDE.lang.getString("misc.questions.undo1") + "<br/><i>" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(tx.getPit()) +
-                                "&nbsp;" + tx.getUser().getUID() + "</i><br/>" + OPDE.lang.getString("misc.questions.undo2"), SYSConst.icon48undo, new Closure() {
+                        new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<br/><i>" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(tx.getPit()) +
+                                "&nbsp;" + tx.getUser().getUID() + "</i><br/>" + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
                             @Override
                             public void execute(Object answer) {
                                 if (answer.equals(JOptionPane.YES_OPTION)) {
                                     EntityManager em = OPDE.createEM();
                                     try {
                                         em.getTransaction().begin();
+
+                                        MedStockTransaction myTX = em.merge(tx);
                                         MedStock myStock = em.merge(stock);
-                                        final MedStockTransaction myOldTX = em.merge(tx);
-
-                                        // TODO: wird doppelt eingefuegt
-
-                                        myOldTX.setState(MedStockTransactionTools.STATE_CANCELLED);
-                                        final MedStockTransaction myNewTX = new MedStockTransaction(myStock, myOldTX.getAmount().negate(), MedStockTransactionTools.STATE_CANCEL_REC);
-                                        myOldTX.setText(OPDE.lang.getString("misc.msg.reversedBy") + ": " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(myNewTX.getPit()));
-                                        myNewTX.setText(OPDE.lang.getString("misc.msg.reversalFor") + ": " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(myOldTX.getPit()));
-                                        myStock.getStockTransaction().add(myNewTX);
-                                        myStock.getStockTransaction().remove(tx);
-                                        myStock.getStockTransaction().add(myOldTX);
-                                        em.lock(em.merge(myNewTX.getStock().getInventory().getResident()), LockModeType.OPTIMISTIC);
+                                        em.lock(em.merge(myTX.getStock().getInventory().getResident()), LockModeType.OPTIMISTIC);
                                         em.lock(myStock, LockModeType.OPTIMISTIC);
                                         em.lock(myStock.getInventory(), LockModeType.OPTIMISTIC);
-                                        em.lock(em.merge(myNewTX.getStock().getInventory().getResident()), LockModeType.OPTIMISTIC);
+                                        em.remove(myTX);
+                                        myStock.getStockTransaction().remove(myTX);
                                         em.getTransaction().commit();
 
                                         int indexInventory = lstInventories.indexOf(stock.getInventory());
@@ -1369,16 +1285,11 @@ public class PnlInventory extends NursingRecordsPanel {
                                         lstInventories.get(indexInventory).getMedStocks().remove(stock);
                                         lstInventories.get(indexInventory).getMedStocks().add(indexStock, myStock);
 
-                                        linemap.remove(tx);
+                                        linemap.remove(myTX);
+
                                         createCP4(myStock.getInventory());
+
                                         buildPanel();
-                                        SwingUtilities.invokeLater(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                GUITools.flashBackground(linemap.get(myOldTX), Color.RED, 2);
-                                                GUITools.flashBackground(linemap.get(myNewTX), Color.YELLOW, 2);
-                                            }
-                                        });
                                     } catch (OptimisticLockException ole) {
                                         if (em.getTransaction().isActive()) {
                                             em.getTransaction().rollback();
@@ -1403,13 +1314,101 @@ public class PnlInventory extends NursingRecordsPanel {
 
                     }
                 });
-                btnUndoTX.setEnabled(!stock.isClosed() && (tx.getState() == MedStockTransactionTools.STATE_DEBIT || tx.getState() == MedStockTransactionTools.STATE_EDIT_MANUAL));
-                pnlTitle.getRight().add(btnUndoTX);
-
-
-                linemap.put(tx, pnlTitle.getMain());
-                pnlTX.add(pnlTitle.getMain());
+                btnDelTX.setEnabled(!stock.isClosed() && (tx.getState() == MedStockTransactionTools.STATE_DEBIT || tx.getState() == MedStockTransactionTools.STATE_EDIT_MANUAL));
+                pnlTitle.getRight().add(btnDelTX);
             }
+
+
+            /***
+             *      _   _           _         _______  __
+             *     | | | |_ __   __| | ___   |_   _\ \/ /
+             *     | | | | '_ \ / _` |/ _ \    | |  \  /
+             *     | |_| | | | | (_| | (_) |   | |  /  \
+             *      \___/|_| |_|\__,_|\___/    |_| /_/\_\
+             *
+             */
+            final JButton btnUndoTX = new JButton(SYSConst.icon22undo);
+            btnUndoTX.setPressedIcon(SYSConst.icon22Pressed);
+            btnUndoTX.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnUndoTX.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            btnUndoTX.setContentAreaFilled(false);
+            btnUndoTX.setBorder(null);
+            btnUndoTX.setToolTipText(OPDE.lang.getString(internalClassID + ".tx.btnUndoTX.tooltip"));
+            btnUndoTX.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    new DlgYesNo(OPDE.lang.getString("misc.questions.undo1") + "<br/><i>" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(tx.getPit()) +
+                            "&nbsp;" + tx.getUser().getUID() + "</i><br/>" + OPDE.lang.getString("misc.questions.undo2"), SYSConst.icon48undo, new Closure() {
+                        @Override
+                        public void execute(Object answer) {
+                            if (answer.equals(JOptionPane.YES_OPTION)) {
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    MedStock myStock = em.merge(stock);
+                                    final MedStockTransaction myOldTX = em.merge(tx);
+
+                                    myOldTX.setState(MedStockTransactionTools.STATE_CANCELLED);
+                                    final MedStockTransaction myNewTX = new MedStockTransaction(myStock, myOldTX.getAmount().negate(), MedStockTransactionTools.STATE_CANCEL_REC);
+                                    myOldTX.setText(OPDE.lang.getString("misc.msg.reversedBy") + ": " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(myNewTX.getPit()));
+                                    myNewTX.setText(OPDE.lang.getString("misc.msg.reversalFor") + ": " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(myOldTX.getPit()));
+
+                                    myStock.getStockTransaction().add(myNewTX);
+                                    myStock.getStockTransaction().remove(tx);
+                                    myStock.getStockTransaction().add(myOldTX);
+
+                                    em.lock(em.merge(myNewTX.getStock().getInventory().getResident()), LockModeType.OPTIMISTIC);
+                                    em.lock(myStock, LockModeType.OPTIMISTIC);
+                                    em.lock(myStock.getInventory(), LockModeType.OPTIMISTIC);
+
+                                    em.getTransaction().commit();
+
+                                    int indexInventory = lstInventories.indexOf(stock.getInventory());
+                                    int indexStock = lstInventories.get(indexInventory).getMedStocks().indexOf(stock);
+                                    lstInventories.get(indexInventory).getMedStocks().remove(stock);
+                                    lstInventories.get(indexInventory).getMedStocks().add(indexStock, myStock);
+
+                                    linemap.remove(tx);
+                                    createCP4(myStock.getInventory());
+                                    buildPanel();
+                                    SwingUtilities.invokeLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            GUITools.flashBackground(linemap.get(myOldTX), Color.RED, 2);
+                                            GUITools.flashBackground(linemap.get(myNewTX), Color.YELLOW, 2);
+                                        }
+                                    });
+                                } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+                            }
+                        }
+                    });
+
+
+                }
+            });
+            btnUndoTX.setEnabled(!stock.isClosed() && (tx.getState() == MedStockTransactionTools.STATE_DEBIT || tx.getState() == MedStockTransactionTools.STATE_EDIT_MANUAL));
+            pnlTitle.getRight().add(btnUndoTX);
+
+
+            linemap.put(tx, pnlTitle.getMain());
+            pnlTX.add(pnlTitle.getMain());
+        }
 
 
 //            lblBOM.setBackground(getBG(resident, 11));
