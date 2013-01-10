@@ -413,6 +413,18 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
 
     @Override
     public String toString() {
-        return "entity.info.ResInfo[bwinfoid=" + bwinfoid + "]";
+        return "ResInfo{" +
+                "bwinfoid=" + bwinfoid +
+                ", version=" + version +
+                ", from=" + from +
+                ", to=" + to +
+                ", bemerkung='" + bemerkung + '\'' +
+                ", bwinfotyp=" + bwinfotyp.getID() +
+                ", userON=" + userON +
+                ", userOFF=" + userOFF +
+                ", resident=" + resident +
+                ", attachedFilesConnections=" + attachedFilesConnections.size() +
+                ", attachedProcessConnections=" + attachedProcessConnections.size() +
+                '}';
     }
 }

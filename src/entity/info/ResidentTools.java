@@ -45,14 +45,14 @@ public class ResidentTools {
     public static final short ADMINONLY = 2;
     public static final short NORMAL = 0;
 
-    public static Resident findByBWKennung(String bwkennung) {
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM Resident b WHERE b.rid = :bWKennung");
-        query.setParameter("bWKennung", bwkennung);
-        Resident bewohner = (Resident) query.getSingleResult();
-        em.close();
-        return bewohner;
-    }
+//    public static Resident findByBWKennung(String bwkennung) {
+//        EntityManager em = OPDE.createEM();
+//        Query query = em.createQuery("SELECT b FROM Resident b WHERE b.rid = :bWKennung");
+//        query.setParameter("bWKennung", bwkennung);
+//        Resident bewohner = (Resident) query.getSingleResult();
+//        em.close();
+//        return bewohner;
+//    }
 
 //    public static JLabel getBWLabel(Resident bewohner) {
 //        JLabel lblBW = new JLabel();
@@ -81,9 +81,9 @@ public class ResidentTools {
         return bewohner.getName() + ", " + bewohner.getFirstname();
     }
 
-    public static String getBWLabelWithBDay(Resident bewohner) {
-        return "(*" + DateFormat.getDateInstance().format(bewohner.getDOB()) + ") [" + bewohner.getRIDAnonymous() + "]";
-    }
+//    public static String getResidentLabelWithBDay(Resident bewohner) {
+//        return "(*" + DateFormat.getDateInstance().format(bewohner.getDOB()) + ") [" + bewohner.getRIDAnonymous() + "]";
+//    }
 
     public static String getTextCompact(Resident bewohner) {
         return bewohner.getName() + ", " + bewohner.getFirstname() + " [" + bewohner.getRIDAnonymous() + "]";

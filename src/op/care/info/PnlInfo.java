@@ -653,7 +653,7 @@ public class PnlInfo extends NursingRecordsPanel {
                 public void actionPerformed(ActionEvent e) {
                     if (mapType2InfoList.containsKey(type) && !mapType2InfoList.get(type).isEmpty()) {
                         String html = "";
-                        html += "<h3 id=\"fonth3\" >" + type.getShortDescription() + "</h3>\n";
+                        html += "<h3 id=\"fonth2\" >" + ResidentTools.getLabelText(resident) + "</h2>\n";
 
                         html += type.getType() == ResInfoTypeTools.TYPE_BIOHAZARD ? SYSConst.html_48x48_biohazard : "";
                         html += type.getType() == ResInfoTypeTools.TYPE_DIABETES ? SYSConst.html_48x48_diabetes : "";
@@ -1222,7 +1222,7 @@ public class PnlInfo extends NursingRecordsPanel {
                     if (searchResults.isEmpty()) {
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.searchempty"));
                     } else {
-                        SYSFilesTools.print(ResInfoTools.getResInfosAsHTML(searchResults, true, txtSearch.getText().trim()), false);
+                        SYSFilesTools.print(SYSConst.html_h2(ResidentTools.getLabelText(resident)) + ResInfoTools.getResInfosAsHTML(searchResults, true, txtSearch.getText().trim()), false);
                     }
                 }
             }

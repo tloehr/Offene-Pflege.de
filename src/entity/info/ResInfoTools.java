@@ -60,14 +60,13 @@ public class ResInfoTools {
     }
 
     public static ArrayList<ResInfoCategory> getCategories(ArrayList<ResInfo> listInfos) {
-        ArrayList<ResInfoCategory> result = new ArrayList<ResInfoCategory>();
+        HashSet<ResInfoCategory> cat = new HashSet<ResInfoCategory>();
         for (ResInfo resInfo : listInfos) {
-            if (!result.contains(resInfo.getResInfoType().getResInfoCat())) {
-                result.add(resInfo.getResInfoType().getResInfoCat());
-            }
+            cat.add(resInfo.getResInfoType().getResInfoCat());
         }
-        Collections.sort(result);
-        return result;
+        ArrayList<ResInfoCategory> list = new ArrayList<ResInfoCategory>(cat);
+        Collections.sort(list);
+        return list;
     }
 
 
@@ -107,7 +106,7 @@ public class ResInfoTools {
     }
 
     public static ArrayList<ResInfo> getActiveBWInfosByBewohnerUndKatArt(Resident bewohner, int katart) {
-        long begin = System.currentTimeMillis();
+//        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.from <= :from AND b.to >= :to AND b.bwinfotyp.resInfoCat.catType = :katart ORDER BY b.from DESC");
         query.setParameter("bewohner", bewohner);
@@ -116,7 +115,7 @@ public class ResInfoTools {
         query.setParameter("to", new Date());
         ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
         em.close();
-        SYSTools.showTimeDifference(begin);
+//        SYSTools.showTimeDifference(begin);
         return resInfos;
     }
 
@@ -124,12 +123,13 @@ public class ResInfoTools {
         String html = "";
 
         if (!resInfos.isEmpty()) {
-//            html += (withlongheader ? " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getLabelText(resInfos.get(0).getResident()) : "") + "</h2>\n";
             html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>"
-                    + "<th>Typ</th><th>Info</th><th>Text</th>\n</tr>";
+                    + "<th>Kategorie</th><th>Typ</th><th>Info</th><th>Text</th>\n</tr>";
             for (ResInfo resInfo : resInfos) {
                 if (withClosed || !resInfo.isClosed()) {
                     html += "<tr>";
+                    html += "<td valign=\"top\">" + resInfo.getResInfoType().getResInfoCat().getText();
+                    html += "</td>";
                     html += "<td valign=\"top\">" + resInfo.getResInfoType().getShortDescription();
                     html += "</td>";
                     html += "<td valign=\"top\">" + resInfo.getPITAsHTML();

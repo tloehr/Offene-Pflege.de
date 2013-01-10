@@ -28,6 +28,10 @@ package op;
 import com.jidesoft.utils.Lm;
 import com.jidesoft.wizard.WizardStyle;
 import entity.files.SYSFilesTools;
+import entity.info.ResInfo;
+import entity.info.ResInfoTools;
+import entity.info.Resident;
+import entity.info.ResidentTools;
 import entity.nursingprocess.DFNTools;
 import entity.prescription.BHPTools;
 import entity.system.*;
@@ -155,7 +159,7 @@ public class OPDE {
 
     public static void setFTPworking(boolean FTPisWORKING) {
         OPDE.FTPisWORKING = FTPisWORKING;
-        if (!OPDE.FTPisWORKING){
+        if (!OPDE.FTPisWORKING) {
             getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.ftpNotWorking"));
         }
     }
@@ -673,6 +677,7 @@ public class OPDE {
              */
             mainframe = new FrmMain();
             mainframe.setVisible(true);
+
         }
     }
 

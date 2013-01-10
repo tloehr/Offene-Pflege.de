@@ -6,6 +6,7 @@
 package entity.info;
 
 import op.OPDE;
+import op.tools.SYSTools;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -46,13 +47,10 @@ public class ResInfoCategory implements Serializable, Comparable {
         return text;
     }
 
-
     @Override
     public int compareTo(Object o) {
-        if (o == null || getClass() != o.getClass()) return 1;
         return id.compareTo(((ResInfoCategory) o).getID());
     }
-
 
     @Override
     public boolean equals(Object o) {
@@ -63,7 +61,7 @@ public class ResInfoCategory implements Serializable, Comparable {
 
         if (catType != null ? !catType.equals(that.catType) : that.catType != null) return false;
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (resInfoTypes != null ? !resInfoTypes.equals(that.resInfoTypes) : that.resInfoTypes != null) return false;
+//        if (resInfoTypes != null ? !resInfoTypes.equals(that.resInfoTypes) : that.resInfoTypes != null) return false;
         if (sort != null ? !sort.equals(that.sort) : that.sort != null) return false;
         if (text != null ? !text.equals(that.text) : that.text != null) return false;
 
@@ -76,7 +74,7 @@ public class ResInfoCategory implements Serializable, Comparable {
         result = 31 * result + (text != null ? text.hashCode() : 0);
         result = 31 * result + (catType != null ? catType.hashCode() : 0);
         result = 31 * result + (sort != null ? sort.hashCode() : 0);
-        result = 31 * result + (resInfoTypes != null ? resInfoTypes.hashCode() : 0);
+//        result = 31 * result + (resInfoTypes != null ? resInfoTypes.hashCode() : 0);
         return result;
     }
 

@@ -787,7 +787,7 @@
        <string>size</string> 
        <object class="java.awt.Dimension"> 
         <int>1145</int> 
-        <int>740</int> 
+        <int>570</int> 
        </object> 
       </void> 
       <void method="setProperty"> 

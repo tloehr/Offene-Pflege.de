@@ -240,14 +240,14 @@ public class DlgNursingProcess extends MyJDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "14dlu, $lcgap, 280dlu:grow, $ugap, pref, $lcgap, 14dlu",
-            "fill:14dlu, $lgap, default, $rgap, pref, $lgap, 14dlu"));
+                "14dlu, $lcgap, 280dlu:grow, $ugap, pref, $lcgap, 14dlu",
+                "fill:14dlu, $lgap, default, $rgap, pref, $lgap, 14dlu"));
 
         //======== jPanel5 ========
         {
             jPanel5.setLayout(new FormLayout(
-                "default, $lcgap, default:grow",
-                "fill:default, $rgap, default, 2*($lgap, fill:default:grow), $lgap, pref"));
+                    "default, $lcgap, default:grow",
+                    "fill:default, $rgap, default, 2*($lgap, fill:default:grow), $lgap, pref"));
 
             //---- jLabel4 ----
             jLabel4.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -270,11 +270,11 @@ public class DlgNursingProcess extends MyJDialog {
             jPanel5.add(jLabel5, CC.xy(1, 3));
 
             //---- cmbKategorie ----
-            cmbKategorie.setModel(new DefaultComboBoxModel(new String[] {
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
+            cmbKategorie.setModel(new DefaultComboBoxModel(new String[]{
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
             }));
             cmbKategorie.setFont(new Font("Arial", Font.PLAIN, 14));
             jPanel5.add(cmbKategorie, CC.xy(3, 3));
@@ -341,8 +341,8 @@ public class DlgNursingProcess extends MyJDialog {
         //======== panel2 ========
         {
             panel2.setLayout(new FormLayout(
-                "default:grow",
-                "default, $lgap, default"));
+                    "default:grow",
+                    "default, $lgap, default"));
 
             //======== jspPlanung ========
             {
@@ -355,15 +355,15 @@ public class DlgNursingProcess extends MyJDialog {
 
                 //---- tblPlanung ----
                 tblPlanung.setModel(new DefaultTableModel(
-                    new Object[][] {
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                    },
-                    new String[] {
-                        "Title 1", "Title 2", "Title 3", "Title 4"
-                    }
+                        new Object[][]{
+                                {null, null, null, null},
+                                {null, null, null, null},
+                                {null, null, null, null},
+                                {null, null, null, null},
+                        },
+                        new String[]{
+                                "Title 1", "Title 2", "Title 3", "Title 4"
+                        }
                 ));
                 tblPlanung.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
                 tblPlanung.addMouseListener(new MouseAdapter() {
@@ -426,7 +426,7 @@ public class DlgNursingProcess extends MyJDialog {
             panel1.add(btnSave);
         }
         contentPane.add(panel1, CC.xy(5, 5, CC.RIGHT, CC.DEFAULT));
-        setSize(1145, 740);
+        setSize(1145, 570);
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
@@ -488,7 +488,6 @@ public class DlgNursingProcess extends MyJDialog {
             }
         });
         menu.add(itemPopupDelete);
-//        itemPopupDelete.setEnabled(!kontrollenMarkiert());
 
         /***
          *      _ _                 ____                        ____       _              _       _
@@ -542,7 +541,9 @@ public class DlgNursingProcess extends MyJDialog {
                 popup.removeExcludedComponent(jspPlanung);
                 popup.setDefaultFocusComponent(dlg);
 
-                GUITools.showPopup(popup, SwingConstants.WEST);
+//                popup.showPopup(new Insets(-5, dlg.getPreferredSize().width * -1 - 200, -5, -100), itemPopupSchedule);
+                //TODO: fenster verrutscht
+                GUITools.showPopup(popup, SwingConstants.SOUTH_WEST);
             }
         });
         menu.add(itemPopupSchedule);
@@ -552,99 +553,6 @@ public class DlgNursingProcess extends MyJDialog {
     }//GEN-LAST:event_tblPlanungMousePressed
 
 
-    //    private void saveTEMPLATE() {
-//        HashMap hm = new HashMap();
-//        hm.put("BWKennung", bewohner.getRIDAnonymous());
-//        hm.put("Stichwort", txtStichwort.getText());
-//        hm.put("Situation", txtSituation.getText());
-//        hm.put("Ziel", txtZiele.getText());
-//        ListElement lel = (ListElement) cmbKategorie.getSelectedItem();
-//        hm.put("BWIKID", lel.getPk());
-//        hm.put("Von", "!NOW!");
-//        hm.put("Bis", "!BAW!");
-//        hm.put("AnUKennung", OPDE.getLogin().getUser().getUID());
-//        hm.put("AbUKennung", null);
-//        hm.put("PlanKennung", OPDE.getDb().getUID("__plankenn"));
-//        hm.put("NKontrolle", jdcKontrolle.getDate());
-//
-//        Connection db = OPDE.getDb().db;
-//        try {
-//            // Hier beginnt eine Transaktion
-//            db.setAutoCommit(false);
-//            db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-//            db.commit();
-//
-//            planid = op.tools.DBHandling.insertRecord("Planung", hm);
-//            if (planid < 0) {
-//                throw new SQLException("Fehler bei Insert into Planung");
-//            }
-//            hm.clear();
-//            DBHandling.tmp2real(planid);
-//            DFNImport.importDFN(planid);
-//
-//            db.commit();
-//            db.setAutoCommit(true);
-//
-//        } catch (SQLException ex) {
-//            try {
-//                db.rollback();
-//            } catch (SQLException ex1) {
-//                new DlgException(ex1);
-//                ex1.printStackTrace();
-//                System.exit(1);
-//            }
-//            new DlgException(ex);
-//        }
-//    }
-//
-//    private void saveCHANGE() {
-//        // Daten für die NEUE Planung
-//        HashMap hm = new HashMap();
-//        hm.put("BWKennung", bewohner.getRIDAnonymous());
-//        hm.put("Stichwort", txtStichwort.getText());
-//        hm.put("Situation", txtSituation.getText());
-//        hm.put("Ziel", txtZiele.getText());
-//        ListElement lel = (ListElement) cmbKategorie.getSelectedItem();
-//        hm.put("BWIKID", lel.getPk());
-//        hm.put("Von", "!NOW+1!");
-//        hm.put("Bis", "!BAW!");
-//        hm.put("AnUKennung", OPDE.getLogin().getUser().getUID());
-//        hm.put("AbUKennung", null);
-//        hm.put("PlanKennung", plankenn);
-//        hm.put("NKontrolle", jdcKontrolle.getDate());
-//
-//        Connection db = OPDE.getDb().db;
-//        try {
-//            // Hier beginnt eine Transaktion
-//            db.setAutoCommit(false);
-//            db.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-//            db.commit();
-//
-//            DBHandling.absetzen(planid, txtSituation.getText());
-//
-//            planid = op.tools.DBHandling.insertRecord("Planung", hm);
-//            if (planid < 0) {
-//                throw new SQLException("Fehler bei Insert into Planung");
-//            }
-//            hm.clear();
-//            DBHandling.tmp2real(planid);
-//            DFNImport.importDFN(planid, SYSCalendar.nowDB(), 0);
-//
-//            db.commit();
-//            db.setAutoCommit(true);
-//
-//        } catch (SQLException ex) {
-//            try {
-//                db.rollback();
-//            } catch (SQLException ex1) {
-//                new DlgException(ex1);
-//                ex1.printStackTrace();
-//                System.exit(1);
-//            }
-//            new DlgException(ex);
-//        }
-//    }
-//
     private void save() {
         planung.setTopic(txtStichwort.getText().trim());
         planung.setSituation(txtSituation.getText().trim());
