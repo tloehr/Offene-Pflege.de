@@ -497,7 +497,7 @@ public class SYSFilesTools {
                     "<div id=\"fonttext\">" +
                     "<b>" + OPDE.lang.getString("misc.msg.endofreport") + "</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getFullname()) : "")
                     + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
-                    + "<br/>" + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuild() + "</div></body></html>";
+                    + "<br/>" + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum() + "</div></body></html>";
 
 
             // Write to temp file

@@ -63,11 +63,5 @@
         <class>entity.process.PCat</class>
         <class>entity.process.QProcess</class>
         <class>entity.values.ResValueTypes</class>
-        <properties>
-            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://srv0004:3306/opde"/>
-            <property name="javax.persistence.jdbc.password" value="75r9qq8"/>
-            <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
-            <property name="javax.persistence.jdbc.user" value="opdeuser"/>
-        </properties>
     </persistence-unit>
 </persistence>

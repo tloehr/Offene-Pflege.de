@@ -82,7 +82,11 @@ public class PnlWelcome extends CleanablePanel {
     }
 
     private void initPanel() {
+        if (OPDE.isUpdateAvailable()){
+            lblOPDE.setText(OPDE.lang.getString("misc.msg.updateAvailable"));
+        }
         addApps();
+
         prepareSearchArea();
     }
 
@@ -515,7 +519,7 @@ public class PnlWelcome extends CleanablePanel {
         scrollPane1 = new JScrollPane();
         cpsWelcome = new CollapsiblePanes();
         pnlApps = new JPanel();
-        label1 = new JLabel();
+        lblOPDE = new JLabel();
 
         //======== this ========
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -523,8 +527,8 @@ public class PnlWelcome extends CleanablePanel {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                    "default:grow, $lcgap, default",
-                    "default:grow"));
+                "default:grow, $lcgap, default",
+                "default:grow"));
 
             //======== scrollPane1 ========
             {
@@ -541,11 +545,14 @@ public class PnlWelcome extends CleanablePanel {
             {
                 pnlApps.setLayout(new VerticalLayout(2));
 
-                //---- label1 ----
-                label1.setText(null);
-                label1.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/OPDE-blue.png")));
-                label1.setHorizontalAlignment(SwingConstants.TRAILING);
-                pnlApps.add(label1);
+                //---- lblOPDE ----
+                lblOPDE.setText(null);
+                lblOPDE.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/OPDE-blue.png")));
+                lblOPDE.setHorizontalAlignment(SwingConstants.TRAILING);
+                lblOPDE.setFont(new Font("Arial", Font.BOLD, 14));
+                lblOPDE.setForeground(Color.red);
+                lblOPDE.setHorizontalTextPosition(SwingConstants.LEADING);
+                pnlApps.add(lblOPDE);
             }
             panel1.add(pnlApps, CC.xy(3, 1, CC.DEFAULT, CC.FILL));
         }
@@ -591,6 +598,6 @@ public class PnlWelcome extends CleanablePanel {
     private JScrollPane scrollPane1;
     private CollapsiblePanes cpsWelcome;
     private JPanel pnlApps;
-    private JLabel label1;
+    private JLabel lblOPDE;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

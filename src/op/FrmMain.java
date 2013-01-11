@@ -41,7 +41,9 @@ import com.jidesoft.swing.JideSplitPane;
 import entity.Station;
 import entity.StationTools;
 import entity.files.SYSFilesTools;
-import entity.info.*;
+import entity.info.ResInfoTools;
+import entity.info.Resident;
+import entity.info.ResidentTools;
 import entity.prescription.PrescriptionTools;
 import entity.system.SYSLoginTools;
 import entity.system.SYSPropsTools;
@@ -73,7 +75,11 @@ import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -109,6 +115,7 @@ public class FrmMain extends JFrame {
     private Closure residentChangeAction;
     private HashMap<Resident, JideButton> bwButtonMap;
     private JideButton homeButton;
+
 //    private ResInfoType biohazard;
 //    private MouseListener blockingListener;
 
@@ -170,7 +177,7 @@ public class FrmMain extends JFrame {
         initPhase = false;
     }
 
-    public void completeRefresh(){
+    public void completeRefresh() {
         emptyFrame();
         afterLogin();
     }
@@ -242,7 +249,39 @@ public class FrmMain extends JFrame {
         }
     }
 
+    private void checkForSoftwareupdates() {
+        int remoteBuildnum = -1;
+        int mybuildnum = OPDE.getAppInfo().getBuildnum();
+        try {
+            URL url;
+            URLConnection urlConn;
+            BufferedReader dis;
+
+            url = new URL(OPDE.getAppInfo().getUpdateCheckUrl());
+
+            urlConn = url.openConnection();
+            urlConn.setDoInput(true);
+            urlConn.setUseCaches(false);
+
+            dis = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+
+            String s;
+
+            while ((s = dis.readLine()) != null) {
+                remoteBuildnum = Integer.parseInt(s);
+            }
+            dis.close();
+        } catch (Exception e) {
+            OPDE.debug("ERROR");
+        }
+
+        OPDE.setUpdateAvailable(remoteBuildnum > mybuildnum);
+    }
+
+
     public void afterLogin() {
+
+        checkForSoftwareupdates();
 
         prepareSearchArea();
         labelUSER.setText(OPDE.getLogin().getUser().getFullname());
@@ -310,16 +349,16 @@ public class FrmMain extends JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                    "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                    "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
-                    "0dlu, $lgap, pref, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
+                        "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
+                        "0dlu, $lgap, pref, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
 
                 //---- btnVerlegung ----
                 btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2.png")));
@@ -554,7 +593,7 @@ public class FrmMain extends JFrame {
             panel = new PnlWelcome(jspSearch);
         } else if (classname.equals("op.controlling.PnlControlling")) {
             panel = new PnlControlling(jspSearch);
-        }  else if (classname.equals("op.system.PnlConfigs")) {
+        } else if (classname.equals("op.system.PnlConfigs")) {
             panel = new PnlConfigs(jspSearch);
         }
         return panel;

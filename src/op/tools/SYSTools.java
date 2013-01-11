@@ -780,7 +780,7 @@ public class SYSTools {
             moduleName = ", " + moduleName;
         }
         return OPDE.getAppInfo().getProgname() + moduleName + ", v" + OPDE.getAppInfo().getVersion()
-                + "/" + OPDE.getAppInfo().getBuild() + (OPDE.isDebug() ? " !! DEBUG !!" : "");
+                + "/" + OPDE.getAppInfo().getBuildnum() + (OPDE.isDebug() ? " !! DEBUG !!" : "");
     }
 
     public static void expandAll(JTree tree) {

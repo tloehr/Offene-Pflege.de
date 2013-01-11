@@ -48,6 +48,7 @@ public class AppInfo {
 
     private ArrayList<InternalClass> mainClasses;
 
+
     /**
      * Angabe darüber, welches Datenbank Schema diese Version des Programms unbedingt braucht.
      */
@@ -60,6 +61,8 @@ public class AppInfo {
      */
     private SortedProperties defaultProperties;
 
+    private String updateCheckUrl;
+
     /**
      * Hier stehen Versions und Build Informationen drin. Diese stammen aus der appinfo.properties, die teilweise automatisch
      * von einem ANT script geändert wird.
@@ -67,7 +70,7 @@ public class AppInfo {
     private Properties appinfo;
 
     private String version;
-    private String build;
+    private int build;
     private String progname;
 
     public AppInfo() {
@@ -87,7 +90,8 @@ public class AppInfo {
 
             progname = appinfo.getProperty("program.PROGNAME");
             version = appinfo.getProperty("program.VERSION");
-            build = appinfo.getProperty("program.BUILDNUM");
+            build = Integer.parseInt(appinfo.getProperty("program.BUILDNUM"));
+            updateCheckUrl = appinfo.getProperty("program.UPDATECHECKURL");
 
             // parse appinfo.xml
             XMLReader parser = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
@@ -173,7 +177,7 @@ public class AppInfo {
         return version;
     }
 
-    public String getBuild() {
+    public int getBuildnum() {
         return build;
     }
 
@@ -268,5 +272,9 @@ public class AppInfo {
             super.endDocument();
         }
 
+    }
+
+    public String getUpdateCheckUrl() {
+        return updateCheckUrl;
     }
 }

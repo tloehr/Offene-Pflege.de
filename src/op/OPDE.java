@@ -28,10 +28,6 @@ package op;
 import com.jidesoft.utils.Lm;
 import com.jidesoft.wizard.WizardStyle;
 import entity.files.SYSFilesTools;
-import entity.info.ResInfo;
-import entity.info.ResInfoTools;
-import entity.info.Resident;
-import entity.info.ResidentTools;
 import entity.nursingprocess.DFNTools;
 import entity.prescription.BHPTools;
 import entity.system.*;
@@ -97,6 +93,7 @@ public class OPDE {
     protected static String css = "";
 
     protected static boolean FTPisWORKING = false;
+    protected static boolean updateAvailable = false;
 
 
     /**
@@ -104,6 +101,14 @@ public class OPDE {
      */
     public static String getOPWD() {
         return opwd;
+    }
+
+    public static boolean isUpdateAvailable() {
+        return updateAvailable;
+    }
+
+    public static void setUpdateAvailable(boolean updateAvailable) {
+        OPDE.updateAvailable = updateAvailable;
     }
 
     public static String getOPCache() {
@@ -455,7 +460,7 @@ public class OPDE {
         } catch (ParseException ex) {
             HelpFormatter f = new HelpFormatter();
             f.printHelp("OffenePflege.jar [OPTION]", "Offene-Pflege.de, Version " + appInfo.getVersion()
-                    + " Build:" + appInfo.getBuild(), opts, footer);
+                    + " Build:" + appInfo.getBuildnum(), opts, footer);
             System.exit(0);
         }
 
@@ -463,7 +468,7 @@ public class OPDE {
         if (cl.hasOption("h")) {
             HelpFormatter f = new HelpFormatter();
             f.printHelp("OffenePflege.jar [OPTION]", "Offene-Pflege.de, Version " + appInfo.getVersion()
-                    + " Build:" + appInfo.getBuild(), opts, footer);
+                    + " Build:" + appInfo.getBuildnum(), opts, footer);
             System.exit(0);
         }
 

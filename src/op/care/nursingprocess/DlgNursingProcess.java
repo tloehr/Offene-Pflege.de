@@ -240,14 +240,14 @@ public class DlgNursingProcess extends MyJDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "14dlu, $lcgap, 280dlu:grow, $ugap, pref, $lcgap, 14dlu",
-                "fill:14dlu, $lgap, default, $rgap, pref, $lgap, 14dlu"));
+            "14dlu, $lcgap, 280dlu:grow, $ugap, pref, $lcgap, 14dlu",
+            "fill:14dlu, $lgap, default, $rgap, pref, $lgap, 14dlu"));
 
         //======== jPanel5 ========
         {
             jPanel5.setLayout(new FormLayout(
-                    "default, $lcgap, default:grow",
-                    "fill:default, $rgap, default, 2*($lgap, fill:default:grow), $lgap, pref"));
+                "default, $lcgap, default:grow",
+                "fill:default, $rgap, default, 2*($lgap, fill:default:grow), $lgap, pref"));
 
             //---- jLabel4 ----
             jLabel4.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -270,11 +270,11 @@ public class DlgNursingProcess extends MyJDialog {
             jPanel5.add(jLabel5, CC.xy(1, 3));
 
             //---- cmbKategorie ----
-            cmbKategorie.setModel(new DefaultComboBoxModel(new String[]{
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+            cmbKategorie.setModel(new DefaultComboBoxModel(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
             }));
             cmbKategorie.setFont(new Font("Arial", Font.PLAIN, 14));
             jPanel5.add(cmbKategorie, CC.xy(3, 3));
@@ -341,8 +341,8 @@ public class DlgNursingProcess extends MyJDialog {
         //======== panel2 ========
         {
             panel2.setLayout(new FormLayout(
-                    "default:grow",
-                    "default, $lgap, default"));
+                "default:grow",
+                "default, $lgap, default"));
 
             //======== jspPlanung ========
             {
@@ -355,15 +355,15 @@ public class DlgNursingProcess extends MyJDialog {
 
                 //---- tblPlanung ----
                 tblPlanung.setModel(new DefaultTableModel(
-                        new Object[][]{
-                                {null, null, null, null},
-                                {null, null, null, null},
-                                {null, null, null, null},
-                                {null, null, null, null},
-                        },
-                        new String[]{
-                                "Title 1", "Title 2", "Title 3", "Title 4"
-                        }
+                    new Object[][] {
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null},
+                    },
+                    new String[] {
+                        "Title 1", "Title 2", "Title 3", "Title 4"
+                    }
                 ));
                 tblPlanung.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
                 tblPlanung.addMouseListener(new MouseAdapter() {
@@ -541,8 +541,6 @@ public class DlgNursingProcess extends MyJDialog {
                 popup.removeExcludedComponent(jspPlanung);
                 popup.setDefaultFocusComponent(dlg);
 
-//                popup.showPopup(new Insets(-5, dlg.getPreferredSize().width * -1 - 200, -5, -100), itemPopupSchedule);
-                //TODO: fenster verrutscht
                 GUITools.showPopup(popup, SwingConstants.SOUTH_WEST);
             }
         });

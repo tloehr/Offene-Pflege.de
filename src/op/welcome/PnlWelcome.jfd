@@ -108,8 +108,24 @@
              <string>horizontalAlignment</string> 
              <int>11</int> 
             </void> 
+            <void method="setProperty"> 
+             <string>font</string> 
+             <object class="java.awt.Font"> 
+              <string>Arial</string> 
+              <int>1</int> 
+              <int>14</int> 
+             </object> 
+            </void> 
+            <void method="setProperty"> 
+             <string>foreground</string> 
+             <object class="java.awt.Color" field="red"/> 
+            </void> 
+            <void method="setProperty"> 
+             <string>horizontalTextPosition</string> 
+             <int>10</int> 
+            </void> 
             <void property="name"> 
-             <string>label1</string> 
+             <string>lblOPDE</string> 
             </void> 
            </object> 
           </void> 
