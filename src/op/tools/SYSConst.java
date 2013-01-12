@@ -27,6 +27,7 @@
 package op.tools;
 
 import op.OPDE;
+import op.system.AppInfo;
 
 import javax.swing.*;
 import java.awt.*;
@@ -38,6 +39,8 @@ import java.util.HashMap;
  * @author tloehr
  */
 public class SYSConst {
+
+    public static final String sep = System.getProperty("file.separator");
 
     public static final Font ARIAL10BOLD = new Font("Arial", Font.BOLD, 10);
     public static final Font ARIAL12BOLD = new Font("Arial", Font.BOLD, 12);
@@ -64,13 +67,13 @@ public class SYSConst {
     public static Color orangered = new Color(255, 36, 0);
     public static Color sun3 = new Color(153, 153, 204);
 
-    public static String html_22x22_StopSign = "<img src=\"" + OPDE.getOPWD() + "/artwork/22x22/stop.png\" border=\"0\">";
-    public static String html_22x22_Eraser = "<img src=\"" + OPDE.getOPWD() + "/artwork/22x22/eraser.png\" border=\"0\">";
-    public static String html_22x22_Edited = "<img src=\"" + OPDE.getOPWD() + "/artwork/22x22/edited.png\" border=\"0\">";
-    public static String html_48x48_biohazard = "<img src=\"" + OPDE.getOPWD() + "/artwork/48x48/biohazard.png\" border=\"0\">";
-    public static String html_48x48_warning = "<img src=\"" + OPDE.getOPWD() + "/artwork/48x48/warning.png\" border=\"0\">";
-    public static String html_48x48_diabetes = "<img src=\"" + OPDE.getOPWD() + "/artwork/48x48/diabetes.png\" border=\"0\">";
-    public static String html_48x48_allergy = "<img src=\"" + OPDE.getOPWD() + "/artwork/48x48/allergy.png\" border=\"0\">";
+    public static String html_22x22_StopSign = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "/stop.png\" border=\"0\">";
+    public static String html_22x22_Eraser = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "eraser.png\" border=\"0\">";
+    public static String html_22x22_Edited = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork22 + "edited.png\" border=\"0\">";
+    public static String html_48x48_biohazard = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "biohazard.png\" border=\"0\">";
+    public static String html_48x48_warning = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "warning.png\" border=\"0\">";
+    public static String html_48x48_diabetes = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "diabetes.png\" border=\"0\">";
+    public static String html_48x48_allergy = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "allergy.png\" border=\"0\">";
 
     public static String html_darkgreen = "color=\"#007600\"";
     public static String html_darkred = "color=\"#bd0000\"";
@@ -307,8 +310,8 @@ public class SYSConst {
     }
 
     public static String html_italic(String content) {
-            return "<i>" + SYSTools.xx(content) + "</i>";
-        }
+        return "<i>" + SYSTools.xx(content) + "</i>";
+    }
 
     public static String html_paragraph(String content) {
         return "<p id=\"fonttext\">\n" + SYSTools.xx(content) + "</p>\n";

@@ -31,6 +31,7 @@ import entity.files.SYSFilesTools;
 import entity.system.SYSPropsTools;
 import entity.system.Users;
 import op.OPDE;
+import op.system.AppInfo;
 import op.threads.DisplayMessage;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.TimingSource;
@@ -1978,7 +1979,7 @@ public class SYSTools {
         String html;
 
         try {
-            html = SYSTools.readFileAsString(OPDE.getOPWD() + System.getProperty("file.separator") + "newuser.html");
+            html = SYSTools.readFileAsString(OPDE.getOPWD() + SYSConst.sep + AppInfo.dirTemplates + SYSConst.sep + AppInfo.fileNewuser);
         } catch (IOException ie) {
             html = "<body>"
                     + "<h1>Access to Offene-Pflege.de (OPDE)</h1>"

@@ -95,6 +95,7 @@ public class OPDE {
     protected static boolean FTPisWORKING = false;
     protected static boolean updateAvailable = false;
 
+    protected static final String sep = System.getProperty("file.separator");
 
     /**
      * @return Das Arbeitsverzeichnis für OPDE.
@@ -482,9 +483,9 @@ public class OPDE {
          */
         if (cl.hasOption("k")) {
             String homedir = cl.getOptionValue("k");
-            opwd = homedir + System.getProperty("file.separator") + ".opde";
+            opwd = homedir + sep + AppInfo.dirBase;
         } else {
-            opwd = System.getProperty("user.home") + System.getProperty("file.separator") + ".opde";
+            opwd = System.getProperty("user.home") + sep + AppInfo.dirBase;
         }
 
         /***
@@ -523,7 +524,7 @@ public class OPDE {
          */
         if (loadLocalProperties()) {
 
-            String sep = System.getProperty("file.separator");
+
             try {
                 FileAppender fileAppender = new FileAppender(layout, opwd + sep + "opde.log", true);
                 logger.addAppender(fileAppender);
@@ -662,7 +663,7 @@ public class OPDE {
             setStandardFont();
 
             try {
-                css = SYSTools.readFileAsString(opwd + sep + "standard.css");
+                css = SYSTools.readFileAsString(opwd + sep + AppInfo.dirTemplates + sep + AppInfo.fileStandardCSS);
             } catch (IOException ie) {
                 css = "";
             }
@@ -702,9 +703,9 @@ public class OPDE {
     private static boolean loadLocalProperties() {
         boolean success = false;
         Properties sysprops = System.getProperties();
-        String sep = sysprops.getProperty("file.separator");
+
         try {
-            FileInputStream in = new FileInputStream(new File(opwd + sep + "local.properties"));
+            FileInputStream in = new FileInputStream(new File(opwd + sep + AppInfo.fileConfig));
             Properties p = new Properties();
             p.load(in);
             localProps.putAll(p);

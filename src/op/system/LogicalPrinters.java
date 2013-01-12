@@ -51,7 +51,7 @@ public class LogicalPrinters {
 
     private HashMap<String, LogicalPrinter> mapName2LogicalPrinter;
     private ArrayList<LogicalPrinter> printers;
-    private final String CONFIGFILE = "printers.xml";
+    //    private final String CONFIGFILE = "printers.xml";
     private HashMap tags;
 
 
@@ -63,7 +63,7 @@ public class LogicalPrinters {
         initTags();
         printers = new ArrayList<LogicalPrinter>();
         mapName2LogicalPrinter = new HashMap<String, LogicalPrinter>();
-        File configfile = new File(OPDE.getOPWD() + System.getProperty("file.separator") + CONFIGFILE);
+        File configfile = new File(OPDE.getOPWD() + System.getProperty("file.separator") + AppInfo.dirTemplates + System.getProperty("file.separator") + AppInfo.filePrinters);
         if (configfile.exists()) {
             try {
                 XMLReader parser = XMLReaderFactory.createXMLReader();

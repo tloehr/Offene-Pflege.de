@@ -281,6 +281,7 @@ public class FrmMain extends JFrame {
 
     public void afterLogin() {
 
+
         checkForSoftwareupdates();
 
         prepareSearchArea();

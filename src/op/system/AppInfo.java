@@ -44,6 +44,21 @@ import java.util.*;
  */
 public class AppInfo {
 
+    public static final String fileConfig = "opde.cfg";
+    public static final String fileNewuser = "newuser.html";
+    public static final String filePrinters = "printers.xml";
+    public static final String fileStandardCSS = "standard.css";
+
+    public static final String dirCache = "cache";
+    public static final String dirArtwork = "artwork";
+    public static final String dirTemplates = "templates";
+    public static final String dirJar = "jar";
+    public static final String dirArtwork22 = "22x22";
+    public static final String dirArtwork48 = "48x48";
+    public static final String dirArtwork64 = "64x64";
+    public static final String dirBase = "opde";
+
+
     private HashMap<String, InternalClass> internalClasses;
 
     private ArrayList<InternalClass> mainClasses;
