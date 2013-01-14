@@ -101,10 +101,11 @@ public class PnlInfo extends NursingRecordsPanel {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                btnResDied.setEnabled(resident.isActive());
-                btnResMovedOut.setEnabled(resident.isActive());
-                btnResIsAway.setEnabled(resident.isActive() && !ResInfoTools.isAway(resident));
-                btnResIsBack.setEnabled(resident.isActive() && ResInfoTools.isAway(resident));
+                if (btnResDied != null) btnResDied.setEnabled(resident.isActive());
+                if (btnResMovedOut != null) btnResMovedOut.setEnabled(resident.isActive());
+                if (btnResIsAway != null)
+                    btnResIsAway.setEnabled(resident.isActive() && !ResInfoTools.isAway(resident));
+                if (btnResIsBack != null) btnResIsBack.setEnabled(resident.isActive() && ResInfoTools.isAway(resident));
             }
         });
 
@@ -910,8 +911,6 @@ public class PnlInfo extends NursingRecordsPanel {
              */
             btnResMovedOut = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".resident.movedout"), SYSConst.icon22residentGone, null);
             btnResDied = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".resident.died"), SYSConst.icon22residentDied, null);
-            btnResIsAway = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".resident.isaway"), SYSConst.icon22residentAbsent, null);
-            btnResIsBack = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".resident.isback"), SYSConst.icon22residentBack, null);
             btnResDied.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -1017,7 +1016,9 @@ public class PnlInfo extends NursingRecordsPanel {
             list.add(btnResMovedOut);
         }
 
+
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
+            btnResIsAway = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".resident.isaway"), SYSConst.icon22residentAbsent, null);
             /***
              *      _          _
              *     (_)___     / \__      ____ _ _   _
@@ -1091,6 +1092,7 @@ public class PnlInfo extends NursingRecordsPanel {
             btnResIsAway.setEnabled(resident.isActive() && !ResInfoTools.isAway(resident));
             list.add(btnResIsAway);
 
+            btnResIsBack = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".resident.isback"), SYSConst.icon22residentBack, null);
             /***
              *      _       ____             _
              *     (_)___  | __ )  __ _  ___| | __

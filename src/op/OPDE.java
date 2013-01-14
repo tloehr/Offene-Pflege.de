@@ -307,7 +307,7 @@ public class OPDE {
 
     public static void saveLocalProps() {
         try {
-            FileOutputStream out = new FileOutputStream(new File(opwd + System.getProperty("file.separator") + "local.properties"));
+            FileOutputStream out = new FileOutputStream(new File(opwd + sep + AppInfo.fileConfig));
             localProps.store(out, "Settings Offene-Pflege.de");
             out.close();
         } catch (Exception ex) {

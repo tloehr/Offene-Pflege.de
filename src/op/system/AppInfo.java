@@ -71,7 +71,7 @@ public class AppInfo {
 
     /**
      * Diese defaultsProperties werden gebraucht, wenn der Client zum ersten mal eingerichtet wird. Dann stehen hier
-     * die unbedingt erforderlichen Konfigurationen drin. Diese werden dann in die local.properties übernommen,
+     * die unbedingt erforderlichen Konfigurationen drin. Diese werden dann in die opde.cfg übernommen,
      * damit es nicht zu Exceptions kommt.
      */
     private SortedProperties defaultProperties;

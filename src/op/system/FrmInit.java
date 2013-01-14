@@ -25,10 +25,10 @@ import java.util.UUID;
 
 /**
  *
- * Diese Klasse erzeugt einen Frame, der immer dann aufgerufen wird, wenn die Datei local.properties nicht gefunden wird.
+ * Diese Klasse erzeugt einen Frame, der immer dann aufgerufen wird, wenn die Datei opde.cfg nicht gefunden wird.
  * In dieser Datei stehen eine ganze Reihe von Konfigurationsinformationen, besonders die Datenbank Verbindungsinformationen.
  *
- * Dieses Formular fragt die Grunddaten ab, testet die Datenbankverbindung und erzeugt die local.properties inkl. der notwendigen
+ * Dieses Formular fragt die Grunddaten ab, testet die Datenbankverbindung und erzeugt die opde.cfg inkl. der notwendigen
  * Verzeichnisse. Dass Datenbank Benutzer Passwort wird mittels des erzeugten, eindeutigen Hostkeys verschlüsselt gespeichert.
  *
  * Gleichzeitig erstellt die Speicheroutine einen neuen Eintrag in der Tabelle Syshosts für den aktuellen Client.
@@ -128,7 +128,7 @@ public class FrmInit extends JFrame {
 
             defaultProps.put("javax.persistence.jdbc.password", cryptpw);
 
-            FileOutputStream out = new FileOutputStream(new File(OPDE.getOPWD() + System.getProperty("file.separator") + "local.properties"));
+            FileOutputStream out = new FileOutputStream(new File(OPDE.getOPWD() + System.getProperty("file.separator") + AppInfo.fileConfig));
             defaultProps.store(out, "Lokale Einstellungen für Offene-Pflege.de");
             out.close();
 
