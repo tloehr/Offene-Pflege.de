@@ -329,9 +329,9 @@ public class MedStockTools {
         result += "&nbsp;<font color=\"blue\">Eingang: " + df.format(stock.getIN()) + "</font>";
         if (stock.isOpened()) {
             result += "&nbsp;<font color=\"green\">Anbruch: " + df.format(stock.getOpened()) + "</font>";
-            if (stock.isClosed()) {
-                result += "&nbsp;<font color=\"black\">Ausgebucht: " + df.format(stock.getOut()) + "</font>";
-            }
+        }
+        if (stock.isClosed()) {
+            result += SYSConst.html_bold("&nbsp;<font color=\"black\">Ausgebucht: " + df.format(stock.getOut()) + "</font>");
         }
         result += "</font>";
 
@@ -559,7 +559,6 @@ public class MedStockTools {
      * calculates a starting UPR for a newly opened stock. If there is no UPR yet, it creates a new one and marks it as dummy,
      * so it will be replaced by the first calculated result, when this package is closed.
      * For DosageForms with type UPR1, there is no calculation at all. Those are always 1 constantly.
-     *
      */
     public static BigDecimal getEstimatedUPR(TradeForm tradeForm, Resident resident) {
         OPDE.debug("<--- calcProspectiveUPR");

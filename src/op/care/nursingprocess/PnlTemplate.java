@@ -60,7 +60,7 @@ public class PnlTemplate extends JPanel {
                     JTextPane txtHTML = new JTextPane();
                     txtHTML.setEditable(false);
                     txtHTML.setContentType("text/html");
-                    txtHTML.setText(SYSTools.toHTML(NursingProcessTools.getAsHTML((NursingProcess) lstTemplates.getSelectedValue(), true, false, false)));
+                    txtHTML.setText(SYSTools.toHTML(NursingProcessTools.getAsHTML((NursingProcess) lstTemplates.getSelectedValue(), true, false, false, false)));
                     JPanel content = new JPanel();
                     content.setLayout(new BoxLayout(content, BoxLayout.LINE_AXIS));
                     final JScrollPane jsp = new JScrollPane(txtHTML);
@@ -77,7 +77,7 @@ public class PnlTemplate extends JPanel {
                         }
                     });
 
-                    GUITools.showPopup(popup, SwingConstants.EAST);
+                    GUITools.showPopup(popup, SwingConstants.SOUTH_EAST);
                 }
             }
         });

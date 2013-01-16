@@ -65,11 +65,13 @@ public class DosageFormTools {
     }
 
     public static String getPackageText(DosageForm form) {
-        String result = "";
-        if (SYSTools.catchNull(form.getPreparation()).isEmpty()) {
-            result = SYSConst.UNITS[form.getPackUnit()] + " " + form.getUsageText();
-        } else {
-            result = SYSConst.UNITS[form.getPackUnit()] + " " + form.getPreparation();
+        String result = "<null>";
+        if (form != null) {
+            if (SYSTools.catchNull(form.getPreparation()).isEmpty()) {
+                result = SYSConst.UNITS[form.getPackUnit()] + " " + form.getUsageText();
+            } else {
+                result = SYSConst.UNITS[form.getPackUnit()] + " " + form.getPreparation();
+            }
         }
 
         return result;

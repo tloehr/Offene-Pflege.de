@@ -97,7 +97,6 @@ public class PnlInfo extends NursingRecordsPanel {
     @Override
     public void switchResident(Resident res) {
         resident = EntityTools.find(Resident.class, res.getRID());
-//        resident = EntityTools.refresh(res);
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -260,7 +259,9 @@ public class PnlInfo extends NursingRecordsPanel {
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
                 JPanel pnlContent = new JPanel(new VerticalLayout());
                 for (ResInfoType type : ResInfoTypeTools.getByCat(cat)) {
-                    pnlContent.add(createCP4(type));
+                    if (type.getType() != ResInfoTypeTools.TYPE_OLD || mapType2InfoList.containsKey(type)) {
+                        pnlContent.add(createCP4(type));
+                    }
                 }
                 cpCat.setContentPane(pnlContent);
             }
@@ -290,7 +291,6 @@ public class PnlInfo extends NursingRecordsPanel {
         DefaultCPTitle cptitle = new DefaultCPTitle(title, null);
 
         if (!resInfo.getAttachedFilesConnections().isEmpty()) {
-            OPDE.debug("erstelle grünen stern");
             /***
              *      _     _         _____ _ _
              *     | |__ | |_ _ __ |  ___(_) | ___  ___
@@ -543,7 +543,7 @@ public class PnlInfo extends NursingRecordsPanel {
             }
         });
 
-        if (type.getType() != ResInfoTypeTools.TYPE_ABSENCE && type.getType() != ResInfoTypeTools.TYPE_STAY) {
+        if (type.getType() != ResInfoTypeTools.TYPE_ABSENCE && type.getType() != ResInfoTypeTools.TYPE_STAY && type.getType() != ResInfoTypeTools.TYPE_OLD) {
             /***
              *         _       _     _
              *        / \   __| | __| |
@@ -590,7 +590,6 @@ public class PnlInfo extends NursingRecordsPanel {
                                     }
 
                                     if (mapKey2CP.get(keyType).isCollapsed()) {
-//                                    final String keyType = type.getID() + ".xtype";
                                         try {
                                             mapKey2CP.get(keyType).setCollapsed(false);
                                         } catch (PropertyVetoException e1) {
@@ -678,7 +677,6 @@ public class PnlInfo extends NursingRecordsPanel {
             }
         });
 
-//        cpType.setCollapsible(mapType2InfoList.containsKey(type) && !mapType2InfoList.get(type).isEmpty());
 
         if (!cpType.isCollapsed()) {
             cpType.setContentPane(createPanel(type));
@@ -764,7 +762,7 @@ public class PnlInfo extends NursingRecordsPanel {
             final JButton btnPrint = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.print"), SYSConst.icon22print2, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-//                    Collections.sort(listInfo);
+
                     String html = "";
                     html += "<h1 id=\"fonth1\" >" + OPDE.lang.getString("nursingrecords.info");
                     html += " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getLabelText(resident) + "</h1>\n";
@@ -1153,43 +1151,16 @@ public class PnlInfo extends NursingRecordsPanel {
 
     private boolean containsOnlyClosedInfos(final ResInfoType type) {
         boolean containsOnlyClosedInfos = true;
-        for (ResInfo info : mapType2InfoList.get(type)) {
-            containsOnlyClosedInfos = info.isClosed();
-            if (!containsOnlyClosedInfos) {
-                break;
+        if (mapType2InfoList.containsKey(type)) {
+            for (ResInfo info : mapType2InfoList.get(type)) {
+                containsOnlyClosedInfos = info.isClosed();
+                if (!containsOnlyClosedInfos) {
+                    break;
+                }
             }
         }
         return containsOnlyClosedInfos;
     }
-
-//    private HashSet<ResInfoType> search(String pattern) {
-//        pattern = pattern.toLowerCase();
-//        HashSet<ResInfoType> hits = new HashSet<ResInfoType>();
-//        for (ResInfo info : listInfo) {
-//            if (!hits.contains(info.getResInfoType())) {
-//                boolean hit = false;
-//                if (!hit) hit = SYSTools.catchNull(info.getText()).toLowerCase().indexOf(pattern) > 0;
-//                if (!hit) hit = SYSTools.catchNull(info.getHtml()).toLowerCase().indexOf(pattern) > 0;
-//                if (!hit) hit = SYSTools.catchNull(info.getProperties()).toLowerCase().indexOf(pattern) > 0;
-//                if (!hit)
-//                    hit = SYSTools.catchNull(info.getResInfoType().getShortDescription()).toLowerCase().indexOf(pattern) > 0;
-//                if (!hit)
-//                    hit = SYSTools.catchNull(info.getResInfoType().getLongDescription()).toLowerCase().indexOf(pattern) > 0;
-//                if (hit) hits.add(info.getResInfoType());
-//            }
-//        }
-//        for (ResInfoType type : ResInfoTypeTools.getAllActive()) {
-//            if (!hits.contains(type)) {
-////                boolean hit = false;
-//                boolean hit = SYSTools.catchNull(type.getShortDescription()).toLowerCase().indexOf(pattern) > 0;
-//                if (!hit)
-//                    hit = SYSTools.catchNull(type.getLongDescription()).toLowerCase().indexOf(pattern) > 0;
-//                if (hit) hits.add(type);
-//            }
-//        }
-//        return hits;
-//    }
-
 
     private ArrayList<ResInfo> search(String pattern) {
         pattern = pattern.toLowerCase();
@@ -1344,7 +1315,7 @@ public class PnlInfo extends NursingRecordsPanel {
                         });
                     }
                 });
-                btnChange.setEnabled(resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && !resInfo.isClosed() && !resInfo.isSingleIncident() && !resInfo.isNoConstraints());
+                btnChange.setEnabled(resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD && !resInfo.isClosed() && !resInfo.isSingleIncident() && !resInfo.isNoConstraints());
                 pnlMenu.add(btnChange);
 
 
@@ -1470,7 +1441,7 @@ public class PnlInfo extends NursingRecordsPanel {
                 pnlMenu.add(btnEdit);
             }
 
-//        btnDelete.setEnabled(!prescription.isClosed() && (!prescriptionHasBeenUsedAlready || OPDE.getAppInfo().isAllowedTo(internalClassID, InternalClassACL.MANAGER)));
+
             if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, internalClassID)) {
                 /***
                  *      ____       _      _
@@ -1675,7 +1646,7 @@ public class PnlInfo extends NursingRecordsPanel {
                 public void actionPerformed(ActionEvent actionEvent) {
                     // If the closure is null, only attached files can be viewed but no new ones can be attached.
                     Closure closure = null;
-                    if (!resInfo.isClosed()) {
+                    if (!resInfo.isClosed() && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD) {
                         closure = new Closure() {
                             @Override
                             public void execute(Object o) {

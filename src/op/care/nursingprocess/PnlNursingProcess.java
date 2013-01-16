@@ -399,7 +399,6 @@ public class PnlNursingProcess extends NursingRecordsPanel {
             DefaultCPTitle cptitle = new DefaultCPTitle(title, null);
             cptitle.getButton().setVerticalTextPosition(SwingConstants.TOP);
 
-
             if (!np.getAttachedFilesConnections().isEmpty()) {
                 /***
                  *      _     _         _____ _ _
@@ -550,6 +549,32 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                 cptitle.getRight().add(btnProcess);
             }
 
+            if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
+                /***
+                 *      _     _         ____       _       _
+                 *     | |__ | |_ _ __ |  _ \ _ __(_)_ __ | |_
+                 *     | '_ \| __| '_ \| |_) | '__| | '_ \| __|
+                 *     | |_) | |_| | | |  __/| |  | | | | | |_
+                 *     |_.__/ \__|_| |_|_|   |_|  |_|_| |_|\__|
+                 *
+                 */
+                JButton btnPrint = new JButton(SYSConst.icon22print2);
+                btnPrint.setContentAreaFilled(false);
+                btnPrint.setBorder(null);
+                btnPrint.setPressedIcon(SYSConst.icon22print2Pressed);
+                btnPrint.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                btnPrint.setAlignmentY(Component.TOP_ALIGNMENT);
+                btnPrint.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        SYSFilesTools.print(NursingProcessTools.getAsHTML(np, true, true, true, true), true);
+                    }
+                });
+
+                cptitle.getRight().add(btnPrint);
+                //                cptitle.getButton().setVerticalTextPosition(SwingConstants.TOP);
+            }
+
 
             /***
              *      __  __
@@ -594,13 +619,6 @@ public class PnlNursingProcess extends NursingRecordsPanel {
         return contenPanelMap.get(np);
     }
 
-//    public void refreshDisplay() {
-//        for (ResInfoCategory category : categories) {
-//            for (NursingProcess planung : valuecache.get(category)) {
-//                planungCollapsiblePaneMap.get(planung).setVisible(tbInactive.isSelected() || !planung.isClosed());
-//            }
-//        }
-//    }
 
     private java.util.List<Component> addKey() {
         java.util.List<Component> list = new ArrayList<Component>();
@@ -675,47 +693,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
         return SYSTools.toHTMLForScreen(result);
     }
 
-    private List<Component> addFilters() {
-        List<Component> list = new ArrayList<Component>();
 
-//        txtSearch = new JXSearchField(OPDE.lang.getString("misc.msg.searchphrase"));
-//        txtSearch.setInstantSearchDelay(750);
-//        txtSearch.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//
-//            }
-//        });
-//        list.add(txtSearch);
-
-//        tbInactive = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".inactive"));
-//        tbInactive.addItemListener(new ItemListener() {
-//            @Override
-//            public void itemStateChanged(ItemEvent e) {
-//                if (initPhase) return;
-//                reloadDisplay();
-//            }
-//        });
-//        tbInactive.setHorizontalAlignment(SwingConstants.LEFT);
-//        list.add(tbInactive);
-        return list;
-    }
-
-//    private void addNursingProcessToDisplay(NursingProcess np) {
-////        private HashMap<NursingProcess, CollapsiblePane> planungCollapsiblePaneMap;
-////    private HashMap<ResInfoCategory, java.util.List<NursingProcess>> valuecache;
-//
-//        if (!valuecache.containsKey(np.getCategory())) {
-//            valuecache.put(np.getCategory(), new ArrayList<NursingProcess>());
-//        }
-//        valuecache.get(np.getCategory()).add(np);
-//        Collections.sort(valuecache.get(np.getCategory()));
-//
-//        if (!categories.contains(np.getCategory())) {
-//            categories.add(np.getCategory());
-//        }
-//        Collections.sort(categories);
-//    }
 
     private List<Component> addCommands() {
         List<Component> list = new ArrayList<Component>();
@@ -949,28 +927,6 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
         final JPanel pnlMenu = new JPanel(new VerticalLayout());
         long numDFNs = DFNTools.getNumDFNs(np);
-
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
-            /***
-             *      _     _         ____       _       _
-             *     | |__ | |_ _ __ |  _ \ _ __(_)_ __ | |_
-             *     | '_ \| __| '_ \| |_) | '__| | '_ \| __|
-             *     | |_) | |_| | | |  __/| |  | | | | | |_
-             *     |_.__/ \__|_| |_|_|   |_|  |_|_| |_|\__|
-             *
-             */
-            JButton btnPrint = GUITools.createHyperlinkButton("misc.commands.print", SYSConst.icon22print2, null);
-            btnPrint.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnPrint.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    SYSFilesTools.print(NursingProcessTools.getAsHTML(np, true, true, true), true);
-                }
-            });
-            pnlMenu.add(btnPrint);
-            pnlMenu.add(new JSeparator());
-        }
-
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             /***

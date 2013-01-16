@@ -17,7 +17,6 @@ import org.joda.time.DateTime;
 import org.joda.time.Years;
 
 import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
@@ -32,8 +31,8 @@ public class ResidentTools {
 
     public static final int MALE = 1;
     public static final int FEMALE = 2;
-    public static final String GESCHLECHT[] = {"", OPDE.lang.getString("misc.msg.male"), OPDE.lang.getString("misc.msg.female")};
-    public static final String ANREDE[] = {"", OPDE.lang.getString("misc.msg.termofaddress.mr"), OPDE.lang.getString("misc.msg.termofaddress.mrs")};
+    public static final String GENDER[] = {"", OPDE.lang.getString("misc.msg.male"), OPDE.lang.getString("misc.msg.female")};
+    public static final String ADDRESS[] = {"", OPDE.lang.getString("misc.msg.termofaddress.mr"), OPDE.lang.getString("misc.msg.termofaddress.mrs")};
 
     public static final String KEY_STOOLDAYS = "stooldays";
     public static final String KEY_BALANCE = "liquidbalance";
@@ -97,7 +96,7 @@ public class ResidentTools {
 //    }
 
     public static String getFullName(Resident bewohner) {
-        return ANREDE[bewohner.getGender()] + " " + bewohner.getFirstname() + " " + bewohner.getName();
+        return ADDRESS[bewohner.getGender()] + " " + bewohner.getFirstname() + " " + bewohner.getName();
     }
 
 //    public static boolean isWeiblich(Bewohner bewohner) {
@@ -204,20 +203,28 @@ public class ResidentTools {
     public static ArrayList<Resident> getAllActive(DateMidnight month) {
         DateTime from = month.dayOfMonth().withMinimumValue().toDateTime();
         DateTime to = month.dayOfMonth().withMaximumValue().plusDays(1).toDateTime().minusSeconds(1);
+        ArrayList<Resident> list = null;
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery(" " +
-                " SELECT b FROM Resident b " +
-                " JOIN b.resInfoCollection rinfo" +
-                " WHERE rinfo.bwinfotyp.bwinftyp = :type " +
-                " AND ((rinfo.from <= :from AND rinfo.to >= :from) OR " +
-                " (rinfo.from <= :to AND rinfo.to >= :to) OR " +
-                " (rinfo.from > :from AND rinfo.to < :to)) " +
-                " ORDER BY b.name, b.firstname");
-        query.setParameter("type", ResInfoTypeTools.TYPE_STAY);
-        query.setParameter("from", from.toDate());
-        query.setParameter("to", to.toDate());
-        ArrayList<Resident> list = new ArrayList<Resident>(query.getResultList());
-        em.close();
+        try {
+
+            Query query = em.createQuery(" " +
+                    " SELECT b FROM Resident b " +
+                    " JOIN b.resInfoCollection rinfo " +
+                    " WHERE rinfo.bwinfotyp.type = :type " +
+                    " AND b.adminonly <> 2 "+
+                    " AND ((rinfo.from <= :from AND rinfo.to >= :from) OR " +
+                    " (rinfo.from <= :to AND rinfo.to >= :to) OR " +
+                    " (rinfo.from > :from AND rinfo.to < :to)) " +
+                    " ORDER BY b.name, b.firstname");
+            query.setParameter("type", ResInfoTypeTools.TYPE_STAY);
+            query.setParameter("from", from.toDate());
+            query.setParameter("to", to.toDate());
+            list = new ArrayList<Resident>(query.getResultList());
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        } finally {
+            em.close();
+        }
         return list;
     }
 

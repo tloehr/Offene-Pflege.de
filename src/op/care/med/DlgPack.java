@@ -29,12 +29,15 @@ package op.care.med;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.EntityTools;
-import entity.prescription.TradeFormTools;
 import entity.prescription.MedPackage;
 import entity.prescription.MedPackageTools;
+import entity.prescription.TradeFormTools;
+import op.OPDE;
+import op.tools.MyJDialog;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 
+import javax.persistence.EntityManager;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -47,14 +50,14 @@ import java.text.DecimalFormat;
 /**
  * @author tloehr
  */
-public class DlgPack extends javax.swing.JDialog {
+public class DlgPack extends MyJDialog {
     private MedPackage aPackage;
 
     /**
      * Creates new form DlgPack
      */
-    public DlgPack(JFrame parent, String title, MedPackage aPackage) {
-        super(parent, true);
+    public DlgPack(String title, MedPackage aPackage) {
+        super();
         initComponents();
         setTitle(title);
         this.aPackage = aPackage;
@@ -66,7 +69,7 @@ public class DlgPack extends javax.swing.JDialog {
             cmbGroesse.setSelectedIndex(aPackage.getSize());
         }
         lblPackEinheit.setText(TradeFormTools.getPackUnit(aPackage.getTradeForm()));
-        SYSTools.centerOnParent(parent, this);
+//        SYSTools.centerOnParent(parent, this);
         pack();
         setVisible(true);
     }
@@ -79,36 +82,29 @@ public class DlgPack extends javax.swing.JDialog {
      */
     // <editor-fold defaultstate="collapsed" desc=" Erzeugter Quelltext ">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jLabel1 = new JLabel();
-        jSeparator1 = new JSeparator();
         lblPZN = new JLabel();
         cmbGroesse = new JComboBox();
         jLabel3 = new JLabel();
         txtPZN = new javax.swing.JFormattedTextField(new DecimalFormat("0000000"));;
         lblInhalt = new JLabel();
         txtInhalt = new javax.swing.JFormattedTextField(new DecimalFormat("#####.##"));;
-        jSeparator2 = new JSeparator();
+        lblPackEinheit = new JLabel();
+        panel1 = new JPanel();
         btnCancel = new JButton();
         btnOK = new JButton();
-        lblPackEinheit = new JLabel();
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "$rgap, $lcgap, default, 2*($lcgap, default:grow), $lcgap, default, $lcgap, $rgap",
-            "6*(fill:default, $lgap), fill:default"));
-
-        //---- jLabel1 ----
-        jLabel1.setFont(new Font("Dialog", Font.BOLD, 14));
-        jLabel1.setText("Packung");
-        contentPane.add(jLabel1, CC.xywh(3, 1, 7, 1));
-        contentPane.add(jSeparator1, CC.xywh(3, 3, 7, 1));
+            "14dlu, $lcgap, default, 2*($lcgap, default:grow), $lcgap, default, $lcgap, 14dlu",
+            "14dlu, 5*($lgap, fill:default), $lgap, 14dlu"));
 
         //---- lblPZN ----
         lblPZN.setText("PZN:");
-        contentPane.add(lblPZN, CC.xy(3, 5));
+        lblPZN.setFont(new Font("Arial", Font.PLAIN, 14));
+        contentPane.add(lblPZN, CC.xy(3, 3));
 
         //---- cmbGroesse ----
         cmbGroesse.setModel(new DefaultComboBoxModel(new String[] {
@@ -117,62 +113,73 @@ public class DlgPack extends javax.swing.JDialog {
             "Item 3",
             "Item 4"
         }));
-        contentPane.add(cmbGroesse, CC.xywh(5, 7, 5, 1));
+        cmbGroesse.setFont(new Font("Arial", Font.PLAIN, 14));
+        contentPane.add(cmbGroesse, CC.xywh(5, 5, 5, 1));
 
         //---- jLabel3 ----
         jLabel3.setText("Gr\u00f6\u00dfe:");
-        contentPane.add(jLabel3, CC.xy(3, 7));
+        jLabel3.setFont(new Font("Arial", Font.PLAIN, 14));
+        contentPane.add(jLabel3, CC.xy(3, 5));
 
         //---- txtPZN ----
+        txtPZN.setFont(new Font("Arial", Font.PLAIN, 14));
         txtPZN.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
                 txtPZNFocusGained(e);
             }
         });
-        contentPane.add(txtPZN, CC.xywh(5, 5, 5, 1));
+        contentPane.add(txtPZN, CC.xywh(5, 3, 5, 1));
 
         //---- lblInhalt ----
         lblInhalt.setText("Inhalt:");
-        contentPane.add(lblInhalt, CC.xy(3, 9));
+        lblInhalt.setFont(new Font("Arial", Font.PLAIN, 14));
+        contentPane.add(lblInhalt, CC.xy(3, 7));
 
         //---- txtInhalt ----
         txtInhalt.setHorizontalAlignment(SwingConstants.RIGHT);
         txtInhalt.setText("0");
+        txtInhalt.setFont(new Font("Arial", Font.PLAIN, 14));
         txtInhalt.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
                 txtInhaltFocusGained(e);
             }
         });
-        contentPane.add(txtInhalt, CC.xywh(5, 9, 3, 1));
-        contentPane.add(jSeparator2, CC.xywh(3, 11, 7, 1));
-
-        //---- btnCancel ----
-        btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/cancel.png")));
-        btnCancel.setText("Abbrechen");
-        btnCancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnCancelActionPerformed(e);
-            }
-        });
-        contentPane.add(btnCancel, CC.xywh(7, 13, 3, 1));
-
-        //---- btnOK ----
-        btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/apply.png")));
-        btnOK.setText("OK");
-        btnOK.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnOKActionPerformed(e);
-            }
-        });
-        contentPane.add(btnOK, CC.xy(5, 13));
+        contentPane.add(txtInhalt, CC.xywh(5, 7, 3, 1));
 
         //---- lblPackEinheit ----
         lblPackEinheit.setText("jLabel5");
-        contentPane.add(lblPackEinheit, CC.xy(9, 9));
+        lblPackEinheit.setFont(new Font("Arial", Font.PLAIN, 14));
+        contentPane.add(lblPackEinheit, CC.xy(9, 7));
+
+        //======== panel1 ========
+        {
+            panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
+
+            //---- btnCancel ----
+            btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/cancel.png")));
+            btnCancel.setText(null);
+            btnCancel.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnCancelActionPerformed(e);
+                }
+            });
+            panel1.add(btnCancel);
+
+            //---- btnOK ----
+            btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/apply.png")));
+            btnOK.setText(null);
+            btnOK.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnOKActionPerformed(e);
+                }
+            });
+            panel1.add(btnOK);
+        }
+        contentPane.add(panel1, CC.xywh(5, 11, 5, 1, CC.RIGHT, CC.DEFAULT));
         pack();
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
@@ -189,45 +196,46 @@ public class DlgPack extends javax.swing.JDialog {
 
         String pzn = MedPackageTools.checkNewPZN(txtPZN.getText().trim(), aPackage.getID() != null ? aPackage : null);
         BigDecimal inhalt = SYSTools.parseBigDecimal(txtInhalt.getText());
-        if (inhalt.compareTo(BigDecimal.ZERO) <= 0){
+        if (inhalt.compareTo(BigDecimal.ZERO) <= 0) {
             inhalt = null;
         }
 
         String txt = "";
 
         if (pzn == null) {
-            lblPZN.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/editdelete.png")));
+            lblPZN.setIcon(SYSConst.icon22delete);
         } else {
             lblPZN.setIcon(null);
         }
 
         if (inhalt == null) {
-            lblInhalt.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/editdelete.png")));
+            lblInhalt.setIcon(SYSConst.icon22delete);
         } else {
             lblInhalt.setIcon(null);
         }
 
 
         if (pzn != null && inhalt != null) {
-            aPackage.setPzn(txtPZN.getText());
-            aPackage.setSize((short) cmbGroesse.getSelectedIndex());
-            aPackage.setContent(inhalt);
-
-            if (aPackage.getID() != null) {
-                aPackage = EntityTools.merge(aPackage);
-            } else {
-                EntityTools.persist(aPackage);
-
+            // TODO: locking ? do it better.
+            EntityManager em = OPDE.createEM();
+            try {
+                em.getTransaction().begin();
+                MedPackage myPackage = em.merge(aPackage);
+                myPackage.setPzn(txtPZN.getText());
+                myPackage.setSize((short) cmbGroesse.getSelectedIndex());
+                myPackage.setContent(inhalt);
+                em.getTransaction().commit();
+            } catch (Exception e) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                OPDE.fatal(e);
+            } finally {
+                em.close();
             }
+
             dispose();
         }
-
-
-//        HashMap hm = new HashMap();
-//        Number Inhalt = (Number) txtInhalt.getValue();
-//        hm.put("PZN", txtPZN.getText());
-//        hm.put("Groesse", cmbGroesse.getSelectedIndex());
-//        hm.put("Inhalt", Inhalt.doubleValue());
 
     }//GEN-LAST:event_btnOKActionPerformed
 
@@ -237,18 +245,16 @@ public class DlgPack extends javax.swing.JDialog {
 
 
     // Variablendeklaration - nicht modifizieren//GEN-BEGIN:variables
-    private JLabel jLabel1;
-    private JSeparator jSeparator1;
     private JLabel lblPZN;
     private JComboBox cmbGroesse;
     private JLabel jLabel3;
     private JFormattedTextField txtPZN;
     private JLabel lblInhalt;
     private JTextField txtInhalt;
-    private JSeparator jSeparator2;
+    private JLabel lblPackEinheit;
+    private JPanel panel1;
     private JButton btnCancel;
     private JButton btnOK;
-    private JLabel lblPackEinheit;
     // Ende der Variablendeklaration//GEN-END:variables
 
 }

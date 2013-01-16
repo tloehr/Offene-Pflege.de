@@ -122,7 +122,7 @@
         <!--
         Hier stehen die Datenbank-Schema Versionen, die für diese Applikation geignet sind.
         -->
-        <schema version="1"/>
+        <structure version="1"/>
     </database>
 
     <properties>
@@ -133,8 +133,8 @@
         <property key="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
         <property key="mainhost" value="false"/>
         <property key="station" value="1"/>
-        <property key="stellplan_pagebreak_after_element_no" value="23"/>
-        <property key="barbetrag_pagebreak_after_element_no" value="30"/>
+        <property key="dailyplan_pagebreak_after_element_no" value="23"/>
+        <property key="cash_pagebreak_after_element_no" value="30"/>
         <property key="bhp_max_minutes_to_withdraw" value="30"/>
         <property key="dfn_max_minutes_to_withdraw" value="30"/>
         <property key="bhp_max_minutes_to_withdraw" value="30"/>

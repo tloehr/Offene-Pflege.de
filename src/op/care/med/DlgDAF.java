@@ -27,64 +27,51 @@
 
 package op.care.med;
 
-import entity.prescription.*;
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
+import entity.prescription.DosageForm;
+import entity.prescription.DosageFormTools;
+import entity.prescription.TradeForm;
 import op.OPDE;
+import op.tools.MyJDialog;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 /**
  * @author root
  */
-public class DlgDAF extends javax.swing.JDialog {
-    private TradeForm darreichung;
+public class DlgDAF extends MyJDialog {
+    private TradeForm tradeForm;
     private boolean editMode;
 
 
-    public DlgDAF(JFrame parent, String title, TradeForm darreichung) {
-        super(parent, true);
+    public DlgDAF(String title, TradeForm tradeForm) {
+        super();
         initComponents();
-        this.darreichung = darreichung;
+        this.tradeForm = tradeForm;
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT m FROM DosageForm m ORDER BY m.preparation, m.usageText");
         cmbForm.setModel(new DefaultComboBoxModel(query.getResultList().toArray(new DosageForm[]{})));
         cmbForm.setRenderer(DosageFormTools.getRenderer(0));
         em.close();
-        editMode = darreichung.getID() != null;
+        editMode = tradeForm.getID() != null;
 
         if (editMode) {
-
-//            //HashMap daf = DBRetrieve.getSingleRecord("MPDarreichung", new String[]{"Zusatz", "FormID"}, "DafID", dafid);
-////            double apv = op.care.med.DBHandling.getUPR4(dafid, "");
-////            long thisFormID = ((BigInteger) daf.get("FormID")).longValue();
-//
-//            apv = APVTools.getUPR4(darreichung);
-//            if (apv == null) {
-//                apv = new APV(BigDecimal.ONE, false, null, darreichung);
-//            }
-//
-//            if (darreichung.getDosageForm().getState() == MedFormenTools.UPR1) {
-//                txtAPV.setText("1");
-//                txtAPV.setEnabled(false);
-//            } else {
-//                txtAPV.setText(apv.getUPR4().setScale(2, BigDecimal.ROUND_HALF_UP).toString());
-//                txtAPV.setEnabled(true);
-//            }
-
-            cmbForm.setSelectedItem(darreichung.getDosageForm());
-            txtZusatz.setText(SYSTools.catchNull(darreichung.getSubtext()));
-
+            cmbForm.setSelectedItem(tradeForm.getDosageForm());
+            txtZusatz.setText(SYSTools.catchNull(tradeForm.getSubtext()));
         } else {
-//            apv = new APV(BigDecimal.ONE, false, null, darreichung);
             cmbForm.setSelectedIndex(1);
         }
 
-        setTitle(title);
-        SYSTools.centerOnParent(parent, this);
+        pack();
         setVisible(true);
     }
 
@@ -98,13 +85,11 @@ public class DlgDAF extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         jPanel1 = new JPanel();
-        jLabel1 = new JLabel();
-        jSeparator1 = new JSeparator();
         jLabel2 = new JLabel();
         txtZusatz = new JTextField();
         jLabel3 = new JLabel();
         cmbForm = new JComboBox();
-        jSeparator2 = new JSeparator();
+        panel1 = new JPanel();
         btnCancel = new JButton();
         btnOK = new JButton();
 
@@ -112,19 +97,27 @@ public class DlgDAF extends javax.swing.JDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
         Container contentPane = getContentPane();
+        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
 
         //======== jPanel1 ========
         {
-
-            //---- jLabel1 ----
-            jLabel1.setFont(new Font("Dialog", Font.BOLD, 14));
-            jLabel1.setText("Darreichungsform");
+            jPanel1.setLayout(new FormLayout(
+                "14dlu, $lcgap, default, $lcgap, default:grow, $lcgap, 14dlu",
+                "fill:14dlu, 4*($lgap, fill:default), $lgap, 14dlu"));
 
             //---- jLabel2 ----
             jLabel2.setText("Zusatzbezeichnung:");
+            jLabel2.setFont(new Font("Arial", Font.PLAIN, 14));
+            jPanel1.add(jLabel2, CC.xy(3, 3));
+
+            //---- txtZusatz ----
+            txtZusatz.setFont(new Font("Arial", Font.PLAIN, 14));
+            jPanel1.add(txtZusatz, CC.xy(5, 3));
 
             //---- jLabel3 ----
-            jLabel3.setText("PrinterForm:");
+            jLabel3.setText("Form:");
+            jLabel3.setFont(new Font("Arial", Font.PLAIN, 14));
+            jPanel1.add(jLabel3, CC.xy(3, 5));
 
             //---- cmbForm ----
             cmbForm.setModel(new DefaultComboBoxModel(new String[] {
@@ -133,94 +126,38 @@ public class DlgDAF extends javax.swing.JDialog {
                 "Item 3",
                 "Item 4"
             }));
-            cmbForm.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    cmbFormItemStateChanged(e);
-                }
-            });
+            cmbForm.setFont(new Font("Arial", Font.PLAIN, 14));
+            jPanel1.add(cmbForm, CC.xy(5, 5));
 
-            //---- btnCancel ----
-            btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/cancel.png")));
-            btnCancel.setText("Abbrechen");
-            btnCancel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnCancelActionPerformed(e);
-                }
-            });
+            //======== panel1 ========
+            {
+                panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
 
-            //---- btnOK ----
-            btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/apply.png")));
-            btnOK.setText("OK");
-            btnOK.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnOKActionPerformed(e);
-                }
-            });
+                //---- btnCancel ----
+                btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/cancel.png")));
+                btnCancel.setText(null);
+                btnCancel.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnCancelActionPerformed(e);
+                    }
+                });
+                panel1.add(btnCancel);
 
-            GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
-            jPanel1.setLayout(jPanel1Layout);
-            jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup()
-                            .addComponent(jSeparator1, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
-                            .addComponent(jLabel1, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
-                            .addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel2, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE)
-                                    .addComponent(jLabel3, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup()
-                                    .addComponent(cmbForm, 0, 258, Short.MAX_VALUE)
-                                    .addComponent(txtZusatz, GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE)))
-                            .addComponent(jSeparator2, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
-                            .addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addComponent(btnOK)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnCancel)))
-                        .addContainerGap())
-            );
-            jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup()
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jSeparator1, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel2)
-                            .addComponent(txtZusatz, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(cmbForm, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel3))
-                        .addGap(52, 52, 52)
-                        .addComponent(jSeparator2, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnCancel)
-                            .addComponent(btnOK))
-                        .addContainerGap(11, Short.MAX_VALUE))
-            );
+                //---- btnOK ----
+                btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/apply.png")));
+                btnOK.setText(null);
+                btnOK.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnOKActionPerformed(e);
+                    }
+                });
+                panel1.add(btnOK);
+            }
+            jPanel1.add(panel1, CC.xy(5, 9, CC.RIGHT, CC.DEFAULT));
         }
-
-        GroupLayout contentPaneLayout = new GroupLayout(contentPane);
-        contentPane.setLayout(contentPaneLayout);
-        contentPaneLayout.setHorizontalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        contentPaneLayout.setVerticalGroup(
-            contentPaneLayout.createParallelGroup()
-                .addGroup(contentPaneLayout.createSequentialGroup()
-                    .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addContainerGap())
-        );
+        contentPane.add(jPanel1);
         pack();
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
@@ -230,25 +167,17 @@ public class DlgDAF extends javax.swing.JDialog {
     }//GEN-LAST:event_btnCancelActionPerformed
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
-
-        darreichung.setSubtext(txtZusatz.getText());
-        darreichung.setDosageForm((DosageForm) cmbForm.getSelectedItem());
-
-
         EntityManager em = OPDE.createEM();
         try {
             em.getTransaction().begin();
-            if (editMode) {
-                darreichung = em.merge(darreichung);
-//                apv = em.merge(apv);
-            } else {
-                em.persist(darreichung);
-//                apv.setTauschen(darreichung.getDosageForm().getState() == MedFormenTools.UPR_BY_TRADEFORM);
-//                em.persist(apv);
-            }
+            TradeForm myTradeForm = em.merge(tradeForm);
+            myTradeForm.setSubtext(txtZusatz.getText());
+            myTradeForm.setDosageForm((DosageForm) cmbForm.getSelectedItem());
             em.getTransaction().commit();
         } catch (Exception e) {
-            em.getTransaction().rollback();
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
             OPDE.fatal(e);
         } finally {
             em.close();
@@ -256,24 +185,13 @@ public class DlgDAF extends javax.swing.JDialog {
         dispose();
     }//GEN-LAST:event_btnOKActionPerformed
 
-    private void cmbFormItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbFormItemStateChanged
-        DosageForm form = (DosageForm) evt.getItem();
-//        lblAnw.setText(MedFormenTools.UNITS[form.getUsageUnit()]);
-//        lblPack.setText(MedFormenTools.UNITS[form.getPackUnit()]);
-//        txtAPV.setText("1");
-//        txtAPV.setEnabled(form.getState() != MedFormenTools.UPR1);
-//        apv.setUPR(BigDecimal.ONE);
-    }//GEN-LAST:event_cmbFormItemStateChanged
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel jPanel1;
-    private JLabel jLabel1;
-    private JSeparator jSeparator1;
     private JLabel jLabel2;
     private JTextField txtZusatz;
     private JLabel jLabel3;
     private JComboBox cmbForm;
-    private JSeparator jSeparator2;
+    private JPanel panel1;
     private JButton btnCancel;
     private JButton btnOK;
     // End of variables declaration//GEN-END:variables

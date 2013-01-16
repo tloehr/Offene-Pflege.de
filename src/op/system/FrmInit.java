@@ -94,7 +94,7 @@ public class FrmInit extends JFrame {
      */
     private boolean schemaKorrekt() {
         Query query = em.createQuery("SELECT s FROM SYSProps s WHERE s.key = :key");
-        query.setParameter("key", "DBSCHEMA");
+        query.setParameter("key", "dbstructure");
         SYSProps dbschema = (SYSProps) query.getSingleResult();
 
         return OPDE.getAppInfo().getDBschema().contains(Integer.parseInt(dbschema.getValue()));

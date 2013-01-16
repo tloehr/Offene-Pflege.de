@@ -330,7 +330,7 @@ public class MedInventoryTools {
             Query query = em.createQuery(" " +
                     " SELECT tf.dosageForm FROM MedInventory i " +
                     " JOIN i.medStocks s " +
-                    " JOIN s.tradeform tf" +
+                    " JOIN s.tradeform tf " +
                     " WHERE i = :inventory");
             query.setParameter("inventory", inventory);
             query.setMaxResults(1);

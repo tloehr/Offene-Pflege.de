@@ -662,7 +662,7 @@ public class NReportTools {
                     " FROM NReport nr " +
                     " WHERE nr.resident = :resident " +
                     " AND nr.text like :search " +
-                    " ORDER BY nr.pit DESC";
+                    " ORDER BY nr.pit DESC ";
 
             Query query = em.createQuery(jpql);
 
@@ -734,14 +734,12 @@ public class NReportTools {
                     " WHERE nr.resident = :resident " +
                     " AND t = :tag " +
 //                    " AND nr.pit >= :from AND nr.pit <= :to  " +
-                    " ORDER BY nr.pit ASC ";
+                    " ORDER BY nr.pit DESC ";
 
             Query query = em.createQuery(jpql);
 
             query.setParameter("resident", resident);
             query.setParameter("tag", tag);
-//            query.setParameter("from", from.toDate());
-//            query.setParameter("to", to.toDate());
 
             list = new ArrayList<NReport>(query.getResultList());
 

@@ -252,7 +252,7 @@ public class AppInfo {
                 }
 
             } else if (environment.equalsIgnoreCase("database")) {
-                if (tagName.equalsIgnoreCase("schema")) {
+                if (tagName.equalsIgnoreCase("structure")) {
                     dbschema.add(Integer.parseInt(attributes.getValue("version")));
                 }
             } else if (environment.equalsIgnoreCase("properties")) {

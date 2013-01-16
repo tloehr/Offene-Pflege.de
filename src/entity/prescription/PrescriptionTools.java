@@ -7,6 +7,7 @@ package entity.prescription;
 import entity.Station;
 import entity.info.Resident;
 import entity.info.ResidentTools;
+import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.tools.HTMLTools;
 import op.tools.SYSConst;
@@ -188,7 +189,7 @@ public class PrescriptionTools {
 //    }
 
     private static String getDailyPlan(EntityManager em, Station station, List data) {
-        int STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO = Integer.parseInt(OPDE.getProps().getProperty("stellplan_pagebreak_after_element_no"));
+        int DAILYPLAN_PAGEBREAK_AFTER_ELEMENT_NO = Integer.parseInt(OPDE.getProps().getProperty(SYSPropsTools.KEY_DAILYPLAN_PAGEBREAK));
 
         int elementNumber = 1;
         boolean pagebreak = false;
@@ -234,7 +235,7 @@ public class PrescriptionTools {
                 // müssen wir hier schonmal vorsorglich den Seitenumbruch machen.
                 // 2 Zeilen rechne ich nochdrauf, damit die Tabelle mindestens 2 Zeilen hat, bevor der Seitenumbruch kommt.
                 // Das kann dann passieren, wenn dieser if Konstrukt aufgrund eines BW Wechsels durchlaufen wird.
-                pagebreak = (elementNumber + 2 + 2) > STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
+                pagebreak = (elementNumber + 2 + 2) > DAILYPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
 
                 // Außer beim ersten mal und beim Pagebreak, muss dabei die vorherige Tabelle abgeschlossen werden.
                 if (pagebreak || !bwkennung.equals("")) {
@@ -272,7 +273,7 @@ public class PrescriptionTools {
             html += "</tr>\n\n";
             elementNumber += 1;
 
-            pagebreak = elementNumber > STELLPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
+            pagebreak = elementNumber > DAILYPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
         }
 
         html += "</table>"

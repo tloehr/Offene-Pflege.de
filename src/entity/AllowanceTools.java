@@ -6,6 +6,7 @@ package entity;
 
 import entity.info.Resident;
 import entity.info.ResidentTools;
+import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.allowance.PnlAllowance;
 import op.tools.Pair;
@@ -46,7 +47,7 @@ public class AllowanceTools {
 
         BigDecimal saldo = carry;
 
-        int BARBEGTRAG_PAGEBREAK_AFTER_ELEMENT_NO = Integer.parseInt(OPDE.getProps().getProperty("barbetrag_pagebreak_after_element_no"));
+        int CASH_PAGEBREAK_AFTER_ELEMENT_NO = Integer.parseInt(OPDE.getProps().getProperty(SYSPropsTools.KEY_CASH_PAGEBREAK));
 
         int elementNumber = 1;
         boolean pagebreak = false;
@@ -70,7 +71,7 @@ public class AllowanceTools {
                 // müssen wir hier schonmal vorsorglich den Seitenumbruch machen.
                 // 2 Zeilen rechne ich nochdrauf, damit die Tabelle mindestens 2 Zeilen hat, bevor der Seitenumbruch kommt.
                 // Das kann dann passieren, wenn dieser if Konstrukt aufgrund eines Monats-Wechsels durchlaufen wird.
-                pagebreak = (elementNumber + 3 + 2) > BARBEGTRAG_PAGEBREAK_AFTER_ELEMENT_NO;
+                pagebreak = (elementNumber + 3 + 2) > CASH_PAGEBREAK_AFTER_ELEMENT_NO;
 
                 // Außer beim ersten mal und beim Pagebreak, muss dabei die vorherige Tabelle abgeschlossen werden.
 
@@ -117,7 +118,7 @@ public class AllowanceTools {
             html += "</tr>\n";
             elementNumber += 1;
 
-            pagebreak = elementNumber > BARBEGTRAG_PAGEBREAK_AFTER_ELEMENT_NO;
+            pagebreak = elementNumber > CASH_PAGEBREAK_AFTER_ELEMENT_NO;
         }
 
         html += "<tr>";

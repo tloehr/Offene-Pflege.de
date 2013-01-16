@@ -14,6 +14,7 @@ import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -26,6 +27,7 @@ import java.util.List;
  */
 public class NursingProcessTools {
     public static final String UNIQUEID = "__plankenn";
+    public static final int MAXNumOfEvals = 4;
 
     public static ArrayList<NursingProcess> getAll(Resident resident, ResInfoCategory cat) {
         EntityManager em = OPDE.createEM();
@@ -78,7 +80,7 @@ public class NursingProcessTools {
      * @param np
      * @return
      */
-    public static String getAsHTML(NursingProcess np, boolean withHeader, boolean withDetails, boolean withIcon) {
+    public static String getAsHTML(NursingProcess np, boolean withHeader, boolean withDetails, boolean withIcon, boolean showAllEvals) {
         String html = SYSConst.html_h2((withHeader ? OPDE.lang.getString(PnlNursingProcess.internalClassID) + " " + OPDE.lang.getString("misc.msg.for") + " (" + ResidentTools.getTextCompact(np.getResident()) + ")" : "") + "&nbsp;&raquo;" + np.getTopic() + "&laquo");
 
         html += withIcon && np.isClosed() ? SYSConst.html_22x22_StopSign : "";
@@ -127,8 +129,15 @@ public class NursingProcessTools {
         if (!np.getEvaluations().isEmpty()) {
             html += SYSConst.html_h3(OPDE.lang.getString("misc.msg.DateOfEvals"));
             html += "<ul>";
+            int numEvals = 0;
+            Collections.sort(np.getEvaluations());
             for (NPControl npControl : np.getEvaluations()) {
+                numEvals++;
                 html += "<li><div id=\"fonttext\">" + NPControlTools.getAsHTML(npControl) + "</div></li>";
+                if (!showAllEvals && np.getEvaluations().size() > MAXNumOfEvals && numEvals >= MAXNumOfEvals) {
+                    html += "<li>" + SYSConst.html_italic((np.getEvaluations().size() - numEvals) + " " + OPDE.lang.getString("misc.msg.moreToShow")) + " </li>";
+                    break;
+                }
             }
             html += "</ul>";
         }

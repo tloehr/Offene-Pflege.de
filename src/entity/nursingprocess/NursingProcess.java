@@ -106,7 +106,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
     private Collection<SYSNP2PROCESS> attachedQProcessConnections;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
-    private Collection<NPControl> npControls;
+    private List<NPControl> npControls;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nursingProcess")
     private List<InterventionSchedule> interventionSchedules;
 
@@ -234,7 +234,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
         return to.before(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
     }
 
-    public Collection<NPControl> getEvaluations() {
+    public List<NPControl> getEvaluations() {
         return npControls;
     }
 
@@ -254,7 +254,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
 
     @Override
     public String getContentAsHTML() {
-        return NursingProcessTools.getAsHTML(this, false, false, false);
+        return NursingProcessTools.getAsHTML(this, false, false, false, false);
     }
 
     @Override
@@ -397,7 +397,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
         return result;
     }
 
-    public NursingProcess(String topic, String situation, String goal, Date from, Date to, long npseries, Date nextEval, Long version, Users userON, Users userOFF, Resident bewohner, ResInfoCategory category, Collection<SYSNP2PROCESS> attachedQProcessConnections, Collection<NPControl> npControls, List<InterventionSchedule> interventionSchedules) {
+    public NursingProcess(String topic, String situation, String goal, Date from, Date to, long npseries, Date nextEval, Long version, Users userON, Users userOFF, Resident bewohner, ResInfoCategory category, Collection<SYSNP2PROCESS> attachedQProcessConnections, List<NPControl> npControls, List<InterventionSchedule> interventionSchedules) {
         this.topic = topic;
         this.situation = situation;
         this.goal = goal;

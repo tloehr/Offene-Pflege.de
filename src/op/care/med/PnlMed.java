@@ -28,6 +28,7 @@
 
 package op.care.med;
 
+import java.awt.event.*;
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.popup.JidePopup;
@@ -40,10 +41,7 @@ import op.care.med.inventory.DlgNewStocks;
 import op.care.med.inventory.PnlInventory;
 import op.care.med.prodassistant.MedProductWizard;
 import op.system.InternalClassACL;
-import op.tools.CleanablePanel;
-import op.tools.GUITools;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
+import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
@@ -80,6 +78,7 @@ public class PnlMed extends CleanablePanel {
     private JScrollPane jspSearch;
     private JXSearchField txtSuche;
     private JList lstPraep;
+
 
     /**
      * Creates new form FrmMed
@@ -128,6 +127,12 @@ public class PnlMed extends CleanablePanel {
 
             //---- treeMed ----
             treeMed.setFont(new Font("Arial", Font.PLAIN, 14));
+            treeMed.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    treeMedMousePressed(e);
+                }
+            });
             jScrollPane1.setViewportView(treeMed);
         }
         add(jScrollPane1);
@@ -167,13 +172,13 @@ public class PnlMed extends CleanablePanel {
             // Dieses Popupmenu für den Table
             SYSTools.unregisterListeners(menu);
             menu = new JPopupMenu();
-            JMenuItem itemdaf = new JMenuItem("Neue Darreichungsform");
-            itemdaf.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    btnNeuDAF(evt);
-                }
-            });
-            menu.add(itemdaf);
+//            JMenuItem itemdaf = new JMenuItem("Neue Darreichungsform");
+//            itemdaf.addActionListener(new java.awt.event.ActionListener() {
+//                public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                    btnNeuDAF(evt);
+//                }
+//            });
+//            menu.add(itemdaf);
 
             if (treeMed.getRowForLocation(evt.getX(), evt.getY()) != -1) {
                 JMenuItem itemedit = null;
@@ -187,48 +192,48 @@ public class PnlMed extends CleanablePanel {
 //                int nodetype = ((Integer) le.getObject()).intValue();
 
 
-//                if (dmtn.getUserObject() instanceof Darreichung) {
-//                    final Darreichung darreichung = (Darreichung) dmtn.getUserObject();
-//                    itemedit = new JMenuItem("Bearbeiten");
-//                    itemedit.addActionListener(new java.awt.event.ActionListener() {
-//                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                            new DlgDAF(thisFrame, "", darreichung);
-//                            createTree();
-//                        }
-//                    });
+                if (dmtn.getUserObject() instanceof TradeForm) {
+                    final TradeForm tradeForm = (TradeForm) dmtn.getUserObject();
+                    itemedit = new JMenuItem(OPDE.lang.getString("misc.msg.edit"));
+                    itemedit.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                            new DlgDAF("", tradeForm);
+                            createTree();
+                        }
+                    });
 //                    itemdelete = new JMenuItem("Entfernen");
 //                    itemdelete.addActionListener(new java.awt.event.ActionListener() {
 //                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                            btnDeleteDAF(darreichung);
+//                            btnDeleteDAF(tradeForm);
 //                        }
 //                    });
 //                    itempack = new JMenuItem("Neue Verpackung");
 //                    itempack.addActionListener(new java.awt.event.ActionListener() {
 //                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                            MedPackage mypack = new MedPackage(darreichung);
-//                            new DlgPack(thisFrame, "Neu", mypack);
+//                            MedPackage mypack = new MedPackage(tradeForm);
+//                            new DlgPack(OPDE.getMainframe(), "Neu", mypack);
 ////                            OPDE.getEMF().getCache().evict(Darreichung.class, darreichung.getID());
 //                            createTree();
 //                        }
 //                    });
-//                } else if (dmtn.getUserObject() instanceof MedPackage) {
-//                    final MedPackage packung = (MedPackage) dmtn.getUserObject();
-//                    itemedit = new JMenuItem("Bearbeiten");
-//                    itemedit.addActionListener(new java.awt.event.ActionListener() {
-//                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                            new DlgPack(thisFrame, "Bearbeiten", packung);
-//                            createTree();
-//                        }
-//                    });
-//                }
-
-                if (itemedit != null || itemdelete != null || itemnew != null) {
-                    menu.add(new JSeparator(JSeparator.HORIZONTAL));
+                } else if (dmtn.getUserObject() instanceof MedPackage) {
+                    final MedPackage packung = (MedPackage) dmtn.getUserObject();
+                    itemedit = new JMenuItem("Bearbeiten");
+                    itemedit.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                            new DlgPack(OPDE.lang.getString("misc.msg.edit"), packung);
+                            createTree();
+                        }
+                    });
                 }
-                if (itemnew != null) menu.add(itemnew);
-                if (itempack != null) menu.add(itempack);
+//
+//                if (itemedit != null || itemdelete != null || itemnew != null) {
+//                    menu.add(new JSeparator(JSeparator.HORIZONTAL));
+//                }
+//                if (itemnew != null) menu.add(itemnew);
+//                if (itempack != null) menu.add(itempack);
                 if (itemedit != null) menu.add(itemedit);
-                if (itemdelete != null) menu.add(itemdelete);
+//                if (itemdelete != null) menu.add(itemdelete);
             }
             menu.show(evt.getComponent(), evt.getX(), evt.getY());
         }

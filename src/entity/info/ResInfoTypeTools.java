@@ -68,7 +68,7 @@ public class ResInfoTypeTools {
 
     public static List<ResInfoType> getByCat(ResInfoCategory category) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfoType b WHERE b.resInfoCat = :cat AND b.type >= 0 ORDER BY b.bWInfoKurz, b.bwinftyp");
+        Query query = em.createQuery("SELECT b FROM ResInfoType b WHERE b.resInfoCat = :cat  ORDER BY b.bWInfoKurz, b.bwinftyp");  // AND b.type >= 0
         query.setParameter("cat", category);
         List<ResInfoType> resInfoTypen = query.getResultList();
         em.close();

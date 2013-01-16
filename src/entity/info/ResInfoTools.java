@@ -83,30 +83,25 @@ public class ResInfoTools {
     }
 
     public static ArrayList<ResInfo> getByResidentAndType(Resident resident, ResInfoType type) {
-        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.from DESC");
         query.setParameter("bewohner", resident);
         query.setParameter("bwinfotyp", type);
         ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
         em.close();
-        SYSTools.showTimeDifference(begin);
         return resInfos;
     }
 
     public static ArrayList<ResInfo> getAll(Resident resident) {
-        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner ORDER BY b.from DESC");
         query.setParameter("bewohner", resident);
         ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
         em.close();
-        SYSTools.showTimeDifference(begin);
         return resInfos;
     }
 
     public static ArrayList<ResInfo> getActiveBWInfosByBewohnerUndKatArt(Resident bewohner, int katart) {
-//        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.from <= :from AND b.to >= :to AND b.bwinfotyp.resInfoCat.catType = :katart ORDER BY b.from DESC");
         query.setParameter("bewohner", bewohner);
@@ -115,7 +110,6 @@ public class ResInfoTools {
         query.setParameter("to", new Date());
         ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
         em.close();
-//        SYSTools.showTimeDifference(begin);
         return resInfos;
     }
 
@@ -230,7 +224,7 @@ public class ResInfoTools {
     }
 
     public static boolean isEditable(ResInfo resInfo) {
-        return resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && resInfo.getResident().isActive() && (!resInfo.isClosed() || resInfo.isNoConstraints() || resInfo.isSingleIncident());
+        return resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD && resInfo.getResident().isActive() && (!resInfo.isClosed() || resInfo.isNoConstraints() || resInfo.isSingleIncident());
     }
 
     /**
@@ -766,7 +760,7 @@ public class ResInfoTools {
                 String sql = "SELECT ein.PIT, ein.EINFUHR, ifnull(aus.AUSFUHR,0) AUSFUHR, (ein.EINFUHR+ifnull(aus.AUSFUHR,0)) BILANZ FROM "
                         + "("
                         + "   SELECT PIT, SUM(Wert) AUSFUHR FROM BWerte "
-                        + "   WHERE ReplacedBy IS NULL AND Wert < 0 AND BWKennung=? AND Type = ? AND PIT >= ? "
+                        + "   WHERE ReplacedBy IS NULL AND Wert < 0 AND BWKennung=? AND TYPE = ? AND PIT >= ? "
                         + "   GROUP BY DATE(PIT) "
                         + ") aus"
                         + " "
@@ -774,11 +768,11 @@ public class ResInfoTools {
                         + " "
                         + "("
                         + "   SELECT PIT, SUM(Wert) EINFUHR FROM BWerte "
-                        + "   WHERE ReplacedBy IS NULL AND Wert > 0 AND BWKennung=? AND Type = ? AND PIT >= ?"
+                        + "   WHERE ReplacedBy IS NULL AND Wert > 0 AND BWKennung=? AND TYPE = ? AND PIT >= ?"
                         + "   GROUP BY DATE(PIT) "
                         + ") ein "
                         + "ON DATE(aus.PIT) = DATE(ein.PIT) "
-                        + "ORDER BY aus.PIT desc";
+                        + "ORDER BY aus.PIT DESC";
                 Query query = em.createNativeQuery(sql);
                 query.setParameter(1, resident.getRID());
                 query.setParameter(2, ResValueTypesTools.LIQUIDBALANCE);
@@ -800,7 +794,6 @@ public class ResInfoTools {
                         BigDecimal ausfuhr = ((BigDecimal) objects[2]);
                         BigDecimal ergebnis = ((BigDecimal) objects[3]);
 
-//                                DateFormat df = DateFormat.getDateInstance();
                         result += "<tr>";
                         result += "<td>" + df.format(((Timestamp) objects[0])) + "</td>";
                         result += "<td>" + einfuhr.setScale(BigDecimal.ROUND_UP).toPlainString() + "</td>";
@@ -823,19 +816,12 @@ public class ResInfoTools {
             } else if (hateinfuhren) {
 
 
-//                String s = " SELECT PIT, SUM(Wert) EINFUHR FROM ResValue "
-//                        + "   WHERE ReplacedBy = 0 AND Wert > 0 AND BWKennung=? AND XML='<LIQUIDBALANCE/>' "
-//                        + "   AND DATE(PIT) >= ADDDATE(DATE(now()), INTERVAL -7 DAY) "
-//                        + "   Group By DATE(PIT) "
-//                        + " ORDER BY PIT desc";
-
-
                 EntityManager em = OPDE.createEM();
                 String sql = " "
                         + " SELECT PIT, SUM(Wert) FROM BWerte "
-                        + " WHERE ReplacedBy IS NULL AND Wert > 0 AND BWKennung=? AND Type = ? AND PIT >= ? "
-                        + " Group By DATE(PIT) "
-                        + " ORDER BY PIT desc";
+                        + " WHERE ReplacedBy IS NULL AND Wert > 0 AND BWKennung=? AND TYPE = ? AND PIT >= ? "
+                        + " GROUP BY DATE(PIT) "
+                        + " ORDER BY PIT DESC";
 
                 Query query = em.createNativeQuery(sql);
                 query.setParameter(1, resident.getRID());
@@ -871,10 +857,6 @@ public class ResInfoTools {
                 result += "</table>";
 
             }
-//            else {
-//                result += OPDE.lang.getString("misc.msg.insufficientdata");
-//            }
-
 
         }
 
@@ -994,14 +976,37 @@ public class ResInfoTools {
         String result = "";
 
         if (!diags.isEmpty()) {
-            result += "<h2 id=\"fonth2\">" + OPDE.lang.getString("misc.msg.diags") + "</h2>";
-            result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\">";
-            result += "<tr><th>ICD</th><th>" + OPDE.lang.getString("misc.msg.diag") + "</th><th>" + OPDE.lang.getString("misc.msg.diag.side") + "</th><th>" + OPDE.lang.getString("misc.msg.diag.security") + "</th></tr>";
+
+            result += SYSConst.html_h2("misc.msg.diags");
+
+            String table = SYSConst.html_table_tr(
+                    SYSConst.html_table_th("misc.msg.diag.icd10") +
+                            SYSConst.html_table_th("misc.msg.Date") +
+                            SYSConst.html_table_th("misc.msg.diag") +
+                            SYSConst.html_table_th("misc.msg.diag.side") +
+                            SYSConst.html_table_th("misc.msg.diag.security") +
+                            SYSConst.html_table_th("misc.msg.comment")
+            );
+
+
             for (ResInfo diag : diags) {
                 Properties props = getContent(diag);
-                result += "<tr><td>" + props.getProperty("icd") + "</td><td>" + props.getProperty("text") + "</td><td>" + props.getProperty("koerperseite") + "</td><td>" + props.getProperty("diagnosesicherheit") + "</td></tr>";
+                table += SYSConst.html_table_tr(
+                        SYSConst.html_table_td(props.getProperty("icd")) +
+                                SYSConst.html_table_td(DateFormat.getDateInstance().format(diag.getFrom())) +
+                                SYSConst.html_table_td(props.getProperty("text")) +
+                                SYSConst.html_table_td(props.getProperty("koerperseite")) +
+                                SYSConst.html_table_td(props.getProperty("diagnosesicherheit")) +
+
+                                (SYSTools.catchNull(diag.getText()).isEmpty() ?
+                                        SYSConst.html_table_td("--", "center") :
+                                        SYSConst.html_table_td(diag.getText())
+                                )
+                );
             }
-            result += "</table>";
+
+
+            result += SYSConst.html_table(table, "1");
         }
 
         return result;

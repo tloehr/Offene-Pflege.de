@@ -19,6 +19,9 @@ import java.util.Properties;
  */
 public class SYSPropsTools {
 
+
+    public static final String KEY_DAILYPLAN_PAGEBREAK = "dailyplan_pagebreak_after_element_no";
+    public static final String KEY_CASH_PAGEBREAK = "cash_pagebreak_after_element_no";
     public static final String KEY_PHYSICAL_PRINTER = "printer.physical.name";
     public static final String KEY_LOGICAL_PRINTER = "printer.logical.name";
     public static final String KEY_MEDSTOCK_LABEL = "printer.medstock.label.name";
