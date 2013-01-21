@@ -325,6 +325,7 @@ public class PnlWelcome extends CleanablePanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 OPDE.getMainframe().clearPreviousProgbutton();
+                OPDE.getMainframe().setCurrentResident(resident);
                 OPDE.getMainframe().setPanelTo(new PnlCare(resident, jspSearch));
             }
         });
@@ -394,6 +395,7 @@ public class PnlWelcome extends CleanablePanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 OPDE.getMainframe().clearPreviousProgbutton();
+                OPDE.getMainframe().setCurrentResident(resident);
                 OPDE.getMainframe().setPanelTo(new PnlCare(resident, jspSearch));
             }
         });
@@ -426,6 +428,7 @@ public class PnlWelcome extends CleanablePanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 OPDE.getMainframe().clearPreviousProgbutton();
+                OPDE.getMainframe().setCurrentResident(resident);
                 OPDE.getMainframe().setPanelTo(new PnlCare(resident, jspSearch));
             }
         });

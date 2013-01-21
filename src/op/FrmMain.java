@@ -350,16 +350,16 @@ public class FrmMain extends JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                    "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
+                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                        "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
-                        "0dlu, $lgap, pref, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
+                    "0dlu, $lgap, pref, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
 
                 //---- btnVerlegung ----
                 btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2.png")));
@@ -691,58 +691,13 @@ public class FrmMain extends JFrame {
         return mypane;
     }
 
-//    public void change2Bewohner(Resident bw) {
-//        if (previousProgButton != null) {
-//            previousProgButton.setBackground(Color.WHITE);
-//            previousProgButton.setOpaque(false);
-//        }
-//        currentResident = bw;
-//
-//        previousProgButton = bwButtonMap.get(bw);
-//        previousProgButton.setBackground(Color.YELLOW);
-//        previousProgButton.setOpaque(true);
-//
-//
-//        List<Component> list = findPathForComponent(panesApps, previousProgButton);
-//
-//        if (list != null && !list.isEmpty()) {
-//            for (Component comp : list) {
-//                if (comp instanceof CollapsiblePane) {
-//                    try {
-//                        ((CollapsiblePane) comp).setCollapsed(false);
-//                        previousProgButton.scrollRectToVisible(previousProgButton.getBounds());
-//                    } catch (PropertyVetoException e) {
-//                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//                    }
-//                    break;
-//                }
-//            }
-//        }
-//    }
+    public Resident getCurrentResident() {
+        return currentResident;
+    }
 
-
-//    private java.util.List<Component> findPathForComponent(Container container, Component comp) {
-//        java.util.List<Component> result = null;
-//
-//        java.util.List<Component> containerList = Arrays.asList(container.getComponents());
-//
-//        for (Component component : containerList) {
-//            if (component.equals(comp)) { // ANKER
-//                result = new ArrayList<Component>();
-//                result.add(comp);
-//                break;
-//            } else {
-//                if (component instanceof Container) {
-//                    result = findPathForComponent((Container) component, comp);
-//                    if (result != null) {
-//                        result.add(component);
-//                        break;
-//                    }
-//                }
-//            }
-//        }
-//        return result;
-//    }
+    public void setCurrentResident(Resident currentResident) {
+        this.currentResident = currentResident;
+    }
 
     public void setBlocked(boolean blocked) {
         if (blocked) {

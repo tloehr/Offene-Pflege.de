@@ -21,6 +21,7 @@ import op.care.sysfiles.PnlFiles;
 import op.care.prescription.PnlPrescription;
 import op.care.values.PnlValues;
 import op.tools.CleanablePanel;
+import op.tools.GUITools;
 import op.tools.NursingRecordsPanel;
 import op.tools.SYSTools;
 import op.process.PnlProcess;
@@ -68,11 +69,11 @@ public class PnlCare extends NursingRecordsPanel {
     private JScrollPane jspSearch;
     private NursingRecordsPanel previousPanel;
 
-    public PnlCare(Resident bewohner, JScrollPane jspSearch) {
+    public PnlCare(Resident resident, JScrollPane jspSearch) {
         initPhase = true;
         initComponents();
         this.jspSearch = jspSearch;
-        resident = bewohner;
+        this.resident = resident;
         initPanel();
         initPhase = false;
         jtpPflegeakteStateChanged(null);
@@ -102,6 +103,7 @@ public class PnlCare extends NursingRecordsPanel {
     @Override
     public void switchResident(Resident res) {
         this.resident = EntityTools.find(Resident.class, res.getRID());
+        GUITools.setResidentDisplay(resident);
         ((NursingRecordsPanel) jtpPflegeakte.getSelectedComponent()).switchResident(resident);
     }
 

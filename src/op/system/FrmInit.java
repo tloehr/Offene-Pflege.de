@@ -140,40 +140,6 @@ public class FrmInit extends JFrame {
         }
     }
 
-//    /**
-//     * Legt für den aktuellen Client eine neue Host Entity an. Ermittelt einen zufälligen Hostkey.
-//     *
-//     * @return
-//     */
-//    public SYSHosts createNewHost(boolean mainhost) {
-//        InetAddress localMachine = null;
-//        try {
-//            localMachine = InetAddress.getLocalHost();
-//        } catch (java.net.UnknownHostException uhe) {
-//            OPDE.fatal(uhe);
-//            System.exit(1);
-//        }
-//
-//        SYSHosts host = null;
-//        // Solange versuchen hostkeys zu erzeugen, bis ein eindeutiger gefunden wurde. Das sollte
-//        // so gut wie nie mehr als einmal nötig sein.
-//        boolean success = false;
-//        while (!success) {
-//            String hostkey = UUID.randomUUID().toString();
-//            host = new SYSHosts(hostkey, localMachine.getHostName(), localMachine.getHostAddress(), mainhost);
-//            try {
-//                em.getTransaction().begin();
-//                em.persist(host);
-//                em.getTransaction().commit();
-//                success = true;
-//            } catch (Exception e) {
-//                em.getTransaction().rollback();
-//                success = false;
-//            }
-//        }
-//
-//        return host;
-//    }
 
     private void btnCancelActionPerformed(ActionEvent e) {
         dispose();

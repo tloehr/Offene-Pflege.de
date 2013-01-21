@@ -208,8 +208,8 @@ public class PrescriptionTools {
 
         Iterator it = data.iterator();
 
-        String html = "<h1 align=\"center\" id=\"fonth1\">" + header + " (" + station.getName() + ")" + "</h1>";
-        html += "<div align=\"center\" id=\"fontsmall\">Stellpläne <u>nur einen Tag</u> lang benutzen! Danach <u>müssen sie vernichtet</u> werden.</div>";
+        String html = "<h1 align=\"center\" id=\"fonth1\">" + header + " (" + station.getName() + ")" + "</h1>\n";
+        html += "<div align=\"center\" id=\"fontsmall\">Stellpläne <u>nur einen Tag</u> lang benutzen! Danach <u>müssen sie vernichtet</u> werden.</div>\n";
 
 
         while (it.hasNext()) {
@@ -248,7 +248,7 @@ public class PrescriptionTools {
                         (pagebreak ? "style=\"page-break-before:always\">" : ">") +
                         ((pagebreak && !bewohnerWechsel) ? "<i>(fortgesetzt)</i> " : "")
                         + ResidentTools.getLabelText(verordnung.getResident())
-                        + "</h2>";
+                        + "</h2>\n";
                 html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>"
                         + "<th>Präparat / Massnahme</th><th>FM</th><th>MO</th><th>MI</th><th>NM</th><th>AB</th><th>NA</th><th>Bemerkungen</th></tr>\n";
                 elementNumber += 2;
@@ -276,8 +276,7 @@ public class PrescriptionTools {
             pagebreak = elementNumber > DAILYPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
         }
 
-        html += "</table>"
-                + "</body>";
+        html += "</table>";
 
 
         return html;

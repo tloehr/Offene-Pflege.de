@@ -1131,6 +1131,37 @@ public class PnlInventory extends NursingRecordsPanel {
         btnAddTX.setEnabled(!stock.isClosed());
         pnlTX.add(btnAddTX);
 
+        //TODO: Worker
+
+//        OPDE.getMainframe().setBlocked(true);
+//                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+//
+//                    SwingWorker worker = new SwingWorker() {
+//
+//                        @Override
+//                        protected Object doInBackground() throws Exception {
+//                            int progress = 0;
+//                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, lstInventories.size()));
+//
+//                            for (MedInventory inventory : lstInventories) {
+//                                progress++;
+//                                createCP4(inventory);
+//                                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, lstInventories.size()));
+//                            }
+//
+//                            return null;
+//                        }
+//
+//                        @Override
+//                        protected void done() {
+//                            buildPanel();
+//                            OPDE.getDisplayManager().setProgressBarMessage(null);
+//                            OPDE.getMainframe().setBlocked(false);
+//                        }
+//                    };
+//                    worker.execute();
+
+
         BigDecimal rowsum = MedStockTools.getSum(stock);
         Collections.sort(stock.getStockTransaction());
         for (final MedStockTransaction tx : stock.getStockTransaction()) {

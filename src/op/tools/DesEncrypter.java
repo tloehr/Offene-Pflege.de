@@ -7,7 +7,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
-import javax.swing.tree.ExpandVetoException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.security.spec.AlgorithmParameterSpec;

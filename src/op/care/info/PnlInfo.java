@@ -1350,6 +1350,11 @@ public class PnlInfo extends NursingRecordsPanel {
                                         mapType2InfoList.get(newinfo.getResInfoType()).add(newinfo);
                                         Collections.sort(mapType2InfoList.get(newinfo.getResInfoType()));
                                         CollapsiblePane myCP = createCP4(newinfo.getResInfoType());
+
+                                        if (newinfo.getResInfoType().isAlertType()) {
+                                            GUITools.setResidentDisplay(resident);
+                                        }
+
                                         buildPanel();
 
                                         GUITools.flashBackground(myCP, Color.YELLOW, 2);
