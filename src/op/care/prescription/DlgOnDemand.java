@@ -39,6 +39,7 @@ import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
+import org.jdesktop.swingx.prompt.*;
 import org.joda.time.DateMidnight;
 
 import javax.persistence.EntityManager;
@@ -315,7 +316,7 @@ public class DlgOnDemand extends MyJDialog {
             //---- txtMed ----
             txtMed.setFont(new Font("Arial", Font.PLAIN, 14));
             txtMed.setPrompt("Medikamente");
-            txtMed.setFocusBehavior(org.jdesktop.swingx.prompt.PromptSupport.FocusBehavior.HIGHLIGHT_PROMPT);
+            txtMed.setFocusBehavior(PromptSupport.FocusBehavior.HIGHLIGHT_PROMPT);
             txtMed.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -634,7 +635,7 @@ public class DlgOnDemand extends MyJDialog {
             panel1.add(btnSave);
         }
         contentPane.add(panel1, CC.xy(5, 5, CC.RIGHT, CC.DEFAULT));
-        setSize(805, 475);
+        setSize(1035, 515);
         setLocationRelativeTo(getOwner());
 
         //---- bgMedikament ----

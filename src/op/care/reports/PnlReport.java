@@ -80,7 +80,7 @@ public class PnlReport extends NursingRecordsPanel {
     public static final String internalClassID = "nursingrecords.reports";
 
     private JXSearchField txtSearch;
-    //    private JToggleButton tbShowReplaced;
+    private JToggleButton tbShowReplaced;
     private JComboBox cmbTags;
 
     private HashMap<String, CollapsiblePane> cpMap;
@@ -291,16 +291,16 @@ public class PnlReport extends NursingRecordsPanel {
 ////        SYSPropsTools.restoreState(internalClassID + ":tbFilesOnly", tbFilesOnly);
 //        tbFilesOnly.setHorizontalAlignment(SwingConstants.LEFT);
 
-//        tbShowReplaced = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.filters.showreplaced"));
-//        tbShowReplaced.addItemListener(new ItemListener() {
-//            @Override
-//            public void itemStateChanged(ItemEvent itemEvent) {
-//                if (initPhase) return;
-//                reloadDisplay();
-//            }
-//        });
-//        list.add(tbShowReplaced);
-//        tbShowReplaced.setHorizontalAlignment(SwingConstants.LEFT);
+        tbShowReplaced = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.filters.showreplaced"));
+        tbShowReplaced.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) {
+                if (initPhase) return;
+                reloadDisplay();
+            }
+        });
+        list.add(tbShowReplaced);
+        tbShowReplaced.setHorizontalAlignment(SwingConstants.LEFT);
 
 //        JideButton resetButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.resetFilter"), SYSConst.icon22undo, new ActionListener() {
 //            @Override
@@ -887,158 +887,67 @@ public class PnlReport extends NursingRecordsPanel {
         int i = 0; // for zebra pattern
         for (final NReport nreport : valuecache.get(key)) {
 
-//            if (tbShowReplaced.isSelected() || !nreport.isObsolete()) {
+            if (tbShowReplaced.isSelected() || !nreport.isObsolete()) {
 
-            String title = "<html><table border=\"0\">" +
-                    "<tr valign=\"top\">" +
-                    "<td width=\"100\" align=\"left\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
-                    " " + OPDE.lang.getString("misc.msg.Time.short") +
-                    "<br/>" + nreport.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)") +
-                    "</td>" +
-                    "<td width=\"100\" align=\"left\">" + SYSTools.catchNull(NReportTools.getTagsAsHTML(nreport), " [", "]") + "</td>" +
-                    "<td width=\"400\" align=\"left\">" +
-                    nreport.getText() +
-                    "</td>" +
-                    "<td width=\"200\" align=\"left\">" + nreport.getUser().getFullname() + "</td>" +
-                    "</tr>" +
-                    "</table>" +
-                    "</html>";
+                String title = "<html><table border=\"0\">" +
+                        "<tr valign=\"top\">" +
+                        "<td width=\"100\" align=\"left\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
+                        " " + OPDE.lang.getString("misc.msg.Time.short") +
+                        "<br/>" + nreport.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)") +
+                        "</td>" +
+                        "<td width=\"100\" align=\"left\">" + SYSTools.catchNull(NReportTools.getTagsAsHTML(nreport), " [", "]") + "</td>" +
+                        "<td width=\"400\" align=\"left\">" +
+                        nreport.getText() +
+                        "</td>" +
+                        "<td width=\"200\" align=\"left\">" + nreport.getUser().getFullname() + "</td>" +
+                        "</tr>" +
+                        "</table>" +
+                        "</html>";
 
-            final DefaultCPTitle pnlSingle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), null);
-            if (nreport.isObsolete()) {
-                pnlSingle.getButton().setIcon(SYSConst.icon22eraser);
-            } else if (nreport.isReplacement()) {
-                pnlSingle.getButton().setIcon(SYSConst.icon22edited);
-            }
-            pnlSingle.getButton().addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    GUITools.showPopup(GUITools.getHTMLPopup(pnlSingle.getButton(), NReportTools.getInfoAsHTML(nreport)), SwingConstants.NORTH);
+                final DefaultCPTitle pnlSingle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), null);
+                if (nreport.isObsolete()) {
+                    pnlSingle.getButton().setIcon(SYSConst.icon22eraser);
+                } else if (nreport.isReplacement()) {
+                    pnlSingle.getButton().setIcon(SYSConst.icon22edited);
                 }
-            });
-
-            if (!nreport.getAttachedFilesConnections().isEmpty()) {
-                /***
-                 *      _     _         _____ _ _
-                 *     | |__ | |_ _ __ |  ___(_) | ___  ___
-                 *     | '_ \| __| '_ \| |_  | | |/ _ \/ __|
-                 *     | |_) | |_| | | |  _| | | |  __/\__ \
-                 *     |_.__/ \__|_| |_|_|   |_|_|\___||___/
-                 *
-                 */
-                final JButton btnFiles = new JButton(Integer.toString(nreport.getAttachedFilesConnections().size()), SYSConst.icon22greenStar);
-                btnFiles.setToolTipText(OPDE.lang.getString("misc.btnfiles.tooltip"));
-                btnFiles.setForeground(Color.BLUE);
-                btnFiles.setHorizontalTextPosition(SwingUtilities.CENTER);
-                btnFiles.setFont(SYSConst.ARIAL18BOLD);
-                btnFiles.setPressedIcon(SYSConst.icon22Pressed);
-                btnFiles.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                btnFiles.setAlignmentY(Component.TOP_ALIGNMENT);
-                btnFiles.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnFiles.setContentAreaFilled(false);
-                btnFiles.setBorder(null);
-
-                btnFiles.addActionListener(new ActionListener() {
+                pnlSingle.getButton().addActionListener(new ActionListener() {
                     @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
-                        Closure fileHandleClosure = OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) ? null : new Closure() {
-                            @Override
-                            public void execute(Object o) {
-                                EntityManager em = OPDE.createEM();
-                                final NReport myReport = em.merge(nreport);
-                                em.refresh(myReport);
-                                em.close();
-
-                                final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
-
-                                contentmap.remove(keyNewDay);
-                                linemap.remove(nreport);
-
-                                valuecache.get(keyNewDay).remove(nreport);
-                                valuecache.get(keyNewDay).add(myReport);
-                                Collections.sort(valuecache.get(keyNewDay));
-
-                                createCP4Day(new DateMidnight(myReport.getPit()));
-
-                                buildPanel();
-                                GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-                            }
-                        };
-                        new DlgFiles(nreport, fileHandleClosure);
+                    public void actionPerformed(ActionEvent e) {
+                        GUITools.showPopup(GUITools.getHTMLPopup(pnlSingle.getButton(), NReportTools.getInfoAsHTML(nreport)), SwingConstants.NORTH);
                     }
                 });
-                btnFiles.setEnabled(OPDE.isFTPworking());
-                pnlSingle.getRight().add(btnFiles);
-            }
 
+                if (!nreport.getAttachedFilesConnections().isEmpty()) {
+                    /***
+                     *      _     _         _____ _ _
+                     *     | |__ | |_ _ __ |  ___(_) | ___  ___
+                     *     | '_ \| __| '_ \| |_  | | |/ _ \/ __|
+                     *     | |_) | |_| | | |  _| | | |  __/\__ \
+                     *     |_.__/ \__|_| |_|_|   |_|_|\___||___/
+                     *
+                     */
+                    final JButton btnFiles = new JButton(Integer.toString(nreport.getAttachedFilesConnections().size()), SYSConst.icon22greenStar);
+                    btnFiles.setToolTipText(OPDE.lang.getString("misc.btnfiles.tooltip"));
+                    btnFiles.setForeground(Color.BLUE);
+                    btnFiles.setHorizontalTextPosition(SwingUtilities.CENTER);
+                    btnFiles.setFont(SYSConst.ARIAL18BOLD);
+                    btnFiles.setPressedIcon(SYSConst.icon22Pressed);
+                    btnFiles.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                    btnFiles.setAlignmentY(Component.TOP_ALIGNMENT);
+                    btnFiles.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    btnFiles.setContentAreaFilled(false);
+                    btnFiles.setBorder(null);
 
-            if (!nreport.getAttachedQProcessConnections().isEmpty()) {
-                /***
-                 *      _     _         ____
-                 *     | |__ | |_ _ __ |  _ \ _ __ ___   ___ ___  ___ ___
-                 *     | '_ \| __| '_ \| |_) | '__/ _ \ / __/ _ \/ __/ __|
-                 *     | |_) | |_| | | |  __/| | | (_) | (_|  __/\__ \__ \
-                 *     |_.__/ \__|_| |_|_|   |_|  \___/ \___\___||___/___/
-                 *
-                 */
-                final JButton btnProcess = new JButton(Integer.toString(nreport.getAttachedQProcessConnections().size()), SYSConst.icon22redStar);
-                btnProcess.setToolTipText(OPDE.lang.getString("misc.btnprocess.tooltip"));
-                btnProcess.setForeground(Color.YELLOW);
-                btnProcess.setHorizontalTextPosition(SwingUtilities.CENTER);
-                btnProcess.setFont(SYSConst.ARIAL18BOLD);
-                btnProcess.setPressedIcon(SYSConst.icon22Pressed);
-                btnProcess.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                btnProcess.setAlignmentY(Component.TOP_ALIGNMENT);
-                btnProcess.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnProcess.setContentAreaFilled(false);
-                btnProcess.setBorder(null);
-                btnProcess.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
-                        new DlgProcessAssign(nreport, new Closure() {
-                            @Override
-                            public void execute(Object o) {
-                                if (o == null) {
-                                    return;
-                                }
-                                Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = (Pair<ArrayList<QProcess>, ArrayList<QProcess>>) o;
-
-                                ArrayList<QProcess> assigned = result.getFirst();
-                                ArrayList<QProcess> unassigned = result.getSecond();
-
-                                EntityManager em = OPDE.createEM();
-
-                                try {
-                                    em.getTransaction().begin();
-
-                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                    NReport myReport = em.merge(nreport);
-                                    em.lock(myReport, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-
-                                    ArrayList<SYSNR2PROCESS> attached = new ArrayList<SYSNR2PROCESS>(myReport.getAttachedQProcessConnections());
-                                    for (SYSNR2PROCESS linkObject : attached) {
-                                        if (unassigned.contains(linkObject.getQProcess())) {
-                                            linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
-                                            linkObject.getNReport().getAttachedQProcessConnections().remove(linkObject);
-                                            em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
-
-                                            em.remove(linkObject);
-                                        }
-                                    }
-                                    attached.clear();
-
-                                    for (QProcess qProcess : assigned) {
-                                        java.util.List<QProcessElement> listElements = qProcess.getElements();
-                                        if (!listElements.contains(myReport)) {
-                                            QProcess myQProcess = em.merge(qProcess);
-                                            SYSNR2PROCESS myLinkObject = em.merge(new SYSNR2PROCESS(myQProcess, myReport));
-                                            em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
-                                            qProcess.getAttachedNReportConnections().add(myLinkObject);
-                                            myReport.getAttachedQProcessConnections().add(myLinkObject);
-                                        }
-                                    }
-
-                                    em.getTransaction().commit();
+                    btnFiles.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent actionEvent) {
+                            Closure fileHandleClosure = OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) ? null : new Closure() {
+                                @Override
+                                public void execute(Object o) {
+                                    EntityManager em = OPDE.createEM();
+                                    final NReport myReport = em.merge(nreport);
+                                    em.refresh(myReport);
+                                    em.close();
 
                                     final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
 
@@ -1053,81 +962,172 @@ public class PnlReport extends NursingRecordsPanel {
 
                                     buildPanel();
                                     GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-                                } catch (OptimisticLockException ole) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    } else {
-                                        reloadDisplay(true);
-                                    }
-                                } catch (Exception e) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
                                 }
+                            };
+                            new DlgFiles(nreport, fileHandleClosure);
+                        }
+                    });
+                    btnFiles.setEnabled(OPDE.isFTPworking());
+                    pnlSingle.getRight().add(btnFiles);
+                }
 
-                            }
-                        });
+
+                if (!nreport.getAttachedQProcessConnections().isEmpty()) {
+                    /***
+                     *      _     _         ____
+                     *     | |__ | |_ _ __ |  _ \ _ __ ___   ___ ___  ___ ___
+                     *     | '_ \| __| '_ \| |_) | '__/ _ \ / __/ _ \/ __/ __|
+                     *     | |_) | |_| | | |  __/| | | (_) | (_|  __/\__ \__ \
+                     *     |_.__/ \__|_| |_|_|   |_|  \___/ \___\___||___/___/
+                     *
+                     */
+                    final JButton btnProcess = new JButton(Integer.toString(nreport.getAttachedQProcessConnections().size()), SYSConst.icon22redStar);
+                    btnProcess.setToolTipText(OPDE.lang.getString("misc.btnprocess.tooltip"));
+                    btnProcess.setForeground(Color.YELLOW);
+                    btnProcess.setHorizontalTextPosition(SwingUtilities.CENTER);
+                    btnProcess.setFont(SYSConst.ARIAL18BOLD);
+                    btnProcess.setPressedIcon(SYSConst.icon22Pressed);
+                    btnProcess.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                    btnProcess.setAlignmentY(Component.TOP_ALIGNMENT);
+                    btnProcess.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    btnProcess.setContentAreaFilled(false);
+                    btnProcess.setBorder(null);
+                    btnProcess.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent actionEvent) {
+                            new DlgProcessAssign(nreport, new Closure() {
+                                @Override
+                                public void execute(Object o) {
+                                    if (o == null) {
+                                        return;
+                                    }
+                                    Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = (Pair<ArrayList<QProcess>, ArrayList<QProcess>>) o;
+
+                                    ArrayList<QProcess> assigned = result.getFirst();
+                                    ArrayList<QProcess> unassigned = result.getSecond();
+
+                                    EntityManager em = OPDE.createEM();
+
+                                    try {
+                                        em.getTransaction().begin();
+
+                                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                        NReport myReport = em.merge(nreport);
+                                        em.lock(myReport, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
+                                        ArrayList<SYSNR2PROCESS> attached = new ArrayList<SYSNR2PROCESS>(myReport.getAttachedQProcessConnections());
+                                        for (SYSNR2PROCESS linkObject : attached) {
+                                            if (unassigned.contains(linkObject.getQProcess())) {
+                                                linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
+                                                linkObject.getNReport().getAttachedQProcessConnections().remove(linkObject);
+                                                em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+
+                                                em.remove(linkObject);
+                                            }
+                                        }
+                                        attached.clear();
+
+                                        for (QProcess qProcess : assigned) {
+                                            java.util.List<QProcessElement> listElements = qProcess.getElements();
+                                            if (!listElements.contains(myReport)) {
+                                                QProcess myQProcess = em.merge(qProcess);
+                                                SYSNR2PROCESS myLinkObject = em.merge(new SYSNR2PROCESS(myQProcess, myReport));
+                                                em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
+                                                qProcess.getAttachedNReportConnections().add(myLinkObject);
+                                                myReport.getAttachedQProcessConnections().add(myLinkObject);
+                                            }
+                                        }
+
+                                        em.getTransaction().commit();
+
+                                        final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
+
+                                        contentmap.remove(keyNewDay);
+                                        linemap.remove(nreport);
+
+                                        valuecache.get(keyNewDay).remove(nreport);
+                                        valuecache.get(keyNewDay).add(myReport);
+                                        Collections.sort(valuecache.get(keyNewDay));
+
+                                        createCP4Day(new DateMidnight(myReport.getPit()));
+
+                                        buildPanel();
+                                        GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
+                                    } catch (OptimisticLockException ole) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                            OPDE.getMainframe().emptyFrame();
+                                            OPDE.getMainframe().afterLogin();
+                                        } else {
+                                            reloadDisplay(true);
+                                        }
+                                    } catch (Exception e) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        OPDE.fatal(e);
+                                    } finally {
+                                        em.close();
+                                    }
+
+                                }
+                            });
+                        }
+                    });
+                    btnProcess.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
+                    pnlSingle.getRight().add(btnProcess);
+                }
+
+                /***
+                 *      __  __
+                 *     |  \/  | ___ _ __  _   _
+                 *     | |\/| |/ _ \ '_ \| | | |
+                 *     | |  | |  __/ | | | |_| |
+                 *     |_|  |_|\___|_| |_|\__,_|
+                 *
+                 */
+                final JButton btnMenu = new JButton(SYSConst.icon22menu);
+                btnMenu.setPressedIcon(SYSConst.icon22Pressed);
+                btnMenu.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                btnMenu.setAlignmentY(Component.TOP_ALIGNMENT);
+                btnMenu.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnMenu.setContentAreaFilled(false);
+                btnMenu.setBorder(null);
+                btnMenu.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        JidePopup popup = new JidePopup();
+                        popup.setMovable(false);
+                        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                        popup.setOwner(btnMenu);
+                        popup.removeExcludedComponent(btnMenu);
+                        JPanel pnl = getMenu(nreport);
+                        popup.getContentPane().add(pnl);
+                        popup.setDefaultFocusComponent(pnl);
+
+                        GUITools.showPopup(popup, SwingConstants.WEST);
                     }
                 });
-                btnProcess.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
-                pnlSingle.getRight().add(btnProcess);
-            }
+                btnMenu.setEnabled(!nreport.isObsolete());
+                pnlSingle.getRight().add(btnMenu);
 
-            /***
-             *      __  __
-             *     |  \/  | ___ _ __  _   _
-             *     | |\/| |/ _ \ '_ \| | | |
-             *     | |  | |  __/ | | | |_| |
-             *     |_|  |_|\___|_| |_|\__,_|
-             *
-             */
-            final JButton btnMenu = new JButton(SYSConst.icon22menu);
-            btnMenu.setPressedIcon(SYSConst.icon22Pressed);
-            btnMenu.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnMenu.setAlignmentY(Component.TOP_ALIGNMENT);
-            btnMenu.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btnMenu.setContentAreaFilled(false);
-            btnMenu.setBorder(null);
-            btnMenu.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JidePopup popup = new JidePopup();
-                    popup.setMovable(false);
-                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-                    popup.setOwner(btnMenu);
-                    popup.removeExcludedComponent(btnMenu);
-                    JPanel pnl = getMenu(nreport);
-                    popup.getContentPane().add(pnl);
-                    popup.setDefaultFocusComponent(pnl);
-
-                    GUITools.showPopup(popup, SwingConstants.WEST);
+                JPanel zebra = new JPanel();
+                zebra.setLayout(new BoxLayout(zebra, BoxLayout.LINE_AXIS));
+                zebra.setOpaque(true);
+                if (i % 2 == 0) {
+                    zebra.setBackground(SYSConst.orange1[SYSConst.light2]);
+                } else {
+                    zebra.setBackground(Color.WHITE);
                 }
-            });
-            btnMenu.setEnabled(!nreport.isObsolete());
-            pnlSingle.getRight().add(btnMenu);
+                zebra.add(pnlSingle.getMain());
+                i++;
 
-            JPanel zebra = new JPanel();
-            zebra.setLayout(new BoxLayout(zebra, BoxLayout.LINE_AXIS));
-            zebra.setOpaque(true);
-            if (i % 2 == 0) {
-                zebra.setBackground(SYSConst.orange1[SYSConst.light2]);
-            } else {
-                zebra.setBackground(Color.WHITE);
+                dayPanel.add(zebra);
+                linemap.put(nreport, pnlSingle.getMain());
             }
-            zebra.add(pnlSingle.getMain());
-            i++;
-
-            dayPanel.add(zebra);
-            linemap.put(nreport, pnlSingle.getMain());
         }
-//        }
         contentmap.put(key, dayPanel);
         return dayPanel;
     }
@@ -1330,9 +1330,9 @@ public class PnlReport extends NursingRecordsPanel {
 //                                    expandDay(new DateMidnight(delReport.getPit()));
 
                                     buildPanel();
-//
-                                    GUITools.flashBackground(linemap.get(delReport), Color.YELLOW, 2);
-
+                                    if (tbShowReplaced.isSelected()) {
+                                        GUITools.flashBackground(linemap.get(delReport), Color.YELLOW, 2);
+                                    }
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();

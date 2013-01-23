@@ -28,6 +28,7 @@ package op.tools;
 
 import com.jidesoft.swing.JideSplitPane;
 import entity.files.SYSFilesTools;
+import entity.info.ResidentTools;
 import entity.system.SYSPropsTools;
 import entity.system.Users;
 import op.OPDE;
@@ -1729,24 +1730,33 @@ public class SYSTools {
         String html = "";
         StackTraceElement[] stacktrace = exc.getStackTrace();
 
+        html += SYSConst.html_h1("opde.errormail.attachment.line1");
+        html += SYSConst.html_h2(exc.getClass().getName());
+        html += SYSConst.html_paragraph(exc.getMessage());
 
-        html += "<h1>Ausnahmezustand aufgetreten</h1>";
-        html += "<h2>" + exc.getClass().getName() + "</h2>";
-        html += "<p>" + exc.getMessage() + "</p>";
-        html += "<table border=\"1\" cellspacing=\"0\"><tr>"
-                + "<th>Methode</th><th>Zeile</th><th>Klasse</th><th>Datei</th></tr>";
+        if (OPDE.getMainframe().getCurrentResident() != null){
+            html += SYSConst.html_h3(OPDE.lang.getString("misc.msg.resident") + ": " + ResidentTools.getLabelText(OPDE.getMainframe().getCurrentResident()));
+        }
 
+        html += SYSConst.html_h3(OPDE.getMainframe().getCurrentClassname());
+
+        String table = SYSConst.html_table_th("opde.errormail.attachment.tab.col1") +
+                SYSConst.html_table_th("opde.errormail.attachment.tab.col2") +
+                SYSConst.html_table_th("opde.errormail.attachment.tab.col3") +
+                SYSConst.html_table_th("opde.errormail.attachment.tab.col4");
 
         for (int exception = 0; exception < stacktrace.length; exception++) {
             StackTraceElement element = stacktrace[exception];
-            html += "<tr>";
-            html += "<td>" + element.getMethodName() + "</td>";
-            html += "<td>" + element.getLineNumber() + "</td>";
-            html += "<td>" + element.getClassName() + "</td>";
-            html += "<td>" + element.getFileName() + "</td>";
-            html += "</tr>";
+            table += SYSConst.html_table_tr(
+                    SYSConst.html_table_td(element.getMethodName()) +
+                            SYSConst.html_table_td(Integer.toString(element.getLineNumber())) +
+                            SYSConst.html_table_td(element.getClassName()) +
+                            SYSConst.html_table_td(element.getFileName())
+            );
         }
-        html += "</table>";
+
+        html += SYSConst.html_table(table, "1");
+
 
         return html;
     }

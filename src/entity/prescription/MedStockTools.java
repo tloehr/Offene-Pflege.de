@@ -584,7 +584,14 @@ public class MedStockTools {
         try {
             Query query = em.createQuery("SELECT AVG(s.upr) FROM MedStock s WHERE s.tradeform = :tradeform AND s.uprDummy = FALSE ");
             query.setParameter("tradeform", tradeForm);
-            upr = (BigDecimal) query.getSingleResult();
+            Object result = query.getSingleResult();
+
+            if (result instanceof Double) {
+                upr = new BigDecimal((Double) result);
+            } else {
+                upr = (BigDecimal) query.getSingleResult();
+            }
+            upr = upr.setScale(2, BigDecimal.ROUND_HALF_UP);
         } catch (NoResultException nre) {
             upr = null;
         } catch (Exception e) {
@@ -602,7 +609,13 @@ public class MedStockTools {
             Query query = em.createQuery("SELECT AVG(s.upr) FROM MedStock s WHERE s.tradeform = :tradeform AND s.inventory.resident = :resident AND s.uprDummy = FALSE ");
             query.setParameter("tradeform", tradeForm);
             query.setParameter("resident", resident);
-            upr = (BigDecimal) query.getSingleResult();
+            Object result = query.getSingleResult();
+            if (result instanceof Double) {
+                upr = new BigDecimal((Double) result);
+            } else {
+                upr = (BigDecimal) query.getSingleResult();
+            }
+            upr = upr.setScale(2, BigDecimal.ROUND_HALF_UP);
         } catch (NoResultException nre) {
             upr = null;
         } catch (Exception e) {

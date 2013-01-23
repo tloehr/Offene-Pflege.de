@@ -113,7 +113,7 @@ public class OPDE {
     }
 
     public static String getOPCache() {
-        return opwd + System.getProperty("file.separator") + "cache";
+        return opwd + sep + AppInfo.dirCache;
     }
 
     public static LogicalPrinters getLogicalPrinters() {

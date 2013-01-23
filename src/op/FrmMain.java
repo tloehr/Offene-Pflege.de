@@ -90,7 +90,6 @@ import java.util.HashMap;
 public class FrmMain extends JFrame {
 
     public static final String internalClassID = "opde.mainframe";
-
     private boolean initPhase;
 
     public DisplayManager getDisplayManager() {
@@ -98,7 +97,6 @@ public class FrmMain extends JFrame {
     }
 
     private DisplayManager displayManager;
-
     private PrintProcessor printProcessor;
 
     public PrintProcessor getPrintProcessor() {
@@ -107,18 +105,13 @@ public class FrmMain extends JFrame {
 
     private CleanablePanel currentVisiblePanel;
     private Resident currentResident;
+    private String currentClassname;
     private JideButton previousProgButton;
-    private DlgLogin dlgLogin;
     private LabelStatusBarItem labelUSER;
     private JScrollPane jspSearch, jspApps;
     private CollapsiblePanes panesSearch, panesApps;
-    private Closure residentChangeAction;
     private HashMap<Resident, JideButton> bwButtonMap;
     private JideButton homeButton;
-
-//    private ResInfoType biohazard;
-//    private MouseListener blockingListener;
-
 
     public FrmMain() {
         initPhase = true;
@@ -146,12 +139,12 @@ public class FrmMain extends JFrame {
         printProcessor.start();
 
 
-        residentChangeAction = new Closure() {
-            @Override
-            public void execute(Object o) {
-                currentResident = (Resident) o;
-            }
-        };
+//        residentChangeAction = new Closure() {
+//            @Override
+//            public void execute(Object o) {
+//                currentResident = (Resident) o;
+//            }
+//        };
 
 //        biohazard = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_BIOHAZARD);
 
@@ -350,16 +343,16 @@ public class FrmMain extends JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                    "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                    "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
-                    "0dlu, $lgap, pref, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
+                        "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
+                        "0dlu, $lgap, pref, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
 
                 //---- btnVerlegung ----
                 btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2.png")));
@@ -580,6 +573,7 @@ public class FrmMain extends JFrame {
     public CleanablePanel loadPanel(String classname) {
         CleanablePanel panel = null;
         currentResident = null;
+        currentClassname = classname;
         if (classname.equals("op.allowance.PnlAllowance")) {
             panel = new PnlAllowance(jspSearch);
         } else if (classname.equals("op.process.PnlProcess")) {
@@ -598,6 +592,10 @@ public class FrmMain extends JFrame {
             panel = new PnlConfigs(jspSearch);
         }
         return panel;
+    }
+
+    public String getCurrentClassname() {
+        return currentClassname;
     }
 
     private CollapsiblePane addNursingRecords(final Station station) {
@@ -744,7 +742,7 @@ public class FrmMain extends JFrame {
     }
 
     private void showLogin() {
-        dlgLogin = new DlgLogin(new Closure() {
+        new DlgLogin(new Closure() {
             @Override
             public void execute(Object o) {
                 if (o != null) {
@@ -770,7 +768,7 @@ public class FrmMain extends JFrame {
 
         SYSLoginTools.logout();
 
-        System.gc();
+//        System.gc();
         cleanup();
 
     }

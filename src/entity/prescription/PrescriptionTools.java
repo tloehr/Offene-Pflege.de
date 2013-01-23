@@ -194,23 +194,14 @@ public class PrescriptionTools {
         int elementNumber = 1;
         boolean pagebreak = false;
 
-        String header = "Stellplan für den " + DateFormat.getDateInstance().format(new Date());
-
-//        String html = "<html>"
-//                + "<head>"
-//                + "<title>" + header + "</title>"
-//                + OPDE.getCSS()
-//                + HTMLTools.JSCRIPT_PRINT
-//                + "</head>"
-//                + "<body>";
+        String header = OPDE.lang.getString("nursingrecords.prescription.dailyplan.header1") + " " + DateFormat.getDateInstance().format(new Date());
 
         String bwkennung = "";
 
         Iterator it = data.iterator();
 
-        String html = "<h1 align=\"center\" id=\"fonth1\">" + header + " (" + station.getName() + ")" + "</h1>\n";
-        html += "<div align=\"center\" id=\"fontsmall\">Stellpläne <u>nur einen Tag</u> lang benutzen! Danach <u>müssen sie vernichtet</u> werden.</div>\n";
-
+        String html = SYSConst.html_h1(header + " (" + station.getName() + ")");
+        html += "<div align=\"center\">" + OPDE.lang.getString("nursingrecords.prescription.dailyplan.warning") + "</div>\n";
 
         while (it.hasNext()) {
             Object[] objects = (Object[]) it.next();
@@ -249,8 +240,17 @@ public class PrescriptionTools {
                         ((pagebreak && !bewohnerWechsel) ? "<i>(fortgesetzt)</i> " : "")
                         + ResidentTools.getLabelText(verordnung.getResident())
                         + "</h2>\n";
-                html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>"
-                        + "<th>Präparat / Massnahme</th><th>FM</th><th>MO</th><th>MI</th><th>NM</th><th>AB</th><th>NA</th><th>Bemerkungen</th></tr>\n";
+                html += "<table id=\"font14\" border=\"1\" cellspacing=\"0\">";
+                html += SYSConst.html_table_tr(
+                        SYSConst.html_table_th("nursingrecords.prescription.dailyplan.table.col1")
+                                + SYSConst.html_table_th("misc.msg.earlyinthemorning.short")
+                                + SYSConst.html_table_th("misc.msg.morning.short")
+                                + SYSConst.html_table_th("misc.msg.noon.short")
+                                + SYSConst.html_table_th("misc.msg.afternoon.short")
+                                + SYSConst.html_table_th("misc.msg.evening.short")
+                                + SYSConst.html_table_th("misc.msg.lateatnight.short")
+                                + SYSConst.html_table_th("misc.msg.comment")
+                );
                 elementNumber += 2;
 
                 if (pagebreak) {
@@ -260,9 +260,9 @@ public class PrescriptionTools {
             }
 
 
-            html += "<tr style=\"page-break-before:avoid\" " + (grau ? "id=\"fonttextgrau\">" : ">\n");
+            html += "<tr style=\"page-break-before:avoid\" " + (grau ? "id=\"fonttextgray14\">" : ">\n");
             html += "<td width=\"300\" >" + (verordnung.hasMed() ? "<b>" + TradeFormTools.toPrettyString(verordnung.getTradeForm()) + "</b>" : verordnung.getIntervention().getBezeichnung());
-            html += (bestid != null ? "<br/><i>Bestand im Anbruch Nr.: " + bestid + "</i>" : "") + "</td>\n";
+            html += (bestid != null ? "<br/><i>" + OPDE.lang.getString("nursingrecords.prescription.dailyplan.stockInUse") + " " + OPDE.lang.getString("misc.msg.number") + " " + bestid + "</i>" : "") + "</td>\n";
             html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getNachtMo()) + "</td>\n";
             html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getMorgens()) + "</td>\n";
             html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getMittags()) + "</td>\n";

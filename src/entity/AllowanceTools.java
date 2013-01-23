@@ -93,7 +93,7 @@ public class AllowanceTools {
                         + "<th>Belegdatum</th><th>Belegtext</th><th>Betrag</th><th>Saldo</th></tr>\n";
 
                 // Vortragszeile
-                html += "<tr id=\"fonttextgrau\">";
+                html += "<tr id=\"fonttextgray\">";
                 html += "<td width=\"90\"  align=\"center\" >&nbsp;</td>";
                 html += "<td width=\"340\">" + (pagebreak && !monatsWechsel ? "Übertrag von vorheriger Seite" : "Übertrag aus Vormonat") + "</td>";
                 html += "<td>&nbsp;</td>";
