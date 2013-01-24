@@ -6,6 +6,8 @@ package entity.info;
 
 import entity.EntityTools;
 import entity.Homes;
+import entity.Station;
+import entity.StationTools;
 import entity.nursingprocess.NursingProcessTools;
 import entity.prescription.MedInventoryTools;
 import entity.prescription.PrescriptionTools;
@@ -194,9 +196,19 @@ public class ResidentTools {
         return list;
     }
 
+    public static ArrayList<Resident> getAllActive(Station station) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM Resident b WHERE b.station = :station ORDER BY b.name, b.firstname");
+        query.setParameter("station", station);
+        ArrayList<Resident> list = new ArrayList<Resident>(query.getResultList());
+        em.close();
+        return list;
+    }
+
     /**
      * retrieves a list of all residents who were staying in the home during that particular
      * month. They are also included if they have left or arrived in that time period.
+     *
      * @param month
      * @return
      */
@@ -211,7 +223,7 @@ public class ResidentTools {
                     " SELECT b FROM Resident b " +
                     " JOIN b.resInfoCollection rinfo " +
                     " WHERE rinfo.bwinfotyp.type = :type " +
-                    " AND b.adminonly <> 2 "+
+                    " AND b.adminonly <> 2 " +
                     " AND ((rinfo.from <= :from AND rinfo.to >= :from) OR " +
                     " (rinfo.from <= :to AND rinfo.to >= :to) OR " +
                     " (rinfo.from > :from AND rinfo.to < :to)) " +
@@ -237,16 +249,18 @@ public class ResidentTools {
     }
 
     public static ArrayList<Resident> getAllWithBirthdayIn(int days) {
-        ArrayList<Resident> list = getAllActive();
+
         ArrayList<Resident> result = new ArrayList<Resident>();
+        Station currentStation = StationTools.getStationForThisHost();
+        ArrayList<Resident> list = getAllActive(currentStation.getHome());
 
         for (Resident resident : list) {
             DateMidnight birthday = new DateMidnight(resident.getDOB());
             DateMidnight now = new DateMidnight();
-            if (
-                    now.getDayOfYear() <= birthday.getDayOfYear() && now.getDayOfYear() + days >= birthday.getDayOfYear()
-                            ||
-                            now.getDayOfYear() <= birthday.getDayOfYear() + 365 && now.getDayOfYear() + days >= birthday.getDayOfYear() + 365
+
+            if (now.getDayOfYear() <= birthday.getDayOfYear() && now.getDayOfYear() + days >= birthday.getDayOfYear()
+                    ||
+                    now.getDayOfYear() <= birthday.getDayOfYear() + 365 && now.getDayOfYear() + days >= birthday.getDayOfYear() + 365
                     ) {
                 result.add(resident);
             }

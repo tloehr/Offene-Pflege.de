@@ -145,7 +145,11 @@ public class PnlPrescription extends NursingRecordsPanel {
                     int progress = -1;
                     OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, lstPrescriptions.size()));
 
-                    lstPrescriptions = PrescriptionTools.getAll(resident);
+                    if (tbClosed.isSelected()) {
+                        lstPrescriptions = PrescriptionTools.getAll(resident);
+                    } else {
+                        lstPrescriptions = PrescriptionTools.getAllActive(resident);
+                    }
                     Collections.sort(lstPrescriptions);
 
                     for (Prescription prescription : lstPrescriptions) {
@@ -167,7 +171,11 @@ public class PnlPrescription extends NursingRecordsPanel {
             worker.execute();
 
         } else {
-            lstPrescriptions = PrescriptionTools.getAll(resident);
+            if (tbClosed.isSelected()) {
+                lstPrescriptions = PrescriptionTools.getAll(resident);
+            } else {
+                lstPrescriptions = PrescriptionTools.getAllActive(resident);
+            }
             Collections.sort(lstPrescriptions);
             for (Prescription prescription : lstPrescriptions) {
                 createCP4(prescription);
@@ -549,7 +557,8 @@ public class PnlPrescription extends NursingRecordsPanel {
             @Override
             public void itemStateChanged(ItemEvent e) {
 //                SYSPropsTools.storeState(internalClassID + ":tbClosed", tbClosed);
-                buildPanel();
+                reloadDisplay();
+//                buildPanel();
             }
         });
         tbClosed.setHorizontalAlignment(SwingConstants.LEFT);
@@ -731,11 +740,11 @@ public class PnlPrescription extends NursingRecordsPanel {
         int i = 0;
         // for the zebra coloring
         for (Prescription prescription : lstPrescriptions) {
-            if (tbClosed.isSelected() || !prescription.isClosed()) {
-                cpMap.get(prescription.getID() + ".xprescription").setBackground(getColor(SYSConst.medium1, i % 2 == 1));
-                cpsPrescription.add(cpMap.get(prescription.getID() + ".xprescription"));
-                i++;
-            }
+//            if (tbClosed.isSelected() || !prescription.isClosed()) {
+            cpMap.get(prescription.getID() + ".xprescription").setBackground(getColor(SYSConst.medium1, i % 2 == 1));
+            cpsPrescription.add(cpMap.get(prescription.getID() + ".xprescription"));
+            i++;
+//            }
         }
         cpsPrescription.addExpansion();
     }

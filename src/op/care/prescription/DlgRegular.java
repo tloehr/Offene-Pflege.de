@@ -39,6 +39,7 @@ import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
+import org.jdesktop.swingx.prompt.*;
 import org.joda.time.DateMidnight;
 import tablerenderer.RNDHTML;
 
@@ -78,6 +79,7 @@ public class DlgRegular extends MyJDialog {
     private List<PrescriptionSchedule> schedules2delete = null;
     private Pair<Prescription, List<PrescriptionSchedule>> returnPackage = null;
 
+    private JToggleButton tbDailyPlan;
 
     /**
      * Creates new form DlgRegular
@@ -131,8 +133,8 @@ public class DlgRegular extends MyJDialog {
             cmbMed.setModel(new DefaultComboBoxModel());
             cmbIntervention.setEnabled(true);
             txtIntervention.setEnabled(true);
-            cbDailyPlan.setEnabled(true);
-            cbDailyPlan.setSelected(false);
+            tbDailyPlan.setEnabled(true);
+            tbDailyPlan.setSelected(false);
             rbEndOfPackage.setEnabled(false);
         } else {
             OPDE.getDisplayManager().setDBActionMessage(true);
@@ -167,8 +169,8 @@ public class DlgRegular extends MyJDialog {
                 cmbIntervention.setSelectedIndex(-1);
                 cmbIntervention.setEnabled(true);
                 txtIntervention.setEnabled(true);
-                cbDailyPlan.setEnabled(true);
-                cbDailyPlan.setSelected(false);
+                tbDailyPlan.setEnabled(true);
+                tbDailyPlan.setSelected(false);
                 OPDE.getDisplayManager().clearSubMessages();
             }
             rbEndOfPackage.setEnabled(cmbMed.getModel().getSize() > 0);
@@ -222,7 +224,6 @@ public class DlgRegular extends MyJDialog {
         tblDosis = new JTable();
         panel2 = new JPanel();
         btnAddDosis = new JButton();
-        cbDailyPlan = new JCheckBox();
         jPanel3 = new JPanel();
         pnlOFF = new JPanel();
         rbActive = new JRadioButton();
@@ -258,7 +259,7 @@ public class DlgRegular extends MyJDialog {
             //---- txtMed ----
             txtMed.setFont(new Font("Arial", Font.PLAIN, 14));
             txtMed.setPrompt("Medikamente");
-            txtMed.setFocusBehavior(org.jdesktop.swingx.prompt.PromptSupport.FocusBehavior.HIGHLIGHT_PROMPT);
+            txtMed.setFocusBehavior(PromptSupport.FocusBehavior.HIGHLIGHT_PROMPT);
             txtMed.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -392,14 +393,6 @@ public class DlgRegular extends MyJDialog {
                 jPanel8.add(panel2, CC.xy(1, 3, CC.LEFT, CC.DEFAULT));
             }
             jPanel1.add(jPanel8, CC.xywh(1, 7, 5, 1));
-
-            //---- cbDailyPlan ----
-            cbDailyPlan.setText("Auf den Stellplan, auch wenn kein Medikament");
-            cbDailyPlan.setBorder(BorderFactory.createEmptyBorder());
-            cbDailyPlan.setMargin(new Insets(0, 0, 0, 0));
-            cbDailyPlan.setFont(new Font("Arial", Font.PLAIN, 14));
-            cbDailyPlan.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            jPanel1.add(cbDailyPlan, CC.xywh(1, 5, 5, 1));
         }
         contentPane.add(jPanel1, CC.xy(5, 3));
 
@@ -573,8 +566,11 @@ public class DlgRegular extends MyJDialog {
         cmbIntervention.setSelectedItem(prescription.getIntervention());
         txtIntervention.setEnabled(cmbMed.getModel().getSize() == 0);
 
-        cbDailyPlan.setEnabled(cmbMed.getModel().getSize() == 0);
-        cbDailyPlan.setSelected(prescription.isOnDailyPlan());
+        tbDailyPlan = GUITools.getNiceToggleButton(PnlPrescription.internalClassID+".dlgRegular.addToDailyPlan");
+        jPanel1.add(tbDailyPlan, CC.xywh(1, 5, 5, 1, CC.LEFT, CC.DEFAULT));
+
+        tbDailyPlan.setEnabled(cmbMed.getModel().getSize() == 0);
+        tbDailyPlan.setSelected(prescription.isOnDailyPlan());
 
         cmbMed.setEnabled(editMode != MODE_CHANGE);
         txtMed.setEnabled(editMode != MODE_CHANGE);
@@ -637,8 +633,8 @@ public class DlgRegular extends MyJDialog {
         cmbIntervention.setEnabled(false);
         txtIntervention.setText(null);
         txtIntervention.setEnabled(false);
-        cbDailyPlan.setEnabled(false);
-        cbDailyPlan.setSelected(false);
+        tbDailyPlan.setEnabled(false);
+        tbDailyPlan.setSelected(false);
     }//GEN-LAST:event_cmbMedItemStateChanged
 
 
@@ -696,7 +692,7 @@ public class DlgRegular extends MyJDialog {
 
         prescription.setHospitalON((Hospital) cmbHospitalON.getSelectedItem());
         prescription.setIntervention((Intervention) cmbIntervention.getSelectedItem());
-        prescription.setShowOnDailyPlan(cbDailyPlan.isSelected());
+        prescription.setShowOnDailyPlan(tbDailyPlan.isSelected());
         prescription.setSituation(null);
         prescription.setText(txtBemerkung.getText().trim());
         prescription.setTradeForm((TradeForm) cmbMed.getSelectedItem());
@@ -858,7 +854,6 @@ public class DlgRegular extends MyJDialog {
     private JTable tblDosis;
     private JPanel panel2;
     private JButton btnAddDosis;
-    private JCheckBox cbDailyPlan;
     private JPanel jPanel3;
     private JPanel pnlOFF;
     private JRadioButton rbActive;

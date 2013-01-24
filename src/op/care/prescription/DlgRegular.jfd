@@ -615,55 +615,6 @@
           </void> 
          </object> 
         </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JCheckBox</string> 
-          <void method="setProperty"> 
-           <string>text</string> 
-           <string>Auf den Stellplan, auch wenn kein Medikament</string> 
-          </void> 
-          <void method="setProperty"> 
-           <string>border</string> 
-           <object class="javax.swing.border.EmptyBorder"> 
-            <int>0</int> 
-            <int>0</int> 
-            <int>0</int> 
-            <int>0</int> 
-           </object> 
-          </void> 
-          <void method="setProperty"> 
-           <string>margin</string> 
-           <object class="java.awt.Insets"> 
-            <int>0</int> 
-            <int>0</int> 
-            <int>0</int> 
-            <int>0</int> 
-           </object> 
-          </void> 
-          <void method="setProperty"> 
-           <string>font</string> 
-           <object idref="Font0"/> 
-          </void> 
-          <void method="setProperty"> 
-           <string>cursor</string> 
-           <object idref="Cursor0"/> 
-          </void> 
-          <void property="name"> 
-           <string>cbDailyPlan</string> 
-          </void> 
-         </object> 
-         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-          <class>com.jgoodies.forms.layout.CellConstraints</class> 
-          <void method="setProperty"> 
-           <string>gridY</string> 
-           <int>5</int> 
-          </void> 
-          <void method="setProperty"> 
-           <string>gridWidth</string> 
-           <int>5</int> 
-          </void> 
-         </object> 
-        </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
         <class>com.jgoodies.forms.layout.CellConstraints</class> 

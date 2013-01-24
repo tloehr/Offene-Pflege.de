@@ -39,6 +39,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
 import java.util.*;
 import java.util.List;
@@ -65,6 +67,8 @@ public class PnlInfo extends NursingRecordsPanel {
     private Color[] color1, color2;
 
     private ResInfoType typeAbsence, typeStartOfStay;
+
+    private JToggleButton tbShowClosedWithOldForms, tbShowClosedWithActiveForms, tbShowEmpty;
 
     @Override
     public String getInternalClassID() {
@@ -259,9 +263,14 @@ public class PnlInfo extends NursingRecordsPanel {
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
                 JPanel pnlContent = new JPanel(new VerticalLayout());
                 for (ResInfoType type : ResInfoTypeTools.getByCat(cat)) {
-                    if (type.getType() != ResInfoTypeTools.TYPE_OLD || mapType2InfoList.containsKey(type)) {
+
+                    if (tbShowEmpty.isSelected() || mapType2InfoList.containsKey(type)){
                         pnlContent.add(createCP4(type));
                     }
+
+//                    if (type.getType() != ResInfoTypeTools.TYPE_OLD || mapType2InfoList.containsKey(type)) {
+//                        pnlContent.add(createCP4(type));
+//                    }
                 }
                 cpCat.setContentPane(pnlContent);
             }
@@ -477,7 +486,10 @@ public class PnlInfo extends NursingRecordsPanel {
         cptitle.getMain().setOpaque(true);
         cptitle.getButton().setVerticalTextPosition(SwingConstants.TOP);
 
-        if (resInfo.isClosed()) cptitle.getAdditionalIconPanel().add(new JLabel(SYSConst.icon22stopSign));
+        if (resInfo.isClosed()) {
+            cptitle.getButton().setIcon(resInfo.getResInfoType().isObsolete() ? SYSConst.icon22stopSignGray : SYSConst.icon22stopSign);
+//            cptitle.getAdditionalIconPanel().add(new JLabel(SYSConst.icon22stopSign));
+        }
 
         mapInfo2Panel.put(resInfo, cptitle.getMain());
 
@@ -686,7 +698,7 @@ public class PnlInfo extends NursingRecordsPanel {
         boolean empty = !mapType2InfoList.containsKey(type) || mapType2InfoList.get(type).isEmpty();
         if (!empty) {
             if (containsOnlyClosedInfos(type))
-                cptitle.getAdditionalIconPanel().add(new JLabel(SYSConst.icon22stopSign));
+                cptitle.getAdditionalIconPanel().add(new JLabel(type.isObsolete() ? SYSConst.icon22stopSignGray : SYSConst.icon22stopSign));
             else
                 cptitle.getAdditionalIconPanel().add(new JLabel(SYSConst.icon22infogreen2));
         }
@@ -812,6 +824,7 @@ public class PnlInfo extends NursingRecordsPanel {
         list.add(new JSeparator());
         list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
         list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22stopSign, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription7"), SYSConst.icon22stopSignGray, SwingConstants.LEADING));
         list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22infogreen2, SwingConstants.LEADING));
         list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription3"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
         list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription4"), SYSConst.icon22ledGreenOff, SwingConstants.LEADING));
@@ -1200,9 +1213,37 @@ public class PnlInfo extends NursingRecordsPanel {
                 }
             }
         });
-
-
         list.add(txtSearch);
+
+        tbShowEmpty = GUITools.getNiceToggleButton(internalClassID+".tbShowEmpty");
+        tbShowEmpty.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                reload();
+            }
+        });
+        tbShowEmpty.setHorizontalAlignment(SwingConstants.LEFT);
+        list.add(tbShowEmpty);
+
+        tbShowClosedWithActiveForms = GUITools.getNiceToggleButton(internalClassID + ".tbShowClosedWithActiveForms");
+        tbShowClosedWithActiveForms.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                reload();
+            }
+        });
+        tbShowClosedWithActiveForms.setHorizontalAlignment(SwingConstants.LEFT);
+        list.add(tbShowClosedWithActiveForms);
+
+        tbShowClosedWithOldForms = GUITools.getNiceToggleButton(internalClassID + ".tbShowClosedWithOldForms");
+        tbShowClosedWithOldForms.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                reload();
+            }
+        });
+        tbShowClosedWithOldForms.setHorizontalAlignment(SwingConstants.LEFT);
+        list.add(tbShowClosedWithOldForms);
 
         return list;
     }
@@ -1795,7 +1836,14 @@ public class PnlInfo extends NursingRecordsPanel {
     @Override
     public void reload() {
         cleanup();
-        listInfo = ResInfoTools.getAll(resident);
+        listInfo = ResInfoTools.getAllActive(resident);
+        if (tbShowClosedWithActiveForms.isSelected()) {
+            listInfo.addAll(ResInfoTools.getClosedWithActiveForms(resident));
+        }
+        if (tbShowClosedWithOldForms.isSelected()) {
+            listInfo.addAll(ResInfoTools.getClosedWithOldForms(resident));
+        }
+
         listOfCategoriesWithContent = ResInfoTools.getCategories(listInfo);
         reloadDisplay();
     }

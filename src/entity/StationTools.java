@@ -28,7 +28,11 @@ public class StationTools {
     }
 
 
-    public static Station getSpecialStation() {
+    /**
+     * returns the station where the current host is located.
+     * @return
+     */
+    public static Station getStationForThisHost() {
         long statid = OPDE.getLocalProps().containsKey("station") ? Long.parseLong(OPDE.getLocalProps().getProperty("station")) : 1l;
         return EntityTools.find(Station.class, statid);
     }

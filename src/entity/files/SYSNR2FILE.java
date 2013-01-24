@@ -39,7 +39,7 @@ import java.util.Date;
  * @author tloehr
  */
 @Entity
-@Table(name = "SYSNR2FILE")
+@Table(name = "sysnr2file")
 //@NamedQueries({
 //        @NamedQuery(name = "SYSNR2FILE.findAll", query = "SELECT s FROM SYSNR2FILE s"),
 //        @NamedQuery(name = "SYSNR2FILE.findById", query = "SELECT s FROM SYSNR2FILE s WHERE s.id = :id")})

@@ -583,6 +583,7 @@ public class SYSConst {
     public static final Icon icon22intervalBySecond = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/by-second.png"));
     public static final Icon icon22intervalNoConstraints = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/no-constraints.png"));
     public static final Icon icon22nothing = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/nothing.png"));
+    public static final Icon icon22stopSignGray = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/stop-gray.png"));
     public static final Icon icon22stopSign = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/stop.png"));
     public static final Icon icon22magnify1 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/magnify1.png"));
     public static final Icon icon22home = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/home.png"));

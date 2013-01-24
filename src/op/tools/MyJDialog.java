@@ -8,6 +8,7 @@ import org.jdesktop.core.animation.timing.TimingTargetAdapter;
 import org.jdesktop.swing.animation.timing.sources.SwingTimerTimingSource;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
@@ -23,10 +24,11 @@ public class MyJDialog extends JDialog {
     private Animator fadeIn, fadeOut;
     private MyJDialog thisDialog;
     private boolean isDisposed;
-
+    private JPanel content;
 
     public MyJDialog() {
         super(OPDE.getMainframe(), true);
+        initContent();
         isDisposed = false;
         setResizable(false);
         setUndecorated(true);
@@ -35,10 +37,17 @@ public class MyJDialog extends JDialog {
 
     public MyJDialog(Dialog owner) {
         super(owner, true);
+        initContent();
         isDisposed = false;
         setResizable(false);
         setUndecorated(true);
         initAnimator();
+    }
+
+    private void initContent(){
+        content = new JPanel();
+        content.setBorder(new LineBorder(Color.BLACK, 1));
+        setContentPane(content);
     }
 
     @Override

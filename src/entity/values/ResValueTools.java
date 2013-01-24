@@ -1,6 +1,8 @@
 package entity.values;
 
 
+import entity.Station;
+import entity.StationTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.nursingprocess.DFNTools;
@@ -667,8 +669,9 @@ public class ResValueTools {
      */
     public static ArrayList<Object[]> getNoStool() {
 
-        ArrayList<Resident> listResident = ResidentTools.getAllActive();
         ArrayList<Object[]> result = new ArrayList<Object[]>();
+        Station currentStation = StationTools.getStationForThisHost();
+        ArrayList<Resident> listResident = ResidentTools.getAllActive(currentStation.getHome());
 
         DateTime now = new DateTime();
 
@@ -690,9 +693,9 @@ public class ResValueTools {
 
     public static ArrayList<Object[]> getHighLowIn() {
 
-        ArrayList<Resident> listResident = ResidentTools.getAllActive();
         ArrayList<Object[]> result = new ArrayList<Object[]>();
-
+        Station currentStation = StationTools.getStationForThisHost();
+        ArrayList<Resident> listResident = ResidentTools.getAllActive(currentStation.getHome());
 
         DateMidnight now = new DateMidnight();
 

@@ -614,7 +614,7 @@ public class FrmMain extends JFrame {
 
         CollapsiblePane mypane = new CollapsiblePane(station == null ? OPDE.lang.getString("misc.msg.Archive") : station.getName());
         mypane.setFont(SYSConst.ARIAL14);
-        mypane.setEmphasized(station != null && station.equals(StationTools.getSpecialStation()));
+        mypane.setEmphasized(station != null && station.equals(StationTools.getStationForThisHost()));
 //        mypane.setSlidingDirection(SwingConstants.SOUTH);
         mypane.setStyle(CollapsiblePane.PLAIN_STYLE);
 

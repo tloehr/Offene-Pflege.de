@@ -36,7 +36,7 @@ import java.util.Date;
  * @author tloehr
  */
 @Entity
-@Table(name = "SYSVAL2FILE")
+@Table(name = "sysval2file")
 public class SYSVAL2FILE implements Serializable {
 
     private static final long serialVersionUID = 1L;

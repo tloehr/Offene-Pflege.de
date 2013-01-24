@@ -35,13 +35,7 @@ import java.util.Collection;
  * @author tloehr
  */
 @Entity
-@Table(name = "BWInfoTyp")
-//@NamedQueries({
-//        @NamedQuery(name = "BWInfoTyp.findAll", query = "SELECT b FROM ResInfoType b"),
-//        @NamedQuery(name = "BWInfoTyp.findByBwinftyp", query = "SELECT b FROM ResInfoType b WHERE b.bwinftyp = :bwinftyp"),
-//        @NamedQuery(name = "BWInfoTyp.findByBWInfoKurz", query = "SELECT b FROM ResInfoType b WHERE b.bWInfoKurz = :bWInfoKurz"),
-//        @NamedQuery(name = "BWInfoTyp.findByKat", query = "SELECT b FROM ResInfoType b WHERE b.resInfokat = :kat AND b.status >= 0 ORDER BY b.bWInfoKurz"),
-//        @NamedQuery(name = "BWInfoTyp.findByIntervalMode", query = "SELECT b FROM ResInfoType b WHERE b.intervalMode = :intervalMode")})
+@Table(name = "bwinfotyp")
 public class ResInfoType implements Serializable {
 
     private static final long serialVersionUID = 1L;

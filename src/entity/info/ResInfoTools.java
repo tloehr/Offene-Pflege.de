@@ -101,6 +101,38 @@ public class ResInfoTools {
         return resInfos;
     }
 
+    public static ArrayList<ResInfo> getAllActive(Resident resident) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.to = :tfn ORDER BY b.from DESC");
+        query.setParameter("bewohner", resident);
+        query.setParameter("tfn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+        ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
+        em.close();
+        return resInfos;
+    }
+
+    public static ArrayList<ResInfo> getClosedWithActiveForms(Resident resident) {
+            EntityManager em = OPDE.createEM();
+            Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp.type <> :type AND b.to < :tfn ORDER BY b.from DESC");
+            query.setParameter("bewohner", resident);
+            query.setParameter("type", ResInfoTypeTools.TYPE_OLD);
+        query.setParameter("tfn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+            ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
+            em.close();
+            return resInfos;
+        }
+
+    public static ArrayList<ResInfo> getClosedWithOldForms(Resident resident) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp.type = :type AND b.to < :tfn ORDER BY b.from DESC");
+        query.setParameter("bewohner", resident);
+        query.setParameter("type", ResInfoTypeTools.TYPE_OLD);
+        query.setParameter("tfn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+        ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
+        em.close();
+        return resInfos;
+    }
+
     public static ArrayList<ResInfo> getActiveBWInfosByBewohnerUndKatArt(Resident bewohner, int katart) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.from <= :from AND b.to >= :to AND b.bwinfotyp.resInfoCat.catType = :katart ORDER BY b.from DESC");

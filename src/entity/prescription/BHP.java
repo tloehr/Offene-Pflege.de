@@ -373,6 +373,9 @@ public class BHP implements Serializable, Comparable<BHP> {
     public int compareTo(BHP that) {
         int result = this.getShift().compareTo(that.getShift());
         if (result == 0) {
+            result = sZeit.compareTo(that.getSollZeit());
+        }
+        if (result == 0) {
             result = SYSTools.nullCompare(this.getTradeForm(), that.getTradeForm());
         }
 
@@ -383,9 +386,7 @@ public class BHP implements Serializable, Comparable<BHP> {
                 result = this.prescription.getIntervention().getBezeichnung().compareTo(that.getPrescription().getIntervention().getBezeichnung());
             }
         }
-        if (result == 0) {
-            result = sZeit.compareTo(that.getSollZeit());
-        }
+
 //        if (result == 0) {
 //            result = nanotime.compareTo(that.nanotime);
 //        }
@@ -454,7 +455,6 @@ public class BHP implements Serializable, Comparable<BHP> {
         result = 31 * result + (user != null ? user.hashCode() : 0);
         return result;
     }
-
 
 
 //    @Override

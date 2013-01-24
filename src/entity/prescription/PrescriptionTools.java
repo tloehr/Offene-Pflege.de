@@ -594,7 +594,6 @@ public class PrescriptionTools {
     }
 
     public static ArrayList<Prescription> getAll(Resident resident) {
-//        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
 
         ArrayList<Prescription> result = null;
@@ -603,9 +602,22 @@ public class PrescriptionTools {
         result = new ArrayList<Prescription>(query.getResultList());
 
         em.close();
-//        SYSTools.showTimeDifference(begin);
         return result;
     }
+
+    public static ArrayList<Prescription> getAllActive(Resident resident) {
+        EntityManager em = OPDE.createEM();
+
+        ArrayList<Prescription> result = null;
+        Query query = em.createQuery(" SELECT p FROM Prescription p WHERE p.resident = :resident AND p.to = :tfn");
+        query.setParameter("resident", resident);
+        query.setParameter("tfn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+        result = new ArrayList<Prescription>(query.getResultList());
+
+        em.close();
+        return result;
+    }
+
 
 
     /**

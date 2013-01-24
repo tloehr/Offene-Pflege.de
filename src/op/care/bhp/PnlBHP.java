@@ -351,10 +351,47 @@ public class PnlBHP extends NursingRecordsPanel {
         prPanel.setLayout(new VerticalLayout());
 
         if (mapShift2BHP.containsKey(shift)) {
-            for (BHP bhp : mapShift2BHP.get(shift)) {
-                prPanel.setBackground(bhp.getBG());
-                mapBHP2Pane.put(bhp, createCP4(bhp));
-                prPanel.add(mapBHP2Pane.get(bhp));
+
+            if (shift == BHPTools.SHIFT_EARLY) {
+                final CollapsiblePane morning = new CollapsiblePane("morning");
+                morning.setSlidingDirection(SwingConstants.SOUTH);
+                morning.setBackground(SYSCalendar.getBGSHIFT(shift).darker());
+                morning.setForeground(SYSCalendar.getFGSHIFT(shift).darker());
+                morning.setOpaque(false);
+
+                final CollapsiblePane noon = new CollapsiblePane("noon");
+                noon.setSlidingDirection(SwingConstants.SOUTH);
+                noon.setBackground(SYSCalendar.getBGSHIFT(shift).darker());
+                noon.setForeground(SYSCalendar.getFGSHIFT(shift).darker());
+                noon.setOpaque(false);
+
+                final CollapsiblePane clock = new CollapsiblePane("clock");
+                clock.setSlidingDirection(SwingConstants.SOUTH);
+                clock.setBackground(SYSCalendar.getBGSHIFT(shift).darker());
+                clock.setForeground(SYSCalendar.getFGSHIFT(shift).darker());
+                clock.setOpaque(false);
+
+                for (BHP bhp : mapShift2BHP.get(shift)) {
+                    prPanel.setBackground(bhp.getBG());
+                    mapBHP2Pane.put(bhp, createCP4(bhp));
+                    if (bhp.getSollZeit() == BHPTools.BYTE_MORNING) {
+                        morning.add(mapBHP2Pane.get(bhp));
+                    } else if (bhp.getSollZeit() == BHPTools.BYTE_NOON) {
+                        noon.add(mapBHP2Pane.get(bhp));
+                    } else {
+                        clock.add(mapBHP2Pane.get(bhp));
+                    }
+                }
+                prPanel.add(clock);
+                prPanel.add(morning);
+                prPanel.add(noon);
+
+            } else {
+                for (BHP bhp : mapShift2BHP.get(shift)) {
+                    prPanel.setBackground(bhp.getBG());
+                    mapBHP2Pane.put(bhp, createCP4(bhp));
+                    prPanel.add(mapBHP2Pane.get(bhp));
+                }
             }
             prPane.setContentPane(prPanel);
             prPane.setCollapsible(true);

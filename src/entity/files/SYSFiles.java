@@ -38,7 +38,7 @@ import java.util.Date;
  * @author tloehr
  */
 @Entity
-@Table(name = "SYSFiles")
+@Table(name = "sysfiles")
 //@NamedQueries({
 //        @NamedQuery(name = "SYSFiles.findAll", query = "SELECT s FROM SYSFiles s"),
 //        @NamedQuery(name = "SYSFiles.findByOcfid", query = "SELECT s FROM SYSFiles s WHERE s.ocfid = :ocfid"),
