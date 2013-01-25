@@ -44,9 +44,13 @@ public class NReportTools {
     }
 
 
+    public static boolean isMine(NReport nReport){
+      return OPDE.isAdmin() || nReport.getUser().equals(OPDE.getLogin().getUser());
+    }
+
     public static boolean isChangeable(NReport nReport) {
 //        OPDE.debug(nReport.getPbid());
-        return !nReport.isObsolete() && nReport.getResident().isActive() && nReport.getUsersAcknowledged().isEmpty() && (OPDE.isAdmin() || nReport.getUser().equals(OPDE.getLogin().getUser()));
+        return !nReport.isObsolete() && nReport.getResident().isActive() && nReport.getUsersAcknowledged().isEmpty();
     }
 
     /**

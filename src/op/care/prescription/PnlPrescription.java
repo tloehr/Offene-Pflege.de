@@ -127,7 +127,7 @@ public class PnlPrescription extends NursingRecordsPanel {
          *     |_|  \___|_|\___/ \__,_|\__,_|____/|_|___/ .__/|_|\__,_|\__, |
          *                                              |_|            |___/
          */
-        final boolean withworker = true;
+        final boolean withworker = false;
         cpsPrescription.removeAll();
         lstVisiblePrescriptions.clear();
         cpMap.clear();

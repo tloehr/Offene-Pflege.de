@@ -587,11 +587,11 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
     public int compareTo(PrescriptionSchedule that) {
         int result = 0;
 
-        if (this.verwendetMaximalDosis() == that.verwendetMaximalDosis()) {
+        if (this.verwendetMaximalDosis() && that.verwendetMaximalDosis()) {
             result = this.bhppid.compareTo(that.getBhppid());
-        } else if (this.verwendetZeiten() == that.verwendetZeiten()) {
+        } else if (this.verwendetZeiten() && that.verwendetZeiten()) {
             result = this.bhppid.compareTo(that.getBhppid());
-        } else if (this.verwendetUhrzeit() == that.verwendetUhrzeit()) {
+        } else if (this.verwendetUhrzeit() && that.verwendetUhrzeit()) {
             result = this.uhrzeit.compareTo(that.getUhrzeit());
         } else if (this.verwendetZeiten()) { // Zeiten zuerst.
             result = 1;

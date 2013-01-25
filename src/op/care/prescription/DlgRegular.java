@@ -753,39 +753,6 @@ public class DlgRegular extends MyJDialog {
         SYSTools.unregisterListeners(menu);
         menu = new JPopupMenu();
 
-//
-//        JMenuItem itemPopupEditText = new JMenuItem(OPDE.lang.getString("misc.msg.edit"), SYSConst.icon22edit);
-//        itemPopupEditText.addActionListener(new java.awt.event.ActionListener() {
-//
-//            public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                PrescriptionSchedule planung = prescription.getPrescriptionSchedule().get(row);
-//                final JidePopup popup = new JidePopup();
-//
-//                CleanablePanel dlg = null;
-//                dlg = new PnlScheduleDose(planung, new Closure() {
-//                    @Override
-//                    public void execute(Object o) {
-//                        if (o != null) {
-//                            reloadTable();
-//                            popup.hidePopup();
-//                        }
-//                    }
-//                });
-//
-//                popup.setMovable(false);
-//                popup.setOwner(tblDosis);
-//                popup.removeExcludedComponent(tblDosis);
-//                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-//                popup.getContentPane().add(dlg);
-//                popup.setDefaultFocusComponent(dlg);
-//
-//                Point p3 = new Point(btnAddDosis.getX(), btnAddDosis.getY());
-//                SwingUtilities.convertPointToScreen(p3, btnAddDosis);
-//                popup.showPopup(p3.x, p3.y - (int) dlg.getPreferredSize().getWidth() - (int) btnAddDosis.getPreferredSize().getHeight());
-//            }
-//        });
-//        menu.add(itemPopupEditText);
-
         //-----------------------------------------
         JMenuItem itemPopupDelete = new JMenuItem(OPDE.lang.getString("misc.msg.delete"), SYSConst.icon22delete);
         itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {

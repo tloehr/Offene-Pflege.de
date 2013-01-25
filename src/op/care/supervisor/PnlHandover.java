@@ -113,6 +113,15 @@ public class PnlHandover extends NursingRecordsPanel {
         reloadDisplay();
     }
 
+    private java.util.List<Component> addKey() {
+            java.util.List<Component> list = new ArrayList<Component>();
+            list.add(new JSeparator());
+            list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
+            list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
+            list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
+            return list;
+        }
+
     private void initPanel() {
         contentmap = new HashMap<String, JPanel>();
         cpMap = new HashMap<String, CollapsiblePane>();
@@ -176,6 +185,7 @@ public class PnlHandover extends NursingRecordsPanel {
 
         GUITools.addAllComponents(mypanel, addCommands());
         GUITools.addAllComponents(mypanel, addFilters());
+        GUITools.addAllComponents(mypanel, addKey());
 
         searchPane.setContentPane(mypanel);
 
@@ -641,10 +651,11 @@ public class PnlHandover extends NursingRecordsPanel {
                                     "<td width=\"100\" align=\"left\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(handover.getPit()) +
                                     " " + OPDE.lang.getString("misc.msg.Time.short") +
                                     "</td>" +
+                                    "<td width=\"100\" align=\"center\">--</td>" +
                                     "<td width=\"400\" align=\"left\">" +
                                     handover.getText() +
                                     "</td>" +
-                                    "<td width=\"100\" align=\"center\">" + OPDE.lang.getString(internalClassID + ".handoversreport") + "</td>" +
+
                                     "<td width=\"100\" align=\"left\">" + handover.getUser().getFullname() + "</td>" +
                                     "</tr>" +
                                     "</table>" +
@@ -708,7 +719,7 @@ public class PnlHandover extends NursingRecordsPanel {
                             });
                             pnlSingle.getRight().add(btnInfo);
 
-                            pnlSingle.getButton().setIcon(Handover2UserTools.containsUser(handover.getUsersAcknowledged(), OPDE.getLogin().getUser()) ? SYSConst.icon16ledGreenOn : SYSConst.icon16ledGreenOff);
+                            pnlSingle.getButton().setIcon(Handover2UserTools.containsUser(handover.getUsersAcknowledged(), OPDE.getLogin().getUser()) ? SYSConst.icon22ledGreenOn : SYSConst.icon22ledRedOn);
                             pnlSingle.getButton().setVerticalTextPosition(SwingConstants.TOP);
                             linemapHO.put(handover, pnlSingle.getMain());
                         }
@@ -734,10 +745,11 @@ public class PnlHandover extends NursingRecordsPanel {
                                     " " + OPDE.lang.getString("misc.msg.Time.short") +
                                     "<br/>" + nreport.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)") +
                                     "</td>" +
+                                    "<td width=\"100\" align=\"left\">" + ResidentTools.getTextCompact(nreport.getResident()) + "</td>" +
                                     "<td width=\"400\" align=\"left\">" +
                                     nreport.getText() +
                                     "</td>" +
-                                    "<td width=\"100\" align=\"left\">" + ResidentTools.getTextCompact(nreport.getResident()) + "</td>" +
+
                                     "<td width=\"100\" align=\"left\">" + nreport.getUser().getFullname() + "</td>" +
                                     "</tr>" +
                                     "</table>" +
@@ -801,7 +813,7 @@ public class PnlHandover extends NursingRecordsPanel {
                             });
                             pnlSingle.getRight().add(btnInfo);
 
-                            pnlSingle.getButton().setIcon(NR2UserTools.containsUser(nreport.getUsersAcknowledged(), OPDE.getLogin().getUser()) ? SYSConst.icon16ledGreenOn : SYSConst.icon16ledGreenOff);
+                            pnlSingle.getButton().setIcon(NR2UserTools.containsUser(nreport.getUsersAcknowledged(), OPDE.getLogin().getUser()) ? SYSConst.icon22ledGreenOn : SYSConst.icon22ledRedOn);
                             pnlSingle.getButton().setVerticalTextPosition(SwingConstants.TOP);
                             linemapNR.put(nreport, pnlSingle.getMain());
                         }

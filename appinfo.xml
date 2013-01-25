@@ -49,6 +49,7 @@
         </class>
         <class name="nursingrecords.nursingprocess" short="Pflegeakte/Pflegeplanung"
                long="Dieses Modul gehört zur Pflegedokumentation. Es ermöglicht die Verwaltung von Pflegeplanungen.">
+            <print langbundle="appinfo.default.acl.print"/>
             <delete langbundle="appinfo.default.acl.delete"/>
             <update langbundle="appinfo.default.acl.update"/>
         </class>

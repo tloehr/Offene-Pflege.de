@@ -30,6 +30,7 @@ public class InterventionTools {
 
     public static final int TYPE_CARE = 1;
     public static final int TYPE_PRESCRIPTION = 2;
+    public static final int TYPE_SOCIAL = 4;
 
     public static ListCellRenderer getMassnahmenRenderer() {
         return new ListCellRenderer() {

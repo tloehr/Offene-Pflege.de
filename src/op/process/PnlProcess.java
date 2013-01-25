@@ -424,7 +424,7 @@ public class PnlProcess extends NursingRecordsPanel {
                     popup.getContentPane().add(pnl);
 
                     popup.setDefaultFocusComponent(editor);
-                    GUITools.showPopup(popup, SwingUtilities.WEST);
+                    GUITools.showPopup(popup, SwingUtilities.EAST);
                 }
             });
             btnAddPReport.setEnabled(!qProcess.isClosed());

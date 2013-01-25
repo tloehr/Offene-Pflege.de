@@ -218,8 +218,9 @@ public class PnlReport extends NursingRecordsPanel {
         java.util.List<Component> list = new ArrayList<Component>();
 
         txtSearch = new JXSearchField(OPDE.lang.getString("misc.msg.searchphrase"));
+        txtSearch.setInstantSearchDelay(100000);
         txtSearch.setFont(SYSConst.ARIAL14);
-        txtSearch.setInstantSearchDelay(750);
+//        txtSearch.setInstantSearchDelay(750);
         txtSearch.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -1327,7 +1328,6 @@ public class PnlReport extends NursingRecordsPanel {
                                     Collections.sort(valuecache.get(keyDay));
 
                                     createCP4Day(new DateMidnight(delReport.getPit()));
-//                                    expandDay(new DateMidnight(delReport.getPit()));
 
                                     buildPanel();
                                     if (tbShowReplaced.isSelected()) {
@@ -1444,7 +1444,7 @@ public class PnlReport extends NursingRecordsPanel {
 
                 }
             });
-            btnTAGs.setEnabled(NReportTools.isChangeable(nreport));
+            btnTAGs.setEnabled(NReportTools.isChangeable(nreport) && NReportTools.isMine(nreport));
             pnlMenu.add(btnTAGs);
 
             /***
@@ -1514,6 +1514,7 @@ public class PnlReport extends NursingRecordsPanel {
                     menu.show(btnMinutes, 0, btnMinutes.getHeight());
                 }
             });
+            btnMinutes.setEnabled(!nreport.isObsolete() && NReportTools.isMine(nreport));
             pnlMenu.add(btnMinutes);
 
             pnlMenu.add(new JSeparator());

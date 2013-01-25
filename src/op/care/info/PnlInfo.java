@@ -267,10 +267,6 @@ public class PnlInfo extends NursingRecordsPanel {
                     if (tbShowEmpty.isSelected() || mapType2InfoList.containsKey(type)){
                         pnlContent.add(createCP4(type));
                     }
-
-//                    if (type.getType() != ResInfoTypeTools.TYPE_OLD || mapType2InfoList.containsKey(type)) {
-//                        pnlContent.add(createCP4(type));
-//                    }
                 }
                 cpCat.setContentPane(pnlContent);
             }
@@ -596,6 +592,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                     mapType2InfoList.get(newinfo.getResInfoType()).add(newinfo);
                                     Collections.sort(mapType2InfoList.get(newinfo.getResInfoType()));
                                     createCP4(newinfo.getResInfoType());
+                                    createCP4(newinfo.getResInfoType().getResInfoCat());
 
                                     if (newinfo.getResInfoType().isAlertType()) {
                                         GUITools.setResidentDisplay(resident);
