@@ -63,12 +63,6 @@ public class AppInfo {
 
     private ArrayList<InternalClass> mainClasses;
 
-
-    /**
-     * Angabe darüber, welches Datenbank Schema diese Version des Programms unbedingt braucht.
-     */
-    private ArrayList<Integer> dbschema;
-
     /**
      * Diese defaultsProperties werden gebraucht, wenn der Client zum ersten mal eingerichtet wird. Dann stehen hier
      * die unbedingt erforderlichen Konfigurationen drin. Diese werden dann in die opde.cfg übernommen,
@@ -85,7 +79,7 @@ public class AppInfo {
     private Properties appinfo;
 
     private String version;
-    private int build;
+    private int build, dbstructure;
     private String progname;
 
     public AppInfo() {
@@ -93,7 +87,6 @@ public class AppInfo {
         appinfo = new Properties();
         internalClasses = new HashMap();
         mainClasses = new ArrayList<InternalClass>();
-        dbschema = new ArrayList<Integer>();
         defaultProperties = new SortedProperties();
 
         try {
@@ -105,6 +98,7 @@ public class AppInfo {
 
             progname = appinfo.getProperty("program.PROGNAME");
             version = appinfo.getProperty("program.VERSION");
+            dbstructure = Integer.parseInt(appinfo.getProperty("program.DBSTRUCTURE"));
             build = Integer.parseInt(appinfo.getProperty("program.BUILDNUM"));
             updateCheckUrl = appinfo.getProperty("program.UPDATECHECKURL");
 
@@ -180,10 +174,6 @@ public class AppInfo {
         return allowed;
     }
 
-    public ArrayList<Integer> getDBschema() {
-        return dbschema;
-    }
-
     public SortedProperties getDefaultProperties() {
         return defaultProperties;
     }
@@ -251,10 +241,6 @@ public class AppInfo {
                     thisClass.getPossibleACLs().add(new InternalClassACL(attributes.getValue("langbundle"), InternalClassACL.USER4));
                 }
 
-            } else if (environment.equalsIgnoreCase("database")) {
-                if (tagName.equalsIgnoreCase("structure")) {
-                    dbschema.add(Integer.parseInt(attributes.getValue("version")));
-                }
             } else if (environment.equalsIgnoreCase("properties")) {
                 if (tagName.equalsIgnoreCase("property")) {
                     SimpleDateFormat sdf = null;
@@ -287,6 +273,10 @@ public class AppInfo {
             super.endDocument();
         }
 
+    }
+
+    public int getDbstructure() {
+        return dbstructure;
     }
 
     public String getUpdateCheckUrl() {

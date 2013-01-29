@@ -35,6 +35,7 @@ import org.joda.time.DateTime;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
+import javax.persistence.RollbackException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -264,7 +265,7 @@ public class PnlInfo extends NursingRecordsPanel {
                 JPanel pnlContent = new JPanel(new VerticalLayout());
                 for (ResInfoType type : ResInfoTypeTools.getByCat(cat)) {
 
-                    if (tbShowEmpty.isSelected() || mapType2InfoList.containsKey(type)){
+                    if (tbShowEmpty.isSelected() || mapType2InfoList.containsKey(type)) {
                         pnlContent.add(createCP4(type));
                     }
                 }
@@ -429,6 +430,15 @@ public class PnlInfo extends NursingRecordsPanel {
                                 } else {
                                     reloadDisplay();
                                 }
+                            } catch (RollbackException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                             } catch (Exception e) {
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
@@ -614,6 +624,15 @@ public class PnlInfo extends NursingRecordsPanel {
                                     buildPanel();
 
                                 } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (RollbackException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1075,6 +1094,15 @@ public class PnlInfo extends NursingRecordsPanel {
                                         OPDE.getMainframe().afterLogin();
                                     }
                                     OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (RollbackException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                                 } catch (Exception e) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -1142,6 +1170,15 @@ public class PnlInfo extends NursingRecordsPanel {
                             em.getTransaction().rollback();
                         }
                         reload();
+                    } catch (RollbackException ole) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                     } catch (Exception e) {
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
@@ -1212,7 +1249,7 @@ public class PnlInfo extends NursingRecordsPanel {
         });
         list.add(txtSearch);
 
-        tbShowEmpty = GUITools.getNiceToggleButton(internalClassID+".tbShowEmpty");
+        tbShowEmpty = GUITools.getNiceToggleButton(internalClassID + ".tbShowEmpty");
         tbShowEmpty.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -1332,6 +1369,15 @@ public class PnlInfo extends NursingRecordsPanel {
                                         buildPanel();
                                         GUITools.flashBackground(myCP, Color.YELLOW, 2);
                                     } catch (OptimisticLockException ole) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                            OPDE.getMainframe().emptyFrame();
+                                            OPDE.getMainframe().afterLogin();
+                                        }
+                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                    } catch (RollbackException ole) {
                                         if (em.getTransaction().isActive()) {
                                             em.getTransaction().rollback();
                                         }
@@ -1778,8 +1824,17 @@ public class PnlInfo extends NursingRecordsPanel {
                                 createPanel(myInfo);
 
                                 buildPanel();
-//                            GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
+
                             } catch (OptimisticLockException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (RollbackException ole) {
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }

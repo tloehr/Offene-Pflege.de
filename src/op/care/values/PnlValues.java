@@ -51,10 +51,7 @@ import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateTime;
 
-import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
-import javax.persistence.OptimisticLockException;
-import javax.persistence.Query;
+import javax.persistence.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -735,6 +732,15 @@ public class PnlValues extends NursingRecordsPanel {
                                         OPDE.getMainframe().afterLogin();
                                     }
                                     OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (RollbackException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                                 } catch (Exception e) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -1114,9 +1120,18 @@ public class PnlValues extends NursingRecordsPanel {
                                 createCP4(vtype, dt.getYear());
 
                                 buildPanel();
-//                                GUITools.flashBackground(contentmap.get(keyMonth), Color.YELLOW, 2);
+                                //GUITools.flashBackground(contentmap.get(keyMonth), Color.YELLOW, 2);
 
                             } catch (OptimisticLockException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (RollbackException ole) {
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }

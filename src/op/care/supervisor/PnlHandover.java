@@ -528,7 +528,7 @@ public class PnlHandover extends NursingRecordsPanel {
                         for (final Handovers ho : listHO) {
                             if (!Handover2UserTools.containsUser(ho.getUsersAcknowledged(), OPDE.getLogin().getUser())) {
                                 Handovers myHO = em.merge(ho);
-                                em.lock(myHO, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                //em.lock(myHO, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
                                 Handover2User connObj = em.merge(new Handover2User(myHO, em.merge(OPDE.getLogin().getUser())));
                                 myHO.getUsersAcknowledged().add(connObj);
 
@@ -546,7 +546,7 @@ public class PnlHandover extends NursingRecordsPanel {
                         for (final NReport nreport : listNR) {
                             if (!NR2UserTools.containsUser(nreport.getUsersAcknowledged(), OPDE.getLogin().getUser())) {
                                 NReport myNR = em.merge(nreport);
-                                em.lock(myNR, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                //em.lock(myNR, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
                                 NR2User connObj = em.merge(new NR2User(myNR, em.merge(OPDE.getLogin().getUser())));
                                 myNR.getUsersAcknowledged().add(connObj);
 

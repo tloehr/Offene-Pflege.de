@@ -170,7 +170,6 @@ public class ResidentTools {
      * @param resident the resident in question
      */
     public static void endOfStay(EntityManager em, Resident resident, Date enddate, String reason) throws Exception {
-//        em.lock(em.merge(resident), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
         NursingProcessTools.closeAll(em, resident, enddate);
         ResInfoTools.closeAll(em, resident, enddate, reason);
         MedInventoryTools.closeAll(em, resident, enddate);

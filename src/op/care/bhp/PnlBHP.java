@@ -49,6 +49,7 @@ import org.joda.time.DateMidnight;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
+import javax.persistence.RollbackException;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -310,7 +311,7 @@ public class PnlBHP extends NursingRecordsPanel {
                     sitPane = new CollapsiblePane(SYSTools.toHTMLForScreen("<b>" + currentPrescription.getSituation().getText()) + "</b>");
                     sitPane.setSlidingDirection(SwingConstants.SOUTH);
                     sitPane.setBackground(ColorUtils.getDerivedColor(SYSCalendar.getBGSHIFT(BHPTools.SHIFT_ON_DEMAND), 0.4f)); // a little darker
-                    sitPane.setForeground(Color.BLACK);//SYSCalendar.getFGSHIFT(BHPTools.SHIFT_ON_DEMAND));
+                    sitPane.setForeground(Color.BLACK);
                     sitPane.setOpaque(false);
                 }
 
@@ -520,7 +521,6 @@ public class PnlBHP extends NursingRecordsPanel {
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             if (!bhp.getPrescription().isClosed()) {
 
-
                 /***
                  *      _     _            _                _
                  *     | |__ | |_ _ __    / \   _ __  _ __ | |_   _
@@ -550,8 +550,14 @@ public class PnlBHP extends NursingRecordsPanel {
                                 em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                                 BHP myBHP = em.merge(bhp);
                                 em.lock(myBHP, LockModeType.OPTIMISTIC);
-                                em.lock(myBHP.getPrescriptionSchedule(), LockModeType.OPTIMISTIC);
-                                em.lock(myBHP.getPrescription(), LockModeType.OPTIMISTIC);
+
+                                if (myBHP.isOnDemand()) {
+                                    em.lock(myBHP.getPrescriptionSchedule(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                    em.lock(myBHP.getPrescription(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                } else {
+                                    em.lock(myBHP.getPrescriptionSchedule(), LockModeType.OPTIMISTIC);
+                                    em.lock(myBHP.getPrescription(), LockModeType.OPTIMISTIC);
+                                }
 
                                 myBHP.setStatus(BHPTools.STATE_DONE);
                                 myBHP.setUser(em.merge(OPDE.getLogin().getUser()));
@@ -586,6 +592,15 @@ public class PnlBHP extends NursingRecordsPanel {
                                     buildPanel(false);
                                 }
                             } catch (OptimisticLockException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (RollbackException ole) {
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }

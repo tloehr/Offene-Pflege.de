@@ -39,6 +39,7 @@ public class DlgValue extends MyJDialog {
         this.afterAction = afterAction;
         initComponents();
         initPanel();
+//        pack();
         setVisible(true);
 
     }
@@ -181,8 +182,8 @@ public class DlgValue extends MyJDialog {
         //======== this ========
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "14dlu, $lcgap, default, $lcgap, 84dlu:grow, $lcgap, 55dlu:grow, $lcgap, default, $lcgap, 14dlu",
-                "14dlu, $lgap, pref, 3*($lgap, default), 2*($lgap, fill:default:grow), $lgap, 14dlu"));
+            "14dlu, $lcgap, default, $lcgap, 84dlu:grow, $lcgap, 55dlu:grow, $lcgap, default, $lcgap, 14dlu",
+            "14dlu, $lgap, pref, 3*($lgap, default), 2*($lgap, fill:default:grow), $lgap, 14dlu"));
 
         //======== panel4 ========
         {
@@ -205,7 +206,6 @@ public class DlgValue extends MyJDialog {
         //---- txtWert1 ----
         txtWert1.setFont(new Font("Arial", Font.PLAIN, 14));
         txtWert1.setColumns(10);
-        txtWert1.setHorizontalAlignment(SwingConstants.TRAILING);
         txtWert1.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -227,7 +227,6 @@ public class DlgValue extends MyJDialog {
         //---- txtWert2 ----
         txtWert2.setFont(new Font("Arial", Font.PLAIN, 14));
         txtWert2.setColumns(10);
-        txtWert2.setHorizontalAlignment(SwingConstants.TRAILING);
         txtWert2.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -249,7 +248,6 @@ public class DlgValue extends MyJDialog {
         //---- txtWert3 ----
         txtWert3.setFont(new Font("Arial", Font.PLAIN, 14));
         txtWert3.setColumns(10);
-        txtWert3.setHorizontalAlignment(SwingConstants.TRAILING);
         txtWert3.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -308,7 +306,7 @@ public class DlgValue extends MyJDialog {
             panel1.add(btnApply);
         }
         contentPane.add(panel1, CC.xywh(7, 13, 3, 1, CC.RIGHT, CC.BOTTOM));
-        setSize(600, 320);
+        setSize(595, 320);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }

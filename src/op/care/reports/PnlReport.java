@@ -56,10 +56,7 @@ import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 
-import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
-import javax.persistence.OptimisticLockException;
-import javax.persistence.Query;
+import javax.persistence.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -1064,6 +1061,15 @@ public class PnlReport extends NursingRecordsPanel {
                                         } else {
                                             reloadDisplay(true);
                                         }
+                                    } catch (RollbackException ole) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                            OPDE.getMainframe().emptyFrame();
+                                            OPDE.getMainframe().afterLogin();
+                                        }
+                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                                     } catch (Exception e) {
                                         if (em.getTransaction().isActive()) {
                                             em.getTransaction().rollback();
@@ -1418,6 +1424,15 @@ public class PnlReport extends NursingRecordsPanel {
                                 } else {
                                     reloadDisplay(true);
                                 }
+                            } catch (RollbackException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                             } catch (Exception e) {
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
@@ -1642,6 +1657,15 @@ public class PnlReport extends NursingRecordsPanel {
                                 } else {
                                     reloadDisplay(true);
                                 }
+                            } catch (RollbackException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                             } catch (Exception e) {
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();

@@ -47,7 +47,6 @@ public class PnlCare extends NursingRecordsPanel {
     public static final int TAB_PPLANUNG = 8;
     public static final int TAB_VORGANG = 9;
     public static final int TAB_FILES = 10;
-//    public static final int TAB_CASH = 11;
 
     private boolean initPhase;
     private String[] tabs = new String[]{

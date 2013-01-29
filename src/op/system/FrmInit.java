@@ -20,17 +20,17 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.UUID;
 
 /**
- *
  * Diese Klasse erzeugt einen Frame, der immer dann aufgerufen wird, wenn die Datei opde.cfg nicht gefunden wird.
  * In dieser Datei stehen eine ganze Reihe von Konfigurationsinformationen, besonders die Datenbank Verbindungsinformationen.
- *
+ * <p/>
  * Dieses Formular fragt die Grunddaten ab, testet die Datenbankverbindung und erzeugt die opde.cfg inkl. der notwendigen
  * Verzeichnisse. Dass Datenbank Benutzer Passwort wird mittels des erzeugten, eindeutigen Hostkeys verschlüsselt gespeichert.
- *
+ * <p/>
  * Gleichzeitig erstellt die Speicheroutine einen neuen Eintrag in der Tabelle Syshosts für den aktuellen Client.
  *
  * @author Torsten Löhr
@@ -64,7 +64,7 @@ public class FrmInit extends JFrame {
         try {
             em = Persistence.createEntityManagerFactory("OPDEPU", defaultProps).createEntityManager();
 
-            if (schemaKorrekt()) {
+            if (isDBStructureGood()) {
                 lblTest.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/apply.png")));
                 txtTest.setText("Verbindung erfolgreich hergestellt");
                 btnSave.setEnabled(true);
@@ -92,12 +92,12 @@ public class FrmInit extends JFrame {
      *
      * @return ja oder nein
      */
-    private boolean schemaKorrekt() {
+    private boolean isDBStructureGood() {
         Query query = em.createQuery("SELECT s FROM SYSProps s WHERE s.key = :key");
         query.setParameter("key", "dbstructure");
         SYSProps dbschema = (SYSProps) query.getSingleResult();
 
-        return OPDE.getAppInfo().getDBschema().contains(Integer.parseInt(dbschema.getValue()));
+        return OPDE.getAppInfo().getDbstructure() == Integer.parseInt(dbschema.getValue());
     }
 
     private void btnSaveActionPerformed(ActionEvent e) {
@@ -174,8 +174,8 @@ public class FrmInit extends JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "$rgap, $lcgap, 250dlu:grow, $lcgap, $rgap",
-            "2*(default, $lgap), fill:default:grow, $lgap, default, $lgap, $rgap"));
+                "$rgap, $lcgap, 250dlu:grow, $lcgap, $rgap",
+                "2*(default, $lgap), fill:default:grow, $lgap, default, $lgap, $rgap"));
 
         //---- label1 ----
         label1.setText("Client Setup");
@@ -193,8 +193,8 @@ public class FrmInit extends JFrame {
             panel1.setBorder(new TitledBorder("Datenbank"));
             panel1.setBackground(new Color(238, 238, 238));
             panel1.setLayout(new FormLayout(
-                "default, $lcgap, default:grow, $lcgap, $rgap",
-                "4*(default, $lgap), default, $ugap, fill:default:grow"));
+                    "default, $lcgap, default:grow, $lcgap, $rgap",
+                    "4*(default, $lgap), default, $ugap, fill:default:grow"));
 
             //---- label4 ----
             label4.setText("Server");
@@ -236,8 +236,8 @@ public class FrmInit extends JFrame {
             {
                 panel4.setBackground(new Color(238, 238, 238));
                 panel4.setLayout(new FormLayout(
-                    "default, $lcgap, default",
-                    "default"));
+                        "default, $lcgap, default",
+                        "default"));
 
                 //---- btnCheckDB ----
                 btnCheckDB.setText("Verbindungstest");

@@ -119,13 +119,6 @@
         </class>
     </classes>
 
-    <database>
-        <!--
-        Hier stehen die Datenbank-Schema Versionen, die für diese Applikation geignet sind.
-        -->
-        <structure version="1"/>
-    </database>
-
     <properties>
         <!--
             Diese Standard-Property Werte müssen immer vorhanden sein. Sonst kommt es zu Exceptions.

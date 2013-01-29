@@ -143,10 +143,6 @@
          <string>columns</string> 
          <int>10</int> 
         </void> 
-        <void method="setProperty"> 
-         <string>horizontalAlignment</string> 
-         <int>11</int> 
-        </void> 
         <void property="name"> 
          <string>txtWert1</string> 
         </void> 
@@ -240,10 +236,6 @@
          <string>columns</string> 
          <int>10</int> 
         </void> 
-        <void method="setProperty"> 
-         <string>horizontalAlignment</string> 
-         <int>11</int> 
-        </void> 
         <void property="name"> 
          <string>txtWert2</string> 
         </void> 
@@ -336,10 +328,6 @@
         <void method="setProperty"> 
          <string>columns</string> 
          <int>10</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>horizontalAlignment</string> 
-         <int>11</int> 
         </void> 
         <void property="name"> 
          <string>txtWert3</string> 
@@ -612,7 +600,7 @@
       <void method="setProperty"> 
        <string>size</string> 
        <object class="java.awt.Dimension"> 
-        <int>600</int> 
+        <int>595</int> 
         <int>320</int> 
        </object> 
       </void> 
