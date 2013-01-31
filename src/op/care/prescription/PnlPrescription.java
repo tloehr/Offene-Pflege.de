@@ -124,7 +124,7 @@ public class PnlPrescription extends NursingRecordsPanel {
          *     |_|  \___|_|\___/ \__,_|\__,_|____/|_|___/ .__/|_|\__,_|\__, |
          *                                              |_|            |___/
          */
-        final boolean withworker = false;
+        final boolean withworker = true;
         cpsPrescription.removeAll();
         lstVisiblePrescriptions.clear();
         cpMap.clear();
@@ -730,7 +730,7 @@ public class PnlPrescription extends NursingRecordsPanel {
 //            JideButton printDaily = GUITools.createHyperlinkButton(internalClassID + ".printdailyplan", SYSConst.icon22print2, new ActionListener() {
 //                @Override
 //                public void actionPerformed(ActionEvent actionEvent) {
-//                    SYSFilesTools.print(PrescriptionTools.getDailyPlanAsHTML(resident.getStation().getHome()), true);
+//                    SYSFilesTools.print(PrescriptionTools.printDailyPlan(resident.getStation().getHome()), true);
 //                }
 //            });
 //            list.add(printDaily);

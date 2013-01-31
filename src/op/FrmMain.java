@@ -633,7 +633,7 @@ public class FrmMain extends JFrame {
             JideButton button = GUITools.createHyperlinkButton(internalClassID + ".printdailyplan", SYSConst.icon22print2, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    SYSFilesTools.print(PrescriptionTools.getDailyPlanAsHTML(station), true);
+                    PrescriptionTools.printDailyPlan(station);
                 }
             });
             button.setBackground(Color.WHITE);

@@ -5,10 +5,12 @@
 package entity.prescription;
 
 import entity.Station;
+import entity.files.SYSFilesTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
+import op.threads.DisplayMessage;
 import op.tools.HTMLTools;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -17,10 +19,12 @@ import org.joda.time.DateTime;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
+import javax.swing.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author tloehr
@@ -54,10 +58,10 @@ public class PrescriptionTools {
      *
      * @param station Die Station, für die der Stellplan erstellt werden soll. Sortiert nach den Station.
      */
-    public static String getDailyPlanAsHTML(Station station) {
-        long begin = System.currentTimeMillis();
+    public static void printDailyPlan(Station station) {
+//        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
-        String html = "";
+//        String html = "";
 
         try {
             Query query = em.createNativeQuery("" +
@@ -77,17 +81,18 @@ public class PrescriptionTools {
                     " ) vorr ON vorr.DafID = v.DafID AND vorr.BWKennung = v.BWKennung" +
                     " LEFT OUTER JOIN MPVorrat vor ON vor.VorID = vorr.VorID" +
                     " LEFT OUTER JOIN MPBestand best ON best.VorID = vor.VorID" +
-                    " WHERE v.AnDatum < now() AND v.AbDatum > now() AND v.SitID IS NULL AND (v.DafID IS NOT NULL OR v.Stellplan IS TRUE) " +
+                    " WHERE bw.adminonly <> 2 " +
+                    " AND v.AnDatum < now() AND v.AbDatum > now() AND v.SitID IS NULL AND (v.DafID IS NOT NULL OR v.Stellplan IS TRUE) " +
                     " AND bw.StatID = ? AND ((best.Aus = '9999-12-31 23:59:59' AND best.Anbruch < '9999-12-31 23:59:59') OR (v.DafID IS NULL)) " +
                     " ORDER BY CONCAT(bw.nachname,bw.vorname), bw.BWKennung, v.DafID IS NOT NULL, F.Stellplan, CONCAT( M.Bezeichnung, Ms.Bezeichnung)");
             query.setParameter(1, station.getStatID());
-            html = getDailyPlan(em, station, query.getResultList());
+            printDailyPlan(station, query.getResultList());
             em.close();
         } catch (Exception e) {
             OPDE.fatal(e);
         }
-        SYSTools.showTimeDifference(begin);
-        return html;
+//        SYSTools.showTimeDifference(begin);
+//        return html;
     }
 
 //    /**
@@ -188,98 +193,123 @@ public class PrescriptionTools {
 //        return ((Long) query.getSingleResult()).longValue() > 0;
 //    }
 
-    private static String getDailyPlan(EntityManager em, Station station, List data) {
-        int DAILYPLAN_PAGEBREAK_AFTER_ELEMENT_NO = Integer.parseInt(OPDE.getProps().getProperty(SYSPropsTools.KEY_DAILYPLAN_PAGEBREAK));
+    private static void printDailyPlan(final Station station, final List data) {
 
-        int elementNumber = 1;
-        boolean pagebreak = false;
+        OPDE.getMainframe().setBlocked(true);
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
 
-        String header = OPDE.lang.getString("nursingrecords.prescription.dailyplan.header1") + " " + DateFormat.getDateInstance().format(new Date());
+        final EntityManager em = OPDE.createEM();
 
-        String bwkennung = "";
+        SwingWorker worker = new SwingWorker() {
 
-        Iterator it = data.iterator();
+            @Override
+            protected Object doInBackground() throws Exception {
+                int progress = -1;
+                int DAILYPLAN_PAGEBREAK_AFTER_ELEMENT_NO = Integer.parseInt(OPDE.getProps().getProperty(SYSPropsTools.KEY_DAILYPLAN_PAGEBREAK));
+                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, data.size()));
+                String resID = "";
+                int elementNumber = 1;
+                boolean pagebreak = false;
+                String header = OPDE.lang.getString("nursingrecords.prescription.dailyplan.header1") + " " + DateFormat.getDateInstance().format(new Date());
+                String html = SYSConst.html_h1(header + " (" + station.getName() + ")");
+                html += "<div align=\"center\" id=\"fonttext\" >" + OPDE.lang.getString("nursingrecords.prescription.dailyplan.warning") + "</div>\n";
 
-        String html = SYSConst.html_h1(header + " (" + station.getName() + ")");
-        html += "<div align=\"center\">" + OPDE.lang.getString("nursingrecords.prescription.dailyplan.warning") + "</div>\n";
+                for (Object obj : data) {
+                    progress++;
 
-        while (it.hasNext()) {
-            Object[] objects = (Object[]) it.next();
-            Prescription verordnung = em.find(Prescription.class, ((BigInteger) objects[0]).longValue());
-            PrescriptionSchedule planung = em.find(PrescriptionSchedule.class, ((BigInteger) objects[1]).longValue());
-            BigInteger bestid = (BigInteger) objects[2];
-            BigInteger formid = (BigInteger) objects[4];
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, data.size()));
 
-            // Alle Formen, die nicht abzählbar sind, werden grau hinterlegt. Also Tropfen, Spritzen etc.
-            boolean grau = false;
-            if (formid != null) {
-                DosageForm form = em.find(DosageForm.class, formid.longValue());
-                grau = form.getDailyPlan() > 0;
+                    Object[] objects = (Object[]) obj;
+                    Prescription verordnung = em.find(Prescription.class, ((BigInteger) objects[0]).longValue());
+                    PrescriptionSchedule planung = em.find(PrescriptionSchedule.class, ((BigInteger) objects[1]).longValue());
+                    BigInteger bestid = (BigInteger) objects[2];
+                    BigInteger formid = (BigInteger) objects[4];
+
+                    // Alle Formen, die nicht abzählbar sind, werden grau hinterlegt. Also Tropfen, Spritzen etc.
+                    boolean gray = false;
+                    if (formid != null) {
+                        DosageForm form = em.find(DosageForm.class, formid.longValue());
+                        gray = form.getDailyPlan() > 0;
+                    }
+
+                    // Wenn der Bewohnername sich in der Liste ändert, muss
+                    // einmal die Überschrift drüber gesetzt werden.
+                    boolean bewohnerWechsel = !resID.equalsIgnoreCase(verordnung.getResident().getRID());
+
+                    if (pagebreak || bewohnerWechsel) {
+                        // Falls zufällig ein weiterer Header (der 2 Elemente hoch ist) einen Pagebreak auslösen WÜRDE
+                        // müssen wir hier schonmal vorsorglich den Seitenumbruch machen.
+                        // 2 Zeilen rechne ich nochdrauf, damit die Tabelle mindestens 2 Zeilen hat, bevor der Seitenumbruch kommt.
+                        // Das kann dann passieren, wenn dieser if Konstrukt aufgrund eines BW Wechsels durchlaufen wird.
+                        pagebreak = (elementNumber + 2 + 2) > DAILYPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
+
+                        // Außer beim ersten mal und beim Pagebreak, muss dabei die vorherige Tabelle abgeschlossen werden.
+                        if (pagebreak || !resID.equals("")) {
+                            html += "</table>";
+                        }
+
+                        resID = verordnung.getResident().getRID();
+
+                        html += "<h2 id=\"fonth2\" " +
+                                (pagebreak ? "style=\"page-break-before:always\">" : ">") +
+                                ((pagebreak && !bewohnerWechsel) ? "<i>(fortgesetzt)</i> " : "")
+                                + ResidentTools.getLabelText(verordnung.getResident())
+                                + "</h2>\n";
+                        html += "<table id=\"font14\" border=\"1\" cellspacing=\"0\">";
+                        html += SYSConst.html_table_tr(
+                                SYSConst.html_table_th("nursingrecords.prescription.dailyplan.table.col1")
+                                        + SYSConst.html_table_th("misc.msg.earlyinthemorning.short")
+                                        + SYSConst.html_table_th("misc.msg.morning.short")
+                                        + SYSConst.html_table_th("misc.msg.noon.short")
+                                        + SYSConst.html_table_th("misc.msg.afternoon.short")
+                                        + SYSConst.html_table_th("misc.msg.evening.short")
+                                        + SYSConst.html_table_th("misc.msg.lateatnight.short")
+                                        + SYSConst.html_table_th("misc.msg.comment")
+                        );
+                        elementNumber += 2;
+
+                        if (pagebreak) {
+                            elementNumber = 1;
+                            pagebreak = false;
+                        }
+                    }
+
+                    html += "<tr style=\"page-break-before:avoid\" " + (gray ? "id=\"fonttextgray14\">" : ">\n");
+                    html += "<td width=\"300\" valign=\"top\">" + (verordnung.hasMed() ? "<b>" + TradeFormTools.toPrettyString(verordnung.getTradeForm()) + "</b>" : verordnung.getIntervention().getBezeichnung());
+                    html += (bestid != null ? "<br/><i>" + OPDE.lang.getString("nursingrecords.prescription.dailyplan.stockInUse") + " " + OPDE.lang.getString("misc.msg.number") + " " + bestid + "</i>" : "") + "</td>\n";
+                    html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getNachtMo()) + "</td>\n";
+                    html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getMorgens()) + "</td>\n";
+                    html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getMittags()) + "</td>\n";
+                    html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getNachmittags()) + "</td>\n";
+                    html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getAbends()) + "</td>\n";
+                    html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getNachtAb()) + "</td>\n";
+                    html += "<td width=\"300\" >" + PrescriptionScheduleTools.getRemark(planung) + "</td>\n";
+                    html += "</tr>\n\n";
+                    elementNumber += 1;
+
+                    pagebreak = elementNumber > DAILYPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
+                }
+                return html+"</table>";
             }
 
-            // Wenn der Bewohnername sich in der Liste ändert, muss
-            // einmal die Überschrift drüber gesetzt werden.
-            boolean bewohnerWechsel = !bwkennung.equalsIgnoreCase(verordnung.getResident().getRID());
+            @Override
+            protected void done() {
+                OPDE.getDisplayManager().setProgressBarMessage(null);
+                OPDE.getMainframe().setBlocked(false);
 
-            if (pagebreak || bewohnerWechsel) {
-                // Falls zufällig ein weiterer Header (der 2 Elemente hoch ist) einen Pagebreak auslösen WÜRDE
-                // müssen wir hier schonmal vorsorglich den Seitenumbruch machen.
-                // 2 Zeilen rechne ich nochdrauf, damit die Tabelle mindestens 2 Zeilen hat, bevor der Seitenumbruch kommt.
-                // Das kann dann passieren, wenn dieser if Konstrukt aufgrund eines BW Wechsels durchlaufen wird.
-                pagebreak = (elementNumber + 2 + 2) > DAILYPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
-
-                // Außer beim ersten mal und beim Pagebreak, muss dabei die vorherige Tabelle abgeschlossen werden.
-                if (pagebreak || !bwkennung.equals("")) {
-                    html += "</table>";
+                try {
+                    SYSFilesTools.print(get().toString(), true);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                } catch (ExecutionException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
-
-                bwkennung = verordnung.getResident().getRID();
-
-                html += "<h2 id=\"fonth2\" " +
-                        (pagebreak ? "style=\"page-break-before:always\">" : ">") +
-                        ((pagebreak && !bewohnerWechsel) ? "<i>(fortgesetzt)</i> " : "")
-                        + ResidentTools.getLabelText(verordnung.getResident())
-                        + "</h2>\n";
-                html += "<table id=\"font14\" border=\"1\" cellspacing=\"0\">";
-                html += SYSConst.html_table_tr(
-                        SYSConst.html_table_th("nursingrecords.prescription.dailyplan.table.col1")
-                                + SYSConst.html_table_th("misc.msg.earlyinthemorning.short")
-                                + SYSConst.html_table_th("misc.msg.morning.short")
-                                + SYSConst.html_table_th("misc.msg.noon.short")
-                                + SYSConst.html_table_th("misc.msg.afternoon.short")
-                                + SYSConst.html_table_th("misc.msg.evening.short")
-                                + SYSConst.html_table_th("misc.msg.lateatnight.short")
-                                + SYSConst.html_table_th("misc.msg.comment")
-                );
-                elementNumber += 2;
-
-                if (pagebreak) {
-                    elementNumber = 1;
-                    pagebreak = false;
-                }
+                em.close();
             }
+        };
+        worker.execute();
 
-
-            html += "<tr style=\"page-break-before:avoid\" " + (grau ? "id=\"fonttextgray14\">" : ">\n");
-            html += "<td width=\"300\" >" + (verordnung.hasMed() ? "<b>" + TradeFormTools.toPrettyString(verordnung.getTradeForm()) + "</b>" : verordnung.getIntervention().getBezeichnung());
-            html += (bestid != null ? "<br/><i>" + OPDE.lang.getString("nursingrecords.prescription.dailyplan.stockInUse") + " " + OPDE.lang.getString("misc.msg.number") + " " + bestid + "</i>" : "") + "</td>\n";
-            html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getNachtMo()) + "</td>\n";
-            html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getMorgens()) + "</td>\n";
-            html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getMittags()) + "</td>\n";
-            html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getNachmittags()) + "</td>\n";
-            html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getAbends()) + "</td>\n";
-            html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getNachtAb()) + "</td>\n";
-            html += "<td width=\"300\" >" + PrescriptionScheduleTools.getHinweis(planung, false) + "</td>\n";
-            html += "</tr>\n\n";
-            elementNumber += 1;
-
-            pagebreak = elementNumber > DAILYPLAN_PAGEBREAK_AFTER_ELEMENT_NO;
-        }
-
-        html += "</table>";
-
-
-        return html;
+//        return result;
     }
 
     public static String getShortDescription(Prescription prescription) {
@@ -333,7 +363,7 @@ public class PrescriptionTools {
                 }
             }
         }
-        return (result.isEmpty() ? "" : SYSConst.html_div(result) + "<br/>");
+        return (result.isEmpty() ? "" : result + "<br/>");
     }
 
     public static String getLongDescription(Prescription presription) {
@@ -617,7 +647,6 @@ public class PrescriptionTools {
         em.close();
         return result;
     }
-
 
 
     /**

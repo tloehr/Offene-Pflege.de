@@ -575,6 +575,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 }
                                 em.getTransaction().commit();
 
+
                                 if (myBHP.hasMed() && involvedPresciption.isClosed()) {
                                     reload();
                                 } else {
@@ -583,6 +584,24 @@ public class PnlBHP extends NursingRecordsPanel {
                                     mapShift2BHP.get(myBHP.getShift()).remove(position);
                                     mapShift2BHP.get(myBHP.getShift()).add(position, myBHP);
                                     if (myBHP.isOnDemand()) {
+                                        // This whole thing here is only to handle the BPHs on Demand
+                                        // Fix the other BHPs on demand. If not, you will get locking excpetions,
+                                        // we FORCED INCREMENTED LOCKS on the Schedule and the Prescription.
+                                        ArrayList<BHP> changeList = new ArrayList<BHP>();
+                                        for (BHP bhp : mapShift2BHP.get(BHPTools.SHIFT_ON_DEMAND)) {
+                                            if (bhp.getPrescription().getID() == myBHP.getPrescription().getID() && bhp.getBHPid() != myBHP.getBHPid()) {
+                                                bhp.setPrescription(myBHP.getPrescription());
+                                                bhp.setPrescriptionSchedule(myBHP.getPrescriptionSchedule());
+                                                changeList.add(bhp);
+                                            }
+                                        }
+                                        for (BHP bhp : changeList) {
+                                            mapBHP2Pane.put(bhp, createCP4(myBHP));
+                                            position = mapShift2BHP.get(bhp.getShift()).indexOf(bhp);
+                                            mapShift2BHP.get(myBHP.getShift()).remove(position);
+                                            mapShift2BHP.get(myBHP.getShift()).add(position, bhp);
+                                        }
+
                                         Collections.sort(mapShift2BHP.get(myBHP.getShift()), BHPTools.getOnDemandComparator());
                                     } else {
                                         Collections.sort(mapShift2BHP.get(myBHP.getShift()));

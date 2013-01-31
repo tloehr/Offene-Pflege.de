@@ -1,7 +1,5 @@
 package entity.prescription;
 
-import entity.system.Users;
-import op.OPDE;
 import op.tools.SYSCalendar;
 
 import javax.persistence.*;
@@ -365,7 +363,7 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
      *
      * @return
      */
-    public boolean verwendetZeiten() {
+    public boolean usesTimesOfTheDay() {
         return nachtMo.add(morgens).add(mittags).add(nachmittags).add(abends).add(nachtAb).compareTo(BigDecimal.ZERO) > 0;
     }
 
@@ -383,7 +381,7 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
      *
      * @return
      */
-    public boolean verwendetUhrzeit() {
+    public boolean usesTime() {
         return uhrzeit != null;
     }
 
@@ -589,13 +587,13 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
 
         if (this.verwendetMaximalDosis() && that.verwendetMaximalDosis()) {
             result = this.bhppid.compareTo(that.getBhppid());
-        } else if (this.verwendetZeiten() && that.verwendetZeiten()) {
+        } else if (this.usesTimesOfTheDay() && that.usesTimesOfTheDay()) {
             result = this.bhppid.compareTo(that.getBhppid());
-        } else if (this.verwendetUhrzeit() && that.verwendetUhrzeit()) {
+        } else if (this.usesTime() && that.usesTime()) {
             result = this.uhrzeit.compareTo(that.getUhrzeit());
-        } else if (this.verwendetZeiten()) { // Zeiten zuerst.
+        } else if (this.usesTimesOfTheDay()) { // Zeiten zuerst.
             result = 1;
-        } else if (this.verwendetUhrzeit() && that.verwendetMaximalDosis()) { // dann Uhrzeiten
+        } else if (this.usesTime() && that.verwendetMaximalDosis()) { // dann Uhrzeiten
             result = 1;
         } else {
             result = -1;

@@ -25,7 +25,7 @@ public class PrescriptionScheduleTools {
 
     public static int getTerminStatus(PrescriptionSchedule planung) {
         int status = 0;
-        if (planung.verwendetZeiten()) {
+        if (planung.usesTimesOfTheDay()) {
             status = ZEIT;
         } else if (planung.verwendetMaximalDosis()) {
             status = MAXDOSIS;
@@ -203,30 +203,34 @@ public class PrescriptionScheduleTools {
     }
 
 
-    public static String getHinweis(PrescriptionSchedule planung, boolean writeTaeglich) {
+    public static String getRemark(PrescriptionSchedule schedule) {
         String result = "";
 
-        // Handelt es sich hierbei vielleicht um Uhrzeit oder Bedarf ?
-        if (planung.verwendetMaximalDosis()) {
+        if (schedule.getPrescription().isOnDemand()) {
             result += "Maximale Tagesdosis: ";
-            result += planung.getMaxAnzahl() + "x " + HTMLTools.printDouble(planung.getMaxEDosis()) + " " + SYSConst.UNITS[planung.getPrescription().getTradeForm().getDosageForm().getUsageUnit()];
+            result += schedule.getMaxAnzahl() + "x " + HTMLTools.printDouble(schedule.getMaxEDosis()) + " " + SYSConst.UNITS[schedule.getPrescription().getTradeForm().getDosageForm().getUsageUnit()];
             result += "<br/>";
-        } else if (planung.verwendetUhrzeit()) {
-
-            result += "<b><u>" + DateFormat.getTimeInstance(DateFormat.SHORT).format(planung.getUhrzeit()) + " Uhr</u></b> ";
-            result += HTMLTools.printDouble(planung.getUhrzeitDosis());
-            result += planung.getPrescription().hasMed() ? " " + SYSConst.UNITS[planung.getPrescription().getTradeForm().getDosageForm().getUsageUnit()] : "x";
+        } else if (schedule.usesTime()) {
+            result += "<b><u>" + DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getUhrzeit()) + " Uhr</u></b> ";
+            result += HTMLTools.printDouble(schedule.getUhrzeitDosis());
+            result += schedule.getPrescription().hasMed() ? " " + SYSConst.UNITS[schedule.getPrescription().getTradeForm().getDosageForm().getUsageUnit()] : "x";
             result += "<br/>";
         }
 
-        String wiederholung = getRepeatPattern(planung, writeTaeglich);
+        String wiederholung = getRepeatPattern(schedule, false);
         result += wiederholung;
 
-        if (!SYSTools.catchNull(planung.getPrescription().getText()).isEmpty()) {
+        String substitution = PrescriptionTools.getOriginalPrescription(schedule.getPrescription());
+        if (!substitution.isEmpty()){
+            result += substitution;
+        }
+
+        if (!SYSTools.catchNull(schedule.getPrescription().getText()).isEmpty()) {
             if (!wiederholung.isEmpty()) {
                 result += "<br/>";
             }
-            result += "<b><u>Bemerkung:</u></b> " + planung.getPrescription().getText();
+            result += "<b><u>Bemerkung:</u></b> " + schedule.getPrescription().getText();
+
         }
 
         return result.equals("") ? "&nbsp;" : result;
