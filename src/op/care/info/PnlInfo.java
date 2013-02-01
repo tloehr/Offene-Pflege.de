@@ -1214,14 +1214,17 @@ public class PnlInfo extends NursingRecordsPanel {
         ArrayList<ResInfo> hits = new ArrayList<ResInfo>();
         for (ResInfo info : listInfo) {
             boolean hit = false;
-            if (!hit) hit = SYSTools.catchNull(info.getText()).toLowerCase().indexOf(pattern) > 0;
-            if (!hit) hit = SYSTools.catchNull(info.getHtml()).toLowerCase().indexOf(pattern) > 0;
-            if (!hit) hit = SYSTools.catchNull(info.getProperties()).toLowerCase().indexOf(pattern) > 0;
+            if (!hit) hit |= SYSTools.catchNull(info.getText()).toLowerCase().indexOf(pattern) >= 0;
+            if (!hit) hit |= SYSTools.catchNull(info.getHtml()).toLowerCase().indexOf(pattern) >= 0;
+            if (!hit) hit |= SYSTools.catchNull(info.getProperties()).toLowerCase().indexOf(pattern) >= 0;
             if (!hit)
-                hit = SYSTools.catchNull(info.getResInfoType().getShortDescription()).toLowerCase().indexOf(pattern) > 0;
+                hit |= SYSTools.catchNull(info.getResInfoType().getShortDescription()).toLowerCase().indexOf(pattern) >= 0;
             if (!hit)
-                hit = SYSTools.catchNull(info.getResInfoType().getLongDescription()).toLowerCase().indexOf(pattern) > 0;
+                hit |= SYSTools.catchNull(info.getResInfoType().getResInfoCat().getText()).toLowerCase().indexOf(pattern) >= 0;
+            if (!hit)
+                hit |= SYSTools.catchNull(info.getResInfoType().getLongDescription()).toLowerCase().indexOf(pattern) >= 0;
             if (hit) hits.add(info);
+//            OPDE.debug(info);
         }
         return hits;
     }

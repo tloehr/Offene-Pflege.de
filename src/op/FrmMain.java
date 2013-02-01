@@ -242,40 +242,7 @@ public class FrmMain extends JFrame {
         }
     }
 
-    private void checkForSoftwareupdates() {
-        int remoteBuildnum = -1;
-        int mybuildnum = OPDE.getAppInfo().getBuildnum();
-        try {
-            URL url;
-            URLConnection urlConn;
-            BufferedReader dis;
-
-            url = new URL(OPDE.getAppInfo().getUpdateCheckUrl());
-
-            urlConn = url.openConnection();
-            urlConn.setDoInput(true);
-            urlConn.setUseCaches(false);
-
-            dis = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
-
-            String s;
-
-            while ((s = dis.readLine()) != null) {
-                remoteBuildnum = Integer.parseInt(s);
-            }
-            dis.close();
-        } catch (Exception e) {
-            OPDE.debug("ERROR");
-        }
-
-        OPDE.setUpdateAvailable(remoteBuildnum > mybuildnum);
-    }
-
-
     public void afterLogin() {
-
-
-        checkForSoftwareupdates();
 
         prepareSearchArea();
         labelUSER.setText(OPDE.getLogin().getUser().getFullname());

@@ -106,10 +106,10 @@ public class PnlFiles extends NursingRecordsPanel {
     void reloadTable() {
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT s FROM SYSFiles s WHERE s.resident = :bewohner");
+        Query query = em.createQuery("SELECT s FROM SYSFiles s WHERE s.resident = :bewohner ORDER BY s.pit DESC");
         query.setParameter("bewohner", resident);
         ArrayList<SYSFiles> files = new ArrayList<SYSFiles>(query.getResultList());
-        Collections.sort(files);
+//        Collections.sort(files);
         em.close();
 
         tblFiles.setModel(new TMSYSFiles(files));
@@ -157,15 +157,15 @@ public class PnlFiles extends NursingRecordsPanel {
 
                 //---- tblFiles ----
                 tblFiles.setModel(new DefaultTableModel(
-                        new Object[][]{
-                                {null, null, null, null},
-                                {null, null, null, null},
-                                {null, null, null, null},
-                                {null, null, null, null},
-                        },
-                        new String[]{
-                                "Title 1", "Title 2", "Title 3", "Title 4"
-                        }
+                    new Object[][] {
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null},
+                    },
+                    new String[] {
+                        "Title 1", "Title 2", "Title 3", "Title 4"
+                    }
                 ));
                 tblFiles.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
                 tblFiles.addMouseListener(new MouseAdapter() {

@@ -25,6 +25,9 @@
  */
 package op;
 
+import com.enterprisedt.net.ftp.FTPConnectMode;
+import com.enterprisedt.net.ftp.FTPException;
+import com.enterprisedt.net.ftp.FileTransferClient;
 import com.jidesoft.utils.Lm;
 import com.jidesoft.wizard.WizardStyle;
 import entity.files.SYSFilesTools;
@@ -39,6 +42,7 @@ import op.threads.DisplayMessage;
 import op.threads.PrintProcessor;
 import op.tools.*;
 import org.apache.commons.cli.*;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.*;
 
 import javax.activation.DataHandler;
@@ -681,12 +685,59 @@ public class OPDE {
              *     |_|  |_|  |_| |_| |_|_|  |_|\__,_|_|_| |_| |  | |
              *                                               \_\/_/
              */
+
+            checkForSoftwareupdates();
+
             mainframe = new FrmMain();
             mainframe.setVisible(true);
 
         }
     }
 
+
+    private static void checkForSoftwareupdates() {
+        final String FTPServer = "ftp.offene-pflege.de";
+        final int FTPPort = 21;
+        final String FTPUser = "anonymous";
+        final String FTPPassword = Integer.toString(appInfo.getBuildnum());
+        final String FTPWorkingDirectory = "/pub/opde";
+        final String FILENAME = "buildnum";
+
+        int remoteBuildnum = -1;
+        int mybuildnum = OPDE.getAppInfo().getBuildnum();
+        FileTransferClient ftp = null;
+        try {
+            File target = File.createTempFile("opde", ".txt");
+            ftp = new FileTransferClient();
+
+            ftp.setRemoteHost(FTPServer);
+            ftp.setUserName(FTPUser);
+            ftp.setPassword(FTPPassword);
+            ftp.setRemotePort(FTPPort);
+            ftp.connect();
+            ftp.getAdvancedFTPSettings().setConnectMode(FTPConnectMode.PASV);
+            ftp.changeDirectory(FTPWorkingDirectory);
+            ftp.downloadFile(target.getPath(), FILENAME);
+
+            String strRemoteBuildnum = FileUtils.readLines(target).get(0);
+            remoteBuildnum = Integer.parseInt(strRemoteBuildnum);
+
+            ftp.disconnect();
+        } catch (Exception e) {
+            if (ftp != null && ftp.isConnected()) {
+                try {
+                    ftp.disconnect();
+                } catch (FTPException e1) {
+                    OPDE.error(e1);
+                } catch (IOException e1) {
+                    OPDE.error(e1);
+                }
+            }
+            OPDE.error(e);
+        }
+
+        OPDE.setUpdateAvailable(remoteBuildnum > mybuildnum);
+    }
 
     public static DisplayManager getDisplayManager() {
         return mainframe.getDisplayManager();

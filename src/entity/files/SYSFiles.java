@@ -251,7 +251,6 @@ public class SYSFiles implements Serializable, Comparable {
 
     @Override
     public int compareTo(Object o) {
-
         return getFilename().compareTo(((SYSFiles) o).getFilename());
     }
 
