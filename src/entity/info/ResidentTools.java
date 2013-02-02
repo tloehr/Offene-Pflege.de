@@ -35,14 +35,12 @@ public class ResidentTools {
     public static final int FEMALE = 2;
     public static final String GENDER[] = {"", OPDE.lang.getString("misc.msg.male"), OPDE.lang.getString("misc.msg.female")};
     public static final String ADDRESS[] = {"", OPDE.lang.getString("misc.msg.termofaddress.mr"), OPDE.lang.getString("misc.msg.termofaddress.mrs")};
-
     public static final String KEY_STOOLDAYS = "stooldays";
     public static final String KEY_BALANCE = "liquidbalance";
     public static final String KEY_LOWIN = "lowin";
     public static final String KEY_TARGETIN = "targetin";
     public static final String KEY_HIGHIN = "highin";
     public static final String KEY_DAYSDRINK = "daysdrink";
-
     public static final short ADMINONLY = 2;
     public static final short NORMAL = 0;
 
@@ -126,12 +124,12 @@ public class ResidentTools {
     }
 
     /**
-     * creates a list of fitting residents by the given pattern
+     * creates a list of residents by the given pattern
      *
      * @param pattern
      * @return
      */
-    public static ArrayList<Resident> getBy(String pattern) {
+    public static ArrayList<Resident> getBy(String pattern, boolean archiveToo) {
         ArrayList<Resident> lstResult = null;
         Resident resident = EntityTools.find(Resident.class, pattern);
 
@@ -139,7 +137,9 @@ public class ResidentTools {
             pattern += "%"; // MySQL Wildcard
             EntityManager em = OPDE.createEM();
 
-            Query query = em.createQuery("SELECT b FROM Resident b WHERE b.name like :nachname ORDER BY b.name, b.firstname");
+            Query query = em.createQuery("SELECT b FROM Resident b WHERE b.name like :nachname " +
+                    (archiveToo ? "" : "AND b.station IS NOT NULL ")
+                    + " ORDER BY b.name, b.firstname");
             query.setParameter("nachname", pattern);
             lstResult = new ArrayList<Resident>(query.getResultList());
         } else {
@@ -160,7 +160,6 @@ public class ResidentTools {
 //            }
 
     }
-
 
     /**
      * This method must be called if a resident finally leaves the home. It will then seize all running processes and

@@ -225,10 +225,10 @@ public class PnlTX extends JPanel {
 
         if (tx.getResident() != null) {
             cmbResident.setModel(new DefaultComboBoxModel(new Resident[]{tx.getResident()}));
-            cmbResident.setEnabled(false);
+            //cmbResident.setEditable(false);
         } else {
             cmbResident.setModel(SYSTools.list2cmb(ResidentTools.getAllActive()));
-            cmbResident.setEnabled(true);
+            //cmbResident.setEditable(true);
         }
 
         ResInfo firstStay = ResInfoTools.getFirstResinfo(tx.getResident(), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));

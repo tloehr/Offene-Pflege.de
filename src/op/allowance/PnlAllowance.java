@@ -74,16 +74,13 @@ import java.util.HashMap;
  */
 public class PnlAllowance extends CleanablePanel {
     public static final String internalClassID = "admin.residents.cash";
-
+    NumberFormat cf = NumberFormat.getCurrencyInstance();
+    Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
     private Resident currentResident;
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
     private JXSearchField txtSearch;
     private JComboBox cmbResident;
-
-    NumberFormat cf = NumberFormat.getCurrencyInstance();
-    Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
-
     private ArrayList<Resident> lstResidents;
     // this map contains the monthly lists of allowances, once they have been loaded
     // it's a cache to speed up things. the key is a combined string like this:
@@ -92,12 +89,10 @@ public class PnlAllowance extends CleanablePanel {
     private HashMap<String, CollapsiblePane> cpMap;
     private HashMap<String, JPanel> contentmap;
     private HashMap<Allowance, JPanel> linemap;
-
-
-    @Override
-    public String getInternalClassID() {
-        return internalClassID;
-    }
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private JPanel pnlCash;
+    private JScrollPane jspCash;
+    private CollapsiblePanes cpsCash;
 
     public PnlAllowance(JScrollPane jspSearch) {
         super();
@@ -108,6 +103,10 @@ public class PnlAllowance extends CleanablePanel {
         reloadDisplay();
     }
 
+    @Override
+    public String getInternalClassID() {
+        return internalClassID;
+    }
 
     private void initPanel() {
         lstResidents = new ArrayList<Resident>();
@@ -118,6 +117,7 @@ public class PnlAllowance extends CleanablePanel {
 
         lstResidents = ResidentTools.getAllActive();
         currentResident = null;
+        OPDE.getMainframe().setCurrentResident(currentResident);
     }
 
     @Override
@@ -167,7 +167,6 @@ public class PnlAllowance extends CleanablePanel {
         }
         add(pnlCash);
     }// </editor-fold>//GEN-END:initComponents
-
 
     private void reloadDisplay() {
         /***
@@ -315,10 +314,10 @@ public class PnlAllowance extends CleanablePanel {
 
 
         /***
-         *           _ _      _            _                               _     _            _   
-         *       ___| (_) ___| | _____  __| |   ___  _ __    _ __ ___  ___(_) __| | ___ _ __ | |_ 
+         *           _ _      _            _                               _     _            _
+         *       ___| (_) ___| | _____  __| |   ___  _ __    _ __ ___  ___(_) __| | ___ _ __ | |_
          *      / __| | |/ __| |/ / _ \/ _` |  / _ \| '_ \  | '__/ _ \/ __| |/ _` |/ _ \ '_ \| __|
-         *     | (__| | | (__|   <  __/ (_| | | (_) | | | | | | |  __/\__ \ | (_| |  __/ | | | |_ 
+         *     | (__| | | (__|   <  __/ (_| | | (_) | | | | | | |  __/\__ \ | (_| |  __/ | | | |_
          *      \___|_|_|\___|_|\_\___|\__,_|  \___/|_| |_| |_|  \___||___/_|\__,_|\___|_| |_|\__|
          *
          */
@@ -439,7 +438,7 @@ public class PnlAllowance extends CleanablePanel {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 popupTX.setOwner(btnNewTX);
-                GUITools.showPopup(popupTX, SwingConstants.NORTH_EAST);
+                GUITools.showPopup(popupTX, SwingConstants.NORTH);
             }
         });
         btnNewTX.setBackground(getBG(resident, 9));
@@ -452,6 +451,7 @@ public class PnlAllowance extends CleanablePanel {
             if (!resident.equals(currentResident)) {
                 OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(resident));
                 currentResident = resident;
+                OPDE.getMainframe().setCurrentResident(currentResident);
             }
             for (int year = end.getYear(); year >= start.getYear(); year--) {
                 pnlContent.add(createCP4(resident, year, start, end));
@@ -516,6 +516,8 @@ public class PnlAllowance extends CleanablePanel {
             }
         });
 
+        GUITools.addExpandCollapseButtons(cpYear, cptitle.getRight());
+
         /***
          *      ____       _       _ __   __
          *     |  _ \ _ __(_)_ __ | |\ \ / /__  __ _ _ __
@@ -561,6 +563,7 @@ public class PnlAllowance extends CleanablePanel {
                 if (!resident.equals(currentResident)) {
                     OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(resident));
                     currentResident = resident;
+                    OPDE.getMainframe().setCurrentResident(currentResident);
                 }
 
                 // somebody clicked on the year
@@ -686,6 +689,7 @@ public class PnlAllowance extends CleanablePanel {
                 if (!resident.equals(currentResident)) {
                     OPDE.getDisplayManager().setMainMessage(ResidentTools.getLabelText(resident));
                     currentResident = resident;
+                    OPDE.getMainframe().setCurrentResident(currentResident);
                 }
 
                 cpMonth.setContentPane(createContentPanel4(resident, carry, month));
@@ -702,13 +706,7 @@ public class PnlAllowance extends CleanablePanel {
 
         return cpMonth;
     }
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JPanel pnlCash;
-    private JScrollPane jspCash;
-    private CollapsiblePanes cpsCash;
     // End of variables declaration//GEN-END:variables
-
 
     private void prepareSearchArea() {
         searchPanes = new CollapsiblePanes();
@@ -738,20 +736,20 @@ public class PnlAllowance extends CleanablePanel {
         searchPanes.addExpansion();
     }
 
-
     private java.util.List<Component> addFilters() {
         java.util.List<Component> list = new ArrayList<Component>();
 
         txtSearch = new JXSearchField(OPDE.lang.getString("misc.msg.residentsearch"));
         txtSearch.setFont(SYSConst.ARIAL14);
-        txtSearch.setInstantSearchDelay(750);
+        txtSearch.setInstantSearchDelay(100000);
         txtSearch.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                cmbResident.setModel(SYSTools.list2cmb(ResidentTools.getBy(txtSearch.getText().trim())));
+                cmbResident.setModel(SYSTools.list2cmb(ResidentTools.getBy(txtSearch.getText().trim(), OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, internalClassID))));
                 lstResidents = new ArrayList<Resident>();
                 lstResidents.add((Resident) cmbResident.getSelectedItem());
                 currentResident = (Resident) cmbResident.getSelectedItem();
+                OPDE.getMainframe().setCurrentResident(currentResident);
                 reloadDisplay();
             }
         });
@@ -767,6 +765,7 @@ public class PnlAllowance extends CleanablePanel {
                     lstResidents = new ArrayList<Resident>();
                     lstResidents.add((Resident) e.getItem());
                     currentResident = (Resident) e.getItem();
+                    OPDE.getMainframe().setCurrentResident(currentResident);
                     reloadDisplay();
                 }
             }
@@ -779,35 +778,39 @@ public class PnlAllowance extends CleanablePanel {
             public void actionPerformed(ActionEvent actionEvent) {
                 lstResidents = ResidentTools.getAllActive();
                 currentResident = null;
+                OPDE.getMainframe().setCurrentResident(currentResident);
                 reloadDisplay();
             }
         });
         list.add(btnAllActiveResidents);
 
-        final JideButton btnAllInactiveResidents = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".showallinactiveresidents"), SYSConst.icon22residentInactive, null);
-        btnAllInactiveResidents.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                lstResidents = ResidentTools.getAllInactive();
-                currentResident = null;
-                reloadDisplay();
-            }
-        });
-        list.add(btnAllInactiveResidents);
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, internalClassID)) {
+            final JideButton btnAllInactiveResidents = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".showallinactiveresidents"), SYSConst.icon22residentInactive, null);
+            btnAllInactiveResidents.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    lstResidents = ResidentTools.getAllInactive();
+                    currentResident = null;
+                    OPDE.getMainframe().setCurrentResident(currentResident);
+                    reloadDisplay();
+                }
+            });
+            list.add(btnAllInactiveResidents);
 
-        final JideButton btnAllResidents = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".showallresidents"), SYSConst.icon22residentBoth, null);
-        btnAllResidents.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                lstResidents = ResidentTools.getAllInactive();
-                lstResidents.addAll(ResidentTools.getAllActive());
-                Collections.sort(lstResidents);
-                currentResident = null;
-                reloadDisplay();
-            }
-        });
-        list.add(btnAllResidents);
-
+            final JideButton btnAllResidents = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".showallresidents"), SYSConst.icon22residentBoth, null);
+            btnAllResidents.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    lstResidents = ResidentTools.getAllInactive();
+                    lstResidents.addAll(ResidentTools.getAllActive());
+                    Collections.sort(lstResidents);
+                    currentResident = null;
+                    OPDE.getMainframe().setCurrentResident(currentResident);
+                    reloadDisplay();
+                }
+            });
+            list.add(btnAllResidents);
+        }
         return list;
     }
 

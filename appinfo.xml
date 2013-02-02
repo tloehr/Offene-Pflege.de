@@ -35,6 +35,7 @@
             <delete langbundle="appinfo.default.acl.delete"/>
             <print langbundle="appinfo.default.acl.print"/>
             <execute langbundle="appinfo.default.acl.execute"/>
+            <archive langbundle="appinfo.default.acl.archive"/>
         </class>
         <class name="opde.welcome" short="Startseite"
                long="Willkommen bei Offene-Pflege.de" main="true"
