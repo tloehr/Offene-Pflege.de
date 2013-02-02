@@ -708,6 +708,7 @@ public class OPDE {
         FileTransferClient ftp = null;
         try {
             File target = File.createTempFile("opde", ".txt");
+            target.deleteOnExit();
             ftp = new FileTransferClient();
 
             ftp.setRemoteHost(FTPServer);
