@@ -88,9 +88,9 @@ import java.util.HashMap;
  * @author __USER__
  */
 public class FrmMain extends JFrame {
-
     public static final String internalClassID = "opde.mainframe";
     private boolean initPhase;
+    private ArrayList<CollapsiblePane> listOfNursingrecords;
 
     public DisplayManager getDisplayManager() {
         return displayManager;
@@ -121,7 +121,7 @@ public class FrmMain extends JFrame {
         currentResident = null;
         lblWait.setText(OPDE.lang.getString("misc.msg.wait"));
         lblWait.setVisible(false);
-
+        listOfNursingrecords = new ArrayList<CollapsiblePane>();
         btnHelp.setToolTipText(OPDE.lang.getString(internalClassID + ".btnHelp.tooltip"));
 
         if (OPDE.isDebug()) {
@@ -485,6 +485,14 @@ public class FrmMain extends JFrame {
     }
 
     private void prepareSearchArea() {
+        // fixes #1
+        if (panesApps != null){
+            panesApps.removeAll();
+        }
+        for (CollapsiblePane cp : listOfNursingrecords){
+            cp.removeAll();
+        }
+        listOfNursingrecords.clear();
 
         panesSearch = new CollapsiblePanes();
         panesSearch.setLayout(new JideBoxLayout(panesSearch, JideBoxLayout.Y_AXIS));
@@ -492,9 +500,6 @@ public class FrmMain extends JFrame {
 
         panesApps = new CollapsiblePanes();
         panesApps.setLayout(new JideBoxLayout(panesApps, JideBoxLayout.Y_AXIS));
-
-//        panesApps.add(addCommandNewBW());
-//        panesApps.add(addApps());
 
         homeButton = GUITools.createHyperlinkButton(OPDE.lang.getString(PnlWelcome.internalClassID), SYSConst.icon22home, new ActionListener() {
             @Override
@@ -523,8 +528,8 @@ public class FrmMain extends JFrame {
             panesApps.add(addNursingRecords(station));
         }
 
-        // Darf auf das Archiv zugreifen
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, PnlInfo.internalClassID)) { // => ACLMATRIX
+        // May see the archive
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, PnlInfo.internalClassID)) {
             panesApps.add(addNursingRecords(null));
         }
 
@@ -582,7 +587,6 @@ public class FrmMain extends JFrame {
         CollapsiblePane mypane = new CollapsiblePane(station == null ? OPDE.lang.getString("misc.msg.Archive") : station.getName());
         mypane.setFont(SYSConst.ARIAL14);
         mypane.setEmphasized(station != null && station.equals(StationTools.getStationForThisHost()));
-//        mypane.setSlidingDirection(SwingConstants.SOUTH);
         mypane.setStyle(CollapsiblePane.PLAIN_STYLE);
 
         JPanel labelPanel = new JPanel();
@@ -653,7 +657,22 @@ public class FrmMain extends JFrame {
         }
 
         mypane.setContentPane(labelPanel);
+        // fixes #1
+        listOfNursingrecords.add(mypane);
         return mypane;
+    }
+
+    /**
+     * fixes #1
+     */
+    public void collapseNursingRecords(){
+        try {
+            for (CollapsiblePane cp : listOfNursingrecords){
+                cp.setCollapsed(true);
+            }
+        } catch (PropertyVetoException e) {
+            // bah!
+        }
     }
 
     public Resident getCurrentResident() {

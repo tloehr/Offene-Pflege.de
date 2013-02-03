@@ -109,6 +109,7 @@ public class PnlAllowance extends CleanablePanel {
     }
 
     private void initPanel() {
+        OPDE.getMainframe().collapseNursingRecords();
         lstResidents = new ArrayList<Resident>();
         cpMap = new HashMap<String, CollapsiblePane>();
         cashmap = new HashMap<String, ArrayList<Allowance>>();
