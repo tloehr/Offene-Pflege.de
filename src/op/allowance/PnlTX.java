@@ -14,7 +14,6 @@ import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,8 +25,6 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Date;
-import java.util.Vector;
 
 /**
  * @author Torsten Löhr
@@ -86,9 +83,7 @@ public class PnlTX extends JPanel {
     }
 
     private void save() {
-        tx.setEditedBy(OPDE.getLogin().getUser());
-        tx.setEditDate(new Date());
-        tx.setDate(SYSCalendar.parseDate(txtDate.getText()));
+        tx.setPit(SYSCalendar.parseDate(txtDate.getText()));
         tx.setAmount(checkCash(txtCash.getText(), BigDecimal.ONE));
         tx.setText(txtText.getText().trim());
         tx.setResident((Resident) cmbResident.getSelectedItem());
@@ -215,7 +210,7 @@ public class PnlTX extends JPanel {
         lblDate.setText(OPDE.lang.getString(internalClassID + ".lbldate"));
         lblText.setText(OPDE.lang.getString(internalClassID + ".lbltext"));
         lblCash.setText(OPDE.lang.getString(internalClassID + ".lblcash"));
-        txtDate.setText(DateFormat.getDateInstance().format(tx.getDate()));
+        txtDate.setText(DateFormat.getDateInstance().format(tx.getPit()));
         txtCash.setText(cf.format(tx.getAmount()));
         if (tx.getId() == null){
             txtText.setText(OPDE.lang.getString(internalClassID + ".txtText"));

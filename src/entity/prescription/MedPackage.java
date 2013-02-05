@@ -9,13 +9,7 @@ import java.math.BigDecimal;
  */
 @Entity
 @Table(name = "MPackung")
-//@NamedQueries({
-//        @NamedQuery(name = "MedPackung.findAll", query = "SELECT m FROM MedPackage m"),
-//        @NamedQuery(name = "MedPackung.findByMpid", query = "SELECT m FROM MedPackage m WHERE m.id = :mpid"),
-//        @NamedQuery(name = "MedPackung.findByPzn", query = "SELECT m FROM MedPackage m WHERE m.pzn = :pzn"),
-//        @NamedQuery(name = "MedPackung.findByGroesse", query = "SELECT m FROM MedPackage m WHERE m.groesse = :groesse"),
-//        @NamedQuery(name = "MedPackung.findByInhalt", query = "SELECT m FROM MedPackage m WHERE m.inhalt = :inhalt")
-//})
+
 public class MedPackage implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -39,7 +33,6 @@ public class MedPackage implements Serializable {
 
     public MedPackage(TradeForm tf) {
         this.tradeForm = tf;
-//        this.darreichung.getPackages().add(this);
     }
 
     public TradeForm getTradeForm() {

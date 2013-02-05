@@ -63,7 +63,7 @@ public class PnlPackage extends JPanel {
         pzn = MedPackageTools.checkNewPZN(txtPZN.getText().trim(), null);
 
         if (MedPackageTools.parsePZN(txtPZN.getText().trim()) == null) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Die PZN ist falsch. Sie muss aus genau 7 Ziffern bestehen.", DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Die PZN ist falsch. Sie muss aus 7 oder 8 Ziffern bestehen.", DisplayMessage.WARNING));
         } else if (pzn == null){
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Die PZN ist wird bereits verwendet.", DisplayMessage.WARNING));
         }

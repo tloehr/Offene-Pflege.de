@@ -83,11 +83,45 @@ public class MedPackageTools {
      */
     public static String parsePZN(String pzn) {
         pzn = pzn.trim();
-        if (pzn.matches("^ß?\\d{7}")) { // Hier sucht man nach einer PZN. Im Barcode ist das führende 'ß' enthalten.
+        if (pzn.matches("^ß?\\d{7,8}")) {
             pzn = (pzn.startsWith("ß") ? pzn.substring(1) : pzn);
+
+            if (!isPZNValid(pzn)) {
+                pzn = null;
+            }
+
         } else {
             pzn = null;
         }
         return pzn;
+    }
+
+
+    /**
+     * checks the validity of a given PZN according to the algorithm defined by SecurPharm
+     *
+     * @return guess
+     */
+    private static boolean isPZNValid(String pzn) {
+        int[] digits = new int[pzn.length() - 1];
+
+        for (int c = 0; c < pzn.length() - 1; c++) {
+            digits[c] = Integer.parseInt(String.valueOf(pzn.charAt(c)));
+        }
+        int givenChecksum = Integer.parseInt(String.valueOf(pzn.charAt(pzn.length() - 1)));
+
+        int weightedSum = 0;
+        int w = 7;
+        for (int c = digits.length - 1; c >= 0; c--) {
+            weightedSum += digits[c] * w;
+            w--;
+        }
+        int calculatedChecksum = weightedSum % 11;
+
+        if (calculatedChecksum != givenChecksum) {
+            OPDE.debug("PZN is NOT valid");
+        }
+
+        return calculatedChecksum == givenChecksum;
     }
 }
