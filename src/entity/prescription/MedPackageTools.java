@@ -44,7 +44,8 @@ public class MedPackageTools {
     }
 
     /**
-     * Testet ob eine neue PZN gültig ist. Also ob sie genau 7 Zeichen lang ist. Führende 'ß' Zeichen (kommt bei den Barcodes vor)
+     * Checks if a PZN is valid and id not already in use.
+     * Testet ob eine neue PZN gültig ist. Also ob sie 7 oder 8 Zeichen lang ist. Führende 'ß' Zeichen (kommt bei den Barcodes vor)
      * werden abgeschnitten. Und es wird anhand der Datenbank geprüft, ob die PZN noch frei ist oder nicht.
      *
      * @param pzn      die geprüfte und bereinigte PZN. <code>null</code> bei falscher oder belegter PZN.
@@ -58,11 +59,11 @@ public class MedPackageTools {
             // PZN's darfs nur einmal geben. Gibts die hier schon ?
             // Dann ist die Packung falsch.
             EntityManager em = OPDE.createEM();
-            String jpql = "SELECT m FROM MedPackage m WHERE m.pzn = :pzn " + (ignoreMe != null ? " AND m <> :packung " : "");
+            String jpql = "SELECT m FROM MedPackage m WHERE m.pzn = :pzn " + (ignoreMe != null ? " AND m <> :medPackage " : "");
             Query query = em.createQuery(jpql);
             query.setParameter("pzn", pzn);
             if (ignoreMe != null) {
-                query.setParameter("packung", ignoreMe);
+                query.setParameter("medPackage", ignoreMe);
             }
             if (!query.getResultList().isEmpty()) {
                 pzn = null;
@@ -74,17 +75,23 @@ public class MedPackageTools {
     }
 
     /**
-     * Diese Methode prüft ob ein String einem PZN String entspricht. Dabei wird berücksichtigt, dass bei einer PZN
-     * die von einem Barcode Scanner erkannt wird, immer ein "ß" zu Beginn der Zeichenkette steht. Diese wird dann
-     * direkt abgeschnitten.
+     * This method checks if a given string represents a valid german PZN, which may (as of 2013) have a length
+     * of 7 or 8 chars. It must also be conform to the checksum algorithm defined by SecurPharm.
+     * All the barcode scanners that came across added a "ß" at the front of the scanned number. So this
+     * has to be removed if present.
      *
-     * @param pzn die, ggf. gesäuberte PZN. null, wenn der String unpassend war.
-     * @return
+     * @param pzn the string to be checked
+     * @return the cleaned and checked string. PZN7's are always added up to PZN8's (by puttin a zero to the head). If the PZN was invalid you will only get NULL.
      */
     public static String parsePZN(String pzn) {
         pzn = pzn.trim();
         if (pzn.matches("^ß?\\d{7,8}")) {
             pzn = (pzn.startsWith("ß") ? pzn.substring(1) : pzn);
+
+            // this is only temporarily until the PZN7's are gone completely. it may take some years.
+            if (pzn.length() == 7) {
+                pzn = "0" + pzn;
+            }
 
             if (!isPZNValid(pzn)) {
                 pzn = null;
@@ -99,6 +106,13 @@ public class MedPackageTools {
 
     /**
      * checks the validity of a given PZN according to the algorithm defined by SecurPharm
+     * <br/>
+     * <br/>
+     * <img src="http://www.offene-pflege.de/images/javadoc/pzn-checksum-calculation.png">
+     * <br/>
+     * <br/>
+     * <i>This picture has been taken from the german PZN8 document. It is copyrighted to
+     * Informationsstelle für Arzneispezialitäten - IFA GmbH</i>
      *
      * @return guess
      */

@@ -221,7 +221,7 @@ public class DlgPack extends MyJDialog {
             try {
                 em.getTransaction().begin();
                 MedPackage myPackage = em.merge(aPackage);
-                myPackage.setPzn(txtPZN.getText());
+                myPackage.setPzn(pzn);
                 myPackage.setSize((short) cmbGroesse.getSelectedIndex());
                 myPackage.setContent(inhalt);
                 em.getTransaction().commit();
