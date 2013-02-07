@@ -1198,7 +1198,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                     });
                 }
             });
-            btnOpenStock.setEnabled(inventory != null && stockInUse == null);
+            btnOpenStock.setEnabled(inventory != null && stockInUse == null && !prescription.isClosed());
             pnlMenu.add(btnOpenStock);
 
             pnlMenu.add(new JSeparator());

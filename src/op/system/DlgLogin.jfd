@@ -13,7 +13,7 @@
        <class>com.jgoodies.forms.layout.FormLayout</class> 
        <void method="setProperty"> 
         <string>$columnSpecs</string> 
-        <string>13dlu, default, labelcompgap, 13dlu</string> 
+        <string>13dlu, default, 13dlu</string> 
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
@@ -104,10 +104,6 @@
            </object> 
           </void> 
           <void method="setProperty"> 
-           <string>toolTipText</string> 
-           <string>Über Offene-Pflege.de...</string> 
-          </void> 
-          <void method="setProperty"> 
            <string>borderPainted</string> 
            <boolean>false</boolean> 
           </void> 
@@ -128,6 +124,10 @@
            <object class="java.awt.Cursor"> 
             <int>12</int> 
            </object> 
+          </void> 
+          <void method="setProperty"> 
+           <string>toolTipText</string> 
+           <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
           </void> 
           <void property="name"> 
            <string>btnAbout</string> 
@@ -336,7 +336,7 @@
       <void method="setProperty"> 
        <string>size</string> 
        <object class="java.awt.Dimension"> 
-        <int>335</int> 
+        <int>320</int> 
         <int>540</int> 
        </object> 
       </void> 

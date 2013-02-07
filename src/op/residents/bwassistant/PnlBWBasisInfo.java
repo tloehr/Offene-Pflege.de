@@ -4,7 +4,6 @@
 
 package op.residents.bwassistant;
 
-import java.awt.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.info.Resident;
@@ -20,10 +19,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.text.DateFormat;
 import java.util.Date;
@@ -99,28 +95,38 @@ public class PnlBWBasisInfo extends JPanel {
         check();
     }
 
-    private void txtDOBFocusLost(FocusEvent e) {
-        gebdatum = null;
-        try {
-            gebdatum = SYSCalendar.parseDate(txtDOB.getText());
-            if (!SYSCalendar.isBirthdaySane(gebdatum)) {
-                gebdatum = null;
-                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".dobXX"), DisplayMessage.WARNING));
-            } else {
-                txtDOB.setText(DateFormat.getDateInstance().format(gebdatum));
-            }
-        } catch (NumberFormatException e1) {
-            gebdatum = null;
-            txtDOB.setText(DateFormat.getDateInstance().format(new Date()));
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".dobXX"), DisplayMessage.WARNING));
-        }
+    private void txtDOBFocusLost(FocusEvent evt) {
+        //TODO: those min and max values must not be hardcoded in future
+        int maxage = 120;
+        int minage = 15;
 
-        if (gebdatum != null && SYSCalendar.isBirthdaySane(gebdatum)) {
+        SYSCalendar.handleDateFocusLost(evt, new DateMidnight().minusYears(maxage), new DateMidnight().minusYears(minage));
+
+        gebdatum = SYSCalendar.parseDate(txtDOB.getText());
+
+//        gebdatum = null;
+//        try {
+//            gebdatum = SYSCalendar.parseDate(txtDOB.getText());
+//            if (!SYSCalendar.isBirthdaySane(gebdatum)) {
+//                gebdatum = null;
+//                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".dobXX"), DisplayMessage.WARNING));
+//            } else {
+//                txtDOB.setText(DateFormat.getDateInstance().format(gebdatum));
+//            }
+//        } catch (NumberFormatException e1) {
+//            gebdatum = null;
+//            txtDOB.setText(DateFormat.getDateInstance().format(new Date()));
+//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".dobXX"), DisplayMessage.WARNING));
+//        }
+//
+        if (SYSCalendar.isBirthdaySane(gebdatum)) {
             DateMidnight birthdate = new DateTime(gebdatum).toDateMidnight();
             DateTime now = new DateTime();
             Years age = Years.yearsBetween(birthdate, now);
             lblAge.setText(age.getYears() + " " + OPDE.lang.getString("misc.msg.Years"));
-            gebdatum = birthdate.toDate();
+//            gebdatum = birthdate.toDate();
+        } else {
+            gebdatum = null;
         }
         check();
     }
@@ -151,8 +157,8 @@ public class PnlBWBasisInfo extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "default, $lcgap, pref, 2*($lcgap, default:grow), $lcgap, default",
-            "5*(default, $lgap), default"));
+                "default, $lcgap, pref, 2*($lcgap, default:grow), $lcgap, default",
+                "5*(default, $lgap), default"));
 
         //---- lblName ----
         lblName.setText("text");

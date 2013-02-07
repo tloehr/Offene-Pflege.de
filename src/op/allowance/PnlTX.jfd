@@ -61,6 +61,10 @@
          <string>font</string> 
          <object idref="Font0"/> 
         </void> 
+        <void method="setProperty"> 
+         <string>focusable</string> 
+         <boolean>false</boolean> 
+        </void> 
         <void property="name"> 
          <string>cmbResident</string> 
         </void> 

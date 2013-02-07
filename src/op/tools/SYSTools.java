@@ -126,7 +126,6 @@ public class SYSTools {
         if (!OPDE.isDebug()) return;
         final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
 
-
         OPDE.debug(ste[2].toString() + ": " + (System.currentTimeMillis() - begin) + " ms");
     }
 

@@ -2,7 +2,7 @@
 <!-- You may freely edit this file. See commented blocks below for -->
 <!-- some examples of how toTemplate customize the build. -->
 <!-- (If you delete it and reopen the project it will be recreated.) -->
-<project name="Offene-Pflege.de" default="default" basedir=".">
+<project name="Offene-Pflege.de" default="buildnum" basedir=".">
     <description>Builds, tests, and runs the project Offene-Pflege.de.</description>
     <!--
 
@@ -77,7 +77,7 @@
             <entry key="program.DESCRIPTION" default=""/>
             <entry key="program.VERSION" default="1.0.0"/>
             <entry key="program.BUILDNUM" value="${build.number}"/>
-            <entry key="program.BUILDDATE" type="date" value="now" pattern="yyyyMMDDHHmmss"/>
+            <entry key="program.BUILDDATE" type="date" value="now" pattern="yyyyMMddHHmmss"/>
         </propertyfile>
         <!-- <copy file="appinfo.properties" todir="${build.classes.dir}"/>
             <copy file="internalclasses.xml" todir="${build.classes.dir}"/> -->

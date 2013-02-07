@@ -79,7 +79,7 @@ public class DlgLogin extends MyJDialog {
         lblUsernamePassword.setText(OPDE.lang.getString("misc.msg.username") + "/" + OPDE.lang.getString("misc.msg.password"));
 
         txtUsername.requestFocus();
-
+//        pack();
         setVisible(true);
 
     }
@@ -109,8 +109,8 @@ public class DlgLogin extends MyJDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "13dlu, default, $lcgap, 13dlu",
-                "13dlu, $lgap, fill:48dlu:grow, $lgap, default, $lgap, 13dlu"));
+            "13dlu, default, 13dlu",
+            "13dlu, $lgap, fill:48dlu:grow, $lgap, default, $lgap, 13dlu"));
 
         //======== jPanel2 ========
         {
@@ -126,12 +126,12 @@ public class DlgLogin extends MyJDialog {
 
             //---- btnAbout ----
             btnAbout.setIcon(new ImageIcon(getClass().getResource("/artwork/256x256/opde-logo.png")));
-            btnAbout.setToolTipText("\u00dcber Offene-Pflege.de...");
             btnAbout.setBorderPainted(false);
             btnAbout.setBorder(null);
             btnAbout.setOpaque(false);
             btnAbout.setContentAreaFilled(false);
             btnAbout.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            btnAbout.setToolTipText(null);
             btnAbout.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -206,7 +206,7 @@ public class DlgLogin extends MyJDialog {
             panel1.add(btnLogin);
         }
         contentPane.add(panel1, CC.xy(2, 5, CC.RIGHT, CC.DEFAULT));
-        setSize(335, 540);
+        setSize(320, 540);
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 

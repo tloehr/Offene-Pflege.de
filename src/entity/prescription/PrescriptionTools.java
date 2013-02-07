@@ -59,7 +59,7 @@ public class PrescriptionTools {
      * @param station Die Station, für die der Stellplan erstellt werden soll. Sortiert nach den Station.
      */
     public static void printDailyPlan(Station station) {
-//        long begin = System.currentTimeMillis();
+        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
 //        String html = "";
 
@@ -91,7 +91,7 @@ public class PrescriptionTools {
         } catch (Exception e) {
             OPDE.fatal(e);
         }
-//        SYSTools.showTimeDifference(begin);
+        SYSTools.showTimeDifference(begin);
 //        return html;
     }
 

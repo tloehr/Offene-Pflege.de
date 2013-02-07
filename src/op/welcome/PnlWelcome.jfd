@@ -92,7 +92,7 @@
           </void> 
           <void method="add"> 
            <object class="com.jformdesigner.model.FormComponent"> 
-            <string>javax.swing.JLabel</string> 
+            <string>javax.swing.JButton</string> 
             <void method="setProperty"> 
              <string>text</string> 
              <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
@@ -124,8 +124,34 @@
              <string>horizontalTextPosition</string> 
              <int>10</int> 
             </void> 
+            <void method="setProperty"> 
+             <string>borderPainted</string> 
+             <boolean>false</boolean> 
+            </void> 
+            <void method="setProperty"> 
+             <string>contentAreaFilled</string> 
+             <boolean>false</boolean> 
+            </void> 
+            <void method="setProperty"> 
+             <string>border</string> 
+             <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+            </void> 
+            <void method="setProperty"> 
+             <string>cursor</string> 
+             <object class="java.awt.Cursor"> 
+              <int>12</int> 
+             </object> 
+            </void> 
             <void property="name"> 
-             <string>lblOPDE</string> 
+             <string>btnAbout</string> 
+            </void> 
+            <void method="addEvent"> 
+             <object class="com.jformdesigner.model.FormEvent"> 
+              <string>java.awt.event.ActionListener</string> 
+              <string>actionPerformed</string> 
+              <string>btnAboutActionPerformed</string> 
+              <boolean>true</boolean> 
+             </object> 
             </void> 
            </object> 
           </void> 

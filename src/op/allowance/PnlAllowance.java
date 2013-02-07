@@ -763,12 +763,17 @@ public class PnlAllowance extends CleanablePanel {
         txtSearch.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                cmbResident.setModel(SYSTools.list2cmb(ResidentTools.getBy(txtSearch.getText().trim(), OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, internalClassID))));
-                lstResidents = new ArrayList<Resident>();
-                lstResidents.add((Resident) cmbResident.getSelectedItem());
-                currentResident = (Resident) cmbResident.getSelectedItem();
-                OPDE.getMainframe().setCurrentResident(currentResident);
-                reloadDisplay();
+                ArrayList<Resident> listSearchResidents = ResidentTools.getBy(txtSearch.getText().trim(), OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, internalClassID));
+                if (listSearchResidents != null && !listSearchResidents.isEmpty()) {
+                    cmbResident.setModel(SYSTools.list2cmb(listSearchResidents));
+                    lstResidents = new ArrayList<Resident>();
+                    lstResidents.add((Resident) cmbResident.getSelectedItem());
+                    currentResident = (Resident) cmbResident.getSelectedItem();
+                    OPDE.getMainframe().setCurrentResident(currentResident);
+                    reloadDisplay();
+                } else {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.nodata"));
+                }
             }
         });
 
@@ -1110,7 +1115,8 @@ public class PnlAllowance extends CleanablePanel {
                         }
                     });
                     cptitle.getRight().add(btnEdit);
-                    btnEdit.setEnabled(!allowance.isReplaced() && !allowance.isReplacement());
+                    // you can edit your own entries or you are a manager. once they are replaced or a replacement record, its over.
+                    btnEdit.setEnabled((OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID) || allowance.getUser().equals(OPDE.getLogin().getUser())) && !allowance.isReplaced() && !allowance.isReplacement());
 
                     /***
                      *      _   _           _         _______  __

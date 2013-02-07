@@ -38,8 +38,11 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -82,8 +85,8 @@ public class PnlWelcome extends CleanablePanel {
     }
 
     private void initPanel() {
-        if (OPDE.isUpdateAvailable()){
-            lblOPDE.setText(OPDE.lang.getString("misc.msg.updateAvailable"));
+        if (OPDE.isUpdateAvailable()) {
+            btnAbout.setText(OPDE.lang.getString("misc.msg.updateAvailable"));
         }
         addApps();
 
@@ -516,13 +519,26 @@ public class PnlWelcome extends CleanablePanel {
 
     }
 
+    private void btnAboutActionPerformed(ActionEvent e) {
+        Desktop desktop = Desktop.getDesktop();
+        try {
+            desktop.browse(new URI("http://www.offene-pflege.de"));
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        } catch (URISyntaxException use) {
+            use.printStackTrace();
+
+        }
+    }
+
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         panel1 = new JPanel();
         scrollPane1 = new JScrollPane();
         cpsWelcome = new CollapsiblePanes();
         pnlApps = new JPanel();
-        lblOPDE = new JLabel();
+        btnAbout = new JButton();
 
         //======== this ========
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -548,14 +564,24 @@ public class PnlWelcome extends CleanablePanel {
             {
                 pnlApps.setLayout(new VerticalLayout(2));
 
-                //---- lblOPDE ----
-                lblOPDE.setText(null);
-                lblOPDE.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/OPDE-blue.png")));
-                lblOPDE.setHorizontalAlignment(SwingConstants.TRAILING);
-                lblOPDE.setFont(new Font("Arial", Font.BOLD, 14));
-                lblOPDE.setForeground(Color.red);
-                lblOPDE.setHorizontalTextPosition(SwingConstants.LEADING);
-                pnlApps.add(lblOPDE);
+                //---- btnAbout ----
+                btnAbout.setText(null);
+                btnAbout.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/OPDE-blue.png")));
+                btnAbout.setHorizontalAlignment(SwingConstants.TRAILING);
+                btnAbout.setFont(new Font("Arial", Font.BOLD, 14));
+                btnAbout.setForeground(Color.red);
+                btnAbout.setHorizontalTextPosition(SwingConstants.LEADING);
+                btnAbout.setBorderPainted(false);
+                btnAbout.setContentAreaFilled(false);
+                btnAbout.setBorder(null);
+                btnAbout.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnAbout.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnAboutActionPerformed(e);
+                    }
+                });
+                pnlApps.add(btnAbout);
             }
             panel1.add(pnlApps, CC.xy(3, 1, CC.DEFAULT, CC.FILL));
         }
@@ -601,6 +627,6 @@ public class PnlWelcome extends CleanablePanel {
     private JScrollPane scrollPane1;
     private CollapsiblePanes cpsWelcome;
     private JPanel pnlApps;
-    private JLabel lblOPDE;
+    private JButton btnAbout;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }
