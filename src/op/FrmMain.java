@@ -628,7 +628,6 @@ public class FrmMain extends JFrame {
 
                         currentResident = resident;
 
-//                        ((NursingRecordsPanel) currentVisiblePanel).switchResident(innerbewohner);
                         if (currentVisiblePanel instanceof PnlCare) {
                             ((NursingRecordsPanel) currentVisiblePanel).switchResident(resident);
                         } else {
@@ -643,14 +642,6 @@ public class FrmMain extends JFrame {
             JideButton button = GUITools.createHyperlinkButton(titel, null, actionListener);
             button.setForegroundOfState(ThemePainter.STATE_DEFAULT, resident.getGender() == ResidentTools.FEMALE ? Color.red : Color.blue);
             button.setBackground(Color.WHITE);
-
-//            if (station != null){
-//                if (ResInfoTools.getLastResinfo(resident, biohazard) != null){
-//                    button.setIcon(SYSConst.icon22biohazard);
-//                }
-//            }
-
-//            button.putClientProperty("bewohner", innerbewohner);
 
             labelPanel.add(button);
             bwButtonMap.put(resident, button);
@@ -754,7 +745,8 @@ public class FrmMain extends JFrame {
 
         SYSLoginTools.logout();
 
-//        System.gc();
+        // After the logout a forced garbage collection seems to be adequate
+        System.gc();
         cleanup();
 
     }

@@ -157,8 +157,8 @@ public class PnlBWBasisInfo extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "default, $lcgap, pref, 2*($lcgap, default:grow), $lcgap, default",
-                "5*(default, $lgap), default"));
+            "default, $lcgap, pref, 2*($lcgap, default:grow), $lcgap, default",
+            "5*(default, $lgap), default"));
 
         //---- lblName ----
         lblName.setText("text");
