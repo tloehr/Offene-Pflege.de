@@ -27,11 +27,11 @@
          <class>com.jgoodies.forms.layout.FormLayout</class> 
          <void method="setProperty"> 
           <string>$columnSpecs</string> 
-          <string>default, 0dlu, labelcompgap, 70dlu, labelcompgap, default:grow, labelcompgap, 0dlu, default</string> 
+          <string>14dlu, 0dlu, labelcompgap, 70dlu, labelcompgap, default:grow, labelcompgap, 0dlu, 14dlu</string> 
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
-          <string>default, 0dlu, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, pref, linegap, default, linegap, default</string> 
+          <string>14dlu, 0dlu, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, pref, linegap, 12dlu, linegap, top:20dlu, linegap, 14dlu</string> 
          </void> 
         </object> 
         <void property="name"> 
@@ -340,16 +340,12 @@
            <int>14</int> 
           </void> 
           <void method="setProperty"> 
-           <string>hAlign</string> 
-           <object class="com.jgoodies.forms.layout.CellConstraints" field="RIGHT"/> 
-          </void> 
-          <void method="setProperty"> 
-           <string>vAlign</string> 
-           <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
-          </void> 
-          <void method="setProperty"> 
            <string>gridX</string> 
            <int>6</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>hAlign</string> 
+           <object class="com.jgoodies.forms.layout.CellConstraints" field="RIGHT"/> 
           </void> 
          </object> 
         </void> 
@@ -371,8 +367,8 @@
       <void method="setProperty"> 
        <string>size</string> 
        <object class="java.awt.Dimension"> 
-        <int>705</int> 
-        <int>305</int> 
+        <int>590</int> 
+        <int>255</int> 
        </object> 
       </void> 
      </object> 

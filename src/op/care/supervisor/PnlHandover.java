@@ -44,13 +44,14 @@ import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
+import org.jdesktop.swingx.JXComboBox;
+import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 
 import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import java.awt.*;
@@ -75,6 +76,8 @@ import java.util.List;
 public class PnlHandover extends NursingRecordsPanel {
     public static final String internalClassID = "nursingrecords.handover";
 
+    private JXSearchField txtSearch;
+    private JComboBox yearCombo;
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
 
@@ -114,13 +117,13 @@ public class PnlHandover extends NursingRecordsPanel {
     }
 
     private java.util.List<Component> addKey() {
-            java.util.List<Component> list = new ArrayList<Component>();
-            list.add(new JSeparator());
-            list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
-            list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
-            list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
-            return list;
-        }
+        java.util.List<Component> list = new ArrayList<Component>();
+        list.add(new JSeparator());
+        list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
+        return list;
+    }
 
     private void initPanel() {
         contentmap = new HashMap<String, JPanel>();
@@ -982,6 +985,38 @@ public class PnlHandover extends NursingRecordsPanel {
 
     private List<Component> addFilters() {
         List<Component> list = new ArrayList<Component>();
+
+        Pair<DateTime, DateTime> minmax = NReportTools.getMinMax();
+
+        final DefaultComboBoxModel yearModel = new DefaultComboBoxModel();
+        for (int year = new DateMidnight().getYear(); year >= minmax.getFirst().getYear(); year--) {
+            yearModel.addElement(year);
+        }
+
+        JPanel myPanel = new JPanel();
+        myPanel.setLayout(new BoxLayout(myPanel, BoxLayout.LINE_AXIS));
+
+        txtSearch = new JXSearchField(OPDE.lang.getString("misc.msg.searchphrase"));
+        txtSearch.setInstantSearchDelay(100000);
+        txtSearch.setFont(SYSConst.ARIAL14);
+        txtSearch.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (SYSTools.catchNull(txtSearch.getText()).trim().length() > 3) {
+                    SYSFilesTools.print(NReportTools.getReportsAndHandoversAsHTML(NReportTools.getNReports4Handover((Homes) cmbHomes.getSelectedItem(), txtSearch.getText().trim(), Integer.parseInt(yearModel.getSelectedItem().toString())), txtSearch.getText().trim(), Integer.parseInt(yearModel.getSelectedItem().toString())), false);
+                }
+            }
+        });
+        myPanel.add(txtSearch);
+        yearCombo = new JXComboBox(yearModel);
+        yearCombo.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                txtSearch.postActionEvent();
+            }
+        });
+        myPanel.add(yearCombo);
+        list.add(myPanel);
 
         cmbHomes = new JComboBox();
         cmbHomes.setFont(SYSConst.ARIAL14);

@@ -217,7 +217,6 @@ public class PnlReport extends NursingRecordsPanel {
         txtSearch = new JXSearchField(OPDE.lang.getString("misc.msg.searchphrase"));
         txtSearch.setInstantSearchDelay(100000);
         txtSearch.setFont(SYSConst.ARIAL14);
-//        txtSearch.setInstantSearchDelay(750);
         txtSearch.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

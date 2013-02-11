@@ -35,6 +35,7 @@ public class PnlTX extends JPanel {
     private Closure afterChange;
     DecimalFormat cf = new DecimalFormat("######.00");
     DateMidnight min;
+    Component focusOwner = null;
 
     public PnlTX(Allowance tx, Closure afterChange) {
         super();
@@ -50,14 +51,17 @@ public class PnlTX extends JPanel {
 
     private void txtDateFocusGained(FocusEvent e) {
         txtDate.selectAll();
+        focusOwner = e.getComponent();
     }
 
     private void txtTextFocusGained(FocusEvent e) {
         txtText.selectAll();
+        focusOwner = e.getComponent();
     }
 
     private void txtCashFocusGained(FocusEvent e) {
         txtCash.selectAll();
+        focusOwner = e.getComponent();
     }
 
     private void txtTextFocusLost(FocusEvent e) {
@@ -110,8 +114,8 @@ public class PnlTX extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "default, $lcgap, pref, $lcgap, 161dlu, $lcgap, default",
-            "default, $lgap, pref, 4*($lgap, default)"));
+                "default, $lcgap, pref, $lcgap, 161dlu, $lcgap, default",
+                "default, $lgap, pref, 4*($lgap, default)"));
 
         //---- lblResident ----
         lblResident.setText("text");
@@ -141,6 +145,7 @@ public class PnlTX extends JPanel {
             public void focusGained(FocusEvent e) {
                 txtDateFocusGained(e);
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 txtDateFocusLost(e);
@@ -166,6 +171,7 @@ public class PnlTX extends JPanel {
             public void focusGained(FocusEvent e) {
                 txtTextFocusGained(e);
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 txtTextFocusLost(e);
@@ -191,6 +197,7 @@ public class PnlTX extends JPanel {
             public void focusGained(FocusEvent e) {
                 txtCashFocusGained(e);
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 txtCashFocusLost(e);
@@ -213,7 +220,7 @@ public class PnlTX extends JPanel {
         lblCash.setText(OPDE.lang.getString(internalClassID + ".lblcash"));
         txtDate.setText(DateFormat.getDateInstance().format(tx.getPit()));
         txtCash.setText(cf.format(tx.getAmount()));
-        if (tx.getId() == null){
+        if (tx.getId() == null) {
             txtText.setText(OPDE.lang.getString(internalClassID + ".txtText"));
         } else {
             txtText.setText(tx.getText());
@@ -229,6 +236,56 @@ public class PnlTX extends JPanel {
 
         ResInfo firstStay = ResInfoTools.getFirstResinfo(tx.getResident(), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
         min = firstStay == null ? new DateMidnight().dayOfMonth().withMinimumValue() : new DateMidnight(firstStay.getFrom());
+
+        setFocusCycleRoot(true);
+        setFocusTraversalPolicy(new FocusTraversalPolicy() {
+            @Override
+            public Component getComponentAfter(Container aContainer, Component aComponent) {
+                if (focusOwner == null) {
+                    focusOwner = txtDate;
+                } else if (focusOwner.equals(txtDate)) {
+                    focusOwner = txtText;
+                } else if (focusOwner.equals(txtText)) {
+                    focusOwner = txtCash;
+                } else if (focusOwner.equals(txtCash)) {
+                    focusOwner = txtDate;
+                } else {
+                    focusOwner = txtDate;
+                }
+                return focusOwner;
+            }
+
+            @Override
+            public Component getComponentBefore(Container aContainer, Component aComponent) {
+                if (focusOwner == null) {
+                    focusOwner = txtDate;
+                } else if (focusOwner.equals(txtDate)) {
+                    focusOwner = txtCash;
+                } else if (focusOwner.equals(txtText)) {
+                    focusOwner = txtDate;
+                } else if (focusOwner.equals(txtCash)) {
+                    focusOwner = txtText;
+                } else {
+                    focusOwner = txtDate;
+                }
+                return focusOwner;
+            }
+
+            @Override
+            public Component getFirstComponent(Container aContainer) {
+                return txtDate;
+            }
+
+            @Override
+            public Component getLastComponent(Container aContainer) {
+                return txtCash;
+            }
+
+            @Override
+            public Component getDefaultComponent(Container aContainer) {
+                return txtDate;
+            }
+        });
 
         txtDate.requestFocus();
     }

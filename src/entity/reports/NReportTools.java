@@ -8,6 +8,7 @@ import entity.EntityTools;
 import entity.Homes;
 import entity.info.Resident;
 import entity.info.ResidentTools;
+import entity.process.QProcessElement;
 import op.OPDE;
 import op.controlling.PnlControlling;
 import op.tools.Pair;
@@ -44,8 +45,8 @@ public class NReportTools {
     }
 
 
-    public static boolean isMine(NReport nReport){
-      return OPDE.isAdmin() || nReport.getUser().equals(OPDE.getLogin().getUser());
+    public static boolean isMine(NReport nReport) {
+        return OPDE.isAdmin() || nReport.getUser().equals(OPDE.getLogin().getUser());
     }
 
     public static boolean isChangeable(NReport nReport) {
@@ -272,6 +273,43 @@ public class NReportTools {
         if (nReports.isEmpty() || !ihavesomethingtoshow) {
             html = ""; //SYSConst.html_italic("misc.msg.noentryyet");
         }
+        return html;
+    }
+
+    public static String getReportsAndHandoversAsHTML(List<QProcessElement> reports, String highlight, int year) {
+        String html = "";
+//        boolean ihavesomethingtoshow = false;
+
+        if (!reports.isEmpty()) {
+            html += SYSConst.html_h2(OPDE.lang.getString("nursingrecords.handover.searchresults"));
+            html += SYSConst.html_h3(OPDE.lang.getString("misc.msg.period") + ": " + year);
+
+            String table = "";
+            table += SYSConst.html_table_tr(
+                    SYSConst.html_table_th("misc.msg.DateAndUser") +
+                            SYSConst.html_table_th("misc.msg.resident") +
+                            SYSConst.html_table_th("misc.msg.Text")
+            );
+
+//            html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr><th>Info</th><th>Text</th>\n</tr>";
+            for (QProcessElement report : reports) {
+                String dateAndUser = (report instanceof NReport ? NReportTools.getDateAndUser((NReport) report, false, false) : HandoversTools.getDateAndUser((Handovers) report, false));
+                String resident = (report instanceof NReport ? ResidentTools.getFullName(report.getResident()) : "--");
+                String text = (report instanceof NReport ? NReportTools.getAsHTML((NReport) report, highlight) : SYSTools.replace(((Handovers) report).getText(), highlight, "<font style=\"BACKGROUND-COLOR: yellow\">" + highlight + "</font>", true));
+                table += SYSConst.html_table_tr(
+                        SYSConst.html_table_td(dateAndUser) +
+                                SYSConst.html_table_td(resident) +
+                                SYSConst.html_table_td(text)
+                );
+
+
+            }
+            html += SYSConst.html_table(table, "1");
+        }
+
+//        if (nReports.isEmpty() || !ihavesomethingtoshow) {
+//            html = ""; //SYSConst.html_italic("misc.msg.noentryyet");
+//        }
         return html;
     }
 
@@ -674,6 +712,65 @@ public class NReportTools {
             query.setParameter("search", EntityTools.getMySQLsearchPattern(search));
 
             list = new ArrayList<NReport>(query.getResultList());
+
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+        return list;
+    }
+
+    public static ArrayList getNReports4Handover(Homes home, String searchphrase, int year) {
+        EntityManager em = OPDE.createEM();
+        ArrayList list = new ArrayList();
+        DateTime from = new DateMidnight(year, 1, 1).dayOfMonth().withMinimumValue().toDateTime();
+        DateTime to = new DateMidnight(year, 12, 31).dayOfMonth().withMaximumValue().plusDays(1).toDateTime().minusSeconds(1);
+
+        try {
+
+            String jpql = " SELECT nr " +
+                    " FROM NReport nr " +
+                    " JOIN nr.tags t " +
+                    " WHERE " +
+                    " nr.pit >= :from AND nr.pit <= :to  AND (t.system = :handover OR t.nrtagid = :emergency) AND nr.text LIKE :search" +
+                    " AND nr.resident.station.home = :home " +
+                    " AND nr.replacedBy IS NULL AND nr.editedBy IS NULL ";
+
+            Query query = em.createQuery(jpql);
+
+            query.setParameter("from", from.toDate());
+            query.setParameter("to", to.toDate());
+            query.setParameter("home", home);
+            query.setParameter("handover", NReportTAGSTools.TYPE_SYS_HANDOVER);
+            query.setParameter("emergency", NReportTAGSTools.TYPE_SYS_EMERGENCY);
+            query.setParameter("search", EntityTools.getMySQLsearchPattern(searchphrase));
+
+            list.addAll(query.getResultList());
+
+            String jpql2 = " SELECT ho " +
+                    " FROM Handovers ho " +
+                    " WHERE " +
+                    " ho.pit >= :from AND ho.pit <= :to AND ho.text LIKE :search " +
+                    " AND ho.home = :home ";
+
+            Query query2 = em.createQuery(jpql2);
+
+            query2.setParameter("from", from.toDate());
+            query2.setParameter("to", to.toDate());
+            query2.setParameter("home", home);
+            query2.setParameter("search", EntityTools.getMySQLsearchPattern(searchphrase));
+
+            list.addAll(query2.getResultList());
+
+
+            Collections.sort(list, new Comparator() {
+                @Override
+                public int compare(Object o1, Object o2) {
+                    return new Long(((QProcessElement) o1).getPITInMillis()).compareTo(new Long(((QProcessElement) o2).getPITInMillis())) * -1;
+                }
+            });
+
 
         } catch (Exception se) {
             OPDE.fatal(se);

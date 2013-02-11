@@ -28,19 +28,11 @@ import javax.persistence.TemporalType;
  */
 @Entity
 @Table(name = "SYSLOG")
-//@NamedQueries({
-//    @NamedQuery(name = "Syslog.findAll", query = "SELECT s FROM Syslog s"),
-//    @NamedQuery(name = "Syslog.findByLogid", query = "SELECT s FROM Syslog s WHERE s.logid = :logid"),
-//    @NamedQuery(name = "Syslog.findByHost", query = "SELECT s FROM Syslog s WHERE s.host = :host"),
-//    @NamedQuery(name = "Syslog.findByIp", query = "SELECT s FROM Syslog s WHERE s.ip = :ip"),
-//    @NamedQuery(name = "Syslog.findByHostkey", query = "SELECT s FROM Syslog s WHERE s.hostkey = :hostkey"),
-//    @NamedQuery(name = "Syslog.findByPit", query = "SELECT s FROM Syslog s WHERE s.pit = :pit"),
-//    @NamedQuery(name = "Syslog.findByLoglevel", query = "SELECT s FROM Syslog s WHERE s.loglevel = :loglevel")})
+
 public class Syslog implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "LOGID")
     private Long logid;
     @Column(name = "Host")

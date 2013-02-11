@@ -5,6 +5,9 @@
 package entity.reports;
 
 import entity.Homes;
+import entity.info.Resident;
+import entity.process.QProcess;
+import entity.process.QProcessElement;
 import entity.system.Users;
 import op.OPDE;
 
@@ -54,7 +57,7 @@ import java.util.List;
 //                + " GROUP BY u.UEBID "
 //                + " ORDER BY u.PIT DESC", resultSetMapping = "Handovers.findByEinrichtungAndDatumAndAckUserResultMapping")
 //})
-public class Handovers implements Serializable, Comparable<Handovers> {
+public class Handovers implements Serializable, QProcessElement, Comparable<Handovers> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -157,6 +160,41 @@ public class Handovers implements Serializable, Comparable<Handovers> {
     @Override
     public int compareTo(Handovers o) {
         return pit.compareTo(o.getPit());
+    }
+
+    @Override
+    public long getPITInMillis() {
+        return pit.getTime();
+    }
+
+    @Override
+    public ArrayList<QProcess> getAttachedProcesses() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public String getContentAsHTML() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public String getTitle() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public String getPITAsHTML() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public long getID() {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Resident getResident() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override

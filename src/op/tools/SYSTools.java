@@ -40,9 +40,6 @@ import org.jdesktop.core.animation.timing.TimingTargetAdapter;
 import org.jdesktop.core.animation.timing.interpolators.AccelerationInterpolator;
 import org.jdesktop.swing.animation.timing.sources.SwingTimerTimingSource;
 import org.joda.time.DateTime;
-//import org.pushingpixels.trident.Timeline;
-//import org.pushingpixels.trident.callback.TimelineCallback;
-//import org.pushingpixels.trident.callback.TimelineCallbackAdapter;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableColumnModel;
@@ -72,6 +69,10 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+
+//import org.pushingpixels.trident.Timeline;
+//import org.pushingpixels.trident.callback.TimelineCallback;
+//import org.pushingpixels.trident.callback.TimelineCallbackAdapter;
 
 public class SYSTools {
 
@@ -780,8 +781,7 @@ public class SYSTools {
         if (!moduleName.isEmpty()) {
             moduleName = ", " + moduleName;
         }
-        return OPDE.getAppInfo().getProgname() + moduleName + ", v" + OPDE.getAppInfo().getVersion()
-                + "/" + OPDE.getAppInfo().getBuildnum() + (OPDE.isDebug() ? " !! DEBUG !!" : "");
+        return OPDE.getAppInfo().getProgname() + moduleName + ", v" + OPDE.getAppInfo().getVersion();// + (OPDE.isDebug() ? " !! DEBUG !!" : "");
     }
 
     public static void expandAll(JTree tree) {
@@ -1733,7 +1733,7 @@ public class SYSTools {
         html += SYSConst.html_h2(exc.getClass().getName());
         html += SYSConst.html_paragraph(exc.getMessage());
 
-        if (OPDE.getMainframe().getCurrentResident() != null){
+        if (OPDE.getMainframe().getCurrentResident() != null) {
             html += SYSConst.html_h3(OPDE.lang.getString("misc.msg.resident") + ": " + ResidentTools.getLabelText(OPDE.getMainframe().getCurrentResident()));
         }
 

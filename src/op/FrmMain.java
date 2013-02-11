@@ -75,11 +75,7 @@ import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.net.URI;
-import java.net.URL;
-import java.net.URLConnection;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -150,7 +146,7 @@ public class FrmMain extends JFrame {
 
         // StatusBar Setup
         final LabelStatusBarItem label = new LabelStatusBarItem("Line");
-        label.setText(OPDE.getLocalProps().getProperty("javax.persistence.jdbc.url"));
+        label.setText(OPDE.getLocalProps().getProperty("javax.persistence.jdbc.url") + " [Build " + OPDE.getAppInfo().getBuildnum() + "]");
         label.setFont(new Font("Arial", Font.PLAIN, 14));
         statusBar.add(label, JideBoxLayout.FLEXIBLE);
         labelUSER = new LabelStatusBarItem("Line");
@@ -183,16 +179,22 @@ public class FrmMain extends JFrame {
         }
         currentVisiblePanel = null;
         displayManager.clearAllMessages();
+
+        emptySearchArea();
+
+    }
+
+    public void emptySearchArea() {
         jspSearch.removeAll();
         jspSearch = null;
         jspApps.removeAll();
         jspApps = null;
+
         panesSearch.removeAll();
         panesSearch = null;
         panesApps.removeAll();
         panesApps = null;
         splitPaneLeft.removeAll();
-
     }
 
     private void btnExitActionPerformed(ActionEvent e) {
@@ -484,12 +486,12 @@ public class FrmMain extends JFrame {
         }
     }
 
-    private void prepareSearchArea() {
+    public void prepareSearchArea() {
         // fixes #1
-        if (panesApps != null){
+        if (panesApps != null) {
             panesApps.removeAll();
         }
-        for (CollapsiblePane cp : listOfNursingrecords){
+        for (CollapsiblePane cp : listOfNursingrecords) {
             cp.removeAll();
         }
         listOfNursingrecords.clear();
@@ -656,9 +658,9 @@ public class FrmMain extends JFrame {
     /**
      * fixes #1
      */
-    public void collapseNursingRecords(){
+    public void collapseNursingRecords() {
         try {
-            for (CollapsiblePane cp : listOfNursingrecords){
+            for (CollapsiblePane cp : listOfNursingrecords) {
                 cp.setCollapsed(true);
             }
         } catch (PropertyVetoException e) {

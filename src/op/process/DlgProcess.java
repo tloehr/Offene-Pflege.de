@@ -38,6 +38,7 @@ public class DlgProcess extends MyJDialog {
         this.actionBlock = actionBlock;
         initComponents();
         initDialog();
+        pack();
         setVisible(true);
     }
 
@@ -121,8 +122,8 @@ public class DlgProcess extends MyJDialog {
         //======== pnlDetails ========
         {
             pnlDetails.setLayout(new FormLayout(
-                    "default, 0dlu, $lcgap, 70dlu, $lcgap, default:grow, $lcgap, 0dlu, default",
-                    "default, 0dlu, 3*($lgap, fill:default), $lgap, pref, 2*($lgap, default)"));
+                "14dlu, 0dlu, $lcgap, 70dlu, $lcgap, default:grow, $lcgap, 0dlu, 14dlu",
+                "14dlu, 0dlu, 3*($lgap, fill:default), $lgap, pref, $lgap, 12dlu, $lgap, top:20dlu, $lgap, 14dlu"));
 
             //---- lblTitle ----
             lblTitle.setText("Titel");
@@ -185,10 +186,10 @@ public class DlgProcess extends MyJDialog {
                 });
                 panel2.add(btnApply);
             }
-            pnlDetails.add(panel2, CC.xy(6, 14, CC.RIGHT, CC.FILL));
+            pnlDetails.add(panel2, CC.xy(6, 14, CC.RIGHT, CC.DEFAULT));
         }
         contentPane.add(pnlDetails);
-        setSize(705, 305);
+        setSize(590, 255);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }

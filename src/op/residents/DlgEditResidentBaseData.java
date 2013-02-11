@@ -86,7 +86,7 @@ public class DlgEditResidentBaseData extends MyJDialog {
         cmbGP.setRenderer(DocTools.getRenderer());
         cmbGP.setSelectedItem(resident.getGP());
 
-        cmbStation.setModel(StationTools.getAll4Combobox(true));
+        cmbStation.setModel(StationTools.getAll4Combobox(false));
         cmbStation.setRenderer(SYSTools.getDefaultRenderer());
         cmbStation.setSelectedItem(resident.getStation());
         cmbStation.addItemListener(new ItemListener() {

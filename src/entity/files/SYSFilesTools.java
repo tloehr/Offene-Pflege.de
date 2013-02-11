@@ -27,6 +27,7 @@ package entity.files;
 
 import com.enterprisedt.net.ftp.EventListener;
 import com.enterprisedt.net.ftp.FTPConnectMode;
+import com.enterprisedt.net.ftp.FTPException;
 import com.enterprisedt.net.ftp.FileTransferClient;
 import entity.info.ResInfo;
 import entity.info.Resident;
@@ -278,13 +279,14 @@ public class SYSFilesTools {
             }
 
             ftp.disconnect();
+        } catch (FTPException ftpex) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("FTPError: " + ftpex.getMessage(), "SYSFilesTools.getFile(SYSFiles, EventListener)"));
+            target = null;
         } catch (Exception ex) {
             OPDE.fatal(ex);
         }
         return target;
     }
-
-
 
 
     public static boolean deleteFile(SYSFiles sysfile) {
@@ -390,6 +392,9 @@ public class SYSFilesTools {
      * @param action
      */
     public static void handleFile(File file, java.awt.Desktop.Action action) {
+        if (file == null) {
+            return;
+        }
         Desktop desktop = null;
 
         if (getLocalDefinedApp(file.getName()) != null) {

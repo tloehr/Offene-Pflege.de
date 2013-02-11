@@ -214,7 +214,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                 "<tr valign=\"top\">" +
                 "<td width=\"280\" align=\"left\">" + prescription.getPITAsHTML() + "</td>" +
                 "<td width=\"380\" align=\"left\">" +
-                PrescriptionTools.getShortDescription(prescription) +
+                "<font size=+1>" + PrescriptionTools.getShortDescription(prescription) + "</font>" +
                 PrescriptionTools.getDose(prescription) +
                 PrescriptionTools.getInventoryInformationAsHTML(prescription) +
                 "</td>" +

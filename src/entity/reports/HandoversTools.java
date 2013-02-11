@@ -34,7 +34,7 @@ import java.util.*;
  */
 public class HandoversTools {
 
-    public static String getDatumUndUser(Handovers bericht, boolean showIDs) {
+    public static String getDateAndUser(Handovers bericht, boolean showIDs) {
         String result = "";
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
         result = sdf.format(bericht.getPit()) + "; " + bericht.getUser().getFullname();
