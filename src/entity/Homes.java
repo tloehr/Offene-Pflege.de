@@ -20,16 +20,8 @@ import javax.persistence.Table;
  * @author tloehr
  */
 @Entity
-@Table(name = "Homes")
-//@NamedQueries({
-//    @NamedQuery(name = "Einrichtungen.findAll", query = "SELECT e FROM Homes e ORDER BY e.eKennung "),
-//    @NamedQuery(name = "Einrichtungen.findByEKennung", query = "SELECT e FROM Homes e WHERE e.eKennung = :eKennung"),
-//    @NamedQuery(name = "Einrichtungen.findByBezeichnung", query = "SELECT e FROM Homes e WHERE e.bezeichnung = :bezeichnung"),
-//    @NamedQuery(name = "Einrichtungen.findByStrasse", query = "SELECT e FROM Homes e WHERE e.strasse = :strasse"),
-//    @NamedQuery(name = "Einrichtungen.findByPlz", query = "SELECT e FROM Homes e WHERE e.plz = :plz"),
-//    @NamedQuery(name = "Einrichtungen.findByOrt", query = "SELECT e FROM Homes e WHERE e.ort = :ort"),
-//    @NamedQuery(name = "Einrichtungen.findByTel", query = "SELECT e FROM Homes e WHERE e.tel = :tel"),
-//    @NamedQuery(name = "Einrichtungen.findByFax", query = "SELECT e FROM Homes e WHERE e.fax = :fax")})
+@Table(name = "homes")
+
 public class Homes implements Serializable {
 
     private static final long serialVersionUID = 1L;

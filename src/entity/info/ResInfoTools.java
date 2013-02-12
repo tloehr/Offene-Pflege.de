@@ -791,7 +791,7 @@ public class ResInfoTools {
                 EntityManager em = OPDE.createEM();
                 String sql = "SELECT ein.PIT, ein.EINFUHR, ifnull(aus.AUSFUHR,0) AUSFUHR, (ein.EINFUHR+ifnull(aus.AUSFUHR,0)) BILANZ FROM "
                         + "("
-                        + "   SELECT PIT, SUM(Wert) AUSFUHR FROM BWerte "
+                        + "   SELECT PIT, SUM(Wert) AUSFUHR FROM resvalue "
                         + "   WHERE ReplacedBy IS NULL AND Wert < 0 AND BWKennung=? AND TYPE = ? AND PIT >= ? "
                         + "   GROUP BY DATE(PIT) "
                         + ") aus"
@@ -799,7 +799,7 @@ public class ResInfoTools {
                         + "RIGHT OUTER JOIN"
                         + " "
                         + "("
-                        + "   SELECT PIT, SUM(Wert) EINFUHR FROM BWerte "
+                        + "   SELECT PIT, SUM(Wert) EINFUHR FROM resvalue "
                         + "   WHERE ReplacedBy IS NULL AND Wert > 0 AND BWKennung=? AND TYPE = ? AND PIT >= ?"
                         + "   GROUP BY DATE(PIT) "
                         + ") ein "
@@ -850,7 +850,7 @@ public class ResInfoTools {
 
                 EntityManager em = OPDE.createEM();
                 String sql = " "
-                        + " SELECT PIT, SUM(Wert) FROM BWerte "
+                        + " SELECT PIT, SUM(Wert) FROM resvalue "
                         + " WHERE ReplacedBy IS NULL AND Wert > 0 AND BWKennung=? AND TYPE = ? AND PIT >= ? "
                         + " GROUP BY DATE(PIT) "
                         + " ORDER BY PIT DESC";

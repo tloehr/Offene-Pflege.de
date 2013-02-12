@@ -14,14 +14,8 @@ import java.io.Serializable;
  * @author tloehr
  */
 @Entity
-@Table(name = "Rooms")
-//@NamedQueries({
-//    @NamedQuery(name = "Raeume.findAll", query = "SELECT r FROM Rooms r"),
-//    @NamedQuery(name = "Raeume.findByRaumID", query = "SELECT r FROM Rooms r WHERE r.raumID = :raumID"),
-//    @NamedQuery(name = "Raeume.findByBezeichnung", query = "SELECT r FROM Rooms r WHERE r.bezeichnung = :bezeichnung"),
-//    @NamedQuery(name = "Raeume.findByEtage", query = "SELECT r FROM Rooms r WHERE r.etage = :etage"),
-//    @NamedQuery(name = "Raeume.findByEinzel", query = "SELECT r FROM Rooms r WHERE r.einzel = :einzel"),
-//    @NamedQuery(name = "Raeume.findByBad", query = "SELECT r FROM Rooms r WHERE r.bad = :bad")})
+@Table(name = "rooms")
+
 public class Rooms implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

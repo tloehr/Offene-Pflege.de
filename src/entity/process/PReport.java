@@ -17,7 +17,7 @@ import java.util.Date;
  * @author tloehr
  */
 @Entity
-@Table(name = "VBericht")
+@Table(name = "preport")
 
 public class PReport implements Serializable, QProcessElement {
 

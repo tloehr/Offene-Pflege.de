@@ -27,7 +27,7 @@ import javax.persistence.TemporalType;
  * @author tloehr
  */
 @Entity
-@Table(name = "SYSLOG")
+@Table(name = "syslog")
 
 public class Syslog implements Serializable {
     private static final long serialVersionUID = 1L;

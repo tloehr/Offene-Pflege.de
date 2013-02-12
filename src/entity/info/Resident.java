@@ -46,18 +46,8 @@ import java.util.Properties;
  * @author tloehr
  */
 @Entity
-@Table(name = "Bewohner")
-//@NamedQueries({
-//        @NamedQuery(name = "Resident.findAll", query = "SELECT b FROM Resident b"),
-//        @NamedQuery(name = "Resident.findAllActiveSorted", query = " SELECT b FROM Resident b WHERE b.station IS NOT NULL ORDER BY b.nachname, b.vorname "),
-//        @NamedQuery(name = "Resident.findAllActiveSortedByStationen", query = "SELECT b FROM Resident b WHERE b.station IS NOT NULL ORDER BY b.station.bezeichnung, b.nachname, b.vorname"),
-//        @NamedQuery(name = "Resident.findByBWKennung", query = "SELECT b FROM Resident b WHERE b.bWKennung = :bWKennung"),
-//        @NamedQuery(name = "Resident.findByNachname", query = "SELECT b FROM Resident b WHERE b.nachname like :nachname ORDER BY b.nachname, b.vorname"),
-//        @NamedQuery(name = "Resident.findByVorname", query = "SELECT b FROM Resident b WHERE b.vorname = :vorname"),
-//        @NamedQuery(name = "Resident.findByGeschlecht", query = "SELECT b FROM Resident b WHERE b.geschlecht = :geschlecht"),
-//        @NamedQuery(name = "Resident.findByGebDatum", query = "SELECT b FROM Resident b WHERE b.gebDatum = :gebDatum"),
-//        @NamedQuery(name = "Resident.findByEditor", query = "SELECT b FROM Resident b WHERE b.editor = :editor"),
-//        @NamedQuery(name = "Resident.findByAdminonly", query = "SELECT b FROM Resident b WHERE b.adminonly = :adminonly")})
+@Table(name = "resident")
+
 public class Resident implements Serializable, Comparable<Resident> {
     private static final long serialVersionUID = 1L;
     @Id
@@ -89,17 +79,9 @@ public class Resident implements Serializable, Comparable<Resident> {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "resident")
     private Collection<Allowance> allowance;
 
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bewohner")
-//    private Collection<NReport> pflegeberichteCollection;
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bewohner")
-//    private Collection<Verordnung> verordnungCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "resident")
     private Collection<ResInfo> resInfoCollection;
-//
-//    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "bewohner")
-//    private Collection<NReport> pflegberichte;
 
-    // Bewohner, die keiner Pflegestation zugeordnet sind, gelten als inaktiv.
     @JoinColumn(name = "StatID", referencedColumnName = "StatID")
     @ManyToOne
     private Station station;

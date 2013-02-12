@@ -25,7 +25,7 @@ import java.util.*;
  * @author tloehr
  */
 @Entity
-@Table(name = "Vorgaenge")
+@Table(name = "qprocess")
 
 public class QProcess implements Serializable, Comparable<QProcess> {
 

@@ -4,17 +4,8 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "KH")
-//@NamedQueries({
-//    @NamedQuery(name = "Krankenhaus.findAll", query = "SELECT k FROM Hospital k ORDER BY k.name"),
-//        @NamedQuery(name = "Krankenhaus.findAllActive", query = "SELECT k FROM Hospital k WHERE k.status >= 0 ORDER BY k.name"),
-//    @NamedQuery(name = "Krankenhaus.findByKhid", query = "SELECT k FROM Hospital k WHERE k.khid = :khid"),
-//    @NamedQuery(name = "Krankenhaus.findByName", query = "SELECT k FROM Hospital k WHERE k.name = :name"),
-//    @NamedQuery(name = "Krankenhaus.findByStrasse", query = "SELECT k FROM Hospital k WHERE k.strasse = :strasse"),
-//    @NamedQuery(name = "Krankenhaus.findByPlz", query = "SELECT k FROM Hospital k WHERE k.plz = :plz"),
-//    @NamedQuery(name = "Krankenhaus.findByOrt", query = "SELECT k FROM Hospital k WHERE k.ort = :ort"),
-//    @NamedQuery(name = "Krankenhaus.findByTel", query = "SELECT k FROM Hospital k WHERE k.tel = :tel"),
-//    @NamedQuery(name = "Krankenhaus.findByFax", query = "SELECT k FROM Hospital k WHERE k.fax = :fax")})
+@Table(name = "hospital")
+
 public class Hospital implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

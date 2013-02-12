@@ -6,13 +6,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @Entity
-@Table(name = "MProdukte")
-//@NamedQueries({
-//        @NamedQuery(name = "MedProdukte.findAll", query = "SELECT m FROM MedProducts m"),
-//        @NamedQuery(name = "MedProdukte.findByMedPID", query = "SELECT m FROM MedProducts m WHERE m.medPID = :medPID"),
-//        @NamedQuery(name = "MedProdukte.findByBezeichnungLike", query = "SELECT m FROM MedProducts m WHERE m.bezeichnung LIKE :bezeichnung ORDER BY m.bezeichnung"),
-//        @NamedQuery(name = "MedProdukte.findByBezeichnung", query = "SELECT m FROM MedProducts m WHERE m.bezeichnung = :bezeichnung")
-//})
+@Table(name = "medproducts")
+
 public class MedProducts implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

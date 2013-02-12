@@ -19,7 +19,7 @@ import java.util.Date;
  * @author tloehr
  */
 @Entity
-@Table(name = "NR2User")
+@Table(name = "nr2user")
 public class NR2User implements Serializable, Comparable<NR2User> {
     private static final long serialVersionUID = 1L;
     @Id

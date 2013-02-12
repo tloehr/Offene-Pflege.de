@@ -24,19 +24,16 @@ import javax.persistence.Table;
  * @author tloehr
  */
 @Entity
-@Table(name = "ICD")
-//@NamedQueries({
-//    @NamedQuery(name = "Icd.findAll", query = "SELECT i FROM ICD i"),
-//    @NamedQuery(name = "Icd.findByIcdid", query = "SELECT i FROM ICD i WHERE i.icdid = :icdid"),
-//    @NamedQuery(name = "Icd.findByIcd10", query = "SELECT i FROM ICD i WHERE i.icd10 = :icd10")})
+@Table(name = "icd")
+
 public class ICD implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ICDID")
+    @Column(name = "icdid")
     private Long icdid;
     @Basic(optional = false)
-    @Column(name = "ICD10")
+    @Column(name = "icd10")
     private String icd10;
     @Basic(optional = false)
     @Lob

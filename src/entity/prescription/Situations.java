@@ -4,17 +4,12 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "Situationen")
-//@NamedQueries({
-//    @NamedQuery(name = "Situationen.findAll", query = "SELECT s FROM Situations s"),
-//    @NamedQuery(name = "Situationen.findBySitID", query = "SELECT s FROM Situations s WHERE s.sitID = :sitID"),
-//    @NamedQuery(name = "Situationen.findByKategorie", query = "SELECT s FROM Situations s WHERE s.kategorie = :kategorie"),
-//    @NamedQuery(name = "Situationen.findByUKategorie", query = "SELECT s FROM Situations s WHERE s.uKategorie = :uKategorie")})
+@Table(name = "situations")
+
 public class Situations implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "SitID")
     private Long sitID;
     @Column(name = "Kategorie")

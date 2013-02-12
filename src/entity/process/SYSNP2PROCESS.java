@@ -13,8 +13,9 @@ import javax.persistence.*;
  * Wer mehr wissen will: http://en.wikibooks.org/wiki/Java_Persistence/ManyToMany#Mapping_a_Join_Table_with_Additional_Columns
  * Leider bin ich nicht selbst drauf gekommen.
  */
+
 @Entity
-@Table(name = "SYSNP2PROCESS")
+@Table(name = "sysnp2process")
 
 public class SYSNP2PROCESS {
     @Id

@@ -33,9 +33,10 @@ import java.util.Collection;
 
 /**
  * @author tloehr
+ *
  */
 @Entity
-@Table(name = "bwinfotyp")
+@Table(name = "resinfotype")
 public class ResInfoType implements Serializable {
 
     private static final long serialVersionUID = 1L;

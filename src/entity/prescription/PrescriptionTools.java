@@ -66,21 +66,21 @@ public class PrescriptionTools {
         try {
             Query query = em.createNativeQuery("" +
                     " SELECT v.VerID, bhp.BHPPID, best.BestID, vor.VorID, F.FormID, M.MedPID, M.Bezeichnung, Ms.Bezeichnung " +
-                    " FROM BHPVerordnung v " +
-                    " INNER JOIN Bewohner bw ON v.BWKennung = bw.BWKennung  " +
-                    " INNER JOIN Massnahmen Ms ON Ms.MassID = v.MassID " +
+                    " FROM prescription v " +
+                    " INNER JOIN resident bw ON v.BWKennung = bw.BWKennung  " +
+                    " INNER JOIN intervention Ms ON Ms.MassID = v.MassID " +
 //                    " INNER JOIN Station st ON bw.StatID = st.StatID  " +
-                    " LEFT OUTER JOIN MPDarreichung D ON v.DafID = D.DafID " +
-                    " LEFT OUTER JOIN BHPPlanung bhp ON bhp.VerID = v.VerID " +
-                    " LEFT OUTER JOIN MProdukte M ON M.MedPID = D.MedPID " +
-                    " LEFT OUTER JOIN MPFormen F ON D.FormID = F.FormID " +
+                    " LEFT OUTER JOIN tradeform D ON v.DafID = D.DafID " +
+                    " LEFT OUTER JOIN pschedule bhp ON bhp.VerID = v.VerID " +
+                    " LEFT OUTER JOIN medproducts M ON M.MedPID = D.MedPID " +
+                    " LEFT OUTER JOIN dosageform F ON D.FormID = F.FormID " +
                     " LEFT OUTER JOIN ( " +
-                    "      SELECT DISTINCT M.VorID, M.BWKennung, B.DafID FROM MPVorrat M  " +
-                    "      INNER JOIN MPBestand B ON M.VorID = B.VorID " +
+                    "      SELECT DISTINCT M.VorID, M.BWKennung, B.DafID FROM medinventory M  " +
+                    "      INNER JOIN medstock B ON M.VorID = B.VorID " +
                     "      WHERE M.Bis = '9999-12-31 23:59:59' " +
                     " ) vorr ON vorr.DafID = v.DafID AND vorr.BWKennung = v.BWKennung" +
-                    " LEFT OUTER JOIN MPVorrat vor ON vor.VorID = vorr.VorID" +
-                    " LEFT OUTER JOIN MPBestand best ON best.VorID = vor.VorID" +
+                    " LEFT OUTER JOIN medinventory vor ON vor.VorID = vorr.VorID" +
+                    " LEFT OUTER JOIN medstock best ON best.VorID = vor.VorID" +
                     " WHERE bw.adminonly <> 2 " +
                     " AND v.AnDatum < now() AND v.AbDatum > now() AND v.SitID IS NULL AND (v.DafID IS NOT NULL OR v.Stellplan IS TRUE) " +
                     " AND bw.StatID = ? AND ((best.Aus = '9999-12-31 23:59:59' AND best.Anbruch < '9999-12-31 23:59:59') OR (v.DafID IS NULL)) " +
@@ -500,9 +500,9 @@ public class PrescriptionTools {
         List<BigInteger> list;
         List<Prescription> result = new ArrayList<Prescription>();
 
-        Query query = em.createNativeQuery(" SELECT DISTINCT ver.VerID FROM BHPVerordnung ver " +
-                " INNER JOIN MPVorrat v ON v.BWKennung = ver.BWKennung " + // Verbindung über Bewohner
-                " INNER JOIN MPBestand b ON ver.DafID = b.DafID AND v.VorID = b.VorID " + // Verbindung über Bestand zur Darreichung UND dem Vorrat
+        Query query = em.createNativeQuery(" SELECT DISTINCT ver.VerID FROM prescription ver " +
+                " INNER JOIN medinventory v ON v.BWKennung = ver.BWKennung " + // Verbindung über Bewohner
+                " INNER JOIN medstock b ON ver.DafID = b.DafID AND v.VorID = b.VorID " + // Verbindung über Bestand zur Darreichung UND dem Vorrat
                 " WHERE b.VorID=? AND ver.AbDatum > now() ");
         query.setParameter(1, inventory.getID());
         list = query.getResultList();

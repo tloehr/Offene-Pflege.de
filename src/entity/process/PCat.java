@@ -12,7 +12,7 @@ import java.io.Serializable;
  * @author tloehr
  */
 @Entity
-@Table(name = "VKat")
+@Table(name = "pcat")
 public class PCat implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

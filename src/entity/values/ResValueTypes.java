@@ -11,7 +11,7 @@ import java.math.BigDecimal;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-@Table(name = "ResValueTypes")
+@Table(name = "resvaluetypes")
 public class ResValueTypes {
     private long id;
 

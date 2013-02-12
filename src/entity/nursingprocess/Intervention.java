@@ -15,7 +15,7 @@ import java.math.BigDecimal;
  * @author tloehr
  */
 @Entity
-@Table(name = "massnahmen")
+@Table(name = "intervention")
 public class Intervention implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

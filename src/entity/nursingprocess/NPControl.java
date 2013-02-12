@@ -16,12 +16,8 @@ import java.util.Date;
  * @author tloehr
  */
 @Entity
-@Table(name = "PlanKontrolle")
-//@NamedQueries({
-//        @NamedQuery(name = "PlanKontrolle.findAll", query = "SELECT p FROM NPControl p"),
-//        @NamedQuery(name = "PlanKontrolle.findByPKonID", query = "SELECT p FROM NPControl p WHERE p.pKonID = :pKonID"),
-//        @NamedQuery(name = "PlanKontrolle.findByDatum", query = "SELECT p FROM NPControl p WHERE p.datum = :datum"),
-//        @NamedQuery(name = "PlanKontrolle.findByAbschluss", query = "SELECT p FROM NPControl p WHERE p.abschluss = :abschluss")})
+@Table(name = "npcontrol")
+
 public class NPControl implements Serializable, Comparable<NPControl> {
     private static final long serialVersionUID = 1L;
     @Id

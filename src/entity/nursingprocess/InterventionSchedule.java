@@ -19,32 +19,8 @@ import java.util.UUID;
  * @author tloehr
  */
 @Entity
-@Table(name = "MassTermin")
-//@NamedQueries({
-//        @NamedQuery(name = "InterventionSchedule.findAll", query = "SELECT m FROM InterventionSchedule m"),
-//        @NamedQuery(name = "InterventionSchedule.findByTermID", query = "SELECT m FROM InterventionSchedule m WHERE m.termID = :termID"),
-//        @NamedQuery(name = "InterventionSchedule.findByNachtMo", query = "SELECT m FROM InterventionSchedule m WHERE m.nachtMo = :nachtMo"),
-//        @NamedQuery(name = "InterventionSchedule.findByMorgens", query = "SELECT m FROM InterventionSchedule m WHERE m.morgens = :morgens"),
-//        @NamedQuery(name = "InterventionSchedule.findByMittags", query = "SELECT m FROM InterventionSchedule m WHERE m.mittags = :mittags"),
-//        @NamedQuery(name = "InterventionSchedule.findByNachmittags", query = "SELECT m FROM InterventionSchedule m WHERE m.nachmittags = :nachmittags"),
-//        @NamedQuery(name = "InterventionSchedule.findByAbends", query = "SELECT m FROM InterventionSchedule m WHERE m.abends = :abends"),
-//        @NamedQuery(name = "InterventionSchedule.findByNachtAb", query = "SELECT m FROM InterventionSchedule m WHERE m.nachtAb = :nachtAb"),
-//        @NamedQuery(name = "InterventionSchedule.findByUhrzeitAnzahl", query = "SELECT m FROM InterventionSchedule m WHERE m.uhrzeitAnzahl = :uhrzeitAnzahl"),
-//        @NamedQuery(name = "InterventionSchedule.findByUhrzeit", query = "SELECT m FROM InterventionSchedule m WHERE m.uhrzeit = :uhrzeit"),
-//        @NamedQuery(name = "InterventionSchedule.findByTaeglich", query = "SELECT m FROM InterventionSchedule m WHERE m.taeglich = :taeglich"),
-//        @NamedQuery(name = "InterventionSchedule.findByWoechentlich", query = "SELECT m FROM InterventionSchedule m WHERE m.woechentlich = :woechentlich"),
-//        @NamedQuery(name = "InterventionSchedule.findByMonatlich", query = "SELECT m FROM InterventionSchedule m WHERE m.monatlich = :monatlich"),
-//        @NamedQuery(name = "InterventionSchedule.findByTagNum", query = "SELECT m FROM InterventionSchedule m WHERE m.tagNum = :tagNum"),
-//        @NamedQuery(name = "InterventionSchedule.findByMon", query = "SELECT m FROM InterventionSchedule m WHERE m.mon = :mon"),
-//        @NamedQuery(name = "InterventionSchedule.findByDie", query = "SELECT m FROM InterventionSchedule m WHERE m.die = :die"),
-//        @NamedQuery(name = "InterventionSchedule.findByMit", query = "SELECT m FROM InterventionSchedule m WHERE m.mit = :mit"),
-//        @NamedQuery(name = "InterventionSchedule.findByDon", query = "SELECT m FROM InterventionSchedule m WHERE m.don = :don"),
-//        @NamedQuery(name = "InterventionSchedule.findByFre", query = "SELECT m FROM InterventionSchedule m WHERE m.fre = :fre"),
-//        @NamedQuery(name = "InterventionSchedule.findBySam", query = "SELECT m FROM InterventionSchedule m WHERE m.sam = :sam"),
-//        @NamedQuery(name = "InterventionSchedule.findBySon", query = "SELECT m FROM InterventionSchedule m WHERE m.son = :son"),
-//        @NamedQuery(name = "InterventionSchedule.findByErforderlich", query = "SELECT m FROM InterventionSchedule m WHERE m.erforderlich = :erforderlich"),
-//        @NamedQuery(name = "InterventionSchedule.findByLDatum", query = "SELECT m FROM InterventionSchedule m WHERE m.lDatum = :lDatum"),
-//        @NamedQuery(name = "InterventionSchedule.findByDauer", query = "SELECT m FROM InterventionSchedule m WHERE m.dauer = :dauer")})
+@Table(name = "ischedule")
+
 public class InterventionSchedule implements Serializable, Cloneable, Comparable<InterventionSchedule> {
     private static final long serialVersionUID = 1L;
     @Id

@@ -16,7 +16,7 @@ import java.util.Collection;
  * @author tloehr
  */
 @Entity
-@Table(name = "BWInfoKat")
+@Table(name = "resinfocategory")
 public class ResInfoCategory implements Serializable, Comparable {
     private static final long serialVersionUID = 1L;
     @Id

@@ -11,7 +11,6 @@ import entity.process.QProcessElement;
 import entity.process.SYSVAL2PROCESS;
 import entity.system.Users;
 import op.OPDE;
-import op.care.prescription.PnlPrescription;
 import op.care.values.PnlValues;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
@@ -22,30 +21,13 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 
 /**
  * @author tloehr
  */
 @Entity
-@Table(name = "BWerte")
-//@NamedQueries({
-//        @NamedQuery(name = "BWerte.findAll", query = "SELECT b FROM ResValue b"),
-//        /**
-//         * Sucht Berichte für einen Bewohner mit bestimmten Markierungen
-//         */
-//        @NamedQuery(name = "BWerte.findByVorgang", query = " "
-//                + " SELECT b FROM ResValue b "
-//                + " JOIN b.attachedProcesses av"
-//                + " JOIN av.vorgang v"
-//                + " WHERE v = :process "),
-//        @NamedQuery(name = "BWerte.findByBwid", query = "SELECT b FROM ResValue b WHERE b.id = :bwid"),
-//        @NamedQuery(name = "BWerte.findByPit", query = "SELECT b FROM ResValue b WHERE b.pit = :pit"),
-//        @NamedQuery(name = "BWerte.findByWert", query = "SELECT b FROM ResValue b WHERE b.val1 = :wert"),
-//        @NamedQuery(name = "BWerte.findByReplacedBy", query = "SELECT b FROM ResValue b WHERE b.replacedBy = :replacedBy"),
-//        @NamedQuery(name = "BWerte.findByReplacementFor", query = "SELECT b FROM ResValue b WHERE b.replacementFor = :replacementFor"),
-//        @NamedQuery(name = "BWerte.findByCdate", query = "SELECT b FROM ResValue b WHERE b.createDate = :cdate"),
-//        @NamedQuery(name = "BWerte.findByMdate", query = "SELECT b FROM ResValue b WHERE b.editDate = :mdate")})
+@Table(name = "resvalue")
+
 public class ResValue implements Serializable, QProcessElement, Cloneable, Comparable<ResValue> {
 
     private static final long serialVersionUID = 1L;
@@ -80,12 +62,7 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
     @Column(name = "_mdate")
     @Temporal(TemporalType.TIMESTAMP)
     private Date editDate;
-    //    @Basic(optional = false)
-//    @Column(name = "Type")
-//    private Integer type;
-    // ==
-    // 1:1 Relationen
-    // ==
+
     @JoinColumn(name = "editBy", referencedColumnName = "UKennung")
     @ManyToOne
     private Users editedBy;
@@ -115,11 +92,6 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
 //    // ==
 //    // M:N Relationen
 //    // ==
-//    @ManyToMany
-//    @JoinTable(name = "SYSBWERTE2VORGANG", joinColumns =
-//    @JoinColumn(name = "BWID"), inverseJoinColumns =
-//    @JoinColumn(name = "VorgangID"))
-//    private Collection<QProcess> vorgaenge;
 
     public ResValue() {
     }
@@ -383,7 +355,7 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
 
     @Override
     public String getTitle() {
-        return OPDE.lang.getString(PnlValues.internalClassID)+ ": " + vtype.getText();
+        return OPDE.lang.getString(PnlValues.internalClassID) + ": " + vtype.getText();
     }
 
     @Override

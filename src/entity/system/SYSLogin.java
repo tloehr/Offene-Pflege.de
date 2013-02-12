@@ -25,7 +25,7 @@ import javax.persistence.TemporalType;
  * @author tloehr
  */
 @Entity
-@Table(name = "SYSLogin")
+@Table(name = "syslogin")
 //@NamedQueries({
 //    @NamedQuery(name = "SYSLogin.findAll", query = "SELECT s FROM SYSLogin s"),
 //    @NamedQuery(name = "SYSLogin.findByLoginID", query = "SELECT s FROM SYSLogin s WHERE s.loginID = :loginID"),

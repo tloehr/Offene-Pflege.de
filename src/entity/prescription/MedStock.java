@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "mpbestand")
+@Table(name = "medstock")
 
 public class MedStock implements Serializable, Comparable<MedStock> {
     private static final long serialVersionUID = 1L;

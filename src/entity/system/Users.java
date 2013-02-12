@@ -41,20 +41,8 @@ import java.util.Collection;
  * @author tloehr
  */
 @Entity
-@Table(name = "OCUsers")
-//@NamedQueries({
-//        @NamedQuery(name = "Users.findAll", query = "SELECT o FROM Users o"),
-//        @NamedQuery(name = "Users.findAllSorted", query = "SELECT o FROM Users o ORDER BY o.nachname, o.vorname "),
-//        @NamedQuery(name = "Users.findByUKennung", query = "SELECT o FROM Users o WHERE o.uid = :uKennung"),
-//        @NamedQuery(name = "Users.findForLogin", query = "SELECT o FROM Users o WHERE o.uid = :uKennung AND o.md5pw = :md5pw"),
-//        @NamedQuery(name = "Users.findByVorname", query = "SELECT o FROM Users o WHERE o.vorname = :vorname"),
-//        @NamedQuery(name = "Users.findByNachname", query = "SELECT o FROM Users o WHERE o.nachname = :nachname"),
-//        @NamedQuery(name = "Users.findByStatusSorted", query = "SELECT o FROM Users o WHERE o.status = :status ORDER BY o.nachname, o.vorname"),
-//        @NamedQuery(name = "Users.findAllMembers", query = "SELECT o FROM Users o "
-//                + " WHERE :group MEMBER OF o.groups ORDER BY o.nachname, o.vorname "),
-//        @NamedQuery(name = "Users.findAllNonMembers", query = "SELECT o FROM Users o "
-//                + " WHERE :group NOT MEMBER OF o.groups ORDER BY o.nachname, o.vorname "),
-//        @NamedQuery(name = "Users.findByEMail", query = "SELECT o FROM Users o WHERE o.eMail = :eMail")})
+@Table(name = "users")
+
 public class Users implements Serializable, Comparable<Users> {
     private static final long serialVersionUID = 1L;
     @Id
@@ -77,7 +65,7 @@ public class Users implements Serializable, Comparable<Users> {
     @Column(name = "EMail")
     private String eMail;
     @ManyToMany
-    @JoinTable(name = "OCMember", joinColumns =
+    @JoinTable(name = "member", joinColumns =
     @JoinColumn(name = "UKennung"), inverseJoinColumns =
     @JoinColumn(name = "GKennung"))
     private Collection<Groups> groups;
@@ -100,17 +88,6 @@ public class Users implements Serializable, Comparable<Users> {
         groups = new ArrayList<Groups>();
         status = UsersTools.STATUS_ACTIVE;
     }
-//
-//    public Users(String uKennung) {
-//        this.uKennung = uKennung;
-//    }
-//
-//    public Users(String uKennung, String vorname, String nachname, String md5pw) {
-//        this.uKennung = uKennung;
-//        this.vorname = vorname;
-//        this.nachname = nachname;
-//        this.md5pw = md5pw;
-//    }
 
     public String getUID() {
         return uid;

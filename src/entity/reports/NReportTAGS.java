@@ -21,17 +21,8 @@ import javax.persistence.Table;
  * @author tloehr
  */
 @Entity
-@Table(name = "NReportTAGS")
-//@NamedQueries({
-//    @NamedQuery(name = "PBerichtTAGS.findAll", query = "SELECT p FROM NReportTAGS p"),
-//    @NamedQuery(name = "PBerichtTAGS.findAllActive", query = "SELECT p FROM NReportTAGS p WHERE p.aktiv = TRUE ORDER BY p.besonders DESC, p.sort DESC, p.bezeichnung "),
-//    @NamedQuery(name = "PBerichtTAGS.findByPbtagid", query = "SELECT p FROM NReportTAGS p WHERE p.nrtagid = :pbtagid"),
-//    @NamedQuery(name = "PBerichtTAGS.findByBezeichnung", query = "SELECT p FROM NReportTAGS p WHERE p.bezeichnung = :bezeichnung"),
-//    @NamedQuery(name = "PBerichtTAGS.findByKurzbezeichnung", query = "SELECT p FROM NReportTAGS p WHERE p.kurzbezeichnung = :kurzbezeichnung"),
-//    @NamedQuery(name = "PBerichtTAGS.findByAktiv", query = "SELECT p FROM NReportTAGS p WHERE p.aktiv = :aktiv"),
-//    @NamedQuery(name = "PBerichtTAGS.findBySystem", query = "SELECT p FROM NReportTAGS p WHERE p.system = :system"),
-//    @NamedQuery(name = "PBerichtTAGS.findByFarbe", query = "SELECT p FROM NReportTAGS p WHERE p.farbe = :farbe")
-//})
+@Table(name = "nreporttags")
+
 public class NReportTAGS implements Serializable {
 
     private static final long serialVersionUID = 1L;

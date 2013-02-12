@@ -14,7 +14,7 @@ import java.io.Serializable;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-@Table(name = "Betreuer")
+@Table(name = "lcustodian")
 //@NamedQueries({
 //        @NamedQuery(name = "Betreuer.findAll", query = "SELECT b FROM LCustodian b"),
 //        @NamedQuery(name = "Betreuer.findAllActive", query = "SELECT b FROM LCustodian b WHERE b.status >= 0 ORDER BY b.name, b.vorname"),

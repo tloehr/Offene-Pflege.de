@@ -23,7 +23,7 @@ import java.util.*;
  * @author tloehr
  */
 @Entity
-@Table(name = "NReports")
+@Table(name = "nreports")
 
 public class NReport implements Serializable, QProcessElement, Comparable<NReport>, Cloneable {
 
@@ -75,16 +75,10 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
     // M:N Relationen
     // ==
     @ManyToMany
-    @JoinTable(name = "NR2TAGS", joinColumns =
+    @JoinTable(name = "nr2tags", joinColumns =
     @JoinColumn(name = "PBID"), inverseJoinColumns =
     @JoinColumn(name = "PBTAGID"))
     private Collection<NReportTAGS> tags;
-//    @ManyToMany
-//    @JoinTable(name = "SYSNR2PROCESS", joinColumns =
-//    @JoinColumn(name = "PBID"), inverseJoinColumns =
-//    @JoinColumn(name = "VorgangID"))
-//    private Collection<QProcess> vorgaenge;
-
 
     public NReport() {
     }

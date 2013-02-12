@@ -13,19 +13,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
-@Table(name = "DFN")
-//@NamedQueries({
-//        @NamedQuery(name = "Dfn.findAll", query = "SELECT d FROM DFN d"),
-//        @NamedQuery(name = "Dfn.findByDfnid", query = "SELECT d FROM DFN d WHERE d.dfnid = :dfnid"),
-//        @NamedQuery(name = "Dfn.findBySoll", query = "SELECT d FROM DFN d WHERE d.soll = :soll"),
-//        @NamedQuery(name = "Dfn.findByIst", query = "SELECT d FROM DFN d WHERE d.ist = :ist"),
-//        @NamedQuery(name = "Dfn.findByStDatum", query = "SELECT d FROM DFN d WHERE d.stDatum = :stDatum"),
-//        @NamedQuery(name = "Dfn.findBySZeit", query = "SELECT d FROM DFN d WHERE d.sZeit = :sZeit"),
-//        @NamedQuery(name = "Dfn.findByIZeit", query = "SELECT d FROM DFN d WHERE d.iZeit = :iZeit"),
-//        @NamedQuery(name = "Dfn.findByStatus", query = "SELECT d FROM DFN d WHERE d.status = :status"),
-//        @NamedQuery(name = "Dfn.findByErforderlich", query = "SELECT d FROM DFN d WHERE d.floating = :erforderlich"),
-//        @NamedQuery(name = "Dfn.findByDauer", query = "SELECT d FROM DFN d WHERE d.dauer = :dauer"),
-//        @NamedQuery(name = "Dfn.findByMdate", query = "SELECT d FROM DFN d WHERE d.mdate = :mdate")})
+@Table(name = "dfn")
+
 public class DFN implements Serializable, Comparable<DFN> {
     private static final long serialVersionUID = 1L;
     @Id

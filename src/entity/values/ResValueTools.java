@@ -68,7 +68,7 @@ public class ResValueTools {
 
     public static ArrayList<Integer> getYearsWithValues(Resident resident, ResValueTypes type) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createNativeQuery("SELECT DISTINCT(YEAR(PIT)) j FROM BWerte WHERE BWKennung = ? AND TYPE = ? ORDER BY j DESC");
+        Query query = em.createNativeQuery("SELECT DISTINCT(YEAR(PIT)) j FROM resvalue WHERE BWKennung = ? AND TYPE = ? ORDER BY j DESC");
         query.setParameter(1, resident.getRID());
         query.setParameter(2, type.getValType());
         ArrayList<Integer> result = new ArrayList<Integer>(query.getResultList());

@@ -128,7 +128,7 @@
         <property key="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
         <property key="mainhost" value="false"/>
         <property key="station" value="1"/>
-        <property key="dailyplan_pagebreak_after_element_no" value="23"/>
+        <property key="dailyplan_pagebreak_after_element_no" value="17"/>
         <property key="cash_pagebreak_after_element_no" value="30"/>
         <property key="bhp_max_minutes_to_withdraw" value="30"/>
         <property key="dfn_max_minutes_to_withdraw" value="30"/>

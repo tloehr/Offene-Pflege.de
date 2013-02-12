@@ -14,7 +14,7 @@ import javax.persistence.*;
  * Leider bin ich nicht selbst drauf gekommen.
  */
 @Entity
-@Table(name = "SYSNR2PROCESS")
+@Table(name = "sysnr2process")
 
 public class SYSNR2PROCESS {
     @Id

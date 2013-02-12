@@ -6,13 +6,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @Entity
-@Table(name = "MPDarreichung")
-//@NamedQueries({
-//        @NamedQuery(name = "Darreichung.findAll", query = "SELECT m FROM TradeForm m"),
-//        @NamedQuery(name = "Darreichung.findByDafID", query = "SELECT m FROM TradeForm m WHERE m.id = :dafID"),
-//        @NamedQuery(name = "Darreichung.findByZusatz", query = "SELECT m FROM TradeForm m WHERE m.subtext = :zusatz"),
-//        @NamedQuery(name = "Darreichung.findByMedProdukt", query = "SELECT m FROM TradeForm m WHERE m.medProduct = :medProdukt ORDER BY m.dosageForm.preparation")
-//})
+@Table(name = "tradeform")
+
 public class TradeForm implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

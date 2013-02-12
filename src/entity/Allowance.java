@@ -16,6 +16,7 @@ import java.util.Date;
 
 /**
  * @author tloehr
+ *
  */
 @Entity
 @Table(name = "allowance")

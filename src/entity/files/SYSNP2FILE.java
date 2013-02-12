@@ -39,9 +39,6 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "sysnp2file")
-//@NamedQueries({
-//        @NamedQuery(name = "SYSNR2FILE.findAll", query = "SELECT s FROM SYSNR2FILE s"),
-//        @NamedQuery(name = "SYSNR2FILE.findById", query = "SELECT s FROM SYSNR2FILE s WHERE s.id = :id")})
 public class SYSNP2FILE implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
-@Table(name = "MPBuchung")
+@Table(name = "medstocktx")
 
 public class MedStockTransaction implements Serializable, Comparable<MedStockTransaction> {
     private static final long serialVersionUID = 1L;

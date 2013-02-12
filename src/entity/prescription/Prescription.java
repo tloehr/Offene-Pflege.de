@@ -80,7 +80,7 @@ import java.util.List;
  * @author tloehr
  */
 @Entity
-@Table(name = "BHPVerordnung")
+@Table(name = "prescription")
 
 public class Prescription implements Serializable, QProcessElement, Cloneable, Comparable<Prescription> {
     private static final long serialVersionUID = 1L;

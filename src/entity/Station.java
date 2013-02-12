@@ -26,11 +26,8 @@ import javax.persistence.Table;
  * @author tloehr
  */
 @Entity
-@Table(name = "Station")
-//@NamedQueries({
-//    @NamedQuery(name = "Stationen.findAllSorted", query = "SELECT s FROM Station s ORDER BY s.bezeichnung "),
-//    @NamedQuery(name = "Stationen.findByStatID", query = "SELECT s FROM Station s WHERE s.statID = :statID"),
-//    @NamedQuery(name = "Stationen.findByBezeichnung", query = "SELECT s FROM Station s WHERE s.bezeichnung = :bezeichnung")})
+@Table(name = "station")
+
 public class Station implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

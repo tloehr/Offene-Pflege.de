@@ -12,14 +12,8 @@ import java.util.Collection;
  * @author tloehr
  */
 @Entity
-@Table(name = "OCGroups")
-//@NamedQueries({
-//        @NamedQuery(name = "Groups.findAll", query = "SELECT g FROM Groups g"),
-//        @NamedQuery(name = "Groups.findAllSorted", query = "SELECT g FROM Groups g ORDER BY g.gid"),
-//        @NamedQuery(name = "Groups.findAllUnassigned", query = "SELECT g FROM Groups g WHERE :ocuser NOT MEMBER OF g.members ORDER BY g.gid"),
-//        @NamedQuery(name = "Groups.findByUserAndAdmin", query = "SELECT g FROM Groups g WHERE g.gid = 'admin' AND :user MEMBER OF g.members "),
-//        @NamedQuery(name = "Groups.findByUserAndExamen", query = "SELECT g FROM Groups g WHERE g.qualified = true AND :user MEMBER OF g.members "),
-//        @NamedQuery(name = "Groups.findByGkennung", query = "SELECT g FROM Groups g WHERE g.gid = :gkennung")})
+@Table(name = "groups")
+
 public class Groups implements Serializable, Comparable<Groups> {
 
     private static final long serialVersionUID = 1L;

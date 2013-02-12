@@ -12,26 +12,14 @@ import javax.persistence.*;
  * @author tloehr
  */
 @Entity
-@Table(name = "SYSProps")
-//@NamedQueries({
-//    @NamedQuery(name = "SYSProps.findAll", query = "SELECT s FROM SYSProps s"),
-//    @NamedQuery(name = "SYSProps.findBySyspid", query = "SELECT s FROM SYSProps s WHERE s.syspid = :syspid"),
-//    @NamedQuery(name = "SYSProps.findByKey", query = "SELECT s FROM SYSProps s WHERE s.key = :key"),
-//    @NamedQuery(name = "SYSProps.findByKeyAndUser", query = "SELECT s FROM SYSProps s WHERE s.key = :key AND s.user = :user "),
-//    @NamedQuery(name = "SYSProps.findByValue", query = "SELECT s FROM SYSProps s WHERE s.value = :value"),
-//    @NamedQuery(name = "SYSProps.findAllWOUsers", query = "SELECT s FROM SYSProps s WHERE s.user IS NULL"),
-//    @NamedQuery(name = "SYSProps.findByUser", query = "SELECT s FROM SYSProps s WHERE s.user = :user ")})
-public class SYSProps implements Serializable {
+@Table(name = "sysprops")
 
+public class SYSProps implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "SYSPID")
     private Long syspid;
-//    @Version
-//    @Column(name = "version")
-//    private Long version;
     @Basic(optional = false)
     @Column(name = "K")
     private String key;

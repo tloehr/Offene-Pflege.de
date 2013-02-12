@@ -30,20 +30,8 @@ import java.util.List;
  * @author tloehr
  */
 @Entity
-@Table(name = "Planung")
-//@NamedQueries({
-//        @NamedQuery(name = "Planung.findAll", query = "SELECT p FROM NursingProcess p"),
-//        @NamedQuery(name = "Planung.findByPlanID", query = "SELECT p FROM NursingProcess p WHERE p.id = :planID"),
-//        @NamedQuery(name = "Planung.findByVorgang", query = " "
-//                + " SELECT p FROM NursingProcess p "
-//                + " JOIN p.attachedQProcessConnections av"
-//                + " JOIN av.vorgang v"
-//                + " WHERE v = :vorgang "),
-//        @NamedQuery(name = "Planung.findByStichwort", query = "SELECT p FROM NursingProcess p WHERE p.topic = :stichwort"),
-//        @NamedQuery(name = "Planung.findByVon", query = "SELECT p FROM NursingProcess p WHERE p.von = :von"),
-//        @NamedQuery(name = "Planung.findByBis", query = "SELECT p FROM NursingProcess p WHERE p.to = :bis"),
-//        @NamedQuery(name = "Planung.findByPlanKennung", query = "SELECT p FROM NursingProcess p WHERE p.npseries = :planKennung"),
-//        @NamedQuery(name = "Planung.findByNKontrolle", query = "SELECT p FROM NursingProcess p WHERE p.nextEval = :nKontrolle")})
+@Table(name = "nursingprocess")
+
 public class NursingProcess implements Serializable, QProcessElement, Comparable<NursingProcess>, Cloneable {
 
     private static final long serialVersionUID = 1L;

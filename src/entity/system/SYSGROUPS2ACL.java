@@ -15,7 +15,7 @@ import javax.persistence.*;
  * @author tloehr
  */
 @Entity
-@Table(name = "IntClasses")
+@Table(name = "sysgroups2acl")
 //@NamedQueries({
 //    @NamedQuery(name = "IntClasses.findAll", query = "SELECT i FROM SYSGROUPS2ACL i"),
 //    @NamedQuery(name = "IntClasses.findByIcid", query = "SELECT i FROM SYSGROUPS2ACL i WHERE i.icid = :icid"),

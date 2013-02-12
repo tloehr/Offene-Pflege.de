@@ -21,7 +21,7 @@ import javax.persistence.Table;
  * @author tloehr
  */
 @Entity
-@Table(name = "KKasse")
+@Table(name = "hinsurance")
 //@NamedQueries({
 //    @NamedQuery(name = "KKasse.findAll", query = "SELECT k FROM HInsurance k"),
 //    @NamedQuery(name = "KKasse.findByKassID", query = "SELECT k FROM HInsurance k WHERE k.kassID = :kassID"),

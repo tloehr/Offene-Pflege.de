@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 @Entity
-@Table(name = "BHPPlanung")
+@Table(name = "pschedule")
 
 public class PrescriptionSchedule implements Serializable, Cloneable, Comparable<PrescriptionSchedule> {
     private static final long serialVersionUID = 1L;
