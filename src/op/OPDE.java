@@ -57,6 +57,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.swing.*;
+import java.awt.*;
 import java.io.*;
 import java.net.InetAddress;
 import java.text.DateFormat;
@@ -538,7 +539,7 @@ public class OPDE {
 
             animation = localProps.containsKey("animation") && localProps.getProperty("animation").equals("true");
 
-            logger.info("######### START ###########  " + SYSTools.getWindowTitle(""));
+            logger.info("######### START ###########  " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum());
             logger.info(System.getProperty("os.name").toLowerCase());
 
             /***
@@ -570,7 +571,18 @@ public class OPDE {
             DesEncrypter desEncrypter = new DesEncrypter(hostkey);
             Properties jpaProps = new Properties();
             jpaProps.put("javax.persistence.jdbc.user", localProps.getProperty("javax.persistence.jdbc.user"));
-            jpaProps.put("javax.persistence.jdbc.password", desEncrypter.decrypt(cryptpassword));
+
+            try {
+                jpaProps.put("javax.persistence.jdbc.password", desEncrypter.decrypt(cryptpassword));
+            } catch (Exception e) {
+                if (Desktop.isDesktopSupported()) {
+                    JOptionPane.showMessageDialog(null, OPDE.lang.getString("misc.msg.decryption.failure"), appInfo.getProgname(), JOptionPane.ERROR_MESSAGE);
+                } else {
+                    OPDE.fatal(e);
+                }
+                System.exit(1);
+            }
+
             jpaProps.put("javax.persistence.jdbc.driver", localProps.getProperty("javax.persistence.jdbc.driver"));
             url = cl.hasOption("j") ? cl.getOptionValue("j") : localProps.getProperty("javax.persistence.jdbc.url");
             jpaProps.put("javax.persistence.jdbc.url", url);

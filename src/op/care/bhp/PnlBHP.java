@@ -472,6 +472,7 @@ public class PnlBHP extends NursingRecordsPanel {
 
     private CollapsiblePane createCP4(final BHP bhp) {
         final CollapsiblePane bhpPane = new CollapsiblePane();
+        bhpPane.setCollapseOnTitleClick(false);
 
         JPanel titlePanelleft = new JPanel();
         titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
@@ -490,16 +491,7 @@ public class PnlBHP extends NursingRecordsPanel {
                 (bhp.getUser() != null ? ", <i>" + bhp.getUser().getUID() + "</i>" : "") +
                 "</font></html>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                try {
-                    bhpPane.setCollapsed(!bhpPane.isCollapsed());
-                } catch (PropertyVetoException e) {
-                    OPDE.error(e);
-                }
-            }
-        });
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, null);
 
 
         JLabel icon1 = new JLabel(BHPTools.getIcon(bhp));

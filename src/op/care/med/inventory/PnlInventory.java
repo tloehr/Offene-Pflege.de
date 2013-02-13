@@ -134,10 +134,10 @@ public class PnlInventory extends NursingRecordsPanel {
 
     @Override
     public void switchResident(Resident resident) {
-        switchResident(resident, null);
+        switchResident(resident, null, null);
     }
 
-    public void switchResident(Resident res, MedInventory inventory) {
+    private void switchResident(Resident res, MedInventory inventory, Closure afterwards) {
         this.resident = EntityTools.find(Resident.class, res.getRID());
         GUITools.setResidentDisplay(resident);
         if (inventory == null) {
@@ -147,7 +147,7 @@ public class PnlInventory extends NursingRecordsPanel {
             lstInventories.add(inventory);
         }
 
-        reloadDisplay();
+        reloadDisplay(afterwards);
     }
 
     @Override
@@ -216,7 +216,7 @@ public class PnlInventory extends NursingRecordsPanel {
             public void itemStateChanged(ItemEvent e) {
 //                SYSPropsTools.storeState(internalClassID + ":tbClosedInventory", tbClosedInventory);
                 lstInventories = tbClosedInventory.isSelected() ? MedInventoryTools.getAll(resident) : MedInventoryTools.getAllActive(resident);
-                reloadDisplay();
+                reloadDisplay(null);
             }
         });
         list.add(tbClosedInventory);
@@ -259,10 +259,10 @@ public class PnlInventory extends NursingRecordsPanel {
     @Override
     public void reload() {
         lstInventories = tbClosedInventory.isSelected() ? MedInventoryTools.getAll(resident) : MedInventoryTools.getAllActive(resident);
-        reloadDisplay();
+        reloadDisplay(null);
     }
 
-    private void reloadDisplay() {
+    private void reloadDisplay(final Closure afterwards) {
         /***
          *               _                 _ ____  _           _
          *      _ __ ___| | ___   __ _  __| |  _ \(_)___ _ __ | | __ _ _   _
@@ -302,6 +302,9 @@ public class PnlInventory extends NursingRecordsPanel {
                 @Override
                 protected void done() {
                     buildPanel();
+                    if (afterwards != null) {
+                        afterwards.execute(null);
+                    }
                     OPDE.getDisplayManager().setProgressBarMessage(null);
                     OPDE.getMainframe().setBlocked(false);
                 }
@@ -1402,20 +1405,34 @@ public class PnlInventory extends NursingRecordsPanel {
             em.close();
 
             if (stock != null) {
-                String key = stock.getInventory().getID() + ".xinventory";
+                final String key = stock.getInventory().getID() + ".xinventory";
                 if (!resident.equals(stock.getInventory().getResident())) {
-                    if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, PnlInfo.internalClassID)) { // => ACLMATRIX
-                        switchResident(stock.getInventory().getResident(), stock.getInventory());
+                    if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, PnlInfo.internalClassID)) {
+                        switchResident(stock.getInventory().getResident(), stock.getInventory(), new Closure() {
+                            @Override
+                            public void execute(Object o) {
+                                mapKey2ClosedToggleButton.get(key).setSelected(true);
+
+//                                SwingUtilities.invokeLater(new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//                                        cpMap.get(stock.getID() + ".xstock").revalidate();
+//                                        GUITools.scroll2show(jspInventory, cpMap.get(stock.getID() + ".xstock").getLocation().y, new Closure() {
+//                                            @Override
+//                                            public void execute(Object o) {
+//                                                GUITools.flashBackground(cpMap.get(stock.getID() + ".xstock"), Color.RED, 2);
+//                                            }
+//                                        });
+//                                    }
+//                                });
+
+                            }
+                        });
                     } else {
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.noarchiveaccess"));
                     }
 
                 } else {
-
-
-//                    lstInventories.clear();
-//                    lstInventories.add(stock.getInventory());
-//                    reloadDisplay();
 
                     CollapsiblePane myCP = cpMap.get(key);
 
@@ -1429,20 +1446,6 @@ public class PnlInventory extends NursingRecordsPanel {
 
 
                 }
-                mapKey2ClosedToggleButton.get(key).setSelected(true);
-
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        cpMap.get(stock.getID() + ".xstock").revalidate();
-                        GUITools.scroll2show(jspInventory, cpMap.get(stock.getID() + ".xstock").getLocation().y, new Closure() {
-                            @Override
-                            public void execute(Object o) {
-                                GUITools.flashBackground(cpMap.get(stock.getID() + ".xstock"), Color.RED, 2);
-                            }
-                        });
-                    }
-                });
 
 
             } else {

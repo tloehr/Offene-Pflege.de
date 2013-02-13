@@ -37,6 +37,7 @@ import com.toedter.calendar.JDateChooser;
 import entity.EntityTools;
 import entity.info.Resident;
 import entity.nursingprocess.*;
+import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.nursingprocess.PnlSelectIntervention;
 import op.system.InternalClassACL;
@@ -58,15 +59,15 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
+import java.util.List;
 
 /**
  * @author root
@@ -347,17 +348,8 @@ public class PnlDFN extends NursingRecordsPanel {
                 ", " + dfn.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)") + (dfn.getUser() != null ? ", <i>" + dfn.getUser().getUID() + "</i>" : "") +
                 "</font></html>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                if (dfn.isOnDemand()) return;
-                try {
-                    dfnPane.setCollapsed(!dfnPane.isCollapsed());
-                } catch (PropertyVetoException e) {
-                    OPDE.error(e);
-                }
-            }
-        });
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, null);
+        dfnPane.setCollapseOnTitleClick(false);
 //        cptitle.getButton().setIcon(DFNTools.getIcon(dfn));
         JLabel icon1 = new JLabel(DFNTools.getIcon(dfn));
         icon1.setOpaque(false);
@@ -767,8 +759,8 @@ public class PnlDFN extends NursingRecordsPanel {
 
     }
 
-    private java.util.List<Component> addFilters() {
-        java.util.List<Component> list = new ArrayList<Component>();
+    private List<Component> addFilters() {
+        List<Component> list = new ArrayList<Component>();
 
         jdcDate = new JDateChooser(new Date());
         jdcDate.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -862,20 +854,13 @@ public class PnlDFN extends NursingRecordsPanel {
                 if (initPhase) {
                     return;
                 }
-//                DateMidnight now = new DateMidnight();
-                DateMidnight selected = new DateMidnight(jdcDate.getDate());
-                DateMidnight min = new DateMidnight(jdcDate.getMinSelectableDate());
-                DateMidnight max = new DateMidnight(jdcDate.getMaxSelectableDate());
-//                fwdButton.setEnabled(selected.isBefore(max));
-//                backButton.setEnabled(selected.isAfter(min));
-
                 if (evt.getPropertyName().equals("date")) {
                     reloadDisplay();
                 }
             }
         });
 
-//        fwdButton.setEnabled(false);
+
 
         return list;
     }
