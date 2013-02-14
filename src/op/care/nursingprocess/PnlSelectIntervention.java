@@ -4,14 +4,14 @@
 
 package op.care.nursingprocess;
 
-import java.awt.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import entity.info.ResInfoCategory;
 import entity.info.ResInfoCategoryTools;
 import entity.nursingprocess.Intervention;
 import entity.nursingprocess.InterventionTools;
-import entity.info.ResInfoCategory;
 import op.OPDE;
+import op.system.InternalClassACL;
 import op.threads.DisplayMessage;
 import op.tools.GUITools;
 import op.tools.SYSTools;
@@ -21,11 +21,10 @@ import org.jdesktop.swingx.JXSearchField;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
+import java.awt.event.*;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -35,25 +34,28 @@ import java.util.Arrays;
  * @author Torsten Löhr
  */
 public class PnlSelectIntervention extends JPanel {
-    public static final String internalClassID = PnlNursingProcess.internalClassID+".pnlselectinterventions";
+    public static final String internalClassID = PnlNursingProcess.internalClassID + ".pnlselectinterventions";
     private Closure actionBlock;
     private JToggleButton tbAktiv;
     Number dauer = BigDecimal.TEN;
 
     public PnlSelectIntervention(Closure actionBlock) {
-        this(actionBlock, false);
-    }
-
-    public PnlSelectIntervention(Closure actionBlock, boolean withEditFunction) {
         this.actionBlock = actionBlock;
         initComponents();
         initPanel();
-        btnAdd.setEnabled(withEditFunction);
+        btnEdit.setEnabled(false);
+        btnAdd.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlNursingProcess.internalClassID));
     }
 
     private void initPanel() {
+
+        lblText.setText(OPDE.lang.getString(internalClassID+".lbltext"));
+        lblLength.setText(OPDE.lang.getString(internalClassID+".lbllength"));
+        lblCat.setText(OPDE.lang.getString(internalClassID+".lblcat"));
+        lblType.setText(OPDE.lang.getString(internalClassID+".lbltype"));
+
         lstInterventions.setModel(new DefaultListModel());
-        tbAktiv = GUITools.getNiceToggleButton("Aktiv");
+        tbAktiv = GUITools.getNiceToggleButton(internalClassID + ".activeIntervention");
         tbAktiv.setEnabled(false);
         pnlRight.add(tbAktiv, CC.xy(1, 9));
         SwingUtilities.invokeLater(new Runnable() {
@@ -63,8 +65,8 @@ public class PnlSelectIntervention extends JPanel {
             }
         });
 
-        cmbArt.setModel(new DefaultComboBoxModel(new String[]{"Pflege","Verordungen"}));
-        cmbKategorie.setModel(new DefaultComboBoxModel(ResInfoCategoryTools.getAll4NP().toArray()));
+        cmbType.setModel(new DefaultComboBoxModel(new String[]{OPDE.lang.getString("misc.msg.interventions.CARE"), OPDE.lang.getString("misc.msg.interventions.PRESCRIPTION"), OPDE.lang.getString("misc.msg.interventions.SOCIAL")}));
+        cmbCat.setModel(new DefaultComboBoxModel(ResInfoCategoryTools.getAll4NP().toArray()));
         cmbCategory.setModel(new DefaultComboBoxModel(ResInfoCategoryTools.getAll4NP().toArray()));
         cmbCategory.setSelectedItem(null);
     }
@@ -79,21 +81,13 @@ public class PnlSelectIntervention extends JPanel {
         SYSTools.showSide(split1, SYSTools.RIGHT_LOWER_SIDE, SYSTools.SPEED_NORMAL);
     }
 
-    private void btnBackActionPerformed(ActionEvent e) {
-        if (saveok()) {
-            Intervention intervention = new Intervention(txtBezeichnung.getText().trim(), new BigDecimal(dauer.doubleValue()), cmbArt.getSelectedIndex(), (ResInfoCategory) cmbKategorie.getSelectedItem());
-            lstInterventions.setModel(SYSTools.list2dlm(Arrays.asList(intervention)));
-        }
-        SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, SYSTools.SPEED_NORMAL);
-    }
-
     private void btnOkActionPerformed(ActionEvent e) {
         actionBlock.execute(lstInterventions.getSelectedValues());
     }
 
     private boolean saveok() {
-        if (txtBezeichnung.getText().trim().isEmpty()) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID+".textempty"), DisplayMessage.WARNING));
+        if (txtText.getText().trim().isEmpty()) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".textempty"), DisplayMessage.WARNING));
             return false;
         }
         return true;
@@ -101,24 +95,52 @@ public class PnlSelectIntervention extends JPanel {
 
     private void txtDauerFocusLost(FocusEvent e) {
         try {
-            dauer = NumberFormat.getNumberInstance().parse(txtDauer.getText());
+            dauer = NumberFormat.getNumberInstance().parse(txtLength.getText());
         } catch (ParseException e1) {
             dauer = BigDecimal.TEN;
-            txtDauer.setText("10");
+            txtLength.setText("10");
         }
     }
 
     private void lstInterventionsMouseClicked(MouseEvent e) {
-        if (e.getClickCount() == 2){
+        if (e.getClickCount() == 2) {
             btnOk.doClick();
         }
     }
 
     private void cmbCategoryItemStateChanged(ItemEvent e) {
-        if (e.getStateChange() == ItemEvent.SELECTED && e.getItem() != null){
+        if (e.getStateChange() == ItemEvent.SELECTED && e.getItem() != null) {
             txtSearch.setText(null);
             lstInterventions.setModel(SYSTools.list2dlm(InterventionTools.findMassnahmenBy((ResInfoCategory) e.getItem())));
         }
+    }
+
+    private void btnCancelActionPerformed(ActionEvent e) {
+        SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, SYSTools.SPEED_NORMAL);
+    }
+
+    private void btnEditActionPerformed(ActionEvent e) {
+        Intervention intervention = (Intervention) lstInterventions.getSelectedValue();
+        txtText.setText(intervention.getBezeichnung());
+        txtLength.setText(intervention.getDauer().toBigInteger().toString());
+        tbAktiv.setSelected(intervention.isActive());
+        cmbCategory.setSelectedItem(intervention.getCategory());
+
+        cmbType.setSelectedIndex(intervention.getInterventionType() - 1);
+
+        SYSTools.showSide(split1, SYSTools.RIGHT_LOWER_SIDE, SYSTools.SPEED_NORMAL);
+    }
+
+    private void lstInterventionsValueChanged(ListSelectionEvent e) {
+        btnEdit.setEnabled(lstInterventions.getSelectedValues().length == 1 && OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlNursingProcess.internalClassID));
+    }
+
+    private void btnSaveActionPerformed(ActionEvent e) {
+        if (saveok()) {
+            Intervention intervention = new Intervention(txtText.getText().trim(), new BigDecimal(dauer.doubleValue()), cmbType.getSelectedIndex()+1, (ResInfoCategory) cmbCat.getSelectedItem());
+            lstInterventions.setModel(SYSTools.list2dlm(Arrays.asList(intervention)));
+        }
+        SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, SYSTools.SPEED_NORMAL);
     }
 
     private void initComponents() {
@@ -134,17 +156,19 @@ public class PnlSelectIntervention extends JPanel {
         panel5 = new JPanel();
         btnOk = new JButton();
         btnAdd = new JButton();
+        btnEdit = new JButton();
         pnlRight = new JPanel();
-        jLabel1 = new JLabel();
-        jLabel2 = new JLabel();
-        txtBezeichnung = new JTextField();
-        txtDauer = new JTextField();
-        jLabel3 = new JLabel();
-        cmbKategorie = new JComboBox();
-        jLabel4 = new JLabel();
-        cmbArt = new JComboBox();
+        lblText = new JLabel();
+        lblLength = new JLabel();
+        txtText = new JTextField();
+        txtLength = new JTextField();
+        lblCat = new JLabel();
+        cmbCat = new JComboBox();
+        lblType = new JLabel();
+        cmbType = new JComboBox();
         panel4 = new JPanel();
-        btnBack = new JButton();
+        btnCancel = new JButton();
+        btnSave = new JButton();
 
         //======== this ========
         setLayout(new BorderLayout());
@@ -156,7 +180,7 @@ public class PnlSelectIntervention extends JPanel {
 
             //======== split1 ========
             {
-                split1.setDividerLocation(500);
+                split1.setDividerLocation(150);
                 split1.setDividerSize(1);
                 split1.setEnabled(false);
 
@@ -196,6 +220,12 @@ public class PnlSelectIntervention extends JPanel {
                                 lstInterventionsMouseClicked(e);
                             }
                         });
+                        lstInterventions.addListSelectionListener(new ListSelectionListener() {
+                            @Override
+                            public void valueChanged(ListSelectionEvent e) {
+                                lstInterventionsValueChanged(e);
+                            }
+                        });
                         scrollPane1.setViewportView(lstInterventions);
                     }
                     panel2.add(scrollPane1, CC.xy(1, 5, CC.FILL, CC.FILL));
@@ -211,6 +241,12 @@ public class PnlSelectIntervention extends JPanel {
                             //---- btnOk ----
                             btnOk.setText(null);
                             btnOk.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+                            btnOk.setBorderPainted(false);
+                            btnOk.setBorder(null);
+                            btnOk.setContentAreaFilled(false);
+                            btnOk.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                            btnOk.setSelectedIcon(null);
+                            btnOk.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
                             btnOk.addActionListener(new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
@@ -223,7 +259,13 @@ public class PnlSelectIntervention extends JPanel {
 
                         //---- btnAdd ----
                         btnAdd.setText(null);
-                        btnAdd.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/1rightarrow.png")));
+                        btnAdd.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
+                        btnAdd.setBorder(null);
+                        btnAdd.setBorderPainted(false);
+                        btnAdd.setContentAreaFilled(false);
+                        btnAdd.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                        btnAdd.setSelectedIcon(null);
+                        btnAdd.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
                         btnAdd.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
@@ -231,6 +273,23 @@ public class PnlSelectIntervention extends JPanel {
                             }
                         });
                         panel3.add(btnAdd);
+
+                        //---- btnEdit ----
+                        btnEdit.setText(null);
+                        btnEdit.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/edit3.png")));
+                        btnEdit.setBorder(null);
+                        btnEdit.setBorderPainted(false);
+                        btnEdit.setContentAreaFilled(false);
+                        btnEdit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                        btnEdit.setSelectedIcon(null);
+                        btnEdit.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
+                        btnEdit.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                btnEditActionPerformed(e);
+                            }
+                        });
+                        panel3.add(btnEdit);
                     }
                     panel2.add(panel3, CC.xy(1, 7, CC.FILL, CC.DEFAULT));
                 }
@@ -243,79 +302,102 @@ public class PnlSelectIntervention extends JPanel {
                         "default, $lcgap, default:grow",
                         "3*(fill:default, $lgap), 2*(default, $lgap), default:grow"));
 
-                    //---- jLabel1 ----
-                    jLabel1.setText("Bezeichnung");
-                    jLabel1.setFont(new Font("Arial", Font.PLAIN, 14));
-                    pnlRight.add(jLabel1, CC.xy(1, 1));
+                    //---- lblText ----
+                    lblText.setText("Bezeichnung");
+                    lblText.setFont(new Font("Arial", Font.PLAIN, 14));
+                    pnlRight.add(lblText, CC.xy(1, 1));
 
-                    //---- jLabel2 ----
-                    jLabel2.setText("Dauer");
-                    jLabel2.setFont(new Font("Arial", Font.PLAIN, 14));
-                    pnlRight.add(jLabel2, CC.xy(1, 3));
+                    //---- lblLength ----
+                    lblLength.setText("Dauer");
+                    lblLength.setFont(new Font("Arial", Font.PLAIN, 14));
+                    pnlRight.add(lblLength, CC.xy(1, 3));
 
-                    //---- txtBezeichnung ----
-                    txtBezeichnung.setFont(new Font("Arial", Font.PLAIN, 14));
-                    pnlRight.add(txtBezeichnung, CC.xy(3, 1));
+                    //---- txtText ----
+                    txtText.setFont(new Font("Arial", Font.PLAIN, 14));
+                    pnlRight.add(txtText, CC.xy(3, 1));
 
-                    //---- txtDauer ----
-                    txtDauer.setHorizontalAlignment(SwingConstants.RIGHT);
-                    txtDauer.setText("10");
-                    txtDauer.setToolTipText(null);
-                    txtDauer.setFont(new Font("Arial", Font.PLAIN, 14));
-                    txtDauer.addFocusListener(new FocusAdapter() {
+                    //---- txtLength ----
+                    txtLength.setHorizontalAlignment(SwingConstants.RIGHT);
+                    txtLength.setText("10");
+                    txtLength.setToolTipText(null);
+                    txtLength.setFont(new Font("Arial", Font.PLAIN, 14));
+                    txtLength.addFocusListener(new FocusAdapter() {
                         @Override
                         public void focusLost(FocusEvent e) {
                             txtDauerFocusLost(e);
                         }
                     });
-                    pnlRight.add(txtDauer, CC.xy(3, 3));
+                    pnlRight.add(txtLength, CC.xy(3, 3));
 
-                    //---- jLabel3 ----
-                    jLabel3.setText("Kategorie");
-                    jLabel3.setFont(new Font("Arial", Font.PLAIN, 14));
-                    pnlRight.add(jLabel3, CC.xy(1, 5));
+                    //---- lblCat ----
+                    lblCat.setText("Kategorie");
+                    lblCat.setFont(new Font("Arial", Font.PLAIN, 14));
+                    pnlRight.add(lblCat, CC.xy(1, 5));
 
-                    //---- cmbKategorie ----
-                    cmbKategorie.setModel(new DefaultComboBoxModel(new String[] {
+                    //---- cmbCat ----
+                    cmbCat.setModel(new DefaultComboBoxModel(new String[] {
                         "Item 1",
                         "Item 2",
                         "Item 3",
                         "Item 4"
                     }));
-                    cmbKategorie.setFont(new Font("Arial", Font.PLAIN, 14));
-                    pnlRight.add(cmbKategorie, CC.xy(3, 5));
+                    cmbCat.setFont(new Font("Arial", Font.PLAIN, 14));
+                    pnlRight.add(cmbCat, CC.xy(3, 5));
 
-                    //---- jLabel4 ----
-                    jLabel4.setText("Art");
-                    jLabel4.setFont(new Font("Arial", Font.PLAIN, 14));
-                    pnlRight.add(jLabel4, CC.xy(1, 7));
+                    //---- lblType ----
+                    lblType.setText("Art");
+                    lblType.setFont(new Font("Arial", Font.PLAIN, 14));
+                    pnlRight.add(lblType, CC.xy(1, 7));
 
-                    //---- cmbArt ----
-                    cmbArt.setModel(new DefaultComboBoxModel(new String[] {
+                    //---- cmbType ----
+                    cmbType.setModel(new DefaultComboBoxModel(new String[] {
                         "Item 1",
                         "Item 2",
                         "Item 3",
                         "Item 4"
                     }));
-                    cmbArt.setFont(new Font("Arial", Font.PLAIN, 14));
-                    pnlRight.add(cmbArt, CC.xy(3, 7));
+                    cmbType.setFont(new Font("Arial", Font.PLAIN, 14));
+                    pnlRight.add(cmbType, CC.xy(3, 7));
 
                     //======== panel4 ========
                     {
                         panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
 
-                        //---- btnBack ----
-                        btnBack.setText(null);
-                        btnBack.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/1leftarrow.png")));
-                        btnBack.addActionListener(new ActionListener() {
+                        //---- btnCancel ----
+                        btnCancel.setText(null);
+                        btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
+                        btnCancel.setBorder(null);
+                        btnCancel.setBorderPainted(false);
+                        btnCancel.setContentAreaFilled(false);
+                        btnCancel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                        btnCancel.setSelectedIcon(null);
+                        btnCancel.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
+                        btnCancel.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                btnBackActionPerformed(e);
+                                btnCancelActionPerformed(e);
                             }
                         });
-                        panel4.add(btnBack);
+                        panel4.add(btnCancel);
+
+                        //---- btnSave ----
+                        btnSave.setText(null);
+                        btnSave.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+                        btnSave.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                        btnSave.setBorderPainted(false);
+                        btnSave.setBorder(null);
+                        btnSave.setContentAreaFilled(false);
+                        btnSave.setSelectedIcon(null);
+                        btnSave.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
+                        btnSave.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                btnSaveActionPerformed(e);
+                            }
+                        });
+                        panel4.add(btnSave);
                     }
-                    pnlRight.add(panel4, CC.xywh(1, 11, 3, 1, CC.LEFT, CC.BOTTOM));
+                    pnlRight.add(panel4, CC.xywh(1, 11, 3, 1, CC.RIGHT, CC.BOTTOM));
                 }
                 split1.setRightComponent(pnlRight);
             }
@@ -337,16 +419,18 @@ public class PnlSelectIntervention extends JPanel {
     private JPanel panel5;
     private JButton btnOk;
     private JButton btnAdd;
+    private JButton btnEdit;
     private JPanel pnlRight;
-    private JLabel jLabel1;
-    private JLabel jLabel2;
-    private JTextField txtBezeichnung;
-    private JTextField txtDauer;
-    private JLabel jLabel3;
-    private JComboBox cmbKategorie;
-    private JLabel jLabel4;
-    private JComboBox cmbArt;
+    private JLabel lblText;
+    private JLabel lblLength;
+    private JTextField txtText;
+    private JTextField txtLength;
+    private JLabel lblCat;
+    private JComboBox cmbCat;
+    private JLabel lblType;
+    private JComboBox cmbType;
     private JPanel panel4;
-    private JButton btnBack;
+    private JButton btnCancel;
+    private JButton btnSave;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

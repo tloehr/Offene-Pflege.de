@@ -52,6 +52,7 @@ import op.care.PnlCare;
 import op.care.info.PnlInfo;
 import op.care.med.PnlMed;
 import op.care.supervisor.PnlHandover;
+import op.config.PnlUserSettings;
 import op.controlling.PnlControlling;
 import op.process.PnlProcess;
 import op.system.DlgLogin;
@@ -266,10 +267,6 @@ public class FrmMain extends JFrame {
         };
 
         SwingUtilities.invokeLater(runnable);
-
-//        displayManager.setMainMessage("Willkommen bei Offene-Pflege.de");
-//        displayManager.addSubMessage(new DisplayMessage("Wählen Sie eine(n) BewohnerIn aus oder das gewünschten Programm.", 2));
-
     }
 
     /**
@@ -466,10 +463,6 @@ public class FrmMain extends JFrame {
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
-//    private void jtpMainStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jtpMainStateChanged
-////        reloadDisplay(currentResident);
-//    }//GEN-LAST:event_jtpMainStateChanged
-
     private void btnVerlegungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerlegungActionPerformed
         if (currentResident != null) {
             SYSFilesTools.print(ResInfoTools.getTXReport(currentResident, true, true, true, true, true, true, true, true, true), true);
@@ -564,6 +557,8 @@ public class FrmMain extends JFrame {
             panel = new PnlControlling(jspSearch);
         } else if (classname.equals("op.system.PnlConfigs")) {
             panel = new PnlConfigs(jspSearch);
+        } else if (classname.equals("op.config.PnlUserSettings")) {
+            panel = new PnlUserSettings(jspSearch);
         }
         return panel;
     }

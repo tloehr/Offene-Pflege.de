@@ -37,7 +37,6 @@ import com.toedter.calendar.JDateChooser;
 import entity.EntityTools;
 import entity.info.Resident;
 import entity.nursingprocess.*;
-import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.nursingprocess.PnlSelectIntervention;
 import op.system.InternalClassACL;
@@ -59,8 +58,6 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
@@ -861,7 +858,6 @@ public class PnlDFN extends NursingRecordsPanel {
         });
 
 
-
         return list;
     }
 
@@ -919,7 +915,6 @@ public class PnlDFN extends NursingRecordsPanel {
 
                                     em.getTransaction().commit();
 
-//                                    if (new DateMidnight(jdcDate.getDate()).isEqualNow()) {
                                     mapShift2Pane.put(DFNTools.SHIFT_ON_DEMAND, createCP4(DFNTools.SHIFT_ON_DEMAND));
                                     buildPanel(false);
                                     try {
@@ -927,9 +922,7 @@ public class PnlDFN extends NursingRecordsPanel {
                                     } catch (PropertyVetoException e) {
                                         OPDE.debug(e);
                                     }
-//                                    } else {
-//                                        jdcDate
-//                                    }
+
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();

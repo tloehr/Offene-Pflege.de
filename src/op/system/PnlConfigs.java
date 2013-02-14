@@ -99,8 +99,8 @@ public class PnlConfigs extends CleanablePanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "default, $lcgap, default:grow, $lcgap, default",
-                "6*(default, $lgap), default:grow"));
+            "default, $lcgap, default:grow, $lcgap, default",
+            "6*(default, $lgap), default:grow"));
 
         //---- lblPrinters ----
         lblPrinters.setText("Etiketten-Drucker");

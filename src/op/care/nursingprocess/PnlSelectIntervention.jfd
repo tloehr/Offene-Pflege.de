@@ -41,7 +41,7 @@
           </object> 
           <void method="setProperty"> 
            <string>dividerLocation</string> 
-           <int>500</int> 
+           <int>150</int> 
           </void> 
           <void method="setProperty"> 
            <string>dividerSize</string> 
@@ -152,6 +152,14 @@
                   <boolean>true</boolean> 
                  </object> 
                 </void> 
+                <void method="addEvent"> 
+                 <object class="com.jformdesigner.model.FormEvent"> 
+                  <string>javax.swing.event.ListSelectionListener</string> 
+                  <string>valueChanged</string> 
+                  <string>lstInterventionsValueChanged</string> 
+                  <boolean>true</boolean> 
+                 </object> 
+                </void> 
                </object> 
               </void> 
              </object> 
@@ -203,6 +211,35 @@
                     <string>/artwork/22x22/apply.png</string> 
                    </object> 
                   </void> 
+                  <void method="setProperty"> 
+                   <string>borderPainted</string> 
+                   <boolean>false</boolean> 
+                  </void> 
+                  <void method="setProperty"> 
+                   <string>border</string> 
+                   <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+                  </void> 
+                  <void method="setProperty"> 
+                   <string>contentAreaFilled</string> 
+                   <boolean>false</boolean> 
+                  </void> 
+                  <void method="setProperty"> 
+                   <string>cursor</string> 
+                   <object id="Cursor0" class="java.awt.Cursor"> 
+                    <int>12</int> 
+                   </object> 
+                  </void> 
+                  <void method="setProperty"> 
+                   <string>selectedIcon</string> 
+                   <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+                  </void> 
+                  <void method="setProperty"> 
+                   <string>pressedIcon</string> 
+                   <object id="SwingIcon0" class="com.jformdesigner.model.SwingIcon"> 
+                    <int>0</int> 
+                    <string>/artwork/22x22/bw/pressed.png</string> 
+                   </object> 
+                  </void> 
                   <void property="name"> 
                    <string>btnOk</string> 
                   </void> 
@@ -229,8 +266,32 @@
                  <string>icon</string> 
                  <object class="com.jformdesigner.model.SwingIcon"> 
                   <int>0</int> 
-                  <string>/artwork/22x22/bw/1rightarrow.png</string> 
+                  <string>/artwork/22x22/bw/add.png</string> 
                  </object> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>border</string> 
+                 <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>borderPainted</string> 
+                 <boolean>false</boolean> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>contentAreaFilled</string> 
+                 <boolean>false</boolean> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>cursor</string> 
+                 <object idref="Cursor0"/> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>selectedIcon</string> 
+                 <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>pressedIcon</string> 
+                 <object idref="SwingIcon0"/> 
                 </void> 
                 <void property="name"> 
                  <string>btnAdd</string> 
@@ -240,6 +301,57 @@
                   <string>java.awt.event.ActionListener</string> 
                   <string>actionPerformed</string> 
                   <string>btnAddActionPerformed</string> 
+                  <boolean>true</boolean> 
+                 </object> 
+                </void> 
+               </object> 
+              </void> 
+              <void method="add"> 
+               <object class="com.jformdesigner.model.FormComponent"> 
+                <string>javax.swing.JButton</string> 
+                <void method="setProperty"> 
+                 <string>text</string> 
+                 <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>icon</string> 
+                 <object class="com.jformdesigner.model.SwingIcon"> 
+                  <int>0</int> 
+                  <string>/artwork/22x22/bw/edit3.png</string> 
+                 </object> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>border</string> 
+                 <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>borderPainted</string> 
+                 <boolean>false</boolean> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>contentAreaFilled</string> 
+                 <boolean>false</boolean> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>cursor</string> 
+                 <object idref="Cursor0"/> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>selectedIcon</string> 
+                 <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>pressedIcon</string> 
+                 <object idref="SwingIcon0"/> 
+                </void> 
+                <void property="name"> 
+                 <string>btnEdit</string> 
+                </void> 
+                <void method="addEvent"> 
+                 <object class="com.jformdesigner.model.FormEvent"> 
+                  <string>java.awt.event.ActionListener</string> 
+                  <string>actionPerformed</string> 
+                  <string>btnEditActionPerformed</string> 
                   <boolean>true</boolean> 
                  </object> 
                 </void> 
@@ -304,7 +416,7 @@
                </object> 
               </void> 
               <void property="name"> 
-               <string>jLabel1</string> 
+               <string>lblText</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -331,7 +443,7 @@
                <object idref="Font1"/> 
               </void> 
               <void property="name"> 
-               <string>jLabel2</string> 
+               <string>lblLength</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -354,7 +466,7 @@
                <object idref="Font1"/> 
               </void> 
               <void property="name"> 
-               <string>txtBezeichnung</string> 
+               <string>txtText</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -385,7 +497,7 @@
                <object idref="Font1"/> 
               </void> 
               <void property="name"> 
-               <string>txtDauer</string> 
+               <string>txtLength</string> 
               </void> 
               <void method="addEvent"> 
                <object class="com.jformdesigner.model.FormEvent"> 
@@ -420,7 +532,7 @@
                <object idref="Font1"/> 
               </void> 
               <void property="name"> 
-               <string>jLabel3</string> 
+               <string>lblCat</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -459,7 +571,7 @@
                <object idref="Font1"/> 
               </void> 
               <void property="name"> 
-               <string>cmbKategorie</string> 
+               <string>cmbCat</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -486,7 +598,7 @@
                <object idref="Font1"/> 
               </void> 
               <void property="name"> 
-               <string>jLabel4</string> 
+               <string>lblType</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -525,7 +637,7 @@
                <object idref="Font1"/> 
               </void> 
               <void property="name"> 
-               <string>cmbArt</string> 
+               <string>cmbType</string> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -560,17 +672,92 @@
                  <string>icon</string> 
                  <object class="com.jformdesigner.model.SwingIcon"> 
                   <int>0</int> 
-                  <string>/artwork/22x22/bw/1leftarrow.png</string> 
+                  <string>/artwork/22x22/cancel.png</string> 
                  </object> 
                 </void> 
+                <void method="setProperty"> 
+                 <string>border</string> 
+                 <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>borderPainted</string> 
+                 <boolean>false</boolean> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>contentAreaFilled</string> 
+                 <boolean>false</boolean> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>cursor</string> 
+                 <object idref="Cursor0"/> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>selectedIcon</string> 
+                 <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>pressedIcon</string> 
+                 <object idref="SwingIcon0"/> 
+                </void> 
                 <void property="name"> 
-                 <string>btnBack</string> 
+                 <string>btnCancel</string> 
                 </void> 
                 <void method="addEvent"> 
                  <object class="com.jformdesigner.model.FormEvent"> 
                   <string>java.awt.event.ActionListener</string> 
                   <string>actionPerformed</string> 
-                  <string>btnBackActionPerformed</string> 
+                  <string>btnCancelActionPerformed</string> 
+                  <boolean>true</boolean> 
+                 </object> 
+                </void> 
+               </object> 
+              </void> 
+              <void method="add"> 
+               <object class="com.jformdesigner.model.FormComponent"> 
+                <string>javax.swing.JButton</string> 
+                <void method="setProperty"> 
+                 <string>text</string> 
+                 <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>icon</string> 
+                 <object class="com.jformdesigner.model.SwingIcon"> 
+                  <int>0</int> 
+                  <string>/artwork/22x22/apply.png</string> 
+                 </object> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>cursor</string> 
+                 <object idref="Cursor0"/> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>borderPainted</string> 
+                 <boolean>false</boolean> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>border</string> 
+                 <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>contentAreaFilled</string> 
+                 <boolean>false</boolean> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>selectedIcon</string> 
+                 <object class="com.jformdesigner.model.FormObject" field="NULL_VALUE"/> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>pressedIcon</string> 
+                 <object idref="SwingIcon0"/> 
+                </void> 
+                <void property="name"> 
+                 <string>btnSave</string> 
+                </void> 
+                <void method="addEvent"> 
+                 <object class="com.jformdesigner.model.FormEvent"> 
+                  <string>java.awt.event.ActionListener</string> 
+                  <string>actionPerformed</string> 
+                  <string>btnSaveActionPerformed</string> 
                   <boolean>true</boolean> 
                  </object> 
                 </void> 
@@ -593,7 +780,7 @@
               </void> 
               <void method="setProperty"> 
                <string>hAlign</string> 
-               <object class="com.jgoodies.forms.layout.CellConstraints" field="LEFT"/> 
+               <object class="com.jgoodies.forms.layout.CellConstraints" field="RIGHT"/> 
               </void> 
              </object> 
             </void> 

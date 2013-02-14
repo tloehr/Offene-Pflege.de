@@ -115,17 +115,7 @@ public class PnlWelcome extends CleanablePanel {
                 JideButton progButton = GUITools.createHyperlinkButton(shortDescription, icon, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-//
-//                        if (previousProgButton != null) {
-//                            previousProgButton.setBackground(Color.WHITE);
-//                            previousProgButton.setOpaque(false);
-//                        }
-//                        previousProgButton = (JideButton) actionEvent.getSource();
-//                        previousProgButton.setBackground(Color.YELLOW);
-//                        previousProgButton.setOpaque(true);
-//
-//                        displayManager.setMainMessage(shortDescription);
-//                        displayManager.addSubMessage(new DisplayMessage(longDescription, 5));
+
                         OPDE.getMainframe().clearPreviousProgbutton();
                         OPDE.getMainframe().setPanelTo(OPDE.getMainframe().loadPanel(javaclass));
                     }
@@ -546,8 +536,8 @@ public class PnlWelcome extends CleanablePanel {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                "default:grow, $lcgap, default",
-                "default:grow"));
+                    "default:grow, $lcgap, default",
+                    "default:grow"));
 
             //======== scrollPane1 ========
             {

@@ -392,27 +392,6 @@ public class PnlUser extends CleanablePanel {
                     }
                 });
 
-
-//                    new DlgProcess(new QProcess(resident), new Closure() {
-//                        @Override
-//                        public void execute(Object o) {
-//                            if (o != null) {
-//                                EntityManager em = OPDE.createEM();
-//                                try {
-//                                    em.getTransaction().begin();
-//                                    QProcess qProcess = em.merge((QProcess) o);
-//                                    em.getTransaction().commit();
-//                                    processList.add(qProcess);
-//                                    qProcessMap.put(qProcess, createCP4(qProcess));
-//                                    buildPanel();
-//                                } catch (Exception e) {
-//                                    em.getTransaction().rollback();
-//                                } finally {
-//                                    em.close();
-//                                }
-//                            }
-//                        }
-//                    });
             }
         });
         list.add(btnAddUser);

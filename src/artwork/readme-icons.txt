@@ -25,3 +25,7 @@ Lots of different icons and symbols taken fromTemplate www.wpclipart.com. This m
 -- allergy.png (http://www.wpclipart.com/smiley/assorted_smiley/assorted_3/smiley_sneeze_T.png)
 -- warning.png (http://openclipart.org/detail/48349/warning-sign-by-palomaironique)
 
+-- stuff from findicons
+-- system_preferences.png (http://findicons.com/icon/130192/system_preferences?width=256), says "public domain, non commercial"
+-- package_network.png (http://findicons.com/icon/234318/package_network), GNU/GPL
+

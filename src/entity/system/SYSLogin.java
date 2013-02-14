@@ -18,7 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-//import op.tools.SYSConst;
+
 
 /**
  *
@@ -26,12 +26,6 @@ import javax.persistence.TemporalType;
  */
 @Entity
 @Table(name = "syslogin")
-//@NamedQueries({
-//    @NamedQuery(name = "SYSLogin.findAll", query = "SELECT s FROM SYSLogin s"),
-//    @NamedQuery(name = "SYSLogin.findByLoginID", query = "SELECT s FROM SYSLogin s WHERE s.loginID = :loginID"),
-//    @NamedQuery(name = "SYSLogin.findByLogin", query = "SELECT s FROM SYSLogin s WHERE s.login = :login"),
-////    @NamedQuery(name = "SYSLogin.findByHost", query = "SELECT s FROM SYSLogin s WHERE s.host = :host"),
-//    @NamedQuery(name = "SYSLogin.findByLogout", query = "SELECT s FROM SYSLogin s WHERE s.logout = :logout")})
 public class SYSLogin implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -46,11 +40,6 @@ public class SYSLogin implements Serializable {
     @Column(name = "Logout")
     @Temporal(TemporalType.TIMESTAMP)
     private Date logout;
-//    @JoinColumn(name = "HostID", referencedColumnName = "HostID")
-//    @ManyToOne
-//    private SYSHosts host;
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "login")
-//    private Collection<SYSRunningClasses> runningClasses;
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
     private Users user;
@@ -68,6 +57,10 @@ public class SYSLogin implements Serializable {
 
     public Users getUser() {
         return user;
+    }
+
+    public void setUser(Users user) {
+        this.user = user;
     }
 
     public Long getLoginID() {

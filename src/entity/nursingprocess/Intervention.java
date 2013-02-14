@@ -93,11 +93,11 @@ public class Intervention implements Serializable {
         this.category = kategorie;
     }
 
-    public Boolean getAktiv() {
+    public boolean isActive() {
         return aktiv;
     }
 
-    public void setAktiv(Boolean aktiv) {
+    public void setActive(boolean active) {
         this.aktiv = aktiv;
     }
 
