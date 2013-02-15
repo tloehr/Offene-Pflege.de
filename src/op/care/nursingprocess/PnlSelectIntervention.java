@@ -12,6 +12,7 @@ import entity.nursingprocess.Intervention;
 import entity.nursingprocess.InterventionTools;
 import op.OPDE;
 import op.system.InternalClassACL;
+import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.tools.GUITools;
 import op.tools.SYSTools;
@@ -19,6 +20,9 @@ import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.JXSearchField;
 
+import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
+import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -34,29 +38,29 @@ import java.util.Arrays;
  * @author Torsten Löhr
  */
 public class PnlSelectIntervention extends JPanel {
+    private Intervention intervention2Edit = null;
     public static final String internalClassID = PnlNursingProcess.internalClassID + ".pnlselectinterventions";
     private Closure actionBlock;
     private JToggleButton tbAktiv;
     Number dauer = BigDecimal.TEN;
+    Component focusOwner = null;
 
     public PnlSelectIntervention(Closure actionBlock) {
         this.actionBlock = actionBlock;
         initComponents();
         initPanel();
         btnEdit.setEnabled(false);
-        btnAdd.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlNursingProcess.internalClassID));
+        btnAdd.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, PnlNursingProcess.internalClassID));
     }
 
     private void initPanel() {
-
-        lblText.setText(OPDE.lang.getString(internalClassID+".lbltext"));
-        lblLength.setText(OPDE.lang.getString(internalClassID+".lbllength"));
-        lblCat.setText(OPDE.lang.getString(internalClassID+".lblcat"));
-        lblType.setText(OPDE.lang.getString(internalClassID+".lbltype"));
+        lblText.setText(OPDE.lang.getString(internalClassID + ".lbltext"));
+        lblLength.setText(OPDE.lang.getString(internalClassID + ".lbllength"));
+        lblCat.setText(OPDE.lang.getString(internalClassID + ".lblcat"));
+        lblType.setText(OPDE.lang.getString(internalClassID + ".lbltype"));
 
         lstInterventions.setModel(new DefaultListModel());
         tbAktiv = GUITools.getNiceToggleButton(internalClassID + ".activeIntervention");
-        tbAktiv.setEnabled(false);
         pnlRight.add(tbAktiv, CC.xy(1, 9));
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -69,6 +73,51 @@ public class PnlSelectIntervention extends JPanel {
         cmbCat.setModel(new DefaultComboBoxModel(ResInfoCategoryTools.getAll4NP().toArray()));
         cmbCategory.setModel(new DefaultComboBoxModel(ResInfoCategoryTools.getAll4NP().toArray()));
         cmbCategory.setSelectedItem(null);
+
+
+        setFocusCycleRoot(true);
+        setFocusTraversalPolicy(new FocusTraversalPolicy() {
+            @Override
+            public Component getComponentAfter(Container aContainer, Component aComponent) {
+                if (focusOwner == null) {
+                    focusOwner = txtText;
+                } else if (focusOwner.equals(txtText)) {
+                    focusOwner = txtLength;
+                } else {
+                    focusOwner = txtText;
+                }
+                return focusOwner;
+            }
+
+            @Override
+            public Component getComponentBefore(Container aContainer, Component aComponent) {
+                if (focusOwner == null) {
+                    focusOwner = txtLength;
+                } else if (focusOwner.equals(txtLength)) {
+                    focusOwner = txtText;
+                } else {
+                    focusOwner = txtLength;
+                }
+                return focusOwner;
+            }
+
+            @Override
+            public Component getFirstComponent(Container aContainer) {
+                return txtText;
+            }
+
+            @Override
+            public Component getLastComponent(Container aContainer) {
+                return txtLength;
+            }
+
+            @Override
+            public Component getDefaultComponent(Container aContainer) {
+                return txtText;
+            }
+        });
+
+
     }
 
     private void txtSearchActionPerformed(ActionEvent e) {
@@ -78,6 +127,8 @@ public class PnlSelectIntervention extends JPanel {
     }
 
     private void btnAddActionPerformed(ActionEvent e) {
+        tbAktiv.setEnabled(false);
+        intervention2Edit = null;
         SYSTools.showSide(split1, SYSTools.RIGHT_LOWER_SIDE, SYSTools.SPEED_NORMAL);
     }
 
@@ -115,30 +166,65 @@ public class PnlSelectIntervention extends JPanel {
         }
     }
 
-    private void btnCancelActionPerformed(ActionEvent e) {
-        SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, SYSTools.SPEED_NORMAL);
-    }
+//    private void btnCancelActionPerformed(ActionEvent e) {
+//        SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, SYSTools.SPEED_NORMAL);
+//    }
 
     private void btnEditActionPerformed(ActionEvent e) {
-        Intervention intervention = (Intervention) lstInterventions.getSelectedValue();
-        txtText.setText(intervention.getBezeichnung());
-        txtLength.setText(intervention.getDauer().toBigInteger().toString());
-        tbAktiv.setSelected(intervention.isActive());
-        cmbCategory.setSelectedItem(intervention.getCategory());
-
-        cmbType.setSelectedIndex(intervention.getInterventionType() - 1);
+        intervention2Edit = (Intervention) lstInterventions.getSelectedValue();
+        txtText.setText(intervention2Edit.getBezeichnung());
+        txtLength.setText(intervention2Edit.getDauer().toBigInteger().toString());
+        tbAktiv.setSelected(intervention2Edit.isActive());
+        cmbCategory.setSelectedItem(intervention2Edit.getCategory());
+        tbAktiv.setEnabled(true);
+        cmbType.setSelectedIndex(intervention2Edit.getInterventionType() - 1);
 
         SYSTools.showSide(split1, SYSTools.RIGHT_LOWER_SIDE, SYSTools.SPEED_NORMAL);
     }
 
     private void lstInterventionsValueChanged(ListSelectionEvent e) {
-        btnEdit.setEnabled(lstInterventions.getSelectedValues().length == 1 && OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlNursingProcess.internalClassID));
+        btnEdit.setEnabled(lstInterventions.getSelectedValues().length == 1 && ((Intervention) lstInterventions.getSelectedValue()).getMassID() != null && OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlNursingProcess.internalClassID));
     }
 
-    private void btnSaveActionPerformed(ActionEvent e) {
+    private void btnSaveActionPerformed(ActionEvent evt) {
         if (saveok()) {
-            Intervention intervention = new Intervention(txtText.getText().trim(), new BigDecimal(dauer.doubleValue()), cmbType.getSelectedIndex()+1, (ResInfoCategory) cmbCat.getSelectedItem());
-            lstInterventions.setModel(SYSTools.list2dlm(Arrays.asList(intervention)));
+            if (intervention2Edit == null) {
+                Intervention intervention = new Intervention(txtText.getText().trim(), new BigDecimal(dauer.doubleValue()), cmbType.getSelectedIndex() + 1, (ResInfoCategory) cmbCat.getSelectedItem());
+                lstInterventions.setModel(SYSTools.list2dlm(Arrays.asList(intervention)));
+                btnEdit.setEnabled(false);
+            } else {
+                EntityManager em = OPDE.createEM();
+                try {
+                    em.getTransaction().begin();
+                    Intervention myIntervention = em.merge(intervention2Edit);
+                    em.lock(myIntervention, LockModeType.OPTIMISTIC);
+                    myIntervention.setBezeichnung(txtText.getText().trim());
+                    myIntervention.setDauer(new BigDecimal(dauer.doubleValue()));
+                    myIntervention.setCategory(em.merge((ResInfoCategory) cmbCat.getSelectedItem()));
+                    myIntervention.setInterventionType(cmbType.getSelectedIndex() + 1);
+                    myIntervention.setActive(tbAktiv.isSelected());
+                    em.getTransaction().commit();
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".interventionedited"));
+                    actionBlock.execute(null);
+                } catch (OptimisticLockException ole) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                        OPDE.getMainframe().emptyFrame();
+                        OPDE.getMainframe().afterLogin();
+                    }
+                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                } catch (Exception e) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.fatal(e);
+                } finally {
+                    em.close();
+                }
+
+            }
         }
         SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, SYSTools.SPEED_NORMAL);
     }
@@ -167,7 +253,6 @@ public class PnlSelectIntervention extends JPanel {
         lblType = new JLabel();
         cmbType = new JComboBox();
         panel4 = new JPanel();
-        btnCancel = new JButton();
         btnSave = new JButton();
 
         //======== this ========
@@ -187,8 +272,8 @@ public class PnlSelectIntervention extends JPanel {
                 //======== panel2 ========
                 {
                     panel2.setLayout(new FormLayout(
-                        "default:grow",
-                        "2*(default, $lgap), default:grow, $lgap, default"));
+                            "default:grow",
+                            "2*(default, $lgap), default:grow, $lgap, default"));
 
                     //---- txtSearch ----
                     txtSearch.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -299,8 +384,8 @@ public class PnlSelectIntervention extends JPanel {
                 {
                     pnlRight.setBorder(null);
                     pnlRight.setLayout(new FormLayout(
-                        "default, $lcgap, default:grow",
-                        "3*(fill:default, $lgap), 2*(default, $lgap), default:grow"));
+                            "default, $lcgap, default:grow",
+                            "3*(fill:default, $lgap), 2*(default, $lgap), default:grow"));
 
                     //---- lblText ----
                     lblText.setText("Bezeichnung");
@@ -335,11 +420,11 @@ public class PnlSelectIntervention extends JPanel {
                     pnlRight.add(lblCat, CC.xy(1, 5));
 
                     //---- cmbCat ----
-                    cmbCat.setModel(new DefaultComboBoxModel(new String[] {
-                        "Item 1",
-                        "Item 2",
-                        "Item 3",
-                        "Item 4"
+                    cmbCat.setModel(new DefaultComboBoxModel(new String[]{
+                            "Item 1",
+                            "Item 2",
+                            "Item 3",
+                            "Item 4"
                     }));
                     cmbCat.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlRight.add(cmbCat, CC.xy(3, 5));
@@ -350,11 +435,11 @@ public class PnlSelectIntervention extends JPanel {
                     pnlRight.add(lblType, CC.xy(1, 7));
 
                     //---- cmbType ----
-                    cmbType.setModel(new DefaultComboBoxModel(new String[] {
-                        "Item 1",
-                        "Item 2",
-                        "Item 3",
-                        "Item 4"
+                    cmbType.setModel(new DefaultComboBoxModel(new String[]{
+                            "Item 1",
+                            "Item 2",
+                            "Item 3",
+                            "Item 4"
                     }));
                     cmbType.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlRight.add(cmbType, CC.xy(3, 7));
@@ -362,23 +447,6 @@ public class PnlSelectIntervention extends JPanel {
                     //======== panel4 ========
                     {
                         panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
-
-                        //---- btnCancel ----
-                        btnCancel.setText(null);
-                        btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-                        btnCancel.setBorder(null);
-                        btnCancel.setBorderPainted(false);
-                        btnCancel.setContentAreaFilled(false);
-                        btnCancel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                        btnCancel.setSelectedIcon(null);
-                        btnCancel.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
-                        btnCancel.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                btnCancelActionPerformed(e);
-                            }
-                        });
-                        panel4.add(btnCancel);
 
                         //---- btnSave ----
                         btnSave.setText(null);
@@ -430,7 +498,6 @@ public class PnlSelectIntervention extends JPanel {
     private JLabel lblType;
     private JComboBox cmbType;
     private JPanel panel4;
-    private JButton btnCancel;
     private JButton btnSave;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

@@ -388,7 +388,8 @@ public class DFNTools {
             String jpql = " SELECT dfn " +
                     " FROM DFN dfn " +
                     " WHERE dfn.resident = :resident " +
-                    " AND dfn.soll >= :von AND dfn.soll <= :bis ";
+                    " AND dfn.soll >= :von AND dfn.soll <= :bis " +
+                    " ORDER BY dfn.intervention.bezeichnung ";
 
 //                    " ORDER BY dfn.nursingProcess.id, dfn.sZeit, dfn.soll, dfn.intervention.bezeichnung, dfn.dfnid ";
 
@@ -455,20 +456,20 @@ public class DFNTools {
 
         Icon icon;
 
-        if (Days.daysBetween(start, stop).getDays() > 14){
-            if (dfn.isOpen()){
+        if (Days.daysBetween(start, stop).getDays() > 14) {
+            if (dfn.isOpen()) {
                 icon = SYSConst.icon22ledPurpleOn;
             } else {
                 icon = SYSConst.icon22ledPurpleOff;
             }
-        } else if (Days.daysBetween(start, stop).getDays() > 7){
-            if (dfn.isOpen()){
+        } else if (Days.daysBetween(start, stop).getDays() > 7) {
+            if (dfn.isOpen()) {
                 icon = SYSConst.icon22ledOrangeOn;
             } else {
                 icon = SYSConst.icon22ledOrangeOff;
             }
         } else {
-            if (dfn.isOpen()){
+            if (dfn.isOpen()) {
                 icon = SYSConst.icon22ledBlueOn;
             } else {
                 icon = SYSConst.icon22ledBlueOff;
@@ -505,8 +506,9 @@ public class DFNTools {
      * <li>there is no owning user assigned or its the same user that is currently logged in and the time period of the last change does not exceed DFN_MAX_MINUTES_TO_WITHDRAW</li>
      * </ul>
      * </p>
-     *
+     * <p/>
      * <p>Note: DFN_MAX_MINUTES_TO_WITHDRAW is a system parameter which can be changed in the system settings and is stored as a system property with the key &quot;dfn_max_minutes_to_withdraw&quot;</p>
+     *
      * @param dfn
      * @return
      */

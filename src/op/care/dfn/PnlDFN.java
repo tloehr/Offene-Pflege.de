@@ -36,7 +36,11 @@ import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
 import entity.EntityTools;
 import entity.info.Resident;
-import entity.nursingprocess.*;
+import entity.nursingprocess.DFN;
+import entity.nursingprocess.DFNTools;
+import entity.nursingprocess.Intervention;
+import entity.nursingprocess.NursingProcessTools;
+import entity.prescription.BHPTools;
 import op.OPDE;
 import op.care.nursingprocess.PnlSelectIntervention;
 import op.system.InternalClassACL;
@@ -179,7 +183,7 @@ public class PnlDFN extends NursingRecordsPanel {
                     OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 100));
 
                     ArrayList<DFN> listDFNs = DFNTools.getDFNs(resident, jdcDate.getDate());
-                    Collections.sort(listDFNs);
+//                    Collections.sort(listDFNs);
 
                     for (DFN dfn : listDFNs) {
                         mapShift2DFN.get(dfn.getShift()).add(dfn);
@@ -242,40 +246,161 @@ public class PnlDFN extends NursingRecordsPanel {
         mainPane.setForeground(SYSCalendar.getFGSHIFT(shift));
         mainPane.setOpaque(false);
 
-        if (!mapShift2DFN.get(shift).isEmpty()) {
-            NursingProcess currentNP = null;
-            CollapsiblePane npPane = null;
-            JPanel npPanel = null;
-            JPanel shiftOuterPanel = new JPanel();
-            shiftOuterPanel.setLayout(new VerticalLayout());
-            for (DFN dfn : mapShift2DFN.get(shift)) {
-                if (currentNP == null || dfn.getNursingProcess().getID() != currentNP.getID()) {
-                    if (currentNP != null) {
-                        npPane.setContentPane(npPanel);
-                        shiftOuterPanel.add(npPane);
+        JPanel npPanel = new JPanel();
+        npPanel.setLayout(new VerticalLayout());
+
+        if (mapShift2DFN.containsKey(shift)) {
+            if (shift == BHPTools.SHIFT_EARLY) {
+
+                final CollapsiblePane morning = new CollapsiblePane("<html><font size=+1>" + OPDE.lang.getString("misc.msg.morning.long") + "</font></html>", null);
+                morning.setSlidingDirection(SwingConstants.SOUTH);
+                morning.setBackground(SYSCalendar.getBGSHIFT(shift).darker());
+                morning.setForeground(Color.white);
+                morning.setOpaque(false);
+                JPanel pnlMorning = new JPanel();
+                pnlMorning.setLayout(new VerticalLayout());
+                morning.setContentPane(pnlMorning);
+
+                final CollapsiblePane noon = new CollapsiblePane("<html><font size=+1>" + OPDE.lang.getString("misc.msg.noon.long") + "</font></html>", null);
+                noon.setSlidingDirection(SwingConstants.SOUTH);
+                noon.setBackground(SYSCalendar.getBGSHIFT(shift).darker());
+                noon.setForeground(Color.white);
+                noon.setOpaque(false);
+                JPanel pnlNoon = new JPanel();
+                pnlNoon.setLayout(new VerticalLayout());
+                noon.setContentPane(pnlNoon);
+
+                final CollapsiblePane clock = new CollapsiblePane("<html><font size=+1>" + OPDE.lang.getString("misc.msg.Time.long") + "</font></html>", null);
+                clock.setSlidingDirection(SwingConstants.SOUTH);
+                clock.setBackground(SYSCalendar.getBGSHIFT(shift).darker());
+                clock.setForeground(Color.white);
+                clock.setOpaque(false);
+                JPanel pnlClock = new JPanel();
+                pnlClock.setLayout(new VerticalLayout());
+                clock.setContentPane(pnlClock);
+
+                for (DFN dfn : mapShift2DFN.get(shift)) {
+                    npPanel.setBackground(dfn.getBG());
+                    mapDFN2Pane.put(dfn, createCP4(dfn));
+                    if (dfn.getSollZeit() == DFNTools.BYTE_MORNING) {
+                        pnlMorning.add(mapDFN2Pane.get(dfn));
+                    } else if (dfn.getSollZeit() == DFNTools.BYTE_NOON) {
+                        pnlNoon.add(mapDFN2Pane.get(dfn));
+                    } else {
+                        pnlClock.add(mapDFN2Pane.get(dfn));
                     }
-                    currentNP = dfn.getNursingProcess();
-                    npPanel = new JPanel();
-                    npPanel.setLayout(new VerticalLayout());
-                    npPane = new CollapsiblePane("<html><font size=+1>" + currentNP.getTopic() + " (" + currentNP.getCategory().getText() + ")" + "</font></html>", currentNP.isClosed() ? SYSConst.icon22stopSign : null);
-                    npPane.setCollapsible(false);
-                    npPane.setBackground(SYSCalendar.getBGSHIFT(shift).darker()); // a little darker
-                    npPane.setForeground(Color.WHITE);
-                    npPane.setOpaque(false);
                 }
 
-                npPane.setContentPane(npPanel);
-                shiftOuterPanel.add(npPane);
+                if (pnlClock.getComponentCount() > 0) {
+                    npPanel.add(clock);
+                }
+                if (pnlMorning.getComponentCount() > 0) {
+                    npPanel.add(morning);
+                }
+                if (pnlNoon.getComponentCount() > 0) {
+                    npPanel.add(noon);
+                }
 
-                mapDFN2Pane.put(dfn, createCP4(dfn));
-                npPanel.add(mapDFN2Pane.get(dfn));
+            } else if (shift == BHPTools.SHIFT_LATE) {
+                final CollapsiblePane afternoon = new CollapsiblePane("<html><font size=+1>" + OPDE.lang.getString("misc.msg.afternoon.long") + "</font></html>", null);
+                afternoon.setSlidingDirection(SwingConstants.SOUTH);
+                afternoon.setBackground(SYSCalendar.getBGSHIFT(shift).darker());
+                afternoon.setForeground(Color.white);
+                afternoon.setOpaque(false);
+                JPanel pnlAfternoon = new JPanel();
+                pnlAfternoon.setLayout(new VerticalLayout());
+                afternoon.setContentPane(pnlAfternoon);
+
+                final CollapsiblePane evening = new CollapsiblePane("<html><font size=+1>" + OPDE.lang.getString("misc.msg.evening.long") + "</font></html>", null);
+                evening.setSlidingDirection(SwingConstants.SOUTH);
+                evening.setBackground(SYSCalendar.getBGSHIFT(shift).darker());
+                evening.setForeground(Color.white);
+                evening.setOpaque(false);
+                JPanel pnlEvening = new JPanel();
+                pnlEvening.setLayout(new VerticalLayout());
+                evening.setContentPane(pnlEvening);
+
+                final CollapsiblePane clock = new CollapsiblePane("<html><font size=+1>" + OPDE.lang.getString("misc.msg.Time.long") + "</font></html>", null);
+                clock.setSlidingDirection(SwingConstants.SOUTH);
+                clock.setBackground(SYSCalendar.getBGSHIFT(shift).darker());
+                clock.setForeground(Color.white);
+                clock.setOpaque(false);
+                JPanel pnlClock = new JPanel();
+                pnlClock.setLayout(new VerticalLayout());
+                clock.setContentPane(pnlClock);
+
+
+                for (DFN dfn : mapShift2DFN.get(shift)) {
+                    npPanel.setBackground(dfn.getBG());
+                    mapDFN2Pane.put(dfn, createCP4(dfn));
+                    if (dfn.getSollZeit() == DFNTools.BYTE_AFTERNOON) {
+                        pnlAfternoon.add(mapDFN2Pane.get(dfn));
+                    } else if (dfn.getSollZeit() == DFNTools.BYTE_EVENING) {
+                        pnlEvening.add(mapDFN2Pane.get(dfn));
+                    } else {
+                        pnlClock.add(mapDFN2Pane.get(dfn));
+                    }
+                }
+
+                if (pnlClock.getComponentCount() > 0) {
+                    npPanel.add(clock);
+                }
+                if (pnlAfternoon.getComponentCount() > 0) {
+                    npPanel.add(afternoon);
+                }
+                if (pnlEvening.getComponentCount() > 0) {
+                    npPanel.add(evening);
+                }
+
+
+            } else {
+                for (DFN dfn : mapShift2DFN.get(shift)) {
+                    npPanel.setBackground(dfn.getBG());
+                    mapDFN2Pane.put(dfn, createCP4(dfn));
+                    npPanel.add(mapDFN2Pane.get(dfn));
+                }
             }
-            mainPane.setContentPane(shiftOuterPanel);
+            mainPane.setContentPane(npPanel);
             mainPane.setCollapsible(true);
         } else {
-            mainPane.setContentPane(new JPanel());
+            mainPane.setContentPane(npPanel);
             mainPane.setCollapsible(false);
         }
+
+//        if (!mapShift2DFN.get(shift).isEmpty()) {
+//            NursingProcess currentNP = null;
+//            CollapsiblePane npPane = null;
+//            JPanel npPanel = null;
+//            JPanel shiftOuterPanel = new JPanel();
+//            shiftOuterPanel.setLayout(new VerticalLayout());
+////            for (DFN dfn : mapShift2DFN.get(shift)) {
+////                if (currentNP == null || dfn.getNursingProcess().getID() != currentNP.getID()) {
+////                    if (currentNP != null) {
+////                        npPane.setContentPane(npPanel);
+////                        shiftOuterPanel.add(npPane);
+////                    }
+////                    currentNP = dfn.getNursingProcess();
+////                    npPanel = new JPanel();
+////                    npPanel.setLayout(new VerticalLayout());
+////                    npPane = new CollapsiblePane("<html><font size=+1>" + currentNP.getTopic() + " (" + currentNP.getCategory().getText() + ")" + "</font></html>", currentNP.isClosed() ? SYSConst.icon22stopSign : null);
+////                    npPane.setCollapsible(false);
+////                    npPane.setBackground(SYSCalendar.getBGSHIFT(shift).darker()); // a little darker
+////                    npPane.setForeground(Color.WHITE);
+////                    npPane.setOpaque(false);
+////                }
+////
+////                npPane.setContentPane(npPanel);
+////                shiftOuterPanel.add(npPane);
+////
+////                mapDFN2Pane.put(dfn, createCP4(dfn));
+////                npPanel.add(mapDFN2Pane.get(dfn));
+////            }
+//            mainPane.setContentPane(shiftOuterPanel);
+//            mainPane.setCollapsible(true);
+//        } else {
+//            mainPane.setContentPane(new JPanel());
+//            mainPane.setCollapsible(false);
+//        }
 
         return mainPane;
     }

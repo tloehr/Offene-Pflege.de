@@ -33,6 +33,9 @@ public class Intervention implements Serializable {
     private int interventionType;
     @Column(name = "Aktiv")
     private Boolean aktiv;
+    @Version
+    @Column(name = "version")
+    private Long version;
 
     @JoinColumn(name = "BWIKID", referencedColumnName = "BWIKID")
     @ManyToOne
