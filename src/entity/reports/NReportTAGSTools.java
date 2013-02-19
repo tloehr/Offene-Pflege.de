@@ -46,7 +46,7 @@ public class NReportTAGSTools {
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                 String text;
                 if (o == null) {
-                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
+                    text = OPDE.lang.getString("misc.commands.>>noselection<<");
                 } else if (o instanceof NReportTAGS) {
                     NReportTAGS tag = (NReportTAGS) o;
                     text = tag.getBezeichnung() + " ("+tag.getKurzbezeichnung()+")";

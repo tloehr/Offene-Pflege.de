@@ -505,16 +505,17 @@ public class PnlAllowance extends CleanablePanel {
         final CollapsiblePane cpYear = cpMap.get(key);
 
         DateTime to = new DateTime(year, 1, 1, 0, 0).dayOfYear().withMaximumValue();
-        final BigDecimal carry = AllowanceTools.getSUM(resident, to);
+        BigDecimal carry4screen = AllowanceTools.getSUM(resident, to);
+        final BigDecimal carry4print = AllowanceTools.getSUM(resident, to.minusYears(1));
 
         String title = "<html><table border=\"0\">" +
                 "<tr>" +
 
                 "<td width=\"520\" align=\"left\"><font size=+1>" + Integer.toString(year) + "</font></td>" +
                 "<td width=\"200\" align=\"right\">" +
-                (carry.compareTo(BigDecimal.ZERO) < 0 ? "<font color=\"red\">" : "") +
-                cf.format(carry) +
-                (carry.compareTo(BigDecimal.ZERO) < 0 ? "</font>" : "") +
+                (carry4screen.compareTo(BigDecimal.ZERO) < 0 ? "<font color=\"red\">" : "") +
+                cf.format(carry4screen) +
+                (carry4screen.compareTo(BigDecimal.ZERO) < 0 ? "</font>" : "") +
                 "</td>" +
 
                 "</tr>" +
@@ -553,7 +554,7 @@ public class PnlAllowance extends CleanablePanel {
         btnPrintYear.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                SYSFilesTools.print(AllowanceTools.getAsHTML(AllowanceTools.getYear(resident, start.toDate()), carry, currentResident), true);
+                SYSFilesTools.print(AllowanceTools.getAsHTML(AllowanceTools.getYear(resident, start.toDate()), carry4print, currentResident), true);
             }
 
 
@@ -633,16 +634,17 @@ public class PnlAllowance extends CleanablePanel {
         }
         final CollapsiblePane cpMonth = cpMap.get(key);
 
-        final DateTime to = new DateTime(month).dayOfMonth().withMaximumValue();
-        final BigDecimal carry = AllowanceTools.getSUM(resident, to);
+        DateTime to = new DateTime(month).dayOfMonth().withMaximumValue();
+        final BigDecimal carry4screen = AllowanceTools.getSUM(resident, to);
+        final BigDecimal carry4print = AllowanceTools.getSUM(resident, to.minusMonths(1));
         String title = "<html><table border=\"0\">" +
                 "<tr>" +
 
                 "<td width=\"520\" align=\"left\">" + monthFormatter.format(month.toDate()) + "</td>" +
                 "<td width=\"200\" align=\"right\">" +
-                (carry.compareTo(BigDecimal.ZERO) < 0 ? "<font color=\"red\">" : "") +
-                cf.format(carry) +
-                (carry.compareTo(BigDecimal.ZERO) < 0 ? "</font>" : "") +
+                (carry4screen.compareTo(BigDecimal.ZERO) < 0 ? "<font color=\"red\">" : "") +
+                cf.format(carry4screen) +
+                (carry4screen.compareTo(BigDecimal.ZERO) < 0 ? "</font>" : "") +
                 "</td>" +
                 "</tr>" +
                 "</table>" +
@@ -681,7 +683,7 @@ public class PnlAllowance extends CleanablePanel {
                 if (!cashmap.containsKey(key)) {
                     cashmap.put(key, AllowanceTools.getMonth(resident, month.toDate()));
                 }
-                SYSFilesTools.print(AllowanceTools.getAsHTML(cashmap.get(key), carry, currentResident), true);
+                SYSFilesTools.print(AllowanceTools.getAsHTML(cashmap.get(key), carry4print, currentResident), true);
             }
         });
 
@@ -710,13 +712,13 @@ public class PnlAllowance extends CleanablePanel {
                     OPDE.getMainframe().setCurrentResident(currentResident);
                 }
 
-                cpMonth.setContentPane(createContentPanel4(resident, carry, month));
+                cpMonth.setContentPane(createContentPanel4(resident, carry4screen, month));
                 cpMonth.setOpaque(false);
             }
         });
 
         if (!cpMonth.isCollapsed()) {
-            cpMonth.setContentPane(createContentPanel4(resident, carry, month));
+            cpMonth.setContentPane(createContentPanel4(resident, carry4screen, month));
         }
 
         cpMonth.setHorizontalAlignment(SwingConstants.LEADING);

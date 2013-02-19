@@ -65,6 +65,7 @@ import op.tools.*;
 import op.users.PnlUser;
 import op.welcome.PnlWelcome;
 import org.apache.commons.collections.Closure;
+import org.apache.commons.io.FileUtils;
 import org.jdesktop.swingx.VerticalLayout;
 
 import javax.persistence.EntityManager;
@@ -76,6 +77,7 @@ import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
+import java.io.File;
 import java.net.URI;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -147,7 +149,10 @@ public class FrmMain extends JFrame {
 
         // StatusBar Setup
         final LabelStatusBarItem label = new LabelStatusBarItem("Line");
-        label.setText(OPDE.getLocalProps().getProperty("javax.persistence.jdbc.url") + " [Build " + OPDE.getAppInfo().getBuildnum() + "]");
+        label.setText(OPDE.getUrl() + " [Build " + OPDE.getAppInfo().getBuildnum() + "]");
+        if (OPDE.isCustomUrl()) {
+            label.setForeground(Color.RED);
+        }
         label.setFont(new Font("Arial", Font.PLAIN, 14));
         statusBar.add(label, JideBoxLayout.FLEXIBLE);
         labelUSER = new LabelStatusBarItem("Line");
@@ -207,6 +212,8 @@ public class FrmMain extends JFrame {
         if (OPDE.getLogin() != null) {
             logout();
         }
+        // Delete the pidfile if present
+        FileUtils.deleteQuietly(new File(OPDE.getOPWD() + File.separatorChar + "opde.pid"));
         System.exit(0);
     }
 
@@ -722,7 +729,8 @@ public class FrmMain extends JFrame {
                 if (o != null) {
                     afterLogin();
                 } else {
-                    System.exit(1);
+                    FileUtils.deleteQuietly(new File(OPDE.getOPWD() + File.separatorChar + "opde.pid"));
+                    System.exit(0);
                 }
             }
         });

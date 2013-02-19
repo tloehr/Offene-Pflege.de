@@ -894,7 +894,7 @@ public class PnlReport extends NursingRecordsPanel {
                         "</td>" +
                         "<td width=\"100\" align=\"left\">" + SYSTools.catchNull(NReportTools.getTagsAsHTML(nreport), " [", "]") + "</td>" +
                         "<td width=\"400\" align=\"left\">" +
-                        nreport.getText() +
+                        SYSTools.replace(nreport.getText(), "\n", "<br/>", false) +
                         "</td>" +
                         "<td width=\"200\" align=\"left\">" + nreport.getUser().getFullname() + "</td>" +
                         "</tr>" +

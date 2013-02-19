@@ -209,6 +209,8 @@ public class LogicalPrinters {
         PrintRequestAttributeSet aset = new HashPrintRequestAttributeSet();
         aset.add(MediaSizeName.ISO_A4);
 
+//        OPDE.info(flavor);
+
         try {
             PrintService ps = getPrintService(printer);
             if (ps != null) {

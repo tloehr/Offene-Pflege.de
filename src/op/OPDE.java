@@ -44,6 +44,7 @@ import op.tools.*;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.*;
+import org.eclipse.persistence.logging.JavaLog;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -173,6 +174,11 @@ public class OPDE {
         if (!OPDE.FTPisWORKING) {
             getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.ftpNotWorking"));
         }
+    }
+
+    public static boolean isCustomUrl(){
+        return !url.equals(localProps.getProperty("javax.persistence.jdbc.url"));
+
     }
 
     public static String getUrl() {
@@ -432,11 +438,12 @@ public class OPDE {
         opts.addOption("v", "version", false, "Zeigt die Versionsinformationen an.");
         opts.addOption("a", "anonym", false, "Blendet die Bewohnernamen in allen Ansichten aus. Spezieller Modus für Schulungsmaterial zu erstellen.");
         opts.addOption("l", "debug", false, "Schaltet alle Ausgaben ein auf der Konsole ein, auch die, die eigentlich nur während der Softwareentwicklung angezeigt werden.");
+//        opts.addOption("p", "pidfile", false, "Path to the pidfile which needs to be deleted when this application ends properly.");
 
-        Option konfigdir = OptionBuilder.hasOptionalArg().withDescription("Legt einen altenativen Pfad fest, in dem sich das .opde Verzeichnis befindet.").create("k");
-        opts.addOption(konfigdir);
+//        Option konfigdir = OptionBuilder.hasOptionalArg().withDescription("Legt einen altenativen Pfad fest, in dem sich das .opde Verzeichnis befindet.").create("k");
+//        opts.addOption(konfigdir);
 
-        opts.addOption(OptionBuilder.withLongOpt("jdbc").hasArg().withDescription("Setzt eine alternative URL zur Datenbank fest. Ersetzt die Angaben in der local.properties.").create("j"));
+        opts.addOption(OptionBuilder.withLongOpt("jdbc").hasArg().withDescription("Setzt eine alternative URL zur Datenbank fest. Ersetzt die Angaben in der opde.cfg.").create("j"));
 
         Option dfnimport = OptionBuilder //.withArgName("datum")
                 .withLongOpt("dfnimport").hasOptionalArg()
@@ -478,20 +485,7 @@ public class OPDE {
             System.exit(0);
         }
 
-        /***
-         *            _ _                        _   _                                _    _                   _ _        ___
-         *       __ _| | |_ ___ _ __ _ __   __ _| |_(_)_   _____  __      _____  _ __| | _(_)_ __   __ _    __| (_)_ __  |__ \
-         *      / _` | | __/ _ \ '__| '_ \ / _` | __| \ \ / / _ \ \ \ /\ / / _ \| '__| |/ / | '_ \ / _` |  / _` | | '__|   / /
-         *     | (_| | | ||  __/ |  | | | | (_| | |_| |\ V /  __/  \ V  V / (_) | |  |   <| | | | | (_| | | (_| | | |     |_|
-         *      \__,_|_|\__\___|_|  |_| |_|\__,_|\__|_| \_/ \___|   \_/\_/ \___/|_|  |_|\_\_|_| |_|\__, |  \__,_|_|_|     (_)
-         *                                                                                         |___/
-         */
-        if (cl.hasOption("k")) {
-            String homedir = cl.getOptionValue("k");
-            opwd = homedir + sep + AppInfo.dirBase;
-        } else {
-            opwd = System.getProperty("user.home") + sep + AppInfo.dirBase;
-        }
+        opwd = System.getProperty("user.home") + sep + AppInfo.dirBase;
 
         /***
          *                                                                ___
@@ -590,8 +584,9 @@ public class OPDE {
             // Turn of JPA Cache
             jpaProps.put("eclipselink.cache.shared.default", "false");
             jpaProps.put("eclipselink.session.customizer", "op.system.JPAEclipseLinkSessionCustomizer");
-//            jpaProps.put("eclipselink.logging.level", JavaLog.FINE_LABEL);
+//            jpaProps.put("eclipselink.logging.level", JavaLog.FINEST_LABEL);
             emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
+
 
             /***
              *     __     __            _
@@ -674,6 +669,11 @@ public class OPDE {
                 }
                 System.exit(0);
             }
+
+
+            // to speed things later. The first connection loads the while JPA system.
+            EntityManager em1 = createEM();
+            em1.close();
 
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
             setStandardFont();

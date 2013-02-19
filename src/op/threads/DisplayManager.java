@@ -293,7 +293,7 @@ public class DisplayManager extends Thread {
                 jp.setValue(progressBarMessage.getPercentage());
             }
 
-            jp.setString(progressBarMessage.getRawMessage());
+            jp.setString(SYSTools.catchNull(progressBarMessage.getMessage()));
         } else {
             if (jp.getValue() > 0) {
 //                OPDE.debug("jp.setValue(0)");

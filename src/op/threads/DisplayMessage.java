@@ -171,9 +171,9 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         return message; //SYSTools.toHTML(SYSConst.html_div_open + message + SYSConst.html_div_close);
     }
 
-    public String getRawMessage() {
-        return message;
-    }
+//    public String getRawMessage() {
+//        return message;
+//    }
 
     public void setMessage(String message) {
         this.message = message;

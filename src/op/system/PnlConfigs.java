@@ -6,6 +6,8 @@ package op.system;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import entity.Station;
+import entity.StationTools;
 import entity.prescription.MedStock;
 import entity.system.SYSPropsTools;
 import op.OPDE;
@@ -13,12 +15,16 @@ import op.tools.CleanablePanel;
 import op.tools.PrintListElement;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.awt.print.PrinterGraphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.math.BigInteger;
 
 /**
  * @author Torsten Löhr
@@ -27,6 +33,8 @@ public class PnlConfigs extends CleanablePanel {
     public static final String internalClassID = "opde.config";
     private MedStock testStock;
 
+    private boolean configsHaveBeenSaved = false;
+
     public PnlConfigs(JScrollPane jspSearch) {
         jspSearch.setViewportView(new JPanel());
         initComponents();
@@ -34,32 +42,48 @@ public class PnlConfigs extends CleanablePanel {
     }
 
     private void btnTestLabelActionPerformed(ActionEvent e) {
-
-        // TODO: Sicherstellen, dass vorher die Config gesichert wurde
-        LogicalPrinter localPrinter = OPDE.getLogicalPrinters().getMapName2LogicalPrinter().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_LOGICAL_PRINTER));
-        PrinterForm printerForm1 = localPrinter.getForms().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL));
-
-        OPDE.getPrintProcessor().addPrintJob(new PrintListElement(testStock, localPrinter, printerForm1, OPDE.getProps().getProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER)));
-    }
-
-
-    private void txtStockIDFocusLost(FocusEvent e) {
+        if (!configsHaveBeenSaved) return;
 
         try {
-            long stockid = Long.parseLong(txtStockID.getText());
+            //            long stockid = Long.parseLong(txtStockID.getText());
             EntityManager em = OPDE.createEM();
-            testStock = em.find(MedStock.class, stockid);
+            Query query = em.createNativeQuery("SELECT BestID FROM medstock ORDER BY RAND() LIMIT 0,1");
+            if (!query.getResultList().isEmpty()) {
+                testStock = em.find(MedStock.class, ((BigInteger) query.getResultList().get(0)).longValue());
+            }
             em.close();
         } catch (Exception e1) {
             testStock = null;
 
         }
-        btnTestLabel.setEnabled(testStock != null);
-    }
+        if (testStock == null) return;
 
-    private void txtStockIDActionPerformed(ActionEvent e) {
-        btnTestLabel.requestFocus();
+        LogicalPrinter localPrinter = OPDE.getLogicalPrinters().getMapName2LogicalPrinter().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_LOGICAL_PRINTER));
+        PrinterForm printerForm1 = localPrinter.getForms().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL));
+
+        OPDE.getPrintProcessor().addPrintJob(new PrintListElement(testStock, localPrinter, printerForm1, OPDE.getProps().getProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER)));
     }
+//
+//
+//    private void txtStockIDFocusLost(FocusEvent e) {
+//        try {
+////            long stockid = Long.parseLong(txtStockID.getText());
+//            EntityManager em = OPDE.createEM();
+//            Query query = em.createNativeQuery("SELECT BestID FROM medstock ORDER BY RAND() LIMIT 0,1");
+//            if (!query.getResultList().isEmpty()) {
+//                testStock = em.find(MedStock.class, query.getResultList().get(0));
+//            }
+//            em.close();
+//        } catch (Exception e1) {
+//            testStock = null;
+//
+//        }
+//        btnTestLabel.setEnabled(testStock != null);
+//    }
+//
+//    private void txtStockIDActionPerformed(ActionEvent e) {
+//        btnTestLabel.requestFocus();
+//    }
 
     private void btnSaveActionPerformed(ActionEvent e) {
 
@@ -76,83 +100,91 @@ public class PnlConfigs extends CleanablePanel {
         }
 
         PrinterForm form = (PrinterForm) cmbForm.getSelectedItem();
-        if (form != null){
+        if (form != null) {
             OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL, ((PrinterForm) cmbForm.getSelectedItem()).getName());
             OPDE.getProps().setProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL, ((PrinterForm) cmbForm.getSelectedItem()).getName());
         }
 
         OPDE.saveLocalProps();
 
+        configsHaveBeenSaved = true;
+    }
+
+    private void cmbPrintersItemStateChanged(ItemEvent e) {
+        configsHaveBeenSaved = false;
+    }
+
+    private void cmbStationItemStateChanged(ItemEvent e) {
+        OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_STATION, ((Station) cmbStation.getSelectedItem()).getStatID().toString());
+        OPDE.saveLocalProps();
+        configsHaveBeenSaved = true;
     }
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         lblPrinters = new JLabel();
+        lblStation = new JLabel();
         cmbPhysicalPrinters = new JComboBox();
+        cmbStation = new JComboBox();
         cmbLogicalPrinters = new JComboBox();
         cmbForm = new JComboBox();
-        panel1 = new JPanel();
-        txtStockID = new JTextField();
-        hSpacer1 = new JPanel(null);
         btnTestLabel = new JButton();
+        panel1 = new JPanel();
         btnSave = new JButton();
 
         //======== this ========
         setLayout(new FormLayout(
-            "default, $lcgap, default:grow, $lcgap, default",
-            "6*(default, $lgap), default:grow"));
+            "default, 2*($lcgap, default:grow), $lcgap, default",
+            "6*(default, $lgap), default:grow, $lgap, default, $lgap, 14dlu"));
 
         //---- lblPrinters ----
         lblPrinters.setText("Etiketten-Drucker");
         lblPrinters.setFont(new Font("Arial", Font.BOLD, 18));
         add(lblPrinters, CC.xy(3, 3));
+
+        //---- lblStation ----
+        lblStation.setText("Etiketten-Drucker");
+        lblStation.setFont(new Font("Arial", Font.BOLD, 18));
+        add(lblStation, CC.xy(5, 3));
         add(cmbPhysicalPrinters, CC.xy(3, 5));
+
+        //---- cmbStation ----
+        cmbStation.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                cmbStationItemStateChanged(e);
+            }
+        });
+        add(cmbStation, CC.xy(5, 5));
         add(cmbLogicalPrinters, CC.xy(3, 7));
         add(cmbForm, CC.xy(3, 9));
 
-        //======== panel1 ========
-        {
-            panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
-
-            //---- txtStockID ----
-            txtStockID.setToolTipText("StockID");
-            txtStockID.addFocusListener(new FocusAdapter() {
-                @Override
-                public void focusLost(FocusEvent e) {
-                    txtStockIDFocusLost(e);
-                }
-            });
-            txtStockID.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    txtStockIDActionPerformed(e);
-                }
-            });
-            panel1.add(txtStockID);
-            panel1.add(hSpacer1);
-
-            //---- btnTestLabel ----
-            btnTestLabel.setText("Test");
-            btnTestLabel.setEnabled(false);
-            btnTestLabel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnTestLabelActionPerformed(e);
-                }
-            });
-            panel1.add(btnTestLabel);
-        }
-        add(panel1, CC.xy(3, 11));
-
-        //---- btnSave ----
-        btnSave.setText("Save");
-        btnSave.addActionListener(new ActionListener() {
+        //---- btnTestLabel ----
+        btnTestLabel.setText("Test");
+        btnTestLabel.setEnabled(false);
+        btnTestLabel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                btnSaveActionPerformed(e);
+                btnTestLabelActionPerformed(e);
             }
         });
-        add(btnSave, CC.xy(3, 13, CC.RIGHT, CC.BOTTOM));
+        add(btnTestLabel, CC.xy(3, 11));
+
+        //======== panel1 ========
+        {
+            panel1.setLayout(new BoxLayout(panel1, BoxLayout.LINE_AXIS));
+
+            //---- btnSave ----
+            btnSave.setText("Save");
+            btnSave.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnSaveActionPerformed(e);
+                }
+            });
+            panel1.add(btnSave);
+        }
+        add(panel1, CC.xywh(3, 15, 3, 1, CC.RIGHT, CC.DEFAULT));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
@@ -276,23 +308,32 @@ public class PnlConfigs extends CleanablePanel {
             }
         }
 
-        txtStockID.setEnabled(prservices != null);
+//        txtStockID.setEnabled(prservices != null);
         btnTestLabel.setEnabled(prservices != null);
         cmbForm.setEnabled(prservices != null);
         cmbLogicalPrinters.setEnabled(prservices != null);
         cmbPhysicalPrinters.setEnabled(prservices != null);
         btnSave.setEnabled(prservices != null);
+
+
+        lblPrinters.setText(OPDE.lang.getString(internalClassID + ".labelPrinters"));
+        lblStation.setText(OPDE.lang.getString(internalClassID + ".station"));
+        btnSave.setText(OPDE.lang.getString(internalClassID + ".btnsave"));
+
+        cmbStation.setModel(StationTools.getAll4Combobox(false));
+        cmbStation.setSelectedItem(StationTools.getStationForThisHost());
+
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JLabel lblPrinters;
+    private JLabel lblStation;
     private JComboBox cmbPhysicalPrinters;
+    private JComboBox cmbStation;
     private JComboBox cmbLogicalPrinters;
     private JComboBox cmbForm;
-    private JPanel panel1;
-    private JTextField txtStockID;
-    private JPanel hSpacer1;
     private JButton btnTestLabel;
+    private JPanel panel1;
     private JButton btnSave;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

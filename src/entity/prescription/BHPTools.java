@@ -216,6 +216,9 @@ public class BHPTools {
         System.out.println(OPDE.lang.getString(internalClassID + ".progress"));
 
         for (PrescriptionSchedule pSchedule : list) {
+            int numbhpbefore = numbhp;
+            OPDE.debug("generation for schedule: " + pSchedule.toString());
+            OPDE.debug("targetdate: " + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()));
             row = row.add(BigDecimal.ONE);
             SYSTools.printProgBar(row.divide(maxrows, 2, BigDecimal.ROUND_UP).multiply(new BigDecimal(100)).intValue());
 
@@ -307,11 +310,15 @@ public class BHPTools {
 
                 }
             }
+            OPDE.debug("number of bhps for this run: " + Integer.toString(numbhp - numbhpbefore));
         }
 
         System.out.println();
         System.out.println(OPDE.lang.getString(internalClassID + ".numCreatedEntities") + " [" + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()) + "]: " + numbhp);
         System.out.println("------------------------------------------");
+
+        OPDE.debug("number of bhps overall: " + Integer.toString(numbhp));
+        OPDE.debug("------------------------------------------");
 
         return numbhp;
     }

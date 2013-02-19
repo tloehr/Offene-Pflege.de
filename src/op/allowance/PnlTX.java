@@ -234,8 +234,11 @@ public class PnlTX extends JPanel {
             //cmbResident.setEditable(true);
         }
 
+        // TODO: change min, when combobox changes
         ResInfo firstStay = ResInfoTools.getFirstResinfo(tx.getResident(), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
         min = firstStay == null ? new DateMidnight().dayOfMonth().withMinimumValue() : new DateMidnight(firstStay.getFrom());
+
+        OPDE.debug(min);
 
         setFocusCycleRoot(true);
         setFocusTraversalPolicy(new FocusTraversalPolicy() {

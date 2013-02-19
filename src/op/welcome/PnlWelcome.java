@@ -163,7 +163,6 @@ public class PnlWelcome extends CleanablePanel {
                     Collections.sort(processList);
                     int max = processList.size() + birthdayList.size() + noStoolList.size() + violatingLiquidValues.size();
 
-
                     if (!processList.isEmpty()) {
                         String title = "<html><font size=+1>" +
                                 OPDE.lang.getString(PnlProcess.internalClassID) +
@@ -221,6 +220,15 @@ public class PnlWelcome extends CleanablePanel {
                         }
                         cp.setContentPane(pnlContent);
                         cpsWelcome.add(cp);
+                    }
+
+                    if (max == 0){
+                        JPanel pnlContent = new JPanel(new VerticalLayout());
+                        JLabel lbl = new JLabel(OPDE.lang.getString("misc.msg.noEntries"));
+                        lbl.setFont(SYSConst.ARIAL18BOLD);
+                        pnlContent.add(lbl);
+
+                        cpsWelcome.add(pnlContent);
                     }
 
                     return null;

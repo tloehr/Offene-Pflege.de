@@ -814,8 +814,6 @@ public class PnlPrescription extends NursingRecordsPanel {
                                     Collections.sort(lstPrescriptions);
 
                                     // Refresh Display
-//                                    final String oldkey = oldPrescription.getID() + ".xprescription";
-//                                    cpMap.remove(oldkey);
                                     createCP4(oldPrescription);
                                     final CollapsiblePane myNewCP = createCP4(newPrescription);
                                     buildPanel();

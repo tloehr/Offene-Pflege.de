@@ -50,7 +50,6 @@ public class DlgReport extends MyJDialog {
         this.actionBlock = actionBlock;
         initComponents();
         initDialog();
-//        pack();
         setVisible(true);
     }
 
@@ -174,6 +173,8 @@ public class DlgReport extends MyJDialog {
 
                 //---- txtBericht ----
                 txtBericht.setFont(new Font("Arial", Font.PLAIN, 14));
+                txtBericht.setWrapStyleWord(true);
+                txtBericht.setLineWrap(true);
                 txtBericht.addCaretListener(new CaretListener() {
                     @Override
                     public void caretUpdate(CaretEvent e) {

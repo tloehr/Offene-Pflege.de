@@ -137,6 +137,14 @@
              <string>font</string> 
              <object idref="Font0"/> 
             </void> 
+            <void method="setProperty"> 
+             <string>wrapStyleWord</string> 
+             <boolean>true</boolean> 
+            </void> 
+            <void method="setProperty"> 
+             <string>lineWrap</string> 
+             <boolean>true</boolean> 
+            </void> 
             <void property="name"> 
              <string>txtBericht</string> 
             </void> 
