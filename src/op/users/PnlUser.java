@@ -25,6 +25,7 @@
  */
 package op.users;
 
+import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.pane.event.CollapsiblePaneAdapter;
@@ -47,6 +48,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -64,8 +67,11 @@ import java.util.Random;
 public class PnlUser extends CleanablePanel {
     public static final String internalClassID = "opde.users";
 
+    private final int TAB_USER = 0;
+    private final int TAB_GROUPS = 1;
+
     private boolean initPhase = false;
-    private JToggleButton tbOldUsers, tbShowUsers, tbShowGroups;
+    private JToggleButton tbOldUsers;//, tbShowUsers, tbShowGroups;
     private ButtonGroup bg1;
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
@@ -125,6 +131,14 @@ public class PnlUser extends CleanablePanel {
         usermap = new HashMap<String, Users>();
         OPDE.getDisplayManager().setMainMessage(OPDE.getAppInfo().getInternalClasses().get(internalClassID).getShortDescription());
         prepareSearchArea();
+        tabMain.setTitleAt(TAB_USER, OPDE.lang.getString(internalClassID + ".tab.users"));
+        tabMain.setTitleAt(TAB_GROUPS, OPDE.lang.getString(internalClassID + ".tab.groups"));
+        tabMain.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                buildPanel();
+            }
+        });
     }
 
 
@@ -211,8 +225,13 @@ public class PnlUser extends CleanablePanel {
         usermap.clear();
         contentMap.clear();
         cpMap.clear();
-        cpMain.removeAll();
+        cpsGroups.removeAll();
+        cpsUsers.removeAll();
         searchPanes.removeAll();
+    }
+
+    private void tabMainStateChanged(ChangeEvent e) {
+
     }
 
     @Override
@@ -229,22 +248,46 @@ public class PnlUser extends CleanablePanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        scrollPane1 = new JScrollPane();
-        cpMain = new CollapsiblePanes();
+        tabMain = new JTabbedPane();
+        jspUsers = new JScrollPane();
+        cpsUsers = new CollapsiblePanes();
+        jspGroups = new JScrollPane();
+        cpsGroups = new CollapsiblePanes();
 
         //======== this ========
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
-        //======== scrollPane1 ========
+        //======== tabMain ========
         {
+            tabMain.setFont(new Font("Arial", Font.PLAIN, 18));
 
-            //======== cpMain ========
+            //======== jspUsers ========
             {
-                cpMain.setLayout(new BoxLayout(cpMain, BoxLayout.X_AXIS));
+
+                //======== cpsUsers ========
+                {
+                    cpsUsers.setLayout(new BoxLayout(cpsUsers, BoxLayout.X_AXIS));
+                }
+                jspUsers.setViewportView(cpsUsers);
             }
-            scrollPane1.setViewportView(cpMain);
+            tabMain.addTab("text", jspUsers);
+
+
+            //======== jspGroups ========
+            {
+
+                //======== cpsGroups ========
+                {
+                    cpsGroups.setLayout(new FormLayout(
+                            "default, $lcgap, default",
+                            "2*(default, $lgap), default"));
+                }
+                jspGroups.setViewportView(cpsGroups);
+            }
+            tabMain.addTab("text", jspGroups);
+
         }
-        add(scrollPane1);
+        add(tabMain);
     }// </editor-fold>//GEN-END:initComponents
 
 
@@ -310,41 +353,41 @@ public class PnlUser extends CleanablePanel {
         list.add(tbOldUsers);
 
 
-        /***
-         *      _   _    ____  _                   _   _                      ______
-         *     | |_| |__/ ___|| |__   _____      _| | | |___  ___ _ __ ___   / / ___|_ __ ___  _   _ _ __  ___
-         *     | __| '_ \___ \| '_ \ / _ \ \ /\ / / | | / __|/ _ \ '__/ __| / / |  _| '__/ _ \| | | | '_ \/ __|
-         *     | |_| |_) |__) | | | | (_) \ V  V /| |_| \__ \  __/ |  \__ \/ /| |_| | | | (_) | |_| | |_) \__ \
-         *      \__|_.__/____/|_| |_|\___/ \_/\_/  \___/|___/\___|_|  |___/_/  \____|_|  \___/ \__,_| .__/|___/
-         *                                                                                          |_|
-         */
-        tbShowUsers = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".filter.showusers"));
-        tbShowUsers.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
-                if (initPhase || itemEvent.getStateChange() == ItemEvent.DESELECTED) return;
-                buildPanel();
-            }
-        });
-        tbShowUsers.setHorizontalAlignment(SwingConstants.LEFT);
-        list.add(tbShowUsers);
-
-        tbShowGroups = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".filter.showgroups"));
-        tbShowGroups.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
-                if (initPhase || itemEvent.getStateChange() == ItemEvent.DESELECTED) return;
-                buildPanel();
-            }
-        });
-        tbShowGroups.setHorizontalAlignment(SwingConstants.LEFT);
-        list.add(tbShowGroups);
-
-        bg1 = new ButtonGroup();
-        bg1.add(tbShowGroups);
-        bg1.add(tbShowUsers);
-
-        tbShowUsers.setSelected(true);
+//        /***
+//         *      _   _    ____  _                   _   _                      ______
+//         *     | |_| |__/ ___|| |__   _____      _| | | |___  ___ _ __ ___   / / ___|_ __ ___  _   _ _ __  ___
+//         *     | __| '_ \___ \| '_ \ / _ \ \ /\ / / | | / __|/ _ \ '__/ __| / / |  _| '__/ _ \| | | | '_ \/ __|
+//         *     | |_| |_) |__) | | | | (_) \ V  V /| |_| \__ \  __/ |  \__ \/ /| |_| | | | (_) | |_| | |_) \__ \
+//         *      \__|_.__/____/|_| |_|\___/ \_/\_/  \___/|___/\___|_|  |___/_/  \____|_|  \___/ \__,_| .__/|___/
+//         *                                                                                          |_|
+//         */
+//        tbShowUsers = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".filter.showusers"));
+//        tbShowUsers.addItemListener(new ItemListener() {
+//            @Override
+//            public void itemStateChanged(ItemEvent itemEvent) {
+//                if (initPhase || itemEvent.getStateChange() == ItemEvent.DESELECTED) return;
+//                buildPanel();
+//            }
+//        });
+//        tbShowUsers.setHorizontalAlignment(SwingConstants.LEFT);
+//        list.add(tbShowUsers);
+//
+//        tbShowGroups = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".filter.showgroups"));
+//        tbShowGroups.addItemListener(new ItemListener() {
+//            @Override
+//            public void itemStateChanged(ItemEvent itemEvent) {
+//                if (initPhase || itemEvent.getStateChange() == ItemEvent.DESELECTED) return;
+//                buildPanel();
+//            }
+//        });
+//        tbShowGroups.setHorizontalAlignment(SwingConstants.LEFT);
+//        list.add(tbShowGroups);
+//
+//        bg1 = new ButtonGroup();
+//        bg1.add(tbShowGroups);
+//        bg1.add(tbShowUsers);
+//
+//        tbShowUsers.setSelected(true);
 
 
         return list;
@@ -366,6 +409,9 @@ public class PnlUser extends CleanablePanel {
         btnAddUser.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
+                if (tabMain.getSelectedIndex() != TAB_USER) {
+                    tabMain.setSelectedIndex(TAB_USER);
+                }
                 new DlgUser(new Users(), new Closure() {
                     @Override
                     public void execute(Object o) {
@@ -408,26 +454,31 @@ public class PnlUser extends CleanablePanel {
         btnAddGroup.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-//                    new DlgProcess(new QProcess(resident), new Closure() {
-//                        @Override
-//                        public void execute(Object o) {
-//                            if (o != null) {
-//                                EntityManager em = OPDE.createEM();
-//                                try {
-//                                    em.getTransaction().begin();
-//                                    QProcess qProcess = em.merge((QProcess) o);
-//                                    em.getTransaction().commit();
-//                                    processList.add(qProcess);
-//                                    qProcessMap.put(qProcess, createCP4(qProcess));
-//                                    buildPanel();
-//                                } catch (Exception e) {
-//                                    em.getTransaction().rollback();
-//                                } finally {
-//                                    em.close();
-//                                }
-//                            }
-//                        }
-//                    });
+                if (tabMain.getSelectedIndex() != TAB_GROUPS) {
+                    tabMain.setSelectedIndex(TAB_GROUPS);
+                }
+                new DlgGroup(new Groups(), new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        if (o != null) {
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                Groups myGroup = em.merge((Groups) o);
+                                em.getTransaction().commit();
+                                createCP4(myGroup);
+                                lstGroups.add(myGroup);
+                                buildPanel();
+                            } catch (Exception e) {
+//                                em.getTransaction().rollback();
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+                            }
+                        }
+                    }
+                });
+
             }
         });
         list.add(btnAddGroup);
@@ -440,13 +491,13 @@ public class PnlUser extends CleanablePanel {
          *     |_.__/ \__|_| |_|_|   |_|  |_|_| |_|\__|
          *
          */
-        JideButton btnPrint = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.print"), SYSConst.icon22print2, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-
-            }
-        });
-        list.add(btnPrint);
+//        JideButton btnPrint = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.print"), SYSConst.icon22print2, new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent actionEvent) {
+//
+//            }
+//        });
+//        list.add(btnPrint);
 
 
         return list;
@@ -885,26 +936,34 @@ public class PnlUser extends CleanablePanel {
     }
 
     private void buildPanel() {
-        cpMain.removeAll();
-        cpMain.setLayout(new JideBoxLayout(cpMain, JideBoxLayout.Y_AXIS));
-        Collections.sort(lstUsers);
-        Collections.sort(lstGroups);
-        if (tbShowUsers.isSelected()) {
+
+        if (tabMain.getSelectedIndex() == TAB_USER) {
+            cpsUsers.removeAll();
+            cpsUsers.setLayout(new JideBoxLayout(cpsUsers, JideBoxLayout.Y_AXIS));
+            Collections.sort(lstUsers);
             for (Users user : lstUsers) {
                 if (tbOldUsers.isSelected() || user.isActive()) {
-                    cpMain.add(cpMap.get(user.getUID() + ".xusers"));
+                    cpsUsers.add(cpMap.get(user.getUID() + ".xusers"));
                 }
             }
+            cpsUsers.addExpansion();
         } else {
+            cpsGroups.removeAll();
+            cpsGroups.setLayout(new JideBoxLayout(cpsGroups, JideBoxLayout.Y_AXIS));
+            Collections.sort(lstGroups);
             for (Groups group : lstGroups) {
-                cpMain.add(cpMap.get(group.getGID() + ".xgroups"));
+                cpsGroups.add(cpMap.get(group.getGID() + ".xgroups"));
             }
+            cpsGroups.addExpansion();
         }
-        cpMain.addExpansion();
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JScrollPane scrollPane1;
-    private CollapsiblePanes cpMain;
+    private JTabbedPane tabMain;
+    private JScrollPane jspUsers;
+    private CollapsiblePanes cpsUsers;
+    private JScrollPane jspGroups;
+    private CollapsiblePanes cpsGroups;
     // End of variables declaration//GEN-END:variables
 }

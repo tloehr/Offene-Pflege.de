@@ -93,6 +93,7 @@
                long="Medikamente eingeben, buchen, korrigieren. All das können Sie hier." main="true"
                javaclass="op.care.med.PnlMed" icon="agt_virussafe.png">
             <execute langbundle="appinfo.default.acl.execute"/>
+            <insert langbundle="appinfo.default.acl.insert"/>
         </class>
         <class name="opde.users" short="Benutzerverwaltung"
                long="Benutzer- und Gruppenverwaltung" main="true"
@@ -103,7 +104,7 @@
                long="Hier wird die Dienstübergabe behandelt" main="true"
                javaclass="op.care.supervisor.PnlHandover" icon="meeting.png">
             <execute langbundle="appinfo.default.acl.execute"/>
-            <insert langbundle="appinfo.default.acl.update"/>
+            <insert langbundle="appinfo.default.acl.insert"/>
         </class>
         <class name="nursingrecords.inventory" short="Medikamentenbestände"
                long="Dies ist die Bestandsveraltung für Medikamente">

@@ -105,8 +105,6 @@ public class DlgNewStocks extends MyJDialog {
 
         } else {
 
-            OPDE.getDisplayManager().setDBActionMessage(true);
-
             String pzn = MedPackageTools.parsePZN(txtMedSuche.getText());
             if (pzn != null) { // Hier sucht man nach einer PZN. Im Barcode ist das führende 'ß' enthalten.
                 EntityManager em = OPDE.createEM();
@@ -132,8 +130,6 @@ public class DlgNewStocks extends MyJDialog {
 
             }
             cmbMProduktItemStateChanged(null);
-
-            OPDE.getDisplayManager().setDBActionMessage(false);
         }
         setApply();
     }
@@ -256,8 +252,8 @@ public class DlgNewStocks extends MyJDialog {
         //======== mainPane ========
         {
             mainPane.setLayout(new FormLayout(
-                    "14dlu, $lcgap, default, $lcgap, 39dlu, $lcgap, default:grow, $lcgap, 14dlu",
-                    "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
+                "14dlu, $lcgap, default, $lcgap, 39dlu, $lcgap, default:grow, $lcgap, 14dlu",
+                "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
 
             //---- jLabel1 ----
             jLabel1.setText("PZN oder Suchbegriff");
@@ -301,7 +297,7 @@ public class DlgNewStocks extends MyJDialog {
             mainPane.add(jLabel3, CC.xy(3, 5));
 
             //---- cmbMProdukt ----
-            cmbMProdukt.setModel(new DefaultComboBoxModel(new String[]{
+            cmbMProdukt.setModel(new DefaultComboBoxModel(new String[] {
 
             }));
             cmbMProdukt.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -344,7 +340,7 @@ public class DlgNewStocks extends MyJDialog {
             mainPane.add(jLabel6, CC.xy(3, 7));
 
             //---- cmbPackung ----
-            cmbPackung.setModel(new DefaultComboBoxModel(new String[]{
+            cmbPackung.setModel(new DefaultComboBoxModel(new String[] {
 
             }));
             cmbPackung.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -738,7 +734,11 @@ public class DlgNewStocks extends MyJDialog {
             dcbm.insertElementAt("<Sonderpackung>", 0);
             cmbPackung.setModel(dcbm);
             cmbPackung.setRenderer(MedPackageTools.getMedPackungRenderer());
-            cmbPackung.setSelectedIndex(cmbPackung.getModel().getSize() - 1);
+            if (aPackage == null) {
+                cmbPackung.setSelectedIndex(cmbPackung.getModel().getSize() - 1);
+            } else {
+                cmbPackung.setSelectedItem(aPackage);
+            }
             cmbPackungItemStateChanged(null);
         } else {
             cmbPackung.setModel(new DefaultComboBoxModel());

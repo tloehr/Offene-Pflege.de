@@ -85,8 +85,10 @@ public class MedPackageTools {
      */
     public static String parsePZN(String pzn) {
         pzn = pzn.trim();
-        if (pzn.matches("^ß?\\d{7,8}")) {
-            pzn = (pzn.startsWith("ß") ? pzn.substring(1) : pzn);
+        pzn = pzn.replaceAll( "[^\\d]", "");
+
+        if (pzn.matches("^\\d{7,8}")) {
+//            pzn = (pzn.startsWith("ß") ? pzn.substring(1) : pzn);
 
             // this is only temporarily until the PZN7's are gone completely. it may take some years.
             if (pzn.length() == 7) {

@@ -522,11 +522,11 @@ public class PnlBHP extends NursingRecordsPanel {
                  *                             |_|   |_|      |___/
                  */
                 JButton btnApply = new JButton(SYSConst.icon22apply);
-                btnApply.setPressedIcon(SYSConst.icon22applyPressed);
+//                btnApply.setPressedIcon(SYSConst.icon22applyPressed);
                 btnApply.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                btnApply.setContentAreaFilled(false);
+//                btnApply.setContentAreaFilled(false);
                 btnApply.setToolTipText(OPDE.lang.getString(internalClassID + ".btnApply.tooltip"));
-                btnApply.setBorder(null);
+//                btnApply.setBorder(null);
                 btnApply.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
@@ -637,7 +637,9 @@ public class PnlBHP extends NursingRecordsPanel {
                 // TODO: Calc Medi here
                 btnApply.setEnabled(bhp.isOpen() && (!bhp.hasMed() || mapPrescription2Stock.containsKey(bhp.getPrescription())));
                 cptitle.getRight().add(btnApply);
-
+                JPanel spacer = new JPanel();
+                spacer.setOpaque(false);
+                cptitle.getRight().add(spacer);
 
                 /***
                  *      _     _         ____       __

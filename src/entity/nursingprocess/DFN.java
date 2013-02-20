@@ -311,29 +311,34 @@ public class DFN implements Serializable, Comparable<DFN> {
     public int compareTo(DFN other) {
 //        int result = this.getShift().compareTo(other.getShift());
         int result = 0;
+        // first by the nursing process, even if there isn't any
         if (result == 0) {
             result = SYSTools.nullCompare(this.nursingProcess, other.getNursingProcess());
         }
+        // then by the topic of the nursing process
         if (result == 0 && this.nursingProcess != null) {
             result = this.nursingProcess.getTopic().compareTo(other.getNursingProcess().getTopic());
         }
-        if (result == 0 && this.nursingProcess != null) {
-            result = new Long(this.nursingProcess.getID()).compareTo(new Long(other.getNursingProcess().getID()));
-        }
-//        if (result == 0) {
+        //
+//        if (result == 0 && this.nursingProcess != null) {
+//            result = new Long(this.nursingProcess.getID()).compareTo(new Long(other.getNursingProcess().getID()));
+//        }
+////        if (result == 0) {
 //            if (this.getNursingProcess() != null){
 //                result = dfnid.compareTo(new Long(getNursingProcess().getID()));
 //            }
 //        }
-        if (result == 0) {
-            result = sZeit.compareTo(other.getSollZeit());
-        }
-        if (result == 0 && sZeit == DFNTools.BYTE_TIMEOFDAY) {
-            result = soll.compareTo(other.getSoll());
-        }
+//        if (result == 0) {
+//            result = sZeit.compareTo(other.getSollZeit());
+//        }
+//        if (result == 0 && sZeit == DFNTools.BYTE_TIMEOFDAY) {
+//            result = soll.compareTo(other.getSoll());
+//        }
+        // then by the name of the intervention
         if (result == 0) {
             result = intervention.getBezeichnung().compareTo(other.getIntervention().getBezeichnung());
         }
+        // then, as a catch all case, simply by the id of the dfn
         if (result == 0) {
             result = dfnid.compareTo(other.getDfnid());
         }

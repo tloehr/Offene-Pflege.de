@@ -17,25 +17,88 @@
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormContainer"> 
-        <string>javax.swing.JScrollPane</string> 
+        <string>javax.swing.JTabbedPane</string> 
         <object class="com.jformdesigner.model.FormLayoutManager"> 
-         <class>javax.swing.JScrollPane</class> 
+         <class>javax.swing.JTabbedPane</class> 
         </object> 
+        <void method="setProperty"> 
+         <string>font</string> 
+         <object class="java.awt.Font"> 
+          <string>Arial</string> 
+          <int>0</int> 
+          <int>18</int> 
+         </object> 
+        </void> 
         <void property="name"> 
-         <string>scrollPane1</string> 
+         <string>tabMain</string> 
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormContainer"> 
-          <string>com.jidesoft.pane.CollapsiblePanes</string> 
+          <string>javax.swing.JScrollPane</string> 
           <object class="com.jformdesigner.model.FormLayoutManager"> 
-           <class>javax.swing.BoxLayout</class> 
-           <void method="setProperty"> 
-            <string>axis</string> 
-            <int>0</int> 
-           </void> 
+           <class>javax.swing.JScrollPane</class> 
           </object> 
           <void property="name"> 
-           <string>cpMain</string> 
+           <string>jspUsers</string> 
+          </void> 
+          <void method="add"> 
+           <object class="com.jformdesigner.model.FormContainer"> 
+            <string>com.jidesoft.pane.CollapsiblePanes</string> 
+            <object class="com.jformdesigner.model.FormLayoutManager"> 
+             <class>javax.swing.BoxLayout</class> 
+             <void method="setProperty"> 
+              <string>axis</string> 
+              <int>0</int> 
+             </void> 
+            </object> 
+            <void property="name"> 
+             <string>cpsUsers</string> 
+            </void> 
+           </object> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <null/> 
+          <void method="setProperty"> 
+           <string>title</string> 
+           <string>text</string> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormContainer"> 
+          <string>javax.swing.JScrollPane</string> 
+          <object class="com.jformdesigner.model.FormLayoutManager"> 
+           <class>javax.swing.JScrollPane</class> 
+          </object> 
+          <void property="name"> 
+           <string>jspGroups</string> 
+          </void> 
+          <void method="add"> 
+           <object class="com.jformdesigner.model.FormContainer"> 
+            <string>com.jidesoft.pane.CollapsiblePanes</string> 
+            <object class="com.jformdesigner.model.FormLayoutManager"> 
+             <class>com.jgoodies.forms.layout.FormLayout</class> 
+             <void method="setProperty"> 
+              <string>$columnSpecs</string> 
+              <string>default, labelcompgap, default</string> 
+             </void> 
+             <void method="setProperty"> 
+              <string>$rowSpecs</string> 
+              <string>default, linegap, default, linegap, default</string> 
+             </void> 
+            </object> 
+            <void property="name"> 
+             <string>cpsGroups</string> 
+            </void> 
+           </object> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <null/> 
+          <void method="setProperty"> 
+           <string>title</string> 
+           <string>text</string> 
           </void> 
          </object> 
         </void> 

@@ -85,6 +85,7 @@ public class DlgOpenStock extends MyJDialog {
         lbl2 = new JLabel();
         panel1 = new JPanel();
         btnClose = new JButton();
+        hSpacer1 = new JPanel(null);
         btnOK = new JButton();
 
         //======== this ========
@@ -134,6 +135,7 @@ public class DlgOpenStock extends MyJDialog {
                 }
             });
             panel1.add(btnClose);
+            panel1.add(hSpacer1);
 
             //---- btnOK ----
             btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
@@ -226,6 +228,7 @@ public class DlgOpenStock extends MyJDialog {
     private JLabel lbl2;
     private JPanel panel1;
     private JButton btnClose;
+    private JPanel hSpacer1;
     private JButton btnOK;
     // End of variables declaration//GEN-END:variables
 }

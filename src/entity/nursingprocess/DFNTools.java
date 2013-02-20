@@ -19,6 +19,7 @@ import javax.swing.*;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -388,8 +389,8 @@ public class DFNTools {
             String jpql = " SELECT dfn " +
                     " FROM DFN dfn " +
                     " WHERE dfn.resident = :resident " +
-                    " AND dfn.soll >= :von AND dfn.soll <= :bis " +
-                    " ORDER BY dfn.intervention.bezeichnung ";
+                    " AND dfn.soll >= :von AND dfn.soll <= :bis ";
+//                    " ORDER BY dfn.intervention.bezeichnung ";
 
 //                    " ORDER BY dfn.nursingProcess.id, dfn.sZeit, dfn.soll, dfn.intervention.bezeichnung, dfn.dfnid ";
 
@@ -400,7 +401,7 @@ public class DFNTools {
             query.setParameter("bis", new DateTime(date).toDateMidnight().plusDays(1).toDateTime().minusSeconds(1).toDate());
 
             listDFN = new ArrayList<DFN>(query.getResultList());
-//            Collections.sort(listDFN);
+            Collections.sort(listDFN);
 
         } catch (Exception se) {
             OPDE.fatal(se);

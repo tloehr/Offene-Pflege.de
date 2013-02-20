@@ -41,6 +41,10 @@ public class Groups implements Serializable, Comparable<Groups> {
         this.gid = null;
     }
 
+    public void setGid(String gid) {
+        this.gid = gid;
+    }
+
     public void setMembers(Collection<Users> members) {
         this.members = members;
     }
