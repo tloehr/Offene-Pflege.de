@@ -37,10 +37,7 @@ import op.OPDE;
 import op.system.InternalClass;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
-import op.tools.CleanablePanel;
-import op.tools.GUITools;
-import op.tools.SYSConst;
-import op.tools.SYSTools;
+import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 
@@ -515,51 +512,11 @@ public class PnlUser extends CleanablePanel {
 
         }
         final CollapsiblePane cp = cpMap.get(key);
-
-        /***
-         *      _   _ _____    _    ____  _____ ____
-         *     | | | | ____|  / \  |  _ \| ____|  _ \
-         *     | |_| |  _|   / _ \ | | | |  _| | |_) |
-         *     |  _  | |___ / ___ \| |_| | |___|  _ <
-         *     |_| |_|_____/_/   \_\____/|_____|_| \_\
-         *
-         */
-
-        JPanel titlePanelleft = new JPanel();
-        titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
-
-
-        /***
-         *      _     _       _    _           _   _                _   _                _
-         *     | |   (_)_ __ | | _| |__  _   _| |_| |_ ___  _ __   | | | | ___  __ _  __| | ___ _ __
-         *     | |   | | '_ \| |/ / '_ \| | | | __| __/ _ \| '_ \  | |_| |/ _ \/ _` |/ _` |/ _ \ '__|
-         *     | |___| | | | |   <| |_) | |_| | |_| || (_) | | | | |  _  |  __/ (_| | (_| |  __/ |
-         *     |_____|_|_| |_|_|\_\_.__/ \__,_|\__|\__\___/|_| |_| |_| |_|\___|\__,_|\__,_|\___|_|
-         *
-         */
-        JideButton btnUser = GUITools.createHyperlinkButton("<html><font size=+1>" +
+        DefaultCPTitle cptitle = new DefaultCPTitle("<html><font size=+1>" +
                 user.toString() +
                 (UsersTools.isQualified(user) ?
-                        ", Examen" : "") +
-                "</font></html>", null, null);
-
-        btnUser.setAlignmentX(Component.LEFT_ALIGNMENT);
-        btnUser.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                try {
-                    cp.setCollapsed(!cp.isCollapsed());
-                } catch (PropertyVetoException e) {
-                    OPDE.error(e);
-                }
-            }
-        });
-        btnUser.setForeground(user.isActive() ? Color.black : Color.gray);
-        titlePanelleft.add(btnUser);
-
-
-        JPanel titlePanelright = new JPanel();
-        titlePanelright.setLayout(new BoxLayout(titlePanelright, BoxLayout.LINE_AXIS));
+                        ", " + OPDE.lang.getString(internalClassID + ".qualifiedNurse") : "") +
+                "</font></html>", null);
 
 
         /***
@@ -612,55 +569,10 @@ public class PnlUser extends CleanablePanel {
                     em.close();
                 }
 
-
-//                new DlgChangePW(user, new Closure() {
-//                    @Override
-//                    public void execute(Object answer) {
-//                        if (answer != null) {
-//                            EntityManager em = OPDE.createEM();
-//                            try {
-//                                em.getTransaction().begin();
-//                                Users myUser = em.merge(user);
-//                                em.lock(myUser, LockModeType.OPTIMISTIC);
-//                                myUser.setMd5pw(SYSTools.hashword(answer.toString()));
-//                                em.getTransaction().commit();
-//
-////                                lstUsers.remove(user);
-////                                lstUsers.add(myUser);
-////                                Collections.sort(lstUsers);
-////                                CollapsiblePane cp = createCP4(myUser);
-////                                boolean wasCollapsed = userMap.get(user).isCollapsed();
-////                                userMap.remove(user);
-////                                userMap.put(myUser, cp);
-////                                cp.setCollapsed(wasCollapsed);
-//                                buildPanel();
-//
-//                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".pwchanged")));
-//
-//                            } catch (OptimisticLockException ole) {
-//                                if (em.getTransaction().isActive()) {
-//                                    em.getTransaction().rollback();
-//                                }
-//                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-//                                    OPDE.getMainframe().emptyFrame();
-//                                    OPDE.getMainframe().afterLogin();
-//                                }
-//                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-//                            } catch (Exception e) {
-//                                if (em.getTransaction().isActive()) {
-//                                    em.getTransaction().rollback();
-//                                }
-//                                OPDE.fatal(e);
-//                            } finally {
-//                                em.close();
-//                            }
-//                        }
-//                    }
-//                });
             }
         });
         btnChangePW.setEnabled(user.isActive());
-        titlePanelright.add(btnChangePW);
+        cptitle.getRight().add(btnChangePW);
 
         /***
          *      _     _            _        _   _           ___                  _   _
@@ -719,26 +631,73 @@ public class PnlUser extends CleanablePanel {
 
 
         });
-        titlePanelright.add(btnActiveInactive);
+        cptitle.getRight().add(btnActiveInactive);
 
-        titlePanelleft.setOpaque(false);
-        titlePanelright.setOpaque(false);
-        JPanel titlePanel = new JPanel();
-        titlePanel.setOpaque(false);
+        /***
+         *               _ _ _
+         *       ___  __| (_) |_
+         *      / _ \/ _` | | __|
+         *     |  __/ (_| | | |_
+         *      \___|\__,_|_|\__|
+         *
+         */
+        final JButton btnEdit = new JButton(SYSConst.icon22edit3);
+        btnEdit.setPressedIcon(SYSConst.icon22edit3Pressed);
+        btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnEdit.setContentAreaFilled(false);
+        btnEdit.setBorder(null);
+        btnEdit.setToolTipText(OPDE.lang.getString(internalClassID + ".btnEdit"));
+        btnEdit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
 
-        titlePanel.setLayout(new GridBagLayout());
-        ((GridBagLayout) titlePanel.getLayout()).columnWidths = new int[]{0, 80};
-        ((GridBagLayout) titlePanel.getLayout()).columnWeights = new double[]{1.0, 1.0};
+                new DlgUser(user, new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        if (o != null) {
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                Users myUser = em.merge((Users) o);
+                                em.lock(myUser, LockModeType.OPTIMISTIC);
+                                em.getTransaction().commit();
+                                lstUsers.remove(user);
+                                lstUsers.add(myUser);
+                                usermap.put(myUser.getUID(), myUser);
+                                Collections.sort(lstUsers);
+                                CollapsiblePane cp = createCP4(myUser);
+                                boolean wasCollapsed = cpMap.get(key).isCollapsed();
+                                cpMap.put(key, cp);
 
-        titlePanel.add(titlePanelleft, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
-                new Insets(0, 0, 0, 5), 0, 0));
+                                cp.setCollapsed(myUser.isActive() ? wasCollapsed : true);
+                                buildPanel();
+                            } catch (OptimisticLockException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+                            }
+                        }
+                    }
+                });
+            }
 
-        titlePanel.add(titlePanelright, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-                GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-                new Insets(0, 0, 0, 0), 0, 0));
 
-        cp.setTitleLabelComponent(titlePanel);
+        });
+        cptitle.getRight().add(btnEdit);
+
+        cp.setTitleLabelComponent(cptitle.getMain());
         cp.setSlidingDirection(SwingConstants.SOUTH);
 
 

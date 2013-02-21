@@ -85,6 +85,7 @@ public class Users implements Serializable, Comparable<Users> {
     private Collection<SYSLogin> logins;
 
     public Users() {
+        uid = null;
         groups = new ArrayList<Groups>();
         status = UsersTools.STATUS_ACTIVE;
     }

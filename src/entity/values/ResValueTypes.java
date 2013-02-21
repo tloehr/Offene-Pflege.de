@@ -196,4 +196,44 @@ public class ResValueTypes {
     public void setDefault3(BigDecimal default3) {
         this.default3 = default3;
     }
+
+
+    private String format1;
+
+    @Column(name = "format1", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
+    @Basic
+    public String getFormat1() {
+        return format1;
+    }
+
+    public void setFormat1(String format1) {
+        this.format1 = format1;
+    }
+
+    private String format2;
+
+    @Column(name = "format2", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
+    @Basic
+    public String getFormat2() {
+        return format2;
+    }
+
+    public void setFormat2(String format2) {
+        this.format2 = format2;
+    }
+
+
+    private String format3;
+
+    @Column(name = "format3", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
+    @Basic
+    public String getFormat3() {
+        return format3;
+    }
+
+    public void setFormat3(String format3) {
+        this.format3 = format3;
+    }
+
+
 }

@@ -299,29 +299,6 @@ public class ResValueTools {
         return list;
     }
 
-//    public static ArrayList<ResValue> getResValues(Resident resident, ResValueTypes vtype, DateTime month) {
-//        DateTime from = month.dayOfMonth().withMinimumValue();
-//        DateTime to = month.dayOfMonth().withMaximumValue();
-//
-//        EntityManager em = OPDE.createEM();
-//        Query query = em.createQuery("" +
-//                " SELECT rv FROM ResValue rv " +
-//                " WHERE rv.resident = :resident " +
-//                " AND rv.replacedBy IS NULL " +
-//                " AND rv.vtype = :vtype" +
-//                " AND rv.pit >= :from" +
-//                " AND rv.pit <= :to" +
-//                " ORDER BY rv.pit DESC ");
-//        query.setParameter("resident", resident);
-//        query.setParameter("vtype", vtype);
-//        query.setParameter("from", from.toDate());
-//        query.setParameter("to", to.toDate());
-//        ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
-//        em.close();
-//
-//        return list;
-//    }
-
     public static ArrayList<ResValue> getResValues(Resident resident, ResValueTypes vtype, int year) {
 
         DateTime theYear = new DateTime(year, 1, 1, 0, 0, 0);
@@ -348,12 +325,17 @@ public class ResValueTools {
 
     public static String getValueAsHTML(ResValue rv) {
         String result = (rv.isDeleted() || rv.isReplaced() ? "<s>" : "");
-        NumberFormat dcf = DecimalFormat.getNumberInstance();
+//        NumberFormat dcf = DecimalFormat.getNumberInstance();
+
         if (rv.getType().getValType() == ResValueTypesTools.RR) {
-            result += "<b>" + dcf.format(rv.getVal1()) + "/" + dcf.format(rv.getVal2()) + " " + rv.getType().getUnit1() + " " + rv.getType().getLabel3() + ": " + dcf.format(rv.getVal3()) + " " + rv.getType().getUnit3() + "</b>";
+            DecimalFormat dcf1 = new DecimalFormat(rv.getType().getFormat1());
+            DecimalFormat dcf2 = new DecimalFormat(rv.getType().getFormat2());
+            DecimalFormat dcf3 = new DecimalFormat(rv.getType().getFormat3());
+            result += "<b>" + dcf1.format(rv.getVal1()) + "/" + dcf2.format(rv.getVal2()) + " " + rv.getType().getUnit1() + " " + rv.getType().getLabel3() + ": " + dcf3.format(rv.getVal3()) + " " + rv.getType().getUnit3() + "</b>";
         } else if (rv.getType().getValType() == ResValueTypesTools.STOOL || rv.getType().getValType() == ResValueTypesTools.VOMIT) {
             result += "<i>" + SYSTools.catchNull(rv.getText(), "--") + "</i>";
         } else {
+            DecimalFormat dcf = new DecimalFormat(rv.getType().getFormat1());
             result += "<b>" + dcf.format(rv.getVal1()) + " " + rv.getType().getUnit1() + "</b>";
         }
         result += (rv.isDeleted() || rv.isReplaced() ? "</s>" : "");

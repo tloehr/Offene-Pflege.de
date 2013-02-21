@@ -6,9 +6,7 @@ package op.users;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.files.SYSFilesTools;
 import entity.system.Users;
-import entity.system.UsersTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
@@ -17,14 +15,11 @@ import org.apache.commons.collections.Closure;
 
 import javax.persistence.EntityManager;
 import javax.swing.*;
-import javax.swing.event.CaretEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.io.IOException;
-import java.util.Random;
 
 /**
  * @author Torsten Löhr
@@ -39,18 +34,36 @@ public class DlgUser extends MyJDialog {
         this.user = user;
         this.callback = callback;
         initComponents();
-        pack();
+        initPanel();
+//        pack();
         setVisible(true);
     }
 
+    private void initPanel() {
+
+        lblFirstname.setText(OPDE.lang.getString("misc.msg.firstname"));
+        lblName.setText(OPDE.lang.getString("misc.msg.name"));
+        lblPW.setText(OPDE.lang.getString("misc.msg.password"));
+        lblUID.setText(OPDE.lang.getString("misc.msg.uid"));
+        lblEmail.setText(OPDE.lang.getString("misc.msg.email"));
+
+        txtName.setText(user.getName());
+        txtEMail.setText(user.getEMail());
+        txtVorname.setText(user.getVorname());
+        txtUID.setText(user.getUID());
+
+        txtPW.setEnabled(user.getUID() == null);
+        txtUID.setEnabled(user.getUID() == null);
+    }
+
     private void txtNameFocusLost(FocusEvent e) {
-        if (!txtName.getText().isEmpty() && !txtVorname.getText().isEmpty()) {
+        if (txtPW.isEnabled() && txtName.getText().isEmpty() && !txtVorname.getText().isEmpty()) {
             txtPW.setText(SYSTools.generatePassword(txtVorname.getText(), txtName.getText()));
         }
     }
 
     private void txtVornameFocusLost(FocusEvent e) {
-        if (!txtName.getText().isEmpty() && !txtVorname.getText().isEmpty()) {
+        if (txtPW.isEnabled() && !txtName.getText().isEmpty() && !txtVorname.getText().isEmpty()) {
             txtPW.setText(SYSTools.generatePassword(txtVorname.getText(), txtName.getText()));
         }
     }
@@ -63,16 +76,12 @@ public class DlgUser extends MyJDialog {
     @Override
     public void dispose() {
         super.dispose();
-        if (user != null){
-            SYSTools.printpw(txtPW.getText().trim(), user);
-        }
         callback.execute(user);
     }
 
 
-
     private void btnSaveActionPerformed(ActionEvent e) {
-        if (txtName.getText().isEmpty() || txtVorname.getText().isEmpty() || txtPW.getText().isEmpty() || txtUID.getText().isEmpty()) {
+        if (txtName.getText().isEmpty() || txtVorname.getText().isEmpty() || (txtPW.isEnabled() && txtPW.getText().isEmpty()) || txtUID.getText().isEmpty()) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.emptyentry"));
             return;
         }
@@ -82,21 +91,28 @@ public class DlgUser extends MyJDialog {
             return;
         }
 
-        EntityManager em = OPDE.createEM();
-        Users check4user = em.find(Users.class, txtUID.getText().trim());
-        if (check4user != null) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".uidtaken")));
-            return;
+        if (txtUID.isEnabled()) {
+            EntityManager em = OPDE.createEM();
+            Users check4user = em.find(Users.class, txtUID.getText().trim());
+            em.close();
+            if (check4user != null) {
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".uidtaken")));
+                return;
+            }
         }
 
-        user.setUID(txtUID.getText().trim());
         user.setEMail(txtEMail.getText().isEmpty() ? null : txtEMail.getText().trim());
         user.setVorname(txtVorname.getText().trim());
         user.setNachname(txtName.getText().trim());
-        user.setMd5pw(SYSTools.hashword(txtPW.getText()));
+
+        if (txtUID.isEnabled()) {
+            user.setMd5pw(SYSTools.hashword(txtPW.getText()));
+            user.setUID(txtUID.getText().trim());
+            SYSTools.printpw(txtPW.getText().trim(), user);
+        }
+
         dispose();
     }
-
 
 
     private void initComponents() {
@@ -123,8 +139,8 @@ public class DlgUser extends MyJDialog {
         //======== jPanel4 ========
         {
             jPanel4.setLayout(new FormLayout(
-                "14dlu, $lcgap, default, $lcgap, default:grow, $lcgap, 14dlu",
-                "14dlu, 4*($lgap, fill:default), 2*($lgap, default), $lgap, 14dlu"));
+                    "14dlu, $lcgap, default, $lcgap, default:grow, $lcgap, 14dlu",
+                    "14dlu, 4*($lgap, fill:default), $lgap, default, 9dlu, default, $lgap, 14dlu"));
 
             //---- lblUID ----
             lblUID.setText("UKennung");

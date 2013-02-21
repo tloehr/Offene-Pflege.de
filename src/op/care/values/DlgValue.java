@@ -89,27 +89,30 @@ public class DlgValue extends MyJDialog {
         BigDecimal bd = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
         if (bd == null) {
             ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(resValue.getVal1()));
-        } else {
-            ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(bd));
         }
+//        else {
+//            ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(bd));
+//        }
     }
 
     private void txtWert2FocusLost(FocusEvent e) {
         BigDecimal bd = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
         if (bd == null) {
             ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(resValue.getVal2()));
-        } else {
-            ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(bd));
         }
+//        else {
+//            ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(bd));
+//        }
     }
 
     private void txtWert3FocusLost(FocusEvent e) {
         BigDecimal bd = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
         if (bd == null) {
             ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(resValue.getVal3()));
-        } else {
-            ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(bd));
         }
+//        else {
+//            ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(bd));
+//        }
     }
 
     private boolean saveOK() {

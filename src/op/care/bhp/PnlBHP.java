@@ -474,8 +474,8 @@ public class PnlBHP extends NursingRecordsPanel {
         final CollapsiblePane bhpPane = new CollapsiblePane();
         bhpPane.setCollapseOnTitleClick(false);
 
-        JPanel titlePanelleft = new JPanel();
-        titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
+//        JPanel titlePanelleft = new JPanel();
+//        titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
 
         MedStock stock = mapPrescription2Stock.get(bhp.getPrescription());
         if (bhp.hasMed() && stock == null) {
