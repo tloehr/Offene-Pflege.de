@@ -48,6 +48,9 @@ new FormModel {
 					"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
 					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnCancelActionPerformed", true ) )
 				} )
+				add( new FormComponent( "com.jformdesigner.designer.wrapper.HSpacer" ) {
+					name: "hSpacer1"
+				} )
 				add( new FormComponent( "javax.swing.JButton" ) {
 					name: "btnOK"
 					"text": sfield com.jformdesigner.model.FormObject NULL_VALUE

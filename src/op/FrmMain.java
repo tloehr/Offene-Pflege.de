@@ -52,12 +52,12 @@ import op.care.PnlCare;
 import op.care.info.PnlInfo;
 import op.care.med.PnlMed;
 import op.care.supervisor.PnlHandover;
-import op.config.PnlUserSettings;
+import op.settings.PnlUserSettings;
 import op.controlling.PnlControlling;
 import op.process.PnlProcess;
 import op.system.DlgLogin;
 import op.system.InternalClassACL;
-import op.system.PnlConfigs;
+import op.settings.PnlSystemSettings;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.threads.PrintProcessor;
@@ -515,7 +515,7 @@ public class FrmMain extends JFrame {
                 previousProgButton.setBackground(Color.YELLOW);
                 previousProgButton.setOpaque(true);
                 displayManager.setMainMessage(OPDE.lang.getString(PnlWelcome.internalClassID));
-                displayManager.addSubMessage(new DisplayMessage(OPDE.lang.getString(PnlWelcome.internalClassID + ".longDescription"), 5));
+//                displayManager.addSubMessage(new DisplayMessage(OPDE.lang.getString(PnlWelcome.internalClassID + ".longDescription"), 5));
                 displayManager.clearAllIcons();
                 setPanelTo(new PnlWelcome(jspSearch));
             }
@@ -562,9 +562,9 @@ public class FrmMain extends JFrame {
             panel = new PnlWelcome(jspSearch);
         } else if (classname.equals("op.controlling.PnlControlling")) {
             panel = new PnlControlling(jspSearch);
-        } else if (classname.equals("op.system.PnlConfigs")) {
-            panel = new PnlConfigs(jspSearch);
-        } else if (classname.equals("op.config.PnlUserSettings")) {
+        } else if (classname.equals("op.settings.PnlSystemSettings")) {
+            panel = new PnlSystemSettings(jspSearch);
+        } else if (classname.equals("op.settings.PnlUserSettings")) {
             panel = new PnlUserSettings(jspSearch);
         }
         return panel;

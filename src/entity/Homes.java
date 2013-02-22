@@ -6,17 +6,12 @@ package entity;
 
 import entity.reports.Handovers;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import java.util.List;
 
 /**
- *
  * @author tloehr
  */
 @Entity
@@ -40,10 +35,13 @@ public class Homes implements Serializable {
     private String tel;
     @Column(name = "Fax")
     private String fax;
+    @Version
+    @Column(name = "version")
+    private Long version;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "home")
     private Collection<Handovers> handovers;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "home")
-    private Collection<Station> station;
+    private List<Station> station;
 
     public Homes() {
     }
@@ -120,5 +118,9 @@ public class Homes implements Serializable {
     @Override
     public String toString() {
         return bezeichnung;
+    }
+
+    public List<Station> getStations() {
+        return station;
     }
 }

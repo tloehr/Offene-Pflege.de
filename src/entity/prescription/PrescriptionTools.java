@@ -43,7 +43,7 @@ public class PrescriptionTools {
      * Nach einem Pagebreak wird der Name des aktuellen Bewohner nocheinmal wiederholt.
      * <p/>
      * Ein Mac OS Safari druckt mit diesen Werten sehr gut.
-     * Beim Firefox (about:config) sollten die Ränder wie folgt eingestellt werden:
+     * Beim Firefox (about:settings) sollten die Ränder wie folgt eingestellt werden:
      * <ul>
      * <li>print.print_margin_bottom = 0.3</li>
      * <li>print.print_margin_left = 0.1</li>

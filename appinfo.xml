@@ -22,10 +22,11 @@
                javaclass="op.controlling.PnlControlling" icon="kfind.png">
             <execute langbundle="appinfo.default.acl.execute"/>
         </class>
-        <class name="opde.config" short="System-Einstellungen"
+        <class name="opde.systemsettings" short="System-Einstellungen"
                long="Systemeinstellungen" main="true"
-               javaclass="op.system.PnlConfigs" icon="systemconfig.png">
+               javaclass="op.settings.PnlSystemSettings" icon="systemconfig.png">
             <execute langbundle="appinfo.default.acl.execute"/>
+            <manager langbundle="appinfo.default.acl.manager"/>
         </class>
         <class name="admin.residents.cash" short="Barbeträge"
                long="Dieses Programm dient der Verwaltung der sog. Taschengelder der BewohnerInnen" main="true"
@@ -37,9 +38,9 @@
             <execute langbundle="appinfo.default.acl.execute"/>
             <archive langbundle="appinfo.default.acl.archive"/>
         </class>
-        <class name="opde.usersettings" short="Benutzer-Einstellungen"
+        <class name="opde.usersettings" short="Deine Einstellungen"
                long="Hiermit kann man die eigene Konfiguration ändern." main="true"
-               javaclass="op.config.PnlUserSettings" icon="userconfig.png">
+               javaclass="op.settings.PnlUserSettings" icon="userconfig.png">
             <execute langbundle="appinfo.default.acl.execute"/>
         </class>
         <class name="opde.welcome" short="Startseite"

@@ -7,28 +7,17 @@ package entity;
 
 import entity.info.Resident;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
 
 /**
- *
  * @author tloehr
  */
 @Entity
 @Table(name = "station")
 
-public class Station implements Serializable {
+public class Station implements Serializable, Comparable<Station> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,6 +26,9 @@ public class Station implements Serializable {
     @Basic(optional = false)
     @Column(name = "Name")
     private String name;
+    @Version
+    @Column(name = "version")
+    private Long version;
     @JoinColumn(name = "EID", referencedColumnName = "EID")
     @ManyToOne
     private Homes home;
@@ -64,8 +56,8 @@ public class Station implements Serializable {
         return name;
     }
 
-    public void setBezeichnung(String bezeichnung) {
-        this.name = bezeichnung;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Homes getHome() {
@@ -76,7 +68,7 @@ public class Station implements Serializable {
         this.home = einrichtung;
     }
 
-    public Collection<Resident> getBewohnerAufDieserStation() {
+    public Collection<Resident> getResidents() {
         return bewohnerAufDieserStation;
     }
 
@@ -109,4 +101,8 @@ public class Station implements Serializable {
         return name;
     }
 
+    @Override
+    public int compareTo(Station o) {
+        return getName().toLowerCase().compareTo(o.getName().toLowerCase());
+    }
 }

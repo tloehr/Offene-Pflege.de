@@ -485,7 +485,7 @@ public class SYSConst {
     public static final Icon icon22deleteall = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/deleteall.png"));
     public static final Icon icon22deleteallPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/deleteall_pressed.png"));
     public static final Icon icon22down = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/1downarrow.png"));
-    public static final Icon icon22edit = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/kspread.png"));
+    public static final Icon icon22edit = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/edit3.png"));
     public static final Icon icon22edit3 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/edit3.png"));
     public static final Icon icon22menu = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/menu.png"));
     public static final Icon icon32menu = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/bw/menu.png"));

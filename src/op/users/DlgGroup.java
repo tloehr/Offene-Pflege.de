@@ -40,7 +40,7 @@ public class DlgGroup extends MyJDialog {
 
 
     private void initPanel() {
-        tbQualified = GUITools.getNiceToggleButton(internalClassID + ".qualified");
+        tbQualified = GUITools.getNiceToggleButton(PnlUser.internalClassID+".qualifiedGroup");
         tbQualified.setSelected(group.isQualified());
         txtText.setText(group.getDescription());
 
@@ -49,19 +49,13 @@ public class DlgGroup extends MyJDialog {
 
         lblGID.setText(OPDE.lang.getString(internalClassID + ".gid"));
         lblText.setText(OPDE.lang.getString(internalClassID + ".text"));
-        // TODO: Hier gehts weiter
-        getContentPane().add(tbQualified, CC.xyw(3, 7, 2));
+        getContentPane().add(tbQualified, CC.xyw(3, 7, 3, CC.LEFT, CC.DEFAULT));
 
-    }
-
-    public DlgGroup(Dialog owner) {
-        super(owner);
-        initComponents();
     }
 
     private void btnOKActionPerformed(ActionEvent e) {
         if (txtText.getText().trim().isEmpty() || (txtGID.getText().trim().isEmpty() && group.getGID() == null)) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("leer", DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.emptyentry", DisplayMessage.WARNING));
             return;
         }
 
@@ -70,7 +64,7 @@ public class DlgGroup extends MyJDialog {
             Groups myGroup = em.find(Groups.class, txtGID.getText().trim());
             em.close();
             if (myGroup != null) {
-                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("alread exists", DisplayMessage.WARNING));
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.alreadyExits", DisplayMessage.WARNING));
                 return;
             }
             group.setGid(txtGID.getText().trim());
@@ -93,6 +87,7 @@ public class DlgGroup extends MyJDialog {
         txtText = new JTextField();
         panel1 = new JPanel();
         btnCancel = new JButton();
+        hSpacer1 = new JPanel(null);
         btnOK = new JButton();
 
         //======== this ========
@@ -128,6 +123,7 @@ public class DlgGroup extends MyJDialog {
                 }
             });
             panel1.add(btnCancel);
+            panel1.add(hSpacer1);
 
             //---- btnOK ----
             btnOK.setText(null);
@@ -156,6 +152,7 @@ public class DlgGroup extends MyJDialog {
     private JTextField txtText;
     private JPanel panel1;
     private JButton btnCancel;
+    private JPanel hSpacer1;
     private JButton btnOK;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

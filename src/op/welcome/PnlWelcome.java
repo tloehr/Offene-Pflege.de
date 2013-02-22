@@ -115,7 +115,6 @@ public class PnlWelcome extends CleanablePanel {
                 JideButton progButton = GUITools.createHyperlinkButton(shortDescription, icon, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-
                         OPDE.getMainframe().clearPreviousProgbutton();
                         OPDE.getMainframe().setPanelTo(OPDE.getMainframe().loadPanel(javaclass));
                     }

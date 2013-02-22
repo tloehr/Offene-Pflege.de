@@ -2,7 +2,7 @@
  * Created by JFormDesigner on Thu Feb 14 15:09:30 CET 2013
  */
 
-package op.config;
+package op.settings;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
@@ -36,6 +36,9 @@ public class PnlUserSettings extends CleanablePanel {
     }
 
     private void initPanel() {
+        OPDE.getDisplayManager().setMainMessage(OPDE.lang.getString(internalClassID));
+        OPDE.getDisplayManager().clearAllIcons();
+
         lblPWTitle.setText(OPDE.lang.getString(internalClassID + ".pwtitle"));
         lblNew.setText(OPDE.lang.getString(internalClassID + ".newpw"));
         lblOld.setText(OPDE.lang.getString(internalClassID + ".oldpw"));

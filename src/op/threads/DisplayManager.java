@@ -181,6 +181,9 @@ public class DisplayManager extends Thread {
     public void clearAllIcons() {
         lblMain.setIcon(null);
         lblBiohazard.setVisible(false);
+        lblWarning.setVisible(false);
+        lblDiabetes.setVisible(false);
+        lblAllergy.setVisible(false);
     }
 
     public void setProgressBarMessage(DisplayMessage progressBarMessage) {

@@ -17,7 +17,7 @@ public class GroupsTools {
 
     public static ArrayList<Groups> getGroups() {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT g FROM Groups g ORDER BY g.description ");
+        Query query = em.createQuery("SELECT g FROM Groups g ORDER BY g.gid ");
         ArrayList<Groups> list = new ArrayList<Groups>(query.getResultList());
         em.close();
         return list;

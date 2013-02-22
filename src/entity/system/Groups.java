@@ -95,7 +95,7 @@ public class Groups implements Serializable, Comparable<Groups> {
 
     @Override
     public int compareTo(Groups o) {
-        return gid.compareTo(o.getGID());
+        return gid.toLowerCase().compareTo(o.getGID().toLowerCase());
     }
 
     @Override

@@ -56,7 +56,6 @@ import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Random;
 
 /**
  * @author tloehr
@@ -81,8 +80,6 @@ public class PnlUser extends CleanablePanel {
 
     private HashMap<String, Users> usermap;
 
-//    private HashMap<Groups, Pair<ArrayList<Users>, ArrayList<InternalClass>>> groupMap2;
-
 
     private Color fg, bg;
 
@@ -92,28 +89,6 @@ public class PnlUser extends CleanablePanel {
     public PnlUser(JScrollPane jspSearch) {
         this.jspSearch = jspSearch;
         initComponents();
-//        btnEnableUser.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/user_active.png")));
-//        btnEnableUser.setIcon(new javax.swing.ImageIcon(getClass().getResource("/artwork/22x22/user_inactive.png")));
-
-//        lstAllGroups.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-//
-//            @Override
-//            public void valueChanged(ListSelectionEvent lse) {
-//                if (!lse.getValueIsAdjusting()) {
-//
-//                    if (lstAllGroups.getSelectedIndex() >= 0) {
-//                        selectedGroup = (Groups) lstAllGroups.getSelectedValue();
-//                        EntityManager em1 = OPDE.createEM();
-//                        em1.refresh(selectedGroup);
-//                        em1.close();
-//                    } else {
-//                        selectedGroup = null;
-//                    }
-//                    setLeftSideOnGroupTab();
-//                    setRightSideOnGroupTab();
-//                }
-//            }
-//        });
 
         initPhase = true;
         initPanel();
@@ -288,14 +263,14 @@ public class PnlUser extends CleanablePanel {
     }// </editor-fold>//GEN-END:initComponents
 
 
-    private String generatePassword(String firstname, String lastname) {
-        Random generator = new Random(System.currentTimeMillis());
-        return lastname.substring(0, 1).toLowerCase() + firstname.substring(0, 1).toLowerCase() + SYSTools.padL(Integer.toString(generator.nextInt(9999)), 4, "0");
-//        selectedUser.setMd5pw(SYSTools.hashword(pw));
-//        if (JOptionPane.showConfirmDialog(this, "Das Passwort wurde auf '" + pw + "' gesetzt.\nMöchten Sie einen Beleg ausdrucken ?", "Passwort", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-//            print(pw);
-//        }
-    }
+//    private String generatePassword(String firstname, String lastname) {
+//        Random generator = new Random(System.currentTimeMillis());
+//        return lastname.substring(0, 1).toLowerCase() + firstname.substring(0, 1).toLowerCase() + SYSTools.padL(Integer.toString(generator.nextInt(9999)), 4, "0");
+////        selectedUser.setMd5pw(SYSTools.hashword(pw));
+////        if (JOptionPane.showConfirmDialog(this, "Das Passwort wurde auf '" + pw + "' gesetzt.\nMöchten Sie einen Beleg ausdrucken ?", "Passwort", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+////            print(pw);
+////        }
+//    }
 
 
     private void prepareSearchArea() {
@@ -338,7 +313,7 @@ public class PnlUser extends CleanablePanel {
          *      \__|_.__/ \___/|_|\__,_|\___/|___/\___|_|  |___/
          *
          */
-        tbOldUsers = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.filters.showclosed"));
+        tbOldUsers = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".showclosedmembers"));
         tbOldUsers.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
@@ -348,43 +323,6 @@ public class PnlUser extends CleanablePanel {
         });
         tbOldUsers.setHorizontalAlignment(SwingConstants.LEFT);
         list.add(tbOldUsers);
-
-
-//        /***
-//         *      _   _    ____  _                   _   _                      ______
-//         *     | |_| |__/ ___|| |__   _____      _| | | |___  ___ _ __ ___   / / ___|_ __ ___  _   _ _ __  ___
-//         *     | __| '_ \___ \| '_ \ / _ \ \ /\ / / | | / __|/ _ \ '__/ __| / / |  _| '__/ _ \| | | | '_ \/ __|
-//         *     | |_| |_) |__) | | | | (_) \ V  V /| |_| \__ \  __/ |  \__ \/ /| |_| | | | (_) | |_| | |_) \__ \
-//         *      \__|_.__/____/|_| |_|\___/ \_/\_/  \___/|___/\___|_|  |___/_/  \____|_|  \___/ \__,_| .__/|___/
-//         *                                                                                          |_|
-//         */
-//        tbShowUsers = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".filter.showusers"));
-//        tbShowUsers.addItemListener(new ItemListener() {
-//            @Override
-//            public void itemStateChanged(ItemEvent itemEvent) {
-//                if (initPhase || itemEvent.getStateChange() == ItemEvent.DESELECTED) return;
-//                buildPanel();
-//            }
-//        });
-//        tbShowUsers.setHorizontalAlignment(SwingConstants.LEFT);
-//        list.add(tbShowUsers);
-//
-//        tbShowGroups = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".filter.showgroups"));
-//        tbShowGroups.addItemListener(new ItemListener() {
-//            @Override
-//            public void itemStateChanged(ItemEvent itemEvent) {
-//                if (initPhase || itemEvent.getStateChange() == ItemEvent.DESELECTED) return;
-//                buildPanel();
-//            }
-//        });
-//        tbShowGroups.setHorizontalAlignment(SwingConstants.LEFT);
-//        list.add(tbShowGroups);
-//
-//        bg1 = new ButtonGroup();
-//        bg1.add(tbShowGroups);
-//        bg1.add(tbShowUsers);
-//
-//        tbShowUsers.setSelected(true);
 
 
         return list;
@@ -465,6 +403,7 @@ public class PnlUser extends CleanablePanel {
                                 em.getTransaction().commit();
                                 createCP4(myGroup);
                                 lstGroups.add(myGroup);
+                                Collections.sort(lstGroups);
                                 buildPanel();
                             } catch (Exception e) {
 //                                em.getTransaction().rollback();
@@ -516,7 +455,16 @@ public class PnlUser extends CleanablePanel {
                 user.toString() +
                 (UsersTools.isQualified(user) ?
                         ", " + OPDE.lang.getString(internalClassID + ".qualifiedNurse") : "") +
-                "</font></html>", null);
+                "</font></html>", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    cp.setCollapsed(!cp.isCollapsed());
+                } catch (PropertyVetoException pve) {
+                    // BAH!
+                }
+            }
+        });
 
 
         /***
@@ -745,7 +693,6 @@ public class PnlUser extends CleanablePanel {
                     cpMap.get(key).setContentPane(contentMap.get(key));
                 }
             });
-
             cpMap.get(key).setHorizontalAlignment(SwingConstants.LEADING);
             cpMap.get(key).setOpaque(false);
             try {
@@ -754,71 +701,83 @@ public class PnlUser extends CleanablePanel {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
 
+
         }
         final CollapsiblePane cp = cpMap.get(key);
 
-        /***
-         *      _   _ _____    _    ____  _____ ____
-         *     | | | | ____|  / \  |  _ \| ____|  _ \
-         *     | |_| |  _|   / _ \ | | | |  _| | |_) |
-         *     |  _  | |___ / ___ \| |_| | |___|  _ <
-         *     |_| |_|_____/_/   \_\____/|_____|_| \_\
-         *
-         */
-
-        JPanel titlePanelleft = new JPanel();
-        titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
-
-
-        /***
-         *      _     _       _    _           _   _                _   _                _
-         *     | |   (_)_ __ | | _| |__  _   _| |_| |_ ___  _ __   | | | | ___  __ _  __| | ___ _ __
-         *     | |   | | '_ \| |/ / '_ \| | | | __| __/ _ \| '_ \  | |_| |/ _ \/ _` |/ _` |/ _ \ '__|
-         *     | |___| | | | |   <| |_) | |_| | |_| || (_) | | | | |  _  |  __/ (_| | (_| |  __/ |
-         *     |_____|_|_| |_|_|\_\_.__/ \__,_|\__|\__\___/|_| |_| |_| |_|\___|\__,_|\__,_|\___|_|
-         *
-         */
-        JideButton btnGroup = GUITools.createHyperlinkButton("<html><font size=+1>" +
-                group.toString() +
+        DefaultCPTitle cpTitle = new DefaultCPTitle("<html><font size=+1>" +
+                group.getGID().toUpperCase() +
                 (group.isQualified() ?
                         ", " + OPDE.lang.getString(internalClassID + ".qualifiedGroup") : "") +
-                "</font></html>", null, null);
-
-        btnGroup.setAlignmentX(Component.LEFT_ALIGNMENT);
-        btnGroup.addActionListener(new ActionListener() {
+                "</font></html>", new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent actionEvent) {
+            public void actionPerformed(ActionEvent e) {
                 try {
                     cp.setCollapsed(!cp.isCollapsed());
-                } catch (PropertyVetoException e) {
-                    OPDE.error(e);
+                } catch (PropertyVetoException pve) {
+                    // BAH!
                 }
             }
         });
-        titlePanelleft.add(btnGroup);
+
+        /***
+         *          _      _      _
+         *       __| | ___| | ___| |_ ___    __ _ _ __ ___  _   _ _ __
+         *      / _` |/ _ \ |/ _ \ __/ _ \  / _` | '__/ _ \| | | | '_ \
+         *     | (_| |  __/ |  __/ ||  __/ | (_| | | | (_) | |_| | |_) |
+         *      \__,_|\___|_|\___|\__\___|  \__, |_|  \___/ \__,_| .__/
+         *                                  |___/                |_|
+         */
+        final JButton btnDeleteGroup = new JButton(SYSConst.icon22delete);
+        btnDeleteGroup.setPressedIcon(SYSConst.icon22deletePressed);
+        btnDeleteGroup.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnDeleteGroup.setContentAreaFilled(false);
+        btnDeleteGroup.setBorder(null);
+        btnDeleteGroup.setToolTipText(OPDE.lang.getString(internalClassID + ".btnDeleteGroup"));
+        btnDeleteGroup.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<br/><i>" + group.getGID() + "</i><br/>" + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        if (o.equals(JOptionPane.YES_OPTION)) {
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                Groups myGroup = em.merge(group);
+                                em.remove(myGroup);
+                                em.getTransaction().commit();
+                                lstGroups.remove(group);
+                                cpMap.remove(key);
+                                buildPanel();
+                            } catch (OptimisticLockException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+                            }
+                        }
+                    }
+                });
+
+            }
 
 
-        JPanel titlePanelright = new JPanel();
-        titlePanelright.setLayout(new BoxLayout(titlePanelright, BoxLayout.LINE_AXIS));
+        });
+        cpTitle.getRight().add(btnDeleteGroup);
 
-        titlePanelleft.setOpaque(false);
-        titlePanelright.setOpaque(false);
-        JPanel titlePanel = new JPanel();
-        titlePanel.setOpaque(false);
-
-        titlePanel.setLayout(new GridBagLayout());
-        ((GridBagLayout) titlePanel.getLayout()).columnWidths = new int[]{0, 80};
-        ((GridBagLayout) titlePanel.getLayout()).columnWeights = new double[]{1.0, 1.0};
-
-        titlePanel.add(titlePanelleft, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
-                new Insets(0, 0, 0, 5), 0, 0));
-
-        titlePanel.add(titlePanelright, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-                GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-                new Insets(0, 0, 0, 0), 0, 0));
-
-        cp.setTitleLabelComponent(titlePanel);
+        cp.setTitleLabelComponent(cpTitle.getMain());
 
         if (!cp.isCollapsed()) {
             if (!contentMap.containsKey(key)) {
@@ -832,6 +791,8 @@ public class PnlUser extends CleanablePanel {
 
     private JPanel createContentPanel4(final Groups group) {
         JPanel contentPanel = new JPanel(new VerticalLayout());
+        contentPanel.add(new JLabel(SYSTools.toHTMLForScreen(SYSConst.html_bold(group.getDescription()))));
+
         if (!group.isEveryone()) { // everyone does not need a membership.
             contentPanel.add(createMemberPanel4(group));
         }
