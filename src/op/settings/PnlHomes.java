@@ -1,80 +1,79 @@
 /*
- * Created by JFormDesigner on Mon Jul 09 15:57:43 CEST 2012
+ * Created by JFormDesigner on Sat Feb 23 12:00:49 CET 2013
  */
 
-package op.tools;
+package op.settings;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.prescription.Hospital;
+import entity.Homes;
 import op.OPDE;
+import op.tools.NonEmptyTextfieldVerifier;
+import op.tools.PopupPanel;
+import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
+import java.awt.event.ActionEvent;
+import java.util.UUID;
 
 /**
  * @author Torsten Löhr
  */
-public class PnlEditKH extends JPanel {
-    private Hospital kh;
+public class PnlHomes extends PopupPanel {
+    public static final String internalClassID = "opde.settings.pnlhomes";
+    private Homes home;
 
-    public PnlEditKH(Hospital kh) {
-        this.kh = kh;
+    public PnlHomes(Homes home) {
+        this.home = home;
         initComponents();
         initPanel();
     }
 
-    private void initPanel(){
-        lblKHName.setText(OPDE.lang.getString("misc.msg.name"));
+    private void initPanel() {
+        lblName.setText(OPDE.lang.getString(internalClassID + ".lblName"));
         lblStrasse.setText(OPDE.lang.getString("misc.msg.street"));
         lblPLZ.setText(OPDE.lang.getString("misc.msg.zipcode"));
         lblOrt.setText(OPDE.lang.getString("misc.msg.city"));
         lblTel.setText(OPDE.lang.getString("misc.msg.phone"));
         lblFax.setText(OPDE.lang.getString("misc.msg.fax"));
 
-        txtKHName.setText(kh.getName());
-        txtStrasse.setText(kh.getStrasse());
-        txtPLZ.setText(kh.getPlz());
-        txtOrt.setText(kh.getOrt());
-        txtTel.setText(kh.getTel());
-        txtFax.setText(kh.getFax());
+        txtName.setText(home.getName());
+        txtStrasse.setText(home.getStreet());
+        txtPLZ.setText(home.getZIP());
+        txtOrt.setText(home.getCity());
+        txtFax.setText(home.getFax());
+        txtTel.setText(home.getTel());
 
-        FocusAdapter fa = new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent focusEvent) {
-                ((JTextField) focusEvent.getSource()).selectAll();
-            }
-        };
 
-        txtKHName.addFocusListener(fa);
-        txtStrasse.addFocusListener(fa);
-        txtPLZ.addFocusListener(fa);
-        txtOrt.addFocusListener(fa);
-        txtTel.addFocusListener(fa);
-        txtFax.addFocusListener(fa);
+        txtName.setInputVerifier(new NonEmptyTextfieldVerifier());
+        txtStrasse.setInputVerifier(new NonEmptyTextfieldVerifier());
+        txtPLZ.setInputVerifier(new NonEmptyTextfieldVerifier());
+        txtOrt.setInputVerifier(new NonEmptyTextfieldVerifier());
+        txtTel.setInputVerifier(new NonEmptyTextfieldVerifier());
+        txtFax.setInputVerifier(new NonEmptyTextfieldVerifier());
+
     }
 
-    public Hospital getKrankenhaus(){
-        if (txtKHName.getText().isEmpty()){
-            return null;
-        }
+    @Override
+    public Object getResult() {
+        home.setName(txtName.getText().trim());
+        home.setStreet(txtStrasse.getText().trim());
+        home.setZip(txtPLZ.getText().trim());
+        home.setCity(txtOrt.getText().trim());
+        home.setTel(txtTel.getText().trim());
+        home.setFax(txtFax.getText().trim());
+        return home;
+    }
 
-        kh.setName(txtKHName.getText().trim());
-        kh.setStrasse(txtStrasse.getText().trim());
-        kh.setPlz(txtPLZ.getText().trim());
-        kh.setOrt(txtOrt.getText().trim());
-        kh.setTel(txtTel.getText().trim());
-        kh.setFax(txtFax.getText().trim());
-
-        return kh;
+    private boolean isSaveOK() {
+        return false;
     }
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
-        lblKHName = new JLabel();
-        txtKHName = new JTextField();
+        lblName = new JLabel();
+        txtName = new JTextField();
         lblStrasse = new JLabel();
         txtStrasse = new JTextField();
         lblPLZ = new JLabel();
@@ -88,68 +87,68 @@ public class PnlEditKH extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "default, $lcgap, default:grow",
-            "6*(default, $lgap), default"));
+            "2*(default, $lcgap), 162dlu:grow, $lcgap, default",
+            "7*(default, $lgap), default"));
 
-        //---- lblKHName ----
-        lblKHName.setText("Anrede");
-        lblKHName.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(lblKHName, CC.xy(1, 3));
+        //---- lblName ----
+        lblName.setText("Anrede");
+        lblName.setFont(new Font("Arial", Font.PLAIN, 14));
+        add(lblName, CC.xy(3, 3));
 
-        //---- txtKHName ----
-        txtKHName.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(txtKHName, CC.xy(3, 3));
+        //---- txtName ----
+        txtName.setFont(new Font("Arial", Font.PLAIN, 14));
+        add(txtName, CC.xy(5, 3));
 
         //---- lblStrasse ----
         lblStrasse.setText("text");
         lblStrasse.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(lblStrasse, CC.xy(1, 5));
+        add(lblStrasse, CC.xy(3, 5));
 
         //---- txtStrasse ----
         txtStrasse.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(txtStrasse, CC.xy(3, 5));
+        add(txtStrasse, CC.xy(5, 5));
 
         //---- lblPLZ ----
         lblPLZ.setText("text");
         lblPLZ.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(lblPLZ, CC.xy(1, 7));
+        add(lblPLZ, CC.xy(3, 7));
 
         //---- txtPLZ ----
         txtPLZ.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(txtPLZ, CC.xy(3, 7));
+        add(txtPLZ, CC.xy(5, 7));
 
         //---- lblOrt ----
         lblOrt.setText("text");
         lblOrt.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(lblOrt, CC.xy(1, 9));
+        add(lblOrt, CC.xy(3, 9));
 
         //---- txtOrt ----
         txtOrt.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(txtOrt, CC.xy(3, 9));
+        add(txtOrt, CC.xy(5, 9));
 
         //---- lblTel ----
         lblTel.setText("text");
         lblTel.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(lblTel, CC.xy(1, 11));
+        add(lblTel, CC.xy(3, 11));
 
         //---- txtTel ----
         txtTel.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(txtTel, CC.xy(3, 11));
+        add(txtTel, CC.xy(5, 11));
 
         //---- lblFax ----
         lblFax.setText("text");
         lblFax.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(lblFax, CC.xy(1, 13));
+        add(lblFax, CC.xy(3, 13));
 
         //---- txtFax ----
         txtFax.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(txtFax, CC.xy(3, 13));
+        add(txtFax, CC.xy(5, 13));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-    private JLabel lblKHName;
-    private JTextField txtKHName;
+    private JLabel lblName;
+    private JTextField txtName;
     private JLabel lblStrasse;
     private JTextField txtStrasse;
     private JLabel lblPLZ;

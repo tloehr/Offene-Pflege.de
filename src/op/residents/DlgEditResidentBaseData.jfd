@@ -294,6 +294,10 @@
          <string>font</string> 
          <object idref="Font0"/> 
         </void> 
+        <void method="setProperty"> 
+         <string>enabled</string> 
+         <boolean>false</boolean> 
+        </void> 
         <void property="name"> 
          <string>lblRoom</string> 
         </void> 
@@ -316,6 +320,10 @@
         <void method="setProperty"> 
          <string>font</string> 
          <object idref="Font0"/> 
+        </void> 
+        <void method="setProperty"> 
+         <string>enabled</string> 
+         <boolean>false</boolean> 
         </void> 
         <void property="name"> 
          <string>cmbRoom</string> 

@@ -23,7 +23,7 @@ public class HomesTools {
      * @return
      */
     public static String getAsText(Homes einrichtung) {
-        return einrichtung.getBezeichnung() + ", " + einrichtung.getStrasse() + ", " + einrichtung.getZIP() + " " + einrichtung.getOrt() + ", Tel.: " + einrichtung.getTel() + ", Fax.: " + einrichtung.getFax();
+        return einrichtung.getName() + ", " + einrichtung.getStreet() + ", " + einrichtung.getZIP() + " " + einrichtung.getCity() + ", Tel.: " + einrichtung.getTel() + ", Fax.: " + einrichtung.getFax();
     }
 
     /**

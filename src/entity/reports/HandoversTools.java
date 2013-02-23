@@ -116,7 +116,7 @@ public class HandoversTools {
         String result = "";
 
         String fonthead = "<font " + getHTMLColor(bericht) + ">";
-        result += bericht.getHome().getBezeichnung();
+        result += bericht.getHome().getName();
         result = fonthead + result + "</font>";
         return result;
     }

@@ -31,7 +31,6 @@ import javax.persistence.RollbackException;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
@@ -43,6 +42,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.UUID;
 
 /**
  * @author Torsten Löhr
@@ -53,6 +53,7 @@ public class PnlSystemSettings extends CleanablePanel {
     public static final String internalClassID = "opde.settings";
     private MedStock testStock;
     private HashMap<String, CollapsiblePane> cpMap;
+    private HashMap<String, JPanel> cpPanel;
     private ArrayList<Homes> listHomes;
 
     private boolean configsHaveBeenSaved = false;
@@ -60,6 +61,7 @@ public class PnlSystemSettings extends CleanablePanel {
     public PnlSystemSettings(JScrollPane jspSearch) {
         jspSearch.setViewportView(new JPanel());
         cpMap = new HashMap<String, CollapsiblePane>();
+        cpPanel = new HashMap<String, JPanel>();
         initComponents();
         initPanel();
     }
@@ -254,11 +256,69 @@ public class PnlSystemSettings extends CleanablePanel {
         em.close();
         cpsHomes.removeAll();
         cpsHomes.setLayout(new JideBoxLayout(cpsHomes, JideBoxLayout.Y_AXIS));
+        final JideButton btnAddHome = GUITools.createHyperlinkButton(internalClassID + ".btnAddHome", SYSConst.icon22add, null);
+        btnAddHome.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                final PnlHomes pnlHomes = new PnlHomes(new Homes(UUID.randomUUID().toString().substring(0, 15)));
+                JidePopup popup = GUITools.createPanelPopup(pnlHomes, new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        if (o != null) {
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                Homes home = em.merge((Homes) o);
+                                em.getTransaction().commit();
+                                createHomesList();
+                                OPDE.getMainframe().emptySearchArea();
+                                OPDE.getMainframe().prepareSearchArea();
+                            } catch (Exception e) {
+                                em.getTransaction().rollback();
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+                            }
+                        }
+                    }
+                }, btnAddHome);
+                GUITools.showPopup(popup, SwingConstants.SOUTH);
+            }
+        });
+        cpsHomes.add(btnAddHome);
         for (final Homes home : listHomes) {
-
             JPanel pnlContentH = new JPanel(new VerticalLayout());
-            JideButton btnAddTX = GUITools.createHyperlinkButton("add new station", null, null);
-            pnlContentH.add(btnAddTX);
+            final JideButton btnAddStation = GUITools.createHyperlinkButton(internalClassID + ".btnAddStation", SYSConst.icon22add, null);
+            btnAddStation.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JidePopup popup = GUITools.getTextEditor(null, 1, 40, new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            if (o != null && !o.toString().trim().isEmpty()) {
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    em.merge(new Station(o.toString(), em.merge(home)));
+                                    em.getTransaction().commit();
+                                    createHomesList();
+                                    OPDE.getMainframe().emptySearchArea();
+                                    OPDE.getMainframe().prepareSearchArea();
+                                } catch (Exception e) {
+                                    em.getTransaction().rollback();
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+                            }
+                        }
+                    }, btnAddStation);
+                    GUITools.showPopup(popup, SwingConstants.SOUTH);
+                }
+            });
+
+
+            pnlContentH.add(btnAddStation);
 
             Collections.sort(home.getStations());
 
@@ -275,55 +335,29 @@ public class PnlSystemSettings extends CleanablePanel {
                 btnEditStation.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        final JidePopup popup = new JidePopup();
-                        popup.setMovable(false);
-                        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
 
-                        final JTextArea editor = new JTextArea(station.getName(), 10, 40);
-                        editor.setLineWrap(false);
-                        editor.setWrapStyleWord(false);
-                        editor.setEditable(true);
-
-                        popup.getContentPane().add(new JScrollPane(editor));
-                        final JButton saveButton = new JButton(SYSConst.icon16apply);
-                        saveButton.addActionListener(new ActionListener() {
+                        final JidePopup popup = GUITools.getTextEditor(station.getName(), 1, 40, new Closure() {
                             @Override
-                            public void actionPerformed(ActionEvent actionEvent) {
-                                EntityManager em = OPDE.createEM();
-                                try {
-                                    em.getTransaction().begin();
-                                    popup.hidePopup();
-                                    Station myStation = em.merge(station);
-                                    myStation.setName(editor.getText().trim());
-                                    em.getTransaction().commit();
-                                    createHomesList();
-                                    OPDE.getMainframe().emptySearchArea();
-                                    OPDE.getMainframe().prepareSearchArea();
-                                } catch (Exception e) {
-                                    em.getTransaction().rollback();
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
+                            public void execute(Object o) {
+                                if (o != null && !o.toString().trim().isEmpty()) {
+                                    EntityManager em = OPDE.createEM();
+                                    try {
+                                        em.getTransaction().begin();
+                                        Station myStation = em.merge(station);
+                                        myStation.setName(o.toString().trim());
+                                        em.getTransaction().commit();
+                                        createHomesList();
+                                        OPDE.getMainframe().emptySearchArea();
+                                        OPDE.getMainframe().prepareSearchArea();
+                                    } catch (Exception e) {
+                                        em.getTransaction().rollback();
+                                        OPDE.fatal(e);
+                                    } finally {
+                                        em.close();
+                                    }
                                 }
                             }
-                        });
-
-                        saveButton.setHorizontalAlignment(SwingConstants.RIGHT);
-                        JPanel pnl = new JPanel(new BorderLayout(10, 10));
-                        JScrollPane pnlEditor = new JScrollPane(editor);
-
-                        pnl.add(pnlEditor, BorderLayout.CENTER);
-                        JPanel buttonPanel = new JPanel();
-                        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
-                        buttonPanel.add(saveButton);
-                        pnl.setBorder(new EmptyBorder(10, 10, 10, 10));
-                        pnl.add(buttonPanel, BorderLayout.SOUTH);
-
-                        popup.setOwner(btnEditStation);
-                        popup.removeExcludedComponent(btnEditStation);
-                        popup.getContentPane().add(pnl);
-                        popup.setDefaultFocusComponent(editor);
-
+                        }, btnEditStation);
                         GUITools.showPopup(popup, SwingConstants.SOUTH_WEST);
                     }
                 });
@@ -361,6 +395,7 @@ public class PnlSystemSettings extends CleanablePanel {
                                             em.remove(myStation);
                                             em.getTransaction().commit();
                                             createHomesList();
+                                            OPDE.getMainframe().emptySearchArea();
                                             OPDE.getMainframe().prepareSearchArea();
                                         } catch (RollbackException ole) {
                                             if (em.getTransaction().isActive()) {
@@ -389,7 +424,7 @@ public class PnlSystemSettings extends CleanablePanel {
                 pnlContentH.add(cpTitleS.getMain());
 
             }
-            String titleH = "<html><font size=+1><b>" + home.getBezeichnung() + "</b></font></html>";
+            String titleH = "<html><font size=+1><b>" + home.getName() + "</b></font></html>";
             DefaultCPTitle cpTitleH = new DefaultCPTitle(titleH, null);
 
             CollapsiblePane cpH = new CollapsiblePane();
@@ -541,7 +576,9 @@ public class PnlSystemSettings extends CleanablePanel {
 
     @Override
     public void cleanup() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        cpMap.clear();
+        cpPanel.clear();
+        cpsHomes.removeAll();
     }
 
     @Override

@@ -15,11 +15,14 @@ import org.jdesktop.core.animation.timing.interpolators.AccelerationInterpolator
 import org.jdesktop.swing.animation.timing.sources.SwingTimerTimingSource;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -480,5 +483,96 @@ public class GUITools {
         });
         pane.add(btnCollapseAll);
 
+    }
+
+    public static JidePopup getTextEditor(String preset, int rows, int cols, final Closure saveClosure, Component owner) {
+
+        final JidePopup popup = new JidePopup();
+        popup.setMovable(false);
+        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+
+        final JTextComponent editor = rows == 1 ? new JTextField(preset, cols) : new JTextArea(preset, rows, cols);
+        editor.setFont(SYSConst.ARIAL18);
+        if (rows > 1) {
+            ((JTextArea) editor).setLineWrap(false);
+            ((JTextArea) editor).setWrapStyleWord(false);
+        }
+        popup.getContentPane().add(new JScrollPane(editor));
+        final JButton saveButton = new JButton(SYSConst.icon16apply);
+
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                popup.hidePopup();
+                saveClosure.execute(editor.getText());
+            }
+        });
+
+        saveButton.setHorizontalAlignment(SwingConstants.RIGHT);
+        JPanel pnl = new JPanel(new BorderLayout(10, 10));
+        JScrollPane pnlEditor = new JScrollPane(editor);
+
+        pnl.add(pnlEditor, BorderLayout.CENTER);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
+        saveButton.setContentAreaFilled(false);
+        saveButton.setBorder(null);
+        saveButton.setBorderPainted(false);
+        buttonPanel.add(saveButton);
+        pnl.setBorder(new EmptyBorder(10, 10, 10, 10));
+        pnl.add(buttonPanel, BorderLayout.EAST);
+
+        popup.setOwner(owner);
+        popup.removeExcludedComponent(owner);
+        popup.getContentPane().add(pnl);
+        popup.setDefaultFocusComponent(editor);
+
+        return popup;
+    }
+
+    public static JidePopup createPanelPopup(final PopupPanel myPnl, final Closure saveAction, Component owner) {
+        final JidePopup popup = new JidePopup();
+        popup.setMovable(false);
+        JPanel pnl = new JPanel(new BorderLayout(10, 10));
+
+        pnl.add(myPnl, BorderLayout.CENTER);
+
+        JPanel btnPanel = new JPanel();
+        btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.X_AXIS));
+
+        JButton saveButton = new JButton(SYSConst.icon22apply);
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                popup.hidePopup();
+                saveAction.execute(myPnl.getResult());
+            }
+        });
+        saveButton.setContentAreaFilled(false);
+        saveButton.setBorder(null);
+        saveButton.setBorderPainted(false);
+        btnPanel.add(Box.createHorizontalGlue());
+        btnPanel.add(saveButton);
+        pnl.add(btnPanel, BorderLayout.SOUTH);
+
+        popup.setContentPane(pnl);
+        popup.setPreferredSize(pnl.getPreferredSize());
+        pnl.revalidate();
+        popup.setOwner(owner);
+        popup.removeExcludedComponent(owner);
+//        popup.removeExcludedComponent(pnl);
+        popup.setDefaultFocusComponent(pnl);
+        return popup;
+    }
+
+    public static boolean containsEmpty(ArrayList<JTextComponent> list){
+        boolean result = false;
+        for (JTextComponent comp : list){
+            if (comp.getText().trim().isEmpty()){
+                result = true;
+                break;
+            }
+        }
+        return result;
     }
 }

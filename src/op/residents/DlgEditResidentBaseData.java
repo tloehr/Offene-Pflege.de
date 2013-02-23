@@ -416,10 +416,12 @@ public class DlgEditResidentBaseData extends MyJDialog {
         //---- lblRoom ----
         lblRoom.setText("text");
         lblRoom.setFont(new Font("Arial", Font.PLAIN, 14));
+        lblRoom.setEnabled(false);
         contentPane.add(lblRoom, CC.xy(3, 11));
 
         //---- cmbRoom ----
         cmbRoom.setFont(new Font("Arial", Font.PLAIN, 14));
+        cmbRoom.setEnabled(false);
         contentPane.add(cmbRoom, CC.xywh(5, 11, 3, 1));
 
         //---- lblStation ----

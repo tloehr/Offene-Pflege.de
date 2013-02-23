@@ -9,6 +9,7 @@ import entity.info.Resident;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -35,13 +36,16 @@ public class Station implements Serializable, Comparable<Station> {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "station")
     private Collection<Rooms> rooms;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "station")
-    private Collection<Resident> bewohnerAufDieserStation;
+    private Collection<Resident> residents;
 
     public Station() {
     }
 
-    public Station(String name) {
+    public Station(String name, Homes home) {
         this.name = name;
+        this.home = home;
+        rooms = new ArrayList<Rooms>();
+        residents = new ArrayList<Resident>();
     }
 
     public Long getStatID() {
@@ -64,12 +68,8 @@ public class Station implements Serializable, Comparable<Station> {
         return home;
     }
 
-    public void setEinrichtung(Homes einrichtung) {
-        this.home = einrichtung;
-    }
-
     public Collection<Resident> getResidents() {
-        return bewohnerAufDieserStation;
+        return residents;
     }
 
     public Collection<Rooms> getRooms() {

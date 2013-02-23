@@ -17,7 +17,7 @@
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
-        <string>default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default</string> 
+        <string>default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default</string> 
        </void> 
       </object> 
       <void property="name"> 
@@ -50,7 +50,7 @@
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>1</int> 
+         <int>3</int> 
         </void> 
        </object> 
       </void> 
@@ -73,7 +73,7 @@
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>1</int> 
+         <int>3</int> 
         </void> 
        </object> 
       </void> 
@@ -100,7 +100,7 @@
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>3</int> 
+         <int>5</int> 
         </void> 
        </object> 
       </void> 
@@ -123,7 +123,7 @@
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>3</int> 
+         <int>5</int> 
         </void> 
        </object> 
       </void> 
@@ -150,7 +150,7 @@
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>5</int> 
+         <int>7</int> 
         </void> 
        </object> 
       </void> 
@@ -173,7 +173,7 @@
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>5</int> 
+         <int>7</int> 
         </void> 
        </object> 
       </void> 
@@ -200,7 +200,7 @@
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>7</int> 
+         <int>9</int> 
         </void> 
        </object> 
       </void> 
@@ -223,7 +223,7 @@
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>7</int> 
+         <int>9</int> 
         </void> 
        </object> 
       </void> 
@@ -250,7 +250,7 @@
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>9</int> 
+         <int>11</int> 
         </void> 
        </object> 
       </void> 
@@ -273,7 +273,7 @@
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>9</int> 
+         <int>11</int> 
         </void> 
        </object> 
       </void> 
@@ -296,7 +296,7 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>11</int> 
+         <int>13</int> 
         </void> 
        </object> 
       </void> 
@@ -319,7 +319,7 @@
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>11</int> 
+         <int>13</int> 
         </void> 
        </object> 
       </void> 

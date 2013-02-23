@@ -92,24 +92,24 @@ public class DlgText extends javax.swing.JDialog {
         GroupLayout contentPaneLayout = new GroupLayout(contentPane);
         contentPane.setLayout(contentPaneLayout);
         contentPaneLayout.setHorizontalGroup(
-                contentPaneLayout.createParallelGroup()
-                        .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addContainerGap(359, Short.MAX_VALUE)
-                                .addComponent(btnOk)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnCancel)
-                                .addContainerGap())
-                        .addComponent(pnlEditor, GroupLayout.DEFAULT_SIZE, 568, Short.MAX_VALUE)
+            contentPaneLayout.createParallelGroup()
+                .addGroup(contentPaneLayout.createSequentialGroup()
+                    .addContainerGap(359, Short.MAX_VALUE)
+                    .addComponent(btnOk)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(btnCancel)
+                    .addContainerGap())
+                .addComponent(pnlEditor, GroupLayout.DEFAULT_SIZE, 568, Short.MAX_VALUE)
         );
         contentPaneLayout.setVerticalGroup(
-                contentPaneLayout.createParallelGroup()
-                        .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                                .addComponent(pnlEditor, GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(btnCancel)
-                                        .addComponent(btnOk))
-                                .addContainerGap())
+            contentPaneLayout.createParallelGroup()
+                .addGroup(GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                    .addComponent(pnlEditor, GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addGroup(contentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnCancel)
+                        .addComponent(btnOk))
+                    .addContainerGap())
         );
         pack();
         setLocationRelativeTo(getOwner());

@@ -105,7 +105,7 @@ public class Rooms implements Serializable {
 
     @Override
     public String toString() {
-        return OPDE.lang.getString("misc.msg.room") + " " + text + ", " + station.getName() + ", " + station.getHome().getBezeichnung();
+        return OPDE.lang.getString("misc.msg.room") + " " + text + ", " + station.getName() + ", " + station.getHome().getName();
     }
 
 }

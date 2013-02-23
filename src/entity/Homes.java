@@ -10,6 +10,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author tloehr
@@ -24,13 +25,13 @@ public class Homes implements Serializable {
     @Column(name = "EID")
     private String eid;
     @Column(name = "Name")
-    private String bezeichnung;
+    private String name;
     @Column(name = "Str")
-    private String strasse;
+    private String street;
     @Column(name = "ZIP")
     private String zip;
     @Column(name = "City")
-    private String ort;
+    private String city;
     @Column(name = "Tel")
     private String tel;
     @Column(name = "Fax")
@@ -46,24 +47,28 @@ public class Homes implements Serializable {
     public Homes() {
     }
 
+    public Homes(String eid) {
+        this.eid = eid;
+    }
+
     public String getEID() {
         return eid;
     }
 
-    public String getBezeichnung() {
-        return bezeichnung;
+    public String getName() {
+        return name;
     }
 
-    public void setBezeichnung(String bezeichnung) {
-        this.bezeichnung = bezeichnung;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getStrasse() {
-        return strasse;
+    public String getStreet() {
+        return street;
     }
 
-    public void setStrasse(String strasse) {
-        this.strasse = strasse;
+    public void setStreet(String street) {
+        this.street = street;
     }
 
     public String getZIP() {
@@ -71,12 +76,12 @@ public class Homes implements Serializable {
     }
 
 
-    public String getOrt() {
-        return ort;
+    public String getCity() {
+        return city;
     }
 
-    public void setOrt(String ort) {
-        this.ort = ort;
+    public void setCity(String city) {
+        this.city = city;
     }
 
     public String getTel() {
@@ -93,6 +98,14 @@ public class Homes implements Serializable {
 
     public void setFax(String fax) {
         this.fax = fax;
+    }
+
+    public String getZip() {
+        return zip;
+    }
+
+    public void setZip(String zip) {
+        this.zip = zip;
     }
 
     @Override
@@ -117,7 +130,7 @@ public class Homes implements Serializable {
 
     @Override
     public String toString() {
-        return bezeichnung;
+        return name;
     }
 
     public List<Station> getStations() {

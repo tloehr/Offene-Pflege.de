@@ -1,0 +1,106 @@
+JFDML JFormDesigner: "5.1.0.2.64" Java: "1.6.0_33" encoding: "UTF-8"
+
+new FormModel {
+	contentType: "form/swing"
+	root: new FormRoot {
+		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
+			"$columnSpecs": "default, labelcompgap, default, labelcompgap, 162dlu:grow, labelcompgap, default"
+			"$rowSpecs": "default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default"
+		} ) {
+			name: "this"
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblName"
+				"text": "Anrede"
+				"font": &Font0 new java.awt.Font( "Arial", 0, 14 )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 3
+				"gridY": 3
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "txtName"
+				"font": #Font0
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 5
+				"gridY": 3
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblStrasse"
+				"text": "text"
+				"font": #Font0
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridY": 5
+				"gridX": 3
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "txtStrasse"
+				"font": #Font0
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 5
+				"gridY": 5
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblPLZ"
+				"text": "text"
+				"font": #Font0
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridY": 7
+				"gridX": 3
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "txtPLZ"
+				"font": #Font0
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 5
+				"gridY": 7
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblOrt"
+				"text": "text"
+				"font": #Font0
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridY": 9
+				"gridX": 3
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "txtOrt"
+				"font": #Font0
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 5
+				"gridY": 9
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblTel"
+				"text": "text"
+				"font": #Font0
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridY": 11
+				"gridX": 3
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "txtTel"
+				"font": #Font0
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 5
+				"gridY": 11
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblFax"
+				"text": "text"
+				"font": #Font0
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridY": 13
+				"gridX": 3
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "txtFax"
+				"font": #Font0
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 5
+				"gridY": 13
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 0 )
+			"size": new java.awt.Dimension( 445, 220 )
+		} )
+	}
+}

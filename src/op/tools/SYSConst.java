@@ -47,6 +47,7 @@ public class SYSConst {
     public static final Font ARIAL14 = new Font("Arial", Font.PLAIN, 14);
     public static final Font ARIAL14BOLD = new Font("Arial", Font.BOLD, 14);
     public static final Font ARIAL20 = new Font("Arial", Font.PLAIN, 20);
+    public static final Font ARIAL18 = new Font("Arial", Font.PLAIN, 18);
     public static final Font ARIAL18BOLD = new Font("Arial", Font.BOLD, 18);
     public static final Font ARIAL20BOLD = new Font("Arial", Font.BOLD, 20);
     public static final Font ARIAL28 = new Font("Arial", Font.PLAIN, 28);

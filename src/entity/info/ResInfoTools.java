@@ -1094,7 +1094,8 @@ public class ResInfoTools {
 
         em.close();
 
-        Station exResident = new Station(OPDE.lang.getString(PnlControlling.internalClassID + ".nursing.falls.exResidents"));
+        // virtual station. is never persisted
+        Station exResident = new Station(OPDE.lang.getString(PnlControlling.internalClassID + ".nursing.falls.exResidents"), null);
 
         // Init Maps
         HashMap<DateMidnight, HashMap<Station, Integer>> statMap = new HashMap<DateMidnight, HashMap<Station, Integer>>();

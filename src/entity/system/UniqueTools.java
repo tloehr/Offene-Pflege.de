@@ -23,8 +23,6 @@ public class UniqueTools {
      * @return long   UID
      */
     public static Unique getNewUID(EntityManager em, String prefix) throws Exception {
-
-        long newID = 0L;
         Query query = em.createQuery("SELECT u FROM Unique u WHERE u.prefix = :prefix");
         query.setParameter("prefix", SYSTools.catchNull(prefix).trim());
 
@@ -51,5 +49,5 @@ public class UniqueTools {
             }
         }
         return unique;
-    } // getUID()
+    }
 }
