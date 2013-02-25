@@ -565,14 +565,53 @@ public class GUITools {
         return popup;
     }
 
-    public static boolean containsEmpty(ArrayList<JTextComponent> list){
+    public static boolean containsEmpty(ArrayList<JTextComponent> list) {
         boolean result = false;
-        for (JTextComponent comp : list){
-            if (comp.getText().trim().isEmpty()){
+        for (JTextComponent comp : list) {
+            if (comp.getText().trim().isEmpty()) {
                 result = true;
                 break;
             }
         }
         return result;
+    }
+
+    public static FocusTraversalPolicy createTraversalPolicy(final ArrayList<Component> list) {
+        FocusTraversalPolicy myPolicy = new FocusTraversalPolicy() {
+
+            @Override
+            public Component getComponentAfter(Container aContainer, Component aComponent) {
+                int pos = list.indexOf(aComponent) + 1;
+                if (pos == list.size()) {
+                    pos = 0;
+                }
+                return list.get(pos);
+            }
+
+            @Override
+            public Component getComponentBefore(Container aContainer, Component aComponent) {
+                int pos = list.indexOf(aComponent) - 1;
+                if (pos < 0) {
+                    pos = list.size() - 1;
+                }
+                return list.get(pos);
+            }
+
+            @Override
+            public Component getFirstComponent(Container aContainer) {
+                return list.get(0);
+            }
+
+            @Override
+            public Component getLastComponent(Container aContainer) {
+                return list.get(list.size() - 1);
+            }
+
+            @Override
+            public Component getDefaultComponent(Container aContainer) {
+                return list.get(0);
+            }
+        };
+        return myPolicy;
     }
 }

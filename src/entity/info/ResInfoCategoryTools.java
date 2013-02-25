@@ -18,11 +18,10 @@ import java.util.List;
  */
 public class ResInfoCategoryTools {
 
-    public static final int GRUNDPFLEGE = 100;
-    public static final int HAUT = 110;
+    public static final int BASICS = 100;
+    public static final int SKIN = 110;
     public static final int VITAL = 120;
-    public static final int VERWALTUNG = 1000;
-    public static final int STAMMDATEN = 2000;
+    public static final int ADMINISTRATIVE = 1000;
 
 
 //    public static ListCellRenderer getRenderer() {
@@ -61,8 +60,8 @@ public class ResInfoCategoryTools {
         long begin = System.currentTimeMillis();
         String katart = "0";   // a little trick. 0 is always viable
 
-        katart += OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, PnlInfo.internalClassID) ? "," + STAMMDATEN : ""; // Stammdaten
-        katart += OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER2, PnlInfo.internalClassID) ? "," + VERWALTUNG : ""; // Verwaltung
+//        katart += OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, PnlInfo.internalClassID) ? "," + STAMMDATEN : ""; // Stammdaten
+        katart += OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER2, PnlInfo.internalClassID) ? "," + ADMINISTRATIVE : ""; // Verwaltung
 
         // katart below 1000 is accessible for everyone
         EntityManager em = OPDE.createEM();

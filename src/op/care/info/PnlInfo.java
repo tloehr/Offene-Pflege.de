@@ -265,9 +265,14 @@ public class PnlInfo extends NursingRecordsPanel {
                 JPanel pnlContent = new JPanel(new VerticalLayout());
                 for (ResInfoType type : ResInfoTypeTools.getByCat(cat)) {
 
-                    if (tbShowEmpty.isSelected() || mapType2InfoList.containsKey(type)) {
+
+                    if ((tbShowEmpty.isSelected() && (!type.isObsolete() || tbShowClosedWithOldForms.isSelected())) || mapType2InfoList.containsKey(type)) {
                         pnlContent.add(createCP4(type));
                     }
+
+//                    if (tbShowEmpty.isSelected() || mapType2InfoList.containsKey(type)) {
+//                        pnlContent.add(createCP4(type));
+//                    }
                 }
                 cpCat.setContentPane(pnlContent);
             }
@@ -1260,6 +1265,7 @@ public class PnlInfo extends NursingRecordsPanel {
         list.add(txtSearch);
 
         tbShowEmpty = GUITools.getNiceToggleButton(internalClassID + ".tbShowEmpty");
+        tbShowEmpty.setSelected(true);
         tbShowEmpty.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {

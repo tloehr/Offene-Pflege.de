@@ -12,6 +12,7 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import entity.Homes;
+import entity.HomesTools;
 import entity.Station;
 import entity.StationTools;
 import entity.prescription.MedStock;
@@ -283,6 +284,7 @@ public class PnlSystemSettings extends CleanablePanel {
                     }
                 }, btnAddHome);
                 GUITools.showPopup(popup, SwingConstants.SOUTH);
+                pnlHomes.setStartFocus();
             }
         });
         cpsHomes.add(btnAddHome);
@@ -326,6 +328,14 @@ public class PnlSystemSettings extends CleanablePanel {
                 String titleS = "<html><font size=+1>" + station.getName() + "</font></html>";
                 DefaultCPTitle cpTitleS = new DefaultCPTitle(titleS, null);
 
+                /***
+                 *               _ _ _         _        _   _
+                 *       ___  __| (_) |_   ___| |_ __ _| |_(_) ___  _ __
+                 *      / _ \/ _` | | __| / __| __/ _` | __| |/ _ \| '_ \
+                 *     |  __/ (_| | | |_  \__ \ || (_| | |_| | (_) | | | |
+                 *      \___|\__,_|_|\__| |___/\__\__,_|\__|_|\___/|_| |_|
+                 *
+                 */
                 final JButton btnEditStation = new JButton(SYSConst.icon22edit);
                 btnEditStation.setPressedIcon(SYSConst.icon22Pressed);
                 btnEditStation.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -432,6 +442,98 @@ public class PnlSystemSettings extends CleanablePanel {
             cpH.setHorizontalAlignment(SwingConstants.LEADING);
             cpH.setOpaque(false);
             cpH.setTitleLabelComponent(cpTitleH.getMain());
+
+            /***
+             *               _ _ _     _
+             *       ___  __| (_) |_  | |__   ___  _ __ ___   ___
+             *      / _ \/ _` | | __| | '_ \ / _ \| '_ ` _ \ / _ \
+             *     |  __/ (_| | | |_  | | | | (_) | | | | | |  __/
+             *      \___|\__,_|_|\__| |_| |_|\___/|_| |_| |_|\___|
+             *
+             */
+            final JButton btnEditHome = new JButton(SYSConst.icon22edit);
+            btnEditHome.setPressedIcon(SYSConst.icon22Pressed);
+            btnEditHome.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            btnEditHome.setContentAreaFilled(false);
+            btnEditHome.setBorder(null);
+            btnEditHome.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    final PnlHomes pnlHomes = new PnlHomes(home);
+                    GUITools.showPopup(GUITools.createPanelPopup(pnlHomes, new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            if (o != null) {
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    Homes myHome = em.merge((Homes) o);
+                                    em.getTransaction().commit();
+                                    createHomesList();
+                                    OPDE.getMainframe().emptySearchArea();
+                                    OPDE.getMainframe().prepareSearchArea();
+                                } catch (Exception e) {
+                                    em.getTransaction().rollback();
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+                            }
+                        }
+                    }, btnEditHome), SwingConstants.SOUTH_WEST);
+
+                }
+            });
+            cpTitleH.getRight().add(btnEditHome);
+
+            if (home.getStations().isEmpty()) {
+                final JButton btnDeleteHome = new JButton(SYSConst.icon22delete);
+                btnDeleteHome.setPressedIcon(SYSConst.icon22Pressed);
+                btnDeleteHome.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnDeleteHome.setContentAreaFilled(false);
+                btnDeleteHome.setBorder(null);
+
+                btnDeleteHome.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<br/><i>" + HomesTools.getAsText(home) + "</i><br/>" + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
+                            @Override
+                            public void execute(Object answer) {
+                                if (answer.equals(JOptionPane.YES_OPTION)) {
+                                    EntityManager em = OPDE.createEM();
+                                    try {
+                                        em.getTransaction().begin();
+                                        Homes myHome = em.merge(home);
+                                        em.lock(myHome, LockModeType.OPTIMISTIC);
+                                        em.remove(myHome);
+                                        em.getTransaction().commit();
+                                        createHomesList();
+                                        OPDE.getMainframe().emptySearchArea();
+                                        OPDE.getMainframe().prepareSearchArea();
+                                    } catch (RollbackException ole) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                            OPDE.getMainframe().completeRefresh();
+                                        }
+                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                    } catch (Exception e) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        OPDE.fatal(e);
+                                    } finally {
+                                        em.close();
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+                cpTitleH.getRight().add(btnDeleteHome);
+            }
+
             cpH.setContentPane(pnlContentH);
             cpsHomes.add(cpH);
 
@@ -440,6 +542,7 @@ public class PnlSystemSettings extends CleanablePanel {
     }
 
     private void initComponents() {
+        // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         tabMain = new JTabbedPane();
         pnlLocal = new JPanel();
         lblPrinters = new JLabel();
@@ -454,7 +557,9 @@ public class PnlSystemSettings extends CleanablePanel {
         lblHomes = new JLabel();
         jspHomeStation = new JScrollPane();
         cpsHomes = new CollapsiblePanes();
-        btnAddHome = new JButton();
+        lblCat = new JLabel();
+        jspCat = new JScrollPane();
+        cpsCat = new CollapsiblePanes();
 
         //======== this ========
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -471,16 +576,16 @@ public class PnlSystemSettings extends CleanablePanel {
             //======== pnlLocal ========
             {
                 pnlLocal.setLayout(new FormLayout(
-                        "default, 2*($lcgap, default:grow), $lcgap, default",
-                        "6*(default, $lgap), default:grow, $lgap, default, $lgap, 14dlu"));
+                    "default, 2*($lcgap, default:grow), $lcgap, default",
+                    "6*(default, $lgap), pref, $lgap, default, $lgap, 14dlu"));
 
                 //---- lblPrinters ----
-                lblPrinters.setText("Etiketten-Drucker");
+                lblPrinters.setText("labelPrinter");
                 lblPrinters.setFont(new Font("Arial", Font.BOLD, 18));
                 pnlLocal.add(lblPrinters, CC.xy(3, 3));
 
                 //---- lblStation ----
-                lblStation.setText("Etiketten-Drucker");
+                lblStation.setText("Default Station");
                 lblStation.setFont(new Font("Arial", Font.BOLD, 18));
                 pnlLocal.add(lblStation, CC.xy(5, 3));
 
@@ -543,13 +648,13 @@ public class PnlSystemSettings extends CleanablePanel {
             //======== pnlGlobal ========
             {
                 pnlGlobal.setLayout(new FormLayout(
-                        "default, $lcgap, default:grow, $lcgap, default",
-                        "pref, $lgap, default:grow, 2*($lgap, default)"));
+                    "default, $lcgap, default:grow, $lcgap, default",
+                    "default, $lgap, pref, $lgap, default:grow, 4*($lgap, default)"));
 
                 //---- lblHomes ----
-                lblHomes.setText("Etiketten-Drucker");
+                lblHomes.setText("Homes");
                 lblHomes.setFont(new Font("Arial", Font.BOLD, 18));
-                pnlGlobal.add(lblHomes, CC.xy(3, 1));
+                pnlGlobal.add(lblHomes, CC.xy(3, 3));
 
                 //======== jspHomeStation ========
                 {
@@ -560,16 +665,27 @@ public class PnlSystemSettings extends CleanablePanel {
                     }
                     jspHomeStation.setViewportView(cpsHomes);
                 }
-                pnlGlobal.add(jspHomeStation, CC.xy(3, 3, CC.FILL, CC.FILL));
+                pnlGlobal.add(jspHomeStation, CC.xy(3, 5, CC.FILL, CC.FILL));
 
-                //---- btnAddHome ----
-                btnAddHome.setText("text");
-                pnlGlobal.add(btnAddHome, CC.xy(3, 5, CC.LEFT, CC.DEFAULT));
+                //---- lblCat ----
+                lblCat.setText("ResInfoCat");
+                lblCat.setFont(new Font("Arial", Font.BOLD, 18));
+                pnlGlobal.add(lblCat, CC.xy(3, 9));
+
+                //======== jspCat ========
+                {
+
+                    //======== cpsCat ========
+                    {
+                        cpsCat.setLayout(new BoxLayout(cpsCat, BoxLayout.X_AXIS));
+                    }
+                    jspCat.setViewportView(cpsCat);
+                }
+                pnlGlobal.add(jspCat, CC.xy(3, 11, CC.FILL, CC.FILL));
             }
             tabMain.addTab("text", pnlGlobal);
 
         }
-        add(tabMain);
         add(tabMain);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
@@ -603,6 +719,7 @@ public class PnlSystemSettings extends CleanablePanel {
         tabMainStateChanged(null);
     }
 
+    // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JTabbedPane tabMain;
     private JPanel pnlLocal;
     private JLabel lblPrinters;
@@ -617,6 +734,8 @@ public class PnlSystemSettings extends CleanablePanel {
     private JLabel lblHomes;
     private JScrollPane jspHomeStation;
     private CollapsiblePanes cpsHomes;
-    private JButton btnAddHome;
+    private JLabel lblCat;
+    private JScrollPane jspCat;
+    private CollapsiblePanes cpsCat;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

@@ -901,7 +901,7 @@ public class ResInfoTools {
          *                                  |_|               |___/
          */
         if (grundpflege) {
-            List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(resident, ResInfoCategoryTools.GRUNDPFLEGE);
+            List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(resident, ResInfoCategoryTools.BASICS);
             if (!bwinfos.isEmpty()) {
                 result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getResInfoCat().getText() + "</h2><div id=\"fonttext\">";
                 for (ResInfo bwinfo : bwinfos) {
@@ -922,7 +922,7 @@ public class ResInfoTools {
          *
          */
         if (haut) {
-            List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(resident, ResInfoCategoryTools.HAUT);
+            List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(resident, ResInfoCategoryTools.SKIN);
             if (!bwinfos.isEmpty()) {
                 result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getResInfoCat().getText() + "</h2><div id=\"fonttext\">";
                 for (ResInfo bwinfo : bwinfos) {

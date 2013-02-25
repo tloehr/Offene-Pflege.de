@@ -8,14 +8,14 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.Homes;
 import op.OPDE;
-import op.tools.NonEmptyTextfieldVerifier;
+import op.threads.DisplayMessage;
+import op.tools.GUITools;
 import op.tools.PopupPanel;
-import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.UUID;
+import java.util.ArrayList;
 
 /**
  * @author Torsten Löhr
@@ -23,11 +23,20 @@ import java.util.UUID;
 public class PnlHomes extends PopupPanel {
     public static final String internalClassID = "opde.settings.pnlhomes";
     private Homes home;
+    private ArrayList<JTextComponent> allTXT;
+    private ArrayList<Component> allComponents;
 
     public PnlHomes(Homes home) {
         this.home = home;
+        allTXT = new ArrayList<JTextComponent>();
+        allComponents = new ArrayList<Component>();
         initComponents();
         initPanel();
+    }
+
+    @Override
+    public void setStartFocus() {
+        txtName.requestFocus();
     }
 
     private void initPanel() {
@@ -45,29 +54,48 @@ public class PnlHomes extends PopupPanel {
         txtFax.setText(home.getFax());
         txtTel.setText(home.getTel());
 
+        allTXT.add(txtName);
+        allTXT.add(txtStrasse);
+        allTXT.add(txtPLZ);
+        allTXT.add(txtOrt);
+        allTXT.add(txtTel);
+        allTXT.add(txtFax);
 
-        txtName.setInputVerifier(new NonEmptyTextfieldVerifier());
-        txtStrasse.setInputVerifier(new NonEmptyTextfieldVerifier());
-        txtPLZ.setInputVerifier(new NonEmptyTextfieldVerifier());
-        txtOrt.setInputVerifier(new NonEmptyTextfieldVerifier());
-        txtTel.setInputVerifier(new NonEmptyTextfieldVerifier());
-        txtFax.setInputVerifier(new NonEmptyTextfieldVerifier());
+        allComponents.add(txtName);
+        allComponents.add(txtStrasse);
+        allComponents.add(txtPLZ);
+        allComponents.add(txtOrt);
+        allComponents.add(txtTel);
+        allComponents.add(txtFax);
 
+
+        setFocusCycleRoot(true);
+        setFocusTraversalPolicy(GUITools.createTraversalPolicy(allComponents));
     }
 
     @Override
     public Object getResult() {
-        home.setName(txtName.getText().trim());
-        home.setStreet(txtStrasse.getText().trim());
-        home.setZip(txtPLZ.getText().trim());
-        home.setCity(txtOrt.getText().trim());
-        home.setTel(txtTel.getText().trim());
-        home.setFax(txtFax.getText().trim());
+        if (isSaveOK()) {
+            home.setName(txtName.getText().trim());
+            home.setStreet(txtStrasse.getText().trim());
+            home.setZip(txtPLZ.getText().trim());
+            home.setCity(txtOrt.getText().trim());
+            home.setTel(txtTel.getText().trim());
+            home.setFax(txtFax.getText().trim());
+        } else {
+            home = null;
+        }
         return home;
     }
 
     private boolean isSaveOK() {
-        return false;
+        boolean ok = !GUITools.containsEmpty(allTXT);
+
+        if (!ok) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".emptyFields", DisplayMessage.WARNING));
+        }
+
+        return ok;
     }
 
     private void initComponents() {
@@ -87,8 +115,8 @@ public class PnlHomes extends PopupPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "2*(default, $lcgap), 162dlu:grow, $lcgap, default",
-            "7*(default, $lgap), default"));
+                "2*(default, $lcgap), 162dlu:grow, $lcgap, default",
+                "7*(default, $lgap), default"));
 
         //---- lblName ----
         lblName.setText("Anrede");

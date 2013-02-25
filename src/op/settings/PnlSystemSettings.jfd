@@ -43,7 +43,7 @@
            </void> 
            <void method="setProperty"> 
             <string>$rowSpecs</string> 
-            <string>default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default:grow, linegap, default, linegap, 14dlu</string> 
+            <string>default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, pref, linegap, default, linegap, 14dlu</string> 
            </void> 
           </object> 
           <void property="name"> 
@@ -54,7 +54,7 @@
             <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>Etiketten-Drucker</string> 
+             <string>labelPrinter</string> 
             </void> 
             <void method="setProperty"> 
              <string>font</string> 
@@ -85,7 +85,7 @@
             <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>Etiketten-Drucker</string> 
+             <string>Default Station</string> 
             </void> 
             <void method="setProperty"> 
              <string>font</string> 
@@ -308,7 +308,7 @@
            </void> 
            <void method="setProperty"> 
             <string>$rowSpecs</string> 
-            <string>pref, linegap, default:grow, linegap, default, linegap, default</string> 
+            <string>default, linegap, pref, linegap, default:grow, linegap, default, linegap, default, linegap, default, linegap, default</string> 
            </void> 
           </object> 
           <void property="name"> 
@@ -319,7 +319,7 @@
             <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>Etiketten-Drucker</string> 
+             <string>Homes</string> 
             </void> 
             <void method="setProperty"> 
              <string>font</string> 
@@ -333,6 +333,10 @@
             <class>com.jgoodies.forms.layout.CellConstraints</class> 
             <void method="setProperty"> 
              <string>gridX</string> 
+             <int>3</int> 
+            </void> 
+            <void method="setProperty"> 
+             <string>gridY</string> 
              <int>3</int> 
             </void> 
            </object> 
@@ -370,7 +374,7 @@
             </void> 
             <void method="setProperty"> 
              <string>gridY</string> 
-             <int>3</int> 
+             <int>5</int> 
             </void> 
             <void method="setProperty"> 
              <string>hAlign</string> 
@@ -384,13 +388,54 @@
           </void> 
           <void method="add"> 
            <object class="com.jformdesigner.model.FormComponent"> 
-            <string>javax.swing.JButton</string> 
+            <string>javax.swing.JLabel</string> 
             <void method="setProperty"> 
              <string>text</string> 
-             <string>text</string> 
+             <string>ResInfoCat</string> 
+            </void> 
+            <void method="setProperty"> 
+             <string>font</string> 
+             <object idref="Font0"/> 
             </void> 
             <void property="name"> 
-             <string>btnAddHome</string> 
+             <string>lblCat</string> 
+            </void> 
+           </object> 
+           <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+            <class>com.jgoodies.forms.layout.CellConstraints</class> 
+            <void method="setProperty"> 
+             <string>gridY</string> 
+             <int>9</int> 
+            </void> 
+            <void method="setProperty"> 
+             <string>gridX</string> 
+             <int>3</int> 
+            </void> 
+           </object> 
+          </void> 
+          <void method="add"> 
+           <object class="com.jformdesigner.model.FormContainer"> 
+            <string>javax.swing.JScrollPane</string> 
+            <object class="com.jformdesigner.model.FormLayoutManager"> 
+             <class>javax.swing.JScrollPane</class> 
+            </object> 
+            <void property="name"> 
+             <string>jspCat</string> 
+            </void> 
+            <void method="add"> 
+             <object class="com.jformdesigner.model.FormContainer"> 
+              <string>com.jidesoft.pane.CollapsiblePanes</string> 
+              <object class="com.jformdesigner.model.FormLayoutManager"> 
+               <class>javax.swing.BoxLayout</class> 
+               <void method="setProperty"> 
+                <string>axis</string> 
+                <int>0</int> 
+               </void> 
+              </object> 
+              <void property="name"> 
+               <string>cpsCat</string> 
+              </void> 
+             </object> 
             </void> 
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -401,11 +446,15 @@
             </void> 
             <void method="setProperty"> 
              <string>gridY</string> 
-             <int>5</int> 
+             <int>11</int> 
             </void> 
             <void method="setProperty"> 
              <string>hAlign</string> 
-             <object class="com.jgoodies.forms.layout.CellConstraints" field="LEFT"/> 
+             <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
+            </void> 
+            <void method="setProperty"> 
+             <string>vAlign</string> 
+             <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
             </void> 
            </object> 
           </void> 

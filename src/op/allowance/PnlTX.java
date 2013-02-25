@@ -114,8 +114,8 @@ public class PnlTX extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "default, $lcgap, pref, $lcgap, 161dlu, $lcgap, default",
-                "default, $lgap, pref, 4*($lgap, default)"));
+            "default, $lcgap, pref, $lcgap, 161dlu, $lcgap, default",
+            "default, $lgap, pref, 4*($lgap, default)"));
 
         //---- lblResident ----
         lblResident.setText("text");
@@ -145,7 +145,6 @@ public class PnlTX extends JPanel {
             public void focusGained(FocusEvent e) {
                 txtDateFocusGained(e);
             }
-
             @Override
             public void focusLost(FocusEvent e) {
                 txtDateFocusLost(e);
@@ -171,7 +170,6 @@ public class PnlTX extends JPanel {
             public void focusGained(FocusEvent e) {
                 txtTextFocusGained(e);
             }
-
             @Override
             public void focusLost(FocusEvent e) {
                 txtTextFocusLost(e);
@@ -197,7 +195,6 @@ public class PnlTX extends JPanel {
             public void focusGained(FocusEvent e) {
                 txtCashFocusGained(e);
             }
-
             @Override
             public void focusLost(FocusEvent e) {
                 txtCashFocusLost(e);
