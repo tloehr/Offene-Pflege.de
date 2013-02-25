@@ -291,7 +291,7 @@ public class MedStockTools {
         String result = "";
         result += "<font color=\"blue\"><b>" + bestand.getTradeForm().getMedProduct().getBezeichnung() + " " + bestand.getTradeForm().getSubtext() + ", ";
 
-        if (!SYSTools.catchNull(bestand.getPackage().getPzn()).equals("")) {
+        if (bestand.getPackage() != null &&  !SYSTools.catchNull(bestand.getPackage().getPzn()).isEmpty()) {
             result += OPDE.lang.getString("misc.msg.PZN") + ": " + bestand.getPackage().getPzn() + ", ";
             result += MedPackageTools.GROESSE[bestand.getPackage().getSize()] + ", " + bestand.getPackage().getContent() + " " + SYSConst.UNITS[bestand.getTradeForm().getDosageForm().getPackUnit()] + " ";
             String zubereitung = SYSTools.catchNull(bestand.getTradeForm().getDosageForm().getPreparation());
