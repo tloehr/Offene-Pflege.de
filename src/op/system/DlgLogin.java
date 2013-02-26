@@ -25,6 +25,7 @@
  */
 package op.system;
 
+import java.awt.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.files.SYSFilesTools;
@@ -57,6 +58,10 @@ public class DlgLogin extends MyJDialog {
         dispose();
     }
 
+    private void thisWindowActivated(WindowEvent e) {
+        txtUsername.requestFocus();
+    }
+
     public DlgLogin(Closure actionBlock) {
         super();
         OPDE.setLogin(null);
@@ -77,12 +82,10 @@ public class DlgLogin extends MyJDialog {
         txtUsername.setText(defaultlogin);
         txtPassword.setText(defaultpw);
         lblUsernamePassword.setText(OPDE.lang.getString("misc.msg.username") + "/" + OPDE.lang.getString("misc.msg.password"));
-
-        txtUsername.requestFocus();
-//        pack();
         setVisible(true);
-
     }
+
+
 
     /**
      * This method is called from within the constructor to
@@ -107,6 +110,12 @@ public class DlgLogin extends MyJDialog {
         setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
         setResizable(false);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowActivated(WindowEvent e) {
+                thisWindowActivated(e);
+            }
+        });
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "13dlu, default, 13dlu",

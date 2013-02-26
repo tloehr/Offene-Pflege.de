@@ -59,9 +59,6 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -450,79 +447,6 @@ public class SYSTools {
         }
     };
 
-    public static DefaultListModel rs2lst(ResultSet rs) {
-        return rs2lst(rs, null, false);
-    }
-
-    public static DefaultListModel rs2lst(ResultSet rs, String[] prefix) {
-        return rs2lst(rs, prefix, false);
-    }
-
-    /**
-     * Die erste Spalte enthält immer den Primary Key.
-     */
-    public static DefaultListModel rs2lst(ResultSet rs, String[] prefix, boolean withEmptyFirstElement) {
-        DefaultListModel dcbm = new DefaultListModel();
-        if (withEmptyFirstElement) {
-            dcbm.addElement(new ListElement("<html><i>Keine Auswahl</i></html>", 0l));
-        }
-        if (rs != null) {
-            try {
-                ResultSetMetaData rsmd = rs.getMetaData();
-                int colcount = rsmd.getColumnCount();
-                int pktype = rsmd.getColumnType(1);
-
-                // hier stimmt was nicht. Es muss für jeden Col einen Prefix geben. Und wenn der auch leer ist.
-                if (prefix != null && prefix.length != colcount) {
-                    return dcbm;
-                }
-
-                rs.beforeFirst();
-
-                while (rs.next()) {
-                    String value = "";
-                    boolean dropComma = false;
-                    for (int i = 2; i <= colcount; i++) {
-                        if (prefix != null) {
-                            value += prefix[i - 1]; // das prefix Array beginnt bei 0, aber den PK brauchen wir ja nicht, somit 1
-                        }
-                        int type = rsmd.getColumnType(i);
-                        switch (type) {
-                            case (java.sql.Types.DATE): {
-                                value += SYSCalendar.printGermanStyle(rs.getDate(i));
-                                dropComma = false;
-                                break;
-                            }
-                            default: {
-                                String str = rs.getString(i);
-                                if (str == null || str.equals("")) {
-                                    dropComma = true;
-                                } else {
-                                    dropComma = false;
-                                    value += str;
-                                }
-                            }
-                        }
-                        if (i < colcount && !dropComma) {
-                            value += ", ";
-                        }
-                    }
-
-                    if (pktype == java.sql.Types.BIGINT || pktype == java.sql.Types.INTEGER) {
-                        java.math.BigInteger bi = (java.math.BigInteger) rs.getObject(1);
-                        dcbm.addElement(new ListElement(value, bi.longValue()));
-                    } else {
-                        dcbm.addElement(new ListElement(value, rs.getString(1)));
-                    }
-                }
-            } // try
-            catch (SQLException se) {
-//                new DlgException(se);
-                se.printStackTrace();
-            } // catch
-        }
-        return dcbm;
-    }
 
 
     public static DefaultListModel list2dlm(List list) {
@@ -545,32 +469,7 @@ public class SYSTools {
         return cmb;
     }
 
-    /**
-     * Erstellt aus einem Result Set ein ComboBox Modell. Wobei davon ausgegangen wird, dass in der ersten Spalte immer der PK steht.
-     *
-     * @param rs
-     * @return
-     */
-    public static DefaultComboBoxModel rs2cmb(ResultSet rs) {
-        return rs2cmb(rs, null, false);
-    }
 
-    public static DefaultComboBoxModel rs2cmb(ResultSet rs, boolean withEmptyFirstElement) {
-        return rs2cmb(rs, null, withEmptyFirstElement);
-    }
-
-    public static DefaultComboBoxModel rs2cmb(ResultSet rs, String[] prefix) {
-        return rs2cmb(rs, prefix, false);
-    }
-
-    public static DefaultComboBoxModel rs2cmb(ResultSet rs, String[] prefix, boolean withEmptyFirstElement) {
-        DefaultListModel dlm = rs2lst(rs, prefix, withEmptyFirstElement);
-        Object ar = Array.newInstance(ListElement.class, dlm.size());
-        ListElement[] array = (ListElement[]) ar;
-        dlm.copyInto(array);
-        dlm.clear();
-        return new DefaultComboBoxModel(array);
-    }
 
     // This method iconifies a frame; the maximized bits are not affected.
     // taken from: The Java Developers Almanac 1.4
@@ -1170,49 +1069,6 @@ public class SYSTools {
         return Double.parseDouble(text);
     }
 
-    public static String rs2html(ResultSet rs, boolean markiere0) {
-        String result = "";
-        try {
-            ResultSetMetaData md = rs.getMetaData();
-            int count = md.getColumnCount();
-            rs.beforeFirst();
-
-            result += "<table border=1>";
-            result += "<tr>";
-            for (int i = 1; i <= count; i++) {
-                result += "<th>";
-                result += md.getColumnLabel(i);
-                result += "</th>";
-            }
-            result += "</tr>";
-            while (rs.next()) {
-                result += "<tr>";
-                for (int i = 1; i <= count; i++) {
-                    result += "<td>";
-                    if (markiere0) {
-                        try {
-                            double d = Double.parseDouble(rs.getString(i));
-                            if (d == 0) {
-                                result += "<font color=\"red\"><b>" + rs.getString(i) + "</b></font>";
-                            } else {
-                                result += rs.getString(i);
-                            }
-                        } catch (NumberFormatException ne) {
-                            result += rs.getString(i);
-                        }
-                    } else {
-                        result += rs.getString(i);
-                    }
-                    result += "</td>";
-                }
-                result += "</tr>";
-            }
-            result += "</table>";
-        } catch (SQLException sql) {
-            OPDE.getLogger().error(sql);
-        }
-        return result;
-    }
 
     /**
      * Erstellt ein Teil eines SQL Ausdrucks für "WHERE X IN (1, 2, 3, 4)" ähnliche Ausdrücke.

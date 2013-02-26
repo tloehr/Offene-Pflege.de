@@ -2,11 +2,14 @@ package entity.info;
 
 import op.OPDE;
 import op.care.info.PnlInfo;
+import op.settings.PnlCats;
 import op.system.InternalClassACL;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.swing.*;
+import java.awt.*;
 import java.util.List;
 
 /**
@@ -18,28 +21,38 @@ import java.util.List;
  */
 public class ResInfoCategoryTools {
 
-    public static final int BASICS = 100;
+    public static final int BASICS = 0;
+    public static final int NURSING = 100;
     public static final int SKIN = 110;
     public static final int VITAL = 120;
     public static final int ADMINISTRATIVE = 1000;
 
+    public static final String[] TYPESS = new String[]{SYSTools.xx(PnlCats.internalClassID+".type.BASICS"),SYSTools.xx(PnlCats.internalClassID+".type.NURSING"), SYSTools.xx(PnlCats.internalClassID+".type.SKIN"), SYSTools.xx(PnlCats.internalClassID+".type.VITAL"), SYSTools.xx(PnlCats.internalClassID+".type.ADMINISTRATIVE")};
+    public static final Integer[] TYPES = new Integer[]{BASICS, NURSING, SKIN, VITAL, ADMINISTRATIVE};
 
-//    public static ListCellRenderer getRenderer() {
-//        return new ListCellRenderer() {
-//            @Override
-//            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
-//                String text;
-//                if (o == null) {
-//                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
-//                } else if (o instanceof ResInfoCategory) {
-//                    text = SYSTools.toHTML("<div id=\"fonttext\"><font color=\"#"+((ResInfoCategory) o).getFgheader()+"\">"+((ResInfoCategory) o).getText()+"</font></div>");
-//                } else {
-//                    text = o.toString();
-//                }
-//                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
-//            }
-//        };
-//    }
+    public static ListCellRenderer getTypesRenderer() {
+        return new ListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                String text;
+                if (o == null) {
+                    text = SYSTools.toHTML(OPDE.lang.getString("misc.commands.>>noselection<<"));
+                } else {
+                    int type = (Integer) o;
+                    switch (type) {
+                        case BASICS: {
+
+                        }
+                        default: {
+                            text = OPDE.lang.getString("misc.msg.error");
+                        }
+                    }
+
+                }
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+            }
+        };
+    }
 
     /**
      * @return

@@ -92,7 +92,7 @@ public class PnlHomes extends PopupPanel {
         boolean ok = !GUITools.containsEmpty(allTXT);
 
         if (!ok) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".emptyFields", DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.emptyFields", DisplayMessage.WARNING));
         }
 
         return ok;

@@ -15,21 +15,7 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "lcustodian")
-//@NamedQueries({
-//        @NamedQuery(name = "Betreuer.findAll", query = "SELECT b FROM LCustodian b"),
-//        @NamedQuery(name = "Betreuer.findAllActive", query = "SELECT b FROM LCustodian b WHERE b.status >= 0 ORDER BY b.name, b.vorname"),
-//        @NamedQuery(name = "Betreuer.findByBetrID", query = "SELECT b FROM LCustodian b WHERE b.betrID = :betrID"),
-//        @NamedQuery(name = "Betreuer.findByAnrede", query = "SELECT b FROM LCustodian b WHERE b.anrede = :anrede"),
-//        @NamedQuery(name = "Betreuer.findByName", query = "SELECT b FROM LCustodian b WHERE b.name = :name"),
-//        @NamedQuery(name = "Betreuer.findByVorname", query = "SELECT b FROM LCustodian b WHERE b.vorname = :vorname"),
-//        @NamedQuery(name = "Betreuer.findByStrasse", query = "SELECT b FROM LCustodian b WHERE b.strasse = :strasse"),
-//        @NamedQuery(name = "Betreuer.findByPlz", query = "SELECT b FROM LCustodian b WHERE b.plz = :plz"),
-//        @NamedQuery(name = "Betreuer.findByOrt", query = "SELECT b FROM LCustodian b WHERE b.ort = :ort"),
-//        @NamedQuery(name = "Betreuer.findByTel", query = "SELECT b FROM LCustodian b WHERE b.tel = :tel"),
-//        @NamedQuery(name = "Betreuer.findByPrivat", query = "SELECT b FROM LCustodian b WHERE b.privat = :privat"),
-//        @NamedQuery(name = "Betreuer.findByFax", query = "SELECT b FROM LCustodian b WHERE b.fax = :fax"),
-//        @NamedQuery(name = "Betreuer.findByMobil", query = "SELECT b FROM LCustodian b WHERE b.mobil = :mobil"),
-//        @NamedQuery(name = "Betreuer.findByEMail", query = "SELECT b FROM LCustodian b WHERE b.eMail = :eMail")})
+
 public class LCustodian implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

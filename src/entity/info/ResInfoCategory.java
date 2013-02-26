@@ -28,11 +28,19 @@ public class ResInfoCategory implements Serializable, Comparable {
     private Integer catType;
     @Column(name = "Sortierung")
     private Integer sort;
+    @Version
+    @Column(name = "version")
+    private Long version;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "resInfoCat")
     private Collection<ResInfoType> resInfoTypes;
 
     public ResInfoCategory() {
+    }
+
+    public ResInfoCategory(Integer catType) {
+        this.catType = catType;
+        this.sort = 1;
     }
 
     public ResInfoCategory(Long id) {
@@ -50,6 +58,19 @@ public class ResInfoCategory implements Serializable, Comparable {
     @Override
     public int compareTo(Object o) {
         return id.compareTo(((ResInfoCategory) o).getID());
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public Integer getCatType() {
+
+        return catType;
+    }
+
+    public void setCatType(Integer catType) {
+        this.catType = catType;
     }
 
     @Override

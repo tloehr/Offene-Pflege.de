@@ -344,6 +344,10 @@
                  <string>pressedIcon</string> 
                  <object idref="SwingIcon0"/> 
                 </void> 
+                <void method="setProperty"> 
+                 <string>enabled</string> 
+                 <boolean>false</boolean> 
+                </void> 
                 <void property="name"> 
                  <string>btnEdit</string> 
                 </void> 

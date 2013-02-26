@@ -183,7 +183,8 @@ public class PnlSelectIntervention extends JPanel {
     }
 
     private void lstInterventionsValueChanged(ListSelectionEvent e) {
-        btnEdit.setEnabled(lstInterventions.getSelectedValues().length == 1 && ((Intervention) lstInterventions.getSelectedValue()).getMassID() != null && OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlNursingProcess.internalClassID));
+//        btnEdit.setEnabled(lstInterventions.getSelectedValues().length == 1 && ((Intervention) lstInterventions.getSelectedValue()).getMassID() != null && OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlNursingProcess.internalClassID));
+        btnEdit.setEnabled(false);
     }
 
     private void btnSaveActionPerformed(ActionEvent evt) {
@@ -272,8 +273,8 @@ public class PnlSelectIntervention extends JPanel {
                 //======== panel2 ========
                 {
                     panel2.setLayout(new FormLayout(
-                            "default:grow",
-                            "2*(default, $lgap), default:grow, $lgap, default"));
+                        "default:grow",
+                        "2*(default, $lgap), default:grow, $lgap, default"));
 
                     //---- txtSearch ----
                     txtSearch.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -368,6 +369,7 @@ public class PnlSelectIntervention extends JPanel {
                         btnEdit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                         btnEdit.setSelectedIcon(null);
                         btnEdit.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
+                        btnEdit.setEnabled(false);
                         btnEdit.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
@@ -384,8 +386,8 @@ public class PnlSelectIntervention extends JPanel {
                 {
                     pnlRight.setBorder(null);
                     pnlRight.setLayout(new FormLayout(
-                            "default, $lcgap, default:grow",
-                            "3*(fill:default, $lgap), 2*(default, $lgap), default:grow"));
+                        "default, $lcgap, default:grow",
+                        "3*(fill:default, $lgap), 2*(default, $lgap), default:grow"));
 
                     //---- lblText ----
                     lblText.setText("Bezeichnung");
@@ -420,11 +422,11 @@ public class PnlSelectIntervention extends JPanel {
                     pnlRight.add(lblCat, CC.xy(1, 5));
 
                     //---- cmbCat ----
-                    cmbCat.setModel(new DefaultComboBoxModel(new String[]{
-                            "Item 1",
-                            "Item 2",
-                            "Item 3",
-                            "Item 4"
+                    cmbCat.setModel(new DefaultComboBoxModel(new String[] {
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                        "Item 4"
                     }));
                     cmbCat.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlRight.add(cmbCat, CC.xy(3, 5));
@@ -435,11 +437,11 @@ public class PnlSelectIntervention extends JPanel {
                     pnlRight.add(lblType, CC.xy(1, 7));
 
                     //---- cmbType ----
-                    cmbType.setModel(new DefaultComboBoxModel(new String[]{
-                            "Item 1",
-                            "Item 2",
-                            "Item 3",
-                            "Item 4"
+                    cmbType.setModel(new DefaultComboBoxModel(new String[] {
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                        "Item 4"
                     }));
                     cmbType.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlRight.add(cmbType, CC.xy(3, 7));

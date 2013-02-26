@@ -112,15 +112,15 @@ public class ResInfoTools {
     }
 
     public static ArrayList<ResInfo> getClosedWithActiveForms(Resident resident) {
-            EntityManager em = OPDE.createEM();
-            Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp.type <> :type AND b.to < :tfn ORDER BY b.from DESC");
-            query.setParameter("bewohner", resident);
-            query.setParameter("type", ResInfoTypeTools.TYPE_OLD);
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp.type <> :type AND b.to < :tfn ORDER BY b.from DESC");
+        query.setParameter("bewohner", resident);
+        query.setParameter("type", ResInfoTypeTools.TYPE_OLD);
         query.setParameter("tfn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
-            ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
-            em.close();
-            return resInfos;
-        }
+        ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
+        em.close();
+        return resInfos;
+    }
 
     public static ArrayList<ResInfo> getClosedWithOldForms(Resident resident) {
         EntityManager em = OPDE.createEM();
@@ -761,11 +761,16 @@ public class ResInfoTools {
          */
         if (withNReports) {
             EntityManager em = OPDE.createEM();
-            Query query = em.createQuery("SELECT p FROM NReport p "
-                    + " WHERE p.resident = :bewohner AND p.pit >= :von "
+            Query query = em.createQuery(" " +
+                    " SELECT p FROM NReport p " +
+                    " JOIN p.tags t "
+                    + " WHERE p.resident = :bewohner AND (t.system = :handover OR t.system = :emergency ) AND p.pit >= :von "
                     + " ORDER BY p.pit DESC ");
+
             query.setParameter("bewohner", resident);
             query.setParameter("von", new DateTime().toDateMidnight().minusDays(7).toDate());
+            query.setParameter("handover", NReportTAGSTools.TYPE_SYS_HANDOVER);
+            query.setParameter("emergency", NReportTAGSTools.TYPE_SYS_EMERGENCY);
             result += NReportTools.getReportsAsHTML(query.getResultList(), true, false, null, null);
             em.close();
 

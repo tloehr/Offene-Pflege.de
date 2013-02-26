@@ -15,6 +15,8 @@ import entity.Homes;
 import entity.HomesTools;
 import entity.Station;
 import entity.StationTools;
+import entity.info.ResInfoCategory;
+import entity.info.ResInfoCategoryTools;
 import entity.prescription.MedStock;
 import entity.system.SYSPropsTools;
 import op.OPDE;
@@ -35,10 +37,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -238,8 +237,8 @@ public class PnlSystemSettings extends CleanablePanel {
         cmbLogicalPrinters.setEnabled(prservices != null);
         cmbPhysicalPrinters.setEnabled(prservices != null);
 
-        lblPrinters.setText(OPDE.lang.getString(internalClassID + ".labelPrinters"));
-        lblStation.setText(OPDE.lang.getString(internalClassID + ".station"));
+        lblPrinters.setText(OPDE.lang.getString(internalClassID + ".local.labelPrinters"));
+        lblStation.setText(OPDE.lang.getString(internalClassID + ".local.station"));
 
         cmbStation.setModel(StationTools.getAll4Combobox(false));
         cmbStation.setSelectedItem(StationTools.getStationForThisHost());
@@ -247,6 +246,16 @@ public class PnlSystemSettings extends CleanablePanel {
 
     private void initGlobal() {
         createHomesList();
+        createCatList();
+    }
+
+    private void createCatList() {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM ResInfoCategory b ORDER BY b.text ");
+        java.util.List<ResInfoCategory> listCats = query.getResultList();
+        em.close();
+        lstCat.setModel(SYSTools.list2dlm(listCats));
+
     }
 
 
@@ -541,6 +550,54 @@ public class PnlSystemSettings extends CleanablePanel {
         cpsHomes.addExpansion();
     }
 
+    private void lstCatMousePressed(MouseEvent e) {
+        if (e.getClickCount() == 2) {
+            final PnlCats pnlCats = new PnlCats((ResInfoCategory) lstCat.getSelectedValue());
+            GUITools.showPopup(GUITools.createPanelPopup(pnlCats, new Closure() {
+                @Override
+                public void execute(Object o) {
+                    if (o != null) {
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+                            ResInfoCategory myCat = em.merge((ResInfoCategory) o);
+                            em.getTransaction().commit();
+                            createCatList();
+                        } catch (Exception e) {
+                            em.getTransaction().rollback();
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
+                        }
+                    }
+                }
+            }, lblCat), SwingConstants.NORTH_EAST);
+        }
+    }
+
+    private void btnAddCatActionPerformed(ActionEvent e) {
+        final PnlCats pnlCats = new PnlCats(new ResInfoCategory(ResInfoCategoryTools.BASICS));
+        GUITools.showPopup(GUITools.createPanelPopup(pnlCats, new Closure() {
+            @Override
+            public void execute(Object o) {
+                if (o != null) {
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        ResInfoCategory myCat = em.merge((ResInfoCategory) o);
+                        em.getTransaction().commit();
+                        createCatList();
+                    } catch (Exception e) {
+                        em.getTransaction().rollback();
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                    }
+                }
+            }
+        }, lblCat), SwingConstants.NORTH_EAST);
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         tabMain = new JTabbedPane();
@@ -559,7 +616,10 @@ public class PnlSystemSettings extends CleanablePanel {
         cpsHomes = new CollapsiblePanes();
         lblCat = new JLabel();
         jspCat = new JScrollPane();
-        cpsCat = new CollapsiblePanes();
+        lstCat = new JList();
+        panel2 = new JPanel();
+        btnAddCat = new JButton();
+        btnDeleteCat = new JButton();
 
         //======== this ========
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -649,7 +709,7 @@ public class PnlSystemSettings extends CleanablePanel {
             {
                 pnlGlobal.setLayout(new FormLayout(
                     "default, $lcgap, default:grow, $lcgap, default",
-                    "default, $lgap, pref, $lgap, default:grow, 4*($lgap, default)"));
+                    "default, $lgap, pref, $lgap, fill:default:grow, 2*($lgap, default), $lgap, fill:default:grow, 2*($lgap, default)"));
 
                 //---- lblHomes ----
                 lblHomes.setText("Homes");
@@ -675,13 +735,48 @@ public class PnlSystemSettings extends CleanablePanel {
                 //======== jspCat ========
                 {
 
-                    //======== cpsCat ========
-                    {
-                        cpsCat.setLayout(new BoxLayout(cpsCat, BoxLayout.X_AXIS));
-                    }
-                    jspCat.setViewportView(cpsCat);
+                    //---- lstCat ----
+                    lstCat.setFont(new Font("Arial", Font.PLAIN, 14));
+                    lstCat.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                    lstCat.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mousePressed(MouseEvent e) {
+                            lstCatMousePressed(e);
+                        }
+                    });
+                    jspCat.setViewportView(lstCat);
                 }
                 pnlGlobal.add(jspCat, CC.xy(3, 11, CC.FILL, CC.FILL));
+
+                //======== panel2 ========
+                {
+                    panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
+
+                    //---- btnAddCat ----
+                    btnAddCat.setText(null);
+                    btnAddCat.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
+                    btnAddCat.setBorderPainted(false);
+                    btnAddCat.setBorder(null);
+                    btnAddCat.setContentAreaFilled(false);
+                    btnAddCat.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
+                    btnAddCat.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            btnAddCatActionPerformed(e);
+                        }
+                    });
+                    panel2.add(btnAddCat);
+
+                    //---- btnDeleteCat ----
+                    btnDeleteCat.setText(null);
+                    btnDeleteCat.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/editdelete.png")));
+                    btnDeleteCat.setBorderPainted(false);
+                    btnDeleteCat.setBorder(null);
+                    btnDeleteCat.setContentAreaFilled(false);
+                    btnDeleteCat.setEnabled(false);
+                    panel2.add(btnDeleteCat);
+                }
+                pnlGlobal.add(panel2, CC.xy(3, 13));
             }
             tabMain.addTab("text", pnlGlobal);
 
@@ -711,11 +806,11 @@ public class PnlSystemSettings extends CleanablePanel {
         OPDE.getDisplayManager().setMainMessage(OPDE.lang.getString(internalClassID));
         OPDE.getDisplayManager().clearAllIcons();
 
-        tabMain.setTitleAt(TAB_LOCAL, OPDE.lang.getString(internalClassID + ".tab.local"));
-        tabMain.setTitleAt(TAB_GLOBAL, OPDE.lang.getString(internalClassID + ".tab.global"));
+        tabMain.setTitleAt(TAB_LOCAL, OPDE.lang.getString(internalClassID + ".local"));
+        tabMain.setTitleAt(TAB_GLOBAL, OPDE.lang.getString(internalClassID + ".global"));
 
-        lblHomes.setText(OPDE.lang.getString(internalClassID + ".lblHomes"));
-
+        lblHomes.setText(OPDE.lang.getString(internalClassID + ".global.homes"));
+        lblCat.setText(OPDE.lang.getString(internalClassID + ".global.categories"));
         tabMainStateChanged(null);
     }
 
@@ -736,6 +831,9 @@ public class PnlSystemSettings extends CleanablePanel {
     private CollapsiblePanes cpsHomes;
     private JLabel lblCat;
     private JScrollPane jspCat;
-    private CollapsiblePanes cpsCat;
+    private JList lstCat;
+    private JPanel panel2;
+    private JButton btnAddCat;
+    private JButton btnDeleteCat;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

@@ -733,7 +733,7 @@ public class NReportTools {
                     " FROM NReport nr " +
                     " JOIN nr.tags t " +
                     " WHERE " +
-                    " nr.pit >= :from AND nr.pit <= :to  AND (t.system = :handover OR t.nrtagid = :emergency) AND nr.text LIKE :search" +
+                    " nr.pit >= :from AND nr.pit <= :to AND (t.system = :handover OR t.system = :emergency) AND nr.text LIKE :search" +
                     " AND nr.resident.station.home = :home " +
                     " AND nr.replacedBy IS NULL AND nr.editedBy IS NULL ";
 

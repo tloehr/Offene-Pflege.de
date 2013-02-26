@@ -534,7 +534,7 @@ public class GUITools {
         final JidePopup popup = new JidePopup();
         popup.setMovable(false);
         JPanel pnl = new JPanel(new BorderLayout(10, 10));
-
+        pnl.setBorder(new EmptyBorder(5,5,5,5));
         pnl.add(myPnl, BorderLayout.CENTER);
 
         JPanel btnPanel = new JPanel();
