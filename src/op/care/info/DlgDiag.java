@@ -69,7 +69,7 @@ public class DlgDiag extends MyJDialog {
      * Creates new form DlgVorlage
      */
     public DlgDiag(ResInfo diag, Closure actionBlock) {
-        super();
+        super(false);
         this.diag = diag;
         this.actionBlock = actionBlock;
         initComponents();
@@ -100,7 +100,7 @@ public class DlgDiag extends MyJDialog {
         java.util.List<Doc> listAerzte = queryArzt.getResultList();
         listAerzte.add(0, null);
 
-        Query queryKH = em.createQuery("SELECT k FROM Hospital k WHERE k.status >= 0 ORDER BY k.name");
+        Query queryKH = em.createQuery("SELECT k FROM Hospital k WHERE k.state >= 0 ORDER BY k.name");
         java.util.List<Hospital> listKH = queryKH.getResultList();
         listKH.add(0, null);
         em.close();

@@ -8,17 +8,20 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.info.LCustodian;
 import op.OPDE;
-import op.tools.SYSTools;
+import op.tools.GUITools;
+import op.tools.PopupPanel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * @author Torsten Löhr
  */
-public class PnlEditLC extends JPanel {
+public class PnlEditLC extends PopupPanel {
     private LCustodian LCustodian;
 
     public PnlEditLC(LCustodian LCustodian) {
@@ -29,7 +32,7 @@ public class PnlEditLC extends JPanel {
         txtAnrede.requestFocus();
     }
 
-    private void initPanel(){
+    private void initPanel() {
         lblAnrede.setText(OPDE.lang.getString("misc.msg.termofaddress"));
         lblNachname.setText(OPDE.lang.getString("misc.msg.surname"));
         lblVorname.setText(OPDE.lang.getString("misc.msg.firstname"));
@@ -51,8 +54,8 @@ public class PnlEditLC extends JPanel {
         txtTel.setText(LCustodian.getTel());
         txtPrivate.setText(LCustodian.getPrivat());
         txtFax.setText(LCustodian.getFax());
-        txtMobil.setText(SYSTools.catchNull(LCustodian.getOrt()));
-        txtEMAIL.setText(SYSTools.catchNull(LCustodian.getEMail()));
+        txtMobil.setText(LCustodian.getMobil());
+        txtEMAIL.setText(LCustodian.getEMail());
 
         FocusAdapter fa = new FocusAdapter() {
             @Override
@@ -72,27 +75,32 @@ public class PnlEditLC extends JPanel {
         txtFax.addFocusListener(fa);
         txtMobil.addFocusListener(fa);
         txtEMAIL.addFocusListener(fa);
+
+
+        setFocusCycleRoot(true);
+        setFocusTraversalPolicy(GUITools.createTraversalPolicy(new ArrayList<Component>(Arrays.asList(new Component[]{txtAnrede, txtNachname, txtVorname, txtStrasse, txtPLZ, txtOrt, txtTel, txtPrivate, txtFax, txtMobil, txtEMAIL}))));
+
     }
 
-    public LCustodian getLCustodian(){
-        if (txtNachname.getText().isEmpty()){
-            return null;
-        }
-
-        LCustodian.setAnrede(txtAnrede.getText().trim());
-        LCustodian.setName(txtNachname.getText().trim());
-        LCustodian.setVorname(txtVorname.getText().trim());
-        LCustodian.setStrasse(txtStrasse.getText().trim());
-        LCustodian.setPlz(txtPLZ.getText().trim());
-        LCustodian.setOrt(txtOrt.getText().trim());
-        LCustodian.setTel(txtTel.getText().trim());
-        LCustodian.setPrivat(txtPrivate.getText().trim());
-        LCustodian.setFax(txtFax.getText().trim());
-        LCustodian.setMobil(txtMobil.getText().trim());
-        LCustodian.setEMail(txtEMAIL.getText().trim());
-
-        return LCustodian;
-    }
+//    public LCustodian getLCustodian() {
+//        if (txtNachname.getText().isEmpty()) {
+//            return null;
+//        }
+//
+//        LCustodian.setAnrede(txtAnrede.getText().trim());
+//        LCustodian.setName(txtNachname.getText().trim());
+//        LCustodian.setVorname(txtVorname.getText().trim());
+//        LCustodian.setStrasse(txtStrasse.getText().trim());
+//        LCustodian.setPlz(txtPLZ.getText().trim());
+//        LCustodian.setOrt(txtOrt.getText().trim());
+//        LCustodian.setTel(txtTel.getText().trim());
+//        LCustodian.setPrivat(txtPrivate.getText().trim());
+//        LCustodian.setFax(txtFax.getText().trim());
+//        LCustodian.setMobil(txtMobil.getText().trim());
+//        LCustodian.setEMail(txtEMAIL.getText().trim());
+//
+//        return LCustodian;
+//    }
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -121,8 +129,8 @@ public class PnlEditLC extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "13dlu, $lcgap, default, $lcgap, 139dlu, $lcgap, 13dlu",
-            "13dlu, 11*($lgap, default), $lgap, 13dlu"));
+                "13dlu, $lcgap, default, $lcgap, 139dlu, $lcgap, 13dlu",
+                "13dlu, 11*($lgap, default), $lgap, 13dlu"));
 
         //---- lblAnrede ----
         lblAnrede.setText("Anrede");
@@ -223,6 +231,32 @@ public class PnlEditLC extends JPanel {
         txtEMAIL.setFont(new Font("Arial", Font.PLAIN, 14));
         add(txtEMAIL, CC.xy(5, 23));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
+    }
+
+    @Override
+    public Object getResult() {
+        if (txtNachname.getText().isEmpty()) {
+            return null;
+        }
+
+        LCustodian.setAnrede(txtAnrede.getText().trim());
+        LCustodian.setName(txtNachname.getText().trim());
+        LCustodian.setVorname(txtVorname.getText().trim());
+        LCustodian.setStrasse(txtStrasse.getText().trim());
+        LCustodian.setPlz(txtPLZ.getText().trim());
+        LCustodian.setOrt(txtOrt.getText().trim());
+        LCustodian.setTel(txtTel.getText().trim());
+        LCustodian.setPrivat(txtPrivate.getText().trim());
+        LCustodian.setFax(txtFax.getText().trim());
+        LCustodian.setMobil(txtMobil.getText().trim());
+        LCustodian.setEMail(txtEMAIL.getText().trim());
+
+        return LCustodian;
+    }
+
+    @Override
+    public void setStartFocus() {
+        txtAnrede.requestFocus();
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables

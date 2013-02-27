@@ -33,7 +33,7 @@ public class DlgProcess extends MyJDialog {
     private Closure actionBlock;
 
     public DlgProcess(QProcess qProcess, Closure actionBlock) {
-        super();
+        super(false);
         this.qProcess = qProcess;
         this.actionBlock = actionBlock;
         initComponents();

@@ -38,8 +38,10 @@ import op.care.med.prodassistant.MedProductWizard;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.jdesktop.swingx.JXSearchField;
-import org.jdesktop.swingx.prompt.*;
+import org.jdesktop.swingx.prompt.PromptSupport;
 import org.joda.time.DateMidnight;
 
 import javax.persistence.EntityManager;
@@ -76,13 +78,14 @@ public class DlgOnDemand extends MyJDialog {
     private PrescriptionSchedule schedule;
     private List<PrescriptionSchedule> schedules2delete = null;
     private Pair<Prescription, PrescriptionSchedule> returnPackage = null;
-
+    private List<Doc> listAerzte;
+    private List<Hospital> listKH;
 
     /**
      * Creates new form DlgRegular
      */
     public DlgOnDemand(Prescription prescription, Closure actionBlock) {
-
+        super(false);
         // OnDemand prescriptions have exactly ONE schedule
         if (prescription.getPrescriptionSchedule().isEmpty()) {
             PrescriptionSchedule schedule = new PrescriptionSchedule(prescription);
@@ -250,6 +253,19 @@ public class DlgOnDemand extends MyJDialog {
 
     private void txtEDosisActionPerformed(ActionEvent e) {
         txtMaxTimes.requestFocus();
+    }
+
+    private void cmbDocONKeyPressed(KeyEvent e) {
+        final String searchKey = String.valueOf(e.getKeyChar());
+        Doc doc = (Doc) CollectionUtils.find(listAerzte, new Predicate() {
+            @Override
+            public boolean evaluate(Object o) {
+                return o != null && ((Doc) o).getName().toLowerCase().charAt(0) == searchKey.toLowerCase().charAt(0);
+            }
+        });
+        if (doc != null) {
+            cmbDocON.setSelectedItem(doc);
+        }
     }
 
     private void txtMassActionPerformed(ActionEvent e) {
@@ -593,6 +609,12 @@ public class DlgOnDemand extends MyJDialog {
                     "Item 3",
                     "Item 4"
                 }));
+                cmbDocON.addKeyListener(new KeyAdapter() {
+                    @Override
+                    public void keyPressed(KeyEvent e) {
+                        cmbDocONKeyPressed(e);
+                    }
+                });
                 pnlON.add(cmbDocON, CC.xy(1, 1));
 
                 //---- cmbHospitalON ----
@@ -853,11 +875,11 @@ public class DlgOnDemand extends MyJDialog {
     private void fillComboBoxes() {
         EntityManager em = OPDE.createEM();
         Query queryArzt = em.createQuery("SELECT a FROM Doc a WHERE a.status >= 0 ORDER BY a.name, a.vorname");
-        List<Doc> listAerzte = queryArzt.getResultList();
+        listAerzte = queryArzt.getResultList();
         listAerzte.add(0, null);
 
-        Query queryKH = em.createQuery("SELECT k FROM Hospital k WHERE k.status >= 0 ORDER BY k.name");
-        List<Hospital> listKH = queryKH.getResultList();
+        Query queryKH = em.createQuery("SELECT k FROM Hospital k WHERE k.state >= 0 ORDER BY k.name");
+        listKH = queryKH.getResultList();
         listKH.add(0, null);
         em.close();
 

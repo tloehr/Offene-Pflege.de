@@ -69,7 +69,7 @@ public class DlgNursingProcess extends MyJDialog {
      * Creates new form DlgNursingProcess
      */
     public DlgNursingProcess(NursingProcess planung, Closure actionBlock) {
-        super();
+        super(false);
         this.planung = planung;
         this.actionBlock = actionBlock;
         initComponents();

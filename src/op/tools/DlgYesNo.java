@@ -23,7 +23,7 @@ public class DlgYesNo extends MyJDialog {
     private int result;
 
     public DlgYesNo(String message, Icon icon, Closure actionBlock) {
-        super();
+        super(false);
         initComponents();
         this.actionBlock = actionBlock;
         txtMessage.setText(SYSTools.toHTML("<div id=\"fonttext\">"+message+"</div>"));

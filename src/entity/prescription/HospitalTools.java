@@ -23,7 +23,7 @@ public class HospitalTools {
                 if (o == null) {
                     text = OPDE.lang.getString("misc.commands.>>noselection<<");
                 } else if (o instanceof Hospital) {
-                    text = ((Hospital) o).getName() + ", " + ((Hospital) o).getOrt();
+                    text = ((Hospital) o).getName() + ", " + ((Hospital) o).getCity();
                 } else {
                     text = o.toString();
                 }
@@ -36,7 +36,7 @@ public class HospitalTools {
         if (kh == null)
             return "--";
 
-        String string = kh.getName() + SYSTools.catchNull(kh.getOrt(), ", ", "");
+        String string = kh.getName() + SYSTools.catchNull(kh.getCity(), ", ", "");
 //        string += SYSTools.catchNull(kh.getTel(), OPDE.lang.getString("misc.msg.phone") + ": ", " ") + SYSTools.catchNull(kh.getFax(), OPDE.lang.getString("misc.msg.fax") + ": ", " ");
 //        String string = kh.getName() + ", " + SYSTools.catchNull(kh.getStreet(), "", ", ") + SYSTools.catchNull(kh.getZIP(), "", " ") + SYSTools.catchNull(kh.getCity(), "", ", ");
 //        string += SYSTools.catchNull(kh.getTel(), OPDE.lang.getString("misc.msg.phone") + ": ", " ") + SYSTools.catchNull(kh.getFax(), OPDE.lang.getString("misc.msg.fax") + ": ", " ");

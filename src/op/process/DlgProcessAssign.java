@@ -37,7 +37,7 @@ public class DlgProcessAssign extends MyJDialog {
     private Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = null;
 
     public DlgProcessAssign(QProcessElement element, Closure afterAction) {
-        super();
+        super(false);
         this.element = element;
         this.afterAction = afterAction;
         initComponents();

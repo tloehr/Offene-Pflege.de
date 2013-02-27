@@ -4,6 +4,7 @@
 
 package op.care.values;
 
+import java.awt.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.swing.JideLabel;
@@ -161,6 +162,10 @@ public class DlgValue extends MyJDialog {
         dispose();
     }
 
+    private void thisWindowClosing(WindowEvent e) {
+        btnCancelActionPerformed(null);
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         panel4 = new JPanel();
@@ -183,6 +188,13 @@ public class DlgValue extends MyJDialog {
         btnApply = new JButton();
 
         //======== this ========
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                thisWindowClosing(e);
+            }
+        });
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "14dlu, $lcgap, default, $lcgap, 84dlu:grow, $lcgap, 55dlu:grow, $lcgap, default, $lcgap, 14dlu",

@@ -5,38 +5,18 @@
 
 package entity.info;
 
+import javax.persistence.*;
 import java.io.Serializable;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
 
 /**
- *
  * @author tloehr
  */
 @Entity
 @Table(name = "hinsurance")
-//@NamedQueries({
-//    @NamedQuery(name = "KKasse.findAll", query = "SELECT k FROM HInsurance k"),
-//    @NamedQuery(name = "KKasse.findByKassID", query = "SELECT k FROM HInsurance k WHERE k.kassID = :kassID"),
-//    @NamedQuery(name = "KKasse.findByName", query = "SELECT k FROM HInsurance k WHERE k.name = :name"),
-//    @NamedQuery(name = "KKasse.findByStrasse", query = "SELECT k FROM HInsurance k WHERE k.strasse = :strasse"),
-//    @NamedQuery(name = "KKasse.findByPlz", query = "SELECT k FROM HInsurance k WHERE k.plz = :plz"),
-//    @NamedQuery(name = "KKasse.findByOrt", query = "SELECT k FROM HInsurance k WHERE k.ort = :ort"),
-//    @NamedQuery(name = "KKasse.findByTel", query = "SELECT k FROM HInsurance k WHERE k.tel = :tel"),
-//    @NamedQuery(name = "KKasse.findByFax", query = "SELECT k FROM HInsurance k WHERE k.fax = :fax"),
-//    @NamedQuery(name = "KKasse.findByKNr", query = "SELECT k FROM HInsurance k WHERE k.kNr = :kNr")})
 public class HInsurance implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
     @Column(name = "KassID")
     private Long kassID;
     @Basic(optional = false)
@@ -60,6 +40,9 @@ public class HInsurance implements Serializable {
     @Basic(optional = false)
     @Column(name = "KNr")
     private String kNr;
+    @Version
+    @Column(name = "version")
+    private Long version;
 
     public HInsurance() {
     }

@@ -530,7 +530,7 @@ public class SYSFilesTools {
             text += "</head><body>" + SYSTools.htmlUmlautConversion(html)
                     + "<hr/>" +
                     "<div id=\"fonttext\">" +
-                    "<b>" + OPDE.lang.getString("misc.msg.endofreport") + "</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getFullname()) : "")
+                    "<b>" + OPDE.lang.getString("misc.msg.endofreport") + "</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getUID()) : "")
                     + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
                     + "<br/>" + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum() + "</div></body></html>";
 

@@ -29,7 +29,7 @@ public class DlgGroup extends MyJDialog {
     private Closure afterAction;
 
     public DlgGroup(Groups group, Closure afterAction) {
-        super();
+        super(false);
         this.group = group;
         this.afterAction = afterAction;
         initComponents();

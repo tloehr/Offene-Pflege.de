@@ -45,6 +45,9 @@ public class Doc implements Serializable {
     private String eMail;
     @Column(name = "Status")
     private Integer status;
+    @Version
+    @Column(name = "version")
+    private Long version;
 
     public Doc() {
         this.anrede = "";

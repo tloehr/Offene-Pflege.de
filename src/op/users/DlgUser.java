@@ -30,7 +30,7 @@ public class DlgUser extends MyJDialog {
     private Closure callback;
 
     public DlgUser(Users user, Closure callback) {
-        super();
+        super(false);
         this.user = user;
         this.callback = callback;
         initComponents();

@@ -6,15 +6,17 @@ package op.care.info;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideTabbedPane;
 import entity.EntityTools;
 import entity.info.ResInfo;
-import entity.prescription.Hospital;
-import entity.prescription.HospitalTools;
 import entity.info.ResInfoTools;
 import entity.info.ResInfoTypeTools;
+import entity.prescription.Hospital;
+import entity.prescription.HospitalTools;
 import op.OPDE;
-import op.tools.PnlEditKH;
+import op.residents.PnlEditHospital;
+import op.tools.GUITools;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
@@ -42,7 +44,6 @@ public class PnlAway extends JPanel {
     public static final String internalClassID = "nursingrecords.info.pnlabwesend";
     private ResInfo abwesenheit;
     private Closure actionBlock;
-    private PnlEditKH pnlEditKH;
     private Properties props;
 
     public PnlAway(ResInfo abwesenheit, Closure actionBlock) {
@@ -54,18 +55,16 @@ public class PnlAway extends JPanel {
 
     private void initPanel() {
 
-
-
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT h FROM Hospital h WHERE h.status = 0");
+        Query query = em.createQuery("SELECT h FROM Hospital h WHERE h.state = 0 ORDER BY h.name");
         java.util.List<Hospital> list = query.getResultList();
         em.close();
+//
+//        pnlEditKH = new PnlEditKH(new Hospital());
+//        pnlRight.add(pnlEditKH, 0);
 
-        pnlEditKH = new PnlEditKH(new Hospital());
-        pnlRight.add(pnlEditKH, 0);
-
-        cmbKH.setModel(new DefaultComboBoxModel(list.toArray()));
-        cmbKH.setRenderer(HospitalTools.getKHRenderer());
+        cmbHospital.setModel(new DefaultComboBoxModel(list.toArray()));
+        cmbHospital.setRenderer(HospitalTools.getKHRenderer());
 
         tab1.setTitleAt(TAB_KH, OPDE.lang.getString("misc.msg.hospital"));
         tab1.setTitleAt(TAB_HOLLIDAY, OPDE.lang.getString("misc.msg.holliday"));
@@ -93,7 +92,7 @@ public class PnlAway extends JPanel {
         if (props.containsKey("khid")) {
             Long khid = Long.parseLong(props.getProperty("khid"));
             preselect = EntityTools.find(Hospital.class, khid);
-            cmbKH.setSelectedItem(preselect);
+            cmbHospital.setSelectedItem(preselect);
         }
 
         SwingUtilities.invokeLater(new Runnable() {
@@ -106,15 +105,25 @@ public class PnlAway extends JPanel {
     }
 
     private void btnAddKHActionPerformed(ActionEvent e) {
-        SYSTools.showSide(split1, SYSTools.RIGHT_LOWER_SIDE, SYSConst.SCROLL_TIME_FAST);
+//        SYSTools.showSide(split1, SYSTools.RIGHT_LOWER_SIDE, SYSConst.SCROLL_TIME_FAST);
+        final PnlEditHospital pnlHospital = new PnlEditHospital(new Hospital());
+        JidePopup popup = GUITools.createPanelPopup(pnlHospital, new Closure() {
+            @Override
+            public void execute(Object o) {
+                if (o != null) {
+                    cmbHospital.setModel(new DefaultComboBoxModel(new Hospital[]{(Hospital) o}));
+                }
+            }
+        }, btnAddKH);
+        GUITools.showPopup(popup, SwingConstants.EAST);
     }
 
     private void btnToLeftActionPerformed(ActionEvent e) {
-        Hospital newKH = pnlEditKH.getKrankenhaus();
-        if (newKH != null) {
-            cmbKH.setModel(new DefaultComboBoxModel(new Hospital[]{newKH}));
-        }
-        SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, SYSConst.SCROLL_TIME_FAST);
+//        Hospital newKH = pnlEditKH.getKrankenhaus();
+//        if (newKH != null) {
+//            cmbHospital.setModel(new DefaultComboBoxModel(new Hospital[]{newKH}));
+//        }
+//        SYSTools.showSide(split1, SYSTools.LEFT_UPPER_SIDE, SYSConst.SCROLL_TIME_FAST);
 
     }
 
@@ -128,7 +137,8 @@ public class PnlAway extends JPanel {
             case TAB_KH: {
                 abwesenheit.setText(txtKH.getText().trim());
 
-                Hospital hospital = (Hospital) cmbKH.getSelectedItem();
+                Hospital hospital = (Hospital) cmbHospital.getSelectedItem();
+
                 if (hospital.getKhid() == null) {
                     hospital = EntityTools.merge(hospital);
                 }
@@ -177,7 +187,7 @@ public class PnlAway extends JPanel {
         pnlKH = new JPanel();
         split1 = new JSplitPane();
         panel5 = new JPanel();
-        cmbKH = new JComboBox();
+        cmbHospital = new JComboBox();
         btnAddKH = new JButton();
         lblKH = new JLabel();
         scrollPane3 = new JScrollPane();
@@ -222,9 +232,9 @@ public class PnlAway extends JPanel {
                             "default:grow, default",
                             "pref, $ugap, default, $lgap, fill:default:grow"));
 
-                        //---- cmbKH ----
-                        cmbKH.setFont(new Font("Arial", Font.PLAIN, 14));
-                        panel5.add(cmbKH, CC.xy(1, 1, CC.FILL, CC.DEFAULT));
+                        //---- cmbHospital ----
+                        cmbHospital.setFont(new Font("Arial", Font.PLAIN, 14));
+                        panel5.add(cmbHospital, CC.xy(1, 1, CC.FILL, CC.DEFAULT));
 
                         //---- btnAddKH ----
                         btnAddKH.setText(null);
@@ -357,7 +367,7 @@ public class PnlAway extends JPanel {
     private JPanel pnlKH;
     private JSplitPane split1;
     private JPanel panel5;
-    private JComboBox cmbKH;
+    private JComboBox cmbHospital;
     private JButton btnAddKH;
     private JLabel lblKH;
     private JScrollPane scrollPane3;

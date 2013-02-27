@@ -52,12 +52,12 @@ import op.care.PnlCare;
 import op.care.info.PnlInfo;
 import op.care.med.PnlMed;
 import op.care.supervisor.PnlHandover;
-import op.settings.PnlUserSettings;
 import op.controlling.PnlControlling;
 import op.process.PnlProcess;
+import op.settings.PnlSystemSettings;
+import op.settings.PnlUserSettings;
 import op.system.DlgLogin;
 import op.system.InternalClassACL;
-import op.settings.PnlSystemSettings;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.threads.PrintProcessor;
@@ -137,15 +137,6 @@ public class FrmMain extends JFrame {
         printProcessor = new PrintProcessor();
         printProcessor.start();
 
-
-//        residentChangeAction = new Closure() {
-//            @Override
-//            public void execute(Object o) {
-//                currentResident = (Resident) o;
-//            }
-//        };
-
-//        biohazard = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_BIOHAZARD);
 
         // StatusBar Setup
         final LabelStatusBarItem label = new LabelStatusBarItem("Line");
@@ -486,7 +477,7 @@ public class FrmMain extends JFrame {
         }
     }
 
-    public void prepareSearchArea() {
+    public JScrollPane prepareSearchArea() {
         // fixes #1
         if (panesApps != null) {
             panesApps.removeAll();
@@ -541,7 +532,7 @@ public class FrmMain extends JFrame {
         splitPaneLeft.setOrientation(JideSplitPane.VERTICAL_SPLIT);
         splitPaneLeft.add(jspApps);
         splitPaneLeft.add(jspSearch);
-
+        return jspSearch;
     }
 
     public CleanablePanel loadPanel(String classname) {
@@ -572,6 +563,10 @@ public class FrmMain extends JFrame {
 
     public String getCurrentClassname() {
         return currentClassname;
+    }
+
+    public void setCurrentClassname(String currentClassname) {
+        this.currentClassname = currentClassname;
     }
 
     private CollapsiblePane addNursingRecords(final Station station) {

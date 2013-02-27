@@ -63,7 +63,7 @@ public class DlgLogin extends MyJDialog {
     }
 
     public DlgLogin(Closure actionBlock) {
-        super();
+        super(false);
         OPDE.setLogin(null);
 
         this.actionBlock = actionBlock;

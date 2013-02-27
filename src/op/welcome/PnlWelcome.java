@@ -598,7 +598,7 @@ public class PnlWelcome extends CleanablePanel {
             addbw.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    final MyJDialog dlg = new MyJDialog();
+                    final MyJDialog dlg = new MyJDialog(false);
                     WizardDialog wizard = new AddBWWizard(new Closure() {
                         @Override
                         public void execute(Object o) {

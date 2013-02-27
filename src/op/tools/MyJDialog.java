@@ -26,25 +26,41 @@ public class MyJDialog extends JDialog {
     private boolean isDisposed;
     private JPanel content;
 
-    public MyJDialog() {
-        super(OPDE.getMainframe(), true);
-        initContent();
-        isDisposed = false;
-        setResizable(false);
-        setUndecorated(true);
-        initAnimator();
+    public MyJDialog(boolean decorated) {
+        this(OPDE.getMainframe(), decorated);
     }
 
-    public MyJDialog(Dialog owner) {
+    public MyJDialog() {
+        this(true);
+    }
+
+    public MyJDialog(JFrame owner) {
+        this(owner, true);
+    }
+
+    public MyJDialog(Dialog owner, boolean decorated) {
         super(owner, true);
         initContent();
         isDisposed = false;
         setResizable(false);
-        setUndecorated(true);
+        setUndecorated(!decorated);
         initAnimator();
     }
 
-    private void initContent(){
+    public MyJDialog(JFrame owner, boolean decorated) {
+        super(owner, true);
+        initContent();
+        isDisposed = false;
+        setResizable(false);
+        setUndecorated(!decorated);
+        initAnimator();
+    }
+
+    public MyJDialog(Dialog owner) {
+        this(owner, true);
+    }
+
+    private void initContent() {
         content = new JPanel();
         content.setBorder(new LineBorder(Color.BLACK, 1));
         setContentPane(content);
@@ -56,7 +72,7 @@ public class MyJDialog extends JDialog {
     }
 
     protected void initAnimator() {
-        if (!OPDE.isAnimation()){
+        if (!OPDE.isAnimation()) {
             return;
         }
 
@@ -107,11 +123,11 @@ public class MyJDialog extends JDialog {
 
     @Override
     public void setVisible(boolean visible) {
-        if (isDisposed){
+        if (isDisposed) {
             return;
         }
 
-        if (!OPDE.isAnimation()){
+        if (!OPDE.isAnimation()) {
             super.setVisible(visible);
             return;
         }

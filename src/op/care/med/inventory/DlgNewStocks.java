@@ -83,7 +83,7 @@ public class DlgNewStocks extends MyJDialog {
     private PrinterForm printForm;
 
     public DlgNewStocks(Resident resident) {
-        super();
+        super(false);
         this.resident = resident;
         initComponents();
         initDialog();

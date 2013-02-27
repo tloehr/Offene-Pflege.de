@@ -57,7 +57,7 @@ public class DlgPack extends MyJDialog {
      * Creates new form DlgPack
      */
     public DlgPack(String title, MedPackage aPackage) {
-        super();
+        super(false);
         initComponents();
         setTitle(title);
         this.aPackage = aPackage;

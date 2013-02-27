@@ -23,7 +23,7 @@ public class DlgPIT extends MyJDialog {
     private Date pit;
 
     public DlgPIT(String text, Closure actionBlock) {
-        super();
+        super(false);
         this.actionBlock = actionBlock;
         initComponents();
         lblText.setText(text);

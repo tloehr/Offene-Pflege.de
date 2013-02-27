@@ -11,11 +11,9 @@ import entity.prescription.Doc;
 import entity.prescription.DocTools;
 import op.residents.PnlEditGP;
 import op.tools.GUITools;
-import op.tools.SYSConst;
 import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -43,42 +41,16 @@ public class PnlGP extends JPanel {
         cmbArzt.setRenderer(DocTools.getRenderer());
     }
 
-    private JidePopup createPopup(final PnlEditGP pnlGP) {
-        final JidePopup popup = new JidePopup();
-        popup.setMovable(false);
-        JPanel pnl = new JPanel(new BorderLayout(10, 10));
-
-        pnl.add(pnlGP, BorderLayout.CENTER);
-
-        JPanel btnPanel = new JPanel();
-        btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.X_AXIS));
-
-        JButton save = new JButton(SYSConst.icon22apply);
-        save.addActionListener(new ActionListener() {
+    private void btnAddActionPerformed(ActionEvent e) {
+        final JidePopup popupGP = GUITools.createPanelPopup(new PnlEditGP(new Doc()), new Closure() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                popup.hidePopup();
-                if (pnlGP.getDoc() != null) {
-                    cmbArzt.setModel(new DefaultComboBoxModel(new Doc[]{pnlGP.getDoc()}));
+            public void execute(Object o) {
+                if (o != null) {
+                    cmbArzt.setModel(new DefaultComboBoxModel(new Doc[]{(Doc) o}));
                     validate.execute(cmbArzt.getSelectedItem());
                 }
             }
-        });
-        btnPanel.add(Box.createHorizontalGlue());
-        btnPanel.add(save);
-        pnl.add(btnPanel, BorderLayout.SOUTH);
-
-        popup.setContentPane(pnl);
-        popup.setPreferredSize(pnl.getPreferredSize());
-        pnl.revalidate();
-        popup.removeExcludedComponent(pnl);
-        popup.setDefaultFocusComponent(pnl);
-        return popup;
-    }
-
-    private void btnAddActionPerformed(ActionEvent e) {
-        final JidePopup popupGP = createPopup(new PnlEditGP(new Doc()));
-        popupGP.setOwner(btnAdd);
+        }, btnAdd);
         popupGP.setMovable(false);
         GUITools.showPopup(popupGP, SwingConstants.WEST);
     }
@@ -94,8 +66,8 @@ public class PnlGP extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "default:grow, $lcgap, default",
-            "default"));
+                "default:grow, $lcgap, default",
+                "default"));
 
         //---- cmbArzt ----
         cmbArzt.addItemListener(new ItemListener() {

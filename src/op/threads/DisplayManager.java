@@ -251,7 +251,7 @@ public class DisplayManager extends Thread {
                 messageQ.remove(0); // remove head
                 currentSubMessage = nextMessage;
                 currentSubMessage.setProcessed(System.currentTimeMillis());
-                lblSub.setText(currentSubMessage.getMessage());
+                lblSub.setText(SYSTools.toHTMLForScreen(currentSubMessage.getMessage()));
                 if (currentSubMessage.getPriority() == DisplayMessage.IMMEDIATELY) {
                     SyslogTools.addLog("[" + currentSubMessage.getClassname() + "] " + currentSubMessage.getMessage(), SyslogTools.ERROR);
                 }

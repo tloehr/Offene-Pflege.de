@@ -283,7 +283,7 @@ public class OPDE {
             } catch (MessagingException e1) {
                 OPDE.info(e1);
                 OPDE.info("Mail-System is not configured");
-                e1.printStackTrace();
+//                e1.printStackTrace();
             } catch (UnsupportedEncodingException e1) {
                 OPDE.info(e1);
                 e1.printStackTrace();

@@ -21,7 +21,10 @@ import entity.system.Users;
 import entity.system.UsersTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
-import op.tools.*;
+import op.tools.GUITools;
+import op.tools.MyJDialog;
+import op.tools.SYSCalendar;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.HorizontalLayout;
 
@@ -48,7 +51,7 @@ public class DlgEditResidentBaseData extends MyJDialog {
     Date dob = null;
 
     public DlgEditResidentBaseData(Resident resident, Closure actionBlock) {
-        super();
+        super(false);
         this.resident = resident;
         this.actionBlock = actionBlock;
         initComponents();
@@ -198,32 +201,14 @@ public class DlgEditResidentBaseData extends MyJDialog {
 
     private void btnAddGPActionPerformed(ActionEvent e) {
         final PnlEditGP pnlGP = new PnlEditGP(new Doc());
-        final JidePopup popup = createPopup(pnlGP);
-        popup.setOwner(btnAddGP);
-        popup.showPopup(SwingConstants.EAST, btnAddGP);
-    }
-
-    private JidePopup createPopup(final PnlEditGP pnlGP) {
-        final JidePopup popup = new JidePopup();
-        popup.setMovable(false);
-        JPanel pnl = new JPanel(new BorderLayout(10, 10));
-
-        pnl.add(pnlGP, BorderLayout.CENTER);
-
-        JPanel btnPanel = new JPanel();
-        btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.X_AXIS));
-
-        JButton save = new JButton(SYSConst.icon22apply);
-//        save.setAlignmentX(0.0f);
-        save.addActionListener(new ActionListener() {
+        final JidePopup popup = GUITools.createPanelPopup(pnlGP, new Closure() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                popup.hidePopup();
-                if (pnlGP.getDoc() != null) {
+            public void execute(Object o) {
+                if (o != null) {
                     EntityManager em = OPDE.createEM();
                     try {
                         em.getTransaction().begin();
-                        Doc myGP = em.merge(pnlGP.getDoc());
+                        Doc myGP = em.merge((Doc) o);
                         em.getTransaction().commit();
                         cmbGP.setModel(new DefaultComboBoxModel(new Doc[]{myGP}));
                         resident.setGP(myGP);
@@ -235,44 +220,23 @@ public class DlgEditResidentBaseData extends MyJDialog {
                     } finally {
                         em.close();
                     }
-//                    cmbGP.setModel(new DefaultComboBoxModel(new Doc[]{pnlGP.getDoc()}));
-//                    resident.setGP(pnlGP.getDoc());
                 }
             }
-        });
-        btnPanel.add(Box.createHorizontalGlue());
-        btnPanel.add(save);
-        pnl.add(btnPanel, BorderLayout.SOUTH);
-
-        popup.setContentPane(pnl);
-        popup.setPreferredSize(pnl.getPreferredSize());
-        pnl.revalidate();
-        popup.removeExcludedComponent(pnl);
-        popup.setDefaultFocusComponent(pnl);
-        return popup;
+        }, btnAddGP);
+        GUITools.showPopup(popup, SwingConstants.EAST);
     }
 
-    private JidePopup createPopup(final PnlEditLC pnlLC) {
-        final JidePopup popup = new JidePopup();
-        popup.setMovable(false);
-        JPanel pnl = new JPanel(new BorderLayout(10, 10));
-
-        pnl.add(pnlLC, BorderLayout.CENTER);
-
-        JPanel btnPanel = new JPanel();
-        btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.X_AXIS));
-
-        JButton save = new JButton(SYSConst.icon22apply);
-//        save.setAlignmentX(0.0f);
-        save.addActionListener(new ActionListener() {
+    private void btnEditGPActionPerformed(ActionEvent e) {
+        if (cmbGP.getSelectedItem() == null) return;
+        final PnlEditGP pnlGP = new PnlEditGP((Doc) cmbGP.getSelectedItem());
+        final JidePopup popup = GUITools.createPanelPopup(pnlGP, new Closure() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                popup.hidePopup();
-                if (pnlLC.getLCustodian() != null) {
+            public void execute(Object o) {
+                if (o != null) {
                     EntityManager em = OPDE.createEM();
                     try {
                         em.getTransaction().begin();
-                        LCustodian myLC = em.merge(pnlLC.getLCustodian());
+                        LCustodian myLC = em.merge((LCustodian) o);
                         em.getTransaction().commit();
                         cmbLCust.setModel(new DefaultComboBoxModel(new LCustodian[]{myLC}));
                         resident.setLCustodian1(myLC);
@@ -284,44 +248,66 @@ public class DlgEditResidentBaseData extends MyJDialog {
                     } finally {
                         em.close();
                     }
-//                    cmbLCust.setModel(new DefaultComboBoxModel(new LCustodian[]{pnlLC.getLCustodian()}));
-//                    resident.setLCustodian1(pnlLC.getLCustodian());
                 }
             }
-        });
-        btnPanel.add(Box.createHorizontalGlue());
-        btnPanel.add(save);
-        pnl.add(btnPanel, BorderLayout.SOUTH);
-
-        popup.setContentPane(pnl);
-        popup.setPreferredSize(pnl.getPreferredSize());
-        pnl.revalidate();
-        popup.removeExcludedComponent(pnl);
-        popup.setDefaultFocusComponent(pnl);
-        return popup;
-    }
-
-    private void btnEditGPActionPerformed(ActionEvent e) {
-        if (cmbGP.getSelectedItem() == null) return;
-        final PnlEditGP pnlGP = new PnlEditGP((Doc) cmbGP.getSelectedItem());
-        final JidePopup popup = createPopup(pnlGP);
-        popup.setOwner(btnEditGP);
-        popup.showPopup(SwingConstants.EAST, btnEditGP);
+        }, btnEditGP);
+        GUITools.showPopup(popup, SwingConstants.EAST);
     }
 
     private void btnEditLCActionPerformed(ActionEvent e) {
         if (cmbLCust.getSelectedItem() == null) return;
         final PnlEditLC pnlLC = new PnlEditLC((LCustodian) cmbLCust.getSelectedItem());
-        final JidePopup popup = createPopup(pnlLC);
-        popup.setOwner(btnEditLC);
-        popup.showPopup(SwingConstants.EAST, btnEditLC);
+        final JidePopup popup = GUITools.createPanelPopup(pnlLC, new Closure() {
+            @Override
+            public void execute(Object o) {
+                if (o != null) {
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        Doc myGP = em.merge((Doc) o);
+                        em.getTransaction().commit();
+                        cmbGP.setModel(new DefaultComboBoxModel(new Doc[]{myGP}));
+                        resident.setGP(myGP);
+                    } catch (Exception ex) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(ex);
+                    } finally {
+                        em.close();
+                    }
+                }
+            }
+        }, btnEditLC);
+        GUITools.showPopup(popup, SwingConstants.EAST);
+
     }
 
     private void btnAddLCActionPerformed(ActionEvent e) {
         final PnlEditLC pnlLC = new PnlEditLC(new LCustodian());
-        final JidePopup popup = createPopup(pnlLC);
-        popup.setOwner(btnAddLC);
-        popup.showPopup(SwingConstants.EAST, btnAddLC);
+        final JidePopup popup = GUITools.createPanelPopup(pnlLC, new Closure() {
+            @Override
+            public void execute(Object o) {
+                if (o != null) {
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        Doc myGP = em.merge((Doc) o);
+                        em.getTransaction().commit();
+                        cmbGP.setModel(new DefaultComboBoxModel(new Doc[]{myGP}));
+                        resident.setGP(myGP);
+                    } catch (Exception ex) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(ex);
+                    } finally {
+                        em.close();
+                    }
+                }
+            }
+        }, btnAddLC);
+        GUITools.showPopup(popup, SwingConstants.EAST);
     }
 
     private void initComponents() {
@@ -361,8 +347,8 @@ public class DlgEditResidentBaseData extends MyJDialog {
         //======== this ========
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "13dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default, $lcgap, 13dlu",
-            "13dlu, 12*($lgap, default), $lgap, 13dlu"));
+                "13dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default, $lcgap, 13dlu",
+                "13dlu, 12*($lgap, default), $lgap, 13dlu"));
 
         //---- lblName ----
         lblName.setText("text");

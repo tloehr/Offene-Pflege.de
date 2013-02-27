@@ -29,13 +29,13 @@ package op.care.prescription;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.prescription.Hospital;
 import entity.prescription.*;
-import entity.prescription.HospitalTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
 import org.apache.commons.collections.Closure;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -43,6 +43,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 /**
  * @author root
@@ -50,15 +52,31 @@ import java.awt.event.ActionListener;
 public class DlgDiscontinue extends MyJDialog {
     private Prescription prescription;
     private Closure actionBlock;
+    private java.util.List<Doc> listAerzte;
+    private java.util.List<Hospital> listKH;
 
     /**
      * Creates new form DlgDiscontinue
      */
+    private void cmbArztAbKeyPressed(KeyEvent e) {
+        final String searchKey = String.valueOf(e.getKeyChar());
+        Doc doc = (Doc) CollectionUtils.find(listAerzte, new Predicate() {
+            @Override
+            public boolean evaluate(Object o) {
+                return o != null && ((Doc) o).getName().toLowerCase().charAt(0) == searchKey.toLowerCase().charAt(0);
+            }
+        });
+        if (doc != null) {
+            cmbArztAb.setSelectedItem(doc);
+        }
+    }
+
     public DlgDiscontinue(Prescription prescription, Closure actionBlock) {
+        super(false);
         this.actionBlock = actionBlock;
         this.prescription = prescription;
         initComponents();
-        lblQuestion.setText(OPDE.lang.getString(PnlPrescription.internalClassID+".dlgDiscontinue.question"));
+        lblQuestion.setText(OPDE.lang.getString(PnlPrescription.internalClassID + ".dlgDiscontinue.question"));
         fillCMBs();
         setVisible(true);
     }
@@ -93,21 +111,27 @@ public class DlgDiscontinue extends MyJDialog {
         contentPane.add(lblQuestion, CC.xy(2, 3));
 
         //---- cmbArztAb ----
-        cmbArztAb.setModel(new DefaultComboBoxModel(new String[]{
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
+        cmbArztAb.setModel(new DefaultComboBoxModel(new String[] {
+            "Item 1",
+            "Item 2",
+            "Item 3",
+            "Item 4"
         }));
         cmbArztAb.setFont(new Font("Arial", Font.PLAIN, 14));
+        cmbArztAb.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                cmbArztAbKeyPressed(e);
+            }
+        });
         contentPane.add(cmbArztAb, CC.xy(2, 5));
 
         //---- cmbKHAb ----
-        cmbKHAb.setModel(new DefaultComboBoxModel(new String[]{
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
+        cmbKHAb.setModel(new DefaultComboBoxModel(new String[] {
+            "Item 1",
+            "Item 2",
+            "Item 3",
+            "Item 4"
         }));
         cmbKHAb.setFont(new Font("Arial", Font.PLAIN, 14));
         contentPane.add(cmbKHAb, CC.xy(2, 7));
@@ -160,7 +184,7 @@ public class DlgDiscontinue extends MyJDialog {
         Hospital hospital = (Hospital) cmbKHAb.getSelectedItem();
 
         if (doc == null && hospital == null) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(PnlPrescription.internalClassID+".dlgDiscontinue.docandhospitalempty"));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(PnlPrescription.internalClassID + ".dlgDiscontinue.docandhospitalempty"));
         } else {
             prescription.setDocOFF(doc);
             prescription.setHospitalOFF(hospital);
@@ -169,23 +193,14 @@ public class DlgDiscontinue extends MyJDialog {
         }
     }//GEN-LAST:event_btnOKActionPerformed
 
-    private void cmbKHAbItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbKHAbItemStateChanged
-
-    }//GEN-LAST:event_cmbKHAbItemStateChanged
-
-    private void cmbArztAbItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbArztAbItemStateChanged
-
-    }//GEN-LAST:event_cmbArztAbItemStateChanged
-
-
     private void fillCMBs() {
         EntityManager em = OPDE.createEM();
         Query queryArzt = em.createQuery("SELECT a FROM Doc a ORDER BY a.name, a.vorname");
-        java.util.List<Doc> listAerzte = queryArzt.getResultList();
+        listAerzte = queryArzt.getResultList();
         listAerzte.add(0, null);
 
         Query queryKH = em.createQuery("SELECT k FROM Hospital k ORDER BY k.name");
-        java.util.List<Hospital> listKH = queryKH.getResultList();
+        listKH = queryKH.getResultList();
         listKH.add(0, null);
 
         cmbArztAb.setModel(new DefaultComboBoxModel(listAerzte.toArray()));

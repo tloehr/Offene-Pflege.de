@@ -1100,12 +1100,14 @@ public class PnlInventory extends NursingRecordsPanel {
                                 SwingUtilities.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
-                                        GUITools.scroll2show(jspInventory, linemap.get(myTX).getLocation().y, new Closure() {
-                                            @Override
-                                            public void execute(Object o) {
-                                                GUITools.flashBackground(linemap.get(myTX), Color.YELLOW, 2);
-                                            }
-                                        });
+                                        if (linemap.containsKey(myTX)) {
+                                            GUITools.scroll2show(jspInventory, linemap.get(myTX).getLocation().y, new Closure() {
+                                                @Override
+                                                public void execute(Object o) {
+                                                    GUITools.flashBackground(linemap.get(myTX), Color.YELLOW, 2);
+                                                }
+                                            });
+                                        }
                                     }
                                 });
 

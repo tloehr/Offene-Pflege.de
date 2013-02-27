@@ -51,7 +51,7 @@ public class DlgFiles extends MyJDialog {
      * @param afterAttachAction what to do, after files have been attached. if this is <code>null</code>, file drops are not possible.
      */
     public DlgFiles(Object attachable, Closure afterAttachAction) {
-        super();
+        super(false);
         this.attachable = attachable;
         this.afterAttachAction = afterAttachAction;
         initComponents();

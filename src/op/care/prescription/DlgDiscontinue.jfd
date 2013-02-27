@@ -104,6 +104,14 @@
         <void property="name"> 
          <string>cmbArztAb</string> 
         </void> 
+        <void method="addEvent"> 
+         <object class="com.jformdesigner.model.FormEvent"> 
+          <string>java.awt.event.KeyListener</string> 
+          <string>keyPressed</string> 
+          <string>cmbArztAbKeyPressed</string> 
+          <boolean>true</boolean> 
+         </object> 
+        </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
         <class>com.jgoodies.forms.layout.CellConstraints</class> 

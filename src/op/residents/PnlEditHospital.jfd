@@ -13,11 +13,11 @@
        <class>com.jgoodies.forms.layout.FormLayout</class> 
        <void method="setProperty"> 
         <string>$columnSpecs</string> 
-        <string>default, labelcompgap, default:grow</string> 
+        <string>13dlu, labelcompgap, default, labelcompgap, 143dlu, labelcompgap, 13dlu</string> 
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
-        <string>default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default</string> 
+        <string>13dlu, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, 13dlu</string> 
        </void> 
       </object> 
       <void property="name"> 
@@ -28,7 +28,7 @@
         <string>javax.swing.JLabel</string> 
         <void method="setProperty"> 
          <string>text</string> 
-         <string>Anrede</string> 
+         <string>text</string> 
         </void> 
         <void method="setProperty"> 
          <string>font</string> 
@@ -39,14 +39,14 @@
          </object> 
         </void> 
         <void property="name"> 
-         <string>lblKHName</string> 
+         <string>lblName</string> 
         </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>1</int> 
+         <int>3</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
@@ -62,14 +62,22 @@
          <object idref="Font0"/> 
         </void> 
         <void property="name"> 
-         <string>txtKHName</string> 
+         <string>txtName</string> 
+        </void> 
+        <void method="addEvent"> 
+         <object class="com.jformdesigner.model.FormEvent"> 
+          <string>java.awt.event.ActionListener</string> 
+          <string>actionPerformed</string> 
+          <string>txtNachnameActionPerformed</string> 
+          <boolean>true</boolean> 
+         </object> 
         </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>3</int> 
+         <int>5</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
@@ -96,7 +104,7 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>1</int> 
+         <int>3</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
@@ -114,12 +122,20 @@
         <void property="name"> 
          <string>txtStrasse</string> 
         </void> 
+        <void method="addEvent"> 
+         <object class="com.jformdesigner.model.FormEvent"> 
+          <string>java.awt.event.ActionListener</string> 
+          <string>actionPerformed</string> 
+          <string>txtStrasseActionPerformed</string> 
+          <boolean>true</boolean> 
+         </object> 
+        </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>3</int> 
+         <int>5</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
@@ -146,7 +162,7 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>1</int> 
+         <int>3</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
@@ -164,12 +180,20 @@
         <void property="name"> 
          <string>txtPLZ</string> 
         </void> 
+        <void method="addEvent"> 
+         <object class="com.jformdesigner.model.FormEvent"> 
+          <string>java.awt.event.ActionListener</string> 
+          <string>actionPerformed</string> 
+          <string>txtPLZActionPerformed</string> 
+          <boolean>true</boolean> 
+         </object> 
+        </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>3</int> 
+         <int>5</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
@@ -196,7 +220,7 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>1</int> 
+         <int>3</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
@@ -214,12 +238,20 @@
         <void property="name"> 
          <string>txtOrt</string> 
         </void> 
+        <void method="addEvent"> 
+         <object class="com.jformdesigner.model.FormEvent"> 
+          <string>java.awt.event.ActionListener</string> 
+          <string>actionPerformed</string> 
+          <string>txtOrtActionPerformed</string> 
+          <boolean>true</boolean> 
+         </object> 
+        </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>3</int> 
+         <int>5</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
@@ -246,7 +278,7 @@
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>1</int> 
+         <int>3</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
@@ -264,12 +296,20 @@
         <void property="name"> 
          <string>txtTel</string> 
         </void> 
+        <void method="addEvent"> 
+         <object class="com.jformdesigner.model.FormEvent"> 
+          <string>java.awt.event.ActionListener</string> 
+          <string>actionPerformed</string> 
+          <string>txtTelActionPerformed</string> 
+          <boolean>true</boolean> 
+         </object> 
+        </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>3</int> 
+         <int>5</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
@@ -295,6 +335,10 @@
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>3</int> 
+        </void> 
+        <void method="setProperty"> 
          <string>gridY</string> 
          <int>13</int> 
         </void> 
@@ -310,12 +354,20 @@
         <void property="name"> 
          <string>txtFax</string> 
         </void> 
+        <void method="addEvent"> 
+         <object class="com.jformdesigner.model.FormEvent"> 
+          <string>java.awt.event.ActionListener</string> 
+          <string>actionPerformed</string> 
+          <string>txtFaxActionPerformed</string> 
+          <boolean>true</boolean> 
+         </object> 
+        </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
         <void method="setProperty"> 
          <string>gridX</string> 
-         <int>3</int> 
+         <int>5</int> 
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 

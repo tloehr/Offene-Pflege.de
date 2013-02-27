@@ -16,26 +16,29 @@ public class Hospital implements Serializable {
     @Column(name = "Name")
     private String name;
     @Column(name = "Strasse")
-    private String strasse;
+    private String street;
     @Column(name = "PLZ")
-    private String plz;
+    private String zip;
     @Column(name = "Ort")
-    private String ort;
+    private String city;
     @Column(name = "Tel")
     private String tel;
     @Column(name = "Fax")
     private String fax;
     @Column(name = "Status")
-    private Integer status;
+    private Integer state;
+    @Version
+    @Column(name = "version")
+    private Long version;
 
     public Hospital() {
         this.name = "";
-        this.strasse = "";
-        this.plz = "";
-        this.ort = "";
+        this.street = "";
+        this.zip = "";
+        this.city = "";
         this.tel = "";
         this.fax = "";
-        this.status = 0;
+        this.state = 0;
     }
 
     public Long getKhid() {
@@ -54,36 +57,36 @@ public class Hospital implements Serializable {
         this.name = name;
     }
 
-    public String getStrasse() {
-        return strasse;
+    public String getStreet() {
+        return street;
     }
 
-    public void setStrasse(String strasse) {
-        this.strasse = strasse;
+    public void setStreet(String strasse) {
+        this.street = strasse;
     }
 
-    public String getPlz() {
-        return plz;
+    public String getZip() {
+        return zip;
     }
 
-    public void setPlz(String plz) {
-        this.plz = plz;
+    public void setZip(String plz) {
+        this.zip = plz;
     }
 
-    public Integer getStatus() {
-        return status;
+    public Integer getState() {
+        return state;
     }
 
-    public void setStatus(Integer status) {
-        this.status = status;
+    public void setState(Integer status) {
+        this.state = status;
     }
 
-    public String getOrt() {
-        return ort;
+    public String getCity() {
+        return city;
     }
 
-    public void setOrt(String ort) {
-        this.ort = ort;
+    public void setCity(String ort) {
+        this.city = ort;
     }
 
     public String getTel() {
@@ -112,10 +115,10 @@ public class Hospital implements Serializable {
         if (fax != null ? !fax.equals(hospital.fax) : hospital.fax != null) return false;
         if (khid != null ? !khid.equals(hospital.khid) : hospital.khid != null) return false;
         if (name != null ? !name.equals(hospital.name) : hospital.name != null) return false;
-        if (ort != null ? !ort.equals(hospital.ort) : hospital.ort != null) return false;
-        if (plz != null ? !plz.equals(hospital.plz) : hospital.plz != null) return false;
-        if (status != null ? !status.equals(hospital.status) : hospital.status != null) return false;
-        if (strasse != null ? !strasse.equals(hospital.strasse) : hospital.strasse != null) return false;
+        if (city != null ? !city.equals(hospital.city) : hospital.city != null) return false;
+        if (zip != null ? !zip.equals(hospital.zip) : hospital.zip != null) return false;
+        if (state != null ? !state.equals(hospital.state) : hospital.state != null) return false;
+        if (street != null ? !street.equals(hospital.street) : hospital.street != null) return false;
         if (tel != null ? !tel.equals(hospital.tel) : hospital.tel != null) return false;
 
         return true;
@@ -125,12 +128,12 @@ public class Hospital implements Serializable {
     public int hashCode() {
         int result = khid != null ? khid.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (strasse != null ? strasse.hashCode() : 0);
-        result = 31 * result + (plz != null ? plz.hashCode() : 0);
-        result = 31 * result + (ort != null ? ort.hashCode() : 0);
+        result = 31 * result + (street != null ? street.hashCode() : 0);
+        result = 31 * result + (zip != null ? zip.hashCode() : 0);
+        result = 31 * result + (city != null ? city.hashCode() : 0);
         result = 31 * result + (tel != null ? tel.hashCode() : 0);
         result = 31 * result + (fax != null ? fax.hashCode() : 0);
-        result = 31 * result + (status != null ? status.hashCode() : 0);
+        result = 31 * result + (state != null ? state.hashCode() : 0);
         return result;
     }
 

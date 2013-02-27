@@ -291,7 +291,7 @@ public class MedStockTools {
         String result = "";
         result += "<font color=\"blue\"><b>" + bestand.getTradeForm().getMedProduct().getBezeichnung() + " " + bestand.getTradeForm().getSubtext() + ", ";
 
-        if (bestand.getPackage() != null &&  !SYSTools.catchNull(bestand.getPackage().getPzn()).isEmpty()) {
+        if (bestand.getPackage() != null && !SYSTools.catchNull(bestand.getPackage().getPzn()).isEmpty()) {
             result += OPDE.lang.getString("misc.msg.PZN") + ": " + bestand.getPackage().getPzn() + ", ";
             result += MedPackageTools.GROESSE[bestand.getPackage().getSize()] + ", " + bestand.getPackage().getContent() + " " + SYSConst.UNITS[bestand.getTradeForm().getDosageForm().getPackUnit()] + " ";
             String zubereitung = SYSTools.catchNull(bestand.getTradeForm().getDosageForm().getPreparation());
@@ -586,7 +586,9 @@ public class MedStockTools {
             query.setParameter("tradeform", tradeForm);
             Object result = query.getSingleResult();
 
-            if (result instanceof Double) {
+            if (result == null) {
+                upr = BigDecimal.ONE;
+            } else if (result instanceof Double) {
                 upr = new BigDecimal((Double) result);
             } else {
                 upr = (BigDecimal) query.getSingleResult();
@@ -610,7 +612,10 @@ public class MedStockTools {
             query.setParameter("tradeform", tradeForm);
             query.setParameter("resident", resident);
             Object result = query.getSingleResult();
-            if (result instanceof Double) {
+
+            if (result == null) {
+                upr = BigDecimal.ONE;
+            } else if (result instanceof Double) {
                 upr = new BigDecimal((Double) result);
             } else {
                 upr = (BigDecimal) query.getSingleResult();

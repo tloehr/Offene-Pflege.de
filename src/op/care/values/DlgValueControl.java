@@ -35,7 +35,7 @@ public class DlgValueControl extends MyJDialog {
     private Closure afterAction;
 
     public DlgValueControl(Resident resident, Closure afterAction) {
-        super();
+        super(false);
         this.afterAction = afterAction;
         props = resident.getControlling();
         initComponents();

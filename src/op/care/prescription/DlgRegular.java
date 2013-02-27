@@ -35,11 +35,15 @@ import entity.nursingprocess.InterventionTools;
 import entity.prescription.*;
 import op.OPDE;
 import op.care.med.prodassistant.MedProductWizard;
+import op.residents.PnlEditGP;
+import op.residents.PnlEditHospital;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.jdesktop.swingx.JXSearchField;
-import org.jdesktop.swingx.prompt.*;
+import org.jdesktop.swingx.prompt.PromptSupport;
 import org.joda.time.DateMidnight;
 import tablerenderer.RNDHTML;
 
@@ -55,6 +59,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -72,6 +77,9 @@ public class DlgRegular extends MyJDialog {
 
     private boolean ignoreEvent;
 
+    private List<Doc> listAerzte;
+    private List<Hospital> listKH;
+
     private JPopupMenu menu;
     private int editMode;
     private Closure actionBlock;
@@ -85,6 +93,7 @@ public class DlgRegular extends MyJDialog {
      * Creates new form DlgRegular
      */
     public DlgRegular(Prescription prescription, int mode, Closure actionBlock) {
+        super(false);
         this.actionBlock = actionBlock;
         this.prescription = prescription;
         schedules2delete = new ArrayList<PrescriptionSchedule>();
@@ -200,6 +209,45 @@ public class DlgRegular extends MyJDialog {
         SYSCalendar.handleDateFocusLost(evt, new DateMidnight(), new DateMidnight().plusYears(1));
     }
 
+    private void cmbDocONKeyPressed(KeyEvent e) {
+        final String searchKey = String.valueOf(e.getKeyChar());
+        Doc doc = (Doc) CollectionUtils.find(listAerzte, new Predicate() {
+            @Override
+            public boolean evaluate(Object o) {
+                return o != null && ((Doc) o).getName().toLowerCase().charAt(0) == searchKey.toLowerCase().charAt(0);
+            }
+        });
+        if (doc != null) {
+            cmbDocON.setSelectedItem(doc);
+        }
+    }
+
+    private void btnAddGPActionPerformed(ActionEvent e) {
+        final PnlEditGP pnlGP = new PnlEditGP(new Doc());
+        JidePopup popup = GUITools.createPanelPopup(pnlGP, new Closure() {
+            @Override
+            public void execute(Object o) {
+                if (o != null) {
+                    cmbDocON.setModel(new DefaultComboBoxModel(new Doc[]{(Doc) o}));
+                }
+            }
+        }, btnAddGP);
+        GUITools.showPopup(popup, SwingConstants.EAST);
+    }
+
+    private void btnAddHospitalActionPerformed(ActionEvent e) {
+        final PnlEditHospital pnlHospital = new PnlEditHospital(new Hospital());
+        JidePopup popup = GUITools.createPanelPopup(pnlHospital, new Closure() {
+            @Override
+            public void execute(Object o) {
+                if (o != null) {
+                    cmbHospitalON.setModel(new DefaultComboBoxModel(new Hospital[]{(Hospital) o}));
+                }
+            }
+        }, btnAddHospital);
+        GUITools.showPopup(popup, SwingConstants.EAST);
+    }
+
     private void txtMassActionPerformed(ActionEvent e) {
         cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.TYPE_PRESCRIPTION, txtIntervention.getText()).toArray()));
     }
@@ -235,7 +283,9 @@ public class DlgRegular extends MyJDialog {
         lblText = new JLabel();
         pnlON = new JPanel();
         cmbDocON = new JComboBox();
+        btnAddGP = new JButton();
         cmbHospitalON = new JComboBox();
+        btnAddHospital = new JButton();
         panel1 = new JPanel();
         btnClose = new JButton();
         btnSave = new JButton();
@@ -246,15 +296,15 @@ public class DlgRegular extends MyJDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "$rgap, $lcgap, default, $lcgap, default:grow, $lcgap, $rgap",
-            "$rgap, $lgap, fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
+                "$rgap, $lcgap, default, $lcgap, default:grow, $lcgap, $rgap",
+                "$rgap, $lgap, fill:default:grow, $lgap, fill:default, $lgap, $rgap"));
 
         //======== jPanel1 ========
         {
             jPanel1.setBorder(null);
             jPanel1.setLayout(new FormLayout(
-                "68dlu, $lcgap, 284dlu, $lcgap, pref",
-                "2*(16dlu, $lgap), default, $lgap, fill:default:grow"));
+                    "68dlu, $lcgap, 284dlu, $lcgap, pref",
+                    "2*(16dlu, $lgap), default, $lgap, fill:default:grow"));
 
             //---- txtMed ----
             txtMed.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -275,11 +325,11 @@ public class DlgRegular extends MyJDialog {
             jPanel1.add(txtMed, CC.xy(1, 1));
 
             //---- cmbMed ----
-            cmbMed.setModel(new DefaultComboBoxModel(new String[] {
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
+            cmbMed.setModel(new DefaultComboBoxModel(new String[]{
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
             }));
             cmbMed.setFont(new Font("Arial", Font.PLAIN, 14));
             cmbMed.addItemListener(new ItemListener() {
@@ -313,11 +363,11 @@ public class DlgRegular extends MyJDialog {
             jPanel1.add(panel4, CC.xy(5, 1));
 
             //---- cmbIntervention ----
-            cmbIntervention.setModel(new DefaultComboBoxModel(new String[] {
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
+            cmbIntervention.setModel(new DefaultComboBoxModel(new String[]{
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
             }));
             cmbIntervention.setFont(new Font("Arial", Font.PLAIN, 14));
             jPanel1.add(cmbIntervention, CC.xywh(3, 3, 3, 1));
@@ -336,11 +386,11 @@ public class DlgRegular extends MyJDialog {
             //======== jPanel8 ========
             {
                 jPanel8.setBorder(new TitledBorder(null, "Dosis / H\u00e4ufigkeit", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION,
-                    new Font("Arial", Font.PLAIN, 14)));
+                        new Font("Arial", Font.PLAIN, 14)));
                 jPanel8.setFont(new Font("Arial", Font.PLAIN, 14));
                 jPanel8.setLayout(new FormLayout(
-                    "default:grow",
-                    "fill:default:grow, $lgap, pref"));
+                        "default:grow",
+                        "fill:default:grow, $lgap, pref"));
 
                 //======== jspDosis ========
                 {
@@ -348,15 +398,15 @@ public class DlgRegular extends MyJDialog {
 
                     //---- tblDosis ----
                     tblDosis.setModel(new DefaultTableModel(
-                        new Object[][] {
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                            {null, null, null, null},
-                        },
-                        new String[] {
-                            "Title 1", "Title 2", "Title 3", "Title 4"
-                        }
+                            new Object[][]{
+                                    {null, null, null, null},
+                                    {null, null, null, null},
+                                    {null, null, null, null},
+                                    {null, null, null, null},
+                            },
+                            new String[]{
+                                    "Title 1", "Title 2", "Title 3", "Title 4"
+                            }
                     ));
                     tblDosis.setSurrendersFocusOnKeystroke(true);
                     tblDosis.setToolTipText(null);
@@ -400,15 +450,15 @@ public class DlgRegular extends MyJDialog {
         {
             jPanel3.setBorder(null);
             jPanel3.setLayout(new FormLayout(
-                "149dlu",
-                "3*(fill:default, $lgap), fill:default:grow"));
+                    "149dlu",
+                    "3*(fill:default, $lgap), fill:default:grow"));
 
             //======== pnlOFF ========
             {
                 pnlOFF.setBorder(new TitledBorder("Absetzung"));
                 pnlOFF.setLayout(new FormLayout(
-                    "pref, 86dlu:grow",
-                    "2*(fill:17dlu, $lgap), fill:17dlu"));
+                        "pref, 86dlu:grow",
+                        "2*(fill:17dlu, $lgap), fill:17dlu"));
 
                 //---- rbActive ----
                 rbActive.setText("text");
@@ -474,26 +524,64 @@ public class DlgRegular extends MyJDialog {
             {
                 pnlON.setBorder(new TitledBorder("Ansetzung"));
                 pnlON.setLayout(new FormLayout(
-                    "119dlu:grow",
-                    "17dlu, $lgap, fill:17dlu"));
+                        "119dlu:grow, $lcgap, default",
+                        "default, $lgap, default"));
 
                 //---- cmbDocON ----
-                cmbDocON.setModel(new DefaultComboBoxModel(new String[] {
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+                cmbDocON.setModel(new DefaultComboBoxModel(new String[]{
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                        "Item 4"
                 }));
+                cmbDocON.addKeyListener(new KeyAdapter() {
+                    @Override
+                    public void keyPressed(KeyEvent e) {
+                        cmbDocONKeyPressed(e);
+                    }
+                });
                 pnlON.add(cmbDocON, CC.xy(1, 1));
 
+                //---- btnAddGP ----
+                btnAddGP.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
+                btnAddGP.setBorderPainted(false);
+                btnAddGP.setBorder(null);
+                btnAddGP.setContentAreaFilled(false);
+                btnAddGP.setToolTipText("Neues Medikament eintragen");
+                btnAddGP.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnAddGP.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png")));
+                btnAddGP.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnAddGPActionPerformed(e);
+                    }
+                });
+                pnlON.add(btnAddGP, CC.xy(3, 1));
+
                 //---- cmbHospitalON ----
-                cmbHospitalON.setModel(new DefaultComboBoxModel(new String[] {
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+                cmbHospitalON.setModel(new DefaultComboBoxModel(new String[]{
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                        "Item 4"
                 }));
                 pnlON.add(cmbHospitalON, CC.xy(1, 3));
+
+                //---- btnAddHospital ----
+                btnAddHospital.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
+                btnAddHospital.setBorderPainted(false);
+                btnAddHospital.setBorder(null);
+                btnAddHospital.setContentAreaFilled(false);
+                btnAddHospital.setToolTipText("Neues Medikament eintragen");
+                btnAddHospital.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnAddHospital.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png")));
+                btnAddHospital.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnAddHospitalActionPerformed(e);
+                    }
+                });
+                pnlON.add(btnAddHospital, CC.xy(3, 3));
             }
             jPanel3.add(pnlON, CC.xy(1, 1));
         }
@@ -545,8 +633,6 @@ public class DlgRegular extends MyJDialog {
         rbEndOfPackage.setText(OPDE.lang.getString(PnlPrescription.internalClassID + ".dlgRegular.rbEndOfPackage"));
 
         txtMed.setText("");
-//        jdcAB.setMinSelectableDate(new Date());
-
         cmbMed.setRenderer(TradeFormTools.getRenderer(TradeFormTools.LONG));
         cmbDocON.setSelectedItem(prescription.getDocON());
         cmbHospitalON.setSelectedItem(prescription.getHospitalON());
@@ -566,7 +652,7 @@ public class DlgRegular extends MyJDialog {
         cmbIntervention.setSelectedItem(prescription.getIntervention());
         txtIntervention.setEnabled(cmbMed.getModel().getSize() == 0);
 
-        tbDailyPlan = GUITools.getNiceToggleButton(PnlPrescription.internalClassID+".dlgRegular.addToDailyPlan");
+        tbDailyPlan = GUITools.getNiceToggleButton(PnlPrescription.internalClassID + ".dlgRegular.addToDailyPlan");
         jPanel1.add(tbDailyPlan, CC.xywh(1, 5, 5, 1, CC.LEFT, CC.DEFAULT));
 
         tbDailyPlan.setEnabled(cmbMed.getModel().getSize() == 0);
@@ -589,6 +675,9 @@ public class DlgRegular extends MyJDialog {
         ignoreEvent = false;
         txtMed.requestFocus();
 
+        setFocusCycleRoot(true);
+        setFocusTraversalPolicy(GUITools.createTraversalPolicy(new ArrayList<Component>(Arrays.asList(new Component[]{cmbDocON, cmbHospitalON, txtMed, rbActive, txtBemerkung}))));
+
         reloadTable();
     }
 
@@ -598,7 +687,7 @@ public class DlgRegular extends MyJDialog {
 
     private void btnMedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMedActionPerformed
 
-        String pzn = MedPackageTools.parsePZN(txtMed.getText());
+//        String pzn = MedPackageTools.parsePZN(txtMed.getText());
         final JidePopup popup = new JidePopup();
 
         WizardDialog wizard = new MedProductWizard(new Closure() {
@@ -648,7 +737,7 @@ public class DlgRegular extends MyJDialog {
             day = null;
         }
 
-        boolean OnOK = (cmbDocON.getSelectedIndex() > 0 || cmbHospitalON.getSelectedIndex() > 0);
+        boolean OnOK = (cmbDocON.getSelectedItem() != null || cmbHospitalON.getSelectedIndex() > 0);
         boolean OffOK = !rbDate.isSelected() || day != null;
         boolean medOK = cmbMed.getModel().getSize() == 0 || cmbMed.getSelectedItem() != null;
         boolean intervOK = cmbIntervention.getSelectedItem() != null;
@@ -778,11 +867,11 @@ public class DlgRegular extends MyJDialog {
     private void fillComboBoxes() {
         EntityManager em = OPDE.createEM();
         Query queryArzt = em.createQuery("SELECT a FROM Doc a WHERE a.status >= 0 ORDER BY a.name, a.vorname");
-        List<Doc> listAerzte = queryArzt.getResultList();
+        listAerzte = queryArzt.getResultList();
         listAerzte.add(0, null);
 
-        Query queryKH = em.createQuery("SELECT k FROM Hospital k WHERE k.status >= 0 ORDER BY k.name");
-        List<Hospital> listKH = queryKH.getResultList();
+        Query queryKH = em.createQuery("SELECT k FROM Hospital k WHERE k.state >= 0 ORDER BY k.name");
+        listKH = queryKH.getResultList();
         listKH.add(0, null);
         em.close();
 
@@ -832,7 +921,9 @@ public class DlgRegular extends MyJDialog {
     private JLabel lblText;
     private JPanel pnlON;
     private JComboBox cmbDocON;
+    private JButton btnAddGP;
     private JComboBox cmbHospitalON;
+    private JButton btnAddHospital;
     private JPanel panel1;
     private JButton btnClose;
     private JButton btnSave;

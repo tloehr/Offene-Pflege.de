@@ -1590,7 +1590,7 @@ public class SYSTools {
         html += SYSConst.html_paragraph(exc.getMessage());
 
         if (OPDE.getMainframe().getCurrentResident() != null) {
-            html += SYSConst.html_h3(OPDE.lang.getString("misc.msg.resident") + ": " + ResidentTools.getLabelText(OPDE.getMainframe().getCurrentResident()));
+            html += SYSConst.html_h3("ResID: " + OPDE.getMainframe().getCurrentResident().getRID());
         }
 
         html += SYSConst.html_h3(OPDE.getMainframe().getCurrentClassname());

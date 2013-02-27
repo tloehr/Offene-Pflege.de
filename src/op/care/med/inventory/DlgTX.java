@@ -59,6 +59,7 @@ public class DlgTX extends MyJDialog {
     private MedStockTransaction tx;
 
     public DlgTX(MedStockTransaction tx, Closure actionBlock) {
+        super(false);
         this.tx = tx;
         this.actionBlock = actionBlock;
         initDialog();

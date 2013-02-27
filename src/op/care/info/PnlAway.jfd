@@ -103,7 +103,7 @@
                  <object idref="Font0"/> 
                 </void> 
                 <void property="name"> 
-                 <string>cmbKH</string> 
+                 <string>cmbHospital</string> 
                 </void> 
                </object> 
                <object class="com.jformdesigner.model.FormLayoutConstraints"> 

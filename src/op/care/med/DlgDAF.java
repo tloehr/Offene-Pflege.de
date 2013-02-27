@@ -54,7 +54,7 @@ public class DlgDAF extends MyJDialog {
 
 
     public DlgDAF(String title, TradeForm tradeForm) {
-        super();
+        super(false);
         initComponents();
         this.tradeForm = tradeForm;
         EntityManager em = OPDE.createEM();

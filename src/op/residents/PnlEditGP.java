@@ -4,19 +4,29 @@
 
 package op.residents;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import com.jgoodies.forms.factories.*;
-import com.jgoodies.forms.layout.*;
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
 import entity.prescription.Doc;
 import op.OPDE;
+import op.tools.GUITools;
+import op.tools.PopupPanel;
 import op.tools.SYSTools;
+import org.apache.commons.collections.CollectionUtils;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * @author Torsten Löhr
  */
-public class PnlEditGP extends JPanel {
+public class PnlEditGP extends PopupPanel {
     private Doc doc;
 
     public PnlEditGP(Doc doc) {
@@ -27,7 +37,7 @@ public class PnlEditGP extends JPanel {
         txtAnrede.requestFocus();
     }
 
-    private void initPanel(){
+    private void initPanel() {
         lblAnrede.setText(OPDE.lang.getString("misc.msg.termofaddress"));
         lblTitel.setText(OPDE.lang.getString("misc.msg.title"));
         lblNachname.setText(OPDE.lang.getString("misc.msg.surname"));
@@ -49,7 +59,7 @@ public class PnlEditGP extends JPanel {
         txtOrt.setText(doc.getCity());
         txtTel.setText(doc.getTel());
         txtFax.setText(doc.getFax());
-        txtMobil.setText(SYSTools.catchNull(doc.getCity()));
+        txtMobil.setText(SYSTools.catchNull(doc.getMobile()));
         txtEMAIL.setText(SYSTools.catchNull(doc.getEMail()));
 
         FocusAdapter fa = new FocusAdapter() {
@@ -71,26 +81,9 @@ public class PnlEditGP extends JPanel {
         txtMobil.addFocusListener(fa);
         txtEMAIL.addFocusListener(fa);
 
-    }
+        setFocusCycleRoot(true);
+        setFocusTraversalPolicy(GUITools.createTraversalPolicy(new ArrayList<Component>(Arrays.asList(new Component[]{txtAnrede, txtTitel, txtNachname, txtVorname, txtStrasse, txtPLZ, txtOrt, txtTel, txtFax, txtMobil, txtEMAIL}))));
 
-    public Doc getDoc(){
-        if (txtNachname.getText().isEmpty()){
-            return null;
-        }
-
-        doc.setAnrede(txtAnrede.getText().trim());
-        doc.setTitle(txtTitel.getText().trim());
-        doc.setName(txtNachname.getText().trim());
-        doc.setFirstname(txtVorname.getText().trim());
-        doc.setStreet(txtStrasse.getText().trim());
-        doc.setZIP(txtPLZ.getText().trim());
-        doc.setOrt(txtOrt.getText().trim());
-        doc.setTel(txtTel.getText().trim());
-        doc.setFax(txtFax.getText().trim());
-        doc.setMobile(txtMobil.getText().trim());
-        doc.setEMail(txtEMAIL.getText().trim());
-
-        return doc;
     }
 
     private void txtAnredeActionPerformed(ActionEvent e) {
@@ -164,8 +157,8 @@ public class PnlEditGP extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "13dlu, $lcgap, default, $lcgap, 143dlu, $lcgap, 13dlu",
-            "13dlu, 11*($lgap, default), $lgap, 13dlu"));
+                "13dlu, $lcgap, default, $lcgap, 143dlu, $lcgap, 13dlu",
+                "13dlu, 11*($lgap, default), $lgap, 13dlu"));
 
         //---- lblAnrede ----
         lblAnrede.setText("Anrede");
@@ -357,5 +350,32 @@ public class PnlEditGP extends JPanel {
     private JTextField txtMobil;
     private JLabel lblEMAIL;
     private JTextField txtEMAIL;
+
+    @Override
+    public Object getResult() {
+
+        if (txtNachname.getText().isEmpty()) {
+            return null;
+        }
+
+        doc.setAnrede(txtAnrede.getText().trim());
+        doc.setTitle(txtTitel.getText().trim());
+        doc.setName(txtNachname.getText().trim());
+        doc.setFirstname(txtVorname.getText().trim());
+        doc.setStreet(txtStrasse.getText().trim());
+        doc.setZIP(txtPLZ.getText().trim());
+        doc.setOrt(txtOrt.getText().trim());
+        doc.setTel(txtTel.getText().trim());
+        doc.setFax(txtFax.getText().trim());
+        doc.setMobile(txtMobil.getText().trim());
+        doc.setEMail(txtEMAIL.getText().trim());
+
+        return doc;
+    }
+
+    @Override
+    public void setStartFocus() {
+        txtAnrede.requestFocus();
+    }
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

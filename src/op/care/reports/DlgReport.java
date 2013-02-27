@@ -100,7 +100,7 @@ public class DlgReport extends MyJDialog {
     private void txtDauerFocusLost(FocusEvent e) {
         NumberFormat nf = NumberFormat.getIntegerInstance();
         String test = txtDauer.getText();
-        int dauer = defaultMinutes;
+        int dauer;
         try {
             Number num = nf.parse(test);
             dauer = num.intValue();
@@ -120,8 +120,14 @@ public class DlgReport extends MyJDialog {
         nReport.setText(txtBericht.getText());
     }
 
+    @Override
+    public void dispose() {
+        actionBlock.execute(nReport);
+        super.dispose();
+    }
+
     private void btnCancelActionPerformed(ActionEvent e) {
-        actionBlock.execute(null);
+        nReport = null;
         dispose();
     }
 
@@ -132,8 +138,11 @@ public class DlgReport extends MyJDialog {
         }
         nReport.setPit(pnlPIT.getPIT());
         nReport.setUser(OPDE.getLogin().getUser());
-        actionBlock.execute(nReport);
         dispose();
+    }
+
+    private void thisWindowClosing(WindowEvent e) {
+        btnCancelActionPerformed(null);
     }
 
     private void initComponents() {
@@ -150,7 +159,13 @@ public class DlgReport extends MyJDialog {
         //======== this ========
         setResizable(false);
         setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                thisWindowClosing(e);
+            }
+        });
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "13dlu, default:grow, $lcgap, 13dlu",

@@ -59,7 +59,7 @@ public class DlgInfo extends MyJDialog {
     private op.tools.PnlPIT pnlPIT;
 
     public DlgInfo(ResInfo resInfo, Closure actionBlock) {
-        super();
+        super(false);
         this.resInfo = resInfo;
         this.actionBlock = actionBlock;
         initComponents();

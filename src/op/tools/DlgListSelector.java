@@ -51,7 +51,7 @@ public class DlgListSelector extends MyJDialog {
      * Creates new form DlgFindeBW
      */
     public DlgListSelector(String topic, String detail, DefaultListModel dlm, Closure applyClosure) {
-        super();
+        super(false);
         initComponents();
         lstSelect.setModel(dlm);
         lstSelect.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

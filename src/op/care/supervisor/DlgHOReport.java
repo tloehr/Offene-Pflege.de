@@ -26,6 +26,7 @@
  */
 package op.care.supervisor;
 
+import java.awt.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.Homes;
@@ -58,11 +59,16 @@ public class DlgHOReport extends MyJDialog {
      * Creates new form DlgReport
      */
     public DlgHOReport(Handovers handover, Closure actionBlock) {
+        super(false);
         this.handover = handover;
         this.actionBlock = actionBlock;
         initComponents();
         initDialog();
         setVisible(true);
+    }
+
+    private void thisWindowClosing(WindowEvent e) {
+        btnCancelActionPerformed(null);
     }
 
     private void initDialog() {
@@ -88,11 +94,17 @@ public class DlgHOReport extends MyJDialog {
         btnSave = new JButton();
 
         //======== this ========
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                thisWindowClosing(e);
+            }
+        });
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "default, $lcgap, default:grow, $lcgap, default",
-                "2*(default, $lgap), fill:default:grow, $lgap, fill:default, $lgap, default"));
+            "default, $lcgap, default:grow, $lcgap, default",
+            "2*(default, $lgap), fill:default:grow, $lgap, fill:default, $lgap, default"));
 
         //======== jScrollPane1 ========
         {

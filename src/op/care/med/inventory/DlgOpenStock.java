@@ -62,7 +62,7 @@ public class DlgOpenStock extends MyJDialog {
      * Creates new form DlgOpenStock
      */
     public DlgOpenStock(TradeForm darreichung, Resident resident, Closure actionBlock) {
-        super();
+        super(false);
         this.inventory = TradeFormTools.getInventory4TradeForm(resident, darreichung);
         this.medStock = null;
         this.actionBlock = actionBlock;

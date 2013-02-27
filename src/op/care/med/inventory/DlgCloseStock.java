@@ -61,7 +61,7 @@ public class DlgCloseStock extends MyJDialog {
      * Creates new form DlgBestandAnbruch
      */
     public DlgCloseStock(MedStock medStock, Closure actionBlock) {
-        super();
+        super(false);
         this.actionBlock = actionBlock;
         this.medStock = medStock;
         initComponents();

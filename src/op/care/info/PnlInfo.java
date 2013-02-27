@@ -872,14 +872,15 @@ public class PnlInfo extends NursingRecordsPanel {
             addRes.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    final MyJDialog dlg = new MyJDialog();
+                    final MyJDialog dlg = new MyJDialog(false);
                     WizardDialog wizard = new AddBWWizard(new Closure() {
                         @Override
                         public void execute(Object o) {
                             dlg.dispose();
                             // to refresh the resident list
                             OPDE.getMainframe().emptySearchArea();
-                            OPDE.getMainframe().prepareSearchArea();
+                            jspSearch = OPDE.getMainframe().prepareSearchArea();
+                            prepareSearchArea();
                         }
                     }).getWizard();
                     dlg.setContentPane(wizard.getContentPane());
@@ -911,10 +912,11 @@ public class PnlInfo extends NursingRecordsPanel {
                                     em.lock(em.merge(myResident), LockModeType.OPTIMISTIC);
                                     em.getTransaction().commit();
                                     resident = myResident;
+                                    GUITools.setResidentDisplay(resident);
                                     // to refresh the resident list
                                     OPDE.getMainframe().emptySearchArea();
-                                    OPDE.getMainframe().prepareSearchArea();
-                                    GUITools.setResidentDisplay(resident);
+                                    jspSearch = OPDE.getMainframe().prepareSearchArea();
+                                    prepareSearchArea();
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -969,7 +971,9 @@ public class PnlInfo extends NursingRecordsPanel {
                                     btnResIsAway.setEnabled(false);
                                     btnResIsBack.setEnabled(false);
 
-                                    OPDE.getMainframe().completeRefresh();
+                                    OPDE.getMainframe().emptySearchArea();
+                                    jspSearch = OPDE.getMainframe().prepareSearchArea();
+                                    prepareSearchArea();
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -1028,7 +1032,8 @@ public class PnlInfo extends NursingRecordsPanel {
                                     btnResIsBack.setEnabled(false);
 
                                     OPDE.getMainframe().emptySearchArea();
-                                    OPDE.getMainframe().prepareSearchArea();
+                                    jspSearch = OPDE.getMainframe().prepareSearchArea();
+                                    prepareSearchArea();
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
