@@ -495,6 +495,10 @@ public class DlgNewStocks extends MyJDialog {
             }
 
             em.getTransaction().commit();
+            menge = null;
+            aPackage = null;
+            tradeForm = null;
+            inventory = null;
 
             if (btnPrint.isSelected()) {
                 OPDE.getPrintProcessor().addPrintJob(new PrintListElement(newStock, logicalPrinter, printForm, OPDE.getProps().getProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER)));

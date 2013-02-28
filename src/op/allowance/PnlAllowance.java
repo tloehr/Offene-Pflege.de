@@ -636,7 +636,7 @@ public class PnlAllowance extends CleanablePanel {
 
         DateTime to = new DateTime(month).dayOfMonth().withMaximumValue();
         final BigDecimal carry4screen = AllowanceTools.getSUM(resident, to);
-        final BigDecimal carry4print = AllowanceTools.getSUM(resident, to.minusMonths(1));
+
         String title = "<html><table border=\"0\">" +
                 "<tr>" +
 
@@ -683,6 +683,7 @@ public class PnlAllowance extends CleanablePanel {
                 if (!cashmap.containsKey(key)) {
                     cashmap.put(key, AllowanceTools.getMonth(resident, month.toDate()));
                 }
+                final BigDecimal carry4print = AllowanceTools.getSUM(resident, month.dayOfMonth().withMinimumValue().toDateTime().minusSeconds(1));
                 SYSFilesTools.print(AllowanceTools.getAsHTML(cashmap.get(key), carry4print, currentResident), true);
             }
         });
