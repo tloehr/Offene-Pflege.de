@@ -15,14 +15,17 @@ import entity.Homes;
 import entity.HomesTools;
 import entity.Station;
 import entity.StationTools;
+import entity.files.SYSFilesTools;
 import entity.info.ResInfoCategory;
 import entity.info.ResInfoCategoryTools;
 import entity.prescription.MedStock;
 import entity.system.SYSPropsTools;
 import op.OPDE;
+import op.system.FileDrop;
 import op.system.LogicalPrinter;
 import op.system.PrinterForm;
 import op.threads.DisplayManager;
+import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
@@ -36,8 +39,11 @@ import javax.print.PrintServiceLookup;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,7 +61,7 @@ public class PnlSystemSettings extends CleanablePanel {
     private HashMap<String, CollapsiblePane> cpMap;
     private HashMap<String, JPanel> cpPanel;
     private ArrayList<Homes> listHomes;
-
+    private File opdeicd = null;
     private boolean configsHaveBeenSaved = false;
 
     public PnlSystemSettings(JScrollPane jspSearch) {
@@ -136,7 +142,6 @@ public class PnlSystemSettings extends CleanablePanel {
         if (prservices != null) {
 
             cmbPhysicalPrinters.setModel(new DefaultComboBoxModel(prservices));
-
             cmbPhysicalPrinters.setRenderer(new ListCellRenderer() {
                 @Override
                 public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
@@ -145,6 +150,7 @@ public class PnlSystemSettings extends CleanablePanel {
                     return new DefaultListCellRenderer().getListCellRendererComponent(jList, ((PrintService) o).getName(), i, isSelected, cellHasFocus);
                 }
             });
+
             cmbLogicalPrinters.setRenderer(new ListCellRenderer() {
                 @Override
                 public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
@@ -169,8 +175,9 @@ public class PnlSystemSettings extends CleanablePanel {
                         PrintService printService = (PrintService) cmbPhysicalPrinters.getSelectedItem();
                         OPDE.getProps().setProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER, printService.getName());
                         OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER, printService.getName());
+                        OPDE.saveLocalProps();
                     }
-                    OPDE.saveLocalProps();
+
                 }
             });
 
@@ -187,7 +194,7 @@ public class PnlSystemSettings extends CleanablePanel {
                         OPDE.getProps().setProperty(SYSPropsTools.KEY_LOGICAL_PRINTER, logicalPrinter.getName());
                         OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL, ((PrinterForm) cmbForm.getSelectedItem()).getName());
                         OPDE.getProps().setProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL, ((PrinterForm) cmbForm.getSelectedItem()).getName());
-                        OPDE.saveLocalProps();
+
                     }
                 }
             });
@@ -199,7 +206,7 @@ public class PnlSystemSettings extends CleanablePanel {
                         OPDE.getProps().setProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL, ((PrinterForm) cmbForm.getSelectedItem()).getName());
                         OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL, ((PrinterForm) cmbForm.getSelectedItem()).getName());
                     }
-                    OPDE.saveLocalProps();
+
                 }
             });
 
@@ -213,13 +220,23 @@ public class PnlSystemSettings extends CleanablePanel {
             }
             if (OPDE.getProps().containsKey(SYSPropsTools.KEY_PHYSICAL_PRINTER) && OPDE.getLogicalPrinters().getPrintService(OPDE.getProps().getProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER)) != null) {
                 cmbPhysicalPrinters.setSelectedItem(OPDE.getLogicalPrinters().getPrintService(OPDE.getProps().getProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER)));
-            }
+            } else {
+                PrintService printService = (PrintService) cmbPhysicalPrinters.getSelectedItem();
+                OPDE.getProps().setProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER, printService.getName());
+                OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER, printService.getName());
 
+            }
 
             if (!OPDE.getLogicalPrinters().getLogicalPrintersList().isEmpty()) {
                 cmbLogicalPrinters.setModel(new DefaultComboBoxModel(OPDE.getLogicalPrinters().getLogicalPrintersList().toArray()));
                 LogicalPrinter logicalPrinter = OPDE.getLogicalPrinters().getMapName2LogicalPrinter().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_LOGICAL_PRINTER));
                 if (logicalPrinter == null) logicalPrinter = OPDE.getLogicalPrinters().getLogicalPrintersList().get(0);
+
+                if (!OPDE.getProps().containsKey(SYSPropsTools.KEY_LOGICAL_PRINTER)) {
+                    OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_LOGICAL_PRINTER, logicalPrinter.getName());
+                    OPDE.getProps().setProperty(SYSPropsTools.KEY_LOGICAL_PRINTER, logicalPrinter.getName());
+
+                }
 
                 cmbLogicalPrinters.setSelectedItem(logicalPrinter);
 
@@ -228,6 +245,9 @@ public class PnlSystemSettings extends CleanablePanel {
                     cmbForm.setSelectedItem(logicalPrinter.getForms().get(OPDE.getProps().getProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL)));
                 } else {
                     cmbForm.setSelectedIndex(0);
+                    OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL, ((PrinterForm) cmbForm.getSelectedItem()).getName());
+                    OPDE.getProps().setProperty(SYSPropsTools.KEY_MEDSTOCK_LABEL, ((PrinterForm) cmbForm.getSelectedItem()).getName());
+
                 }
             }
         }
@@ -242,11 +262,13 @@ public class PnlSystemSettings extends CleanablePanel {
 
         cmbStation.setModel(StationTools.getAll4Combobox(false));
         cmbStation.setSelectedItem(StationTools.getStationForThisHost());
+        OPDE.saveLocalProps();
     }
 
     private void initGlobal() {
         createHomesList();
         createCatList();
+        createICDImporter();
     }
 
     private void createCatList() {
@@ -256,6 +278,40 @@ public class PnlSystemSettings extends CleanablePanel {
         em.close();
         lstCat.setModel(SYSTools.list2dlm(listCats));
 
+    }
+
+    private void createICDImporter() {
+        btnImportICD.setText(OPDE.lang.getString(internalClassID + ".global.btnImportICD"));
+        btnImportICD.setIcon(SYSConst.icon22ledRedOn);
+        pnlICD.add(GUITools.getDropPanel(new FileDrop.Listener() {
+            public void filesDropped(java.io.File[] files) {
+                if (files.length == 1) {
+                    opdeicd = files[0].exists() ? files[0] : null;
+                    if (!SYSFilesTools.filenameExtension(opdeicd.getPath()).equalsIgnoreCase("xml")) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".global.wrongfile", DisplayMessage.WARNING));
+                        btnImportICD.setIcon(SYSConst.icon22ledRedOn);
+                        opdeicd = null;
+                    } else {
+
+                        try {
+                            SAXParserFactory factory = SAXParserFactory.newInstance();
+                            SAXParser saxParser = factory.newSAXParser();
+                            saxParser.parse(opdeicd, new ICDImporter(null));
+                            btnImportICD.setIcon(SYSConst.icon22ledGreenOn);
+                        } catch (Exception e) {
+                            OPDE.getDisplayManager().addSubMessage(internalClassID + ".global.noICDFile");
+                            opdeicd = null;
+                            btnImportICD.setIcon(SYSConst.icon22ledRedOn);
+                        }
+                    }
+                } else {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".global.only1file", DisplayMessage.WARNING));
+                    btnImportICD.setIcon(SYSConst.icon22ledRedOn);
+                    opdeicd = null;
+                }
+
+            }
+        }, OPDE.lang.getString(internalClassID + ".global.dropICDHere")), CC.xy(1, 1));
     }
 
 
@@ -598,6 +654,33 @@ public class PnlSystemSettings extends CleanablePanel {
         }, lblCat), SwingConstants.NORTH_EAST);
     }
 
+    private void btnImportICDActionPerformed(ActionEvent e) {
+        if (opdeicd == null) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".global.noICDFile", DisplayMessage.WARNING));
+            return;
+        }
+
+        EntityManager em = OPDE.createEM();
+        try {
+            em.getTransaction().begin();
+
+            Query query = em.createQuery("DELETE FROM ICD icd");
+            query.executeUpdate();
+
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            SAXParser saxParser = factory.newSAXParser();
+
+            saxParser.parse(opdeicd, new ICDImporter(em));
+
+            em.getTransaction().commit();
+        } catch (Exception ex) {
+            em.getTransaction().rollback();
+            OPDE.fatal(ex);
+        } finally {
+            em.close();
+        }
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         tabMain = new JTabbedPane();
@@ -612,8 +695,11 @@ public class PnlSystemSettings extends CleanablePanel {
         panel1 = new JPanel();
         pnlGlobal = new JPanel();
         lblHomes = new JLabel();
+        lblICD = new JLabel();
         jspHomeStation = new JScrollPane();
         cpsHomes = new CollapsiblePanes();
+        pnlICD = new JPanel();
+        btnImportICD = new JButton();
         lblCat = new JLabel();
         jspCat = new JScrollPane();
         lstCat = new JList();
@@ -636,8 +722,8 @@ public class PnlSystemSettings extends CleanablePanel {
             //======== pnlLocal ========
             {
                 pnlLocal.setLayout(new FormLayout(
-                    "default, 2*($lcgap, default:grow), $lcgap, default",
-                    "6*(default, $lgap), pref, $lgap, default, $lgap, 14dlu"));
+                        "default, 2*($lcgap, default:grow), $lcgap, default",
+                        "6*(default, $lgap), pref, $lgap, default, $lgap, 14dlu"));
 
                 //---- lblPrinters ----
                 lblPrinters.setText("labelPrinter");
@@ -708,13 +794,18 @@ public class PnlSystemSettings extends CleanablePanel {
             //======== pnlGlobal ========
             {
                 pnlGlobal.setLayout(new FormLayout(
-                    "default, $lcgap, default:grow, $lcgap, default",
-                    "default, $lgap, pref, $lgap, fill:default:grow, 2*($lgap, default), $lgap, fill:default:grow, 2*($lgap, default)"));
+                        "default, $lcgap, default:grow, $ugap, default:grow, $lcgap, default",
+                        "default, $lgap, pref, $lgap, fill:default:grow, 2*($lgap, default), $lgap, fill:default:grow, 2*($lgap, default)"));
 
                 //---- lblHomes ----
                 lblHomes.setText("Homes");
                 lblHomes.setFont(new Font("Arial", Font.BOLD, 18));
                 pnlGlobal.add(lblHomes, CC.xy(3, 3));
+
+                //---- lblICD ----
+                lblICD.setText("ICD");
+                lblICD.setFont(new Font("Arial", Font.BOLD, 18));
+                pnlGlobal.add(lblICD, CC.xy(5, 3));
 
                 //======== jspHomeStation ========
                 {
@@ -726,6 +817,24 @@ public class PnlSystemSettings extends CleanablePanel {
                     jspHomeStation.setViewportView(cpsHomes);
                 }
                 pnlGlobal.add(jspHomeStation, CC.xy(3, 5, CC.FILL, CC.FILL));
+
+                //======== pnlICD ========
+                {
+                    pnlICD.setLayout(new FormLayout(
+                            "default:grow",
+                            "fill:default:grow, $lgap, default"));
+
+                    //---- btnImportICD ----
+                    btnImportICD.setText("importICD");
+                    btnImportICD.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            btnImportICDActionPerformed(e);
+                        }
+                    });
+                    pnlICD.add(btnImportICD, CC.xy(1, 3, CC.LEFT, CC.DEFAULT));
+                }
+                pnlGlobal.add(pnlICD, CC.xy(5, 5));
 
                 //---- lblCat ----
                 lblCat.setText("ResInfoCat");
@@ -812,6 +921,8 @@ public class PnlSystemSettings extends CleanablePanel {
         lblHomes.setText(OPDE.lang.getString(internalClassID + ".global.homes"));
         lblCat.setText(OPDE.lang.getString(internalClassID + ".global.categories"));
         tabMainStateChanged(null);
+
+
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
@@ -827,8 +938,11 @@ public class PnlSystemSettings extends CleanablePanel {
     private JPanel panel1;
     private JPanel pnlGlobal;
     private JLabel lblHomes;
+    private JLabel lblICD;
     private JScrollPane jspHomeStation;
     private CollapsiblePanes cpsHomes;
+    private JPanel pnlICD;
+    private JButton btnImportICD;
     private JLabel lblCat;
     private JScrollPane jspCat;
     private JList lstCat;

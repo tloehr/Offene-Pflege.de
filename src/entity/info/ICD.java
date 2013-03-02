@@ -5,22 +5,10 @@
 
 package entity.info;
 
-import op.tools.SYSTools;
-
+import javax.persistence.*;
 import java.io.Serializable;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
 
 /**
- *
  * @author tloehr
  */
 @Entity
@@ -43,14 +31,9 @@ public class ICD implements Serializable {
     public ICD() {
     }
 
-    public ICD(Long icdid) {
-        this.icdid = icdid;
-    }
-
-    public ICD(Long icdid, String icd10, String text) {
-        this.icdid = icdid;
-        this.icd10 = icd10;
-        this.text = text;
+    public ICD(String code, String content) {
+        this.icd10 = code;
+        this.text = content;
     }
 
     public Long getIcdid() {

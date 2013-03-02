@@ -25,9 +25,6 @@
  */
 package op;
 
-import com.enterprisedt.net.ftp.FTPConnectMode;
-import com.enterprisedt.net.ftp.FTPException;
-import com.enterprisedt.net.ftp.FileTransferClient;
 import com.jidesoft.utils.Lm;
 import com.jidesoft.wizard.WizardStyle;
 import entity.files.SYSFilesTools;
@@ -42,9 +39,7 @@ import op.threads.DisplayMessage;
 import op.threads.PrintProcessor;
 import op.tools.*;
 import org.apache.commons.cli.*;
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.*;
-import org.eclipse.persistence.logging.JavaLog;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -99,6 +94,7 @@ public class OPDE {
     protected static String css = "";
 
     protected static boolean FTPisWORKING = false;
+    public static String UPDATE_FTPSERVER = "ftp.offene-pflege.de";
     protected static boolean updateAvailable = false;
 
     protected static final String sep = System.getProperty("file.separator");
@@ -176,7 +172,7 @@ public class OPDE {
         }
     }
 
-    public static boolean isCustomUrl(){
+    public static boolean isCustomUrl() {
         return !url.equals(localProps.getProperty("javax.persistence.jdbc.url"));
 
     }
@@ -283,7 +279,6 @@ public class OPDE {
             } catch (MessagingException e1) {
                 OPDE.info(e1);
                 OPDE.info("Mail-System is not configured");
-//                e1.printStackTrace();
             } catch (UnsupportedEncodingException e1) {
                 OPDE.info(e1);
                 e1.printStackTrace();
@@ -438,6 +433,8 @@ public class OPDE {
         opts.addOption("v", "version", false, "Zeigt die Versionsinformationen an.");
         opts.addOption("a", "anonym", false, "Blendet die Bewohnernamen in allen Ansichten aus. Spezieller Modus für Schulungsmaterial zu erstellen.");
         opts.addOption("l", "debug", false, "Schaltet alle Ausgaben ein auf der Konsole ein, auch die, die eigentlich nur während der Softwareentwicklung angezeigt werden.");
+        Option optFTPserver = OptionBuilder.withLongOpt("ftpserver").withArgName("ip or hostname").hasArgs(1).withDescription(lang.getString("cmdline.ftpserver")).create("f");
+        opts.addOption(optFTPserver);
 //        opts.addOption("p", "pidfile", false, "Path to the pidfile which needs to be deleted when this application ends properly.");
 
 //        Option konfigdir = OptionBuilder.hasOptionalArg().withDescription("Legt einen altenativen Pfad fest, in dem sich das .opde Verzeichnis befindet.").create("k");
@@ -475,6 +472,11 @@ public class OPDE {
             f.printHelp("OffenePflege.jar [OPTION]", "Offene-Pflege.de, Version " + appInfo.getVersion()
                     + " Build:" + appInfo.getBuildnum(), opts, footer);
             System.exit(0);
+        }
+
+        // Alternative FTP-Server
+        if (cl.hasOption("f")) {
+            UPDATE_FTPSERVER = cl.getOptionValue("f");
         }
 
 
@@ -698,59 +700,13 @@ public class OPDE {
              *                                               \_\/_/
              */
 
-            checkForSoftwareupdates();
-
+            SYSTools.checkForSoftwareupdates();
             mainframe = new FrmMain();
             mainframe.setVisible(true);
 
         }
     }
 
-
-    private static void checkForSoftwareupdates() {
-        final String FTPServer = "ftp.offene-pflege.de";
-        final int FTPPort = 21;
-        final String FTPUser = "anonymous";
-        final String FTPPassword = Integer.toString(appInfo.getBuildnum());
-        final String FTPWorkingDirectory = "/pub/opde";
-        final String FILENAME = "buildnum";
-
-        int remoteBuildnum = -1;
-        int mybuildnum = OPDE.getAppInfo().getBuildnum();
-        FileTransferClient ftp = null;
-        try {
-            File target = File.createTempFile("opde", ".txt");
-            target.deleteOnExit();
-            ftp = new FileTransferClient();
-
-            ftp.setRemoteHost(FTPServer);
-            ftp.setUserName(FTPUser);
-            ftp.setPassword(FTPPassword);
-            ftp.setRemotePort(FTPPort);
-            ftp.connect();
-            ftp.getAdvancedFTPSettings().setConnectMode(FTPConnectMode.PASV);
-            ftp.changeDirectory(FTPWorkingDirectory);
-            ftp.downloadFile(target.getPath(), FILENAME);
-
-            String strRemoteBuildnum = FileUtils.readLines(target).get(0);
-            remoteBuildnum = Integer.parseInt(strRemoteBuildnum);
-
-            ftp.disconnect();
-        } catch (Exception e) {
-            if (ftp != null && ftp.isConnected()) {
-                try {
-                    ftp.disconnect();
-                } catch (FTPException e1) {
-                    OPDE.error(e1);
-                } catch (IOException e1) {
-                    OPDE.error(e1);
-                }
-            }
-            OPDE.error(e);
-        }
-
-        OPDE.setUpdateAvailable(remoteBuildnum > mybuildnum);
-    }
 
     public static DisplayManager getDisplayManager() {
         return mainframe.getDisplayManager();

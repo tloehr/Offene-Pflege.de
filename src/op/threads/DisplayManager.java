@@ -194,6 +194,11 @@ public class DisplayManager extends Thread {
 //        }
     }
 
+    public void addSubMessage(String text) {
+        DisplayMessage msg = new DisplayMessage(text);
+        addSubMessage(msg);
+    }
+
     public void addSubMessage(DisplayMessage msg) {
         messageQ.add(msg);
         Collections.sort(messageQ);
@@ -278,13 +283,9 @@ public class DisplayManager extends Thread {
             jp.setForeground(defaultColor);
         }
 
-//        isIndeterminate = currentSubMessage != null && pbIntermediateZyklen < 40;
-//        jp.setIndeterminate(isIndeterminate); // 40x 50ms lang bei neuen Nachrichten leuchten
     }
 
     private void processProgressBar() {
-//        OPDE.debug("DisplayManager.processProgressBar");
-
         if (progressBarMessage != null) {  //  && zyklen/5%2 == 0 && zyklen % 5 == 0
             if (progressBarMessage.getPercentage() < 0) {
                 if (!isIndeterminate) {
@@ -292,24 +293,28 @@ public class DisplayManager extends Thread {
                 }
             } else {
                 isIndeterminate = false;
-//                OPDE.debug("jp.setValue(progressBarMessage.getPercentage())");
                 jp.setValue(progressBarMessage.getPercentage());
             }
 
-            jp.setString(SYSTools.catchNull(progressBarMessage.getMessage()));
+            try {
+                jp.setString(SYSTools.catchNull(progressBarMessage.getMessage()));
+            } catch (NullPointerException npe) {
+                OPDE.error("BUG HUNTING #1");
+                OPDE.error(npe);
+                OPDE.error(jp);
+                OPDE.error(progressBarMessage);
+                jp.setString("");
+            }
+
+
         } else {
             if (jp.getValue() > 0) {
-//                OPDE.debug("jp.setValue(0)");
                 jp.setValue(0);
                 jp.setString(null);
             }
             isIndeterminate = false;
 
         }
-
-        // Exception ?
-//            jp.setIndeterminate(isIndeterminate);
-
     }
 
     public static DisplayMessage getLockMessage() {
@@ -334,7 +339,6 @@ public class DisplayManager extends Thread {
                 processProgressBar();
                 processSubMessage();
 
-
                 zyklen++;
                 Thread.sleep(50);
             } catch (InterruptedException ie) {
@@ -346,5 +350,35 @@ public class DisplayManager extends Thread {
         }
     }
 
-
+    @Override
+    public String toString() {
+        return "DisplayManager{" +
+                "interrupted=" + interrupted +
+                ", dbAction=" + dbAction +
+                ", jp=" + jp +
+                ", lblMain=" + lblMain +
+                ", lblSub=" + lblSub +
+                ", messageQ=" + messageQ +
+                ", oldMessages=" + oldMessages +
+                ", progressBarMessage=" + progressBarMessage +
+                ", currentSubMessage=" + currentSubMessage +
+                ", zyklen=" + zyklen +
+                ", pbIntermediateZyklen=" + pbIntermediateZyklen +
+                ", defaultColor=" + defaultColor +
+                ", dbZyklenRest=" + dbZyklenRest +
+                ", icon1=" + icon1 +
+                ", icon2=" + icon2 +
+                ", icondead=" + icondead +
+                ", iconaway=" + iconaway +
+                ", icongone=" + icongone +
+                ", iconbiohazard=" + iconbiohazard +
+                ", worker=" + worker +
+                ", isIndeterminate=" + isIndeterminate +
+                ", pnlIcons=" + pnlIcons +
+                ", lblBiohazard=" + lblBiohazard +
+                ", lblDiabetes=" + lblDiabetes +
+                ", lblAllergy=" + lblAllergy +
+                ", lblWarning=" + lblWarning +
+                "} ";
+    }
 }

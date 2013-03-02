@@ -212,10 +212,15 @@ public class GUITools {
         showPopup(popup, location, true);
     }
 
+
     public static JPanel getDropPanel(FileDrop.Listener dropListener) {
+           return getDropPanel(dropListener, OPDE.lang.getString(PnlFiles.internalClassID + ".drophere"));
+    }
+
+    public static JPanel getDropPanel(FileDrop.Listener dropListener, String text) {
         JPanel dropPanel = new JPanel();
         dropPanel.setLayout(new BorderLayout());
-        JLabel dropLabel = new JLabel(OPDE.lang.getString(PnlFiles.internalClassID + ".drophere"), new ImageIcon(Double.class.getResource("/artwork/48x48/kget_dock.png")), SwingConstants.CENTER);
+        JLabel dropLabel = new JLabel(text, new ImageIcon(Double.class.getResource("/artwork/48x48/kget_dock.png")), SwingConstants.CENTER);
         dropLabel.setFont(SYSConst.ARIAL20);
         dropLabel.setHorizontalTextPosition(SwingConstants.CENTER);
         dropLabel.setVerticalTextPosition(SwingConstants.BOTTOM);

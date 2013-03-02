@@ -375,7 +375,7 @@ public class DlgDiag extends MyJDialog {
         }
 
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT i FROM ICD i WHERE i.icd10 LIKE :icd10 OR i.text like :text");
+        Query query = em.createQuery("SELECT i FROM ICD i WHERE i.icd10 LIKE :icd10 OR i.text like :text ORDER BY i.icd10 ");
 
         String suche = "%" + txtSuche.getText() + "%";
 

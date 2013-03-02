@@ -26,6 +26,9 @@
  */
 package op.tools;
 
+import com.enterprisedt.net.ftp.FTPConnectMode;
+import com.enterprisedt.net.ftp.FTPException;
+import com.enterprisedt.net.ftp.FileTransferClient;
 import com.jidesoft.swing.JideSplitPane;
 import entity.files.SYSFilesTools;
 import entity.info.ResidentTools;
@@ -34,6 +37,7 @@ import entity.system.Users;
 import op.OPDE;
 import op.system.AppInfo;
 import op.threads.DisplayMessage;
+import org.apache.commons.io.FileUtils;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.TimingSource;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
@@ -293,7 +297,6 @@ public class SYSTools {
         }
         result.append(input.substring(s));
         return result.toString();
-
     }
 
     /**
@@ -1915,6 +1918,52 @@ public class SYSTools {
             // ok, its not a langbundle key
         }
         return title;
+    }
+
+
+    public static void checkForSoftwareupdates() {
+//        final String FTPServer = "ftp.offene-pflege.de";
+        final int FTPPort = 21;
+        final String FTPUser = "anonymous";
+        final String FTPPassword = Integer.toString(OPDE.getAppInfo().getBuildnum());
+        final String FTPWorkingDirectory = "/pub/opde";
+        final String FILENAME = "buildnum";
+
+        int remoteBuildnum = -1;
+        int mybuildnum = OPDE.getAppInfo().getBuildnum();
+        FileTransferClient ftp = null;
+        try {
+            File target = File.createTempFile("opde", ".txt");
+            target.deleteOnExit();
+            ftp = new FileTransferClient();
+
+            ftp.setRemoteHost(OPDE.UPDATE_FTPSERVER);
+            ftp.setUserName(FTPUser);
+            ftp.setPassword(FTPPassword);
+            ftp.setRemotePort(FTPPort);
+            ftp.connect();
+            ftp.getAdvancedFTPSettings().setConnectMode(FTPConnectMode.PASV);
+            ftp.changeDirectory(FTPWorkingDirectory);
+            ftp.downloadFile(target.getPath(), FILENAME);
+
+            String strRemoteBuildnum = FileUtils.readLines(target).get(0);
+            remoteBuildnum = Integer.parseInt(strRemoteBuildnum);
+
+            ftp.disconnect();
+        } catch (Exception e) {
+            if (ftp != null && ftp.isConnected()) {
+                try {
+                    ftp.disconnect();
+                } catch (FTPException e1) {
+                    OPDE.error(e1);
+                } catch (IOException e1) {
+                    OPDE.error(e1);
+                }
+            }
+            OPDE.error(e);
+        }
+
+        OPDE.setUpdateAvailable(remoteBuildnum > mybuildnum);
     }
 
 }

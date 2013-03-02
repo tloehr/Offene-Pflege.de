@@ -1031,7 +1031,7 @@ public class ResInfoTools {
                 table += SYSConst.html_table_tr(
                         SYSConst.html_table_td(props.getProperty("icd")) +
                                 SYSConst.html_table_td(DateFormat.getDateInstance().format(diag.getFrom())) +
-                                SYSConst.html_table_td(props.getProperty("text")) +
+                                SYSConst.html_table_td(SYSTools.replace(props.getProperty("text"), "\n", "&nbsp;", false)) +
                                 SYSConst.html_table_td(props.getProperty("koerperseite")) +
                                 SYSConst.html_table_td(props.getProperty("diagnosesicherheit")) +
 

@@ -748,6 +748,7 @@ public class FrmMain extends JFrame {
         // After the logout a forced garbage collection seems to be adequate
         System.gc();
         cleanup();
+        SYSTools.checkForSoftwareupdates();
 
     }
 
