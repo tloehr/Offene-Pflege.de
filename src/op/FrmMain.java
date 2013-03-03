@@ -307,16 +307,16 @@ public class FrmMain extends JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                    "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
+                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                        "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
-                        "0dlu, $lgap, pref, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
+                    "0dlu, $lgap, pref, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
 
                 //---- btnVerlegung ----
                 btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2.png")));

@@ -84,11 +84,11 @@ public class DisplayManager extends Thread {
         oldMessages = new ArrayList<DisplayMessage>();
     }
 
-    public void setMainMessage(String message) {
+    public  synchronized void setMainMessage(String message) {
         setMainMessage(message, null);
     }
 
-    public void setMainMessage(final String message, final String tooltip) {
+    public synchronized  void setMainMessage(final String message, final String tooltip) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -100,7 +100,7 @@ public class DisplayManager extends Thread {
         });
     }
 
-    public void clearAllMessages() {
+    public  synchronized void clearAllMessages() {
         setMainMessage(" ");
         setIconBiohazard(null);
         setIconDiabetes(null);
@@ -111,7 +111,7 @@ public class DisplayManager extends Thread {
         processSubMessage();
     }
 
-    public void setIconDead() {
+    public synchronized  void setIconDead() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -120,7 +120,7 @@ public class DisplayManager extends Thread {
         });
     }
 
-    public void setIconGone() {
+    public  synchronized void setIconGone() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -129,7 +129,7 @@ public class DisplayManager extends Thread {
         });
     }
 
-    public void setIconBiohazard(final String tooltip) {
+    public synchronized  void setIconBiohazard(final String tooltip) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -139,7 +139,7 @@ public class DisplayManager extends Thread {
         });
     }
 
-    public void setIconWarning(final String tooltip) {
+    public synchronized  void setIconWarning(final String tooltip) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -149,7 +149,7 @@ public class DisplayManager extends Thread {
         });
     }
 
-    public void setIconAllergy(final String tooltip) {
+    public synchronized  void setIconAllergy(final String tooltip) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -159,7 +159,7 @@ public class DisplayManager extends Thread {
         });
     }
 
-    public void setIconDiabetes(final String tooltip) {
+    public synchronized  void setIconDiabetes(final String tooltip) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -169,7 +169,7 @@ public class DisplayManager extends Thread {
         });
     }
 
-    public void setIconAway() {
+    public synchronized  void setIconAway() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -178,7 +178,7 @@ public class DisplayManager extends Thread {
         });
     }
 
-    public void clearAllIcons() {
+    public synchronized  void clearAllIcons() {
         lblMain.setIcon(null);
         lblBiohazard.setVisible(false);
         lblWarning.setVisible(false);
@@ -186,7 +186,7 @@ public class DisplayManager extends Thread {
         lblAllergy.setVisible(false);
     }
 
-    public void setProgressBarMessage(DisplayMessage progressBarMessage) {
+    public synchronized  void setProgressBarMessage(DisplayMessage progressBarMessage) {
         this.progressBarMessage = progressBarMessage;
         jp.setStringPainted(progressBarMessage != null);
 //        if (progressBarMessage == null) {
@@ -194,12 +194,12 @@ public class DisplayManager extends Thread {
 //        }
     }
 
-    public void addSubMessage(String text) {
+    public synchronized void addSubMessage(String text) {
         DisplayMessage msg = new DisplayMessage(text);
         addSubMessage(msg);
     }
 
-    public void addSubMessage(DisplayMessage msg) {
+    public synchronized void addSubMessage(DisplayMessage msg) {
         messageQ.add(msg);
         Collections.sort(messageQ);
     }
@@ -212,13 +212,13 @@ public class DisplayManager extends Thread {
 //        }
 //    }
 
-    public void clearSubMessages() {
+    public synchronized  void clearSubMessages() {
         messageQ.clear();
         currentSubMessage = null;
         processSubMessage();
     }
 
-    public void setDBActionMessage(boolean action) {
+    public synchronized  void setDBActionMessage(boolean action) {
 //        if (this.dbAction == action) {
 //            return;
 //        }
@@ -296,15 +296,17 @@ public class DisplayManager extends Thread {
                 jp.setValue(progressBarMessage.getPercentage());
             }
 
-            try {
-                jp.setString(SYSTools.catchNull(progressBarMessage.getMessage()));
-            } catch (NullPointerException npe) {
-                OPDE.error("BUG HUNTING #1");
-                OPDE.error(npe);
-                OPDE.error(jp);
-                OPDE.error(progressBarMessage);
-                jp.setString("");
-            }
+            jp.setString(SYSTools.catchNull(progressBarMessage.getMessage()));
+
+//            try {
+//                jp.setString(SYSTools.catchNull(progressBarMessage.getMessage()));
+//            } catch (NullPointerException npe) {
+//                OPDE.error("BUG HUNTING #1");
+//                OPDE.error(npe);
+//                OPDE.error(jp);
+//                OPDE.error(progressBarMessage);
+//                jp.setString("");
+//            }
 
 
         } else {
@@ -317,7 +319,7 @@ public class DisplayManager extends Thread {
         }
     }
 
-    public static DisplayMessage getLockMessage() {
+    public  synchronized static DisplayMessage getLockMessage() {
         return new DisplayMessage(OPDE.lang.getString("misc.msg.lockingexception"), DisplayMessage.IMMEDIATELY, OPDE.WARNING_TIME);
     }
 
@@ -326,10 +328,11 @@ public class DisplayManager extends Thread {
      * @param operation can be one of deleted, closed, entered, changed, edited
      * @return
      */
-    public static DisplayMessage getSuccessMessage(String text, String operation) {
+    public  synchronized static DisplayMessage getSuccessMessage(String text, String operation) {
         return new DisplayMessage("&raquo;" + text + " " + "&laquo; " + OPDE.lang.getString("misc.msg.successfully") + " " + OPDE.lang.getString("misc.msg." + operation), DisplayMessage.NORMAL);
     }
 
+    @Override
     public void run() {
         while (!interrupted) {
             try {

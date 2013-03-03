@@ -142,12 +142,12 @@ public class PnlTX extends JPanel {
         txtDate.setFont(new Font("Arial", Font.PLAIN, 14));
         txtDate.addFocusListener(new FocusAdapter() {
             @Override
-            public void focusGained(FocusEvent e) {
-                txtDateFocusGained(e);
-            }
-            @Override
             public void focusLost(FocusEvent e) {
                 txtDateFocusLost(e);
+            }
+            @Override
+            public void focusGained(FocusEvent e) {
+                txtDateFocusGained(e);
             }
         });
         txtDate.addActionListener(new ActionListener() {
@@ -167,12 +167,12 @@ public class PnlTX extends JPanel {
         txtText.setFont(new Font("Arial", Font.PLAIN, 14));
         txtText.addFocusListener(new FocusAdapter() {
             @Override
-            public void focusGained(FocusEvent e) {
-                txtTextFocusGained(e);
-            }
-            @Override
             public void focusLost(FocusEvent e) {
                 txtTextFocusLost(e);
+            }
+            @Override
+            public void focusGained(FocusEvent e) {
+                txtTextFocusGained(e);
             }
         });
         txtText.addActionListener(new ActionListener() {
@@ -192,12 +192,12 @@ public class PnlTX extends JPanel {
         txtCash.setFont(new Font("Arial", Font.PLAIN, 14));
         txtCash.addFocusListener(new FocusAdapter() {
             @Override
-            public void focusGained(FocusEvent e) {
-                txtCashFocusGained(e);
-            }
-            @Override
             public void focusLost(FocusEvent e) {
                 txtCashFocusLost(e);
+            }
+            @Override
+            public void focusGained(FocusEvent e) {
+                txtCashFocusGained(e);
             }
         });
         txtCash.addActionListener(new ActionListener() {
