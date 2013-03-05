@@ -1121,7 +1121,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                     new DlgNursingProcess(np, new Closure() {
                         @Override
                         public void execute(Object o) {
-                            if (np != null) {
+                            if (o != null) {
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();

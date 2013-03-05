@@ -3,14 +3,12 @@ package op.threads;
 import entity.system.SyslogTools;
 import op.OPDE;
 import op.tools.FadingLabel;
+import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,8 +23,8 @@ public class DisplayManager extends Thread {
     private JProgressBar jp;
     private JLabel lblMain;
     private FadingLabel lblSub;
-    private List<DisplayMessage> messageQ, oldMessages;
-    private DisplayMessage progressBarMessage, currentSubMessage;
+    private MessageQ messageQ;
+    private Pair<String, Integer> progressBarMessage;
     private long zyklen = 0, pbIntermediateZyklen = 0;
     private final Color defaultColor = new Color(105, 80, 69);
     private long dbZyklenRest = 0;
@@ -36,6 +34,7 @@ public class DisplayManager extends Thread {
     private JPanel pnlIcons;
     private JLabel lblBiohazard, lblDiabetes, lblAllergy, lblWarning;
 
+
 //    private DateFormat df;
 
     /**
@@ -43,12 +42,12 @@ public class DisplayManager extends Thread {
      */
     public DisplayManager(JProgressBar p, JLabel lblM, FadingLabel lblS, JPanel pnlIcons) {
         super();
+        progressBarMessage = new Pair<String, Integer>("", -1);
         this.pnlIcons = pnlIcons;
         setName("DisplayManager");
         interrupted = false;
         dbAction = false;
         jp = p;
-        progressBarMessage = null;
         jp.setStringPainted(false);
         jp.setValue(0);
         jp.setMaximum(100);
@@ -80,15 +79,15 @@ public class DisplayManager extends Thread {
 //        this.lblDB.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/db.png")));
         lblMain.setText(" ");
         lblSub.setText(" ");
-        messageQ = new ArrayList<DisplayMessage>();
-        oldMessages = new ArrayList<DisplayMessage>();
+        messageQ = new MessageQ();
+
     }
 
-    public  synchronized void setMainMessage(String message) {
+    public void setMainMessage(String message) {
         setMainMessage(message, null);
     }
 
-    public synchronized  void setMainMessage(final String message, final String tooltip) {
+    public void setMainMessage(final String message, final String tooltip) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -100,18 +99,18 @@ public class DisplayManager extends Thread {
         });
     }
 
-    public  synchronized void clearAllMessages() {
+    public void clearAllMessages() {
         setMainMessage(" ");
         setIconBiohazard(null);
         setIconDiabetes(null);
         setIconWarning(null);
         setIconAllergy(null);
         messageQ.clear();
-        oldMessages.clear();
+//        oldMessages.clear();
         processSubMessage();
     }
 
-    public synchronized  void setIconDead() {
+    public void setIconDead() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -120,7 +119,7 @@ public class DisplayManager extends Thread {
         });
     }
 
-    public  synchronized void setIconGone() {
+    public void setIconGone() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -129,7 +128,7 @@ public class DisplayManager extends Thread {
         });
     }
 
-    public synchronized  void setIconBiohazard(final String tooltip) {
+    public void setIconBiohazard(final String tooltip) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -139,7 +138,7 @@ public class DisplayManager extends Thread {
         });
     }
 
-    public synchronized  void setIconWarning(final String tooltip) {
+    public void setIconWarning(final String tooltip) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -149,7 +148,7 @@ public class DisplayManager extends Thread {
         });
     }
 
-    public synchronized  void setIconAllergy(final String tooltip) {
+    public void setIconAllergy(final String tooltip) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -159,7 +158,7 @@ public class DisplayManager extends Thread {
         });
     }
 
-    public synchronized  void setIconDiabetes(final String tooltip) {
+    public void setIconDiabetes(final String tooltip) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -169,7 +168,7 @@ public class DisplayManager extends Thread {
         });
     }
 
-    public synchronized  void setIconAway() {
+    public void setIconAway() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -178,7 +177,7 @@ public class DisplayManager extends Thread {
         });
     }
 
-    public synchronized  void clearAllIcons() {
+    public void clearAllIcons() {
         lblMain.setIcon(null);
         lblBiohazard.setVisible(false);
         lblWarning.setVisible(false);
@@ -186,39 +185,52 @@ public class DisplayManager extends Thread {
         lblAllergy.setVisible(false);
     }
 
-    public synchronized  void setProgressBarMessage(DisplayMessage progressBarMessage) {
-        this.progressBarMessage = progressBarMessage;
-        jp.setStringPainted(progressBarMessage != null);
-//        if (progressBarMessage == null) {
-//            jp.setIndeterminate(false);
-//        }
+    public void setProgressBarMessage(DisplayMessage pbMessage) {
+        synchronized (progressBarMessage) {
+            if (pbMessage == null) {
+                progressBarMessage.setFirst("");
+                progressBarMessage.setSecond(-1);
+                jp.setStringPainted(false);
+            } else {
+
+                progressBarMessage.setFirst(pbMessage.getMessage() == null ? "" : pbMessage.getMessage());
+                progressBarMessage.setSecond(pbMessage.getPercentage());
+                jp.setStringPainted(true);
+            }
+        }
     }
 
-    public synchronized void addSubMessage(String text) {
+    public void setProgressBarMessage(String message, int percentage) {
+        synchronized (progressBarMessage) {
+            progressBarMessage.setFirst(message == null ? "" : message);
+            progressBarMessage.setSecond(percentage);
+            jp.setStringPainted(true);
+        }
+    }
+//
+//    public synchronized void clearProgressBarMessage() {
+//        synchronized (progressBarMessage) {
+//            progressBarMessage.setFirst("");
+//            progressBarMessage.setSecond(-1);
+//            jp.setStringPainted(false);
+//        }
+//    }
+
+    public void addSubMessage(String text) {
         DisplayMessage msg = new DisplayMessage(text);
         addSubMessage(msg);
     }
 
-    public synchronized void addSubMessage(DisplayMessage msg) {
+    public void addSubMessage(DisplayMessage msg) {
         messageQ.add(msg);
-        Collections.sort(messageQ);
     }
 
-//    public void showLastSubMessageAgain() {
-//        if (!oldMessages.isEmpty()) {
-//            DisplayMessage lastMessage = oldMessages.get(oldMessages.size() - 1);
-//            messageQ.add(lastMessage);
-//            processSubMessage();
-//        }
-//    }
-
-    public synchronized  void clearSubMessages() {
+    public void clearSubMessages() {
         messageQ.clear();
-        currentSubMessage = null;
         processSubMessage();
     }
 
-    public synchronized  void setDBActionMessage(boolean action) {
+    public void setDBActionMessage(boolean action) {
 //        if (this.dbAction == action) {
 //            return;
 //        }
@@ -248,34 +260,29 @@ public class DisplayManager extends Thread {
     }
 
     private void processSubMessage() {
-        DisplayMessage nextMessage = messageQ.isEmpty() ? null : messageQ.get(0);
-
-        if (nextMessage != null) {
-            if (currentSubMessage == null || nextMessage.getPriority() == DisplayMessage.IMMEDIATELY || currentSubMessage.isObsolete()) {
+        messageQ.debug();
+        if (!messageQ.isEmpty()) {
+            // TODO: Das hier klappt nicht
+            if (messageQ.getNextMessage().getPriority() == DisplayMessage.IMMEDIATELY || messageQ.getHead().isObsolete()) {
                 pbIntermediateZyklen = 0;
-                messageQ.remove(0); // remove head
-                currentSubMessage = nextMessage;
-                currentSubMessage.setProcessed(System.currentTimeMillis());
-                lblSub.setText(SYSTools.toHTMLForScreen(currentSubMessage.getMessage()));
-                if (currentSubMessage.getPriority() == DisplayMessage.IMMEDIATELY) {
-                    SyslogTools.addLog("[" + currentSubMessage.getClassname() + "] " + currentSubMessage.getMessage(), SyslogTools.ERROR);
+                messageQ.next();
+                messageQ.getHead().setProcessed(System.currentTimeMillis());
+                lblSub.setText(SYSTools.toHTMLForScreen(messageQ.getHead().getMessage()));
+                if (messageQ.getHead().getPriority() == DisplayMessage.IMMEDIATELY) {
+                    SyslogTools.addLog("[" + messageQ.getHead().getClassname() + "] " + messageQ.getHead().getMessage(), SyslogTools.ERROR);
                 }
             }
         } else {
             pbIntermediateZyklen++;
-            if (currentSubMessage == null || currentSubMessage.isObsolete()) {
+            if (messageQ.isEmpty() || messageQ.getHead().isObsolete()) {
                 lblSub.setText(null);
-                if (currentSubMessage != null && !oldMessages.contains(currentSubMessage)) {
-                    oldMessages.add(currentSubMessage);
-                }
-                currentSubMessage = null;
             }
         }
 
-        if (currentSubMessage != null && currentSubMessage.getPriority() == DisplayMessage.IMMEDIATELY) {
+        if (!messageQ.isEmpty() && messageQ.getHead().getPriority() == DisplayMessage.IMMEDIATELY) {
             jp.setForeground(Color.RED);
             lblSub.setForeground(Color.RED);
-        } else if (currentSubMessage != null && currentSubMessage.getPriority() == DisplayMessage.WARNING) {
+        } else if (!messageQ.isEmpty() && messageQ.getHead().getPriority() == DisplayMessage.WARNING) {
             jp.setForeground(SYSConst.darkorange);
             lblSub.setForeground(SYSConst.darkorange);
         } else {
@@ -286,40 +293,29 @@ public class DisplayManager extends Thread {
     }
 
     private void processProgressBar() {
-        if (progressBarMessage != null) {  //  && zyklen/5%2 == 0 && zyklen % 5 == 0
-            if (progressBarMessage.getPercentage() < 0) {
-                if (!isIndeterminate) {
-                    isIndeterminate = true;
+        synchronized (progressBarMessage) {
+            if (!progressBarMessage.getFirst().isEmpty() || progressBarMessage.getSecond() >= 0) {  //  && zyklen/5%2 == 0 && zyklen % 5 == 0
+                if (progressBarMessage.getSecond() < 0) {
+                    if (!isIndeterminate) {
+                        isIndeterminate = true;
+                    }
+                } else {
+                    isIndeterminate = false;
+                    jp.setValue(progressBarMessage.getSecond());
                 }
+                jp.setString(progressBarMessage.getFirst());
             } else {
+                if (jp.getValue() > 0) {
+                    jp.setValue(0);
+                    jp.setString(null);
+                }
                 isIndeterminate = false;
-                jp.setValue(progressBarMessage.getPercentage());
             }
-
-            jp.setString(SYSTools.catchNull(progressBarMessage.getMessage()));
-
-//            try {
-//                jp.setString(SYSTools.catchNull(progressBarMessage.getMessage()));
-//            } catch (NullPointerException npe) {
-//                OPDE.error("BUG HUNTING #1");
-//                OPDE.error(npe);
-//                OPDE.error(jp);
-//                OPDE.error(progressBarMessage);
-//                jp.setString("");
-//            }
-
-
-        } else {
-            if (jp.getValue() > 0) {
-                jp.setValue(0);
-                jp.setString(null);
-            }
-            isIndeterminate = false;
-
         }
+
     }
 
-    public  synchronized static DisplayMessage getLockMessage() {
+    public static DisplayMessage getLockMessage() {
         return new DisplayMessage(OPDE.lang.getString("misc.msg.lockingexception"), DisplayMessage.IMMEDIATELY, OPDE.WARNING_TIME);
     }
 
@@ -328,7 +324,7 @@ public class DisplayManager extends Thread {
      * @param operation can be one of deleted, closed, entered, changed, edited
      * @return
      */
-    public  synchronized static DisplayMessage getSuccessMessage(String text, String operation) {
+    public static DisplayMessage getSuccessMessage(String text, String operation) {
         return new DisplayMessage("&raquo;" + text + " " + "&laquo; " + OPDE.lang.getString("misc.msg.successfully") + " " + OPDE.lang.getString("misc.msg." + operation), DisplayMessage.NORMAL);
     }
 
@@ -336,6 +332,7 @@ public class DisplayManager extends Thread {
     public void run() {
         while (!interrupted) {
             try {
+
                 lblMain.repaint();
                 lblSub.repaint();
 
@@ -353,35 +350,4 @@ public class DisplayManager extends Thread {
         }
     }
 
-    @Override
-    public String toString() {
-        return "DisplayManager{" +
-                "interrupted=" + interrupted +
-                ", dbAction=" + dbAction +
-                ", jp=" + jp +
-                ", lblMain=" + lblMain +
-                ", lblSub=" + lblSub +
-                ", messageQ=" + messageQ +
-                ", oldMessages=" + oldMessages +
-                ", progressBarMessage=" + progressBarMessage +
-                ", currentSubMessage=" + currentSubMessage +
-                ", zyklen=" + zyklen +
-                ", pbIntermediateZyklen=" + pbIntermediateZyklen +
-                ", defaultColor=" + defaultColor +
-                ", dbZyklenRest=" + dbZyklenRest +
-                ", icon1=" + icon1 +
-                ", icon2=" + icon2 +
-                ", icondead=" + icondead +
-                ", iconaway=" + iconaway +
-                ", icongone=" + icongone +
-                ", iconbiohazard=" + iconbiohazard +
-                ", worker=" + worker +
-                ", isIndeterminate=" + isIndeterminate +
-                ", pnlIcons=" + pnlIcons +
-                ", lblBiohazard=" + lblBiohazard +
-                ", lblDiabetes=" + lblDiabetes +
-                ", lblAllergy=" + lblAllergy +
-                ", lblWarning=" + lblWarning +
-                "} ";
-    }
 }

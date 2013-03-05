@@ -22,6 +22,8 @@ import java.util.List;
  */
 public class PrintProcessor extends Thread {
 
+    // TODO: change to synchronized version
+
     private boolean interrupted;
     private List<PrintListElement> printQueue;
     HashMap<String, ArrayList<PrintListElement>> preparedPrintJobs;

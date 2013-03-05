@@ -27,11 +27,12 @@ package op;
 
 import com.jidesoft.utils.Lm;
 import com.jidesoft.wizard.WizardStyle;
-import entity.files.SYSFilesTools;
+
 import entity.nursingprocess.DFNTools;
 import entity.prescription.BHPTools;
 import entity.system.*;
 import op.system.AppInfo;
+import op.system.EMailSystem;
 import op.system.FrmInit;
 import op.system.LogicalPrinters;
 import op.threads.DisplayManager;
@@ -41,22 +42,12 @@ import op.tools.*;
 import org.apache.commons.cli.*;
 import org.apache.log4j.*;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
-import java.net.InetAddress;
-import java.text.DateFormat;
 import java.util.*;
 
 //import op.threads.BackgroundMonitor;
@@ -194,7 +185,7 @@ public class OPDE {
         return logger;
     }
 
-    public static void warn(Object message) {
+    public static void warn(Throwable message) {
         logger.warn(message);
         SyslogTools.warn(message.toString());
     }
@@ -228,63 +219,67 @@ public class OPDE {
         }
         e.printStackTrace();
 
-        String html = SYSTools.getThrowableAsHTML(e);
+//        String html = SYSTools.getThrowableAsHTML(e);
+//
+//        File temp = SYSFilesTools.print(html, false);
 
-        File temp = SYSFilesTools.print(html, false);
+        if (!isDebug()) { //Stellvertretend für die anderen Keys.
 
-        if (!isDebug() && props.containsKey("mail.smtp.host")) { //Stellvertretend für die anderen Keys.
-            try {
-
-                InetAddress localMachine = InetAddress.getLocalHost();
-
-                javax.mail.Authenticator auth = new javax.mail.Authenticator() {
-                    @Override
-                    public PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(props.getProperty("mail.sender"), props.getProperty("mail.password"));
-                    }
-                };
-
-                Session session = Session.getDefaultInstance(props, auth);
-
-                Message msg = new MimeMessage(session);
-                msg.setFrom(new InternetAddress(props.getProperty("mail.sender"), props.getProperty("mail.sender.personal")));
-                msg.addRecipient(Message.RecipientType.TO, new InternetAddress(props.getProperty("mail.recipient"), props.getProperty("mail.recipient.personal")));
-                msg.setSubject(lang.getString(internalClassID + ".errormail.subject") + ": " + e.getMessage());
+            EMailSystem.sendErrorMail(e);
 
 
-                BodyPart messageBodyPart = new MimeBodyPart();
-
-                messageBodyPart.setText("" +
-                        lang.getString(internalClassID + ".errormail.line1") + "\n" +
-                        lang.getString(internalClassID + ".errormail.line2") + ": " + localMachine.getHostName() + "\n" +
-                        lang.getString(internalClassID + ".errormail.line3") + ": " + localMachine.getHostAddress() + "\n" +
-                        lang.getString(internalClassID + ".errormail.line4") + ": " + getLogin().getUser().getUID() + "\n" +
-                        lang.getString(internalClassID + ".errormail.line5") + ": " + DateFormat.getDateTimeInstance().format(new Date()) + "\n\n\n" +
-                        lang.getString(internalClassID + ".errormail.line6")
-                );
-
-                Multipart multipart = new MimeMultipart();
-                multipart.addBodyPart(messageBodyPart);
-                messageBodyPart = new MimeBodyPart();
-
-                DataSource source = new FileDataSource(temp);
-                messageBodyPart.setDataHandler(new DataHandler(source));
-                messageBodyPart.setFileName(temp.getName());
-
-                multipart.addBodyPart(messageBodyPart);
-                msg.setContent(multipart);
-                msg.saveChanges();
-
-                Transport.send(msg);
-            } catch (MessagingException e1) {
-                OPDE.info(e1);
-                OPDE.info("Mail-System is not configured");
-            } catch (UnsupportedEncodingException e1) {
-                OPDE.info(e1);
-                e1.printStackTrace();
-            } catch (java.net.UnknownHostException uhe) {
-                OPDE.info(uhe);
-            }
+//            try {
+//
+//                InetAddress localMachine = InetAddress.getLocalHost();
+//
+//                javax.mail.Authenticator auth = new javax.mail.Authenticator() {
+//                    @Override
+//                    public PasswordAuthentication getPasswordAuthentication() {
+//                        return new PasswordAuthentication(props.getProperty("mail.sender"), props.getProperty("mail.password"));
+//                    }
+//                };
+//
+//                Session session = Session.getDefaultInstance(props, auth);
+//
+//                Message msg = new MimeMessage(session);
+//                msg.setFrom(new InternetAddress(props.getProperty("mail.sender"), props.getProperty("mail.sender.personal")));
+//                msg.addRecipient(Message.RecipientType.TO, new InternetAddress(props.getProperty("mail.recipient"), props.getProperty("mail.recipient.personal")));
+//                msg.setSubject(lang.getString(internalClassID + ".errormail.subject") + ": " + e.getMessage());
+//
+//
+//                BodyPart messageBodyPart = new MimeBodyPart();
+//
+//                messageBodyPart.setText("" +
+//                        lang.getString(internalClassID + ".errormail.line1") + "\n" +
+//                        lang.getString(internalClassID + ".errormail.line2") + ": " + localMachine.getHostName() + "\n" +
+//                        lang.getString(internalClassID + ".errormail.line3") + ": " + localMachine.getHostAddress() + "\n" +
+//                        lang.getString(internalClassID + ".errormail.line4") + ": " + getLogin().getUser().getUID() + "\n" +
+//                        lang.getString(internalClassID + ".errormail.line5") + ": " + DateFormat.getDateTimeInstance().format(new Date()) + "\n\n\n" +
+//                        lang.getString(internalClassID + ".errormail.line6")
+//                );
+//
+//                Multipart multipart = new MimeMultipart();
+//                multipart.addBodyPart(messageBodyPart);
+//                messageBodyPart = new MimeBodyPart();
+//
+//                DataSource source = new FileDataSource(temp);
+//                messageBodyPart.setDataHandler(new DataHandler(source));
+//                messageBodyPart.setFileName(temp.getName());
+//
+//                multipart.addBodyPart(messageBodyPart);
+//                msg.setContent(multipart);
+//                msg.saveChanges();
+//
+//                Transport.send(msg);
+//            } catch (MessagingException e1) {
+//                OPDE.info(e1);
+//                OPDE.info("Mail-System is not configured");
+//            } catch (UnsupportedEncodingException e1) {
+//                OPDE.info(e1);
+//                e1.printStackTrace();
+//            } catch (java.net.UnknownHostException uhe) {
+//                OPDE.info(uhe);
+//            }
         }
 
         System.exit(1);

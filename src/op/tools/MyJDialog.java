@@ -91,7 +91,8 @@ public class MyJDialog extends JDialog {
                         mSetWindowOpacity.invoke(null, thisDialog, new Float(fraction));
                         repaint();
                     } catch (Exception ex) {
-                        OPDE.warn(ex);
+//                        OPDE.info("timingEvent#1");
+//                        OPDE.warn(ex);
                     }
                 }
             }
@@ -108,7 +109,8 @@ public class MyJDialog extends JDialog {
                         mSetWindowOpacity.invoke(null, thisDialog, new Float(fraction));
                         repaint();
                     } catch (Exception ex) {
-                        OPDE.warn(ex);
+//                        OPDE.info("timingEvent#2");
+//                        OPDE.warn(ex);
                     }
                 }
             }
@@ -142,7 +144,8 @@ public class MyJDialog extends JDialog {
                         mSetWindowOpacity.invoke(null, thisDialog, 0.0f);
                         repaint();
                     } catch (Exception ex) {
-                        OPDE.warn(ex);
+//                        OPDE.info("setVisible#1");
+//                        OPDE.warn(ex);
                     }
                 }
                 fadeIn.start();
@@ -160,7 +163,8 @@ public class MyJDialog extends JDialog {
                         mSetWindowOpacity.invoke(null, thisDialog, 1.0f);
                         repaint();
                     } catch (Exception ex) {
-                        OPDE.warn(ex);
+//                        OPDE.info("setVisible#2");
+//                        OPDE.warn(ex);
                     }
                 }
                 fadeOut.start();

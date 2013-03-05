@@ -21,6 +21,7 @@ import entity.info.ResInfoCategoryTools;
 import entity.prescription.MedStock;
 import entity.system.SYSPropsTools;
 import op.OPDE;
+import op.system.EMailSystem;
 import op.system.FileDrop;
 import op.system.LogicalPrinter;
 import op.system.PrinterForm;
@@ -45,10 +46,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Torsten Löhr
@@ -62,7 +60,8 @@ public class PnlSystemSettings extends CleanablePanel {
     private HashMap<String, JPanel> cpPanel;
     private ArrayList<Homes> listHomes;
     private File opdeicd = null;
-    private boolean configsHaveBeenSaved = false;
+    //    private boolean configsHaveBeenSaved = false;
+    private JToggleButton tbauth, tbtls, tbstarttls, tbactive;
 
     public PnlSystemSettings(JScrollPane jspSearch) {
         jspSearch.setViewportView(new JPanel());
@@ -73,7 +72,7 @@ public class PnlSystemSettings extends CleanablePanel {
     }
 
     private void btnTestLabelActionPerformed(ActionEvent e) {
-        if (!configsHaveBeenSaved) return;
+//        if (!configsHaveBeenSaved) return;
 
         try {
             EntityManager em = OPDE.createEM();
@@ -97,7 +96,7 @@ public class PnlSystemSettings extends CleanablePanel {
     private void cmbStationItemStateChanged(ItemEvent e) {
         OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_STATION, ((Station) cmbStation.getSelectedItem()).getStatID().toString());
         OPDE.saveLocalProps();
-        configsHaveBeenSaved = true;
+//        configsHaveBeenSaved = true;
     }
 
     private void cmbPhysicalPrintersItemStateChanged(ItemEvent e) {
@@ -269,6 +268,7 @@ public class PnlSystemSettings extends CleanablePanel {
         createHomesList();
         createCatList();
         createICDImporter();
+        createMailSystem();
     }
 
     private void createCatList() {
@@ -314,6 +314,58 @@ public class PnlSystemSettings extends CleanablePanel {
         }, OPDE.lang.getString(internalClassID + ".global.dropICDHere")), CC.xy(1, 1));
     }
 
+
+    private void createMailSystem() {
+        btnTestmail.setText(OPDE.lang.getString(internalClassID + ".global.mail.btnTestmail"));
+
+        txtMailHost.setText(SYSTools.catchNull(OPDE.getProps().getProperty(EMailSystem.KEY_HOST)));
+        txtMailPort.setText(SYSTools.catchNull(OPDE.getProps().getProperty(EMailSystem.KEY_PORT)));
+        txtMailUser.setText(SYSTools.catchNull(OPDE.getProps().getProperty(EMailSystem.KEY_USER)));
+        txtMailPassword.setText(SYSTools.catchNull(OPDE.getProps().getProperty(EMailSystem.KEY_PASSWORD)));
+        txtMailSender.setText(SYSTools.catchNull(OPDE.getProps().getProperty(EMailSystem.KEY_SENDER)));
+        txtMailRecipient.setText(SYSTools.catchNull(OPDE.getProps().getProperty(EMailSystem.KEY_RECIPIENT)));
+        txtMailSenderPersonal.setText(SYSTools.catchNull(OPDE.getProps().getProperty(EMailSystem.KEY_SENDER_PERSONAL)));
+        txtMailRecipientPersonal.setText(SYSTools.catchNull(OPDE.getProps().getProperty(EMailSystem.KEY_RECIPIENT_PERSONAL)));
+
+        lblMailHost.setText(OPDE.lang.getString(internalClassID + ".global.mail.host"));
+        lblMailPort.setText(OPDE.lang.getString(internalClassID + ".global.mail.port"));
+        lblMailUser.setText(OPDE.lang.getString(internalClassID + ".global.mail.user"));
+        lblMailPassword.setText(OPDE.lang.getString(internalClassID + ".global.mail.password"));
+        lblMailSender.setText(OPDE.lang.getString(internalClassID + ".global.mail.sender"));
+        lblMailRecipient.setText(OPDE.lang.getString(internalClassID + ".global.mail.recipient"));
+        lblMailSenderPersonal.setText(OPDE.lang.getString(internalClassID + ".global.mail.sender.personal"));
+        lblMailRecipientPersonal.setText(OPDE.lang.getString(internalClassID + ".global.mail.recipient.personal"));
+
+        lblAuth.setText(OPDE.lang.getString(internalClassID + ".global.mail.auth"));
+        tbauth = GUITools.getNiceToggleButton(null);
+        tbauth.setSelected(SYSTools.catchNull(OPDE.getProps().getProperty(EMailSystem.KEY_AUTH)).equalsIgnoreCase("true"));
+        pnlMail.add(tbauth, CC.xywh(3, 17, 1, 1, CC.LEFT, CC.DEFAULT));
+
+        lblStarttls.setText(OPDE.lang.getString(internalClassID + ".global.mail.starttls"));
+        tbstarttls = GUITools.getNiceToggleButton(null);
+        tbstarttls.setSelected(SYSTools.catchNull(OPDE.getProps().getProperty(EMailSystem.KEY_STARTTLS)).equalsIgnoreCase("true"));
+        pnlMail.add(tbstarttls, CC.xywh(3, 19, 1, 1, CC.LEFT, CC.DEFAULT));
+
+        lblTLS.setText(OPDE.lang.getString(internalClassID + ".global.mail.tls"));
+        tbtls = GUITools.getNiceToggleButton(null);
+        tbtls.setSelected(SYSTools.catchNull(OPDE.getProps().getProperty(EMailSystem.KEY_TLS)).equalsIgnoreCase("true"));
+        pnlMail.add(tbtls, CC.xywh(3, 21, 1, 1, CC.LEFT, CC.DEFAULT));
+
+        lblActive.setText(OPDE.lang.getString(internalClassID + ".global.mail.active"));
+        tbactive = GUITools.getNiceToggleButton(null);
+        tbactive.setSelected(SYSTools.catchNull(OPDE.getProps().getProperty(EMailSystem.KEY_MAILSYSTEM_ACTIVE)).equalsIgnoreCase("true"));
+        pnlMail.add(tbactive, CC.xywh(3, 25, 1, 1, CC.LEFT, CC.DEFAULT));
+        tbactive.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                OPDE.getProps().put(EMailSystem.KEY_TLS, Boolean.toString(tbactive.isSelected()));
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    OPDE.getProps().putAll(getMailProps());
+                }
+            }
+        });
+
+    }
 
     private void createHomesList() {
         EntityManager em = OPDE.createEM();
@@ -681,6 +733,35 @@ public class PnlSystemSettings extends CleanablePanel {
         }
     }
 
+    private Properties getMailProps() {
+        Properties myMailProps = new Properties();
+        myMailProps.put(EMailSystem.KEY_HOST, txtMailHost.getText().trim());
+        myMailProps.put(EMailSystem.KEY_PORT, txtMailPort.getText().trim());
+        myMailProps.put(EMailSystem.KEY_USER, txtMailUser.getText().trim());
+        myMailProps.put(EMailSystem.KEY_PASSWORD, txtMailPassword.getText().trim());
+        myMailProps.put(EMailSystem.KEY_SENDER, txtMailSender.getText().trim());
+        myMailProps.put(EMailSystem.KEY_RECIPIENT, txtMailRecipient.getText().trim());
+        myMailProps.put(EMailSystem.KEY_SENDER_PERSONAL, txtMailSenderPersonal.getText().trim());
+        myMailProps.put(EMailSystem.KEY_RECIPIENT_PERSONAL, txtMailRecipientPersonal.getText().trim());
+        myMailProps.put(EMailSystem.KEY_AUTH, Boolean.toString(tbauth.isSelected()));
+        myMailProps.put(EMailSystem.KEY_TLS, Boolean.toString(tbtls.isSelected()));
+        myMailProps.put(EMailSystem.KEY_STARTTLS, Boolean.toString(tbstarttls.isSelected()));
+        return myMailProps;
+    }
+
+    private void btnTestmailActionPerformed(ActionEvent e) {
+
+        tbactive.setSelected(false);
+        tbactive.setEnabled(false);
+        final Pair<String, String>[] testRecipient = new Pair[]{new Pair(getMailProps().getProperty(EMailSystem.KEY_RECIPIENT), getMailProps().getProperty(EMailSystem.KEY_RECIPIENT))};
+        btnTestmail.setEnabled(false);
+        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Testing EMail System....", 10));
+        EMailSystem.sendTestmail(testRecipient, null, getMailProps());
+        btnTestmail.setEnabled(true);
+        tbactive.setEnabled(true);
+
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         tabMain = new JTabbedPane();
@@ -696,10 +777,33 @@ public class PnlSystemSettings extends CleanablePanel {
         pnlGlobal = new JPanel();
         lblHomes = new JLabel();
         lblICD = new JLabel();
+        lblEMail = new JLabel();
         jspHomeStation = new JScrollPane();
         cpsHomes = new CollapsiblePanes();
         pnlICD = new JPanel();
         btnImportICD = new JButton();
+        pnlMail = new JPanel();
+        lblMailHost = new JLabel();
+        txtMailHost = new JTextField();
+        lblMailPort = new JLabel();
+        txtMailPort = new JTextField();
+        lblMailUser = new JLabel();
+        txtMailUser = new JTextField();
+        lblMailPassword = new JLabel();
+        txtMailPassword = new JTextField();
+        lblMailSender = new JLabel();
+        txtMailSender = new JTextField();
+        lblMailRecipient = new JLabel();
+        txtMailRecipient = new JTextField();
+        lblMailSenderPersonal = new JLabel();
+        txtMailSenderPersonal = new JTextField();
+        lblMailRecipientPersonal = new JLabel();
+        txtMailRecipientPersonal = new JTextField();
+        lblAuth = new JLabel();
+        lblStarttls = new JLabel();
+        lblTLS = new JLabel();
+        btnTestmail = new JButton();
+        lblActive = new JLabel();
         lblCat = new JLabel();
         jspCat = new JScrollPane();
         lstCat = new JList();
@@ -794,8 +898,8 @@ public class PnlSystemSettings extends CleanablePanel {
             //======== pnlGlobal ========
             {
                 pnlGlobal.setLayout(new FormLayout(
-                        "default, $lcgap, default:grow, $ugap, default:grow, $lcgap, default",
-                        "default, $lgap, pref, $lgap, fill:default:grow, 2*($lgap, default), $lgap, fill:default:grow, 2*($lgap, default)"));
+                        "default, $lcgap, 2*(default:grow, $ugap), default:grow, 2*($lcgap, default)",
+                        "default, $lgap, pref, $lgap, fill:default:grow, $lgap, $ugap, $lgap, default, $lgap, fill:default:grow, 2*($lgap, default)"));
 
                 //---- lblHomes ----
                 lblHomes.setText("Homes");
@@ -806,6 +910,11 @@ public class PnlSystemSettings extends CleanablePanel {
                 lblICD.setText("ICD");
                 lblICD.setFont(new Font("Arial", Font.BOLD, 18));
                 pnlGlobal.add(lblICD, CC.xy(5, 3));
+
+                //---- lblEMail ----
+                lblEMail.setText("E-Mail System");
+                lblEMail.setFont(new Font("Arial", Font.BOLD, 18));
+                pnlGlobal.add(lblEMail, CC.xy(7, 3));
 
                 //======== jspHomeStation ========
                 {
@@ -835,6 +944,80 @@ public class PnlSystemSettings extends CleanablePanel {
                     pnlICD.add(btnImportICD, CC.xy(1, 3, CC.LEFT, CC.DEFAULT));
                 }
                 pnlGlobal.add(pnlICD, CC.xy(5, 5));
+
+                //======== pnlMail ========
+                {
+                    pnlMail.setLayout(new FormLayout(
+                            "default, $lcgap, default:grow",
+                            "12*(default, $lgap), default"));
+
+                    //---- lblMailHost ----
+                    lblMailHost.setText("host");
+                    pnlMail.add(lblMailHost, CC.xy(1, 1));
+                    pnlMail.add(txtMailHost, CC.xy(3, 1));
+
+                    //---- lblMailPort ----
+                    lblMailPort.setText("port");
+                    pnlMail.add(lblMailPort, CC.xy(1, 3));
+                    pnlMail.add(txtMailPort, CC.xy(3, 3));
+
+                    //---- lblMailUser ----
+                    lblMailUser.setText("user");
+                    pnlMail.add(lblMailUser, CC.xy(1, 5));
+                    pnlMail.add(txtMailUser, CC.xy(3, 5));
+
+                    //---- lblMailPassword ----
+                    lblMailPassword.setText("password");
+                    pnlMail.add(lblMailPassword, CC.xy(1, 7));
+                    pnlMail.add(txtMailPassword, CC.xy(3, 7));
+
+                    //---- lblMailSender ----
+                    lblMailSender.setText("sender");
+                    pnlMail.add(lblMailSender, CC.xy(1, 9));
+                    pnlMail.add(txtMailSender, CC.xy(3, 9));
+
+                    //---- lblMailRecipient ----
+                    lblMailRecipient.setText("error-recipient");
+                    pnlMail.add(lblMailRecipient, CC.xy(1, 11));
+                    pnlMail.add(txtMailRecipient, CC.xy(3, 11));
+
+                    //---- lblMailSenderPersonal ----
+                    lblMailSenderPersonal.setText("sender personal");
+                    pnlMail.add(lblMailSenderPersonal, CC.xy(1, 13));
+                    pnlMail.add(txtMailSenderPersonal, CC.xy(3, 13));
+
+                    //---- lblMailRecipientPersonal ----
+                    lblMailRecipientPersonal.setText("recipient personal");
+                    pnlMail.add(lblMailRecipientPersonal, CC.xy(1, 15));
+                    pnlMail.add(txtMailRecipientPersonal, CC.xy(3, 15));
+
+                    //---- lblAuth ----
+                    lblAuth.setText("auth");
+                    pnlMail.add(lblAuth, CC.xy(1, 17));
+
+                    //---- lblStarttls ----
+                    lblStarttls.setText("starttls");
+                    pnlMail.add(lblStarttls, CC.xy(1, 19));
+
+                    //---- lblTLS ----
+                    lblTLS.setText("tls");
+                    pnlMail.add(lblTLS, CC.xy(1, 21));
+
+                    //---- btnTestmail ----
+                    btnTestmail.setText("Send Testmail");
+                    btnTestmail.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            btnTestmailActionPerformed(e);
+                        }
+                    });
+                    pnlMail.add(btnTestmail, CC.xywh(1, 23, 3, 1, CC.LEFT, CC.DEFAULT));
+
+                    //---- lblActive ----
+                    lblActive.setText("active");
+                    pnlMail.add(lblActive, CC.xy(1, 25));
+                }
+                pnlGlobal.add(pnlMail, CC.xy(7, 5));
 
                 //---- lblCat ----
                 lblCat.setText("ResInfoCat");
@@ -939,10 +1122,33 @@ public class PnlSystemSettings extends CleanablePanel {
     private JPanel pnlGlobal;
     private JLabel lblHomes;
     private JLabel lblICD;
+    private JLabel lblEMail;
     private JScrollPane jspHomeStation;
     private CollapsiblePanes cpsHomes;
     private JPanel pnlICD;
     private JButton btnImportICD;
+    private JPanel pnlMail;
+    private JLabel lblMailHost;
+    private JTextField txtMailHost;
+    private JLabel lblMailPort;
+    private JTextField txtMailPort;
+    private JLabel lblMailUser;
+    private JTextField txtMailUser;
+    private JLabel lblMailPassword;
+    private JTextField txtMailPassword;
+    private JLabel lblMailSender;
+    private JTextField txtMailSender;
+    private JLabel lblMailRecipient;
+    private JTextField txtMailRecipient;
+    private JLabel lblMailSenderPersonal;
+    private JTextField txtMailSenderPersonal;
+    private JLabel lblMailRecipientPersonal;
+    private JTextField txtMailRecipientPersonal;
+    private JLabel lblAuth;
+    private JLabel lblStarttls;
+    private JLabel lblTLS;
+    private JButton btnTestmail;
+    private JLabel lblActive;
     private JLabel lblCat;
     private JScrollPane jspCat;
     private JList lstCat;

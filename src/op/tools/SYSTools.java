@@ -31,7 +31,6 @@ import com.enterprisedt.net.ftp.FTPException;
 import com.enterprisedt.net.ftp.FileTransferClient;
 import com.jidesoft.swing.JideSplitPane;
 import entity.files.SYSFilesTools;
-import entity.info.ResidentTools;
 import entity.system.SYSPropsTools;
 import entity.system.Users;
 import op.OPDE;
@@ -451,7 +450,6 @@ public class SYSTools {
     };
 
 
-
     public static DefaultListModel list2dlm(List list) {
         DefaultListModel dlm = new DefaultListModel();
         if (list != null) {
@@ -471,7 +469,6 @@ public class SYSTools {
         }
         return cmb;
     }
-
 
 
     // This method iconifies a frame; the maximized bits are not affected.
@@ -1592,6 +1589,7 @@ public class SYSTools {
         html += SYSConst.html_h2(exc.getClass().getName());
         html += SYSConst.html_paragraph(exc.getMessage());
 
+
         if (OPDE.getMainframe().getCurrentResident() != null) {
             html += SYSConst.html_h3("ResID: " + OPDE.getMainframe().getCurrentResident().getRID());
         }
@@ -1614,6 +1612,29 @@ public class SYSTools {
         }
 
         html += SYSConst.html_table(table, "1");
+
+
+        // Possible Cause
+        if (exc.getCause() != null) {
+            html += SYSConst.html_h3("Caused by: " + exc.getCause().getMessage());
+            StackTraceElement[] stacktrace1 = exc.getCause().getStackTrace();
+            String table1 = SYSConst.html_table_th("opde.errormail.attachment.tab.col1") +
+                    SYSConst.html_table_th("opde.errormail.attachment.tab.col2") +
+                    SYSConst.html_table_th("opde.errormail.attachment.tab.col3") +
+                    SYSConst.html_table_th("opde.errormail.attachment.tab.col4");
+
+            for (int exception = 0; exception < stacktrace1.length; exception++) {
+                StackTraceElement element = stacktrace1[exception];
+                table1 += SYSConst.html_table_tr(
+                        SYSConst.html_table_td(element.getMethodName()) +
+                                SYSConst.html_table_td(Integer.toString(element.getLineNumber())) +
+                                SYSConst.html_table_td(element.getClassName()) +
+                                SYSConst.html_table_td(element.getFileName())
+                );
+            }
+
+            html += SYSConst.html_table(table1, "1");
+        }
 
 
         return html;

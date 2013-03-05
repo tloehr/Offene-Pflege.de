@@ -16,7 +16,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.sql.Time;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -25,7 +24,7 @@ import java.util.GregorianCalendar;
  * @author Torsten Löhr
  */
 public class PnlPIT extends JPanel {
-    private Time uhrzeit;
+    private DateTime time;
     private Date preset;
     private Date max, min;
 
@@ -48,11 +47,8 @@ public class PnlPIT extends JPanel {
 
         txtDate.setText(DateFormat.getDateInstance().format(preset));
 
-//        jdcDatum.setDate(preset);
-//        jdcDatum.setMaxSelectableDate(max == null ? SYSConst.DATE_UNTIL_FURTHER_NOTICE : max);
-//        jdcDatum.setMinSelectableDate(min == null ? SYSConst.DATE_THE_VERY_BEGINNING : min);
-        uhrzeit = new Time(preset.getTime());
-        txtUhrzeit.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(uhrzeit));
+        time = new DateTime(preset);
+        txtUhrzeit.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(time.toDate()));
     }
 
     public Date getPIT() {
@@ -63,7 +59,7 @@ public class PnlPIT extends JPanel {
             day = new DateMidnight();
         }
 
-        DateTime time = new DateTime(uhrzeit);
+        DateTime time = new DateTime(this.time);
         return day.toDateTime().plusHours(time.getHourOfDay()).plusMinutes(time.getMinuteOfHour()).plusSeconds(time.getSecondOfMinute()).toDate();
     }
 
@@ -76,20 +72,30 @@ public class PnlPIT extends JPanel {
         try {
             gc = SYSCalendar.parseTime(txtUhrzeit.getText());
         } catch (NumberFormatException nfe) {
-            gc = new GregorianCalendar();
-            gc.setTime(preset);
+            gc = null;
         }
 
-        if (new DateTime(gc).isAfter(new DateTime(max))) {
-            gc = new DateTime(max).toGregorianCalendar();
+        DateTime pit;
+        if (gc != null) {
+            DateTime time = new DateTime(gc.getTimeInMillis());
+            DateMidnight day = new DateMidnight(SYSCalendar.parseDate(txtDate.getText()));
+            pit = day.toDateTime().plusHours(time.getHourOfDay()).plusMinutes(time.getMinuteOfHour()).plusSeconds(time.getSecondOfMinute());
+
+            if (pit.isAfter(new DateTime(max))) {
+                pit = new DateTime(max);
+            }
+
+            if (pit.isBefore(new DateTime(min))) {
+                pit = new DateTime(min);
+            }
+
+        } else {
+            pit = new DateTime();
         }
 
-        if (new DateTime(gc).isBefore(new DateTime(min))) {
-            gc = new DateTime(min).toGregorianCalendar();
-        }
 
-        txtUhrzeit.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(new Date(gc.getTimeInMillis())));
-        uhrzeit = new Time(gc.getTimeInMillis());
+        txtUhrzeit.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(pit.toDate()));
+        time = pit;//this.time = new Time(gc.getTimeInMillis());
 
     }
 
