@@ -200,7 +200,7 @@ public class PnlFiles extends NursingRecordsPanel {
         final TMSYSFiles tm = (TMSYSFiles) tblFiles.getModel();
         final SYSFiles sysfile = tm.getRow(row);
 
-        if (evt.isPopupTrigger()) {
+        if (SwingUtilities.isRightMouseButton(evt)) {
 
             SYSTools.unregisterListeners(menu);
             menu = new JPopupMenu();
@@ -214,7 +214,6 @@ public class PnlFiles extends NursingRecordsPanel {
                 }
             });
             menu.add(itemPopupShow);
-//            itemPopupShow.setEnabled(OPDE.getAppInfo().isAllowedTo(internalClassID, InternalClassACL.SELECT));
 
 
             if (col == TMSYSFiles.COL_DESCRIPTION && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {

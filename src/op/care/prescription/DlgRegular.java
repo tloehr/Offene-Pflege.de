@@ -814,14 +814,9 @@ public class DlgRegular extends MyJDialog {
 
 
     private void tblDosisMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblDosisMousePressed
-        if (!evt.isPopupTrigger()) {
+        if (!SwingUtilities.isRightMouseButton(evt)) {
             return;
         }
-
-//        if (prescription.isClosed() && new DateMidnight(jdcAB.getDate()).isBefore(new DateMidnight())) {
-//            JOptionPane.showMessageDialog(tblDosis, "Verordnung wurde bereits abgesetzt. Sie können diese nicht mehr ändern.");
-//            return;
-//        }
 
         final TMDose tm = (TMDose) tblDosis.getModel();
         if (tm.getRowCount() == 0) {

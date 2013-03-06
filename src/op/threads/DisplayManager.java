@@ -1,6 +1,5 @@
 package op.threads;
 
-import entity.system.SyslogTools;
 import op.OPDE;
 import op.tools.FadingLabel;
 import op.tools.Pair;
@@ -19,19 +18,17 @@ import java.awt.*;
  */
 public class DisplayManager extends Thread {
     public static final String internalClassID = "opde.displaymanager";
-    private boolean interrupted, dbAction;
+    private boolean interrupted;
     private JProgressBar jp;
     private JLabel lblMain;
     private FadingLabel lblSub;
     private MessageQ messageQ;
     private Pair<String, Integer> progressBarMessage;
-    private long zyklen = 0, pbIntermediateZyklen = 0;
     private final Color defaultColor = new Color(105, 80, 69);
-    private long dbZyklenRest = 0;
-    private Icon icon1, icon2, icondead, iconaway, icongone, iconbiohazard;
-    private SwingWorker worker;
+    private Icon icondead, iconaway, icongone, iconbiohazard;
+//    private SwingWorker worker;
     private boolean isIndeterminate = false;
-    private JPanel pnlIcons;
+//    private JPanel pnlIcons;
     private JLabel lblBiohazard, lblDiabetes, lblAllergy, lblWarning;
 
 
@@ -43,10 +40,10 @@ public class DisplayManager extends Thread {
     public DisplayManager(JProgressBar p, JLabel lblM, FadingLabel lblS, JPanel pnlIcons) {
         super();
         progressBarMessage = new Pair<String, Integer>("", -1);
-        this.pnlIcons = pnlIcons;
+//        this.pnlIcons = pnlIcons;
         setName("DisplayManager");
         interrupted = false;
-        dbAction = false;
+//        dbAction = false;
         jp = p;
         jp.setStringPainted(false);
         jp.setValue(0);
@@ -106,7 +103,6 @@ public class DisplayManager extends Thread {
         setIconWarning(null);
         setIconAllergy(null);
         messageQ.clear();
-//        oldMessages.clear();
         processSubMessage();
     }
 
@@ -260,25 +256,23 @@ public class DisplayManager extends Thread {
     }
 
     private void processSubMessage() {
-        messageQ.debug();
         if (!messageQ.isEmpty()) {
-            // TODO: Das hier klappt nicht
-            if (messageQ.getNextMessage().getPriority() == DisplayMessage.IMMEDIATELY || messageQ.getHead().isObsolete()) {
-                pbIntermediateZyklen = 0;
+            if (messageQ.getHead().isObsolete()) {
                 messageQ.next();
-                messageQ.getHead().setProcessed(System.currentTimeMillis());
+            } else if (!messageQ.getHead().isProcessed()) {
+                messageQ.getHead().setProcessed();
                 lblSub.setText(SYSTools.toHTMLForScreen(messageQ.getHead().getMessage()));
-                if (messageQ.getHead().getPriority() == DisplayMessage.IMMEDIATELY) {
-                    SyslogTools.addLog("[" + messageQ.getHead().getClassname() + "] " + messageQ.getHead().getMessage(), SyslogTools.ERROR);
-                }
+            } else if (messageQ.hasNextMessage() && messageQ.getNextMessage().isUrgent()) {
+                messageQ.next();
+            } else if (messageQ.getHead().isShowingTillReplacement() && messageQ.hasNextMessage()) {
+                messageQ.next();
             }
         } else {
-            pbIntermediateZyklen++;
-            if (messageQ.isEmpty() || messageQ.getHead().isObsolete()) {
-                lblSub.setText(null);
-            }
+            lblSub.setText(null);
         }
 
+
+        // Coloring
         if (!messageQ.isEmpty() && messageQ.getHead().getPriority() == DisplayMessage.IMMEDIATELY) {
             jp.setForeground(Color.RED);
             lblSub.setForeground(Color.RED);
@@ -339,7 +333,6 @@ public class DisplayManager extends Thread {
                 processProgressBar();
                 processSubMessage();
 
-                zyklen++;
                 Thread.sleep(50);
             } catch (InterruptedException ie) {
                 interrupted = true;

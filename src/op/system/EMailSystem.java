@@ -1,6 +1,7 @@
 package op.system;
 
 import entity.files.SYSFilesTools;
+import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.settings.PnlSystemSettings;
 import op.threads.DisplayMessage;
@@ -30,23 +31,9 @@ import java.util.Properties;
  * To change this template use File | Settings | File Templates.
  */
 public class EMailSystem {
-    public static final String KEY_HOST = "mail.smtp.host";
-    public static String KEY_PORT = "mail.smtp.port";
-    public static String KEY_PROTOCOL = "mail.transport.protocol";
-    public static String KEY_AUTH = "mail.smtp.auth";
-    public static String KEY_STARTTLS = "mail.smtp.starttls.enable";
-    public static String KEY_TLS = "mail.smtp.tls";
-    public static String KEY_USER = "mail.smtp.user";
-    public static String KEY_PASSWORD = "mail.password";
-    public static String KEY_SENDER = "mail.sender";
-    public static String KEY_RECIPIENT = "mail.recipient";
-    public static String KEY_SENDER_PERSONAL = "mail.sender.personal";
-    public static String KEY_RECIPIENT_PERSONAL = "mail.recipient.personal";
-    public static String KEY_MAILSYSTEM_ACTIVE = "mail.system.active";
-
 
     public static boolean isMailsystemActive() {
-        return OPDE.getProps().containsKey(KEY_MAILSYSTEM_ACTIVE) && OPDE.getProps().getProperty(KEY_MAILSYSTEM_ACTIVE).equalsIgnoreCase("true");
+        return OPDE.getProps().containsKey(SYSPropsTools.KEY_MAIL_SYSTEM_ACTIVE) && OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_SYSTEM_ACTIVE).equalsIgnoreCase("true");
     }
 
     /**
@@ -62,7 +49,7 @@ public class EMailSystem {
 
         String html = SYSTools.getThrowableAsHTML(throwable);
         File temp = SYSFilesTools.print(html, false);
-        Pair<String, String> pair = new Pair<String, String>(OPDE.getProps().getProperty(KEY_RECIPIENT), OPDE.getProps().getProperty(KEY_RECIPIENT_PERSONAL));
+        Pair<String, String> pair = new Pair<String, String>(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_RECIPIENT), OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_RECIPIENT_PERSONAL));
         Pair<String, String>[] pairs = new Pair[]{pair};
 
         InetAddress localMachine = null;
@@ -103,14 +90,14 @@ public class EMailSystem {
             javax.mail.Authenticator auth = new javax.mail.Authenticator() {
                 @Override
                 public PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(mailProps.getProperty(KEY_USER), mailProps.getProperty(KEY_PASSWORD));
+                    return new PasswordAuthentication(mailProps.getProperty(SYSPropsTools.KEY_MAIL_USER), mailProps.getProperty(SYSPropsTools.KEY_MAIL_PASSWORD));
                 }
             };
 
             Session session = Session.getInstance(mailProps, auth);
 
             Message msg = new MimeMessage(session);
-            msg.setFrom(new InternetAddress(mailProps.getProperty(KEY_SENDER), mailProps.getProperty(KEY_SENDER_PERSONAL)));
+            msg.setFrom(new InternetAddress(mailProps.getProperty(SYSPropsTools.KEY_MAIL_SENDER), mailProps.getProperty(SYSPropsTools.KEY_MAIL_SENDER_PERSONAL)));
 
             for (Pair<String, String> recipient : recipients) {
                 msg.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient.getFirst(), recipient.getSecond()));

@@ -21,6 +21,8 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
     public static final short NORMAL = 30;
     public static final short INDEFFERENT = 40;
 
+    public static final int WAIT_TIL_NEXT_MESSAGE = 0;
+
     private String message;
     private short priority;
     private long timestamp;
@@ -128,28 +130,6 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         this.classname = "";
     }
 
-    public DisplayMessage(String message,
-                          short priority,
-                          long timestamp,
-                          long processed,
-                          int secondsToShow) {
-        String title = SYSTools.catchNull(message);
-        try {
-            title = OPDE.lang.getString(message);
-        } catch (Exception e){
-            // ok, its not a langbundle key
-        }
-
-        this.message = title;
-        this.priority = priority;
-        this.timestamp = timestamp;
-        this.processed = processed;
-        this.secondsToShow = secondsToShow;
-        this.percentage = 0;
-        uid = UUID.randomUUID().toString();
-        this.classname = "";
-    }
-
     public DisplayMessage(String message, String classname) {
         String title = SYSTools.catchNull(message);
         try {
@@ -170,10 +150,6 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
     public String getMessage() {
         return message; //SYSTools.toHTML(SYSConst.html_div_open + message + SYSConst.html_div_close);
     }
-
-//    public String getRawMessage() {
-//        return message;
-//    }
 
     public void setMessage(String message) {
         this.message = message;
@@ -199,9 +175,14 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         return processed;
     }
 
+
     public void setProcessed(long processed) {
         this.processed = processed;
     }
+
+    public void setProcessed() {
+            this.processed = System.currentTimeMillis();
+        }
 
     public int getSecondsToShow() {
         return secondsToShow;
@@ -227,6 +208,10 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         this.classname = classname;
     }
 
+    public boolean isUrgent(){
+        return priority == IMMEDIATELY;
+    }
+
     public String getUID() {
         return uid;
     }
@@ -235,11 +220,11 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
      * @return true, wenn die Nachricht
      */
     public boolean isObsolete() {
-        return !isShowingTillReplacement() && processed + secondsToShow * 1000 <= System.currentTimeMillis();
+        return isProcessed() && !isShowingTillReplacement() && processed + secondsToShow * 1000 <= System.currentTimeMillis();
     }
 
     public boolean isProcessed() {
-        return processed != 0;
+        return processed > 0;
     }
 
     public boolean isShowingTillReplacement() {

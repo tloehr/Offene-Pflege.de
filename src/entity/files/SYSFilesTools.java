@@ -34,6 +34,7 @@ import entity.info.Resident;
 import entity.nursingprocess.NursingProcess;
 import entity.prescription.Prescription;
 import entity.reports.NReport;
+import entity.system.SYSPropsTools;
 import entity.values.ResValue;
 import op.OPDE;
 import op.threads.DisplayManager;
@@ -57,6 +58,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * @author tloehr
@@ -463,19 +465,28 @@ public class SYSFilesTools {
 //    }
 
 
-    public static FileTransferClient getFTPClient() {
+    public static FileTransferClient getFTPClient(Properties ftpProps) throws Exception {
         FileTransferClient ftp = new FileTransferClient();
-        try {
-            ftp.setRemoteHost(OPDE.getProps().getProperty("FTPServer"));
-            ftp.setUserName(OPDE.getProps().getProperty("FTPUser"));
-            ftp.setPassword(OPDE.getProps().getProperty("FTPPassword"));
-            ftp.setRemotePort(Integer.parseInt(OPDE.getProps().getProperty("FTPPort")));
-            ftp.connect();
-            ftp.getAdvancedFTPSettings().setConnectMode(FTPConnectMode.PASV);
-            if (!OPDE.getProps().getProperty("FTPWorkingDirectory").isEmpty()) {
-                ftp.changeDirectory(OPDE.getProps().getProperty("FTPWorkingDirectory"));
-            }
 
+        ftp.setRemoteHost(ftpProps.getProperty(SYSPropsTools.KEY_FTP_SERVER));
+        ftp.setUserName(ftpProps.getProperty(SYSPropsTools.KEY_FTP_USER));
+        ftp.setPassword(ftpProps.getProperty(SYSPropsTools.KEY_FTP_PASSWORD));
+        ftp.setRemotePort(Integer.parseInt(ftpProps.getProperty(SYSPropsTools.KEY_FTP_PORT)));
+        ftp.connect();
+        ftp.getAdvancedFTPSettings().setConnectMode(FTPConnectMode.PASV);
+        if (!ftpProps.getProperty(SYSPropsTools.KEY_FTP_WD).isEmpty()) {
+            ftp.changeDirectory(ftpProps.getProperty(SYSPropsTools.KEY_FTP_WD));
+        }
+
+
+        return ftp;
+    }
+
+
+    public static FileTransferClient getFTPClient() {
+        FileTransferClient ftp;
+        try {
+            ftp = getFTPClient(OPDE.getProps());
         } catch (Exception e) {
             OPDE.error(e);
             ftp = null;

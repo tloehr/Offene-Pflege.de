@@ -62,7 +62,7 @@ public class RNDMedTree extends JLabel implements TreeCellRenderer {
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent evt) {
                 OPDE.debug(evt);
-                if (evt.isPopupTrigger()) {
+                if (SwingUtilities.isRightMouseButton(evt)) {
                     OPDE.debug(evt.getButton());
                     menu.show(evt.getComponent(), evt.getX(), evt.getY());
                 }
@@ -70,7 +70,7 @@ public class RNDMedTree extends JLabel implements TreeCellRenderer {
 
             public void mouseReleased(MouseEvent evt) {
                 OPDE.debug(evt);
-                if (evt.isPopupTrigger()) {
+                if (SwingUtilities.isRightMouseButton(evt)) {
                     menu.show(evt.getComponent(), evt.getX(), evt.getY());
                 }
             }

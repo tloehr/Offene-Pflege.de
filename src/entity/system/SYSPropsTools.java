@@ -26,6 +26,25 @@ public class SYSPropsTools {
     public static final String KEY_LOGICAL_PRINTER = "printer.logical.name";
     public static final String KEY_MEDSTOCK_LABEL = "printer.medstock.label.name";
     public static final String KEY_STATION = "station";
+    public static final String KEY_MAIL_HOST = "mail.smtp.host";
+    public static final String KEY_MAIL_PORT = "mail.smtp.port";
+    public static final String KEY_MAIL_PROTOCOL = "mail.transport.protocol";
+    public static final String KEY_MAIL_AUTH = "mail.smtp.auth";
+    public static final String KEY_MAIL_STARTTLS = "mail.smtp.starttls.enable";
+    public static final String KEY_MAIL_TLS = "mail.smtp.tls";
+    public static final String KEY_MAIL_USER = "mail.smtp.user";
+    public static final String KEY_MAIL_PASSWORD = "mail.password";
+    public static final String KEY_MAIL_SENDER = "mail.sender";
+    public static final String KEY_MAIL_RECIPIENT = "mail.recipient";
+    public static final String KEY_MAIL_SENDER_PERSONAL = "mail.sender.personal";
+    public static final String KEY_MAIL_RECIPIENT_PERSONAL = "mail.recipient.personal";
+    public static final String KEY_MAIL_SYSTEM_ACTIVE = "mail.system.active";
+    public static final String KEY_FTP_SERVER = "FTPServer";
+    public static final String KEY_FTP_USER = "FTPUser";
+    public static final String KEY_FTP_PASSWORD = "FTPPassword";
+    public static final String KEY_FTP_WD = "FTPWorkingDirectory";
+    public static final String KEY_FTP_PORT = "FTPPort";
+    public static final String KEY_FTP_IS_WORKING = "FTPIsWorking";
 
     public static void storeProp(EntityManager em, String key, String value, Users user) throws Exception {
         String jpql = "SELECT s FROM SYSProps s WHERE s.key = :key AND s.user = :user";
@@ -51,7 +70,7 @@ public class SYSPropsTools {
             prop = new SYSProps(key, value, user);
         }
 
-        prop = em.merge(prop);
+        em.merge(prop);
         OPDE.setProp(key, value);
     }
 

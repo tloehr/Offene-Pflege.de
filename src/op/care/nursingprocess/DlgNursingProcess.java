@@ -456,7 +456,7 @@ public class DlgNursingProcess extends MyJDialog {
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void tblPlanungMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblPlanungMousePressed
-        if (!evt.isPopupTrigger()) {
+        if (!SwingUtilities.isRightMouseButton(evt)) {
             return;
         }
 

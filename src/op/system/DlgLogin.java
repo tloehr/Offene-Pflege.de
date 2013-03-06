@@ -254,7 +254,7 @@ public class DlgLogin extends MyJDialog {
             } else {
                 OPDE.initProps();
                 OPDE.info("Login: " + username + "  LoginID: " + OPDE.getLogin().getLoginID());
-                OPDE.setFTPworking(SYSFilesTools.isFTPServerReady());
+//                OPDE.setFTPworking(SYSFilesTools.isFTPServerReady());
                 dispose();
             }
 

@@ -84,7 +84,7 @@ public class OPDE {
     protected static String opwd = "";
     protected static String css = "";
 
-    protected static boolean FTPisWORKING = false;
+//    protected static boolean FTPisWORKING = false;
     public static String UPDATE_FTPSERVER = "ftp.offene-pflege.de";
     protected static boolean updateAvailable = false;
 
@@ -153,15 +153,9 @@ public class OPDE {
     }
 
     public static boolean isFTPworking() {
-        return FTPisWORKING;
+        return SYSTools.catchNull(props.getProperty(SYSPropsTools.KEY_FTP_IS_WORKING)).equalsIgnoreCase("true");
     }
 
-    public static void setFTPworking(boolean FTPisWORKING) {
-        OPDE.FTPisWORKING = FTPisWORKING;
-        if (!OPDE.FTPisWORKING) {
-            getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.ftpNotWorking"));
-        }
-    }
 
     public static boolean isCustomUrl() {
         return !url.equals(localProps.getProperty("javax.persistence.jdbc.url"));
@@ -219,67 +213,8 @@ public class OPDE {
         }
         e.printStackTrace();
 
-//        String html = SYSTools.getThrowableAsHTML(e);
-//
-//        File temp = SYSFilesTools.print(html, false);
-
-        if (!isDebug()) { //Stellvertretend für die anderen Keys.
-
+        if (!isDebug()) {
             EMailSystem.sendErrorMail(e);
-
-
-//            try {
-//
-//                InetAddress localMachine = InetAddress.getLocalHost();
-//
-//                javax.mail.Authenticator auth = new javax.mail.Authenticator() {
-//                    @Override
-//                    public PasswordAuthentication getPasswordAuthentication() {
-//                        return new PasswordAuthentication(props.getProperty("mail.sender"), props.getProperty("mail.password"));
-//                    }
-//                };
-//
-//                Session session = Session.getDefaultInstance(props, auth);
-//
-//                Message msg = new MimeMessage(session);
-//                msg.setFrom(new InternetAddress(props.getProperty("mail.sender"), props.getProperty("mail.sender.personal")));
-//                msg.addRecipient(Message.RecipientType.TO, new InternetAddress(props.getProperty("mail.recipient"), props.getProperty("mail.recipient.personal")));
-//                msg.setSubject(lang.getString(internalClassID + ".errormail.subject") + ": " + e.getMessage());
-//
-//
-//                BodyPart messageBodyPart = new MimeBodyPart();
-//
-//                messageBodyPart.setText("" +
-//                        lang.getString(internalClassID + ".errormail.line1") + "\n" +
-//                        lang.getString(internalClassID + ".errormail.line2") + ": " + localMachine.getHostName() + "\n" +
-//                        lang.getString(internalClassID + ".errormail.line3") + ": " + localMachine.getHostAddress() + "\n" +
-//                        lang.getString(internalClassID + ".errormail.line4") + ": " + getLogin().getUser().getUID() + "\n" +
-//                        lang.getString(internalClassID + ".errormail.line5") + ": " + DateFormat.getDateTimeInstance().format(new Date()) + "\n\n\n" +
-//                        lang.getString(internalClassID + ".errormail.line6")
-//                );
-//
-//                Multipart multipart = new MimeMultipart();
-//                multipart.addBodyPart(messageBodyPart);
-//                messageBodyPart = new MimeBodyPart();
-//
-//                DataSource source = new FileDataSource(temp);
-//                messageBodyPart.setDataHandler(new DataHandler(source));
-//                messageBodyPart.setFileName(temp.getName());
-//
-//                multipart.addBodyPart(messageBodyPart);
-//                msg.setContent(multipart);
-//                msg.saveChanges();
-//
-//                Transport.send(msg);
-//            } catch (MessagingException e1) {
-//                OPDE.info(e1);
-//                OPDE.info("Mail-System is not configured");
-//            } catch (UnsupportedEncodingException e1) {
-//                OPDE.info(e1);
-//                e1.printStackTrace();
-//            } catch (java.net.UnknownHostException uhe) {
-//                OPDE.info(uhe);
-//            }
         }
 
         System.exit(1);

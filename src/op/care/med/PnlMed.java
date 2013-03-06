@@ -168,7 +168,7 @@ public class PnlMed extends CleanablePanel {
 
     private void treeMedMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_treeMedMousePressed
         if (produkt == null) return;
-        if (evt.isPopupTrigger()) {
+        if (SwingUtilities.isRightMouseButton(evt)) {
             // Dieses Popupmenu für den Table
             SYSTools.unregisterListeners(menu);
             menu = new JPopupMenu();
