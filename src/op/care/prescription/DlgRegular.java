@@ -30,6 +30,7 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.wizard.WizardDialog;
+import entity.EntityTools;
 import entity.nursingprocess.Intervention;
 import entity.nursingprocess.InterventionTools;
 import entity.prescription.*;
@@ -152,7 +153,6 @@ public class DlgRegular extends MyJDialog {
             String pzn = MedPackageTools.parsePZN(txtMed.getText());
 
             if (pzn != null) {
-
                 Query pznQuery = em.createQuery("SELECT m FROM MedPackage m WHERE m.pzn = :pzn");
                 pznQuery.setParameter("pzn", pzn);
 
@@ -165,8 +165,19 @@ public class DlgRegular extends MyJDialog {
                     OPDE.fatal(ex);
                 }
 
-            } else { // Falls die Suche NICHT nur aus Zahlen besteht, dann nach Namen suchen.
-                cmbMed.setModel(new DefaultComboBoxModel(TradeFormTools.findTradeFormByMedProductText(em, txtMed.getText()).toArray()));
+            } else { // no PZN, a Stock maybe ? or just a text
+                MedStock potentialStock = null;
+                try {
+                    long potentialStockID = Integer.parseInt(txtMed.getText());
+                    potentialStock = EntityTools.find(MedStock.class, potentialStockID);
+                } catch (NumberFormatException e1) {
+                    // noch stockid then
+                }
+                if (potentialStock != null && potentialStock.getInventory().getResident().equals(prescription.getResident()) && !potentialStock.isClosed()) {
+                    cmbMed.setModel(new DefaultComboBoxModel(new TradeForm[]{potentialStock.getTradeForm()}));
+                } else {
+                    cmbMed.setModel(new DefaultComboBoxModel(TradeFormTools.findTradeFormByMedProductText(em, txtMed.getText()).toArray()));
+                }
             }
             OPDE.getDisplayManager().setDBActionMessage(false);
             em.close();

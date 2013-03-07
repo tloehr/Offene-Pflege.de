@@ -197,7 +197,7 @@ public class PnlMed extends CleanablePanel {
                     itemedit = new JMenuItem(OPDE.lang.getString("misc.msg.edit"));
                     itemedit.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
-                            new DlgDAF("", tradeForm);
+                            new DlgDAF(tradeForm);
                             createTree();
                         }
                     });

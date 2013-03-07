@@ -95,6 +95,7 @@
                javaclass="op.care.med.PnlMed" icon="agt_virussafe.png">
             <execute langbundle="appinfo.default.acl.execute"/>
             <insert langbundle="appinfo.default.acl.insert"/>
+            <manager langbundle="appinfo.default.acl.manager"/>
         </class>
         <class name="opde.users" short="Benutzerverwaltung"
                long="Benutzer- und Gruppenverwaltung" main="true"

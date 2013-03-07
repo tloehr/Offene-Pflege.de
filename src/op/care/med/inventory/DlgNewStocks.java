@@ -226,6 +226,7 @@ public class DlgNewStocks extends MyJDialog {
         jLabel1 = new JLabel();
         panel2 = new JPanel();
         txtMedSuche = new JXSearchField();
+        hSpacer1 = new JPanel(null);
         btnMed = new JButton();
         jLabel3 = new JLabel();
         cmbMProdukt = new JComboBox();
@@ -273,6 +274,7 @@ public class DlgNewStocks extends MyJDialog {
                     }
                 });
                 panel2.add(txtMedSuche);
+                panel2.add(hSpacer1);
 
                 //---- btnMed ----
                 btnMed.setBackground(Color.white);
@@ -768,6 +770,7 @@ public class DlgNewStocks extends MyJDialog {
     private JLabel jLabel1;
     private JPanel panel2;
     private JXSearchField txtMedSuche;
+    private JPanel hSpacer1;
     private JButton btnMed;
     private JLabel jLabel3;
     private JComboBox cmbMProdukt;

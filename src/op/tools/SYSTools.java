@@ -1585,7 +1585,7 @@ public class SYSTools {
         String html = "";
         StackTraceElement[] stacktrace = exc.getStackTrace();
 
-        html += SYSConst.html_h1("opde.errormail.attachment.line1");
+        html += SYSConst.html_h1("mail.errormail.attachment.line1");
         html += SYSConst.html_h2(exc.getClass().getName());
         html += SYSConst.html_paragraph(exc.getMessage());
 
@@ -1596,10 +1596,10 @@ public class SYSTools {
 
         html += SYSConst.html_h3(OPDE.getMainframe().getCurrentClassname());
 
-        String table = SYSConst.html_table_th("opde.errormail.attachment.tab.col1") +
-                SYSConst.html_table_th("opde.errormail.attachment.tab.col2") +
-                SYSConst.html_table_th("opde.errormail.attachment.tab.col3") +
-                SYSConst.html_table_th("opde.errormail.attachment.tab.col4");
+        String table = SYSConst.html_table_th("mail.errormail.attachment.tab.col1") +
+                SYSConst.html_table_th("mail.errormail.attachment.tab.col2") +
+                SYSConst.html_table_th("mail.errormail.attachment.tab.col3") +
+                SYSConst.html_table_th("mail.errormail.attachment.tab.col4");
 
         for (int exception = 0; exception < stacktrace.length; exception++) {
             StackTraceElement element = stacktrace[exception];
@@ -1618,10 +1618,10 @@ public class SYSTools {
         if (exc.getCause() != null) {
             html += SYSConst.html_h3("Caused by: " + exc.getCause().getMessage());
             StackTraceElement[] stacktrace1 = exc.getCause().getStackTrace();
-            String table1 = SYSConst.html_table_th("opde.errormail.attachment.tab.col1") +
-                    SYSConst.html_table_th("opde.errormail.attachment.tab.col2") +
-                    SYSConst.html_table_th("opde.errormail.attachment.tab.col3") +
-                    SYSConst.html_table_th("opde.errormail.attachment.tab.col4");
+            String table1 = SYSConst.html_table_th("mail.errormail.attachment.tab.col1") +
+                    SYSConst.html_table_th("mail.errormail.attachment.tab.col2") +
+                    SYSConst.html_table_th("mail.errormail.attachment.tab.col3") +
+                    SYSConst.html_table_th("mail.errormail.attachment.tab.col4");
 
             for (int exception = 0; exception < stacktrace1.length; exception++) {
                 StackTraceElement element = stacktrace1[exception];

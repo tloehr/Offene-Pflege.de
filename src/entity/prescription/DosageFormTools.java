@@ -15,11 +15,9 @@ import java.awt.*;
  * To change this template use File | Settings | File Templates.
  */
 public class DosageFormTools {
-    public static final short UPR1 = 0;
-    public static final short UPR_BY_TRADEFORM = 1;
-    public static final short UPR_BY_RESIDENT = 2;
-
-//    public static final String UNIT[] = {"", "Stück", "ml", "l", "mg", "g", "cm", "m"}; // Für AnwEinheit, PackEinheit, Dimension
+    public static final short STATE_UPR1 = 0;
+    public static final short STATE_UPR_BY_TRADEFORM = 1;
+    public static final short STATE_UPR_BY_RESIDENT = 2;
 
     /**
      * @param maxlen maximale Zeichenlänge pro Zeile. maxlen < 1 heisst egal.

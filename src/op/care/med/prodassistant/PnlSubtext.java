@@ -8,10 +8,10 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.prescription.*;
 import op.OPDE;
-import op.tools.SYSConst;
+import op.care.med.PnlDosageForm;
+import op.tools.GUITools;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
-import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.JXSearchField;
 
 import javax.persistence.EntityManager;
@@ -66,7 +66,6 @@ public class PnlSubtext extends JPanel {
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(" SELECT m FROM DosageForm m ");
-//        query.setParameter("product", product);
 
         java.util.List listDosageForm = query.getResultList();
         Collections.sort(listDosageForm, new Comparator<Object>() {
@@ -103,11 +102,9 @@ public class PnlSubtext extends JPanel {
         }
         if (!e.getValueIsAdjusting()) {
             if (lstDaf.getSelectedIndex() > 0) {
-//                ignoreEvent = true;
                 tradeForm = (TradeForm) lstDaf.getSelectedValue();
                 txtZusatz.setText(null);
                 cmbFormen.setEnabled(false);
-//                ignoreEvent = false;
             } else {
                 cmbFormen.setEnabled(true);
                 tradeForm = new TradeForm(product, txtZusatz.getText().trim(), dosageForm);
@@ -125,10 +122,28 @@ public class PnlSubtext extends JPanel {
         validate.execute(tradeForm);
     }
 
+
+    private void btnAddActionPerformed(ActionEvent e) {
+        PnlDosageForm pnl = new PnlDosageForm(new DosageForm(0));
+
+        GUITools.showPopup(GUITools.createPanelPopup(pnl, new Closure() {
+            @Override
+            public void execute(Object o) {
+                if (o != null) {
+                    cmbFormen.setModel(new DefaultComboBoxModel(new DosageForm[]{(DosageForm) o}));
+                    dosageForm = (DosageForm) cmbFormen.getSelectedItem();
+                    tradeForm = new TradeForm(product, txtZusatz.getText().trim(), dosageForm);
+                    validate.execute(tradeForm);
+                }
+            }
+        }, btnAdd), SwingConstants.SOUTH_WEST);
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         txtZusatz = new JXSearchField();
         cmbFormen = new JComboBox();
+        btnAdd = new JButton();
         lbl1 = new JLabel();
         lblMsg = new JLabel();
         jsp1 = new JScrollPane();
@@ -136,8 +151,8 @@ public class PnlSubtext extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "2*(default, $lcgap), default:grow, $lcgap, default",
-            "2*(default, $lgap), default, $rgap, pref, $lgap, default:grow, $lgap, default"));
+                "2*(default, $lcgap), default:grow, 2*($lcgap, default)",
+                "2*(default, $lgap), default, $rgap, pref, $lgap, default:grow, $lgap, default"));
 
         //---- txtZusatz ----
         txtZusatz.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -149,7 +164,7 @@ public class PnlSubtext extends JPanel {
                 txtZusatzActionPerformed(e);
             }
         });
-        add(txtZusatz, CC.xywh(3, 3, 3, 1));
+        add(txtZusatz, CC.xywh(3, 3, 5, 1));
 
         //---- cmbFormen ----
         cmbFormen.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -161,6 +176,21 @@ public class PnlSubtext extends JPanel {
         });
         add(cmbFormen, CC.xywh(3, 5, 3, 1));
 
+        //---- btnAdd ----
+        btnAdd.setBackground(Color.white);
+        btnAdd.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
+        btnAdd.setToolTipText("Medikamente bearbeiten");
+        btnAdd.setBorder(null);
+        btnAdd.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png")));
+        btnAdd.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnAdd.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnAddActionPerformed(e);
+            }
+        });
+        add(btnAdd, CC.xy(7, 5));
+
         //---- lbl1 ----
         lbl1.setText(null);
         lbl1.setIcon(new ImageIcon(getClass().getResource("/artwork/other/medicine2.png")));
@@ -171,7 +201,7 @@ public class PnlSubtext extends JPanel {
         lblMsg.setText("text");
         lblMsg.setFont(new Font("Arial", Font.PLAIN, 14));
         lblMsg.setHorizontalAlignment(SwingConstants.RIGHT);
-        add(lblMsg, CC.xywh(3, 7, 3, 1));
+        add(lblMsg, CC.xywh(3, 7, 5, 1));
 
         //======== jsp1 ========
         {
@@ -187,13 +217,14 @@ public class PnlSubtext extends JPanel {
             });
             jsp1.setViewportView(lstDaf);
         }
-        add(jsp1, CC.xy(5, 9, CC.DEFAULT, CC.FILL));
+        add(jsp1, CC.xywh(5, 9, 3, 1, CC.DEFAULT, CC.FILL));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JXSearchField txtZusatz;
     private JComboBox cmbFormen;
+    private JButton btnAdd;
     private JLabel lbl1;
     private JLabel lblMsg;
     private JScrollPane jsp1;

@@ -45,6 +45,7 @@ public class SYSPropsTools {
     public static final String KEY_FTP_WD = "FTPWorkingDirectory";
     public static final String KEY_FTP_PORT = "FTPPort";
     public static final String KEY_FTP_IS_WORKING = "FTPIsWorking";
+    public static final String BHP_MAX_MINUTES_TO_WITHDRAW ="bhp_max_minutes_to_withdraw";
 
     public static void storeProp(EntityManager em, String key, String value, Users user) throws Exception {
         String jpql = "SELECT s FROM SYSProps s WHERE s.key = :key AND s.user = :user";

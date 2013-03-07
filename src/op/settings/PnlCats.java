@@ -10,7 +10,6 @@ import entity.info.ResInfoCategory;
 import entity.info.ResInfoCategoryTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
-import op.tools.GUITools;
 import op.tools.PopupPanel;
 
 import javax.swing.*;
@@ -50,16 +49,19 @@ public class PnlCats extends PopupPanel {
 
     @Override
     public Object getResult() {
-        if (isSaveOK()) {
-            resInfoCategory.setText(txtName.getText().trim());
-            resInfoCategory.setCatType(ResInfoCategoryTools.TYPES[cmbCatType.getSelectedIndex()]);
-        } else {
-            resInfoCategory = null;
-        }
+        resInfoCategory.setText(txtName.getText().trim());
+        resInfoCategory.setCatType(ResInfoCategoryTools.TYPES[cmbCatType.getSelectedIndex()]);
+//        if (isSaveOK()) {
+//            resInfoCategory.setText(txtName.getText().trim());
+//            resInfoCategory.setCatType(ResInfoCategoryTools.TYPES[cmbCatType.getSelectedIndex()]);
+//        } else {
+//            resInfoCategory = null;
+//        }
         return resInfoCategory;
     }
 
-    private boolean isSaveOK() {
+    @Override
+    public boolean isSaveOK() {
         boolean ok = !txtName.getText().trim().isEmpty();
 
         if (!ok) {

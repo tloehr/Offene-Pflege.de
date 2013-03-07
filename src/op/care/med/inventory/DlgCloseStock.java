@@ -298,7 +298,7 @@ public class DlgCloseStock extends MyJDialog {
         txtLetzte.setText("");
         txtLetzte.setEnabled(false);
         // Das mit dem Vorabstellen nur bei Formen, die auf Stück basieren also APV = 1
-        rbStellen.setEnabled(medStock.getTradeForm().getDosageForm().getState() == DosageFormTools.UPR1);
+        rbStellen.setEnabled(medStock.getTradeForm().getDosageForm().getUPRState() == DosageFormTools.STATE_UPR1);
     }
 
     private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed

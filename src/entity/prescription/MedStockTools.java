@@ -97,7 +97,7 @@ public class MedStockTools {
         HashMap hm = new HashMap();
         hm.put("medstock.tradeform", TradeFormTools.toPrettyString(bestand.getTradeForm()));
 
-        String pzn = bestand.getPackage().getPzn() == null ? "??" : bestand.getPackage().getPzn();
+        String pzn = bestand.getPackage() == null ? "??" : bestand.getPackage().getPzn();
         hm.put("medstock.package.pzn", pzn);
         hm.put("medstock.id", bestand.getID());
         hm.put("medstock.in", bestand.getIN());
@@ -461,14 +461,14 @@ public class MedStockTools {
 //        if (!stock.getTradeForm().getDosageForm().isUPR1()) {
 //            EntityManager em = OPDE.createEM();
 //            Query query = null;
-//            if (stock.getTradeForm().getDosageForm().getState() == DosageFormTools.UPR_BY_RESIDENT) {
-//                OPDE.debug("UPR_BY_RESIDENT");
+//            if (stock.getTradeForm().getDosageForm().getUPRState() == DosageFormTools.STATE_UPR_BY_RESIDENT) {
+//                OPDE.debug("STATE_UPR_BY_RESIDENT");
 //                String jpql = "SELECT AVG(upr.upr) FROM UPR upr WHERE upr.tradeform = :tradeform AND upr.resident = :resident ";
 //                query = em.createQuery(jpql);
 //                query.setParameter("tradeform", stock.getTradeForm());
 //                query.setParameter("resident", stock.getInventory().getResident());
 //            } else {
-//                OPDE.debug("UPR_BY_TRADEFORM");
+//                OPDE.debug("STATE_UPR_BY_TRADEFORM");
 //                String jpql = "SELECT AVG(upr.upr) FROM UPR upr WHERE upr.tradeform = :tradeform ";
 //                query = em.createQuery(jpql);
 //                query.setParameter("tradeform", stock.getTradeForm());
@@ -488,7 +488,7 @@ public class MedStockTools {
 //
 //            em.close();
 //        } else {
-//            OPDE.debug("UPR1");
+//            OPDE.debug("STATE_UPR1");
 //            bdUPR = BigDecimal.ONE;
 //        }
 ////        OPDE.debug("upr: " + bdUPR);
@@ -558,19 +558,19 @@ public class MedStockTools {
     /**
      * calculates a starting UPR for a newly opened stock. If there is no UPR yet, it creates a new one and marks it as dummy,
      * so it will be replaced by the first calculated result, when this package is closed.
-     * For DosageForms with type UPR1, there is no calculation at all. Those are always 1 constantly.
+     * For DosageForms with type STATE_UPR1, there is no calculation at all. Those are always 1 constantly.
      */
     public static BigDecimal getEstimatedUPR(TradeForm tradeForm, Resident resident) {
         OPDE.debug("<--- calcProspectiveUPR");
         BigDecimal upr;
-        if (tradeForm.getDosageForm().getState() == DosageFormTools.UPR_BY_RESIDENT) {
-            OPDE.debug("UPR_BY_RESIDENT");
+        if (tradeForm.getDosageForm().getUPRState() == DosageFormTools.STATE_UPR_BY_RESIDENT) {
+            OPDE.debug("STATE_UPR_BY_RESIDENT");
             upr = getEstimatedUPR_BY_RESIDENT(tradeForm, resident);
-        } else if (tradeForm.getDosageForm().getState() == DosageFormTools.UPR_BY_TRADEFORM) {
-            OPDE.debug("UPR_BY_TRADEFORM");
+        } else if (tradeForm.getDosageForm().getUPRState() == DosageFormTools.STATE_UPR_BY_TRADEFORM) {
+            OPDE.debug("STATE_UPR_BY_TRADEFORM");
             upr = getEstimatedUPR_BY_TRADEFORM(tradeForm);
         } else {
-            OPDE.debug("UPR1");
+            OPDE.debug("STATE_UPR1");
             upr = BigDecimal.ONE;
         }
         OPDE.debug("upr: " + upr);

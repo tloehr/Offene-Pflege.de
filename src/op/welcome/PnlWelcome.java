@@ -31,8 +31,8 @@ import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
-import org.joda.time.Years;
 
+import javax.persistence.EntityManager;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -56,7 +56,7 @@ public class PnlWelcome extends CleanablePanel {
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
     private java.util.List<QProcess> processList;
-    private java.util.List<Resident> birthdayList;
+    private java.util.List<Object[]> birthdayList;
     ArrayList<Object[]> noStoolList;
     ArrayList<Object[]> violatingLiquidValues;
     private final int BIRTHDAY = 4;
@@ -141,167 +141,117 @@ public class PnlWelcome extends CleanablePanel {
          *     |_|  \___|_|\___/ \__,_|\__,_|____/|_|___/ .__/|_|\__,_|\__, |
          *                                              |_|            |___/
          */
-        boolean withworker = true;
+
         cpsWelcome.removeAll();
         cpsWelcome.setLayout(new JideBoxLayout(cpsWelcome, JideBoxLayout.Y_AXIS));
-        if (withworker) {
 
-            OPDE.getMainframe().setBlocked(true);
-            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+        OPDE.getMainframe().setBlocked(true);
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
 
-            SwingWorker worker = new SwingWorker() {
+        SwingWorker worker = new SwingWorker() {
 
-                @Override
-                protected Object doInBackground() throws Exception {
-                    int progress = -1;
-                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 100));
-                    processList = QProcessTools.getActiveProcesses4(OPDE.getLogin().getUser());
-                    birthdayList = ResidentTools.getAllWithBirthdayIn(BIRTHDAY);
-                    noStoolList = ResValueTools.getNoStool();
-                    violatingLiquidValues = ResValueTools.getHighLowIn();
-                    Collections.sort(processList);
-                    int max = processList.size() + birthdayList.size() + noStoolList.size() + violatingLiquidValues.size();
+            @Override
+            protected Object doInBackground() throws Exception {
+                int progress = -1;
+                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 100));
+                processList = QProcessTools.getActiveProcesses4(OPDE.getLogin().getUser());
+                birthdayList = ResidentTools.getAllWithBirthdayIn(BIRTHDAY);
+                noStoolList = ResValueTools.getNoStool();
+                violatingLiquidValues = ResValueTools.getHighLowIn();
+                Collections.sort(processList);
+                int max = processList.size() + birthdayList.size() + noStoolList.size() + violatingLiquidValues.size();
 
-                    if (!processList.isEmpty()) {
-                        String title = "<html><font size=+1>" +
-                                OPDE.lang.getString(PnlProcess.internalClassID) +
-                                "</font></html>";
-                        CollapsiblePane cp = new CollapsiblePane(title);
-                        JPanel pnlContent = new JPanel(new VerticalLayout());
-                        for (QProcess process : processList) {
-                            progress++;
-                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
-                            pnlContent.add(createCP4(process).getMain());
-                        }
-                        cp.setContentPane(pnlContent);
-                        cpsWelcome.add(cp);
+                if (!processList.isEmpty()) {
+                    String title = "<html><font size=+1>" +
+                            OPDE.lang.getString(PnlProcess.internalClassID) +
+                            "</font></html>";
+                    CollapsiblePane cp = new CollapsiblePane(title);
+                    JPanel pnlContent = new JPanel(new VerticalLayout());
+                    for (QProcess process : processList) {
+                        progress++;
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+                        pnlContent.add(createCP4(process).getMain());
                     }
-
-                    if (!birthdayList.isEmpty()) {
-                        String title = "<html><font size=+1>" +
-                                OPDE.lang.getString(internalClassID + ".birthdayNext") + " " + BIRTHDAY + " " + OPDE.lang.getString("misc.msg.Days") +
-                                "</font></html>";
-                        CollapsiblePane cp = new CollapsiblePane(title);
-                        JPanel pnlContent = new JPanel(new VerticalLayout());
-                        Collections.sort(birthdayList);
-                        for (Resident resident : birthdayList) {
-                            progress++;
-                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
-                            pnlContent.add(createCP4Birthdays(resident).getMain());
-                        }
-                        cp.setContentPane(pnlContent);
-                        cpsWelcome.add(cp);
-                    }
-
-                    if (!noStoolList.isEmpty()) {
-                        String title = "<html><font size=+1>" +
-                                OPDE.lang.getString(PnlValues.internalClassID + ".residentsWithNoStool") + "</font></html>";
-                        CollapsiblePane cp = new CollapsiblePane(title);
-                        JPanel pnlContent = new JPanel(new VerticalLayout());
-                        for (Object[] ns : noStoolList) {
-                            progress++;
-                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
-                            pnlContent.add(createCP4NoStool(ns).getMain());
-                        }
-                        cp.setContentPane(pnlContent);
-                        cpsWelcome.add(cp);
-                    }
-
-                    if (!violatingLiquidValues.isEmpty()) {
-                        String title = "<html><font size=+1>" +
-                                OPDE.lang.getString(PnlValues.internalClassID + ".residentsWithHighOrLowIn") + "</font></html>";
-                        CollapsiblePane cp = new CollapsiblePane(title);
-                        JPanel pnlContent = new JPanel(new VerticalLayout());
-                        for (Object[] ns : violatingLiquidValues) {
-                            progress++;
-                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
-                            pnlContent.add(createCP4HighLowIn(ns).getMain());
-                        }
-                        cp.setContentPane(pnlContent);
-                        cpsWelcome.add(cp);
-                    }
-
-                    if (max == 0){
-                        JPanel pnlContent = new JPanel(new VerticalLayout());
-                        JLabel lbl = new JLabel(OPDE.lang.getString("misc.msg.noEntries"));
-                        lbl.setFont(SYSConst.ARIAL18BOLD);
-                        pnlContent.add(lbl);
-
-                        cpsWelcome.add(pnlContent);
-                    }
-
-                    return null;
+                    cp.setContentPane(pnlContent);
+                    cpsWelcome.add(cp);
                 }
 
-                @Override
-                protected void done() {
-                    cpsWelcome.addExpansion();
-                    OPDE.getDisplayManager().setProgressBarMessage(null);
-                    OPDE.getMainframe().setBlocked(false);
-                }
-            };
-            worker.execute();
+                if (!birthdayList.isEmpty()) {
+                    String title = "<html><font size=+1>" +
+                            OPDE.lang.getString(internalClassID + ".birthdayNext") + " " + BIRTHDAY + " " + OPDE.lang.getString("misc.msg.Days") +
+                            "</font></html>";
+                    CollapsiblePane cp = new CollapsiblePane(title);
+                    JPanel pnlContent = new JPanel(new VerticalLayout());
 
-        } else {
-            processList = QProcessTools.getActiveProcesses4(OPDE.getLogin().getUser());
-            birthdayList = ResidentTools.getAllWithBirthdayIn(BIRTHDAY);
-            noStoolList = ResValueTools.getNoStool();
-            violatingLiquidValues = ResValueTools.getHighLowIn();
-            Collections.sort(processList);
+                    final int RESID = 0;
+                    final int NEWAGE = 1;
+                    final int DAYS2BIRTHDAY = 2;
 
-            if (!processList.isEmpty()) {
-                String title = "<html><font size=+1>" +
-                        OPDE.lang.getString(PnlProcess.internalClassID) +
-                        "</font></html>";
-                CollapsiblePane cp = new CollapsiblePane(title);
-                JPanel pnlContent = new JPanel(new VerticalLayout());
-                for (QProcess process : processList) {
-                    pnlContent.add(createCP4(process).getMain());
+                    EntityManager em = OPDE.createEM();
+                    for (Object[] objects : birthdayList) {
+                        Resident resident = em.find(Resident.class, objects[RESID]);
+
+                        progress++;
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+                        pnlContent.add(createCP4Birthdays(resident, ((Double) objects[NEWAGE]).intValue(), ((Long) objects[DAYS2BIRTHDAY]).intValue()).getMain());
+
+                    }
+                    em.close();
+
+
+                    cp.setContentPane(pnlContent);
+                    cpsWelcome.add(cp);
                 }
-                cp.setContentPane(pnlContent);
-                cpsWelcome.add(cp);
+
+                if (!noStoolList.isEmpty()) {
+                    String title = "<html><font size=+1>" +
+                            OPDE.lang.getString(PnlValues.internalClassID + ".residentsWithNoStool") + "</font></html>";
+                    CollapsiblePane cp = new CollapsiblePane(title);
+                    JPanel pnlContent = new JPanel(new VerticalLayout());
+                    for (Object[] ns : noStoolList) {
+                        progress++;
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+                        pnlContent.add(createCP4NoStool(ns).getMain());
+                    }
+                    cp.setContentPane(pnlContent);
+                    cpsWelcome.add(cp);
+                }
+
+                if (!violatingLiquidValues.isEmpty()) {
+                    String title = "<html><font size=+1>" +
+                            OPDE.lang.getString(PnlValues.internalClassID + ".residentsWithHighOrLowIn") + "</font></html>";
+                    CollapsiblePane cp = new CollapsiblePane(title);
+                    JPanel pnlContent = new JPanel(new VerticalLayout());
+                    for (Object[] ns : violatingLiquidValues) {
+                        progress++;
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+                        pnlContent.add(createCP4HighLowIn(ns).getMain());
+                    }
+                    cp.setContentPane(pnlContent);
+                    cpsWelcome.add(cp);
+                }
+
+                if (max == 0) {
+                    JPanel pnlContent = new JPanel(new VerticalLayout());
+                    JLabel lbl = new JLabel(OPDE.lang.getString("misc.msg.noEntries"));
+                    lbl.setFont(SYSConst.ARIAL18BOLD);
+                    pnlContent.add(lbl);
+
+                    cpsWelcome.add(pnlContent);
+                }
+
+                return null;
             }
 
-            if (!birthdayList.isEmpty()) {
-                String title = "<html><font size=+1>" +
-                        OPDE.lang.getString(internalClassID + ".birthdayNext") + " " + BIRTHDAY + " " + OPDE.lang.getString("misc.msg.Days") +
-                        "</font></html>";
-                CollapsiblePane cp = new CollapsiblePane(title);
-                JPanel pnlContent = new JPanel(new VerticalLayout());
-                Collections.sort(birthdayList);
-                for (Resident resident : birthdayList) {
-                    pnlContent.add(createCP4Birthdays(resident).getMain());
-                }
-                cp.setContentPane(pnlContent);
-                cpsWelcome.add(cp);
+            @Override
+            protected void done() {
+                cpsWelcome.addExpansion();
+                OPDE.getDisplayManager().setProgressBarMessage(null);
+                OPDE.getMainframe().setBlocked(false);
             }
+        };
+        worker.execute();
 
-            if (!noStoolList.isEmpty()) {
-                String title = "<html><font size=+1>" +
-                        OPDE.lang.getString(PnlValues.internalClassID + ".residentsWithNoStool") + "</font></html>";
-                CollapsiblePane cp = new CollapsiblePane(title);
-                JPanel pnlContent = new JPanel(new VerticalLayout());
-                for (Object[] ns : noStoolList) {
-                    pnlContent.add(createCP4NoStool(ns).getMain());
-                }
-                cp.setContentPane(pnlContent);
-                cpsWelcome.add(cp);
-            }
-
-            if (!violatingLiquidValues.isEmpty()) {
-                String title = "<html><font size=+1>" +
-                        OPDE.lang.getString(PnlValues.internalClassID + ".residentsWithHighOrLowIn") + "</font></html>";
-                CollapsiblePane cp = new CollapsiblePane(title);
-                JPanel pnlContent = new JPanel(new VerticalLayout());
-                for (Object[] ns : violatingLiquidValues) {
-                    pnlContent.add(createCP4HighLowIn(ns).getMain());
-                }
-                cp.setContentPane(pnlContent);
-                cpsWelcome.add(cp);
-            }
-
-            cpsWelcome.addExpansion();
-        }
     }
 
     private DefaultCPTitle createCP4NoStool(Object[] ns) {
@@ -408,17 +358,21 @@ public class PnlWelcome extends CleanablePanel {
         return cptitle;
     }
 
-    private DefaultCPTitle createCP4Birthdays(final Resident resident) {
-        DateMidnight birthdate = new DateMidnight(resident.getDOB());
-        Years age = Years.yearsBetween(birthdate, new DateMidnight());
+    private DefaultCPTitle createCP4Birthdays(final Resident resident, int newAge, int days2Birthday) {
 
-        DateMidnight birthdayNext = new DateMidnight(new DateMidnight().getYear(), birthdate.getMonthOfYear(), birthdate.getDayOfMonth());
+
+        String textInTheMiddle = OPDE.lang.getString(internalClassID + ".becomesindays") + days2Birthday + OPDE.lang.getString("misc.msg.Days");
+        if (days2Birthday == 1) {
+            textInTheMiddle = OPDE.lang.getString("misc.msg.becomes") + " " + OPDE.lang.getString("misc.msg.tomorrow");
+        } else if (days2Birthday == 0) {
+            textInTheMiddle = OPDE.lang.getString("misc.msg.becomes") + " " + OPDE.lang.getString("misc.msg.today");
+        }
 
         String title = "<html><table border=\"0\">" +
                 "<tr valign=\"top\">" +
-                "<td width=\"100\" align=\"left\">" + DateFormat.getDateInstance().format(birthdayNext.toDate()) + "</td>" +
+                "<td width=\"100\" align=\"left\">" + DateFormat.getDateInstance().format(resident.getDOB()) + "</td>" +
                 "<td width=\"400\" align=\"left\">" +
-                "<b>" + ResidentTools.getTextCompact(resident) + "</b> " + OPDE.lang.getString("misc.msg.becomes") + " " + (age.getYears() + 1) + " " + OPDE.lang.getString("misc.msg.Years") +
+                "<b>" + ResidentTools.getTextCompact(resident) + "</b> " + textInTheMiddle + " " + newAge + " " + OPDE.lang.getString(internalClassID+".yearsold") +
                 "</td>" +
                 "</tr>" +
                 "</table>" +

@@ -75,20 +75,21 @@ public class PnlHomes extends PopupPanel {
 
     @Override
     public Object getResult() {
-        if (isSaveOK()) {
+
             home.setName(txtName.getText().trim());
             home.setStreet(txtStrasse.getText().trim());
             home.setZip(txtPLZ.getText().trim());
             home.setCity(txtOrt.getText().trim());
             home.setTel(txtTel.getText().trim());
             home.setFax(txtFax.getText().trim());
-        } else {
-            home = null;
-        }
+//        } else {
+//            home = null;
+//        }
         return home;
     }
 
-    private boolean isSaveOK() {
+    @Override
+    public boolean isSaveOK() {
         boolean ok = !GUITools.containsEmpty(allTXT);
 
         if (!ok) {

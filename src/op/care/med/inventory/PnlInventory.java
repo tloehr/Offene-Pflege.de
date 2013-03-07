@@ -814,7 +814,11 @@ public class PnlInventory extends NursingRecordsPanel {
                 @Override
                 public void itemStateChanged(ItemEvent ie) {
                     if (ignoreEvent) return;
-                    if (!OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) return;
+                    if (!OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.noaccess"));
+                        reset();
+                        return;
+                    }
                     if (ie.getStateChange() == ItemEvent.SELECTED) {
                         /***
                          *       ____ _
@@ -885,7 +889,12 @@ public class PnlInventory extends NursingRecordsPanel {
                 @Override
                 public void itemStateChanged(ItemEvent ie) {
                     if (ignoreEvent) return;
-                    if (!OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) return;
+                    if (!OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.noaccess"));
+                        reset();
+                        return;
+                    }
+                    ;
                     if (ie.getStateChange() == ItemEvent.SELECTED) {
                         if (!stock.isToBeClosedSoon()) {
                             MedStock openedStock = MedInventoryTools.getCurrentOpened(stock.getInventory());
@@ -974,7 +983,11 @@ public class PnlInventory extends NursingRecordsPanel {
                 @Override
                 public void itemStateChanged(ItemEvent ie) {
                     if (ignoreEvent) return;
-                    if (!OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) return;
+                    if (!OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.noaccess"));
+                        reset();
+                        return;
+                    }
                     if (ie.getStateChange() == ItemEvent.SELECTED) {
                         /***
                          *                      _                                                  _

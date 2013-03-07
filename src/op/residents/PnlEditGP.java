@@ -374,6 +374,11 @@ public class PnlEditGP extends PopupPanel {
     }
 
     @Override
+    public boolean isSaveOK() {
+        return !txtNachname.getText().isEmpty();
+    }
+
+    @Override
     public void setStartFocus() {
         txtAnrede.requestFocus();
     }

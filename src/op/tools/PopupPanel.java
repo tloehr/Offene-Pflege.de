@@ -10,4 +10,5 @@ package op.tools;
 public  abstract class PopupPanel extends javax.swing.JPanel {
     public abstract Object getResult();
     public abstract void setStartFocus();
+    public abstract boolean isSaveOK();
 }

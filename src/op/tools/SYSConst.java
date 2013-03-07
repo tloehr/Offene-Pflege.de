@@ -220,22 +220,13 @@ public class SYSConst {
     public static Color colorWeekend = SYSTools.getColor("FFC895");
     public static Color colorHolliday = SYSTools.getColor("FF800D");
 
-    //Gray50  	747170
     public static char eurosymbol = '\u20AC';
     public static final GregorianCalendar VERY_BEGINNING = new GregorianCalendar(1970, GregorianCalendar.JANUARY, 1, 0, 0, 0);
     public static final GregorianCalendar UNTIL_FURTHER_NOTICE = new GregorianCalendar(9999, GregorianCalendar.DECEMBER, 31, 23, 59, 59);
-    //    public static final GregorianCalendar BIS_AUF_WEITERES_WO_TIME = new GregorianCalendar(9999, GregorianCalendar.DECEMBER, 31, 0, 0, 0);
     public static final Date DATE_THE_VERY_BEGINNING = new Date(VERY_BEGINNING.getTimeInMillis());
     public static final Date DATE_UNTIL_FURTHER_NOTICE = new Date(UNTIL_FURTHER_NOTICE.getTimeInMillis());
-//    public static final Date DATE_BIS_AUF_WEITERES_WO_TIME = new Date(BIS_AUF_WEITERES_WO_TIME.getTimeInMillis());
-    //    public static final Timestamp TS_VON_ANFANG_AN = new Timestamp(VERY_BEGINNING.getTimeInMillis());
-//    public static final Timestamp TS_BIS_AUF_WEITERES = new Timestamp(UNTIL_FURTHER_NOTICE.getTimeInMillis());
-//    public static final String MYSQL_DATETIME_VON_ANFANG_AN = "'1000-01-01 00:00:00'";
-//    public static final String MYSQL_DATETIME_BIS_AUF_WEITERES = "'9999-12-31 23:59:59'";
-//    public static final int MALE = 1;
-//    public static final int FEMALE = 2;
 
-    public static final String UNITS[] = {"", OPDE.lang.getString("misc.msg.piece"), "ml", "l", "mg", "g", "cm", "m"}; // Für AnwEinheit, PackEinheit, Dimension
+    public static final String UNITS[] = {"", OPDE.lang.getString("misc.msg.piece"), "ml", "l", "mg", "g", "cm", "m"};
 
     public static final byte UZ = 0; // Solluhrzeit
     public static final byte FM = 1; // Nacht Morgens
@@ -250,8 +241,6 @@ public class SYSConst {
     public static final int ZEIT_FRUEH = 1;
     public static final int ZEIT_SPAET = 2;
     public static final int ZEIT_NACHT_AB = 3;
-//    public static final String ZEIT[] = {"Alles", "Nacht, morgens", "Früh", "Spät", "Nacht, abends"};
-
 
     public static final String html_arial14 = "face=\"" + ARIAL14.getFamily() + "\"";
     public static final String html_fontface = "<font " + html_arial14 + " >";

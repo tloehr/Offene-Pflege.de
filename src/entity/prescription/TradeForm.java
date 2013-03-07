@@ -16,6 +16,9 @@ public class TradeForm implements Serializable {
     private Long id;
     @Column(name = "Zusatz")
     private String subtext;
+    @Version
+    @Column(name = "version")
+    private Long version;
 
     public TradeForm() {
     }

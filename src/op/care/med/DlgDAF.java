@@ -33,17 +33,19 @@ import entity.prescription.DosageForm;
 import entity.prescription.DosageFormTools;
 import entity.prescription.TradeForm;
 import op.OPDE;
+import op.system.InternalClassACL;
+import op.tools.GUITools;
 import op.tools.MyJDialog;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
 /**
  * @author root
@@ -53,7 +55,33 @@ public class DlgDAF extends MyJDialog {
     private boolean editMode;
 
 
-    public DlgDAF(String title, TradeForm tradeForm) {
+    private void btnEditActionPerformed(ActionEvent e) {
+        PnlDosageForm pnl = new PnlDosageForm((DosageForm) cmbForm.getSelectedItem());
+
+        GUITools.showPopup(GUITools.createPanelPopup(pnl, new Closure() {
+            @Override
+            public void execute(Object o) {
+                if (o != null) {
+                    cmbForm.setModel(new DefaultComboBoxModel(new DosageForm[]{(DosageForm) o}));
+                }
+            }
+        }, this), SwingConstants.SOUTH);
+    }
+
+    private void btnAddActionPerformed(ActionEvent e) {
+        PnlDosageForm pnl = new PnlDosageForm(new DosageForm(0));
+
+        GUITools.showPopup(GUITools.createPanelPopup(pnl, new Closure() {
+            @Override
+            public void execute(Object o) {
+                if (o != null) {
+                    cmbForm.setModel(new DefaultComboBoxModel(new DosageForm[]{(DosageForm) o}));
+                }
+            }
+        }, this), SwingConstants.SOUTH);
+    }
+
+    public DlgDAF(TradeForm tradeForm) {
         super(false);
         initComponents();
         this.tradeForm = tradeForm;
@@ -70,6 +98,9 @@ public class DlgDAF extends MyJDialog {
         } else {
             cmbForm.setSelectedIndex(1);
         }
+
+        btnAdd.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlMed.internalClassID));
+        btnEdit.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlMed.internalClassID));
 
         pack();
         setVisible(true);
@@ -89,6 +120,10 @@ public class DlgDAF extends MyJDialog {
         txtZusatz = new JTextField();
         jLabel3 = new JLabel();
         cmbForm = new JComboBox();
+        panel2 = new JPanel();
+        btnAdd = new JButton();
+        hSpacer1 = new JPanel(null);
+        btnEdit = new JButton();
         panel1 = new JPanel();
         btnCancel = new JButton();
         btnOK = new JButton();
@@ -102,8 +137,8 @@ public class DlgDAF extends MyJDialog {
         //======== jPanel1 ========
         {
             jPanel1.setLayout(new FormLayout(
-                "14dlu, $lcgap, default, $lcgap, default:grow, $lcgap, 14dlu",
-                "fill:14dlu, 4*($lgap, fill:default), $lgap, 14dlu"));
+                    "14dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default, $lcgap, 14dlu",
+                    "fill:14dlu, 4*($lgap, fill:default), $lgap, 14dlu"));
 
             //---- jLabel2 ----
             jLabel2.setText("Zusatzbezeichnung:");
@@ -112,7 +147,7 @@ public class DlgDAF extends MyJDialog {
 
             //---- txtZusatz ----
             txtZusatz.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel1.add(txtZusatz, CC.xy(5, 3));
+            jPanel1.add(txtZusatz, CC.xywh(5, 3, 3, 1));
 
             //---- jLabel3 ----
             jLabel3.setText("Form:");
@@ -120,14 +155,51 @@ public class DlgDAF extends MyJDialog {
             jPanel1.add(jLabel3, CC.xy(3, 5));
 
             //---- cmbForm ----
-            cmbForm.setModel(new DefaultComboBoxModel(new String[] {
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
+            cmbForm.setModel(new DefaultComboBoxModel(new String[]{
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
             }));
             cmbForm.setFont(new Font("Arial", Font.PLAIN, 14));
             jPanel1.add(cmbForm, CC.xy(5, 5));
+
+            //======== panel2 ========
+            {
+                panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
+
+                //---- btnAdd ----
+                btnAdd.setText(null);
+                btnAdd.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
+                btnAdd.setBorder(null);
+                btnAdd.setBorderPainted(false);
+                btnAdd.setContentAreaFilled(false);
+                btnAdd.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
+                btnAdd.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnAddActionPerformed(e);
+                    }
+                });
+                panel2.add(btnAdd);
+                panel2.add(hSpacer1);
+
+                //---- btnEdit ----
+                btnEdit.setText(null);
+                btnEdit.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/edit3.png")));
+                btnEdit.setBorder(null);
+                btnEdit.setBorderPainted(false);
+                btnEdit.setContentAreaFilled(false);
+                btnEdit.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
+                btnEdit.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnEditActionPerformed(e);
+                    }
+                });
+                panel2.add(btnEdit);
+            }
+            jPanel1.add(panel2, CC.xy(7, 5));
 
             //======== panel1 ========
             {
@@ -155,7 +227,7 @@ public class DlgDAF extends MyJDialog {
                 });
                 panel1.add(btnOK);
             }
-            jPanel1.add(panel1, CC.xy(5, 9, CC.RIGHT, CC.DEFAULT));
+            jPanel1.add(panel1, CC.xywh(5, 9, 3, 1, CC.RIGHT, CC.DEFAULT));
         }
         contentPane.add(jPanel1);
         pack();
@@ -171,8 +243,12 @@ public class DlgDAF extends MyJDialog {
         try {
             em.getTransaction().begin();
             TradeForm myTradeForm = em.merge(tradeForm);
+            em.lock(myTradeForm, LockModeType.OPTIMISTIC);
             myTradeForm.setSubtext(txtZusatz.getText());
-            myTradeForm.setDosageForm((DosageForm) cmbForm.getSelectedItem());
+            DosageForm dosageForm = em.merge((DosageForm) cmbForm.getSelectedItem());
+            em.lock(dosageForm, LockModeType.OPTIMISTIC);
+            myTradeForm.setDosageForm(dosageForm);
+
             em.getTransaction().commit();
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
@@ -191,6 +267,10 @@ public class DlgDAF extends MyJDialog {
     private JTextField txtZusatz;
     private JLabel jLabel3;
     private JComboBox cmbForm;
+    private JPanel panel2;
+    private JButton btnAdd;
+    private JPanel hSpacer1;
+    private JButton btnEdit;
     private JPanel panel1;
     private JButton btnCancel;
     private JButton btnOK;

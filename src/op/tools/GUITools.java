@@ -214,7 +214,7 @@ public class GUITools {
 
 
     public static JPanel getDropPanel(FileDrop.Listener dropListener) {
-           return getDropPanel(dropListener, OPDE.lang.getString(PnlFiles.internalClassID + ".drophere"));
+        return getDropPanel(dropListener, OPDE.lang.getString(PnlFiles.internalClassID + ".drophere"));
     }
 
     public static JPanel getDropPanel(FileDrop.Listener dropListener, String text) {
@@ -539,7 +539,7 @@ public class GUITools {
         final JidePopup popup = new JidePopup();
         popup.setMovable(false);
         JPanel pnl = new JPanel(new BorderLayout(10, 10));
-        pnl.setBorder(new EmptyBorder(5,5,5,5));
+        pnl.setBorder(new EmptyBorder(5, 5, 5, 5));
         pnl.add(myPnl, BorderLayout.CENTER);
 
         JPanel btnPanel = new JPanel();
@@ -549,8 +549,10 @@ public class GUITools {
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                popup.hidePopup();
-                saveAction.execute(myPnl.getResult());
+                if (myPnl.isSaveOK()) {
+                    popup.hidePopup();
+                    saveAction.execute(myPnl.getResult());
+                }
             }
         });
         saveButton.setContentAreaFilled(false);

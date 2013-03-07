@@ -88,7 +88,7 @@ public class BHPTools {
                     result = o1.getPrescription().compareTo(o2.getPrescription());
                 }
 //                if (result == 0) {
-//                    result = o1.getState().compareTo(o2.getState());
+//                    result = o1.getUPRState().compareTo(o2.getUPRState());
 //                }
 
                 return result;
@@ -510,9 +510,10 @@ public class BHPTools {
     }
 
     public static boolean isChangeable(BHP bhp) {
-        int BHP_MAX_MINUTES_TO_WITHDRAW = Integer.parseInt(OPDE.getProps().getProperty("bhp_max_minutes_to_withdraw"));
+        int BHP_MAX_MINUTES_TO_WITHDRAW = Integer.parseInt(OPDE.getProps().getProperty(SYSPropsTools.BHP_MAX_MINUTES_TO_WITHDRAW));
         boolean residentAbsent = bhp.getResident().isActive() && ResInfoTools.absentSince(bhp.getResident()) != null;
-        boolean medTrouble = bhp.hasMed() && TradeFormTools.getInventory4TradeForm(bhp.getResident(), bhp.getTradeForm()) == null;
+        MedInventory inventoryInUse = bhp.hasMed() ? TradeFormTools.getInventory4TradeForm(bhp.getResident(), bhp.getTradeForm()) : null;
+        boolean medTrouble = (inventoryInUse == null || MedStockTools.getStockInUse(inventoryInUse) == null);
 
         return !residentAbsent && bhp.getResident().isActive() &&
                 !bhp.getPrescription().isClosed() &&

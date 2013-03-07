@@ -116,10 +116,6 @@ public class DlgReport extends MyJDialog {
         nReport.setMinutes(dauer);
     }
 
-    private void txtBerichtCaretUpdate(CaretEvent e) {
-        nReport.setText(txtBericht.getText());
-    }
-
     @Override
     public void dispose() {
         actionBlock.execute(nReport);
@@ -132,10 +128,11 @@ public class DlgReport extends MyJDialog {
     }
 
     private void btnApplyActionPerformed(ActionEvent e) {
-        if (nReport.getText().trim().isEmpty()){
+        if (SYSTools.catchNull(txtBericht.getText()).trim().isEmpty()){
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.emptyentry")));
             return;
         }
+        nReport.setText(txtBericht.getText());
         nReport.setPit(pnlPIT.getPIT());
         nReport.setUser(OPDE.getLogin().getUser());
         dispose();
@@ -190,12 +187,6 @@ public class DlgReport extends MyJDialog {
                 txtBericht.setFont(new Font("Arial", Font.PLAIN, 14));
                 txtBericht.setWrapStyleWord(true);
                 txtBericht.setLineWrap(true);
-                txtBericht.addCaretListener(new CaretListener() {
-                    @Override
-                    public void caretUpdate(CaretEvent e) {
-                        txtBerichtCaretUpdate(e);
-                    }
-                });
                 scrollPane1.setViewportView(txtBericht);
             }
             panel1.add(scrollPane1, CC.xywh(3, 7, 3, 1, CC.FILL, CC.FILL));

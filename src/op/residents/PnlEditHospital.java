@@ -108,6 +108,11 @@ public class PnlEditHospital extends PopupPanel {
     }
 
     @Override
+    public boolean isSaveOK() {
+        return !txtName.getText().isEmpty();
+    }
+
+    @Override
     public void setStartFocus() {
         txtName.requestFocus();
     }
