@@ -137,8 +137,8 @@ public class DlgDAF extends MyJDialog {
         //======== jPanel1 ========
         {
             jPanel1.setLayout(new FormLayout(
-                    "14dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default, $lcgap, 14dlu",
-                    "fill:14dlu, 4*($lgap, fill:default), $lgap, 14dlu"));
+                "14dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default, $lcgap, 14dlu",
+                "fill:14dlu, 4*($lgap, fill:default), $lgap, 14dlu"));
 
             //---- jLabel2 ----
             jLabel2.setText("Zusatzbezeichnung:");
@@ -155,11 +155,11 @@ public class DlgDAF extends MyJDialog {
             jPanel1.add(jLabel3, CC.xy(3, 5));
 
             //---- cmbForm ----
-            cmbForm.setModel(new DefaultComboBoxModel(new String[]{
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+            cmbForm.setModel(new DefaultComboBoxModel(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
             }));
             cmbForm.setFont(new Font("Arial", Font.PLAIN, 14));
             jPanel1.add(cmbForm, CC.xy(5, 5));

@@ -151,8 +151,8 @@ public class PnlSubtext extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "2*(default, $lcgap), default:grow, 2*($lcgap, default)",
-                "2*(default, $lgap), default, $rgap, pref, $lgap, default:grow, $lgap, default"));
+            "2*(default, $lcgap), default:grow, 2*($lcgap, default)",
+            "2*(default, $lgap), default, $rgap, pref, $lgap, default:grow, $lgap, default"));
 
         //---- txtZusatz ----
         txtZusatz.setFont(new Font("Arial", Font.PLAIN, 14));
