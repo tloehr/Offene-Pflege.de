@@ -26,9 +26,9 @@ public class DisplayManager extends Thread {
     private Pair<String, Integer> progressBarMessage;
     private final Color defaultColor = new Color(105, 80, 69);
     private Icon icondead, iconaway, icongone, iconbiohazard;
-//    private SwingWorker worker;
+    //    private SwingWorker worker;
     private boolean isIndeterminate = false;
-//    private JPanel pnlIcons;
+    //    private JPanel pnlIcons;
     private JLabel lblBiohazard, lblDiabetes, lblAllergy, lblWarning;
 
 
@@ -226,64 +226,37 @@ public class DisplayManager extends Thread {
         processSubMessage();
     }
 
-    public void setDBActionMessage(boolean action) {
-//        if (this.dbAction == action) {
-//            return;
-//        }
-//        this.dbAction = action;
-//
-//        if (action) {
-//            worker = new SwingWorker() {
-//                @Override
-//                protected Object doInBackground() throws Exception {
-//                    boolean visible = true;
-//                    while (!isCancelled()) {
-//                        lblDB.setIcon(visible ? icon1 : icon2);
-//                        lblDB.repaint();
-//                        OPDE.debug("lbldb: "+visible);
-//                        visible = !visible;
-//                        Thread.sleep(150);
-//                    }
-//
-//                    return null;
-//                }
-//            };
-//            worker.execute();
-//        } else {
-//            worker.cancel(true);
-//        }
-//        dbZyklenRest = (zyklen + 1) % 2; // Damit es sofort blinkt.
-    }
-
     private void processSubMessage() {
-        if (!messageQ.isEmpty()) {
-            if (messageQ.getHead().isObsolete()) {
-                messageQ.next();
-            } else if (!messageQ.getHead().isProcessed()) {
-                messageQ.getHead().setProcessed();
-                lblSub.setText(SYSTools.toHTMLForScreen(messageQ.getHead().getMessage()));
-            } else if (messageQ.hasNextMessage() && messageQ.getNextMessage().isUrgent()) {
-                messageQ.next();
-            } else if (messageQ.getHead().isShowingTillReplacement() && messageQ.hasNextMessage()) {
-                messageQ.next();
+        synchronized (messageQ) {
+
+            if (!messageQ.isEmpty()) {
+                if (messageQ.getHead().isObsolete()) {
+                    messageQ.next();
+                } else if (!messageQ.getHead().isProcessed()) {
+                    messageQ.getHead().setProcessed();
+                    lblSub.setText(SYSTools.toHTMLForScreen(messageQ.getHead().getMessage()));
+                } else if (messageQ.hasNextMessage() && messageQ.getNextMessage().isUrgent()) {
+                    messageQ.next();
+                } else if (messageQ.getHead().isShowingTillReplacement() && messageQ.hasNextMessage()) {
+                    messageQ.next();
+                }
+            } else {
+                lblSub.setText(null);
             }
-        } else {
-            lblSub.setText(null);
+
+
+            // Coloring
+            if (!messageQ.isEmpty() && messageQ.getHead().getPriority() == DisplayMessage.IMMEDIATELY) {
+                jp.setForeground(Color.RED);
+                lblSub.setForeground(Color.RED);
+            } else if (!messageQ.isEmpty() && messageQ.getHead().getPriority() == DisplayMessage.WARNING) {
+                jp.setForeground(SYSConst.darkorange);
+                lblSub.setForeground(SYSConst.darkorange);
+            } else {
+                lblSub.setForeground(defaultColor);
+                jp.setForeground(defaultColor);
+            }
         }
-
-
-        // Coloring
-        if (!messageQ.isEmpty() && messageQ.getHead().getPriority() == DisplayMessage.IMMEDIATELY) {
-            jp.setForeground(Color.RED);
-            lblSub.setForeground(Color.RED);
-        } else if (!messageQ.isEmpty() && messageQ.getHead().getPriority() == DisplayMessage.WARNING) {
-            jp.setForeground(SYSConst.darkorange);
-            lblSub.setForeground(SYSConst.darkorange);
-        } else {
-            lblSub.setForeground(defaultColor);
-            jp.setForeground(defaultColor);
-        }
-
     }
 
     private void processProgressBar() {

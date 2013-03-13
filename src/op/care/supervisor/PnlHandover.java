@@ -38,6 +38,7 @@ import entity.files.SYSFilesTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.reports.*;
+import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.system.InternalClassACL;
 import op.threads.DisplayManager;
@@ -63,9 +64,7 @@ import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -89,9 +88,7 @@ public class PnlHandover extends NursingRecordsPanel {
     private HashMap<Handovers, JPanel> linemapHO;
     HashMap<DateMidnight, String> hollidays;
     private JComboBox cmbHomes;
-//    private JDateChooser jdcDay;
-
-//    private Color[] color1, color2;
+    private JToggleButton tbResidentFirst;
 
 
     Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
@@ -173,7 +170,7 @@ public class PnlHandover extends NursingRecordsPanel {
         jspSearch.setViewportView(searchPanes);
 
         JPanel mypanel = new JPanel();
-        mypanel.setLayout(new VerticalLayout());
+        mypanel.setLayout(new VerticalLayout(2));
         mypanel.setBackground(Color.WHITE);
 
         CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
@@ -194,7 +191,6 @@ public class PnlHandover extends NursingRecordsPanel {
 
         searchPanes.add(searchPane);
         searchPanes.addExpansion();
-
 
     }
 
@@ -233,59 +229,19 @@ public class PnlHandover extends NursingRecordsPanel {
         cacheHO.clear();
         cacheNR.clear();
 
-        final boolean withworker = false;
-        if (withworker) {
-//            initPhase = true;
-//
-//            OPDE.getMainframe().setBlocked(true);
-//            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
-//
-//            SwingWorker worker = new SwingWorker() {
-//
-//                @Override
-//                protected Object doInBackground() throws Exception {
-//
-//                    Pair<DateTime, DateTime> minmax = NReportTools.getMinMax(resident);
-//                    hollidays = SYSCalendar.getHollidays(minmax.getFirst().getYear(), minmax.getSecond().getYear());
-//
-//                    if (minmax != null) {
-//                        DateMidnight start = minmax.getFirst().toDateMidnight().dayOfMonth().withMinimumValue();
-//                        DateMidnight end = resident.isActive() ? new DateMidnight() : minmax.getSecond().toDateMidnight().dayOfMonth().withMinimumValue();
-//                        for (int year = end.getYear(); year >= start.getYear(); year--) {
-//                            createCP4Year(year, start, end);
-//                        }
-//                    }
-//
-//                    return null;
-//                }
-//
-//                @Override
-//                protected void done() {
-//                    expandTheLast2Weeks();
-//
-//                    buildPanel();
-//                    initPhase = false;
-//                    OPDE.getDisplayManager().setProgressBarMessage(null);
-//                    OPDE.getMainframe().setBlocked(false);
-//                }
-//            };
-//            worker.execute();
-
-        } else {
-            Pair<DateTime, DateTime> minmax = NReportTools.getMinMax();
-            hollidays = SYSCalendar.getHollidays(minmax.getFirst().getYear(), minmax.getSecond().getYear());
-            if (minmax != null) {
-                DateMidnight start = minmax.getFirst().toDateMidnight().dayOfMonth().withMinimumValue();
-                DateMidnight end = new DateMidnight();
-                for (int year = end.getYear(); year >= start.getYear(); year--) {
-                    createCP4Year(year, start, end);
-                }
+        Pair<DateTime, DateTime> minmax = NReportTools.getMinMax();
+        hollidays = SYSCalendar.getHollidays(minmax.getFirst().getYear(), minmax.getSecond().getYear());
+        if (minmax != null) {
+            DateMidnight start = minmax.getFirst().toDateMidnight().dayOfMonth().withMinimumValue();
+            DateMidnight end = new DateMidnight();
+            for (int year = end.getYear(); year >= start.getYear(); year--) {
+                createCP4Year(year, start, end);
             }
-
-            expandDay(new DateMidnight());
-
-            buildPanel();
         }
+
+        expandDay(new DateMidnight());
+
+        buildPanel();
 
     }
 
@@ -494,7 +450,6 @@ public class PnlHandover extends NursingRecordsPanel {
         final String key = DateFormat.getDateInstance().format(day.toDate());
         if (!cpMap.containsKey(key)) {
             cpMap.put(key, new CollapsiblePane());
-//            cpMap.get(key).setStyle(CollapsiblePane.PLAIN_STYLE);
             try {
                 cpMap.get(key).setCollapsed(true);
             } catch (PropertyVetoException e) {
@@ -531,7 +486,6 @@ public class PnlHandover extends NursingRecordsPanel {
                         for (final Handovers ho : listHO) {
                             if (!Handover2UserTools.containsUser(ho.getUsersAcknowledged(), OPDE.getLogin().getUser())) {
                                 Handovers myHO = em.merge(ho);
-                                //em.lock(myHO, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
                                 Handover2User connObj = em.merge(new Handover2User(myHO, em.merge(OPDE.getLogin().getUser())));
                                 myHO.getUsersAcknowledged().add(connObj);
 
@@ -549,7 +503,6 @@ public class PnlHandover extends NursingRecordsPanel {
                         for (final NReport nreport : listNR) {
                             if (!NR2UserTools.containsUser(nreport.getUsersAcknowledged(), OPDE.getLogin().getUser())) {
                                 NReport myNR = em.merge(nreport);
-                                //em.lock(myNR, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
                                 NR2User connObj = em.merge(new NR2User(myNR, em.merge(OPDE.getLogin().getUser())));
                                 myNR.getUsersAcknowledged().add(connObj);
 
@@ -642,6 +595,20 @@ public class PnlHandover extends NursingRecordsPanel {
                     }
                     if (!cacheNR.containsKey(key)) {
                         cacheNR.put(key, NReportTools.getNReports4Handover(day, (Homes) cmbHomes.getSelectedItem()));
+                        Collections.sort(cacheNR.get(key), new Comparator<NReport>() {
+                            @Override
+                            public int compare(NReport o1, NReport o2) {
+                                if (!tbResidentFirst.isSelected()){
+                                    return o1.getPit().compareTo(o2.getPit());
+                                } else {
+                                    int comp = o1.getResident().getRID().compareTo(o2.getResident().getRID());
+                                    if (comp == 0){
+                                        comp = o1.getPit().compareTo(o2.getPit());
+                                    }
+                                    return comp;
+                                }
+                            }
+                        });
                     }
 
                     int max = cacheHO.get(key).size() + cacheNR.get(key).size();
@@ -1029,6 +996,18 @@ public class PnlHandover extends NursingRecordsPanel {
             }
         });
         list.add(cmbHomes);
+
+        tbResidentFirst = GUITools.getNiceToggleButton(internalClassID+".residentFirst");
+        SYSPropsTools.restoreState(internalClassID + ".tbResidentFirst", tbResidentFirst);
+        tbResidentFirst.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                SYSPropsTools.storeState(internalClassID + ".tbResidentFirst", tbResidentFirst);
+                reload();
+            }
+        });
+        tbResidentFirst.setHorizontalAlignment(SwingConstants.LEFT);
+        list.add(tbResidentFirst);
 
         return list;
     }

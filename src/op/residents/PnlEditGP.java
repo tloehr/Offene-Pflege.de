@@ -358,8 +358,8 @@ public class PnlEditGP extends PopupPanel {
             return null;
         }
 
-        doc.setAnrede(txtAnrede.getText().trim());
-        doc.setTitle(txtTitel.getText().trim());
+        doc.setAnrede(SYSTools.left(txtAnrede.getText().trim(), 20));
+        doc.setTitle(SYSTools.left(txtTitel.getText().trim(), 20));
         doc.setName(txtNachname.getText().trim());
         doc.setFirstname(txtVorname.getText().trim());
         doc.setStreet(txtStrasse.getText().trim());

@@ -264,10 +264,7 @@ public class PnlReport extends NursingRecordsPanel {
         cmbTags.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
-                if (initPhase || itemEvent.getStateChange() != ItemEvent.SELECTED) return;
-//                reloadDisplay();
-
-
+                if (initPhase || itemEvent.getStateChange() != ItemEvent.SELECTED || !(cmbTags.getSelectedItem() instanceof NReportTAGS)) return;
                 SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Tags(resident, (NReportTAGS) cmbTags.getSelectedItem()), false, true, null, null), true);
 
             }

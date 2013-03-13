@@ -558,13 +558,10 @@ public class PnlPrescription extends NursingRecordsPanel {
         java.util.List<Component> list = new ArrayList<Component>();
 
         tbClosed = GUITools.getNiceToggleButton(internalClassID + ".showclosed");
-//        SYSPropsTools.restoreState(internalClassID + ":tbClosed", tbClosed);
         tbClosed.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-//                SYSPropsTools.storeState(internalClassID + ":tbClosed", tbClosed);
                 reloadDisplay();
-//                buildPanel();
             }
         });
         tbClosed.setHorizontalAlignment(SwingConstants.LEFT);

@@ -147,7 +147,6 @@ public class DlgRegular extends MyJDialog {
             tbDailyPlan.setSelected(false);
             rbEndOfPackage.setEnabled(false);
         } else {
-            OPDE.getDisplayManager().setDBActionMessage(true);
             EntityManager em = OPDE.createEM();
 
             String pzn = MedPackageTools.parsePZN(txtMed.getText());
@@ -179,7 +178,6 @@ public class DlgRegular extends MyJDialog {
                     cmbMed.setModel(new DefaultComboBoxModel(TradeFormTools.findTradeFormByMedProductText(em, txtMed.getText()).toArray()));
                 }
             }
-            OPDE.getDisplayManager().setDBActionMessage(false);
             em.close();
 
             if (cmbMed.getModel().getSize() > 0) {

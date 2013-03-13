@@ -1261,7 +1261,9 @@ public class PnlAllowance extends CleanablePanel {
                                             createCP4(myAllowance.getResident());
 
                                             try {
-                                                cpMap.get(keyMonth).setCollapsed(false);
+                                                if (cpMap.containsKey(keyMonth)) {
+                                                    cpMap.get(keyMonth).setCollapsed(false);
+                                                }
                                             } catch (PropertyVetoException e) {
                                                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                                             }
