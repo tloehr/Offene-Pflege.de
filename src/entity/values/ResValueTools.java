@@ -21,7 +21,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.*;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -72,6 +75,28 @@ public class ResValueTools {
         query.setParameter(1, resident.getRID());
         query.setParameter(2, type.getValType());
         ArrayList<Integer> result = new ArrayList<Integer>(query.getResultList());
+        em.close();
+        return result;
+    }
+
+    public static ArrayList<Date> getDaysWithValues(Resident resident, ResValueTypes type, int year) {
+        DateTime from = new DateMidnight(year,1,1).dayOfYear().withMinimumValue().toDateTime();
+        DateTime to = new DateMidnight(year,1,1).toDateTime().dayOfYear().withMaximumValue().secondOfDay().withMaximumValue();
+
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNativeQuery(" " +
+                " SELECT DISTINCT DATE(r.pit) d" +
+                " FROM resvalue r " +
+                " INNER JOIN resvaluetypes t ON r.type = t.id " +
+                " WHERE DATE(r.pit) >= ? AND DATE(r.pit) <= ? AND r.bwkennung = ? AND t.valtype = ? " +
+                " GROUP BY DATE(r.pit)" +
+                " ORDER BY d DESC");
+
+        query.setParameter(1, from.toDate());
+        query.setParameter(2, to.toDate());
+        query.setParameter(3, resident.getRID());
+        query.setParameter(4, type.getValType());
+        ArrayList<Date> result = new ArrayList<Date>(query.getResultList());
         em.close();
         return result;
     }
@@ -299,11 +324,11 @@ public class ResValueTools {
         return list;
     }
 
-    public static ArrayList<ResValue> getResValues(Resident resident, ResValueTypes vtype, int year) {
+    public static ArrayList<ResValue> getResValues(Resident resident, ResValueTypes vtype, DateMidnight day) {
 
-        DateTime theYear = new DateTime(year, 1, 1, 0, 0, 0);
-        DateTime from = theYear.dayOfYear().withMinimumValue();
-        DateTime to = theYear.dayOfYear().withMaximumValue();
+//        DateTime theYear = new DateTime(year, 1, 1, 0, 0, 0);
+        DateTime from = day.toDateTime().secondOfDay().withMinimumValue();
+        DateTime to = day.toDateTime().secondOfDay().withMaximumValue();
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("" +
@@ -322,6 +347,30 @@ public class ResValueTools {
 
         return list;
     }
+
+    public static ArrayList<ResValue> getResValues(Resident resident, ResValueTypes vtype, int year) {
+
+            DateTime theYear = new DateTime(year, 1, 1, 0, 0, 0);
+            DateTime from = theYear.dayOfYear().withMinimumValue();
+            DateTime to = theYear.dayOfYear().withMaximumValue();
+
+            EntityManager em = OPDE.createEM();
+            Query query = em.createQuery("" +
+                    " SELECT rv FROM ResValue rv " +
+                    " WHERE rv.resident = :resident " +
+                    " AND rv.vtype = :vtype" +
+                    " AND rv.pit >= :from" +
+                    " AND rv.pit <= :to" +
+                    " ORDER BY rv.pit DESC ");
+            query.setParameter("resident", resident);
+            query.setParameter("vtype", vtype);
+            query.setParameter("from", from.toDate());
+            query.setParameter("to", to.toDate());
+            ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
+            em.close();
+
+            return list;
+        }
 
     public static String getValueAsHTML(ResValue rv) {
         String result = (rv.isDeleted() || rv.isReplaced() ? "<s>" : "");
@@ -526,6 +575,7 @@ public class ResValueTools {
                 " SELECT rv FROM ResValue rv " +
                 " WHERE rv.resident = :resident " +
                 " AND rv.replacedBy IS NULL " +
+                " AND rv.editedBy IS NULL " +
                 " AND rv.vtype.valType = :valType" +
                 " AND rv.pit >= :from" +
                 " AND rv.pit <= :to" +

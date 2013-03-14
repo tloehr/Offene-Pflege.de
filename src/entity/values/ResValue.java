@@ -100,6 +100,10 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
         this(new Date(), vtype.getDefault1(), vtype.getDefault2(), vtype.getDefault3(), "", new Date(), new Date(), vtype, null, null, null, OPDE.getLogin().getUser(), resident);
     }
 
+    public ResValue(Resident resident, ResValueTypes vtype, Date date) {
+        this(date, vtype.getDefault1(), vtype.getDefault2(), vtype.getDefault3(), "", new Date(), new Date(), vtype, null, null, null, OPDE.getLogin().getUser(), resident);
+    }
+
     public ResValue(Date pit, BigDecimal val1, BigDecimal val2, BigDecimal val3, String text, Date createDate, Date editDate, ResValueTypes vtype, Users editedBy, ResValue replacedBy, ResValue replacementFor, Users user, Resident resident) {
         this.pit = pit;
         this.val2 = val2;
@@ -312,46 +316,56 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
         if (o == null || getClass() != o.getClass()) return false;
 
         ResValue resValue = (ResValue) o;
+        return resValue.getID() == id;
 
-        if (createDate != null ? !createDate.equals(resValue.createDate) : resValue.createDate != null) return false;
-        if (editDate != null ? !editDate.equals(resValue.editDate) : resValue.editDate != null) return false;
-//        if (editedBy != null ? !editedBy.equals(resValue.editedBy) : resValue.editedBy != null) return false;
-        if (id != null ? !id.equals(resValue.id) : resValue.id != null) return false;
-        if (pit != null ? !pit.equals(resValue.pit) : resValue.pit != null) return false;
-//        if (replacedBy != null ? !replacedBy.equals(resValue.replacedBy) : resValue.replacedBy != null) return false;
-//        if (replacementFor != null ? !replacementFor.equals(resValue.replacementFor) : resValue.replacementFor != null)
-//            return false;
-        if (resident != null ? !resident.equals(resValue.resident) : resValue.resident != null) return false;
-        if (text != null ? !text.equals(resValue.text) : resValue.text != null) return false;
-        if (user != null ? !user.equals(resValue.user) : resValue.user != null) return false;
-        if (val1 != null ? !val1.equals(resValue.val1) : resValue.val1 != null) return false;
-        if (val2 != null ? !val2.equals(resValue.val2) : resValue.val2 != null) return false;
-        if (val3 != null ? !val3.equals(resValue.val3) : resValue.val3 != null) return false;
-        if (version != null ? !version.equals(resValue.version) : resValue.version != null) return false;
-        if (vtype != null ? !vtype.equals(resValue.vtype) : resValue.vtype != null) return false;
-
-        return true;
     }
 
-    @Override
-    public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (version != null ? version.hashCode() : 0);
-        result = 31 * result + (pit != null ? pit.hashCode() : 0);
-        result = 31 * result + (val2 != null ? val2.hashCode() : 0);
-        result = 31 * result + (val3 != null ? val3.hashCode() : 0);
-        result = 31 * result + (val1 != null ? val1.hashCode() : 0);
-        result = 31 * result + (text != null ? text.hashCode() : 0);
-        result = 31 * result + (createDate != null ? createDate.hashCode() : 0);
-        result = 31 * result + (editDate != null ? editDate.hashCode() : 0);
-//        result = 31 * result + (editedBy != null ? editedBy.hashCode() : 0);
-//        result = 31 * result + (replacedBy != null ? replacedBy.hashCode() : 0);
-//        result = 31 * result + (replacementFor != null ? replacementFor.hashCode() : 0);
-        result = 31 * result + (user != null ? user.hashCode() : 0);
-        result = 31 * result + (resident != null ? resident.hashCode() : 0);
-        result = 31 * result + (vtype != null ? vtype.hashCode() : 0);
-        return result;
-    }
+    //    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//
+//        ResValue resValue = (ResValue) o;
+//
+//        if (createDate != null ? !createDate.equals(resValue.createDate) : resValue.createDate != null) return false;
+//        if (editDate != null ? !editDate.equals(resValue.editDate) : resValue.editDate != null) return false;
+////        if (editedBy != null ? !editedBy.equals(resValue.editedBy) : resValue.editedBy != null) return false;
+//        if (id != null ? !id.equals(resValue.id) : resValue.id != null) return false;
+//        if (pit != null ? !pit.equals(resValue.pit) : resValue.pit != null) return false;
+////        if (replacedBy != null ? !replacedBy.equals(resValue.replacedBy) : resValue.replacedBy != null) return false;
+////        if (replacementFor != null ? !replacementFor.equals(resValue.replacementFor) : resValue.replacementFor != null)
+////            return false;
+//        if (resident != null ? !resident.equals(resValue.resident) : resValue.resident != null) return false;
+//        if (text != null ? !text.equals(resValue.text) : resValue.text != null) return false;
+//        if (user != null ? !user.equals(resValue.user) : resValue.user != null) return false;
+//        if (val1 != null ? !val1.equals(resValue.val1) : resValue.val1 != null) return false;
+//        if (val2 != null ? !val2.equals(resValue.val2) : resValue.val2 != null) return false;
+//        if (val3 != null ? !val3.equals(resValue.val3) : resValue.val3 != null) return false;
+//        if (version != null ? !version.equals(resValue.version) : resValue.version != null) return false;
+//        if (vtype != null ? !vtype.equals(resValue.vtype) : resValue.vtype != null) return false;
+//
+//        return true;
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        int result = id != null ? id.hashCode() : 0;
+//        result = 31 * result + (version != null ? version.hashCode() : 0);
+//        result = 31 * result + (pit != null ? pit.hashCode() : 0);
+//        result = 31 * result + (val2 != null ? val2.hashCode() : 0);
+//        result = 31 * result + (val3 != null ? val3.hashCode() : 0);
+//        result = 31 * result + (val1 != null ? val1.hashCode() : 0);
+//        result = 31 * result + (text != null ? text.hashCode() : 0);
+//        result = 31 * result + (createDate != null ? createDate.hashCode() : 0);
+//        result = 31 * result + (editDate != null ? editDate.hashCode() : 0);
+////        result = 31 * result + (editedBy != null ? editedBy.hashCode() : 0);
+////        result = 31 * result + (replacedBy != null ? replacedBy.hashCode() : 0);
+////        result = 31 * result + (replacementFor != null ? replacementFor.hashCode() : 0);
+//        result = 31 * result + (user != null ? user.hashCode() : 0);
+//        result = 31 * result + (resident != null ? resident.hashCode() : 0);
+//        result = 31 * result + (vtype != null ? vtype.hashCode() : 0);
+//        return result;
+//    }
 
     @Override
     public String getTitle() {
