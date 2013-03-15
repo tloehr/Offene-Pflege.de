@@ -325,20 +325,31 @@ public class PnlValues extends NursingRecordsPanel {
                                     DateTime dt = new DateTime(myValue.getPit());
 
                                     final String keyType = vtype.getID() + ".xtypes";
-                                    final String key = myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE ? vtype.getID() + ".xtypes." + dt.toDateMidnight().getMillis() + ".day" : vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
+                                    final String keyDay = vtype.getID() + ".xtypes." + dt.toDateMidnight().getMillis() + ".day";
+                                    final String keyYear = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
 
                                     try {
                                         cpMap.get(keyType).setCollapsed(false);
-                                        cpMap.get(key).setCollapsed(false);
+                                        cpMap.get(keyYear).setCollapsed(false);
+                                        if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
+                                            cpMap.get(keyDay).setCollapsed(false);
+                                        }
+
                                     } catch (PropertyVetoException e) {
                                         e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                                     }
 
-                                    if (!mapType2Values.get(key).contains(myValue)) {
-                                        mapType2Values.get(key).add(myValue);
-                                        Collections.sort(mapType2Values.get(key));
+                                    if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
+                                        if (!mapType2Values.get(keyDay).contains(myValue)) {
+                                            mapType2Values.get(keyDay).add(myValue);
+                                            Collections.sort(mapType2Values.get(keyDay));
+                                        }
+                                    } else {
+                                        if (!mapType2Values.get(keyYear).contains(myValue)) {
+                                            mapType2Values.get(keyYear).add(myValue);
+                                            Collections.sort(mapType2Values.get(keyYear));
+                                        }
                                     }
-
                                     cptitle.getButton().setIcon(SYSConst.icon22ledGreenOn);
 
                                     createCP4(vtype, dt.getYear());
@@ -816,25 +827,43 @@ public class PnlValues extends NursingRecordsPanel {
                                         DateTime dt = new DateTime(myValue.getPit());
 
                                         final String keyType = vtype.getID() + ".xtypes";
-                                        final String key = myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE ? vtype.getID() + ".xtypes." + dt.toDateMidnight().getMillis() + ".day" : vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
+                                        final String keyDay = vtype.getID() + ".xtypes." + dt.toDateMidnight().getMillis() + ".day";
+                                        final String keyYear = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
 
                                         try {
                                             cpMap.get(keyType).setCollapsed(false);
-                                            cpMap.get(key).setCollapsed(false);
+                                            cpMap.get(keyYear).setCollapsed(false);
+                                            if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
+                                                cpMap.get(keyDay).setCollapsed(false);
+                                            }
+
                                         } catch (PropertyVetoException e) {
                                             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                                         }
 
-                                        if (!mapType2Values.get(key).contains(myValue)) {
-                                            mapType2Values.get(key).add(myValue);
-                                            Collections.sort(mapType2Values.get(key));
+                                        if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
+                                            if (!mapType2Values.get(keyDay).contains(myValue)) {
+                                                mapType2Values.get(keyDay).add(myValue);
+                                                Collections.sort(mapType2Values.get(keyDay));
+                                            }
+                                        } else {
+                                            if (!mapType2Values.get(keyYear).contains(myValue)) {
+                                                mapType2Values.get(keyYear).add(myValue);
+                                                Collections.sort(mapType2Values.get(keyYear));
+                                            }
                                         }
-
                                         cptitle.getButton().setIcon(SYSConst.icon22ledGreenOn);
 
                                         createCP4(vtype, dt.getYear());
 
                                         buildPanel();
+
+//                                        try {
+//                                            cpMap.get(keyType).setCollapsed(false);
+//                                            cpMap.get(key).setCollapsed(false);
+//                                        } catch (PropertyVetoException e) {
+//                                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//                                        }
 
                                         GUITools.scroll2show(jspValues, linemap.get(myValue), cpsValues, new Closure() {
                                             @Override

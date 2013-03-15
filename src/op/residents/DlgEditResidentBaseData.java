@@ -236,10 +236,10 @@ public class DlgEditResidentBaseData extends MyJDialog {
                     EntityManager em = OPDE.createEM();
                     try {
                         em.getTransaction().begin();
-                        LCustodian myLC = em.merge((LCustodian) o);
+                        Doc myGP = em.merge((Doc) o);
                         em.getTransaction().commit();
-                        cmbLCust.setModel(new DefaultComboBoxModel(new LCustodian[]{myLC}));
-                        resident.setLCustodian1(myLC);
+                        cmbGP.setModel(new DefaultComboBoxModel(new Doc[]{myGP}));
+                        resident.setGP(myGP);
                     } catch (Exception ex) {
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
@@ -264,10 +264,11 @@ public class DlgEditResidentBaseData extends MyJDialog {
                     EntityManager em = OPDE.createEM();
                     try {
                         em.getTransaction().begin();
-                        Doc myGP = em.merge((Doc) o);
+                        LCustodian myLC = em.merge((LCustodian) o);
+
                         em.getTransaction().commit();
-                        cmbGP.setModel(new DefaultComboBoxModel(new Doc[]{myGP}));
-                        resident.setGP(myGP);
+                        cmbLCust.setModel(new DefaultComboBoxModel(new LCustodian[]{myLC}));
+                        resident.setLCustodian1(myLC);
                     } catch (Exception ex) {
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
@@ -292,10 +293,11 @@ public class DlgEditResidentBaseData extends MyJDialog {
                     EntityManager em = OPDE.createEM();
                     try {
                         em.getTransaction().begin();
-                        Doc myGP = em.merge((Doc) o);
+                        LCustodian myLC = em.merge((LCustodian) o);
+
                         em.getTransaction().commit();
-                        cmbGP.setModel(new DefaultComboBoxModel(new Doc[]{myGP}));
-                        resident.setGP(myGP);
+                        cmbLCust.setModel(new DefaultComboBoxModel(new LCustodian[]{myLC}));
+                        resident.setLCustodian1(myLC);
                     } catch (Exception ex) {
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
