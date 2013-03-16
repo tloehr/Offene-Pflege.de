@@ -36,8 +36,12 @@ public class LCustodianTools {
         };
     }
 
-    public static String getFullName(LCustodian LCustodian) {
-        return SYSTools.anonymizeString(LCustodian.getAnrede() + " " + LCustodian.getVorname() + " " + LCustodian.getName());
+    public static String getFullName(LCustodian lcustodian) {
+        if (lcustodian != null) {
+            return SYSTools.anonymizeString(lcustodian.getAnrede() + " " + lcustodian.getVorname() + " " + lcustodian.getName());
+        } else {
+            return OPDE.lang.getString("misc.msg.noentryyet");
+        }
     }
 
     public static ArrayList<LCustodian> getAllActive() {

@@ -53,8 +53,8 @@ public class PnlBV extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "default, $lcgap, default:grow, $lcgap, default",
-                "2*(default, $lgap), default"));
+            "default:grow",
+            "default"));
 
         //---- cmbBV ----
         cmbBV.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -64,7 +64,7 @@ public class PnlBV extends JPanel {
                 cmbBVItemStateChanged(e);
             }
         });
-        add(cmbBV, CC.xy(3, 3));
+        add(cmbBV, CC.xy(1, 1));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 

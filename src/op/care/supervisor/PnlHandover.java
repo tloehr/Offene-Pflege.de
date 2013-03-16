@@ -230,8 +230,8 @@ public class PnlHandover extends NursingRecordsPanel {
         cacheNR.clear();
 
         Pair<DateTime, DateTime> minmax = NReportTools.getMinMax();
-        hollidays = SYSCalendar.getHollidays(minmax.getFirst().getYear(), minmax.getSecond().getYear());
         if (minmax != null) {
+            hollidays = SYSCalendar.getHollidays(minmax.getFirst().getYear(), minmax.getSecond().getYear());
             DateMidnight start = minmax.getFirst().toDateMidnight().dayOfMonth().withMinimumValue();
             DateMidnight end = new DateMidnight();
             for (int year = end.getYear(); year >= start.getYear(); year--) {
@@ -457,6 +457,9 @@ public class PnlHandover extends NursingRecordsPanel {
             }
         }
         final CollapsiblePane cpDay = cpMap.get(key);
+        if (hollidays == null){
+            hollidays = SYSCalendar.getHollidays(day.getYear(), day.getYear());
+        }
         String titleDay = "<html><font size=+1>" +
                 dayFormat.format(day.toDate()) +
                 SYSTools.catchNull(hollidays.get(day), " (", ")") +
@@ -598,11 +601,11 @@ public class PnlHandover extends NursingRecordsPanel {
                         Collections.sort(cacheNR.get(key), new Comparator<NReport>() {
                             @Override
                             public int compare(NReport o1, NReport o2) {
-                                if (!tbResidentFirst.isSelected()){
+                                if (!tbResidentFirst.isSelected()) {
                                     return o1.getPit().compareTo(o2.getPit());
                                 } else {
                                     int comp = o1.getResident().getRID().compareTo(o2.getResident().getRID());
-                                    if (comp == 0){
+                                    if (comp == 0) {
                                         comp = o1.getPit().compareTo(o2.getPit());
                                     }
                                     return comp;
@@ -954,36 +957,39 @@ public class PnlHandover extends NursingRecordsPanel {
         List<Component> list = new ArrayList<Component>();
 
         Pair<DateTime, DateTime> minmax = NReportTools.getMinMax();
+        if (minmax != null) {
 
-        final DefaultComboBoxModel yearModel = new DefaultComboBoxModel();
-        for (int year = new DateMidnight().getYear(); year >= minmax.getFirst().getYear(); year--) {
-            yearModel.addElement(year);
-        }
 
-        JPanel myPanel = new JPanel();
-        myPanel.setLayout(new BoxLayout(myPanel, BoxLayout.LINE_AXIS));
+            final DefaultComboBoxModel yearModel = new DefaultComboBoxModel();
+            for (int year = new DateMidnight().getYear(); year >= minmax.getFirst().getYear(); year--) {
+                yearModel.addElement(year);
+            }
 
-        txtSearch = new JXSearchField(OPDE.lang.getString("misc.msg.searchphrase"));
-        txtSearch.setInstantSearchDelay(100000);
-        txtSearch.setFont(SYSConst.ARIAL14);
-        txtSearch.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (SYSTools.catchNull(txtSearch.getText()).trim().length() > 3) {
-                    SYSFilesTools.print(NReportTools.getReportsAndHandoversAsHTML(NReportTools.getNReports4Handover((Homes) cmbHomes.getSelectedItem(), txtSearch.getText().trim(), Integer.parseInt(yearModel.getSelectedItem().toString())), txtSearch.getText().trim(), Integer.parseInt(yearModel.getSelectedItem().toString())), false);
+            JPanel myPanel = new JPanel();
+            myPanel.setLayout(new BoxLayout(myPanel, BoxLayout.LINE_AXIS));
+
+            txtSearch = new JXSearchField(OPDE.lang.getString("misc.msg.searchphrase"));
+            txtSearch.setInstantSearchDelay(100000);
+            txtSearch.setFont(SYSConst.ARIAL14);
+            txtSearch.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (SYSTools.catchNull(txtSearch.getText()).trim().length() > 3) {
+                        SYSFilesTools.print(NReportTools.getReportsAndHandoversAsHTML(NReportTools.getNReports4Handover((Homes) cmbHomes.getSelectedItem(), txtSearch.getText().trim(), Integer.parseInt(yearModel.getSelectedItem().toString())), txtSearch.getText().trim(), Integer.parseInt(yearModel.getSelectedItem().toString())), false);
+                    }
                 }
-            }
-        });
-        myPanel.add(txtSearch);
-        yearCombo = new JXComboBox(yearModel);
-        yearCombo.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                txtSearch.postActionEvent();
-            }
-        });
-        myPanel.add(yearCombo);
-        list.add(myPanel);
+            });
+            myPanel.add(txtSearch);
+            yearCombo = new JXComboBox(yearModel);
+            yearCombo.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    txtSearch.postActionEvent();
+                }
+            });
+            myPanel.add(yearCombo);
+            list.add(myPanel);
+        }
 
         cmbHomes = new JComboBox();
         cmbHomes.setFont(SYSConst.ARIAL14);
@@ -997,7 +1003,7 @@ public class PnlHandover extends NursingRecordsPanel {
         });
         list.add(cmbHomes);
 
-        tbResidentFirst = GUITools.getNiceToggleButton(internalClassID+".residentFirst");
+        tbResidentFirst = GUITools.getNiceToggleButton(internalClassID + ".residentFirst");
         SYSPropsTools.restoreState(internalClassID + ".tbResidentFirst", tbResidentFirst);
         tbResidentFirst.addItemListener(new ItemListener() {
             @Override

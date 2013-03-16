@@ -1,6 +1,7 @@
 package op.settings;
 
 import entity.info.ICD;
+import op.OPDE;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -18,6 +19,8 @@ public class ICDImporter extends DefaultHandler {
 
     private final EntityManager em;
     private String firstElement;
+    private StringBuilder content;
+    String code = null;
 
     public ICDImporter(EntityManager em) throws Exception {
         this.em = em;
@@ -26,22 +29,36 @@ public class ICDImporter extends DefaultHandler {
 
     @Override
     public void startElement(String nsURI, String strippedName, String tagName, Attributes attributes) throws SAXException {
+
         if (firstElement == null) {
             firstElement = tagName;
             if (!firstElement.equalsIgnoreCase("opdeicd")) throw new SAXException("not my kind of document");
         }
 
         if (tagName.equalsIgnoreCase("icd")) {
+            code = attributes.getValue("code");
+            OPDE.debug(code);
+            content = new StringBuilder();
+        }
+    }
 
+    @Override
+    public void characters(char[] c, int start, int length)
+            throws SAXException {
+        if (code != null) {
+            content.append(new String(c, start, length)); // remove double whitespaces, if any
+        }
+    }
 
-            String code = attributes.getValue("code");
-            String content = attributes.getValue("content");
-
+    @Override
+    public void endElement(String uri, String localName, String qName) throws SAXException {
+        if (qName.equalsIgnoreCase("icd")) {
             // only persist if needed. Check only otherwise.
             if (em != null) {
-                em.merge(new ICD(code, content));
+                em.merge(new ICD(code, content.toString()));
             }
-
+            code = null;
+            content = null;
         }
     }
 

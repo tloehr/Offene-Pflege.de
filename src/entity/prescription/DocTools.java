@@ -40,7 +40,7 @@ public class DocTools {
         if (doc != null) {
             return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitle(), "", " ") + doc.getName() + " " + doc.getFirstname() + ", " + doc.getCity() ;
         } else {
-            return "--";
+            return OPDE.lang.getString("misc.msg.noentryyet");
         }
     }
 

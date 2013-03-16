@@ -61,8 +61,8 @@ public class NReportTools {
      * @return
      */
     public static Pair<DateTime, DateTime> getMinMax() {
-        long begin = System.currentTimeMillis();
         Pair<DateTime, DateTime> result = null;
+        long min, max;
 
         EntityManager em = OPDE.createEM();
         Query queryMin1 = em.createQuery("SELECT nr FROM NReport nr ORDER BY nr.pit ASC ");
@@ -83,25 +83,35 @@ public class NReportTools {
             ArrayList<Handovers> min2 = new ArrayList<Handovers>(queryMin2.getResultList());
             ArrayList<Handovers> max2 = new ArrayList<Handovers>(queryMax2.getResultList());
 
-            if (min1.isEmpty() && min2.isEmpty()) {
+
+            if (min1.isEmpty() && min2.isEmpty()) { // that means, that there is now report at all
                 result = null;
             } else {
-                if (min1 == null) {
-                    result = new Pair<DateTime, DateTime>(new DateTime(min2.get(0).getPit()), new DateTime(max2.get(0).getPit()));
-                } else if (min2 == null) {
-                    result = new Pair<DateTime, DateTime>(new DateTime(min1.get(0).getPit()), new DateTime(max1.get(0).getPit()));
-                } else {
-                    DateTime min3 = new DateTime(Math.min(min1.get(0).getPit().getTime(), min2.get(0).getPit().getTime()));
-                    DateTime max3 = new DateTime(Math.max(max1.get(0).getPit().getTime(), max2.get(0).getPit().getTime()));
-                    result = new Pair<DateTime, DateTime>(min3, max3);
-                }
+                long mi1 = min1.isEmpty() ? System.currentTimeMillis() : min1.get(0).getPit().getTime();
+                long mi2 = min2.isEmpty() ? System.currentTimeMillis() : min2.get(0).getPit().getTime();
+                min = Math.min(mi1, mi2);
+
+                long ma1 = max1.isEmpty() ? System.currentTimeMillis() : max1.get(0).getPit().getTime();
+                long ma2 = max2.isEmpty() ? System.currentTimeMillis() : max2.get(0).getPit().getTime();
+                max = Math.max(ma1, ma2);
+
+                result = new Pair<DateTime, DateTime>(new DateTime(min), new DateTime(max));
+
+//                if (min1 == null) {
+//                    result = new Pair<DateTime, DateTime>(new DateTime(min2.get(0).getPit()), new DateTime(max2.get(0).getPit()));
+//                } else if (min2 == null) {
+//                    result = new Pair<DateTime, DateTime>(new DateTime(min1.get(0).getPit()), new DateTime(max1.get(0).getPit()));
+//                } else {
+//                    DateTime min3 = new DateTime(Math.min(min1.get(0).getPit().getTime(), min2.get(0).getPit().getTime()));
+//                    DateTime max3 = new DateTime(Math.max(max1.get(0).getPit().getTime(), max2.get(0).getPit().getTime()));
+//                    result = new Pair<DateTime, DateTime>(min3, max3);
+//                }
             }
         } catch (Exception e) {
             OPDE.fatal(e);
         }
 
         em.close();
-        SYSTools.showTimeDifference(begin);
         return result;
     }
 

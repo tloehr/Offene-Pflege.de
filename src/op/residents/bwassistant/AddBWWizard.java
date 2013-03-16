@@ -34,7 +34,7 @@ public class AddBWWizard {
     public static final String internalClassID = "opde.admin.bw.wizard";
 
     private WizardDialog wizard;
-    private Resident bewohner;
+    private Resident resident;
     private Closure finishAction;
     private ResInfo bwinfo_hauf;
 
@@ -50,9 +50,9 @@ public class AddBWWizard {
 
         AbstractWizardPage page1 = new WelcomePage(OPDE.lang.getString(internalClassID + ".page1.title"), OPDE.lang.getString(internalClassID + ".page1.description"));
         AbstractWizardPage page2 = new BasisInfoPage(OPDE.lang.getString(PnlBWBasisInfo.internalClassID + ".title"), OPDE.lang.getString(PnlBWBasisInfo.internalClassID + ".description"));
-        AbstractWizardPage page3 = new BVPage(OPDE.lang.getString(PnlBV.internalClassID + ".title"), OPDE.lang.getString(PnlBV.internalClassID + ".description"));
-        AbstractWizardPage page4 = new HausarztPage(OPDE.lang.getString(PnlGP.internalClassID + ".title"), OPDE.lang.getString(PnlGP.internalClassID + ".description"));
-        AbstractWizardPage page5 = new BetreuerPage(OPDE.lang.getString(PnlLC.internalClassID + ".title"), OPDE.lang.getString(PnlLC.internalClassID + ".description"));
+        AbstractWizardPage page3 = new PNPage(OPDE.lang.getString(PnlBV.internalClassID + ".title"), OPDE.lang.getString(PnlBV.internalClassID + ".description"));
+        AbstractWizardPage page4 = new GPPage(OPDE.lang.getString(PnlGP.internalClassID + ".title"), OPDE.lang.getString(PnlGP.internalClassID + ".description"));
+        AbstractWizardPage page5 = new LCPage(OPDE.lang.getString(PnlLC.internalClassID + ".title"), OPDE.lang.getString(PnlLC.internalClassID + ".description"));
         AbstractWizardPage page6 = new HaufPage(OPDE.lang.getString(PnlHAUF.internalClassID + ".title"), OPDE.lang.getString(PnlHAUF.internalClassID + ".description"));
         AbstractWizardPage page7 = new CompletionPage(OPDE.lang.getString(internalClassID + ".page7.title"), OPDE.lang.getString(internalClassID + ".page7.description"));
 
@@ -96,18 +96,18 @@ public class AddBWWizard {
             em.getTransaction().begin();
 
 
-            String prefix = bewohner.getName().substring(0, 1) + bewohner.getFirstname().substring(0, 1);
+            String prefix = resident.getName().substring(0, 1) + resident.getFirstname().substring(0, 1);
             prefix = prefix.toUpperCase();
 
             Unique unique = UniqueTools.getNewUID(em, prefix);
             String bwkennung = prefix + unique.getUid();
-            bewohner.setRID(bwkennung);
+            resident.setRID(bwkennung);
 
-            bewohner = em.merge(bewohner);
+            resident = em.merge(resident);
             bwinfo_hauf = em.merge(bwinfo_hauf);
             em.getTransaction().commit();
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ResidentTools.getTextCompact(bewohner) + " " + OPDE.lang.getString("misc.msg.entrysuccessful"), 6));
-            finishAction.execute(bewohner);
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ResidentTools.getTextCompact(resident) + " " + OPDE.lang.getString("misc.msg.entrysuccessful"), 6));
+            finishAction.execute(resident);
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -179,7 +179,7 @@ public class AddBWWizard {
             super.setupWizardButtons();
 
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
-            fireButtonEvent(bewohner == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
             fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
@@ -190,7 +190,7 @@ public class AddBWWizard {
             addComponent(new PnlBWBasisInfo(new Closure() {
                 @Override
                 public void execute(Object o) {
-                    bewohner = (Resident) o;
+                    resident = (Resident) o;
                     setupWizardButtons();
                 }
             }), true);
@@ -199,10 +199,10 @@ public class AddBWWizard {
 
     }
 
-    private class BVPage extends DefaultWizardPage {
+    private class PNPage extends DefaultWizardPage {
 //         boolean alreadyexecute = false;
 
-        public BVPage(String title, String description) {
+        public PNPage(String title, String description) {
             super(title, description);
             addPageListener(new PageListener() {
                 @Override
@@ -219,7 +219,7 @@ public class AddBWWizard {
             super.setupWizardButtons();
 
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
-            fireButtonEvent(bewohner == null || bewohner.getPN1() == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(resident == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
             fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
@@ -230,24 +230,24 @@ public class AddBWWizard {
             addComponent(new PnlBV(new Closure() {
                 @Override
                 public void execute(Object o) {
-                    bewohner.setPN1((Users) o);
+                    resident.setPN1((Users) o);
                     setupWizardButtons();
                 }
             }), true);
         }
     }
 
-    private class HausarztPage extends DefaultWizardPage {
+    private class GPPage extends DefaultWizardPage {
         private PnlGP pnlGP;
 //        private boolean alreadyexecute = false;
 
-        public HausarztPage(String title, String description) {
+        public GPPage(String title, String description) {
             super(title, description);
             pnlGP = new PnlGP(new Closure() {
                 @Override
                 public void execute(Object o) {
                     if (o != null) {
-                        bewohner.setGP((Doc) o);
+                        resident.setGP((Doc) o);
                     }
                     setupWizardButtons();
                 }
@@ -266,7 +266,7 @@ public class AddBWWizard {
             super.setupWizardButtons();
 
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
-            fireButtonEvent(bewohner == null || bewohner.getGP() == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
             fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
@@ -279,16 +279,16 @@ public class AddBWWizard {
     }
 
 
-    private class BetreuerPage extends DefaultWizardPage {
+    private class LCPage extends DefaultWizardPage {
         private PnlLC pnlLC;
 //        private boolean alreadyexecute = false;
 
-        public BetreuerPage(String title, String description) {
+        public LCPage(String title, String description) {
             super(title, description);
             pnlLC = new PnlLC(new Closure() {
                 @Override
                 public void execute(Object o) {
-                    bewohner.setLCustodian1((LCustodian) o);
+                    resident.setLCustodian1((LCustodian) o);
                     setupWizardButtons();
                 }
             });
@@ -307,7 +307,7 @@ public class AddBWWizard {
             super.setupWizardButtons();
 
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
-            fireButtonEvent(bewohner == null || bewohner.getLCustodian1() == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
             fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
@@ -338,7 +338,7 @@ public class AddBWWizard {
             super.setupWizardButtons();
 
             fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
-            fireButtonEvent(bewohner == null || bwinfo_hauf == null || bewohner.getStation() == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
+            fireButtonEvent(resident == null || bwinfo_hauf == null || resident.getStation() == null ? ButtonEvent.DISABLE_BUTTON : ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
             fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
         }
@@ -353,12 +353,12 @@ public class AddBWWizard {
                     Date hauf = ((Pair<Date, Station>) o).getFirst();
                     Station station = ((Pair<Date, Station>) o).getSecond();
                     if (hauf != null) {
-                        bwinfo_hauf = new ResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY), bewohner);
+                        bwinfo_hauf = new ResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY), resident);
                         bwinfo_hauf.setFrom(hauf);
                     } else {
                         bwinfo_hauf = null;
                     }
-                    bewohner.setStation(station);
+                    resident.setStation(station);
                     setupWizardButtons();
                 }
             }), true);
@@ -407,14 +407,14 @@ public class AddBWWizard {
             String result = "<b>" + OPDE.lang.getString(internalClassID + ".page7.summaryline1") + "</b><br/>";
             result += OPDE.lang.getString(internalClassID + ".page7.summaryline2") + "<br/>";
             result += "<ul>";
-            result += "<li>" + ResidentTools.getFullName(bewohner) + "</li>";
-            result += "<li>" + OPDE.lang.getString("misc.msg.dob") + ": " + DateFormat.getDateInstance().format(bewohner.getDOB()) + "</li>";
-            result += "<li>" + OPDE.lang.getString("misc.msg.primaryNurse") + ": " + bewohner.getPN1().getFullname() + "</li>";
-            result += "<li>" + OPDE.lang.getString("misc.msg.gp") + ": " + DocTools.getFullName(bewohner.getGP()) + "</li>";
-            result += "<li>" + OPDE.lang.getString("misc.msg.lc") + ": " + LCustodianTools.getFullName(bewohner.getLCustodian1()) + "</li>";
+            result += "<li>" + ResidentTools.getFullName(resident) + "</li>";
+            result += "<li>" + OPDE.lang.getString("misc.msg.dob") + ": " + DateFormat.getDateInstance().format(resident.getDOB()) + "</li>";
+            result += "<li>" + OPDE.lang.getString("misc.msg.primaryNurse") + ": " + (resident.getPN1() == null ? OPDE.lang.getString("misc.msg.noentryyet") : resident.getPN1().getFullname()) + "</li>";
+            result += "<li>" + OPDE.lang.getString("misc.msg.gp") + ": " + DocTools.getFullName(resident.getGP()) + "</li>";
+            result += "<li>" + OPDE.lang.getString("misc.msg.lc") + ": " + LCustodianTools.getFullName(resident.getLCustodian1()) + "</li>";
 
             result += "<li>" + OPDE.lang.getString("misc.msg.movein") + ": " + DateFormat.getDateInstance().format(bwinfo_hauf.getFrom()) + "</li>";
-            result += "<li>" + OPDE.lang.getString("misc.msg.subdivision") + ": " + bewohner.getStation().getName() + "</li>";
+            result += "<li>" + OPDE.lang.getString("misc.msg.subdivision") + ": " + resident.getStation().getName() + "</li>";
 
             result += "</ul>";
 

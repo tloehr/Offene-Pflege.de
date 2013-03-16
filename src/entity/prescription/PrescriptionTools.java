@@ -59,17 +59,13 @@ public class PrescriptionTools {
      * @param station Die Station, für die der Stellplan erstellt werden soll. Sortiert nach den Station.
      */
     public static void printDailyPlan(Station station) {
-//        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
-//        String html = "";
-
         try {
             Query query = em.createNativeQuery("" +
                     " SELECT v.VerID, bhp.BHPPID, best.BestID, vor.VorID, F.FormID, M.MedPID, M.Bezeichnung, Ms.Bezeichnung " +
                     " FROM prescription v " +
                     " INNER JOIN resident bw ON v.BWKennung = bw.BWKennung  " +
                     " INNER JOIN intervention Ms ON Ms.MassID = v.MassID " +
-//                    " INNER JOIN Station st ON bw.StatID = st.StatID  " +
                     " LEFT OUTER JOIN tradeform D ON v.DafID = D.DafID " +
                     " LEFT OUTER JOIN pschedule bhp ON bhp.VerID = v.VerID " +
                     " LEFT OUTER JOIN medproducts M ON M.MedPID = D.MedPID " +
@@ -84,14 +80,13 @@ public class PrescriptionTools {
                     " WHERE bw.adminonly <> 2 " +
                     " AND v.AnDatum < now() AND v.AbDatum > now() AND v.SitID IS NULL AND (v.DafID IS NOT NULL OR v.Stellplan IS TRUE) " +
                     " AND bw.StatID = ? AND ((best.Aus = '9999-12-31 23:59:59' AND best.Anbruch < '9999-12-31 23:59:59') OR (v.DafID IS NULL)) " +
-                    " ORDER BY CONCAT(bw.nachname,bw.vorname), bw.BWKennung, v.DafID IS NOT NULL, F.Stellplan, CONCAT( M.Bezeichnung, Ms.Bezeichnung)");
+                    " ORDER BY CONCAT(bw.nachname,bw.vorname), bw.BWKennung, v.DafID IS NOT NULL, bhp.Uhrzeit, F.Stellplan, CONCAT( M.Bezeichnung, Ms.Bezeichnung)");
             query.setParameter(1, station.getStatID());
             printDailyPlan(station, query.getResultList());
             em.close();
         } catch (Exception e) {
             OPDE.fatal(e);
         }
-//        SYSTools.showTimeDifference(begin);
     }
 
     private static void printDailyPlan(final Station station, final List data) {
@@ -122,7 +117,7 @@ public class PrescriptionTools {
 
                     Object[] objects = (Object[]) obj;
                     Prescription prescription = em.find(Prescription.class, ((BigInteger) objects[0]).longValue());
-                    PrescriptionSchedule planung = em.find(PrescriptionSchedule.class, ((BigInteger) objects[1]).longValue());
+                    PrescriptionSchedule schedule = em.find(PrescriptionSchedule.class, ((BigInteger) objects[1]).longValue());
                     BigInteger bestid = (BigInteger) objects[2];
                     BigInteger formid = (BigInteger) objects[4];
 
@@ -178,13 +173,25 @@ public class PrescriptionTools {
                     html += "<tr style=\"page-break-before:avoid\" " + (gray ? "id=\"fonttextgray14\">" : ">\n");
                     html += "<td width=\"300\" valign=\"top\">" + getShortDescription(prescription);   // (verordnung.hasMed() ? "<b>" + TradeFormTools.toPrettyString(verordnung.getTradeForm()) + "</b>" : verordnung.getIntervention().getName())
                     html += (bestid != null ? "<br/><i>" + OPDE.lang.getString("nursingrecords.prescription.dailyplan.stockInUse") + " " + OPDE.lang.getString("misc.msg.number") + " " + bestid + "</i>" : "") + "</td>\n";
-                    html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getNachtMo()) + "</td>\n";
-                    html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getMorgens()) + "</td>\n";
-                    html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getMittags()) + "</td>\n";
-                    html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getNachmittags()) + "</td>\n";
-                    html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getAbends()) + "</td>\n";
-                    html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(planung.getNachtAb()) + "</td>\n";
-                    html += "<td width=\"300\" >" + PrescriptionScheduleTools.getRemark(planung) + "</td>\n";
+
+                    if (schedule.usesTime()) {
+                        html += "<td colspan=\"6\" align=\"center\">";
+
+                        html += "<b><u>" + DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getUhrzeit()) + " Uhr</u></b> ";
+                        html += HTMLTools.printDouble(schedule.getUhrzeitDosis());
+                        html += schedule.getPrescription().hasMed() ? " " + SYSConst.UNITS[schedule.getPrescription().getTradeForm().getDosageForm().getUsageUnit()] : "x";
+
+                        html += "</td>\n";
+                    } else {
+
+                        html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(schedule.getNachtMo()) + "</td>\n";
+                        html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(schedule.getMorgens()) + "</td>\n";
+                        html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(schedule.getMittags()) + "</td>\n";
+                        html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(schedule.getNachmittags()) + "</td>\n";
+                        html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(schedule.getAbends()) + "</td>\n";
+                        html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(schedule.getNachtAb()) + "</td>\n";
+                    }
+                    html += "<td width=\"300\" >" + PrescriptionScheduleTools.getRemark(schedule) + "</td>\n";
                     html += "</tr>\n\n";
                     elementNumber += 1;
 

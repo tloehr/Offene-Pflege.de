@@ -210,12 +210,13 @@ public class PrescriptionScheduleTools {
             result += "Maximale Tagesdosis: ";
             result += schedule.getMaxAnzahl() + "x " + HTMLTools.printDouble(schedule.getMaxEDosis()) + " " + SYSConst.UNITS[schedule.getPrescription().getTradeForm().getDosageForm().getUsageUnit()];
             result += "<br/>";
-        } else if (schedule.usesTime()) {
-            result += "<b><u>" + DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getUhrzeit()) + " Uhr</u></b> ";
-            result += HTMLTools.printDouble(schedule.getUhrzeitDosis());
-            result += schedule.getPrescription().hasMed() ? " " + SYSConst.UNITS[schedule.getPrescription().getTradeForm().getDosageForm().getUsageUnit()] : "x";
-            result += "<br/>";
         }
+//        else if (schedule.usesTime()) {
+//            result += "<b><u>" + DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getUhrzeit()) + " Uhr</u></b> ";
+//            result += HTMLTools.printDouble(schedule.getUhrzeitDosis());
+//            result += schedule.getPrescription().hasMed() ? " " + SYSConst.UNITS[schedule.getPrescription().getTradeForm().getDosageForm().getUsageUnit()] : "x";
+//            result += "<br/>";
+//        }
 
         String wiederholung = getRepeatPattern(schedule, false);
         result += wiederholung;

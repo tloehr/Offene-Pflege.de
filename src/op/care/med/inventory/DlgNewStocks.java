@@ -506,7 +506,8 @@ public class DlgNewStocks extends MyJDialog {
                 OPDE.getPrintProcessor().addPrintJob(new PrintListElement(newStock, logicalPrinter, printForm, OPDE.getProps().getProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER)));
             }
 
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bestand Nr." + newStock.getID() + " wurde eingebucht", 2));
+            // if the label printer is not used, the new number is shown until the next message, so the user has time to write the number down manually.
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bestand Nr. <b>" + newStock.getID() + "</b> wurde eingebucht", btnPrint.isSelected() ? 2 : 0));
         } catch (OptimisticLockException ole) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
