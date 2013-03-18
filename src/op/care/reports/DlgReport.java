@@ -90,7 +90,12 @@ public class DlgReport extends MyJDialog {
         ovrDauer.setOverlayVisible(true);
         panel1.add(ovrDauer, CC.xy(5, 5));
 
-        txtBericht.requestFocus();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                txtBericht.requestFocus();
+            }
+        });
     }
 
     private void txtDauerFocusGained(FocusEvent e) {
