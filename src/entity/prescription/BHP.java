@@ -187,6 +187,11 @@ public class BHP implements Serializable, Comparable<BHP> {
         return prescription.getTradeForm() != null;
     }
 
+    public boolean shouldBeCalculated() {
+        // TODO: distinction between the several UPR modes
+        return hasMed() && OPDE.isCalcMediUPR1();
+    }
+
     public boolean isOpen() {
         return state == BHPTools.STATE_OPEN;
     }

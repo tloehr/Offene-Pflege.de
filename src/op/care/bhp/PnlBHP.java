@@ -522,11 +522,8 @@ public class PnlBHP extends NursingRecordsPanel {
                  *                             |_|   |_|      |___/
                  */
                 JButton btnApply = new JButton(SYSConst.icon22apply);
-//                btnApply.setPressedIcon(SYSConst.icon22applyPressed);
                 btnApply.setAlignmentX(Component.RIGHT_ALIGNMENT);
-//                btnApply.setContentAreaFilled(false);
                 btnApply.setToolTipText(OPDE.lang.getString(internalClassID + ".btnApply.tooltip"));
-//                btnApply.setBorder(null);
                 btnApply.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
@@ -557,9 +554,8 @@ public class PnlBHP extends NursingRecordsPanel {
                                 myBHP.setiZeit(SYSCalendar.whatTimeIDIs(new Date()));
                                 myBHP.setMDate(new Date());
 
-                                // TODO: Calc Medi here
                                 Prescription involvedPresciption = null;
-                                if (myBHP.hasMed()) {
+                                if (myBHP.shouldBeCalculated()) {
                                     MedInventory inventory = TradeFormTools.getInventory4TradeForm(resident, myBHP.getTradeForm());
                                     MedInventoryTools.withdraw(em, em.merge(inventory), myBHP.getDose(), myBHP);
                                     // Was the prescription closed during this withdraw ?
@@ -568,7 +564,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 em.getTransaction().commit();
 
 
-                                if (myBHP.hasMed() && involvedPresciption.isClosed()) {
+                                if (myBHP.shouldBeCalculated() && involvedPresciption.isClosed()) {
                                     reload();
                                 } else {
                                     mapBHP2Pane.put(myBHP, createCP4(myBHP));
@@ -755,8 +751,8 @@ public class PnlBHP extends NursingRecordsPanel {
                                 myBHP.setIst(new Date());
                                 myBHP.setiZeit(SYSCalendar.whatTimeIDIs(new Date()));
                                 myBHP.setMDate(new Date());
-                                // TODO: Calc Medi here
-                                if (myBHP.hasMed()) {
+
+                                if (myBHP.shouldBeCalculated()) {
                                     MedInventory inventory = TradeFormTools.getInventory4TradeForm(resident, myBHP.getTradeForm());
                                     if (inventory != null) {
                                         MedInventoryTools.withdraw(em, em.merge(inventory), myBHP.getDose(), myBHP);
@@ -846,8 +842,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 myBHP.setiZeit(null);
                                 myBHP.setMDate(new Date());
 
-                                // TODO: Calc Medi here
-                                if (myBHP.getPrescription().hasMed()) {
+                                if (myBHP.shouldBeCalculated()) {
                                     for (MedStockTransaction tx : myBHP.getStockTransaction()) {
                                         em.remove(tx);
                                     }

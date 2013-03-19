@@ -74,10 +74,10 @@ public class PnlControlling extends CleanablePanel {
     private Closure progressClosure;
 
     // Variables declaration - do not modify
-//GEN-BEGIN:variables
+    //GEN-BEGIN:variables
     private JScrollPane scrollPane1;
     private CollapsiblePanes cpsControlling;
-// End of variables declaration//GEN-END:variables
+    // End of variables declaration//GEN-END:variables
 
 
 //    JCheckBox[] jbs = null;
@@ -128,7 +128,9 @@ public class PnlControlling extends CleanablePanel {
         cpsControlling.add(createCP4Orga());
         cpsControlling.add(createCP4Nursing());
         cpsControlling.add(createCP4Nutrition());
-        cpsControlling.add(createCP4Drugs());
+        if (OPDE.isCalcMediUPR1()) {
+            cpsControlling.add(createCP4Drugs());
+        }
         cpsControlling.addExpansion();
     }
 
@@ -224,6 +226,7 @@ public class PnlControlling extends CleanablePanel {
                 }
             }
         });
+
         cpOrga.setTitleLabelComponent(cptitle.getMain());
         cpOrga.setSlidingDirection(SwingConstants.SOUTH);
         cpOrga.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
@@ -238,8 +241,6 @@ public class PnlControlling extends CleanablePanel {
         }
 
         cpOrga.setHorizontalAlignment(SwingConstants.LEADING);
-//        cpOrga.setOpaque(false);
-//        cpOrga.setBackground(getColor(vtype, SYSConst.medium1));
 
         return cpOrga;
     }

@@ -238,7 +238,7 @@ public class PnlInventory extends NursingRecordsPanel {
     private java.util.List<Component> addCommands() {
         java.util.List<Component> list = new ArrayList<Component>();
 
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
+        if (OPDE.isCalcMediUPR1() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
             JideButton buchenButton = GUITools.createHyperlinkButton(internalClassID + ".newstocks", SYSConst.icon22addrow, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {

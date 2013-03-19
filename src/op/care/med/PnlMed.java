@@ -424,15 +424,6 @@ public class PnlMed extends CleanablePanel {
         }
 
 
-//        if (OPDE.getAppInfo().isAllowedTo(internalClassID, InternalClassACL.INSERT)) {
-//            JideButton addButton = GUITools.createHyperlinkButton("Neues Medikament", new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent actionEvent) {
-//                }
-//            });
-//            mypanel.add(addButton);
-//        }
-
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
             final JideButton addButton = GUITools.createHyperlinkButton(MedProductWizard.internalClassID, SYSConst.icon22wizard, null);
 
@@ -465,12 +456,10 @@ public class PnlMed extends CleanablePanel {
                     popup.addPropertyChangeListener("visible", new PropertyChangeListener() {
                         @Override
                         public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-//                            OPDE.debug("popup property: " + propertyChangeEvent.getPropertyName() + " value: " + propertyChangeEvent.getNewValue() + " compCount: " + popup.getContentPane().getComponentCount());
                             popup.getContentPane().getComponentCount();
                         }
                     });
 
-//                    popup.showPopup(new Insets(-5, 0, -5, 0), addButton);
                     GUITools.showPopup(popup, SwingConstants.NORTH_EAST);
                 }
             });
@@ -478,7 +467,7 @@ public class PnlMed extends CleanablePanel {
             mypanel.add(addButton);
         }
 
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
+        if (OPDE.isCalcMediUPR1() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
             JideButton buchenButton = GUITools.createHyperlinkButton(PnlInventory.internalClassID + ".newstocks", SYSConst.icon22addrow, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {

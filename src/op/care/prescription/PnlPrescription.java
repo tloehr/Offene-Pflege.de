@@ -438,7 +438,7 @@ public class PnlPrescription extends NursingRecordsPanel {
             icon = SYSConst.icon22stopSign;
         } else if (mypres.isOnDemand()) {
             icon = null;
-            if (mypres.hasMed()) {
+            if (mypres.shouldBeCalculated()) {
                 MedInventory inventory = TradeFormTools.getInventory4TradeForm(mypres.getResident(), mypres.getTradeForm());
                 MedStock stockInUse = MedStockTools.getStockInUse(inventory);
                 if (stockInUse == null) {
@@ -453,7 +453,7 @@ public class PnlPrescription extends NursingRecordsPanel {
             }
         } else {
             icon = null;
-            if (mypres.hasMed()) {
+            if (mypres.shouldBeCalculated()) {
                 MedInventory inventory = TradeFormTools.getInventory4TradeForm(mypres.getResident(), mypres.getTradeForm());
                 MedStock stockInUse = MedStockTools.getStockInUse(inventory);
                 if (stockInUse == null) {
@@ -700,7 +700,7 @@ public class PnlPrescription extends NursingRecordsPanel {
             list.add(addNewOnDemand);
         }
 
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
+        if (OPDE.isCalcMediUPR1() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             JideButton buchenButton = GUITools.createHyperlinkButton(internalClassID + ".newstocks", new ImageIcon(getClass().getResource("/artwork/22x22/shetaddrow.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -757,7 +757,7 @@ public class PnlPrescription extends NursingRecordsPanel {
 
         JPanel pnlMenu = new JPanel(new VerticalLayout());
         long numBHPs = BHPTools.getNumBHPs(prescription);
-        final MedInventory inventory = TradeFormTools.getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm());
+        final MedInventory inventory = prescription.shouldBeCalculated() ? TradeFormTools.getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm()) : null;
         final MedStock stockInUse = MedStockTools.getStockInUse(inventory);
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
@@ -1235,17 +1235,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                 }
             });
 
-//            if (prescription.getAttachedFilesConnections().size() > 0) {
-//                JLabel lblNum = new JLabel(Integer.toString(prescription.getAttachedFilesConnections().size()), SYSConst.icon16greenStar, SwingConstants.CENTER);
-//                lblNum.setFont(SYSConst.ARIAL10BOLD);
-//                lblNum.setForeground(Color.BLUE);
-//                lblNum.setHorizontalTextPosition(SwingConstants.CENTER);
-//                DefaultOverlayable overlayableBtn = new DefaultOverlayable(btnFiles, lblNum, DefaultOverlayable.SOUTH_EAST);
-//                overlayableBtn.setOpaque(false);
-//                pnlMenu.add(overlayableBtn);
-//            } else {
             pnlMenu.add(btnFiles);
-//            }
 
             /***
              *      _     _         ____

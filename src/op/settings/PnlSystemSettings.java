@@ -62,7 +62,7 @@ public class PnlSystemSettings extends CleanablePanel {
     private HashMap<String, JPanel> cpPanel;
     private ArrayList<Homes> listHomes;
     private File opdeicd = null;
-    private JToggleButton tbauth, tbtls, tbstarttls, tbactive;
+    private JToggleButton tbauth, tbtls, tbstarttls, tbactive, tbCalcMed;
 
     public PnlSystemSettings(JScrollPane jspSearch) {
         jspSearch.setViewportView(new JPanel());
@@ -269,6 +269,7 @@ public class PnlSystemSettings extends CleanablePanel {
         createICDImporter();
         createMailSystem();
         createFTPSystem();
+        createCalcMed();
     }
 
     private void createCatList() {
@@ -368,7 +369,19 @@ public class PnlSystemSettings extends CleanablePanel {
                 }
             }
         });
+    }
 
+    private void createCalcMed() {
+        lblCalcMed.setText(OPDE.lang.getString(internalClassID + ".global.calcmed"));
+        tbCalcMed = GUITools.getNiceToggleButton(internalClassID+".global.tbCalcMed");
+        tbCalcMed.setSelected(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_CALC_MEDI_APV1)).equalsIgnoreCase("true"));
+        pnlCalcMed.add(tbCalcMed, CC.xy(1, 1));
+        tbCalcMed.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                SYSPropsTools.storeProp(SYSPropsTools.KEY_CALC_MEDI_APV1, Boolean.toString(tbCalcMed.isSelected()));
+            }
+        });
     }
 
     private void createFTPSystem() {
@@ -386,7 +399,6 @@ public class PnlSystemSettings extends CleanablePanel {
         lblFTPUser.setText(OPDE.lang.getString(internalClassID + ".global.ftp.user"));
         lblFTPPassword.setText(OPDE.lang.getString(internalClassID + ".global.ftp.password"));
         lblFTPWD.setText(OPDE.lang.getString(internalClassID + ".global.ftp.wd"));
-
 
     }
 
@@ -891,9 +903,11 @@ public class PnlSystemSettings extends CleanablePanel {
         btnTestmail = new JButton();
         lblActive = new JLabel();
         lblCat = new JLabel();
+        lblCalcMed = new JLabel();
         lblFTP = new JLabel();
         jspCat = new JScrollPane();
         lstCat = new JList();
+        pnlCalcMed = new JPanel();
         panel3 = new JPanel();
         lblFTPServer = new JLabel();
         txtFTPServer = new JTextField();
@@ -1126,6 +1140,11 @@ public class PnlSystemSettings extends CleanablePanel {
                     lblCat.setFont(new Font("Arial", Font.BOLD, 18));
                     pnlGlobal.add(lblCat, CC.xy(3, 9));
 
+                    //---- lblCalcMed ----
+                    lblCalcMed.setText("ResInfoCat");
+                    lblCalcMed.setFont(new Font("Arial", Font.BOLD, 18));
+                    pnlGlobal.add(lblCalcMed, CC.xy(5, 9));
+
                     //---- lblFTP ----
                     lblFTP.setText("FTP System");
                     lblFTP.setFont(new Font("Arial", Font.BOLD, 18));
@@ -1146,6 +1165,14 @@ public class PnlSystemSettings extends CleanablePanel {
                         jspCat.setViewportView(lstCat);
                     }
                     pnlGlobal.add(jspCat, CC.xy(3, 11, CC.FILL, CC.FILL));
+
+                    //======== pnlCalcMed ========
+                    {
+                        pnlCalcMed.setLayout(new FormLayout(
+                            "default:grow",
+                            "2*(default, $lgap), default"));
+                    }
+                    pnlGlobal.add(pnlCalcMed, CC.xy(5, 11));
 
                     //======== panel3 ========
                     {
@@ -1303,9 +1330,11 @@ public class PnlSystemSettings extends CleanablePanel {
     private JButton btnTestmail;
     private JLabel lblActive;
     private JLabel lblCat;
+    private JLabel lblCalcMed;
     private JLabel lblFTP;
     private JScrollPane jspCat;
     private JList lstCat;
+    private JPanel pnlCalcMed;
     private JPanel panel3;
     private JLabel lblFTPServer;
     private JTextField txtFTPServer;

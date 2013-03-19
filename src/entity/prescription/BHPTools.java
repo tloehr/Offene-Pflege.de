@@ -495,7 +495,7 @@ public class BHPTools {
 
 
     public static Icon getWarningIcon(BHP bhp, MedStock stock) {
-        if (!bhp.hasMed() || bhp.getPrescription().isClosed()) return null;
+        if (!bhp.shouldBeCalculated() || bhp.getPrescription().isClosed()) return null;
 
         Icon icon = null;
         BigDecimal sum = stock == null ? BigDecimal.ZERO : MedStockTools.getSum(stock);
@@ -513,7 +513,7 @@ public class BHPTools {
         int BHP_MAX_MINUTES_TO_WITHDRAW = Integer.parseInt(OPDE.getProps().getProperty(SYSPropsTools.BHP_MAX_MINUTES_TO_WITHDRAW));
         boolean residentAbsent = bhp.getResident().isActive() && ResInfoTools.absentSince(bhp.getResident()) != null;
         MedInventory inventoryInUse = bhp.hasMed() ? TradeFormTools.getInventory4TradeForm(bhp.getResident(), bhp.getTradeForm()) : null;
-        boolean medTrouble = bhp.hasMed() && (inventoryInUse == null || MedStockTools.getStockInUse(inventoryInUse) == null);
+        boolean medTrouble = bhp.shouldBeCalculated() && (inventoryInUse == null || MedStockTools.getStockInUse(inventoryInUse) == null);
 
         return !residentAbsent && bhp.getResident().isActive() &&
                 !bhp.getPrescription().isClosed() &&

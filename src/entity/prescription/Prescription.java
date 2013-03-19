@@ -13,7 +13,6 @@ import entity.process.QProcessElement;
 import entity.process.SYSPRE2PROCESS;
 import entity.system.Users;
 import op.OPDE;
-import op.care.nursingprocess.PnlNursingProcess;
 import op.care.prescription.PnlPrescription;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -282,6 +281,11 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
 
     public boolean hasMed() {
         return tradeform != null;
+    }
+
+    public boolean shouldBeCalculated() {
+        // TODO: distinction between the several UPR modes
+        return hasMed() && OPDE.isCalcMediUPR1();
     }
 
     public void setSituation(Situations situation) {

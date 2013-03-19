@@ -251,7 +251,7 @@ public class PrescriptionTools {
     public static String getOriginalPrescription(Prescription presription) {
         String result = "";
 
-        if (presription.hasMed()) {
+        if (presription.shouldBeCalculated()) {
 
             MedInventory inventory = TradeFormTools.getInventory4TradeForm(presription.getResident(), presription.getTradeForm());
             MedStock stockInUse = MedStockTools.getStockInUse(inventory);
@@ -423,7 +423,7 @@ public class PrescriptionTools {
 
     public static String getInventoryInformationAsHTML(final Prescription prescription) {
         String result = "";
-        if (!prescription.isClosed() && prescription.hasMed()) {
+        if (!prescription.isClosed() && prescription.shouldBeCalculated()) {
             MedInventory inventory = TradeFormTools.getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm());
             MedStock stockInUse = MedStockTools.getStockInUse(inventory);
 

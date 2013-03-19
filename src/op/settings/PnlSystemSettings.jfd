@@ -1011,6 +1011,33 @@
               <string>javax.swing.JLabel</string> 
               <void method="setProperty"> 
                <string>text</string> 
+               <string>ResInfoCat</string> 
+              </void> 
+              <void method="setProperty"> 
+               <string>font</string> 
+               <object idref="Font0"/> 
+              </void> 
+              <void property="name"> 
+               <string>lblCalcMed</string> 
+              </void> 
+             </object> 
+             <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+              <class>com.jgoodies.forms.layout.CellConstraints</class> 
+              <void method="setProperty"> 
+               <string>gridY</string> 
+               <int>9</int> 
+              </void> 
+              <void method="setProperty"> 
+               <string>gridX</string> 
+               <int>5</int> 
+              </void> 
+             </object> 
+            </void> 
+            <void method="add"> 
+             <object class="com.jformdesigner.model.FormComponent"> 
+              <string>javax.swing.JLabel</string> 
+              <void method="setProperty"> 
+               <string>text</string> 
                <string>FTP System</string> 
               </void> 
               <void method="setProperty"> 
@@ -1088,6 +1115,36 @@
               <void method="setProperty"> 
                <string>vAlign</string> 
                <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
+              </void> 
+             </object> 
+            </void> 
+            <void method="add"> 
+             <object class="com.jformdesigner.model.FormContainer"> 
+              <string>javax.swing.JPanel</string> 
+              <object class="com.jformdesigner.model.FormLayoutManager"> 
+               <class>com.jgoodies.forms.layout.FormLayout</class> 
+               <void method="setProperty"> 
+                <string>$columnSpecs</string> 
+                <string>default:grow</string> 
+               </void> 
+               <void method="setProperty"> 
+                <string>$rowSpecs</string> 
+                <string>default, linegap, default, linegap, default</string> 
+               </void> 
+              </object> 
+              <void property="name"> 
+               <string>pnlCalcMed</string> 
+              </void> 
+             </object> 
+             <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+              <class>com.jgoodies.forms.layout.CellConstraints</class> 
+              <void method="setProperty"> 
+               <string>gridX</string> 
+               <int>5</int> 
+              </void> 
+              <void method="setProperty"> 
+               <string>gridY</string> 
+               <int>11</int> 
               </void> 
              </object> 
             </void> 

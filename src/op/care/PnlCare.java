@@ -93,10 +93,6 @@ public class PnlCare extends NursingRecordsPanel {
             }
             jtpPflegeakte.setComponentAt(i, null);
         }
-
-        jtpPflegeakte.setEnabledAt(TAB_FILES, OPDE.isFTPworking());
-//        jtpPflegeakte.setEnabledAt(TAB_VORRAT, OPDE.isCalcMedi());
-
     }
 
     @Override
@@ -231,6 +227,9 @@ public class PnlCare extends NursingRecordsPanel {
         for (int i = 0; i < tabs.length; i++) {
             jtpPflegeakte.add(tabs[i], new JPanel());
         }
+        jtpPflegeakte.setEnabledAt(TAB_FILES, OPDE.isFTPworking());
+        jtpPflegeakte.setEnabledAt(TAB_VORRAT, OPDE.isCalcMediUPR1());
+
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables

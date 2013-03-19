@@ -60,9 +60,6 @@ public class OPDE {
     public static final int ERROR_TIME = 4;
     public static final int START_OF_MODULE_TIME = 6;
 
-    public static final boolean CALC_MEDI_APV1 = true;
-    public static final boolean CALC_MEDI_OTHER = true;
-
     public static long uptime;
     public static ResourceBundle lang;
 
@@ -128,12 +125,12 @@ public class OPDE {
     /**
      * @return zeigt an, ob die Medikamente gerechnet werden sollen oder nicht.
      */
-    public static boolean isCalcMediAPV1() {
-        return CALC_MEDI_APV1;
+    public static boolean isCalcMediUPR1() {
+        return SYSPropsTools.isBooleanTrue(SYSPropsTools.KEY_CALC_MEDI_APV1);
     }
 
     public static boolean isCalcMediOther() {
-        return CALC_MEDI_OTHER;
+        return false;
     }
 
     public static boolean isAnonym() {
