@@ -546,7 +546,7 @@ public class OPDE {
 
                 try {
                     em.getTransaction().begin();
-                    Users rootUser = em.find(Users.class, "root");
+                    Users rootUser = em.find(Users.class, "admin");
 
                     SYSLogin rootLogin = em.merge(new SYSLogin(rootUser));
                     OPDE.setLogin(rootLogin);
@@ -579,7 +579,7 @@ public class OPDE {
 
                 try {
                     em.getTransaction().begin();
-                    Users rootUser = em.find(Users.class, "root");
+                    Users rootUser = em.find(Users.class, "admin");
 
                     SYSLogin rootLogin = em.merge(new SYSLogin(rootUser));
                     OPDE.setLogin(rootLogin);

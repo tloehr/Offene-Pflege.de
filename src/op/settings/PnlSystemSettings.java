@@ -248,6 +248,10 @@ public class PnlSystemSettings extends CleanablePanel {
 
                 }
             }
+        } else {
+            cmbPhysicalPrinters.setEnabled(false);
+            cmbLogicalPrinters.setEnabled(false);
+            cmbPhysicalPrinters.setEnabled(false);
         }
 
         btnTestLabel.setEnabled(prservices != null);
