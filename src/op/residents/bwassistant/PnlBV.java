@@ -44,13 +44,6 @@ public class PnlBV extends JPanel {
     }
 
     private void cmbBVItemStateChanged(ItemEvent e) {
-        // TODO: hier gabs eine Exception. Siehe Mail vom 22.03. 10:40 Uhr
-        /*
-        execute	233	op.residents.bwassistant.AddBWWizard$PNPage$2	AddBWWizard.java
-        cmbBVItemStateChanged	47	op.residents.bwassistant.PnlBV	PnlBV.java
-        access$000	25	op.residents.bwassistant.PnlBV	PnlBV.java
-        itemStateChanged	64	op.residents.bwassistant.PnlBV$1	PnlBV.java
-         */
         validate.execute(cmbBV.getSelectedItem());
     }
 

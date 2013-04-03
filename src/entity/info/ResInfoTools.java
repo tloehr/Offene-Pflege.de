@@ -532,27 +532,12 @@ public class ResInfoTools {
 
         result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\">";
 
-        /***
-         *      _____ _            _      _     _
-         *     | ____(_)_ __  _ __(_) ___| |__ | |_ _   _ _ __   __ _
-         *     |  _| | | '_ \| '__| |/ __| '_ \| __| | | | '_ \ / _` |
-         *     | |___| | | | | |  | | (__| | | | |_| |_| | | | | (_| |
-         *     |_____|_|_| |_|_|  |_|\___|_| |_|\__|\__,_|_| |_|\__, |
-         *                                                      |___/
-         */
         if (withlongheader) {
             if (resident.getStation() != null) {
                 result += "<tr><td valign=\"top\">BewohnerIn wohnt im</td><td valign=\"top\"><b>" + HomesTools.getAsText(resident.getStation().getHome()) + "</b></td></tr>";
             }
         }
-        /***
-         *       ____     _   _  ___         ______               _      _     _      ______  __  __ ___
-         *      / ___|_ _(_)_(_)/ _ \ ___   / / ___| _____      _(_) ___| |__ | |_   / / __ )|  \/  |_ _|
-         *     | |  _| '__/ _ \| |/ // _ \ / / |  _ / _ \ \ /\ / / |/ __| '_ \| __| / /|  _ \| |\/| || |
-         *     | |_| | | | (_) | |\ \  __// /| |_| |  __/\ V  V /| | (__| | | | |_ / / | |_) | |  | || |
-         *      \____|_|  \___/| ||_/\___/_/  \____|\___| \_/\_/ |_|\___|_| |_|\__/_/  |____/|_|  |_|___|
-         *                     |_|
-         */
+
         ResValue weight = ResValueTools.getLast(resident, ResValueTypesTools.WEIGHT);
         result += "<tr><td valign=\"top\">Zuletzt bestimmtes Körpergewicht</td><td valign=\"top\"><b>";
         if (weight == null) {
@@ -580,14 +565,6 @@ public class ResInfoTools {
         }
         result += "</b></td></tr>";
 
-        /***
-         *      ____ _____
-         *     | __ )__  /
-         *     |  _ \ / /
-         *     | |_) / /_
-         *     |____/____|
-         *
-         */
         ResValue bz = ResValueTools.getLast(resident, ResValueTypesTools.GLUCOSE);
         result += "<tr><td valign=\"top\">Zuletzt gemessener BZ</td><td valign=\"top\"><b>";
         if (bz == null) {
@@ -597,14 +574,6 @@ public class ResInfoTools {
         }
         result += "</b></td></tr>";
 
-        /***
-         *      _   _    _   _   _ _____
-         *     | | | |  / \ | | | |  ___|
-         *     | |_| | / _ \| | | | |_
-         *     |  _  |/ ___ \ |_| |  _|
-         *     |_| |_/_/   \_\___/|_|
-         *
-         */
         ResInfo bwinfo_hauf = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
         if (bwinfo_hauf != null) {
             result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.movein") + "</td><td valign=\"top\">";
@@ -612,14 +581,6 @@ public class ResInfoTools {
             result += "</td></tr>";
         }
 
-        /***
-         *      ____  ____
-         *     |  _ \/ ___|
-         *     | |_) \___ \
-         *     |  __/ ___) |
-         *     |_|   |____/
-         *
-         */
         // TODO: "PSTF" ersetzen
         ResInfo bwinfo_pstf = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByID("PSTF"));
         if (bwinfo_pstf != null) {
@@ -627,14 +588,8 @@ public class ResInfoTools {
             result += bwinfo_pstf.getHtml();
             result += "</td></tr>";
         }
-        /***
-         *      _                     _    ____          _            _ _
-         *     | |    ___  __ _  __ _| |  / ___|   _ ___| |_ ___   __| (_) __ _ _ __
-         *     | |   / _ \/ _` |/ _` | | | |  | | | / __| __/ _ \ / _` | |/ _` | '_ \
-         *     | |__|  __/ (_| | (_| | | | |__| |_| \__ \ || (_) | (_| | | (_| | | | |
-         *     |_____\___|\__, |\__,_|_|  \____\__,_|___/\__\___/ \__,_|_|\__,_|_| |_|
-         *                |___/
-         */
+
+
         if (resident.getLCustodian1() != null) {
             result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.lc") + "</td><td valign=\"top\">";
             result += LCustodianTools.getFullName(resident.getLCustodian1());
@@ -642,34 +597,24 @@ public class ResInfoTools {
             if (!OPDE.isAnonym()) {
                 result += ", " + resident.getLCustodian1().getStrasse();
                 result += ", " + resident.getLCustodian1().getPlz() + " " + resident.getLCustodian1().getOrt();
-                result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + resident.getLCustodian1().getTel() + ", " + OPDE.lang.getString("misc.msg.mobilephone") + ": " + resident.getLCustodian1().getMobil();
+                result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + resident.getLCustodian1().getTel();
+
+                if (!SYSTools.catchNull(resident.getLCustodian1().getMobil()).isEmpty()) {
+                    result += ", " + OPDE.lang.getString("misc.msg.mobilephone") + ": " + resident.getLCustodian1().getMobil();
+                }
+
             }
 
             result += "</td></tr>";
         }
 
-        /***
-         *      ______     __
-         *     | __ ) \   / /
-         *     |  _ \\ \ / /
-         *     | |_) |\ V /
-         *     |____/  \_/
-         *
-         */
         if (resident.getPN1() != null) {
             result += "<tr id=\"fonttext\"><td valign=\"top\">" + OPDE.lang.getString("misc.msg.primaryNurse") + "</td><td valign=\"top\">";
             result += resident.getPN1().getFullname();
             result += "</td></tr>";
         }
 
-        /***
-         *         _                     _     _   _      _
-         *        / \   _ __   __ _  ___| |__ (_)_(_)_ __(_) __ _  ___
-         *       / _ \ | '_ \ / _` |/ _ \ '_ \ / _ \| '__| |/ _` |/ _ \
-         *      / ___ \| | | | (_| |  __/ | | | (_) | |  | | (_| |  __/
-         *     /_/   \_\_| |_|\__, |\___|_| |_|\___/|_|  |_|\__, |\___|
-         *                    |___/                         |___/
-         */
+
         // TODO: "ANGEH" ersetzen
         ResInfo bwinfo_angeh = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByID("ANGEH"));
         if (bwinfo_angeh != null) {

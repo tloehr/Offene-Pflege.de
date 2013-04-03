@@ -50,8 +50,6 @@ import java.awt.*;
 import java.io.*;
 import java.util.*;
 
-//import op.threads.BackgroundMonitor;
-
 public class OPDE {
     public static final String internalClassID = "opde";
 

@@ -53,15 +53,10 @@ public class PnlBWBasisInfo extends JPanel {
         gebdatum = null;
     }
 
-    private void jdcDOBPropertyChange(PropertyChangeEvent e) {
-
-    }
-
-
     private void check() {
         boolean complete = !vorname.isEmpty() && !nachname.isEmpty() && gebdatum != null;
         int geschlecht = cmbGender.getSelectedIndex() + 1;
-        Resident bewohner = null;
+        Resident resident = null;
         // Check if this resident has already been entered before.
         if (complete) {
             EntityManager em = OPDE.createEM();
@@ -73,12 +68,12 @@ public class PnlBWBasisInfo extends JPanel {
             if (query.getResultList().size() > 0) {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".alreadyexists"), DisplayMessage.WARNING));
             } else {
-                bewohner = new Resident(nachname, vorname, geschlecht, gebdatum);
+                resident = new Resident(nachname, vorname, geschlecht, gebdatum);
                 OPDE.getDisplayManager().clearSubMessages();
             }
             em.close();
         }
-        validate.execute(bewohner);
+        validate.execute(resident);
     }
 
     private void txtVornameFocusLost(FocusEvent e) {

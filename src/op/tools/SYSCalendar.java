@@ -417,7 +417,8 @@ public class SYSCalendar {
         }
         if (dt.isAfter(max)) {
             dt = new DateTime();
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.futuredate")));
+            DisplayMessage dm = new DisplayMessage(dt.isAfterNow() ? OPDE.lang.getString("misc.msg.futuredate") : OPDE.lang.getString("misc.msg.wrongdate"));
+            OPDE.getDisplayManager().addSubMessage(dm);
         }
         if (dt.isBefore(min)) {
             dt = new DateTime();

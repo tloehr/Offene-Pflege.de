@@ -75,6 +75,9 @@ public class Resident implements Serializable, Comparable<Resident> {
     @Basic(optional = false)
     @Column(name = "controlling")
     private String controlling;
+    @Basic(optional = false)
+    @Column(name = "calcmedi")
+    private Boolean calcMediUPR1;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "resident")
     private Collection<Allowance> allowance;
@@ -116,6 +119,7 @@ public class Resident implements Serializable, Comparable<Resident> {
         this.editor = OPDE.getLogin().getUser();
         this.adminonly = 0;
         this.controlling = null;
+        this.calcMediUPR1 = OPDE.isCalcMediUPR1();
     }
 
     public String getRIDAnonymous() {
@@ -124,6 +128,14 @@ public class Resident implements Serializable, Comparable<Resident> {
 
     public String getRID() {
         return rid;
+    }
+
+    public Boolean isCalcMediUPR1() {
+        return calcMediUPR1;
+    }
+
+    public void setCalcMediUPR1(Boolean calcMedi) {
+        this.calcMediUPR1 = calcMedi;
     }
 
     public void setRID(String rid) {

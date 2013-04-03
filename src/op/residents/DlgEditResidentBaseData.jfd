@@ -17,7 +17,7 @@
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
-        <string>13dlu, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, 13dlu</string> 
+        <string>13dlu, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, 13dlu</string> 
        </void> 
       </object> 
       <void method="add"> 
@@ -885,7 +885,7 @@
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>25</int> 
+         <int>27</int> 
         </void> 
         <void method="setProperty"> 
          <string>vAlign</string> 

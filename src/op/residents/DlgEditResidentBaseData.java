@@ -47,7 +47,7 @@ public class DlgEditResidentBaseData extends MyJDialog {
     private Resident resident;
     private Closure actionBlock;
     private boolean ignoreEvent = false;
-    private JToggleButton tbAdminOnly;
+    private JToggleButton tbAdminOnly, tbCalcMediUPR1;
     Date dob = null;
 
     public DlgEditResidentBaseData(Resident resident, Closure actionBlock) {
@@ -140,9 +140,14 @@ public class DlgEditResidentBaseData extends MyJDialog {
             }
         });
 
+        tbCalcMediUPR1 = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID+".tbCalcMediUPR1"));
+        tbCalcMediUPR1.setToolTipText(OPDE.lang.getString(internalClassID+".tooltip.tbCalcMediUPR1"));
+        tbCalcMediUPR1.setSelected(resident.isCalcMediUPR1());
+        add(tbCalcMediUPR1, CC.xywh(3, 23, 3, 1, CC.LEFT, CC.FILL));
+
         tbAdminOnly = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.msg.adminonly"));
         tbAdminOnly.setSelected(resident.getAdminonly() == 2);
-        add(tbAdminOnly, CC.xywh(3, 23, 3, 1, CC.LEFT, CC.FILL));
+        add(tbAdminOnly, CC.xywh(3, 25, 3, 1, CC.LEFT, CC.FILL));
     }
 
     private boolean saveOK() {
@@ -193,7 +198,7 @@ public class DlgEditResidentBaseData extends MyJDialog {
         resident.setPN2((Users) cmbPrimNurse2.getSelectedItem());
         resident.setRoom((Rooms) cmbRoom.getSelectedItem());
         resident.setStation((Station) cmbStation.getSelectedItem());
-
+        resident.setCalcMediUPR1(tbCalcMediUPR1.isSelected());
         resident.setAdminonly(tbAdminOnly.isSelected() ? ResidentTools.ADMINONLY : ResidentTools.NORMAL);
 
         dispose();
@@ -349,8 +354,8 @@ public class DlgEditResidentBaseData extends MyJDialog {
         //======== this ========
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "13dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default, $lcgap, 13dlu",
-                "13dlu, 12*($lgap, default), $lgap, 13dlu"));
+            "13dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default, $lcgap, 13dlu",
+            "13dlu, 13*($lgap, default), $lgap, 13dlu"));
 
         //---- lblName ----
         lblName.setText("text");
@@ -551,7 +556,7 @@ public class DlgEditResidentBaseData extends MyJDialog {
             });
             panel1.add(btnApply);
         }
-        contentPane.add(panel1, CC.xywh(5, 25, 3, 1, CC.RIGHT, CC.FILL));
+        contentPane.add(panel1, CC.xywh(5, 27, 3, 1, CC.RIGHT, CC.FILL));
         pack();
         setLocationRelativeTo(getOwner());
 

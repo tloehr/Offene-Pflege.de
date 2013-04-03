@@ -100,6 +100,7 @@ public class PnlCare extends NursingRecordsPanel {
         this.resident = EntityTools.find(Resident.class, res.getRID());
         GUITools.setResidentDisplay(resident);
         ((NursingRecordsPanel) jtpPflegeakte.getSelectedComponent()).switchResident(resident);
+        jtpPflegeakte.setEnabledAt(TAB_VORRAT, resident.isCalcMediUPR1());
     }
 
     @Override
@@ -228,8 +229,7 @@ public class PnlCare extends NursingRecordsPanel {
             jtpPflegeakte.add(tabs[i], new JPanel());
         }
         jtpPflegeakte.setEnabledAt(TAB_FILES, OPDE.isFTPworking());
-        jtpPflegeakte.setEnabledAt(TAB_VORRAT, OPDE.isCalcMediUPR1());
-
+        jtpPflegeakte.setEnabledAt(TAB_VORRAT, resident.isCalcMediUPR1());
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
