@@ -378,12 +378,12 @@ public class PnlSystemSettings extends CleanablePanel {
     private void createCalcMed() {
         lblCalcMed.setText(OPDE.lang.getString(internalClassID + ".global.calcmed"));
         tbCalcMed = GUITools.getNiceToggleButton(internalClassID+".global.tbCalcMed");
-        tbCalcMed.setSelected(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_CALC_MEDI_APV1)).equalsIgnoreCase("true"));
+        tbCalcMed.setSelected(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_CALC_MEDI_UPR1)).equalsIgnoreCase("true"));
         pnlCalcMed.add(tbCalcMed, CC.xy(1, 1));
         tbCalcMed.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                SYSPropsTools.storeProp(SYSPropsTools.KEY_CALC_MEDI_APV1, Boolean.toString(tbCalcMed.isSelected()));
+                SYSPropsTools.storeProp(SYSPropsTools.KEY_CALC_MEDI_UPR1, Boolean.toString(tbCalcMed.isSelected()));
             }
         });
     }
@@ -868,6 +868,7 @@ public class PnlSystemSettings extends CleanablePanel {
         tabMain = new JTabbedPane();
         pnlLocal = new JPanel();
         lblPrinters = new JLabel();
+        panel4 = new JPanel();
         lblStation = new JLabel();
         cmbPhysicalPrinters = new JComboBox();
         cmbStation = new JComboBox();
@@ -877,6 +878,8 @@ public class PnlSystemSettings extends CleanablePanel {
         panel1 = new JPanel();
         jspGlobal = new JScrollPane();
         pnlGlobal = new JPanel();
+        panel5 = new JPanel();
+        panel6 = new JPanel();
         lblHomes = new JLabel();
         lblICD = new JLabel();
         lblEMail = new JLabel();
@@ -906,6 +909,7 @@ public class PnlSystemSettings extends CleanablePanel {
         lblTLS = new JLabel();
         btnTestmail = new JButton();
         lblActive = new JLabel();
+        panel7 = new JPanel();
         lblCat = new JLabel();
         lblCalcMed = new JLabel();
         lblFTP = new JLabel();
@@ -943,7 +947,7 @@ public class PnlSystemSettings extends CleanablePanel {
             //======== pnlLocal ========
             {
                 pnlLocal.setLayout(new FormLayout(
-                    "default, 2*($lcgap, default:grow), $lcgap, default",
+                    "default, $lcgap, default:grow, $lcgap, default, $lcgap, default:grow, $lcgap, default",
                     "6*(default, $lgap), pref, $lgap, default, $lgap, 14dlu"));
 
                 //---- lblPrinters ----
@@ -951,10 +955,17 @@ public class PnlSystemSettings extends CleanablePanel {
                 lblPrinters.setFont(new Font("Arial", Font.BOLD, 18));
                 pnlLocal.add(lblPrinters, CC.xy(3, 3));
 
+                //======== panel4 ========
+                {
+                    panel4.setBackground(Color.gray);
+                    panel4.setLayout(new FlowLayout());
+                }
+                pnlLocal.add(panel4, CC.xywh(5, 1, 1, 17));
+
                 //---- lblStation ----
                 lblStation.setText("Default Station");
                 lblStation.setFont(new Font("Arial", Font.BOLD, 18));
-                pnlLocal.add(lblStation, CC.xy(5, 3));
+                pnlLocal.add(lblStation, CC.xy(7, 3));
 
                 //---- cmbPhysicalPrinters ----
                 cmbPhysicalPrinters.addItemListener(new ItemListener() {
@@ -972,7 +983,7 @@ public class PnlSystemSettings extends CleanablePanel {
                         cmbStationItemStateChanged(e);
                     }
                 });
-                pnlLocal.add(cmbStation, CC.xy(5, 5));
+                pnlLocal.add(cmbStation, CC.xy(7, 5));
 
                 //---- cmbLogicalPrinters ----
                 cmbLogicalPrinters.addItemListener(new ItemListener() {
@@ -1007,7 +1018,7 @@ public class PnlSystemSettings extends CleanablePanel {
                 {
                     panel1.setLayout(new BoxLayout(panel1, BoxLayout.LINE_AXIS));
                 }
-                pnlLocal.add(panel1, CC.xywh(3, 15, 3, 1, CC.RIGHT, CC.DEFAULT));
+                pnlLocal.add(panel1, CC.xywh(3, 15, 5, 1, CC.RIGHT, CC.DEFAULT));
             }
             tabMain.addTab("text", pnlLocal);
 
@@ -1018,8 +1029,22 @@ public class PnlSystemSettings extends CleanablePanel {
                 //======== pnlGlobal ========
                 {
                     pnlGlobal.setLayout(new FormLayout(
-                        "default, $lcgap, 2*(default:grow, $ugap), default:grow, 2*($lcgap, default)",
-                        "default, $lgap, pref, $lgap, fill:default:grow, $lgap, $ugap, $lgap, default, $lgap, fill:default:grow, 2*($lgap, default)"));
+                        "default, $lcgap, default:grow, $lcgap, default, $ugap, default:grow, $lcgap, default, $ugap, default:grow, 2*($lcgap, default)",
+                        "default, $lgap, pref, $lgap, fill:default:grow, 2*($lgap), 2*(default, $lgap), fill:default:grow, 2*($lgap, default)"));
+
+                    //======== panel5 ========
+                    {
+                        panel5.setBackground(Color.gray);
+                        panel5.setLayout(new FlowLayout());
+                    }
+                    pnlGlobal.add(panel5, CC.xywh(5, 1, 1, 16));
+
+                    //======== panel6 ========
+                    {
+                        panel6.setBackground(Color.gray);
+                        panel6.setLayout(new FlowLayout());
+                    }
+                    pnlGlobal.add(panel6, CC.xywh(9, 1, 1, 16));
 
                     //---- lblHomes ----
                     lblHomes.setText("Homes");
@@ -1029,12 +1054,12 @@ public class PnlSystemSettings extends CleanablePanel {
                     //---- lblICD ----
                     lblICD.setText("ICD");
                     lblICD.setFont(new Font("Arial", Font.BOLD, 18));
-                    pnlGlobal.add(lblICD, CC.xy(5, 3));
+                    pnlGlobal.add(lblICD, CC.xy(7, 3));
 
                     //---- lblEMail ----
                     lblEMail.setText("E-Mail System");
                     lblEMail.setFont(new Font("Arial", Font.BOLD, 18));
-                    pnlGlobal.add(lblEMail, CC.xy(7, 3));
+                    pnlGlobal.add(lblEMail, CC.xy(11, 3));
 
                     //======== jspHomeStation ========
                     {
@@ -1063,7 +1088,7 @@ public class PnlSystemSettings extends CleanablePanel {
                         });
                         pnlICD.add(btnImportICD, CC.xy(1, 3, CC.LEFT, CC.DEFAULT));
                     }
-                    pnlGlobal.add(pnlICD, CC.xy(5, 5));
+                    pnlGlobal.add(pnlICD, CC.xy(7, 5));
 
                     //======== pnlMail ========
                     {
@@ -1137,22 +1162,29 @@ public class PnlSystemSettings extends CleanablePanel {
                         lblActive.setText("active");
                         pnlMail.add(lblActive, CC.xy(1, 25));
                     }
-                    pnlGlobal.add(pnlMail, CC.xy(7, 5));
+                    pnlGlobal.add(pnlMail, CC.xy(11, 5));
+
+                    //======== panel7 ========
+                    {
+                        panel7.setBackground(Color.gray);
+                        panel7.setLayout(new FlowLayout());
+                    }
+                    pnlGlobal.add(panel7, CC.xywh(3, 8, 9, 1));
 
                     //---- lblCat ----
                     lblCat.setText("ResInfoCat");
                     lblCat.setFont(new Font("Arial", Font.BOLD, 18));
-                    pnlGlobal.add(lblCat, CC.xy(3, 9));
+                    pnlGlobal.add(lblCat, CC.xy(3, 10));
 
                     //---- lblCalcMed ----
                     lblCalcMed.setText("ResInfoCat");
                     lblCalcMed.setFont(new Font("Arial", Font.BOLD, 18));
-                    pnlGlobal.add(lblCalcMed, CC.xy(5, 9));
+                    pnlGlobal.add(lblCalcMed, CC.xy(7, 10));
 
                     //---- lblFTP ----
                     lblFTP.setText("FTP System");
                     lblFTP.setFont(new Font("Arial", Font.BOLD, 18));
-                    pnlGlobal.add(lblFTP, CC.xy(7, 9));
+                    pnlGlobal.add(lblFTP, CC.xy(11, 10));
 
                     //======== jspCat ========
                     {
@@ -1168,7 +1200,7 @@ public class PnlSystemSettings extends CleanablePanel {
                         });
                         jspCat.setViewportView(lstCat);
                     }
-                    pnlGlobal.add(jspCat, CC.xy(3, 11, CC.FILL, CC.FILL));
+                    pnlGlobal.add(jspCat, CC.xy(3, 12, CC.FILL, CC.FILL));
 
                     //======== pnlCalcMed ========
                     {
@@ -1176,7 +1208,7 @@ public class PnlSystemSettings extends CleanablePanel {
                             "default:grow",
                             "2*(default, $lgap), default"));
                     }
-                    pnlGlobal.add(pnlCalcMed, CC.xy(5, 11));
+                    pnlGlobal.add(pnlCalcMed, CC.xy(7, 12));
 
                     //======== panel3 ========
                     {
@@ -1219,7 +1251,7 @@ public class PnlSystemSettings extends CleanablePanel {
                         });
                         panel3.add(btnFTPTest, CC.xywh(1, 11, 3, 1, CC.LEFT, CC.DEFAULT));
                     }
-                    pnlGlobal.add(panel3, CC.xy(7, 11));
+                    pnlGlobal.add(panel3, CC.xy(11, 12));
 
                     //======== panel2 ========
                     {
@@ -1249,7 +1281,7 @@ public class PnlSystemSettings extends CleanablePanel {
                         btnDeleteCat.setEnabled(false);
                         panel2.add(btnDeleteCat);
                     }
-                    pnlGlobal.add(panel2, CC.xy(3, 13));
+                    pnlGlobal.add(panel2, CC.xy(3, 14));
                 }
                 jspGlobal.setViewportView(pnlGlobal);
             }
@@ -1295,6 +1327,7 @@ public class PnlSystemSettings extends CleanablePanel {
     private JTabbedPane tabMain;
     private JPanel pnlLocal;
     private JLabel lblPrinters;
+    private JPanel panel4;
     private JLabel lblStation;
     private JComboBox cmbPhysicalPrinters;
     private JComboBox cmbStation;
@@ -1304,6 +1337,8 @@ public class PnlSystemSettings extends CleanablePanel {
     private JPanel panel1;
     private JScrollPane jspGlobal;
     private JPanel pnlGlobal;
+    private JPanel panel5;
+    private JPanel panel6;
     private JLabel lblHomes;
     private JLabel lblICD;
     private JLabel lblEMail;
@@ -1333,6 +1368,7 @@ public class PnlSystemSettings extends CleanablePanel {
     private JLabel lblTLS;
     private JButton btnTestmail;
     private JLabel lblActive;
+    private JPanel panel7;
     private JLabel lblCat;
     private JLabel lblCalcMed;
     private JLabel lblFTP;

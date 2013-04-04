@@ -46,7 +46,7 @@ public class SYSPropsTools {
     public static final String KEY_FTP_PORT = "FTPPort";
     public static final String KEY_FTP_IS_WORKING = "FTPIsWorking";
     public static final String BHP_MAX_MINUTES_TO_WITHDRAW ="bhp_max_minutes_to_withdraw";
-    public static final String KEY_CALC_MEDI_APV1 = "calc.medi.apv1";
+    public static final String KEY_CALC_MEDI_UPR1 = "calc.medi.upr1";
     public static final String KEY_CALC_MEDI_OTHER = "calc.medi.other"; // yet unused
 
     public static void storeProp(EntityManager em, String key, String value, Users user) throws Exception {

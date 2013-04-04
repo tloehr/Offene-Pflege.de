@@ -48,6 +48,7 @@ public class HandoversTools {
         return OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(bericht.getPit())] + "_FGBHP");
     }
 
+
     /**
      * retrieves all NReports for a certain day which have been assigned with the Tags Nr. 1 (Handover) and Nr. 2 (Emergency)
      *
@@ -57,6 +58,17 @@ public class HandoversTools {
     public static ArrayList<Handovers> getBy(DateMidnight day, Homes home) {
         DateTime from = day.toDateTime();
         DateTime to = day.plusDays(1).toDateTime().minusSeconds(1);
+        return getBy(from, to, home);
+    }
+
+    public static ArrayList<Handovers> getBy(int year, Homes home) {
+        DateTime dtYear = new DateTime(year, 1, 1, 0, 0);
+        DateTime from = dtYear.dayOfYear().withMinimumValue().secondOfDay().withMinimumValue();
+        DateTime to = dtYear.dayOfYear().withMaximumValue().secondOfDay().withMaximumValue();
+        return getBy(from, to, home);
+    }
+
+    public static ArrayList<Handovers> getBy(DateTime from, DateTime to, Homes home) {
         EntityManager em = OPDE.createEM();
         ArrayList<Handovers> list = null;
 
@@ -266,7 +278,7 @@ public class HandoversTools {
                             htmlul2 += "<li>" + inventory.getText() + ": <b>";
                             htmlul2 += (stock == null ?
                                     OPDE.lang.getString(PnlInventory.internalClassID + ".noOpenStock") :
-                                    "["+stock.getID()+"] "+OPDE.lang.getString(PnlInventory.internalClassID + ".StockSum") + " " + stockSum.setScale(2, BigDecimal.ROUND_HALF_UP) + " " + TradeFormTools.getPackUnit(stock.getTradeForm()));
+                                    "[" + stock.getID() + "] " + OPDE.lang.getString(PnlInventory.internalClassID + ".StockSum") + " " + stockSum.setScale(2, BigDecimal.ROUND_HALF_UP) + " " + TradeFormTools.getPackUnit(stock.getTradeForm()));
                             htmlul2 += "</b></li>";
                         }
                     }
@@ -291,7 +303,7 @@ public class HandoversTools {
                 mapAbsentSince.clear();
                 bhpStats.clear();
                 SYSFilesTools.print(html, false);
-                if (afterAction != null){
+                if (afterAction != null) {
                     afterAction.execute(null);
                 }
             }

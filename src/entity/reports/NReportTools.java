@@ -305,7 +305,19 @@ public class NReportTools {
             for (QProcessElement report : reports) {
                 String dateAndUser = (report instanceof NReport ? NReportTools.getDateAndUser((NReport) report, false, false) : HandoversTools.getDateAndUser((Handovers) report, false));
                 String resident = (report instanceof NReport ? ResidentTools.getFullName(report.getResident()) : "--");
-                String text = (report instanceof NReport ? NReportTools.getAsHTML((NReport) report, highlight) : SYSTools.replace(((Handovers) report).getText(), highlight, "<font style=\"BACKGROUND-COLOR: yellow\">" + highlight + "</font>", true));
+
+
+                String text;
+                if (report instanceof NReport) {
+                    text = NReportTools.getAsHTML((NReport) report, highlight);
+                } else {
+                    if (!SYSTools.catchNull(highlight).isEmpty()) {
+                        text = SYSTools.replace(((Handovers) report).getText(), highlight, "<font style=\"BACKGROUND-COLOR: yellow\">" + highlight + "</font>", true);
+                    } else {
+                        text = ((Handovers) report).getText();
+                    }
+                }
+
                 table += SYSConst.html_table_tr(
                         SYSConst.html_table_td(dateAndUser) +
                                 SYSConst.html_table_td(resident) +

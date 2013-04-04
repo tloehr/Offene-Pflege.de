@@ -89,7 +89,7 @@ public class PnlHandover extends NursingRecordsPanel {
     HashMap<DateMidnight, String> hollidays;
     private JComboBox cmbHomes;
     private JToggleButton tbResidentFirst;
-
+    private Comparator myComparator;
 
     Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
     Format dayFormat = new SimpleDateFormat("EEEE, dd.MM.yyyy");
@@ -123,6 +123,22 @@ public class PnlHandover extends NursingRecordsPanel {
     }
 
     private void initPanel() {
+
+        myComparator = new Comparator<NReport>() {
+            @Override
+            public int compare(NReport o1, NReport o2) {
+                if (!tbResidentFirst.isSelected()) {
+                    return o1.getPit().compareTo(o2.getPit());
+                } else {
+                    int comp = o1.getResident().getRID().compareTo(o2.getResident().getRID());
+                    if (comp == 0) {
+                        comp = o1.getPit().compareTo(o2.getPit());
+                    }
+                    return comp;
+                }
+            }
+        };
+
         contentmap = new HashMap<String, JPanel>();
         cpMap = new HashMap<String, CollapsiblePane>();
         linemapNR = new HashMap<NReport, JPanel>();
@@ -457,7 +473,7 @@ public class PnlHandover extends NursingRecordsPanel {
             }
         }
         final CollapsiblePane cpDay = cpMap.get(key);
-        if (hollidays == null){
+        if (hollidays == null) {
             hollidays = SYSCalendar.getHollidays(day.getYear(), day.getYear());
         }
         String titleDay = "<html><font size=+1>" +
@@ -516,7 +532,7 @@ public class PnlHandover extends NursingRecordsPanel {
                                 contentmap.remove(keyDay);
                             }
                         }
-                        Collections.sort(cacheNR.get(key));
+                        Collections.sort(cacheNR.get(key), myComparator);
                     }
                     em.getTransaction().commit();
                     createCP4Day(day);
@@ -598,20 +614,7 @@ public class PnlHandover extends NursingRecordsPanel {
                     }
                     if (!cacheNR.containsKey(key)) {
                         cacheNR.put(key, NReportTools.getNReports4Handover(day, (Homes) cmbHomes.getSelectedItem()));
-                        Collections.sort(cacheNR.get(key), new Comparator<NReport>() {
-                            @Override
-                            public int compare(NReport o1, NReport o2) {
-                                if (!tbResidentFirst.isSelected()) {
-                                    return o1.getPit().compareTo(o2.getPit());
-                                } else {
-                                    int comp = o1.getResident().getRID().compareTo(o2.getResident().getRID());
-                                    if (comp == 0) {
-                                        comp = o1.getPit().compareTo(o2.getPit());
-                                    }
-                                    return comp;
-                                }
-                            }
-                        });
+                        Collections.sort(cacheNR.get(key), myComparator);
                     }
 
                     int max = cacheHO.get(key).size() + cacheNR.get(key).size();
@@ -745,7 +748,7 @@ public class PnlHandover extends NursingRecordsPanel {
 
                                         cacheNR.get(key).remove(nreport);
                                         cacheNR.get(key).add(myNR);
-                                        Collections.sort(cacheNR.get(key));
+                                        Collections.sort(cacheNR.get(key), myComparator);
                                         linemapNR.remove(nreport);
                                         final String keyDay = DateFormat.getDateInstance().format(nreport.getPit());
                                         contentmap.remove(keyDay);
@@ -958,16 +961,14 @@ public class PnlHandover extends NursingRecordsPanel {
 
         Pair<DateTime, DateTime> minmax = NReportTools.getMinMax();
         if (minmax != null) {
-
-
             final DefaultComboBoxModel yearModel = new DefaultComboBoxModel();
             for (int year = new DateMidnight().getYear(); year >= minmax.getFirst().getYear(); year--) {
                 yearModel.addElement(year);
             }
 
-            JPanel myPanel = new JPanel();
-            myPanel.setLayout(new BoxLayout(myPanel, BoxLayout.LINE_AXIS));
-
+            JPanel innerPanel = new JPanel();
+            innerPanel.setOpaque(false);
+            innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.PAGE_AXIS));
             txtSearch = new JXSearchField(OPDE.lang.getString("misc.msg.searchphrase"));
             txtSearch.setInstantSearchDelay(100000);
             txtSearch.setFont(SYSConst.ARIAL14);
@@ -979,7 +980,16 @@ public class PnlHandover extends NursingRecordsPanel {
                     }
                 }
             });
-            myPanel.add(txtSearch);
+            innerPanel.add(txtSearch);
+            JButton btnSearchGeneralReports = GUITools.createHyperlinkButton(internalClassID+".searchHandovers", null, null);
+            btnSearchGeneralReports.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    List listHandovers = HandoversTools.getBy(Integer.parseInt(yearModel.getSelectedItem().toString()), (Homes) cmbHomes.getSelectedItem());
+                    SYSFilesTools.print(NReportTools.getReportsAndHandoversAsHTML(listHandovers, "", Integer.parseInt(yearModel.getSelectedItem().toString())), false);
+                }
+            });
+            innerPanel.add(btnSearchGeneralReports);
             yearCombo = new JXComboBox(yearModel);
             yearCombo.addItemListener(new ItemListener() {
                 @Override
@@ -987,6 +997,11 @@ public class PnlHandover extends NursingRecordsPanel {
                     txtSearch.postActionEvent();
                 }
             });
+
+            JPanel myPanel = new JPanel();
+            myPanel.setOpaque(false);
+            myPanel.setLayout(new BoxLayout(myPanel, BoxLayout.LINE_AXIS));
+            myPanel.add(innerPanel);
             myPanel.add(yearCombo);
             list.add(myPanel);
         }

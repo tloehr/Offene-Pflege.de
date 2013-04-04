@@ -36,7 +36,6 @@ import op.system.EMailSystem;
 import op.system.FrmInit;
 import op.system.LogicalPrinters;
 import op.threads.DisplayManager;
-import op.threads.DisplayMessage;
 import op.threads.PrintProcessor;
 import op.tools.*;
 import org.apache.commons.cli.*;
@@ -124,7 +123,7 @@ public class OPDE {
      * @return zeigt an, ob die Medikamente gerechnet werden sollen oder nicht.
      */
     public static boolean isCalcMediUPR1() {
-        return SYSPropsTools.isBooleanTrue(SYSPropsTools.KEY_CALC_MEDI_APV1);
+        return SYSPropsTools.isBooleanTrue(SYSPropsTools.KEY_CALC_MEDI_UPR1);
     }
 
     public static boolean isCalcMediOther() {

@@ -653,7 +653,7 @@ public class SYSTools {
     }
 
     public static String catchNull(String in) {
-        return (in == null ? "" : in);
+        return (in == null ? "" : in.trim());
     }
 
     /**
