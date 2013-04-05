@@ -418,9 +418,14 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
             result += "</table>\n";
 
         } else {
-            result += SYSConst.html_bold(df.format(from)) + "&nbsp;&raquo;&raquo;" +
-                    "<br/>" +
-                    userON.getFullname();
+
+            if (to.before(SYSConst.DATE_UNTIL_FURTHER_NOTICE)) {
+                result += SYSConst.html_bold(df.format(from)) + "&nbsp;&raquo;&nbsp;" + SYSConst.html_bold(df.format(to));
+            } else {
+                result += SYSConst.html_bold(df.format(from)) + "&nbsp;&raquo;&raquo;";
+            }
+
+            result += "<br/>" + userON.getFullname();
             if (docON != null) {
                 result += "<br/>";
                 result += DocTools.getFullName(docON);

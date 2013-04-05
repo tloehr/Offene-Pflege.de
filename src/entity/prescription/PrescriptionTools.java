@@ -10,6 +10,7 @@ import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
+import op.care.prescription.PnlPrescription;
 import op.threads.DisplayMessage;
 import op.tools.HTMLTools;
 import op.tools.SYSConst;
@@ -66,8 +67,8 @@ public class PrescriptionTools {
                     " FROM prescription v " +
                     " INNER JOIN resident bw ON v.BWKennung = bw.BWKennung  " +
                     " INNER JOIN intervention Ms ON Ms.MassID = v.MassID " +
+                    " INNER JOIN pschedule bhp ON bhp.VerID = v.VerID " +
                     " LEFT OUTER JOIN tradeform D ON v.DafID = D.DafID " +
-                    " LEFT OUTER JOIN pschedule bhp ON bhp.VerID = v.VerID " +
                     " LEFT OUTER JOIN medproducts M ON M.MedPID = D.MedPID " +
                     " LEFT OUTER JOIN dosageform F ON D.FormID = F.FormID " +
                     " LEFT OUTER JOIN ( " +
@@ -78,7 +79,7 @@ public class PrescriptionTools {
                     " LEFT OUTER JOIN medinventory vor ON vor.VorID = vorr.VorID" +
                     " LEFT OUTER JOIN medstock best ON best.VorID = vor.VorID" +
                     " WHERE bw.adminonly <> 2 " +
-                    " AND v.AnDatum < now() AND v.AbDatum > now() AND v.SitID IS NULL AND (v.DafID IS NOT NULL OR v.Stellplan IS TRUE) " +
+                    " AND v.AnDatum < now() AND v.AbDatum > now() AND Date(bhp.LDatum) <= Date(now()) AND v.SitID IS NULL AND (v.DafID IS NOT NULL OR v.Stellplan IS TRUE) " +
                     " AND bw.StatID = ? AND ((best.Aus = '9999-12-31 23:59:59' AND best.Anbruch < '9999-12-31 23:59:59') OR (v.DafID IS NULL)) " +
                     " ORDER BY CONCAT(bw.nachname,bw.vorname), bw.BWKennung, v.DafID IS NOT NULL, bhp.Uhrzeit, F.Stellplan, CONCAT( M.Bezeichnung, Ms.Bezeichnung)");
             query.setParameter(1, station.getStatID());
@@ -177,7 +178,7 @@ public class PrescriptionTools {
                     if (schedule.usesTime()) {
                         html += "<td colspan=\"6\" align=\"center\">";
 
-                        html += "<b><u>" + DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getUhrzeit()) + " Uhr</u></b> ";
+                        html += "<b><u>" + DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getUhrzeit()) + " " + OPDE.lang.getString("misc.msg.Time.short") + "</u></b> ";
                         html += HTMLTools.printDouble(schedule.getUhrzeitDosis());
                         html += schedule.getPrescription().hasMed() ? " " + SYSConst.UNITS[schedule.getPrescription().getTradeForm().getDosageForm().getUsageUnit()] : "x";
 
@@ -191,7 +192,11 @@ public class PrescriptionTools {
                         html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(schedule.getAbends()) + "</td>\n";
                         html += "<td width=\"25\" align=\"center\">" + HTMLTools.printDouble(schedule.getNachtAb()) + "</td>\n";
                     }
-                    html += "<td width=\"300\" >" + PrescriptionScheduleTools.getRemark(schedule) + "</td>\n";
+                    html += "<td width=\"300\" >" + PrescriptionScheduleTools.getRemark(schedule);
+                    if (prescription.getTo().before(SYSConst.DATE_UNTIL_FURTHER_NOTICE)) {
+                        html += "<br/><b>" + OPDE.lang.getString(PnlPrescription.internalClassID + ".endsAtChrono") + ": " + DateFormat.getDateInstance().format(prescription.getTo()) + "</b>";
+                    }
+                    html += "</td>\n";
                     html += "</tr>\n\n";
                     elementNumber += 1;
 
@@ -412,7 +417,7 @@ public class PrescriptionTools {
                 result += "</table>";
             }
         } else {
-            result += "<i>Noch keine Dosierung / Anwendungsinformationen verfügbar</i><br/>";
+            result += "<i>" + OPDE.lang.getString(PnlPrescription.internalClassID + ".noDosageYet") + "</i><br/>";
         }
 
         result += showInventory ? getInventoryInformationAsHTML(prescription) : "";
@@ -539,9 +544,10 @@ public class PrescriptionTools {
         EntityManager em = OPDE.createEM();
 
         ArrayList<Prescription> result = null;
-        Query query = em.createQuery(" SELECT p FROM Prescription p WHERE p.resident = :resident AND p.to = :tfn");
+        Query query = em.createQuery(" SELECT p FROM Prescription p WHERE p.resident = :resident AND p.to >= :now");
         query.setParameter("resident", resident);
-        query.setParameter("tfn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+        query.setParameter("now", new Date());
+//        query.setParameter("tfn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
         result = new ArrayList<Prescription>(query.getResultList());
 
         em.close();
@@ -573,9 +579,6 @@ public class PrescriptionTools {
         return getPrescriptionsAsHTML(single, withheader, withlongheader, withmed, true, withIcon);
     }
 
-    /**
-     * Gibt eine HTML Darstellung der Verordungen zurück, die in dem übergebenen TableModel enthalten sind.
-     */
     public static String getPrescriptionsAsHTML(List<Prescription> list, boolean withheader, boolean withlongheader, boolean withmed, boolean withDiscontinued, boolean withIcon) {
         String result = "";
 
@@ -639,7 +642,7 @@ public class PrescriptionTools {
             myPretty = verordnung.getIntervention().getBezeichnung();
         }
 
-        myPretty += verordnung.isOnDemand() ? " (Nur bei Bedarf: " + verordnung.getSituation().getText() + ")" : "";
+        myPretty += verordnung.isOnDemand() ? " (" + OPDE.lang.getString("misc.msg.ondemand") + ": " + verordnung.getSituation().getText() + ")" : "";
 
         return myPretty;
     }

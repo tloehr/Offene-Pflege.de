@@ -1,6 +1,7 @@
 package entity.prescription;
 
 import op.OPDE;
+import op.care.prescription.PnlPrescription;
 import op.tools.HTMLTools;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
@@ -40,102 +41,102 @@ public class PrescriptionScheduleTools {
     }
 
     /**
-     * @param planung       um die es geht
+     * @param schedule      um die es geht
      * @param writeTaeglich hiermit kann man festlegen, ob bei den Dosierungen, die jeden Tag gegeben werden sollen, das Wort <i>täglich</i> in die Wiederholungsspalte geschrieben wird oder nicht.
      * @return
      */
-    public static String getRepeatPattern(PrescriptionSchedule planung, boolean writeTaeglich) {
+    public static String getRepeatPattern(PrescriptionSchedule schedule, boolean writeTaeglich) {
         String result = "";
 
-        if (planung.isTaeglich()) {
-            if (planung.getTaeglich() > 1) {
-                result += "<b>alle " + planung.getTaeglich() + " Tage</b>";
+        if (schedule.isTaeglich()) {
+            if (schedule.getTaeglich() > 1) {
+                result += "<b>" + OPDE.lang.getString("misc.msg.every") + " " + schedule.getTaeglich() + " " + OPDE.lang.getString("misc.msg.Days2") + "</b>";
             } else if (writeTaeglich) {
-                result += "<b>täglich</b>";
+                result += "<b>" + OPDE.lang.getString("misc.msg.daily") + "</b>";
             }
-        } else if (planung.isWoechentlich()) {
+        } else if (schedule.isWoechentlich()) {
             result += "<b>";
-            if (planung.getWoechentlich() == 1) {
-                result += "jede Woche ";
+            if (schedule.getWoechentlich() == 1) {
+                result += OPDE.lang.getString("misc.msg.everyWeek") + " ";
             } else {
-                result += "alle " + planung.getWoechentlich() + " Wochen ";
+                result += OPDE.lang.getString("misc.msg.every") + " " + schedule.getWoechentlich() + " " + OPDE.lang.getString("misc.msg.weeks") + " ";
             }
 
             String daylist = "";
 
-            daylist += (planung.getMon() > 0 ? OPDE.lang.getString("misc.msg.monday").substring(0, 3) + ", " : "");
-            daylist += (planung.getTue() > 0 ? OPDE.lang.getString("misc.msg.tuesday").substring(0, 3) + ", " : "");
-            daylist += (planung.getWed() > 0 ? OPDE.lang.getString("misc.msg.wednesday").substring(0, 3) + ", " : "");
-            daylist += (planung.getThu() > 0 ? OPDE.lang.getString("misc.msg.thursday").substring(0, 3) + ", " : "");
-            daylist += (planung.getFri() > 0 ? OPDE.lang.getString("misc.msg.friday").substring(0, 3) + ", " : "");
-            daylist += (planung.getSat() > 0 ? OPDE.lang.getString("misc.msg.saturday").substring(0, 3) + ", " : "");
-            daylist += (planung.getSun() > 0 ? OPDE.lang.getString("misc.msg.sunday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getMon() > 0 ? OPDE.lang.getString("misc.msg.monday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getTue() > 0 ? OPDE.lang.getString("misc.msg.tuesday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getWed() > 0 ? OPDE.lang.getString("misc.msg.wednesday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getThu() > 0 ? OPDE.lang.getString("misc.msg.thursday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getFri() > 0 ? OPDE.lang.getString("misc.msg.friday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getSat() > 0 ? OPDE.lang.getString("misc.msg.saturday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getSun() > 0 ? OPDE.lang.getString("misc.msg.sunday").substring(0, 3) + ", " : "");
 
             if (!daylist.isEmpty()) {
                 result += "{" + daylist.substring(0, daylist.length() - 2) + "}";
             }
 
             result += "</b>";
-        } else if (planung.isMonatlich()) {
+        } else if (schedule.isMonatlich()) {
             result += "<b>";
-            if (planung.getMonatlich() == 1) {
-                result += "jeden Monat ";
+            if (schedule.getMonatlich() == 1) {
+                result += OPDE.lang.getString("misc.msg.everyMonth") + " ";
             } else {
-                result += "alle " + planung.getMonatlich() + " Monate ";
+                result += OPDE.lang.getString("misc.msg.every") + " " + schedule.getMonatlich() + " " + OPDE.lang.getString("misc.msg.months") + " ";
             }
 
-            if (planung.getTagNum() > 0) {
-                result += "am " + planung.getTagNum() + ". des Monats";
+            if (schedule.getTagNum() > 0) {
+                result += OPDE.lang.getString("misc.msg.atchrono") + " " + schedule.getTagNum() + ". " + OPDE.lang.getString("misc.msg.ofTheMonth");
             } else {
                 int wtag = 0;
                 String tag = "";
 
                 // In diesem fall kann immer nur ein Wochentag >0 sein. Daher klappt das so.
-                tag += (planung.getMon() > 0 ? OPDE.lang.getString("misc.msg.monday") : "");
-                tag += (planung.getTue() > 0 ? OPDE.lang.getString("misc.msg.tuesday") : "");
-                tag += (planung.getWed() > 0 ? OPDE.lang.getString("misc.msg.wednesday") : "");
-                tag += (planung.getThu() > 0 ? OPDE.lang.getString("misc.msg.thursday") : "");
-                tag += (planung.getFri() > 0 ? OPDE.lang.getString("misc.msg.friday") : "");
-                tag += (planung.getSat() > 0 ? OPDE.lang.getString("misc.msg.saturday") : "");
-                tag += (planung.getSun() > 0 ? OPDE.lang.getString("misc.msg.sunday") : "");
+                tag += (schedule.getMon() > 0 ? OPDE.lang.getString("misc.msg.monday") : "");
+                tag += (schedule.getTue() > 0 ? OPDE.lang.getString("misc.msg.tuesday") : "");
+                tag += (schedule.getWed() > 0 ? OPDE.lang.getString("misc.msg.wednesday") : "");
+                tag += (schedule.getThu() > 0 ? OPDE.lang.getString("misc.msg.thursday") : "");
+                tag += (schedule.getFri() > 0 ? OPDE.lang.getString("misc.msg.friday") : "");
+                tag += (schedule.getSat() > 0 ? OPDE.lang.getString("misc.msg.saturday") : "");
+                tag += (schedule.getSun() > 0 ? OPDE.lang.getString("misc.msg.sunday") : "");
 
-                wtag += planung.getMon();
-                wtag += planung.getTue();
-                wtag += planung.getWed();
-                wtag += planung.getThu();
-                wtag += planung.getFri();
-                wtag += planung.getSat();
-                wtag += planung.getSun();
+                wtag += schedule.getMon();
+                wtag += schedule.getTue();
+                wtag += schedule.getWed();
+                wtag += schedule.getThu();
+                wtag += schedule.getFri();
+                wtag += schedule.getSat();
+                wtag += schedule.getSun();
 
-                result += "am " + wtag + ". " + tag + " des Monats";
+                result += OPDE.lang.getString("misc.msg.atchrono") + " " + wtag + ". " + tag + " " + OPDE.lang.getString("misc.msg.ofTheMonth");
             }
             result += "</b>";
         } else {
             result = "";
         }
 
-        if (planung.getTaeglich() != 1) { // Wenn nicht jeden Tag, dann das letzte mal anzeigen.
-            DateFormat df = DateFormat.getDateInstance();
-            if (SYSCalendar.isInFuture(planung.getLDatum().getTime())) {
-                result += "<br/>erste Anwendung am: ";
-            } else {
-                result += "<br/>Zuletzt eingeplant: ";
+        DateFormat df = DateFormat.getDateInstance();
+        if (SYSCalendar.isInFuture(schedule.getLDatum().getTime())) {
+            result += "<br/><font color=\"red\">" + OPDE.lang.getString(PnlPrescription.internalClassID + ".firstApplication") + ": " + df.format(schedule.getLDatum())+"</font>";
+        } else {
+            if (schedule.getTaeglich() != 1) { // Wenn nicht jeden Tag, dann das letzte mal anzeigen.
+                result += "<br/>" + OPDE.lang.getString(PnlPrescription.internalClassID + ".mostRecentApplication") + ": ";
+                result += df.format(schedule.getLDatum());
             }
-            result += df.format(planung.getLDatum());
         }
 
         return result.isEmpty() ? "" : "<div id=\"fonttext\">" + result + "</div>";
     }
 
-    public static String getDoseAsHTML(PrescriptionSchedule planung, PrescriptionSchedule vorherigePlanung, boolean singleUsageOnly) {
+    public static String getDoseAsHTML(PrescriptionSchedule schedule, PrescriptionSchedule vorherigePlanung, boolean singleUsageOnly) {
         String result = "<div id=\"fonttext\">";
 
         // Wenn die vorherige Planung null ist, dann muss das hier der De erste durchlauf sein
         // gleichzeitig brauchen wir einen Header dann, wenn der Status sich unterscheidet.
         // Sagen wir, dass vorher eine Verordnungn nach früh, spät, nacht usw. war
         // und jetzt eine Uhrzeit kommt. Dann ändert sich der Aufbau der Tabellen.
-        boolean headerNeeded = vorherigePlanung == null || getTerminStatus(vorherigePlanung) != getTerminStatus(planung);
-        boolean footerNeeded = vorherigePlanung != null && getTerminStatus(vorherigePlanung) != getTerminStatus(planung) && getTerminStatus(vorherigePlanung) != MAXDOSIS;
+        boolean headerNeeded = vorherigePlanung == null || getTerminStatus(vorherigePlanung) != getTerminStatus(schedule);
+        boolean footerNeeded = vorherigePlanung != null && getTerminStatus(vorherigePlanung) != getTerminStatus(schedule) && getTerminStatus(vorherigePlanung) != MAXDOSIS;
 
         if (footerNeeded) {
             // noch den Footer vom letzten Durchgang dabei. Aber nur, wenn nicht
@@ -144,60 +145,55 @@ public class PrescriptionScheduleTools {
             result += "</table>";
         }
 
-        if (getTerminStatus(planung) == ZEIT) {
+        if (getTerminStatus(schedule) == ZEIT) {
             if (headerNeeded) {
                 result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\">" +
                         "   <tr>" +
-                        "      <th align=\"center\">fm</th>" +
-                        "      <th align=\"center\">mo</th>" +
-                        "      <th align=\"center\">mi</th>" +
-                        "      <th align=\"center\">nm</th>" +
-                        "      <th align=\"center\">ab</th>" +
-                        "      <th align=\"center\">sa</th>" +
-                        "      <th align=\"center\">Wdh.</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.earlyinthemorning.short") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.morning.short") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.noon.short") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.afternoon.short") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.evening.short") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.lateatnight.short") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.repeat.short") + ".</th>" +
                         "   </tr>";
             }
             result += "    <tr>" +
-                    "      <td align=\"center\">" + getValueAsString(planung.getNachtMo()) + "</td>" +
-                    "      <td align=\"center\">" + getValueAsString(planung.getMorgens()) + "</td>" +
-                    "      <td align=\"center\">" + getValueAsString(planung.getMittags()) + "</td>" +
-                    "      <td align=\"center\">" + getValueAsString(planung.getNachmittags()) + "</td>" +
-                    "      <td align=\"center\">" + getValueAsString(planung.getAbends()) + "</td>" +
-                    "      <td align=\"center\">" + getValueAsString(planung.getNachtAb()) + "</td>" +
-                    "      <td>" + getRepeatPattern(planung, true) + "</td>" +
+                    "      <td align=\"center\">" + getValueAsString(schedule.getNachtMo()) + "</td>" +
+                    "      <td align=\"center\">" + getValueAsString(schedule.getMorgens()) + "</td>" +
+                    "      <td align=\"center\">" + getValueAsString(schedule.getMittags()) + "</td>" +
+                    "      <td align=\"center\">" + getValueAsString(schedule.getNachmittags()) + "</td>" +
+                    "      <td align=\"center\">" + getValueAsString(schedule.getAbends()) + "</td>" +
+                    "      <td align=\"center\">" + getValueAsString(schedule.getNachtAb()) + "</td>" +
+                    "      <td>" + getRepeatPattern(schedule, true) + "</td>" +
                     "    </tr>";
             if (singleUsageOnly) {
                 result += "</table>";
             }
-        } else if (getTerminStatus(planung) == MAXDOSIS) {
-//                        if (rsDosis.getLong("DafID") > 0){
-//                            result += "Maximale Tagesdosis: ";
-//                        } else {
-//                            result += "Maximale Häufigkeit: ";
-//                        }
-            result += "<b>Maximale Tagesdosis: ";
-            result += planung.getMaxAnzahl() + "x " + SYSTools.printDouble(planung.getMaxEDosis().doubleValue());
+        } else if (getTerminStatus(schedule) == MAXDOSIS) {
+            result += "<b>" + OPDE.lang.getString(PnlPrescription.internalClassID + ".maxDailyDose") + ": ";
+            result += schedule.getMaxAnzahl() + "x " + SYSTools.printDouble(schedule.getMaxEDosis().doubleValue());
             result += "</b><br/>";
-        } else if (getTerminStatus(planung) == UHRZEIT) {
+        } else if (getTerminStatus(schedule) == UHRZEIT) {
             if (headerNeeded) {
                 result += "<table border=\"1\" cellspacing=\"0\" >" +
                         "   <tr>" +
-                        "      <th align=\"center\">Uhrzeit</th>" +
-                        "      <th align=\"center\">Anzahl</th>" +
-                        "      <th align=\"center\">Wdh.</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.Time") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.Number") + "</th>" +
+                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.repeat.short") + ".</th>" +
                         "   </tr>";
             }
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
             result += "    <tr>" +
-                    "      <td align=\"center\">" + sdf.format(planung.getUhrzeit()) + " Uhr</td>" +
-                    "      <td align=\"center\">" + planung.getUhrzeitDosis().toPlainString() + "</td>" +
-                    "      <td>" + getRepeatPattern(planung, true) + "</td>" +
+                    "      <td align=\"center\">" + sdf.format(schedule.getUhrzeit()) + " " + OPDE.lang.getString("misc.msg.Time.short") + "</td>" +
+                    "      <td align=\"center\">" + schedule.getUhrzeitDosis().toPlainString() + "</td>" +
+                    "      <td>" + getRepeatPattern(schedule, true) + "</td>" +
                     "    </tr>";
             if (singleUsageOnly) {
                 result += "</table>";
             }
         } else {
-            result = "!!FEHLER!!";
+            result = "!!" + OPDE.lang.getString("misc.msg.error") + "!!";
         }
         return result + "</div>";
     }
@@ -207,7 +203,7 @@ public class PrescriptionScheduleTools {
         String result = "";
 
         if (schedule.getPrescription().isOnDemand()) {
-            result += "Maximale Tagesdosis: ";
+            result += OPDE.lang.getString(PnlPrescription.internalClassID + ".maxDailyDose") + ": ";
             result += schedule.getMaxAnzahl() + "x " + HTMLTools.printDouble(schedule.getMaxEDosis()) + " " + SYSConst.UNITS[schedule.getPrescription().getTradeForm().getDosageForm().getUsageUnit()];
             result += "<br/>";
         }
@@ -222,7 +218,7 @@ public class PrescriptionScheduleTools {
         result += wiederholung;
 
         String substitution = PrescriptionTools.getOriginalPrescription(schedule.getPrescription());
-        if (!substitution.isEmpty()){
+        if (!substitution.isEmpty()) {
             result += substitution;
         }
 
@@ -230,7 +226,7 @@ public class PrescriptionScheduleTools {
             if (!wiederholung.isEmpty()) {
                 result += "<br/>";
             }
-            result += "<b><u>Bemerkung:</u></b> " + schedule.getPrescription().getText();
+            result += "<b><u>" + OPDE.lang.getString("misc.msg.comment") + ":</u></b> " + schedule.getPrescription().getText();
 
         }
 

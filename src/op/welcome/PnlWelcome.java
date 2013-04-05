@@ -372,7 +372,7 @@ public class PnlWelcome extends CleanablePanel {
                 "<tr valign=\"top\">" +
                 "<td width=\"100\" align=\"left\">" + DateFormat.getDateInstance().format(resident.getDOB()) + "</td>" +
                 "<td width=\"400\" align=\"left\">" +
-                "<b>" + ResidentTools.getTextCompact(resident) + "</b> " + textInTheMiddle + " " + newAge + " " + OPDE.lang.getString(internalClassID+".yearsold") +
+                "<b>" + ResidentTools.getTextCompact(resident) + "</b> " + textInTheMiddle + " " + newAge + " " + OPDE.lang.getString(internalClassID + ".yearsold") +
                 "</td>" +
                 "</tr>" +
                 "</table>" +
@@ -473,7 +473,11 @@ public class PnlWelcome extends CleanablePanel {
     private void btnAboutActionPerformed(ActionEvent e) {
         Desktop desktop = Desktop.getDesktop();
         try {
-            desktop.browse(new URI("http://www.offene-pflege.de"));
+            if (OPDE.isUpdateAvailable()) {
+                desktop.browse(new URI("https://www.offene-pflege.de/de/versionen"));
+            } else {
+                desktop.browse(new URI("https://www.offene-pflege.de"));
+            }
         } catch (IOException ioe) {
             ioe.printStackTrace();
         } catch (URISyntaxException use) {

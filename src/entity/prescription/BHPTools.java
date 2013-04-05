@@ -87,9 +87,6 @@ public class BHPTools {
                 if (result == 0) {
                     result = o1.getPrescription().compareTo(o2.getPrescription());
                 }
-//                if (result == 0) {
-//                    result = o1.getUPRState().compareTo(o2.getUPRState());
-//                }
 
                 return result;
             }
