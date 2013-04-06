@@ -21,7 +21,9 @@ import entity.values.ResValueTools;
 import op.OPDE;
 import op.care.PnlCare;
 import op.care.info.PnlInfo;
+import op.care.nursingprocess.PnlNursingProcess;
 import op.care.values.PnlValues;
+import op.misc.DlgIntervention;
 import op.process.PnlProcess;
 import op.residents.bwassistant.AddBWWizard;
 import op.system.InternalClass;
@@ -573,6 +575,21 @@ public class PnlWelcome extends CleanablePanel {
             list.add(addbw);
         }
 
+
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlNursingProcess.internalClassID)) {
+            JideButton editInterventions = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".editInterventions"), null, null);
+            //            final MyJDialog dlg = new MyJDialog();
+            editInterventions.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
+            editInterventions.setAlignmentX(Component.LEFT_ALIGNMENT);
+            editInterventions.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    DlgIntervention dlgIntervention = new DlgIntervention();
+                    dlgIntervention.setVisible(true);
+                }
+            });
+            list.add(editInterventions);
+        }
 
         return list;
     }
