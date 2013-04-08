@@ -137,8 +137,12 @@ public class PnlSystemSettings extends CleanablePanel {
 
         PrintService[] prservices = PrintServiceLookup.lookupPrintServices(null, null);
 
-        if (prservices != null) {
+        // this prevents exceptions when there are no printers installed on the OS yet
+        if (prservices != null && prservices.length == 0){
+            prservices = null;
+        }
 
+        if (prservices != null) {
             cmbPhysicalPrinters.setModel(new DefaultComboBoxModel(prservices));
             cmbPhysicalPrinters.setRenderer(new ListCellRenderer() {
                 @Override

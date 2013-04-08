@@ -258,7 +258,7 @@ public class DlgRegular extends MyJDialog {
     }
 
     private void txtMassActionPerformed(ActionEvent e) {
-        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.TYPE_PRESCRIPTION, txtIntervention.getText()).toArray()));
+        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findBy(InterventionTools.TYPE_PRESCRIPTION, txtIntervention.getText()).toArray()));
     }
 
     /**
@@ -655,8 +655,8 @@ public class DlgRegular extends MyJDialog {
             cmbMed.setModel(new DefaultComboBoxModel(new TradeForm[]{prescription.getTradeForm()}));
         }
 
-        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.TYPE_PRESCRIPTION).toArray()));
-        cmbIntervention.setRenderer(InterventionTools.getMassnahmenRenderer());
+        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findBy(InterventionTools.TYPE_PRESCRIPTION).toArray()));
+        cmbIntervention.setRenderer(InterventionTools.getRenderer());
         cmbIntervention.setEnabled(cmbMed.getModel().getSize() == 0);
         cmbIntervention.setSelectedItem(prescription.getIntervention());
         txtIntervention.setEnabled(cmbMed.getModel().getSize() == 0);
@@ -726,7 +726,7 @@ public class DlgRegular extends MyJDialog {
 
 
     private void cmbMedItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbMedItemStateChanged
-        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.TYPE_PRESCRIPTION).toArray()));
+        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findBy(InterventionTools.TYPE_PRESCRIPTION).toArray()));
         cmbIntervention.setSelectedItem(((TradeForm) cmbMed.getSelectedItem()).getDosageForm().getIntervention());
         cmbIntervention.setEnabled(false);
         txtIntervention.setText(null);

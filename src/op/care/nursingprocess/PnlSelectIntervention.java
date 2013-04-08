@@ -122,7 +122,7 @@ public class PnlSelectIntervention extends JPanel {
 
     private void txtSearchActionPerformed(ActionEvent e) {
         if (txtSearch.getText().isEmpty()) return;
-        lstInterventions.setModel(SYSTools.list2dlm(InterventionTools.findMassnahmenBy(InterventionTools.TYPE_CARE, txtSearch.getText())));
+        lstInterventions.setModel(SYSTools.list2dlm(InterventionTools.findBy(InterventionTools.TYPE_CARE, txtSearch.getText())));
         cmbCategory.setSelectedItem(null);
     }
 
@@ -162,7 +162,7 @@ public class PnlSelectIntervention extends JPanel {
     private void cmbCategoryItemStateChanged(ItemEvent e) {
         if (e.getStateChange() == ItemEvent.SELECTED && e.getItem() != null) {
             txtSearch.setText(null);
-            lstInterventions.setModel(SYSTools.list2dlm(InterventionTools.findMassnahmenBy((ResInfoCategory) e.getItem())));
+            lstInterventions.setModel(SYSTools.list2dlm(InterventionTools.findBy((ResInfoCategory) e.getItem())));
         }
     }
 

@@ -11,6 +11,7 @@ import org.apache.commons.collections.Closure;
 
 import javax.persistence.EntityManager;
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
@@ -93,7 +94,7 @@ public class MedProductWizard {
                 }
             }
         });
-
+        ((JPanel) wizard.getContentPane()).setBorder(new LineBorder(Color.BLACK, 1));
         wizard.pack();
     }
 
@@ -359,7 +360,7 @@ public class MedProductWizard {
                 @Override
                 public void pageEventFired(PageEvent pageEvent) {
                     if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
-                        txt.setText("<html>"+SYSConst.html_fontface +
+                        txt.setText("<html>" + SYSConst.html_fontface +
                                 check() +
                                 "</font></html>");
                     }

@@ -577,7 +577,7 @@ public class PnlWelcome extends CleanablePanel {
 
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlNursingProcess.internalClassID)) {
-            JideButton editInterventions = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".editInterventions"), null, null);
+            JideButton editInterventions = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".editInterventions"), SYSConst.icon22work, null);
             //            final MyJDialog dlg = new MyJDialog();
             editInterventions.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
             editInterventions.setAlignmentX(Component.LEFT_ALIGNMENT);

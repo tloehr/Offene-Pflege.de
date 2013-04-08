@@ -7,6 +7,7 @@ package op.misc;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.info.ResInfoCategory;
+import entity.info.ResInfoCategoryTools;
 import entity.nursingprocess.Intervention;
 import entity.nursingprocess.InterventionTools;
 import op.OPDE;
@@ -25,18 +26,20 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.Arrays;
 
 /**
  * @author Torsten Löhr
  */
 public class DlgIntervention extends MyJDialog {
     Intervention intervention2Edit;
-    private JToggleButton tbAktiv;
+    private JToggleButton tbActive;
     Number dauer = BigDecimal.TEN;
 
     public DlgIntervention() {
@@ -46,32 +49,48 @@ public class DlgIntervention extends MyJDialog {
     }
 
     private void initDialog() {
-        tbAktiv = GUITools.getNiceToggleButton(PnlSelectIntervention.internalClassID + ".activeIntervention");
-        panel2.add(tbAktiv, CC.xywh(1, 9, 2, 1));
+        tbActive = GUITools.getNiceToggleButton(PnlSelectIntervention.internalClassID + ".activeIntervention");
+        tbActive.setEnabled(false);
+        panel2.add(tbActive, CC.xywh(1, 9, 3, 1, CC.LEFT, CC.DEFAULT));
+        cmbType.setModel(new DefaultComboBoxModel(new String[]{OPDE.lang.getString("misc.msg.interventions.CARE"), OPDE.lang.getString("misc.msg.interventions.PRESCRIPTION"), OPDE.lang.getString("misc.msg.interventions.SOCIAL")}));
+        cmbCat.setModel(new DefaultComboBoxModel(ResInfoCategoryTools.getAll4NP().toArray()));
     }
 
     private void txtSearchActionPerformed(ActionEvent e) {
         if (txtSearch.getText().isEmpty()) return;
-        lstInterventions.setModel(SYSTools.list2dlm(InterventionTools.findMassnahmenBy(InterventionTools.TYPE_CARE, txtSearch.getText())));
-    }
-
-    private void lstInterventionsMouseClicked(MouseEvent e) {
-        // TODO add your code here
+        lstInterventions.setModel(SYSTools.list2dlm(InterventionTools.findBy(txtSearch.getText())));
     }
 
     private void lstInterventionsValueChanged(ListSelectionEvent e) {
         if (!e.getValueIsAdjusting()) {
             intervention2Edit = (Intervention) lstInterventions.getSelectedValue();
-            txtText.setText(intervention2Edit.getBezeichnung());
-            txtLength.setText(intervention2Edit.getDauer().toBigInteger().toString());
-            tbAktiv.setSelected(intervention2Edit.isActive());
-            cmbType.setSelectedIndex(intervention2Edit.getInterventionType() - 1);
+            if (intervention2Edit == null) {
+                txtText.setText(null);
+                txtLength.setText(null);
+                tbActive.setSelected(false);
+                cmbType.setSelectedIndex(-1);
+                cmbCat.setSelectedIndex(-1);
+            } else {
+                txtText.setText(intervention2Edit.getBezeichnung());
+                txtLength.setText(intervention2Edit.getDauer().toBigInteger().toString());
+                tbActive.setSelected(intervention2Edit.isActive());
+                cmbType.setSelectedIndex(intervention2Edit.getInterventionType() - 1);
+                cmbCat.setSelectedItem(intervention2Edit.getCategory());
+            }
         }
     }
 
     private boolean saveok() {
         if (txtText.getText().trim().isEmpty()) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(PnlSelectIntervention.internalClassID + ".textempty"), DisplayMessage.WARNING));
+            return false;
+        }
+        if (cmbType.getSelectedIndex() < 0) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.emptyFields"), DisplayMessage.WARNING));
+            return false;
+        }
+        if (cmbCat.getSelectedItem() == null) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.emptyFields"), DisplayMessage.WARNING));
             return false;
         }
         return true;
@@ -87,13 +106,16 @@ public class DlgIntervention extends MyJDialog {
     }
 
     private void btnEditActionPerformed(ActionEvent e) {
+        if (lstInterventions.getSelectedValue() == null){
+            return;
+        }
         set2EditMode(true);
     }
 
     private void set2EditMode(boolean editMode) {
         txtText.setEnabled(editMode);
         txtLength.setEnabled(editMode);
-        tbAktiv.setEnabled(editMode);
+        tbActive.setEnabled(editMode);
         cmbType.setEnabled(editMode);
         cmbCat.setEnabled(editMode);
         txtSearch.setEnabled(!editMode);
@@ -107,45 +129,55 @@ public class DlgIntervention extends MyJDialog {
     private void btnSaveActionPerformed(ActionEvent evt) {
         if (saveok()) {
             if (intervention2Edit == null) {
-                Intervention intervention = new Intervention(txtText.getText().trim(), new BigDecimal(dauer.doubleValue()), cmbType.getSelectedIndex() + 1, (ResInfoCategory) cmbCat.getSelectedItem());
-                lstInterventions.setModel(SYSTools.list2dlm(Arrays.asList(intervention)));
-                btnEdit.setEnabled(false);
-            } else {
-                EntityManager em = OPDE.createEM();
-                try {
-                    em.getTransaction().begin();
-                    Intervention myIntervention = em.merge(intervention2Edit);
-                    em.lock(myIntervention, LockModeType.OPTIMISTIC);
-                    myIntervention.setBezeichnung(txtText.getText().trim());
-                    myIntervention.setDauer(new BigDecimal(dauer.doubleValue()));
-                    myIntervention.setCategory(em.merge((ResInfoCategory) cmbCat.getSelectedItem()));
-                    myIntervention.setInterventionType(cmbType.getSelectedIndex() + 1);
-                    myIntervention.setActive(tbAktiv.isSelected());
-                    em.getTransaction().commit();
-                } catch (OptimisticLockException ole) {
-                    if (em.getTransaction().isActive()) {
-                        em.getTransaction().rollback();
-                    }
-                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                        OPDE.getMainframe().emptyFrame();
-                        OPDE.getMainframe().afterLogin();
-                    }
-                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                } catch (Exception e) {
-                    if (em.getTransaction().isActive()) {
-                        em.getTransaction().rollback();
-                    }
-                    OPDE.fatal(e);
-                } finally {
-                    em.close();
-                }
-
+                intervention2Edit = new Intervention(txtText.getText().trim(), new BigDecimal(dauer.doubleValue()), cmbType.getSelectedIndex() + 1, (ResInfoCategory) cmbCat.getSelectedItem());
             }
+
+            EntityManager em = OPDE.createEM();
+            try {
+                em.getTransaction().begin();
+                Intervention myIntervention = em.merge(intervention2Edit);
+                em.lock(myIntervention, LockModeType.OPTIMISTIC);
+                myIntervention.setBezeichnung(txtText.getText().trim());
+                myIntervention.setDauer(new BigDecimal(dauer.doubleValue()));
+                myIntervention.setCategory(em.merge((ResInfoCategory) cmbCat.getSelectedItem()));
+                myIntervention.setInterventionType(cmbType.getSelectedIndex() + 1);
+                myIntervention.setActive(tbActive.isSelected());
+
+                em.getTransaction().commit();
+            } catch (OptimisticLockException ole) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                    OPDE.getMainframe().emptyFrame();
+                    OPDE.getMainframe().afterLogin();
+                }
+                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+            } catch (Exception e) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                OPDE.fatal(e);
+            } finally {
+                em.close();
+            }
+
+            set2EditMode(false);
+            lstInterventions.setModel(SYSTools.list2dlm(InterventionTools.findBy(txtSearch.getText())));
         }
     }
 
     private void btnEjectActionPerformed(ActionEvent e) {
         dispose();
+    }
+
+    private void btnAddActionPerformed(ActionEvent e) {
+        txtText.setText(txtSearch.getText());
+        txtLength.setText(null);
+        tbActive.setSelected(false);
+        cmbType.setSelectedIndex(-1);
+        cmbCat.setSelectedIndex(-1);
+        set2EditMode(true);
     }
 
 
@@ -163,15 +195,15 @@ public class DlgIntervention extends MyJDialog {
         lblType = new JLabel();
         cmbType = new JComboBox();
         panel3 = new JPanel();
-        btnEdit = new JButton();
-        hSpacer1 = new JPanel(null);
         btnCancel = new JButton();
         btnSave = new JButton();
-        hSpacer2 = new JPanel(null);
+        hSpacer1 = new JPanel(null);
         btnEject = new JButton();
         panel4 = new JScrollPane();
         lstInterventions = new JList();
+        panel5 = new JPanel();
         btnAdd = new JButton();
+        btnEdit = new JButton();
 
         //======== this ========
         Container contentPane = getContentPane();
@@ -180,8 +212,8 @@ public class DlgIntervention extends MyJDialog {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                "default, $lcgap, 87dlu, $lcgap, default:grow, $lcgap, default",
-                "2*(default, $lgap), default:grow, 2*($lgap, default)"));
+                    "default, $lcgap, 87dlu:grow, $lcgap, default:grow, $lcgap, default",
+                    "2*(default, $lgap), default:grow, 2*($lgap, default)"));
 
             //---- txtSearch ----
             txtSearch.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -196,8 +228,8 @@ public class DlgIntervention extends MyJDialog {
             //======== panel2 ========
             {
                 panel2.setLayout(new FormLayout(
-                    "default, $lcgap, 63dlu:grow",
-                    "5*(default, $lgap), fill:default:grow"));
+                        "default, $lcgap, 63dlu:grow",
+                        "5*(default, $lgap), fill:default:grow"));
 
                 //---- lblText ----
                 lblText.setText("Bezeichnung");
@@ -215,7 +247,6 @@ public class DlgIntervention extends MyJDialog {
                 panel2.add(lblLength, CC.xy(1, 3));
 
                 //---- txtLength ----
-                txtLength.setHorizontalAlignment(SwingConstants.RIGHT);
                 txtLength.setText("10");
                 txtLength.setToolTipText(null);
                 txtLength.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -234,11 +265,11 @@ public class DlgIntervention extends MyJDialog {
                 panel2.add(lblCat, CC.xy(1, 5));
 
                 //---- cmbCat ----
-                cmbCat.setModel(new DefaultComboBoxModel(new String[] {
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+                cmbCat.setModel(new DefaultComboBoxModel(new String[]{
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                        "Item 4"
                 }));
                 cmbCat.setFont(new Font("Arial", Font.PLAIN, 14));
                 cmbCat.setEnabled(false);
@@ -250,11 +281,11 @@ public class DlgIntervention extends MyJDialog {
                 panel2.add(lblType, CC.xy(1, 7));
 
                 //---- cmbType ----
-                cmbType.setModel(new DefaultComboBoxModel(new String[] {
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+                cmbType.setModel(new DefaultComboBoxModel(new String[]{
+                        "Item 1",
+                        "Item 2",
+                        "Item 3",
+                        "Item 4"
                 }));
                 cmbType.setFont(new Font("Arial", Font.PLAIN, 14));
                 cmbType.setEnabled(false);
@@ -263,21 +294,6 @@ public class DlgIntervention extends MyJDialog {
                 //======== panel3 ========
                 {
                     panel3.setLayout(new BoxLayout(panel3, BoxLayout.X_AXIS));
-
-                    //---- btnEdit ----
-                    btnEdit.setText(null);
-                    btnEdit.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit1.png")));
-                    btnEdit.setContentAreaFilled(false);
-                    btnEdit.setBorder(null);
-                    btnEdit.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
-                    btnEdit.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            btnEditActionPerformed(e);
-                        }
-                    });
-                    panel3.add(btnEdit);
-                    panel3.add(hSpacer1);
 
                     //---- btnCancel ----
                     btnCancel.setText(null);
@@ -306,7 +322,7 @@ public class DlgIntervention extends MyJDialog {
                         }
                     });
                     panel3.add(btnSave);
-                    panel3.add(hSpacer2);
+                    panel3.add(hSpacer1);
 
                     //---- btnEject ----
                     btnEject.setText(null);
@@ -322,7 +338,7 @@ public class DlgIntervention extends MyJDialog {
                     });
                     panel3.add(btnEject);
                 }
-                panel2.add(panel3, CC.xywh(1, 11, 3, 1, CC.DEFAULT, CC.BOTTOM));
+                panel2.add(panel3, CC.xywh(1, 11, 3, 1, CC.RIGHT, CC.BOTTOM));
             }
             panel1.add(panel2, CC.xywh(5, 3, 1, 5));
 
@@ -331,12 +347,7 @@ public class DlgIntervention extends MyJDialog {
 
                 //---- lstInterventions ----
                 lstInterventions.setFont(new Font("Arial", Font.PLAIN, 14));
-                lstInterventions.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        lstInterventionsMouseClicked(e);
-                    }
-                });
+                lstInterventions.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
                 lstInterventions.addListSelectionListener(new ListSelectionListener() {
                     @Override
                     public void valueChanged(ListSelectionEvent e) {
@@ -347,14 +358,40 @@ public class DlgIntervention extends MyJDialog {
             }
             panel1.add(panel4, CC.xy(3, 5, CC.DEFAULT, CC.FILL));
 
-            //---- btnAdd ----
-            btnAdd.setText(null);
-            btnAdd.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
-            btnAdd.setBorderPainted(false);
-            btnAdd.setContentAreaFilled(false);
-            btnAdd.setBorder(null);
-            btnAdd.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
-            panel1.add(btnAdd, CC.xy(3, 7, CC.LEFT, CC.DEFAULT));
+            //======== panel5 ========
+            {
+                panel5.setLayout(new BoxLayout(panel5, BoxLayout.X_AXIS));
+
+                //---- btnAdd ----
+                btnAdd.setText(null);
+                btnAdd.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
+                btnAdd.setBorderPainted(false);
+                btnAdd.setContentAreaFilled(false);
+                btnAdd.setBorder(null);
+                btnAdd.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
+                btnAdd.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnAddActionPerformed(e);
+                    }
+                });
+                panel5.add(btnAdd);
+
+                //---- btnEdit ----
+                btnEdit.setText(null);
+                btnEdit.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/edit3.png")));
+                btnEdit.setContentAreaFilled(false);
+                btnEdit.setBorder(null);
+                btnEdit.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
+                btnEdit.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnEditActionPerformed(e);
+                    }
+                });
+                panel5.add(btnEdit);
+            }
+            panel1.add(panel5, CC.xy(3, 7));
         }
         contentPane.add(panel1);
         setSize(735, 495);
@@ -375,14 +412,14 @@ public class DlgIntervention extends MyJDialog {
     private JLabel lblType;
     private JComboBox cmbType;
     private JPanel panel3;
-    private JButton btnEdit;
-    private JPanel hSpacer1;
     private JButton btnCancel;
     private JButton btnSave;
-    private JPanel hSpacer2;
+    private JPanel hSpacer1;
     private JButton btnEject;
     private JScrollPane panel4;
     private JList lstInterventions;
+    private JPanel panel5;
     private JButton btnAdd;
+    private JButton btnEdit;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

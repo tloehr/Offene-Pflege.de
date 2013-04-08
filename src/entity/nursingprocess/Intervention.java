@@ -32,7 +32,7 @@ public class Intervention implements Serializable {
     @Column(name = "MassArt")
     private int interventionType;
     @Column(name = "Aktiv")
-    private Boolean aktiv;
+    private Boolean active;
     @Version
     @Column(name = "version")
     private Long version;
@@ -53,7 +53,7 @@ public class Intervention implements Serializable {
         this.dauer = dauer;
         this.interventionType = interventionType;
         this.category = category;
-        this.aktiv = true;
+        this.active = true;
     }
 
     public Long getMassID() {
@@ -97,11 +97,11 @@ public class Intervention implements Serializable {
     }
 
     public boolean isActive() {
-        return aktiv;
+        return active;
     }
 
     public void setActive(boolean active) {
-        this.aktiv = aktiv;
+        this.active = active;
     }
 
     @Override

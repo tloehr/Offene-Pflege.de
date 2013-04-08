@@ -18,6 +18,8 @@ import org.apache.commons.collections.Closure;
 
 import javax.persistence.EntityManager;
 import javax.swing.*;
+import javax.swing.border.LineBorder;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.text.DateFormat;
 import java.util.Date;
@@ -81,7 +83,7 @@ public class AddBWWizard {
                 }
             }
         });
-
+        ((JPanel) wizard.getContentPane()).setBorder(new LineBorder(Color.BLACK, 1));
         wizard.pack();
     }
 

@@ -2,21 +2,13 @@ package entity.nursingprocess;
 
 import entity.EntityTools;
 import entity.info.ResInfoCategory;
-import entity.info.Resident;
-import entity.prescription.MedInventory;
-import entity.prescription.MedStock;
-import entity.prescription.MedStockTools;
-import entity.prescription.MedStockTransactionTools;
 import op.OPDE;
-import op.care.med.inventory.PnlInventory;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -32,7 +24,7 @@ public class InterventionTools {
     public static final int TYPE_PRESCRIPTION = 2;
     public static final int TYPE_SOCIAL = 3;
 
-    public static ListCellRenderer getMassnahmenRenderer() {
+    public static ListCellRenderer getRenderer() {
         return new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean b, boolean b1) {
@@ -50,23 +42,21 @@ public class InterventionTools {
         };
     }
 
-    public static List<Intervention> findMassnahmenBy(int mode) {
-        return findMassnahmenBy(mode, "");
+    public static List<Intervention> findBy(int mode) {
+        return findBy(mode, "");
     }
 
-    public static List<Intervention> findMassnahmenBy(int massArt, String suche) {
+    public static List<Intervention> findBy(String suche) {
 
         EntityManager em = OPDE.createEM();
 
         Query query = em.createQuery(" " +
-                " SELECT m FROM Intervention m WHERE m.aktiv = TRUE AND m.interventionType = :art " +
-                (SYSTools.catchNull(suche).isEmpty() ? "" : " AND m.bezeichnung like :suche ") +
+                " SELECT m FROM Intervention m WHERE m.bezeichnung like :search " +
                 " ORDER BY m.bezeichnung "
         );
 
-        query.setParameter("art", massArt);
         if (!SYSTools.catchNull(suche).isEmpty()) {
-            query.setParameter("suche", EntityTools.getMySQLsearchPattern(suche));
+            query.setParameter("search", EntityTools.getMySQLsearchPattern(suche));
         }
 
         List<Intervention> list = query.getResultList();
@@ -76,12 +66,34 @@ public class InterventionTools {
         return list;
     }
 
-    public static List<Intervention> findMassnahmenBy(ResInfoCategory category) {
+    public static List<Intervention> findBy(int massArt, String suche) {
 
             EntityManager em = OPDE.createEM();
 
             Query query = em.createQuery(" " +
-                    " SELECT m FROM Intervention m WHERE m.aktiv = TRUE AND m.category = :cat " +
+                    " SELECT m FROM Intervention m WHERE m.active = TRUE AND m.interventionType = :art " +
+                    (SYSTools.catchNull(suche).isEmpty() ? "" : " AND m.bezeichnung like :suche ") +
+                    " ORDER BY m.bezeichnung "
+            );
+
+            query.setParameter("art", massArt);
+            if (!SYSTools.catchNull(suche).isEmpty()) {
+                query.setParameter("suche", EntityTools.getMySQLsearchPattern(suche));
+            }
+
+            List<Intervention> list = query.getResultList();
+
+            em.close();
+
+            return list;
+        }
+
+    public static List<Intervention> findBy(ResInfoCategory category) {
+
+            EntityManager em = OPDE.createEM();
+
+            Query query = em.createQuery(" " +
+                    " SELECT m FROM Intervention m WHERE m.active = TRUE AND m.category = :cat " +
                     " ORDER BY m.bezeichnung "
             );
 

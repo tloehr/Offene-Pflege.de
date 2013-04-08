@@ -76,8 +76,8 @@ public class PnlDosageForm extends PopupPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "2*(default, $lcgap), default:grow, $lcgap, default",
-                "9*(default, $lgap), default"));
+            "2*(default, $lcgap), default:grow, $lcgap, default",
+            "9*(default, $lgap), default"));
 
         //---- lblPreparation ----
         lblPreparation.setText("preparation");
@@ -148,7 +148,7 @@ public class PnlDosageForm extends PopupPanel {
 
         cmbUPR.setModel(new DefaultComboBoxModel(new String[]{OPDE.lang.getString("state_upr1"), OPDE.lang.getString("state_upr_by_tradeform"), OPDE.lang.getString("state_upr_by_resident")}));
         cmbUPR.setSelectedIndex(form.getUPRState());
-        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findMassnahmenBy(InterventionTools.TYPE_PRESCRIPTION).toArray()));
+        cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findBy(InterventionTools.TYPE_PRESCRIPTION).toArray()));
         cmbUsageUnit.setModel(new DefaultComboBoxModel(Arrays.copyOfRange(SYSConst.UNITS, 1, SYSConst.UNITS.length - 1)));
         cmbPackUnit.setModel(new DefaultComboBoxModel(Arrays.copyOfRange(SYSConst.UNITS, 1, SYSConst.UNITS.length - 1)));
         txtDailyPlan = GUITools.createIntegerTextField(0, 20, 0);
