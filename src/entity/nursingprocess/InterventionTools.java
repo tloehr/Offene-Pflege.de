@@ -50,6 +50,7 @@ public class InterventionTools {
 
         EntityManager em = OPDE.createEM();
 
+
         Query query = em.createQuery(" " +
                 " SELECT m FROM Intervention m WHERE m.bezeichnung like :search " +
                 " ORDER BY m.bezeichnung "

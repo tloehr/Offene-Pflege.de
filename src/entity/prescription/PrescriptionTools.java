@@ -436,7 +436,6 @@ public class PrescriptionTools {
                 result += "<b>" + OPDE.lang.getString("misc.msg.onlyUntilEndOfPackage") + "</b><br/>";
             }
             if (!prescription.isClosed()) {
-                // TODO: Calc Medi here
                 if (stockInUse != null) {
                     EntityManager em = OPDE.createEM();
 
@@ -587,7 +586,7 @@ public class PrescriptionTools {
             result += withheader ? "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.prescription") + (withlongheader ? " für " + ResidentTools.getLabelText(prescription.getResident()) : "") + "</h2>" : "";
 
             result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
-                    "<th>Medikament/Massnahme</th><th>Dosierung / Hinweise</th><th >Angesetzt</th></tr>";
+                    "<th>Medikament/Massnahme</th><th>Dosierung / Hinweise</th><th>Angesetzt</th></tr>";
 
             for (Prescription myprescription : list) {
 
@@ -598,12 +597,6 @@ public class PrescriptionTools {
                     result += "<td valign=\"top\">" + getDose(myprescription, withmed) + "<br/>";
                     result += getRemark(myprescription) + "</td>";
                     result += "<td valign=\"top\">" + myprescription.getPITAsHTML();
-
-//                    if (myprescription.isClosed()) {
-//                        result += getOFF(myprescription);
-//                    }
-//
-//
 
                     result += "</td>";
                     result += "</tr>";

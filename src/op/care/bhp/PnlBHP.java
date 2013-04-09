@@ -630,7 +630,7 @@ public class PnlBHP extends NursingRecordsPanel {
                         }
                     }
                 });
-                // TODO: Calc Medi here
+
                 btnApply.setEnabled(bhp.isOpen() && (!bhp.hasMed() || mapPrescription2Stock.containsKey(bhp.getPrescription())));
                 cptitle.getRight().add(btnApply);
                 JPanel spacer = new JPanel();
@@ -797,8 +797,8 @@ public class PnlBHP extends NursingRecordsPanel {
                         }
                     }
                 });
-                // TODO: Calc Medi here
-                btnRefuseDiscard.setEnabled(!bhp.isOnDemand() && bhp.hasMed() && bhp.isOpen());
+
+                btnRefuseDiscard.setEnabled(!bhp.isOnDemand() && bhp.hasMed() && bhp.shouldBeCalculated() && bhp.isOpen());
                 cptitle.getRight().add(btnRefuseDiscard);
 
 
@@ -1019,28 +1019,16 @@ public class PnlBHP extends NursingRecordsPanel {
         java.util.List<Component> list = new ArrayList<Component>();
         list.add(new JSeparator());
         list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
         list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription3"), SYSConst.icon22stopSign, SwingConstants.LEADING));
+//        if (resident.isCalcMediUPR1()) {
+            list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
+            list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
+//        }
         return list;
     }
 
     private java.util.List<Component> addFilter() {
         java.util.List<Component> list = new ArrayList<Component>();
-
-
-//        cmbSchicht = new JComboBox(new DefaultComboBoxModel(GUITools.getLocalizedMessages(new String[]{"misc.msg.everything", internalClassID + ".shift.veryearly", internalClassID + ".shift.early", internalClassID + ".shift.late", internalClassID + ".shift.verylate"})));
-//        cmbSchicht.setFont(new Font("Arial", Font.PLAIN, 14));
-//        cmbSchicht.setSelectedIndex(SYSCalendar.ermittleSchicht() + 1);
-//        cmbSchicht.addItemListener(new ItemListener() {
-//            @Override
-//            public void itemStateChanged(ItemEvent itemEvent) {
-//                if (!initPhase) {
-//                    reloadDisplay();
-//                }
-//            }
-//        });
-//        labelPanel.add(cmbSchicht);
 
         jdcDatum = new JDateChooser(new Date());
         jdcDatum.setFont(new Font("Arial", Font.PLAIN, 18));

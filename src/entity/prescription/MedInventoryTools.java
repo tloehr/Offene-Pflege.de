@@ -81,15 +81,13 @@ public class MedInventoryTools {
     }
 
     public static BigDecimal getSum(EntityManager em, MedInventory inventory) throws Exception {
-//        long timeStart = System.currentTimeMillis();
         BigDecimal result = BigDecimal.ZERO;
         for (MedStock stock : inventory.getMedStocks()) {
-//            OPDE.debug(stock.getID());
-            BigDecimal summe = MedStockTools.getSum(em, stock);
-            result = result.add(summe);
+            if (!stock.isClosed()) {
+                BigDecimal summe = MedStockTools.getSum(em, stock);
+                result = result.add(summe);
+            }
         }
-//        long time2 = System.currentTimeMillis();
-//        OPDE.debug("MedInventoryTools.getSumme(): " + (time2 - timeStart) + " millis");
         return result;
     }
 
@@ -103,9 +101,9 @@ public class MedInventoryTools {
      * Ist <b>keine</b> Packung im Anbruch, dann wird eine Exception geworfen. Das kann aber eingentlich nicht passieren. Es sei denn jemand hat von Hand
      * an den Datenbank rumgespielt.
      *
-     * @param em                  der EntityManager der verwendet wird
-     * @param quantity               die gewünschte Entnahmemenge
-     * @param bhp                 BHP aufgrund dere dieser Buchungsvorgang erfolgt.
+     * @param em       der EntityManager der verwendet wird
+     * @param quantity die gewünschte Entnahmemenge
+     * @param bhp      BHP aufgrund dere dieser Buchungsvorgang erfolgt.
      */
     public static void withdraw(EntityManager em, MedInventory inventory, BigDecimal quantity, BHP bhp) throws Exception {
         OPDE.debug("withdraw/5: inventory: " + inventory);
@@ -114,7 +112,7 @@ public class MedInventoryTools {
         }
         MedStock stock = MedStockTools.getStockInUse(inventory);
 
-        if (!stock.getTradeForm().getDosageForm().isUPR1()){
+        if (!stock.getTradeForm().getDosageForm().isUPR1()) {
             quantity = quantity.divide(stock.getUPR(), 4, BigDecimal.ROUND_UP);
         }
 
@@ -200,9 +198,9 @@ public class MedInventoryTools {
                 MedStockTools.close(em, stock, OPDE.lang.getString(DlgCloseStock.internalClassID + ".TX.AUTOCLOSED_EMPTY_PACKAGE"), MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
             }
         } else if (stockSum.compareTo(quantity) < 0) {
-            if (!stock.hasNext2Open() && stock.isToBeClosedSoon()){
+            if (!stock.hasNext2Open() && stock.isToBeClosedSoon()) {
                 MedStockTools.close(em, stock, OPDE.lang.getString(DlgCloseStock.internalClassID + ".TX.AUTOCLOSED_EMPTY_PACKAGE"), MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
-            } else if (stock.hasNext2Open()){
+            } else if (stock.hasNext2Open()) {
                 MedStock nextStock = MedStockTools.close(em, stock, OPDE.lang.getString(DlgCloseStock.internalClassID + ".TX.AUTOCLOSED_EMPTY_PACKAGE"), MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
                 withdraw(em, nextStock, quantity.subtract(stockSum), bhp);
             }
@@ -292,7 +290,7 @@ public class MedInventoryTools {
         MedStock bestand = null;
         if (!inventory.getMedStocks().isEmpty()) {
             Collections.sort(inventory.getMedStocks());
-            for (MedStock myBestand : inventory.getMedStocks()) {                
+            for (MedStock myBestand : inventory.getMedStocks()) {
                 if (myBestand.isNew()) {
                     bestand = myBestand;
                     break;

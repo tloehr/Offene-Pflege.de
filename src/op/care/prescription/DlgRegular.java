@@ -125,13 +125,6 @@ public class DlgRegular extends MyJDialog {
         popup.setOwner(btnAddDosis);
         popup.removeExcludedComponent(btnAddDosis);
         popup.setDefaultFocusComponent(dlg);
-//        popup.addPropertyChangeListener("visible", new PropertyChangeListener() {
-//            @Override
-//            public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-//                OPDE.debug("popup property: " + propertyChangeEvent.getPropertyName() + " value: " + propertyChangeEvent.getNewValue() + " compCount: " + popup.getContentPane().getComponentCount());
-//                popup.getContentPane().getComponentCount();
-//            }
-//        });
 
         GUITools.showPopup(popup, SwingConstants.NORTH);
 
@@ -191,7 +184,7 @@ public class DlgRegular extends MyJDialog {
                 tbDailyPlan.setSelected(false);
                 OPDE.getDisplayManager().clearSubMessages();
             }
-            rbEndOfPackage.setEnabled(cmbMed.getModel().getSize() > 0);
+            rbEndOfPackage.setEnabled(prescription.getResident().isCalcMediUPR1() && cmbMed.getModel().getSize() > 0);
         }
     }
 
@@ -672,14 +665,10 @@ public class DlgRegular extends MyJDialog {
         cmbIntervention.setEnabled(editMode != MODE_CHANGE);
         txtIntervention.setEnabled(editMode != MODE_CHANGE);
 
-        // TODO: Calc Medi here
-        // hide the endOfPackage completely
         if (cmbMed.getSelectedItem() != null) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(TradeFormTools.toPrettyString((TradeForm) cmbMed.getSelectedItem())));
-            rbEndOfPackage.setEnabled(true);
-        } else {
-            rbEndOfPackage.setEnabled(false);
         }
+        rbEndOfPackage.setEnabled(prescription.getResident().isCalcMediUPR1() && cmbMed.getSelectedItem() != null);
 
         ignoreEvent = false;
         txtMed.requestFocus();

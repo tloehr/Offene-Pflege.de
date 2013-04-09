@@ -103,13 +103,16 @@ public class PnlCare extends NursingRecordsPanel {
         jtpPflegeakte.setEnabledAt(TAB_VORRAT, resident.isCalcMediUPR1());
     }
 
+    public void setJspSearch(JScrollPane jspSearch) {
+        this.jspSearch = jspSearch;
+    }
+
     @Override
     public void reload() {
         if (previousPanel != null) {
             previousPanel.reload();
         }
     }
-
 
     private void jtpPflegeakteStateChanged(ChangeEvent e) {
         if (initPhase) {
@@ -147,7 +150,7 @@ public class PnlCare extends NursingRecordsPanel {
                 break;
             }
             case TAB_INFO: {
-                previousPanel = new PnlInfo(resident, jspSearch);
+                previousPanel = new PnlInfo(resident, jspSearch, this);
                 jtpPflegeakte.setComponentAt(TAB_INFO, previousPanel);
                 OPDE.getMainframe().setCurrentClassname(PnlInfo.internalClassID);
                 break;

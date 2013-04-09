@@ -18,6 +18,7 @@ import entity.files.SYSFilesTools;
 import entity.info.*;
 import entity.process.*;
 import op.OPDE;
+import op.care.PnlCare;
 import op.care.sysfiles.DlgFiles;
 import op.process.DlgProcessAssign;
 import op.residents.DlgEditResidentBaseData;
@@ -54,6 +55,7 @@ public class PnlInfo extends NursingRecordsPanel {
 
     private JXSearchField txtSearch;
     private Resident resident;
+    private final PnlCare pnlCare;
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
 
@@ -76,9 +78,10 @@ public class PnlInfo extends NursingRecordsPanel {
         return internalClassID;
     }
 
-    public PnlInfo(Resident resident, JScrollPane jspSearch) {
+    public PnlInfo(Resident resident, JScrollPane jspSearch, PnlCare pnlCare) {
         this.jspSearch = jspSearch;
         this.resident = resident;
+        this.pnlCare = pnlCare;
         initComponents();
         initPanel();
         switchResident(resident);
@@ -917,6 +920,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                     OPDE.getMainframe().emptySearchArea();
                                     jspSearch = OPDE.getMainframe().prepareSearchArea();
                                     prepareSearchArea();
+                                    pnlCare.setJspSearch(jspSearch);
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -974,6 +978,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                     OPDE.getMainframe().emptySearchArea();
                                     jspSearch = OPDE.getMainframe().prepareSearchArea();
                                     prepareSearchArea();
+                                    pnlCare.setJspSearch(jspSearch);
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -1034,6 +1039,7 @@ public class PnlInfo extends NursingRecordsPanel {
                                     OPDE.getMainframe().emptySearchArea();
                                     jspSearch = OPDE.getMainframe().prepareSearchArea();
                                     prepareSearchArea();
+                                    pnlCare.setJspSearch(jspSearch);
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
