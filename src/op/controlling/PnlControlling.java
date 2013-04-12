@@ -485,7 +485,7 @@ public class PnlControlling extends CleanablePanel {
         } catch (NumberFormatException nfe) {
             fallsMonthsBack = 7;
         }
-        final JTextField txtFallsMonthsBack = GUITools.createIntegerTextField(1, 12, fallsMonthsBack);
+        final JTextField txtFallsMonthsBack = GUITools.createIntegerTextField(1, 120, fallsMonthsBack);
         txtFallsMonthsBack.setToolTipText(OPDE.lang.getString("misc.msg.monthsback"));
 
         btnFallsAnon.addActionListener(new ActionListener() {
@@ -529,7 +529,7 @@ public class PnlControlling extends CleanablePanel {
         } catch (NumberFormatException nfe) {
             fallsResMonthsBack = 7;
         }
-        final JTextField txtResFallsMonthsBack = GUITools.createIntegerTextField(1, 12, fallsResMonthsBack);
+        final JTextField txtResFallsMonthsBack = GUITools.createIntegerTextField(1, 120, fallsResMonthsBack);
         txtResFallsMonthsBack.setToolTipText(OPDE.lang.getString("misc.msg.monthsback"));
 
         btnFallsRes.addActionListener(new ActionListener() {
