@@ -488,7 +488,7 @@ public class PnlBHP extends NursingRecordsPanel {
                 (bhp.hasMed() ? ", <b>" + SYSTools.getAsHTML(bhp.getDose()) +
                         " " + DosageFormTools.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
                 BHPTools.getScheduleText(bhp, ", ", "") +
-                (bhp.getUser() != null ? ", <i>" + bhp.getUser().getUID() + "</i>" : "") +
+                (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser().getUID()) + "</i>" : "") +
                 "</font></html>";
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, null);

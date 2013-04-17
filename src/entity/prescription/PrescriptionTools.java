@@ -75,12 +75,15 @@ public class PrescriptionTools {
                     "      SELECT DISTINCT M.VorID, M.BWKennung, B.DafID FROM medinventory M  " +
                     "      INNER JOIN medstock B ON M.VorID = B.VorID " +
                     "      WHERE M.Bis = '9999-12-31 23:59:59' " +
-                    " ) vorr ON vorr.DafID = v.DafID AND vorr.BWKennung = v.BWKennung" +
-                    " LEFT OUTER JOIN medinventory vor ON vor.VorID = vorr.VorID" +
-                    " LEFT OUTER JOIN medstock best ON best.VorID = vor.VorID" +
+                    " ) vorr ON vorr.DafID = v.DafID AND vorr.BWKennung = v.BWKennung " +
+                    " LEFT OUTER JOIN medinventory vor ON vor.VorID = vorr.VorID " +
+                    " LEFT OUTER JOIN ( " +
+                    "      SELECT stock.BestID, stock.VorID FROM medstock stock " +
+                    "      WHERE stock.Aus = '9999-12-31 23:59:59' AND stock.Anbruch < '9999-12-31 23:59:59' " +
+                    ") best ON best.VorID = vor.VorID " +
                     " WHERE bw.adminonly <> 2 " +
                     " AND v.AnDatum < now() AND v.AbDatum > now() AND Date(bhp.LDatum) <= Date(now()) AND v.SitID IS NULL AND (v.DafID IS NOT NULL OR v.Stellplan IS TRUE) " +
-                    " AND bw.StatID = ? AND ((best.Aus = '9999-12-31 23:59:59' AND best.Anbruch < '9999-12-31 23:59:59') OR (v.DafID IS NULL)) " +
+                    " AND bw.StatID = ? " +
                     " ORDER BY CONCAT(bw.nachname,bw.vorname), bw.BWKennung, v.DafID IS NOT NULL, bhp.Uhrzeit, F.Stellplan, CONCAT( M.Bezeichnung, Ms.Bezeichnung)");
             query.setParameter(1, station.getStatID());
             printDailyPlan(station, query.getResultList());

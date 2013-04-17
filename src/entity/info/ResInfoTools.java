@@ -635,10 +635,17 @@ public class ResInfoTools {
          */
         if (resident.getGP() != null) {
             result += "<h2 id=\"fonth2\">" + OPDE.lang.getString("misc.msg.gp") + "</h2>";
-            result += "<div id=\"fonttext\">" + DocTools.getFullName(resident.getGP()) + ", " + resident.getGP().getStreet();
-            result += ", " + resident.getGP().getZIP() + " " + resident.getGP().getCity();
-            result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + resident.getGP().getTel() + ", " + OPDE.lang.getString("misc.msg.fax") + ": " + resident.getGP().getFax();
+
+            result += "<div id=\"fonttext\">";
+            if (OPDE.isAnonym()) {
+                result += "[" + OPDE.lang.getString("misc.msg.anon") + "]";
+            } else {
+                result += DocTools.getFullName(resident.getGP()) + ", " + resident.getGP().getStreet();
+                result += ", " + resident.getGP().getZIP() + " " + resident.getGP().getCity();
+                result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + resident.getGP().getTel() + ", " + OPDE.lang.getString("misc.msg.fax") + ": " + resident.getGP().getFax();
+            }
             result += "</div>";
+
         }
         return result;
     }
@@ -1127,18 +1134,18 @@ public class ResInfoTools {
         query1.setParameter("from", from.toDate());
         ArrayList<QProcessElement> listData = new ArrayList<QProcessElement>(query1.getResultList());
 
-        String jpql2 = " " +
-                " SELECT n FROM NReport n " +
-                " JOIN n.tags t " +
-                " WHERE n.pit > :from " +
-                " AND n.resident.adminonly <> 2 " +
-                " AND n.replacedBy IS NULL " +
-                " AND t.system = :tagsystem " +
-                " ORDER BY n.resident.rid, n.pit DESC ";
-        Query query2 = em.createQuery(jpql2);
-        query2.setParameter("tagsystem", NReportTAGSTools.TYPE_SYS_FALLS);
-        query2.setParameter("from", from.toDate());
-        listData.addAll(new ArrayList<QProcessElement>(query2.getResultList()));
+//        String jpql2 = " " +
+//                " SELECT n FROM NReport n " +
+//                " JOIN n.tags t " +
+//                " WHERE n.pit > :from " +
+//                " AND n.resident.adminonly <> 2 " +
+//                " AND n.replacedBy IS NULL " +
+//                " AND t.system = :tagsystem " +
+//                " ORDER BY n.resident.rid, n.pit DESC ";
+//        Query query2 = em.createQuery(jpql2);
+//        query2.setParameter("tagsystem", NReportTAGSTools.TYPE_SYS_FALLS);
+//        query2.setParameter("from", from.toDate());
+//        listData.addAll(new ArrayList<QProcessElement>(query2.getResultList()));
 
         p = 0;
         HashMap<Resident, ArrayList<QProcessElement>> dataMap = new HashMap<Resident, ArrayList<QProcessElement>>();

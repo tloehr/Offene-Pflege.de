@@ -38,7 +38,10 @@ public class DocTools {
 
     public static String getFullName(Doc doc) {
         if (doc != null) {
-            return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitle(), "", " ") + doc.getName() + " " + doc.getFirstname() + ", " + doc.getCity() ;
+            if (OPDE.isAnonym()) {
+                return "[" + OPDE.lang.getString("misc.msg.anon") + "]";
+            }
+            return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitle(), "", " ") + doc.getName() + " " + doc.getFirstname() + ", " + doc.getCity();
         } else {
             return OPDE.lang.getString("misc.msg.noentryyet");
         }

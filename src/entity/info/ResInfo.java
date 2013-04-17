@@ -66,9 +66,6 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
     @Temporal(TemporalType.TIMESTAMP)
     private Date to;
     @Lob
-    @Column(name = "XML")
-    private String xml;
-    @Lob
     @Column(name = "HTML")
     private String html;
     @Lob
@@ -135,10 +132,9 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
         this.attachedProcessConnections = new ArrayList<SYSINF2PROCESS>();
     }
 
-    public ResInfo(Date from, Date to, String xml, String html, String properties, String bemerkung, ResInfoType bwinfotyp, Resident resident) {
+    public ResInfo(Date from, Date to, String html, String properties, String bemerkung, ResInfoType bwinfotyp, Resident resident) {
         this.from = from;
         this.to = to;
-        this.xml = xml;
         this.html = html;
         this.properties = properties;
         this.bemerkung = bemerkung;
@@ -191,20 +187,12 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
         return attachedProcessConnections;
     }
 
-    public String getXml() {
-        return xml;
-    }
-
     public String getHtml() {
         return SYSTools.anonymizeString(html);
     }
 
     public void setHtml(String html) {
         this.html = html;
-    }
-
-    public void setXml(String xml) {
-        this.xml = xml;
     }
 
     public String getText() {
@@ -384,7 +372,6 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
         if (userOFF != null ? !userOFF.equals(resInfo.userOFF) : resInfo.userOFF != null) return false;
         if (userON != null ? !userON.equals(resInfo.userON) : resInfo.userON != null) return false;
         if (version != null ? !version.equals(resInfo.version) : resInfo.version != null) return false;
-        if (xml != null ? !xml.equals(resInfo.xml) : resInfo.xml != null) return false;
 
         return true;
     }
@@ -395,7 +382,6 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
         result = 31 * result + (version != null ? version.hashCode() : 0);
         result = 31 * result + (from != null ? from.hashCode() : 0);
         result = 31 * result + (to != null ? to.hashCode() : 0);
-        result = 31 * result + (xml != null ? xml.hashCode() : 0);
         result = 31 * result + (html != null ? html.hashCode() : 0);
         result = 31 * result + (properties != null ? properties.hashCode() : 0);
         result = 31 * result + (bemerkung != null ? bemerkung.hashCode() : 0);
@@ -408,7 +394,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
 
     @Override
     public ResInfo clone() {
-        return new ResInfo(from, to, xml, html, properties, bemerkung, bwinfotyp, resident);
+        return new ResInfo(from, to, html, properties, bemerkung, bwinfotyp, resident);
     }
 
     @Override

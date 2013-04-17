@@ -1191,7 +1191,7 @@ public class PnlInventory extends NursingRecordsPanel {
                             (rowsum.compareTo(BigDecimal.ZERO) < 0 ? "</font>" : "") +
                             "</td>" +
                             "<td width=\"100\" align=\"left\">" +
-                            tx.getUser().getUID() +
+                            SYSTools.anonymizeUser(tx.getUser().getUID()) +
                             "</td>" +
                             "</tr>" +
                             "</table>" +
