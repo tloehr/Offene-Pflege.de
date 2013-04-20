@@ -981,7 +981,7 @@ public class PnlHandover extends NursingRecordsPanel {
                 }
             });
             innerPanel.add(txtSearch);
-            JButton btnSearchGeneralReports = GUITools.createHyperlinkButton(internalClassID+".searchHandovers", null, null);
+            JButton btnSearchGeneralReports = GUITools.createHyperlinkButton(internalClassID + ".searchHandovers", null, null);
             btnSearchGeneralReports.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {

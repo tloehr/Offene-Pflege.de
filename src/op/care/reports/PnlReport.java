@@ -264,7 +264,8 @@ public class PnlReport extends NursingRecordsPanel {
         cmbTags.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
-                if (initPhase || itemEvent.getStateChange() != ItemEvent.SELECTED || !(cmbTags.getSelectedItem() instanceof NReportTAGS)) return;
+                if (initPhase || itemEvent.getStateChange() != ItemEvent.SELECTED || !(cmbTags.getSelectedItem() instanceof NReportTAGS))
+                    return;
                 SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Tags(resident, (NReportTAGS) cmbTags.getSelectedItem()), false, true, null, null), true);
 
             }
@@ -414,10 +415,12 @@ public class PnlReport extends NursingRecordsPanel {
         if (withworker) {
             initPhase = true;
 
+
             OPDE.getMainframe().setBlocked(true);
             OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
 
             SwingWorker worker = new SwingWorker() {
+                Date max = null;
 
                 @Override
                 protected Object doInBackground() throws Exception {
@@ -428,6 +431,7 @@ public class PnlReport extends NursingRecordsPanel {
                     hollidays = SYSCalendar.getHollidays(minmax.getFirst().getYear(), minmax.getSecond().getYear());
 
                     if (minmax != null) {
+                        max = minmax.getSecond().toDate();
                         DateMidnight start = minmax.getFirst().toDateMidnight().dayOfMonth().withMinimumValue();
                         DateMidnight end = resident.isActive() ? new DateMidnight() : minmax.getSecond().toDateMidnight().dayOfMonth().withMinimumValue();
                         for (int year = end.getYear(); year >= start.getYear(); year--) {
@@ -447,6 +451,11 @@ public class PnlReport extends NursingRecordsPanel {
                     OPDE.getDisplayManager().setProgressBarMessage(null);
                     OPDE.getMainframe().setBlocked(false);
                     if (lockmessageAfterwards) OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    if (max != null) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.lastEntry") + ": " + DateFormat.getDateInstance().format(max), 5));
+                    } else {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.noentryyet"), 5));
+                    }
                 }
             };
             worker.execute();

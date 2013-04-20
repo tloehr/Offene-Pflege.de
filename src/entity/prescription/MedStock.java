@@ -144,6 +144,15 @@ public class MedStock implements Serializable, Comparable<MedStock> {
         }
     }
 
+    /**
+     * the UPREffective value is in fact never used. it is simply stored for debugging reasons.
+     * when the user sets a new UPR, then THIS UPR is always stored as UPReffective. The setUPR method
+     * then decides if the UPR should be preserved or discarded.
+     * if it is discarded the UPR which was used when the new stock was registeres is kept.
+     * if not, it replaces the old value.
+     * if the UPR is a dummy (because its the first stock for that tradeform) its always used.
+     * @return
+     */
     public BigDecimal getUPREffective() {
         return uprEffective;
     }

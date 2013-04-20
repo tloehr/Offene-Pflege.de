@@ -339,17 +339,17 @@ public class MedStockTools {
 
     }
 
-    public static String getCompactHTML(MedStock stock) {
-        String result = "";
-        result += "<b>" + stock.getID() + "</b>&nbsp;";
-        result += TradeFormTools.toPrettyString(stock.getTradeForm());
-
-        if (stock.hasPackage()) {
-            result += ", " + MedPackageTools.toPrettyString(stock.getPackage());
-        }
-        result += ", APV: " + NumberFormat.getNumberInstance().format(stock.getUPR()) + " " + (stock.isDummyUPR() ? OPDE.lang.getString(PnlInventory.internalClassID + ".UPRwillBeReplaced") : "");
-        return result;
-    }
+//    public static String getCompactHTML(MedStock stock) {
+//        String result = "";
+//        result += "<b>" + stock.getID() + "</b>&nbsp;";
+//        result += TradeFormTools.toPrettyString(stock.getTradeForm());
+//
+//        if (stock.hasPackage()) {
+//            result += ", " + MedPackageTools.toPrettyString(stock.getPackage());
+//        }
+//        result += ", APV: " + NumberFormat.getNumberInstance().format(stock.getUPR()) + " " + (stock.isDummyUPR() ? OPDE.lang.getString(PnlInventory.internalClassID + ".UPRwillBeReplaced") : "");
+//        return result;
+//    }
 
     public static void open(EntityManager em, MedStock stock) {
         MedStock myStock = em.merge(stock);

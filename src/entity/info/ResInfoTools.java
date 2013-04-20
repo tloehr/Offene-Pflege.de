@@ -615,6 +615,14 @@ public class ResInfoTools {
         }
 
 
+        Date absentSince = ResInfoTools.absentSince(resident);
+        if (absentSince != null) {
+            result += "<tr id=\"fonttext\"><td valign=\"top\">" + OPDE.lang.getString("misc.msg.ResidentAbsentSince") + "</td><td valign=\"top\">";
+            result += DateFormat.getDateInstance().format(absentSince);
+            result += "</td></tr>";
+        }
+
+
         // TODO: "ANGEH" ersetzen
         ResInfo bwinfo_angeh = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByID("ANGEH"));
         if (bwinfo_angeh != null) {
@@ -869,6 +877,7 @@ public class ResInfoTools {
             }
 //            result += "<br/><br/>";
         }
+
 
         /***
          *      _   _             _
