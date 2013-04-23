@@ -17,7 +17,7 @@
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
-        <string>default, linegap, default, linegap, default, relgap, pref, linegap, default:grow, linegap, default</string> 
+        <string>default, linegap, default, linegap, default, relgap, pref, linegap, default, linegap, default:grow, linegap, default</string> 
        </void> 
       </object> 
       <void property="name"> 
@@ -202,7 +202,7 @@
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>9</int> 
+         <int>11</int> 
         </void> 
         <void method="setProperty"> 
          <string>hAlign</string> 
@@ -255,6 +255,128 @@
       </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormContainer"> 
+        <string>javax.swing.JPanel</string> 
+        <object class="com.jformdesigner.model.FormLayoutManager"> 
+         <class>javax.swing.BoxLayout</class> 
+         <void method="setProperty"> 
+          <string>axis</string> 
+          <int>0</int> 
+         </void> 
+        </object> 
+        <void property="name"> 
+         <string>pnlUPR</string> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JRadioButton</string> 
+          <void method="setProperty"> 
+           <string>text</string> 
+           <string>text</string> 
+          </void> 
+          <void method="setProperty"> 
+           <string>$buttonGroup</string> 
+           <object class="com.jformdesigner.model.FormReference"> 
+            <string>buttonGroup1</string> 
+           </object> 
+          </void> 
+          <void property="name"> 
+           <string>rbCalcUPR</string> 
+          </void> 
+          <void method="addEvent"> 
+           <object class="com.jformdesigner.model.FormEvent"> 
+            <string>java.awt.event.ItemListener</string> 
+            <string>itemStateChanged</string> 
+            <string>rbCalcUPRItemStateChanged</string> 
+            <boolean>true</boolean> 
+           </object> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JRadioButton</string> 
+          <void method="setProperty"> 
+           <string>text</string> 
+           <string>text</string> 
+          </void> 
+          <void method="setProperty"> 
+           <string>$buttonGroup</string> 
+           <object class="com.jformdesigner.model.FormReference"> 
+            <string>buttonGroup1</string> 
+           </object> 
+          </void> 
+          <void property="name"> 
+           <string>rbSetUPR</string> 
+          </void> 
+          <void method="addEvent"> 
+           <object class="com.jformdesigner.model.FormEvent"> 
+            <string>java.awt.event.ItemListener</string> 
+            <string>itemStateChanged</string> 
+            <string>rbSetUPRItemStateChanged</string> 
+            <boolean>true</boolean> 
+           </object> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JTextField</string> 
+          <void method="setProperty"> 
+           <string>columns</string> 
+           <int>10</int> 
+          </void> 
+          <void property="name"> 
+           <string>txtUPR</string> 
+          </void> 
+          <void method="addEvent"> 
+           <object class="com.jformdesigner.model.FormEvent"> 
+            <string>java.awt.event.FocusListener</string> 
+            <string>focusLost</string> 
+            <string>txtUPRFocusLost</string> 
+            <boolean>true</boolean> 
+           </object> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JLabel</string> 
+          <void method="setProperty"> 
+           <string>text</string> 
+           <string>text</string> 
+          </void> 
+          <void property="name"> 
+           <string>lblTo1</string> 
+          </void> 
+         </object> 
+        </void> 
+       </object> 
+       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+        <class>com.jgoodies.forms.layout.CellConstraints</class> 
+        <void method="setProperty"> 
+         <string>gridX</string> 
+         <int>3</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridY</string> 
+         <int>9</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridWidth</string> 
+         <int>5</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>vAlign</string> 
+         <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
+        </void> 
+        <void method="setProperty"> 
+         <string>hAlign</string> 
+         <object class="com.jgoodies.forms.layout.CellConstraints" field="LEFT"/> 
+        </void> 
+       </object> 
+      </void> 
+      <void method="add"> 
+       <object class="com.jformdesigner.model.FormContainer"> 
         <string>javax.swing.JScrollPane</string> 
         <object class="com.jformdesigner.model.FormLayoutManager"> 
          <class>javax.swing.JScrollPane</class> 
@@ -299,7 +421,7 @@
         </void> 
         <void method="setProperty"> 
          <string>gridY</string> 
-         <int>9</int> 
+         <int>11</int> 
         </void> 
         <void method="setProperty"> 
          <string>vAlign</string> 
@@ -324,8 +446,26 @@
       <void method="setProperty"> 
        <string>size</string> 
        <object class="java.awt.Dimension"> 
-        <int>630</int> 
+        <int>800</int> 
         <int>500</int> 
+       </object> 
+      </void> 
+     </object> 
+    </void> 
+    <void method="add"> 
+     <object class="com.jformdesigner.model.FormNonVisual"> 
+      <string>javax.swing.ButtonGroup</string> 
+      <void property="name"> 
+       <string>buttonGroup1</string> 
+      </void> 
+     </object> 
+     <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+      <null/> 
+      <void method="setProperty"> 
+       <string>location</string> 
+       <object class="java.awt.Point"> 
+        <int>0</int> 
+        <int>510</int> 
        </object> 
       </void> 
      </object> 

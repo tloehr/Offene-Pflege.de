@@ -93,7 +93,7 @@
         </class>
         <class name="opde.medication" short="Medikamente"
                long="Medikamente eingeben, buchen, korrigieren. All das können Sie hier." main="true"
-               javaclass="op.care.med.PnlMed" icon="agt_virussafe.png">
+               javaclass="op.care.med.structure.PnlMed" icon="agt_virussafe.png">
             <execute langbundle="appinfo.default.acl.execute"/>
             <insert langbundle="appinfo.default.acl.insert"/>
             <manager langbundle="appinfo.default.acl.manager"/>

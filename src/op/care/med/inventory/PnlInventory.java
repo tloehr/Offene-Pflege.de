@@ -38,6 +38,8 @@ import entity.prescription.*;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.info.PnlInfo;
+import op.care.med.structure.DlgUPREditor;
+import op.care.med.structure.PnlMed;
 import op.system.InternalClassACL;
 import op.system.LogicalPrinter;
 import op.system.PrinterForm;
@@ -730,6 +732,33 @@ public class PnlInventory extends NursingRecordsPanel {
                 });
                 btnDelete.setEnabled(!stock.isClosed());
                 cptitle.getRight().add(btnDelete);
+            }
+
+            if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlMed.internalClassID)) {
+                /***
+                 *      _   _ ____  ____          _ _ _
+                 *     | | | |  _ \|  _ \ ___  __| (_) |_ ___  _ __
+                 *     | | | | |_) | |_) / _ \/ _` | | __/ _ \| '__|
+                 *     | |_| |  __/|  _ <  __/ (_| | | || (_) | |
+                 *      \___/|_|   |_| \_\___|\__,_|_|\__\___/|_|
+                 *
+                 */
+                final JButton btnUPReditor = new JButton(SYSConst.icon22calc);
+                btnUPReditor.setPressedIcon(SYSConst.icon22Pressed);
+                btnUPReditor.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                btnUPReditor.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnUPReditor.setContentAreaFilled(false);
+                btnUPReditor.setBorder(null);
+//                btnUPReditor.setToolTipText(OPDE.lang.getString(internalClassID + ".stock.btndelete.tooltip"));
+                btnUPReditor.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        new DlgUPREditor(stock.getTradeForm());
+                        reload();
+                    }
+                });
+                btnUPReditor.setEnabled(stock.getTradeForm().getDosageForm().isUPRn());
+                cptitle.getRight().add(btnUPReditor);
             }
         }
         /***

@@ -50,7 +50,7 @@ import entity.system.SYSPropsTools;
 import op.allowance.PnlAllowance;
 import op.care.PnlCare;
 import op.care.info.PnlInfo;
-import op.care.med.PnlMed;
+import op.care.med.structure.PnlMed;
 import op.care.supervisor.PnlHandover;
 import op.controlling.PnlControlling;
 import op.process.PnlProcess;
@@ -543,7 +543,7 @@ public class FrmMain extends JFrame {
             panel = new PnlAllowance(jspSearch);
         } else if (classname.equals("op.process.PnlProcess")) {
             panel = new PnlProcess(jspSearch);
-        } else if (classname.equals("op.care.med.PnlMed")) {
+        } else if (classname.equals("op.care.med.structure.PnlMed")) {
             panel = new PnlMed(jspSearch);
         } else if (classname.equals("op.users.PnlUser")) {
             panel = new PnlUser(jspSearch);

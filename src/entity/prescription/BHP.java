@@ -188,8 +188,7 @@ public class BHP implements Serializable, Comparable<BHP> {
     }
 
     public boolean shouldBeCalculated() {
-        // TODO: distinction between the several UPR modes
-        return hasMed() && resident.isCalcMediUPR1();
+        return hasMed() && resident.isCalcMediUPR1() && !getPrescription().getTradeForm().getDosageForm().isDontCALC();
     }
 
     public boolean isOpen() {

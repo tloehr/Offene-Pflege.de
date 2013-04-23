@@ -2,7 +2,7 @@
  * Created by JFormDesigner on Thu Mar 07 10:20:20 CET 2013
  */
 
-package op.care.med;
+package op.care.med.structure;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
@@ -146,7 +146,7 @@ public class PnlDosageForm extends PopupPanel {
         lblEquiv.setText(OPDE.lang.getString(internalClassID + ".sameas"));
         lblUPRState.setText(OPDE.lang.getString(internalClassID + ".uprstate"));
 
-        cmbUPR.setModel(new DefaultComboBoxModel(new String[]{OPDE.lang.getString("state_upr1"), OPDE.lang.getString("state_upr_by_tradeform"), OPDE.lang.getString("state_upr_by_resident")}));
+        cmbUPR.setModel(new DefaultComboBoxModel(new String[]{OPDE.lang.getString("state_upr1"), OPDE.lang.getString("state_uprn"), OPDE.lang.getString("state_dont_calc")}));
         cmbUPR.setSelectedIndex(form.getUPRState());
         cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findBy(InterventionTools.TYPE_PRESCRIPTION).toArray()));
         cmbUsageUnit.setModel(new DefaultComboBoxModel(Arrays.copyOfRange(SYSConst.UNITS, 1, SYSConst.UNITS.length - 1)));

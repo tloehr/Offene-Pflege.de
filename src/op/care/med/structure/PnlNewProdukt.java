@@ -25,7 +25,7 @@
  * 
  */
 
-package op.care.med;
+package op.care.med.structure;
 
 import com.jgoodies.forms.factories.*;
 import com.jgoodies.forms.layout.*;

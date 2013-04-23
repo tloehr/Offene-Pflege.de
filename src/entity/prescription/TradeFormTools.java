@@ -59,7 +59,7 @@ public class TradeFormTools {
         String usageText = SYSTools.catchNull(tradeForm.getDosageForm().getUsageText());
         String subtext = SYSTools.catchNull(tradeForm.getSubtext());
 
-        String text = tradeForm.getMedProduct().getBezeichnung();
+        String text = tradeForm.getMedProduct().getText();
         text += subtext.isEmpty() ? "" : " " + subtext;
         text += preparation.isEmpty() ? " " : ", " + preparation + ", ";
         text += usageText.isEmpty() ? SYSConst.UNITS[tradeForm.getDosageForm().getUsageUnit()] : usageText;
@@ -70,7 +70,7 @@ public class TradeFormTools {
         String preparation = SYSTools.catchNull(tradeForm.getDosageForm().getPreparation());
         String usageText = SYSTools.catchNull(tradeForm.getDosageForm().getUsageText());
         String subtext = SYSTools.catchNull(tradeForm.getSubtext());
-        String text = tradeForm.getMedProduct().getBezeichnung();
+        String text = tradeForm.getMedProduct().getText();
         text += subtext.isEmpty() ? "" : " " + subtext;
         text = SYSConst.html_bold(text);
         text += preparation.isEmpty() ? " " : ", " + preparation + ", ";
@@ -84,7 +84,7 @@ public class TradeFormTools {
             String altPreparation = SYSTools.catchNull(alternative.getDosageForm().getPreparation());
             String altUsageText = SYSTools.catchNull(alternative.getDosageForm().getUsageText());
             String altSubtext = SYSTools.catchNull(alternative.getSubtext());
-            text += "(" + OPDE.lang.getString(PnlPrescription.internalClassID + ".originalprescription") + ": " + alternative.getMedProduct().getBezeichnung() + (altSubtext.isEmpty() ? "" : " " + altSubtext);
+            text += "(" + OPDE.lang.getString(PnlPrescription.internalClassID + ".originalprescription") + ": " + alternative.getMedProduct().getText() + (altSubtext.isEmpty() ? "" : " " + altSubtext);
             text += altPreparation.isEmpty() ? " " : ", " + altPreparation + ", ";
             text += altUsageText.isEmpty() ? SYSConst.UNITS[alternative.getDosageForm().getUsageUnit()] : altUsageText;
             text += ")";

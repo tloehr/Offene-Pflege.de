@@ -16,8 +16,8 @@ import java.awt.*;
  */
 public class DosageFormTools {
     public static final short STATE_UPR1 = 0;
-    public static final short STATE_UPR_BY_TRADEFORM = 1;
-    public static final short STATE_UPR_BY_RESIDENT = 2;
+    public static final short STATE_UPRn = 1;
+    public static final short STATE_DONT_CALC = 2;
 
     /**
      * @param maxlen maximale Zeichenlänge pro Zeile. maxlen < 1 heisst egal.

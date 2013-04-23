@@ -8,8 +8,9 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.prescription.*;
 import op.OPDE;
-import op.care.med.PnlDosageForm;
+import op.care.med.structure.PnlDosageForm;
 import op.tools.GUITools;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
@@ -20,10 +21,9 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -82,6 +82,14 @@ public class PnlSubtext extends JPanel {
         dosageForm = (DosageForm) cmbFormen.getSelectedItem();
 
         tradeForm = new TradeForm(product, "", dosageForm);
+
+        rbCalcUPR.setSelected(true);
+        rbCalcUPR.setText(OPDE.lang.getString(internalClassID + ".calcUPR"));
+        rbSetUPR.setText(OPDE.lang.getString(internalClassID + ".setUPR"));
+        txtUPR.setText("10");
+        txtUPR.setEnabled(false);
+        pnlUPR.setVisible(false);
+
         validate.execute(tradeForm);
     }
 
@@ -119,9 +127,18 @@ public class PnlSubtext extends JPanel {
         dosageForm = (DosageForm) cmbFormen.getSelectedItem();
 
         tradeForm = new TradeForm(product, txtZusatz.getText().trim(), dosageForm);
-        validate.execute(tradeForm);
-    }
 
+        // selection of constant UPR ?
+        if (dosageForm.getUPRState() == DosageFormTools.STATE_UPRn) {
+            lblTo1.setText(" " + SYSConst.UNITS[dosageForm.getUsageUnit()] + " " + dosageForm.getUsageText() + " " + OPDE.lang.getString("misc.msg.to1") + " " + SYSConst.UNITS[dosageForm.getPackUnit()]);
+            pnlUPR.setVisible(true);
+            rbCalcUPR.setSelected(true);
+        } else {
+            pnlUPR.setVisible(false);
+            validate.execute(tradeForm);
+        }
+
+    }
 
     private void btnAddActionPerformed(ActionEvent e) {
         PnlDosageForm pnl = new PnlDosageForm(new DosageForm(0));
@@ -139,6 +156,33 @@ public class PnlSubtext extends JPanel {
         }, btnAdd), SwingConstants.SOUTH_WEST);
     }
 
+    private void rbCalcUPRItemStateChanged(ItemEvent e) {
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            tradeForm.setUpr(null);
+            txtUPR.setEnabled(false);
+            validate.execute(tradeForm);
+        }
+    }
+
+    private void rbSetUPRItemStateChanged(ItemEvent e) {
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            tradeForm.setUpr(SYSTools.checkBigDecimal(txtUPR.getText()));
+            txtUPR.setEnabled(true);
+            validate.execute(tradeForm);
+        }
+    }
+
+    private void txtUPRFocusLost(FocusEvent e) {
+        BigDecimal upr = SYSTools.checkBigDecimal(txtUPR.getText());
+        if (upr == null || upr.compareTo(BigDecimal.ZERO) <= 0) {
+            upr = BigDecimal.TEN;
+            txtUPR.setText("10");
+        } else {
+            txtUPR.setText(upr.setScale(2, RoundingMode.HALF_UP).toString());
+        }
+        tradeForm.setUpr(upr);
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         txtZusatz = new JXSearchField();
@@ -146,13 +190,18 @@ public class PnlSubtext extends JPanel {
         btnAdd = new JButton();
         lbl1 = new JLabel();
         lblMsg = new JLabel();
+        pnlUPR = new JPanel();
+        rbCalcUPR = new JRadioButton();
+        rbSetUPR = new JRadioButton();
+        txtUPR = new JTextField();
+        lblTo1 = new JLabel();
         jsp1 = new JScrollPane();
         lstDaf = new JList();
 
         //======== this ========
         setLayout(new FormLayout(
             "2*(default, $lcgap), default:grow, 2*($lcgap, default)",
-            "2*(default, $lgap), default, $rgap, pref, $lgap, default:grow, $lgap, default"));
+            "2*(default, $lgap), default, $rgap, pref, $lgap, default, $lgap, default:grow, $lgap, default"));
 
         //---- txtZusatz ----
         txtZusatz.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -195,13 +244,53 @@ public class PnlSubtext extends JPanel {
         lbl1.setText(null);
         lbl1.setIcon(new ImageIcon(getClass().getResource("/artwork/other/medicine2.png")));
         lbl1.setFont(new Font("Arial", Font.PLAIN, 18));
-        add(lbl1, CC.xy(3, 9, CC.CENTER, CC.FILL));
+        add(lbl1, CC.xy(3, 11, CC.CENTER, CC.FILL));
 
         //---- lblMsg ----
         lblMsg.setText("text");
         lblMsg.setFont(new Font("Arial", Font.PLAIN, 14));
         lblMsg.setHorizontalAlignment(SwingConstants.RIGHT);
         add(lblMsg, CC.xywh(3, 7, 5, 1));
+
+        //======== pnlUPR ========
+        {
+            pnlUPR.setLayout(new BoxLayout(pnlUPR, BoxLayout.X_AXIS));
+
+            //---- rbCalcUPR ----
+            rbCalcUPR.setText("text");
+            rbCalcUPR.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    rbCalcUPRItemStateChanged(e);
+                }
+            });
+            pnlUPR.add(rbCalcUPR);
+
+            //---- rbSetUPR ----
+            rbSetUPR.setText("text");
+            rbSetUPR.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    rbSetUPRItemStateChanged(e);
+                }
+            });
+            pnlUPR.add(rbSetUPR);
+
+            //---- txtUPR ----
+            txtUPR.setColumns(10);
+            txtUPR.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusLost(FocusEvent e) {
+                    txtUPRFocusLost(e);
+                }
+            });
+            pnlUPR.add(txtUPR);
+
+            //---- lblTo1 ----
+            lblTo1.setText("text");
+            pnlUPR.add(lblTo1);
+        }
+        add(pnlUPR, CC.xywh(3, 9, 5, 1, CC.LEFT, CC.FILL));
 
         //======== jsp1 ========
         {
@@ -217,7 +306,12 @@ public class PnlSubtext extends JPanel {
             });
             jsp1.setViewportView(lstDaf);
         }
-        add(jsp1, CC.xywh(5, 9, 3, 1, CC.DEFAULT, CC.FILL));
+        add(jsp1, CC.xywh(5, 11, 3, 1, CC.DEFAULT, CC.FILL));
+
+        //---- buttonGroup1 ----
+        ButtonGroup buttonGroup1 = new ButtonGroup();
+        buttonGroup1.add(rbCalcUPR);
+        buttonGroup1.add(rbSetUPR);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
@@ -227,6 +321,11 @@ public class PnlSubtext extends JPanel {
     private JButton btnAdd;
     private JLabel lbl1;
     private JLabel lblMsg;
+    private JPanel pnlUPR;
+    private JRadioButton rbCalcUPR;
+    private JRadioButton rbSetUPR;
+    private JTextField txtUPR;
+    private JLabel lblTo1;
     private JScrollPane jsp1;
     private JList lstDaf;
     // JFormDesigner - End of variables declaration  //GEN-END:variables

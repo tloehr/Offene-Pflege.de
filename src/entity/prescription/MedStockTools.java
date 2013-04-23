@@ -110,36 +110,6 @@ public class MedStockTools {
         return hm;
     }
 
-
-//    public static String getBestandText4Print(MedBestand bestand) {
-//        String result = "";
-//
-//        result = SYSPrint.EPL2_CLEAR_IMAGE_BUFFER;
-//        result += SYSPrint.EPL2_labelformat(57, 19, 3);
-//        result += SYSPrint.EPL2_print_ascii(5, 5, 0, SYSPrint.EPL2_FONT_7pt, 1, 1, false, DarreichungTools.toPrettyString(bestand.getTradeForm())); // bestand.getTradeForm().getMedProduct().getText() + " " + bestand.getTradeForm().getSubtext())
-//        if (!SYSTools.catchNull(bestand.getPackage().getPzn()).equals("")) {
-//            result += SYSPrint.EPL2_print_ascii(5, 30, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, "PZN:" + bestand.getPackage().getPzn() + "  Datum:" + DateFormat.getDateInstance().format(bestand.getIN()) + " (" + bestand.getUser().getUID() + ")");
-//        }
-//
-//        result += SYSPrint.EPL2_print_ascii(5, 55, 0, SYSPrint.EPL2_FONT_12pt, 2, 2, true, Long.toString(bestand.getID()));
-//        result += SYSPrint.EPL2_print_ascii(5, 107, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, BewohnerTools.getNameAndFirstname(bestand.getInventory().getResident()));
-//        result += SYSPrint.EPL2_print_ascii(5, 122, 0, SYSPrint.EPL2_FONT_6pt, 1, 1, false, BewohnerTools.getBWLabel2(bestand.getInventory().getResident()));
-//
-//        result += SYSPrint.EPL2_PRINT;
-//
-//
-//        // Konvertierung auf PC850 weg. Umlauten.
-//        try {
-//            byte[] conv = result.getBytes("Cp850");
-//            result = new String(conv);
-//        } catch (UnsupportedEncodingException ex) {
-//            //ex.printStackTrace();
-//            new DlgException(ex);
-//        }
-//        return result;
-//    }
-
-
     public static BigDecimal getSum(MedStock bestand) {
         BigDecimal result = BigDecimal.ZERO;
         for (MedStockTransaction buchung : bestand.getStockTransaction()) {
@@ -289,7 +259,7 @@ public class MedStockTools {
 
     public static String getTextASHTML(MedStock bestand) {
         String result = "";
-        result += "<font color=\"blue\"><b>" + bestand.getTradeForm().getMedProduct().getBezeichnung() + " " + bestand.getTradeForm().getSubtext() + ", ";
+        result += "<font color=\"blue\"><b>" + bestand.getTradeForm().getMedProduct().getText() + " " + bestand.getTradeForm().getSubtext() + ", ";
 
         if (bestand.getPackage() != null && !SYSTools.catchNull(bestand.getPackage().getPzn()).isEmpty()) {
             result += OPDE.lang.getString("misc.msg.PZN") + ": " + bestand.getPackage().getPzn() + ", ";
@@ -461,14 +431,14 @@ public class MedStockTools {
 //        if (!stock.getTradeForm().getDosageForm().isUPR1()) {
 //            EntityManager em = OPDE.createEM();
 //            Query query = null;
-//            if (stock.getTradeForm().getDosageForm().getUPRState() == DosageFormTools.STATE_UPR_BY_RESIDENT) {
-//                OPDE.debug("STATE_UPR_BY_RESIDENT");
+//            if (stock.getTradeForm().getDosageForm().getUPRState() == DosageFormTools.STATE_DONT_CALC) {
+//                OPDE.debug("STATE_DONT_CALC");
 //                String jpql = "SELECT AVG(upr.upr) FROM UPR upr WHERE upr.tradeform = :tradeform AND upr.resident = :resident ";
 //                query = em.createQuery(jpql);
 //                query.setParameter("tradeform", stock.getTradeForm());
 //                query.setParameter("resident", stock.getInventory().getResident());
 //            } else {
-//                OPDE.debug("STATE_UPR_BY_TRADEFORM");
+//                OPDE.debug("STATE_UPRn");
 //                String jpql = "SELECT AVG(upr.upr) FROM UPR upr WHERE upr.tradeform = :tradeform ";
 //                query = em.createQuery(jpql);
 //                query.setParameter("tradeform", stock.getTradeForm());
@@ -508,8 +478,9 @@ public class MedStockTools {
         if (medstock.getTradeForm().getDosageForm().isUPR1()) {
             return BigDecimal.ONE;
         }
-
-//        BigDecimal resultUPR = medstock.getUPR();
+        if (medstock.getTradeForm().getUpr() != null){
+            return medstock.getTradeForm().getUpr();
+        }
 
         OPDE.debug("<--- recalculateUPR ");
         OPDE.debug("MedStock ID: " + medstock.getID());
@@ -519,7 +490,7 @@ public class MedStockTools {
         BigDecimal startContent = MedStockTools.getStartTX(medstock).getAmount();
 
         // usage unit
-        BigDecimal sumOfAllAplications = MedStockTools.getSumOfDosesInBHP(medstock);
+        BigDecimal theoreticalSum = MedStockTools.getSumOfDosesInBHP(medstock);
 
         // Die Gaben aus der BHP sind immer in der Anwendungseinheit. Teilt man diese durch das
         // verwendete APV, erhält man das was rechnerisch in der Packung drin gewesen
@@ -532,25 +503,15 @@ public class MedStockTools {
         // the unit of the usage.
         // When a package is empty, we know two things for sure:
         // 1. The startContent has been completely used up
-        // 2. the sum of all applications (theoreticalSum) is what we could really get out of the bottle
+        // 2. the sum of all applications (theoreticalSum) is what we've got really out of the bottle
         //
         // hence the effective UPR must have been
         //
-        //                          the startContent in the package unit
-        //    effective UPR   =     --------------------------------------------
         //                          the sum of all applications in the usage unit
+        //    effective UPR   =     --------------------------------------------
+        //                          the startContent in the package unit
         //
-        // This prevents a DIV BY ZERO error, if the MedStock in question has never been used.
-        BigDecimal effectiveUPR = sumOfAllAplications.equals(BigDecimal.ZERO) ? medstock.getUPR() : startContent.divide(sumOfAllAplications, 4, BigDecimal.ROUND_UP);
-
-        // Nimmt man den realen Inhalt und teil ihn durch den rechnerischen, dann gibt es drei Möglichkeiten
-        // 1. Es wurde mehr gegeben als in der Packung drin war. Dann muss das ursprüngliche APV zu gross gewesen
-        // sein. Die Division von realem Inhalt durch rechnerischem Inhalt ist kleiner 1 und somit wird auch
-        // das apvNeu kleiner als das apvAlt.
-        // 2. Es wurde genau so viel gegeben wie drin war. Dann war das apvAlt genau richtig. Der Divisor ist
-        // dann 1 und apvNeu ist gleich apvAlt.
-        // 3. Es wurde weniger gegeben als drin war. Dann war apvAlt zu klein und der Divisor (real durch rechnerisch) wird größer 0 und
-        // der apvNeu wird größer als der apvAlt.
+        BigDecimal effectiveUPR = theoreticalSum.divide(startContent, 4, BigDecimal.ROUND_UP);
 
         return effectiveUPR;
     }
@@ -563,12 +524,20 @@ public class MedStockTools {
     public static BigDecimal getEstimatedUPR(TradeForm tradeForm, Resident resident) {
         OPDE.debug("<--- calcProspectiveUPR");
         BigDecimal upr;
-        if (tradeForm.getDosageForm().getUPRState() == DosageFormTools.STATE_UPR_BY_RESIDENT) {
-            OPDE.debug("STATE_UPR_BY_RESIDENT");
-            upr = getEstimatedUPR_BY_RESIDENT(tradeForm, resident);
-        } else if (tradeForm.getDosageForm().getUPRState() == DosageFormTools.STATE_UPR_BY_TRADEFORM) {
-            OPDE.debug("STATE_UPR_BY_TRADEFORM");
-            upr = getEstimatedUPR_BY_TRADEFORM(tradeForm);
+        if (tradeForm.getDosageForm().getUPRState() == DosageFormTools.STATE_DONT_CALC) {
+            OPDE.debug("STATE_DONT_CALC");
+            upr = BigDecimal.ONE;// getEstimatedUPR_BY_RESIDENT(tradeForm, resident);
+        } else if (tradeForm.getDosageForm().getUPRState() == DosageFormTools.STATE_UPRn) {
+            OPDE.debug("STATE_UPRn");
+
+            if (tradeForm.getUpr() != null){
+                // if there is a constant UPR defined for that tradeform
+                // then there is no estimation necessary
+                upr = tradeForm.getUpr();
+            } else {
+                upr = getEstimatedUPR_BY_TRADEFORM(tradeForm);
+            }
+
         } else {
             OPDE.debug("STATE_UPR1");
             upr = BigDecimal.ONE;

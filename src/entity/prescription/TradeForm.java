@@ -2,6 +2,7 @@ package entity.prescription;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -19,6 +20,9 @@ public class TradeForm implements Serializable {
     @Version
     @Column(name = "version")
     private Long version;
+    @Basic(optional = false)
+    @Column(name = "UPR")
+    private BigDecimal upr;
 
     public TradeForm() {
     }
@@ -27,6 +31,7 @@ public class TradeForm implements Serializable {
         this.medProduct = medProduct;
         this.packages = new ArrayList<MedPackage>();
         this.stocks = new ArrayList<MedStock>();
+        this.upr = null;
     }
 
     public TradeForm(MedProducts medProduct, String subtext, DosageForm dosageForm) {
@@ -35,6 +40,7 @@ public class TradeForm implements Serializable {
         this.dosageForm = dosageForm;
         this.packages = new ArrayList<MedPackage>();
         this.stocks = new ArrayList<MedStock>();
+        this.upr = null;
     }
 
     public Long getID() {
@@ -86,6 +92,14 @@ public class TradeForm implements Serializable {
 
     public Collection<MedStock> getMedStocks() {
         return stocks;
+    }
+
+    public BigDecimal getUpr() {
+        return upr;
+    }
+
+    public void setUpr(BigDecimal upr) {
+        this.upr = upr;
     }
 
     @Override

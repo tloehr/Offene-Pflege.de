@@ -42,12 +42,8 @@ public class MedProducts implements Serializable {
     }
 
 
-    public String getBezeichnung() {
+    public String getText() {
         return text;
-    }
-
-    public void setBezeichnung(String bezeichnung) {
-        this.text = bezeichnung;
     }
 
     public ACME getACME() {

@@ -26,9 +26,8 @@
  */
 
 
-package op.care.med;
+package op.care.med.structure;
 
-import java.awt.event.*;
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.popup.JidePopup;
@@ -41,7 +40,10 @@ import op.care.med.inventory.DlgNewStocks;
 import op.care.med.inventory.PnlInventory;
 import op.care.med.prodassistant.MedProductWizard;
 import op.system.InternalClassACL;
-import op.tools.*;
+import op.tools.CleanablePanel;
+import op.tools.GUITools;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
@@ -56,10 +58,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
+import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
@@ -182,9 +181,9 @@ public class PnlMed extends CleanablePanel {
 
             if (treeMed.getRowForLocation(evt.getX(), evt.getY()) != -1) {
                 JMenuItem itemedit = null;
-                JMenuItem itemdelete = null;
-                JMenuItem itemnew = null;
-                JMenuItem itempack = null;
+                JMenuItem itemUPRedit = null;
+//                JMenuItem itemnew = null;
+//                JMenuItem itempack = null;
                 TreePath curPath = treeMed.getPathForLocation(evt.getX(), evt.getY());
                 DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) curPath.getLastPathComponent();
                 treeMed.setSelectionPath(curPath);
@@ -201,12 +200,13 @@ public class PnlMed extends CleanablePanel {
                             createTree();
                         }
                     });
-//                    itemdelete = new JMenuItem("Entfernen");
-//                    itemdelete.addActionListener(new java.awt.event.ActionListener() {
-//                        public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                            btnDeleteDAF(tradeForm);
-//                        }
-//                    });
+                    itemUPRedit = new JMenuItem("UPREdit");
+                    itemUPRedit.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                            new DlgUPREditor(tradeForm);
+                        }
+                    });
+                    itemUPRedit.setEnabled(tradeForm.getDosageForm().isUPRn());
 //                    itempack = new JMenuItem("Neue Verpackung");
 //                    itempack.addActionListener(new java.awt.event.ActionListener() {
 //                        public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -233,34 +233,11 @@ public class PnlMed extends CleanablePanel {
 //                if (itemnew != null) menu.add(itemnew);
 //                if (itempack != null) menu.add(itempack);
                 if (itemedit != null) menu.add(itemedit);
-//                if (itemdelete != null) menu.add(itemdelete);
+                if (itemUPRedit != null) menu.add(itemUPRedit);
             }
             menu.show(evt.getComponent(), evt.getX(), evt.getY());
         }
     }//GEN-LAST:event_treeMedMousePressed
-
-    private void btnNeuDAF(java.awt.event.ActionEvent evt) {
-
-//        Darreichung darreichung = new Darreichung(produkt);
-//
-//        new DlgDAF(this, "", darreichung);
-//        createTree();
-    }
-
-
-    private void btnEditDAF(TradeForm darreichung) {
-//        new DlgDAF(this, "", darreichung);
-//        createTree();
-    }
-
-    private void btnDeleteDAF(TradeForm darreichung) {
-//        if (JOptionPane.showConfirmDialog(this, "Damit werden auch alle Zuordnungen und Packungen gelöscht.\n\nSind Sie sicher ?", DarreichungTools.toPrettyString(darreichung) + " entfernen", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
-//            return;
-//        }
-//
-//        EntityTools.delete(darreichung);
-//        createTree();
-    }
 
     private void createTree() {
         if (produkt == null) return;
@@ -327,7 +304,7 @@ public class PnlMed extends CleanablePanel {
             if (node.getUserObject() instanceof MedProducts) {
                 component.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/info.png")));
                 MedProducts myprod = (MedProducts) node.getUserObject();
-                component.setText(myprod.getBezeichnung() + ", " + myprod.getACME().getName() + ", " + myprod.getACME().getCity());
+                component.setText(myprod.getText() + ", " + myprod.getACME().getName() + ", " + myprod.getACME().getCity());
             } else if (node.getUserObject() instanceof TradeForm) {
                 component.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/medical.png")));
                 component.setText(TradeFormTools.toPrettyStringMedium((TradeForm) node.getUserObject()));

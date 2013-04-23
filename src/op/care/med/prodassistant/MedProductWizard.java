@@ -120,7 +120,7 @@ public class MedProductWizard {
             tradeform.getPackages().add(aPackage);
 
             em.getTransaction().commit();
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(product.getBezeichnung() + ", " + TradeFormTools.toPrettyString(tradeform) + ", " + MedPackageTools.toPrettyString(aPackage) + " " + OPDE.lang.getString("misc.msg.entrysuccessful")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(product.getText() + ", " + TradeFormTools.toPrettyString(tradeform) + ", " + MedPackageTools.toPrettyString(aPackage) + " " + OPDE.lang.getString("misc.msg.entrysuccessful")));
             finishAction.execute(aPackage);
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
@@ -390,8 +390,13 @@ public class MedProductWizard {
             String result = "<b>" + OPDE.lang.getString(internalClassID + ".page6.summaryline1") + "</b><br/>";
             result += OPDE.lang.getString(internalClassID + ".page6.summaryline2") + "<br/>";
             result += "<ul>";
-            result += "<li>" + OPDE.lang.getString("misc.msg.drug") + ": <b>" + product.getBezeichnung() + "</b>" + (product.getMedPID() == null ? " <i>" + OPDE.lang.getString("misc.msg.willBeCreated") + "</i>" : " <i>" + OPDE.lang.getString("misc.msg.alreadyExits") + "</i>") + "</li>";
+            result += "<li>" + OPDE.lang.getString("misc.msg.drug") + ": <b>" + product.getText() + "</b>" + (product.getMedPID() == null ? " <i>" + OPDE.lang.getString("misc.msg.willBeCreated") + "</i>" : " <i>" + OPDE.lang.getString("misc.msg.alreadyExits") + "</i>") + "</li>";
             result += "<li>" + OPDE.lang.getString(internalClassID + ".page3.title") + ": <b>" + TradeFormTools.toPrettyStringMedium(tradeform) + "</b>" + (tradeform.getID() == null ? " <i>" + OPDE.lang.getString("misc.msg.willBeCreated") + "</i>" : " <i>" + OPDE.lang.getString("misc.msg.alreadyExits") + "</i>") + "</li>";
+            if (tradeform.getDosageForm().getUPRState() == DosageFormTools.STATE_UPRn) {
+
+                result += "<li>" + OPDE.lang.getString(internalClassID + ".page6.UPR") + ": <b>";
+                result += (tradeform.getUpr() == null ? OPDE.lang.getString(internalClassID + ".page6.calcUPR") : OPDE.lang.getString(internalClassID + ".page6.setUPR") + SYSConst.UNITS[tradeform.getDosageForm().getUsageUnit()] + " " + tradeform.getDosageForm().getUsageText() + " " + OPDE.lang.getString("misc.msg.to1") + " " + SYSConst.UNITS[tradeform.getDosageForm().getPackUnit()]) + "</b>" + "</li>";
+            }
             result += "<li>" + OPDE.lang.getString(internalClassID + ".page6.newPackageWillBeCreated") + ": <b>" + MedPackageTools.toPrettyString(aPackage) + "</b></li>";
 
             ACME displayFactory = acme == null ? product.getACME() : acme;

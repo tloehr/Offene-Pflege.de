@@ -58,7 +58,7 @@ public class PnlProduct extends JPanel {
         em.close();
 
         if (!listProd.isEmpty()) {
-            if (listProd.size() == 1 && ((MedProducts) listProd.get(0)).getBezeichnung().equalsIgnoreCase(txtProd.getText().trim())) {
+            if (listProd.size() == 1 && ((MedProducts) listProd.get(0)).getText().equalsIgnoreCase(txtProd.getText().trim())) {
                 // Die Eingabe des Produktnamens entspricht GENAU einem bestehenden Produkt. Dann muss das das gleiche sein.
                 produkt = (MedProducts) listProd.get(0);
                 lblProdMsg.setVisible(false);

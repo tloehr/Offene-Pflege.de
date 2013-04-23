@@ -238,13 +238,13 @@ public class PrescriptionTools {
             MedStock stockInUse = prescription.isClosed() ? null : MedStockTools.getStockInUse(inventory);
 
             if (stockInUse != null) {
-                result += "<b>" + stockInUse.getTradeForm().getMedProduct().getBezeichnung()
+                result += "<b>" + stockInUse.getTradeForm().getMedProduct().getText()
                         + (stockInUse.getTradeForm().getSubtext().isEmpty() ? "" : " " + stockInUse.getTradeForm().getSubtext()) + "</b>" +
                         (stockInUse.getTradeForm().getDosageForm().getPreparation().isEmpty() ? "" : " " + stockInUse.getTradeForm().getDosageForm().getPreparation()) + " " +
                         (prescription.getTradeForm().getDosageForm().getUsageText().isEmpty() ? SYSConst.UNITS[prescription.getTradeForm().getDosageForm().getUsageUnit()] : prescription.getTradeForm().getDosageForm().getUsageText());
 
             } else {
-                result += "<b>" + prescription.getTradeForm().getMedProduct().getBezeichnung()
+                result += "<b>" + prescription.getTradeForm().getMedProduct().getText()
                         + (prescription.getTradeForm().getSubtext().isEmpty() ? "" : " " + prescription.getTradeForm().getSubtext()) + "</b>" +
                         (prescription.getTradeForm().getDosageForm().getPreparation().isEmpty() ? "" : " " + prescription.getTradeForm().getDosageForm().getPreparation()) + " " +
                         (prescription.getTradeForm().getDosageForm().getUsageText().isEmpty() ? SYSConst.UNITS[prescription.getTradeForm().getDosageForm().getUsageUnit()] : prescription.getTradeForm().getDosageForm().getUsageText());
@@ -326,7 +326,7 @@ public class PrescriptionTools {
         } else {
 
 
-            result += verordnung.getTradeForm().getMedProduct().getBezeichnung()
+            result += verordnung.getTradeForm().getMedProduct().getText()
                     + (verordnung.getTradeForm().getSubtext().isEmpty() ? "" : " " + verordnung.getTradeForm().getSubtext());
 
 

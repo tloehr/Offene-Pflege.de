@@ -1020,10 +1020,8 @@ public class PnlBHP extends NursingRecordsPanel {
         list.add(new JSeparator());
         list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
         list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription3"), SYSConst.icon22stopSign, SwingConstants.LEADING));
-//        if (resident.isCalcMediUPR1()) {
-            list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
-            list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
-//        }
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
         return list;
     }
 

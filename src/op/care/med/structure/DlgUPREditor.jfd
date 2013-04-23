@@ -1,0 +1,114 @@
+JFDML JFormDesigner: "5.1.0.2.64" Java: "1.6.0_33" encoding: "UTF-8"
+
+new FormModel {
+	contentType: "form/swing"
+	root: new FormRoot {
+		add( new FormWindow( "javax.swing.JDialog", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
+			"$columnSpecs": "default, labelcompgap, pref, labelcompgap, default:grow, labelcompgap, default"
+			"$rowSpecs": "default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default:grow, linegap, default"
+		} ) {
+			name: "this"
+			"$sizePolicy": 1
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblProduct"
+				"text": "Product here"
+				"font": new com.jformdesigner.model.SwingDerivedFont( null, 2, 4, false )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 3
+				"gridY": 3
+				"gridWidth": 3
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
+				"$columnSpecs": "pref"
+				"$rowSpecs": "default, linegap, default, linegap, default"
+			} ) {
+				name: "panel3"
+				add( new FormComponent( "javax.swing.JRadioButton" ) {
+					name: "rbUPRAuto"
+					"text": "UPR automatic"
+					"$buttonGroup": new FormReference( "buttonGroup1" )
+					addEvent( new FormEvent( "java.awt.event.ItemListener", "itemStateChanged", "rbUPRAutoItemStateChanged", true ) )
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) )
+				add( new FormComponent( "javax.swing.JTextField" ) {
+					name: "txtSetUPR"
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridY": 3
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "btnSetUPR"
+					"text": "setUPR"
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnSetUPRActionPerformed", true ) )
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridY": 5
+				} )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 3
+				"gridY": 5
+			} )
+			add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+				name: "scrollPane1"
+				add( new FormComponent( "javax.swing.JTable" ) {
+					name: "tblStock"
+					"autoResizeMode": 4
+				} )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 5
+				"gridY": 5
+				"gridHeight": 9
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
+				"axis": 3
+			} ) {
+				name: "panel1"
+				add( new FormComponent( "javax.swing.JRadioButton" ) {
+					name: "rbUPRConst"
+					"text": "UPR constant"
+					"$buttonGroup": new FormReference( "buttonGroup1" )
+					addEvent( new FormEvent( "java.awt.event.ItemListener", "itemStateChanged", "rbUPRConstItemStateChanged", true ) )
+				} )
+				add( new FormComponent( "javax.swing.JTextField" ) {
+					name: "txtUPR"
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "txtUPRActionPerformed", true ) )
+					addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtUPRFocusLost", true ) )
+				} )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 3
+				"gridY": 7
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblDosageForm"
+				"text": "DosageForm here"
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 3
+				"gridY": 9
+			} )
+			add( new FormComponent( "javax.swing.JComboBox" ) {
+				name: "cmbDosageForm"
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 3
+				"gridY": 11
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
+				"axis": 3
+			} ) {
+				name: "panel2"
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "btnClose"
+					"text": "cancel"
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnCloseActionPerformed", true ) )
+				} )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 3
+				"gridY": 13
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 0 )
+			"size": new java.awt.Dimension( 970, 490 )
+		} )
+		add( new FormNonVisual( "javax.swing.ButtonGroup" ) {
+			name: "buttonGroup1"
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 440 )
+		} )
+	}
+}

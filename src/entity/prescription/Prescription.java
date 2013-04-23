@@ -285,7 +285,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
 
     public boolean shouldBeCalculated() {
         // TODO: distinction between the several UPR modes
-        return hasMed() && resident.isCalcMediUPR1();
+        return hasMed() && resident.isCalcMediUPR1() && !getTradeForm().getDosageForm().isDontCALC();
     }
 
     public void setSituation(Situations situation) {
@@ -528,8 +528,8 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
             result = ((Boolean) hasMed()).compareTo(them.hasMed());
         }
         if (result == 0) {
-            String mytitle = hasMed() ? getTradeForm().getMedProduct().getBezeichnung() : getIntervention().getBezeichnung();
-            String thattitle = hasMed() ? them.getTradeForm().getMedProduct().getBezeichnung() : them.getIntervention().getBezeichnung();
+            String mytitle = hasMed() ? getTradeForm().getMedProduct().getText() : getIntervention().getBezeichnung();
+            String thattitle = hasMed() ? them.getTradeForm().getMedProduct().getText() : them.getIntervention().getBezeichnung();
             result = mytitle.compareTo(thattitle);
         }
         if (result == 0) {

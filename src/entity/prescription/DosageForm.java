@@ -128,12 +128,12 @@ public class DosageForm implements Serializable {
         return uprstate == DosageFormTools.STATE_UPR1;
     }
 
-    public boolean isUPRbyResident() {
-        return uprstate == DosageFormTools.STATE_UPR_BY_RESIDENT;
+    public boolean isDontCALC() {
+        return uprstate == DosageFormTools.STATE_DONT_CALC;
     }
 
-    public boolean isUPRbyTradeForm() {
-        return uprstate == DosageFormTools.STATE_UPR_BY_TRADEFORM;
+    public boolean isUPRn() {
+        return uprstate == DosageFormTools.STATE_UPRn;
     }
 
     public Intervention getIntervention() {
