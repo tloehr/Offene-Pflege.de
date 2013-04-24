@@ -395,7 +395,7 @@ public class MedProductWizard {
             if (tradeform.getDosageForm().getUPRState() == DosageFormTools.STATE_UPRn) {
 
                 result += "<li>" + OPDE.lang.getString(internalClassID + ".page6.UPR") + ": <b>";
-                result += (tradeform.getUpr() == null ? OPDE.lang.getString(internalClassID + ".page6.calcUPR") : OPDE.lang.getString(internalClassID + ".page6.setUPR") + SYSConst.UNITS[tradeform.getDosageForm().getUsageUnit()] + " " + tradeform.getDosageForm().getUsageText() + " " + OPDE.lang.getString("misc.msg.to1") + " " + SYSConst.UNITS[tradeform.getDosageForm().getPackUnit()]) + "</b>" + "</li>";
+                result += (tradeform.getUPR() == null ? OPDE.lang.getString(internalClassID + ".page6.calcUPR") : OPDE.lang.getString(internalClassID + ".page6.setUPR") + SYSConst.UNITS[tradeform.getDosageForm().getUsageUnit()] + " " + tradeform.getDosageForm().getUsageText() + " " + OPDE.lang.getString("misc.msg.to1") + " " + SYSConst.UNITS[tradeform.getDosageForm().getPackUnit()]) + "</b>" + "</li>";
             }
             result += "<li>" + OPDE.lang.getString(internalClassID + ".page6.newPackageWillBeCreated") + ": <b>" + MedPackageTools.toPrettyString(aPackage) + "</b></li>";
 

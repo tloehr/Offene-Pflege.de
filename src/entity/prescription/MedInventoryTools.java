@@ -111,12 +111,17 @@ public class MedInventoryTools {
             throw new Exception("No MedStock is currently in use");
         }
         MedStock stock = MedStockTools.getStockInUse(inventory);
-
-        if (!stock.getTradeForm().getDosageForm().isUPR1()) {
-            quantity = quantity.divide(stock.getUPR(), 4, BigDecimal.ROUND_UP);
+        if (stock.getTradeForm().getDosageForm().isDontCALC()){
+            OPDE.debug("withdraw/5: no calculation necessary. is ointment or something like that");
+            return;
         }
 
-        OPDE.debug("withdraw/5: menge: " + quantity);
+        if (stock.getTradeForm().getDosageForm().isUPRn()) {
+            BigDecimal upr = stock.getTradeForm().getUPR() != null ? stock.getTradeForm().getUPR() : stock.getUPR();
+            quantity = quantity.divide(upr, 4, BigDecimal.ROUND_HALF_UP);
+        }
+
+        OPDE.debug("withdraw/5: amount: " + quantity);
         withdraw(em, stock, quantity, bhp);
     }
 
@@ -170,7 +175,7 @@ public class MedInventoryTools {
      * @param bhp
      * @throws Exception
      */
-    public static void withdraw(EntityManager em, MedStock activeStock, BigDecimal quantity, BHP bhp) throws Exception {
+    private static void withdraw(EntityManager em, MedStock activeStock, BigDecimal quantity, BHP bhp) throws Exception {
         if (quantity.compareTo(BigDecimal.ZERO) < 0) {
             OPDE.fatal(new NumberFormatException("withdraw/4: negative quantity"));
         }
@@ -206,60 +211,6 @@ public class MedInventoryTools {
             }
         }
     }
-
-//    public static void withdraw(EntityManager em, MedInventory inventory, BigDecimal wunschmenge, BHP bhp) throws Exception {
-//        MedStock stock = em.merge(MedStockTools.getStockInUse(inventory));
-//        em.lock(stock, LockModeType.OPTIMISTIC);
-//
-//        OPDE.debug("withdraw/4: MedStock: " + stock);
-//        // stock != null
-//        if (wunschmenge.compareTo(BigDecimal.ZERO) > 0) {
-//            BigDecimal restsumme = MedStockTools.getSum(stock); // wieviel der angebrochene Bestand noch hergibt.
-//
-//            // normalerweise wird immer das hergegeben, was auch gewünscht ist. Notfalls bis ins minus.
-//            BigDecimal entnahme = wunschmenge; // wieviel in diesem Durchgang tatsächlich entnommen wird.
-//
-//
-//            /**
-//             * Sagen wir, dass in der Packung nicht mehr so viel drin ist, wie gewünscht.
-//             * Es gibt aber bereits eine NACHFOLGEPACKUNG. Dann brauchen wir DIESE hier
-//             * erst mal auf und nehmen den Rest aus der nächsten.
-//             *
-//             */
-//            if (stock.isToBeClosedSoon() && restsumme.compareTo(wunschmenge) <= 0) {
-//                entnahme = restsumme;
-//            }
-//
-//            // Also erst mal die Buchung für DIESEN Durchgang.
-//            MedStockTransaction tx = em.merge(new MedStockTransaction(stock, entnahme.negate(), bhp));
-//            stock.getStockTransaction().add(tx);
-//            bhp.getStockTransaction().add(tx);
-//            OPDE.debug("withdraw/4: tx: " + tx);
-//
-//            /**
-//             * Gibt es schon eine neue Packung oder soll diese jetzt geschlossen werden ? Wenn nicht, dann nehmen brechen wir ab.
-//             * So lange keine neue Packung bekannt nehmen wir immer weiter aus dieser hier.
-//             * Selbst wenn die dann ins Minus läuft.
-//             */
-//            if (stock.isToBeClosedSoon()) {
-//                if (restsumme.compareTo(wunschmenge) <= 0) { // ist nicht mehr genug in der Packung, bzw. die Packung wird jetzt leer.
-//
-//                    if (stock.hasNext2Open()) {
-//                        MedStock naechsterBestand = em.merge(stock.getNextStock());
-//                        em.lock(naechsterBestand, LockModeType.OPTIMISTIC);
-//                    }
-//                    // Es war mehr gewünscht, als die angebrochene Packung hergegeben hat.
-//                    // Bzw. die Packung wurde mit dieser Gabe geleert.
-//                    // Dann müssen wird erstmal den alten Bestand abschließen.
-//                    MedStockTools.close(em, stock, OPDE.lang.getString(DlgCloseStock.internalClassID + ".TX.AUTOCLOSED_EMPTY_PACKAGE"), MedStockTransactionTools.STATE_EDIT_EMPTY_SOON);
-//                }
-//
-//                if (wunschmenge.compareTo(entnahme) > 0) { // Sind wir hier fertig, oder müssen wir noch mehr ausbuchen.
-//                    withdraw(em, inventory, wunschmenge.subtract(entnahme), bhp);
-//                }
-//            }
-//        }
-//    }
 
     /**
      * Diese Methode bucht ein Medikament in einen Vorrat ein.

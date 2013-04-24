@@ -188,7 +188,7 @@ public class BHP implements Serializable, Comparable<BHP> {
     }
 
     public boolean shouldBeCalculated() {
-        return hasMed() && resident.isCalcMediUPR1() && !getPrescription().getTradeForm().getDosageForm().isDontCALC();
+        return hasMed() && resident.isCalcMediUPR1();
     }
 
     public boolean isOpen() {

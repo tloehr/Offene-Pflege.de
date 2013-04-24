@@ -457,13 +457,13 @@ public class PrescriptionTools {
                         result += "<b><u>Vorrat:</u> <font color=\"green\">" + invSum.setScale(2, BigDecimal.ROUND_UP) + " " +
                                 SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getPackUnit()] +
                                 "</font></b>";
-                        if (!stockInUse.getTradeForm().getDosageForm().isUPR1()) {
+                        if (stockInUse.getTradeForm().getDosageForm().isUPRn()) {
                             BigDecimal anwmenge = invSum.multiply(stockInUse.getUPR());
 
                             result += " entspricht " + anwmenge.setScale(2, BigDecimal.ROUND_UP) + " " +
                                     DosageFormTools.getUsageText(stockInUse.getTradeForm().getDosageForm());
                             result += " (bei einem APV von " + stockInUse.getUPR().setScale(2, BigDecimal.ROUND_UP) + " zu 1";
-                            if (stockInUse.isDummyUPR()) {
+                            if (stockInUse.getUPRDummyMode() == MedStockTools.REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING) {
                                 result += ", dieses APV ist nur vorläufig";
                             }
                             result += ")";
@@ -474,7 +474,7 @@ public class PrescriptionTools {
                         if (invSum.compareTo(stockSum) != 0) {
                             result += "<br/>Restmenge im Anbruch: <b><font color=\"green\">" + stockSum.setScale(2, BigDecimal.ROUND_UP) + " " +
                                     SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getPackUnit()] + "</font></b>";
-                            if (!stockInUse.getTradeForm().getDosageForm().isUPR1()) {
+                            if (stockInUse.getTradeForm().getDosageForm().isUPRn()) {
                                 BigDecimal usage = stockSum.multiply(stockInUse.getUPR());
 
                                 result += " (entspricht " + usage.setScale(2, BigDecimal.ROUND_UP) + " " +

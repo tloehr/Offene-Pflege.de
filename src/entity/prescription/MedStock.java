@@ -48,7 +48,7 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     private BigDecimal uprEffective;
     @Basic(optional = false)
     @Column(name = "DummyUPR")
-    private Boolean uprDummy;
+    private Integer uprDummyMode;
 
     public MedStock() {
     }
@@ -56,7 +56,7 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     public MedStock(MedInventory inventory, TradeForm tradeform, MedPackage aPackage, String text, BigDecimal upr) {
         this.upr = upr == null ? BigDecimal.ONE : upr;
         this.uprEffective = this.upr;
-        this.uprDummy = upr == null;
+        this.uprDummyMode = upr == null ? MedStockTools.REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING : MedStockTools.ADD_TO_AVERAGES_UPR_WHEN_CLOSING;
         this.inventory = inventory;
         this.tradeform = tradeform;
         this.aPackage = aPackage;
@@ -118,30 +118,21 @@ public class MedStock implements Serializable, Comparable<MedStock> {
         this.text = text;
     }
 
+    /**
+     * this upr is used for calculation if the dosageform is type UPRn and the tradeform has no UPR on it own.
+     *
+     * @return
+     */
     public BigDecimal getUPR() {
         return upr;
     }
 
+    public Integer getUPRDummyMode() {
+        return uprDummyMode;
+    }
+
     public void setUPR(BigDecimal upr) {
-        this.uprEffective = upr;
-
-        if (uprDummy) {
-            this.upr = upr;
-            this.uprDummy = false;
-            return;
-        }
-
-        // if the deviation was too high (usually more than 20%), then the new UPR is discarded
-        BigDecimal maxDeviation = new BigDecimal(Double.parseDouble(OPDE.getProps().getProperty("apv_korridor")));
-        BigDecimal deviation = getUPR().divide(upr, 4, BigDecimal.ROUND_HALF_UP).subtract(new BigDecimal(100)).abs();
-        OPDE.debug("the deviation was: " + deviation + "%");
-
-        // if the deviation is below the limit, then the new UPR will be accepted.
-        // it must also be greater than 0
-        if (deviation.compareTo(maxDeviation) <= 0 && upr.compareTo(BigDecimal.ZERO) > 0) {
-            this.upr = upr;
-            this.uprDummy = false;
-        }
+        this.upr = upr;
     }
 
     /**
@@ -151,15 +142,16 @@ public class MedStock implements Serializable, Comparable<MedStock> {
      * if it is discarded the UPR which was used when the new stock was registeres is kept.
      * if not, it replaces the old value.
      * if the UPR is a dummy (because its the first stock for that tradeform) its always used.
+     *
      * @return
      */
     public BigDecimal getUPREffective() {
         return uprEffective;
     }
 
-    public boolean isDummyUPR() {
-        return uprDummy;
-    }
+//    public boolean isDummyUPR() {
+//        return uprDummy;
+//    }
 
     // ==
     // 1:1 Relationen
@@ -256,6 +248,14 @@ public class MedStock implements Serializable, Comparable<MedStock> {
         return aPackage != null;
     }
 
+    public void setUPREffective(BigDecimal uprEffective) {
+        this.uprEffective = uprEffective;
+    }
+
+    public void setUPRDummyMode(Integer uprDummyMode) {
+        this.uprDummyMode = uprDummyMode;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -276,7 +276,7 @@ public class MedStock implements Serializable, Comparable<MedStock> {
         if (text != null ? !text.equals(medStock.text) : medStock.text != null) return false;
         if (tradeform != null ? !tradeform.equals(medStock.tradeform) : medStock.tradeform != null) return false;
         if (upr != null ? !upr.equals(medStock.upr) : medStock.upr != null) return false;
-        if (uprDummy != null ? !uprDummy.equals(medStock.uprDummy) : medStock.uprDummy != null) return false;
+//        if (uprDummy != null ? !uprDummy.equals(medStock.uprDummy) : medStock.uprDummy != null) return false;
         if (uprEffective != null ? !uprEffective.equals(medStock.uprEffective) : medStock.uprEffective != null)
             return false;
         if (user != null ? !user.equals(medStock.user) : medStock.user != null) return false;
@@ -296,7 +296,7 @@ public class MedStock implements Serializable, Comparable<MedStock> {
         result = 31 * result + (state != null ? state.hashCode() : 0);
         result = 31 * result + (upr != null ? upr.hashCode() : 0);
         result = 31 * result + (uprEffective != null ? uprEffective.hashCode() : 0);
-        result = 31 * result + (uprDummy != null ? uprDummy.hashCode() : 0);
+//        result = 31 * result + (uprDummy != null ? uprDummy.hashCode() : 0);
         result = 31 * result + (nextStock != null ? nextStock.hashCode() : 0);
 //        result = 31 * result + (stockTransaction != null ? stockTransaction.hashCode() : 0);
         result = 31 * result + (aPackage != null ? aPackage.hashCode() : 0);

@@ -158,7 +158,7 @@ public class PnlSubtext extends JPanel {
 
     private void rbCalcUPRItemStateChanged(ItemEvent e) {
         if (e.getStateChange() == ItemEvent.SELECTED) {
-            tradeForm.setUpr(null);
+            tradeForm.setUPR(null);
             txtUPR.setEnabled(false);
             validate.execute(tradeForm);
         }
@@ -166,7 +166,7 @@ public class PnlSubtext extends JPanel {
 
     private void rbSetUPRItemStateChanged(ItemEvent e) {
         if (e.getStateChange() == ItemEvent.SELECTED) {
-            tradeForm.setUpr(SYSTools.checkBigDecimal(txtUPR.getText()));
+            tradeForm.setUPR(SYSTools.checkBigDecimal(txtUPR.getText()));
             txtUPR.setEnabled(true);
             validate.execute(tradeForm);
         }
@@ -180,7 +180,7 @@ public class PnlSubtext extends JPanel {
         } else {
             txtUPR.setText(upr.setScale(2, RoundingMode.HALF_UP).toString());
         }
-        tradeForm.setUpr(upr);
+        tradeForm.setUPR(upr);
     }
 
     private void initComponents() {

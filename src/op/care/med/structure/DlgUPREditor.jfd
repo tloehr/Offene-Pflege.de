@@ -5,22 +5,21 @@ new FormModel {
 	root: new FormRoot {
 		add( new FormWindow( "javax.swing.JDialog", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
 			"$columnSpecs": "default, labelcompgap, pref, labelcompgap, default:grow, labelcompgap, default"
-			"$rowSpecs": "default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default:grow, linegap, default"
+			"$rowSpecs": "default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default:grow, linegap, default, linegap, default"
 		} ) {
 			name: "this"
 			"$sizePolicy": 1
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "lblProduct"
 				"text": "Product here"
-				"font": new com.jformdesigner.model.SwingDerivedFont( null, 2, 4, false )
+				"font": new com.jformdesigner.model.SwingDerivedFont( null, 2, 6, false )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 3
 				"gridY": 3
 				"gridWidth": 3
 			} )
-			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-				"$columnSpecs": "pref"
-				"$rowSpecs": "default, linegap, default, linegap, default"
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
+				"axis": 3
 			} ) {
 				name: "panel3"
 				add( new FormComponent( "javax.swing.JRadioButton" ) {
@@ -28,18 +27,11 @@ new FormModel {
 					"text": "UPR automatic"
 					"$buttonGroup": new FormReference( "buttonGroup1" )
 					addEvent( new FormEvent( "java.awt.event.ItemListener", "itemStateChanged", "rbUPRAutoItemStateChanged", true ) )
-				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) )
+				} )
 				add( new FormComponent( "javax.swing.JTextField" ) {
 					name: "txtSetUPR"
-				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridY": 3
-				} )
-				add( new FormComponent( "javax.swing.JButton" ) {
-					name: "btnSetUPR"
-					"text": "setUPR"
-					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnSetUPRActionPerformed", true ) )
-				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridY": 5
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "txtSetUPRActionPerformed", true ) )
+					addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtSetUPRFocusLost", true ) )
 				} )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 3
@@ -75,31 +67,35 @@ new FormModel {
 				"gridX": 3
 				"gridY": 7
 			} )
-			add( new FormComponent( "javax.swing.JLabel" ) {
-				name: "lblDosageForm"
-				"text": "DosageForm here"
-			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridX": 3
-				"gridY": 9
-			} )
-			add( new FormComponent( "javax.swing.JComboBox" ) {
-				name: "cmbDosageForm"
-			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridX": 3
-				"gridY": 11
-			} )
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
 				"axis": 3
 			} ) {
 				name: "panel2"
-				add( new FormComponent( "javax.swing.JButton" ) {
-					name: "btnClose"
-					"text": "cancel"
-					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnCloseActionPerformed", true ) )
-				} )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 3
 				"gridY": 13
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
+				"axis": 2
+			} ) {
+				name: "panel4"
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "btnClose"
+					"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
+					"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/cancel.png" )
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnCloseActionPerformed", true ) )
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "btnSave"
+					"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
+					"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/apply.png" )
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnSaveActionPerformed", true ) )
+				} )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 5
+				"gridY": 15
+				"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+				"hAlign": sfield com.jgoodies.forms.layout.CellConstraints RIGHT
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )

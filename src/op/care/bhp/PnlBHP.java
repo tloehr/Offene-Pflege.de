@@ -474,6 +474,115 @@ public class PnlBHP extends NursingRecordsPanel {
         final CollapsiblePane bhpPane = new CollapsiblePane();
         bhpPane.setCollapseOnTitleClick(false);
 
+
+        ActionListener applyActionListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (bhp.getStatus() != BHPTools.STATE_OPEN) {
+                    return;
+                }
+
+                if (BHPTools.isChangeable(bhp)) {
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+
+                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                        BHP myBHP = em.merge(bhp);
+                        em.lock(myBHP, LockModeType.OPTIMISTIC);
+
+                        if (myBHP.isOnDemand()) {
+                            em.lock(myBHP.getPrescriptionSchedule(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                            em.lock(myBHP.getPrescription(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                        } else {
+                            em.lock(myBHP.getPrescriptionSchedule(), LockModeType.OPTIMISTIC);
+                            em.lock(myBHP.getPrescription(), LockModeType.OPTIMISTIC);
+                        }
+
+                        myBHP.setStatus(BHPTools.STATE_DONE);
+                        myBHP.setUser(em.merge(OPDE.getLogin().getUser()));
+                        myBHP.setIst(new Date());
+                        myBHP.setiZeit(SYSCalendar.whatTimeIDIs(new Date()));
+                        myBHP.setMDate(new Date());
+
+                        Prescription involvedPresciption = null;
+                        if (myBHP.shouldBeCalculated()) {
+                            MedInventory inventory = TradeFormTools.getInventory4TradeForm(resident, myBHP.getTradeForm());
+                            MedInventoryTools.withdraw(em, em.merge(inventory), myBHP.getDose(), myBHP);
+                            // Was the prescription closed during this withdraw ?
+                            involvedPresciption = em.find(Prescription.class, myBHP.getPrescription().getID());
+                        }
+                        em.getTransaction().commit();
+
+
+                        if (myBHP.shouldBeCalculated() && involvedPresciption.isClosed()) {
+                            reload();
+                        } else {
+                            mapBHP2Pane.put(myBHP, createCP4(myBHP));
+                            int position = mapShift2BHP.get(myBHP.getShift()).indexOf(bhp);
+                            mapShift2BHP.get(myBHP.getShift()).remove(position);
+                            mapShift2BHP.get(myBHP.getShift()).add(position, myBHP);
+                            if (myBHP.isOnDemand()) {
+                                // This whole thing here is only to handle the BPHs on Demand
+                                // Fix the other BHPs on demand. If not, you will get locking excpetions,
+                                // we FORCED INCREMENTED LOCKS on the Schedule and the Prescription.
+                                ArrayList<BHP> changeList = new ArrayList<BHP>();
+                                for (BHP bhp : mapShift2BHP.get(BHPTools.SHIFT_ON_DEMAND)) {
+                                    if (bhp.getPrescription().getID() == myBHP.getPrescription().getID() && bhp.getBHPid() != myBHP.getBHPid()) {
+                                        bhp.setPrescription(myBHP.getPrescription());
+                                        bhp.setPrescriptionSchedule(myBHP.getPrescriptionSchedule());
+                                        changeList.add(bhp);
+                                    }
+                                }
+                                for (BHP bhp : changeList) {
+                                    mapBHP2Pane.put(bhp, createCP4(myBHP));
+                                    position = mapShift2BHP.get(bhp.getShift()).indexOf(bhp);
+                                    mapShift2BHP.get(myBHP.getShift()).remove(position);
+                                    mapShift2BHP.get(myBHP.getShift()).add(position, bhp);
+                                }
+
+                                Collections.sort(mapShift2BHP.get(myBHP.getShift()), BHPTools.getOnDemandComparator());
+                            } else {
+                                Collections.sort(mapShift2BHP.get(myBHP.getShift()));
+                            }
+
+                            mapShift2Pane.put(myBHP.getShift(), createCP4(myBHP.getShift()));
+                            buildPanel(false);
+                        }
+                    } catch (OptimisticLockException ole) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    } catch (RollbackException ole) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    } catch (Exception e) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                    }
+
+                } else {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".notchangeable")));
+                }
+            }
+        };
+
+
 //        JPanel titlePanelleft = new JPanel();
 //        titlePanelleft.setLayout(new BoxLayout(titlePanelleft, BoxLayout.LINE_AXIS));
 
@@ -491,7 +600,7 @@ public class PnlBHP extends NursingRecordsPanel {
                 (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser().getUID()) + "</i>" : "") +
                 "</font></html>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, null);
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, applyActionListener);
 
 
         JLabel icon1 = new JLabel(BHPTools.getIcon(bhp));
@@ -524,112 +633,7 @@ public class PnlBHP extends NursingRecordsPanel {
                 JButton btnApply = new JButton(SYSConst.icon22apply);
                 btnApply.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 btnApply.setToolTipText(OPDE.lang.getString(internalClassID + ".btnApply.tooltip"));
-                btnApply.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
-                        if (bhp.getStatus() != BHPTools.STATE_OPEN) {
-                            return;
-                        }
-
-                        if (BHPTools.isChangeable(bhp)) {
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
-
-                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                BHP myBHP = em.merge(bhp);
-                                em.lock(myBHP, LockModeType.OPTIMISTIC);
-
-                                if (myBHP.isOnDemand()) {
-                                    em.lock(myBHP.getPrescriptionSchedule(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                                    em.lock(myBHP.getPrescription(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                                } else {
-                                    em.lock(myBHP.getPrescriptionSchedule(), LockModeType.OPTIMISTIC);
-                                    em.lock(myBHP.getPrescription(), LockModeType.OPTIMISTIC);
-                                }
-
-                                myBHP.setStatus(BHPTools.STATE_DONE);
-                                myBHP.setUser(em.merge(OPDE.getLogin().getUser()));
-                                myBHP.setIst(new Date());
-                                myBHP.setiZeit(SYSCalendar.whatTimeIDIs(new Date()));
-                                myBHP.setMDate(new Date());
-
-                                Prescription involvedPresciption = null;
-                                if (myBHP.shouldBeCalculated()) {
-                                    MedInventory inventory = TradeFormTools.getInventory4TradeForm(resident, myBHP.getTradeForm());
-                                    MedInventoryTools.withdraw(em, em.merge(inventory), myBHP.getDose(), myBHP);
-                                    // Was the prescription closed during this withdraw ?
-                                    involvedPresciption = em.find(Prescription.class, myBHP.getPrescription().getID());
-                                }
-                                em.getTransaction().commit();
-
-
-                                if (myBHP.shouldBeCalculated() && involvedPresciption.isClosed()) {
-                                    reload();
-                                } else {
-                                    mapBHP2Pane.put(myBHP, createCP4(myBHP));
-                                    int position = mapShift2BHP.get(myBHP.getShift()).indexOf(bhp);
-                                    mapShift2BHP.get(myBHP.getShift()).remove(position);
-                                    mapShift2BHP.get(myBHP.getShift()).add(position, myBHP);
-                                    if (myBHP.isOnDemand()) {
-                                        // This whole thing here is only to handle the BPHs on Demand
-                                        // Fix the other BHPs on demand. If not, you will get locking excpetions,
-                                        // we FORCED INCREMENTED LOCKS on the Schedule and the Prescription.
-                                        ArrayList<BHP> changeList = new ArrayList<BHP>();
-                                        for (BHP bhp : mapShift2BHP.get(BHPTools.SHIFT_ON_DEMAND)) {
-                                            if (bhp.getPrescription().getID() == myBHP.getPrescription().getID() && bhp.getBHPid() != myBHP.getBHPid()) {
-                                                bhp.setPrescription(myBHP.getPrescription());
-                                                bhp.setPrescriptionSchedule(myBHP.getPrescriptionSchedule());
-                                                changeList.add(bhp);
-                                            }
-                                        }
-                                        for (BHP bhp : changeList) {
-                                            mapBHP2Pane.put(bhp, createCP4(myBHP));
-                                            position = mapShift2BHP.get(bhp.getShift()).indexOf(bhp);
-                                            mapShift2BHP.get(myBHP.getShift()).remove(position);
-                                            mapShift2BHP.get(myBHP.getShift()).add(position, bhp);
-                                        }
-
-                                        Collections.sort(mapShift2BHP.get(myBHP.getShift()), BHPTools.getOnDemandComparator());
-                                    } else {
-                                        Collections.sort(mapShift2BHP.get(myBHP.getShift()));
-                                    }
-
-                                    mapShift2Pane.put(myBHP.getShift(), createCP4(myBHP.getShift()));
-                                    buildPanel(false);
-                                }
-                            } catch (OptimisticLockException ole) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            } catch (RollbackException ole) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            } catch (Exception e) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
-                            }
-
-                        } else {
-                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".notchangeable")));
-                        }
-                    }
-                });
+                btnApply.addActionListener(applyActionListener);
 
                 btnApply.setEnabled(bhp.isOpen() && (!bhp.hasMed() || mapPrescription2Stock.containsKey(bhp.getPrescription())));
                 cptitle.getRight().add(btnApply);

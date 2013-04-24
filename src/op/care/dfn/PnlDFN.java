@@ -481,6 +481,65 @@ public class PnlDFN extends NursingRecordsPanel {
     private CollapsiblePane createCP4(final DFN dfn) {
         final CollapsiblePane dfnPane = new CollapsiblePane();
 
+        ActionListener applyActionListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (dfn.getState() == DFNTools.STATE_DONE) {
+                    return;
+                }
+
+                if (DFNTools.isChangeable(dfn)) {
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+
+                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                        DFN myDFN = em.merge(dfn);
+                        em.lock(myDFN, LockModeType.OPTIMISTIC);
+                        if (!myDFN.isOnDemand()) {
+                            em.lock(myDFN.getNursingProcess(), LockModeType.OPTIMISTIC);
+                        }
+
+                        myDFN.setState(DFNTools.STATE_DONE);
+                        myDFN.setUser(em.merge(OPDE.getLogin().getUser()));
+                        myDFN.setIst(new Date());
+                        myDFN.setiZeit(SYSCalendar.whatTimeIDIs(new Date()));
+                        myDFN.setMdate(new Date());
+
+                        mapDFN2Pane.put(myDFN, createCP4(myDFN));
+                        int position = mapShift2DFN.get(myDFN.getShift()).indexOf(myDFN);
+                        mapShift2DFN.get(myDFN.getShift()).remove(position);
+                        mapShift2DFN.get(myDFN.getShift()).add(position, myDFN);
+
+                        em.getTransaction().commit();
+
+                        mapShift2Pane.put(myDFN.getShift(), createCP4(myDFN.getShift()));
+                        buildPanel(false);
+
+                    } catch (OptimisticLockException ole) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    } catch (Exception e) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                    }
+
+                } else {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".notchangeable")));
+                }
+            }
+        };
+
         String title = "<html><font size=+1>" +
 //                (dfn.isFloating() ? (dfn.isOpen() ? "(!) " : "(OK) ") : "") +
                 SYSTools.left(dfn.getIntervention().getBezeichnung(), MAX_TEXT_LENGTH) +
@@ -488,7 +547,7 @@ public class PnlDFN extends NursingRecordsPanel {
                 ", " + dfn.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)") + (dfn.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(dfn.getUser().getUID()) + "</i>" : "") +
                 "</font></html>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, null);
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, applyActionListener);
         dfnPane.setCollapseOnTitleClick(false);
 //        cptitle.getButton().setIcon(DFNTools.getIcon(dfn));
         JLabel icon1 = new JLabel(DFNTools.getIcon(dfn));
@@ -516,64 +575,7 @@ public class PnlDFN extends NursingRecordsPanel {
             btnApply.setAlignmentX(Component.RIGHT_ALIGNMENT);
 //            btnApply.setContentAreaFilled(false);
 //            btnApply.setBorder(null);
-            btnApply.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    if (dfn.getState() == DFNTools.STATE_DONE) {
-                        return;
-                    }
-
-                    if (DFNTools.isChangeable(dfn)) {
-                        EntityManager em = OPDE.createEM();
-                        try {
-                            em.getTransaction().begin();
-
-                            em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                            DFN myDFN = em.merge(dfn);
-                            em.lock(myDFN, LockModeType.OPTIMISTIC);
-                            if (!myDFN.isOnDemand()) {
-                                em.lock(myDFN.getNursingProcess(), LockModeType.OPTIMISTIC);
-                            }
-
-                            myDFN.setState(DFNTools.STATE_DONE);
-                            myDFN.setUser(em.merge(OPDE.getLogin().getUser()));
-                            myDFN.setIst(new Date());
-                            myDFN.setiZeit(SYSCalendar.whatTimeIDIs(new Date()));
-                            myDFN.setMdate(new Date());
-
-                            mapDFN2Pane.put(myDFN, createCP4(myDFN));
-                            int position = mapShift2DFN.get(myDFN.getShift()).indexOf(myDFN);
-                            mapShift2DFN.get(myDFN.getShift()).remove(position);
-                            mapShift2DFN.get(myDFN.getShift()).add(position, myDFN);
-
-                            em.getTransaction().commit();
-
-                            mapShift2Pane.put(myDFN.getShift(), createCP4(myDFN.getShift()));
-                            buildPanel(false);
-
-                        } catch (OptimisticLockException ole) {
-                            if (em.getTransaction().isActive()) {
-                                em.getTransaction().rollback();
-                            }
-                            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                OPDE.getMainframe().emptyFrame();
-                                OPDE.getMainframe().afterLogin();
-                            }
-                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                        } catch (Exception e) {
-                            if (em.getTransaction().isActive()) {
-                                em.getTransaction().rollback();
-                            }
-                            OPDE.fatal(e);
-                        } finally {
-                            em.close();
-                        }
-
-                    } else {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".notchangeable")));
-                    }
-                }
-            });
+            btnApply.addActionListener(applyActionListener);
             btnApply.setEnabled(!dfn.isOnDemand() && dfn.isOpen());
             cptitle.getRight().add(btnApply);
             JPanel spacer = new JPanel();

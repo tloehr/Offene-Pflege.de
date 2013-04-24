@@ -1709,6 +1709,7 @@ public class SYSTools {
 
     public static BigDecimal checkBigDecimal(String txt) {
         BigDecimal bd = null;
+        txt = txt.replace(".", ",");
         try {
             NumberFormat nf = DecimalFormat.getNumberInstance();
             Number number = nf.parse(txt);

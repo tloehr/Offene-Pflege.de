@@ -94,11 +94,17 @@ public class TradeForm implements Serializable {
         return stocks;
     }
 
-    public BigDecimal getUpr() {
+    /**
+     * This is only relevant for DosageFormTypes UPRn. If this UPR is null, then the UPRs from the single MedStocks are
+     * used for calculation. If this UPR is NOT null then it is used for calculations instead.
+     *
+     * @return the upr to be used. NULL if not set.
+     */
+    public BigDecimal getUPR() {
         return upr;
     }
 
-    public void setUpr(BigDecimal upr) {
+    public void setUPR(BigDecimal upr) {
         this.upr = upr;
     }
 

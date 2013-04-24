@@ -285,7 +285,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
 
     public boolean shouldBeCalculated() {
         // TODO: distinction between the several UPR modes
-        return hasMed() && resident.isCalcMediUPR1() && !getTradeForm().getDosageForm().isDontCALC();
+        return hasMed() && resident.isCalcMediUPR1();
     }
 
     public void setSituation(Situations situation) {
