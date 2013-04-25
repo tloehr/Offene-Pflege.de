@@ -49,14 +49,20 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     @Basic(optional = false)
     @Column(name = "DummyUPR")
     private Integer uprDummyMode;
+    @Basic(optional = false)
+    @Column(name = "expire")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date expires;
+
+
 
     public MedStock() {
     }
 
-    public MedStock(MedInventory inventory, TradeForm tradeform, MedPackage aPackage, String text, BigDecimal upr) {
+    public MedStock(MedInventory inventory, TradeForm tradeform, MedPackage aPackage, String text, BigDecimal upr, int uprDummyMode) {
         this.upr = upr == null ? BigDecimal.ONE : upr;
         this.uprEffective = this.upr;
-        this.uprDummyMode = upr == null ? MedStockTools.REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING : MedStockTools.ADD_TO_AVERAGES_UPR_WHEN_CLOSING;
+        this.uprDummyMode = uprDummyMode;
         this.inventory = inventory;
         this.tradeform = tradeform;
         this.aPackage = aPackage;
@@ -100,6 +106,14 @@ public class MedStock implements Serializable, Comparable<MedStock> {
 
     public void setOpened(Date anbruch) {
         this.opened = anbruch;
+    }
+
+    public Date getExpires() {
+        return expires;
+    }
+
+    public void setExpires(Date expires) {
+        this.expires = expires;
     }
 
     public Date getOut() {

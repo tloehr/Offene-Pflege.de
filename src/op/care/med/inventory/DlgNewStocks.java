@@ -64,7 +64,7 @@ import java.util.List;
 public class DlgNewStocks extends MyJDialog {
     private boolean ignoreEvent;
 
-    private BigDecimal menge;
+    private BigDecimal amount;
     private MedPackage aPackage;
     private TradeForm tradeForm;
     private Resident resident;
@@ -81,6 +81,8 @@ public class DlgNewStocks extends MyJDialog {
 
     private LogicalPrinter logicalPrinter;
     private PrinterForm printForm;
+
+    public static final String internalClassID = "newstocks";
 
     public DlgNewStocks(Resident resident) {
         super(false);
@@ -152,7 +154,7 @@ public class DlgNewStocks extends MyJDialog {
             btnPrint.setSelected(false);
         }
 
-        menge = null;
+        amount = null;
         cmbMProdukt.setRenderer(TradeFormTools.getRenderer(TradeFormTools.LONG));
 
         attentionIconVorrat = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.ATTENTION));
@@ -185,7 +187,7 @@ public class DlgNewStocks extends MyJDialog {
 
         if (resident == null) {
             ovrBW.addOverlayComponent(attentionIconBW, DefaultOverlayable.SOUTH_WEST);
-            attentionIconBW.setToolTipText("<html>Keine(n) BewohnerIn ausgewählt.<html>");
+            attentionIconBW.setToolTipText(OPDE.lang.getString("misc.msg.emptyselection"));
         } else {
             txtBWSuche.setEnabled(false);
             cmbBW.setModel(new DefaultComboBoxModel(new Resident[]{resident}));
@@ -236,6 +238,8 @@ public class DlgNewStocks extends MyJDialog {
         lblMenge = new JLabel();
         jLabel6 = new JLabel();
         cmbPackung = new JComboBox();
+        lblExpires = new JLabel();
+        txtExpires = new JTextField();
         jLabel7 = new JLabel();
         txtBemerkung = new JTextField();
         btnPrint = new JToggleButton();
@@ -254,7 +258,7 @@ public class DlgNewStocks extends MyJDialog {
         {
             mainPane.setLayout(new FormLayout(
                 "14dlu, $lcgap, default, $lcgap, 39dlu, $lcgap, default:grow, $lcgap, 14dlu",
-                "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
+                "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, $lgap, default, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
 
             //---- jLabel1 ----
             jLabel1.setText("PZN oder Suchbegriff");
@@ -314,12 +318,12 @@ public class DlgNewStocks extends MyJDialog {
             //---- lblVorrat ----
             lblVorrat.setText("vorhandene Vorr\u00e4te");
             lblVorrat.setFont(new Font("Arial", Font.PLAIN, 14));
-            mainPane.add(lblVorrat, CC.xy(3, 11));
+            mainPane.add(lblVorrat, CC.xy(3, 13));
 
             //---- jLabel4 ----
             jLabel4.setText("Zuordnung zu Bewohner");
             jLabel4.setFont(new Font("Arial", Font.PLAIN, 14));
-            mainPane.add(jLabel4, CC.xy(3, 15));
+            mainPane.add(jLabel4, CC.xy(3, 17));
 
             //---- txtBWSuche ----
             txtBWSuche.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -329,12 +333,12 @@ public class DlgNewStocks extends MyJDialog {
                     txtBWSucheCaretUpdate(e);
                 }
             });
-            mainPane.add(txtBWSuche, CC.xy(5, 15));
+            mainPane.add(txtBWSuche, CC.xy(5, 17));
 
             //---- lblMenge ----
             lblMenge.setText("Buchungsmenge");
             lblMenge.setFont(new Font("Arial", Font.PLAIN, 14));
-            mainPane.add(lblMenge, CC.xy(3, 9));
+            mainPane.add(lblMenge, CC.xy(3, 11));
 
             //---- jLabel6 ----
             jLabel6.setText("Packung");
@@ -354,10 +358,19 @@ public class DlgNewStocks extends MyJDialog {
             });
             mainPane.add(cmbPackung, CC.xywh(5, 7, 4, 1));
 
+            //---- lblExpires ----
+            lblExpires.setText("expires");
+            lblExpires.setFont(new Font("Arial", Font.PLAIN, 14));
+            mainPane.add(lblExpires, CC.xy(3, 9));
+
+            //---- txtExpires ----
+            txtExpires.setFont(new Font("Arial", Font.PLAIN, 14));
+            mainPane.add(txtExpires, CC.xywh(5, 9, 3, 1));
+
             //---- jLabel7 ----
             jLabel7.setText("Bemerkung");
             jLabel7.setFont(new Font("Arial", Font.PLAIN, 14));
-            mainPane.add(jLabel7, CC.xy(3, 13));
+            mainPane.add(jLabel7, CC.xy(3, 15));
 
             //---- txtBemerkung ----
             txtBemerkung.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -367,7 +380,7 @@ public class DlgNewStocks extends MyJDialog {
                     txtBemerkungCaretUpdate(e);
                 }
             });
-            mainPane.add(txtBemerkung, CC.xywh(5, 13, 4, 1));
+            mainPane.add(txtBemerkung, CC.xywh(5, 15, 4, 1));
 
             //---- btnPrint ----
             btnPrint.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/printer-on.png")));
@@ -380,7 +393,7 @@ public class DlgNewStocks extends MyJDialog {
                     btnPrintItemStateChanged(e);
                 }
             });
-            mainPane.add(btnPrint, CC.xy(3, 17, CC.RIGHT, CC.DEFAULT));
+            mainPane.add(btnPrint, CC.xy(3, 19, CC.RIGHT, CC.DEFAULT));
 
             //======== panel1 ========
             {
@@ -408,7 +421,7 @@ public class DlgNewStocks extends MyJDialog {
                 });
                 panel1.add(btnApply);
             }
-            mainPane.add(panel1, CC.xywh(7, 17, 2, 1, CC.RIGHT, CC.DEFAULT));
+            mainPane.add(panel1, CC.xywh(7, 19, 2, 1, CC.RIGHT, CC.DEFAULT));
         }
         contentPane.add(mainPane);
         pack();
@@ -446,7 +459,7 @@ public class DlgNewStocks extends MyJDialog {
         if (tradeForm == null) {
             text += "Kein Medikament ausgewählt. ";
         }
-        if (menge == null && aPackage == null) {
+        if (amount == null && aPackage == null) {
             text += "Keine korrekte Mengenangabe. ";
         }
         if (inventory == null) {
@@ -461,7 +474,7 @@ public class DlgNewStocks extends MyJDialog {
             txtMedSuche.setText("");
             txtMedSuche.requestFocus();
         } else {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Buchen nicht möglich: " + text, DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("newstocks.registration.failed") + ": " + text, DisplayMessage.WARNING));
         }
     }//GEN-LAST:event_btnApplyActionPerformed
 
@@ -476,8 +489,8 @@ public class DlgNewStocks extends MyJDialog {
             // Wenn die aPackage null ist, dann ist eine Sonderpackung
             if (aPackage != null) {
                 aPackage = em.merge(aPackage);
-                if (menge == null) {
-                    menge = aPackage.getContent();
+                if (amount == null) {
+                    amount = aPackage.getContent();
                 }
             }
 
@@ -488,16 +501,21 @@ public class DlgNewStocks extends MyJDialog {
                 inventory.setText(TradeFormTools.toPrettyString(tradeForm) + "; " + ACMETools.toPrettyStringShort(tradeForm.getMedProduct().getACME()));
             }
 
-            MedStock newStock = em.merge(MedInventoryTools.addTo(inventory, aPackage, tradeForm, txtBemerkung.getText(), menge));
+            BigDecimal estimatedUPR = MedStockTools.getEstimatedUPR(tradeForm);
+            int dummyMode = tradeForm.getDosageForm().isUPRn() && MedStockTools.isNoStockYetForThis(tradeForm) ? MedStockTools.REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING : MedStockTools.ADD_TO_AVERAGES_UPR_WHEN_CLOSING;
+
+            MedStock newStock = em.merge(new MedStock(inventory, tradeForm, aPackage, txtBemerkung.getText(), estimatedUPR, dummyMode));
+            MedStockTransaction buchung = em.merge(new MedStockTransaction(newStock, amount));
+            newStock.getStockTransaction().add(buchung);
             inventory.getMedStocks().add(newStock);
 
             if (MedStockTools.getStockInUse(inventory) == null) {
                 MedInventoryTools.openNext(inventory);
-                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Neuer Vorrat wurde direkt angebrochen", 2));
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("newstocks.new.stock.has.been.opened"));
             }
 
             em.getTransaction().commit();
-            menge = null;
+            amount = null;
             aPackage = null;
             tradeForm = null;
             inventory = null;
@@ -580,21 +598,21 @@ public class DlgNewStocks extends MyJDialog {
         }
 
         if (txtMenge.getText().trim().isEmpty()) {
-            menge = null;
+            amount = null;
         } else {
 
-            menge = SYSTools.checkBigDecimal(txtMenge.getText().trim());
+            amount = SYSTools.checkBigDecimal(txtMenge.getText().trim());
 
-            if (menge != null) {
-                if (menge.compareTo(BigDecimal.ZERO) <= 0) {
+            if (amount != null) {
+                if (amount.compareTo(BigDecimal.ZERO) <= 0) {
 //                lblMenge.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/editdelete.png")));
                     ovrMenge.addOverlayComponent(attentionIconMenge, DefaultOverlayable.SOUTH_WEST);
                     attentionIconMenge.setToolTipText(SYSTools.toHTML("<i>Mengen müssen größer 0 sein.</i>"));
-                    menge = null;
-                } else if (aPackage != null && menge.compareTo(aPackage.getContent()) > 0) {
+                    amount = null;
+                } else if (aPackage != null && amount.compareTo(aPackage.getContent()) > 0) {
                     ovrMenge.addOverlayComponent(attentionIconMenge, DefaultOverlayable.SOUTH_WEST);
                     attentionIconMenge.setToolTipText(SYSTools.toHTML("<i>Mengen dürfen nicht größer als der Packungsinhalt sein.</i>"));
-                    menge = aPackage.getContent();
+                    amount = aPackage.getContent();
                 } else {
                     ovrMenge.addOverlayComponent(correctIconMenge, DefaultOverlayable.SOUTH_WEST);
                 }
@@ -781,6 +799,8 @@ public class DlgNewStocks extends MyJDialog {
     private JLabel lblMenge;
     private JLabel jLabel6;
     private JComboBox cmbPackung;
+    private JLabel lblExpires;
+    private JTextField txtExpires;
     private JLabel jLabel7;
     private JTextField txtBemerkung;
     private JToggleButton btnPrint;

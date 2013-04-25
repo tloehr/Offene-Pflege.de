@@ -58,7 +58,7 @@ public class DlgUPREditor extends MyJDialog {
             txtUPR.setText(tradeForm.getUPR().setScale(2, RoundingMode.HALF_UP).toString());
             rbUPRConst.setSelected(true);
         } else {
-            txtSetUPR.setText(MedStockTools.getEstimatedUPR(tradeForm, null).setScale(2, RoundingMode.HALF_UP).toString());
+            txtSetUPR.setText(MedStockTools.getEstimatedUPR(tradeForm).setScale(2, RoundingMode.HALF_UP).toString());
             rbUPRAuto.setSelected(true);
         }
 

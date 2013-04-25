@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 @Entity
 @Table(name = "tradeform")
@@ -23,6 +24,10 @@ public class TradeForm implements Serializable {
     @Basic(optional = false)
     @Column(name = "UPR")
     private BigDecimal upr;
+    @Basic(optional = false)
+    @Column(name = "expDaysWhenOpen")
+    private Integer daysToExpireAfterOpened;
+
 
     public TradeForm() {
     }
@@ -57,6 +62,14 @@ public class TradeForm implements Serializable {
 
     public Collection<MedPackage> getPackages() {
         return packages;
+    }
+
+    public Integer getDaysToExpireAfterOpened() {
+        return daysToExpireAfterOpened;
+    }
+
+    public void setDaysToExpireAfterOpened(Integer daysToExpireAfterOpened) {
+        this.daysToExpireAfterOpened = daysToExpireAfterOpened;
     }
 
     // ==

@@ -79,8 +79,11 @@ public class PnlSubtext extends JPanel {
         cmbFormen.setRenderer(DosageFormTools.getRenderer(0));
         em.close();
 
-        dosageForm = (DosageForm) cmbFormen.getSelectedItem();
+        cmbDaysWeeks.setModel(new DefaultComboBoxModel(new String[]{OPDE.lang.getString("misc.msg.Days"), OPDE.lang.getString("misc.msg.weeks")}));
 
+        dosageForm = (DosageForm) cmbFormen.getSelectedItem();
+        cbExpiresAfterOpened.setText(OPDE.lang.getString(internalClassID + ".expiresAfterOpenedIn"));
+        cbExpiresAfterOpened.setSelected(false);
         tradeForm = new TradeForm(product, "", dosageForm);
 
         rbCalcUPR.setSelected(true);
@@ -129,14 +132,15 @@ public class PnlSubtext extends JPanel {
         tradeForm = new TradeForm(product, txtZusatz.getText().trim(), dosageForm);
 
         // selection of constant UPR ?
-        if (dosageForm.getUPRState() == DosageFormTools.STATE_UPRn) {
-            lblTo1.setText(" " + SYSConst.UNITS[dosageForm.getUsageUnit()] + " " + dosageForm.getUsageText() + " " + OPDE.lang.getString("misc.msg.to1") + " " + SYSConst.UNITS[dosageForm.getPackUnit()]);
+        if (dosageForm.isUPRn()) {
+            lblTo1.setText(" " + SYSConst.UNITS[dosageForm.getUsageUnit()] + " " + OPDE.lang.getString("misc.msg.to1") + " " + SYSConst.UNITS[dosageForm.getPackUnit()]);
             pnlUPR.setVisible(true);
             rbCalcUPR.setSelected(true);
         } else {
             pnlUPR.setVisible(false);
-            validate.execute(tradeForm);
         }
+
+        validate.execute(tradeForm);
 
     }
 
@@ -157,17 +161,17 @@ public class PnlSubtext extends JPanel {
     }
 
     private void rbCalcUPRItemStateChanged(ItemEvent e) {
+        txtUPR.setEnabled(e.getStateChange() != ItemEvent.SELECTED);
         if (e.getStateChange() == ItemEvent.SELECTED) {
             tradeForm.setUPR(null);
-            txtUPR.setEnabled(false);
             validate.execute(tradeForm);
         }
     }
 
     private void rbSetUPRItemStateChanged(ItemEvent e) {
+        txtUPR.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
         if (e.getStateChange() == ItemEvent.SELECTED) {
             tradeForm.setUPR(SYSTools.checkBigDecimal(txtUPR.getText()));
-            txtUPR.setEnabled(true);
             validate.execute(tradeForm);
         }
     }
@@ -183,6 +187,52 @@ public class PnlSubtext extends JPanel {
         tradeForm.setUPR(upr);
     }
 
+    private void cbExpiresAfterOpenedItemStateChanged(ItemEvent e) {
+        txtExpiresIn.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+        cmbDaysWeeks.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            txtExpiresIn.setText("7");
+            cmbDaysWeeks.setSelectedIndex(0);
+            tradeForm.setDaysToExpireAfterOpened(7);
+            validate.execute(tradeForm);
+        } else {
+            tradeForm.setDaysToExpireAfterOpened(null);
+            validate.execute(tradeForm);
+        }
+    }
+
+    private void txtExpiresInFocusLost(FocusEvent e) {
+        Integer i = SYSTools.checkInteger(txtExpiresIn.getText());
+        if (i == null || i.compareTo(0) <= 0) {
+            i = 7;
+            txtExpiresIn.setText("7");
+        }
+        if (cmbDaysWeeks.getSelectedIndex() == 1) {
+            tradeForm.setDaysToExpireAfterOpened(i * 7);
+        } else {
+            tradeForm.setDaysToExpireAfterOpened(i);
+        }
+
+        validate.execute(tradeForm);
+    }
+
+    private void cmbDaysWeeksItemStateChanged(ItemEvent e) {
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            Integer i = SYSTools.checkInteger(txtExpiresIn.getText());
+            if (i == null || i.compareTo(0) <= 0) {
+                i = 7;
+                txtExpiresIn.setText("7");
+            }
+            if (cmbDaysWeeks.getSelectedIndex() == 1) {
+                tradeForm.setDaysToExpireAfterOpened(i * 7);
+            } else {
+                tradeForm.setDaysToExpireAfterOpened(i);
+            }
+            validate.execute(tradeForm);
+        }
+    }
+
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         txtZusatz = new JXSearchField();
@@ -195,13 +245,19 @@ public class PnlSubtext extends JPanel {
         rbSetUPR = new JRadioButton();
         txtUPR = new JTextField();
         lblTo1 = new JLabel();
+        panel1 = new JPanel();
+        cbExpiresAfterOpened = new JCheckBox();
+        hSpacer1 = new JPanel(null);
+        txtExpiresIn = new JTextField();
+        hSpacer2 = new JPanel(null);
+        cmbDaysWeeks = new JComboBox();
         jsp1 = new JScrollPane();
         lstDaf = new JList();
 
         //======== this ========
         setLayout(new FormLayout(
             "2*(default, $lcgap), default:grow, 2*($lcgap, default)",
-            "2*(default, $lgap), default, $rgap, pref, $lgap, default, $lgap, default:grow, $lgap, default"));
+            "2*(default, $lgap), default, $rgap, pref, 2*($lgap, default), $lgap, default:grow, $lgap, default"));
 
         //---- txtZusatz ----
         txtZusatz.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -244,7 +300,7 @@ public class PnlSubtext extends JPanel {
         lbl1.setText(null);
         lbl1.setIcon(new ImageIcon(getClass().getResource("/artwork/other/medicine2.png")));
         lbl1.setFont(new Font("Arial", Font.PLAIN, 18));
-        add(lbl1, CC.xy(3, 11, CC.CENTER, CC.FILL));
+        add(lbl1, CC.xy(3, 13, CC.LEFT, CC.FILL));
 
         //---- lblMsg ----
         lblMsg.setText("text");
@@ -292,6 +348,45 @@ public class PnlSubtext extends JPanel {
         }
         add(pnlUPR, CC.xywh(3, 9, 5, 1, CC.LEFT, CC.FILL));
 
+        //======== panel1 ========
+        {
+            panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
+
+            //---- cbExpiresAfterOpened ----
+            cbExpiresAfterOpened.setText("expiresAfterOpened");
+            cbExpiresAfterOpened.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    cbExpiresAfterOpenedItemStateChanged(e);
+                }
+            });
+            panel1.add(cbExpiresAfterOpened);
+            panel1.add(hSpacer1);
+
+            //---- txtExpiresIn ----
+            txtExpiresIn.setColumns(10);
+            txtExpiresIn.setEnabled(false);
+            txtExpiresIn.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusLost(FocusEvent e) {
+                    txtExpiresInFocusLost(e);
+                }
+            });
+            panel1.add(txtExpiresIn);
+            panel1.add(hSpacer2);
+
+            //---- cmbDaysWeeks ----
+            cmbDaysWeeks.setEnabled(false);
+            cmbDaysWeeks.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    cmbDaysWeeksItemStateChanged(e);
+                }
+            });
+            panel1.add(cmbDaysWeeks);
+        }
+        add(panel1, CC.xy(3, 11));
+
         //======== jsp1 ========
         {
 
@@ -306,7 +401,7 @@ public class PnlSubtext extends JPanel {
             });
             jsp1.setViewportView(lstDaf);
         }
-        add(jsp1, CC.xywh(5, 11, 3, 1, CC.DEFAULT, CC.FILL));
+        add(jsp1, CC.xywh(5, 13, 3, 1, CC.DEFAULT, CC.FILL));
 
         //---- buttonGroup1 ----
         ButtonGroup buttonGroup1 = new ButtonGroup();
@@ -326,6 +421,12 @@ public class PnlSubtext extends JPanel {
     private JRadioButton rbSetUPR;
     private JTextField txtUPR;
     private JLabel lblTo1;
+    private JPanel panel1;
+    private JCheckBox cbExpiresAfterOpened;
+    private JPanel hSpacer1;
+    private JTextField txtExpiresIn;
+    private JPanel hSpacer2;
+    private JComboBox cmbDaysWeeks;
     private JScrollPane jsp1;
     private JList lstDaf;
     // JFormDesigner - End of variables declaration  //GEN-END:variables

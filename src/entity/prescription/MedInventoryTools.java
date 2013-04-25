@@ -212,29 +212,29 @@ public class MedInventoryTools {
         }
     }
 
-    /**
-     * Diese Methode bucht ein Medikament in einen Vorrat ein.
-     * Dabei wird ein passendes APV ermittelt, eine Buchung angelegt und der neue MedBestand zurück gegeben.
-     * Der muss dann nur noch persistiert werden.
-     *
-     * @param inventory
-     * @param aPackage
-     * @param tradeForm
-     * @param text
-     * @param menge
-     * @return
-     * @throws Exception
-     */
-    public static MedStock addTo(MedInventory inventory, MedPackage aPackage, TradeForm tradeForm, String text, BigDecimal menge) {
-        MedStock stock = null;
-        if (menge.compareTo(BigDecimal.ZERO) > 0) {
-            BigDecimal estimatedUPR = MedStockTools.getEstimatedUPR(tradeForm, inventory.getResident());
-            stock = new MedStock(inventory, tradeForm, aPackage, text, estimatedUPR);
-            MedStockTransaction buchung = new MedStockTransaction(stock, menge);
-            stock.getStockTransaction().add(buchung);
-        }
-        return stock;
-    }
+//    /**
+//     * Diese Methode bucht ein Medikament in einen Vorrat ein.
+//     * Dabei wird ein passendes APV ermittelt, eine Buchung angelegt und der neue MedBestand zurück gegeben.
+//     * Der muss dann nur noch persistiert werden.
+//     *
+//     * @param inventory
+//     * @param aPackage
+//     * @param tradeForm
+//     * @param text
+//     * @param menge
+//     * @return
+//     * @throws Exception
+//     */
+//    public static MedStock addTo(MedInventory inventory, MedPackage aPackage, TradeForm tradeForm, String text, BigDecimal menge) {
+//        MedStock stock = null;
+//        if (menge.compareTo(BigDecimal.ZERO) > 0) {
+//            BigDecimal estimatedUPR = MedStockTools.getEstimatedUPR(tradeForm, inventory.getResident());
+//            stock = new MedStock(inventory, tradeForm, aPackage, text, estimatedUPR);
+//            MedStockTransaction buchung = new MedStockTransaction(stock, menge);
+//            stock.getStockTransaction().add(buchung);
+//        }
+//        return stock;
+//    }
 
 
     public static MedStock getNextToOpen(MedInventory inventory) {

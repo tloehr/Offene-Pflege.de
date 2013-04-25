@@ -21,7 +21,6 @@ import javax.swing.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.util.*;
 
 /**
@@ -301,8 +300,8 @@ public class MedStockTools {
 
         if (stock.getTradeForm().getDosageForm().isUPRn()) {
             result += ", APV: ";
-            if (stock.getTradeForm().getUPR() != null){
-                result += stock.getTradeForm().getUPR().setScale(2, RoundingMode.HALF_UP).toString() + " (" + OPDE.lang.getString(DlgUPREditor.internalClassID + ".constant.upr")+")";
+            if (stock.getTradeForm().getUPR() != null) {
+                result += stock.getTradeForm().getUPR().setScale(2, RoundingMode.HALF_UP).toString() + " (" + OPDE.lang.getString(DlgUPREditor.internalClassID + ".constant.upr") + ")";
             } else {
                 result += stock.getUPR().setScale(2, RoundingMode.HALF_UP).toString();
             }
@@ -494,9 +493,9 @@ public class MedStockTools {
      * so it will be replaced by the first calculated result, when this package is closed.
      * For DosageForms with type STATE_UPR1, there is no calculation at all. Those are always 1 constantly.
      */
-    public static BigDecimal getEstimatedUPR(TradeForm tradeForm, Resident resident) {
+    public static BigDecimal getEstimatedUPR(TradeForm tradeForm) {
         OPDE.debug("<--- calcProspectiveUPR");
-        BigDecimal upr;
+        BigDecimal upr = null;
         if (tradeForm.getDosageForm().getUPRState() == DosageFormTools.STATE_DONT_CALC) {
             OPDE.debug("STATE_DONT_CALC");
             // no calculation for gel or ointments. they wont work out anyways.
@@ -508,8 +507,33 @@ public class MedStockTools {
                 // if there is a constant UPR defined for that tradeform
                 // so there is no estimation necessary
                 upr = tradeForm.getUPR();
+                OPDE.debug("constant UPRn");
             } else {
-                upr = getEstimatedUPR_BY_TRADEFORM(tradeForm);
+                EntityManager em = OPDE.createEM();
+                try {
+                    Query query = em.createQuery("SELECT AVG(s.upr) FROM MedStock s WHERE s.tradeform = :tradeform AND s.uprDummyMode = :dummymode ");
+                    query.setParameter("dummymode", ADD_TO_AVERAGES_UPR_WHEN_CLOSING);
+                    query.setParameter("tradeform", tradeForm);
+                    Object result = query.getSingleResult();
+
+                    if (result == null) {
+                        upr = BigDecimal.ONE;
+                        OPDE.debug("calculated UPRn. first of its kind. UPR: 1");
+                    } else if (result instanceof Double) {
+                        upr = new BigDecimal((Double) result);
+                    } else {
+                        upr = (BigDecimal) query.getSingleResult();
+                    }
+                    upr = upr.setScale(2, BigDecimal.ROUND_HALF_UP);
+                    OPDE.debug("calculated UPRn. average so far: " + upr.toString());
+                } catch (NoResultException nre) {
+                    upr = BigDecimal.ONE;
+                } catch (Exception e) {
+                    OPDE.fatal(e);
+                } finally {
+                    em.close();
+                }
+
             }
 
         } else {
@@ -521,32 +545,58 @@ public class MedStockTools {
         return upr;
     }
 
-    private static BigDecimal getEstimatedUPR_BY_TRADEFORM(TradeForm tradeForm) {
-        BigDecimal upr = null;
+    public static boolean isNoStockYetForThis(TradeForm tradeForm) {
+        Integer count = null;
         EntityManager em = OPDE.createEM();
         try {
-            Query query = em.createQuery("SELECT AVG(s.upr) FROM MedStock s WHERE s.tradeform = :tradeform AND s.uprDummyMode = :dummymode ");
+            Query query = em.createQuery("SELECT COUNT(s.upr) FROM MedStock s WHERE s.tradeform = :tradeform AND s.uprDummyMode = :dummymode ");
             query.setParameter("dummymode", ADD_TO_AVERAGES_UPR_WHEN_CLOSING);
             query.setParameter("tradeform", tradeForm);
             Object result = query.getSingleResult();
 
             if (result == null) {
-                upr = BigDecimal.ONE;
-            } else if (result instanceof Double) {
-                upr = new BigDecimal((Double) result);
+                count = 0;
+            } else if (result instanceof Long) {
+                count = ((Long) result).intValue();
             } else {
-                upr = (BigDecimal) query.getSingleResult();
+                count = (Integer) query.getSingleResult();
             }
-            upr = upr.setScale(2, BigDecimal.ROUND_HALF_UP);
         } catch (NoResultException nre) {
-            upr = null;
+            count = 0;
         } catch (Exception e) {
             OPDE.fatal(e);
         } finally {
             em.close();
         }
-        return upr;
+        return count == 0;
     }
+
+//    private static BigDecimal getEstimatedUPR_BY_TRADEFORM(TradeForm tradeForm) {
+//        BigDecimal upr = null;
+//        EntityManager em = OPDE.createEM();
+//        try {
+//            Query query = em.createQuery("SELECT AVG(s.upr) FROM MedStock s WHERE s.tradeform = :tradeform AND s.uprDummyMode = :dummymode ");
+//            query.setParameter("dummymode", ADD_TO_AVERAGES_UPR_WHEN_CLOSING);
+//            query.setParameter("tradeform", tradeForm);
+//            Object result = query.getSingleResult();
+//
+//            if (result == null) {
+//                upr = BigDecimal.ONE;
+//            } else if (result instanceof Double) {
+//                upr = new BigDecimal((Double) result);
+//            } else {
+//                upr = (BigDecimal) query.getSingleResult();
+//            }
+//            upr = upr.setScale(2, BigDecimal.ROUND_HALF_UP);
+//        } catch (NoResultException nre) {
+//            upr = null;
+//        } catch (Exception e) {
+//            OPDE.fatal(e);
+//        } finally {
+//            em.close();
+//        }
+//        return upr;
+//    }
 
 //    private static BigDecimal getEstimatedUPR_BY_RESIDENT(TradeForm tradeForm, Resident resident) {
 //        BigDecimal upr = null;
@@ -588,6 +638,7 @@ public class MedStockTools {
             em.lock(stock, LockModeType.OPTIMISTIC);
             em.lock(stock.getInventory(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
             stock.setUPR(upr);
+            stock.setUPRDummyMode(ADD_TO_AVERAGES_UPR_WHEN_CLOSING); // no dummies after this has been set
         }
     }
 }
