@@ -428,18 +428,50 @@ public class SYSCalendar {
         ((JTextField) evt.getSource()).setText(DateFormat.getDateInstance().format(dt.toDate()));
     }
 
+    /**
+     * Expiry dates usually have a form like "12-10" oder "12/10" to indicate that the product in question is
+     * best before December 31st, 2010. This method parses dates like this.
+     * If it fails it hands over the parsing efforts to <code>public static Date parseDate(String input)</code>.
+     *
+     * @param input a string to be parsed. It can handle the following formats "mm/yy", "mm/yyyy" (it also recognizes these kinds of
+     *              dates if the slash is replaced with one of the following chars: "-,.".
+     * @return the parsed date which is always the last day and the last second of that month.
+     * @throws NumberFormatException
+     */
+    public static DateTime parseExpiryDate(String input) throws NumberFormatException {
+        if (input == null || input.isEmpty()) {
+            throw new NumberFormatException("empty");
+        }
+        input = input.trim();
+        if (input.indexOf(".") + input.indexOf(",") + input.indexOf("-") + input.indexOf("/") == -4) {
+            input += ".";
+        }
+
+        StringTokenizer st = new StringTokenizer(input, "/,.-");
+        if (st.countTokens() == 1) { // only one number, then this must be the month. we add the current year.
+            input = "1." + input + SYSCalendar.today().get(GregorianCalendar.YEAR);
+        }
+        if (st.countTokens() == 2) { // complete expiry date. we fill up some dummy day.
+            input = "1." + input;
+            //st = new StringTokenizer(input, "/,.-"); // split again...
+        }
+        DateTime expiry = new DateTime(parseDate(input));
+
+        return expiry.dayOfMonth().withMaximumValue().secondOfDay().withMaximumValue();
+
+    }
 
     public static Date parseDate(String input) throws NumberFormatException {
         if (input == null || input.equals("")) {
             throw new NumberFormatException("empty");
         }
-        if (input.indexOf(".") + input.indexOf(",") + input.indexOf("-") == -3) {
+        if (input.indexOf(".") + input.indexOf(",") + input.indexOf("-") + input.indexOf("/") == -4) {
             input += "."; // er war zu faul auch nur einen punkt anzuhängen.
         }
-        StringTokenizer st = new StringTokenizer(input, ",.-");
+        StringTokenizer st = new StringTokenizer(input, "/,.-");
         if (st.countTokens() == 1) { // Vielleicht fehlen ja nur die Monats- und Jahresangaben. Dann hängen wir sie einach an.
             input += (SYSCalendar.today().get(GregorianCalendar.MONTH) + 1) + "." + SYSCalendar.today().get(GregorianCalendar.YEAR);
-            st = new StringTokenizer(input, ",.-"); // dann nochmal aufteilen...
+            st = new StringTokenizer(input, "/,.-"); // dann nochmal aufteilen...
         }
         if (st.countTokens() == 2) { // Vielleicht fehlt ja nur die Jahresangabe. Dann hängen wir es einfach an.
 
@@ -447,7 +479,7 @@ public class SYSCalendar {
                 input += "."; // er war zu faul den letzten Punkt anzuhängen.
             }
             input += SYSCalendar.today().get(GregorianCalendar.YEAR);
-            st = new StringTokenizer(input, ",.-"); // dann nochmal aufteilen...
+            st = new StringTokenizer(input, "/,.-"); // dann nochmal aufteilen...
         }
         if (st.countTokens() != 3) {
             throw new NumberFormatException("wrong format");

@@ -499,6 +499,8 @@ public class BHPTools {
 
         if (stock == null) {
             icon = SYSConst.icon22ledRedOn;
+        } else if (stock.isExpired()) {
+            icon = SYSConst.icon22ledOrangeOn;
         } else if (sum.compareTo(BigDecimal.ZERO) <= 0) {
             icon = SYSConst.icon22ledYellowOn;
         }

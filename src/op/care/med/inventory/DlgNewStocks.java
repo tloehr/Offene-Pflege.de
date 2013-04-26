@@ -44,6 +44,7 @@ import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
+import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import javax.swing.*;
@@ -54,7 +55,9 @@ import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -69,6 +72,7 @@ public class DlgNewStocks extends MyJDialog {
     private TradeForm tradeForm;
     private Resident resident;
     private MedInventory inventory;
+    private Date expiry;
 
     private OverlayComboBox cmbVorrat, cmbBW;
     private DefaultOverlayable ovrVorrat, ovrBW;
@@ -141,9 +145,32 @@ public class DlgNewStocks extends MyJDialog {
         SYSPropsTools.storeState(this.getClass().getName() + "::btnPrint", btnPrint);
     }
 
+    private void txtExpiresFocusGained(FocusEvent e) {
+        txtExpires.selectAll();
+    }
+
+    private void txtExpiresFocusLost(FocusEvent e) {
+        try {
+            DateTime myExpiry = SYSCalendar.parseExpiryDate(txtExpires.getText());
+            if (myExpiry.isBeforeNow()){
+                throw new Exception("date must not be in the past");
+            }
+            expiry = myExpiry.toDate();
+            txtExpires.setText(DateFormat.getDateInstance().format(expiry));
+        } catch (Exception ex) {
+            expiry = null;
+            txtExpires.setText(null);
+        }
+    }
+
+    private void txtExpiresActionPerformed(ActionEvent e) {
+        txtExpiresFocusLost(null);
+    }
+
     private void initDialog() {
         ignoreEvent = true;
 
+        expiry = null;
         logicalPrinter = OPDE.getPrintProcessor().getSelectedLogicalPrinter();
         printForm = OPDE.getPrintProcessor().getSelectedForm();
 
@@ -210,7 +237,7 @@ public class DlgNewStocks extends MyJDialog {
         });
         txtMenge.setFont(SYSConst.ARIAL14);
         ovrMenge = new DefaultOverlayable(txtMenge);
-        mainPane.add(ovrMenge, CC.xywh(5, 9, 4, 1));
+        mainPane.add(ovrMenge, CC.xywh(5, 11, 4, 1));
 
         ignoreEvent = false;
         setVisible(true);
@@ -258,7 +285,7 @@ public class DlgNewStocks extends MyJDialog {
         {
             mainPane.setLayout(new FormLayout(
                 "14dlu, $lcgap, default, $lcgap, 39dlu, $lcgap, default:grow, $lcgap, 14dlu",
-                "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, $lgap, default, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
+                "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, $lgap, 17dlu, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
 
             //---- jLabel1 ----
             jLabel1.setText("PZN oder Suchbegriff");
@@ -365,7 +392,23 @@ public class DlgNewStocks extends MyJDialog {
 
             //---- txtExpires ----
             txtExpires.setFont(new Font("Arial", Font.PLAIN, 14));
-            mainPane.add(txtExpires, CC.xywh(5, 9, 3, 1));
+            txtExpires.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusGained(FocusEvent e) {
+                    txtExpiresFocusGained(e);
+                }
+                @Override
+                public void focusLost(FocusEvent e) {
+                    txtExpiresFocusLost(e);
+                }
+            });
+            txtExpires.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    txtExpiresActionPerformed(e);
+                }
+            });
+            mainPane.add(txtExpires, CC.xywh(5, 9, 3, 1, CC.DEFAULT, CC.FILL));
 
             //---- jLabel7 ----
             jLabel7.setText("Bemerkung");
@@ -469,9 +512,10 @@ public class DlgNewStocks extends MyJDialog {
         if (text.isEmpty()) {
             save();
 
-            txtMenge.setText("");
-            txtBemerkung.setText("");
-            txtMedSuche.setText("");
+            txtMenge.setText(null);
+            txtBemerkung.setText(null);
+            txtMedSuche.setText(null);
+            txtExpires.setText(null);
             txtMedSuche.requestFocus();
         } else {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("newstocks.registration.failed") + ": " + text, DisplayMessage.WARNING));
@@ -505,6 +549,7 @@ public class DlgNewStocks extends MyJDialog {
             int dummyMode = tradeForm.getDosageForm().isUPRn() && MedStockTools.isNoStockYetForThis(tradeForm) ? MedStockTools.REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING : MedStockTools.ADD_TO_AVERAGES_UPR_WHEN_CLOSING;
 
             MedStock newStock = em.merge(new MedStock(inventory, tradeForm, aPackage, txtBemerkung.getText(), estimatedUPR, dummyMode));
+            newStock.setExpires(expiry);
             MedStockTransaction buchung = em.merge(new MedStockTransaction(newStock, amount));
             newStock.getStockTransaction().add(buchung);
             inventory.getMedStocks().add(newStock);
@@ -519,13 +564,14 @@ public class DlgNewStocks extends MyJDialog {
             aPackage = null;
             tradeForm = null;
             inventory = null;
+            expiry = null;
 
             if (btnPrint.isSelected()) {
                 OPDE.getPrintProcessor().addPrintJob(new PrintListElement(newStock, logicalPrinter, printForm, OPDE.getProps().getProperty(SYSPropsTools.KEY_PHYSICAL_PRINTER)));
             }
 
             // if the label printer is not used, the new number is shown until the next message, so the user has time to write the number down manually.
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("Bestand Nr. <b>" + newStock.getID() + "</b> wurde eingebucht", btnPrint.isSelected() ? 2 : 0));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("newstocks.registration.success.1") + " <b>" + newStock.getID() + "</b> " + OPDE.lang.getString("newstocks.registration.success.1"), btnPrint.isSelected() ? 2 : 0));
         } catch (OptimisticLockException ole) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -547,7 +593,7 @@ public class DlgNewStocks extends MyJDialog {
 
     private void btnMedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMedActionPerformed
 
-        String pzn = MedPackageTools.parsePZN(txtMedSuche.getText());
+//        String pzn = MedPackageTools.parsePZN(txtMedSuche.getText());
         final JidePopup popup = new JidePopup();
 
         WizardDialog wizard = new MedProductWizard(new Closure() {

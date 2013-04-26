@@ -50,7 +50,7 @@
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
-          <string>14dlu, linegap, fill:17dlu, linegap, fill:17dlu, linegap, fill:default, linegap, default, linegap, fill:17dlu, linegap, fill:17dlu, linegap, fill:17dlu, linegap, fill:17dlu, 10dlu, fill:default, linegap, 14dlu</string> 
+          <string>14dlu, linegap, fill:17dlu, linegap, fill:17dlu, linegap, fill:default, linegap, 17dlu, linegap, fill:17dlu, linegap, fill:17dlu, linegap, fill:17dlu, linegap, fill:17dlu, 10dlu, fill:default, linegap, 14dlu</string> 
          </void> 
         </object> 
         <void property="name"> 
@@ -482,6 +482,30 @@
           <void property="name"> 
            <string>txtExpires</string> 
           </void> 
+          <void method="addEvent"> 
+           <object class="com.jformdesigner.model.FormEvent"> 
+            <string>java.awt.event.FocusListener</string> 
+            <string>focusGained</string> 
+            <string>txtExpiresFocusGained</string> 
+            <boolean>true</boolean> 
+           </object> 
+          </void> 
+          <void method="addEvent"> 
+           <object class="com.jformdesigner.model.FormEvent"> 
+            <string>java.awt.event.FocusListener</string> 
+            <string>focusLost</string> 
+            <string>txtExpiresFocusLost</string> 
+            <boolean>true</boolean> 
+           </object> 
+          </void> 
+          <void method="addEvent"> 
+           <object class="com.jformdesigner.model.FormEvent"> 
+            <string>java.awt.event.ActionListener</string> 
+            <string>actionPerformed</string> 
+            <string>txtExpiresActionPerformed</string> 
+            <boolean>true</boolean> 
+           </object> 
+          </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
           <class>com.jgoodies.forms.layout.CellConstraints</class> 
@@ -496,6 +520,10 @@
           <void method="setProperty"> 
            <string>gridWidth</string> 
            <int>3</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>vAlign</string> 
+           <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
           </void> 
          </object> 
         </void> 
@@ -712,7 +740,7 @@
        <string>size</string> 
        <object class="java.awt.Dimension"> 
         <int>640</int> 
-        <int>360</int> 
+        <int>380</int> 
        </object> 
       </void> 
       <void method="setProperty"> 

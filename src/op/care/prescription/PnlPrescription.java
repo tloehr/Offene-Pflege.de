@@ -436,21 +436,6 @@ public class PnlPrescription extends NursingRecordsPanel {
 
         if (mypres.isClosed()) {
             icon = SYSConst.icon22stopSign;
-        } else if (mypres.isOnDemand()) {
-            icon = null;
-            if (mypres.shouldBeCalculated()) {
-                MedInventory inventory = TradeFormTools.getInventory4TradeForm(mypres.getResident(), mypres.getTradeForm());
-                MedStock stockInUse = MedStockTools.getStockInUse(inventory);
-                if (stockInUse == null) {
-                    icon = SYSConst.icon22ledRedOn;
-                } else {
-                    if (MedStockTools.getSum(stockInUse).compareTo(BigDecimal.ZERO) <= 0) {
-                        icon = SYSConst.icon22ledYellowOn;
-                    } else {
-                        icon = null;
-                    }
-                }
-            }
         } else {
             icon = null;
             if (mypres.shouldBeCalculated()) {
@@ -458,13 +443,14 @@ public class PnlPrescription extends NursingRecordsPanel {
                 MedStock stockInUse = MedStockTools.getStockInUse(inventory);
                 if (stockInUse == null) {
                     icon = SYSConst.icon22ledRedOn;
+                } else if (stockInUse.isExpired()) {
+                    icon = SYSConst.icon22ledOrangeOn;
+                } else if (MedStockTools.getSum(stockInUse).compareTo(BigDecimal.ZERO) <= 0) {
+                    icon = SYSConst.icon22ledYellowOn;
                 } else {
-                    if (MedStockTools.getSum(stockInUse).compareTo(BigDecimal.ZERO) <= 0) {
-                        icon = SYSConst.icon22ledYellowOn;
-                    } else {
-                        icon = null;
-                    }
+                    icon = null;
                 }
+
             }
         }
         return icon;
@@ -547,10 +533,11 @@ public class PnlPrescription extends NursingRecordsPanel {
         java.util.List<Component> list = new ArrayList<Component>();
         list.add(new JSeparator());
         list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22stopSign, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString("nursingrecords.prescription.keydescription1"), SYSConst.icon22stopSign, SwingConstants.LEADING));
 //        if (resident.isCalcMediUPR1()) {
-            list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
-            list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription3"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
+            list.add(new JLabel(OPDE.lang.getString("nursingrecords.prescription.keydescription2"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
+            list.add(new JLabel(OPDE.lang.getString("nursingrecords.prescription.keydescription3"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
+            list.add(new JLabel(OPDE.lang.getString("nursingrecords.prescription.keydescription4"), SYSConst.icon22ledOrangeOn, SwingConstants.LEADING));
 //        }
         return list;
     }

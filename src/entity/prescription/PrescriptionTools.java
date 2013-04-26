@@ -24,6 +24,7 @@ import javax.swing.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
@@ -454,45 +455,59 @@ public class PrescriptionTools {
                     }
 
                     if (invSum != null && invSum.compareTo(BigDecimal.ZERO) > 0) {
-                        result += "<b><u>Vorrat:</u> <font color=\"green\">" + invSum.setScale(2, BigDecimal.ROUND_UP) + " " +
+                        result += "<b><u>" + OPDE.lang.getString("misc.msg.inventory") + ":</u> <font color=\"green\">" + invSum.setScale(2, BigDecimal.ROUND_UP) + " " +
                                 SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getPackUnit()] +
                                 "</font></b>";
                         if (stockInUse.getTradeForm().getDosageForm().isUPRn()) {
                             BigDecimal anwmenge = invSum.multiply(stockInUse.getUPR());
 
-                            result += " entspricht " + anwmenge.setScale(2, BigDecimal.ROUND_UP) + " " +
+                            result += " " + OPDE.lang.getString("misc.msg.equalTo") + " " + anwmenge.setScale(2, BigDecimal.ROUND_UP) + " " +
                                     DosageFormTools.getUsageText(stockInUse.getTradeForm().getDosageForm());
-                            result += " (bei einem APV von " + stockInUse.getUPR().setScale(2, BigDecimal.ROUND_UP) + " zu 1";
+                            result += " (" + OPDE.lang.getString("misc.msg.upr") + ": " + stockInUse.getUPR().setScale(2, BigDecimal.ROUND_UP) + " " + OPDE.lang.getString("misc.msg.to1");
                             if (stockInUse.getUPRDummyMode() == MedStockTools.REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING) {
-                                result += ", dieses APV ist nur vorläufig";
+                                result += ", " + OPDE.lang.getString("misc.msg.preliminary");
                             }
                             result += ")";
                         }
 
-                        result += "<br/>Bestand im Anbruch Nr.: <b><font color=\"green\">" + stockInUse.getID() + "</font></b>";
+                        result += "<br/>" + OPDE.lang.getString("misc.msg.stockInUse") + ": <b><font color=\"green\">" + stockInUse.getID() + "</font></b>";
 
                         if (invSum.compareTo(stockSum) != 0) {
-                            result += "<br/>Restmenge im Anbruch: <b><font color=\"green\">" + stockSum.setScale(2, BigDecimal.ROUND_UP) + " " +
+                            result += "<br/>" + OPDE.lang.getString("misc.msg.leftInStock") + ": <b><font color=\"green\">" + stockSum.setScale(2, BigDecimal.ROUND_UP) + " " +
                                     SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getPackUnit()] + "</font></b>";
                             if (stockInUse.getTradeForm().getDosageForm().isUPRn()) {
                                 BigDecimal usage = stockSum.multiply(stockInUse.getUPR());
 
-                                result += " (entspricht " + usage.setScale(2, BigDecimal.ROUND_UP) + " " +
+                                result += " (" + OPDE.lang.getString("misc.msg.equalTo") + " " + usage.setScale(2, BigDecimal.ROUND_UP) + " " +
                                         DosageFormTools.getUsageText(stockInUse.getTradeForm().getDosageForm()) + ")";
                             }
                         }
 
+                        DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
+                        // variable expiry ?
+                        if (stockInUse.getTradeForm().getDaysToExpireAfterOpened() != null) {
+                            String color = stockInUse.isExpired() ? "red" : "black";
+                            result += "<br/><font color=\"" + color + "\">" + OPDE.lang.getString("misc.msg.expiresAfterOpened") + ": " + df.format(new DateTime(stockInUse.getOpened()).plusDays(stockInUse.getTradeForm().getDaysToExpireAfterOpened()).toDate()) + "</font>";
+                        }
+
+                        // fixed expiry ?
+                        if (stockInUse.getExpires() != null) {
+                            String color = stockInUse.isExpired() ? "red" : "black";
+                            result += "<br/><font color=\"" + color + "\">" + OPDE.lang.getString("misc.msg.expires") + ": " + new SimpleDateFormat("MM/yy").format(stockInUse.getExpires()) + "</font>";
+                        }
+
+
                     } else {
-                        result += "<b><font color=\"red\">Der Vorrat an diesem Medikament ist <u>leer</u>.</font></b>";
+                        result += "<b><font color=\"red\">" + OPDE.lang.getString("misc.msg.emptyInventory") + "</font></b>";
                     }
                 } else {
                     if (inventory == null) {
-                        result += "<b><font color=\"red\">Es gibt bisher keinen Vorrat für dieses Medikament.</font></b>";
+                        result += "<b><font color=\"red\">" + OPDE.lang.getString("misc.msg.noInventoryYet") + "</font></b>";
                     } else {
                         if (MedInventoryTools.getNextToOpen(inventory) != null) {
-                            result += "<br/><b><font color=\"red\">Kein Bestand im Anbruch. Vergabe nicht möglich.</font></b>";
+                            result += "<br/><b><font color=\"red\">" + OPDE.lang.getString("misc.msg.noOpenStock") + "</font></b>";
                         } else {
-                            result += "<br/><b><font color=\"red\">Keine Bestände mehr im Vorrat vorhanden. Vergabe nicht möglich.</font></b>";
+                            result += "<br/><b><font color=\"red\">" + OPDE.lang.getString("misc.msg.noOpenStock") + "</font></b>";
                         }
 
                     }

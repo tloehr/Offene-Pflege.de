@@ -290,6 +290,8 @@ public class OPDE {
          *
          */
         uptime = SYSCalendar.now();
+
+
 //        arial14 = new Font("Arial", Font.PLAIN, 14);
 //        arial28 = new Font("Arial", Font.PLAIN, 28);
 

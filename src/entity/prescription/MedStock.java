@@ -3,6 +3,7 @@ package entity.prescription;
 import entity.system.Users;
 import op.OPDE;
 import op.tools.SYSConst;
+import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -110,6 +111,15 @@ public class MedStock implements Serializable, Comparable<MedStock> {
 
     public Date getExpires() {
         return expires;
+    }
+
+    public boolean isExpired(){
+        if (isClosed()){
+            return false;
+        }
+        boolean expired1 = expires != null && new DateTime(expires).isBeforeNow();
+        boolean expired2 = isOpened() && tradeform.getDaysToExpireAfterOpened() != null && new DateTime(opened).plusDays(tradeform.getDaysToExpireAfterOpened()).isBeforeNow();
+        return expired1 || expired2;
     }
 
     public void setExpires(Date expires) {

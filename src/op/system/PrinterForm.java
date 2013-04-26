@@ -65,91 +65,95 @@ public class PrinterForm {
                 // Für jede Zeile einer Multiline. Wenn keine Multiline, dann eben nur einmal.
                 for (int line = 0; line < elemAttributes.get(providedAttribKey).size(); line++) {
 
-                    // Wert für den Einsatz im Formular.
-                    String replacement = attributes.get(providedAttribKey).toString();
-                    // Parameter für das aktuelle Element
-                    HashMap<String, String> attribs = (HashMap) elemAttributes.get(providedAttribKey).get(line);
+                    if (attributes.get(providedAttribKey) != null) {
+                        // Wert für den Einsatz im Formular.
+                        String replacement = attributes.get(providedAttribKey).toString();
+                        // Parameter für das aktuelle Element
+                        HashMap<String, String> attribs = (HashMap) elemAttributes.get(providedAttribKey).get(line);
 
-                    // Defaults für die Parameter
-                    int fixedlength = 0;
-                    int maxlength = 0;
-                    boolean multiline = false;
-                    String fillchar = " ";
-                    boolean toUpper = false;
-                    boolean toLower = false;
-                    int pad = RIGHT;
-                    String dateformat = "dd.MM.yy";
+                        // Defaults für die Parameter
+                        int fixedlength = 0;
+                        int maxlength = 0;
+                        boolean multiline = false;
+                        String fillchar = " ";
+                        boolean toUpper = false;
+                        boolean toLower = false;
+                        int pad = RIGHT;
+                        String dateformat = "dd.MM.yy";
 
-                    if (attribs.containsKey("fixedlength")) {
-                        fixedlength = Integer.parseInt(attribs.get("fixedlength"));
-                    }
-                    if (attribs.containsKey("maxlength")) {
-                        maxlength = Integer.parseInt(attribs.get("maxlength"));
-                    }
-                    if (attribs.containsKey("multiline")) {
-                        multiline = attribs.get("multiline").equalsIgnoreCase("true");
-                    }
-                    if (attribs.containsKey("fillchar")) {
-                        fillchar = attribs.get("fillchar");
-                    }
-                    if (attribs.containsKey("toupper")) {
-                        toUpper = attribs.get("toupper").equalsIgnoreCase("true");
-                    }
-                    if (attribs.containsKey("tolower")) {
-                        toLower = attribs.get("tolower").equalsIgnoreCase("true");
-                    }
-                    if (attribs.containsKey("pad")) {
-                        if (attribs.get("pad").equalsIgnoreCase("left")){
-                            pad = LEFT;
-                        } else if (attribs.get("pad").equalsIgnoreCase("center")){
-                            pad = CENTER;
-                        } else {
-                            pad = RIGHT;
+                        if (attribs.containsKey("fixedlength")) {
+                            fixedlength = Integer.parseInt(attribs.get("fixedlength"));
                         }
-                    }
-                    if (attribs.containsKey("dateformat")) {
-                        dateformat = attribs.get("dateformat");
-                    }
+                        if (attribs.containsKey("maxlength")) {
+                            maxlength = Integer.parseInt(attribs.get("maxlength"));
+                        }
+                        if (attribs.containsKey("multiline")) {
+                            multiline = attribs.get("multiline").equalsIgnoreCase("true");
+                        }
+                        if (attribs.containsKey("fillchar")) {
+                            fillchar = attribs.get("fillchar");
+                        }
+                        if (attribs.containsKey("toupper")) {
+                            toUpper = attribs.get("toupper").equalsIgnoreCase("true");
+                        }
+                        if (attribs.containsKey("tolower")) {
+                            toLower = attribs.get("tolower").equalsIgnoreCase("true");
+                        }
+                        if (attribs.containsKey("pad")) {
+                            if (attribs.get("pad").equalsIgnoreCase("left")) {
+                                pad = LEFT;
+                            } else if (attribs.get("pad").equalsIgnoreCase("center")) {
+                                pad = CENTER;
+                            } else {
+                                pad = RIGHT;
+                            }
+                        }
+                        if (attribs.containsKey("dateformat")) {
+                            dateformat = attribs.get("dateformat");
+                        }
 
-                    if (attributes.get(providedAttribKey) instanceof Date) {
-                        SimpleDateFormat sdf = new SimpleDateFormat(dateformat);
-                        replacement = sdf.format((Date) attributes.get(providedAttribKey));
-                    }
+                        if (attributes.get(providedAttribKey) instanceof Date) {
+                            SimpleDateFormat sdf = new SimpleDateFormat(dateformat);
+                            replacement = sdf.format((Date) attributes.get(providedAttribKey));
+                        }
 
-                    if (maxlength > 0) {
-                        replacement = substring(replacement, currentCharForThisElement, currentCharForThisElement + maxlength);
-                        currentCharForThisElement += maxlength;
+                        if (maxlength > 0) {
+                            replacement = substring(replacement, currentCharForThisElement, currentCharForThisElement + maxlength);
+                            currentCharForThisElement += maxlength;
+                        } else {
+                            replacement = substring(replacement, currentCharForThisElement, replacement.length());
+                            currentCharForThisElement += replacement.length();
+                        }
+
+                        // Egal was vorher gerechnet wurde. Nur bei Multiline ist das interessant.
+                        if (!multiline) {
+                            currentCharForThisElement = 0;
+                        }
+
+                        if (fixedlength > 0) {
+                            if (pad == LEFT) {
+                                replacement = SYSTools.padL(replacement, fixedlength, fillchar);
+                            } else if (pad == CENTER) {
+                                replacement = SYSTools.padC(replacement, fixedlength, fillchar);
+                            } else {
+                                replacement = SYSTools.padR(replacement, fixedlength, fillchar);
+                            }
+                        }
+
+                        if (toUpper) {
+                            replacement = replacement.toUpperCase();
+                        }
+
+                        if (toLower) {
+                            replacement = replacement.toLowerCase();
+                        }
+
+                        // Hier wird ein Teil des Formulars ausgefüllt. Jeweils für ein Element und (wenn nötig) für eine weitere Zeile
+                        // So werden Stück für Stück alle Platzhalter gegen die Werte erstetzt.
+                        myForm = SYSTools.replace(myForm, "$" + providedAttribKey + (line + 1) + "$", replacement, false);
                     } else {
-                        replacement = substring(replacement, currentCharForThisElement, replacement.length());
-                        currentCharForThisElement += replacement.length();
+                        myForm = SYSTools.replace(myForm, "$" + providedAttribKey + (line + 1) + "$", "", false);
                     }
-
-                    // Egal was vorher gerechnet wurde. Nur bei Multiline ist das interessant.
-                    if (!multiline) {
-                        currentCharForThisElement = 0;
-                    }
-
-                    if (fixedlength > 0) {
-                        if (pad == LEFT) {
-                            replacement = SYSTools.padL(replacement, fixedlength, fillchar);
-                        } else if (pad == CENTER){
-                            replacement = SYSTools.padC(replacement, fixedlength, fillchar);
-                        } else {
-                            replacement = SYSTools.padR(replacement, fixedlength, fillchar);
-                        }
-                    }
-
-                    if (toUpper) {
-                        replacement = replacement.toUpperCase();
-                    }
-
-                    if (toLower) {
-                        replacement = replacement.toLowerCase();
-                    }
-
-                    // Hier wird ein Teil des Formulars ausgefüllt. Jeweils für ein Element und (wenn nötig) für eine weitere Zeile
-                    // So werden Stück für Stück alle Platzhalter gegen die Werte erstetzt.
-                    myForm = SYSTools.replace(myForm, "$" + providedAttribKey + (line + 1) + "$", replacement, false);
                 }
 
             }

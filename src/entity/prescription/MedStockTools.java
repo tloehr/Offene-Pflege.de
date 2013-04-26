@@ -21,6 +21,7 @@ import javax.swing.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -91,6 +92,23 @@ public class MedStockTools {
         hm.put("medstock.package.pzn", pzn);
         hm.put("medstock.id", bestand.getID());
         hm.put("medstock.in", bestand.getIN());
+
+        // stock expires
+        hm.put("medstock.expires", bestand.getExpires());
+
+        // expires after being opened
+        if (bestand.getTradeForm().getDaysToExpireAfterOpened() == null) {
+            hm.put("medstock.tradeform.expires.after.opened", null);
+        } else {
+            int days = bestand.getTradeForm().getDaysToExpireAfterOpened();
+            int weeks = 0;
+            if (days >= 7) {
+                weeks = days / 7;
+            }
+            String exp = weeks > 0 ? weeks + OPDE.lang.getString("misc.msg.weeks").substring(0, 1).toUpperCase() : days + OPDE.lang.getString("misc.msg.Days").substring(0, 1).toUpperCase();
+            hm.put("medstock.tradeform.expires.after.opened", "!!" + exp);
+        }
+
         hm.put("medstock.usershort", bestand.getUser().getUID());
         hm.put("medstock.userlong", bestand.getUser().getFullname());
         hm.put("medstock.inventory.resident.name", ResidentTools.getNameAndFirstname(bestand.getInventory().getResident()));
@@ -316,12 +334,25 @@ public class MedStockTools {
 
         DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
 
-        result += "&nbsp;<font color=\"blue\">Eingang: " + df.format(stock.getIN()) + "</font>";
+        result += "&nbsp;<font color=\"blue\">" + OPDE.lang.getString("misc.msg.incoming") + ": " + df.format(stock.getIN()) + "</font>";
         if (stock.isOpened()) {
-            result += "&nbsp;<font color=\"green\">Anbruch: " + df.format(stock.getOpened()) + "</font>";
+            result += "&nbsp;<font color=\"green\">" + OPDE.lang.getString("misc.msg.opening") + ": " + df.format(stock.getOpened()) + "</font>";
+
+            // variable expiry ?
+            if (stock.getTradeForm().getDaysToExpireAfterOpened() != null && !stock.isClosed()) {
+                String color = stock.isExpired() ? "red" : "black";
+                result += "&nbsp;<font color=\""+color+"\">" + OPDE.lang.getString("misc.msg.expiresAfterOpened") + ": " + df.format(new DateTime(stock.getOpened()).plusDays(stock.getTradeForm().getDaysToExpireAfterOpened()).toDate()) + "</font>";
+            }
+
+            // fixed expiry ?
+            if (stock.getExpires() != null && !stock.isClosed()) {
+                String color = stock.isExpired() ? "red" : "black";
+                result += "&nbsp;<font color=\""+color+"\">" + OPDE.lang.getString("misc.msg.expires") + ": " + new SimpleDateFormat("MM/yy").format(stock.getExpires()) + "</font>";
+            }
+
         }
         if (stock.isClosed()) {
-            result += SYSConst.html_bold("&nbsp;<font color=\"black\">Ausgebucht: " + df.format(stock.getOut()) + "</font>");
+            result += SYSConst.html_bold("&nbsp;<font color=\"black\">" + OPDE.lang.getString("misc.msg.outgoing") + ": " + df.format(stock.getOut()) + "</font>");
         }
         result += "</font>";
 
