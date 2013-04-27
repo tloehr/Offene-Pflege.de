@@ -38,6 +38,7 @@ import entity.prescription.*;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.info.PnlInfo;
+import op.care.med.structure.DlgTradeForm;
 import op.care.med.structure.DlgUPREditor;
 import op.care.med.structure.PnlMed;
 import op.system.InternalClassACL;
@@ -736,6 +737,29 @@ public class PnlInventory extends NursingRecordsPanel {
 
             if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlMed.internalClassID)) {
                 /***
+                 *      _____              _      _____                    _____    _ _ _
+                 *     |_   _| __ __ _  __| | ___|  ___|__  _ __ _ __ ___ | ____|__| (_) |_ ___  _ __
+                 *       | || '__/ _` |/ _` |/ _ \ |_ / _ \| '__| '_ ` _ \|  _| / _` | | __/ _ \| '__|
+                 *       | || | | (_| | (_| |  __/  _| (_) | |  | | | | | | |__| (_| | | || (_) | |
+                 *       |_||_|  \__,_|\__,_|\___|_|  \___/|_|  |_| |_| |_|_____\__,_|_|\__\___/|_|
+                 *
+                 */
+                final JButton btnTFEditor = new JButton(SYSConst.icon22medical);
+                btnTFEditor.setPressedIcon(SYSConst.icon22Pressed);
+                btnTFEditor.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                btnTFEditor.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnTFEditor.setContentAreaFilled(false);
+                btnTFEditor.setBorder(null);
+                btnTFEditor.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        new DlgTradeForm(stock.getTradeForm());
+                        reload();
+                    }
+                });
+                cptitle.getRight().add(btnTFEditor);
+
+                /***
                  *      _   _ ____  ____          _ _ _
                  *     | | | |  _ \|  _ \ ___  __| (_) |_ ___  _ __
                  *     | | | | |_) | |_) / _ \/ _` | | __/ _ \| '__|
@@ -749,7 +773,6 @@ public class PnlInventory extends NursingRecordsPanel {
                 btnUPReditor.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 btnUPReditor.setContentAreaFilled(false);
                 btnUPReditor.setBorder(null);
-//                btnUPReditor.setToolTipText(OPDE.lang.getString(internalClassID + ".stock.btndelete.tooltip"));
                 btnUPReditor.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {

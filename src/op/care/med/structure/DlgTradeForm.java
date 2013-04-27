@@ -32,10 +32,12 @@ import com.jgoodies.forms.layout.FormLayout;
 import entity.prescription.DosageForm;
 import entity.prescription.DosageFormTools;
 import entity.prescription.TradeForm;
+import entity.prescription.TradeFormTools;
 import op.OPDE;
 import op.system.InternalClassACL;
 import op.tools.GUITools;
 import op.tools.MyJDialog;
+import op.tools.Pair;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
@@ -44,16 +46,14 @@ import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 
 /**
  * @author root
  */
-public class DlgDAF extends MyJDialog {
+public class DlgTradeForm extends MyJDialog {
     private TradeForm tradeForm;
-    private boolean editMode;
-
+    private boolean initPhase;
 
     private void btnEditActionPerformed(ActionEvent e) {
         PnlDosageForm pnl = new PnlDosageForm((DosageForm) cmbForm.getSelectedItem());
@@ -81,29 +81,85 @@ public class DlgDAF extends MyJDialog {
         }, this), SwingConstants.SOUTH);
     }
 
-    public DlgDAF(TradeForm tradeForm) {
+
+    private void cbExpiresAfterOpenedItemStateChanged(ItemEvent e) {
+        if (initPhase) return;
+        txtExpiresIn.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+        cmbDaysWeeks.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            txtExpiresIn.setText("7");
+            cmbDaysWeeks.setSelectedIndex(0);
+            tradeForm.setDaysToExpireAfterOpened(7);
+        } else {
+            tradeForm.setDaysToExpireAfterOpened(null);
+        }
+    }
+
+    private void txtExpiresInFocusLost(FocusEvent e) {
+        if (initPhase) return;
+        Integer i = SYSTools.checkInteger(txtExpiresIn.getText());
+        if (i == null || i.compareTo(0) <= 0) {
+            i = 7;
+            txtExpiresIn.setText("7");
+        }
+        if (cmbDaysWeeks.getSelectedIndex() == 1) {
+            tradeForm.setDaysToExpireAfterOpened(i * 7);
+        } else {
+            tradeForm.setDaysToExpireAfterOpened(i);
+        }
+
+    }
+
+    private void cmbDaysWeeksItemStateChanged(ItemEvent e) {
+        if (initPhase) return;
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            Integer i = SYSTools.checkInteger(txtExpiresIn.getText());
+            if (i == null || i.compareTo(0) <= 0) {
+                i = 7;
+                txtExpiresIn.setText("7");
+            }
+            if (cmbDaysWeeks.getSelectedIndex() == 1) {
+                tradeForm.setDaysToExpireAfterOpened(i * 7);
+            } else {
+                tradeForm.setDaysToExpireAfterOpened(i);
+            }
+        }
+    }
+
+    public DlgTradeForm(TradeForm tradeForm) {
         super(false);
-        initComponents();
         this.tradeForm = tradeForm;
+        initComponents();
+        initDialog();
+        pack();
+        setVisible(true);
+    }
+
+    private void initDialog() {
+        initPhase = true;
+        cmbDaysWeeks.setModel(new DefaultComboBoxModel(new String[]{OPDE.lang.getString("misc.msg.Days"), OPDE.lang.getString("misc.msg.weeks")}));
+        cbExpiresAfterOpened.setText(OPDE.lang.getString("tradeform.subtext.expiresAfterOpenedIn"));
+        cbExpiresAfterOpened.setSelected(tradeForm.getDaysToExpireAfterOpened() != null);
+        txtExpiresIn.setEnabled(cbExpiresAfterOpened.isSelected());
+        cmbDaysWeeks.setEnabled(cbExpiresAfterOpened.isSelected());
+        Pair<Integer, Integer> pair = TradeFormTools.getExpiresIn(tradeForm);
+        if (pair != null) {
+            txtExpiresIn.setText(pair.getFirst() > 0 ? pair.getFirst().toString() : pair.getSecond().toString());
+            cmbDaysWeeks.setSelectedIndex(pair.getFirst() > 0 ? 0 : 1);
+        }
+
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT m FROM DosageForm m ORDER BY m.preparation, m.usageText");
         cmbForm.setModel(new DefaultComboBoxModel(query.getResultList().toArray(new DosageForm[]{})));
         cmbForm.setRenderer(DosageFormTools.getRenderer(0));
         em.close();
-        editMode = tradeForm.getID() != null;
 
-        if (editMode) {
-            cmbForm.setSelectedItem(tradeForm.getDosageForm());
-            txtZusatz.setText(SYSTools.catchNull(tradeForm.getSubtext()));
-        } else {
-            cmbForm.setSelectedIndex(1);
-        }
+        cmbForm.setSelectedItem(tradeForm.getDosageForm());
+        txtZusatz.setText(SYSTools.catchNull(tradeForm.getSubtext()));
 
         btnAdd.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlMed.internalClassID));
         btnEdit.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlMed.internalClassID));
-
-        pack();
-        setVisible(true);
+        initPhase = false;
     }
 
 
@@ -116,14 +172,18 @@ public class DlgDAF extends MyJDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         jPanel1 = new JPanel();
-        jLabel2 = new JLabel();
         txtZusatz = new JTextField();
-        jLabel3 = new JLabel();
         cmbForm = new JComboBox();
         panel2 = new JPanel();
         btnAdd = new JButton();
         hSpacer1 = new JPanel(null);
         btnEdit = new JButton();
+        panel4 = new JPanel();
+        cbExpiresAfterOpened = new JCheckBox();
+        hSpacer2 = new JPanel(null);
+        txtExpiresIn = new JTextField();
+        hSpacer3 = new JPanel(null);
+        cmbDaysWeeks = new JComboBox();
         panel1 = new JPanel();
         btnCancel = new JButton();
         btnOK = new JButton();
@@ -137,32 +197,22 @@ public class DlgDAF extends MyJDialog {
         //======== jPanel1 ========
         {
             jPanel1.setLayout(new FormLayout(
-                "14dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default, $lcgap, 14dlu",
-                "fill:14dlu, 4*($lgap, fill:default), $lgap, 14dlu"));
-
-            //---- jLabel2 ----
-            jLabel2.setText("Zusatzbezeichnung:");
-            jLabel2.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel1.add(jLabel2, CC.xy(3, 3));
+                    "14dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default, $lcgap, 14dlu",
+                    "fill:14dlu, 2*($lgap, fill:default), $lgap, default, 2*($lgap, fill:default), $lgap, 14dlu"));
 
             //---- txtZusatz ----
             txtZusatz.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel1.add(txtZusatz, CC.xywh(5, 3, 3, 1));
-
-            //---- jLabel3 ----
-            jLabel3.setText("Form:");
-            jLabel3.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel1.add(jLabel3, CC.xy(3, 5));
+            jPanel1.add(txtZusatz, CC.xywh(3, 3, 5, 1));
 
             //---- cmbForm ----
-            cmbForm.setModel(new DefaultComboBoxModel(new String[] {
-                "Item 1",
-                "Item 2",
-                "Item 3",
-                "Item 4"
+            cmbForm.setModel(new DefaultComboBoxModel(new String[]{
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
             }));
             cmbForm.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel1.add(cmbForm, CC.xy(5, 5));
+            jPanel1.add(cmbForm, CC.xywh(3, 5, 3, 1));
 
             //======== panel2 ========
             {
@@ -201,6 +251,45 @@ public class DlgDAF extends MyJDialog {
             }
             jPanel1.add(panel2, CC.xy(7, 5));
 
+            //======== panel4 ========
+            {
+                panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
+
+                //---- cbExpiresAfterOpened ----
+                cbExpiresAfterOpened.setText("expiresAfterOpened");
+                cbExpiresAfterOpened.addItemListener(new ItemListener() {
+                    @Override
+                    public void itemStateChanged(ItemEvent e) {
+                        cbExpiresAfterOpenedItemStateChanged(e);
+                    }
+                });
+                panel4.add(cbExpiresAfterOpened);
+                panel4.add(hSpacer2);
+
+                //---- txtExpiresIn ----
+                txtExpiresIn.setColumns(10);
+                txtExpiresIn.setEnabled(false);
+                txtExpiresIn.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        txtExpiresInFocusLost(e);
+                    }
+                });
+                panel4.add(txtExpiresIn);
+                panel4.add(hSpacer3);
+
+                //---- cmbDaysWeeks ----
+                cmbDaysWeeks.setEnabled(false);
+                cmbDaysWeeks.addItemListener(new ItemListener() {
+                    @Override
+                    public void itemStateChanged(ItemEvent e) {
+                        cmbDaysWeeksItemStateChanged(e);
+                    }
+                });
+                panel4.add(cmbDaysWeeks);
+            }
+            jPanel1.add(panel4, CC.xywh(3, 7, 5, 1));
+
             //======== panel1 ========
             {
                 panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
@@ -227,10 +316,10 @@ public class DlgDAF extends MyJDialog {
                 });
                 panel1.add(btnOK);
             }
-            jPanel1.add(panel1, CC.xywh(5, 9, 3, 1, CC.RIGHT, CC.DEFAULT));
+            jPanel1.add(panel1, CC.xywh(5, 11, 3, 1, CC.RIGHT, CC.DEFAULT));
         }
         contentPane.add(jPanel1);
-        pack();
+        setSize(425, 220);
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
@@ -263,14 +352,18 @@ public class DlgDAF extends MyJDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel jPanel1;
-    private JLabel jLabel2;
     private JTextField txtZusatz;
-    private JLabel jLabel3;
     private JComboBox cmbForm;
     private JPanel panel2;
     private JButton btnAdd;
     private JPanel hSpacer1;
     private JButton btnEdit;
+    private JPanel panel4;
+    private JCheckBox cbExpiresAfterOpened;
+    private JPanel hSpacer2;
+    private JTextField txtExpiresIn;
+    private JPanel hSpacer3;
+    private JComboBox cmbDaysWeeks;
     private JPanel panel1;
     private JButton btnCancel;
     private JButton btnOK;

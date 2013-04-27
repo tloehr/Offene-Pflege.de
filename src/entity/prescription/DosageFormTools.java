@@ -18,6 +18,7 @@ public class DosageFormTools {
     public static final short STATE_UPR1 = 0;
     public static final short STATE_UPRn = 1;
     public static final short STATE_DONT_CALC = 2;
+    public static final String[] UPR_STATES = new String[]{OPDE.lang.getString("state_upr1"), OPDE.lang.getString("state_uprn"), OPDE.lang.getString("state_dont_calc")};
 
     /**
      * @param maxlen maximale Zeichenlänge pro Zeile. maxlen < 1 heisst egal.
@@ -33,7 +34,10 @@ public class DosageFormTools {
                     text = SYSTools.toHTML("<i>" + OPDE.lang.getString("misc.commands.noselection") + "</i>");
                 } else if (o instanceof DosageForm) {
                     DosageForm form = (DosageForm) o;
+
                     text = toPrettyString(form);
+                    text += ", " + OPDE.lang.getString("misc.msg.upr") + " " + UPR_STATES[form.getUPRState()];
+
                 } else {
                     text = o.toString();
                 }
@@ -59,7 +63,7 @@ public class DosageFormTools {
     }
 
     public static String toPrettyString(DosageForm form) {
-        return (SYSTools.catchNull(form.getPreparation()).isEmpty() ? form.getUsageText() : form.getPreparation() + ", " + form.getUsageText());
+        return (SYSTools.catchNull(form.getPreparation()).isEmpty() ? form.getUsageText() : form.getPreparation() + SYSTools.catchNull(form.getUsageText(), ", ", ""));
     }
 
     public static String getPackageText(DosageForm form) {

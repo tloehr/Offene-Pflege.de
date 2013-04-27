@@ -207,7 +207,7 @@ public class MedProductWizard {
     }
 
     private class SubtextPage extends DefaultWizardPage {
-        private PnlSubtext pnlSubtext;
+        private PnlTradeForm pnlTradeForm;
 
         public SubtextPage(String title, String description) {
             super(title, description);
@@ -220,7 +220,7 @@ public class MedProductWizard {
                     } else if (pageEvent.getID() == PageEvent.PAGE_OPENED) {
                         OPDE.debug("SubtextPage OPENDED");
 //                        tradeform = null;
-                        pnlSubtext.setProduct(product);
+                        pnlTradeForm.setProduct(product);
                     }
                 }
             });
@@ -238,7 +238,7 @@ public class MedProductWizard {
         @Override
         protected void initContentPane() {
             super.initContentPane();
-            pnlSubtext = new PnlSubtext(new Closure() {
+            pnlTradeForm = new PnlTradeForm(new Closure() {
                 @Override
                 public void execute(Object o) {
                     tradeform = (TradeForm) o;
@@ -247,7 +247,7 @@ public class MedProductWizard {
                     setupWizardButtons();
                 }
             }, product);
-            addComponent(pnlSubtext, true);
+            addComponent(pnlTradeForm, true);
         }
     }
 
@@ -391,7 +391,7 @@ public class MedProductWizard {
             result += OPDE.lang.getString(internalClassID + ".page6.summaryline2") + "<br/>";
             result += "<ul>";
             result += "<li>" + OPDE.lang.getString("misc.msg.drug") + ": <b>" + product.getText() + "</b>" + (product.getMedPID() == null ? " <i>" + OPDE.lang.getString("misc.msg.willBeCreated") + "</i>" : " <i>" + OPDE.lang.getString("misc.msg.alreadyExits") + "</i>") + "</li>";
-            result += "<li>" + OPDE.lang.getString(internalClassID + ".page3.title") + ": <b>" + TradeFormTools.toPrettyStringMedium(tradeform) + "</b>" + (tradeform.getID() == null ? " <i>" + OPDE.lang.getString("misc.msg.willBeCreated") + "</i>" : " <i>" + OPDE.lang.getString("misc.msg.alreadyExits") + "</i>") + "</li>";
+            result += "<li>" + OPDE.lang.getString(internalClassID + ".page3.title") + ": <b>" + TradeFormTools.toPrettyStringMediumWithExpiry(tradeform) + "</b>" + (tradeform.getID() == null ? " <i>" + OPDE.lang.getString("misc.msg.willBeCreated") + "</i>" : " <i>" + OPDE.lang.getString("misc.msg.alreadyExits") + "</i>") + "</li>";
             if (tradeform.getDosageForm().getUPRState() == DosageFormTools.STATE_UPRn) {
 
                 result += "<li>" + OPDE.lang.getString(internalClassID + ".page6.UPR") + ": <b>";

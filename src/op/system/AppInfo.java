@@ -70,7 +70,7 @@ public class AppInfo {
      */
     private SortedProperties defaultProperties;
 
-    private String updateCheckUrl;
+//    private String updateCheckUrl;
 
     /**
      * Hier stehen Versions und Build Informationen drin. Diese stammen aus der appinfo.properties, die teilweise automatisch
@@ -100,7 +100,7 @@ public class AppInfo {
             version = appinfo.getProperty("program.VERSION");
             dbstructure = Integer.parseInt(appinfo.getProperty("program.DBSTRUCTURE"));
             build = Integer.parseInt(appinfo.getProperty("program.BUILDNUM"));
-            updateCheckUrl = appinfo.getProperty("program.UPDATECHECKURL");
+//            updateCheckUrl = appinfo.getProperty("program.UPDATECHECKURL");
 
             // parse appinfo.xml
             XMLReader parser = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
@@ -279,7 +279,7 @@ public class AppInfo {
         return dbstructure;
     }
 
-    public String getUpdateCheckUrl() {
-        return updateCheckUrl;
-    }
+//    public String getUpdateCheckUrl() {
+//        return updateCheckUrl;
+//    }
 }

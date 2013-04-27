@@ -1730,21 +1730,23 @@ public class SYSTools {
     }
 
     public static Integer checkInteger(String txt) {
-            Integer i = null;
-            try {
-                NumberFormat nf = DecimalFormat.getIntegerInstance();
-                Number number = nf.parse(txt);
+        Integer i = null;
+        try {
+            NumberFormat nf = DecimalFormat.getIntegerInstance();
+            Number number = nf.parse(txt);
 
-                if (number instanceof Integer) {
-                    i = Integer.valueOf(number.intValue());
-                }
-
-            } catch (ParseException ex) {
-                OPDE.debug(ex);
-                // Pech
+            if (number instanceof Integer) {
+                i = Integer.valueOf(number.intValue());
+            } else if (number instanceof Long) {
+                i = Integer.valueOf(number.intValue());
             }
-            return i;
+
+        } catch (ParseException ex) {
+            OPDE.debug(ex);
+            // Pech
         }
+        return i;
+    }
 
     public static String left(String text, int size) {
 //        OPDE.debug("IN: " + text);

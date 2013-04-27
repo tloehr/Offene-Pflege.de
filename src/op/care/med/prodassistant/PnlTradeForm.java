@@ -31,7 +31,7 @@ import java.util.Comparator;
 /**
  * @author Torsten Löhr
  */
-public class PnlSubtext extends JPanel {
+public class PnlTradeForm extends JPanel {
     private MedProducts product;
     private TradeForm tradeForm;
     private DosageForm dosageForm;
@@ -40,7 +40,7 @@ public class PnlSubtext extends JPanel {
 
     public static final String internalClassID = MedProductWizard.internalClassID + ".subtext";
 
-    public PnlSubtext(Closure validate, MedProducts product) {
+    public PnlTradeForm(Closure validate, MedProducts product) {
         this.validate = validate;
         this.product = product;
         initComponents();
@@ -82,7 +82,7 @@ public class PnlSubtext extends JPanel {
         cmbDaysWeeks.setModel(new DefaultComboBoxModel(new String[]{OPDE.lang.getString("misc.msg.Days"), OPDE.lang.getString("misc.msg.weeks")}));
 
         dosageForm = (DosageForm) cmbFormen.getSelectedItem();
-        cbExpiresAfterOpened.setText(OPDE.lang.getString(internalClassID + ".expiresAfterOpenedIn"));
+        cbExpiresAfterOpened.setText(OPDE.lang.getString("tradeform.subtext.expiresAfterOpenedIn"));
         cbExpiresAfterOpened.setSelected(false);
         tradeForm = new TradeForm(product, "", dosageForm);
 

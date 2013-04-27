@@ -4,6 +4,7 @@ import entity.EntityTools;
 import entity.info.Resident;
 import op.OPDE;
 import op.care.prescription.PnlPrescription;
+import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
@@ -103,6 +104,13 @@ public class TradeFormTools {
         String text = subtext;
         text += preparation.isEmpty() ? " " : " " + preparation + ", ";
         text += usageText.isEmpty() ? SYSConst.UNITS[tradeForm.getDosageForm().getUsageUnit()] : usageText;
+        return text;
+    }
+
+    public static String toPrettyStringMediumWithExpiry(TradeForm tradeForm) {
+
+        String text = toPrettyStringMedium(tradeForm);
+        text += SYSTools.catchNull(getExpiresInAsString(tradeForm), ", "+OPDE.lang.getString("tradeform.subtext.expiresAfterOpenedIn")+" ", "");
         return text;
     }
 
@@ -255,6 +263,42 @@ public class TradeFormTools {
         liste = queryVorraete.getResultList();
         em.close();
         return liste;
+    }
+
+    /**
+     * returns a pair of integers. the first one stands for the days. if there are more than 7 days then the second integer is used as the weeks figure.
+     * the days are set to 0 then.
+     *
+     * @param tradeForm
+     * @return
+     */
+    public static Pair<Integer, Integer> getExpiresIn(TradeForm tradeForm) {
+
+        // expires after being opened
+        if (tradeForm.getDaysToExpireAfterOpened() == null) {
+            return null;
+        } else {
+            int days = tradeForm.getDaysToExpireAfterOpened();
+            int weeks = 0;
+            if (days >= 7) {
+                weeks = days / 7;
+                days = 0;
+            }
+            return new Pair<Integer, Integer>(days, weeks);
+        }
+    }
+
+    public static String getExpiresInAsString(TradeForm tradeForm) {
+        Pair<Integer, Integer> pair = getExpiresIn(tradeForm);
+
+        // expires after being opened
+        if (pair == null) {
+            return "";
+        } else {
+            int days = pair.getFirst();
+            int weeks = pair.getSecond();
+            return weeks > 0 ? weeks + " " + OPDE.lang.getString("misc.msg.weeks") : days + " " + OPDE.lang.getString("misc.msg.Days");
+        }
     }
 
 

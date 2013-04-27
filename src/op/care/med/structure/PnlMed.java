@@ -77,6 +77,7 @@ public class PnlMed extends CleanablePanel {
     private JScrollPane jspSearch;
     private JXSearchField txtSuche;
     private JList lstPraep;
+    private JToggleButton tbIDs;
 
 
     /**
@@ -97,7 +98,7 @@ public class PnlMed extends CleanablePanel {
 
     @Override
     public void reload() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        createTree();
     }
 
     private void initDialog() {
@@ -196,7 +197,7 @@ public class PnlMed extends CleanablePanel {
                     itemedit = new JMenuItem(OPDE.lang.getString("misc.msg.edit"));
                     itemedit.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
-                            new DlgDAF(tradeForm);
+                            new DlgTradeForm(tradeForm);
                             createTree();
                         }
                     });
@@ -304,13 +305,13 @@ public class PnlMed extends CleanablePanel {
             if (node.getUserObject() instanceof MedProducts) {
                 component.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/info.png")));
                 MedProducts myprod = (MedProducts) node.getUserObject();
-                component.setText(myprod.getText() + ", " + myprod.getACME().getName() + ", " + myprod.getACME().getCity());
+                component.setText((tbIDs.isSelected() ? "[" + ((MedProducts) node.getUserObject()).getMedPID() + "] " : "") + myprod.getText() + ", " + myprod.getACME().getName() + ", " + myprod.getACME().getCity());
             } else if (node.getUserObject() instanceof TradeForm) {
                 component.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/medical.png")));
-                component.setText(TradeFormTools.toPrettyStringMedium((TradeForm) node.getUserObject()));
+                component.setText((tbIDs.isSelected() ? "[" + ((TradeForm) node.getUserObject()).getID() + "] " : "") + TradeFormTools.toPrettyStringMediumWithExpiry((TradeForm) node.getUserObject()));
             } else if (node.getUserObject() instanceof MedPackage) {
                 component.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/package.png")));
-                component.setText(MedPackageTools.toPrettyString((MedPackage) node.getUserObject()));
+                component.setText((tbIDs.isSelected() ? "[" + ((MedPackage) node.getUserObject()).getID() + "] " : "") + MedPackageTools.toPrettyString((MedPackage) node.getUserObject()));
             } else {
                 component.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/filenew.png")));
                 component.setText(null);
@@ -329,28 +330,43 @@ public class PnlMed extends CleanablePanel {
         searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
         jspSearch.setViewportView(searchPanes);
 
+        JPanel mypanel = new JPanel();
+        mypanel.setLayout(new VerticalLayout(3));
+        mypanel.setBackground(Color.WHITE);
 
-        searchPanes.add(addCommands());
-        searchPanes.add(addFilters());
+        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
+        searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
+        searchPane.setCollapsible(false);
 
+        try {
+            searchPane.setCollapsed(false);
+        } catch (PropertyVetoException e) {
+            OPDE.error(e);
+        }
+
+        GUITools.addAllComponents(mypanel, addCommands());
+        GUITools.addAllComponents(mypanel, addFilters());
+
+
+        searchPane.setContentPane(mypanel);
+
+        searchPanes.add(searchPane);
         searchPanes.addExpansion();
 
     }
 
-    private CollapsiblePane addFilters() {
-        JPanel labelPanel = new JPanel();
-        labelPanel.setBackground(Color.WHITE);
-        labelPanel.setLayout(new VerticalLayout());
+    private java.util.List<Component> addFilters() {
+        java.util.List<Component> list = new ArrayList<Component>();
 
-        CollapsiblePane panelFilter = new CollapsiblePane("Suchen");
-        panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
-        panelFilter.setCollapsible(false);
-
-        try {
-            panelFilter.setCollapsed(false);
-        } catch (PropertyVetoException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
+        tbIDs = GUITools.getNiceToggleButton("misc.msg.showIDs");
+        tbIDs.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                reload();
+            }
+        });
+        tbIDs.setHorizontalAlignment(SwingConstants.LEFT);
+        list.add(tbIDs);
 
         txtSuche = new JXSearchField("Suchen");
         txtSuche.setFont(SYSConst.ARIAL14);
@@ -366,7 +382,7 @@ public class PnlMed extends CleanablePanel {
                 SYSTools.markAllTxt(txtSuche);
             }
         });
-        labelPanel.add(txtSuche);
+        list.add(txtSuche);
 
         lstPraep = new JList(new DefaultListModel());
         lstPraep.setCellRenderer(MedProductsTools.getMedProdukteRenderer());
@@ -379,27 +395,13 @@ public class PnlMed extends CleanablePanel {
         });
         lstPraep.setFixedCellWidth(200);
 
-        labelPanel.add(new JScrollPane(lstPraep));
+        list.add(new JScrollPane(lstPraep));
 
-        panelFilter.setContentPane(labelPanel);
-        return panelFilter;
+        return list;
     }
 
-    private CollapsiblePane addCommands() {
-        JPanel mypanel = new JPanel();
-        mypanel.setLayout(new VerticalLayout());
-        mypanel.setBackground(Color.WHITE);
-
-        CollapsiblePane searchPane = new CollapsiblePane("Medikamente");
-        searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
-        searchPane.setCollapsible(false);
-
-        try {
-            searchPane.setCollapsed(false);
-        } catch (PropertyVetoException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-
+    private java.util.List<Component> addCommands() {
+        java.util.List<Component> list = new ArrayList<Component>();
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
             final JideButton addButton = GUITools.createHyperlinkButton(MedProductWizard.internalClassID, SYSConst.icon22wizard, null);
@@ -441,7 +443,7 @@ public class PnlMed extends CleanablePanel {
                 }
             });
 
-            mypanel.add(addButton);
+            list.add(addButton);
         }
 
         if (OPDE.isCalcMediUPR1() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
@@ -451,10 +453,9 @@ public class PnlMed extends CleanablePanel {
                     new DlgNewStocks(null);
                 }
             });
-            mypanel.add(buchenButton);
+            list.add(buchenButton);
         }
 
-        searchPane.setContentPane(mypanel);
-        return searchPane;
+        return list;
     }
 }
