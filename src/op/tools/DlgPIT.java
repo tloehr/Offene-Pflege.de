@@ -15,6 +15,7 @@ import java.awt.*;
 import java.util.Date;
 
 /**
+ *
  * @author Torsten Löhr
  */
 public class DlgPIT extends MyJDialog {
@@ -22,6 +23,11 @@ public class DlgPIT extends MyJDialog {
     private PnlPIT pnlPIT;
     private Date pit;
 
+    /**
+     * creates a
+     * @param text
+     * @param actionBlock
+     */
     public DlgPIT(String text, Closure actionBlock) {
         super(false);
         this.actionBlock = actionBlock;

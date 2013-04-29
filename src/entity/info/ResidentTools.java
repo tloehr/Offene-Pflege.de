@@ -257,34 +257,17 @@ public class ResidentTools {
                 "SELECT BWKennung, DATE_FORMAT(NOW(), '%Y') - DATE_FORMAT(GebDatum, '%Y') + IF(DATE_FORMAT(GebDatum, '%m%d') < DATE_FORMAT(NOW(), '%m%d'), 1, 0) AS new_age, " +
                 "DATEDIFF(GebDatum + INTERVAL YEAR(NOW()) - YEAR(GebDatum) + IF(DATE_FORMAT(NOW(), '%m%d') > DATE_FORMAT(GebDatum, '%m%d'), 1, 0) YEAR, NOW()) AS days_to_birthday " +
                 "FROM resident res " +
-                "WHERE res.StatID = ? " +
+                "WHERE res.StatID IS NOT NULL " +
                 "HAVING days_to_birthday < ? " +
                 "ORDER BY days_to_birthday ASC ";
 
-
-
-//        ArrayList<Resident> result = new ArrayList<Resident>();
-        Station currentStation = StationTools.getStationForThisHost();
-
         EntityManager em = OPDE.createEM();
         Query query = em.createNativeQuery(mysql);
-        query.setParameter(1, currentStation.getStatID());
-        query.setParameter(2, days);
+        query.setParameter(1, days);
 
         ArrayList<Object[]> list = new ArrayList(query.getResultList());
 
         em.close();
-//            DateMidnight birthday = new DateMidnight(resident.getDOB());
-//            DateMidnight now = new DateMidnight();
-//
-//            if (now.getDayOfYear() <= birthday.getDayOfYear() && now.getDayOfYear() + days >= birthday.getDayOfYear()
-//                    ||
-//                    now.getDayOfYear() <= birthday.getDayOfYear() + 365 && now.getDayOfYear() + days >= birthday.getDayOfYear() + 365
-//                    ) {
-//                result.add(resident);
-//            }
-//        }
-//        list.clear();
 
         return list;
     }

@@ -515,7 +515,7 @@ public class SYSConst {
     public static final Icon icon22print2 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/printer2.png"));
     public static final Icon icon22print2Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/printer2_pressed.png"));
     public static final Icon icon22redo = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/redo.png"));
-    public static final Icon icon22calc = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/calc.png"));
+    public static final Icon icon22calc = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/kcalc.png"));
     public static final Icon icon22redoPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/redo_pressed.png"));
     public static final Icon icon22residentAbsent = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/resident-absent.png"));
     public static final Icon icon22residentActive = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/resident-active.png"));
