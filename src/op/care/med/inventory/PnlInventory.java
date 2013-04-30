@@ -1403,20 +1403,6 @@ public class PnlInventory extends NursingRecordsPanel {
                             @Override
                             public void execute(Object o) {
                                 mapKey2ClosedToggleButton.get(key).setSelected(true);
-
-//                                SwingUtilities.invokeLater(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        cpMap.get(stock.getID() + ".xstock").revalidate();
-//                                        GUITools.scroll2show(jspInventory, cpMap.get(stock.getID() + ".xstock").getLocation().y, new Closure() {
-//                                            @Override
-//                                            public void execute(Object o) {
-//                                                GUITools.flashBackground(cpMap.get(stock.getID() + ".xstock"), Color.RED, 2);
-//                                            }
-//                                        });
-//                                    }
-//                                });
-
                             }
                         });
                     } else {
@@ -1550,37 +1536,37 @@ public class PnlInventory extends NursingRecordsPanel {
                         @Override
                         public void execute(Object o) {
                             popup.hidePopup();
-                            if (o != null) {
-                                EntityManager em = OPDE.createEM();
-                                try {
-                                    em.getTransaction().begin();
-                                    MedStock myStock = em.merge(stock);
-                                    em.lock(em.merge(myStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
-                                    em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
-                                    myStock.setExpires((Date) o);
-                                    em.getTransaction().commit();
 
-                                    cpMap.remove(key);
-                                    createCP4(myStock.getInventory());
-                                    buildPanel();
-                                } catch (OptimisticLockException ole) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    }
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                } catch (Exception e) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                MedStock myStock = em.merge(stock);
+                                em.lock(em.merge(myStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
+                                em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
+                                myStock.setExpires((Date) o);
+                                em.getTransaction().commit();
+
+                                cpMap.remove(key);
+                                createCP4(myStock.getInventory());
+                                buildPanel();
+                            } catch (OptimisticLockException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
                                 }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
                             }
+
                         }
                     });
                     popup.setOwner(btnExpiry);
@@ -1590,6 +1576,7 @@ public class PnlInventory extends NursingRecordsPanel {
                     GUITools.showPopup(popup, SwingConstants.WEST);
                 }
             });
+            btnExpiry.setEnabled(!stock.isClosed());
             pnlMenu.add(btnExpiry);
 
 

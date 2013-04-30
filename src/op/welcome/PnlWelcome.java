@@ -14,6 +14,10 @@ import com.jidesoft.wizard.WizardDialog;
 import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
+import entity.prescription.DosageFormTools;
+import entity.prescription.MedInventoryTools;
+import entity.prescription.MedStock;
+import entity.prescription.MedStockTools;
 import entity.process.QProcess;
 import entity.process.QProcessTools;
 import entity.values.ResValue;
@@ -46,6 +50,7 @@ import java.math.RoundingMode;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Properties;
@@ -58,9 +63,10 @@ public class PnlWelcome extends CleanablePanel {
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
     private java.util.List<QProcess> processList;
+    private java.util.List<MedStock> expiryList;
     private java.util.List<Object[]> birthdayList;
-    ArrayList<Object[]> noStoolList;
-    ArrayList<Object[]> violatingLiquidValues;
+    private ArrayList<Object[]> noStoolList;
+    private ArrayList<Object[]> violatingLiquidValues;
     private final int BIRTHDAY = 4;
 
     public PnlWelcome(JScrollPane jspSearch) {
@@ -158,10 +164,11 @@ public class PnlWelcome extends CleanablePanel {
                 OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 100));
                 processList = QProcessTools.getActiveProcesses4(OPDE.getLogin().getUser());
                 birthdayList = ResidentTools.getAllWithBirthdayIn(BIRTHDAY);
+                expiryList = MedStockTools.getExpiryList(7);
                 noStoolList = ResValueTools.getNoStool();
                 violatingLiquidValues = ResValueTools.getHighLowIn();
                 Collections.sort(processList);
-                int max = processList.size() + birthdayList.size() + noStoolList.size() + violatingLiquidValues.size();
+                int max = processList.size() + birthdayList.size() + noStoolList.size() + violatingLiquidValues.size() + expiryList.size();
 
                 if (!processList.isEmpty()) {
                     String title = "<html><font size=+1>" +
@@ -170,6 +177,21 @@ public class PnlWelcome extends CleanablePanel {
                     CollapsiblePane cp = new CollapsiblePane(title);
                     JPanel pnlContent = new JPanel(new VerticalLayout());
                     for (QProcess process : processList) {
+                        progress++;
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+                        pnlContent.add(createCP4(process).getMain());
+                    }
+                    cp.setContentPane(pnlContent);
+                    cpsWelcome.add(cp);
+                }
+
+                if (!expiryList.isEmpty()) {
+                    String title = "<html><font size=+1>" +
+                            OPDE.lang.getString("misc.msg.expiredStocks") +
+                            "</font></html>";
+                    CollapsiblePane cp = new CollapsiblePane(title);
+                    JPanel pnlContent = new JPanel(new VerticalLayout());
+                    for (MedStock process : expiryList) {
                         progress++;
                         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
                         pnlContent.add(createCP4(process).getMain());
@@ -436,6 +458,54 @@ public class PnlWelcome extends CleanablePanel {
             cptitle.getButton().setIcon(SYSConst.icon22ledGreenOn);
         }
         cptitle.getButton().setVerticalTextPosition(SwingConstants.TOP);
+
+        return cptitle;
+    }
+
+    private DefaultCPTitle createCP4(final MedStock stock) {
+
+//        BigDecimal sumStock = BigDecimal.ZERO;
+//        try {
+//            EntityManager em = OPDE.createEM();
+//            sumStock = MedStockTools.getSum(em, stock);
+//            em.close();
+//        } catch (Exception e) {
+//            OPDE.fatal(e);
+//        }
+
+        String title = "<html><table border=\"0\">" +
+                "<tr>" +
+                (stock.isClosed() ? "<s>" : "") +
+                "<td width=\"600\" align=\"left\">" + MedStockTools.getAsHTML(stock) + "</td>" +
+//                "<td width=\"200\" align=\"right\">" + NumberFormat.getNumberInstance().format(sumStock) + " " + DosageFormTools.getPackageText(MedInventoryTools.getForm(stock.getInventory())) + "</td>" +
+//                (stock.isClosed() ? "</s>" : "") +
+                "</tr>" +
+                "</table>" +
+
+
+                "</html>";
+
+        DefaultCPTitle cptitle = new DefaultCPTitle(title,new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OPDE.getMainframe().clearPreviousProgbutton();
+                OPDE.getMainframe().setCurrentResident(stock.getInventory().getResident());
+                OPDE.getMainframe().setPanelTo(new PnlCare(stock.getInventory().getResident(), jspSearch));
+            }
+        });
+
+
+
+//        if (qProcess.isRevisionPastDue()) {
+//            cptitle.getButton().setIcon(SYSConst.icon22ledRedOn);
+//        } else if (qProcess.isRevisionDue()) {
+//            cptitle.getButton().setIcon(SYSConst.icon22ledYellowOn);
+//        } else if (qProcess.isClosed()) {
+//            cptitle.getButton().setIcon(SYSConst.icon22stopSign);
+//        } else {
+//            cptitle.getButton().setIcon(SYSConst.icon22ledGreenOn);
+//        }
+//        cptitle.getButton().setVerticalTextPosition(SwingConstants.TOP);
 
         return cptitle;
     }

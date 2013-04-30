@@ -11,6 +11,7 @@ import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
+import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 
 import javax.persistence.EntityManager;
@@ -193,28 +194,32 @@ public class MedStockTools {
         DateTime now = new DateTime();
         medStock.setOut(now.toDate());
 
+        BigDecimal effectiveUPR = getEffectiveUPR(medStock);
         if (medStock.getTradeForm().getDosageForm().isUPRn()) {
-            BigDecimal effectiveUPR = getEffectiveUPR(medStock);
-            medStock.setUPREffective(effectiveUPR);
-            if (medStock.getUPRDummyMode() == ADD_TO_AVERAGES_UPR_WHEN_CLOSING) {
-                // if the deviation was too high (usually more than 20%), then the new UPR is discarded
-                BigDecimal maxDeviation = new BigDecimal(Double.parseDouble(OPDE.getProps().getProperty("apv_korridor")));
-                BigDecimal deviation = medStock.getUPR().divide(effectiveUPR, 4, BigDecimal.ROUND_HALF_UP).subtract(new BigDecimal(100)).abs();
-                OPDE.debug("the deviation was: " + deviation + "%");
+            if (medStock.getTradeForm().getUPR() != null) {
+                medStock.setUPR(medStock.getTradeForm().getUPR());
+                medStock.setUPRDummyMode(ADD_TO_AVERAGES_UPR_WHEN_CLOSING);
+            } else {
+                if (medStock.getUPRDummyMode() == ADD_TO_AVERAGES_UPR_WHEN_CLOSING) {
+                    // if the deviation was too high (usually more than 20%), then the new UPR is discarded
+                    BigDecimal maxDeviation = new BigDecimal(Double.parseDouble(OPDE.getProps().getProperty("apv_korridor")));
+                    BigDecimal deviation = medStock.getUPR().divide(effectiveUPR, 4, BigDecimal.ROUND_HALF_UP).subtract(new BigDecimal(100)).abs();
+                    OPDE.debug("the deviation was: " + deviation + "%");
 
-                // if the deviation is below the limit, then the new UPR will be accepted.
-                // it must also be greater than 0
-                if (deviation.compareTo(maxDeviation) <= 0 && effectiveUPR.compareTo(BigDecimal.ZERO) > 0) {
+                    // if the deviation is below the limit, then the new UPR will be accepted.
+                    // it must also be greater than 0
+                    if (deviation.compareTo(maxDeviation) <= 0 && effectiveUPR.compareTo(BigDecimal.ZERO) > 0) {
+                        medStock.setUPR(effectiveUPR);
+                    }
+                } else if (medStock.getUPRDummyMode() == REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING) {  // REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING
                     medStock.setUPR(effectiveUPR);
+                    medStock.setUPRDummyMode(ADD_TO_AVERAGES_UPR_WHEN_CLOSING);
+                } else { // DONT_REPLACE_UPR
+                    medStock.setUPRDummyMode(ADD_TO_AVERAGES_UPR_WHEN_CLOSING);
                 }
-            } else if (medStock.getUPRDummyMode() == REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING) {  // REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING
-                medStock.setUPR(effectiveUPR);
-                medStock.setUPRDummyMode(ADD_TO_AVERAGES_UPR_WHEN_CLOSING);
-            } else { // DONT_REPLACE_UPR
-                medStock.setUPRDummyMode(ADD_TO_AVERAGES_UPR_WHEN_CLOSING);
             }
         }
-        medStock.setUPR(getEffectiveUPR(medStock));
+        medStock.setUPREffective(effectiveUPR);
 
         if (medStock.hasNext2Open()) {
             nextStock = medStock.getNextStock();
@@ -323,7 +328,7 @@ public class MedStockTools {
             } else {
                 result += stock.getUPR().setScale(2, RoundingMode.HALF_UP).toString();
             }
-            result += " " + (stock.getUPRDummyMode() == REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING ? OPDE.lang.getString(PnlInventory.internalClassID + ".UPRwillBeReplaced") : "");
+            result += " " + (stock.getUPRDummyMode() == REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING && stock.getTradeForm().getUPR() != null ? OPDE.lang.getString(PnlInventory.internalClassID + ".UPRwillBeReplaced") : "");
         }
 
         if (stock.hasNext2Open()) {
@@ -339,18 +344,25 @@ public class MedStockTools {
             result += "&nbsp;<font color=\"green\">" + OPDE.lang.getString("misc.msg.opening") + ": " + df.format(stock.getOpened()) + "</font>";
 
             // variable expiry ?
-            if (stock.getTradeForm().getDaysToExpireAfterOpened() != null && !stock.isClosed()) {
+            if (stock.getTradeForm().getDaysToExpireAfterOpened() != null) {
                 String color = stock.isExpired() ? "red" : "black";
-                result += "&nbsp;<font color=\""+color+"\">" + OPDE.lang.getString("misc.msg.expiresAfterOpened") + ": " + df.format(new DateTime(stock.getOpened()).plusDays(stock.getTradeForm().getDaysToExpireAfterOpened()).toDate()) + "</font>";
-            }
-
-            // fixed expiry ?
-            if (stock.getExpires() != null && !stock.isClosed()) {
-                String color = stock.isExpired() ? "red" : "black";
-                result += "&nbsp;<font color=\""+color+"\">" + OPDE.lang.getString("misc.msg.expires") + ": " + new SimpleDateFormat("MM/yy").format(stock.getExpires()) + "</font>";
+                result += "&nbsp;<font color=\"" + color + "\">" + OPDE.lang.getString("misc.msg.expiresAfterOpened") + ": " + df.format(new DateTime(stock.getOpened()).plusDays(stock.getTradeForm().getDaysToExpireAfterOpened()).toDate()) + "</font>";
             }
 
         }
+
+        // fixed expiry ?
+        if (stock.getExpires() != null && !stock.isClosed()) {
+            String color = stock.isExpired() ? "red" : "black";
+
+            DateFormat sdf = df;
+            // if expiry isa at the end of a month then it has a different format
+            if (new DateMidnight(stock.getExpires()).equals(new DateMidnight(stock.getExpires()).dayOfMonth().withMaximumValue())) {
+                sdf = new SimpleDateFormat("MM/yy");
+            }
+            result += "&nbsp;<font color=\"" + color + "\">" + OPDE.lang.getString("misc.msg.expires") + ": " + sdf.format(stock.getExpires()) + "</font>";
+        }
+
         if (stock.isClosed()) {
             result += SYSConst.html_bold("&nbsp;<font color=\"black\">" + OPDE.lang.getString("misc.msg.outgoing") + ": " + df.format(stock.getOut()) + "</font>");
         }
@@ -671,5 +683,30 @@ public class MedStockTools {
             stock.setUPR(upr);
             stock.setUPRDummyMode(ADD_TO_AVERAGES_UPR_WHEN_CLOSING); // no dummies after this has been set
         }
+    }
+
+    public static List<MedStock> getExpiryList(int days) {
+        ArrayList<MedStock> list = new ArrayList<MedStock>();
+
+        EntityManager em = OPDE.createEM();
+        Query query1 = em.createQuery("SELECT s FROM MedStock s WHERE s.expires IS NOT NULL AND s.out = :tfn ");
+        query1.setParameter("tfn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+        ArrayList<MedStock> list1 = new ArrayList<MedStock>(query1.getResultList());
+
+        Query query2 = em.createQuery("SELECT s FROM MedStock s JOIN s.tradeform t WHERE t.daysToExpireAfterOpened IS NOT NULL AND s.out = :tfn AND s.opened < :now");
+        query2.setParameter("tfn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+        query2.setParameter("now", new Date());
+        list1.addAll(new ArrayList<MedStock>(query2.getResultList()));
+
+        for (MedStock stock : list1) {
+            if (stock.expiresIn(days)) {
+                list.add(stock);
+            }
+        }
+
+        list1.clear();
+
+        em.close();
+        return list;
     }
 }

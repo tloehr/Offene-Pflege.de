@@ -56,7 +56,6 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     private Date expires;
 
 
-
     public MedStock() {
     }
 
@@ -113,12 +112,22 @@ public class MedStock implements Serializable, Comparable<MedStock> {
         return expires;
     }
 
-    public boolean isExpired(){
-        if (isClosed()){
+    public boolean isExpired() {
+//        if (isClosed()) {
+//            return false;
+//        }
+//        boolean expired1 = expires != null && new DateTime(expires).isBeforeNow();
+//        boolean expired2 = isOpened() && tradeform.getDaysToExpireAfterOpened() != null && new DateTime(opened).plusDays(tradeform.getDaysToExpireAfterOpened()).isBeforeNow();
+//        return expired1 || expired2;
+        return expiresIn(0);
+    }
+
+    public boolean expiresIn(int days) {
+        if (isClosed()) {
             return false;
         }
-        boolean expired1 = expires != null && new DateTime(expires).isBeforeNow();
-        boolean expired2 = isOpened() && tradeform.getDaysToExpireAfterOpened() != null && new DateTime(opened).plusDays(tradeform.getDaysToExpireAfterOpened()).isBeforeNow();
+        boolean expired1 = expires != null && new DateTime(expires).minusDays(days).isBeforeNow();
+        boolean expired2 = isOpened() && tradeform.getDaysToExpireAfterOpened() != null && new DateTime(opened).plusDays(tradeform.getDaysToExpireAfterOpened()).minusDays(days).isBeforeNow();
         return expired1 || expired2;
     }
 

@@ -91,6 +91,8 @@ public class FrmMain extends JFrame {
     private boolean initPhase;
     private ArrayList<CollapsiblePane> listOfNursingrecords;
 
+    private DlgLogin dlgLogin;
+
     public DisplayManager getDisplayManager() {
         return displayManager;
     }
@@ -121,7 +123,7 @@ public class FrmMain extends JFrame {
         lblWait.setText(OPDE.lang.getString("misc.msg.wait"));
         lblWait.setVisible(false);
         listOfNursingrecords = new ArrayList<CollapsiblePane>();
-        btnHelp.setToolTipText(OPDE.lang.getString(internalClassID + ".btnHelp.tooltip"));
+        btnHelp.setToolTipText(OPDE.lang.getString("opde.mainframe.btnHelp.tooltip"));
 
         if (OPDE.isDebug()) {
             setSize(1366, 768);
@@ -226,7 +228,7 @@ public class FrmMain extends JFrame {
 
     private void splitPaneLeftPropertyChange(PropertyChangeEvent e) {
         if (!initPhase) {
-            SYSPropsTools.storeProp(internalClassID + ":splitPaneLeftDividerLocation", SYSTools.getDividerInRelativePosition(splitPaneLeft).toString(), OPDE.getLogin().getUser());
+            SYSPropsTools.storeProp("opde.mainframe:splitPaneLeftDividerLocation", SYSTools.getDividerInRelativePosition(splitPaneLeft).toString(), OPDE.getLogin().getUser());
         }
     }
 
@@ -236,15 +238,15 @@ public class FrmMain extends JFrame {
                 URI uri = new URI(OPDE.lang.getString(currentVisiblePanel.getInternalClassID() + ".helpurl"));
                 Desktop.getDesktop().browse(uri);
             } catch (Exception ex) {
-                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".noHelpAvailable"));
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.mainframe.noHelpAvailable"));
             }
         } else {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".noHelpAvailable"));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.mainframe.noHelpAvailable"));
         }
     }
 
     public void afterLogin() {
-
+        dlgLogin = null;
         prepareSearchArea();
         labelUSER.setText(OPDE.getLogin().getUser().getFullname());
 
@@ -254,7 +256,7 @@ public class FrmMain extends JFrame {
                 initPhase = true;
                 double pos;
                 try {
-                    pos = Double.parseDouble(OPDE.getProps().getProperty(internalClassID + ":splitPaneLeftDividerLocation"));
+                    pos = Double.parseDouble(OPDE.getProps().getProperty("opde.mainframe:splitPaneLeftDividerLocation"));
                 } catch (Exception e) {
                     pos = 0.5d;
                 }
@@ -307,16 +309,16 @@ public class FrmMain extends JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                    "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                    "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
-                    "0dlu, $lgap, pref, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
+                        "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
+                        "0dlu, $lgap, pref, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
 
                 //---- btnVerlegung ----
                 btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2.png")));
@@ -506,7 +508,7 @@ public class FrmMain extends JFrame {
                 previousProgButton.setBackground(Color.YELLOW);
                 previousProgButton.setOpaque(true);
                 displayManager.setMainMessage(OPDE.lang.getString(PnlWelcome.internalClassID));
-                displayManager.addSubMessage(new DisplayMessage(OPDE.lang.getString(PnlWelcome.internalClassID + ".longDescription")));
+                displayManager.addSubMessage(new DisplayMessage(OPDE.lang.getString(PnlWelcome.internalClassID+".longDescription")));
                 displayManager.clearAllIcons();
                 setPanelTo(new PnlWelcome(jspSearch));
             }
@@ -599,8 +601,7 @@ public class FrmMain extends JFrame {
         }
 
         if (!residentList.isEmpty() && station != null) {
-            String titel = "";
-            JideButton button = GUITools.createHyperlinkButton(internalClassID + ".printdailyplan", SYSConst.icon22print2, new ActionListener() {
+            JideButton button = GUITools.createHyperlinkButton("opde.mainframe.printdailyplan", SYSConst.icon22print2, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     PrescriptionTools.printDailyPlan(station);
@@ -647,7 +648,6 @@ public class FrmMain extends JFrame {
         }
 
         mypane.setContentPane(labelPanel);
-        // fixes #1
         listOfNursingrecords.add(mypane);
         return mypane;
     }
@@ -718,7 +718,7 @@ public class FrmMain extends JFrame {
     }
 
     private void showLogin() {
-        new DlgLogin(new Closure() {
+        dlgLogin = new DlgLogin(new Closure() {
             @Override
             public void execute(Object o) {
                 if (o != null) {

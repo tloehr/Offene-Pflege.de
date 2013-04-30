@@ -57,18 +57,18 @@ public class MedProductWizard {
         wizard = new WizardDialog(OPDE.getMainframe(), false);
         PageList model = new PageList();
 
-        AbstractWizardPage page1 = new WelcomePage(OPDE.lang.getString(internalClassID + ".page1.title"),
-                OPDE.lang.getString(internalClassID + ".page1.description"));
-        AbstractWizardPage page2 = new ProductPage(OPDE.lang.getString(internalClassID + ".page2.title"),
-                OPDE.lang.getString(internalClassID + ".page2.description"));
-        AbstractWizardPage page3 = new SubtextPage(OPDE.lang.getString(internalClassID + ".page3.title"),
-                OPDE.lang.getString(internalClassID + ".page3.description"));
-        AbstractWizardPage page4 = new PackagePage(OPDE.lang.getString(internalClassID + ".page4.title"),
-                OPDE.lang.getString(internalClassID + ".page4.description"));
-        AbstractWizardPage page5 = new ACMEPage(OPDE.lang.getString(internalClassID + ".page5.title"),
-                OPDE.lang.getString(internalClassID + ".page5.description"));
-        AbstractWizardPage page6 = new CompletionPage(OPDE.lang.getString(internalClassID + ".page6.title"),
-                OPDE.lang.getString(internalClassID + ".page6.description"));
+        AbstractWizardPage page1 = new WelcomePage(OPDE.lang.getString("opde.medication.medproduct.wizard.page1.title"),
+                OPDE.lang.getString("opde.medication.medproduct.wizard.page1.description"));
+        AbstractWizardPage page2 = new ProductPage(OPDE.lang.getString("opde.medication.medproduct.wizard.page2.title"),
+                OPDE.lang.getString("opde.medication.medproduct.wizard.page2.description"));
+        AbstractWizardPage page3 = new SubtextPage(OPDE.lang.getString("opde.medication.medproduct.wizard.page3.title"),
+                OPDE.lang.getString("opde.medication.medproduct.wizard.page3.description"));
+        AbstractWizardPage page4 = new PackagePage(OPDE.lang.getString("opde.medication.medproduct.wizard.page4.title"),
+                OPDE.lang.getString("opde.medication.medproduct.wizard.page4.description"));
+        AbstractWizardPage page5 = new ACMEPage(OPDE.lang.getString("opde.medication.medproduct.wizard.page5.title"),
+                OPDE.lang.getString("opde.medication.medproduct.wizard.page5.description"));
+        AbstractWizardPage page6 = new CompletionPage(OPDE.lang.getString("opde.medication.medproduct.wizard.page6.title"),
+                OPDE.lang.getString("opde.medication.medproduct.wizard.page6.description"));
 
         model.append(page1);
         model.append(page2);
@@ -150,7 +150,7 @@ public class MedProductWizard {
             txt.setContentType("text/html");
             txt.setOpaque(false);
             txt.setText("<html>" + SYSConst.html_fontface +
-                    OPDE.lang.getString(internalClassID + ".welcome") +
+                    OPDE.lang.getString("opde.medication.medproduct.wizard.welcome") +
                     "</font></html>");
 
             main.add(BorderLayout.CENTER, txt);
@@ -387,24 +387,24 @@ public class MedProductWizard {
         }
 
         private String check() {
-            String result = "<b>" + OPDE.lang.getString(internalClassID + ".page6.summaryline1") + "</b><br/>";
-            result += OPDE.lang.getString(internalClassID + ".page6.summaryline2") + "<br/>";
+            String result = "<b>" + OPDE.lang.getString("opde.medication.medproduct.wizard.page6.summaryline1") + "</b><br/>";
+            result += OPDE.lang.getString("opde.medication.medproduct.wizard.page6.summaryline2") + "<br/>";
             result += "<ul>";
             result += "<li>" + OPDE.lang.getString("misc.msg.drug") + ": <b>" + product.getText() + "</b>" + (product.getMedPID() == null ? " <i>" + OPDE.lang.getString("misc.msg.willBeCreated") + "</i>" : " <i>" + OPDE.lang.getString("misc.msg.alreadyExits") + "</i>") + "</li>";
-            result += "<li>" + OPDE.lang.getString(internalClassID + ".page3.title") + ": <b>" + TradeFormTools.toPrettyStringMediumWithExpiry(tradeform) + "</b>" + (tradeform.getID() == null ? " <i>" + OPDE.lang.getString("misc.msg.willBeCreated") + "</i>" : " <i>" + OPDE.lang.getString("misc.msg.alreadyExits") + "</i>") + "</li>";
+            result += "<li>" + OPDE.lang.getString("opde.medication.medproduct.wizard.page3.title") + ": <b>" + TradeFormTools.toPrettyStringMediumWithExpiry(tradeform) + "</b>" + (tradeform.getID() == null ? " <i>" + OPDE.lang.getString("misc.msg.willBeCreated") + "</i>" : " <i>" + OPDE.lang.getString("misc.msg.alreadyExits") + "</i>") + "</li>";
             if (tradeform.getDosageForm().getUPRState() == DosageFormTools.STATE_UPRn) {
 
-                result += "<li>" + OPDE.lang.getString(internalClassID + ".page6.UPR") + ": <b>";
-                result += (tradeform.getUPR() == null ? OPDE.lang.getString(internalClassID + ".page6.calcUPR") : OPDE.lang.getString(internalClassID + ".page6.setUPR") + SYSConst.UNITS[tradeform.getDosageForm().getUsageUnit()] + " " + tradeform.getDosageForm().getUsageText() + " " + OPDE.lang.getString("misc.msg.to1") + " " + SYSConst.UNITS[tradeform.getDosageForm().getPackUnit()]) + "</b>" + "</li>";
+                result += "<li>" + OPDE.lang.getString("misc.msg.upr") + ": <b>";
+                result += (tradeform.getUPR() == null ? OPDE.lang.getString("opde.medication.medproduct.wizard.page6.calcUPR") : OPDE.lang.getString("opde.medication.medproduct.wizard.page6.setUPR") + SYSConst.UNITS[tradeform.getDosageForm().getUsageUnit()] + " " + tradeform.getDosageForm().getUsageText() + " " + OPDE.lang.getString("misc.msg.to1") + " " + SYSConst.UNITS[tradeform.getDosageForm().getPackUnit()]) + "</b>" + "</li>";
             }
-            result += "<li>" + OPDE.lang.getString(internalClassID + ".page6.newPackageWillBeCreated") + ": <b>" + MedPackageTools.toPrettyString(aPackage) + "</b></li>";
+            result += "<li>" + OPDE.lang.getString("opde.medication.medproduct.wizard.page6.newPackageWillBeCreated") + ": <b>" + MedPackageTools.toPrettyString(aPackage) + "</b></li>";
 
             ACME displayFactory = acme == null ? product.getACME() : acme;
-            result += "<li>" + OPDE.lang.getString(internalClassID + ".page5.title") + ": <b>" + displayFactory.getName() + ", " + displayFactory.getCity() + "</b>" + (displayFactory.getMphid() == null ? " <i>" + OPDE.lang.getString("misc.msg.willBeCreated") + "</i>" : " <i>" + OPDE.lang.getString("misc.msg.alreadyExits") + "</i>") + "</li>";
+            result += "<li>" + OPDE.lang.getString("opde.medication.medproduct.wizard.page5.title") + ": <b>" + displayFactory.getName() + ", " + displayFactory.getCity() + "</b>" + (displayFactory.getMphid() == null ? " <i>" + OPDE.lang.getString("misc.msg.willBeCreated") + "</i>" : " <i>" + OPDE.lang.getString("misc.msg.alreadyExits") + "</i>") + "</li>";
 
             result += "</ul>";
 
-            result += "<p>" + OPDE.lang.getString(internalClassID + ".page6.summaryline1") + "</p>" +
+            result += "<p>" + OPDE.lang.getString("opde.medication.medproduct.wizard.page6.summaryline1") + "</p>" +
                     "</font>";
             return result;
         }

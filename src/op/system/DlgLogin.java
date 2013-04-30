@@ -30,6 +30,8 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.files.SYSFilesTools;
 import entity.system.SYSLoginTools;
+import entity.system.SYSProps;
+import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
@@ -51,6 +53,8 @@ import java.net.URISyntaxException;
  * @author __USER__
  */
 public class DlgLogin extends MyJDialog {
+
+    public static final String internalClassID = "dlglogin";
 
     private Closure actionBlock;
 
@@ -82,6 +86,7 @@ public class DlgLogin extends MyJDialog {
         txtUsername.setText(defaultlogin);
         txtPassword.setText(defaultpw);
         lblUsernamePassword.setText(OPDE.lang.getString("misc.msg.username") + "/" + OPDE.lang.getString("misc.msg.password"));
+
         setVisible(true);
     }
 
@@ -244,6 +249,12 @@ public class DlgLogin extends MyJDialog {
     }//GEN-LAST:event_txtUsernameActionPerformed
 
     private void DoLogin(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DoLogin
+
+        if (SYSPropsTools.isTrue(SYSPropsTools.KEY_MAINTENANCE_MODE, null)){
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("dlglogin.maintenance.mode", DisplayMessage.IMMEDIATELY, 5));
+            return;
+        }
+
         String username = txtUsername.getText().trim();
 
         try {

@@ -181,6 +181,15 @@ public class DlgNewStocks extends MyJDialog {
             btnPrint.setSelected(false);
         }
 
+        lblPZN.setText(OPDE.lang.getString("newstocks.lblPZN"));
+        lblProd.setText(OPDE.lang.getString("newstocks.lblProd"));
+        lblPack.setText(OPDE.lang.getString("newstocks.lblPack"));
+        lblAmount.setText(OPDE.lang.getString("newstocks.lblAmount"));
+        lblInventory.setText(OPDE.lang.getString("newstocks.lblInventory"));
+        lblRemark.setText(OPDE.lang.getString("misc.msg.comment"));
+        lblExpires.setText(OPDE.lang.getString("misc.msg.expires"));
+        lblResident.setText(OPDE.lang.getString("misc.msg.resident"));
+
         amount = null;
         cmbMProdukt.setRenderer(TradeFormTools.getRenderer(TradeFormTools.LONG));
 
@@ -210,7 +219,7 @@ public class DlgNewStocks extends MyJDialog {
         });
         cmbBW.setFont(SYSConst.ARIAL14);
         ovrBW = new DefaultOverlayable(cmbBW);
-        mainPane.add(ovrBW, CC.xywh(7, 15, 2, 1));
+        mainPane.add(ovrBW, CC.xywh(7, 17, 2, 1));
 
         if (resident == null) {
             ovrBW.addOverlayComponent(attentionIconBW, DefaultOverlayable.SOUTH_WEST);
@@ -252,22 +261,22 @@ public class DlgNewStocks extends MyJDialog {
     // <editor-fold defaultstate="collapsed" desc=" Erzeugter Quelltext ">//GEN-BEGIN:initComponents
     private void initComponents() {
         mainPane = new JPanel();
-        jLabel1 = new JLabel();
+        lblPZN = new JLabel();
         panel2 = new JPanel();
         txtMedSuche = new JXSearchField();
         hSpacer1 = new JPanel(null);
         btnMed = new JButton();
-        jLabel3 = new JLabel();
+        lblProd = new JLabel();
         cmbMProdukt = new JComboBox();
-        lblVorrat = new JLabel();
-        jLabel4 = new JLabel();
+        lblInventory = new JLabel();
+        lblResident = new JLabel();
         txtBWSuche = new JTextField();
-        lblMenge = new JLabel();
-        jLabel6 = new JLabel();
+        lblAmount = new JLabel();
+        lblPack = new JLabel();
         cmbPackung = new JComboBox();
         lblExpires = new JLabel();
         txtExpires = new JTextField();
-        jLabel7 = new JLabel();
+        lblRemark = new JLabel();
         txtBemerkung = new JTextField();
         btnPrint = new JToggleButton();
         panel1 = new JPanel();
@@ -287,10 +296,10 @@ public class DlgNewStocks extends MyJDialog {
                 "14dlu, $lcgap, default, $lcgap, 39dlu, $lcgap, default:grow, $lcgap, 14dlu",
                 "14dlu, 2*($lgap, fill:17dlu), $lgap, fill:default, $lgap, 17dlu, 4*($lgap, fill:17dlu), 10dlu, fill:default, $lgap, 14dlu"));
 
-            //---- jLabel1 ----
-            jLabel1.setText("PZN oder Suchbegriff");
-            jLabel1.setFont(new Font("Arial", Font.PLAIN, 14));
-            mainPane.add(jLabel1, CC.xy(3, 3));
+            //---- lblPZN ----
+            lblPZN.setText("PZN oder Suchbegriff");
+            lblPZN.setFont(new Font("Arial", Font.PLAIN, 14));
+            mainPane.add(lblPZN, CC.xy(3, 3));
 
             //======== panel2 ========
             {
@@ -324,10 +333,10 @@ public class DlgNewStocks extends MyJDialog {
             }
             mainPane.add(panel2, CC.xywh(5, 3, 4, 1));
 
-            //---- jLabel3 ----
-            jLabel3.setText("Produkt");
-            jLabel3.setFont(new Font("Arial", Font.PLAIN, 14));
-            mainPane.add(jLabel3, CC.xy(3, 5));
+            //---- lblProd ----
+            lblProd.setText("Produkt");
+            lblProd.setFont(new Font("Arial", Font.PLAIN, 14));
+            mainPane.add(lblProd, CC.xy(3, 5));
 
             //---- cmbMProdukt ----
             cmbMProdukt.setModel(new DefaultComboBoxModel(new String[] {
@@ -342,15 +351,15 @@ public class DlgNewStocks extends MyJDialog {
             });
             mainPane.add(cmbMProdukt, CC.xywh(5, 5, 4, 1));
 
-            //---- lblVorrat ----
-            lblVorrat.setText("vorhandene Vorr\u00e4te");
-            lblVorrat.setFont(new Font("Arial", Font.PLAIN, 14));
-            mainPane.add(lblVorrat, CC.xy(3, 13));
+            //---- lblInventory ----
+            lblInventory.setText("vorhandene Vorr\u00e4te");
+            lblInventory.setFont(new Font("Arial", Font.PLAIN, 14));
+            mainPane.add(lblInventory, CC.xy(3, 13));
 
-            //---- jLabel4 ----
-            jLabel4.setText("Zuordnung zu Bewohner");
-            jLabel4.setFont(new Font("Arial", Font.PLAIN, 14));
-            mainPane.add(jLabel4, CC.xy(3, 17));
+            //---- lblResident ----
+            lblResident.setText("Zuordnung zu Bewohner");
+            lblResident.setFont(new Font("Arial", Font.PLAIN, 14));
+            mainPane.add(lblResident, CC.xy(3, 17));
 
             //---- txtBWSuche ----
             txtBWSuche.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -362,15 +371,15 @@ public class DlgNewStocks extends MyJDialog {
             });
             mainPane.add(txtBWSuche, CC.xy(5, 17));
 
-            //---- lblMenge ----
-            lblMenge.setText("Buchungsmenge");
-            lblMenge.setFont(new Font("Arial", Font.PLAIN, 14));
-            mainPane.add(lblMenge, CC.xy(3, 11));
+            //---- lblAmount ----
+            lblAmount.setText("Buchungsmenge");
+            lblAmount.setFont(new Font("Arial", Font.PLAIN, 14));
+            mainPane.add(lblAmount, CC.xy(3, 11));
 
-            //---- jLabel6 ----
-            jLabel6.setText("Packung");
-            jLabel6.setFont(new Font("Arial", Font.PLAIN, 14));
-            mainPane.add(jLabel6, CC.xy(3, 7));
+            //---- lblPack ----
+            lblPack.setText("Packung");
+            lblPack.setFont(new Font("Arial", Font.PLAIN, 14));
+            mainPane.add(lblPack, CC.xy(3, 7));
 
             //---- cmbPackung ----
             cmbPackung.setModel(new DefaultComboBoxModel(new String[] {
@@ -410,10 +419,10 @@ public class DlgNewStocks extends MyJDialog {
             });
             mainPane.add(txtExpires, CC.xywh(5, 9, 3, 1, CC.DEFAULT, CC.FILL));
 
-            //---- jLabel7 ----
-            jLabel7.setText("Bemerkung");
-            jLabel7.setFont(new Font("Arial", Font.PLAIN, 14));
-            mainPane.add(jLabel7, CC.xy(3, 15));
+            //---- lblRemark ----
+            lblRemark.setText("Bemerkung");
+            lblRemark.setFont(new Font("Arial", Font.PLAIN, 14));
+            mainPane.add(lblRemark, CC.xy(3, 15));
 
             //---- txtBemerkung ----
             txtBemerkung.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -832,22 +841,22 @@ public class DlgNewStocks extends MyJDialog {
 
     // Variablendeklaration - nicht modifizieren//GEN-BEGIN:variables
     private JPanel mainPane;
-    private JLabel jLabel1;
+    private JLabel lblPZN;
     private JPanel panel2;
     private JXSearchField txtMedSuche;
     private JPanel hSpacer1;
     private JButton btnMed;
-    private JLabel jLabel3;
+    private JLabel lblProd;
     private JComboBox cmbMProdukt;
-    private JLabel lblVorrat;
-    private JLabel jLabel4;
+    private JLabel lblInventory;
+    private JLabel lblResident;
     private JTextField txtBWSuche;
-    private JLabel lblMenge;
-    private JLabel jLabel6;
+    private JLabel lblAmount;
+    private JLabel lblPack;
     private JComboBox cmbPackung;
     private JLabel lblExpires;
     private JTextField txtExpires;
-    private JLabel jLabel7;
+    private JLabel lblRemark;
     private JTextField txtBemerkung;
     private JToggleButton btnPrint;
     private JPanel panel1;

@@ -6,6 +6,7 @@ package op.care.med.inventory;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import op.OPDE;
 import op.tools.SYSCalendar;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateTime;
@@ -28,6 +29,8 @@ public class PnlExpiry extends JPanel {
         initComponents();
         lblTitle.setText(title);
         cbExpiry.setSelected(expiry != null);
+        txtExpiry.setEnabled(expiry != null);
+        cbExpiry.setText(OPDE.lang.getString("misc.msg.expires"));
         if (expiry != null) {
             txtExpiry.setText(DateFormat.getDateInstance().format(expiry));
         } else {
@@ -37,6 +40,9 @@ public class PnlExpiry extends JPanel {
 
     private void cbExpiryItemStateChanged(ItemEvent e) {
         txtExpiry.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+        if (e.getStateChange() == ItemEvent.SELECTED){
+            txtExpiry.requestFocus();
+        }
     }
 
     private void txtExpiryFocusLost(FocusEvent e) {

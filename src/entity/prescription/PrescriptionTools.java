@@ -15,6 +15,7 @@ import op.threads.DisplayMessage;
 import op.tools.HTMLTools;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 
 import javax.persistence.EntityManager;
@@ -105,6 +106,7 @@ public class PrescriptionTools {
 
             @Override
             protected Object doInBackground() throws Exception {
+                DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
                 int progress = -1;
                 int DAILYPLAN_PAGEBREAK_AFTER_ELEMENT_NO = Integer.parseInt(OPDE.getProps().getProperty(SYSPropsTools.KEY_DAILYPLAN_PAGEBREAK));
                 OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, data.size()));
@@ -177,7 +179,29 @@ public class PrescriptionTools {
 
                     html += "<tr style=\"page-break-before:avoid\" " + (gray ? "id=\"fonttextgray14\">" : ">\n");
                     html += "<td width=\"300\" valign=\"top\">" + getShortDescription(prescription);   // (verordnung.hasMed() ? "<b>" + TradeFormTools.toPrettyString(verordnung.getTradeForm()) + "</b>" : verordnung.getIntervention().getName())
-                    html += (bestid != null ? "<br/><i>" + OPDE.lang.getString("nursingrecords.prescription.dailyplan.stockInUse") + " " + OPDE.lang.getString("misc.msg.number") + " " + bestid + "</i>" : "") + "</td>\n";
+//                    html += (bestid != null ? "<br/><i>" + OPDE.lang.getString("nursingrecords.prescription.dailyplan.stockInUse") + " " + OPDE.lang.getString("misc.msg.number") + " " + bestid + "</i>" : "") + "</td>\n";
+                    if (bestid != null) {
+                        MedStock stock = em.find(MedStock.class, bestid.longValue());
+                        html += "<br/><i>" + OPDE.lang.getString("nursingrecords.prescription.dailyplan.stockInUse") + " " + OPDE.lang.getString("misc.msg.number") + " " + stock.getID() + "</i>";
+
+
+                        String warning = "";
+                        warning += (stock.expiresIn(7) ? "!!" : "");
+                        warning += (stock.expiresIn(0) ? "!!!!" : "");
+                        // variable expiry ?
+                        if (stock.getTradeForm().getDaysToExpireAfterOpened() != null) {
+                            html += "<br/>" + warning + "&nbsp;" + OPDE.lang.getString("misc.msg.expiresAfterOpened") + ": " + df.format(new DateTime(stock.getOpened()).plusDays(stock.getTradeForm().getDaysToExpireAfterOpened()).toDate());
+                        }
+                        if (stock.getExpires() != null) {
+                            DateFormat sdf = df;
+                            // if expiry isa at the end of a month then it has a different format
+                            if (new DateMidnight(stock.getExpires()).equals(new DateMidnight(stock.getExpires()).dayOfMonth().withMaximumValue())) {
+                                sdf = new SimpleDateFormat("MM/yy");
+                            }
+                            html += "<br/>" + OPDE.lang.getString("misc.msg.expires") + ": " + sdf.format(stock.getExpires());
+                        }
+                    }
+                    html += "</td>\n";
 
                     if (schedule.usesTime()) {
                         html += "<td colspan=\"6\" align=\"center\">";

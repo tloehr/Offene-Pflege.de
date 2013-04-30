@@ -57,7 +57,7 @@ public class OPDE {
     public static final int ERROR_TIME = 4;
     public static final int START_OF_MODULE_TIME = 6;
 
-    public static long uptime;
+    private static long uptime;
     public static ResourceBundle lang;
 
     public static FrmMain mainframe;
@@ -89,6 +89,10 @@ public class OPDE {
      */
     public static String getOPWD() {
         return opwd;
+    }
+
+    public static long getUPTime() {
+        return uptime;
     }
 
     public static boolean isUpdateAvailable() {
@@ -512,7 +516,6 @@ public class OPDE {
             // Turn of JPA Cache
             jpaProps.put("eclipselink.cache.shared.default", "false");
             jpaProps.put("eclipselink.session.customizer", "op.system.JPAEclipseLinkSessionCustomizer");
-//            jpaProps.put("eclipselink.logging.level", JavaLog.FINEST_LABEL);
             emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);
 
 

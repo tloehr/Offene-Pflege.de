@@ -1,10 +1,15 @@
 package op.threads;
 
+import entity.files.SYSFilesTools;
+import entity.info.ResInfoTools;
+import entity.system.SYSLoginTools;
+import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.tools.FadingLabel;
 import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.joda.time.DateTime;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,7 +35,8 @@ public class DisplayManager extends Thread {
     private boolean isIndeterminate = false;
     //    private JPanel pnlIcons;
     private JLabel lblBiohazard, lblDiabetes, lblAllergy, lblWarning;
-
+    private long step = 0;
+    private int lastMinute;
 
 //    private DateFormat df;
 
@@ -259,6 +265,21 @@ public class DisplayManager extends Thread {
         }
     }
 
+    private void check4MaintenanceMode() {
+        if (OPDE.getLogin() == null){
+            return;
+        }
+        int minute = new DateTime().getMinuteOfHour();
+        if (minute != lastMinute) {
+            lastMinute = minute;
+            if (SYSPropsTools.isTrue(SYSPropsTools.KEY_MAINTENANCE_MODE, null)){
+                SYSFilesTools.print("Maintenance Mode. Sorry.",false);
+                SYSLoginTools.logout();
+                System.exit(0);
+            }
+        }
+    }
+
     private void processProgressBar() {
         synchronized (progressBarMessage) {
             if (!progressBarMessage.getFirst().isEmpty() || progressBarMessage.getSecond() >= 0) {  //  && zyklen/5%2 == 0 && zyklen % 5 == 0
@@ -299,12 +320,14 @@ public class DisplayManager extends Thread {
     public void run() {
         while (!interrupted) {
             try {
+                step++;
 
                 lblMain.repaint();
                 lblSub.repaint();
 
                 processProgressBar();
                 processSubMessage();
+                check4MaintenanceMode();
 
                 Thread.sleep(50);
             } catch (InterruptedException ie) {

@@ -457,7 +457,9 @@ public class SYSCalendar {
         }
         DateTime expiry = new DateTime(parseDate(input));
 
-        return expiry.dayOfMonth().withMaximumValue().secondOfDay().withMaximumValue();
+        // when the user has entered a complete date, then we return that date
+        // if he has omitted some parts of it, we consider it always the last day of that month.
+        return st.countTokens() == 3 ? expiry : expiry.dayOfMonth().withMaximumValue().secondOfDay().withMaximumValue();
 
     }
 

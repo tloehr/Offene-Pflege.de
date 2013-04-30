@@ -45,9 +45,10 @@ public class SYSPropsTools {
     public static final String KEY_FTP_WD = "FTPWorkingDirectory";
     public static final String KEY_FTP_PORT = "FTPPort";
     public static final String KEY_FTP_IS_WORKING = "FTPIsWorking";
-    public static final String BHP_MAX_MINUTES_TO_WITHDRAW ="bhp_max_minutes_to_withdraw";
+    public static final String BHP_MAX_MINUTES_TO_WITHDRAW = "bhp_max_minutes_to_withdraw";
     public static final String KEY_CALC_MEDI_UPR1 = "calc.medi.upr1";
     public static final String KEY_CALC_MEDI_OTHER = "calc.medi.other"; // yet unused
+    public static final String KEY_MAINTENANCE_MODE = "system.maintenance.mode";
 
     public static void storeProp(EntityManager em, String key, String value, Users user) throws Exception {
         String jpql = "SELECT s FROM SYSProps s WHERE s.key = :key AND s.user = :user";
@@ -78,7 +79,7 @@ public class SYSPropsTools {
     }
 
     public static void storeProp(String key, String value, Users user) {
-        if (OPDE.getProps().containsKey(key) && OPDE.getProps().getProperty(key).equals(value)){
+        if (OPDE.getProps().containsKey(key) && OPDE.getProps().getProperty(key).equals(value)) {
             return;
         }
 
@@ -159,6 +160,31 @@ public class SYSPropsTools {
         em.close();
 
         return p;
+    }
+
+    public static boolean isTrue(String key, Users user) {
+        EntityManager em = OPDE.createEM();
+        String jpql = "SELECT s FROM SYSProps s WHERE s.key = :key AND s.user = :user";
+
+        if (user == null) {
+            jpql = "SELECT s FROM SYSProps s WHERE s.key = :key AND s.user IS NULL";
+        }
+
+        Query query = em.createQuery(jpql);
+
+        if (user != null) {
+            query.setParameter("user", user);
+        }
+        query.setParameter("key", key);
+
+        boolean b;
+        try {
+            b = ((SYSProps) query.getSingleResult()).getValue().equalsIgnoreCase("true");
+        } catch (Exception e) {
+            b = false;
+        }
+        em.close();
+        return b;
     }
 
     public static void storeState(String name, JCheckBox cb) {

@@ -49,6 +49,9 @@ public class DlgUPREditor extends MyJDialog {
 
         mapEffectiveUPRs = new HashMap<MedStock, Pair<BigDecimal, BigDecimal>>();
 
+        rbUPRConst.setText(OPDE.lang.getString("upreditor.constant.upr"));
+        rbUPRAuto.setText(OPDE.lang.getString("upreditor.calculated.upr"));
+
 
 //        Query query = em.createQuery("SELECT m FROM DosageForm m ORDER BY m.preparation, m.usageText");
 //        cmbDosageForm.setModel(new DefaultComboBoxModel(query.getResultList().toArray(new DosageForm[]{})));
@@ -79,7 +82,6 @@ public class DlgUPREditor extends MyJDialog {
 
         tblStock.setModel(new MDLStock());
 
-//        cmbDosageForm.setSelectedItem(tradeForm.getDosageForm());
     }
 
     private void btnCloseActionPerformed(ActionEvent e) {
