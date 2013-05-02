@@ -42,13 +42,12 @@ public class EMailSystem {
      * @param throwable
      * @return false, if there was an mail exception. true otherwise.
      */
-    public static boolean sendErrorMail(Throwable throwable) {
+    public static boolean sendErrorMail(String message, File attachment) {
         if (!isMailsystemActive()) {
             return false;
         }
 
-        String html = SYSTools.getThrowableAsHTML(throwable);
-        File temp = SYSFilesTools.print(html, false);
+
         Pair<String, String> pair = new Pair<String, String>(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_RECIPIENT), OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_RECIPIENT_PERSONAL));
         Pair<String, String>[] pairs = new Pair[]{pair};
 
@@ -66,7 +65,7 @@ public class EMailSystem {
                 OPDE.lang.getString("mail.errormail.line5") + ": " + DateFormat.getDateTimeInstance().format(new Date()) + "\n\n\n" +
                 OPDE.lang.getString("mail.errormail.line6");
 
-        return send(OPDE.lang.getString("mail.errormail.subject") + ": " + throwable.getMessage(), bodyText, pairs, new File[]{temp}, OPDE.getProps());
+        return send(OPDE.lang.getString("mail.errormail.subject") + ": " + message, bodyText, pairs, new File[]{attachment}, OPDE.getProps());
 
     }
 

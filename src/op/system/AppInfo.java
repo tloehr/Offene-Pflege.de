@@ -79,7 +79,7 @@ public class AppInfo {
     private Properties appinfo;
 
     private String version;
-    private int build, dbstructure;
+    private int build, dbversion;
     private String progname;
 
     public AppInfo() {
@@ -98,7 +98,7 @@ public class AppInfo {
 
             progname = appinfo.getProperty("program.PROGNAME");
             version = appinfo.getProperty("program.VERSION");
-            dbstructure = Integer.parseInt(appinfo.getProperty("program.DBSTRUCTURE"));
+            dbversion = Integer.parseInt(appinfo.getProperty("program.DBVERSION"));
             build = Integer.parseInt(appinfo.getProperty("program.BUILDNUM"));
 //            updateCheckUrl = appinfo.getProperty("program.UPDATECHECKURL");
 
@@ -275,8 +275,8 @@ public class AppInfo {
 
     }
 
-    public int getDbstructure() {
-        return dbstructure;
+    public int getDbversion() {
+        return dbversion;
     }
 
 //    public String getUpdateCheckUrl() {

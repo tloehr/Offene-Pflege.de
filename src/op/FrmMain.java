@@ -508,7 +508,7 @@ public class FrmMain extends JFrame {
                 previousProgButton.setBackground(Color.YELLOW);
                 previousProgButton.setOpaque(true);
                 displayManager.setMainMessage(OPDE.lang.getString(PnlWelcome.internalClassID));
-                displayManager.addSubMessage(new DisplayMessage(OPDE.lang.getString(PnlWelcome.internalClassID+".longDescription")));
+                displayManager.addSubMessage(new DisplayMessage(OPDE.lang.getString(PnlWelcome.internalClassID + ".longDescription")));
                 displayManager.clearAllIcons();
                 setPanelTo(new PnlWelcome(jspSearch));
             }

@@ -27,13 +27,12 @@ package op;
 
 import com.jidesoft.utils.Lm;
 import com.jidesoft.wizard.WizardStyle;
-
+import entity.files.SYSFilesTools;
 import entity.nursingprocess.DFNTools;
 import entity.prescription.BHPTools;
 import entity.system.*;
 import op.system.AppInfo;
 import op.system.EMailSystem;
-import op.system.FrmInit;
 import op.system.LogicalPrinters;
 import op.threads.DisplayManager;
 import op.threads.PrintProcessor;
@@ -47,7 +46,11 @@ import javax.persistence.Persistence;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
-import java.util.*;
+import java.sql.*;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.ResourceBundle;
 
 public class OPDE {
     public static final String internalClassID = "opde";
@@ -78,7 +81,7 @@ public class OPDE {
     protected static String opwd = "";
     protected static String css = "";
 
-//    protected static boolean FTPisWORKING = false;
+    //    protected static boolean FTPisWORKING = false;
     public static String UPDATE_FTPSERVER = "ftp.offene-pflege.de";
     protected static boolean updateAvailable = false;
 
@@ -211,8 +214,11 @@ public class OPDE {
         }
         e.printStackTrace();
 
+        String html = SYSTools.getThrowableAsHTML(e);
+        File temp = SYSFilesTools.print(html, false);
+
         if (!isDebug()) {
-            EMailSystem.sendErrorMail(e);
+            EMailSystem.sendErrorMail(e.getMessage(), temp);
         }
 
         System.exit(1);
@@ -370,7 +376,7 @@ public class OPDE {
 //        Option konfigdir = OptionBuilder.hasOptionalArg().withDescription("Legt einen altenativen Pfad fest, in dem sich das .opde Verzeichnis befindet.").create("k");
 //        opts.addOption(konfigdir);
 
-        opts.addOption(OptionBuilder.withLongOpt("jdbc").hasArg().withDescription("Setzt eine alternative URL zur Datenbank fest. Ersetzt die Angaben in der opde.cfg.").create("j"));
+        opts.addOption(OptionBuilder.withLongOpt("jdbc").hasArg().withDescription(lang.getString("cmdline.jdbc")).create("j"));
 
         Option dfnimport = OptionBuilder //.withArgName("datum")
                 .withLongOpt("dfnimport").hasOptionalArg()
@@ -484,6 +490,26 @@ public class OPDE {
                 logger.setLevel(Level.INFO);
             }
 
+
+            /***
+             *          _ _                       _                                               _   _ _     _        ___ 
+             *       __| | |____   _____ _ __ ___(_) ___  _ __     ___ ___  _ __ ___  _ __   __ _| |_(_) |__ | | ___  |__ \
+             *      / _` | '_ \ \ / / _ \ '__/ __| |/ _ \| '_ \   / __/ _ \| '_ ` _ \| '_ \ / _` | __| | '_ \| |/ _ \   / /
+             *     | (_| | |_) \ V /  __/ |  \__ \ | (_) | | | | | (_| (_) | | | | | | |_) | (_| | |_| | |_) | |  __/  |_| 
+             *      \__,_|_.__/ \_/ \___|_|  |___/_|\___/|_| |_|  \___\___/|_| |_| |_| .__/ \__,_|\__|_|_.__/|_|\___|  (_) 
+             *                                                                       |_|                                   
+             */
+            url = cl.hasOption("j") ? cl.getOptionValue("j") : localProps.getProperty("javax.persistence.jdbc.url");
+            String hostkey = OPDE.getLocalProps().getProperty("hostkey");
+            String cryptpassword = localProps.getProperty("javax.persistence.jdbc.password");
+            DesEncrypter desEncrypter = new DesEncrypter(hostkey);
+            Connection jdbcConnection = DriverManager.getConnection(url, localProps.getProperty("javax.persistence.jdbc.user"), desEncrypter.decrypt(cryptpassword));
+            if (appInfo.getDbversion() != getDBVersion(jdbcConnection)) {
+                SYSFilesTools.print(lang.getString("cant.start.with.version.mismatch"), false);
+                System.exit(1);
+            }
+            jdbcConnection.close();
+
             /***
              *          _ ____   _      ____        _        _
              *         | |  _ \ / \    |  _ \  __ _| |_ __ _| |__   __ _ ___  ___
@@ -492,9 +518,6 @@ public class OPDE {
              *      \___/|_| /_/   \_\ |____/ \__,_|\__\__,_|_.__/ \__,_|___/\___|
              *
              */
-            String hostkey = OPDE.getLocalProps().getProperty("hostkey");
-            String cryptpassword = localProps.getProperty("javax.persistence.jdbc.password");
-            DesEncrypter desEncrypter = new DesEncrypter(hostkey);
             Properties jpaProps = new Properties();
             jpaProps.put("javax.persistence.jdbc.user", localProps.getProperty("javax.persistence.jdbc.user"));
 
@@ -510,7 +533,6 @@ public class OPDE {
             }
 
             jpaProps.put("javax.persistence.jdbc.driver", localProps.getProperty("javax.persistence.jdbc.driver"));
-            url = cl.hasOption("j") ? cl.getOptionValue("j") : localProps.getProperty("javax.persistence.jdbc.url");
             jpaProps.put("javax.persistence.jdbc.url", url);
 
             // Turn of JPA Cache
@@ -664,15 +686,17 @@ public class OPDE {
 
             success = true;
         } catch (FileNotFoundException ex) {
-            // Keine local.properties. Wir richten wohl gerade einen neuen Client ein.
+            fatal(new Throwable(lang.getString("misc.msg.installation.error")));
+//            // Keine local.properties. Wir richten wohl gerade einen neuen Client ein.
+//
+//            FrmInit frame = new FrmInit();
+//            frame.setVisible(true);
+//            SYSTools.center(frame);
 
-            FrmInit frame = new FrmInit();
-            frame.setVisible(true);
-            SYSTools.center(frame);
 
         } catch (IOException ex) {
             fatal(ex);
-            System.exit(1);
+//            System.exit(1);
         }
         return success;
     }
@@ -715,4 +739,22 @@ public class OPDE {
         UIManager.put("Tree.font", SYSConst.ARIAL14);
     }
 
+    public static int getDBVersion(Connection jdbcConnection) {
+        int version = -1;
+        try {
+            String query = " SELECT p.V FROM sysprops p WHERE p.K = ? ";
+            PreparedStatement stmt = jdbcConnection.prepareStatement(query);
+            stmt.setString(1, "dbstructure");
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.first()) {
+                String v = rs.getString("V");
+                version = Integer.parseInt(v);
+            }
+
+        } catch (SQLException e) {
+            fatal(e);
+        }
+        return version;
+    }
 }

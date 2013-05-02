@@ -97,7 +97,7 @@ public class FrmInit extends JFrame {
         query.setParameter("key", "dbstructure");
         SYSProps dbschema = (SYSProps) query.getSingleResult();
 
-        return OPDE.getAppInfo().getDbstructure() == Integer.parseInt(dbschema.getValue());
+        return OPDE.getAppInfo().getDbversion() == Integer.parseInt(dbschema.getValue());
     }
 
     private void btnSaveActionPerformed(ActionEvent e) {

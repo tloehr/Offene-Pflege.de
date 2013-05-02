@@ -139,7 +139,7 @@ public class DlgUPREditor extends MyJDialog {
     }
 
     private void btnSaveActionPerformed(ActionEvent e) {
-        new DlgYesNo(OPDE.lang.getString(internalClassID + ".changeupr.yesno"), SYSConst.icon48stop, new Closure() {
+        new DlgYesNo(OPDE.lang.getString("upreditor.changeupr.yesno"), SYSConst.icon48stop, new Closure() {
             @Override
             public void execute(Object answer) {
                 if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -329,7 +329,7 @@ public class DlgUPREditor extends MyJDialog {
         String[] columnNames;
 
         private MDLStock() {
-            columnNames = new String[]{OPDE.lang.getString(internalClassID + ".col1"), OPDE.lang.getString(internalClassID + ".col2"), OPDE.lang.getString(internalClassID + ".col3"), OPDE.lang.getString(internalClassID + ".col4"), OPDE.lang.getString(internalClassID + ".col5"), OPDE.lang.getString(internalClassID + ".col6"), OPDE.lang.getString(internalClassID + ".col7")};
+            columnNames = new String[]{OPDE.lang.getString("upreditor.col1"), OPDE.lang.getString("upreditor.col2"), OPDE.lang.getString("upreditor.col3"), OPDE.lang.getString("upreditor.col4"), OPDE.lang.getString("upreditor.col5"), OPDE.lang.getString("upreditor.col6"), OPDE.lang.getString("upreditor.col7")};
         }
 
         @Override
