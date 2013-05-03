@@ -38,10 +38,7 @@ import entity.prescription.*;
 import entity.process.*;
 import entity.system.UniqueTools;
 import op.OPDE;
-import op.care.med.inventory.DlgCloseStock;
-import op.care.med.inventory.DlgNewStocks;
-import op.care.med.inventory.DlgOpenStock;
-import op.care.med.inventory.PnlInventory;
+import op.care.med.inventory.*;
 import op.care.sysfiles.DlgFiles;
 import op.process.DlgProcessAssign;
 import op.system.InternalClassACL;
@@ -445,7 +442,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                     icon = SYSConst.icon22ledRedOn;
                 } else if (stockInUse.isExpired()) {
                     icon = SYSConst.icon22ledOrangeOn;
-                } else if (MedStockTools.getSum(stockInUse).compareTo(BigDecimal.ZERO) <= 0) {
+                } else if (!stockInUse.getTradeForm().getDosageForm().isDontCALC() && MedStockTools.getSum(stockInUse).compareTo(BigDecimal.ZERO) <= 0) {
                     icon = SYSConst.icon22ledYellowOn;
                 } else {
                     icon = null;
@@ -535,9 +532,9 @@ public class PnlPrescription extends NursingRecordsPanel {
         list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
         list.add(new JLabel(OPDE.lang.getString("nursingrecords.prescription.keydescription1"), SYSConst.icon22stopSign, SwingConstants.LEADING));
 //        if (resident.isCalcMediUPR1()) {
-            list.add(new JLabel(OPDE.lang.getString("nursingrecords.prescription.keydescription2"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
-            list.add(new JLabel(OPDE.lang.getString("nursingrecords.prescription.keydescription3"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
-            list.add(new JLabel(OPDE.lang.getString("nursingrecords.prescription.keydescription4"), SYSConst.icon22ledOrangeOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString("nursingrecords.prescription.keydescription2"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString("nursingrecords.prescription.keydescription3"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString("nursingrecords.prescription.keydescription4"), SYSConst.icon22ledOrangeOn, SwingConstants.LEADING));
 //        }
         return list;
     }
@@ -1109,6 +1106,67 @@ public class PnlPrescription extends NursingRecordsPanel {
         }
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             pnlMenu.add(new JSeparator());
+
+
+            /***
+             *      ____       _   _____            _            ____        _
+             *     / ___|  ___| |_| ____|_  ___ __ (_)_ __ _   _|  _ \  __ _| |_ ___
+             *     \___ \ / _ \ __|  _| \ \/ / '_ \| | '__| | | | | | |/ _` | __/ _ \
+             *      ___) |  __/ |_| |___ >  <| |_) | | |  | |_| | |_| | (_| | ||  __/
+             *     |____/ \___|\__|_____/_/\_\ .__/|_|_|   \__, |____/ \__,_|\__\___|
+             *                               |_|           |___/
+             */
+            final JButton btnExpiry = GUITools.createHyperlinkButton("nursingrecords.inventory.tooltip.btnSetExpiry", SYSConst.icon22gotoEnd, null);
+            btnExpiry.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    final JidePopup popup = new JidePopup();
+                    popup.setMovable(false);
+
+                    PnlExpiry pnlExpiry = new PnlExpiry(stockInUse.getExpires(), OPDE.lang.getString("nursingrecords.inventory.pnlExpiry.title") + ": " + stockInUse.getID(), new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            popup.hidePopup();
+
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                MedStock myStock = em.merge(stockInUse);
+                                em.lock(em.merge(myStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
+                                em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
+                                myStock.setExpires((Date) o);
+                                em.getTransaction().commit();
+                                createCP4(prescription);
+                                buildPanel();
+                            } catch (OptimisticLockException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+                            }
+
+                        }
+                    });
+                    popup.setOwner(btnExpiry);
+                    popup.setContentPane(pnlExpiry);
+                    popup.removeExcludedComponent(pnlExpiry);
+                    popup.setDefaultFocusComponent(pnlExpiry);
+                    GUITools.showPopup(popup, SwingConstants.WEST);
+                }
+            });
+            btnExpiry.setEnabled(inventory != null && stockInUse != null);
+            pnlMenu.add(btnExpiry);
 
             /***
              *       ____ _                ____  _             _

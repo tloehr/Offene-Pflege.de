@@ -1516,70 +1516,70 @@ public class PnlInventory extends NursingRecordsPanel {
             pnlMenu.add(btnDelete);
         }
 
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlMed.internalClassID)) {
-            /***
-             *      ____       _   _____            _            ____        _
-             *     / ___|  ___| |_| ____|_  ___ __ (_)_ __ _   _|  _ \  __ _| |_ ___
-             *     \___ \ / _ \ __|  _| \ \/ / '_ \| | '__| | | | | | |/ _` | __/ _ \
-             *      ___) |  __/ |_| |___ >  <| |_) | | |  | |_| | |_| | (_| | ||  __/
-             *     |____/ \___|\__|_____/_/\_\ .__/|_|_|   \__, |____/ \__,_|\__\___|
-             *                               |_|           |___/
-             */
-            final JButton btnExpiry = GUITools.createHyperlinkButton("nursingrecords.inventory.tooltip.btnSetExpiry", SYSConst.icon22gotoEnd, null);
-            btnExpiry.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    final JidePopup popup = new JidePopup();
-                    popup.setMovable(false);
 
-                    PnlExpiry pnlExpiry = new PnlExpiry(stock.getExpires(), OPDE.lang.getString("nursingrecords.inventory.pnlExpiry.title") + ": " + stock.getID(), new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            popup.hidePopup();
+        /***
+         *      ____       _   _____            _            ____        _
+         *     / ___|  ___| |_| ____|_  ___ __ (_)_ __ _   _|  _ \  __ _| |_ ___
+         *     \___ \ / _ \ __|  _| \ \/ / '_ \| | '__| | | | | | |/ _` | __/ _ \
+         *      ___) |  __/ |_| |___ >  <| |_) | | |  | |_| | |_| | (_| | ||  __/
+         *     |____/ \___|\__|_____/_/\_\ .__/|_|_|   \__, |____/ \__,_|\__\___|
+         *                               |_|           |___/
+         */
+        final JButton btnExpiry = GUITools.createHyperlinkButton("nursingrecords.inventory.tooltip.btnSetExpiry", SYSConst.icon22gotoEnd, null);
+        btnExpiry.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                final JidePopup popup = new JidePopup();
+                popup.setMovable(false);
 
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
-                                MedStock myStock = em.merge(stock);
-                                em.lock(em.merge(myStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
-                                em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
-                                myStock.setExpires((Date) o);
-                                em.getTransaction().commit();
+                PnlExpiry pnlExpiry = new PnlExpiry(stock.getExpires(), OPDE.lang.getString("nursingrecords.inventory.pnlExpiry.title") + ": " + stock.getID(), new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        popup.hidePopup();
 
-                                cpMap.remove(key);
-                                createCP4(myStock.getInventory());
-                                buildPanel();
-                            } catch (OptimisticLockException ole) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            } catch (Exception e) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
+                        EntityManager em = OPDE.createEM();
+                        try {
+                            em.getTransaction().begin();
+                            MedStock myStock = em.merge(stock);
+                            em.lock(em.merge(myStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
+                            em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
+                            myStock.setExpires((Date) o);
+                            em.getTransaction().commit();
+
+                            cpMap.remove(key);
+                            createCP4(myStock.getInventory());
+                            buildPanel();
+                        } catch (OptimisticLockException ole) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
                             }
-
+                            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                OPDE.getMainframe().emptyFrame();
+                                OPDE.getMainframe().afterLogin();
+                            }
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
                         }
-                    });
-                    popup.setOwner(btnExpiry);
-                    popup.setContentPane(pnlExpiry);
-                    popup.removeExcludedComponent(pnlExpiry);
-                    popup.setDefaultFocusComponent(pnlExpiry);
-                    GUITools.showPopup(popup, SwingConstants.WEST);
-                }
-            });
-            btnExpiry.setEnabled(!stock.isClosed());
-            pnlMenu.add(btnExpiry);
 
+                    }
+                });
+                popup.setOwner(btnExpiry);
+                popup.setContentPane(pnlExpiry);
+                popup.removeExcludedComponent(pnlExpiry);
+                popup.setDefaultFocusComponent(pnlExpiry);
+                GUITools.showPopup(popup, SwingConstants.WEST);
+            }
+        });
+        btnExpiry.setEnabled(!stock.isClosed());
+        pnlMenu.add(btnExpiry);
 
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlMed.internalClassID)) {
             /***
              *      _____              _      _____                    _____    _ _ _
              *     |_   _| __ __ _  __| | ___|  ___|__  _ __ _ __ ___ | ____|__| (_) |_ ___  _ __
