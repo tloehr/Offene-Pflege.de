@@ -580,7 +580,7 @@ public class DlgNewStocks extends MyJDialog {
             }
 
             // if the label printer is not used, the new number is shown until the next message, so the user has time to write the number down manually.
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("newstocks.registration.success.1") + " <b>" + newStock.getID() + "</b> " + OPDE.lang.getString("newstocks.registration.success.1"), btnPrint.isSelected() ? 2 : 0));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("newstocks.registration.success.1") + " <b>" + newStock.getID() + "</b> " + OPDE.lang.getString("newstocks.registration.success.2"), btnPrint.isSelected() ? 2 : 0));
         } catch (OptimisticLockException ole) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
