@@ -1094,7 +1094,7 @@ public class PnlDFN extends NursingRecordsPanel {
                     popup.setOwner(btnAdd);
                     popup.removeExcludedComponent(pnl);
                     popup.setDefaultFocusComponent(pnl);
-                    GUITools.showPopup(popup, SwingConstants.EAST);
+                    GUITools.showPopup(popup, SwingConstants.NORTH);
                 }
             });
             list.add(btnAdd);
