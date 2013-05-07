@@ -668,22 +668,22 @@ public class MedStockTools {
 //        return upr;
 //    }
 
-    /**
-     * sets the upr for all stocks in that list.
-     *
-     * @param upr
-     * @param listStocks
-     * @throws Exception
-     */
-    public static void setUPR(EntityManager em, BigDecimal upr, ArrayList<MedStock> listStocks) throws Exception {
-        for (MedStock s : listStocks) {
-            MedStock stock = em.merge(s);
-            em.lock(stock, LockModeType.OPTIMISTIC);
-            em.lock(stock.getInventory(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-            stock.setUPR(upr);
-            stock.setUPRDummyMode(ADD_TO_AVERAGES_UPR_WHEN_CLOSING); // no dummies after this has been set
-        }
-    }
+//    /**
+//     * sets the upr for all stocks in that list.
+//     *
+//     * @param upr
+//     * @param listStocks
+//     * @throws Exception
+//     */
+//    public static void setUPR(EntityManager em, BigDecimal upr, ArrayList<MedStock> listStocks) throws Exception {
+//        for (MedStock s : listStocks) {
+//            MedStock stock = em.merge(s);
+//            em.lock(stock, LockModeType.OPTIMISTIC);
+//            em.lock(stock.getInventory(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+//            stock.setUPR(upr);
+//            stock.setUPRDummyMode(ADD_TO_AVERAGES_UPR_WHEN_CLOSING); // no dummies after this has been set
+//        }
+//    }
 
     public static List<MedStock> getExpiryList(int days) {
         ArrayList<MedStock> list = new ArrayList<MedStock>();

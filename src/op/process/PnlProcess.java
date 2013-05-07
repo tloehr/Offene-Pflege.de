@@ -34,10 +34,7 @@ import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
 
-import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
-import javax.persistence.OptimisticLockException;
-import javax.persistence.RollbackException;
+import javax.persistence.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
@@ -257,7 +254,7 @@ public class PnlProcess extends NursingRecordsPanel {
             btnPrint.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnPrint.setContentAreaFilled(false);
             btnPrint.setBorder(null);
-            btnPrint.setToolTipText(OPDE.lang.getString(internalClassID + ".btnrevision.tooltip"));
+            btnPrint.setToolTipText(OPDE.lang.getString("nursingrecords.qprocesses.btnrevision.tooltip"));
             btnPrint.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -347,7 +344,7 @@ public class PnlProcess extends NursingRecordsPanel {
              *     |_.__/ \__|_| |_/_/   \_\__,_|\__,_|_|   |_| \_\___| .__/ \___/|_|   \__|
              *                                                        |_|
              */
-            final JButton btnAddPReport = GUITools.createHyperlinkButton(internalClassID + ".btnaddpreport.tooltip", SYSConst.icon22add, null);
+            final JButton btnAddPReport = GUITools.createHyperlinkButton("nursingrecords.qprocesses.btnaddpreport.tooltip", SYSConst.icon22add, null);
             btnAddPReport.setBackground(QProcessTools.getBG2(qProcess));
             btnAddPReport.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnAddPReport.addActionListener(new ActionListener() {
@@ -446,7 +443,11 @@ public class PnlProcess extends NursingRecordsPanel {
                 if (element instanceof PReport && ((PReport) element).isSystem()) {
                     cpElement.setIcon(SYSConst.icon16exec);
                 }
-                cpElement.setBackground(QProcessTools.getBG2(qProcess));
+                if (element instanceof PReport && ((PReport) element).isPDCA()) {
+                    cpElement.setBackground(QProcessTools.getBG2(qProcess).darker());
+                } else {
+                    cpElement.setBackground(QProcessTools.getBG2(qProcess));
+                }
 //                elementMap.put(element, cpElement);
                 elementPanel.add(cpElement);
             }
@@ -458,12 +459,6 @@ public class PnlProcess extends NursingRecordsPanel {
     private CollapsiblePane createCP4(final QProcessElement element, final QProcess qProcess) {
         String elementTitle = "[" + DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(new Date(element.getPITInMillis())) + "] " + SYSTools.left(element.getTitle(), MAX_TEXT_LENGTH);
         elementTitle += " [" + element.getUser().getUID() + "]";
-
-//        try {
-//            cpElement.setCollapsed(true);
-//        } catch (PropertyVetoException e) {
-//            OPDE.debug(e);
-//        }
 
         if (!mapCP.containsKey(element.hashCode())) {
             mapCP.put(element.hashCode(), new CollapsiblePane(elementTitle));
@@ -495,11 +490,11 @@ public class PnlProcess extends NursingRecordsPanel {
         btnUnlink.setContentAreaFilled(false);
         btnUnlink.setOpaque(false);
         btnUnlink.setBorder(null);
-        btnUnlink.setToolTipText(OPDE.lang.getString(internalClassID + ".btnunlink.tooltip"));
+        btnUnlink.setToolTipText(OPDE.lang.getString("nursingrecords.qprocesses.btnunlink.tooltip"));
         btnUnlink.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                new DlgYesNo(OPDE.lang.getString(internalClassID + ".question.unlink") + "<p>" + element.getContentAsHTML() + "</p>", SYSConst.icon48delete, new Closure() {
+                new DlgYesNo(OPDE.lang.getString("nursingrecords.qprocesses.question.unlink") + "<p>" + element.getContentAsHTML() + "</p>", SYSConst.icon48delete, new Closure() {
                     @Override
                     public void execute(Object answer) {
                         if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -565,7 +560,7 @@ public class PnlProcess extends NursingRecordsPanel {
                 });
             }
         });
-        btnUnlink.setEnabled(!qProcess.isClosed() && !((element instanceof PReport) && ((PReport) element).isSystem()));
+        btnUnlink.setEnabled(!qProcess.isClosed() && !((element instanceof PReport) && (((PReport) element).isSystem() || ((PReport) element).isPDCA())));
         btnPanel.add(btnUnlink);
 
         cpElement.setTitleComponent(btnPanel);
@@ -636,10 +631,10 @@ public class PnlProcess extends NursingRecordsPanel {
         java.util.List<Component> list = new ArrayList<Component>();
         list.add(new JSeparator());
         list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription3"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription4"), SYSConst.icon22stopSign, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString("nursingrecords.qprocesses.keydescription1"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString("nursingrecords.qprocesses.keydescription2"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString("nursingrecords.qprocesses.keydescription3"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString("nursingrecords.qprocesses.keydescription4"), SYSConst.icon22stopSign, SwingConstants.LEADING));
 
 //        if (qProcess.isRevisionPastDue()) {
 //                   cptitle.getButton().setIcon(SYSConst.icon22ledRedOn);
@@ -759,7 +754,7 @@ public class PnlProcess extends NursingRecordsPanel {
                 });
                 list.add(cmbPCat);
 
-                final JideButton btnAll = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".btnallactive"), SYSConst.icon22link, new ActionListener() {
+                final JideButton btnAll = GUITools.createHyperlinkButton(OPDE.lang.getString("nursingrecords.qprocesses.btnallactive"), SYSConst.icon22link, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         processList = QProcessTools.getAllActive();
@@ -777,7 +772,7 @@ public class PnlProcess extends NursingRecordsPanel {
                 });
                 list.add(btnAll);
 
-                final JideButton btnRunningOut = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".btnrunningout"), SYSConst.icon22clock, new ActionListener() {
+                final JideButton btnRunningOut = GUITools.createHyperlinkButton(OPDE.lang.getString("nursingrecords.qprocesses.btnrunningout"), SYSConst.icon22clock, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         processList = QProcessTools.getProcessesRunningOutIn(5);
@@ -796,7 +791,7 @@ public class PnlProcess extends NursingRecordsPanel {
                 list.add(btnRunningOut);
             }
 
-            final JideButton btnMyProcesses = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".btnmyprocesses"), SYSConst.icon22myself, new ActionListener() {
+            final JideButton btnMyProcesses = GUITools.createHyperlinkButton(OPDE.lang.getString("nursingrecords.qprocesses.btnmyprocesses"), SYSConst.icon22myself, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     initPhase = true;
@@ -843,7 +838,7 @@ public class PnlProcess extends NursingRecordsPanel {
          *      \__|_.__/____/ \__, |___/\__\___|_| |_| |_|
          *                     |___/
          */
-        tbSystem = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".tbsystem.text"));
+        tbSystem = GUITools.getNiceToggleButton(OPDE.lang.getString("nursingrecords.qprocesses.tbsystem.text"));
         tbSystem.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
@@ -900,7 +895,7 @@ public class PnlProcess extends NursingRecordsPanel {
          *
          */
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
-            final JideButton btnAdd = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".btnadd"), SYSConst.icon22add, null);
+            final JideButton btnAdd = GUITools.createHyperlinkButton(OPDE.lang.getString("nursingrecords.qprocesses.btnadd"), SYSConst.icon22add, null);
             btnAdd.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -951,12 +946,12 @@ public class PnlProcess extends NursingRecordsPanel {
                  *     |_.__/ \__|_| |_|\____|_|\___/|___/\___|
                  *
                  */
-                final JButton btnClose = GUITools.createHyperlinkButton(internalClassID + ".btnclose.tooltip", SYSConst.icon22stop, null);
+                final JButton btnClose = GUITools.createHyperlinkButton("nursingrecords.qprocesses.btnclose.tooltip", SYSConst.icon22stop, null);
                 btnClose.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 btnClose.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        new DlgYesNo(OPDE.lang.getString(internalClassID + ".question.close") + "<p>" + qProcess.getTitle() + "</p>", SYSConst.icon48stop, new Closure() {
+                        new DlgYesNo(OPDE.lang.getString("nursingrecords.qprocesses.question.close") + "<p>" + qProcess.getTitle() + "</p>", SYSConst.icon48stop, new Closure() {
                             @Override
                             public void execute(Object answer) {
                                 if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -1014,12 +1009,12 @@ public class PnlProcess extends NursingRecordsPanel {
                  *     |_.__/ \__|_| |_|_| \_\___|\___/| .__/ \___|_| |_|
                  *                                     |_|
                  */
-                final JButton btnReopen = GUITools.createHyperlinkButton(internalClassID + ".btnreopen.tooltip", SYSConst.icon22playerPlay, null);
+                final JButton btnReopen = GUITools.createHyperlinkButton("nursingrecords.qprocesses.btnreopen.tooltip", SYSConst.icon22playerPlay, null);
                 btnReopen.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 btnReopen.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        new DlgYesNo(OPDE.lang.getString(internalClassID + ".question.reopen") + "<p>" + qProcess.getTitle() + "</p>", SYSConst.icon48play, new Closure() {
+                        new DlgYesNo(OPDE.lang.getString("nursingrecords.qprocesses.question.reopen") + "<p>" + qProcess.getTitle() + "</p>", SYSConst.icon48play, new Closure() {
                             @Override
                             public void execute(Object answer) {
                                 if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -1068,7 +1063,6 @@ public class PnlProcess extends NursingRecordsPanel {
                 btnReopen.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID));
                 pnlMenu.add(btnReopen);
             }
-
         }
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, internalClassID)) {
             /***
@@ -1079,12 +1073,12 @@ public class PnlProcess extends NursingRecordsPanel {
              *     |_.__/ \__|_| |_|____/ \___|_|\___|\__\___|
              *
              */
-            final JButton btnDelete = GUITools.createHyperlinkButton(internalClassID + ".btndelete.tooltip", SYSConst.icon22delete, null);
+            final JButton btnDelete = GUITools.createHyperlinkButton("nursingrecords.qprocesses.btndelete.tooltip", SYSConst.icon22delete, null);
             btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnDelete.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgYesNo(OPDE.lang.getString(internalClassID + ".question.delete") + "<p>" + qProcess.getTitle() + "</p>", SYSConst.icon48delete, new Closure() {
+                    new DlgYesNo(OPDE.lang.getString("nursingrecords.qprocesses.question.delete") + "<p>" + qProcess.getTitle() + "</p>", SYSConst.icon48delete, new Closure() {
                         @Override
                         public void execute(Object answer) {
                             if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -1155,7 +1149,7 @@ public class PnlProcess extends NursingRecordsPanel {
              *     |_.__/ \__|_| |_|_| \_\___| \_/ |_|___/_|\___/|_| |_|
              *
              */
-            final JButton btnRevision = GUITools.createHyperlinkButton(internalClassID + ".btnrevision.tooltip", SYSConst.icon22calendar, null);
+            final JButton btnRevision = GUITools.createHyperlinkButton("nursingrecords.qprocesses.btnrevision.tooltip", SYSConst.icon22calendar, null);
             btnRevision.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnRevision.addActionListener(new ActionListener() {
                 @Override
@@ -1247,6 +1241,116 @@ public class PnlProcess extends NursingRecordsPanel {
             pnlMenu.add(btnRevision);
 
 
+            if (qProcess.isCommon()) {
+                /***
+                 *      ____  ____   ____    _
+                 *     |  _ \|  _ \ / ___|  / \
+                 *     | |_) | | | | |     / _ \
+                 *     |  __/| |_| | |___ / ___ \
+                 *     |_|   |____/ \____/_/   \_\
+                 *
+                 */
+                final JPopupMenu pdcaMenu = new JPopupMenu(OPDE.lang.getString("nursingrecords.qprocesses.set.pdca"));
+
+                JMenuItem pdca_plan = new JMenuItem(OPDE.lang.getString("nursingrecords.qprocesses.set.pdca.plan"));
+                pdca_plan.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        new DlgYesNo(OPDE.lang.getString("misc.msg.are.you.sure"), null, new Closure() {
+                            @Override
+                            public void execute(Object answer) {
+                                if (answer.equals(JOptionPane.YES_OPTION)) {
+                                    setPDCA(qProcess, PReportTools.PREPORT_TYPE_SET_PDCA_PLAN, QProcessTools.PDCA_PLAN);
+                                }
+                            }
+                        });
+                    }
+                });
+                pdca_plan.setEnabled(!qProcess.isPDCA() || qProcess.getPDCA() == QProcessTools.PDCA_ACT);
+                pdcaMenu.add(pdca_plan);
+
+                JMenuItem pdca_do = new JMenuItem(OPDE.lang.getString("nursingrecords.qprocesses.set.pdca.do"));
+                pdca_do.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        new DlgYesNo(OPDE.lang.getString("misc.msg.are.you.sure"), null, new Closure() {
+                            @Override
+                            public void execute(Object answer) {
+                                if (answer.equals(JOptionPane.YES_OPTION)) {
+                                    setPDCA(qProcess, PReportTools.PREPORT_TYPE_SET_PDCA_DO, QProcessTools.PDCA_DO);
+                                }
+                            }
+                        });
+                    }
+                });
+                pdca_do.setEnabled(qProcess.isPDCA() && qProcess.getPDCA() == QProcessTools.PDCA_PLAN);
+                pdcaMenu.add(pdca_do);
+
+                JMenuItem pdca_check = new JMenuItem(OPDE.lang.getString("nursingrecords.qprocesses.set.pdca.check"));
+                pdca_check.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        new DlgYesNo(OPDE.lang.getString("misc.msg.are.you.sure"), null, new Closure() {
+                            @Override
+                            public void execute(Object answer) {
+                                if (answer.equals(JOptionPane.YES_OPTION)) {
+                                    setPDCA(qProcess, PReportTools.PREPORT_TYPE_SET_PDCA_CHECK, QProcessTools.PDCA_CHECK);
+                                }
+                            }
+                        });
+                    }
+                });
+                pdca_check.setEnabled(qProcess.isPDCA() && qProcess.getPDCA() == QProcessTools.PDCA_DO);
+                pdcaMenu.add(pdca_check);
+
+                JMenuItem pdca_act = new JMenuItem(OPDE.lang.getString("nursingrecords.qprocesses.set.pdca.act"));
+                pdca_act.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        new DlgYesNo(OPDE.lang.getString("misc.msg.are.you.sure"), null, new Closure() {
+                            @Override
+                            public void execute(Object answer) {
+                                if (answer.equals(JOptionPane.YES_OPTION)) {
+                                    setPDCA(qProcess, PReportTools.PREPORT_TYPE_SET_PDCA_ACT, QProcessTools.PDCA_ACT);
+                                }
+                            }
+                        });
+                    }
+                });
+                pdca_act.setEnabled(qProcess.isPDCA() && qProcess.getPDCA() == QProcessTools.PDCA_CHECK);
+                pdcaMenu.add(pdca_act);
+
+                pdcaMenu.add(new JSeparator());
+                JMenuItem pdca_clear = new JMenuItem(OPDE.lang.getString("nursingrecords.qprocesses.clear.pdca"));
+                pdca_clear.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        new DlgYesNo(OPDE.lang.getString("misc.msg.are.you.sure"), null, new Closure() {
+                            @Override
+                            public void execute(Object answer) {
+                                if (answer.equals(JOptionPane.YES_OPTION)) {
+                                    setPDCA(qProcess, null, null);
+                                }
+                            }
+                        });
+                    }
+                });
+                pdca_clear.setEnabled(qProcess.isPDCA());
+                pdcaMenu.add(pdca_clear);
+
+                final JideButton btnPDCA = GUITools.createHyperlinkButton("nursingrecords.qprocesses.set.pdca", SYSConst.icon22pdca, null);
+
+                btnPDCA.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        pdcaMenu.show(btnPDCA, 0, 0);
+                    }
+                });
+
+                pnlMenu.add(btnPDCA);
+            }
+
+
             if (qProcess.isYours()) {
                 /***
                  *      _     _         _   _                 _  ___
@@ -1256,7 +1360,7 @@ public class PnlProcess extends NursingRecordsPanel {
                  *     |_.__/ \__|_| |_|_| |_|\__,_|_| |_|\__,_|\___/  \_/ \___|_|
                  *
                  */
-                final JButton btnHandOver = GUITools.createHyperlinkButton(internalClassID + ".btnhandover.tooltip", SYSConst.icon22give, null);
+                final JButton btnHandOver = GUITools.createHyperlinkButton("nursingrecords.qprocesses.btnhandover.tooltip", SYSConst.icon22give, null);
                 btnHandOver.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 btnHandOver.addActionListener(new ActionListener() {
                     @Override
@@ -1349,12 +1453,12 @@ public class PnlProcess extends NursingRecordsPanel {
                  *     |_.__/ \__|_| |_|_|\__,_|_|\_\___|\___/  \_/ \___|_|
                  *
                  */
-                final JButton btbTakeOver = GUITools.createHyperlinkButton(internalClassID + ".btntakeover.tooltip", SYSConst.icon22take, null);
+                final JButton btbTakeOver = GUITools.createHyperlinkButton("nursingrecords.qprocesses.btntakeover.tooltip", SYSConst.icon22take, null);
                 btbTakeOver.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 btbTakeOver.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        new DlgYesNo(OPDE.lang.getString(internalClassID + ".question.takeover") + "<p>" + qProcess.getTitle() + "</p>", SYSConst.icon48play, new Closure() {
+                        new DlgYesNo(OPDE.lang.getString("nursingrecords.qprocesses.question.takeover") + "<p>" + qProcess.getTitle() + "</p>", SYSConst.icon48play, new Closure() {
                             @Override
                             public void execute(Object answer) {
                                 if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -1410,6 +1514,67 @@ public class PnlProcess extends NursingRecordsPanel {
 
         return pnlMenu;
     }
+
+
+    private void setPDCA(QProcess qProcess, Short preportType, Integer pdca) {
+        EntityManager em = OPDE.createEM();
+        try {
+            em.getTransaction().begin();
+            QProcess myProcess = em.merge(qProcess);
+
+            em.lock(myProcess, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+            myProcess.setPDCA(pdca);
+
+            if (pdca == null) {
+                Query query = em.createQuery("DELETE FROM PReport p WHERE p.qProcess = :qProcess AND p.art IN (:art1, :art2, :art3, :art4)");
+                query.setParameter("qProcess", qProcess);
+                query.setParameter("art1", PReportTools.PREPORT_TYPE_SET_PDCA_PLAN);
+                query.setParameter("art2", PReportTools.PREPORT_TYPE_SET_PDCA_DO);
+                query.setParameter("art3", PReportTools.PREPORT_TYPE_SET_PDCA_CHECK);
+                query.setParameter("art4", PReportTools.PREPORT_TYPE_SET_PDCA_ACT);
+                query.executeUpdate();
+            } else {
+                PReport pReport = em.merge(new PReport(null, preportType, myProcess));
+                myProcess.getPReports().add(pReport);
+            }
+
+            em.getTransaction().commit();
+
+            processList.remove(qProcess);
+            em.refresh(myProcess);
+            processList.add(myProcess);
+
+            createCP4(myProcess);
+
+            buildPanel();
+        } catch (OptimisticLockException ole) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                OPDE.getMainframe().emptyFrame();
+                OPDE.getMainframe().afterLogin();
+            }
+            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+        } catch (RollbackException ole) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                OPDE.getMainframe().emptyFrame();
+                OPDE.getMainframe().afterLogin();
+            }
+            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            OPDE.fatal(e);
+        } finally {
+            em.close();
+        }
+    }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JScrollPane jspProcess;

@@ -12,6 +12,7 @@ import entity.prescription.TradeForm;
 import entity.prescription.TradeFormTools;
 import op.OPDE;
 import op.threads.DisplayManager;
+import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 
@@ -41,46 +42,71 @@ public class DlgUPREditor extends MyJDialog {
         this.tradeForm = tradeForm;
         initComponents();
         initPanel();
-        setVisible(true);
     }
 
     private void initPanel() {
-        lblProduct.setText(tradeForm.getMedProduct().getText() + " " + TradeFormTools.toPrettyStringMedium(tradeForm));
-
-        mapEffectiveUPRs = new HashMap<MedStock, Pair<BigDecimal, BigDecimal>>();
-
-        rbUPRConst.setText(OPDE.lang.getString("upreditor.constant.upr"));
-        rbUPRAuto.setText(OPDE.lang.getString("upreditor.calculated.upr"));
 
 
-//        Query query = em.createQuery("SELECT m FROM DosageForm m ORDER BY m.preparation, m.usageText");
-//        cmbDosageForm.setModel(new DefaultComboBoxModel(query.getResultList().toArray(new DosageForm[]{})));
-//        cmbDosageForm.setRenderer(DosageFormTools.getRenderer(0));
-
-        if (tradeForm.getUPR() != null) {
-            txtUPR.setText(tradeForm.getUPR().setScale(2, RoundingMode.HALF_UP).toString());
-            rbUPRConst.setSelected(true);
-        } else {
-            txtSetUPR.setText(MedStockTools.getEstimatedUPR(tradeForm).setScale(2, RoundingMode.HALF_UP).toString());
-            rbUPRAuto.setSelected(true);
-        }
-
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT s FROM MedStock s WHERE s.tradeform = :tf ORDER BY s.in ");
-        query.setParameter("tf", tradeForm);
-        listStocks = new ArrayList<MedStock>(query.getResultList());
-
-        em.close();
+        OPDE.getMainframe().setBlocked(true);
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
 
 
-        // calculate effective UPRs for every closed stock for that tradeform
-        for (MedStock stock : listStocks) {
-            if (stock.isClosed()) {
-                mapEffectiveUPRs.put(stock, new Pair<BigDecimal, BigDecimal>(MedStockTools.getSumOfDosesInBHP(stock), MedStockTools.getEffectiveUPR(stock)));
+        SwingWorker worker = new SwingWorker() {
+
+            @Override
+            protected Object doInBackground() throws Exception {
+
+                int progress = 0;
+                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 100));
+
+
+                lblProduct.setText(tradeForm.getMedProduct().getText() + " " + TradeFormTools.toPrettyStringMedium(tradeForm));
+
+                mapEffectiveUPRs = new HashMap<MedStock, Pair<BigDecimal, BigDecimal>>();
+
+                rbUPRConst.setText(OPDE.lang.getString("upreditor.constant.upr"));
+                rbUPRAuto.setText(OPDE.lang.getString("upreditor.calculated.upr"));
+
+
+                //        Query query = em.createQuery("SELECT m FROM DosageForm m ORDER BY m.preparation, m.usageText");
+                //        cmbDosageForm.setModel(new DefaultComboBoxModel(query.getResultList().toArray(new DosageForm[]{})));
+                //        cmbDosageForm.setRenderer(DosageFormTools.getRenderer(0));
+
+                if (tradeForm.getUPR() != null) {
+                    txtUPR.setText(tradeForm.getUPR().setScale(2, RoundingMode.HALF_UP).toString());
+                    rbUPRConst.setSelected(true);
+                } else {
+                    txtSetUPR.setText(MedStockTools.getEstimatedUPR(tradeForm).setScale(2, RoundingMode.HALF_UP).toString());
+                    rbUPRAuto.setSelected(true);
+                }
+
+                EntityManager em = OPDE.createEM();
+                Query query = em.createQuery("SELECT s FROM MedStock s WHERE s.tradeform = :tf ORDER BY s.in ");
+                query.setParameter("tf", tradeForm);
+                listStocks = new ArrayList<MedStock>(query.getResultList());
+                em.close();
+
+                // calculate effective UPRs for every closed stock for that tradeform
+                for (MedStock stock : listStocks) {
+                    progress++;
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, listStocks.size()));
+                    if (stock.isClosed()) {
+                        mapEffectiveUPRs.put(stock, new Pair<BigDecimal, BigDecimal>(MedStockTools.getSumOfDosesInBHP(stock), MedStockTools.getEffectiveUPR(stock)));
+                    }
+                }
+                return null;
             }
-        }
 
-        tblStock.setModel(new MDLStock());
+            @Override
+            protected void done() {
+                tblStock.setModel(new MDLStock());
+                OPDE.getDisplayManager().setProgressBarMessage(null);
+                OPDE.getMainframe().setBlocked(false);
+                setVisible(true);
+            }
+        };
+        worker.execute();
+
 
     }
 
@@ -143,41 +169,78 @@ public class DlgUPREditor extends MyJDialog {
             @Override
             public void execute(Object answer) {
                 if (answer.equals(JOptionPane.YES_OPTION)) {
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-                        if (rbUPRAuto.isSelected()) {
-                            BigDecimal upr = checkUPR(txtSetUPR.getText());
-                            TradeForm mytf = em.merge(tradeForm);
-                            em.lock(mytf, LockModeType.OPTIMISTIC);
-                            mytf.setUPR(null);
-                            MedStockTools.setUPR(em, upr, listStocks);
-                        } else {
-                            BigDecimal upr = checkUPR(txtUPR.getText());
-                            TradeForm mytf = em.merge(tradeForm);
-                            em.lock(mytf, LockModeType.OPTIMISTIC);
-                            mytf.setUPR(upr);
+                    SwingWorker worker = new SwingWorker() {
+
+                        @Override
+                        protected Object doInBackground() throws Exception {
+
+                            btnSave.setEnabled(false);
+                            btnClose.setEnabled(false);
+                            rbUPRAuto.setEnabled(false);
+                            rbUPRConst.setEnabled(false);
+                            txtUPR.setEnabled(false);
+                            txtSetUPR.setEnabled(false);
+
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                if (rbUPRAuto.isSelected()) {
+
+                                    int progress = 0;
+                                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 100));
+
+                                    BigDecimal upr = checkUPR(txtSetUPR.getText());
+                                    TradeForm mytf = em.merge(tradeForm);
+                                    em.lock(mytf, LockModeType.OPTIMISTIC);
+                                    mytf.setUPR(null);
+
+                                    for (MedStock s : listStocks) {
+                                        progress++;
+                                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, listStocks.size()));
+                                        MedStock stock = em.merge(s);
+                                        em.lock(stock, LockModeType.OPTIMISTIC);
+                                        em.lock(stock.getInventory(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                        stock.setUPR(upr);
+                                        stock.setUPRDummyMode(MedStockTools.ADD_TO_AVERAGES_UPR_WHEN_CLOSING); // no dummies after this has been set
+                                    }
+
+                                } else {
+                                    BigDecimal upr = checkUPR(txtUPR.getText());
+                                    TradeForm mytf = em.merge(tradeForm);
+                                    em.lock(mytf, LockModeType.OPTIMISTIC);
+                                    mytf.setUPR(upr);
+                                }
+                                em.getTransaction().commit();
+
+                            } catch (OptimisticLockException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (RollbackException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception ex) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(ex);
+                            } finally {
+                                em.close();
+                            }
+                            return null;
                         }
-                        em.getTransaction().commit();
-                    } catch (OptimisticLockException ole) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
+
+                        @Override
+                        protected void done() {
+                            OPDE.getDisplayManager().setProgressBarMessage(null);
+                            OPDE.getMainframe().setBlocked(false);
+                            dispose();
                         }
-                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                    } catch (RollbackException ole) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                    } catch (Exception ex) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.fatal(ex);
-                    } finally {
-                        em.close();
-                    }
-                    dispose();
+                    };
+                    worker.execute();
                 }
             }
         });
@@ -202,8 +265,8 @@ public class DlgUPREditor extends MyJDialog {
         //======== this ========
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "default, $lcgap, pref, $lcgap, default:grow, $lcgap, default",
-            "6*(default, $lgap), default:grow, 2*($lgap, default)"));
+                "default, $lcgap, pref, $lcgap, default:grow, $lcgap, default",
+                "6*(default, $lgap), default:grow, 2*($lgap, default)"));
 
         //---- lblProduct ----
         lblProduct.setText("Product here");

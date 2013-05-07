@@ -207,7 +207,7 @@ public class DlgNewStocks extends MyJDialog {
         });
         cmbVorrat.setFont(SYSConst.ARIAL14);
         ovrVorrat = new DefaultOverlayable(cmbVorrat);
-        mainPane.add(ovrVorrat, CC.xywh(5, 11, 4, 1));
+        mainPane.add(ovrVorrat, CC.xywh(5, 13, 4, 1));
 
         attentionIconBW = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.ATTENTION));
         cmbBW = new OverlayComboBox();
@@ -487,10 +487,6 @@ public class DlgNewStocks extends MyJDialog {
     private void txtBemerkungCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtBemerkungCaretUpdate
         setApply();
     }//GEN-LAST:event_txtBemerkungCaretUpdate
-
-    private void txtMedSucheFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtMedSucheFocusGained
-        SYSTools.markAllTxt(txtMedSuche);
-    }//GEN-LAST:event_txtMedSucheFocusGained
 
     private void cmbBWItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmbBWItemStateChanged
         if (ignoreEvent || (evt != null && evt.getStateChange() != ItemEvent.SELECTED)) {

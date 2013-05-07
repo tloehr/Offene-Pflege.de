@@ -64,6 +64,22 @@ public class QProcess implements Serializable, Comparable<QProcess> {
     @JoinColumn(name = "VKatID", referencedColumnName = "VKatID")
     @ManyToOne
     private PCat pcat;
+    @Basic(optional = false)
+    @Column(name = "pdca")
+    private Integer pdca;
+
+    public boolean isPDCA() {
+        return pdca != null;
+    }
+
+    public Integer getPDCA() {
+        return pdca;
+    }
+
+    public void setPDCA(Integer pdca) {
+        this.pdca = pdca;
+    }
+
     //
     // 1:n Relationen
     //

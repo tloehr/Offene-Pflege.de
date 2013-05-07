@@ -35,6 +35,11 @@ import java.util.List;
  */
 public class QProcessTools {
 
+    public static final int PDCA_PLAN = 0;
+    public static final int PDCA_DO = 1;
+    public static final int PDCA_CHECK = 2;
+    public static final int PDCA_ACT = 3;
+
     public static Color getBG1(QProcess qProcess) {
         Color common = SYSTools.getColor("CEF0FF");
         Color resident = SYSTools.getColor("DFB0FF");
@@ -154,27 +159,36 @@ public class QProcessTools {
         } else {
             html += "<font " + SYSConst.html_darkgreen + ">";
         }
-//
-//        if (revision.isAfterNow()) {
-//            int daysBetween = Days.daysBetween(new DateTime(), revision).getDays();
-//
-//            if (qProcess.idaysBetween > 7) {
-//                html += "<font " + SYSConst.html_darkgreen + ">";
-//            } else if (daysBetween == 0) {
-//                html += "<font " + SYSConst.html_gold7 + ">";
-//            } else {
-//                html += "<font " + SYSConst.html_darkorange + ">";
-//            }
-//        } else {
-//            html += "<font " + SYSConst.html_darkred + ">";
-//        }
+
         html += "&nbsp;&nbsp;<b>" + OPDE.lang.getString(PnlProcess.internalClassID + ".revision") + ":</b> ";
         html += DateFormat.getDateInstance().format(qProcess.getRevision()) + "</font>";
         html += "<br/><b>" + OPDE.lang.getString(PnlProcess.internalClassID + ".createdby") + ":</b> " + qProcess.getCreator().getFullname();
         html += "&nbsp;&nbsp;<b>" + OPDE.lang.getString(PnlProcess.internalClassID + ".ownedby") + ":</b> " + qProcess.getOwner().getFullname();
 
+        if (qProcess.getPDCA() != null) {
+            html += "<br/><b>" + getPDCA(qProcess.getPDCA()) + "</b>";
+        }
+
+
         html += "</div>";
         return html;
+    }
+
+    public static String getPDCA(Integer pdca) {
+        if (pdca == null) return "";
+        if (pdca == PDCA_PLAN) {
+            return OPDE.lang.getString(PReportTools.PREPORT_TEXT_PDCA_PLAN);
+        }
+        if (pdca == PDCA_DO) {
+            return OPDE.lang.getString(PReportTools.PREPORT_TEXT_PDCA_DO);
+        }
+        if (pdca == PDCA_CHECK) {
+            return OPDE.lang.getString(PReportTools.PREPORT_TEXT_PDCA_CHECK);
+        }
+        if (pdca == PDCA_ACT) {
+            return OPDE.lang.getString(PReportTools.PREPORT_TEXT_PDCA_ACT);
+        }
+        return "";
     }
 
     public static String getElementsAsHTML(QProcess qProcess, boolean includeSystemReports) {

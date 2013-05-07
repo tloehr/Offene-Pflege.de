@@ -273,7 +273,7 @@ public class DisplayManager extends Thread {
         if (minute != lastMinute) {
             lastMinute = minute;
             if (SYSPropsTools.isTrue(SYSPropsTools.KEY_MAINTENANCE_MODE, null)){
-                SYSFilesTools.print("Maintenance Mode. Sorry.",false);
+                SYSFilesTools.print(OPDE.lang.getString("maintenance.mode.sorry"),false);
                 SYSLoginTools.logout();
                 System.exit(0);
             }

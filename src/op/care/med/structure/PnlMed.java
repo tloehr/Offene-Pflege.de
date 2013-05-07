@@ -168,6 +168,8 @@ public class PnlMed extends CleanablePanel {
 
     private void treeMedMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_treeMedMousePressed
         if (produkt == null) return;
+        if (!OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)) return;
+
         if (SwingUtilities.isRightMouseButton(evt)) {
             // Dieses Popupmenu für den Table
             SYSTools.unregisterListeners(menu);
@@ -201,7 +203,7 @@ public class PnlMed extends CleanablePanel {
                             createTree();
                         }
                     });
-                    itemUPRedit = new JMenuItem("UPREdit");
+                    itemUPRedit = new JMenuItem(OPDE.lang.getString("upreditor.tooltip"));
                     itemUPRedit.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
                             new DlgUPREditor(tradeForm);

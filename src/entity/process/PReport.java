@@ -4,8 +4,8 @@
  */
 package entity.process;
 
-import entity.system.Users;
 import entity.info.Resident;
+import entity.system.Users;
 import op.OPDE;
 
 import javax.persistence.*;
@@ -107,13 +107,17 @@ public class PReport implements Serializable, QProcessElement {
         return art != PReportTools.PREPORT_TYPE_USER;
     }
 
+    public boolean isPDCA() {
+        return art == PReportTools.PREPORT_TYPE_SET_PDCA_PLAN || art == PReportTools.PREPORT_TYPE_SET_PDCA_DO || art == PReportTools.PREPORT_TYPE_SET_PDCA_CHECK || art == PReportTools.PREPORT_TYPE_SET_PDCA_ACT;
+    }
+
     @Override
     public String getContentAsHTML() {
         return PReportTools.getBerichtAsHTML(this);
     }
 
-@Override
-    public ArrayList<QProcess> getAttachedProcesses(){
+    @Override
+    public ArrayList<QProcess> getAttachedProcesses() {
         ArrayList<QProcess> list = new ArrayList<QProcess>();
         list.add(qProcess);
         return list;
@@ -132,6 +136,7 @@ public class PReport implements Serializable, QProcessElement {
 
     @Override
     public String getTitle() {
+        if (isPDCA()) return PReportTools.getPDCA(this);
         return text;
     }
 
