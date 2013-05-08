@@ -4,6 +4,10 @@
  */
 package entity.prescription;
 
+import com.itextpdf.text.*;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
 import entity.Station;
 import entity.files.SYSFilesTools;
 import entity.info.Resident;
@@ -11,6 +15,7 @@ import entity.info.ResidentTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.care.prescription.PnlPrescription;
+import op.system.PDF;
 import op.threads.DisplayMessage;
 import op.tools.HTMLTools;
 import op.tools.SYSConst;
@@ -22,11 +27,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.swing.*;
+import java.awt.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -61,7 +68,7 @@ public class PrescriptionTools {
      *
      * @param station Die Station, für die der Stellplan erstellt werden soll. Sortiert nach den Station.
      */
-    public static void printDailyPlan(Station station) {
+    public static void printDailyPlan(Station station, String type) {
         EntityManager em = OPDE.createEM();
         try {
             Query query = em.createNativeQuery("" +
@@ -88,11 +95,214 @@ public class PrescriptionTools {
                     " AND bw.StatID = ? " +
                     " ORDER BY CONCAT(bw.nachname,bw.vorname), bw.BWKennung, v.DafID IS NOT NULL, bhp.Uhrzeit, F.Stellplan, CONCAT( M.Bezeichnung, Ms.Bezeichnung)");
             query.setParameter(1, station.getStatID());
-            printDailyPlan(station, query.getResultList());
+
+            if (type.equalsIgnoreCase("html")) {
+                printDailyPlan(station, query.getResultList());
+            } else {
+                printDailyPlanAsPDF(station, query.getResultList());
+            }
+
             em.close();
         } catch (Exception e) {
             OPDE.fatal(e);
         }
+    }
+
+
+    private static void printDailyPlanAsPDF(final Station station, final List data) throws Exception {
+
+        OPDE.getMainframe().setBlocked(true);
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+
+        final Font whiteFont = PDF.bold();
+        whiteFont.setColor(BaseColor.WHITE);
+        final EntityManager em = OPDE.createEM();
+
+        SwingWorker worker = new SwingWorker() {
+
+            @Override
+            protected Object doInBackground() throws Exception {
+                String header = OPDE.lang.getString("nursingrecords.prescription.dailyplan.header1") + " " + DateFormat.getDateInstance().format(new Date()) + " (" + station.getName() + ")";
+                final PDF pdf = new PDF(null, header, 10);
+                pdf.getDocument().add(new Header("name", "content"));
+
+
+                Paragraph h1 = new Paragraph(new Phrase(header, PDF.plain(PDF.sizeH1())));
+                h1.setAlignment(Element.ALIGN_CENTER);
+                pdf.getDocument().add(h1);
+                pdf.getDocument().add(Chunk.NEWLINE);
+
+                Paragraph p = new Paragraph(SYSTools.xx("nursingrecords.prescription.dailyplan.warning"));
+                p.setAlignment(Element.ALIGN_CENTER);
+                pdf.getDocument().add(p);
+                pdf.getDocument().add(Chunk.NEWLINE);
+
+                DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
+                int progress = -1;
+                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, data.size()));
+                String resID = "";
+                PdfPTable table = null;
+
+                for (Object obj : data) {
+                    progress++;
+
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, data.size()));
+
+                    Object[] objects = (Object[]) obj;
+                    Prescription prescription = em.find(Prescription.class, ((BigInteger) objects[0]).longValue());
+                    PrescriptionSchedule schedule = em.find(PrescriptionSchedule.class, ((BigInteger) objects[1]).longValue());
+                    BigInteger bestid = (BigInteger) objects[2];
+                    BigInteger formid = (BigInteger) objects[4];
+
+                    // Alle Formen, die nicht abzählbar sind, werden grau hinterlegt. Also Tropfen, Spritzen etc.
+                    boolean gray = false;
+                    if (formid != null) {
+                        DosageForm form = em.find(DosageForm.class, formid.longValue());
+                        gray = form.getDailyPlan() > 0;
+                    }
+
+                    /***
+                     *      _                    _
+                     *     | |__   ___  __ _  __| |
+                     *     | '_ \ / _ \/ _` |/ _` |
+                     *     | | | |  __/ (_| | (_| |
+                     *     |_| |_|\___|\__,_|\__,_|
+                     *
+                     */
+                    // If the resident changes in the list. We need to restart a new table.
+                    boolean residentChanges = !resID.equalsIgnoreCase(prescription.getResident().getRID());
+                    if (residentChanges) {
+                        // the table has to be closed every time the resident changes. But not the first time... obviously
+                        if (table != null) {
+                            pdf.getDocument().add(table);
+                            pdf.getDocument().add(Chunk.NEWLINE);
+                        }
+
+                        table = new PdfPTable(new float[]{6, 1, 1, 1, 1, 1, 1, 6});
+                        table.setTotalWidth(Utilities.millimetersToPoints(180));
+                        table.setLockedWidth(true);
+                        PdfPCell cell = new PdfPCell(new Phrase(ResidentTools.getLabelText(prescription.getResident()), whiteFont));
+                        cell.setBackgroundColor(BaseColor.BLACK);
+                        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        cell.setVerticalAlignment(Element.ALIGN_TOP);
+                        cell.setColspan(8);
+                        table.addCell(cell);
+
+                        table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
+//                        table.getDefaultCell().setBackgroundColor(null);
+
+                        table.addCell(PDF.cell("nursingrecords.prescription.dailyplan.table.col1", PDF.bold(), Element.ALIGN_CENTER, Element.ALIGN_MIDDLE));
+                        table.addCell(PDF.cell("misc.msg.earlyinthemorning.short", PDF.bold(), Element.ALIGN_CENTER, Element.ALIGN_MIDDLE));
+                        table.addCell(PDF.cell("misc.msg.morning.short", PDF.bold(), Element.ALIGN_CENTER, Element.ALIGN_MIDDLE));
+                        table.addCell(PDF.cell("misc.msg.noon.short", PDF.bold(), Element.ALIGN_CENTER, Element.ALIGN_MIDDLE));
+                        table.addCell(PDF.cell("misc.msg.afternoon.short", PDF.bold(), Element.ALIGN_CENTER, Element.ALIGN_MIDDLE));
+                        table.addCell(PDF.cell("misc.msg.evening.short", PDF.bold(), Element.ALIGN_CENTER, Element.ALIGN_MIDDLE));
+                        table.addCell(PDF.cell("misc.msg.lateatnight.short", PDF.bold(), Element.ALIGN_CENTER, Element.ALIGN_MIDDLE));
+                        table.addCell(PDF.cell("misc.msg.comment", PDF.bold(), Element.ALIGN_CENTER, Element.ALIGN_MIDDLE));
+
+                        table.setHeaderRows(2);
+
+                        resID = prescription.getResident().getRID();
+                    }
+
+                    /***
+                     *                      _             _
+                     *       ___ ___  _ __ | |_ ___ _ __ | |_
+                     *      / __/ _ \| '_ \| __/ _ \ '_ \| __|
+                     *     | (_| (_) | | | | ||  __/ | | | |_
+                     *      \___\___/|_| |_|\__\___|_| |_|\__|
+                     *
+                     */
+                    table.getDefaultCell().setVerticalAlignment(Element.ALIGN_LEFT);
+                    table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_TOP);
+
+                    if (gray) {
+                        table.getDefaultCell().setBackgroundColor(BaseColor.LIGHT_GRAY);
+                    }
+
+                    Phrase col1 = getShortDescriptionAsPhrase(prescription);
+                    if (bestid != null) {
+                        MedStock stock = em.find(MedStock.class, bestid.longValue());
+                        col1.add(Chunk.NEWLINE);
+                        col1.add(PDF.chunk(OPDE.lang.getString("nursingrecords.prescription.dailyplan.stockInUse") + " " + OPDE.lang.getString("misc.msg.number") + " " + stock.getID(), PDF.italic()));
+
+                        String warning = "";
+                        warning += (stock.expiresIn(7) ? "!!" : "");
+                        warning += (stock.expiresIn(0) ? "!!!!" : "");
+                        // variable expiry ?
+                        if (stock.getTradeForm().getDaysToExpireAfterOpened() != null) {
+                            col1.add(Chunk.NEWLINE);
+                            col1.add(PDF.chunk(warning + " " + OPDE.lang.getString("misc.msg.expiresAfterOpened") + ": " + df.format(new DateTime(stock.getOpened()).plusDays(stock.getTradeForm().getDaysToExpireAfterOpened()).toDate())));
+                        }
+                        if (stock.getExpires() != null) {
+                            DateFormat sdf = df;
+                            // if expiry is at the end of a month then it has a different format
+                            if (new DateMidnight(stock.getExpires()).equals(new DateMidnight(stock.getExpires()).dayOfMonth().withMaximumValue())) {
+                                sdf = new SimpleDateFormat("MM/yy");
+                            }
+                            col1.add(Chunk.NEWLINE);
+                            col1.add(PDF.chunk(OPDE.lang.getString("misc.msg.expires") + ": " + sdf.format(stock.getExpires())));
+                        }
+                    }
+                    table.addCell(col1);
+
+                    table.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
+
+                    if (schedule.usesTime()) {
+                        PdfPCell cellTime = new PdfPCell();
+                        cellTime.setColspan(6);
+
+                        Chunk timeChunk = PDF.chunk(DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getUhrzeit()) + " " + OPDE.lang.getString("misc.msg.Time.short"), PDF.bold());
+                        timeChunk.setUnderline(0.4f, -1f);
+
+                        Phrase contentTime = new Phrase();
+                        contentTime.add(timeChunk);
+
+                        contentTime.add(" ");
+
+                        contentTime.add(PDF.getAsPhrase(schedule.getUhrzeitDosis()));
+                        contentTime.add(schedule.getPrescription().hasMed() ? " " + SYSConst.UNITS[schedule.getPrescription().getTradeForm().getDosageForm().getUsageUnit()] : "x");
+                    } else {
+                        table.addCell(PDF.getAsPhrase(schedule.getNachtMo()));
+                        table.addCell(PDF.getAsPhrase(schedule.getMorgens()));
+                        table.addCell(PDF.getAsPhrase(schedule.getMittags()));
+                        table.addCell(PDF.getAsPhrase(schedule.getNachmittags()));
+                        table.addCell(PDF.getAsPhrase(schedule.getAbends()));
+                        table.addCell(PDF.getAsPhrase(schedule.getNachtAb()));
+                    }
+
+                    table.getDefaultCell().setVerticalAlignment(Element.ALIGN_JUSTIFIED);
+                    table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_TOP);
+
+                    table.addCell(PrescriptionScheduleTools.getRemarkAsPhrase(schedule));
+
+                    table.getDefaultCell().setBackgroundColor(null);
+
+                }
+                pdf.getDocument().add(table);
+                pdf.getDocument().close();
+                return pdf;
+            }
+
+            @Override
+            protected void done() {
+                OPDE.getDisplayManager().setProgressBarMessage(null);
+                OPDE.getMainframe().setBlocked(false);
+
+                try {
+                    SYSFilesTools.handleFile(((PDF) get()).getOutputFile(), Desktop.Action.OPEN);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                } catch (ExecutionException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+                em.close();
+            }
+        };
+        worker.execute();
+
+
     }
 
     private static void printDailyPlan(final Station station, final List data) {
@@ -281,6 +491,33 @@ public class PrescriptionTools {
         return result;
     }
 
+    public static Phrase getShortDescriptionAsPhrase(Prescription prescription) {
+        Phrase phrase = new Phrase();
+
+        if (!prescription.hasMed()) {
+            phrase.add(PDF.chunk(prescription.getIntervention().getBezeichnung()));
+        } else {
+            MedInventory inventory = TradeFormTools.getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm());
+            MedStock stockInUse = prescription.isClosed() ? null : MedStockTools.getStockInUse(inventory);
+
+            if (stockInUse != null) {
+                phrase.add(PDF.chunk(stockInUse.getTradeForm().getMedProduct().getText() + (stockInUse.getTradeForm().getSubtext().isEmpty() ? "" : " " + stockInUse.getTradeForm().getSubtext()), PDF.bold()));
+                phrase.add(" ");
+                phrase.add(PDF.chunk((stockInUse.getTradeForm().getDosageForm().getPreparation().isEmpty() ? "" : " " + stockInUse.getTradeForm().getDosageForm().getPreparation()) + " " +
+                        (prescription.getTradeForm().getDosageForm().getUsageText().isEmpty() ? SYSConst.UNITS[prescription.getTradeForm().getDosageForm().getUsageUnit()] : prescription.getTradeForm().getDosageForm().getUsageText())));
+            } else {
+                phrase.add(PDF.chunk(prescription.getTradeForm().getMedProduct().getText() + (prescription.getTradeForm().getSubtext().isEmpty() ? "" : " " + prescription.getTradeForm().getSubtext()), PDF.bold()));
+                phrase.add(" ");
+                phrase.add(PDF.chunk((prescription.getTradeForm().getDosageForm().getPreparation().isEmpty() ? "" : " " + prescription.getTradeForm().getDosageForm().getPreparation()) + " " +
+                        (prescription.getTradeForm().getDosageForm().getUsageText().isEmpty() ? SYSConst.UNITS[prescription.getTradeForm().getDosageForm().getUsageUnit()] : prescription.getTradeForm().getDosageForm().getUsageText())));
+            }
+        }
+
+        //result += "</font>";
+
+        return phrase;
+    }
+
     public static String getOriginalPrescription(Prescription presription) {
         String result = "";
 
@@ -297,6 +534,27 @@ public class PrescriptionTools {
             }
         }
         return (result.isEmpty() ? "" : result + "<br/>");
+    }
+
+    public static Phrase getOriginalPrescriptionAsPhrase(Prescription presription) {
+        Phrase phrase = new Phrase();
+
+        if (presription.shouldBeCalculated()) {
+
+            MedInventory inventory = TradeFormTools.getInventory4TradeForm(presription.getResident(), presription.getTradeForm());
+            MedStock stockInUse = MedStockTools.getStockInUse(inventory);
+
+            if (stockInUse != null) {
+                // If the current prescription defers from the original one (different provider of the medication as in the beginning)
+                if (!stockInUse.getTradeForm().equals(presription.getTradeForm())) {
+                    phrase.add(PDF.chunk(TradeFormTools.toPrettyHTMLalternative(presription.getTradeForm()), PDF.plain(PDF.sizeDefault() - 2)));
+                    phrase.add(Chunk.NEWLINE);
+                }
+            }
+        }
+
+
+        return phrase;
     }
 
     public static String getLongDescription(Prescription presription) {

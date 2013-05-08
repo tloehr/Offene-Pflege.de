@@ -1,7 +1,11 @@
 package entity.prescription;
 
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Phrase;
 import op.OPDE;
-import op.care.prescription.PnlPrescription;
+import op.system.PDF;
 import op.tools.HTMLTools;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
@@ -117,15 +121,101 @@ public class PrescriptionScheduleTools {
 
         DateFormat df = DateFormat.getDateInstance();
         if (SYSCalendar.isInFuture(schedule.getLDatum().getTime())) {
-            result += "<br/><font color=\"red\">" + OPDE.lang.getString(PnlPrescription.internalClassID + ".firstApplication") + ": " + df.format(schedule.getLDatum())+"</font>";
+            result += "<br/><font color=\"red\">" + OPDE.lang.getString("nursingrecords.prescription.firstApplication") + ": " + df.format(schedule.getLDatum()) + "</font>";
         } else {
             if (schedule.getTaeglich() != 1) { // Wenn nicht jeden Tag, dann das letzte mal anzeigen.
-                result += "<br/>" + OPDE.lang.getString(PnlPrescription.internalClassID + ".mostRecentApplication") + ": ";
+                result += "<br/>" + OPDE.lang.getString("nursingrecords.prescription.mostRecentApplication") + ": ";
                 result += df.format(schedule.getLDatum());
             }
         }
 
         return result.isEmpty() ? "" : "<div id=\"fonttext\">" + result + "</div>";
+    }
+
+    public static Phrase getRepeatPatternAsPhrase(PrescriptionSchedule schedule, boolean writeDaily) {
+        Phrase phrase = new Phrase();
+
+        if (schedule.isTaeglich()) {
+            if (schedule.getTaeglich() > 1) {
+                phrase.add(new Chunk(OPDE.lang.getString("misc.msg.every") + " " + schedule.getTaeglich() + " " + OPDE.lang.getString("misc.msg.Days2"), PDF.bold()));
+            } else if (writeDaily) {
+                phrase.add(new Chunk("misc.msg.daily", PDF.bold()));
+            }
+        } else if (schedule.isWoechentlich()) {
+            String text = "";
+            if (schedule.getWoechentlich() == 1) {
+
+                text += OPDE.lang.getString("misc.msg.everyWeek") + " ";
+            } else {
+                text += OPDE.lang.getString("misc.msg.every") + " " + schedule.getWoechentlich() + " " + OPDE.lang.getString("misc.msg.weeks") + " ";
+            }
+
+            String daylist = "";
+
+            daylist += (schedule.getMon() > 0 ? OPDE.lang.getString("misc.msg.monday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getTue() > 0 ? OPDE.lang.getString("misc.msg.tuesday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getWed() > 0 ? OPDE.lang.getString("misc.msg.wednesday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getThu() > 0 ? OPDE.lang.getString("misc.msg.thursday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getFri() > 0 ? OPDE.lang.getString("misc.msg.friday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getSat() > 0 ? OPDE.lang.getString("misc.msg.saturday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getSun() > 0 ? OPDE.lang.getString("misc.msg.sunday").substring(0, 3) + ", " : "");
+
+            if (!daylist.isEmpty()) {
+                text += "{" + daylist.substring(0, daylist.length() - 2) + "}";
+            }
+
+            phrase.add(PDF.chunk(text, PDF.bold()));
+
+        } else if (schedule.isMonatlich()) {
+            String text = "";
+            if (schedule.getMonatlich() == 1) {
+                text += OPDE.lang.getString("misc.msg.everyMonth") + " ";
+            } else {
+                text += OPDE.lang.getString("misc.msg.every") + " " + schedule.getMonatlich() + " " + OPDE.lang.getString("misc.msg.months") + " ";
+            }
+
+            if (schedule.getTagNum() > 0) {
+                text += OPDE.lang.getString("misc.msg.atchrono") + " " + schedule.getTagNum() + ". " + OPDE.lang.getString("misc.msg.ofTheMonth");
+            } else {
+                int wtag = 0;
+                String tag = "";
+
+                // In diesem fall kann immer nur ein Wochentag >0 sein. Daher klappt das so.
+                tag += (schedule.getMon() > 0 ? OPDE.lang.getString("misc.msg.monday") : "");
+                tag += (schedule.getTue() > 0 ? OPDE.lang.getString("misc.msg.tuesday") : "");
+                tag += (schedule.getWed() > 0 ? OPDE.lang.getString("misc.msg.wednesday") : "");
+                tag += (schedule.getThu() > 0 ? OPDE.lang.getString("misc.msg.thursday") : "");
+                tag += (schedule.getFri() > 0 ? OPDE.lang.getString("misc.msg.friday") : "");
+                tag += (schedule.getSat() > 0 ? OPDE.lang.getString("misc.msg.saturday") : "");
+                tag += (schedule.getSun() > 0 ? OPDE.lang.getString("misc.msg.sunday") : "");
+
+                wtag += schedule.getMon();
+                wtag += schedule.getTue();
+                wtag += schedule.getWed();
+                wtag += schedule.getThu();
+                wtag += schedule.getFri();
+                wtag += schedule.getSat();
+                wtag += schedule.getSun();
+
+                text += OPDE.lang.getString("misc.msg.atchrono") + " " + wtag + ". " + tag + " " + OPDE.lang.getString("misc.msg.ofTheMonth");
+            }
+            phrase.add(PDF.chunk(text, PDF.bold()));
+        }
+
+        DateFormat df = DateFormat.getDateInstance();
+        if (SYSCalendar.isInFuture(schedule.getLDatum().getTime())) {
+            phrase.add(Chunk.NEWLINE);
+            Font red = PDF.plain();
+            red.setColor(BaseColor.RED);
+            phrase.add(PDF.chunk(OPDE.lang.getString("nursingrecords.prescription.firstApplication") + ": " + df.format(schedule.getLDatum()), red));
+        } else {
+            if (schedule.getTaeglich() != 1) { // Wenn nicht jeden Tag, dann das letzte mal anzeigen.
+                phrase.add(Chunk.NEWLINE);
+                phrase.add(PDF.chunk(OPDE.lang.getString("nursingrecords.prescription.mostRecentApplication") + ": " + df.format(schedule.getLDatum())));
+            }
+        }
+
+        return phrase;
     }
 
     public static String getDoseAsHTML(PrescriptionSchedule schedule, PrescriptionSchedule vorherigePlanung, boolean singleUsageOnly) {
@@ -171,7 +261,7 @@ public class PrescriptionScheduleTools {
                 result += "</table>";
             }
         } else if (getTerminStatus(schedule) == MAXDOSIS) {
-            result += "<b>" + OPDE.lang.getString(PnlPrescription.internalClassID + ".maxDailyDose") + ": ";
+            result += "<b>" + OPDE.lang.getString("nursingrecords.prescription.maxDailyDose") + ": ";
             result += schedule.getMaxAnzahl() + "x " + SYSTools.printDouble(schedule.getMaxEDosis().doubleValue());
             result += "</b><br/>";
         } else if (getTerminStatus(schedule) == UHRZEIT) {
@@ -199,11 +289,44 @@ public class PrescriptionScheduleTools {
     }
 
 
+    public static Phrase getRemarkAsPhrase(PrescriptionSchedule schedule) {
+        Phrase phrase = new Phrase();
+
+        if (schedule.getPrescription().isOnDemand()) {
+            phrase.add(OPDE.lang.getString("nursingrecords.prescription.maxDailyDose") + ": ");
+            phrase.add(schedule.getMaxAnzahl() + "x " + HTMLTools.printDouble(schedule.getMaxEDosis()) + " " + SYSConst.UNITS[schedule.getPrescription().getTradeForm().getDosageForm().getUsageUnit()]);
+            phrase.add(Chunk.NEWLINE);
+        }
+
+        phrase.add(PrescriptionTools.getOriginalPrescriptionAsPhrase(schedule.getPrescription()));
+
+        Phrase repeat = getRepeatPatternAsPhrase(schedule, false);
+        phrase.add(repeat);
+
+
+
+        if (!SYSTools.catchNull(schedule.getPrescription().getText()).isEmpty()) {
+            Chunk comment = PDF.chunk("misc.msg.comment", PDF.bold());
+            comment.setUnderline(0.4f, -1f);
+            phrase.add(comment);
+            phrase.add(": ");
+            phrase.add(PDF.chunk(schedule.getPrescription().getText()));
+        }
+
+        if (schedule.getPrescription().getTo().before(SYSConst.DATE_UNTIL_FURTHER_NOTICE)) {
+            phrase.add(Chunk.NEWLINE);
+            phrase.add(PDF.chunk(OPDE.lang.getString("nursingrecords.prescription.endsAtChrono") + ": " + DateFormat.getDateInstance().format(schedule.getPrescription().getTo()), PDF.bold()));
+        }
+
+        return phrase;
+    }
+
+
     public static String getRemark(PrescriptionSchedule schedule) {
         String result = "";
 
         if (schedule.getPrescription().isOnDemand()) {
-            result += OPDE.lang.getString(PnlPrescription.internalClassID + ".maxDailyDose") + ": ";
+            result += OPDE.lang.getString("nursingrecords.prescription.maxDailyDose") + ": ";
             result += schedule.getMaxAnzahl() + "x " + HTMLTools.printDouble(schedule.getMaxEDosis()) + " " + SYSConst.UNITS[schedule.getPrescription().getTradeForm().getDosageForm().getUsageUnit()];
             result += "<br/>";
         }
