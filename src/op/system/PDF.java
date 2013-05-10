@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.util.Date;
 
 /**
@@ -204,11 +205,15 @@ public class PDF {
 
     public static Phrase getAsPhrase(BigDecimal bd) {
 
+//        BigDecimal bd = in.stripTrailingZeros();
+
         Phrase phrase = new Phrase();
+        phrase.setFont(plain());
+
         if (bd.compareTo(BigDecimal.ZERO) == 0) {
             // nop
-        } else if (bd.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) == 0) {
-            phrase.add(Integer.toString(bd.intValue()));
+//        } else if (bd.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) == 0) {
+//            phrase.add(Integer.toString(bd.intValue()));
         } else if (bd.compareTo(new BigDecimal(0.5d)) == 0) {
             phrase.add(new Chunk(frac12));
         } else if (bd.compareTo(new BigDecimal(0.25d)) == 0){
@@ -226,7 +231,13 @@ public class PDF {
             phrase.add(third);
 
         } else {
-            phrase.add(bd.setScale(2, RoundingMode.HALF_UP).toString());
+            DecimalFormat df = new DecimalFormat();
+
+            df.setMaximumFractionDigits(2);
+            df.setMinimumFractionDigits(0);
+            df.setGroupingUsed(false);
+
+            phrase.add(df.format(bd.setScale(2, RoundingMode.HALF_UP)));
         }
 
         return phrase;

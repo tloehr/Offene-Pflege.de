@@ -21,6 +21,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -277,6 +278,11 @@ public class AppInfo {
 
     public int getDbversion() {
         return dbversion;
+    }
+
+    public String getSignature(){
+        return (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getUID()) : "") + "; " + DateFormat.getDateTimeInstance().format(new Date())
+                            + "; " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum();
     }
 
 //    public String getUpdateCheckUrl() {

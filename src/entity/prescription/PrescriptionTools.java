@@ -8,6 +8,7 @@ import com.itextpdf.text.*;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.draw.VerticalPositionMark;
 import entity.Station;
 import entity.files.SYSFilesTools;
 import entity.info.Resident;
@@ -124,13 +125,13 @@ public class PrescriptionTools {
             protected Object doInBackground() throws Exception {
                 String header = OPDE.lang.getString("nursingrecords.prescription.dailyplan.header1") + " " + DateFormat.getDateInstance().format(new Date()) + " (" + station.getName() + ")";
                 final PDF pdf = new PDF(null, header, 10);
-                pdf.getDocument().add(new Header("name", "content"));
+                pdf.getDocument().add(new Header(OPDE.getAppInfo().getSignature(), header));
 
 
                 Paragraph h1 = new Paragraph(new Phrase(header, PDF.plain(PDF.sizeH1())));
                 h1.setAlignment(Element.ALIGN_CENTER);
                 pdf.getDocument().add(h1);
-                pdf.getDocument().add(Chunk.NEWLINE);
+//                pdf.getDocument().add(Chunk.NEWLINE);
 
                 Paragraph p = new Paragraph(SYSTools.xx("nursingrecords.prescription.dailyplan.warning"));
                 p.setAlignment(Element.ALIGN_CENTER);
@@ -251,18 +252,30 @@ public class PrescriptionTools {
 
                     if (schedule.usesTime()) {
                         PdfPCell cellTime = new PdfPCell();
+                        cellTime.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        cellTime.setVerticalAlignment(Element.ALIGN_MIDDLE);
                         cellTime.setColspan(6);
 
                         Chunk timeChunk = PDF.chunk(DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getUhrzeit()) + " " + OPDE.lang.getString("misc.msg.Time.short"), PDF.bold());
                         timeChunk.setUnderline(0.4f, -1f);
 
                         Phrase contentTime = new Phrase();
-                        contentTime.add(timeChunk);
+                        contentTime.setFont(PDF.plain());
 
+                        // this is only as a workaround until i figure out to align cells with a colspan.
+                        Chunk tab1 = new Chunk(new VerticalPositionMark(), 40, false);
+                        contentTime.add(tab1);
+                        contentTime.add(timeChunk);
                         contentTime.add(" ");
 
                         contentTime.add(PDF.getAsPhrase(schedule.getUhrzeitDosis()));
                         contentTime.add(schedule.getPrescription().hasMed() ? " " + SYSConst.UNITS[schedule.getPrescription().getTradeForm().getDosageForm().getUsageUnit()] : "x");
+                        contentTime.add(Chunk.NEWLINE);
+                        contentTime.add(" ");
+                        cellTime.addElement(contentTime);
+
+                        table.addCell(cellTime);
+
                     } else {
                         table.addCell(PDF.getAsPhrase(schedule.getNachtMo()));
                         table.addCell(PDF.getAsPhrase(schedule.getMorgens()));
