@@ -47,6 +47,8 @@ import java.util.*;
  */
 public class ResInfoTools {
 
+    public static final String KEY_SLEEP = "SLEEP";
+
     public static ResInfo getLastResinfo(Resident bewohner, ResInfoType bwinfotyp) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.from DESC");

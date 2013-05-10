@@ -1,0 +1,116 @@
+JFDML JFormDesigner: "5.1.0.2.64" Java: "1.6.0_33" encoding: "UTF-8"
+
+new FormModel {
+	contentType: "form/swing"
+	root: new FormRoot {
+		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
+			"$columnSpecs": "default, labelcompgap, default:grow, labelcompgap, default"
+			"$rowSpecs": "default, linegap, default, unrelgap, default, linegap, default, unrelgap, default, linegap, default, unrelgap, default, linegap, default"
+		} ) {
+			name: "this"
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblCat"
+				"text": "Ruhen und Schlafen"
+				"font": new java.awt.Font( "Arial", 1, 18 )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 3
+				"gridY": 3
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lbl"
+				"text": "Schlafverhalten"
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 3
+				"gridY": 5
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
+				name: "panel1"
+				add( new FormComponent( "javax.swing.JCheckBox" ) {
+					name: "cbSleep1"
+					"text": "normal"
+					"name": "normal"
+				} )
+				add( new FormComponent( "javax.swing.JCheckBox" ) {
+					name: "cbSleep2"
+					"text": "Einschlafstörungen"
+					"name": "fallAsleep"
+				} )
+				add( new FormComponent( "javax.swing.JCheckBox" ) {
+					name: "cbSleep3"
+					"text": "Durchschlafstörungen"
+					"name": "sleepThrough"
+				} )
+				add( new FormComponent( "javax.swing.JCheckBox" ) {
+					name: "cbSleep4"
+					"text": "Unruhe"
+					"name": "restless"
+				} )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 3
+				"gridY": 7
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "label1"
+				"text": "Schlafgewohnheiten"
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 3
+				"gridY": 9
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "txtHabits"
+				"name": "sleepingHabits"
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 3
+				"gridY": 11
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "label2"
+				"text": "Tag / Nachtrhythmus"
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 3
+				"gridY": 13
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
+				name: "panel2"
+				add( new FormComponent( "javax.swing.JRadioButton" ) {
+					name: "rbSleep1"
+					"text": "unauffällig"
+					"$buttonGroup": new FormReference( "buttonGroup2" )
+					"name": "normal"
+				} )
+				add( new FormComponent( "javax.swing.JRadioButton" ) {
+					name: "rbSleep2"
+					"text": "teilweise umgekehrt"
+					"$buttonGroup": new FormReference( "buttonGroup2" )
+					"name": "partlyReversed"
+				} )
+				add( new FormComponent( "javax.swing.JRadioButton" ) {
+					name: "rbSleep3"
+					"text": "vollständig umgekehrt"
+					"$buttonGroup": new FormReference( "buttonGroup2" )
+					"name": "reversed"
+				} )
+				add( new FormComponent( "javax.swing.JRadioButton" ) {
+					name: "rbSleep4"
+					"text": "kein Rhythmus erkennbar"
+					"$buttonGroup": new FormReference( "buttonGroup2" )
+					"name": "noRhythm"
+				} )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 3
+				"gridY": 15
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 0 )
+			"size": new java.awt.Dimension( 670, 240 )
+		} )
+		add( new FormNonVisual( "javax.swing.ButtonGroup" ) {
+			name: "buttonGroup2"
+			auxiliary() {
+				"JavaCodeGenerator.variableLocal": false
+			}
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 430 )
+		} )
+	}
+}

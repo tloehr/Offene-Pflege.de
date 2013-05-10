@@ -9,22 +9,22 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.pane.CollapsiblePanes;
 import entity.EntityTools;
 import entity.info.Resident;
-import entity.files.SYSFilesTools;
 import op.OPDE;
-import op.care.nursingprocess.PnlNursingProcess;
-import op.care.reports.PnlReport;
 import op.care.bhp.PnlBHP;
 import op.care.dfn.PnlDFN;
 import op.care.info.PnlInfo;
+import op.care.info.PnlInformation;
 import op.care.med.inventory.PnlInventory;
-import op.care.sysfiles.PnlFiles;
+import op.care.nursingprocess.PnlNursingProcess;
 import op.care.prescription.PnlPrescription;
+import op.care.reports.PnlReport;
+import op.care.sysfiles.PnlFiles;
 import op.care.values.PnlValues;
+import op.process.PnlProcess;
 import op.tools.CleanablePanel;
 import op.tools.GUITools;
 import op.tools.NursingRecordsPanel;
 import op.tools.SYSTools;
-import op.process.PnlProcess;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -47,21 +47,22 @@ public class PnlCare extends NursingRecordsPanel {
     public static final int TAB_PPLANUNG = 8;
     public static final int TAB_VORGANG = 9;
     public static final int TAB_FILES = 10;
+    public static final int TAB_INFO2 = 11;
 
     private boolean initPhase;
     private String[] tabs = new String[]{
-            OPDE.lang.getString(internalClassID + ".tab1"),
-            OPDE.lang.getString(internalClassID + ".tab2"),
-            OPDE.lang.getString(internalClassID + ".tab3"),
-            OPDE.lang.getString(internalClassID + ".tab4"),
-            OPDE.lang.getString(internalClassID + ".tab5"),
-            OPDE.lang.getString(internalClassID + ".tab6"),
-            OPDE.lang.getString(internalClassID + ".tab7"),
-            OPDE.lang.getString(internalClassID + ".tab8"),
-            OPDE.lang.getString(internalClassID + ".tab9"),
-            OPDE.lang.getString(internalClassID + ".tab10"),
-            OPDE.lang.getString(internalClassID + ".tab11")
-//            OPDE.lang.getString(internalClassID + ".tab12")
+            OPDE.lang.getString("nursingrecords.main.tab1"),
+            OPDE.lang.getString("nursingrecords.main.tab2"),
+            OPDE.lang.getString("nursingrecords.main.tab3"),
+            OPDE.lang.getString("nursingrecords.main.tab4"),
+            OPDE.lang.getString("nursingrecords.main.tab5"),
+            OPDE.lang.getString("nursingrecords.main.tab6"),
+            OPDE.lang.getString("nursingrecords.main.tab7"),
+            OPDE.lang.getString("nursingrecords.main.tab8"),
+            OPDE.lang.getString("nursingrecords.main.tab9"),
+            OPDE.lang.getString("nursingrecords.main.tab10"),
+            OPDE.lang.getString("nursingrecords.main.tab11"),
+            OPDE.lang.getString("nursingrecords.main.tab12")
     };
     private Resident resident = null;
     private CollapsiblePanes searchPanes;
@@ -127,7 +128,6 @@ public class PnlCare extends NursingRecordsPanel {
             case TAB_UEBERSICHT: {
                 previousPanel = new PnlResOverview(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_UEBERSICHT, previousPanel);
-                jtpPflegeakte.setTitleAt(TAB_UEBERSICHT, "Übersicht");
                 OPDE.getMainframe().setCurrentClassname(PnlResOverview.internalClassID);
                 break;
             }
@@ -191,6 +191,12 @@ public class PnlCare extends NursingRecordsPanel {
                 OPDE.getMainframe().setCurrentClassname(PnlFiles.internalClassID);
                 break;
             }
+            case TAB_INFO2: {
+                previousPanel = new PnlInformation(resident, jspSearch);
+                jtpPflegeakte.setComponentAt(TAB_INFO2, previousPanel);
+                OPDE.getMainframe().setCurrentClassname(PnlInformation.internalClassID);
+                break;
+            }
             default: {
             }
         }
@@ -208,8 +214,8 @@ public class PnlCare extends NursingRecordsPanel {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                "default:grow",
-                "default:grow"));
+                    "default:grow",
+                    "default:grow"));
 
             //======== jtpPflegeakte ========
             {
@@ -233,6 +239,7 @@ public class PnlCare extends NursingRecordsPanel {
         }
         jtpPflegeakte.setEnabledAt(TAB_FILES, OPDE.isFTPworking());
         jtpPflegeakte.setEnabledAt(TAB_VORRAT, resident.isCalcMediUPR1());
+        jtpPflegeakte.setEnabledAt(TAB_INFO2, OPDE.isDebug() && OPDE.isAdmin());
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables

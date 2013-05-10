@@ -1,21 +1,21 @@
 Manifest-Version: 1.0
-Class-Path: log4j-1.2.16.jar eclipselink.jar javax.persistence_2.0.3.v
- 201010191057.jar swing-layout-1.0.4-doc.zip swing-layout-1.0.4-src.zi
- p swing-layout-1.0.4.jar timingframework-swing-4.1.jar resolver.jar s
- erializer.jar xercesImpl.jar xercesSamples.jar xml-apis.jar commons-l
- ang-2.6-sources.jar commons-lang-2.6-javadoc.jar commons-lang-2.6.jar
-  jgoodies-common-1.2.0.jar jgoodies-forms-1.4.1.jar jgoodies-looks-2.
- 4.1.jar jgoodies-binding-2.2.2.jar jgoodies-validation-2.3.0.jar anim
- ation-1.2.0.jar commons-collections-3.2.1-javadoc.jar commons-collect
- ions-3.2.1-sources.jar commons-collections-3.2.1.jar commons-collecti
- ons-testframework-3.2.1.jar commons-beanutils-core-1.8.3.jar commons-
- beanutils-1.8.3.jar commons-beanutils-bean-collections-1.8.3.jar comm
- ons-digester-2.1-javadoc.jar commons-digester-2.1-sources.jar commons
- -digester-2.1.jar looks-2.0.1.jar jcalendar-1.3.3.jar edtftpj.jar com
- mons-io-2.4.jar mysql-connector-java-5.1.22-bin.jar mailapi.jar imap.
- jar pop3.jar smtp.jar dsn.jar mail.jar jide-plaf-jdk7.jar jide-common
- .jar jide-plaf.jar jide-components.jar jide-dialogs.jar joda-time-2.1
- .jar swingx-beaninfo-1.6.2.jar swingx-core-1.6.2.jar commons-cli-1.2.
- jar
+Class-Path: itext-pdfa-5.4.0.jar itext-xtra-5.4.0.jar itextpdf-5.4.0.j
+ ar swing-layout-1.0.4.jar swing-layout-1.0.4-doc.zip swing-layout-1.0
+ .4-src.zip joda-time-2.1.jar mailapi.jar imap.jar pop3.jar smtp.jar d
+ sn.jar mail.jar commons-io-2.4.jar eclipselink.jar javax.persistence_
+ 2.0.3.v201010191057.jar mysql-connector-java-5.1.22-bin.jar log4j-1.2
+ .16.jar commons-digester-2.1.jar commons-digester-2.1-javadoc.jar com
+ mons-digester-2.1-sources.jar commons-cli-1.2.jar commons-collections
+ -3.2.1.jar commons-collections-3.2.1-javadoc.jar commons-collections-
+ 3.2.1-sources.jar commons-collections-testframework-3.2.1.jar looks-2
+ .0.1.jar jcalendar-1.3.3.jar commons-lang-2.6.jar commons-lang-2.6-ja
+ vadoc.jar commons-lang-2.6-sources.jar resolver.jar xml-apis.jar seri
+ alizer.jar xercesImpl.jar xercesSamples.jar jgoodies-common-1.2.0.jar
+  jgoodies-forms-1.4.1.jar jgoodies-looks-2.4.1.jar jgoodies-binding-2
+ .2.2.jar jgoodies-validation-2.3.0.jar animation-1.2.0.jar commons-be
+ anutils-core-1.8.3.jar commons-beanutils-1.8.3.jar commons-beanutils-
+ bean-collections-1.8.3.jar timingframework-swing-4.1.jar jide-plaf-jd
+ k7.jar jide-common.jar jide-plaf.jar jide-components.jar jide-dialogs
+ .jar edtftpj.jar swingx-beaninfo-1.6.2.jar swingx-core-1.6.2.jar
 Main-Class: op.OPDE
 

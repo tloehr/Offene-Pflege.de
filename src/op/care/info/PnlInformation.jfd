@@ -7,6 +7,9 @@ new FormModel {
 			"axis": 0
 		} ) {
 			name: "this"
+			add( new FormContainer( "com.jidesoft.swing.JideTabbedPane", new FormLayoutManager( class javax.swing.JTabbedPane ) ) {
+				name: "tabCats"
+			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
 			"size": new java.awt.Dimension( 620, 515 )
