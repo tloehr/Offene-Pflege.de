@@ -84,7 +84,7 @@ public class ResInfoTools {
         return bwinfos.isEmpty() ? null : bwinfos.get(0);
     }
 
-    public static ArrayList<ResInfo> getByResidentAndType(Resident resident, ResInfoType type) {
+    public static ArrayList<ResInfo> getAll(Resident resident, ResInfoType type) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.from DESC");
         query.setParameter("bewohner", resident);
@@ -135,7 +135,19 @@ public class ResInfoTools {
         return resInfos;
     }
 
-    public static ArrayList<ResInfo> getActiveBWInfosByBewohnerUndKatArt(Resident bewohner, int katart) {
+    public static ArrayList<ResInfo> getActive(Resident bewohner, ResInfoCategory cat) {
+            EntityManager em = OPDE.createEM();
+            Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.from <= :from AND b.to >= :to AND b.bwinfotyp.resInfoCat = :cat ORDER BY b.from DESC, b.bwinfotyp.bwinftyp");
+            query.setParameter("bewohner", bewohner);
+            query.setParameter("cat", cat);
+            query.setParameter("from", new Date());
+            query.setParameter("to", new Date());
+            ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
+            em.close();
+            return resInfos;
+        }
+
+    public static ArrayList<ResInfo> getActive(Resident bewohner, int katart) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.from <= :from AND b.to >= :to AND b.bwinfotyp.resInfoCat.catType = :katart ORDER BY b.from DESC");
         query.setParameter("bewohner", bewohner);
@@ -269,7 +281,7 @@ public class ResInfoTools {
      * @return
      */
     public static String getContentAsHTML(ResInfo resInfo) {
-        ArrayList result = parseBWInfo(resInfo);
+        ArrayList result = parseResInfo(resInfo);
 
         DefaultMutableTreeNode struktur = (DefaultMutableTreeNode) result.get(0);
         Properties content = (Properties) result.get(1);
@@ -372,7 +384,7 @@ public class ResInfoTools {
         return found;
     }
 
-    public static ArrayList parseBWInfo(ResInfo resInfo) {
+    public static ArrayList parseResInfo(ResInfo resInfo) {
         HandlerStruktur s = new HandlerStruktur();
 
         try {
@@ -868,7 +880,7 @@ public class ResInfoTools {
          *                                  |_|               |___/
          */
         if (grundpflege) {
-            List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(resident, ResInfoCategoryTools.BASICS);
+            List<ResInfo> bwinfos = getActive(resident, ResInfoCategoryTools.BASICS);
             if (!bwinfos.isEmpty()) {
                 result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getResInfoCat().getText() + "</h2><div id=\"fonttext\">";
                 for (ResInfo bwinfo : bwinfos) {
@@ -890,7 +902,7 @@ public class ResInfoTools {
          *
          */
         if (haut) {
-            List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(resident, ResInfoCategoryTools.SKIN);
+            List<ResInfo> bwinfos = getActive(resident, ResInfoCategoryTools.SKIN);
             if (!bwinfos.isEmpty()) {
                 result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getResInfoCat().getText() + "</h2><div id=\"fonttext\">";
                 for (ResInfo bwinfo : bwinfos) {
@@ -947,7 +959,7 @@ public class ResInfoTools {
          *
          */
         if (vital) {
-            List<ResInfo> bwinfos = getActiveBWInfosByBewohnerUndKatArt(resident, ResInfoCategoryTools.VITAL);
+            List<ResInfo> bwinfos = getActive(resident, ResInfoCategoryTools.VITAL);
             if (!bwinfos.isEmpty()) {
                 result += "<h2 id=\"fonth2\">" + bwinfos.get(0).getResInfoType().getResInfoCat().getText() + "</h2><div id=\"fonttext\">";
                 for (ResInfo bwinfo : bwinfos) {

@@ -515,7 +515,7 @@ public class PnlInfo extends NursingRecordsPanel {
         infoPanel.setOpaque(false);
 
         if (!mapType2InfoList.containsKey(type)) {
-            mapType2InfoList.put(type, ResInfoTools.getByResidentAndType(resident, type));
+            mapType2InfoList.put(type, ResInfoTools.getAll(resident, type));
         }
 
         int i = 0; // for zebra pattern

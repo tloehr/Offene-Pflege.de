@@ -23,6 +23,7 @@ import java.awt.event.*;
 import java.beans.PropertyVetoException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -620,5 +621,25 @@ public class GUITools {
             }
         };
         return myPolicy;
+    }
+
+    public static void load(Properties content, java.util.List<Component> components) {
+        for (Component comp : components) {
+            if (comp instanceof JTextComponent) {
+                ((JTextComponent) comp).setText(content.getProperty(comp.getName()));
+            } else if (comp instanceof AbstractButton) {
+                ((AbstractButton) comp).setSelected(Boolean.parseBoolean(SYSTools.catchNull(content.getProperty(comp.getName()), "false")));
+            }
+        }
+    }
+
+    public static void save(Properties content, java.util.List<Component> components) {
+        for (Component comp : components) {
+            if (comp instanceof JTextComponent) {
+                content.setProperty(comp.getName(), ((JTextComponent) comp).getText());
+            } else if (comp instanceof AbstractButton) {
+                content.setProperty(comp.getName(), Boolean.toString(((AbstractButton) comp).isSelected()));
+            }
+        }
     }
 }

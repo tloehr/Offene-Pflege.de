@@ -8,11 +8,13 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.info.ResInfo;
 import entity.info.ResInfoTools;
+import op.tools.GUITools;
 import op.tools.SYSTools;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Properties;
 
 /**
@@ -22,6 +24,8 @@ public class PnlSleep extends JPanel {
 
     private final ResInfo resInfo;
     private Properties content;
+    private ArrayList<Component> components;
+//    private HashMap<String, Component> components;
 
     public PnlSleep(ResInfo resInfo) {
         this.resInfo = resInfo;
@@ -32,19 +36,30 @@ public class PnlSleep extends JPanel {
 
     private void initPanel() {
         content = ResInfoTools.getContent(resInfo);
-        loadPanel();
+//        components = new HashMap<String, Component>();
+//        for (AbstractButton btn : Collections.list(buttonGroup2.getElements())) {
+//            components.put(btn.getName(), btn);
+//        }
+//        components.put(txtHabits.getName(), txtHabits);
+//        components.put(cbSleep1.getName(), cbSleep1);
+//        components.put(cbSleep2.getName(), cbSleep2);
+//        components.put(cbSleep3.getName(), cbSleep3);
+//        components.put(cbSleep4.getName(), cbSleep4);
+
+
+        components = new ArrayList<Component>();
+        components.addAll(Collections.list(buttonGroup2.getElements()));
+
+        components.add(txtHabits);
+        components.add(cbSleep1);
+        components.add(cbSleep2);
+        components.add(cbSleep3);
+        components.add(cbSleep4);
+
+        GUITools.load(content, components);
     }
 
-    private void loadPanel() {
-        txtHabits.setText(SYSTools.catchNull(content.getProperty(txtHabits.getName())));
-    }
 
-    private void savePanel() {
-        content.setProperty(txtHabits.getName(), txtHabits.getText());
-        for (AbstractButton btn : new ArrayList<AbstractButton>(buttonGroup2.getElements())){
-
-        }
-    }
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -67,8 +82,8 @@ public class PnlSleep extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "default, $lcgap, default:grow, $lcgap, default",
-            "default, $lgap, default, $ugap, default, $lgap, default, $ugap, default, $lgap, default, $ugap, default, $lgap, default"));
+                "default, $lcgap, default:grow, $lcgap, default",
+                "default, $lgap, default, $ugap, default, $lgap, default, $ugap, default, $lgap, default, $ugap, default, $lgap, default"));
 
         //---- lblCat ----
         lblCat.setText("Ruhen und Schlafen");
