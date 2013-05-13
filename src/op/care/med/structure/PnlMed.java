@@ -449,14 +449,14 @@ public class PnlMed extends CleanablePanel {
             list.add(addButton);
         }
 
-        OPDE.debug("isCalcMediUPR1: " + OPDE.isCalcMediUPR1());
-
-        if (OPDE.isDebug()) {
-            Iterator it = OPDE.getProps().entrySet().iterator();
-            while (it.hasNext()) {
-                OPDE.debug(it.next().toString());
-            }
-        }
+//       OPDE.debug("isCalcMediUPR1: " + OPDE.isCalcMediUPR1());
+//
+//        if (OPDE.isDebug()) {
+//            Iterator it = OPDE.getProps().entrySet().iterator();
+//            while (it.hasNext()) {
+//                OPDE.debug(it.next().toString());
+//            }
+//        }
 
         if (OPDE.isCalcMediUPR1() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
             JideButton buchenButton = GUITools.createHyperlinkButton(PnlInventory.internalClassID + ".newstocks", SYSConst.icon22addrow, new ActionListener() {

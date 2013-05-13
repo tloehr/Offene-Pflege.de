@@ -28,7 +28,7 @@ import java.util.*;
  * Time: 13:57
  * To change this template use File | Settings | File Templates.
  */
-public class PnlEditResInfo  {
+public class PnlEditResInfo {
 
 
     public static final String internalClassID = "nursingrecords.info.dlg";
@@ -48,10 +48,14 @@ public class PnlEditResInfo  {
     private HashMap components;
     private ResInfo resInfo;
     private Closure actionBlock;
-    private op.tools.PnlPIT pnlPIT;
+//    private op.tools.PnlPIT pnlPIT;
+    private JPanel pnlContent;
+    private boolean changed = false;
+
 
     /**
      * here you can get the edited ResInfo
+     *
      * @return
      */
     public ResInfo getResInfo() {
@@ -66,6 +70,37 @@ public class PnlEditResInfo  {
 
     private void initPanel() {
         content = new Properties();
+
+        pnlContent = new JPanel();
+        initPanel = true;
+
+        // Structure...
+        try {
+            String xmltext = "<?xml version=\"1.0\"?><structure>" + resInfo.getResInfoType().getXml() + "</structure>";
+            XMLReader parser = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
+            InputSource is = new org.xml.sax.InputSource(new java.io.BufferedReader(new java.io.StringReader(xmltext)));
+
+            HandlerDatenStruktur h = new HandlerDatenStruktur();
+            parser.setContentHandler(h);
+
+            parser.parse(is);
+
+            pnlContent = h.getPanel();
+
+        } catch (SAXException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+
+        // ... and content
+        setContent();
+
+        SYSTools.setXEnabled(pnlContent, false);
+
+        initPanel = false;
+
 
     }
 
@@ -95,34 +130,11 @@ public class PnlEditResInfo  {
      * in ResInfo.
      */
     public JPanel getPanel() {
-        JPanel jp = new JPanel();
-        initPanel = true;
+        return pnlContent;
+    }
 
-        // Structure...
-        try {
-            String xmltext = "<?xml version=\"1.0\"?><structure>" + resInfo.getResInfoType().getXml() + "</structure>";
-            XMLReader parser = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
-            InputSource is = new org.xml.sax.InputSource(new java.io.BufferedReader(new java.io.StringReader(xmltext)));
-
-            HandlerDatenStruktur h = new HandlerDatenStruktur();
-            parser.setContentHandler(h);
-
-            parser.parse(is);
-
-            jp = h.getPanel();
-
-        } catch (SAXException ex) {
-            ex.printStackTrace();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-
-        // ... and content
-        setContent();
-
-        initPanel = false;
-        return jp;
+    public void setEnabled(boolean enabled) {
+        SYSTools.setXEnabled(pnlContent, enabled);
     }
 
     private void calcScale() {
@@ -162,6 +174,13 @@ public class PnlEditResInfo  {
         }
     }
 
+    /**
+     * tells whether the user has changed the data or not.
+     * @return
+     */
+    public boolean isChanged() {
+        return changed;
+    }
 
     private void setContent() {
         try {
@@ -214,6 +233,7 @@ public class PnlEditResInfo  {
             if (scalemode) {
                 calcScale();
             }
+            changed = true;
         }
     }
 
@@ -223,6 +243,7 @@ public class PnlEditResInfo  {
             JCheckBox j = (JCheckBox) evt.getSource();
             String cbname = j.getName();
             content.put(cbname, Boolean.toString(j.isSelected()));
+            changed = true;
         }
     }
 
@@ -234,6 +255,7 @@ public class PnlEditResInfo  {
             ComboBoxModel cbm = j.getModel();
             ListElement le = (ListElement) cbm.getSelectedItem();
             content.put(cmbname, le.getData());
+            changed = true;
         }
     }
 
@@ -276,6 +298,7 @@ public class PnlEditResInfo  {
                 j.setText(num.toString());
             }
             content.put(j.getName(), SYSTools.escapeXML(j.getText()));
+            changed = true;
         }
     }
 

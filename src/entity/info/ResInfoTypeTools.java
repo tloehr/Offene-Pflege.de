@@ -77,7 +77,7 @@ public class ResInfoTypeTools {
 
     public static List<ResInfoType> getAllActive() {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfoType b WHERE b.type >= 0 ");
+        Query query = em.createQuery("SELECT b FROM ResInfoType b WHERE b.type >= 0 ORDER BY b.bWInfoKurz ");
         List<ResInfoType> resInfoTypen = query.getResultList();
         em.close();
         return resInfoTypen;

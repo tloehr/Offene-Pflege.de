@@ -27,7 +27,7 @@ public class ResInfoCategoryTools {
     public static final int VITAL = 120;
     public static final int ADMINISTRATIVE = 1000;
 
-    public static final String[] TYPESS = new String[]{SYSTools.xx(PnlCats.internalClassID+".type.BASICS"),SYSTools.xx(PnlCats.internalClassID+".type.NURSING"), SYSTools.xx(PnlCats.internalClassID+".type.SKIN"), SYSTools.xx(PnlCats.internalClassID+".type.VITAL"), SYSTools.xx(PnlCats.internalClassID+".type.ADMINISTRATIVE")};
+    public static final String[] TYPESS = new String[]{SYSTools.xx(PnlCats.internalClassID + ".type.BASICS"), SYSTools.xx(PnlCats.internalClassID + ".type.NURSING"), SYSTools.xx(PnlCats.internalClassID + ".type.SKIN"), SYSTools.xx(PnlCats.internalClassID + ".type.VITAL"), SYSTools.xx(PnlCats.internalClassID + ".type.ADMINISTRATIVE")};
     public static final Integer[] TYPES = new Integer[]{BASICS, NURSING, SKIN, VITAL, ADMINISTRATIVE};
 
     public static ListCellRenderer getTypesRenderer() {
@@ -73,7 +73,7 @@ public class ResInfoCategoryTools {
         long begin = System.currentTimeMillis();
         String katart = "0";   // a little trick. 0 is always viable
 
-//        katart += OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, PnlInfo.internalClassID) ? "," + STAMMDATEN : ""; // Stammdaten
+        //        katart += OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, PnlInfo.internalClassID) ? "," + STAMMDATEN : ""; // Stammdaten
         katart += OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER2, PnlInfo.internalClassID) ? "," + ADMINISTRATIVE : ""; // Verwaltung
 
         // katart below 1000 is accessible for everyone
@@ -82,9 +82,17 @@ public class ResInfoCategoryTools {
         List<ResInfoCategory> result = query.getResultList();
         em.close();
         SYSTools.showTimeDifference(begin);
-//        Collections.sort(result);
+        //        Collections.sort(result);
         return result;
     }
 
+    public static List<ResInfoCategory> getAll() {
+
+            EntityManager em = OPDE.createEM();
+            Query query = em.createQuery("SELECT DISTINCT b FROM ResInfoCategory b ORDER BY b.text ");
+            List<ResInfoCategory> result = query.getResultList();
+            em.close();
+            return result;
+        }
 
 }

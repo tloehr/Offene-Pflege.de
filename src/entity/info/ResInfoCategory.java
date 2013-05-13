@@ -5,10 +5,10 @@
 
 package entity.info;
 
-import op.OPDE;
 import op.tools.SYSTools;
 
 import javax.persistence.*;
+import java.awt.*;
 import java.io.Serializable;
 import java.util.Collection;
 
@@ -31,6 +31,8 @@ public class ResInfoCategory implements Serializable, Comparable {
     @Version
     @Column(name = "version")
     private Long version;
+    @Column(name = "color")
+    private String color;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "resInfoCat")
     private Collection<ResInfoType> resInfoTypes;
@@ -67,6 +69,10 @@ public class ResInfoCategory implements Serializable, Comparable {
     public Integer getCatType() {
 
         return catType;
+    }
+
+    public Color getColor() {
+        return SYSTools.getColor(color);
     }
 
     public void setCatType(Integer catType) {
