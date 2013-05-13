@@ -5,6 +5,7 @@
 package entity.system;
 
 import op.OPDE;
+import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -116,6 +117,9 @@ public class SYSPropsTools {
 
     public static boolean isBooleanTrue(String key, boolean defaultBoolean) {
         boolean bool = defaultBoolean;
+
+        OPDE.debug("isBooleanTrue: " + key + ": " + SYSTools.catchNull(OPDE.getProps().getProperty(key), "no key/value pair"));
+
         if (OPDE.getProps().containsKey(key)) {
             bool = OPDE.getProps().getProperty(key).equalsIgnoreCase("true");
         }

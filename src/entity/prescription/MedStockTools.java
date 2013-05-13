@@ -201,15 +201,22 @@ public class MedStockTools {
                 medStock.setUPRDummyMode(ADD_TO_AVERAGES_UPR_WHEN_CLOSING);
             } else {
                 if (medStock.getUPRDummyMode() == ADD_TO_AVERAGES_UPR_WHEN_CLOSING) {
-                    // if the deviation was too high (usually more than 20%), then the new UPR is discarded
-                    BigDecimal maxDeviation = new BigDecimal(Double.parseDouble(OPDE.getProps().getProperty("apv_korridor")));
-                    BigDecimal deviation = medStock.getUPR().divide(effectiveUPR, 4, BigDecimal.ROUND_HALF_UP).subtract(new BigDecimal(100)).abs();
-                    OPDE.debug("the deviation was: " + deviation + "%");
+                    if (effectiveUPR.compareTo(BigDecimal.ZERO) > 0) { // if this stock was never used the effective UPR must be 0. we must handle this case separately
+                        // if the deviation was too high (usually more than 20%), then the new UPR is discarded
+                        BigDecimal maxDeviation = new BigDecimal(Double.parseDouble(OPDE.getProps().getProperty("apv_korridor")));
+                        BigDecimal deviation = medStock.getUPR().divide(effectiveUPR, 4, BigDecimal.ROUND_HALF_UP).subtract(new BigDecimal(100)).abs();
+                        OPDE.debug("the deviation was: " + deviation + "%");
 
-                    // if the deviation is below the limit, then the new UPR will be accepted.
-                    // it must also be greater than 0
-                    if (deviation.compareTo(maxDeviation) <= 0 && effectiveUPR.compareTo(BigDecimal.ZERO) > 0) {
-                        medStock.setUPR(effectiveUPR);
+                        // if the deviation is below the limit, then the new UPR will be accepted.
+                        // it must also be greater than 0
+                        if (deviation.compareTo(maxDeviation) <= 0 && effectiveUPR.compareTo(BigDecimal.ZERO) > 0) {
+                            OPDE.debug("acceptable");
+                            medStock.setUPR(effectiveUPR);
+                        } else {
+                            OPDE.debug("discarded");
+                        }
+                    } else {
+                        OPDE.debug("effective UPR is 0 or less. new UPR discarded");
                     }
                 } else if (medStock.getUPRDummyMode() == REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING) {  // REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING
                     medStock.setUPR(effectiveUPR);

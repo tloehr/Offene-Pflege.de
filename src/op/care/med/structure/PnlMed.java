@@ -63,6 +63,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * @author tloehr
@@ -446,6 +447,15 @@ public class PnlMed extends CleanablePanel {
             });
 
             list.add(addButton);
+        }
+
+        OPDE.debug("isCalcMediUPR1: " + OPDE.isCalcMediUPR1());
+
+        if (OPDE.isDebug()) {
+            Iterator it = OPDE.getProps().entrySet().iterator();
+            while (it.hasNext()) {
+                OPDE.debug(it.next().toString());
+            }
         }
 
         if (OPDE.isCalcMediUPR1() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
