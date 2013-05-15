@@ -3,6 +3,7 @@ package entity.prescription;
 import entity.info.Resident;
 import entity.system.Users;
 import op.OPDE;
+import op.tools.GUITools;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 
@@ -204,16 +205,16 @@ public class BHP implements Serializable, Comparable<BHP> {
 
     public Color getFG() {
         if (isOnDemand()) {
-            return SYSTools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGBHP"));
+            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGBHP"));
         }
-        return SYSTools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[getShift()] + "_FGBHP"));
+        return GUITools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[getShift()] + "_FGBHP"));
     }
 
     public Color getBG() {
         if (isOnDemand()) {
-            return SYSTools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGBHP"));
+            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGBHP"));
         }
-        return SYSTools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[getShift()] + "_BGBHP"));
+        return GUITools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[getShift()] + "_BGBHP"));
     }
 
     public void setDosis(BigDecimal dosis) {

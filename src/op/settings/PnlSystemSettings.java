@@ -443,7 +443,7 @@ public class PnlSystemSettings extends CleanablePanel {
                         }
                     }
                 }, btnAddHome);
-                GUITools.showPopup(popup, SwingConstants.SOUTH);
+                GUITools.showPopup(popup, SwingConstants.EAST);
                 pnlHomes.setStartFocus();
             }
         });
@@ -475,7 +475,7 @@ public class PnlSystemSettings extends CleanablePanel {
                             }
                         }
                     }, btnAddStation);
-                    GUITools.showPopup(popup, SwingConstants.SOUTH);
+                    GUITools.showPopup(popup, SwingConstants.EAST);
                 }
             });
 
@@ -528,7 +528,7 @@ public class PnlSystemSettings extends CleanablePanel {
                                 }
                             }
                         }, btnEditStation);
-                        GUITools.showPopup(popup, SwingConstants.SOUTH_WEST);
+                        GUITools.showPopup(popup, SwingConstants.EAST);
                     }
                 });
 

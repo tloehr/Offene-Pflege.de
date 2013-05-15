@@ -1513,29 +1513,29 @@ public class SYSCalendar {
 
     public static Color getFGSHIFT(Byte shift) {
         if (shift == BHPTools.SHIFT_ON_DEMAND) {
-            return SYSTools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGSHIFT"));
+            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGSHIFT"));
         }
-        return SYSTools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[shift] + "_FGSHIFT"));
+        return GUITools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[shift] + "_FGSHIFT"));
     }
 
     public static Color getBGSHIFT(Byte shift) {
         if (shift == BHPTools.SHIFT_ON_DEMAND) {
-            return SYSTools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGSHIFT"));
+            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGSHIFT"));
         }
-        return SYSTools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[shift] + "_BGSHIFT"));
+        return GUITools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[shift] + "_BGSHIFT"));
     }
 
     public static Color getFG(Byte shift) {
         if (shift == -1) {
-            return SYSTools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGBHP"));
+            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGBHP"));
         }
-        return SYSTools.getColor(OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[shift] + "_FGBHP"));
+        return GUITools.getColor(OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[shift] + "_FGBHP"));
     }
 
     public static Color getBG(Byte shift) {
         if (shift == -1) {
-            return SYSTools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGBHP"));
+            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGBHP"));
         }
-        return SYSTools.getColor(OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[shift] + "_BGBHP"));
+        return GUITools.getColor(OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[shift] + "_BGBHP"));
     }
 }

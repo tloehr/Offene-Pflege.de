@@ -3,6 +3,7 @@ package entity.nursingprocess;
 import entity.info.Resident;
 import entity.system.Users;
 import op.OPDE;
+import op.tools.GUITools;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 
@@ -246,16 +247,16 @@ public class DFN implements Serializable, Comparable<DFN> {
 
     public Color getFG() {
         if (isOnDemand()) {
-            return SYSTools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGBHP"));
+            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGBHP"));
         }
-        return SYSTools.getColor(OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[getShift()] + "_FGBHP"));
+        return GUITools.getColor(OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[getShift()] + "_FGBHP"));
     }
 
     public Color getBG() {
         if (isOnDemand()) {
-            return SYSTools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGBHP"));
+            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGBHP"));
         }
-        return SYSTools.getColor(OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[getShift()] + "_BGBHP"));
+        return GUITools.getColor(OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[getShift()] + "_BGBHP"));
     }
 
     public void setNursingProcess(NursingProcess nursingProcess) {

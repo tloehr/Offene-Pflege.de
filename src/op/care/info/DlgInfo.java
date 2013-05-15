@@ -10,7 +10,6 @@ import com.jgoodies.forms.layout.FormLayout;
 import entity.info.ResInfo;
 import entity.info.ResInfoTypeTools;
 import op.OPDE;
-import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.HorizontalLayout;
@@ -296,7 +295,7 @@ public class DlgInfo extends MyJDialog {
                 }
             }
             sumlabel.setText(scalesumlabeltext + ": " + scalesum + " (" + risiko + ")");
-            sumlabel.setForeground(SYSTools.getColor(color));
+            sumlabel.setForeground(GUITools.getColor(color));
         }
     }
 
@@ -488,7 +487,7 @@ public class DlgInfo extends MyJDialog {
             if (tagName.equalsIgnoreCase("tabgroup")) {
                 JLabel jl = new JLabel(attributes.getValue("label") + ":");
                 if (!SYSTools.catchNull(attributes.getValue("color")).isEmpty()) {
-                    jl.setForeground(SYSTools.getColor(attributes.getValue("color")));
+                    jl.setForeground(GUITools.getColor(attributes.getValue("color")));
                 }
                 if (!SYSTools.catchNull(attributes.getValue("size")).isEmpty()) {
 //                    int size = Integer.parseInt(attributes.getValue("size"));
@@ -598,7 +597,7 @@ public class DlgInfo extends MyJDialog {
                 groupname = attributes.getValue("name");
                 JLabel jl = new JLabel(attributes.getValue("label"));
                 if (!SYSTools.catchNull(attributes.getValue("color")).isEmpty()) {
-                    jl.setForeground(SYSTools.getColor(attributes.getValue("color")));
+                    jl.setForeground(GUITools.getColor(attributes.getValue("color")));
                 }
                 if (!SYSTools.catchNull(attributes.getValue("size")).isEmpty()) {
 //                    int size = Integer.parseInt(attributes.getValue("size"));

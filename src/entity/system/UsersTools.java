@@ -5,6 +5,7 @@
 package entity.system;
 
 import op.OPDE;
+import op.tools.GUITools;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
@@ -69,8 +70,8 @@ public class UsersTools {
     }
 
     public static Color getBG1(Users user) {
-        Color active = SYSTools.getColor("CEF0FF");
-        Color closed = SYSTools.getColor("C0C0C0");
+        Color active = GUITools.getColor("CEF0FF");
+        Color closed = GUITools.getColor("C0C0C0");
         if (user.isActive()) {
             return active;
         }

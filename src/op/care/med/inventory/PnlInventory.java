@@ -416,7 +416,7 @@ public class PnlInventory extends NursingRecordsPanel {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     new DlgYesNo(OPDE.lang.getString("nursingrecords.inventory.question.close1") + "<br/><b>" + inventory.getText() + "</b>" +
-                            "<br/>" + OPDE.lang.getString("nursingrecords.inventory.question.close2"), SYSConst.icon48stop, new Closure() {
+                            "<br/>" + OPDE.lang.getString("nursingrecords.inventory.question.close2"), SYSConst.icon48playerStop, new Closure() {
                         @Override
                         public void execute(Object answer) {
                             if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -1076,12 +1076,12 @@ public class PnlInventory extends NursingRecordsPanel {
                                 em.lock(myStock, LockModeType.OPTIMISTIC);
                                 em.lock(myStock.getInventory(), LockModeType.OPTIMISTIC);
                                 em.lock(em.merge(myTX.getStock().getInventory().getResident()), LockModeType.OPTIMISTIC);
+                                em.getTransaction().commit();
+
                                 int indexInventory = lstInventories.indexOf(stock.getInventory());
                                 int indexStock = lstInventories.get(indexInventory).getMedStocks().indexOf(stock);
                                 lstInventories.get(indexInventory).getMedStocks().remove(stock);
                                 lstInventories.get(indexInventory).getMedStocks().add(indexStock, myStock);
-                                em.getTransaction().commit();
-
                                 createCP4(myStock.getInventory());
 
                                 buildPanel();

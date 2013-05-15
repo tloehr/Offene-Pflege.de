@@ -165,7 +165,7 @@ public class DlgUPREditor extends MyJDialog {
     }
 
     private void btnSaveActionPerformed(ActionEvent e) {
-        new DlgYesNo(OPDE.lang.getString("upreditor.changeupr.yesno"), SYSConst.icon48stop, new Closure() {
+        new DlgYesNo(OPDE.lang.getString("upreditor.changeupr.yesno"), SYSConst.icon48playerStop, new Closure() {
             @Override
             public void execute(Object answer) {
                 if (answer.equals(JOptionPane.YES_OPTION)) {

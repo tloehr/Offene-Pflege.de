@@ -45,10 +45,14 @@ public class SYSConst {
     public static final Font ARIAL10BOLD = new Font("Arial", Font.BOLD, 10);
     public static final Font ARIAL12BOLD = new Font("Arial", Font.BOLD, 12);
     public static final Font ARIAL14 = new Font("Arial", Font.PLAIN, 14);
-    public static final Font ARIAL14BOLD = new Font("Arial", Font.BOLD, 14);
+    public static final Font ARIAL14BOLD = new Font("Arial", Font.BOLD, 16);
+    public static final Font ARIAL16 = new Font("Arial", Font.PLAIN, 16);
+    public static final Font ARIAL16BOLD = new Font("Arial", Font.BOLD, 14);
     public static final Font ARIAL20 = new Font("Arial", Font.PLAIN, 20);
     public static final Font ARIAL18 = new Font("Arial", Font.PLAIN, 18);
     public static final Font ARIAL18BOLD = new Font("Arial", Font.BOLD, 18);
+    public static final Font ARIAL24BOLD = new Font("Arial", Font.BOLD, 24);
+    public static final Font ARIAL24 = new Font("Arial", Font.PLAIN, 24);
     public static final Font ARIAL20BOLD = new Font("Arial", Font.BOLD, 20);
     public static final Font ARIAL28 = new Font("Arial", Font.PLAIN, 28);
 
@@ -136,89 +140,89 @@ public class SYSConst {
     public static final int light1 = 11;
 
     public static Color[] purple1 = new Color[]{
-            SYSTools.getColor("800080"), SYSTools.getColor("BF00BF"),
-            SYSTools.getColor("DB00DB"), SYSTools.getColor("F900F9"),
-            SYSTools.getColor("FF4AFF"), SYSTools.getColor("FF86FF"),
-            SYSTools.getColor("FFA4FF"), SYSTools.getColor("FFBBFF"),
-            SYSTools.getColor("FFCEFF"), SYSTools.getColor("FFDFFF"),
-            SYSTools.getColor("FFECFF"), SYSTools.getColor("FFF9FF")
+            GUITools.getColor("800080"), GUITools.getColor("BF00BF"),
+            GUITools.getColor("DB00DB"), GUITools.getColor("F900F9"),
+            GUITools.getColor("FF4AFF"), GUITools.getColor("FF86FF"),
+            GUITools.getColor("FFA4FF"), GUITools.getColor("FFBBFF"),
+            GUITools.getColor("FFCEFF"), GUITools.getColor("FFDFFF"),
+            GUITools.getColor("FFECFF"), GUITools.getColor("FFF9FF")
     };
 
     public static Color[] greyscale = new Color[]{
-            SYSTools.getColor("2E2E2E"), SYSTools.getColor("424242"),
-            SYSTools.getColor("585858"), SYSTools.getColor("6E6E6E"),
-            SYSTools.getColor("848484"), SYSTools.getColor("A4A4A4"),
-            SYSTools.getColor("BDBDBD"), SYSTools.getColor("D8D8D8"),
-            SYSTools.getColor("E6E6E6"), SYSTools.getColor("F2F2F2"),
-            SYSTools.getColor("FAFAFA"), SYSTools.getColor("FFFFFF")
+            GUITools.getColor("2E2E2E"), GUITools.getColor("424242"),
+            GUITools.getColor("585858"), GUITools.getColor("6E6E6E"),
+            GUITools.getColor("848484"), GUITools.getColor("A4A4A4"),
+            GUITools.getColor("BDBDBD"), GUITools.getColor("D8D8D8"),
+            GUITools.getColor("E6E6E6"), GUITools.getColor("F2F2F2"),
+            GUITools.getColor("FAFAFA"), GUITools.getColor("FFFFFF")
     };
 
     public static Color[] yellow1 = new Color[]{
-            SYSTools.getColor("C8B400"), SYSTools.getColor("D9C400"),
-            SYSTools.getColor("E6CE00"), SYSTools.getColor("F7DE00"),
-            SYSTools.getColor("FFE920"), SYSTools.getColor("FFF06A"),
-            SYSTools.getColor("FFF284"), SYSTools.getColor("FFF7B7"),
-            SYSTools.getColor("FFF9CE"), SYSTools.getColor("FFFBDF"),
-            SYSTools.getColor("FFFEF7"), SYSTools.getColor("FFFFFF")
+            GUITools.getColor("C8B400"), GUITools.getColor("D9C400"),
+            GUITools.getColor("E6CE00"), GUITools.getColor("F7DE00"),
+            GUITools.getColor("FFE920"), GUITools.getColor("FFF06A"),
+            GUITools.getColor("FFF284"), GUITools.getColor("FFF7B7"),
+            GUITools.getColor("FFF9CE"), GUITools.getColor("FFFBDF"),
+            GUITools.getColor("FFFEF7"), GUITools.getColor("FFFFFF")
     };
 
     public static Color[] blue1 = new Color[]{
-            SYSTools.getColor("3923D6"), SYSTools.getColor("6755E3"),
-            SYSTools.getColor("8678E9"), SYSTools.getColor("9588EC"),
-            SYSTools.getColor("A095EE"), SYSTools.getColor("B0A7F1"),
-            SYSTools.getColor("BCB4F3"), SYSTools.getColor("CBC5F5"),
-            SYSTools.getColor("D7D1F8"), SYSTools.getColor("E3E0FA"),
-            SYSTools.getColor("EFEDFC"), SYSTools.getColor("F7F5FE")
+            GUITools.getColor("3923D6"), GUITools.getColor("6755E3"),
+            GUITools.getColor("8678E9"), GUITools.getColor("9588EC"),
+            GUITools.getColor("A095EE"), GUITools.getColor("B0A7F1"),
+            GUITools.getColor("BCB4F3"), GUITools.getColor("CBC5F5"),
+            GUITools.getColor("D7D1F8"), GUITools.getColor("E3E0FA"),
+            GUITools.getColor("EFEDFC"), GUITools.getColor("F7F5FE")
     };
 
     public static Color[] red1 = new Color[]{
-            SYSTools.getColor("F70000"), SYSTools.getColor("FF2626"),
-            SYSTools.getColor("FF5353"), SYSTools.getColor("FF7373"),
-            SYSTools.getColor("FF8E8E"), SYSTools.getColor("FFA4A4"),
-            SYSTools.getColor("FFB5B5"), SYSTools.getColor("FFC8C8"),
-            SYSTools.getColor("FFEAEA"), SYSTools.getColor("FFEAEA"),
-            SYSTools.getColor("FFFDFD"), SYSTools.getColor("FFFDFD")
+            GUITools.getColor("F70000"), GUITools.getColor("FF2626"),
+            GUITools.getColor("FF5353"), GUITools.getColor("FF7373"),
+            GUITools.getColor("FF8E8E"), GUITools.getColor("FFA4A4"),
+            GUITools.getColor("FFB5B5"), GUITools.getColor("FFC8C8"),
+            GUITools.getColor("FFEAEA"), GUITools.getColor("FFEAEA"),
+            GUITools.getColor("FFFDFD"), GUITools.getColor("FFFDFD")
     };
 
     public static Color[] red2 = new Color[]{
-            SYSTools.getColor("B9264F"), SYSTools.getColor("D73E68"),
-            SYSTools.getColor("DD597D"), SYSTools.getColor("E37795"),
-            SYSTools.getColor("E994AB"), SYSTools.getColor("EDA9BC"),
-            SYSTools.getColor("F0B9C8"), SYSTools.getColor("F4CAD6"),
-            SYSTools.getColor("F8DAE2"), SYSTools.getColor("FAE7EC"),
-            SYSTools.getColor("FEFAFB"), SYSTools.getColor("FEFAFB")
+            GUITools.getColor("B9264F"), GUITools.getColor("D73E68"),
+            GUITools.getColor("DD597D"), GUITools.getColor("E37795"),
+            GUITools.getColor("E994AB"), GUITools.getColor("EDA9BC"),
+            GUITools.getColor("F0B9C8"), GUITools.getColor("F4CAD6"),
+            GUITools.getColor("F8DAE2"), GUITools.getColor("FAE7EC"),
+            GUITools.getColor("FEFAFB"), GUITools.getColor("FEFAFB")
     };
 
     public static Color[] orange1 = new Color[]{
-            SYSTools.getColor("FF800D"), SYSTools.getColor("FF9C42"),
-            SYSTools.getColor("FFAC62"), SYSTools.getColor("FFBD82"),
-            SYSTools.getColor("FFC895"), SYSTools.getColor("FFCEA2"),
-            SYSTools.getColor("FFD7B3"), SYSTools.getColor("FFE2C8"),
-            SYSTools.getColor("FFE6D0"), SYSTools.getColor("FFF1E6"),
-            SYSTools.getColor("FFF9F4"), SYSTools.getColor("FFF9F4")
+            GUITools.getColor("FF800D"), GUITools.getColor("FF9C42"),
+            GUITools.getColor("FFAC62"), GUITools.getColor("FFBD82"),
+            GUITools.getColor("FFC895"), GUITools.getColor("FFCEA2"),
+            GUITools.getColor("FFD7B3"), GUITools.getColor("FFE2C8"),
+            GUITools.getColor("FFE6D0"), GUITools.getColor("FFF1E6"),
+            GUITools.getColor("FFF9F4"), GUITools.getColor("FFF9F4")
     };
 
     public static Color[] green1 = new Color[]{
-            SYSTools.getColor("1FCB4A"), SYSTools.getColor("27DE55"),
-            SYSTools.getColor("4AE371"), SYSTools.getColor("7CEB98"),
-            SYSTools.getColor("93EEAA"), SYSTools.getColor("A4F0B7"),
-            SYSTools.getColor("BDF4CB"), SYSTools.getColor("D6F8DE"),
-            SYSTools.getColor("E3FBE9"), SYSTools.getColor("E3FBE9"),
-            SYSTools.getColor("FAFEFB"), SYSTools.getColor("FFFFFF")
+            GUITools.getColor("1FCB4A"), GUITools.getColor("27DE55"),
+            GUITools.getColor("4AE371"), GUITools.getColor("7CEB98"),
+            GUITools.getColor("93EEAA"), GUITools.getColor("A4F0B7"),
+            GUITools.getColor("BDF4CB"), GUITools.getColor("D6F8DE"),
+            GUITools.getColor("E3FBE9"), GUITools.getColor("E3FBE9"),
+            GUITools.getColor("FAFEFB"), GUITools.getColor("FFFFFF")
     };
 
     public static Color[] green2 = new Color[]{
-            SYSTools.getColor("4A9586"), SYSTools.getColor("5EAE9E"),
-            SYSTools.getColor("74BAAC"), SYSTools.getColor("8DC7BB"),
-            SYSTools.getColor("A5D3CA"), SYSTools.getColor("C0E0DA"),
-            SYSTools.getColor("CFE7E2"), SYSTools.getColor("DCEDEA"),
-            SYSTools.getColor("E7F3F1"), SYSTools.getColor("F2F9F8"),
-            SYSTools.getColor("F7FBFA"), SYSTools.getColor("FFFFFF")
+            GUITools.getColor("4A9586"), GUITools.getColor("5EAE9E"),
+            GUITools.getColor("74BAAC"), GUITools.getColor("8DC7BB"),
+            GUITools.getColor("A5D3CA"), GUITools.getColor("C0E0DA"),
+            GUITools.getColor("CFE7E2"), GUITools.getColor("DCEDEA"),
+            GUITools.getColor("E7F3F1"), GUITools.getColor("F2F9F8"),
+            GUITools.getColor("F7FBFA"), GUITools.getColor("FFFFFF")
     };
 
-    public static Color colorWeekday = SYSTools.getColor("FFE6D0");
-    public static Color colorWeekend = SYSTools.getColor("FFC895");
-    public static Color colorHolliday = SYSTools.getColor("FF800D");
+    public static Color colorWeekday = GUITools.getColor("FFE6D0");
+    public static Color colorWeekend = GUITools.getColor("FFC895");
+    public static Color colorHolliday = GUITools.getColor("FF800D");
 
     public static char eurosymbol = '\u20AC';
     public static final GregorianCalendar VERY_BEGINNING = new GregorianCalendar(1970, GregorianCalendar.JANUARY, 1, 0, 0, 0);
@@ -469,7 +473,7 @@ public class SYSConst {
     public static final Icon icon22changePeriodPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/reload_page_pressed.png"));
     public static final Icon icon22clock = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/clock.png"));
     public static final Icon icon22clock1 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/clock.png"));
-    public static final Icon icon22clockPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/edit3_pressed.png"));
+    public static final Icon icon22clockPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/pressed.png"));
     public static final Icon icon22delete = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/editdelete.png"));
     public static final Icon icon22deletePressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/editdelete_pressed.png"));
     public static final Icon icon22deleteall = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/deleteall.png"));
@@ -481,7 +485,7 @@ public class SYSConst {
     public static final Icon icon32menu = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/bw/menu.png"));
     public static final Icon icon32Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/bw/pressed.png"));
     public static final Icon icon22Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/pressed.png"));
-    public static final Icon icon22edit3Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/edit3_pressed.png"));
+    public static final Icon icon22edit3Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/edit3_invert.png"));
     //    public static final Icon icon22edit1 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/edit1.png"));
 //    public static final Icon icon22edit1Pressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/edit1_pressed.png"));
     public static final Icon icon22editPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/kspread_pressed.png"));
@@ -548,7 +552,7 @@ public class SYSConst {
     public static final Icon icon48kgetdock = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/kget_dock.png"));
     public static final Icon icon48play = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/bw/player_play.png"));
     public static final Icon icon48undo = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/bw/undo.png"));
-    public static final Icon icon48stop = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/bw/player_stop.png"));
+    public static final Icon icon48playerStop = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/bw/player_stop.png"));
     public static final Icon icon48take = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/take-over.png"));
     public static final Icon icon48userconfig = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/userconfig.png"));
     public static final Icon icon48systemconfig = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/systemconfig.png"));
@@ -585,10 +589,13 @@ public class SYSConst {
     public static final Icon icon22addrow = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/shetaddrow.png"));
     public static final Icon icon22biohazard = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/biohazard.png"));
     public static final Icon icon48biohazard = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/biohazard.png"));
+    public static final Icon icon48edit = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/edit3.png"));
     public static final Icon icon22diabetes = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/diabetes.png"));
     public static final Icon icon22medical = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/medical.png"));
     public static final Icon icon22warning = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/medical.png"));
     public static final Icon icon22work = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/work.png"));
+    public static final Icon icon22colorset = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/colorset.png"));
+    public static final Icon icon22colorsetPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/colorset_pressed.png"));
     public static final Icon icon22allergy = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/allergy.png"));
     public static final Icon gfx259x203medic0 = new ImageIcon(SYSConst.class.getResource("/artwork/other/medicine0.png"));
     public static final Icon gfx259x203medic1 = new ImageIcon(SYSConst.class.getResource("/artwork/other/medicine1.png"));

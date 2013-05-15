@@ -136,16 +136,16 @@ public class ResInfoTools {
     }
 
     public static ArrayList<ResInfo> getActive(Resident bewohner, ResInfoCategory cat) {
-            EntityManager em = OPDE.createEM();
-            Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.from <= :from AND b.to >= :to AND b.bwinfotyp.resInfoCat = :cat ORDER BY b.from DESC, b.bwinfotyp.bwinftyp");
-            query.setParameter("bewohner", bewohner);
-            query.setParameter("cat", cat);
-            query.setParameter("from", new Date());
-            query.setParameter("to", new Date());
-            ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
-            em.close();
-            return resInfos;
-        }
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.from <= :from AND b.to >= :to AND b.bwinfotyp.resInfoCat = :cat ORDER BY b.from DESC, b.bwinfotyp.bwinftyp");
+        query.setParameter("bewohner", bewohner);
+        query.setParameter("cat", cat);
+        query.setParameter("from", new Date());
+        query.setParameter("to", new Date());
+        ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
+        em.close();
+        return resInfos;
+    }
 
     public static ArrayList<ResInfo> getActive(Resident bewohner, int katart) {
         EntityManager em = OPDE.createEM();
@@ -270,7 +270,12 @@ public class ResInfoTools {
     }
 
     public static boolean isEditable(ResInfo resInfo) {
-        return resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD && resInfo.getResident().isActive() && (!resInfo.isClosed() || resInfo.isNoConstraints() || resInfo.isSingleIncident());
+        return resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS
+                && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_ABSENCE
+                && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY
+                && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD
+                && resInfo.getResident().isActive()
+                && (!resInfo.isClosed() || resInfo.isNoConstraints() || resInfo.isSingleIncident());
     }
 
     /**

@@ -12,9 +12,11 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -47,24 +49,18 @@ public class PnlEditResInfo {
     private ArrayList<String> scaleButtonGroups; // eine Liste mit den Namen der Buttongroups eines scales;
     private HashMap components;
     private ResInfo resInfo;
-    private Closure actionBlock;
-//    private op.tools.PnlPIT pnlPIT;
-    private JPanel pnlContent;
+    private Closure closure;
+    //    private op.tools.PnlPIT pnlPIT;
+    private JPanel pnlContent, main;
     private boolean changed = false;
 
-
-    /**
-     * here you can get the edited ResInfo
-     *
-     * @return
-     */
-    public ResInfo getResInfo() {
-        return resInfo;
+    public PnlEditResInfo(ResInfo resInfo) {
+        this(resInfo, null);
     }
 
-    public PnlEditResInfo(ResInfo resInfo, Closure actionBlock) {
+    public PnlEditResInfo(ResInfo resInfo, Closure closure) {
         this.resInfo = resInfo;
-        this.actionBlock = actionBlock;
+        this.closure = closure;
         initPanel();
     }
 
@@ -96,33 +92,53 @@ public class PnlEditResInfo {
 
         // ... and content
         setContent();
-
-        SYSTools.setXEnabled(pnlContent, false);
-
         initPanel = false;
 
+        // add apply and cancel button
+        main = null;
+        if (closure != null) {
+            main = new JPanel(new BorderLayout());
+            main.add(pnlContent, BorderLayout.CENTER);
 
+            JPanel btnPanel = new JPanel(new BorderLayout());
+
+            JButton apply = new JButton(SYSConst.icon22apply);
+            apply.setPressedIcon(SYSConst.icon22applyPressed);
+            apply.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            apply.setContentAreaFilled(false);
+            apply.setBorder(null);
+            apply.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    closure.execute(getResInfo());
+                }
+            });
+            btnPanel.add(apply, BorderLayout.LINE_END);
+            main.add(btnPanel, BorderLayout.SOUTH);
+        }
+
+        SYSTools.setXEnabled(pnlContent, main != null);
     }
 
-//        private void btnOKActionPerformed(ActionEvent e) {
+
+    public ResInfo getResInfo() {
 //            if (pnlPIT != null) {
-//                resInfo.setFrom(pnlPIT.getPIT());
+//            resInfo.setFrom(pnlPIT.getPIT());
+
 //            }
-//
-//            try {
-//                StringWriter writer = new StringWriter();
-//                content.store(writer, "[" + resInfo.getResInfoType().getID() + "] " + resInfo.getResInfoType().getShortDescription());
-//                resInfo.setProperties(writer.toString());
-//                writer.close();
-//            } catch (IOException e1) {
-//                OPDE.fatal(e1);
-//            }
-//
-//            resInfo.setText(txtBemerkung.getText().trim());
-//
-//            dispose();
-//        }
-//
+
+
+        try {
+            StringWriter writer = new StringWriter();
+            content.store(writer, "[" + resInfo.getResInfoType().getID() + "] " + resInfo.getResInfoType().getShortDescription());
+            resInfo.setProperties(writer.toString());
+            writer.close();
+        } catch (IOException e1) {
+            OPDE.fatal(e1);
+        }
+
+        return resInfo;
+    }
 
 
     /**
@@ -130,6 +146,7 @@ public class PnlEditResInfo {
      * in ResInfo.
      */
     public JPanel getPanel() {
+        if (main != null) return main;
         return pnlContent;
     }
 
@@ -170,12 +187,13 @@ public class PnlEditResInfo {
                 }
             }
             sumlabel.setText(scalesumlabeltext + ": " + scalesum + " (" + risiko + ")");
-            sumlabel.setForeground(SYSTools.getColor(color));
+            sumlabel.setForeground(GUITools.getColor(color));
         }
     }
 
     /**
      * tells whether the user has changed the data or not.
+     *
      * @return
      */
     public boolean isChanged() {
@@ -373,7 +391,7 @@ public class PnlEditResInfo {
             if (tagName.equalsIgnoreCase("tabgroup")) {
                 JLabel jl = new JLabel(attributes.getValue("label") + ":");
                 if (!SYSTools.catchNull(attributes.getValue("color")).isEmpty()) {
-                    jl.setForeground(SYSTools.getColor(attributes.getValue("color")));
+                    jl.setForeground(GUITools.getColor(attributes.getValue("color")));
                 }
                 if (!SYSTools.catchNull(attributes.getValue("size")).isEmpty()) {
                     //                    int size = Integer.parseInt(attributes.getValue("size"));
@@ -481,7 +499,7 @@ public class PnlEditResInfo {
                 groupname = attributes.getValue("name");
                 JLabel jl = new JLabel(attributes.getValue("label"));
                 if (!SYSTools.catchNull(attributes.getValue("color")).isEmpty()) {
-                    jl.setForeground(SYSTools.getColor(attributes.getValue("color")));
+                    jl.setForeground(GUITools.getColor(attributes.getValue("color")));
                 }
                 if (!SYSTools.catchNull(attributes.getValue("size")).isEmpty()) {
                     //                    int size = Integer.parseInt(attributes.getValue("size"));

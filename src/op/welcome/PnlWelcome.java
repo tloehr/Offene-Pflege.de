@@ -14,8 +14,6 @@ import com.jidesoft.wizard.WizardDialog;
 import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
-import entity.prescription.DosageFormTools;
-import entity.prescription.MedInventoryTools;
 import entity.prescription.MedStock;
 import entity.prescription.MedStockTools;
 import entity.process.QProcess;
@@ -50,7 +48,6 @@ import java.math.RoundingMode;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Properties;
@@ -202,7 +199,7 @@ public class PnlWelcome extends CleanablePanel {
 
                 if (!birthdayList.isEmpty()) {
                     String title = "<html><font size=+1>" +
-                            OPDE.lang.getString(internalClassID + ".birthdayNext") + " " + BIRTHDAY + " " + OPDE.lang.getString("misc.msg.Days") +
+                            OPDE.lang.getString("opde.welcome.birthdayNext") + " " + BIRTHDAY + " " + OPDE.lang.getString("misc.msg.Days") +
                             "</font></html>";
                     CollapsiblePane cp = new CollapsiblePane(title);
                     JPanel pnlContent = new JPanel(new VerticalLayout());
@@ -243,7 +240,7 @@ public class PnlWelcome extends CleanablePanel {
 
                 if (!violatingLiquidValues.isEmpty()) {
                     String title = "<html><font size=+1>" +
-                            OPDE.lang.getString(PnlValues.internalClassID + ".residentsWithHighOrLowIn") + "</font></html>";
+                            OPDE.lang.getString("nursingrecords.vitalparameters.residentsWithHighOrLowIn") + "</font></html>";
                     CollapsiblePane cp = new CollapsiblePane(title);
                     JPanel pnlContent = new JPanel(new VerticalLayout());
                     for (Object[] ns : violatingLiquidValues) {
@@ -287,9 +284,9 @@ public class PnlWelcome extends CleanablePanel {
                 "<tr valign=\"top\">" +
                 "<td width=\"200\" align=\"left\">" +
                 "<b>" + ResidentTools.getTextCompact(resident) + "</b></td>" +
-                "<td width=\"200\" align=\"left\">" + OPDE.lang.getString(internalClassID + ".lastStool") + ": " +
+                "<td width=\"200\" align=\"left\">" + OPDE.lang.getString("opde.welcome.lastStool") + ": " +
                 (lastStool == null ? OPDE.lang.getString("misc.msg.noentryyet") : DateFormat.getDateInstance().format(lastStool.getPit())) + "</td>" +
-                "<td width=\"200\" align=\"left\">" + OPDE.lang.getString(internalClassID + ".controlPeriod") + ": " +
+                "<td width=\"200\" align=\"left\">" + OPDE.lang.getString("opde.welcome.controlPeriod") + ": " +
                 daysControl + " " + OPDE.lang.getString("misc.msg.Days2") + "</td>" +
                 "</tr>" +
                 "</table>" +
@@ -347,12 +344,12 @@ public class PnlWelcome extends CleanablePanel {
             // TODO: replace ml with the values of the ResValueTypes
             if (highin != null && highin.compareTo(val.getSecond()) < 0) {
                 title += "<td width=\"350\" align=\"left\"><b>" +
-                        OPDE.lang.getString("misc.msg.tooHigh") + "</b>, " + OPDE.lang.getString(internalClassID + ".highin") +
+                        OPDE.lang.getString("misc.msg.tooHigh") + "</b>, " + OPDE.lang.getString("opde.welcome.highin") +
                         ": " + highin.setScale(2, RoundingMode.HALF_UP).toPlainString() + " ml</td>";
             }
             if (lowin != null && lowin.compareTo(val.getSecond()) > 0) {
                 title += "<td width=\"350\" align=\"left\"><b>" +
-                        OPDE.lang.getString("misc.msg.tooLow") + "</b>, " + OPDE.lang.getString(internalClassID + ".lowin") +
+                        OPDE.lang.getString("misc.msg.tooLow") + "</b>, " + OPDE.lang.getString("opde.welcome.lowin") +
                         ": " + lowin.setScale(2, RoundingMode.HALF_UP).toPlainString() + " ml</td>";
             }
 
@@ -385,7 +382,7 @@ public class PnlWelcome extends CleanablePanel {
     private DefaultCPTitle createCP4Birthdays(final Resident resident, int newAge, int days2Birthday) {
 
 
-        String textInTheMiddle = OPDE.lang.getString(internalClassID + ".becomesindays") + days2Birthday + OPDE.lang.getString("misc.msg.Days");
+        String textInTheMiddle = OPDE.lang.getString("opde.welcome.becomesindays") + " " + days2Birthday + " " + OPDE.lang.getString("misc.msg.Days");
         if (days2Birthday == 1) {
             textInTheMiddle = OPDE.lang.getString("misc.msg.becomes") + " " + OPDE.lang.getString("misc.msg.tomorrow");
         } else if (days2Birthday == 0) {
@@ -396,7 +393,7 @@ public class PnlWelcome extends CleanablePanel {
                 "<tr valign=\"top\">" +
                 "<td width=\"100\" align=\"left\">" + DateFormat.getDateInstance().format(resident.getDOB()) + "</td>" +
                 "<td width=\"400\" align=\"left\">" +
-                "<b>" + ResidentTools.getTextCompact(resident) + "</b> " + textInTheMiddle + " " + newAge + " " + OPDE.lang.getString(internalClassID + ".yearsold") +
+                "<b>" + ResidentTools.getTextCompact(resident) + "</b> " + textInTheMiddle + " " + newAge + " " + OPDE.lang.getString("opde.welcome.yearsold") +
                 "</td>" +
                 "</tr>" +
                 "</table>" +
@@ -485,7 +482,7 @@ public class PnlWelcome extends CleanablePanel {
 
                 "</html>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title,new ActionListener() {
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 OPDE.getMainframe().clearPreviousProgbutton();
@@ -493,7 +490,6 @@ public class PnlWelcome extends CleanablePanel {
                 OPDE.getMainframe().setPanelTo(new PnlCare(stock.getInventory().getResident(), jspSearch));
             }
         });
-
 
 
 //        if (qProcess.isRevisionPastDue()) {
@@ -621,7 +617,7 @@ public class PnlWelcome extends CleanablePanel {
         java.util.List<Component> list = new ArrayList<Component>();
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlInfo.internalClassID)) { // => ACLMATRIX
-            JideButton addbw = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".addbw"), SYSConst.icon22addbw, null);
+            JideButton addbw = GUITools.createHyperlinkButton(OPDE.lang.getString("opde.welcome.addbw"), SYSConst.icon22addbw, null);
 //            final MyJDialog dlg = new MyJDialog();
             addbw.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
             addbw.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -647,7 +643,7 @@ public class PnlWelcome extends CleanablePanel {
 
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlNursingProcess.internalClassID)) {
-            JideButton editInterventions = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".editInterventions"), SYSConst.icon22work, null);
+            JideButton editInterventions = GUITools.createHyperlinkButton(OPDE.lang.getString("opde.welcome.editInterventions"), SYSConst.icon22work, null);
             //            final MyJDialog dlg = new MyJDialog();
             editInterventions.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
             editInterventions.setAlignmentX(Component.LEFT_ALIGNMENT);

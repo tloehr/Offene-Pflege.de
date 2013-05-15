@@ -15,9 +15,9 @@ import entity.values.ResValue;
 import op.OPDE;
 import op.controlling.PnlControlling;
 import op.process.PnlProcess;
+import op.tools.GUITools;
 import op.tools.Pair;
 import op.tools.SYSConst;
-import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
 
@@ -41,9 +41,9 @@ public class QProcessTools {
     public static final int PDCA_ACT = 3;
 
     public static Color getBG1(QProcess qProcess) {
-        Color common = SYSTools.getColor("CEF0FF");
-        Color resident = SYSTools.getColor("DFB0FF");
-        Color closed = SYSTools.getColor("C0C0C0");
+        Color common = GUITools.getColor("CEF0FF");
+        Color resident = GUITools.getColor("DFB0FF");
+        Color closed = GUITools.getColor("C0C0C0");
         if (qProcess.isClosed()) {
             return closed;
         }
@@ -55,9 +55,9 @@ public class QProcessTools {
     }
 
     public static Color getBG2(QProcess qProcess) {
-        Color common = SYSTools.getColor("D9F3FF");
-        Color resident = SYSTools.getColor("F9EEFF");
-        Color closed = SYSTools.getColor("E8E8E8");
+        Color common = GUITools.getColor("D9F3FF");
+        Color resident = GUITools.getColor("F9EEFF");
+        Color closed = GUITools.getColor("E8E8E8");
         if (qProcess.isClosed()) {
             return closed;
         }

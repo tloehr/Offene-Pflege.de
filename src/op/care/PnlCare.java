@@ -192,7 +192,7 @@ public class PnlCare extends NursingRecordsPanel {
                 break;
             }
             case TAB_INFO2: {
-                previousPanel = new PnlInformation(resident, jspSearch);
+                previousPanel = new PnlInformation(resident, jspSearch, this);
                 jtpPflegeakte.setComponentAt(TAB_INFO2, previousPanel);
                 OPDE.getMainframe().setCurrentClassname(PnlInformation.internalClassID);
                 break;

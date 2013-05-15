@@ -951,7 +951,7 @@ public class PnlProcess extends NursingRecordsPanel {
                 btnClose.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        new DlgYesNo(OPDE.lang.getString("nursingrecords.qprocesses.question.close") + "<p>" + qProcess.getTitle() + "</p>", SYSConst.icon48stop, new Closure() {
+                        new DlgYesNo(OPDE.lang.getString("nursingrecords.qprocesses.question.close") + "<p>" + qProcess.getTitle() + "</p>", SYSConst.icon48playerStop, new Closure() {
                             @Override
                             public void execute(Object answer) {
                                 if (answer.equals(JOptionPane.YES_OPTION)) {

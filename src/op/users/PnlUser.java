@@ -96,8 +96,8 @@ public class PnlUser extends CleanablePanel {
     }
 
     private void initPanel() {
-        fg = SYSTools.getColor(OPDE.getProps().getProperty("EARLY_FGBHP"));
-        bg = SYSTools.getColor(OPDE.getProps().getProperty("EARLY_BGBHP"));
+        fg = GUITools.getColor(OPDE.getProps().getProperty("EARLY_FGBHP"));
+        bg = GUITools.getColor(OPDE.getProps().getProperty("EARLY_BGBHP"));
         contentMap = new HashMap<String, JPanel>();
         cpMap = new HashMap<String, CollapsiblePane>();
         usermap = new HashMap<String, Users>();

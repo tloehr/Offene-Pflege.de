@@ -80,6 +80,7 @@ public class SYSPropsTools {
     }
 
     public static void storeProp(String key, String value, Users user) {
+        // prevent redundant saves
         if (OPDE.getProps().containsKey(key) && OPDE.getProps().getProperty(key).equals(value)) {
             return;
         }

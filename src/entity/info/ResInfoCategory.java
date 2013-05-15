@@ -5,7 +5,7 @@
 
 package entity.info;
 
-import op.tools.SYSTools;
+import op.tools.GUITools;
 
 import javax.persistence.*;
 import java.awt.*;
@@ -72,7 +72,11 @@ public class ResInfoCategory implements Serializable, Comparable {
     }
 
     public Color getColor() {
-        return SYSTools.getColor(color);
+        return GUITools.getColor(color);
+    }
+
+    public void setColor(Color newColor){
+        color = GUITools.toHexString(newColor);
     }
 
     public void setCatType(Integer catType) {

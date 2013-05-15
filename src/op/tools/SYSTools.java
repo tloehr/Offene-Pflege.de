@@ -847,17 +847,7 @@ public class SYSTools {
         return htmlUmlautConversion(out);
     }
 
-    public static Color brighter(Color color, float FACTOR) {
-        return new Color(Math.min((int) (color.getRed() * (1 / FACTOR)), 255),
-                Math.min((int) (color.getGreen() * (1 / FACTOR)), 255),
-                Math.min((int) (color.getBlue() * (1 / FACTOR)), 255));
-    }
 
-    public static Color darker(Color color, float FACTOR) {
-        return new Color(Math.max((int) (color.getRed() * FACTOR), 0),
-                Math.max((int) (color.getGreen() * FACTOR), 0),
-                Math.max((int) (color.getBlue() * FACTOR), 0));
-    }
 
     //    /**
 //     * Fügt html Tags vor und hinter den Eingangsstring ein.
@@ -984,53 +974,6 @@ public class SYSTools {
             dcbm.addElement(dlm.get(i));
         }
         return dcbm;
-    }
-
-    /**
-     * Creates a Color object according to the names of the Java color constants.
-     * A HTML color string like "62A9FF" may also be used. Please remove the leading "#".
-     *
-     * @param colornameOrHTMLCode
-     * @return the desired color. Defaults to BLACK, in case of an error.
-     */
-    public static Color getColor(String colornameOrHTMLCode) {
-        Color color = Color.black;
-
-        if (colornameOrHTMLCode.equalsIgnoreCase("red")) {
-            color = Color.red;
-        } else if (colornameOrHTMLCode.equalsIgnoreCase("blue")) {
-            color = Color.blue;
-        } else if (colornameOrHTMLCode.equalsIgnoreCase("green")) {
-            color = Color.green;
-        } else if (colornameOrHTMLCode.equalsIgnoreCase("yellow")) {
-            color = Color.yellow;
-        } else if (colornameOrHTMLCode.equalsIgnoreCase("cyan")) {
-            color = Color.CYAN;
-        } else if (colornameOrHTMLCode.equalsIgnoreCase("light_gray")) {
-            color = Color.LIGHT_GRAY;
-        } else if (colornameOrHTMLCode.equalsIgnoreCase("dark_gray")) {
-            color = Color.DARK_GRAY;
-        } else if (colornameOrHTMLCode.equalsIgnoreCase("gray")) {
-            color = Color.GRAY;
-        } else if (colornameOrHTMLCode.equalsIgnoreCase("pink")) {
-            color = Color.PINK;
-        } else if (colornameOrHTMLCode.equalsIgnoreCase("magenta")) {
-            color = Color.MAGENTA;
-        } else if (colornameOrHTMLCode.equalsIgnoreCase("white")) {
-            color = Color.WHITE;
-        } else if (colornameOrHTMLCode.equalsIgnoreCase("orange")) {
-            color = Color.ORANGE;
-        } else {
-            try {
-                int red = Integer.parseInt(colornameOrHTMLCode.substring(0, 2), 16);
-                int green = Integer.parseInt(colornameOrHTMLCode.substring(2, 4), 16);
-                int blue = Integer.parseInt(colornameOrHTMLCode.substring(4), 16);
-                color = new Color(red, green, blue);
-            } catch (NumberFormatException nfe) {
-                color = Color.BLACK;
-            }
-        }
-        return color;
     }
 
     /**
@@ -1580,6 +1523,8 @@ public class SYSTools {
         // Set the width
         col.setPreferredWidth(width);
     }
+
+
 
     public static String getThrowableAsHTML(Throwable exc) {
         String html = "";

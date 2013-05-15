@@ -154,6 +154,35 @@ public class GUITools {
      */
     public static void showPopup(JidePopup popup, int location, boolean keepOnScreen) {
 
+
+        Point desiredPosition = getDesiredPosition(popup, location);
+
+//        OPDE.debug(Boolean.toString(isFullyVisibleOnScreen(popup, desiredPosition)));
+
+
+        if (keepOnScreen && !isFullyVisibleOnScreen(popup, desiredPosition)) {
+            int[] positions = new int[]{SwingConstants.SOUTH_EAST, SwingConstants.SOUTH_WEST, SwingConstants.NORTH_EAST, SwingConstants.NORTH_WEST, SwingConstants.SOUTH, SwingConstants.EAST, SwingConstants.SOUTH_WEST, SwingConstants.NORTH, SwingConstants.CENTER};
+            boolean found = false;
+
+            for (int pos : positions) {
+                desiredPosition = getDesiredPosition(popup, pos);
+                if (isFullyVisibleOnScreen(popup, desiredPosition)) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                desiredPosition = getDesiredPosition(popup, location);
+            }
+
+        }
+
+        popup.showPopup(desiredPosition.x, desiredPosition.y);
+
+    }
+
+    private static Point getDesiredPosition(JidePopup popup, int location) {
         Container content = popup.getContentPane();
 
         final Point screenposition = new Point(popup.getOwner().getLocationOnScreen().x, popup.getOwner().getLocationOnScreen().y);
@@ -206,7 +235,19 @@ public class GUITools {
                 // nop
             }
         }
-        popup.showPopup(x, y);
+        return new Point(x, y);
+    }
+
+    public static boolean isFullyVisibleOnScreen(JidePopup popup, Point point) {
+        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        int width = gd.getDisplayMode().getWidth();
+        int height = gd.getDisplayMode().getHeight();
+
+        int spreadX = point.x + popup.getContentPane().getPreferredSize().width;
+        int spreadY = point.y + popup.getContentPane().getPreferredSize().height;
+
+        return width > spreadX && height > spreadY;
+
     }
 
     public static void showPopup(JidePopup popup, int location) {
@@ -420,6 +461,75 @@ public class GUITools {
         animator.start();
 
 //        jsp.getVerticalScrollBar().setValue(Math.min(SwingUtilities.convertPoint(component, component.getLocation(), container).y, jsp.getVerticalScrollBar().getMaximum()));
+    }
+
+    public static Animator flashIcon(final AbstractButton btn, final Icon icon) {
+
+
+        final Icon originalIcon = btn.isSelected() ? btn.getSelectedIcon() : btn.getIcon();
+
+        final TimingSource ts = new SwingTimerTimingSource();
+        Animator.setDefaultTimingSource(ts);
+        ts.init();
+
+        Animator animator = new Animator.Builder().setDuration(750, TimeUnit.MILLISECONDS).setRepeatCount(Animator.INFINITE).setRepeatBehavior(Animator.RepeatBehavior.REVERSE).setStartDirection(Animator.Direction.FORWARD).addTarget(new TimingTargetAdapter() {
+            @Override
+            public void begin(Animator source) {
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (btn.isSelected()) {
+                            btn.setSelectedIcon(icon);
+                        } else {
+                            btn.setIcon(icon);
+                        }
+
+                    }
+                });
+
+
+            }
+
+            @Override
+            public void reverse(Animator source) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (btn.isSelected()) {
+                            btn.setSelectedIcon(icon);
+                        } else {
+                            btn.setIcon(icon);
+                        }
+
+                    }
+                });
+            }
+
+            @Override
+            public void repeat(Animator source) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (btn.isSelected()) {
+                            btn.setSelectedIcon(originalIcon);
+                        } else {
+                            btn.setIcon(originalIcon);
+                        }
+
+                    }
+                });
+            }
+
+            @Override
+            public void end(Animator source) {
+                repeat(source);
+            }
+        }).build();
+
+
+        return animator;
+        //        jsp.getVerticalScrollBar().setValue(Math.min(SwingUtilities.convertPoint(component, component.getLocation(), container).y, jsp.getVerticalScrollBar().getMaximum()));
     }
 
     /**
@@ -641,5 +751,137 @@ public class GUITools {
                 content.setProperty(comp.getName(), Boolean.toString(((AbstractButton) comp).isSelected()));
             }
         }
+    }
+
+    public static Color invert(Color color) {
+        return new Color(255 - color.getRed(), 255 - color.getGreen(), 255 - color.getBlue());
+    }
+
+    /**
+     * http://stackoverflow.com/questions/8741479/automatically-determine-optimal-fontcolor-by-backgroundcolor
+     *
+     * @param background
+     * @return
+     */
+    public static Color getForeground(Color background) {
+        int red = 0;
+        int green = 0;
+        int blue = 0;
+
+        if (background.getRed() + background.getGreen() + background.getBlue() < 383) {
+            red = 255;
+            green = 255;
+            blue = 255;
+        }
+        return new Color(red, green, blue);
+    }
+
+    /**
+     * http://stackoverflow.com/questions/4059133/getting-html-color-codes-with-a-jcolorchooser
+     *
+     * @param c
+     * @return
+     */
+    public static String toHexString(Color c) {
+        StringBuilder sb = new StringBuilder("");
+
+        if (c.getRed() < 16) sb.append('0');
+        sb.append(Integer.toHexString(c.getRed()));
+
+        if (c.getGreen() < 16) sb.append('0');
+        sb.append(Integer.toHexString(c.getGreen()));
+
+        if (c.getBlue() < 16) sb.append('0');
+        sb.append(Integer.toHexString(c.getBlue()));
+
+        return sb.toString();
+    }
+
+    /**
+     * Creates a Color object according to the names of the Java color constants.
+     * A HTML color string like "62A9FF" may also be used. Please remove the leading "#".
+     *
+     * @param colornameOrHTMLCode
+     * @return the desired color. Defaults to BLACK, in case of an error.
+     */
+    public static Color getColor(String colornameOrHTMLCode) {
+        Color color = Color.black;
+
+        if (colornameOrHTMLCode.equalsIgnoreCase("red")) {
+            color = Color.red;
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("blue")) {
+            color = Color.blue;
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("green")) {
+            color = Color.green;
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("yellow")) {
+            color = Color.yellow;
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("cyan")) {
+            color = Color.CYAN;
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("light_gray")) {
+            color = Color.LIGHT_GRAY;
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("dark_gray")) {
+            color = Color.DARK_GRAY;
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("gray")) {
+            color = Color.GRAY;
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("pink")) {
+            color = Color.PINK;
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("magenta")) {
+            color = Color.MAGENTA;
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("white")) {
+            color = Color.WHITE;
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("orange")) {
+            color = Color.ORANGE;
+        } else {
+            try {
+                int red = Integer.parseInt(colornameOrHTMLCode.substring(0, 2), 16);
+                int green = Integer.parseInt(colornameOrHTMLCode.substring(2, 4), 16);
+                int blue = Integer.parseInt(colornameOrHTMLCode.substring(4), 16);
+                color = new Color(red, green, blue);
+            } catch (NumberFormatException nfe) {
+                color = Color.BLACK;
+            }
+        }
+        return color;
+    }
+
+    public static Color blend(Color clOne, Color clTwo, float fAmount) {
+        float fInverse = 1.0f - fAmount;
+
+        // I had to look up getting colour components in java.  Google is good :)
+        float afOne[] = new float[3];
+        clOne.getColorComponents(afOne);
+        float afTwo[] = new float[3];
+        clTwo.getColorComponents(afTwo);
+
+        float afResult[] = new float[3];
+        afResult[0] = afOne[0] * fAmount + afTwo[0] * fInverse;
+        afResult[1] = afOne[1] * fAmount + afTwo[1] * fInverse;
+        afResult[2] = afOne[2] * fAmount + afTwo[2] * fInverse;
+
+        return new Color (afResult[0], afResult[1], afResult[2]);
+    }
+
+    public static Color brighter(Color originalColour, float FACTOR) {
+
+
+        float hsbVals[] = Color.RGBtoHSB( originalColour.getRed(),
+                                               originalColour.getGreen(),
+                                               originalColour.getBlue(), null );
+
+            Color highlight = Color.getHSBColor( hsbVals[0], hsbVals[1], FACTOR * ( 1f + hsbVals[2] ));
+//            Color shadow = Color.getHSBColor( hsbVals[0], hsbVals[1], 0.5f * hsbVals[2] );
+
+        return highlight;
+
+
+//        return new Color(Math.min((int) (color.getRed() * (1 / FACTOR)), 255),
+//                Math.min((int) (color.getGreen() * (1 / FACTOR)), 255),
+//                Math.min((int) (color.getBlue() * (1 / FACTOR)), 255));
+    }
+
+    public static Color darker(Color color, float FACTOR) {
+        return new Color(Math.max((int) (color.getRed() * FACTOR), 0),
+                Math.max((int) (color.getGreen() * FACTOR), 0),
+                Math.max((int) (color.getBlue() * FACTOR), 0));
     }
 }
