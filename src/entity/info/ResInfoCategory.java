@@ -59,7 +59,7 @@ public class ResInfoCategory implements Serializable, Comparable {
 
     @Override
     public int compareTo(Object o) {
-        return id.compareTo(((ResInfoCategory) o).getID());
+        return  text.compareTo(((ResInfoCategory) o).getText()); //id.compareTo(((ResInfoCategory) o).getID());
     }
 
     public void setText(String text) {

@@ -23,37 +23,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-/**
- * <p>RiverLayout makes it very simple to construct user interfaces as components
- * are laid out similar to how text is added to a word processor (Components flow
- * like a "river". RiverLayout is however much more powerful than FlowLayout:
- * Components added with the add() method generally gets laid out horizontally,
- * but one may add a string before the component being added to specify "constraints"
- * like this:
- * add("br hfill", new JTextField("Your name here");
- * The code above forces a "line break" and extends the added component horizontally.
- * Without the "hfill" constraint, the component would take on its preferred size.
- * </p>
- * <p>
- * List of constraints:<ul>
- * <li>br - Add a line break
- * <li>p - Add a paragraph break
- * <li>tab - Add a tab stop (handy for constructing forms with labels followed by fields)
- * <li>hfill - Extend component horizontally
- * <li>vfill - Extent component vertically (currently only one allowed)
- * <li>left - Align following components to the left (default)
- * <li>center - Align following components horizontally centered
- * <li>right - Align following components to the right
- * <li>vtop - Align following components vertically top aligned
- * <li>vcenter - Align following components vertically centered (default)
- * </ul>
- * </p>
- * RiverLayout is LGPL licenced - use it freely in free and commercial programs
- *
- * @author David Ekholm
- * @version 1.1 (2005-05-23) -Bugfix: JScrollPanes were oversized (sized to their containing component)
- *          if the container containing the JScrollPane was resized.
- */
+
 public class RiverLayout
         extends FlowLayout
         implements LayoutManager, java.io.Serializable {
@@ -76,7 +46,37 @@ public class RiverLayout
     Insets extraInsets;
     Insets totalInsets = new Insets(0, 0, 0, 0);// Dummy values. Set by getInsets()
 
-
+    /**
+     * <p>RiverLayout makes it very simple to construct user interfaces as components
+     * are laid out similar to how text is added to a word processor (Components flow
+     * like a "river". RiverLayout is however much more powerful than FlowLayout:
+     * Components added with the add() method generally gets laid out horizontally,
+     * but one may add a string before the component being added to specify "constraints"
+     * like this:
+     * add("br hfill", new JTextField("Your name here");
+     * The code above forces a "line break" and extends the added component horizontally.
+     * Without the "hfill" constraint, the component would take on its preferred size.
+     * </p>
+     * <p>
+     * List of constraints:<ul>
+     * <li>br - Add a line break
+     * <li>p - Add a paragraph break
+     * <li>tab - Add a tab stop (handy for constructing forms with labels followed by fields)
+     * <li>hfill - Extend component horizontally
+     * <li>vfill - Extent component vertically (currently only one allowed)
+     * <li>left - Align following components to the left (default)
+     * <li>center - Align following components horizontally centered
+     * <li>right - Align following components to the right
+     * <li>vtop - Align following components vertically top aligned
+     * <li>vcenter - Align following components vertically centered (default)
+     * </ul>
+     * </p>
+     * RiverLayout is LGPL licenced - use it freely in free and commercial programs
+     *
+     * @author David Ekholm
+     * @version 1.1 (2005-05-23) -Bugfix: JScrollPanes were oversized (sized to their containing component)
+     *          if the container containing the JScrollPane was resized.
+     */
     public RiverLayout() {
         this(10, 5);
     }

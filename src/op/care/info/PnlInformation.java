@@ -186,7 +186,7 @@ public class PnlInformation extends NursingRecordsPanel {
                  *      \___\___/|_|\___/|_|
                  *
                  */
-                if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
+                if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)) {
                     final JButton btnColor = new JButton(SYSConst.icon22colorset);
                     btnColor.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     btnColor.setContentAreaFilled(false);
@@ -340,9 +340,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                                     ResInfoType myType = em.merge(resInfoType);
                                                     em.lock(myType, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
                                                     final ResInfo newinfo = em.merge((ResInfo) o);
-                                                    if (newinfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS) {
-                                                        newinfo.setHtml(ResInfoTools.getContentAsHTML(newinfo));
-                                                    }
+                                                    newinfo.setHtml(ResInfoTools.getContentAsHTML(newinfo));
                                                     em.getTransaction().commit();
 
                                                     mapType2ResInfos.get(newinfo.getResInfoType()).add(newinfo);
@@ -408,6 +406,65 @@ public class PnlInformation extends NursingRecordsPanel {
                             } catch (PropertyVetoException e) {
                                 // bah!
                             }
+                        } else if (resInfoType.getType() == ResInfoTypeTools.TYPE_DIAGNOSIS) {
+                            new DlgDiag(new ResInfo(resInfoType, resident), new Closure() {
+                                @Override
+                                public void execute(Object o) {
+                                    if (o != null) {
+                                        EntityManager em = OPDE.createEM();
+                                        try {
+                                            em.getTransaction().begin();
+                                            em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                            // so that no conflicts can occur if another user enters a new info at the same time
+                                            ResInfoType myType = em.merge(resInfoType);
+                                            em.lock(myType, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                            final ResInfo newinfo = em.merge((ResInfo) o);
+
+                                            em.getTransaction().commit();
+
+                                            mapType2ResInfos.get(newinfo.getResInfoType()).add(newinfo);
+                                            Collections.sort(mapType2ResInfos.get(newinfo.getResInfoType()));
+
+                                            listAllTypes.remove(resInfoType);
+                                            listAllTypes.add(myType);
+
+                                            listAllInfos.add(newinfo);
+
+                                            if (newinfo.getResInfoType().isAlertType()) {
+                                                GUITools.setResidentDisplay(resident);
+                                            }
+
+                                            reloadDisplay();
+
+                                        } catch (OptimisticLockException ole) {
+                                            if (em.getTransaction().isActive()) {
+                                                em.getTransaction().rollback();
+                                            }
+                                            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                                OPDE.getMainframe().emptyFrame();
+                                                OPDE.getMainframe().afterLogin();
+                                            }
+                                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                        } catch (RollbackException ole) {
+                                            if (em.getTransaction().isActive()) {
+                                                em.getTransaction().rollback();
+                                            }
+                                            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                                OPDE.getMainframe().emptyFrame();
+                                                OPDE.getMainframe().afterLogin();
+                                            }
+                                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                        } catch (Exception e) {
+                                            if (em.getTransaction().isActive()) {
+                                                em.getTransaction().rollback();
+                                            }
+                                            OPDE.fatal(e);
+                                        } finally {
+                                            em.close();
+                                        }
+                                    }
+                                }
+                            });
                         } else if (resInfoType.getType() != ResInfoTypeTools.TYPE_ABSENCE) {
                             cpsType.add(new JLabel(OPDE.lang.getString("nursingrecords.info.cant.add.absence.here")));
                         } else if (resInfoType.getType() != ResInfoTypeTools.TYPE_STAY) {
@@ -441,9 +498,14 @@ public class PnlInformation extends NursingRecordsPanel {
 
         final CollapsiblePane cpInfo = mapKey2CP.get(keyResInfo);
 
-        String title = DateFormat.getDateInstance().format(resInfo.getFrom()) + " (" + resInfo.getUserON().getFullname() + ") " + " >> ";
-        title += resInfo.isClosed() ? DateFormat.getDateInstance().format(resInfo.getTo()) + " (" + resInfo.getUserOFF().getFullname() + ")" : "";
+        String title = "";
 
+        if (resInfo.isSingleIncident()) {
+            title += DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(resInfo.getFrom()) + " (" + resInfo.getUserON().getFullname() + ")";
+        } else {
+            title += DateFormat.getDateInstance().format(resInfo.getFrom()) + " (" + resInfo.getUserON().getFullname() + ") " + " >> ";
+            title += resInfo.isClosed() ? DateFormat.getDateInstance().format(resInfo.getTo()) + " (" + resInfo.getUserOFF().getFullname() + ")" : "";
+        }
         DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -455,7 +517,7 @@ public class PnlInformation extends NursingRecordsPanel {
             }
         });
 
-        if (!resInfo.isClosed()) {
+        if (!resInfo.isClosed() || !resInfo.isSingleIncident()) {
             cpInfo.setBackground((GUITools.blend(resInfo.getResInfoType().getResInfoCat().getColor(), Color.WHITE, 0.25f)));
             cptitle.getButton().setForeground(GUITools.getForeground(cpInfo.getBackground()));
         }
@@ -643,7 +705,11 @@ public class PnlInformation extends NursingRecordsPanel {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 mapInfo2Editor.get(resInfo).setEnabled(e.getStateChange() == ItemEvent.SELECTED);
-                btnEdit.setEnabled(e.getStateChange() == ItemEvent.DESELECTED);
+                btnEdit.setEnabled(e.getStateChange() == ItemEvent.DESELECTED && ResInfoTools.isEditable(resInfo) && (OPDE.isAdmin() ||
+                        (resInfo.getUserON().equals(OPDE.getLogin().getUser()) && new DateMidnight(resInfo.getFrom()).equals(new DateMidnight()))  // The same user only on the same day.
+                ));
+
+
                 if (e.getStateChange() == ItemEvent.DESELECTED && mapInfo2Editor.get(resInfo).isChanged()) {
                     new DlgYesNo("geändert", SYSConst.icon48play, new Closure() {
                         @Override
@@ -710,8 +776,8 @@ public class PnlInformation extends NursingRecordsPanel {
                 }
             }
         });
-        btnChange.setEnabled(!resInfo.isClosed());
-        grmpf; DIAGS ?
+        btnChange.setEnabled(resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD && !resInfo.isClosed() && !resInfo.isSingleIncident() && !resInfo.isNoConstraints());
+
         /***
          *               _ _ _
          *       ___  __| (_) |_
@@ -729,9 +795,15 @@ public class PnlInformation extends NursingRecordsPanel {
         btnEdit.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
+                if (!mapInfo2Editor.containsKey(resInfo)){
+                    try {
+                        cpInfo.setCollapsed(false);
+                    } catch (PropertyVetoException e1) {
+                        //bah!!
+                    }
+                }
                 mapInfo2Editor.get(resInfo).setEnabled(e.getStateChange() == ItemEvent.SELECTED);
-                btnChange.setEnabled(e.getStateChange() == ItemEvent.DESELECTED);
-
+                btnChange.setEnabled(e.getStateChange() == ItemEvent.DESELECTED && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD && !resInfo.isClosed() && !resInfo.isSingleIncident() && !resInfo.isNoConstraints());
                 if (e.getStateChange() == ItemEvent.DESELECTED && mapInfo2Editor.get(resInfo).isChanged()) {
 
                     EntityManager em = OPDE.createEM();
@@ -819,6 +891,7 @@ public class PnlInformation extends NursingRecordsPanel {
             }
         });
         cptitle.getRight().add(btnMenu);
+        btnMenu.setEnabled(resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_ABSENCE && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY);
 
 
         cpInfo.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
@@ -842,7 +915,7 @@ public class PnlInformation extends NursingRecordsPanel {
 
         cpInfo.setTitleLabelComponent(cptitle.getMain());
         try {
-            cpInfo.setCollapsed(resInfo.isClosed());
+            cpInfo.setCollapsed(resInfo.isClosed() || resInfo.isSingleIncident());
         } catch (PropertyVetoException e) {
             // bah!
         }
@@ -898,7 +971,7 @@ public class PnlInformation extends NursingRecordsPanel {
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID) || OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             JPanel cmdPanel = new JPanel();
-            CollapsiblePane commandPane = new CollapsiblePane(OPDE.lang.getString(internalClassID + ".functions"));
+            CollapsiblePane commandPane = new CollapsiblePane(OPDE.lang.getString("nursingrecords.info.functions"));
             cmdPanel.setLayout(new VerticalLayout());
             GUITools.addAllComponents(cmdPanel, addCommands());
             commandPane.setContentPane(cmdPanel);
@@ -959,7 +1032,7 @@ public class PnlInformation extends NursingRecordsPanel {
 
 
         GUITools.addAllComponents(mypanel, addFilters());
-        GUITools.addAllComponents(mypanel, addKey());
+//        GUITools.addAllComponents(mypanel, addKey());
 
 
         searchPane.setContentPane(mypanel);
@@ -1006,7 +1079,7 @@ public class PnlInformation extends NursingRecordsPanel {
                  *     |____/ \__\___/| .__/
                  *                    |_|
                  */
-                final JButton btnStop = GUITools.createHyperlinkButton(internalClassID + ".btnStop.tooltip", SYSConst.icon22playerStop, null);
+                final JButton btnStop = GUITools.createHyperlinkButton("nursingrecords.info.btnStop.tooltip", SYSConst.icon22playerStop, null);
                 btnStop.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 btnStop.addActionListener(new ActionListener() {
                     @Override
@@ -1071,7 +1144,7 @@ public class PnlInformation extends NursingRecordsPanel {
                      *     |____/ \___|_|\___|\__\___|
                      *
                      */
-                    final JButton btnDelete = GUITools.createHyperlinkButton(internalClassID + ".btnDelete.tooltip", SYSConst.icon22delete, null);
+                    final JButton btnDelete = GUITools.createHyperlinkButton("nursingrecords.info.btnDelete.tooltip", SYSConst.icon22delete, null);
                     btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
                     btnDelete.addActionListener(new ActionListener() {
                         @Override
@@ -1128,7 +1201,7 @@ public class PnlInformation extends NursingRecordsPanel {
                      *     |_|   \___|_|  |_|\___/ \__,_|
                      *
                      */
-                    final JButton btnChangePeriod = GUITools.createHyperlinkButton(internalClassID + ".btnChangePeriod.tooltip", SYSConst.icon22changePeriod, null);
+                    final JButton btnChangePeriod = GUITools.createHyperlinkButton("nursingrecords.info.btnChangePeriod.tooltip", SYSConst.icon22changePeriod, null);
                     btnChangePeriod.setAlignmentX(Component.RIGHT_ALIGNMENT);
                     btnChangePeriod.addActionListener(new ActionListener() {
                         @Override
@@ -1434,7 +1507,7 @@ public class PnlInformation extends NursingRecordsPanel {
              *     |_| |_|\___| \_/\_/ |_| \_\___||___/_|\__,_|\___|_| |_|\__|
              *
              */
-            JideButton addRes = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".addbw"), SYSConst.icon22addbw, null);
+            JideButton addRes = GUITools.createHyperlinkButton(OPDE.lang.getString("nursingrecords.info.addbw"), SYSConst.icon22addbw, null);
             addRes.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
             addRes.setAlignmentX(Component.LEFT_ALIGNMENT);
             addRes.addActionListener(new ActionListener() {
@@ -1459,7 +1532,7 @@ public class PnlInformation extends NursingRecordsPanel {
             });
             list.add(addRes);
 
-            JideButton editRes = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".editbw"), SYSConst.icon22edit3, null);
+            JideButton editRes = GUITools.createHyperlinkButton(OPDE.lang.getString("nursingrecords.info.editbw"), SYSConst.icon22edit3, null);
             editRes.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
             editRes.setAlignmentX(Component.LEFT_ALIGNMENT);
             editRes.addActionListener(new ActionListener() {
@@ -1518,12 +1591,12 @@ public class PnlInformation extends NursingRecordsPanel {
              *     |_|___/ |____/ \___|\__,_|\__,_|
              *
              */
-            btnResMovedOut = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".resident.movedout"), SYSConst.icon22residentGone, null);
-            btnResDied = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".resident.died"), SYSConst.icon22residentDied, null);
+            btnResMovedOut = GUITools.createHyperlinkButton(OPDE.lang.getString("nursingrecords.info.resident.movedout"), SYSConst.icon22residentGone, null);
+            btnResDied = GUITools.createHyperlinkButton(OPDE.lang.getString("nursingrecords.info.resident.died"), SYSConst.icon22residentDied, null);
             btnResDied.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgPIT(OPDE.lang.getString(internalClassID + ".dlg.dateofdeath"), new Closure() {
+                    new DlgPIT(OPDE.lang.getString("nursingrecords.info.dlg.dateofdeath"), new Closure() {
                         @Override
                         public void execute(Object o) {
                             if (o != null) {
@@ -1582,7 +1655,7 @@ public class PnlInformation extends NursingRecordsPanel {
             btnResMovedOut.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgPIT(OPDE.lang.getString(internalClassID + ".dlg.dateofmoveout"), new Closure() {
+                    new DlgPIT(OPDE.lang.getString("nursingrecords.info.dlg.dateofmoveout"), new Closure() {
                         @Override
                         public void execute(Object o) {
                             if (o != null) {
@@ -1629,11 +1702,11 @@ public class PnlInformation extends NursingRecordsPanel {
             });
             btnResMovedOut.setEnabled(resident.isActive());
             list.add(btnResMovedOut);
-        }
+        } // MANAGER
 
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
-            btnResIsAway = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".resident.isaway"), SYSConst.icon22residentAbsent, null);
+            btnResIsAway = GUITools.createHyperlinkButton(OPDE.lang.getString("nursingrecords.info.resident.isaway"), SYSConst.icon22residentAbsent, null);
             /***
              *      _          _
              *     (_)___     / \__      ____ _ _   _
@@ -1660,7 +1733,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                     em.getTransaction().commit();
 
                                     switchResident(myResident);
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".msg.isawaynow")));
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.info.msg.isawaynow")));
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -1704,7 +1777,7 @@ public class PnlInformation extends NursingRecordsPanel {
             btnResIsAway.setEnabled(resident.isActive() && !ResInfoTools.isAway(resident));
             list.add(btnResIsAway);
 
-            btnResIsBack = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".resident.isback"), SYSConst.icon22residentBack, null);
+            btnResIsBack = GUITools.createHyperlinkButton(OPDE.lang.getString("nursingrecords.info.resident.isback"), SYSConst.icon22residentBack, null);
             /***
              *      _       ____             _
              *     (_)___  | __ )  __ _  ___| | __
@@ -1729,7 +1802,7 @@ public class PnlInformation extends NursingRecordsPanel {
                         em.getTransaction().commit();
 
                         switchResident(myResident);
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".msg.isbacknow")));
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.info.msg.isbacknow")));
                     } catch (OptimisticLockException ole) {
                         OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                         if (em.getTransaction().isActive()) {
@@ -1757,7 +1830,7 @@ public class PnlInformation extends NursingRecordsPanel {
             });
             btnResIsBack.setEnabled(resident.isActive() && !ResInfoTools.isAway(resident));
             list.add(btnResIsBack);
-        }
+        } // UPDATE
 
         return list;
     }
@@ -1766,11 +1839,11 @@ public class PnlInformation extends NursingRecordsPanel {
         java.util.List<Component> list = new ArrayList<Component>();
         list.add(new JSeparator());
         list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
-//        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22stopSign, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription7"), SYSConst.icon22stopSignGray, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22infogreen2, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription3"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription4"), SYSConst.icon22ledGreenOff, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString("nursingrecords.info.keydescription1"), SYSConst.icon22stopSign, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString("nursingrecords.info.keydescription7"), SYSConst.icon22stopSignGray, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString("nursingrecords.info.keydescription2"), SYSConst.icon22infogreen2, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString("nursingrecords.info.keydescription3"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString("nursingrecords.info.keydescription4"), SYSConst.icon22ledGreenOff, SwingConstants.LEADING));
 
         return list;
     }

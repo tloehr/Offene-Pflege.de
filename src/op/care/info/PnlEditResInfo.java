@@ -100,13 +100,10 @@ public class PnlEditResInfo {
             main = new JPanel(new BorderLayout());
             main.add(pnlContent, BorderLayout.CENTER);
 
+
             JPanel btnPanel = new JPanel(new BorderLayout());
 
             JButton apply = new JButton(SYSConst.icon22apply);
-            apply.setPressedIcon(SYSConst.icon22applyPressed);
-            apply.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            apply.setContentAreaFilled(false);
-            apply.setBorder(null);
             apply.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -115,6 +112,13 @@ public class PnlEditResInfo {
             });
             btnPanel.add(apply, BorderLayout.LINE_END);
             main.add(btnPanel, BorderLayout.SOUTH);
+
+            JPanel hdrPanel = new JPanel(new BorderLayout());
+            JLabel jl = new JLabel(resInfo.getResInfoType().getShortDescription());
+            jl.setFont(SYSConst.ARIAL24BOLD);
+            hdrPanel.add(jl, BorderLayout.CENTER);
+            hdrPanel.add(new JSeparator(), BorderLayout.SOUTH);
+            main.add(jl, BorderLayout.NORTH);
         }
 
         SYSTools.setXEnabled(pnlContent, main != null);
@@ -376,7 +380,7 @@ public class PnlEditResInfo {
                 if (attributes.getValue("label") != null) {
                     JLabel jl = new JLabel(attributes.getValue("label") + ":");
                     jl.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
-                    outerpanel.add("p left", jl);
+                    outerpanel.add("br left", jl);
                 }
             }
             if (tagName.equalsIgnoreCase("scale")) {
@@ -398,7 +402,7 @@ public class PnlEditResInfo {
                     jl.setFont(SYSConst.ARIAL14BOLD);
                 }
                 jl.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
-                outerpanel.add("p left", jl);
+                outerpanel.add("br left", jl);
                 tabgroup = true;
             }
             if (tagName.equalsIgnoreCase("option")) {
@@ -448,7 +452,7 @@ public class PnlEditResInfo {
                 if (tabgroup) {
                     outerpanel.add(layout, j);
                 } else {
-                    outerpanel.add("p left", j);
+                    outerpanel.add("br left", j);
                 }
                 if (attributes.getValue("default") != null && attributes.getValue("default").equals("true")) {
                     j.setSelected(true);
@@ -472,7 +476,8 @@ public class PnlEditResInfo {
                 JTextField j = new JTextField(TEXTFIELD_STANDARD_WIDTH);
                 j.setName(groupname);
                 j.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
-                outerpanel.add("p left", jl);
+                String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
+                outerpanel.add(layout, jl);
                 outerpanel.add("tab hfill", j);
                 components.put(groupname, j); // für den späteren Direktzugriff
                 j.addFocusListener(new TextFieldFocusListener(type));
@@ -485,14 +490,23 @@ public class PnlEditResInfo {
             if (tagName.equalsIgnoreCase("separator")) {
                 //groupname = attributes.getValue("name");
                 //JLabel jl = new JLabel(new javax.swing.ImageIcon(getClass().getResource(attributes.getValue("image"))));
-                outerpanel.add("p hfill", new JSeparator());
+                String layout = SYSTools.catchNull(attributes.getValue("layout"), "p hfill");
+                outerpanel.add(layout, new JSeparator());
+            }
+            // ---------------------- tiny ambulance car --------------------------------
+            if (tagName.equalsIgnoreCase("tx")) {
+                JLabel jl = new JLabel(SYSConst.icon16ambulance);
+
+//                                            String layout = SYSTools.catchNull(attributes.getValue("layout"), "p left");
+                outerpanel.add(jl);
             }
             // ---------------------- Imagelabels --------------------------------
             if (tagName.equalsIgnoreCase("imagelabel")) {
                 groupname = attributes.getValue("name");
                 JLabel jl = new JLabel(new javax.swing.ImageIcon(getClass().getResource(attributes.getValue("image"))));
                 jl.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
-                outerpanel.add("p left", jl);
+                String layout = SYSTools.catchNull(attributes.getValue("layout"), "p left");
+                outerpanel.add(layout, jl);
             }
             // ---------------------- Textlabels --------------------------------
             if (tagName.equalsIgnoreCase("label")) {
@@ -506,7 +520,8 @@ public class PnlEditResInfo {
                     jl.setFont(SYSConst.ARIAL14BOLD);
                 }
                 jl.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
-                outerpanel.add("p left", jl);
+                String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
+                outerpanel.add(layout, jl);
             }
             // ---------------------- Comboboxen --------------------------------
             if (tagName.equalsIgnoreCase("combobox")) {
@@ -519,7 +534,8 @@ public class PnlEditResInfo {
                 components.put(groupname, jcb);
                 jcb.addItemListener(new ComboBoxItemStateListener());
                 JLabel jl = new JLabel(attributes.getValue("label") + ":");
-                outerpanel.add("p left", jl);
+                String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
+                outerpanel.add(layout, jl);
                 outerpanel.add("tab hfill", jcb);
 
             }

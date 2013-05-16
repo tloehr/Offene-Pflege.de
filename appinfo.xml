@@ -116,16 +116,16 @@
             <insert langbundle="appinfo.default.acl.insert"/>
             <delete langbundle="appinfo.default.acl.delete"/>
         </class>
-        <class name="nursingrecords.info" short="Pflegeakte/Informationen"
-               long="Hier können Informationen zu den BewohnerInnen eingegeben werden."
+        <class name="nursingrecords.info" short="nursingrecords.info.appinfo.short"
+               long="nursingrecords.info.appinfo.long"
                javaclass="op.care.info.PnlInfo">
             <update langbundle="appinfo.default.acl.update"/>
-            <manager langbundle="appinfo.default.acl.manager"/>
+            <manager langbundle="nursingrecords.info.appinfo.acl.manager"/>
             <delete langbundle="appinfo.default.acl.delete"/>
             <print langbundle="appinfo.default.acl.print"/>
             <archive langbundle="appinfo.default.acl.archive"/>
-            <user1 langbundle="appinfo.nursingrecords.info.acl.user1"/>
-            <user2 langbundle="appinfo.nursingrecords.info.acl.user2"/>
+            <user1 langbundle="nursingrecords.info.appinfo.acl.user1"/>
+            <user2 langbundle="nursingrecords.info.appinfo.acl.user2"/>
         </class>
     </classes>
 
