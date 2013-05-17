@@ -2,8 +2,11 @@ package op.care.info;
 
 import entity.info.ResInfo;
 import op.OPDE;
+import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -18,6 +21,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -37,6 +41,7 @@ public class PnlEditResInfo {
     private final int TYPE_DONT_CARE = 0;
     private final int TYPE_INT = 1;
     private final int TYPE_DOUBLE = 2;
+    private final int TYPE_DATE = 3;
     private boolean scalemode = false;
     private final int TEXTFIELD_STANDARD_WIDTH = 35;
 
@@ -283,9 +288,16 @@ public class PnlEditResInfo {
 
     private class TextFieldFocusListener implements FocusListener {
         int type = TYPE_DONT_CARE;
+        Pair<DateTime, DateTime> minmax;
 
         TextFieldFocusListener(int type) {
             this.type = type;
+            minmax = new Pair<DateTime, DateTime>(new DateTime(SYSConst.DATE_THE_VERY_BEGINNING), new DateTime(SYSConst.DATE_UNTIL_FURTHER_NOTICE));
+        }
+
+        TextFieldFocusListener(int type, Pair<DateTime, DateTime> minmax) {
+            this.type = type;
+            this.minmax = minmax;
         }
 
         public void focusGained(FocusEvent e) {
@@ -297,27 +309,43 @@ public class PnlEditResInfo {
             String text = ((JTextField) e.getSource()).getText();
 
             if (type != TYPE_DONT_CARE) {
-                NumberFormat nf = DecimalFormat.getNumberInstance();
-                text = text.replace(".", ",");
-                Number num;
-                try {
-                    num = nf.parse(text);
-                } catch (ParseException ex) {
-                    num = null;
-                }
-
-                if (type == TYPE_INT) {
-                    if (num == null) {
-                        num = new Integer(1);
+                if (type == TYPE_DATE) {
+                    try {
+                        Date myDate = SYSCalendar.parseDate(text);
+                        if (new DateMidnight(myDate).isBefore(minmax.getFirst().toDateMidnight())) {
+                            throw new Exception("date out of bounds");
+                        }
+                        if (new DateMidnight(myDate).isAfter(minmax.getSecond().toDateMidnight())) {
+                            throw new Exception("date out of bounds");
+                        }
+                        j.setText(DateFormat.getDateInstance().format(myDate));
+                    } catch (Exception ex) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.wrongdate", DisplayMessage.WARNING));
+                        j.setText(DateFormat.getDateInstance().format(new Date()));
                     }
-                }
-
-                if (type == TYPE_DOUBLE) {
-                    if (num == null) {
-                        num = new Double(1.0);
+                } else {
+                    NumberFormat nf = DecimalFormat.getNumberInstance();
+                    text = text.replace(".", ",");
+                    Number num;
+                    try {
+                        num = nf.parse(text);
+                    } catch (ParseException ex) {
+                        num = null;
                     }
+
+                    if (type == TYPE_INT) {
+                        if (num == null) {
+                            num = new Integer(1);
+                        }
+                    }
+
+                    if (type == TYPE_DOUBLE) {
+                        if (num == null) {
+                            num = new Double(1.0);
+                        }
+                    }
+                    j.setText(num.toString());
                 }
-                j.setText(num.toString());
             }
             content.put(j.getName(), SYSTools.escapeXML(j.getText()));
             changed = true;
@@ -402,7 +430,8 @@ public class PnlEditResInfo {
                     jl.setFont(SYSConst.ARIAL14BOLD);
                 }
                 jl.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
-                outerpanel.add("br left", jl);
+                String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
+                outerpanel.add(layout, jl);
                 tabgroup = true;
             }
             if (tagName.equalsIgnoreCase("option")) {
@@ -462,14 +491,22 @@ public class PnlEditResInfo {
             // ---------------------- TEXTFELDER --------------------------------
             if (tagName.equalsIgnoreCase("textfield")) {
                 groupname = attributes.getValue("name");
-                // Hiermit kann man den Datentyp des Textfeldes erzwingen.
-                // Der Caretlistener sorgt für den Rest.
-                int type = TYPE_DONT_CARE;
+
+                TextFieldFocusListener tffl = new TextFieldFocusListener(TYPE_DONT_CARE);
                 if (SYSTools.catchNull(attributes.getValue("type")).equals("int")) {
-                    type = TYPE_INT;
+                    tffl = new TextFieldFocusListener(TYPE_INT);
                 }
                 if (SYSTools.catchNull(attributes.getValue("type")).equals("double")) {
-                    type = TYPE_DOUBLE;
+                    tffl = new TextFieldFocusListener(TYPE_DOUBLE);
+                }
+                if (SYSTools.catchNull(attributes.getValue("type")).equals("date")) {
+
+                    if (SYSTools.catchNull(attributes.getValue("onlyinfuture"), "false").equalsIgnoreCase("true")) {
+                        tffl = new TextFieldFocusListener(TYPE_DATE, new Pair<DateTime, DateTime>(new DateTime(), new DateTime(SYSConst.DATE_UNTIL_FURTHER_NOTICE)));
+                    } else {
+                        tffl = new TextFieldFocusListener(TYPE_DATE);
+                    }
+
                 }
 
                 JLabel jl = new JLabel(attributes.getValue("label") + ":");
@@ -480,7 +517,7 @@ public class PnlEditResInfo {
                 outerpanel.add(layout, jl);
                 outerpanel.add("tab hfill", j);
                 components.put(groupname, j); // für den späteren Direktzugriff
-                j.addFocusListener(new TextFieldFocusListener(type));
+                j.addFocusListener(tffl);
                 //                j.addCaretListener(new TextFieldCaretListener(type, notempty));
                 String defaultText = SYSTools.catchNull(attributes.getValue("default"));
                 j.setText(defaultText);
@@ -496,8 +533,7 @@ public class PnlEditResInfo {
             // ---------------------- tiny ambulance car --------------------------------
             if (tagName.equalsIgnoreCase("tx")) {
                 JLabel jl = new JLabel(SYSConst.icon16ambulance);
-
-//                                            String layout = SYSTools.catchNull(attributes.getValue("layout"), "p left");
+                jl.setToolTipText(OPDE.lang.getString("nursingrecords.info.tx.tooltip"));
                 outerpanel.add(jl);
             }
             // ---------------------- Imagelabels --------------------------------

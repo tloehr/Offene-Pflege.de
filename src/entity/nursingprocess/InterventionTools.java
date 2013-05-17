@@ -24,6 +24,10 @@ public class InterventionTools {
     public static final int TYPE_PRESCRIPTION = 2;
     public static final int TYPE_SOCIAL = 3;
 
+    public static final int FLAG_NONE = 0;
+    public static final int FLAG_MOBILIZATION = 1;
+
+
     public static ListCellRenderer getRenderer() {
         return new ListCellRenderer() {
             @Override

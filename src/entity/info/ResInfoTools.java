@@ -96,7 +96,7 @@ public class ResInfoTools {
 
     public static ArrayList<ResInfo> getAll(Resident resident) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp.type >= 0 ORDER BY b.from DESC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner ORDER BY b.from DESC");
         query.setParameter("bewohner", resident);
         ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
         em.close();
@@ -273,7 +273,7 @@ public class ResInfoTools {
         return resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS
                 && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_ABSENCE
                 && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY
-                && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD
+                && !resInfo.getResInfoType().isObsolete()
                 && resInfo.getResident().isActive()
                 && (!resInfo.isClosed() || resInfo.isNoConstraints() || resInfo.isSingleIncident());
     }

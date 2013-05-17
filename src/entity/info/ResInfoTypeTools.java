@@ -4,6 +4,7 @@ import op.OPDE;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -82,6 +83,57 @@ public class ResInfoTypeTools {
         List<ResInfoType> resInfoTypen = query.getResultList();
         em.close();
         return resInfoTypen;
+    }
+
+    public static boolean containsOnlyClosedInfos(ArrayList<ResInfo> listInfos) {
+        boolean containsOnlyClosedInfos = true;
+        for (ResInfo info : listInfos) {
+            containsOnlyClosedInfos = info.isClosed();
+            if (!containsOnlyClosedInfos) {
+                break;
+            }
+        }
+        return containsOnlyClosedInfos;
+    }
+
+    public static boolean containsOneActiveObsoleteInfo(ArrayList<ResInfo> listInfos) {
+            boolean containsOneActiveObsoleteInfo = false;
+            for (ResInfo info : listInfos) {
+                containsOneActiveObsoleteInfo = info.getResInfoType().isObsolete() && !info.isClosed();
+                if (containsOneActiveObsoleteInfo) {
+                    break;
+                }
+            }
+            return containsOneActiveObsoleteInfo;
+        }
+
+    /**
+     * if you hand over an obsolete infotype to this method it returns an
+     * active version for it, using the equiv attribute. If the type is not
+     * obsolete, you will get it back.
+     * If there is no active version you will get NULL instead.
+     * Infotypes without replacements have either none active one withing their
+     * equiv domain or equiv is 0.
+     *
+     * @param resInfoType
+     * @return
+     */
+    public static ResInfoType getActiveVersion4(ResInfoType resInfoType) {
+        if (!resInfoType.isObsolete()) {
+            return resInfoType;
+        }
+        if (resInfoType.getEquiv().intValue() == 0) {
+            return null;
+        }
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM ResInfoType b WHERE b.equiv = :equiv AND b.type >= 0 ");
+        query.setParameter("equiv", resInfoType.getEquiv());
+        List<ResInfoType> resInfoTypes = query.getResultList();
+        em.close();
+        if (resInfoTypes.isEmpty()) {
+            return null;
+        }
+        return resInfoTypes.get(0); // there should never be more than one active resinfotype.
     }
 
 }

@@ -74,8 +74,9 @@ public class PnlInformation extends NursingRecordsPanel {
     private HashMap<ResInfoType, ArrayList<ResInfo>> mapType2ResInfos;
     private HashMap<ResInfo, PnlEditResInfo> mapInfo2Editor;
     private HashMap<String, CollapsiblePane> mapKey2CP;
+    private HashMap<Integer, ResInfoType> mapEquiv2Type;
 
-    private ResInfoType typeAbsence, typeStartOfStay;
+//    private ResInfoType typeAbsence, typeStartOfStay;
 
     public PnlInformation(Resident resident, JScrollPane jspSearch, PnlCare pnlCare) {
         this.resident = resident;
@@ -86,8 +87,8 @@ public class PnlInformation extends NursingRecordsPanel {
     }
 
     public void initPanel() {
-        typeAbsence = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ABSENCE);
-        typeStartOfStay = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY);
+//        typeAbsence = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ABSENCE);
+//        typeStartOfStay = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY);
         cpsAll = new CollapsiblePanes();
         jspMain.setViewportView(cpsAll);
         mapCat2Type = new HashMap<ResInfoCategory, ArrayList<ResInfoType>>();
@@ -96,6 +97,7 @@ public class PnlInformation extends NursingRecordsPanel {
         listAllTypes = new ArrayList<ResInfoType>();
         mapInfo2Editor = new HashMap<ResInfo, PnlEditResInfo>();
         mapKey2CP = new HashMap<String, CollapsiblePane>();
+        mapEquiv2Type = new HashMap<Integer, ResInfoType>();
         prepareSearchArea();
         reload();
     }
@@ -110,22 +112,30 @@ public class PnlInformation extends NursingRecordsPanel {
             mapCat2Type.put(cat, new ArrayList<ResInfoType>());
             OPDE.debug(cat.getText());
         }
-        for (ResInfoType types : listAllTypes) {
-            mapType2ResInfos.put(types, new ArrayList<ResInfo>());
-            mapCat2Type.get(types.getResInfoCat()).add(types);
+        for (ResInfoType type : listAllTypes) {
+            mapType2ResInfos.put(type, new ArrayList<ResInfo>());
+            mapCat2Type.get(type.getResInfoCat()).add(type);
+            if (type.getEquiv() > 0) {
+                mapEquiv2Type.put(type.getEquiv(), type);
+            }
         }
 
+
         for (ResInfo info : listAllInfos) {
+
             if (mapType2ResInfos.containsKey(info.getResInfoType())) {
                 mapType2ResInfos.get(info.getResInfoType()).add(info);
+            } else if (mapEquiv2Type.containsKey(info.getResInfoType().getEquiv())) { // this maybe an obsolete infotype. we will file it under its replacement
+                OPDE.debug("assigning " + info.getResInfoType().getShortDescription() + " to " + mapEquiv2Type.get(info.getResInfoType().getEquiv()).getShortDescription());
+                mapType2ResInfos.get(mapEquiv2Type.get(info.getResInfoType().getEquiv())).add(info);
             }
+
         }
 
-        for (ResInfo info : listAllInfos) {
-            if (mapType2ResInfos.containsKey(info.getResInfoType())) {
-                Collections.sort(mapType2ResInfos.get(info.getResInfoType()));
+        for (ResInfoType type : listAllTypes) {
+            if (mapType2ResInfos.containsKey(type)) {
+                Collections.sort(mapType2ResInfos.get(type));
             }
-
         }
     }
 
@@ -319,13 +329,13 @@ public class PnlInformation extends NursingRecordsPanel {
                      *      \__,_|\__,_|\__,_|
                      *
                      */
-                    if (mapType2ResInfos.get(resInfoType).isEmpty()) {
-                        if (resInfoType.getType() != ResInfoTypeTools.TYPE_ABSENCE && resInfoType.getType() != ResInfoTypeTools.TYPE_STAY && resInfoType.getType() != ResInfoTypeTools.TYPE_OLD) {
-                            final JideButton btnAdd = GUITools.createHyperlinkButton("Bisher kein Eintrag. Jetzt neu hinzufügen.", SYSConst.icon22add, null);
+                    if (mapType2ResInfos.get(resInfoType).isEmpty() || ResInfoTypeTools.containsOnlyClosedInfos(mapType2ResInfos.get(resInfoType)) || ResInfoTypeTools.containsOneActiveObsoleteInfo(mapType2ResInfos.get(resInfoType))) {
+                        String buttonText = mapType2ResInfos.get(resInfoType).isEmpty() ? "nursingrecords.info.no.entry.yet" : "nursingrecords.info.only.closed.entries";
+                        if (resInfoType.getType() != ResInfoTypeTools.TYPE_ABSENCE && resInfoType.getType() != ResInfoTypeTools.TYPE_STAY) {
+                            final JideButton btnAdd = GUITools.createHyperlinkButton(buttonText, SYSConst.icon22add, null);
                             btnAdd.addActionListener(new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-
                                     final JidePopup popup = new JidePopup();
                                     PnlEditResInfo pnlEditResInfo = new PnlEditResInfo(new ResInfo(resInfoType, resident), new Closure() {
                                         @Override
@@ -399,6 +409,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                     GUITools.showPopup(popup, SwingConstants.CENTER);
                                 }
                             });
+                            btnAdd.setEnabled(!ResInfoTypeTools.containsOneActiveObsoleteInfo(mapType2ResInfos.get(resInfoType)));
                             cpsType.add(btnAdd);
 
                             try {
@@ -470,11 +481,12 @@ public class PnlInformation extends NursingRecordsPanel {
                         } else if (resInfoType.getType() != ResInfoTypeTools.TYPE_STAY) {
                             cpsType.add(new JLabel(OPDE.lang.getString("nursingrecords.info.cant.add.stays.here")));
                         }
-                    } else {
-                        for (final ResInfo info : mapType2ResInfos.get(resInfoType)) {
-                            cpsType.add(createCP4(info));
-                        }
                     }
+
+                    for (final ResInfo info : mapType2ResInfos.get(resInfoType)) {
+                        cpsType.add(createCP4(info));
+                    }
+
                     cpsType.addExpansion();
 
                     pnlTypes.add(cpResInfoType);
@@ -776,7 +788,13 @@ public class PnlInformation extends NursingRecordsPanel {
                 }
             }
         });
-        btnChange.setEnabled(resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD && !resInfo.isClosed() && !resInfo.isSingleIncident() && !resInfo.isNoConstraints());
+        btnChange.setEnabled(
+                resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS
+                        && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY
+                        && !resInfo.getResInfoType().isObsolete()
+                        && !resInfo.isClosed()
+                        && !resInfo.isSingleIncident()
+                        && !resInfo.isNoConstraints());
 
         /***
          *               _ _ _
@@ -795,7 +813,7 @@ public class PnlInformation extends NursingRecordsPanel {
         btnEdit.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                if (!mapInfo2Editor.containsKey(resInfo)){
+                if (!mapInfo2Editor.containsKey(resInfo)) {
                     try {
                         cpInfo.setCollapsed(false);
                     } catch (PropertyVetoException e1) {
@@ -897,11 +915,11 @@ public class PnlInformation extends NursingRecordsPanel {
         cpInfo.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                if (resInfo.getResInfoType().equals(typeAbsence) || resInfo.getResInfoType().equals(typeStartOfStay)) {
+                if (resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_ABSENCE || resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_STAY || resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_DIAGNOSIS) {
                     JTextPane txt = new JTextPane();
                     txt.setContentType("text/html");
                     txt.setEditable(false);
-                    txt.setText(resInfo.getContentAsHTML());
+                    txt.setText(SYSConst.html_div(resInfo.getContentAsHTML()));
                     cpInfo.setContentPane(new JScrollPane(txt));
                 } else {
                     if (!mapInfo2Editor.containsKey(resInfo)) {
@@ -940,6 +958,7 @@ public class PnlInformation extends NursingRecordsPanel {
         listAllInfos.clear();
         mapInfo2Editor.clear();
         mapKey2CP.clear();
+        mapEquiv2Type.clear();
     }
 
     @Override
@@ -1098,10 +1117,12 @@ public class PnlInformation extends NursingRecordsPanel {
                                         editinfo.setUserOFF(em.merge(OPDE.getLogin().getUser()));
                                         em.getTransaction().commit();
 
+
+                                        ResInfoType referenceType = mapType2ResInfos.containsKey(resInfo.getResInfoType()) ? resInfo.getResInfoType() : mapEquiv2Type.get(resInfo.getResInfoType().getEquiv());
                                         // refresh data
-                                        int oldIndex = mapType2ResInfos.get(resInfo.getResInfoType()).indexOf(resInfo);
-                                        mapType2ResInfos.get(resInfo.getResInfoType()).remove(resInfo);
-                                        mapType2ResInfos.get(editinfo.getResInfoType()).add(oldIndex, editinfo);
+                                        int oldIndex = mapType2ResInfos.get(referenceType).indexOf(resInfo);
+                                        mapType2ResInfos.get(referenceType).remove(resInfo);
+                                        mapType2ResInfos.get(referenceType).add(oldIndex, editinfo);
 
                                         listAllInfos.remove(resInfo);
                                         listAllInfos.add(editinfo);
@@ -1163,7 +1184,8 @@ public class PnlInformation extends NursingRecordsPanel {
                                             em.getTransaction().commit();
 
                                             // refresh data
-                                            mapType2ResInfos.get(resInfo.getResInfoType()).remove(resInfo);
+                                            ResInfoType referenceType = mapType2ResInfos.containsKey(resInfo.getResInfoType()) ? resInfo.getResInfoType() : mapEquiv2Type.get(resInfo.getResInfoType().getEquiv());
+                                            mapType2ResInfos.get(referenceType).remove(resInfo);
                                             listAllInfos.remove(resInfo);
                                             sortData();
                                             mapKey2CP.remove(keyResInfo);
@@ -1719,7 +1741,7 @@ public class PnlInformation extends NursingRecordsPanel {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     final JidePopup popup = new JidePopup();
-                    PnlAway pnlAway = new PnlAway(new ResInfo(typeAbsence, resident), new Closure() {
+                    PnlAway pnlAway = new PnlAway(new ResInfo(ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ABSENCE), resident), new Closure() {
                         @Override
                         public void execute(Object o) {
                             popup.hidePopup();

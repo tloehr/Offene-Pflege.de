@@ -25,15 +25,12 @@
  */
 package entity.info;
 
-import op.OPDE;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
 
 /**
  * @author tloehr
- *
  */
 @Entity
 @Table(name = "resinfotype")
@@ -60,6 +57,10 @@ public class ResInfoType implements Serializable {
     @Version
     @Column(name = "version")
     private Long version;
+    // this column tells us which form was replaced by which other form. In fact it means, that every ResInfoType with the same equiv has
+    // evolved over the time. All ResInfoTypes with the same Equiv are listed in the same CollapsiblePane in PnlInformation.
+    @Column(name = "equiv")
+    private Integer equiv;
 
     // ==
     // N:1 Relationen
@@ -86,6 +87,10 @@ public class ResInfoType implements Serializable {
 
     public void setBwinftyp(String bwinftyp) {
         this.bwinftyp = bwinftyp;
+    }
+
+    public Integer getEquiv() {
+        return equiv;
     }
 
     public String getXml() {
