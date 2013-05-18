@@ -335,7 +335,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
 
     @Override
     public int compareTo(ResInfo resInfo) {
-        int compare = resInfo.getResInfoType().isObsolete() ? -1 : 0;
+        int compare = new Boolean(this.getResInfoType().isObsolete()).compareTo(resInfo.getResInfoType().isObsolete());
         if (compare == 0) {
             compare = to.compareTo(resInfo.getTo());
         }

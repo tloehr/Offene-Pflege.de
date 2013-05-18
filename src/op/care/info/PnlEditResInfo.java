@@ -1,5 +1,7 @@
 package op.care.info;
 
+import com.jidesoft.swing.DefaultOverlayable;
+import com.jidesoft.swing.OverlayTextArea;
 import entity.info.ResInfo;
 import op.OPDE;
 import op.threads.DisplayMessage;
@@ -15,6 +17,9 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
@@ -58,6 +63,8 @@ public class PnlEditResInfo {
     //    private op.tools.PnlPIT pnlPIT;
     private JPanel pnlContent, main;
     private boolean changed = false;
+    private OverlayTextArea txtComment;
+    private DefaultOverlayable ovrComment;
 
     public PnlEditResInfo(ResInfo resInfo) {
         this(resInfo, null);
@@ -72,7 +79,7 @@ public class PnlEditResInfo {
     private void initPanel() {
         content = new Properties();
 
-        pnlContent = new JPanel();
+        pnlContent = new JPanel(new BorderLayout());
         initPanel = true;
 
         // Structure...
@@ -86,7 +93,22 @@ public class PnlEditResInfo {
 
             parser.parse(is);
 
-            pnlContent = h.getPanel();
+            txtComment = new OverlayTextArea();
+            txtComment.setDisabledTextColor(Color.DARK_GRAY);
+            txtComment.addCaretListener(new CaretListener() {
+                @Override
+                public void caretUpdate(CaretEvent e) {
+                    if (initPanel) return;
+                    changed = true;
+                }
+            });
+            ovrComment = new DefaultOverlayable(txtComment);
+            JLabel lblComment = new JLabel(OPDE.lang.getString("misc.msg.comment"));
+            lblComment.setForeground(Color.LIGHT_GRAY);
+            lblComment.setFont(SYSConst.ARIAL18BOLD);
+            ovrComment.addOverlayComponent(lblComment, DefaultOverlayable.SOUTH_EAST);
+            pnlContent.add(h.getPanel(), BorderLayout.CENTER);
+            pnlContent.add(ovrComment, BorderLayout.SOUTH);
 
         } catch (SAXException ex) {
             ex.printStackTrace();
@@ -103,8 +125,8 @@ public class PnlEditResInfo {
         main = null;
         if (closure != null) {
             main = new JPanel(new BorderLayout());
+            main.setBorder(new EmptyBorder(10, 10, 10, 10));
             main.add(pnlContent, BorderLayout.CENTER);
-
 
             JPanel btnPanel = new JPanel(new BorderLayout());
 
@@ -126,6 +148,7 @@ public class PnlEditResInfo {
             main.add(jl, BorderLayout.NORTH);
         }
 
+
         SYSTools.setXEnabled(pnlContent, main != null);
     }
 
@@ -145,6 +168,8 @@ public class PnlEditResInfo {
         } catch (IOException e1) {
             OPDE.fatal(e1);
         }
+
+        resInfo.setText(txtComment.getText());
 
         return resInfo;
     }
@@ -218,6 +243,8 @@ public class PnlEditResInfo {
             OPDE.fatal(ex);
         }
 
+        txtComment.setText(resInfo.getText());
+
         //        OPDE.debug(content.toString());
 
         for (Object key : components.keySet()) {
@@ -242,8 +269,17 @@ public class PnlEditResInfo {
             } else if (entry instanceof JTextField) {
                 ((JTextField) entry).setText(SYSTools.unescapeXML(content.getProperty(key.toString())));
             } else if (entry instanceof JComboBox) {
-                SYSTools.selectInComboBox((JComboBox) entry, content.getProperty(key.toString()));
-                //                 ((JComboBox) entry), content.getProperty(key.toString())
+                JComboBox cmb = ((JComboBox) entry);
+                for (int i = 0; i < cmb.getModel().getSize(); i++) {
+                    if (((ComboBoxBean) cmb.getModel().getElementAt(i)).getName().equals(content.getProperty(key.toString()))) {
+                        cmb.setSelectedIndex(i);
+                        break;
+                    }
+                }
+//
+//                ((JComboBox) entry).setSelectedItem(new ComboBoxBean());
+//                SYSTools.selectInComboBox((JComboBox) entry, content.getProperty(key.toString()));
+//                //                 ((JComboBox) entry), content.getProperty(key.toString())
             }
         }
 
@@ -277,11 +313,15 @@ public class PnlEditResInfo {
     private class ComboBoxItemStateListener implements ItemListener {
 
         public void itemStateChanged(java.awt.event.ItemEvent evt) {
+            if (evt.getStateChange() != ItemEvent.SELECTED) return;
             JComboBox j = (JComboBox) evt.getSource();
-            String cmbname = j.getName();
-            ComboBoxModel cbm = j.getModel();
-            ListElement le = (ListElement) cbm.getSelectedItem();
-            content.put(cmbname, le.getData());
+//            String cmbname = j.getName();
+//            ComboBoxModel cbm = j.getModel();
+            ComboBoxBean bean = (ComboBoxBean) j.getSelectedItem();
+            content.put(j.getName(), bean.getName());
+            j.setToolTipText(bean.getTooltip());
+//            ListElement le = (ListElement) cbm.getSelectedItem();
+//            content.put(cmbname, le.getData());
             changed = true;
         }
     }
@@ -394,6 +434,7 @@ public class PnlEditResInfo {
 
         @Override
         public void startElement(String nsURI, String strippedName, String tagName, Attributes attributes) throws SAXException {
+            OPDE.debug(SYSTools.catchNull(attributes.getValue("name"), "noname"));
             // ---------------------- OPTIONGROUPS --------------------------------
             if (tagName.equalsIgnoreCase("optiongroup") || tagName.equalsIgnoreCase("scalegroup")) {
                 groupname = attributes.getValue("name");
@@ -500,22 +541,25 @@ public class PnlEditResInfo {
                     tffl = new TextFieldFocusListener(TYPE_DOUBLE);
                 }
                 if (SYSTools.catchNull(attributes.getValue("type")).equals("date")) {
-
                     if (SYSTools.catchNull(attributes.getValue("onlyinfuture"), "false").equalsIgnoreCase("true")) {
                         tffl = new TextFieldFocusListener(TYPE_DATE, new Pair<DateTime, DateTime>(new DateTime(), new DateTime(SYSConst.DATE_UNTIL_FURTHER_NOTICE)));
                     } else {
                         tffl = new TextFieldFocusListener(TYPE_DATE);
                     }
-
                 }
-
+                int length = TEXTFIELD_STANDARD_WIDTH;
+                if (!SYSTools.catchNull(attributes.getValue("length")).isEmpty()) {
+                    length = Integer.parseInt(attributes.getValue("length"));
+                }
                 JLabel jl = new JLabel(attributes.getValue("label") + ":");
-                JTextField j = new JTextField(TEXTFIELD_STANDARD_WIDTH);
+                JTextField j = new JTextField(length);
                 j.setName(groupname);
                 j.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 outerpanel.add(layout, jl);
-                outerpanel.add("tab hfill", j);
+
+                String hfill = SYSTools.catchNull(attributes.getValue("hfill")).equalsIgnoreCase("false") ? "" : " hfill";
+                outerpanel.add("tab" + hfill, j);
                 components.put(groupname, j); // für den späteren Direktzugriff
                 j.addFocusListener(tffl);
                 //                j.addCaretListener(new TextFieldCaretListener(type, notempty));
@@ -551,9 +595,20 @@ public class PnlEditResInfo {
                 if (!SYSTools.catchNull(attributes.getValue("color")).isEmpty()) {
                     jl.setForeground(GUITools.getColor(attributes.getValue("color")));
                 }
+                int fontstyle = Font.PLAIN;
+                if (!SYSTools.catchNull(attributes.getValue("fontstyle")).isEmpty()) {
+                    if (attributes.getValue("fontstyle").equalsIgnoreCase("bold")) {
+                        fontstyle = Font.BOLD;
+                    }
+                    if (attributes.getValue("fontstyle").equalsIgnoreCase("italic")) {
+                        fontstyle = Font.ITALIC;
+                    }
+                }
                 if (!SYSTools.catchNull(attributes.getValue("size")).isEmpty()) {
-                    //                    int size = Integer.parseInt(attributes.getValue("size"));
-                    jl.setFont(SYSConst.ARIAL14BOLD);
+                    int size = Integer.parseInt(attributes.getValue("size"));
+                    jl.setFont(new Font("Arial", fontstyle, size));
+                } else {
+                    jl.setFont(new Font("Arial", fontstyle, 12));
                 }
                 jl.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
@@ -563,7 +618,6 @@ public class PnlEditResInfo {
             if (tagName.equalsIgnoreCase("combobox")) {
                 groupname = attributes.getValue("name");
                 boxModel = new DefaultComboBoxModel();
-                //itemNum = 0;
                 JComboBox jcb = new JComboBox();
                 jcb.setName(groupname);
                 jcb.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
@@ -576,8 +630,7 @@ public class PnlEditResInfo {
 
             }
             if (tagName.equalsIgnoreCase("item")) {
-                //itemNum++;
-                boxModel.addElement(new ListElement(attributes.getValue("label"), attributes.getValue("name")));
+                boxModel.addElement(new ComboBoxBean(attributes.getValue("label"), attributes.getValue("name"), attributes.getValue("tooltip")));
             }
         }
 
@@ -594,13 +647,16 @@ public class PnlEditResInfo {
             if (qName.equalsIgnoreCase("combobox")) {
                 JComboBox j = (JComboBox) components.get(groupname);
                 j.setModel(boxModel);
-                ListElement le = (ListElement) j.getSelectedItem();
-                // Hier muss unterschieden werden, ob der PK ein Long oder ein String ist.
-                if (le.getPk() <= 0) {
-                    content.put(j.getName(), le.getData());
-                } else {
-                    content.put(j.getName(), Long.toString(le.getPk()));
-                }
+                ComboBoxBean bean = (ComboBoxBean) j.getSelectedItem();
+//                ListElement le = (ListElement) j.getSelectedItem();
+//                // Hier muss unterschieden werden, ob der PK ein Long oder ein String ist.
+//                if (le.getPk() <= 0) {
+//                    content.put(j.getName(), le.getData());
+//                } else {
+//                    content.put(j.getName(), Long.toString(le.getPk()));
+//                }
+                content.put(bean.getName(), bean.getLabel());
+
                 boxModel = null;
             }
         }
@@ -613,5 +669,49 @@ public class PnlEditResInfo {
         }
     } // private class HandlerDatenStruktur
 
+
+    class ComboBoxBean {
+        private String label, name, tooltip;
+
+        @Override
+        public String toString() {
+            return label;
+        }
+
+        public ComboBoxBean(String label, String name, String tooltip) {
+            this.label = label;
+            this.name = name;
+            this.tooltip = tooltip;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public void setLabel(String label) {
+            this.label = label;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getTooltip() {
+            return tooltip;
+        }
+
+        public void setTooltip(String tooltip) {
+            this.tooltip = tooltip;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return name.equals(((ComboBoxBean) obj).getName());
+        }
+    }
 
 }

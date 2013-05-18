@@ -510,6 +510,8 @@ public class PnlInformation extends NursingRecordsPanel {
 
         final CollapsiblePane cpInfo = mapKey2CP.get(keyResInfo);
 
+        final boolean btnMenuEnabled = resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_ABSENCE && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY;
+
         String title = "";
 
         if (resInfo.isSingleIncident()) {
@@ -696,8 +698,35 @@ public class PnlInformation extends NursingRecordsPanel {
         }
 
 
+        final JButton btnPrint = new JButton(SYSConst.icon22print2);
+        btnPrint.setPressedIcon(SYSConst.icon22print2Pressed);
+        btnPrint.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnPrint.setAlignmentY(Component.TOP_ALIGNMENT);
+        btnPrint.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnPrint.setContentAreaFilled(false);
+        btnPrint.setBorder(null);
+        btnPrint.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String html = "";
+                html += "<h3 id=\"fonth2\" >" + ResidentTools.getLabelText(resident) + "</h2>\n";
+                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_BIOHAZARD ? SYSConst.html_48x48_biohazard : "";
+                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_DIABETES ? SYSConst.html_48x48_diabetes : "";
+                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_ALLERGY ? SYSConst.html_48x48_allergy : "";
+                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_WARNING ? SYSConst.html_48x48_warning : "";
+                ArrayList<ResInfo> list = new ArrayList<ResInfo>();
+                list.add(resInfo);
+                html += ResInfoTools.getResInfosAsHTML(list, true, null);
+                SYSFilesTools.print(html, true);
+                list.clear();
+            }
+        });
+        cptitle.getRight().add(btnPrint);
+
+
         // forward declaration
         final JToggleButton btnEdit = new JToggleButton(SYSConst.icon22edit3);
+        final JButton btnMenu = new JButton(SYSConst.icon22menu);
         /***
          *           _
          *       ___| |__   __ _ _ __   __ _  ___
@@ -717,6 +746,8 @@ public class PnlInformation extends NursingRecordsPanel {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 mapInfo2Editor.get(resInfo).setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+                btnPrint.setEnabled(e.getStateChange() != ItemEvent.SELECTED);
+                btnMenu.setEnabled(btnMenuEnabled && e.getStateChange() != ItemEvent.SELECTED);
                 btnEdit.setEnabled(e.getStateChange() == ItemEvent.DESELECTED && ResInfoTools.isEditable(resInfo) && (OPDE.isAdmin() ||
                         (resInfo.getUserON().equals(OPDE.getLogin().getUser()) && new DateMidnight(resInfo.getFrom()).equals(new DateMidnight()))  // The same user only on the same day.
                 ));
@@ -820,6 +851,8 @@ public class PnlInformation extends NursingRecordsPanel {
                         //bah!!
                     }
                 }
+                btnPrint.setEnabled(e.getStateChange() != ItemEvent.SELECTED);
+                btnMenu.setEnabled(btnMenuEnabled && e.getStateChange() != ItemEvent.SELECTED);
                 mapInfo2Editor.get(resInfo).setEnabled(e.getStateChange() == ItemEvent.SELECTED);
                 btnChange.setEnabled(e.getStateChange() == ItemEvent.DESELECTED && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD && !resInfo.isClosed() && !resInfo.isSingleIncident() && !resInfo.isNoConstraints());
                 if (e.getStateChange() == ItemEvent.DESELECTED && mapInfo2Editor.get(resInfo).isChanged()) {
@@ -832,6 +865,7 @@ public class PnlInformation extends NursingRecordsPanel {
                         ResInfo tmpInfo = mapInfo2Editor.get(resInfo).getResInfo();
                         editinfo.setHtml(ResInfoTools.getContentAsHTML(tmpInfo));
                         editinfo.setProperties(tmpInfo.getProperties());
+                        editinfo.setText(tmpInfo.getText());
                         editinfo.setUserON(em.merge(OPDE.getLogin().getUser()));
 
                         em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
@@ -886,7 +920,7 @@ public class PnlInformation extends NursingRecordsPanel {
          *     |_|  |_|\___|_| |_|\__,_|
          *
          */
-        final JButton btnMenu = new JButton(SYSConst.icon22menu);
+
         btnMenu.setPressedIcon(SYSConst.icon22Pressed);
         btnMenu.setAlignmentX(Component.RIGHT_ALIGNMENT);
         btnMenu.setAlignmentY(Component.TOP_ALIGNMENT);
@@ -909,7 +943,7 @@ public class PnlInformation extends NursingRecordsPanel {
             }
         });
         cptitle.getRight().add(btnMenu);
-        btnMenu.setEnabled(resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_ABSENCE && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY);
+        btnMenu.setEnabled(btnMenuEnabled);
 
 
         cpInfo.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
