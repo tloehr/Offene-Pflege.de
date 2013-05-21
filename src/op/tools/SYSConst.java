@@ -563,6 +563,8 @@ public class SYSConst {
     public static final Icon icon22pdca = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/pdca.png"));
     public static final Icon icon22RedFlag = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/flag.png"));
     public static final Icon icon22ledRedOn = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ledred.png"));
+    public static final Icon icon32ledRedOn = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/ledred.png"));
+    public static final Icon icon32ledGrey = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/ledgrey.png"));
     public static final Icon icon22ledRedOff = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/leddarkred.png"));
     public static final Icon icon22ledYellowOn = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/ledyellow.png"));
     public static final Icon icon22ledYellowOff = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/leddarkyellow.png"));
@@ -598,6 +600,8 @@ public class SYSConst {
     public static final Icon icon22colorset = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/colorset.png"));
     public static final Icon icon22colorsetPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/colorset_pressed.png"));
     public static final Icon icon22allergy = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/allergy.png"));
+    public static final Icon icon32selected = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/bw/selected.png"));
+    public static final Icon icon32unselected = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/bw/unselected.png"));
     public static final Icon gfx259x203medic0 = new ImageIcon(SYSConst.class.getResource("/artwork/other/medicine0.png"));
     public static final Icon gfx259x203medic1 = new ImageIcon(SYSConst.class.getResource("/artwork/other/medicine1.png"));
     public static final Icon gfx259x203medic2 = new ImageIcon(SYSConst.class.getResource("/artwork/other/medicine2.png"));

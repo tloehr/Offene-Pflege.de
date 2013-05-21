@@ -31,6 +31,7 @@ import entity.files.SYSFilesTools;
 import entity.nursingprocess.DFNTools;
 import entity.prescription.BHPTools;
 import entity.system.*;
+import op.care.info.PnlBodyScheme;
 import op.system.AppInfo;
 import op.system.EMailSystem;
 import op.system.LogicalPrinters;
@@ -651,9 +652,25 @@ public class OPDE {
              *                                               \_\/_/
              */
 
-            SYSTools.checkForSoftwareupdates();
-            mainframe = new FrmMain();
-            mainframe.setVisible(true);
+
+
+        JFrame frm = new JFrame();
+            frm.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            frm.setLayout(new FlowLayout());
+
+                    frm.getContentPane().add(new PnlBodyScheme(new Properties()));
+
+                    frm.setVisible(true);
+
+//            SYSTools.checkForSoftwareupdates();
+//
+//
+//
+//            mainframe = new FrmMain();
+//
+//
+//
+//            mainframe.setVisible(true);
 
         }
     }
