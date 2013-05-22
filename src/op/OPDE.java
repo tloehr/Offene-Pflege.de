@@ -654,23 +654,23 @@ public class OPDE {
 
 
 
-        JFrame frm = new JFrame();
-            frm.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-            frm.setLayout(new FlowLayout());
+//        JFrame frm = new JFrame();
+//            frm.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+//            frm.setLayout(new FlowLayout());
+//
+//                    frm.getContentPane().add(new PnlBodyScheme(new Properties()));
+//
+//                    frm.setVisible(true);
 
-                    frm.getContentPane().add(new PnlBodyScheme(new Properties()));
+            SYSTools.checkForSoftwareupdates();
 
-                    frm.setVisible(true);
 
-//            SYSTools.checkForSoftwareupdates();
-//
-//
-//
-//            mainframe = new FrmMain();
-//
-//
-//
-//            mainframe.setVisible(true);
+
+            mainframe = new FrmMain();
+
+
+
+            mainframe.setVisible(true);
 
         }
     }

@@ -154,11 +154,6 @@ public class PnlEditResInfo {
 
 
     public ResInfo getResInfo() {
-//            if (pnlPIT != null) {
-//            resInfo.setFrom(pnlPIT.getPIT());
-
-//            }
-
 
         try {
             StringWriter writer = new StringWriter();
@@ -245,8 +240,6 @@ public class PnlEditResInfo {
 
         txtComment.setText(resInfo.getText());
 
-        //        OPDE.debug(content.toString());
-
         for (Object key : components.keySet()) {
             Object entry = components.get(key);
 
@@ -254,20 +247,18 @@ public class PnlEditResInfo {
                 StringTokenizer st = new StringTokenizer(key.toString(), ":");
                 String tagname = st.nextToken();
                 String value = st.nextToken();
-                //                OPDE.debug("key: " + key.toString());
-                //                OPDE.debug("componentname: " + componentname);
                 ((JRadioButton) entry).setSelected(content.containsKey(tagname) && content.getProperty(tagname).equals(value));
             } else if (entry instanceof Pair) { // Scale
                 StringTokenizer st = new StringTokenizer(key.toString(), ":");
                 String tagname = st.nextToken();
                 String value = st.nextToken();
-                //                OPDE.debug("key: " + key.toString());
-                //                OPDE.debug("componentname: " + componentname);
                 ((Pair<JRadioButton, BigDecimal>) entry).getFirst().setSelected(content.getProperty(tagname).equals(value));
             } else if (entry instanceof JCheckBox) {
                 ((JCheckBox) entry).setSelected(content.getProperty(key.toString()).equalsIgnoreCase("true"));
             } else if (entry instanceof JTextField) {
                 ((JTextField) entry).setText(SYSTools.unescapeXML(content.getProperty(key.toString())));
+            } else if (entry instanceof PnlBodyScheme) {
+                ((PnlBodyScheme) entry).setContent(content);
             } else if (entry instanceof JComboBox) {
                 JComboBox cmb = ((JComboBox) entry);
                 for (int i = 0; i < cmb.getModel().getSize(); i++) {
@@ -276,10 +267,6 @@ public class PnlEditResInfo {
                         break;
                     }
                 }
-//
-//                ((JComboBox) entry).setSelectedItem(new ComboBoxBean());
-//                SYSTools.selectInComboBox((JComboBox) entry, content.getProperty(key.toString()));
-//                //                 ((JComboBox) entry), content.getProperty(key.toString())
             }
         }
 
@@ -296,6 +283,20 @@ public class PnlEditResInfo {
             if (scalemode) {
                 calcScale();
             }
+            changed = true;
+        }
+    }
+
+    private class BodySchemeItemListener implements ItemListener {
+        private final String name;
+
+        private BodySchemeItemListener(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+            content.put(name + "." + ((JCheckBox) e.getSource()).getName(), Boolean.toString(((JCheckBox) e.getSource()).isSelected()));
             changed = true;
         }
     }
@@ -434,7 +435,7 @@ public class PnlEditResInfo {
 
         @Override
         public void startElement(String nsURI, String strippedName, String tagName, Attributes attributes) throws SAXException {
-            OPDE.debug(SYSTools.catchNull(attributes.getValue("name"), "noname"));
+//            OPDE.debug(SYSTools.catchNull(attributes.getValue("name"), "noname"));
             // ---------------------- OPTIONGROUPS --------------------------------
             if (tagName.equalsIgnoreCase("optiongroup") || tagName.equalsIgnoreCase("scalegroup")) {
                 groupname = attributes.getValue("name");
@@ -461,15 +462,35 @@ public class PnlEditResInfo {
             if (tagName.equalsIgnoreCase("risk")) {
                 scaleriskmodel.add(new RiskBean(attributes.getValue("from"), attributes.getValue("to"), attributes.getValue("label"), attributes.getValue("color")));
             }
+            /***
+             *      _        _
+             *     | |_ __ _| |__  __ _ _ _ ___ _  _ _ __
+             *     |  _/ _` | '_ \/ _` | '_/ _ \ || | '_ \
+             *      \__\__,_|_.__/\__, |_| \___/\_,_| .__/
+             *                    |___/             |_|
+             */
             if (tagName.equalsIgnoreCase("tabgroup")) {
                 JLabel jl = new JLabel(attributes.getValue("label") + ":");
                 if (!SYSTools.catchNull(attributes.getValue("color")).isEmpty()) {
                     jl.setForeground(GUITools.getColor(attributes.getValue("color")));
                 }
-                if (!SYSTools.catchNull(attributes.getValue("size")).isEmpty()) {
-                    //                    int size = Integer.parseInt(attributes.getValue("size"));
-                    jl.setFont(SYSConst.ARIAL14BOLD);
+
+                int fontstyle = Font.BOLD;
+                if (!SYSTools.catchNull(attributes.getValue("fontstyle")).isEmpty()) {
+                    if (attributes.getValue("fontstyle").equalsIgnoreCase("plain")) {
+                        fontstyle = Font.PLAIN;
+                    }
+                    if (attributes.getValue("fontstyle").equalsIgnoreCase("italic")) {
+                        fontstyle = Font.ITALIC;
+                    }
                 }
+                if (!SYSTools.catchNull(attributes.getValue("size")).isEmpty()) {
+                    int size = Integer.parseInt(attributes.getValue("size"));
+                    jl.setFont(new Font("Arial", fontstyle, size));
+                } else {
+                    jl.setFont(new Font("Arial", fontstyle, 14));
+                }
+
                 jl.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 outerpanel.add(layout, jl);
@@ -529,7 +550,13 @@ public class PnlEditResInfo {
                 }
                 content.put(groupname, (j.isSelected() ? "true" : "false"));
             }
-            // ---------------------- TEXTFELDER --------------------------------
+            /***
+             *      _           _    __ _     _    _
+             *     | |_ _____ _| |_ / _(_)___| |__| |
+             *     |  _/ -_) \ /  _|  _| / -_) / _` |
+             *      \__\___/_\_\\__|_| |_\___|_\__,_|
+             *
+             */
             if (tagName.equalsIgnoreCase("textfield")) {
                 groupname = attributes.getValue("name");
 
@@ -569,10 +596,22 @@ public class PnlEditResInfo {
             }
             // ---------------------- Separators --------------------------------
             if (tagName.equalsIgnoreCase("separator")) {
-                //groupname = attributes.getValue("name");
-                //JLabel jl = new JLabel(new javax.swing.ImageIcon(getClass().getResource(attributes.getValue("image"))));
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "p hfill");
                 outerpanel.add(layout, new JSeparator());
+            }
+            /***
+             *      _             _             _
+             *     | |__  ___  __| |_  _ ___ __| |_  ___ _ __  ___
+             *     | '_ \/ _ \/ _` | || (_-</ _| ' \/ -_) '  \/ -_)
+             *     |_.__/\___/\__,_|\_, /__/\__|_||_\___|_|_|_\___|
+             *                      |__/
+             */
+            if (tagName.equalsIgnoreCase("bodyscheme")) {
+                groupname = attributes.getValue("name");
+                PnlBodyScheme pnlBodyScheme = new PnlBodyScheme(groupname, new BodySchemeItemListener(groupname));
+                String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
+                components.put(groupname, pnlBodyScheme);
+                outerpanel.add(layout, pnlBodyScheme);
             }
             // ---------------------- tiny ambulance car --------------------------------
             if (tagName.equalsIgnoreCase("tx")) {
@@ -614,7 +653,13 @@ public class PnlEditResInfo {
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 outerpanel.add(layout, jl);
             }
-            // ---------------------- Comboboxen --------------------------------
+            /***
+             *                   _         _
+             *      __ ___ _ __ | |__  ___| |__  _____ __
+             *     / _/ _ \ '  \| '_ \/ _ \ '_ \/ _ \ \ /
+             *     \__\___/_|_|_|_.__/\___/_.__/\___/_\_\
+             *
+             */
             if (tagName.equalsIgnoreCase("combobox")) {
                 groupname = attributes.getValue("name");
                 boxModel = new DefaultComboBoxModel();
@@ -626,11 +671,21 @@ public class PnlEditResInfo {
                 JLabel jl = new JLabel(attributes.getValue("label") + ":");
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 outerpanel.add(layout, jl);
-                outerpanel.add("tab hfill", jcb);
+                outerpanel.add("tab", jcb);
 
             }
+            /***
+             *      _ _
+             *     (_) |_ ___ _ __
+             *     | |  _/ -_) '  \
+             *     |_|\__\___|_|_|_|
+             *
+             */
             if (tagName.equalsIgnoreCase("item")) {
                 boxModel.addElement(new ComboBoxBean(attributes.getValue("label"), attributes.getValue("name"), attributes.getValue("tooltip")));
+                if (SYSTools.catchNull(attributes.getValue("default")).equals("true")) {
+                    content.put(groupname, attributes.getValue("name"));
+                }
             }
         }
 
@@ -647,17 +702,7 @@ public class PnlEditResInfo {
             if (qName.equalsIgnoreCase("combobox")) {
                 JComboBox j = (JComboBox) components.get(groupname);
                 j.setModel(boxModel);
-                ComboBoxBean bean = (ComboBoxBean) j.getSelectedItem();
-//                ListElement le = (ListElement) j.getSelectedItem();
-//                // Hier muss unterschieden werden, ob der PK ein Long oder ein String ist.
-//                if (le.getPk() <= 0) {
-//                    content.put(j.getName(), le.getData());
-//                } else {
-//                    content.put(j.getName(), Long.toString(le.getPk()));
-//                }
-                content.put(bean.getName(), bean.getLabel());
-
-                boxModel = null;
+//                ComboBoxBean bean = (ComboBoxBean) j.getSelectedItem();
             }
         }
 

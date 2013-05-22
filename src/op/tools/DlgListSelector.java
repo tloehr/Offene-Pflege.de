@@ -171,7 +171,7 @@ public class DlgListSelector extends MyJDialog {
         dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
 
-//    public Object getSelection() {
+//    public Object getContent() {
 //        super.setVisible(true);
 //        Object result = null;
 //        if (apply) {

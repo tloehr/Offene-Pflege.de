@@ -26,6 +26,19 @@ public class InterventionTools {
 
     public static final int FLAG_NONE = 0;
     public static final int FLAG_MOBILIZATION = 1;
+    public static final int FLAG_WEIGHT_CONTROL = 2;
+    public static final int FLAG_CATHETER_CHANGE = 3;
+    public static final int FLAG_SUP_CATHETER_CHANGE = 4;
+    public static final int FLAG_CONTROL_PACEMAKER = 5;
+    public static final int FLAG_GAVAGE_FOOD = 6;
+    public static final int FLAG_GAVAGE_LIQUID = 7;
+    public static final int FLAG_GLUCOSE_CHECK  = 8;
+    public static final int FLAG_BP_CHECK  = 9;
+    public static final int FLAG_PORT_CHECK  = 10;
+    public static final int FLAG_PULSE_CHECK  = 11;
+    public static final int FLAG_WEIGHT_CHECK  = 12;
+    public static final int FLAG_PAIN_CHECK  = 13;
+    public static final int FLAG_TEMP_CHECK  = 14;
 
 
     public static ListCellRenderer getRenderer() {

@@ -26,6 +26,18 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class NursingProcessTools {
+
+    public static final int FLAG_NONE = 0;
+    public static final int FLAG_PROPH_CONTRACTURE = 1;
+    public static final int FLAG_PROPH_BEDSORE = 2;
+    public static final int FLAG_PROPH_SOOR = 3;
+    public static final int FLAG_PROPH_THROMBOSIS = 4;
+    public static final int FLAG_PROPH_PNEUMONIA = 5;
+    public static final int FLAG_PROPH_INTERTRIGO = 6;
+    public static final int FLAG_PROPH_FALL = 7;
+    public static final int FLAG_PROPH_OBSTIPATION = 7;
+    public static final int FLAG_ADDITIONAL_NUTRITION = 8;
+
     public static final String UNIQUEID = "__plankenn";
     public static final int MAXNumOfEvals = 4;
 
