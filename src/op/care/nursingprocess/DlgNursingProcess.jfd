@@ -39,7 +39,7 @@
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
-          <string>fill:default, relgap, default, linegap, fill:default:grow, linegap, fill:default:grow, linegap, pref</string> 
+          <string>fill:default, relgap, default, linegap, fill:default:grow, linegap, fill:default:grow, linegap, default, linegap, pref</string> 
          </void> 
         </object> 
         <void property="name"> 
@@ -58,10 +58,10 @@
           </void> 
           <void method="setProperty"> 
            <string>text</string> 
-           <string>Stichwort:</string> 
+           <string>Stichwort</string> 
           </void> 
           <void property="name"> 
-           <string>jLabel4</string> 
+           <string>lblTopic</string> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -120,10 +120,10 @@
           </void> 
           <void method="setProperty"> 
            <string>text</string> 
-           <string>Kategorie:</string> 
+           <string>Kategorie</string> 
           </void> 
           <void property="name"> 
-           <string>jLabel5</string> 
+           <string>lblCat</string> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -244,10 +244,10 @@
           </void> 
           <void method="setProperty"> 
            <string>text</string> 
-           <string>Situation:</string> 
+           <string>Situation</string> 
           </void> 
           <void property="name"> 
-           <string>jLabel3</string> 
+           <string>lblSituation</string> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -275,10 +275,10 @@
           </void> 
           <void method="setProperty"> 
            <string>text</string> 
-           <string>Ziele:</string> 
+           <string>Ziele</string> 
           </void> 
           <void property="name"> 
-           <string>jLabel8</string> 
+           <string>lblGoal</string> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -364,10 +364,10 @@
           </void> 
           <void method="setProperty"> 
            <string>text</string> 
-           <string>Erste Kontrolle am:</string> 
+           <string>Markierung</string> 
           </void> 
           <void property="name"> 
-           <string>jLabel7</string> 
+           <string>lblFlag</string> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -375,6 +375,56 @@
           <void method="setProperty"> 
            <string>gridY</string> 
            <int>9</int> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JComboBox</string> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object class="java.awt.Font"> 
+            <string>Arial</string> 
+            <int>0</int> 
+            <int>14</int> 
+           </object> 
+          </void> 
+          <void property="name"> 
+           <string>cmbFlags</string> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jgoodies.forms.layout.CellConstraints</class> 
+          <void method="setProperty"> 
+           <string>gridX</string> 
+           <int>3</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridY</string> 
+           <int>9</int> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JLabel</string> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object idref="Font0"/> 
+          </void> 
+          <void method="setProperty"> 
+           <string>text</string> 
+           <string>Erste Kontrolle am</string> 
+          </void> 
+          <void property="name"> 
+           <string>lblFirstRevision</string> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jgoodies.forms.layout.CellConstraints</class> 
+          <void method="setProperty"> 
+           <string>gridY</string> 
+           <int>11</int> 
           </void> 
          </object> 
         </void> 
@@ -401,7 +451,7 @@
           </void> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>9</int> 
+           <int>11</int> 
           </void> 
          </object> 
         </void> 

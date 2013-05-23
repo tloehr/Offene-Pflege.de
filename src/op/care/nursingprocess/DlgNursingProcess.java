@@ -35,6 +35,7 @@ import entity.info.ResInfoCategoryTools;
 import entity.nursingprocess.Intervention;
 import entity.nursingprocess.InterventionSchedule;
 import entity.nursingprocess.NursingProcess;
+import entity.nursingprocess.NursingProcessTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.GUITools;
@@ -61,16 +62,16 @@ import java.util.Date;
 public class DlgNursingProcess extends MyJDialog {
     public static final String internalClassID = "nursingrecords.nursingprocess.dlgplanung";
     private Closure actionBlock;
-    private NursingProcess planung;
+    private NursingProcess nursingProcess;
     private JPopupMenu menu;
     private ArrayList<InterventionSchedule> listInterventionSchedule2Remove = new ArrayList();
 
     /**
      * Creates new form DlgNursingProcess
      */
-    public DlgNursingProcess(NursingProcess planung, Closure actionBlock) {
+    public DlgNursingProcess(NursingProcess nursingProcess, Closure actionBlock) {
         super(false);
-        this.planung = planung;
+        this.nursingProcess = nursingProcess;
         this.actionBlock = actionBlock;
         initComponents();
         initDialog();
@@ -81,23 +82,34 @@ public class DlgNursingProcess extends MyJDialog {
     private void initDialog() {
         cmbKategorie.setModel(new DefaultComboBoxModel(ResInfoCategoryTools.getAll4NP().toArray()));
 
-        txtStichwort.setText(planung.getTopic());
-        txtSituation.setText(planung.getSituation());
-        txtZiele.setText(planung.getGoal());
-        jdcKontrolle.setDate(planung.getNextEval());
+        lblTopic.setText(OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.lblTopic"));
+        lblCat.setText(OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.lblCat"));
+        lblSituation.setText(OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.lblSituation"));
+        lblGoal.setText(OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.lblGoal"));
+        lblFlag.setText(OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.lblFlag"));
+        lblFirstRevision.setText(OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.lblFirstRevision"));
+
+        txtStichwort.setText(nursingProcess.getTopic());
+        txtSituation.setText(nursingProcess.getSituation());
+        txtZiele.setText(nursingProcess.getGoal());
+        jdcKontrolle.setDate(nursingProcess.getNextEval());
         jdcKontrolle.setMinSelectableDate(new Date());
-        cmbKategorie.setSelectedItem(planung.getCategory());
+        cmbKategorie.setSelectedItem(nursingProcess.getCategory());
         reloadInterventions();
 
+        cmbFlags.setModel(new DefaultComboBoxModel(NursingProcessTools.FLAGS));
+        cmbFlags.setSelectedIndex(nursingProcess.getFlag());
+
+
         String mode = "new";
-        if (planung.getID() != 0) {
+        if (nursingProcess.getID() != 0) {
             mode = "edit";
-        } else if (planung.getID() == 0 && planung.getNPSeries() > -1) {
+        } else if (nursingProcess.getID() == 0 && nursingProcess.getNPSeries() > -1) {
             mode = "change";
-        } else if (planung.getID() == 0 && planung.getNPSeries() == -2) {
+        } else if (nursingProcess.getID() == 0 && nursingProcess.getNPSeries() == -2) {
             mode = "template";
         }
-        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + "." + mode), OPDE.START_OF_MODULE_TIME));
+        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung." + mode), OPDE.START_OF_MODULE_TIME));
     }
 
     @Override
@@ -105,18 +117,18 @@ public class DlgNursingProcess extends MyJDialog {
         jdcKontrolle.cleanup();
         super.dispose();
 
-        if (planung == null) {
+        if (nursingProcess == null) {
             actionBlock.execute(null);
         } else {
-            actionBlock.execute(new Pair<NursingProcess, ArrayList<InterventionSchedule>>(planung, listInterventionSchedule2Remove));
+            actionBlock.execute(new Pair<NursingProcess, ArrayList<InterventionSchedule>>(nursingProcess, listInterventionSchedule2Remove));
         }
     }
 
     private void reloadInterventions() {
-        tblPlanung.setModel(new TMPlan(planung));
+        tblPlanung.setModel(new TMPlan(nursingProcess));
         tblPlanung.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         tblPlanung.getColumnModel().getColumn(TMPlan.COL_TXT).setCellRenderer(new RNDHTML());
-        tblPlanung.getColumnModel().getColumn(TMPlan.COL_TXT).setHeaderValue(OPDE.lang.getString(PnlNursingProcess.internalClassID + ".interventions"));
+        tblPlanung.getColumnModel().getColumn(TMPlan.COL_TXT).setHeaderValue(OPDE.lang.getString("nursingrecords.nursingprocess.interventions"));
     }
 
     private void btnAddInterventionActionPerformed(ActionEvent e) {
@@ -136,7 +148,7 @@ public class DlgNursingProcess extends MyJDialog {
                 if (o != null) {
                     for (Object obj : (Object[]) o) {
                         Intervention intervention = (Intervention) obj;
-                        planung.getInterventionSchedule().add(new InterventionSchedule(planung, intervention));
+                        nursingProcess.getInterventionSchedule().add(new InterventionSchedule(nursingProcess, intervention));
                     }
                     reloadInterventions();
                 }
@@ -173,32 +185,32 @@ public class DlgNursingProcess extends MyJDialog {
     private boolean saveOK() {
 
         if (txtStichwort.getText().trim().isEmpty()) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".stichwortxx"), DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.stichwortxx"), DisplayMessage.WARNING));
             return false;
         }
 
         if (jdcKontrolle.getDate() == null) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".datumxx"), DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.datumxx"), DisplayMessage.WARNING));
             return false;
         }
 
         if (cmbKategorie.getSelectedItem() == null) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".kategoriexx"), DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.kategoriexx"), DisplayMessage.WARNING));
             return false;
         }
 
-        if (planung.getInterventionSchedule().isEmpty()) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".schedulexx"), DisplayMessage.WARNING));
+        if (nursingProcess.getInterventionSchedule().isEmpty()) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.schedulexx"), DisplayMessage.WARNING));
             return false;
         }
 
         if (txtSituation.getText().isEmpty()) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".situationxx"), DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.situationxx"), DisplayMessage.WARNING));
             return false;
         }
 
         if (txtZiele.getText().isEmpty()) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".goalxx"), DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.goalxx"), DisplayMessage.WARNING));
             return false;
         }
 
@@ -215,17 +227,19 @@ public class DlgNursingProcess extends MyJDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         jPanel5 = new JPanel();
-        jLabel4 = new JLabel();
+        lblTopic = new JLabel();
         txtStichwort = new JTextField();
-        jLabel5 = new JLabel();
+        lblCat = new JLabel();
         cmbKategorie = new JComboBox();
         jScrollPane3 = new JScrollPane();
         txtSituation = new JTextArea();
-        jLabel3 = new JLabel();
-        jLabel8 = new JLabel();
+        lblSituation = new JLabel();
+        lblGoal = new JLabel();
         jScrollPane1 = new JScrollPane();
         txtZiele = new JTextArea();
-        jLabel7 = new JLabel();
+        lblFlag = new JLabel();
+        cmbFlags = new JComboBox();
+        lblFirstRevision = new JLabel();
         jdcKontrolle = new JDateChooser();
         panel2 = new JPanel();
         jspPlanung = new JScrollPane();
@@ -247,12 +261,12 @@ public class DlgNursingProcess extends MyJDialog {
         {
             jPanel5.setLayout(new FormLayout(
                 "default, $lcgap, default:grow",
-                "fill:default, $rgap, default, 2*($lgap, fill:default:grow), $lgap, pref"));
+                "fill:default, $rgap, default, 2*($lgap, fill:default:grow), $lgap, default, $lgap, pref"));
 
-            //---- jLabel4 ----
-            jLabel4.setFont(new Font("Arial", Font.PLAIN, 14));
-            jLabel4.setText("Stichwort:");
-            jPanel5.add(jLabel4, CC.xy(1, 1, CC.DEFAULT, CC.TOP));
+            //---- lblTopic ----
+            lblTopic.setFont(new Font("Arial", Font.PLAIN, 14));
+            lblTopic.setText("Stichwort");
+            jPanel5.add(lblTopic, CC.xy(1, 1, CC.DEFAULT, CC.TOP));
 
             //---- txtStichwort ----
             txtStichwort.setFont(new Font("Arial", Font.BOLD, 20));
@@ -264,10 +278,10 @@ public class DlgNursingProcess extends MyJDialog {
             });
             jPanel5.add(txtStichwort, CC.xy(3, 1));
 
-            //---- jLabel5 ----
-            jLabel5.setFont(new Font("Arial", Font.PLAIN, 14));
-            jLabel5.setText("Kategorie:");
-            jPanel5.add(jLabel5, CC.xy(1, 3));
+            //---- lblCat ----
+            lblCat.setFont(new Font("Arial", Font.PLAIN, 14));
+            lblCat.setText("Kategorie");
+            jPanel5.add(lblCat, CC.xy(1, 3));
 
             //---- cmbKategorie ----
             cmbKategorie.setModel(new DefaultComboBoxModel(new String[] {
@@ -298,15 +312,15 @@ public class DlgNursingProcess extends MyJDialog {
             }
             jPanel5.add(jScrollPane3, CC.xy(3, 5));
 
-            //---- jLabel3 ----
-            jLabel3.setFont(new Font("Arial", Font.PLAIN, 14));
-            jLabel3.setText("Situation:");
-            jPanel5.add(jLabel3, CC.xy(1, 5, CC.DEFAULT, CC.TOP));
+            //---- lblSituation ----
+            lblSituation.setFont(new Font("Arial", Font.PLAIN, 14));
+            lblSituation.setText("Situation");
+            jPanel5.add(lblSituation, CC.xy(1, 5, CC.DEFAULT, CC.TOP));
 
-            //---- jLabel8 ----
-            jLabel8.setFont(new Font("Arial", Font.PLAIN, 14));
-            jLabel8.setText("Ziele:");
-            jPanel5.add(jLabel8, CC.xy(1, 7, CC.DEFAULT, CC.TOP));
+            //---- lblGoal ----
+            lblGoal.setFont(new Font("Arial", Font.PLAIN, 14));
+            lblGoal.setText("Ziele");
+            jPanel5.add(lblGoal, CC.xy(1, 7, CC.DEFAULT, CC.TOP));
 
             //======== jScrollPane1 ========
             {
@@ -327,14 +341,23 @@ public class DlgNursingProcess extends MyJDialog {
             }
             jPanel5.add(jScrollPane1, CC.xy(3, 7));
 
-            //---- jLabel7 ----
-            jLabel7.setFont(new Font("Arial", Font.PLAIN, 14));
-            jLabel7.setText("Erste Kontrolle am:");
-            jPanel5.add(jLabel7, CC.xy(1, 9));
+            //---- lblFlag ----
+            lblFlag.setFont(new Font("Arial", Font.PLAIN, 14));
+            lblFlag.setText("Markierung");
+            jPanel5.add(lblFlag, CC.xy(1, 9));
+
+            //---- cmbFlags ----
+            cmbFlags.setFont(new Font("Arial", Font.PLAIN, 14));
+            jPanel5.add(cmbFlags, CC.xy(3, 9));
+
+            //---- lblFirstRevision ----
+            lblFirstRevision.setFont(new Font("Arial", Font.PLAIN, 14));
+            lblFirstRevision.setText("Erste Kontrolle am");
+            jPanel5.add(lblFirstRevision, CC.xy(1, 11));
 
             //---- jdcKontrolle ----
             jdcKontrolle.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel5.add(jdcKontrolle, CC.xy(3, 9));
+            jPanel5.add(jdcKontrolle, CC.xy(3, 11));
         }
         contentPane.add(jPanel5, CC.xy(3, 3, CC.DEFAULT, CC.FILL));
 
@@ -432,7 +455,7 @@ public class DlgNursingProcess extends MyJDialog {
 
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        planung = null;
+        nursingProcess = null;
         dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
 
@@ -445,7 +468,7 @@ public class DlgNursingProcess extends MyJDialog {
         int textWidth = dim.width - 25;
         TableColumnModel tcm1 = tblPlanung.getColumnModel();
         tcm1.getColumn(0).setPreferredWidth(textWidth);
-        tcm1.getColumn(0).setHeaderValue(OPDE.lang.getString(PnlNursingProcess.internalClassID + ".interventions"));
+        tcm1.getColumn(0).setHeaderValue(OPDE.lang.getString("nursingrecords.nursingprocess.interventions"));
     }//GEN-LAST:event_jspPlanungComponentResized
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
@@ -482,7 +505,7 @@ public class DlgNursingProcess extends MyJDialog {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 for (int row : tblPlanung.getSelectedRows()) {
                     listInterventionSchedule2Remove.add(((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row));
-                    planung.getInterventionSchedule().remove(((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row));
+                    nursingProcess.getInterventionSchedule().remove(((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row));
                 }
                 ((TMPlan) tblPlanung.getModel()).fireTableDataChanged();
             }
@@ -525,10 +548,10 @@ public class DlgNursingProcess extends MyJDialog {
                                 listInterventionSchedule2Remove.add(oldTermin);
                                 listInterventionSchedule2Add.add(newTermin);
                             }
-                            planung.getInterventionSchedule().removeAll(listInterventionSchedule2Remove);
-                            planung.getInterventionSchedule().addAll(listInterventionSchedule2Add);
+                            nursingProcess.getInterventionSchedule().removeAll(listInterventionSchedule2Remove);
+                            nursingProcess.getInterventionSchedule().addAll(listInterventionSchedule2Add);
                             popup.hidePopup();
-                            Collections.sort(planung.getInterventionSchedule());
+                            Collections.sort(nursingProcess.getInterventionSchedule());
                             ((TMPlan) tblPlanung.getModel()).fireTableDataChanged();
                         }
                     }
@@ -552,28 +575,30 @@ public class DlgNursingProcess extends MyJDialog {
 
 
     private void save() {
-        planung.setTopic(txtStichwort.getText().trim());
-        planung.setSituation(txtSituation.getText().trim());
-        planung.setGoal(txtZiele.getText().trim());
-        planung.setNextEval(jdcKontrolle.getDate());
-        planung.setCategory((ResInfoCategory) cmbKategorie.getSelectedItem());
-
+        nursingProcess.setTopic(txtStichwort.getText().trim());
+        nursingProcess.setSituation(txtSituation.getText().trim());
+        nursingProcess.setGoal(txtZiele.getText().trim());
+        nursingProcess.setNextEval(jdcKontrolle.getDate());
+        nursingProcess.setCategory((ResInfoCategory) cmbKategorie.getSelectedItem());
+        nursingProcess.setFlag(cmbFlags.getSelectedIndex());
     }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel jPanel5;
-    private JLabel jLabel4;
+    private JLabel lblTopic;
     private JTextField txtStichwort;
-    private JLabel jLabel5;
+    private JLabel lblCat;
     private JComboBox cmbKategorie;
     private JScrollPane jScrollPane3;
     private JTextArea txtSituation;
-    private JLabel jLabel3;
-    private JLabel jLabel8;
+    private JLabel lblSituation;
+    private JLabel lblGoal;
     private JScrollPane jScrollPane1;
     private JTextArea txtZiele;
-    private JLabel jLabel7;
+    private JLabel lblFlag;
+    private JComboBox cmbFlags;
+    private JLabel lblFirstRevision;
     private JDateChooser jdcKontrolle;
     private JPanel panel2;
     private JScrollPane jspPlanung;

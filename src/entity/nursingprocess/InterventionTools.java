@@ -39,6 +39,7 @@ public class InterventionTools {
     public static final int FLAG_WEIGHT_CHECK  = 12;
     public static final int FLAG_PAIN_CHECK  = 13;
     public static final int FLAG_TEMP_CHECK  = 14;
+    public static final int FLAG_FOOD_CONSUMPTION  = 15;
 
 
     public static ListCellRenderer getRenderer() {

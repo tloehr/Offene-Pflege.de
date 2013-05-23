@@ -13,7 +13,6 @@ import entity.process.SYSNP2PROCESS;
 import entity.system.Users;
 import op.OPDE;
 import op.care.nursingprocess.PnlNursingProcess;
-import op.care.prescription.PnlPrescription;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.joda.time.DateTime;
@@ -69,6 +68,9 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
     @Version
     @Column(name = "version")
     private Long version;
+    @Version
+    @Column(name = "flag")
+    private Integer flag;
 
     // ==
     // N:1 Relationen
@@ -109,6 +111,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
         attachedQProcessConnections = new ArrayList<SYSNP2PROCESS>();
         nextEval = new DateTime().plusWeeks(4).toDate();
         from = new Date();
+        flag = NursingProcessTools.FLAG_NONE;
         to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
         this.npseries = -1l;
     }
@@ -119,6 +122,14 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
             return 0;
         }
         return id;
+    }
+
+    public Integer getFlag() {
+        return flag;
+    }
+
+    public void setFlag(Integer flag) {
+        this.flag = flag;
     }
 
     public String getTopic() {
@@ -232,7 +243,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
 
     @Override
     public String getTitle() {
-        return OPDE.lang.getString(PnlNursingProcess.internalClassID)+ ": " + topic;
+        return OPDE.lang.getString(PnlNursingProcess.internalClassID) + ": " + topic;
     }
 
     @Override

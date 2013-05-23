@@ -94,6 +94,9 @@ public class PnlEditResInfo {
             parser.parse(is);
 
             txtComment = new OverlayTextArea();
+            txtComment.setRows(3);
+            txtComment.setWrapStyleWord(true);
+            txtComment.setLineWrap(true);
             txtComment.setDisabledTextColor(Color.DARK_GRAY);
             txtComment.addCaretListener(new CaretListener() {
                 @Override
@@ -527,24 +530,25 @@ public class PnlEditResInfo {
                     content.put(groupname, attributes.getValue("name"));
                 }
             }
-            // ---------------------- CHECKBOXES --------------------------------
+            /***
+             *         _           _   _
+             *      __| |_  ___ __| |_| |__  _____ __
+             *     / _| ' \/ -_) _| / / '_ \/ _ \ \ /
+             *     \__|_||_\___\__|_\_\_.__/\___/_\_\
+             *
+             */
             if (tagName.equalsIgnoreCase("checkbox")) {
                 groupname = attributes.getValue("name");
                 JCheckBox j = new JCheckBox(attributes.getValue("label"));
                 j.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
-                String layout = attributes.getValue("layout");
-                if (SYSTools.catchNull(layout).isEmpty()) {
-                    layout = "tab";
-                }
                 j.setName(groupname);
                 outerpanel.add(j);
                 components.put(groupname, j); // für den späteren Direktzugriff
                 j.addActionListener(new CheckBoxActionListener());
-                if (tabgroup) {
-                    outerpanel.add(layout, j);
-                } else {
-                    outerpanel.add("br left", j);
-                }
+
+                String layout = SYSTools.catchNull(attributes.getValue("layout"), tabgroup ? "tab" : "br left");
+                outerpanel.add(layout, j);
+
                 if (attributes.getValue("default") != null && attributes.getValue("default").equals("true")) {
                     j.setSelected(true);
                 }
@@ -627,7 +631,13 @@ public class PnlEditResInfo {
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "p left");
                 outerpanel.add(layout, jl);
             }
-            // ---------------------- Textlabels --------------------------------
+            /***
+             *      _      _         _
+             *     | |__ _| |__  ___| |
+             *     | / _` | '_ \/ -_) |
+             *     |_\__,_|_.__/\___|_|
+             *
+             */
             if (tagName.equalsIgnoreCase("label")) {
                 groupname = attributes.getValue("name");
                 JLabel jl = new JLabel(attributes.getValue("label"));
@@ -745,6 +755,7 @@ public class PnlEditResInfo {
             this.name = name;
         }
 
+
         public String getTooltip() {
             return tooltip;
         }
@@ -758,5 +769,6 @@ public class PnlEditResInfo {
             return name.equals(((ComboBoxBean) obj).getName());
         }
     }
+
 
 }

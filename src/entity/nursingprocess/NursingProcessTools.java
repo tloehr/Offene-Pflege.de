@@ -37,6 +37,16 @@ public class NursingProcessTools {
     public static final int FLAG_PROPH_FALL = 7;
     public static final int FLAG_PROPH_OBSTIPATION = 7;
     public static final int FLAG_ADDITIONAL_NUTRITION = 8;
+    public static final String[] FLAGS = new String[]{"nursingrecords.nursingprocess.flag.none",
+            "nursingrecords.nursingprocess.flag.contracture",
+            "nursingrecords.nursingprocess.flag.bedsore",
+            "nursingrecords.nursingprocess.flag.soor",
+            "nursingrecords.nursingprocess.flag.thrombosis",
+            "nursingrecords.nursingprocess.flag.pneumonia",
+            "nursingrecords.nursingprocess.flag.intertrigo",
+            "nursingrecords.nursingprocess.flag.fall",
+            "nursingrecords.nursingprocess.flag.obstipation",
+            "nursingrecords.nursingprocess.flag.extranutrition"};
 
     public static final String UNIQUEID = "__plankenn";
     public static final int MAXNumOfEvals = 4;
@@ -137,6 +147,9 @@ public class NursingProcessTools {
             html += "</ul>";
         }
 
+        if (np.getFlag() > 0) {
+            html += "<br/><b>" + OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.lblFlag") + ":</b> " + FLAGS[np.getFlag()];
+        }
 
         if (!np.getEvaluations().isEmpty()) {
             html += SYSConst.html_h3(OPDE.lang.getString("misc.msg.DateOfEvals"));
