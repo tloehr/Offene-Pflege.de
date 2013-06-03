@@ -857,11 +857,12 @@ public class PnlPrescription extends NursingRecordsPanel {
                                     Collections.sort(lstPrescriptions);
                                     final CollapsiblePane myCP = createCP4(myPrescription);
 
-                                    if (!tbClosed.isSelected()) {
-                                        tbClosed.setSelected(true);
-                                    } else {
-                                        buildPanel();
-                                    }
+                                    buildPanel();
+//                                    if (!tbClosed.isSelected()) {
+//                                        tbClosed.setSelected(true);
+//                                    } else {
+//
+//                                    }
 
                                     SwingUtilities.invokeLater(new Runnable() {
                                         @Override

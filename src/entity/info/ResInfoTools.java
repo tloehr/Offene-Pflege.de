@@ -1,9 +1,14 @@
 package entity.info;
 
+import com.itextpdf.text.*;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.draw.VerticalPositionMark;
 import entity.HomesTools;
 import entity.Station;
-import entity.prescription.DocTools;
-import entity.prescription.PrescriptionTools;
+import entity.files.SYSFilesTools;
+import entity.prescription.*;
 import entity.process.QProcessElement;
 import entity.reports.NReportTAGSTools;
 import entity.reports.NReportTools;
@@ -12,6 +17,8 @@ import entity.values.ResValueTools;
 import entity.values.ResValueTypesTools;
 import op.OPDE;
 import op.controlling.PnlControlling;
+import op.system.PDF;
+import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
@@ -26,17 +33,22 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import java.awt.*;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -676,7 +688,6 @@ public class ResInfoTools {
         }
         return result;
     }
-
 
     public static String getTXReport(Resident resident, boolean withlongheader,
                                      boolean medi, boolean bilanz, boolean withNReports,

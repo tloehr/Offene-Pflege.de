@@ -37,6 +37,9 @@ public class NursingProcessTools {
     public static final int FLAG_PROPH_FALL = 7;
     public static final int FLAG_PROPH_OBSTIPATION = 7;
     public static final int FLAG_ADDITIONAL_NUTRITION = 8;
+    public static final int FLAG_THERAPY_PHYSIO = 9;
+    public static final int FLAG_THERAPY_ERGO = 10;
+    public static final int FLAG_THERAPY_LOGOPEDICS = 11;
     public static final String[] FLAGS = new String[]{"nursingrecords.nursingprocess.flag.none",
             "nursingrecords.nursingprocess.flag.contracture",
             "nursingrecords.nursingprocess.flag.bedsore",
@@ -46,7 +49,10 @@ public class NursingProcessTools {
             "nursingrecords.nursingprocess.flag.intertrigo",
             "nursingrecords.nursingprocess.flag.fall",
             "nursingrecords.nursingprocess.flag.obstipation",
-            "nursingrecords.nursingprocess.flag.extranutrition"};
+            "nursingrecords.nursingprocess.flag.extranutrition",
+            "nursingrecords.nursingprocess.flag.physio",
+            "nursingrecords.nursingprocess.flag.ergo",
+            "nursingrecords.nursingprocess.flag.logo"};
 
     public static final String UNIQUEID = "__plankenn";
     public static final int MAXNumOfEvals = 4;

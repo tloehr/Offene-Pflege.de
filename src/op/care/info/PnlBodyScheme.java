@@ -23,12 +23,12 @@ import java.util.Properties;
  */
 public class PnlBodyScheme extends JPanel {
 
-    public static final String[] NAMES = new String[]{"head.left.side", "shoulder.left.side", "upper.back.left.side", "ellbow.left.side", "hand.left.side", "hip.left.side", "bottom.left.side", "upper.leg.left.side",
+    public static final String[] NAMES = new String[]{"head.left.side", "shoulder.left.side", "upper.back.left.side", "ellbow.side.left", "hand.left.side", "hip.left.side", "bottom.left.side", "upper.leg.left.side",
             "lower.leg.left.side", "calf.left.side", "heel.left.side", "face", "shoulder.front.right", "shoulder.front.left", "upper.belly", "crook.arm.right",
             "crook.arm.left", "lower.belly", "groin", "upper.leg.right.front", "upper.leg.left.front", "knee.right", "knee.left", "shin.right.front", "shin.left.front",
             "foot.right.front", "foot.left.front", "back.of.the.head", "shoulder.back.left", "shoulder.back.right", "back.mid", "ellbow.left",
-            "ellbow.right", "back.low", "bottom", "upper.leg.left.back", "upper.leg.right.back", "knee.hollow.left", "knee.hollow.right", "calf.left",
-            "calf.right", "foot.left.back", "foot.right.back", "head.right.side", "shoulder.right.side", "back.upper.left.side", "ellbow.right.side",
+            "ellbow.right", "back.low", "bottom.back", "upper.leftleg.back", "upper.rightleg.back", "knee.hollowleft", "knee.hollowright", "calf.leftback",
+            "calf.rightback", "foot.leftback", "foot.rightback", "head.right.side", "shoulder.right.side", "back.upper.left.side", "ellbow.rightside",
             "hand.right.side", "hip.right.side", "bottom.right.side", "upper.leg.right.side", "lower.leg.right.side", "calf.right.side", "heel.right.side"};
 
     BufferedImage bimg;

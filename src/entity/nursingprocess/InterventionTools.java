@@ -32,13 +32,13 @@ public class InterventionTools {
     public static final int FLAG_CONTROL_PACEMAKER = 5;
     public static final int FLAG_GAVAGE_FOOD = 6;
     public static final int FLAG_GAVAGE_LIQUID = 7;
-    public static final int FLAG_GLUCOSE_CHECK  = 8;
-    public static final int FLAG_BP_CHECK  = 9;
-    public static final int FLAG_PORT_CHECK  = 10;
-    public static final int FLAG_PULSE_CHECK  = 11;
-    public static final int FLAG_WEIGHT_CHECK  = 12;
-    public static final int FLAG_PAIN_CHECK  = 13;
-    public static final int FLAG_TEMP_CHECK  = 14;
+    public static final int FLAG_GLUCOSE_MONITORING  = 8;
+    public static final int FLAG_BP_MONITORING  = 9;
+    public static final int FLAG_PORT_MONITORING  = 10;
+    public static final int FLAG_PULSE_MONITORING  = 11;
+    public static final int FLAG_WEIGHT_MONITORING  = 12;
+    public static final int FLAG_PAIN_MONITORING  = 13;
+    public static final int FLAG_TEMP_MONITORING  = 14;
     public static final int FLAG_FOOD_CONSUMPTION  = 15;
 
 

@@ -141,6 +141,11 @@ public class ResInfoType implements Serializable {
         return type == ResInfoTypeTools.TYPE_ALLERGY || type == ResInfoTypeTools.TYPE_BIOHAZARD || type == ResInfoTypeTools.TYPE_DIABETES || type == ResInfoTypeTools.TYPE_WARNING;
     }
 
+    /**
+     * means, that the underlying form for this infotype is not used anymore. current resinfos are still
+     * available but cannot be changed anymore. Use the replacement instead. If there is any.
+     * @return
+     */
     public boolean isObsolete() {
         return type < 0;
     }

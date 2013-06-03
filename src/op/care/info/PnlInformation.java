@@ -110,7 +110,7 @@ public class PnlInformation extends NursingRecordsPanel {
 
         for (ResInfoCategory cat : listCategories) {
             mapCat2Type.put(cat, new ArrayList<ResInfoType>());
-            OPDE.debug(cat.getText());
+//            OPDE.debug(cat.getText());
         }
         for (ResInfoType type : listAllTypes) {
             mapType2ResInfos.put(type, new ArrayList<ResInfo>());
@@ -122,7 +122,6 @@ public class PnlInformation extends NursingRecordsPanel {
 
 
         for (ResInfo info : listAllInfos) {
-
             if (mapType2ResInfos.containsKey(info.getResInfoType())) {
                 mapType2ResInfos.get(info.getResInfoType()).add(info);
             } else if (mapEquiv2Type.containsKey(info.getResInfoType().getEquiv())) { // this maybe an obsolete infotype. we will file it under its replacement
@@ -351,6 +350,24 @@ public class PnlInformation extends NursingRecordsPanel {
                                                     em.lock(myType, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
                                                     final ResInfo newinfo = em.merge((ResInfo) o);
                                                     newinfo.setHtml(ResInfoTools.getContentAsHTML(newinfo));
+
+
+                                                    // only for the screen refresh
+                                                    ArrayList<Pair<ResInfo, ResInfo>> changedInfos = new ArrayList<Pair<ResInfo, ResInfo>>();
+
+                                                    // if there are active resinfos with obsolete forms that should be replaced
+                                                    // by this one, they must all be closed now.
+                                                    for (ResInfo myResInfo : mapType2ResInfos.get(resInfoType)) {
+                                                        if (!myResInfo.isClosed() && myResInfo.getResInfoType().isObsolete()) {
+                                                            ResInfo closedResInfo = em.merge(myResInfo);
+                                                            em.lock(closedResInfo, LockModeType.OPTIMISTIC);
+                                                            closedResInfo.setTo(new DateTime(newinfo.getFrom()).minusSeconds(1).toDate());
+                                                            closedResInfo.setUserOFF(em.merge(OPDE.getLogin().getUser()));
+
+                                                            changedInfos.add(new Pair<ResInfo, ResInfo>(closedResInfo, myResInfo));
+                                                        }
+                                                    }
+
                                                     em.getTransaction().commit();
 
                                                     mapType2ResInfos.get(newinfo.getResInfoType()).add(newinfo);
@@ -360,6 +377,17 @@ public class PnlInformation extends NursingRecordsPanel {
                                                     listAllTypes.add(myType);
 
                                                     listAllInfos.add(newinfo);
+
+                                                    for (Pair<ResInfo, ResInfo> pair : changedInfos) {
+                                                        // refresh data
+                                                        int oldIndex = mapType2ResInfos.get(pair.getFirst().getResInfoType()).indexOf(pair.getFirst());
+                                                        mapType2ResInfos.get(pair.getFirst().getResInfoType()).remove(pair.getFirst());
+                                                        mapType2ResInfos.get(pair.getSecond().getResInfoType()).add(oldIndex, pair.getSecond());
+
+                                                        listAllInfos.remove(pair.getFirst());
+                                                        listAllInfos.add(pair.getSecond());
+                                                    }
+                                                    changedInfos.clear();
 
                                                     if (newinfo.getResInfoType().isAlertType()) {
                                                         GUITools.setResidentDisplay(resident);
@@ -409,7 +437,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                     GUITools.showPopup(popup, SwingConstants.CENTER);
                                 }
                             });
-                            btnAdd.setEnabled(!ResInfoTypeTools.containsOneActiveObsoleteInfo(mapType2ResInfos.get(resInfoType)));
+//                            btnAdd.setEnabled(!ResInfoTypeTools.containsOneActiveObsoleteInfo(mapType2ResInfos.get(resInfoType)));
                             cpsType.add(btnAdd);
 
                             try {
@@ -520,6 +548,11 @@ public class PnlInformation extends NursingRecordsPanel {
             title += DateFormat.getDateInstance().format(resInfo.getFrom()) + " (" + resInfo.getUserON().getFullname() + ") " + " >> ";
             title += resInfo.isClosed() ? DateFormat.getDateInstance().format(resInfo.getTo()) + " (" + resInfo.getUserOFF().getFullname() + ")" : "";
         }
+
+        if (resInfo.getResInfoType().isObsolete() && mapEquiv2Type.containsKey(resInfo.getResInfoType().getEquiv())) {
+            title += " -" + resInfo.getResInfoType().getShortDescription() + "-";
+        }
+
         DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
