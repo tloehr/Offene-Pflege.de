@@ -481,6 +481,9 @@ public class PnlBHP extends NursingRecordsPanel {
                 if (bhp.getStatus() != BHPTools.STATE_OPEN) {
                     return;
                 }
+                if (!bhp.getPrescription().isClosed()) {
+                    return;
+                }
 
                 if (BHPTools.isChangeable(bhp)) {
                     EntityManager em = OPDE.createEM();
@@ -600,7 +603,8 @@ public class PnlBHP extends NursingRecordsPanel {
                 (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser().getUID()) + "</i>" : "") +
                 "</font></html>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, applyActionListener);
+
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) ? applyActionListener : null);
 
 
         JLabel icon1 = new JLabel(BHPTools.getIcon(bhp));

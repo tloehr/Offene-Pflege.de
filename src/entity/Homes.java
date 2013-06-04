@@ -100,10 +100,6 @@ public class Homes implements Serializable {
         this.fax = fax;
     }
 
-    public String getZip() {
-        return zip;
-    }
-
     public void setZip(String zip) {
         this.zip = zip;
     }

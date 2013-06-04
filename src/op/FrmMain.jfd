@@ -129,13 +129,13 @@
              <boolean>false</boolean> 
             </void> 
             <void property="name"> 
-             <string>btnVerlegung</string> 
+             <string>btnTX</string> 
             </void> 
             <void method="addEvent"> 
              <object class="com.jformdesigner.model.FormEvent"> 
               <string>java.awt.event.ActionListener</string> 
               <string>actionPerformed</string> 
-              <string>btnVerlegungActionPerformed</string> 
+              <string>btnTXActionPerformed</string> 
               <boolean>true</boolean> 
              </object> 
             </void> 

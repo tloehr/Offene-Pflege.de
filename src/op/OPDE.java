@@ -73,6 +73,9 @@ public class OPDE {
     protected static Logger logger;
     public static HashMap[] anonymize = null;
 
+    public static String SUBDIR_TEMPLATES = "templates";
+    public static String SUBDIR_CACHE = "cache";
+
     protected static EntityManagerFactory emf;
     protected static AppInfo appInfo;
     protected static SYSLogin login;

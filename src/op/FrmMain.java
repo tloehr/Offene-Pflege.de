@@ -44,6 +44,7 @@ import entity.files.SYSFilesTools;
 import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
+import entity.info.TXEssenDoc1;
 import entity.prescription.PrescriptionTools;
 import entity.system.SYSLoginTools;
 import entity.system.SYSPropsTools;
@@ -245,6 +246,18 @@ public class FrmMain extends JFrame {
         }
     }
 
+    private void btnTXActionPerformed(ActionEvent e) {
+        if (currentResident != null) {
+
+
+            new TXEssenDoc1(currentResident);
+
+//            SYSFilesTools.print(ResInfoTools.getTXReport(currentResident, true, true, true, true, true, true, true, true, true), true);
+        } else {
+            displayManager.addSubMessage(new DisplayMessage("misc.msg.choose.a.resident.first"));
+        }
+    }
+
     public void afterLogin() {
         dlgLogin = null;
         prepareSearchArea();
@@ -279,7 +292,7 @@ public class FrmMain extends JFrame {
     private void initComponents() {
         pnlMain = new JPanel();
         pnlMainMessage = new JPanel();
-        btnVerlegung = new JButton();
+        btnTX = new JButton();
         panel1 = new JPanel();
         pnlIcons = new JPanel();
         lblMainMsg = new JLabel();
@@ -309,33 +322,33 @@ public class FrmMain extends JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                    "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
+                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
                 pnlMainMessage.setBackground(new Color(220, 223, 208));
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setLayout(new FormLayout(
-                        "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
-                        "0dlu, $lgap, pref, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
+                    "0dlu, $lgap, pref, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
 
-                //---- btnVerlegung ----
-                btnVerlegung.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2.png")));
-                btnVerlegung.setBorder(null);
-                btnVerlegung.setBorderPainted(false);
-                btnVerlegung.setSelectedIcon(null);
-                btnVerlegung.setToolTipText("Verlegungsbericht drucken");
-                btnVerlegung.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnVerlegung.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2_pressed.png")));
-                btnVerlegung.setContentAreaFilled(false);
-                btnVerlegung.addActionListener(new ActionListener() {
+                //---- btnTX ----
+                btnTX.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2.png")));
+                btnTX.setBorder(null);
+                btnTX.setBorderPainted(false);
+                btnTX.setSelectedIcon(null);
+                btnTX.setToolTipText("Verlegungsbericht drucken");
+                btnTX.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnTX.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2_pressed.png")));
+                btnTX.setContentAreaFilled(false);
+                btnTX.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        btnVerlegungActionPerformed(e);
+                        btnTXActionPerformed(e);
                     }
                 });
-                pnlMainMessage.add(btnVerlegung, CC.xywh(3, 3, 1, 3));
+                pnlMainMessage.add(btnTX, CC.xywh(3, 3, 1, 3));
 
                 //======== panel1 ========
                 {
@@ -462,15 +475,6 @@ public class FrmMain extends JFrame {
         setSize(945, 695);
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
-
-    private void btnVerlegungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerlegungActionPerformed
-        if (currentResident != null) {
-            SYSFilesTools.print(ResInfoTools.getTXReport(currentResident, true, true, true, true, true, true, true, true, true), true);
-        } else {
-            displayManager.addSubMessage(new DisplayMessage("misc.msg.choose.a.resident.first"));
-        }
-    }//GEN-LAST:event_btnVerlegungActionPerformed
-
 
     public void clearPreviousProgbutton() {
         if (previousProgButton != null) {
@@ -760,7 +764,7 @@ public class FrmMain extends JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel pnlMain;
     private JPanel pnlMainMessage;
-    private JButton btnVerlegung;
+    private JButton btnTX;
     private JPanel panel1;
     private JPanel pnlIcons;
     private JLabel lblMainMsg;

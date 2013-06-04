@@ -33,9 +33,16 @@ public class ResInfoTypeTools {
     public static final int TYPE_DIAGNOSIS = 50;
     public static final int TYPE_FALL = 30; // Sturz
     public static final int TYPE_OLD = -1;
-    public static final int TYPE_STAY = 100;
+
     public static final int TYPE_WARNING = 96;
     public static final int TYPE_WOUNDS = 20;
+
+
+    public static final int TYPE_STAY = 100;
+    public static final int TYPE_COMMS = 101;
+    public static final int TYPE_CONFIDANTS = 102;
+    public static final int TYPE_LEGALCUSTODIANS = 103;
+
 
 
 //    public static final String TYPE_HOSPITAL_STAY = "KH";

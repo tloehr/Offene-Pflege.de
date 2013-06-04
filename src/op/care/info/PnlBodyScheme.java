@@ -23,7 +23,7 @@ import java.util.Properties;
  */
 public class PnlBodyScheme extends JPanel {
 
-    public static final String[] NAMES = new String[]{"head.left.side", "shoulder.left.side", "upper.back.left.side", "ellbow.side.left", "hand.left.side", "hip.left.side", "bottom.left.side", "upper.leg.left.side",
+    public static final String[] PARTS = new String[]{"head.left.side", "shoulder.left.side", "upper.back.left.side", "ellbow.side.left", "hand.left.side", "hip.left.side", "bottom.left.side", "upper.leg.left.side",
             "lower.leg.left.side", "calf.left.side", "heel.left.side", "face", "shoulder.front.right", "shoulder.front.left", "upper.belly", "crook.arm.right",
             "crook.arm.left", "lower.belly", "groin", "upper.leg.right.front", "upper.leg.left.front", "knee.right", "knee.left", "shin.right.front", "shin.left.front",
             "foot.right.front", "foot.left.front", "back.of.the.head", "shoulder.back.left", "shoulder.back.right", "back.mid", "ellbow.left",
@@ -81,8 +81,8 @@ public class PnlBodyScheme extends JPanel {
         for (int i = 0; i < cbPositions.length; i++) {
 
             final JCheckBox jcb = new JCheckBox((String) null);
-            jcb.setToolTipText(OPDE.lang.getString(NAMES[i]));
-            jcb.setName(NAMES[i]);
+            jcb.setToolTipText(OPDE.lang.getString(PARTS[i]));
+            jcb.setName(PARTS[i]);
             jcb.setBorder(null);
             jcb.setContentAreaFilled(false);
             jcb.addItemListener(itemListener);
