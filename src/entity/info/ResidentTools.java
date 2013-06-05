@@ -7,12 +7,12 @@ package entity.info;
 import entity.EntityTools;
 import entity.Homes;
 import entity.Station;
-import entity.StationTools;
 import entity.nursingprocess.NursingProcessTools;
 import entity.prescription.MedInventoryTools;
 import entity.prescription.PrescriptionTools;
 import entity.process.QProcessTools;
 import op.OPDE;
+import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
@@ -31,6 +31,7 @@ import java.util.Date;
  */
 public class ResidentTools {
 
+    public static final int AGE_MINOR = 18;
     public static final int MALE = 1;
     public static final int FEMALE = 2;
     public static final String GENDER[] = {"", OPDE.lang.getString("misc.msg.male"), OPDE.lang.getString("misc.msg.female")};
@@ -76,6 +77,10 @@ public class ResidentTools {
         };
     }
 
+    public static boolean isMinor(Resident resident) {
+        return getAge(resident).getYears() < AGE_MINOR;
+    }
+
     public static String getNameAndFirstname(Resident bewohner) {
         return bewohner.getName() + ", " + bewohner.getFirstname();
     }
@@ -103,18 +108,26 @@ public class ResidentTools {
 //        return bewohner.getGender() == FEMALE;
 //    }
 
-    public static String getLabelText(Resident bewohner) {
-        boolean dead = ResInfoTools.isDead(bewohner);
-        boolean left = ResInfoTools.isDead(bewohner);
-        ResInfo stay = ResInfoTools.getLastResinfo(bewohner, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
+
+    public static Years getAge(Resident resident) {
+        boolean dead = ResInfoTools.isDead(resident);
+        ResInfo stay = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
+        DateMidnight birthdate = new DateTime(resident.getDOB()).toDateMidnight();
+        DateTime refdate = dead ? new DateTime(stay.getTo()) : new DateTime();
+        return Years.yearsBetween(birthdate, refdate);
+
+    }
+
+    public static String getLabelText(Resident resident) {
+        boolean dead = ResInfoTools.isDead(resident);
+        boolean left = ResInfoTools.isDead(resident);
+        ResInfo stay = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
 
         DateFormat df = DateFormat.getDateInstance();
-        String result = bewohner.getName() + ", " + bewohner.getFirstname() + " (*" + df.format(bewohner.getDOB()) + "), ";
+        String result = resident.getName() + ", " + resident.getFirstname() + " (*" + df.format(resident.getDOB()) + "), ";
 
-        DateMidnight birthdate = new DateTime(bewohner.getDOB()).toDateMidnight();
-        DateTime refdate = dead ? new DateTime(stay.getTo()) : new DateTime();
-        Years age = Years.yearsBetween(birthdate, refdate);
-        result += age.getYears() + " " + OPDE.lang.getString("misc.msg.Years") + " [" + bewohner.getRIDAnonymous() + "]";
+
+        result += getAge(resident).getYears() + " " + OPDE.lang.getString("misc.msg.Years") + " [" + resident.getRIDAnonymous() + "]";
 
         if (dead || left) {
             result += "  " + (dead ? OPDE.lang.getString("misc.msg.late") : OPDE.lang.getString("misc.msg.movedout")) + ": " + df.format(stay.getTo()) + ", ";
@@ -248,6 +261,7 @@ public class ResidentTools {
 
     /**
      * http://www.tsc-web.net/archive/2007/12/mysql-query-howto-select-upcoming-birthdays/comment-page-1/
+     *
      * @param days
      * @return
      */

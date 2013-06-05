@@ -679,7 +679,6 @@ public class PnlEditResInfo {
                 JComboBox jcb = new JComboBox();
                 jcb.setName(groupname);
                 jcb.setToolTipText(SYSTools.toHTML("<p>"+SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>'))+"</p>");
-//                jcb.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
                 components.put(groupname, jcb);
                 jcb.addItemListener(new ComboBoxItemStateListener());
                 JLabel jl = new JLabel(attributes.getValue("label") + ":");
@@ -716,7 +715,6 @@ public class PnlEditResInfo {
             if (qName.equalsIgnoreCase("combobox")) {
                 JComboBox j = (JComboBox) components.get(groupname);
                 j.setModel(boxModel);
-//                ComboBoxBean bean = (ComboBoxBean) j.getSelectedItem();
             }
         }
 

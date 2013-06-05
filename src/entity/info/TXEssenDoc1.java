@@ -66,15 +66,21 @@ public class TXEssenDoc1 {
             stamper = new PdfStamper(new PdfReader(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_TEMPLATES + File.separator + SOURCEFILENAME), new FileOutputStream(stamperFile));
 
 
-            createContent4AdministrativeInformations();
+            createContent4Section1();
+            createContent4Section2();
+            createContent4Section3();
+            createContent4Section4();
 
             fillDataIntoPDF();
             fillWoundsIntoPDF();
+
+            stamper.setFormFlattening(true);
 
             stamper.close();
 
             mapInfo2Properties.clear();
             listICD.clear();
+            content.clear();
 
             SYSFilesTools.handleFile(stamperFile, Desktop.Action.OPEN);
         } catch (Exception e) {
@@ -91,7 +97,6 @@ public class TXEssenDoc1 {
             }
         }
 
-
     }
 
     private void fillWoundsIntoPDF() {
@@ -102,8 +107,11 @@ public class TXEssenDoc1 {
     /**
      * fills the usual stuff like resident name, insurances, dob and the rest on all three pages.
      * filling means, putting pairs into the content HashMap.
+     * <p/>
+     * Contains also "1 Soziale Aspekte"
      */
-    private void createContent4AdministrativeInformations() {
+    private void createContent4Section1() {
+        content.put(RESIDENT_GENDER, resident.getGender() == ResidentTools.MALE ? "1" : "0");
         content.put(RESIDENT_FIRSTNAME, resident.getFirstname());
         content.put(RESIDENT_FIRSTNAME_PAGE2, resident.getFirstname());
         content.put(RESIDENT_NAME, resident.getName());
@@ -125,13 +133,109 @@ public class TXEssenDoc1 {
         content.put(TX2_DATE_PAGE3, DateFormat.getDateInstance().format(new Date()));
         content.put(TX_TIME, DateFormat.getTimeInstance(DateFormat.SHORT).format(new Date()));
 
+        content.put(RESIDENT_HINSURANCE, getValue(ResInfoTypeTools.TYPE_HEALTH_INSURANCE, "hiname"));
+        content.put(RESIDENT_HINSURANCE_PAGE3, getValue(ResInfoTypeTools.TYPE_HEALTH_INSURANCE, "hiname"));
+        content.put(RESIDENT_HINSURANCEID, getValue(ResInfoTypeTools.TYPE_HEALTH_INSURANCE, "personno"));
+        content.put(RESIDENT_HINSURANCENO, getValue(ResInfoTypeTools.TYPE_HEALTH_INSURANCE, "insuranceno"));
 
         content.put(COMMS_MOTHERTONGUE, getValue(ResInfoTypeTools.TYPE_COMMS, "mothertongue"));
+        content.put(SOCIAL_RELIGION, getValue(ResInfoTypeTools.TYPE_PERSONALS, "konfession"));
+
+        content.put(LEGAL_SINGLE, setCheckbox(getValue(ResInfoTypeTools.TYPE_PERSONALS, "single")));
+        content.put(LEGAL_MINOR, setCheckbox(ResidentTools.isMinor(resident)));
+
+        content.put(LC_GENERAL, setCheckbox(mapID2Info.containsKey(ResInfoTypeTools.TYPE_LEGALCUSTODIANS)));
+        content.put(LC_FINANCE, setCheckbox(getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "finance")));
+        content.put(LC_HEALTH, setCheckbox(getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "health")));
+        content.put(LC_CUSTODY, setCheckbox(getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "confinement")));
+        content.put(LC_NAME, getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "name"));
+        content.put(LC_FIRSTNAME, getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "firstname"));
+        content.put(LC_PHONE, getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "tel"));
+        content.put(LC_STREET, getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "street"));
+        content.put(LC_ZIP, getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "zip"));
+        content.put(LC_CITY, getValue(ResInfoTypeTools.TYPE_LEGALCUSTODIANS, "city"));
+
+        content.put(CONFIDANT_NAME, getValue(ResInfoTypeTools.TYPE_CONFIDANTS, "c1name"));
+        content.put(CONFIDANT_FIRSTNAME, getValue(ResInfoTypeTools.TYPE_CONFIDANTS, "c1firstname"));
+        content.put(CONFIDANT_STREET, getValue(ResInfoTypeTools.TYPE_CONFIDANTS, "c1street"));
+        content.put(CONFIDANT_ZIP, getValue(ResInfoTypeTools.TYPE_CONFIDANTS, "c1zip"));
+        content.put(CONFIDANT_CITY, getValue(ResInfoTypeTools.TYPE_CONFIDANTS, "c1city"));
+        content.put(CONFIDANT_PHONE, getValue(ResInfoTypeTools.TYPE_CONFIDANTS, "c1tel"));
+        content.put(SOCIAL_CONFIDANT_CARE, setCheckbox(getValue(ResInfoTypeTools.TYPE_CONFIDANTS, "c1ready2nurse")));
+
+        content.put(SOCIAL_CURRENT_RESTHOME, "1");
+
+        content.put(DATE_REQUESTED_INSURANCE_GRADE, getValue(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "requestdate"));
+        content.put(ASSIGNED_INSURANCE_GRADE, getValue(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "result"));
+
+        String grade = getValue(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade");
+        grade = grade.equalsIgnoreCase("refused") ? "none" : grade; // there is no such thing as refused request in this document.
+        content.put(INSURANCE_GRADE, setRadiobutton(grade, new String[]{"none", "requested", "assigned"}));
+        content.put(DATE_REQUESTED_INSURANCE_GRADE_PAGE3, setCheckbox(grade.equalsIgnoreCase("requested")));
+    }
 
 
+    private void createContent4Section2() {
+        // nothing yet
+    }
+
+    private void createContent4Section3() {
+        content.put(PERSONAL_CARE_LEVEL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care"), new String[]{"none", "lvl1", "lvl2", "lvl3"}));
+        content.put(PERSONAL_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.bed")));
+        content.put(PERSONAL_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.shower")));
+        content.put(PERSONAL_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.basin")));
+        content.put(MOUTH_CARE_LEVEL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOUTHCARE, "mouth.care"), new String[]{"none", "lvl1", "lvl2", "lvl3"}));
+        content.put(MOUTH_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOUTHCARE, "mouth.care.bed")));
+        content.put(MOUTH_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOUTHCARE, "mouth.care.shower")));
+        content.put(MOUTH_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOUTHCARE, "mouth.care.basin")));
+        content.put(DENTURE_CARE_LEVEL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOUTHCARE, "denture.care"), new String[]{"none", "lvl1", "lvl2", "lvl3"}));
+        content.put(DENTURE_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOUTHCARE, "denture.care.bed")));
+        content.put(DENTURE_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOUTHCARE, "denture.care.shower")));
+        content.put(DENTURE_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOUTHCARE, "denture.care.basin")));
+        content.put(COMBING_CARE_LEVEL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_CARE, "combing.care"), new String[]{"none", "lvl1", "lvl2", "lvl3"}));
+        content.put(COMBING_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "combing.care.bed")));
+        content.put(COMBING_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "combing.care.shower")));
+        content.put(COMBING_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "combing.care.basin")));
+        content.put(SHAVE_CARE_LEVEL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_CARE, "shave.care"), new String[]{"none", "lvl1", "lvl2", "lvl3"}));
+        content.put(SHAVE_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "shave.care.bed")));
+        content.put(SHAVE_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "shave.care.shower")));
+        content.put(SHAVE_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "shave.care.basin")));
+        content.put(DRESSING_CARE_LEVEL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_CARE, "dressing.care"), new String[]{"none", "lvl1", "lvl2", "lvl3"}));
+        content.put(DRESSING_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "dressing.care.bed")));
+        content.put(DRESSING_CARE_SHOWER, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "dressing.care.shower")));
+        content.put(DRESSING_CARE_BASIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "dressing.care.basin")));
+
+        content.put(SKIN_DRY, setCheckbox(getValue(ResInfoTypeTools.TYPE_SKIN, "skin.dry")));
+        content.put(SKIN_GREASY, setCheckbox(getValue(ResInfoTypeTools.TYPE_SKIN, "skin.greasy")));
+        content.put(SKIN_ITCH, setCheckbox(getValue(ResInfoTypeTools.TYPE_SKIN, "skin.itch")));
+        content.put(SKIN_NORMAL, setCheckbox(getValue(ResInfoTypeTools.TYPE_SKIN, "skin.normal")));
+
+        content.put(PREFERRED_CAREPRODUCTS, getValue(ResInfoTypeTools.TYPE_CARE, "preferred.careproducts"));
 
 
-        //form.setField(key, ;
+    }
+
+    private void createContent4Section4() {
+        content.put(MOBILITY_GET_UP, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "stand"), new String[]{"none", "lvl1", "lvl2", "lvl3"}));
+        content.put(MOBILITY_AID_GETUP, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "stand.aid")));
+        content.put(MOBILITY_WALKING, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "walk"), new String[]{"none", "lvl1", "lvl2", "lvl3"}));
+        content.put(MOBILITY_AID_WALKING, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "walk.aid")));
+        content.put(MOBILITY_TRANSFER, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "transfer"), new String[]{"none", "lvl1", "lvl2", "lvl3"}));
+        content.put(MOBILITY_AID_TRANSFER, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "transfer.aid")));
+        content.put(MOBILITY_TOILET, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "toilet"), new String[]{"none", "lvl1", "lvl2", "lvl3"}));
+        content.put(MOBILITY_AID_TOILET, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "toilet.aid")));
+        content.put(MOBILITY_SITTING, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "sitting"), new String[]{"none", "lvl1", "lvl2", "lvl3"}));
+        content.put(MOBILITY_AID_SITTING, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "sitting.aid")));
+        content.put(MOBILITY_BED, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "bedmovement"), new String[]{"none", "lvl1", "lvl2", "lvl3"}));
+        content.put(MOBILITY_AID_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "bedmovement.aid")));
+
+        content.put(MOBILITY_AID_CRUTCH, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "crutch.aid")));
+        content.put(MOBILITY_AID_CANE, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "cane.aid")));
+        content.put(MOBILITY_AID_WHEELCHAIR, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "wheel.aid")));
+        // TODO: AUSSCHEIDUNGEN
+        // content.put(MOBILITY_AID_COMMODE, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "crutch.aid")));
+        content.put(MOBILITY_AID_WALKER, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "walker.aid")));
+
     }
 
     private String getValue(int type, String propsKey) {
@@ -141,13 +245,17 @@ public class TXEssenDoc1 {
         return SYSTools.catchNull(mapInfo2Properties.get(mapID2Info.get(type)).getProperty(propsKey), "--");
     }
 
+    private String setCheckbox(boolean in) {
+        return in ? "1" : "0";
+    }
+
     private String setCheckbox(Object in) {
         return SYSTools.catchNull(in).equalsIgnoreCase("true") ? "1" : "0";
     }
 
     private String setRadiobutton(Object in, String[] list) {
         String sIn = SYSTools.catchNull(in);
-        return Integer.toString(Arrays.binarySearch(list, sIn));
+        return Integer.toString(Arrays.asList(list).indexOf(sIn));
     }
 
     private Properties load(String text) {
@@ -397,7 +505,7 @@ public class TXEssenDoc1 {
     public static final String MOBILITY_AID_COMMODE = "mobility.aid.commode";
     public static final String MOBILITY_AID_CRUTCH = "mobility.aid.crutch";
     public static final String MOBILITY_AID_SITTING = "mobility.aid.sitting";
-    public static final String MOBILITY_AID_STAND = "mobility.aid.stand";
+    public static final String MOBILITY_AID_GETUP = "mobility.aid.stand";
     public static final String MOBILITY_AID_TOILET = "mobility.aid.toilet";
     public static final String MOBILITY_AID_TRANSFER = "mobility.aid.transfer";
     public static final String MOBILITY_AID_WALKER = "mobility.aid.walker";
@@ -431,7 +539,7 @@ public class TXEssenDoc1 {
     public static final String ORIENTATION_RUNNAWAY_TENDENCY = "orientation.runnaway.tendency";
     public static final String ORIENTATION_SITUATION_ABILITY = "orientation.situation.ability";
     public static final String ORIENTATION_TIME_ABILITY = "orientation.time.ability";
-    public static final String INSURANCE_REQUESTED_PAGE3 = "page3.insurance.requested";
+    public static final String DATE_REQUESTED_INSURANCE_GRADE_PAGE3 = "page3.insurance.requested";
     public static final String TX2_DATE_PAGE3 = "page3.tx2.date";
     public static final String PERSONAL_CARE_BASIN = "personal.care.basin";
     public static final String PERSONAL_CARE_BED = "personal.care.bed";
@@ -552,6 +660,14 @@ public class TXEssenDoc1 {
     public static final String VALUABLES_OTHER = "valuables.other";
     public static final String VALUABLES_WALLET = "valuables.wallet";
     public static final String VALUABLES_WATCH = "valuables.watch";
+    public static final String ASSIGNED_INSURANCE_GRADE = "assigned.insurance.grade";
+    public static final String DATE_REQUESTED_INSURANCE_GRADE = "date.requested.insurance.grade";
+    public static final String DOCS_ADDITIONALMEDSLIST = "docs.additionalMedsList";
+    public static final String INSURANCE_GRADE = "insurance.grade";
+    public static final String MEDS_EVENING_GLUCOSE = "meds.evening.glucose";
+    public static final String MEDS_NOON_GLUCOSE = "meds.noon.glucose";
+    public static final String PAGE3_DOCS_WITHPATIENT = "page3.docs.withPatient";
+    public static final String PREFERRED_CAREPRODUCTS = "preferred.careproducts";
 
 
 }

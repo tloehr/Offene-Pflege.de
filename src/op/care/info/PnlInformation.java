@@ -159,16 +159,16 @@ public class PnlInformation extends NursingRecordsPanel {
                     mapKey2CP.get(keyResInfoCat).addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
                         @Override
                         public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                            SYSPropsTools.storeProp(keyResInfoCat + ".collapsed", "false", OPDE.getLogin().getUser());
+                            SYSPropsTools.storeProp(keyResInfoCat + ".expanded", "true", OPDE.getLogin().getUser());
                         }
 
                         @Override
                         public void paneCollapsed(CollapsiblePaneEvent collapsiblePaneEvent) {
-                            SYSPropsTools.storeProp(keyResInfoCat + ".collapsed", "true", OPDE.getLogin().getUser());
+                            SYSPropsTools.storeProp(keyResInfoCat + ".expanded", "false", OPDE.getLogin().getUser());
                         }
                     });
                     try {
-                        mapKey2CP.get(keyResInfoCat).setCollapsed(SYSPropsTools.isBooleanTrue(keyResInfoCat + ".collapsed"));
+                        mapKey2CP.get(keyResInfoCat).setCollapsed(!SYSPropsTools.isBooleanTrue(keyResInfoCat + ".expanded"));
                     } catch (PropertyVetoException e) {
                         // Bah!
                     }
@@ -287,16 +287,16 @@ public class PnlInformation extends NursingRecordsPanel {
                         mapKey2CP.get(keyResInfoType).addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
                             @Override
                             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                                SYSPropsTools.storeProp(keyResInfoType + ".collapsed", "false", OPDE.getLogin().getUser());
+                                SYSPropsTools.storeProp(keyResInfoType + ".expanded", "true", OPDE.getLogin().getUser());
                             }
 
                             @Override
                             public void paneCollapsed(CollapsiblePaneEvent collapsiblePaneEvent) {
-                                SYSPropsTools.storeProp(keyResInfoType + ".collapsed", "true", OPDE.getLogin().getUser());
+                                SYSPropsTools.storeProp(keyResInfoType + ".expanded", "false", OPDE.getLogin().getUser());
                             }
                         });
                         try {
-                            mapKey2CP.get(keyResInfoType).setCollapsed(SYSPropsTools.isBooleanTrue(keyResInfoType + ".collapsed"));
+                            mapKey2CP.get(keyResInfoType).setCollapsed(!SYSPropsTools.isBooleanTrue(keyResInfoType + ".expanded"));
                         } catch (PropertyVetoException e) {
                             // Bah!
                         }
@@ -328,9 +328,87 @@ public class PnlInformation extends NursingRecordsPanel {
                      *      \__,_|\__,_|\__,_|
                      *
                      */
-                    if (mapType2ResInfos.get(resInfoType).isEmpty() || ResInfoTypeTools.containsOnlyClosedInfos(mapType2ResInfos.get(resInfoType)) || ResInfoTypeTools.containsOneActiveObsoleteInfo(mapType2ResInfos.get(resInfoType))) {
-                        String buttonText = mapType2ResInfos.get(resInfoType).isEmpty() ? "nursingrecords.info.no.entry.yet" : "nursingrecords.info.only.closed.entries";
-                        if (resInfoType.getType() != ResInfoTypeTools.TYPE_ABSENCE && resInfoType.getType() != ResInfoTypeTools.TYPE_STAY) {
+                    if (resInfoType.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS ||
+                            resInfoType.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_NOCONSTRAINTS ||
+                            mapType2ResInfos.get(resInfoType).isEmpty() ||
+                            ResInfoTypeTools.containsOnlyClosedInfos(mapType2ResInfos.get(resInfoType)) ||
+                            ResInfoTypeTools.containsOneActiveObsoleteInfo(mapType2ResInfos.get(resInfoType))
+                            ) {
+                        if (resInfoType.getType() == ResInfoTypeTools.TYPE_DIAGNOSIS) {
+                            final JideButton btnAdd = GUITools.createHyperlinkButton("nursingrecords.info.noconstraints", SYSConst.icon22add, null);
+                            btnAdd.addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    new DlgDiag(new ResInfo(resInfoType, resident), new Closure() {
+                                        @Override
+                                        public void execute(Object o) {
+                                            if (o != null) {
+                                                EntityManager em = OPDE.createEM();
+                                                try {
+                                                    em.getTransaction().begin();
+                                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                                    // so that no conflicts can occur if another user enters a new info at the same time
+                                                    ResInfoType myType = em.merge(resInfoType);
+                                                    em.lock(myType, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                                    final ResInfo newinfo = em.merge((ResInfo) o);
+
+                                                    em.getTransaction().commit();
+
+                                                    mapType2ResInfos.get(newinfo.getResInfoType()).add(newinfo);
+                                                    Collections.sort(mapType2ResInfos.get(newinfo.getResInfoType()));
+
+                                                    listAllTypes.remove(resInfoType);
+                                                    listAllTypes.add(myType);
+
+                                                    listAllInfos.add(newinfo);
+
+                                                    if (newinfo.getResInfoType().isAlertType()) {
+                                                        GUITools.setResidentDisplay(resident);
+                                                    }
+
+                                                    reloadDisplay();
+
+                                                } catch (OptimisticLockException ole) {
+                                                    if (em.getTransaction().isActive()) {
+                                                        em.getTransaction().rollback();
+                                                    }
+                                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                                        OPDE.getMainframe().emptyFrame();
+                                                        OPDE.getMainframe().afterLogin();
+                                                    }
+                                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                                } catch (RollbackException ole) {
+                                                    if (em.getTransaction().isActive()) {
+                                                        em.getTransaction().rollback();
+                                                    }
+                                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                                        OPDE.getMainframe().emptyFrame();
+                                                        OPDE.getMainframe().afterLogin();
+                                                    }
+                                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                                } catch (Exception e) {
+                                                    if (em.getTransaction().isActive()) {
+                                                        em.getTransaction().rollback();
+                                                    }
+                                                    OPDE.fatal(e);
+                                                } finally {
+                                                    em.close();
+                                                }
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                            cpsType.add(btnAdd);
+                        } else if (resInfoType.getType() == ResInfoTypeTools.TYPE_ABSENCE) {
+                            cpsType.add(new JLabel(OPDE.lang.getString("nursingrecords.info.cant.add.absence.here")));
+                        } else if (resInfoType.getType() == ResInfoTypeTools.TYPE_STAY) {
+                            cpsType.add(new JLabel(OPDE.lang.getString("nursingrecords.info.cant.add.stays.here")));
+                        } else {// if (resInfoType.getType() != ResInfoTypeTools.TYPE_ABSENCE && resInfoType.getType() != ResInfoTypeTools.TYPE_STAY)
+                            String buttonText = mapType2ResInfos.get(resInfoType).isEmpty() ? "nursingrecords.info.no.entry.yet" : "nursingrecords.info.only.closed.entries";
+                            if (resInfoType.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
+                                buttonText = "nursingrecords.info.singleincident";
+                            }
                             final JideButton btnAdd = GUITools.createHyperlinkButton(buttonText, SYSConst.icon22add, null);
                             btnAdd.addActionListener(new ActionListener() {
                                 @Override
@@ -437,7 +515,6 @@ public class PnlInformation extends NursingRecordsPanel {
                                     GUITools.showPopup(popup, SwingConstants.CENTER);
                                 }
                             });
-//                            btnAdd.setEnabled(!ResInfoTypeTools.containsOneActiveObsoleteInfo(mapType2ResInfos.get(resInfoType)));
                             cpsType.add(btnAdd);
 
                             try {
@@ -445,69 +522,6 @@ public class PnlInformation extends NursingRecordsPanel {
                             } catch (PropertyVetoException e) {
                                 // bah!
                             }
-                        } else if (resInfoType.getType() == ResInfoTypeTools.TYPE_DIAGNOSIS) {
-                            new DlgDiag(new ResInfo(resInfoType, resident), new Closure() {
-                                @Override
-                                public void execute(Object o) {
-                                    if (o != null) {
-                                        EntityManager em = OPDE.createEM();
-                                        try {
-                                            em.getTransaction().begin();
-                                            em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                            // so that no conflicts can occur if another user enters a new info at the same time
-                                            ResInfoType myType = em.merge(resInfoType);
-                                            em.lock(myType, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                                            final ResInfo newinfo = em.merge((ResInfo) o);
-
-                                            em.getTransaction().commit();
-
-                                            mapType2ResInfos.get(newinfo.getResInfoType()).add(newinfo);
-                                            Collections.sort(mapType2ResInfos.get(newinfo.getResInfoType()));
-
-                                            listAllTypes.remove(resInfoType);
-                                            listAllTypes.add(myType);
-
-                                            listAllInfos.add(newinfo);
-
-                                            if (newinfo.getResInfoType().isAlertType()) {
-                                                GUITools.setResidentDisplay(resident);
-                                            }
-
-                                            reloadDisplay();
-
-                                        } catch (OptimisticLockException ole) {
-                                            if (em.getTransaction().isActive()) {
-                                                em.getTransaction().rollback();
-                                            }
-                                            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                                OPDE.getMainframe().emptyFrame();
-                                                OPDE.getMainframe().afterLogin();
-                                            }
-                                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                        } catch (RollbackException ole) {
-                                            if (em.getTransaction().isActive()) {
-                                                em.getTransaction().rollback();
-                                            }
-                                            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                                OPDE.getMainframe().emptyFrame();
-                                                OPDE.getMainframe().afterLogin();
-                                            }
-                                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                        } catch (Exception e) {
-                                            if (em.getTransaction().isActive()) {
-                                                em.getTransaction().rollback();
-                                            }
-                                            OPDE.fatal(e);
-                                        } finally {
-                                            em.close();
-                                        }
-                                    }
-                                }
-                            });
-                        } else if (resInfoType.getType() != ResInfoTypeTools.TYPE_ABSENCE) {
-                            cpsType.add(new JLabel(OPDE.lang.getString("nursingrecords.info.cant.add.absence.here")));
-                        } else if (resInfoType.getType() != ResInfoTypeTools.TYPE_STAY) {
-                            cpsType.add(new JLabel(OPDE.lang.getString("nursingrecords.info.cant.add.stays.here")));
                         }
                     }
 

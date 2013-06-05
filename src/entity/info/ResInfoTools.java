@@ -73,6 +73,18 @@ public class ResInfoTools {
         return bwinfos.isEmpty() ? null : bwinfos.get(0);
     }
 
+    public static ResInfo getLastResinfo(Resident bewohner, int type) {
+            EntityManager em = OPDE.createEM();
+            Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp.type = :type ORDER BY b.from DESC");
+            query.setParameter("bewohner", bewohner);
+            query.setParameter("type", type);
+            query.setFirstResult(0);
+            query.setMaxResults(1);
+            List<ResInfo> bwinfos = query.getResultList();
+            em.close();
+            return bwinfos.isEmpty() ? null : bwinfos.get(0);
+        }
+
     public static ArrayList<ResInfoCategory> getCategories(ArrayList<ResInfo> listInfos) {
         HashSet<ResInfoCategory> cat = new HashSet<ResInfoCategory>();
         for (ResInfo resInfo : listInfos) {
@@ -621,18 +633,21 @@ public class ResInfoTools {
         }
 
 
-        if (resident.getLCustodian1() != null) {
+
+        ResInfo lc = getLastResinfo(resident, ResInfoTypeTools.TYPE_LEGALCUSTODIANS);
+        if (lc != null && !lc.isClosed()) {
             result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.lc") + "</td><td valign=\"top\">";
             result += LCustodianTools.getFullName(resident.getLCustodian1());
 
             if (!OPDE.isAnonym()) {
-                result += ", " + resident.getLCustodian1().getStrasse();
-                result += ", " + resident.getLCustodian1().getPlz() + " " + resident.getLCustodian1().getOrt();
-                result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + resident.getLCustodian1().getTel();
 
-                if (!SYSTools.catchNull(resident.getLCustodian1().getMobil()).isEmpty()) {
-                    result += ", " + OPDE.lang.getString("misc.msg.mobilephone") + ": " + resident.getLCustodian1().getMobil();
-                }
+                result += lc.getHtml();
+//                result += ", " + resident.getLCustodian1().getPlz() + " " + resident.getLCustodian1().getOrt();
+//                result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + resident.getLCustodian1().getTel();
+//
+//                if (!SYSTools.catchNull(resident.getLCustodian1().getMobil()).isEmpty()) {
+//                    result += ", " + OPDE.lang.getString("misc.msg.mobilephone") + ": " + resident.getLCustodian1().getMobil();
+//                }
 
             }
 
@@ -653,9 +668,7 @@ public class ResInfoTools {
             result += "</td></tr>";
         }
 
-
-        // TODO: "ANGEH" ersetzen
-        ResInfo bwinfo_angeh = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByID("ANGEH"));
+        ResInfo bwinfo_angeh = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByID("CONFIDANTS"));
         if (bwinfo_angeh != null) {
             result += "<tr id=\"fonttext\"><td valign=\"top\">" + OPDE.lang.getString("misc.msg.relatives") + "</td><td valign=\"top\">";
             result += bwinfo_angeh.getHtml();

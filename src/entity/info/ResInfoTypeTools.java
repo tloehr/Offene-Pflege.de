@@ -42,6 +42,13 @@ public class ResInfoTypeTools {
     public static final int TYPE_COMMS = 101;
     public static final int TYPE_CONFIDANTS = 102;
     public static final int TYPE_LEGALCUSTODIANS = 103;
+    public static final int TYPE_PERSONALS = 104;
+    public static final int TYPE_NURSING_INSURANCE = 105;
+    public static final int TYPE_HEALTH_INSURANCE = 106;
+    public static final int TYPE_MOUTHCARE = 107;
+    public static final int TYPE_CARE = 108;
+    public static final int TYPE_SKIN = 109;
+    public static final int TYPE_MOBILITY = 110;
 
 
 

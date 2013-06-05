@@ -168,18 +168,36 @@ public class GUITools {
                 desiredPosition = getDesiredPosition(popup, pos);
                 if (isFullyVisibleOnScreen(popup, desiredPosition)) {
                     found = true;
+                    OPDE.debug("fits on screen");
                     break;
                 }
             }
 
             if (!found) {
-                desiredPosition = getDesiredPosition(popup, location);
+                // desiredPosition = getDesiredPosition(popup, location);
+                desiredPosition = centerOnScreen(popup);
+                OPDE.debug("didnt find any position thats on the screen");
             }
 
         }
 
         popup.showPopup(desiredPosition.x, desiredPosition.y);
 
+    }
+
+    private static Point centerOnScreen(JidePopup popup) {
+        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        int width = gd.getDisplayMode().getWidth();
+        int height = gd.getDisplayMode().getHeight();
+
+        int midx = width / 2;
+        int midy = height / 2;
+
+
+        int x = midx - popup.getContentPane().getPreferredSize().width / 2;
+        int y = midy - popup.getContentPane().getPreferredSize().height / 2;
+
+        return new Point(x, y);
     }
 
     private static Point getDesiredPosition(JidePopup popup, int location) {
@@ -246,7 +264,10 @@ public class GUITools {
         int spreadX = point.x + popup.getContentPane().getPreferredSize().width;
         int spreadY = point.y + popup.getContentPane().getPreferredSize().height;
 
-        return width > spreadX && height > spreadY;
+        OPDE.debug("PointX: " + point.x);
+        OPDE.debug("PointY: " + point.y);
+
+        return point.x >= 0 && point.y >= 0 && width > spreadX && height > spreadY;
 
     }
 
@@ -858,17 +879,17 @@ public class GUITools {
         afResult[1] = afOne[1] * fAmount + afTwo[1] * fInverse;
         afResult[2] = afOne[2] * fAmount + afTwo[2] * fInverse;
 
-        return new Color (afResult[0], afResult[1], afResult[2]);
+        return new Color(afResult[0], afResult[1], afResult[2]);
     }
 
     public static Color brighter(Color originalColour, float FACTOR) {
 
 
-        float hsbVals[] = Color.RGBtoHSB( originalColour.getRed(),
-                                               originalColour.getGreen(),
-                                               originalColour.getBlue(), null );
+        float hsbVals[] = Color.RGBtoHSB(originalColour.getRed(),
+                originalColour.getGreen(),
+                originalColour.getBlue(), null);
 
-            Color highlight = Color.getHSBColor( hsbVals[0], hsbVals[1], FACTOR * ( 1f + hsbVals[2] ));
+        Color highlight = Color.getHSBColor(hsbVals[0], hsbVals[1], FACTOR * (1f + hsbVals[2]));
 //            Color shadow = Color.getHSBColor( hsbVals[0], hsbVals[1], 0.5f * hsbVals[2] );
 
         return highlight;

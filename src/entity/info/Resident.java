@@ -32,6 +32,9 @@ import entity.prescription.Doc;
 import entity.system.Users;
 import op.OPDE;
 import op.tools.SYSTools;
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
+import org.joda.time.Years;
 
 import javax.persistence.*;
 import java.io.IOException;
@@ -282,6 +285,8 @@ public class Resident implements Serializable, Comparable<Resident> {
     public LCustodian getLCustodian1() {
         return LCustodian1;
     }
+
+
 
     public void setLCustodian1(LCustodian LCustodian1) {
         this.LCustodian1 = LCustodian1;
