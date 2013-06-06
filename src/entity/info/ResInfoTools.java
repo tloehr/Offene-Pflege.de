@@ -1,14 +1,9 @@
 package entity.info;
 
-import com.itextpdf.text.*;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.draw.VerticalPositionMark;
 import entity.HomesTools;
 import entity.Station;
-import entity.files.SYSFilesTools;
-import entity.prescription.*;
+import entity.prescription.DocTools;
+import entity.prescription.PrescriptionTools;
 import entity.process.QProcessElement;
 import entity.reports.NReportTAGSTools;
 import entity.reports.NReportTools;
@@ -17,8 +12,6 @@ import entity.values.ResValueTools;
 import entity.values.ResValueTypesTools;
 import op.OPDE;
 import op.controlling.PnlControlling;
-import op.system.PDF;
-import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
@@ -33,22 +26,17 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
-import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
-import java.awt.*;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -74,16 +62,16 @@ public class ResInfoTools {
     }
 
     public static ResInfo getLastResinfo(Resident bewohner, int type) {
-            EntityManager em = OPDE.createEM();
-            Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp.type = :type ORDER BY b.from DESC");
-            query.setParameter("bewohner", bewohner);
-            query.setParameter("type", type);
-            query.setFirstResult(0);
-            query.setMaxResults(1);
-            List<ResInfo> bwinfos = query.getResultList();
-            em.close();
-            return bwinfos.isEmpty() ? null : bwinfos.get(0);
-        }
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp.type = :type ORDER BY b.from DESC");
+        query.setParameter("bewohner", bewohner);
+        query.setParameter("type", type);
+        query.setFirstResult(0);
+        query.setMaxResults(1);
+        List<ResInfo> bwinfos = query.getResultList();
+        em.close();
+        return bwinfos.isEmpty() ? null : bwinfos.get(0);
+    }
 
     public static ArrayList<ResInfoCategory> getCategories(ArrayList<ResInfo> listInfos) {
         HashSet<ResInfoCategory> cat = new HashSet<ResInfoCategory>();
@@ -633,11 +621,10 @@ public class ResInfoTools {
         }
 
 
-
         ResInfo lc = getLastResinfo(resident, ResInfoTypeTools.TYPE_LEGALCUSTODIANS);
         if (lc != null && !lc.isClosed()) {
             result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.lc") + "</td><td valign=\"top\">";
-            result += LCustodianTools.getFullName(resident.getLCustodian1());
+//            result += LCustodianTools.getFullName(resident.getLCustodian1());
 
             if (!OPDE.isAnonym()) {
 

@@ -211,16 +211,24 @@ public class PnlEditResInfo {
 
             String risiko = "unbekanntes Risiko";
             String color = "black";
+            String rating = "0";
             for (RiskBean risk : scaleriskmodel) {
                 if (risk.getFrom().compareTo(scalesum) <= 0 && scalesum.compareTo(risk.getTo()) <= 0) {
                     color = risk.getColor();
                     risiko = risk.getLabel();
+                    rating = risk.getRating();
                     break;
                 }
             }
             sumlabel.setText(scalesumlabeltext + ": " + scalesum + " (" + risiko + ")");
             sumlabel.setForeground(GUITools.getColor(color));
+
+            content.put("scalesum", scalesum.toString());
+            content.put("risk", risiko);
+            content.put("rating", rating);
         }
+
+
     }
 
     /**
@@ -463,7 +471,7 @@ public class PnlEditResInfo {
                 scaleriskmodel = new ArrayList();
             }
             if (tagName.equalsIgnoreCase("risk")) {
-                scaleriskmodel.add(new RiskBean(attributes.getValue("from"), attributes.getValue("to"), attributes.getValue("label"), attributes.getValue("color")));
+                scaleriskmodel.add(new RiskBean(attributes.getValue("from"), attributes.getValue("to"), attributes.getValue("label"), attributes.getValue("color"), attributes.getValue("rating")));
             }
             /***
              *      _        _
@@ -540,7 +548,7 @@ public class PnlEditResInfo {
             if (tagName.equalsIgnoreCase("checkbox")) {
                 groupname = attributes.getValue("name");
                 JCheckBox j = new JCheckBox(attributes.getValue("label"));
-                j.setToolTipText(SYSTools.toHTML("<p>"+SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>'))+"</p>");
+                j.setToolTipText(SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 j.setName(groupname);
                 outerpanel.add(j);
                 components.put(groupname, j); // für den späteren Direktzugriff
@@ -585,7 +593,7 @@ public class PnlEditResInfo {
                 JLabel jl = new JLabel(attributes.getValue("label") + ":");
                 JTextField j = new JTextField(length);
                 j.setName(groupname);
-                j.setToolTipText(SYSTools.toHTML("<p>"+SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>'))+"</p>");
+                j.setToolTipText(SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
 //                j.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 outerpanel.add(layout, jl);
@@ -628,7 +636,7 @@ public class PnlEditResInfo {
             if (tagName.equalsIgnoreCase("imagelabel")) {
                 groupname = attributes.getValue("name");
                 JLabel jl = new JLabel(new javax.swing.ImageIcon(getClass().getResource(attributes.getValue("image"))));
-                jl.setToolTipText(SYSTools.toHTML("<p>"+SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>'))+"</p>");
+                jl.setToolTipText(SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
 //                jl.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "p left");
                 outerpanel.add(layout, jl);
@@ -661,7 +669,7 @@ public class PnlEditResInfo {
                 } else {
                     jl.setFont(new Font("Arial", fontstyle, 12));
                 }
-                jl.setToolTipText(SYSTools.toHTML("<p>"+SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>'))+"</p>");
+                jl.setToolTipText(SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
 //                jl.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 outerpanel.add(layout, jl);
@@ -678,7 +686,7 @@ public class PnlEditResInfo {
                 boxModel = new DefaultComboBoxModel();
                 JComboBox jcb = new JComboBox();
                 jcb.setName(groupname);
-                jcb.setToolTipText(SYSTools.toHTML("<p>"+SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>'))+"</p>");
+                jcb.setToolTipText(SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 components.put(groupname, jcb);
                 jcb.addItemListener(new ComboBoxItemStateListener());
                 JLabel jl = new JLabel(attributes.getValue("label") + ":");

@@ -15,17 +15,16 @@ public class RiskBean {
     BigDecimal from, to;
     String label;
     String color;
+    String rating;
 
-    public RiskBean(BigDecimal from, BigDecimal to, String label, String color) {
-        this.from = from;
-        this.to = to;
-        this.label = label;
-        this.color = color;
-    }
+//    public RiskBean(BigDecimal from, BigDecimal to, String label, String color) {
+//        this.from = from;
+//        this.to = to;
+//        this.label = label;
+//        this.color = color;
+//    }
 
-    public RiskBean(String from, String to, String label, String color) {
-
-
+    public RiskBean(String from, String to, String label, String color, String rating) {
         try {
             this.from = new BigDecimal(NumberFormat.getNumberInstance().parse(from).doubleValue());
         } catch (ParseException e) {
@@ -39,6 +38,15 @@ public class RiskBean {
         }
         this.label = label;
         this.color = color;
+        this.rating = rating;
+    }
+
+    public String getRating() {
+        return rating;
+    }
+
+    public void setRating(String rating) {
+        this.rating = rating;
     }
 
     public BigDecimal getFrom() {

@@ -3,8 +3,16 @@ package entity.info;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.pdf.*;
 import entity.files.SYSFilesTools;
+import entity.nursingprocess.InterventionSchedule;
+import entity.nursingprocess.InterventionScheduleTools;
+import entity.nursingprocess.InterventionTools;
+import entity.prescription.BHP;
+import entity.prescription.BHPTools;
+import entity.prescription.Prescription;
+import entity.prescription.PrescriptionTools;
 import op.OPDE;
 import op.care.info.PnlBodyScheme;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.lang.ArrayUtils;
 
@@ -70,6 +78,8 @@ public class TXEssenDoc1 {
             createContent4Section2();
             createContent4Section3();
             createContent4Section4();
+            createContent4Section5();
+            createContent4Section6();
 
             fillDataIntoPDF();
             fillWoundsIntoPDF();
@@ -170,7 +180,7 @@ public class TXEssenDoc1 {
 
         String grade = getValue(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade");
         grade = grade.equalsIgnoreCase("refused") ? "none" : grade; // there is no such thing as refused request in this document.
-        content.put(INSURANCE_GRADE, setRadiobutton(grade, new String[]{"none", "requested", "assigned"}));
+        content.put(INSURANCE_GRADE, setRadiobutton(grade, new String[]{"none", "assigned", "requested"}));
         content.put(DATE_REQUESTED_INSURANCE_GRADE_PAGE3, setCheckbox(grade.equalsIgnoreCase("requested")));
     }
 
@@ -232,10 +242,113 @@ public class TXEssenDoc1 {
         content.put(MOBILITY_AID_CRUTCH, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "crutch.aid")));
         content.put(MOBILITY_AID_CANE, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "cane.aid")));
         content.put(MOBILITY_AID_WHEELCHAIR, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "wheel.aid")));
-        // TODO: AUSSCHEIDUNGEN
-        // content.put(MOBILITY_AID_COMMODE, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "crutch.aid")));
+        content.put(MOBILITY_AID_COMMODE, setCheckbox(getValue(ResInfoTypeTools.TYPE_INCOAID, "commode.aid"))); // <- from other section
         content.put(MOBILITY_AID_WALKER, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "walker.aid")));
+        content.put(MOBILITY_AID_COMMENT, getValue(ResInfoTypeTools.TYPE_MOBILITY, "other.aid"));
+        content.put(MOBILITY_BEDRIDDEN, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "bedridden")));
 
+        String mobilityMeasures = "";
+        long prev = -1;
+        for (InterventionSchedule is : InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_MOBILITY)) {
+            if (is.getIntervention().getMassID() != prev) {
+                prev = is.getIntervention().getMassID();
+                if (!mobilityMeasures.isEmpty()) {
+                    mobilityMeasures += "; ";
+                }
+                mobilityMeasures += is.getIntervention().getBezeichnung() + ": ";
+            }
+            mobilityMeasures += InterventionScheduleTools.getTerminAsCompactText(is) + ", ";
+        }
+        content.put(MOBILITY_BEDPOSITION, mobilityMeasures.substring(0, mobilityMeasures.length() - 2)); // the last ", " has to be cut off again
+    }
+
+    private void createContent4Section5() {
+        boolean weightControl = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_WEIGHT_MONITORING).isEmpty() ||
+                !InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_WEIGHT_MONITORING).isEmpty();
+        content.put(EXCRETIONS_CONTROL_WEIGHT, setCheckbox(weightControl));
+        content.put(MONITORING_WEIGHT, setCheckbox(weightControl));
+
+        Properties controlling = resident.getControlling();
+        content.put(EXCRETIONS_LIQUID_BALANCE, setCheckbox(SYSTools.catchNull(controlling.getProperty("liquidbalance")).equalsIgnoreCase("on")));
+
+        content.put(EXCRETIONS_AID_BEDPAN, setCheckbox(getValue(ResInfoTypeTools.TYPE_INCOAID, "bedpan.aid")));
+        content.put(EXCRETIONS_AID_COMMODE, setCheckbox(getValue(ResInfoTypeTools.TYPE_INCOAID, "commode.aid")));
+        content.put(EXCRETIONS_AID_URINAL, setCheckbox(getValue(ResInfoTypeTools.TYPE_INCOAID, "urinal.aid")));
+
+        boolean noAid = getValue(ResInfoTypeTools.TYPE_INCOAID, "bedpan.aid").equalsIgnoreCase("false") &&
+                getValue(ResInfoTypeTools.TYPE_INCOAID, "commode.aid").equalsIgnoreCase("false") &&
+                getValue(ResInfoTypeTools.TYPE_INCOAID, "urinal.aid").equalsIgnoreCase("false");
+        content.put(EXCRETIONS_AID_NO, setCheckbox(noAid));
+
+        content.put(EXCRETIONS_DIARRHOEA_TENDENCY, setCheckbox(getValue(ResInfoTypeTools.TYPE_EXCRETIONS, "diarrhoe")));
+        content.put(EXCRETIONS_OBSTIPATION_TENDENCY, setCheckbox(getValue(ResInfoTypeTools.TYPE_EXCRETIONS, "obstipation")));
+        content.put(EXCRETIONS_DIGITAL, setCheckbox(getValue(ResInfoTypeTools.TYPE_EXCRETIONS, "digital")));
+
+        boolean inco_urine = (mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_PROFILE_DAY) && !getValue(ResInfoTypeTools.TYPE_INCO_PROFILE_DAY, "inkoprofil").equalsIgnoreCase("kontinenz")) ||
+                (mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT) && !getValue(ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT, "inkoprofil").equalsIgnoreCase("kontinenz"));
+        boolean inco_faecal = (mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_FAECAL) && !getValue(ResInfoTypeTools.TYPE_INCO_FAECAL, "incolevel").equalsIgnoreCase("0"));
+        content.put(EXCRETIONS_INCO_URINE, setCheckbox(inco_urine));
+        content.put(EXCRETIONS_INCO_FAECAL, setCheckbox(inco_faecal));
+
+        content.put(EXCRETIONS_INCOAID_NEEDSHELP, setCheckbox(getValue(ResInfoTypeTools.TYPE_INCOAID, "needshelp")));
+        content.put(EXCRETIONS_INCOAID_SELF, setCheckbox(getValue(ResInfoTypeTools.TYPE_INCOAID, "needshelp").equalsIgnoreCase("false")));
+        content.put(EXCRETIONS_TRANS_AID, setCheckbox(getValue(ResInfoTypeTools.TYPE_INCOAID, "trans.aid")));
+        content.put(EXCRETIONS_SUP_AID, setCheckbox(getValue(ResInfoTypeTools.TYPE_INCOAID, "sup.aid")));
+
+
+        boolean diapers = getValue(ResInfoTypeTools.TYPE_INCOAID, "windel").equalsIgnoreCase("true");
+        boolean pads1 = getValue(ResInfoTypeTools.TYPE_INCOAID, "vorlagen1").equalsIgnoreCase("true") ||
+                getValue(ResInfoTypeTools.TYPE_INCOAID, "vorlagen2").equalsIgnoreCase("true") ||
+                getValue(ResInfoTypeTools.TYPE_INCOAID, "vorlagen3").equalsIgnoreCase("true");
+        boolean pads2 = getValue(ResInfoTypeTools.TYPE_INCOAID, "dbinden").equalsIgnoreCase("true");
+        boolean undersheet = getValue(ResInfoTypeTools.TYPE_INCOAID, "krunterlagen").equalsIgnoreCase("true");
+
+        String incoaidtext = (diapers ? OPDE.lang.getString("misc.msg.diaper") + ", " : "") +
+                (pads1 ? OPDE.lang.getString("misc.msg.incopad") + ", " : "") +
+                (pads2 ? OPDE.lang.getString("misc.msg.sanitarypads") + ", " : "") +
+                (undersheet ? OPDE.lang.getString("misc.msg.undersheet") + ", " : "");
+
+        content.put(EXCRETIONS_ONEWAY_AID, setCheckbox(diapers || pads1 || pads2 || undersheet));
+        content.put(EXCRETIONS_CURRENT_USED_AID, incoaidtext.substring(0, incoaidtext.length() - 2));
+
+        ArrayList<Prescription> presCatheterChange = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_CATHETER_CHANGE);
+        if (!presCatheterChange.isEmpty()) {
+            Date lastChange = SYSConst.DATE_THE_VERY_BEGINNING;
+            for (Prescription prescription : presCatheterChange) { // usually there shouldn't be more than 1, but you never know
+                BHP bhp = BHPTools.getLastBHP(prescription);
+                if (bhp != null) {
+                    lastChange = new Date(Math.max(lastChange.getTime(), BHPTools.getLastBHP(prescription).getIst().getTime()));
+                }
+            }
+            if (!lastChange.equals(SYSConst.DATE_THE_VERY_BEGINNING)) {
+                content.put(EXCRETIONS_LASTCHANGE, DateFormat.getDateInstance().format(lastChange));
+            } else {
+                content.put(EXCRETIONS_LASTCHANGE, "--");
+            }
+        }
+    }
+
+    private void createContent4Section6() {
+        content.put(PROPH_CONTRACTURE, setCheckbox(!InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_CONTRACTURE).isEmpty()));
+        content.put(PROPH_BEDSORE, setCheckbox(!InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_BEDSORE).isEmpty()));
+        content.put(PROPH_SOOR, setCheckbox(!InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_SOOR).isEmpty()));
+        content.put(PROPH_THROMBOSIS, setCheckbox(!InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_THROMBOSIS).isEmpty()));
+        content.put(PROPH_PNEUMONIA, setCheckbox(!InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_PNEUMONIA).isEmpty()));
+        content.put(PROPH_INTERTRIGO, setCheckbox(!InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_INTERTRIGO).isEmpty()));
+        content.put(PROPH_FALL, setCheckbox(!InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_FALL).isEmpty()));
+        content.put(PROPH_OBSTIPATION, setCheckbox(!InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_OBSTIPATION).isEmpty()));
+    }
+
+    private void createContent4Section7() {
+        String braden = "Braden: " + getValue(ResInfoTypeTools.TYPE_SCALE_BRADEN, "scalesum") + " (" + getValue(ResInfoTypeTools.TYPE_SCALE_BRADEN, "risk") + ")";
+        content.put(RISKSCALE_TYPE_BEDSORE, braden);
+        int rating;
+        try {
+            rating = Integer.parseInt(getValue(ResInfoTypeTools.TYPE_SCALE_BRADEN, "rating"));
+        } catch (NumberFormatException nfe){
+            rating = 0;
+        }
+        content.put(SCALE_RISK_BEDSORE, setCheckbox(rating > 0));
     }
 
     private String getValue(int type, String propsKey) {
@@ -514,7 +627,6 @@ public class TXEssenDoc1 {
     public static final String MOBILITY_BED = "mobility.bed";
     public static final String MOBILITY_BEDPOSITION = "mobility.bedposition";
     public static final String MOBILITY_BEDRIDDEN = "mobility.bedridden";
-    public static final String MOBILITY_CHANGE_BEDPOSITION = "mobility.change.bedposition";
     public static final String MOBILITY_COMMENT = "mobility.comment";
     public static final String MOBILITY_GET_UP = "mobility.get.up";
     public static final String MOBILITY_SITTING = "mobility.sitting";

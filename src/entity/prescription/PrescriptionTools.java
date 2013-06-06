@@ -570,6 +570,8 @@ public class PrescriptionTools {
         return phrase;
     }
 
+
+
     public static String getLongDescription(Prescription presription) {
         String result = "<div id=\"fonttext\">";// = SYSConst.html_fontface;
 
@@ -866,6 +868,19 @@ public class PrescriptionTools {
         return result;
     }
 
+    public static ArrayList<Prescription> getAllActiveByFlag(Resident resident, int flag) {
+            EntityManager em = OPDE.createEM();
+
+            ArrayList<Prescription> result = null;
+            Query query = em.createQuery(" SELECT p FROM Prescription p WHERE p.resident = :resident AND p.to >= :now AND p.intervention.flag = :flag");
+            query.setParameter("resident", resident);
+            query.setParameter("now", new Date());
+            query.setParameter("flag", flag);
+            result = new ArrayList<Prescription>(query.getResultList());
+
+            em.close();
+            return result;
+        }
 
     /**
      * Dieser Query ordnet Verordnungen den Vorräten zu. Dazu ist ein kleiner Trick nötig. Denn über die Zeit können verschiedene Vorräte mit verschiedenen

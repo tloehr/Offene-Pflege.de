@@ -47,9 +47,6 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
     @Lob
     @Column(name = "Ziel")
     private String goal;
-    //    @Basic(optional = false)
-//    @Column(name = "BWIKID")
-//    private long bwikid;
     @Basic(optional = false)
     @Column(name = "Von")
     @Temporal(TemporalType.TIMESTAMP)
@@ -68,9 +65,6 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
     @Version
     @Column(name = "version")
     private Long version;
-    @Version
-    @Column(name = "flag")
-    private Integer flag;
 
     // ==
     // N:1 Relationen
@@ -111,7 +105,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
         attachedQProcessConnections = new ArrayList<SYSNP2PROCESS>();
         nextEval = new DateTime().plusWeeks(4).toDate();
         from = new Date();
-        flag = NursingProcessTools.FLAG_NONE;
+//        flag = NursingProcessTools.FLAG_NONE;
         to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
         this.npseries = -1l;
     }
@@ -124,13 +118,13 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
         return id;
     }
 
-    public Integer getFlag() {
-        return flag;
-    }
-
-    public void setFlag(Integer flag) {
-        this.flag = flag;
-    }
+//    public Integer getFlag() {
+//        return flag;
+//    }
+//
+//    public void setFlag(Integer flag) {
+//        this.flag = flag;
+//    }
 
     public String getTopic() {
         return topic;

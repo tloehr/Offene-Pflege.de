@@ -97,8 +97,8 @@ public class DlgNursingProcess extends MyJDialog {
         cmbKategorie.setSelectedItem(nursingProcess.getCategory());
         reloadInterventions();
 
-        cmbFlags.setModel(new DefaultComboBoxModel(NursingProcessTools.FLAGS));
-        cmbFlags.setSelectedIndex(nursingProcess.getFlag());
+//        cmbFlags.setModel(new DefaultComboBoxModel(NursingProcessTools.FLAGS));
+//        cmbFlags.setSelectedIndex(nursingProcess.getFlag());
 
 
         String mode = "new";
@@ -580,7 +580,7 @@ public class DlgNursingProcess extends MyJDialog {
         nursingProcess.setGoal(txtZiele.getText().trim());
         nursingProcess.setNextEval(jdcKontrolle.getDate());
         nursingProcess.setCategory((ResInfoCategory) cmbKategorie.getSelectedItem());
-        nursingProcess.setFlag(cmbFlags.getSelectedIndex());
+//        nursingProcess.setFlag(cmbFlags.getSelectedIndex());
     }
 
 

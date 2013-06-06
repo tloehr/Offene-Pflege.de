@@ -49,7 +49,12 @@ public class ResInfoTypeTools {
     public static final int TYPE_CARE = 108;
     public static final int TYPE_SKIN = 109;
     public static final int TYPE_MOBILITY = 110;
-
+    public static final int TYPE_EXCRETIONS = 111;
+    public static final int TYPE_INCOAID = 112;
+    public static final int TYPE_INCO_PROFILE_DAY = 113;
+    public static final int TYPE_INCO_PROFILE_NIGHT = 114;
+    public static final int TYPE_INCO_FAECAL = 115;
+    public static final int TYPE_SCALE_BRADEN = 116;
 
 
 //    public static final String TYPE_HOSPITAL_STAY = "KH";
@@ -111,15 +116,15 @@ public class ResInfoTypeTools {
     }
 
     public static boolean containsOneActiveObsoleteInfo(ArrayList<ResInfo> listInfos) {
-            boolean containsOneActiveObsoleteInfo = false;
-            for (ResInfo info : listInfos) {
-                containsOneActiveObsoleteInfo = info.getResInfoType().isObsolete() && !info.isClosed();
-                if (containsOneActiveObsoleteInfo) {
-                    break;
-                }
+        boolean containsOneActiveObsoleteInfo = false;
+        for (ResInfo info : listInfos) {
+            containsOneActiveObsoleteInfo = info.getResInfoType().isObsolete() && !info.isClosed();
+            if (containsOneActiveObsoleteInfo) {
+                break;
             }
-            return containsOneActiveObsoleteInfo;
         }
+        return containsOneActiveObsoleteInfo;
+    }
 
     /**
      * if you hand over an obsolete infotype to this method it returns an

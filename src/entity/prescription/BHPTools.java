@@ -56,6 +56,19 @@ public class BHPTools {
     public static final byte BYTE_EVENING = 5;
     public static final byte BYTE_LATE_AT_NIGHT = 6;
 
+
+    public static BHP getLastBHP(Prescription prescription) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM BHP b WHERE b.prescription = :prescription AND b.state = :state ORDER BY b.ist DESC");
+        query.setParameter("prescription", prescription);
+        query.setParameter("state", STATE_DONE);
+        query.setFirstResult(0);
+        query.setMaxResults(1);
+        List<BHP> bhp = query.getResultList();
+        em.close();
+        return bhp.isEmpty() ? null : bhp.get(0);
+    }
+
     public static long getNumBHPs(Prescription prescription) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT COUNT(bhp) FROM BHP bhp WHERE bhp.prescription = :prescription AND bhp.state <> :status");

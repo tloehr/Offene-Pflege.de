@@ -4,6 +4,7 @@ import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Phrase;
+import entity.info.Resident;
 import op.OPDE;
 import op.system.PDF;
 import op.tools.HTMLTools;
@@ -11,9 +12,12 @@ import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA.
@@ -288,7 +292,6 @@ public class PrescriptionScheduleTools {
         return result + "</div>";
     }
 
-
     public static Phrase getRemarkAsPhrase(PrescriptionSchedule schedule) {
         Phrase phrase = new Phrase();
 
@@ -302,7 +305,6 @@ public class PrescriptionScheduleTools {
 
         Phrase repeat = getRepeatPatternAsPhrase(schedule, false);
         phrase.add(repeat);
-
 
 
         if (!SYSTools.catchNull(schedule.getPrescription().getText()).isEmpty()) {

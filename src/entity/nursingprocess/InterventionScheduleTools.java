@@ -1,12 +1,17 @@
 package entity.nursingprocess;
 
+import entity.info.Resident;
 import op.OPDE;
 import op.care.nursingprocess.PnlNursingProcess;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.text.DateFormat;
+import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA.
@@ -19,7 +24,6 @@ public class InterventionScheduleTools {
 
     public static String getTerminAsHTML(InterventionSchedule termin) {
         String result = "";
-
 
         final int ZEIT = 0;
         final int UHRZEIT = 1;
@@ -82,7 +86,7 @@ public class InterventionScheduleTools {
                     "      <td>" + wdh + "</td>" +
                     "    </tr>";
         } else {
-            result = "!!FEHLER!!";
+            result = "!!ERROR!!";
         }
 
         result += "</table>";
@@ -112,7 +116,7 @@ public class InterventionScheduleTools {
                 result += "alle " + schedule.getWoechentlich() + " Wochen ";
             }
 
-           String daylist = "";
+            String daylist = "";
 
             daylist += (schedule.getMon() > 0 ? OPDE.lang.getString("misc.msg.monday").substring(0, 3) + ", " : "");
             daylist += (schedule.getDie() > 0 ? OPDE.lang.getString("misc.msg.tuesday").substring(0, 3) + ", " : "");
@@ -126,42 +130,21 @@ public class InterventionScheduleTools {
                 result += "{" + daylist.substring(0, daylist.length() - 2) + "}";
             }
 
-//            if (termin.getMon() > 0) {
-//                result += "Mon ";
-//            }
-//            if (termin.getTue() > 0) {
-//                result += "Die ";
-//            }
-//            if (termin.getWed() > 0) {
-//                result += "Mit ";
-//            }
-//            if (termin.getThu() > 0) {
-//                result += "Don ";
-//            }
-//            if (termin.getFri() > 0) {
-//                result += "Fre ";
-//            }
-//            if (termin.getSat() > 0) {
-//                result += "Sam ";
-//            }
-//            if (termin.getSun() > 0) {
-//                result += "Son ";
-//            }
-
         } else if (schedule.isMonatlich()) {
             if (schedule.getMonatlich() == 1) {
-                result += "jeden Monat ";
+                result += OPDE.lang.getString("misc.msg.everyMonth") + " ";
             } else {
-                result += "alle " + schedule.getMonatlich() + " Monate ";
+                result += OPDE.lang.getString("misc.msg.every") + " " + schedule.getMonatlich() + " " + OPDE.lang.getString("misc.msg.months") + " ";
+//                result += "alle " + schedule.getMonatlich() + " Monate ";
             }
 
             if (schedule.getTagNum() > 0) {
-                result += "jeweils am " + schedule.getTagNum() + ". des Monats";
+                result += OPDE.lang.getString("misc.msg.atchrono") + " " + schedule.getTagNum() + ". " + OPDE.lang.getString("misc.msg.ofTheMonth");
+//                result += "jeweils am " + schedule.getTagNum() + ". des Monats";
             } else {
                 int wtag = 0;
                 String tag = "";
-
-                                tag += (schedule.getMon() > 0 ? OPDE.lang.getString("misc.msg.monday") : "");
+                tag += (schedule.getMon() > 0 ? OPDE.lang.getString("misc.msg.monday") : "");
                 tag += (schedule.getDie() > 0 ? OPDE.lang.getString("misc.msg.tuesday") : "");
                 tag += (schedule.getMit() > 0 ? OPDE.lang.getString("misc.msg.wednesday") : "");
                 tag += (schedule.getDon() > 0 ? OPDE.lang.getString("misc.msg.thursday") : "");
@@ -178,35 +161,7 @@ public class InterventionScheduleTools {
                 wtag += schedule.getSam();
                 wtag += schedule.getSon();
 
-//                if (termin.getMon() > 0) {
-//                    tag += "Montag ";
-//                    wtag = termin.getMon();
-//                }
-//                if (termin.getTue() > 0) {
-//                    tag += "Dienstag ";
-//                    wtag = termin.getTue();
-//                }
-//                if (termin.getWed() > 0) {
-//                    tag += "Mittwoch ";
-//                    wtag = termin.getWed();
-//                }
-//                if (termin.getThu() > 0) {
-//                    tag += "Donnerstag ";
-//                    wtag = termin.getThu();
-//                }
-//                if (termin.getFri() > 0) {
-//                    tag += "Freitag ";
-//                    wtag = termin.getFri();
-//                }
-//                if (termin.getSat() > 0) {
-//                    tag += "Samstag ";
-//                    wtag = termin.getSat();
-//                }
-//                if (termin.getSun() > 0) {
-//                    tag += "Sonntag ";
-//                    wtag = termin.getSun();
-//                }
-                result += "jeweils am " + wtag + ". " + tag + " des Monats";
+                result += OPDE.lang.getString("misc.msg.atchrono") + " " + wtag + ". " + tag + " " + OPDE.lang.getString("misc.msg.ofTheMonth");
             }
         } else {
             result = "";
@@ -216,15 +171,58 @@ public class InterventionScheduleTools {
         DateMidnight today = new DateMidnight();
 
         if (ldatum.compareTo(today) > 0) { // Die erste Ausführung liegt in der Zukunft
-            result += "<br/>erst ab: " + DateFormat.getDateInstance().format(schedule.getLDatum());
+            result += OPDE.lang.getString("nursingrecords.prescription.firstApplication") + ": " + DateFormat.getDateInstance().format(schedule.getLDatum());
         }
 
         return result;
     }
 
+    public static ArrayList<InterventionSchedule> getAllActiveByFlag(Resident resident, int flag) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery(" " +
+                " SELECT i FROM InterventionSchedule i " +
+                " WHERE i.nursingProcess.resident = :resident AND i.nursingProcess.to = :ufn AND i.intervention.flag = :flag ORDER BY i.intervention.bezeichnung ");
+        query.setParameter("ufn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+        query.setParameter("resident", resident);
+        query.setParameter("flag", flag);
+        ArrayList<InterventionSchedule> listIS = new ArrayList<InterventionSchedule>(query.getResultList());
+        em.close();
+        return listIS;
+    }
 
+    public static String getTerminAsCompactText(InterventionSchedule schedule) {
+        String result = "";
 
+        final int ZEIT = 0;
+        final int UHRZEIT = 1;
+//            int previousState = -1;
 
+        int currentState;
+        // Zeit verwendet ?
+        if (schedule.verwendetUhrzeit()) {
+            currentState = UHRZEIT;
+        } else {
+            currentState = ZEIT;
+        }
 
+        if (currentState == ZEIT) {
+            result += (schedule.getNachtMo() > 0 ? OPDE.lang.getString("misc.msg.earlyinthemorning.long") : "") +
+                    (schedule.getMorgens() > 0 ? OPDE.lang.getString("misc.msg.morning.long") : "") +
+                    (schedule.getMittags() > 0 ? OPDE.lang.getString("misc.msg.noon.long") : "") +
+                    (schedule.getNachmittags() > 0 ? OPDE.lang.getString("misc.msg.afternoon.long") : "") +
+                    (schedule.getAbends() > 0 ? OPDE.lang.getString("misc.msg.evening.long") : "") +
+                    (schedule.getNachtAb() > 0 ? OPDE.lang.getString("misc.msg.lateatnight.long") : "");
+
+            result += (schedule.getTaeglich() != 1 ? getRepeatPattern(schedule) : "");
+        } else if (currentState == UHRZEIT) {
+
+            result += DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getUhrzeit()) + " " + OPDE.lang.getString("misc.msg.Time.short");
+
+        } else {
+            result = "!!ERROR!!";
+        }
+
+        return result;
+    }
 
 }

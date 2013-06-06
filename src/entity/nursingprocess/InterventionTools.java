@@ -25,22 +25,46 @@ public class InterventionTools {
     public static final int TYPE_SOCIAL = 3;
 
     public static final int FLAG_NONE = 0;
-    public static final int FLAG_MOBILIZATION = 1;
+    public static final int FLAG_MOBILITY = 1;
     public static final int FLAG_WEIGHT_CONTROL = 2;
     public static final int FLAG_CATHETER_CHANGE = 3;
     public static final int FLAG_SUP_CATHETER_CHANGE = 4;
     public static final int FLAG_CONTROL_PACEMAKER = 5;
     public static final int FLAG_GAVAGE_FOOD = 6;
     public static final int FLAG_GAVAGE_LIQUID = 7;
-    public static final int FLAG_GLUCOSE_MONITORING  = 8;
-    public static final int FLAG_BP_MONITORING  = 9;
-    public static final int FLAG_PORT_MONITORING  = 10;
-    public static final int FLAG_PULSE_MONITORING  = 11;
-    public static final int FLAG_WEIGHT_MONITORING  = 12;
-    public static final int FLAG_PAIN_MONITORING  = 13;
-    public static final int FLAG_TEMP_MONITORING  = 14;
-    public static final int FLAG_FOOD_CONSUMPTION  = 15;
-
+    public static final int FLAG_GLUCOSE_MONITORING = 8;
+    public static final int FLAG_BP_MONITORING = 9;
+    public static final int FLAG_PORT_MONITORING = 10;
+    public static final int FLAG_PULSE_MONITORING = 11;
+    public static final int FLAG_WEIGHT_MONITORING = 12;
+    public static final int FLAG_PAIN_MONITORING = 13;
+    public static final int FLAG_TEMP_MONITORING = 14;
+    public static final int FLAG_FOOD_CONSUMPTION = 15;
+    public static final int FLAG_PROPH_CONTRACTURE = 16;
+    public static final int FLAG_PROPH_BEDSORE = 17;
+    public static final int FLAG_PROPH_SOOR = 18;
+    public static final int FLAG_PROPH_THROMBOSIS = 19;
+    public static final int FLAG_PROPH_PNEUMONIA = 20;
+    public static final int FLAG_PROPH_INTERTRIGO = 21;
+    public static final int FLAG_PROPH_FALL = 22;
+    public static final int FLAG_PROPH_OBSTIPATION = 23;
+    public static final int FLAG_ADDITIONAL_NUTRITION = 24;
+    public static final int FLAG_THERAPY_PHYSIO = 25;
+    public static final int FLAG_THERAPY_ERGO = 26;
+    public static final int FLAG_THERAPY_LOGOPEDICS = 27;
+//    public static final String[] FLAGS = new String[]{"nursingrecords.nursingprocess.flag.none",
+//            "nursingrecords.nursingprocess.flag.contracture",
+//            "nursingrecords.nursingprocess.flag.bedsore",
+//            "nursingrecords.nursingprocess.flag.soor",
+//            "nursingrecords.nursingprocess.flag.thrombosis",
+//            "nursingrecords.nursingprocess.flag.pneumonia",
+//            "nursingrecords.nursingprocess.flag.intertrigo",
+//            "nursingrecords.nursingprocess.flag.fall",
+//            "nursingrecords.nursingprocess.flag.obstipation",
+//            "nursingrecords.nursingprocess.flag.extranutrition",
+//            "nursingrecords.nursingprocess.flag.physio",
+//            "nursingrecords.nursingprocess.flag.ergo",
+//            "nursingrecords.nursingprocess.flag.logo"};
 
     public static ListCellRenderer getRenderer() {
         return new ListCellRenderer() {
@@ -87,43 +111,43 @@ public class InterventionTools {
 
     public static List<Intervention> findBy(int massArt, String suche) {
 
-            EntityManager em = OPDE.createEM();
+        EntityManager em = OPDE.createEM();
 
-            Query query = em.createQuery(" " +
-                    " SELECT m FROM Intervention m WHERE m.active = TRUE AND m.interventionType = :art " +
-                    (SYSTools.catchNull(suche).isEmpty() ? "" : " AND m.bezeichnung like :suche ") +
-                    " ORDER BY m.bezeichnung "
-            );
+        Query query = em.createQuery(" " +
+                " SELECT m FROM Intervention m WHERE m.active = TRUE AND m.interventionType = :art " +
+                (SYSTools.catchNull(suche).isEmpty() ? "" : " AND m.bezeichnung like :suche ") +
+                " ORDER BY m.bezeichnung "
+        );
 
-            query.setParameter("art", massArt);
-            if (!SYSTools.catchNull(suche).isEmpty()) {
-                query.setParameter("suche", EntityTools.getMySQLsearchPattern(suche));
-            }
-
-            List<Intervention> list = query.getResultList();
-
-            em.close();
-
-            return list;
+        query.setParameter("art", massArt);
+        if (!SYSTools.catchNull(suche).isEmpty()) {
+            query.setParameter("suche", EntityTools.getMySQLsearchPattern(suche));
         }
+
+        List<Intervention> list = query.getResultList();
+
+        em.close();
+
+        return list;
+    }
 
     public static List<Intervention> findBy(ResInfoCategory category) {
 
-            EntityManager em = OPDE.createEM();
+        EntityManager em = OPDE.createEM();
 
-            Query query = em.createQuery(" " +
-                    " SELECT m FROM Intervention m WHERE m.active = TRUE AND m.category = :cat " +
-                    " ORDER BY m.bezeichnung "
-            );
+        Query query = em.createQuery(" " +
+                " SELECT m FROM Intervention m WHERE m.active = TRUE AND m.category = :cat " +
+                " ORDER BY m.bezeichnung "
+        );
 
-            query.setParameter("cat", category);
+        query.setParameter("cat", category);
 
-            List<Intervention> list = query.getResultList();
+        List<Intervention> list = query.getResultList();
 
-            em.close();
+        em.close();
 
-            return list;
-        }
+        return list;
+    }
 
 
 }

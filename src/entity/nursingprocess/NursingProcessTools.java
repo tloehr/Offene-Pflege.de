@@ -27,33 +27,6 @@ import java.util.List;
  */
 public class NursingProcessTools {
 
-    public static final int FLAG_NONE = 0;
-    public static final int FLAG_PROPH_CONTRACTURE = 1;
-    public static final int FLAG_PROPH_BEDSORE = 2;
-    public static final int FLAG_PROPH_SOOR = 3;
-    public static final int FLAG_PROPH_THROMBOSIS = 4;
-    public static final int FLAG_PROPH_PNEUMONIA = 5;
-    public static final int FLAG_PROPH_INTERTRIGO = 6;
-    public static final int FLAG_PROPH_FALL = 7;
-    public static final int FLAG_PROPH_OBSTIPATION = 7;
-    public static final int FLAG_ADDITIONAL_NUTRITION = 8;
-    public static final int FLAG_THERAPY_PHYSIO = 9;
-    public static final int FLAG_THERAPY_ERGO = 10;
-    public static final int FLAG_THERAPY_LOGOPEDICS = 11;
-    public static final String[] FLAGS = new String[]{"nursingrecords.nursingprocess.flag.none",
-            "nursingrecords.nursingprocess.flag.contracture",
-            "nursingrecords.nursingprocess.flag.bedsore",
-            "nursingrecords.nursingprocess.flag.soor",
-            "nursingrecords.nursingprocess.flag.thrombosis",
-            "nursingrecords.nursingprocess.flag.pneumonia",
-            "nursingrecords.nursingprocess.flag.intertrigo",
-            "nursingrecords.nursingprocess.flag.fall",
-            "nursingrecords.nursingprocess.flag.obstipation",
-            "nursingrecords.nursingprocess.flag.extranutrition",
-            "nursingrecords.nursingprocess.flag.physio",
-            "nursingrecords.nursingprocess.flag.ergo",
-            "nursingrecords.nursingprocess.flag.logo"};
-
     public static final String UNIQUEID = "__plankenn";
     public static final int MAXNumOfEvals = 4;
 
@@ -80,13 +53,11 @@ public class NursingProcessTools {
     }
 
     public static ArrayList<NursingProcess> getAll(Resident resident) {
-        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT p FROM NursingProcess p WHERE p.resident = :resident ");
         query.setParameter("resident", resident);
         ArrayList<NursingProcess> nursingProcesses = new ArrayList<NursingProcess>(query.getResultList());
         em.close();
-        SYSTools.showTimeDifference(begin);
         return nursingProcesses;
     }
 
@@ -153,9 +124,9 @@ public class NursingProcessTools {
             html += "</ul>";
         }
 
-        if (np.getFlag() > 0) {
-            html += "<br/><b>" + OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.lblFlag") + ":</b> " + FLAGS[np.getFlag()];
-        }
+//        if (np.getFlag() > 0) {
+//            html += "<br/><b>" + OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.lblFlag") + ":</b> " + FLAGS[np.getFlag()];
+//        }
 
         if (!np.getEvaluations().isEmpty()) {
             html += SYSConst.html_h3(OPDE.lang.getString("misc.msg.DateOfEvals"));

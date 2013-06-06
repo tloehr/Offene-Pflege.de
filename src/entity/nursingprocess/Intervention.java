@@ -103,6 +103,14 @@ public class Intervention implements Serializable {
         return active;
     }
 
+    public int getFlag() {
+        return flag;
+    }
+
+    public void setFlag(int flag) {
+        this.flag = flag;
+    }
+
     public void setActive(boolean active) {
         this.active = active;
     }
