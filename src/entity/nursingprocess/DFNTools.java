@@ -540,4 +540,19 @@ public class DFNTools {
         return date;
     }
 
+
+    public static DFN getLastDFN(Resident resident, int flag) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT d FROM DFN d WHERE d.resident = :resident AND d.intervention.flag = :flag AND d.state = :state AND d.nursingProcess.to > :now ORDER BY d.ist DESC");
+        query.setParameter("resident", resident);
+        query.setParameter("flag", flag);
+        query.setParameter("now", new Date());
+        query.setParameter("state", STATE_DONE);
+        query.setFirstResult(0);
+        query.setMaxResults(1);
+        List<DFN> dfn = query.getResultList();
+        em.close();
+        return dfn.isEmpty() ? null : dfn.get(0);
+    }
+
 }

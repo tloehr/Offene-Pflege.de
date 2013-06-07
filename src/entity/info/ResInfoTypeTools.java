@@ -28,7 +28,7 @@ public class ResInfoTypeTools {
 
     public static final int TYPE_ABSENCE = 10;
     public static final int TYPE_ALLERGY = 97;
-    public static final int TYPE_BIOHAZARD = 99;
+    public static final int TYPE_INFECTION = 99;
     public static final int TYPE_DIABETES = 98;
     public static final int TYPE_DIAGNOSIS = 50;
     public static final int TYPE_FALL = 30; // Sturz
@@ -55,6 +55,21 @@ public class ResInfoTypeTools {
     public static final int TYPE_INCO_PROFILE_NIGHT = 114;
     public static final int TYPE_INCO_FAECAL = 115;
     public static final int TYPE_SCALE_BRADEN = 116;
+    public static final int TYPE_WOUND1 = 117;
+    public static final int TYPE_WOUND2 = 118;
+    public static final int TYPE_WOUND3 = 119;
+    public static final int TYPE_WOUND4 = 120;
+    public static final int TYPE_WOUND5 = 121;
+    public static final int[] TYPE_ALL_WOUNDS = new int[]{TYPE_WOUND1, TYPE_WOUND2, TYPE_WOUND3, TYPE_WOUND4, TYPE_WOUND5};
+    public static final int TYPE_WOUNDHISTORY1 = 122;
+    public static final int TYPE_WOUNDHISTORY2 = 123;
+    public static final int TYPE_WOUNDHISTORY3 = 124;
+    public static final int TYPE_WOUNDHISTORY4 = 125;
+    public static final int TYPE_WOUNDHISTORY5 = 126;
+    public static final int TYPE_SLEEP = 127;
+    public static final int TYPE_FOOD = 128;
+    public static final int TYPE_ARTIFICIAL_NUTRTITION = 129;
+    public static final int TYPE_PACEMAKER = 130;
 
 
 //    public static final String TYPE_HOSPITAL_STAY = "KH";

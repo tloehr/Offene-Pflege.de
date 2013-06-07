@@ -69,6 +69,20 @@ public class BHPTools {
         return bhp.isEmpty() ? null : bhp.get(0);
     }
 
+    public static BHP getLastBHP(Resident resident, int flag) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM BHP b WHERE b.resident = :resident AND b.prescription.intervention.flag = :flag AND b.state = :state AND b.prescription.to > :now ORDER BY b.ist DESC");
+        query.setParameter("resident", resident);
+        query.setParameter("flag", flag);
+        query.setParameter("now", new Date());
+        query.setParameter("state", STATE_DONE);
+        query.setFirstResult(0);
+        query.setMaxResults(1);
+        List<BHP> bhp = query.getResultList();
+        em.close();
+        return bhp.isEmpty() ? null : bhp.get(0);
+    }
+
     public static long getNumBHPs(Prescription prescription) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT COUNT(bhp) FROM BHP bhp WHERE bhp.prescription = :prescription AND bhp.state <> :status");

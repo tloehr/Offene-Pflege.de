@@ -482,7 +482,7 @@ public class DlgInfo extends MyJDialog {
                 scaleriskmodel = new ArrayList();
             }
             if (tagName.equalsIgnoreCase("risk")) {
-                scaleriskmodel.add(new RiskBean(attributes.getValue("from"), attributes.getValue("to"), attributes.getValue("label"), attributes.getValue("color")));
+                scaleriskmodel.add(new RiskBean(attributes.getValue("from"), attributes.getValue("to"), attributes.getValue("label"), attributes.getValue("color"), attributes.getValue("rating")));
             }
             if (tagName.equalsIgnoreCase("tabgroup")) {
                 JLabel jl = new JLabel(attributes.getValue("label") + ":");

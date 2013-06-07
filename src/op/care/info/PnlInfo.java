@@ -691,7 +691,7 @@ public class PnlInfo extends NursingRecordsPanel {
                         String html = "";
                         html += "<h3 id=\"fonth2\" >" + ResidentTools.getLabelText(resident) + "</h2>\n";
 
-                        html += type.getType() == ResInfoTypeTools.TYPE_BIOHAZARD ? SYSConst.html_48x48_biohazard : "";
+                        html += type.getType() == ResInfoTypeTools.TYPE_INFECTION ? SYSConst.html_48x48_biohazard : "";
                         html += type.getType() == ResInfoTypeTools.TYPE_DIABETES ? SYSConst.html_48x48_diabetes : "";
                         html += type.getType() == ResInfoTypeTools.TYPE_ALLERGY ? SYSConst.html_48x48_allergy : "";
                         html += type.getType() == ResInfoTypeTools.TYPE_WARNING ? SYSConst.html_48x48_warning : "";
@@ -732,7 +732,7 @@ public class PnlInfo extends NursingRecordsPanel {
             cptitle.getAdditionalIconPanel().add(new JLabel(SYSConst.icon22allergy));
         if (type.getType() == ResInfoTypeTools.TYPE_DIABETES)
             cptitle.getAdditionalIconPanel().add(new JLabel(SYSConst.icon22diabetes));
-        if (type.getType() == ResInfoTypeTools.TYPE_BIOHAZARD)
+        if (type.getType() == ResInfoTypeTools.TYPE_INFECTION)
             cptitle.getAdditionalIconPanel().add(new JLabel(SYSConst.icon22biohazard));
         if (type.getType() == ResInfoTypeTools.TYPE_WARNING)
             cptitle.getAdditionalIconPanel().add(new JLabel(SYSConst.icon22warning));
@@ -809,7 +809,7 @@ public class PnlInfo extends NursingRecordsPanel {
                             if (mapType2InfoList.containsKey(type) && !mapType2InfoList.get(type).isEmpty()) {
                                 html += "<h3 id=\"fonth3\" >" + type.getShortDescription() + "</h3>\n";
 
-                                html += type.getType() == ResInfoTypeTools.TYPE_BIOHAZARD ? SYSConst.html_48x48_biohazard : "";
+                                html += type.getType() == ResInfoTypeTools.TYPE_INFECTION ? SYSConst.html_48x48_biohazard : "";
                                 html += type.getType() == ResInfoTypeTools.TYPE_DIABETES ? SYSConst.html_48x48_diabetes : "";
                                 html += type.getType() == ResInfoTypeTools.TYPE_ALLERGY ? SYSConst.html_48x48_allergy : "";
                                 html += type.getType() == ResInfoTypeTools.TYPE_WARNING ? SYSConst.html_48x48_warning : "";

@@ -358,6 +358,11 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
         this.prescription = prescription;
     }
 
+
+    public BigDecimal getOverAllDoseSum(){
+        return nachtMo.add(morgens).add(mittags).add(nachmittags).add(abends).add(nachtAb).add(uhrzeitDosis);
+    }
+
     /**
      * gibt an, ob bei der Planungen die festen Zeiten wie Früh, Spät, Nacht usw. verwendet wurden
      *

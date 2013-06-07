@@ -30,8 +30,8 @@ public class InterventionTools {
     public static final int FLAG_CATHETER_CHANGE = 3;
     public static final int FLAG_SUP_CATHETER_CHANGE = 4;
     public static final int FLAG_CONTROL_PACEMAKER = 5;
-    public static final int FLAG_GAVAGE_FOOD = 6;
-    public static final int FLAG_GAVAGE_LIQUID = 7;
+    public static final int FLAG_GAVAGE_FOOD_500ML = 6;
+    public static final int FLAG_GAVAGE_LIQUID_500ML = 7;
     public static final int FLAG_GLUCOSE_MONITORING = 8;
     public static final int FLAG_BP_MONITORING = 9;
     public static final int FLAG_PORT_MONITORING = 10;

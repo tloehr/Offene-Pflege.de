@@ -757,7 +757,7 @@ public class PnlInformation extends NursingRecordsPanel {
             public void actionPerformed(ActionEvent e) {
                 String html = "";
                 html += "<h3 id=\"fonth2\" >" + ResidentTools.getLabelText(resident) + "</h2>\n";
-                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_BIOHAZARD ? SYSConst.html_48x48_biohazard : "";
+                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_INFECTION ? SYSConst.html_48x48_biohazard : "";
                 html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_DIABETES ? SYSConst.html_48x48_diabetes : "";
                 html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_ALLERGY ? SYSConst.html_48x48_allergy : "";
                 html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_WARNING ? SYSConst.html_48x48_warning : "";
@@ -1106,7 +1106,7 @@ public class PnlInformation extends NursingRecordsPanel {
                             if (mapType2ResInfos.containsKey(type) && !mapType2ResInfos.get(type).isEmpty()) {
                                 html += "<h3 id=\"fonth3\" >" + type.getShortDescription() + "</h3>\n";
 
-                                html += type.getType() == ResInfoTypeTools.TYPE_BIOHAZARD ? SYSConst.html_48x48_biohazard : "";
+                                html += type.getType() == ResInfoTypeTools.TYPE_INFECTION ? SYSConst.html_48x48_biohazard : "";
                                 html += type.getType() == ResInfoTypeTools.TYPE_DIABETES ? SYSConst.html_48x48_diabetes : "";
                                 html += type.getType() == ResInfoTypeTools.TYPE_ALLERGY ? SYSConst.html_48x48_allergy : "";
                                 html += type.getType() == ResInfoTypeTools.TYPE_WARNING ? SYSConst.html_48x48_warning : "";

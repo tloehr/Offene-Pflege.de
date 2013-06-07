@@ -3,13 +3,9 @@ package entity.info;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.pdf.*;
 import entity.files.SYSFilesTools;
-import entity.nursingprocess.InterventionSchedule;
-import entity.nursingprocess.InterventionScheduleTools;
-import entity.nursingprocess.InterventionTools;
-import entity.prescription.BHP;
-import entity.prescription.BHPTools;
-import entity.prescription.Prescription;
-import entity.prescription.PrescriptionTools;
+import entity.nursingprocess.*;
+import entity.prescription.*;
+import entity.values.ResValueTools;
 import op.OPDE;
 import op.care.info.PnlBodyScheme;
 import op.tools.SYSConst;
@@ -21,6 +17,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -57,7 +55,7 @@ public class TXEssenDoc1 {
         mapID2Info = new HashMap<Integer, ResInfo>();
         mapInfo2Properties = new HashMap<ResInfo, Properties>();
 
-        for (ResInfo info : ResInfoTools.getAll(resident)) {
+        for (ResInfo info : ResInfoTools.getAllActive(resident)) {
             if (!info.isSingleIncident() && !info.isNoConstraints()) {
                 mapID2Info.put(info.getResInfoType().getType(), info);
                 mapInfo2Properties.put(info, load(info.getProperties()));
@@ -66,7 +64,6 @@ public class TXEssenDoc1 {
                 listICD.add(info);
             }
         }
-
 
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
@@ -80,6 +77,10 @@ public class TXEssenDoc1 {
             createContent4Section4();
             createContent4Section5();
             createContent4Section6();
+            createContent4Section7();
+            createContent4Section8();
+            createContent4Section9();
+            createContent4Section10();
 
             fillDataIntoPDF();
             fillWoundsIntoPDF();
@@ -184,11 +185,16 @@ public class TXEssenDoc1 {
         content.put(DATE_REQUESTED_INSURANCE_GRADE_PAGE3, setCheckbox(grade.equalsIgnoreCase("requested")));
     }
 
-
+    /**
+     * valuables
+     */
     private void createContent4Section2() {
         // nothing yet
     }
 
+    /**
+     * personal care
+     */
     private void createContent4Section3() {
         content.put(PERSONAL_CARE_LEVEL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care"), new String[]{"none", "lvl1", "lvl2", "lvl3"}));
         content.put(PERSONAL_CARE_BED, setCheckbox(getValue(ResInfoTypeTools.TYPE_CARE, "personal.care.bed")));
@@ -225,6 +231,10 @@ public class TXEssenDoc1 {
 
     }
 
+
+    /**
+     * mobilty
+     */
     private void createContent4Section4() {
         content.put(MOBILITY_GET_UP, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MOBILITY, "stand"), new String[]{"none", "lvl1", "lvl2", "lvl3"}));
         content.put(MOBILITY_AID_GETUP, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "stand.aid")));
@@ -259,9 +269,12 @@ public class TXEssenDoc1 {
             }
             mobilityMeasures += InterventionScheduleTools.getTerminAsCompactText(is) + ", ";
         }
-        content.put(MOBILITY_BEDPOSITION, mobilityMeasures.substring(0, mobilityMeasures.length() - 2)); // the last ", " has to be cut off again
+        content.put(MOBILITY_BEDPOSITION, mobilityMeasures.isEmpty() ? "--" : mobilityMeasures.substring(0, mobilityMeasures.length() - 2)); // the last ", " has to be cut off again
     }
 
+    /**
+     * excretiions
+     */
     private void createContent4Section5() {
         boolean weightControl = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_WEIGHT_MONITORING).isEmpty() ||
                 !InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_WEIGHT_MONITORING).isEmpty();
@@ -309,7 +322,7 @@ public class TXEssenDoc1 {
                 (undersheet ? OPDE.lang.getString("misc.msg.undersheet") + ", " : "");
 
         content.put(EXCRETIONS_ONEWAY_AID, setCheckbox(diapers || pads1 || pads2 || undersheet));
-        content.put(EXCRETIONS_CURRENT_USED_AID, incoaidtext.substring(0, incoaidtext.length() - 2));
+        content.put(EXCRETIONS_CURRENT_USED_AID, incoaidtext.isEmpty() ? "--" : incoaidtext.substring(0, incoaidtext.length() - 2));
 
         ArrayList<Prescription> presCatheterChange = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_CATHETER_CHANGE);
         if (!presCatheterChange.isEmpty()) {
@@ -339,16 +352,131 @@ public class TXEssenDoc1 {
         content.put(PROPH_OBSTIPATION, setCheckbox(!InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_OBSTIPATION).isEmpty()));
     }
 
+    /**
+     * bedsore
+     */
     private void createContent4Section7() {
         String braden = "Braden: " + getValue(ResInfoTypeTools.TYPE_SCALE_BRADEN, "scalesum") + " (" + getValue(ResInfoTypeTools.TYPE_SCALE_BRADEN, "risk") + ")";
         content.put(RISKSCALE_TYPE_BEDSORE, braden);
         int rating;
         try {
             rating = Integer.parseInt(getValue(ResInfoTypeTools.TYPE_SCALE_BRADEN, "rating"));
-        } catch (NumberFormatException nfe){
+        } catch (NumberFormatException nfe) {
             rating = 0;
         }
         content.put(SCALE_RISK_BEDSORE, setCheckbox(rating > 0));
+
+        boolean bedsore = false;
+        for (int type : ResInfoTypeTools.TYPE_ALL_WOUNDS) {
+            bedsore |= setCheckbox(type).equals("1");
+        }
+        content.put(BEDSORE, setCheckbox(bedsore));
+    }
+
+    /**
+     * sleep
+     */
+    private void createContent4Section8() {
+        content.put(SLEEP_NORMAL, setCheckbox(getValue(ResInfoTypeTools.TYPE_SLEEP, "normal")));
+
+        boolean insomnia = getValue(ResInfoTypeTools.TYPE_SLEEP, "einschlaf").equalsIgnoreCase("true") || getValue(ResInfoTypeTools.TYPE_SLEEP, "durchschlaf").equalsIgnoreCase("true");
+        content.put(SLEEP_INSOMNIA, setCheckbox(insomnia));
+
+        boolean restless = getValue(ResInfoTypeTools.TYPE_SLEEP, "unruhe").equalsIgnoreCase("true") || getValue(ResInfoTypeTools.TYPE_SLEEP, "daynight").equalsIgnoreCase("true");
+        content.put(SLEEP_RESTLESS, setCheckbox(restless));
+
+        content.put(SLEEP_POS_LEFT, setCheckbox(getValue(ResInfoTypeTools.TYPE_SLEEP, "left")));
+        content.put(SLEEP_POS_FRONT, setCheckbox(getValue(ResInfoTypeTools.TYPE_SLEEP, "front")));
+        content.put(SLEEP_POS_BACK, setCheckbox(getValue(ResInfoTypeTools.TYPE_SLEEP, "back")));
+        content.put(SLEEP_POS_RIGHT, setCheckbox(getValue(ResInfoTypeTools.TYPE_SLEEP, "right")));
+
+        content.put(SLEEP_COMMENTS, setCheckbox(getValue(ResInfoTypeTools.TYPE_SLEEP, "schlafhilfen")));
+
+    }
+
+    /**
+     * food
+     */
+    private void createContent4Section9() {
+        content.put(FOOD_ASSISTANCE_LEVEL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_FOOD, "transfer"), new String[]{"none", "needsmotivation", "needshelp", "completehelp"}));
+        content.put(FOOD_DYSPHAGIA, setCheckbox(getValue(ResInfoTypeTools.TYPE_FOOD, "dysphagia")));
+        content.put(FOOD_BITESIZE, setCheckbox(getValue(ResInfoTypeTools.TYPE_FOOD, "bitesize")));
+
+        Date lastMeal = SYSConst.DATE_THE_VERY_BEGINNING;
+
+        BHP bhp = BHPTools.getLastBHP(resident, InterventionTools.FLAG_FOOD_CONSUMPTION);
+        DFN dfn = DFNTools.getLastDFN(resident, InterventionTools.FLAG_FOOD_CONSUMPTION);
+
+        lastMeal = new Date(Math.max(lastMeal.getTime(), (bhp == null ? 0 : bhp.getIst().getTime())));
+        lastMeal = new Date(Math.max(lastMeal.getTime(), (dfn == null ? 0 : dfn.getIst().getTime())));
+
+        if (!lastMeal.equals(SYSConst.DATE_THE_VERY_BEGINNING)) {
+            content.put(FOOD_LAST_MEAL, DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(lastMeal));
+        } else {
+            content.put(FOOD_LAST_MEAL, "--");
+        }
+
+
+        BigDecimal foodml = BigDecimal.ZERO;
+        ArrayList<Prescription> listPresGavageFood = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_FOOD_500ML);
+        for (Prescription p : listPresGavageFood) {
+            for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
+                foodml = foodml.add(ps.getOverAllDoseSum());
+            }
+        }
+
+        BigDecimal liquidml = BigDecimal.ZERO;
+        ArrayList<Prescription> listPresGavageLiquid = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_LIQUID_500ML);
+        for (Prescription p : listPresGavageLiquid) {
+            for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
+                liquidml = liquidml.add(ps.getOverAllDoseSum());
+            }
+        }
+        content.put(FOOD_ARTIFICIAL_FEEDING, setCheckbox(foodml.compareTo(BigDecimal.ZERO) > 0));
+        content.put(FOOD_DAILY_ML, setBD(foodml, "ml"));
+        content.put(FOOD_TEE_DAILY_ML, setBD(liquidml, "ml"));
+
+
+        String tubetype = "--";
+        if (!getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "bitesize").equals("--")) {
+            String langKey = "misc.msg." + getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "tubetype");
+            tubetype = OPDE.lang.getString(langKey);
+        }
+
+        content.put(FOOD_TUBETYPE, tubetype);
+        content.put(FOOD_TUBESINCE, getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "tubesince"));
+        content.put(FOOD_PUMP, setCheckbox(getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "pump")));
+        content.put(FOOD_SYRINGE, setCheckbox(getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "syringe")));
+        content.put(FOOD_GRAVITY, setCheckbox(getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "gravity")));
+
+        content.put(FOOD_DAILY_KCAL, getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "calories"));
+        content.put(FOOD_ORALNUTRITION, setCheckbox(getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "oralnutrition")));
+        content.put(FOOD_BREADUNTIS, getValue(ResInfoTypeTools.TYPE_FOOD, "breadunit"));
+        content.put(FOOD_LIQUIDS_DAILY_ML, getValue(ResInfoTypeTools.TYPE_FOOD, "zieltrinkmenge"));
+        content.put(FOOD_BMI, setBD(ResValueTools.getBMI(resident), ""));
+
+
+        content.put(FOOD_PARENTERAL, setCheckbox(getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "parenteral")));
+        content.put(FOOD_DRINKSALONE, setCheckbox(getValue(ResInfoTypeTools.TYPE_FOOD, "drinksalone")));
+        content.put(FOOD_ABROSIA, setCheckbox(getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "abrosia")));
+        content.put(FOOD_DRINKINGMOTIVATION, setCheckbox(getValue(ResInfoTypeTools.TYPE_FOOD, "motivationdrinking")));
+
+    }
+
+    /**
+     * special aspects
+     */
+    private void createContent4Section10() {
+        content.put(SPECIAL_MRE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_INFECTION, "multiresistant"), new String[]{"no", "yes", "notchecked"}));
+        content.put(SPECIAL_YESNO_ALLERGY, setCheckbox(mapID2Info.containsKey(ResInfoTypeTools.TYPE_ALLERGY)));
+        content.put(SPECIAL_ALLERGIEPASS, setCheckbox(getValue(ResInfoTypeTools.TYPE_ALLERGY, "allergiepass")));
+        content.put(SPECIAL_COMMENT_ALLERGY, getValue(ResInfoTypeTools.TYPE_ALLERGY, "beschreibung"));
+
+        content.put(SPECIAL_MYCOSIS, setCheckbox(getValue(ResInfoTypeTools.TYPE_INFECTION, "mycosis")));
+        content.put(SPECIAL_WOUNDS, setCheckbox(hasWounds()));
+        content.put(SPECIAL_WOUNDPAIN, setCheckbox(hasWoundPain()));
+        content.put(SPECIAL_PACER, setCheckbox(getValue(ResInfoTypeTools.TYPE_PACEMAKER, "pacemaker")));
+        content.put(SPECIAL_LASTCONTROL_PACER, setCheckbox(getValue(ResInfoTypeTools.TYPE_PACEMAKER, "lastcheck")));
     }
 
     private String getValue(int type, String propsKey) {
@@ -362,8 +490,29 @@ public class TXEssenDoc1 {
         return in ? "1" : "0";
     }
 
+    private String setBD(BigDecimal bd, String suffix) {
+
+        return (bd != null && bd.compareTo(BigDecimal.ZERO) > 0) ? bd.setScale(2, RoundingMode.HALF_UP).toString() + " " + suffix : "--";
+    }
+
     private String setCheckbox(Object in) {
         return SYSTools.catchNull(in).equalsIgnoreCase("true") ? "1" : "0";
+    }
+
+    private boolean hasWounds() {
+        boolean wounds = false;
+        for (int type : ResInfoTypeTools.TYPE_ALL_WOUNDS) {
+            wounds |= mapID2Info.containsKey(type);
+        }
+        return wounds;
+    }
+
+    private boolean hasWoundPain() {
+        boolean pain = false;
+        for (int type : ResInfoTypeTools.TYPE_ALL_WOUNDS) {
+            pain |= getValue(type, "pain").equalsIgnoreCase("true");
+        }
+        return pain;
     }
 
     private String setRadiobutton(Object in, String[] list) {

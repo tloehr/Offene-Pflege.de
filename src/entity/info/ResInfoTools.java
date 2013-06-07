@@ -277,7 +277,7 @@ public class ResInfoTools {
     }
 
     public static boolean isBiohazard(Resident resident) {
-        ResInfo biohazard = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_BIOHAZARD));
+        ResInfo biohazard = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_INFECTION));
         return biohazard != null;
     }
 
@@ -508,7 +508,7 @@ public class ResInfoTools {
                             }
                         } else if (tagName.equalsIgnoreCase("risk")) {
                             // Dieser Teil ermittelt die Risikotabelle.
-                            scaleriskmodel.add(new RiskBean(attributes.getValue("from"), attributes.getValue("to"), attributes.getValue("label"), attributes.getValue("color")));
+                            scaleriskmodel.add(new RiskBean(attributes.getValue("from"), attributes.getValue("to"), attributes.getValue("label"), attributes.getValue("color"), attributes.getValue("rating")));
                         }
 
                     }
@@ -938,7 +938,7 @@ public class ResInfoTools {
          *     |____/| .__/ \___|\___|_|\__,_|_|    \_/\_/ \__,_|_|  |_| |_|_|_| |_|\__, |___/
          *           |_|                                                            |___/
          */
-        ResInfo biohazard = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_BIOHAZARD));
+        ResInfo biohazard = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_INFECTION));
         if (biohazard != null && biohazard.isCurrentlyValid()) {
             result += SYSConst.html_h2("misc.msg.biohazard");
             result += withHTMLIcons ? SYSConst.html_48x48_biohazard : "";
