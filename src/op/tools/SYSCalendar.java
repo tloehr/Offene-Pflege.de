@@ -856,6 +856,13 @@ public class SYSCalendar {
         return whatShiftIs(whatTimeIDIs(date));
     }
 
+
+    /**
+     * determines to which timeofday code a given date object belongs. The settings in SYSProps are taken into account.
+     * or in short: it answers a question like "is 0800h early, noon or early in the morning ?"
+     * @param date
+     * @return timecode
+     */
     public static byte whatTimeIDIs(Date date) {
         byte timeid;
 

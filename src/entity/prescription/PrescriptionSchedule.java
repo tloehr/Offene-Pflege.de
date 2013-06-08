@@ -18,7 +18,7 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
     @Column(name = "BHPPID")
     private Long bhppid;
     @Version
-    @Column(name="version")
+    @Column(name = "version")
     private Long version;
     @Column(name = "NachtMo")
     private BigDecimal nachtMo;
@@ -317,6 +317,55 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
         this.son = son;
     }
 
+
+    /**
+     * sums up the applications in the morning (that means early in the morning, in the morning and everything between 0h and midday)
+     *
+     * @return
+     */
+    public BigDecimal getMorningSum() {
+        BigDecimal bd = BigDecimal.ZERO;
+        if (uhrzeit != null) {
+            byte timecode = SYSCalendar.whatTimeIDIs(uhrzeit);
+            if (timecode >= BHPTools.BYTE_EARLY_IN_THE_MORNING && timecode <= BHPTools.BYTE_MORNING) {
+                bd = uhrzeitDosis;
+            }
+        } else {
+            bd = nachtMo.add(morgens);
+        }
+
+        return bd;
+    }
+
+    public BigDecimal getNoonSum() {
+        BigDecimal bd = BigDecimal.ZERO;
+        if (uhrzeit != null) {
+            byte timecode = SYSCalendar.whatTimeIDIs(uhrzeit);
+            if (timecode >= BHPTools.BYTE_NOON && timecode <= BHPTools.BYTE_AFTERNOON) {
+                bd = uhrzeitDosis;
+            }
+        } else {
+            bd = mittags.add(nachmittags);
+        }
+
+        return bd;
+    }
+
+
+    public BigDecimal getEveningSum() {
+        BigDecimal bd = BigDecimal.ZERO;
+        if (uhrzeit != null) {
+            byte timecode = SYSCalendar.whatTimeIDIs(uhrzeit);
+            if (timecode >= BHPTools.BYTE_EVENING && timecode <= BHPTools.BYTE_LATE_AT_NIGHT) {
+                bd = uhrzeitDosis;
+            }
+        } else {
+            bd = abends.add(nachtAb);
+        }
+
+        return bd;
+    }
+
     /**
      * LDatum enthält das Datum, an dem diese PrescriptionSchedule zuletzt zu einer BHP geführt hat. Das Datum kann auch in der Zukunft liegen,
      * dann wird der BHPImport solange warten, bis diese prescription "an der Reihe" ist. Das LDatum wird bei DlgVerabreichung ebenfalls gesetzt.
@@ -359,7 +408,7 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
     }
 
 
-    public BigDecimal getOverAllDoseSum(){
+    public BigDecimal getOverAllDoseSum() {
         return nachtMo.add(morgens).add(mittags).add(nachmittags).add(abends).add(nachtAb).add(uhrzeitDosis);
     }
 
@@ -402,7 +451,7 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
         return monatlich > 0;
     }
 
-     /**
+    /**
      * @param date, zu prüfendes Datum.
      * @return Ist <code>true</code>, wenn diese Planung wöchentlich gilt und das Attribut mit dem aktuellen Wochentagsnamen größer null ist.
      */

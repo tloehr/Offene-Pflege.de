@@ -70,6 +70,10 @@ public class ResInfoTypeTools {
     public static final int TYPE_FOOD = 128;
     public static final int TYPE_ARTIFICIAL_NUTRTITION = 129;
     public static final int TYPE_PACEMAKER = 130;
+    public static final int TYPE_CONSCIUOS = 131;
+    public static final int TYPE_ORIENTATION = 132;
+    public static final int TYPE_RESPIRATION = 133;
+    public static final int TYPE_MEDS = 134;
 
 
 //    public static final String TYPE_HOSPITAL_STAY = "KH";

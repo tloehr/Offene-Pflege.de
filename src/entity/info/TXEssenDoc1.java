@@ -81,6 +81,18 @@ public class TXEssenDoc1 {
             createContent4Section8();
             createContent4Section9();
             createContent4Section10();
+            createContent4Section11();
+            createContent4Section12();
+            createContent4Section13();
+            createContent4Section14();
+            createContent4Section15();
+            createContent4Section16();
+            createContent4Section17();
+            createContent4Section18();
+            createContent4Section19();
+
+            createContent4SectionICD();
+
 
             fillDataIntoPDF();
             fillWoundsIntoPDF();
@@ -339,6 +351,7 @@ public class TXEssenDoc1 {
                 content.put(EXCRETIONS_LASTCHANGE, "--");
             }
         }
+        presCatheterChange.clear();
     }
 
     private void createContent4Section6() {
@@ -424,6 +437,7 @@ public class TXEssenDoc1 {
                 foodml = foodml.add(ps.getOverAllDoseSum());
             }
         }
+        listPresGavageFood.clear();
 
         BigDecimal liquidml = BigDecimal.ZERO;
         ArrayList<Prescription> listPresGavageLiquid = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_LIQUID_500ML);
@@ -432,6 +446,8 @@ public class TXEssenDoc1 {
                 liquidml = liquidml.add(ps.getOverAllDoseSum());
             }
         }
+        listPresGavageLiquid.clear();
+
         content.put(FOOD_ARTIFICIAL_FEEDING, setCheckbox(foodml.compareTo(BigDecimal.ZERO) > 0));
         content.put(FOOD_DAILY_ML, setBD(foodml, "ml"));
         content.put(FOOD_TEE_DAILY_ML, setBD(liquidml, "ml"));
@@ -477,6 +493,170 @@ public class TXEssenDoc1 {
         content.put(SPECIAL_WOUNDPAIN, setCheckbox(hasWoundPain()));
         content.put(SPECIAL_PACER, setCheckbox(getValue(ResInfoTypeTools.TYPE_PACEMAKER, "pacemaker")));
         content.put(SPECIAL_LASTCONTROL_PACER, setCheckbox(getValue(ResInfoTypeTools.TYPE_PACEMAKER, "lastcheck")));
+    }
+
+    /**
+     * consciousness
+     */
+    private void createContent4Section11() {
+        content.put(CONSCIOUSNESS_AWAKE, setCheckbox(getValue(ResInfoTypeTools.TYPE_CONSCIUOS, "awake")));
+        content.put(CONSCIOUSNESS_SOPOR, setCheckbox(getValue(ResInfoTypeTools.TYPE_CONSCIUOS, "sopor")));
+        content.put(CONSCIOUSNESS_COMA, setCheckbox(getValue(ResInfoTypeTools.TYPE_CONSCIUOS, "coma")));
+        content.put(CONSCIOUSNESS_SOMNOLENT, setCheckbox(getValue(ResInfoTypeTools.TYPE_CONSCIUOS, "somnolent")));
+
+        content.put(COMMS_SPEECH_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "ability1"), new String[]{"oE1", "mE1", "zE1"}));
+        content.put(COMMS_UNDERSTANDING_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "ability2"), new String[]{"oE2", "mE2", "zE2"}));
+        content.put(COMMS_HEARING_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "ability3"), new String[]{"oE3", "mE3", "zE3"}));
+        content.put(COMMS_SEEING_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "ability4"), new String[]{"oE4", "mE4", "zE4"}));
+        content.put(COMMS_WRITING_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "ability5"), new String[]{"oE5", "mE5", "zE5"}));
+
+        content.put(ORIENTATION_TIME_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "time"), new String[]{"no1", "yes1", "intermittent1"}));
+        content.put(ORIENTATION_PERSONAL_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "personal"), new String[]{"no2", "yes2", "intermittent2"}));
+        content.put(ORIENTATION_LOCATION_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "location"), new String[]{"no3", "yes3", "intermittent3"}));
+        content.put(ORIENTATION_SITUATION_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "situation"), new String[]{"no4", "yes4", "intermittent4"}));
+        content.put(ORIENTATION_RUNNAWAY_TENDENCY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "runaway"), new String[]{"no5", "yes5", "intermittent5"}));
+    }
+
+
+    /**
+     * respiration
+     */
+    private void createContent4Section12() {
+        content.put(RESPIRATION_NORMAL, setCheckbox(getValue(ResInfoTypeTools.TYPE_RESPIRATION, "awake")));
+        content.put(RESPIRATION_CARDCONGEST, setCheckbox(getValue(ResInfoTypeTools.TYPE_RESPIRATION, "cardcongest")));
+        content.put(RESPIRATION_PAIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_RESPIRATION, "pain")));
+        content.put(RESPIRATION_COUGH, setCheckbox(getValue(ResInfoTypeTools.TYPE_RESPIRATION, "cough")));
+        content.put(RESPIRATION_MUCOUS, setCheckbox(getValue(ResInfoTypeTools.TYPE_RESPIRATION, "mucous")));
+        content.put(RESPIRATION_SPUTUM, setCheckbox(getValue(ResInfoTypeTools.TYPE_RESPIRATION, "sputum")));
+        content.put(RESPIRATION_SMOKING, setCheckbox(getValue(ResInfoTypeTools.TYPE_RESPIRATION, "smoking")));
+        content.put(RESPIRATION_ASTHMA, setCheckbox(getValue(ResInfoTypeTools.TYPE_RESPIRATION, "asthma")));
+        content.put(RESPIRATION_COMMENT, mapID2Info.containsKey(ResInfoTypeTools.TYPE_RESPIRATION) ? SYSTools.catchNull(mapID2Info.get(ResInfoTypeTools.TYPE_RESPIRATION).getText()) : "");
+
+        content.put(RESPIRATION_STOMA, setCheckbox(getValue(ResInfoTypeTools.TYPE_RESPIRATION, "stoma")));
+        content.put(RESPIRATION_SILVERTUBE, setCheckbox(getValue(ResInfoTypeTools.TYPE_RESPIRATION, "silver")));
+        content.put(RESPIRATION_SILICONTUBE, setCheckbox(getValue(ResInfoTypeTools.TYPE_RESPIRATION, "silicon")));
+        content.put(RESPIRATION_ASPIRATE, setCheckbox(getValue(ResInfoTypeTools.TYPE_RESPIRATION, "aspirate")));
+
+        content.put(RESPIRATION_TUBESIZE, getValue(ResInfoTypeTools.TYPE_RESPIRATION, "tubesize"));
+        content.put(RESPIRATION_TUBETYPE, getValue(ResInfoTypeTools.TYPE_RESPIRATION, "tubetype"));
+
+    }
+
+    /**
+     * special monitoring
+     */
+    private void createContent4Section13() {
+        boolean bp = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_BP_MONITORING).isEmpty();
+        boolean port = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PORT_MONITORING).isEmpty();
+        boolean respiration = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_BREATH_MONITORING).isEmpty();
+        boolean pulse = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PULSE_MONITORING).isEmpty();
+        boolean temp = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_TEMP_MONITORING).isEmpty();
+        boolean weight = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_WEIGHT_MONITORING).isEmpty();
+        boolean pain = !InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PAIN_MONITORING).isEmpty();
+
+        content.put(MONITORING_BP, setCheckbox(bp));
+        content.put(MONITORING_PORT, setCheckbox(port));
+        content.put(MONITORING_RESPIRATION, setCheckbox(respiration));
+        content.put(MONITORING_PULSE, setCheckbox(pulse));
+        content.put(MONITORING_TEMP, setCheckbox(temp));
+        content.put(MONITORING_WEIGHT, setCheckbox(weight));
+        content.put(MONITORING_PAIN, setCheckbox(pain));
+
+        Properties controlling = resident.getControlling();
+        content.put(MONITORING_INTAKE, setCheckbox(SYSTools.catchNull(controlling.getProperty("liquidbalance")).equalsIgnoreCase("on")));
+        content.put(MONITORING_EXCRETION, setCheckbox(SYSTools.catchNull(controlling.getProperty("liquidbalance")).equalsIgnoreCase("on")));
+
+    }
+
+    /**
+     * special monitoring
+     */
+    private void createContent4Section14() {
+        boolean logo = !InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_THERAPY_LOGOPEDICS).isEmpty();
+        boolean physio = !InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_THERAPY_PHYSIO).isEmpty();
+        boolean ergo = !InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_THERAPY_ERGO).isEmpty();
+
+        content.put(THERAPY_ERGO, setCheckbox(ergo));
+        content.put(THERAPY_LOGO, setCheckbox(logo));
+        content.put(THERAPY_PHYSIO, setCheckbox(physio));
+    }
+
+
+    private void createContent4Section15() {
+        // nothing yet
+    }
+
+
+    /**
+     * meds / diabetes
+     */
+    private void createContent4Section16() {
+        content.put(MEDS_INSULIN_APPLICATION, setRadiobutton(getValue(ResInfoTypeTools.TYPE_DIABETES, "application"), new String[]{"pen", "syringe", "pump", "none"}));
+        content.put(MEDS_INJECTION_LEVEL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_MEDS, "injection"), new String[]{"none", "lvl1", "lvl3"}));
+        content.put(MEDS_SELF, setCheckbox(getValue(ResInfoTypeTools.TYPE_MEDS, "self")));
+        content.put(MEDS_DAILY_RATION, setCheckbox(getValue(ResInfoTypeTools.TYPE_MEDS, "dailyration")));
+        content.put(MEDS_CONTROL, setCheckbox(getValue(ResInfoTypeTools.TYPE_MEDS, "control")));
+        content.put(MEDS_MARCUMARPASS, setCheckbox(getValue(ResInfoTypeTools.TYPE_MEDS, "marcumarpass")));
+
+        BHP lastMed = BHPTools.getLastBHP(resident, InterventionTools.FLAG_MEDS_APPLICATION);
+        if (lastMed != null) {
+            content.put(MEDS_LAST_APPLICATION, DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(lastMed.getIst()));
+        } else {
+            content.put(MEDS_LAST_APPLICATION, "--");
+        }
+
+
+        ArrayList<Prescription> listGlucose = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GLUCOSE_MONITORING);
+        if (!listGlucose.isEmpty()) {
+            int daily = 0, weekly = 0;
+            BigDecimal morning = BigDecimal.ZERO, noon = BigDecimal.ZERO, evening = BigDecimal.ZERO;
+            for (Prescription p : listGlucose) {
+                for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
+                    if (ps.isTaeglich()) {
+                        daily++;
+                        morning = morning.add(ps.getMorningSum());
+                        noon = noon.add(ps.getNoonSum());
+                        evening = evening.add(ps.getEveningSum());
+                    }
+                    if (ps.isWoechentlich()) {
+                        weekly++;
+                        morning = morning.add(ps.getMorningSum());
+                        noon = noon.add(ps.getNoonSum());
+                        evening = evening.add(ps.getEveningSum());
+                    }
+                }
+            }
+            content.put(MEDS_MORNING_GLUCOSE, setCheckbox(morning.compareTo(BigDecimal.ZERO) > 0));
+            content.put(MEDS_NOON_GLUCOSE, setCheckbox(noon.compareTo(BigDecimal.ZERO) > 0));
+            content.put(MEDS_EVENING_GLUCOSE, setCheckbox(evening.compareTo(BigDecimal.ZERO) > 0));
+            content.put(MEDS_DAILY_GLUCOSECHECK, (daily > 0 ? Integer.toString(daily) : "--"));
+            content.put(MEDS_WEEKLY_GLUCOSECHECK, (weekly > 0 ? Integer.toString(weekly) : "--"));
+        }
+
+    }
+
+    private void createContent4Section17() {
+        // nothing yet
+    }
+
+    private void createContent4Section18() {
+        // nothing yet
+    }
+
+    private void createContent4Section19() {
+        // nothing yet
+    }
+
+    private void createContent4SectionICD() {
+
+        String sICD = "";
+
+       for (ResInfo icd : listICD){
+           Properties props = icd.getProperties();
+           sICD += icd.
+       }
+
+        content.put(DIAG_ICD10, "");
     }
 
     private String getValue(int type, String propsKey) {
@@ -843,7 +1023,7 @@ public class TXEssenDoc1 {
     public static final String RESPIRATION_NORMAL = "respiration.normal";
     public static final String RESPIRATION_OTHER = "respiration.other";
     public static final String RESPIRATION_PAIN = "respiration.pain";
-    public static final String RESPIRATION_RAUCHEN = "respiration.rauchen";
+    public static final String RESPIRATION_SMOKING = "respiration.rauchen";
     public static final String RESPIRATION_SILICONTUBE = "respiration.silicontube";
     public static final String RESPIRATION_SILVERTUBE = "respiration.silvertube";
     public static final String RESPIRATION_SPUTUM = "respiration.sputum";
