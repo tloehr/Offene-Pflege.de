@@ -1,5 +1,6 @@
 package entity.info;
 
+import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.pdf.*;
 import entity.files.SYSFilesTools;
@@ -12,6 +13,7 @@ import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.lang.ArrayUtils;
 
+import javax.persistence.EntityManager;
 import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -62,6 +64,7 @@ public class TXEssenDoc1 {
             }
             if (info.getResInfoType().getType() == ResInfoTypeTools.TYPE_DIAGNOSIS) {
                 listICD.add(info);
+                mapInfo2Properties.put(info, load(info.getProperties()));
             }
         }
 
@@ -640,23 +643,105 @@ public class TXEssenDoc1 {
     }
 
     private void createContent4Section18() {
-        // nothing yet
+        content.put(COMMENTS_GENERAL, getValue(ResInfoTypeTools.TYPE_WARNING, "beschreibung"));
     }
 
     private void createContent4Section19() {
-        // nothing yet
+        ArrayList<String> bodyParts = new ArrayList<String>(Arrays.asList(PnlBodyScheme.PARTS));
+        String[] pdfbody = new String[]{BODY1_DESCRIPTION, BODY2_DESCRIPTION, BODY3_DESCRIPTION, BODY4_DESCRIPTION, BODY5_DESCRIPTION, BODY6_DESCRIPTION};
+        int lineno = -1;
+        AcroFields form = stamper.getAcroFields();
+        PdfContentByte directcontent = stamper.getOverContent(2);
+
+        for (int type : ResInfoTypeTools.TYPE_ALL_WOUNDS) {
+            if (mapID2Info.containsKey(type)) {
+                ResInfo currentWound = mapID2Info.get(type);
+                lineno++;
+
+                content.put(pdfbody[lineno], "Wunddoku vom: " + DateFormat.getDateInstance().format(currentWound.getFrom()));
+
+                AcroFields.FieldPosition pos1 = form.getFieldPositions(pdfbody[lineno]).get(0);
+                directcontent.saveState();
+
+//                directcontent.moveTo(pos1.position.getRight(), pos1.position.getTop() - (pos1.position.getHeight() / 2f));
+                // draw a frame around the used textfield.
+                directcontent.rectangle(pos1.position.getLeft(), pos1.position.getBottom(), pos1.position.getWidth(), pos1.position.getHeight());
+
+                /***
+                 *          _                      _   _            _ _
+                 *       __| |_ __ __ ___      __ | |_| |__   ___  | (_)_ __   ___  ___
+                 *      / _` | '__/ _` \ \ /\ / / | __| '_ \ / _ \ | | | '_ \ / _ \/ __|
+                 *     | (_| | | | (_| |\ V  V /  | |_| | | |  __/ | | | | | |  __/\__ \
+                 *      \__,_|_|  \__,_| \_/\_/    \__|_| |_|\___| |_|_|_| |_|\___||___/
+                 *
+                 */
+                for (String key : mapInfo2Properties.get(currentWound).stringPropertyNames()) {
+                    if (key.startsWith("bs1.")) {
+                        String bodykey = key.substring(4);
+                        // does this property denote a body part AND is it clicked ?
+                        if (bodyParts.contains(bodykey) && mapInfo2Properties.get(currentWound).getProperty(key).equalsIgnoreCase("true")) {
+                            // set the pointer to the middle right part of the frame
+                            directcontent.moveTo(pos1.position.getRight(), pos1.position.getTop() - (pos1.position.getHeight() / 2f));
+                            // find the position of the checkbox representing the bodypart.
+                            AcroFields.FieldPosition pos2 = form.getFieldPositions(bodykey).get(0);
+                            // draw a line from the right side of the frame into the middle of the checkbox.
+                            directcontent.lineTo(pos2.position.getLeft() + (pos2.position.getWidth() / 2), pos2.position.getBottom() + (pos2.position.getHeight() / 2));
+                        }
+                    }
+                }
+
+                directcontent.setLineWidth(1f);
+                directcontent.setColorStroke(BaseColor.GRAY);
+                directcontent.stroke();
+                directcontent.restoreState();
+
+                /***
+                 *          _                      _   _            _ _ _   _   _             _          _
+                 *       __| |_ __ __ ___      __ | |_| |__   ___  | (_) |_| |_| | ___    ___(_)_ __ ___| | ___  ___
+                 *      / _` | '__/ _` \ \ /\ / / | __| '_ \ / _ \ | | | __| __| |/ _ \  / __| | '__/ __| |/ _ \/ __|
+                 *     | (_| | | | (_| |\ V  V /  | |_| | | |  __/ | | | |_| |_| |  __/ | (__| | | | (__| |  __/\__ \
+                 *      \__,_|_|  \__,_| \_/\_/    \__|_| |_|\___| |_|_|\__|\__|_|\___|  \___|_|_|  \___|_|\___||___/
+                 *
+                 */
+                directcontent.saveState();
+                for (String key : mapInfo2Properties.get(currentWound).stringPropertyNames()) {
+                    if (key.startsWith("bs1.")) {
+                        String bodykey = key.substring(4);
+                        // does this property denote a body part AND is it clicked ?
+                        if (bodyParts.contains(bodykey) && mapInfo2Properties.get(currentWound).getProperty(key).equalsIgnoreCase("true")) {
+                            AcroFields.FieldPosition pos2 = form.getFieldPositions(bodykey).get(0);
+                            directcontent.circle(pos2.position.getLeft() + (pos2.position.getWidth() / 2), pos2.position.getBottom() + (pos2.position.getHeight() / 2), 2f);
+                        }
+                    }
+                }
+                directcontent.setColorFill(BaseColor.GRAY);
+                directcontent.fill();
+                directcontent.restoreState();
+            }
+        }
+
     }
 
     private void createContent4SectionICD() {
 
         String sICD = "";
 
-       for (ResInfo icd : listICD){
-           Properties props = icd.getProperties();
-           sICD += icd.
-       }
+        for (ResInfo icd : listICD) {
+            EntityManager em = OPDE.createEM();
+            Doc gp = em.find(Doc.class, Long.parseLong(mapInfo2Properties.get(icd).getProperty("arztid")));
+            Hospital hp = em.find(Hospital.class, Long.parseLong(mapInfo2Properties.get(icd).getProperty("khid")));
+            em.close();
 
-        content.put(DIAG_ICD10, "");
+            mapInfo2Properties.get(icd).getProperty("");
+            sICD += mapInfo2Properties.get(icd).getProperty("icd");
+            sICD += ": " + mapInfo2Properties.get(icd).getProperty("text");
+            sICD += "(Körperseite: " + mapInfo2Properties.get(icd).getProperty("koerperseite");
+            sICD += " - Festgestellt: " + (gp != null ? DocTools.getFullName(gp) : HospitalTools.getFullName(hp)) + "), ";
+        }
+
+        if (!sICD.isEmpty()) {
+            content.put(DIAG_ICD10, sICD.substring(0, sICD.length() - 2));
+        }
     }
 
     private String getValue(int type, String propsKey) {

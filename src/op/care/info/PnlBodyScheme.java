@@ -79,7 +79,6 @@ public class PnlBodyScheme extends JPanel {
         setLayout(null);
 
         for (int i = 0; i < cbPositions.length; i++) {
-
             final JCheckBox jcb = new JCheckBox((String) null);
             jcb.setToolTipText(OPDE.lang.getString(PARTS[i]));
             jcb.setName(PARTS[i]);

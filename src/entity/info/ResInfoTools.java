@@ -292,7 +292,7 @@ public class ResInfoTools {
 
     /**
      * Ermittelt für eine ResInfo eine passende HTML Darstellung. Diese Methode wird nur bei einer Neueingabe oder Änderung
-     * verwendet. ResInfo Beans speicher die HTML Darstellung aus Performance Gründen kurz nach Ihrer Entstehung ab.
+     * verwendet. ResInfo Beans speichert die HTML Darstellung aus Performance Gründen kurz nach Ihrer Entstehung ab.
      *
      * @param resInfo
      * @return
@@ -353,6 +353,9 @@ public class ResInfoTools {
                                 }
                             }
                         }
+                    }
+                    if (infonode.getTagName().equalsIgnoreCase("bodyscheme")){
+                        // TODO: hier gehts weiter. Körperstellen raussuchen
                     }
                 } else { // TABGROUPS, weil ist kein Blatt (Leaf)
                     // nur anzeigen, wenn es mindestens eine angekreuzte Checkbox in dieser TABGROUP gibt.

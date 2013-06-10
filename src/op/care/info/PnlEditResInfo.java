@@ -157,7 +157,6 @@ public class PnlEditResInfo {
 
 
     public ResInfo getResInfo() {
-
         try {
             StringWriter writer = new StringWriter();
             content.store(writer, "[" + resInfo.getResInfoType().getID() + "] " + resInfo.getResInfoType().getShortDescription());
@@ -313,7 +312,6 @@ public class PnlEditResInfo {
     }
 
     private class CheckBoxActionListener implements ActionListener {
-
         public void actionPerformed(ActionEvent evt) {
             JCheckBox j = (JCheckBox) evt.getSource();
             String cbname = j.getName();

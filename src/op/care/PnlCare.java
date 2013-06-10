@@ -8,6 +8,8 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.pane.CollapsiblePanes;
 import entity.EntityTools;
+import entity.info.ResInfo;
+import entity.info.ResInfoTools;
 import entity.info.Resident;
 import op.OPDE;
 import op.care.bhp.PnlBHP;
@@ -26,6 +28,7 @@ import op.tools.GUITools;
 import op.tools.NursingRecordsPanel;
 import op.tools.SYSTools;
 
+import javax.persistence.EntityManager;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -77,6 +80,16 @@ public class PnlCare extends NursingRecordsPanel {
         initPanel();
         initPhase = false;
         jtpPflegeakteStateChanged(null);
+
+
+        EntityManager em = OPDE.createEM();
+        ResInfo info = em.find(ResInfo.class, 20149l);
+        em.close();
+
+        OPDE.debug(ResInfoTools.getContentAsHTML(info));
+
+
+
     }
 
     @Override
