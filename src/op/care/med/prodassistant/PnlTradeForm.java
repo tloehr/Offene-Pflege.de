@@ -42,16 +42,13 @@ public class PnlTradeForm extends JPanel {
 
     public PnlTradeForm(Closure validate, MedProducts product) {
         this.validate = validate;
-        this.product = product;
         initComponents();
+        setProduct(product);
         initPanel();
     }
 
     public void setProduct(MedProducts product) {
         this.product = product;
-    }
-
-    private void initPanel() {
         if (!product.getTradeforms().isEmpty()) {
             ArrayList model = new ArrayList(product.getTradeforms());
             model.add(0, "<html><b>" + OPDE.lang.getString("misc.msg.noneOfThem") + "</b></html>");
@@ -63,6 +60,10 @@ public class PnlTradeForm extends JPanel {
         lblMsg.setVisible(!product.getTradeforms().isEmpty());
         jsp1.setVisible(!product.getTradeforms().isEmpty());
         lstDaf.setVisible(!product.getTradeforms().isEmpty());
+    }
+
+    private void initPanel() {
+
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery(" SELECT m FROM DosageForm m ");
@@ -256,8 +257,8 @@ public class PnlTradeForm extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "2*(default, $lcgap), default:grow, 2*($lcgap, default)",
-            "2*(default, $lgap), default, $rgap, pref, 2*($lgap, default), $lgap, default:grow, $lgap, default"));
+                "2*(default, $lcgap), default:grow, 2*($lcgap, default)",
+                "2*(default, $lgap), default, $rgap, pref, 2*($lgap, default), $lgap, default:grow, $lgap, default"));
 
         //---- txtZusatz ----
         txtZusatz.setFont(new Font("Arial", Font.PLAIN, 14));

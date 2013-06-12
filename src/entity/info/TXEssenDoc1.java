@@ -1,6 +1,6 @@
 package entity.info;
 
-import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.*;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.pdf.*;
 import entity.files.SYSFilesTools;
@@ -9,16 +9,15 @@ import entity.prescription.*;
 import entity.values.ResValueTools;
 import op.OPDE;
 import op.care.info.PnlBodyScheme;
+import op.system.PDF;
+import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.lang.ArrayUtils;
 
 import javax.persistence.EntityManager;
 import java.awt.*;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
@@ -34,7 +33,7 @@ import java.util.*;
  */
 public class TXEssenDoc1 {
 
-    public static final String SOURCEFILENAME = "essen-1-121029.pdf";
+    public static final String SOURCEFILENAME = "ueberleitungsbogen210809.pdf";
     private final HashMap<ResInfo, Properties> mapInfo2Properties;
     private Resident resident;
     private HashMap<String, String> content;
@@ -48,6 +47,16 @@ public class TXEssenDoc1 {
     private PdfContentByte over = null;
     private PdfWriter writer = null;
     PdfStamper stamper = null;
+
+
+    public static final String[] PARTS = new String[]{"head.left.side", "shoulder.left.side", "upper.back.left.side", "ellbow.side.left", "hand.left.side", "hip.left.side", "bottom.left.side", "upper.leg.left.side",
+            "lower.leg.left.side", "calf.left.side", "heel.left.side", "face", "shoulder.front.right", "shoulder.front.left", "upper.belly", "crook.arm.right",
+            "crook.arm.left", "lower.belly", "groin", "upper.leg.right.front", "upper.leg.left.front", "knee.right", "knee.left", "shin.right.front", "shin.left.front",
+            "foot.right.front", "foot.left.front", "back.of.the.head", "shoulder.back.left", "shoulder.back.right", "back.mid", "ellbow.left",
+            "ellbow.right", "back.low", "bottom.back", "upper.leftleg.back", "upper.rightleg.back", "knee.hollowleft", "knee.hollowright", "calf.leftback",
+            "calf.rightback", "foot.leftback", "foot.rightback", "head.right.side", "shoulder.right.side", "back.upper.left.side", "ellbow.rightside",
+            "hand.right.side", "hip.right.side", "bottom.right.side", "upper.leg.right.side", "lower.leg.right.side", "calf.right.side", "heel.right.side"};
+
 
     public TXEssenDoc1(Resident resident) {
         this.resident = resident;
@@ -73,7 +82,6 @@ public class TXEssenDoc1 {
             File stamperFile = new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TX_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
             stamper = new PdfStamper(new PdfReader(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_TEMPLATES + File.separator + SOURCEFILENAME), new FileOutputStream(stamperFile));
 
-
             createContent4Section1();
             createContent4Section2();
             createContent4Section3();
@@ -95,7 +103,7 @@ public class TXEssenDoc1 {
             createContent4Section19();
 
             createContent4SectionICD();
-
+            createContent4Meds();
 
             fillDataIntoPDF();
             fillWoundsIntoPDF();
@@ -120,6 +128,8 @@ public class TXEssenDoc1 {
         for (String key : content.keySet()) {
             if (!ArrayUtils.contains(PnlBodyScheme.PARTS, key)) { // this is a special case. The bodyparts and the pdfkeys have the same name.
                 form.setField(key, content.get(key));
+
+
             }
         }
 
@@ -139,28 +149,28 @@ public class TXEssenDoc1 {
     private void createContent4Section1() {
         content.put(RESIDENT_GENDER, resident.getGender() == ResidentTools.MALE ? "1" : "0");
         content.put(RESIDENT_FIRSTNAME, resident.getFirstname());
-        content.put(RESIDENT_FIRSTNAME_PAGE2, resident.getFirstname());
+        content.put(PAGE2_RESIDENT_FIRSTNAME, resident.getFirstname());
         content.put(RESIDENT_NAME, resident.getName());
-        content.put(RESIDENT_NAME_PAGE2, resident.getName());
-        content.put(RESIDENT_FULLNAME_PAGE3, ResidentTools.getFullName(resident));
+        content.put(PAGE2_RESIDENT_NAME, resident.getName());
+        content.put(PAGE3_RESIDENT_FULLNAME, ResidentTools.getFullName(resident));
         content.put(RESIDENT_DOB, DateFormat.getDateInstance().format(resident.getDOB()));
-        content.put(RESIDENT_DOB_PAGE2, DateFormat.getDateInstance().format(resident.getDOB()));
-        content.put(RESIDENT_DOB_PAGE3, DateFormat.getDateInstance().format(resident.getDOB()));
+        content.put(PAGE2_RESIDENT_DOB, DateFormat.getDateInstance().format(resident.getDOB()));
+        content.put(PAGE3_RESIDENT_DOB, DateFormat.getDateInstance().format(resident.getDOB()));
         if (resident.isActive()) {
             content.put(RESIDENT_STREET, resident.getStation().getHome().getStreet());
             content.put(RESIDENT_CITY, resident.getStation().getHome().getCity());
             content.put(RESIDENT_ZIP, resident.getStation().getHome().getZIP());
             content.put(RESIDENT_PHONE, resident.getStation().getHome().getTel());
-            content.put(RESIDENT_PHONE_PAGE2, resident.getStation().getHome().getTel());
+            content.put(PAGE2_PHONE, resident.getStation().getHome().getTel());
         }
         content.put(TX_DATE, DateFormat.getDateInstance().format(new Date()));
-        content.put(TX_DATE_PAGE2, DateFormat.getDateInstance().format(new Date()));
-        content.put(TX_DATE_PAGE3, DateFormat.getDateInstance().format(new Date()));
-        content.put(TX2_DATE_PAGE3, DateFormat.getDateInstance().format(new Date()));
+        content.put(PAGE2_DATE, DateFormat.getDateInstance().format(new Date()));
+        content.put(PAGE3_TX_DATE, DateFormat.getDateInstance().format(new Date()));
+        content.put(PAGE3_TX2_DATE, DateFormat.getDateInstance().format(new Date()));
         content.put(TX_TIME, DateFormat.getTimeInstance(DateFormat.SHORT).format(new Date()));
 
         content.put(RESIDENT_HINSURANCE, getValue(ResInfoTypeTools.TYPE_HEALTH_INSURANCE, "hiname"));
-        content.put(RESIDENT_HINSURANCE_PAGE3, getValue(ResInfoTypeTools.TYPE_HEALTH_INSURANCE, "hiname"));
+        content.put(PAGE3_RESIDENT_HINSURANCE, getValue(ResInfoTypeTools.TYPE_HEALTH_INSURANCE, "hiname"));
         content.put(RESIDENT_HINSURANCEID, getValue(ResInfoTypeTools.TYPE_HEALTH_INSURANCE, "personno"));
         content.put(RESIDENT_HINSURANCENO, getValue(ResInfoTypeTools.TYPE_HEALTH_INSURANCE, "insuranceno"));
 
@@ -196,7 +206,7 @@ public class TXEssenDoc1 {
 
         String grade = getValue(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade");
         grade = grade.equalsIgnoreCase("refused") ? "none" : grade; // there is no such thing as refused request in this document.
-        content.put(INSURANCE_GRADE, setRadiobutton(grade, new String[]{"none", "assigned", "requested"}));
+        content.put(ASSIGNED_INSURANCE_GRADE, setRadiobutton(grade, new String[]{"none", "assigned", "requested"}));
         content.put(DATE_REQUESTED_INSURANCE_GRADE_PAGE3, setCheckbox(grade.equalsIgnoreCase("requested")));
     }
 
@@ -653,18 +663,19 @@ public class TXEssenDoc1 {
         AcroFields form = stamper.getAcroFields();
         PdfContentByte directcontent = stamper.getOverContent(2);
 
-        for (int type : ResInfoTypeTools.TYPE_ALL_WOUNDS) {
+        for (int type : ArrayUtils.add(ResInfoTypeTools.TYPE_ALL_WOUNDS, ResInfoTypeTools.TYPE_MYCOSIS)) {
             if (mapID2Info.containsKey(type)) {
+
+                String descriptionKey = (type == ResInfoTypeTools.TYPE_MYCOSIS ? "misc.msg.mycosis" : "misc.msg.wound.documentation");
+
                 ResInfo currentWound = mapID2Info.get(type);
                 lineno++;
 
-                content.put(pdfbody[lineno], "Wunddoku vom: " + DateFormat.getDateInstance().format(currentWound.getFrom()));
+                content.put(pdfbody[lineno], OPDE.lang.getString(descriptionKey) + " " + DateFormat.getDateInstance().format(currentWound.getFrom()) + ": " + ResInfoTools.getContentAsPlainText(currentWound));
 
                 AcroFields.FieldPosition pos1 = form.getFieldPositions(pdfbody[lineno]).get(0);
                 directcontent.saveState();
 
-//                directcontent.moveTo(pos1.position.getRight(), pos1.position.getTop() - (pos1.position.getHeight() / 2f));
-                // draw a frame around the used textfield.
                 directcontent.rectangle(pos1.position.getLeft(), pos1.position.getBottom(), pos1.position.getWidth(), pos1.position.getHeight());
 
                 /***
@@ -678,12 +689,15 @@ public class TXEssenDoc1 {
                 for (String key : mapInfo2Properties.get(currentWound).stringPropertyNames()) {
                     if (key.startsWith("bs1.")) {
                         String bodykey = key.substring(4);
+                        OPDE.debug(bodykey);
+                        int listpos = Arrays.asList(PnlBodyScheme.PARTS).indexOf(bodykey);
+                        OPDE.debug(listpos);
                         // does this property denote a body part AND is it clicked ?
                         if (bodyParts.contains(bodykey) && mapInfo2Properties.get(currentWound).getProperty(key).equalsIgnoreCase("true")) {
                             // set the pointer to the middle right part of the frame
                             directcontent.moveTo(pos1.position.getRight(), pos1.position.getTop() - (pos1.position.getHeight() / 2f));
                             // find the position of the checkbox representing the bodypart.
-                            AcroFields.FieldPosition pos2 = form.getFieldPositions(bodykey).get(0);
+                            AcroFields.FieldPosition pos2 = form.getFieldPositions(PDFPARTS[listpos]).get(0);
                             // draw a line from the right side of the frame into the middle of the checkbox.
                             directcontent.lineTo(pos2.position.getLeft() + (pos2.position.getWidth() / 2), pos2.position.getBottom() + (pos2.position.getHeight() / 2));
                         }
@@ -707,9 +721,11 @@ public class TXEssenDoc1 {
                 for (String key : mapInfo2Properties.get(currentWound).stringPropertyNames()) {
                     if (key.startsWith("bs1.")) {
                         String bodykey = key.substring(4);
+                        int listpos = Arrays.asList(PnlBodyScheme.PARTS).indexOf(bodykey);
+
                         // does this property denote a body part AND is it clicked ?
                         if (bodyParts.contains(bodykey) && mapInfo2Properties.get(currentWound).getProperty(key).equalsIgnoreCase("true")) {
-                            AcroFields.FieldPosition pos2 = form.getFieldPositions(bodykey).get(0);
+                            AcroFields.FieldPosition pos2 = form.getFieldPositions(PDFPARTS[listpos]).get(0);
                             directcontent.circle(pos2.position.getLeft() + (pos2.position.getWidth() / 2), pos2.position.getBottom() + (pos2.position.getHeight() / 2), 2f);
                         }
                     }
@@ -728,20 +744,116 @@ public class TXEssenDoc1 {
 
         for (ResInfo icd : listICD) {
             EntityManager em = OPDE.createEM();
-            Doc gp = em.find(Doc.class, Long.parseLong(mapInfo2Properties.get(icd).getProperty("arztid")));
-            Hospital hp = em.find(Hospital.class, Long.parseLong(mapInfo2Properties.get(icd).getProperty("khid")));
+
+            Doc gp = null;
+            try {
+                long gpid = Long.parseLong(mapInfo2Properties.get(icd).getProperty("arztid"));
+                gp = em.find(Doc.class, gpid);
+            } catch (NumberFormatException e) {
+                // bah!
+            }
+
+            Hospital hp = null;
+            try {
+                long hpid = Long.parseLong(mapInfo2Properties.get(icd).getProperty("khid"));
+                hp = em.find(Hospital.class, hpid);
+            } catch (NumberFormatException e) {
+                // bah!
+            }
+
             em.close();
 
             mapInfo2Properties.get(icd).getProperty("");
             sICD += mapInfo2Properties.get(icd).getProperty("icd");
             sICD += ": " + mapInfo2Properties.get(icd).getProperty("text");
-            sICD += "(Körperseite: " + mapInfo2Properties.get(icd).getProperty("koerperseite");
-            sICD += " - Festgestellt: " + (gp != null ? DocTools.getFullName(gp) : HospitalTools.getFullName(hp)) + "), ";
+            sICD += mapInfo2Properties.get(icd).getProperty("koerperseite").equalsIgnoreCase("nicht festgelegt") ? "" : " " + mapInfo2Properties.get(icd).getProperty("koerperseite") + ", ";
+            sICD += mapInfo2Properties.get(icd).getProperty("diagnosesicherheit").equalsIgnoreCase("nicht festgelegt") ? "" : " " + mapInfo2Properties.get(icd).getProperty("diagnosesicherheit");
+
+            sICD += "; ";
         }
 
         if (!sICD.isEmpty()) {
             content.put(DIAG_ICD10, sICD.substring(0, sICD.length() - 2));
         }
+    }
+
+    /**
+     * creates the medications list. Max length of this list 15 entries. Which is medical overkill anyways.
+     */
+    private void createContent4Meds() {
+        ArrayList<Pair<String, String>> listFieldsOnPage3 = new ArrayList<Pair<String, String>>();
+        listFieldsOnPage3.add(new Pair(MEDS1, DOSAGE1));
+        listFieldsOnPage3.add(new Pair(MEDS2, DOSAGE2));
+        listFieldsOnPage3.add(new Pair(MEDS3, DOSAGE3));
+        listFieldsOnPage3.add(new Pair(MEDS4, DOSAGE4));
+        listFieldsOnPage3.add(new Pair(MEDS5, DOSAGE5));
+        listFieldsOnPage3.add(new Pair(MEDS6, DOSAGE6));
+        listFieldsOnPage3.add(new Pair(MEDS7, DOSAGE7));
+        listFieldsOnPage3.add(new Pair(MEDS8, DOSAGE8));
+        listFieldsOnPage3.add(new Pair(MEDS9, DOSAGE9));
+        listFieldsOnPage3.add(new Pair(MEDS10, DOSAGE10));
+        listFieldsOnPage3.add(new Pair(MEDS11, DOSAGE11));
+        listFieldsOnPage3.add(new Pair(MEDS12, DOSAGE12));
+        listFieldsOnPage3.add(new Pair(MEDS13, DOSAGE13));
+        listFieldsOnPage3.add(new Pair(MEDS14, DOSAGE14));
+        listFieldsOnPage3.add(new Pair(MEDS15, DOSAGE15));
+
+        ArrayList<Prescription> listRegularMeds = PrescriptionTools.getAllActiveRegularMedsOnly(resident);
+
+        int line = 0;
+
+//        for (int i = 0; i < 15; i++){
+//        }
+
+        for (Prescription pres : listRegularMeds) {
+            content.put(listFieldsOnPage3.get(line).getFirst(), PrescriptionTools.getShortDescriptionAsCompactText(pres));
+            content.put(listFieldsOnPage3.get(line).getSecond(), PrescriptionTools.getDoseAsCompactText(pres));
+            line++;
+        }
+
+
+        boolean needMoreRoom = line >= 15;
+
+        content.put(DOCS_ADDITIONALMEDSLIST, setCheckbox(needMoreRoom));
+
+        listFieldsOnPage3.clear();
+
+    }
+
+    private void getAdditionMeds() {
+
+        try {
+            Document document = new Document(PageSize.A4, Utilities.millimetersToPoints(10), Utilities.millimetersToPoints(10), Utilities.millimetersToPoints(20), Utilities.millimetersToPoints(20));
+            ByteArrayOutputStream streamDoc = new ByteArrayOutputStream();
+            PdfWriter.getInstance(document, streamDoc);
+            document.open();
+
+            Paragraph h1 = new Paragraph(new Phrase("HEADER!!", PDF.plain(PDF.sizeH1())));
+            h1.setAlignment(Element.ALIGN_CENTER);
+            document.add(h1);
+
+            Paragraph p = new Paragraph(SYSTools.xx("nursingrecords.prescription.dailyplan.warning"));
+            p.setAlignment(Element.ALIGN_CENTER);
+            document.add(p);
+            document.add(Chunk.NEWLINE);
+
+            document.close();
+
+
+            try {
+                PdfReader docReader = new PdfReader(streamDoc.toByteArray());
+                stamper.insertPage(4, PageSize.A4);
+                // Add the stationary to the new page
+                stamper.getUnderContent(4).addTemplate(, 0, 0);
+                // Add as much content of the column as possible
+            } catch (IOException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+
+        } catch (DocumentException d) {
+
+        }
+
     }
 
     private String getValue(int type, String propsKey) {
@@ -804,396 +916,364 @@ public class TXEssenDoc1 {
     //    / ___ \ (__| | | (_) |  _| (_) | |  | | | | | | |   <  __/ |_| \__ \ | |_) |  __/ | (_) \ V  V /
     //   /_/   \_\___|_|  \___/|_|  \___/|_|  |_| |_| |_| |_|\_\___|\__, |___/ |_.__/ \___|_|\___/ \_/\_/
     //                                                              |___/
-    public static final String BACK_LOW = "back.low";
-    public static final String BACK_MID = "back.mid";
-    public static final String BACK_OF_THE_HEAD = "back.of.the.head";
-    public static final String BACK_UPPER_LEFT_SIDE = "back.upper.left.side";
-    public static final String BEDSORE = "bedsore";
-    public static final String BODY1_DESCRIPTION = "body1.description";
-    public static final String BODY2_DESCRIPTION = "body2.description";
-    public static final String BODY3_DESCRIPTION = "body3.description";
-    public static final String BODY4_DESCRIPTION = "body4.description";
-    public static final String BODY5_DESCRIPTION = "body5.description";
-    public static final String BODY6_DESCRIPTION = "body6.description";
-    public static final String BOTTOM_BACK = "bottom.back";
-    public static final String BOTTOM_LEFT_SIDE = "bottom.left.side";
-    public static final String BOTTOM_RIGHT_SIDE = "bottom.right.side";
-    public static final String CALF_LEFTBACK = "calf.leftback";
-    public static final String CALF_LEFTSIDE = "calf.leftside";
-    public static final String CALF_RIGHTBACK = "calf.rightback";
-    public static final String CALF_RIGHT_SIDE = "calf.right.side";
-    public static final String COMBING_CARE_BASIN = "combing.care.basin";
-    public static final String COMBING_CARE_BED = "combing.care.bed";
-    public static final String COMBING_CARE_LEVEL = "combing.care.level";
-    public static final String COMBING_CARE_SHOWER = "combing.care.shower";
-    public static final String COMMENTS_GENERAL = "comments.general";
-    public static final String COMMS_HEARING_ABILITY = "comms.hearing.ability";
-    public static final String COMMS_MOTHERTONGUE = "comms.mothertongue";
-    public static final String COMMS_SEEING_ABILITY = "comms.seeing.ability";
-    public static final String COMMS_SPEECH_ABILITY = "comms.speech.ability";
-    public static final String COMMS_UNDERSTANDING_ABILITY = "comms.understanding.ability";
-    public static final String COMMS_WRITING_ABILITY = "comms.writing.ability";
-    public static final String CONFIDANT_CITY = "confidant.city";
-    public static final String CONFIDANT_FIRSTNAME = "confidant.firstname";
-    public static final String CONFIDANT_NAME = "confidant.name";
-    public static final String CONFIDANT_PHONE = "confidant.phone";
-    public static final String CONFIDANT_STREET = "confidant.street";
-    public static final String CONFIDANT_ZIP = "confidant.zip";
-    public static final String CONSCIOUSNESS_AWAKE = "consciousness.awake";
-    public static final String CONSCIOUSNESS_COMA = "consciousness.coma";
-    public static final String CONSCIOUSNESS_SOMNOLENT = "consciousness.somnolent";
-    public static final String CONSCIOUSNESS_SOPOR = "consciousness.sopor";
-    public static final String CROOK_ARM_LEFT = "crook.arm.left";
-    public static final String CROOK_ARM_RIGHT = "crook.arm.right";
-    public static final String DENTURE_CARE_BASIN = "denture.care.basin";
-    public static final String DENTURE_CARE_BED = "denture.care.bed";
-    public static final String DENTURE_CARE_LEVEL = "denture.care.level";
-    public static final String DENTURE_CARE_SHOWER = "denture.care.shower";
-    public static final String DIAG_ICD10 = "diag.icd10";
-    public static final String DOCS_GP_REPORT = "docs.gp.report";
-    public static final String DOCS_IMAGES = "docs.images";
-    public static final String DOCS_LAB = "docs.lab";
-    public static final String DOCS_MEDS_LIST = "docs.meds.list";
-    public static final String DOCS_MISC = "docs.misc";
-    public static final String DOCS_PREVIOUS = "docs.previous";
-    public static final String DOCS_WITHPATIENT = "docs.withPatient";
-    public static final String DRESSING_CARE_BASIN = "dressing.care.basin";
-    public static final String DRESSING_CARE_BED = "dressing.care.bed";
-    public static final String DRESSING_CARE_LEVEL = "dressing.care.level";
-    public static final String DRESSING_CARE_SHOWER = "dressing.care.shower";
-    public static final String ELLBOW_LEFT = "ellbow.left";
-    public static final String ELLBOW_RIGHT = "ellbow.right";
-    public static final String ELLBOW_RIGHTSIDE = "ellbow.rightside";
-    public static final String ELLBOW_SIDE_LEFT = "ellbow.side.left";
-    public static final String EXCRETIONS_AID_BEDPAN = "excretions.aid.bedpan";
-    public static final String EXCRETIONS_AID_COMMODE = "excretions.aid.commode";
-    public static final String EXCRETIONS_AID_NO = "excretions.aid.no";
-    public static final String EXCRETIONS_AID_URINAL = "excretions.aid.urinal";
-    public static final String EXCRETIONS_AP_AID = "excretions.ap.aid";
-    public static final String EXCRETIONS_COMMENT = "excretions.comment";
-    public static final String EXCRETIONS_CONTROL_WEIGHT = "excretions.control.weight";
-    public static final String EXCRETIONS_CURRENT_USED_AID = "excretions.current.used.aid";
-    public static final String EXCRETIONS_DIARRHOEA_TENDENCY = "excretions.diarrhoea.tendency";
-    public static final String EXCRETIONS_DIGITAL = "excretions.digital";
-    public static final String EXCRETIONS_INCOAID_NEEDSHELP = "excretions.incoaid.needshelp";
-    public static final String EXCRETIONS_INCOAID_SELF = "excretions.incoaid.self";
-    public static final String EXCRETIONS_INCO_FAECAL = "excretions.inco.faecal";
-    public static final String EXCRETIONS_INCO_URINE = "excretions.inco.urine";
-    public static final String EXCRETIONS_LASTCHANGE = "excretions.lastchange";
-    public static final String EXCRETIONS_LIQUID_BALANCE = "excretions.liquid.balance";
-    public static final String EXCRETIONS_NORMAL = "excretions.normal";
-    public static final String EXCRETIONS_OBSTIPATION_TENDENCY = "excretions.obstipation.tendency";
-    public static final String EXCRETIONS_ONEWAY_AID = "excretions.oneway.aid";
-    public static final String EXCRETIONS_SUP_AID = "excretions.sup.aid";
-    public static final String EXCRETIONS_TRANS_AID = "excretions.trans.aid";
-    public static final String EXCRETIONS_TUBESIZE_CH = "excretions.tubesize.ch";
-    public static final String FACE = "face";
-    public static final String FOOD_ABROSIA = "food.abrosia";
-    public static final String FOOD_ARTIFICIAL_FEEDING = "food.artificial.feeding";
-    public static final String FOOD_ASSISTANCE_LEVEL = "food.assistance.level";
-    public static final String FOOD_BITESIZE = "food.bitesize";
-    public static final String FOOD_BMI = "food.bmi";
-    public static final String FOOD_BREADUNTIS = "food.breaduntis";
-    public static final String FOOD_DAILY_KCAL = "food.daily.kcal";
-    public static final String FOOD_DAILY_ML = "food.daily.ml";
-    public static final String FOOD_DRINKINGMOTIVATION = "food.drinkingmotivation";
-    public static final String FOOD_DRINKSALONE = "food.drinksalone";
-    public static final String FOOD_DYSPHAGIA = "food.dysphagia";
-    public static final String FOOD_GRAVITY = "food.gravity";
-    public static final String FOOD_LAST_MEAL = "food.last.meal";
-    public static final String FOOD_LIQUIDS_DAILY_ML = "food.liquids.daily.ml";
-    public static final String FOOD_ORALNUTRITION = "food.oralnutrition";
-    public static final String FOOD_PARENTERAL = "food.parenteral";
-    public static final String FOOD_PUMP = "food.pump";
-    public static final String FOOD_SYRINGE = "food.syringe";
-    public static final String FOOD_TEE_DAILY_ML = "food.tee.daily.ml";
-    public static final String FOOD_TUBESINCE = "food.tubesince";
-    public static final String FOOD_TUBETYPE = "food.tubetype";
-    public static final String FOOT_LEFTBACK = "foot.leftback";
-    public static final String FOOT_LEFT_FRONT = "foot.left.front";
-    public static final String FOOT_RIGHTBACK = "foot.rightback";
-    public static final String FOOT_RIGHT_FRONT = "foot.right.front";
-    public static final String GROIN = "groin";
-    public static final String HAND_LEFT_SIDE = "hand.left.side";
-    public static final String HAND_RIGHT_SIDE = "hand.right.side";
-    public static final String HEAD_LEFT_SIDE = "head.left.side";
-    public static final String HEAD_RIGHT_SIDE = "head.right.side";
-    public static final String HEEL_LEFT_SIDE = "heel.left.side";
-    public static final String HEEL_RIGHT_SIDE = "heel.right.side";
-    public static final String HIP_LEFT_SIDE = "hip.left.side";
-    public static final String HIP_RIGHT_SIDE = "hip.right.side";
-    public static final String KNEE_HOLLOWLEFT = "knee.hollowleft";
-    public static final String KNEE_HOLLOWRIGHT = "knee.hollowright";
-    public static final String KNEE_LEFT = "knee.left";
-    public static final String KNEE_RIGHT = "knee.right";
-    public static final String LC_CITY = "lc.city";
-    public static final String LC_CUSTODY = "lc.custody";
-    public static final String LC_FINANCE = "lc.finance";
-    public static final String LC_FIRSTNAME = "lc.firstname";
-    public static final String LC_GENERAL = "lc.general";
-    public static final String LC_HEALTH = "lc.health";
-    public static final String LC_NAME = "lc.name";
-    public static final String LC_PHONE = "lc.phone";
-    public static final String LC_STREET = "lc.street";
-    public static final String LC_ZIP = "lc.zip";
-    public static final String LEGAL_MINOR = "legal.minor";
-    public static final String LEGAL_SINGLE = "legal.single";
-    public static final String LOWER_BELLY = "lower.belly";
-    public static final String LOWER_LEG_LEFT_SIDE = "lower.leg.left.side";
-    public static final String LOWER_LEG_RIGHT_SIDE = "lower.leg.right.side";
-    public static final String MEDS10_EVENING = "meds10.evening";
-    public static final String MEDS10_MORNING = "meds10.morning";
-    public static final String MEDS10_NIGHT = "meds10.night";
-    public static final String MEDS10_NOON = "meds10.noon";
-    public static final String MEDS10_TEXT = "meds10.text";
-    public static final String MEDS11_EVENING = "meds11.evening";
-    public static final String MEDS11_MORNING = "meds11.morning";
-    public static final String MEDS11_NIGHT = "meds11.night";
-    public static final String MEDS11_NOON = "meds11.noon";
-    public static final String MEDS11_TEXT = "meds11.text";
-    public static final String MEDS12_EVENING = "meds12.evening";
-    public static final String MEDS12_MORNING = "meds12.morning";
-    public static final String MEDS12_NIGHT = "meds12.night";
-    public static final String MEDS12_NOON = "meds12.noon";
-    public static final String MEDS12_TEXT = "meds12.text";
-    public static final String MEDS13_EVENING = "meds13.evening";
-    public static final String MEDS13_MORNING = "meds13.morning";
-    public static final String MEDS13_NIGHT = "meds13.night";
-    public static final String MEDS13_NOON = "meds13.noon";
-    public static final String MEDS13_TEXT = "meds13.text";
-    public static final String MEDS14_EVENING = "meds14.evening";
-    public static final String MEDS14_MORNING = "meds14.morning";
-    public static final String MEDS14_NIGHT = "meds14.night";
-    public static final String MEDS14_NOON = "meds14.noon";
-    public static final String MEDS14_TEXT = "meds14.text";
-    public static final String MEDS15_EVENING = "meds15.evening";
-    public static final String MEDS15_MORNING = "meds15.morning";
-    public static final String MEDS15_NIGHT = "meds15.night";
-    public static final String MEDS15_NOON = "meds15.noon";
-    public static final String MEDS15_TEXT = "meds15.text";
-    public static final String MEDS1_EVENING = "meds1.evening";
-    public static final String MEDS1_MORNING = "meds1.morning";
-    public static final String MEDS1_NIGHT = "meds1.night";
-    public static final String MEDS1_NOON = "meds1.noon";
-    public static final String MEDS1_TEXT = "meds1.text";
-    public static final String MEDS2_EVENING = "meds2.evening";
-    public static final String MEDS2_MORNING = "meds2.morning";
-    public static final String MEDS2_NIGHT = "meds2.night";
-    public static final String MEDS2_NOON = "meds2.noon";
-    public static final String MEDS2_TEXT = "meds2.text";
-    public static final String MEDS3_EVENING = "meds3.evening";
-    public static final String MEDS3_MORNING = "meds3.morning";
-    public static final String MEDS3_NIGHT = "meds3.night";
-    public static final String MEDS3_NOON = "meds3.noon";
-    public static final String MEDS3_TEXT = "meds3.text";
-    public static final String MEDS4_EVENING = "meds4.evening";
-    public static final String MEDS4_MORNING = "meds4.morning";
-    public static final String MEDS4_NIGHT = "meds4.night";
-    public static final String MEDS4_NOON = "meds4.noon";
-    public static final String MEDS4_TEXT = "meds4.text";
-    public static final String MEDS5_EVENING = "meds5.evening";
-    public static final String MEDS5_MORNING = "meds5.morning";
-    public static final String MEDS5_NIGHT = "meds5.night";
-    public static final String MEDS5_NOON = "meds5.noon";
-    public static final String MEDS5_TEXT = "meds5.text";
-    public static final String MEDS6_EVENING = "meds6.evening";
-    public static final String MEDS6_MORNING = "meds6.morning";
-    public static final String MEDS6_NIGHT = "meds6.night";
-    public static final String MEDS6_NOON = "meds6.noon";
-    public static final String MEDS6_TEXT = "meds6.text";
-    public static final String MEDS7_EVENING = "meds7.evening";
-    public static final String MEDS7_MORNING = "meds7.morning";
-    public static final String MEDS7_NIGHT = "meds7.night";
-    public static final String MEDS7_NOON = "meds7.noon";
-    public static final String MEDS7_TEXT = "meds7.text";
-    public static final String MEDS8_EVENING = "meds8.evening";
-    public static final String MEDS8_MORNING = "meds8.morning";
-    public static final String MEDS8_NIGHT = "meds8.night";
-    public static final String MEDS8_NOON = "meds8.noon";
-    public static final String MEDS8_TEXT = "meds8.text";
-    public static final String MEDS9_EVENING = "meds9.evening";
-    public static final String MEDS9_MORNING = "meds9.morning";
-    public static final String MEDS9_NIGHT = "meds9.night";
-    public static final String MEDS9_NOON = "meds9.noon";
-    public static final String MEDS9_TEXT = "meds9.text";
-    public static final String MEDS_CONTROL = "meds.control";
-    public static final String MEDS_DAILY_GLUCOSECHECK = "meds.daily.glucosecheck";
-    public static final String MEDS_DAILY_RATION = "meds.daily.ration";
-    public static final String MEDS_INJECTION_LEVEL = "meds.injection.level";
-    public static final String MEDS_INSULIN_APPLICATION = "meds.insulin.application";
-    public static final String MEDS_LAST_APPLICATION = "meds.last.application";
-    public static final String MEDS_MARCUMARPASS = "meds.marcumarpass";
-    public static final String MEDS_MORNING_GLUCOSE = "meds.morning.glucose";
-    public static final String MEDS_SELF = "meds.self";
-    public static final String MEDS_WEEKLY_GLUCOSECHECK = "meds.weekly.glucosecheck";
-    public static final String MOBILITY_AID_BED = "mobility.aid.bed";
-    public static final String MOBILITY_AID_CANE = "mobility.aid.cane";
-    public static final String MOBILITY_AID_COMMENT = "mobility.aid.comment";
-    public static final String MOBILITY_AID_COMMODE = "mobility.aid.commode";
-    public static final String MOBILITY_AID_CRUTCH = "mobility.aid.crutch";
-    public static final String MOBILITY_AID_SITTING = "mobility.aid.sitting";
-    public static final String MOBILITY_AID_GETUP = "mobility.aid.stand";
-    public static final String MOBILITY_AID_TOILET = "mobility.aid.toilet";
-    public static final String MOBILITY_AID_TRANSFER = "mobility.aid.transfer";
-    public static final String MOBILITY_AID_WALKER = "mobility.aid.walker";
-    public static final String MOBILITY_AID_WALKING = "mobility.aid.walking";
-    public static final String MOBILITY_AID_WHEELCHAIR = "mobility.aid.wheelchair";
-    public static final String MOBILITY_BED = "mobility.bed";
-    public static final String MOBILITY_BEDPOSITION = "mobility.bedposition";
-    public static final String MOBILITY_BEDRIDDEN = "mobility.bedridden";
-    public static final String MOBILITY_COMMENT = "mobility.comment";
-    public static final String MOBILITY_GET_UP = "mobility.get.up";
-    public static final String MOBILITY_SITTING = "mobility.sitting";
-    public static final String MOBILITY_TOILET = "mobility.toilet";
-    public static final String MOBILITY_TRANSFER = "mobility.transfer";
-    public static final String MOBILITY_WALKING = "mobility.walking";
-    public static final String MONITORING_BP = "monitoring.bp";
-    public static final String MONITORING_EXCRETION = "monitoring.excretion";
-    public static final String MONITORING_INTAKE = "monitoring.intake";
-    public static final String MONITORING_PAIN = "monitoring.pain";
-    public static final String MONITORING_PORT = "monitoring.port";
-    public static final String MONITORING_PULSE = "monitoring.pulse";
-    public static final String MONITORING_RESPIRATION = "monitoring.respiration";
-    public static final String MONITORING_TEMP = "monitoring.temp";
-    public static final String MONITORING_WEIGHT = "monitoring.weight";
-    public static final String MOUTH_CARE_BASIN = "mouth.care.basin";
-    public static final String MOUTH_CARE_BED = "mouth.care.bed";
-    public static final String MOUTH_CARE_LEVEL = "mouth.care.level";
-    public static final String MOUTH_CARE_SHOWER = "mouth.care.shower";
-    public static final String ORIENTATION_LOCATION_ABILITY = "orientation.location.ability";
-    public static final String ORIENTATION_PERSONAL_ABILITY = "orientation.personal.ability";
-    public static final String ORIENTATION_RUNNAWAY_TENDENCY = "orientation.runnaway.tendency";
-    public static final String ORIENTATION_SITUATION_ABILITY = "orientation.situation.ability";
-    public static final String ORIENTATION_TIME_ABILITY = "orientation.time.ability";
-    public static final String DATE_REQUESTED_INSURANCE_GRADE_PAGE3 = "page3.insurance.requested";
-    public static final String TX2_DATE_PAGE3 = "page3.tx2.date";
-    public static final String PERSONAL_CARE_BASIN = "personal.care.basin";
-    public static final String PERSONAL_CARE_BED = "personal.care.bed";
-    public static final String PERSONAL_CARE_COMMENT = "personal.care.comment";
-    public static final String PERSONAL_CARE_LEVEL = "personal.care.level";
-    public static final String PERSONAL_CARE_SHOWER = "personal.care.shower";
-    public static final String PROPH_BEDSORE = "proph.bedsore";
-    public static final String PROPH_CONTRACTURE = "proph.contracture";
-    public static final String PROPH_FALL = "proph.fall";
-    public static final String PROPH_INTERTRIGO = "proph.intertrigo";
-    public static final String PROPH_OBSTIPATION = "proph.obstipation";
-    public static final String PROPH_PNEUMONIA = "proph.pneumonia";
-    public static final String PROPH_SOOR = "proph.soor";
-    public static final String PROPH_THROMBOSIS = "proph.thrombosis";
-    public static final String RESIDENT_CARDSTATE_HINSURANCE = "resident.cardstate.hinsurance";
-    public static final String RESIDENT_CITY = "resident.city";
-    public static final String RESIDENT_DOB = "resident.dob";
-    public static final String RESIDENT_DOB_PAGE2 = "page2.resident.dob";
-    public static final String RESIDENT_DOB_PAGE3 = "page3.resident.dob";
-    public static final String RESIDENT_FIRSTNAME = "resident.firstname";
-    public static final String RESIDENT_FIRSTNAME_PAGE2 = "page2.resident.firstname";
-    public static final String RESIDENT_FULLNAME_PAGE3 = "page3.resident.fullname";
-    public static final String RESIDENT_GENDER = "resident.gender";
-    public static final String RESIDENT_HINSURANCE = "resident.hinsurance";
-    public static final String RESIDENT_HINSURANCEID = "resident.hinsuranceid";
-    public static final String RESIDENT_HINSURANCENO = "resident.hinsuranceno";
-    public static final String RESIDENT_HINSURANCE_PAGE3 = "page3.resident.hinsurance";
-    public static final String RESIDENT_NAME = "resident.name";
-    public static final String RESIDENT_NAME_PAGE2 = "page2.resident.name";
-    public static final String RESIDENT_PHONE = "resident.phone";
-    public static final String RESIDENT_PHONE_PAGE2 = "page2.phone";
-    public static final String RESIDENT_STREET = "resident.street";
-    public static final String RESIDENT_ZIP = "resident.zip";
-    public static final String RESPIRATION_ASPIRATE = "respiration.aspirate";
-    public static final String RESPIRATION_ASTHMA = "respiration.asthma";
-    public static final String RESPIRATION_CARDCONGEST = "respiration.cardcongest";
-    public static final String RESPIRATION_COMMENT = "respiration.comment";
-    public static final String RESPIRATION_COUGH = "respiration.cough";
-    public static final String RESPIRATION_MUCOUS = "respiration.mucous";
-    public static final String RESPIRATION_NORMAL = "respiration.normal";
-    public static final String RESPIRATION_OTHER = "respiration.other";
-    public static final String RESPIRATION_PAIN = "respiration.pain";
-    public static final String RESPIRATION_SMOKING = "respiration.rauchen";
-    public static final String RESPIRATION_SILICONTUBE = "respiration.silicontube";
-    public static final String RESPIRATION_SILVERTUBE = "respiration.silvertube";
-    public static final String RESPIRATION_SPUTUM = "respiration.sputum";
-    public static final String RESPIRATION_STOMA = "respiration.stoma";
-    public static final String RESPIRATION_TUBESIZE = "respiration.tubesize";
-    public static final String RESPIRATION_TUBETYPE = "respiration.tubetype";
-    public static final String RISKSCALE_TYPE_BEDSORE = "riskscale.type.bedsore";
-    public static final String SCALE_RISK_BEDSORE = "scale.risk.bedsore";
-    public static final String SHAVE_CARE_BASIN = "shave.care.basin";
-    public static final String SHAVE_CARE_BED = "shave.care.bed";
-    public static final String SHAVE_CARE_LEVEL = "shave.care.level";
-    public static final String SHAVE_CARE_SHOWER = "shave.care.shower";
-    public static final String SHIN_LEFT_FRONT = "shin.left.front";
-    public static final String SHIN_RIGHT_FRONT = "shin.right.front";
-    public static final String SHOULDER_BACK_LEFT = "shoulder.back.left";
-    public static final String SHOULDER_BACK_RIGHT = "shoulder.back.right";
-    public static final String SHOULDER_FRONT_LEFT = "shoulder.front.left";
-    public static final String SHOULDER_FRONT_RIGHT = "shoulder.front.right";
-    public static final String SHOULDER_LEFT_SIDE = "shoulder.left.side";
-    public static final String SHOULDER_RIGHT_SIDE = "shoulder.right.side";
-    public static final String SKIN_DRY = "skin.dry";
-    public static final String SKIN_GREASY = "skin.greasy";
-    public static final String SKIN_ITCH = "skin.itch";
-    public static final String SKIN_NORMAL = "skin.normal";
-    public static final String SLEEP_COMMENTS = "sleep.comments";
-    public static final String SLEEP_INSOMNIA = "sleep.insomnia";
-    public static final String SLEEP_NORMAL = "sleep.normal";
-    public static final String SLEEP_POS_BACK = "sleep.pos.back";
-    public static final String SLEEP_POS_FRONT = "sleep.pos.front";
-    public static final String SLEEP_POS_LEFT = "sleep.pos.left";
-    public static final String SLEEP_POS_RIGHT = "sleep.pos.right";
-    public static final String SLEEP_RESTLESS = "sleep.restless";
-    public static final String SOCIAL_CONFIDANT_CARE = "social.confidant.care";
-    public static final String SOCIAL_CURRENT_RESTHOME = "social.current.resthome";
-    public static final String SOCIAL_CURRENT_SITUATION_CONFIDANT = "social.current.situation.confidant";
-    public static final String SOCIAL_CURRENT_SITUATION_NURSING_SERVICE = "social.current.situation.nursing.service";
-    public static final String SOCIAL_CURRENT_SITUATION_SELF = "social.current.situation.self";
-    public static final String SOCIAL_RELIGION = "social.religion";
-    public static final String SPECIAL_ALLERGIEPASS = "special.allergiepass";
-    public static final String SPECIAL_COMMENT_ALLERGY = "special.comment.allergy";
-    public static final String SPECIAL_LASTCONTROL_PACER = "special.lastcontrol.pacer";
-    public static final String SPECIAL_MRE = "special.mre";
-    public static final String SPECIAL_MYCOSIS = "special.mycosis";
-    public static final String SPECIAL_PACER = "special.pacer";
-    public static final String SPECIAL_PALLIATIVE = "special.palliative";
-    public static final String SPECIAL_WOUNDPAIN = "special.woundpain";
-    public static final String SPECIAL_WOUNDS = "special.wounds";
-    public static final String SPECIAL_YESNO_ALLERGY = "special.yesno.allergy";
-    public static final String THERAPY_ERGO = "therapy.ergo";
-    public static final String THERAPY_LOGO = "therapy.logo";
-    public static final String THERAPY_PHYSIO = "therapy.physio";
-    public static final String TX_DATE = "tx.date";
-    public static final String TX_DATE_PAGE2 = "page2.date";
-    public static final String TX_DATE_PAGE3 = "page3.tx.date";
-    public static final String TX_FINAL = "tx.final";
-    public static final String TX_LOGO = "tx.logo";
-    public static final String TX_RECIPIENT = "tx.recipient";
-    public static final String TX_RECIPIENT_OTHER = "tx.recipient.other";
-    public static final String TX_TIME = "tx.time";
-    public static final String UPPER_BACK_LEFT_SIDE = "upper.back.left.side";
-    public static final String UPPER_BELLY = "upper.belly";
-    public static final String UPPER_LEFTLEG_BACK = "upper.leftleg.back";
-    public static final String UPPER_LEG_LEFT_FRONT = "upper.leg.left.front";
-    public static final String UPPER_LEG_LEFT_SIDE = "upper.leg.left.side";
-    public static final String UPPER_LEG_RIGHT_FRONT = "upper.leg.right.front";
-    public static final String UPPER_LEG_RIGHT_SIDE = "upper.leg.right.side";
-    public static final String UPPER_RIGHTLEG_BACK = "upper.rightleg.back";
-    public static final String USERNAME_PAGE2 = "page2.username";
-    public static final String VALUABLES_COURTORDER = "valuables.courtorder";
-    public static final String VALUABLES_CREDITCARD = "valuables.creditcard";
-    public static final String VALUABLES_HEALTHCARD = "valuables.healthcard";
-    public static final String VALUABLES_KEYS = "valuables.keys";
-    public static final String VALUABLES_LIVINGWILL = "valuables.livingwill";
-    public static final String VALUABLES_ORGANDONOR = "valuables.organdonor";
-    public static final String VALUABLES_OTHER = "valuables.other";
-    public static final String VALUABLES_WALLET = "valuables.wallet";
-    public static final String VALUABLES_WATCH = "valuables.watch";
-    public static final String ASSIGNED_INSURANCE_GRADE = "assigned.insurance.grade";
-    public static final String DATE_REQUESTED_INSURANCE_GRADE = "date.requested.insurance.grade";
-    public static final String DOCS_ADDITIONALMEDSLIST = "docs.additionalMedsList";
-    public static final String INSURANCE_GRADE = "insurance.grade";
-    public static final String MEDS_EVENING_GLUCOSE = "meds.evening.glucose";
-    public static final String MEDS_NOON_GLUCOSE = "meds.noon.glucose";
-    public static final String PAGE3_DOCS_WITHPATIENT = "page3.docs.withPatient";
-    public static final String PREFERRED_CAREPRODUCTS = "preferred.careproducts";
+    public static final String ASSIGNED_INSURANCE_GRADE = "Formular1[0].#subform[0].#area[2].#area[3].bewilligtePflegestufe[0]";
+    public static final String BACK_LOW = "Formular1[0].#subform[1].Kontrollkästchen[15]";
+    public static final String BACK_MID = "Formular1[0].#subform[1].Kontrollkästchen[14]";
+    public static final String BACK_OF_THE_HEAD = "Formular1[0].#subform[1].GrafikKopf_hinten[0]";
+    public static final String BACK_UPPER_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[3]";
+    public static final String BEDSORE = "Formular1[0].#subform[0].Gruppe-Dekubitus[0]";
+    public static final String BODY1_DESCRIPTION = "Formular1[0].#subform[1].TextField1[1]";
+    public static final String BODY2_DESCRIPTION = "Formular1[0].#subform[1].TextField1[0]";
+    public static final String BODY3_DESCRIPTION = "Formular1[0].#subform[1].TextField1[5]";
+    public static final String BODY4_DESCRIPTION = "Formular1[0].#subform[1].TextField1[4]";
+    public static final String BODY5_DESCRIPTION = "Formular1[0].#subform[1].TextField1[3]";
+    public static final String BODY6_DESCRIPTION = "Formular1[0].#subform[1].TextField1[2]";
+    public static final String BOTTOM_BACK = "Formular1[0].#subform[1].Kontrollkästchen[11]";
+    public static final String BOTTOM_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[26]";
+    public static final String BOTTOM_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[5]";
+    public static final String CALF_LEFTBACK = "Formular1[0].#subform[1].Kontrollkästchen[34]";
+    public static final String CALF_LEFTSIDE = "Formular1[0].#subform[1].Kontrollkästchen[28]";
+    public static final String CALF_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[7]";
+    public static final String CALF_RIGHTBACK = "Formular1[0].#subform[1].Kontrollkästchen[32]";
+    public static final String COMBING_CARE_BASIN = "Formular1[0].#subform[0].Waschbecken[0]";
+    public static final String COMBING_CARE_BED = "Formular1[0].#subform[0].Bett[3]";
+    public static final String COMBING_CARE_LEVEL = "Formular1[0].#subform[0].Kämmen[3]";
+    public static final String COMBING_CARE_SHOWER = "Formular1[0].#subform[0].Bad_Dusche[3]";
+    public static final String COMMENTS_GENERAL = "Formular1[0].#subform[1].BisherigeVersorgungFreitext[0]";
+    public static final String COMMS_HEARING_ABILITY = "Formular1[0].#subform[1].Gehör[0]";
+    public static final String COMMS_MOTHERTONGUE = "Formular1[0].#subform[0].Muttersprache[0]";
+    public static final String COMMS_SEEING_ABILITY = "Formular1[0].#subform[1].Sehen[0]";
+    public static final String COMMS_SPEECH_ABILITY = "Formular1[0].#subform[1].Sprache[0]";
+    public static final String COMMS_UNDERSTANDING_ABILITY = "Formular1[0].#subform[1].Sprachverständnis[0]";
+    public static final String COMMS_WRITING_ABILITY = "Formular1[0].#subform[1].Schrift[0]";
+    public static final String CONFIDANT_CITY = "Formular1[0].#subform[0].#area[2].OrtZugehörige[1]";
+    public static final String CONFIDANT_FIRSTNAME = "Formular1[0].#subform[0].#area[2].VornameZugehörige[1]";
+    public static final String CONFIDANT_NAME = "Formular1[0].#subform[0].#area[2].NameZugehörige[1]";
+    public static final String CONFIDANT_PHONE = "Formular1[0].#subform[0].#area[2].TelefonZugehörige[1]";
+    public static final String CONFIDANT_STREET = "Formular1[0].#subform[0].#area[2].StraßeZugehörige[1]";
+    public static final String CONFIDANT_ZIP = "Formular1[0].#subform[0].#area[2].PLZZugehörige[1]";
+    public static final String CONSCIOUSNESS_AWAKE = "Formular1[0].#subform[1].BewußtseinslageWach[0]";
+    public static final String CONSCIOUSNESS_COMA = "Formular1[0].#subform[1].BewußtseinslageKomatös[0]";
+    public static final String CONSCIOUSNESS_SOMNOLENT = "Formular1[0].#subform[1].BewußtseinslageBlanko[0]";
+    public static final String CONSCIOUSNESS_SOPOR = "Formular1[0].#subform[1].BewußtseinslageSomnolent[0]";
+    public static final String CROOK_ARM_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[37]";
+    public static final String CROOK_ARM_RIGHT = "Formular1[0].#subform[1].Kontrollkästchen[38]";
+    public static final String DATE_REQUESTED_INSURANCE_GRADE_PAGE3 = "Formular1[0].Patientenüberleitung-Seite3[0].Kontrollkästchen2[0]";
+    public static final String DATE_REQUESTED_INSURANCE_GRADE = "Formular1[0].#subform[0].#area[2].DatumsUhrzeitfeld4[0]";
+    public static final String DENTURE_CARE_BASIN = "Formular1[0].#subform[0].Waschbecken[1]";
+    public static final String DENTURE_CARE_BED = "Formular1[0].#subform[0].Bett[1]";
+    public static final String DENTURE_CARE_LEVEL = "Formular1[0].#subform[0].Zahnprothese[0]";
+    public static final String DENTURE_CARE_SHOWER = "Formular1[0].#subform[0].Bad_Dusche[1]";
+    public static final String DIAG_ICD10 = "Formular1[0].Patientenüberleitung-Seite3[0].AufnahmegrundDiagnose[0]";
+    public static final String DOCS_ADDITIONALMEDSLIST = "Formular1[0].Patientenüberleitung-Seite3[0].Medi-Plan[0]";
+    public static final String DOCS_GP_REPORT = "Formular1[0].#subform[1].Arztbrief[0]";
+    public static final String DOCS_IMAGES = "Formular1[0].#subform[1].Bilder[0]";
+    public static final String DOCS_LAB = "Formular1[0].#subform[1].Labor[0]";
+    public static final String DOCS_MEDS_LIST = "Formular1[0].#subform[1].Medi-Plan[0]";
+    public static final String DOCS_MISC = "Formular1[0].#subform[1].Sonstiges[0]";
+    public static final String DOCS_PREVIOUS = "Formular1[0].#subform[1].Vorberichte[0]";
+    public static final String DOCS_WITHPATIENT = "Formular1[0].#subform[1].Kontrollkästchen1[0]";
+    public static final String DRESSING_CARE_BASIN = "Formular1[0].#subform[0].Waschbecken[4]";
+    public static final String DRESSING_CARE_BED = "Formular1[0].#subform[0].Bett[4]";
+    public static final String DRESSING_CARE_LEVEL = "Formular1[0].#subform[0].Auskleiden[0]";
+    public static final String DRESSING_CARE_SHOWER = "Formular1[0].#subform[0].Bad_Dusche[4]";
+    public static final String ELLBOW_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[19]";
+    public static final String ELLBOW_RIGHT = "Formular1[0].#subform[1].Kontrollkästchen[20]";
+    public static final String ELLBOW_RIGHTSIDE = "Formular1[0].#subform[1].Kontrollkästchen[10]";
+    public static final String ELLBOW_SIDE_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[31]";
+    public static final String EXCRETIONS_AID_BEDPAN = "Formular1[0].#subform[0].Steckbecken[0]";
+    public static final String EXCRETIONS_AID_COMMODE = "Formular1[0].#subform[0].#area[5].Kontrollkästchen4[0]";
+    public static final String EXCRETIONS_AID_NO = "Formular1[0].#subform[0].Hilfsmittel_nein[0]";
+    public static final String EXCRETIONS_AID_URINAL = "Formular1[0].#subform[0].Urinflasche[0]";
+    public static final String EXCRETIONS_AP_AID = "Formular1[0].#subform[0].Anuspraeter[0]";
+    public static final String EXCRETIONS_COMMENT = "Formular1[0].#subform[0].Besonderheiten[1]";
+    public static final String EXCRETIONS_CONTROL_WEIGHT = "Formular1[0].#subform[0].#area[5].Gewichtskontrolle[0]";
+    public static final String EXCRETIONS_CURRENT_USED_AID = "Formular1[0].#subform[0].bisherversorgtmit[0]";
+    public static final String EXCRETIONS_DIARRHOEA_TENDENCY = "Formular1[0].#subform[0].Stuhlgang_Durchfall[0]";
+    public static final String EXCRETIONS_DIGITAL = "Formular1[0].#subform[0].Stuhlgang_Ausräumung[0]";
+    public static final String EXCRETIONS_INCO_FAECAL = "Formular1[0].#subform[0].Stuhlinkontinenz[0]";
+    public static final String EXCRETIONS_INCO_URINE = "Formular1[0].#subform[0].Harninkontinenz[0]";
+    public static final String EXCRETIONS_INCOAID_NEEDSHELP = "Formular1[0].#subform[0].Versorgung_mitHilfe[0]";
+    public static final String EXCRETIONS_INCOAID_SELF = "Formular1[0].#subform[0].Versorgung_selbständig[0]";
+    public static final String EXCRETIONS_LASTCHANGE = "Formular1[0].#subform[0].DatumsUhrzeitfeld2[0]";
+    public static final String EXCRETIONS_LIQUID_BALANCE = "Formular1[0].#subform[0].#area[5].Flüssigkeit[0]";
+    public static final String EXCRETIONS_NORMAL = "Formular1[0].#subform[0].Stuhlgang_normal[0]";
+    public static final String EXCRETIONS_OBSTIPATION_TENDENCY = "Formular1[0].#subform[0].Stuhlgang_Verstopfung[0]";
+    public static final String EXCRETIONS_ONEWAY_AID = "Formular1[0].#subform[0].Einmalinkontinenzartikel[0]";
+    public static final String EXCRETIONS_SUP_AID = "Formular1[0].#subform[0].suprapub\\.Harnblasenkatheter[0]";
+    public static final String EXCRETIONS_TRANS_AID = "Formular1[0].#subform[0].transur\\.Blasenkatheter[0]";
+    public static final String EXCRETIONS_TUBESIZE_CH = "Formular1[0].#subform[0].CH[0]";
+    public static final String FACE = "Formular1[0].#subform[1].Kontrollkästchen[40]";
+    public static final String FOOD_ABROSIA = "Formular1[0].#subform[1].Nahrungskarenz[0]";
+    public static final String FOOD_ARTIFICIAL_FEEDING = "Formular1[0].#subform[1].SonderkostJaNein[0]";
+    public static final String FOOD_ASSISTANCE_LEVEL = "Formular1[0].#subform[1].HilfebeiNahrung[0]";
+    public static final String FOOD_BITESIZE = "Formular1[0].#subform[1].ErnährungMundgrechteZubereitung[0]";
+    public static final String FOOD_BMI = "Formular1[0].#subform[1].Bodymaßindex[0]";
+    public static final String FOOD_BREADUNTIS = "Formular1[0].#subform[1].täglicheBE[0]";
+    public static final String FOOD_DAILY_KCAL = "Formular1[0].#subform[1].#area[12].Kalorienzufuhr_kcal[0]";
+    public static final String FOOD_DAILY_ML = "Formular1[0].#subform[1].#area[12].Sondenkost_ml[0]";
+    public static final String FOOD_DRINKINGMOTIVATION = "Formular1[0].#subform[1].AnhaltenzumTrinken[0]";
+    public static final String FOOD_DRINKSALONE = "Formular1[0].#subform[1].Trinkverhalten_selbständig[0]";
+    public static final String FOOD_DYSPHAGIA = "Formular1[0].#subform[1].Ernährung_Schluckstörung[0]";
+    public static final String FOOD_GRAVITY = "Formular1[0].#subform[1].Schwerkraft[0]";
+    public static final String FOOD_LAST_MEAL = "Formular1[0].#subform[1].ErnährungLetzteMahlzeit[0]";
+    public static final String FOOD_LIQUIDS_DAILY_ML = "Formular1[0].#subform[1].TäglicheTrinkmenge[0]";
+    public static final String FOOD_ORALNUTRITION = "Formular1[0].#subform[1].OraleErnährung[0]";
+    public static final String FOOD_PARENTERAL = "Formular1[0].#subform[1].ParenteraleErnährung[0]";
+    public static final String FOOD_PUMP = "Formular1[0].#subform[1].Ernährungspumpe[0]";
+    public static final String FOOD_SYRINGE = "Formular1[0].#subform[1].Spritze[0]";
+    public static final String FOOD_TEE_DAILY_ML = "Formular1[0].#subform[1].#area[12].Tee_ml[0]";
+    public static final String FOOD_TUBESINCE = "Formular1[0].#subform[1].Sondegelegtam[0]";
+    public static final String FOOD_TUBETYPE = "Formular1[0].#subform[1].Sondentyp[0]";
+    public static final String FOOT_LEFT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[52]";
+    public static final String FOOT_LEFTBACK = "Formular1[0].#subform[1].Kontrollkästchen[35]";
+    public static final String FOOT_RIGHT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[51]";
+    public static final String FOOT_RIGHTBACK = "Formular1[0].#subform[1].Kontrollkästchen[36]";
+    public static final String GROIN = "Formular1[0].#subform[1].Kontrollkästchen[39]";
+    public static final String HAND_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[30]";
+    public static final String HAND_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[9]";
+    public static final String HEAD_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[22]";
+    public static final String HEAD_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[1]";
+    public static final String HEEL_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[29]";
+    public static final String HEEL_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[8]";
+    public static final String HIP_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[25]";
+    public static final String HIP_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[4]";
+    public static final String INSURANCE_GRADE_NO = "Formular1[0].#subform[0].#area[2].#area[3].Einstufung_nein[0]";
+    public static final String INSURANCE_GRADE_REQUESTED = "Formular1[0].#subform[0].#area[2].#area[3].Einstufung_beantragt[0]";
+    public static final String INSURANCE_GRADE_YES = "Formular1[0].#subform[0].#area[2].#area[3].Einstufung_ja[0]";
+    public static final String KNEE_HOLLOWLEFT = "Formular1[0].#subform[1].Kontrollkästchen[33]";
+    public static final String KNEE_HOLLOWRIGHT = "Formular1[0].#subform[1].Kontrollkästchen[18]";
+    public static final String KNEE_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[47]";
+    public static final String KNEE_RIGHT = "Formular1[0].#subform[1].Kontrollkästchen[49]";
+    public static final String LC_CITY = "Formular1[0].#subform[0].#area[2].OrtZugehörige[0]";
+    public static final String LC_CUSTODY = "Formular1[0].#subform[0].#area[2].Aufenthaltsbestimmung[0]";
+    public static final String LC_FINANCE = "Formular1[0].#subform[0].#area[2].Vermögensverwaltung[0]";
+    public static final String LC_FIRSTNAME = "Formular1[0].#subform[0].#area[2].VornameZugehörige[0]";
+    public static final String LC_GENERAL = "Formular1[0].#subform[0].#area[2].gesetzl\\.Betreuer[0]";
+    public static final String LC_HEALTH = "Formular1[0].#subform[0].#area[2].Gesundheitsfürsorge[0]";
+    public static final String LC_NAME = "Formular1[0].#subform[0].#area[2].NameZugehörige[0]";
+    public static final String LC_PHONE = "Formular1[0].#subform[0].#area[2].TelefonZugehörige[0]";
+    public static final String LC_STREET = "Formular1[0].#subform[0].#area[2].StraßeZugehörige[0]";
+    public static final String LC_ZIP = "Formular1[0].#subform[0].#area[2].PLZZugehörige[0]";
+    public static final String LEGAL_MINOR = "Formular1[0].#subform[0].#area[2].minderjährig[0]";
+    public static final String LEGAL_SINGLE = "Formular1[0].#subform[0].#area[2].alleinstehend[0]";
+    public static final String LOWER_BELLY = "Formular1[0].#subform[1].Kontrollkästchen[44]";
+    public static final String LOWER_LEG_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[27]";
+    public static final String LOWER_LEG_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[6]";
+    public static final String MEDS_CONTROL = "Formular1[0].#subform[1].ÜberwachungEinnahme[0]";
+    public static final String MEDS_DAILY_GLUCOSECHECK = "Formular1[0].#subform[1].BZKontrolleXtäglich[0]";
+    public static final String MEDS_DAILY_RATION = "Formular1[0].#subform[1].BereitstellenTagesration[0]";
+    public static final String MEDS_EVENING_GLUCOSE = "Formular1[0].#subform[1].BZKontrolleAbends[0]";
+    public static final String MEDS_INJECTION_LEVEL = "Formular1[0].#subform[1].Injektion[0]";
+    public static final String MEDS_INSULIN_APPLICATION = "Formular1[0].#subform[1].InsulinVerabreichung[0]";
+    public static final String MEDS_LAST_APPLICATION = "Formular1[0].#subform[1].letzteMedikation[0]";
+    public static final String MEDS_MARCUMARPASS = "Formular1[0].#subform[1].Wundschmerz[1]";
+    public static final String MEDS_MORNING_GLUCOSE = "Formular1[0].#subform[1].BZKontrolleMorgens[0]";
+    public static final String MEDS_NOON_GLUCOSE = "Formular1[0].#subform[1].BZKontrolleMittags[0]";
+    public static final String MEDS_SELF = "Formular1[0].#subform[1].Einnahme_selbständig[0]";
+    public static final String MEDS_WEEKLY_GLUCOSECHECK = "Formular1[0].#subform[1].BZKontrollexwöchentlich[0]";
+    public static final String MOBILITY_AID_BED = "Formular1[0].#subform[0].#area[7].Hilfsmittel[5]";
+    public static final String MOBILITY_AID_CANE = "Formular1[0].#subform[0].#area[7].HilfsmittelGehstock[0]";
+    public static final String MOBILITY_AID_COMMENT = "Formular1[0].#subform[0].#area[7].Textfeld22[0]";
+    public static final String MOBILITY_AID_COMMODE = "Formular1[0].#subform[0].#area[7].HilfsmittelToilettenstuhl[0]";
+    public static final String MOBILITY_AID_CRUTCH = "Formular1[0].#subform[0].#area[7].HilfsmittelUnterarmgehstütze[0]";
+    public static final String MOBILITY_AID_SITTING = "Formular1[0].#subform[0].Hilfsmittel[4]";
+    public static final String MOBILITY_AID_GETUP = "Formular1[0].#subform[0].Hilfsmittel[0]";
+    public static final String MOBILITY_AID_TOILET = "Formular1[0].#subform[0].Hilfsmittel[3]";
+    public static final String MOBILITY_AID_TRANSFER = "Formular1[0].#subform[0].Hilfsmittel[2]";
+    public static final String MOBILITY_AID_WALKER = "Formular1[0].#subform[0].#area[7].HilfsmittelRollator[0]";
+    public static final String MOBILITY_AID_WALKING = "Formular1[0].#subform[0].Hilfsmittel[1]";
+    public static final String MOBILITY_AID_WHEELCHAIR = "Formular1[0].#subform[0].#area[7].HilfsmittelRollstuhl[0]";
+    public static final String MOBILITY_BED = "Formular1[0].#subform[0].#area[7].BeweglichkeitimBett[0]";
+    public static final String MOBILITY_BEDPOSITION = "Formular1[0].#subform[0].#area[7].Lagerungsart[0]";
+    public static final String MOBILITY_BEDRIDDEN = "Formular1[0].#subform[0].#area[7].Bettlägerig[0]";
+    public static final String MOBILITY_COMMENT = "Formular1[0].#subform[0].#area[7].MobilitätBemerkung[0]";
+    public static final String MOBILITY_GET_UP = "Formular1[0].#subform[0].Aufstehen[0]";
+    public static final String MOBILITY_SITTING = "Formular1[0].#subform[0].SitzenimStuhl[0]";
+    public static final String MOBILITY_TOILET = "Formular1[0].#subform[0].Toilettengang[0]";
+    public static final String MOBILITY_TRANSFER = "Formular1[0].#subform[0].Transfer[0]";
+    public static final String MOBILITY_WALKING = "Formular1[0].#subform[0].Gehen[0]";
+    public static final String MONITORING_BP = "Formular1[0].#subform[1].ÜberwachungBlutdruck[0]";
+    public static final String MONITORING_EXCRETION = "Formular1[0].#subform[1].Überwachung_Ausfuhr[0]";
+    public static final String MONITORING_INTAKE = "Formular1[0].#subform[1].ÜberwachungTemperatur[0]";
+    public static final String MONITORING_PAIN = "Formular1[0].#subform[1].ÜberwachungSchnerz[0]";
+    public static final String MONITORING_PORT = "Formular1[0].#subform[1].ÜberwachungPuls[0]";
+    public static final String MONITORING_PULSE = "Formular1[0].#subform[1].ÜberwachungPsyche[0]";
+    public static final String MONITORING_RESPIRATION = "Formular1[0].#subform[1].ÜberwachungAtmung[0]";
+    public static final String MONITORING_TEMP = "Formular1[0].#subform[1].ÜberwachungSturz[0]";
+    public static final String MONITORING_WEIGHT = "Formular1[0].#subform[1].Überwachung_Gewicht[0]";
+    public static final String MOUTH_CARE_BASIN = "Formular1[0].#subform[0].Waschbecken[0]";
+    public static final String MOUTH_CARE_BED = "Formular1[0].#subform[0].Bett[0]";
+    public static final String MOUTH_CARE_LEVEL = "Formular1[0].#subform[0].Mundpflege[0]";
+    public static final String MOUTH_CARE_SHOWER = "Formular1[0].#subform[0].Bad_Dusche[0]";
+    public static final String ORIENTATION_LOCATION_ABILITY = "Formular1[0].#subform[1].örtlich[0]";
+    public static final String ORIENTATION_PERSONAL_ABILITY = "Formular1[0].#subform[1].Persönlich[0]";
+    public static final String ORIENTATION_RUNNAWAY_TENDENCY = "Formular1[0].#subform[1].Weglauftendenz[0]";
+    public static final String ORIENTATION_SITUATION_ABILITY = "Formular1[0].#subform[1].Situativ[0]";
+    public static final String ORIENTATION_TIME_ABILITY = "Formular1[0].#subform[1].Zeitlich[0]";
+    public static final String PAGE2_DATE = "Formular1[0].#subform[1].Datum[0]";
+    public static final String PAGE2_PHONE = "Formular1[0].#subform[1].Telefonnummer[0]";
+    public static final String PAGE2_RESIDENT_DOB = "Formular1[0].#subform[1].Pat-Geburtsdatum[1]";
+    public static final String PAGE2_RESIDENT_FIRSTNAME = "Formular1[0].#subform[1].Pat-Vorname[1]";
+    public static final String PAGE2_RESIDENT_NAME = "Formular1[0].#subform[1].Pat-Name[1]";
+    public static final String PAGE2_USERNAME = "Formular1[0].#subform[1].Name_Unterschrift[0]";
+    public static final String PAGE3_RESIDENT_GP = "Formular1[0].Patientenüberleitung-Seite3[0].AdressederweiterbehandelndenPraxis[0]";
+    public static final String PAGE3_DOCS_WITHPATIENT = "Formular1[0].Patientenüberleitung-Seite3[0].Kontrollkästchen1[0]";
+    public static final String PAGE3_RESIDENT_DOB = "Formular1[0].Patientenüberleitung-Seite3[0].Pat-Geburtsdatum[0]";
+    public static final String PAGE3_RESIDENT_FULLNAME = "Formular1[0].Patientenüberleitung-Seite3[0].Pat-Name[0]";
+    public static final String PAGE3_RESIDENT_HINSURANCE = "Formular1[0].Patientenüberleitung-Seite3[0].Krankenkasse[0]";
+    public static final String PAGE3_TX_DATE = "Formular1[0].Patientenüberleitung-Seite3[0].Datum[0]";
+    public static final String PAGE3_TX2_DATE = "Formular1[0].Patientenüberleitung-Seite3[0].Textfeld27[3]";
+    public static final String PERSONAL_CARE_BASIN = "Formular1[0].#subform[0].PersonalCareBasin[0]";
+    public static final String PERSONAL_CARE_BED = "Formular1[0].#subform[0].PersonalCareBed[0]";
+    public static final String PERSONAL_CARE_COMMENT = "Formular1[0].#subform[0].SonstigesGrundpflege[0]";
+    public static final String PERSONAL_CARE_LEVEL = "Formular1[0].#subform[0].Körperpflege[0]";
+    public static final String PERSONAL_CARE_SHOWER = "Formular1[0].#subform[0].PersonalCareShower[0]";
+    public static final String PREFERRED_CAREPRODUCTS = "Formular1[0].#subform[0].Pflegemittel[0]";
+    public static final String PROPH_BEDSORE = "Formular1[0].#subform[0].#area[6].Dekubitus[0]";
+    public static final String PROPH_CONTRACTURE = "Formular1[0].#subform[0].#area[6].Kontraktur[0]";
+    public static final String PROPH_FALL = "Formular1[0].#subform[0].#area[6].Sturz[0]";
+    public static final String PROPH_INTERTRIGO = "Formular1[0].#subform[0].Intertrigo[0]";
+    public static final String PROPH_OBSTIPATION = "Formular1[0].#subform[0].#area[6].Obstipation[0]";
+    public static final String PROPH_PNEUMONIA = "Formular1[0].#subform[0].Pneunomie[0]";
+    public static final String PROPH_SOOR = "Formular1[0].#subform[0].#area[6].Soor_Protitis[0]";
+    public static final String PROPH_THROMBOSIS = "Formular1[0].#subform[0].Thrombose[0]";
+    public static final String RESIDENT_CARDSTATE_HINSURANCE = "Formular1[0].Patientenüberleitung-Seite3[0].Status[0]";
+    public static final String RESIDENT_CITY = "Formular1[0].#subform[0].#area[0].#area[1].Pat-Ort[0]";
+    public static final String RESIDENT_DOB = "Formular1[0].#subform[0].#area[0].#area[1].Pat-Geburtsdatum[0]";
+    public static final String RESIDENT_FIRSTNAME = "Formular1[0].#subform[0].#area[0].#area[1].Pat-Vorname[0]";
+    public static final String RESIDENT_GENDER = "Formular1[0].#subform[0].#area[0].#area[1].Geschlechtsoptionsfelder[0]";
+    public static final String RESIDENT_HINSURANCE = "Formular1[0].#subform[0].#area[0].#area[1].Krankenkasse[0]";
+    public static final String RESIDENT_HINSURANCEID = "Formular1[0].Patientenüberleitung-Seite3[0].Versicherten-Nr\\.[0]";
+    public static final String RESIDENT_HINSURANCENO = "Formular1[0].Patientenüberleitung-Seite3[0].Kassen-Nr\\.[0]";
+    public static final String RESIDENT_NAME = "Formular1[0].#subform[0].#area[0].#area[1].Pat-Name[0]";
+    public static final String RESIDENT_PHONE = "Formular1[0].#subform[0].#area[0].#area[1].Pat-Telefonnr[0]";
+    public static final String RESIDENT_STREET = "Formular1[0].#subform[0].#area[0].#area[1].Pat-Straße[0]";
+    public static final String RESIDENT_ZIP = "Formular1[0].#subform[0].#area[0].#area[1].Pat-PLZ[0]";
+    public static final String RESPIRATION_ASPIRATE = "Formular1[0].#subform[1].Absaugen[0]";
+    public static final String RESPIRATION_ASTHMA = "Formular1[0].#subform[1].Asthma[0]";
+    public static final String RESPIRATION_CARDCONGEST = "Formular1[0].#subform[1].kardialerStau[0]";
+    public static final String RESPIRATION_COMMENT = "Formular1[0].#subform[1].Atmung_Eingabe[0]";
+    public static final String RESPIRATION_COUGH = "Formular1[0].#subform[1].Husten[0]";
+    public static final String RESPIRATION_MUCOUS = "Formular1[0].#subform[1].Verschleimung[0]";
+    public static final String RESPIRATION_NORMAL = "Formular1[0].#subform[1].unauffällig[0]";
+    public static final String RESPIRATION_OTHER = "Formular1[0].#subform[1].Atmung_Sonstiges[0]";
+    public static final String RESPIRATION_PAIN = "Formular1[0].#subform[1].Schmerzen[0]";
+    public static final String RESPIRATION_SMOKING = "Formular1[0].#subform[1].Rauchen[0]";
+    public static final String RESPIRATION_SILICONTUBE = "Formular1[0].#subform[1].Silikonkanüle[0]";
+    public static final String RESPIRATION_SILVERTUBE = "Formular1[0].#subform[1].Silberkanüle[0]";
+    public static final String RESPIRATION_SPUTUM = "Formular1[0].#subform[1].Auswurf[0]";
+    public static final String RESPIRATION_STOMA = "Formular1[0].#subform[1].Tracheostoma[0]";
+    public static final String RESPIRATION_TUBESIZE = "Formular1[0].#subform[1].Kanülengröße[0]";
+    public static final String RESPIRATION_TUBETYPE = "Formular1[0].#subform[1].Kanülenart[0]";
+    public static final String RISKSCALE_TYPE_BEDSORE = "Formular1[0].#subform[0].Risiko[0]";
+    public static final String SCALE_RISK_BEDSORE = "Formular1[0].#subform[0].BradenSkala[0]";
+    public static final String SHAVE_CARE_BASIN = "Formular1[0].#subform[0].Waschbecken[2]";
+    public static final String SHAVE_CARE_BED = "Formular1[0].#subform[0].Bett[2]";
+    public static final String SHAVE_CARE_LEVEL = "Formular1[0].#subform[0].Rasieren[0]";
+    public static final String SHAVE_CARE_SHOWER = "Formular1[0].#subform[0].Bad_Dusche[2]";
+    public static final String SHIN_LEFT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[48]";
+    public static final String SHIN_RIGHT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[50]";
+    public static final String SHOULDER_BACK_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[12]";
+    public static final String SHOULDER_BACK_RIGHT = "Formular1[0].#subform[1].Kontrollkästchen[13]";
+    public static final String SHOULDER_FRONT_LEFT = "Formular1[0].#subform[1].Kontrollkästchen[42]";
+    public static final String SHOULDER_FRONT_RIGHT = "Formular1[0].#subform[1].Kontrollkästchen[41]";
+    public static final String SHOULDER_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[23]";
+    public static final String SHOULDER_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[2]";
+    public static final String SKIN_DRY = "Formular1[0].#subform[0].Haut_trocken[0]";
+    public static final String SKIN_GREASY = "Formular1[0].#subform[0].Haut_fettig[0]";
+    public static final String SKIN_ITCH = "Formular1[0].#subform[0].Haut_Juckreiz[0]";
+    public static final String SKIN_NORMAL = "Formular1[0].#subform[0].Haut_intakt[0]";
+    public static final String SLEEP_COMMENTS = "Formular1[0].#subform[0].Besonderheiten[0]";
+    public static final String SLEEP_INSOMNIA = "Formular1[0].#subform[0].Schlafstörungen[0]";
+    public static final String SLEEP_NORMAL = "Formular1[0].#subform[0].SchlafUngestört[0]";
+    public static final String SLEEP_POS_BACK = "Formular1[0].#subform[0].SchlaflageRücken[0]";
+    public static final String SLEEP_POS_FRONT = "Formular1[0].#subform[0].SchlaflageBauch[0]";
+    public static final String SLEEP_POS_LEFT = "Formular1[0].#subform[0].SchlaflageLinks[0]";
+    public static final String SLEEP_POS_RIGHT = "Formular1[0].#subform[0].SchlaflageRechts[0]";
+    public static final String SLEEP_RESTLESS = "Formular1[0].#subform[0].SchlafNächlticheUnruhe[0]";
+    public static final String SOCIAL_CONFIDANT_CARE = "Formular1[0].#subform[0].#area[2].#area[3].Pflegebereitschaft[0]";
+    public static final String SOCIAL_CURRENT_RESTHOME = "Formular1[0].#subform[0].#area[2].Pflegeheim[0]";
+    public static final String SOCIAL_CURRENT_SITUATION_CONFIDANT = "Formular1[0].#subform[0].#area[2].Bezugsperson[0]";
+    public static final String SOCIAL_CURRENT_SITUATION_NURSING_SERVICE = "Formular1[0].#subform[0].#area[2].amb\\.Pflegedienst[0]";
+    public static final String SOCIAL_CURRENT_SITUATION_SELF = "Formular1[0].#subform[0].#area[2].selbständig[0]";
+    public static final String SOCIAL_RELIGION = "Formular1[0].#subform[0].Religion[0]";
+    public static final String SPECIAL_ALLERGIEPASS = "Formular1[0].#subform[1].#area[9].Allergiepass_vorhanden[0]";
+    public static final String SPECIAL_COMMENT_ALLERGY = "Formular1[0].#subform[1].Art[0]";
+    public static final String SPECIAL_LASTCONTROL_PACER = "Formular1[0].#subform[1].#area[9].letzteKontrolleam[0]";
+    public static final String SPECIAL_MRE = "Formular1[0].#subform[1].#area[9].MRSA[0]";
+    public static final String SPECIAL_MYCOSIS = "Formular1[0].#subform[1].Pilzinfektion[0]";
+    public static final String SPECIAL_PACER = "Formular1[0].#subform[1].#area[9].Herzschrittmacher[0]";
+    public static final String SPECIAL_PALLIATIVE = "Formular1[0].#subform[1].#area[9].Palliativpflege[0]";
+    public static final String SPECIAL_WOUNDPAIN = "Formular1[0].#subform[1].#area[9].Wundschmerz[0]";
+    public static final String SPECIAL_WOUNDS = "Formular1[0].#subform[1].Wunden[0]";
+    public static final String SPECIAL_YESNO_ALLERGY = "Formular1[0].#subform[1].#area[9].Allergien[0]";
+    public static final String THERAPY_ERGO = "Formular1[0].#subform[1].TherapieErgotherapie[0]";
+    public static final String THERAPY_LOGO = "Formular1[0].#subform[1].TherapieLogopädie[0]";
+    public static final String THERAPY_PHYSIO = "Formular1[0].#subform[1].TherapieKrankengymnastik[0]";
+    public static final String TX_DATE = "Formular1[0].#subform[0].DatumÜberleitung[0]";
+    public static final String TX_FINAL = "Formular1[0].#subform[0].Pflegschaftsauswahlfelder[0]";
+    public static final String TX_LOGO = "Formular1[0].#subform[0].Bildfeld1[0]";
+    public static final String TX_RECIPIENT = "Formular1[0].#subform[0].#area[8].Überleitungsort[0]";
+    public static final String TX_RECIPIENT_OTHER = "Formular1[0].#subform[0].SonstigeÜberleitungsorte[0]";
+    public static final String TX_TIME = "Formular1[0].#subform[0].DatumsUhrzeitfeldÜberleitung[0]";
+    public static final String UPPER_BACK_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[24]";
+    public static final String UPPER_BELLY = "Formular1[0].#subform[1].Kontrollkästchen[43]";
+    public static final String UPPER_LEFTLEG_BACK = "Formular1[0].#subform[1].Kontrollkästchen[17]";
+    public static final String UPPER_LEG_LEFT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[45]";
+    public static final String UPPER_LEG_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[21]";
+    public static final String UPPER_LEG_RIGHT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[46]";
+    public static final String UPPER_LEG_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[0]";
+    public static final String UPPER_RIGHTLEG_BACK = "Formular1[0].#subform[1].Kontrollkästchen[16]";
+    public static final String VALUABLES_COURTORDER = "Formular1[0].#subform[0].#area[2].Versichertenkarte[0]";
+    public static final String VALUABLES_CREDITCARD = "Formular1[0].#subform[0].#area[2].Kreditkarte[0]";
+    public static final String VALUABLES_HEALTHCARD = "Formular1[0].#subform[0].#area[2].Andenken[0]";
+    public static final String VALUABLES_KEYS = "Formular1[0].#subform[0].#area[2].Hausschlüssel[0]";
+    public static final String VALUABLES_LIVINGWILL = "Formular1[0].#subform[0].#area[2].Patientenverfügung[0]";
+    public static final String VALUABLES_ORGANDONOR = "Formular1[0].#subform[0].#area[2].Organspendeausweis[0]";
+    public static final String VALUABLES_OTHER = "Formular1[0].#subform[0].#area[2].SonstigeWertsachen[0]";
+    public static final String VALUABLES_WALLET = "Formular1[0].#subform[0].#area[2].Geldbörse[0]";
+    public static final String VALUABLES_WATCH = "Formular1[0].#subform[0].#area[2].Uhr[0]";
+    public static final String MEDS1 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Medication[0]";
+    public static final String DOSAGE1 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Dosage[14]";
+    public static final String MEDS2 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Medication[14]";
+    public static final String DOSAGE2 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Dosage[0]";
+    public static final String MEDS3 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Medication[13]";
+    public static final String DOSAGE3 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Dosage[1]";
+    public static final String MEDS4 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Medication[1]";
+    public static final String DOSAGE4 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Dosage[13]";
+    public static final String MEDS5 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Medication[2]";
+    public static final String DOSAGE5 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Dosage[12]";
+    public static final String MEDS6 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Medication[12]";
+    public static final String DOSAGE6 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Dosage[2]";
+    public static final String MEDS7 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Medication[11]";
+    public static final String DOSAGE7 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Dosage[3]";
+    public static final String MEDS8 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Medication[3]";
+    public static final String DOSAGE8 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Dosage[11]";
+    public static final String MEDS9 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Medication[4]";
+    public static final String DOSAGE9 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Dosage[10]";
+    public static final String MEDS10 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Medication[10]";
+    public static final String DOSAGE10 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Dosage[4]";
+    public static final String MEDS11 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Medication[9]";
+    public static final String DOSAGE11 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Dosage[5]";
+    public static final String MEDS12 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Medication[5]";
+    public static final String DOSAGE12 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Dosage[9]";
+    public static final String MEDS13 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Medication[6]";
+    public static final String DOSAGE13 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Dosage[8]";
+    public static final String MEDS14 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Medication[7]";
+    public static final String DOSAGE14 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Dosage[7]";
+    public static final String MEDS15 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Medication[8]";
+    public static final String DOSAGE15 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Dosage[6]";
+    public static final String MEDS_WARNINGTEXT = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Text1";
+
+
+    public static final String[] PDFPARTS = new String[]{HEAD_LEFT_SIDE, SHOULDER_LEFT_SIDE, UPPER_BACK_LEFT_SIDE, ELLBOW_SIDE_LEFT, HAND_LEFT_SIDE, HIP_LEFT_SIDE, BOTTOM_LEFT_SIDE, UPPER_LEG_LEFT_SIDE,
+            LOWER_LEG_LEFT_SIDE, CALF_LEFTSIDE, HEEL_LEFT_SIDE, FACE, SHOULDER_FRONT_RIGHT, SHOULDER_FRONT_LEFT, UPPER_BELLY, CROOK_ARM_RIGHT,
+            CROOK_ARM_LEFT, LOWER_BELLY, GROIN, UPPER_LEG_RIGHT_FRONT, UPPER_LEG_LEFT_FRONT, KNEE_RIGHT, KNEE_LEFT, SHIN_RIGHT_FRONT, SHIN_LEFT_FRONT,
+            FOOT_RIGHT_FRONT, FOOT_LEFT_FRONT, BACK_OF_THE_HEAD, SHOULDER_BACK_LEFT, SHOULDER_BACK_RIGHT, BACK_MID, ELLBOW_LEFT,
+            ELLBOW_RIGHT, BACK_LOW, BOTTOM_BACK, UPPER_LEFTLEG_BACK, UPPER_RIGHTLEG_BACK, KNEE_HOLLOWLEFT, KNEE_HOLLOWRIGHT, CALF_LEFTBACK,
+            CALF_RIGHTBACK, FOOT_LEFTBACK, FOOT_RIGHTBACK, HEAD_RIGHT_SIDE, SHOULDER_RIGHT_SIDE, BACK_UPPER_LEFT_SIDE, ELLBOW_RIGHTSIDE,
+            HAND_RIGHT_SIDE, HIP_RIGHT_SIDE, BOTTOM_RIGHT_SIDE, UPPER_LEG_RIGHT_SIDE, LOWER_LEG_RIGHT_SIDE, CALF_RIGHT_SIDE, HEEL_RIGHT_SIDE};
 
 
 }

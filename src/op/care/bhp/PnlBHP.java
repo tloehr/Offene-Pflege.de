@@ -72,6 +72,8 @@ public class PnlBHP extends NursingRecordsPanel {
     private Resident resident;
     private boolean initPhase;
 
+
+    //TODO: synchronize this !
     private HashMap<BHP, CollapsiblePane> mapBHP2Pane;
     private HashMap<Byte, ArrayList<BHP>> mapShift2BHP;
     private HashMap<Byte, CollapsiblePane> mapShift2Pane;
@@ -253,7 +255,6 @@ public class PnlBHP extends NursingRecordsPanel {
     private void buildPanel(boolean resetCollapseState) {
         cpBHP.removeAll();
         cpBHP.setLayout(new JideBoxLayout(cpBHP, JideBoxLayout.Y_AXIS));
-//        cpBHP.add(mapShift2Pane.get(BHPTools.SHIFT_ON_DEMAND));
         for (Byte shift : new Byte[]{BHPTools.SHIFT_ON_DEMAND, BHPTools.SHIFT_VERY_EARLY, BHPTools.SHIFT_EARLY, BHPTools.SHIFT_LATE, BHPTools.SHIFT_VERY_LATE}) {
             cpBHP.add(mapShift2Pane.get(shift));
             if (resetCollapseState) {
@@ -596,7 +597,7 @@ public class PnlBHP extends NursingRecordsPanel {
         }
 
         String title = "<html><font size=+1>" +
-                SYSTools.left(PrescriptionTools.getPrescriptionAsShortText(bhp.getPrescriptionSchedule().getPrescription()), MAX_TEXT_LENGTH) +
+                SYSTools.left(PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()), MAX_TEXT_LENGTH) +
                 (bhp.hasMed() ? ", <b>" + SYSTools.getAsHTML(bhp.getDose()) +
                         " " + DosageFormTools.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
                 BHPTools.getScheduleText(bhp, ", ", "") +

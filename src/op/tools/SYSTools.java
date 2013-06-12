@@ -848,7 +848,6 @@ public class SYSTools {
     }
 
 
-
     //    /**
 //     * Fügt html Tags vor und hinter den Eingangsstring ein.
 //     *
@@ -1525,7 +1524,6 @@ public class SYSTools {
     }
 
 
-
     public static String getThrowableAsHTML(Throwable exc) {
         String html = "";
         StackTraceElement[] stacktrace = exc.getStackTrace();
@@ -1694,12 +1692,16 @@ public class SYSTools {
     }
 
     public static String left(String text, int size) {
-//        OPDE.debug("IN: " + text);
+        return left(text, size, "...");
+    }
+
+    public static String left(String text, int size, String abrev) {
+        //        OPDE.debug("IN: " + text);
         int originalLaenge = text.length();
         int max = Math.min(size, originalLaenge);
         text = text.substring(0, max);
         if (max < originalLaenge) {
-            text += "...";
+            text += abrev;
         }
         return text;
     }

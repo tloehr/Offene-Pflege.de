@@ -461,21 +461,9 @@ public class PnlWelcome extends CleanablePanel {
 
     private DefaultCPTitle createCP4(final MedStock stock) {
 
-//        BigDecimal sumStock = BigDecimal.ZERO;
-//        try {
-//            EntityManager em = OPDE.createEM();
-//            sumStock = MedStockTools.getSum(em, stock);
-//            em.close();
-//        } catch (Exception e) {
-//            OPDE.fatal(e);
-//        }
-
         String title = "<html><table border=\"0\">" +
                 "<tr>" +
-                (stock.isClosed() ? "<s>" : "") +
-                "<td width=\"600\" align=\"left\">" + MedStockTools.getAsHTML(stock) + "</td>" +
-//                "<td width=\"200\" align=\"right\">" + NumberFormat.getNumberInstance().format(sumStock) + " " + DosageFormTools.getPackageText(MedInventoryTools.getForm(stock.getInventory())) + "</td>" +
-//                (stock.isClosed() ? "</s>" : "") +
+                "<td width=\"600\" align=\"left\">" + MedStockTools.getAsHTML(stock) + " (" + ResidentTools.getNameAndFirstname(stock.getInventory().getResident()) +  ")</td>" +
                 "</tr>" +
                 "</table>" +
 
@@ -490,18 +478,6 @@ public class PnlWelcome extends CleanablePanel {
                 OPDE.getMainframe().setPanelTo(new PnlCare(stock.getInventory().getResident(), jspSearch));
             }
         });
-
-
-//        if (qProcess.isRevisionPastDue()) {
-//            cptitle.getButton().setIcon(SYSConst.icon22ledRedOn);
-//        } else if (qProcess.isRevisionDue()) {
-//            cptitle.getButton().setIcon(SYSConst.icon22ledYellowOn);
-//        } else if (qProcess.isClosed()) {
-//            cptitle.getButton().setIcon(SYSConst.icon22stopSign);
-//        } else {
-//            cptitle.getButton().setIcon(SYSConst.icon22ledGreenOn);
-//        }
-//        cptitle.getButton().setVerticalTextPosition(SwingConstants.TOP);
 
         return cptitle;
     }

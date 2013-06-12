@@ -504,6 +504,33 @@ public class PrescriptionTools {
         return result;
     }
 
+    public static String getShortDescriptionAsCompactText(Prescription prescription) {
+        String result = "";
+
+        if (!prescription.hasMed()) {
+            result += prescription.getIntervention().getBezeichnung();
+        } else {
+            MedInventory inventory = TradeFormTools.getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm());
+            MedStock stockInUse = prescription.isClosed() ? null : MedStockTools.getStockInUse(inventory);
+
+            if (stockInUse != null) {
+                result += stockInUse.getTradeForm().getMedProduct().getText()
+                        + (stockInUse.getTradeForm().getSubtext().isEmpty() ? "" : " " + stockInUse.getTradeForm().getSubtext()) +
+                        SYSTools.left(
+                                (stockInUse.getTradeForm().getDosageForm().getPreparation().isEmpty() ? "" : " " + stockInUse.getTradeForm().getDosageForm().getPreparation()) + " " +
+                                        (prescription.getTradeForm().getDosageForm().getUsageText().isEmpty() ? SYSConst.UNITS[prescription.getTradeForm().getDosageForm().getUsageUnit()] : prescription.getTradeForm().getDosageForm().getUsageText()), 4, ".");
+
+            } else {
+                result += prescription.getTradeForm().getMedProduct().getText()
+                        + (prescription.getTradeForm().getSubtext().isEmpty() ? "" : " " + prescription.getTradeForm().getSubtext()) +
+                        SYSTools.left(
+                                (prescription.getTradeForm().getDosageForm().getPreparation().isEmpty() ? "" : " " + prescription.getTradeForm().getDosageForm().getPreparation()) + " " +
+                                        (prescription.getTradeForm().getDosageForm().getUsageText().isEmpty() ? SYSConst.UNITS[prescription.getTradeForm().getDosageForm().getUsageUnit()] : prescription.getTradeForm().getDosageForm().getUsageText()), 4, ".");
+            }
+        }
+        return result;
+    }
+
     public static Phrase getShortDescriptionAsPhrase(Prescription prescription) {
         Phrase phrase = new Phrase();
 
@@ -571,7 +598,6 @@ public class PrescriptionTools {
     }
 
 
-
     public static String getLongDescription(Prescription presription) {
         String result = "<div id=\"fonttext\">";// = SYSConst.html_fontface;
 
@@ -607,34 +633,20 @@ public class PrescriptionTools {
             } else {
                 result = TradeFormTools.toPrettyHTML(presription.getTradeForm());
             }
-
-
         }
         return result + "</div>";
     }
 
-    public static String getPrescriptionAsShortText(Prescription verordnung) {
-        String result = "";
-
-//        if (verordnung.isClosed()) {
-//            result += "<s>"; // Abgesetzte
+//    public static String getPrescriptionAsShortText(Prescription verordnung) {
+//        String result = "";
+//        if (!verordnung.hasMed()) {
+//            result += verordnung.getIntervention().getBezeichnung();
+//        } else {
+//            result += verordnung.getTradeForm().getMedProduct().getText()
+//                    + (verordnung.getTradeForm().getSubtext().isEmpty() ? "" : " " + verordnung.getTradeForm().getSubtext());
 //        }
-        if (!verordnung.hasMed()) {
-            result += verordnung.getIntervention().getBezeichnung();
-        } else {
-
-
-            result += verordnung.getTradeForm().getMedProduct().getText()
-                    + (verordnung.getTradeForm().getSubtext().isEmpty() ? "" : " " + verordnung.getTradeForm().getSubtext());
-
-
-        }
-//        if (verordnung.isClosed()) {
-//            result += "</s>"; // Abgesetzte
-//        }
-
-        return result;
-    }
+//        return result;
+//    }
 
     public static String getRemark(Prescription verordnung) {
         String result = "<div id=\"fonttext\">";
@@ -649,53 +661,73 @@ public class PrescriptionTools {
         return result + "</div>";
     }
 
-    public static String getON(Prescription verordnung) {
-        String result = "<div id=\"fonttext\">";
-        String datum = DateFormat.getDateInstance().format(verordnung.getFrom());
+//    public static String getON(Prescription verordnung) {
+//        String result = "<div id=\"fonttext\">";
+//        String datum = DateFormat.getDateInstance().format(verordnung.getFrom());
+//
+//        result += "<font color=\"green\">" + datum + "; ";
+//        if (verordnung.getHospitalON() != null) {
+//            result += verordnung.getHospitalON().getName();
+//        }
+//        if (verordnung.getDocON() != null) {
+//            if (verordnung.getHospitalON() != null) {
+//                result += " <i>" + OPDE.lang.getString("misc.msg.confirmedby") + ":</i> ";
+//            }
+//            result += verordnung.getDocON().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getDocON().getName(), SYSTools.INDEX_LASTNAME);
+//        }
+//        result += "; " + verordnung.getUserON().getFullname() + "</font>";
+//
+//        return result + "</div>";
+//    }
+//
+//    public static String getOFF(Prescription verordnung) {
+//        String result = "<div id=\"fonttext\">";
+//
+//        if (verordnung.isLimited()) {
+//            String datum = DateFormat.getDateInstance().format(verordnung.getTo());
+//
+//            result += "<font color=\"" + (verordnung.isClosed() ? "red" : "lime") + "\">" + datum + "; ";
+//
+//            result += verordnung.getHospitalOFF() != null ? verordnung.getHospitalOFF().getName() : "";
+//
+//            if (verordnung.getDocOFF() != null) {
+//                if (verordnung.getHospitalOFF() != null) {
+//                    result += " <i>" + OPDE.lang.getString("misc.msg.confirmedby") + ":</i> ";
+//                }
+//                result += verordnung.getDocOFF().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getDocOFF().getName(), SYSTools.INDEX_LASTNAME);
+//            }
+//            result += "; " + verordnung.getUserOFF().getFullname() + "</font>";
+//
+//        }
+//        return result + "</div>";
+//    }
 
-        result += "<font color=\"green\">" + datum + "; ";
-        if (verordnung.getHospitalON() != null) {
-            result += verordnung.getHospitalON().getName();
+    public static String getDoseAsHTML(Prescription prescription) {
+        return getDoseAsHTML(prescription, false);
+    }
+
+    public static String getDoseAsCompactText(Prescription prescription) {
+        String result = "";
+        if (prescription.getPrescriptionSchedule().size() > 1) {
+            Collections.sort(prescription.getPrescriptionSchedule());
         }
-        if (verordnung.getDocON() != null) {
-            if (verordnung.getHospitalON() != null) {
-                result += " <i>" + OPDE.lang.getString("misc.msg.confirmedby") + ":</i> ";
+        Iterator<PrescriptionSchedule> schedules = prescription.getPrescriptionSchedule().iterator();
+
+        if (schedules.hasNext()) {
+            while (schedules.hasNext()) {
+                PrescriptionSchedule schedule = schedules.next();
+                result += PrescriptionScheduleTools.getDoseAsCompactText(schedule) + "; ";
             }
-            result += verordnung.getDocON().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getDocON().getName(), SYSTools.INDEX_LASTNAME);
+            result = result.substring(0, result.length() - 2);
+        } else {
+            result += OPDE.lang.getString("nursingrecords.prescription.noDosageYet");
         }
-        result += "; " + verordnung.getUserON().getFullname() + "</font>";
 
-        return result + "</div>";
+        return result;
     }
 
-    public static String getOFF(Prescription verordnung) {
-        String result = "<div id=\"fonttext\">";
-
-        if (verordnung.isLimited()) {
-            String datum = DateFormat.getDateInstance().format(verordnung.getTo());
-
-            result += "<font color=\"" + (verordnung.isClosed() ? "red" : "lime") + "\">" + datum + "; ";
-
-            result += verordnung.getHospitalOFF() != null ? verordnung.getHospitalOFF().getName() : "";
-
-            if (verordnung.getDocOFF() != null) {
-                if (verordnung.getHospitalOFF() != null) {
-                    result += " <i>" + OPDE.lang.getString("misc.msg.confirmedby") + ":</i> ";
-                }
-                result += verordnung.getDocOFF().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getDocOFF().getName(), SYSTools.INDEX_LASTNAME);
-            }
-            result += "; " + verordnung.getUserOFF().getFullname() + "</font>";
-
-        }
-        return result + "</div>";
-    }
-
-    public static String getDose(Prescription prescription) {
-        return getDose(prescription, false);
-    }
-
-    public static String getDose(Prescription prescription, boolean showInventory) {
-//        long timestart = System.currentTimeMillis();
+    public static String getDoseAsHTML(Prescription prescription, boolean showInventory) {
+        //        long timestart = System.currentTimeMillis();
         String result = "";
         if (prescription.getPrescriptionSchedule().size() > 1) {
             Collections.sort(prescription.getPrescriptionSchedule());
@@ -711,14 +743,14 @@ public class PrescriptionTools {
                 result += PrescriptionScheduleTools.getDoseAsHTML(planung, vorherigePlanung, false);
                 vorherigePlanung = planung;
             }
-            if (PrescriptionScheduleTools.getTerminStatus(planung) != PrescriptionScheduleTools.MAXDOSIS) {
+            if (PrescriptionScheduleTools.getTerminStatus(planung) != PrescriptionScheduleTools.MAXDOSE) {
                 // Wenn die letzte Planung eine Tabelle benötigte (das tut sie dann, wenn
                 // es keine Bedarfsverordnung war), dann müssen wir die Tabelle hier noch
                 // schließen.
                 result += "</table>";
             }
         } else {
-            result += "<i>" + OPDE.lang.getString(PnlPrescription.internalClassID + ".noDosageYet") + "</i><br/>";
+            result += "<i>" + OPDE.lang.getString("nursingrecords.prescription.noDosageYet") + "</i><br/>";
         }
 
         result += showInventory ? getInventoryInformationAsHTML(prescription) : "";
@@ -868,19 +900,32 @@ public class PrescriptionTools {
         return result;
     }
 
+    public static ArrayList<Prescription> getAllActiveRegularMedsOnly(Resident resident) {
+        EntityManager em = OPDE.createEM();
+
+        ArrayList<Prescription> result = null;
+        Query query = em.createQuery(" SELECT p FROM Prescription p WHERE p.resident = :resident AND p.situation IS NULL AND p.tradeform IS NOT NULL AND p.to >= :now");
+        query.setParameter("resident", resident);
+        query.setParameter("now", new Date());
+        result = new ArrayList<Prescription>(query.getResultList());
+
+        em.close();
+        return result;
+    }
+
     public static ArrayList<Prescription> getAllActiveByFlag(Resident resident, int flag) {
-            EntityManager em = OPDE.createEM();
+        EntityManager em = OPDE.createEM();
 
-            ArrayList<Prescription> result = null;
-            Query query = em.createQuery(" SELECT p FROM Prescription p WHERE p.resident = :resident AND p.to >= :now AND p.intervention.flag = :flag");
-            query.setParameter("resident", resident);
-            query.setParameter("now", new Date());
-            query.setParameter("flag", flag);
-            result = new ArrayList<Prescription>(query.getResultList());
+        ArrayList<Prescription> result = null;
+        Query query = em.createQuery(" SELECT p FROM Prescription p WHERE p.resident = :resident AND p.to >= :now AND p.intervention.flag = :flag");
+        query.setParameter("resident", resident);
+        query.setParameter("now", new Date());
+        query.setParameter("flag", flag);
+        result = new ArrayList<Prescription>(query.getResultList());
 
-            em.close();
-            return result;
-        }
+        em.close();
+        return result;
+    }
 
     /**
      * Dieser Query ordnet Verordnungen den Vorräten zu. Dazu ist ein kleiner Trick nötig. Denn über die Zeit können verschiedene Vorräte mit verschiedenen
@@ -922,7 +967,7 @@ public class PrescriptionTools {
 
                     result += "<tr>";
                     result += "<td valign=\"top\">" + (withIcon && myprescription.isClosed() ? SYSConst.html_22x22_StopSign : "") + getLongDescription(myprescription) + "</td>";
-                    result += "<td valign=\"top\">" + getDose(myprescription, withmed) + "<br/>";
+                    result += "<td valign=\"top\">" + getDoseAsHTML(myprescription, withmed) + "<br/>";
                     result += getRemark(myprescription) + "</td>";
                     result += "<td valign=\"top\">" + myprescription.getPITAsHTML();
 

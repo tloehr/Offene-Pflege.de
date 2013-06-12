@@ -23,7 +23,7 @@ public class MedProductsTools {
                     text = SYSTools.toHTML("<i>Keine Auswahl</i>");
                 } else if (o instanceof MedProducts) {
                     MedProducts produkt = (MedProducts) o;
-                    text = produkt.getText();
+                    text = produkt.getText() + " ["+produkt.getACME().getName()+"]";
                 } else {
                     text = o.toString();
                 }

@@ -41,7 +41,7 @@ public class InterventionScheduleTools {
         if (previousState > -1 && headerNeeded) {
             // noch den Footer vom letzten Durchgang dabei. Aber nur, wenn nicht
             // der erste Durchlauf, ein Wechsel stattgefunden hat und der
-            // vorherige Zustand nicht MAXDOSIS war, das braucht nämlich keinen Footer.
+            // vorherige Zustand nicht MAXDOSE war, das braucht nämlich keinen Footer.
             result += "</table>";
         }
         previousState = currentState;

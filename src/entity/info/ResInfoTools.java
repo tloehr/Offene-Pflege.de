@@ -308,6 +308,17 @@ public class ResInfoTools {
 
     }
 
+    public static String getContentAsPlainText(ResInfo resInfo) {
+            ArrayList result = parseResInfo(resInfo);
+
+            DefaultMutableTreeNode struktur = (DefaultMutableTreeNode) result.get(0);
+            Properties content = (Properties) result.get(1);
+            ArrayList<RiskBean> scaleriskmodel = (ArrayList<RiskBean>) result.get(2);
+
+            return toPlainText(struktur, content, scaleriskmodel);
+
+        }
+
     private static String toHTML(DefaultMutableTreeNode struktur, Properties content, ArrayList<RiskBean> scaleriskmodel) {
         BigDecimal scalesum = null;
         String html = "<ul>";
@@ -338,7 +349,7 @@ public class ResInfoTools {
                                     if (infonode.getTagName().equalsIgnoreCase("scalegroup")) {
                                         scalesum = scalesum == null ? thisNode.getScore() : scalesum.add(thisNode.getScore());
 //                                        Double score = (Double) ((Object[]) thisNode.getUserObject())[3];
-                                        html += "<li><b>" + infonode.getLabel() + ":</b> " + text + " (Risikowert: " + thisNode.getScore().setScale(2, BigDecimal.ROUND_UP).toPlainString() + ")</li>";
+                                        html += "<li><b>" + infonode.getLabel() + ":</b> " + text + " (" + OPDE.lang.getString("misc.msg.scaleriskvalue") + ": " + thisNode.getScore().setScale(2, BigDecimal.ROUND_UP).toPlainString() + ")</li>";
 //                                        scalesum += score;
                                     } else {
                                         html += "<li><b>" + infonode.getLabel() + ":</b> " + text + "</li>";
@@ -354,8 +365,26 @@ public class ResInfoTools {
                             }
                         }
                     }
-                    if (infonode.getTagName().equalsIgnoreCase("bodyscheme")){
-                        // TODO: hier gehts weiter. Körperstellen raussuchen
+                    if (infonode.getTagName().equalsIgnoreCase("bodyscheme")) {
+                        ArrayList<String> bodyparts = new ArrayList<String>();
+                        for (String key : content.stringPropertyNames()) {
+                            if (key.startsWith(infonode.getName())) {
+                                bodyparts.add(key.substring(4));
+                            }
+                        }
+
+                        if (!bodyparts.isEmpty()) {
+                            // + " " + OPDE.lang.getString("misc.msg.for")+
+                            html += "<li><b>" + OPDE.lang.getString("misc.msg.bodylocations") + ":</b> ";
+                            html += "<ul>";
+                            for (String bodykey : bodyparts) {
+                                html += "<li>" + OPDE.lang.getString(bodykey) + "</li>";
+                            }
+                            html += "</ul>";
+                            html += "</li>";
+                        }
+
+
                     }
                 } else { // TABGROUPS, weil ist kein Blatt (Leaf)
                     // nur anzeigen, wenn es mindestens eine angekreuzte Checkbox in dieser TABGROUP gibt.
@@ -372,7 +401,7 @@ public class ResInfoTools {
             // nun noch die Einschätzung des Risikos
             // Bezeichnung und Farbe
 
-            String risiko = "unbekanntes Risiko";
+            String risiko = OPDE.lang.getString("misc.msg.scalerisk.unknown");
             String color = "black";
             for (RiskBean risk : scaleriskmodel) {
                 if (risk.getFrom().compareTo(scalesum) <= 0 && scalesum.compareTo(risk.getTo()) <= 0) {
@@ -381,9 +410,101 @@ public class ResInfoTools {
                     break;
                 }
             }
-            html += "<b><font color=\"" + color + "\">Risiko-Einschätzung: " + scalesum + " (" + risiko + ")</font></b><br/>";
+            html += "<b><font color=\"" + color + "\">" + OPDE.lang.getString("misc.msg.scalerisk.rating") + ": " + scalesum + " (" + risiko + ")</font></b><br/>";
         }
         return html;
+    }
+
+    private static String toPlainText(DefaultMutableTreeNode struktur, Properties content, ArrayList<RiskBean> scaleriskmodel) {
+        BigDecimal scalesum = null;
+        String plaintext = "";
+        if (!content.isEmpty()) {
+            Enumeration en = struktur.children();
+
+            while (en.hasMoreElements()) {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) en.nextElement();
+                InfoTreeNodeBean infonode = (InfoTreeNodeBean) node.getUserObject();
+                String value = SYSTools.catchNull(content.getProperty(infonode.getName()));
+
+                if (node.isLeaf()) {
+                    if (!value.isEmpty() && !value.equalsIgnoreCase("false")) {
+                        if (value.equalsIgnoreCase("true")) {
+                            plaintext += infonode.getLabel() + ", ";
+                        } else {
+                            if (!value.equalsIgnoreCase("tnz")) {
+                                OPDE.debug(infonode.getName());
+                                if (!infonode.getName().equalsIgnoreCase("hauf") && (infonode.getTagName().equalsIgnoreCase("optiongroup") || infonode.getTagName().equalsIgnoreCase("scalegroup") || infonode.getTagName().equalsIgnoreCase("combobox"))) {
+                                    InfoTreeNodeBean thisNode = null;
+                                    try {
+                                        thisNode = (InfoTreeNodeBean) findNameInTree(struktur, value).getUserObject();
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                        System.exit(1);
+                                    }
+                                    String text = SYSTools.catchNull(thisNode.getLabel());
+                                    if (infonode.getTagName().equalsIgnoreCase("scalegroup")) {
+                                        scalesum = scalesum == null ? thisNode.getScore() : scalesum.add(thisNode.getScore());
+                                        //                                        Double score = (Double) ((Object[]) thisNode.getUserObject())[3];
+                                        plaintext += infonode.getLabel() + ": " + text + " (" + OPDE.lang.getString("misc.msg.scaleriskvalue") + ": " + thisNode.getScore().setScale(2, BigDecimal.ROUND_UP).toPlainString() + "); ";
+                                        //                                        scalesum += score;
+                                    } else {
+                                        plaintext += infonode.getLabel() + ": " + text + "; ";
+                                    }
+                                } else {
+                                    if (infonode.getName().equalsIgnoreCase("java")) {
+                                        plaintext += value;
+                                        content.remove(infonode.getName());
+                                    } else {
+                                        plaintext += infonode.getLabel() + ": " + value + "; ";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (infonode.getTagName().equalsIgnoreCase("bodyscheme")) {
+                        ArrayList<String> bodyparts = new ArrayList<String>();
+                        for (String key : content.stringPropertyNames()) {
+                            if (key.startsWith(infonode.getName())) {
+                                bodyparts.add(key.substring(4));
+                            }
+                        }
+
+                        if (!bodyparts.isEmpty()) {
+                            // + " " + OPDE.lang.getString("misc.msg.for")+
+                            plaintext += OPDE.lang.getString("misc.msg.bodylocations") + ": ";
+                            for (String bodykey : bodyparts) {
+                                plaintext += OPDE.lang.getString(bodykey) + ", ";
+                            }
+                            plaintext = plaintext.substring(0, plaintext.length()-2)+"; ";
+                        }
+
+
+                    }
+                } else { // TABGROUPS, weil ist kein Blatt (Leaf)
+                    // nur anzeigen, wenn es mindestens eine angekreuzte Checkbox in dieser TABGROUP gibt.
+                    if (treeHasTrueCheckboxes(node, content)) {
+                        plaintext += infonode.getLabel() + ": " + toPlainText(node, content, null) + "; ";
+                    }
+                }
+
+            } // while
+//            plaintext += "; ";
+        }
+
+        if (scaleriskmodel != null && scalesum != null) {
+            // nun noch die Einschätzung des Risikos
+            // Bezeichnung und Farbe
+
+            String risiko = OPDE.lang.getString("misc.msg.scalerisk.unknown");
+            for (RiskBean risk : scaleriskmodel) {
+                if (risk.getFrom().compareTo(scalesum) <= 0 && scalesum.compareTo(risk.getTo()) <= 0) {
+                    risiko = risk.getLabel();
+                    break;
+                }
+            }
+            plaintext += OPDE.lang.getString("misc.msg.scalerisk.rating") + ": " + scalesum + " (" + risiko + "); ";
+        }
+        return plaintext.substring(0, plaintext.length() - 2);
     }
 
     private static boolean treeHasTrueCheckboxes(DefaultMutableTreeNode tree, Properties content) {

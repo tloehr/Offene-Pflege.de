@@ -57,6 +57,7 @@ import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -260,7 +261,7 @@ public class DlgOnDemand extends MyJDialog {
     }
 
     private void txtEDosisFocusLost(FocusEvent e) {
-        SYSTools.handleBigDecimalFocusLost(e, BigDecimal.ONE, new BigDecimal(1000), BigDecimal.ONE);
+        SYSTools.handleBigDecimalFocusLost(e, new BigDecimal(BigInteger.ZERO), new BigDecimal(1000), BigDecimal.ONE);
     }
 
     private void txtEDosisActionPerformed(ActionEvent e) {

@@ -82,13 +82,13 @@ public class PnlCare extends NursingRecordsPanel {
         jtpPflegeakteStateChanged(null);
 
 
-        EntityManager em = OPDE.createEM();
-        ResInfo info = em.find(ResInfo.class, 20149l);
-        em.close();
-
-        OPDE.debug(ResInfoTools.getContentAsHTML(info));
-
-
+//        EntityManager em = OPDE.createEM();
+//        ResInfo info = em.find(ResInfo.class, 20149l);
+//        em.close();
+//
+//        OPDE.debug(ResInfoTools.getContentAsHTML(info));
+//
+//
 
     }
 

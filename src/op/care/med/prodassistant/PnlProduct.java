@@ -4,7 +4,6 @@
 
 package op.care.med.prodassistant;
 
-import java.awt.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.prescription.MedProducts;
@@ -22,12 +21,14 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * @author Torsten Löhr
  */
 public class PnlProduct extends JPanel {
-    public static final String internalClassID = MedProductWizard.internalClassID+".product";
+    public static final String internalClassID = MedProductWizard.internalClassID + ".product";
     private java.util.List listProd;
     private MedProducts produkt;
     private Closure validate;
@@ -44,7 +45,7 @@ public class PnlProduct extends JPanel {
 
     private void initPanel() {
         lblProdMsg.setVisible(false);
-        lblProdMsg.setText(OPDE.lang.getString(internalClassID+".existingProducts"));
+        lblProdMsg.setText(OPDE.lang.getString(internalClassID + ".existingProducts"));
         jsp1.setVisible(false);
         lstProd.setVisible(false);
         txtProd.setText(template);
@@ -58,23 +59,23 @@ public class PnlProduct extends JPanel {
         em.close();
 
         if (!listProd.isEmpty()) {
-            if (listProd.size() == 1 && ((MedProducts) listProd.get(0)).getText().equalsIgnoreCase(txtProd.getText().trim())) {
-                // Die Eingabe des Produktnamens entspricht GENAU einem bestehenden Produkt. Dann muss das das gleiche sein.
-                produkt = (MedProducts) listProd.get(0);
-                lblProdMsg.setVisible(false);
-                jsp1.setVisible(false);
-                lstProd.setVisible(false);
-                validate.execute(produkt);
-            } else {
-                lblProdMsg.setVisible(true);
-                jsp1.setVisible(true);
-                lstProd.setVisible(true);
-                listProd.add(0, "<html><b>" + OPDE.lang.getString("misc.msg.noneOfThem") + "</b></html>");
-                DefaultListModel lmProd;
-                lmProd = SYSTools.list2dlm(listProd);
-                lstProd.setModel(lmProd);
-                lstProd.setCellRenderer(MedProductsTools.getMedProdukteRenderer());
-            }
+//            if (listProd.size() == 1 && ((MedProducts) listProd.get(0)).getText().equalsIgnoreCase(txtProd.getText().trim())) {
+//                // Die Eingabe des Produktnamens entspricht GENAU einem bestehenden Produkt. Dann muss das das gleiche sein.
+//                produkt = (MedProducts) listProd.get(0);
+//                lblProdMsg.setVisible(false);
+//                jsp1.setVisible(false);
+//                lstProd.setVisible(false);
+//                validate.execute(produkt);
+//            } else {
+            lblProdMsg.setVisible(true);
+            jsp1.setVisible(true);
+            lstProd.setVisible(true);
+            listProd.add(0, "<html><b>" + OPDE.lang.getString("misc.msg.noneOfThem") + "</b></html>");
+            DefaultListModel lmProd;
+            lmProd = SYSTools.list2dlm(listProd);
+            lstProd.setModel(lmProd);
+            lstProd.setCellRenderer(MedProductsTools.getMedProdukteRenderer());
+//            }
         } else {
             produkt = txtProd.getText().trim().isEmpty() ? null : new MedProducts(txtProd.getText().trim());
             lblProdMsg.setVisible(false);
@@ -100,7 +101,6 @@ public class PnlProduct extends JPanel {
     }
 
 
-
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         txtProd = new JXSearchField();
@@ -112,8 +112,8 @@ public class PnlProduct extends JPanel {
         //======== this ========
         setPreferredSize(new Dimension(610, 198));
         setLayout(new FormLayout(
-            "2*(default, $lcgap), default:grow, $lcgap, default",
-            "2*(default), $ugap, default, $lgap, default:grow, $lgap, default"));
+                "2*(default, $lcgap), default:grow, $lcgap, default",
+                "2*(default), $ugap, default, $lgap, default:grow, $lgap, default"));
 
         //---- txtProd ----
         txtProd.setFont(new Font("Arial", Font.PLAIN, 14));
