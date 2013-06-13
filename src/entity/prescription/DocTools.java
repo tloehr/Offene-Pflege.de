@@ -47,6 +47,17 @@ public class DocTools {
         }
     }
 
+    public static String getCompleteAddress(Doc doc) {
+        if (doc != null) {
+            if (OPDE.isAnonym()) {
+                return "[" + OPDE.lang.getString("misc.msg.anon") + "]";
+            }
+            return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitle(), "", " ") + doc.getFirstname() + " " + doc.getName() + ", " + doc.getStreet() + ", " + doc.getZIP() + " " + doc.getCity() + ", Tel: " + doc.getTel();
+        } else {
+            return OPDE.lang.getString("misc.msg.noentryyet");
+        }
+    }
+
 
     public static ArrayList<Doc> getAllActive() {
         EntityManager em = OPDE.createEM();

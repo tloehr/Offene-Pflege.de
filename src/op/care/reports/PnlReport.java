@@ -80,6 +80,7 @@ public class PnlReport extends NursingRecordsPanel {
     private JToggleButton tbShowReplaced;
     private JComboBox cmbTags;
 
+    //TODO: synchronize this!
     private HashMap<String, CollapsiblePane> cpMap;
     private HashMap<String, JPanel> contentmap;
     private HashMap<String, ArrayList<NReport>> valuecache;

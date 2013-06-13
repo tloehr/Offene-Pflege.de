@@ -3,9 +3,11 @@ package entity.info;
 import com.itextpdf.text.*;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.pdf.*;
+import entity.HomesTools;
 import entity.files.SYSFilesTools;
 import entity.nursingprocess.*;
 import entity.prescription.*;
+import entity.system.UsersTools;
 import entity.values.ResValueTools;
 import op.OPDE;
 import op.care.info.PnlBodyScheme;
@@ -41,27 +43,29 @@ public class TXEssenDoc1 {
     private ArrayList<ResInfo> listICD;
     private HashMap<Integer, ResInfo> mapID2Info;
 
-    private final Font pdf_font_small = new Font(Font.FontFamily.HELVETICA, 6);
-    private final Font pdf_font_small_bold = new Font(Font.FontFamily.HELVETICA, 6, Font.BOLD);
+    private final Font pdf_font_small = new Font(Font.FontFamily.HELVETICA, 8);
+    private final Font pdf_font_small_bold = new Font(Font.FontFamily.HELVETICA, 8, Font.BOLD);
     private final Font pdf_font_normal_bold = new Font(Font.FontFamily.HELVETICA, 9, Font.BOLD);
     private PdfContentByte over = null;
     private PdfWriter writer = null;
     PdfStamper stamper = null;
+    ByteArrayOutputStream medListStream = null;
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+    File outfile1, outfileMRE, outfileDementia, outfileMain;
 
 
-    public static final String[] PARTS = new String[]{"head.left.side", "shoulder.left.side", "upper.back.left.side", "ellbow.side.left", "hand.left.side", "hip.left.side", "bottom.left.side", "upper.leg.left.side",
-            "lower.leg.left.side", "calf.left.side", "heel.left.side", "face", "shoulder.front.right", "shoulder.front.left", "upper.belly", "crook.arm.right",
-            "crook.arm.left", "lower.belly", "groin", "upper.leg.right.front", "upper.leg.left.front", "knee.right", "knee.left", "shin.right.front", "shin.left.front",
-            "foot.right.front", "foot.left.front", "back.of.the.head", "shoulder.back.left", "shoulder.back.right", "back.mid", "ellbow.left",
-            "ellbow.right", "back.low", "bottom.back", "upper.leftleg.back", "upper.rightleg.back", "knee.hollowleft", "knee.hollowright", "calf.leftback",
-            "calf.rightback", "foot.leftback", "foot.rightback", "head.right.side", "shoulder.right.side", "back.upper.left.side", "ellbow.rightside",
-            "hand.right.side", "hip.right.side", "bottom.right.side", "upper.leg.right.side", "lower.leg.right.side", "calf.right.side", "heel.right.side"};
-
+//    public static final String[] PARTS = new String[]{"head.left.side", "shoulder.left.side", "upper.back.left.side", "ellbow.side.left", "hand.left.side", "hip.left.side", "bottom.left.side", "upper.leg.left.side",
+//            "lower.leg.left.side", "calf.left.side", "heel.left.side", "face", "shoulder.front.right", "shoulder.front.left", "upper.belly", "crook.arm.right",
+//            "crook.arm.left", "lower.belly", "groin", "upper.leg.right.front", "upper.leg.left.front", "knee.right", "knee.left", "shin.right.front", "shin.left.front",
+//            "foot.right.front", "foot.left.front", "back.of.the.head", "shoulder.back.left", "shoulder.back.right", "back.mid", "ellbow.left",
+//            "ellbow.right", "back.low", "bottom.back", "upper.leftleg.back", "upper.rightleg.back", "knee.hollowleft", "knee.hollowright", "calf.leftback",
+//            "calf.rightback", "foot.leftback", "foot.rightback", "head.right.side", "shoulder.right.side", "back.upper.left.side", "ellbow.rightside",
+//            "hand.right.side", "hip.right.side", "bottom.right.side", "upper.leg.right.side", "lower.leg.right.side", "calf.right.side", "heel.right.side"};
+//
 
     public TXEssenDoc1(Resident resident) {
         this.resident = resident;
         content = new HashMap<String, String>();
-//        listAllInfos.addAll(ResInfoTools.getAll(resident));
         listICD = new ArrayList<ResInfo>();
         mapID2Info = new HashMap<Integer, ResInfo>();
         mapInfo2Properties = new HashMap<ResInfo, Properties>();
@@ -78,9 +82,12 @@ public class TXEssenDoc1 {
         }
 
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-            File stamperFile = new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TX_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
-            stamper = new PdfStamper(new PdfReader(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_TEMPLATES + File.separator + SOURCEFILENAME), new FileOutputStream(stamperFile));
+
+            outfile1 = new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TX1_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
+            outfileMRE = new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TXMRE_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
+            outfileDementia = new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TXDEM_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
+            stamper = new PdfStamper(new PdfReader(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_TEMPLATES + File.separator + SOURCEFILENAME), new FileOutputStream(outfile1));
+
 
             createContent4Section1();
             createContent4Section2();
@@ -116,10 +123,68 @@ public class TXEssenDoc1 {
             listICD.clear();
             content.clear();
 
-            SYSFilesTools.handleFile(stamperFile, Desktop.Action.OPEN);
+            concatPDFFiles();
+
+            SYSFilesTools.handleFile(outfileMain, Desktop.Action.OPEN);
         } catch (Exception e) {
             OPDE.fatal(e);
         }
+
+    }
+
+    /**
+     * concats all the parts and puts a unified pagenumbering on every page
+     *
+     * @throws Exception
+     */
+    private void concatPDFFiles() throws Exception {
+        outfileMain = new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TX_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
+
+
+        Document document = new Document(PageSize.A4, Utilities.millimetersToPoints(0), Utilities.millimetersToPoints(0), Utilities.millimetersToPoints(0), Utilities.millimetersToPoints(0));
+        PdfCopy copy = new PdfCopy(document, new FileOutputStream(outfileMain));
+        document.open();
+        int maxpages = 0;
+        int runningPage = 0;
+        PdfReader reader1 = new PdfReader(new FileInputStream(outfile1));
+        maxpages += reader1.getNumberOfPages();
+
+        PdfReader reader1a = medListStream == null ? null : new PdfReader(new ByteArrayInputStream(medListStream.toByteArray()));
+        maxpages += reader1a == null ? 0 : reader1a.getNumberOfPages();
+
+        PdfImportedPage page;
+        PdfCopy.PageStamp stamp;
+        for (int p = 1; p <= reader1.getNumberOfPages(); p++) {
+            runningPage++;
+            page = copy.getImportedPage(reader1, p);
+            stamp = copy.createPageStamp(page);
+            String sidenote = String.format(OPDE.lang.getString("pdf.pagefooter"), runningPage, maxpages)
+                    + " // " + ResidentTools.getLabelText(resident)
+                    + " // " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(new Date())
+                    + " // " + OPDE.lang.getString("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
+                    + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum();
+
+            ColumnText.showTextAligned(stamp.getUnderContent(), Element.ALIGN_CENTER, new Phrase(sidenote, pdf_font_small), Utilities.millimetersToPoints(207), Utilities.millimetersToPoints(260), 270);
+            stamp.alterContents();
+            copy.addPage(page);
+        }
+
+        if (reader1a != null) {
+            for (int p = 1; p <= reader1a.getNumberOfPages(); p++) {
+                runningPage++;
+                page = copy.getImportedPage(reader1a, p);
+                stamp = copy.createPageStamp(page);
+                String sidenote = String.format(OPDE.lang.getString("pdf.pagefooter"), runningPage, maxpages)
+                        + " // " + ResidentTools.getLabelText(resident)
+                        + " // " + OPDE.lang.getString("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
+                        + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum();
+                ColumnText.showTextAligned(stamp.getUnderContent(), Element.ALIGN_CENTER, new Phrase(sidenote, pdf_font_small), Utilities.millimetersToPoints(207), Utilities.millimetersToPoints(260), 270);
+                stamp.alterContents();
+                copy.addPage(page);
+            }
+        }
+
+        document.close();
 
     }
 
@@ -128,8 +193,6 @@ public class TXEssenDoc1 {
         for (String key : content.keySet()) {
             if (!ArrayUtils.contains(PnlBodyScheme.PARTS, key)) { // this is a special case. The bodyparts and the pdfkeys have the same name.
                 form.setField(key, content.get(key));
-
-
             }
         }
 
@@ -147,7 +210,7 @@ public class TXEssenDoc1 {
      * Contains also "1 Soziale Aspekte"
      */
     private void createContent4Section1() {
-        content.put(RESIDENT_GENDER, resident.getGender() == ResidentTools.MALE ? "1" : "0");
+        content.put(RESIDENT_GENDER, resident.getGender() == ResidentTools.MALE ? "0" : "1");
         content.put(RESIDENT_FIRSTNAME, resident.getFirstname());
         content.put(PAGE2_RESIDENT_FIRSTNAME, resident.getFirstname());
         content.put(RESIDENT_NAME, resident.getName());
@@ -156,6 +219,15 @@ public class TXEssenDoc1 {
         content.put(RESIDENT_DOB, DateFormat.getDateInstance().format(resident.getDOB()));
         content.put(PAGE2_RESIDENT_DOB, DateFormat.getDateInstance().format(resident.getDOB()));
         content.put(PAGE3_RESIDENT_DOB, DateFormat.getDateInstance().format(resident.getDOB()));
+
+        content.put(PAGE2_USERNAME, (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : ""));
+        content.put(PAGE3_USERNAME, (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : ""));
+
+        content.put(PAGE3_RESIDENT_GP, DocTools.getCompleteAddress(resident.getGP()));
+
+
+        content.put(PAGE1_LOGO_TEXTFIELD, HomesTools.getAsTextForTX(resident.getStation().getHome()));
+
         if (resident.isActive()) {
             content.put(RESIDENT_STREET, resident.getStation().getHome().getStreet());
             content.put(RESIDENT_CITY, resident.getStation().getHome().getCity());
@@ -497,6 +569,12 @@ public class TXEssenDoc1 {
      */
     private void createContent4Section10() {
         content.put(SPECIAL_MRE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_INFECTION, "multiresistant"), new String[]{"no", "yes", "notchecked"}));
+        String mre = getValue(ResInfoTypeTools.TYPE_INFECTION, "multiresistant");
+        if (mre.equalsIgnoreCase("no") || mre.equals("--")) {
+            content.put(NO_INFECTIONS_CERTIFIED, setCheckbox(true));
+            outfileMRE = new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TXMRE_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
+        }
+
         content.put(SPECIAL_YESNO_ALLERGY, setCheckbox(mapID2Info.containsKey(ResInfoTypeTools.TYPE_ALLERGY)));
         content.put(SPECIAL_ALLERGIEPASS, setCheckbox(getValue(ResInfoTypeTools.TYPE_ALLERGY, "allergiepass")));
         content.put(SPECIAL_COMMENT_ALLERGY, getValue(ResInfoTypeTools.TYPE_ALLERGY, "beschreibung"));
@@ -811,44 +889,58 @@ public class TXEssenDoc1 {
             line++;
         }
 
+        if (line >= 15) {
+            getAdditionMeds(listRegularMeds, line);
+        }
 
-        boolean needMoreRoom = line >= 15;
-
-        content.put(DOCS_ADDITIONALMEDSLIST, setCheckbox(needMoreRoom));
+        content.put(DOCS_ADDITIONALMEDSLIST, setCheckbox(medListStream != null));
 
         listFieldsOnPage3.clear();
 
     }
 
-    private void getAdditionMeds() {
+    private void getAdditionMeds(ArrayList<Prescription> listRegularMeds, int startAt) {
+        if (listRegularMeds.size() - 1 < startAt) return;
+
 
         try {
             Document document = new Document(PageSize.A4, Utilities.millimetersToPoints(10), Utilities.millimetersToPoints(10), Utilities.millimetersToPoints(20), Utilities.millimetersToPoints(20));
-            ByteArrayOutputStream streamDoc = new ByteArrayOutputStream();
-            PdfWriter.getInstance(document, streamDoc);
+            medListStream = new ByteArrayOutputStream();
+            PdfWriter.getInstance(document, medListStream);
             document.open();
 
-            Paragraph h1 = new Paragraph(new Phrase("HEADER!!", PDF.plain(PDF.sizeH1())));
+            Paragraph h1 = new Paragraph(new Phrase(OPDE.lang.getString("misc.msg.additional.medslist"), PDF.plain(PDF.sizeH1())));
             h1.setAlignment(Element.ALIGN_CENTER);
             document.add(h1);
 
-            Paragraph p = new Paragraph(SYSTools.xx("nursingrecords.prescription.dailyplan.warning"));
+            Paragraph p = new Paragraph(new Phrase(ResidentTools.getLabelText(resident)));
             p.setAlignment(Element.ALIGN_CENTER);
             document.add(p);
             document.add(Chunk.NEWLINE);
 
-            document.close();
 
+            PdfPTable table = new PdfPTable(new float[]{1, 1});
+            table.setTotalWidth(Utilities.millimetersToPoints(150));
+            table.setLockedWidth(true);
 
-            try {
-                PdfReader docReader = new PdfReader(streamDoc.toByteArray());
-                stamper.insertPage(4, PageSize.A4);
-                // Add the stationary to the new page
-                stamper.getUnderContent(4).addTemplate(, 0, 0);
-                // Add as much content of the column as possible
-            } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
+            table.addCell(PDF.cell("misc.msg.drug", PDF.bold(), Element.ALIGN_CENTER, Element.ALIGN_MIDDLE));
+            table.addCell(PDF.cell("misc.msg.dosage", PDF.bold(), Element.ALIGN_CENTER, Element.ALIGN_MIDDLE));
+            table.setHeaderRows(1);
+
+            table.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
+            table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_LEFT);
+
+            for (int pr = startAt; pr < listRegularMeds.size(); pr++) {
+
+                Prescription prescription = listRegularMeds.get(pr);
+
+                table.addCell(new Phrase(PrescriptionTools.getShortDescriptionAsCompactText(prescription)));
+                table.addCell(new Phrase(PrescriptionTools.getDoseAsCompactText(prescription)));
+
             }
+            document.add(table);
+            document.close();
 
         } catch (DocumentException d) {
 
@@ -1217,7 +1309,7 @@ public class TXEssenDoc1 {
     public static final String TX_RECIPIENT = "Formular1[0].#subform[0].#area[8].Überleitungsort[0]";
     public static final String TX_RECIPIENT_OTHER = "Formular1[0].#subform[0].SonstigeÜberleitungsorte[0]";
     public static final String TX_TIME = "Formular1[0].#subform[0].DatumsUhrzeitfeldÜberleitung[0]";
-    public static final String UPPER_BACK_LEFT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[24]";
+    public static final String BACK_UPPER_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[24]";
     public static final String UPPER_BELLY = "Formular1[0].#subform[1].Kontrollkästchen[43]";
     public static final String UPPER_LEFTLEG_BACK = "Formular1[0].#subform[1].Kontrollkästchen[17]";
     public static final String UPPER_LEG_LEFT_FRONT = "Formular1[0].#subform[1].Kontrollkästchen[45]";
@@ -1265,9 +1357,99 @@ public class TXEssenDoc1 {
     public static final String MEDS15 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Medication[8]";
     public static final String DOSAGE15 = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Dosage[6]";
     public static final String MEDS_WARNINGTEXT = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].Text1";
+    public static final String NO_INFECTIONS_CERTIFIED = "Formular1[0].Patientenüberleitung-Seite3[0].BescheinigungInfektionsschutzgesetz[0]";
+    public static final String DETAILED_REPORT_FOLLOWS = "Formular1[0].Patientenüberleitung-Seite3[0].Berichtfolgt[0]";
+    public static final String ATTACHMENT_OTHER = "Formular1[0].Patientenüberleitung-Seite3[0].Sonstiges[0]";
+    public static final String PAGE3_USERNAME = "Formular1[0].Patientenüberleitung-Seite3[0].Textfeld27[2]";
+    public static final String PAGE1_LOGO_TEXTFIELD = "Formular1[0].#subform[0].TextField2[0]";
+    public static final String PAGE3_LOGO_TEXTFIELD = "Formular1[0].Patientenüberleitung-Seite3[0].#area[0].TextField3[0]";
+    public static final String MRE_BACK_LOW = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[13]";
+    public static final String MRE_BACK_MID = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[12]";
+    public static final String MRE_BACK_OF_THE_HEAD = "topmostSubform[0].Page1[0].#subform[0].#area[0].GrafikKopf_hinten[0]";
+    public static final String MRE_BACK_UPPER_LEFT_SIDE = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[2]";
+    public static final String MRE_BOTTOM_BACK = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[9]";
+    public static final String MRE_BOTTOM_LEFT_SIDE = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[24]";
+    public static final String MRE_BOTTOM_RIGHT_SIDE = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[4]";
+    public static final String MRE_CALF_LEFTBACK = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[32]";
+    public static final String MRE_CALF_LEFTSIDE = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[26]";
+    public static final String MRE_CALF_RIGHT_SIDE = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[6]";
+    public static final String MRE_CALF_RIGHTBACK = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[30]";
+    public static final String MRE_CROOK_ARM_LEFT = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[35]";
+    public static final String MRE_CROOK_ARM_RIGHT = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[36]";
+    public static final String MRE_ELLBOW_LEFT = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[17]";
+    public static final String MRE_ELLBOW_RIGHT = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[18]";
+    public static final String MRE_ELLBOW_RIGHTSIDE = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[8]";
+    public static final String MRE_ELLBOW_SIDE_LEFT = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[29]";
+    public static final String MRE_FACE = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[38]";
+    public static final String MRE_FOOT_LEFT_FRONT = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[50]";
+    public static final String MRE_FOOT_LEFTBACK = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[34]";
+    public static final String MRE_FOOT_RIGHT_FRONT = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[49]";
+    public static final String MRE_FOOT_RIGHTBACK = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[33]";
+    public static final String MRE_GROIN = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[37]";
+    public static final String MRE_HAND_LEFT_SIDE = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[28]";
+    public static final String MRE_HAND_RIGHT_SIDE = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[52]";
+    public static final String MRE_HEAD_LEFT_SIDE = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[20]";
+    public static final String MRE_HEAD_RIGHT_SIDE = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[0]";
+    public static final String MRE_HEEL_LEFT_SIDE = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[27]";
+    public static final String MRE_HEEL_RIGHT_SIDE = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[7]";
+    public static final String MRE_HIP_LEFT_SIDE = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[23]";
+    public static final String MRE_HIP_RIGHT_SIDE = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[3]";
+    public static final String MRE_KNEE_HOLLOWLEFT = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[31]";
+    public static final String MRE_KNEE_HOLLOWRIGHT = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[16]";
+    public static final String MRE_KNEE_LEFT = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[45]";
+    public static final String MRE_KNEE_RIGHT = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[47]";
+    public static final String MRE_LOWER_BELLY = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[42]";
+    public static final String MRE_LOWER_LEG_LEFT_SIDE = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[25]";
+    public static final String MRE_LOWER_LEG_RIGHT_SIDE = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[5]";
+    public static final String MRE_SHIN_LEFT_FRONT = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[46]";
+    public static final String MRE_SHIN_RIGHT_FRONT = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[48]";
+    public static final String MRE_SHOULDER_BACK_LEFT = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[10]";
+    public static final String MRE_SHOULDER_BACK_RIGHT = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[11]";
+    public static final String MRE_SHOULDER_FRONT_LEFT = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[40]";
+    public static final String MRE_SHOULDER_FRONT_RIGHT = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[39]";
+    public static final String MRE_SHOULDER_LEFT_SIDE = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[21]";
+    public static final String MRE_SHOULDER_RIGHT_SIDE = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[1]";
+    public static final String MRE_BACK_UPPER_RIGHT_SIDE = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[22]";
+    public static final String MRE_UPPER_BELLY = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[41]";
+    public static final String MRE_UPPER_LEFTLEG_BACK = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[15]";
+    public static final String MRE_UPPER_LEG_LEFT_FRONT = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[43]";
+    public static final String MRE_UPPER_LEG_LEFT_SIDE = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[19]";
+    public static final String MRE_UPPER_LEG_RIGHT_FRONT = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[44]";
+    public static final String MRE_UPPER_LEG_RIGHT_SIDE = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[51]";
+    public static final String MRE_UPPER_RIGHTLEG_BACK = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[14]";
+    public static final String MRE_MRSA1 = "topmostSubform[0].Page1[0].#subform[0].CheckBox1[0]";
+    public static final String MRE_VRE = "topmostSubform[0].Page1[0].#subform[0].CheckBox1[1]";
+    public static final String MRE_LOCAL_NOSE = "topmostSubform[0].Page1[0].#subform[0].CheckBox1[10]";
+    public static final String MRE_LOCAL_OTHER = "topmostSubform[0].Page1[0].#subform[0].CheckBox1[11]";
+    public static final String MRE_ESBL = "topmostSubform[0].Page1[0].#subform[0].CheckBox1[2]";
+    public static final String MRE_LAB_CONFIRMED = "topmostSubform[0].Page1[0].#subform[0].CheckBox1[3]";
+    public static final String MRE_LAB_WAITING = "topmostSubform[0].Page1[0].#subform[0].CheckBox1[4]";
+    public static final String MRE_LOCAL_PHARYNX = "topmostSubform[0].Page1[0].#subform[0].CheckBox1[5]";
+    public static final String MRE_LOCAL_URINE = "topmostSubform[0].Page1[0].#subform[0].CheckBox1[6]";
+    public static final String MRE_LOCAL_RESPIRATION = "topmostSubform[0].Page1[0].#subform[0].CheckBox1[7]";
+    public static final String MRE_LOCAL_WOUND = "topmostSubform[0].Page1[0].#subform[0].CheckBox1[8]";
+    public static final String MRE_MRSA2 = "topmostSubform[0].Page1[0].#subform[0].CheckBox1[9]";
+    public static final String MRE_RESIDENT_HINSURANCE = "topmostSubform[0].Page1[0].#subform[0].TextField1[0]";
+    public static final String MRE_RESIDENT_PHONE = "topmostSubform[0].Page1[0].#subform[0].TextField1[1]";
+    public static final String MRE_LOGO_TEXTFIELD = "topmostSubform[0].Page1[0].#subform[0].TextField2[0]";
+    public static final String MRE_WOUND_TEXTFIELD = "topmostSubform[0].Page1[0].#subform[0].TextField3[0]";
+    public static final String MRE_OTHER_TEXTFIELD = "topmostSubform[0].Page1[0].#subform[0].TextField3[1]";
+    public static final String MRE_LAB_DATE = "topmostSubform[0].Page1[0].#subform[0].TextField3[2]";
+    public static final String MRE_MRE_TEXTFIELD = "topmostSubform[0].Page1[0].#subform[0].TextField3[3]";
+    public static final String MRE_TX_DATE = "topmostSubform[0].Page1[0].#subform[0].TextField3[4]";
+    public static final String MRE_TX_USERNAME = "topmostSubform[0].Page1[0].#subform[0].TextField3[5]";
+    public static final String MRE_RESIDENT_GENDER_MALE = "topmostSubform[0].Page1[0].CheckBox1[12]";
+    public static final String MRE_RESIDENT_GENDER_FEMALE = "topmostSubform[0].Page1[0].CheckBox1[13]";
+    public static final String MRE_RESIDENT_NAME = "topmostSubform[0].Page1[0].TextField1[2]";
+    public static final String MRE_RESIDENT_STREET = "topmostSubform[0].Page1[0].TextField1[3]";
+    public static final String MRE_RESIDENT_FIRSTNAME = "topmostSubform[0].Page1[0].TextField1[4]";
+    public static final String MRE_RESIDENT_DOB = "topmostSubform[0].Page1[0].TextField1[5]";
+    public static final String MRE_RESIDENT_ZIP = "topmostSubform[0].Page1[0].TextField1[6]";
+    public static final String MRE_RESIDENT_CITY = "topmostSubform[0].Page1[0].TextField1[7]";
 
 
-    public static final String[] PDFPARTS = new String[]{HEAD_LEFT_SIDE, SHOULDER_LEFT_SIDE, UPPER_BACK_LEFT_SIDE, ELLBOW_SIDE_LEFT, HAND_LEFT_SIDE, HIP_LEFT_SIDE, BOTTOM_LEFT_SIDE, UPPER_LEG_LEFT_SIDE,
+
+    public static final String[] PDFPARTS = new String[]{HEAD_LEFT_SIDE, SHOULDER_LEFT_SIDE, BACK_UPPER_RIGHT_SIDE, ELLBOW_SIDE_LEFT, HAND_LEFT_SIDE, HIP_LEFT_SIDE, BOTTOM_LEFT_SIDE, UPPER_LEG_LEFT_SIDE,
             LOWER_LEG_LEFT_SIDE, CALF_LEFTSIDE, HEEL_LEFT_SIDE, FACE, SHOULDER_FRONT_RIGHT, SHOULDER_FRONT_LEFT, UPPER_BELLY, CROOK_ARM_RIGHT,
             CROOK_ARM_LEFT, LOWER_BELLY, GROIN, UPPER_LEG_RIGHT_FRONT, UPPER_LEG_LEFT_FRONT, KNEE_RIGHT, KNEE_LEFT, SHIN_RIGHT_FRONT, SHIN_LEFT_FRONT,
             FOOT_RIGHT_FRONT, FOOT_LEFT_FRONT, BACK_OF_THE_HEAD, SHOULDER_BACK_LEFT, SHOULDER_BACK_RIGHT, BACK_MID, ELLBOW_LEFT,
