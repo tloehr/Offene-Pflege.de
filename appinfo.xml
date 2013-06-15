@@ -48,6 +48,11 @@
                javaclass="op.welcome.PnlWelcome" icon="home.png">
             <execute langbundle="appinfo.default.acl.execute"/>
         </class>
+        <class name="opde.dev" short="Developer"
+               long="Entwicklungswerkzeuge" main="true"
+               javaclass="op.dev.PnlDev" icon="developer1.png">
+            <execute langbundle="appinfo.default.acl.execute"/>
+        </class>
         <class name="nursingrecords.prescription" short="Pflegeakte/Verordnungen"
                long="Dieses Modul gehört zur Pflegedokumentation. Es ermöglicht die Verwaltung von ärztlichen Verordnungen.">
             <print langbundle="appinfo.default.acl.print"/>

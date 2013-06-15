@@ -54,6 +54,7 @@ import op.care.info.PnlInfo;
 import op.care.med.structure.PnlMed;
 import op.care.supervisor.PnlHandover;
 import op.controlling.PnlControlling;
+import op.dev.PnlDev;
 import op.process.PnlProcess;
 import op.settings.PnlSystemSettings;
 import op.settings.PnlUserSettings;
@@ -569,6 +570,8 @@ public class FrmMain extends JFrame {
             panel = new PnlSystemSettings(jspSearch);
         } else if (classname.equals("op.settings.PnlUserSettings")) {
             panel = new PnlUserSettings(jspSearch);
+        } else if (classname.equals("op.dev.PnlDev")) {
+            panel = new PnlDev();
         }
         return panel;
     }

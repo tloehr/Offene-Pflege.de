@@ -7,6 +7,7 @@ import entity.info.*;
 import op.OPDE;
 import op.care.sysfiles.PnlFiles;
 import op.system.FileDrop;
+import op.threads.DisplayMessage;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.TimingSource;
@@ -14,15 +15,20 @@ import org.jdesktop.core.animation.timing.TimingTargetAdapter;
 import org.jdesktop.core.animation.timing.interpolators.AccelerationInterpolator;
 import org.jdesktop.swing.animation.timing.sources.SwingTimerTimingSource;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyVetoException;
+import java.io.File;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -34,6 +40,19 @@ import java.util.concurrent.TimeUnit;
  * To change this template use File | Settings | File Templates.
  */
 public class GUITools {
+
+    public static void exportToPNG(JPanel pnl) {
+        BufferedImage bi = new BufferedImage(pnl.getSize().width, pnl.getSize().height, BufferedImage.TYPE_INT_ARGB);
+        Graphics g = bi.createGraphics();
+        pnl.paint(g);
+        g.dispose();
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+            ImageIO.write(bi, "png", new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "pnl2png_" + sdf.format(new Date()) + ".png"));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("PNG exported"));
+        } catch (Exception e) {
+        }
+    }
 
     public static JideButton createHyperlinkButton(String titleORlangbundle, Icon icon, ActionListener actionListener) {
         String title = SYSTools.catchNull(titleORlangbundle);

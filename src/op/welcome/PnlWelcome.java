@@ -25,6 +25,7 @@ import op.care.PnlCare;
 import op.care.info.PnlInfo;
 import op.care.nursingprocess.PnlNursingProcess;
 import op.care.values.PnlValues;
+import op.dev.PnlDev;
 import op.misc.DlgIntervention;
 import op.process.PnlProcess;
 import op.residents.bwassistant.AddBWWizard;
@@ -104,7 +105,9 @@ public class PnlWelcome extends CleanablePanel {
         Collections.sort(OPDE.getAppInfo().getMainClasses());
         for (InternalClass ic : OPDE.getAppInfo().getMainClasses()) {
 
-            if (!ic.getInternalClassID().equals(PnlWelcome.internalClassID) && OPDE.getAppInfo().isAllowedTo(InternalClassACL.EXECUTE, ic.getInternalClassID())) {
+            if (!ic.getInternalClassID().equals(internalClassID)
+                    && (!ic.getInternalClassID().equals(PnlDev.internalClassID) || (OPDE.isDebug() && OPDE.isAdmin()))
+                    && OPDE.getAppInfo().isAllowedTo(InternalClassACL.EXECUTE, ic.getInternalClassID())) {
 
                 final String shortDescription = ic.getShortDescription();
                 final String longDescription = ic.getLongDescription();
@@ -463,7 +466,7 @@ public class PnlWelcome extends CleanablePanel {
 
         String title = "<html><table border=\"0\">" +
                 "<tr>" +
-                "<td width=\"600\" align=\"left\">" + MedStockTools.getAsHTML(stock) + " (" + ResidentTools.getNameAndFirstname(stock.getInventory().getResident()) +  ")</td>" +
+                "<td width=\"600\" align=\"left\">" + MedStockTools.getAsHTML(stock) + " (" + ResidentTools.getNameAndFirstname(stock.getInventory().getResident()) + ")</td>" +
                 "</tr>" +
                 "</table>" +
 

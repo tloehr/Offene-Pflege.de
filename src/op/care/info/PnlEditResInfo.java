@@ -65,6 +65,7 @@ public class PnlEditResInfo {
     private boolean changed = false;
     private OverlayTextArea txtComment;
     private DefaultOverlayable ovrComment;
+    Exception lastParsingException;
 
     public PnlEditResInfo(ResInfo resInfo) {
         this(resInfo, null);
@@ -73,18 +74,30 @@ public class PnlEditResInfo {
     public PnlEditResInfo(ResInfo resInfo, Closure closure) {
         this.resInfo = resInfo;
         this.closure = closure;
-        initPanel();
+        initPanel(resInfo.getResInfoType().getXml());
     }
 
-    private void initPanel() {
+    /**
+     * only for development reasons
+     *
+     * @param xml
+     */
+    public PnlEditResInfo(String xml) {
+        this.resInfo = null;
+        this.closure = null;
+        initPanel(xml);
+    }
+
+    private void initPanel(String xml) {
         content = new Properties();
 
         pnlContent = new JPanel(new BorderLayout());
         initPanel = true;
+        lastParsingException = null;
 
         // Structure...
         try {
-            String xmltext = "<?xml version=\"1.0\"?><structure>" + resInfo.getResInfoType().getXml() + "</structure>";
+            String xmltext = "<?xml version=\"1.0\"?><structure>" + xml + "</structure>";
             XMLReader parser = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
             InputSource is = new org.xml.sax.InputSource(new java.io.BufferedReader(new java.io.StringReader(xmltext)));
 
@@ -113,15 +126,19 @@ public class PnlEditResInfo {
             pnlContent.add(h.getPanel(), BorderLayout.CENTER);
             pnlContent.add(ovrComment, BorderLayout.SOUTH);
 
-        } catch (SAXException ex) {
-            ex.printStackTrace();
+        } catch (SAXException ex1) {
+            ex1.printStackTrace();
+            lastParsingException = ex1;
         } catch (IOException ex) {
             ex.printStackTrace();
+            lastParsingException = ex;
         }
 
 
-        // ... and content
-        setContent();
+        if (resInfo != null) {
+            // ... and content
+            setContent();
+        }
         initPanel = false;
 
         // add apply and cancel button
@@ -131,7 +148,23 @@ public class PnlEditResInfo {
             main.setBorder(new EmptyBorder(10, 10, 10, 10));
             main.add(pnlContent, BorderLayout.CENTER);
 
-            JPanel btnPanel = new JPanel(new BorderLayout());
+            JPanel enlosingButtonPanel = new JPanel(new BorderLayout());
+
+            JPanel btnPanel = new JPanel();
+            btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.LINE_AXIS));
+
+
+            // export 2 png function for development
+            if (OPDE.isDebug()) {
+                JButton png = new JButton(SYSConst.icon22magnify1);
+                png.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        GUITools.exportToPNG(pnlContent);
+                    }
+                });
+                btnPanel.add(png, BorderLayout.LINE_END);
+            }
 
             JButton apply = new JButton(SYSConst.icon22apply);
             apply.addActionListener(new ActionListener() {
@@ -141,7 +174,11 @@ public class PnlEditResInfo {
                 }
             });
             btnPanel.add(apply, BorderLayout.LINE_END);
-            main.add(btnPanel, BorderLayout.SOUTH);
+
+
+            enlosingButtonPanel.add(btnPanel, BorderLayout.LINE_END);
+            main.add(enlosingButtonPanel, BorderLayout.SOUTH);
+
 
             JPanel hdrPanel = new JPanel(new BorderLayout());
             JLabel jl = new JLabel(resInfo.getResInfoType().getShortDescription());
@@ -155,6 +192,9 @@ public class PnlEditResInfo {
         SYSTools.setXEnabled(pnlContent, main != null);
     }
 
+    public Exception getLastParsingException() {
+        return lastParsingException;
+    }
 
     public ResInfo getResInfo() {
         try {
@@ -339,15 +379,18 @@ public class PnlEditResInfo {
     private class TextFieldFocusListener implements FocusListener {
         int type = TYPE_DONT_CARE;
         Pair<DateTime, DateTime> minmax;
+        boolean optional;
 
-        TextFieldFocusListener(int type) {
+        TextFieldFocusListener(int type, boolean optional) {
             this.type = type;
+            this.optional = optional;
             minmax = new Pair<DateTime, DateTime>(new DateTime(SYSConst.DATE_THE_VERY_BEGINNING), new DateTime(SYSConst.DATE_UNTIL_FURTHER_NOTICE));
         }
 
-        TextFieldFocusListener(int type, Pair<DateTime, DateTime> minmax) {
+        TextFieldFocusListener(int type, Pair<DateTime, DateTime> minmax, boolean optional) {
             this.type = type;
             this.minmax = minmax;
+            this.optional = optional;
         }
 
         public void focusGained(FocusEvent e) {
@@ -359,7 +402,10 @@ public class PnlEditResInfo {
             String text = ((JTextField) e.getSource()).getText();
 
             if (type != TYPE_DONT_CARE) {
-                if (type == TYPE_DATE) {
+
+                if (optional && text.trim().isEmpty()) {
+                    // nop!
+                } else if (type == TYPE_DATE) {
                     try {
                         Date myDate = SYSCalendar.parseDate(text);
                         if (new DateMidnight(myDate).isBefore(minmax.getFirst().toDateMidnight())) {
@@ -444,8 +490,13 @@ public class PnlEditResInfo {
 
         @Override
         public void startElement(String nsURI, String strippedName, String tagName, Attributes attributes) throws SAXException {
-//            OPDE.debug(SYSTools.catchNull(attributes.getValue("name"), "noname"));
-            // ---------------------- OPTIONGROUPS --------------------------------
+            /***
+             *               _   _
+             *      ___ _ __| |_(_)___ _ _  __ _ _ _ ___ _  _ _ __
+             *     / _ \ '_ \  _| / _ \ ' \/ _` | '_/ _ \ || | '_ \
+             *     \___/ .__/\__|_\___/_||_\__, |_| \___/\_,_| .__/
+             *         |_|                 |___/             |_|
+             */
             if (tagName.equalsIgnoreCase("optiongroup") || tagName.equalsIgnoreCase("scalegroup")) {
                 groupname = attributes.getValue("name");
                 //Diese HashMap enthält alle Buttongroups zugeordnet zu den Gruppennamen
@@ -454,11 +505,30 @@ public class PnlEditResInfo {
                 if (scalemode) {
                     scaleButtonGroups.add(groupname);
                 }
+
                 innerpanel = new JPanel(new RiverLayout());
                 innerpanel.setName(groupname);
                 if (attributes.getValue("label") != null) {
                     JLabel jl = new JLabel(attributes.getValue("label") + ":");
                     jl.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
+
+                    int fontstyle = Font.PLAIN;
+                    if (!SYSTools.catchNull(attributes.getValue("fontstyle")).isEmpty()) {
+                        if (attributes.getValue("fontstyle").equalsIgnoreCase("bold")) {
+                            fontstyle = Font.BOLD;
+                        }
+                        if (attributes.getValue("fontstyle").equalsIgnoreCase("italic")) {
+                            fontstyle = Font.ITALIC;
+                        }
+                    }
+                    if (!SYSTools.catchNull(attributes.getValue("size")).isEmpty()) {
+                        int size = Integer.parseInt(attributes.getValue("size"));
+                        jl.setFont(new Font("Arial", fontstyle, size));
+                    } else {
+                        jl.setFont(new Font("Arial", fontstyle, 14));
+                    }
+
+
                     outerpanel.add("br left", jl);
                 }
             }
@@ -484,10 +554,10 @@ public class PnlEditResInfo {
                     jl.setForeground(GUITools.getColor(attributes.getValue("color")));
                 }
 
-                int fontstyle = Font.BOLD;
+                int fontstyle = Font.PLAIN;
                 if (!SYSTools.catchNull(attributes.getValue("fontstyle")).isEmpty()) {
-                    if (attributes.getValue("fontstyle").equalsIgnoreCase("plain")) {
-                        fontstyle = Font.PLAIN;
+                    if (attributes.getValue("fontstyle").equalsIgnoreCase("bold")) {
+                        fontstyle = Font.BOLD;
                     }
                     if (attributes.getValue("fontstyle").equalsIgnoreCase("italic")) {
                         fontstyle = Font.ITALIC;
@@ -546,7 +616,8 @@ public class PnlEditResInfo {
             if (tagName.equalsIgnoreCase("checkbox")) {
                 groupname = attributes.getValue("name");
                 JCheckBox j = new JCheckBox(attributes.getValue("label"));
-                j.setToolTipText(SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
+                j.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
+//                j.setToolTipText(SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 j.setName(groupname);
                 outerpanel.add(j);
                 components.put(groupname, j); // für den späteren Direktzugriff
@@ -570,18 +641,20 @@ public class PnlEditResInfo {
             if (tagName.equalsIgnoreCase("textfield")) {
                 groupname = attributes.getValue("name");
 
-                TextFieldFocusListener tffl = new TextFieldFocusListener(TYPE_DONT_CARE);
+                boolean optional = SYSTools.catchNull(attributes.getValue("optional"), "false").equalsIgnoreCase("true");
+
+                TextFieldFocusListener tffl = new TextFieldFocusListener(TYPE_DONT_CARE, optional);
                 if (SYSTools.catchNull(attributes.getValue("type")).equals("int")) {
-                    tffl = new TextFieldFocusListener(TYPE_INT);
+                    tffl = new TextFieldFocusListener(TYPE_INT, optional);
                 }
                 if (SYSTools.catchNull(attributes.getValue("type")).equals("double")) {
-                    tffl = new TextFieldFocusListener(TYPE_DOUBLE);
+                    tffl = new TextFieldFocusListener(TYPE_DOUBLE, optional);
                 }
                 if (SYSTools.catchNull(attributes.getValue("type")).equals("date")) {
                     if (SYSTools.catchNull(attributes.getValue("onlyinfuture"), "false").equalsIgnoreCase("true")) {
-                        tffl = new TextFieldFocusListener(TYPE_DATE, new Pair<DateTime, DateTime>(new DateTime(), new DateTime(SYSConst.DATE_UNTIL_FURTHER_NOTICE)));
+                        tffl = new TextFieldFocusListener(TYPE_DATE, new Pair<DateTime, DateTime>(new DateTime(), new DateTime(SYSConst.DATE_UNTIL_FURTHER_NOTICE)), optional);
                     } else {
-                        tffl = new TextFieldFocusListener(TYPE_DATE);
+                        tffl = new TextFieldFocusListener(TYPE_DATE, optional);
                     }
                 }
                 int length = TEXTFIELD_STANDARD_WIDTH;
@@ -591,13 +664,15 @@ public class PnlEditResInfo {
                 JLabel jl = new JLabel(attributes.getValue("label") + ":");
                 JTextField j = new JTextField(length);
                 j.setName(groupname);
-                j.setToolTipText(SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
-//                j.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
+                j.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 outerpanel.add(layout, jl);
 
+
                 String hfill = SYSTools.catchNull(attributes.getValue("hfill")).equalsIgnoreCase("false") ? "" : " hfill";
-                outerpanel.add("tab" + hfill, j);
+                String innerlayout = SYSTools.catchNull(attributes.getValue("innerlayout"), "tab" + hfill);
+                outerpanel.add(innerlayout, j);
+
                 components.put(groupname, j); // für den späteren Direktzugriff
                 j.addFocusListener(tffl);
                 //                j.addCaretListener(new TextFieldCaretListener(type, notempty));
