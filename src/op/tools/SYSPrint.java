@@ -139,7 +139,7 @@ public class SYSPrint {
 //                DocPrintJob pj = prserv.createPrintJob();
 //                //FileInputStream fis = new FileInputStream();
 //                // new java.io.BufferedReader(new java.io.StringReader(xmltext))
-//                Doc doc = new SimpleDoc(text, flavor, null);
+//                GP doc = new SimpleDoc(text, flavor, null);
 //
 //                pj.print(doc, aset);
 //            }

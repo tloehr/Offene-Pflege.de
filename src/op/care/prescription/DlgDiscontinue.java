@@ -52,7 +52,7 @@ import java.awt.event.KeyEvent;
 public class DlgDiscontinue extends MyJDialog {
     private Prescription prescription;
     private Closure actionBlock;
-    private java.util.List<Doc> listAerzte;
+    private java.util.List<GP> listAerzte;
     private java.util.List<Hospital> listKH;
 
     /**
@@ -60,10 +60,10 @@ public class DlgDiscontinue extends MyJDialog {
      */
     private void cmbArztAbKeyPressed(KeyEvent e) {
         final String searchKey = String.valueOf(e.getKeyChar());
-        Doc doc = (Doc) CollectionUtils.find(listAerzte, new Predicate() {
+        GP doc = (GP) CollectionUtils.find(listAerzte, new Predicate() {
             @Override
             public boolean evaluate(Object o) {
-                return o != null && ((Doc) o).getName().toLowerCase().charAt(0) == searchKey.toLowerCase().charAt(0);
+                return o != null && ((GP) o).getName().toLowerCase().charAt(0) == searchKey.toLowerCase().charAt(0);
             }
         });
         if (doc != null) {
@@ -180,7 +180,7 @@ public class DlgDiscontinue extends MyJDialog {
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
 
-        Doc doc = (Doc) cmbArztAb.getSelectedItem();
+        GP doc = (GP) cmbArztAb.getSelectedItem();
         Hospital hospital = (Hospital) cmbKHAb.getSelectedItem();
 
         if (doc == null && hospital == null) {
@@ -195,7 +195,7 @@ public class DlgDiscontinue extends MyJDialog {
 
     private void fillCMBs() {
         EntityManager em = OPDE.createEM();
-        Query queryArzt = em.createQuery("SELECT a FROM Doc a ORDER BY a.name, a.vorname");
+        Query queryArzt = em.createQuery("SELECT a FROM GP a ORDER BY a.name, a.vorname");
         listAerzte = queryArzt.getResultList();
         listAerzte.add(0, null);
 
@@ -204,7 +204,7 @@ public class DlgDiscontinue extends MyJDialog {
         listKH.add(0, null);
 
         cmbArztAb.setModel(new DefaultComboBoxModel(listAerzte.toArray()));
-        cmbArztAb.setRenderer(DocTools.getRenderer());
+        cmbArztAb.setRenderer(GPTools.getRenderer());
         cmbArztAb.setSelectedIndex(0);
 
         cmbKHAb.setModel(new DefaultComboBoxModel(listKH.toArray()));

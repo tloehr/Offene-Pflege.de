@@ -16,8 +16,8 @@ public class ICDTools {
 //                if (o == null) {
 //                    text = OPDE.lang.getString("misc.commands.>>noselection<<");
 //                } else if (o instanceof ICD) {
-////                    text = ((Doc) o).getName() + ", " + ((Doc) o).getFirstname() + ", " + ((Doc) o).getCity();
-//                    text = getFullName((Doc) o);
+////                    text = ((GP) o).getName() + ", " + ((GP) o).getFirstname() + ", " + ((GP) o).getCity();
+//                    text = getFullName((GP) o);
 //                } else {
 //                    text = o.toString();
 //                }

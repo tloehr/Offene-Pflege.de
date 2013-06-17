@@ -2,7 +2,7 @@ package entity.info;
 
 import entity.HomesTools;
 import entity.Station;
-import entity.prescription.DocTools;
+import entity.prescription.GPTools;
 import entity.prescription.PrescriptionTools;
 import entity.process.QProcessElement;
 import entity.reports.NReportTAGSTools;
@@ -803,7 +803,7 @@ public class ResInfoTools {
             if (OPDE.isAnonym()) {
                 result += "[" + OPDE.lang.getString("misc.msg.anon") + "]";
             } else {
-                result += DocTools.getFullName(resident.getGP()) + ", " + resident.getGP().getStreet();
+                result += GPTools.getFullName(resident.getGP()) + ", " + resident.getGP().getStreet();
                 result += ", " + resident.getGP().getZIP() + " " + resident.getGP().getCity();
                 result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + resident.getGP().getTel() + ", " + OPDE.lang.getString("misc.msg.fax") + ": " + resident.getGP().getFax();
             }

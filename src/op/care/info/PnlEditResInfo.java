@@ -2,7 +2,10 @@ package op.care.info;
 
 import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.OverlayTextArea;
+import entity.EntityTools;
 import entity.info.ResInfo;
+import entity.prescription.GP;
+import entity.prescription.GPTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.*;
@@ -82,9 +85,9 @@ public class PnlEditResInfo {
      *
      * @param xml
      */
-    public PnlEditResInfo(String xml) {
+    public PnlEditResInfo(String xml, Closure closure) {
         this.resInfo = null;
-        this.closure = null;
+        this.closure = closure;
         initPanel(xml);
     }
 
@@ -143,50 +146,53 @@ public class PnlEditResInfo {
 
         // add apply and cancel button
         main = null;
-        if (closure != null) {
-            main = new JPanel(new BorderLayout());
-            main.setBorder(new EmptyBorder(10, 10, 10, 10));
-            main.add(pnlContent, BorderLayout.CENTER);
 
-            JPanel enlosingButtonPanel = new JPanel(new BorderLayout());
+        main = new JPanel(new BorderLayout());
+        main.setBorder(new EmptyBorder(10, 10, 10, 10));
+        main.add(pnlContent, BorderLayout.CENTER);
 
-            JPanel btnPanel = new JPanel();
-            btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.LINE_AXIS));
+        JPanel enlosingButtonPanel = new JPanel(new BorderLayout());
+
+        JPanel btnPanel = new JPanel();
+        btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.LINE_AXIS));
 
 
-            // export 2 png function for development
-            if (OPDE.isDebug()) {
-                JButton png = new JButton(SYSConst.icon22magnify1);
-                png.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        GUITools.exportToPNG(pnlContent);
-                    }
-                });
-                btnPanel.add(png, BorderLayout.LINE_END);
-            }
-
-            JButton apply = new JButton(SYSConst.icon22apply);
-            apply.addActionListener(new ActionListener() {
+        // export 2 png function for development
+        if (OPDE.isDebug()) {
+            JButton png = new JButton(SYSConst.icon22magnify1);
+            png.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    closure.execute(getResInfo());
+                    GUITools.exportToPNG(pnlContent);
                 }
             });
-            btnPanel.add(apply, BorderLayout.LINE_END);
-
-
-            enlosingButtonPanel.add(btnPanel, BorderLayout.LINE_END);
-            main.add(enlosingButtonPanel, BorderLayout.SOUTH);
-
-
-            JPanel hdrPanel = new JPanel(new BorderLayout());
-            JLabel jl = new JLabel(resInfo.getResInfoType().getShortDescription());
-            jl.setFont(SYSConst.ARIAL24BOLD);
-            hdrPanel.add(jl, BorderLayout.CENTER);
-            hdrPanel.add(new JSeparator(), BorderLayout.SOUTH);
-            main.add(jl, BorderLayout.NORTH);
+            btnPanel.add(png, BorderLayout.LINE_END);
         }
+
+        JButton apply = new JButton(SYSConst.icon22apply);
+        apply.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (resInfo != null) {
+                    closure.execute(getResInfo());
+                } else {
+                    closure.execute(content);
+                }
+            }
+        });
+        btnPanel.add(apply, BorderLayout.LINE_END);
+
+
+        enlosingButtonPanel.add(btnPanel, BorderLayout.LINE_END);
+        main.add(enlosingButtonPanel, BorderLayout.SOUTH);
+
+
+        JPanel hdrPanel = new JPanel(new BorderLayout());
+        JLabel jl = new JLabel(resInfo != null ? resInfo.getResInfoType().getShortDescription() : "dev");
+        jl.setFont(SYSConst.ARIAL24BOLD);
+        hdrPanel.add(jl, BorderLayout.CENTER);
+        hdrPanel.add(new JSeparator(), BorderLayout.SOUTH);
+        main.add(jl, BorderLayout.NORTH);
 
 
         SYSTools.setXEnabled(pnlContent, main != null);
@@ -195,6 +201,7 @@ public class PnlEditResInfo {
     public Exception getLastParsingException() {
         return lastParsingException;
     }
+
 
     public ResInfo getResInfo() {
         try {
@@ -309,6 +316,12 @@ public class PnlEditResInfo {
                 ((JTextField) entry).setText(SYSTools.unescapeXML(content.getProperty(key.toString())));
             } else if (entry instanceof PnlBodyScheme) {
                 ((PnlBodyScheme) entry).setContent(content);
+            } else if (entry instanceof PnlGP) {
+                long gpid = Long.parseLong(SYSTools.catchNull(content.containsKey(key + ".gpid"), "-1"));
+                if (gpid > 0) {
+                    GP gp = EntityTools.find(GP.class, gpid);
+                    ((PnlGP) entry).setSelected(gp);
+                }
             } else if (entry instanceof JComboBox) {
                 JComboBox cmb = ((JComboBox) entry);
                 for (int i = 0; i < cmb.getModel().getSize(); i++) {
@@ -510,7 +523,7 @@ public class PnlEditResInfo {
                 innerpanel.setName(groupname);
                 if (attributes.getValue("label") != null) {
                     JLabel jl = new JLabel(attributes.getValue("label") + ":");
-                    jl.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
+                    jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
 
                     int fontstyle = Font.PLAIN;
                     if (!SYSTools.catchNull(attributes.getValue("fontstyle")).isEmpty()) {
@@ -570,7 +583,7 @@ public class PnlEditResInfo {
                     jl.setFont(new Font("Arial", fontstyle, 14));
                 }
 
-                jl.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
+                jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 outerpanel.add(layout, jl);
                 tabgroup = true;
@@ -581,7 +594,7 @@ public class PnlEditResInfo {
                     score = SYSTools.parseBigDecimal(attributes.getValue("score"));
                 }
                 JRadioButton j = new JRadioButton(attributes.getValue("label"));
-                j.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
+                j.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 String compName = attributes.getValue("name");
                 String layout = attributes.getValue("layout");
                 if (SYSTools.catchNull(layout).isEmpty()) {
@@ -658,8 +671,10 @@ public class PnlEditResInfo {
                     }
                 }
                 int length = TEXTFIELD_STANDARD_WIDTH;
+                String hfill = SYSTools.catchNull(attributes.getValue("hfill")).equalsIgnoreCase("false") ? "" : " hfill";
                 if (!SYSTools.catchNull(attributes.getValue("length")).isEmpty()) {
                     length = Integer.parseInt(attributes.getValue("length"));
+                    hfill = "";
                 }
                 JLabel jl = new JLabel(attributes.getValue("label") + ":");
                 JTextField j = new JTextField(length);
@@ -669,7 +684,7 @@ public class PnlEditResInfo {
                 outerpanel.add(layout, jl);
 
 
-                String hfill = SYSTools.catchNull(attributes.getValue("hfill")).equalsIgnoreCase("false") ? "" : " hfill";
+
                 String innerlayout = SYSTools.catchNull(attributes.getValue("innerlayout"), "tab" + hfill);
                 outerpanel.add(innerlayout, j);
 
@@ -686,6 +701,50 @@ public class PnlEditResInfo {
                 outerpanel.add(layout, new JSeparator());
             }
             /***
+             *                        _        _
+             *      __ _ _ __ ___ ___| |___ __| |_
+             *     / _` | '_ (_-</ -_) / -_) _|  _|
+             *     \__, | .__/__/\___|_\___\__|\__|
+             *     |___/|_|
+             */
+            if (tagName.equalsIgnoreCase("gpselect")) {
+                groupname = attributes.getValue("name");
+                final String thisGroupName = groupname;
+
+                String sNeurologist = attributes.getValue("neurologist");
+                Boolean neurologist = sNeurologist == null ? null : (sNeurologist.equalsIgnoreCase("true") ? true : false);
+
+                String sDermatology = attributes.getValue("dermatology");
+                Boolean dermatology = sDermatology == null ? null : (sDermatology.equalsIgnoreCase("true") ? true : false);
+
+                PnlGP pnlGP = new PnlGP(new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        long gpid;
+                        String gpText;
+                        if (o == null) {
+                            gpid = -1;
+                            gpText = "--";
+                        } else {
+                            gpid = ((GP) o).getArztID();
+                            gpText = GPTools.getCompleteAddress((GP) o);
+                        }
+                        content.put(thisGroupName + ".id", gpid);
+                        content.put(thisGroupName + ".text", gpText);
+                        changed = true;
+                    }
+                }, neurologist, dermatology);
+                String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
+                if (attributes.getValue("label") != null) {
+                    JLabel jl = new JLabel(attributes.getValue("label") + ":");
+                    outerpanel.add(layout, jl);
+                    layout = "left";
+                }
+
+                components.put(groupname, pnlGP);
+                outerpanel.add(layout, pnlGP);
+            }
+            /***
              *      _             _             _
              *     | |__  ___  __| |_  _ ___ __| |_  ___ _ __  ___
              *     | '_ \/ _ \/ _` | || (_-</ _| ' \/ -_) '  \/ -_)
@@ -699,18 +758,29 @@ public class PnlEditResInfo {
                 components.put(groupname, pnlBodyScheme);
                 outerpanel.add(layout, pnlBodyScheme);
             }
-            // ---------------------- tiny ambulance car --------------------------------
+            /***
+             *      _   _                       _         _
+             *     | |_(_)_ _ _  _   __ _ _ __ | |__ _  _| |__ _ _ _  __ ___   __ __ _ _ _
+             *     |  _| | ' \ || | / _` | '  \| '_ \ || | / _` | ' \/ _/ -_) / _/ _` | '_|
+             *      \__|_|_||_\_, | \__,_|_|_|_|_.__/\_,_|_\__,_|_||_\__\___| \__\__,_|_|
+             *                |__/
+             */
             if (tagName.equalsIgnoreCase("tx")) {
                 JLabel jl = new JLabel(SYSConst.icon16ambulance);
                 jl.setToolTipText(OPDE.lang.getString("nursingrecords.info.tx.tooltip"));
                 outerpanel.add(jl);
             }
-            // ---------------------- Imagelabels --------------------------------
+            /***
+             *      _                     _      _         _
+             *     (_)_ __  __ _ __ _ ___| |__ _| |__  ___| |
+             *     | | '  \/ _` / _` / -_) / _` | '_ \/ -_) |
+             *     |_|_|_|_\__,_\__, \___|_\__,_|_.__/\___|_|
+             *                  |___/
+             */
             if (tagName.equalsIgnoreCase("imagelabel")) {
                 groupname = attributes.getValue("name");
                 JLabel jl = new JLabel(new javax.swing.ImageIcon(getClass().getResource(attributes.getValue("image"))));
-                jl.setToolTipText(SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
-//                jl.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
+                jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "p left");
                 outerpanel.add(layout, jl);
             }
@@ -722,7 +792,8 @@ public class PnlEditResInfo {
              *
              */
             if (tagName.equalsIgnoreCase("label")) {
-                groupname = attributes.getValue("name");
+                //groupname = attributes.getValue("name");
+                groupname = null;
                 JLabel jl = new JLabel(attributes.getValue("label"));
                 if (!SYSTools.catchNull(attributes.getValue("color")).isEmpty()) {
                     jl.setForeground(GUITools.getColor(attributes.getValue("color")));
@@ -742,7 +813,7 @@ public class PnlEditResInfo {
                 } else {
                     jl.setFont(new Font("Arial", fontstyle, 12));
                 }
-                jl.setToolTipText(SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
+                jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
 //                jl.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 outerpanel.add(layout, jl);
@@ -759,7 +830,7 @@ public class PnlEditResInfo {
                 boxModel = new DefaultComboBoxModel();
                 JComboBox jcb = new JComboBox();
                 jcb.setName(groupname);
-                jcb.setToolTipText(SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
+                jcb.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 components.put(groupname, jcb);
                 jcb.addItemListener(new ComboBoxItemStateListener());
                 JLabel jl = new JLabel(attributes.getValue("label") + ":");

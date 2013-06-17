@@ -31,8 +31,8 @@ import com.jgoodies.forms.layout.FormLayout;
 import entity.info.ICD;
 import entity.info.ResInfo;
 import entity.info.ResInfoTools;
-import entity.prescription.Doc;
-import entity.prescription.DocTools;
+import entity.prescription.GP;
+import entity.prescription.GPTools;
 import entity.prescription.Hospital;
 import entity.prescription.HospitalTools;
 import op.OPDE;
@@ -96,8 +96,8 @@ public class DlgDiag extends MyJDialog {
 
     private void fillCMBs() {
         EntityManager em = OPDE.createEM();
-        Query queryArzt = em.createQuery("SELECT a FROM Doc a WHERE a.status >= 0 ORDER BY a.name, a.vorname");
-        java.util.List<Doc> listAerzte = queryArzt.getResultList();
+        Query queryArzt = em.createQuery("SELECT a FROM GP a WHERE a.status >= 0 ORDER BY a.name, a.vorname");
+        java.util.List<GP> listAerzte = queryArzt.getResultList();
         listAerzte.add(0, null);
 
         Query queryKH = em.createQuery("SELECT k FROM Hospital k WHERE k.state >= 0 ORDER BY k.name");
@@ -106,7 +106,7 @@ public class DlgDiag extends MyJDialog {
         em.close();
 
         cmbArzt.setModel(new DefaultComboBoxModel(listAerzte.toArray()));
-        cmbArzt.setRenderer(DocTools.getRenderer());
+        cmbArzt.setRenderer(GPTools.getRenderer());
         cmbArzt.setSelectedIndex(0);
 
         cmbKH.setModel(new DefaultComboBoxModel(listKH.toArray()));
@@ -335,7 +335,7 @@ public class DlgDiag extends MyJDialog {
 
 
     private void save() {
-        Doc doc = (Doc) cmbArzt.getSelectedItem();
+        GP doc = (GP) cmbArzt.getSelectedItem();
         Hospital kh = (Hospital) cmbKH.getSelectedItem();
         ICD icd = (ICD) lstDiag.getSelectedValue();
 
@@ -357,7 +357,7 @@ public class DlgDiag extends MyJDialog {
             if (kh != null) {
                 html += "<br/>" + OPDE.lang.getString("misc.msg.confirmedby") + ": ";
             }
-            html += SYSConst.html_bold(DocTools.getFullName(doc)) + "<br/>";
+            html += SYSConst.html_bold(GPTools.getFullName(doc)) + "<br/>";
         }
         html += OPDE.lang.getString("misc.msg.diag.side") + ": " + SYSConst.html_bold(cmbKoerper.getSelectedItem().toString()) + "<br/>";
         html += OPDE.lang.getString("misc.msg.diag.security") + ": " + SYSConst.html_bold(cmbSicherheit.getSelectedItem().toString()) + "<br/>";

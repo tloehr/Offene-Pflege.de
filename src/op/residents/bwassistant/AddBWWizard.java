@@ -4,8 +4,8 @@ import com.jidesoft.dialog.*;
 import com.jidesoft.wizard.*;
 import entity.Station;
 import entity.info.*;
-import entity.prescription.Doc;
-import entity.prescription.DocTools;
+import entity.prescription.GP;
+import entity.prescription.GPTools;
 import entity.system.Unique;
 import entity.system.UniqueTools;
 import entity.system.Users;
@@ -54,7 +54,7 @@ public class AddBWWizard {
         AbstractWizardPage page2 = new BasisInfoPage(OPDE.lang.getString(PnlBWBasisInfo.internalClassID + ".title"), OPDE.lang.getString(PnlBWBasisInfo.internalClassID + ".description"));
         AbstractWizardPage page3 = new PNPage(OPDE.lang.getString(PnlBV.internalClassID + ".title"), OPDE.lang.getString(PnlBV.internalClassID + ".description"));
         AbstractWizardPage page4 = new GPPage(OPDE.lang.getString(PnlGP.internalClassID + ".title"), OPDE.lang.getString(PnlGP.internalClassID + ".description"));
-        AbstractWizardPage page5 = new LCPage(OPDE.lang.getString(PnlLC.internalClassID + ".title"), OPDE.lang.getString(PnlLC.internalClassID + ".description"));
+//        AbstractWizardPage page5 = new LCPage(OPDE.lang.getString(PnlLC.internalClassID + ".title"), OPDE.lang.getString(PnlLC.internalClassID + ".description"));
         AbstractWizardPage page6 = new HaufPage(OPDE.lang.getString(PnlHAUF.internalClassID + ".title"), OPDE.lang.getString(PnlHAUF.internalClassID + ".description"));
         AbstractWizardPage page7 = new CompletionPage(OPDE.lang.getString(internalClassID + ".page7.title"), OPDE.lang.getString(internalClassID + ".page7.description"));
 
@@ -62,7 +62,7 @@ public class AddBWWizard {
         model.append(page2);
         model.append(page3);
         model.append(page4);
-        model.append(page5);
+//        model.append(page5);
         model.append(page6);
         model.append(page7);
 
@@ -249,7 +249,7 @@ public class AddBWWizard {
                 @Override
                 public void execute(Object o) {
                     if (o != null) {
-                        resident.setGP((Doc) o);
+                        resident.setGP((GP) o);
                     }
                     setupWizardButtons();
                 }
@@ -281,45 +281,45 @@ public class AddBWWizard {
     }
 
 
-    private class LCPage extends DefaultWizardPage {
-        private PnlLC pnlLC;
-//        private boolean alreadyexecute = false;
-
-        public LCPage(String title, String description) {
-            super(title, description);
-            pnlLC = new PnlLC(new Closure() {
-                @Override
-                public void execute(Object o) {
-                    resident.setLCustodian1((LCustodian) o);
-                    setupWizardButtons();
-                }
-            });
-            addPageListener(new PageListener() {
-                @Override
-                public void pageEventFired(PageEvent pageEvent) {
-                    if (pageEvent.getID() != PageEvent.PAGE_OPENED) return;
-                    setupWizardButtons();
-                }
-            });
-            setupWizardButtons();
-        }
-
-        @Override
-        public void setupWizardButtons() {
-            super.setupWizardButtons();
-
-            fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
-            fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
-            fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
-            fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
-        }
-
-        @Override
-        protected void initContentPane() {
-            super.initContentPane();
-            addComponent(pnlLC, true);
-        }
-    }
+//    private class LCPage extends DefaultWizardPage {
+//        private PnlLC pnlLC;
+////        private boolean alreadyexecute = false;
+//
+//        public LCPage(String title, String description) {
+//            super(title, description);
+//            pnlLC = new PnlLC(new Closure() {
+//                @Override
+//                public void execute(Object o) {
+//                    resident.setLCustodian1((LCustodian) o);
+//                    setupWizardButtons();
+//                }
+//            });
+//            addPageListener(new PageListener() {
+//                @Override
+//                public void pageEventFired(PageEvent pageEvent) {
+//                    if (pageEvent.getID() != PageEvent.PAGE_OPENED) return;
+//                    setupWizardButtons();
+//                }
+//            });
+//            setupWizardButtons();
+//        }
+//
+//        @Override
+//        public void setupWizardButtons() {
+//            super.setupWizardButtons();
+//
+//            fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.BACK);
+//            fireButtonEvent(ButtonEvent.ENABLE_BUTTON, ButtonNames.NEXT);
+//            fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
+//            fireButtonEvent(ButtonEvent.SHOW_BUTTON, ButtonNames.CANCEL);
+//        }
+//
+//        @Override
+//        protected void initContentPane() {
+//            super.initContentPane();
+//            addComponent(pnlLC, true);
+//        }
+//    }
 
 
     private class HaufPage extends DefaultWizardPage {
@@ -412,8 +412,8 @@ public class AddBWWizard {
             result += "<li>" + ResidentTools.getFullName(resident) + "</li>";
             result += "<li>" + OPDE.lang.getString("misc.msg.dob") + ": " + DateFormat.getDateInstance().format(resident.getDOB()) + "</li>";
             result += "<li>" + OPDE.lang.getString("misc.msg.primaryNurse") + ": " + (resident.getPN1() == null ? OPDE.lang.getString("misc.msg.noentryyet") : resident.getPN1().getFullname()) + "</li>";
-            result += "<li>" + OPDE.lang.getString("misc.msg.gp") + ": " + DocTools.getFullName(resident.getGP()) + "</li>";
-            result += "<li>" + OPDE.lang.getString("misc.msg.lc") + ": " + LCustodianTools.getFullName(resident.getLCustodian1()) + "</li>";
+            result += "<li>" + OPDE.lang.getString("misc.msg.gp") + ": " + GPTools.getFullName(resident.getGP()) + "</li>";
+//            result += "<li>" + OPDE.lang.getString("misc.msg.lc") + ": " + LCustodianTools.getFullName(resident.getLCustodian1()) + "</li>";
 
             result += "<li>" + OPDE.lang.getString("misc.msg.movein") + ": " + DateFormat.getDateInstance().format(bwinfo_hauf.getFrom()) + "</li>";
             result += "<li>" + OPDE.lang.getString("misc.msg.subdivision") + ": " + resident.getStation().getName() + "</li>";

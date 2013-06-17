@@ -16,7 +16,7 @@ import java.util.ArrayList;
  * Time: 13:27
  * To change this template use File | Settings | File Templates.
  */
-public class DocTools {
+public class GPTools {
 
     public static ListCellRenderer getRenderer() {
         return new ListCellRenderer() {
@@ -25,9 +25,9 @@ public class DocTools {
                 String text;
                 if (o == null) {
                     text = OPDE.lang.getString("misc.commands.>>noselection<<");
-                } else if (o instanceof Doc) {
-//                    text = ((Doc) o).getName() + ", " + ((Doc) o).getFirstname() + ", " + ((Doc) o).getCity();
-                    text = getFullName((Doc) o);
+                } else if (o instanceof GP) {
+//                    text = ((GP) o).getName() + ", " + ((GP) o).getFirstname() + ", " + ((GP) o).getCity();
+                    text = getFullName((GP) o);
                 } else {
                     text = o.toString();
                 }
@@ -36,7 +36,7 @@ public class DocTools {
         };
     }
 
-    public static String getFullName(Doc doc) {
+    public static String getFullName(GP doc) {
         if (doc != null) {
             if (OPDE.isAnonym()) {
                 return "[" + OPDE.lang.getString("misc.msg.anon") + "]";
@@ -47,7 +47,7 @@ public class DocTools {
         }
     }
 
-    public static String getCompleteAddress(Doc doc) {
+    public static String getCompleteAddress(GP doc) {
         if (doc != null) {
             if (OPDE.isAnonym()) {
                 return "[" + OPDE.lang.getString("misc.msg.anon") + "]";
@@ -59,13 +59,24 @@ public class DocTools {
     }
 
 
-    public static ArrayList<Doc> getAllActive() {
+    public static ArrayList<GP> getAllActive() {
         EntityManager em = OPDE.createEM();
-        Query queryArzt = em.createQuery("SELECT a FROM Doc a WHERE a.status >= 0 ORDER BY a.name, a.vorname");
-        ArrayList<Doc> listAerzte = new ArrayList<Doc>(queryArzt.getResultList());
+        Query queryArzt = em.createQuery("SELECT a FROM GP a WHERE a.status >= 0 ORDER BY a.name, a.vorname");
+        ArrayList<GP> listAerzte = new ArrayList<GP>(queryArzt.getResultList());
         em.close();
 
         return listAerzte;
+
+    }
+
+    public static ArrayList<GP> getAllActiveNeurologist() {
+        EntityManager em = OPDE.createEM();
+        Query queryGP = em.createQuery("SELECT a FROM GP a WHERE a.status >= 0 AND a.neurologist = TRUE ORDER BY a.name, a.vorname");
+        ArrayList<GP> listGPs = new ArrayList<GP>(queryGP.getResultList());
+
+        em.close();
+
+        return listGPs;
 
     }
 }

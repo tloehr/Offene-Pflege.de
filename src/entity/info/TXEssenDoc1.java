@@ -35,7 +35,9 @@ import java.util.*;
 public class TXEssenDoc1 {
 
     public static final String SOURCEDOC1 = "ueberleitungsbogen_121029.pdf";
-    public static final String SOURCEMRE = "anlage_mre2_130207.pdf";
+    public static final String SOURCEMRE = "anlage_mre_130207.pdf";
+    public static final String SOURCEPSYCH = "anlage_psych_080418.pdf";
+
     private final HashMap<ResInfo, Properties> mapInfo2Properties;
     private Resident resident;
     private HashMap<String, String> content;
@@ -268,7 +270,7 @@ public class TXEssenDoc1 {
         content.put(TXEAF.PAGE2_USERNAME, (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : ""));
         content.put(TXEAF.PAGE3_USERNAME, (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : ""));
 
-        content.put(TXEAF.PAGE3_RESIDENT_GP, DocTools.getCompleteAddress(resident.getGP()));
+        content.put(TXEAF.PAGE3_RESIDENT_GP, GPTools.getCompleteAddress(resident.getGP()));
 
         if (resident.isActive()) {
             content.put(TXEAF.RESIDENT_STREET, resident.getStation().getHome().getStreet());
@@ -882,10 +884,10 @@ public class TXEssenDoc1 {
         for (ResInfo icd : listICD) {
             EntityManager em = OPDE.createEM();
 
-            Doc gp = null;
+            GP gp = null;
             try {
                 long gpid = Long.parseLong(mapInfo2Properties.get(icd).getProperty("arztid"));
-                gp = em.find(Doc.class, gpid);
+                gp = em.find(GP.class, gpid);
             } catch (NumberFormatException e) {
                 // bah!
             }

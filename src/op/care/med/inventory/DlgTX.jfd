@@ -58,6 +58,10 @@
       <void method="add"> 
        <object class="com.jformdesigner.model.FormComponent"> 
         <string>javax.swing.JTextField</string> 
+        <void method="setProperty"> 
+         <string>columns</string> 
+         <int>100</int> 
+        </void> 
         <void property="name"> 
          <string>txtText</string> 
         </void> 

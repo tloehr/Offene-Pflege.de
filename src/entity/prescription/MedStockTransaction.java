@@ -23,7 +23,7 @@ public class MedStockTransaction implements Serializable, Comparable<MedStockTra
     @Basic(optional = false)
     @Column(name = "Menge")
     private BigDecimal amount;
-    @Column(name = "Text")
+    @Column(name = "Text", length = 100)
     private String text;
     @Basic(optional = false)
     @Column(name = "Status")

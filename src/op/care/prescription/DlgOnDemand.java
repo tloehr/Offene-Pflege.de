@@ -80,7 +80,7 @@ public class DlgOnDemand extends MyJDialog {
     private PrescriptionSchedule schedule;
     private List<PrescriptionSchedule> schedules2delete = null;
     private Pair<Prescription, PrescriptionSchedule> returnPackage = null;
-    private List<Doc> listAerzte;
+    private List<GP> listAerzte;
     private List<Hospital> listKH;
 
     /**
@@ -270,10 +270,10 @@ public class DlgOnDemand extends MyJDialog {
 
     private void cmbDocONKeyPressed(KeyEvent e) {
         final String searchKey = String.valueOf(e.getKeyChar());
-        Doc doc = (Doc) CollectionUtils.find(listAerzte, new Predicate() {
+        GP doc = (GP) CollectionUtils.find(listAerzte, new Predicate() {
             @Override
             public boolean evaluate(Object o) {
-                return o != null && ((Doc) o).getName().toLowerCase().charAt(0) == searchKey.toLowerCase().charAt(0);
+                return o != null && ((GP) o).getName().toLowerCase().charAt(0) == searchKey.toLowerCase().charAt(0);
             }
         });
         if (doc != null) {
@@ -860,7 +860,7 @@ public class DlgOnDemand extends MyJDialog {
         prescription.setText(txtBemerkung.getText().trim());
         prescription.setTradeForm((TradeForm) cmbMed.getSelectedItem());
         prescription.setUserON(OPDE.getLogin().getUser());
-        prescription.setDocON((Doc) cmbDocON.getSelectedItem());
+        prescription.setDocON((GP) cmbDocON.getSelectedItem());
 
         prescription.setFrom(new DateMidnight().toDate());
         if (rbDate.isSelected()) {
@@ -889,7 +889,7 @@ public class DlgOnDemand extends MyJDialog {
 
     private void fillComboBoxes() {
         EntityManager em = OPDE.createEM();
-        Query queryArzt = em.createQuery("SELECT a FROM Doc a WHERE a.status >= 0 ORDER BY a.name, a.vorname");
+        Query queryArzt = em.createQuery("SELECT a FROM GP a WHERE a.status >= 0 ORDER BY a.name, a.vorname");
         listAerzte = queryArzt.getResultList();
         listAerzte.add(0, null);
 
@@ -899,7 +899,7 @@ public class DlgOnDemand extends MyJDialog {
         em.close();
 
         cmbDocON.setModel(new DefaultComboBoxModel(listAerzte.toArray()));
-        cmbDocON.setRenderer(DocTools.getRenderer());
+        cmbDocON.setRenderer(GPTools.getRenderer());
         cmbDocON.setSelectedIndex(0);
 
         cmbHospitalON.setModel(new DefaultComboBoxModel(listKH.toArray()));

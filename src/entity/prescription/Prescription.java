@@ -64,13 +64,13 @@ import java.util.List;
  * <h3>Bedarfsmedikation</h3>
  * <img src="http://www.offene-pflege.de/images/stories/opde/medi/prescription-bedarf1.png" />
  * <ul>
- * <li><code><b>Verordnung</b>{verid=4658, anDatum=Thu Dec 22 15:54:14 CET 2011, abDatum=Fri Dec 31 23:59:59 CET 9999, bisPackEnde=false, verKennung=3580, bemerkung='', stellplan=false, attachedFiles=[], attachedVorgaenge=[], angesetztDurch=Löhr, Torsten [tloehr], abgesetztDurch=null, bewohner=[JH1], massnahme=entity.rest.Massnahmen[massID=140], darreichung=entity.rest.Darreichung[dafID=1336], situation=entity.rest.Situations[sitID=10], anKH=entity.rest.Hospital[khid=16], abKH=null, anArzt=entity.rest.Doc[arztID=21], abArzt=null}</code></li>
+ * <li><code><b>Verordnung</b>{verid=4658, anDatum=Thu Dec 22 15:54:14 CET 2011, abDatum=Fri Dec 31 23:59:59 CET 9999, bisPackEnde=false, verKennung=3580, bemerkung='', stellplan=false, attachedFiles=[], attachedVorgaenge=[], angesetztDurch=Löhr, Torsten [tloehr], abgesetztDurch=null, bewohner=[JH1], massnahme=entity.rest.Massnahmen[massID=140], darreichung=entity.rest.Darreichung[dafID=1336], situation=entity.rest.Situations[sitID=10], anKH=entity.rest.Hospital[khid=16], abKH=null, anArzt=entity.rest.GP[arztID=21], abArzt=null}</code></li>
  * <li><code><b>VerordnungPlanung</b>{bhppid=7403, nachtMo=0, morgens=0, mittags=0, nachmittags=0, abends=0, nachtAb=0, uhrzeitDosis=0, uhrzeit=null, maxAnzahl=1, maxEDosis=2, taeglich=1, woechentlich=0, monatlich=0, tagNum=0, mon=0, die=0, mit=0, don=0, fre=0, sam=0, son=0, lDatum=Thu Dec 22 15:55:05 CET 2011, uKennung='tloehr', prescription=Verordnung{verid=4658, ...}}</code></li>
  * </ul>
  * <p/>
  * <h3>Regelverordnung mit sehr unterschiedlichen Dosierungen</h3>
  * <ul>
- * <li><img src="http://www.offene-pflege.de/images/stories/opde/medi/prescription-regel123.png" /><p/><code><b>Verordnung</b>{verid=4659, anDatum=Thu Dec 22 16:09:09 CET 2011, abDatum=Fri Dec 31 23:59:59 CET 9999, bisPackEnde=false, verKennung=3581, bemerkung='', stellplan=false, attachedFiles=[], attachedVorgaenge=[], angesetztDurch=Löhr, Torsten [tloehr], abgesetztDurch=null, bewohner=[JH1], massnahme=entity.rest.Massnahmen[massID=140], darreichung=entity.rest.Darreichung[dafID=1336], situation=null, anKH=null, abKH=null, anArzt=entity.rest.Doc[arztID=1], abArzt=null}</code></li>
+ * <li><img src="http://www.offene-pflege.de/images/stories/opde/medi/prescription-regel123.png" /><p/><code><b>Verordnung</b>{verid=4659, anDatum=Thu Dec 22 16:09:09 CET 2011, abDatum=Fri Dec 31 23:59:59 CET 9999, bisPackEnde=false, verKennung=3581, bemerkung='', stellplan=false, attachedFiles=[], attachedVorgaenge=[], angesetztDurch=Löhr, Torsten [tloehr], abgesetztDurch=null, bewohner=[JH1], massnahme=entity.rest.Massnahmen[massID=140], darreichung=entity.rest.Darreichung[dafID=1336], situation=null, anKH=null, abKH=null, anArzt=entity.rest.GP[arztID=1], abArzt=null}</code></li>
  * <li><img src="http://www.offene-pflege.de/images/stories/opde/medi/prescription-regel1.png" /><p/><code><b>VerordnungPlanung</b>{bhppid=7406, nachtMo=0, morgens=1, mittags=1, nachmittags=0, abends=1, nachtAb=0, uhrzeitDosis=0, uhrzeit=null, maxAnzahl=0, maxEDosis=0, taeglich=1, woechentlich=0, monatlich=0, tagNum=0, mon=0, die=0, mit=0, don=0, fre=0, sam=0, son=0, lDatum=Thu Dec 22 16:12:49 CET 2011, uKennung='tloehr', prescription=Verordnung{verid=4659, ...}}</code></li>
  * <li><img src="http://www.offene-pflege.de/images/stories/opde/medi/prescription-regel2.png" /><p/><code><b>VerordnungPlanung</b>{bhppid=7404, nachtMo=0, morgens=0, mittags=0, nachmittags=0, abends=0, nachtAb=0, uhrzeitDosis=2.5, uhrzeit=Thu Dec 22 22:00:00 CET 2011, maxAnzahl=0, maxEDosis=0, taeglich=0, woechentlich=1, monatlich=0, tagNum=0, mon=0, die=1, mit=0, don=0, fre=0, sam=1, son=0, lDatum=Thu Dec 22 16:10:52 CET 2011, uKennung='tloehr', prescription=Verordnung{verid=4659, ...}}</code></li>
  * <li><img src="http://www.offene-pflege.de/images/stories/opde/medi/prescription-regel3.png" /><p/><code><b>VerordnungPlanung</b>{bhppid=7405, nachtMo=0, morgens=0, mittags=0, nachmittags=0, abends=3, nachtAb=0, uhrzeitDosis=0, uhrzeit=null, maxAnzahl=0, maxEDosis=0, taeglich=0, woechentlich=0, monatlich=2, tagNum=0, mon=0, die=0, mit=0, don=0, fre=0, sam=1, son=0, lDatum=Thu Dec 22 16:11:49 CET 2011, uKennung='tloehr', prescription=Verordnung{verid=4659, ...}}</code></li>
@@ -150,10 +150,10 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
     private Hospital hospitalOFF;
     @JoinColumn(name = "AnArztID", referencedColumnName = "ArztID")
     @ManyToOne
-    private Doc docON;
+    private GP docON;
     @JoinColumn(name = "AbArztID", referencedColumnName = "ArztID")
     @ManyToOne
-    private Doc docOFF;
+    private GP docOFF;
 
 
     public Prescription() {
@@ -169,7 +169,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         this.userON = OPDE.getLogin().getUser();
     }
 
-    public Prescription(Date from, Date to, boolean toEndOfPackage, long relation, String text, boolean showOnDailyPlan, List<SYSPRE2FILE> attachedFilesConnections, List<SYSPRE2PROCESS> attachedProcessConnections, Users userON, Users userOFF, Resident resident, Intervention intervention, TradeForm tradeform, Situations situation, Hospital hospitalON, Hospital hospitalOFF, Doc docON, Doc docOFF) {
+    public Prescription(Date from, Date to, boolean toEndOfPackage, long relation, String text, boolean showOnDailyPlan, List<SYSPRE2FILE> attachedFilesConnections, List<SYSPRE2PROCESS> attachedProcessConnections, Users userON, Users userOFF, Resident resident, Intervention intervention, TradeForm tradeform, Situations situation, Hospital hospitalON, Hospital hospitalOFF, GP docON, GP docOFF) {
         this.from = from;
         this.to = to;
         this.toEndOfPackage = toEndOfPackage;
@@ -223,19 +223,19 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         this.hospitalOFF = abKH;
     }
 
-    public Doc getDocON() {
+    public GP getDocON() {
         return docON;
     }
 
-    public void setDocON(Doc anDoc) {
+    public void setDocON(GP anDoc) {
         this.docON = anDoc;
     }
 
-    public Doc getDocOFF() {
+    public GP getDocOFF() {
         return docOFF;
     }
 
-    public void setDocOFF(Doc abDoc) {
+    public void setDocOFF(GP abDoc) {
         this.docOFF = abDoc;
     }
 
@@ -403,9 +403,9 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
             result += "</tr>\n";
             if (docON != null || docOFF != null) {
                 result += "<tr>";
-                result += "<td valign=\"top\">" + DocTools.getFullName(docON) + "</td>";
+                result += "<td valign=\"top\">" + GPTools.getFullName(docON) + "</td>";
                 result += "<td valign=\"top\">&raquo;</td>";
-                result += "<td valign=\"top\">" + DocTools.getFullName(docOFF) + "</td>";
+                result += "<td valign=\"top\">" + GPTools.getFullName(docOFF) + "</td>";
                 result += "</tr>\n";
             }
             if (hospitalON != null || hospitalOFF != null) {
@@ -428,7 +428,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
             result += "<br/>" + userON.getFullname();
             if (docON != null) {
                 result += "<br/>";
-                result += DocTools.getFullName(docON);
+                result += GPTools.getFullName(docON);
             }
             if (hospitalON != null) {
                 result += "<br/>";

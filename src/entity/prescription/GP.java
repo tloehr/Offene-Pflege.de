@@ -4,9 +4,9 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "doc")
+@Table(name = "gp")
 
-public class Doc implements Serializable {
+public class GP implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,8 +48,14 @@ public class Doc implements Serializable {
     @Version
     @Column(name = "version")
     private Long version;
+    @Basic(optional = false)
+    @Column(name = "neurologist")
+    private boolean neurologist;
+    @Basic(optional = false)
+    @Column(name = "skin")
+    private boolean dermatology;
 
-    public Doc() {
+    public GP() {
         this.anrede = "";
         this.titel = "";
         this.name = "";
@@ -61,10 +67,12 @@ public class Doc implements Serializable {
         this.fax = "";
         this.eMail = "";
         this.mobil = "";
+        this.neurologist = false;
+        this.dermatology = false;
         this.status = 0;
     }
 
-    public Doc(String anrede, String titel, String name, String vorname, String strasse, String plz, String ort, String tel, String fax) {
+    public GP(String anrede, String titel, String name, String vorname, String strasse, String plz, String ort, String tel, String fax) {
         this.anrede = anrede;
         this.titel = titel;
         this.name = name;
@@ -74,6 +82,8 @@ public class Doc implements Serializable {
         this.ort = ort;
         this.tel = tel;
         this.fax = fax;
+        this.neurologist = false;
+        this.dermatology = false;
     }
 
     public Long getArztID() {
@@ -94,6 +104,22 @@ public class Doc implements Serializable {
 
     public String getTitle() {
         return titel;
+    }
+
+    public boolean isNeurologist() {
+        return neurologist;
+    }
+
+    public void setNeurologist(boolean neurologist) {
+        this.neurologist = neurologist;
+    }
+
+    public boolean isDermatology() {
+        return dermatology;
+    }
+
+    public void setDermatology(boolean dermatology) {
+        this.dermatology = dermatology;
     }
 
     public void setTitle(String title) {
@@ -186,7 +212,7 @@ public class Doc implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Doc doc = (Doc) o;
+        GP doc = (GP) o;
 
         if (anrede != null ? !anrede.equals(doc.anrede) : doc.anrede != null) return false;
         if (arztID != null ? !arztID.equals(doc.arztID) : doc.arztID != null) return false;
@@ -225,7 +251,7 @@ public class Doc implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.rest.Doc[arztID=" + arztID + "]";
+        return "entity.rest.GP[arztID=" + arztID + "]";
     }
 
 }

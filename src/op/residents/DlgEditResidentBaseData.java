@@ -11,12 +11,10 @@ import entity.Rooms;
 import entity.RoomsTools;
 import entity.Station;
 import entity.StationTools;
-import entity.info.LCustodian;
-import entity.info.LCustodianTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
-import entity.prescription.Doc;
-import entity.prescription.DocTools;
+import entity.prescription.GP;
+import entity.prescription.GPTools;
 import entity.system.Users;
 import entity.system.UsersTools;
 import op.OPDE;
@@ -71,7 +69,6 @@ public class DlgEditResidentBaseData extends MyJDialog {
         lblPrimNurse1.setText(OPDE.lang.getString("misc.msg.primaryNurse") + " 1");
         lblPrimNurse2.setText(OPDE.lang.getString("misc.msg.primaryNurse") + " 2");
         lblGP.setText(OPDE.lang.getString("misc.msg.gp"));
-        lblLCust.setText(OPDE.lang.getString("misc.msg.lc"));
         rbMale.setText(OPDE.lang.getString("misc.msg.male"));
         rbFemale.setText(OPDE.lang.getString("misc.msg.female"));
 
@@ -83,10 +80,10 @@ public class DlgEditResidentBaseData extends MyJDialog {
 
         txtDOB.setText(DateFormat.getDateInstance().format(resident.getDOB()));
 
-        ArrayList<Doc> listGPs = DocTools.getAllActive();
+        ArrayList<GP> listGPs = GPTools.getAllActive();
         listGPs.add(0, null);
         cmbGP.setModel(new DefaultComboBoxModel(listGPs.toArray()));
-        cmbGP.setRenderer(DocTools.getRenderer());
+        cmbGP.setRenderer(GPTools.getRenderer());
         cmbGP.setSelectedItem(resident.getGP());
 
         cmbStation.setModel(StationTools.getAll4Combobox(false));
@@ -116,12 +113,6 @@ public class DlgEditResidentBaseData extends MyJDialog {
         cmbPrimNurse2.setModel(new DefaultComboBoxModel(listUsers.toArray()));
         cmbPrimNurse2.setRenderer(UsersTools.getRenderer());
         cmbPrimNurse2.setSelectedItem(resident.getPN2());
-
-        ArrayList<LCustodian> listLCs = LCustodianTools.getAllActive();
-        listLCs.add(0, null);
-        cmbLCust.setModel(new DefaultComboBoxModel(listLCs.toArray()));
-        cmbLCust.setRenderer(LCustodianTools.getRenderer());
-        cmbLCust.setSelectedItem(resident.getLCustodian1());
 
         ArrayList<Rooms> listRooms = RoomsTools.getAllActive();
         listGPs.add(0, null);
@@ -192,8 +183,7 @@ public class DlgEditResidentBaseData extends MyJDialog {
         resident.setDOB(dob);
         resident.setEditor(OPDE.getLogin().getUser());
         resident.setGender(rbFemale.isSelected() ? ResidentTools.FEMALE : ResidentTools.MALE);
-        resident.setGP((Doc) cmbGP.getSelectedItem());
-        resident.setLCustodian1((LCustodian) cmbLCust.getSelectedItem());
+        resident.setGP((GP) cmbGP.getSelectedItem());
         resident.setPN1((Users) cmbPrimNurse1.getSelectedItem());
         resident.setPN2((Users) cmbPrimNurse2.getSelectedItem());
         resident.setRoom((Rooms) cmbRoom.getSelectedItem());
@@ -205,7 +195,7 @@ public class DlgEditResidentBaseData extends MyJDialog {
     }
 
     private void btnAddGPActionPerformed(ActionEvent e) {
-        final PnlEditGP pnlGP = new PnlEditGP(new Doc());
+        final PnlEditGP pnlGP = new PnlEditGP(new GP());
         final JidePopup popup = GUITools.createPanelPopup(pnlGP, new Closure() {
             @Override
             public void execute(Object o) {
@@ -213,9 +203,9 @@ public class DlgEditResidentBaseData extends MyJDialog {
                     EntityManager em = OPDE.createEM();
                     try {
                         em.getTransaction().begin();
-                        Doc myGP = em.merge((Doc) o);
+                        GP myGP = em.merge((GP) o);
                         em.getTransaction().commit();
-                        cmbGP.setModel(new DefaultComboBoxModel(new Doc[]{myGP}));
+                        cmbGP.setModel(new DefaultComboBoxModel(new GP[]{myGP}));
                         resident.setGP(myGP);
                     } catch (Exception ex) {
                         if (em.getTransaction().isActive()) {
@@ -233,7 +223,7 @@ public class DlgEditResidentBaseData extends MyJDialog {
 
     private void btnEditGPActionPerformed(ActionEvent e) {
         if (cmbGP.getSelectedItem() == null) return;
-        final PnlEditGP pnlGP = new PnlEditGP((Doc) cmbGP.getSelectedItem());
+        final PnlEditGP pnlGP = new PnlEditGP((GP) cmbGP.getSelectedItem());
         final JidePopup popup = GUITools.createPanelPopup(pnlGP, new Closure() {
             @Override
             public void execute(Object o) {
@@ -241,9 +231,9 @@ public class DlgEditResidentBaseData extends MyJDialog {
                     EntityManager em = OPDE.createEM();
                     try {
                         em.getTransaction().begin();
-                        Doc myGP = em.merge((Doc) o);
+                        GP myGP = em.merge((GP) o);
                         em.getTransaction().commit();
-                        cmbGP.setModel(new DefaultComboBoxModel(new Doc[]{myGP}));
+                        cmbGP.setModel(new DefaultComboBoxModel(new GP[]{myGP}));
                         resident.setGP(myGP);
                     } catch (Exception ex) {
                         if (em.getTransaction().isActive()) {
@@ -259,63 +249,7 @@ public class DlgEditResidentBaseData extends MyJDialog {
         GUITools.showPopup(popup, SwingConstants.EAST);
     }
 
-    private void btnEditLCActionPerformed(ActionEvent e) {
-        if (cmbLCust.getSelectedItem() == null) return;
-        final PnlEditLC pnlLC = new PnlEditLC((LCustodian) cmbLCust.getSelectedItem());
-        final JidePopup popup = GUITools.createPanelPopup(pnlLC, new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-                        LCustodian myLC = em.merge((LCustodian) o);
 
-                        em.getTransaction().commit();
-                        cmbLCust.setModel(new DefaultComboBoxModel(new LCustodian[]{myLC}));
-                        resident.setLCustodian1(myLC);
-                    } catch (Exception ex) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.fatal(ex);
-                    } finally {
-                        em.close();
-                    }
-                }
-            }
-        }, btnEditLC);
-        GUITools.showPopup(popup, SwingConstants.EAST);
-
-    }
-
-    private void btnAddLCActionPerformed(ActionEvent e) {
-        final PnlEditLC pnlLC = new PnlEditLC(new LCustodian());
-        final JidePopup popup = GUITools.createPanelPopup(pnlLC, new Closure() {
-            @Override
-            public void execute(Object o) {
-                if (o != null) {
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-                        LCustodian myLC = em.merge((LCustodian) o);
-
-                        em.getTransaction().commit();
-                        cmbLCust.setModel(new DefaultComboBoxModel(new LCustodian[]{myLC}));
-                        resident.setLCustodian1(myLC);
-                    } catch (Exception ex) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.fatal(ex);
-                    } finally {
-                        em.close();
-                    }
-                }
-            }
-        }, btnAddLC);
-        GUITools.showPopup(popup, SwingConstants.EAST);
-    }
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -342,11 +276,6 @@ public class DlgEditResidentBaseData extends MyJDialog {
         panel3 = new JPanel();
         btnAddGP = new JButton();
         btnEditGP = new JButton();
-        lblLCust = new JLabel();
-        cmbLCust = new JComboBox();
-        panel4 = new JPanel();
-        btnAddLC = new JButton();
-        btnEditLC = new JButton();
         panel1 = new JPanel();
         btnCancel = new JButton();
         btnApply = new JButton();
@@ -355,7 +284,7 @@ public class DlgEditResidentBaseData extends MyJDialog {
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "13dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default, $lcgap, 13dlu",
-            "13dlu, 13*($lgap, default), $lgap, 13dlu"));
+            "13dlu, 12*($lgap, default), $lgap, 13dlu"));
 
         //---- lblName ----
         lblName.setText("text");
@@ -487,49 +416,6 @@ public class DlgEditResidentBaseData extends MyJDialog {
         }
         contentPane.add(panel3, CC.xy(7, 19));
 
-        //---- lblLCust ----
-        lblLCust.setText("text");
-        lblLCust.setFont(new Font("Arial", Font.PLAIN, 14));
-        contentPane.add(lblLCust, CC.xy(3, 21));
-
-        //---- cmbLCust ----
-        cmbLCust.setFont(new Font("Arial", Font.PLAIN, 14));
-        contentPane.add(cmbLCust, CC.xy(5, 21));
-
-        //======== panel4 ========
-        {
-            panel4.setLayout(new HorizontalLayout(5));
-
-            //---- btnAddLC ----
-            btnAddLC.setText(null);
-            btnAddLC.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
-            btnAddLC.setBorderPainted(false);
-            btnAddLC.setContentAreaFilled(false);
-            btnAddLC.setBorder(null);
-            btnAddLC.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnAddLCActionPerformed(e);
-                }
-            });
-            panel4.add(btnAddLC);
-
-            //---- btnEditLC ----
-            btnEditLC.setText(null);
-            btnEditLC.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/edit3.png")));
-            btnEditLC.setBorderPainted(false);
-            btnEditLC.setContentAreaFilled(false);
-            btnEditLC.setBorder(null);
-            btnEditLC.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnEditLCActionPerformed(e);
-                }
-            });
-            panel4.add(btnEditLC);
-        }
-        contentPane.add(panel4, CC.xy(7, 21));
-
         //======== panel1 ========
         {
             panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
@@ -556,7 +442,7 @@ public class DlgEditResidentBaseData extends MyJDialog {
             });
             panel1.add(btnApply);
         }
-        contentPane.add(panel1, CC.xywh(5, 27, 3, 1, CC.RIGHT, CC.FILL));
+        contentPane.add(panel1, CC.xywh(5, 25, 3, 1, CC.RIGHT, CC.FILL));
         pack();
         setLocationRelativeTo(getOwner());
 
@@ -591,11 +477,6 @@ public class DlgEditResidentBaseData extends MyJDialog {
     private JPanel panel3;
     private JButton btnAddGP;
     private JButton btnEditGP;
-    private JLabel lblLCust;
-    private JComboBox cmbLCust;
-    private JPanel panel4;
-    private JButton btnAddLC;
-    private JButton btnEditLC;
     private JPanel panel1;
     private JButton btnCancel;
     private JButton btnApply;

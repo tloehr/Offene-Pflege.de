@@ -7,8 +7,8 @@ package op.residents.bwassistant;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
-import entity.prescription.Doc;
-import entity.prescription.DocTools;
+import entity.prescription.GP;
+import entity.prescription.GPTools;
 import op.residents.PnlEditGP;
 import op.tools.GUITools;
 import org.apache.commons.collections.Closure;
@@ -34,19 +34,19 @@ public class PnlGP extends JPanel {
     }
 
     private void initPanel() {
-        ArrayList<Doc> listGPs = DocTools.getAllActive();
+        ArrayList<GP> listGPs = GPTools.getAllActive();
         listGPs.add(0, null);
 
         cmbArzt.setModel(new DefaultComboBoxModel(listGPs.toArray()));
-        cmbArzt.setRenderer(DocTools.getRenderer());
+        cmbArzt.setRenderer(GPTools.getRenderer());
     }
 
     private void btnAddActionPerformed(ActionEvent e) {
-        final JidePopup popupGP = GUITools.createPanelPopup(new PnlEditGP(new Doc()), new Closure() {
+        final JidePopup popupGP = GUITools.createPanelPopup(new PnlEditGP(new GP()), new Closure() {
             @Override
             public void execute(Object o) {
                 if (o != null) {
-                    cmbArzt.setModel(new DefaultComboBoxModel(new Doc[]{(Doc) o}));
+                    cmbArzt.setModel(new DefaultComboBoxModel(new GP[]{(GP) o}));
                     validate.execute(cmbArzt.getSelectedItem());
                 }
             }

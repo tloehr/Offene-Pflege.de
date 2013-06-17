@@ -6,12 +6,11 @@ package op.residents;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.prescription.Doc;
+import entity.prescription.GP;
 import op.OPDE;
 import op.tools.GUITools;
 import op.tools.PopupPanel;
 import op.tools.SYSTools;
-import org.apache.commons.collections.CollectionUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,15 +20,14 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 /**
  * @author Torsten Löhr
  */
 public class PnlEditGP extends PopupPanel {
-    private Doc doc;
+    private GP doc;
 
-    public PnlEditGP(Doc doc) {
+    public PnlEditGP(GP doc) {
         this.doc = doc;
         initComponents();
         initPanel();

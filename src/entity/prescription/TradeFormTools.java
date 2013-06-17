@@ -207,7 +207,7 @@ public class TradeFormTools {
      * Über die Zeit kann es immer wieder vorkommen, dass eine Verordnung zwar bestehen bleibt, aber
      * das Medikament sich verändert. Allerdings nicht beliebig sondern <b>wirkstoffgleich</b>. Das passiert
      * z.B. wenn zu Beginn, sagen wir Aspirin von Bayer verordnet wurde. Nach einigen Wochen schreibt der
-     * Doc dann aber statt dessen ASS 100 von ratiopharm auf. Diese Medikament kommt dann an und passt aber
+     * GP dann aber statt dessen ASS 100 von ratiopharm auf. Diese Medikament kommt dann an und passt aber
      * nicht zu der ursprünglichen Verordnung (aus Sicht von OPDE). Es ist ja eine andere <b>Darreichung</b>.
      * </p>
      * Trotzdem muss dieses neue Präparat ebenfalls mit auf den Vorrat, der für die Verordnung verwendet wird,

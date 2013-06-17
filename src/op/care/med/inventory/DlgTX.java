@@ -62,6 +62,7 @@ public class DlgTX extends MyJDialog {
         super(false);
         this.tx = tx;
         this.actionBlock = actionBlock;
+
         initDialog();
         setVisible(true);
     }
@@ -129,6 +130,7 @@ public class DlgTX extends MyJDialog {
         contentPane.add(lblText, CC.xy(3, 3, CC.DEFAULT, CC.TOP));
 
         //---- txtText ----
+        txtText.setColumns(100);
         txtText.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

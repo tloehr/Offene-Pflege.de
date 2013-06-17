@@ -11,12 +11,14 @@ import op.OPDE;
 import op.care.info.PnlEditResInfo;
 import op.tools.CleanablePanel;
 import op.tools.GUITools;
+import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
+import java.util.Properties;
 
 /**
  * @author Torsten Löhr
@@ -45,7 +47,12 @@ public class PnlDev extends CleanablePanel {
 
     private void button1ActionPerformed(ActionEvent e) {
         final JidePopup popup = new JidePopup();
-        PnlEditResInfo pnlEditResInfo = new PnlEditResInfo(txtXML.getText());
+        PnlEditResInfo pnlEditResInfo = new PnlEditResInfo(txtXML.getText(), new Closure() {
+            @Override
+            public void execute(Object o) {
+                txtException.setText(o.toString());
+            }
+        });
 
         if (pnlEditResInfo.getLastParsingException() == null) {
             pnlEditResInfo.setEnabled(true);

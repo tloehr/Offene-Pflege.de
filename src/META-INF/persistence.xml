@@ -5,7 +5,7 @@
     <persistence-unit name="OPDEPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <class>entity.system.Acl</class>
-        <class>entity.prescription.Doc</class>
+        <class>entity.prescription.GP</class>
         <class>entity.values.ResValue</class>
         <class>entity.Allowance</class>
         <class>entity.info.LCustodian</class>

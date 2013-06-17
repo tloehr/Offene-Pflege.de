@@ -78,7 +78,7 @@ public class DlgRegular extends MyJDialog {
 
     private boolean ignoreEvent;
 
-    private List<Doc> listAerzte;
+    private List<GP> listAerzte;
     private List<Hospital> listKH;
 
     private JPopupMenu menu;
@@ -213,10 +213,10 @@ public class DlgRegular extends MyJDialog {
 
     private void cmbDocONKeyPressed(KeyEvent e) {
         final String searchKey = String.valueOf(e.getKeyChar());
-        Doc doc = (Doc) CollectionUtils.find(listAerzte, new Predicate() {
+        GP doc = (GP) CollectionUtils.find(listAerzte, new Predicate() {
             @Override
             public boolean evaluate(Object o) {
-                return o != null && ((Doc) o).getName().toLowerCase().charAt(0) == searchKey.toLowerCase().charAt(0);
+                return o != null && ((GP) o).getName().toLowerCase().charAt(0) == searchKey.toLowerCase().charAt(0);
             }
         });
         if (doc != null) {
@@ -225,12 +225,12 @@ public class DlgRegular extends MyJDialog {
     }
 
     private void btnAddGPActionPerformed(ActionEvent e) {
-        final PnlEditGP pnlGP = new PnlEditGP(new Doc());
+        final PnlEditGP pnlGP = new PnlEditGP(new GP());
         JidePopup popup = GUITools.createPanelPopup(pnlGP, new Closure() {
             @Override
             public void execute(Object o) {
                 if (o != null) {
-                    cmbDocON.setModel(new DefaultComboBoxModel(new Doc[]{(Doc) o}));
+                    cmbDocON.setModel(new DefaultComboBoxModel(new GP[]{(GP) o}));
                 }
             }
         }, btnAddGP);
@@ -784,7 +784,7 @@ public class DlgRegular extends MyJDialog {
         prescription.setText(txtBemerkung.getText().trim());
         prescription.setTradeForm((TradeForm) cmbMed.getSelectedItem());
         prescription.setUserON(OPDE.getLogin().getUser());
-        prescription.setDocON((Doc) cmbDocON.getSelectedItem());
+        prescription.setDocON((GP) cmbDocON.getSelectedItem());
 
         prescription.setFrom(new Date());
         if (rbDate.isSelected()) {
@@ -859,7 +859,7 @@ public class DlgRegular extends MyJDialog {
 
     private void fillComboBoxes() {
         EntityManager em = OPDE.createEM();
-        Query queryArzt = em.createQuery("SELECT a FROM Doc a WHERE a.status >= 0 ORDER BY a.name, a.vorname");
+        Query queryArzt = em.createQuery("SELECT a FROM GP a WHERE a.status >= 0 ORDER BY a.name, a.vorname");
         listAerzte = queryArzt.getResultList();
         listAerzte.add(0, null);
 
@@ -869,7 +869,7 @@ public class DlgRegular extends MyJDialog {
         em.close();
 
         cmbDocON.setModel(new DefaultComboBoxModel(listAerzte.toArray()));
-        cmbDocON.setRenderer(DocTools.getRenderer());
+        cmbDocON.setRenderer(GPTools.getRenderer());
         cmbDocON.setSelectedIndex(0);
 
         cmbHospitalON.setModel(new DefaultComboBoxModel(listKH.toArray()));

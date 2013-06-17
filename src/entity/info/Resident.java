@@ -28,13 +28,10 @@ package entity.info;
 import entity.Allowance;
 import entity.Rooms;
 import entity.Station;
-import entity.prescription.Doc;
+import entity.prescription.GP;
 import entity.system.Users;
 import op.OPDE;
 import op.tools.SYSTools;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.joda.time.Years;
 
 import javax.persistence.*;
 import java.io.IOException;
@@ -99,10 +96,7 @@ public class Resident implements Serializable, Comparable<Resident> {
     private Users pn2;
     @JoinColumn(name = "ArztID", referencedColumnName = "ArztID")
     @ManyToOne
-    private Doc gp;
-    @JoinColumn(name = "BetrID1", referencedColumnName = "BetrID")
-    @ManyToOne
-    private LCustodian LCustodian1;
+    private GP gp;
     @JoinColumn(name = "Editor", referencedColumnName = "UKennung")
     @ManyToOne
     private Users editor;
@@ -274,23 +268,14 @@ public class Resident implements Serializable, Comparable<Resident> {
         this.pn2 = bv2;
     }
 
-    public Doc getGP() {
+    public GP getGP() {
         return gp;
     }
 
-    public void setGP(Doc gp) {
+    public void setGP(GP gp) {
         this.gp = gp;
     }
 
-    public LCustodian getLCustodian1() {
-        return LCustodian1;
-    }
-
-
-
-    public void setLCustodian1(LCustodian LCustodian1) {
-        this.LCustodian1 = LCustodian1;
-    }
 
     @Override
     public int hashCode() {
