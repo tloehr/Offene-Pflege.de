@@ -160,6 +160,10 @@ public class PnlEditResInfo {
         // export 2 png function for development
         if (OPDE.isDebug()) {
             JButton png = new JButton(SYSConst.icon22magnify1);
+            png.setBorder(null);
+            png.setContentAreaFilled(false);
+            png.setPressedIcon(SYSConst.icon22Pressed);
+            png.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             png.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -170,6 +174,10 @@ public class PnlEditResInfo {
         }
 
         JButton apply = new JButton(SYSConst.icon22apply);
+        apply.setBorder(null);
+        apply.setContentAreaFilled(false);
+        apply.setPressedIcon(SYSConst.icon22Pressed);
+        apply.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         apply.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -182,8 +190,21 @@ public class PnlEditResInfo {
         });
         btnPanel.add(apply, BorderLayout.LINE_END);
 
+        JButton cancel = new JButton(SYSConst.icon22cancel);
+        cancel.setBorder(null);
+        cancel.setContentAreaFilled(false);
+        cancel.setPressedIcon(SYSConst.icon22Pressed);
+        cancel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        cancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                closure.execute(null);
+            }
+        });
+        btnPanel.add(cancel, BorderLayout.LINE_END);
 
-        enlosingButtonPanel.add(btnPanel, BorderLayout.LINE_END);
+
+        enlosingButtonPanel.add(btnPanel, BorderLayout.LINE_START);
         main.add(enlosingButtonPanel, BorderLayout.SOUTH);
 
 
@@ -194,14 +215,16 @@ public class PnlEditResInfo {
         hdrPanel.add(new JSeparator(), BorderLayout.SOUTH);
         main.add(jl, BorderLayout.NORTH);
 
-
-        SYSTools.setXEnabled(pnlContent, main != null);
+        setEnabled(false);
     }
 
     public Exception getLastParsingException() {
         return lastParsingException;
     }
 
+    public void setClosure(Closure closure) {
+        this.closure = closure;
+    }
 
     public ResInfo getResInfo() {
         try {
@@ -229,7 +252,7 @@ public class PnlEditResInfo {
     }
 
     public void setEnabled(boolean enabled) {
-        SYSTools.setXEnabled(pnlContent, enabled);
+        SYSTools.setXEnabled(main, enabled);
     }
 
     private void calcScale() {
@@ -317,7 +340,7 @@ public class PnlEditResInfo {
             } else if (entry instanceof PnlBodyScheme) {
                 ((PnlBodyScheme) entry).setContent(content);
             } else if (entry instanceof PnlGP) {
-                long gpid = Long.parseLong(SYSTools.catchNull(content.containsKey(key + ".gpid"), "-1"));
+                long gpid = Long.parseLong(SYSTools.catchNull(content.getProperty(key + ".gpid"), "-1"));
                 if (gpid > 0) {
                     GP gp = EntityTools.find(GP.class, gpid);
                     ((PnlGP) entry).setSelected(gp);
@@ -605,7 +628,6 @@ public class PnlEditResInfo {
 
                 j.addActionListener(new RadioButtonActionListener());
                 if (scalemode) {
-                    //                    j.addActionListener(new ScaleOptionActionListener());
                     components.put(groupname + ":" + compName, new Pair<JRadioButton, BigDecimal>(j, score)); // Hier weichen wir vom üblichen SChema ab und übergeben nicht nur die Component sondern auch den Score.
                 } else {
                     j.addActionListener(new RadioButtonActionListener());
@@ -615,7 +637,6 @@ public class PnlEditResInfo {
 
                 if (SYSTools.catchNull(attributes.getValue("default")).equals("true")) {
                     j.setSelected(true);
-                    //scalesum += score;
                     content.put(groupname, attributes.getValue("name"));
                 }
             }
@@ -630,7 +651,6 @@ public class PnlEditResInfo {
                 groupname = attributes.getValue("name");
                 JCheckBox j = new JCheckBox(attributes.getValue("label"));
                 j.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
-//                j.setToolTipText(SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 j.setName(groupname);
                 outerpanel.add(j);
                 components.put(groupname, j); // für den späteren Direktzugriff
@@ -684,7 +704,6 @@ public class PnlEditResInfo {
                 outerpanel.add(layout, jl);
 
 
-
                 String innerlayout = SYSTools.catchNull(attributes.getValue("innerlayout"), "tab" + hfill);
                 outerpanel.add(innerlayout, j);
 
@@ -729,7 +748,7 @@ public class PnlEditResInfo {
                             gpid = ((GP) o).getArztID();
                             gpText = GPTools.getCompleteAddress((GP) o);
                         }
-                        content.put(thisGroupName + ".id", gpid);
+                        content.put(thisGroupName + ".id", Long.toString(gpid));
                         content.put(thisGroupName + ".text", gpText);
                         changed = true;
                     }

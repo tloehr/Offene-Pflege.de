@@ -75,6 +75,7 @@ public class ResInfoTypeTools {
     public static final int TYPE_RESPIRATION = 133;
     public static final int TYPE_MEDS = 134;
     public static final int TYPE_MYCOSIS = 135;
+    public static final int TYPE_PSYCH = 136;
 
 
 //    public static final String TYPE_HOSPITAL_STAY = "KH";

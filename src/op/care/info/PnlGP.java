@@ -150,8 +150,8 @@ public class PnlGP extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "default:grow, $lcgap, default",
-                "default"));
+            "default:grow, $lcgap, default",
+            "default"));
 
         //---- cmbGP ----
         cmbGP.setFont(new Font("Arial", Font.PLAIN, 14));

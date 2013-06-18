@@ -772,7 +772,7 @@ public class PnlInformation extends NursingRecordsPanel {
 
 
         // forward declaration
-        final JToggleButton btnEdit = new JToggleButton(SYSConst.icon22edit3);
+        final JButton btnEdit = new JButton(SYSConst.icon22edit3);
         final JButton btnMenu = new JButton(SYSConst.icon22menu);
         /***
          *           _
@@ -782,12 +782,12 @@ public class PnlInformation extends NursingRecordsPanel {
          *      \___|_| |_|\__,_|_| |_|\__, |\___|
          *                             |___/
          */
-        final JToggleButton btnChange = new JToggleButton(SYSConst.icon22playerPlay);
+        final JButton btnChange = new JButton(SYSConst.icon22playerPlay);
         btnChange.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnChange.setContentAreaFilled(false);
         btnChange.setBorder(null);
         btnChange.setAlignmentY(Component.TOP_ALIGNMENT);
-        btnChange.setSelectedIcon(SYSConst.icon22playerPlayPressed);
+        btnChange.setPressedIcon(SYSConst.icon22Pressed);
         cptitle.getRight().add(btnChange);
         btnChange.addItemListener(new ItemListener() {
             @Override
@@ -801,7 +801,7 @@ public class PnlInformation extends NursingRecordsPanel {
 
 
                 if (e.getStateChange() == ItemEvent.DESELECTED && mapInfo2Editor.get(resInfo).isChanged()) {
-                    new DlgYesNo("geändert", SYSConst.icon48play, new Closure() {
+                    new DlgYesNo(OPDE.lang.getString("misc.questions.edit1") + "<br/>" + resInfo.getID() + "<br/>" + OPDE.lang.getString("misc.questions.edit2"), SYSConst.icon48play, new Closure() {
                         @Override
                         public void execute(Object answer) {
                             if (!answer.equals(JOptionPane.YES_OPTION)) {
@@ -883,14 +883,15 @@ public class PnlInformation extends NursingRecordsPanel {
          *
          */
         btnEdit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnEdit.setPressedIcon(SYSConst.icon22Pressed);
         btnEdit.setContentAreaFilled(false);
         btnEdit.setBorder(null);
         btnEdit.setSelectedIcon(SYSConst.icon22edit3Pressed);
         btnEdit.setAlignmentY(Component.TOP_ALIGNMENT);
         cptitle.getRight().add(btnEdit);
-        btnEdit.addItemListener(new ItemListener() {
+        btnEdit.addActionListener(new ActionListener() {
             @Override
-            public void itemStateChanged(ItemEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 if (!mapInfo2Editor.containsKey(resInfo)) {
                     try {
                         cpInfo.setCollapsed(false);
@@ -898,61 +899,89 @@ public class PnlInformation extends NursingRecordsPanel {
                         //bah!!
                     }
                 }
-                btnPrint.setEnabled(e.getStateChange() != ItemEvent.SELECTED);
-                btnMenu.setEnabled(btnMenuEnabled && e.getStateChange() != ItemEvent.SELECTED);
-                mapInfo2Editor.get(resInfo).setEnabled(e.getStateChange() == ItemEvent.SELECTED);
-                btnChange.setEnabled(e.getStateChange() == ItemEvent.DESELECTED && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD && !resInfo.isClosed() && !resInfo.isSingleIncident() && !resInfo.isNoConstraints());
-                if (e.getStateChange() == ItemEvent.DESELECTED && mapInfo2Editor.get(resInfo).isChanged()) {
+                btnPrint.setEnabled(false);
+                btnMenu.setEnabled(false);
+                mapInfo2Editor.get(resInfo).setEnabled(true);
+                btnChange.setEnabled(false);
+                btnEdit.setEnabled(false);
 
-                    EntityManager em = OPDE.createEM();
-                    try {
-                        em.getTransaction().begin();
-                        ResInfo editinfo = em.merge(resInfo);
+                mapInfo2Editor.get(resInfo).setClosure(new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        btnPrint.setEnabled(true);
+                        btnMenu.setEnabled(btnMenuEnabled);
+                        mapInfo2Editor.get(resInfo).setEnabled(resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD && !resInfo.isClosed() && !resInfo.isSingleIncident() && !resInfo.isNoConstraints());
+                        btnChange.setEnabled(true);
+                        btnEdit.setEnabled(ResInfoTools.isEditable(resInfo) && (OPDE.isAdmin() ||
+                                (resInfo.getUserON().equals(OPDE.getLogin().getUser()) && new DateMidnight(resInfo.getFrom()).equals(new DateMidnight()))  // The same user only on the same day.
+                        ));
 
-                        ResInfo tmpInfo = mapInfo2Editor.get(resInfo).getResInfo();
-                        editinfo.setHtml(ResInfoTools.getContentAsHTML(tmpInfo));
-                        editinfo.setProperties(tmpInfo.getProperties());
-                        editinfo.setText(tmpInfo.getText());
-                        editinfo.setUserON(em.merge(OPDE.getLogin().getUser()));
-
-                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                        // so that no conflicts can occur if another user enters a new info at the same time
-                        em.lock(em.merge(editinfo.getResInfoType()), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                        em.lock(editinfo, LockModeType.OPTIMISTIC);
-
-                        em.getTransaction().commit();
-
-                        // refresh data
-                        int oldIndex = mapType2ResInfos.get(resInfo.getResInfoType()).indexOf(resInfo);
-                        mapType2ResInfos.get(resInfo.getResInfoType()).remove(resInfo);
-                        mapType2ResInfos.get(editinfo.getResInfoType()).add(oldIndex, editinfo);
-
-                        listAllInfos.remove(resInfo);
-                        listAllInfos.add(editinfo);
-
-                    } catch (OptimisticLockException ole) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
+                        if (o == null || !mapInfo2Editor.get(resInfo).isChanged()) {
+                            return;
                         }
-                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                            OPDE.getMainframe().emptyFrame();
-                            OPDE.getMainframe().afterLogin();
-                        }
-                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                    } catch (Exception ex) {
-                        if (em.getTransaction().isActive()) {
-                            em.getTransaction().rollback();
-                        }
-                        OPDE.fatal(ex);
-                    } finally {
-                        em.close();
+
+                        new DlgYesNo(OPDE.lang.getString("misc.questions.edit1") + "<br/>" + resInfo.getID() + "<br/>" + OPDE.lang.getString("misc.questions.edit2"), SYSConst.icon48play, new Closure() {
+                            @Override
+                            public void execute(Object answer) {
+
+                                if (!answer.equals(JOptionPane.YES_OPTION)) {
+                                    return;
+                                }
+
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    ResInfo editinfo = em.merge(resInfo);
+
+                                    ResInfo tmpInfo = mapInfo2Editor.get(resInfo).getResInfo();
+                                    editinfo.setHtml(ResInfoTools.getContentAsHTML(tmpInfo));
+                                    editinfo.setProperties(tmpInfo.getProperties());
+                                    editinfo.setText(tmpInfo.getText());
+                                    editinfo.setUserON(em.merge(OPDE.getLogin().getUser()));
+
+                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                    // so that no conflicts can occur if another user enters a new info at the same time
+                                    em.lock(em.merge(editinfo.getResInfoType()), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                    em.lock(editinfo, LockModeType.OPTIMISTIC);
+
+                                    em.getTransaction().commit();
+
+                                    // refresh data
+                                    int oldIndex = mapType2ResInfos.get(resInfo.getResInfoType()).indexOf(resInfo);
+                                    mapType2ResInfos.get(resInfo.getResInfoType()).remove(resInfo);
+                                    mapType2ResInfos.get(editinfo.getResInfoType()).add(oldIndex, editinfo);
+
+                                    listAllInfos.remove(resInfo);
+                                    listAllInfos.add(editinfo);
+
+                                } catch (OptimisticLockException ole) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception ex) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(ex);
+                                } finally {
+                                    em.close();
+                                }
+                                mapKey2CP.remove(keyResInfo);
+                                reloadDisplay();
+                            }
+                        });
+
+
                     }
-
-                    mapKey2CP.remove(keyResInfo);
-                    reloadDisplay();
-                }
+                });
             }
         });
+
         // Only active ones can be edited, and only by the same user that started it or the admin.
         btnEdit.setEnabled(ResInfoTools.isEditable(resInfo) && (OPDE.isAdmin() ||
                 (resInfo.getUserON().equals(OPDE.getLogin().getUser()) && new DateMidnight(resInfo.getFrom()).equals(new DateMidnight()))  // The same user only on the same day.

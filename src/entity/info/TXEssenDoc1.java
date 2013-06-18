@@ -55,16 +55,6 @@ public class TXEssenDoc1 {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
     boolean mre, psych = false;
 
-
-//    public static final String[] PARTS = new String[]{"head.left.side", "shoulder.left.side", "upper.back.left.side", "ellbow.side.left", "hand.left.side", "hip.left.side", "bottom.left.side", "upper.leg.left.side",
-//            "lower.leg.left.side", "calf.left.side", "heel.left.side", "face", "shoulder.front.right", "shoulder.front.left", "upper.belly", "crook.arm.right",
-//            "crook.arm.left", "lower.belly", "groin", "upper.leg.right.front", "upper.leg.left.front", "knee.right", "knee.left", "shin.right.front", "shin.left.front",
-//            "foot.right.front", "foot.left.front", "back.of.the.head", "shoulder.back.left", "shoulder.back.right", "back.mid", "ellbow.left",
-//            "ellbow.right", "back.low", "bottom.back", "upper.leftleg.back", "upper.rightleg.back", "knee.hollowleft", "knee.hollowright", "calf.leftback",
-//            "calf.rightback", "foot.leftback", "foot.rightback", "head.right.side", "shoulder.right.side", "back.upper.left.side", "ellbow.rightside",
-//            "hand.right.side", "hip.right.side", "bottom.right.side", "upper.leg.right.side", "lower.leg.right.side", "calf.right.side", "heel.right.side"};
-//
-
     public TXEssenDoc1(Resident resident) {
         this.resident = resident;
         content = new HashMap<String, String>();
@@ -85,9 +75,6 @@ public class TXEssenDoc1 {
 
         try {
 
-
-//            outfileDementia = new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TXDEM_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
-
             File file1 = createDoc1();
             content.clear();
             listICD.clear();
@@ -98,6 +85,12 @@ public class TXEssenDoc1 {
                 content.clear();
             }
 
+            File filepsych = null;
+            if (!mapID2Info.containsKey(ResInfoTypeTools.TYPE_PSYCH)) {
+                filepsych = createDocPSYCH();
+                content.clear();
+            }
+
             mapInfo2Properties.clear();
 
 
@@ -105,7 +98,20 @@ public class TXEssenDoc1 {
         } catch (Exception e) {
             OPDE.fatal(e);
         }
+    }
 
+    private File createDocPSYCH() throws Exception {
+        File outfilePSYCH = new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TXTXEAF.PSYCH_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
+        PdfStamper stamper = new PdfStamper(new PdfReader(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_TEMPLATES + File.separator + SOURCEMRE), new FileOutputStream(outfilePSYCH));
+        createContent4PSYCH();
+
+        AcroFields form = stamper.getAcroFields();
+        for (String key : content.keySet()) {
+            form.setField(key, content.get(key));
+        }
+        stamper.setFormFlattening(true);
+        stamper.close();
+        return outfilePSYCH;
     }
 
     private File createDocMRE() throws Exception {
@@ -623,7 +629,7 @@ public class TXEssenDoc1 {
         if (confirmed) {
             rb = "1";
         }
-        if (notchecked){
+        if (notchecked) {
             rb = "2";
         }
 
@@ -1087,8 +1093,6 @@ public class TXEssenDoc1 {
             content.put(TXEAF.MRE_PHONE, resident.getStation().getHome().getTel());
         }
 
-        content.put(TXEAF.MRE_RESIDENT_ZIP, resident.getStation().getHome().getZIP());
-
         content.put(TXEAF.MRE_MRSA1, setCheckbox(getValue(ResInfoTypeTools.TYPE_INFECTION, "mrsa")));
         content.put(TXEAF.MRE_MRSA2, setCheckbox(getValue(ResInfoTypeTools.TYPE_INFECTION, "mrsa")));
         content.put(TXEAF.MRE_VRE, setCheckbox(getValue(ResInfoTypeTools.TYPE_INFECTION, "vre")));
@@ -1161,13 +1165,62 @@ public class TXEssenDoc1 {
 
     }
 
+    private void createContent4PSYCH() {
+        content.put(TXEAF.PSYCH_RESIDENT_GENDER, resident.getGender() == ResidentTools.MALE ? "0" : "1");
+        content.put(TXEAF.PSYCH_RESIDENT_FIRSTNAME, resident.getFirstname());
+        content.put(TXEAF.PSYCH_RESIDENT_NAME, resident.getName());
+        content.put(TXEAF.PSYCH_RESIDENT_DOB, DateFormat.getDateInstance().format(resident.getDOB()));
+        content.put(TXEAF.PSYCH_RESIDENT_HINSURANCE, getValue(ResInfoTypeTools.TYPE_HEALTH_INSURANCE, "hiname"));
+        if (resident.isActive()) {
+            content.put(TXEAF.PSYCH_LOGO_TEXTFIELD, HomesTools.getAsTextForTX(resident.getStation().getHome()));
+            content.put(TXEAF.PSYCH_RESIDENT_PHONE, resident.getStation().getHome().getTel());
+            content.put(TXEAF.PSYCH_RESIDENT_STREET, resident.getStation().getHome().getStreet());
+            content.put(TXEAF.PSYCH_RESIDENT_CITY, resident.getStation().getHome().getCity());
+            content.put(TXEAF.PSYCH_RESIDENT_ZIP, resident.getStation().getHome().getZIP());
+            content.put(TXEAF.PSYCH_PHONE, resident.getStation().getHome().getTel());
+        }
 
-    //       _                  _____                      _                    _          _
-    //      / \   ___ _ __ ___ |  ___|__  _ __ _ __ ___   | | _____ _   _ ___  | |__   ___| | _____      __
-    //     / _ \ / __| '__/ _ \| |_ / _ \| '__| '_ ` _ \  | |/ / _ \ | | / __| | '_ \ / _ \ |/ _ \ \ /\ / /
-    //    / ___ \ (__| | | (_) |  _| (_) | |  | | | | | | |   <  __/ |_| \__ \ | |_) |  __/ | (_) \ V  V /
-    //   /_/   \_\___|_|  \___/|_|  \___/|_|  |_| |_| |_| |_|\_\___|\__, |___/ |_.__/ \___|_|\___/ \_/\_/
-    //                                                              |___/
+        content.put(TXEAF.PSYCH_SPECIALIST, getValue(ResInfoTypeTools.TYPE_PSYCH, "gp1.text"));
+        content.put(TXEAF.PSYCH_RESIDENT_ACCOMODATION, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "accomodation"), new String[]{"apartment", "assistedliving", "homeless"}));
+        content.put(TXEAF.PSYCH_SOCIAL_CONTACTS, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "socialcontacts"), new String[]{"supportive", "problem", "missing"}));
 
+        content.put(TXEAF.PSYCH_RESIDENT_JOB, setCheckbox(getValue(ResInfoTypeTools.TYPE_PSYCH, "job")));
+        content.put(TXEAF.PSYCH_RESIDENT_VOLUNTEER, setCheckbox(getValue(ResInfoTypeTools.TYPE_PSYCH, "volunteer")));
+
+        content.put(TXEAF.PSYCH_AGGRESSIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "aggressive"), new String[]{"yes1", "no1", "intermittent1"}));
+        content.put(TXEAF.PSYCH_SELFDESTRUCTIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "selfdestructive"), new String[]{"yes2", "no2", "intermittent2"}));
+        content.put(TXEAF.PSYCH_MANICDEPRESSIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "manicdepressive"), new String[]{"yes3", "no3", "intermittent3"}));
+        content.put(TXEAF.PSYCH_DELUSION, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "delusion"), new String[]{"yes4", "no4", "intermittent4"}));
+        content.put(TXEAF.PSYCH_HALLUCINATION, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "hallucination"), new String[]{"yes5", "no5", "intermittent5"}));
+        content.put(TXEAF.PSYCH_FEAR, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "fear"), new String[]{"yes12", "no12", "intermittent12"}));
+        content.put(TXEAF.PSYCH_PASSIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "passive"), new String[]{"yes6", "no6", "intermittent6"}));
+        content.put(TXEAF.PSYCH_RESTLESS, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "restless"), new String[]{"yes7", "no7", "intermittent7"}));
+        content.put(TXEAF.PSYCH_REGRESSIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "regressive"), new String[]{"yes8", "no8", "intermittent8"}));
+        content.put(TXEAF.PSYCH_FAECAL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "faecal"), new String[]{"yes9", "no9", "intermittent9"}));
+        content.put(TXEAF.PSYCH_APRAXIA, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "apraxia"), new String[]{"yes10", "no10", "intermittent10"}));
+        content.put(TXEAF.PSYCH_AGNOSIA, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "agnosia"), new String[]{"yes11", "no11", "intermittent11"}));
+
+        content.put(TXEAF.PSYCH_CONSUMING, setCheckbox(getValue(ResInfoTypeTools.TYPE_PSYCH, "consuming")));
+        content.put(TXEAF.PSYCH_TREATMENTSYMPTOMS, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "treatmentsymptoms"), new String[]{"yes13", "no13", "intermittent13"}));
+
+        content.put(TXEAF.PSYCH_ALCOHOL, setCheckbox(getValue(ResInfoTypeTools.TYPE_PSYCH, "alcohol")));
+        content.put(TXEAF.PSYCH_DRUGS, setCheckbox(getValue(ResInfoTypeTools.TYPE_PSYCH, "drugs")));
+        content.put(TXEAF.PSYCH_MEDS, setCheckbox(getValue(ResInfoTypeTools.TYPE_PSYCH, "meds")));
+        content.put(TXEAF.PSYCH_NICOTIN, setCheckbox(getValue(ResInfoTypeTools.TYPE_PSYCH, "nicotin")));
+        content.put(TXEAF.PSYCH_GAMBLING, setCheckbox(getValue(ResInfoTypeTools.TYPE_PSYCH, "gambling")));
+
+        content.put(TXEAF.PSYCH_ADDICTION_OTHER, getValue(ResInfoTypeTools.TYPE_PSYCH, "otheraddiction"));
+
+        content.put(TXEAF.PSYCH_SUBSTITUTION, getValue(ResInfoTypeTools.TYPE_PSYCH, "substitution"));
+        content.put(TXEAF.PSYCH_SUBSTLOCATION, getValue(ResInfoTypeTools.TYPE_PSYCH, "substlocation"));
+        content.put(TXEAF.PSYCH_SUBSTCONTACT, getValue(ResInfoTypeTools.TYPE_PSYCH, "substcontact"));
+
+
+        content.put(TXEAF.PSYCH_CONSUMING, SYSTools.catchNull(mapID2Info.get(ResInfoTypeTools.TYPE_PSYCH).getText(), "--"));
+        content.put(TXEAF.PSYCH_TX_DATE, DateFormat.getDateInstance().format(new Date()));
+        content.put(TXEAF.PSYCH_TX_USERNAME, (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : ""));
+
+
+    }
 
 }
