@@ -1,12 +1,18 @@
 package op.care.info;
 
+import com.itextpdf.text.*;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.pdf.PdfWriter;
 import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.OverlayTextArea;
 import entity.EntityTools;
+import entity.files.SYSFilesTools;
 import entity.info.ResInfo;
+import entity.info.ResidentTools;
 import entity.prescription.GP;
 import entity.prescription.GPTools;
 import op.OPDE;
+import op.system.PDF;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
@@ -24,10 +30,10 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import java.awt.*;
+import java.awt.Font;
 import java.awt.event.*;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.awt.font.TextAttribute;
+import java.io.*;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -220,6 +226,48 @@ public class PnlEditResInfo {
 
     public Exception getLastParsingException() {
         return lastParsingException;
+    }
+
+
+    public void print() {
+
+        try {
+
+//            File file = File.createTempFile("opde", "pdf");
+//            file.deleteOnExit();
+
+            final PDF pdf = new PDF(null, "footer", 10);
+
+
+            pdf.getDocument().open();
+
+            Paragraph h1 = new Paragraph(new Phrase(OPDE.lang.getString("misc.msg.additional.medslist"), PDF.plain(PDF.sizeH1())));
+            h1.setAlignment(Element.ALIGN_CENTER);
+            pdf.getDocument().add(h1);
+
+            Paragraph p = new Paragraph(new Phrase(ResidentTools.getLabelText(resInfo.getResident())));
+            p.setAlignment(Element.ALIGN_CENTER);
+            pdf.getDocument().add(p);
+            pdf.getDocument().add(Chunk.NEWLINE);
+
+
+            File pngfile = File.createTempFile("opde", "pdf");
+            GUITools.exportToPNG(pnlContent, pngfile);
+
+            Image image = Image.getInstance("/Users/tloehr/opde/cache/pnl2png_20130615141839349.png");
+            image.setScaleToFitLineWhenOverflow(true);
+
+            pdf.getDocument().add(image);
+
+            pdf.getDocument().close();
+
+
+            SYSFilesTools.handleFile(pdf.getOutputFile(), Desktop.Action.OPEN);
+
+        } catch (Exception e) {
+             OPDE.error(e);
+        }
+
     }
 
     public void setClosure(Closure closure) {
@@ -545,7 +593,7 @@ public class PnlEditResInfo {
                 innerpanel = new JPanel(new RiverLayout());
                 innerpanel.setName(groupname);
                 if (attributes.getValue("label") != null) {
-                    JLabel jl = new JLabel(attributes.getValue("label") + ":");
+                    JLabel jl = new JLabel(attributes.getValue("label"));
                     jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
 
                     int fontstyle = Font.PLAIN;
@@ -564,8 +612,12 @@ public class PnlEditResInfo {
                         jl.setFont(new Font("Arial", fontstyle, 14));
                     }
 
+                    Font original = jl.getFont();
+                    Map map = original.getAttributes();
+                    map.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+                    jl.setFont(original.deriveFont(map));
 
-                    outerpanel.add("br left", jl);
+                    outerpanel.add("p left", jl);
                 }
             }
             if (tagName.equalsIgnoreCase("scale")) {
@@ -611,6 +663,13 @@ public class PnlEditResInfo {
                 outerpanel.add(layout, jl);
                 tabgroup = true;
             }
+            /***
+             *               _   _
+             *      ___ _ __| |_(_)___ _ _
+             *     / _ \ '_ \  _| / _ \ ' \
+             *     \___/ .__/\__|_\___/_||_|
+             *         |_|
+             */
             if (tagName.equalsIgnoreCase("option")) {
                 BigDecimal score = BigDecimal.ZERO;
                 if (scalemode) {
@@ -875,7 +934,7 @@ public class PnlEditResInfo {
 
         public void endElement(String uri, String localName, String qName) throws SAXException {
             if (qName.equalsIgnoreCase("optiongroup") || qName.equalsIgnoreCase("scalegroup")) {
-                outerpanel.add("tab", innerpanel);
+                outerpanel.add("br", innerpanel);
             }
             if (qName.equalsIgnoreCase("scale")) {
                 outerpanel.add("p hfill", new JSeparator());
@@ -895,6 +954,8 @@ public class PnlEditResInfo {
         public JPanel getPanel() {
             return this.outerpanel;
         }
+
+
     } // private class HandlerDatenStruktur
 
 

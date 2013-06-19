@@ -429,9 +429,8 @@ public class PnlInformation extends NursingRecordsPanel {
                                                     final ResInfo newinfo = em.merge((ResInfo) o);
                                                     newinfo.setHtml(ResInfoTools.getContentAsHTML(newinfo));
 
-
                                                     // only for the screen refresh
-                                                    ArrayList<Pair<ResInfo, ResInfo>> changedInfos = new ArrayList<Pair<ResInfo, ResInfo>>();
+//                                                    ArrayList<Pair<ResInfo, ResInfo>> changedInfos = new ArrayList<Pair<ResInfo, ResInfo>>();
 
                                                     // if there are active resinfos with obsolete forms that should be replaced
                                                     // by this one, they must all be closed now.
@@ -442,37 +441,37 @@ public class PnlInformation extends NursingRecordsPanel {
                                                             closedResInfo.setTo(new DateTime(newinfo.getFrom()).minusSeconds(1).toDate());
                                                             closedResInfo.setUserOFF(em.merge(OPDE.getLogin().getUser()));
 
-                                                            changedInfos.add(new Pair<ResInfo, ResInfo>(closedResInfo, myResInfo));
+//                                                            changedInfos.add(new Pair<ResInfo, ResInfo>(closedResInfo, myResInfo));
                                                         }
                                                     }
 
                                                     em.getTransaction().commit();
 
-                                                    mapType2ResInfos.get(newinfo.getResInfoType()).add(newinfo);
-                                                    Collections.sort(mapType2ResInfos.get(newinfo.getResInfoType()));
-
-                                                    listAllTypes.remove(resInfoType);
-                                                    listAllTypes.add(myType);
-
-                                                    listAllInfos.add(newinfo);
-
-                                                    for (Pair<ResInfo, ResInfo> pair : changedInfos) {
-                                                        // refresh data
-                                                        int oldIndex = mapType2ResInfos.get(pair.getFirst().getResInfoType()).indexOf(pair.getFirst());
-                                                        mapType2ResInfos.get(pair.getFirst().getResInfoType()).remove(pair.getFirst());
-                                                        mapType2ResInfos.get(pair.getSecond().getResInfoType()).add(oldIndex, pair.getSecond());
-
-                                                        listAllInfos.remove(pair.getFirst());
-                                                        listAllInfos.add(pair.getSecond());
-                                                    }
-                                                    changedInfos.clear();
+//                                                    mapType2ResInfos.get(newinfo.getResInfoType()).add(newinfo);
+//                                                    Collections.sort(mapType2ResInfos.get(newinfo.getResInfoType()));
+//
+//                                                    listAllTypes.remove(resInfoType);
+//                                                    listAllTypes.add(myType);
+//
+//                                                    listAllInfos.add(newinfo);
+//
+//                                                    for (Pair<ResInfo, ResInfo> pair : changedInfos) {
+//                                                        // refresh data
+//                                                        int oldIndex = mapType2ResInfos.get(resInfoType).indexOf(pair.getFirst());
+//                                                        mapType2ResInfos.get(resInfoType).add(oldIndex, pair.getSecond());
+//                                                        mapType2ResInfos.get(resInfoType).remove(pair.getFirst());
+//
+//                                                        listAllInfos.remove(pair.getFirst());
+//                                                        listAllInfos.add(pair.getSecond());
+//                                                    }
+//                                                    changedInfos.clear();
 
                                                     if (newinfo.getResInfoType().isAlertType()) {
                                                         GUITools.setResidentDisplay(resident);
                                                     }
 
-                                                    reloadDisplay();
-
+//                                                    reloadDisplay();
+                                                    reload();
                                                 } catch (OptimisticLockException ole) {
                                                     if (em.getTransaction().isActive()) {
                                                         em.getTransaction().rollback();
@@ -502,6 +501,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                             }
                                         }
                                     });
+                                    pnlEditResInfo.setEnabled(true);
 
                                     popup.setMovable(false);
                                     popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
@@ -577,6 +577,12 @@ public class PnlInformation extends NursingRecordsPanel {
                 }
             }
         });
+
+        if (resInfo.getResInfoType().isObsolete()) {
+            cptitle.getButton().setIcon(SYSConst.icon22infogray);
+            cptitle.getButton().setHorizontalTextPosition(SwingConstants.LEADING);
+            cptitle.getButton().setToolTipText(SYSTools.toHTMLForScreen(OPDE.lang.getString("nursingrecords.info.outdated.form.explanation")));
+        }
 
         if (!resInfo.isClosed() || !resInfo.isSingleIncident()) {
             cpInfo.setBackground((GUITools.blend(resInfo.getResInfoType().getResInfoCat().getColor(), Color.WHITE, 0.25f)));
@@ -755,17 +761,18 @@ public class PnlInformation extends NursingRecordsPanel {
         btnPrint.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String html = "";
-                html += "<h3 id=\"fonth2\" >" + ResidentTools.getLabelText(resident) + "</h2>\n";
-                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_INFECTION ? SYSConst.html_48x48_biohazard : "";
-                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_DIABETES ? SYSConst.html_48x48_diabetes : "";
-                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_ALLERGY ? SYSConst.html_48x48_allergy : "";
-                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_WARNING ? SYSConst.html_48x48_warning : "";
-                ArrayList<ResInfo> list = new ArrayList<ResInfo>();
-                list.add(resInfo);
-                html += ResInfoTools.getResInfosAsHTML(list, true, null);
-                SYSFilesTools.print(html, true);
-                list.clear();
+//                String html = "";
+//                html += "<h3 id=\"fonth2\" >" + ResidentTools.getLabelText(resident) + "</h2>\n";
+//                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_INFECTION ? SYSConst.html_48x48_biohazard : "";
+//                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_DIABETES ? SYSConst.html_48x48_diabetes : "";
+//                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_ALLERGY ? SYSConst.html_48x48_allergy : "";
+//                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_WARNING ? SYSConst.html_48x48_warning : "";
+//                ArrayList<ResInfo> list = new ArrayList<ResInfo>();
+//                list.add(resInfo);
+//                html += ResInfoTools.getResInfosAsHTML(list, true, null);
+//                SYSFilesTools.print(html, true);
+//                list.clear();
+                mapInfo2Editor.get(resInfo).print();
             }
         });
         cptitle.getRight().add(btnPrint);
@@ -789,31 +796,48 @@ public class PnlInformation extends NursingRecordsPanel {
         btnChange.setAlignmentY(Component.TOP_ALIGNMENT);
         btnChange.setPressedIcon(SYSConst.icon22Pressed);
         cptitle.getRight().add(btnChange);
-        btnChange.addItemListener(new ItemListener() {
+        btnChange.addActionListener(new ActionListener() {
             @Override
-            public void itemStateChanged(ItemEvent e) {
-                mapInfo2Editor.get(resInfo).setEnabled(e.getStateChange() == ItemEvent.SELECTED);
-                btnPrint.setEnabled(e.getStateChange() != ItemEvent.SELECTED);
-                btnMenu.setEnabled(btnMenuEnabled && e.getStateChange() != ItemEvent.SELECTED);
-                btnEdit.setEnabled(e.getStateChange() == ItemEvent.DESELECTED && ResInfoTools.isEditable(resInfo) && (OPDE.isAdmin() ||
-                        (resInfo.getUserON().equals(OPDE.getLogin().getUser()) && new DateMidnight(resInfo.getFrom()).equals(new DateMidnight()))  // The same user only on the same day.
-                ));
+            public void actionPerformed(ActionEvent e) {
+                if (!mapInfo2Editor.containsKey(resInfo)) {
+                    try {
+                        cpInfo.setCollapsed(false);
+                    } catch (PropertyVetoException e1) {
+                        //bah!!
+                    }
+                }
+                btnPrint.setEnabled(false);
+                btnMenu.setEnabled(false);
+                mapInfo2Editor.get(resInfo).setEnabled(resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD && !resInfo.isClosed() && !resInfo.isSingleIncident() && !resInfo.isNoConstraints());
+                final boolean wasChangeable = btnChange.isEnabled();
+                btnChange.setEnabled(false);
+                final boolean wasEditable = btnEdit.isEnabled();
+                btnEdit.setEnabled(false);
 
+                mapInfo2Editor.get(resInfo).setClosure(new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        btnPrint.setEnabled(true);
+                        btnMenu.setEnabled(btnMenuEnabled);
+                        mapInfo2Editor.get(resInfo).setEnabled(false);
+                        btnChange.setEnabled(wasChangeable);
+                        btnEdit.setEnabled(wasEditable);
 
-                if (e.getStateChange() == ItemEvent.DESELECTED && mapInfo2Editor.get(resInfo).isChanged()) {
-                    new DlgYesNo(OPDE.lang.getString("misc.questions.edit1") + "<br/>" + resInfo.getID() + "<br/>" + OPDE.lang.getString("misc.questions.edit2"), SYSConst.icon48play, new Closure() {
-                        @Override
-                        public void execute(Object answer) {
-                            if (!answer.equals(JOptionPane.YES_OPTION)) {
-                                mapInfo2Editor.put(resInfo, new PnlEditResInfo(resInfo.clone()));
-                                cpInfo.setContentPane(mapInfo2Editor.get(resInfo).getPanel());
-                            } else {
+                        if (o == null || !mapInfo2Editor.get(resInfo).isChanged()) {
+                            return;
+                        }
+                        new DlgYesNo(OPDE.lang.getString("misc.questions.change1") + "<br/>" + ResInfoTools.getCompactHTML(resInfo) + "<br/>" + OPDE.lang.getString("misc.questions.change2"), SYSConst.icon48play, new Closure() {
+                            @Override
+                            public void execute(Object answer) {
+                                if (!answer.equals(JOptionPane.YES_OPTION)) {
+                                    return;
+                                }
                                 EntityManager em = OPDE.createEM();
                                 try {
-
                                     em.getTransaction().begin();
                                     ResInfo oldinfo = em.merge(resInfo);
                                     ResInfo newinfo = em.merge(mapInfo2Editor.get(resInfo).getResInfo());
+
                                     em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                                     // so that no conflicts can occur if another user enters a new info at the same time
                                     em.lock(em.merge(resInfo.getResInfoType()), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
@@ -827,7 +851,6 @@ public class PnlInformation extends NursingRecordsPanel {
                                     oldinfo.setUserOFF(newinfo.getUserON());
 
                                     em.getTransaction().commit();
-
 
                                     // refresh data
                                     mapType2ResInfos.get(oldinfo.getResInfoType()).remove(resInfo);
@@ -861,11 +884,15 @@ public class PnlInformation extends NursingRecordsPanel {
                                 mapKey2CP.remove(keyResInfo);
                                 reloadDisplay();
                             }
-                        }
-                    });
-                }
+                        });
+
+
+                    }
+                });
             }
         });
+
+
         btnChange.setEnabled(
                 resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS
                         && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY
@@ -901,8 +928,10 @@ public class PnlInformation extends NursingRecordsPanel {
                 }
                 btnPrint.setEnabled(false);
                 btnMenu.setEnabled(false);
-                mapInfo2Editor.get(resInfo).setEnabled(true);
+                mapInfo2Editor.get(resInfo).setEnabled(true);//resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD && !resInfo.isClosed() && !resInfo.isSingleIncident() && !resInfo.isNoConstraints());
+                final boolean wasChangeable = btnChange.isEnabled();
                 btnChange.setEnabled(false);
+                final boolean wasEditable = btnEdit.isEnabled();
                 btnEdit.setEnabled(false);
 
                 mapInfo2Editor.get(resInfo).setClosure(new Closure() {
@@ -910,11 +939,13 @@ public class PnlInformation extends NursingRecordsPanel {
                     public void execute(Object o) {
                         btnPrint.setEnabled(true);
                         btnMenu.setEnabled(btnMenuEnabled);
-                        mapInfo2Editor.get(resInfo).setEnabled(resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD && !resInfo.isClosed() && !resInfo.isSingleIncident() && !resInfo.isNoConstraints());
-                        btnChange.setEnabled(true);
-                        btnEdit.setEnabled(ResInfoTools.isEditable(resInfo) && (OPDE.isAdmin() ||
-                                (resInfo.getUserON().equals(OPDE.getLogin().getUser()) && new DateMidnight(resInfo.getFrom()).equals(new DateMidnight()))  // The same user only on the same day.
-                        ));
+                        mapInfo2Editor.get(resInfo).setEnabled(false);
+                        btnChange.setEnabled(wasChangeable);
+                        btnEdit.setEnabled(wasEditable);
+
+//                        btnEdit.setEnabled(ResInfoTools.isEditable(resInfo) && (OPDE.isAdmin() ||
+//                                (resInfo.getUserON().equals(OPDE.getLogin().getUser()) && new DateMidnight(resInfo.getFrom()).equals(new DateMidnight()))  // The same user only on the same day.
+//                        ));
 
                         if (o == null || !mapInfo2Editor.get(resInfo).isChanged()) {
                             return;

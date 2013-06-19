@@ -41,17 +41,24 @@ import java.util.concurrent.TimeUnit;
  */
 public class GUITools {
 
-    public static void exportToPNG(JPanel pnl) {
+    public static void exportToPNG(JPanel pnl, File output) {
         BufferedImage bi = new BufferedImage(pnl.getSize().width, pnl.getSize().height, BufferedImage.TYPE_INT_ARGB);
         Graphics g = bi.createGraphics();
         pnl.paint(g);
         g.dispose();
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-            ImageIO.write(bi, "png", new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "pnl2png_" + sdf.format(new Date()) + ".png"));
+
+            ImageIO.write(bi, "png", output);
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("PNG exported"));
         } catch (Exception e) {
         }
+
+    }
+
+
+    public static void exportToPNG(JPanel pnl){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+        exportToPNG(pnl, new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "pnl2png_" + sdf.format(new Date()) + ".png"));
     }
 
     public static JideButton createHyperlinkButton(String titleORlangbundle, Icon icon, ActionListener actionListener) {

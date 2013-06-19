@@ -368,6 +368,8 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
 
         ResInfo resInfo = (ResInfo) o;
 
+        if (bwinfoid != null && resInfo.bwinfoid != null) return bwinfoid.longValue() == resInfo.bwinfoid.longValue();
+
         if (bemerkung != null ? !bemerkung.equals(resInfo.bemerkung) : resInfo.bemerkung != null) return false;
         if (bwinfoid != null ? !bwinfoid.equals(resInfo.bwinfoid) : resInfo.bwinfoid != null) return false;
         if (bwinfotyp != null ? !bwinfotyp.equals(resInfo.bwinfotyp) : resInfo.bwinfotyp != null) return false;

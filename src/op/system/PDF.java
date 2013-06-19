@@ -88,6 +88,7 @@ public class PDF {
         SIZE = basefontsize;
         if (output == null) {
             this.output = File.createTempFile("opde", ".pdf");
+
         } else {
             this.output = output;
         }

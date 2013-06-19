@@ -904,7 +904,7 @@ public class PrescriptionTools {
         EntityManager em = OPDE.createEM();
 
         ArrayList<Prescription> result = null;
-        Query query = em.createQuery(" SELECT p FROM Prescription p WHERE p.resident = :resident AND p.situation IS NULL AND p.tradeform IS NOT NULL AND p.to >= :now");
+        Query query = em.createQuery(" SELECT p FROM Prescription p WHERE p.resident = :resident AND p.situation IS NULL AND p.tradeform IS NOT NULL AND p.to >= :now ORDER BY p.tradeform.medProduct.text");
         query.setParameter("resident", resident);
         query.setParameter("now", new Date());
         result = new ArrayList<Prescription>(query.getResultList());

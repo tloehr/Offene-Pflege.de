@@ -2,7 +2,9 @@ package entity.info;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.Font;
+import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.*;
+import com.itextpdf.text.pdf.TextField;
 import entity.HomesTools;
 import entity.files.SYSFilesTools;
 import entity.nursingprocess.*;
@@ -75,6 +77,8 @@ public class TXEssenDoc1 {
 
         try {
 
+            psych = mapID2Info.containsKey(ResInfoTypeTools.TYPE_PSYCH);
+
             File file1 = createDoc1();
             content.clear();
             listICD.clear();
@@ -86,7 +90,7 @@ public class TXEssenDoc1 {
             }
 
             File filepsych = null;
-            if (!mapID2Info.containsKey(ResInfoTypeTools.TYPE_PSYCH)) {
+            if (psych) {
                 filepsych = createDocPSYCH();
                 content.clear();
             }
@@ -94,7 +98,7 @@ public class TXEssenDoc1 {
             mapInfo2Properties.clear();
 
 
-            SYSFilesTools.handleFile(concatPDFFiles(file1, filemre), Desktop.Action.OPEN);
+            SYSFilesTools.handleFile(concatPDFFiles(file1, filemre, filepsych), Desktop.Action.OPEN);
         } catch (Exception e) {
             OPDE.fatal(e);
         }
@@ -102,7 +106,7 @@ public class TXEssenDoc1 {
 
     private File createDocPSYCH() throws Exception {
         File outfilePSYCH = new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TXTXEAF.PSYCH_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
-        PdfStamper stamper = new PdfStamper(new PdfReader(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_TEMPLATES + File.separator + SOURCEMRE), new FileOutputStream(outfilePSYCH));
+        PdfStamper stamper = new PdfStamper(new PdfReader(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_TEMPLATES + File.separator + SOURCEPSYCH), new FileOutputStream(outfilePSYCH));
         createContent4PSYCH();
 
         AcroFields form = stamper.getAcroFields();
@@ -157,7 +161,7 @@ public class TXEssenDoc1 {
 
         String docs = mre ? "MRE, " : "";
         docs += psych ? "PSYCH, " : "";
-        docs = docs.substring(0, docs.length() - 2);
+        docs = docs.isEmpty() ? "" : docs.substring(0, docs.length() - 2);
 
         content.put(TXEAF.DOCS_MISC, setCheckbox(mre || psych));
         content.put(TXEAF.PAGE3_DOCS_MISC, setCheckbox(mre || psych));
@@ -173,6 +177,15 @@ public class TXEssenDoc1 {
             }
         }
 
+//        TextField tf = new TextField(stamper.getWriter(), new Rectangle(Utilities.millimetersToPoints(1.3696f), Utilities.millimetersToPoints(2.4f), Utilities.millimetersToPoints(1.3696f + 9.25f), Utilities.millimetersToPoints(5.8f)), "asd");
+//        tf.setText("Eine alte Dame geht fische essen.");
+//        tf.setFont(pdf_font_normal_bold.getBaseFont());
+//        tf.set
+//        tf.setFontSize(0f);
+//        stamper.addAnnotation(tf.getTextField(), 2);
+//        tf.setVisibility(BaseField.VISIBLE);
+//        tf.setBackgroundColor(BaseColor.RED);
+
         stamper.setFormFlattening(true);
 
         stamper.close();
@@ -184,7 +197,7 @@ public class TXEssenDoc1 {
      *
      * @throws Exception
      */
-    private File concatPDFFiles(File file1, File filemre) throws Exception {
+    private File concatPDFFiles(File file1, File filemre, File filepsych) throws Exception {
         File outfileMain = new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TX_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
 
 
@@ -201,6 +214,9 @@ public class TXEssenDoc1 {
 
         PdfReader readerMRE = filemre == null ? null : new PdfReader(new FileInputStream(filemre));
         maxpages += readerMRE == null ? 0 : readerMRE.getNumberOfPages();
+
+        PdfReader readerPSYCH = filepsych == null ? null : new PdfReader(new FileInputStream(filepsych));
+        maxpages += readerPSYCH == null ? 0 : readerPSYCH.getNumberOfPages();
 
         PdfImportedPage page;
         PdfCopy.PageStamp stamp;
@@ -238,6 +254,21 @@ public class TXEssenDoc1 {
             for (int p = 1; p <= readerMRE.getNumberOfPages(); p++) {
                 runningPage++;
                 page = copy.getImportedPage(readerMRE, p);
+                stamp = copy.createPageStamp(page);
+                String sidenote = String.format(OPDE.lang.getString("pdf.pagefooter"), runningPage, maxpages)
+                        + " // " + ResidentTools.getLabelText(resident)
+                        + " // " + OPDE.lang.getString("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
+                        + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum();
+                ColumnText.showTextAligned(stamp.getUnderContent(), Element.ALIGN_LEFT, new Phrase(sidenote, pdf_font_small), Utilities.millimetersToPoints(207), Utilities.millimetersToPoints(260), 270);
+                stamp.alterContents();
+                copy.addPage(page);
+            }
+        }
+
+        if (readerPSYCH != null) {
+            for (int p = 1; p <= readerPSYCH.getNumberOfPages(); p++) {
+                runningPage++;
+                page = copy.getImportedPage(readerPSYCH, p);
                 stamp = copy.createPageStamp(page);
                 String sidenote = String.format(OPDE.lang.getString("pdf.pagefooter"), runningPage, maxpages)
                         + " // " + ResidentTools.getLabelText(resident)
@@ -801,7 +832,9 @@ public class TXEssenDoc1 {
         content.put(TXEAF.COMMENTS_GENERAL, getValue(ResInfoTypeTools.TYPE_WARNING, "beschreibung"));
     }
 
-    private void createContent4Section19(PdfStamper stamper) {
+    private void createContent4Section19(PdfStamper stamper) throws Exception {
+
+
         ArrayList<String> bodyParts = new ArrayList<String>(Arrays.asList(PnlBodyScheme.PARTS));
         String[] pdfbody = new String[]{TXEAF.BODY1_DESCRIPTION, TXEAF.BODY2_DESCRIPTION, TXEAF.BODY3_DESCRIPTION, TXEAF.BODY4_DESCRIPTION, TXEAF.BODY5_DESCRIPTION, TXEAF.BODY6_DESCRIPTION};
         int lineno = -1;
@@ -935,29 +968,22 @@ public class TXEssenDoc1 {
         listFieldsOnPage3.add(new Pair(TXEAF.MEDS6, TXEAF.DOSAGE6));
         listFieldsOnPage3.add(new Pair(TXEAF.MEDS7, TXEAF.DOSAGE7));
         listFieldsOnPage3.add(new Pair(TXEAF.MEDS8, TXEAF.DOSAGE8));
-        listFieldsOnPage3.add(new Pair(TXEAF.MEDS9, TXEAF.DOSAGE9));
-        listFieldsOnPage3.add(new Pair(TXEAF.MEDS10, TXEAF.DOSAGE10));
-        listFieldsOnPage3.add(new Pair(TXEAF.MEDS11, TXEAF.DOSAGE11));
-        listFieldsOnPage3.add(new Pair(TXEAF.MEDS12, TXEAF.DOSAGE12));
-        listFieldsOnPage3.add(new Pair(TXEAF.MEDS13, TXEAF.DOSAGE13));
-        listFieldsOnPage3.add(new Pair(TXEAF.MEDS14, TXEAF.DOSAGE14));
-        listFieldsOnPage3.add(new Pair(TXEAF.MEDS15, TXEAF.DOSAGE15));
 
         ArrayList<Prescription> listRegularMeds = PrescriptionTools.getAllActiveRegularMedsOnly(resident);
 
-        int line = 0;
+//        int line = 0;
 
-//        for (int i = 0; i < 15; i++){
-//        }
+        int MAXLINESONPDF = 8;
 
-        for (Prescription pres : listRegularMeds) {
+        for (int line = 0; line < Math.min(listRegularMeds.size(), MAXLINESONPDF); line++) {
+            Prescription pres = listRegularMeds.get(line);
             content.put(listFieldsOnPage3.get(line).getFirst(), PrescriptionTools.getShortDescriptionAsCompactText(pres));
             content.put(listFieldsOnPage3.get(line).getSecond(), PrescriptionTools.getDoseAsCompactText(pres));
-            line++;
         }
 
-        if (line >= 15) {
-            getAdditionMeds(listRegularMeds, line);
+        if (listRegularMeds.size() >= MAXLINESONPDF) {
+            content.put(TXEAF.MEDS_WARNINGTEXT, listRegularMeds.size() - MAXLINESONPDF + " " + OPDE.lang.getString("nursingrecords.info.tx.more.meds.to.follow"));
+            getAdditionMeds(listRegularMeds, MAXLINESONPDF);
         }
 
         content.put(TXEAF.DOCS_MEDS_LIST, setCheckbox(medListStream != null));
@@ -1187,21 +1213,21 @@ public class TXEssenDoc1 {
         content.put(TXEAF.PSYCH_RESIDENT_JOB, setCheckbox(getValue(ResInfoTypeTools.TYPE_PSYCH, "job")));
         content.put(TXEAF.PSYCH_RESIDENT_VOLUNTEER, setCheckbox(getValue(ResInfoTypeTools.TYPE_PSYCH, "volunteer")));
 
-        content.put(TXEAF.PSYCH_AGGRESSIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "aggressive"), new String[]{"yes1", "no1", "intermittent1"}));
-        content.put(TXEAF.PSYCH_SELFDESTRUCTIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "selfdestructive"), new String[]{"yes2", "no2", "intermittent2"}));
-        content.put(TXEAF.PSYCH_MANICDEPRESSIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "manicdepressive"), new String[]{"yes3", "no3", "intermittent3"}));
-        content.put(TXEAF.PSYCH_DELUSION, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "delusion"), new String[]{"yes4", "no4", "intermittent4"}));
-        content.put(TXEAF.PSYCH_HALLUCINATION, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "hallucination"), new String[]{"yes5", "no5", "intermittent5"}));
-        content.put(TXEAF.PSYCH_FEAR, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "fear"), new String[]{"yes12", "no12", "intermittent12"}));
-        content.put(TXEAF.PSYCH_PASSIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "passive"), new String[]{"yes6", "no6", "intermittent6"}));
-        content.put(TXEAF.PSYCH_RESTLESS, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "restless"), new String[]{"yes7", "no7", "intermittent7"}));
-        content.put(TXEAF.PSYCH_REGRESSIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "regressive"), new String[]{"yes8", "no8", "intermittent8"}));
-        content.put(TXEAF.PSYCH_FAECAL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "faecal"), new String[]{"yes9", "no9", "intermittent9"}));
-        content.put(TXEAF.PSYCH_APRAXIA, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "apraxia"), new String[]{"yes10", "no10", "intermittent10"}));
-        content.put(TXEAF.PSYCH_AGNOSIA, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "agnosia"), new String[]{"yes11", "no11", "intermittent11"}));
+        content.put(TXEAF.PSYCH_AGGRESSIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "aggressive"), new String[]{"yes1", "no1", "intermittent1"}));
+        content.put(TXEAF.PSYCH_SELFDESTRUCTIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "selfdestructive"), new String[]{"yes2", "no2", "intermittent2"}));
+        content.put(TXEAF.PSYCH_MANICDEPRESSIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "manicdepressive"), new String[]{"yes3", "no3", "intermittent3"}));
+        content.put(TXEAF.PSYCH_DELUSION, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "delusion"), new String[]{"yes4", "no4", "intermittent4"}));
+        content.put(TXEAF.PSYCH_HALLUCINATION, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "hallucination"), new String[]{"yes5", "no5", "intermittent5"}));
+        content.put(TXEAF.PSYCH_FEAR, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "fear"), new String[]{"yes12", "no12", "intermittent12"}));
+        content.put(TXEAF.PSYCH_PASSIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "passive"), new String[]{"yes6", "no6", "intermittent6"}));
+        content.put(TXEAF.PSYCH_RESTLESS, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "restless"), new String[]{"yes7", "no7", "intermittent7"}));
+        content.put(TXEAF.PSYCH_REGRESSIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "regressive"), new String[]{"yes8", "no8", "intermittent8"}));
+        content.put(TXEAF.PSYCH_FAECAL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "faecal"), new String[]{"yes9", "no9", "intermittent9"}));
+        content.put(TXEAF.PSYCH_APRAXIA, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "apraxia"), new String[]{"yes10", "no10", "intermittent10"}));
+        content.put(TXEAF.PSYCH_AGNOSIA, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "agnosia"), new String[]{"yes11", "no11", "intermittent11"}));
 
         content.put(TXEAF.PSYCH_CONSUMING, setCheckbox(getValue(ResInfoTypeTools.TYPE_PSYCH, "consuming")));
-        content.put(TXEAF.PSYCH_TREATMENTSYMPTOMS, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "treatmentsymptoms"), new String[]{"yes13", "no13", "intermittent13"}));
+        content.put(TXEAF.PSYCH_TREATMENTSYMPTOMS, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "treatmentsymptoms"), new String[]{"yes13", "no13", "intermittent13"}));
 
         content.put(TXEAF.PSYCH_ALCOHOL, setCheckbox(getValue(ResInfoTypeTools.TYPE_PSYCH, "alcohol")));
         content.put(TXEAF.PSYCH_DRUGS, setCheckbox(getValue(ResInfoTypeTools.TYPE_PSYCH, "drugs")));
@@ -1216,7 +1242,7 @@ public class TXEssenDoc1 {
         content.put(TXEAF.PSYCH_SUBSTCONTACT, getValue(ResInfoTypeTools.TYPE_PSYCH, "substcontact"));
 
 
-        content.put(TXEAF.PSYCH_CONSUMING, SYSTools.catchNull(mapID2Info.get(ResInfoTypeTools.TYPE_PSYCH).getText(), "--"));
+        content.put(TXEAF.PSYCH_COMMENTS, SYSTools.catchNull(mapID2Info.get(ResInfoTypeTools.TYPE_PSYCH).getText(), "--"));
         content.put(TXEAF.PSYCH_TX_DATE, DateFormat.getDateInstance().format(new Date()));
         content.put(TXEAF.PSYCH_TX_USERNAME, (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : ""));
 
