@@ -2,7 +2,6 @@ package op.care.info;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.Image;
-import com.itextpdf.text.pdf.PdfWriter;
 import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.OverlayTextArea;
 import entity.EntityTools;
@@ -33,7 +32,9 @@ import java.awt.*;
 import java.awt.Font;
 import java.awt.event.*;
 import java.awt.font.TextAttribute;
-import java.io.*;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -56,20 +57,23 @@ public class PnlEditResInfo {
     private final int TYPE_INT = 1;
     private final int TYPE_DOUBLE = 2;
     private final int TYPE_DATE = 3;
+    private final int TYPE_TIME = 4;
     private boolean scalemode = false;
+    private boolean enabled;
     private final int TEXTFIELD_STANDARD_WIDTH = 35;
 
     boolean initPanel = false;
     Properties content;
     private JLabel sumlabel;
+    private Component focusOwner = null;
 
     private ArrayList<RiskBean> scaleriskmodel;
     private String scalesumlabeltext;
     private ArrayList<String> scaleButtonGroups; // eine Liste mit den Namen der Buttongroups eines scales;
     private HashMap components;
+    private ArrayList<JComponent> focusTraversal;
     private ResInfo resInfo;
     private Closure closure;
-    //    private op.tools.PnlPIT pnlPIT;
     private JPanel pnlContent, main;
     private boolean changed = false;
     private OverlayTextArea txtComment;
@@ -99,6 +103,7 @@ public class PnlEditResInfo {
 
     private void initPanel(String xml) {
         content = new Properties();
+        focusTraversal = new ArrayList<JComponent>();
 
         pnlContent = new JPanel(new BorderLayout());
         initPanel = true;
@@ -221,6 +226,60 @@ public class PnlEditResInfo {
         hdrPanel.add(new JSeparator(), BorderLayout.SOUTH);
         main.add(jl, BorderLayout.NORTH);
 
+        if (!focusTraversal.isEmpty()) {
+            main.setFocusCycleRoot(true);
+            main.setFocusTraversalPolicy(new FocusTraversalPolicy() {
+                @Override
+                public Component getComponentAfter(Container aContainer, Component aComponent) {
+                    if (focusOwner == null) {
+                        focusOwner = focusTraversal.get(0);
+                    } else {
+                        int pos = focusTraversal.indexOf(focusOwner) + 1;
+                        if (pos >= focusTraversal.size()) {
+                            pos = 0;
+                        }
+                        focusOwner = focusTraversal.get(pos);
+                    }
+                    return focusOwner;
+                }
+
+                @Override
+                public Component getComponentBefore(Container aContainer, Component aComponent) {
+                    if (focusOwner == null) {
+                        focusOwner = focusTraversal.get(focusTraversal.size() - 1);
+                    } else {
+                        int pos = focusTraversal.indexOf(focusOwner) - 1;
+                        if (pos < 0) {
+                            pos = focusTraversal.size() - 1;
+                        }
+                        focusOwner = focusTraversal.get(pos);
+                    }
+                    return focusOwner;
+                }
+
+                @Override
+                public Component getFirstComponent(Container aContainer) {
+                    return focusTraversal.get(0);
+                }
+
+                @Override
+                public Component getLastComponent(Container aContainer) {
+                    return focusTraversal.get(focusTraversal.size() - 1);
+                }
+
+                @Override
+                public Component getDefaultComponent(Container aContainer) {
+                    return focusTraversal.get(0);
+                }
+            });
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    focusTraversal.get(0).requestFocus();
+                    focusOwner = focusTraversal.get(0);
+                }
+            });
+        }
         setEnabled(false);
     }
 
@@ -233,15 +292,19 @@ public class PnlEditResInfo {
 
         try {
 
-//            File file = File.createTempFile("opde", "pdf");
-//            file.deleteOnExit();
-
             final PDF pdf = new PDF(null, "footer", 10);
 
 
             pdf.getDocument().open();
 
-            Paragraph h1 = new Paragraph(new Phrase(OPDE.lang.getString("misc.msg.additional.medslist"), PDF.plain(PDF.sizeH1())));
+            //                html += "<h3 id=\"fonth2\" >" + ResidentTools.getLabelText(resident) + "</h2>\n";
+            //                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_INFECTION ? SYSConst.html_48x48_biohazard : "";
+            //                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_DIABETES ? SYSConst.html_48x48_diabetes : "";
+            //                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_ALLERGY ? SYSConst.html_48x48_allergy : "";
+            //                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_WARNING ? SYSConst.html_48x48_warning : "";
+
+
+            Paragraph h1 = new Paragraph(new Phrase(OPDE.lang.getString("nursingrecords.info.single"), PDF.plain(PDF.sizeH1())));
             h1.setAlignment(Element.ALIGN_CENTER);
             pdf.getDocument().add(h1);
 
@@ -250,12 +313,36 @@ public class PnlEditResInfo {
             pdf.getDocument().add(p);
             pdf.getDocument().add(Chunk.NEWLINE);
 
+            Paragraph p1 = new Paragraph();
 
-            File pngfile = File.createTempFile("opde", "pdf");
-            GUITools.exportToPNG(pnlContent, pngfile);
+            p1.add(new Chunk(resInfo.getResInfoType().getResInfoCat().getText()));
+            p1.add(Chunk.NEWLINE);
+            p1.add(new Chunk(resInfo.getResInfoType().getShortDescription()));
+            p1.add(Chunk.NEWLINE);
+            p1.add(Chunk.NEWLINE);
 
-            Image image = Image.getInstance("/Users/tloehr/opde/cache/pnl2png_20130615141839349.png");
-            image.setScaleToFitLineWhenOverflow(true);
+
+            DateFormat df = resInfo.isSingleIncident() || resInfo.isBySecond() ? DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT) : DateFormat.getDateInstance();
+
+            if (resInfo.isSingleIncident()) {
+                p1.add(new Chunk(df.format(resInfo.getFrom()) + " " + resInfo.getUserON().getFullname()));
+                p1.add(Chunk.NEWLINE);
+            } else if (resInfo.isClosed()) {
+                p1.add(new Chunk(df.format(resInfo.getFrom()) + " (" + resInfo.getUserON().getFullname()) + ") >> " + df.format(resInfo.getTo()) + " (" + resInfo.getUserOFF().getFullname() + ")");
+                p1.add(Chunk.NEWLINE);
+
+            } else {
+                p1.add(new Chunk(df.format(resInfo.getFrom()) + " (" + resInfo.getUserON().getFullname()) + ") >> ");
+                p1.add(Chunk.NEWLINE);
+            }
+            pdf.getDocument().add(p1);
+
+            setEnabled(true);
+            Image image = Image.getInstance(GUITools.getAsImage(pnlContent).toByteArray());
+            setEnabled(false);
+
+            image.scaleToFit(Utilities.millimetersToPoints(170f), Utilities.millimetersToPoints(170f));
+
 
             pdf.getDocument().add(image);
 
@@ -265,10 +352,11 @@ public class PnlEditResInfo {
             SYSFilesTools.handleFile(pdf.getOutputFile(), Desktop.Action.OPEN);
 
         } catch (Exception e) {
-             OPDE.error(e);
+            OPDE.fatal(e);
         }
 
     }
+
 
     public void setClosure(Closure closure) {
         this.closure = closure;
@@ -300,6 +388,7 @@ public class PnlEditResInfo {
     }
 
     public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
         SYSTools.setXEnabled(main, enabled);
     }
 
@@ -309,7 +398,6 @@ public class PnlEditResInfo {
         BigDecimal scalesum = BigDecimal.ZERO;
 
         for (String bgName : scaleButtonGroups) {
-            //            OPDE.debug(components.toString());
             ButtonGroup bg = (ButtonGroup) components.get(bgName);
             Enumeration e = bg.getElements();
             boolean found = false;
@@ -323,8 +411,6 @@ public class PnlEditResInfo {
         }
 
         if (scaleriskmodel != null && scalesum != null) {
-            // nun noch die Einschätzung des Risikos
-            // Bezeichnung und Farbe
 
             String risiko = "unbekanntes Risiko";
             String color = "black";
@@ -503,6 +589,14 @@ public class PnlEditResInfo {
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.wrongdate", DisplayMessage.WARNING));
                         j.setText(DateFormat.getDateInstance().format(new Date()));
                     }
+                } else if (type == TYPE_TIME) {
+                    try {
+                        Date myDate = new Date(SYSCalendar.parseTime(text).getTimeInMillis());
+                        j.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(myDate));
+                    } catch (Exception ex) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.wrongtime", DisplayMessage.WARNING));
+                        j.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(new Date()));
+                    }
                 } else {
                     NumberFormat nf = DecimalFormat.getNumberInstance();
                     text = text.replace(".", ",");
@@ -676,6 +770,8 @@ public class PnlEditResInfo {
                     score = SYSTools.parseBigDecimal(attributes.getValue("score"));
                 }
                 JRadioButton j = new JRadioButton(attributes.getValue("label"));
+                focusTraversal.add(j);
+
                 j.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 String compName = attributes.getValue("name");
                 String layout = attributes.getValue("layout");
@@ -709,6 +805,7 @@ public class PnlEditResInfo {
             if (tagName.equalsIgnoreCase("checkbox")) {
                 groupname = attributes.getValue("name");
                 JCheckBox j = new JCheckBox(attributes.getValue("label"));
+                focusTraversal.add(j);
                 j.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 j.setName(groupname);
                 outerpanel.add(j);
@@ -749,6 +846,9 @@ public class PnlEditResInfo {
                         tffl = new TextFieldFocusListener(TYPE_DATE, optional);
                     }
                 }
+                if (SYSTools.catchNull(attributes.getValue("type")).equals("time")) {
+                    tffl = new TextFieldFocusListener(TYPE_TIME, optional);
+                }
                 int length = TEXTFIELD_STANDARD_WIDTH;
                 String hfill = SYSTools.catchNull(attributes.getValue("hfill")).equalsIgnoreCase("false") ? "" : " hfill";
                 if (!SYSTools.catchNull(attributes.getValue("length")).isEmpty()) {
@@ -757,13 +857,14 @@ public class PnlEditResInfo {
                 }
                 JLabel jl = new JLabel(attributes.getValue("label") + ":");
                 JTextField j = new JTextField(length);
+                focusTraversal.add(j);
                 j.setName(groupname);
                 j.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 outerpanel.add(layout, jl);
 
 
-                String innerlayout = SYSTools.catchNull(attributes.getValue("innerlayout"), "tab" + hfill);
+                String innerlayout = SYSTools.catchNull(attributes.getValue("innerlayout"), "left" + hfill);
                 outerpanel.add(innerlayout, j);
 
                 components.put(groupname, j); // für den späteren Direktzugriff
@@ -907,6 +1008,7 @@ public class PnlEditResInfo {
                 groupname = attributes.getValue("name");
                 boxModel = new DefaultComboBoxModel();
                 JComboBox jcb = new JComboBox();
+                focusTraversal.add(jcb);
                 jcb.setName(groupname);
                 jcb.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 components.put(groupname, jcb);

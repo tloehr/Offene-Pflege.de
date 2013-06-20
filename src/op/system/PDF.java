@@ -163,6 +163,7 @@ public class PDF {
     }
 
     public File getOutputFile() {
+        output.deleteOnExit();
         return output;
     }
 

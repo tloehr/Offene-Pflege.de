@@ -4,6 +4,7 @@
 
 package op.dev;
 
+import java.awt.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
@@ -81,6 +82,10 @@ public class PnlDev extends CleanablePanel {
         invalidate();
     }
 
+    private void txtXMLFocusGained(FocusEvent e) {
+        txtXML.selectAll();
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         scrollPane1 = new JScrollPane();
@@ -91,7 +96,7 @@ public class PnlDev extends CleanablePanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "default, 2*($lcgap, default:grow), $lcgap, default",
+            "default, $lcgap, 130dlu, $lcgap, default:grow, $lcgap, default",
             "default, $lgap, fill:default:grow, 2*($lgap, default)"));
 
         //======== scrollPane1 ========
@@ -99,6 +104,12 @@ public class PnlDev extends CleanablePanel {
 
             //---- txtXML ----
             txtXML.setLineWrap(true);
+            txtXML.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusGained(FocusEvent e) {
+                    txtXMLFocusGained(e);
+                }
+            });
             scrollPane1.setViewportView(txtXML);
         }
         add(scrollPane1, CC.xy(3, 3, CC.FILL, CC.FILL));

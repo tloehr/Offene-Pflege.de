@@ -132,15 +132,15 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
         this.attachedProcessConnections = new ArrayList<SYSINF2PROCESS>();
     }
 
-    public ResInfo(Date from, Date to, String html, String properties, String bemerkung, ResInfoType bwinfotyp, Resident resident) {
+    public ResInfo(Date from, Date to, String html, String properties, String bemerkung, ResInfoType bwinfotyp, Resident resident, Users userON, Users userOFF) {
         this.from = from;
         this.to = to;
         this.html = html;
         this.properties = properties;
         this.bemerkung = bemerkung;
         this.bwinfotyp = bwinfotyp;
-        this.userON = OPDE.getLogin().getUser();
-        this.userOFF = null;
+        this.userON = userON;
+        this.userOFF = userOFF;
         this.resident = resident;
         this.attachedFilesConnections = new ArrayList<SYSINF2FILE>();
         this.attachedProcessConnections = new ArrayList<SYSINF2PROCESS>();
@@ -403,7 +403,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
 
     @Override
     public ResInfo clone() {
-        return new ResInfo(from, to, html, properties, bemerkung, bwinfotyp, resident);
+        return new ResInfo(from, to, html, properties, bemerkung, bwinfotyp, resident, userON, userOFF);
     }
 
     @Override

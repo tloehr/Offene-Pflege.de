@@ -24,6 +24,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyVetoException;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -47,7 +48,6 @@ public class GUITools {
         pnl.paint(g);
         g.dispose();
         try {
-
             ImageIO.write(bi, "png", output);
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("PNG exported"));
         } catch (Exception e) {
@@ -56,7 +56,17 @@ public class GUITools {
     }
 
 
-    public static void exportToPNG(JPanel pnl){
+    public static ByteArrayOutputStream getAsImage(JPanel pnl) throws Exception {
+        BufferedImage bi = new BufferedImage(pnl.getPreferredSize().width, pnl.getPreferredSize().height, BufferedImage.TYPE_INT_ARGB);
+        Graphics g = bi.createGraphics();
+        pnl.paint(g);
+        g.dispose();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(bi, "png", baos);
+        return baos;
+    }
+
+    public static void exportToPNG(JPanel pnl) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
         exportToPNG(pnl, new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "pnl2png_" + sdf.format(new Date()) + ".png"));
     }

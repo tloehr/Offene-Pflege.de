@@ -40,11 +40,11 @@ import javax.persistence.RollbackException;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -67,6 +67,7 @@ public class PnlInformation extends NursingRecordsPanel {
     private CollapsiblePanes cpsAll;
     private JideButton btnResDied, btnResMovedOut, btnResIsAway, btnResIsBack;
     private JXSearchField txtSearch;
+    private JList listSearchResults;
     private ArrayList<ResInfoCategory> listCategories = new ArrayList<ResInfoCategory>();
     private ArrayList<ResInfo> listAllInfos;
     private ArrayList<ResInfoType> listAllTypes;
@@ -76,7 +77,6 @@ public class PnlInformation extends NursingRecordsPanel {
     private HashMap<String, CollapsiblePane> mapKey2CP;
     private HashMap<Integer, ResInfoType> mapEquiv2Type;
 
-//    private ResInfoType typeAbsence, typeStartOfStay;
 
     public PnlInformation(Resident resident, JScrollPane jspSearch, PnlCare pnlCare) {
         this.resident = resident;
@@ -186,6 +186,9 @@ public class PnlInformation extends NursingRecordsPanel {
                         }
                     }
                 });
+
+
+                GUITools.addExpandCollapseButtons(cpCat, cpTitleCat.getRight());
 
                 /***
                  *                _
@@ -447,24 +450,6 @@ public class PnlInformation extends NursingRecordsPanel {
 
                                                     em.getTransaction().commit();
 
-//                                                    mapType2ResInfos.get(newinfo.getResInfoType()).add(newinfo);
-//                                                    Collections.sort(mapType2ResInfos.get(newinfo.getResInfoType()));
-//
-//                                                    listAllTypes.remove(resInfoType);
-//                                                    listAllTypes.add(myType);
-//
-//                                                    listAllInfos.add(newinfo);
-//
-//                                                    for (Pair<ResInfo, ResInfo> pair : changedInfos) {
-//                                                        // refresh data
-//                                                        int oldIndex = mapType2ResInfos.get(resInfoType).indexOf(pair.getFirst());
-//                                                        mapType2ResInfos.get(resInfoType).add(oldIndex, pair.getSecond());
-//                                                        mapType2ResInfos.get(resInfoType).remove(pair.getFirst());
-//
-//                                                        listAllInfos.remove(pair.getFirst());
-//                                                        listAllInfos.add(pair.getSecond());
-//                                                    }
-//                                                    changedInfos.clear();
 
                                                     if (newinfo.getResInfoType().isAlertType()) {
                                                         GUITools.setResidentDisplay(resident);
@@ -761,18 +746,20 @@ public class PnlInformation extends NursingRecordsPanel {
         btnPrint.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-//                String html = "";
-//                html += "<h3 id=\"fonth2\" >" + ResidentTools.getLabelText(resident) + "</h2>\n";
-//                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_INFECTION ? SYSConst.html_48x48_biohazard : "";
-//                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_DIABETES ? SYSConst.html_48x48_diabetes : "";
-//                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_ALLERGY ? SYSConst.html_48x48_allergy : "";
-//                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_WARNING ? SYSConst.html_48x48_warning : "";
-//                ArrayList<ResInfo> list = new ArrayList<ResInfo>();
-//                list.add(resInfo);
-//                html += ResInfoTools.getResInfosAsHTML(list, true, null);
-//                SYSFilesTools.print(html, true);
-//                list.clear();
-                mapInfo2Editor.get(resInfo).print();
+                if (!mapInfo2Editor.containsKey(resInfo)) {
+                    try {
+                        cpInfo.setCollapsed(false);
+                    } catch (PropertyVetoException e1) {
+                        //bah!!
+                    }
+                }
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        mapInfo2Editor.get(resInfo).print();
+                    }
+                });
             }
         });
         cptitle.getRight().add(btnPrint);
@@ -1191,8 +1178,8 @@ public class PnlInformation extends NursingRecordsPanel {
         }
 
 
+        GUITools.addAllComponents(mypanel, addKey());
         GUITools.addAllComponents(mypanel, addFilters());
-//        GUITools.addAllComponents(mypanel, addKey());
 
 
         searchPane.setContentPane(mypanel);
@@ -1993,26 +1980,118 @@ public class PnlInformation extends NursingRecordsPanel {
             });
             btnResIsBack.setEnabled(resident.isActive() && !ResInfoTools.isAway(resident));
             list.add(btnResIsBack);
+
+
         } // UPDATE
+
 
         return list;
     }
 
     private java.util.List<Component> addKey() {
         java.util.List<Component> list = new ArrayList<Component>();
-        list.add(new JSeparator());
-        list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.info.keydescription1"), SYSConst.icon22stopSign, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.info.keydescription7"), SYSConst.icon22stopSignGray, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.info.keydescription2"), SYSConst.icon22infogreen2, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.info.keydescription3"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.info.keydescription4"), SYSConst.icon22ledGreenOff, SwingConstants.LEADING));
+//        list.add(new JSeparator());
+//        list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
+//        list.add(new JLabel(OPDE.lang.getString("nursingrecords.info.keydescription1"), SYSConst.icon22stopSign, SwingConstants.LEADING));
+//        list.add(new JLabel(OPDE.lang.getString("nursingrecords.info.keydescription7"), SYSConst.icon22stopSignGray, SwingConstants.LEADING));
+//        list.add(new JLabel(OPDE.lang.getString("nursingrecords.info.keydescription2"), SYSConst.icon22infogreen2, SwingConstants.LEADING));
+//        list.add(new JLabel(OPDE.lang.getString("nursingrecords.info.keydescription3"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
+//        list.add(new JLabel(OPDE.lang.getString("nursingrecords.info.keydescription4"), SYSConst.icon22ledGreenOff, SwingConstants.LEADING));
+
+        final JButton btnExpandAll = GUITools.createHyperlinkButton("misc.msg.expand.active", SYSConst.icon22expand, null);
+        btnExpandAll.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                try {
+                    for (ResInfo info : listAllInfos) {
+                        final String keyResInfo = info.getID() + ".resinfo";
+                        final String keyResInfoType = info.getResInfoType().getID() + ".resinfotype";
+                        final String keyResInfoCat = info.getResInfoType().getResInfoCat().getID() + ".resinfocat";
+                        if (!info.isClosed()) {
+                            if (mapKey2CP.containsKey(keyResInfo) && mapKey2CP.get(keyResInfo).isCollapsed()) {
+                                mapKey2CP.get(keyResInfo).setCollapsed(false);
+                            }
+                            if (mapKey2CP.containsKey(keyResInfoType) && mapKey2CP.get(keyResInfoType).isCollapsed()) {
+                                mapKey2CP.get(keyResInfoType).setCollapsed(false);
+                            }
+                            if (mapKey2CP.containsKey(keyResInfoCat) && mapKey2CP.get(keyResInfoCat).isCollapsed()) {
+                                mapKey2CP.get(keyResInfoCat).setCollapsed(false);
+                            }
+                        }
+                    }
+                } catch (PropertyVetoException e) {
+                    // bah!
+                }
+            }
+
+
+        });
+        list.add(btnExpandAll);
+
+        final JButton btnCollapseAll = GUITools.createHyperlinkButton("misc.msg.collapseall", SYSConst.icon22collapse, null);
+
+        btnCollapseAll.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                try {
+                    GUITools.setCollapsed(cpsAll, true);
+                } catch (PropertyVetoException e) {
+                    // bah!
+                }
+            }
+
+
+        });
+        list.add(btnCollapseAll);
 
         return list;
     }
 
     private java.util.List<Component> addFilters() {
         java.util.List<Component> list = new ArrayList<Component>();
+
+        listSearchResults = new JList();
+        listSearchResults.setModel(new DefaultListModel());
+        listSearchResults.setVisibleRowCount(7);
+        listSearchResults.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        listSearchResults.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting()) return;
+
+                //TODO: this always scrolls to the wrong place :-(
+//                if (listSearchResults.getSelectedValue() instanceof ResInfo) {
+//                    ResInfo info = (ResInfo) listSearchResults.getSelectedValue();
+//                    final String keyResInfo = info.getID() + ".resinfo";
+//                    if (!mapInfo2Editor.containsKey(info)) {
+//                        try {
+//
+//                            mapKey2CP.get(keyResInfo).setCollapsed(false);
+//                        } catch (PropertyVetoException e1) {
+//                            //bah!!
+//                        }
+//                    }
+//                    GUITools.scroll2show(jspMain, mapKey2CP.get(keyResInfo), cpsAll, null);
+//                }
+            }
+        });
+
+        listSearchResults.setCellRenderer(new ListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                String text = "";
+                if (value instanceof ResInfo) {
+                    text = ((ResInfo) value).getResInfoType().getShortDescription() + ", " + DateFormat.getDateInstance(DateFormat.SHORT).format(((ResInfo) value).getFrom());
+                } else if (value instanceof ResInfoType) {
+                    text = ((ResInfoType) value).getShortDescription();
+                } else {
+                    text = value.toString();
+                }
+
+                return new DefaultListCellRenderer().getListCellRendererComponent(list, text, index, isSelected, cellHasFocus);
+
+            }
+        });
 
         txtSearch = new JXSearchField(OPDE.lang.getString("misc.msg.searchphrase"));
         txtSearch.setFont(SYSConst.ARIAL14);
@@ -2022,18 +2101,33 @@ public class PnlInformation extends NursingRecordsPanel {
             public void actionPerformed(ActionEvent e) {
                 if (SYSTools.catchNull(txtSearch.getText()).trim().length() > 3) {
 
-                    ArrayList<ResInfo> searchResults = search(txtSearch.getText().trim());
-
-                    if (searchResults.isEmpty()) {
+                    ArrayList<ResInfo> searchResults1 = searchInInfos(txtSearch.getText().trim());
+                    ArrayList<ResInfoType> searchResults2 = searchInTypes(txtSearch.getText().trim());
+                    if (searchResults1.isEmpty() && searchResults2.isEmpty()) {
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.searchempty"));
+                        listSearchResults.setModel(new DefaultListModel());
                     } else {
-                        SYSFilesTools.print(SYSConst.html_h2(ResidentTools.getLabelText(resident)) + ResInfoTools.getResInfosAsHTML(searchResults, true, txtSearch.getText().trim()), false);
+
+                        DefaultListModel dlm = new DefaultListModel();
+
+                        for (ResInfoType o : searchResults2) {
+                            dlm.addElement(o);
+                        }
+                        for (ResInfo o : searchResults1) {
+                            if (searchResults2.contains(o)) {
+                                dlm.removeElement(o.getResInfoType());
+                            }
+                            dlm.addElement(o);
+                        }
+
+                        listSearchResults.setModel(dlm);
                     }
                 }
             }
         });
-        list.add(txtSearch);
 
+        list.add(txtSearch);
+        list.add(new JScrollPane(listSearchResults));
 
         return list;
     }
@@ -2051,7 +2145,7 @@ public class PnlInformation extends NursingRecordsPanel {
         return containsOnlyClosedInfos;
     }
 
-    private ArrayList<ResInfo> search(String pattern) {
+    private ArrayList<ResInfo> searchInInfos(String pattern) {
         pattern = pattern.toLowerCase();
         ArrayList<ResInfo> hits = new ArrayList<ResInfo>();
         for (ResInfo info : listAllInfos) {
@@ -2059,15 +2153,28 @@ public class PnlInformation extends NursingRecordsPanel {
             if (!hit) hit |= SYSTools.catchNull(info.getText()).toLowerCase().indexOf(pattern) >= 0;
             if (!hit) hit |= SYSTools.catchNull(info.getHtml()).toLowerCase().indexOf(pattern) >= 0;
             if (!hit) hit |= SYSTools.catchNull(info.getProperties()).toLowerCase().indexOf(pattern) >= 0;
-            if (!hit)
-                hit |= SYSTools.catchNull(info.getResInfoType().getShortDescription()).toLowerCase().indexOf(pattern) >= 0;
-            if (!hit)
-                hit |= SYSTools.catchNull(info.getResInfoType().getResInfoCat().getText()).toLowerCase().indexOf(pattern) >= 0;
-            if (!hit)
-                hit |= SYSTools.catchNull(info.getResInfoType().getLongDescription()).toLowerCase().indexOf(pattern) >= 0;
             if (hit) hits.add(info);
-            //            OPDE.debug(info);
         }
+        return hits;
+    }
+
+    private ArrayList<ResInfoType> searchInTypes(String pattern) {
+        pattern = pattern.toLowerCase();
+
+        ArrayList<ResInfoType> hits = new ArrayList<ResInfoType>();
+        for (ResInfoType type : listAllTypes) {
+            boolean hit = false;
+            if (!hit)
+                hit |= SYSTools.catchNull(type.getShortDescription()).toLowerCase().indexOf(pattern) >= 0;
+            if (!hit)
+                hit |= SYSTools.catchNull(type.getResInfoCat().getText()).toLowerCase().indexOf(pattern) >= 0;
+            if (!hit)
+                hit |= SYSTools.catchNull(type.getLongDescription()).toLowerCase().indexOf(pattern) >= 0;
+            if (!hit)
+                hit |= SYSTools.catchNull(type.getXml()).toLowerCase().indexOf(pattern) >= 0;
+            if (hit) hits.add(type);
+        }
+
         return hits;
     }
 }
