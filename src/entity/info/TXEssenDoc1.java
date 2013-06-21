@@ -677,7 +677,9 @@ public class TXEssenDoc1 {
         content.put(TXEAF.SPECIAL_ALLERGIEPASS, setCheckbox(getValue(ResInfoTypeTools.TYPE_ALLERGY, "allergiepass")));
         content.put(TXEAF.SPECIAL_COMMENT_ALLERGY, getValue(ResInfoTypeTools.TYPE_ALLERGY, "beschreibung"));
 
-        content.put(TXEAF.SPECIAL_MYCOSIS, setCheckbox(getValue(ResInfoTypeTools.TYPE_INFECTION, "mycosis")));
+        content.put(TXEAF.SPECIAL_MYCOSIS, setCheckbox(mapID2Info.containsKey(ResInfoTypeTools.TYPE_MYCOSIS)));
+
+
         content.put(TXEAF.SPECIAL_WOUNDS, setCheckbox(hasWounds()));
         content.put(TXEAF.SPECIAL_WOUNDPAIN, setCheckbox(hasWoundPain()));
         content.put(TXEAF.SPECIAL_PACER, setCheckbox(getValue(ResInfoTypeTools.TYPE_PACEMAKER, "pacemaker")));

@@ -64,8 +64,8 @@ public class PnlCare extends NursingRecordsPanel {
             OPDE.lang.getString("nursingrecords.main.tab8"),
             OPDE.lang.getString("nursingrecords.main.tab9"),
             OPDE.lang.getString("nursingrecords.main.tab10"),
-            OPDE.lang.getString("nursingrecords.main.tab11"),
-            OPDE.lang.getString("nursingrecords.main.tab12")
+            OPDE.lang.getString("nursingrecords.main.tab11")
+//            OPDE.lang.getString("nursingrecords.main.tab12")
     };
     private Resident resident = null;
     private CollapsiblePanes searchPanes;
@@ -163,9 +163,9 @@ public class PnlCare extends NursingRecordsPanel {
                 break;
             }
             case TAB_INFO: {
-                previousPanel = new PnlInfo(resident, jspSearch, this);
+                previousPanel = new PnlInformation(resident, jspSearch, this);
                 jtpPflegeakte.setComponentAt(TAB_INFO, previousPanel);
-                OPDE.getMainframe().setCurrentClassname(PnlInfo.internalClassID);
+                OPDE.getMainframe().setCurrentClassname(PnlInformation.internalClassID);
                 break;
             }
             case TAB_BHP: {
@@ -204,12 +204,12 @@ public class PnlCare extends NursingRecordsPanel {
                 OPDE.getMainframe().setCurrentClassname(PnlFiles.internalClassID);
                 break;
             }
-            case TAB_INFO2: {
-                previousPanel = new PnlInformation(resident, jspSearch, this);
-                jtpPflegeakte.setComponentAt(TAB_INFO2, previousPanel);
-                OPDE.getMainframe().setCurrentClassname(PnlInformation.internalClassID);
-                break;
-            }
+//            case TAB_INFO2: {
+//                previousPanel = new PnlInformation(resident, jspSearch, this);
+//                jtpPflegeakte.setComponentAt(TAB_INFO2, previousPanel);
+//                OPDE.getMainframe().setCurrentClassname(PnlInformation.internalClassID);
+//                break;
+//            }
             default: {
             }
         }
@@ -252,7 +252,7 @@ public class PnlCare extends NursingRecordsPanel {
         }
         jtpPflegeakte.setEnabledAt(TAB_FILES, OPDE.isFTPworking());
         jtpPflegeakte.setEnabledAt(TAB_VORRAT, resident.isCalcMediUPR1());
-        jtpPflegeakte.setEnabledAt(TAB_INFO2, OPDE.isDebug() && OPDE.isAdmin());
+//        jtpPflegeakte.setEnabledAt(TAB_INFO2, OPDE.isDebug() && OPDE.isAdmin());
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables

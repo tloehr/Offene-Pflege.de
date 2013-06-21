@@ -156,6 +156,7 @@ public class PnlInformation extends NursingRecordsPanel {
                 final String keyResInfoCat = cat.getID() + ".resinfocat";
                 if (!mapKey2CP.containsKey(keyResInfoCat)) {
                     mapKey2CP.put(keyResInfoCat, new CollapsiblePane());
+                    mapKey2CP.get(keyResInfoCat).setStyle(CollapsiblePane.TREE_STYLE);
                     mapKey2CP.get(keyResInfoCat).addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
                         @Override
                         public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
@@ -264,11 +265,14 @@ public class PnlInformation extends NursingRecordsPanel {
                     cpTitleCat.getRight().add(btnColor);
                 }
 
-                cpTitleCat.getButton().setFont(SYSConst.ARIAL24BOLD);
+                cpTitleCat.getButton().setFont(SYSConst.ARIAL24);
                 cpTitleCat.getButton().setForeground(GUITools.getForeground(cat.getColor()));
 
+                cpTitleCat.getButton().setForeground(cat.getColor());
+                cpCat.setBackground(Color.white);
                 cpCat.setTitleLabelComponent(cpTitleCat.getMain());
-                cpCat.setBackground(cat.getColor());
+
+//                cpCat.setBackground(cat.getColor());
 
 
                 JPanel pnlTypes = new JPanel();
@@ -287,6 +291,7 @@ public class PnlInformation extends NursingRecordsPanel {
                     final String keyResInfoType = resInfoType.getID() + ".resinfotype";
                     if (!mapKey2CP.containsKey(keyResInfoType)) {
                         mapKey2CP.put(keyResInfoType, new CollapsiblePane());
+                        mapKey2CP.get(keyResInfoType).setStyle(CollapsiblePane.TREE_STYLE);
                         mapKey2CP.get(keyResInfoType).addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
                             @Override
                             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
@@ -309,9 +314,13 @@ public class PnlInformation extends NursingRecordsPanel {
                     CollapsiblePane cpResInfoType = mapKey2CP.get(keyResInfoType);
                     cpResInfoType.setTitle(resInfoType.getShortDescription());
 
-                    cpResInfoType.setFont(SYSConst.ARIAL18BOLD);
-                    cpResInfoType.setBackground((GUITools.blend(cat.getColor(), Color.WHITE, 0.7f)));
-                    cpResInfoType.setForeground(GUITools.getForeground(cpResInfoType.getBackground()));
+                    cpResInfoType.setFont(SYSConst.ARIAL18);
+
+
+
+//                    cpResInfoType.setBackground((GUITools.blend(cat.getColor(), Color.WHITE, 0.7f)));
+                    cpResInfoType.setForeground((GUITools.blend(cat.getColor(), Color.BLACK, 0.7f)));
+                    cpResInfoType.setBackground(Color.WHITE);
 
                     JPanel pnlInfos = new JPanel();
                     pnlInfos.setLayout(new BoxLayout(pnlInfos, BoxLayout.Y_AXIS));
@@ -485,7 +494,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                                 }
                                             }
                                         }
-                                    });
+                                    }, resInfoType.getResInfoCat().getColor());
                                     pnlEditResInfo.setEnabled(true);
 
                                     popup.setMovable(false);
@@ -533,6 +542,7 @@ public class PnlInformation extends NursingRecordsPanel {
         final String keyResInfo = resInfo.getID() + ".resinfo";
         if (!mapKey2CP.containsKey(keyResInfo)) {
             mapKey2CP.put(keyResInfo, new CollapsiblePane());
+            mapKey2CP.get(keyResInfo).setStyle(CollapsiblePane.TREE_STYLE);
         }
 
         final CollapsiblePane cpInfo = mapKey2CP.get(keyResInfo);
@@ -1051,7 +1061,7 @@ public class PnlInformation extends NursingRecordsPanel {
                     cpInfo.setContentPane(new JScrollPane(txt));
                 } else {
                     if (!mapInfo2Editor.containsKey(resInfo)) {
-                        mapInfo2Editor.put(resInfo, new PnlEditResInfo(resInfo.clone()));
+                        mapInfo2Editor.put(resInfo, new PnlEditResInfo(resInfo.clone(), resInfo.getResInfoType().getResInfoCat().getColor()));
                     }
                     cpInfo.setContentPane(new JScrollPane(mapInfo2Editor.get(resInfo).getPanel()));
                 }

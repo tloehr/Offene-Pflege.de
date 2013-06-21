@@ -7,9 +7,13 @@ import com.jidesoft.swing.OverlayTextArea;
 import entity.EntityTools;
 import entity.files.SYSFilesTools;
 import entity.info.ResInfo;
+import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.prescription.GP;
 import entity.prescription.GPTools;
+import entity.values.ResValue;
+import entity.values.ResValueTools;
+import entity.values.ResValueTypesTools;
 import op.OPDE;
 import op.system.PDF;
 import op.threads.DisplayMessage;
@@ -79,14 +83,22 @@ public class PnlEditResInfo {
     private OverlayTextArea txtComment;
     private DefaultOverlayable ovrComment;
     Exception lastParsingException;
+    Color background;
 
     public PnlEditResInfo(ResInfo resInfo) {
-        this(resInfo, null);
+        this(resInfo, null, null);
     }
 
-    public PnlEditResInfo(ResInfo resInfo, Closure closure) {
+    public PnlEditResInfo(ResInfo resInfo, Color basecolor) {
+        this(resInfo, null, basecolor);
+    }
+
+    public PnlEditResInfo(ResInfo resInfo, Closure closure, Color basecolor) {
         this.resInfo = resInfo;
         this.closure = closure;
+        if (basecolor != null) {
+            background = GUITools.blend(basecolor, Color.WHITE, 0.1f);
+        }
         initPanel(resInfo.getResInfoType().getXml());
     }
 
@@ -121,6 +133,7 @@ public class PnlEditResInfo {
             parser.parse(is);
 
             txtComment = new OverlayTextArea();
+            txtComment.setOpaque(false);
             txtComment.setRows(3);
             txtComment.setWrapStyleWord(true);
             txtComment.setLineWrap(true);
@@ -137,6 +150,7 @@ public class PnlEditResInfo {
             lblComment.setForeground(Color.LIGHT_GRAY);
             lblComment.setFont(SYSConst.ARIAL18BOLD);
             ovrComment.addOverlayComponent(lblComment, DefaultOverlayable.SOUTH_EAST);
+            ovrComment.setPreferredSize(new Dimension(h.getPanel().getPreferredSize().width, txtComment.getPreferredSize().height));
             pnlContent.add(h.getPanel(), BorderLayout.CENTER);
             pnlContent.add(ovrComment, BorderLayout.SOUTH);
 
@@ -156,11 +170,10 @@ public class PnlEditResInfo {
         initPanel = false;
 
         // add apply and cancel button
-        main = null;
-
         main = new JPanel(new BorderLayout());
         main.setBorder(new EmptyBorder(10, 10, 10, 10));
         main.add(pnlContent, BorderLayout.CENTER);
+
 
         JPanel enlosingButtonPanel = new JPanel(new BorderLayout());
 
@@ -215,7 +228,7 @@ public class PnlEditResInfo {
         btnPanel.add(cancel, BorderLayout.LINE_END);
 
 
-        enlosingButtonPanel.add(btnPanel, BorderLayout.LINE_START);
+        enlosingButtonPanel.add(btnPanel, BorderLayout.LINE_END);
         main.add(enlosingButtonPanel, BorderLayout.SOUTH);
 
 
@@ -287,6 +300,86 @@ public class PnlEditResInfo {
         return lastParsingException;
     }
 
+    /**
+     * retrieves presets from various locations in the database. mainly from ResValue.
+     *
+     * @param preset
+     * @param deflt
+     * @return
+     */
+    private String getPreset(String preset, String deflt) {
+        String d = SYSTools.catchNull(deflt);
+        NumberFormat nf = DecimalFormat.getNumberInstance();
+        nf.setMinimumFractionDigits(2);
+        nf.setMaximumFractionDigits(2);
+        nf.setGroupingUsed(false);
+
+        if (SYSTools.catchNull(preset).isEmpty()) {
+            return d;
+        }
+
+        Resident resident;
+        if (resInfo == null) {
+            resident = ResidentTools.getAllActive().get(0);
+        } else {
+            resident = resInfo.getResident();
+        }
+
+        if (preset.equalsIgnoreCase("heightlast")) {
+            ResValue r = ResValueTools.getLast(resident, ResValueTypesTools.HEIGHT);
+            return r == null ? d : nf.format(r.getVal1()).replace(",", ".");
+        }
+        if (preset.equalsIgnoreCase("weightlast")) {
+            ResValue r = ResValueTools.getLast(resident, ResValueTypesTools.WEIGHT);
+            return r == null ? d : nf.format(r.getVal1()).replace(",", ".");
+        }
+        if (preset.equalsIgnoreCase("weight-1m")) {
+            long target = new DateTime().minusMonths(1).getMillis();
+            ArrayList<ResValue> list = ResValueTools.getResValues(resident, ResValueTypesTools.WEIGHT, new DateMidnight().minusDays(45), new DateMidnight().minusDays(15));
+
+            ResValue closest = null;
+            long distance = Long.MAX_VALUE;
+            for (ResValue rv : list) {
+                if (Math.abs(target - rv.getPit().getTime()) < distance) {
+                    distance = Math.abs(target - rv.getPit().getTime());
+                    closest = rv;
+                }
+            }
+
+            return closest == null ? d : nf.format(closest.getVal1()).replace(",", ".");
+        }
+        if (preset.equalsIgnoreCase("weight-6m")) {
+            long target = new DateTime().minusMonths(6).getMillis();
+            ArrayList<ResValue> list = ResValueTools.getResValues(resident, ResValueTypesTools.WEIGHT, new DateMidnight().minusMonths(6).minusDays(15), new DateMidnight().minusMonths(5).minusDays(15));
+
+            ResValue closest = null;
+            long distance = Long.MAX_VALUE;
+            for (ResValue rv : list) {
+                if (Math.abs(target - rv.getPit().getTime()) < distance) {
+                    distance = Math.abs(target - rv.getPit().getTime());
+                    closest = rv;
+                }
+            }
+
+            return closest == null ? d : nf.format(closest.getVal1()).replace(",", ".");
+        }
+        if (preset.equalsIgnoreCase("weight-1y")) {
+            long target = new DateTime().minusYears(1).getMillis();
+            ArrayList<ResValue> list = ResValueTools.getResValues(resident, ResValueTypesTools.WEIGHT, new DateMidnight().minusYears(1).minusDays(15), new DateMidnight().minusMonths(11).minusDays(15));
+
+            ResValue closest = null;
+            long distance = Long.MAX_VALUE;
+            for (ResValue rv : list) {
+                if (Math.abs(target - rv.getPit().getTime()) < distance) {
+                    distance = Math.abs(target - rv.getPit().getTime());
+                    closest = rv;
+                }
+            }
+
+            return closest == null ? d : nf.format(closest.getVal1()).replace(",", ".");
+        }
+        return d;
+    }
 
     public void print() {
 
@@ -383,7 +476,21 @@ public class PnlEditResInfo {
      * in ResInfo.
      */
     public JPanel getPanel() {
-        if (main != null) return main;
+
+        if (background != null) {
+                    pnlContent.setOpaque(true);
+                    pnlContent.setBackground(background);
+                }
+
+        if (main != null) {
+            if (background != null) {
+                main.setOpaque(true);
+                main.setBackground(background);
+            }
+            return main;
+        }
+
+
         return pnlContent;
     }
 
@@ -686,6 +793,7 @@ public class PnlEditResInfo {
 
                 innerpanel = new JPanel(new RiverLayout());
                 innerpanel.setName(groupname);
+                innerpanel.setOpaque(false);
                 if (attributes.getValue("label") != null) {
                     JLabel jl = new JLabel(attributes.getValue("label"));
                     jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
@@ -770,6 +878,7 @@ public class PnlEditResInfo {
                     score = SYSTools.parseBigDecimal(attributes.getValue("score"));
                 }
                 JRadioButton j = new JRadioButton(attributes.getValue("label"));
+                j.setOpaque(false);
                 focusTraversal.add(j);
 
                 j.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
@@ -805,6 +914,7 @@ public class PnlEditResInfo {
             if (tagName.equalsIgnoreCase("checkbox")) {
                 groupname = attributes.getValue("name");
                 JCheckBox j = new JCheckBox(attributes.getValue("label"));
+                j.setOpaque(false);
                 focusTraversal.add(j);
                 j.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 j.setName(groupname);
@@ -870,9 +980,9 @@ public class PnlEditResInfo {
                 components.put(groupname, j); // für den späteren Direktzugriff
                 j.addFocusListener(tffl);
                 //                j.addCaretListener(new TextFieldCaretListener(type, notempty));
-                String defaultText = SYSTools.catchNull(attributes.getValue("default"));
-                j.setText(defaultText);
-                content.put(groupname, defaultText);
+//                String defaultText = SYSTools.catchNull(attributes.getValue("default"));
+                j.setText(getPreset(attributes.getValue("preset"), attributes.getValue("default")));
+                content.put(groupname, j.getText());
             }
             // ---------------------- Separators --------------------------------
             if (tagName.equalsIgnoreCase("separator")) {
@@ -1008,6 +1118,7 @@ public class PnlEditResInfo {
                 groupname = attributes.getValue("name");
                 boxModel = new DefaultComboBoxModel();
                 JComboBox jcb = new JComboBox();
+                jcb.setOpaque(false);
                 focusTraversal.add(jcb);
                 jcb.setName(groupname);
                 jcb.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
@@ -1016,7 +1127,7 @@ public class PnlEditResInfo {
                 JLabel jl = new JLabel(attributes.getValue("label") + ":");
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 outerpanel.add(layout, jl);
-                outerpanel.add("tab", jcb);
+                outerpanel.add("left", jcb);
 
             }
             /***
@@ -1054,6 +1165,9 @@ public class PnlEditResInfo {
         }
 
         public JPanel getPanel() {
+            if (background != null) {
+                outerpanel.setOpaque(false);
+            }
             return this.outerpanel;
         }
 

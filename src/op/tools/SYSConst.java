@@ -118,7 +118,6 @@ public class SYSConst {
     public static Color thistle2 = new Color(0xe9, 0xcf, 0xEC);
     public static Color thistle3 = new Color(0xc6, 0xae, 0xc7);
     public static Color thistle4 = new Color(0x80, 0x6d, 0x7E);
-    //    public static Color yellow1 = new Color(0xFF, 0xFF, 0x00);
     public static Color yellow2 = new Color(0xEE, 0xEE, 0x00);
     public static Color yellow3 = new Color(0xCD, 0xCD, 0x00);
     public static Color yellow4 = new Color(0x8B, 0x8B, 0x00);

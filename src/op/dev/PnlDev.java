@@ -12,6 +12,7 @@ import op.OPDE;
 import op.care.info.PnlEditResInfo;
 import op.tools.CleanablePanel;
 import op.tools.GUITools;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
@@ -51,7 +52,7 @@ public class PnlDev extends CleanablePanel {
         PnlEditResInfo pnlEditResInfo = new PnlEditResInfo(txtXML.getText(), new Closure() {
             @Override
             public void execute(Object o) {
-                txtException.setText(o.toString());
+                txtException.setText(SYSTools.catchNull(o));
             }
         });
 

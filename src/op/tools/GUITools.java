@@ -868,8 +868,12 @@ public class GUITools {
             color = Color.red;
         } else if (colornameOrHTMLCode.equalsIgnoreCase("blue")) {
             color = Color.blue;
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("dark_red")) {
+            color = Color.red.darker();
         } else if (colornameOrHTMLCode.equalsIgnoreCase("green")) {
             color = Color.green;
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("dark_green")) {
+            color = Color.green.darker();
         } else if (colornameOrHTMLCode.equalsIgnoreCase("yellow")) {
             color = Color.yellow;
         } else if (colornameOrHTMLCode.equalsIgnoreCase("cyan")) {
@@ -887,7 +891,9 @@ public class GUITools {
         } else if (colornameOrHTMLCode.equalsIgnoreCase("white")) {
             color = Color.WHITE;
         } else if (colornameOrHTMLCode.equalsIgnoreCase("orange")) {
-            color = Color.ORANGE;
+            color = SYSConst.gold7;
+        } else if (colornameOrHTMLCode.equalsIgnoreCase("dark_orange")) {
+            color = SYSConst.darkorange;
         } else {
             try {
                 int red = Integer.parseInt(colornameOrHTMLCode.substring(0, 2), 16);
