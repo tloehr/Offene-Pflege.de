@@ -2,9 +2,7 @@ package entity.info;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.Font;
-import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.*;
-import com.itextpdf.text.pdf.TextField;
 import entity.HomesTools;
 import entity.files.SYSFilesTools;
 import entity.nursingprocess.*;
@@ -105,7 +103,8 @@ public class TXEssenDoc1 {
     }
 
     private File createDocPSYCH() throws Exception {
-        File outfilePSYCH = new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TXTXEAF.PSYCH_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
+        File outfilePSYCH = File.createTempFile("TXE",".pdf"); //new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TXTXEAF.PSYCH_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
+        outfilePSYCH.deleteOnExit();
         PdfStamper stamper = new PdfStamper(new PdfReader(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_TEMPLATES + File.separator + SOURCEPSYCH), new FileOutputStream(outfilePSYCH));
         createContent4PSYCH();
 
@@ -119,7 +118,8 @@ public class TXEssenDoc1 {
     }
 
     private File createDocMRE() throws Exception {
-        File outfileMRE = new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TXTXEAF.MRE_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
+        File outfileMRE = File.createTempFile("TXE",".pdf"); //new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TXTXEAF.MRE_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
+        outfileMRE.deleteOnExit();
         PdfStamper stamper = new PdfStamper(new PdfReader(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_TEMPLATES + File.separator + SOURCEMRE), new FileOutputStream(outfileMRE));
         createContent4MRE();
 
@@ -133,7 +133,8 @@ public class TXEssenDoc1 {
     }
 
     private File createDoc1() throws Exception {
-        File outfile1 = new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TX1_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
+        File outfile1 = File.createTempFile("TXE",".pdf");//new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TX1_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
+        outfile1.deleteOnExit();
         PdfStamper stamper = new PdfStamper(new PdfReader(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_TEMPLATES + File.separator + SOURCEDOC1), new FileOutputStream(outfile1));
 
         createContent4Section1();
@@ -173,6 +174,7 @@ public class TXEssenDoc1 {
         AcroFields form = stamper.getAcroFields();
         for (String key : content.keySet()) {
             if (!ArrayUtils.contains(PnlBodyScheme.PARTS, key)) { // this is a special case. The bodyparts and the pdfkeys have the same name.
+                OPDE.debug(key);
                 form.setField(key, content.get(key));
             }
         }
@@ -198,8 +200,9 @@ public class TXEssenDoc1 {
      * @throws Exception
      */
     private File concatPDFFiles(File file1, File filemre, File filepsych) throws Exception {
-        File outfileMain = new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TX_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
-
+        File outfileMain = File.createTempFile("TXE",".pdf");//new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "TX_" + resident.getRID() + "_" + sdf.format(new Date()) + ".pdf");
+        outfileMain.deleteOnExit();
+//        file1.deleteOnExit();
 
         Document document = new Document(PageSize.A4, Utilities.millimetersToPoints(0), Utilities.millimetersToPoints(0), Utilities.millimetersToPoints(0), Utilities.millimetersToPoints(0));
         PdfCopy copy = new PdfCopy(document, new FileOutputStream(outfileMain));
@@ -251,6 +254,7 @@ public class TXEssenDoc1 {
         }
 
         if (readerMRE != null) {
+//            filemre.deleteOnExit();
             for (int p = 1; p <= readerMRE.getNumberOfPages(); p++) {
                 runningPage++;
                 page = copy.getImportedPage(readerMRE, p);
@@ -266,6 +270,7 @@ public class TXEssenDoc1 {
         }
 
         if (readerPSYCH != null) {
+//            filepsych.deleteOnExit();
             for (int p = 1; p <= readerPSYCH.getNumberOfPages(); p++) {
                 runningPage++;
                 page = copy.getImportedPage(readerPSYCH, p);
@@ -323,6 +328,7 @@ public class TXEssenDoc1 {
         content.put(TXEAF.PAGE2_DATE, DateFormat.getDateInstance().format(new Date()));
         content.put(TXEAF.PAGE3_TX_DATE, DateFormat.getDateInstance().format(new Date()));
         content.put(TXEAF.PAGE3_TX2_DATE, DateFormat.getDateInstance().format(new Date()));
+        content.put(TXEAF.PAGE3_TX3_DATE, DateFormat.getDateInstance().format(new Date()));
         content.put(TXEAF.TX_TIME, DateFormat.getTimeInstance(DateFormat.SHORT).format(new Date()));
 
         content.put(TXEAF.RESIDENT_HINSURANCE, getValue(ResInfoTypeTools.TYPE_HEALTH_INSURANCE, "hiname"));
@@ -362,7 +368,10 @@ public class TXEssenDoc1 {
 
         String grade = getValue(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "grade");
         grade = grade.equalsIgnoreCase("refused") ? "none" : grade; // there is no such thing as refused request in this document.
-        content.put(TXEAF.ASSIGNED_INSURANCE_GRADE, setRadiobutton(grade, new String[]{"none", "assigned", "requested"}));
+        content.put(TXEAF.ASSIGNED_INSURANCE_GRADE, getValue(ResInfoTypeTools.TYPE_NURSING_INSURANCE, "result"));
+        content.put(TXEAF.INSURANCE_GRADE_NO, setCheckbox(grade.equalsIgnoreCase("none")));
+        content.put(TXEAF.INSURANCE_GRADE_YES, setCheckbox(grade.equalsIgnoreCase("assigned")));
+        content.put(TXEAF.INSURANCE_GRADE_REQUESTED, setCheckbox(grade.equalsIgnoreCase("requested")));
         content.put(TXEAF.DATE_REQUESTED_INSURANCE_GRADE_PAGE3, setCheckbox(grade.equalsIgnoreCase("requested")));
     }
 
@@ -408,7 +417,7 @@ public class TXEssenDoc1 {
         content.put(TXEAF.SKIN_NORMAL, setCheckbox(getValue(ResInfoTypeTools.TYPE_SKIN, "skin.normal")));
 
         content.put(TXEAF.PREFERRED_CAREPRODUCTS, getValue(ResInfoTypeTools.TYPE_CARE, "preferred.careproducts"));
-
+        content.put(TXEAF.PERSONAL_CARE_COMMENT, getComment(ResInfoTypeTools.TYPE_CARE));
 
     }
 
@@ -437,6 +446,8 @@ public class TXEssenDoc1 {
         content.put(TXEAF.MOBILITY_AID_WALKER, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "walker.aid")));
         content.put(TXEAF.MOBILITY_AID_COMMENT, getValue(ResInfoTypeTools.TYPE_MOBILITY, "other.aid"));
         content.put(TXEAF.MOBILITY_BEDRIDDEN, setCheckbox(getValue(ResInfoTypeTools.TYPE_MOBILITY, "bedridden")));
+
+        content.put(TXEAF.MOBILITY_COMMENT, getComment(ResInfoTypeTools.TYPE_MOBILITY));
 
         String mobilityMeasures = "";
         long prev = -1;
@@ -469,14 +480,24 @@ public class TXEssenDoc1 {
         content.put(TXEAF.EXCRETIONS_AID_COMMODE, setCheckbox(getValue(ResInfoTypeTools.TYPE_INCOAID, "commode.aid")));
         content.put(TXEAF.EXCRETIONS_AID_URINAL, setCheckbox(getValue(ResInfoTypeTools.TYPE_INCOAID, "urinal.aid")));
 
+
+
         boolean noAid = getValue(ResInfoTypeTools.TYPE_INCOAID, "bedpan.aid").equalsIgnoreCase("false") &&
                 getValue(ResInfoTypeTools.TYPE_INCOAID, "commode.aid").equalsIgnoreCase("false") &&
                 getValue(ResInfoTypeTools.TYPE_INCOAID, "urinal.aid").equalsIgnoreCase("false");
         content.put(TXEAF.EXCRETIONS_AID_NO, setCheckbox(noAid));
 
+        boolean normal = getValue(ResInfoTypeTools.TYPE_EXCRETIONS, "diarrhoe").equalsIgnoreCase("false") &&
+                       getValue(ResInfoTypeTools.TYPE_EXCRETIONS, "digital").equalsIgnoreCase("false") &&
+                       getValue(ResInfoTypeTools.TYPE_EXCRETIONS, "obstipation").equalsIgnoreCase("false");
         content.put(TXEAF.EXCRETIONS_DIARRHOEA_TENDENCY, setCheckbox(getValue(ResInfoTypeTools.TYPE_EXCRETIONS, "diarrhoe")));
         content.put(TXEAF.EXCRETIONS_OBSTIPATION_TENDENCY, setCheckbox(getValue(ResInfoTypeTools.TYPE_EXCRETIONS, "obstipation")));
         content.put(TXEAF.EXCRETIONS_DIGITAL, setCheckbox(getValue(ResInfoTypeTools.TYPE_EXCRETIONS, "digital")));
+        content.put(TXEAF.EXCRETIONS_AP_AID, setCheckbox(getValue(ResInfoTypeTools.TYPE_EXCRETIONS, "ap.aid")));
+        content.put(TXEAF.EXCRETIONS_NORMAL, setCheckbox(normal));
+        content.put(TXEAF.EXCRETIONS_COMMENT, getComment(ResInfoTypeTools.TYPE_EXCRETIONS));
+
+        content.put(TXEAF.EXCRETIONS_TUBESIZE_CH, getValue(ResInfoTypeTools.TYPE_INCOAID, "tubesize"));
 
         boolean inco_urine = (mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_PROFILE_DAY) && !getValue(ResInfoTypeTools.TYPE_INCO_PROFILE_DAY, "inkoprofil").equalsIgnoreCase("kontinenz")) ||
                 (mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT) && !getValue(ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT, "inkoprofil").equalsIgnoreCase("kontinenz"));
@@ -572,7 +593,7 @@ public class TXEssenDoc1 {
         content.put(TXEAF.SLEEP_POS_BACK, setCheckbox(getValue(ResInfoTypeTools.TYPE_SLEEP, "back")));
         content.put(TXEAF.SLEEP_POS_RIGHT, setCheckbox(getValue(ResInfoTypeTools.TYPE_SLEEP, "right")));
 
-        content.put(TXEAF.SLEEP_COMMENTS, setCheckbox(getValue(ResInfoTypeTools.TYPE_SLEEP, "schlafhilfen")));
+        content.put(TXEAF.SLEEP_COMMENTS, getValue(ResInfoTypeTools.TYPE_SLEEP, "schlafhilfen"));
 
     }
 
@@ -584,15 +605,14 @@ public class TXEssenDoc1 {
         content.put(TXEAF.FOOD_DYSPHAGIA, setCheckbox(getValue(ResInfoTypeTools.TYPE_FOOD, "dysphagia")));
         content.put(TXEAF.FOOD_BITESIZE, setCheckbox(getValue(ResInfoTypeTools.TYPE_FOOD, "bitesize")));
 
-        Date lastMeal = SYSConst.DATE_THE_VERY_BEGINNING;
+        long lastMeal = 0;
 
         BHP bhp = BHPTools.getLastBHP(resident, InterventionTools.FLAG_FOOD_CONSUMPTION);
         DFN dfn = DFNTools.getLastDFN(resident, InterventionTools.FLAG_FOOD_CONSUMPTION);
 
-        lastMeal = new Date(Math.max(lastMeal.getTime(), (bhp == null ? 0 : bhp.getIst().getTime())));
-        lastMeal = new Date(Math.max(lastMeal.getTime(), (dfn == null ? 0 : dfn.getIst().getTime())));
+        lastMeal = Math.max((bhp == null ? 0 : bhp.getIst().getTime()), (dfn == null ? 0 : dfn.getIst().getTime()));
 
-        if (!lastMeal.equals(SYSConst.DATE_THE_VERY_BEGINNING)) {
+        if (lastMeal != 0) {
             content.put(TXEAF.FOOD_LAST_MEAL, DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(lastMeal));
         } else {
             content.put(TXEAF.FOOD_LAST_MEAL, "--");
@@ -721,7 +741,9 @@ public class TXEssenDoc1 {
         content.put(TXEAF.RESPIRATION_SPUTUM, setCheckbox(getValue(ResInfoTypeTools.TYPE_RESPIRATION, "sputum")));
         content.put(TXEAF.RESPIRATION_SMOKING, setCheckbox(getValue(ResInfoTypeTools.TYPE_RESPIRATION, "smoking")));
         content.put(TXEAF.RESPIRATION_ASTHMA, setCheckbox(getValue(ResInfoTypeTools.TYPE_RESPIRATION, "asthma")));
-        content.put(TXEAF.RESPIRATION_COMMENT, mapID2Info.containsKey(ResInfoTypeTools.TYPE_RESPIRATION) ? SYSTools.catchNull(mapID2Info.get(ResInfoTypeTools.TYPE_RESPIRATION).getText()) : "");
+
+        content.put(TXEAF.RESPIRATION_OTHER, setCheckbox(getValue(ResInfoTypeTools.TYPE_RESPIRATION, "other").equals("--")));
+        content.put(TXEAF.RESPIRATION_COMMENT, getValue(ResInfoTypeTools.TYPE_RESPIRATION, "other"));
 
         content.put(TXEAF.RESPIRATION_STOMA, setCheckbox(getValue(ResInfoTypeTools.TYPE_RESPIRATION, "stoma")));
         content.put(TXEAF.RESPIRATION_SILVERTUBE, setCheckbox(getValue(ResInfoTypeTools.TYPE_RESPIRATION, "silver")));
@@ -1189,8 +1211,6 @@ public class TXEssenDoc1 {
         content.put(TXEAF.MRE_THERAPY_TO4, getValue(ResInfoTypeTools.TYPE_INFECTION, "to4"));
 
         content.put(TXEAF.MRE_COMMENTS, SYSTools.catchNull(mapID2Info.get(ResInfoTypeTools.TYPE_INFECTION).getText(), "--"));
-
-
     }
 
     private void createContent4PSYCH() {
@@ -1221,6 +1241,7 @@ public class TXEssenDoc1 {
         content.put(TXEAF.PSYCH_DELUSION, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "delusion"), new String[]{"yes4", "no4", "intermittent4"}));
         content.put(TXEAF.PSYCH_HALLUCINATION, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "hallucination"), new String[]{"yes5", "no5", "intermittent5"}));
         content.put(TXEAF.PSYCH_FEAR, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "fear"), new String[]{"yes12", "no12", "intermittent12"}));
+        content.put(TXEAF.PSYCH_FEARTEXT, getValue(ResInfoTypeTools.TYPE_PSYCH, "feartext"));
         content.put(TXEAF.PSYCH_PASSIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "passive"), new String[]{"yes6", "no6", "intermittent6"}));
         content.put(TXEAF.PSYCH_RESTLESS, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "restless"), new String[]{"yes7", "no7", "intermittent7"}));
         content.put(TXEAF.PSYCH_REGRESSIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "regressive"), new String[]{"yes8", "no8", "intermittent8"}));
@@ -1249,6 +1270,13 @@ public class TXEssenDoc1 {
         content.put(TXEAF.PSYCH_TX_USERNAME, (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : ""));
 
 
+    }
+
+    String getComment(int type) {
+        if (!mapID2Info.containsKey(type)) {
+            return "--";
+        }
+        return SYSTools.catchNull(mapID2Info.get(type).getText(), "--");
     }
 
 }

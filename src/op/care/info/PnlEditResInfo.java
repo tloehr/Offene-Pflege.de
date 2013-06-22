@@ -30,6 +30,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import java.awt.*;
@@ -74,7 +75,7 @@ public class PnlEditResInfo {
     private ArrayList<RiskBean> scaleriskmodel;
     private String scalesumlabeltext;
     private ArrayList<String> scaleButtonGroups; // eine Liste mit den Namen der Buttongroups eines scales;
-    private HashMap components;
+    private HashMap<String, Object> components;
     private ArrayList<JComponent> focusTraversal;
     private ResInfo resInfo;
     private Closure closure;
@@ -133,7 +134,11 @@ public class PnlEditResInfo {
             parser.parse(is);
 
             txtComment = new OverlayTextArea();
-            txtComment.setOpaque(false);
+            txtComment.setBorder(new LineBorder(Color.DARK_GRAY, 1));
+            txtComment.setOpaque(true);
+            if (background != null) {
+                txtComment.setBackground(background);
+            }
             txtComment.setRows(3);
             txtComment.setWrapStyleWord(true);
             txtComment.setLineWrap(true);
@@ -176,10 +181,11 @@ public class PnlEditResInfo {
 
 
         JPanel enlosingButtonPanel = new JPanel(new BorderLayout());
+        enlosingButtonPanel.setOpaque(false);
 
         JPanel btnPanel = new JPanel();
         btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.LINE_AXIS));
-
+        btnPanel.setOpaque(false);
 
         // export 2 png function for development
         if (OPDE.isDebug()) {
@@ -191,7 +197,7 @@ public class PnlEditResInfo {
             png.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    GUITools.exportToPNG(pnlContent);
+                    GUITools.exportToPNG(pnlContent, resInfo.getResInfoType().getID());
                 }
             });
             btnPanel.add(png, BorderLayout.LINE_END);
@@ -478,9 +484,9 @@ public class PnlEditResInfo {
     public JPanel getPanel() {
 
         if (background != null) {
-                    pnlContent.setOpaque(true);
-                    pnlContent.setBackground(background);
-                }
+            pnlContent.setOpaque(true);
+            pnlContent.setBackground(background);
+        }
 
         if (main != null) {
             if (background != null) {
@@ -967,6 +973,8 @@ public class PnlEditResInfo {
                 }
                 JLabel jl = new JLabel(attributes.getValue("label") + ":");
                 JTextField j = new JTextField(length);
+                j.setOpaque(false);
+                j.setDisabledTextColor(Color.DARK_GRAY);
                 focusTraversal.add(j);
                 j.setName(groupname);
                 j.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
@@ -1162,6 +1170,18 @@ public class PnlEditResInfo {
         }
 
         public void endDocument() {
+            // adding a focusgained listener to all JComponents
+            for (final Object key : components.keySet()){
+                if (components.get(key) instanceof JComponent){
+                    ((JComponent) components.get(key)).addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusGained(FocusEvent e) {
+                            focusOwner = (JComponent) e.getSource();
+                        }
+                    });
+                }
+            }
+
         }
 
         public JPanel getPanel() {

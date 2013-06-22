@@ -253,10 +253,11 @@ public class PnlInformation extends NursingRecordsPanel {
 
                             popup.setMovable(false);
                             popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-
+                            popup.setPopupType(JidePopup.HEAVY_WEIGHT_POPUP);
 
                             popup.setOwner(btnColor);
                             popup.removeExcludedComponent(btnColor);
+                            popup.setTransient(false);
                             popup.getContentPane().add(clr);
                             popup.setDefaultFocusComponent(clr);
                             GUITools.showPopup(popup, SwingConstants.SOUTH_WEST);
@@ -315,7 +316,6 @@ public class PnlInformation extends NursingRecordsPanel {
                     cpResInfoType.setTitle(resInfoType.getShortDescription());
 
                     cpResInfoType.setFont(SYSConst.ARIAL18);
-
 
 
 //                    cpResInfoType.setBackground((GUITools.blend(cat.getColor(), Color.WHITE, 0.7f)));
@@ -580,8 +580,11 @@ public class PnlInformation extends NursingRecordsPanel {
         }
 
         if (!resInfo.isClosed() || !resInfo.isSingleIncident()) {
-            cpInfo.setBackground((GUITools.blend(resInfo.getResInfoType().getResInfoCat().getColor(), Color.WHITE, 0.25f)));
-            cptitle.getButton().setForeground(GUITools.getForeground(cpInfo.getBackground()));
+//            cpInfo.setBackground((GUITools.blend(resInfo.getResInfoType().getResInfoCat().getColor(), Color.WHITE, 0.25f)));
+//            cptitle.getButton().setForeground(GUITools.getForeground(cpInfo.getBackground()));
+            cptitle.getButton().setForeground(GUITools.blend(resInfo.getResInfoType().getResInfoCat().getColor(), Color.BLACK, 0.25f));
+            cpInfo.setBackground(Color.WHITE);
+//            cpInfo.setBorder(new LineBorder(GUITools.blend(resInfo.getResInfoType().getResInfoCat().getColor(), Color.BLACK, 0.25f), 2));
         }
 
 
@@ -1188,7 +1191,7 @@ public class PnlInformation extends NursingRecordsPanel {
         }
 
 
-        GUITools.addAllComponents(mypanel, addKey());
+        GUITools.addAllComponents(mypanel, addDisplayCommands());
         GUITools.addAllComponents(mypanel, addFilters());
 
 
@@ -1998,7 +2001,7 @@ public class PnlInformation extends NursingRecordsPanel {
         return list;
     }
 
-    private java.util.List<Component> addKey() {
+    private java.util.List<Component> addDisplayCommands() {
         java.util.List<Component> list = new ArrayList<Component>();
 //        list.add(new JSeparator());
 //        list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
@@ -2069,20 +2072,40 @@ public class PnlInformation extends NursingRecordsPanel {
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getValueIsAdjusting()) return;
 
-                //TODO: this always scrolls to the wrong place :-(
-//                if (listSearchResults.getSelectedValue() instanceof ResInfo) {
-//                    ResInfo info = (ResInfo) listSearchResults.getSelectedValue();
-//                    final String keyResInfo = info.getID() + ".resinfo";
-//                    if (!mapInfo2Editor.containsKey(info)) {
-//                        try {
-//
-//                            mapKey2CP.get(keyResInfo).setCollapsed(false);
-//                        } catch (PropertyVetoException e1) {
-//                            //bah!!
-//                        }
-//                    }
-//                    GUITools.scroll2show(jspMain, mapKey2CP.get(keyResInfo), cpsAll, null);
-//                }
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        // collapse everything first
+                        try {
+                            GUITools.setCollapsed(cpsAll, true);
+                        } catch (PropertyVetoException ev) {
+                            // bah!
+                        }
+
+
+                        String key = "";
+                        if (listSearchResults.getSelectedValue() instanceof ResInfo) {
+                            key = ((ResInfo) listSearchResults.getSelectedValue()).getID() + ".resinfo";
+                        }
+
+                        if (listSearchResults.getSelectedValue() instanceof ResInfoType) {
+                            key = ((ResInfoType) listSearchResults.getSelectedValue()).getID() + ".resinfotype";
+                        }
+
+
+                        if (mapKey2CP.containsKey(key)) {
+                            try {
+                                GUITools.expand(mapKey2CP.get(key));
+                            } catch (PropertyVetoException e1) {
+                                //bah!!
+                            }
+                        }
+                        GUITools.scroll2show(jspMain, mapKey2CP.get(key), cpsAll, null);
+                    }
+                });
+
+
             }
         });
 

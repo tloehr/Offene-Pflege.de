@@ -66,9 +66,12 @@ public class GUITools {
         return baos;
     }
 
-    public static void exportToPNG(JPanel pnl) {
+    public static void exportToPNG(JPanel pnl, String prefix) {
+        if (prefix == null) {
+            prefix = "pnl2png";
+        }
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-        exportToPNG(pnl, new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + "pnl2png_" + sdf.format(new Date()) + ".png"));
+        exportToPNG(pnl, new File(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_CACHE + File.separator + prefix + "_" + sdf.format(new Date()) + ".png"));
     }
 
     public static JideButton createHyperlinkButton(String titleORlangbundle, Icon icon, ActionListener actionListener) {
@@ -376,6 +379,31 @@ public class GUITools {
                 setCollapsed((Container) component, collapsed);
             }
         }
+    }
+
+    public static void expand(CollapsiblePane cp) throws PropertyVetoException {
+//        ArrayList<CollapsiblePane> path = new ArrayList<CollapsiblePane>();
+//        path.add(cp);
+        cp.setCollapsed(false);
+        Container cont = cp.getParent();
+        while (cont != null) {
+            if (cont instanceof CollapsiblePane) {
+                ((CollapsiblePane) cont).setCollapsed(false);
+            }
+            cont = cont.getParent();
+        }
+//
+//
+//        if (root instanceof CollapsiblePane) {
+//            if (((CollapsiblePane) root).isCollapsible()) {
+//                ((CollapsiblePane) root).setCollapsed(collapsed);
+//            }
+//        }
+//        for (Component component : root.getComponents()) {
+//            if (component instanceof Container) {
+//                setCollapsed((Container) component, collapsed);
+//            }
+//        }
     }
 
 

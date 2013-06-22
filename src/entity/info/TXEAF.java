@@ -8,6 +8,7 @@ package entity.info;
  * To change this template use File | Settings | File Templates.
  */
 public class TXEAF {
+    public static final String PAGE3_TX3_DATE = "Formular1[0].Patientenüberleitung-Seite3[0].Textfeld27[0]";
     public static final String MRE_BACK_LOW = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[13]";
     public static final String MRE_BACK_MID = "topmostSubform[0].Page1[0].#subform[0].#area[0].Kontrollkästchen[12]";
     public static final String MRE_BACK_OF_THE_HEAD = "topmostSubform[0].Page1[0].#subform[0].#area[0].GrafikKopf_hinten[0]";
@@ -309,7 +310,7 @@ public class TXEAF {
     public static final String MOBILITY_BED = "Formular1[0].#subform[0].#area[7].BeweglichkeitimBett[0]";
     public static final String MOBILITY_BEDPOSITION = "Formular1[0].#subform[0].#area[7].Lagerungsart[0]";
     public static final String MOBILITY_BEDRIDDEN = "Formular1[0].#subform[0].#area[7].Bettlägerig[0]";
-    public static final String MOBILITY_COMMENT = "Formular1[0].#subform[0].#area[7].MobilitätBemerkung[0]";
+    public static final String MOBILITY_COMMENT = "Formular1[0].#subform[0].#area[7].TextField4[0]";
     public static final String MOBILITY_GET_UP = "Formular1[0].#subform[0].Aufstehen[0]";
     public static final String MOBILITY_SITTING = "Formular1[0].#subform[0].SitzenimStuhl[0]";
     public static final String MOBILITY_TOILET = "Formular1[0].#subform[0].Toilettengang[0]";
