@@ -71,16 +71,16 @@ public class PDF {
     }
 
 
-    public static int sizeDefault(){
-            return SIZE;
-        }
-
-    public static int sizeH1(){
-        return SIZE+12;
+    public static int sizeDefault() {
+        return SIZE;
     }
 
-    public static int sizeH2(){
-        return SIZE+6;
+    public static int sizeH1() {
+        return SIZE + 12;
+    }
+
+    public static int sizeH2() {
+        return SIZE + 6;
     }
 
     public PDF(File output, String footer, int basefontsize) throws IOException, DocumentException {
@@ -111,7 +111,7 @@ public class PDF {
 
 
         writer.setPageEvent(new PdfPageEventHelper() {
-            int pagenumber;
+//            int pagenumber = 0;
             PdfTemplate totalPages;
 
             @Override
@@ -121,7 +121,6 @@ public class PDF {
 
             @Override
             public void onStartPage(PdfWriter writer, Document document) {
-                pagenumber++;
             }
 
             @Override
@@ -146,9 +145,6 @@ public class PDF {
                 } catch (DocumentException de) {
                     throw new ExceptionConverter(de);
                 }
-
-//                Rectangle rect = writer.getBoxSize("art");
-//                ColumnText.showTextAligned(writer.getDirectContent(), Element.ALIGN_CENTER, new Phrase(OPDE.lang.getString() + pagenumber + " " + DateFormat.getDateTimeInstance().format(new Date())), (rect.getLeft() + rect.getRight()) / 2, rect.getBottom() - 18, 0);
             }
 
 
@@ -218,7 +214,7 @@ public class PDF {
 //            phrase.add(Integer.toString(bd.intValue()));
         } else if (bd.compareTo(new BigDecimal(0.5d)) == 0) {
             phrase.add(new Chunk(frac12));
-        } else if (bd.compareTo(new BigDecimal(0.25d)) == 0){
+        } else if (bd.compareTo(new BigDecimal(0.25d)) == 0) {
             phrase.add(new Chunk(frac14));
         } else if (bd.compareTo(new BigDecimal(0.75d)) == 0) {
             phrase.add(new Chunk(frac34));
