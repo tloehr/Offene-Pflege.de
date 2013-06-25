@@ -64,10 +64,7 @@ import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * @author root
@@ -80,11 +77,11 @@ public class PnlReport extends NursingRecordsPanel {
     private JToggleButton tbShowReplaced;
     private JComboBox cmbTags;
 
-    //TODO: synchronize this!
-    private HashMap<String, CollapsiblePane> cpMap;
-    private HashMap<String, JPanel> contentmap;
-    private HashMap<String, ArrayList<NReport>> valuecache;
-    private HashMap<NReport, JPanel> linemap;
+    private Map<String, CollapsiblePane> cpMap;
+    private Map<String, JPanel> contentmap;
+    private Map<String, ArrayList<NReport>> valuecache;
+    private Map<NReport, JPanel> linemap;
+    private Map<DateMidnight, String> hollidays;
 
     private Resident resident;
     private boolean initPhase;
@@ -96,7 +93,6 @@ public class PnlReport extends NursingRecordsPanel {
     Format weekFormater = new SimpleDateFormat("w yyyy");
     Format dayFormat = new SimpleDateFormat("EEEE, dd.MM.yyyy");
 
-    HashMap<DateMidnight, String> hollidays;
 
     @Override
     public String getInternalClassID() {
@@ -121,10 +117,10 @@ public class PnlReport extends NursingRecordsPanel {
     }
 
     private void initPanel() {
-        contentmap = new HashMap<String, JPanel>();
-        cpMap = new HashMap<String, CollapsiblePane>();
-        valuecache = new HashMap<String, ArrayList<NReport>>();
-        linemap = new HashMap<NReport, JPanel>();
+        contentmap = Collections.synchronizedMap(new HashMap<String, JPanel>());
+        cpMap = Collections.synchronizedMap(new HashMap<String, CollapsiblePane>());
+        valuecache = Collections.synchronizedMap(new HashMap<String, ArrayList<NReport>>());
+        linemap = Collections.synchronizedMap(new HashMap<NReport, JPanel>());
         prepareSearchArea();
     }
 
@@ -193,12 +189,22 @@ public class PnlReport extends NursingRecordsPanel {
 
     @Override
     public void cleanup() {
-        SYSTools.clear(contentmap);
-        SYSTools.clear(cpMap);
+        synchronized (contentmap) {
+            SYSTools.clear(contentmap);
+        }
+        synchronized (cpMap) {
+            SYSTools.clear(cpMap);
+        }
         cpsReports.removeAll();
-        SYSTools.clear(linemap);
-        SYSTools.clear(valuecache);
-        SYSTools.clear(hollidays);
+        synchronized (linemap) {
+            SYSTools.clear(linemap);
+        }
+        synchronized (valuecache) {
+            SYSTools.clear(valuecache);
+        }
+        synchronized (hollidays) {
+            SYSTools.clear(hollidays);
+        }
     }
 
     @Override
@@ -349,10 +355,14 @@ public class PnlReport extends NursingRecordsPanel {
                                         reloadDisplay();
                                     } else {
                                         final String keyDay = DateFormat.getDateInstance().format(myReport.getPit());
-                                        contentmap.remove(keyDay);
-                                        if (valuecache.containsKey(keyDay)) {
-                                            valuecache.get(keyDay).add(myReport);
-                                            Collections.sort(valuecache.get(keyDay));
+                                        synchronized (contentmap) {
+                                            contentmap.remove(keyDay);
+                                        }
+                                        synchronized (valuecache) {
+                                            if (valuecache.containsKey(keyDay)) {
+                                                valuecache.get(keyDay).add(myReport);
+                                                Collections.sort(valuecache.get(keyDay));
+                                            }
                                         }
                                         createCP4Day(new DateMidnight(myReport.getPit()));
                                         expandDay(new DateMidnight(myReport.getPit()));
@@ -407,87 +417,68 @@ public class PnlReport extends NursingRecordsPanel {
          *                                              |_|            |___/
          */
 
-        contentmap.clear();
-        cpMap.clear();
-        linemap.clear();
-        valuecache.clear();
+        synchronized (contentmap) {
+            SYSTools.clear(contentmap);
+        }
+        synchronized (cpMap) {
+            SYSTools.clear(cpMap);
+        }
 
-        final boolean withworker = true;
-        if (withworker) {
-            initPhase = true;
+        synchronized (linemap) {
+            SYSTools.clear(linemap);
+        }
+        synchronized (valuecache) {
+            SYSTools.clear(valuecache);
+        }
+
+        initPhase = true;
 
 
-            OPDE.getMainframe().setBlocked(true);
-            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+        OPDE.getMainframe().setBlocked(true);
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
 
-            SwingWorker worker = new SwingWorker() {
-                Date max = null;
+        SwingWorker worker = new SwingWorker() {
+            Date max = null;
 
-                @Override
-                protected Object doInBackground() throws Exception {
+            @Override
+            protected Object doInBackground() throws Exception {
 
-                    GUITools.setResidentDisplay(resident);
+                GUITools.setResidentDisplay(resident);
 
-                    Pair<DateTime, DateTime> minmax = NReportTools.getMinMax(resident);
-                    hollidays = SYSCalendar.getHollidays(minmax.getFirst().getYear(), minmax.getSecond().getYear());
+                Pair<DateTime, DateTime> minmax = NReportTools.getMinMax(resident);
 
-                    if (minmax != null) {
-                        max = minmax.getSecond().toDate();
-                        DateMidnight start = minmax.getFirst().toDateMidnight().dayOfMonth().withMinimumValue();
-                        DateMidnight end = resident.isActive() ? new DateMidnight() : minmax.getSecond().toDateMidnight().dayOfMonth().withMinimumValue();
-                        for (int year = end.getYear(); year >= start.getYear(); year--) {
-                            createCP4Year(year, start, end);
-                        }
-                    }
+                hollidays = Collections.synchronizedMap(SYSCalendar.getHollidays(minmax.getFirst().getYear(), minmax.getSecond().getYear()));
 
-                    return null;
-                }
-
-                @Override
-                protected void done() {
-                    expandTheLast2Weeks();
-
-                    buildPanel();
-                    initPhase = false;
-                    OPDE.getDisplayManager().setProgressBarMessage(null);
-                    OPDE.getMainframe().setBlocked(false);
-                    if (lockmessageAfterwards) OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                    if (max != null) {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.lastEntry") + ": " + DateFormat.getDateInstance().format(max), 5));
-                    } else {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.noentryyet"), 5));
+                if (minmax != null) {
+                    max = minmax.getSecond().toDate();
+                    DateMidnight start = minmax.getFirst().toDateMidnight().dayOfMonth().withMinimumValue();
+                    DateMidnight end = resident.isActive() ? new DateMidnight() : minmax.getSecond().toDateMidnight().dayOfMonth().withMinimumValue();
+                    for (int year = end.getYear(); year >= start.getYear(); year--) {
+                        createCP4Year(year, start, end);
                     }
                 }
-            };
-            worker.execute();
 
-        } else {
-            initPhase = true;
-            Pair<DateTime, DateTime> minmax = NReportTools.getMinMax(resident);
-            hollidays = SYSCalendar.getHollidays(minmax.getFirst().getYear(), minmax.getSecond().getYear());
-            if (minmax != null) {
-                DateMidnight start = minmax.getFirst().toDateMidnight().dayOfMonth().withMinimumValue();
-                DateMidnight end = resident.isActive() ? new DateMidnight() : minmax.getSecond().toDateMidnight().dayOfMonth().withMinimumValue();
-                for (int year = end.getYear(); year >= start.getYear(); year--) {
-                    createCP4Year(year, start, end);
-                }
+                return null;
             }
 
-            expandTheLast2Weeks();
+            @Override
+            protected void done() {
+                expandTheLast2Weeks();
 
+                buildPanel();
+                initPhase = false;
+                OPDE.getDisplayManager().setProgressBarMessage(null);
+                OPDE.getMainframe().setBlocked(false);
+                if (lockmessageAfterwards) OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                if (max != null) {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.lastEntry") + ": " + DateFormat.getDateInstance().format(max), 5));
+                } else {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.noentryyet"), 5));
+                }
+            }
+        };
+        worker.execute();
 
-//            for (NReport report : reportList) {
-//                DateMidnight dateMidnight = new DateMidnight(report.getPit());
-//                if (!dayMap.containsKey(dateMidnight)) {
-//                    dayMap.put(dateMidnight, new ArrayList<NReport>());
-//                }
-//                dayMap.get(dateMidnight).add(report);
-//                reportMap.put(report, createCP4Month(report));
-//            }
-
-            buildPanel();
-            initPhase = false;
-        }
 
     }
 
@@ -505,18 +496,19 @@ public class PnlReport extends NursingRecordsPanel {
         final DateMidnight end = new DateMidnight(year, 12, 31).isAfter(max.dayOfMonth().withMaximumValue()) ? max.dayOfMonth().withMaximumValue() : new DateMidnight(year, 12, 31);
 
         final String keyYear = Integer.toString(year) + ".year";
-        if (!cpMap.containsKey(keyYear)) {
-            cpMap.put(keyYear, new CollapsiblePane());
-            try {
-                cpMap.get(keyYear).setCollapsed(true);
-            } catch (PropertyVetoException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
+        synchronized (cpMap) {
+            if (!cpMap.containsKey(keyYear)) {
+                cpMap.put(keyYear, new CollapsiblePane());
+                try {
+                    cpMap.get(keyYear).setCollapsed(true);
+                } catch (PropertyVetoException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
 
+            }
         }
 
         final CollapsiblePane cpYear = cpMap.get(keyYear);
-
 
         String title = "<html><font size=+1>" +
                 "<b>" + Integer.toString(year) + "</b>" +
@@ -591,14 +583,16 @@ public class PnlReport extends NursingRecordsPanel {
          *
          */
         final String key = monthFormatter.format(month.toDate()) + ".month";
-        if (!cpMap.containsKey(key)) {
-            cpMap.put(key, new CollapsiblePane());
-            try {
-                cpMap.get(key).setCollapsed(true);
-            } catch (PropertyVetoException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
+        synchronized (cpMap) {
+            if (!cpMap.containsKey(key)) {
+                cpMap.put(key, new CollapsiblePane());
+                try {
+                    cpMap.get(key).setCollapsed(true);
+                } catch (PropertyVetoException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
 
+            }
         }
         final CollapsiblePane cpMonth = cpMap.get(key);
 
@@ -696,14 +690,16 @@ public class PnlReport extends NursingRecordsPanel {
 
     private CollapsiblePane createCP4Week(final DateMidnight week) {
         final String key = weekFormater.format(week.toDate()) + ".week";
-        if (!cpMap.containsKey(key)) {
-            cpMap.put(key, new CollapsiblePane());
-            try {
-                cpMap.get(key).setCollapsed(true);
-            } catch (PropertyVetoException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
+        synchronized (cpMap) {
+            if (!cpMap.containsKey(key)) {
+                cpMap.put(key, new CollapsiblePane());
+                try {
+                    cpMap.get(key).setCollapsed(true);
+                } catch (PropertyVetoException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
 
+            }
         }
         final CollapsiblePane cpWeek = cpMap.get(key);
 
@@ -799,13 +795,14 @@ public class PnlReport extends NursingRecordsPanel {
 
     private CollapsiblePane createCP4Day(final DateMidnight day) {
         final String key = DateFormat.getDateInstance().format(day.toDate());
-        if (!cpMap.containsKey(key)) {
-            cpMap.put(key, new CollapsiblePane());
-//            cpMap.get(key).setStyle(CollapsiblePane.PLAIN_STYLE);
-            try {
-                cpMap.get(key).setCollapsed(true);
-            } catch (PropertyVetoException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        synchronized (cpMap) {
+            if (!cpMap.containsKey(key)) {
+                cpMap.put(key, new CollapsiblePane());
+                try {
+                    cpMap.get(key).setCollapsed(true);
+                } catch (PropertyVetoException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
             }
         }
         final CollapsiblePane cpDay = cpMap.get(key);
@@ -873,275 +870,289 @@ public class PnlReport extends NursingRecordsPanel {
 //        progress++;
 
         final String key = DateFormat.getDateInstance().format(day.toDate());
-        if (contentmap.containsKey(key)) {
-            return contentmap.get(key);
+        synchronized (contentmap) {
+            if (contentmap.containsKey(key)) {
+                return contentmap.get(key);
+            }
         }
         final JPanel dayPanel = new JPanel(new VerticalLayout());
         dayPanel.setOpaque(false);
-        if (!valuecache.containsKey(key)) {
-//            if (cmbTags.getSelectedIndex() > 0) {
-//                valuecache.put(key, NReportTools.getNReports4Tags(resident, day, (NReportTAGS) cmbTags.getSelectedItem()));
-//            } else {
-//                valuecache.put(key, NReportTools.getNReports4Day(resident, day));
-//            }
+        synchronized (valuecache) {
+            if (!valuecache.containsKey(key)) {
+                valuecache.put(key, NReportTools.getNReports4Day(resident, day));
+            }
 
-            valuecache.put(key, NReportTools.getNReports4Day(resident, day));
-        }
 
-        int i = 0; // for zebra pattern
-        for (final NReport nreport : valuecache.get(key)) {
+            int i = 0; // for zebra pattern
+            for (final NReport nreport : valuecache.get(key)) {
 
-            if (tbShowReplaced.isSelected() || !nreport.isObsolete()) {
+                if (tbShowReplaced.isSelected() || !nreport.isObsolete()) {
 
-                String title = "<html><table border=\"0\">" +
-                        "<tr valign=\"top\">" +
-                        "<td width=\"100\" align=\"left\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
-                        " " + OPDE.lang.getString("misc.msg.Time.short") +
-                        "<br/>" + nreport.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)") +
-                        "</td>" +
-                        "<td width=\"100\" align=\"left\">" + SYSTools.catchNull(NReportTools.getTagsAsHTML(nreport), " [", "]") + "</td>" +
-                        "<td width=\"400\" align=\"left\">" +
-                        SYSTools.replace(nreport.getText(), "\n", "<br/>", false) +
-                        "</td>" +
-                        "<td width=\"200\" align=\"left\">" + nreport.getUser().getFullname() + "</td>" +
-                        "</tr>" +
-                        "</table>" +
-                        "</html>";
+                    String title = "<html><table border=\"0\">" +
+                            "<tr valign=\"top\">" +
+                            "<td width=\"100\" align=\"left\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
+                            " " + OPDE.lang.getString("misc.msg.Time.short") +
+                            "<br/>" + nreport.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)") +
+                            "</td>" +
+                            "<td width=\"100\" align=\"left\">" + SYSTools.catchNull(NReportTools.getTagsAsHTML(nreport), " [", "]") + "</td>" +
+                            "<td width=\"400\" align=\"left\">" +
+                            SYSTools.replace(nreport.getText(), "\n", "<br/>", false) +
+                            "</td>" +
+                            "<td width=\"200\" align=\"left\">" + nreport.getUser().getFullname() + "</td>" +
+                            "</tr>" +
+                            "</table>" +
+                            "</html>";
 
-                final DefaultCPTitle pnlSingle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), null);
-                if (nreport.isObsolete()) {
-                    pnlSingle.getButton().setIcon(SYSConst.icon22eraser);
-                } else if (nreport.isReplacement()) {
-                    pnlSingle.getButton().setIcon(SYSConst.icon22edited);
-                }
-                pnlSingle.getButton().addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        GUITools.showPopup(GUITools.getHTMLPopup(pnlSingle.getButton(), NReportTools.getInfoAsHTML(nreport)), SwingConstants.NORTH);
+                    final DefaultCPTitle pnlSingle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), null);
+                    if (nreport.isObsolete()) {
+                        pnlSingle.getButton().setIcon(SYSConst.icon22eraser);
+                    } else if (nreport.isReplacement()) {
+                        pnlSingle.getButton().setIcon(SYSConst.icon22edited);
                     }
-                });
-
-                if (!nreport.getAttachedFilesConnections().isEmpty()) {
-                    /***
-                     *      _     _         _____ _ _
-                     *     | |__ | |_ _ __ |  ___(_) | ___  ___
-                     *     | '_ \| __| '_ \| |_  | | |/ _ \/ __|
-                     *     | |_) | |_| | | |  _| | | |  __/\__ \
-                     *     |_.__/ \__|_| |_|_|   |_|_|\___||___/
-                     *
-                     */
-                    final JButton btnFiles = new JButton(Integer.toString(nreport.getAttachedFilesConnections().size()), SYSConst.icon22greenStar);
-                    btnFiles.setToolTipText(OPDE.lang.getString("misc.btnfiles.tooltip"));
-                    btnFiles.setForeground(Color.BLUE);
-                    btnFiles.setHorizontalTextPosition(SwingUtilities.CENTER);
-                    btnFiles.setFont(SYSConst.ARIAL18BOLD);
-                    btnFiles.setPressedIcon(SYSConst.icon22Pressed);
-                    btnFiles.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                    btnFiles.setAlignmentY(Component.TOP_ALIGNMENT);
-                    btnFiles.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    btnFiles.setContentAreaFilled(false);
-                    btnFiles.setBorder(null);
-
-                    btnFiles.addActionListener(new ActionListener() {
+                    pnlSingle.getButton().addActionListener(new ActionListener() {
                         @Override
-                        public void actionPerformed(ActionEvent actionEvent) {
-                            Closure fileHandleClosure = OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) ? null : new Closure() {
-                                @Override
-                                public void execute(Object o) {
-                                    EntityManager em = OPDE.createEM();
-                                    final NReport myReport = em.merge(nreport);
-                                    em.refresh(myReport);
-                                    em.close();
-
-                                    final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
-
-                                    contentmap.remove(keyNewDay);
-                                    linemap.remove(nreport);
-
-                                    valuecache.get(keyNewDay).remove(nreport);
-                                    valuecache.get(keyNewDay).add(myReport);
-                                    Collections.sort(valuecache.get(keyNewDay));
-
-                                    createCP4Day(new DateMidnight(myReport.getPit()));
-
-                                    buildPanel();
-                                    GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-                                }
-                            };
-                            new DlgFiles(nreport, fileHandleClosure);
+                        public void actionPerformed(ActionEvent e) {
+                            GUITools.showPopup(GUITools.getHTMLPopup(pnlSingle.getButton(), NReportTools.getInfoAsHTML(nreport)), SwingConstants.NORTH);
                         }
                     });
-                    btnFiles.setEnabled(OPDE.isFTPworking());
-                    pnlSingle.getRight().add(btnFiles);
-                }
 
+                    if (!nreport.getAttachedFilesConnections().isEmpty()) {
+                        /***
+                         *      _     _         _____ _ _
+                         *     | |__ | |_ _ __ |  ___(_) | ___  ___
+                         *     | '_ \| __| '_ \| |_  | | |/ _ \/ __|
+                         *     | |_) | |_| | | |  _| | | |  __/\__ \
+                         *     |_.__/ \__|_| |_|_|   |_|_|\___||___/
+                         *
+                         */
+                        final JButton btnFiles = new JButton(Integer.toString(nreport.getAttachedFilesConnections().size()), SYSConst.icon22greenStar);
+                        btnFiles.setToolTipText(OPDE.lang.getString("misc.btnfiles.tooltip"));
+                        btnFiles.setForeground(Color.BLUE);
+                        btnFiles.setHorizontalTextPosition(SwingUtilities.CENTER);
+                        btnFiles.setFont(SYSConst.ARIAL18BOLD);
+                        btnFiles.setPressedIcon(SYSConst.icon22Pressed);
+                        btnFiles.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                        btnFiles.setAlignmentY(Component.TOP_ALIGNMENT);
+                        btnFiles.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                        btnFiles.setContentAreaFilled(false);
+                        btnFiles.setBorder(null);
 
-                if (!nreport.getAttachedQProcessConnections().isEmpty()) {
-                    /***
-                     *      _     _         ____
-                     *     | |__ | |_ _ __ |  _ \ _ __ ___   ___ ___  ___ ___
-                     *     | '_ \| __| '_ \| |_) | '__/ _ \ / __/ _ \/ __/ __|
-                     *     | |_) | |_| | | |  __/| | | (_) | (_|  __/\__ \__ \
-                     *     |_.__/ \__|_| |_|_|   |_|  \___/ \___\___||___/___/
-                     *
-                     */
-                    final JButton btnProcess = new JButton(Integer.toString(nreport.getAttachedQProcessConnections().size()), SYSConst.icon22redStar);
-                    btnProcess.setToolTipText(OPDE.lang.getString("misc.btnprocess.tooltip"));
-                    btnProcess.setForeground(Color.YELLOW);
-                    btnProcess.setHorizontalTextPosition(SwingUtilities.CENTER);
-                    btnProcess.setFont(SYSConst.ARIAL18BOLD);
-                    btnProcess.setPressedIcon(SYSConst.icon22Pressed);
-                    btnProcess.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                    btnProcess.setAlignmentY(Component.TOP_ALIGNMENT);
-                    btnProcess.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    btnProcess.setContentAreaFilled(false);
-                    btnProcess.setBorder(null);
-                    btnProcess.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent actionEvent) {
-                            new DlgProcessAssign(nreport, new Closure() {
-                                @Override
-                                public void execute(Object o) {
-                                    if (o == null) {
-                                        return;
-                                    }
-                                    Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = (Pair<ArrayList<QProcess>, ArrayList<QProcess>>) o;
-
-                                    ArrayList<QProcess> assigned = result.getFirst();
-                                    ArrayList<QProcess> unassigned = result.getSecond();
-
-                                    EntityManager em = OPDE.createEM();
-
-                                    try {
-                                        em.getTransaction().begin();
-
-                                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                        NReport myReport = em.merge(nreport);
-                                        em.lock(myReport, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-
-                                        ArrayList<SYSNR2PROCESS> attached = new ArrayList<SYSNR2PROCESS>(myReport.getAttachedQProcessConnections());
-                                        for (SYSNR2PROCESS linkObject : attached) {
-                                            if (unassigned.contains(linkObject.getQProcess())) {
-                                                linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
-                                                linkObject.getNReport().getAttachedQProcessConnections().remove(linkObject);
-                                                em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
-
-                                                em.remove(linkObject);
-                                            }
-                                        }
-                                        attached.clear();
-
-                                        for (QProcess qProcess : assigned) {
-                                            java.util.List<QProcessElement> listElements = qProcess.getElements();
-                                            if (!listElements.contains(myReport)) {
-                                                QProcess myQProcess = em.merge(qProcess);
-                                                SYSNR2PROCESS myLinkObject = em.merge(new SYSNR2PROCESS(myQProcess, myReport));
-                                                em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
-                                                qProcess.getAttachedNReportConnections().add(myLinkObject);
-                                                myReport.getAttachedQProcessConnections().add(myLinkObject);
-                                            }
-                                        }
-
-                                        em.getTransaction().commit();
+                        btnFiles.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent actionEvent) {
+                                Closure fileHandleClosure = OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) ? null : new Closure() {
+                                    @Override
+                                    public void execute(Object o) {
+                                        EntityManager em = OPDE.createEM();
+                                        final NReport myReport = em.merge(nreport);
+                                        em.refresh(myReport);
+                                        em.close();
 
                                         final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
 
-                                        contentmap.remove(keyNewDay);
-                                        linemap.remove(nreport);
+                                        synchronized (contentmap) {
+                                            contentmap.remove(keyNewDay);
+                                        }
+                                        synchronized (linemap) {
+                                            linemap.remove(nreport);
+                                        }
 
-                                        valuecache.get(keyNewDay).remove(nreport);
-                                        valuecache.get(keyNewDay).add(myReport);
-                                        Collections.sort(valuecache.get(keyNewDay));
+                                        synchronized (valuecache) {
+                                            valuecache.get(keyNewDay).remove(nreport);
+                                            valuecache.get(keyNewDay).add(myReport);
+                                            Collections.sort(valuecache.get(keyNewDay));
+                                        }
 
                                         createCP4Day(new DateMidnight(myReport.getPit()));
 
                                         buildPanel();
                                         GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-                                    } catch (OptimisticLockException ole) {
-                                        if (em.getTransaction().isActive()) {
-                                            em.getTransaction().rollback();
-                                        }
-                                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                            OPDE.getMainframe().emptyFrame();
-                                            OPDE.getMainframe().afterLogin();
-                                        } else {
-                                            reloadDisplay(true);
-                                        }
-                                    } catch (RollbackException ole) {
-                                        if (em.getTransaction().isActive()) {
-                                            em.getTransaction().rollback();
-                                        }
-                                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                            OPDE.getMainframe().emptyFrame();
-                                            OPDE.getMainframe().afterLogin();
-                                        }
-                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                    } catch (Exception e) {
-                                        if (em.getTransaction().isActive()) {
-                                            em.getTransaction().rollback();
-                                        }
-                                        OPDE.fatal(e);
-                                    } finally {
-                                        em.close();
                                     }
+                                };
+                                new DlgFiles(nreport, fileHandleClosure);
+                            }
+                        });
+                        btnFiles.setEnabled(OPDE.isFTPworking());
+                        pnlSingle.getRight().add(btnFiles);
+                    }
 
-                                }
-                            });
+
+                    if (!nreport.getAttachedQProcessConnections().isEmpty()) {
+                        /***
+                         *      _     _         ____
+                         *     | |__ | |_ _ __ |  _ \ _ __ ___   ___ ___  ___ ___
+                         *     | '_ \| __| '_ \| |_) | '__/ _ \ / __/ _ \/ __/ __|
+                         *     | |_) | |_| | | |  __/| | | (_) | (_|  __/\__ \__ \
+                         *     |_.__/ \__|_| |_|_|   |_|  \___/ \___\___||___/___/
+                         *
+                         */
+                        final JButton btnProcess = new JButton(Integer.toString(nreport.getAttachedQProcessConnections().size()), SYSConst.icon22redStar);
+                        btnProcess.setToolTipText(OPDE.lang.getString("misc.btnprocess.tooltip"));
+                        btnProcess.setForeground(Color.YELLOW);
+                        btnProcess.setHorizontalTextPosition(SwingUtilities.CENTER);
+                        btnProcess.setFont(SYSConst.ARIAL18BOLD);
+                        btnProcess.setPressedIcon(SYSConst.icon22Pressed);
+                        btnProcess.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                        btnProcess.setAlignmentY(Component.TOP_ALIGNMENT);
+                        btnProcess.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                        btnProcess.setContentAreaFilled(false);
+                        btnProcess.setBorder(null);
+                        btnProcess.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent actionEvent) {
+                                new DlgProcessAssign(nreport, new Closure() {
+                                    @Override
+                                    public void execute(Object o) {
+                                        if (o == null) {
+                                            return;
+                                        }
+                                        Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = (Pair<ArrayList<QProcess>, ArrayList<QProcess>>) o;
+
+                                        ArrayList<QProcess> assigned = result.getFirst();
+                                        ArrayList<QProcess> unassigned = result.getSecond();
+
+                                        EntityManager em = OPDE.createEM();
+
+                                        try {
+                                            em.getTransaction().begin();
+
+                                            em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                            NReport myReport = em.merge(nreport);
+                                            em.lock(myReport, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
+                                            ArrayList<SYSNR2PROCESS> attached = new ArrayList<SYSNR2PROCESS>(myReport.getAttachedQProcessConnections());
+                                            for (SYSNR2PROCESS linkObject : attached) {
+                                                if (unassigned.contains(linkObject.getQProcess())) {
+                                                    linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
+                                                    linkObject.getNReport().getAttachedQProcessConnections().remove(linkObject);
+                                                    em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+
+                                                    em.remove(linkObject);
+                                                }
+                                            }
+                                            attached.clear();
+
+                                            for (QProcess qProcess : assigned) {
+                                                java.util.List<QProcessElement> listElements = qProcess.getElements();
+                                                if (!listElements.contains(myReport)) {
+                                                    QProcess myQProcess = em.merge(qProcess);
+                                                    SYSNR2PROCESS myLinkObject = em.merge(new SYSNR2PROCESS(myQProcess, myReport));
+                                                    em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
+                                                    qProcess.getAttachedNReportConnections().add(myLinkObject);
+                                                    myReport.getAttachedQProcessConnections().add(myLinkObject);
+                                                }
+                                            }
+
+                                            em.getTransaction().commit();
+
+                                            final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
+
+
+                                            synchronized (contentmap) {
+                                                contentmap.remove(keyNewDay);
+                                            }
+                                            synchronized (linemap) {
+                                                linemap.remove(nreport);
+                                            }
+
+                                            synchronized (valuecache) {
+                                                valuecache.get(keyNewDay).remove(nreport);
+                                                valuecache.get(keyNewDay).add(myReport);
+                                                Collections.sort(valuecache.get(keyNewDay));
+                                            }
+
+                                            createCP4Day(new DateMidnight(myReport.getPit()));
+
+                                            buildPanel();
+                                            GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
+                                        } catch (OptimisticLockException ole) {
+                                            if (em.getTransaction().isActive()) {
+                                                em.getTransaction().rollback();
+                                            }
+                                            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                                OPDE.getMainframe().emptyFrame();
+                                                OPDE.getMainframe().afterLogin();
+                                            } else {
+                                                reloadDisplay(true);
+                                            }
+                                        } catch (RollbackException ole) {
+                                            if (em.getTransaction().isActive()) {
+                                                em.getTransaction().rollback();
+                                            }
+                                            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                                OPDE.getMainframe().emptyFrame();
+                                                OPDE.getMainframe().afterLogin();
+                                            }
+                                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                        } catch (Exception e) {
+                                            if (em.getTransaction().isActive()) {
+                                                em.getTransaction().rollback();
+                                            }
+                                            OPDE.fatal(e);
+                                        } finally {
+                                            em.close();
+                                        }
+
+                                    }
+                                });
+                            }
+                        });
+                        btnProcess.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
+                        pnlSingle.getRight().add(btnProcess);
+                    }
+
+                    /***
+                     *      __  __
+                     *     |  \/  | ___ _ __  _   _
+                     *     | |\/| |/ _ \ '_ \| | | |
+                     *     | |  | |  __/ | | | |_| |
+                     *     |_|  |_|\___|_| |_|\__,_|
+                     *
+                     */
+                    final JButton btnMenu = new JButton(SYSConst.icon22menu);
+                    btnMenu.setPressedIcon(SYSConst.icon22Pressed);
+                    btnMenu.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                    btnMenu.setAlignmentY(Component.TOP_ALIGNMENT);
+                    btnMenu.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    btnMenu.setContentAreaFilled(false);
+                    btnMenu.setBorder(null);
+                    btnMenu.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            JidePopup popup = new JidePopup();
+                            popup.setMovable(false);
+                            popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                            popup.setOwner(btnMenu);
+                            popup.removeExcludedComponent(btnMenu);
+                            JPanel pnl = getMenu(nreport);
+                            popup.getContentPane().add(pnl);
+                            popup.setDefaultFocusComponent(pnl);
+
+                            GUITools.showPopup(popup, SwingConstants.WEST);
                         }
                     });
-                    btnProcess.setEnabled(OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID));
-                    pnlSingle.getRight().add(btnProcess);
-                }
+                    btnMenu.setEnabled(!nreport.isObsolete());
+                    pnlSingle.getRight().add(btnMenu);
 
-                /***
-                 *      __  __
-                 *     |  \/  | ___ _ __  _   _
-                 *     | |\/| |/ _ \ '_ \| | | |
-                 *     | |  | |  __/ | | | |_| |
-                 *     |_|  |_|\___|_| |_|\__,_|
-                 *
-                 */
-                final JButton btnMenu = new JButton(SYSConst.icon22menu);
-                btnMenu.setPressedIcon(SYSConst.icon22Pressed);
-                btnMenu.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                btnMenu.setAlignmentY(Component.TOP_ALIGNMENT);
-                btnMenu.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnMenu.setContentAreaFilled(false);
-                btnMenu.setBorder(null);
-                btnMenu.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        JidePopup popup = new JidePopup();
-                        popup.setMovable(false);
-                        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-                        popup.setOwner(btnMenu);
-                        popup.removeExcludedComponent(btnMenu);
-                        JPanel pnl = getMenu(nreport);
-                        popup.getContentPane().add(pnl);
-                        popup.setDefaultFocusComponent(pnl);
-
-                        GUITools.showPopup(popup, SwingConstants.WEST);
+                    JPanel zebra = new JPanel();
+                    zebra.setLayout(new BoxLayout(zebra, BoxLayout.LINE_AXIS));
+                    zebra.setOpaque(true);
+                    if (i % 2 == 0) {
+                        zebra.setBackground(SYSConst.orange1[SYSConst.light2]);
+                    } else {
+                        zebra.setBackground(Color.WHITE);
                     }
-                });
-                btnMenu.setEnabled(!nreport.isObsolete());
-                pnlSingle.getRight().add(btnMenu);
+                    zebra.add(pnlSingle.getMain());
+                    i++;
 
-                JPanel zebra = new JPanel();
-                zebra.setLayout(new BoxLayout(zebra, BoxLayout.LINE_AXIS));
-                zebra.setOpaque(true);
-                if (i % 2 == 0) {
-                    zebra.setBackground(SYSConst.orange1[SYSConst.light2]);
-                } else {
-                    zebra.setBackground(Color.WHITE);
+                    dayPanel.add(zebra);
+                    linemap.put(nreport, pnlSingle.getMain());
                 }
-                zebra.add(pnlSingle.getMain());
-                i++;
-
-                dayPanel.add(zebra);
-                linemap.put(nreport, pnlSingle.getMain());
             }
         }
-        contentmap.put(key, dayPanel);
+        synchronized (contentmap) {
+            contentmap.put(key, dayPanel);
+        }
         return dayPanel;
     }
 
@@ -1149,16 +1160,18 @@ public class PnlReport extends NursingRecordsPanel {
         cpsReports.removeAll();
         cpsReports.setLayout(new JideBoxLayout(cpsReports, JideBoxLayout.Y_AXIS));
 
-        Pair<DateTime, DateTime> minmax = NReportTools.getMinMax(resident);
-        if (minmax != null) {
-            DateMidnight start = minmax.getFirst().toDateMidnight().dayOfMonth().withMinimumValue();
-            DateMidnight end = resident.isActive() ? new DateMidnight() : minmax.getSecond().toDateMidnight().dayOfMonth().withMinimumValue();
-            for (int year = end.getYear(); year >= start.getYear(); year--) {
-                final String keyYear = Integer.toString(year) + ".year";
-                cpsReports.add(cpMap.get(keyYear));
+        synchronized (cpMap) {
+            Pair<DateTime, DateTime> minmax = NReportTools.getMinMax(resident);
+            if (minmax != null) {
+                DateMidnight start = minmax.getFirst().toDateMidnight().dayOfMonth().withMinimumValue();
+                DateMidnight end = resident.isActive() ? new DateMidnight() : minmax.getSecond().toDateMidnight().dayOfMonth().withMinimumValue();
+                for (int year = end.getYear(); year >= start.getYear(); year--) {
+                    final String keyYear = Integer.toString(year) + ".year";
+
+                    cpsReports.add(cpMap.get(keyYear));
+                }
             }
         }
-
         cpsReports.addExpansion();
     }
 
@@ -1248,18 +1261,23 @@ public class PnlReport extends NursingRecordsPanel {
                                     final String keyNewDay = DateFormat.getDateInstance().format(newReport.getPit());
                                     final String keyOldDay = DateFormat.getDateInstance().format(oldReport.getPit());
 
-                                    contentmap.remove(keyNewDay);
-                                    contentmap.remove(keyOldDay);
+                                    synchronized (contentmap) {
+                                        contentmap.remove(keyNewDay);
+                                        contentmap.remove(keyOldDay);
+                                    }
+                                    synchronized (linemap) {
+                                        linemap.remove(oldReport);
+                                    }
 
-                                    linemap.remove(oldReport);
+                                    synchronized (valuecache) {
+                                        valuecache.get(keyOldDay).remove(nreport);
+                                        valuecache.get(keyOldDay).add(oldReport);
+                                        Collections.sort(valuecache.get(keyOldDay));
 
-                                    valuecache.get(keyOldDay).remove(nreport);
-                                    valuecache.get(keyOldDay).add(oldReport);
-                                    Collections.sort(valuecache.get(keyOldDay));
-
-                                    if (valuecache.containsKey(keyNewDay)) {
-                                        valuecache.get(keyNewDay).add(newReport);
-                                        Collections.sort(valuecache.get(keyNewDay));
+                                        if (valuecache.containsKey(keyNewDay)) {
+                                            valuecache.get(keyNewDay).add(newReport);
+                                            Collections.sort(valuecache.get(keyNewDay));
+                                        }
                                     }
 
                                     createCP4Day(new DateMidnight(oldReport.getPit()));
@@ -1333,11 +1351,19 @@ public class PnlReport extends NursingRecordsPanel {
 
                                     final String keyDay = DateFormat.getDateInstance().format(delReport.getPit());
 
-                                    contentmap.remove(keyDay);
-                                    linemap.remove(delReport);
-                                    valuecache.get(keyDay).remove(nreport);
-                                    valuecache.get(keyDay).add(delReport);
-                                    Collections.sort(valuecache.get(keyDay));
+
+                                    synchronized (contentmap) {
+                                        contentmap.remove(keyDay);
+                                    }
+                                    synchronized (linemap) {
+                                        linemap.remove(delReport);
+                                    }
+
+                                    synchronized (valuecache) {
+                                        valuecache.get(keyDay).remove(nreport);
+                                        valuecache.get(keyDay).add(delReport);
+                                        Collections.sort(valuecache.get(keyDay));
+                                    }
 
                                     createCP4Day(new DateMidnight(delReport.getPit()));
 
@@ -1409,12 +1435,19 @@ public class PnlReport extends NursingRecordsPanel {
 
                                 final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
 
-                                contentmap.remove(keyNewDay);
-                                linemap.remove(nreport);
 
-                                valuecache.get(keyNewDay).remove(nreport);
-                                valuecache.get(keyNewDay).add(myReport);
-                                Collections.sort(valuecache.get(keyNewDay));
+                                synchronized (contentmap) {
+                                    contentmap.remove(keyNewDay);
+                                }
+                                synchronized (linemap) {
+                                    linemap.remove(nreport);
+                                }
+
+                                synchronized (valuecache) {
+                                    valuecache.get(keyNewDay).remove(nreport);
+                                    valuecache.get(keyNewDay).add(myReport);
+                                    Collections.sort(valuecache.get(keyNewDay));
+                                }
 
                                 createCP4Day(new DateMidnight(myReport.getPit()));
 
@@ -1500,12 +1533,19 @@ public class PnlReport extends NursingRecordsPanel {
 
                                 final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
 
-                                contentmap.remove(keyNewDay);
-                                linemap.remove(nreport);
 
-                                valuecache.get(keyNewDay).remove(nreport);
-                                valuecache.get(keyNewDay).add(myReport);
-                                Collections.sort(valuecache.get(keyNewDay));
+                                synchronized (contentmap) {
+                                    contentmap.remove(keyNewDay);
+                                }
+                                synchronized (linemap) {
+                                    linemap.remove(nreport);
+                                }
+
+                                synchronized (valuecache) {
+                                    valuecache.get(keyNewDay).remove(nreport);
+                                    valuecache.get(keyNewDay).add(myReport);
+                                    Collections.sort(valuecache.get(keyNewDay));
+                                }
 
                                 createCP4Day(new DateMidnight(myReport.getPit()));
 
@@ -1563,12 +1603,19 @@ public class PnlReport extends NursingRecordsPanel {
 
                             final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
 
-                            contentmap.remove(keyNewDay);
-                            linemap.remove(nreport);
 
-                            valuecache.get(keyNewDay).remove(nreport);
-                            valuecache.get(keyNewDay).add(myReport);
-                            Collections.sort(valuecache.get(keyNewDay));
+                            synchronized (contentmap) {
+                                contentmap.remove(keyNewDay);
+                            }
+                            synchronized (linemap) {
+                                linemap.remove(nreport);
+                            }
+
+                            synchronized (valuecache) {
+                                valuecache.get(keyNewDay).remove(nreport);
+                                valuecache.get(keyNewDay).add(myReport);
+                                Collections.sort(valuecache.get(keyNewDay));
+                            }
 
                             createCP4Day(new DateMidnight(myReport.getPit()));
 
@@ -1642,12 +1689,19 @@ public class PnlReport extends NursingRecordsPanel {
 
                                 final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
 
-                                contentmap.remove(keyNewDay);
-                                linemap.remove(nreport);
 
-                                valuecache.get(keyNewDay).remove(nreport);
-                                valuecache.get(keyNewDay).add(myReport);
-                                Collections.sort(valuecache.get(keyNewDay));
+                                synchronized (contentmap) {
+                                    contentmap.remove(keyNewDay);
+                                }
+                                synchronized (linemap) {
+                                    linemap.remove(nreport);
+                                }
+
+                                synchronized (valuecache) {
+                                    valuecache.get(keyNewDay).remove(nreport);
+                                    valuecache.get(keyNewDay).add(myReport);
+                                    Collections.sort(valuecache.get(keyNewDay));
+                                }
 
                                 createCP4Day(new DateMidnight(myReport.getPit()));
 

@@ -122,7 +122,6 @@ public class NReportTools {
      * @return
      */
     public static Pair<DateTime, DateTime> getMinMax(Resident resident) {
-        long begin = System.currentTimeMillis();
         Pair<DateTime, DateTime> result = null;
 
         EntityManager em = OPDE.createEM();
@@ -148,7 +147,6 @@ public class NReportTools {
         }
 
         em.close();
-        SYSTools.showTimeDifference(begin);
         return result;
     }
 

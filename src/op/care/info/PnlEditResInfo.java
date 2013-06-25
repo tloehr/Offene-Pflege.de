@@ -103,19 +103,31 @@ public class PnlEditResInfo {
         initPanel(resInfo.getResInfoType().getXml());
     }
 
-    public void addTooltipButton(JPanel pnl, String tooltip) {
-        if (tooltip == null) return;
-        JButton ttip = new JButton(SYSConst.icon16info);
-        ttip.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        ttip.setContentAreaFilled(false);
-        ttip.setBorder(null);
-        ttip.setPressedIcon(SYSConst.icon16infoPressed);
+    public void addInfoButtons(JPanel pnl, String tooltip, String tx) {
+        if (tooltip == null && tx == null) return;
 
-        tooltip = tooltip.replace('[', '<').replace(']', '>');
-//        tooltip = SYSTools.replace(tooltip, "<p>", "<p style=\"width:400px;\">", true);
+        if (tooltip != null) {
+            JLabel ttip = new JLabel(SYSConst.icon16info);
+//            ttip.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+//            ttip.setContentAreaFilled(false);
+            ttip.setBorder(null);
 
-        ttip.setToolTipText(SYSTools.toHTMLForScreen("<p style=\"width:400px;\">" + tooltip + "</p>"));
-        pnl.add("left", ttip);
+            tooltip = tooltip.replace('[', '<').replace(']', '>');
+            ttip.setToolTipText(SYSTools.toHTMLForScreen("<p style=\"width:300px;\">" + tooltip + "</p>"));
+            pnl.add("left", ttip);
+        }
+
+        if (tx != null) {
+            JLabel btntx = new JLabel(SYSConst.icon16ambulance);
+//            btntx.setCursor(Cursor.getPredefinedCursor(Cursor.CUSTOM_CURSOR));
+//            btntx.setContentAreaFilled(false);
+            btntx.setBorder(null);
+
+            tx = tx.replace('[', '<').replace(']', '>');
+            btntx.setToolTipText(SYSTools.toHTMLForScreen("<p style=\"width:300px;\">" + tx + "</p>"));
+            pnl.add("left", btntx);
+        }
+
         pnl.add("left", new JLabel(" "));
     }
 
@@ -818,7 +830,6 @@ public class PnlEditResInfo {
                 innerpanel.setOpaque(false);
                 if (attributes.getValue("label") != null) {
                     JLabel jl = new JLabel(attributes.getValue("label"));
-//                    jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
 
                     int fontstyle = Font.PLAIN;
                     if (!SYSTools.catchNull(attributes.getValue("fontstyle")).isEmpty()) {
@@ -842,7 +853,7 @@ public class PnlEditResInfo {
                     jl.setFont(original.deriveFont(map));
 
                     outerpanel.add("p left", jl);
-                    addTooltipButton(outerpanel, attributes.getValue("tooltip"));
+                    addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
                 }
             }
             if (tagName.equalsIgnoreCase("scale")) {
@@ -886,7 +897,7 @@ public class PnlEditResInfo {
 //                jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 outerpanel.add(layout, jl);
-                addTooltipButton(outerpanel, attributes.getValue("tooltip"));
+                addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
                 tabgroup = true;
             }
             /***
@@ -913,7 +924,7 @@ public class PnlEditResInfo {
                 }
                 j.setName(compName);
                 innerpanel.add(layout, j);
-                addTooltipButton(innerpanel, attributes.getValue("tooltip"));
+                addInfoButtons(innerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
 
                 j.addActionListener(new RadioButtonActionListener());
                 if (scalemode) {
@@ -942,13 +953,14 @@ public class PnlEditResInfo {
                 j.setOpaque(false);
                 focusTraversal.add(j);
                 j.setName(groupname);
-                outerpanel.add(j);
-                addTooltipButton(outerpanel, attributes.getValue("tooltip"));
+
+
                 components.put(groupname, j); // für den späteren Direktzugriff
                 j.addActionListener(new CheckBoxActionListener());
 
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), tabgroup ? "tab" : "br left");
                 outerpanel.add(layout, j);
+                addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
 
                 if (attributes.getValue("default") != null && attributes.getValue("default").equals("true")) {
                     j.setSelected(true);
@@ -996,7 +1008,7 @@ public class PnlEditResInfo {
                 j.setDisabledTextColor(Color.DARK_GRAY);
                 focusTraversal.add(j);
                 j.setName(groupname);
-//                j.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p>" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
+
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 outerpanel.add(layout, jl);
 
@@ -1004,7 +1016,7 @@ public class PnlEditResInfo {
                 String innerlayout = SYSTools.catchNull(attributes.getValue("innerlayout"), "left" + hfill);
                 outerpanel.add(innerlayout, j);
 
-                addTooltipButton(outerpanel, attributes.getValue("tooltip"));
+                addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
 
                 components.put(groupname, j); // für den späteren Direktzugriff
                 j.addFocusListener(tffl);
@@ -1061,7 +1073,7 @@ public class PnlEditResInfo {
 
                 components.put(groupname, pnlGP);
                 outerpanel.add(layout, pnlGP);
-                addTooltipButton(outerpanel, attributes.getValue("tooltip"));
+                addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
             }
             /***
              *      _             _             _
@@ -1085,8 +1097,8 @@ public class PnlEditResInfo {
              *                |__/
              */
             if (tagName.equalsIgnoreCase("tx")) {
-                JLabel jl = new JLabel(SYSConst.icon16ambulance);
-//                jl.setToolTipText(OPDE.lang.getString("nursingrecords.info.tx.tooltip"));
+                JLabel jl = new JLabel(SYSConst.icon22ambulance);
+                jl.setToolTipText(attributes.getValue("tooltip") == null ? null : SYSTools.toHTML("<p style=\"width:300px;\">" + SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')) + "</p>");
                 outerpanel.add(jl);
             }
             /***
@@ -1136,7 +1148,7 @@ public class PnlEditResInfo {
 //                jl.setToolTipText(SYSTools.toHTML(SYSTools.catchNull(attributes.getValue("tooltip")).replace('[', '<').replace(']', '>')));
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 outerpanel.add(layout, jl);
-                addTooltipButton(outerpanel, attributes.getValue("tooltip"));
+                addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
             }
             /***
              *                   _         _
@@ -1159,7 +1171,7 @@ public class PnlEditResInfo {
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), "br left");
                 outerpanel.add(layout, jl);
                 outerpanel.add("left", jcb);
-                addTooltipButton(outerpanel, attributes.getValue("tooltip"));
+                addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
 
             }
             /***

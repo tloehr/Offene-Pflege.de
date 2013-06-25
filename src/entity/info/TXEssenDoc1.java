@@ -11,12 +11,14 @@ import entity.values.ResValueTools;
 import op.OPDE;
 import op.care.info.PnlBodyScheme;
 import op.system.PDF;
+import op.threads.DisplayMessage;
 import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.lang.ArrayUtils;
 
 import javax.persistence.EntityManager;
+import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.math.BigDecimal;
@@ -54,52 +56,88 @@ public class TXEssenDoc1 {
     ByteArrayOutputStream medListStream = null;
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
     boolean mre, psych = false;
+    int progress, max;
 
-    public TXEssenDoc1(Resident resident) {
-        this.resident = resident;
+    public TXEssenDoc1(Resident res) {
+        OPDE.getMainframe().setBlocked(true);
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+
+        //    #docs  #mre  #psych  + allActive.size()
+        max = 21 + 1 + 1;
+        progress = 0;
+
+
+        this.resident = res;
         content = new HashMap<String, String>();
         listICD = new ArrayList<ResInfo>();
         mapID2Info = new HashMap<Integer, ResInfo>();
         mapInfo2Properties = new HashMap<ResInfo, Properties>();
 
-        for (ResInfo info : ResInfoTools.getAllActive(resident)) {
-            if (!info.isSingleIncident() && !info.isNoConstraints()) {
-                mapID2Info.put(info.getResInfoType().getType(), info);
-                mapInfo2Properties.put(info, load(info.getProperties()));
+
+        SwingWorker worker = new SwingWorker() {
+            @Override
+            protected Object doInBackground() throws Exception {
+
+                for (ResInfo info : ResInfoTools.getAllActive(resident)) {
+
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+
+                    if (!info.isSingleIncident() && !info.isNoConstraints()) {
+                        mapID2Info.put(info.getResInfoType().getType(), info);
+                        mapInfo2Properties.put(info, load(info.getProperties()));
+                    }
+                    if (info.getResInfoType().getType() == ResInfoTypeTools.TYPE_DIAGNOSIS) {
+                        listICD.add(info);
+                        mapInfo2Properties.put(info, load(info.getProperties()));
+                    }
+                }
+
+                try {
+
+                    psych = mapID2Info.containsKey(ResInfoTypeTools.TYPE_PSYCH);
+
+                    File file1 = createDoc1();
+                    content.clear();
+                    listICD.clear();
+
+                    progress++;
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+                    File filemre = null;
+                    if (mre) {
+                        filemre = createDocMRE();
+                        content.clear();
+                    }
+
+                    progress++;
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+                    File filepsych = null;
+                    if (psych) {
+                        filepsych = createDocPSYCH();
+                        content.clear();
+                    }
+
+                    mapInfo2Properties.clear();
+
+
+                    SYSFilesTools.handleFile(concatPDFFiles(file1, filemre, filepsych), Desktop.Action.OPEN);
+                } catch (Exception e) {
+                    OPDE.fatal(e);
+                }
+
+
+                return null;
             }
-            if (info.getResInfoType().getType() == ResInfoTypeTools.TYPE_DIAGNOSIS) {
-                listICD.add(info);
-                mapInfo2Properties.put(info, load(info.getProperties()));
+
+            @Override
+            protected void done() {
+                OPDE.getDisplayManager().setProgressBarMessage(null);
+                OPDE.getMainframe().setBlocked(false);
             }
-        }
+        };
 
-        try {
-
-            psych = mapID2Info.containsKey(ResInfoTypeTools.TYPE_PSYCH);
-
-            File file1 = createDoc1();
-            content.clear();
-            listICD.clear();
-
-            File filemre = null;
-            if (mre) {
-                filemre = createDocMRE();
-                content.clear();
-            }
-
-            File filepsych = null;
-            if (psych) {
-                filepsych = createDocPSYCH();
-                content.clear();
-            }
-
-            mapInfo2Properties.clear();
+        worker.execute();
 
 
-            SYSFilesTools.handleFile(concatPDFFiles(file1, filemre, filepsych), Desktop.Action.OPEN);
-        } catch (Exception e) {
-            OPDE.fatal(e);
-        }
     }
 
     private File createDocPSYCH() throws Exception {
@@ -137,27 +175,88 @@ public class TXEssenDoc1 {
         outfile1.deleteOnExit();
         PdfStamper stamper = new PdfStamper(new PdfReader(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_TEMPLATES + File.separator + SOURCEDOC1), new FileOutputStream(outfile1));
 
+        progress++;
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
         createContent4Section1();
+
+        progress++;
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
         createContent4Section2();
+
+        progress++;
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
         createContent4Section3();
+
+        progress++;
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
         createContent4Section4();
+
+        progress++;
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
         createContent4Section5();
+
+        progress++;
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
         createContent4Section6();
+
+        progress++;
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
         createContent4Section7();
+
+        progress++;
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
         createContent4Section8();
+
+        progress++;
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
         createContent4Section9();
+
+        progress++;
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
         createContent4Section10();
+
+        progress++;
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
         createContent4Section11();
+
+        progress++;
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
         createContent4Section12();
+
+        progress++;
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
         createContent4Section13();
+
+        progress++;
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
         createContent4Section14();
+
+        progress++;
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
         createContent4Section15();
+
+        progress++;
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
         createContent4Section16();
+
+        progress++;
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
         createContent4Section17();
+
+        progress++;
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
         createContent4Section18();
+
+        progress++;
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
         createContent4Section19(stamper);
 
+        progress++;
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
         createContent4SectionICD();
+
+        progress++;
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
         createContent4Meds();
 
         String docs = mre ? "MRE, " : "";
@@ -324,6 +423,7 @@ public class TXEssenDoc1 {
             content.put(TXEAF.PAGE3_LOGO_TEXTFIELD, HomesTools.getAsTextForTX(resident.getStation().getHome()));
 
         }
+
         content.put(TXEAF.TX_DATE, DateFormat.getDateInstance().format(new Date()));
         content.put(TXEAF.PAGE2_DATE, DateFormat.getDateInstance().format(new Date()));
         content.put(TXEAF.PAGE3_TX_DATE, DateFormat.getDateInstance().format(new Date()));
@@ -469,6 +569,7 @@ public class TXEssenDoc1 {
      * excretiions
      */
     private void createContent4Section5() {
+        grmpf;
         boolean weightControl = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_WEIGHT_MONITORING).isEmpty() ||
                 !InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_WEIGHT_MONITORING).isEmpty();
         content.put(TXEAF.EXCRETIONS_CONTROL_WEIGHT, setCheckbox(weightControl));
@@ -968,8 +1069,8 @@ public class TXEssenDoc1 {
             mapInfo2Properties.get(icd).getProperty("");
             sICD += mapInfo2Properties.get(icd).getProperty("icd");
             sICD += ": " + mapInfo2Properties.get(icd).getProperty("text");
-            sICD += mapInfo2Properties.get(icd).getProperty("koerperseite").equalsIgnoreCase("nicht festgelegt") ? "" : " " + mapInfo2Properties.get(icd).getProperty("koerperseite") + ", ";
-            sICD += mapInfo2Properties.get(icd).getProperty("diagnosesicherheit").equalsIgnoreCase("nicht festgelegt") ? "" : " " + mapInfo2Properties.get(icd).getProperty("diagnosesicherheit");
+            sICD += " (" + (mapInfo2Properties.get(icd).getProperty("koerperseite").equalsIgnoreCase("nicht festgelegt") ? "" : mapInfo2Properties.get(icd).getProperty("koerperseite") + ", ");
+            sICD +=  mapInfo2Properties.get(icd).getProperty("diagnosesicherheit") + ")";
 
             sICD += "; ";
         }
@@ -1120,8 +1221,8 @@ public class TXEssenDoc1 {
     }
 
     private String setYesNoRadiobutton(boolean in) {
-            return in ? "2" : "1";
-        }
+        return in ? "2" : "1";
+    }
 
 
     private Properties load(String text) {

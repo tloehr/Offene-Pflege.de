@@ -58,10 +58,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * @author tloehr
@@ -73,11 +70,10 @@ public class PnlBHP extends NursingRecordsPanel {
     private boolean initPhase;
 
 
-    //TODO: synchronize this !
-    private HashMap<BHP, CollapsiblePane> mapBHP2Pane;
-    private HashMap<Byte, ArrayList<BHP>> mapShift2BHP;
-    private HashMap<Byte, CollapsiblePane> mapShift2Pane;
-    private HashMap<Prescription, MedStock> mapPrescription2Stock;
+    private Map<BHP, CollapsiblePane> mapBHP2Pane;
+    private Map<Byte, ArrayList<BHP>> mapShift2BHP;
+    private Map<Byte, CollapsiblePane> mapShift2Pane;
+    private Map<Prescription, MedStock> mapPrescription2Stock;
     private int MAX_TEXT_LENGTH = 65;
 
     private JScrollPane jspSearch;
@@ -111,10 +107,10 @@ public class PnlBHP extends NursingRecordsPanel {
     }
 
     private void initPanel() {
-        mapBHP2Pane = new HashMap<BHP, CollapsiblePane>();
-        mapShift2Pane = new HashMap<Byte, CollapsiblePane>();
-        mapShift2BHP = new HashMap<Byte, ArrayList<BHP>>();
-        mapPrescription2Stock = new HashMap<Prescription, MedStock>();
+        mapBHP2Pane = Collections.synchronizedMap(new HashMap<BHP, CollapsiblePane>());
+        mapShift2Pane = Collections.synchronizedMap(new HashMap<Byte, CollapsiblePane>());
+        mapShift2BHP = Collections.synchronizedMap(new HashMap<Byte, ArrayList<BHP>>());
+        mapPrescription2Stock = Collections.synchronizedMap(new HashMap<Prescription, MedStock>());
         prepareSearchArea();
     }
 
@@ -122,10 +118,18 @@ public class PnlBHP extends NursingRecordsPanel {
     @Override
     public void cleanup() {
         jdcDatum.cleanup();
-        mapShift2BHP.clear();
-        mapShift2Pane.clear();
-        mapPrescription2Stock.clear();
-        mapBHP2Pane.clear();
+        synchronized (mapShift2BHP) {
+            SYSTools.clear(mapShift2BHP);
+        }
+        synchronized (mapShift2Pane) {
+            SYSTools.clear(mapShift2Pane);
+        }
+        synchronized (mapPrescription2Stock) {
+            SYSTools.clear(mapPrescription2Stock);
+        }
+        synchronized (mapBHP2Pane) {
+            SYSTools.clear(mapBHP2Pane);
+        }
         SYSTools.unregisterListeners(this);
     }
 
@@ -151,19 +155,29 @@ public class PnlBHP extends NursingRecordsPanel {
             OPDE.getMainframe().setBlocked(true);
             OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
 
-            mapPrescription2Stock.clear();
-            mapBHP2Pane.clear();
-            if (mapShift2BHP != null) {
-                for (Byte key : mapShift2BHP.keySet()) {
-                    mapShift2BHP.get(key).clear();
-                }
-                mapShift2BHP.clear();
+
+            synchronized (mapPrescription2Stock) {
+                SYSTools.clear(mapPrescription2Stock);
             }
-            if (mapShift2Pane != null) {
-                for (Byte key : mapShift2Pane.keySet()) {
-                    mapShift2Pane.get(key).removeAll();
+            synchronized (mapBHP2Pane) {
+                SYSTools.clear(mapBHP2Pane);
+            }
+
+            synchronized (mapShift2BHP) {
+                if (mapShift2BHP != null) {
+                    for (Byte key : mapShift2BHP.keySet()) {
+                        mapShift2BHP.get(key).clear();
+                    }
+                    mapShift2BHP.clear();
                 }
-                mapShift2Pane.clear();
+            }
+            synchronized (mapShift2Pane) {
+                if (mapShift2Pane != null) {
+                    for (Byte key : mapShift2Pane.keySet()) {
+                        mapShift2Pane.get(key).removeAll();
+                    }
+                    mapShift2Pane.clear();
+                }
             }
 
             SwingWorker worker = new SwingWorker() {
@@ -173,27 +187,32 @@ public class PnlBHP extends NursingRecordsPanel {
 
                     int progress = 0;
                     OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
-                    for (BHP bhp : BHPTools.getBHPs(resident, jdcDatum.getDate())) {
-                        if (!mapShift2BHP.containsKey(bhp.getShift())) {
-                            mapShift2BHP.put(bhp.getShift(), new ArrayList<BHP>());
+
+                    synchronized (mapShift2BHP) {
+                        for (BHP bhp : BHPTools.getBHPs(resident, jdcDatum.getDate())) {
+                            if (!mapShift2BHP.containsKey(bhp.getShift())) {
+                                mapShift2BHP.put(bhp.getShift(), new ArrayList<BHP>());
+                            }
+                            mapShift2BHP.get(bhp.getShift()).add(bhp);
                         }
-                        mapShift2BHP.get(bhp.getShift()).add(bhp);
+
+                        if (!mapShift2BHP.containsKey(BHPTools.SHIFT_ON_DEMAND)) {
+                            mapShift2BHP.put(BHPTools.SHIFT_ON_DEMAND, new ArrayList<BHP>());
+                        }
+                        mapShift2BHP.get(BHPTools.SHIFT_ON_DEMAND).addAll(BHPTools.getBHPsOnDemand(resident, jdcDatum.getDate()));
                     }
 
-                    if (!mapShift2BHP.containsKey(BHPTools.SHIFT_ON_DEMAND)) {
-                        mapShift2BHP.put(BHPTools.SHIFT_ON_DEMAND, new ArrayList<BHP>());
-                    }
-                    mapShift2BHP.get(BHPTools.SHIFT_ON_DEMAND).addAll(BHPTools.getBHPsOnDemand(resident, jdcDatum.getDate()));
-
-                    for (Byte shift : new Byte[]{BHPTools.SHIFT_ON_DEMAND, BHPTools.SHIFT_VERY_EARLY, BHPTools.SHIFT_EARLY, BHPTools.SHIFT_LATE, BHPTools.SHIFT_VERY_LATE}) {
-                        mapShift2Pane.put(shift, createCP4(shift));
-                        try {
-                            mapShift2Pane.get(shift).setCollapsed(shift == BHPTools.SHIFT_ON_DEMAND || shift != SYSCalendar.whatShiftIs(new Date()));
-                        } catch (PropertyVetoException e) {
-                            OPDE.debug(e);
+                    synchronized (mapShift2Pane) {
+                        for (Byte shift : new Byte[]{BHPTools.SHIFT_ON_DEMAND, BHPTools.SHIFT_VERY_EARLY, BHPTools.SHIFT_EARLY, BHPTools.SHIFT_LATE, BHPTools.SHIFT_VERY_LATE}) {
+                            mapShift2Pane.put(shift, createCP4(shift));
+                            try {
+                                mapShift2Pane.get(shift).setCollapsed(shift == BHPTools.SHIFT_ON_DEMAND || shift != SYSCalendar.whatShiftIs(new Date()));
+                            } catch (PropertyVetoException e) {
+                                OPDE.debug(e);
+                            }
+                            progress += 20;
+                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 100));
                         }
-                        progress += 20;
-                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 100));
                     }
 
                     return null;
@@ -253,15 +272,17 @@ public class PnlBHP extends NursingRecordsPanel {
     }
 
     private void buildPanel(boolean resetCollapseState) {
-        cpBHP.removeAll();
-        cpBHP.setLayout(new JideBoxLayout(cpBHP, JideBoxLayout.Y_AXIS));
-        for (Byte shift : new Byte[]{BHPTools.SHIFT_ON_DEMAND, BHPTools.SHIFT_VERY_EARLY, BHPTools.SHIFT_EARLY, BHPTools.SHIFT_LATE, BHPTools.SHIFT_VERY_LATE}) {
-            cpBHP.add(mapShift2Pane.get(shift));
-            if (resetCollapseState) {
-                try {
-                    mapShift2Pane.get(shift).setCollapsed(shift != SYSCalendar.whatShiftIs(new Date()));
-                } catch (PropertyVetoException e) {
-                    OPDE.debug(e);
+        synchronized (mapShift2Pane) {
+            cpBHP.removeAll();
+            cpBHP.setLayout(new JideBoxLayout(cpBHP, JideBoxLayout.Y_AXIS));
+            for (Byte shift : new Byte[]{BHPTools.SHIFT_ON_DEMAND, BHPTools.SHIFT_VERY_EARLY, BHPTools.SHIFT_EARLY, BHPTools.SHIFT_LATE, BHPTools.SHIFT_VERY_LATE}) {
+                cpBHP.add(mapShift2Pane.get(shift));
+                if (resetCollapseState) {
+                    try {
+                        mapShift2Pane.get(shift).setCollapsed(shift != SYSCalendar.whatShiftIs(new Date()));
+                    } catch (PropertyVetoException e) {
+                        OPDE.debug(e);
+                    }
                 }
             }
         }
