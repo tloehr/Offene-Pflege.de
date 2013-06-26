@@ -127,6 +127,8 @@ public class FrmMain extends JFrame {
         listOfNursingrecords = new ArrayList<CollapsiblePane>();
         btnHelp.setToolTipText(OPDE.lang.getString("opde.mainframe.btnHelp.tooltip"));
 
+
+
         if (OPDE.isDebug()) {
             setSize(1366, 768);
         } else {

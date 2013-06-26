@@ -142,7 +142,7 @@ public class TXEAF {
     public static final String CALF_RIGHT_SIDE = "Formular1[0].#subform[1].Kontrollkästchen[7]";
     public static final String COMBING_CARE_BASIN = "Formular1[0].#subform[0].Waschbecken[0]";
     public static final String COMBING_CARE_BED = "Formular1[0].#subform[0].Bett[3]";
-    public static final String COMBING_CARE_LEVEL = "Formular1[0].#subform[0].Kämmen[3]";
+    public static final String COMBING_CARE_LEVEL = "Formular1[0].#subform[0].Kämmen[0]";
     public static final String COMBING_CARE_SHOWER = "Formular1[0].#subform[0].Bad_Dusche[3]";
     public static final String COMMENTS_GENERAL = "Formular1[0].#subform[1].BisherigeVersorgungFreitext[0]";
     public static final String COMMS_HEARING_ABILITY = "Formular1[0].#subform[1].Gehör[0]";

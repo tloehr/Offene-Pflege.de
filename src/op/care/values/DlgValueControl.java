@@ -26,10 +26,9 @@ import java.util.Properties;
  * @author Torsten Löhr
  */
 public class DlgValueControl extends MyJDialog {
-    public static final String internalClassID = "nursingrecords.vitalparameters.DlgValueControl";
+    //    public static final String internalClassID = "nursingrecords.vitalparameters.DlgValueControl";
     private JToggleButton tbStool, tbBalance, tbLowIn, tbHighIn;
     Properties props = null;
-
 
 
     private Closure afterAction;
@@ -51,30 +50,38 @@ public class DlgValueControl extends MyJDialog {
     }
 
     private void initDialog() {
-        tbStool = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".tbStool.tooltip"));
+
+
+        String tooltip = OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.tx.tooltip").replace('[', '<').replace(']', '>');
+        lblTX.setToolTipText(SYSTools.toHTMLForScreen("<p style=\"width:300px;\">" + tooltip + "</p>"));
+        tooltip = OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.tx.hiloin.tooltip").replace('[', '<').replace(']', '>');
+        lblTX2.setToolTipText(SYSTools.toHTMLForScreen("<p style=\"width:300px;\">" + tooltip + "</p>"));
+        lblTX3.setToolTipText(SYSTools.toHTMLForScreen("<p style=\"width:300px;\">" + tooltip + "</p>"));
+
+        tbStool = GUITools.getNiceToggleButton(OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.tbStool.tooltip"));
         tbStool.setFont(SYSConst.ARIAL14BOLD);
         tbStool.setHorizontalAlignment(SwingConstants.LEFT);
-        panel1.add(tbStool, CC.xy(3, 3));
+        panel1.add(tbStool, CC.xyw(3, 3, 2));
 
-        tbBalance = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".tbBalance.tooltip"));
+        tbBalance = GUITools.getNiceToggleButton(OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.tbBalance.tooltip"));
         tbBalance.setHorizontalAlignment(SwingConstants.LEFT);
         tbBalance.setFont(SYSConst.ARIAL14BOLD);
         panel1.add(tbBalance, CC.xy(3, 11));
 
-        tbLowIn = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".tbLowIn.tooltip"));
+        tbLowIn = GUITools.getNiceToggleButton(OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.tbLowIn.tooltip"));
         tbLowIn.setHorizontalAlignment(SwingConstants.LEFT);
         tbLowIn.setFont(SYSConst.ARIAL14BOLD);
-        panel1.add(tbLowIn, CC.xy(3, 13));
+        panel1.add(tbLowIn, CC.xyw(3, 13, 2));
 
-        tbHighIn = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".tbHighIn.tooltip"));
+        tbHighIn = GUITools.getNiceToggleButton(OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.tbHighIn.tooltip"));
         tbHighIn.setHorizontalAlignment(SwingConstants.LEFT);
         tbHighIn.setFont(SYSConst.ARIAL14BOLD);
-        panel1.add(tbHighIn, CC.xy(3, 15));
+        panel1.add(tbHighIn, CC.xyw(3, 15, 2));
 
-        lblDaysDrink.setText(OPDE.lang.getString(internalClassID + ".lblDaysDrink.tooltip"));
-        lblDayStool.setText(OPDE.lang.getString(internalClassID + ".lblDayStool.tooltip"));
-        lblMin.setText(OPDE.lang.getString(internalClassID + ".lblMin.tooltip"));
-        lblMax.setText(OPDE.lang.getString(internalClassID + ".lblMax.tooltip"));
+        lblDaysDrink.setText(OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.lblDaysDrink.tooltip"));
+        lblDayStool.setText(OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.lblDayStool.tooltip"));
+        lblMin.setText(OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.lblMin.tooltip"));
+        lblMax.setText(OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.lblMax.tooltip"));
 
         tbStool.setSelected(props.containsKey(ResidentTools.KEY_STOOLDAYS) && !props.getProperty(ResidentTools.KEY_STOOLDAYS).equals("off"));
         tbBalance.setSelected(props.containsKey(ResidentTools.KEY_BALANCE) && !props.getProperty(ResidentTools.KEY_BALANCE).equals("off"));
@@ -158,12 +165,12 @@ public class DlgValueControl extends MyJDialog {
         boolean sanityOK = aLESSb(lowin, targetin) && aLESSb(lowin, highin) && aLESSb(targetin, highin);
 
         String reason = "";
-        reason += (stoolOK ? "" : OPDE.lang.getString(internalClassID + ".stoolXX"));
-        reason += (highinOK ? "" : OPDE.lang.getString(internalClassID + ".highinXX"));
-        reason += (lowinOK ? "" : OPDE.lang.getString(internalClassID + ".lowinXX"));
-        reason += (daysOK ? "" : OPDE.lang.getString(internalClassID + ".daysdrinkXX"));
-        reason += (sanityOK ? "" : OPDE.lang.getString(internalClassID + ".sanityXX"));
-        reason += (targetinOK ? "" : OPDE.lang.getString(internalClassID + ".targetinXX"));
+        reason += (stoolOK ? "" : OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.stoolXX"));
+        reason += (highinOK ? "" : OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.highinXX"));
+        reason += (lowinOK ? "" : OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.lowinXX"));
+        reason += (daysOK ? "" : OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.daysdrinkXX"));
+        reason += (sanityOK ? "" : OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.sanityXX"));
+        reason += (targetinOK ? "" : OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.targetinXX"));
 
         if (!reason.isEmpty()) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(reason, DisplayMessage.WARNING));
@@ -172,8 +179,8 @@ public class DlgValueControl extends MyJDialog {
 
     }
 
-    private boolean aLESSb(BigDecimal a, BigDecimal b){
-        if (a == null || b == null){
+    private boolean aLESSb(BigDecimal a, BigDecimal b) {
+        if (a == null || b == null) {
             return true;
         }
         return a.compareTo(b) < 0;
@@ -215,13 +222,16 @@ public class DlgValueControl extends MyJDialog {
         lblDayStool = new JLabel();
         txtStoolDays = new JTextField();
         separator1 = new JSeparator();
+        lblTX = new JLabel();
         separator2 = new JSeparator();
         lblMin = new JLabel();
         txtLowIn = new JTextField();
+        lblTX2 = new JLabel();
         lblTarget = new JLabel();
         txtTargetIn = new JTextField();
         lblMax = new JLabel();
         txtHighIn = new JTextField();
+        lblTX3 = new JLabel();
         lblDaysDrink = new JLabel();
         txtDaysDrink = new JTextField();
         panel2 = new JPanel();
@@ -235,7 +245,7 @@ public class DlgValueControl extends MyJDialog {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                "13dlu, $lcgap, default:grow, $lcgap, 13dlu",
+                "13dlu, $lcgap, default:grow, $lcgap, default, $lcgap, 13dlu",
                 "13dlu, 16*($lgap, default), $pgap, default, $lgap, 13dlu"));
 
             //---- lblDayStool ----
@@ -252,9 +262,14 @@ public class DlgValueControl extends MyJDialog {
                     txtStoolDaysFocusLost(e);
                 }
             });
-            panel1.add(txtStoolDays, CC.xy(3, 7));
-            panel1.add(separator1, CC.xy(3, 9));
-            panel1.add(separator2, CC.xy(3, 17));
+            panel1.add(txtStoolDays, CC.xywh(3, 7, 3, 1));
+            panel1.add(separator1, CC.xywh(3, 9, 3, 1));
+
+            //---- lblTX ----
+            lblTX.setText(null);
+            lblTX.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/ambulance2.png")));
+            panel1.add(lblTX, CC.xy(5, 11));
+            panel1.add(separator2, CC.xywh(3, 17, 3, 1));
 
             //---- lblMin ----
             lblMin.setText("min menge in 24h");
@@ -271,6 +286,11 @@ public class DlgValueControl extends MyJDialog {
                 }
             });
             panel1.add(txtLowIn, CC.xy(3, 21));
+
+            //---- lblTX2 ----
+            lblTX2.setText(null);
+            lblTX2.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/ambulance2.png")));
+            panel1.add(lblTX2, CC.xy(5, 21));
 
             //---- lblTarget ----
             lblTarget.setText("zieltrink menge in 24h");
@@ -304,6 +324,11 @@ public class DlgValueControl extends MyJDialog {
             });
             panel1.add(txtHighIn, CC.xy(3, 29));
 
+            //---- lblTX3 ----
+            lblTX3.setText(null);
+            lblTX3.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/ambulance2.png")));
+            panel1.add(lblTX3, CC.xy(5, 29));
+
             //---- lblDaysDrink ----
             lblDaysDrink.setText("kontrollzeitraum tage");
             lblDaysDrink.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -318,7 +343,7 @@ public class DlgValueControl extends MyJDialog {
                     txtDaysDrinkFocusLost(e);
                 }
             });
-            panel1.add(txtDaysDrink, CC.xy(3, 33));
+            panel1.add(txtDaysDrink, CC.xywh(3, 33, 3, 1));
 
             //======== panel2 ========
             {
@@ -359,13 +384,16 @@ public class DlgValueControl extends MyJDialog {
     private JLabel lblDayStool;
     private JTextField txtStoolDays;
     private JSeparator separator1;
+    private JLabel lblTX;
     private JSeparator separator2;
     private JLabel lblMin;
     private JTextField txtLowIn;
+    private JLabel lblTX2;
     private JLabel lblTarget;
     private JTextField txtTargetIn;
     private JLabel lblMax;
     private JTextField txtHighIn;
+    private JLabel lblTX3;
     private JLabel lblDaysDrink;
     private JTextField txtDaysDrink;
     private JPanel panel2;

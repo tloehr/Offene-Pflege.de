@@ -396,7 +396,7 @@ public class TXEssenDoc1 {
      * Contains also "1 Soziale Aspekte"
      */
     private void createContent4Section1() {
-        content.put(TXEAF.RESIDENT_GENDER, resident.getGender() == ResidentTools.MALE ? "1" : "2");
+        content.put(TXEAF.RESIDENT_GENDER, resident.getGender() == ResidentTools.MALE ? "2" : "1");
         content.put(TXEAF.RESIDENT_FIRSTNAME, resident.getFirstname());
         content.put(TXEAF.PAGE2_RESIDENT_FIRSTNAME, resident.getFirstname());
         content.put(TXEAF.RESIDENT_NAME, resident.getName());
@@ -569,14 +569,14 @@ public class TXEssenDoc1 {
      * excretiions
      */
     private void createContent4Section5() {
-        grmpf;
+
         boolean weightControl = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_WEIGHT_MONITORING).isEmpty() ||
                 !InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_WEIGHT_MONITORING).isEmpty();
         content.put(TXEAF.EXCRETIONS_CONTROL_WEIGHT, setCheckbox(weightControl));
         content.put(TXEAF.MONITORING_WEIGHT, setCheckbox(weightControl));
 
         Properties controlling = resident.getControlling();
-        content.put(TXEAF.EXCRETIONS_LIQUID_BALANCE, setYesNoRadiobutton(SYSTools.catchNull(controlling.getProperty("liquidbalance")).equalsIgnoreCase("on")));
+        content.put(TXEAF.EXCRETIONS_LIQUID_BALANCE, setYesNoRadiobutton(SYSTools.catchNull(controlling.getProperty(ResidentTools.KEY_BALANCE)).equalsIgnoreCase("on")));
 
         content.put(TXEAF.EXCRETIONS_AID_BEDPAN, setCheckbox(getValue(ResInfoTypeTools.TYPE_INCOAID, "bedpan.aid")));
         content.put(TXEAF.EXCRETIONS_AID_COMMODE, setCheckbox(getValue(ResInfoTypeTools.TYPE_INCOAID, "commode.aid")));
@@ -602,7 +602,7 @@ public class TXEssenDoc1 {
 
         boolean inco_urine = (mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_PROFILE_DAY) && !getValue(ResInfoTypeTools.TYPE_INCO_PROFILE_DAY, "inkoprofil").equalsIgnoreCase("kontinenz")) ||
                 (mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT) && !getValue(ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT, "inkoprofil").equalsIgnoreCase("kontinenz"));
-        boolean inco_faecal = (mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_FAECAL) && !getValue(ResInfoTypeTools.TYPE_INCO_FAECAL, "incolevel").equalsIgnoreCase("0"));
+        boolean inco_faecal = ( mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_FAECAL) && !getValue(ResInfoTypeTools.TYPE_INCO_FAECAL, "incolevel").equalsIgnoreCase("0"));
         content.put(TXEAF.EXCRETIONS_INCO_URINE, setYesNoRadiobutton(inco_urine));
         content.put(TXEAF.EXCRETIONS_INCO_FAECAL, setYesNoRadiobutton(inco_faecal));
 
@@ -610,7 +610,6 @@ public class TXEssenDoc1 {
         content.put(TXEAF.EXCRETIONS_INCOAID_SELF, setCheckbox(getValue(ResInfoTypeTools.TYPE_INCOAID, "needshelp").equalsIgnoreCase("false")));
         content.put(TXEAF.EXCRETIONS_TRANS_AID, setCheckbox(getValue(ResInfoTypeTools.TYPE_INCOAID, "trans.aid")));
         content.put(TXEAF.EXCRETIONS_SUP_AID, setCheckbox(getValue(ResInfoTypeTools.TYPE_INCOAID, "sup.aid")));
-
 
         boolean diapers = getValue(ResInfoTypeTools.TYPE_INCOAID, "windel").equalsIgnoreCase("true");
         boolean pads1 = getValue(ResInfoTypeTools.TYPE_INCOAID, "vorlagen1").equalsIgnoreCase("true") ||
@@ -1046,25 +1045,25 @@ public class TXEssenDoc1 {
         String sICD = "";
 
         for (ResInfo icd : listICD) {
-            EntityManager em = OPDE.createEM();
-
-            GP gp = null;
-            try {
-                long gpid = Long.parseLong(mapInfo2Properties.get(icd).getProperty("arztid"));
-                gp = em.find(GP.class, gpid);
-            } catch (NumberFormatException e) {
-                // bah!
-            }
-
-            Hospital hp = null;
-            try {
-                long hpid = Long.parseLong(mapInfo2Properties.get(icd).getProperty("khid"));
-                hp = em.find(Hospital.class, hpid);
-            } catch (NumberFormatException e) {
-                // bah!
-            }
-
-            em.close();
+//            EntityManager em = OPDE.createEM();
+//
+//            GP gp = null;
+//            try {
+//                long gpid = Long.parseLong(mapInfo2Properties.get(icd).getProperty("arztid"));
+//                gp = em.find(GP.class, gpid);
+//            } catch (NumberFormatException e) {
+//                // bah!
+//            }
+//
+//            Hospital hp = null;
+//            try {
+//                long hpid = Long.parseLong(mapInfo2Properties.get(icd).getProperty("khid"));
+//                hp = em.find(Hospital.class, hpid);
+//            } catch (NumberFormatException e) {
+//                // bah!
+//            }
+//
+//            em.close();
 
             mapInfo2Properties.get(icd).getProperty("");
             sICD += mapInfo2Properties.get(icd).getProperty("icd");
@@ -1325,7 +1324,7 @@ public class TXEssenDoc1 {
     }
 
     private void createContent4PSYCH() {
-        content.put(TXEAF.PSYCH_RESIDENT_GENDER, resident.getGender() == ResidentTools.MALE ? "1" : "2");
+        content.put(TXEAF.PSYCH_RESIDENT_GENDER, resident.getGender() == ResidentTools.MALE ? "2" : "1");
         content.put(TXEAF.PSYCH_RESIDENT_FIRSTNAME, resident.getFirstname());
         content.put(TXEAF.PSYCH_RESIDENT_NAME, resident.getName());
         content.put(TXEAF.PSYCH_RESIDENT_DOB, DateFormat.getDateInstance().format(resident.getDOB()));
@@ -1376,7 +1375,7 @@ public class TXEssenDoc1 {
         content.put(TXEAF.PSYCH_SUBSTCONTACT, getValue(ResInfoTypeTools.TYPE_PSYCH, "substcontact"));
 
 
-        content.put(TXEAF.PSYCH_COMMENTS, SYSTools.catchNull(mapID2Info.get(ResInfoTypeTools.TYPE_PSYCH).getText(), "--"));
+        content.put(TXEAF.PSYCH_COMMENTS, getComment(ResInfoTypeTools.TYPE_PSYCH));
         content.put(TXEAF.PSYCH_TX_DATE, DateFormat.getDateInstance().format(new Date()));
         content.put(TXEAF.PSYCH_TX_USERNAME, (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : ""));
 

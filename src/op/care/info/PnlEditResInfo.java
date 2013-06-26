@@ -86,10 +86,6 @@ public class PnlEditResInfo {
     Exception lastParsingException;
     Color background;
 
-    public PnlEditResInfo(ResInfo resInfo) {
-        this(resInfo, null, null);
-    }
-
     public PnlEditResInfo(ResInfo resInfo, Color basecolor) {
         this(resInfo, null, basecolor);
     }
@@ -108,8 +104,6 @@ public class PnlEditResInfo {
 
         if (tooltip != null) {
             JLabel ttip = new JLabel(SYSConst.icon16info);
-//            ttip.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-//            ttip.setContentAreaFilled(false);
             ttip.setBorder(null);
 
             tooltip = tooltip.replace('[', '<').replace(']', '>');
@@ -119,8 +113,6 @@ public class PnlEditResInfo {
 
         if (tx != null) {
             JLabel btntx = new JLabel(SYSConst.icon16ambulance);
-//            btntx.setCursor(Cursor.getPredefinedCursor(Cursor.CUSTOM_CURSOR));
-//            btntx.setContentAreaFilled(false);
             btntx.setBorder(null);
 
             tx = tx.replace('[', '<').replace(']', '>');
@@ -354,9 +346,17 @@ public class PnlEditResInfo {
 
         Resident resident;
         if (resInfo == null) {
-            resident = ResidentTools.getAllActive().get(0);
+            resident = ResidentTools.getAllActive().get(0);  // only for development reasons
         } else {
             resident = resInfo.getResident();
+        }
+
+        if (preset.equalsIgnoreCase("currenttime")) {
+            return DateFormat.getTimeInstance(DateFormat.SHORT).format(new Date());
+        }
+
+        if (preset.equalsIgnoreCase("currentdate")) {
+            return DateFormat.getDateInstance(DateFormat.DEFAULT).format(new Date());
         }
 
         if (preset.equalsIgnoreCase("heightlast")) {
@@ -585,6 +585,11 @@ public class PnlEditResInfo {
     }
 
     private void setContent() {
+        txtComment.setText(SYSTools.catchNull(resInfo.getText()));
+        if (resInfo.getProperties().isEmpty()){
+            return;
+        }
+
         try {
             StringReader reader = new StringReader(resInfo.getProperties());
             content.load(reader);
@@ -592,8 +597,6 @@ public class PnlEditResInfo {
         } catch (IOException ex) {
             OPDE.fatal(ex);
         }
-
-        txtComment.setText(resInfo.getText());
 
         for (Object key : components.keySet()) {
             Object entry = components.get(key);
@@ -676,13 +679,9 @@ public class PnlEditResInfo {
         public void itemStateChanged(java.awt.event.ItemEvent evt) {
             if (evt.getStateChange() != ItemEvent.SELECTED) return;
             JComboBox j = (JComboBox) evt.getSource();
-//            String cmbname = j.getName();
-//            ComboBoxModel cbm = j.getModel();
             ComboBoxBean bean = (ComboBoxBean) j.getSelectedItem();
             content.put(j.getName(), bean.getName());
             j.setToolTipText(bean.getTooltip());
-//            ListElement le = (ListElement) cbm.getSelectedItem();
-//            content.put(cmbname, le.getData());
             changed = true;
         }
     }
@@ -1202,6 +1201,9 @@ public class PnlEditResInfo {
             if (qName.equalsIgnoreCase("combobox")) {
                 JComboBox j = (JComboBox) components.get(groupname);
                 j.setModel(boxModel);
+                ComboBoxBean bean = (ComboBoxBean) j.getSelectedItem();
+                j.setToolTipText(bean.getTooltip());
+                content.put(j.getName(), bean.getName());
             }
         }
 
@@ -1242,7 +1244,7 @@ public class PnlEditResInfo {
         public ComboBoxBean(String label, String name, String tooltip) {
             this.label = label;
             this.name = name;
-            this.tooltip = tooltip;
+            this.tooltip = SYSTools.toHTMLForScreen("<p style=\"width:300px;\">" + SYSTools.catchNull(tooltip).replace('[', '<').replace(']', '>') + "</p>");
         }
 
         public String getLabel() {
@@ -1266,9 +1268,6 @@ public class PnlEditResInfo {
             return tooltip;
         }
 
-        public void setTooltip(String tooltip) {
-            this.tooltip = tooltip;
-        }
 
         @Override
         public boolean equals(Object obj) {

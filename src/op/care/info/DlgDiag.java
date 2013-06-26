@@ -79,14 +79,18 @@ public class DlgDiag extends MyJDialog {
 
     private void initDialog() {
         fillCMBs();
+
+        String tooltip = OPDE.lang.getString("nursingrecords.info.dlg.diags.tx.tooltip").replace('[', '<').replace(']', '>');
+        lblTX.setToolTipText(SYSTools.toHTMLForScreen("<p style=\"width:300px;\">" + tooltip + "</p>"));
+
         txtSuche.setPrompt(OPDE.lang.getString("misc.msg.search"));
-        lblDiagBy.setText(OPDE.lang.getString(internalClassID + ".by"));
+        lblDiagBy.setText(OPDE.lang.getString("nursingrecords.info.dlg.diags.by"));
         lblSide.setText(OPDE.lang.getString("misc.msg.diag.side"));
         lblSecurity.setText(OPDE.lang.getString("misc.msg.diag.security"));
-        lblInterval.setText(OPDE.lang.getString(PnlInfo.internalClassID + ".dlg.interval_noconstraints"));
+        lblInterval.setText(OPDE.lang.getString("nursingrecors.info.dlg.interval_noconstraints"));
         lblInterval.setIcon(SYSConst.icon22intervalNoConstraints);
         reloadTable();
-        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID), 10));
+        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.info.dlg.diags"), 10));
     }
 
     private void txtSucheActionPerformed(ActionEvent e) {
@@ -140,6 +144,7 @@ public class DlgDiag extends MyJDialog {
     private void initComponents() {
         jPanel1 = new JPanel();
         txtSuche = new JXSearchField();
+        lblTX = new JLabel();
         jspDiagnosen = new JScrollPane();
         lstDiag = new JList();
         lblDiagBy = new JLabel();
@@ -165,7 +170,7 @@ public class DlgDiag extends MyJDialog {
         {
             jPanel1.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
             jPanel1.setLayout(new FormLayout(
-                "default, 2*($lcgap, default:grow), $ugap, 2*(default:grow, $lcgap), default",
+                "default, 2*($lcgap, default:grow), $ugap, 2*(default:grow, $lcgap), default, $lcgap, default",
                 "default, $lgap, fill:default, $lgap, fill:104dlu:grow, $lgap, fill:default, $lgap, default, $lgap, fill:default, $lgap, fill:89dlu:grow, $ugap, default, $lgap, default"));
 
             //---- txtSuche ----
@@ -178,6 +183,11 @@ public class DlgDiag extends MyJDialog {
             });
             jPanel1.add(txtSuche, CC.xywh(3, 3, 7, 1));
 
+            //---- lblTX ----
+            lblTX.setText(null);
+            lblTX.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/ambulance2.png")));
+            jPanel1.add(lblTX, CC.xy(11, 3));
+
             //======== jspDiagnosen ========
             {
 
@@ -185,7 +195,7 @@ public class DlgDiag extends MyJDialog {
                 lstDiag.setFont(new Font("Arial", Font.PLAIN, 14));
                 jspDiagnosen.setViewportView(lstDiag);
             }
-            jPanel1.add(jspDiagnosen, CC.xywh(3, 5, 7, 1));
+            jPanel1.add(jspDiagnosen, CC.xywh(3, 5, 9, 1));
 
             //---- lblDiagBy ----
             lblDiagBy.setText("Festgestellt durch:");
@@ -208,7 +218,7 @@ public class DlgDiag extends MyJDialog {
                 cmbArzt.setFont(new Font("Arial", Font.PLAIN, 14));
                 panel2.add(cmbArzt, CC.xywh(1, 1, 3, 1));
             }
-            jPanel1.add(panel2, CC.xywh(5, 7, 5, 1));
+            jPanel1.add(panel2, CC.xywh(5, 7, 7, 1));
 
             //---- cmbKH ----
             cmbKH.setModel(new DefaultComboBoxModel(new String[] {
@@ -218,7 +228,7 @@ public class DlgDiag extends MyJDialog {
                 "Item 4"
             }));
             cmbKH.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel1.add(cmbKH, CC.xywh(5, 9, 5, 1));
+            jPanel1.add(cmbKH, CC.xywh(5, 9, 7, 1));
 
             //---- lblSecurity ----
             lblSecurity.setText("Diagnosesicherheit:");
@@ -249,7 +259,7 @@ public class DlgDiag extends MyJDialog {
                 "Zustand nach"
             }));
             cmbSicherheit.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel1.add(cmbSicherheit, CC.xy(9, 11));
+            jPanel1.add(cmbSicherheit, CC.xywh(9, 11, 3, 1));
 
             //======== jScrollPane1 ========
             {
@@ -260,7 +270,7 @@ public class DlgDiag extends MyJDialog {
                 txtBemerkung.setFont(new Font("Arial", Font.PLAIN, 14));
                 jScrollPane1.setViewportView(txtBemerkung);
             }
-            jPanel1.add(jScrollPane1, CC.xywh(3, 13, 7, 1));
+            jPanel1.add(jScrollPane1, CC.xywh(3, 13, 9, 1));
 
             //---- lblInterval ----
             lblInterval.setText("text");
@@ -292,10 +302,10 @@ public class DlgDiag extends MyJDialog {
                 });
                 panel1.add(btnOK);
             }
-            jPanel1.add(panel1, CC.xy(9, 15));
+            jPanel1.add(panel1, CC.xywh(7, 15, 5, 1, CC.RIGHT, CC.DEFAULT));
         }
         contentPane.add(jPanel1, BorderLayout.CENTER);
-        setSize(600, 565);
+        setSize(620, 565);
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
@@ -326,7 +336,7 @@ public class DlgDiag extends MyJDialog {
         }
 
         if (lstDiag.getSelectedValue() == null) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".emptydiag")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.info.dlg.diags.emptydiag")));
             saveOK = false;
         }
 
@@ -392,6 +402,7 @@ public class DlgDiag extends MyJDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel jPanel1;
     private JXSearchField txtSuche;
+    private JLabel lblTX;
     private JScrollPane jspDiagnosen;
     private JList lstDiag;
     private JLabel lblDiagBy;
