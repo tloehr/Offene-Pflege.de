@@ -10,6 +10,7 @@ import op.tools.HTMLTools;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.joda.time.DateTime;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -407,9 +408,16 @@ public class PrescriptionScheduleTools {
             result += OPDE.lang.getString("nursingrecords.prescription.maxDailyDose") + ": ";
             result += schedule.getMaxAnzahl() + "x " + SYSTools.printDouble(schedule.getMaxEDosis().doubleValue());
         } else if (getTerminStatus(schedule) == EXACTTIME) {
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-            result += sdf.format(schedule.getUhrzeit()) + " " + OPDE.lang.getString("misc.msg.Time.short") + " " +
-                    df.format(schedule.getUhrzeitDosis()).replace(",", ".");
+
+            DateTime dt = new DateTime(schedule.getUhrzeit());
+
+            if (dt.getMinuteOfHour() == 0) {
+                result += dt.getHourOfDay() + "h";
+            } else {
+                result += DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getUhrzeit()) + "h";
+            }
+
+            result += " " + df.format(schedule.getUhrzeitDosis()).replace(",", ".");
             String repeat = getRepeatPatternAsCompactText(schedule);
             if (!repeat.isEmpty()) {
                 result = "(" + result + " => " + repeat + ")";

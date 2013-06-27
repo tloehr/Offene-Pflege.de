@@ -206,17 +206,23 @@ public class InterventionScheduleTools {
         }
 
         if (currentState == ZEIT) {
-            result += (schedule.getNachtMo() > 0 ? OPDE.lang.getString("misc.msg.earlyinthemorning.long") : "") +
-                    (schedule.getMorgens() > 0 ? OPDE.lang.getString("misc.msg.morning.long") : "") +
-                    (schedule.getMittags() > 0 ? OPDE.lang.getString("misc.msg.noon.long") : "") +
-                    (schedule.getNachmittags() > 0 ? OPDE.lang.getString("misc.msg.afternoon.long") : "") +
-                    (schedule.getAbends() > 0 ? OPDE.lang.getString("misc.msg.evening.long") : "") +
-                    (schedule.getNachtAb() > 0 ? OPDE.lang.getString("misc.msg.lateatnight.long") : "");
+            result += (schedule.getNachtMo() > 0 ? OPDE.lang.getString("misc.msg.earlyinthemorning.medium") : "") +
+                    (schedule.getMorgens() > 0 ? OPDE.lang.getString("misc.msg.morning.medium") : "") +
+                    (schedule.getMittags() > 0 ? OPDE.lang.getString("misc.msg.noon.medium") : "") +
+                    (schedule.getNachmittags() > 0 ? OPDE.lang.getString("misc.msg.afternoon.medium") : "") +
+                    (schedule.getAbends() > 0 ? OPDE.lang.getString("misc.msg.evening.medium") : "") +
+                    (schedule.getNachtAb() > 0 ? OPDE.lang.getString("misc.msg.lateatnight.medium") : "");
 
             result += (schedule.getTaeglich() != 1 ? getRepeatPattern(schedule) : "");
         } else if (currentState == UHRZEIT) {
 
-            result += DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getUhrzeit()) + " " + OPDE.lang.getString("misc.msg.Time.short");
+            DateTime dt = new DateTime(schedule.getUhrzeit());
+
+            if (dt.getMinuteOfHour() == 0) {
+                result += dt.getHourOfDay() + "h";
+            } else {
+                result += DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getUhrzeit()) + "h";
+            }
 
         } else {
             result = "!!ERROR!!";

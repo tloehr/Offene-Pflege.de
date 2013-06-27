@@ -17,7 +17,6 @@ import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.lang.ArrayUtils;
 
-import javax.persistence.EntityManager;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
@@ -552,16 +551,23 @@ public class TXEssenDoc1 {
 
         String mobilityMeasures = "";
         long prev = -1;
-        for (InterventionSchedule is : InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_MOBILITY)) {
+
+        ArrayList<InterventionSchedule> listSchedule = InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_MOBILITY);
+        listSchedule.addAll(InterventionScheduleTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PROPH_BEDSORE));
+
+        for (InterventionSchedule is : listSchedule) {
             if (is.getIntervention().getMassID() != prev) {
                 prev = is.getIntervention().getMassID();
                 if (!mobilityMeasures.isEmpty()) {
-                    mobilityMeasures += "; ";
+                    mobilityMeasures = mobilityMeasures.substring(0, mobilityMeasures.length() - 2) + "; ";
                 }
                 mobilityMeasures += is.getIntervention().getBezeichnung() + ": ";
             }
             mobilityMeasures += InterventionScheduleTools.getTerminAsCompactText(is) + ", ";
         }
+
+        listSchedule.clear();
+
         content.put(TXEAF.MOBILITY_BEDPOSITION, mobilityMeasures.isEmpty() ? "--" : mobilityMeasures.substring(0, mobilityMeasures.length() - 2)); // the last ", " has to be cut off again
     }
 
@@ -602,7 +608,7 @@ public class TXEssenDoc1 {
 
         boolean inco_urine = (mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_PROFILE_DAY) && !getValue(ResInfoTypeTools.TYPE_INCO_PROFILE_DAY, "inkoprofil").equalsIgnoreCase("kontinenz")) ||
                 (mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT) && !getValue(ResInfoTypeTools.TYPE_INCO_PROFILE_NIGHT, "inkoprofil").equalsIgnoreCase("kontinenz"));
-        boolean inco_faecal = ( mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_FAECAL) && !getValue(ResInfoTypeTools.TYPE_INCO_FAECAL, "incolevel").equalsIgnoreCase("0"));
+        boolean inco_faecal = (mapID2Info.containsKey(ResInfoTypeTools.TYPE_INCO_FAECAL) && !getValue(ResInfoTypeTools.TYPE_INCO_FAECAL, "incolevel").equalsIgnoreCase("0"));
         content.put(TXEAF.EXCRETIONS_INCO_URINE, setYesNoRadiobutton(inco_urine));
         content.put(TXEAF.EXCRETIONS_INCO_FAECAL, setYesNoRadiobutton(inco_faecal));
 
@@ -701,9 +707,9 @@ public class TXEssenDoc1 {
      * food
      */
     private void createContent4Section9() {
-        content.put(TXEAF.FOOD_ASSISTANCE_LEVEL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_FOOD, "transfer"), new String[]{"none", "needsmotivation", "needshelp", "completehelp"}));
-        content.put(TXEAF.FOOD_DYSPHAGIA, setYesNoRadiobutton(getValue(ResInfoTypeTools.TYPE_FOOD, "dysphagia")));
-        content.put(TXEAF.FOOD_BITESIZE, setYesNoRadiobutton(getValue(ResInfoTypeTools.TYPE_FOOD, "bitesize")));
+        content.put(TXEAF.FOOD_ASSISTANCE_LEVEL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_FOOD, "assistancelevelfood"), new String[]{"none", "needsmotivation", "needshelp", "completehelp"}));
+        content.put(TXEAF.FOOD_DYSPHAGIA, setCheckbox(getValue(ResInfoTypeTools.TYPE_FOOD, "dysphagia")));
+        content.put(TXEAF.FOOD_BITESIZE, setCheckbox(getValue(ResInfoTypeTools.TYPE_FOOD, "bitesize")));
 
         long lastMeal = 0;
 
@@ -718,12 +724,12 @@ public class TXEssenDoc1 {
             content.put(TXEAF.FOOD_LAST_MEAL, "--");
         }
 
-
+        BigDecimal bd500 = new BigDecimal(500);
         BigDecimal foodml = BigDecimal.ZERO;
         ArrayList<Prescription> listPresGavageFood = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_FOOD_500ML);
         for (Prescription p : listPresGavageFood) {
             for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
-                foodml = foodml.add(ps.getOverAllDoseSum());
+                foodml = foodml.add(ps.getOverAllDoseSum().multiply(bd500));
             }
         }
         listPresGavageFood.clear();
@@ -732,14 +738,14 @@ public class TXEssenDoc1 {
         ArrayList<Prescription> listPresGavageLiquid = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_LIQUID_500ML);
         for (Prescription p : listPresGavageLiquid) {
             for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
-                liquidml = liquidml.add(ps.getOverAllDoseSum());
+                liquidml = liquidml.add(ps.getOverAllDoseSum().multiply(bd500));
             }
         }
         listPresGavageLiquid.clear();
 
         content.put(TXEAF.FOOD_ARTIFICIAL_FEEDING, setYesNoRadiobutton(foodml.compareTo(BigDecimal.ZERO) > 0));
-        content.put(TXEAF.FOOD_DAILY_ML, setBD(foodml, "ml"));
-        content.put(TXEAF.FOOD_TEE_DAILY_ML, setBD(liquidml, "ml"));
+        content.put(TXEAF.FOOD_DAILY_ML, setBD(foodml));
+        content.put(TXEAF.FOOD_TEE_DAILY_ML, setBD(liquidml));
 
 
         String tubetype = "--";
@@ -758,12 +764,12 @@ public class TXEssenDoc1 {
         content.put(TXEAF.FOOD_ORALNUTRITION, setYesNoRadiobutton(getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "oralnutrition")));
         content.put(TXEAF.FOOD_BREADUNTIS, getValue(ResInfoTypeTools.TYPE_FOOD, "breadunit"));
         content.put(TXEAF.FOOD_LIQUIDS_DAILY_ML, getValue(ResInfoTypeTools.TYPE_FOOD, "zieltrinkmenge"));
-        content.put(TXEAF.FOOD_BMI, setBD(ResValueTools.getBMI(resident), ""));
+        content.put(TXEAF.FOOD_BMI, setBD(ResValueTools.getBMI(resident)));
 
 
         content.put(TXEAF.FOOD_PARENTERAL, setCheckbox(getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "parenteral")));
         content.put(TXEAF.FOOD_DRINKSALONE, setCheckbox(getValue(ResInfoTypeTools.TYPE_FOOD, "drinksalone")));
-        content.put(TXEAF.FOOD_ABROSIA, setCheckbox(getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "abrosia")));
+        content.put(TXEAF.FOOD_ABROSIA, setCheckbox(getValue(ResInfoTypeTools.TYPE_FOOD, "abrosia")));
         content.put(TXEAF.FOOD_DRINKINGMOTIVATION, setCheckbox(getValue(ResInfoTypeTools.TYPE_FOOD, "motivationdrinking")));
 
     }
@@ -799,6 +805,7 @@ public class TXEssenDoc1 {
 
         content.put(TXEAF.SPECIAL_MYCOSIS, setYesNoRadiobutton(mapID2Info.containsKey(ResInfoTypeTools.TYPE_MYCOSIS)));
 
+        // palliative is not set
 
         content.put(TXEAF.SPECIAL_WOUNDS, setYesNoRadiobutton(hasWounds()));
         content.put(TXEAF.SPECIAL_WOUNDPAIN, setYesNoRadiobutton(hasWoundPain()));
@@ -821,11 +828,11 @@ public class TXEssenDoc1 {
         content.put(TXEAF.COMMS_SEEING_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "ability4"), new String[]{"oE4", "mE4", "zE4"}));
         content.put(TXEAF.COMMS_WRITING_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_COMMS, "ability5"), new String[]{"oE5", "mE5", "zE5"}));
 
-        content.put(TXEAF.ORIENTATION_TIME_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "time"), new String[]{"no1", "yes1", "intermittent1"}));
-        content.put(TXEAF.ORIENTATION_PERSONAL_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "personal"), new String[]{"no2", "yes2", "intermittent2"}));
-        content.put(TXEAF.ORIENTATION_LOCATION_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "location"), new String[]{"no3", "yes3", "intermittent3"}));
-        content.put(TXEAF.ORIENTATION_SITUATION_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "situation"), new String[]{"no4", "yes4", "intermittent4"}));
-        content.put(TXEAF.ORIENTATION_RUNNAWAY_TENDENCY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "runaway"), new String[]{"no5", "yes5", "intermittent5"}));
+        content.put(TXEAF.ORIENTATION_TIME_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "time"), new String[]{"yes1", "no1", "intermittent1"}));
+        content.put(TXEAF.ORIENTATION_PERSONAL_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "personal"), new String[]{"yes2", "no2", "intermittent2"}));
+        content.put(TXEAF.ORIENTATION_LOCATION_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "location"), new String[]{"yes3", "no3", "intermittent3"}));
+        content.put(TXEAF.ORIENTATION_SITUATION_ABILITY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "situation"), new String[]{"yes4", "no4", "intermittent4"}));
+        content.put(TXEAF.ORIENTATION_RUNNAWAY_TENDENCY, setRadiobutton(getValue(ResInfoTypeTools.TYPE_ORIENTATION, "runaway"), new String[]{"yes5", "no5", "intermittent5"}));
     }
 
 
@@ -842,7 +849,7 @@ public class TXEssenDoc1 {
         content.put(TXEAF.RESPIRATION_SMOKING, setCheckbox(getValue(ResInfoTypeTools.TYPE_RESPIRATION, "smoking")));
         content.put(TXEAF.RESPIRATION_ASTHMA, setCheckbox(getValue(ResInfoTypeTools.TYPE_RESPIRATION, "asthma")));
 
-        content.put(TXEAF.RESPIRATION_OTHER, setCheckbox(getValue(ResInfoTypeTools.TYPE_RESPIRATION, "other").equals("--")));
+        content.put(TXEAF.RESPIRATION_OTHER, setCheckbox(!getValue(ResInfoTypeTools.TYPE_RESPIRATION, "other").equals("--")));
         content.put(TXEAF.RESPIRATION_COMMENT, getValue(ResInfoTypeTools.TYPE_RESPIRATION, "other"));
 
         content.put(TXEAF.RESPIRATION_STOMA, setCheckbox(getValue(ResInfoTypeTools.TYPE_RESPIRATION, "stoma")));
@@ -859,6 +866,8 @@ public class TXEssenDoc1 {
      * special monitoring
      */
     private void createContent4Section13() {
+
+        // TODO: hier gibts noch lücken
         boolean bp = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_BP_MONITORING).isEmpty();
         boolean port = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PORT_MONITORING).isEmpty();
         boolean respiration = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_BREATH_MONITORING).isEmpty();
@@ -1069,7 +1078,7 @@ public class TXEssenDoc1 {
             sICD += mapInfo2Properties.get(icd).getProperty("icd");
             sICD += ": " + mapInfo2Properties.get(icd).getProperty("text");
             sICD += " (" + (mapInfo2Properties.get(icd).getProperty("koerperseite").equalsIgnoreCase("nicht festgelegt") ? "" : mapInfo2Properties.get(icd).getProperty("koerperseite") + ", ");
-            sICD +=  mapInfo2Properties.get(icd).getProperty("diagnosesicherheit") + ")";
+            sICD += mapInfo2Properties.get(icd).getProperty("diagnosesicherheit") + ")";
 
             sICD += "; ";
         }
@@ -1184,8 +1193,8 @@ public class TXEssenDoc1 {
         return in ? "1" : "0";
     }
 
-    private String setBD(BigDecimal bd, String suffix) {
-        return (bd != null && bd.compareTo(BigDecimal.ZERO) > 0) ? bd.setScale(2, RoundingMode.HALF_UP).toString() + " " + suffix : "--";
+    private String setBD(BigDecimal bd) {
+        return (bd != null && bd.compareTo(BigDecimal.ZERO) > 0) ? bd.setScale(2, RoundingMode.HALF_UP).toString(): "--";
     }
 
     private String setCheckbox(Object in) {

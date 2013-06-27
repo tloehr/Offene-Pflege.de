@@ -891,7 +891,7 @@ public class PnlInformation extends NursingRecordsPanel {
                         if (o == null || !mapInfo2Editor.get(resInfo).isChanged()) {
                             return;
                         }
-                        new DlgYesNo(OPDE.lang.getString("misc.questions.change1") + "<br/>" + ResInfoTools.getCompactHTML(resInfo) + "<br/>" + OPDE.lang.getString("misc.questions.change2"), SYSConst.icon48play, new Closure() {
+                        new DlgYesNo(OPDE.lang.getString("misc.questions.change1") + "<br/>&raquo;" + resInfo.getResInfoType().getShortDescription() +"&laquo;<br/>" +DateFormat.getDateInstance().format(resInfo.getFrom()) + "<br/>" + OPDE.lang.getString("misc.questions.change2"), SYSConst.icon48play, new Closure() {
                             @Override
                             public void execute(Object answer) {
                                 if (!answer.equals(JOptionPane.YES_OPTION)) {
@@ -1023,7 +1023,7 @@ public class PnlInformation extends NursingRecordsPanel {
                             return;
                         }
 
-                        new DlgYesNo(OPDE.lang.getString("misc.questions.edit1") + "<br/>" + resInfo.getID() + "<br/>" + OPDE.lang.getString("misc.questions.edit2"), SYSConst.icon48play, new Closure() {
+                        new DlgYesNo(OPDE.lang.getString("misc.questions.edit1") + "<br/>&raquo;" + resInfo.getResInfoType().getShortDescription() +"&laquo;<br/>" +DateFormat.getDateInstance().format(resInfo.getFrom()) +  "<br/>" + OPDE.lang.getString("misc.questions.edit2"), SYSConst.icon48play, new Closure() {
                             @Override
                             public void execute(Object answer) {
 
