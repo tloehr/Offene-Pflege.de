@@ -251,14 +251,14 @@ public class BHPTools {
             em.lock(em.merge(pSchedule.getPrescription()), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
             em.lock(pSchedule.getPrescription().getResident(), LockModeType.OPTIMISTIC);
 
-            if (!SYSCalendar.isInFuture(pSchedule.getLDatum()) && (pSchedule.isTaeglich() || pSchedule.isPassenderWochentag(targetdate.toDate()) || pSchedule.isPassenderTagImMonat(targetdate.toDate()))) {
+            if (!SYSCalendar.isInFuture(pSchedule.getLDatum()) && (pSchedule.isDaily() || pSchedule.isPassenderWochentag(targetdate.toDate()) || pSchedule.isPassenderTagImMonat(targetdate.toDate()))) {
 
                 boolean treffer = false;
                 DateMidnight ldatum = new DateMidnight(pSchedule.getLDatum());
 
                 // Genaue Ermittlung der Treffer
                 // =============================
-                if (pSchedule.isTaeglich()) {
+                if (pSchedule.isDaily()) {
 //                    OPDE.debug("Eine tägliche pSchedule");
                     // Dann wird das LDatum solange um die gewünschte Tagesanzahl erhöht, bis
                     // der targetdate getroffen wurde oder überschritten ist.
@@ -267,7 +267,7 @@ public class BHPTools {
                     }
                     // Mich interssiert nur der Treffer, also die Punktlandung auf dem targetdate
                     treffer = Days.daysBetween(ldatum, targetdate).getDays() == 0;
-                } else if (pSchedule.isWoechentlich()) {
+                } else if (pSchedule.isWeekly()) {
 //                    OPDE.debug("Eine wöchentliche pSchedule");
                     while (Weeks.weeksBetween(ldatum, targetdate).getWeeks() > 0) {
                         ldatum = ldatum.plusWeeks(pSchedule.getWoechentlich());
@@ -275,7 +275,7 @@ public class BHPTools {
                     // Ein Treffer ist es dann, wenn das Referenzdatum gleich dem targetdate ist ODER es zumindest in der selben Kalenderwoche liegt.
                     // Da bei der Vorauswahl durch die Datenbank nur passende Wochentage überhaupt zugelassen wurden, muss das somit der richtige sein.
                     treffer = Weeks.weeksBetween(ldatum, targetdate).getWeeks() == 0;
-                } else if (pSchedule.isMonatlich()) {
+                } else if (pSchedule.isMonthly()) {
 //                    OPDE.debug("Eine monatliche pSchedule");
                     while (Months.monthsBetween(ldatum, targetdate).getMonths() > 0) {
                         ldatum = ldatum.plusMonths(pSchedule.getMonatlich());

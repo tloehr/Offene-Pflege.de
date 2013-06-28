@@ -47,8 +47,6 @@ import java.util.*;
  */
 public class ResInfoTools {
 
-    public static final String KEY_SLEEP = "SLEEP";
-
     public static ResInfo getLastResinfo(Resident bewohner, ResInfoType bwinfotyp) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp = :bwinfotyp ORDER BY b.from DESC");
@@ -152,6 +150,18 @@ public class ResInfoTools {
         Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.from <= :from AND b.to >= :to AND b.bwinfotyp.resInfoCat = :cat ORDER BY b.from DESC, b.bwinfotyp.bwinftyp");
         query.setParameter("bewohner", bewohner);
         query.setParameter("cat", cat);
+        query.setParameter("from", new Date());
+        query.setParameter("to", new Date());
+        ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
+        em.close();
+        return resInfos;
+    }
+
+    public static ArrayList<ResInfo> getTemplatesByType(Resident resident2exclude, int resinfotype) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident <> :resident AND b.from <= :from AND b.to >= :to AND b.bwinfotyp.type = :resinfotype ORDER BY b.resident.name ASC");
+        query.setParameter("resident", resident2exclude);
+        query.setParameter("resinfotype", resinfotype);
         query.setParameter("from", new Date());
         query.setParameter("to", new Date());
         ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
@@ -308,16 +318,16 @@ public class ResInfoTools {
 
     }
 
-    public static String getContentAsPlainText(ResInfo resInfo) {
-            ArrayList result = parseResInfo(resInfo);
+    public static String getContentAsPlainText(ResInfo resInfo, boolean ignorebodyscheme) {
+        ArrayList result = parseResInfo(resInfo);
 
-            DefaultMutableTreeNode struktur = (DefaultMutableTreeNode) result.get(0);
-            Properties content = (Properties) result.get(1);
-            ArrayList<RiskBean> scaleriskmodel = (ArrayList<RiskBean>) result.get(2);
+        DefaultMutableTreeNode struktur = (DefaultMutableTreeNode) result.get(0);
+        Properties content = (Properties) result.get(1);
+        ArrayList<RiskBean> scaleriskmodel = (ArrayList<RiskBean>) result.get(2);
 
-            return toPlainText(struktur, content, scaleriskmodel);
+        return toPlainText(struktur, content, scaleriskmodel, ignorebodyscheme);
 
-        }
+    }
 
     private static String toHTML(DefaultMutableTreeNode struktur, Properties content, ArrayList<RiskBean> scaleriskmodel) {
         BigDecimal scalesum = null;
@@ -415,7 +425,7 @@ public class ResInfoTools {
         return html;
     }
 
-    private static String toPlainText(DefaultMutableTreeNode struktur, Properties content, ArrayList<RiskBean> scaleriskmodel) {
+    private static String toPlainText(DefaultMutableTreeNode struktur, Properties content, ArrayList<RiskBean> scaleriskmodel, boolean ignorebodyscheme) {
         BigDecimal scalesum = null;
         String plaintext = "";
         if (!content.isEmpty()) {
@@ -461,7 +471,7 @@ public class ResInfoTools {
                             }
                         }
                     }
-                    if (infonode.getTagName().equalsIgnoreCase("bodyscheme")) {
+                    if (!ignorebodyscheme && infonode.getTagName().equalsIgnoreCase("bodyscheme")) {
                         ArrayList<String> bodyparts = new ArrayList<String>();
                         for (String key : content.stringPropertyNames()) {
                             if (key.startsWith(infonode.getName())) {
@@ -475,7 +485,7 @@ public class ResInfoTools {
                             for (String bodykey : bodyparts) {
                                 plaintext += OPDE.lang.getString(bodykey) + ", ";
                             }
-                            plaintext = plaintext.substring(0, plaintext.length()-2)+"; ";
+                            plaintext = plaintext.substring(0, plaintext.length() - 2) + "; ";
                         }
 
 
@@ -483,7 +493,7 @@ public class ResInfoTools {
                 } else { // TABGROUPS, weil ist kein Blatt (Leaf)
                     // nur anzeigen, wenn es mindestens eine angekreuzte Checkbox in dieser TABGROUP gibt.
                     if (treeHasTrueCheckboxes(node, content)) {
-                        plaintext += infonode.getLabel() + ": " + toPlainText(node, content, null) + "; ";
+                        plaintext += infonode.getLabel() + ": " + toPlainText(node, content, null, ignorebodyscheme) + "; ";
                     }
                 }
 

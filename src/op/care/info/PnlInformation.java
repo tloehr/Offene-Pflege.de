@@ -537,7 +537,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                                         }
                                                     }
                                                 }
-                                            }, resInfoType.getResInfoCat().getColor());
+                                            }, resInfoType.getResInfoCat().getColor(), true);
                                             pnlEditResInfo.setEnabled(true);
 
                                             popup.setMovable(false);
@@ -1140,7 +1140,7 @@ public class PnlInformation extends NursingRecordsPanel {
                     cpInfo.setContentPane(new JScrollPane(txt));
                 } else {
                     if (!mapInfo2Editor.containsKey(resInfo)) {
-                        mapInfo2Editor.put(resInfo, new PnlEditResInfo(resInfo.clone(), resInfo.getResInfoType().getResInfoCat().getColor()));
+                        mapInfo2Editor.put(resInfo, new PnlEditResInfo(resInfo.clone(), resInfo.getResInfoType().getResInfoCat().getColor(), false));
                     }
                     cpInfo.setContentPane(new JScrollPane(mapInfo2Editor.get(resInfo).getPanel()));
                 }

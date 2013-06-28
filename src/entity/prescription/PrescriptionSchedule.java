@@ -439,15 +439,15 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
         return uhrzeit != null;
     }
 
-    public boolean isTaeglich() {
+    public boolean isDaily() {
         return taeglich > 0;
     }
 
-    public boolean isWoechentlich() {
+    public boolean isWeekly() {
         return woechentlich > 0;
     }
 
-    public boolean isMonatlich() {
+    public boolean isMonthly() {
         return monatlich > 0;
     }
 
@@ -458,7 +458,7 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
     public boolean isPassenderWochentag(Date date) {
         boolean passend = false;
 
-        if (isWoechentlich()) { // wenn nicht wöchentlich, dann passt gar nix
+        if (isWeekly()) { // wenn nicht wöchentlich, dann passt gar nix
             GregorianCalendar gcDate = SYSCalendar.toGC(date);
             switch (gcDate.get(GregorianCalendar.DAY_OF_WEEK)) {
                 case GregorianCalendar.MONDAY: {
@@ -505,7 +505,7 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
      */
     public boolean isPassenderTagImMonat(Date date) {
         boolean passend = false;
-        if (isMonatlich()) { // wenn nicht monatlich, dann passt gar nix
+        if (isMonthly()) { // wenn nicht monatlich, dann passt gar nix
             GregorianCalendar gcDate = SYSCalendar.toGC(date);
 
             passend = tagNum == gcDate.get(GregorianCalendar.DAY_OF_MONTH);

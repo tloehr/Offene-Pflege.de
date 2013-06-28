@@ -7,6 +7,7 @@ import com.jidesoft.swing.OverlayTextArea;
 import entity.EntityTools;
 import entity.files.SYSFilesTools;
 import entity.info.ResInfo;
+import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.prescription.GP;
@@ -63,6 +64,7 @@ public class PnlEditResInfo {
     private final int TYPE_DOUBLE = 2;
     private final int TYPE_DATE = 3;
     private final int TYPE_TIME = 4;
+    private boolean newmode;
     private boolean scalemode = false;
     private boolean enabled;
     private final int TEXTFIELD_STANDARD_WIDTH = 35;
@@ -86,13 +88,14 @@ public class PnlEditResInfo {
     Exception lastParsingException;
     Color background;
 
-    public PnlEditResInfo(ResInfo resInfo, Color basecolor) {
-        this(resInfo, null, basecolor);
+    public PnlEditResInfo(ResInfo resInfo, Color basecolor, boolean newmode) {
+        this(resInfo, null, basecolor, newmode);
     }
 
-    public PnlEditResInfo(ResInfo resInfo, Closure closure, Color basecolor) {
+    public PnlEditResInfo(ResInfo resInfo, Closure closure, Color basecolor, boolean newmode) {
         this.resInfo = resInfo;
         this.closure = closure;
+        this.newmode = newmode;
         if (basecolor != null) {
             background = GUITools.blend(basecolor, Color.WHITE, 0.1f);
         }
@@ -586,7 +589,7 @@ public class PnlEditResInfo {
 
     private void setContent() {
         txtComment.setText(SYSTools.catchNull(resInfo.getText()));
-        if (resInfo.getProperties().isEmpty()){
+        if (resInfo.getProperties().isEmpty()) {
             return;
         }
 
@@ -872,7 +875,7 @@ public class PnlEditResInfo {
              *                    |___/             |_|
              */
             if (tagName.equalsIgnoreCase("tabgroup")) {
-                JLabel jl = new JLabel(attributes.getValue("label") + ":");
+                JLabel jl = new JLabel(attributes.getValue("label"));
                 if (!SYSTools.catchNull(attributes.getValue("color")).isEmpty()) {
                     jl.setForeground(GUITools.getColor(attributes.getValue("color")));
                 }
@@ -1073,6 +1076,50 @@ public class PnlEditResInfo {
                 components.put(groupname, pnlGP);
                 outerpanel.add(layout, pnlGP);
                 addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
+            }
+            /***
+             *                        __              _                  _      _
+             *      __ ___ _ __ _  _ / _|_ _ ___ _ __| |_ ___ _ __  _ __| |__ _| |_ ___
+             *     / _/ _ \ '_ \ || |  _| '_/ _ \ '  \  _/ -_) '  \| '_ \ / _` |  _/ -_)
+             *     \__\___/ .__/\_, |_| |_| \___/_|_|_\__\___|_|_|_| .__/_\__,_|\__\___|
+             *            |_|   |__/                               |_|
+             */
+            if (newmode && tagName.equalsIgnoreCase("copyfromtemplate")) {
+
+                JPanel pnl = new JPanel(new RiverLayout());
+
+                ArrayList<ResInfo> listTemplates = ResInfoTools.getTemplatesByType(resInfo.getResident(), resInfo.getResInfoType().getType());
+                final JComboBox cmb = new JComboBox();
+                cmb.setModel(SYSTools.list2cmb(listTemplates));
+                cmb.setRenderer(new ListCellRenderer() {
+                    @Override
+                    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                        String text = "";
+                        if (value instanceof ResInfo) {
+                            text = ResidentTools.getFullName(((ResInfo) value).getResident());
+                        } else {
+                            text = SYSTools.catchNull(value);
+                        }
+
+                        return new DefaultListCellRenderer().getListCellRendererComponent(list, text, index, isSelected, cellHasFocus);
+                    }
+                });
+                pnl.add("left hfill", cmb);
+
+                JButton btnCopyOver = new JButton(OPDE.lang.getString("nursingrecords.info.dlg.copyfromtemplate"));
+                btnCopyOver.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        if (cmb.getSelectedItem() != null) {
+                            ResInfo template = (ResInfo) cmb.getSelectedItem();
+                            resInfo.setProperties(template.getProperties());
+                            setContent();
+                        }
+                    }
+                });
+                pnl.add("left", btnCopyOver);
+
+                outerpanel.add("left hfill", pnl);
             }
             /***
              *      _             _             _

@@ -866,8 +866,6 @@ public class TXEssenDoc1 {
      * special monitoring
      */
     private void createContent4Section13() {
-
-        // TODO: hier gibts noch lücken
         boolean bp = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_BP_MONITORING).isEmpty();
         boolean port = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_PORT_MONITORING).isEmpty();
         boolean respiration = !PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_BREATH_MONITORING).isEmpty();
@@ -934,14 +932,13 @@ public class TXEssenDoc1 {
             BigDecimal morning = BigDecimal.ZERO, noon = BigDecimal.ZERO, evening = BigDecimal.ZERO;
             for (Prescription p : listGlucose) {
                 for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
-                    if (ps.isTaeglich()) {
+                    if (ps.getTaeglich() == 1) {
                         daily++;
                         morning = morning.add(ps.getMorningSum());
                         noon = noon.add(ps.getNoonSum());
                         evening = evening.add(ps.getEveningSum());
-                    }
-                    if (ps.isWoechentlich()) {
-                        weekly++;
+                    } else if (ps.getTaeglich() > 1) {
+                        weekly += 7 / ps.getTaeglich();
                         morning = morning.add(ps.getMorningSum());
                         noon = noon.add(ps.getNoonSum());
                         evening = evening.add(ps.getEveningSum());
@@ -962,7 +959,7 @@ public class TXEssenDoc1 {
     }
 
     private void createContent4Section18() {
-        content.put(TXEAF.COMMENTS_GENERAL, getValue(ResInfoTypeTools.TYPE_WARNING, "beschreibung"));
+        content.put(TXEAF.COMMENTS_GENERAL, getValue(ResInfoTypeTools.TYPE_WARNING, "beschreibung") +  (mapID2Info.containsKey(ResInfoTypeTools.TYPE_WARNING) ?  SYSTools.catchNull(mapID2Info.get(ResInfoTypeTools.TYPE_WARNING).getText(), "\n", "") : ""));
     }
 
     private void createContent4Section19(PdfStamper stamper) throws Exception {
@@ -982,7 +979,7 @@ public class TXEssenDoc1 {
                 ResInfo currentWound = mapID2Info.get(type);
                 lineno++;
 
-                content.put(pdfbody[lineno], OPDE.lang.getString(descriptionKey) + " " + DateFormat.getDateInstance().format(currentWound.getFrom()) + ": " + ResInfoTools.getContentAsPlainText(currentWound));
+                content.put(pdfbody[lineno], OPDE.lang.getString(descriptionKey) + " " + DateFormat.getDateInstance().format(currentWound.getFrom()) + ": " + ResInfoTools.getContentAsPlainText(currentWound, true));
 
                 AcroFields.FieldPosition pos1 = form.getFieldPositions(pdfbody[lineno]).get(0);
                 directcontent.saveState();
@@ -1194,7 +1191,7 @@ public class TXEssenDoc1 {
     }
 
     private String setBD(BigDecimal bd) {
-        return (bd != null && bd.compareTo(BigDecimal.ZERO) > 0) ? bd.setScale(2, RoundingMode.HALF_UP).toString(): "--";
+        return (bd != null && bd.compareTo(BigDecimal.ZERO) > 0) ? bd.setScale(2, RoundingMode.HALF_UP).toString() : "--";
     }
 
     private String setCheckbox(Object in) {
@@ -1354,22 +1351,22 @@ public class TXEssenDoc1 {
         content.put(TXEAF.PSYCH_RESIDENT_JOB, setYesNoRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "job")));
         content.put(TXEAF.PSYCH_RESIDENT_VOLUNTEER, setYesNoRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "volunteer")));
 
-        content.put(TXEAF.PSYCH_AGGRESSIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "aggressive"), new String[]{"yes1", "no1", "intermittent1"}));
-        content.put(TXEAF.PSYCH_SELFDESTRUCTIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "selfdestructive"), new String[]{"yes2", "no2", "intermittent2"}));
-        content.put(TXEAF.PSYCH_MANICDEPRESSIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "manicdepressive"), new String[]{"yes3", "no3", "intermittent3"}));
-        content.put(TXEAF.PSYCH_DELUSION, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "delusion"), new String[]{"yes4", "no4", "intermittent4"}));
-        content.put(TXEAF.PSYCH_HALLUCINATION, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "hallucination"), new String[]{"yes5", "no5", "intermittent5"}));
-        content.put(TXEAF.PSYCH_FEAR, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "fear"), new String[]{"yes12", "no12", "intermittent12"}));
+        content.put(TXEAF.PSYCH_AGGRESSIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "aggressive"), new String[]{"no1", "yes1", "intermittent1"}));
+        content.put(TXEAF.PSYCH_SELFDESTRUCTIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "selfdestructive"), new String[]{"no2", "yes2", "intermittent2"}));
+        content.put(TXEAF.PSYCH_MANICDEPRESSIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "manicdepressive"), new String[]{"no3", "yes3", "intermittent3"}));
+        content.put(TXEAF.PSYCH_DELUSION, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "delusion"), new String[]{"no4", "yes4", "intermittent4"}));
+        content.put(TXEAF.PSYCH_HALLUCINATION, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "hallucination"), new String[]{"no5", "yes5", "intermittent5"}));
+        content.put(TXEAF.PSYCH_FEAR, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "fear"), new String[]{"no12", "yes12", "intermittent12"}));
         content.put(TXEAF.PSYCH_FEARTEXT, getValue(ResInfoTypeTools.TYPE_PSYCH, "feartext"));
-        content.put(TXEAF.PSYCH_PASSIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "passive"), new String[]{"yes6", "no6", "intermittent6"}));
-        content.put(TXEAF.PSYCH_RESTLESS, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "restless"), new String[]{"yes7", "no7", "intermittent7"}));
-        content.put(TXEAF.PSYCH_REGRESSIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "regressive"), new String[]{"yes8", "no8", "intermittent8"}));
-        content.put(TXEAF.PSYCH_FAECAL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "faecal"), new String[]{"yes9", "no9", "intermittent9"}));
-        content.put(TXEAF.PSYCH_APRAXIA, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "apraxia"), new String[]{"yes10", "no10", "intermittent10"}));
-        content.put(TXEAF.PSYCH_AGNOSIA, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "agnosia"), new String[]{"yes11", "no11", "intermittent11"}));
+        content.put(TXEAF.PSYCH_PASSIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "passive"), new String[]{"no6", "yes6", "intermittent6"}));
+        content.put(TXEAF.PSYCH_RESTLESS, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "restless"), new String[]{"no7", "yes7", "intermittent7"}));
+        content.put(TXEAF.PSYCH_REGRESSIVE, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "regressive"), new String[]{"no8", "yes8", "intermittent8"}));
+        content.put(TXEAF.PSYCH_FAECAL, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "faecal"), new String[]{"no9", "yes9", "intermittent9"}));
+        content.put(TXEAF.PSYCH_APRAXIA, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "apraxia"), new String[]{"no10", "yes10", "intermittent10"}));
+        content.put(TXEAF.PSYCH_AGNOSIA, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "agnosia"), new String[]{"no11", "yes11", "intermittent11"}));
 
         content.put(TXEAF.PSYCH_CONSUMING, setYesNoRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "consuming")));
-        content.put(TXEAF.PSYCH_TREATMENTSYMPTOMS, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "treatmentsymptoms"), new String[]{"yes13", "no13", "intermittent13"}));
+        content.put(TXEAF.PSYCH_TREATMENTSYMPTOMS, setRadiobutton(getValue(ResInfoTypeTools.TYPE_PSYCH, "treatmentsymptoms"), new String[]{"no13", "yes13", "intermittent13"}));
 
         content.put(TXEAF.PSYCH_ALCOHOL, setCheckbox(getValue(ResInfoTypeTools.TYPE_PSYCH, "alcohol")));
         content.put(TXEAF.PSYCH_DRUGS, setCheckbox(getValue(ResInfoTypeTools.TYPE_PSYCH, "drugs")));

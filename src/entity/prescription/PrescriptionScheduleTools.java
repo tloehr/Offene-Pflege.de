@@ -57,13 +57,13 @@ public class PrescriptionScheduleTools {
     public static String getRepeatPattern(PrescriptionSchedule schedule, boolean writeTaeglich) {
         String result = "";
 
-        if (schedule.isTaeglich()) {
+        if (schedule.isDaily()) {
             if (schedule.getTaeglich() > 1) {
                 result += "<b>" + OPDE.lang.getString("misc.msg.every") + " " + schedule.getTaeglich() + " " + OPDE.lang.getString("misc.msg.Days2") + "</b>";
             } else if (writeTaeglich) {
                 result += "<b>" + OPDE.lang.getString("misc.msg.daily") + "</b>";
             }
-        } else if (schedule.isWoechentlich()) {
+        } else if (schedule.isWeekly()) {
             result += "<b>";
             if (schedule.getWoechentlich() == 1) {
                 result += OPDE.lang.getString("misc.msg.everyWeek") + " ";
@@ -86,7 +86,7 @@ public class PrescriptionScheduleTools {
             }
 
             result += "</b>";
-        } else if (schedule.isMonatlich()) {
+        } else if (schedule.isMonthly()) {
             result += "<b>";
             if (schedule.getMonatlich() == 1) {
                 result += OPDE.lang.getString("misc.msg.everyMonth") + " ";
@@ -146,11 +146,11 @@ public class PrescriptionScheduleTools {
     public static String getRepeatPatternAsCompactText(PrescriptionSchedule schedule) {
         String result = "";
 
-        if (schedule.isTaeglich()) {
+        if (schedule.isDaily()) {
             if (schedule.getTaeglich() > 1) {
                 result += OPDE.lang.getString("misc.msg.every") + " " + schedule.getTaeglich() + " " + OPDE.lang.getString("misc.msg.Days2");
             }
-        } else if (schedule.isWoechentlich()) {
+        } else if (schedule.isWeekly()) {
             String text = "";
             if (schedule.getWoechentlich() == 1) {
 
@@ -175,7 +175,7 @@ public class PrescriptionScheduleTools {
 
             result += text;
 
-        } else if (schedule.isMonatlich()) {
+        } else if (schedule.isMonthly()) {
             String text = "";
             if (schedule.getMonatlich() == 1) {
                 text += OPDE.lang.getString("misc.msg.everyMonth") + " ";
@@ -226,13 +226,13 @@ public class PrescriptionScheduleTools {
     public static Phrase getRepeatPatternAsPhrase(PrescriptionSchedule schedule, boolean writeDaily) {
         Phrase phrase = new Phrase();
 
-        if (schedule.isTaeglich()) {
+        if (schedule.isDaily()) {
             if (schedule.getTaeglich() > 1) {
                 phrase.add(new Chunk(OPDE.lang.getString("misc.msg.every") + " " + schedule.getTaeglich() + " " + OPDE.lang.getString("misc.msg.Days2"), PDF.bold()));
             } else if (writeDaily) {
                 phrase.add(new Chunk("misc.msg.daily", PDF.bold()));
             }
-        } else if (schedule.isWoechentlich()) {
+        } else if (schedule.isWeekly()) {
             String text = "";
             if (schedule.getWoechentlich() == 1) {
 
@@ -257,7 +257,7 @@ public class PrescriptionScheduleTools {
 
             phrase.add(PDF.chunk(text, PDF.bold()));
 
-        } else if (schedule.isMonatlich()) {
+        } else if (schedule.isMonthly()) {
             String text = "";
             if (schedule.getMonatlich() == 1) {
                 text += OPDE.lang.getString("misc.msg.everyMonth") + " ";

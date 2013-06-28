@@ -573,22 +573,22 @@ public class InterventionSchedule implements Serializable, Cloneable, Comparable
 //        if (uhrzeit != null){
 //            return uhrzeit.compareTo(interventionSchedule.getUhrzeit());
 //        }
-//        if (isTaeglich() && !interventionSchedule.isTaeglich()){
+//        if (isDaily() && !interventionSchedule.isDaily()){
 //            return 1;
 //        }
-//        if (!isTaeglich() && interventionSchedule.isTaeglich()){
+//        if (!isDaily() && interventionSchedule.isDaily()){
 //            return -1;
 //        }
-//        if (isTaeglich()){
+//        if (isDaily()){
 //            return new Short(getTaeglich()).compareTo(interventionSchedule.getTaeglich());
 //        }
-//        if (isWoechentlich() && !interventionSchedule.isWoechentlich()){
+//        if (isWeekly() && !interventionSchedule.isWeekly()){
 //            return 1;
 //        }
-//        if (!isWoechentlich() && interventionSchedule.isWoechentlich()){
+//        if (!isWeekly() && interventionSchedule.isWeekly()){
 //            return -1;
 //        }
-//        if (isWoechentlich()){
+//        if (isWeekly()){
 //            return new Short(getWoechentlich()).compareTo(interventionSchedule.getWoechentlich());
 //        }
 //

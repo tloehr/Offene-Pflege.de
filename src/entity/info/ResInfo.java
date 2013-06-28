@@ -329,7 +329,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
 
     @Override
     public long getID() {
-        return bwinfoid;
+        return bwinfoid == null ? 0 : bwinfoid.longValue();
     }
 
 
