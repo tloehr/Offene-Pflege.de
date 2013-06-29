@@ -456,11 +456,12 @@ public class GUITools {
 //        jsp.getVerticalScrollBar().setValue(Math.min(SwingUtilities.convertPoint(component, component.getLocation(), container).y, jsp.getVerticalScrollBar().getMaximum()));
     }
 
-    public static void scroll2show(final JScrollPane jsp, final Component component, Container container, final Closure what2doAfterwards) {
+    public static void scroll2show(final JScrollPane jsp, final JComponent component, Container container, final Closure what2doAfterwards) {
         if (component == null)
             return; // this prevents NULL pointer exceptions when quickly switching the residents after the entry
         final int start = jsp.getVerticalScrollBar().getValue();
         final int end = SwingUtilities.convertPoint(component, component.getLocation(), container).y;
+
         if (OPDE.isAnimation()) {
             final int distance = end - start;
             final TimingSource ts = new SwingTimerTimingSource();
@@ -473,14 +474,25 @@ public class GUITools {
                 }
 
                 @Override
-                public void timingEvent(Animator animator, double fraction) {
+                public void timingEvent(final Animator animator, double fraction) {
                     final BigDecimal value = new BigDecimal(start).add(new BigDecimal(fraction).multiply(new BigDecimal(distance)));
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            jsp.getVerticalScrollBar().setValue(value.intValue());
+                            Rectangle r = component.getVisibleRect();
+                            if (r.getSize().equals(component.getSize())) {
+                                animator.stop();
+                            } else if (r.isEmpty()) {
+                                OPDE.debug("not visible");
+                                jsp.getVerticalScrollBar().setValue(value.intValue());
+                            } else {
+                                OPDE.debug("partly visible");
+                                jsp.getVerticalScrollBar().setValue(value.intValue());
+                            }
                         }
                     });
+
+
                 }
 
                 @Override

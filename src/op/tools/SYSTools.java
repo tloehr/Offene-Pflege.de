@@ -1929,6 +1929,7 @@ public class SYSTools {
             ftp.setUserName(FTPUser);
             ftp.setPassword(FTPPassword);
             ftp.setRemotePort(FTPPort);
+            ftp.setTimeout(5000);
             ftp.connect();
             ftp.getAdvancedFTPSettings().setConnectMode(FTPConnectMode.PASV);
             ftp.changeDirectory(FTPWorkingDirectory);

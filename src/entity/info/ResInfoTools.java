@@ -1291,7 +1291,7 @@ public class ResInfoTools {
         DateMidnight from = new DateMidnight().minusMonths(monthsback).dayOfMonth().withMinimumValue();
         EntityManager em = OPDE.createEM();
         DateFormat df = DateFormat.getDateInstance();
-        SimpleDateFormat monthFormatter = new SimpleDateFormat("MMMM yyyy");
+
         int p = -1;
         progress.execute(new Pair<Integer, Integer>(p, 100));
 
@@ -1306,19 +1306,6 @@ public class ResInfoTools {
         query1.setParameter("type", ResInfoTypeTools.TYPE_FALL);
         query1.setParameter("from", from.toDate());
         ArrayList<QProcessElement> listData = new ArrayList<QProcessElement>(query1.getResultList());
-
-//        String jpql2 = " " +
-//                " SELECT n FROM NReport n " +
-//                " JOIN n.tags t " +
-//                " WHERE n.pit > :from " +
-//                " AND n.resident.adminonly <> 2 " +
-//                " AND n.replacedBy IS NULL " +
-//                " AND t.system = :tagsystem " +
-//                " ORDER BY n.resident.rid, n.pit DESC ";
-//        Query query2 = em.createQuery(jpql2);
-//        query2.setParameter("tagsystem", NReportTAGSTools.TYPE_SYS_FALLS);
-//        query2.setParameter("from", from.toDate());
-//        listData.addAll(new ArrayList<QProcessElement>(query2.getResultList()));
 
         p = 0;
         HashMap<Resident, ArrayList<QProcessElement>> dataMap = new HashMap<Resident, ArrayList<QProcessElement>>();

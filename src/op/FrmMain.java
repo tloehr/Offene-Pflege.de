@@ -40,11 +40,9 @@ import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideSplitPane;
 import entity.Station;
 import entity.StationTools;
-import entity.files.SYSFilesTools;
-import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
-import entity.info.TXEssenDoc1;
+import entity.info.TXEssenDoc;
 import entity.prescription.PrescriptionTools;
 import entity.system.SYSLoginTools;
 import entity.system.SYSPropsTools;
@@ -252,16 +250,17 @@ public class FrmMain extends JFrame {
     private void btnTXActionPerformed(ActionEvent e) {
         if (currentResident != null) {
 
+            new TXEssenDoc(currentResident);
 
-            if ((e.getModifiers() & InputEvent.CTRL_MASK) != 0) {
-                SYSFilesTools.print(ResInfoTools.getTXReport(currentResident, true, true, true, true, true, true, true, true, true), true);
-            } else {
-                new TXEssenDoc1(currentResident);
-
-            }
-
-
+//            if ((e.getModifiers() & InputEvent.CTRL_MASK) != 0) {
+//                SYSFilesTools.print(ResInfoTools.getTXReport(currentResident, true, true, true, true, true, true, true, true, true), true);
+//            } else {
 //
+//
+//            }
+//
+
+
         } else {
             displayManager.addSubMessage(new DisplayMessage("misc.msg.choose.a.resident.first"));
         }

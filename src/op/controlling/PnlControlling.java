@@ -139,7 +139,7 @@ public class PnlControlling extends CleanablePanel {
         final CollapsiblePane cpOrga = new CollapsiblePane();
 
         String title = "<html><font size=+1>" +
-                OPDE.lang.getString(internalClassID + ".orga") +
+                OPDE.lang.getString("opde.controlling.orga") +
                 "</font></html>";
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
@@ -176,7 +176,7 @@ public class PnlControlling extends CleanablePanel {
         final CollapsiblePane cpOrga = new CollapsiblePane();
 
         String title = "<html><font size=+1>" +
-                OPDE.lang.getString(internalClassID + ".nutrition") +
+                OPDE.lang.getString("opde.controlling.nutrition") +
                 "</font></html>";
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
@@ -213,7 +213,7 @@ public class PnlControlling extends CleanablePanel {
         final CollapsiblePane cpOrga = new CollapsiblePane();
 
         String title = "<html><font size=+1>" +
-                OPDE.lang.getString(internalClassID + ".drugs") +
+                OPDE.lang.getString("opde.controlling.drugs") +
                 "</font></html>";
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
@@ -249,7 +249,7 @@ public class PnlControlling extends CleanablePanel {
         final CollapsiblePane cpOrga = new CollapsiblePane();
 
         String title = "<html><font size=+1>" +
-                OPDE.lang.getString(internalClassID + ".nursing") +
+                OPDE.lang.getString("opde.controlling.nursing") +
                 "</font></html>";
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
@@ -294,10 +294,10 @@ public class PnlControlling extends CleanablePanel {
          *
          */
         JPanel pnlBV = new JPanel(new BorderLayout());
-        final JButton btnBVActivities = GUITools.createHyperlinkButton(internalClassID + ".orga.bvactivities", null, null);
+        final JButton btnBVActivities = GUITools.createHyperlinkButton("opde.controlling.orga.bvactivities", null, null);
         int bvWeeksBack;
         try {
-            bvWeeksBack = Integer.parseInt(OPDE.getProps().getProperty(internalClassID + "::bvactivitiesWeeksBack"));
+            bvWeeksBack = Integer.parseInt(OPDE.getProps().getProperty("opde.controlling::bvactivitiesWeeksBack"));
         } catch (NumberFormatException nfe) {
             bvWeeksBack = 7;
         }
@@ -311,7 +311,7 @@ public class PnlControlling extends CleanablePanel {
                 SwingWorker worker = new SwingWorker() {
                     @Override
                     protected Object doInBackground() throws Exception {
-                        SYSPropsTools.storeProp(internalClassID + "::bvactivitiesWeeksBack", txtBVWeeksBack.getText(), OPDE.getLogin().getUser());
+                        SYSPropsTools.storeProp("opde.controlling::bvactivitiesWeeksBack", txtBVWeeksBack.getText(), OPDE.getLogin().getUser());
                         SYSFilesTools.print(NReportTools.getBVActivites(new DateMidnight().minusWeeks(Integer.parseInt(txtBVWeeksBack.getText())), progressClosure), false);
                         return null;
                     }
@@ -339,10 +339,10 @@ public class PnlControlling extends CleanablePanel {
          *                         |_|
          */
         JPanel pnlComplaints = new JPanel(new BorderLayout());
-        final JButton btnComplaints = GUITools.createHyperlinkButton(internalClassID + ".orga.complaints", null, null);
+        final JButton btnComplaints = GUITools.createHyperlinkButton("opde.controlling.orga.complaints", null, null);
         int complaintsMonthBack;
         try {
-            complaintsMonthBack = Integer.parseInt(OPDE.getProps().getProperty(internalClassID + "::complaintsMonthBack"));
+            complaintsMonthBack = Integer.parseInt(OPDE.getProps().getProperty("opde.controlling::complaintsMonthBack"));
         } catch (NumberFormatException nfe) {
             complaintsMonthBack = 7;
         }
@@ -356,7 +356,7 @@ public class PnlControlling extends CleanablePanel {
                 SwingWorker worker = new SwingWorker() {
                     @Override
                     protected Object doInBackground() throws Exception {
-                        SYSPropsTools.storeProp(internalClassID + "::complaintsMonthBack", txtComplaintsMonthsBack.getText(), OPDE.getLogin().getUser());
+                        SYSPropsTools.storeProp("opde.controlling::complaintsMonthBack", txtComplaintsMonthsBack.getText(), OPDE.getLogin().getUser());
                         SYSFilesTools.print(QProcessTools.getComplaintsAnalysis(Integer.parseInt(txtComplaintsMonthsBack.getText()), progressClosure), false);
                         return null;
                     }
@@ -390,10 +390,10 @@ public class PnlControlling extends CleanablePanel {
          *
          */
         JPanel pnlWounds = new JPanel(new BorderLayout());
-        final JButton btnWounds = GUITools.createHyperlinkButton(internalClassID + ".nursing.wounds", null, null);
+        final JButton btnWounds = GUITools.createHyperlinkButton("opde.controlling.nursing.wounds", null, null);
         int woundsMonthsBack;
         try {
-            woundsMonthsBack = Integer.parseInt(OPDE.getProps().getProperty(internalClassID + "::woundsMonthsBack"));
+            woundsMonthsBack = Integer.parseInt(OPDE.getProps().getProperty("opde.controlling::woundsMonthsBack"));
         } catch (NumberFormatException nfe) {
             woundsMonthsBack = 7;
         }
@@ -407,7 +407,7 @@ public class PnlControlling extends CleanablePanel {
                 SwingWorker worker = new SwingWorker() {
                     @Override
                     protected Object doInBackground() throws Exception {
-                        SYSPropsTools.storeProp(internalClassID + "::woundsMonthsBack", txtWoundsMonthsBack.getText(), OPDE.getLogin().getUser());
+                        SYSPropsTools.storeProp("opde.controlling::woundsMonthsBack", txtWoundsMonthsBack.getText(), OPDE.getLogin().getUser());
                         SYSFilesTools.print(getWounds(Integer.parseInt(txtWoundsMonthsBack.getText()), progressClosure), false);
                         return null;
                     }
@@ -435,7 +435,7 @@ public class PnlControlling extends CleanablePanel {
          *
          */
         JPanel pblSocialTimes = new JPanel(new BorderLayout());
-        final JButton btnSocialTimes = GUITools.createHyperlinkButton(internalClassID + ".nursing.social", null, null);
+        final JButton btnSocialTimes = GUITools.createHyperlinkButton("opde.controlling.nursing.social", null, null);
         final JComboBox cmbSocialTimes = new JComboBox(SYSCalendar.createMonthList(new DateMidnight().minusYears(1), new DateMidnight()));
         btnSocialTimes.addActionListener(new ActionListener() {
             @Override
@@ -478,10 +478,10 @@ public class PnlControlling extends CleanablePanel {
          *                                                    |___/
          */
         JPanel pnlFallsAnon = new JPanel(new BorderLayout());
-        final JButton btnFallsAnon = GUITools.createHyperlinkButton(internalClassID + ".nursing.falls.anonymous", null, null);
+        final JButton btnFallsAnon = GUITools.createHyperlinkButton("opde.controlling.nursing.falls.anonymous", null, null);
         int fallsMonthsBack;
         try {
-            fallsMonthsBack = Integer.parseInt(OPDE.getProps().getProperty(internalClassID + "::fallsMonthsBack"));
+            fallsMonthsBack = Integer.parseInt(OPDE.getProps().getProperty("opde.controlling::fallsMonthsBack"));
         } catch (NumberFormatException nfe) {
             fallsMonthsBack = 7;
         }
@@ -495,7 +495,7 @@ public class PnlControlling extends CleanablePanel {
                 SwingWorker worker = new SwingWorker() {
                     @Override
                     protected Object doInBackground() throws Exception {
-                        SYSPropsTools.storeProp(internalClassID + "::fallsMonthsBack", txtFallsMonthsBack.getText(), OPDE.getLogin().getUser());
+                        SYSPropsTools.storeProp("opde.controlling::fallsMonthsBack", txtFallsMonthsBack.getText(), OPDE.getLogin().getUser());
                         SYSFilesTools.print(ResInfoTools.getFallsAnonymous(Integer.parseInt(txtFallsMonthsBack.getText()), progressClosure), false);
                         return null;
                     }
@@ -522,10 +522,10 @@ public class PnlControlling extends CleanablePanel {
          *                                |___/
          */
         JPanel pnlFallsRes = new JPanel(new BorderLayout());
-        final JButton btnFallsRes = GUITools.createHyperlinkButton(internalClassID + ".nursing.falls.byResident", null, null);
+        final JButton btnFallsRes = GUITools.createHyperlinkButton("opde.controlling.nursing.falls.byResident", null, null);
         int fallsResMonthsBack;
         try {
-            fallsResMonthsBack = Integer.parseInt(OPDE.getProps().getProperty(internalClassID + "::fallsResMonthsBack"));
+            fallsResMonthsBack = Integer.parseInt(OPDE.getProps().getProperty("opde.controlling::fallsResMonthsBack"));
         } catch (NumberFormatException nfe) {
             fallsResMonthsBack = 7;
         }
@@ -539,7 +539,7 @@ public class PnlControlling extends CleanablePanel {
                 SwingWorker worker = new SwingWorker() {
                     @Override
                     protected Object doInBackground() throws Exception {
-                        SYSPropsTools.storeProp(internalClassID + "::fallsResMonthsBack", txtResFallsMonthsBack.getText(), OPDE.getLogin().getUser());
+                        SYSPropsTools.storeProp("opde.controlling::fallsResMonthsBack", txtResFallsMonthsBack.getText(), OPDE.getLogin().getUser());
                         SYSFilesTools.print(ResInfoTools.getFallsByResidents(Integer.parseInt(txtResFallsMonthsBack.getText()), progressClosure), false);
                         return null;
                     }
@@ -574,7 +574,7 @@ public class PnlControlling extends CleanablePanel {
          *                       |___/
          */
         JPanel pnlDrugControl = new JPanel(new BorderLayout());
-        final JButton btnDrugControl = GUITools.createHyperlinkButton(internalClassID + ".drugs.controllist", null, null);
+        final JButton btnDrugControl = GUITools.createHyperlinkButton("opde.controlling.drugs.controllist", null, null);
         final JComboBox cmbStation = new JComboBox(StationTools.getAll4Combobox(false));
         btnDrugControl.addActionListener(new ActionListener() {
             @Override
@@ -617,7 +617,7 @@ public class PnlControlling extends CleanablePanel {
          *             |_|
          */
         JPanel pnlLiquidBalance = new JPanel(new BorderLayout());
-        final JButton btnLiquidBalance = GUITools.createHyperlinkButton(internalClassID + ".nutrition.liquidbalance", null, null);
+        final JButton btnLiquidBalance = GUITools.createHyperlinkButton("opde.controlling.nutrition.liquidbalance", null, null);
         final JComboBox cmbLiquidBalanceMonth = new JComboBox(SYSCalendar.createMonthList(new DateMidnight().minusYears(1), new DateMidnight()));
         btnLiquidBalance.addActionListener(new ActionListener() {
             @Override
@@ -660,10 +660,10 @@ public class PnlControlling extends CleanablePanel {
          *                     |___/
          */
         JPanel pnlWeight = new JPanel(new BorderLayout());
-        final JButton btnWeightStats = GUITools.createHyperlinkButton(internalClassID + ".nutrition.weightstats", null, null);
+        final JButton btnWeightStats = GUITools.createHyperlinkButton("opde.controlling.nutrition.weightstats", null, null);
         int wsMonthsBack;
         try {
-            wsMonthsBack = Integer.parseInt(OPDE.getProps().getProperty(internalClassID + "::wsMonthsBack"));
+            wsMonthsBack = Integer.parseInt(OPDE.getProps().getProperty("opde.controlling::wsMonthsBack"));
         } catch (NumberFormatException nfe) {
             wsMonthsBack = 7;
         }
@@ -676,7 +676,7 @@ public class PnlControlling extends CleanablePanel {
                 SwingWorker worker = new SwingWorker() {
                     @Override
                     protected Object doInBackground() throws Exception {
-                        SYSPropsTools.storeProp(internalClassID + "::wsMonthsBack", txtWSMonthsBack.getText(), OPDE.getLogin().getUser());
+                        SYSPropsTools.storeProp("opde.controlling::wsMonthsBack", txtWSMonthsBack.getText(), OPDE.getLogin().getUser());
                         SYSFilesTools.print(ResValueTools.getWeightStats(Integer.parseInt(txtWSMonthsBack.getText()), progressClosure), false);
                         return null;
                     }
@@ -778,7 +778,7 @@ public class PnlControlling extends CleanablePanel {
         ArrayList<Resident> listResident = new ArrayList<Resident>(listData.keySet());
         Collections.sort(listResident);
 
-        html.append(SYSConst.html_h1(OPDE.lang.getString(PnlControlling.internalClassID + ".nursing.wounds") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
+        html.append(SYSConst.html_h1(OPDE.lang.getString("opde.controlling.nursing.wounds") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
 //        html.append(SYSConst.html_h2(OPDE.lang.getString("misc.msg.analysis") + ": " + );
 
         p = 0;

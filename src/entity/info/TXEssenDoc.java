@@ -33,7 +33,7 @@ import java.util.*;
  * Time: 17:18
  * To change this template use File | Settings | File Templates.
  */
-public class TXEssenDoc1 {
+public class TXEssenDoc {
 
     public static final String SOURCEDOC1 = "ueberleitungsbogen_121029.pdf";
     public static final String SOURCEMRE = "anlage_mre_130207.pdf";
@@ -57,7 +57,7 @@ public class TXEssenDoc1 {
     boolean mre, psych = false;
     int progress, max;
 
-    public TXEssenDoc1(Resident res) {
+    public TXEssenDoc(Resident res) {
         OPDE.getMainframe().setBlocked(true);
         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
 
@@ -419,8 +419,7 @@ public class TXEssenDoc1 {
             content.put(TXEAF.RESIDENT_PHONE, resident.getStation().getHome().getTel());
             content.put(TXEAF.PAGE2_PHONE, resident.getStation().getHome().getTel());
             content.put(TXEAF.PAGE1_LOGO_TEXTFIELD, HomesTools.getAsTextForTX(resident.getStation().getHome()));
-            content.put(TXEAF.PAGE3_LOGO_TEXTFIELD, HomesTools.getAsTextForTX(resident.getStation().getHome()));
-
+            content.put(TXEAF.PAGE3_LOGO_TEXTFIELD, HomesTools.getAsText(resident.getStation().getHome()));
         }
 
         content.put(TXEAF.TX_DATE, DateFormat.getDateInstance().format(new Date()));
@@ -1262,7 +1261,7 @@ public class TXEssenDoc1 {
         content.put(TXEAF.MRE_MRSA1, setCheckbox(getValue(ResInfoTypeTools.TYPE_INFECTION, "mrsa")));
         content.put(TXEAF.MRE_MRSA2, setCheckbox(getValue(ResInfoTypeTools.TYPE_INFECTION, "mrsa")));
         content.put(TXEAF.MRE_VRE, setCheckbox(getValue(ResInfoTypeTools.TYPE_INFECTION, "vre")));
-        content.put(TXEAF.MRE_ESBL, setCheckbox(getValue(ResInfoTypeTools.TYPE_INFECTION, "mrsa")));
+        content.put(TXEAF.MRE_ESBL, setCheckbox(getValue(ResInfoTypeTools.TYPE_INFECTION, "esbl")));
         content.put(TXEAF.MRE_MRE_TEXTFIELD, getValue(ResInfoTypeTools.TYPE_INFECTION, "other"));
         content.put(TXEAF.MRE_LAB_CONFIRMED, setYesNoRadiobutton(getValue(ResInfoTypeTools.TYPE_INFECTION, "lab").equalsIgnoreCase("confirmed")));
         content.put(TXEAF.MRE_LAB_WAITING, setCheckbox(getValue(ResInfoTypeTools.TYPE_INFECTION, "lab").equalsIgnoreCase("waiting")));
@@ -1287,7 +1286,7 @@ public class TXEssenDoc1 {
                 int listpos = bodyParts.indexOf(bodykey);
                 OPDE.debug(listpos);
                 // does this property denote a body part AND is it clicked ?
-                content.put(TXEAF.PDFPARTSMRE[listpos], setCheckbox(bodyParts.contains(bodykey) && mapInfo2Properties.get(ResInfoTypeTools.TYPE_INFECTION).getProperty(key).equalsIgnoreCase("true")));
+                content.put(TXEAF.PDFPARTSMRE[listpos], setCheckbox(bodyParts.contains(bodykey) && mapInfo2Properties.get(mapID2Info.get(ResInfoTypeTools.TYPE_INFECTION)).getProperty(key).equalsIgnoreCase("true")));
             }
         }
 

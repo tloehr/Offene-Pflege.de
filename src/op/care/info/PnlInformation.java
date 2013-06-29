@@ -841,7 +841,7 @@ public class PnlInformation extends NursingRecordsPanel {
             }
         });
         cptitle.getRight().add(btnPrint);
-
+        btnPrint.setEnabled(btnMenuEnabled);
 
         // forward declaration
         final JButton btnEdit = new JButton(SYSConst.icon22edit3);

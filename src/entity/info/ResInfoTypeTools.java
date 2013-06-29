@@ -31,7 +31,7 @@ public class ResInfoTypeTools {
     public static final int TYPE_INFECTION = 99;
     public static final int TYPE_DIABETES = 98;
     public static final int TYPE_DIAGNOSIS = 50;
-    public static final int TYPE_FALL = 30; // Sturz
+    public static final int TYPE_FALL = 30; // Sturzprotokoll
     public static final int TYPE_OLD = -1;
 
     public static final int TYPE_WARNING = 96;
