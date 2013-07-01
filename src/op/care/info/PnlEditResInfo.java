@@ -34,6 +34,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.Font;
 import java.awt.event.*;
@@ -57,6 +58,10 @@ import java.util.*;
  */
 public class PnlEditResInfo {
 
+    public static final int EDIT = 0;
+    public static final int CHANGE = 1;
+    public static final int NEW = 2;
+    public static final int DISPLAY = 3;
 
     public static final String internalClassID = "nursingrecords.info.dlg";
     private final int TYPE_DONT_CARE = 0;
@@ -64,9 +69,8 @@ public class PnlEditResInfo {
     private final int TYPE_DOUBLE = 2;
     private final int TYPE_DATE = 3;
     private final int TYPE_TIME = 4;
-    private boolean newmode;
-    private boolean scalemode = false;
-    private boolean enabled;
+    private int mode;
+    private boolean scalemode;
     private final int TEXTFIELD_STANDARD_WIDTH = 35;
 
     boolean initPanel = false;
@@ -76,9 +80,12 @@ public class PnlEditResInfo {
 
     private ArrayList<RiskBean> scaleriskmodel;
     private String scalesumlabeltext;
-    private ArrayList<String> scaleButtonGroups; // eine Liste mit den Namen der Buttongroups eines scales;
+    private ArrayList<String> scaleButtonGroups, defaultdisabled; // eine Liste mit den Namen der Buttongroups eines scales;
     private HashMap<String, Object> components;
+    private ArrayList<String> lockedforchanges;
     private ArrayList<JComponent> focusTraversal;
+    private HashMap<String, ArrayList<String>> enables, disables;
+    private HashMap<String, String> enabledBy, disabledBy;
     private ResInfo resInfo;
     private Closure closure;
     private JPanel pnlContent, main;
@@ -88,14 +95,15 @@ public class PnlEditResInfo {
     Exception lastParsingException;
     Color background;
 
-    public PnlEditResInfo(ResInfo resInfo, Color basecolor, boolean newmode) {
-        this(resInfo, null, basecolor, newmode);
+
+    public PnlEditResInfo(ResInfo resInfo, Color basecolor) {
+        this(resInfo, null, basecolor);
     }
 
-    public PnlEditResInfo(ResInfo resInfo, Closure closure, Color basecolor, boolean newmode) {
+    public PnlEditResInfo(ResInfo resInfo, Closure closure, Color basecolor) {
         this.resInfo = resInfo;
         this.closure = closure;
-        this.newmode = newmode;
+        this.mode = DISPLAY;
         if (basecolor != null) {
             background = GUITools.blend(basecolor, Color.WHITE, 0.1f);
         }
@@ -134,12 +142,29 @@ public class PnlEditResInfo {
     public PnlEditResInfo(String xml, Closure closure) {
         this.resInfo = null;
         this.closure = closure;
+        this.mode = NEW;
         initPanel(xml);
+    }
+
+    public void cleanup() {
+//        focusTraversal.clear();
+//        enables.clear();
+//        disables.clear();
+//        lockedforchanges.clear();
+//        components.clear();
+//        enabledBy.clear();
+//        disabledBy.clear();
     }
 
     private void initPanel(String xml) {
         content = new Properties();
         focusTraversal = new ArrayList<JComponent>();
+        lockedforchanges = new ArrayList<String>();
+        enables = new HashMap<String, ArrayList<String>>();
+        disables = new HashMap<String, ArrayList<String>>();
+        defaultdisabled = new ArrayList<String>();
+        enabledBy = new HashMap<String, String>();
+        disabledBy = new HashMap<String, String>();
 
         pnlContent = new JPanel(new BorderLayout());
         initPanel = true;
@@ -239,6 +264,7 @@ public class PnlEditResInfo {
                 } else {
                     closure.execute(content);
                 }
+                cleanup();
             }
         });
         btnPanel.add(apply, BorderLayout.LINE_END);
@@ -252,6 +278,7 @@ public class PnlEditResInfo {
             @Override
             public void actionPerformed(ActionEvent e) {
                 closure.execute(null);
+                cleanup();
             }
         });
         btnPanel.add(cancel, BorderLayout.LINE_END);
@@ -322,7 +349,7 @@ public class PnlEditResInfo {
                 }
             });
         }
-        setEnabled(false);
+        setXEnabled(main, false);
     }
 
     public Exception getLastParsingException() {
@@ -424,16 +451,6 @@ public class PnlEditResInfo {
 
             final PDF pdf = new PDF(null, "", 10);
 
-
-//            pdf.getDocument().open();
-
-            //                html += "<h3 id=\"fonth2\" >" + ResidentTools.getLabelText(resident) + "</h2>\n";
-            //                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_INFECTION ? SYSConst.html_48x48_biohazard : "";
-            //                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_DIABETES ? SYSConst.html_48x48_diabetes : "";
-            //                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_ALLERGY ? SYSConst.html_48x48_allergy : "";
-            //                html += resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_WARNING ? SYSConst.html_48x48_warning : "";
-
-
             Paragraph h1 = new Paragraph(new Phrase(OPDE.lang.getString("nursingrecords.info.single"), PDF.plain(PDF.sizeH1())));
             h1.setAlignment(Element.ALIGN_CENTER);
             pdf.getDocument().add(h1);
@@ -467,9 +484,9 @@ public class PnlEditResInfo {
             }
             pdf.getDocument().add(p1);
 
-            setEnabled(true);
+            setXEnabled(main, false);
             Image image = Image.getInstance(GUITools.getAsImage(pnlContent).toByteArray());
-            setEnabled(false);
+            setXEnabled(main, true);
 
             image.scaleToFit(Utilities.millimetersToPoints(170f), Utilities.millimetersToPoints(170f));
 
@@ -531,9 +548,47 @@ public class PnlEditResInfo {
         return pnlContent;
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-        SYSTools.setXEnabled(main, enabled);
+    public void setEnabled(boolean enabled, int mode) {
+        this.mode = mode;
+        setXEnabled(main, enabled);
+    }
+
+
+    /**
+     * läuft rekursiv durch alle Kinder eines Containers und setzt deren Enabled Status auf
+     * enabled.
+     */
+    private void setXEnabled(JComponent container, boolean enabled) {
+        // Bei einer Combobox muss die Rekursion ebenfalls enden.
+        // Sie besteht aus weiteren Unterkomponenten
+        // "disabled" wird sie aber bereits hier.
+        if (container.getComponentCount() == 0 || container instanceof JComboBox) {
+            // Rekursionsanker
+            container.setEnabled(enabled);
+        } else {
+            Component[] c = container.getComponents();
+            for (int i = 0; i < c.length; i++) {
+                if (c[i] instanceof JComponent) {
+                    JComponent jc = (JComponent) c[i];
+
+                    OPDE.debug(SYSTools.catchNull(jc.getName()));
+
+                    if (!enabled) {
+                        setXEnabled(jc, enabled);
+                    } else if (mode == CHANGE && lockedforchanges.contains(jc.getName())) {
+                        setXEnabled(jc, false);
+                    } else if (mode == NEW && defaultdisabled.contains(jc.getName())) {
+                        setXEnabled(jc, false);
+                    } else if (enabledBy.containsKey(jc.getName())) {
+                        setXEnabled(jc, ((JCheckBox) components.get(enabledBy.get(jc.getName()))).isSelected());
+                    } else if (disabledBy.containsKey(jc.getName())) {
+                        setXEnabled(jc, !((JCheckBox) components.get(disabledBy.get(jc.getName()))).isSelected());
+                    } else {
+                        setXEnabled(jc, enabled);
+                    }
+                }
+            }
+        }
     }
 
     private void calcScale() {
@@ -616,6 +671,8 @@ public class PnlEditResInfo {
                 ((Pair<JRadioButton, BigDecimal>) entry).getFirst().setSelected(content.getProperty(tagname).equals(value));
             } else if (entry instanceof JCheckBox) {
                 ((JCheckBox) entry).setSelected(content.getProperty(key.toString()).equalsIgnoreCase("true"));
+
+
             } else if (entry instanceof JTextField) {
                 ((JTextField) entry).setText(SYSTools.unescapeXML(content.getProperty(key.toString())));
             } else if (entry instanceof PnlBodyScheme) {
@@ -668,14 +725,45 @@ public class PnlEditResInfo {
         }
     }
 
-    private class CheckBoxActionListener implements ActionListener {
-        public void actionPerformed(ActionEvent evt) {
+    private class CheckBoxItemListener implements ItemListener {
+
+        @Override
+        public void itemStateChanged(ItemEvent evt) {
             JCheckBox j = (JCheckBox) evt.getSource();
             String cbname = j.getName();
             content.put(cbname, Boolean.toString(j.isSelected()));
             changed = true;
+
+            if (enables.containsKey(cbname)) {
+                for (String key : enables.get(cbname)) {
+                    if (components.containsKey(key) && components.get(key) instanceof Component) {
+                        ((Component) components.get(key)).setEnabled(j.isSelected());
+                        //                        if (components.get(key) instanceof JComboBox) {
+                        //                            ((JComboBox) components.get(key)).setSelectedIndex(0);
+                        //                        }
+                        if (components.get(key) instanceof JTextComponent) {
+                            ((JTextComponent) components.get(key)).setText("");
+                        }
+                    }
+                }
+            }
+            if (disables.containsKey(cbname)) {
+                for (String key : disables.get(cbname)) {
+                    if (components.containsKey(key) && components.get(key) instanceof Component) {
+                        ((Component) components.get(key)).setEnabled(!j.isSelected());
+                        //                        if (components.get(key) instanceof JComboBox) {
+                        //                            ((JComboBox) components.get(key)).setSelectedIndex(-1);
+                        //                        }
+                        if (components.get(key) instanceof JTextComponent) {
+                            ((JTextComponent) components.get(key)).setText(null);
+                        }
+                    }
+                }
+            }
         }
+
     }
+
 
     private class ComboBoxItemStateListener implements ItemListener {
 
@@ -958,7 +1046,8 @@ public class PnlEditResInfo {
 
 
                 components.put(groupname, j); // für den späteren Direktzugriff
-                j.addActionListener(new CheckBoxActionListener());
+//                j.addActionListener(new CheckBoxActionListener());
+                j.addItemListener(new CheckBoxItemListener());
 
                 String layout = SYSTools.catchNull(attributes.getValue("layout"), tabgroup ? "tab" : "br left");
                 outerpanel.add(layout, j);
@@ -968,6 +1057,31 @@ public class PnlEditResInfo {
                     j.setSelected(true);
                 }
                 content.put(groupname, (j.isSelected() ? "true" : "false"));
+                if (SYSTools.catchNull(attributes.getValue("lockedforchanges"), "false").equalsIgnoreCase("true")) {
+                    lockedforchanges.add(groupname);
+                }
+                if (!SYSTools.catchNull(attributes.getValue("enables")).isEmpty()) {
+                    StringTokenizer st = new StringTokenizer(attributes.getValue("enables"), ",");
+                    while (st.hasMoreTokens()) {
+                        if (!enables.containsKey(groupname)) {
+                            enables.put(groupname, new ArrayList<String>());
+                        }
+                        String token = st.nextToken();
+                        enables.get(groupname).add(token);
+                        enabledBy.put(token, groupname);
+                    }
+                }
+                if (!SYSTools.catchNull(attributes.getValue("disables")).isEmpty()) {
+                    StringTokenizer st = new StringTokenizer(attributes.getValue("disables"), ",");
+                    while (st.hasMoreTokens()) {
+                        if (!disables.containsKey(groupname)) {
+                            disables.put(groupname, new ArrayList<String>());
+                        }
+                        String token = st.nextToken();
+                        disables.get(groupname).add(token);
+                        disabledBy.put(token, groupname);
+                    }
+                }
             }
             /***
              *      _           _    __ _     _    _
@@ -1024,7 +1138,9 @@ public class PnlEditResInfo {
                 j.addFocusListener(tffl);
                 //                j.addCaretListener(new TextFieldCaretListener(type, notempty));
 //                String defaultText = SYSTools.catchNull(attributes.getValue("default"));
-                j.setText(getPreset(attributes.getValue("preset"), attributes.getValue("default")));
+                if (mode != CHANGE) {
+                    j.setText(getPreset(attributes.getValue("preset"), attributes.getValue("default")));
+                }
                 content.put(groupname, j.getText());
             }
             // ---------------------- Separators --------------------------------
@@ -1084,7 +1200,7 @@ public class PnlEditResInfo {
              *     \__\___/ .__/\_, |_| |_| \___/_|_|_\__\___|_|_|_| .__/_\__,_|\__\___|
              *            |_|   |__/                               |_|
              */
-            if (newmode && tagName.equalsIgnoreCase("copyfromtemplate")) {
+            if (mode != CHANGE && tagName.equalsIgnoreCase("copyfromtemplate")) {
 
                 JPanel pnl = new JPanel(new RiverLayout());
 
@@ -1218,7 +1334,12 @@ public class PnlEditResInfo {
                 outerpanel.add(layout, jl);
                 outerpanel.add("left", jcb);
                 addInfoButtons(outerpanel, attributes.getValue("tooltip"), attributes.getValue("tx"));
-
+//                if (SYSTools.catchNull(attributes.getValue("defaultdisabled"), "false").equalsIgnoreCase("true")) {
+//                    defaultdisabled.add(groupname);
+//                }
+                if (SYSTools.catchNull(attributes.getValue("lockedforchanges"), "false").equalsIgnoreCase("true")) {
+                    lockedforchanges.add(groupname);
+                }
             }
             /***
              *      _ _
@@ -1232,6 +1353,10 @@ public class PnlEditResInfo {
                 if (SYSTools.catchNull(attributes.getValue("default")).equals("true")) {
                     content.put(groupname, attributes.getValue("name"));
                 }
+            }
+
+            if (SYSTools.catchNull(attributes.getValue("defaultdisabled"), "false").equalsIgnoreCase("true")) {
+                defaultdisabled.add(groupname);
             }
         }
 
@@ -1266,7 +1391,6 @@ public class PnlEditResInfo {
                     });
                 }
             }
-
         }
 
         public JPanel getPanel() {

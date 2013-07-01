@@ -11,6 +11,7 @@ import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Properties;
 
@@ -41,7 +42,10 @@ public class PnlBodyScheme extends JPanel {
         this.name = name;
         this.itemListener = itemListener;
         try {
-            bimg = ImageIO.read(new File(this.getClass().getResource("/artwork/body-scheme.png").getPath()));
+//            SYSConst.class.getResource("/artwork/other/medicine4.png")
+            String path = "artwork/body-scheme.png";
+            bimg = ImageIO.read(getClass().getClassLoader().getResource(path));
+
         } catch (IOException e) {
             OPDE.fatal(e);
         }

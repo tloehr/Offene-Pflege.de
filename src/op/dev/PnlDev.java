@@ -57,7 +57,7 @@ public class PnlDev extends CleanablePanel {
         });
 
         if (pnlEditResInfo.getLastParsingException() == null) {
-            pnlEditResInfo.setEnabled(true);
+            pnlEditResInfo.setEnabled(true, PnlEditResInfo.NEW);
             popup.setMovable(false);
             popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
             JScrollPane scrl = new JScrollPane(pnlEditResInfo.getPanel());

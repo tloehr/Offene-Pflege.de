@@ -537,13 +537,13 @@ public class PnlInformation extends NursingRecordsPanel {
                                                         }
                                                     }
                                                 }
-                                            }, resInfoType.getResInfoCat().getColor(), true);
-                                            pnlEditResInfo.setEnabled(true);
+                                            }, resInfoType.getResInfoCat().getColor());
+                                            pnlEditResInfo.setEnabled(true, PnlEditResInfo.NEW);
 
                                             popup.setMovable(false);
                                             popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
                                             JScrollPane scrl = new JScrollPane(pnlEditResInfo.getPanel());
-                                            scrl.setPreferredSize(new Dimension(pnlEditResInfo.getPanel().getPreferredSize().width + 100, Math.min(pnlEditResInfo.getPanel().getPreferredSize().height, OPDE.getMainframe().getHeight())));
+                                            scrl.setPreferredSize(new Dimension(pnlEditResInfo.getPanel().getPreferredSize().width + 100, Math.min(pnlEditResInfo.getPanel().getPreferredSize().height, OPDE.getMainframe().getHeight())-100));
 
                                             popup.setOwner(btnAdd);
                                             popup.removeExcludedComponent(btnAdd);
@@ -873,7 +873,7 @@ public class PnlInformation extends NursingRecordsPanel {
                 }
                 btnPrint.setEnabled(false);
                 btnMenu.setEnabled(false);
-                mapInfo2Editor.get(resInfo).setEnabled(resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD && !resInfo.isClosed() && !resInfo.isSingleIncident() && !resInfo.isNoConstraints());
+                mapInfo2Editor.get(resInfo).setEnabled(resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD && !resInfo.isClosed() && !resInfo.isSingleIncident() && !resInfo.isNoConstraints(), PnlEditResInfo.CHANGE);
                 final boolean wasChangeable = btnChange.isEnabled();
                 btnChange.setEnabled(false);
                 final boolean wasEditable = btnEdit.isEnabled();
@@ -884,7 +884,7 @@ public class PnlInformation extends NursingRecordsPanel {
                     public void execute(Object o) {
                         btnPrint.setEnabled(true);
                         btnMenu.setEnabled(btnMenuEnabled);
-                        mapInfo2Editor.get(resInfo).setEnabled(false);
+                        mapInfo2Editor.get(resInfo).setEnabled(false, PnlEditResInfo.CHANGE);
                         btnChange.setEnabled(wasChangeable);
                         btnEdit.setEnabled(wasEditable);
 
@@ -1000,7 +1000,7 @@ public class PnlInformation extends NursingRecordsPanel {
                 }
                 btnPrint.setEnabled(false);
                 btnMenu.setEnabled(false);
-                mapInfo2Editor.get(resInfo).setEnabled(true);//resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD && !resInfo.isClosed() && !resInfo.isSingleIncident() && !resInfo.isNoConstraints());
+                mapInfo2Editor.get(resInfo).setEnabled(true, PnlEditResInfo.EDIT);//resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD && !resInfo.isClosed() && !resInfo.isSingleIncident() && !resInfo.isNoConstraints());
                 final boolean wasChangeable = btnChange.isEnabled();
                 btnChange.setEnabled(false);
                 final boolean wasEditable = btnEdit.isEnabled();
@@ -1011,7 +1011,7 @@ public class PnlInformation extends NursingRecordsPanel {
                     public void execute(Object o) {
                         btnPrint.setEnabled(true);
                         btnMenu.setEnabled(btnMenuEnabled);
-                        mapInfo2Editor.get(resInfo).setEnabled(false);
+                        mapInfo2Editor.get(resInfo).setEnabled(false, PnlEditResInfo.EDIT);
                         btnChange.setEnabled(wasChangeable);
                         btnEdit.setEnabled(wasEditable);
 
@@ -1140,7 +1140,7 @@ public class PnlInformation extends NursingRecordsPanel {
                     cpInfo.setContentPane(new JScrollPane(txt));
                 } else {
                     if (!mapInfo2Editor.containsKey(resInfo)) {
-                        mapInfo2Editor.put(resInfo, new PnlEditResInfo(resInfo.clone(), resInfo.getResInfoType().getResInfoCat().getColor(), false));
+                        mapInfo2Editor.put(resInfo, new PnlEditResInfo(resInfo.clone(), resInfo.getResInfoType().getResInfoCat().getColor()));
                     }
                     cpInfo.setContentPane(new JScrollPane(mapInfo2Editor.get(resInfo).getPanel()));
                 }
