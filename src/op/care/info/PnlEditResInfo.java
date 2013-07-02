@@ -262,6 +262,13 @@ public class PnlEditResInfo {
                 if (resInfo != null) {
                     closure.execute(getResInfo());
                 } else {
+//                    // remove content form disabled controls
+//                    for (String key : content.stringPropertyNames()) {
+//                        if (!((Component) components.get(key)).isEnabled()) {
+//                            content.remove(key);
+//                            OPDE.debug("removing content for: " + key);
+//                        }
+//                    }
                     closure.execute(content);
                 }
                 cleanup();
@@ -509,9 +516,18 @@ public class PnlEditResInfo {
         this.closure = closure;
     }
 
-    public ResInfo getResInfo() {
+    private ResInfo getResInfo() {
         try {
             StringWriter writer = new StringWriter();
+
+//            // remove content form disabled controls
+            for (String key : content.stringPropertyNames()) {
+                if (components.containsKey(key) && !((Component) components.get(key)).isEnabled()) {
+                    content.remove(key);
+                    OPDE.debug("removing content for: " + key);
+                }
+            }
+
             content.store(writer, "[" + resInfo.getResInfoType().getID() + "] " + resInfo.getResInfoType().getShortDescription());
             resInfo.setProperties(writer.toString());
             writer.close();
@@ -750,13 +766,18 @@ public class PnlEditResInfo {
             if (disables.containsKey(cbname)) {
                 for (String key : disables.get(cbname)) {
                     if (components.containsKey(key) && components.get(key) instanceof Component) {
-                        ((Component) components.get(key)).setEnabled(!j.isSelected());
+                        boolean disable = j.isSelected();
+                        ((Component) components.get(key)).setEnabled(!disable);
                         //                        if (components.get(key) instanceof JComboBox) {
                         //                            ((JComboBox) components.get(key)).setSelectedIndex(-1);
                         //                        }
                         if (components.get(key) instanceof JTextComponent) {
                             ((JTextComponent) components.get(key)).setText(null);
                         }
+//                        if (disable) {
+//                            // if its disabled, we dont want to store it.
+//                            content.remove(((Component) components.get(key)).getName());
+//                        }
                     }
                 }
             }
@@ -770,6 +791,8 @@ public class PnlEditResInfo {
         public void itemStateChanged(java.awt.event.ItemEvent evt) {
             if (evt.getStateChange() != ItemEvent.SELECTED) return;
             JComboBox j = (JComboBox) evt.getSource();
+            if (!j.isEnabled()) return;
+
             ComboBoxBean bean = (ComboBoxBean) j.getSelectedItem();
             content.put(j.getName(), bean.getName());
             j.setToolTipText(bean.getTooltip());

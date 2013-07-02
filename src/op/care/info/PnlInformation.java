@@ -881,7 +881,7 @@ public class PnlInformation extends NursingRecordsPanel {
 
                 mapInfo2Editor.get(resInfo).setClosure(new Closure() {
                     @Override
-                    public void execute(Object o) {
+                    public void execute(final Object o) {
                         btnPrint.setEnabled(true);
                         btnMenu.setEnabled(btnMenuEnabled);
                         mapInfo2Editor.get(resInfo).setEnabled(false, PnlEditResInfo.CHANGE);
@@ -901,8 +901,11 @@ public class PnlInformation extends NursingRecordsPanel {
                                 try {
                                     em.getTransaction().begin();
                                     ResInfo oldinfo = em.merge(resInfo);
-                                    ResInfo newinfo = em.merge(mapInfo2Editor.get(resInfo).getResInfo());
 
+
+
+                                    ResInfo newinfo = em.merge((ResInfo) o);
+//                                    mapInfo2Editor.get(resInfo).getResInfo()
                                     em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                                     // so that no conflicts can occur if another user enters a new info at the same time
                                     em.lock(em.merge(resInfo.getResInfoType()), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
@@ -1008,7 +1011,7 @@ public class PnlInformation extends NursingRecordsPanel {
 
                 mapInfo2Editor.get(resInfo).setClosure(new Closure() {
                     @Override
-                    public void execute(Object o) {
+                    public void execute(final Object o) {
                         btnPrint.setEnabled(true);
                         btnMenu.setEnabled(btnMenuEnabled);
                         mapInfo2Editor.get(resInfo).setEnabled(false, PnlEditResInfo.EDIT);
@@ -1036,7 +1039,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                     em.getTransaction().begin();
                                     ResInfo editinfo = em.merge(resInfo);
 
-                                    ResInfo tmpInfo = mapInfo2Editor.get(resInfo).getResInfo();
+                                    ResInfo tmpInfo =  (ResInfo) o; //mapInfo2Editor.get(resInfo).getResInfo();
                                     editinfo.setHtml(ResInfoTools.getContentAsHTML(tmpInfo));
                                     editinfo.setProperties(tmpInfo.getProperties());
                                     editinfo.setText(tmpInfo.getText());

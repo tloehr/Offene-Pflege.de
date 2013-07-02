@@ -87,7 +87,7 @@ public class DlgDiag extends MyJDialog {
         lblDiagBy.setText(OPDE.lang.getString("nursingrecords.info.dlg.diags.by"));
         lblSide.setText(OPDE.lang.getString("misc.msg.diag.side"));
         lblSecurity.setText(OPDE.lang.getString("misc.msg.diag.security"));
-        lblInterval.setText(OPDE.lang.getString("nursingrecors.info.dlg.interval_noconstraints"));
+        lblInterval.setText(OPDE.lang.getString("nursingrecords.info.dlg.interval_noconstraints"));
         lblInterval.setIcon(SYSConst.icon22intervalNoConstraints);
         reloadTable();
         OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.info.dlg.diags"), 10));
@@ -170,7 +170,7 @@ public class DlgDiag extends MyJDialog {
         {
             jPanel1.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
             jPanel1.setLayout(new FormLayout(
-                "default, 2*($lcgap, default:grow), $ugap, 2*(default:grow, $lcgap), default, $lcgap, default",
+                "default, $lcgap, pref, $lcgap, default:grow, $ugap, pref, $lcgap, default:grow, 2*($lcgap, default)",
                 "default, $lgap, fill:default, $lgap, fill:104dlu:grow, $lgap, fill:default, $lgap, default, $lgap, fill:default, $lgap, fill:89dlu:grow, $ugap, default, $lgap, default"));
 
             //---- txtSuche ----
@@ -305,7 +305,7 @@ public class DlgDiag extends MyJDialog {
             jPanel1.add(panel1, CC.xywh(7, 15, 5, 1, CC.RIGHT, CC.DEFAULT));
         }
         contentPane.add(jPanel1, BorderLayout.CENTER);
-        setSize(620, 565);
+        setSize(730, 565);
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 

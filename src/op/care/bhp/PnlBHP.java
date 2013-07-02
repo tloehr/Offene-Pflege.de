@@ -503,7 +503,7 @@ public class PnlBHP extends NursingRecordsPanel {
                 if (bhp.getStatus() != BHPTools.STATE_OPEN) {
                     return;
                 }
-                if (!bhp.getPrescription().isClosed()) {
+                if (bhp.getPrescription().isClosed()) {
                     return;
                 }
 
