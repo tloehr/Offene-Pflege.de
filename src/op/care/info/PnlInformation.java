@@ -864,7 +864,7 @@ public class PnlInformation extends NursingRecordsPanel {
         btnChange.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (!mapInfo2Editor.containsKey(resInfo) || !cpInfo.isCollapsed()) {
+                if (!mapInfo2Editor.containsKey(resInfo) || cpInfo.isCollapsed()) {
                     try {
                         cpInfo.setCollapsed(false);
                     } catch (PropertyVetoException e1) {
@@ -993,7 +993,7 @@ public class PnlInformation extends NursingRecordsPanel {
 //                if (!mapInfo2Editor.containsKey(resInfo)) {
 //
 //                }
-                if (!mapInfo2Editor.containsKey(resInfo) || !cpInfo.isCollapsed()) {
+                if (!mapInfo2Editor.containsKey(resInfo) || cpInfo.isCollapsed()) {
                     try {
                         cpInfo.setCollapsed(false);
 
@@ -1298,7 +1298,7 @@ public class PnlInformation extends NursingRecordsPanel {
 
     @Override
     public String getInternalClassID() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return internalClassID;
     }
 
     private void initComponents() {

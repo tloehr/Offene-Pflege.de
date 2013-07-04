@@ -78,6 +78,8 @@ public class PnlEditResInfo {
     private JLabel sumlabel;
     private Component focusOwner = null;
 
+    boolean enabled;
+
     private ArrayList<RiskBean> scaleriskmodel;
     private String scalesumlabeltext;
     private ArrayList<String> scaleButtonGroups, defaultdisabled; // eine Liste mit den Namen der Buttongroups eines scales;
@@ -491,9 +493,9 @@ public class PnlEditResInfo {
             }
             pdf.getDocument().add(p1);
 
-            setXEnabled(main, false);
-            Image image = Image.getInstance(GUITools.getAsImage(pnlContent).toByteArray());
             setXEnabled(main, true);
+            Image image = Image.getInstance(GUITools.getAsImage(pnlContent).toByteArray());
+            setXEnabled(main, enabled);
 
             image.scaleToFit(Utilities.millimetersToPoints(170f), Utilities.millimetersToPoints(170f));
 
@@ -522,7 +524,8 @@ public class PnlEditResInfo {
 
 //            // remove content form disabled controls
             for (String key : content.stringPropertyNames()) {
-                if (components.containsKey(key) && !((Component) components.get(key)).isEnabled()) {
+
+                if (components.containsKey(key) && components.get(key) instanceof Component && !((Component) components.get(key)).isEnabled()) {
                     content.remove(key);
                     OPDE.debug("removing content for: " + key);
                 }
@@ -566,6 +569,7 @@ public class PnlEditResInfo {
 
     public void setEnabled(boolean enabled, int mode) {
         this.mode = mode;
+        this.enabled = enabled;
         setXEnabled(main, enabled);
     }
 
@@ -768,16 +772,9 @@ public class PnlEditResInfo {
                     if (components.containsKey(key) && components.get(key) instanceof Component) {
                         boolean disable = j.isSelected();
                         ((Component) components.get(key)).setEnabled(!disable);
-                        //                        if (components.get(key) instanceof JComboBox) {
-                        //                            ((JComboBox) components.get(key)).setSelectedIndex(-1);
-                        //                        }
                         if (components.get(key) instanceof JTextComponent) {
                             ((JTextComponent) components.get(key)).setText(null);
                         }
-//                        if (disable) {
-//                            // if its disabled, we dont want to store it.
-//                            content.remove(((Component) components.get(key)).getName());
-//                        }
                     }
                 }
             }
