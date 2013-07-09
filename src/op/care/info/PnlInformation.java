@@ -492,12 +492,14 @@ public class PnlInformation extends NursingRecordsPanel {
                                                             // only for the screen refresh
                                                             // if there are active resinfos with obsolete forms that should be replaced
                                                             // by this one, they must all be closed now.
-                                                            for (ResInfo myResInfo : mapType2ResInfos.get(resInfoType)) {
-                                                                if (!myResInfo.isClosed() && myResInfo.getResInfoType().isObsolete()) {
-                                                                    ResInfo closedResInfo = em.merge(myResInfo);
-                                                                    em.lock(closedResInfo, LockModeType.OPTIMISTIC);
-                                                                    closedResInfo.setTo(new DateTime(newinfo.getFrom()).minusSeconds(1).toDate());
-                                                                    closedResInfo.setUserOFF(em.merge(OPDE.getLogin().getUser()));
+                                                            if (!newinfo.isSingleIncident()) {
+                                                                for (ResInfo myResInfo : mapType2ResInfos.get(resInfoType)) {
+                                                                    if (!myResInfo.isClosed() && myResInfo.getResInfoType().isObsolete()) {
+                                                                        ResInfo closedResInfo = em.merge(myResInfo);
+                                                                        em.lock(closedResInfo, LockModeType.OPTIMISTIC);
+                                                                        closedResInfo.setTo(new DateTime(newinfo.getFrom()).minusSeconds(1).toDate());
+                                                                        closedResInfo.setUserOFF(em.merge(OPDE.getLogin().getUser()));
+                                                                    }
                                                                 }
                                                             }
 
@@ -543,7 +545,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                             popup.setMovable(false);
                                             popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
                                             JScrollPane scrl = new JScrollPane(pnlEditResInfo.getPanel());
-                                            scrl.setPreferredSize(new Dimension(pnlEditResInfo.getPanel().getPreferredSize().width + 100, Math.min(pnlEditResInfo.getPanel().getPreferredSize().height, OPDE.getMainframe().getHeight())-100));
+                                            scrl.setPreferredSize(new Dimension(pnlEditResInfo.getPanel().getPreferredSize().width + 100, Math.min(pnlEditResInfo.getPanel().getPreferredSize().height, OPDE.getMainframe().getHeight()) - 100));
 
                                             popup.setOwner(btnAdd);
                                             popup.removeExcludedComponent(btnAdd);
@@ -891,7 +893,7 @@ public class PnlInformation extends NursingRecordsPanel {
                         if (o == null || !mapInfo2Editor.get(resInfo).isChanged()) {
                             return;
                         }
-                        new DlgYesNo(OPDE.lang.getString("misc.questions.change1") + "<br/>&raquo;" + resInfo.getResInfoType().getShortDescription() +"&laquo;<br/>" +DateFormat.getDateInstance().format(resInfo.getFrom()) + "<br/>" + OPDE.lang.getString("misc.questions.change2"), SYSConst.icon48play, new Closure() {
+                        new DlgYesNo(OPDE.lang.getString("misc.questions.change1") + "<br/>&raquo;" + resInfo.getResInfoType().getShortDescription() + "&laquo;<br/>" + DateFormat.getDateInstance().format(resInfo.getFrom()) + "<br/>" + OPDE.lang.getString("misc.questions.change2"), SYSConst.icon48play, new Closure() {
                             @Override
                             public void execute(Object answer) {
                                 if (!answer.equals(JOptionPane.YES_OPTION)) {
@@ -901,7 +903,6 @@ public class PnlInformation extends NursingRecordsPanel {
                                 try {
                                     em.getTransaction().begin();
                                     ResInfo oldinfo = em.merge(resInfo);
-
 
 
                                     ResInfo newinfo = em.merge((ResInfo) o);
@@ -1026,7 +1027,7 @@ public class PnlInformation extends NursingRecordsPanel {
                             return;
                         }
 
-                        new DlgYesNo(OPDE.lang.getString("misc.questions.edit1") + "<br/>&raquo;" + resInfo.getResInfoType().getShortDescription() +"&laquo;<br/>" +DateFormat.getDateInstance().format(resInfo.getFrom()) +  "<br/>" + OPDE.lang.getString("misc.questions.edit2"), SYSConst.icon48play, new Closure() {
+                        new DlgYesNo(OPDE.lang.getString("misc.questions.edit1") + "<br/>&raquo;" + resInfo.getResInfoType().getShortDescription() + "&laquo;<br/>" + DateFormat.getDateInstance().format(resInfo.getFrom()) + "<br/>" + OPDE.lang.getString("misc.questions.edit2"), SYSConst.icon48play, new Closure() {
                             @Override
                             public void execute(Object answer) {
 
@@ -1039,7 +1040,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                     em.getTransaction().begin();
                                     ResInfo editinfo = em.merge(resInfo);
 
-                                    ResInfo tmpInfo =  (ResInfo) o; //mapInfo2Editor.get(resInfo).getResInfo();
+                                    ResInfo tmpInfo = (ResInfo) o; //mapInfo2Editor.get(resInfo).getResInfo();
                                     editinfo.setHtml(ResInfoTools.getContentAsHTML(tmpInfo));
                                     editinfo.setProperties(tmpInfo.getProperties());
                                     editinfo.setText(tmpInfo.getText());

@@ -67,11 +67,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
-/**
- * <I>20.06.2007 - WishID:43</I>
- *
- * @author tloehr
- */
 public class PnlHandover extends NursingRecordsPanel {
     public static final String internalClassID = "nursingrecords.handover";
 
@@ -80,13 +75,13 @@ public class PnlHandover extends NursingRecordsPanel {
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
 
-    private HashMap<String, CollapsiblePane> cpMap;
-    private HashMap<String, JPanel> contentmap;
-    private HashMap<String, ArrayList<Handovers>> cacheHO;
-    private HashMap<String, ArrayList<NReport>> cacheNR;
-    private HashMap<NReport, JPanel> linemapNR;
-    private HashMap<Handovers, JPanel> linemapHO;
-    HashMap<DateMidnight, String> hollidays;
+    private Map<String, CollapsiblePane> cpMap;
+    private Map<String, JPanel> contentmap;
+    private Map<String, ArrayList<Handovers>> cacheHO;
+    private Map<String, ArrayList<NReport>> cacheNR;
+    private Map<NReport, JPanel> linemapNR;
+    private Map<Handovers, JPanel> linemapHO;
+    private HashMap<DateMidnight, String> hollidays;
     private JComboBox cmbHomes;
     private JToggleButton tbResidentFirst;
     private Comparator myComparator;
@@ -139,12 +134,12 @@ public class PnlHandover extends NursingRecordsPanel {
             }
         };
 
-        contentmap = new HashMap<String, JPanel>();
-        cpMap = new HashMap<String, CollapsiblePane>();
-        linemapNR = new HashMap<NReport, JPanel>();
-        linemapHO = new HashMap<Handovers, JPanel>();
-        cacheHO = new HashMap<String, ArrayList<Handovers>>();
-        cacheNR = new HashMap<String, ArrayList<NReport>>();
+        contentmap = Collections.synchronizedMap(new HashMap<String, JPanel>());
+        cpMap = Collections.synchronizedMap(new HashMap<String, CollapsiblePane>());
+        linemapNR = Collections.synchronizedMap(new HashMap<NReport, JPanel>());
+        linemapHO = Collections.synchronizedMap(new HashMap<Handovers, JPanel>());
+        cacheHO = Collections.synchronizedMap(new HashMap<String, ArrayList<Handovers>>());
+        cacheNR = Collections.synchronizedMap(new HashMap<String, ArrayList<NReport>>());
         OPDE.getDisplayManager().setMainMessage(OPDE.lang.getString(internalClassID));
         prepareSearchArea();
     }
@@ -214,13 +209,26 @@ public class PnlHandover extends NursingRecordsPanel {
     public void cleanup() {
         cpsHandover.removeAll();
 
-        contentmap.clear();
-        cpMap.clear();
-        linemapHO.clear();
-        linemapNR.clear();
-        cacheHO.clear();
-        cacheNR.clear();
-        hollidays.clear();
+        synchronized (contentmap) {
+            SYSTools.clear(contentmap);
+        }
+        synchronized (cpMap) {
+            SYSTools.clear(cpMap);
+        }
+        synchronized (linemapHO) {
+            SYSTools.clear(linemapHO);
+        }
+        synchronized (linemapNR) {
+            SYSTools.clear(linemapNR);
+        }
+        synchronized (cacheHO) {
+            SYSTools.clear(cacheHO);
+        }
+        synchronized (cacheNR) {
+            SYSTools.clear(cacheNR);
+        }
+        SYSTools.clear(hollidays);
+
     }
 
     @Override
@@ -238,15 +246,30 @@ public class PnlHandover extends NursingRecordsPanel {
          *                                              |_|            |___/
          */
 
-        contentmap.clear();
-        cpMap.clear();
-        linemapNR.clear();
-        linemapHO.clear();
-        cacheHO.clear();
-        cacheNR.clear();
+
+        synchronized (contentmap) {
+            SYSTools.clear(contentmap);
+        }
+        synchronized (cpMap) {
+            SYSTools.clear(cpMap);
+        }
+        synchronized (linemapHO) {
+            SYSTools.clear(linemapHO);
+        }
+        synchronized (linemapNR) {
+            SYSTools.clear(linemapNR);
+        }
+        synchronized (cacheHO) {
+            SYSTools.clear(cacheHO);
+        }
+        synchronized (cacheNR) {
+            SYSTools.clear(cacheNR);
+        }
+
 
         Pair<DateTime, DateTime> minmax = NReportTools.getMinMax();
         if (minmax != null) {
+
             hollidays = SYSCalendar.getHollidays(minmax.getFirst().getYear(), minmax.getSecond().getYear());
             DateMidnight start = minmax.getFirst().toDateMidnight().dayOfMonth().withMinimumValue();
             DateMidnight end = new DateMidnight();
@@ -303,14 +326,16 @@ public class PnlHandover extends NursingRecordsPanel {
         final DateMidnight end = new DateMidnight(year, 12, 31).isAfter(max.dayOfMonth().withMaximumValue()) ? max.dayOfMonth().withMaximumValue() : new DateMidnight(year, 12, 31);
 
         final String keyYear = Integer.toString(year) + ".year";
-        if (!cpMap.containsKey(keyYear)) {
-            cpMap.put(keyYear, new CollapsiblePane());
-            try {
-                cpMap.get(keyYear).setCollapsed(true);
-            } catch (PropertyVetoException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
+        synchronized (cpMap) {
+            if (!cpMap.containsKey(keyYear)) {
+                cpMap.put(keyYear, new CollapsiblePane());
+                try {
+                    cpMap.get(keyYear).setCollapsed(true);
+                } catch (PropertyVetoException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
 
+            }
         }
 
         final CollapsiblePane cpYear = cpMap.get(keyYear);
@@ -387,12 +412,14 @@ public class PnlHandover extends NursingRecordsPanel {
          *
          */
         final String key = monthFormatter.format(month.toDate()) + ".month";
-        if (!cpMap.containsKey(key)) {
-            cpMap.put(key, new CollapsiblePane());
-            try {
-                cpMap.get(key).setCollapsed(true);
-            } catch (PropertyVetoException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        synchronized (cpMap) {
+            if (!cpMap.containsKey(key)) {
+                cpMap.put(key, new CollapsiblePane());
+                try {
+                    cpMap.get(key).setCollapsed(true);
+                } catch (PropertyVetoException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
             }
         }
         final CollapsiblePane cpMonth = cpMap.get(key);
@@ -464,12 +491,14 @@ public class PnlHandover extends NursingRecordsPanel {
 
     private CollapsiblePane createCP4Day(final DateMidnight day) {
         final String key = DateFormat.getDateInstance().format(day.toDate());
-        if (!cpMap.containsKey(key)) {
-            cpMap.put(key, new CollapsiblePane());
-            try {
-                cpMap.get(key).setCollapsed(true);
-            } catch (PropertyVetoException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        synchronized (cpMap) {
+            if (!cpMap.containsKey(key)) {
+                cpMap.put(key, new CollapsiblePane());
+                try {
+                    cpMap.get(key).setCollapsed(true);
+                } catch (PropertyVetoException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
             }
         }
         final CollapsiblePane cpDay = cpMap.get(key);
@@ -500,39 +529,43 @@ public class PnlHandover extends NursingRecordsPanel {
                 EntityManager em = OPDE.createEM();
                 try {
                     em.getTransaction().begin();
-                    if (cacheHO.containsKey(key)) {
-                        ArrayList<Handovers> listHO = new ArrayList<Handovers>(cacheHO.get(key));
-                        for (final Handovers ho : listHO) {
-                            if (!Handover2UserTools.containsUser(ho.getUsersAcknowledged(), OPDE.getLogin().getUser())) {
-                                Handovers myHO = em.merge(ho);
-                                Handover2User connObj = em.merge(new Handover2User(myHO, em.merge(OPDE.getLogin().getUser())));
-                                myHO.getUsersAcknowledged().add(connObj);
+                    synchronized (cacheHO) {
+                        if (cacheHO.containsKey(key)) {
+                            ArrayList<Handovers> listHO = new ArrayList<Handovers>(cacheHO.get(key));
+                            for (final Handovers ho : listHO) {
+                                if (!Handover2UserTools.containsUser(ho.getUsersAcknowledged(), OPDE.getLogin().getUser())) {
+                                    Handovers myHO = em.merge(ho);
+                                    Handover2User connObj = em.merge(new Handover2User(myHO, em.merge(OPDE.getLogin().getUser())));
+                                    myHO.getUsersAcknowledged().add(connObj);
 
-                                cacheHO.get(key).remove(ho);
-                                cacheHO.get(key).add(myHO);
-                                linemapHO.remove(ho);
-                                final String keyDay = DateFormat.getDateInstance().format(ho.getPit());
-                                contentmap.remove(keyDay);
+                                    cacheHO.get(key).remove(ho);
+                                    cacheHO.get(key).add(myHO);
+                                    linemapHO.remove(ho);
+                                    final String keyDay = DateFormat.getDateInstance().format(ho.getPit());
+                                    contentmap.remove(keyDay);
+                                }
                             }
+                            Collections.sort(cacheHO.get(key));
                         }
-                        Collections.sort(cacheHO.get(key));
                     }
-                    if (cacheNR.containsKey(key)) {
-                        ArrayList<NReport> listNR = new ArrayList<NReport>(cacheNR.get(key));
-                        for (final NReport nreport : listNR) {
-                            if (!NR2UserTools.containsUser(nreport.getUsersAcknowledged(), OPDE.getLogin().getUser())) {
-                                NReport myNR = em.merge(nreport);
-                                NR2User connObj = em.merge(new NR2User(myNR, em.merge(OPDE.getLogin().getUser())));
-                                myNR.getUsersAcknowledged().add(connObj);
+                    synchronized (cacheNR) {
+                        if (cacheNR.containsKey(key)) {
+                            ArrayList<NReport> listNR = new ArrayList<NReport>(cacheNR.get(key));
+                            for (final NReport nreport : listNR) {
+                                if (!NR2UserTools.containsUser(nreport.getUsersAcknowledged(), OPDE.getLogin().getUser())) {
+                                    NReport myNR = em.merge(nreport);
+                                    NR2User connObj = em.merge(new NR2User(myNR, em.merge(OPDE.getLogin().getUser())));
+                                    myNR.getUsersAcknowledged().add(connObj);
 
-                                cacheNR.get(key).remove(nreport);
-                                cacheNR.get(key).add(myNR);
-                                linemapNR.remove(nreport);
-                                final String keyDay = DateFormat.getDateInstance().format(nreport.getPit());
-                                contentmap.remove(keyDay);
+                                    cacheNR.get(key).remove(nreport);
+                                    cacheNR.get(key).add(myNR);
+                                    linemapNR.remove(nreport);
+                                    final String keyDay = DateFormat.getDateInstance().format(nreport.getPit());
+                                    contentmap.remove(keyDay);
+                                }
                             }
+                            Collections.sort(cacheNR.get(key), myComparator);
                         }
-                        Collections.sort(cacheNR.get(key), myComparator);
                     }
                     em.getTransaction().commit();
                     createCP4Day(day);
@@ -609,14 +642,17 @@ public class PnlHandover extends NursingRecordsPanel {
 
                     final JPanel dayPanel = new JPanel(new VerticalLayout());
                     dayPanel.setOpaque(false);
-                    if (!cacheHO.containsKey(key)) {
-                        cacheHO.put(key, HandoversTools.getBy(day, (Homes) cmbHomes.getSelectedItem()));
+                    synchronized (cacheHO) {
+                        if (!cacheHO.containsKey(key)) {
+                            cacheHO.put(key, HandoversTools.getBy(day, (Homes) cmbHomes.getSelectedItem()));
+                        }
                     }
-                    if (!cacheNR.containsKey(key)) {
-                        cacheNR.put(key, NReportTools.getNReports4Handover(day, (Homes) cmbHomes.getSelectedItem()));
-                        Collections.sort(cacheNR.get(key), myComparator);
+                    synchronized (cacheNR) {
+                        if (!cacheNR.containsKey(key)) {
+                            cacheNR.put(key, NReportTools.getNReports4Handover(day, (Homes) cmbHomes.getSelectedItem()));
+                            Collections.sort(cacheNR.get(key), myComparator);
+                        }
                     }
-
                     int max = cacheHO.get(key).size() + cacheNR.get(key).size();
                     int i = 0; // for zebra pattern and progress
                     for (final Handovers handover : cacheHO.get(key)) {
@@ -650,14 +686,20 @@ public class PnlHandover extends NursingRecordsPanel {
                                         Handover2User connObj = em.merge(new Handover2User(myHO, em.merge(OPDE.getLogin().getUser())));
                                         myHO.getUsersAcknowledged().add(connObj);
                                         em.getTransaction().commit();
-                                        cacheHO.get(key).remove(handover);
-                                        cacheHO.get(key).add(myHO);
-                                        Collections.sort(cacheHO.get(key));
-                                        linemapHO.remove(handover);
+                                        synchronized (cacheHO) {
+                                            cacheHO.get(key).remove(handover);
+                                            cacheHO.get(key).add(myHO);
+                                            Collections.sort(cacheHO.get(key));
+                                        }
+                                        synchronized (linemapHO) {
+                                            linemapHO.remove(handover);
+                                        }
                                         createCP4Day(day);
 
                                         final String keyDay = DateFormat.getDateInstance().format(handover.getPit());
-                                        contentmap.remove(keyDay);
+                                        synchronized (contentmap) {
+                                            contentmap.remove(keyDay);
+                                        }
 
                                         buildPanel();
                                     } catch (OptimisticLockException ole) {
@@ -697,7 +739,9 @@ public class PnlHandover extends NursingRecordsPanel {
 
                             pnlSingle.getButton().setIcon(Handover2UserTools.containsUser(handover.getUsersAcknowledged(), OPDE.getLogin().getUser()) ? SYSConst.icon22ledGreenOn : SYSConst.icon22ledRedOn);
                             pnlSingle.getButton().setVerticalTextPosition(SwingConstants.TOP);
-                            linemapHO.put(handover, pnlSingle.getMain());
+                            synchronized (linemapHO) {
+                                linemapHO.put(handover, pnlSingle.getMain());
+                            }
                         }
                         JPanel zebra = new JPanel();
                         zebra.setLayout(new BoxLayout(zebra, BoxLayout.LINE_AXIS));
@@ -713,6 +757,7 @@ public class PnlHandover extends NursingRecordsPanel {
                     }
                     for (final NReport nreport : cacheNR.get(key)) {
                         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), i, max));
+
                         if (!linemapNR.containsKey(nreport)) {
 
                             String title = "<html><table border=\"0\">" +
@@ -745,13 +790,18 @@ public class PnlHandover extends NursingRecordsPanel {
                                         NR2User connObj = em.merge(new NR2User(myNR, em.merge(OPDE.getLogin().getUser())));
                                         myNR.getUsersAcknowledged().add(connObj);
                                         em.getTransaction().commit();
-
-                                        cacheNR.get(key).remove(nreport);
-                                        cacheNR.get(key).add(myNR);
-                                        Collections.sort(cacheNR.get(key), myComparator);
-                                        linemapNR.remove(nreport);
+                                        synchronized (cacheNR) {
+                                            cacheNR.get(key).remove(nreport);
+                                            cacheNR.get(key).add(myNR);
+                                            Collections.sort(cacheNR.get(key), myComparator);
+                                        }
+                                        synchronized (linemapNR) {
+                                            linemapNR.remove(nreport);
+                                        }
                                         final String keyDay = DateFormat.getDateInstance().format(nreport.getPit());
-                                        contentmap.remove(keyDay);
+                                        synchronized (contentmap) {
+                                            contentmap.remove(keyDay);
+                                        }
                                         createCP4Day(day);
                                         buildPanel();
                                     } catch (OptimisticLockException ole) {
@@ -791,7 +841,9 @@ public class PnlHandover extends NursingRecordsPanel {
 
                             pnlSingle.getButton().setIcon(NR2UserTools.containsUser(nreport.getUsersAcknowledged(), OPDE.getLogin().getUser()) ? SYSConst.icon22ledGreenOn : SYSConst.icon22ledRedOn);
                             pnlSingle.getButton().setVerticalTextPosition(SwingConstants.TOP);
-                            linemapNR.put(nreport, pnlSingle.getMain());
+                            synchronized (linemapNR) {
+                                linemapNR.put(nreport, pnlSingle.getMain());
+                            }
                         }
                         JPanel zebra = new JPanel();
                         zebra.setLayout(new BoxLayout(zebra, BoxLayout.LINE_AXIS));
@@ -806,8 +858,10 @@ public class PnlHandover extends NursingRecordsPanel {
 
                         dayPanel.add(zebra);
                     }
-                    contentmap.put(key, dayPanel);
-                    cpDay.setContentPane(contentmap.get(key));
+                    synchronized (contentmap) {
+                        contentmap.put(key, dayPanel);
+                        cpDay.setContentPane(contentmap.get(key));
+                    }
 //                return dayPanel;
 
                     return null;
@@ -879,14 +933,17 @@ public class PnlHandover extends NursingRecordsPanel {
                                     DateMidnight day = new DateMidnight(myHO.getPit());
 
                                     final String key = DateFormat.getDateInstance().format(myHO.getPit());
-                                    if (!cacheHO.containsKey(key)) {
-                                        cacheHO.put(key, HandoversTools.getBy(day, (Homes) cmbHomes.getSelectedItem()));
-                                    } else {
-                                        cacheHO.get(key).add(myHO);
-                                        Collections.sort(cacheHO.get(key));
+                                    synchronized (cacheHO) {
+                                        if (!cacheHO.containsKey(key)) {
+                                            cacheHO.put(key, HandoversTools.getBy(day, (Homes) cmbHomes.getSelectedItem()));
+                                        } else {
+                                            cacheHO.get(key).add(myHO);
+                                            Collections.sort(cacheHO.get(key));
+                                        }
                                     }
-
-                                    contentmap.remove(key);
+                                    synchronized (contentmap) {
+                                        contentmap.remove(key);
+                                    }
                                     createCP4Day(day);
                                     expandDay(day);
 
