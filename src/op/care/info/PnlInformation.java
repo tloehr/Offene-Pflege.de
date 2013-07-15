@@ -179,408 +179,413 @@ public class PnlInformation extends NursingRecordsPanel {
 
             @Override
             protected Object doInBackground() throws Exception {
-
                 int progress = 0;
-//                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, listCategories.size()));
 
-                for (final ResInfoCategory cat : listCategories) {
-                    progress++;
-                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, listCategories.size()));
+                try {
+                    for (final ResInfoCategory cat : listCategories) {
+                        progress++;
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, listCategories.size()));
 
-                    if (!mapCat2Type.get(cat).isEmpty()) {
+                        OPDE.debug(cat.getText());
+                        OPDE.debug(mapCat2Type.get(cat).isEmpty());
 
-                        final String keyResInfoCat = cat.getID() + ".resinfocat";
-                        if (!mapKey2CP.containsKey(keyResInfoCat)) {
+                        if (!mapCat2Type.get(cat).isEmpty()) {
 
-                            synchronized (mapKey2CP) {
-                                mapKey2CP.put(keyResInfoCat, new CollapsiblePane());
-                            }
-                            mapKey2CP.get(keyResInfoCat).setStyle(CollapsiblePane.TREE_STYLE);
-                            mapKey2CP.get(keyResInfoCat).addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
-                                @Override
-                                public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                                    SYSPropsTools.storeProp(keyResInfoCat + ".expanded", "true", OPDE.getLogin().getUser());
-                                }
+                            final String keyResInfoCat = cat.getID() + ".resinfocat";
+                            if (!mapKey2CP.containsKey(keyResInfoCat)) {
 
-                                @Override
-                                public void paneCollapsed(CollapsiblePaneEvent collapsiblePaneEvent) {
-                                    SYSPropsTools.storeProp(keyResInfoCat + ".expanded", "false", OPDE.getLogin().getUser());
-                                }
-                            });
-                            try {
-                                mapKey2CP.get(keyResInfoCat).setCollapsed(!SYSPropsTools.isBooleanTrue(keyResInfoCat + ".expanded"));
-                            } catch (PropertyVetoException e) {
-                                // Bah!
-                            }
-
-                        }
-
-                        final CollapsiblePane cpCat = mapKey2CP.get(keyResInfoCat);
-                        final DefaultCPTitle cpTitleCat = new DefaultCPTitle(cat.getText(), new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                try {
-                                    cpCat.setCollapsed(!cpCat.isCollapsed());
-                                } catch (PropertyVetoException pve) {
-                                    // BAH!
-                                }
-                            }
-                        });
-
-
-                        GUITools.addExpandCollapseButtons(cpCat, cpTitleCat.getRight());
-
-                        /***
-                         *                _
-                         *       ___ ___ | | ___  _ __
-                         *      / __/ _ \| |/ _ \| '__|
-                         *     | (_| (_) | | (_) | |
-                         *      \___\___/|_|\___/|_|
-                         *
-                         */
-                        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)) {
-                            final JButton btnColor = new JButton(SYSConst.icon22colorset);
-                            btnColor.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                            btnColor.setContentAreaFilled(false);
-                            btnColor.setBorder(null);
-                            btnColor.setToolTipText(OPDE.lang.getString("misc.msg.colorset"));
-                            btnColor.setSelectedIcon(SYSConst.icon22colorsetPressed);
-                            btnColor.addActionListener(new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    final JColorChooser clr = new JColorChooser(cat.getColor());
-                                    final JidePopup popup = new JidePopup();
-                                    clr.getSelectionModel().addChangeListener(new ChangeListener() {
-                                        @Override
-                                        public void stateChanged(ChangeEvent e) {
-                                            popup.hidePopup();
-                                            EntityManager em = OPDE.createEM();
-                                            try {
-                                                em.getTransaction().begin();
-                                                ResInfoCategory myCat = em.merge(cat);
-                                                em.lock(myCat, LockModeType.OPTIMISTIC);
-                                                myCat.setColor(clr.getColor());
-                                                em.getTransaction().commit();
-                                                synchronized (listCategories) {
-                                                    listCategories.remove(cat);
-                                                    listCategories.add(myCat);
-                                                }
-                                                sortData();
-                                                reload();
-                                            } catch (OptimisticLockException ole) {
-                                                if (em.getTransaction().isActive()) {
-                                                    em.getTransaction().rollback();
-                                                }
-                                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                            } catch (RollbackException ole) {
-                                                if (em.getTransaction().isActive()) {
-                                                    em.getTransaction().rollback();
-                                                }
-                                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                                    OPDE.getMainframe().emptyFrame();
-                                                    OPDE.getMainframe().afterLogin();
-                                                }
-                                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ole.getMessage(), DisplayMessage.IMMEDIATELY));
-                                            } catch (Exception ex) {
-                                                if (em.getTransaction().isActive()) {
-                                                    em.getTransaction().rollback();
-                                                }
-                                                OPDE.fatal(ex);
-                                            } finally {
-                                                em.close();
-                                            }
-                                        }
-                                    });
-
-                                    popup.setMovable(false);
-                                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-                                    popup.setPopupType(JidePopup.HEAVY_WEIGHT_POPUP);
-
-                                    popup.setOwner(btnColor);
-                                    popup.removeExcludedComponent(btnColor);
-                                    popup.setTransient(false);
-                                    popup.getContentPane().add(clr);
-                                    popup.setDefaultFocusComponent(clr);
-                                    GUITools.showPopup(popup, SwingConstants.SOUTH_WEST);
-                                }
-                            });
-                            cpTitleCat.getRight().add(btnColor);
-                        }
-
-                        cpTitleCat.getButton().setFont(SYSConst.ARIAL24);
-                        cpTitleCat.getButton().setForeground(GUITools.getForeground(cat.getColor()));
-
-                        cpTitleCat.getButton().setForeground(cat.getColor());
-                        cpCat.setBackground(Color.white);
-                        cpCat.setTitleLabelComponent(cpTitleCat.getMain());
-
-                        //                cpCat.setBackground(cat.getColor());
-
-
-                        JPanel pnlTypes = new JPanel();
-                        pnlTypes.setLayout(new BoxLayout(pnlTypes, BoxLayout.Y_AXIS));
-
-
-                        /***
-                         *                          _ _     _                        _             _
-                         *      _ __   ___  ___ ___(_) |__ | | ___    ___ ___  _ __ | |_ ___ _ __ | |_
-                         *     | '_ \ / _ \/ __/ __| | '_ \| |/ _ \  / __/ _ \| '_ \| __/ _ \ '_ \| __|
-                         *     | |_) | (_) \__ \__ \ | |_) | |  __/ | (_| (_) | | | | ||  __/ | | | |_
-                         *     | .__/ \___/|___/___/_|_.__/|_|\___|  \___\___/|_| |_|\__\___|_| |_|\__|
-                         *     |_|
-                         */
-                        for (final ResInfoType resInfoType : mapCat2Type.get(cat)) {
-                            final String keyResInfoType = resInfoType.getID() + ".resinfotype";
-                            if (!mapKey2CP.containsKey(keyResInfoType)) {
                                 synchronized (mapKey2CP) {
-                                    mapKey2CP.put(keyResInfoType, new CollapsiblePane());
+                                    mapKey2CP.put(keyResInfoCat, new CollapsiblePane());
                                 }
-                                mapKey2CP.get(keyResInfoType).setStyle(CollapsiblePane.TREE_STYLE);
-                                mapKey2CP.get(keyResInfoType).addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+                                mapKey2CP.get(keyResInfoCat).setStyle(CollapsiblePane.TREE_STYLE);
+                                mapKey2CP.get(keyResInfoCat).addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
                                     @Override
                                     public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                                        SYSPropsTools.storeProp(keyResInfoType + ".expanded", "true", OPDE.getLogin().getUser());
+                                        SYSPropsTools.storeProp(keyResInfoCat + ".expanded", "true", OPDE.getLogin().getUser());
                                     }
 
                                     @Override
                                     public void paneCollapsed(CollapsiblePaneEvent collapsiblePaneEvent) {
-                                        SYSPropsTools.storeProp(keyResInfoType + ".expanded", "false", OPDE.getLogin().getUser());
+                                        SYSPropsTools.storeProp(keyResInfoCat + ".expanded", "false", OPDE.getLogin().getUser());
                                     }
                                 });
                                 try {
-                                    mapKey2CP.get(keyResInfoType).setCollapsed(!SYSPropsTools.isBooleanTrue(keyResInfoType + ".expanded"));
+                                    mapKey2CP.get(keyResInfoCat).setCollapsed(!SYSPropsTools.isBooleanTrue(keyResInfoCat + ".expanded"));
                                 } catch (PropertyVetoException e) {
                                     // Bah!
                                 }
 
                             }
 
-                            CollapsiblePane cpResInfoType = mapKey2CP.get(keyResInfoType);
-                            cpResInfoType.setTitle(resInfoType.getShortDescription());
-
-                            cpResInfoType.setFont(SYSConst.ARIAL18);
-
-
-                            //                    cpResInfoType.setBackground((GUITools.blend(cat.getColor(), Color.WHITE, 0.7f)));
-                            cpResInfoType.setForeground((GUITools.blend(cat.getColor(), Color.BLACK, 0.7f)));
-                            cpResInfoType.setBackground(Color.WHITE);
-
-                            JPanel pnlInfos = new JPanel();
-                            pnlInfos.setLayout(new BoxLayout(pnlInfos, BoxLayout.Y_AXIS));
-
-                            CollapsiblePanes cpsType = new CollapsiblePanes();
-                            cpsType.setLayout(new JideBoxLayout(cpsType, JideBoxLayout.Y_AXIS));
-
-                            pnlInfos.add(cpsType);
-
-                            cpResInfoType.setContentPane(pnlInfos);
-
-                            /***
-                             *                _     _
-                             *       __ _  __| | __| |
-                             *      / _` |/ _` |/ _` |
-                             *     | (_| | (_| | (_| |
-                             *      \__,_|\__,_|\__,_|
-                             *
-                             */
-                            if (resInfoType.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS ||
-                                    resInfoType.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_NOCONSTRAINTS ||
-                                    mapType2ResInfos.get(resInfoType).isEmpty() ||
-                                    ResInfoTypeTools.containsOnlyClosedInfos(mapType2ResInfos.get(resInfoType)) ||
-                                    ResInfoTypeTools.containsOneActiveObsoleteInfo(mapType2ResInfos.get(resInfoType))
-                                    ) {
-                                if (resInfoType.getType() == ResInfoTypeTools.TYPE_DIAGNOSIS) {
-                                    final JideButton btnAdd = GUITools.createHyperlinkButton("nursingrecords.info.noconstraints", SYSConst.icon22add, null);
-                                    btnAdd.addActionListener(new ActionListener() {
-                                        @Override
-                                        public void actionPerformed(ActionEvent e) {
-                                            new DlgDiag(new ResInfo(resInfoType, resident), new Closure() {
-                                                @Override
-                                                public void execute(Object o) {
-                                                    if (o != null) {
-                                                        EntityManager em = OPDE.createEM();
-                                                        try {
-                                                            em.getTransaction().begin();
-                                                            em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                                            // so that no conflicts can occur if another user enters a new info at the same time
-                                                            ResInfoType myType = em.merge(resInfoType);
-                                                            em.lock(myType, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                                                            final ResInfo newinfo = em.merge((ResInfo) o);
-
-                                                            em.getTransaction().commit();
-                                                            synchronized (mapType2ResInfos) {
-                                                                mapType2ResInfos.get(newinfo.getResInfoType()).add(newinfo);
-                                                                Collections.sort(mapType2ResInfos.get(newinfo.getResInfoType()));
-                                                            }
-
-                                                            synchronized (listAllTypes) {
-                                                                listAllTypes.remove(resInfoType);
-                                                                listAllTypes.add(myType);
-                                                            }
-
-                                                            synchronized (listAllInfos) {
-                                                                listAllInfos.add(newinfo);
-                                                            }
-
-                                                            if (newinfo.getResInfoType().isAlertType()) {
-                                                                GUITools.setResidentDisplay(resident);
-                                                            }
-
-                                                            reloadDisplay();
-
-                                                        } catch (OptimisticLockException ole) {
-                                                            if (em.getTransaction().isActive()) {
-                                                                em.getTransaction().rollback();
-                                                            }
-                                                            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                                                OPDE.getMainframe().emptyFrame();
-                                                                OPDE.getMainframe().afterLogin();
-                                                            }
-                                                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                                        } catch (RollbackException ole) {
-                                                            if (em.getTransaction().isActive()) {
-                                                                em.getTransaction().rollback();
-                                                            }
-                                                            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                                                OPDE.getMainframe().emptyFrame();
-                                                                OPDE.getMainframe().afterLogin();
-                                                            }
-                                                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                                        } catch (Exception e) {
-                                                            if (em.getTransaction().isActive()) {
-                                                                em.getTransaction().rollback();
-                                                            }
-                                                            OPDE.fatal(e);
-                                                        } finally {
-                                                            em.close();
-                                                        }
-                                                    }
-                                                }
-                                            });
-                                        }
-                                    });
-                                    cpsType.add(btnAdd);
-                                } else if (resInfoType.getType() == ResInfoTypeTools.TYPE_ABSENCE) {
-                                    cpsType.add(new JLabel(OPDE.lang.getString("nursingrecords.info.cant.add.absence.here")));
-                                } else if (resInfoType.getType() == ResInfoTypeTools.TYPE_STAY) {
-                                    cpsType.add(new JLabel(OPDE.lang.getString("nursingrecords.info.cant.add.stays.here")));
-                                } else {// if (resInfoType.getType() != ResInfoTypeTools.TYPE_ABSENCE && resInfoType.getType() != ResInfoTypeTools.TYPE_STAY)
-                                    String buttonText = mapType2ResInfos.get(resInfoType).isEmpty() ? "nursingrecords.info.no.entry.yet" : "nursingrecords.info.only.closed.entries";
-                                    if (resInfoType.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
-                                        buttonText = "nursingrecords.info.singleincident";
-                                    }
-                                    final JideButton btnAdd = GUITools.createHyperlinkButton(buttonText, SYSConst.icon22add, null);
-                                    btnAdd.addActionListener(new ActionListener() {
-                                        @Override
-                                        public void actionPerformed(ActionEvent e) {
-                                            final JidePopup popup = new JidePopup();
-                                            PnlEditResInfo pnlEditResInfo = new PnlEditResInfo(new ResInfo(resInfoType, resident), new Closure() {
-                                                @Override
-                                                public void execute(Object o) {
-                                                    popup.hidePopup();
-                                                    if (o != null) {
-                                                        EntityManager em = OPDE.createEM();
-                                                        try {
-                                                            em.getTransaction().begin();
-                                                            em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                                            // so that no conflicts can occur if another user enters a new info at the same time
-                                                            ResInfoType myType = em.merge(resInfoType);
-                                                            em.lock(myType, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                                                            final ResInfo newinfo = em.merge((ResInfo) o);
-                                                            newinfo.setHtml(ResInfoTools.getContentAsHTML(newinfo));
-
-                                                            // only for the screen refresh
-                                                            // if there are active resinfos with obsolete forms that should be replaced
-                                                            // by this one, they must all be closed now.
-                                                            if (!newinfo.isSingleIncident()) {
-                                                                for (ResInfo myResInfo : mapType2ResInfos.get(resInfoType)) {
-                                                                    if (!myResInfo.isClosed() && myResInfo.getResInfoType().isObsolete()) {
-                                                                        ResInfo closedResInfo = em.merge(myResInfo);
-                                                                        em.lock(closedResInfo, LockModeType.OPTIMISTIC);
-                                                                        closedResInfo.setTo(new DateTime(newinfo.getFrom()).minusSeconds(1).toDate());
-                                                                        closedResInfo.setUserOFF(em.merge(OPDE.getLogin().getUser()));
-                                                                    }
-                                                                }
-                                                            }
-
-                                                            em.getTransaction().commit();
-
-
-                                                            if (newinfo.getResInfoType().isAlertType()) {
-                                                                GUITools.setResidentDisplay(resident);
-                                                            }
-
-                                                            reload();
-                                                        } catch (OptimisticLockException ole) {
-                                                            if (em.getTransaction().isActive()) {
-                                                                em.getTransaction().rollback();
-                                                            }
-                                                            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                                                OPDE.getMainframe().emptyFrame();
-                                                                OPDE.getMainframe().afterLogin();
-                                                            }
-                                                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                                        } catch (RollbackException ole) {
-                                                            if (em.getTransaction().isActive()) {
-                                                                em.getTransaction().rollback();
-                                                            }
-                                                            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                                                OPDE.getMainframe().emptyFrame();
-                                                                OPDE.getMainframe().afterLogin();
-                                                            }
-                                                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                                        } catch (Exception e) {
-                                                            if (em.getTransaction().isActive()) {
-                                                                em.getTransaction().rollback();
-                                                            }
-                                                            OPDE.fatal(e);
-                                                        } finally {
-                                                            em.close();
-                                                        }
-                                                    }
-                                                }
-                                            }, resInfoType.getResInfoCat().getColor());
-                                            pnlEditResInfo.setEnabled(true, PnlEditResInfo.NEW);
-
-                                            popup.setMovable(false);
-                                            popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-                                            JScrollPane scrl = new JScrollPane(pnlEditResInfo.getPanel());
-                                            scrl.setPreferredSize(new Dimension(pnlEditResInfo.getPanel().getPreferredSize().width + 100, Math.min(pnlEditResInfo.getPanel().getPreferredSize().height, OPDE.getMainframe().getHeight()) - 100));
-
-                                            popup.setOwner(btnAdd);
-                                            popup.removeExcludedComponent(btnAdd);
-                                            popup.getContentPane().add(scrl);
-                                            popup.setDefaultFocusComponent(scrl);
-                                            GUITools.showPopup(popup, SwingConstants.CENTER);
-                                        }
-                                    });
-                                    cpsType.add(btnAdd);
-
+                            final CollapsiblePane cpCat = mapKey2CP.get(keyResInfoCat);
+                            final DefaultCPTitle cpTitleCat = new DefaultCPTitle(cat.getText(), new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
                                     try {
-                                        mapKey2CP.get(keyResInfoType).setCollapsed(true);
-                                    } catch (PropertyVetoException e) {
-                                        // bah!
+                                        cpCat.setCollapsed(!cpCat.isCollapsed());
+                                    } catch (PropertyVetoException pve) {
+                                        // BAH!
                                     }
                                 }
+                            });
+
+
+                            GUITools.addExpandCollapseButtons(cpCat, cpTitleCat.getRight());
+
+                            /***
+                             *                _
+                             *       ___ ___ | | ___  _ __
+                             *      / __/ _ \| |/ _ \| '__|
+                             *     | (_| (_) | | (_) | |
+                             *      \___\___/|_|\___/|_|
+                             *
+                             */
+                            if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)) {
+                                final JButton btnColor = new JButton(SYSConst.icon22colorset);
+                                btnColor.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                                btnColor.setContentAreaFilled(false);
+                                btnColor.setBorder(null);
+                                btnColor.setToolTipText(OPDE.lang.getString("misc.msg.colorset"));
+                                btnColor.setSelectedIcon(SYSConst.icon22colorsetPressed);
+                                btnColor.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        final JColorChooser clr = new JColorChooser(cat.getColor());
+                                        final JidePopup popup = new JidePopup();
+                                        clr.getSelectionModel().addChangeListener(new ChangeListener() {
+                                            @Override
+                                            public void stateChanged(ChangeEvent e) {
+                                                popup.hidePopup();
+                                                EntityManager em = OPDE.createEM();
+                                                try {
+                                                    em.getTransaction().begin();
+                                                    ResInfoCategory myCat = em.merge(cat);
+                                                    em.lock(myCat, LockModeType.OPTIMISTIC);
+                                                    myCat.setColor(clr.getColor());
+                                                    em.getTransaction().commit();
+                                                    synchronized (listCategories) {
+                                                        listCategories.remove(cat);
+                                                        listCategories.add(myCat);
+                                                    }
+                                                    sortData();
+                                                    reload();
+                                                } catch (OptimisticLockException ole) {
+                                                    if (em.getTransaction().isActive()) {
+                                                        em.getTransaction().rollback();
+                                                    }
+                                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                                } catch (RollbackException ole) {
+                                                    if (em.getTransaction().isActive()) {
+                                                        em.getTransaction().rollback();
+                                                    }
+                                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                                        OPDE.getMainframe().emptyFrame();
+                                                        OPDE.getMainframe().afterLogin();
+                                                    }
+                                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ole.getMessage(), DisplayMessage.IMMEDIATELY));
+                                                } catch (Exception ex) {
+                                                    if (em.getTransaction().isActive()) {
+                                                        em.getTransaction().rollback();
+                                                    }
+                                                    OPDE.fatal(ex);
+                                                } finally {
+                                                    em.close();
+                                                }
+                                            }
+                                        });
+
+                                        popup.setMovable(false);
+                                        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                                        popup.setPopupType(JidePopup.HEAVY_WEIGHT_POPUP);
+
+                                        popup.setOwner(btnColor);
+                                        popup.removeExcludedComponent(btnColor);
+                                        popup.setTransient(false);
+                                        popup.getContentPane().add(clr);
+                                        popup.setDefaultFocusComponent(clr);
+                                        GUITools.showPopup(popup, SwingConstants.SOUTH_WEST);
+                                    }
+                                });
+                                cpTitleCat.getRight().add(btnColor);
                             }
 
-                            for (final ResInfo info : mapType2ResInfos.get(resInfoType)) {
-                                cpsType.add(createCP4(info));
+                            cpTitleCat.getButton().setFont(SYSConst.ARIAL24);
+                            cpTitleCat.getButton().setForeground(GUITools.getForeground(cat.getColor()));
+
+                            cpTitleCat.getButton().setForeground(cat.getColor());
+                            cpCat.setBackground(Color.white);
+                            cpCat.setTitleLabelComponent(cpTitleCat.getMain());
+
+                            //                cpCat.setBackground(cat.getColor());
+
+
+                            JPanel pnlTypes = new JPanel();
+                            pnlTypes.setLayout(new BoxLayout(pnlTypes, BoxLayout.Y_AXIS));
+
+
+                            /***
+                             *                          _ _     _                        _             _
+                             *      _ __   ___  ___ ___(_) |__ | | ___    ___ ___  _ __ | |_ ___ _ __ | |_
+                             *     | '_ \ / _ \/ __/ __| | '_ \| |/ _ \  / __/ _ \| '_ \| __/ _ \ '_ \| __|
+                             *     | |_) | (_) \__ \__ \ | |_) | |  __/ | (_| (_) | | | | ||  __/ | | | |_
+                             *     | .__/ \___/|___/___/_|_.__/|_|\___|  \___\___/|_| |_|\__\___|_| |_|\__|
+                             *     |_|
+                             */
+                            for (final ResInfoType resInfoType : mapCat2Type.get(cat)) {
+                                final String keyResInfoType = resInfoType.getID() + ".resinfotype";
+                                if (!mapKey2CP.containsKey(keyResInfoType)) {
+                                    synchronized (mapKey2CP) {
+                                        mapKey2CP.put(keyResInfoType, new CollapsiblePane());
+                                    }
+                                    mapKey2CP.get(keyResInfoType).setStyle(CollapsiblePane.TREE_STYLE);
+                                    mapKey2CP.get(keyResInfoType).addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+                                        @Override
+                                        public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+                                            SYSPropsTools.storeProp(keyResInfoType + ".expanded", "true", OPDE.getLogin().getUser());
+                                        }
+
+                                        @Override
+                                        public void paneCollapsed(CollapsiblePaneEvent collapsiblePaneEvent) {
+                                            SYSPropsTools.storeProp(keyResInfoType + ".expanded", "false", OPDE.getLogin().getUser());
+                                        }
+                                    });
+                                    try {
+                                        mapKey2CP.get(keyResInfoType).setCollapsed(!SYSPropsTools.isBooleanTrue(keyResInfoType + ".expanded"));
+                                    } catch (PropertyVetoException e) {
+                                        // Bah!
+                                    }
+
+                                }
+
+                                CollapsiblePane cpResInfoType = mapKey2CP.get(keyResInfoType);
+                                cpResInfoType.setTitle(resInfoType.getShortDescription());
+
+                                cpResInfoType.setFont(SYSConst.ARIAL18);
+
+
+                                //                    cpResInfoType.setBackground((GUITools.blend(cat.getColor(), Color.WHITE, 0.7f)));
+                                cpResInfoType.setForeground((GUITools.blend(cat.getColor(), Color.BLACK, 0.7f)));
+                                cpResInfoType.setBackground(Color.WHITE);
+
+                                JPanel pnlInfos = new JPanel();
+                                pnlInfos.setLayout(new BoxLayout(pnlInfos, BoxLayout.Y_AXIS));
+
+                                CollapsiblePanes cpsType = new CollapsiblePanes();
+                                cpsType.setLayout(new JideBoxLayout(cpsType, JideBoxLayout.Y_AXIS));
+
+                                pnlInfos.add(cpsType);
+
+                                cpResInfoType.setContentPane(pnlInfos);
+
+                                /***
+                                 *                _     _
+                                 *       __ _  __| | __| |
+                                 *      / _` |/ _` |/ _` |
+                                 *     | (_| | (_| | (_| |
+                                 *      \__,_|\__,_|\__,_|
+                                 *
+                                 */
+                                if (resInfoType.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS ||
+                                        resInfoType.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_NOCONSTRAINTS ||
+                                        mapType2ResInfos.get(resInfoType).isEmpty() ||
+                                        ResInfoTypeTools.containsOnlyClosedInfos(mapType2ResInfos.get(resInfoType)) ||
+                                        ResInfoTypeTools.containsOneActiveObsoleteInfo(mapType2ResInfos.get(resInfoType))
+                                        ) {
+                                    if (resInfoType.getType() == ResInfoTypeTools.TYPE_DIAGNOSIS) {
+                                        final JideButton btnAdd = GUITools.createHyperlinkButton("nursingrecords.info.noconstraints", SYSConst.icon22add, null);
+                                        btnAdd.addActionListener(new ActionListener() {
+                                            @Override
+                                            public void actionPerformed(ActionEvent e) {
+                                                new DlgDiag(new ResInfo(resInfoType, resident), new Closure() {
+                                                    @Override
+                                                    public void execute(Object o) {
+                                                        if (o != null) {
+                                                            EntityManager em = OPDE.createEM();
+                                                            try {
+                                                                em.getTransaction().begin();
+                                                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                                                // so that no conflicts can occur if another user enters a new info at the same time
+                                                                ResInfoType myType = em.merge(resInfoType);
+                                                                em.lock(myType, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                                                final ResInfo newinfo = em.merge((ResInfo) o);
+
+                                                                em.getTransaction().commit();
+                                                                synchronized (mapType2ResInfos) {
+                                                                    mapType2ResInfos.get(newinfo.getResInfoType()).add(newinfo);
+                                                                    Collections.sort(mapType2ResInfos.get(newinfo.getResInfoType()));
+                                                                }
+
+                                                                synchronized (listAllTypes) {
+                                                                    listAllTypes.remove(resInfoType);
+                                                                    listAllTypes.add(myType);
+                                                                }
+
+                                                                synchronized (listAllInfos) {
+                                                                    listAllInfos.add(newinfo);
+                                                                }
+
+                                                                if (newinfo.getResInfoType().isAlertType()) {
+                                                                    GUITools.setResidentDisplay(resident);
+                                                                }
+
+                                                                reloadDisplay();
+
+                                                            } catch (OptimisticLockException ole) {
+                                                                if (em.getTransaction().isActive()) {
+                                                                    em.getTransaction().rollback();
+                                                                }
+                                                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                                                    OPDE.getMainframe().emptyFrame();
+                                                                    OPDE.getMainframe().afterLogin();
+                                                                }
+                                                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                                            } catch (RollbackException ole) {
+                                                                if (em.getTransaction().isActive()) {
+                                                                    em.getTransaction().rollback();
+                                                                }
+                                                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                                                    OPDE.getMainframe().emptyFrame();
+                                                                    OPDE.getMainframe().afterLogin();
+                                                                }
+                                                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                                            } catch (Exception e) {
+                                                                if (em.getTransaction().isActive()) {
+                                                                    em.getTransaction().rollback();
+                                                                }
+                                                                OPDE.fatal(e);
+                                                            } finally {
+                                                                em.close();
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        });
+                                        cpsType.add(btnAdd);
+                                    } else if (resInfoType.getType() == ResInfoTypeTools.TYPE_ABSENCE) {
+                                        cpsType.add(new JLabel(OPDE.lang.getString("nursingrecords.info.cant.add.absence.here")));
+                                    } else if (resInfoType.getType() == ResInfoTypeTools.TYPE_STAY) {
+                                        cpsType.add(new JLabel(OPDE.lang.getString("nursingrecords.info.cant.add.stays.here")));
+                                    } else {// if (resInfoType.getType() != ResInfoTypeTools.TYPE_ABSENCE && resInfoType.getType() != ResInfoTypeTools.TYPE_STAY)
+                                        String buttonText = mapType2ResInfos.get(resInfoType).isEmpty() ? "nursingrecords.info.no.entry.yet" : "nursingrecords.info.only.closed.entries";
+                                        if (resInfoType.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
+                                            buttonText = "nursingrecords.info.singleincident";
+                                        }
+                                        final JideButton btnAdd = GUITools.createHyperlinkButton(buttonText, SYSConst.icon22add, null);
+                                        btnAdd.addActionListener(new ActionListener() {
+                                            @Override
+                                            public void actionPerformed(ActionEvent e) {
+                                                final JidePopup popup = new JidePopup();
+                                                PnlEditResInfo pnlEditResInfo = new PnlEditResInfo(new ResInfo(resInfoType, resident), new Closure() {
+                                                    @Override
+                                                    public void execute(Object o) {
+                                                        popup.hidePopup();
+                                                        if (o != null) {
+                                                            EntityManager em = OPDE.createEM();
+                                                            try {
+                                                                em.getTransaction().begin();
+                                                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                                                // so that no conflicts can occur if another user enters a new info at the same time
+                                                                ResInfoType myType = em.merge(resInfoType);
+                                                                em.lock(myType, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                                                final ResInfo newinfo = em.merge((ResInfo) o);
+                                                                newinfo.setHtml(ResInfoTools.getContentAsHTML(newinfo));
+
+                                                                // only for the screen refresh
+                                                                // if there are active resinfos with obsolete forms that should be replaced
+                                                                // by this one, they must all be closed now.
+                                                                if (!newinfo.isSingleIncident()) {
+                                                                    for (ResInfo myResInfo : mapType2ResInfos.get(resInfoType)) {
+                                                                        if (!myResInfo.isClosed() && myResInfo.getResInfoType().isObsolete()) {
+                                                                            ResInfo closedResInfo = em.merge(myResInfo);
+                                                                            em.lock(closedResInfo, LockModeType.OPTIMISTIC);
+                                                                            closedResInfo.setTo(new DateTime(newinfo.getFrom()).minusSeconds(1).toDate());
+                                                                            closedResInfo.setUserOFF(em.merge(OPDE.getLogin().getUser()));
+                                                                        }
+                                                                    }
+                                                                }
+
+                                                                em.getTransaction().commit();
+
+
+                                                                if (newinfo.getResInfoType().isAlertType()) {
+                                                                    GUITools.setResidentDisplay(resident);
+                                                                }
+
+                                                                reload();
+                                                            } catch (OptimisticLockException ole) {
+                                                                if (em.getTransaction().isActive()) {
+                                                                    em.getTransaction().rollback();
+                                                                }
+                                                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                                                    OPDE.getMainframe().emptyFrame();
+                                                                    OPDE.getMainframe().afterLogin();
+                                                                }
+                                                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                                            } catch (RollbackException ole) {
+                                                                if (em.getTransaction().isActive()) {
+                                                                    em.getTransaction().rollback();
+                                                                }
+                                                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                                                    OPDE.getMainframe().emptyFrame();
+                                                                    OPDE.getMainframe().afterLogin();
+                                                                }
+                                                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                                            } catch (Exception e) {
+                                                                if (em.getTransaction().isActive()) {
+                                                                    em.getTransaction().rollback();
+                                                                }
+                                                                OPDE.fatal(e);
+                                                            } finally {
+                                                                em.close();
+                                                            }
+                                                        }
+                                                    }
+                                                }, resInfoType.getResInfoCat().getColor());
+                                                pnlEditResInfo.setEnabled(true, PnlEditResInfo.NEW);
+
+                                                popup.setMovable(false);
+                                                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                                                JScrollPane scrl = new JScrollPane(pnlEditResInfo.getPanel());
+                                                scrl.setPreferredSize(new Dimension(pnlEditResInfo.getPanel().getPreferredSize().width + 100, Math.min(pnlEditResInfo.getPanel().getPreferredSize().height, OPDE.getMainframe().getHeight()) - 100));
+
+                                                popup.setOwner(btnAdd);
+                                                popup.removeExcludedComponent(btnAdd);
+                                                popup.getContentPane().add(scrl);
+                                                popup.setDefaultFocusComponent(scrl);
+                                                GUITools.showPopup(popup, SwingConstants.CENTER);
+                                            }
+                                        });
+                                        cpsType.add(btnAdd);
+
+                                        try {
+                                            mapKey2CP.get(keyResInfoType).setCollapsed(true);
+                                        } catch (PropertyVetoException e) {
+                                            // bah!
+                                        }
+                                    }
+                                }
+
+                                for (final ResInfo info : mapType2ResInfos.get(resInfoType)) {
+                                    cpsType.add(createCP4(info));
+                                }
+
+                                cpsType.addExpansion();
+
+                                pnlTypes.add(cpResInfoType);
+
                             }
 
-                            cpsType.addExpansion();
+                            cpCat.setContentPane(pnlTypes);
 
-                            pnlTypes.add(cpResInfoType);
-
+                            cpsAll.add(cpCat);
                         }
 
-                        cpCat.setContentPane(pnlTypes);
-
-                        cpsAll.add(cpCat);
                     }
-
+                    cpsAll.addExpansion();
+                } catch (Exception e) {
+                    OPDE.fatal(e);
                 }
-                cpsAll.addExpansion();
                 return null;
             }
 
@@ -637,11 +642,8 @@ public class PnlInformation extends NursingRecordsPanel {
         }
 
         if (!resInfo.isClosed() || !resInfo.isSingleIncident()) {
-//            cpInfo.setBackground((GUITools.blend(resInfo.getResInfoType().getResInfoCat().getColor(), Color.WHITE, 0.25f)));
-//            cptitle.getButton().setForeground(GUITools.getForeground(cpInfo.getBackground()));
             cptitle.getButton().setForeground(GUITools.blend(resInfo.getResInfoType().getResInfoCat().getColor(), Color.BLACK, 0.25f));
             cpInfo.setBackground(Color.WHITE);
-//            cpInfo.setBorder(new LineBorder(GUITools.blend(resInfo.getResInfoType().getResInfoCat().getColor(), Color.BLACK, 0.25f), 2));
         }
 
 

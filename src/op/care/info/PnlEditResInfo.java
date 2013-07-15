@@ -664,7 +664,7 @@ public class PnlEditResInfo {
 
     private void setContent() {
         txtComment.setText(SYSTools.catchNull(resInfo.getText()));
-        if (resInfo.getProperties().isEmpty()) {
+        if (SYSTools.catchNull(resInfo.getProperties()).isEmpty()) {
             return;
         }
 
