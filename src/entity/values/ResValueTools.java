@@ -324,53 +324,53 @@ public class ResValueTools {
         return list;
     }
 
-    public static ArrayList<ResValue> getResValues(Resident resident,short type, DateMidnight f, DateMidnight t) {
+    public static ArrayList<ResValue> getResValues(Resident resident, short type, DateMidnight f, DateMidnight t) {
 
-    //        DateTime theYear = new DateTime(year, 1, 1, 0, 0, 0);
-            DateTime from = f.toDateTime().secondOfDay().withMinimumValue();
-            DateTime to = t.toDateTime().secondOfDay().withMaximumValue();
+        //        DateTime theYear = new DateTime(year, 1, 1, 0, 0, 0);
+        DateTime from = f.toDateTime().secondOfDay().withMinimumValue();
+        DateTime to = t.toDateTime().secondOfDay().withMaximumValue();
 
-            EntityManager em = OPDE.createEM();
-            Query query = em.createQuery("" +
-                    " SELECT rv FROM ResValue rv " +
-                    " WHERE rv.resident = :resident " +
-                    " AND rv.pit >= :from" +
-                    " AND rv.pit <= :to" +
-                    " AND rv.vtype.valType = :type" +
-                    " ORDER BY rv.pit DESC ");
-            query.setParameter("resident", resident);
-            query.setParameter("type", type);
-            query.setParameter("from", from.toDate());
-            query.setParameter("to", to.toDate());
-            ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
-            em.close();
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("" +
+                " SELECT rv FROM ResValue rv " +
+                " WHERE rv.resident = :resident " +
+                " AND rv.pit >= :from" +
+                " AND rv.pit <= :to" +
+                " AND rv.vtype.valType = :type" +
+                " ORDER BY rv.pit DESC ");
+        query.setParameter("resident", resident);
+        query.setParameter("type", type);
+        query.setParameter("from", from.toDate());
+        query.setParameter("to", to.toDate());
+        ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
+        em.close();
 
-            return list;
-        }
+        return list;
+    }
 
     public static ArrayList<ResValue> getResValues(Resident resident, ResValueTypes vtype, DateMidnight day) {
 
-    //        DateTime theYear = new DateTime(year, 1, 1, 0, 0, 0);
-            DateTime from = day.toDateTime().secondOfDay().withMinimumValue();
-            DateTime to = day.toDateTime().secondOfDay().withMaximumValue();
+        //        DateTime theYear = new DateTime(year, 1, 1, 0, 0, 0);
+        DateTime from = day.toDateTime().secondOfDay().withMinimumValue();
+        DateTime to = day.toDateTime().secondOfDay().withMaximumValue();
 
-            EntityManager em = OPDE.createEM();
-            Query query = em.createQuery("" +
-                    " SELECT rv FROM ResValue rv " +
-                    " WHERE rv.resident = :resident " +
-                    " AND rv.vtype = :vtype" +
-                    " AND rv.pit >= :from" +
-                    " AND rv.pit <= :to" +
-                    " ORDER BY rv.pit DESC ");
-            query.setParameter("resident", resident);
-            query.setParameter("vtype", vtype);
-            query.setParameter("from", from.toDate());
-            query.setParameter("to", to.toDate());
-            ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
-            em.close();
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("" +
+                " SELECT rv FROM ResValue rv " +
+                " WHERE rv.resident = :resident " +
+                " AND rv.vtype = :vtype" +
+                " AND rv.pit >= :from" +
+                " AND rv.pit <= :to" +
+                " ORDER BY rv.pit DESC ");
+        query.setParameter("resident", resident);
+        query.setParameter("vtype", vtype);
+        query.setParameter("from", from.toDate());
+        query.setParameter("to", to.toDate());
+        ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
+        em.close();
 
-            return list;
-        }
+        return list;
+    }
 
     public static ArrayList<ResValue> getResValues(Resident resident, ResValueTypes vtype, int year) {
 
@@ -754,32 +754,45 @@ public class ResValueTools {
         ArrayList<Resident> listResident = ResidentTools.getAllActive(currentStation.getHome());
 
         DateMidnight now = new DateMidnight();
+        try {
+            for (Resident resident : listResident) {
 
-        for (Resident resident : listResident) {
-            ArrayList<Pair<DateMidnight, BigDecimal>> violatingValues = new ArrayList<Pair<DateMidnight, BigDecimal>>();
-            Properties controlling = resident.getControlling();
+                ArrayList<Pair<DateMidnight, BigDecimal>> violatingValues = new ArrayList<Pair<DateMidnight, BigDecimal>>();
+                Properties controlling = resident.getControlling();
 
-            if ((controlling.containsKey(ResidentTools.KEY_LOWIN) && !controlling.getProperty(ResidentTools.KEY_LOWIN).equals("off")) ||
-                    (controlling.containsKey(ResidentTools.KEY_HIGHIN) && !controlling.getProperty(ResidentTools.KEY_HIGHIN).equals("off"))) {
-                int days = Integer.parseInt(controlling.getProperty(ResidentTools.KEY_DAYSDRINK));
-                HashMap<DateMidnight, BigDecimal> in = getLiquidIn(resident, now.minusDays(days));
-                if (!in.isEmpty()) {
-                    for (DateMidnight day = now.minusDays(days); day.compareTo(new DateMidnight()) <= 0; day = day.plusDays(1)) {
-                        if (in.get(day).compareTo(new BigDecimal(controlling.getProperty(ResidentTools.KEY_LOWIN))) < 0) {
-                            violatingValues.add(new Pair<DateMidnight, BigDecimal>(day, in.get(day)));
-                        }
-                        if (in.get(day).compareTo(new BigDecimal(controlling.getProperty(ResidentTools.KEY_HIGHIN))) > 0) {
-                            violatingValues.add(new Pair<DateMidnight, BigDecimal>(day, in.get(day)));
+                if (controlling.containsKey(ResidentTools.KEY_LOWIN) && !controlling.getProperty(ResidentTools.KEY_LOWIN).equals("off")) {
+                    int days = Integer.parseInt(controlling.getProperty(ResidentTools.KEY_DAYSDRINK));
+                    HashMap<DateMidnight, BigDecimal> in = getLiquidIn(resident, now.minusDays(days));
+                    if (!in.isEmpty()) {
+                        for (DateMidnight day = now.minusDays(days); day.compareTo(new DateMidnight()) <= 0; day = day.plusDays(1)) {
+
+                            if (in.get(day).compareTo(new BigDecimal(controlling.getProperty(ResidentTools.KEY_LOWIN))) < 0) {
+                                violatingValues.add(new Pair<DateMidnight, BigDecimal>(day, in.get(day)));
+                            }
                         }
                     }
                 }
-            }
 
-            if (!violatingValues.isEmpty()) {
-                result.add(new Object[]{resident, violatingValues});
+                if (controlling.containsKey(ResidentTools.KEY_HIGHIN) && !controlling.getProperty(ResidentTools.KEY_HIGHIN).equals("off")) {
+                    int days = Integer.parseInt(controlling.getProperty(ResidentTools.KEY_DAYSDRINK));
+                    HashMap<DateMidnight, BigDecimal> in = getLiquidIn(resident, now.minusDays(days));
+                    if (!in.isEmpty()) {
+                        for (DateMidnight day = now.minusDays(days); day.compareTo(new DateMidnight()) <= 0; day = day.plusDays(1)) {
+
+                            if (in.get(day).compareTo(new BigDecimal(controlling.getProperty(ResidentTools.KEY_HIGHIN))) > 0) {
+                                violatingValues.add(new Pair<DateMidnight, BigDecimal>(day, in.get(day)));
+                            }
+                        }
+                    }
+                }
+
+                if (!violatingValues.isEmpty()) {
+                    result.add(new Object[]{resident, violatingValues});
+                }
             }
+        } catch (Exception e) {
+            OPDE.fatal(e);
         }
-
         listResident.clear();
 
 
