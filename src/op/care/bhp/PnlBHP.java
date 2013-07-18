@@ -668,6 +668,67 @@ public class PnlBHP extends NursingRecordsPanel {
                 cptitle.getRight().add(spacer);
 
                 /***
+                 *                             ____  _             _
+                 *       ___  _ __   ___ _ __ / ___|| |_ ___   ___| | __
+                 *      / _ \| '_ \ / _ \ '_ \\___ \| __/ _ \ / __| |/ /
+                 *     | (_) | |_) |  __/ | | |___) | || (_) | (__|   <
+                 *      \___/| .__/ \___|_| |_|____/ \__\___/ \___|_|\_\
+                 *           |_|
+                 */
+                if (bhp.hasMed() && stock == null && MedInventoryTools.getNextToOpen(TradeFormTools.getInventory4TradeForm(resident, bhp.getTradeForm())) != null) {
+                    final JButton btnOpenStock = new JButton(SYSConst.icon22ledGreenOn);
+                    btnOpenStock.setPressedIcon(SYSConst.icon22ledGreenOff);
+                    btnOpenStock.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                    btnOpenStock.setContentAreaFilled(false);
+                    btnOpenStock.setBorder(null);
+                    btnOpenStock.setToolTipText(SYSTools.toHTMLForScreen(OPDE.lang.getString("nursingrecords.inventory.stock.btnopen.tooltip")));
+                    btnOpenStock.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent actionEvent) {
+
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                BHP myBHP = em.merge(bhp);
+                                em.lock(myBHP, LockModeType.OPTIMISTIC);
+                                em.lock(myBHP.getPrescriptionSchedule(), LockModeType.OPTIMISTIC);
+                                em.lock(myBHP.getPrescription(), LockModeType.OPTIMISTIC);
+
+                                MedStock myStock = em.merge(MedInventoryTools.openNext(TradeFormTools.getInventory4TradeForm(resident, myBHP.getTradeForm())));
+                                em.lock(myStock, LockModeType.OPTIMISTIC);
+                                em.getTransaction().commit();
+
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(String.format(OPDE.lang.getString("newstocks.stock.has.been.opened"), myStock.getID().toString())));
+                                reload();
+
+                            } catch (OptimisticLockException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+                            }
+
+
+                        }
+
+
+                    });
+                    cptitle.getRight().add(btnOpenStock);
+                }
+
+                /***
                  *      _     _         ____       __
                  *     | |__ | |_ _ __ |  _ \ ___ / _|_   _ ___  ___
                  *     | '_ \| __| '_ \| |_) / _ \ |_| | | / __|/ _ \

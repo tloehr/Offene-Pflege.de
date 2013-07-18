@@ -547,7 +547,8 @@ public class PnlInformation extends NursingRecordsPanel {
                                                 popup.setMovable(false);
                                                 popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
                                                 JScrollPane scrl = new JScrollPane(pnlEditResInfo.getPanel());
-                                                scrl.setPreferredSize(new Dimension(pnlEditResInfo.getPanel().getPreferredSize().width + 100, Math.min(pnlEditResInfo.getPanel().getPreferredSize().height, OPDE.getMainframe().getHeight()) - 100));
+                                                //scrl.setPreferredSize(new Dimension(pnlEditResInfo.getPanel().getPreferredSize().width + 100, Math.min(pnlEditResInfo.getPanel().getPreferredSize().height, OPDE.getMainframe().getHeight()) - 100));
+                                                scrl.setPreferredSize(new Dimension(pnlEditResInfo.getPanel().getPreferredSize().width + 100, Math.min(pnlEditResInfo.getPanel().getPreferredSize().height, OPDE.getMainframe().getHeight())));
 
                                                 popup.setOwner(btnAdd);
                                                 popup.removeExcludedComponent(btnAdd);
@@ -1203,6 +1204,14 @@ public class PnlInformation extends NursingRecordsPanel {
     @Override
     public void reload() {
         refreshData();
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)) {
+            btnResDied.setEnabled(resident.isActive());
+            btnResMovedOut.setEnabled(resident.isActive());
+        }
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
+            btnResIsAway.setEnabled(resident.isActive() && !ResInfoTools.isAway(resident));
+            btnResIsBack.setEnabled(resident.isActive() && ResInfoTools.isAway(resident));
+        }
         reloadDisplay();
     }
 
@@ -2120,7 +2129,7 @@ public class PnlInformation extends NursingRecordsPanel {
                     }
                 }
             });
-            btnResIsBack.setEnabled(resident.isActive() && !ResInfoTools.isAway(resident));
+            btnResIsBack.setEnabled(resident.isActive() && ResInfoTools.isAway(resident));
             list.add(btnResIsBack);
 
 

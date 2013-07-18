@@ -555,4 +555,39 @@ public class DFNTools {
         return dfn.isEmpty() ? null : dfn.get(0);
     }
 
+    public static ArrayList<Object[]> getAVGTimesPerDay(DateMidnight month) {
+
+        String mysql = "" +
+                "SELECT i1 j1, (i4 / ?) j3, i3 j4  FROM " +
+                " (" +
+                "SELECT dfn.BWKennung i1, DATE(dfn.Soll) i2, intv.BWIKID i3, SUM(dfn.Dauer) i4 FROM DFN dfn " +
+                "INNER JOIN Intervention intv ON dfn.MassID = intv.MassID " +
+                " INNER JOIN resident res ON res.BWKennung = dfn.BWKennung " +
+                " WHERE dfn.Soll >= ? AND dfn.Soll <= ? AND res.StatID IS NOT NULL " +
+                " GROUP BY dfn.BWKennung, intv.BWIKID " +
+                " ) tbl1 " +
+                " INNER JOIN resinfocategory cat ON cat.BWIKID = i3 " +
+                " GROUP BY j1, j3 " +
+                " ORDER BY j1, j4 ";
+
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNativeQuery(mysql);
+
+        DateTime f = month.toDateTime().dayOfMonth().withMinimumValue().secondOfDay().withMinimumValue();
+        DateTime t = month.toDateTime().dayOfMonth().withMaximumValue().secondOfDay().withMaximumValue();
+
+
+//        OPDE.debug("period " + Days.daysBetween(f, t).getDays() + " days");
+
+        query.setParameter(1, Days.daysBetween(f, t).getDays()+1);
+        query.setParameter(2, f.toDate());
+        query.setParameter(3, t.toDate());
+
+        ArrayList<Object[]> list = new ArrayList(query.getResultList());
+
+        em.close();
+
+        return list;
+    }
+
 }

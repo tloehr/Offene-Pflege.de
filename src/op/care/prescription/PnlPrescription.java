@@ -741,7 +741,7 @@ public class PnlPrescription extends NursingRecordsPanel {
     private JPanel getMenu(final Prescription prescription) {
 
         JPanel pnlMenu = new JPanel(new VerticalLayout());
-        long numBHPs = BHPTools.getNumBHPs(prescription);
+        long numBHPs = BHPTools.getConfirmedBHPs(prescription);
         final MedInventory inventory = prescription.shouldBeCalculated() ? TradeFormTools.getInventory4TradeForm(prescription.getResident(), prescription.getTradeForm()) : null;
         final MedStock stockInUse = MedStockTools.getStockInUse(inventory);
 
@@ -858,11 +858,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                                     final CollapsiblePane myCP = createCP4(myPrescription);
 
                                     buildPanel();
-//                                    if (!tbClosed.isSelected()) {
-//                                        tbClosed.setSelected(true);
-//                                    } else {
-//
-//                                    }
+
 
                                     SwingUtilities.invokeLater(new Runnable() {
                                         @Override
@@ -896,7 +892,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                     });
                 }
             });
-            btnStop.setEnabled(!prescription.isClosed() && numBHPs != 0);
+            btnStop.setEnabled(!prescription.isClosed()); //  && numBHPs != 0
             pnlMenu.add(btnStop);
 
 

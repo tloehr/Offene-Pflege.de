@@ -83,7 +83,7 @@ public class BHPTools {
         return bhp.isEmpty() ? null : bhp.get(0);
     }
 
-    public static long getNumBHPs(Prescription prescription) {
+    public static long getConfirmedBHPs(Prescription prescription) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT COUNT(bhp) FROM BHP bhp WHERE bhp.prescription = :prescription AND bhp.state <> :status");
         query.setParameter("prescription", prescription);

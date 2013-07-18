@@ -1110,7 +1110,7 @@ public class TXEssenDoc {
             content.put(listFieldsOnPage3.get(line).getSecond(), PrescriptionTools.getDoseAsCompactText(pres));
         }
 
-        if (listRegularMeds.size() >= MAXLINESONPDF) {
+        if (listRegularMeds.size() > MAXLINESONPDF) {
             content.put(TXEAF.MEDS_WARNINGTEXT, listRegularMeds.size() - MAXLINESONPDF + " " + OPDE.lang.getString("nursingrecords.info.tx.more.meds.to.follow"));
             getAdditionMeds(listRegularMeds, MAXLINESONPDF);
         }

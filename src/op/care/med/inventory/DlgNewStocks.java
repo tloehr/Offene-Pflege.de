@@ -152,7 +152,7 @@ public class DlgNewStocks extends MyJDialog {
     private void txtExpiresFocusLost(FocusEvent e) {
         try {
             DateTime myExpiry = SYSCalendar.parseExpiryDate(txtExpires.getText());
-            if (myExpiry.isBeforeNow()){
+            if (myExpiry.isBeforeNow()) {
                 throw new Exception("date must not be in the past");
             }
             expiry = myExpiry.toDate();
@@ -559,10 +559,11 @@ public class DlgNewStocks extends MyJDialog {
             newStock.getStockTransaction().add(buchung);
             inventory.getMedStocks().add(newStock);
 
-            if (MedStockTools.getStockInUse(inventory) == null) {
-                MedInventoryTools.openNext(inventory);
-                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("newstocks.new.stock.has.been.opened"));
-            }
+            // i dont want to do this anymore. this messes up the automatic expiry detection by storing wrong "opening" dates.
+//            if (MedStockTools.getStockInUse(inventory) == null) {
+//                MedInventoryTools.openNext(inventory);
+//                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("newstocks.new.stock.has.been.opened"));
+//            }
 
             em.getTransaction().commit();
             amount = null;
