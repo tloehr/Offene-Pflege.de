@@ -520,11 +520,9 @@ public class PnlWelcome extends CleanablePanel {
     private void btnAboutActionPerformed(ActionEvent e) {
         Desktop desktop = Desktop.getDesktop();
         try {
-            if (OPDE.isUpdateAvailable()) {
-                desktop.browse(new URI("https://www.offene-pflege.de/de/versionen"));
-            } else {
-                desktop.browse(new URI("https://www.offene-pflege.de"));
-            }
+
+            desktop.browse(new URI(OPDE.getUpdateDescriptionURL()));
+
         } catch (IOException ioe) {
             ioe.printStackTrace();
         } catch (URISyntaxException use) {
@@ -548,8 +546,8 @@ public class PnlWelcome extends CleanablePanel {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                    "default:grow, $lcgap, default",
-                    "default:grow"));
+                "default:grow, $lcgap, default",
+                "default:grow"));
 
             //======== scrollPane1 ========
             {

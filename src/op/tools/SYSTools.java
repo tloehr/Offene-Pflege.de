@@ -1918,6 +1918,7 @@ public class SYSTools {
         final String FILENAME = "buildnum";
 
         int remoteBuildnum = -1;
+        String descriptionURL = "";
         int mybuildnum = OPDE.getAppInfo().getBuildnum();
         FileTransferClient ftp = null;
         try {
@@ -1938,6 +1939,8 @@ public class SYSTools {
             String strRemoteBuildnum = FileUtils.readLines(target).get(0);
             remoteBuildnum = Integer.parseInt(strRemoteBuildnum);
 
+            descriptionURL = FileUtils.readLines(target).get(1);
+
             ftp.disconnect();
         } catch (Exception e) {
             if (ftp != null && ftp.isConnected()) {
@@ -1952,7 +1955,7 @@ public class SYSTools {
             OPDE.error(e);
         }
 
-        OPDE.setUpdateAvailable(remoteBuildnum > mybuildnum);
+        OPDE.setUpdateAvailable(remoteBuildnum > mybuildnum, descriptionURL);
     }
 
 }

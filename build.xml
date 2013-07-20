@@ -73,7 +73,7 @@
             <entry key="program.PROGNAME" default="${main.class}"/>
             <entry key="program.AUTHOR" default=""/>
             <entry key="program.COMPANY" default=""/>
-            <entry key="program.COPYRIGHT" default="now" type="date" pattern="yyyy"/>
+            <entry key="program.COPYRIGHT" default=""/>
             <entry key="program.DESCRIPTION" default=""/>
             <entry key="program.VERSION" default="1.0.0"/>
             <entry key="program.BUILDNUM" value="${build.number}"/>

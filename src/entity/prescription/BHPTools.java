@@ -551,4 +551,35 @@ public class BHPTools {
     }
 
 
+    public static ArrayList<Object[]> getAVGTimesPerDay(DateMidnight month) {
+
+        String mysql = " " +
+                " SELECT bhp.BWKennung i1, (SUM(intv.Dauer) / ?) i4 FROM BHP bhp " +
+                " INNER JOIN prescription ver ON ver.VERID = bhp.VERID " +
+                " INNER JOIN Intervention intv ON ver.MassID = intv.MassID " +
+                " INNER JOIN resident res ON res.BWKennung = bhp.BWKennung " +
+                " WHERE DATE(bhp.Soll) >= ? AND  DATE(bhp.Soll) <= ? AND res.StatID IS NOT NULL " +
+                " GROUP BY bhp.BWKennung ";
+
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNativeQuery(mysql);
+
+        DateTime f = month.toDateTime().dayOfMonth().withMinimumValue().secondOfDay().withMinimumValue();
+        DateTime t = month.toDateTime().dayOfMonth().withMaximumValue().secondOfDay().withMaximumValue();
+
+
+        //        OPDE.debug("period " + Days.daysBetween(f, t).getDays() + " days");
+
+        query.setParameter(1, Days.daysBetween(f, t).getDays() + 1);
+        query.setParameter(2, f.toDate());
+        query.setParameter(3, t.toDate());
+
+        ArrayList<Object[]> list = new ArrayList(query.getResultList());
+
+        em.close();
+
+        return list;
+    }
+
+
 }

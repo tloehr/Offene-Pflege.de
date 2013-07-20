@@ -185,34 +185,39 @@ public class PnlBHP extends NursingRecordsPanel {
                 @Override
                 protected Object doInBackground() throws Exception {
 
-                    int progress = 0;
-                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+                    try {
 
-                    synchronized (mapShift2BHP) {
-                        for (BHP bhp : BHPTools.getBHPs(resident, jdcDatum.getDate())) {
-                            if (!mapShift2BHP.containsKey(bhp.getShift())) {
-                                mapShift2BHP.put(bhp.getShift(), new ArrayList<BHP>());
+                        int progress = 0;
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+
+                        synchronized (mapShift2BHP) {
+                            for (BHP bhp : BHPTools.getBHPs(resident, jdcDatum.getDate())) {
+                                if (!mapShift2BHP.containsKey(bhp.getShift())) {
+                                    mapShift2BHP.put(bhp.getShift(), new ArrayList<BHP>());
+                                }
+                                mapShift2BHP.get(bhp.getShift()).add(bhp);
                             }
-                            mapShift2BHP.get(bhp.getShift()).add(bhp);
-                        }
 
-                        if (!mapShift2BHP.containsKey(BHPTools.SHIFT_ON_DEMAND)) {
-                            mapShift2BHP.put(BHPTools.SHIFT_ON_DEMAND, new ArrayList<BHP>());
-                        }
-                        mapShift2BHP.get(BHPTools.SHIFT_ON_DEMAND).addAll(BHPTools.getBHPsOnDemand(resident, jdcDatum.getDate()));
-                    }
-
-                    synchronized (mapShift2Pane) {
-                        for (Byte shift : new Byte[]{BHPTools.SHIFT_ON_DEMAND, BHPTools.SHIFT_VERY_EARLY, BHPTools.SHIFT_EARLY, BHPTools.SHIFT_LATE, BHPTools.SHIFT_VERY_LATE}) {
-                            mapShift2Pane.put(shift, createCP4(shift));
-                            try {
-                                mapShift2Pane.get(shift).setCollapsed(shift == BHPTools.SHIFT_ON_DEMAND || shift != SYSCalendar.whatShiftIs(new Date()));
-                            } catch (PropertyVetoException e) {
-                                OPDE.debug(e);
+                            if (!mapShift2BHP.containsKey(BHPTools.SHIFT_ON_DEMAND)) {
+                                mapShift2BHP.put(BHPTools.SHIFT_ON_DEMAND, new ArrayList<BHP>());
                             }
-                            progress += 20;
-                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 100));
+                            mapShift2BHP.get(BHPTools.SHIFT_ON_DEMAND).addAll(BHPTools.getBHPsOnDemand(resident, jdcDatum.getDate()));
                         }
+
+                        synchronized (mapShift2Pane) {
+                            for (Byte shift : new Byte[]{BHPTools.SHIFT_ON_DEMAND, BHPTools.SHIFT_VERY_EARLY, BHPTools.SHIFT_EARLY, BHPTools.SHIFT_LATE, BHPTools.SHIFT_VERY_LATE}) {
+                                mapShift2Pane.put(shift, createCP4(shift));
+                                try {
+                                    mapShift2Pane.get(shift).setCollapsed(shift == BHPTools.SHIFT_ON_DEMAND || shift != SYSCalendar.whatShiftIs(new Date()));
+                                } catch (PropertyVetoException e) {
+                                    OPDE.debug(e);
+                                }
+                                progress += 20;
+                                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 100));
+                            }
+                        }
+                    } catch (Exception exc) {
+                        OPDE.fatal(exc);
                     }
 
                     return null;
@@ -276,6 +281,7 @@ public class PnlBHP extends NursingRecordsPanel {
             cpBHP.removeAll();
             cpBHP.setLayout(new JideBoxLayout(cpBHP, JideBoxLayout.Y_AXIS));
             for (Byte shift : new Byte[]{BHPTools.SHIFT_ON_DEMAND, BHPTools.SHIFT_VERY_EARLY, BHPTools.SHIFT_EARLY, BHPTools.SHIFT_LATE, BHPTools.SHIFT_VERY_LATE}) {
+                OPDE.debug(shift);
                 cpBHP.add(mapShift2Pane.get(shift));
                 if (resetCollapseState) {
                     try {

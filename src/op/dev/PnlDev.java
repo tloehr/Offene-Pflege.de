@@ -9,6 +9,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
 import entity.info.*;
 import entity.nursingprocess.DFNTools;
+import entity.prescription.BHPTools;
 import op.OPDE;
 import op.care.info.PnlEditResInfo;
 import op.tools.CleanablePanel;
@@ -33,6 +34,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Properties;
 
 /**
@@ -107,138 +109,180 @@ public class PnlDev extends CleanablePanel {
 
         int[] stufen = new int[]{0, 45, 120, 240};
 
-        ArrayList<Object[]> list = DFNTools.getAVGTimesPerDay((DateMidnight) cmbMonth.getSelectedItem());
-
         SimpleDateFormat sdf = new SimpleDateFormat("MMMM yyyy");
 
-        System.out.println("Pflegestufen-Auswertung für " + sdf.format(((DateMidnight) cmbMonth.getSelectedItem()).toDate()));
-        System.out.println("-------------------------------------------------------");
-        System.out.println("-------------------------------------------------------");
+//        System.out.println("Pflegestufen-Auswertung für " + sdf.format(((DateMidnight) cmbMonth.getSelectedItem()).toDate()));
+//        System.out.println("-------------------------------------------------------");
+//        System.out.println("-------------------------------------------------------");
 
-        String priorResident = "";
-        Resident currentResident = null;
-        ResInfo ps = null;
-        BigDecimal essen = BigDecimal.ZERO;
-        BigDecimal mobil = BigDecimal.ZERO;
+//        String priorResident = "";
+
+//        ResInfo ps = null;
+//        BigDecimal essen = BigDecimal.ZERO;
+//        BigDecimal mobil = BigDecimal.ZERO;
         BigDecimal grundpf = BigDecimal.ZERO;
         BigDecimal behand = BigDecimal.ZERO;
         BigDecimal hausw = BigDecimal.ZERO;
         BigDecimal sozial = BigDecimal.ZERO;
         BigDecimal sonst = BigDecimal.ZERO;
 
+        HashMap<Resident, ArrayList<BigDecimal>> stat = new HashMap<Resident, ArrayList<BigDecimal>>();
+        HashMap<Resident, String> psstat = new HashMap<Resident, String>();
+
+
         DecimalFormat nf = new DecimalFormat();
-
-        for (Object[] objects : list) {
-            String rid = objects[0].toString();
-            BigDecimal avg = (BigDecimal) objects[1];
-            long catid = ((BigInteger) objects[2]).longValue();
-
-            if (!priorResident.equals(rid)) {
-                if (currentResident != null) {
-
-                    System.out.println("Auswertung für " + ResidentTools.getLabelText(currentResident));
-                    System.out.println("Essen und Trinken: " + nf.format(essen) + " Minuten am Tag");
-                    System.out.println("Mobilität: " + nf.format(mobil) + " Minuten am Tag");
-                    System.out.println("Hauswirtschaft: " + nf.format(hausw) + " Minuten am Tag");
-                    System.out.println("Soziales: " + nf.format(sozial) + " Minuten am Tag");
-                    System.out.println("-------");
-                    System.out.println("Grundpflege: " + nf.format(grundpf) + " Minuten am Tag");
-                    System.out.println("Behandlungspflege: " + nf.format(behand) + " Minuten am Tag");
-                    System.out.println("Sonstiges: " + nf.format(sonst) + " Minuten am Tag");
-
-                    if (ps != null) {
-                        try {
-                            StringReader reader = new StringReader(ps.getProperties());
-                            Properties props = new Properties();
-                            props.load(reader);
-                            System.out.println("Reelle Pflegestufe: " + props.getProperty("result"));
-                            reader.close();
-                        } catch (IOException ex) {
-                            OPDE.fatal(ex);
-                        }
-                    }
-
-                    int psc = 0;
-                    for (int stufe : stufen) {
-                        if (stufe > grundpf.intValue()) {
-                            System.out.println("Berechnete Pflegestufe: PS" + psc);
-                            break;
-                        }
-                        psc++;
-                    }
-
-
-                    System.out.println("===========================================================");
-                    essen = BigDecimal.ZERO;
-                    mobil = BigDecimal.ZERO;
-                    grundpf = BigDecimal.ZERO;
-                    behand = BigDecimal.ZERO;
-                    hausw = BigDecimal.ZERO;
-                    sozial = BigDecimal.ZERO;
-                    sonst = BigDecimal.ZERO;
-                }
-
-                EntityManager em = OPDE.createEM();
-                currentResident = em.find(Resident.class, rid);
-                ps = ResInfoTools.getLastResinfo(currentResident, ResInfoTypeTools.TYPE_NURSING_INSURANCE);
-                em.close();
-                priorResident = rid;
-            }
-
-            if (catid == 4) {
-                essen = essen.add(avg);
-            } else if (catid == 3) {
-                mobil = mobil.add(avg);
-            } else if (catid == 15) {
-                behand = behand.add(avg);
-            } else if (catid == 10) {
-                hausw = hausw.add(avg);
-            } else if (catid == 12) {
-                sozial = sozial.add(avg);
-            } else if (catid == 1 || catid == 2) {
-                grundpf = grundpf.add(avg);
-            }
-
-        }
-
-        if (currentResident != null) {
-
-            System.out.println("Auswertung für " + ResidentTools.getLabelText(currentResident));
-            System.out.println("Essen und Trinken: " + nf.format(essen) + " Minuten am Tag");
-            System.out.println("Mobilität: " + nf.format(mobil) + " Minuten am Tag");
-            System.out.println("Hauswirtschaft: " + nf.format(hausw) + " Minuten am Tag");
-            System.out.println("Soziales: " + nf.format(sozial) + " Minuten am Tag");
-            System.out.println("-------");
-            System.out.println("Grundpflege: " + nf.format(grundpf) + " Minuten am Tag");
-            System.out.println("Behandlungspflege: " + nf.format(behand) + " Minuten am Tag");
-            System.out.println("Sonstiges: " + nf.format(sonst) + " Minuten am Tag");
+        ArrayList<Resident> listResident = ResidentTools.getAllActive();
+//        Resident currentResident = null;
+        // vorauswertung
+        for (Resident res : listResident) {
+            stat.put(res, new ArrayList<BigDecimal>());
+            ResInfo ps = ResInfoTools.getLastResinfo(res, ResInfoTypeTools.TYPE_NURSING_INSURANCE);
             if (ps != null) {
                 try {
                     StringReader reader = new StringReader(ps.getProperties());
                     Properties props = new Properties();
                     props.load(reader);
-                    System.out.println("Reelle Pflegestufe: " + props.getProperty("result"));
+//                                        System.out.println("Reelle Pflegestufe: " + props.getProperty("result"));
+                    psstat.put(res, props.getProperty("result"));
                     reader.close();
                 } catch (IOException ex) {
                     OPDE.fatal(ex);
                 }
+            }
+        }
 
+        ArrayList<Object[]> listCare = DFNTools.getAVGTimesPerDay((DateMidnight) cmbMonth.getSelectedItem());
+        // pflege
+        int pos = 0;
+        for (Object[] objects : listCare) {
+            String rid = objects[0].toString();
+            BigDecimal avg = (BigDecimal) objects[1];
+            long catid = ((BigInteger) objects[2]).longValue();
+
+            if (catid == 15) {
+                behand = behand.add(avg);
+            } else if (catid == 10) {
+                hausw = hausw.add(avg);
+            } else if (catid == 12) {
+                sozial = sozial.add(avg);
+            } else if (catid == 1 || catid == 2 || catid == 3 || catid == 4) {
+                grundpf = grundpf.add(avg);
+            }
+
+            // wenn das hier der letzte eintrag ist oder der nächste einem anderen BW gehören wird.
+            // dann abschluss dieses durchgangs!
+            if (pos == listCare.size() - 1 || !listCare.get(pos + 1)[0].equals(rid)) {
+
+                EntityManager em = OPDE.createEM();
+                Resident currentResident = em.find(Resident.class, rid);
+                em.close();
+
+                stat.get(currentResident).add(grundpf);
+                stat.get(currentResident).add(behand);
+                stat.get(currentResident).add(hausw);
+                stat.get(currentResident).add(sozial);
+                stat.get(currentResident).add(sonst);
+
+                grundpf = BigDecimal.ZERO;
+                behand = BigDecimal.ZERO;
+                hausw = BigDecimal.ZERO;
+                sozial = BigDecimal.ZERO;
+                sonst = BigDecimal.ZERO;
+            }
+            pos++;
+        }
+
+        behand = BigDecimal.ZERO;
+//        priorResident = "";
+        pos = 0;
+        ArrayList<Object[]> listMed = BHPTools.getAVGTimesPerDay((DateMidnight) cmbMonth.getSelectedItem());
+        // behandlungspflege
+        for (Object[] objects : listMed) {
+            String rid = objects[0].toString();
+            BigDecimal avg = (BigDecimal) objects[1];
+            behand = behand.add(avg);
+
+            // wenn das hier der letzte eintrag ist oder der nächste einem anderen BW gehören wird.
+            // dann abschluss dieses durchgangs!
+            if (pos == listMed.size() - 1 || !listMed.get(pos + 1)[0].equals(rid)) {
+
+                EntityManager em = OPDE.createEM();
+                Resident currentResident = em.find(Resident.class, rid);
+                em.close();
+
+                behand = behand.add(stat.get(currentResident).get(1));
+                stat.get(currentResident).set(1, behand);
+
+                behand = BigDecimal.ZERO;
 
             }
 
-            int psc = 0;
-            for (int stufe : stufen) {
-                if (stufe > grundpf.intValue()) {
-                    System.out.println("Berechnete Pflegestufe: PS" + psc);
-                    break;
-                }
-                psc++;
-            }
-            System.out.println("===========================================================");
+            pos++;
 
         }
 
+        System.out.println("Bewohner[in];Hauswirtschaft;Soziales;Grundpflege;Behandlungspflege;Sonstiges;PS MDK;PS berechnet");
+        System.out.println("Pflegestufen-Auswertung für " + sdf.format(((DateMidnight) cmbMonth.getSelectedItem()).toDate()) + ";;;;;;;");
+        // abschluss
+        String line = "%s;%s;%s;%s;%s;%s;%s;%s";
+        for (Resident res : listResident) {
+            if (stat.containsKey(res) && !stat.get(res).isEmpty()) {
 
+                int psc = -1;
+                for (int stufe : stufen) {
+                    if (stufe > stat.get(res).get(0).intValue()) {
+//                        System.out.println("Berechnete Pflegestufe: PS" + psc);
+                        break;
+                    }
+                    psc++;
+                }
+
+                System.out.println(
+                        String.format(line,
+                                ResidentTools.getLabelText(res),
+                                nf.format(stat.get(res).get(2)),
+                                nf.format(stat.get(res).get(3)),
+                                nf.format(stat.get(res).get(0)),
+                                nf.format(stat.get(res).get(1)),
+                                nf.format(stat.get(res).get(4)),
+                                SYSTools.catchNull(psstat.get(res), "--"),
+                                "PS " + psc)
+                );
+
+//                System.out.println("Hauswirtschaft: " + nf.format(stat.get(res).get(2)) + " Minuten am Tag");
+//                System.out.println("Soziales: " + nf.format(stat.get(res).get(3)) + " Minuten am Tag");
+//                System.out.println("Grundpflege (Körperpflege, Ernährung, Mobilität, Ausscheidung): " + nf.format(stat.get(res).get(0)) + " Minuten am Tag");
+//                System.out.println("Behandlungspflege: " + nf.format(stat.get(res).get(1)) + " Minuten am Tag");
+//                System.out.println("Sonstiges: " + nf.format(stat.get(res).get(4)) + " Minuten am Tag");
+//
+//                if (psstat.containsKey(res)) {
+//                    System.out.println("Pflegestufe laut MDK: " + psstat.get(res));
+//                }
+//
+//                int psc = 0;
+//                for (int stufe : stufen) {
+//                    if (stufe > stat.get(res).get(0).intValue()) {
+//                        System.out.println("Berechnete Pflegestufe: PS" + psc);
+//                        break;
+//                    }
+//                    psc++;
+//                }
+//                System.out.println("===========================================================");
+
+            } else {
+                System.out.println(
+                        String.format(line,
+                                ResidentTools.getLabelText(res),
+                                "--",
+                                "--",
+                                "--",
+                                "--",
+                                "--",
+                                "--",
+                                "--")
+                );
+            }
+        }
     }
 
 
@@ -264,8 +308,8 @@ public class PnlDev extends CleanablePanel {
             //======== panel1 ========
             {
                 panel1.setLayout(new FormLayout(
-                    "default, $lcgap, 130dlu, $lcgap, default:grow, $lcgap, default",
-                    "default, $lgap, fill:default:grow, 2*($lgap, default)"));
+                        "default, $lcgap, 130dlu, $lcgap, default:grow, $lcgap, default",
+                        "default, $lgap, fill:default:grow, 2*($lgap, default)"));
 
                 //======== scrollPane1 ========
                 {
@@ -307,8 +351,8 @@ public class PnlDev extends CleanablePanel {
             //======== panel2 ========
             {
                 panel2.setLayout(new FormLayout(
-                    "left:default:grow",
-                    "default, $lgap, default, $rgap, fill:default, $lgap, default"));
+                        "left:default:grow",
+                        "default, $lgap, default, $rgap, fill:default, $lgap, default"));
                 panel2.add(cmbMonth, CC.xy(1, 3, CC.FILL, CC.DEFAULT));
 
                 //---- button2 ----

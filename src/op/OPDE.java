@@ -89,6 +89,12 @@ public class OPDE {
     public static String UPDATE_FTPSERVER = "ftp.offene-pflege.de";
     protected static boolean updateAvailable = false;
 
+    public static String getUpdateDescriptionURL() {
+        return updateDescriptionURL;
+    }
+
+    protected static String updateDescriptionURL = "http://www.offene-pflege.de";
+
     protected static final String sep = System.getProperty("file.separator");
 
     /**
@@ -106,8 +112,11 @@ public class OPDE {
         return updateAvailable;
     }
 
-    public static void setUpdateAvailable(boolean updateAvailable) {
+    public static void setUpdateAvailable(boolean updateAvailable, String url) {
         OPDE.updateAvailable = updateAvailable;
+        if (updateAvailable){
+            updateDescriptionURL = url;
+        }
     }
 
     public static String getOPCache() {

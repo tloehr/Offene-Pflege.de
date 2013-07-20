@@ -239,7 +239,7 @@ public class MedInventoryTools {
 
     public static MedStock getNextToOpen(MedInventory inventory) {
         MedStock bestand = null;
-        if (!inventory.getMedStocks().isEmpty()) {
+        if (inventory != null && !inventory.getMedStocks().isEmpty()) {
             Collections.sort(inventory.getMedStocks());
             for (MedStock myBestand : inventory.getMedStocks()) {
                 if (myBestand.isNew()) {
