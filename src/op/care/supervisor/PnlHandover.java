@@ -76,11 +76,11 @@ public class PnlHandover extends NursingRecordsPanel {
     private CollapsiblePanes searchPanes;
 
     private Map<String, CollapsiblePane> cpMap;
-    private Map<String, JPanel> contentmap;
+    //    private Map<String, JPanel> contentmap;
     private Map<String, ArrayList<Handovers>> cacheHO;
     private Map<String, ArrayList<NReport>> cacheNR;
-    private Map<NReport, JPanel> linemapNR;
-    private Map<Handovers, JPanel> linemapHO;
+    //    private Map<NReport, JPanel> linemapNR;
+//    private Map<Handovers, JPanel> linemapHO;
     private HashMap<DateMidnight, String> hollidays;
     private JComboBox cmbHomes;
     private JToggleButton tbResidentFirst;
@@ -134,10 +134,10 @@ public class PnlHandover extends NursingRecordsPanel {
             }
         };
 
-        contentmap = Collections.synchronizedMap(new HashMap<String, JPanel>());
+//        contentmap = Collections.synchronizedMap(new HashMap<String, JPanel>());
         cpMap = Collections.synchronizedMap(new HashMap<String, CollapsiblePane>());
-        linemapNR = Collections.synchronizedMap(new HashMap<NReport, JPanel>());
-        linemapHO = Collections.synchronizedMap(new HashMap<Handovers, JPanel>());
+//        linemapNR = Collections.synchronizedMap(new HashMap<NReport, JPanel>());
+//        linemapHO = Collections.synchronizedMap(new HashMap<Handovers, JPanel>());
         cacheHO = Collections.synchronizedMap(new HashMap<String, ArrayList<Handovers>>());
         cacheNR = Collections.synchronizedMap(new HashMap<String, ArrayList<NReport>>());
         OPDE.getDisplayManager().setMainMessage(OPDE.lang.getString(internalClassID));
@@ -209,18 +209,18 @@ public class PnlHandover extends NursingRecordsPanel {
     public void cleanup() {
         cpsHandover.removeAll();
 
-        synchronized (contentmap) {
-            SYSTools.clear(contentmap);
-        }
+//        synchronized (contentmap) {
+//            SYSTools.clear(contentmap);
+//        }
         synchronized (cpMap) {
             SYSTools.clear(cpMap);
         }
-        synchronized (linemapHO) {
-            SYSTools.clear(linemapHO);
-        }
-        synchronized (linemapNR) {
-            SYSTools.clear(linemapNR);
-        }
+//        synchronized (linemapHO) {
+//            SYSTools.clear(linemapHO);
+//        }
+//        synchronized (linemapNR) {
+//            SYSTools.clear(linemapNR);
+//        }
         synchronized (cacheHO) {
             SYSTools.clear(cacheHO);
         }
@@ -247,18 +247,18 @@ public class PnlHandover extends NursingRecordsPanel {
          */
 
 
-        synchronized (contentmap) {
-            SYSTools.clear(contentmap);
-        }
+//        synchronized (contentmap) {
+//            SYSTools.clear(contentmap);
+//        }
         synchronized (cpMap) {
             SYSTools.clear(cpMap);
         }
-        synchronized (linemapHO) {
-            SYSTools.clear(linemapHO);
-        }
-        synchronized (linemapNR) {
-            SYSTools.clear(linemapNR);
-        }
+//        synchronized (linemapHO) {
+//            SYSTools.clear(linemapHO);
+//        }
+//        synchronized (linemapNR) {
+//            SYSTools.clear(linemapNR);
+//        }
         synchronized (cacheHO) {
             SYSTools.clear(cacheHO);
         }
@@ -497,7 +497,7 @@ public class PnlHandover extends NursingRecordsPanel {
                 try {
                     cpMap.get(key).setCollapsed(true);
                 } catch (PropertyVetoException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    e.printStackTrace();
                 }
             }
         }
@@ -529,44 +529,29 @@ public class PnlHandover extends NursingRecordsPanel {
                 EntityManager em = OPDE.createEM();
                 try {
                     em.getTransaction().begin();
+
                     synchronized (cacheHO) {
-                        if (cacheHO.containsKey(key)) {
-                            ArrayList<Handovers> listHO = new ArrayList<Handovers>(cacheHO.get(key));
-                            for (final Handovers ho : listHO) {
-                                if (!Handover2UserTools.containsUser(ho.getUsersAcknowledged(), OPDE.getLogin().getUser())) {
-                                    Handovers myHO = em.merge(ho);
-                                    Handover2User connObj = em.merge(new Handover2User(myHO, em.merge(OPDE.getLogin().getUser())));
-                                    myHO.getUsersAcknowledged().add(connObj);
-
-                                    cacheHO.get(key).remove(ho);
-                                    cacheHO.get(key).add(myHO);
-                                    linemapHO.remove(ho);
-                                    final String keyDay = DateFormat.getDateInstance().format(ho.getPit());
-                                    contentmap.remove(keyDay);
-                                }
+                        ArrayList<Handovers> listHO = new ArrayList<Handovers>(cacheHO.get(key));
+                        for (final Handovers ho : listHO) {
+                            if (!Handover2UserTools.containsUser(ho.getUsersAcknowledged(), OPDE.getLogin().getUser())) {
+                                Handovers myHO = em.merge(ho);
+                                Handover2User connObj = em.merge(new Handover2User(myHO, em.merge(OPDE.getLogin().getUser())));
+                                myHO.getUsersAcknowledged().add(connObj);
                             }
-                            Collections.sort(cacheHO.get(key));
                         }
                     }
+
                     synchronized (cacheNR) {
-                        if (cacheNR.containsKey(key)) {
-                            ArrayList<NReport> listNR = new ArrayList<NReport>(cacheNR.get(key));
-                            for (final NReport nreport : listNR) {
-                                if (!NR2UserTools.containsUser(nreport.getUsersAcknowledged(), OPDE.getLogin().getUser())) {
-                                    NReport myNR = em.merge(nreport);
-                                    NR2User connObj = em.merge(new NR2User(myNR, em.merge(OPDE.getLogin().getUser())));
-                                    myNR.getUsersAcknowledged().add(connObj);
-
-                                    cacheNR.get(key).remove(nreport);
-                                    cacheNR.get(key).add(myNR);
-                                    linemapNR.remove(nreport);
-                                    final String keyDay = DateFormat.getDateInstance().format(nreport.getPit());
-                                    contentmap.remove(keyDay);
-                                }
+                        ArrayList<NReport> listNR = new ArrayList<NReport>(cacheNR.get(key));
+                        for (final NReport nreport : listNR) {
+                            if (!NR2UserTools.containsUser(nreport.getUsersAcknowledged(), OPDE.getLogin().getUser())) {
+                                NReport myNR = em.merge(nreport);
+                                NR2User connObj = em.merge(new NR2User(myNR, em.merge(OPDE.getLogin().getUser())));
+                                myNR.getUsersAcknowledged().add(connObj);
                             }
-                            Collections.sort(cacheNR.get(key), myComparator);
                         }
                     }
+
                     em.getTransaction().commit();
                     createCP4Day(day);
                     buildPanel();
@@ -628,255 +613,218 @@ public class PnlHandover extends NursingRecordsPanel {
 
 
     private void createContentPanel4Day(final DateMidnight day, final CollapsiblePane cpDay) {
-        final String key = DateFormat.getDateInstance().format(day.toDate());
-        if (contentmap.containsKey(key)) {
-            cpDay.setContentPane(contentmap.get(key));
-        } else {
 
-            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+        final JPanel dayPanel = new JPanel(new VerticalLayout());
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
 
-            SwingWorker worker = new SwingWorker() {
+        SwingWorker worker = new SwingWorker() {
 
-                @Override
-                protected Object doInBackground() throws Exception {
+            @Override
+            protected Object doInBackground() throws Exception {
 
-                    final JPanel dayPanel = new JPanel(new VerticalLayout());
-                    dayPanel.setOpaque(false);
-                    synchronized (cacheHO) {
-                        if (!cacheHO.containsKey(key)) {
-                            cacheHO.put(key, HandoversTools.getBy(day, (Homes) cmbHomes.getSelectedItem()));
-                        }
-                    }
-                    synchronized (cacheNR) {
-                        if (!cacheNR.containsKey(key)) {
-                            cacheNR.put(key, NReportTools.getNReports4Handover(day, (Homes) cmbHomes.getSelectedItem()));
-                            Collections.sort(cacheNR.get(key), myComparator);
-                        }
-                    }
-                    int max = cacheHO.get(key).size() + cacheNR.get(key).size();
-                    int i = 0; // for zebra pattern and progress
-                    for (final Handovers handover : cacheHO.get(key)) {
-                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), i, max));
-                        if (!linemapHO.containsKey(handover)) {
-                            String title = "<html><table border=\"0\">" +
-                                    "<tr valign=\"top\">" +
-                                    "<td width=\"100\" align=\"left\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(handover.getPit()) +
-                                    " " + OPDE.lang.getString("misc.msg.Time.short") +
-                                    "</td>" +
-                                    "<td width=\"100\" align=\"center\">--</td>" +
-                                    "<td width=\"400\" align=\"left\">" +
-                                    handover.getText() +
-                                    "</td>" +
+//                final JPanel dayPanel = new JPanel(new VerticalLayout());
+                dayPanel.setOpaque(false);
 
-                                    "<td width=\"100\" align=\"left\">" + handover.getUser().getFullname() + "</td>" +
-                                    "</tr>" +
-                                    "</table>" +
-                                    "</html>";
+                ArrayList<Handovers> listHO = HandoversTools.getBy(day, (Homes) cmbHomes.getSelectedItem());
+                ArrayList<NReport> listNR = NReportTools.getNReports4Handover(day, (Homes) cmbHomes.getSelectedItem());
 
-                            final DefaultCPTitle pnlSingle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent evt) {
-                                    if (handover.getUsersAcknowledged().contains(OPDE.getLogin().getUser())) {
-                                        return;
-                                    }
-                                    EntityManager em = OPDE.createEM();
-                                    try {
-                                        em.getTransaction().begin();
-                                        Handovers myHO = em.merge(handover);
-                                        Handover2User connObj = em.merge(new Handover2User(myHO, em.merge(OPDE.getLogin().getUser())));
-                                        myHO.getUsersAcknowledged().add(connObj);
-                                        em.getTransaction().commit();
-                                        synchronized (cacheHO) {
-                                            cacheHO.get(key).remove(handover);
-                                            cacheHO.get(key).add(myHO);
-                                            Collections.sort(cacheHO.get(key));
-                                        }
-                                        synchronized (linemapHO) {
-                                            linemapHO.remove(handover);
-                                        }
-                                        createCP4Day(day);
+                Collections.sort(listNR, myComparator);
 
-                                        final String keyDay = DateFormat.getDateInstance().format(handover.getPit());
-                                        synchronized (contentmap) {
-                                            contentmap.remove(keyDay);
-                                        }
+                int max = listHO.size() + listNR.size();
+                int i = 0; // for zebra pattern and progress
+                for (final Handovers handover : listHO) {
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), i, max));
 
-                                        buildPanel();
-                                    } catch (OptimisticLockException ole) {
-                                        if (em.getTransaction().isActive()) {
-                                            em.getTransaction().rollback();
-                                        }
-                                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                            OPDE.getMainframe().emptyFrame();
-                                            OPDE.getMainframe().afterLogin();
-                                        }
-                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                    } catch (Exception e) {
-                                        if (em.getTransaction().isActive()) {
-                                            em.getTransaction().rollback();
-                                        }
-                                        OPDE.fatal(e);
-                                    } finally {
-                                        em.close();
-                                    }
+                    String title = "<html><table border=\"0\">" +
+                            "<tr valign=\"top\">" +
+                            "<td width=\"100\" align=\"left\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(handover.getPit()) +
+                            " " + OPDE.lang.getString("misc.msg.Time.short") +
+                            "</td>" +
+                            "<td width=\"100\" align=\"center\">--</td>" +
+                            "<td width=\"400\" align=\"left\">" +
+                            handover.getText() +
+                            "</td>" +
+
+                            "<td width=\"100\" align=\"left\">" + handover.getUser().getFullname() + "</td>" +
+                            "</tr>" +
+                            "</table>" +
+                            "</html>";
+
+                    final DefaultCPTitle pnlSingle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent evt) {
+                            if  (Handover2UserTools.containsUser(handover.getUsersAcknowledged(), OPDE.getLogin().getUser())) {
+                                return;
+                            }
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                Handovers myHO = em.merge(handover);
+                                Handover2User connObj = em.merge(new Handover2User(myHO, em.merge(OPDE.getLogin().getUser())));
+                                myHO.getUsersAcknowledged().add(connObj);
+                                em.getTransaction().commit();
+
+                                createCP4Day(day);
+                                buildPanel();
+
+                            } catch (OptimisticLockException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
                                 }
-                            });
-
-                            final JButton btnInfo = new JButton(SYSConst.icon22info);
-                            btnInfo.setPressedIcon(SYSConst.icon22infoPressed);
-                            btnInfo.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                            btnInfo.setAlignmentY(Component.TOP_ALIGNMENT);
-                            btnInfo.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                            btnInfo.setContentAreaFilled(false);
-                            btnInfo.setBorder(null);
-                            btnInfo.addActionListener(new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    SYSFilesTools.print(Handover2UserTools.getAsHTML(handover), false);
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
                                 }
-                            });
-                            pnlSingle.getRight().add(btnInfo);
-
-                            pnlSingle.getButton().setIcon(Handover2UserTools.containsUser(handover.getUsersAcknowledged(), OPDE.getLogin().getUser()) ? SYSConst.icon22ledGreenOn : SYSConst.icon22ledRedOn);
-                            pnlSingle.getButton().setVerticalTextPosition(SwingConstants.TOP);
-                            synchronized (linemapHO) {
-                                linemapHO.put(handover, pnlSingle.getMain());
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
                             }
                         }
-                        JPanel zebra = new JPanel();
-                        zebra.setLayout(new BoxLayout(zebra, BoxLayout.LINE_AXIS));
-                        zebra.setOpaque(true);
-                        if (i % 2 == 0) {
-                            zebra.setBackground(SYSConst.orange1[SYSConst.light2]);
-                        } else {
-                            zebra.setBackground(Color.WHITE);
+                    });
+
+                    final JButton btnInfo = new JButton(SYSConst.icon22info);
+                    btnInfo.setPressedIcon(SYSConst.icon22infoPressed);
+                    btnInfo.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                    btnInfo.setAlignmentY(Component.TOP_ALIGNMENT);
+                    btnInfo.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    btnInfo.setContentAreaFilled(false);
+                    btnInfo.setBorder(null);
+                    btnInfo.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            SYSFilesTools.print(Handover2UserTools.getAsHTML(handover), false);
                         }
-                        zebra.add(linemapHO.get(handover));
-                        i++;
-                        dayPanel.add(zebra);
+                    });
+                    pnlSingle.getRight().add(btnInfo);
+
+                    pnlSingle.getButton().setIcon(Handover2UserTools.containsUser(handover.getUsersAcknowledged(), OPDE.getLogin().getUser()) ? SYSConst.icon22ledGreenOn : SYSConst.icon22ledRedOn);
+                    pnlSingle.getButton().setVerticalTextPosition(SwingConstants.TOP);
+
+                    JPanel zebra = new JPanel();
+                    zebra.setLayout(new BoxLayout(zebra, BoxLayout.LINE_AXIS));
+                    zebra.setOpaque(true);
+                    if (i % 2 == 0) {
+                        zebra.setBackground(SYSConst.orange1[SYSConst.light2]);
+                    } else {
+                        zebra.setBackground(Color.WHITE);
                     }
-                    for (final NReport nreport : cacheNR.get(key)) {
-                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), i, max));
-
-                        if (!linemapNR.containsKey(nreport)) {
-
-                            String title = "<html><table border=\"0\">" +
-                                    "<tr valign=\"top\">" +
-                                    "<td width=\"100\" align=\"left\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
-                                    " " + OPDE.lang.getString("misc.msg.Time.short") +
-                                    "<br/>" + nreport.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)") +
-                                    "</td>" +
-                                    "<td width=\"100\" align=\"left\">" + ResidentTools.getTextCompact(nreport.getResident()) + "</td>" +
-                                    "<td width=\"400\" align=\"left\">" +
-                                    nreport.getText() +
-                                    "</td>" +
-
-                                    "<td width=\"100\" align=\"left\">" + nreport.getUser().getFullname() + "</td>" +
-                                    "</tr>" +
-                                    "</table>" +
-                                    "</html>";
+                    zebra.add(pnlSingle.getMain());
+                    i++;
+                    dayPanel.add(zebra);
+                }
+                for (final NReport nreport : listNR) {
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), i, max));
 
 
-                            final DefaultCPTitle pnlSingle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent evt) {
-                                    if (NR2UserTools.containsUser(nreport.getUsersAcknowledged(), OPDE.getLogin().getUser())) {
-                                        return;
-                                    }
-                                    EntityManager em = OPDE.createEM();
-                                    try {
-                                        em.getTransaction().begin();
-                                        NReport myNR = em.merge(nreport);
-                                        NR2User connObj = em.merge(new NR2User(myNR, em.merge(OPDE.getLogin().getUser())));
-                                        myNR.getUsersAcknowledged().add(connObj);
-                                        em.getTransaction().commit();
-                                        synchronized (cacheNR) {
-                                            cacheNR.get(key).remove(nreport);
-                                            cacheNR.get(key).add(myNR);
-                                            Collections.sort(cacheNR.get(key), myComparator);
-                                        }
-                                        synchronized (linemapNR) {
-                                            linemapNR.remove(nreport);
-                                        }
-                                        final String keyDay = DateFormat.getDateInstance().format(nreport.getPit());
-                                        synchronized (contentmap) {
-                                            contentmap.remove(keyDay);
-                                        }
-                                        createCP4Day(day);
-                                        buildPanel();
-                                    } catch (OptimisticLockException ole) {
-                                        if (em.getTransaction().isActive()) {
-                                            em.getTransaction().rollback();
-                                        }
-                                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                            OPDE.getMainframe().emptyFrame();
-                                            OPDE.getMainframe().afterLogin();
-                                        }
-                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                    } catch (Exception e) {
-                                        if (em.getTransaction().isActive()) {
-                                            em.getTransaction().rollback();
-                                        }
-                                        OPDE.fatal(e);
-                                    } finally {
-                                        em.close();
-                                    }
+                    String title = "<html><table border=\"0\">" +
+                            "<tr valign=\"top\">" +
+                            "<td width=\"100\" align=\"left\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
+                            " " + OPDE.lang.getString("misc.msg.Time.short") +
+                            "<br/>" + nreport.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)") +
+                            "</td>" +
+                            "<td width=\"100\" align=\"left\">" + ResidentTools.getTextCompact(nreport.getResident()) + "</td>" +
+                            "<td width=\"400\" align=\"left\">" +
+                            nreport.getText() +
+                            "</td>" +
+
+                            "<td width=\"100\" align=\"left\">" + nreport.getUser().getFullname() + "</td>" +
+                            "</tr>" +
+                            "</table>" +
+                            "</html>";
+
+
+                    final DefaultCPTitle pnlSingle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent evt) {
+                            if (NR2UserTools.containsUser(nreport.getUsersAcknowledged(), OPDE.getLogin().getUser())) {
+                                return;
+                            }
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                NReport myNR = em.merge(nreport);
+                                NR2User connObj = em.merge(new NR2User(myNR, em.merge(OPDE.getLogin().getUser())));
+                                myNR.getUsersAcknowledged().add(connObj);
+                                em.getTransaction().commit();
+                                createCP4Day(day);
+                                buildPanel();
+                            } catch (OptimisticLockException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
                                 }
-                            });
-
-                            final JButton btnInfo = new JButton(SYSConst.icon22info);
-                            btnInfo.setPressedIcon(SYSConst.icon22infoPressed);
-                            btnInfo.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                            btnInfo.setAlignmentY(Component.TOP_ALIGNMENT);
-                            btnInfo.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                            btnInfo.setContentAreaFilled(false);
-                            btnInfo.setBorder(null);
-                            btnInfo.addActionListener(new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    SYSFilesTools.print(NR2UserTools.getAsHTML(nreport), false);
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
                                 }
-                            });
-                            pnlSingle.getRight().add(btnInfo);
-
-                            pnlSingle.getButton().setIcon(NR2UserTools.containsUser(nreport.getUsersAcknowledged(), OPDE.getLogin().getUser()) ? SYSConst.icon22ledGreenOn : SYSConst.icon22ledRedOn);
-                            pnlSingle.getButton().setVerticalTextPosition(SwingConstants.TOP);
-                            synchronized (linemapNR) {
-                                linemapNR.put(nreport, pnlSingle.getMain());
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
                             }
                         }
-                        JPanel zebra = new JPanel();
-                        zebra.setLayout(new BoxLayout(zebra, BoxLayout.LINE_AXIS));
-                        zebra.setOpaque(true);
-                        if (i % 2 == 0) {
-                            zebra.setBackground(SYSConst.orange1[SYSConst.light2]);
-                        } else {
-                            zebra.setBackground(Color.WHITE);
+                    });
+
+                    final JButton btnInfo = new JButton(SYSConst.icon22info);
+                    btnInfo.setPressedIcon(SYSConst.icon22infoPressed);
+                    btnInfo.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                    btnInfo.setAlignmentY(Component.TOP_ALIGNMENT);
+                    btnInfo.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    btnInfo.setContentAreaFilled(false);
+                    btnInfo.setBorder(null);
+                    btnInfo.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            SYSFilesTools.print(NR2UserTools.getAsHTML(nreport), false);
                         }
-                        zebra.add(linemapNR.get(nreport));
-                        i++;
+                    });
+                    pnlSingle.getRight().add(btnInfo);
 
-                        dayPanel.add(zebra);
+                    pnlSingle.getButton().setIcon(NR2UserTools.containsUser(nreport.getUsersAcknowledged(), OPDE.getLogin().getUser()) ? SYSConst.icon22ledGreenOn : SYSConst.icon22ledRedOn);
+                    pnlSingle.getButton().setVerticalTextPosition(SwingConstants.TOP);
+
+
+                    JPanel zebra = new JPanel();
+                    zebra.setLayout(new BoxLayout(zebra, BoxLayout.LINE_AXIS));
+                    zebra.setOpaque(true);
+                    if (i % 2 == 0) {
+                        zebra.setBackground(SYSConst.orange1[SYSConst.light2]);
+                    } else {
+                        zebra.setBackground(Color.WHITE);
                     }
-                    synchronized (contentmap) {
-                        contentmap.put(key, dayPanel);
-                        cpDay.setContentPane(contentmap.get(key));
-                    }
-//                return dayPanel;
+                    zebra.add(pnlSingle.getMain());
+                    i++;
 
-                    return null;
+                    dayPanel.add(zebra);
                 }
-
-                @Override
-                protected void done() {
-
-                    OPDE.getDisplayManager().setProgressBarMessage(null);
-                    OPDE.getMainframe().setBlocked(false);
+                final String key = DateFormat.getDateInstance().format(day.toDate());
+                synchronized (cacheHO) {
+                    cacheHO.put(key, listHO);
                 }
-            };
-            worker.execute();
+                synchronized (cacheNR) {
+                    cacheNR.put(key, listNR);
+                }
+                return null;
 
-        }
+            }
+
+            @Override
+            protected void done() {
+                cpDay.setContentPane(dayPanel);
+                OPDE.getDisplayManager().setProgressBarMessage(null);
+                OPDE.getMainframe().setBlocked(false);
+            }
+        };
+        worker.execute();
+
     }
 
 
@@ -933,17 +881,7 @@ public class PnlHandover extends NursingRecordsPanel {
                                     DateMidnight day = new DateMidnight(myHO.getPit());
 
                                     final String key = DateFormat.getDateInstance().format(myHO.getPit());
-                                    synchronized (cacheHO) {
-                                        if (!cacheHO.containsKey(key)) {
-                                            cacheHO.put(key, HandoversTools.getBy(day, (Homes) cmbHomes.getSelectedItem()));
-                                        } else {
-                                            cacheHO.get(key).add(myHO);
-                                            Collections.sort(cacheHO.get(key));
-                                        }
-                                    }
-                                    synchronized (contentmap) {
-                                        contentmap.remove(key);
-                                    }
+
                                     createCP4Day(day);
                                     expandDay(day);
 
@@ -951,7 +889,7 @@ public class PnlHandover extends NursingRecordsPanel {
                                     GUITools.scroll2show(jspHandover, cpMap.get(key), cpsHandover, new Closure() {
                                         @Override
                                         public void execute(Object o) {
-                                            GUITools.flashBackground(linemapHO.get(myHO), Color.YELLOW, 2);
+//                                            GUITools.flashBackground(linemapHO.get(myHO), Color.YELLOW, 2);
                                         }
                                     });
                                 } catch (OptimisticLockException ole) {
