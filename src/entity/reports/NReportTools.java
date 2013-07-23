@@ -31,20 +31,6 @@ import java.util.*;
  */
 public class NReportTools {
 
-    public static NReport getFirstReport(Resident resident) {
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT p FROM NReport p "
-                + " WHERE p.resident = :bewohner "
-                + " ORDER BY p.pit");
-        query.setParameter("bewohner", resident);
-        query.setFirstResult(0);
-        query.setMaxResults(1);
-        NReport p = (NReport) query.getSingleResult();
-        em.close();
-        return p;
-    }
-
-
     public static boolean isMine(NReport nReport) {
         return OPDE.isAdmin() || nReport.getUser().equals(OPDE.getLogin().getUser());
     }
@@ -97,15 +83,6 @@ public class NReportTools {
 
                 result = new Pair<DateTime, DateTime>(new DateTime(min), new DateTime(max));
 
-//                if (min1 == null) {
-//                    result = new Pair<DateTime, DateTime>(new DateTime(min2.get(0).getPit()), new DateTime(max2.get(0).getPit()));
-//                } else if (min2 == null) {
-//                    result = new Pair<DateTime, DateTime>(new DateTime(min1.get(0).getPit()), new DateTime(max1.get(0).getPit()));
-//                } else {
-//                    DateTime min3 = new DateTime(Math.min(min1.get(0).getPit().getTime(), min2.get(0).getPit().getTime()));
-//                    DateTime max3 = new DateTime(Math.max(max1.get(0).getPit().getTime(), max2.get(0).getPit().getTime()));
-//                    result = new Pair<DateTime, DateTime>(min3, max3);
-//                }
             }
         } catch (Exception e) {
             OPDE.fatal(e);
@@ -168,64 +145,6 @@ public class NReportTools {
         em.close();
         return num;
     }
-
-    /**
-     * Führt die notwendigen Änderungen an den Entities durch, wenn ein Bericht geändert wurde. Dazu gehört auch die Dateien
-     * und Vorgänge umzubiegen. Der alte Bericht verliert seine Dateien und Vorgänge. Es werden auch die
-     * notwendigen Querverweise zwischen dem alten und dem neuen Bericht erstellt.
-     *
-     * @param oldReport der Bericht, der durch den <code>newReport</code> ersetzt werden soll.
-     * @param newReport siehe oben
-     * @return Erfolg oder nicht
-     */
-//    public static void editReport(EntityManager em, NReport oldReport, NReport newReport) throws Exception {
-//
-//
-//    }
-
-    /**
-     * liefert eine Kopie eines Berichtes, die noch nicht persistiert wurde. * Somit ist PBID = 0
-     * Gilt nicht für die Mappings (Dateien oder Vorgänge). Die werden erst bei editReport() geändert.
-     *
-     * @param source
-     * @return
-     */
-//    public static NReport copyBericht(NReport source) {
-//        NReport target = new NReport(source.getResident());
-//        target.setMinutes(source.getMinutes());
-//        target.setEditedBy(source.getEditedBy());
-//        target.setEditpit(source.getEditDate());
-//        target.setPit(source.getPit());
-//        target.setReplacedBy(source.getReplacedBy());
-//        target.setReplacementFor(source.getReplacementFor());
-//        target.setText(source.getText());
-//        target.setUser(source.getUser());
-//
-//        Iterator<NReportTAGS> tags = source.getTags().iterator();
-//        while (tags.hasNext()) {
-//            NReportTAGS tag = tags.next();
-//            target.getTags().add(tag);
-//        }
-//
-//        return target;
-//    }
-
-//    public static boolean saveBericht(NReport newBericht) {
-//        boolean success = false;
-//        EntityManager em = OPDE.createEM();
-//        em.getTransaction().begin();
-//        try {
-//            em.persist(newBericht);
-//            em.getTransaction().commit();
-//            success = true;
-//        } catch (Exception e) {
-//            OPDE.getLogger().error(e.getMessage(), e);
-//            em.getTransaction().rollback();
-//        } finally {
-//            em.close();
-//        }
-//        return success;
-//    }
 
     /**
      * Berichtdarstellung für die Vorgänge.
@@ -490,7 +409,7 @@ public class NReportTools {
 
         try {
 
-            String jpql = " SELECT nr " +
+            String jpql = " SELECT DISTINCT nr " +
                     " FROM NReport nr " +
                     " JOIN nr.tags tg " +
                     " WHERE " +
@@ -749,7 +668,7 @@ public class NReportTools {
 
         try {
 
-            String jpql = " SELECT nr " +
+            String jpql = " SELECT DISTINCT nr " +
                     " FROM NReport nr " +
                     " JOIN nr.tags t " +
                     " WHERE " +
@@ -814,7 +733,7 @@ public class NReportTools {
 
         try {
 
-            String jpql = " SELECT nr " +
+            String jpql = " SELECT DISTINCT nr " +
                     " FROM NReport nr " +
                     " JOIN nr.tags t " +
                     " WHERE " +
@@ -872,33 +791,5 @@ public class NReportTools {
         return list;
     }
 
-    /**
-     * @param resident
-     * @return
-     */
-    public static ArrayList<NReport> getReportsWithFilesOnly(Resident resident) {
-        EntityManager em = OPDE.createEM();
-        ArrayList<NReport> list = null;
-
-        try {
-
-            String jpql = " SELECT nr " +
-                    " FROM NReport nr " +
-                    " JOIN nr.attachedFilesConnections nraf " +
-                    " WHERE nr.resident = :resident " +
-                    " ORDER BY nr.pit ";
-
-            Query query = em.createQuery(jpql);
-            query.setParameter("resident", resident);
-
-            list = new ArrayList<NReport>(query.getResultList());
-
-        } catch (Exception se) {
-            OPDE.fatal(se);
-        } finally {
-            em.close();
-        }
-        return list;
-    }
 
 }
