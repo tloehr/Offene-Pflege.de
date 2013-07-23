@@ -270,7 +270,7 @@ public class PnlHandover extends NursingRecordsPanel {
         Pair<DateTime, DateTime> minmax = NReportTools.getMinMax();
         if (minmax != null) {
 
-            hollidays = SYSCalendar.getHollidays(minmax.getFirst().getYear(), minmax.getSecond().getYear());
+            hollidays = SYSCalendar.getHolidays(minmax.getFirst().getYear(), minmax.getSecond().getYear());
             DateMidnight start = minmax.getFirst().toDateMidnight().dayOfMonth().withMinimumValue();
             DateMidnight end = new DateMidnight();
             for (int year = end.getYear(); year >= start.getYear(); year--) {
@@ -503,7 +503,7 @@ public class PnlHandover extends NursingRecordsPanel {
         }
         final CollapsiblePane cpDay = cpMap.get(key);
         if (hollidays == null) {
-            hollidays = SYSCalendar.getHollidays(day.getYear(), day.getYear());
+            hollidays = SYSCalendar.getHolidays(day.getYear(), day.getYear());
         }
         String titleDay = "<html><font size=+1>" +
                 dayFormat.format(day.toDate()) +

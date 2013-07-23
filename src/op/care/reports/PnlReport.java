@@ -447,7 +447,7 @@ public class PnlReport extends NursingRecordsPanel {
 
                 Pair<DateTime, DateTime> minmax = NReportTools.getMinMax(resident);
 
-                hollidays = Collections.synchronizedMap(SYSCalendar.getHollidays(minmax.getFirst().getYear(), minmax.getSecond().getYear()));
+                hollidays = Collections.synchronizedMap(SYSCalendar.getHolidays(minmax.getFirst().getYear(), minmax.getSecond().getYear()));
 
                 if (minmax != null) {
                     max = minmax.getSecond().toDate();

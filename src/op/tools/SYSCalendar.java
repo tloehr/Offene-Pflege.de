@@ -1448,10 +1448,11 @@ public class SYSCalendar {
      *
      * @return Eine Hashmap, die je das Datum als Zeichenkette der PrinterForm "jjjj-mm-tt" enthält und dazu die Bezeichnung des Feiertags.
      */
-    public static HashMap<DateMidnight, String> getHollidays(int from, int to) {
+    public static HashMap<DateMidnight, String> getHolidays(int from, int to) {
 
         HashMap<DateMidnight, String> hm = new HashMap<DateMidnight, String>();
 
+        // TODO: i18n
         for (int year = from; year <= to; year++) {
             // Feste Feiertage
             hm.put(new DateMidnight(year, 1, 1), "Neujahrstag");
