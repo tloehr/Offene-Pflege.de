@@ -36,7 +36,7 @@ public class InterventionTools {
     public static final int FLAG_BP_MONITORING = 9;
     public static final int FLAG_PORT_MONITORING = 10;
     public static final int FLAG_PULSE_MONITORING = 11;
-//    public static final int FLAG_WEIGHT_MONITORING = 12;
+    //    public static final int FLAG_WEIGHT_MONITORING = 12;
     public static final int FLAG_PAIN_MONITORING = 13;
     public static final int FLAG_TEMP_MONITORING = 14;
     public static final int FLAG_FOOD_CONSUMPTION = 15;
@@ -54,6 +54,13 @@ public class InterventionTools {
     public static final int FLAG_THERAPY_LOGOPEDICS = 27;
     public static final int FLAG_BREATH_MONITORING = 28;
     public static final int FLAG_MEDS_APPLICATION = 29;
+    public static final int FLAG_GAVAGE_FOOD_1000ML = 30;
+    public static final int FLAG_GAVAGE_LIQUID_1000ML = 31;
+    public static final int FLAG_GAVAGE_FOOD_250ML = 32;
+    public static final int FLAG_GAVAGE_LIQUID_250ML = 33;
+    public static final int FLAG_GAVAGE_FOOD_750ML = 34;
+    public static final int FLAG_GAVAGE_LIQUID_750ML = 35;
+
 //    public static final String[] FLAGS = new String[]{"nursingrecords.nursingprocess.flag.none",
 //            "nursingrecords.nursingprocess.flag.contracture",
 //            "nursingrecords.nursingprocess.flag.bedsore",

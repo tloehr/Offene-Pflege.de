@@ -63,8 +63,8 @@
         <class>entity.process.PCat</class>
         <class>entity.process.QProcess</class>
         <class>entity.values.ResValueTypes</class>
-<!--        <class>entity.dutyroster.Rosters</class>
+        <class>entity.dutyroster.Rosters</class>
         <class>entity.dutyroster.Shifts</class>
-        <class>entity.dutyroster.Shiftswap</class> -->
+        <class>entity.dutyroster.Shiftswap</class>
     </persistence-unit>
 </persistence>

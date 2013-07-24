@@ -723,21 +723,60 @@ public class TXEssenDoc {
             content.put(TXEAF.FOOD_LAST_MEAL, "--");
         }
 
+        BigDecimal bd250 = new BigDecimal(250);
         BigDecimal bd500 = new BigDecimal(500);
+        BigDecimal bd750 = new BigDecimal(750);
+        BigDecimal bd1000 = new BigDecimal(1000);
         BigDecimal foodml = BigDecimal.ZERO;
-        ArrayList<Prescription> listPresGavageFood = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_FOOD_500ML);
+        ArrayList<Prescription> listPresGavageFood = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_FOOD_250ML);
+        for (Prescription p : listPresGavageFood) {
+            for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
+                foodml = foodml.add(ps.getOverAllDoseSum().multiply(bd250));
+            }
+        }
+        listPresGavageFood = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_FOOD_500ML);
         for (Prescription p : listPresGavageFood) {
             for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
                 foodml = foodml.add(ps.getOverAllDoseSum().multiply(bd500));
             }
         }
+        listPresGavageFood = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_FOOD_750ML);
+        for (Prescription p : listPresGavageFood) {
+            for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
+                foodml = foodml.add(ps.getOverAllDoseSum().multiply(bd750));
+            }
+        }
+        listPresGavageFood = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_FOOD_1000ML);
+        for (Prescription p : listPresGavageFood) {
+            for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
+                foodml = foodml.add(ps.getOverAllDoseSum().multiply(bd1000));
+            }
+        }
         listPresGavageFood.clear();
 
         BigDecimal liquidml = BigDecimal.ZERO;
-        ArrayList<Prescription> listPresGavageLiquid = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_LIQUID_500ML);
+        ArrayList<Prescription> listPresGavageLiquid = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_LIQUID_250ML);
+        for (Prescription p : listPresGavageLiquid) {
+            for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
+                liquidml = liquidml.add(ps.getOverAllDoseSum().multiply(bd250));
+            }
+        }
+        listPresGavageLiquid = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_LIQUID_500ML);
         for (Prescription p : listPresGavageLiquid) {
             for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
                 liquidml = liquidml.add(ps.getOverAllDoseSum().multiply(bd500));
+            }
+        }
+        listPresGavageLiquid = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_LIQUID_750ML);
+        for (Prescription p : listPresGavageLiquid) {
+            for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
+                liquidml = liquidml.add(ps.getOverAllDoseSum().multiply(bd750));
+            }
+        }
+        listPresGavageLiquid = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_LIQUID_1000ML);
+        for (Prescription p : listPresGavageLiquid) {
+            for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
+                liquidml = liquidml.add(ps.getOverAllDoseSum().multiply(bd1000));
             }
         }
         listPresGavageLiquid.clear();
@@ -745,7 +784,6 @@ public class TXEssenDoc {
         content.put(TXEAF.FOOD_ARTIFICIAL_FEEDING, setYesNoRadiobutton(foodml.compareTo(BigDecimal.ZERO) > 0));
         content.put(TXEAF.FOOD_DAILY_ML, setBD(foodml));
         content.put(TXEAF.FOOD_TEE_DAILY_ML, setBD(liquidml));
-
 
         String tubetype = "--";
         if (!getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "bitesize").equals("--")) {
@@ -764,7 +802,6 @@ public class TXEssenDoc {
         content.put(TXEAF.FOOD_BREADUNTIS, getValue(ResInfoTypeTools.TYPE_FOOD, "breadunit"));
         content.put(TXEAF.FOOD_LIQUIDS_DAILY_ML, getValue(ResInfoTypeTools.TYPE_FOOD, "zieltrinkmenge"));
         content.put(TXEAF.FOOD_BMI, setBD(ResValueTools.getBMI(resident)));
-
 
         content.put(TXEAF.FOOD_PARENTERAL, setCheckbox(getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "parenteral")));
         content.put(TXEAF.FOOD_DRINKSALONE, setCheckbox(getValue(ResInfoTypeTools.TYPE_FOOD, "drinksalone")));
@@ -958,7 +995,7 @@ public class TXEssenDoc {
     }
 
     private void createContent4Section18() {
-        content.put(TXEAF.COMMENTS_GENERAL, getValue(ResInfoTypeTools.TYPE_WARNING, "beschreibung") +  (mapID2Info.containsKey(ResInfoTypeTools.TYPE_WARNING) ?  SYSTools.catchNull(mapID2Info.get(ResInfoTypeTools.TYPE_WARNING).getText(), "\n", "") : ""));
+        content.put(TXEAF.COMMENTS_GENERAL, getValue(ResInfoTypeTools.TYPE_WARNING, "beschreibung") + (mapID2Info.containsKey(ResInfoTypeTools.TYPE_WARNING) ? SYSTools.catchNull(mapID2Info.get(ResInfoTypeTools.TYPE_WARNING).getText(), "\n", "") : ""));
     }
 
     private void createContent4Section19(PdfStamper stamper) throws Exception {
