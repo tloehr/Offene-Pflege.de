@@ -530,6 +530,11 @@ public class SYSConst {
     public static final Icon icon22residentBoth = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/resident-both.png"));
     public static final Icon icon22residentDied = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/resident-died.png"));
     public static final Icon icon22residentGone = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/resident-gone.png"));
+
+    public static final Icon icon16residentAbsent = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/resident-absent.png"));
+    public static final Icon icon16residentDied = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/resident-died.png"));
+    public static final Icon icon16residentGone = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/resident-gone.png"));
+
     public static final Icon icon22residentInactive = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/resident-inactive.png"));
     public static final Icon icon22stop = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_stop.png"));
     public static final Icon icon22stopPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/player_stop_pressed.png"));
@@ -593,16 +598,20 @@ public class SYSConst {
     public static final Icon icon22home = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/home.png"));
     public static final Icon icon22wizard = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/wizard.png"));
     public static final Icon icon22addrow = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/shetaddrow.png"));
+    public static final Icon icon16biohazard = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/biohazard.png"));
     public static final Icon icon22biohazard = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/biohazard.png"));
     public static final Icon icon48biohazard = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/biohazard.png"));
     public static final Icon icon48edit = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/edit3.png"));
     public static final Icon icon22diabetes = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/diabetes.png"));
+    public static final Icon icon16diabetes = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/diabetes.png"));
     public static final Icon icon22medical = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/medical.png"));
     public static final Icon icon22warning = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/warning.png"));
+    public static final Icon icon16warning = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/warning.png"));
     public static final Icon icon22work = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/work.png"));
     public static final Icon icon22colorset = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/colorset.png"));
     public static final Icon icon22colorsetPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/colorset_pressed.png"));
     public static final Icon icon22allergy = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/allergy.png"));
+    public static final Icon icon16allergy = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/allergy.png"));
     public static final Icon icon32selected = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/bw/selected.png"));
     public static final Icon icon32unselected = new ImageIcon(SYSConst.class.getResource("/artwork/32x32/bw/unselected.png"));
     public static final Icon gfx259x203medic0 = new ImageIcon(SYSConst.class.getResource("/artwork/other/medicine0.png"));

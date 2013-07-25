@@ -122,7 +122,7 @@ public class DlgTX extends MyJDialog {
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "default, $lcgap, default, $ugap, 141dlu:grow, $rgap, default, $lcgap, default",
-            "2*(default, $lgap), 2*(fill:default, $lgap), default"));
+            "2*(default, $lgap), fill:default, $lgap, fill:default"));
 
         //---- lblText ----
         lblText.setText("Buchungstext");
@@ -199,7 +199,7 @@ public class DlgTX extends MyJDialog {
             panel1.add(btnBuchung);
         }
         contentPane.add(panel1, CC.xywh(5, 7, 3, 1, CC.RIGHT, CC.DEFAULT));
-        pack();
+        setSize(600, 140);
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 

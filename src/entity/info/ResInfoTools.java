@@ -59,6 +59,21 @@ public class ResInfoTools {
         return bwinfos.isEmpty() ? null : bwinfos.get(0);
     }
 
+
+    public static List<ResInfo> getSpecialInfos() {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident.station IS NOT NULL AND b.bwinfotyp.type IN (:absence, :infection, :warning, :diabetes, :allergy) AND b.to > :now ");
+        query.setParameter("absence", ResInfoTypeTools.TYPE_ABSENCE);
+        query.setParameter("infection", ResInfoTypeTools.TYPE_INFECTION);
+        query.setParameter("warning", ResInfoTypeTools.TYPE_WARNING);
+        query.setParameter("allergy", ResInfoTypeTools.TYPE_ALLERGY);
+        query.setParameter("diabetes", ResInfoTypeTools.TYPE_DIABETES);
+        query.setParameter("now", new Date());
+        List<ResInfo> resinfos = query.getResultList();
+        em.close();
+        return resinfos;
+    }
+
     public static ResInfo getLastResinfo(Resident bewohner, int type) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp.type = :type ORDER BY b.from DESC");

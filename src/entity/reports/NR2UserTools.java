@@ -9,22 +9,39 @@ import entity.system.Users;
 import op.OPDE;
 import op.care.supervisor.PnlHandover;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 
 /**
  * @author tloehr
  */
 public class NR2UserTools {
-    public static boolean containsUser(Collection<NR2User> list, Users user) {
-        boolean found = false;
-        for (NR2User conn : list) {
-            found = conn.getUser().equals(user);
-            if (found) break;
-        }
-        return found;
+//    public static boolean containsUser(Collection<NR2User> list, Users user) {
+//        boolean found = false;
+//        for (NR2User conn : list) {
+//            found = conn.getUser().equals(user);
+//            if (found) break;
+//        }
+//        return found;
+//    }
+
+    public static boolean containsUser(EntityManager em, NReport nReport, Users user) {
+
+        Query query = em.createQuery(" " +
+                " SELECT count(u) FROM NReport n JOIN n.usersAcknowledged u " +
+                " WHERE n = :nreport AND u.user = :user ");
+
+        query.setParameter("nreport", nReport);
+        query.setParameter("user", user);
+
+        Long count = (Long) query.getSingleResult();
+
+        return count.longValue() > 0;
+
     }
 
     public static String getAsHTML(NReport nReport) {

@@ -88,7 +88,7 @@ public class PnlHandover extends NursingRecordsPanel {
 
     Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
     Format dayFormat = new SimpleDateFormat("EEEE, dd.MM.yyyy");
-
+    boolean massAcknowledgeRunning = false;
 
     /**
      * Creates new form PnlHandover
@@ -533,7 +533,7 @@ public class PnlHandover extends NursingRecordsPanel {
                     synchronized (cacheHO) {
                         ArrayList<Handovers> listHO = new ArrayList<Handovers>(cacheHO.get(key));
                         for (final Handovers ho : listHO) {
-                            if (!Handover2UserTools.containsUser(ho.getUsersAcknowledged(), OPDE.getLogin().getUser())) {
+                            if (!Handover2UserTools.containsUser(em, ho, OPDE.getLogin().getUser())) {
                                 Handovers myHO = em.merge(ho);
                                 Handover2User connObj = em.merge(new Handover2User(myHO, em.merge(OPDE.getLogin().getUser())));
                                 myHO.getUsersAcknowledged().add(connObj);
@@ -544,7 +544,7 @@ public class PnlHandover extends NursingRecordsPanel {
                     synchronized (cacheNR) {
                         ArrayList<NReport> listNR = new ArrayList<NReport>(cacheNR.get(key));
                         for (final NReport nreport : listNR) {
-                            if (!NR2UserTools.containsUser(nreport.getUsersAcknowledged(), OPDE.getLogin().getUser())) {
+                            if (!NR2UserTools.containsUser(em, nreport, OPDE.getLogin().getUser())) {
                                 NReport myNR = em.merge(nreport);
                                 NR2User connObj = em.merge(new NR2User(myNR, em.merge(OPDE.getLogin().getUser())));
                                 myNR.getUsersAcknowledged().add(connObj);
@@ -572,7 +572,10 @@ public class PnlHandover extends NursingRecordsPanel {
                 } finally {
                     em.close();
                 }
+
             }
+
+
         });
         titleCPDay.getRight().add(btnAcknowledge);
 
@@ -615,7 +618,10 @@ public class PnlHandover extends NursingRecordsPanel {
     private void createContentPanel4Day(final DateMidnight day, final CollapsiblePane cpDay) {
 
         final JPanel dayPanel = new JPanel(new VerticalLayout());
+
+
         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+        OPDE.getMainframe().setBlocked(true);
 
         SwingWorker worker = new SwingWorker() {
 
@@ -653,10 +659,11 @@ public class PnlHandover extends NursingRecordsPanel {
                     final DefaultCPTitle pnlSingle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent evt) {
-                            if  (Handover2UserTools.containsUser(handover.getUsersAcknowledged(), OPDE.getLogin().getUser())) {
+                            EntityManager em = OPDE.createEM();
+                            if (Handover2UserTools.containsUser(em, handover, OPDE.getLogin().getUser())) {
+                                em.close();
                                 return;
                             }
-                            EntityManager em = OPDE.createEM();
                             try {
                                 em.getTransaction().begin();
                                 Handovers myHO = em.merge(handover);
@@ -697,12 +704,34 @@ public class PnlHandover extends NursingRecordsPanel {
                     btnInfo.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            SYSFilesTools.print(Handover2UserTools.getAsHTML(handover), false);
+                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+                            OPDE.getMainframe().setBlocked(true);
+
+                            SwingWorker worker = new SwingWorker() {
+
+                                @Override
+                                protected Object doInBackground() throws Exception {
+                                    SYSFilesTools.print(Handover2UserTools.getAsHTML(handover), false);
+                                    return null;
+                                }
+
+                                @Override
+                                protected void done() {
+                                    OPDE.getDisplayManager().setProgressBarMessage(null);
+                                    OPDE.getMainframe().setBlocked(false);
+                                }
+
+                            };
+                            worker.execute();
+
                         }
                     });
                     pnlSingle.getRight().add(btnInfo);
 
-                    pnlSingle.getButton().setIcon(Handover2UserTools.containsUser(handover.getUsersAcknowledged(), OPDE.getLogin().getUser()) ? SYSConst.icon22ledGreenOn : SYSConst.icon22ledRedOn);
+                    EntityManager em = OPDE.createEM();
+                    pnlSingle.getButton().setIcon(Handover2UserTools.containsUser(em, handover, OPDE.getLogin().getUser()) ? SYSConst.icon22ledGreenOn : SYSConst.icon22ledRedOn);
+                    em.close();
+
                     pnlSingle.getButton().setVerticalTextPosition(SwingConstants.TOP);
 
                     JPanel zebra = new JPanel();
@@ -741,10 +770,12 @@ public class PnlHandover extends NursingRecordsPanel {
                     final DefaultCPTitle pnlSingle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent evt) {
-                            if (NR2UserTools.containsUser(nreport.getUsersAcknowledged(), OPDE.getLogin().getUser())) {
+                            EntityManager em = OPDE.createEM();
+                            if (NR2UserTools.containsUser(em, nreport, OPDE.getLogin().getUser())) {
+                                em.close();
                                 return;
                             }
-                            EntityManager em = OPDE.createEM();
+
                             try {
                                 em.getTransaction().begin();
                                 NReport myNR = em.merge(nreport);
@@ -783,12 +814,34 @@ public class PnlHandover extends NursingRecordsPanel {
                     btnInfo.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            SYSFilesTools.print(NR2UserTools.getAsHTML(nreport), false);
+                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+                            OPDE.getMainframe().setBlocked(true);
+
+                            SwingWorker worker = new SwingWorker() {
+
+                                @Override
+                                protected Object doInBackground() throws Exception {
+                                    SYSFilesTools.print(NR2UserTools.getAsHTML(nreport), false);
+                                    return null;
+                                }
+
+                                @Override
+                                protected void done() {
+                                    OPDE.getDisplayManager().setProgressBarMessage(null);
+                                    OPDE.getMainframe().setBlocked(false);
+                                }
+
+                            };
+                            worker.execute();
+
                         }
                     });
                     pnlSingle.getRight().add(btnInfo);
 
-                    pnlSingle.getButton().setIcon(NR2UserTools.containsUser(nreport.getUsersAcknowledged(), OPDE.getLogin().getUser()) ? SYSConst.icon22ledGreenOn : SYSConst.icon22ledRedOn);
+                    EntityManager em = OPDE.createEM();
+                    pnlSingle.getButton().setIcon(NR2UserTools.containsUser(em, nreport, OPDE.getLogin().getUser()) ? SYSConst.icon22ledGreenOn : SYSConst.icon22ledRedOn);
+                    em.close();
+
                     pnlSingle.getButton().setVerticalTextPosition(SwingConstants.TOP);
 
 

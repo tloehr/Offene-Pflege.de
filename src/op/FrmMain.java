@@ -40,9 +40,7 @@ import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideSplitPane;
 import entity.Station;
 import entity.StationTools;
-import entity.info.Resident;
-import entity.info.ResidentTools;
-import entity.info.TXEssenDoc;
+import entity.info.*;
 import entity.prescription.PrescriptionTools;
 import entity.system.SYSLoginTools;
 import entity.system.SYSPropsTools;
@@ -81,7 +79,9 @@ import java.io.File;
 import java.net.URI;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author __USER__
@@ -90,6 +90,8 @@ public class FrmMain extends JFrame {
     public static final String internalClassID = "opde.mainframe";
     private boolean initPhase;
     private ArrayList<CollapsiblePane> listOfNursingrecords;
+
+    private Map<Integer, ArrayList<Resident>> specialities;
 
     private DlgLogin dlgLogin;
 
@@ -125,7 +127,20 @@ public class FrmMain extends JFrame {
         listOfNursingrecords = new ArrayList<CollapsiblePane>();
         btnHelp.setToolTipText(OPDE.lang.getString("opde.mainframe.btnHelp.tooltip"));
 
+        specialities = Collections.synchronizedMap(new HashMap<Integer, ArrayList<Resident>>());
+        synchronized (specialities) {
+            specialities.put(ResInfoTypeTools.TYPE_ABSENCE, new ArrayList<Resident>());
+            specialities.put(ResInfoTypeTools.TYPE_INFECTION, new ArrayList<Resident>());
+            specialities.put(ResInfoTypeTools.TYPE_WARNING, new ArrayList<Resident>());
+            specialities.put(ResInfoTypeTools.TYPE_ALLERGY, new ArrayList<Resident>());
+            specialities.put(ResInfoTypeTools.TYPE_DIABETES, new ArrayList<Resident>());
 
+            for (ResInfo info : ResInfoTools.getSpecialInfos()) {
+                specialities.get(info.getResInfoType().getType()).add(info.getResident());
+            }
+        }
+
+//        absentList = Collections.synchronizedList(new ArrayList<Resident>());
 
         if (OPDE.isDebug()) {
             setSize(1366, 768);
@@ -656,12 +671,40 @@ public class FrmMain extends JFrame {
                 }
             };
 
+            JPanel singleButtonPanel = new JPanel();
+            singleButtonPanel.setLayout(new BoxLayout(singleButtonPanel, BoxLayout.X_AXIS));
+            singleButtonPanel.setBorder(null);
+
+            singleButtonPanel.setOpaque(false);
+
             String titel = resident.getName() + ", " + resident.getFirstname() + " [" + resident.getRIDAnonymous() + "]";
             JideButton button = GUITools.createHyperlinkButton(titel, null, actionListener);
             button.setForegroundOfState(ThemePainter.STATE_DEFAULT, resident.getGender() == ResidentTools.FEMALE ? Color.red : Color.blue);
             button.setBackground(Color.WHITE);
 
-            labelPanel.add(button);
+            singleButtonPanel.add(button);
+
+            synchronized (specialities) {
+                if (specialities.get(ResInfoTypeTools.TYPE_ABSENCE).contains(resident)) {
+                    singleButtonPanel.add(new JLabel(SYSConst.icon16residentAbsent));
+                }
+                if (specialities.get(ResInfoTypeTools.TYPE_INFECTION).contains(resident)) {
+                    singleButtonPanel.add(new JLabel(SYSConst.icon16biohazard));
+                }
+                if (specialities.get(ResInfoTypeTools.TYPE_DIABETES).contains(resident)) {
+                    singleButtonPanel.add(new JLabel(SYSConst.icon16diabetes));
+                }
+                if (specialities.get(ResInfoTypeTools.TYPE_ALLERGY).contains(resident)) {
+                    singleButtonPanel.add(new JLabel(SYSConst.icon16allergy));
+                }
+                if (specialities.get(ResInfoTypeTools.TYPE_WARNING).contains(resident)) {
+                    singleButtonPanel.add(new JLabel(SYSConst.icon16warning));
+                }
+            }
+
+            OPDE.getDisplayManager().clearSubMessages();
+
+            labelPanel.add(singleButtonPanel);
             bwButtonMap.put(resident, button);
         }
 
@@ -669,6 +712,8 @@ public class FrmMain extends JFrame {
         listOfNursingrecords.add(mypane);
         return mypane;
     }
+
+    public
 
     /**
      * fixes #1
@@ -689,6 +734,10 @@ public class FrmMain extends JFrame {
 
     public void setCurrentResident(Resident currentResident) {
         this.currentResident = currentResident;
+    }
+
+    public boolean isBlocked() {
+        return lblWait.isVisible();
     }
 
     public void setBlocked(boolean blocked) {

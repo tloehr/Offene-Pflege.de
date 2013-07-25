@@ -9,6 +9,8 @@ import entity.system.Users;
 import op.OPDE;
 import op.care.supervisor.PnlHandover;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.text.DateFormat;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,14 +20,29 @@ import java.util.List;
  * @author tloehr
  */
 public class Handover2UserTools {
-    public static boolean containsUser(Collection<Handover2User> list, Users user) {
-        boolean found = false;
-        for (Handover2User conn : list) {
-            found = conn.getUser().equals(user);
-            if (found) break;
-        }
-        return found;
-    }
+//    public static boolean containsUser(Collection<Handover2User> list, Users user) {
+//        boolean found = false;
+//        for (Handover2User conn : list) {
+//            found = conn.getUser().equals(user);
+//            if (found) break;
+//        }
+//        return found;
+//    }
+
+    public static boolean containsUser(EntityManager em, Handovers handover, Users user) {
+
+          Query query = em.createQuery(" " +
+                  " SELECT count(u) FROM Handovers h JOIN h.usersAcknowledged u " +
+                  " WHERE h = :handover AND u.user = :user ");
+
+          query.setParameter("handover", handover);
+          query.setParameter("user", user);
+
+          Long count = (Long) query.getSingleResult();
+
+          return count.longValue() > 0;
+
+      }
 
 
     public static String getAsHTML(Handovers handover) {

@@ -17,9 +17,13 @@
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
-        <string>default, linegap, default, linegap, fill:default, linegap, fill:default, linegap, default</string> 
+        <string>default, linegap, default, linegap, fill:default, linegap, fill:default</string> 
        </void> 
       </object> 
+      <void method="setProperty"> 
+       <string>$sizePolicy</string> 
+       <int>1</int> 
+      </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormComponent"> 
         <string>javax.swing.JLabel</string> 
@@ -288,8 +292,8 @@
       <void method="setProperty"> 
        <string>size</string> 
        <object class="java.awt.Dimension"> 
-        <int>550</int> 
-        <int>205</int> 
+        <int>600</int> 
+        <int>140</int> 
        </object> 
       </void> 
       <void method="setProperty"> 

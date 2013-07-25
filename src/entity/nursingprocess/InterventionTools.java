@@ -60,6 +60,10 @@ public class InterventionTools {
     public static final int FLAG_GAVAGE_LIQUID_250ML = 33;
     public static final int FLAG_GAVAGE_FOOD_750ML = 34;
     public static final int FLAG_GAVAGE_LIQUID_750ML = 35;
+    public static final int FLAG_GAVAGE_FOOD_200ML = 36;
+    public static final int FLAG_GAVAGE_LIQUID_200ML = 37;
+    public static final int FLAG_GAVAGE_FOOD_100ML = 38;
+    public static final int FLAG_GAVAGE_LIQUID_100ML = 39;
 
 //    public static final String[] FLAGS = new String[]{"nursingrecords.nursingprocess.flag.none",
 //            "nursingrecords.nursingprocess.flag.contracture",

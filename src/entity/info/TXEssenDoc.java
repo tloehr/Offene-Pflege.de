@@ -723,6 +723,8 @@ public class TXEssenDoc {
             content.put(TXEAF.FOOD_LAST_MEAL, "--");
         }
 
+        BigDecimal bd200 = new BigDecimal(200);
+        BigDecimal bd100 = new BigDecimal(100);
         BigDecimal bd250 = new BigDecimal(250);
         BigDecimal bd500 = new BigDecimal(500);
         BigDecimal bd750 = new BigDecimal(750);
@@ -752,6 +754,18 @@ public class TXEssenDoc {
                 foodml = foodml.add(ps.getOverAllDoseSum().multiply(bd1000));
             }
         }
+        listPresGavageFood = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_FOOD_100ML);
+        for (Prescription p : listPresGavageFood) {
+            for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
+                foodml = foodml.add(ps.getOverAllDoseSum().multiply(bd100));
+            }
+        }
+        listPresGavageFood = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_FOOD_200ML);
+        for (Prescription p : listPresGavageFood) {
+            for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
+                foodml = foodml.add(ps.getOverAllDoseSum().multiply(bd200));
+            }
+        }
         listPresGavageFood.clear();
 
         BigDecimal liquidml = BigDecimal.ZERO;
@@ -777,6 +791,18 @@ public class TXEssenDoc {
         for (Prescription p : listPresGavageLiquid) {
             for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
                 liquidml = liquidml.add(ps.getOverAllDoseSum().multiply(bd1000));
+            }
+        }
+        listPresGavageLiquid = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_LIQUID_100ML);
+        for (Prescription p : listPresGavageLiquid) {
+            for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
+                liquidml = liquidml.add(ps.getOverAllDoseSum().multiply(bd100));
+            }
+        }
+        listPresGavageLiquid = PrescriptionTools.getAllActiveByFlag(resident, InterventionTools.FLAG_GAVAGE_LIQUID_200ML);
+        for (Prescription p : listPresGavageLiquid) {
+            for (PrescriptionSchedule ps : p.getPrescriptionSchedule()) {
+                liquidml = liquidml.add(ps.getOverAllDoseSum().multiply(bd200));
             }
         }
         listPresGavageLiquid.clear();
