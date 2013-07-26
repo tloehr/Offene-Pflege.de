@@ -1240,6 +1240,7 @@ public class PnlEditResInfo {
                         return new DefaultListCellRenderer().getListCellRendererComponent(list, text, index, isSelected, cellHasFocus);
                     }
                 });
+                cmb.setSelectedIndex(-1);
                 pnl.add("left hfill", cmb);
 
                 JButton btnCopyOver = new JButton(OPDE.lang.getString("nursingrecords.info.dlg.copyfromtemplate"));

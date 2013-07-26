@@ -31,7 +31,7 @@ import entity.process.QProcessElement;
 import entity.process.SYSINF2PROCESS;
 import entity.system.Users;
 import op.OPDE;
-import op.care.info.PnlInfo;
+import op.care.info.PnlInformation;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.joda.time.DateTime;
@@ -358,7 +358,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
 
     @Override
     public String getTitle() {
-        return OPDE.lang.getString(PnlInfo.internalClassID) + ": " + bwinfotyp.getShortDescription();
+        return OPDE.lang.getString(PnlInformation.internalClassID) + ": " + bwinfotyp.getShortDescription();
     }
 
     @Override

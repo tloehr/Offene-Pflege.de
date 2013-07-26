@@ -1,7 +1,7 @@
 package entity.info;
 
 import op.OPDE;
-import op.care.info.PnlInfo;
+import op.care.info.PnlInformation;
 import op.settings.PnlCats;
 import op.system.InternalClassACL;
 import op.tools.SYSTools;
@@ -66,25 +66,25 @@ public class ResInfoCategoryTools {
         return result;
     }
 
-    /**
-     * @return
-     */
-    public static List<ResInfoCategory> getAll4ResInfo() {
-        long begin = System.currentTimeMillis();
-        String katart = "0";   // a little trick. 0 is always viable
-
-        //        katart += OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, PnlInfo.internalClassID) ? "," + STAMMDATEN : ""; // Stammdaten
-        katart += OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER2, PnlInfo.internalClassID) ? "," + ADMINISTRATIVE : ""; // Verwaltung
-
-        // katart below 1000 is accessible for everyone
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT DISTINCT b FROM ResInfoCategory b JOIN b.resInfoTypes t WHERE (b.catType < 1000 OR b.catType IN (" + katart + " )) AND b.sort >= 0 ORDER BY b.text ");
-        List<ResInfoCategory> result = query.getResultList();
-        em.close();
-        SYSTools.showTimeDifference(begin);
-        //        Collections.sort(result);
-        return result;
-    }
+//    /**
+//     * @return
+//     */
+//    public static List<ResInfoCategory> getAll4ResInfo() {
+//        long begin = System.currentTimeMillis();
+//        String katart = "0";   // a little trick. 0 is always viable
+//
+//        //        katart += OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, PnlInfo.internalClassID) ? "," + STAMMDATEN : ""; // Stammdaten
+//        katart += OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER2, PnlInformation.internalClassID) ? "," + ADMINISTRATIVE : ""; // Verwaltung
+//
+//        // katart below 1000 is accessible for everyone
+//        EntityManager em = OPDE.createEM();
+//        Query query = em.createQuery("SELECT DISTINCT b FROM ResInfoCategory b JOIN b.resInfoTypes t WHERE (b.catType < 1000 OR b.catType IN (" + katart + " )) AND b.sort >= 0 ORDER BY b.text ");
+//        List<ResInfoCategory> result = query.getResultList();
+//        em.close();
+//        SYSTools.showTimeDifference(begin);
+//        //        Collections.sort(result);
+//        return result;
+//    }
 
     public static List<ResInfoCategory> getAll() {
 

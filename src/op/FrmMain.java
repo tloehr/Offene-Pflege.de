@@ -46,7 +46,7 @@ import entity.system.SYSLoginTools;
 import entity.system.SYSPropsTools;
 import op.allowance.PnlAllowance;
 import op.care.PnlCare;
-import op.care.info.PnlInfo;
+import op.care.info.PnlInformation;
 import op.care.med.structure.PnlMed;
 import op.care.supervisor.PnlHandover;
 import op.controlling.PnlControlling;
@@ -78,10 +78,7 @@ import java.beans.PropertyVetoException;
 import java.io.File;
 import java.net.URI;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author __USER__
@@ -91,7 +88,8 @@ public class FrmMain extends JFrame {
     private boolean initPhase;
     private ArrayList<CollapsiblePane> listOfNursingrecords;
 
-    private Map<Integer, ArrayList<Resident>> specialities;
+    private Map<Integer, Set<Resident>> specialities;
+    private Map<Resident, JPanel> iconPanels;
 
     private DlgLogin dlgLogin;
 
@@ -113,7 +111,7 @@ public class FrmMain extends JFrame {
     private LabelStatusBarItem labelUSER;
     private JScrollPane jspSearch, jspApps;
     private CollapsiblePanes panesSearch, panesApps;
-    private HashMap<Resident, JideButton> bwButtonMap;
+    //    private HashMap<Resident, JideButton> bwButtonMap;
     private JideButton homeButton;
 
     public FrmMain() {
@@ -127,20 +125,7 @@ public class FrmMain extends JFrame {
         listOfNursingrecords = new ArrayList<CollapsiblePane>();
         btnHelp.setToolTipText(OPDE.lang.getString("opde.mainframe.btnHelp.tooltip"));
 
-        specialities = Collections.synchronizedMap(new HashMap<Integer, ArrayList<Resident>>());
-        synchronized (specialities) {
-            specialities.put(ResInfoTypeTools.TYPE_ABSENCE, new ArrayList<Resident>());
-            specialities.put(ResInfoTypeTools.TYPE_INFECTION, new ArrayList<Resident>());
-            specialities.put(ResInfoTypeTools.TYPE_WARNING, new ArrayList<Resident>());
-            specialities.put(ResInfoTypeTools.TYPE_ALLERGY, new ArrayList<Resident>());
-            specialities.put(ResInfoTypeTools.TYPE_DIABETES, new ArrayList<Resident>());
-
-            for (ResInfo info : ResInfoTools.getSpecialInfos()) {
-                specialities.get(info.getResInfoType().getType()).add(info.getResident());
-            }
-        }
-
-//        absentList = Collections.synchronizedList(new ArrayList<Resident>());
+        iconPanels = Collections.synchronizedMap(new HashMap<Resident, JPanel>());
 
         if (OPDE.isDebug()) {
             setSize(1366, 768);
@@ -281,8 +266,65 @@ public class FrmMain extends JFrame {
         }
     }
 
+    public void removeSpeciality(ResInfoType type, final Resident resident) {
+        if (!type.isAlertType() && type.getType() != ResInfoTypeTools.TYPE_ABSENCE) {
+            return;
+        }
+        synchronized (specialities) {
+            specialities.get(type.getType()).remove(resident);
+        }
+        synchronized (iconPanels) {
+            setIconPanel(iconPanels.get(resident), resident);
+        }
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                iconPanels.get(resident).repaint();
+            }
+        });
+    }
+
+    public void addSpeciality(ResInfoType type, final Resident resident) {
+        if (!type.isAlertType() && type.getType() != ResInfoTypeTools.TYPE_ABSENCE) {
+            return;
+        }
+        synchronized (specialities) {
+            specialities.get(type.getType()).add(resident);
+        }
+        synchronized (iconPanels) {
+            setIconPanel(iconPanels.get(resident), resident);
+        }
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                iconPanels.get(resident).repaint();
+            }
+        });
+
+    }
+
     public void afterLogin() {
         dlgLogin = null;
+
+        if (specialities != null) {
+            synchronized (specialities) {
+                SYSTools.clear(specialities);
+            }
+        }
+
+        specialities = Collections.synchronizedMap(new HashMap<Integer, Set<Resident>>());
+        synchronized (specialities) {
+            specialities.put(ResInfoTypeTools.TYPE_ABSENCE, new HashSet<Resident>());
+            specialities.put(ResInfoTypeTools.TYPE_INFECTION, new HashSet<Resident>());
+            specialities.put(ResInfoTypeTools.TYPE_WARNING, new HashSet<Resident>());
+            specialities.put(ResInfoTypeTools.TYPE_ALLERGY, new HashSet<Resident>());
+            specialities.put(ResInfoTypeTools.TYPE_DIABETES, new HashSet<Resident>());
+
+            for (ResInfo info : ResInfoTools.getSpecialInfos()) {
+                specialities.get(info.getResInfoType().getType()).add(info.getResident());
+            }
+        }
+
         prepareSearchArea();
         labelUSER.setText(OPDE.getLogin().getUser().getFullname());
 
@@ -551,7 +593,7 @@ public class FrmMain extends JFrame {
         }
 
         // May see the archive
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, PnlInfo.internalClassID)) {
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, PnlInformation.internalClassID)) {
             panesApps.add(addNursingRecords(null));
         }
 
@@ -601,7 +643,7 @@ public class FrmMain extends JFrame {
     }
 
     private CollapsiblePane addNursingRecords(final Station station) {
-        bwButtonMap = new HashMap<Resident, JideButton>();
+//        bwButtonMap = new HashMap<Resident, JideButton>();
 
         EntityManager em = OPDE.createEM();
         Query query;
@@ -684,28 +726,24 @@ public class FrmMain extends JFrame {
 
             singleButtonPanel.add(button);
 
-            synchronized (specialities) {
-                if (specialities.get(ResInfoTypeTools.TYPE_ABSENCE).contains(resident)) {
-                    singleButtonPanel.add(new JLabel(SYSConst.icon16residentAbsent));
-                }
-                if (specialities.get(ResInfoTypeTools.TYPE_INFECTION).contains(resident)) {
-                    singleButtonPanel.add(new JLabel(SYSConst.icon16biohazard));
-                }
-                if (specialities.get(ResInfoTypeTools.TYPE_DIABETES).contains(resident)) {
-                    singleButtonPanel.add(new JLabel(SYSConst.icon16diabetes));
-                }
-                if (specialities.get(ResInfoTypeTools.TYPE_ALLERGY).contains(resident)) {
-                    singleButtonPanel.add(new JLabel(SYSConst.icon16allergy));
-                }
-                if (specialities.get(ResInfoTypeTools.TYPE_WARNING).contains(resident)) {
-                    singleButtonPanel.add(new JLabel(SYSConst.icon16warning));
-                }
-            }
-
             OPDE.getDisplayManager().clearSubMessages();
 
+            if (station != null) { // not for the archive
+                JPanel pnl = new JPanel();
+                pnl.setLayout(new BoxLayout(pnl, BoxLayout.X_AXIS));
+                pnl.setOpaque(false);
+                pnl.setBorder(null);
+
+                setIconPanel(pnl, resident);
+
+                synchronized (iconPanels) {
+                    iconPanels.put(resident, pnl);
+                }
+
+                singleButtonPanel.add(pnl);
+            }
+
             labelPanel.add(singleButtonPanel);
-            bwButtonMap.put(resident, button);
         }
 
         mypane.setContentPane(labelPanel);
@@ -713,7 +751,28 @@ public class FrmMain extends JFrame {
         return mypane;
     }
 
-    public
+
+    private void setIconPanel(JPanel pnl, Resident resident) {
+        pnl.removeAll();
+        synchronized (specialities) {
+            if (specialities.get(ResInfoTypeTools.TYPE_ABSENCE).contains(resident)) {
+                pnl.add(new JLabel(SYSConst.icon16residentAbsent));
+            }
+            if (specialities.get(ResInfoTypeTools.TYPE_INFECTION).contains(resident)) {
+                pnl.add(new JLabel(SYSConst.icon16biohazard));
+            }
+            if (specialities.get(ResInfoTypeTools.TYPE_DIABETES).contains(resident)) {
+                pnl.add(new JLabel(SYSConst.icon16diabetes));
+            }
+            if (specialities.get(ResInfoTypeTools.TYPE_ALLERGY).contains(resident)) {
+                pnl.add(new JLabel(SYSConst.icon16allergy));
+            }
+            if (specialities.get(ResInfoTypeTools.TYPE_WARNING).contains(resident)) {
+                pnl.add(new JLabel(SYSConst.icon16warning));
+            }
+        }
+    }
+
 
     /**
      * fixes #1
@@ -801,6 +860,12 @@ public class FrmMain extends JFrame {
     private void cleanup() {
         if (currentVisiblePanel != null) {
             currentVisiblePanel.cleanup();
+        }
+        synchronized (specialities) {
+            specialities.clear();
+        }
+        synchronized (iconPanels) {
+            iconPanels.clear();
         }
     }
 

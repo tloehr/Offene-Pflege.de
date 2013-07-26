@@ -8,13 +8,10 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.pane.CollapsiblePanes;
 import entity.EntityTools;
-import entity.info.ResInfo;
-import entity.info.ResInfoTools;
 import entity.info.Resident;
 import op.OPDE;
 import op.care.bhp.PnlBHP;
 import op.care.dfn.PnlDFN;
-import op.care.info.PnlInfo;
 import op.care.info.PnlInformation;
 import op.care.med.inventory.PnlInventory;
 import op.care.nursingprocess.PnlNursingProcess;
@@ -28,7 +25,6 @@ import op.tools.GUITools;
 import op.tools.NursingRecordsPanel;
 import op.tools.SYSTools;
 
-import javax.persistence.EntityManager;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -50,7 +46,6 @@ public class PnlCare extends NursingRecordsPanel {
     public static final int TAB_PPLANUNG = 8;
     public static final int TAB_VORGANG = 9;
     public static final int TAB_FILES = 10;
-    public static final int TAB_INFO2 = 11;
 
     private boolean initPhase;
     private String[] tabs = new String[]{

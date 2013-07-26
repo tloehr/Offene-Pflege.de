@@ -22,7 +22,7 @@ import entity.values.ResValue;
 import entity.values.ResValueTools;
 import op.OPDE;
 import op.care.PnlCare;
-import op.care.info.PnlInfo;
+import op.care.info.PnlInformation;
 import op.care.nursingprocess.PnlNursingProcess;
 import op.care.values.PnlValues;
 import op.dev.PnlDev;
@@ -593,7 +593,7 @@ public class PnlWelcome extends CleanablePanel {
     private java.util.List<Component> addCommands() {
         java.util.List<Component> list = new ArrayList<Component>();
 
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlInfo.internalClassID)) { // => ACLMATRIX
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlInformation.internalClassID)) { // => ACLMATRIX
             JideButton addbw = GUITools.createHyperlinkButton(OPDE.lang.getString("opde.welcome.addbw"), SYSConst.icon22addbw, null);
 //            final MyJDialog dlg = new MyJDialog();
             addbw.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());

@@ -38,7 +38,7 @@ import entity.info.Resident;
 import entity.prescription.*;
 import entity.system.SYSPropsTools;
 import op.OPDE;
-import op.care.info.PnlInfo;
+import op.care.info.PnlInformation;
 import op.care.med.structure.DlgTradeForm;
 import op.care.med.structure.DlgUPREditor;
 import op.care.med.structure.PnlMed;
@@ -1428,7 +1428,7 @@ public class PnlInventory extends NursingRecordsPanel {
             if (stock != null) {
                 final String key = stock.getInventory().getID() + ".xinventory";
                 if (!resident.equals(stock.getInventory().getResident())) {
-                    if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, PnlInfo.internalClassID)) {
+                    if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, PnlInformation.internalClassID)) {
                         switchResident(stock.getInventory().getResident(), stock.getInventory(), new Closure() {
                             @Override
                             public void execute(Object o) {
