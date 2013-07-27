@@ -698,20 +698,20 @@ public class MedStockTools {
         EntityManager em = OPDE.createEM();
         Query query1 = em.createQuery("SELECT s FROM MedStock s WHERE s.expires IS NOT NULL AND s.out = :tfn ");
         query1.setParameter("tfn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
-        ArrayList<MedStock> list1 = new ArrayList<MedStock>(query1.getResultList());
+        HashSet<MedStock> set = new HashSet<MedStock>(query1.getResultList());
 
         Query query2 = em.createQuery("SELECT s FROM MedStock s JOIN s.tradeform t WHERE t.daysToExpireAfterOpened IS NOT NULL AND s.out = :tfn AND s.opened < :now");
         query2.setParameter("tfn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
         query2.setParameter("now", new Date());
-        list1.addAll(new ArrayList<MedStock>(query2.getResultList()));
+        set.addAll(query2.getResultList());
 
-        for (MedStock stock : list1) {
+        for (MedStock stock : set) {
             if (stock.expiresIn(days)) {
                 list.add(stock);
             }
         }
 
-        list1.clear();
+        set.clear();
 
         em.close();
         return list;
