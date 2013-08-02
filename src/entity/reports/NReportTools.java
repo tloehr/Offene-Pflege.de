@@ -10,7 +10,6 @@ import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.process.QProcessElement;
 import op.OPDE;
-import op.controlling.PnlControlling;
 import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -362,7 +361,7 @@ public class NReportTools {
         int p = -1;
         progress.execute(new Pair<Integer, Integer>(p, listResidents.size()));
 
-        html.append(SYSConst.html_h1_open + OPDE.lang.getString(PnlControlling.internalClassID + ".orga.bvactivities") + SYSConst.html_h1_close);
+        html.append(SYSConst.html_h1_open + OPDE.lang.getString("opde.controlling.orga.bvactivities") + SYSConst.html_h1_close);
 
         p = 0;
         for (Resident resident : listResidents) {
@@ -374,7 +373,7 @@ public class NReportTools {
             html.append(SYSConst.html_h2_open + ResidentTools.getTextCompact(resident) + SYSConst.html_h2_close);
 
             if (resident.getPN1() == null) {
-                html.append(SYSConst.html_div(SYSConst.html_bold(OPDE.lang.getString(PnlControlling.internalClassID + ".orga.bvactivities.nobv"))));
+                html.append(SYSConst.html_div(SYSConst.html_bold(OPDE.lang.getString("opde.controlling.orga.bvactivities.nobv"))));
             } else {
                 html.append(SYSConst.html_div(SYSConst.html_bold(OPDE.lang.getString("misc.msg.primaryNurse")) + ": " + resident.getPN1().getFullname()));
             }
@@ -399,6 +398,71 @@ public class NReportTools {
                 html.append("</table>");
             }
         }
+        return html.toString();
+    }
+
+
+    public static String getComplaints(DateMidnight from, Closure progress) {
+        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT);
+
+
+        StringBuilder html = new StringBuilder(1000);
+
+        int p = -1;
+        progress.execute(new Pair<Integer, Integer>(p, 100));
+
+        html.append(SYSConst.html_h2("opde.controlling.orga.complaints.nreports"));
+
+        try {
+
+            EntityManager em = OPDE.createEM();
+
+            String jpql2 = " " +
+                    " SELECT n FROM NReport n " +
+                    " JOIN n.tags t " +
+                    " WHERE n.pit > :from " +
+                    " AND n.resident.adminonly <> 2 " +
+                    " AND n.replacedBy IS NULL " +
+                    " AND t.system = :tagsystem " +
+                    " ORDER BY n.resident.rid, n.pit DESC ";
+            Query query2 = em.createQuery(jpql2);
+            query2.setParameter("tagsystem", NReportTAGSTools.TYPE_SYS_COMPLAINT);
+            query2.setParameter("from", from.toDate());
+            ArrayList<NReport> listReports = new ArrayList<NReport>(query2.getResultList());
+
+            em.close();
+
+            p = 0;
+
+            if (listReports.isEmpty()) {
+                html.append(SYSConst.html_div(SYSConst.html_bold(OPDE.lang.getString("misc.msg.nodata"))));
+            } else {
+                String table = "";
+                table += SYSConst.html_table_tr(
+                        SYSConst.html_table_th(OPDE.lang.getString("misc.msg.Date")) +
+                                SYSConst.html_table_th(OPDE.lang.getString("misc.msg.resident")) +
+                                SYSConst.html_table_th(OPDE.lang.getString("misc.msg.Text")) +
+                                SYSConst.html_table_th(OPDE.lang.getString("misc.msg.user"))
+                );
+
+                for (NReport nReport : listReports) {
+                    p++;
+                    progress.execute(new Pair<Integer, Integer>(p, listReports.size()));
+
+                    table += SYSConst.html_table_tr(
+                            SYSConst.html_table_td(df.format(nReport.getPit()), null) +
+                                    SYSConst.html_table_td(ResidentTools.getTextCompact(nReport.getResident()), null) +
+                                    SYSConst.html_table_td(SYSConst.html_paragraph(nReport.getText()), null) +
+                                    SYSConst.html_table_td(nReport.getUser().getFullname(), null)
+                    );
+                }
+                html.append(SYSConst.html_table(table, "1"));
+            }
+
+        } catch (Exception exc) {
+            OPDE.fatal(exc);
+        }
+
         return html.toString();
     }
 
@@ -487,7 +551,7 @@ public class NReportTools {
             statmap.put(nr.getResident(), new Pair<Integer, Integer>(socialtime, peatime));
         }
 
-        html.append(SYSConst.html_h1(OPDE.lang.getString(PnlControlling.internalClassID + ".nursing.social")));
+        html.append(SYSConst.html_h1(OPDE.lang.getString("opde.controlling.nursing.social")));
         html.append(SYSConst.html_h2(monthFormmatter.format(month.toDate())));
 
 
@@ -496,10 +560,10 @@ public class NReportTools {
                 SYSConst.html_table_th("misc.msg.resident") +
                         SYSConst.html_table_th(OPDE.lang.getString("misc.msg.Effort") + " (" + OPDE.lang.getString("misc.msg.Minutes") + ")") +
                         SYSConst.html_table_th(OPDE.lang.getString("misc.msg.Effort") + " (" + OPDE.lang.getString("misc.msg.Hours") + ")") +
-                        SYSConst.html_table_th(OPDE.lang.getString(PnlControlling.internalClassID + ".nursing.social.averageHoursPerDay")) +
+                        SYSConst.html_table_th(OPDE.lang.getString("opde.controlling.nursing.social.averageHoursPerDay")) +
                         SYSConst.html_table_th("PEA " + OPDE.lang.getString("misc.msg.Effort") + " (" + OPDE.lang.getString("misc.msg.Minutes") + ")") +
                         SYSConst.html_table_th("PEA " + OPDE.lang.getString("misc.msg.Effort") + " (" + OPDE.lang.getString("misc.msg.Hours") + ")") +
-                        SYSConst.html_table_th("PEA " + OPDE.lang.getString(PnlControlling.internalClassID + ".nursing.social.averageHoursPerDay"))
+                        SYSConst.html_table_th("PEA " + OPDE.lang.getString("opde.controlling.nursing.social.averageHoursPerDay"))
         ));
 
         BigDecimal daysinmonth = new BigDecimal(month.dayOfMonth().withMaximumValue().getDayOfMonth());
@@ -527,7 +591,7 @@ public class NReportTools {
         }
 
         html.append(SYSConst.html_table(table.toString(), "1"));
-        html.append(SYSConst.html_paragraph(PnlControlling.internalClassID + ".nursing.social.peaexplain"));
+        html.append(SYSConst.html_paragraph("opde.controlling.nursing.social.peaexplain"));
 
         return html.toString();
     }

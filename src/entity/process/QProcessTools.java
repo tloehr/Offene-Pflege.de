@@ -13,7 +13,6 @@ import entity.reports.NReport;
 import entity.system.Users;
 import entity.values.ResValue;
 import op.OPDE;
-import op.controlling.PnlControlling;
 import op.process.PnlProcess;
 import op.tools.GUITools;
 import op.tools.Pair;
@@ -329,7 +328,7 @@ public class QProcessTools {
         query1.setParameter("from", from.toDate());
         ArrayList<QProcess> listData = new ArrayList<QProcess>(query1.getResultList());
 
-        html.append(SYSConst.html_h1(PnlControlling.internalClassID + ".orga.complaints"));
+        html.append(SYSConst.html_h1("opde.controlling.orga.complaints"));
         html.append(SYSConst.html_h2(OPDE.lang.getString("misc.msg.analysis") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
 
         // By Month
@@ -360,7 +359,7 @@ public class QProcessTools {
 
         em.close();
 
-        html.append(SYSConst.html_h3(PnlControlling.internalClassID + ".orga.complaints.byMonth"));
+        html.append(SYSConst.html_h3("opde.controlling.orga.complaints.byMonth"));
         table = new StringBuffer(1000);
         table.append(SYSConst.html_table_tr(
                 SYSConst.html_table_th("misc.msg.Number") +
@@ -374,7 +373,7 @@ public class QProcessTools {
         }
         html.append(SYSConst.html_table(table.toString(), "1"));
 
-        html.append(SYSConst.html_h3(PnlControlling.internalClassID + ".orga.complaints.byEmployees"));
+        html.append(SYSConst.html_h3("opde.controlling.orga.complaints.byEmployees"));
         table = new StringBuffer(1000);
         table.append(SYSConst.html_table_tr(
                 SYSConst.html_table_th("misc.msg.Number") +
@@ -388,7 +387,7 @@ public class QProcessTools {
         }
         html.append(SYSConst.html_table(table.toString(), "1"));
 
-        html.append(SYSConst.html_h3(PnlControlling.internalClassID + ".orga.complaints.byResidents"));
+        html.append(SYSConst.html_h3("opde.controlling.orga.complaints.byResidents"));
         table = new StringBuffer(1000);
         table.append(SYSConst.html_table_tr(
                 SYSConst.html_table_th("misc.msg.Number") +
@@ -402,7 +401,7 @@ public class QProcessTools {
         }
         html.append(SYSConst.html_table(table.toString(), "1"));
 
-        html.append(SYSConst.html_h3(PnlControlling.internalClassID + ".orga.complaints.complete"));
+        html.append(SYSConst.html_h3("opde.controlling.orga.complaints.complete"));
         table = new StringBuffer(1000);
         table.append(SYSConst.html_table_tr(
                 SYSConst.html_table_th("misc.msg.title") +

@@ -38,6 +38,7 @@ public class NReportTAGSTools {
     public static final int TYPE_SYS_FALLS = 6;
     public static final int TYPE_SYS_PAIN = 7;
     public static final int TYPE_SYS_SOCIAL = 8;
+    public static final int TYPE_SYS_COMPLAINT = 9;
 
     public static ListCellRenderer getPBerichtTAGSRenderer() {
 //        final int v = verbosity;

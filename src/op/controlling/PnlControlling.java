@@ -357,7 +357,13 @@ public class PnlControlling extends CleanablePanel {
                     @Override
                     protected Object doInBackground() throws Exception {
                         SYSPropsTools.storeProp("opde.controlling::complaintsMonthBack", txtComplaintsMonthsBack.getText(), OPDE.getLogin().getUser());
-                        SYSFilesTools.print(QProcessTools.getComplaintsAnalysis(Integer.parseInt(txtComplaintsMonthsBack.getText()), progressClosure), false);
+
+                        int monthsback = Integer.parseInt(txtComplaintsMonthsBack.getText());
+
+                        String content = QProcessTools.getComplaintsAnalysis(monthsback, progressClosure);
+                        content += NReportTools.getComplaints(new DateMidnight().minusMonths(monthsback).dayOfMonth().withMinimumValue(), progressClosure);
+
+                        SYSFilesTools.print(content, false);
                         return null;
                     }
 
