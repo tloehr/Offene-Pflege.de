@@ -36,20 +36,20 @@ public class DlgUPREditor extends MyJDialog {
     private TradeForm tradeForm;
     private ArrayList<MedStock> listStocks;
     private HashMap<MedStock, Pair<BigDecimal, BigDecimal>> mapEffectiveUPRs;
+    private Closure afterAction;
 
-    public DlgUPREditor(TradeForm tradeForm) {
+    public DlgUPREditor(TradeForm tradeForm, Closure afterAction) {
         super(false);
         this.tradeForm = tradeForm;
+        this.afterAction = afterAction;
         initComponents();
         initPanel();
     }
 
     private void initPanel() {
 
-
         OPDE.getMainframe().setBlocked(true);
         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
-
 
         SwingWorker worker = new SwingWorker() {
 
@@ -111,6 +111,7 @@ public class DlgUPREditor extends MyJDialog {
     }
 
     private void btnCloseActionPerformed(ActionEvent e) {
+        afterAction.execute(null);
         dispose();
     }
 
@@ -237,6 +238,7 @@ public class DlgUPREditor extends MyJDialog {
                         protected void done() {
                             OPDE.getDisplayManager().setProgressBarMessage(null);
                             OPDE.getMainframe().setBlocked(false);
+                            afterAction.execute(null);
                             dispose();
                         }
                     };

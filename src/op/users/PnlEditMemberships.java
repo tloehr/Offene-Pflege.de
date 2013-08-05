@@ -4,7 +4,6 @@ import entity.system.Groups;
 import entity.system.Users;
 import op.OPDE;
 import op.threads.DisplayManager;
-import op.tools.Pair;
 import op.tools.SYSConst;
 import org.apache.commons.collections.Closure;
 
@@ -28,14 +27,12 @@ import java.util.HashMap;
 public class PnlEditMemberships extends JPanel {
     private Users user;
     private ArrayList<Groups> listGroups; // is only needed once during setup of the panel
-//    private Closure callback;
     private HashMap<String, Groups> groupMap; // will be used during the use of the panel
 
     public PnlEditMemberships(Users user, ArrayList<Groups> listGroups) {
         super();
         this.user = user;
         this.listGroups = listGroups;
-//        this.callback = callback;
         setLayout(new GridLayout(0, 3));
         initPanel();
     }
@@ -76,7 +73,6 @@ public class PnlEditMemberships extends JPanel {
                         // so we won't get locking exceptions because of outdated version informations
                         user = myUser;
                         groupMap.put(gid, myGroup);
-
                     } catch (OptimisticLockException ole) {
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();

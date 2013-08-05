@@ -893,75 +893,73 @@ public class PnlInformation extends NursingRecordsPanel {
                         btnChange.setEnabled(wasChangeable);
                         btnEdit.setEnabled(wasEditable);
 
-                        if (o == null || !mapInfo2Editor.get(resInfo).isChanged()) {
-                            return;
-                        }
-                        new DlgYesNo(OPDE.lang.getString("misc.questions.change1") + "<br/>&raquo;" + resInfo.getResInfoType().getShortDescription() + "&laquo;<br/>" + DateFormat.getDateInstance().format(resInfo.getFrom()) + "<br/>" + OPDE.lang.getString("misc.questions.change2"), SYSConst.icon48play, new Closure() {
-                            @Override
-                            public void execute(Object answer) {
-                                if (!answer.equals(JOptionPane.YES_OPTION)) {
-                                    return;
-                                }
-                                EntityManager em = OPDE.createEM();
-                                try {
-                                    em.getTransaction().begin();
-                                    ResInfo oldinfo = em.merge(resInfo);
+                        if (o != null) { //  && mapInfo2Editor.get(resInfo).isChanged()
+
+                            new DlgYesNo(OPDE.lang.getString("misc.questions.change1") + "<br/>&raquo;" + resInfo.getResInfoType().getShortDescription() + "&laquo;<br/>" + DateFormat.getDateInstance().format(resInfo.getFrom()) + "<br/>" + OPDE.lang.getString("misc.questions.change2"), SYSConst.icon48play, new Closure() {
+                                @Override
+                                public void execute(Object answer) {
+                                    if (!answer.equals(JOptionPane.YES_OPTION)) {
+                                        return;
+                                    }
+                                    EntityManager em = OPDE.createEM();
+                                    try {
+                                        em.getTransaction().begin();
+                                        ResInfo oldinfo = em.merge(resInfo);
 
 
-                                    ResInfo newinfo = em.merge((ResInfo) o);
+                                        ResInfo newinfo = em.merge((ResInfo) o);
 //                                    mapInfo2Editor.get(resInfo).getResInfo()
-                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                    // so that no conflicts can occur if another user enters a new info at the same time
-                                    em.lock(em.merge(resInfo.getResInfoType()), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                                    em.lock(oldinfo, LockModeType.OPTIMISTIC);
+                                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                        // so that no conflicts can occur if another user enters a new info at the same time
+                                        em.lock(em.merge(resInfo.getResInfoType()), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                        em.lock(oldinfo, LockModeType.OPTIMISTIC);
 
-                                    newinfo.setHtml(ResInfoTools.getContentAsHTML(newinfo));
-                                    newinfo.setUserON(em.merge(OPDE.getLogin().getUser()));
-                                    newinfo.setFrom(new Date());
+                                        newinfo.setHtml(ResInfoTools.getContentAsHTML(newinfo));
+                                        newinfo.setUserON(em.merge(OPDE.getLogin().getUser()));
+                                        newinfo.setFrom(new Date());
 
-                                    oldinfo.setTo(new DateTime(newinfo.getFrom()).minusSeconds(1).toDate());
-                                    oldinfo.setUserOFF(newinfo.getUserON());
+                                        oldinfo.setTo(new DateTime(newinfo.getFrom()).minusSeconds(1).toDate());
+                                        oldinfo.setUserOFF(newinfo.getUserON());
 
-                                    em.getTransaction().commit();
+                                        em.getTransaction().commit();
 
-                                    synchronized (mapType2ResInfos) {
-                                        mapType2ResInfos.get(oldinfo.getResInfoType()).remove(resInfo);
-                                        mapType2ResInfos.get(newinfo.getResInfoType()).add(newinfo);
-                                        mapType2ResInfos.get(newinfo.getResInfoType()).add(oldinfo);
-                                        Collections.sort(mapType2ResInfos.get(newinfo.getResInfoType()));
+                                        synchronized (mapType2ResInfos) {
+                                            mapType2ResInfos.get(oldinfo.getResInfoType()).remove(resInfo);
+                                            mapType2ResInfos.get(newinfo.getResInfoType()).add(newinfo);
+                                            mapType2ResInfos.get(newinfo.getResInfoType()).add(oldinfo);
+                                            Collections.sort(mapType2ResInfos.get(newinfo.getResInfoType()));
+                                        }
+
+                                        synchronized (listAllInfos) {
+                                            listAllInfos.remove(resInfo);
+                                            listAllInfos.add(oldinfo);
+                                            listAllInfos.add(newinfo);
+                                        }
+                                    } catch (OptimisticLockException ole) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                            OPDE.getMainframe().emptyFrame();
+                                            OPDE.getMainframe().afterLogin();
+                                        }
+                                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                    } catch (Exception ex) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        OPDE.fatal(ex);
+                                    } finally {
+                                        em.close();
                                     }
 
-                                    synchronized (listAllInfos) {
-                                        listAllInfos.remove(resInfo);
-                                        listAllInfos.add(oldinfo);
-                                        listAllInfos.add(newinfo);
+                                    synchronized (mapKey2CP) {
+                                        mapKey2CP.remove(keyResInfo);
                                     }
-                                } catch (OptimisticLockException ole) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    }
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                } catch (Exception ex) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    OPDE.fatal(ex);
-                                } finally {
-                                    em.close();
                                 }
-
-                                synchronized (mapKey2CP) {
-                                    mapKey2CP.remove(keyResInfo);
-                                }
-                                reloadDisplay();
-                            }
-                        });
-
-
+                            });
+                        }
+                        reloadDisplay();
                     }
                 });
             }

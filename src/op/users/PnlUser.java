@@ -78,6 +78,8 @@ public class PnlUser extends CleanablePanel {
     private HashMap<String, JPanel> contentMap;
     private HashMap<String, CollapsiblePane> cpMap;
 
+
+
     private HashMap<String, Users> usermap;
 
 
@@ -124,63 +126,17 @@ public class PnlUser extends CleanablePanel {
          *                                              |_|            |___/
          */
 
-
-        final boolean withworker = false;
-        if (withworker) {
-
-//            OPDE.getMainframe().setBlocked(true);
-//            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
-//
-//            cpDFN.removeAll();
-//
-//            SwingWorker worker = new SwingWorker() {
-//
-//                @Override
-//                protected Object doInBackground() throws Exception {
-//
-//                    int progress = 0;
-//                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 100));
-//
-//                    for (DFN dfn : DFNTools.getDFNs(resident, jdcDatum.getDate())) {
-//                        shiftMAPDFN.get(dfn.getShift()).add(dfn);
-//                    }
-//
-//                    for (Byte shift : new Byte[]{DFNTools.SHIFT_ON_DEMAND, DFNTools.SHIFT_VERY_EARLY, DFNTools.SHIFT_EARLY, DFNTools.SHIFT_LATE, DFNTools.SHIFT_VERY_LATE}) {
-//                        shiftMAPpane.put(shift, createCP4(shift));
-//                        try {
-//                            shiftMAPpane.get(shift).setCollapsed(shift == DFNTools.SHIFT_ON_DEMAND || shift != SYSCalendar.whatShiftIs(new Date()));
-//                        } catch (PropertyVetoException e) {
-//                            OPDE.debug(e);
-//                        }
-//                        progress += 20;
-//                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 100));
-//                    }
-//
-//                    return null;
-//                }
-//
-//                @Override
-//                protected void done() {
-//                    buildPanel(true);
-//                    initPhase = false;
-//                    OPDE.getDisplayManager().setProgressBarMessage(null);
-//                    OPDE.getMainframe().setBlocked(false);
-//                }
-//            };
-//            worker.execute();
-
-        } else {
-            lstUsers = UsersTools.getUsers(true);
-            lstGroups = GroupsTools.getGroups();
-            for (Users user : lstUsers) {
-                usermap.put(user.getUID(), user);
-                createCP4(user);
-            }
-            for (Groups group : lstGroups) {
-                createCP4(group);
-            }
-            buildPanel();
+        lstUsers = UsersTools.getUsers(true);
+        lstGroups = GroupsTools.getGroups();
+        for (Users user : lstUsers) {
+            usermap.put(user.getUID(), user);
+            createCP4(user);
         }
+        for (Groups group : lstGroups) {
+            createCP4(group);
+        }
+        buildPanel();
+
         initPhase = false;
     }
 
@@ -202,12 +158,10 @@ public class PnlUser extends CleanablePanel {
         searchPanes.removeAll();
     }
 
-    private void tabMainStateChanged(ChangeEvent e) {
-
-    }
 
     @Override
     public void reload() {
+        cleanup();
         reloadDisplay();
     }
 
@@ -660,7 +614,10 @@ public class PnlUser extends CleanablePanel {
         cp.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                cp.setContentPane(new PnlEditMemberships(user, lstGroups));
+                if (!contentMap.containsKey(key)){
+                    contentMap.put(key, new PnlEditMemberships(user, lstGroups));
+                }
+                cp.setContentPane(contentMap.get(key));
                 cp.setOpaque(false);
             }
         }

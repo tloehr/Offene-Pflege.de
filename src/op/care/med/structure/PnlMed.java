@@ -207,7 +207,12 @@ public class PnlMed extends CleanablePanel {
                     itemUPRedit = new JMenuItem(OPDE.lang.getString("upreditor.tooltip"));
                     itemUPRedit.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
-                            new DlgUPREditor(tradeForm);
+                            new DlgUPREditor(tradeForm, new Closure() {
+                                @Override
+                                public void execute(Object o) {
+                                    reload();
+                                }
+                            });
                         }
                     });
                     itemUPRedit.setEnabled(tradeForm.getDosageForm().isUPRn());

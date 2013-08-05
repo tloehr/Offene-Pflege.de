@@ -119,65 +119,14 @@ public class PnlProcess extends NursingRecordsPanel {
          */
         initPhase = true;
 
-//        mapProcess2CP.clear();
-//        qProcess2ElementMap.clear();
-//        qProcessMap.clear();
-//        elementMap.clear();
 
         mapCP.clear();
 
-        final boolean withworker = false;
-        if (withworker) {
-
-//            OPDE.getMainframe().setBlocked(true);
-//            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
-//
-//            cpDFN.removeAll();
-//
-//            SwingWorker worker = new SwingWorker() {
-//
-//                @Override
-//                protected Object doInBackground() throws Exception {
-//
-//                    int progress = 0;
-//                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 100));
-//
-//                    for (DFN dfn : DFNTools.getDFNs(resident, jdcDatum.getDate())) {
-//                        shiftMAPDFN.get(dfn.getShift()).add(dfn);
-//                    }
-//
-//                    for (Byte shift : new Byte[]{DFNTools.SHIFT_ON_DEMAND, DFNTools.SHIFT_VERY_EARLY, DFNTools.SHIFT_EARLY, DFNTools.SHIFT_LATE, DFNTools.SHIFT_VERY_LATE}) {
-//                        shiftMAPpane.put(shift, createCP4(shift));
-//                        try {
-//                            shiftMAPpane.get(shift).setCollapsed(shift == DFNTools.SHIFT_ON_DEMAND || shift != SYSCalendar.whatShiftIs(new Date()));
-//                        } catch (PropertyVetoException e) {
-//                            OPDE.debug(e);
-//                        }
-//                        progress += 20;
-//                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 100));
-//                    }
-//
-//                    return null;
-//                }
-//
-//                @Override
-//                protected void done() {
-//                    buildPanel(true);
-//                    initPhase = false;
-//                    OPDE.getDisplayManager().setProgressBarMessage(null);
-//                    OPDE.getMainframe().setBlocked(false);
-//                }
-//            };
-//            worker.execute();
-
-        } else {
-            for (QProcess qProcess : processList) {
-                createCP4(qProcess);
-//                qProcessMap.put(qProcess, createCP4(qProcess));
-            }
-            buildPanel();
+        for (QProcess qProcess : processList) {
+            createCP4(qProcess);
         }
-        initPhase = false;
+        buildPanel();
+
     }
 
 
@@ -1228,6 +1177,7 @@ public class PnlProcess extends NursingRecordsPanel {
                     buttonPanel.add(btnSave);
                     pnl.setBorder(new EmptyBorder(10, 10, 10, 10));
                     pnl.add(buttonPanel, BorderLayout.SOUTH);
+                    popup.setTransient(true);
 
                     popup.setOwner(btnRevision);
                     popup.getContentPane().add(pnl);

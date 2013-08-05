@@ -1647,8 +1647,12 @@ public class PnlInventory extends NursingRecordsPanel {
             btnUPReditor.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgUPREditor(stock.getTradeForm());
-                    reload();
+                    new DlgUPREditor(stock.getTradeForm(), new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            reload();
+                        }
+                    });
                 }
             });
             btnUPReditor.setEnabled(stock.getTradeForm().getDosageForm().isUPRn());
