@@ -94,6 +94,7 @@ public class PnlSystemSettings extends CleanablePanel {
     }
 
     private void cmbStationItemStateChanged(ItemEvent e) {
+        if (cmbStation.getSelectedItem() == null) return;
         OPDE.getLocalProps().setProperty(SYSPropsTools.KEY_STATION, ((Station) cmbStation.getSelectedItem()).getStatID().toString());
         OPDE.saveLocalProps();
     }

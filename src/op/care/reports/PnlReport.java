@@ -81,7 +81,7 @@ public class PnlReport extends NursingRecordsPanel {
     private Map<String, JPanel> contentmap;
     private Map<String, ArrayList<NReport>> valuecache;
     private Map<NReport, JPanel> linemap;
-    private Map<DateMidnight, String> hollidays;
+    private Map<DateMidnight, String> holidays;
 
     private Resident resident;
     private boolean initPhase;
@@ -121,6 +121,7 @@ public class PnlReport extends NursingRecordsPanel {
         cpMap = Collections.synchronizedMap(new HashMap<String, CollapsiblePane>());
         valuecache = Collections.synchronizedMap(new HashMap<String, ArrayList<NReport>>());
         linemap = Collections.synchronizedMap(new HashMap<NReport, JPanel>());
+        holidays = new HashMap<DateMidnight, String>();
         prepareSearchArea();
     }
 
@@ -202,8 +203,8 @@ public class PnlReport extends NursingRecordsPanel {
         synchronized (valuecache) {
             SYSTools.clear(valuecache);
         }
-        synchronized (hollidays) {
-            SYSTools.clear(hollidays);
+        synchronized (holidays) {
+            SYSTools.clear(holidays);
         }
     }
 
@@ -447,7 +448,7 @@ public class PnlReport extends NursingRecordsPanel {
 
                 Pair<DateTime, DateTime> minmax = NReportTools.getMinMax(resident);
 
-                hollidays = Collections.synchronizedMap(SYSCalendar.getHolidays(minmax.getFirst().getYear(), minmax.getSecond().getYear()));
+                holidays = Collections.synchronizedMap(SYSCalendar.getHolidays(minmax.getFirst().getYear(), minmax.getSecond().getYear()));
 
                 if (minmax != null) {
                     max = minmax.getSecond().toDate();
@@ -808,7 +809,7 @@ public class PnlReport extends NursingRecordsPanel {
         final CollapsiblePane cpDay = cpMap.get(key);
         String titleDay = "<html><font size=+1>" +
                 dayFormat.format(day.toDate()) +
-                SYSTools.catchNull(hollidays.get(day), " (", ")") +
+                SYSTools.catchNull(holidays.get(day), " (", ")") +
                 "</font></html>";
         final DefaultCPTitle titleCPDay = new DefaultCPTitle(titleDay, new ActionListener() {
             @Override
@@ -840,7 +841,7 @@ public class PnlReport extends NursingRecordsPanel {
         cpDay.setTitleLabelComponent(titleCPDay.getMain());
         cpDay.setSlidingDirection(SwingConstants.SOUTH);
 
-        if (hollidays.containsKey(day)) {
+        if (holidays.containsKey(day)) {
             cpDay.setBackground(SYSConst.red1[SYSConst.medium1]);
         } else if (day.getDayOfWeek() == DateTimeConstants.SATURDAY || day.getDayOfWeek() == DateTimeConstants.SUNDAY) {
             cpDay.setBackground(SYSConst.red1[SYSConst.light3]);

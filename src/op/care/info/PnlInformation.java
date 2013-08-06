@@ -617,7 +617,7 @@ public class PnlInformation extends NursingRecordsPanel {
         if (resInfo.isSingleIncident()) {
             title += DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(resInfo.getFrom()) + " (" + resInfo.getUserON().getFullname() + ")";
         } else {
-            title += DateFormat.getDateInstance().format(resInfo.getFrom()) + " (" + resInfo.getUserON().getFullname() + ") " + " >> ";
+            title += DateFormat.getDateInstance().format(resInfo.getFrom()) + " (" + (resInfo.getUserON() != null ? resInfo.getUserON().getFullname() : "--") + ") " + " >> ";
             title += resInfo.isClosed() ? DateFormat.getDateInstance().format(resInfo.getTo()) + " (" + resInfo.getUserOFF().getFullname() + ")" : "";
         }
 
