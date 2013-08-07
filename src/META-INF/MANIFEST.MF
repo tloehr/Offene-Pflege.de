@@ -18,4 +18,4 @@ Class-Path: itext-pdfa-5.4.0.jar itext-xtra-5.4.0.jar itextpdf-5.4.0.j
  k7.jar jide-common.jar jide-plaf.jar jide-components.jar jide-dialogs
  .jar edtftpj.jar swingx-beaninfo-1.6.2.jar swingx-core-1.6.2.jar
 Main-Class: op.OPDE
-
+SplashScreen-Image: artwork/splash/opde-splash-868x488.png
