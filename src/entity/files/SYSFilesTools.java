@@ -260,7 +260,7 @@ public class SYSFilesTools {
      * @param sysfile - Datei, die vom FTP Server geholt werden soll.
      * @return File Objekt der geladenen Datei, null bei Fehler.
      */
-    public static File getFile(SYSFiles sysfile, EventListener eventListener) {
+    private static File getFile(SYSFiles sysfile, EventListener eventListener) {
         File target = null;
         try {
 
@@ -437,6 +437,9 @@ public class SYSFilesTools {
      * @param action
      */
     public static void handleFile(SYSFiles sysfile, java.awt.Desktop.Action action) {
+        if (sysfile == null){
+            return;
+        }
         handleFile(getFile(sysfile, null), action);
     }
 
