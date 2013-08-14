@@ -82,6 +82,7 @@ public class DlgValueControl extends MyJDialog {
         lblDayStool.setText(OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.lblDayStool.tooltip"));
         lblMin.setText(OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.lblMin.tooltip"));
         lblMax.setText(OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.lblMax.tooltip"));
+        lblTarget.setText(OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.lblTarget.tooltip"));
 
         tbStool.setSelected(props.containsKey(ResidentTools.KEY_STOOLDAYS) && !props.getProperty(ResidentTools.KEY_STOOLDAYS).equals("off"));
         tbBalance.setSelected(props.containsKey(ResidentTools.KEY_BALANCE) && !props.getProperty(ResidentTools.KEY_BALANCE).equals("off"));
@@ -152,17 +153,18 @@ public class DlgValueControl extends MyJDialog {
     private boolean saveOK() {
         boolean drinkon = tbBalance.isSelected() || tbLowIn.isSelected() || tbHighIn.isSelected();
 
+        BigDecimal stooldays = SYSTools.parseDecimal(txtStoolDays.getText());
         BigDecimal highin = SYSTools.parseDecimal(txtHighIn.getText());
         BigDecimal targetin = SYSTools.parseDecimal(txtTargetIn.getText());
         BigDecimal lowin = SYSTools.parseDecimal(txtLowIn.getText());
 
-        boolean stoolOK = !tbStool.isSelected() || SYSTools.parseDecimal(txtStoolDays.getText()) != null;
-        boolean highinOK = !tbHighIn.isSelected() || highin != null;
-        boolean targetinOK = !tbBalance.isSelected() || targetin != null;
-        boolean lowinOK = !tbLowIn.isSelected() || lowin != null;
-        boolean daysOK = !drinkon || SYSTools.parseDecimal(txtDaysDrink.getText()) != null;
+        boolean stoolOK = !tbStool.isSelected() || (stooldays != null && isGreaterZero(stooldays));
+        boolean highinOK = !tbHighIn.isSelected() || (highin != null && isGreaterZero(highin));
+        boolean targetinOK = !tbBalance.isSelected() || (targetin != null && isGreaterZero(targetin));
+        boolean lowinOK = !tbLowIn.isSelected() || (lowin != null && isGreaterZero(lowin));
+        boolean daysOK = !drinkon || (SYSTools.parseDecimal(txtDaysDrink.getText()) != null && SYSTools.parseDecimal(txtDaysDrink.getText()).compareTo(BigDecimal.ZERO) > 0);
 
-        boolean sanityOK = aLESSb(lowin, targetin) && aLESSb(lowin, highin) && aLESSb(targetin, highin);
+        boolean sanityOK = aLESSERb(lowin, targetin) && aLESSERb(lowin, highin) && aLESSERb(targetin, highin) && isGreaterZero(lowin) && isGreaterZero(highin) && isGreaterZero(targetin);
 
         String reason = "";
         reason += (stoolOK ? "" : OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.stoolXX"));
@@ -175,14 +177,19 @@ public class DlgValueControl extends MyJDialog {
         if (!reason.isEmpty()) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(reason, DisplayMessage.WARNING));
         }
-        return stoolOK && highinOK && lowinOK && daysOK;
+        return stoolOK && highinOK && lowinOK && daysOK && sanityOK;
 
     }
 
-    private boolean aLESSb(BigDecimal a, BigDecimal b) {
+    private boolean isGreaterZero(BigDecimal a) {
+        return a == null || a.compareTo(BigDecimal.ZERO) > 0;
+    }
+
+    private boolean aLESSERb(BigDecimal a, BigDecimal b) {
         if (a == null || b == null) {
             return true;
         }
+
         return a.compareTo(b) < 0;
     }
 
@@ -197,23 +204,23 @@ public class DlgValueControl extends MyJDialog {
     }
 
     private void txtStoolDaysFocusLost(FocusEvent e) {
-        txtStoolDays.setText(SYSTools.parseDecimal(txtStoolDays.getText()).toString());
+        txtStoolDays.setText(SYSTools.parseDecimal(SYSTools.catchNull(txtStoolDays.getText(), "0")).toString());
     }
 
     private void txtLowInFocusLost(FocusEvent e) {
-        txtLowIn.setText(SYSTools.parseDecimal(txtLowIn.getText()).toString());
+        txtLowIn.setText(SYSTools.parseDecimal(SYSTools.catchNull(txtLowIn.getText(), "0")).toString());
     }
 
     private void txtHighInFocusLost(FocusEvent e) {
-        txtHighIn.setText(SYSTools.parseDecimal(txtHighIn.getText()).toString());
+        txtHighIn.setText(SYSTools.parseDecimal(SYSTools.catchNull(txtHighIn.getText(), "0")).toString());
     }
 
     private void txtDaysDrinkFocusLost(FocusEvent e) {
-        txtDaysDrink.setText(SYSTools.parseDecimal(txtDaysDrink.getText()).toString());
+        txtDaysDrink.setText(SYSTools.parseDecimal(SYSTools.catchNull(txtDaysDrink.getText(), "0")).toString());
     }
 
     private void txtTargetInFocusLost(FocusEvent e) {
-        txtTargetIn.setText(SYSTools.parseDecimal(txtTargetIn.getText()).toString());
+        txtTargetIn.setText(SYSTools.parseDecimal(SYSTools.catchNull(txtTargetIn.getText(), "0")).toString());
     }
 
     private void initComponents() {
@@ -245,8 +252,8 @@ public class DlgValueControl extends MyJDialog {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                "13dlu, $lcgap, default:grow, $lcgap, default, $lcgap, 13dlu",
-                "13dlu, 16*($lgap, default), $pgap, default, $lgap, 13dlu"));
+                    "13dlu, $lcgap, default:grow, $lcgap, default, $lcgap, 13dlu",
+                    "13dlu, 16*($lgap, default), $pgap, default, $lgap, 13dlu"));
 
             //---- lblDayStool ----
             lblDayStool.setText("tage ohne stuhlgang");
