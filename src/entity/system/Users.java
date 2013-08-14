@@ -64,6 +64,8 @@ public class Users implements Serializable, Comparable<Users> {
     private String md5pw;
     @Column(name = "EMail")
     private String eMail;
+    @Column(name = "xml")
+    private String xml;
     @ManyToMany
     @JoinTable(name = "member", joinColumns =
     @JoinColumn(name = "UKennung"), inverseJoinColumns =
@@ -112,6 +114,14 @@ public class Users implements Serializable, Comparable<Users> {
 
     public void setNachname(String nachname) {
         this.nachname = nachname;
+    }
+
+    public String getXml() {
+        return xml;
+    }
+
+    public void setXml(String xml) {
+        this.xml = xml;
     }
 
     public Short getStatus() {
@@ -210,7 +220,6 @@ public class Users implements Serializable, Comparable<Users> {
         result = 31 * result + (eMail != null ? eMail.hashCode() : 0);
         return result;
     }
-
 
 
     @Override

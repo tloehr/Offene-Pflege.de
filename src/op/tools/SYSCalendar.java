@@ -38,6 +38,7 @@ import op.threads.DisplayMessage;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
 import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -45,6 +46,8 @@ import org.joda.time.format.DateTimeFormatter;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusEvent;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Time;
 import java.text.DateFormat;
 import java.text.Format;
@@ -860,6 +863,7 @@ public class SYSCalendar {
     /**
      * determines to which timeofday code a given date object belongs. The settings in SYSProps are taken into account.
      * or in short: it answers a question like "is 0800h early, noon or early in the morning ?"
+     *
      * @param date
      * @return timecode
      */
@@ -1546,4 +1550,13 @@ public class SYSCalendar {
         }
         return GUITools.getColor(OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[shift] + "_BGBHP"));
     }
+
+
+    public static BigDecimal getDecimalHours(DateTime from, DateTime to) {
+        Period period = new Period(from, to);
+        return BigDecimal.valueOf(period.toStandardDuration().getMillis()).divide(BigDecimal.valueOf(DateTimeConstants.MILLIS_PER_HOUR), 2, RoundingMode.HALF_DOWN);
+    }
+
+
+
 }

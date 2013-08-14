@@ -31,7 +31,6 @@ import entity.files.SYSFilesTools;
 import entity.nursingprocess.DFNTools;
 import entity.prescription.BHPTools;
 import entity.system.*;
-import op.care.info.PnlBodyScheme;
 import op.system.AppInfo;
 import op.system.EMailSystem;
 import op.system.LogicalPrinters;
@@ -40,6 +39,7 @@ import op.threads.PrintProcessor;
 import op.tools.*;
 import org.apache.commons.cli.*;
 import org.apache.log4j.*;
+import org.joda.time.DateMidnight;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -48,10 +48,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.sql.*;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.List;
 
 public class OPDE {
     public static final String internalClassID = "opde";
@@ -72,6 +70,9 @@ public class OPDE {
     protected static SortedProperties localProps;
     protected static Logger logger;
     public static HashMap[] anonymize = null;
+
+    private static Map<DateMidnight, String> holidays;
+    private static List<Integer> yearsInHolidayMap;
 
     public static String SUBDIR_TEMPLATES = "templates";
     public static String SUBDIR_CACHE = "cache";
@@ -114,7 +115,7 @@ public class OPDE {
 
     public static void setUpdateAvailable(boolean updateAvailable, String url) {
         OPDE.updateAvailable = updateAvailable;
-        if (updateAvailable){
+        if (updateAvailable) {
             updateDescriptionURL = url;
         }
     }
@@ -665,7 +666,6 @@ public class OPDE {
              */
 
 
-
 //        JFrame frm = new JFrame();
 //            frm.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 //            frm.setLayout(new FlowLayout());
@@ -677,9 +677,15 @@ public class OPDE {
             SYSTools.checkForSoftwareupdates();
 
 
+            DateMidnight today = new DateMidnight();
+            yearsInHolidayMap = Collections.synchronizedList(new ArrayList<Integer>());
+            synchronized (yearsInHolidayMap) {
+                yearsInHolidayMap.add(today.getYear() - 1);
+                yearsInHolidayMap.add(today.getYear());
+            }
+            holidays = Collections.synchronizedMap(SYSCalendar.getHolidays(today.getYear() - 1, today.getYear()));
 
             mainframe = new FrmMain();
-
 
 
             mainframe.setVisible(true);
@@ -786,4 +792,27 @@ public class OPDE {
         }
         return version;
     }
+
+    public static boolean isHoliday(DateMidnight day) {
+        boolean cached = false;
+        synchronized (yearsInHolidayMap) {
+            cached = yearsInHolidayMap.contains(day.getYear());
+        }
+        if (!cached) {
+            synchronized (yearsInHolidayMap) {
+                yearsInHolidayMap.add(day.getYear());
+            }
+            synchronized (holidays) {
+                holidays.putAll(SYSCalendar.getHolidays(day.getYear(), day.getYear()));
+            }
+        }
+
+        boolean holiday = false;
+        synchronized (holidays){
+            holiday = holidays.containsKey(day);
+        }
+
+        return holiday;
+    }
+
 }

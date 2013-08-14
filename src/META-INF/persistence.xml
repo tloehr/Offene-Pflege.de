@@ -63,5 +63,10 @@
         <class>entity.process.PCat</class>
         <class>entity.process.QProcess</class>
         <class>entity.values.ResValueTypes</class>
+        <class>entity.roster.Rosters</class>
+        <class>entity.roster.Rplan</class>
+        <class>entity.roster.Specialworkdays</class>
+        <class>entity.roster.Workaccount</class>
+        <class>entity.roster.Workinglog</class>
     </persistence-unit>
 </persistence>
