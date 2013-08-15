@@ -123,8 +123,8 @@ public class DlgReport extends MyJDialog {
 
     @Override
     public void dispose() {
-        actionBlock.execute(nReport);
         super.dispose();
+        actionBlock.execute(nReport);
     }
 
     private void btnCancelActionPerformed(ActionEvent e) {

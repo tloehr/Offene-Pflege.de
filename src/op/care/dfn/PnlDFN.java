@@ -236,13 +236,18 @@ public class PnlDFN extends NursingRecordsPanel {
     }
 
     private void buildPanel(boolean resetCollapseState) {
-        synchronized (mapShift2Pane) {
-            cpDFN.removeAll();
-            cpDFN.setLayout(new JideBoxLayout(cpDFN, JideBoxLayout.Y_AXIS));
 
-            for (Byte shift : new Byte[]{DFNTools.SHIFT_ON_DEMAND, DFNTools.SHIFT_VERY_EARLY, DFNTools.SHIFT_EARLY, DFNTools.SHIFT_LATE, DFNTools.SHIFT_VERY_LATE}) {
+        cpDFN.removeAll();
+        cpDFN.setLayout(new JideBoxLayout(cpDFN, JideBoxLayout.Y_AXIS));
 
-                mapShift2Pane.get(shift).setCollapsible(!mapShift2DFN.get(shift).isEmpty());
+        for (Byte shift : new Byte[]{DFNTools.SHIFT_ON_DEMAND, DFNTools.SHIFT_VERY_EARLY, DFNTools.SHIFT_EARLY, DFNTools.SHIFT_LATE, DFNTools.SHIFT_VERY_LATE}) {
+
+            boolean isEmpty = true;
+            synchronized (mapShift2DFN) {
+                isEmpty = mapShift2DFN.get(shift).isEmpty();
+            }
+            synchronized (mapShift2Pane) {
+                mapShift2Pane.get(shift).setCollapsible(isEmpty);
                 cpDFN.add(mapShift2Pane.get(shift));
                 if (resetCollapseState) {
                     try {
@@ -253,6 +258,7 @@ public class PnlDFN extends NursingRecordsPanel {
                 }
             }
         }
+
         cpDFN.addExpansion();
     }
 
@@ -487,7 +493,7 @@ public class PnlDFN extends NursingRecordsPanel {
                 if (dfn.getState() == DFNTools.STATE_DONE) {
                     return;
                 }
-                if (!dfn.isOnDemand() && dfn.getNursingProcess().isClosed()){
+                if (!dfn.isOnDemand() && dfn.getNursingProcess().isClosed()) {
                     return;
                 }
 
