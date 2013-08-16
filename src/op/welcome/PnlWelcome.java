@@ -537,6 +537,7 @@ public class PnlWelcome extends CleanablePanel {
         panel1 = new JPanel();
         scrollPane1 = new JScrollPane();
         cpsWelcome = new CollapsiblePanes();
+        panel3 = new JScrollPane();
         pnlApps = new JPanel();
         btnAbout = new JButton();
 
@@ -546,7 +547,7 @@ public class PnlWelcome extends CleanablePanel {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                "default:grow, $lcgap, default",
+                "default:grow, $lcgap, pref:grow",
                 "default:grow"));
 
             //======== scrollPane1 ========
@@ -560,30 +561,35 @@ public class PnlWelcome extends CleanablePanel {
             }
             panel1.add(scrollPane1, CC.xy(1, 1, CC.DEFAULT, CC.FILL));
 
-            //======== pnlApps ========
+            //======== panel3 ========
             {
-                pnlApps.setLayout(new VerticalLayout(2));
 
-                //---- btnAbout ----
-                btnAbout.setText(null);
-                btnAbout.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/OPDE-blue.png")));
-                btnAbout.setHorizontalAlignment(SwingConstants.TRAILING);
-                btnAbout.setFont(new Font("Arial", Font.BOLD, 14));
-                btnAbout.setForeground(Color.red);
-                btnAbout.setHorizontalTextPosition(SwingConstants.LEADING);
-                btnAbout.setBorderPainted(false);
-                btnAbout.setContentAreaFilled(false);
-                btnAbout.setBorder(null);
-                btnAbout.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnAbout.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnAboutActionPerformed(e);
-                    }
-                });
-                pnlApps.add(btnAbout);
+                //======== pnlApps ========
+                {
+                    pnlApps.setLayout(new VerticalLayout(2));
+
+                    //---- btnAbout ----
+                    btnAbout.setText(null);
+                    btnAbout.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/OPDE-blue.png")));
+                    btnAbout.setHorizontalAlignment(SwingConstants.TRAILING);
+                    btnAbout.setFont(new Font("Arial", Font.BOLD, 14));
+                    btnAbout.setForeground(Color.red);
+                    btnAbout.setHorizontalTextPosition(SwingConstants.LEADING);
+                    btnAbout.setBorderPainted(false);
+                    btnAbout.setContentAreaFilled(false);
+                    btnAbout.setBorder(null);
+                    btnAbout.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    btnAbout.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            btnAboutActionPerformed(e);
+                        }
+                    });
+                    pnlApps.add(btnAbout);
+                }
+                panel3.setViewportView(pnlApps);
             }
-            panel1.add(pnlApps, CC.xy(3, 1, CC.DEFAULT, CC.FILL));
+            panel1.add(panel3, CC.xy(3, 1));
         }
         add(panel1);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
@@ -641,6 +647,7 @@ public class PnlWelcome extends CleanablePanel {
     private JPanel panel1;
     private JScrollPane scrollPane1;
     private CollapsiblePanes cpsWelcome;
+    private JScrollPane panel3;
     private JPanel pnlApps;
     private JButton btnAbout;
     // JFormDesigner - End of variables declaration  //GEN-END:variables

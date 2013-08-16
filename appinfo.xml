@@ -48,6 +48,12 @@
                javaclass="op.welcome.PnlWelcome" icon="home.png">
             <execute langbundle="appinfo.default.acl.execute"/>
         </class>
+        <class name="opde.worklog" short="Dienste und Zeiten"
+               long="Hier kannst Du Deinen Dienstplan nachsehen. Wünsche, Arbeitszeiten und getauschte Dienste eintragen. Sowie Urlaubs und Krankheitstage prüfen."
+               main="true"
+               javaclass="op.roster.PnlUsersWorklog" icon="spreadsheet.png">
+            <execute langbundle="appinfo.default.acl.execute"/>
+        </class>
         <class name="opde.dev" short="Developer"
                long="Entwicklungswerkzeuge" main="true"
                javaclass="op.dev.PnlDev" icon="developer1.png">

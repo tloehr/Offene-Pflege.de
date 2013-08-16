@@ -52,6 +52,7 @@ import op.care.supervisor.PnlHandover;
 import op.controlling.PnlControlling;
 import op.dev.PnlDev;
 import op.process.PnlProcess;
+import op.roster.PnlUsersWorklog;
 import op.settings.PnlSystemSettings;
 import op.settings.PnlUserSettings;
 import op.system.DlgLogin;
@@ -630,7 +631,9 @@ public class FrmMain extends JFrame {
             panel = new PnlUserSettings(jspSearch);
         } else if (classname.equals("op.dev.PnlDev")) {
             panel = new PnlDev();
-        }
+        } else if (classname.equals("op.roster.PnlUsersWorklog")) {
+                    panel = new PnlUsersWorklog();
+                }
         return panel;
     }
 
