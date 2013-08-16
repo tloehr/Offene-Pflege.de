@@ -597,6 +597,7 @@ public class PnlWelcome extends CleanablePanel {
             JideButton addbw = GUITools.createHyperlinkButton(OPDE.lang.getString("opde.welcome.addbw"), SYSConst.icon22addbw, null);
 //            final MyJDialog dlg = new MyJDialog();
             addbw.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
+
             addbw.setAlignmentX(Component.LEFT_ALIGNMENT);
             addbw.addActionListener(new ActionListener() {
                 @Override

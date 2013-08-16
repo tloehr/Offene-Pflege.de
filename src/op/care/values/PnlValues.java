@@ -73,11 +73,11 @@ public class PnlValues extends NursingRecordsPanel {
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
 
-    private ArrayList<ResValueTypes> lstValueTypes;
-    private HashMap<String, CollapsiblePane> cpMap;
-    private HashMap<ResValue, JPanel> linemap;
-    private HashMap<String, ArrayList<ResValue>> mapType2Values;
-    private HashMap<DateMidnight, Pair<BigDecimal, BigDecimal>> balances;
+    private java.util.List<ResValueTypes> lstValueTypes;
+    private Map<String, CollapsiblePane> cpMap;
+    private Map<ResValue, JPanel> linemap;
+    private Map<String, ArrayList<ResValue>> mapType2Values;
+    private Map<DateMidnight, Pair<BigDecimal, BigDecimal>> balances;
 
     private Color[] color1, color2;
 
@@ -92,14 +92,14 @@ public class PnlValues extends NursingRecordsPanel {
     }
 
     private void initPanel() {
-        cpMap = new HashMap<String, CollapsiblePane>();
-        linemap = new HashMap<ResValue, JPanel>();
-        mapType2Values = new HashMap<String, ArrayList<ResValue>>();
-        balances = new HashMap<DateMidnight, Pair<BigDecimal, BigDecimal>>();
+        cpMap = Collections.synchronizedMap(new HashMap<String, CollapsiblePane>());
+        linemap = Collections.synchronizedMap(new HashMap<ResValue, JPanel>());
+        mapType2Values = Collections.synchronizedMap(new HashMap<String, ArrayList<ResValue>>());
+        balances = Collections.synchronizedMap(new HashMap<DateMidnight, Pair<BigDecimal, BigDecimal>>());
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT t FROM ResValueTypes t ORDER BY t.text");
-        lstValueTypes = new ArrayList<ResValueTypes>(query.getResultList());
+        lstValueTypes = Collections.synchronizedList(new ArrayList<ResValueTypes>(query.getResultList()));
         em.close();
 
         color1 = SYSConst.blue1;
@@ -145,15 +145,15 @@ public class PnlValues extends NursingRecordsPanel {
         java.util.List<Component> list = new ArrayList<Component>();
         list.add(new JSeparator());
         list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22ledGreenOff, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString("nursingrecords.vitalparameters.keydescription1"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString("nursingrecords.vitalparameters.keydescription2"), SYSConst.icon22ledGreenOff, SwingConstants.LEADING));
         return list;
     }
 
     private java.util.List<Component> addCommands() {
         java.util.List<Component> list = new ArrayList<Component>();
 
-        JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".btnControlling.tooltip"), SYSConst.icon22magnify1, new ActionListener() {
+        JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString("nursingrecords.vitalparameters.btnControlling.tooltip"), SYSConst.icon22magnify1, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 if (!resident.isActive()) {
@@ -249,10 +249,18 @@ public class PnlValues extends NursingRecordsPanel {
          *                                              |_|            |___/
          */
         cpsValues.removeAll();
-        linemap.clear();
-        mapType2Values.clear();
-        cpMap.clear();
-        balances.clear();
+        synchronized (linemap) {
+            linemap.clear();
+        }
+        synchronized (mapType2Values) {
+            mapType2Values.clear();
+        }
+        synchronized (cpMap) {
+            cpMap.clear();
+        }
+        synchronized (balances) {
+            balances.clear();
+        }
 
         for (ResValueTypes vtype : lstValueTypes) {
             createCP4(vtype);
@@ -264,15 +272,19 @@ public class PnlValues extends NursingRecordsPanel {
 
     private CollapsiblePane createCP4(final ResValueTypes vtype) {
         final String key = vtype.getID() + ".xtypes";
-        if (!cpMap.containsKey(key)) {
-            cpMap.put(key, new CollapsiblePane());
-            try {
-                cpMap.get(key).setCollapsed(true);
-            } catch (PropertyVetoException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+
+        final CollapsiblePane cpType;
+        synchronized (cpMap) {
+            if (!cpMap.containsKey(key)) {
+                cpMap.put(key, new CollapsiblePane());
+                try {
+                    cpMap.get(key).setCollapsed(true);
+                } catch (PropertyVetoException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
             }
+            cpType = cpMap.get(key);
         }
-        final CollapsiblePane cpType = cpMap.get(key);
 
         String title = "<html><font size=+1>" +
                 SYSConst.html_bold(vtype.getText()) +
@@ -306,7 +318,7 @@ public class PnlValues extends NursingRecordsPanel {
             btnAdd.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             btnAdd.setContentAreaFilled(false);
             btnAdd.setBorder(null);
-            btnAdd.setToolTipText(OPDE.lang.getString(internalClassID + ".btnAdd.tooltip") + " (" + vtype.getText() + ")");
+            btnAdd.setToolTipText(OPDE.lang.getString("nursingrecords.vitalparameters.btnAdd.tooltip") + " (" + vtype.getText() + ")");
             btnAdd.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -329,25 +341,28 @@ public class PnlValues extends NursingRecordsPanel {
                                     final String keyYear = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
 
                                     try {
-                                        cpMap.get(keyType).setCollapsed(false);
-                                        cpMap.get(keyYear).setCollapsed(false);
-                                        if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
-                                            cpMap.get(keyDay).setCollapsed(false);
+                                        synchronized (cpMap) {
+                                            cpMap.get(keyType).setCollapsed(false);
+                                            cpMap.get(keyYear).setCollapsed(false);
+                                            if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
+                                                cpMap.get(keyDay).setCollapsed(false);
+                                            }
                                         }
-
                                     } catch (PropertyVetoException e) {
                                         e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                                     }
 
-                                    if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
-                                        if (!mapType2Values.get(keyDay).contains(myValue)) {
-                                            mapType2Values.get(keyDay).add(myValue);
-                                            Collections.sort(mapType2Values.get(keyDay));
-                                        }
-                                    } else {
-                                        if (!mapType2Values.get(keyYear).contains(myValue)) {
-                                            mapType2Values.get(keyYear).add(myValue);
-                                            Collections.sort(mapType2Values.get(keyYear));
+                                    synchronized (mapType2Values) {
+                                        if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
+                                            if (!mapType2Values.get(keyDay).contains(myValue)) {
+                                                mapType2Values.get(keyDay).add(myValue);
+                                                Collections.sort(mapType2Values.get(keyDay));
+                                            }
+                                        } else {
+                                            if (!mapType2Values.get(keyYear).contains(myValue)) {
+                                                mapType2Values.get(keyYear).add(myValue);
+                                                Collections.sort(mapType2Values.get(keyYear));
+                                            }
                                         }
                                     }
                                     cptitle.getButton().setIcon(SYSConst.icon22ledGreenOn);
@@ -356,13 +371,14 @@ public class PnlValues extends NursingRecordsPanel {
 
                                     buildPanel();
 
-                                    GUITools.scroll2show(jspValues, linemap.get(myValue), cpsValues, new Closure() {
-                                        @Override
-                                        public void execute(Object o) {
-                                            GUITools.flashBackground(linemap.get(myValue), Color.YELLOW, 2);
-                                        }
-                                    });
-
+                                    synchronized (linemap) {
+                                        GUITools.scroll2show(jspValues, linemap.get(myValue), cpsValues, new Closure() {
+                                            @Override
+                                            public void execute(Object o) {
+                                                GUITools.flashBackground(linemap.get(myValue), Color.YELLOW, 2);
+                                            }
+                                        });
+                                    }
                                 } catch (OptimisticLockException ole) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -427,16 +443,18 @@ public class PnlValues extends NursingRecordsPanel {
 
     private CollapsiblePane createCP4(final ResValueTypes vtype, final int year) {
         final String key = vtype.getID() + ".xtypes." + Integer.toString(year) + ".year";
-        if (!cpMap.containsKey(key)) {
-            cpMap.put(key, new CollapsiblePane());
-            try {
-                cpMap.get(key).setCollapsed(true);
-            } catch (PropertyVetoException e) {
-                e.printStackTrace();
+        final CollapsiblePane cpYear;
+        synchronized (cpMap) {
+            if (!cpMap.containsKey(key)) {
+                cpMap.put(key, new CollapsiblePane());
+                try {
+                    cpMap.get(key).setCollapsed(true);
+                } catch (PropertyVetoException e) {
+                    e.printStackTrace();
+                }
             }
+            cpYear = cpMap.get(key);
         }
-        final CollapsiblePane cpYear = cpMap.get(key);
-
         String title = "<html><font size=+1>" +
                 Integer.toString(year) +
                 "</font></html>";
@@ -506,23 +524,28 @@ public class PnlValues extends NursingRecordsPanel {
 
     private JPanel createContentPanel4(final ResValueTypes vtype, final int year) {
         final String key = vtype.getID() + ".xtypes." + Integer.toString(year) + ".year";
-        if (!mapType2Values.containsKey(key)) {
-            mapType2Values.put(key, ResValueTools.getResValues(resident, vtype, year));
-        }
-        if (mapType2Values.get(key).isEmpty()) {
-            JLabel lbl = new JLabel(OPDE.lang.getString("misc.msg.novalue"));
-            JPanel pnl = new JPanel();
-            pnl.add(lbl);
-            return pnl;
-        }
 
+        java.util.List<ResValue> myValues;
+
+        synchronized (mapType2Values) {
+            if (!mapType2Values.containsKey(key)) {
+                mapType2Values.put(key, ResValueTools.getResValues(resident, vtype, year));
+            }
+            if (mapType2Values.get(key).isEmpty()) {
+                JLabel lbl = new JLabel(OPDE.lang.getString("misc.msg.novalue"));
+                JPanel pnl = new JPanel();
+                pnl.add(lbl);
+                return pnl;
+            }
+            myValues = mapType2Values.get(key);
+        }
 
         JPanel pnlYear = new JPanel(new VerticalLayout());
 
         pnlYear.setBackground(getColor(vtype, SYSConst.light3));
         pnlYear.setOpaque(false);
 
-        for (final ResValue resValue : mapType2Values.get(key)) {
+        for (final ResValue resValue : myValues) {
             String title = "<html><table border=\"0\">" +
                     "<tr>" +
                     "<td width=\"200\" align=\"left\">" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(resValue.getPit()) + " [" + resValue.getID() + "]</td>" +
@@ -585,11 +608,13 @@ public class PnlValues extends NursingRecordsPanel {
                                 em.refresh(myValue);
                                 em.close();
 
-                                DateTime dt = new DateTime(myValue.getPit());
+//                                DateTime dt = new DateTime(myValue.getPit());
 
-                                mapType2Values.get(key).remove(resValue);
-                                mapType2Values.get(key).add(myValue);
-                                Collections.sort(mapType2Values.get(key));
+                                synchronized (mapType2Values) {
+                                    mapType2Values.get(key).remove(resValue);
+                                    mapType2Values.get(key).add(myValue);
+                                    Collections.sort(mapType2Values.get(key));
+                                }
 
                                 createCP4(vtype, year);
                                 buildPanel();
@@ -669,10 +694,11 @@ public class PnlValues extends NursingRecordsPanel {
 
                                     em.getTransaction().commit();
 
-                                    mapType2Values.get(key).remove(resValue);
-                                    mapType2Values.get(key).add(myValue);
-                                    Collections.sort(mapType2Values.get(key));
-
+                                    synchronized (mapType2Values) {
+                                        mapType2Values.get(key).remove(resValue);
+                                        mapType2Values.get(key).add(myValue);
+                                        Collections.sort(mapType2Values.get(key));
+                                    }
                                     createCP4(vtype, year);
 
 
@@ -745,7 +771,9 @@ public class PnlValues extends NursingRecordsPanel {
             pnlTitle.getRight().add(btnMenu);
 
             pnlYear.add(pnlTitle.getMain());
-            linemap.put(resValue, pnlTitle.getMain());
+            synchronized (linemap) {
+                linemap.put(resValue, pnlTitle.getMain());
+            }
         }
         return pnlYear;
     }
@@ -758,26 +786,34 @@ public class PnlValues extends NursingRecordsPanel {
         DateTime from = new DateMidnight(year, 1, 1).dayOfYear().withMinimumValue().toDateTime();
         DateTime to = new DateMidnight(year, 1, 1).toDateTime().dayOfYear().withMaximumValue().secondOfDay().withMaximumValue();
 
-        balances.putAll(ResValueTools.getLiquidBalancePerDay(resident, from.toDateMidnight(), to.toDateMidnight()));
-
+        synchronized (balances) {
+            balances.putAll(ResValueTools.getLiquidBalancePerDay(resident, from.toDateMidnight(), to.toDateMidnight()));
+        }
         for (final Date d : listDays) {
 
             final DateMidnight day = new DateMidnight(d);
-
+            final CollapsiblePane cpType;
             final String key = vtype.getID() + ".xtypes." + d.getTime() + ".day";
-            if (!cpMap.containsKey(key)) {
-                cpMap.put(key, new CollapsiblePane());
-                try {
-                    cpMap.get(key).setCollapsed(true);
-                } catch (PropertyVetoException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
-            }
-            final CollapsiblePane cpType = cpMap.get(key);
 
-            String title = "<html><font size=+1>" +
-                    DateFormat.getDateInstance().format(d) + " " + OPDE.lang.getString("misc.msg.ingestion") + ": " + balances.get(day).getFirst() + " " + vtype.getUnit1() + "  " + OPDE.lang.getString("misc.msg.egestion") + ": " + balances.get(day).getSecond() + " " + vtype.getUnit1() +
-                    "</font></html>";
+            synchronized (cpMap) {
+                if (!cpMap.containsKey(key)) {
+                    cpMap.put(key, new CollapsiblePane());
+                    try {
+                        cpMap.get(key).setCollapsed(true);
+                    } catch (PropertyVetoException e) {
+                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    }
+                }
+                cpType = cpMap.get(key);
+            }
+
+            String title;
+
+            synchronized (balances) {
+                title = "<html><font size=+1>" +
+                        DateFormat.getDateInstance().format(d) + " " + OPDE.lang.getString("misc.msg.ingestion") + ": " + balances.get(day).getFirst() + " " + vtype.getUnit1() + "  " + OPDE.lang.getString("misc.msg.egestion") + ": " + balances.get(day).getSecond() + " " + vtype.getUnit1() +
+                        "</font></html>";
+            }
 
             final DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
                 @Override
@@ -807,7 +843,7 @@ public class PnlValues extends NursingRecordsPanel {
                 btnAdd.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 btnAdd.setContentAreaFilled(false);
                 btnAdd.setBorder(null);
-                btnAdd.setToolTipText(OPDE.lang.getString(internalClassID + ".btnAdd.tooltip") + " (" + vtype.getText() + ")");
+                btnAdd.setToolTipText(OPDE.lang.getString("nursingrecords.vitalparameters.btnAdd.tooltip") + " (" + vtype.getText() + ")");
                 btnAdd.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
@@ -831,25 +867,28 @@ public class PnlValues extends NursingRecordsPanel {
                                         final String keyYear = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
 
                                         try {
-                                            cpMap.get(keyType).setCollapsed(false);
-                                            cpMap.get(keyYear).setCollapsed(false);
-                                            if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
-                                                cpMap.get(keyDay).setCollapsed(false);
+                                            synchronized (cpMap) {
+                                                cpMap.get(keyType).setCollapsed(false);
+                                                cpMap.get(keyYear).setCollapsed(false);
+                                                if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
+                                                    cpMap.get(keyDay).setCollapsed(false);
+                                                }
                                             }
-
                                         } catch (PropertyVetoException e) {
                                             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                                         }
 
-                                        if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
-                                            if (!mapType2Values.get(keyDay).contains(myValue)) {
-                                                mapType2Values.get(keyDay).add(myValue);
-                                                Collections.sort(mapType2Values.get(keyDay));
-                                            }
-                                        } else {
-                                            if (!mapType2Values.get(keyYear).contains(myValue)) {
-                                                mapType2Values.get(keyYear).add(myValue);
-                                                Collections.sort(mapType2Values.get(keyYear));
+                                        synchronized (mapType2Values) {
+                                            if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
+                                                if (!mapType2Values.get(keyDay).contains(myValue)) {
+                                                    mapType2Values.get(keyDay).add(myValue);
+                                                    Collections.sort(mapType2Values.get(keyDay));
+                                                }
+                                            } else {
+                                                if (!mapType2Values.get(keyYear).contains(myValue)) {
+                                                    mapType2Values.get(keyYear).add(myValue);
+                                                    Collections.sort(mapType2Values.get(keyYear));
+                                                }
                                             }
                                         }
                                         cptitle.getButton().setIcon(SYSConst.icon22ledGreenOn);
@@ -865,13 +904,14 @@ public class PnlValues extends NursingRecordsPanel {
 //                                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 //                                        }
 
-                                        GUITools.scroll2show(jspValues, linemap.get(myValue), cpsValues, new Closure() {
-                                            @Override
-                                            public void execute(Object o) {
-                                                GUITools.flashBackground(linemap.get(myValue), Color.YELLOW, 2);
-                                            }
-                                        });
-
+                                        synchronized (linemap) {
+                                            GUITools.scroll2show(jspValues, linemap.get(myValue), cpsValues, new Closure() {
+                                                @Override
+                                                public void execute(Object o) {
+                                                    GUITools.flashBackground(linemap.get(myValue), Color.YELLOW, 2);
+                                                }
+                                            });
+                                        }
                                     } catch (OptimisticLockException ole) {
                                         if (em.getTransaction().isActive()) {
                                             em.getTransaction().rollback();
@@ -923,23 +963,27 @@ public class PnlValues extends NursingRecordsPanel {
 
     private JPanel createContentPanel4(final ResValueTypes vtype, final DateMidnight day) {
         final String key = vtype.getID() + ".xtypes." + day.getMillis() + ".day";
-        if (!mapType2Values.containsKey(key)) {
-            mapType2Values.put(key, ResValueTools.getResValues(resident, vtype, day));
-        }
-        if (mapType2Values.get(key).isEmpty()) {
-            JLabel lbl = new JLabel(OPDE.lang.getString("misc.msg.novalue"));
-            JPanel pnl = new JPanel();
-            pnl.add(lbl);
-            return pnl;
+        java.util.List<ResValue> listValues;
+
+        synchronized (mapType2Values) {
+            if (!mapType2Values.containsKey(key)) {
+                mapType2Values.put(key, ResValueTools.getResValues(resident, vtype, day));
+            }
+            if (mapType2Values.get(key).isEmpty()) {
+                JLabel lbl = new JLabel(OPDE.lang.getString("misc.msg.novalue"));
+                JPanel pnl = new JPanel();
+                pnl.add(lbl);
+                return pnl;
+            }
+
+            listValues = mapType2Values.get(key);
         }
 
         JPanel pnlDay = new JPanel(new VerticalLayout());
-
         pnlDay.setBackground(getColor(vtype, SYSConst.light3));
         pnlDay.setOpaque(false);
 
-
-        for (final ResValue resValue : mapType2Values.get(key)) {
+        for (final ResValue resValue : listValues) {
             String title = "<html><table border=\"0\">" +
                     "<tr>" +
                     "<td width=\"200\" align=\"left\">" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(resValue.getPit()) + " [" + resValue.getID() + "]</td>" +
@@ -1004,9 +1048,11 @@ public class PnlValues extends NursingRecordsPanel {
 
                                 DateTime dt = new DateTime(myValue.getPit());
 
-                                mapType2Values.get(key).remove(resValue);
-                                mapType2Values.get(key).add(myValue);
-                                Collections.sort(mapType2Values.get(key));
+                                synchronized (mapType2Values) {
+                                    mapType2Values.get(key).remove(resValue);
+                                    mapType2Values.get(key).add(myValue);
+                                    Collections.sort(mapType2Values.get(key));
+                                }
 
                                 createCP4(vtype, day.getYear());
                                 buildPanel();
@@ -1086,9 +1132,11 @@ public class PnlValues extends NursingRecordsPanel {
 
                                     em.getTransaction().commit();
 
-                                    mapType2Values.get(key).remove(resValue);
-                                    mapType2Values.get(key).add(myValue);
-                                    Collections.sort(mapType2Values.get(key));
+                                    synchronized (mapType2Values) {
+                                        mapType2Values.get(key).remove(resValue);
+                                        mapType2Values.get(key).add(myValue);
+                                        Collections.sort(mapType2Values.get(key));
+                                    }
 
                                     createCP4(vtype, day.getYear());
 
@@ -1162,34 +1210,54 @@ public class PnlValues extends NursingRecordsPanel {
             pnlTitle.getRight().add(btnMenu);
 
             pnlDay.add(pnlTitle.getMain());
-            linemap.put(resValue, pnlTitle.getMain());
+            synchronized (linemap) {
+                linemap.put(resValue, pnlTitle.getMain());
+            }
         }
 
         return pnlDay;
     }
 
     private Color getColor(ResValueTypes vtype, int level) {
-        if (lstValueTypes.indexOf(vtype) % 2 == 0) {
-            return color1[level];
-        } else {
-            return color2[level];
+        synchronized (lstValueTypes) {
+            if (lstValueTypes.indexOf(vtype) % 2 == 0) {
+                return color1[level];
+            } else {
+                return color2[level];
+            }
         }
     }
 
     @Override
     public void cleanup() {
         cpsValues.removeAll();
-        SYSTools.clear(cpMap);
-        SYSTools.clear(linemap);
-        SYSTools.clear(lstValueTypes);
+        synchronized (linemap) {
+            linemap.clear();
+        }
+        synchronized (mapType2Values) {
+            mapType2Values.clear();
+        }
+        synchronized (cpMap) {
+            cpMap.clear();
+        }
+        synchronized (balances) {
+            balances.clear();
+        }
+        synchronized (lstValueTypes) {
+            lstValueTypes.clear();
+        }
     }
 
     private void buildPanel() {
         cpsValues.removeAll();
         cpsValues.setLayout(new JideBoxLayout(cpsValues, JideBoxLayout.Y_AXIS));
 
-        for (ResValueTypes vtype : lstValueTypes) {
-            cpsValues.add(cpMap.get(vtype.getID() + ".xtypes"));
+        synchronized (lstValueTypes) {
+            for (ResValueTypes vtype : lstValueTypes) {
+                synchronized (cpMap) {
+                    cpsValues.add(cpMap.get(vtype.getID() + ".xtypes"));
+                }
+            }
         }
 
         cpsValues.addExpansion();
@@ -1211,7 +1279,7 @@ public class PnlValues extends NursingRecordsPanel {
              *     |_____\__,_|_|\__|
              *
              */
-            final JButton btnEdit = GUITools.createHyperlinkButton(internalClassID + ".btnEdit.tooltip", SYSConst.icon22edit3, null);
+            final JButton btnEdit = GUITools.createHyperlinkButton("nursingrecords.vitalparameters.btnEdit.tooltip", SYSConst.icon22edit3, null);
             btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnEdit.addActionListener(new ActionListener() {
                 @Override
@@ -1251,17 +1319,20 @@ public class PnlValues extends NursingRecordsPanel {
                                     final String keyType = vtype.getID() + ".xtypes";
                                     final String key = newValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE ? vtype.getID() + ".xtypes." + dt.toDateMidnight().getMillis() + ".day" : vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
 
-
-                                    mapType2Values.get(key).remove(resValue);
-                                    mapType2Values.get(key).add(oldValue);
-                                    mapType2Values.get(key).add(newValue);
-                                    Collections.sort(mapType2Values.get(key));
+                                    synchronized (mapType2Values) {
+                                        mapType2Values.get(key).remove(resValue);
+                                        mapType2Values.get(key).add(oldValue);
+                                        mapType2Values.get(key).add(newValue);
+                                        Collections.sort(mapType2Values.get(key));
+                                    }
 
                                     createCP4(vtype, dt.getYear());
 
                                     try {
-                                        cpMap.get(keyType).setCollapsed(false);
-                                        cpMap.get(key).setCollapsed(false);
+                                        synchronized (cpMap) {
+                                            cpMap.get(keyType).setCollapsed(false);
+                                            cpMap.get(key).setCollapsed(false);
+                                        }
                                     } catch (PropertyVetoException e) {
                                         e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                                     }
@@ -1303,7 +1374,7 @@ public class PnlValues extends NursingRecordsPanel {
              *     |____/ \___|_|\___|\__\___|
              *
              */
-            final JButton btnDelete = GUITools.createHyperlinkButton(internalClassID + ".btnDelete.tooltip", SYSConst.icon22delete, null);
+            final JButton btnDelete = GUITools.createHyperlinkButton("nursingrecords.vitalparameters.btnDelete.tooltip", SYSConst.icon22delete, null);
             btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnDelete.addActionListener(new ActionListener() {
                 @Override
@@ -1339,16 +1410,19 @@ public class PnlValues extends NursingRecordsPanel {
 
                                     final String key = myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE ? vtype.getID() + ".xtypes." + dt.toDateMidnight().getMillis() + ".day" : vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
 
-                                    mapType2Values.get(key).remove(resValue);
-                                    mapType2Values.get(key).add(myValue);
-                                    Collections.sort(mapType2Values.get(key));
-
+                                    synchronized (mapType2Values) {
+                                        mapType2Values.get(key).remove(resValue);
+                                        mapType2Values.get(key).add(myValue);
+                                        Collections.sort(mapType2Values.get(key));
+                                    }
 
                                     createCP4(vtype, dt.getYear());
 
                                     try {
-                                        cpMap.get(keyType).setCollapsed(false);
-                                        cpMap.get(key).setCollapsed(false);
+                                        synchronized (cpMap) {
+                                            cpMap.get(keyType).setCollapsed(false);
+                                            cpMap.get(key).setCollapsed(false);
+                                        }
                                     } catch (PropertyVetoException e) {
                                         e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                                     }
@@ -1409,9 +1483,12 @@ public class PnlValues extends NursingRecordsPanel {
                             DateTime dt = new DateTime(myValue.getPit());
                             final String key = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
 
-                            mapType2Values.get(key).remove(resValue);
-                            mapType2Values.get(key).add(myValue);
-                            Collections.sort(mapType2Values.get(key));
+                            synchronized (mapType2Values) {
+                                mapType2Values.get(key).remove(resValue);
+                                mapType2Values.get(key).add(myValue);
+                                Collections.sort(mapType2Values.get(key));
+                            }
+
                             buildPanel();
                         }
                     });
@@ -1480,9 +1557,11 @@ public class PnlValues extends NursingRecordsPanel {
                                 DateTime dt = new DateTime(myValue.getPit());
                                 final String key = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
 
-                                mapType2Values.get(key).remove(resValue);
-                                mapType2Values.get(key).add(myValue);
-                                Collections.sort(mapType2Values.get(key));
+                                synchronized (mapType2Values) {
+                                    mapType2Values.get(key).remove(resValue);
+                                    mapType2Values.get(key).add(myValue);
+                                    Collections.sort(mapType2Values.get(key));
+                                }
 
                                 createCP4(vtype, dt.getYear());
 
