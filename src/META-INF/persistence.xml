@@ -64,9 +64,16 @@
         <class>entity.process.QProcess</class>
         <class>entity.values.ResValueTypes</class>
         <class>entity.roster.Rosters</class>
-        <class>entity.roster.Rplan</class>
+        <class>entity.roster.RPlan</class>
         <class>entity.roster.Specialworkdays</class>
         <class>entity.roster.Workaccount</class>
         <class>entity.roster.Workinglog</class>
+        <class>entity.roster.Rplan</class>
+        <properties>
+            <property name="eclipselink.jdbc.url" value="jdbc:mysql://localhost:3306/opde"/>
+            <property name="eclipselink.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+            <property name="eclipselink.jdbc.user" value="root"/>
+            <property name="eclipselink.jdbc.password" value="dbase123"/>
+        </properties>
     </persistence-unit>
 </persistence>

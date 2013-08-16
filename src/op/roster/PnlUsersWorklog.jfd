@@ -7,6 +7,14 @@ new FormModel {
 			"axis": 0
 		} ) {
 			name: "this"
+			add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+				name: "jspContent"
+				add( new FormContainer( "com.jidesoft.pane.CollapsiblePanes", new FormLayoutManager( class javax.swing.BoxLayout ) {
+					"axis": 0
+				} ) {
+					name: "cpsMain"
+				} )
+			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
 			"size": new java.awt.Dimension( 400, 300 )

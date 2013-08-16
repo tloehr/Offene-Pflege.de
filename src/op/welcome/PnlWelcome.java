@@ -598,11 +598,11 @@ public class PnlWelcome extends CleanablePanel {
 
     private java.util.List<Component> addCommands() {
         java.util.List<Component> list = new ArrayList<Component>();
-
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlInformation.internalClassID)) { // => ACLMATRIX
             JideButton addbw = GUITools.createHyperlinkButton(OPDE.lang.getString("opde.welcome.addbw"), SYSConst.icon22addbw, null);
 //            final MyJDialog dlg = new MyJDialog();
             addbw.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
+
             addbw.setAlignmentX(Component.LEFT_ALIGNMENT);
             addbw.addActionListener(new ActionListener() {
                 @Override
