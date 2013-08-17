@@ -1,8 +1,6 @@
 package entity.roster;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.sql.Date;
 
 /**
@@ -14,10 +12,28 @@ import java.sql.Date;
  */
 @Entity
 public class Rosters {
-    private long id;
-
-    @javax.persistence.Column(name = "id", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
+    @Column(name = "id", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
     @Id
+    private long id;
+    @Column(name = "section", nullable = false, insertable = true, updatable = true, length = 5, precision = 0)
+    @Basic
+    private short section;
+    @Column(name = "month", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
+    @Basic
+    private Date month;
+    @Column(name = "flag", nullable = false, insertable = true, updatable = true, length = 5, precision = 0)
+    @Basic
+    private short flag;
+    @Column(name = "xml", nullable = false, insertable = true, updatable = true, length = 16777215, precision = 0)
+    @Basic
+    private String xml;
+    @Column(name = "openedby", nullable = true, insertable = true, updatable = true, length = 10, precision = 0)
+    @Basic
+    private String openedby;
+    @Column(name = "version", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
+    @Version
+    private long version;
+
     public long getId() {
         return id;
     }
@@ -26,10 +42,7 @@ public class Rosters {
         this.id = id;
     }
 
-    private short section;
 
-    @javax.persistence.Column(name = "section", nullable = false, insertable = true, updatable = true, length = 5, precision = 0)
-    @Basic
     public short getSection() {
         return section;
     }
@@ -38,10 +51,7 @@ public class Rosters {
         this.section = section;
     }
 
-    private Date month;
 
-    @javax.persistence.Column(name = "month", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
-    @Basic
     public Date getMonth() {
         return month;
     }
@@ -50,10 +60,7 @@ public class Rosters {
         this.month = month;
     }
 
-    private short flag;
 
-    @javax.persistence.Column(name = "flag", nullable = false, insertable = true, updatable = true, length = 5, precision = 0)
-    @Basic
     public short getFlag() {
         return flag;
     }
@@ -62,10 +69,7 @@ public class Rosters {
         this.flag = flag;
     }
 
-    private String xml;
 
-    @javax.persistence.Column(name = "xml", nullable = false, insertable = true, updatable = true, length = 16777215, precision = 0)
-    @Basic
     public String getXml() {
         return xml;
     }
@@ -74,10 +78,7 @@ public class Rosters {
         this.xml = xml;
     }
 
-    private String openedby;
 
-    @javax.persistence.Column(name = "openedby", nullable = true, insertable = true, updatable = true, length = 10, precision = 0)
-    @Basic
     public String getOpenedby() {
         return openedby;
     }
@@ -86,10 +87,7 @@ public class Rosters {
         this.openedby = openedby;
     }
 
-    private long version;
 
-    @javax.persistence.Column(name = "version", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
-    @Basic
     public long getVersion() {
         return version;
     }

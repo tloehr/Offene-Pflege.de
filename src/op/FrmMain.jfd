@@ -82,6 +82,10 @@
             <null/> 
            </object> 
           </void> 
+          <void method="setProperty"> 
+           <string>opaque</string> 
+           <boolean>false</boolean> 
+          </void> 
           <void property="name"> 
            <string>pnlMainMessage</string> 
           </void> 

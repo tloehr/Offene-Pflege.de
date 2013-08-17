@@ -1,8 +1,6 @@
 package entity.roster;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Date;
 
@@ -15,10 +13,25 @@ import java.sql.Date;
  */
 @Entity
 public class Specialworkdays {
-    private long id;
-
-    @javax.persistence.Column(name = "id", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
+    @Column(name = "id", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
     @Id
+    private long id;
+    @Column(name = "day", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
+    @Basic
+    private Date day;
+    @Column(name = "uid", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
+    @Basic
+    private String uid;
+    @Column(name = "amount", nullable = false, insertable = true, updatable = true, length = 9, precision = 4)
+    @Basic
+    private BigDecimal amount;
+    @Column(name = "type", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
+    @Basic
+    private int type;
+    @Column(name = "version", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
+    @Version
+    private long version;
+
     public long getId() {
         return id;
     }
@@ -27,10 +40,7 @@ public class Specialworkdays {
         this.id = id;
     }
 
-    private Date day;
 
-    @javax.persistence.Column(name = "day", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
-    @Basic
     public Date getDay() {
         return day;
     }
@@ -39,10 +49,7 @@ public class Specialworkdays {
         this.day = day;
     }
 
-    private String uid;
 
-    @javax.persistence.Column(name = "uid", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
-    @Basic
     public String getUid() {
         return uid;
     }
@@ -51,10 +58,7 @@ public class Specialworkdays {
         this.uid = uid;
     }
 
-    private BigDecimal amount;
 
-    @javax.persistence.Column(name = "amount", nullable = false, insertable = true, updatable = true, length = 9, precision = 4)
-    @Basic
     public BigDecimal getAmount() {
         return amount;
     }
@@ -63,10 +67,7 @@ public class Specialworkdays {
         this.amount = amount;
     }
 
-    private int type;
 
-    @javax.persistence.Column(name = "type", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
-    @Basic
     public int getType() {
         return type;
     }
@@ -75,10 +76,7 @@ public class Specialworkdays {
         this.type = type;
     }
 
-    private long version;
 
-    @javax.persistence.Column(name = "version", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
-    @Basic
     public long getVersion() {
         return version;
     }
