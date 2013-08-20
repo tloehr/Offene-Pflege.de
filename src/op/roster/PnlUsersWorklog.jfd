@@ -7,27 +7,6 @@ new FormModel {
 			"axis": 0
 		} ) {
 			name: "this"
-			add( new FormContainer( "com.jidesoft.swing.JideTabbedPane", new FormLayoutManager( class javax.swing.JTabbedPane ) ) {
-				name: "jideTabbedPane1"
-				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
-					name: "scrollPane1"
-					add( new FormComponent( "javax.swing.JTable" ) {
-						name: "tblRoster"
-					} )
-				}, new FormLayoutConstraints( null ) {
-					"title": "text"
-				} )
-				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
-					name: "jspContent"
-					add( new FormContainer( "com.jidesoft.pane.CollapsiblePanes", new FormLayoutManager( class javax.swing.BoxLayout ) {
-						"axis": 0
-					} ) {
-						name: "cpsMain"
-					} )
-				}, new FormLayoutConstraints( null ) {
-					"title": "text"
-				} )
-			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
 			"size": new java.awt.Dimension( 400, 300 )

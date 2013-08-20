@@ -808,8 +808,30 @@ public class OPDE {
         }
 
         boolean holiday = false;
-        synchronized (holidays){
+        synchronized (holidays) {
             holiday = holidays.containsKey(day);
+        }
+
+        return holiday;
+    }
+
+    public static String getHoliday(DateMidnight day) {
+        boolean cached = false;
+        synchronized (yearsInHolidayMap) {
+            cached = yearsInHolidayMap.contains(day.getYear());
+        }
+        if (!cached) {
+            synchronized (yearsInHolidayMap) {
+                yearsInHolidayMap.add(day.getYear());
+            }
+            synchronized (holidays) {
+                holidays.putAll(SYSCalendar.getHolidays(day.getYear(), day.getYear()));
+            }
+        }
+
+        String holiday = "";
+        synchronized (holidays) {
+            holiday = SYSTools.catchNull(holidays.get(day));
         }
 
         return holiday;

@@ -4,74 +4,63 @@
 
 package op.roster;
 
-import com.jidesoft.pane.*;
-import com.jidesoft.swing.*;
-import entity.roster.RPlan;
-import entity.roster.RPlanTools;
-import entity.roster.TMRoster;
+import com.jidesoft.grid.*;
+import com.jidesoft.grid.JideTable;
+import com.jidesoft.grid.NestedTableHeader;
+import com.jidesoft.grid.TableColumnGroup;
+import com.jidesoft.pane.CollapsiblePane;
+import com.jidesoft.pane.CollapsiblePanes;
+import com.jidesoft.swing.JideTabbedPane;
+import entity.roster.*;
 import op.tools.CleanablePanel;
 import org.joda.time.DateMidnight;
 
 import javax.swing.*;
+import javax.swing.table.TableColumnModel;
 import java.util.ArrayList;
 import java.util.Map;
 
 /**
  * @author Torsten Löhr
  */
-public class PnlUsersWorklog  extends CleanablePanel {
+public class PnlUsersWorklog extends CleanablePanel {
 
     private Map<String, CollapsiblePane> cpMap;
     private Map<String, JPanel> contentmap;
+    private TableScrollPane tsp1;
 
     public PnlUsersWorklog() {
         initComponents();
         initPanel();
     }
 
-    private void initPanel(){
+    private void initPanel() {
 
-        DateMidnight month = new DateMidnight(2013,6,1);
+        DateMidnight month = new DateMidnight(2013, 6, 1);
 
         ArrayList<RPlan> list = RPlanTools.get4Month(month);
 
         TMRoster tmRoster = new TMRoster(list, month);
+        TMRosterHeader tmRosterHeader = new TMRosterHeader(tmRoster);
+        TMRosterFooter tmRosterFooter = new TMRosterFooter(tmRoster);
 
-        tblRoster.setModel(tmRoster);
+//        tblRoster.setModel(tmRoster);
+//
+//        tblRoster.setAutoResizeMode(JideTable.AUTO_RESIZE_FILL);
+
+        tsp1 = new TableScrollPane(tmRoster, tmRosterHeader, tmRosterFooter, true);
+
+
+                add(tsp1);
+
+
     }
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
-        jideTabbedPane1 = new JideTabbedPane();
-        scrollPane1 = new JScrollPane();
-        tblRoster = new JTable();
-        jspContent = new JScrollPane();
-        cpsMain = new CollapsiblePanes();
 
         //======== this ========
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-
-        //======== jideTabbedPane1 ========
-        {
-
-            //======== scrollPane1 ========
-            {
-                scrollPane1.setViewportView(tblRoster);
-            }
-            jideTabbedPane1.addTab("text", scrollPane1);
-
-            //======== jspContent ========
-            {
-
-                //======== cpsMain ========
-                {
-                    cpsMain.setLayout(new BoxLayout(cpsMain, BoxLayout.X_AXIS));
-                }
-                jspContent.setViewportView(cpsMain);
-            }
-            jideTabbedPane1.addTab("text", jspContent);
-        }
-        add(jideTabbedPane1);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
@@ -91,10 +80,5 @@ public class PnlUsersWorklog  extends CleanablePanel {
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-    private JideTabbedPane jideTabbedPane1;
-    private JScrollPane scrollPane1;
-    private JTable tblRoster;
-    private JScrollPane jspContent;
-    private CollapsiblePanes cpsMain;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }
