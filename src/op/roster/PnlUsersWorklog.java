@@ -4,19 +4,13 @@
 
 package op.roster;
 
-import com.jidesoft.grid.*;
-import com.jidesoft.grid.JideTable;
-import com.jidesoft.grid.NestedTableHeader;
-import com.jidesoft.grid.TableColumnGroup;
+import com.jidesoft.grid.TableScrollPane;
 import com.jidesoft.pane.CollapsiblePane;
-import com.jidesoft.pane.CollapsiblePanes;
-import com.jidesoft.swing.JideTabbedPane;
 import entity.roster.*;
 import op.tools.CleanablePanel;
 import org.joda.time.DateMidnight;
 
 import javax.swing.*;
-import javax.swing.table.TableColumnModel;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -44,16 +38,11 @@ public class PnlUsersWorklog extends CleanablePanel {
         TMRosterHeader tmRosterHeader = new TMRosterHeader(tmRoster);
         TMRosterFooter tmRosterFooter = new TMRosterFooter(tmRoster);
 
-//        tblRoster.setModel(tmRoster);
-//
-//        tblRoster.setAutoResizeMode(JideTable.AUTO_RESIZE_FILL);
-
-        tsp1 = new TableScrollPane(tmRoster, tmRosterHeader, tmRosterFooter, true);
+        tsp1 = new TableScrollPane(tmRoster, tmRosterHeader, tmRosterFooter, false);
 
 
-                add(tsp1);
 
-
+        add(tsp1);
     }
 
     private void initComponents() {

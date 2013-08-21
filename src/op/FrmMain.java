@@ -165,6 +165,7 @@ public class FrmMain extends JFrame {
         final MemoryStatusBarItem gc = new MemoryStatusBarItem();
         gc.setFont(new Font("Arial", Font.PLAIN, 14));
         statusBar.add(gc, JideBoxLayout.FLEXIBLE);
+
         initPhase = false;
     }
 
@@ -600,7 +601,10 @@ public class FrmMain extends JFrame {
         }
 
         panesApps.addExpansion();
+        int width = panesApps.getPreferredSize().width;
+
         jspApps = new JScrollPane(panesApps);
+        panesApps.setPreferredSize(new Dimension(width + 16, panesApps.getPreferredSize().height));
 
         splitPaneLeft.setOrientation(JideSplitPane.VERTICAL_SPLIT);
         splitPaneLeft.add(jspApps);
@@ -634,8 +638,8 @@ public class FrmMain extends JFrame {
         } else if (classname.equals("op.dev.PnlDev")) {
             panel = new PnlDev();
         } else if (classname.equals("op.roster.PnlUsersWorklog")) {
-                    panel = new PnlUsersWorklog();
-                }
+            panel = new PnlUsersWorklog();
+        }
         return panel;
     }
 

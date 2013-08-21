@@ -5,12 +5,13 @@
 package entity;
 
 import entity.reports.Handovers;
+import op.tools.SYSConst;
 
 import javax.persistence.*;
+import java.awt.*;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author tloehr
@@ -102,6 +103,15 @@ public class Homes implements Serializable {
 
     public void setZip(String zip) {
         this.zip = zip;
+    }
+
+    // todo: dummy implementation only. fix this!
+    public Color getColor() {
+
+        if (eid.equalsIgnoreCase("herchen")) return SYSConst.darkgreen;
+
+        return SYSConst.blue1[2];
+
     }
 
     @Override
