@@ -2,6 +2,7 @@ package entity.roster;
 
 import entity.Homes;
 import entity.system.Users;
+import op.tools.SYSTools;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -83,27 +84,27 @@ public class RPlan {
     }
 
     public void setP1(String p1) {
-        this.p1 = p1;
+        this.p1 = p1.toUpperCase();
     }
 
     public void setP2(String p2) {
-        this.p2 = p2;
+        this.p2 = p2.toUpperCase();
     }
 
     public void setP3(String p3) {
-        this.p3 = p3;
+        this.p3 = p3.toUpperCase();
     }
 
     public String getP1() {
-        return p1;
+        return SYSTools.catchNull(p1).toUpperCase();
     }
 
     public String getP2() {
-        return p2;
+        return SYSTools.catchNull(p2).toUpperCase();
     }
 
     public String getP3() {
-        return p3;
+        return SYSTools.catchNull(p3).toUpperCase();
     }
 
     public Date getStart() {

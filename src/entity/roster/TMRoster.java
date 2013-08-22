@@ -1,11 +1,17 @@
 package entity.roster;
 
-import com.jidesoft.grid.*;
+import com.jidesoft.grid.AbstractMultiTableModel;
+import com.jidesoft.grid.CellStyle;
+import com.jidesoft.grid.ColumnIdentifierTableModel;
+import com.jidesoft.grid.StyleModel;
 import entity.system.Users;
+import entity.system.UsersTools;
+import op.OPDE;
 import op.tools.Pair;
 import op.tools.SYSConst;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,6 +32,8 @@ import java.util.HashMap;
 public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifierTableModel, StyleModel {
     HashMap<Users, ArrayList<RPlan>> content = new HashMap<Users, ArrayList<RPlan>>();
     ArrayList<Users> listUsers = new ArrayList<Users>();
+    HashMap<Users, UserContracts> contracts = new HashMap<Users, UserContracts>();
+
     private final DateMidnight month;
     private CellStyle cellStyle = new CellStyle();
     public final int ROW_HEADER = 2;
@@ -52,6 +60,26 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
     }
 
+    public int[] getMinimumWidths() {
+        int[] mins = new int[getColumnCount()];
+
+        for (int i = 0; i < getColumnCount(); i++) {
+            mins[i] = 35;
+        }
+
+        return mins;
+    }
+
+    public int[] getMaximumWidths() {
+        int[] mins = new int[getColumnCount()];
+
+        for (int i = 0; i < getColumnCount(); i++) {
+            mins[i] = 70;
+        }
+
+        return mins;
+    }
+
 
     @Override
     public int getColumnType(int column) {
@@ -70,19 +98,32 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         return 0;
     }
 
+
     @Override
     public CellStyle getCellStyleAt(int rowIndex, int columnIndex) {
         CellStyle myStyle = cellStyle;
         myStyle.setHorizontalAlignment(SwingConstants.CENTER);
+
+        Color[] colors = null;
+
         if (rowIndex / 4 % 2 == 0) {
-            myStyle.setBackground(SYSConst.greyscale[6 + (rowIndex % 4)]);
+            colors = SYSConst.greyscale;
         } else {
-            myStyle.setBackground(SYSConst.yellow1[6 + (rowIndex % 4)]);
+            colors = SYSConst.yellow1;
+            //myStyle.setBackground(SYSConst.yellow1[6 + (rowIndex % 4)]);
         }
 
+        if (columnIndex >= ROW_HEADER && columnIndex < getColumnCount() - 1) {
+            if (getDay(getBaseCol(columnIndex)).getDayOfWeek() == DateTimeConstants.SUNDAY || getDay(getBaseCol(columnIndex)).getDayOfWeek() == DateTimeConstants.SATURDAY) {
+                colors = SYSConst.red1;
+            }
 
-        myStyle.setToolTipText(columnIndex+", "+rowIndex);
+            if (OPDE.isHoliday(getDay(getBaseCol(columnIndex)))) {
+                colors = SYSConst.red2;
+            }
+        }
 
+        myStyle.setBackground(colors[6 + (rowIndex % 4)]);
 
         return myStyle;
     }
@@ -94,15 +135,12 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return false;
+        return true;
     }
 
 
     public Pair<Point, Point> getBaseTable() {
-
-
         return new Pair(new Point(ROW_HEADER, COL_HEADER), new Point(COL_FOOTER, ROW_FOOTER));
-
     }
 
     private void prepareContent(ArrayList<RPlan> input) {
@@ -110,11 +148,12 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
             if (!content.containsKey(rplan.getOwner())) {
                 content.put(rplan.getOwner(), new ArrayList<RPlan>());
-
                 for (int i = 0; i < month.dayOfMonth().withMaximumValue().getDayOfMonth(); i++) {
                     content.get(rplan.getOwner()).add(null);
                 }
                 listUsers.add(rplan.getOwner());
+
+                contracts.put(rplan.getOwner(), UsersTools.getContracts(rplan.getOwner()));
             }
 
             DateTime start = new DateTime(rplan.getStart());
@@ -157,13 +196,25 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     }
 
 
-
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         String value = "--";
 
         if (getBaseCol(columnIndex) == -2) {
-            value = listUsers.get(rowIndex / 4).getFullname();
+            if (rowIndex % 4 == 0) {
+                value = listUsers.get(rowIndex / 4).getName();
+            } else if (rowIndex % 4 == 1) {
+                value = listUsers.get(rowIndex / 4).getVorname();
+            } else if (rowIndex % 4 == 2) {
+                value = "";
+            } else {
+
+                if (contracts.get(listUsers.get(rowIndex / 4)).getParameterSet(month).isTrainee()) {
+                    value = "Schüler";
+                } else {
+                    value = contracts.get(listUsers.get(rowIndex / 4)).getParameterSet(month).isExam() ? "Examen" : "Helfer";
+                }
+            }
         } else if (getBaseCol(columnIndex) == -1) {
             value = "0";
         } else if (getBaseCol(columnIndex) >= 0 && getBaseCol(columnIndex) < ROW_FOOTER - 2) {

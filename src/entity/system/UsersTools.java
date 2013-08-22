@@ -4,14 +4,22 @@
  */
 package entity.system;
 
+import entity.roster.UserContracts;
+import entity.roster.UsersXML;
 import op.OPDE;
 import op.tools.GUITools;
 import op.tools.SYSTools;
+import org.eclipse.persistence.platform.xml.DefaultErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import java.awt.*;
+import java.io.StringReader;
 import java.util.ArrayList;
 
 /**
@@ -105,6 +113,27 @@ public class UsersTools {
         }
 
         return user;
+    }
+
+
+    public static UserContracts getContracts(Users user) {
+
+        UsersXML usersXML = new UsersXML();
+
+        SAXParserFactory spf = SAXParserFactory.newInstance();
+        //        spf.setValidating(true);
+        //        spf.setNamespaceAware(true);
+        try {
+            SAXParser saxParser = spf.newSAXParser();
+
+            XMLReader reader = saxParser.getXMLReader();
+            reader.setErrorHandler(new DefaultErrorHandler());
+            reader.setContentHandler(usersXML);
+            reader.parse(new InputSource(new StringReader(user.getXml())));
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+        return usersXML.getUserContracts();
     }
 
 }

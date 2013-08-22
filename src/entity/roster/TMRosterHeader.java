@@ -6,10 +6,12 @@ import com.jidesoft.grid.AbstractMultiTableModel;
 import com.jidesoft.grid.CellStyle;
 import com.jidesoft.grid.ColumnIdentifierTableModel;
 import com.jidesoft.grid.StyleModel;
+import com.jidesoft.swing.StyledLabelBuilder;
 import op.OPDE;
 import op.tools.Pair;
 import op.tools.SYSConst;
 
+import javax.swing.*;
 import java.awt.*;
 
 /**
@@ -33,6 +35,7 @@ public class TMRosterHeader extends AbstractMultiTableModel implements ColumnIde
         CellStyle cellStyle = new CellStyle();
         cellStyle.setFont(SYSConst.ARIAL14);
         cellStyle.setBackground(SYSConst.bluegrey);
+        cellStyle.setHorizontalAlignment(SwingConstants.CENTER);
         return cellStyle;
     }
 
@@ -67,7 +70,7 @@ public class TMRosterHeader extends AbstractMultiTableModel implements ColumnIde
 
         if (columnIndex >= basetable.getFirst().x && columnIndex < basemodel.getColumnCount() - 1) {
             if (rowIndex == 0) {
-                value = basemodel.getDay(basemodel.getBaseCol(columnIndex)).toString("dd.MM.");
+                value =  basemodel.getDay(basemodel.getBaseCol(columnIndex)).toString("dd.MM.");
             } else if (rowIndex == 1) {
                 String holiday = OPDE.getHoliday(basemodel.getDay(basemodel.getBaseCol(columnIndex)));
                 value = basemodel.getDay(basemodel.getBaseCol(columnIndex)).toString("EE") + (holiday.isEmpty() ? "" : " (" + holiday + ")");
