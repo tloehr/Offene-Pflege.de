@@ -1,7 +1,12 @@
 package entity.roster;
 
+import entity.Station;
+import entity.system.Users;
+import org.joda.time.DateMidnight;
+
 import javax.persistence.*;
-import java.sql.Date;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,6 +24,7 @@ public class Rosters {
     @Basic
     private short section;
     @Column(name = "month", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
+    @Temporal(TemporalType.TIMESTAMP)
     @Basic
     private Date month;
     @Column(name = "flag", nullable = false, insertable = true, updatable = true, length = 5, precision = 0)
@@ -27,12 +33,32 @@ public class Rosters {
     @Column(name = "xml", nullable = false, insertable = true, updatable = true, length = 16777215, precision = 0)
     @Basic
     private String xml;
-    @Column(name = "openedby", nullable = true, insertable = true, updatable = true, length = 10, precision = 0)
-    @Basic
-    private String openedby;
     @Column(name = "version", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
     @Version
     private long version;
+    /**
+     * _       _   _
+     * _ __ ___| | __ _| |_(_) ___  _ __  ___
+     * | '__/ _ \ |/ _` | __| |/ _ \| '_ \/ __|
+     * | | |  __/ | (_| | |_| | (_) | | | \__ \
+     * |_|  \___|_|\__,_|\__|_|\___/|_| |_|___/
+     */
+    @JoinColumn(name = "openedby", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users owner;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "roster")
+    private List<RPlan> shifts;
+
+    public List<RPlan> getShifts() {
+        return shifts;
+    }
+
+    public Rosters() {
+    }
+
+    public Rosters(DateMidnight month1) {
+        this.month = month1.dayOfMonth().withMinimumValue().toDate();
+    }
 
     public long getId() {
         return id;
@@ -79,21 +105,20 @@ public class Rosters {
     }
 
 
-    public String getOpenedby() {
-        return openedby;
-    }
-
-    public void setOpenedby(String openedby) {
-        this.openedby = openedby;
-    }
-
-
     public long getVersion() {
         return version;
     }
 
     public void setVersion(long version) {
         this.version = version;
+    }
+
+    public Users getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Users owner) {
+        this.owner = owner;
     }
 
     @Override
@@ -108,7 +133,6 @@ public class Rosters {
         if (section != rosters.section) return false;
         if (version != rosters.version) return false;
         if (month != null ? !month.equals(rosters.month) : rosters.month != null) return false;
-        if (openedby != null ? !openedby.equals(rosters.openedby) : rosters.openedby != null) return false;
         if (xml != null ? !xml.equals(rosters.xml) : rosters.xml != null) return false;
 
         return true;
@@ -121,7 +145,6 @@ public class Rosters {
         result = 31 * result + (month != null ? month.hashCode() : 0);
         result = 31 * result + (int) flag;
         result = 31 * result + (xml != null ? xml.hashCode() : 0);
-        result = 31 * result + (openedby != null ? openedby.hashCode() : 0);
         result = 31 * result + (int) (version ^ (version >>> 32));
         return result;
     }

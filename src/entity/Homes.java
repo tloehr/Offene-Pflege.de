@@ -25,6 +25,9 @@ public class Homes implements Serializable {
     @Id
     @Column(name = "EID")
     private String eid;
+    @Column(name = "Short")
+    @Basic
+    private String shortname;
     @Column(name = "Name")
     private String name;
     @Column(name = "Str")
@@ -47,6 +50,15 @@ public class Homes implements Serializable {
 
     public Homes() {
     }
+
+    public String getShortname() {
+          return shortname;
+      }
+
+      public void setShortname(String shortname) {
+          this.shortname = shortname;
+      }
+
 
     public Homes(String eid) {
         this.eid = eid;

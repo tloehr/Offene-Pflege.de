@@ -129,10 +129,12 @@ public class Symbol {
     }
 
     public DateTime getStart(DateMidnight day) {
+        if (start == null) return day.toDateTime();
         return day.toDateTime().plus(start.getMillisOfDay());
     }
 
     public DateTime getEnd(DateMidnight day) {
+        if (end == null) return null;
         DateTime endTime = day.toDateTime().plus(end.getMillisOfDay());
         return start.isAfter(end) ? endTime.plusDays(1) : endTime;
     }

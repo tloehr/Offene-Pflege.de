@@ -1,14 +1,21 @@
 package entity.roster;
 
-import entity.info.Resident;
 import entity.reports.NReport;
+import entity.system.Users;
 import op.OPDE;
 import op.tools.Pair;
+import org.eclipse.persistence.platform.xml.DefaultErrorHandler;
 import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import java.io.StringReader;
 import java.util.ArrayList;
 
 /**
@@ -47,4 +54,50 @@ public class RostersTools {
         em.close();
         return result;
     }
+
+
+    public static Rosters get4Month(DateMidnight month) {
+        EntityManager em = OPDE.createEM();
+        Rosters roster = null;
+
+        try {
+            String jpql = " SELECT r " +
+                    " FROM Rosters r" +
+                    " WHERE r.month  = :month ";
+
+            Query query = em.createQuery(jpql);
+            query.setParameter("month", month.dayOfMonth().withMinimumValue().toDate());
+
+            roster = (Rosters) query.getSingleResult();
+        } catch (NonUniqueResultException nue) {
+            // thats ok
+        } catch (NoResultException nre) {
+            // thats ok
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+        return roster;
+    }
+
+    public static RosterParameters getParameters(Rosters roster) {
+
+           RosterXML rosterXML = new RosterXML();
+
+           SAXParserFactory spf = SAXParserFactory.newInstance();
+           //        spf.setValidating(true);
+           //        spf.setNamespaceAware(true);
+           try {
+               SAXParser saxParser = spf.newSAXParser();
+
+               XMLReader reader = saxParser.getXMLReader();
+               reader.setErrorHandler(new DefaultErrorHandler());
+               reader.setContentHandler(rosterXML);
+               reader.parse(new InputSource(new StringReader(roster.getXml())));
+           } catch (Exception e) {
+               OPDE.fatal(e);
+           }
+           return rosterXML.getRosterParameters();
+       }
 }

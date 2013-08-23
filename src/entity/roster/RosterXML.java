@@ -54,6 +54,8 @@ public class RosterXML extends DefaultHandler {
                 myRoster.setHoursperyear(Integer.parseInt(attributes.getValue("value")));
             } else if (tagName.equalsIgnoreCase("symbol")) {
                 symbol = new Symbol(attributes.getValue("key"), attributes.getValue("description"), attributes.getValue("starttime"), attributes.getValue("endtime"), Integer.parseInt(SYSTools.catchNull(attributes.getValue("break"), "0")), attributes.getValue("calc"), attributes.getValue("type"));
+            } else if (tagName.equalsIgnoreCase("assign")) {
+                myRoster.addPreferredHomeID(attributes.getValue("uid"), attributes.getValue("homeid"));
             } else if (tagName.equalsIgnoreCase("monday")) {
                 symbol.addDay(DateTimeConstants.MONDAY);
             } else if (tagName.equalsIgnoreCase("tuesday")) {
@@ -71,9 +73,14 @@ public class RosterXML extends DefaultHandler {
             } else if (tagName.equalsIgnoreCase("holiday")) {
                 symbol.addDay(Symbol.HOLIDAY);
             }
-        } catch (Exception e) {
+        } catch (
+                Exception e
+                )
+
+        {
             throw new SAXException(e);
         }
+
     }
 
     @Override

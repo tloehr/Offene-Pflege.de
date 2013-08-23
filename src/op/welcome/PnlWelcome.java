@@ -589,7 +589,7 @@ public class PnlWelcome extends CleanablePanel {
                 }
                 panel3.setViewportView(pnlApps);
             }
-            panel1.add(panel3, CC.xy(3, 1));
+            panel1.add(panel3, CC.xy(3, 1, CC.DEFAULT, CC.FILL));
         }
         add(panel1);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
