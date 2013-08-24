@@ -1462,6 +1462,7 @@ public class SYSCalendar {
             hm.put(new DateMidnight(year, 1, 1), "Neujahrstag");
             hm.put(new DateMidnight(year, 5, 1), "Maifeiertag");
             hm.put(new DateMidnight(year, 10, 3), "Tag der Einheit");
+//            hm.put(new DateMidnight(year, 06, 29), "Peter Paul");
             hm.put(new DateMidnight(year, 11, 1), "Allerheiligen");
             hm.put(new DateMidnight(year, 12, 25), "1. Weihnachtstag");
             hm.put(new DateMidnight(year, 12, 26), "2. Weihnachtstag");

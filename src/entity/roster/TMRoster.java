@@ -73,25 +73,25 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
     }
 
-    public int[] getMinimumWidths() {
-        int[] mins = new int[getColumnCount()];
-
-        for (int i = 0; i < getColumnCount(); i++) {
-            mins[i] = 35;
-        }
-
-        return mins;
-    }
-
-    public int[] getMaximumWidths() {
-        int[] mins = new int[getColumnCount()];
-
-        for (int i = 0; i < getColumnCount(); i++) {
-            mins[i] = 70;
-        }
-
-        return mins;
-    }
+//    public int[] getMinimumWidths() {
+//        int[] mins = new int[getColumnCount()];
+//
+//        for (int i = 0; i < getColumnCount(); i++) {
+//            mins[i] = 35;
+//        }
+//
+//        return mins;
+//    }
+//
+//    public int[] getMaximumWidths() {
+//        int[] mins = new int[getColumnCount()];
+//
+//        for (int i = 0; i < getColumnCount(); i++) {
+//            mins[i] = 70;
+//        }
+//
+//        return mins;
+//    }
 
     @Override
     public Class<?> getCellClassAt(int rowIndex, int columnIndex) {
@@ -157,7 +157,9 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
         }
 
-        myStyle.setBackground(colors[6 + (rowIndex % 4)]);
+        myStyle.setBackground(colors[7]);  //+ (rowIndex % 4)
+//        myStyle.setFont(new Font("Arial", Font.PLAIN, 28));
+
 
         return myStyle;
     }
@@ -179,11 +181,12 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         if (noBorders) {
             RPlan rPlan = content.get(listUsers.get(rowIndex / 4)).get(getBaseCol(columnIndex));
 
-            boolean p3 = rPlan.getP3().isEmpty() && !rPlan.getP2().isEmpty();
-            boolean p2 = rPlan.getP2().isEmpty() && !rPlan.getP1().isEmpty();
+            boolean p3 = !rPlan.getP2().isEmpty();
+            boolean p2 = rPlan.getP3().isEmpty() && !rPlan.getP1().isEmpty();
+            boolean p1 = (rPlan.getP2().isEmpty() && !rPlan.getP1().isEmpty()) || rPlan.getP1().isEmpty();
 
             if (rowIndex % 4 == 0) {
-                symbolEditable = p2;
+                symbolEditable = p1;
             } else if (rowIndex % 4 == 1) {
                 symbolEditable = p2;
             } else if (rowIndex % 4 == 2) {
@@ -264,11 +267,11 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             fireTableCellUpdated(rowIndex, columnIndex);
         } else {
             String newSymbol = aValue.toString();
-
-            if (rosterParameters.getSymbol(newSymbol) == null) return;
-            if (!rosterParameters.getSymbol(newSymbol).isAllowed(getDay(columnIndex))) return;
-
             Symbol symbol = rosterParameters.getSymbol(newSymbol);
+
+            if (!newSymbol.isEmpty() && symbol == null) return;
+            if (symbol != null && !rosterParameters.getSymbol(newSymbol).isAllowed(getDay(columnIndex))) return;
+
             EntityManager em = OPDE.createEM();
             try {
                 em.getTransaction().begin();
@@ -279,28 +282,43 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 RPlan myRPlan = em.merge(content.get(user).get(getBaseCol(columnIndex)));
                 em.lock(myRPlan, LockModeType.OPTIMISTIC);
 
-                if (rowIndex % 4 == 0) {
-                    myRPlan.setP1(newSymbol);
-                } else if (rowIndex % 4 == 1) {
-                    myRPlan.setP2(newSymbol);
-                } else if (rowIndex % 4 == 2) {
-                    myRPlan.setP3(newSymbol);
+                if (newSymbol.isEmpty()) {
+                    if (rowIndex % 4 == 0) {
+                        symbol = null;
+                        em.remove(myRPlan);
+                    } else if (rowIndex % 4 == 1) {
+                        myRPlan.setP2(null);
+                        symbol = rosterParameters.getSymbol(myRPlan.getP1());
+                    } else if (rowIndex % 4 == 2) {
+                        myRPlan.setP3(null);
+                        symbol = rosterParameters.getSymbol(myRPlan.getP2());
+                    }
+                } else {
+                    if (rowIndex % 4 == 0) {
+                        myRPlan.setP1(newSymbol);
+                    } else if (rowIndex % 4 == 1) {
+                        myRPlan.setP2(newSymbol);
+                    } else if (rowIndex % 4 == 2) {
+                        myRPlan.setP3(newSymbol);
+                    }
                 }
 
-                myRPlan.setBasehours(symbol.getBaseHours());
-                myRPlan.setExtrahours(symbol.getExtraHours(getDay(columnIndex), contracts.get(user).getParameterSet(getDay(columnIndex))));
-                myRPlan.setBreaktime(symbol.getBreak());
-                myRPlan.setStart(symbol.getStart(getDay(columnIndex)).toDate());
-                myRPlan.setOwner(em.merge(user));
-
-
-                DateTime end = symbol.getEnd(getDay(columnIndex));
-                myRPlan.setEnd(end == null ? null : end.toDate());
+                if (symbol != null) {
+                    myRPlan.setBasehours(symbol.getBaseHours());
+                    myRPlan.setExtrahours(symbol.getExtraHours(getDay(columnIndex), contracts.get(user).getParameterSet(getDay(columnIndex))));
+                    myRPlan.setBreaktime(symbol.getBreak());
+                    myRPlan.setStart(symbol.getStart(getDay(columnIndex)).toDate());
+                    myRPlan.setOwner(em.merge(user));
+                    DateTime end = symbol.getEnd(getDay(columnIndex));
+                    myRPlan.setEnd(end == null ? null : end.toDate());
+                }
 
                 em.getTransaction().commit();
 
                 content.get(user).remove(getBaseCol(columnIndex));
-                content.get(user).add(getBaseCol(columnIndex), myRPlan);
+                if (em.contains(myRPlan)) {
+                    content.get(user).add(getBaseCol(columnIndex), myRPlan);
+                }
                 roster = myRoster;
 
             } catch (OptimisticLockException ole) {
@@ -329,7 +347,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     public Object getValueAt(int rowIndex, int columnIndex) {
         Object value = "--";
         Users user = listUsers.get(rowIndex / 4);
-        if (getBaseCol(columnIndex) == -2) {
+        if (getBaseCol(columnIndex) == -2) {  // Usernames
             if (rowIndex % 4 == 0) {
                 value = user.getName();
             } else if (rowIndex % 4 == 1) {
@@ -354,11 +372,20 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 if (contracts.get(user).getParameterSet(month).isTrainee()) {
                     value = "Schüler";
                 } else {
-                    value = contracts.get(user).getParameterSet(month).isExam() ? "Examen" : "Helfer";
+                    value = contracts.get(user).getParameterSet(month).isExam() ? "{Examen:bold}" : "Helfer";
                 }
             }
-        } else if (getBaseCol(columnIndex) == -1) {
-            value = "0";
+        } else if (getBaseCol(columnIndex) == -1) { // stats carry
+            if (rowIndex % 4 == 0) {
+                BigDecimal hoursCarry = WorkAccountTools.getSum(month, user, WorkAccountTools.HOURS);
+                value = "Stunden: " + hoursCarry.setScale(2, RoundingMode.HALF_UP).toString();
+            } else if (rowIndex % 4 == 1) {
+                value = "";
+            } else if (rowIndex % 4 == 2) {
+                value = "";
+            }
+
+
         } else if (getBaseCol(columnIndex) >= 0 && getBaseCol(columnIndex) < ROW_FOOTER - 2) {
             if (rowIndex % 4 == 0) {
                 value = content.get(user).get(getBaseCol(columnIndex)).getP1();
@@ -366,6 +393,9 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 value = content.get(user).get(getBaseCol(columnIndex)).getP2();
             } else if (rowIndex % 4 == 2) {
                 value = content.get(user).get(getBaseCol(columnIndex)).getP3();
+                if (!value.toString().isEmpty()){
+                    OPDE.debug(value);
+                }
             } else {
                 BigDecimal basehours = content.get(user).get(getBaseCol(columnIndex)).getBasehours();
                 BigDecimal breaktime = content.get(user).get(getBaseCol(columnIndex)).getBreaktime();
@@ -383,6 +413,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
             }
         }
+
         return value;
     }
 }

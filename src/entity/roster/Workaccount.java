@@ -1,8 +1,9 @@
 package entity.roster;
 
+import entity.system.Users;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -13,34 +14,39 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-public class Workaccount {
+public class WorkAccount {
     @javax.persistence.Column(name = "id", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
-        @Id
+    @Id
     private long id;
-        @javax.persistence.Column(name = "workinglogid", nullable = true, insertable = true, updatable = true, length = 20, precision = 0)
-        @Basic
-        private Long workinglogid;
-
-        @javax.persistence.Column(name = "date", nullable = false, insertable = true, updatable = true, length = 19, precision = 0)
-        @Basic
-        @Temporal(TemporalType.TIMESTAMP)
-        private Date date;
-      @javax.persistence.Column(name = "value", nullable = true, insertable = true, updatable = true, length = 9, precision = 2)
-      @Basic
-      private BigDecimal value;
-       @javax.persistence.Column(name = "type", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
-       @Basic
-       private int type;
-       @javax.persistence.Column(name = "reference", nullable = true, insertable = true, updatable = true, length = 10, precision = 0)
-       @Basic
-       private Integer reference;
-       @javax.persistence.Column(name = "text", nullable = true, insertable = true, updatable = true, length = 200, precision = 0)
-       @Basic
-       private String text;
-       @javax.persistence.Column(name = "version", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
-       @Version
-       private long version;
-
+    @javax.persistence.Column(name = "date", nullable = false, insertable = true, updatable = true, length = 19, precision = 0)
+    @Basic
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date date;
+    @javax.persistence.Column(name = "value", nullable = true, insertable = true, updatable = true, length = 9, precision = 2)
+    @Basic
+    private BigDecimal value;
+    @javax.persistence.Column(name = "type", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
+    @Basic
+    private int type;
+    @javax.persistence.Column(name = "reference", nullable = true, insertable = true, updatable = true, length = 10, precision = 0)
+    @Basic
+    private Integer reference;
+    @javax.persistence.Column(name = "text", nullable = true, insertable = true, updatable = true, length = 200, precision = 0)
+    @Basic
+    private String text;
+    @javax.persistence.Column(name = "version", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
+    @Version
+    private long version;
+    // ---
+    @JoinColumn(name = "owner", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users owner;
+    @JoinColumn(name = "creator", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users creator;
+    @JoinColumn(name = "workinglogid", referencedColumnName = "id")
+    @ManyToOne
+    private WorkingLog workingLog;
 
     public long getId() {
         return id;
@@ -51,14 +57,29 @@ public class Workaccount {
     }
 
 
-    public Long getWorkinglogid() {
-        return workinglogid;
+    public WorkingLog getWorkingLog() {
+        return workingLog;
     }
 
-    public void setWorkinglogid(Long workinglogid) {
-        this.workinglogid = workinglogid;
+    public void setWorkingLog(WorkingLog workingLog) {
+        this.workingLog = workingLog;
     }
 
+    public Users getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Users owner) {
+        this.owner = owner;
+    }
+
+    public Users getCreator() {
+        return creator;
+    }
+
+    public void setCreator(Users creator) {
+        this.creator = creator;
+    }
 
     public Date getDate() {
         return date;
@@ -67,7 +88,6 @@ public class Workaccount {
     public void setDate(Date date) {
         this.date = date;
     }
-
 
 
     public BigDecimal getValue() {
@@ -119,7 +139,7 @@ public class Workaccount {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Workaccount that = (Workaccount) o;
+        WorkAccount that = (WorkAccount) o;
 
         if (id != that.id) return false;
         if (type != that.type) return false;
@@ -128,7 +148,7 @@ public class Workaccount {
         if (reference != null ? !reference.equals(that.reference) : that.reference != null) return false;
         if (text != null ? !text.equals(that.text) : that.text != null) return false;
         if (value != null ? !value.equals(that.value) : that.value != null) return false;
-        if (workinglogid != null ? !workinglogid.equals(that.workinglogid) : that.workinglogid != null) return false;
+
 
         return true;
     }
@@ -136,7 +156,7 @@ public class Workaccount {
     @Override
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (workinglogid != null ? workinglogid.hashCode() : 0);
+
         result = 31 * result + (date != null ? date.hashCode() : 0);
         result = 31 * result + (value != null ? value.hashCode() : 0);
         result = 31 * result + type;
