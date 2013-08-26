@@ -81,8 +81,7 @@ public class UserContracts {
     }
 
     public String toXML() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-//        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n";
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String xml = "<user>\n";
         for (UserContract contract : listContracts) {
             xml += contract.toXML();

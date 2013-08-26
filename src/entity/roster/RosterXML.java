@@ -73,11 +73,7 @@ public class RosterXML extends DefaultHandler {
             } else if (tagName.equalsIgnoreCase("holiday")) {
                 symbol.addDay(Symbol.HOLIDAY);
             }
-        } catch (
-                Exception e
-                )
-
-        {
+        } catch (Exception e) {
             throw new SAXException(e);
         }
 

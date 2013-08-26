@@ -4,25 +4,23 @@
 
 package op.roster;
 
-import com.jidesoft.combobox.ExComboBox;
-import com.jidesoft.combobox.ListExComboBox;
-import com.jidesoft.converter.ConverterContext;
-import com.jidesoft.converter.ObjectConverter;
-import com.jidesoft.converter.ObjectConverterManager;
-import com.jidesoft.grid.*;
+import com.jgoodies.forms.factories.CC;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jidesoft.grid.TableScrollPane;
 import com.jidesoft.pane.CollapsiblePane;
-import com.jidesoft.swing.StyledLabel;
-import com.jidesoft.swing.StyledLabelBuilder;
-import entity.Homes;
-import entity.HomesTools;
-import entity.roster.*;
+import entity.roster.Rosters;
+import entity.roster.RostersTools;
 import op.OPDE;
 import op.tools.CleanablePanel;
-import org.joda.time.DateMidnight;
+import op.tools.SYSTools;
 
+import javax.persistence.EntityManager;
 import javax.swing.*;
-import javax.swing.table.TableCellRenderer;
-import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -33,6 +31,7 @@ public class PnlUsersWorklog extends CleanablePanel {
     private Map<String, CollapsiblePane> cpMap;
     private Map<String, JPanel> contentmap;
     private TableScrollPane tsp1;
+    private ArrayList<Rosters> lstAllRosters;
 
     public PnlUsersWorklog() {
         initComponents();
@@ -41,120 +40,129 @@ public class PnlUsersWorklog extends CleanablePanel {
 
     private void initPanel() {
 
-        DateMidnight month = new DateMidnight(2013, 6, 15);
+        EntityManager em = OPDE.createEM();
+        lstAllRosters = new ArrayList<Rosters>(em.createQuery("SELECT r FROM Rosters r ORDER BY r.month DESC").getResultList());
+        em.close();
 
-        Rosters roster = RostersTools.get4Month(month);
+        lstRosters.setModel(SYSTools.list2dlm(lstAllRosters));
+        lstRosters.setCellRenderer(RostersTools.getRenderer());
 
-        ObjectConverterManager.initDefaultConverter();
-        CellEditorManager.initDefaultEditor();
-
-        ObjectConverterManager.registerConverter(Homes.class, new ObjectConverter() {
-            @Override
-            public String toString(Object o, ConverterContext converterContext) {
-                return o instanceof Homes ? ((Homes) o).getShortname() : "";
-            }
-
-            @Override
-            public boolean supportToString(Object o, ConverterContext converterContext) {
-                return true;
-            }
-
-            @Override
-            public Object fromString(String s, ConverterContext converterContext) {
-                return null;
-            }
-
-            @Override
-            public boolean supportFromString(String s, ConverterContext converterContext) {
-                return false;
-            }
-        });
-
-        CellEditorManager.registerEditor(Homes.class, new CellEditorFactory() {
-            public CellEditor create() {
-                return new ExComboBoxCellEditor() {
-                    @Override
-                    public ExComboBox createExComboBox() {
-                        ExComboBox myEditor = new ListExComboBox(HomesTools.getAll().toArray());
-                        myEditor.setRenderer(HomesTools.getRenderer());
-                        return myEditor;
-                    }
-                };
-            }
-        }, new EditorContext("HomesSelectionEditor"));
-
-//        ObjectConverterManager.registerConverter(String.class, new ObjectConverter() {
+//        DateMidnight month = new DateMidnight(2013, 6, 15);
+//
+//        Rosters roster = RostersTools.get4Month(month);
+//
+//        ObjectConverterManager.initDefaultConverter();
+//        CellEditorManager.initDefaultEditor();
+//
+//        ObjectConverterManager.registerConverter(Homes.class, new ObjectConverter() {
 //            @Override
 //            public String toString(Object o, ConverterContext converterContext) {
-//                return null;  //To change body of implemented methods use File | Settings | File Templates.
+//                return o instanceof Homes ? ((Homes) o).getShortname() : "";
 //            }
 //
 //            @Override
 //            public boolean supportToString(Object o, ConverterContext converterContext) {
-//                return false;  //To change body of implemented methods use File | Settings | File Templates.
+//                return true;
 //            }
 //
 //            @Override
 //            public Object fromString(String s, ConverterContext converterContext) {
-//                return null;  //To change body of implemented methods use File | Settings | File Templates.
+//                return null;
 //            }
 //
 //            @Override
 //            public boolean supportFromString(String s, ConverterContext converterContext) {
-//                return false;  //To change body of implemented methods use File | Settings | File Templates.
+//                return false;
 //            }
 //        });
-
-        final TMRoster tmRoster = new TMRoster(roster, false);
-
-        TMRosterHeader tmRosterHeader = new TMRosterHeader(tmRoster);
-        TMRosterFooter tmRosterFooter = new TMRosterFooter(tmRoster);
-
-        tsp1 = new TableScrollPane(tmRoster, tmRosterHeader, tmRosterFooter, false);
-
-        tsp1.getColumnHeaderTable().setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        tsp1.getColumnFooterTable().setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        tsp1.getMainTable().setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-
-        tsp1.getRowHeaderTable().getColumnModel().getColumn(0).setCellRenderer(new TableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                StyledLabel lbl = StyledLabelBuilder.createStyledLabel(value.toString());
-                lbl.setBackground(((StyleModel) table.getModel()).getCellStyleAt(row,column).getBackground());
-                lbl.setOpaque(true);
-                return lbl;  //To change body of implemented methods use File | Settings | File Templates.
-            }
-        });
 //
-//        tsp1.getMainTable().setDefaultRenderer(String.class, new TableCellRenderer() {
+//        CellEditorManager.registerEditor(Homes.class, new CellEditorFactory() {
+//            public CellEditor create() {
+//                return new ExComboBoxCellEditor() {
+//                    @Override
+//                    public ExComboBox createExComboBox() {
+//                        ExComboBox myEditor = new ListExComboBox(HomesTools.getAll().toArray());
+//                        myEditor.setRenderer(HomesTools.getRenderer());
+//                        return myEditor;
+//                    }
+//                };
+//            }
+//        }, new EditorContext("HomesSelectionEditor"));
+//
+//        final TMRoster tmRoster = new TMRoster(roster, false);
+//
+//        TMRosterHeader tmRosterHeader = new TMRosterHeader(tmRoster);
+//        TMRosterFooter tmRosterFooter = new TMRosterFooter(tmRoster);
+//
+//        tsp1 = new TableScrollPane(tmRoster, tmRosterHeader, tmRosterFooter, false);
+//
+//        tsp1.getColumnHeaderTable().setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+//        tsp1.getColumnFooterTable().setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+//        tsp1.getMainTable().setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+//
+//        tsp1.getRowHeaderTable().getColumnModel().getColumn(0).setCellRenderer(new TableCellRenderer() {
 //            @Override
 //            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-//                OPDE.debug("jkadsdas1");
 //                StyledLabel lbl = StyledLabelBuilder.createStyledLabel(value.toString());
+//                lbl.setBackground(((StyleModel) table.getModel()).getCellStyleAt(row,column).getBackground());
+//                lbl.setOpaque(true);
 //                return lbl;  //To change body of implemented methods use File | Settings | File Templates.
 //            }
 //        });
-//        tsp1.getRowHeaderTable().setDefaultRenderer(String.class, new TableCellRenderer() {
-//            @Override
-//            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-//                OPDE.debug("jkadsdas");
-//                StyledLabel lbl = new StyledLabel(value.toString());
-//                return lbl;  //To change body of implemented methods use File | Settings | File Templates.
-//            }
-//        });
+//
+//        tsp1.getRowHeaderTable().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+//        tsp1.getRowFooterTable().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+//
+//        add(tsp1);
+    }
 
-//        tsp1.getMainTable().getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-        tsp1.getRowHeaderTable().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        tsp1.getRowFooterTable().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-
-        add(tsp1);
+    private void lstRostersMouseClicked(MouseEvent e) {
+        if (e.getClickCount() == 2) {
+            final FrmRoster frmRoster = OPDE.getMainframe().addRoster((Rosters) lstRosters.getSelectedValue());
+            final int pos = lstAllRosters.indexOf(lstRosters.getSelectedValue());
+            lstAllRosters.remove(pos);
+            lstAllRosters.add(pos, frmRoster.getRoster());
+            lstRosters.setModel(SYSTools.list2dlm(lstAllRosters));
+            frmRoster.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosed(WindowEvent e) {
+                    lstAllRosters.remove(pos);
+                    lstAllRosters.add(pos, frmRoster.getRoster());
+                    lstRosters.setModel(SYSTools.list2dlm(lstAllRosters));
+                    super.windowClosed(e);
+                }
+            });
+        }
     }
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
+        scrollPane1 = new JScrollPane();
+        lstRosters = new JList();
+        btnNewRoster = new JButton();
 
         //======== this ========
-        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        setLayout(new FormLayout(
+                "default, $lcgap, default:grow, $lcgap, default",
+                "default, $lgap, default:grow, 2*($lgap, default)"));
+
+        //======== scrollPane1 ========
+        {
+
+            //---- lstRosters ----
+            lstRosters.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    lstRostersMouseClicked(e);
+                }
+            });
+            scrollPane1.setViewportView(lstRosters);
+        }
+        add(scrollPane1, CC.xy(3, 3, CC.DEFAULT, CC.FILL));
+
+        //---- btnNewRoster ----
+        btnNewRoster.setText("new roster");
+        add(btnNewRoster, CC.xy(3, 5));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
@@ -174,5 +182,8 @@ public class PnlUsersWorklog extends CleanablePanel {
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+    private JScrollPane scrollPane1;
+    private JList lstRosters;
+    private JButton btnNewRoster;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

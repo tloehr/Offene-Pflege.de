@@ -40,6 +40,8 @@ import java.util.HashMap;
  */
 public class SYSConst {
 
+    public static final String xmlheader = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n";
+
     public static final String sep = System.getProperty("file.separator");
 
     public static final Font ARIAL10BOLD = new Font("Arial", Font.BOLD, 10);

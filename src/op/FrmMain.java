@@ -42,6 +42,7 @@ import entity.Station;
 import entity.StationTools;
 import entity.info.*;
 import entity.prescription.PrescriptionTools;
+import entity.roster.Rosters;
 import entity.system.SYSLoginTools;
 import entity.system.SYSPropsTools;
 import op.allowance.PnlAllowance;
@@ -52,6 +53,7 @@ import op.care.supervisor.PnlHandover;
 import op.controlling.PnlControlling;
 import op.dev.PnlDev;
 import op.process.PnlProcess;
+import op.roster.FrmRoster;
 import op.roster.PnlUsersWorklog;
 import op.settings.PnlSystemSettings;
 import op.settings.PnlUserSettings;
@@ -91,6 +93,7 @@ public class FrmMain extends JFrame {
 
     private Map<Integer, Set<Resident>> specialities;
     private Map<Resident, JPanel> iconPanels;
+    private java.util.Map<Date, FrmRoster> openedRosters;
 
     private DlgLogin dlgLogin;
 
@@ -118,6 +121,8 @@ public class FrmMain extends JFrame {
     public FrmMain() {
         initPhase = true;
         initComponents();
+
+        openedRosters = Collections.synchronizedMap(new HashMap<Date, FrmRoster>());
 
         currentVisiblePanel = null;
         currentResident = null;
@@ -389,8 +394,8 @@ public class FrmMain extends JFrame {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
+                    "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
+                    "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
@@ -398,8 +403,8 @@ public class FrmMain extends JFrame {
                 pnlMainMessage.setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
                 pnlMainMessage.setOpaque(false);
                 pnlMainMessage.setLayout(new FormLayout(
-                    "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
-                    "0dlu, $lgap, pref, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
+                        "0dlu, $lcgap, 23dlu, $lcgap, default:grow, $lcgap, min, $lcgap, 0dlu",
+                        "0dlu, $lgap, pref, $lgap, fill:11dlu, $lgap, pref, $lgap, 0dlu"));
 
                 //---- btnTX ----
                 btnTX.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/ambulance2.png")));
@@ -876,10 +881,36 @@ public class FrmMain extends JFrame {
         synchronized (iconPanels) {
             iconPanels.clear();
         }
+        synchronized (openedRosters) {
+            openedRosters.clear();
+        }
     }
+
+    public FrmRoster addRoster(Rosters roster) {
+        FrmRoster frmRoster = null;
+        synchronized (openedRosters) {
+            if (!openedRosters.containsKey(roster.getMonth())) {
+                openedRosters.put(roster.getMonth(), new FrmRoster(roster));
+            }
+            frmRoster = openedRosters.get(roster.getMonth());
+        }
+        return frmRoster;
+    }
+
+    public void removeRoster(Rosters roster) {
+        synchronized (openedRosters) {
+            openedRosters.remove(roster.getMonth());
+        }
+    }
+
 
     private void logout() {
         emptyFrame();
+
+        for (Map.Entry<Date, FrmRoster> entry : openedRosters.entrySet()){
+            entry.getValue().dispose();
+        }
+
         OPDE.saveLocalProps();
 
         labelUSER.setText("--");

@@ -67,6 +67,22 @@ public class RPlan {
     private long version;
 
 
+    public Homes getHome() {
+        return home;
+    }
+
+    public void setHome(Homes home) {
+        this.home = home;
+    }
+
+    public Rosters getRoster() {
+        return roster;
+    }
+
+    public void setRoster(Rosters roster) {
+        this.roster = roster;
+    }
+
     public Users getOwner() {
         return owner;
     }
@@ -84,15 +100,27 @@ public class RPlan {
     }
 
     public void setP1(String p1) {
-        this.p1 = p1.toUpperCase();
+        if (p1 != null) {
+            this.p1 = p1.toUpperCase();
+        } else {
+            this.p1 = null;
+        }
     }
 
     public void setP2(String p2) {
-        this.p2 = p2.toUpperCase();
+        if (p2 != null) {
+            this.p2 = p2.toUpperCase();
+        } else {
+            this.p2 = null;
+        }
     }
 
     public void setP3(String p3) {
-        this.p3 = p3.toUpperCase();
+        if (p3 != null) {
+            this.p3 = p3.toUpperCase();
+        } else {
+            this.p3 = null;
+        }
     }
 
     public String getP1() {

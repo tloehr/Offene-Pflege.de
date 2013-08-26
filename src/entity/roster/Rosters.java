@@ -1,6 +1,5 @@
 package entity.roster;
 
-import entity.Station;
 import entity.system.Users;
 import org.joda.time.DateMidnight;
 
@@ -45,7 +44,7 @@ public class Rosters {
      */
     @JoinColumn(name = "openedby", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users owner;
+    private Users openedBy;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "roster")
     private List<RPlan> shifts;
 
@@ -113,12 +112,12 @@ public class Rosters {
         this.version = version;
     }
 
-    public Users getOwner() {
-        return owner;
+    public Users getOpenedBy() {
+        return openedBy;
     }
 
-    public void setOwner(Users owner) {
-        this.owner = owner;
+    public void setOpenedBy(Users owner) {
+        this.openedBy = owner;
     }
 
     @Override
@@ -128,12 +127,7 @@ public class Rosters {
 
         Rosters rosters = (Rosters) o;
 
-        if (flag != rosters.flag) return false;
         if (id != rosters.id) return false;
-        if (section != rosters.section) return false;
-        if (version != rosters.version) return false;
-        if (month != null ? !month.equals(rosters.month) : rosters.month != null) return false;
-        if (xml != null ? !xml.equals(rosters.xml) : rosters.xml != null) return false;
 
         return true;
     }
@@ -141,11 +135,7 @@ public class Rosters {
     @Override
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (int) section;
-        result = 31 * result + (month != null ? month.hashCode() : 0);
-        result = 31 * result + (int) flag;
-        result = 31 * result + (xml != null ? xml.hashCode() : 0);
-        result = 31 * result + (int) (version ^ (version >>> 32));
+
         return result;
     }
 }

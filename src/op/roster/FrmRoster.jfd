@@ -1,0 +1,18 @@
+JFDML JFormDesigner: "5.2.0.0.54" Java: "1.6.0_33" encoding: "UTF-8"
+
+new FormModel {
+	contentType: "form/swing"
+	root: new FormRoot {
+		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
+			"$columnSpecs": "default, labelcompgap, default:grow, labelcompgap, default"
+			"$rowSpecs": "default, linegap, default:grow, linegap, default, linegap, default"
+		} ) {
+			name: "this"
+			"defaultCloseOperation": 2
+			"$sizePolicy": 1
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 0 )
+			"size": new java.awt.Dimension( 875, 660 )
+		} )
+	}
+}

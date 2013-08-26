@@ -80,6 +80,10 @@ public class Symbol {
 
     }
 
+    public HashSet<Integer> getAllowedDays() {
+        return allowedDays;
+    }
+
     public void addDay(int day) {
         allowedDays.add(day);
     }
@@ -119,7 +123,6 @@ public class Symbol {
     }
 
     public LocalTime getStart() {
-
         return start;
     }
 
@@ -237,6 +240,5 @@ public class Symbol {
         }
         return getBaseHours().add(getExtraHours(day, contractsParameterSet));
     }
-
 
 }

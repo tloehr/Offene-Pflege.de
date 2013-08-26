@@ -1,9 +1,11 @@
 package entity.roster;
 
+import entity.prescription.MedProducts;
 import entity.reports.NReport;
 import entity.system.Users;
 import op.OPDE;
 import op.tools.Pair;
+import op.tools.SYSTools;
 import org.eclipse.persistence.platform.xml.DefaultErrorHandler;
 import org.joda.time.DateMidnight;
 import org.xml.sax.InputSource;
@@ -13,9 +15,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
+import javax.swing.*;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import java.awt.*;
 import java.io.StringReader;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 /**
@@ -27,6 +33,24 @@ import java.util.ArrayList;
  */
 public class RostersTools {
 
+
+    public static ListCellRenderer getRenderer() {
+           return new ListCellRenderer() {
+               @Override
+               public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                   String text;
+                   if (o == null) {
+                       text = SYSTools.toHTML("<i>Keine Auswahl</i>");
+                   } else if (o instanceof Rosters) {
+                       Rosters rosters = (Rosters) o;
+                       text = new DateMidnight(rosters.getMonth()).toString("MMMM yyyy");
+                   } else {
+                       text = o.toString();
+                   }
+                   return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+               }
+           };
+       }
 
     public static Pair<DateMidnight, DateMidnight> getMinMax() {
         Pair<DateMidnight, DateMidnight> result = null;

@@ -64,7 +64,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
         baseStyle = new CellStyle();
         baseStyle.setFont(SYSConst.ARIAL16);
-
     }
 
     @Override
@@ -176,7 +175,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
         boolean noBorders = columnIndex >= ROW_HEADER && columnIndex < getColumnCount() - ROW_FOOTER_WIDTH;
         boolean symbolEditable = false;
-        boolean preferredHomes = false;
+        boolean preferredHomes = columnIndex == 0 && rowIndex % 4 == 2;;
+        boolean selectUser = columnIndex == 0 && rowIndex % 4 == 0;
 
         if (noBorders) {
             RPlan rPlan = content.get(listUsers.get(rowIndex / 4)).get(getBaseCol(columnIndex));
@@ -192,12 +192,9 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             } else if (rowIndex % 4 == 2) {
                 symbolEditable = p3;
             }
-        } else {
-            // only for the prefered homes combo box
-            preferredHomes = columnIndex == 0 && rowIndex % 4 == 2;
         }
 
-        return preferredHomes || (noBorders && symbolEditable);
+        return selectUser || preferredHomes || (noBorders && symbolEditable);
     }
 
 
@@ -262,9 +259,15 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         Users user = listUsers.get(rowIndex / 4);
+        boolean selectUser = columnIndex == 0 && rowIndex % 4 == 0;
+
         if (aValue instanceof Homes) {
             preferredHome.put(user, (Homes) aValue);
             fireTableCellUpdated(rowIndex, columnIndex);
+        } else if (selectUser) {
+
+            OPDE.debug(aValue);
+
         } else {
             String newSymbol = aValue.toString();
             Symbol symbol = rosterParameters.getSymbol(newSymbol);
@@ -393,7 +396,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 value = content.get(user).get(getBaseCol(columnIndex)).getP2();
             } else if (rowIndex % 4 == 2) {
                 value = content.get(user).get(getBaseCol(columnIndex)).getP3();
-                if (!value.toString().isEmpty()){
+                if (!value.toString().isEmpty()) {
                     OPDE.debug(value);
                 }
             } else {
@@ -416,4 +419,10 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
         return value;
     }
+
+    public String getUpdatedParametersAsXML(){
+        rosterParameters.setUserlist(listUsers, preferredHome);
+        return rosterParameters.toXML();
+    }
+
 }
