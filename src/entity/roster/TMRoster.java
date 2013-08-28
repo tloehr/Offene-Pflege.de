@@ -3,13 +3,13 @@ package entity.roster;
 import com.jidesoft.converter.ConverterContext;
 import com.jidesoft.grid.*;
 import entity.Homes;
+import entity.HomesTools;
 import entity.StationTools;
 import entity.system.Users;
 import entity.system.UsersTools;
 import op.OPDE;
 import op.tools.Pair;
 import op.tools.SYSConst;
-import op.tools.SYSTools;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
@@ -22,8 +22,6 @@ import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 
 /**
@@ -36,14 +34,13 @@ import java.util.HashMap;
 public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifierTableModel, StyleModel {
     private Rosters roster;
     private final boolean readOnly;
-    HashMap<Users, ArrayList<RPlan>> content = new HashMap<Users, ArrayList<RPlan>>();
-    ArrayList<Users> listUsers = new ArrayList<Users>();
-    HashMap<Users, UserContracts> contracts = new HashMap<Users, UserContracts>();
+    HashMap<Users, ArrayList<Rplan>> content;
+
+    HashMap<Users, UserContracts> contracts;
+
     RosterParameters rosterParameters = null;
-    HashMap<Users, Homes> preferredHome = new HashMap<Users, Homes>();
 
     private final DateMidnight month;
-    private CellStyle cellStyle = new CellStyle();
     public final int ROW_HEADER = 2;
     public final int ROW_FOOTER;
     public final int ROW_FOOTER_WIDTH = 1;
@@ -52,12 +49,23 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
     public CellStyle baseStyle;
 
+    private Homes defaultHome;
+    HashMap<Homes, ArrayList<Dailystats>> stats;
+
     public TMRoster(Rosters roster, boolean readOnly) {
+        defaultHome = StationTools.getStationForThisHost().getHome();
+
         this.roster = roster;
         this.readOnly = readOnly;
         this.month = new DateMidnight(roster.getMonth());
-        prepareContent(roster.getShifts());
+
+        content = new HashMap<Users, ArrayList<Rplan>>();
+        contracts = new HashMap<Users, UserContracts>();
+        stats = new HashMap<Homes, ArrayList<Dailystats>>();
+
+
         rosterParameters = RostersTools.getParameters(roster);
+        prepareContent(roster.getShifts());
 
         ROW_FOOTER = getColumnCount() - ROW_FOOTER_WIDTH;
         COL_FOOTER = COL_HEADER + getRowCount();
@@ -71,26 +79,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         return "Column " + (column + 1);
 
     }
-
-//    public int[] getMinimumWidths() {
-//        int[] mins = new int[getColumnCount()];
-//
-//        for (int i = 0; i < getColumnCount(); i++) {
-//            mins[i] = 35;
-//        }
-//
-//        return mins;
-//    }
-//
-//    public int[] getMaximumWidths() {
-//        int[] mins = new int[getColumnCount()];
-//
-//        for (int i = 0; i < getColumnCount(); i++) {
-//            mins[i] = 70;
-//        }
-//
-//        return mins;
-//    }
 
     @Override
     public Class<?> getCellClassAt(int rowIndex, int columnIndex) {
@@ -133,7 +121,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
     @Override
     public CellStyle getCellStyleAt(int rowIndex, int columnIndex) {
-        CellStyle myStyle = cellStyle;
+
+        CellStyle myStyle = new CellStyle();
         myStyle.setHorizontalAlignment(SwingConstants.CENTER);
 
         Color[] colors = null;
@@ -145,13 +134,21 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             //myStyle.setBackground(SYSConst.yellow1[6 + (rowIndex % 4)]);
         }
 
+        // basedata
         if (columnIndex >= ROW_HEADER && columnIndex < getColumnCount() - ROW_FOOTER_WIDTH) {
+            Users user = rosterParameters.getUserlist().get(rowIndex / 4);
+            Rplan myRplan = content.get(user).get(getBaseCol(columnIndex));
+
             if (getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SUNDAY || getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SATURDAY) {
                 colors = SYSConst.red1;
             }
 
             if (OPDE.isHoliday(getDay(columnIndex))) {
                 colors = SYSConst.red2;
+            }
+
+            if (rowIndex % 4 != 3) {
+                myStyle.setForeground(myRplan.getHome().getColor());
             }
 
         }
@@ -175,15 +172,15 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
         boolean noBorders = columnIndex >= ROW_HEADER && columnIndex < getColumnCount() - ROW_FOOTER_WIDTH;
         boolean symbolEditable = false;
-        boolean preferredHomes = columnIndex == 0 && rowIndex % 4 == 2;;
+        boolean preferredHomes = columnIndex == 0 && rowIndex % 4 == 2;
         boolean selectUser = columnIndex == 0 && rowIndex % 4 == 0;
 
         if (noBorders) {
-            RPlan rPlan = content.get(listUsers.get(rowIndex / 4)).get(getBaseCol(columnIndex));
+            Rplan rplan = content.get(rosterParameters.getUserlist().get(rowIndex / 4)).get(getBaseCol(columnIndex));
 
-            boolean p3 = !rPlan.getP2().isEmpty();
-            boolean p2 = rPlan.getP3().isEmpty() && !rPlan.getP1().isEmpty();
-            boolean p1 = (rPlan.getP2().isEmpty() && !rPlan.getP1().isEmpty()) || rPlan.getP1().isEmpty();
+            boolean p3 = !rplan.getP2().isEmpty();
+            boolean p2 = rplan.getP3().isEmpty() && !rplan.getP1().isEmpty();
+            boolean p1 = (rplan.getP2().isEmpty() && !rplan.getP1().isEmpty()) || rplan.getP1().isEmpty();
 
             if (rowIndex % 4 == 0) {
                 symbolEditable = p1;
@@ -202,28 +199,48 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         return new Pair(new Point(ROW_HEADER, COL_HEADER), new Point(COL_FOOTER, ROW_FOOTER));
     }
 
-    private void prepareContent(java.util.List<RPlan> input) {
-        for (RPlan rplan : input) {
+    private void prepareContent(java.util.List<Rplan> input) {
+
+        for (Homes home : HomesTools.getAll()) {
+            stats.put(home, new ArrayList<Dailystats>());
+            for (int i = 0; i < month.dayOfMonth().withMaximumValue().getDayOfMonth(); i++) {
+                stats.get(home).add(new Dailystats());
+            }
+        }
+
+        for (Rplan rplan : input) {
 
             if (!content.containsKey(rplan.getOwner())) {
-                content.put(rplan.getOwner(), new ArrayList<RPlan>());
+                content.put(rplan.getOwner(), new ArrayList<Rplan>());
                 for (int i = 0; i < month.dayOfMonth().withMaximumValue().getDayOfMonth(); i++) {
                     content.get(rplan.getOwner()).add(null);
                 }
-                listUsers.add(rplan.getOwner());
+                if (!rosterParameters.getUserlist().contains(rplan.getOwner())) {
+                    rosterParameters.getUserlist().add(rplan.getOwner());
+                    rosterParameters.getPreferredHome().put(rplan.getOwner(), defaultHome);
+                }
 
                 contracts.put(rplan.getOwner(), UsersTools.getContracts(rplan.getOwner()));
+
             }
 
             DateTime start = new DateTime(rplan.getStart());
             content.get(rplan.getOwner()).add(start.getDayOfMonth() - 1, rplan);
+
+            Symbol symbol = rosterParameters.getSymbol(rplan.getEffectiveP());
+            stats.get(rplan.getHome()).get(start.getDayOfMonth() - 1).add(symbol.shift1, contracts.get(rplan.getOwner()).getParameterSet(month).isExam(), symbol.getStatval1());
+
+
+            grmpf;
+            // hier gehts weiter. Jetzt musst Du noch die Fußzeilen machen
+
         }
-        Collections.sort(listUsers, new Comparator<Users>() {
-            @Override
-            public int compare(Users o1, Users o2) {
-                return o1.getFullname().compareToIgnoreCase(o2.getFullname());
-            }
-        });
+//        Collections.sort(listUsers, new Comparator<Users>() {
+//            @Override
+//            public int compare(Users o1, Users o2) {
+//                return o1.getFullname().compareToIgnoreCase(o2.getFullname());
+//            }
+//        });
     }
 
     @Override
@@ -233,14 +250,12 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
     public void cleanup() {
         content.clear();
-        listUsers.clear();
-        preferredHome.clear();
         contracts.clear();
     }
 
     @Override
     public int getRowCount() {
-        return listUsers.size() * 4;
+        return rosterParameters.getUserlist().size() * 4;
     }
 
     @Override
@@ -258,11 +273,11 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        Users user = listUsers.get(rowIndex / 4);
+        Users user = rosterParameters.getUserlist().get(rowIndex / 4);
         boolean selectUser = columnIndex == 0 && rowIndex % 4 == 0;
 
         if (aValue instanceof Homes) {
-            preferredHome.put(user, (Homes) aValue);
+            rosterParameters.getPreferredHome().put(user, (Homes) aValue);
             fireTableCellUpdated(rowIndex, columnIndex);
         } else if (selectUser) {
 
@@ -282,45 +297,45 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 Rosters myRoster = em.merge(roster);
                 em.lock(myRoster, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-                RPlan myRPlan = em.merge(content.get(user).get(getBaseCol(columnIndex)));
-                em.lock(myRPlan, LockModeType.OPTIMISTIC);
+                Rplan myRplan = em.merge(content.get(user).get(getBaseCol(columnIndex)));
+                em.lock(myRplan, LockModeType.OPTIMISTIC);
 
                 if (newSymbol.isEmpty()) {
                     if (rowIndex % 4 == 0) {
                         symbol = null;
-                        em.remove(myRPlan);
+                        em.remove(myRplan);
                     } else if (rowIndex % 4 == 1) {
-                        myRPlan.setP2(null);
-                        symbol = rosterParameters.getSymbol(myRPlan.getP1());
+                        myRplan.setP2(null);
+                        symbol = rosterParameters.getSymbol(myRplan.getP1());
                     } else if (rowIndex % 4 == 2) {
-                        myRPlan.setP3(null);
-                        symbol = rosterParameters.getSymbol(myRPlan.getP2());
+                        myRplan.setP3(null);
+                        symbol = rosterParameters.getSymbol(myRplan.getP2());
                     }
                 } else {
                     if (rowIndex % 4 == 0) {
-                        myRPlan.setP1(newSymbol);
+                        myRplan.setP1(newSymbol);
                     } else if (rowIndex % 4 == 1) {
-                        myRPlan.setP2(newSymbol);
+                        myRplan.setP2(newSymbol);
                     } else if (rowIndex % 4 == 2) {
-                        myRPlan.setP3(newSymbol);
+                        myRplan.setP3(newSymbol);
                     }
                 }
 
                 if (symbol != null) {
-                    myRPlan.setBasehours(symbol.getBaseHours());
-                    myRPlan.setExtrahours(symbol.getExtraHours(getDay(columnIndex), contracts.get(user).getParameterSet(getDay(columnIndex))));
-                    myRPlan.setBreaktime(symbol.getBreak());
-                    myRPlan.setStart(symbol.getStart(getDay(columnIndex)).toDate());
-                    myRPlan.setOwner(em.merge(user));
+                    myRplan.setBasehours(symbol.getBaseHours());
+                    myRplan.setExtrahours(symbol.getExtraHours(getDay(columnIndex), contracts.get(user).getParameterSet(getDay(columnIndex))));
+                    myRplan.setBreaktime(symbol.getBreak());
+                    myRplan.setStart(symbol.getStart(getDay(columnIndex)).toDate());
+                    myRplan.setOwner(em.merge(user));
                     DateTime end = symbol.getEnd(getDay(columnIndex));
-                    myRPlan.setEnd(end == null ? null : end.toDate());
+                    myRplan.setEnd(end == null ? null : end.toDate());
                 }
 
                 em.getTransaction().commit();
 
                 content.get(user).remove(getBaseCol(columnIndex));
-                if (em.contains(myRPlan)) {
-                    content.get(user).add(getBaseCol(columnIndex), myRPlan);
+                if (em.contains(myRplan)) {
+                    content.get(user).add(getBaseCol(columnIndex), myRplan);
                 }
                 roster = myRoster;
 
@@ -349,26 +364,15 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         Object value = "--";
-        Users user = listUsers.get(rowIndex / 4);
+        Users user = rosterParameters.getUserlist().get(rowIndex / 4);
         if (getBaseCol(columnIndex) == -2) {  // Usernames
             if (rowIndex % 4 == 0) {
                 value = user.getName();
             } else if (rowIndex % 4 == 1) {
                 value = user.getVorname();
             } else if (rowIndex % 4 == 2) {
-                if (!preferredHome.containsKey(user)) {
-                    Homes myHome = StationTools.getStationForThisHost().getHome();
-                    String homeid = SYSTools.catchNull(rosterParameters.getPreferredHomeID(user.getUID()));
-                    if (!homeid.isEmpty()) {
-                        EntityManager em = OPDE.createEM();
-                        myHome = em.find(Homes.class, homeid);
-                        em.close();
-                    }
-                    preferredHome.put(user, myHome);
-                }
 
-                return preferredHome.get(user);
-
+                return rosterParameters.getPreferredHome().get(user).getShortname();
 
             } else {
 
@@ -420,9 +424,49 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         return value;
     }
 
-    public String getUpdatedParametersAsXML(){
-        rosterParameters.setUserlist(listUsers, preferredHome);
-        return rosterParameters.toXML();
+    public RosterParameters getRosterParameters() {
+        return rosterParameters;
+    }
+
+
+    private class Dailystats {
+        BigDecimal exam_early, exam_late, exam_night, social_early, social_late, social_night, helper_early, helper_late, helper_night;
+
+        private Dailystats() {
+            this.exam_early = BigDecimal.ZERO;
+            this.exam_late = BigDecimal.ZERO;
+            this.exam_night = BigDecimal.ZERO;
+            this.social_early = BigDecimal.ZERO;
+            this.social_late = BigDecimal.ZERO;
+            this.social_night = BigDecimal.ZERO;
+            this.helper_early = BigDecimal.ZERO;
+            this.helper_late = BigDecimal.ZERO;
+            this.helper_night = BigDecimal.ZERO;
+        }
+
+        private void add(int shift, boolean exam, BigDecimal val) {
+            if (shift == Symbol.SHIFT_NONE) return;
+
+            if (shift == Symbol.SHIFT_EARLY) {
+                if (exam) {
+                    exam_early.add(val);
+                } else {
+                    helper_early.add(val);
+                }
+            } else if (shift == Symbol.SHIFT_LATE) {
+                if (exam) {
+                    exam_late.add(val);
+                } else {
+                    helper_late.add(val);
+                }
+            } else {
+                if (exam) {
+                    exam_night.add(val);
+                } else {
+                    helper_night.add(val);
+                }
+            }
+        }
     }
 
 }

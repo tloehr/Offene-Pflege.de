@@ -39,7 +39,7 @@ public class WorkAccountTools {
 
         try {
             String jpql = " SELECT SUM(wa.value) " +
-                    " FROM WorkAccount wa " +
+                    " FROM Workaccount wa " +
                     " WHERE wa.owner = :owner AND wa.date <= :day AND wa.type IN ( ";
             for (int type : types) {
                 jpql += type + ",";

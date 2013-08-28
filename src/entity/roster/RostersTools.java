@@ -106,7 +106,6 @@ public class RostersTools {
     }
 
     public static RosterParameters getParameters(Rosters roster) {
-
            RosterXML rosterXML = new RosterXML();
 
            SAXParserFactory spf = SAXParserFactory.newInstance();

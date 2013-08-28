@@ -14,7 +14,7 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-public class WorkAccount {
+public class Workaccount {
     @javax.persistence.Column(name = "id", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
     @Id
     private long id;
@@ -46,7 +46,7 @@ public class WorkAccount {
     private Users creator;
     @JoinColumn(name = "workinglogid", referencedColumnName = "id")
     @ManyToOne
-    private WorkingLog workingLog;
+    private Workinglog workinglog;
 
     public long getId() {
         return id;
@@ -57,12 +57,12 @@ public class WorkAccount {
     }
 
 
-    public WorkingLog getWorkingLog() {
-        return workingLog;
+    public Workinglog getWorkinglog() {
+        return workinglog;
     }
 
-    public void setWorkingLog(WorkingLog workingLog) {
-        this.workingLog = workingLog;
+    public void setWorkinglog(Workinglog workinglog) {
+        this.workinglog = workinglog;
     }
 
     public Users getOwner() {
@@ -139,7 +139,7 @@ public class WorkAccount {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        WorkAccount that = (WorkAccount) o;
+        Workaccount that = (Workaccount) o;
 
         if (id != that.id) return false;
         if (type != that.type) return false;

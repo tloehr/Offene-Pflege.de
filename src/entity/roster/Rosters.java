@@ -1,5 +1,6 @@
 package entity.roster;
 
+import entity.system.SYSLogin;
 import entity.system.Users;
 import org.joda.time.DateMidnight;
 
@@ -42,13 +43,13 @@ public class Rosters {
      * | | |  __/ | (_| | |_| | (_) | | | \__ \
      * |_|  \___|_|\__,_|\__|_|\___/|_| |_|___/
      */
-    @JoinColumn(name = "openedby", referencedColumnName = "UKennung")
+    @JoinColumn(name = "loginid", referencedColumnName = "loginid")
     @ManyToOne
-    private Users openedBy;
+    private SYSLogin openedBy;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "roster")
-    private List<RPlan> shifts;
+    private List<Rplan> shifts;
 
-    public List<RPlan> getShifts() {
+    public List<Rplan> getShifts() {
         return shifts;
     }
 
@@ -103,21 +104,12 @@ public class Rosters {
         this.xml = xml;
     }
 
-
-    public long getVersion() {
-        return version;
-    }
-
-    public void setVersion(long version) {
-        this.version = version;
-    }
-
-    public Users getOpenedBy() {
+    public SYSLogin getOpenedBy() {
         return openedBy;
     }
 
-    public void setOpenedBy(Users owner) {
-        this.openedBy = owner;
+    public void setOpenedBy(SYSLogin openedBy) {
+        this.openedBy = openedBy;
     }
 
     @Override

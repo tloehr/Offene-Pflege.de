@@ -15,7 +15,7 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-public class WorkingLog {
+public class Workinglog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -101,7 +101,7 @@ public class WorkingLog {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        WorkingLog that = (WorkingLog) o;
+        Workinglog that = (Workinglog) o;
 
         if (id != that.id) return false;
         if (rplanid != that.rplanid) return false;

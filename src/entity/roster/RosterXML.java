@@ -6,7 +6,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 
 /**
@@ -28,7 +27,7 @@ public class RosterXML extends DefaultHandler {
     public static final String[] sections = new String[]{"care", "social", "kitchen", "cleaning", "laundry", "janitor"};
 
     RosterParameters myRoster = null;
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    //    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     Symbol symbol = null;
 
     public RosterXML() {
@@ -54,8 +53,18 @@ public class RosterXML extends DefaultHandler {
                 myRoster.setHoursperyear(Integer.parseInt(attributes.getValue("value")));
             } else if (tagName.equalsIgnoreCase("symbol")) {
                 symbol = new Symbol(attributes.getValue("key"), attributes.getValue("description"), attributes.getValue("starttime"), attributes.getValue("endtime"), Integer.parseInt(SYSTools.catchNull(attributes.getValue("break"), "0")), attributes.getValue("calc"), attributes.getValue("type"));
+
+                if (attributes.getValue("shift1") != null) {
+                    symbol.setShift1(attributes.getValue("shift1"), attributes.getValue("statvalue1"));
+                }
+
+                if (attributes.getValue("shift2") != null) {
+                    symbol.setShift2(attributes.getValue("shift2"), attributes.getValue("statvalue2"));
+                }
+
+
             } else if (tagName.equalsIgnoreCase("assign")) {
-                myRoster.addPreferredHomeID(attributes.getValue("uid"), attributes.getValue("homeid"));
+                myRoster.addPreferredHome(attributes.getValue("uid"), attributes.getValue("homeid"));
             } else if (tagName.equalsIgnoreCase("monday")) {
                 symbol.addDay(DateTimeConstants.MONDAY);
             } else if (tagName.equalsIgnoreCase("tuesday")) {

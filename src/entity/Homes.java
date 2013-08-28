@@ -120,9 +120,9 @@ public class Homes implements Serializable {
     // todo: dummy implementation only. fix this!
     public Color getColor() {
 
-        if (eid.equalsIgnoreCase("herchen")) return SYSConst.darkgreen;
+        if (eid.equalsIgnoreCase("herchen")) return Color.green.darker();
 
-        return SYSConst.blue1[2];
+        return Color.blue.darker();
 
     }
 
@@ -148,7 +148,7 @@ public class Homes implements Serializable {
 
     @Override
     public String toString() {
-        return name;
+        return shortname;
     }
 
     public List<Station> getStations() {

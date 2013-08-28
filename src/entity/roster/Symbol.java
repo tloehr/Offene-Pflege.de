@@ -2,7 +2,6 @@ package entity.roster;
 
 import op.OPDE;
 import op.tools.SYSCalendar;
-import op.tools.SYSTools;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
@@ -36,8 +35,16 @@ public class Symbol {
     public static final int SICK = 1;
     public static final int OFFDUTY = 2;
     public static final int ONLEAVE = 3;
+    public static final int SCHOOL = 3;
 
-    public static final String[] TYPE = new String[]{"work", "sick", "offduty", "onleave"};
+    public static final String[] TYPE = new String[]{"work", "sick", "offduty", "onleave", "school"};
+
+    public static final byte SHIFT_NONE = 0;
+    public static final byte SHIFT_EARLY = 1;
+    public static final byte SHIFT_LATE = 2;
+    public static final byte SHIFT_NIGHT = 3;
+
+    public static final String[] SHIFT = new String[]{"", "early", "late", "night"};
 
     public static final int HOLIDAY = 99;
 
@@ -45,12 +52,19 @@ public class Symbol {
     int calc, symboltype, minutesBreak;
     LocalTime start, end;
 
+    int shift1, shift2;
+    BigDecimal statval1, statval2;
+
     SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 
     HashSet<Integer> allowedDays;
 
     public Symbol() {
         allowedDays = new HashSet<Integer>();
+        shift1 = SHIFT_NONE;
+        shift2 = SHIFT_NONE;
+        statval1 = BigDecimal.ZERO;
+        statval2 = BigDecimal.ZERO;
     }
 
     public Symbol(String key, String description, String start, String end, int minutesBreak, String calc, String symboltype) throws Exception {
@@ -80,6 +94,33 @@ public class Symbol {
 
     }
 
+
+    public int getShift1() {
+        return shift1;
+    }
+
+    public int getShift2() {
+        return shift2;
+    }
+
+    public BigDecimal getStatval1() {
+        return statval1;
+    }
+
+    public BigDecimal getStatval2() {
+        return statval2;
+    }
+
+    public void setShift1(String s1, String sv1) {
+        this.shift1 = Arrays.asList(SHIFT).indexOf(s1);
+        this.statval1 = new BigDecimal(sv1);
+    }
+
+    public void setShift2(String s2, String sv2) {
+        this.shift2 = Arrays.asList(SHIFT).indexOf(s2);
+        this.statval2 = new BigDecimal(sv2);
+    }
+
     public HashSet<Integer> getAllowedDays() {
         return allowedDays;
     }
@@ -102,7 +143,7 @@ public class Symbol {
     }
 
     public BigDecimal getBreak() {
-        if (start == null){
+        if (start == null) {
             return BigDecimal.ZERO;
         }
         DateTime now = new DateTime();

@@ -16,7 +16,7 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-public class RPlan {
+public class Rplan {
     @Column(name = "id", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
     @Id
     private long id;
@@ -133,6 +133,17 @@ public class RPlan {
 
     public String getP3() {
         return SYSTools.catchNull(p3).toUpperCase();
+    }
+
+    public String getEffectiveP() {
+        String p = getP3();
+        if (p.isEmpty()) {
+            p = getP2();
+        }
+        if (p.isEmpty()) {
+            p = getP1();
+        }
+        return p;
     }
 
     public Date getStart() {

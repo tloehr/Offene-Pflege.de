@@ -18,15 +18,15 @@ import java.util.ArrayList;
 public class RPlanTools {
 
 
-    public static ArrayList<RPlan> get4Month(DateMidnight month) {
+    public static ArrayList<Rplan> get4Month(DateMidnight month) {
         EntityManager em = OPDE.createEM();
-        ArrayList<RPlan> list = null;
+        ArrayList<Rplan> list = null;
         DateTime from = month.toDateTime().dayOfMonth().withMinimumValue().minuteOfDay().withMinimumValue().secondOfDay().withMinimumValue();
         DateTime to = month.toDateTime().dayOfMonth().withMaximumValue().hourOfDay().withMaximumValue().secondOfDay().withMaximumValue();
 
         try {
             String jpql = " SELECT rp " +
-                    " FROM RPlan rp" +
+                    " FROM Rplan rp" +
                     " WHERE rp.start >= :from AND rp.start <= :to " +
                     " ORDER BY rp.owner.uid, rp.start ASC ";
 
@@ -34,7 +34,7 @@ public class RPlanTools {
             query.setParameter("from", from.toDate());
             query.setParameter("to", to.toDate());
 
-            list = new ArrayList<RPlan>(query.getResultList());
+            list = new ArrayList<Rplan>(query.getResultList());
         } catch (Exception se) {
             OPDE.fatal(se);
         } finally {

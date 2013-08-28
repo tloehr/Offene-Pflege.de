@@ -55,7 +55,7 @@ public class FrmRoster extends JFrame {
                 em.getTransaction().begin();
                 Rosters myRoster = em.merge(roster);
                 em.lock(myRoster, LockModeType.OPTIMISTIC);
-                myRoster.setOpenedBy(em.merge(OPDE.getLogin().getUser()));
+                myRoster.setOpenedBy(em.merge(OPDE.getLogin()));
                 em.getTransaction().commit();
                 this.roster = myRoster;
             } catch (OptimisticLockException ole) {
@@ -90,7 +90,7 @@ public class FrmRoster extends JFrame {
                 em.lock(myRoster, LockModeType.OPTIMISTIC);
                 myRoster.setOpenedBy(null);
 
-                myRoster.setXml(tmRoster.getUpdatedParametersAsXML());
+                myRoster.setXml(tmRoster.getRosterParameters().toXML());
 
                 em.getTransaction().commit();
                 this.roster = myRoster;

@@ -235,6 +235,8 @@ public class OPDE {
             EMailSystem.sendErrorMail(e.getMessage(), temp);
         }
 
+        SYSLoginTools.logout();
+
         System.exit(1);
     }
 

@@ -2,9 +2,12 @@ package entity.roster;
 
 import entity.Homes;
 import entity.system.Users;
+import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
+import javax.persistence.EntityManager;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,8 +25,8 @@ public class RosterParameters {
     private int hoursperyear;
     private int section;
     private HashMap<String, Symbol> symbolMap;
-    private HashMap<String, String> assigns;
-    private ArrayList<String> userlist;
+    private HashMap<Users, Homes> preferredHome;
+    private ArrayList<Users> userlist;
 
     public int getSection() {
         return section;
@@ -35,8 +38,8 @@ public class RosterParameters {
 
     public RosterParameters() {
         symbolMap = new HashMap<String, Symbol>();
-        assigns = new HashMap<String, String>();
-        userlist = new ArrayList<String>();
+        preferredHome = new HashMap<Users, Homes>();
+        userlist = new ArrayList<Users>();
     }
 
     public void setHoursperyear(int hoursperyear) {
@@ -55,24 +58,31 @@ public class RosterParameters {
         return hoursperyear;
     }
 
-    public String getPreferredHomeID(String uid) {
-        return assigns.get(uid.toLowerCase());
+
+    public void addPreferredHome(String uid, String homeid) {
+        EntityManager em = OPDE.createEM();
+        Homes myHome = em.find(Homes.class, homeid);
+        Users user = em.find(Users.class, uid);
+        em.close();
+        preferredHome.put(user, myHome);
+        userlist.add(user);
     }
 
-    public void addPreferredHomeID(String uid, String homeid) {
-        assigns.put(uid.toLowerCase(), homeid.toLowerCase());
+//    public void setUserlist(ArrayList<Users> ulist, HashMap<Users, Homes> preferredHome) {
+//        userlist.clear();
+//        this.preferredHome.clear();
+//        for (Users user : ulist) {
+//            userlist.add(user.getUID());
+//            this.preferredHome.put(user.getUID(), preferredHome.get(user.getUID()).getEID());
+//        }
+//    }
+
+
+    public HashMap<Users, Homes> getPreferredHome() {
+        return preferredHome;
     }
 
-    public void setUserlist(ArrayList<Users> ulist, HashMap<Users, Homes> preferredHome) {
-        userlist.clear();
-        assigns.clear();
-        for (Users user : ulist) {
-            userlist.add(user.getUID());
-            assigns.put(user.getUID(), preferredHome.get(user.getUID()).getEID());
-        }
-    }
-
-    public ArrayList<String> getUserlist() {
+    public ArrayList<Users> getUserlist() {
         return userlist;
     }
 
@@ -81,19 +91,23 @@ public class RosterParameters {
         String xml = SYSConst.xmlheader;
         xml += String.format("<roster section=\"%s\">\n", RosterXML.sections[section]);
 
-        xml += "<config>\n";
-        xml += String.format("<hourstoworkperyear value=\"%s\"/>\n", hoursperyear);
-        xml += "</config>\n";
+        xml += "    <config>\n";
+        xml += String.format("        <hourstoworkperyear value=\"%s\"/>\n", hoursperyear);
+        xml += "    </config>\n";
 
         if (!symbolMap.isEmpty()) {
-            xml += "<symbols>\n";
+            xml += "    <symbols>\n";
             for (Map.Entry<String, Symbol> entry : symbolMap.entrySet()) {
                 Symbol symbol = entry.getValue();
 
                 String closeTagEarly = symbol.getAllowedDays().isEmpty() ? "/" : "";
 
                 if (entry.getValue().getStart() != null) {
-                    xml += String.format("<symbol key=\"%s\" starttime=\"%s\" endtime=\"%s\" break=\"%s\" calc=\"%s\" type=\"%s\" description=\"%s\" " + closeTagEarly + ">\n",
+
+                    String shift1 = symbol.getShift1() == Symbol.SHIFT_NONE ? "" : String.format(" shift1=\"%s\" statvalue1=\"%s\" ", Symbol.SHIFT[symbol.getShift1()], symbol.getStatval1().setScale(2, RoundingMode.HALF_UP));
+                    String shift2 = symbol.getShift1() == Symbol.SHIFT_NONE ? "" : String.format(" shift2=\"%s\" statvalue2=\"%s\" ", Symbol.SHIFT[symbol.getShift2()], symbol.getStatval2().setScale(2, RoundingMode.HALF_UP));
+
+                    xml += String.format("        <symbol key=\"%s\" starttime=\"%s\" endtime=\"%s\" break=\"%s\" calc=\"%s\" type=\"%s\" description=\"%s\" " + shift1 + shift2 + closeTagEarly + ">\n",
                             symbol.getKey().toUpperCase(),
                             symbol.getStart().toString("HH:mm"),
                             symbol.getEnd().toString("HH:mm"),
@@ -102,7 +116,7 @@ public class RosterParameters {
                             Symbol.TYPE[symbol.getSymbolType()],
                             SYSTools.catchNull(symbol.getDescription()));
                 } else {
-                    xml += String.format("<symbol key=\"%s\" calc=\"%s\" type=\"%s\" description=\"%s\" " + closeTagEarly + ">\n", symbol.getKey().toUpperCase(),
+                    xml += String.format("        <symbol key=\"%s\" calc=\"%s\" type=\"%s\" description=\"%s\" " + closeTagEarly + ">\n",
                             symbol.getKey().toUpperCase(),
                             Symbol.CALC[symbol.getCalc()],
                             Symbol.TYPE[symbol.getSymbolType()],
@@ -111,20 +125,20 @@ public class RosterParameters {
 
                 if (closeTagEarly.isEmpty()) {
                     for (int day : symbol.getAllowedDays().toArray(new Integer[]{})) {
-                        xml += String.format("<%s/>\n", getWeekdayName(day));
+                        xml += String.format("            <%s/>\n", getWeekdayName(day));
                     }
-                    xml += "</symbol>";
+                    xml += "        </symbol>\n";
                 }
             }
-            xml += "</symbols>\n";
+            xml += "    </symbols>\n";
         }
 
         if (!userlist.isEmpty()) {
-            xml += "<users>\n";
-            for (String uid : userlist) {
-                xml += String.format("<assign uid=\"%s\" homeid=\"%s\"/>\n", uid, assigns.get(uid));
+            xml += "    <users>\n";
+            for (Users user : userlist) {
+                xml += String.format("        <assign uid=\"%s\" homeid=\"%s\"/>\n", user.getUID(), preferredHome.get(user).getEID());
             }
-            xml += "</users>\n";
+            xml += "    </users>\n";
         }
         xml += "</roster>\n";
         return xml;
