@@ -29,6 +29,8 @@ import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 /**
  * @author Torsten Löhr
@@ -111,7 +113,6 @@ public class FrmRoster extends JFrame {
     }
 
     private void initFrame() {
-
         ObjectConverterManager.initDefaultConverter();
         CellEditorManager.initDefaultEditor();
 
@@ -176,6 +177,16 @@ public class FrmRoster extends JFrame {
 
         CellConstraints c = new CellConstraints();
         add(tsp1, c.xy(3, 3, CellConstraints.FILL, CellConstraints.FILL));
+
+        tsp1.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent evt) {
+                super.componentResized(evt);
+                tsp1.getRowHeaderTable().getColumnModel().getColumn(0).setPreferredWidth(120);
+                tsp1.getRowHeaderTable().getColumnModel().getColumn(1).setPreferredWidth(120);
+            }
+        });
+
     }
 
     private void initComponents() {
