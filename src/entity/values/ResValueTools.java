@@ -633,6 +633,29 @@ public class ResValueTools {
         return hm;
     }
 
+    public static BigDecimal getEgestion(Resident resident, DateMidnight day) {
+        // First BD is for the influx, second for the outflow
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("" +
+                " SELECT SUM(rv.val1) FROM ResValue rv " +
+                " WHERE rv.resident = :resident " +
+                " AND rv.replacedBy IS NULL " +
+                " AND rv.editedBy IS NULL " +
+                " AND rv.val1 < 0 " +
+                " AND rv.vtype.valType = :valType " +
+                " AND rv.pit >= :from " +
+                " AND rv.pit <= :to ");
+
+        query.setParameter("resident", resident);
+        query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
+        query.setParameter("from", day.toDateTime().hourOfDay().withMinimumValue().secondOfDay().withMinimumValue().toDate());
+        query.setParameter("to", day.toDateTime().hourOfDay().withMaximumValue().secondOfDay().withMaximumValue().toDate());
+        BigDecimal sum = (BigDecimal) query.getSingleResult();
+        em.close();
+
+        return sum == null ? BigDecimal.ZERO : sum;
+    }
+
     public static BigDecimal getAvgIn(Resident resident, DateMidnight month) {
         DateTime from = month.dayOfMonth().withMinimumValue().toDateTime();
         DateTime to = month.dayOfMonth().withMaximumValue().plusDays(1).toDateTime().minusSeconds(1);
