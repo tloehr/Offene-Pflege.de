@@ -1216,6 +1216,11 @@ public class SYSCalendar {
         return new Date(addTime2Date(toGC(date), toGC(time)).getTimeInMillis());
     }
 
+    public static DateTime addCurrentTime(DateMidnight date){
+        DateTime time = new DateTime();
+
+        return date.toDateTime().withTime(time.getHourOfDay(), time.getMinuteOfHour(), time.getSecondOfMinute(), time.getMillisOfSecond());
+    }
 
     public static Date addTime2Date(Date date, Date time) {
         return new Date(addTime2Date(toGC(date), toGC(time)).getTimeInMillis());

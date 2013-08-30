@@ -521,10 +521,9 @@ public class PnlValues extends NursingRecordsPanel {
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
                 if (vtype.getValType() == ResValueTypesTools.LIQUIDBALANCE) {
 //                    cpYear.setContentPane(createContentPanelByDay4(vtype, year));
-                    ArrayList<Date> listDays = ResValueTools.getDaysWithValues(resident, vtype, year);
-                    cpYear.setContentPane(createContentPanel4Year(vtype, listDays));
+                    cpYear.setContentPane(createContentPanel4Weeks(vtype, year));
                 } else {
-                    cpYear.setContentPane(createContentPanel4(vtype, year));
+                    cpYear.setContentPane(createContentPanel4Years(vtype, year));
                 }
                 synchronized (mapCollapsed) {
                     mapCollapsed.put(key, false);
@@ -544,10 +543,10 @@ public class PnlValues extends NursingRecordsPanel {
         if (!cpYear.isCollapsed()) {
             if (vtype.getValType() == ResValueTypesTools.LIQUIDBALANCE) {
 //                cpYear.setContentPane(createContentPanelByDay4(vtype, year));
-                ArrayList<Date> listDays = ResValueTools.getDaysWithValues(resident, vtype, year);
-                cpYear.setContentPane(createContentPanel4Year(vtype, listDays));
+//                ArrayList<Date> listDays = ResValueTools.getDaysWithValues(resident, vtype, year);
+                cpYear.setContentPane(createContentPanel4Weeks(vtype, year));
             } else {
-                cpYear.setContentPane(createContentPanel4(vtype, year));
+                cpYear.setContentPane(createContentPanel4Years(vtype, year));
             }
             cpYear.setOpaque(false);
         }
@@ -558,7 +557,7 @@ public class PnlValues extends NursingRecordsPanel {
         return cpYear;
     }
 
-    private JPanel createContentPanel4(final ResValueTypes vtype, final int year) {
+    private JPanel createContentPanel4Years(final ResValueTypes vtype, final int year) {
         final String key = vtype.getID() + ".xtypes." + Integer.toString(year) + ".year";
 
         java.util.List<ResValue> myValues;
@@ -815,12 +814,12 @@ public class PnlValues extends NursingRecordsPanel {
     }
 
 
-    private JPanel createContentPanel4Year(final ResValueTypes vtype, ArrayList<Date> listDays) {
+    private JPanel createContentPanel4Weeks(final ResValueTypes vtype, int year) {
         JPanel pnlWeek = new JPanel(new VerticalLayout());
-        int year = new DateMidnight(listDays.get(0)).getYear();
+//        int year = new DateMidnight(listDays.get(0)).getYear();
 
         ArrayList<Integer> weeklist = new ArrayList<Integer>();
-        for (Date day : listDays) {
+        for (Date day : ResValueTools.getDaysWithValues(resident, vtype, year)) {
             DateMidnight dm = new DateMidnight(day);
             if (!weeklist.contains(dm.getWeekOfWeekyear())) {
                 weeklist.add(dm.getWeekOfWeekyear());
@@ -830,7 +829,7 @@ public class PnlValues extends NursingRecordsPanel {
 
 
         for (int weeknum : weeklist) {
-            DateMidnight week = new DateMidnight(year, 1, 1).plusWeeks(weeknum-1);
+            final DateMidnight week = new DateMidnight(year, 1, 1).plusWeeks(weeknum - 1).dayOfWeek().withMinimumValue();
 //            week.plusWeeks(weeknum);
             final String key = vtype.getID() + ".xtypes." + week.dayOfWeek().withMinimumValue().getMillis() + ".week";
 
@@ -873,47 +872,24 @@ public class PnlValues extends NursingRecordsPanel {
             cpType.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
                 @Override
                 public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-//                    cpType.setContentPane(createContentPanel4(vtype, day));
+                    cpType.setContentPane(createContentPanel4Days(vtype, week));
                 }
             });
 
             if (!cpType.isCollapsed()) {
-//                cpType.setContentPane(createContentPanel4(vtype, day));
+                cpType.setContentPane(createContentPanel4Days(vtype, week));
             }
 
-//            cpType.setContentPane(pnlWeek);
             pnlWeek.add(cpType);
         }
 
         return pnlWeek;
     }
 
-//    private JPanel createContentPanel4Week(final ResValueTypes vtype, final DateMidnight week, ArrayList<Date> listDays) {
-//        final String key = vtype.getID() + ".xtypes." + week.dayOfWeek().withMinimumValue().getMillis() + ".week";
-//        JPanel pnlWeek = new JPanel(new VerticalLayout());
-//
-//
-//        boolean addThisWeekToo = false;
-//        for (Date day : listDays) {
-//            if (new DateMidnight(day).getDayOfWeek() == week.getDayOfWeek()) {
-//                addThisWeekToo = true;
-//                break;
-//            }
-//        }
-//
-//
-//        Format weekFormater = new SimpleDateFormat("w yyyy");
-//        if (addThisWeekToo) {
-//
-//        }
-//
-//        return pnlWeek;
-//    }
+
+    private JPanel createContentPanel4Days(final ResValueTypes vtype, final DateMidnight weekstart) {
 
 
-    private JPanel createContentPanelByDay4(final ResValueTypes vtype, final int year) {
-
-        ArrayList<Date> listDays = ResValueTools.getDaysWithValues(resident, vtype, year);
         JPanel pnlYear = new JPanel(new VerticalLayout());
 
 //        DateTime from = new DateMidnight(year, 1, 1).dayOfYear().withMinimumValue().toDateTime();
@@ -922,29 +898,30 @@ public class PnlValues extends NursingRecordsPanel {
 //        synchronized (balances) {
 //            balances.putAll(ResValueTools.getLiquidBalancePerDay(resident, from.toDateMidnight(), to.toDateMidnight()));
 //        }
-        for (final Date d : listDays) {
 
-            final DateMidnight day = new DateMidnight(d);
+        DateMidnight weekend = weekstart.dayOfWeek().withMaximumValue();
+
+        for (DateMidnight day = weekend; day.compareTo(weekstart) >= 0; day = day.minusDays(1)) {
+
             final CollapsiblePane cpType;
-            final String key = vtype.getID() + ".xtypes." + d.getTime() + ".day";
+            final String keyDay = vtype.getID() + ".xtypes." + day.getMillis() + ".day";
 
             boolean containsAlready = false;
             synchronized (cpMap) {
-                containsAlready = cpMap.containsKey(key);
+                containsAlready = cpMap.containsKey(keyDay);
             }
 
             if (!containsAlready) {
-
                 synchronized (cpMap) {
-                    if (!cpMap.containsKey(key)) {
-                        cpMap.put(key, new CollapsiblePane());
+                    if (!cpMap.containsKey(keyDay)) {
+                        cpMap.put(keyDay, new CollapsiblePane());
                         try {
-                            cpMap.get(key).setCollapsed(true);
+                            cpMap.get(keyDay).setCollapsed(true);
                         } catch (PropertyVetoException e) {
                             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                         }
                     }
-                    cpType = cpMap.get(key);
+                    cpType = cpMap.get(keyDay);
                 }
 
                 String title;
@@ -953,7 +930,7 @@ public class PnlValues extends NursingRecordsPanel {
 
 //                ResValueTools.getLiquidBalancePerDay(resident, from.toDateMidnight(), to.toDateMidnight());
                 title = "<html><font size=+1>" +
-                        DateFormat.getDateInstance().format(d) + " " + OPDE.lang.getString("misc.msg.ingestion") + ": " + BigDecimal.ZERO + " " + vtype.getUnit1() + "  " + OPDE.lang.getString("misc.msg.egestion") + ": " + egestion + " " + vtype.getUnit1() +
+                        DateFormat.getDateInstance().format(day.toDate()) + " " + OPDE.lang.getString("misc.msg.ingestion") + ": " + BigDecimal.ZERO + " " + vtype.getUnit1() + "  " + OPDE.lang.getString("misc.msg.egestion") + ": " + egestion + " " + vtype.getUnit1() +
                         "</font></html>";
 
 
@@ -969,6 +946,8 @@ public class PnlValues extends NursingRecordsPanel {
                 });
                 cpType.setTitleLabelComponent(cptitle.getMain());
                 cpType.setSlidingDirection(SwingConstants.SOUTH);
+
+                final DateTime time = SYSCalendar.addCurrentTime(day);
 
                 if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
                     /***
@@ -990,7 +969,7 @@ public class PnlValues extends NursingRecordsPanel {
                         @Override
                         public void actionPerformed(ActionEvent actionEvent) {
 
-                            new DlgValue(new ResValue(resident, vtype, SYSCalendar.addTime2Date(d, new Date())), false, new Closure() {
+                            new DlgValue(new ResValue(resident, vtype, time.toDate()), false, new Closure() {
                                 @Override
                                 public void execute(Object o) {
                                     if (o != null) {
@@ -1005,8 +984,9 @@ public class PnlValues extends NursingRecordsPanel {
                                             DateTime dt = new DateTime(myValue.getPit());
 
                                             final String keyType = vtype.getID() + ".xtypes";
-                                            final String keyDay = vtype.getID() + ".xtypes." + dt.toDateMidnight().getMillis() + ".day";
+//                                            final String keyDay = vtype.getID() + ".xtypes." + dt.toDateMidnight().getMillis() + ".day";
                                             final String keyYear = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
+                                            final String keyWeek = vtype.getID() + ".xtypes." + weekstart.getMillis() + ".week";
 
 
                                             try {
@@ -1016,6 +996,9 @@ public class PnlValues extends NursingRecordsPanel {
                                                     }
                                                     if (cpMap.get(keyYear).isCollapsed()) {
                                                         cpMap.get(keyYear).setCollapsed(false);
+                                                    }
+                                                    if (cpMap.get(keyWeek).isCollapsed()) {
+                                                        cpMap.get(keyWeek).setCollapsed(false);
                                                     }
                                                     if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE && cpMap.get(keyDay).isCollapsed()) {
                                                         cpMap.get(keyDay).setCollapsed(false);
@@ -1084,10 +1067,11 @@ public class PnlValues extends NursingRecordsPanel {
                     btnAdd.setEnabled(resident.isActive());
                 }
 
+                final DateMidnight thisday = day;
                 cpType.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
                     @Override
                     public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                        cpType.setContentPane(createContentPanel4(vtype, day));
+                        cpType.setContentPane(createContentPanel4(vtype, thisday));
                     }
                 });
 
@@ -1100,7 +1084,7 @@ public class PnlValues extends NursingRecordsPanel {
 
                 pnlYear.add(cpType);
             } else {
-                pnlYear.add(cpMap.get(key));
+                pnlYear.add(cpMap.get(keyDay));
             }
         }
 

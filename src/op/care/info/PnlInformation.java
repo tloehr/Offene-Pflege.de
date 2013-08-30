@@ -85,8 +85,6 @@ public class PnlInformation extends NursingRecordsPanel {
     }
 
     public void initPanel() {
-//        typeAbsence = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_ABSENCE);
-//        typeStartOfStay = ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY);
         cpsAll = new CollapsiblePanes();
         jspMain.setViewportView(cpsAll);
         mapCat2Type = Collections.synchronizedMap(new HashMap<ResInfoCategory, ArrayList<ResInfoType>>());
