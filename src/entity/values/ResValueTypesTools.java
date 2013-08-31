@@ -4,6 +4,7 @@ import op.OPDE;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.awt.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,4 +33,6 @@ public class ResValueTypesTools {
         ResValueTypes result = (ResValueTypes) query.getSingleResult();
         return result;
     }
+
+
 }

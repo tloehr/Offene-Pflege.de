@@ -1,6 +1,9 @@
 package entity.values;
 
+import op.tools.GUITools;
+
 import javax.persistence.*;
+import java.awt.*;
 import java.math.BigDecimal;
 
 /**
@@ -13,6 +16,66 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "resvaluetypes")
 public class ResValueTypes {
+    public Color getColor() {
+           String color = "black";
+           switch (valType) {
+               case ResValueTypesTools.STOOL: {
+                   color = "006600";
+                   break;
+               }
+               case ResValueTypesTools.LIQUIDBALANCE: {
+                   color = "00cccc";
+                   break;
+               }
+               case ResValueTypesTools.GLUCOSE: {
+                   color = "3399ff";
+                   break;
+               }
+               case ResValueTypesTools.HEIGHT: {
+                   color = "ff00ff";
+                   break;
+               }
+               case ResValueTypesTools.VOMIT: {
+                   color = "ffcc00";
+                   break;
+               }
+               case ResValueTypesTools.QUICK: {
+                   color = "9900ff";
+                   break;
+               }
+               case ResValueTypesTools.RR: {
+                   color = "ff99cc";
+                   break;
+               }
+               case ResValueTypesTools.PULSE: {
+                   color = "EEEEFF";
+                   break;
+               }
+               case ResValueTypesTools.TEMP: {
+                   color = "00ff66";
+                   break;
+               }
+               case ResValueTypesTools.BREATHING: {
+                   color = "cccc00";
+                   break;
+               }
+               case ResValueTypesTools.WEIGHT: {
+                   color = "cc99ff";
+                   break;
+               }
+               default: {
+                   color = "white";
+                   break;
+               }
+           }
+
+           return GUITools.getColor(color);
+       }
+
+
+
+
+
     private long id;
 
     @Column(name = "ID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
