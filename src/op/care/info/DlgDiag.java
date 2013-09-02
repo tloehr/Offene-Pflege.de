@@ -117,7 +117,6 @@ public class DlgDiag extends MyJDialog {
         cmbKH.setRenderer(HospitalTools.getKHRenderer());
         cmbKH.setSelectedIndex(0);
 
-
         cmbSicherheit.setModel(new DefaultComboBoxModel(new String[]{
                 OPDE.lang.getString("misc.msg.diag.security.na"),
                 OPDE.lang.getString("misc.msg.diag.security.confirmed"),
@@ -125,6 +124,7 @@ public class DlgDiag extends MyJDialog {
                 OPDE.lang.getString("misc.msg.diag.security.rulingout"),
                 OPDE.lang.getString("misc.msg.diag.security.conditionafter")
         }));
+        cmbSicherheit.setSelectedIndex(1);
 
         cmbKoerper.setModel(new DefaultComboBoxModel(new String[]{
                 OPDE.lang.getString("misc.msg.diag.side.na"),

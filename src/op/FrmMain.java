@@ -565,6 +565,7 @@ public class FrmMain extends JFrame {
         panesApps = new CollapsiblePanes();
         panesApps.setLayout(new JideBoxLayout(panesApps, JideBoxLayout.Y_AXIS));
 
+
         homeButton = GUITools.createHyperlinkButton(OPDE.lang.getString(PnlWelcome.internalClassID), SYSConst.icon22home, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -598,6 +599,10 @@ public class FrmMain extends JFrame {
         }
 
         panesApps.addExpansion();
+        int width = panesApps.getPreferredSize().width;
+
+        jspApps = new JScrollPane(panesApps);
+        panesApps.setPreferredSize(new Dimension(width + 16, panesApps.getPreferredSize().height));
         jspApps = new JScrollPane(panesApps);
 
         splitPaneLeft.setOrientation(JideSplitPane.VERTICAL_SPLIT);
