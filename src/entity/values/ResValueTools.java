@@ -405,7 +405,7 @@ public class ResValueTools {
             DecimalFormat dcf2 = new DecimalFormat(rv.getType().getFormat2());
             DecimalFormat dcf3 = new DecimalFormat(rv.getType().getFormat3());
             result += "<b>" + dcf1.format(rv.getVal1()) + "/" + dcf2.format(rv.getVal2()) + " " + rv.getType().getUnit1() + " " + rv.getType().getLabel3() + ": " + dcf3.format(rv.getVal3()) + " " + rv.getType().getUnit3() + "</b>";
-        } else if (rv.getType().getValType() == ResValueTypesTools.STOOL || rv.getType().getValType() == ResValueTypesTools.VOMIT) {
+        } else if (rv.getType().getValType() == ResValueTypesTools.STOOL || rv.getType().getValType() == ResValueTypesTools.VOMIT || rv.getType().getValType() == ResValueTypesTools.ASPIRATION) {
             result += "<i>" + SYSTools.catchNull(rv.getText(), "--") + "</i>";
         } else {
             DecimalFormat dcf = new DecimalFormat(rv.getType().getFormat1());
@@ -635,27 +635,27 @@ public class ResValueTools {
 
 
     public static BigDecimal getIngestion(Resident resident, DateMidnight day) {
-            // First BD is for the influx, second for the outflow
-            EntityManager em = OPDE.createEM();
-            Query query = em.createQuery("" +
-                    " SELECT SUM(rv.val1) FROM ResValue rv " +
-                    " WHERE rv.resident = :resident " +
-                    " AND rv.replacedBy IS NULL " +
-                    " AND rv.editedBy IS NULL " +
-                    " AND rv.val1 > 0 " +
-                    " AND rv.vtype.valType = :valType " +
-                    " AND rv.pit >= :from " +
-                    " AND rv.pit <= :to ");
+        // First BD is for the influx, second for the outflow
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("" +
+                " SELECT SUM(rv.val1) FROM ResValue rv " +
+                " WHERE rv.resident = :resident " +
+                " AND rv.replacedBy IS NULL " +
+                " AND rv.editedBy IS NULL " +
+                " AND rv.val1 > 0 " +
+                " AND rv.vtype.valType = :valType " +
+                " AND rv.pit >= :from " +
+                " AND rv.pit <= :to ");
 
-            query.setParameter("resident", resident);
-            query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
-            query.setParameter("from", day.toDateTime().hourOfDay().withMinimumValue().secondOfDay().withMinimumValue().toDate());
-            query.setParameter("to", day.toDateTime().hourOfDay().withMaximumValue().secondOfDay().withMaximumValue().toDate());
-            BigDecimal sum = (BigDecimal) query.getSingleResult();
-            em.close();
+        query.setParameter("resident", resident);
+        query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
+        query.setParameter("from", day.toDateTime().hourOfDay().withMinimumValue().secondOfDay().withMinimumValue().toDate());
+        query.setParameter("to", day.toDateTime().hourOfDay().withMaximumValue().secondOfDay().withMaximumValue().toDate());
+        BigDecimal sum = (BigDecimal) query.getSingleResult();
+        em.close();
 
-            return sum == null ? BigDecimal.ZERO : sum;
-        }
+        return sum == null ? BigDecimal.ZERO : sum;
+    }
 
     public static BigDecimal getEgestion(Resident resident, DateMidnight day) {
         // First BD is for the influx, second for the outflow

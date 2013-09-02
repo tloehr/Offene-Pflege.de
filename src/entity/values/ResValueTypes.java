@@ -16,70 +16,52 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "resvaluetypes")
 public class ResValueTypes {
-    public Color getColor() {
-           String color = "black";
-           switch (valType) {
-               case ResValueTypesTools.STOOL: {
-                   color = "006600";
-                   break;
-               }
-               case ResValueTypesTools.LIQUIDBALANCE: {
-                   color = "00cccc";
-                   break;
-               }
-               case ResValueTypesTools.GLUCOSE: {
-                   color = "3399ff";
-                   break;
-               }
-               case ResValueTypesTools.HEIGHT: {
-                   color = "ff00ff";
-                   break;
-               }
-               case ResValueTypesTools.VOMIT: {
-                   color = "ffcc00";
-                   break;
-               }
-               case ResValueTypesTools.QUICK: {
-                   color = "9900ff";
-                   break;
-               }
-               case ResValueTypesTools.RR: {
-                   color = "ff99cc";
-                   break;
-               }
-               case ResValueTypesTools.PULSE: {
-                   color = "EEEEFF";
-                   break;
-               }
-               case ResValueTypesTools.TEMP: {
-                   color = "00ff66";
-                   break;
-               }
-               case ResValueTypesTools.BREATHING: {
-                   color = "cccc00";
-                   break;
-               }
-               case ResValueTypesTools.WEIGHT: {
-                   color = "cc99ff";
-                   break;
-               }
-               default: {
-                   color = "white";
-                   break;
-               }
-           }
-
-           return GUITools.getColor(color);
-       }
-
-
-
-
-
-    private long id;
-
     @Column(name = "ID", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
     @Id
+    private long id;
+    @Column(name = "Text", nullable = false, insertable = true, updatable = true, length = 100, precision = 0)
+    @Basic
+    private String text;
+    @Column(name = "ValType", nullable = false, insertable = true, updatable = true, length = 5, precision = 0)
+    @Basic
+    private short valType;
+    @Column(name = "Label1", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
+    @Basic
+    private String label1;
+    @Column(name = "Label3", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
+    @Basic
+    private String label3;
+    @Column(name = "Label2", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
+    @Basic
+    private String label2;
+    @Column(name = "Unit1", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
+    @Basic
+    private String unit1;
+    @Column(name = "Unit2", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
+    @Basic
+    private String unit2;
+    @Column(name = "Unit3", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
+    @Basic
+    private String unit3;
+    @Column(name = "Default1", nullable = true, insertable = true, updatable = true, length = 9, precision = 2)
+    @Basic
+    private BigDecimal default1;
+    @Column(name = "Default2", nullable = true, insertable = true, updatable = true, length = 9, precision = 2)
+    @Basic
+    private BigDecimal default2;
+    @Column(name = "Default3", nullable = true, insertable = true, updatable = true, length = 9, precision = 2)
+    @Basic
+    private BigDecimal default3;
+    @Column(name = "format1", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
+    @Basic
+    private String format1;
+    @Column(name = "format2", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
+    @Basic
+    private String format2;
+    @Column(name = "format3", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
+    @Basic
+    private String format3;
+
     public long getID() {
         return id;
     }
@@ -88,10 +70,7 @@ public class ResValueTypes {
         this.id = id;
     }
 
-    private String text;
 
-    @Column(name = "Text", nullable = false, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getText() {
         return text;
     }
@@ -100,10 +79,7 @@ public class ResValueTypes {
         this.text = text;
     }
 
-    private short valType;
 
-    @Column(name = "ValType", nullable = false, insertable = true, updatable = true, length = 5, precision = 0)
-    @Basic
     public short getValType() {
         return valType;
     }
@@ -152,22 +128,17 @@ public class ResValueTypes {
         return result;
     }
 
-    private String label1;
 
-    @Column(name = "Label1", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getLabel1() {
         return label1;
     }
+
 
     public void setLabel1(String label1) {
         this.label1 = label1;
     }
 
-    private String label2;
 
-    @Column(name = "Label2", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getLabel2() {
         return label2;
     }
@@ -176,10 +147,7 @@ public class ResValueTypes {
         this.label2 = label2;
     }
 
-    private String label3;
 
-    @Column(name = "Label3", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getLabel3() {
         return label3;
     }
@@ -188,10 +156,7 @@ public class ResValueTypes {
         this.label3 = label3;
     }
 
-    private String unit1;
 
-    @Column(name = "Unit1", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getUnit1() {
         return unit1;
     }
@@ -200,10 +165,7 @@ public class ResValueTypes {
         this.unit1 = unit1;
     }
 
-    private String unit2;
 
-    @Column(name = "Unit2", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getUnit2() {
         return unit2;
     }
@@ -212,10 +174,7 @@ public class ResValueTypes {
         this.unit2 = unit2;
     }
 
-    private String unit3;
 
-    @Column(name = "Unit3", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getUnit3() {
         return unit3;
     }
@@ -224,10 +183,7 @@ public class ResValueTypes {
         this.unit3 = unit3;
     }
 
-    private BigDecimal default1;
 
-    @Column(name = "Default1", nullable = true, insertable = true, updatable = true, length = 9, precision = 2)
-    @Basic
     public BigDecimal getDefault1() {
         return default1;
     }
@@ -236,10 +192,7 @@ public class ResValueTypes {
         this.default1 = default1;
     }
 
-    private BigDecimal default2;
 
-    @Column(name = "Default2", nullable = true, insertable = true, updatable = true, length = 9, precision = 2)
-    @Basic
     public BigDecimal getDefault2() {
         return default2;
     }
@@ -248,10 +201,7 @@ public class ResValueTypes {
         this.default2 = default2;
     }
 
-    private BigDecimal default3;
 
-    @Column(name = "Default3", nullable = true, insertable = true, updatable = true, length = 9, precision = 2)
-    @Basic
     public BigDecimal getDefault3() {
         return default3;
     }
@@ -261,10 +211,6 @@ public class ResValueTypes {
     }
 
 
-    private String format1;
-
-    @Column(name = "format1", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getFormat1() {
         return format1;
     }
@@ -273,10 +219,7 @@ public class ResValueTypes {
         this.format1 = format1;
     }
 
-    private String format2;
 
-    @Column(name = "format2", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getFormat2() {
         return format2;
     }
@@ -286,10 +229,6 @@ public class ResValueTypes {
     }
 
 
-    private String format3;
-
-    @Column(name = "format3", nullable = true, insertable = true, updatable = true, length = 100, precision = 0)
-    @Basic
     public String getFormat3() {
         return format3;
     }
@@ -298,5 +237,68 @@ public class ResValueTypes {
         this.format3 = format3;
     }
 
+    public Color getColor() {
+        String color = "black";
+        switch (valType) {
+            case ResValueTypesTools.STOOL: {
+                color = "006600";
+                break;
+            }
+            case ResValueTypesTools.LIQUIDBALANCE: {
+                color = "00cccc";
+                break;
+            }
+            case ResValueTypesTools.GLUCOSE: {
+                color = "3399ff";
+                break;
+            }
+            case ResValueTypesTools.HEIGHT: {
+                color = "ff00ff";
+                break;
+            }
+            case ResValueTypesTools.VOMIT: {
+                color = "ffcc00";
+                break;
+            }
+            case ResValueTypesTools.QUICK: {
+                color = "9900ff";
+                break;
+            }
+            case ResValueTypesTools.RR: {
+                color = "ff99cc";
+                break;
+            }
+            case ResValueTypesTools.PULSE: {
+                color = "ff0000";
+                break;
+            }
+            case ResValueTypesTools.TEMP: {
+                color = "00ff66";
+                break;
+            }
+            case ResValueTypesTools.BREATHING: {
+                color = "cccc00";
+                break;
+            }
+            case ResValueTypesTools.WEIGHT: {
+                color = "cc99ff";
+                break;
+            }
+            case ResValueTypesTools.O2SATURATION: {
+                color = "GRAY";
+                break;
+            }
+            case ResValueTypesTools.ASPIRATION: {
+                color = "0000cc";
+                break;
+            }
+            default: {
+                color = "black";
+                break;
+            }
+        }
+
+        return GUITools.getColor(color);
+    }
 
 }

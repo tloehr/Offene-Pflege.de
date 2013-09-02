@@ -25,6 +25,8 @@ public class ResValueTypesTools {
     public static final short STOOL = 9;
     public static final short VOMIT = 10;
     public static final short LIQUIDBALANCE = 11;
+    public static final short O2SATURATION = 12;
+    public static final short ASPIRATION = 13;
 
     public static ResValueTypes getType(short type) {
         EntityManager em = OPDE.createEM();

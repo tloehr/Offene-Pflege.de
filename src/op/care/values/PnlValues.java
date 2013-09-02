@@ -87,7 +87,7 @@ public class PnlValues extends NursingRecordsPanel {
     private Map<String, ArrayList<ResValue>> mapType2Values;
     private final ResValueTypes LIQUIDBALANCE;
 
-    private Color[] color1, color2;
+//    private Color[] color1, color2;
 
     public PnlValues(Resident resident, JScrollPane jspSearch) {
         this.resident = resident;
@@ -113,8 +113,8 @@ public class PnlValues extends NursingRecordsPanel {
         lstValueTypes = Collections.synchronizedList(new ArrayList<ResValueTypes>(query.getResultList()));
         em.close();
 
-        color1 = SYSConst.blue1;
-        color2 = SYSConst.greyscale;
+//        color1 = SYSConst.blue1;
+//        color2 = SYSConst.greyscale;
 
     }
 
@@ -138,7 +138,7 @@ public class PnlValues extends NursingRecordsPanel {
         }
 
         GUITools.addAllComponents(mypanel, addCommands());
-        GUITools.addAllComponents(mypanel, addKey());
+//        GUITools.addAllComponents(mypanel, addKey());
 
         searchPane.setContentPane(mypanel);
 
@@ -152,14 +152,14 @@ public class PnlValues extends NursingRecordsPanel {
         return internalClassID;
     }
 
-    private java.util.List<Component> addKey() {
-        java.util.List<Component> list = new ArrayList<Component>();
-        list.add(new JSeparator());
-        list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.vitalparameters.keydescription1"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.vitalparameters.keydescription2"), SYSConst.icon22ledGreenOff, SwingConstants.LEADING));
-        return list;
-    }
+//    private java.util.List<Component> addKey() {
+//        java.util.List<Component> list = new ArrayList<Component>();
+//        list.add(new JSeparator());
+//        list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
+//        list.add(new JLabel(OPDE.lang.getString("nursingrecords.vitalparameters.keydescription1"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
+//        list.add(new JLabel(OPDE.lang.getString("nursingrecords.vitalparameters.keydescription2"), SYSConst.icon22ledGreenOff, SwingConstants.LEADING));
+//        return list;
+//    }
 
     private java.util.List<Component> addCommands() {
         java.util.List<Component> list = new ArrayList<Component>();
@@ -269,10 +269,6 @@ public class PnlValues extends NursingRecordsPanel {
         synchronized (cpMap) {
             cpMap.clear();
         }
-//        synchronized (balances) {
-//            balances.clear();
-//        }
-
         for (ResValueTypes vtype : lstValueTypes) {
             createCP4Type(vtype);
         }
@@ -285,11 +281,7 @@ public class PnlValues extends NursingRecordsPanel {
         final String keyType = vtype.getID() + ".xtypes";
         final CollapsiblePane cpType = getCP(keyType);
 
-        String title = "<html><font size=+1>" +
-                SYSConst.html_bold(vtype.getText()) +
-                "</font></html>";
-
-        final DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
+        final DefaultCPTitle cptitle = new DefaultCPTitle(vtype.getText(), new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -299,6 +291,10 @@ public class PnlValues extends NursingRecordsPanel {
                 }
             }
         });
+        cptitle.getButton().setFont(SYSConst.ARIAL24);
+        cptitle.getButton().setForeground(vtype.getColor());
+        cpType.setBackground(Color.white);
+
         cpType.setTitleLabelComponent(cptitle.getMain());
         cpType.setSlidingDirection(SwingConstants.SOUTH);
 
@@ -341,10 +337,12 @@ public class PnlValues extends NursingRecordsPanel {
 
                                     try {
                                         synchronized (cpMap) {
+                                            cpMap.get(keyType).setCollapsible(true);
+
                                             if (cpMap.get(keyType).isCollapsed()) {
                                                 cpMap.get(keyType).setCollapsed(false);
                                             }
-                                            if (cpMap.get(keyYear).isCollapsed()) {
+                                            if (cpMap.containsKey(keyYear) && cpMap.get(keyYear).isCollapsed()) {
                                                 cpMap.get(keyYear).setCollapsed(false);
                                             }
                                             if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
@@ -367,9 +365,7 @@ public class PnlValues extends NursingRecordsPanel {
                                     } catch (PropertyVetoException e) {
                                         e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                                     }
-//                                    synchronized (cpMap) {
-//                                                                            cpMap.remove(keyDay);
-//                                                                        }
+
                                     synchronized (mapType2Values) {
                                         if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
                                             if (!mapType2Values.get(keyDay).contains(myValue)) {
@@ -377,13 +373,16 @@ public class PnlValues extends NursingRecordsPanel {
                                                 Collections.sort(mapType2Values.get(keyDay));
                                             }
                                         } else {
+                                            if (!mapType2Values.containsKey(keyYear)){
+                                                mapType2Values.put(keyYear, new ArrayList<ResValue>());
+                                            }
                                             if (!mapType2Values.get(keyYear).contains(myValue)) {
                                                 mapType2Values.get(keyYear).add(myValue);
                                                 Collections.sort(mapType2Values.get(keyYear));
                                             }
                                         }
                                     }
-                                    cptitle.getButton().setIcon(SYSConst.icon22ledGreenOn);
+//                                    cptitle.getButton().setIcon(SYSConst.icon22ledGreenOn);
 
                                     createCP4Year(vtype, dt.getYear());
 
@@ -437,14 +436,16 @@ public class PnlValues extends NursingRecordsPanel {
         }
 
         if (!ResValueTools.getYearsWithValues(resident, vtype).isEmpty()) {
-            cptitle.getButton().setIcon(SYSConst.icon22ledGreenOn);
+//            cptitle.getButton().setIcon(SYSConst.icon22ledGreenOn);
+            cpType.setCollapsible(true);
         } else {
-            cptitle.getButton().setIcon(SYSConst.icon22ledGreenOff);
+//            cptitle.getButton().setIcon(SYSConst.icon22ledGreenOff);
+            cpType.setCollapsible(false);
         }
 
         cpType.setHorizontalAlignment(SwingConstants.LEADING);
         cpType.setOpaque(false);
-        cpType.setBackground(getColor(vtype, SYSConst.medium1));
+//        cpType.setBackground(getColor(vtype, SYSConst.medium1));
 
         return cpType;
     }
@@ -465,11 +466,11 @@ public class PnlValues extends NursingRecordsPanel {
         final CollapsiblePane cpYear = getCP(keyYears);
 
 
-        String title = "<html><font size=+1>" +
-                Integer.toString(year) +
-                "</font></html>";
+//        String title = "<html><font size=+1>" +
+//                Integer.toString(year) +
+//                "</font></html>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
+        DefaultCPTitle cptitle = new DefaultCPTitle(Integer.toString(year), new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -479,6 +480,11 @@ public class PnlValues extends NursingRecordsPanel {
                 }
             }
         });
+
+
+        cptitle.getButton().setFont(SYSConst.ARIAL18);
+        cptitle.getButton().setForeground(GUITools.blend(vtype.getColor(), Color.BLACK, 0.75f));
+        cpYear.setBackground(Color.white);
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
             final JButton btnPrintYear = new JButton(SYSConst.icon22print2);
@@ -514,7 +520,7 @@ public class PnlValues extends NursingRecordsPanel {
             }
 
         });
-        cpYear.setBackground(getColor(vtype, SYSConst.light4));
+//        cpYear.setBackground(getColor(vtype, SYSConst.light4));
 
         if (!cpYear.isCollapsed()) {
             if (vtype.getValType() == ResValueTypesTools.LIQUIDBALANCE) {
@@ -551,7 +557,6 @@ public class PnlValues extends NursingRecordsPanel {
 
         JPanel pnlYear = new JPanel(new VerticalLayout());
 
-        pnlYear.setBackground(getColor(vtype, SYSConst.light3));
         pnlYear.setOpaque(false);
 
         for (final ResValue resValue : myValues) {
@@ -565,6 +570,9 @@ public class PnlValues extends NursingRecordsPanel {
                     "</html>";
 
             final DefaultCPTitle pnlTitle = new DefaultCPTitle(title, null);
+
+            pnlTitle.getMain().setBackground(GUITools.blend(vtype.getColor(), Color.WHITE, 0.1f));
+            pnlTitle.getMain().setOpaque(true);
 
             if (resValue.isObsolete()) {
                 pnlTitle.getAdditionalIconPanel().add(new JLabel(SYSConst.icon22eraser));
@@ -792,15 +800,12 @@ public class PnlValues extends NursingRecordsPanel {
         final String keyWeeks = LIQUIDBALANCE.getID() + ".xtypes." + week.dayOfWeek().withMinimumValue().getMillis() + ".week";
         final CollapsiblePane cpWeek = getCP(keyWeeks);
 
-        String title = "<html><font size=+1><b>" +
-                DateFormat.getDateInstance(DateFormat.SHORT).format(week.dayOfWeek().withMaximumValue().toDate()) + " - " +
+        String title = DateFormat.getDateInstance(DateFormat.SHORT).format(week.dayOfWeek().withMaximumValue().toDate()) + " - " +
                 DateFormat.getDateInstance(DateFormat.SHORT).format(week.dayOfWeek().withMinimumValue().toDate()) +
                 " (" +
                 OPDE.lang.getString("misc.msg.weekinyear") +
                 week.getWeekOfWeekyear() +
-                ")" +
-                "</b>" +
-                "</font></html>";
+                ")";
 
 
         final DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
@@ -815,6 +820,10 @@ public class PnlValues extends NursingRecordsPanel {
         });
         cpWeek.setTitleLabelComponent(cptitle.getMain());
         cpWeek.setSlidingDirection(SwingConstants.SOUTH);
+
+        cptitle.getButton().setFont(SYSConst.ARIAL20);
+        cptitle.getButton().setForeground(GUITools.blend(LIQUIDBALANCE.getColor(), Color.BLACK, 0.60f));
+        cpWeek.setBackground(Color.white);
 
         cpWeek.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
@@ -876,14 +885,10 @@ public class PnlValues extends NursingRecordsPanel {
         final String keyDay = LIQUIDBALANCE.getID() + ".xtypes." + day.getMillis() + ".day";
         final CollapsiblePane cpDay = getCP(keyDay);
 
-
         BigDecimal egestion = ResValueTools.getEgestion(resident, day);
         BigDecimal ingestion = ResValueTools.getIngestion(resident, day);
 
-        String title = "<html><font size=+1>" +
-                DateFormat.getDateInstance().format(day.toDate()) + " " + OPDE.lang.getString("misc.msg.ingestion") + ": " + ingestion + " " + LIQUIDBALANCE.getUnit1() + "  " + OPDE.lang.getString("misc.msg.egestion") + ": " + egestion + " " + LIQUIDBALANCE.getUnit1() +
-                "</font></html>";
-
+        String title = DateFormat.getDateInstance().format(day.toDate()) + " " + OPDE.lang.getString("misc.msg.ingestion") + ": " + ingestion + " " + LIQUIDBALANCE.getUnit1() + "  " + OPDE.lang.getString("misc.msg.egestion") + ": " + egestion.abs() + " " + LIQUIDBALANCE.getUnit1();
 
         final DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
             @Override
@@ -897,6 +902,10 @@ public class PnlValues extends NursingRecordsPanel {
         });
         cpDay.setTitleLabelComponent(cptitle.getMain());
         cpDay.setSlidingDirection(SwingConstants.SOUTH);
+
+        cptitle.getButton().setFont(SYSConst.ARIAL18BOLD);
+        cptitle.getButton().setForeground(GUITools.blend(LIQUIDBALANCE.getColor(), Color.BLACK, 0.50f));
+        cpDay.setBackground(Color.white);
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             /***
@@ -938,6 +947,9 @@ public class PnlValues extends NursingRecordsPanel {
 
                                     try {
                                         synchronized (cpMap) {
+
+                                            cpMap.get(keyType).setCollapsible(true);
+
                                             if (cpMap.get(keyType).isCollapsed()) {
                                                 cpMap.get(keyType).setCollapsed(false);
                                             }
@@ -982,7 +994,8 @@ public class PnlValues extends NursingRecordsPanel {
                                             }
                                         }
                                     }
-                                    cptitle.getButton().setIcon(SYSConst.icon22ledGreenOn);
+//                                    cptitle.getButton().setIcon(SYSConst.icon22ledGreenOn);
+
 
                                     createCP4Year(LIQUIDBALANCE, dt.getYear());
 
@@ -1066,7 +1079,8 @@ public class PnlValues extends NursingRecordsPanel {
         }
 
         JPanel pnlDay = new JPanel(new VerticalLayout());
-        pnlDay.setBackground(getColor(LIQUIDBALANCE, SYSConst.light3));
+//        pnlDay.setBackground(getColor(LIQUIDBALANCE, SYSConst.light3));
+//        pnlDay.setBackground(GUITools.blend(LIQUIDBALANCE.getColor(), Color.WHITE, 0.1f));
         pnlDay.setOpaque(false);
 
         for (final ResValue resValue : listValues) {
@@ -1080,6 +1094,9 @@ public class PnlValues extends NursingRecordsPanel {
                     "</html>";
 
             final DefaultCPTitle pnlTitle = new DefaultCPTitle(title, null);
+
+            pnlTitle.getMain().setBackground(GUITools.blend(LIQUIDBALANCE.getColor(), Color.WHITE, 0.1f));
+            pnlTitle.getMain().setOpaque(true);
 
             if (resValue.isObsolete()) {
                 pnlTitle.getAdditionalIconPanel().add(new JLabel(SYSConst.icon22eraser));
@@ -1304,15 +1321,15 @@ public class PnlValues extends NursingRecordsPanel {
         return pnlDay;
     }
 
-    private Color getColor(ResValueTypes vtype, int level) {
-        synchronized (lstValueTypes) {
-            if (lstValueTypes.indexOf(vtype) % 2 == 0) {
-                return color1[level];
-            } else {
-                return color2[level];
-            }
-        }
-    }
+//    private Color getColor(ResValueTypes vtype, int level) {
+//        synchronized (lstValueTypes) {
+//            if (lstValueTypes.indexOf(vtype) % 2 == 0) {
+//                return color1[level];
+//            } else {
+//                return color2[level];
+//            }
+//        }
+//    }
 
     @Override
     public void cleanup() {
@@ -1326,9 +1343,6 @@ public class PnlValues extends NursingRecordsPanel {
         synchronized (cpMap) {
             cpMap.clear();
         }
-//        synchronized (balances) {
-//            balances.clear();
-//        }
         synchronized (lstValueTypes) {
             lstValueTypes.clear();
         }
@@ -1696,6 +1710,7 @@ public class PnlValues extends NursingRecordsPanel {
         synchronized (cpMap) {
             if (!cpMap.containsKey(key)) {
                 cpMap.put(key, new CollapsiblePane());
+                cpMap.get(key).setStyle(CollapsiblePane.TREE_STYLE);
                 try {
                     cpMap.get(key).setCollapsed(true);
                 } catch (PropertyVetoException e) {
