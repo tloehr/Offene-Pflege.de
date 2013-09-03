@@ -79,6 +79,7 @@ public class ResInfoTypeTools {
     public static final int TYPE_PAIN = 137;
     public static final int TYPE_FIXATION= 138;
     public static final int TYPE_LIVINGWILL= 139;
+    public static final int TYPE_AMPUTATION = 140;
 
 //    public static final String TYPE_HOSPITAL_STAY = "KH";
 

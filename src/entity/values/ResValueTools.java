@@ -3,6 +3,7 @@ package entity.values;
 
 import entity.Station;
 import entity.StationTools;
+import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.nursingprocess.DFNTools;
@@ -592,6 +593,17 @@ public class ResValueTools {
         return html.toString();
     }
 
+    public static BigDecimal getWeightCorrection(ResValue weight){
+        if (weight == null){
+            return null;
+        }
+        BigDecimal correction = ResInfoTools.getAmputationValue(weight.getResident());
+        BigDecimal bd100 = new BigDecimal(100);
+
+        return correction.equals(BigDecimal.ZERO) ? weight.getVal1() : weight.getVal1().multiply(bd100).divide(bd100.subtract(correction), 2, RoundingMode.HALF_UP);
+
+    }
+
     public static HashMap<DateMidnight, Pair<BigDecimal, BigDecimal>> getLiquidBalancePerDay(Resident resident, DateMidnight from, DateMidnight to) {
         // First BD is for the influx, second for the outflow
         EntityManager em = OPDE.createEM();
@@ -848,19 +860,19 @@ public class ResValueTools {
     }
 
 
-    public static BigDecimal getBMI(Resident resident) {
-        ResValue weight = getLast(resident, ResValueTypesTools.WEIGHT);
-
-        ResValue height = getLast(resident, ResValueTypesTools.HEIGHT);
-
-        BigDecimal bmi = null;
-
-        if (weight != null && height != null) {
-            bmi = weight.getVal1().divide(height.getVal1().pow(2), 2, BigDecimal.ROUND_HALF_UP);
-        }
-
-        return bmi;
-
-    }
+//    public static BigDecimal getBMI(Resident resident) {
+//        ResValue weight = getLast(resident, ResValueTypesTools.WEIGHT);
+//        ResValue height = getLast(resident, ResValueTypesTools.HEIGHT);
+//        BigDecimal correctedWeight = ResValueTools.getWeightCorrection(weight);
+//
+//        BigDecimal bmi = null;
+//
+//        if (weight != null && height != null) {
+//            bmi = weight.getVal1().divide(height.getVal1().pow(2), 2, BigDecimal.ROUND_HALF_UP);
+//        }
+//
+//        return bmi;
+//
+//    }
 
 }

@@ -7,7 +7,9 @@ import entity.HomesTools;
 import entity.files.SYSFilesTools;
 import entity.nursingprocess.*;
 import entity.prescription.*;
+import entity.values.ResValue;
 import entity.values.ResValueTools;
+import entity.values.ResValueTypesTools;
 import op.OPDE;
 import op.care.info.PnlBodyScheme;
 import op.system.PDF;
@@ -56,6 +58,8 @@ public class TXEssenDoc {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
     boolean mre, psych = false;
     int progress, max;
+
+    String generalComment = "";
 
     public TXEssenDoc(Resident res) {
         OPDE.getMainframe().setBlocked(true);
@@ -827,7 +831,25 @@ public class TXEssenDoc {
         content.put(TXEAF.FOOD_ORALNUTRITION, setYesNoRadiobutton(getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "oralnutrition")));
         content.put(TXEAF.FOOD_BREADUNTIS, getValue(ResInfoTypeTools.TYPE_FOOD, "breadunit"));
         content.put(TXEAF.FOOD_LIQUIDS_DAILY_ML, getValue(ResInfoTypeTools.TYPE_FOOD, "zieltrinkmenge"));
-        content.put(TXEAF.FOOD_BMI, setBD(ResValueTools.getBMI(resident)));
+
+
+        // BMI
+        ResValue weight = ResValueTools.getLast(resident, ResValueTypesTools.WEIGHT);
+        ResValue height = ResValueTools.getLast(resident, ResValueTypesTools.HEIGHT);
+        BigDecimal correctedWeight = ResValueTools.getWeightCorrection(weight);
+
+        String bmi = "--";
+
+        if (correctedWeight != null && height != null) {
+            bmi = setBD(correctedWeight.divide(height.getVal1().pow(2), 2, BigDecimal.ROUND_HALF_UP));
+            if (!correctedWeight.equals(weight.getVal1())) {
+                generalComment += "* Das Körpergewicht wurde aufgrund von Amputationen angepasst. Mess-Gewicht: " + weight.getVal1().toPlainString() +", ";
+                generalComment += "Theoretisches-Gewicht: " + correctedWeight.toPlainString() + " " + weight.getType().getUnit1() + "\n";
+                bmi += "*";
+            }
+        }
+        content.put(TXEAF.FOOD_BMI, bmi);
+
 
         content.put(TXEAF.FOOD_PARENTERAL, setCheckbox(getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "parenteral")));
         content.put(TXEAF.FOOD_DRINKSALONE, setCheckbox(getValue(ResInfoTypeTools.TYPE_FOOD, "drinksalone")));
@@ -1021,12 +1043,10 @@ public class TXEssenDoc {
     }
 
     private void createContent4Section18() {
-        content.put(TXEAF.COMMENTS_GENERAL, getValue(ResInfoTypeTools.TYPE_WARNING, "beschreibung") + (mapID2Info.containsKey(ResInfoTypeTools.TYPE_WARNING) ? SYSTools.catchNull(mapID2Info.get(ResInfoTypeTools.TYPE_WARNING).getText(), "\n", "") : ""));
+        content.put(TXEAF.COMMENTS_GENERAL, generalComment + (mapID2Info.containsKey(ResInfoTypeTools.TYPE_WARNING) ? getValue(ResInfoTypeTools.TYPE_WARNING, "beschreibung") + SYSTools.catchNull(mapID2Info.get(ResInfoTypeTools.TYPE_WARNING).getText(), "\n", "") : ""));
     }
 
     private void createContent4Section19(PdfStamper stamper) throws Exception {
-
-
         ArrayList<String> bodyParts = new ArrayList<String>(Arrays.asList(PnlBodyScheme.PARTS));
         String[] pdfbody = new String[]{TXEAF.BODY1_DESCRIPTION, TXEAF.BODY2_DESCRIPTION, TXEAF.BODY3_DESCRIPTION, TXEAF.BODY4_DESCRIPTION, TXEAF.BODY5_DESCRIPTION, TXEAF.BODY6_DESCRIPTION};
         int lineno = -1;

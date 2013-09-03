@@ -602,7 +602,7 @@ public class FrmMain extends JFrame {
         int width = panesApps.getPreferredSize().width;
 
         jspApps = new JScrollPane(panesApps);
-        panesApps.setPreferredSize(new Dimension(width + 16, panesApps.getPreferredSize().height));
+//        panesApps.setPreferredSize(new Dimension(width + 16, panesApps.getPreferredSize().height));
         jspApps = new JScrollPane(panesApps);
 
         splitPaneLeft.setOrientation(JideSplitPane.VERTICAL_SPLIT);

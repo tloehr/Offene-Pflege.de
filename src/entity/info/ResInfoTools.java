@@ -306,6 +306,30 @@ public class ResInfoTools {
         return biohazard != null;
     }
 
+    public static BigDecimal getAmputationValue(Resident resident) {
+        BigDecimal correction = BigDecimal.ZERO;
+        ResInfo amputation = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_AMPUTATION));
+
+        if (amputation != null && !amputation.isClosed()) {
+            Properties content = new Properties();
+
+            try {
+                StringReader reader = new StringReader(amputation.getProperties());
+                content.load(reader);
+                reader.close();
+            } catch (IOException ex) {
+                OPDE.fatal(ex);
+            }
+
+            for (String c : content.stringPropertyNames()) {
+                correction = correction.add(new BigDecimal(content.getProperty(c)));
+            }
+        }
+
+
+        return correction;
+    }
+
     public static boolean isEditable(ResInfo resInfo) {
         return resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS
                 && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_ABSENCE
@@ -719,11 +743,21 @@ public class ResInfoTools {
         }
 
         ResValue weight = ResValueTools.getLast(resident, ResValueTypesTools.WEIGHT);
+        BigDecimal correctedWeight = ResValueTools.getWeightCorrection(weight);
+
         result += "<tr><td valign=\"top\">Zuletzt bestimmtes Körpergewicht</td><td valign=\"top\"><b>";
         if (weight == null) {
             result += "Die/der BW wurde noch nicht gewogen.";
         } else {
-            result += weight.getVal1().toPlainString() + " " + weight.getType().getUnit1() + " (" + DateFormat.getDateInstance().format(weight.getPit()) + ")";
+
+            if (correctedWeight.equals(weight.getVal1())) {
+                result += weight.getVal1().toPlainString() + " " + weight.getType().getUnit1() + " (" + DateFormat.getDateInstance().format(weight.getPit()) + ")";
+            } else {
+                result += "Das Körpergewicht wurde aufgrund von Amputationen angepasst.<br/>";
+                result += "Mess-Gewicht: " + weight.getVal1().toPlainString() + " (" + DateFormat.getDateInstance().format(weight.getPit()) + ")<br/>";
+                result += "Theoretisches-Gewicht: " + correctedWeight.toPlainString() + " " + weight.getType().getUnit1();
+            }
+
         }
         result += "</b></td></tr>";
 
@@ -737,10 +771,10 @@ public class ResInfoTools {
         result += "</b></td></tr>";
 
         result += "<tr><td valign=\"top\">Somit letzter BMI</td><td valign=\"top\"><b>";
-        if (weight == null || height == null) {
+        if (correctedWeight == null || height == null) {
             result += "Ein BMI kann noch nicht bestimmt werden.";
         } else {
-            BigDecimal bmi = weight.getVal1().divide(height.getVal1().pow(2), 2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal bmi = correctedWeight.divide(height.getVal1().pow(2), 2, BigDecimal.ROUND_HALF_UP);
             result += bmi.toPlainString();
         }
         result += "</b></td></tr>";

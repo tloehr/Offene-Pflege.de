@@ -421,11 +421,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                                                     listAllInfos.add(newinfo);
                                                                 }
 
-//                                                                if (newinfo.getResInfoType().isAlertType()) {
-//                                                                    GUITools.setResidentDisplay(resident);
-//                                                                }
-
-                                                                reloadDisplay();
+                                                                reload();
 
                                                             } catch (OptimisticLockException ole) {
                                                                 if (em.getTransaction().isActive()) {
