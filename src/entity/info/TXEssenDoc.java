@@ -836,19 +836,32 @@ public class TXEssenDoc {
         // BMI
         ResValue weight = ResValueTools.getLast(resident, ResValueTypesTools.WEIGHT);
         ResValue height = ResValueTools.getLast(resident, ResValueTypesTools.HEIGHT);
-        BigDecimal correctedWeight = ResValueTools.getWeightCorrection(weight);
 
-        String bmi = "--";
 
-        if (correctedWeight != null && height != null) {
-            bmi = setBD(correctedWeight.divide(height.getVal1().pow(2), 2, BigDecimal.ROUND_HALF_UP));
-            if (!correctedWeight.equals(weight.getVal1())) {
-                generalComment += "* Das Körpergewicht wurde aufgrund von Amputationen angepasst. Mess-Gewicht: " + weight.getVal1().toPlainString() +", ";
-                generalComment += "Theoretisches-Gewicht: " + correctedWeight.toPlainString() + " " + weight.getType().getUnit1() + "\n";
-                bmi += "*";
+//        String bmi = "--";
+        BigDecimal bmi = null;
+        String remark = "";
+        if (weight != null && height != null) {
+            ResInfo amputation = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.TYPE_AMPUTATION);
+            BigDecimal adjustmentPercentage = ResInfoTools.getWeightAdjustmentPercentage(amputation);
+            BigDecimal theoreticalweight = weight.getVal1();
+            if (adjustmentPercentage.equals(BigDecimal.ZERO)) {
+                bmi = ResValueTools.getBMI(theoreticalweight, height.getVal1());
+            } else {
+                theoreticalweight = weight.getVal1().multiply(BigDecimal.ONE.add(adjustmentPercentage.multiply(new BigDecimal(0.01))));
+                bmi = ResValueTools.getBMI(theoreticalweight, height.getVal1());
+
+                generalComment += "*) Das Körpergewicht bei der Berechnung des BMI musste aufgrund von Amputationen angepasst werden:\n";
+                generalComment += "Mess-Gewicht: " + weight.getVal1().setScale(2, RoundingMode.HALF_UP) + " " + weight.getType().getUnit1() + " (" + DateFormat.getDateInstance().format(weight.getPit()) + "), ";
+                generalComment += "Prozentuale Anpassung: " + adjustmentPercentage.setScale(2, RoundingMode.HALF_UP) + "%, ";
+                generalComment += "Theoretisches Gewicht: " + theoreticalweight.setScale(2, RoundingMode.HALF_UP) + " " + weight.getType().getUnit1() + "\n";
+                OPDE.debug(ResInfoTools.getContentAsPlainText(amputation, true));
+                remark = "*)";
             }
+
+
         }
-        content.put(TXEAF.FOOD_BMI, bmi);
+        content.put(TXEAF.FOOD_BMI, setBD(bmi)+remark);
 
 
         content.put(TXEAF.FOOD_PARENTERAL, setCheckbox(getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "parenteral")));
@@ -1133,25 +1146,6 @@ public class TXEssenDoc {
         String sICD = "";
 
         for (ResInfo icd : listICD) {
-//            EntityManager em = OPDE.createEM();
-//
-//            GP gp = null;
-//            try {
-//                long gpid = Long.parseLong(mapInfo2Properties.get(icd).getProperty("arztid"));
-//                gp = em.find(GP.class, gpid);
-//            } catch (NumberFormatException e) {
-//                // bah!
-//            }
-//
-//            Hospital hp = null;
-//            try {
-//                long hpid = Long.parseLong(mapInfo2Properties.get(icd).getProperty("khid"));
-//                hp = em.find(Hospital.class, hpid);
-//            } catch (NumberFormatException e) {
-//                // bah!
-//            }
-//
-//            em.close();
 
             mapInfo2Properties.get(icd).getProperty("");
             sICD += mapInfo2Properties.get(icd).getProperty("icd");

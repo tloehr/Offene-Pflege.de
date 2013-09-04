@@ -3,7 +3,6 @@ package entity.values;
 
 import entity.Station;
 import entity.StationTools;
-import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.nursingprocess.DFNTools;
@@ -36,6 +35,16 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class ResValueTools {
+
+    // weight adjustment percentages for amputation
+    public static final BigDecimal FOOT = new BigDecimal(1.8);
+    public static final BigDecimal BELOW_KNEE = new BigDecimal(6);
+    public static final BigDecimal ABOVE_KNEE = new BigDecimal(15);
+    public static final BigDecimal ENTIRE_LOWER_EXTREMITY = new BigDecimal(18.5);
+    public static final BigDecimal HAND = new BigDecimal(1);
+    public static final BigDecimal BELOW_ELLBOW = new BigDecimal(3);
+    public static final BigDecimal ABOVE_ELLBOW = new BigDecimal(5);
+    public static final BigDecimal ENTIRE_UPPER_EXTREMITY = new BigDecimal(6.5);
 
 
 //    public static final String[] VALUES = new String[]{"UNKNOWN", "RR", "PULSE", "TEMP", "GLUCOSE", "WEIGHT", "HEIGHT", "BREATHING", "QUICK", "STOOL", "VOMIT", "LIQUIDBALANCE"};
@@ -593,16 +602,6 @@ public class ResValueTools {
         return html.toString();
     }
 
-    public static BigDecimal getWeightCorrection(ResValue weight){
-        if (weight == null){
-            return null;
-        }
-        BigDecimal correction = ResInfoTools.getAmputationValue(weight.getResident());
-        BigDecimal bd100 = new BigDecimal(100);
-
-        return correction.equals(BigDecimal.ZERO) ? weight.getVal1() : weight.getVal1().multiply(bd100).divide(bd100.subtract(correction), 2, RoundingMode.HALF_UP);
-
-    }
 
     public static HashMap<DateMidnight, Pair<BigDecimal, BigDecimal>> getLiquidBalancePerDay(Resident resident, DateMidnight from, DateMidnight to) {
         // First BD is for the influx, second for the outflow
@@ -859,20 +858,84 @@ public class ResValueTools {
 
     }
 
+    /**
+     * @param weight in kg
+     * @return Required liquid in ml
+     */
+    public static BigDecimal getRequiredLiquid(BigDecimal weight) {
+        if (weight == null){
+            return null;
+        }
+        BigDecimal rl = new BigDecimal(1500); // for the first 20 kg of weight
+        return rl.add(new BigDecimal(15).multiply(weight.subtract(new BigDecimal(20))));
 
-//    public static BigDecimal getBMI(Resident resident) {
-//        ResValue weight = getLast(resident, ResValueTypesTools.WEIGHT);
-//        ResValue height = getLast(resident, ResValueTypesTools.HEIGHT);
-//        BigDecimal correctedWeight = ResValueTools.getWeightCorrection(weight);
-//
-//        BigDecimal bmi = null;
-//
-//        if (weight != null && height != null) {
-//            bmi = weight.getVal1().divide(height.getVal1().pow(2), 2, BigDecimal.ROUND_HALF_UP);
-//        }
-//
-//        return bmi;
-//
-//    }
+    }
+
+    /**
+     * Harris-Benedict-Formula
+     *
+     * @param weight in kg
+     * @param height in cm
+     * @param age    in years
+     * @return Basal Metabolic Rate in kcal / 24h
+     */
+    public static BigDecimal getBasalMetabolicRate(BigDecimal weight, BigDecimal height, int age, int gender) {
+
+        BigDecimal bmr;
+
+        if (gender == ResidentTools.MALE) {
+            bmr = new BigDecimal(66.5).add(new BigDecimal(13.7).multiply(weight)).add(new BigDecimal(5).multiply(height)).subtract(new BigDecimal(6.8).multiply(new BigDecimal(age)));
+        } else {
+            bmr = new BigDecimal(655).add(new BigDecimal(9.6).multiply(weight)).add(new BigDecimal(1.8).multiply(height)).subtract(new BigDecimal(4.7).multiply(new BigDecimal(age)));
+        }
+
+        return bmr;
+    }
+
+
+    /**
+     * Ideal Body Weight (Hamwi Method)
+     *
+     * @param height in cm
+     * @param gender
+     * @return
+     */
+    public static BigDecimal getIBW(BigDecimal height, int gender) {
+
+        if (height == null){
+            return null;
+        }
+
+        BigDecimal HEIGHT_BARRIER = new BigDecimal(152.4);
+        BigDecimal WEIGHT_PER_CM = gender == ResidentTools.MALE ? new BigDecimal(1.1) : new BigDecimal(0.9);
+        BigDecimal BASE_WEIGHT = gender == ResidentTools.MALE ? new BigDecimal(48) : new BigDecimal(45);
+
+        BigDecimal heightAboveBarrier = height.subtract(HEIGHT_BARRIER);
+        if (heightAboveBarrier.compareTo(BigDecimal.ZERO) < 0) {
+            heightAboveBarrier = BigDecimal.ZERO;
+        }
+
+
+        return BASE_WEIGHT.add(heightAboveBarrier.multiply(WEIGHT_PER_CM));
+
+    }
+
+    /**
+     * Body Mass Index
+     *
+     * @param weight in kg
+     * @param height in meter
+     * @return
+     */
+    public static BigDecimal getBMI(BigDecimal weight, BigDecimal height) {
+        BigDecimal bmi = null;
+
+        if (weight != null && height != null) {
+            bmi = weight.divide(height.pow(2), 2, BigDecimal.ROUND_HALF_UP);
+        }
+
+        return bmi;
+
+    }
 
 }

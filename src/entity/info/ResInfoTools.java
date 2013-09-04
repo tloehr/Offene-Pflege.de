@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -306,29 +307,6 @@ public class ResInfoTools {
         return biohazard != null;
     }
 
-    public static BigDecimal getAmputationValue(Resident resident) {
-        BigDecimal correction = BigDecimal.ZERO;
-        ResInfo amputation = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_AMPUTATION));
-
-        if (amputation != null && !amputation.isClosed()) {
-            Properties content = new Properties();
-
-            try {
-                StringReader reader = new StringReader(amputation.getProperties());
-                content.load(reader);
-                reader.close();
-            } catch (IOException ex) {
-                OPDE.fatal(ex);
-            }
-
-            for (String c : content.stringPropertyNames()) {
-                correction = correction.add(new BigDecimal(content.getProperty(c)));
-            }
-        }
-
-
-        return correction;
-    }
 
     public static boolean isEditable(ResInfo resInfo) {
         return resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS
@@ -743,19 +721,22 @@ public class ResInfoTools {
         }
 
         ResValue weight = ResValueTools.getLast(resident, ResValueTypesTools.WEIGHT);
-        BigDecimal correctedWeight = ResValueTools.getWeightCorrection(weight);
-
+        BigDecimal theoreticalweight = weight.getVal1();
         result += "<tr><td valign=\"top\">Zuletzt bestimmtes Körpergewicht</td><td valign=\"top\"><b>";
         if (weight == null) {
             result += "Die/der BW wurde noch nicht gewogen.";
         } else {
+            ResInfo amputation = getLastResinfo(resident, ResInfoTypeTools.TYPE_AMPUTATION);
+            BigDecimal adjustmentPercentage = getWeightAdjustmentPercentage(amputation);
 
-            if (correctedWeight.equals(weight.getVal1())) {
+            if (adjustmentPercentage.equals(BigDecimal.ZERO)) {
                 result += weight.getVal1().toPlainString() + " " + weight.getType().getUnit1() + " (" + DateFormat.getDateInstance().format(weight.getPit()) + ")";
             } else {
-                result += "Das Körpergewicht wurde aufgrund von Amputationen angepasst.<br/>";
-                result += "Mess-Gewicht: " + weight.getVal1().toPlainString() + " (" + DateFormat.getDateInstance().format(weight.getPit()) + ")<br/>";
-                result += "Theoretisches-Gewicht: " + correctedWeight.toPlainString() + " " + weight.getType().getUnit1();
+                result += "Das Körpergewicht muss aufgrund von Amputationen angepasst werden.<br/>";
+                result += "Mess-Gewicht: " + weight.getVal1().setScale(2, RoundingMode.HALF_UP) + " " + weight.getType().getUnit1() + " (" + DateFormat.getDateInstance().format(weight.getPit()) + ")<br/>";
+                result += "Prozentuale Anpassung: " + adjustmentPercentage.setScale(2, RoundingMode.HALF_UP) + "&#37;<br/>";
+                theoreticalweight = weight.getVal1().multiply(BigDecimal.ONE.add(adjustmentPercentage.multiply(new BigDecimal(0.01))));
+                result += "Theoretisches Gewicht: " + theoreticalweight.setScale(2, RoundingMode.HALF_UP) + " " + weight.getType().getUnit1() + "<br/>";
             }
 
         }
@@ -770,13 +751,54 @@ public class ResInfoTools {
         }
         result += "</b></td></tr>";
 
-        result += "<tr><td valign=\"top\">Somit letzter BMI</td><td valign=\"top\"><b>";
-        if (correctedWeight == null || height == null) {
-            result += "Ein BMI kann noch nicht bestimmt werden.";
+        result += "<tr><td valign=\"top\">Ernährungsdaten</td><td valign=\"top\"><b>";
+
+        ResInfo food = getLastResinfo(resident, ResInfoTypeTools.TYPE_FOOD);
+
+
+        BigDecimal bmi = ResValueTools.getBMI(theoreticalweight, height.getVal1()); // body mass index
+        BigDecimal ubw = getUBW(food); // usual body weight
+        BigDecimal ibw = ResValueTools.getIBW(height.getVal1().multiply(new BigDecimal(100)), resident.getGender()); // ideal body weight
+        BigDecimal bmr = ResValueTools.getBasalMetabolicRate(theoreticalweight, height.getVal1().multiply(new BigDecimal(100)), ResidentTools.getAge(resident).getYears(), resident.getGender()); // base metabolic rate
+        BigDecimal rl = ResValueTools.getRequiredLiquid(theoreticalweight); // required amount of liquid
+        BigDecimal tla = getTargetLiquidAmount(food); // usual body weight
+
+        if (bmi == null) {
+            result += "Ein BMI kann noch nicht bestimmt werden.<br/>";
         } else {
-            BigDecimal bmi = correctedWeight.divide(height.getVal1().pow(2), 2, BigDecimal.ROUND_HALF_UP);
-            result += bmi.toPlainString();
+            result += "BMI: " + bmi.setScale(2, RoundingMode.HALF_UP) + "<br/>";
         }
+
+        if (ubw == null) {
+            result += "Das übliche Gewicht ist bisher unbekannt.<br/>";
+        } else {
+            result += "Übliches Gewicht: " + ubw.setScale(2, RoundingMode.HALF_UP) + " " + weight.getType().getUnit1() + "<br/>";
+        }
+
+        if (ibw == null) {
+            result += "Das Idealgewicht konnte noch nicht bestimmt werden.<br/>";
+        } else {
+            result += "Idealgewicht: " + ibw.setScale(2, RoundingMode.HALF_UP) + " " + weight.getType().getUnit1() + "<br/>";
+        }
+
+        if (bmr == null) {
+            result += "Der Grundumsatz konnte noch nicht berechnet werden.<br/>";
+        } else {
+            result += "Grundumsatz: " + bmr.setScale(2, RoundingMode.HALF_UP) + " kcal/24h<br/>";
+        }
+
+        if (rl == null) {
+            result += "Der Flüssigkeitsbedarf konnte noch nicht berechnet werden.<br/>";
+        } else {
+            result += "Flüssigkeitsbedarf: " + rl.setScale(2, RoundingMode.HALF_UP) + " ml/24h<br/>";
+        }
+
+        if (tla == null) {
+            result += "Das Zieltrinkmenge ist bisher unbekannt.<br/>";
+        } else {
+            result += "Zieltrinkmenge: " + tla.setScale(2, RoundingMode.HALF_UP) + " ml/24h<br/>";
+        }
+
         result += "</b></td></tr>";
 
         ResValue bz = ResValueTools.getLast(resident, ResValueTypesTools.GLUCOSE);
@@ -795,8 +817,7 @@ public class ResInfoTools {
             result += "</td></tr>";
         }
 
-        // TODO: "PSTF" ersetzen
-        ResInfo bwinfo_pstf = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByID("PSTF"));
+        ResInfo bwinfo_pstf = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.TYPE_NURSING_INSURANCE);
         if (bwinfo_pstf != null) {
             result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.ps") + "</td><td valign=\"top\">";
             result += bwinfo_pstf.getHtml();
@@ -1450,6 +1471,84 @@ public class ResInfoTools {
             result += SYSConst.html_paragraph(SYSConst.html_bold(OPDE.lang.getString("misc.msg.comment")) + ":<br/>" + resInfo.getText().trim());
         }
         return result;
+    }
+
+    public static BigDecimal getWeightAdjustmentPercentage(ResInfo amputation) {
+        BigDecimal adjustment = BigDecimal.ZERO;
+
+        if (amputation != null) {
+            Properties content = getContent(amputation);
+
+            for (String key : new String[]{"upperleft", "upperright"}) {
+                if (content.containsKey(key)) {
+                    String prop = content.getProperty(key);
+                    if (prop.equalsIgnoreCase("hand")) {
+                        adjustment = adjustment.add(ResValueTools.HAND);
+                    } else if (prop.equalsIgnoreCase("belowellbow")) {
+                        adjustment = adjustment.add(ResValueTools.BELOW_ELLBOW);
+                    } else if (prop.equalsIgnoreCase("aboveellbow")) {
+                        adjustment = adjustment.add(ResValueTools.ABOVE_ELLBOW);
+                    } else if (prop.equalsIgnoreCase("complete")) {
+                        adjustment = adjustment.add(ResValueTools.ENTIRE_UPPER_EXTREMITY);
+                    }
+                }
+            }
+
+            for (String key : new String[]{"lowerleft", "lowerright"}) {
+                if (content.containsKey(key)) {
+                    String prop = content.getProperty(key);
+                    if (prop.equalsIgnoreCase("foot")) {
+                        adjustment = adjustment.add(ResValueTools.FOOT);
+                    } else if (prop.equalsIgnoreCase("belowknee")) {
+                        adjustment = adjustment.add(ResValueTools.BELOW_KNEE);
+                    } else if (prop.equalsIgnoreCase("aboveknee")) {
+                        adjustment = adjustment.add(ResValueTools.ABOVE_KNEE);
+                    } else if (prop.equalsIgnoreCase("complete")) {
+                        adjustment = adjustment.add(ResValueTools.ENTIRE_LOWER_EXTREMITY);
+                    }
+                }
+            }
+        }
+
+        return adjustment;
+    }
+
+    public static BigDecimal getUBW(ResInfo food) {
+
+        BigDecimal ubw = null;
+
+        if (food != null && food.getResInfoType().getType() == ResInfoTypeTools.TYPE_FOOD) {
+            Properties content = getContent(food);
+            if (content.containsKey("ubw")) {
+                ubw = new BigDecimal(content.getProperty("ubw"));
+            }
+        }
+
+        return ubw;
+
+    }
+
+    /**
+     * @param food
+     * @return
+     */
+    public static BigDecimal getTargetLiquidAmount(ResInfo food) {
+
+        BigDecimal tla = null;
+
+        if (food != null && food.getResInfoType().getType() == ResInfoTypeTools.TYPE_FOOD) {
+            Properties content = getContent(food);
+            if (content.containsKey("zieltrinkmenge")) {
+                try {
+                    tla = new BigDecimal(content.getProperty("zieltrinkmenge"));
+                } catch (NumberFormatException nfe) {
+                    tla = null;
+                }
+            }
+        }
+
+        return tla;
+
     }
 
 }
