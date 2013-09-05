@@ -150,7 +150,7 @@ public class PDF {
 
             @Override
             public void onCloseDocument(PdfWriter writer, Document document) {
-                ColumnText.showTextAligned(totalPages, Element.ALIGN_LEFT, new Phrase(String.valueOf(writer.getPageNumber() - 1), plain(16)), 2, 2, 0);
+                ColumnText.showTextAligned(totalPages, Element.ALIGN_LEFT, new Phrase(String.valueOf(writer.getPageNumber() - 1), plain(12)), 2, 8, 0);
             }
         });
         document.open();

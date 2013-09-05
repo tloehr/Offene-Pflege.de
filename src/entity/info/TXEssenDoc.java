@@ -17,7 +17,7 @@ import op.threads.DisplayMessage;
 import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -855,7 +855,8 @@ public class TXEssenDoc {
                 generalComment += "Mess-Gewicht: " + weight.getVal1().setScale(2, RoundingMode.HALF_UP) + " " + weight.getType().getUnit1() + " (" + DateFormat.getDateInstance().format(weight.getPit()) + "), ";
                 generalComment += "Prozentuale Anpassung: " + adjustmentPercentage.setScale(2, RoundingMode.HALF_UP) + "%, ";
                 generalComment += "Theoretisches Gewicht: " + theoreticalweight.setScale(2, RoundingMode.HALF_UP) + " " + weight.getType().getUnit1() + "\n";
-                OPDE.debug(ResInfoTools.getContentAsPlainText(amputation, true));
+                generalComment += "Amputation: " + ResInfoTools.getAmputationAsCompactText(amputation);
+
                 remark = "*)";
             }
 

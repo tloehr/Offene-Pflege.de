@@ -23,6 +23,7 @@ import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -238,7 +239,7 @@ public class PrescriptionTools {
                         if (stock.getExpires() != null) {
                             DateFormat sdf = df;
                             // if expiry is at the end of a month then it has a different format
-                            if (new DateMidnight(stock.getExpires()).equals(new DateMidnight(stock.getExpires()).dayOfMonth().withMaximumValue())) {
+                            if (new LocalDate(stock.getExpires()).equals(new LocalDate(stock.getExpires()).dayOfMonth().withMaximumValue())) {
                                 sdf = new SimpleDateFormat("MM/yy");
                             }
                             col1.add(Chunk.NEWLINE);

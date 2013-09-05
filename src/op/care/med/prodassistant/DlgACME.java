@@ -4,6 +4,7 @@
 
 package op.care.med.prodassistant;
 
+import javax.swing.border.*;
 import com.jgoodies.forms.factories.Borders;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
@@ -102,7 +103,7 @@ public class DlgACME extends JPanel {
 
         //======== dialogPane ========
         {
-            dialogPane.setBorder(Borders.DIALOG_BORDER);
+            dialogPane.setBorder(Borders.DIALOG);
             dialogPane.setLayout(new BorderLayout());
 
             //======== contentPanel ========

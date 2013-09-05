@@ -733,6 +733,7 @@ public class ResInfoTools {
                 result += weight.getVal1().toPlainString() + " " + weight.getType().getUnit1() + " (" + DateFormat.getDateInstance().format(weight.getPit()) + ")";
             } else {
                 result += "Das Körpergewicht muss aufgrund von Amputationen angepasst werden.<br/>";
+                result += OPDE.lang.getString("misc.msg.amputation") + ": " + getAmputationAsCompactText(amputation) + "<br/>";
                 result += "Mess-Gewicht: " + weight.getVal1().setScale(2, RoundingMode.HALF_UP) + " " + weight.getType().getUnit1() + " (" + DateFormat.getDateInstance().format(weight.getPit()) + ")<br/>";
                 result += "Prozentuale Anpassung: " + adjustmentPercentage.setScale(2, RoundingMode.HALF_UP) + "&#37;<br/>";
                 theoreticalweight = weight.getVal1().multiply(BigDecimal.ONE.add(adjustmentPercentage.multiply(new BigDecimal(0.01))));
@@ -784,7 +785,8 @@ public class ResInfoTools {
         if (bmr == null) {
             result += "Der Grundumsatz konnte noch nicht berechnet werden.<br/>";
         } else {
-            result += "Grundumsatz: " + bmr.setScale(2, RoundingMode.HALF_UP) + " kcal/24h<br/>";
+            result += "Grundumsatz: " + bmr.setScale(2, RoundingMode.HALF_UP) + " kcal/24h <br/>";
+            result += "tatsächlicher Umsatz: "+bmr.multiply(new BigDecimal(1.2)).setScale(2, RoundingMode.HALF_UP)+" kcal/24h (wenn Bettlägerig)  "+bmr.multiply(new BigDecimal(1.3)).setScale(2, RoundingMode.HALF_UP)+" kcal/24h (wenn normal mobilisiert)<br/>";
         }
 
         if (rl == null) {
@@ -1548,6 +1550,52 @@ public class ResInfoTools {
         }
 
         return tla;
+
+    }
+
+
+    public static String getAmputationAsCompactText(ResInfo amputation) {
+        String result = "";
+        if (amputation != null) {
+            Properties content = getContent(amputation);
+            for (String key : new String[]{"upperleft", "upperright"}) {
+                if (content.containsKey(key)) {
+                    String prop = content.getProperty(key);
+                    if (prop.equalsIgnoreCase("hand")) {
+                        result += OPDE.lang.getString("amputation.hand");
+                    } else if (prop.equalsIgnoreCase("belowellbow")) {
+                        result += OPDE.lang.getString("amputation.belowellbow");
+                    } else if (prop.equalsIgnoreCase("aboveellbow")) {
+                        result += OPDE.lang.getString("amputation.aboveellbow");
+                    } else if (prop.equalsIgnoreCase("complete")) {
+                        result += OPDE.lang.getString("amputation.complete.arm");
+                    }
+                    if (!prop.equalsIgnoreCase("none")) {
+                        result += ", " + (key.equals("upperleft") ? OPDE.lang.getString("misc.msg.left") : OPDE.lang.getString("misc.msg.right")) + "; ";
+                    }
+                }
+
+            }
+
+            for (String key : new String[]{"lowerleft", "lowerright"}) {
+                if (content.containsKey(key)) {
+                    String prop = content.getProperty(key);
+                    if (prop.equalsIgnoreCase("foot")) {
+                        result += OPDE.lang.getString("amputation.foot");
+                    } else if (prop.equalsIgnoreCase("belowknee")) {
+                        result += OPDE.lang.getString("amputation.belowknee");
+                    } else if (prop.equalsIgnoreCase("aboveknee")) {
+                        result += OPDE.lang.getString("amputation.aboveknee");
+                    } else if (prop.equalsIgnoreCase("complete")) {
+                        result += OPDE.lang.getString("amputation.complete.leg");
+                    }
+                    if (!prop.equalsIgnoreCase("none")) {
+                        result += ", " + (key.equals("lowerleft") ? OPDE.lang.getString("misc.msg.left") : OPDE.lang.getString("misc.msg.right")) + "; ";
+                    }
+                }
+            }
+        }
+        return result.isEmpty() ? "" : result.substring(0, result.length() - 2);
 
     }
 

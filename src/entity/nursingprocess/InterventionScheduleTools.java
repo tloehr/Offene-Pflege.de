@@ -206,14 +206,20 @@ public class InterventionScheduleTools {
         }
 
         if (currentState == ZEIT) {
-            result += (schedule.getNachtMo() > 0 ? OPDE.lang.getString("misc.msg.earlyinthemorning.medium") : "") +
-                    (schedule.getMorgens() > 0 ? OPDE.lang.getString("misc.msg.morning.medium") : "") +
-                    (schedule.getMittags() > 0 ? OPDE.lang.getString("misc.msg.noon.medium") : "") +
-                    (schedule.getNachmittags() > 0 ? OPDE.lang.getString("misc.msg.afternoon.medium") : "") +
-                    (schedule.getAbends() > 0 ? OPDE.lang.getString("misc.msg.evening.medium") : "") +
-                    (schedule.getNachtAb() > 0 ? OPDE.lang.getString("misc.msg.lateatnight.medium") : "");
+            result += (schedule.getNachtMo() > 0 ? OPDE.lang.getString("misc.msg.earlyinthemorning.medium") + ", " : "") +
+                    (schedule.getMorgens() > 0 ? OPDE.lang.getString("misc.msg.morning.medium") + ", " : "") +
+                    (schedule.getMittags() > 0 ? OPDE.lang.getString("misc.msg.noon.medium") : "") + ", " +
+                    (schedule.getNachmittags() > 0 ? OPDE.lang.getString("misc.msg.afternoon.medium") + ", " : "") +
+                    (schedule.getAbends() > 0 ? OPDE.lang.getString("misc.msg.evening.medium") + ", " : "") +
+                    (schedule.getNachtAb() > 0 ? OPDE.lang.getString("misc.msg.lateatnight.medium") + ", " : "");
 
-            result += (schedule.getTaeglich() != 1 ? getRepeatPattern(schedule) : "");
+            if (schedule.getTaeglich() != 1){
+                result += getRepeatPattern(schedule);
+            } else {
+                result = result.substring(0, result.length()-2);
+            }
+
+//            result += (schedule.getTaeglich() != 1 ? getRepeatPattern(schedule) : "");
         } else if (currentState == UHRZEIT) {
 
             DateTime dt = new DateTime(schedule.getUhrzeit());

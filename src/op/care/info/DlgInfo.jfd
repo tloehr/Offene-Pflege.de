@@ -145,7 +145,11 @@
           </object> 
           <void method="setProperty"> 
            <string>border</string> 
-           <object class="com.jgoodies.forms.factories.Borders" field="BUTTON_BAR_GAP_BORDER"/> 
+           <object class="javax.swing.border.LineBorder"> 
+            <object class="java.awt.Color" field="black"/> 
+            <int>1</int> 
+            <boolean>false</boolean> 
+           </object> 
           </void> 
           <void property="name"> 
            <string>buttonBar</string> 

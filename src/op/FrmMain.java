@@ -599,11 +599,28 @@ public class FrmMain extends JFrame {
         }
 
         panesApps.addExpansion();
-        int width = panesApps.getPreferredSize().width;
+        jspApps = new myAppsScrollPane(panesApps);
 
-        jspApps = new JScrollPane(panesApps);
-//        panesApps.setPreferredSize(new Dimension(width + 16, panesApps.getPreferredSize().height));
-        jspApps = new JScrollPane(panesApps);
+
+//        final int width = panesApps.getPreferredSize().width + 16;
+//        panesApps.addComponentListener(new ComponentAdapter() {
+//            @Override
+//            public void componentResized(ComponentEvent e) {
+//                SwingUtilities.invokeLater(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        panesApps.setPreferredSize(new Dimension(width, panesApps.getPreferredSize().height));
+//                        jspApps.revalidate();
+//                    }
+//                });
+//
+//
+//
+////                super.componentResized(e);    //To change body of overridden methods use File | Settings | File Templates.
+////                panesApps.setPreferredSize(new Dimension(width, panesApps.getPreferredSize().height));
+//
+//            }
+//        });
 
         splitPaneLeft.setOrientation(JideSplitPane.VERTICAL_SPLIT);
         splitPaneLeft.add(jspApps);
@@ -887,6 +904,27 @@ public class FrmMain extends JFrame {
         cleanup();
         SYSTools.checkForSoftwareupdates();
 
+    }
+
+    /**
+     * this class is only used for resident names that are so long, that the icons are not visible anymore.
+     * it simply tells Swing, that this particular scroll pane is 16 pixels wider than it really is.
+     * dirty trick, but works.
+     */
+    private class myAppsScrollPane extends JScrollPane {
+
+
+        private myAppsScrollPane(Component view) {
+            super(view);
+        }
+
+
+        @Override
+        public Dimension getPreferredSize() {
+
+            Dimension dim = super.getPreferredSize();
+            return new Dimension(dim.width + 16, dim.height);
+        }
     }
 
 
