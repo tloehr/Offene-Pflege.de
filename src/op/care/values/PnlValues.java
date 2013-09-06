@@ -621,11 +621,8 @@ public class PnlValues extends NursingRecordsPanel {
                             @Override
                             public void execute(Object o) {
                                 EntityManager em = OPDE.createEM();
-                                ResValue myValue = em.merge(resValue);
-                                em.refresh(myValue);
+                                final ResValue myValue = em.find(ResValue.class, resValue.getID());
                                 em.close();
-
-//                                DateTime dt = new DateTime(myValue.getPit());
 
                                 synchronized (mapType2Values) {
                                     mapType2Values.get(keyYears).remove(resValue);
@@ -1145,7 +1142,7 @@ public class PnlValues extends NursingRecordsPanel {
                             @Override
                             public void execute(Object o) {
                                 EntityManager em = OPDE.createEM();
-                                ResValue myValue = em.merge(resValue);
+                                final ResValue myValue = em.find(ResValue.class, resValue.getID());
                                 em.refresh(myValue);
                                 em.close();
 
@@ -1576,8 +1573,7 @@ public class PnlValues extends NursingRecordsPanel {
                         @Override
                         public void execute(Object o) {
                             EntityManager em = OPDE.createEM();
-                            ResValue myValue = em.merge(resValue);
-                            em.refresh(myValue);
+                            final ResValue myValue = em.find(ResValue.class, resValue.getID());
                             em.close();
 
                             DateTime dt = new DateTime(myValue.getPit());

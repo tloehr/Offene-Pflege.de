@@ -945,8 +945,6 @@ public class PnlReport extends NursingRecordsPanel {
                                     @Override
                                     public void execute(Object o) {
                                         EntityManager em = OPDE.createEM();
-//                                        final NReport myReport = em.merge(nreport);
-//                                        em.refresh(myReport);
                                         final NReport myReport = em.find(NReport.class, nreport.getID());
                                         em.close();
 
@@ -1600,7 +1598,6 @@ public class PnlReport extends NursingRecordsPanel {
                         public void execute(Object o) {
                             EntityManager em = OPDE.createEM();
                             final NReport myReport = em.find(NReport.class, nreport.getID());
-//                            em.refresh(myReport);
                             em.close();
 
                             final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());

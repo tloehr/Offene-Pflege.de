@@ -670,8 +670,7 @@ public class PnlInformation extends NursingRecordsPanel {
                         @Override
                         public void execute(Object o) {
                             EntityManager em = OPDE.createEM();
-                            final ResInfo editinfo = em.merge(resInfo);
-                            em.refresh(editinfo);
+                            final ResInfo editinfo = em.find(ResInfo.class, resInfo.getID());
                             em.close();
 
                             // refresh data

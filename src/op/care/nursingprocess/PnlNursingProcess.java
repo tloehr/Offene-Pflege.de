@@ -423,8 +423,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                             @Override
                             public void execute(Object o) {
                                 EntityManager em = OPDE.createEM();
-                                final NursingProcess myNP = em.merge(np);
-                                em.refresh(myNP);
+                                final NursingProcess myNP = em.find(NursingProcess.class, np.getID());
                                 em.close();
                                 // Refresh Display
                                 valuecache.get(np.getCategory()).remove(np);
@@ -1353,8 +1352,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                         @Override
                         public void execute(Object o) {
                             EntityManager em = OPDE.createEM();
-                            final NursingProcess myNP = em.merge(np);
-                            em.refresh(myNP);
+                            final NursingProcess myNP = em.find(NursingProcess.class, np.getID());
                             em.close();
                             // Refresh Display
                             valuecache.get(np.getCategory()).remove(np);

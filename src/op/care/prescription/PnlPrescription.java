@@ -260,8 +260,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                         @Override
                         public void execute(Object o) {
                             EntityManager em = OPDE.createEM();
-                            Prescription myPrescription = em.merge(prescription);
-                            em.refresh(myPrescription);
+                            final Prescription myPrescription = em.find(Prescription.class, prescription.getID());
                             em.close();
                             lstPrescriptions.remove(prescription);
                             lstPrescriptions.add(myPrescription);
@@ -1261,8 +1260,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                             @Override
                             public void execute(Object o) {
                                 EntityManager em = OPDE.createEM();
-                                Prescription myPrescription = em.merge(prescription);
-                                em.refresh(myPrescription);
+                                final Prescription myPrescription = em.find(Prescription.class, prescription.getID());
                                 em.close();
                                 lstPrescriptions.remove(prescription);
                                 lstPrescriptions.add(myPrescription);
