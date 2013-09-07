@@ -84,7 +84,7 @@ public class PnlUserSettings extends CleanablePanel {
             OPDE.getLogin().setUser(user);
             txtNew.setText("");
             txtOld.setText("");
-        } catch (OptimisticLockException ole) {
+        } catch (OptimisticLockException ole) { OPDE.warn(ole);
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }

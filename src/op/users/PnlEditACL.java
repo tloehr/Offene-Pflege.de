@@ -66,7 +66,7 @@ public class PnlEditACL extends JPanel {
 
                         sysgroups2ACL = mySYSGROUPS2ACL;
 
-                    } catch (OptimisticLockException ole) {
+                    } catch (OptimisticLockException ole) { OPDE.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }

@@ -144,7 +144,7 @@ public class DlgIntervention extends MyJDialog {
                 myIntervention.setActive(tbActive.isSelected());
 
                 em.getTransaction().commit();
-            } catch (OptimisticLockException ole) {
+            } catch (OptimisticLockException ole) { OPDE.warn(ole);
                 if (em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
                 }

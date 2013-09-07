@@ -207,7 +207,7 @@ public class PnlSelectIntervention extends JPanel {
                     em.getTransaction().commit();
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage(internalClassID + ".interventionedited"));
                     actionBlock.execute(null);
-                } catch (OptimisticLockException ole) {
+                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                     if (em.getTransaction().isActive()) {
                         em.getTransaction().rollback();
                     }

@@ -213,7 +213,7 @@ public class DlgUPREditor extends MyJDialog {
                                 }
                                 em.getTransaction().commit();
 
-                            } catch (OptimisticLockException ole) {
+                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }

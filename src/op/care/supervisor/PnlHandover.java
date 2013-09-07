@@ -555,7 +555,7 @@ public class PnlHandover extends NursingRecordsPanel {
                     em.getTransaction().commit();
                     createCP4Day(day);
                     buildPanel();
-                } catch (OptimisticLockException ole) {
+                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                     if (em.getTransaction().isActive()) {
                         em.getTransaction().rollback();
                     }
@@ -674,7 +674,7 @@ public class PnlHandover extends NursingRecordsPanel {
                                 createCP4Day(day);
                                 buildPanel();
 
-                            } catch (OptimisticLockException ole) {
+                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -784,7 +784,7 @@ public class PnlHandover extends NursingRecordsPanel {
                                 em.getTransaction().commit();
                                 createCP4Day(day);
                                 buildPanel();
-                            } catch (OptimisticLockException ole) {
+                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -945,7 +945,7 @@ public class PnlHandover extends NursingRecordsPanel {
 //                                            GUITools.flashBackground(linemapHO.get(myHO), Color.YELLOW, 2);
                                         }
                                     });
-                                } catch (OptimisticLockException ole) {
+                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }

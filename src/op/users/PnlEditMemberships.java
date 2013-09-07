@@ -73,7 +73,7 @@ public class PnlEditMemberships extends JPanel {
                         // so we won't get locking exceptions because of outdated version informations
                         user = myUser;
                         groupMap.put(gid, myGroup);
-                    } catch (OptimisticLockException ole) {
+                    } catch (OptimisticLockException ole) { OPDE.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }

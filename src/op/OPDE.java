@@ -195,7 +195,7 @@ public class OPDE {
 
     public static void warn(Throwable message) {
         logger.warn(message);
-        SyslogTools.warn(message.toString());
+        SyslogTools.warn(message.getMessage());
     }
 
     public static void info(Object message) {

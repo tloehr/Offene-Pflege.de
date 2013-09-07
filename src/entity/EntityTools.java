@@ -55,7 +55,7 @@ public class EntityTools {
             mergedEntity = em.merge(entity);
             em.lock(mergedEntity, LockModeType.OPTIMISTIC);
             em.getTransaction().commit();
-        } catch (OptimisticLockException ole) {
+        } catch (OptimisticLockException ole) { OPDE.warn(ole); OPDE.warn(ole);
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }

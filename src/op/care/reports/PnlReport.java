@@ -376,7 +376,7 @@ public class PnlReport extends NursingRecordsPanel {
                                             }
                                         });
                                     }
-                                } catch (OptimisticLockException ole) {
+                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1065,7 +1065,7 @@ public class PnlReport extends NursingRecordsPanel {
 
                                             buildPanel();
                                             GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-                                        } catch (OptimisticLockException ole) {
+                                        } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                             if (em.getTransaction().isActive()) {
                                                 em.getTransaction().rollback();
                                             }
@@ -1290,7 +1290,7 @@ public class PnlReport extends NursingRecordsPanel {
                                             GUITools.flashBackground(linemap.get(newReport), Color.YELLOW, 2);
                                         }
                                     });
-                                } catch (OptimisticLockException ole) {
+                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1371,7 +1371,7 @@ public class PnlReport extends NursingRecordsPanel {
                                     if (tbShowReplaced.isSelected()) {
                                         GUITools.flashBackground(linemap.get(delReport), Color.YELLOW, 2);
                                     }
-                                } catch (OptimisticLockException ole) {
+                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1453,7 +1453,7 @@ public class PnlReport extends NursingRecordsPanel {
 
                                 buildPanel();
                                 GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-                            } catch (OptimisticLockException ole) {
+                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -1551,7 +1551,7 @@ public class PnlReport extends NursingRecordsPanel {
 
                                 buildPanel();
                                 GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-                            } catch (OptimisticLockException ole) {
+                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -1706,7 +1706,7 @@ public class PnlReport extends NursingRecordsPanel {
 
                                 buildPanel();
                                 GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-                            } catch (OptimisticLockException ole) {
+                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }

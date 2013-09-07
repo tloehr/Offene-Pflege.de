@@ -518,7 +518,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     createCP4(myNP.getCategory());
                                     buildPanel();
 
-                                } catch (OptimisticLockException ole) {
+                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -753,7 +753,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                             });
                                         }
                                     });
-                                } catch (OptimisticLockException ole) {
+                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -847,7 +847,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                                         });
                                                     }
                                                 });
-                                            } catch (OptimisticLockException ole) {
+                                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                                 if (em.getTransaction().isActive()) {
                                                     em.getTransaction().rollback();
                                                 }
@@ -988,7 +988,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     createCP4(myNewNP.getCategory());
                                     buildPanel();
                                     GUITools.flashBackground(contenPanelMap.get(myNewNP), Color.YELLOW, 2);
-                                } catch (OptimisticLockException ole) {
+                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1065,7 +1065,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     buildPanel();
 //                                    GUITools.flashBackground(contenPanelMap.get(myOldNP), Color.YELLOW, 2);
 
-                                } catch (OptimisticLockException ole) {
+                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1149,7 +1149,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     buildPanel();
                                     GUITools.flashBackground(contenPanelMap.get(mynp), Color.YELLOW, 2);
 
-                                } catch (OptimisticLockException ole) {
+                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1220,7 +1220,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
                                     OPDE.getDisplayManager().addSubMessage(DisplayManager.getSuccessMessage(np.getTopic(), "deleted"));
 
-                                } catch (OptimisticLockException ole) {
+                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1294,7 +1294,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     buildPanel();
                                     GUITools.flashBackground(contenPanelMap.get(evaluatedNP), Color.YELLOW, 2);
 
-                                } catch (OptimisticLockException ole) {
+                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1437,7 +1437,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                 createCP4(myNP.getCategory());
                                 buildPanel();
 
-                            } catch (OptimisticLockException ole) {
+                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }

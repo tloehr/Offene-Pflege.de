@@ -19,8 +19,8 @@ import javax.persistence.EntityManager;
  */
 public class SyslogTools {
     public static final short INFO = 0;
-    public static final short ERROR = 1;
-    public static final short WARN = 2;
+    public static final short WARN = 1;
+    public static final short ERROR = 2;
     public static final short FATAL = 3;
 
     public static void info(String message){

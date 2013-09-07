@@ -409,7 +409,7 @@ public class PnlAllowance extends CleanablePanel {
                             }
                         });
 
-                    } catch (OptimisticLockException ole) {
+                    } catch (OptimisticLockException ole) { OPDE.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -906,7 +906,7 @@ public class PnlAllowance extends CleanablePanel {
                             }
                         });
 
-                    } catch (OptimisticLockException ole) {
+                    } catch (OptimisticLockException ole) { OPDE.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -1087,7 +1087,7 @@ public class PnlAllowance extends CleanablePanel {
                                             }
 
                                             buildPanel();
-                                        } catch (OptimisticLockException ole) {
+                                        } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                             if (em.getTransaction().isActive()) {
                                                 em.getTransaction().rollback();
                                             }
@@ -1176,7 +1176,7 @@ public class PnlAllowance extends CleanablePanel {
 
                                             buildPanel();
 
-                                        } catch (OptimisticLockException ole) {
+                                        } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                             if (em.getTransaction().isActive()) {
                                                 em.getTransaction().rollback();
                                             }
@@ -1269,7 +1269,7 @@ public class PnlAllowance extends CleanablePanel {
                                             }
 
                                             buildPanel();
-                                        } catch (OptimisticLockException ole) {
+                                        } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                             if (em.getTransaction().isActive()) {
                                                 em.getTransaction().rollback();
                                             }

@@ -184,7 +184,7 @@ public class PnlValues extends NursingRecordsPanel {
                                 em.getTransaction().commit();
 
                                 resident = myResident;
-                            } catch (OptimisticLockException ole) {
+                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -396,7 +396,7 @@ public class PnlValues extends NursingRecordsPanel {
                                             }
                                         });
                                     }
-                                } catch (OptimisticLockException ole) {
+                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -718,7 +718,7 @@ public class PnlValues extends NursingRecordsPanel {
 
                                     buildPanel();
 
-                                } catch (OptimisticLockException ole) {
+                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1006,7 +1006,7 @@ public class PnlValues extends NursingRecordsPanel {
                                             }
                                         });
                                     }
-                                } catch (OptimisticLockException ole) {
+                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1243,7 +1243,7 @@ public class PnlValues extends NursingRecordsPanel {
 
                                     buildPanel();
 
-                                } catch (OptimisticLockException ole) {
+                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1436,7 +1436,7 @@ public class PnlValues extends NursingRecordsPanel {
 
                                     buildPanel();
 
-                                } catch (OptimisticLockException ole) {
+                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1526,7 +1526,7 @@ public class PnlValues extends NursingRecordsPanel {
 
                                     buildPanel();
 
-                                } catch (OptimisticLockException ole) {
+                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1664,7 +1664,7 @@ public class PnlValues extends NursingRecordsPanel {
                                 buildPanel();
                                 //GUITools.flashBackground(contentmap.get(keyMonth), Color.YELLOW, 2);
 
-                            } catch (OptimisticLockException ole) {
+                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }

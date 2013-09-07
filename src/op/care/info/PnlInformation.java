@@ -266,7 +266,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                                     }
                                                     sortData();
                                                     reload();
-                                                } catch (OptimisticLockException ole) {
+                                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                                     if (em.getTransaction().isActive()) {
                                                         em.getTransaction().rollback();
                                                     }
@@ -423,7 +423,7 @@ public class PnlInformation extends NursingRecordsPanel {
 
                                                                 reload();
 
-                                                            } catch (OptimisticLockException ole) {
+                                                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                                                 if (em.getTransaction().isActive()) {
                                                                     em.getTransaction().rollback();
                                                                 }
@@ -507,7 +507,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                                                 }
                                                                 OPDE.getMainframe().addSpeciality(newinfo.getResInfoType(), resident);
 
-                                                            } catch (OptimisticLockException ole) {
+                                                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                                                 if (em.getTransaction().isActive()) {
                                                                     em.getTransaction().rollback();
                                                                 }
@@ -775,7 +775,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                 sortData();
                                 reloadDisplay();
 
-                            } catch (OptimisticLockException ole) {
+                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -928,7 +928,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                             listAllInfos.add(oldinfo);
                                             listAllInfos.add(newinfo);
                                         }
-                                    } catch (OptimisticLockException ole) {
+                                    } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                         if (em.getTransaction().isActive()) {
                                             em.getTransaction().rollback();
                                         }
@@ -1057,7 +1057,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                         listAllInfos.remove(resInfo);
                                         listAllInfos.add(editinfo);
                                     }
-                                } catch (OptimisticLockException ole) {
+                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1378,7 +1378,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                         }
                                         OPDE.getMainframe().removeSpeciality(editinfo.getResInfoType(), resident);
 
-                                    } catch (OptimisticLockException ole) {
+                                    } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                         if (em.getTransaction().isActive()) {
                                             em.getTransaction().rollback();
                                         }
@@ -1451,7 +1451,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                                 GUITools.setResidentDisplay(resident);
                                             }
                                             OPDE.getMainframe().removeSpeciality(editinfo.getResInfoType(), resident);
-                                        } catch (OptimisticLockException ole) {
+                                        } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                             if (em.getTransaction().isActive()) {
                                                 em.getTransaction().rollback();
                                             }
@@ -1529,7 +1529,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                                         OPDE.getMainframe().addSpeciality(editinfo.getResInfoType(), resident);
                                                     }
                                                 }
-                                            } catch (OptimisticLockException ole) {
+                                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                                 if (em.getTransaction().isActive()) {
                                                     em.getTransaction().rollback();
                                                 }
@@ -1591,7 +1591,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                                 }
                                                 sortData();
                                                 reloadDisplay();
-                                            } catch (OptimisticLockException ole) {
+                                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                                 if (em.getTransaction().isActive()) {
                                                     em.getTransaction().rollback();
                                                 }
@@ -1750,7 +1750,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                     sortData();
                                     reloadDisplay();
 
-                                } catch (OptimisticLockException ole) {
+                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1864,7 +1864,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                     jspSearch = OPDE.getMainframe().prepareSearchArea();
                                     prepareSearchArea();
                                     pnlCare.setJspSearch(jspSearch);
-                                } catch (OptimisticLockException ole) {
+                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1922,7 +1922,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                     jspSearch = OPDE.getMainframe().prepareSearchArea();
                                     prepareSearchArea();
                                     pnlCare.setJspSearch(jspSearch);
-                                } catch (OptimisticLockException ole) {
+                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1983,7 +1983,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                     jspSearch = OPDE.getMainframe().prepareSearchArea();
                                     prepareSearchArea();
                                     pnlCare.setJspSearch(jspSearch);
-                                } catch (OptimisticLockException ole) {
+                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -2040,7 +2040,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                     switchResident(myResident);
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.info.msg.isawaynow")));
                                     OPDE.getMainframe().addSpeciality(newAbsence.getResInfoType(), resident);
-                                } catch (OptimisticLockException ole) {
+                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -2110,7 +2110,7 @@ public class PnlInformation extends NursingRecordsPanel {
                         switchResident(myResident);
                         OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.info.msg.isbacknow")));
                         OPDE.getMainframe().removeSpeciality(lastabsence.getResInfoType(), resident);
-                    } catch (OptimisticLockException ole) {
+                    } catch (OptimisticLockException ole) { OPDE.warn(ole);
                         OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();

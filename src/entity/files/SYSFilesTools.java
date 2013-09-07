@@ -200,6 +200,7 @@ public class SYSFilesTools {
                 }
                 em.getTransaction().commit();
             } catch (OptimisticLockException ole) {
+                OPDE.warn(ole);
                 if (em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
                 }
@@ -302,6 +303,7 @@ public class SYSFilesTools {
             em.getTransaction().commit();
             success = true;
         } catch (OptimisticLockException ole) {
+            OPDE.warn(ole);
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
@@ -437,7 +439,7 @@ public class SYSFilesTools {
      * @param action
      */
     public static void handleFile(SYSFiles sysfile, java.awt.Desktop.Action action) {
-        if (sysfile == null){
+        if (sysfile == null) {
             return;
         }
         handleFile(getFile(sysfile, null), action);

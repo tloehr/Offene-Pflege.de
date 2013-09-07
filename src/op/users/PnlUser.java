@@ -456,7 +456,7 @@ public class PnlUser extends CleanablePanel {
                     SYSTools.printpw(newpw, myUser);
 
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".pwchanged")));
-                } catch (OptimisticLockException ole) {
+                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                     if (em.getTransaction().isActive()) {
                         em.getTransaction().rollback();
                     }
@@ -512,7 +512,7 @@ public class PnlUser extends CleanablePanel {
 
                     cp.setCollapsed(myUser.isActive() ? wasCollapsed : true);
                     buildPanel();
-                } catch (OptimisticLockException ole) {
+                } catch (OptimisticLockException ole) { OPDE.warn(ole);
                     if (em.getTransaction().isActive()) {
                         em.getTransaction().rollback();
                     }
@@ -573,7 +573,7 @@ public class PnlUser extends CleanablePanel {
 
                                 cp.setCollapsed(myUser.isActive() ? wasCollapsed : true);
                                 buildPanel();
-                            } catch (OptimisticLockException ole) {
+                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -707,7 +707,7 @@ public class PnlUser extends CleanablePanel {
                                 lstGroups.remove(group);
                                 cpMap.remove(key);
                                 buildPanel();
-                            } catch (OptimisticLockException ole) {
+                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }

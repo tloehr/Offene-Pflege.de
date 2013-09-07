@@ -580,7 +580,8 @@ public class PnlBHP extends NursingRecordsPanel {
                             mapShift2Pane.put(myBHP.getShift(), createCP4(myBHP.getShift()));
                             buildPanel(false);
                         }
-                    } catch (OptimisticLockException ole) {
+                    } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                        OPDE.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -708,7 +709,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(String.format(OPDE.lang.getString("newstocks.stock.has.been.opened"), myStock.getID().toString())));
                                 reload();
 
-                            } catch (OptimisticLockException ole) {
+                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -785,7 +786,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 em.getTransaction().commit();
                                 mapShift2Pane.put(myBHP.getShift(), createCP4(myBHP.getShift()));
                                 buildPanel(false);
-                            } catch (OptimisticLockException ole) {
+                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -871,7 +872,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 em.getTransaction().commit();
                                 mapShift2Pane.put(myBHP.getShift(), createCP4(myBHP.getShift()));
                                 buildPanel(false);
-                            } catch (OptimisticLockException ole) {
+                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -959,7 +960,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 em.getTransaction().commit();
                                 mapShift2Pane.put(myBHP.getShift(), createCP4(myBHP.getShift()));
                                 buildPanel(false);
-                            } catch (OptimisticLockException ole) {
+                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }

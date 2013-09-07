@@ -79,7 +79,7 @@ public class PnlEditMembers extends JPanel {
                             group = myGroup;
                             userMap.put(uid, myUser);
 
-                        } catch (OptimisticLockException ole) {
+                        } catch (OptimisticLockException ole) { OPDE.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
