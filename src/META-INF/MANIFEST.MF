@@ -1,19 +1,19 @@
 Manifest-Version: 1.0
-Class-Path: log4j-1.2.17.jar commons-collections-3.2.1.jar commons-col
- lections-3.2.1-javadoc.jar commons-collections-3.2.1-sources.jar comm
- ons-collections-testframework-3.2.1.jar jgoodies-common-1.6.0.jar com
- mons-beanutils-core-1.8.3.jar commons-beanutils-1.8.3.jar commons-bea
- nutils-bean-collections-1.8.3.jar itext-pdfa-5.4.3.jar itext-xtra-5.4
- .3.jar itextpdf-5.4.3.jar jgoodies-animation-1.4.3.jar jgoodies-valid
- ation-2.5.0.jar jgoodies-forms-1.7.1.jar resolver.jar xml-apis.jar se
- rializer.jar xercesImpl.jar xercesSamples.jar jgoodies-looks-2.5.3.ja
- r looks-2.0.1.jar jcalendar-1.3.3.jar joda-time-2.3.jar commons-cli-1
- .2.jar mail.jar dsn.jar gimap.jar mailapi.jar imap.jar pop3.jar smtp.
- jar mysql-connector-java-5.1.26-bin.jar jide-common.jar jide-componen
- ts.jar jide-dialogs.jar jide-grids.jar jide-plaf-jdk7.jar jide-plaf.j
- ar edtftpj.jar javax.persistence_2.0.5.v201212031355.jar eclipselink.
- jar jgoodies-binding-2.9.1.jar commons-lang3-3.1.jar commons-digester
- 3-3.2.jar timingframework-swing-4.1.jar commons-io-2.4.jar swingx-bea
- ninfo-1.6.2.jar swingx-core-1.6.2.jar
+Class-Path: commons-lang3-3.1.jar jgoodies-common-1.6.0.jar commons-io
+ -2.4.jar jgoodies-looks-2.5.3.jar jgoodies-validation-2.5.0.jar jgood
+ ies-binding-2.9.1.jar eclipselink.jar javax.persistence_2.0.4.v201112
+ 200901.jar commons-digester3-3.2.jar swingx-beaninfo-1.6.2.jar swingx
+ -core-1.6.2.jar jgoodies-forms-1.7.1.jar itext-pdfa-5.4.3.jar itext-x
+ tra-5.4.3.jar itextpdf-5.4.3.jar mail.jar dsn.jar gimap.jar mailapi.j
+ ar imap.jar pop3.jar smtp.jar joda-time-2.3.jar resolver.jar xml-apis
+ .jar serializer.jar xercesImpl.jar jgoodies-animation-1.4.3.jar jide-
+ common.jar jide-components.jar jide-dialogs.jar jide-grids.jar jide-p
+ laf-jdk7.jar jide-plaf.jar mysql-connector-java-5.1.26-bin.jar looks-
+ 2.0.1.jar jcalendar-1.3.3.jar commons-collections-3.2.1.jar commons-c
+ ollections-3.2.1-javadoc.jar commons-collections-3.2.1-sources.jar co
+ mmons-collections-testframework-3.2.1.jar commons-cli-1.2.jar commons
+ -beanutils-core-1.8.3.jar commons-beanutils-1.8.3.jar commons-beanuti
+ ls-bean-collections-1.8.3.jar log4j-1.2.17.jar edtftpj.jar timingfram
+ ework-swing-4.1.jar
 Main-Class: op.OPDE
 

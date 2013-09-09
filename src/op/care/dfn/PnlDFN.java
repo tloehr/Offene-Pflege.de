@@ -536,7 +536,8 @@ public class PnlDFN extends NursingRecordsPanel {
 
                         buildPanel(false);
 
-                    } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                    } catch (OptimisticLockException ole) {
+                        OPDE.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
                         }
@@ -656,7 +657,8 @@ public class PnlDFN extends NursingRecordsPanel {
                                 mapShift2Pane.put(myDFN.getShift(), cp2);
                             }
                             buildPanel(false);
-                        } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -748,7 +750,8 @@ public class PnlDFN extends NursingRecordsPanel {
                                 mapShift2Pane.put(myDFN.getShift(), cp2);
                             }
                             buildPanel(false);
-                        } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
@@ -830,7 +833,8 @@ public class PnlDFN extends NursingRecordsPanel {
                                 }
 
                                 buildPanel(false);
-                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -1125,7 +1129,8 @@ public class PnlDFN extends NursingRecordsPanel {
                                         OPDE.debug(e);
                                     }
 
-                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }

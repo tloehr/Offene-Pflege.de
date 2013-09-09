@@ -113,7 +113,7 @@ public class DlgReport extends MyJDialog {
                 dauer = defaultMinutes;
                 txtDauer.setText(Integer.toString(defaultMinutes));
             }
-        } catch (ParseException ex) {
+        } catch (Exception exc) {
             dauer = defaultMinutes;
             txtDauer.setText(Integer.toString(defaultMinutes));
         }
