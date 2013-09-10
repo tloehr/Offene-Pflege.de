@@ -70,23 +70,23 @@ public class DFNTools {
      * @return Anzahl der erzeugten BHPs
      */
     public static int generate(EntityManager em) throws Exception {
-        String internalClassID = "nursingrecords.dfnimport";
+//        String internalClassID = "nursingrecords.dfnimport";
         int numdfn = 0;
 
-        DateMidnight lastdfn = new DateMidnight().minusDays(1);
+        LocalDate lastdfn = new LocalDate().minusDays(1);
         if (OPDE.getProps().containsKey("LASTDFNIMPORT")) {
-            lastdfn = new DateMidnight(DateTimeFormat.forPattern("yyyy-MM-dd").parseDateTime(OPDE.getProps().getProperty("LASTDFNIMPORT")));
+            lastdfn = new LocalDate(DateTimeFormat.forPattern("yyyy-MM-dd").parseDateTime(OPDE.getProps().getProperty("LASTDFNIMPORT")));
         }
 
-        if (lastdfn.isAfterNow()) {
+        if (lastdfn.compareTo(new LocalDate()) >= 0) {
             throw new IndexOutOfBoundsException("The date of the last import is somewhere in the future. Can't be true.");
         }
 
-        DateMidnight targetdate = null;
+        LocalDate targetdate = null;
 
         // If (for technical reasons) the lastdfn lies in the past (more than the usual 1 day),
         // then the generation is interated until the current day.
-        for (int days = 1; days <= Days.daysBetween(lastdfn.plusDays(1), new DateMidnight()).getDays() + 1; days++) {
+        for (int days = 1; days <= Days.daysBetween(lastdfn.plusDays(1), new LocalDate()).getDays() + 1; days++) {
 
             targetdate = lastdfn.plusDays(days);
 
@@ -107,35 +107,44 @@ public class DFNTools {
             // die wirklichen Treffer nachher genauer ermittelt werden.
 
             OPDE.info("[DFNImport] " + OPDE.lang.getString("misc.msg.writingto") + ": " + OPDE.getUrl());
-
-            select.setParameter("von", targetdate.toDate());
-            select.setParameter("bis", targetdate.plusDays(1).toDateTime().minusMinutes(1).toDate());
+            select.setParameter("von", new DateTime(targetdate.toDate()).hourOfDay().withMinimumValue().minuteOfHour().withMinimumValue().secondOfMinute().withMinimumValue().toDate());
+            select.setParameter("bis", new DateTime(targetdate.toDate()).hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue().toDate());
             select.setParameter("ldatum", targetdate.toDate());
 
             List<InterventionSchedule> list = select.getResultList();
-
             numdfn += generate(em, list, targetdate, true);
-
-            Query forceQuery = em.createQuery(" UPDATE DFN d "
-                    + " SET d.soll = :now "
-                    + " WHERE d.floating = TRUE AND d.state = :state AND d.soll < :now "
-                    + " AND d.nursingProcess.from < :now AND d.nursingProcess.to > :now ");
-            forceQuery.setParameter("now", targetdate.toDate());
-//            forceQuery.setParameter("now1", targetdate.toDate());
-//            forceQuery.setParameter("now2", targetdate.toDate());
-//            forceQuery.setParameter("now3", targetdate.toDate());
-            forceQuery.setParameter("state", DFNTools.STATE_OPEN);
-
-            // Those DFNs which habe to be processed but weren't yet, have to be transferred to the current day.
-            int affectedOldDFNs = forceQuery.executeUpdate();
-
-            OPDE.important(em, OPDE.lang.getString(internalClassID) + " " + OPDE.lang.getString(internalClassID + ".completed") + ": " + DateFormat.getDateInstance().format(targetdate.toDate()) + " " + OPDE.lang.getString(internalClassID + ".numCreatedEntities") + ": " + numdfn);
-            OPDE.important(em, affectedOldDFNs + " " + OPDE.lang.getString(internalClassID + ".floatingMoved"));
+            OPDE.important(em, OPDE.lang.getString("nursingrecords.dfnimport") + " " + OPDE.lang.getString("nursingrecords.dfnimport.completed") + ": " + DateFormat.getDateInstance().format(targetdate.toDate()) + " " + OPDE.lang.getString("nursingrecords.dfnimport.numCreatedEntities") + ": " + numdfn);
         }
 
         SYSPropsTools.storeProp(em, "LASTDFNIMPORT", DateTimeFormat.forPattern("yyyy-MM-dd").print(targetdate));
 
         return numdfn;
+    }
+
+    /**
+     * Those DFNs which habe to be processed but weren't yet, have to be transferred to the current day.
+     * @param em
+     * @throws Exception
+     */
+    public static void moveFloating(EntityManager em) throws Exception {
+
+        Date now = new Date();
+
+        Query forceQuery = em.createQuery(" SELECT d FROM DFN d "
+                + " WHERE d.floating = TRUE AND d.state = :state AND d.soll < :now "
+                + " AND d.nursingProcess.from < :now AND d.nursingProcess.to > :now ");
+
+
+        forceQuery.setParameter("now", now);
+        forceQuery.setParameter("state", DFNTools.STATE_OPEN);
+
+        int affectedOldDFNs = 0;
+        for (DFN dfn : new ArrayList<DFN>(forceQuery.getResultList())) {
+            dfn.setSoll(now);
+            affectedOldDFNs++;
+        }
+
+        OPDE.important(em, affectedOldDFNs + " " + OPDE.lang.getString("nursingrecords.dfnimport.floatingMoved"));
     }
 
     /**
@@ -163,7 +172,7 @@ public class DFNTools {
      * @param wholeday   true, dann wird für den ganzen Tag erzeugt. false, dann ab der aktuellen Zeit.
      * @return die Anzahl der erzeugten BHPs.
      */
-    public static int generate(EntityManager em, List<InterventionSchedule> list, DateMidnight targetdate, boolean wholeday) {
+    public static int generate(EntityManager em, List<InterventionSchedule> list, LocalDate targetdate, boolean wholeday) {
         String internalClassID = "nursingrecords.dfnimport";
         BigDecimal maxrows = new BigDecimal(list.size());
         int numdfn = 0;
@@ -188,20 +197,8 @@ public class DFNTools {
 
             if (!SYSCalendar.isInFuture(termin.getLDatum()) && (termin.isTaeglich() || termin.isPassenderWochentag(targetdate.toDate()) || termin.isPassenderTagImMonat(targetdate.toDate()))) {
 
-
-//                OPDE.debug(row.divide(maxrows, BigDecimal.ROUND_UP).multiply(new BigDecimal(100)).toPlainString());
-
-//                OPDE.debug("Fortschritt Vorgang: " + ((float) row / maxrows) * 100 + "%");
-//                OPDE.debug("==========================================");
-//                OPDE.debug("MassTermin: " + termin.getTermID());
-//                OPDE.debug("BWKennung: " + termin.getNursingProcess().getResident().getRIDAnonymous());
-//                OPDE.debug("PlanID: " + termin.getNursingProcess().getID());
-
                 boolean treffer = false;
-                DateMidnight ldatum = new DateMidnight(termin.getLDatum());
-
-//                OPDE.debug("LDatum: " + DateFormat.getDateTimeInstance().format(ldatum.toDate()));
-//                OPDE.debug("Stichtag: " + DateFormat.getDateTimeInstance().format(targetdate.toDate()));
+                LocalDate ldatum = new LocalDate(termin.getLDatum());
 
                 // Genaue Ermittlung der Treffer
                 // =============================
@@ -234,9 +231,6 @@ public class DFNTools {
                     // Da bei der Vorauswahl durch die Datenbank nur passende Wochentage oder Tage im Monat überhaupt zugelassen wurden, muss das somit der richtige sein.
                     treffer = Months.monthsBetween(ldatum, targetdate).getMonths() == 0;
                 }
-
-//                OPDE.debug("LDatum jetzt: " + DateFormat.getDateTimeInstance().format(ldatum.toDate()));
-//                OPDE.debug("Treffer ? : " + Boolean.toString(treffer));
 
                 // Es wird immer erst eine Schicht später eingetragen. Damit man nicht mit bereits
                 // abgelaufenen Zeitpunkten arbeitet.
@@ -296,9 +290,9 @@ public class DFNTools {
                     if (uhrzeitOK && termin.getUhrzeit() != null) {
 
                         // This adds a Time Value to a given Date
-                        DateTime timeofday = new DateTime(termin.getUhrzeit());
-                        Period period = new Period(timeofday.getHourOfDay(), timeofday.getMinuteOfHour(), timeofday.getSecondOfMinute(), timeofday.getMillisOfSecond());
-                        Date newTargetdate = targetdate.toDateTime().plus(period).toDate();
+                        LocalTime timeofday = new LocalTime(termin.getUhrzeit());
+//                        Period period = new Period(timeofday.getHourOfDay(), timeofday.getMinuteOfHour(), timeofday.getSecondOfMinute(), timeofday.getMillisOfSecond());
+                        Date newTargetdate = targetdate.toDateTime(timeofday).toDate();
 //                        Date neuerStichtag = SYSCalendar.addTime2Date(stichtag.toDate(), termin.getUhrzeit());
 //                        OPDE.debug("SYSConst.UZ, " + termin.getUhrzeit() + ", " + DateFormat.getDateTimeInstance().format(newTargetdate));
                         for (int dfncount = 1; dfncount <= termin.getUhrzeitAnzahl(); dfncount++) {
@@ -334,45 +328,6 @@ public class DFNTools {
     }
 
 
-//    /**
-//     * retrieves a list of BHPs for a given resident for a given day. Only regular prescriptions are used (not OnDemand)
-//     *
-//     * @param resident
-//     * @param date
-//     * @return
-//     */
-//    public static ArrayList<DFN> getDFNs(Resident resident, NursingProcess np, DateMidnight date) {
-//        EntityManager em = OPDE.createEM();
-//        ArrayList<DFN> listDFN = null;
-//
-//        try {
-//
-//            String jpql = " SELECT dfn " +
-//                    " FROM DFN dfn " +
-//                    " WHERE dfn.resident = :resident " +
-//                    " AND dfn.nursingProcess = :np " +
-//                    " AND dfn.soll >= :von AND dfn.soll <= :bis " +
-//                    " ORDER BY dfn.sZeit, dfn.soll, dfn.intervention.bezeichnung, dfn.dfnid ";
-//
-//            Query query = em.createQuery(jpql);
-//
-//            query.setParameter("resident", resident);
-//            query.setParameter("np", np);
-//            query.setParameter("von", date.toDate());
-//            query.setParameter("bis", date.plusDays(1).toDateTime().minusSeconds(1).toDate());
-//
-//            listDFN = new ArrayList<DFN>(query.getResultList());
-////            Collections.sort(listDFN);
-//
-//        } catch (Exception se) {
-//            OPDE.fatal(se);
-//        } finally {
-//            em.close();
-//        }
-//        return listDFN;
-//    }
-
-
     /**
      * retrieves a list of BHPs for a given resident for a given day. Only regular prescriptions are used (not OnDemand)
      *
@@ -397,8 +352,8 @@ public class DFNTools {
             Query query = em.createQuery(jpql);
 
             query.setParameter("resident", resident);
-            query.setParameter("von", new DateTime(date).toDateMidnight().toDate());
-            query.setParameter("bis", new DateTime(date).toDateMidnight().plusDays(1).toDateTime().minusSeconds(1).toDate());
+            query.setParameter("von", new DateTime(date).hourOfDay().withMinimumValue().minuteOfHour().withMinimumValue().secondOfMinute().withMinimumValue().toDate());
+            query.setParameter("bis", new DateTime(date).hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue().toDate());
 
             listDFN = new ArrayList<DFN>(query.getResultList());
             Collections.sort(listDFN);
@@ -452,8 +407,8 @@ public class DFNTools {
 
     public static Icon getFloatingIcon(DFN dfn) {
         if (!dfn.isFloating()) return null;
-        DateMidnight start = new DateMidnight(dfn.getStDatum());
-        DateMidnight stop = dfn.getIst() != null ? new DateMidnight(dfn.getIst()) : new DateMidnight();
+        LocalDate start = new LocalDate(dfn.getStDatum());
+        LocalDate stop = dfn.getIst() != null ? new LocalDate(dfn.getIst()) : new LocalDate();
 
         Icon icon;
 
@@ -579,7 +534,7 @@ public class DFNTools {
 
 //        OPDE.debug("period " + Days.daysBetween(f, t).getDays() + " days");
 
-        query.setParameter(1, Days.daysBetween(f, t).getDays()+1);
+        query.setParameter(1, Days.daysBetween(f, t).getDays() + 1);
         query.setParameter(2, f.toDate());
         query.setParameter(3, t.toDate());
 

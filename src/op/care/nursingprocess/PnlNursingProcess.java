@@ -54,6 +54,7 @@ import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
+import org.joda.time.LocalDate;
 
 import javax.persistence.*;
 import javax.swing.*;
@@ -729,7 +730,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     Unique unique = UniqueTools.getNewUID(em, NursingProcessTools.UNIQUEID);
                                     final NursingProcess newNP = em.merge(((Pair<NursingProcess, ArrayList<InterventionSchedule>>) np).getFirst());
                                     newNP.setNPSeries(unique.getUid());
-                                    DFNTools.generate(em, newNP.getInterventionSchedule(), new DateMidnight(), true);
+                                    DFNTools.generate(em, newNP.getInterventionSchedule(), new LocalDate(), true);
                                     em.getTransaction().commit();
 
                                     // Refresh Display
@@ -823,7 +824,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                                 Unique unique = UniqueTools.getNewUID(em, NursingProcessTools.UNIQUEID);
                                                 final NursingProcess newNP = em.merge(((Pair<NursingProcess, ArrayList<InterventionSchedule>>) np).getFirst());
                                                 newNP.setNPSeries(unique.getUid());
-                                                DFNTools.generate(em, newNP.getInterventionSchedule(), new DateMidnight(), true);
+                                                DFNTools.generate(em, newNP.getInterventionSchedule(), new LocalDate(), true);
                                                 em.getTransaction().commit();
 
                                                 // Refresh Display
@@ -976,7 +977,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     myNewNP.setFrom(new DateTime(myOldNP.getTo()).plusSeconds(1).toDate());
 
                                     // Create new DFNs according to plan
-                                    DFNTools.generate(em, myNewNP.getInterventionSchedule(), new DateMidnight(), true);
+                                    DFNTools.generate(em, myNewNP.getInterventionSchedule(), new LocalDate(), true);
                                     em.getTransaction().commit();
 
                                     // Refresh Display
@@ -1136,7 +1137,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     delQuery.setParameter("nursingprocess", mynp);
                                     delQuery.executeUpdate();
                                     // Create new DFNs according to plan
-                                    DFNTools.generate(em, mynp.getInterventionSchedule(), new DateMidnight(), true);
+                                    DFNTools.generate(em, mynp.getInterventionSchedule(), new LocalDate(), true);
                                     em.getTransaction().commit();
 
                                     // Refresh Display

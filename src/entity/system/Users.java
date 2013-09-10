@@ -31,6 +31,8 @@ import entity.files.SYSNR2FILE;
 import entity.files.SYSPRE2FILE;
 import entity.reports.NReport;
 import op.tools.SYSTools;
+import org.eclipse.persistence.annotations.OptimisticLocking;
+import org.eclipse.persistence.annotations.OptimisticLockingType;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -42,7 +44,7 @@ import java.util.Collection;
  */
 @Entity
 @Table(name = "users")
-
+@OptimisticLocking(cascade = false, type = OptimisticLockingType.VERSION_COLUMN)
 public class Users implements Serializable, Comparable<Users> {
     private static final long serialVersionUID = 1L;
     @Id

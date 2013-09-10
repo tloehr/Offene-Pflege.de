@@ -1,11 +1,14 @@
 package entity.prescription;
 
+import org.eclipse.persistence.annotations.OptimisticLocking;
+import org.eclipse.persistence.annotations.OptimisticLockingType;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "gp")
-
+@OptimisticLocking(cascade = false, type = OptimisticLockingType.VERSION_COLUMN)
 public class GP implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

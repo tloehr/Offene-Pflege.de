@@ -4,7 +4,6 @@
 
 package op.care.values;
 
-import java.awt.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.swing.JideLabel;
@@ -17,10 +16,7 @@ import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
+import java.awt.event.*;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 
@@ -87,6 +83,10 @@ public class DlgValue extends MyJDialog {
     }
 
     private void txtWert1FocusLost(FocusEvent e) {
+        OPDE.debug("DlgValue.txtWert1FocusLost: resValue is null: " + (resValue == null));
+        OPDE.debug("DlgValue.txtWert1FocusLost: e.getSource() is null: " + (e.getSource() == null));
+        OPDE.debug("DlgValue.txtWert1FocusLost: e.isTemporary(): " + e.isTemporary());
+
         BigDecimal bd = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
         if (bd == null) {
             ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(resValue.getVal1()));
@@ -197,8 +197,8 @@ public class DlgValue extends MyJDialog {
         });
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "14dlu, $lcgap, default, $lcgap, 84dlu:grow, $lcgap, 55dlu:grow, $lcgap, default, $lcgap, 14dlu",
-            "14dlu, $lgap, pref, 3*($lgap, default), 2*($lgap, fill:default:grow), $lgap, 14dlu"));
+                "14dlu, $lcgap, default, $lcgap, 84dlu:grow, $lcgap, 55dlu:grow, $lcgap, default, $lcgap, 14dlu",
+                "14dlu, $lgap, pref, 3*($lgap, default), 2*($lgap, fill:default:grow), $lgap, 14dlu"));
 
         //======== panel4 ========
         {

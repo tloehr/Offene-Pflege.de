@@ -18,6 +18,8 @@ import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
+import org.eclipse.persistence.annotations.OptimisticLocking;
+import org.eclipse.persistence.annotations.OptimisticLockingType;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
@@ -80,7 +82,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "prescription")
-
+@OptimisticLocking(cascade = false, type = OptimisticLockingType.VERSION_COLUMN)
 public class Prescription implements Serializable, QProcessElement, Cloneable, Comparable<Prescription> {
     private static final long serialVersionUID = 1L;
     @Id

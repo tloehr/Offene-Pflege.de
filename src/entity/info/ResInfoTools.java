@@ -786,7 +786,7 @@ public class ResInfoTools {
             result += "Der Grundumsatz konnte noch nicht berechnet werden.<br/>";
         } else {
             result += "Grundumsatz: " + bmr.setScale(2, RoundingMode.HALF_UP) + " kcal/24h <br/>";
-            result += "tatsächlicher Umsatz: "+bmr.multiply(new BigDecimal(1.2)).setScale(2, RoundingMode.HALF_UP)+" kcal/24h (wenn Bettlägerig)  "+bmr.multiply(new BigDecimal(1.3)).setScale(2, RoundingMode.HALF_UP)+" kcal/24h (wenn normal mobilisiert)<br/>";
+            result += "tatsächlicher Umsatz: " + bmr.multiply(new BigDecimal(1.2)).setScale(2, RoundingMode.HALF_UP) + " kcal/24h (wenn Bettlägerig)  " + bmr.multiply(new BigDecimal(1.3)).setScale(2, RoundingMode.HALF_UP) + " kcal/24h (wenn normal mobilisiert)<br/>";
         }
 
         if (rl == null) {
@@ -1516,18 +1516,19 @@ public class ResInfoTools {
     }
 
     public static BigDecimal getUBW(ResInfo food) {
-
         BigDecimal ubw = null;
-
         if (food != null && food.getResInfoType().getType() == ResInfoTypeTools.TYPE_FOOD) {
             Properties content = getContent(food);
             if (content.containsKey("ubw")) {
-                ubw = new BigDecimal(content.getProperty("ubw"));
+                try {
+                    ubw = new BigDecimal(content.getProperty("ubw"));
+                } catch (NumberFormatException nfe) {
+                    ubw = null;
+                }
+
             }
         }
-
         return ubw;
-
     }
 
     /**
@@ -1535,9 +1536,7 @@ public class ResInfoTools {
      * @return
      */
     public static BigDecimal getTargetLiquidAmount(ResInfo food) {
-
         BigDecimal tla = null;
-
         if (food != null && food.getResInfoType().getType() == ResInfoTypeTools.TYPE_FOOD) {
             Properties content = getContent(food);
             if (content.containsKey("zieltrinkmenge")) {
@@ -1548,9 +1547,7 @@ public class ResInfoTools {
                 }
             }
         }
-
         return tla;
-
     }
 
 

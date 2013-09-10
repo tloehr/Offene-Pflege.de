@@ -6,6 +6,8 @@ import op.OPDE;
 import op.tools.GUITools;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
+import org.eclipse.persistence.annotations.OptimisticLocking;
+import org.eclipse.persistence.annotations.OptimisticLockingType;
 
 import javax.persistence.*;
 import java.awt.*;
@@ -17,7 +19,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "bhp")
-
+@OptimisticLocking(cascade = false, type = OptimisticLockingType.VERSION_COLUMN)
 public class BHP implements Serializable, Comparable<BHP> {
     private static final long serialVersionUID = 1L;
     @Id

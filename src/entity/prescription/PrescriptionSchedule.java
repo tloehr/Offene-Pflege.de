@@ -1,6 +1,8 @@
 package entity.prescription;
 
 import op.tools.SYSCalendar;
+import org.eclipse.persistence.annotations.OptimisticLocking;
+import org.eclipse.persistence.annotations.OptimisticLockingType;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -10,7 +12,7 @@ import java.util.GregorianCalendar;
 
 @Entity
 @Table(name = "pschedule")
-
+@OptimisticLocking(cascade = false, type = OptimisticLockingType.VERSION_COLUMN)
 public class PrescriptionSchedule implements Serializable, Cloneable, Comparable<PrescriptionSchedule> {
     private static final long serialVersionUID = 1L;
     @Id

@@ -24,12 +24,9 @@ import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.Date;
 
 /**
@@ -103,6 +100,11 @@ public class DlgReport extends MyJDialog {
     }
 
     private void txtDauerFocusLost(FocusEvent e) {
+
+        OPDE.debug("DlgReport.txtDauerFocusLost: nReport is null: " + (nReport == null));
+        OPDE.debug("DlgReport.txtDauerFocusLost: e.getSource() is null: " + (e.getSource() == null));
+        OPDE.debug("DlgReport.txtDauerFocusLost: e.isTemporary(): " + e.isTemporary());
+
         NumberFormat nf = NumberFormat.getIntegerInstance();
         String test = txtDauer.getText();
         int dauer;
@@ -133,7 +135,7 @@ public class DlgReport extends MyJDialog {
     }
 
     private void btnApplyActionPerformed(ActionEvent e) {
-        if (SYSTools.catchNull(txtBericht.getText()).trim().isEmpty()){
+        if (SYSTools.catchNull(txtBericht.getText()).trim().isEmpty()) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.emptyentry")));
             return;
         }
@@ -170,14 +172,14 @@ public class DlgReport extends MyJDialog {
         });
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "13dlu, default:grow, $lcgap, 13dlu",
-            "13dlu, $lgap, fill:default:grow, $lgap, 13dlu"));
+                "13dlu, default:grow, $lcgap, 13dlu",
+                "13dlu, $lgap, fill:default:grow, $lgap, 13dlu"));
 
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                "$rgap, $lcgap, default, $lcgap, 177dlu:grow, $lcgap, 115dlu:grow, 0dlu, $rgap",
-                "0dlu, 2*($lgap, default), $lgap, fill:default:grow, $lgap, default, $lgap, $rgap"));
+                    "$rgap, $lcgap, default, $lcgap, 177dlu:grow, $lcgap, 115dlu:grow, 0dlu, $rgap",
+                    "0dlu, 2*($lgap, default), $lgap, fill:default:grow, $lgap, default, $lgap, $rgap"));
             panel1.add(pnlTags, CC.xywh(7, 3, 1, 5, CC.FILL, CC.FILL));
 
             //---- label3 ----

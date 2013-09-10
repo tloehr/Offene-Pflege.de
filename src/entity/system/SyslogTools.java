@@ -43,6 +43,8 @@ public class SyslogTools {
 
         InetAddress localMachine = null;
 
+        message = String.format("[%s] [%s] %s",Integer.toString(OPDE.getAppInfo().getBuildnum()), OPDE.getLogin().getUser().getUID(), message);
+
         try {
             localMachine = InetAddress.getLocalHost();
         } catch (java.net.UnknownHostException uhe) {
@@ -56,6 +58,8 @@ public class SyslogTools {
     public static void addLog(EntityManager em, String message, short level) throws Exception {
 
         InetAddress localMachine = null;
+
+        message = String.format("[%s] [%s] %s",Integer.toString(OPDE.getAppInfo().getBuildnum()), OPDE.getLogin().getUser().getUID(), message);
 
         try {
             localMachine = InetAddress.getLocalHost();

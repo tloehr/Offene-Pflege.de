@@ -31,7 +31,6 @@ import entity.files.SYSFilesTools;
 import entity.nursingprocess.DFNTools;
 import entity.prescription.BHPTools;
 import entity.system.*;
-import op.care.info.PnlBodyScheme;
 import op.system.AppInfo;
 import op.system.EMailSystem;
 import op.system.LogicalPrinters;
@@ -39,6 +38,7 @@ import op.threads.DisplayManager;
 import op.threads.PrintProcessor;
 import op.tools.*;
 import org.apache.commons.cli.*;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.*;
 
 import javax.persistence.EntityManager;
@@ -114,7 +114,7 @@ public class OPDE {
 
     public static void setUpdateAvailable(boolean updateAvailable, String url) {
         OPDE.updateAvailable = updateAvailable;
-        if (updateAvailable){
+        if (updateAvailable) {
             updateDescriptionURL = url;
         }
     }
@@ -195,7 +195,7 @@ public class OPDE {
 
     public static void warn(Throwable message) {
         logger.warn(message);
-        SyslogTools.warn(message.getMessage());
+        SyslogTools.warn(ExceptionUtils.getMessage(message) + ": " + ExceptionUtils.getStackTrace(message));
     }
 
     public static void info(Object message) {
@@ -589,7 +589,11 @@ public class OPDE {
                     OPDE.setLogin(rootLogin);
                     initProps();
 
+                    // create the new DFNs
                     DFNTools.generate(em);
+                    // move over the floating ones that have not yet been clicked to the current day
+                    DFNTools.moveFloating(em);
+
                     em.getTransaction().commit();
                 } catch (Exception ex) {
                     if (em.getTransaction().isActive()) {
@@ -665,7 +669,6 @@ public class OPDE {
              */
 
 
-
 //        JFrame frm = new JFrame();
 //            frm.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 //            frm.setLayout(new FlowLayout());
@@ -677,9 +680,7 @@ public class OPDE {
             SYSTools.checkForSoftwareupdates();
 
 
-
             mainframe = new FrmMain();
-
 
 
             mainframe.setVisible(true);
