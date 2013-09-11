@@ -22,6 +22,7 @@ import entity.roster.TMRosterFooter;
 import entity.roster.TMRosterHeader;
 import op.OPDE;
 import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -47,7 +48,7 @@ public class FrmRoster extends JFrame {
         this.roster = roster;
         this.readOnly = roster.getOpenedBy() != null;
 
-        setTitle(new DateMidnight(roster.getMonth()).toString("MMMM yyyy"));
+        setTitle(new LocalDate(roster.getMonth()).toString("MMMM yyyy"));
 
         if (!readOnly) {
             EntityManager em = OPDE.createEM();

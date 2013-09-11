@@ -40,6 +40,7 @@ import op.tools.*;
 import org.apache.commons.cli.*;
 import org.apache.log4j.*;
 import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -795,7 +796,7 @@ public class OPDE {
         return version;
     }
 
-    public static boolean isHoliday(DateMidnight day) {
+    public static boolean isHoliday(LocalDate day) {
         boolean cached = false;
         synchronized (yearsInHolidayMap) {
             cached = yearsInHolidayMap.contains(day.getYear());
@@ -817,7 +818,7 @@ public class OPDE {
         return holiday;
     }
 
-    public static String getHoliday(DateMidnight day) {
+    public static String getHoliday(LocalDate day) {
         boolean cached = false;
         synchronized (yearsInHolidayMap) {
             cached = yearsInHolidayMap.contains(day.getYear());

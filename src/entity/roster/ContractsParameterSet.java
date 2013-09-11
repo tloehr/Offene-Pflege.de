@@ -3,6 +3,7 @@ package entity.roster;
 
 import op.tools.Pair;
 import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
 import java.math.BigDecimal;
@@ -17,20 +18,20 @@ import java.math.RoundingMode;
  */
 public class ContractsParameterSet implements Cloneable, Comparable<ContractsParameterSet> {
 
-    DateMidnight from, to;
+    LocalDate from, to;
     Pair<LocalTime, LocalTime> night;
     BigDecimal vacationDaysPerYear, wagePerHour, workingDaysPerWeek, targetHoursPerMonth, hollidayPremiumPercentage, nightPremiumPercentage;
     String section;
     boolean trainee;
 
-    public ContractsParameterSet(DateMidnight from, DateMidnight to) {
+    public ContractsParameterSet(LocalDate from, LocalDate to) {
         this.from = from;
         this.to = to;
         trainee = false;
         exam = false;
     }
 
-    private ContractsParameterSet(DateMidnight from, DateMidnight to, Pair<LocalTime, LocalTime> night, BigDecimal vacationDaysPerYear, BigDecimal wagePerHour, BigDecimal workingDaysPerWeek, BigDecimal targetHoursPerMonth, BigDecimal hollidayPremiumPercentage, BigDecimal nightPremiumPercentage, String section, boolean trainee, boolean exam) {
+    private ContractsParameterSet(LocalDate from, LocalDate to, Pair<LocalTime, LocalTime> night, BigDecimal vacationDaysPerYear, BigDecimal wagePerHour, BigDecimal workingDaysPerWeek, BigDecimal targetHoursPerMonth, BigDecimal hollidayPremiumPercentage, BigDecimal nightPremiumPercentage, String section, boolean trainee, boolean exam) {
         this.from = from;
         this.to = to;
         this.night = night;
@@ -77,19 +78,19 @@ public class ContractsParameterSet implements Cloneable, Comparable<ContractsPar
     }
 
 
-    public DateMidnight getFrom() {
+    public LocalDate getFrom() {
         return from;
     }
 
-    public void setFrom(DateMidnight from) {
+    public void setFrom(LocalDate from) {
         this.from = from;
     }
 
-    public DateMidnight getTo() {
+    public LocalDate getTo() {
         return to;
     }
 
-    public void setTo(DateMidnight to) {
+    public void setTo(LocalDate to) {
         this.to = to;
     }
 

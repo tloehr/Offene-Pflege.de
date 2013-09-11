@@ -1,7 +1,7 @@
 package entity.roster;
 
 import op.tools.Pair;
-import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -46,21 +46,21 @@ public class UsersXML extends DefaultHandler {
                 }
                 userContracts = new UserContracts();
             } else if (tagName.equalsIgnoreCase("contract")) {
-                DateMidnight from = new DateMidnight(sdf.parse(attributes.getValue("from")));
-                DateMidnight to = new DateMidnight(sdf.parse(attributes.getValue("to")));
+                LocalDate from = new LocalDate(sdf.parse(attributes.getValue("from")));
+                LocalDate to = new LocalDate(sdf.parse(attributes.getValue("to")));
                 mySet = new ContractsParameterSet(from, to);
             } else if (tagName.equalsIgnoreCase("defaults")) {
             } else if (tagName.equalsIgnoreCase("probation")) {
-                DateMidnight from = new DateMidnight(sdf.parse(attributes.getValue("from")));
-                DateMidnight to = new DateMidnight(sdf.parse(attributes.getValue("to")));
+                LocalDate from = new LocalDate(sdf.parse(attributes.getValue("from")));
+                LocalDate to = new LocalDate(sdf.parse(attributes.getValue("to")));
                 mySet = new ContractsParameterSet(from, to);
             } else if (tagName.equalsIgnoreCase("extension")) {
-                DateMidnight from = new DateMidnight(sdf.parse(attributes.getValue("from")));
-                DateMidnight to = new DateMidnight(sdf.parse(attributes.getValue("to")));
+                LocalDate from = new LocalDate(sdf.parse(attributes.getValue("from")));
+                LocalDate to = new LocalDate(sdf.parse(attributes.getValue("to")));
                 mySet = new ContractsParameterSet(from, to);
             } else if (tagName.equalsIgnoreCase("alteration")) {
-                DateMidnight from = new DateMidnight(sdf.parse(attributes.getValue("from")));
-                DateMidnight to = new DateMidnight(sdf.parse(attributes.getValue("to")));
+                LocalDate from = new LocalDate(sdf.parse(attributes.getValue("from")));
+                LocalDate to = new LocalDate(sdf.parse(attributes.getValue("to")));
                 mySet = new ContractsParameterSet(from, to);
             } else if (tagName.equalsIgnoreCase("vacationdays")) {
                 mySet.setVacationDaysPerYear(new BigDecimal(attributes.getValue("value")));

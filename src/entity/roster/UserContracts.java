@@ -1,6 +1,7 @@
 package entity.roster;
 
 import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -91,7 +92,7 @@ public class UserContracts {
     }
 
 
-    public ContractsParameterSet getParameterSet(DateMidnight day) {
+    public ContractsParameterSet getParameterSet(LocalDate day) {
         ContractsParameterSet mySet = null;
 
         for (UserContract contract : listContracts) {

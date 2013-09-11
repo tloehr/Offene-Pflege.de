@@ -3,6 +3,7 @@ package entity.roster;
 import entity.system.Users;
 import op.OPDE;
 import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -32,7 +33,7 @@ public class WorkAccountTools {
     public static final int[] HOURS = new int[]{HOURS_AUTO, HOURS_CALCULATED, HOURS_MANUAL};
     public static final int[] SICK = new int[]{SICK_CALCULATED, SICK_MANUAL};
 
-    public static BigDecimal getSum(DateMidnight day, Users owner, int[] types) {
+    public static BigDecimal getSum(LocalDate day, Users owner, int[] types) {
         EntityManager em = OPDE.createEM();
         BigDecimal sum = null;
 

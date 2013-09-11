@@ -2,7 +2,7 @@ package entity.roster;
 
 import op.OPDE;
 import op.tools.SYSCalendar;
-import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalTime;
@@ -129,7 +129,7 @@ public class Symbol {
         allowedDays.add(day);
     }
 
-    public boolean isAllowed(DateMidnight dm) {
+    public boolean isAllowed(LocalDate dm) {
         //todo: holidays
         return allowedDays.isEmpty() || allowedDays.contains(dm.getDayOfWeek());
     }
@@ -172,23 +172,23 @@ public class Symbol {
         return end;
     }
 
-    public DateTime getStart(DateMidnight day) {
-        if (start == null) return day.toDateTime();
-        return day.toDateTime().plus(start.getMillisOfDay());
+    public DateTime getStart(LocalDate day) {
+        if (start == null) return day.toDateTime(new LocalTime().hourOfDay().withMinimumValue().minuteOfHour().withMinimumValue().secondOfMinute().withMinimumValue());
+        return day.toDateTime(start);
     }
 
-    public DateTime getEnd(DateMidnight day) {
+    public DateTime getEnd(LocalDate day) {
         if (end == null) return null;
-        DateTime endTime = day.toDateTime().plus(end.getMillisOfDay());
+        DateTime endTime = day.toDateTime(end);
         return start.isAfter(end) ? endTime.plusDays(1) : endTime;
     }
 
     public BigDecimal getBaseHoursAsDecimal() {
-        DateMidnight today = new DateMidnight();
+        LocalDate today = new LocalDate();
         return SYSCalendar.getDecimalHours(getStart(today), getEnd(today));
     }
 
-    private BigDecimal getExtraHoursA(DateMidnight day, ContractsParameterSet contractsParameterSet) {
+    private BigDecimal getExtraHoursA(LocalDate day, ContractsParameterSet contractsParameterSet) {
         if (day.getDayOfWeek() == DateTimeConstants.SUNDAY && !OPDE.isHoliday(day)) {
             return contractsParameterSet.getDayValue();
         } else {
@@ -196,7 +196,7 @@ public class Symbol {
         }
     }
 
-    private BigDecimal getExtraHoursX(DateMidnight day, ContractsParameterSet contractsParameterSet) {
+    private BigDecimal getExtraHoursX(LocalDate day, ContractsParameterSet contractsParameterSet) {
         if (day.getDayOfWeek() == DateTimeConstants.SUNDAY && !OPDE.isHoliday(day)) {
             return contractsParameterSet.getDayValue();
         } else {
@@ -208,7 +208,7 @@ public class Symbol {
         return contractsParameterSet.getDayValue();
     }
 
-    private BigDecimal getExtraHoursU(DateMidnight day, ContractsParameterSet contractsParameterSet) {
+    private BigDecimal getExtraHoursU(LocalDate day, ContractsParameterSet contractsParameterSet) {
         if (day.getDayOfWeek() == DateTimeConstants.SUNDAY) {
             return contractsParameterSet.getDayValue();
         } else {
@@ -250,7 +250,7 @@ public class Symbol {
         }
     }
 
-    public BigDecimal getExtraHours(DateMidnight day, ContractsParameterSet contractsParameterSet) {
+    public BigDecimal getExtraHours(LocalDate day, ContractsParameterSet contractsParameterSet) {
         if (start == null) {
             return BigDecimal.ZERO;
         } else if (calc == AWERT) {
@@ -275,7 +275,7 @@ public class Symbol {
      * @param contractsParameterSet
      * @return
      */
-    public BigDecimal getHours(DateMidnight day, ContractsParameterSet contractsParameterSet) {
+    public BigDecimal getHours(LocalDate day, ContractsParameterSet contractsParameterSet) {
         if (start == null) {
             return null;
         }

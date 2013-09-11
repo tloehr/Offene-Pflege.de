@@ -2,9 +2,14 @@ package entity.roster;
 
 import com.jidesoft.converter.ConverterContext;
 import com.jidesoft.converter.DoubleConverter;
-import com.jidesoft.grid.*;
+import com.jidesoft.grid.AbstractMultiTableModel;
+import com.jidesoft.grid.CellStyle;
+import com.jidesoft.grid.ColumnIdentifierTableModel;
+import com.jidesoft.grid.StyleModel;
+import entity.Homes;
+import entity.HomesTools;
 
-import javax.swing.table.TableModel;
+import java.util.ArrayList;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,68 +18,94 @@ import javax.swing.table.TableModel;
  * Time: 15:43
  * To change this template use File | Settings | File Templates.
  */
-public class TMRosterFooter  extends AbstractMultiTableModel implements ColumnIdentifierTableModel, StyleModel {
-        TableModel basemodel;
-        private static final long serialVersionUID = -9132647394140127017L;
+public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIdentifierTableModel, StyleModel {
+    TMRoster basemodel;
+    ArrayList<Homes> listHomes;
 
-        public TMRosterFooter(TableModel model) {
-            basemodel = model;
-        }
 
-        public CellStyle getCellStyleAt(int rowIndex, int columnIndex) {
-            return new CellStyle();
-        }
+    private static final long serialVersionUID = -9132647394140127017L;
 
-        public boolean isCellStyleOn() {
-            return false;
-        }
-
-        @Override
-        public String getColumnName(int column) {
-            return basemodel.getColumnName(column);
-        }
-
-        public Object getColumnIdentifier(int columnIndex) {
-            return ((ColumnIdentifierTableModel) basemodel).getColumnIdentifier(columnIndex);
-        }
-
-        public int getColumnCount() {
-            return basemodel.getColumnCount();
-        }
-
-        public int getRowCount() {
-            return 1;
-        }
-
-        @Override
-        public Class<?> getColumnClass(int columnIndex) {
-            return basemodel.getColumnClass(columnIndex);
-        }
-
-        public Object getValueAt(int rowIndex, int columnIndex) {
-            return 0;
-        }
-
-        @Override
-        public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return false;
-        }
-
-        public int getColumnType(int column) {
-            return ((MultiTableModel) basemodel).getColumnType(column);
-        }
-
-        public int getTableIndex(int columnIndex) {
-            return 0;
-        }
-
-        @Override
-        public Class<?> getCellClassAt(int row, int column) {
-            return getColumnClass(column);
-        }
-
-        @Override
-        public ConverterContext getConverterContextAt(int row, int column) {
-            return column >= 1 ? DoubleConverter.CONTEXT_FRACTION_NUMBER : null;
-        }
+    public TMRosterFooter(TMRoster model) {
+        basemodel = model;
+        listHomes = new ArrayList<Homes>(HomesTools.getAll());
     }
+
+    public CellStyle getCellStyleAt(int rowIndex, int columnIndex) {
+        return new CellStyle();
+    }
+
+    public boolean isCellStyleOn() {
+        return false;
+    }
+
+    @Override
+    public String getColumnName(int column) {
+        return basemodel.getColumnName(column);
+    }
+
+    public Object getColumnIdentifier(int columnIndex) {
+        return basemodel.getColumnIdentifier(columnIndex);
+    }
+
+    public int getColumnCount() {
+        return basemodel.getColumnCount();
+    }
+
+    public int getRowCount() {
+        return basemodel.getStats().size() * 2;
+    }
+
+    @Override
+    public Class<?> getColumnClass(int columnIndex) {
+        return basemodel.getColumnClass(columnIndex);
+    }
+
+    public Object getValueAt(int rowIndex, int columnIndex) {
+        Object value = "footer";
+        if (columnIndex == 0) {
+            value = "";
+            if (rowIndex % 2 == 0) {
+                value = listHomes.get(rowIndex / 2).getShortname();
+            }
+        } else if (columnIndex == 1) {
+            if (rowIndex % 2 == 0) {
+                value = "Examen F / S / N";
+            } else {
+                value = "Helfer F / S / N";
+            }
+        } else if (getColumnType(columnIndex) == FOOTER_COLUMN) {
+            value = "--";
+        } else { // here is the stats data
+            if (rowIndex % 2 == 0) {
+                value = String.format("%s/%s/%s", basemodel.getStats().get(listHomes.get(rowIndex / 2)).get(rowIndex / 2).exam_early, basemodel.getStats().get(listHomes.get(rowIndex / 2)).get(rowIndex / 2).exam_late, basemodel.getStats().get(listHomes.get(rowIndex / 2)).get(rowIndex / 2).exam_night);
+            } else {
+                value = String.format("%s/%s/%s", basemodel.getStats().get(listHomes.get(rowIndex / 2)).get(rowIndex / 2).helper_early, basemodel.getStats().get(listHomes.get(rowIndex / 2)).get(rowIndex / 2).helper_late, basemodel.getStats().get(listHomes.get(rowIndex / 2)).get(rowIndex / 2).helper_night);
+            }
+        }
+
+        return value;
+    }
+
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return false;
+    }
+
+    public int getColumnType(int column) {
+        return basemodel.getColumnType(column);
+    }
+
+    public int getTableIndex(int columnIndex) {
+        return 0;
+    }
+
+    @Override
+    public Class<?> getCellClassAt(int row, int column) {
+        return getColumnClass(column);
+    }
+
+    @Override
+    public ConverterContext getConverterContextAt(int row, int column) {
+        return column >= 1 ? DoubleConverter.CONTEXT_FRACTION_NUMBER : null;
+    }
+}

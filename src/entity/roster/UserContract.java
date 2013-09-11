@@ -1,6 +1,7 @@
 package entity.roster;
 
 import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -105,7 +106,7 @@ public class UserContract {
         return xml;
     }
 
-    public ContractsParameterSet getParameterSet(DateMidnight day) {
+    public ContractsParameterSet getParameterSet(LocalDate day) {
         ContractsParameterSet mySet = null;
 
         if (defaults.getFrom().compareTo(day) <= 0 && defaults.getTo().compareTo(day) >= 0) {

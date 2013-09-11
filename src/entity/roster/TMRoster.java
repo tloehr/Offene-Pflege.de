@@ -10,9 +10,9 @@ import entity.system.UsersTools;
 import op.OPDE;
 import op.tools.Pair;
 import op.tools.SYSConst;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -35,12 +35,10 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     private Rosters roster;
     private final boolean readOnly;
     HashMap<Users, ArrayList<Rplan>> content;
-
     HashMap<Users, UserContracts> contracts;
-
     RosterParameters rosterParameters = null;
 
-    private final DateMidnight month;
+    private final LocalDate month;
     public final int ROW_HEADER = 2;
     public final int ROW_FOOTER;
     public final int ROW_FOOTER_WIDTH = 1;
@@ -50,25 +48,24 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     public CellStyle baseStyle;
 
     private Homes defaultHome;
-    HashMap<Homes, ArrayList<Dailystats>> stats;
+    HashMap<Homes, ArrayList<DailyStats>> stats;
 
     public TMRoster(Rosters roster, boolean readOnly) {
         defaultHome = StationTools.getStationForThisHost().getHome();
 
         this.roster = roster;
         this.readOnly = readOnly;
-        this.month = new DateMidnight(roster.getMonth());
+        this.month = new LocalDate(roster.getMonth());
 
         content = new HashMap<Users, ArrayList<Rplan>>();
         contracts = new HashMap<Users, UserContracts>();
-        stats = new HashMap<Homes, ArrayList<Dailystats>>();
-
+        stats = new HashMap<Homes, ArrayList<DailyStats>>();
 
         rosterParameters = RostersTools.getParameters(roster);
         prepareContent(roster.getShifts());
 
         ROW_FOOTER = getColumnCount() - ROW_FOOTER_WIDTH;
-        COL_FOOTER = COL_HEADER + getRowCount();
+        COL_FOOTER = COL_HEADER + getRowCount();// - (9 * stats.size());
 
         baseStyle = new CellStyle();
         baseStyle.setFont(SYSConst.ARIAL16);
@@ -202,9 +199,9 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     private void prepareContent(java.util.List<Rplan> input) {
 
         for (Homes home : HomesTools.getAll()) {
-            stats.put(home, new ArrayList<Dailystats>());
+            stats.put(home, new ArrayList<DailyStats>());
             for (int i = 0; i < month.dayOfMonth().withMaximumValue().getDayOfMonth(); i++) {
-                stats.get(home).add(new Dailystats());
+                stats.get(home).add(new DailyStats());
             }
         }
 
@@ -229,10 +226,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
             Symbol symbol = rosterParameters.getSymbol(rplan.getEffectiveP());
             stats.get(rplan.getHome()).get(start.getDayOfMonth() - 1).add(symbol.shift1, contracts.get(rplan.getOwner()).getParameterSet(month).isExam(), symbol.getStatval1());
-
-
-            grmpf;
-            // hier gehts weiter. Jetzt musst Du noch die Fußzeilen machen
+            stats.get(rplan.getHome()).get(start.getDayOfMonth() - 1).add(symbol.shift2, contracts.get(rplan.getOwner()).getParameterSet(month).isExam(), symbol.getStatval2());
 
         }
 //        Collections.sort(listUsers, new Comparator<Users>() {
@@ -255,7 +249,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
     @Override
     public int getRowCount() {
-        return rosterParameters.getUserlist().size() * 4;
+        return rosterParameters.getUserlist().size() * 4;// + (9 * stats.size()); // 9 lines for every home (3x exam, 3x helper, 3x social)
     }
 
     @Override
@@ -263,7 +257,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         return month.dayOfMonth().withMaximumValue().getDayOfMonth() + ROW_HEADER + 1; // there is 1 sum col at the end
     }
 
-    public DateMidnight getDay(int col) {
+    public LocalDate getDay(int col) {
         return month.plusDays(getBaseCol(col));
     }
 
@@ -273,6 +267,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+
         Users user = rosterParameters.getUserlist().get(rowIndex / 4);
         boolean selectUser = columnIndex == 0 && rowIndex % 4 == 0;
 
@@ -285,6 +280,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
         } else {
             String newSymbol = aValue.toString();
+            Symbol oldSymbol = rosterParameters.getSymbol(getValueAt(rowIndex, columnIndex).toString());
             Symbol symbol = rosterParameters.getSymbol(newSymbol);
 
             if (!newSymbol.isEmpty() && symbol == null) return;
@@ -333,14 +329,27 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
                 em.getTransaction().commit();
 
+                // update the stats
+                boolean exam = contracts.get(myRplan.getOwner()).getParameterSet(month).isExam();
+                if (oldSymbol != null) {
+                    stats.get(myRplan.getHome()).get(new LocalDate(myRplan.getStart()).getDayOfMonth() - 1).subtract(oldSymbol.shift1, exam, oldSymbol.getStatval1());
+                    stats.get(myRplan.getHome()).get(new LocalDate(myRplan.getStart()).getDayOfMonth() - 1).subtract(oldSymbol.shift1, exam, oldSymbol.getStatval2());
+                }
+                if (symbol != null) {
+                    stats.get(myRplan.getHome()).get(new LocalDate(myRplan.getStart()).getDayOfMonth() - 1).add(symbol.shift1, exam, symbol.getStatval1());
+                    stats.get(myRplan.getHome()).get(new LocalDate(myRplan.getStart()).getDayOfMonth() - 1).add(symbol.shift2, exam, symbol.getStatval2());
+                }
+
+                // update the content
                 content.get(user).remove(getBaseCol(columnIndex));
                 if (em.contains(myRplan)) {
                     content.get(user).add(getBaseCol(columnIndex), myRplan);
                 }
+
                 roster = myRoster;
 
             } catch (OptimisticLockException ole) {
-                OPDE.debug(ole.getMessage());
+                OPDE.warn(ole);
                 if (em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
                 }
@@ -353,10 +362,17 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 em.close();
 
                 int startrow = rowIndex - (rowIndex % 4);
+
                 fireTableCellUpdated(startrow, columnIndex);
                 fireTableCellUpdated(startrow + 1, columnIndex);
                 fireTableCellUpdated(startrow + 2, columnIndex);
                 fireTableCellUpdated(startrow + 3, columnIndex);
+
+                fireTableCellUpdated(COL_FOOTER, columnIndex);
+                fireTableCellUpdated(COL_FOOTER+1, columnIndex);
+                fireTableCellUpdated(COL_FOOTER+2, columnIndex);
+                fireTableCellUpdated(COL_FOOTER+3, columnIndex);
+
             }
         }
     }
@@ -371,9 +387,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             } else if (rowIndex % 4 == 1) {
                 value = user.getVorname();
             } else if (rowIndex % 4 == 2) {
-
                 return rosterParameters.getPreferredHome().get(user).getShortname();
-
             } else {
 
                 if (contracts.get(user).getParameterSet(month).isTrainee()) {
@@ -429,44 +443,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     }
 
 
-    private class Dailystats {
-        BigDecimal exam_early, exam_late, exam_night, social_early, social_late, social_night, helper_early, helper_late, helper_night;
-
-        private Dailystats() {
-            this.exam_early = BigDecimal.ZERO;
-            this.exam_late = BigDecimal.ZERO;
-            this.exam_night = BigDecimal.ZERO;
-            this.social_early = BigDecimal.ZERO;
-            this.social_late = BigDecimal.ZERO;
-            this.social_night = BigDecimal.ZERO;
-            this.helper_early = BigDecimal.ZERO;
-            this.helper_late = BigDecimal.ZERO;
-            this.helper_night = BigDecimal.ZERO;
-        }
-
-        private void add(int shift, boolean exam, BigDecimal val) {
-            if (shift == Symbol.SHIFT_NONE) return;
-
-            if (shift == Symbol.SHIFT_EARLY) {
-                if (exam) {
-                    exam_early.add(val);
-                } else {
-                    helper_early.add(val);
-                }
-            } else if (shift == Symbol.SHIFT_LATE) {
-                if (exam) {
-                    exam_late.add(val);
-                } else {
-                    helper_late.add(val);
-                }
-            } else {
-                if (exam) {
-                    exam_night.add(val);
-                } else {
-                    helper_night.add(val);
-                }
-            }
-        }
+    public HashMap<Homes, ArrayList<DailyStats>> getStats() {
+        return stats;
     }
-
 }

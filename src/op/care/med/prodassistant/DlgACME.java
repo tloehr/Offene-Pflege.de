@@ -102,7 +102,7 @@ public class DlgACME extends JPanel {
 
         //======== dialogPane ========
         {
-            dialogPane.setBorder(Borders.DIALOG_BORDER);
+            dialogPane.setBorder(Borders.DIALOG);
             dialogPane.setLayout(new BorderLayout());
 
             //======== contentPanel ========
