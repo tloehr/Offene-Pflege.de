@@ -83,9 +83,7 @@ public class DlgValue extends MyJDialog {
     }
 
     private void txtWert1FocusLost(FocusEvent e) {
-        OPDE.debug("DlgValue.txtWert1FocusLost: resValue is null: " + (resValue == null));
-        OPDE.debug("DlgValue.txtWert1FocusLost: e.getSource() is null: " + (e.getSource() == null));
-        OPDE.debug("DlgValue.txtWert1FocusLost: e.isTemporary(): " + e.isTemporary());
+        if (resValue == null) return;
 
         BigDecimal bd = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
         if (bd == null) {
@@ -97,6 +95,8 @@ public class DlgValue extends MyJDialog {
     }
 
     private void txtWert2FocusLost(FocusEvent e) {
+        if (resValue == null) return;
+
         BigDecimal bd = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
         if (bd == null) {
             ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(resValue.getVal2()));
@@ -107,6 +107,8 @@ public class DlgValue extends MyJDialog {
     }
 
     private void txtWert3FocusLost(FocusEvent e) {
+        if (resValue == null) return;
+
         BigDecimal bd = SYSTools.parseDecimal(((JTextField) e.getSource()).getText());
         if (bd == null) {
             ((JTextField) e.getSource()).setText(NumberFormat.getNumberInstance().format(resValue.getVal3()));

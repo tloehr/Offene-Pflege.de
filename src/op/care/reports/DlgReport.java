@@ -100,10 +100,10 @@ public class DlgReport extends MyJDialog {
     }
 
     private void txtDauerFocusLost(FocusEvent e) {
-
-        OPDE.debug("DlgReport.txtDauerFocusLost: nReport is null: " + (nReport == null));
-        OPDE.debug("DlgReport.txtDauerFocusLost: e.getSource() is null: " + (e.getSource() == null));
-        OPDE.debug("DlgReport.txtDauerFocusLost: e.isTemporary(): " + e.isTemporary());
+        if (nReport == null) return;
+//        OPDE.debug("DlgReport.txtDauerFocusLost: nReport is null: " + (nReport == null));
+//        OPDE.debug("DlgReport.txtDauerFocusLost: e.getSource() is null: " + (e.getSource() == null));
+//        OPDE.debug("DlgReport.txtDauerFocusLost: e.isTemporary(): " + e.isTemporary());
 
         NumberFormat nf = NumberFormat.getIntegerInstance();
         String test = txtDauer.getText();
