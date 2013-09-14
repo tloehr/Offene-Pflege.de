@@ -168,7 +168,6 @@ public class Symbol {
     }
 
     public LocalTime getEnd() {
-
         return end;
     }
 

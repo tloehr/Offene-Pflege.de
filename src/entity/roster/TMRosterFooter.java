@@ -8,6 +8,8 @@ import com.jidesoft.grid.ColumnIdentifierTableModel;
 import com.jidesoft.grid.StyleModel;
 import entity.Homes;
 import entity.HomesTools;
+import op.OPDE;
+import org.apache.commons.collections.Closure;
 
 import java.util.ArrayList;
 
@@ -22,12 +24,20 @@ public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIde
     TMRoster basemodel;
     ArrayList<Homes> listHomes;
 
-
     private static final long serialVersionUID = -9132647394140127017L;
 
     public TMRosterFooter(TMRoster model) {
         basemodel = model;
         listHomes = new ArrayList<Homes>(HomesTools.getAll());
+
+        basemodel.setFooterUpdateListener(new Closure() {
+            @Override
+            public void execute(Object o) {
+                for (int row = 0; row < getRowCount(); row++) {
+                    fireTableCellUpdated(row, (Integer) o);
+                }
+            }
+        });
     }
 
     public CellStyle getCellStyleAt(int rowIndex, int columnIndex) {
@@ -76,10 +86,11 @@ public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIde
         } else if (getColumnType(columnIndex) == FOOTER_COLUMN) {
             value = "--";
         } else { // here is the stats data
+            DailyStats stats = basemodel.getStats().get(listHomes.get(rowIndex/2)).get(columnIndex-2);
             if (rowIndex % 2 == 0) {
-                value = String.format("%s/%s/%s", basemodel.getStats().get(listHomes.get(rowIndex / 2)).get(rowIndex / 2).exam_early, basemodel.getStats().get(listHomes.get(rowIndex / 2)).get(rowIndex / 2).exam_late, basemodel.getStats().get(listHomes.get(rowIndex / 2)).get(rowIndex / 2).exam_night);
+                value = String.format("%s/%s/%s", stats.exam_early, stats.exam_late, stats.exam_night);
             } else {
-                value = String.format("%s/%s/%s", basemodel.getStats().get(listHomes.get(rowIndex / 2)).get(rowIndex / 2).helper_early, basemodel.getStats().get(listHomes.get(rowIndex / 2)).get(rowIndex / 2).helper_late, basemodel.getStats().get(listHomes.get(rowIndex / 2)).get(rowIndex / 2).helper_night);
+                value = String.format("%s/%s/%s", stats.helper_early, stats.helper_late, stats.helper_night);
             }
         }
 

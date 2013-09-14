@@ -21,7 +21,6 @@ import entity.roster.TMRoster;
 import entity.roster.TMRosterFooter;
 import entity.roster.TMRosterHeader;
 import op.OPDE;
-import org.joda.time.DateMidnight;
 import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
@@ -30,8 +29,10 @@ import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
 
 /**
  * @author Torsten Löhr
@@ -185,8 +186,29 @@ public class FrmRoster extends JFrame {
                 super.componentResized(evt);
                 tsp1.getRowHeaderTable().getColumnModel().getColumn(0).setPreferredWidth(120);
                 tsp1.getRowHeaderTable().getColumnModel().getColumn(1).setPreferredWidth(120);
+                for (int day = 0; day < new LocalDate(roster.getMonth()).dayOfMonth().withMaximumValue().getDayOfMonth(); day++) {
+                    tsp1.getMainTable().getColumnModel().getColumn(day).setPreferredWidth(100);
+                }
             }
         });
+
+        int condition = JComponent.WHEN_IN_FOCUSED_WINDOW;
+        InputMap inputMap = tsp1.getMainTable().getInputMap(condition);
+        ActionMap actionMap = tsp1.getMainTable().getActionMap();
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "delete");
+        actionMap.put("delete", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+
+//                OPDE.debug("delete ?");
+                int rowIndex = tsp1.getMainTable().getSelectedRow();
+                int colIndex = tsp1.getMainTable().getSelectedColumn();
+
+                if (rowIndex >= 0 || colIndex >= 0){
+                    tmRoster.emptyCell(rowIndex, colIndex);
+                }
+            }
+        });
+
 
     }
 
@@ -197,8 +219,8 @@ public class FrmRoster extends JFrame {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "default, $lcgap, default:grow, $lcgap, default",
-            "default, $lgap, default:grow, 2*($lgap, default)"));
+                "default, $lcgap, default:grow, $lcgap, default",
+                "default, $lgap, default:grow, 2*($lgap, default)"));
         setSize(875, 660);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents

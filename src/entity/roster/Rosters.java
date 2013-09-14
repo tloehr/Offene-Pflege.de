@@ -46,12 +46,12 @@ public class Rosters {
     @JoinColumn(name = "loginid", referencedColumnName = "loginid")
     @ManyToOne
     private SYSLogin openedBy;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "roster")
-    private List<Rplan> shifts;
+//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "roster")
+//    private List<Rplan> shifts;
 
-    public List<Rplan> getShifts() {
-        return shifts;
-    }
+//    public List<Rplan> getShifts() {
+//        return shifts;
+//    }
 
     public Rosters() {
     }

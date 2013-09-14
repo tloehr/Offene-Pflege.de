@@ -28,7 +28,7 @@ public class CheckTreeManager extends MouseAdapter implements TreeSelectionListe
         this(tree, true);
     }
 
-    public CheckTreeManager(JTree tree, boolean rootClickable) {
+    private CheckTreeManager(JTree tree, boolean rootClickable) {
         this.tree = tree;
         tree.setCellRenderer(new DefaultTreeCellRenderer()); // Erweiterung. Damit sich die Renderer bei mehrfachem Aufruf nicht aufaddieren.
         selectionModel = new CheckTreeSelectionModel(tree.getModel());

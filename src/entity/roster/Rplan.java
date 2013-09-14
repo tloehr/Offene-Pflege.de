@@ -3,6 +3,8 @@ package entity.roster;
 import entity.Homes;
 import entity.system.Users;
 import op.tools.SYSTools;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -66,6 +68,15 @@ public class Rplan {
     @Version
     private long version;
 
+    public Rplan() {
+    }
+
+    public Rplan(Rosters roster, Homes home, Date start, Users owner) {
+        this.start = start;
+        this.owner = owner;
+        this.roster = roster;
+        this.home = home;
+    }
 
     public Homes getHome() {
         return home;
@@ -205,6 +216,15 @@ public class Rplan {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public void setValuesFromSymbol(Symbol symbol, ContractsParameterSet contractsParameterSet) {
+        basehours = symbol.getBaseHours();
+        extrahours = symbol.getExtraHours(new LocalDate(start), contractsParameterSet);
+        breaktime = symbol.getBreak();
+        start = symbol.getStart(new LocalDate(start)).toDate();
+        DateTime end = symbol.getEnd(new LocalDate(start));
+        this.end = end == null ? null : end.toDate();
     }
 
 
