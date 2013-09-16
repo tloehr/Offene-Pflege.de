@@ -875,11 +875,18 @@ public class ResValueTools {
      * Harris-Benedict-Formula
      *
      * @param weight in kg
-     * @param height in cm
+     * @param height in m
      * @param age    in years
      * @return Basal Metabolic Rate in kcal / 24h
      */
     public static BigDecimal getBasalMetabolicRate(BigDecimal weight, BigDecimal height, int age, int gender) {
+
+        if (weight == null || height == null){
+            return null;
+        }
+
+
+        height = height.multiply(new BigDecimal(100));
 
         BigDecimal bmr;
 
@@ -896,7 +903,7 @@ public class ResValueTools {
     /**
      * Ideal Body Weight (Hamwi Method)
      *
-     * @param height in cm
+     * @param height in m
      * @param gender
      * @return
      */
@@ -905,6 +912,8 @@ public class ResValueTools {
         if (height == null){
             return null;
         }
+
+        height = height.multiply(new BigDecimal(100));
 
         BigDecimal HEIGHT_BARRIER = new BigDecimal(152.4);
         BigDecimal WEIGHT_PER_CM = gender == ResidentTools.MALE ? new BigDecimal(1.1) : new BigDecimal(0.9);

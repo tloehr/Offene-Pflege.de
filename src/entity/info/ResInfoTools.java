@@ -721,11 +721,14 @@ public class ResInfoTools {
         }
 
         ResValue weight = ResValueTools.getLast(resident, ResValueTypesTools.WEIGHT);
-        BigDecimal theoreticalweight = weight.getVal1();
+        BigDecimal theoreticalweight = weight == null ? null : weight.getVal1();
+
         result += "<tr><td valign=\"top\">Zuletzt bestimmtes Körpergewicht</td><td valign=\"top\"><b>";
-        if (weight == null) {
+        if (theoreticalweight == null) {
             result += "Die/der BW wurde noch nicht gewogen.";
+//            theoreticalweight = BigDecimal.ZERO;
         } else {
+
             ResInfo amputation = getLastResinfo(resident, ResInfoTypeTools.TYPE_AMPUTATION);
             BigDecimal adjustmentPercentage = getWeightAdjustmentPercentage(amputation);
 
@@ -757,10 +760,12 @@ public class ResInfoTools {
         ResInfo food = getLastResinfo(resident, ResInfoTypeTools.TYPE_FOOD);
 
 
-        BigDecimal bmi = ResValueTools.getBMI(theoreticalweight, height.getVal1()); // body mass index
+        BigDecimal h = height == null ? null : height.getVal1();
+
+        BigDecimal bmi = ResValueTools.getBMI(theoreticalweight, h); // body mass index
         BigDecimal ubw = getUBW(food); // usual body weight
-        BigDecimal ibw = ResValueTools.getIBW(height.getVal1().multiply(new BigDecimal(100)), resident.getGender()); // ideal body weight
-        BigDecimal bmr = ResValueTools.getBasalMetabolicRate(theoreticalweight, height.getVal1().multiply(new BigDecimal(100)), ResidentTools.getAge(resident).getYears(), resident.getGender()); // base metabolic rate
+        BigDecimal ibw = ResValueTools.getIBW(h, resident.getGender()); // ideal body weight
+        BigDecimal bmr = ResValueTools.getBasalMetabolicRate(theoreticalweight, h, ResidentTools.getAge(resident).getYears(), resident.getGender()); // base metabolic rate
         BigDecimal rl = ResValueTools.getRequiredLiquid(theoreticalweight); // required amount of liquid
         BigDecimal tla = getTargetLiquidAmount(food); // usual body weight
 
