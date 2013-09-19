@@ -20,6 +20,7 @@ import java.util.Date;
 @Entity
 public class Rplan {
     @Column(name = "id", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private long id;
     @Column(name = "p1", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)

@@ -18,6 +18,7 @@ import java.util.List;
 @Entity
 public class Rosters {
     @Column(name = "id", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private long id;
     @Column(name = "section", nullable = false, insertable = true, updatable = true, length = 5, precision = 0)

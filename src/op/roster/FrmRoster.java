@@ -205,6 +205,13 @@ public class FrmRoster extends JFrame {
 
                 if (rowIndex >= 0 || colIndex >= 0){
                     tmRoster.emptyCell(rowIndex, colIndex);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            tsp1.getMainTable().validate();
+                            tsp1.getMainTable().repaint();
+                        }
+                    });
                 }
             }
         });

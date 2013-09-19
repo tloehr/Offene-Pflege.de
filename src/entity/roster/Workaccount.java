@@ -16,6 +16,7 @@ import java.util.Date;
 @Entity
 public class Workaccount {
     @javax.persistence.Column(name = "id", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private long id;
     @javax.persistence.Column(name = "date", nullable = false, insertable = true, updatable = true, length = 19, precision = 0)

@@ -178,13 +178,13 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
         boolean symbolEditable = false;
         boolean preferredHomes = columnIndex == 0 && rowIndex % 4 == 2;
-        boolean emptyPlan = false;
 
         if (inMainArea(columnIndex)) {
             Rplan rplan = content.get(rosterParameters.getUserlist().get(rowIndex / 4)).get(columnIndex - ROW_HEADER);
-            emptyPlan = rplan == null;
 
-            if (!emptyPlan) {
+            if (rplan == null) {
+                symbolEditable = rowIndex % 4 == 0; // empty plans must be started at the first row
+            } else {
                 boolean p3 = !rplan.getP2().isEmpty();
                 boolean p2 = rplan.getP3().isEmpty() && !rplan.getP1().isEmpty();
                 boolean p1 = (rplan.getP2().isEmpty() && !rplan.getP1().isEmpty()) || rplan.getP1().isEmpty();
@@ -199,7 +199,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             }
         }
 
-        return emptyPlan || preferredHomes || (inMainArea(columnIndex) && symbolEditable);
+        return preferredHomes || (inMainArea(columnIndex) && symbolEditable);
     }
 
 
@@ -329,21 +329,16 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
                 myRplan.setValuesFromSymbol(symbol, contracts.get(user).getParameterSet(getDay(columnIndex)));
 
-                if (oldPlan.getId() == 0){
+                if (oldPlan.getId() == 0) {
                     stat.add(exam, rosterParameters.getSymbol(myRplan.getEffectiveP()));
                 } else {
                     stat.replace(exam, rosterParameters.getSymbol(oldPlan.getEffectiveP()), rosterParameters.getSymbol(myRplan.getEffectiveP()));
                 }
 
-
-
                 em.getTransaction().commit();
 
                 // update the content
-                content.get(user).remove(columnIndex - ROW_HEADER);
-                content.get(user).add(columnIndex - ROW_HEADER, myRplan);
-
-//                roster = myRoster;
+                content.get(user).set(columnIndex - ROW_HEADER, myRplan);
 
             } catch (OptimisticLockException ole) {
                 OPDE.warn(ole);
@@ -523,11 +518,10 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
             if (myRplan == null) {
                 // update the content
-                content.get(user).remove(columnIndex);
+                content.get(user).set(columnIndex, null);
             } else {
                 // update the content
-                content.get(user).remove(columnIndex);
-                content.get(user).add(columnIndex, myRplan);
+                content.get(user).set(columnIndex, myRplan);
             }
 
             roster = myRoster;
@@ -555,6 +549,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             if (updateFooter != null) {
                 updateFooter.execute(columnIndex);
             }
+
 
         }
 
