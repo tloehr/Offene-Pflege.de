@@ -59,9 +59,15 @@ public class Rplan {
     @JoinColumn(name = "owner", referencedColumnName = "UKennung")
     @ManyToOne
     private Users owner;
-    @JoinColumn(name = "homeid", referencedColumnName = "EID")
+    @JoinColumn(name = "homeid1", referencedColumnName = "EID")
     @ManyToOne
-    private Homes home;
+    private Homes home1;
+    @JoinColumn(name = "homeid2", referencedColumnName = "EID")
+    @ManyToOne
+    private Homes home2;
+    @JoinColumn(name = "homeid3", referencedColumnName = "EID")
+    @ManyToOne
+    private Homes home3;
     @JoinColumn(name = "rosterid", referencedColumnName = "id")
     @ManyToOne
     private Rosters roster;
@@ -72,19 +78,19 @@ public class Rplan {
     public Rplan() {
     }
 
-    public Rplan(Rosters roster, Homes home, Date start, Users owner) {
+    public Rplan(Rosters roster, Homes home1, Date start, Users owner) {
         this.start = start;
         this.owner = owner;
         this.roster = roster;
-        this.home = home;
+        this.home1 = home1;
     }
 
-    public Homes getHome() {
-        return home;
+    public Homes getHome1() {
+        return home1;
     }
 
-    public void setHome(Homes home) {
-        this.home = home;
+    public void setHome1(Homes home) {
+        this.home1 = home;
     }
 
     public Rosters getRoster() {
@@ -133,6 +139,22 @@ public class Rplan {
         } else {
             this.p3 = null;
         }
+    }
+
+    public Homes getHome2() {
+        return home2;
+    }
+
+    public void setHome2(Homes home2) {
+        this.home2 = home2;
+    }
+
+    public Homes getHome3() {
+        return home3;
+    }
+
+    public void setHome3(Homes home3) {
+        this.home3 = home3;
     }
 
     public String getP1() {

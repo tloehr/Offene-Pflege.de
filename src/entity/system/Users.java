@@ -177,6 +177,10 @@ public class Users implements Serializable, Comparable<Users> {
         return toString().compareTo(o.toString());
     }
 
+    public boolean hasContracts(){
+        return !SYSTools.catchNull(xml).isEmpty();
+    }
+
 //    @Override
 //    public boolean equals(Object object) {
 //

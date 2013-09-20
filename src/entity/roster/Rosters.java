@@ -1,12 +1,10 @@
 package entity.roster;
 
 import entity.system.SYSLogin;
-import entity.system.Users;
-import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -57,7 +55,7 @@ public class Rosters {
     public Rosters() {
     }
 
-    public Rosters(DateMidnight month1) {
+    public Rosters(LocalDate month1) {
         this.month = month1.dayOfMonth().withMinimumValue().toDate();
     }
 
@@ -111,6 +109,18 @@ public class Rosters {
 
     public void setOpenedBy(SYSLogin openedBy) {
         this.openedBy = openedBy;
+    }
+
+    public boolean isActive() {
+        return flag == RostersTools.FLAG_ACTIVE;
+    }
+
+    public boolean isClosed() {
+        return flag == RostersTools.FLAG_CLOSED;
+    }
+
+    public boolean isLocked() {
+        return flag == RostersTools.FLAG_LOCKED;
     }
 
     @Override

@@ -49,7 +49,7 @@ public class FrmRoster extends JFrame {
         this.roster = roster;
         this.readOnly = roster.getOpenedBy() != null;
 
-        setTitle(new LocalDate(roster.getMonth()).toString("MMMM yyyy"));
+        setTitle(new LocalDate(roster.getMonth()).toString("MMMM yyyy") + (readOnly ? "  >>readonly<<" : ""));
 
         if (!readOnly) {
             EntityManager em = OPDE.createEM();
@@ -153,7 +153,7 @@ public class FrmRoster extends JFrame {
             }
         }, new EditorContext("HomesSelectionEditor"));
 
-        tmRoster = new TMRoster(roster, false);
+        tmRoster = new TMRoster(roster, readOnly);
 
         TMRosterHeader tmRosterHeader = new TMRosterHeader(tmRoster);
         TMRosterFooter tmRosterFooter = new TMRosterFooter(tmRoster);

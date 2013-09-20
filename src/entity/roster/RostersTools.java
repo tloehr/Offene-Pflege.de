@@ -1,8 +1,8 @@
 package entity.roster;
 
-import entity.prescription.MedProducts;
+
 import entity.reports.NReport;
-import entity.system.Users;
+
 import op.OPDE;
 import op.tools.Pair;
 import op.tools.SYSTools;
@@ -20,8 +20,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.awt.*;
 import java.io.StringReader;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 
 /**
@@ -33,6 +32,9 @@ import java.util.ArrayList;
  */
 public class RostersTools {
 
+    public static final int FLAG_ACTIVE = 0;
+    public static final int FLAG_CLOSED = 1;
+    public static final int FLAG_LOCKED = 2;
 
     public static ListCellRenderer getRenderer() {
            return new ListCellRenderer() {

@@ -37,7 +37,6 @@ public class WorkAccountTools {
         EntityManager em = OPDE.createEM();
         BigDecimal sum = null;
 
-
         try {
             String jpql = " SELECT SUM(wa.value) " +
                     " FROM Workaccount wa " +
@@ -65,6 +64,39 @@ public class WorkAccountTools {
 
         return sum == null ? BigDecimal.ZERO : sum;
     }
+
+
+    public static BigDecimal getSick(LocalDate day, Users owner) {
+            EntityManager em = OPDE.createEM();
+            BigDecimal sum = null;
+            try {
+                String jpql = " SELECT SUM(wa.value) " +
+                        " FROM Workaccount wa " +
+                        " WHERE wa.owner = :owner AND wa.date >= :boy AND wa.date <= :day AND wa.type IN ( ";
+                for (int type : SICK) {
+                    jpql += type + ",";
+                }
+
+                jpql = jpql.substring(0, jpql.length() - 1) + ")";
+
+                Query query = em.createQuery(jpql);
+                query.setParameter("boy", day.dayOfYear().withMinimumValue().toDate());
+                query.setParameter("day", day.toDate());
+                query.setParameter("owner", owner);
+
+                sum = (BigDecimal) query.getSingleResult();
+            } catch (NonUniqueResultException nue) {
+                // thats ok
+            } catch (NoResultException nre) {
+                // thats ok
+            } catch (Exception se) {
+                OPDE.fatal(se);
+            } finally {
+                em.close();
+            }
+
+            return sum == null ? BigDecimal.ZERO : sum;
+        }
 
 
 }

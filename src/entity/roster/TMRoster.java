@@ -23,6 +23,7 @@ import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -49,7 +50,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     public CellStyle baseStyle;
 
     private Homes defaultHome;
-    HashMap<Homes, ArrayList<DailyStats>> stats;
+    HashMap<Homes, ArrayList<DailyStats>> homestats;
+    HashMap<Users, ArrayList<BigDecimal>> userstats;
     private Closure updateFooter = null;
 
 
@@ -62,13 +64,14 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
         content = new HashMap<Users, ArrayList<Rplan>>();
         contracts = new HashMap<Users, UserContracts>();
-        stats = new HashMap<Homes, ArrayList<DailyStats>>();
+        homestats = new HashMap<Homes, ArrayList<DailyStats>>();
+        userstats = new HashMap<Users, ArrayList<BigDecimal>>();
 
         rosterParameters = RostersTools.getParameters(roster);
         prepareContent();
 
         ROW_FOOTER = getColumnCount() - ROW_FOOTER_WIDTH;
-        COL_FOOTER = COL_HEADER + getRowCount();// - (9 * stats.size());
+        COL_FOOTER = COL_HEADER + getRowCount();// - (9 * homestats.size());
 
         baseStyle = new CellStyle();
         baseStyle.setFont(SYSConst.ARIAL16);
@@ -150,9 +153,15 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             if (rowIndex % 4 != 3) {
                 Rplan myRplan = content.get(user).get(columnIndex - ROW_HEADER);
 
-                myStyle.setForeground(myRplan == null ? Color.black : myRplan.getHome().getColor());
-            }
+                if (rowIndex % 4 == 0) {
+                    myStyle.setForeground(myRplan == null || myRplan.getP1().isEmpty() ? Color.black : myRplan.getHome1().getColor());
+                } else if (rowIndex % 4 == 1) {
+                    myStyle.setForeground(myRplan == null || myRplan.getP2().isEmpty() ? Color.black : myRplan.getHome2().getColor());
+                } else if (rowIndex % 4 == 2) {
+                    myStyle.setForeground(myRplan == null || myRplan.getP3().isEmpty() ? Color.black : myRplan.getHome3().getColor());
+                }
 
+            }
         }
 
         myStyle.setBackground(colors[7]);  //+ (rowIndex % 4)
@@ -210,34 +219,51 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     private void prepareContent() {
 
         for (Homes home : HomesTools.getAll()) {
-            stats.put(home, new ArrayList<DailyStats>());
+            homestats.put(home, new ArrayList<DailyStats>());
             for (int i = 0; i < month.dayOfMonth().withMaximumValue().getDayOfMonth(); i++) {
-                stats.get(home).add(new DailyStats());
+                homestats.get(home).add(new DailyStats());
+            }
+        }
+
+        // as long as the roster is active, all users which have valid contracts can be added to it.
+        if (roster.isActive()) {
+            for (Users user : UsersTools.getUsers(false)) {
+                if (user.hasContracts()) {
+                    contracts.put(user, UsersTools.getContracts(user));
+                    content.put(user, new ArrayList<Rplan>());
+                    for (int i = 0; i < month.dayOfMonth().withMaximumValue().getDayOfMonth(); i++) {
+                        content.get(user).add(null);
+                    }
+                    userstats.put(user, new ArrayList<BigDecimal>(Arrays.asList(new BigDecimal[]{WorkAccountTools.getSum(month, user, WorkAccountTools.HOURS), WorkAccountTools.getSick(month, user), WorkAccountTools.getSum(month, user, WorkAccountTools.HOLIDAYS), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO})));
+                }
             }
         }
 
         for (Rplan rplan : RPlanTools.getAll(roster)) {
+            // later on, when the roster is not necessarily active anymore. Only those users connected to it, are visible.
+            if (!contracts.containsKey(rplan.getOwner())) {
+                contracts.put(rplan.getOwner(), UsersTools.getContracts(rplan.getOwner()));
+                userstats.put(rplan.getOwner(), new ArrayList<BigDecimal>(Arrays.asList(new BigDecimal[]{BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO})));
+            }
 
             if (!content.containsKey(rplan.getOwner())) {
                 content.put(rplan.getOwner(), new ArrayList<Rplan>());
                 for (int i = 0; i < month.dayOfMonth().withMaximumValue().getDayOfMonth(); i++) {
                     content.get(rplan.getOwner()).add(null);
                 }
-                if (!rosterParameters.getUserlist().contains(rplan.getOwner())) {
-                    rosterParameters.getUserlist().add(rplan.getOwner());
-                    rosterParameters.getPreferredHome().put(rplan.getOwner(), defaultHome);
-                }
-
-                contracts.put(rplan.getOwner(), UsersTools.getContracts(rplan.getOwner()));
-
             }
+
+            if (!rosterParameters.getUserlist().contains(rplan.getOwner())) {
+                rosterParameters.getUserlist().add(rplan.getOwner());
+                rosterParameters.getPreferredHome().put(rplan.getOwner(), defaultHome);
+            }
+
 
             DateTime start = new DateTime(rplan.getStart());
             content.get(rplan.getOwner()).add(start.getDayOfMonth() - 1, rplan);
 
             Symbol symbol = rosterParameters.getSymbol(rplan.getEffectiveP());
-            stats.get(rplan.getHome()).get(start.getDayOfMonth() - 1).add(contracts.get(rplan.getOwner()).getParameterSet(month).isExam(), symbol);
-
+            homestats.get(rplan.getHome1()).get(start.getDayOfMonth() - 1).add(contracts.get(rplan.getOwner()).getParameterSet(month).isExam(), symbol);
 
         }
 //        Collections.sort(listUsers, new Comparator<Users>() {
@@ -260,7 +286,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
     @Override
     public int getRowCount() {
-        return rosterParameters.getUserlist().size() * 4;// + (9 * stats.size()); // 9 lines for every home (3x exam, 3x helper, 3x social)
+        return rosterParameters.getUserlist().size() * 4;// + (9 * homestats.size()); // 9 lines for every home (3x exam, 3x helper, 3x social)
     }
 
     @Override
@@ -316,15 +342,18 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 Rplan myRplan = em.merge(oldPlan);
                 em.lock(myRplan, LockModeType.OPTIMISTIC);
 
-                DailyStats stat = stats.get(myRplan.getHome()).get(new LocalDate(myRplan.getStart()).getDayOfMonth() - 1);
+                DailyStats stat = homestats.get(myRplan.getHome1()).get(new LocalDate(myRplan.getStart()).getDayOfMonth() - 1);
                 boolean exam = contracts.get(myRplan.getOwner()).getParameterSet(month).isExam();
 
                 if (rowIndex % 4 == 0) {
                     myRplan.setP1(newSymbol);
+                    myRplan.setHome1(preferredHome);
                 } else if (rowIndex % 4 == 1) {
                     myRplan.setP2(newSymbol);
+                    myRplan.setHome2(preferredHome);
                 } else if (rowIndex % 4 == 2) {
                     myRplan.setP3(newSymbol);
+                    myRplan.setHome3(preferredHome);
                 }
 
                 myRplan.setValuesFromSymbol(symbol, contracts.get(user).getParameterSet(getDay(columnIndex)));
@@ -388,14 +417,16 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                     value = contracts.get(user).getParameterSet(month).isExam() ? "{Examen:bold}" : "Helfer";
                 }
             }
-        } else if (columnIndex == 1) { // stats carry
+        } else if (columnIndex == 1) { // homestats carry
             if (rowIndex % 4 == 0) {
-                BigDecimal hoursCarry = WorkAccountTools.getSum(month, user, WorkAccountTools.HOURS);
+                BigDecimal hoursCarry = userstats.get(user).get(0);
                 value = "Stunden: " + hoursCarry.setScale(2, RoundingMode.HALF_UP).toString();
             } else if (rowIndex % 4 == 1) {
-                value = "";
+                BigDecimal sickdays = userstats.get(user).get(1);
+                value = "Krankheitstage: " + sickdays.setScale(2, RoundingMode.HALF_UP).toString();
             } else if (rowIndex % 4 == 2) {
-                value = "";
+                BigDecimal holidays = userstats.get(user).get(2);
+                value = "Urlaubstage: " + holidays.setScale(2, RoundingMode.HALF_UP).toString();
             }
 
 
@@ -442,8 +473,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     }
 
 
-    public HashMap<Homes, ArrayList<DailyStats>> getStats() {
-        return stats;
+    public HashMap<Homes, ArrayList<DailyStats>> getHomestats() {
+        return homestats;
     }
 
     public void setFooterUpdateListener(Closure updateFooter) {
@@ -486,7 +517,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
             Rplan myRplan = em.merge(oldPlan);
 
-            DailyStats stat = stats.get(myRplan.getHome()).get(new LocalDate(myRplan.getStart()).getDayOfMonth() - 1);
+            DailyStats stat = homestats.get(myRplan.getHome1()).get(new LocalDate(myRplan.getStart()).getDayOfMonth() - 1);
 
             em.lock(myRplan, LockModeType.OPTIMISTIC);
             boolean exam = contracts.get(myRplan.getOwner()).getParameterSet(month).isExam();
@@ -502,9 +533,11 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 Symbol symbol = null;
                 if (rowIndex % 4 == 1) {
                     myRplan.setP2(null);
+                    myRplan.setHome2(null);
                     symbol = rosterParameters.getSymbol(myRplan.getP1());
                 } else if (rowIndex % 4 == 2) {
                     myRplan.setP3(null);
+                    myRplan.setHome3(null);
                     symbol = rosterParameters.getSymbol(myRplan.getP2());
                 }
 

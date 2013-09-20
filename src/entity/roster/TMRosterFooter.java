@@ -8,7 +8,6 @@ import com.jidesoft.grid.ColumnIdentifierTableModel;
 import com.jidesoft.grid.StyleModel;
 import entity.Homes;
 import entity.HomesTools;
-import op.OPDE;
 import org.apache.commons.collections.Closure;
 
 import java.util.ArrayList;
@@ -62,7 +61,7 @@ public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIde
     }
 
     public int getRowCount() {
-        return basemodel.getStats().size() * 2;
+        return basemodel.getHomestats().size() * 2;
     }
 
     @Override
@@ -85,8 +84,8 @@ public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIde
             }
         } else if (getColumnType(columnIndex) == FOOTER_COLUMN) {
             value = "--";
-        } else { // here is the stats data
-            DailyStats stats = basemodel.getStats().get(listHomes.get(rowIndex/2)).get(columnIndex-2);
+        } else { // here is the homestats data
+            DailyStats stats = basemodel.getHomestats().get(listHomes.get(rowIndex/2)).get(columnIndex-2);
             if (rowIndex % 2 == 0) {
                 value = String.format("%s/%s/%s", stats.exam_early, stats.exam_late, stats.exam_night);
             } else {
