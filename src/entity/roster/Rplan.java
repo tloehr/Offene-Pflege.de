@@ -113,10 +113,6 @@ public class Rplan {
         return id;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
     public void setP1(String p1) {
         if (p1 != null) {
             this.p1 = p1.toUpperCase();
@@ -248,6 +244,14 @@ public class Rplan {
         start = symbol.getStart(new LocalDate(start)).toDate();
         DateTime end = symbol.getEnd(new LocalDate(start));
         this.end = end == null ? null : end.toDate();
+    }
+
+    public BigDecimal getNetValue() {
+        return basehours.add(extrahours);
+    }
+
+    public BigDecimal getGrossValue() {
+        return basehours.add(extrahours).add(breaktime);
     }
 
 

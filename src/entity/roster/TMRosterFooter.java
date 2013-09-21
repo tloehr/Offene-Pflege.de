@@ -83,9 +83,9 @@ public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIde
                 value = "Helfer F / S / N";
             }
         } else if (getColumnType(columnIndex) == FOOTER_COLUMN) {
-            value = "--";
+            value = "";
         } else { // here is the homestats data
-            DailyStats stats = basemodel.getHomestats().get(listHomes.get(rowIndex/2)).get(columnIndex-2);
+            HomeStats stats = basemodel.getHomestats().get(listHomes.get(rowIndex/2)).get(columnIndex-2);
             if (rowIndex % 2 == 0) {
                 value = String.format("%s/%s/%s", stats.exam_early, stats.exam_late, stats.exam_night);
             } else {

@@ -20,13 +20,18 @@ import java.math.BigDecimal;
  */
 public class WorkAccountTools {
 
+    // everything thas is entered manually
     public static final int HOLIDAY_MANUAL = 0;
     public static final int HOLIDAY_CALCULATED = 1;
     public static final int HOLIDAY_AUTO = 2;
+    // everything thas is entered manually
     public static final int SICK_MANUAL = 3;
     public static final int SICK_CALCULATED = 4;
+    // everything thas is entered manually
     public static final int HOURS_MANUAL = 5;
     public static final int HOURS_CALCULATED = 6;
+    // these WAs are created when a new roster is created (one WA for every user on it, according to his/her contract params).
+    // When a new User is created for a running roster, this WA is also created on the fly.
     public static final int HOURS_AUTO = 7;
 
     public static final int[] HOLIDAYS = new int[]{HOLIDAY_AUTO, HOLIDAY_CALCULATED, HOLIDAY_MANUAL};

@@ -4,6 +4,8 @@
 
 package op.roster;
 
+import java.awt.event.*;
+import com.jgoodies.forms.factories.*;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.combobox.ExComboBox;
@@ -186,9 +188,10 @@ public class FrmRoster extends JFrame {
                 super.componentResized(evt);
                 tsp1.getRowHeaderTable().getColumnModel().getColumn(0).setPreferredWidth(120);
                 tsp1.getRowHeaderTable().getColumnModel().getColumn(1).setPreferredWidth(120);
-                for (int day = 0; day < new LocalDate(roster.getMonth()).dayOfMonth().withMaximumValue().getDayOfMonth(); day++) {
-                    tsp1.getMainTable().getColumnModel().getColumn(day).setPreferredWidth(100);
+                for (int col = 0; col < tsp1.getMainTable().getColumnCount(); col++) {  //(int day = 0; day < new LocalDate(roster.getMonth()).dayOfMonth().withMaximumValue().getDayOfMonth(); day++) {
+                    tsp1.getMainTable().getColumnModel().getColumn(col).setPreferredWidth(100);
                 }
+                tsp1.getRowFooterTable().getColumnModel().getColumn(0).setPreferredWidth(140);
             }
         });
 
@@ -219,15 +222,41 @@ public class FrmRoster extends JFrame {
 
     }
 
+    private void btnSortUserActionPerformed(ActionEvent e) {
+        // TODO add your code here
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
+        toolBar1 = new JToolBar();
+        btnSortUser = new JButton();
+        btnSortHomes = new JButton();
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "default, $lcgap, default:grow, $lcgap, default",
-                "default, $lgap, default:grow, 2*($lgap, default)"));
+            "default, $lcgap, default:grow, $lcgap, default",
+            "default, $lgap, default:grow, 2*($lgap, default)"));
+
+        //======== toolBar1 ========
+        {
+
+            //---- btnSortUser ----
+            btnSortUser.setText("text");
+            btnSortUser.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnSortUserActionPerformed(e);
+                }
+            });
+            toolBar1.add(btnSortUser);
+
+            //---- btnSortHomes ----
+            btnSortHomes.setText("text");
+            toolBar1.add(btnSortHomes);
+        }
+        contentPane.add(toolBar1, CC.xywh(1, 1, 5, 1));
         setSize(875, 660);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
@@ -256,5 +285,8 @@ public class FrmRoster extends JFrame {
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+    private JToolBar toolBar1;
+    private JButton btnSortUser;
+    private JButton btnSortHomes;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

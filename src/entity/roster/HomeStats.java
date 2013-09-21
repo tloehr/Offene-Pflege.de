@@ -2,12 +2,11 @@ package entity.roster;
 
 import java.math.BigDecimal;
 
-public class DailyStats {
+public class HomeStats {
 
     BigDecimal exam_early, exam_late, exam_night, social_early, social_late, social_night, helper_early, helper_late, helper_night;
 
-
-    public DailyStats() {
+    public HomeStats() {
         clear();
     }
 
