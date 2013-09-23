@@ -12,14 +12,17 @@ import entity.roster.Rosters;
 import entity.roster.RostersTools;
 import op.OPDE;
 import op.tools.CleanablePanel;
+import op.tools.SYSCalendar;
 import op.tools.SYSTools;
+import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.swing.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.*;
+import java.awt.event.*;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -135,6 +138,45 @@ public class PnlUsersWorklog extends CleanablePanel {
         }
     }
 
+    private void btnNewRosterActionPerformed(ActionEvent e) {
+        LocalDate monthToCreate = null;
+        String paramsXML = null;
+        if (lstAllRosters.isEmpty()) {
+            JComboBox cmbMonth = new JComboBox(SYSCalendar.createMonthList(new DateMidnight().minusYears(1).monthOfYear().withMinimumValue(), new DateMidnight().monthOfYear().withMaximumValue()));
+            final Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
+            cmbMonth.setRenderer(new ListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                    return new DefaultListCellRenderer().getListCellRendererComponent(list, monthFormatter.format(((DateMidnight) value).toDate()), index, isSelected, cellHasFocus);
+                }
+            });
+            cmbMonth.setSelectedItem(new DateMidnight());
+            JOptionPane.showMessageDialog(this, cmbMonth);
+            monthToCreate = new LocalDate(cmbMonth.getSelectedItem());
+            paramsXML = RostersTools.DEFAULT_XML;
+        } else {
+            monthToCreate = new LocalDate(lstAllRosters.get(lstAllRosters.size() - 1).getMonth()).plusMonths(1);
+            paramsXML = lstAllRosters.get(lstAllRosters.size() - 1).getXml();
+        }
+
+
+        EntityManager em = OPDE.createEM();
+        em.getTransaction().begin();
+        Rosters newRoster = em.merge(new Rosters(monthToCreate, paramsXML));
+
+        grmpf
+        // stunden soll für den neuen monat eintragen.
+        // ma liste für plan eintragen. auch mehrfach nennnungen erlauben. vielleicht über sysprops.
+
+        em.getTransaction().commit();
+        em.close();
+
+        lstAllRosters.add(newRoster);
+        lstRosters.setModel(SYSTools.list2dlm(lstAllRosters));
+
+
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         scrollPane1 = new JScrollPane();
@@ -162,6 +204,12 @@ public class PnlUsersWorklog extends CleanablePanel {
 
         //---- btnNewRoster ----
         btnNewRoster.setText("new roster");
+        btnNewRoster.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnNewRosterActionPerformed(e);
+            }
+        });
         add(btnNewRoster, CC.xy(3, 5));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }

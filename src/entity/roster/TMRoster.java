@@ -180,7 +180,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-
         if (readOnly) return false;
 
         boolean symbolEditable = false;
@@ -208,7 +207,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
         return preferredHomes || (inMainArea(columnIndex) && symbolEditable);
     }
-
 
     public Pair<Point, Point> getBaseTable() {
         return new Pair(new Point(ROW_HEADER, COL_HEADER), new Point(COL_FOOTER, ROW_FOOTER));

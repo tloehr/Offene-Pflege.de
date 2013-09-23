@@ -36,6 +36,42 @@ public class RostersTools {
     public static final int FLAG_CLOSED = 1;
     public static final int FLAG_LOCKED = 2;
 
+    public static final int SECTION_CARE = 0;
+
+
+    public static final String DEFAULT_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+            "<roster section=\"care\">\n" +
+            "    <config>\n" +
+            "        <hourstoworkperyear value=\"2002\"/>\n" +
+            "    </config>\n" +
+            "    <symbols>\n" +
+            "        <symbol key=\"SC\" calc=\"kwert\" type=\"school\" description=\"Schule\" />\n" +
+            "        <symbol key=\"F\" starttime=\"06:30\" endtime=\"13:15\" break=\"0\" calc=\"awert\" type=\"work\" description=\"Frühdienst\"  shift1=\"early\" statvalue1=\"1.00\"  shift2=\"\" statvalue2=\"0.00\" />\n" +
+            "        <symbol key=\"B\" calc=\"pvalue\" type=\"work\" description=\"Ergo\" />\n" +
+            "        <symbol key=\"FB\" calc=\"awert\" type=\"work\" description=\"Fortbildung\" />\n" +
+            "        <symbol key=\"SL\" starttime=\"13:00\" endtime=\"21:00\" break=\"0\" calc=\"awert\" type=\"work\" description=\"Spätdienst, lang\" />\n" +
+            "        <symbol key=\"M\" calc=\"kwert\" type=\"sick\" description=\"Mutterschutz\" />\n" +
+            "        <symbol key=\"S1\" starttime=\"16:45\" endtime=\"19:45\" break=\"0\" calc=\"awert\" type=\"work\" description=\"Spätdienst, kurz\"  shift1=\"late\" statvalue1=\"1.00\"  shift2=\"\" statvalue2=\"0.00\" />\n" +
+            "        <symbol key=\"N\" starttime=\"19:45\" endtime=\"06:45\" break=\"0\" calc=\"awert\" type=\"work\" description=\"Nachtdienst\"  shift1=\"night\" statvalue1=\"1.00\"  shift2=\"\" statvalue2=\"0.00\" />\n" +
+            "        <symbol key=\"K\" calc=\"kwert\" type=\"sick\" description=\"Krank\" />\n" +
+            "        <symbol key=\"U\" calc=\"uwert\" type=\"onleave\" description=\"Urlaub\" >\n" +
+            "            <monday/>\n" +
+            "            <tuesday/>\n" +
+            "            <wednesday/>\n" +
+            "            <thursday/>\n" +
+            "            <holiday/>\n" +
+            "            <friday/>\n" +
+            "            <saturday/>\n" +
+            "        </symbol>\n" +
+            "        <symbol key=\"F1\" starttime=\"06:45\" endtime=\"09:45\" break=\"0\" calc=\"awert\" type=\"work\" description=\"Frühdienst, kurz\"  shift1=\"early\" statvalue1=\"0.50\"  shift2=\"\" statvalue2=\"0.00\" />\n" +
+            "        <symbol key=\"T\" starttime=\"09:00\" endtime=\"16:00\" break=\"0\" calc=\"awert\" type=\"work\" description=\"Tagdienst\"  shift1=\"early\" statvalue1=\"0.50\"  shift2=\"late\" statvalue2=\"0.50\" />\n" +
+            "        <symbol key=\"S\" starttime=\"13:00\" endtime=\"20:00\" break=\"0\" calc=\"awert\" type=\"work\" description=\"Spätdienst\"  shift1=\"late\" statvalue1=\"1.00\"  shift2=\"\" statvalue2=\"0.00\" />\n" +
+            "        <symbol key=\"X\" calc=\"xwert\" type=\"offduty\" description=\"Frei\" />\n" +
+            "    </symbols>\n" +
+            "    <users>\n" +
+            "    </users>\n" +
+            "</roster>\n";
+
     public static ListCellRenderer getRenderer() {
            return new ListCellRenderer() {
                @Override

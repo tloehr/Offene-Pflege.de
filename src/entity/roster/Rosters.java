@@ -55,8 +55,11 @@ public class Rosters {
     public Rosters() {
     }
 
-    public Rosters(LocalDate month1) {
-        this.month = month1.dayOfMonth().withMinimumValue().toDate();
+    public Rosters(LocalDate month, String xml) {
+        this.month = month.dayOfMonth().withMinimumValue().toDate();
+        this.flag = RostersTools.FLAG_ACTIVE;
+        this.section = RostersTools.SECTION_CARE;
+        this.xml = xml;
     }
 
     public long getId() {
