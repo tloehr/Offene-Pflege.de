@@ -1,9 +1,9 @@
 package entity.roster;
 
-import org.joda.time.DateMidnight;
+import org.joda.time.Interval;
 import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 /**
@@ -105,5 +105,27 @@ public class UserContracts {
         return mySet;
     }
 
+
+    public boolean hasValidContractsInMonth(LocalDate month) {
+        boolean hasValid = false;
+        Interval intervalMonth = new Interval(
+                month.dayOfMonth().withMinimumValue().toDateTime(LocalTime.MIDNIGHT),
+                month.dayOfMonth().withMaximumValue().toDateTime(LocalTime.now().hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue())
+        );
+
+        for (UserContract contract : listContracts) {
+            Interval intervalContract = new Interval(
+                    contract.getDefaults().getFrom().toDateTime(LocalTime.MIDNIGHT),
+                    contract.getDefaults().getTo().toDateTime(LocalTime.now().hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue())
+            );
+
+            hasValid = intervalContract.overlaps(intervalMonth);
+
+            if (hasValid) break;
+
+        }
+
+        return hasValid;
+    }
 
 }

@@ -114,9 +114,11 @@ public class UserContract {
 
             ArrayList<ContractsParameterSet>[] list = new ArrayList[]{probations, extensions, alterations};
 
+            // apply alterations, if any
             for (ArrayList<ContractsParameterSet> set : list) {
                 for (ContractsParameterSet paramset : set) {
-                    if (paramset.getFrom().compareTo(day) <= 0) {
+                    // only those which are currently valid
+                    if (paramset.getFrom().compareTo(day) <= 0 && paramset.getTo().compareTo(day) >= 0) {
                         if (paramset.getNight() != null) {
                             mySet.setNight(paramset.getNight());
                         }

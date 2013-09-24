@@ -10,6 +10,7 @@ import op.OPDE;
 import op.tools.GUITools;
 import op.tools.SYSTools;
 import org.eclipse.persistence.platform.xml.DefaultErrorHandler;
+import org.joda.time.LocalDate;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
@@ -116,8 +117,13 @@ public class UsersTools {
     }
 
 
-    public static UserContracts getContracts(Users user) {
+    public static ArrayList<Users> getUsersWithValidContractsIn(LocalDate month) {
+        ArrayList<Users> listAllUsers = getUsers(true);
+        // hier gehts weiter
 
+    }
+
+    public static UserContracts getContracts(Users user) {
         UsersXML usersXML = new UsersXML();
 
         SAXParserFactory spf = SAXParserFactory.newInstance();

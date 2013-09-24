@@ -164,6 +164,9 @@ public class PnlUsersWorklog extends CleanablePanel {
         em.getTransaction().begin();
         Rosters newRoster = em.merge(new Rosters(monthToCreate, paramsXML));
 
+        // the stats of users with a valid contract for this month are entered here
+
+
         grmpf
         // stunden soll für den neuen monat eintragen.
         // ma liste für plan eintragen. auch mehrfach nennnungen erlauben. vielleicht über sysprops.
@@ -185,8 +188,8 @@ public class PnlUsersWorklog extends CleanablePanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "default, $lcgap, default:grow, $lcgap, default",
-                "default, $lgap, default:grow, 2*($lgap, default)"));
+            "default, $lcgap, default:grow, $lcgap, default",
+            "default, $lgap, default:grow, 2*($lgap, default)"));
 
         //======== scrollPane1 ========
         {
