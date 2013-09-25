@@ -22,6 +22,7 @@ import javax.xml.parsers.SAXParserFactory;
 import java.awt.*;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * @author tloehr
@@ -117,10 +118,19 @@ public class UsersTools {
     }
 
 
-    public static ArrayList<Users> getUsersWithValidContractsIn(LocalDate month) {
+    public static HashMap<Users, UserContracts> getUsersWithValidContractsIn(LocalDate month) {
         ArrayList<Users> listAllUsers = getUsers(true);
+        HashMap<Users, UserContracts> mapUsers = new HashMap<Users, UserContracts>();
         // hier gehts weiter
-
+        for (Users user : listAllUsers) {
+            if (user.hasContracts()) {
+                UserContracts contracts = getContracts(user);
+                if (contracts.hasValidContractsInMonth(month)) {
+                    mapUsers.put(user, contracts);
+                }
+            }
+        }
+        return mapUsers;
     }
 
     public static UserContracts getContracts(Users user) {

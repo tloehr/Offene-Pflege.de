@@ -1,6 +1,7 @@
 package entity.roster;
 
 import entity.system.Users;
+import op.OPDE;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -48,6 +49,17 @@ public class Workaccount {
     @JoinColumn(name = "workinglogid", referencedColumnName = "id")
     @ManyToOne
     private Workinglog workinglog;
+
+    public Workaccount() {
+    }
+
+    public Workaccount(Date date, BigDecimal value, int type, Users owner) {
+        this.date = date;
+        this.value = value;
+        this.type = type;
+        this.owner = owner;
+        this.creator = OPDE.getLogin().getUser();
+    }
 
     public long getId() {
         return id;

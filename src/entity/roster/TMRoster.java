@@ -11,6 +11,7 @@ import op.OPDE;
 import op.tools.Pair;
 import op.tools.SYSConst;
 import org.apache.commons.collections.Closure;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
@@ -34,6 +35,8 @@ import java.util.HashMap;
 public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifierTableModel, StyleModel {
     private Rosters roster;
     private final boolean readOnly;
+    ArrayList<Users> userlist;
+    ArrayList<Homes> homeslist;
     HashMap<Users, ArrayList<Rplan>> content;
     HashMap<Users, UserContracts> contracts;
     RosterParameters rosterParameters = null;
@@ -61,10 +64,11 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         this.month = new LocalDate(roster.getMonth());
 
         content = new HashMap<Users, ArrayList<Rplan>>();
-        contracts = new HashMap<Users, UserContracts>();
+        contracts = UsersTools.getUsersWithValidContractsIn(month);
         homestats = new HashMap<Homes, ArrayList<HomeStats>>();
         userstats = new HashMap<Users, UserStats>();
-
+        userlist = new ArrayList<Users>();
+        homeslist = new ArrayList<Homes>();
         rosterParameters = RostersTools.getParameters(roster);
         prepareContent();
 
@@ -137,7 +141,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
         // basedata
         if (columnIndex >= ROW_HEADER && columnIndex < getColumnCount() - ROW_FOOTER_WIDTH) {
-            Users user = rosterParameters.getUserlist().get(rowIndex / 4);
+            Users user = userlist.get(rowIndex / 4);
 
 
             if (getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SUNDAY || getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SATURDAY) {
@@ -186,7 +190,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         boolean preferredHomes = columnIndex == 0 && rowIndex % 4 == 2;
 
         if (inMainArea(columnIndex)) {
-            Rplan rplan = content.get(rosterParameters.getUserlist().get(rowIndex / 4)).get(columnIndex - ROW_HEADER);
+            Rplan rplan = content.get(userlist.get(rowIndex / 4)).get(columnIndex - ROW_HEADER);
 
             if (rplan == null) {
                 symbolEditable = rowIndex % 4 == 0; // empty plans must be started at the first row
@@ -214,6 +218,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
     private void prepareContent() {
 
+        initUserlist();
+
         for (Homes home : HomesTools.getAll()) {
             homestats.put(home, new ArrayList<HomeStats>());
             for (int i = 0; i < month.dayOfMonth().withMaximumValue().getDayOfMonth(); i++) {
@@ -221,28 +227,28 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             }
         }
 
-        // as long as the roster is active, all users which have valid contracts can be added to it.
-        if (roster.isActive()) {
-            for (Users user : UsersTools.getUsers(false)) {
-                if (user.hasContracts()) {
-                    contracts.put(user, UsersTools.getContracts(user));
-                    content.put(user, new ArrayList<Rplan>());
-                    for (int i = 0; i < month.dayOfMonth().withMaximumValue().getDayOfMonth(); i++) {
-                        content.get(user).add(null);
-                    }
-                    // read the carry values
-                    userstats.put(user, new UserStats(WorkAccountTools.getSum(month, user, WorkAccountTools.HOURS), WorkAccountTools.getSick(month, user), WorkAccountTools.getSum(month, user, WorkAccountTools.HOLIDAYS), rosterParameters));
-                }
-            }
-        }
+//        // as long as the roster is active, all users which have valid contracts can be added to it.
+//        if (roster.isActive()) {
+//            for (Users user : UsersTools.getUsers(false)) {
+//                if (user.hasContracts()) {
+//                    contracts.put(user, UsersTools.getContracts(user));
+//                    content.put(user, new ArrayList<Rplan>());
+//                    for (int i = 0; i < month.dayOfMonth().withMaximumValue().getDayOfMonth(); i++) {
+//                        content.get(user).add(null);
+//                    }
+//                    // read the carry values
+//                    userstats.put(user, new UserStats(WorkAccountTools.getSum(month, user, WorkAccountTools.HOURS), WorkAccountTools.getSick(month, user), WorkAccountTools.getSum(month, user, WorkAccountTools.HOLIDAYS), rosterParameters));
+//                }
+//            }
+//        }
 
         for (Rplan rplan : RPlanTools.getAll(roster)) {
             Users user = rplan.getOwner();
             // later on, when the roster is not necessarily active anymore. Only those users connected to it, are visible.
-            if (!contracts.containsKey(rplan.getOwner())) {
-                contracts.put(user, UsersTools.getContracts(user));
-                userstats.put(user, new UserStats(WorkAccountTools.getSum(month, user, WorkAccountTools.HOURS), WorkAccountTools.getSick(month, user), WorkAccountTools.getSum(month, user, WorkAccountTools.HOLIDAYS), rosterParameters));
-            }
+//            if (!contracts.containsKey(rplan.getOwner())) {
+//                contracts.put(user, UsersTools.getContracts(user));
+//                userstats.put(user, new UserStats(WorkAccountTools.getSum(month, user, WorkAccountTools.HOURS), WorkAccountTools.getSick(month, user), WorkAccountTools.getSum(month, user, WorkAccountTools.HOLIDAYS), rosterParameters));
+//            }
 
             if (!content.containsKey(user)) {
                 content.put(user, new ArrayList<Rplan>());
@@ -251,10 +257,10 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 }
             }
 
-            if (!rosterParameters.getUserlist().contains(user)) {
-                rosterParameters.getUserlist().add(user);
-                rosterParameters.getPreferredHome().put(user, defaultHome);
-            }
+//            if (!userlist.contains(user)) {
+//                rosterParameters.getUserlist().add(user);
+//                rosterParameters.getPreferredHome().put(user, defaultHome);
+//            }
 
 
             DateTime start = new DateTime(rplan.getStart());
@@ -263,7 +269,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             Symbol symbol = rosterParameters.getSymbol(rplan.getEffectiveP());
             homestats.get(rplan.getHome1()).get(start.getDayOfMonth() - 1).add(contracts.get(rplan.getOwner()).getParameterSet(month).isExam(), symbol);
         }
-
 
         for (Users user : userstats.keySet()) {
             userstats.get(user).update(content.get(user));
@@ -280,11 +285,15 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     public void cleanup() {
         content.clear();
         contracts.clear();
+        homeslist.clear();
+        userlist.clear();
+        homestats.clear();
+        userstats.clear();
     }
 
     @Override
     public int getRowCount() {
-        return rosterParameters.getUserlist().size() * 4;// + (9 * homestats.size()); // 9 lines for every home (3x exam, 3x helper, 3x social)
+        return userlist.size() * 4;// + (9 * homestats.size()); // 9 lines for every home (3x exam, 3x helper, 3x social)
     }
 
     @Override
@@ -594,6 +603,24 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             }
 
         }
+
+    }
+
+    private void initUserlist() {
+
+        String strUserlist = OPDE.getProps().getProperty("rosterid:" + roster.getId());
+        if (strUserlist.isEmpty()) return;
+
+        EntityManager em = OPDE.createEM();
+
+        for (String token1 : StringUtils.split(strUserlist, ',')) {
+            String[] strAssign = StringUtils.split(token1, '=');
+            Users myUser = em.find(Users.class, strAssign[0]);
+            Homes myHome = em.find(Homes.class, strAssign[1]);
+            userlist.add(myUser);
+            homeslist.add(myHome);
+        }
+
 
     }
 }

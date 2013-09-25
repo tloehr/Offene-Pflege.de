@@ -8,8 +8,12 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.grid.TableScrollPane;
 import com.jidesoft.pane.CollapsiblePane;
-import entity.roster.Rosters;
-import entity.roster.RostersTools;
+import entity.Homes;
+import entity.HomesTools;
+import entity.roster.*;
+import entity.system.SYSPropsTools;
+import entity.system.Users;
+import entity.system.UsersTools;
 import op.OPDE;
 import op.tools.CleanablePanel;
 import op.tools.SYSCalendar;
@@ -24,6 +28,7 @@ import java.awt.event.*;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -141,6 +146,9 @@ public class PnlUsersWorklog extends CleanablePanel {
     private void btnNewRosterActionPerformed(ActionEvent e) {
         LocalDate monthToCreate = null;
         String paramsXML = null;
+
+        Homes defaultHome = HomesTools.getAll().get(0);
+
         if (lstAllRosters.isEmpty()) {
             JComboBox cmbMonth = new JComboBox(SYSCalendar.createMonthList(new DateMidnight().minusYears(1).monthOfYear().withMinimumValue(), new DateMidnight().monthOfYear().withMaximumValue()));
             final Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
@@ -165,18 +173,27 @@ public class PnlUsersWorklog extends CleanablePanel {
         Rosters newRoster = em.merge(new Rosters(monthToCreate, paramsXML));
 
         // the stats of users with a valid contract for this month are entered here
+        HashMap<Users, UserContracts> mapUsers = UsersTools.getUsersWithValidContractsIn(monthToCreate);
 
+        String userlist = "";
+        for (Users user : mapUsers.keySet()) {
+            em.merge(new Workaccount(monthToCreate.toDate(), mapUsers.get(user).getParameterSet(monthToCreate).getTargetHoursPerMonth().negate(), WorkAccountTools.HOURS_AUTO, user));
+            userlist += user.getUID() + "=" + defaultHome.getEID() + ",";
+        }
 
-        grmpf
-        // stunden soll für den neuen monat eintragen.
+        if (!userlist.isEmpty()) {
+            userlist = userlist.substring(0, userlist.length() - 1);
+        }
         // ma liste für plan eintragen. auch mehrfach nennnungen erlauben. vielleicht über sysprops.
 
         em.getTransaction().commit();
         em.close();
 
+
+        SYSPropsTools.storeProp("rosterid:" + newRoster.getId(), userlist);
+
         lstAllRosters.add(newRoster);
         lstRosters.setModel(SYSTools.list2dlm(lstAllRosters));
-
 
     }
 
@@ -188,8 +205,8 @@ public class PnlUsersWorklog extends CleanablePanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "default, $lcgap, default:grow, $lcgap, default",
-            "default, $lgap, default:grow, 2*($lgap, default)"));
+                "default, $lcgap, default:grow, $lcgap, default",
+                "default, $lgap, default:grow, 2*($lgap, default)"));
 
         //======== scrollPane1 ========
         {

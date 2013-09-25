@@ -26,7 +26,7 @@ public class RosterParameters {
     private int section;
     private HashMap<String, Symbol> symbolMap;
     private HashMap<Users, Homes> preferredHome;
-    private ArrayList<Users> userlist;
+//    private ArrayList<Users> userlist;
 
     public int getSection() {
         return section;
@@ -39,7 +39,7 @@ public class RosterParameters {
     public RosterParameters() {
         symbolMap = new HashMap<String, Symbol>();
         preferredHome = new HashMap<Users, Homes>();
-        userlist = new ArrayList<Users>();
+//        userlist = new ArrayList<Users>();
     }
 
     public void setHoursperyear(int hoursperyear) {
@@ -65,7 +65,7 @@ public class RosterParameters {
         Users user = em.find(Users.class, uid);
         em.close();
         preferredHome.put(user, myHome);
-        userlist.add(user);
+//        userlist.add(user);
     }
 
 //    public void setUserlist(ArrayList<Users> ulist, HashMap<Users, Homes> preferredHome) {
@@ -82,9 +82,9 @@ public class RosterParameters {
         return preferredHome;
     }
 
-    public ArrayList<Users> getUserlist() {
-        return userlist;
-    }
+//    public ArrayList<Users> getUserlist() {
+//        return userlist;
+//    }
 
     public String toXML() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -133,13 +133,13 @@ public class RosterParameters {
             xml += "    </symbols>\n";
         }
 
-        if (!userlist.isEmpty()) {
-            xml += "    <users>\n";
-            for (Users user : userlist) {
-                xml += String.format("        <assign uid=\"%s\" homeid=\"%s\"/>\n", user.getUID(), preferredHome.get(user).getEID());
-            }
-            xml += "    </users>\n";
-        }
+//        if (!userlist.isEmpty()) {
+//            xml += "    <users>\n";
+//            for (Users user : userlist) {
+//                xml += String.format("        <assign uid=\"%s\" homeid=\"%s\"/>\n", user.getUID(), preferredHome.get(user).getEID());
+//            }
+//            xml += "    </users>\n";
+//        }
         xml += "</roster>\n";
         return xml;
     }
