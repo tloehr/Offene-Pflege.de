@@ -18,6 +18,7 @@ import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.swing.*;
@@ -46,7 +47,7 @@ public class PnlDev extends CleanablePanel {
     public PnlDev() {
         initComponents();
 
-        cmbMonth.setModel(SYSCalendar.createMonthList(new DateMidnight().minusYears(1), new DateMidnight()));
+        cmbMonth.setModel(SYSCalendar.createMonthList(new LocalDate().minusYears(1), new LocalDate()));
 
     }
 

@@ -25,7 +25,7 @@ public class RosterParameters {
     private int hoursperyear;
     private int section;
     private HashMap<String, Symbol> symbolMap;
-    private HashMap<Users, Homes> preferredHome;
+//    private HashMap<Users, Homes> preferredHome;
 //    private ArrayList<Users> userlist;
 
     public int getSection() {
@@ -38,7 +38,7 @@ public class RosterParameters {
 
     public RosterParameters() {
         symbolMap = new HashMap<String, Symbol>();
-        preferredHome = new HashMap<Users, Homes>();
+//        preferredHome = new HashMap<Users, Homes>();
 //        userlist = new ArrayList<Users>();
     }
 
@@ -59,14 +59,14 @@ public class RosterParameters {
     }
 
 
-    public void addPreferredHome(String uid, String homeid) {
-        EntityManager em = OPDE.createEM();
-        Homes myHome = em.find(Homes.class, homeid);
-        Users user = em.find(Users.class, uid);
-        em.close();
-        preferredHome.put(user, myHome);
-//        userlist.add(user);
-    }
+//    public void addPreferredHome(String uid, String homeid) {
+//        EntityManager em = OPDE.createEM();
+//        Homes myHome = em.find(Homes.class, homeid);
+//        Users user = em.find(Users.class, uid);
+//        em.close();
+//        preferredHome.put(user, myHome);
+////        userlist.add(user);
+//    }
 
 //    public void setUserlist(ArrayList<Users> ulist, HashMap<Users, Homes> preferredHome) {
 //        userlist.clear();
@@ -78,9 +78,9 @@ public class RosterParameters {
 //    }
 
 
-    public HashMap<Users, Homes> getPreferredHome() {
-        return preferredHome;
-    }
+//    public HashMap<Users, Homes> getPreferredHome() {
+//        return preferredHome;
+//    }
 
 //    public ArrayList<Users> getUserlist() {
 //        return userlist;

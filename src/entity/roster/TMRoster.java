@@ -10,6 +10,7 @@ import entity.system.UsersTools;
 import op.OPDE;
 import op.tools.Pair;
 import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -57,11 +58,10 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
 
     public TMRoster(Rosters roster, boolean readOnly) {
-        defaultHome = StationTools.getStationForThisHost().getHome();
-
         this.roster = roster;
         this.readOnly = readOnly;
         this.month = new LocalDate(roster.getMonth());
+        defaultHome = StationTools.getStationForThisHost().getHome();
 
         content = new HashMap<Users, ArrayList<Rplan>>();
         contracts = UsersTools.getUsersWithValidContractsIn(month);
@@ -70,6 +70,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         userlist = new ArrayList<Users>();
         homeslist = new ArrayList<Homes>();
         rosterParameters = RostersTools.getParameters(roster);
+        initUserlist();
         prepareContent();
 
         ROW_FOOTER = getColumnCount() - ROW_FOOTER_WIDTH;
@@ -190,6 +191,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         boolean preferredHomes = columnIndex == 0 && rowIndex % 4 == 2;
 
         if (inMainArea(columnIndex)) {
+
             Rplan rplan = content.get(userlist.get(rowIndex / 4)).get(columnIndex - ROW_HEADER);
 
             if (rplan == null) {
@@ -218,7 +220,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
     private void prepareContent() {
 
-        initUserlist();
 
         for (Homes home : HomesTools.getAll()) {
             homestats.put(home, new ArrayList<HomeStats>());
@@ -314,11 +315,11 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
         if (aValue.toString().equalsIgnoreCase(getValueAt(rowIndex, columnIndex).toString())) return;
 
-        Users user = rosterParameters.getUserlist().get(rowIndex / 4);
+        Users user = userlist.get(rowIndex / 4);
         boolean selectUser = columnIndex == 0 && rowIndex % 4 == 0;
 
         if (aValue instanceof Homes) {
-            rosterParameters.getPreferredHome().put(user, (Homes) aValue);
+            homeslist.set(rowIndex / 4, (Homes) aValue);
             fireTableCellUpdated(rowIndex, columnIndex);
         } else if (selectUser) {
             OPDE.debug(aValue);
@@ -339,7 +340,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             try {
                 em.getTransaction().begin();
 
-                Homes preferredHome = em.merge(rosterParameters.getPreferredHome().containsKey(user) ? rosterParameters.getPreferredHome().get(user) : defaultHome);
+                Homes preferredHome = em.merge(homeslist.get(rowIndex / 4));
 
                 Rplan oldPlan = content.get(user).get(columnIndex - ROW_HEADER);
                 if (oldPlan == null) {
@@ -414,14 +415,15 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     public Object getValueAt(int rowIndex, int columnIndex) {
 //        OPDE.debug(String.format("rowindex: %d   columnindex: %d", rowIndex, columnIndex));
         Object value = "--";
-        Users user = rosterParameters.getUserlist().get(rowIndex / 4);
+
+        Users user = userlist.get(rowIndex / 4);
         if (columnIndex == 0) {  // Usernames
             if (rowIndex % 4 == 0) {
                 value = user.getName();
             } else if (rowIndex % 4 == 1) {
                 value = user.getVorname();
             } else if (rowIndex % 4 == 2) {
-                return rosterParameters.getPreferredHome().get(user).getShortname();
+                return homeslist.get(rowIndex / 4).getShortname();
             } else {
 
                 if (contracts.get(user).getParameterSet(month).isTrainee()) {
@@ -457,7 +459,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                         OPDE.debug(value);
                     }
                 } else {
-
 
                     value = content.get(user).get(columnIndex - ROW_HEADER).getNetValue().setScale(2, RoundingMode.HALF_UP).toString();
 
@@ -505,7 +506,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         //        rowIndex = rowIndex + COL_HEADER;
 
 //        OPDE.debug(String.format("rowindex: %d   columnindex: %d", rowIndex, columnIndex));
-        Users user = rosterParameters.getUserlist().get(rowIndex / 4);
+        Users user = userlist.get(rowIndex / 4);
 
         Rplan oldPlan = content.get(user).get(columnIndex);
 
@@ -609,18 +610,51 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     private void initUserlist() {
 
         String strUserlist = OPDE.getProps().getProperty("rosterid:" + roster.getId());
-        if (strUserlist.isEmpty()) return;
+        if (SYSTools.catchNull(strUserlist).isEmpty()) return;
 
         EntityManager em = OPDE.createEM();
 
         for (String token1 : StringUtils.split(strUserlist, ',')) {
-            String[] strAssign = StringUtils.split(token1, '=');
-            Users myUser = em.find(Users.class, strAssign[0]);
-            Homes myHome = em.find(Homes.class, strAssign[1]);
-            userlist.add(myUser);
-            homeslist.add(myHome);
+
+            if (token1.equalsIgnoreCase("null")) {
+            } else {
+                String[] strAssign = StringUtils.split(token1, '=');
+                Users myUser = em.find(Users.class, strAssign[0]);
+                Homes myHome = em.find(Homes.class, strAssign[1]);
+                userlist.add(myUser);
+                homeslist.add(myHome);
+                if (!userstats.containsKey(myUser)) {
+                    userstats.put(myUser, new UserStats(WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOURS), WorkAccountTools.getSick(month, myUser), WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOLIDAYS), rosterParameters));
+                    content.put(myUser, new ArrayList<Rplan>());
+                    for (int i = 0; i < month.dayOfMonth().withMaximumValue().getDayOfMonth(); i++) {
+                        content.get(myUser).add(null);
+                    }
+                }
+            }
         }
 
+        em.close();
 
+    }
+
+
+    public String getUserList() {
+        String strUserlist = "";
+
+        int index = 0;
+        for (Users user : userlist) {
+            if (user == null) {
+                strUserlist += "null,";
+            } else {
+                strUserlist += user.getUID() + "=" + homeslist.get(index).getEID() + ",";
+            }
+
+            index++;
+        }
+
+        if (!strUserlist.isEmpty()) {
+            strUserlist = strUserlist.substring(0, strUserlist.length() - 1);
+        }
+        return strUserlist;
     }
 }

@@ -63,8 +63,8 @@ public class RosterXML extends DefaultHandler {
                 }
 
 
-            } else if (tagName.equalsIgnoreCase("assign")) {
-                myRoster.addPreferredHome(attributes.getValue("uid"), attributes.getValue("homeid"));
+//            } else if (tagName.equalsIgnoreCase("assign")) {
+//                myRoster.addPreferredHome(attributes.getValue("uid"), attributes.getValue("homeid"));
             } else if (tagName.equalsIgnoreCase("monday")) {
                 symbol.addDay(DateTimeConstants.MONDAY);
             } else if (tagName.equalsIgnoreCase("tuesday")) {

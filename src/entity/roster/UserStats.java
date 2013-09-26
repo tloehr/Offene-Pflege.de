@@ -18,6 +18,9 @@ public class UserStats {
         this.sick_carry = sick_carry;
         this.holiday_carry = holiday_carry;
         this.rosterParameters = rosterParameters;
+        this.hours_sum = hours_carry;
+        this.sick_sum = sick_carry;
+        this.holiday_sum = holiday_carry;
     }
 
     public void update(ArrayList<Rplan> data) {

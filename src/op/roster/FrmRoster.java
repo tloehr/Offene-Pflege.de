@@ -22,6 +22,8 @@ import entity.roster.Rosters;
 import entity.roster.TMRoster;
 import entity.roster.TMRosterFooter;
 import entity.roster.TMRosterHeader;
+import entity.system.SYSProps;
+import entity.system.SYSPropsTools;
 import op.OPDE;
 import org.joda.time.LocalDate;
 
@@ -94,7 +96,9 @@ public class FrmRoster extends JFrame {
                 em.lock(myRoster, LockModeType.OPTIMISTIC);
                 myRoster.setOpenedBy(null);
 
-                myRoster.setXml(tmRoster.getRosterParameters().toXML());
+                SYSPropsTools.storeProp(em, "rosterid:" + myRoster.getId(), tmRoster.getUserList());
+
+//                myRoster.setXml(tmRoster.getRosterParameters().toXML());
 
                 em.getTransaction().commit();
                 this.roster = myRoster;

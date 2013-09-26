@@ -51,6 +51,7 @@ import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -442,7 +443,7 @@ public class PnlControlling extends CleanablePanel {
          */
         JPanel pblSocialTimes = new JPanel(new BorderLayout());
         final JButton btnSocialTimes = GUITools.createHyperlinkButton("opde.controlling.nursing.social", null, null);
-        final JComboBox cmbSocialTimes = new JComboBox(SYSCalendar.createMonthList(new DateMidnight().minusYears(1), new DateMidnight()));
+        final JComboBox cmbSocialTimes = new JComboBox(SYSCalendar.createMonthList(new LocalDate().minusYears(1), new LocalDate()));
         btnSocialTimes.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -624,7 +625,7 @@ public class PnlControlling extends CleanablePanel {
          */
         JPanel pnlLiquidBalance = new JPanel(new BorderLayout());
         final JButton btnLiquidBalance = GUITools.createHyperlinkButton("opde.controlling.nutrition.liquidbalance", null, null);
-        final JComboBox cmbLiquidBalanceMonth = new JComboBox(SYSCalendar.createMonthList(new DateMidnight().minusYears(1), new DateMidnight()));
+        final JComboBox cmbLiquidBalanceMonth = new JComboBox(SYSCalendar.createMonthList(new LocalDate().minusYears(1), new LocalDate()));
         btnLiquidBalance.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

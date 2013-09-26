@@ -36,10 +36,7 @@ import entity.prescription.BHPTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import org.apache.commons.collections.Closure;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.Period;
+import org.joda.time.*;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -1151,9 +1148,11 @@ public class SYSCalendar {
      * @param start Beginn der Liste
      * @param end Ende der Liste
      */
-    public static DefaultComboBoxModel createMonthList(DateMidnight start, DateMidnight end) {
+    public static DefaultComboBoxModel createMonthList(LocalDate start, LocalDate end) {
         DefaultComboBoxModel dcbm = new DefaultComboBoxModel();
-        for (DateMidnight month = start; month.compareTo(end) <= 0; month = month.plusMonths(1)) {
+        start = start.dayOfMonth().withMinimumValue();
+        end = end.dayOfMonth().withMinimumValue();
+        for (LocalDate month = start; month.compareTo(end) <= 0; month = month.plusMonths(1)) {
             dcbm.addElement(month);
         }
         return dcbm;

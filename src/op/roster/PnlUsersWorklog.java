@@ -150,12 +150,12 @@ public class PnlUsersWorklog extends CleanablePanel {
         Homes defaultHome = HomesTools.getAll().get(0);
 
         if (lstAllRosters.isEmpty()) {
-            JComboBox cmbMonth = new JComboBox(SYSCalendar.createMonthList(new DateMidnight().minusYears(1).monthOfYear().withMinimumValue(), new DateMidnight().monthOfYear().withMaximumValue()));
+            JComboBox cmbMonth = new JComboBox(SYSCalendar.createMonthList(new LocalDate().minusYears(1).monthOfYear().withMinimumValue(), new LocalDate().monthOfYear().withMaximumValue()));
             final Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
             cmbMonth.setRenderer(new ListCellRenderer() {
                 @Override
                 public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                    return new DefaultListCellRenderer().getListCellRendererComponent(list, monthFormatter.format(((DateMidnight) value).toDate()), index, isSelected, cellHasFocus);
+                    return new DefaultListCellRenderer().getListCellRendererComponent(list, monthFormatter.format(((LocalDate) value).toDate()), index, isSelected, cellHasFocus);
                 }
             });
             cmbMonth.setSelectedItem(new DateMidnight());
@@ -163,7 +163,7 @@ public class PnlUsersWorklog extends CleanablePanel {
             monthToCreate = new LocalDate(cmbMonth.getSelectedItem());
             paramsXML = RostersTools.DEFAULT_XML;
         } else {
-            monthToCreate = new LocalDate(lstAllRosters.get(lstAllRosters.size() - 1).getMonth()).plusMonths(1);
+            monthToCreate = new LocalDate(lstAllRosters.get(lstAllRosters.size() - 1).getMonth()).plusMonths(1).dayOfMonth().withMinimumValue();
             paramsXML = lstAllRosters.get(lstAllRosters.size() - 1).getXml();
         }
 
@@ -241,7 +241,7 @@ public class PnlUsersWorklog extends CleanablePanel {
 
     @Override
     public void reload() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        initPanel();
     }
 
     @Override
