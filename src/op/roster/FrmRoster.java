@@ -4,8 +4,7 @@
 
 package op.roster;
 
-import java.awt.event.*;
-import com.jgoodies.forms.factories.*;
+import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.combobox.ExComboBox;
@@ -22,8 +21,9 @@ import entity.roster.Rosters;
 import entity.roster.TMRoster;
 import entity.roster.TMRosterFooter;
 import entity.roster.TMRosterHeader;
-import entity.system.SYSProps;
 import entity.system.SYSPropsTools;
+import entity.system.Users;
+import entity.system.UsersTools;
 import op.OPDE;
 import org.joda.time.LocalDate;
 
@@ -33,10 +33,10 @@ import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EventObject;
 
 /**
  * @author Torsten Löhr
@@ -146,18 +146,119 @@ public class FrmRoster extends JFrame {
             }
         });
 
+        ObjectConverterManager.registerConverter(Users.class, new ObjectConverter() {
+            @Override
+            public String toString(Object o, ConverterContext converterContext) {
+                return o instanceof Users ? ((Users) o).getName() : "";
+            }
+
+            @Override
+            public boolean supportToString(Object o, ConverterContext converterContext) {
+                return true;
+            }
+
+            @Override
+            public Object fromString(String s, ConverterContext converterContext) {
+                return null;
+            }
+
+            @Override
+            public boolean supportFromString(String s, ConverterContext converterContext) {
+                return false;
+            }
+        });
+
         CellEditorManager.registerEditor(Homes.class, new CellEditorFactory() {
             public CellEditor create() {
                 return new ExComboBoxCellEditor() {
+                    ExComboBox myEditor;
+
                     @Override
                     public ExComboBox createExComboBox() {
-                        ExComboBox myEditor = new ListExComboBox(HomesTools.getAll().toArray());
+                        myEditor = new ListExComboBox(HomesTools.getAll().toArray());
                         myEditor.setRenderer(HomesTools.getRenderer());
                         return myEditor;
+                    }
+
+                    @Override
+                    public void setCellEditorValue(Object o) {
+                        Homes myHome = (Homes) o;
+                        myEditor.setSelectedItem(myHome);
+                    }
+
+                    @Override
+                    public boolean isCellEditable(EventObject eventObject) {
+                        if (eventObject instanceof MouseEvent) {
+                            return ((MouseEvent) eventObject).getClickCount() >= 2;
+                        }
+                        return true;
+
                     }
                 };
             }
         }, new EditorContext("HomesSelectionEditor"));
+
+        CellEditorManager.registerEditor(Users.class, new CellEditorFactory() {
+            public CellEditor create() {
+                return new ExComboBoxCellEditor() {
+                    ExComboBox myEditor;
+
+                    @Override
+                    public ExComboBox createExComboBox() {
+                        ArrayList<Users> listAllAllowedUsers = new ArrayList<Users>(UsersTools.getUsersWithValidContractsIn(new LocalDate(roster.getMonth())).keySet());
+                        Collections.sort(listAllAllowedUsers);
+
+                        myEditor = new ListExComboBox(listAllAllowedUsers.toArray());
+                        myEditor.setRenderer(UsersTools.getRenderer());
+                        return myEditor;
+                    }
+
+                    @Override
+                    public void setCellEditorValue(Object o) {
+                        Users myUser = (Users) o;
+                        myEditor.setSelectedItem(myUser);
+                    }
+
+                    @Override
+                    public boolean isCellEditable(EventObject eventObject) {
+                        if (eventObject instanceof MouseEvent) {
+                            return ((MouseEvent) eventObject).getClickCount() >= 2;
+                        }
+                        return true;
+
+                    }
+                };
+            }
+        }, new EditorContext("UserSelectionEditor"));
+
+        CellEditorManager.registerEditor(String.class, new CellEditorFactory() {
+            public CellEditor create() {
+                return new TextFieldCellEditor(String.class) {
+                    JTextField myEditor;
+
+                    @Override
+                    protected JTextField createTextField() {
+                        myEditor = super.createTextField();
+                        return myEditor;
+                    }
+
+                    @Override
+                    public void setCellEditorValue(Object o) {
+                        myEditor.setText(o.toString());
+                    }
+
+                    @Override
+                    public boolean isCellEditable(EventObject eventObject) {
+                        if (eventObject instanceof MouseEvent) {
+                            return ((MouseEvent) eventObject).getClickCount() >= 2;
+                        }
+                        return true;
+
+                    }
+                };
+            }
+        }, new EditorContext("DefaultTextEditor"));
+
 
         tmRoster = new TMRoster(roster, readOnly);
 
@@ -194,6 +295,7 @@ public class FrmRoster extends JFrame {
                 tsp1.getRowHeaderTable().getColumnModel().getColumn(1).setPreferredWidth(120);
                 for (int col = 0; col < tsp1.getMainTable().getColumnCount(); col++) {  //(int day = 0; day < new LocalDate(roster.getMonth()).dayOfMonth().withMaximumValue().getDayOfMonth(); day++) {
                     tsp1.getMainTable().getColumnModel().getColumn(col).setPreferredWidth(100);
+
                 }
                 tsp1.getRowFooterTable().getColumnModel().getColumn(0).setPreferredWidth(140);
             }
@@ -210,7 +312,7 @@ public class FrmRoster extends JFrame {
                 int rowIndex = tsp1.getMainTable().getSelectedRow();
                 int colIndex = tsp1.getMainTable().getSelectedColumn();
 
-                if (rowIndex >= 0 || colIndex >= 0){
+                if (rowIndex >= 0 || colIndex >= 0) {
                     tmRoster.emptyCell(rowIndex, colIndex);
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
@@ -240,8 +342,8 @@ public class FrmRoster extends JFrame {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "default, $lcgap, default:grow, $lcgap, default",
-            "default, $lgap, default:grow, 2*($lgap, default)"));
+                "default, $lcgap, default:grow, $lcgap, default",
+                "default, $lgap, default:grow, 2*($lgap, default)"));
 
         //======== toolBar1 ========
         {

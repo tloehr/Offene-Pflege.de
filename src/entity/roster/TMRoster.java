@@ -91,6 +91,9 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         if (columnIndex == 0 && rowIndex % 4 == 2) {
             return Homes.class;
         }
+        if (columnIndex == 0 && rowIndex % 4 == 0) {
+            return Users.class;
+        }
         return String.class;
     }
 
@@ -101,10 +104,13 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
     @Override
     public EditorContext getEditorContextAt(int rowIndex, int columnIndex) {
+        if (columnIndex == 0 && rowIndex % 4 == 0) {
+            return new EditorContext("UserSelectionEditor");
+        }
         if (columnIndex == 0 && rowIndex % 4 == 2) {
             return new EditorContext("HomesSelectionEditor");
         }
-        return super.getEditorContextAt(rowIndex, columnIndex);
+        return new EditorContext("DefaultTextEditor");
     }
 
     @Override
@@ -140,9 +146,9 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             //myStyle.setBackground(SYSConst.yellow1[6 + (rowIndex % 4)]);
         }
 
+
         // basedata
         if (columnIndex >= ROW_HEADER && columnIndex < getColumnCount() - ROW_FOOTER_WIDTH) {
-            Users user = userlist.get(rowIndex / 4);
 
 
             if (getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SUNDAY || getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SATURDAY) {
@@ -153,23 +159,24 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 colors = SYSConst.red2;
             }
 
-            if (rowIndex % 4 != 3) {
-                Rplan myRplan = content.get(user).get(columnIndex - ROW_HEADER);
+            Users user = userlist.get(rowIndex / 4);
+            if (user != null) {
+                if (rowIndex % 4 != 3) {
+                    Rplan myRplan = content.get(user).get(columnIndex - ROW_HEADER);
 
-                if (rowIndex % 4 == 0) {
-                    myStyle.setForeground(myRplan == null || myRplan.getP1().isEmpty() ? Color.black : myRplan.getHome1().getColor());
-                } else if (rowIndex % 4 == 1) {
-                    myStyle.setForeground(myRplan == null || myRplan.getP2().isEmpty() ? Color.black : myRplan.getHome2().getColor());
-                } else if (rowIndex % 4 == 2) {
-                    myStyle.setForeground(myRplan == null || myRplan.getP3().isEmpty() ? Color.black : myRplan.getHome3().getColor());
+                    if (rowIndex % 4 == 0) {
+                        myStyle.setForeground(myRplan == null || myRplan.getP1().isEmpty() ? Color.black : myRplan.getHome1().getColor());
+                    } else if (rowIndex % 4 == 1) {
+                        myStyle.setForeground(myRplan == null || myRplan.getP2().isEmpty() ? Color.black : myRplan.getHome2().getColor());
+                    } else if (rowIndex % 4 == 2) {
+                        myStyle.setForeground(myRplan == null || myRplan.getP3().isEmpty() ? Color.black : myRplan.getHome3().getColor());
+                    }
+
                 }
-
             }
         }
 
         myStyle.setBackground(colors[7]);  //+ (rowIndex % 4)
-//        myStyle.setFont(new Font("Arial", Font.PLAIN, 28));
-
 
         return myStyle;
     }
@@ -183,6 +190,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         return columnIndex >= ROW_HEADER && columnIndex < ROW_FOOTER;
     }
 
+
+
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         if (readOnly) return false;
@@ -190,9 +199,13 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         boolean symbolEditable = false;
         boolean preferredHomes = columnIndex == 0 && rowIndex % 4 == 2;
 
-        if (inMainArea(columnIndex)) {
+        boolean setUser = columnIndex == 0 && rowIndex % 4 == 0;
 
-            Rplan rplan = content.get(userlist.get(rowIndex / 4)).get(columnIndex - ROW_HEADER);
+        Users user = userlist.get(rowIndex / 4);
+
+        if (user != null && inMainArea(columnIndex)) {
+
+            Rplan rplan = content.get(user).get(columnIndex - ROW_HEADER);
 
             if (rplan == null) {
                 symbolEditable = rowIndex % 4 == 0; // empty plans must be started at the first row
@@ -211,7 +224,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             }
         }
 
-        return preferredHomes || (inMainArea(columnIndex) && symbolEditable);
+        return setUser || preferredHomes || (symbolEditable && user != null && inMainArea(columnIndex));
     }
 
     public Pair<Point, Point> getBaseTable() {
@@ -219,7 +232,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     }
 
     private void prepareContent() {
-
 
         for (Homes home : HomesTools.getAll()) {
             homestats.put(home, new ArrayList<HomeStats>());
@@ -321,6 +333,21 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         if (aValue instanceof Homes) {
             homeslist.set(rowIndex / 4, (Homes) aValue);
             fireTableCellUpdated(rowIndex, columnIndex);
+        } else if (aValue instanceof Users) {
+            Users myUser = (Users) aValue;
+            userlist.set(rowIndex / 4, myUser);
+            homeslist.set(rowIndex / 4, defaultHome);
+
+            if (!userstats.containsKey(myUser)) {
+                userstats.put(myUser, new UserStats(WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOURS), WorkAccountTools.getSick(month, myUser), WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOLIDAYS), rosterParameters));
+                content.put(myUser, new ArrayList<Rplan>());
+                for (int i = 0; i < month.dayOfMonth().withMaximumValue().getDayOfMonth(); i++) {
+                    content.get(myUser).add(null);
+                }
+            }
+
+            int startrow = rowIndex - (rowIndex % 4);
+            fireTableRowsUpdated(startrow, startrow + 3);
         } else if (selectUser) {
             OPDE.debug(aValue);
         } else {
@@ -417,13 +444,18 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         Object value = "--";
 
         Users user = userlist.get(rowIndex / 4);
+
+        if (user == null) {
+            return "";
+        }
+
         if (columnIndex == 0) {  // Usernames
             if (rowIndex % 4 == 0) {
-                value = user.getName();
+                value = user;
             } else if (rowIndex % 4 == 1) {
                 value = user.getVorname();
             } else if (rowIndex % 4 == 2) {
-                return homeslist.get(rowIndex / 4).getShortname();
+                return homeslist.get(rowIndex / 4);
             } else {
 
                 if (contracts.get(user).getParameterSet(month).isTrainee()) {
@@ -608,7 +640,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     }
 
     private void initUserlist() {
-
         String strUserlist = OPDE.getProps().getProperty("rosterid:" + roster.getId());
         if (SYSTools.catchNull(strUserlist).isEmpty()) return;
 
@@ -617,6 +648,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         for (String token1 : StringUtils.split(strUserlist, ',')) {
 
             if (token1.equalsIgnoreCase("null")) {
+                userlist.add(null);
+                homeslist.add(null);
             } else {
                 String[] strAssign = StringUtils.split(token1, '=');
                 Users myUser = em.find(Users.class, strAssign[0]);
@@ -634,7 +667,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         }
 
         em.close();
-
     }
 
 
