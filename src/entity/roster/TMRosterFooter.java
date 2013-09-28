@@ -61,7 +61,7 @@ public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIde
     }
 
     public int getRowCount() {
-        return basemodel.getHomestats().size() * 2;
+        return basemodel.getHomestats().size() * 3;
     }
 
     @Override
@@ -79,17 +79,21 @@ public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIde
         } else if (columnIndex == 1) {
             if (rowIndex % 2 == 0) {
                 value = "Examen F / S / N";
-            } else {
+            } else if (rowIndex % 2 == 1) {
                 value = "Helfer F / S / N";
+            } else if (rowIndex % 2 == 2) {
+                value = "Sozial F / S / N";
             }
         } else if (getColumnType(columnIndex) == FOOTER_COLUMN) {
             value = "";
         } else { // here is the homestats data
-            HomeStats stats = basemodel.getHomestats().get(listHomes.get(rowIndex/2)).get(columnIndex-2);
+            HomeStats stats = basemodel.getHomestats().get(listHomes.get(rowIndex / 2)).get(columnIndex - 2);
             if (rowIndex % 2 == 0) {
                 value = String.format("%s/%s/%s", stats.exam_early, stats.exam_late, stats.exam_night);
-            } else {
+            } else if (rowIndex % 2 == 1) {
                 value = String.format("%s/%s/%s", stats.helper_early, stats.helper_late, stats.helper_night);
+            } else if (rowIndex % 2 == 2) {
+                value = String.format("%s/%s/%s", stats.social_early, stats.social_late, stats.social_night);
             }
         }
 

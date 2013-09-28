@@ -34,6 +34,42 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifierTableModel, StyleModel {
+
+    public static final int CT_INVALID = -1;
+    public static final int CT_EMP_LASTNAME = 0;
+    public static final int CT_EMP_FIRSTNAME = 1;
+    public static final int CT_EMP_PREFERRED_HOME = 2;
+    public static final int CT_EMP_QUALIFICATION = 3;
+    public static final int CT_HEADER_USER = 4;
+    public static final int CT_HEADER_USER_EMPTY = 5;
+    public static final int CT_HEADER_CARRY = 6;
+    public static final int CT_HEADER_CARRY_EMPTY = 7;
+    public static final int CT_HEADER_SUM = 8;
+    public static final int CT_HEADER_SUM_EMPTY = 9;
+    public static final int CT_HEADER_DATE = 10;
+    public static final int CT_HEADER_WEEKDAY = 11;
+    public static final int CT_CARRY_SICK = 12;
+    public static final int CT_CARRY_HOLIDAY = 13;
+    public static final int CT_CARRY_EMPTY = 14;
+    public static final int CT_CARRY_HOURS = 15;
+    public static final int CT_SUM_SICK = 16;
+    public static final int CT_SUM_HOLIDAY = 17;
+    public static final int CT_SUM_EMPTY = 18;
+    public static final int CT_SUM_HOURS = 19;
+    public static final int CT_P1 = 20;
+    public static final int CT_P2 = 21;
+    public static final int CT_ACTUAL = 22;
+    public static final int CT_HOURS = 23;
+    public static final int CT_HEADER_HOME_STAT = 24;
+    public static final int CT_HEADER_HOME_STAT_EMPTY1 = 25;
+    public static final int CT_HEADER_HOME_STAT_EMPTY2 = 26;
+    public static final int CT_HEADER_EXAM_STAT = 27;
+    public static final int CT_HEADER_HELPER_STAT = 28;
+    public static final int CT_HEADER_SOCIAL_STAT = 29;
+    public static final int CT_FOOTER_HOME_STAT = 30;
+    public static final int CT_FOOTER_HOME_STAT_EMPTY1 = 31;
+    public static final int CT_FOOTER_HOME_STAT_EMPTY2 = 32;
+
     private Rosters roster;
     private final boolean readOnly;
     ArrayList<Users> userlist;
@@ -95,6 +131,55 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             return Users.class;
         }
         return String.class;
+    }
+
+    public int getCellTypeAt(int rowIndex, int columnIndex) {
+        int cellType = CT_INVALID;
+        if (columnIndex == 0) {
+            if (rowIndex % 4 == 0) {
+                cellType = CT_EMP_LASTNAME;
+            } else if (rowIndex % 4 == 1) {
+                cellType = CT_EMP_FIRSTNAME;
+            } else if (rowIndex % 4 == 2) {
+                cellType = CT_EMP_PREFERRED_HOME;
+            } else if (rowIndex % 4 == 3) {
+                cellType = CT_EMP_QUALIFICATION;
+            }
+        } else if (columnIndex == 1) { // homestats carry
+            if (rowIndex % 4 == 0) {
+                cellType = CT_CARRY_SICK;
+            } else if (rowIndex % 4 == 1) {
+                cellType = CT_CARRY_HOLIDAY;
+            } else if (rowIndex % 4 == 2) {
+                cellType = CT_CARRY_EMPTY;
+            } else if (rowIndex % 4 == 3) {
+                cellType = CT_CARRY_HOURS;
+            }
+        } else if (columnIndex >= ROW_HEADER && columnIndex < ROW_FOOTER) {
+            if (rowIndex % 4 == 0) {
+                cellType = CT_P1;
+            } else if (rowIndex % 4 == 1) {
+                cellType = CT_P2;
+            } else if (rowIndex % 4 == 2) {
+                cellType = CT_ACTUAL;
+
+            } else if (rowIndex % 4 == 3) {
+                cellType = CT_HOURS;
+            }
+        } else if (columnIndex == ROW_FOOTER) {
+            if (rowIndex % 4 == 0) {
+                cellType = CT_SUM_SICK;
+            } else if (rowIndex % 4 == 1) {
+                cellType = CT_SUM_HOLIDAY;
+            } else if (rowIndex % 4 == 2) {
+                cellType = CT_SUM_EMPTY;
+
+            } else if (rowIndex % 4 == 3) {
+                cellType = CT_SUM_HOURS;
+            }
+        }
+
+        return cellType;
     }
 
     @Override
@@ -161,17 +246,12 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
             Users user = userlist.get(rowIndex / 4);
             if (user != null) {
-                if (rowIndex % 4 != 3) {
+                if (rowIndex % 4 == 0) {
                     Rplan myRplan = content.get(user).get(columnIndex - ROW_HEADER);
-
-                    if (rowIndex % 4 == 0) {
-                        myStyle.setForeground(myRplan == null || myRplan.getP1().isEmpty() ? Color.black : myRplan.getHome1().getColor());
-                    } else if (rowIndex % 4 == 1) {
-                        myStyle.setForeground(myRplan == null || myRplan.getP2().isEmpty() ? Color.black : myRplan.getHome2().getColor());
-                    } else if (rowIndex % 4 == 2) {
-                        myStyle.setForeground(myRplan == null || myRplan.getP3().isEmpty() ? Color.black : myRplan.getHome3().getColor());
-                    }
-
+                    myStyle.setForeground(myRplan == null || myRplan.getP1().isEmpty() ? Color.black : myRplan.getHome1().getColor());
+                } else if (rowIndex % 4 == 1) {
+                    Rplan myRplan = content.get(user).get(columnIndex - ROW_HEADER);
+                    myStyle.setForeground(myRplan == null || myRplan.getP2().isEmpty() ? Color.black : myRplan.getHome2().getColor());
                 }
             }
         }
@@ -189,7 +269,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     private boolean inMainArea(int columnIndex) {
         return columnIndex >= ROW_HEADER && columnIndex < ROW_FOOTER;
     }
-
 
 
     @Override
@@ -210,7 +289,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             if (rplan == null) {
                 symbolEditable = rowIndex % 4 == 0; // empty plans must be started at the first row
             } else {
-                boolean p3 = !rplan.getP2().isEmpty();
                 boolean p2 = rplan.getP3().isEmpty() && !rplan.getP1().isEmpty();
                 boolean p1 = (rplan.getP2().isEmpty() && !rplan.getP1().isEmpty()) || rplan.getP1().isEmpty();
 
@@ -218,18 +296,17 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                     symbolEditable = p1;
                 } else if (rowIndex % 4 == 1) {
                     symbolEditable = p2;
-                } else if (rowIndex % 4 == 2) {
-                    symbolEditable = p3;
+
                 }
             }
         }
-
         return setUser || preferredHomes || (symbolEditable && user != null && inMainArea(columnIndex));
     }
 
     public Pair<Point, Point> getBaseTable() {
         return new Pair(new Point(ROW_HEADER, COL_HEADER), new Point(COL_FOOTER, ROW_FOOTER));
     }
+
 
     private void prepareContent() {
 
@@ -289,11 +366,11 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
     }
 
-
-    @Override
-    public String getColumnName(int column) {
-        return null;
-    }
+//
+//    @Override
+//    public String getColumnName(int column) {
+//        return null;
+//    }
 
     public void cleanup() {
         content.clear();

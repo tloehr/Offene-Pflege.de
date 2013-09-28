@@ -4,13 +4,17 @@ import java.math.BigDecimal;
 
 public class HomeStats {
 
+    public static final int EXAM = 0;
+    public static final int HELPER = 0;
+    public static final int SOCIAL = 0;
+
     BigDecimal exam_early, exam_late, exam_night, social_early, social_late, social_night, helper_early, helper_late, helper_night;
 
     public HomeStats() {
         clear();
     }
 
-    public void add(int shift, boolean exam, BigDecimal val) {
+    public void add(int shift, int type, BigDecimal val) {
         if (shift == Symbol.SHIFT_NONE) return;
 
         if (shift == Symbol.SHIFT_EARLY) {

@@ -25,6 +25,8 @@ import entity.system.SYSPropsTools;
 import entity.system.Users;
 import entity.system.UsersTools;
 import op.OPDE;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
@@ -47,6 +49,7 @@ public class FrmRoster extends JFrame {
     private Rosters roster;
     private final boolean readOnly;
     private TableScrollPane tsp1;
+    private JPopupMenu menu;
 
     public FrmRoster(Rosters roster) {
 
@@ -270,6 +273,7 @@ public class FrmRoster extends JFrame {
         tsp1.getColumnHeaderTable().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         tsp1.getColumnFooterTable().setAutoResizeMode(JideTable.AUTO_RESIZE_FILL);
         tsp1.getMainTable().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        tsp1.getMainTable().getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 
         tsp1.getRowHeaderTable().getColumnModel().getColumn(0).setCellRenderer(new TableCellRenderer() {
             @Override
@@ -280,6 +284,14 @@ public class FrmRoster extends JFrame {
                 return lbl;
             }
         });
+
+        tsp1.getMainTable().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                mousePressedOnTable(e);
+            }
+        });
+
 
         tsp1.getRowHeaderTable().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         tsp1.getRowFooterTable().setAutoResizeMode(JideTable.AUTO_RESIZE_FILL);
@@ -300,6 +312,10 @@ public class FrmRoster extends JFrame {
                 tsp1.getRowFooterTable().getColumnModel().getColumn(0).setPreferredWidth(140);
             }
         });
+
+        tsp1.setRowSelectionAllowed(false);
+        tsp1.setColumnSelectionAllowed(false);
+        tsp1.setCellSelectionEnabled(true);
 
         int condition = JComponent.WHEN_IN_FOCUSED_WINDOW;
         InputMap inputMap = tsp1.getMainTable().getInputMap(condition);
@@ -388,6 +404,49 @@ public class FrmRoster extends JFrame {
 
     public Rosters getRoster() {
         return roster;
+    }
+
+    private void mousePressedOnTable(java.awt.event.MouseEvent evt) {
+
+        Point p = evt.getPoint();
+//            ListSelectionModel lsm = tblFiles.getSelectionModel();
+//            Point p2 = evt.getPoint();
+//            SwingUtilities.convertPointToScreen(p2, tblFiles);
+//            final Point screenposition = p2;
+
+//        boolean singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
+
+        final int row = tsp1.getMainTable().rowAtPoint(p);
+        final int col = tsp1.getMainTable().columnAtPoint(p);
+
+        tsp1.getMainTable().setRowSelectionInterval(row, row);
+        tsp1.getMainTable().setColumnSelectionInterval(col, col);
+
+//        if (singleRowSelected) {
+//            lsm.setSelectionInterval(row, row);
+//        }
+
+
+        if (SwingUtilities.isRightMouseButton(evt)) {
+
+            SYSTools.unregisterListeners(menu);
+            menu = new JPopupMenu();
+
+            // SELECT
+            JMenuItem itemPopupShow = new JMenuItem(OPDE.lang.getString("misc.commands.show"), SYSConst.icon22magnify1);
+            itemPopupShow.addActionListener(new java.awt.event.ActionListener() {
+
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+
+                }
+            });
+            menu.add(itemPopupShow);
+
+
+            menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
+        }
+
+
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
