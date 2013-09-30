@@ -5,9 +5,11 @@ import entity.reports.NReport;
 
 import op.OPDE;
 import op.tools.Pair;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.eclipse.persistence.platform.xml.DefaultErrorHandler;
 import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
@@ -37,7 +39,7 @@ public class RostersTools {
     public static final int FLAG_LOCKED = 2;
 
     public static final int SECTION_CARE = 0;
-
+    public static final int SECTION_KITCHEN = 0;
 
     public static final String DEFAULT_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
             "<roster section=\"care\">\n" +
@@ -47,7 +49,7 @@ public class RostersTools {
             "    <symbols>\n" +
             "        <symbol key=\"SC\" calc=\"kwert\" type=\"school\" description=\"Schule\" />\n" +
             "        <symbol key=\"F\" starttime=\"06:30\" endtime=\"13:15\" break=\"0\" calc=\"awert\" type=\"work\" description=\"Frühdienst\"  shift1=\"early\" statvalue1=\"1.00\"  shift2=\"\" statvalue2=\"0.00\" />\n" +
-            "        <symbol key=\"B\" calc=\"pvalue\" type=\"work\" description=\"Ergo\" />\n" +
+            "        <symbol key=\"B\" calc=\"pvalue\" type=\"work\" description=\"Ergo\" section=\"social\" />\n" +
             "        <symbol key=\"FB\" calc=\"awert\" type=\"work\" description=\"Fortbildung\" />\n" +
             "        <symbol key=\"SL\" starttime=\"13:00\" endtime=\"21:00\" break=\"0\" calc=\"awert\" type=\"work\" description=\"Spätdienst, lang\" />\n" +
             "        <symbol key=\"M\" calc=\"kwert\" type=\"sick\" description=\"Mutterschutz\" />\n" +
@@ -77,15 +79,22 @@ public class RostersTools {
                @Override
                public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                    String text;
+                   String tooltip = null;
+                   Icon icon = null;
                    if (o == null) {
                        text = SYSTools.toHTML("<i>Keine Auswahl</i>");
                    } else if (o instanceof Rosters) {
                        Rosters rosters = (Rosters) o;
-                       text = new DateMidnight(rosters.getMonth()).toString("MMMM yyyy");
+                       icon = rosters.getOpenedBy() != null ? SYSConst.icon22encrypted : null;
+                       tooltip = rosters.getOpenedBy() != null ? String.format(OPDE.lang.getString("opde.all.rosters.alreadyOpened"), rosters.getOpenedBy().getUser().getFullname(), rosters.getOpenedBy().getLogin().toString()) : null;
+                       text = new LocalDate(rosters.getMonth()).toString("MMMM yyyy");
                    } else {
                        text = o.toString();
                    }
-                   return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+                   JLabel lbl = (JLabel) new DefaultListCellRenderer().getListCellRendererComponent(jList, text, i, isSelected, cellHasFocus);
+                   lbl.setIcon(icon);
+                   lbl.setToolTipText(tooltip);
+                   return lbl;
                }
            };
        }

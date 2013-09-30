@@ -947,6 +947,13 @@ public class GUITools {
         return color;
     }
 
+    /**
+     * blends to colors and returns the result.
+     * @param clOne
+     * @param clTwo
+     * @param fAmount the amount draws the line between the two colors. the more it tends towards 0, the more the first color is emphasized. the more it tends towards 1, the more the second color is emphasized.
+     * @return
+     */
     public static Color blend(Color clOne, Color clTwo, float fAmount) {
         float fInverse = 1.0f - fAmount;
 

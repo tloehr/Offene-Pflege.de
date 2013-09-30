@@ -1,11 +1,13 @@
 package entity.roster;
 
 import op.tools.SYSTools;
+import org.apache.commons.lang3.ArrayUtils;
 import org.joda.time.DateTimeConstants;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -62,6 +64,9 @@ public class RosterXML extends DefaultHandler {
                     symbol.setShift2(attributes.getValue("shift2"), attributes.getValue("statvalue2"));
                 }
 
+                if (attributes.getValue("section") != null) {
+                    symbol.setSection(Arrays.asList(sections).indexOf(attributes.getValue("section")));
+                }
 
 //            } else if (tagName.equalsIgnoreCase("assign")) {
 //                myRoster.addPreferredHome(attributes.getValue("uid"), attributes.getValue("homeid"));

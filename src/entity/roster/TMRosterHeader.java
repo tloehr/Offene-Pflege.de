@@ -6,10 +6,11 @@ import com.jidesoft.grid.AbstractMultiTableModel;
 import com.jidesoft.grid.CellStyle;
 import com.jidesoft.grid.ColumnIdentifierTableModel;
 import com.jidesoft.grid.StyleModel;
-import com.jidesoft.swing.StyledLabelBuilder;
 import op.OPDE;
+import op.tools.GUITools;
 import op.tools.Pair;
 import op.tools.SYSConst;
+import org.joda.time.DateTimeConstants;
 
 import javax.swing.*;
 import java.awt.*;
@@ -33,8 +34,20 @@ public class TMRosterHeader extends AbstractMultiTableModel implements ColumnIde
 
     public CellStyle getCellStyleAt(int rowIndex, int columnIndex) {
         CellStyle cellStyle = new CellStyle();
-        cellStyle.setFont(SYSConst.ARIAL14);
+
         cellStyle.setBackground(SYSConst.bluegrey);
+        if (basemodel.isInPlanningArea(columnIndex)) {
+            if (basemodel.getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SUNDAY || basemodel.getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SATURDAY) {
+                cellStyle.setBackground(GUITools.blend(SYSConst.bluegrey, Color.black, 0.85f));
+            }
+            if (OPDE.isHoliday(basemodel.getDay(columnIndex))) {
+                cellStyle.setBackground(GUITools.blend(SYSConst.bluegrey, Color.black, 0.8f));
+            }
+
+        }
+
+        cellStyle.setFont(SYSConst.ARIAL14);
+
         cellStyle.setHorizontalAlignment(SwingConstants.CENTER);
         return cellStyle;
     }
@@ -70,7 +83,7 @@ public class TMRosterHeader extends AbstractMultiTableModel implements ColumnIde
 
         if (columnIndex >= basetable.getFirst().x && columnIndex < basemodel.getColumnCount() - 1) {
             if (rowIndex == 0) {
-                value =  basemodel.getDay(columnIndex).toString("dd.MM.");
+                value = basemodel.getDay(columnIndex).toString("dd.MM.");
             } else if (rowIndex == 1) {
                 String holiday = OPDE.getHoliday(basemodel.getDay(columnIndex));
                 value = basemodel.getDay(columnIndex).toString("EE") + (holiday.isEmpty() ? "" : " (" + holiday + ")");

@@ -18,7 +18,6 @@ import op.OPDE;
 import op.tools.CleanablePanel;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
-import org.joda.time.DateMidnight;
 import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
@@ -35,6 +34,7 @@ import java.util.Map;
  * @author Torsten Löhr
  */
 public class PnlUsersWorklog extends CleanablePanel {
+    public static final String internalClassID = "opde.all.rosters";
 
     private Map<String, CollapsiblePane> cpMap;
     private Map<String, JPanel> contentmap;
@@ -156,9 +156,10 @@ public class PnlUsersWorklog extends CleanablePanel {
                 @Override
                 public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                     return new DefaultListCellRenderer().getListCellRendererComponent(list, monthFormatter.format(((LocalDate) value).toDate()), index, isSelected, cellHasFocus);
+
                 }
             });
-            cmbMonth.setSelectedItem(new DateMidnight());
+            cmbMonth.setSelectedItem(new LocalDate());
             JOptionPane.showMessageDialog(this, cmbMonth);
             monthToCreate = new LocalDate(cmbMonth.getSelectedItem());
             paramsXML = RostersTools.DEFAULT_XML;

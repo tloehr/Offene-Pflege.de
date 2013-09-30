@@ -56,7 +56,7 @@ public class FrmRoster extends JFrame {
         this.roster = roster;
         this.readOnly = roster.getOpenedBy() != null;
 
-        setTitle(new LocalDate(roster.getMonth()).toString("MMMM yyyy") + (readOnly ? "  >>readonly<<" : ""));
+        setTitle(new LocalDate(roster.getMonth()).toString("MMMM yyyy"));
 
         if (!readOnly) {
             EntityManager em = OPDE.createEM();
@@ -124,6 +124,10 @@ public class FrmRoster extends JFrame {
     }
 
     private void initFrame() {
+
+        btnLock.setIcon(readOnly ? SYSConst.icon22encrypted : SYSConst.icon22decrypted);
+        btnLock.setEnabled(readOnly);
+
         ObjectConverterManager.initDefaultConverter();
         CellEditorManager.initDefaultEditor();
 
@@ -218,8 +222,10 @@ public class FrmRoster extends JFrame {
 
                     @Override
                     public void setCellEditorValue(Object o) {
-                        Users myUser = (Users) o;
-                        myEditor.setSelectedItem(myUser);
+                        if (o instanceof Users) {
+//                            Users myUser = (Users) o;
+                            myEditor.setSelectedItem(o);
+                        }
                     }
 
                     @Override
@@ -275,15 +281,37 @@ public class FrmRoster extends JFrame {
         tsp1.getMainTable().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         tsp1.getMainTable().getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 
-        tsp1.getRowHeaderTable().getColumnModel().getColumn(0).setCellRenderer(new TableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                StyledLabel lbl = StyledLabelBuilder.createStyledLabel(value.toString());
-                lbl.setBackground(((StyleModel) table.getModel()).getCellStyleAt(row, column).getBackground());
-                lbl.setOpaque(true);
-                return lbl;
-            }
-        });
+//        tsp1.getRowHeaderTable().getColumnModel().getColumn(0).setCellRenderer(new TableCellRenderer() {
+//            @Override
+//            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+//                StyledLabel lbl = StyledLabelBuilder.createStyledLabel(value.toString());
+//                if (isSelected) {
+//                    lbl.setBackground(((StyleModel) table.getModel()).getCellStyleAt(row, column).getSelectionBackground());
+//                } else {
+//                    lbl.setBackground(((StyleModel) table.getModel()).getCellStyleAt(row, column).getBackground());
+//                }
+//
+//                lbl.setOpaque(true);
+//                return lbl;
+//            }
+//        });
+//
+//        for (int col = 0; col < tsp1.getMainTable().getColumnCount(); col++) {
+//            tsp1.getMainTable().getColumnModel().getColumn(col).setCellRenderer(new TableCellRenderer() {
+//                @Override
+//                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+//                    StyledLabel lbl = StyledLabelBuilder.createStyledLabel(value.toString());
+//                    if (isSelected) {
+//                        lbl.setBackground(((StyleModel) table.getModel()).getCellStyleAt(row, column).getSelectionBackground());
+//                    } else {
+//                        lbl.setBackground(((StyleModel) table.getModel()).getCellStyleAt(row, column).getBackground());
+//                    }
+//
+//                    lbl.setOpaque(true);
+//                    return lbl;
+//                }
+//            });
+//        }
 
         tsp1.getMainTable().addMouseListener(new MouseAdapter() {
             @Override
@@ -351,7 +379,7 @@ public class FrmRoster extends JFrame {
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         toolBar1 = new JToolBar();
-        btnSortUser = new JButton();
+        btnLock = new JButton();
         btnSortHomes = new JButton();
 
         //======== this ========
@@ -364,15 +392,15 @@ public class FrmRoster extends JFrame {
         //======== toolBar1 ========
         {
 
-            //---- btnSortUser ----
-            btnSortUser.setText("text");
-            btnSortUser.addActionListener(new ActionListener() {
+            //---- btnLock ----
+            btnLock.setText(null);
+            btnLock.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     btnSortUserActionPerformed(e);
                 }
             });
-            toolBar1.add(btnSortUser);
+            toolBar1.add(btnLock);
 
             //---- btnSortHomes ----
             btnSortHomes.setText("text");
@@ -430,20 +458,11 @@ public class FrmRoster extends JFrame {
         if (SwingUtilities.isRightMouseButton(evt)) {
 
             SYSTools.unregisterListeners(menu);
-            menu = new JPopupMenu();
+            menu = tmRoster.getContextMenuAt(row, col);
 
-            // SELECT
-            JMenuItem itemPopupShow = new JMenuItem(OPDE.lang.getString("misc.commands.show"), SYSConst.icon22magnify1);
-            itemPopupShow.addActionListener(new java.awt.event.ActionListener() {
-
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-
-                }
-            });
-            menu.add(itemPopupShow);
-
-
-            menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
+            if (menu != null) {
+                menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
+            }
         }
 
 
@@ -451,7 +470,7 @@ public class FrmRoster extends JFrame {
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JToolBar toolBar1;
-    private JButton btnSortUser;
+    private JButton btnLock;
     private JButton btnSortHomes;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

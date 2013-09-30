@@ -49,7 +49,7 @@ public class Symbol {
     public static final int HOLIDAY = 99;
 
     String key, description;
-    int calc, symboltype, minutesBreak;
+    int calc, symboltype, minutesBreak, section;
     LocalTime start, end;
 
     int shift1, shift2;
@@ -74,6 +74,7 @@ public class Symbol {
         this.minutesBreak = minutesBreak;
         this.calc = Arrays.asList(CALC).indexOf(calc.toLowerCase());
         this.symboltype = Arrays.asList(TYPE).indexOf(symboltype.toLowerCase());
+        this.section = RosterXML.CARE;
 
         if (start == null) {
             this.start = null;
@@ -157,10 +158,6 @@ public class Symbol {
 
     public String getKey() {
         return key;
-    }
-
-    public int getSymboltype() {
-        return symboltype;
     }
 
     public LocalTime getStart() {
@@ -281,4 +278,11 @@ public class Symbol {
         return getBaseHours().add(getExtraHours(day, contractsParameterSet));
     }
 
+    public int getSection() {
+        return section;
+    }
+
+    public void setSection(int section) {
+        this.section = section;
+    }
 }

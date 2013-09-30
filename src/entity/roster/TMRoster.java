@@ -162,7 +162,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 cellType = CT_P2;
             } else if (rowIndex % 4 == 2) {
                 cellType = CT_ACTUAL;
-
             } else if (rowIndex % 4 == 3) {
                 cellType = CT_HOURS;
             }
@@ -222,26 +221,31 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         CellStyle myStyle = new CellStyle();
         myStyle.setHorizontalAlignment(SwingConstants.CENTER);
 
-        Color[] colors = null;
+        Color background = null;
 
         if (rowIndex / 4 % 2 == 0) {
-            colors = SYSConst.greyscale;
+            background = SYSConst.greyscale[SYSConst.medium1];
         } else {
-            colors = SYSConst.yellow1;
-            //myStyle.setBackground(SYSConst.yellow1[6 + (rowIndex % 4)]);
+            background = SYSConst.yellow1[SYSConst.medium1];
         }
 
 
         // basedata
         if (columnIndex >= ROW_HEADER && columnIndex < getColumnCount() - ROW_FOOTER_WIDTH) {
-
-
             if (getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SUNDAY || getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SATURDAY) {
-                colors = SYSConst.red1;
+                if (rowIndex / 4 % 2 == 0) {
+                    background = SYSConst.red1[SYSConst.medium3];
+                } else {
+                    background = SYSConst.red1[SYSConst.medium1];
+                }
             }
 
             if (OPDE.isHoliday(getDay(columnIndex))) {
-                colors = SYSConst.red2;
+                if (rowIndex / 4 % 2 == 0) {
+                    background = SYSConst.red2[SYSConst.medium3];
+                } else {
+                    background = SYSConst.red2[SYSConst.medium1];
+                }
             }
 
             Users user = userlist.get(rowIndex / 4);
@@ -256,7 +260,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             }
         }
 
-        myStyle.setBackground(colors[7]);  //+ (rowIndex % 4)
+        myStyle.setBackground(background);  //+ (rowIndex % 4)
 
         return myStyle;
     }
@@ -266,7 +270,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         return true;
     }
 
-    private boolean inMainArea(int columnIndex) {
+    public boolean isInPlanningArea(int columnIndex) {
         return columnIndex >= ROW_HEADER && columnIndex < ROW_FOOTER;
     }
 
@@ -282,7 +286,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
         Users user = userlist.get(rowIndex / 4);
 
-        if (user != null && inMainArea(columnIndex)) {
+        if (user != null && isInPlanningArea(columnIndex)) {
 
             Rplan rplan = content.get(user).get(columnIndex - ROW_HEADER);
 
@@ -300,7 +304,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 }
             }
         }
-        return setUser || preferredHomes || (symbolEditable && user != null && inMainArea(columnIndex));
+        return setUser || preferredHomes || (symbolEditable && user != null && isInPlanningArea(columnIndex));
     }
 
     public Pair<Point, Point> getBaseTable() {
@@ -357,7 +361,9 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             content.get(user).add(start.getDayOfMonth() - 1, rplan);
 
             Symbol symbol = rosterParameters.getSymbol(rplan.getEffectiveP());
-            homestats.get(rplan.getHome1()).get(start.getDayOfMonth() - 1).add(contracts.get(rplan.getOwner()).getParameterSet(month).isExam(), symbol);
+            boolean exam = contracts.get(user).getParameterSet(month).isExam();
+            int type = symbol.getSection() == RosterXML.SOCIAL ? HomeStats.SOCIAL : (exam ? HomeStats.EXAM : HomeStats.HELPER);
+            homestats.get(rplan.getHome1()).get(start.getDayOfMonth() - 1).add(type, symbol);
         }
 
         for (Users user : userstats.keySet()) {
@@ -405,7 +411,9 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         if (aValue.toString().equalsIgnoreCase(getValueAt(rowIndex, columnIndex).toString())) return;
 
         Users user = userlist.get(rowIndex / 4);
-        boolean selectUser = columnIndex == 0 && rowIndex % 4 == 0;
+//        boolean selectUser = columnIndex == 0 && rowIndex % 4 == 0;
+
+        int ct = getCellTypeAt(rowIndex, columnIndex);
 
         if (aValue instanceof Homes) {
             homeslist.set(rowIndex / 4, (Homes) aValue);
@@ -425,7 +433,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
             int startrow = rowIndex - (rowIndex % 4);
             fireTableRowsUpdated(startrow, startrow + 3);
-        } else if (selectUser) {
+        } else if (ct == CT_EMP_LASTNAME) {
             OPDE.debug(aValue);
         } else {
             String newSymbol = aValue.toString();
@@ -463,17 +471,20 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 } else if (rowIndex % 4 == 1) {
                     myRplan.setP2(newSymbol);
                     myRplan.setHome2(preferredHome);
-                } else if (rowIndex % 4 == 2) {
-                    myRplan.setP3(newSymbol);
-                    myRplan.setHome3(preferredHome);
                 }
+//                else if (rowIndex % 4 == 2) {
+//                    myRplan.setP3(newSymbol);
+//                    myRplan.setHome3(preferredHome);
+//                }
 
                 myRplan.setValuesFromSymbol(symbol, contracts.get(user).getParameterSet(getDay(columnIndex)));
 
+                int type = symbol.getSection() == RosterXML.SOCIAL ? HomeStats.SOCIAL : (exam ? HomeStats.EXAM : HomeStats.HELPER);
+
                 if (oldPlan.getId() == 0) {
-                    homeStat.add(exam, rosterParameters.getSymbol(myRplan.getEffectiveP()));
+                    homeStat.add(type, rosterParameters.getSymbol(myRplan.getEffectiveP()));
                 } else {
-                    homeStat.replace(exam, rosterParameters.getSymbol(oldPlan.getEffectiveP()), rosterParameters.getSymbol(myRplan.getEffectiveP()));
+                    homeStat.replace(type, rosterParameters.getSymbol(oldPlan.getEffectiveP()), rosterParameters.getSymbol(myRplan.getEffectiveP()));
                 }
 
                 em.getTransaction().commit();
@@ -519,6 +530,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     public Object getValueAt(int rowIndex, int columnIndex) {
 //        OPDE.debug(String.format("rowindex: %d   columnindex: %d", rowIndex, columnIndex));
         Object value = "--";
+        int ct = getCellTypeAt(rowIndex, columnIndex);
 
         Users user = userlist.get(rowIndex / 4);
 
@@ -526,69 +538,41 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             return "";
         }
 
-        if (columnIndex == 0) {  // Usernames
-            if (rowIndex % 4 == 0) {
-                value = user;
-            } else if (rowIndex % 4 == 1) {
-                value = user.getVorname();
-            } else if (rowIndex % 4 == 2) {
-                return homeslist.get(rowIndex / 4);
+        if (ct == CT_EMP_LASTNAME) {
+            value = user;
+        } else if (ct == CT_EMP_FIRSTNAME) {
+            value = user.getVorname();
+        } else if (ct == CT_EMP_PREFERRED_HOME) {
+            value = homeslist.get(rowIndex / 4);
+        } else if (ct == CT_EMP_QUALIFICATION) {
+            if (contracts.get(user).getParameterSet(month).isTrainee()) {
+                value = "Schüler";
             } else {
-
-                if (contracts.get(user).getParameterSet(month).isTrainee()) {
-                    value = "Schüler";
-                } else {
-                    value = contracts.get(user).getParameterSet(month).isExam() ? "{Examen:bold}" : "Helfer";
-                }
+                value = contracts.get(user).getParameterSet(month).isExam() ? "<html><b>Examen</b></html>" : "Helfer";
             }
-        } else if (columnIndex == 1) { // homestats carry
-            if (rowIndex % 4 == 3) {
-                value = "St: " + userstats.get(user).getHoursCarry().setScale(2, RoundingMode.HALF_UP).toString();
-            } else if (rowIndex % 4 == 0) {
-                value = "Kr: " + userstats.get(user).getSickCarry().setScale(2, RoundingMode.HALF_UP).toString();
-            } else if (rowIndex % 4 == 1) {
-                value = "Url: " + userstats.get(user).getHolidayCarry().setScale(2, RoundingMode.HALF_UP).toString();
+        } else if (ct == CT_CARRY_HOURS) {
+            value = "St: " + userstats.get(user).getHoursCarry().setScale(2, RoundingMode.HALF_UP).toString();
+        } else if (ct == CT_CARRY_SICK) {
+            value = "Kr: " + userstats.get(user).getSickCarry().setScale(2, RoundingMode.HALF_UP).toString();
+        } else if (ct == CT_CARRY_HOLIDAY) {
+            value = "Url: " + userstats.get(user).getHolidayCarry().setScale(2, RoundingMode.HALF_UP).toString();
+        } else if (ct == CT_P1) {
+            value = content.get(user).get(columnIndex - ROW_HEADER) != null ? content.get(user).get(columnIndex - ROW_HEADER).getP1() : "";
+            if (!value.toString().isEmpty()) {
+                value = String.format("<html><b>%s</b></html>", value);
             }
-
-
-        } else if (columnIndex >= ROW_HEADER && columnIndex < ROW_FOOTER) {
-//            if (columnIndex == 4 && rowIndex == 12){
-//                OPDE.debug("buh!");
-//            }
-
-            if (content.get(user).get(columnIndex - ROW_HEADER) != null) {
-
-                if (rowIndex % 4 == 0) {
-                    value = content.get(user).get(columnIndex - ROW_HEADER).getP1();
-                } else if (rowIndex % 4 == 1) {
-                    value = content.get(user).get(columnIndex - ROW_HEADER).getP2();
-                } else if (rowIndex % 4 == 2) {
-                    value = content.get(user).get(columnIndex - ROW_HEADER).getP3();
-                    if (!value.toString().isEmpty()) {
-                        OPDE.debug(value);
-                    }
-                } else {
-
-                    value = content.get(user).get(columnIndex - ROW_HEADER).getNetValue().setScale(2, RoundingMode.HALF_UP).toString();
-
-//                if (breaktime.compareTo(BigDecimal.ZERO) > 0) {
-//                    value += " -" + breaktime.setScale(2, RoundingMode.HALF_UP).toString();
-//                }
-//
-//                if (extrahours.compareTo(BigDecimal.ZERO) > 0) {
-//                    value += " +" + extrahours.setScale(2, RoundingMode.HALF_UP).toString();
-//                }
-
-                }
-            }
-        } else if (columnIndex >= ROW_FOOTER) {
-            if (rowIndex % 4 == 3) {
-                value = "St: " + userstats.get(user).getHoursSum().setScale(2, RoundingMode.HALF_UP).toString();
-            } else if (rowIndex % 4 == 0) {
-                value = "Kr: " + userstats.get(user).getSickSum().setScale(2, RoundingMode.HALF_UP).toString();
-            } else if (rowIndex % 4 == 1) {
-                value = "Url: " + userstats.get(user).getHolidaySum().setScale(2, RoundingMode.HALF_UP).toString();
-            }
+        } else if (ct == CT_P2) {
+            value = content.get(user).get(columnIndex - ROW_HEADER) != null ? content.get(user).get(columnIndex - ROW_HEADER).getP2() : "";
+        } else if (ct == CT_ACTUAL) {
+            value = "";
+        } else if (ct == CT_HOURS) {
+            value = content.get(user).get(columnIndex - ROW_HEADER) != null ? content.get(user).get(columnIndex - ROW_HEADER).getNetValue().setScale(2, RoundingMode.HALF_UP).toString() : "";
+        } else if (ct == CT_SUM_HOURS) {
+            value = "St: " + userstats.get(user).getHoursSum().setScale(2, RoundingMode.HALF_UP).toString();
+        } else if (ct == CT_SUM_SICK) {
+            value = "Kr: " + userstats.get(user).getSickSum().setScale(2, RoundingMode.HALF_UP).toString();
+        } else if (ct == CT_SUM_HOLIDAY) {
+            value = "Url: " + userstats.get(user).getHolidaySum().setScale(2, RoundingMode.HALF_UP).toString();
         }
 
         return value;
@@ -628,12 +612,10 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         if (rowIndex % 4 == 1 && oldPlan.getP2().isEmpty()) {
             return;
         }
-        if (rowIndex % 4 == 2 && oldPlan.getP3().isEmpty()) {
+        if (rowIndex % 4 >= 2) {
             return;
         }
-        if (rowIndex % 4 == 3) {
-            return;
-        }
+
 
         EntityManager em = OPDE.createEM();
         try {
@@ -645,26 +627,30 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             em.lock(myRplan, LockModeType.OPTIMISTIC);
             boolean exam = contracts.get(myRplan.getOwner()).getParameterSet(month).isExam();
 
+
             if (rowIndex % 4 == 0) {
                 em.remove(myRplan);
-                stat.subtract(exam, rosterParameters.getSymbol(myRplan.getP1()));
+                int type = rosterParameters.getSymbol(myRplan.getP1()).getSection() == RosterXML.SOCIAL ? HomeStats.SOCIAL : (exam ? HomeStats.EXAM : HomeStats.HELPER);
+                stat.subtract(type, rosterParameters.getSymbol(myRplan.getP1()));
 
                 myRplan = null;
             } else {
 
                 Symbol symbol = null;
-                if (rowIndex % 4 == 1) {
-                    myRplan.setP2(null);
-                    myRplan.setHome2(null);
-                    symbol = rosterParameters.getSymbol(myRplan.getP1());
-                } else if (rowIndex % 4 == 2) {
-                    myRplan.setP3(null);
-                    myRplan.setHome3(null);
-                    symbol = rosterParameters.getSymbol(myRplan.getP2());
-                }
+
+                myRplan.setP2(null);
+                myRplan.setHome2(null);
+                symbol = rosterParameters.getSymbol(myRplan.getP1());
+
+//                } else if (rowIndex % 4 == 2) {
+//                    myRplan.setP3(null);
+//                    myRplan.setHome3(null);
+//                    symbol = rosterParameters.getSymbol(myRplan.getP2());
+//                }
 
                 myRplan.setValuesFromSymbol(symbol, contracts.get(user).getParameterSet(getDay(columnIndex)));
-                stat.replace(exam, rosterParameters.getSymbol(oldPlan.getEffectiveP()), rosterParameters.getSymbol(myRplan.getEffectiveP()));
+                int type = rosterParameters.getSymbol(myRplan.getEffectiveP()).getSection() == RosterXML.SOCIAL ? HomeStats.SOCIAL : (exam ? HomeStats.EXAM : HomeStats.HELPER);
+                stat.replace(type, rosterParameters.getSymbol(oldPlan.getEffectiveP()), rosterParameters.getSymbol(myRplan.getEffectiveP()));
             }
 
 
@@ -765,5 +751,42 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             strUserlist = strUserlist.substring(0, strUserlist.length() - 1);
         }
         return strUserlist;
+    }
+
+    public JPopupMenu getContextMenuAt(final int rowIndex, final int columnIndex) {
+        if (readOnly) return null;
+
+        JPopupMenu menu = new JPopupMenu();
+        int ct = getCellTypeAt(rowIndex, columnIndex);
+
+        JMenuItem itemInsertBlock = new JMenuItem(OPDE.lang.getString("opde.roster.insert.block"), SYSConst.icon22add);
+        itemInsertBlock.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                userlist.add(rowIndex / 4, null);
+                homeslist.add(rowIndex / 4, null);
+                fireTableDataChanged();
+            }
+        });
+        menu.add(itemInsertBlock);
+
+        JMenuItem itemRemoveBlock = new JMenuItem(OPDE.lang.getString("opde.roster.remove.block"), SYSConst.icon22delete);
+        itemRemoveBlock.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                userlist.remove(rowIndex / 4);
+                homeslist.remove(rowIndex / 4);
+                fireTableDataChanged();
+            }
+        });
+        menu.add(itemRemoveBlock);
+
+//        // SELECT
+//        JMenuItem itemPopupShow = new JMenuItem(OPDE.lang.getString("misc.commands.show"), SYSConst.icon22magnify1);
+//        itemPopupShow.addActionListener(new java.awt.event.ActionListener() {
+//            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//
+//            }
+//        });
+//        menu.add(itemPopupShow);
+        return menu;
     }
 }
