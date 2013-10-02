@@ -1,5 +1,11 @@
 package entity.prescription;
 
+import op.OPDE;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import java.util.List;
+
 /**
  * Created by shortelliJ IDEA.
  * User: tloehr
@@ -21,6 +27,32 @@ public class MedStockTransactionTools {
     public static final short STATE_CANCEL_REC = 10;
 
 
+    public static List<MedStockTransaction> getAll(BHP bhp) {
+           EntityManager em = OPDE.createEM();
+           String jpql = " " +
+                   " SELECT tx FROM MedStockTransaction tx " +
+                   " WHERE tx.bhp = :bhp " +
+                   " ORDER BY tx.pit DESC ";
 
+           Query query = em.createQuery(jpql);
+           query.setParameter("bhp", bhp);
+           List<MedStockTransaction> list = query.getResultList();
+           em.close();
+           return list;
+       }
+
+    public static List<MedStockTransaction> getAll(MedStock stock) {
+        EntityManager em = OPDE.createEM();
+        String jpql = " " +
+                " SELECT tx FROM MedStockTransaction tx " +
+                " WHERE tx.stock = :stock " +
+                " ORDER BY tx.pit DESC ";
+
+        Query query = em.createQuery(jpql);
+        query.setParameter("stock", stock);
+        List<MedStockTransaction> list = query.getResultList();
+        em.close();
+        return list;
+    }
 
 }

@@ -68,21 +68,21 @@ public class MedInventoryTools {
 
     }
 
-    public static BigDecimal getSum(MedInventory inventory) {
-//        long timeStart = System.currentTimeMillis();
-        BigDecimal result = BigDecimal.ZERO;
-        for (MedStock bestand : inventory.getMedStocks()) {
-            BigDecimal summe = MedStockTools.getSum(bestand);
-            result = result.add(summe);
-        }
-//        long time2 = System.currentTimeMillis();
-//        OPDE.debug("MedInventoryTools.getSumme(): " + (time2 - timeStart) + " millis");
-        return result;
-    }
+//    public static BigDecimal getSum(MedInventory inventory) {
+////        long timeStart = System.currentTimeMillis();
+//        BigDecimal result = BigDecimal.ZERO;
+//        for (MedStock bestand : inventory.getMedStocks()) {
+//            BigDecimal summe = MedStockTools.getSum(bestand);
+//            result = result.add(summe);
+//        }
+////        long time2 = System.currentTimeMillis();
+////        OPDE.debug("MedInventoryTools.getSumme(): " + (time2 - timeStart) + " millis");
+//        return result;
+//    }
 
     public static BigDecimal getSum(EntityManager em, MedInventory inventory) throws Exception {
         BigDecimal result = BigDecimal.ZERO;
-        for (MedStock stock : inventory.getMedStocks()) {
+        for (MedStock stock : MedStockTools.getAll(inventory)) {
             if (!stock.isClosed()) {
                 BigDecimal summe = MedStockTools.getSum(em, stock);
                 result = result.add(summe);
@@ -136,10 +136,10 @@ public class MedInventoryTools {
     public static MedStock openNext(MedInventory inventory) {
         MedStock result = null;
 
-        java.util.List<MedStock> list = new ArrayList(inventory.getMedStocks());
-        Collections.sort(list);
+//        java.util.List<MedStock> list = new ArrayList(inventory.getMedStocks());
+//        Collections.sort(list);
 
-        for (MedStock medStock : list) {
+        for (MedStock medStock : MedStockTools.getAll(inventory)) {
             if (medStock.getOut().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE) && medStock.getOpened().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE)) {
                 medStock.setOpened(new Date());
                 result = medStock;
@@ -194,8 +194,8 @@ public class MedInventoryTools {
 
         // The TX for this turn
         MedStockTransaction tx = em.merge(new MedStockTransaction(stock, withdrawal.negate(), bhp));
-        stock.getStockTransaction().add(tx);
-        bhp.getStockTransaction().add(tx);
+//        stock.getStockTransaction().add(tx);
+//        bhp.getStockTransaction().add(tx);
         OPDE.debug("withdraw/4: tx: " + tx);
 
         if (stockSum.compareTo(quantity) == 0) {
@@ -239,9 +239,9 @@ public class MedInventoryTools {
 
     public static MedStock getNextToOpen(MedInventory inventory) {
         MedStock bestand = null;
-        if (inventory != null && !inventory.getMedStocks().isEmpty()) {
-            Collections.sort(inventory.getMedStocks());
-            for (MedStock myBestand : inventory.getMedStocks()) {
+        java.util.List<MedStock> listStocks = MedStockTools.getAll(inventory);
+        if (inventory != null && !listStocks.isEmpty()) {
+            for (MedStock myBestand : listStocks) {
                 if (myBestand.isNew()) {
                     bestand = myBestand;
                     break;
@@ -257,8 +257,9 @@ public class MedInventoryTools {
      */
     public static MedStock getCurrentOpened(MedInventory inventory) {
         MedStock stock = null;
-        if (!inventory.getMedStocks().isEmpty()) {
-            for (MedStock mystock : inventory.getMedStocks()) {
+        java.util.List<MedStock> listStocks = MedStockTools.getAll(inventory);
+        if (!listStocks.isEmpty()) {
+            for (MedStock mystock : listStocks) {
                 if (mystock.isOpened()) {
                     stock = mystock;
                     break;
@@ -332,7 +333,7 @@ public class MedInventoryTools {
             em.lock(myInventory, LockModeType.OPTIMISTIC);
 
             // close all stocks
-            for (MedStock stock : myInventory.getMedStocks()) {
+            for (MedStock stock : MedStockTools.getAll(inventory)) {
                 if (!stock.isClosed()) {
                     MedStock mystock = em.merge(stock);
                     em.lock(mystock, LockModeType.OPTIMISTIC);

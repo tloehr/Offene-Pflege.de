@@ -556,8 +556,8 @@ public class DlgNewStocks extends MyJDialog {
             MedStock newStock = em.merge(new MedStock(inventory, tradeForm, aPackage, txtBemerkung.getText(), estimatedUPR, dummyMode));
             newStock.setExpires(expiry);
             MedStockTransaction buchung = em.merge(new MedStockTransaction(newStock, amount));
-            newStock.getStockTransaction().add(buchung);
-            inventory.getMedStocks().add(newStock);
+//            newStock.getStockTransaction().add(buchung);
+//            inventory.getMedStocks().add(newStock);
 
             // i dont want to do this anymore. this messes up the automatic expiry detection by storing wrong "opening" dates.
 //            if (MedStockTools.getStockInUse(inventory) == null) {

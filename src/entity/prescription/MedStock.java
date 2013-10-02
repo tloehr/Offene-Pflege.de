@@ -194,7 +194,7 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     private MedStock nextStock;
 
     // ==
-    // 1:N Relationen
+    // 1:N Relations
     // ==
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "stock")
     private List<MedStockTransaction> stockTransaction;
@@ -223,10 +223,10 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     public void setUser(Users user) {
         this.user = user;
     }
-
-    public List<MedStockTransaction> getStockTransaction() {
-        return stockTransaction;
-    }
+//
+//    public List<MedStockTransaction> getStockTransaction() {
+//        return stockTransaction;
+//    }
 
     public MedPackage getPackage() {
 

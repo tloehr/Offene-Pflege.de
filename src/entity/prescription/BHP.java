@@ -283,9 +283,9 @@ public class BHP implements Serializable, Comparable<BHP> {
     }
 
 
-    public Collection<MedStockTransaction> getStockTransaction() {
-        return stockTransaction;
-    }
+//    public Collection<MedStockTransaction> getStockTransaction() {
+//        return stockTransaction;
+//    }
 
     /**
      * This method tells, whether there was more than one stock involved in order to provide the necessary medication in the course of the

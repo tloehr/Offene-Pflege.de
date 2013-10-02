@@ -62,26 +62,58 @@ public class MedStockTools {
         };
     }
 
-    /**
-     * Sucht aus den den Beständen des Vorrats den angebrochenen heraus.
-     *
-     * @param inventory
-     * @return der angebrochene Bestand. null, wenn es keinen gab.
-     */
-    public static MedStock getStockInUse(MedInventory inventory) {
-        MedStock bestand = null;
-        if (inventory != null && inventory.getMedStocks() != null) {
-            Iterator<MedStock> itBestand = inventory.getMedStocks().iterator();
-            while (itBestand.hasNext()) {
-                MedStock b = itBestand.next();
-                if (b.isOpened() && !b.isClosed()) {
-                    bestand = b;
-                    break;
-                }
-            }
-        }
-        return bestand;
+    public static List<MedStock> getAll(MedInventory inventory) {
+        EntityManager em = OPDE.createEM();
+        String jpql = " " +
+                " SELECT b FROM MedStock b " +
+                " WHERE b.inventory = :inventory " +
+                " ORDER BY b.in, b.id ";
+
+        Query query = em.createQuery(jpql);
+        query.setParameter("inventory", inventory);
+        List<MedStock> list = query.getResultList();
+        em.close();
+        return list;
     }
+
+
+    public static MedStock getStockInUse(MedInventory inventory) {
+        EntityManager em = OPDE.createEM();
+        String jpql = " " +
+                " SELECT b FROM MedStock b " +
+                " WHERE b.inventory = :inventory " +
+                " AND b.opened < :tfn AND b.out = :tfn";
+
+        Query query = em.createQuery(jpql);
+        query.setParameter("inventory", inventory);
+        query.setParameter("tfn", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
+        List<MedStock> list = query.getResultList();
+        em.close();
+
+        return list.isEmpty() ? null : list.get(0);
+    }
+
+//    /**
+//     * Sucht aus den den Beständen des Vorrats den angebrochenen heraus.
+//     *
+//     * @param inventory
+//     * @return der angebrochene Bestand. null, wenn es keinen gab.
+//     */
+//    public static MedStock getStockInUse(MedInventory inventory) {
+//        MedStock bestand = null;
+//
+//        if (inventory != null && inventory.getMedStocks() != null) {
+//            Iterator<MedStock> itBestand = inventory.getMedStocks().iterator();
+//            while (itBestand.hasNext()) {
+//                MedStock b = itBestand.next();
+//                if (b.isOpened() && !b.isClosed()) {
+//                    bestand = b;
+//                    break;
+//                }
+//            }
+//        }
+//        return bestand;
+//    }
 
     public static HashMap getStock4Printing(MedStock bestand) {
         OPDE.debug("StockID: " + bestand.getID());
@@ -119,9 +151,9 @@ public class MedStockTools {
         return hm;
     }
 
-    public static BigDecimal getSum(MedStock bestand) {
+    public static BigDecimal getSum(MedStock stock) {
         BigDecimal result = BigDecimal.ZERO;
-        for (MedStockTransaction buchung : bestand.getStockTransaction()) {
+        for (MedStockTransaction buchung : MedStockTransactionTools.getAll(stock)) {
             result = result.add(buchung.getAmount());
         }
         return result;
@@ -135,7 +167,7 @@ public class MedStockTools {
      */
     public static BigDecimal getSumOfDosesInBHP(MedStock medStock) {
         BigDecimal result = BigDecimal.ZERO;
-        for (MedStockTransaction tx : medStock.getStockTransaction()) {
+        for (MedStockTransaction tx : MedStockTransactionTools.getAll(medStock)) {
             if (!tx.isPartOfCancelPair() && tx.isBHP()) {
                 result = result.add(tx.getBhp().getDose());
             }
@@ -189,7 +221,7 @@ public class MedStockTools {
         BigDecimal stocksum = getSum(medStock);
         MedStockTransaction finalTX = new MedStockTransaction(medStock, stocksum.negate(), state);
         finalTX.setText(text);
-        medStock.getStockTransaction().add(finalTX);
+//        medStock.getStockTransaction().add(finalTX);
         medStock.setState(MedStockTools.STATE_NOTHING);
         DateTime now = new DateTime();
         medStock.setOut(now.toDate());
@@ -253,9 +285,9 @@ public class MedStockTools {
         return nextStock;
     }
 
-    public static MedStockTransaction getStartTX(MedStock bestand) {
+    public static MedStockTransaction getStartTX(MedStock medStock) {
         MedStockTransaction result = null;
-        for (MedStockTransaction buchung : bestand.getStockTransaction()) {
+        for (MedStockTransaction buchung : MedStockTransactionTools.getAll(medStock)) {
             if (buchung.getState() == MedStockTransactionTools.STATE_CREDIT) {
                 result = buchung;
                 break;
@@ -396,16 +428,16 @@ public class MedStockTools {
         myStock.setOpened(new Date());
     }
 
-    public static MedStock getPreviousStock(MedStock fromThisOne) {
-        MedInventory inventory = fromThisOne.getInventory();
-        Collections.sort(inventory.getMedStocks());
-        int index = inventory.getMedStocks().indexOf(fromThisOne);
-        MedStock previous = null;
-        if (index > 0) {
-            previous = inventory.getMedStocks().get(index - 1);
-        }
-        return previous;
-    }
+//    public static MedStock getPreviousStock(MedStock fromThisOne) {
+//        MedInventory inventory = fromThisOne.getInventory();
+//        Collections.sort(inventory.getMedStocks());
+//        int index = inventory.getMedStocks().indexOf(fromThisOne);
+//        MedStock previous = null;
+//        if (index > 0) {
+//            previous = inventory.getMedStocks().get(index - 1);
+//        }
+//        return previous;
+//    }
 
     public static String getListForMedControl(Station station, Closure progress) {
         StringBuilder html = new StringBuilder(1000);

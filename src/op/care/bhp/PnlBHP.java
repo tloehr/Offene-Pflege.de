@@ -941,10 +941,10 @@ public class PnlBHP extends NursingRecordsPanel {
                                 myBHP.setMDate(new Date());
 
                                 if (myBHP.shouldBeCalculated()) {
-                                    for (MedStockTransaction tx : myBHP.getStockTransaction()) {
-                                        em.remove(tx);
+                                    for (MedStockTransaction tx : MedStockTransactionTools.getAll(bhp)) {
+                                        em.remove(em.merge(tx));
                                     }
-                                    myBHP.getStockTransaction().clear();
+//                                    myBHP.getStockTransaction().clear();
                                 }
 
                                 mapBHP2Pane.put(myBHP, createCP4(myBHP));
