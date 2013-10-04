@@ -767,7 +767,7 @@ public class ResInfoTools {
         BigDecimal ibw = ResValueTools.getIBW(h, resident.getGender()); // ideal body weight
         BigDecimal bmr = ResValueTools.getBasalMetabolicRate(theoreticalweight, h, ResidentTools.getAge(resident).getYears(), resident.getGender()); // base metabolic rate
         BigDecimal rl = ResValueTools.getRequiredLiquid(theoreticalweight); // required amount of liquid
-        BigDecimal tla = getTargetLiquidAmount(food); // usual body weight
+        BigDecimal tla = getTargetLiquidAmount(food);
 
         if (bmi == null) {
             result += "Ein BMI kann noch nicht bestimmt werden.<br/>";
@@ -800,9 +800,7 @@ public class ResInfoTools {
             result += "Flüssigkeitsbedarf: " + rl.setScale(2, RoundingMode.HALF_UP) + " ml/24h<br/>";
         }
 
-        if (tla == null) {
-            result += "Das Zieltrinkmenge ist bisher unbekannt.<br/>";
-        } else {
+        if (tla != null) {
             result += "Zieltrinkmenge: " + tla.setScale(2, RoundingMode.HALF_UP) + " ml/24h<br/>";
         }
 

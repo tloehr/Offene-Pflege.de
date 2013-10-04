@@ -99,7 +99,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
     private Resident resident;
 
-    //    private java.util.List<MedInventory> lstInventories;
+    private java.util.List<MedInventory> lstInventories;
     private Map<String, CollapsiblePane> cpMap;
     private Map<String, JToggleButton> mapKey2ClosedToggleButton;
 //    private Map<MedStockTransaction, JPanel> linemap;
@@ -123,6 +123,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
     private void initPanel() {
         cpMap = Collections.synchronizedMap(new HashMap<String, CollapsiblePane>());
+        lstInventories = Collections.synchronizedList(new ArrayList<MedInventory>());
 //        lstInventories = Collections.synchronizedList(new ArrayList<MedInventory>());
         mapKey2ClosedToggleButton = Collections.synchronizedMap(new HashMap<String, JToggleButton>());
         color1 = SYSConst.yellow1;
@@ -141,14 +142,8 @@ public class PnlInventory extends NursingRecordsPanel {
         this.resident = EntityTools.find(Resident.class, res.getRID());
         GUITools.setResidentDisplay(resident);
 
-//        synchronized (lstInventories) {
-//            if (inventory == null) {
-//                lstInventories = tbClosedInventory.isSelected() ? MedInventoryTools.getAll(resident) : MedInventoryTools.getAllActive(resident);
-//            } else {
-//                lstInventories.clear();
-//                lstInventories.add(inventory);
-//            }
-//        }
+        // only for the zebra coloring. can you believe that ?
+
         reloadDisplay(inventory, afterwards);
     }
 
@@ -158,9 +153,9 @@ public class PnlInventory extends NursingRecordsPanel {
         synchronized (cpMap) {
             SYSTools.clear(cpMap);
         }
-//        synchronized (lstInventories) {
-//            SYSTools.clear(lstInventories);
-//        }
+        synchronized (lstInventories) {
+            SYSTools.clear(lstInventories);
+        }
         synchronized (mapKey2ClosedToggleButton) {
             SYSTools.clear(mapKey2ClosedToggleButton);
         }
@@ -272,9 +267,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
     @Override
     public void reload() {
-//        synchronized (lstInventories) {
-//            lstInventories = tbClosedInventory.isSelected() ? MedInventoryTools.getAll(resident) : MedInventoryTools.getAllActive(resident);
-//        }
+
         reloadDisplay(null, null);
     }
 
@@ -298,7 +291,14 @@ public class PnlInventory extends NursingRecordsPanel {
         synchronized (mapKey2ClosedToggleButton) {
             mapKey2ClosedToggleButton.clear();
         }
-
+        synchronized (lstInventories) {
+            lstInventories.clear();
+            if (singleInventory != null) {
+                lstInventories.add(singleInventory);
+            } else {
+                lstInventories = tbClosedInventory.isSelected() ? MedInventoryTools.getAll(resident) : MedInventoryTools.getAllActive(resident);
+            }
+        }
 
         OPDE.getMainframe().setBlocked(true);
         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
@@ -309,28 +309,21 @@ public class PnlInventory extends NursingRecordsPanel {
             protected Object doInBackground() throws Exception {
                 int progress = 0;
 
-//                List<MedInventory> lstInventories = singleInventory != null ? singleInventory :
-
-                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 1));
-
-                if (singleInventory == null) {
-//                synchronized (lstInventories) {
-                    List<MedInventory> lstInventories = tbClosedInventory.isSelected() ? MedInventoryTools.getAll(resident) : MedInventoryTools.getAllActive(resident);
+                synchronized (lstInventories) {
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, lstInventories.size()));
                     for (MedInventory inventory : lstInventories) {
                         progress++;
                         createCP4(inventory);
                         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, lstInventories.size()));
                     }
-                } else {
-                    createCP4(singleInventory);
-                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), 1, 1));
                 }
+
                 return null;
             }
 
             @Override
             protected void done() {
-                buildPanel();
+                buildPanel(singleInventory == null);
                 if (afterwards != null) {
                     afterwards.execute(null);
                 }
@@ -372,7 +365,8 @@ public class PnlInventory extends NursingRecordsPanel {
 
             }
 
-            cpMap.get(key).setName();
+
+            cpMap.get(key).setName("inventory");
 
 //            final CollapsiblePane cpInventory = cpMap.get(key);
 
@@ -585,7 +579,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
             cpMap.get(key).setHorizontalAlignment(SwingConstants.LEADING);
             cpMap.get(key).setOpaque(false);
-//            cpMap.get(key).setBackground(getColor(SYSConst.medium2, lstInventories.indexOf(inventory) % 2 != 0));
+            cpMap.get(key).setBackground(getColor(SYSConst.medium2, lstInventories.indexOf(inventory) % 2 != 0));
 
             return cpMap.get(key);
         }
@@ -624,7 +618,7 @@ public class PnlInventory extends NursingRecordsPanel {
                 }
 
             }
-//            final CollapsiblePane cpStock = cpMap.get(key);
+            cpMap.get(key).setName("stock");
 
             BigDecimal sumStock = BigDecimal.ZERO;
             try {
@@ -747,7 +741,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
             cpMap.get(key).setHorizontalAlignment(SwingConstants.LEADING);
             cpMap.get(key).setOpaque(false);
-//          cpMap.get(key).setBackground(getColor(SYSConst.light3, lstInventories.indexOf(stock.getInventory()) % 2 != 0));
+          cpMap.get(key).setBackground(getColor(SYSConst.light3, lstInventories.indexOf(stock.getInventory()) % 2 != 0));
 
 
             return cpMap.get(key);
@@ -1078,10 +1072,11 @@ public class PnlInventory extends NursingRecordsPanel {
         final JPanel pnlTX = new JPanel(new VerticalLayout());
 //            pnlTX.setLayout(new BoxLayout(pnlTX, BoxLayout.PAGE_AXIS));
 
-        pnlTX.setOpaque(false);
-//        synchronized (lstInventories) {
-//            pnlTX.setBackground(getColor(SYSConst.light1, lstInventories.indexOf(stock.getInventory()) % 2 != 0));
-//        }
+        pnlTX.setOpaque(true);
+//        pnlTX.setBackground(Color.white);
+        synchronized (lstInventories) {
+            pnlTX.setBackground(getColor(SYSConst.light2, lstInventories.indexOf(stock.getInventory()) % 2 != 0));
+        }
 
         /***
          *         _       _     _ _______  __
@@ -1214,6 +1209,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
                     final DefaultCPTitle pnlTitle = new DefaultCPTitle(title, null);
 
+
                     //                pnlTitle.getLeft().addMouseListener();
 
 
@@ -1328,7 +1324,7 @@ public class PnlInventory extends NursingRecordsPanel {
                                             final MedStockTransaction myOldTX = em.merge(tx);
 
                                             myOldTX.setState(MedStockTransactionTools.STATE_CANCELLED);
-                                            final MedStockTransaction myNewTX = new MedStockTransaction(myStock, myOldTX.getAmount().negate(), MedStockTransactionTools.STATE_CANCEL_REC);
+                                            final MedStockTransaction myNewTX = em.merge(new MedStockTransaction(myStock, myOldTX.getAmount().negate(), MedStockTransactionTools.STATE_CANCEL_REC));
                                             myOldTX.setText(OPDE.lang.getString("misc.msg.reversedBy") + ": " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(myNewTX.getPit()));
                                             myNewTX.setText(OPDE.lang.getString("misc.msg.reversalFor") + ": " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(myOldTX.getPit()));
 
@@ -1494,30 +1490,60 @@ public class PnlInventory extends NursingRecordsPanel {
 
 
     private void buildPanel() {
+        buildPanel(true);
+    }
+
+    private void buildPanel(boolean reloadListInventory) {
         cpsInventory.removeAll();
         cpsInventory.setLayout(new JideBoxLayout(cpsInventory, JideBoxLayout.Y_AXIS));
 
-//        synchronized (lstInventories) {
-        List<MedInventory> lstInventories = tbClosedInventory.isSelected() ? MedInventoryTools.getAll(resident) : MedInventoryTools.getAllActive(resident);
-        int row = 0;
-        for (MedInventory inventory : lstInventories) {
-            synchronized (cpMap) {
-                String key = inventory.getID() + ".xinventory";
-                cpMap.get(key).setBackground(getColor(SYSConst.medium2, row % 2 != 0));
-                cpsInventory.add(cpMap.get(key));
-                cpMap.get(key).getContentPane().revalidate();
-                row++;
+        synchronized (lstInventories) {
+            if (reloadListInventory) {
+                lstInventories.clear();
+                lstInventories = tbClosedInventory.isSelected() ? MedInventoryTools.getAll(resident) : MedInventoryTools.getAllActive(resident);
+            }
+
+            int row = 0;
+            for (MedInventory inventory : lstInventories) {
+
+                synchronized (cpMap) {
+                    String key = inventory.getID() + ".xinventory";
+//                    cpMap.get(key).setBackground(getColor(SYSConst.medium2, row % 2 != 0));
+                    cpsInventory.add(cpMap.get(key));
+                    cpMap.get(key).getContentPane().revalidate();
+                    row++;
+                }
             }
         }
-
-        for (Component comp : cpsInventory.getComponents()) {
-            if (comp instanceof)  // vielleicht über name property in den einzelnen CPanes
-        }
+//
+//        boolean odd = true;
+//        for (Component cp : cpsInventory.getComponents()) {
+//            colorize(cp, 1, odd);
+//            odd = !odd;
+//        }
 
 //        }
 
         cpsInventory.addExpansion();
     }
+
+//    private void colorize(Component component, int depth, boolean odd) {
+//
+//        if (component instanceof CollapsiblePane) {
+//            OPDE.debug("Depth: " + depth);
+//            component.setBackground(getColor(depth + 4, odd));
+//        }
+//        if (component instanceof JPanel) {
+//            component.setBackground(getColor(depth + 6, odd));
+//        }
+//
+//        if (component instanceof Container) {
+//            depth++;
+//            for (Component comp : ((Container) component).getComponents()) {
+//                colorize(comp, depth, odd);
+//            }
+//        }
+//    }
 
     private JPanel getMenu(final MedStock stock) {
         final String key = stock.getID() + ".xstock";

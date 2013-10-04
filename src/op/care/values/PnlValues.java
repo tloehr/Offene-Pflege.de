@@ -184,7 +184,8 @@ public class PnlValues extends NursingRecordsPanel {
                                 em.getTransaction().commit();
 
                                 resident = myResident;
-                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -317,107 +318,7 @@ public class PnlValues extends NursingRecordsPanel {
             btnAdd.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgValue(new ResValue(resident, vtype), false, new Closure() {
-                        @Override
-                        public void execute(Object o) {
-                            if (o != null) {
-
-                                EntityManager em = OPDE.createEM();
-                                try {
-                                    em.getTransaction().begin();
-                                    final ResValue myValue = em.merge((ResValue) o);
-                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                    em.getTransaction().commit();
-
-                                    DateTime dt = new DateTime(myValue.getPit());
-
-                                    final String keyDay = vtype.getID() + ".xtypes." + dt.toDateMidnight().getMillis() + ".day";
-                                    final String keyYear = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
-                                    final String keyWeek = vtype.getID() + ".xtypes." + dt.toDateMidnight().dayOfWeek().withMinimumValue().getMillis() + ".week";
-
-                                    try {
-                                        synchronized (cpMap) {
-                                            cpMap.get(keyType).setCollapsible(true);
-
-                                            if (cpMap.get(keyType).isCollapsed()) {
-                                                cpMap.get(keyType).setCollapsed(false);
-                                            }
-                                            if (cpMap.containsKey(keyYear) && cpMap.get(keyYear).isCollapsed()) {
-                                                cpMap.get(keyYear).setCollapsed(false);
-                                            }
-                                            if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
-
-                                                if (!cpMap.containsKey(keyWeek)) {
-                                                    createCP4Weeks(dt.toDateMidnight().dayOfWeek().withMinimumValue());
-                                                } else if (!cpMap.containsKey(keyDay)) {
-                                                    createCP4Day(dt.toDateMidnight());
-                                                }
-
-                                                if (cpMap.get(keyWeek).isCollapsed()) {
-                                                    cpMap.get(keyWeek).setCollapsed(false);
-                                                }
-                                                if (cpMap.get(keyDay).isCollapsed()) {
-                                                    cpMap.get(keyDay).setCollapsed(false);
-                                                }
-                                            }
-
-                                        }
-                                    } catch (PropertyVetoException e) {
-                                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                                    }
-
-                                    synchronized (mapType2Values) {
-                                        if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
-                                            if (!mapType2Values.get(keyDay).contains(myValue)) {
-                                                mapType2Values.get(keyDay).add(myValue);
-                                                Collections.sort(mapType2Values.get(keyDay));
-                                            }
-                                        } else {
-                                            if (!mapType2Values.containsKey(keyYear)){
-                                                mapType2Values.put(keyYear, new ArrayList<ResValue>());
-                                            }
-                                            if (!mapType2Values.get(keyYear).contains(myValue)) {
-                                                mapType2Values.get(keyYear).add(myValue);
-                                                Collections.sort(mapType2Values.get(keyYear));
-                                            }
-                                        }
-                                    }
-//                                    cptitle.getButton().setIcon(SYSConst.icon22ledGreenOn);
-
-                                    createCP4Year(vtype, dt.getYear());
-
-                                    buildPanel();
-
-                                    synchronized (linemap) {
-                                        GUITools.scroll2show(jspValues, linemap.get(myValue), cpsValues, new Closure() {
-                                            @Override
-                                            public void execute(Object o) {
-                                                GUITools.flashBackground(linemap.get(myValue), Color.YELLOW, 2);
-                                            }
-                                        });
-                                    }
-                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    }
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                } catch (Exception e) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
-                                }
-
-
-                            }
-                        }
-                    });
+                    addValue(vtype);
                 }
             });
             cptitle.getRight().add(btnAdd);
@@ -451,8 +352,34 @@ public class PnlValues extends NursingRecordsPanel {
     }
 
     private JPanel createContentPanel4Type(final ResValueTypes vtype) {
+
         ArrayList<Integer> years = ResValueTools.getYearsWithValues(resident, vtype);
         JPanel pnlContent = new JPanel(new VerticalLayout());
+        pnlContent.setOpaque(false);
+
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
+            /***
+             *         _       _     _    __                  _____               __
+             *        / \   __| | __| |  / /_ __   ___ _ __  |_   _|   _ _ __   __\ \
+             *       / _ \ / _` |/ _` | | || '_ \ / _ \ '__|   | || | | | '_ \ / _ \ |
+             *      / ___ \ (_| | (_| | | || |_) |  __/ |      | || |_| | |_) |  __/ |
+             *     /_/   \_\__,_|\__,_| | || .__/ \___|_|      |_| \__, | .__/ \___| |
+             *                           \_\_|                     |___/|_|       /_/
+             */
+            final JideButton btnAdd = GUITools.createHyperlinkButton(OPDE.lang.getString("nursingrecords.vitalparameters.btnAdd.tooltip") + " (" + vtype.getText() + ")", SYSConst.icon22add, null);
+            btnAdd.setOpaque(false);
+            btnAdd.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+
+                    addValue(vtype);
+
+                }
+            });
+            pnlContent.add(btnAdd);
+            btnAdd.setEnabled(resident.isActive());
+        }
+
         if (!years.isEmpty()) {
             for (int year : years) {
                 pnlContent.add(createCP4Year(vtype, year));
@@ -464,11 +391,6 @@ public class PnlValues extends NursingRecordsPanel {
     private CollapsiblePane createCP4Year(final ResValueTypes vtype, final int year) {
         final String keyYears = vtype.getID() + ".xtypes." + Integer.toString(year) + ".year";
         final CollapsiblePane cpYear = getCP(keyYears);
-
-
-//        String title = "<html><font size=+1>" +
-//                Integer.toString(year) +
-//                "</font></html>";
 
         DefaultCPTitle cptitle = new DefaultCPTitle(Integer.toString(year), new ActionListener() {
             @Override
@@ -718,7 +640,8 @@ public class PnlValues extends NursingRecordsPanel {
 
                                     buildPanel();
 
-                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1006,7 +929,8 @@ public class PnlValues extends NursingRecordsPanel {
                                             }
                                         });
                                     }
-                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1243,7 +1167,8 @@ public class PnlValues extends NursingRecordsPanel {
 
                                     buildPanel();
 
-                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1436,7 +1361,8 @@ public class PnlValues extends NursingRecordsPanel {
 
                                     buildPanel();
 
-                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1526,7 +1452,8 @@ public class PnlValues extends NursingRecordsPanel {
 
                                     buildPanel();
 
-                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1664,7 +1591,8 @@ public class PnlValues extends NursingRecordsPanel {
                                 buildPanel();
                                 //GUITools.flashBackground(contentmap.get(keyMonth), Color.YELLOW, 2);
 
-                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -1716,6 +1644,118 @@ public class PnlValues extends NursingRecordsPanel {
             cp = cpMap.get(key);
         }
         return cp;
+    }
+
+
+    private void addValue(final ResValueTypes vtype) {
+
+        final String keyType = vtype.getID() + ".xtypes";
+
+        new DlgValue(new ResValue(resident, vtype), false, new Closure() {
+            @Override
+            public void execute(Object o) {
+
+
+                if (o != null) {
+
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        final ResValue myValue = em.merge((ResValue) o);
+                        em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                        em.getTransaction().commit();
+
+                        DateTime dt = new DateTime(myValue.getPit());
+
+                        final String keyDay = vtype.getID() + ".xtypes." + dt.toDateMidnight().getMillis() + ".day";
+                        final String keyYear = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
+                        final String keyWeek = vtype.getID() + ".xtypes." + dt.toDateMidnight().dayOfWeek().withMinimumValue().getMillis() + ".week";
+
+                        try {
+                            synchronized (cpMap) {
+                                cpMap.get(keyType).setCollapsible(true);
+
+                                if (cpMap.get(keyType).isCollapsed()) {
+                                    cpMap.get(keyType).setCollapsed(false);
+                                }
+                                if (cpMap.containsKey(keyYear) && cpMap.get(keyYear).isCollapsed()) {
+                                    cpMap.get(keyYear).setCollapsed(false);
+                                }
+                                if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
+
+                                    if (!cpMap.containsKey(keyWeek)) {
+                                        createCP4Weeks(dt.toDateMidnight().dayOfWeek().withMinimumValue());
+                                    } else if (!cpMap.containsKey(keyDay)) {
+                                        createCP4Day(dt.toDateMidnight());
+                                    }
+
+                                    if (cpMap.get(keyWeek).isCollapsed()) {
+                                        cpMap.get(keyWeek).setCollapsed(false);
+                                    }
+                                    if (cpMap.get(keyDay).isCollapsed()) {
+                                        cpMap.get(keyDay).setCollapsed(false);
+                                    }
+                                }
+
+                            }
+                        } catch (PropertyVetoException e) {
+                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                        }
+
+                        synchronized (mapType2Values) {
+                            if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
+                                if (!mapType2Values.get(keyDay).contains(myValue)) {
+                                    mapType2Values.get(keyDay).add(myValue);
+                                    Collections.sort(mapType2Values.get(keyDay));
+                                }
+                            } else {
+                                if (!mapType2Values.containsKey(keyYear)) {
+                                    mapType2Values.put(keyYear, new ArrayList<ResValue>());
+                                }
+                                if (!mapType2Values.get(keyYear).contains(myValue)) {
+                                    mapType2Values.get(keyYear).add(myValue);
+                                    Collections.sort(mapType2Values.get(keyYear));
+                                }
+                            }
+                        }
+                        //                                    cptitle.getButton().setIcon(SYSConst.icon22ledGreenOn);
+
+                        createCP4Year(vtype, dt.getYear());
+
+                        buildPanel();
+
+                        synchronized (linemap) {
+                            GUITools.scroll2show(jspValues, linemap.get(myValue), cpsValues, new Closure() {
+                                @Override
+                                public void execute(Object o) {
+                                    GUITools.flashBackground(linemap.get(myValue), Color.YELLOW, 2);
+                                }
+                            });
+                        }
+                    } catch (OptimisticLockException ole) {
+                        OPDE.warn(ole);
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                            OPDE.getMainframe().emptyFrame();
+                            OPDE.getMainframe().afterLogin();
+                        }
+                        OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    } catch (Exception e) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                    }
+
+
+                }
+
+            }
+        });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
