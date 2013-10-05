@@ -72,7 +72,7 @@ public class OPDE {
     protected static Logger logger;
     public static HashMap[] anonymize = null;
 
-    private static Map<DateMidnight, String> holidays;
+    private static Map<LocalDate, String> holidays;
     private static List<Integer> yearsInHolidayMap;
 
     public static String SUBDIR_TEMPLATES = "templates";

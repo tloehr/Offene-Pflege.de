@@ -55,6 +55,7 @@ import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
+import org.joda.time.LocalDate;
 
 import javax.persistence.*;
 import javax.swing.*;
@@ -81,7 +82,7 @@ public class PnlReport extends NursingRecordsPanel {
     private Map<String, JPanel> contentmap;
     private Map<String, ArrayList<NReport>> valuecache;
     private Map<NReport, JPanel> linemap;
-    private Map<DateMidnight, String> holidays;
+    private Map<LocalDate, String> holidays;
 
     private Resident resident;
     private boolean initPhase;
@@ -121,7 +122,7 @@ public class PnlReport extends NursingRecordsPanel {
         cpMap = Collections.synchronizedMap(new HashMap<String, CollapsiblePane>());
         valuecache = Collections.synchronizedMap(new HashMap<String, ArrayList<NReport>>());
         linemap = Collections.synchronizedMap(new HashMap<NReport, JPanel>());
-        holidays = new HashMap<DateMidnight, String>();
+        holidays = new HashMap<LocalDate, String>();
         prepareSearchArea();
     }
 

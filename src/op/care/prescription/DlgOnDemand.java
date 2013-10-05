@@ -44,6 +44,7 @@ import org.apache.commons.collections.Predicate;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.prompt.PromptSupport;
 import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -253,7 +254,7 @@ public class DlgOnDemand extends MyJDialog {
     }
 
     private void txtOFFFocusLost(FocusEvent evt) {
-        SYSCalendar.handleDateFocusLost(evt, new DateMidnight(), new DateMidnight().plusYears(1));
+        SYSCalendar.handleDateFocusLost(evt, new LocalDate(), new LocalDate().plusYears(1));
     }
 
     private void txtMaxTimesFocusLost(FocusEvent e) {

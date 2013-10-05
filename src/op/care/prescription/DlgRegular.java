@@ -46,6 +46,7 @@ import org.apache.commons.collections.Predicate;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.prompt.PromptSupport;
 import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 import tablerenderer.RNDHTML;
 
 import javax.persistence.EntityManager;
@@ -208,7 +209,7 @@ public class DlgRegular extends MyJDialog {
     }
 
     private void txtToFocusLost(FocusEvent evt) {
-        SYSCalendar.handleDateFocusLost(evt, new DateMidnight(), new DateMidnight().plusYears(1));
+        SYSCalendar.handleDateFocusLost(evt, new LocalDate(), new LocalDate().plusYears(1));
     }
 
     private void cmbDocONKeyPressed(KeyEvent e) {

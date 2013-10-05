@@ -14,6 +14,7 @@ import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 
 import javax.swing.*;
 import java.awt.*;
@@ -34,7 +35,7 @@ public class PnlTX extends JPanel {
     private Allowance tx;
     private Closure afterChange;
     DecimalFormat cf = new DecimalFormat("######.00");
-    DateMidnight min;
+    LocalDate min;
     Component focusOwner = null;
 
     public PnlTX(Allowance tx, Closure afterChange) {
@@ -46,7 +47,7 @@ public class PnlTX extends JPanel {
     }
 
     private void txtDateFocusLost(FocusEvent evt) {
-        SYSCalendar.handleDateFocusLost(evt, min, new DateMidnight());
+        SYSCalendar.handleDateFocusLost(evt, min, new LocalDate());
     }
 
     private void txtDateFocusGained(FocusEvent e) {
@@ -233,7 +234,7 @@ public class PnlTX extends JPanel {
 
         // TODO: change min, when combobox changes
         ResInfo firstStay = ResInfoTools.getFirstResinfo(tx.getResident(), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
-        min = firstStay == null ? new DateMidnight().dayOfMonth().withMinimumValue() : new DateMidnight(firstStay.getFrom());
+        min = firstStay == null ? new LocalDate().dayOfMonth().withMinimumValue() : new LocalDate(firstStay.getFrom());
 
         OPDE.debug(min);
 

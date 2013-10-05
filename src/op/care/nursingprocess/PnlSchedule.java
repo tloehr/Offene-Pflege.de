@@ -40,6 +40,7 @@ import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -122,7 +123,7 @@ public class PnlSchedule extends JPanel {
     }
 
     private void txtLDateFocusLost(FocusEvent evt) {
-        SYSCalendar.handleDateFocusLost(evt, new DateMidnight(), new DateMidnight().plusWeeks(4));
+        SYSCalendar.handleDateFocusLost(evt, new LocalDate(), new LocalDate().plusWeeks(4));
     }
 
     private void txtIntegerFocusLost(FocusEvent e) {

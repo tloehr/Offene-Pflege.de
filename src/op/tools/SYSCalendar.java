@@ -54,29 +54,13 @@ import java.util.*;
 
 public class SYSCalendar {
 
-    public static String printGC(GregorianCalendar gc) {
-        return (gc.get(GregorianCalendar.YEAR) + "-" + (gc.get(GregorianCalendar.MONTH) + 1) + "-" + gc.get(GregorianCalendar.DAY_OF_MONTH));
-    }
 
     public static GregorianCalendar heute() {
         return new GregorianCalendar();
     }
 
-    public static Date today_date() {
-        return new Date();
-    }
 
-    /**
-     * Dasselbe wie die gleichnamige Methode, jedoch wird hier als Referenzzeitpunkt immer
-     * die aktuelle Zeit genommen.
-     *
-     * @param time   Zeitpunkt in der Vergangenheit, der geprüft werden soll.
-     * @param offset Anzahl der Minuten, welche die zwei Zeipunkte maximal auseinader liegen dürfen.
-     * @return true, wenn offset nicht überschritten wird. false, sonst.
-     */
-    public static boolean earlyEnough(long time, int offset) {
-        return earlyEnough(now(), time, offset);
-    }
+
 
     public static boolean isInFuture(long time) {
         return isInFuture(new Date(time));
@@ -87,19 +71,6 @@ public class SYSCalendar {
     }
 
 
-    /**
-     * Generiert ein Array aus Uhrzeiten in der PrinterForm {"17:00","17:15"...}
-     * Der verwendete Datentyp ist Time.
-     */
-    public static ArrayList fillUhrzeiten() {
-        ArrayList list = new ArrayList();
-        GregorianCalendar gc = today();
-        for (int i = 1; i <= 96; i++) {
-            list.add(new ListElement(toGermanTime(gc), gc.clone()));
-            gc.add(GregorianCalendar.MINUTE, 15);
-        }
-        return list;
-    }
 
 
     /**
@@ -137,86 +108,6 @@ public class SYSCalendar {
         };
     }
 
-    /**
-     * Ermittelt ob zwei Zeitpunkte nur höchstens eine bestimmte Anzahl von Minuten auseinanderliegen.
-     *
-     * @param reftime Ausgangszeitpunkt. Wird meistens die aktuelle Zeit sein.
-     * @param time    Zeitpunkt in der Vergangenheit, der geprüft werden soll.
-     * @param offset  Anzahl der Minuten, welche die zwei Zeipunkte maximal auseinader liegen dürfen.
-     * @return true, wenn offset nicht überschritten wird. false, sonst.
-     */
-    public static boolean earlyEnough(long reftime, long time, int offset) {
-        GregorianCalendar gcreftime = new GregorianCalendar();
-        gcreftime.setTimeInMillis(reftime);
-        GregorianCalendar gctime = new GregorianCalendar();
-        gctime.setTimeInMillis(time);
-        gctime.add(GregorianCalendar.MINUTE, offset);
-        return gctime.after(gcreftime);
-    }
-
-    public static String printGCGermanStyle(GregorianCalendar gc) {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        String result;
-        Date d = new Date(gc.getTimeInMillis());
-        //result =  gc.get(GregorianCalendar.DAY_OF_MONTH) + "." + (gc.get(GregorianCalendar.MONTH)+1) + "." + gc.get(GregorianCalendar.YEAR);
-        result = formatter.format(d);
-        if (gc.equals(SYSConst.UNTIL_FURTHER_NOTICE)) {
-            result = "bis auf weiteres";
-        }
-        if (gc.equals(SYSConst.VERY_BEGINNING)) {
-            result = "von anfang an";
-        }
-        return (result);
-    }
-
-    public static String GC_MMMYY(GregorianCalendar gc) {
-        return (MonatName(gc) + " " + gc.get(GregorianCalendar.YEAR));
-    }
-
-    public static String printGermanStyle(Date d) {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        String result;
-        GregorianCalendar gc = new GregorianCalendar();
-        gc.setTime(d);
-        result = formatter.format(d);
-        if (gc.equals(SYSConst.UNTIL_FURTHER_NOTICE)) {
-            result = "bis auf weiteres";
-        }
-        if (gc.equals(SYSConst.VERY_BEGINNING)) {
-            result = "von anfang an";
-        }
-        return (result);
-    }
-
-//    public static String printGermanStyleShort(Date d) {
-//        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yy");
-//        String result;
-//        GregorianCalendar gc = new GregorianCalendar();
-//        gc.setTime(d);
-//        result = formatter.format(d);
-//        if (gc.equals(SYSConst.BIS_AUF_WEITERES_WO_TIME)) {
-//            result = "==>";
-//        }
-//        if (gc.equals(SYSConst.VERY_BEGINNING)) {
-//            result = "|<=";
-//        }
-//        if (sameDay(gc, new GregorianCalendar()) == 0) {
-//            result = "heute";
-//        }
-//        GregorianCalendar heute = new GregorianCalendar();
-//        GregorianCalendar morgen = (GregorianCalendar) heute.clone();
-//        morgen.add(GregorianCalendar.DATE, +1);
-//        GregorianCalendar gestern = (GregorianCalendar) heute.clone();
-//        gestern.add(GregorianCalendar.DATE, -1);
-//
-//        if (sameDay(gc, gestern) == 0) {
-//            result = "gestern";
-//        }
-//        if (sameDay(gc, morgen) == 0) {
-//            result = "morgen";
-//        }
-//        return (result);
-//    }
 
     public static GregorianCalendar toGC(Date d) {
         GregorianCalendar gc = new GregorianCalendar();
@@ -224,11 +115,6 @@ public class SYSCalendar {
         return gc;
     }
 
-    public static GregorianCalendar toGC(long l) {
-        GregorianCalendar gc = new GregorianCalendar();
-        gc.setTimeInMillis(l);
-        return gc;
-    }
 
 
     public static String toGermanTime(GregorianCalendar gc) {
@@ -239,62 +125,7 @@ public class SYSCalendar {
         return formatter.format(date);
     }
 
-    public static String toGermanTime(Time t) {
-        if (t == null) {
-            return "";
-        }
-        Date d = new Date(t.getTime());
-        Format formatter;
 
-        formatter = new SimpleDateFormat("HH:mm");
-        return formatter.format(d);
-    }
-
-
-    public static String MonatName(GregorianCalendar gc) {
-        switch (gc.get(GregorianCalendar.MONTH)) {
-            case GregorianCalendar.JANUARY: {
-                return "Januar";
-            }
-            case GregorianCalendar.FEBRUARY: {
-                return "Februar";
-            }
-            case GregorianCalendar.MARCH: {
-                return "März";
-            }
-            case GregorianCalendar.APRIL: {
-                return "April";
-            }
-            case GregorianCalendar.MAY: {
-                return "Mai";
-            }
-            case GregorianCalendar.JUNE: {
-                return "Juni";
-            }
-            case GregorianCalendar.JULY: {
-                return "Juli";
-            }
-            case GregorianCalendar.AUGUST: {
-                return "August";
-            }
-            case GregorianCalendar.SEPTEMBER: {
-                return "September";
-            }
-            case GregorianCalendar.OCTOBER: {
-                return "Oktober";
-            }
-            case GregorianCalendar.NOVEMBER: {
-                return "November";
-            }
-            case GregorianCalendar.DECEMBER: {
-                return "Dezember";
-            }
-
-            default: {
-                return "";
-            }
-        }
-    } // MonatName(GregorianCalendar gc)
 
     public static String WochentagName(GregorianCalendar gc) {
         switch (gc.get(GregorianCalendar.DAY_OF_WEEK)) {
@@ -325,66 +156,7 @@ public class SYSCalendar {
         }
     }
 
-    public static String WochentagName(Date d) {
-        return WochentagName(toGC(d));
-    }
 
-    /**
-     * Calculates the number of days between two calendar days in a manner
-     * which is independent of the Calendar type used.
-     *
-     * @param d1 The first date.
-     * @param d2 The second date.
-     * @return The number of days between the two dates.  Zero is
-     *         returned if the dates are the same, one if the dates are
-     *         adjacent (d1 before d2) etc.
-     *         negative values denote that d2 is before d1;
-     *         If Calendar types of d1 and d2
-     *         are different, the result may not be accurate.
-     */
-    public static int getDaysBetween(java.util.Calendar d1, java.util.Calendar d2) {
-        boolean swapped = false;
-        if (d1.after(d2)) {  // swap dates so that d1 is start and d2 is end
-            java.util.Calendar swap = d1;
-            d1 = d2;
-            d2 = swap;
-            swapped = true;
-        }
-        int days = d2.get(java.util.Calendar.DAY_OF_YEAR) -
-                d1.get(java.util.Calendar.DAY_OF_YEAR);
-        int y2 = d2.get(java.util.Calendar.YEAR);
-        if (d1.get(java.util.Calendar.YEAR) != y2) {
-            d1 = (java.util.Calendar) d1.clone();
-            do {
-                days += d1.getActualMaximum(java.util.Calendar.DAY_OF_YEAR);
-                d1.add(java.util.Calendar.YEAR, 1);
-            } while (d1.get(java.util.Calendar.YEAR) != y2);
-        }
-
-        if (swapped) {
-            days = days * -1;
-        }
-
-        return days;
-    } // getDaysBetween()
-
-    /**
-     * A date is "sane", when it is after the start of the first stay of the resident. When there is no stay yet,
-     * then its must not before now. It must also never be in future.
-     *
-     * @param resident
-     * @param date
-     * @return
-     */
-    public static boolean isDateSane(Resident resident, Date date) {
-        DateMidnight d = new DateMidnight(date);
-        if (d.isAfterNow()) {
-            return false;
-        }
-        ResInfo firstStay = ResInfoTools.getFirstResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
-        DateMidnight min = firstStay == null ? new DateMidnight().dayOfMonth().withMinimumValue() : new DateMidnight(firstStay.getFrom());
-        return new DateMidnight(date).isAfter(min);
-    }
 
     /**
      * A "sane" birthday is not older than 120 years and not younger than 15 years.
@@ -397,31 +169,31 @@ public class SYSCalendar {
         //TODO: those min and max values must not be hardcoded in future
         int maxage = 120;
         int minage = 15;
-        DateMidnight min = new DateMidnight().minusYears(minage);
-        DateMidnight max = new DateMidnight().minusYears(maxage);
-        DateMidnight d = new DateMidnight(date);
+        LocalDate min = new LocalDate().minusYears(minage);
+        LocalDate max = new LocalDate().minusYears(maxage);
+        LocalDate d = new LocalDate(date);
 
         return d.isAfter(max) && d.isBefore(min);
     }
 
-    public static void handleDateFocusLost(FocusEvent evt, DateMidnight min, DateMidnight max) {
-        DateTime dt;
+    public static void handleDateFocusLost(FocusEvent evt, LocalDate min, LocalDate max) {
+        LocalDate dt;
         if (max == null) {
-            max = new DateMidnight();
+            max = new LocalDate();
         }
         try {
-            dt = new DateTime(parseDate(((JTextField) evt.getSource()).getText()));
+            dt = new LocalDate(parseDate(((JTextField) evt.getSource()).getText()));
         } catch (NumberFormatException ex) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wrongdate")));
-            dt = new DateTime();
+            dt = new LocalDate();
         }
         if (dt.isAfter(max)) {
-            dt = new DateTime();
-            DisplayMessage dm = new DisplayMessage(dt.isAfterNow() ? OPDE.lang.getString("misc.msg.futuredate") : OPDE.lang.getString("misc.msg.wrongdate"));
+            dt = new LocalDate();
+            DisplayMessage dm = new DisplayMessage(dt.isAfter(new LocalDate())? OPDE.lang.getString("misc.msg.futuredate") : OPDE.lang.getString("misc.msg.wrongdate"));
             OPDE.getDisplayManager().addSubMessage(dm);
         }
         if (dt.isBefore(min)) {
-            dt = new DateTime();
+            dt = new LocalDate();
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.DateTooOld")));
         }
 
@@ -528,11 +300,11 @@ public class SYSCalendar {
             throw new NumberFormatException("month");
         }
 
-        if (tag < 1 || tag > eom(new GregorianCalendar(jahr, monat - 1, 1))) {
+        if (tag < 1 || tag > eom(new LocalDate(jahr, monat, tag)).getDayOfMonth()) {
             throw new NumberFormatException("month");
         }
 
-        return new DateMidnight(jahr, monat, tag).toDate();
+        return new LocalDate(jahr, monat, tag).toDate();
     }
 
     /**
@@ -908,127 +680,23 @@ public class SYSCalendar {
     }
 
 
-    /**
-     * EndOfMonth
-     * Berechnet das Enddatum eines Monats, passend zum Parameter
-     *
-     * @param d Datum innerhalb des entsprechenden Monats.
-     * @return Enddatum des Monats
-     */
-    public static Date eom(Date d) {
-        GregorianCalendar gc = toGC(d);
-        int ieom = eom(gc);
-        gc.set(GregorianCalendar.DATE, ieom);
-        return new Date(endOfDay(new Date(gc.getTimeInMillis())));
+    public static DateTime bom(DateTime d) {
+        return d.dayOfMonth().withMinimumValue().hourOfDay().withMinimumValue().minuteOfHour().withMinimumValue().secondOfMinute().withMinimumValue();
     }
 
-    public static Date bom(Date d) {
-        GregorianCalendar gc = toGC(d);
-        gc.set(GregorianCalendar.DATE, 1);
-        return new Date(startOfDay(new Date(gc.getTimeInMillis())));
+    public static DateTime eom(DateTime d) {
+        return d.dayOfMonth().withMaximumValue().hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue();
     }
 
-    public static int eom(GregorianCalendar d) {
-        return d.getActualMaximum(GregorianCalendar.DAY_OF_MONTH);
-//        switch (d.get(GregorianCalendar.MONTH)) {
-//            case GregorianCalendar.JANUARY: {
-//                return 31;
-//            }
-//            case GregorianCalendar.FEBRUARY: {
-//                if (d.isLeapYear(d.get(GregorianCalendar.YEAR))) {
-//                    return 29;
-//                } else {
-//                    return 28;
-//                }
-//            }
-//            case GregorianCalendar.MARCH: {
-//                return 31;
-//            }
-//            case GregorianCalendar.APRIL: {
-//                return 30;
-//            }
-//            case GregorianCalendar.MAY: {
-//                return 31;
-//            }
-//            case GregorianCalendar.JUNE: {
-//                return 30;
-//            }
-//            case GregorianCalendar.JULY: {
-//                return 31;
-//            }
-//            case GregorianCalendar.AUGUST: {
-//                return 31;
-//            }
-//            case GregorianCalendar.SEPTEMBER: {
-//                return 30;
-//            }
-//            case GregorianCalendar.OCTOBER: {
-//                return 31;
-//            }
-//            case GregorianCalendar.NOVEMBER: {
-//                return 30;
-//            }
-//            case GregorianCalendar.DECEMBER: {
-//                return 31;
-//            }
-//
-//            default: {
-//                return 0;
-//            }
-//        }
-    } // eom
-
-    /**
-     * Entscheidet ob zwei Daten in der selben Woche liegen. Berücksichtigt dabei die Jahreszahlen, so dass KW 34/2006 != KW 34/2005.
-     */
-    public static int sameWeek(GregorianCalendar a, GregorianCalendar b) {
-        NumberFormat form = new java.text.DecimalFormat("00");
-
-        int aYear = a.get(GregorianCalendar.YEAR);
-        int bYear = b.get(GregorianCalendar.YEAR);
-
-        // Die KW der letzten Tage eines Jahres gehören manchmal schon zum neuen Jahr. So gehörte der 29.12.2008 schon zur KW1 von 2009.
-        // Diese Zeilen berücksichtigen das. Sie erhöhen die Jahreszahl wenn der Monat Dezember ist und die KW trotzdem 1.
-        // Bug 0000016: Fehlende Einträge in der Behandlungspflege
-        if (a.get(GregorianCalendar.WEEK_OF_YEAR) == 1 && a.get(GregorianCalendar.MONTH) == GregorianCalendar.DECEMBER) {
-            aYear++;
-        }
-        if (b.get(GregorianCalendar.WEEK_OF_YEAR) == 1 && b.get(GregorianCalendar.MONTH) == GregorianCalendar.DECEMBER) {
-            bYear++;
-        }
-
-        String sa = Integer.toString(aYear) + form.format(a.get(GregorianCalendar.WEEK_OF_YEAR));
-        String sb = Integer.toString(bYear) + form.format(b.get(GregorianCalendar.WEEK_OF_YEAR));
-        int ia = Integer.parseInt(sa);
-        int ib = Integer.parseInt(sb);
-
-        if (ia > ib) {
-            return 1;
-        }
-        if (ia < ib) {
-            return -1;
-        }
-        return 0;
+    public static LocalDate bom(LocalDate d) {
+        return d.dayOfMonth().withMinimumValue();
     }
 
-    /**
-     * Entscheidet ob zwei Daten im selben Monat liegen. Berücksichtigt dabei die Jahreszahlen, so dass Monat 12/2006 != Monat 12/2005.
-     */
-    public static int sameMonth(GregorianCalendar a, GregorianCalendar b) {
-        NumberFormat form = new java.text.DecimalFormat("00");
-        String sa = Integer.toString(a.get(GregorianCalendar.YEAR)) + form.format(a.get(GregorianCalendar.MONTH));
-        String sb = Integer.toString(b.get(GregorianCalendar.YEAR)) + form.format(b.get(GregorianCalendar.MONTH));
-        int ia = Integer.parseInt(sa);
-        int ib = Integer.parseInt(sb);
-
-        if (ia > ib) {
-            return 1;
-        }
-        if (ia < ib) {
-            return -1;
-        }
-        return 0;
+    public static LocalDate eom(LocalDate d) {
+        return d.dayOfMonth().withMaximumValue();
     }
+
+
 
     /**
      * Entscheidet ob zwei Daten am selben Tag liegen.
@@ -1053,29 +721,6 @@ public class SYSCalendar {
         return 0;
     }
 
-    /**
-     * Entscheidet ob zwei Daten am selben Tag liegen.
-     *
-     * @param a Datum a
-     * @param b Datum b
-     * @return 0, wenn a und b am selben Tag liegen. -1, wenn a <b>vor</b> b ist. und +1 wenn a <b>nach</b> b ist.
-     */
-    public static int sameDay(Date a, Date b) {
-        return sameDay(toGC(a), toGC(b));
-    }
-
-    public static int sameDay(long a, long b) {
-        return sameDay(toGC(a), toGC(b));
-    }
-
-//    public static int calculateAge(GregorianCalendar a, GregorianCalendar b) {
-//        return getDaysBetween(a, b) / 365;
-//    }
-//
-//    public static int calculateAge(GregorianCalendar a) {
-//        return getDaysBetween(a, new GregorianCalendar()) / 365;
-//    }
-
     public static void checkJDC(JDateChooser jdc) {
         if (jdc.getDate() == null) {
             jdc.setDate(new Date());
@@ -1083,12 +728,6 @@ public class SYSCalendar {
         if (jdc.getMaxSelectableDate().before(jdc.getDate())) {
             jdc.setDate(new Date());
         }
-    }
-
-    public static boolean isJDCValid(JDateChooser jdc) {
-        boolean valid = false;
-        boolean dateTrouble = (jdc.getDate() == null);
-        return !dateTrouble && isInRange(jdc);
     }
 
     /**
@@ -1102,23 +741,6 @@ public class SYSCalendar {
     public static Date addDate(Date date, int numDays) {
         GregorianCalendar gc = toGC(date);
         gc.add(GregorianCalendar.DATE, numDays);
-        return new Date(gc.getTimeInMillis());
-    }
-
-//    // Das hier ist noch nicht ganz richtig. Vertut sich an den Rändern schon mal.
-//    public static Date addDate(Date date, int amount, Date min, Date max) {
-//        GregorianCalendar gc = toGC(date);
-//        gc.add(GregorianCalendar.DATE, amount);
-//        Date result = new Date(gc.getTimeInMillis());
-//        if (!(trimTime(min).before(trimTime(result)) && trimTime(max).after(trimTime(result)))) {
-//            result = date;
-//        }
-//        return result;
-//    }
-
-    public static Date addField(Date date, int amount, int field) {
-        GregorianCalendar gc = toGC(date);
-        gc.add(field, amount);
         return new Date(gc.getTimeInMillis());
     }
 
@@ -1171,16 +793,6 @@ public class SYSCalendar {
         return gc;
     }
 
-    /**
-     * Bereinigt ein Datum um die Uhrzeitanteile, damit die Vergleichsoperatoren richtig funktionieren, wenn man sich nur auf das
-     * Datum beschränken will.
-     *
-     * @param date das zu bereinigende Datum
-     * @return das bereinigte Datum
-     */
-    public static Date trimTime(Date date) {
-        return new Date(trimTime(toGC(date)).getTimeInMillis());
-    }
 
     public static boolean betweenDisjunctive(Date from, Date to, Date date) {
         return date.getTime() > from.getTime() && date.getTime() < to.getTime();
@@ -1190,34 +802,6 @@ public class SYSCalendar {
         return betweenDisjunctive(from, to, date) || date.getTime() == from.getTime() || date.getTime() == to.getTime();
     }
 
-    public static boolean betweenDisjunctive(Date fromInt, Date toInt, Date from, Date to) {
-        return betweenDisjunctive(fromInt, toInt, from) && betweenDisjunctive(fromInt, toInt, to);
-    }
-
-    public static boolean betweenOverlap(Date fromInt, Date toInt, Date from, Date to) {
-        return betweenOverlap(fromInt, toInt, from) && betweenOverlap(fromInt, toInt, to);
-    }
-
-    public static boolean isInRange(JDateChooser jdc) {
-        if (jdc.getDate() != null) {
-            return betweenOverlap(jdc.getMinSelectableDate(), jdc.getMaxSelectableDate(), jdc.getDate());
-        }
-        return false;
-    }
-
-    public static ArrayList getUhrzeitListe(GregorianCalendar start, GregorianCalendar stop, int minutes) {
-        ArrayList result = new ArrayList();
-        while (start.before(stop)) {
-            result.add(toGermanTime(start));
-            start.add(GregorianCalendar.MINUTE, minutes);
-        }
-        return result;
-    }
-
-
-    public static Date addTime2Date(Date date, Time time) {
-        return new Date(addTime2Date(toGC(date), toGC(time)).getTimeInMillis());
-    }
 
 
     public static Date addTime2Date(Date date, Date time) {
@@ -1279,22 +863,6 @@ public class SYSCalendar {
         return compareTime(date1.getTime(), date2.getTime());
     }
 
-    public static long startOfDay() {
-        return startOfDay(new Date());
-    }
-
-    public static long midOfDay() {
-        return midOfDay(new Date());
-    }
-
-    /**
-     * Nimmt den aktuellen Zeitpunkt, setzt die Zeit auf 23:59:59 und gibt das Ergebnis zurück.
-     *
-     * @return
-     */
-    public static long endOfDay() {
-        return endOfDay(new Date());
-    }
 
     /**
      * nimmt das übergebene Datum und setzt die Uhrzeitkomponente auf 23:59:59
@@ -1327,23 +895,6 @@ public class SYSCalendar {
         gc.set(GregorianCalendar.MILLISECOND, 0);
         return gc.getTimeInMillis();
     }
-
-    /**
-     * nimmt das übergebene Datum und setzt die Uhrzeitkomponente auf 12:00:00
-     *
-     * @param d
-     * @return das Ergebnis als TimeInMillis
-     */
-    public static long midOfDay(Date d) {
-        GregorianCalendar gc = new GregorianCalendar();
-        gc.setTimeInMillis(d.getTime());
-        gc.set(GregorianCalendar.HOUR_OF_DAY, 12);
-        gc.set(GregorianCalendar.MINUTE, 0);
-        gc.set(GregorianCalendar.SECOND, 0);
-        gc.set(GregorianCalendar.MILLISECOND, 0);
-        return gc.getTimeInMillis();
-    }
-
 
     /**
      * Berechnet zu einem gegebenen Jahr den Ostersonntag. Dieser wird als GregorianCalendar zurückgegeben.
@@ -1440,62 +991,38 @@ public class SYSCalendar {
         return gc;
     }
 
-    public static String toAnsi(GregorianCalendar gc) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Date d = new Date(gc.getTimeInMillis());
-        return sdf.format(d);
-    }
 
     /**
      * Sucht alle Feiertage in einem Jahr zusammen.
      *
      * @return Eine Hashmap, die je das Datum als Zeichenkette der PrinterForm "jjjj-mm-tt" enthält und dazu die Bezeichnung des Feiertags.
      */
-    public static HashMap<DateMidnight, String> getHolidays(int from, int to) {
+    public static HashMap<LocalDate, String> getHolidays(int from, int to) {
 
-        HashMap<DateMidnight, String> hm = new HashMap<DateMidnight, String>();
+        HashMap<LocalDate, String> hm = new HashMap<LocalDate, String>();
 
         // TODO: i18n
         for (int year = from; year <= to; year++) {
             // Feste Feiertage
-            hm.put(new DateMidnight(year, 1, 1), "Neujahrstag");
-            hm.put(new DateMidnight(year, 5, 1), "Maifeiertag");
-            hm.put(new DateMidnight(year, 10, 3), "Tag der Einheit");
+            hm.put(new LocalDate(year, 1, 1), "Neujahrstag");
+            hm.put(new LocalDate(year, 5, 1), "Maifeiertag");
+            hm.put(new LocalDate(year, 10, 3), "Tag der Einheit");
 //            hm.put(new DateMidnight(year, 06, 29), "Peter Paul");
-            hm.put(new DateMidnight(year, 11, 1), "Allerheiligen");
-            hm.put(new DateMidnight(year, 12, 25), "1. Weihnachtstag");
-            hm.put(new DateMidnight(year, 12, 26), "2. Weihnachtstag");
+            hm.put(new LocalDate(year, 11, 1), "Allerheiligen");
+            hm.put(new LocalDate(year, 12, 25), "1. Weihnachtstag");
+            hm.put(new LocalDate(year, 12, 26), "2. Weihnachtstag");
 
             // Bewegliche Feiertage
-            hm.put(new DateMidnight(Karfreitag(year)), "Karfreitag");
-            hm.put(new DateMidnight(Ostersonntag(year)), "Ostersonntag");
-            hm.put(new DateMidnight(Ostermontag(year)), "Ostermontag");
-            hm.put(new DateMidnight(ChristiHimmelfahrt(year)), "Christi Himmelfahrt");
-            hm.put(new DateMidnight(Pfingstsonntag(year)), "Pfingstsonntag");
-            hm.put(new DateMidnight(Pfingstmontag(year)), "Pfingstmontag");
-            hm.put(new DateMidnight(Fronleichnam(year)), "Fronleichnam");
+            hm.put(new LocalDate(Karfreitag(year)), "Karfreitag");
+            hm.put(new LocalDate(Ostersonntag(year)), "Ostersonntag");
+            hm.put(new LocalDate(Ostermontag(year)), "Ostermontag");
+            hm.put(new LocalDate(ChristiHimmelfahrt(year)), "Christi Himmelfahrt");
+            hm.put(new LocalDate(Pfingstsonntag(year)), "Pfingstsonntag");
+            hm.put(new LocalDate(Pfingstmontag(year)), "Pfingstmontag");
+            hm.put(new LocalDate(Fronleichnam(year)), "Fronleichnam");
         }
 
         return hm;
-    }
-
-
-    public static ComboBoxModel getMinuteCMBModelForDFNs(int[] mins) {
-        DefaultComboBoxModel dcbm = new DefaultComboBoxModel();
-//        Pair<Integer, String>[]
-
-        dcbm.addElement(new Pair<String, Integer>("--", -1)); // empty selection
-
-        for (int min : mins) {
-            if (min % 60 == 0) {
-                dcbm.addElement(new Pair<String, Integer>(min / 60 + " " + OPDE.lang.getString("misc.msg.Hour(s)"), min));
-            } else {
-                dcbm.addElement(new Pair<String, Integer>(min + " " + OPDE.lang.getString("misc.msg.Minute(s)"), min));
-            }
-        }
-
-        return dcbm;
-
     }
 
 
@@ -1537,26 +1064,11 @@ public class SYSCalendar {
         return GUITools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[shift] + "_BGSHIFT"));
     }
 
-    public static Color getFG(Byte shift) {
-        if (shift == -1) {
-            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGBHP"));
-        }
-        return GUITools.getColor(OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[shift] + "_FGBHP"));
-    }
-
-    public static Color getBG(Byte shift) {
-        if (shift == -1) {
-            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGBHP"));
-        }
-        return GUITools.getColor(OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[shift] + "_BGBHP"));
-    }
-
 
     public static BigDecimal getDecimalHours(DateTime from, DateTime to) {
         Period period = new Period(from, to);
         return BigDecimal.valueOf(period.toStandardDuration().getMillis()).divide(BigDecimal.valueOf(DateTimeConstants.MILLIS_PER_HOUR), 2, RoundingMode.HALF_DOWN);
     }
-
 
 
 }

@@ -51,6 +51,7 @@ import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.OptimisticLockException;
@@ -81,7 +82,7 @@ public class PnlHandover extends NursingRecordsPanel {
     private Map<String, ArrayList<NReport>> cacheNR;
     //    private Map<NReport, JPanel> linemapNR;
 //    private Map<Handovers, JPanel> linemapHO;
-    private HashMap<DateMidnight, String> hollidays;
+    private HashMap<LocalDate, String> hollidays;
     private JComboBox cmbHomes;
     private JToggleButton tbResidentFirst;
     private Comparator myComparator;

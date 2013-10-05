@@ -13,6 +13,7 @@ import op.tools.SYSCalendar;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.joda.time.Years;
 
 import javax.persistence.EntityManager;
@@ -95,7 +96,7 @@ public class PnlBWBasisInfo extends JPanel {
         int maxage = 120;
         int minage = 15;
 
-        SYSCalendar.handleDateFocusLost(evt, new DateMidnight().minusYears(maxage), new DateMidnight().minusYears(minage));
+        SYSCalendar.handleDateFocusLost(evt, new LocalDate().minusYears(maxage), new LocalDate().minusYears(minage));
 
         gebdatum = SYSCalendar.parseDate(txtDOB.getText());
 

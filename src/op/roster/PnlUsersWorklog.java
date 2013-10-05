@@ -178,7 +178,9 @@ public class PnlUsersWorklog extends CleanablePanel {
 
         String userlist = "";
         for (Users user : mapUsers.keySet()) {
-            em.merge(new Workaccount(monthToCreate.toDate(), mapUsers.get(user).getParameterSet(monthToCreate).getTargetHoursPerMonth().negate(), WorkAccountTools.HOURS_AUTO, user));
+            OPDE.debug(user);
+//            OPDE.debug(mapUsers.get(user).getTargetHoursForMonth(monthToCreate, user));
+            em.merge(mapUsers.get(user).getTargetHoursForMonth(monthToCreate, user));
             userlist += user.getUID() + "=" + defaultHome.getEID() + ",";
         }
 

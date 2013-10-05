@@ -1,9 +1,14 @@
 package entity.roster;
 
+import entity.system.Users;
+import org.joda.time.Days;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DateFormat;
 import java.util.ArrayList;
 
 /**
@@ -105,6 +110,89 @@ public class UserContracts {
         return mySet;
     }
 
+    public Workaccount getTargetHoursForMonth(LocalDate month, Users user) {
+        // em.merge(new Workaccount(monthToCreate.toDate(), mapUsers.get(user).getParameterSet(monthToCreate).getTargetHoursPerMonth().negate(), WorkAccountTools.HOURS_AUTO, user));
+        ArrayList<UserContract> myContracts = getContractsWithinMonth(month);
+        Workaccount workaccount = null;
+
+        DateFormat df = DateFormat.getDateInstance();
+
+        Interval intervalMonth = new Interval(
+                month.dayOfMonth().withMinimumValue().toDateTime(LocalTime.MIDNIGHT),
+                month.dayOfMonth().withMaximumValue().toDateTime(LocalTime.now().hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue())
+        );
+
+        int maxdays = month.dayOfMonth().withMaximumValue().getDayOfMonth();
+
+        String text = "";
+
+        if (!myContracts.isEmpty()) {
+            BigDecimal hours = BigDecimal.ZERO;
+
+            for (UserContract contract : myContracts) {
+                Interval intervalContract = new Interval(
+                        contract.getDefaults().getFrom().toDateTime(LocalTime.MIDNIGHT),
+                        contract.getDefaults().getTo().toDateTime(LocalTime.now().hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue())
+                );
+
+                Interval overlap = intervalContract.overlap(intervalMonth);
+
+                if (overlap != null) {
+//                    OPDE.debug(overlap.toPeriod().getDays());
+
+//                    OPDE.debug(quota.multiply(new BigDecimal(100)) + " %");
+//                    OPDE.debug(contract.getDefaults().getTargetHoursPerMonth());
+//                    OPDE.debug(contract.getDefaults().getTargetHoursPerMonth().multiply(quota));
+
+                    BigDecimal quota = new BigDecimal(Days.daysIn(overlap).getDays() + 1).divide(new BigDecimal(maxdays), 4, RoundingMode.HALF_UP);
+                    text += String.format("Vertrag vom %s bis %s. Sollstunden im Monat: %s. Somit Sollstunden für diesen Monat: %s (%s %%)\n",
+                            df.format(contract.getDefaults().getFrom().toDate()),
+                            df.format(contract.getDefaults().getTo().toDate()),
+                            contract.getDefaults().getTargetHoursPerMonth(),
+                            contract.getDefaults().getTargetHoursPerMonth().multiply(quota),
+                            quota.multiply(new BigDecimal(100))
+                    );
+
+                    hours = hours.add(contract.getDefaults().getTargetHoursPerMonth().multiply(quota));
+
+                }
+
+                if (myContracts.size() > 1) {
+                    text += String.format("Somit gesamt: %s\n", hours);
+                }
+
+
+                workaccount = new Workaccount(month.toDate(), hours.negate(), WorkAccountTools.HOURS_AUTO, user);
+                workaccount.setText(text);
+
+            }
+        }
+
+        return workaccount;
+    }
+
+    public ArrayList<UserContract> getContractsWithinMonth(LocalDate month) {
+        ArrayList<UserContract> myContracts = new ArrayList<UserContract>();
+
+        Interval intervalMonth = new Interval(
+                month.dayOfMonth().withMinimumValue().toDateTime(LocalTime.MIDNIGHT),
+                month.dayOfMonth().withMaximumValue().toDateTime(LocalTime.now().hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue())
+        );
+
+        for (UserContract contract : listContracts) {
+            Interval intervalContract = new Interval(
+                    contract.getDefaults().getFrom().toDateTime(LocalTime.MIDNIGHT),
+                    contract.getDefaults().getTo().toDateTime(LocalTime.now().hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue())
+            );
+
+            if (intervalContract.overlaps(intervalMonth)) {
+                myContracts.add(contract);
+            }
+
+        }
+
+        return myContracts;
+    }
 
     public boolean hasValidContractsInMonth(LocalDate month) {
         boolean hasValid = false;

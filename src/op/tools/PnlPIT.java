@@ -9,6 +9,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import op.OPDE;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import javax.swing.*;
 import java.awt.*;
@@ -104,7 +105,7 @@ public class PnlPIT extends JPanel {
     }
 
     private void txtDateFocusLost(FocusEvent evt) {
-        SYSCalendar.handleDateFocusLost(evt, new DateMidnight(min), new DateMidnight(max));
+        SYSCalendar.handleDateFocusLost(evt, new LocalDate(min), new LocalDate(max));
     }
 
     private void txtDateFocusGained(FocusEvent e) {
