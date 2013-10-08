@@ -10,7 +10,9 @@ import com.jidesoft.grid.TableScrollPane;
 import com.jidesoft.pane.CollapsiblePane;
 import entity.Homes;
 import entity.HomesTools;
-import entity.roster.*;
+import entity.roster.Rosters;
+import entity.roster.RostersTools;
+import entity.roster.UserContracts;
 import entity.system.SYSPropsTools;
 import entity.system.Users;
 import entity.system.UsersTools;
@@ -21,6 +23,8 @@ import op.tools.SYSTools;
 import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
+import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -40,6 +44,7 @@ public class PnlUsersWorklog extends CleanablePanel {
     private Map<String, JPanel> contentmap;
     private TableScrollPane tsp1;
     private ArrayList<Rosters> lstAllRosters;
+    private JPopupMenu menu;
 
     public PnlUsersWorklog() {
         initComponents();
@@ -200,6 +205,54 @@ public class PnlUsersWorklog extends CleanablePanel {
 
     }
 
+    private void lstRostersMousePressed(MouseEvent evt) {
+        Point p = evt.getPoint();
+        final int row = lstRosters.locationToIndex(p);
+
+        lstRosters.setSelectedIndex(row);
+
+        final Rosters selectedRoster = (Rosters) lstRosters.getSelectedValue();
+
+        if (SwingUtilities.isRightMouseButton(evt) && selectedRoster != null && selectedRoster.getOpenedBy() != null && !selectedRoster.getOpenedBy().equals(OPDE.getLogin()) && OPDE.isAdmin()) {
+
+            SYSTools.unregisterListeners(menu);
+            menu = new JPopupMenu();
+
+            JMenuItem forceUnlock = new JMenuItem(OPDE.lang.getString("opde.roster.force.unlock"), null);
+            forceUnlock.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    EntityManager em = OPDE.createEM();
+                    try {
+                        em.getTransaction().begin();
+                        Rosters myRoster = em.merge(selectedRoster);
+                        em.lock(myRoster, LockModeType.OPTIMISTIC);
+                        myRoster.setOpenedBy(null);
+
+                        em.getTransaction().commit();
+                    } catch (OptimisticLockException ole) {
+                        OPDE.debug(ole);
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                    } catch (Exception e) {
+                        if (em.getTransaction().isActive()) {
+                            em.getTransaction().rollback();
+                        }
+                        OPDE.fatal(e);
+                    } finally {
+                        em.close();
+                    }
+                    reload();
+                }
+            });
+            menu.add(forceUnlock);
+
+            if (menu != null) {
+                menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
+            }
+        }
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         scrollPane1 = new JScrollPane();
@@ -219,6 +272,11 @@ public class PnlUsersWorklog extends CleanablePanel {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     lstRostersMouseClicked(e);
+                }
+
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    lstRostersMousePressed(e);
                 }
             });
             scrollPane1.setViewportView(lstRosters);

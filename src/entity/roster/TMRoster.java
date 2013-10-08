@@ -595,6 +595,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
      * clears the selected cell, if possible
      */
     public void emptyCell(int rowIndex, int columnIndex) {
+
 //        columnIndex = columnIndex;
         //        rowIndex = rowIndex + COL_HEADER;
 
@@ -695,7 +696,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             fireTableCellUpdated(startrow + 3, getColumnCount() - 1);
 
             if (updateFooter != null) {
-                updateFooter.execute(columnIndex);
+                // adapt columnindex. the keypressed event ignores the column index of the row header table.
+                updateFooter.execute(columnIndex + 2);
             }
 
         }
@@ -753,11 +755,10 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         return strUserlist;
     }
 
-    public JPopupMenu getContextMenuAt(final int rowIndex, final int columnIndex) {
+    public JPopupMenu getMainContextMenuAt(final int rowIndex, final int columnIndex) {
         if (readOnly) return null;
 
         JPopupMenu menu = new JPopupMenu();
-        int ct = getCellTypeAt(rowIndex, columnIndex);
 
         JMenuItem itemInsertBlock = new JMenuItem(OPDE.lang.getString("opde.roster.insert.block"), SYSConst.icon22add);
         itemInsertBlock.addActionListener(new java.awt.event.ActionListener() {
@@ -787,6 +788,25 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 //            }
 //        });
 //        menu.add(itemPopupShow);
+        return menu;
+    }
+
+    public JPopupMenu getRowHeaderContextMenuAt(final int rowIndex, final int columnIndex) {
+        if (readOnly) return null;
+
+        JPopupMenu menu = new JPopupMenu();
+
+        OPDE.debug(rowIndex);
+        OPDE.debug(columnIndex);
+
+        //        // SELECT
+        //        JMenuItem itemPopupShow = new JMenuItem(OPDE.lang.getString("misc.commands.show"), SYSConst.icon22magnify1);
+        //        itemPopupShow.addActionListener(new java.awt.event.ActionListener() {
+        //            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        //
+        //            }
+        //        });
+        //        menu.add(itemPopupShow);
         return menu;
     }
 }

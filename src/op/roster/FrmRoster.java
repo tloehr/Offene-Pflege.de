@@ -13,8 +13,6 @@ import com.jidesoft.converter.ConverterContext;
 import com.jidesoft.converter.ObjectConverter;
 import com.jidesoft.converter.ObjectConverterManager;
 import com.jidesoft.grid.*;
-import com.jidesoft.swing.StyledLabel;
-import com.jidesoft.swing.StyledLabelBuilder;
 import entity.Homes;
 import entity.HomesTools;
 import entity.roster.Rosters;
@@ -33,9 +31,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import javax.swing.*;
-import javax.swing.table.TableCellRenderer;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EventObject;
@@ -276,50 +277,58 @@ public class FrmRoster extends JFrame {
 
         tsp1 = new TableScrollPane(tmRoster, tmRosterHeader, tmRosterFooter, false);
 
+        TableUtils.unifyTableCellSelection(tsp1.getAllChildTables(), tsp1.getMainTable());
+        TableUtils.unifyTableColumnSelection(tsp1.getAllChildTables());
+        TableUtils.unifyTableRowSelection(tsp1.getAllChildTables());
+
+
         tsp1.getColumnHeaderTable().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         tsp1.getColumnFooterTable().setAutoResizeMode(JideTable.AUTO_RESIZE_FILL);
         tsp1.getMainTable().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        tsp1.getMainTable().getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+//        tsp1.getMainTable().getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 
-//        tsp1.getRowHeaderTable().getColumnModel().getColumn(0).setCellRenderer(new TableCellRenderer() {
+
+//        tsp1.getRowHeaderTable().setFocusable(false);
+//        tsp1.getRowHeaderTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 //            @Override
-//            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-//                StyledLabel lbl = StyledLabelBuilder.createStyledLabel(value.toString());
-//                if (isSelected) {
-//                    lbl.setBackground(((StyleModel) table.getModel()).getCellStyleAt(row, column).getSelectionBackground());
-//                } else {
-//                    lbl.setBackground(((StyleModel) table.getModel()).getCellStyleAt(row, column).getBackground());
+//            public void valueChanged(ListSelectionEvent e) {
+//                if (!tsp1.getRowHeaderTable().getSelectionModel().isSelectionEmpty()) {
+//                    tsp1.getRowHeaderTable().getSelectionModel().clearSelection();
 //                }
-//
-//                lbl.setOpaque(true);
-//                return lbl;
 //            }
 //        });
 //
-//        for (int col = 0; col < tsp1.getMainTable().getColumnCount(); col++) {
-//            tsp1.getMainTable().getColumnModel().getColumn(col).setCellRenderer(new TableCellRenderer() {
-//                @Override
-//                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-//                    StyledLabel lbl = StyledLabelBuilder.createStyledLabel(value.toString());
-//                    if (isSelected) {
-//                        lbl.setBackground(((StyleModel) table.getModel()).getCellStyleAt(row, column).getSelectionBackground());
-//                    } else {
-//                        lbl.setBackground(((StyleModel) table.getModel()).getCellStyleAt(row, column).getBackground());
-//                    }
+//        tsp1.getRowFooterTable().setFocusable(false);
 //
-//                    lbl.setOpaque(true);
-//                    return lbl;
-//                }
-//            });
-//        }
-
-        tsp1.getMainTable().addMouseListener(new MouseAdapter() {
+        tsp1.getColumnFooterTable().setFocusable(false);
+        tsp1.getColumnFooterTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
-            public void mousePressed(MouseEvent e) {
-                mousePressedOnTable(e);
+            public void valueChanged(ListSelectionEvent e) {
+                if (!tsp1.getColumnFooterTable().getSelectionModel().isSelectionEmpty()) {
+                    tsp1.getColumnFooterTable().getSelectionModel().clearSelection();
+                }
             }
         });
 
+        tsp1.getColumnHeaderTable().setFocusable(false);
+        tsp1.getColumnHeaderTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (!tsp1.getColumnHeaderTable().getSelectionModel().isSelectionEmpty()) {
+                    tsp1.getColumnHeaderTable().getSelectionModel().clearSelection();
+                }
+            }
+        });
+//
+//        for (final JTable jTable : tsp1.getAllChildTables()) {
+//            jTable.addMouseListener(new MouseAdapter() {
+//                @Override
+//                public void mousePressed(MouseEvent e) {
+//                    mousePressedOnTable(e, jTable);
+//                }
+//            });
+//
+//        }
 
         tsp1.getRowHeaderTable().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         tsp1.getRowFooterTable().setAutoResizeMode(JideTable.AUTO_RESIZE_FILL);
@@ -343,32 +352,62 @@ public class FrmRoster extends JFrame {
 
         tsp1.setRowSelectionAllowed(false);
         tsp1.setColumnSelectionAllowed(false);
+        tsp1.setAllowMultiSelectionInDifferentTable(false);
         tsp1.setCellSelectionEnabled(true);
 
+
+
+        tsp1.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                OPDE.debug(evt.getPropertyName() + ":" + evt.getNewValue());
+            }
+        });
+
+//        tsp1.getColumnHeaderTable().addPropertyChangeListener(new PropertyChangeListener() {
+//            @Override
+//            public void propertyChange(PropertyChangeEvent evt) {
+//                OPDE.debug(evt.getPropertyName() + ":" + evt.getNewValue());
+//            }
+//        });
+//        tsp1.getColumnFooterTable().addPropertyChangeListener(new PropertyChangeListener() {
+//            @Override
+//            public void propertyChange(PropertyChangeEvent evt) {
+//                OPDE.debug(evt.getPropertyName() + ":" + evt.getNewValue());
+//            }
+//        });
+
         int condition = JComponent.WHEN_IN_FOCUSED_WINDOW;
-        InputMap inputMap = tsp1.getMainTable().getInputMap(condition);
-        ActionMap actionMap = tsp1.getMainTable().getActionMap();
+        InputMap inputMap = tsp1.getInputMap(condition);
+        ActionMap actionMap = tsp1.getActionMap();
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "delete");
         actionMap.put("delete", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
 
-//                OPDE.debug("delete ?");
-                int rowIndex = tsp1.getMainTable().getSelectedRow();
-                int colIndex = tsp1.getMainTable().getSelectedColumn();
+                OPDE.debug("delete1 ?");
 
-                if (rowIndex >= 0 || colIndex >= 0) {
-                    tmRoster.emptyCell(rowIndex, colIndex);
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            tsp1.getMainTable().validate();
-                            tsp1.getMainTable().repaint();
-                        }
-                    });
-                }
+                OPDE.debug(tsp1.getMainTable().getSelectedRow());
+                OPDE.debug(tsp1.getMainTable().getSelectedColumn());
+
+                OPDE.debug(tsp1.getRowHeaderTable().getSelectedRow());
+                                OPDE.debug(tsp1.getRowHeaderTable().getSelectedColumn());
+
+
+//                int rowIndex = tsp1.getMainTable().getSelectedRow();
+//                int colIndex = tsp1.getMainTable().getSelectedColumn();
+//
+//                if (rowIndex >= 0 || colIndex >= 0) {
+//                    tmRoster.emptyCell(rowIndex, colIndex);
+//                    SwingUtilities.invokeLater(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            tsp1.getMainTable().validate();
+//                            tsp1.getMainTable().repaint();
+//                        }
+//                    });
+//                }
             }
         });
-
 
     }
 
@@ -434,7 +473,7 @@ public class FrmRoster extends JFrame {
         return roster;
     }
 
-    private void mousePressedOnTable(java.awt.event.MouseEvent evt) {
+    private void mousePressedOnTable(java.awt.event.MouseEvent evt, final JTable table) {
 
         Point p = evt.getPoint();
 //            ListSelectionModel lsm = tblFiles.getSelectionModel();
@@ -444,27 +483,37 @@ public class FrmRoster extends JFrame {
 
 //        boolean singleRowSelected = lsm.getMaxSelectionIndex() == lsm.getMinSelectionIndex();
 
-        final int row = tsp1.getMainTable().rowAtPoint(p);
-        final int col = tsp1.getMainTable().columnAtPoint(p);
+        final int row = table.rowAtPoint(p);
+        final int col = table.columnAtPoint(p);
 
-        tsp1.getMainTable().setRowSelectionInterval(row, row);
-        tsp1.getMainTable().setColumnSelectionInterval(col, col);
+        table.setRowSelectionInterval(row, row);
+        table.setColumnSelectionInterval(col, col);
 
 //        if (singleRowSelected) {
 //            lsm.setSelectionInterval(row, row);
 //        }
 
+        if (table.equals(tsp1.getMainTable())) {
+            if (SwingUtilities.isRightMouseButton(evt)) {
+                SYSTools.unregisterListeners(menu);
+                menu = tmRoster.getMainContextMenuAt(row, col);
 
-        if (SwingUtilities.isRightMouseButton(evt)) {
-
-            SYSTools.unregisterListeners(menu);
-            menu = tmRoster.getContextMenuAt(row, col);
-
-            if (menu != null) {
-                menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
+                if (menu != null) {
+                    menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
+                }
             }
         }
 
+        if (table.equals(tsp1.getRowHeaderTable())) {
+            if (SwingUtilities.isRightMouseButton(evt)) {
+                SYSTools.unregisterListeners(menu);
+                menu = tmRoster.getRowHeaderContextMenuAt(row, col);
+
+                if (menu != null) {
+                    menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
+                }
+            }
+        }
 
     }
 

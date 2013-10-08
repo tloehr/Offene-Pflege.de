@@ -13,6 +13,7 @@ new FormModel {
 				add( new FormComponent( "javax.swing.JList" ) {
 					name: "lstRosters"
 					addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "lstRostersMouseClicked", true ) )
+					addEvent( new FormEvent( "java.awt.event.MouseListener", "mousePressed", "lstRostersMousePressed", true ) )
 				} )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 3
