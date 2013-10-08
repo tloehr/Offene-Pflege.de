@@ -8,6 +8,7 @@ import com.jidesoft.grid.ColumnIdentifierTableModel;
 import com.jidesoft.grid.StyleModel;
 import entity.Homes;
 import entity.HomesTools;
+import op.OPDE;
 import org.apache.commons.collections.Closure;
 
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIde
             public void execute(Object o) {
                 for (int row = 0; row < getRowCount(); row++) {
                     fireTableCellUpdated(row, (Integer) o);
+                    OPDE.debug(String.format("row %s, col %s", row, o));
                 }
             }
         });

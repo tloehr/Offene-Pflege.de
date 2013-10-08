@@ -772,8 +772,8 @@ public class SYSCalendar {
      */
     public static DefaultComboBoxModel createMonthList(LocalDate start, LocalDate end) {
         DefaultComboBoxModel dcbm = new DefaultComboBoxModel();
-        start = start.dayOfMonth().withMinimumValue();
-        end = end.dayOfMonth().withMinimumValue();
+        start = SYSCalendar.bom(start);
+        end = SYSCalendar.bom(end);
         for (LocalDate month = start; month.compareTo(end) <= 0; month = month.plusMonths(1)) {
             dcbm.addElement(month);
         }

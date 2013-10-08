@@ -159,7 +159,7 @@ public class PnlUsersWorklog extends CleanablePanel {
 
                 }
             });
-            cmbMonth.setSelectedItem(new LocalDate());
+            cmbMonth.setSelectedItem(SYSCalendar.bom(new LocalDate()));
             JOptionPane.showMessageDialog(this, cmbMonth);
             monthToCreate = new LocalDate(cmbMonth.getSelectedItem());
             paramsXML = RostersTools.DEFAULT_XML;
