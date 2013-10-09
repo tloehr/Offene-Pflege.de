@@ -261,8 +261,8 @@ public class PnlUsersWorklog extends CleanablePanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "default, $lcgap, default:grow, $lcgap, default",
-                "default, $lgap, default:grow, 2*($lgap, default)"));
+            "default, $lcgap, default:grow, $lcgap, default",
+            "default, $lgap, default:grow, 2*($lgap, default)"));
 
         //======== scrollPane1 ========
         {
@@ -273,7 +273,6 @@ public class PnlUsersWorklog extends CleanablePanel {
                 public void mouseClicked(MouseEvent e) {
                     lstRostersMouseClicked(e);
                 }
-
                 @Override
                 public void mousePressed(MouseEvent e) {
                     lstRostersMousePressed(e);

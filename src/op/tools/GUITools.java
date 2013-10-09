@@ -1,5 +1,6 @@
 package op.tools;
 
+import com.jidesoft.grid.TableScrollPane;
 import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideButton;
@@ -949,6 +950,7 @@ public class GUITools {
 
     /**
      * blends to colors and returns the result.
+     *
      * @param clOne
      * @param clTwo
      * @param fAmount the amount draws the line between the two colors. the more it tends towards 0, the more the first color is emphasized. the more it tends towards 1, the more the second color is emphasized.
@@ -993,5 +995,31 @@ public class GUITools {
         return new Color(Math.max((int) (color.getRed() * FACTOR), 0),
                 Math.max((int) (color.getGreen() * FACTOR), 0),
                 Math.max((int) (color.getBlue() * FACTOR), 0));
+    }
+
+
+    public static boolean isSelectionInMaintable(TableScrollPane tsp1) {
+        return tsp1.getMainTable().getSelectedRow() >= 0 && tsp1.getMainTable().getSelectedColumn() >= 0;
+
+    }
+
+    public static boolean isSelectionInRowHeaderTable(TableScrollPane tsp1) {
+
+        return tsp1.getRowHeaderTable().getSelectedRow() >= 0 && tsp1.getRowHeaderTable().getSelectedColumn() >= 0;
+
+    }
+
+    public static boolean isSelectionInRowFooterTable(TableScrollPane tsp1) {
+        return tsp1.getRowFooterTable().getSelectedRow() >= 0 && tsp1.getRowFooterTable().getSelectedColumn() >= 0;
+    }
+
+    public static Point[] getSelectedCells(JTable tbl) {
+        ArrayList<Point> list = new ArrayList<Point>();
+        for (int row : tbl.getSelectedRows()) {
+            for (int col : tbl.getSelectedColumns()) {
+                list.add(new Point(col, row));
+            }
+        }
+        return list.toArray(new Point[0]);
     }
 }

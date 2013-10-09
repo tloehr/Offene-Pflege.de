@@ -79,10 +79,10 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     RosterParameters rosterParameters = null;
 
     private final LocalDate month;
-    public final int ROW_HEADER = 2;
+    public static final int ROW_HEADER = 2;
     public final int ROW_FOOTER;
-    public final int ROW_FOOTER_WIDTH = 1;
-    public final int COL_HEADER = 2;
+    public static final int ROW_FOOTER_WIDTH = 1;
+    public static final int COL_HEADER = 2;
     public final int COL_FOOTER;
 
     public CellStyle baseStyle;
@@ -372,12 +372,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
     }
 
-//
-//    @Override
-//    public String getColumnName(int column) {
-//        return null;
-//    }
-
     public void cleanup() {
         content.clear();
         contracts.clear();
@@ -444,7 +438,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             if (symbol != null && !rosterParameters.getSymbol(newSymbol).isAllowed(getDay(columnIndex)))
                 return; // the symbol is valid but not on THAT particular day
             if (newSymbol.isEmpty()) { // he wants to remove the symbol
-                emptyCell(rowIndex, columnIndex);
+                emptyCellInMaintable(rowIndex, columnIndex);
                 return;
             }
 
@@ -591,10 +585,49 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         this.updateFooter = updateFooter;
     }
 
+
+    /**
+     * clears the selected cell, if possible. Only used to empty the user assignment in the table.
+     */
+    public void emptyCellInRowheaderTable(int rowIndex, int columnIndex) {
+
+        //        columnIndex = columnIndex;
+        //        rowIndex = rowIndex + COL_HEADER;
+
+        //        OPDE.debug(String.format("rowindex: %d   columnindex: %d", rowIndex, columnIndex));
+
+        if (rowIndex % 4 != 0) return;
+
+
+        userlist.set(rowIndex / 4, null);
+
+
+
+            int startrow = rowIndex - (rowIndex % 4);
+
+            fireTableCellUpdated(startrow, columnIndex);
+            fireTableCellUpdated(startrow + 1, columnIndex);
+            fireTableCellUpdated(startrow + 2, columnIndex);
+            fireTableCellUpdated(startrow + 3, columnIndex);
+
+            fireTableCellUpdated(startrow, getColumnCount() - 1);
+            fireTableCellUpdated(startrow + 1, getColumnCount() - 1);
+            fireTableCellUpdated(startrow + 2, getColumnCount() - 1);
+            fireTableCellUpdated(startrow + 3, getColumnCount() - 1);
+
+            if (updateFooter != null) {
+                // adapt columnindex. the keypressed event ignores the column index of the row header table.
+                updateFooter.execute(columnIndex + 2);
+            }
+
+
+
+    }
+
     /**
      * clears the selected cell, if possible
      */
-    public void emptyCell(int rowIndex, int columnIndex) {
+    public void emptyCellInMaintable(int rowIndex, int columnIndex) {
 
 //        columnIndex = columnIndex;
         //        rowIndex = rowIndex + COL_HEADER;
