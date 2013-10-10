@@ -34,6 +34,7 @@ import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
@@ -57,6 +58,8 @@ public class FrmRoster extends JFrame {
     private final boolean readOnly;
     private TableScrollPane tsp1;
     private JPopupMenu menu;
+    private Font[] fonts = new Font[]{SYSConst.ARIAL14, SYSConst.ARIAL14BOLD, SYSConst.ARIAL18, SYSConst.ARIAL18BOLD, SYSConst.ARIAL20, SYSConst.ARIAL20BOLD, SYSConst.ARIAL24, SYSConst.ARIAL24BOLD};
+    private int currentFontIndex = 0;
 
     public FrmRoster(Rosters roster) {
 
@@ -64,6 +67,9 @@ public class FrmRoster extends JFrame {
         this.readOnly = roster.getOpenedBy() != null;
 
         setTitle(new LocalDate(roster.getMonth()).toString("MMMM yyyy"));
+
+        currentFontIndex = SYSPropsTools.getInteger("opde.roster.fontsize");
+        SYSPropsTools.storeProp("opde.roster.fontsize", Integer.toString(currentFontIndex), OPDE.getLogin().getUser());
 
         if (!readOnly) {
             EntityManager em = OPDE.createEM();
@@ -137,6 +143,17 @@ public class FrmRoster extends JFrame {
 
         ObjectConverterManager.initDefaultConverter();
         CellEditorManager.initDefaultEditor();
+        CellRendererManager.initDefaultRenderer();
+//        CellRendererManager.registerRenderer(String.class, new DefaultTableCellRenderer() {
+//            @Override
+//            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+//                Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+//                if (comp instanceof JLabel) {
+////                    comp.setFont(SYSConst.ARIAL20);
+//                }
+//                return comp;
+//            }
+//        });
 
         ObjectConverterManager.registerConverter(Homes.class, new ObjectConverter() {
             @Override
@@ -191,6 +208,7 @@ public class FrmRoster extends JFrame {
                     public ExComboBox createExComboBox() {
                         myEditor = new ListExComboBox(HomesTools.getAll().toArray());
                         myEditor.setRenderer(HomesTools.getRenderer());
+//                        myEditor.setFont(SYSConst.ARIAL20);
                         return myEditor;
                     }
 
@@ -224,6 +242,7 @@ public class FrmRoster extends JFrame {
 
                         myEditor = new ListExComboBox(listAllAllowedUsers.toArray());
                         myEditor.setRenderer(UsersTools.getRenderer());
+                        myEditor.setFont(SYSConst.ARIAL20);
                         return myEditor;
                     }
 
@@ -255,6 +274,7 @@ public class FrmRoster extends JFrame {
                     @Override
                     protected JTextField createTextField() {
                         myEditor = super.createTextField();
+//                        myEditor.setFont(SYSConst.ARIAL20);
                         return myEditor;
                     }
 
@@ -276,7 +296,8 @@ public class FrmRoster extends JFrame {
         }, new EditorContext("DefaultTextEditor"));
 
 
-        tmRoster = new TMRoster(roster, readOnly);
+        tmRoster = new TMRoster(roster, readOnly, fonts[currentFontIndex]);
+        btnFontSize.setText(fonts[currentFontIndex].getFontName() + ", " + fonts[currentFontIndex].getSize());
 
         TMRosterHeader tmRosterHeader = new TMRosterHeader(tmRoster);
         TMRosterFooter tmRosterFooter = new TMRosterFooter(tmRoster);
@@ -287,10 +308,12 @@ public class FrmRoster extends JFrame {
         TableUtils.unifyTableColumnSelection(tsp1.getAllChildTables());
         TableUtils.unifyTableRowSelection(tsp1.getAllChildTables());
 
-
         tsp1.getColumnHeaderTable().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         tsp1.getColumnFooterTable().setAutoResizeMode(JideTable.AUTO_RESIZE_FILL);
         tsp1.getMainTable().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+
+
 //        tsp1.getMainTable().getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 
 
@@ -315,6 +338,13 @@ public class FrmRoster extends JFrame {
                     mousePressedOnTable(e, jTable);
                 }
             });
+
+
+            TableUtils.autoResizeAllRows(jTable);
+//            JLabel lbl = new JLabel("X");
+//            lbl.setFont(SYSConst.ARIAL20);
+//
+//            jTable.setRowHeight(lbl.getPreferredSize().height);
 
         }
 
@@ -362,11 +392,24 @@ public class FrmRoster extends JFrame {
         // TODO add your code here
     }
 
+    private void btnFontSizeActionPerformed(ActionEvent e) {
+        currentFontIndex++;
+        if (currentFontIndex >= fonts.length) currentFontIndex = 0;
+        tmRoster.setFont(fonts[currentFontIndex]);
+        for (final JTable jTable : tsp1.getAllChildTables()) {
+            TableUtils.autoResizeAllRows(jTable);
+        }
+        SYSPropsTools.storeProp("opde.roster.fontsize", Integer.toString(currentFontIndex), OPDE.getLogin().getUser());
+        btnFontSize.setText(fonts[currentFontIndex].getFontName() + ", " + fonts[currentFontIndex].getSize());
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         toolBar1 = new JToolBar();
         btnLock = new JButton();
         btnSortHomes = new JButton();
+        btnSortHomes2 = new JButton();
+        btnFontSize = new JButton();
 
         //======== this ========
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -391,6 +434,20 @@ public class FrmRoster extends JFrame {
             //---- btnSortHomes ----
             btnSortHomes.setText("text");
             toolBar1.add(btnSortHomes);
+
+            //---- btnSortHomes2 ----
+            btnSortHomes2.setText("text");
+            toolBar1.add(btnSortHomes2);
+
+            //---- btnFontSize ----
+            btnFontSize.setText("fontsize");
+            btnFontSize.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnFontSizeActionPerformed(e);
+                }
+            });
+            toolBar1.add(btnFontSize);
         }
         contentPane.add(toolBar1, CC.xywh(1, 1, 5, 1));
         setSize(875, 660);
@@ -642,5 +699,7 @@ public class FrmRoster extends JFrame {
     private JToolBar toolBar1;
     private JButton btnLock;
     private JButton btnSortHomes;
+    private JButton btnSortHomes2;
+    private JButton btnFontSize;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

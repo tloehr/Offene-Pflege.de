@@ -3,7 +3,7 @@ package entity.roster;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
-public class UserStats {
+public class StatsPerUser {
 
     private final BigDecimal hours_carry;
     private final BigDecimal sick_carry;
@@ -13,7 +13,7 @@ public class UserStats {
     private BigDecimal sick_sum;
     private BigDecimal holiday_sum;
 
-    public UserStats(BigDecimal hours_carry, BigDecimal sick_carry, BigDecimal holiday_carry, RosterParameters rosterParameters) {
+    public StatsPerUser(BigDecimal hours_carry, BigDecimal sick_carry, BigDecimal holiday_carry, RosterParameters rosterParameters) {
         this.hours_carry = hours_carry;
         this.sick_carry = sick_carry;
         this.holiday_carry = holiday_carry;

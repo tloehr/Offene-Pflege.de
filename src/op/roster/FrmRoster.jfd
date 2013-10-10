@@ -21,6 +21,15 @@ new FormModel {
 					name: "btnSortHomes"
 					"text": "text"
 				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "btnSortHomes2"
+					"text": "text"
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "btnFontSize"
+					"text": "fontsize"
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnFontSizeActionPerformed", true ) )
+				} )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridWidth": 5
 			} )

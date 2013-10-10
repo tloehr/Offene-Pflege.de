@@ -2,7 +2,7 @@ package entity.roster;
 
 import java.math.BigDecimal;
 
-public class HomeStats {
+public class StatsPerDay {
 
     public static final int EXAM = 0;
     public static final int HELPER = 1;
@@ -10,7 +10,7 @@ public class HomeStats {
 
     BigDecimal exam_early, exam_late, exam_night, social_early, social_late, social_night, helper_early, helper_late, helper_night;
 
-    public HomeStats() {
+    public StatsPerDay() {
         clear();
     }
 

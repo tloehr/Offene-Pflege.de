@@ -46,7 +46,7 @@ public class TMRosterHeader extends AbstractMultiTableModel implements ColumnIde
 
         }
 
-        cellStyle.setFont(SYSConst.ARIAL14);
+        cellStyle.setFont(basemodel.getFont());
 
         cellStyle.setHorizontalAlignment(SwingConstants.CENTER);
         return cellStyle;

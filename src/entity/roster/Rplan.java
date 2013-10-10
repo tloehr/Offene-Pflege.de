@@ -176,6 +176,17 @@ public class Rplan {
         return p;
     }
 
+    public Homes getEffectiveHome() {
+        Homes h = getHome3();
+        if (h == null) {
+            h = getHome2();
+        }
+        if (h == null) {
+            h = getHome1();
+        }
+        return h;
+    }
+
     public Date getStart() {
         return start;
     }

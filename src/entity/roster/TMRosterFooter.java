@@ -8,7 +8,6 @@ import com.jidesoft.grid.ColumnIdentifierTableModel;
 import com.jidesoft.grid.StyleModel;
 import entity.Homes;
 import entity.HomesTools;
-import op.OPDE;
 import org.apache.commons.collections.Closure;
 
 import java.util.ArrayList;
@@ -35,18 +34,20 @@ public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIde
             public void execute(Object o) {
                 for (int row = 0; row < getRowCount(); row++) {
                     fireTableCellUpdated(row, (Integer) o);
-                    OPDE.debug(String.format("row %s, col %s", row, o));
+//                    OPDE.debug(String.format("row %s, col %s", row, o));
                 }
             }
         });
     }
 
+    @Override
     public CellStyle getCellStyleAt(int rowIndex, int columnIndex) {
-        return new CellStyle();
+       return basemodel.getCellStyleAt(rowIndex, columnIndex);
     }
 
+    @Override
     public boolean isCellStyleOn() {
-        return false;
+        return true;
     }
 
     @Override
@@ -54,16 +55,19 @@ public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIde
         return basemodel.getColumnName(column);
     }
 
+    @Override
     public Object getColumnIdentifier(int columnIndex) {
         return basemodel.getColumnIdentifier(columnIndex);
     }
 
+    @Override
     public int getColumnCount() {
         return basemodel.getColumnCount();
     }
 
+    @Override
     public int getRowCount() {
-        return basemodel.getHomestats().size() * 3;
+        return listHomes.size() * 3;
     }
 
     @Override
@@ -71,6 +75,7 @@ public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIde
         return basemodel.getColumnClass(columnIndex);
     }
 
+    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         Object value = "footer";
         if (columnIndex == 0) {
@@ -89,13 +94,16 @@ public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIde
         } else if (getColumnType(columnIndex) == FOOTER_COLUMN) {
             value = "";
         } else { // here is the homestats data
-            HomeStats stats = basemodel.getHomestats().get(listHomes.get(rowIndex / 3)).get(columnIndex - 2);
+            //HomeStats stats = basemodel.getHomestats().get(listHomes.get(rowIndex / 3)).get(columnIndex - TMRoster.ROW_HEADER);
+
+            StatsPerDay stats = basemodel.getStatsPerDay(columnIndex - TMRoster.ROW_HEADER).get(listHomes.get(rowIndex / 3));
+
             if (rowIndex % 3 == 0) {
-                value = String.format("%s/%s/%s", stats.exam_early, stats.exam_late, stats.exam_night);
+                value = String.format("EF%s ES%s EN%s", stats.exam_early, stats.exam_late, stats.exam_night);
             } else if (rowIndex % 3 == 1) {
-                value = String.format("%s/%s/%s", stats.helper_early, stats.helper_late, stats.helper_night);
+                value = String.format("HF%s HS%s HN%s", stats.helper_early, stats.helper_late, stats.helper_night);
             } else if (rowIndex % 3 == 2) {
-                value = String.format("%s/%s/%s", stats.social_early, stats.social_late, stats.social_night);
+                value = String.format("SF%s SS%s SN%s", stats.social_early, stats.social_late, stats.social_night);
             }
         }
 
@@ -107,10 +115,12 @@ public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIde
         return false;
     }
 
+    @Override
     public int getColumnType(int column) {
         return basemodel.getColumnType(column);
     }
 
+    @Override
     public int getTableIndex(int columnIndex) {
         return 0;
     }
