@@ -55,16 +55,22 @@ public class RostersTools {
             "        <symbol key=\"M\" calc=\"kwert\" type=\"sick\" description=\"Mutterschutz\" />\n" +
             "        <symbol key=\"S1\" starttime=\"16:45\" endtime=\"19:45\" break=\"0\" calc=\"awert\" type=\"work\" description=\"Spätdienst, kurz\"  shift1=\"late\" statvalue1=\"1.00\"  shift2=\"\" statvalue2=\"0.00\" />\n" +
             "        <symbol key=\"N\" starttime=\"19:45\" endtime=\"06:45\" break=\"0\" calc=\"awert\" type=\"work\" description=\"Nachtdienst\"  shift1=\"night\" statvalue1=\"1.00\"  shift2=\"\" statvalue2=\"0.00\" />\n" +
-            "        <symbol key=\"K\" calc=\"kwert\" type=\"sick\" description=\"Krank\" />\n" +
+            "        <symbol key=\"K\" calc=\"kwert\" type=\"sick\" description=\"Krank\">\n" +
+            "            <monday/>\n" +
+            "            <tuesday/>\n" +
+            "            <wednesday/>\n" +
+            "            <thursday/>\n" +
+            "            <friday/>\n" +
+            "            <saturday/>\n" +
+            "        </symbol>\n" +
             "        <symbol key=\"U\" calc=\"uwert\" type=\"onleave\" description=\"Urlaub\" >\n" +
             "            <monday/>\n" +
             "            <tuesday/>\n" +
             "            <wednesday/>\n" +
             "            <thursday/>\n" +
-            "            <holiday/>\n" +
             "            <friday/>\n" +
             "            <saturday/>\n" +
-            "        </symbol>\n" +
+            "        </symbol>"+
             "        <symbol key=\"F1\" starttime=\"06:45\" endtime=\"09:45\" break=\"0\" calc=\"awert\" type=\"work\" description=\"Frühdienst, kurz\"  shift1=\"early\" statvalue1=\"0.50\"  shift2=\"\" statvalue2=\"0.00\" />\n" +
             "        <symbol key=\"T\" starttime=\"09:00\" endtime=\"16:00\" break=\"0\" calc=\"awert\" type=\"work\" description=\"Tagdienst\"  shift1=\"early\" statvalue1=\"0.50\"  shift2=\"late\" statvalue2=\"0.50\" />\n" +
             "        <symbol key=\"S\" starttime=\"13:00\" endtime=\"20:00\" break=\"0\" calc=\"awert\" type=\"work\" description=\"Spätdienst\"  shift1=\"late\" statvalue1=\"1.00\"  shift2=\"\" statvalue2=\"0.00\" />\n" +

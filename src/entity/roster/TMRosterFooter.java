@@ -8,8 +8,14 @@ import com.jidesoft.grid.ColumnIdentifierTableModel;
 import com.jidesoft.grid.StyleModel;
 import entity.Homes;
 import entity.HomesTools;
+import op.OPDE;
+import op.tools.GUITools;
+import op.tools.SYSConst;
 import org.apache.commons.collections.Closure;
+import org.joda.time.DateTimeConstants;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 
 /**
@@ -42,7 +48,45 @@ public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIde
 
     @Override
     public CellStyle getCellStyleAt(int rowIndex, int columnIndex) {
-       return basemodel.getCellStyleAt(rowIndex, columnIndex);
+        CellStyle myStyle = new CellStyle();
+        myStyle.setHorizontalAlignment(SwingConstants.CENTER);
+
+        Color background = null;
+
+
+        myStyle.setBackground(SYSConst.bluegrey);
+
+        if (rowIndex / 3 % 2 == 0) {
+            background = SYSConst.bluegrey;
+        } else {
+            background = GUITools.blend(SYSConst.bluegrey, Color.white, 0.4f);
+        }
+
+        // basedata
+        if (columnIndex >= TMRoster.ROW_HEADER && columnIndex < getColumnCount() - TMRoster.ROW_FOOTER_WIDTH) {
+            if (basemodel.getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SUNDAY || basemodel.getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SATURDAY) {
+                if (rowIndex / 3 % 2 == 0) {
+                    if (basemodel.getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SUNDAY || basemodel.getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SATURDAY) {
+                        background = GUITools.blend(SYSConst.bluegrey, Color.black, 0.85f);
+                    }
+                    if (OPDE.isHoliday(basemodel.getDay(columnIndex))) {
+                        background = GUITools.blend(SYSConst.bluegrey, Color.black, 0.8f);
+                    }
+                } else {
+                    if (basemodel.getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SUNDAY || basemodel.getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SATURDAY) {
+                        background = GUITools.blend(SYSConst.bluegrey, Color.black, 0.65f);
+                    }
+                    if (OPDE.isHoliday(basemodel.getDay(columnIndex))) {
+                        background = GUITools.blend(SYSConst.bluegrey, Color.black, 0.6f);
+                    }
+                }
+            }
+        }
+
+        myStyle.setFont(basemodel.getFont());
+        myStyle.setBackground(background);
+
+        return myStyle;
     }
 
     @Override

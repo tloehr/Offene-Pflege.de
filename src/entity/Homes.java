@@ -5,6 +5,7 @@
 package entity;
 
 import entity.reports.Handovers;
+import op.tools.GUITools;
 import op.tools.SYSConst;
 
 import javax.persistence.*;
@@ -120,7 +121,7 @@ public class Homes implements Serializable {
     // todo: dummy implementation only. fix this!
     public Color getColor() {
 
-        if (eid.equalsIgnoreCase("herchen")) return Color.green.darker();
+        if (eid.equalsIgnoreCase("herchen")) return GUITools.blend(Color.GREEN, Color.BLACK, 0.45f);
 
         return Color.blue.darker();
 
@@ -144,6 +145,11 @@ public class Homes implements Serializable {
             return false;
         }
         return true;
+    }
+
+    // todo: dummy implementation only. fix this!
+    public Character getPrefix(){
+        return shortname.charAt(0);
     }
 
     @Override

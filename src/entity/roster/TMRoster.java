@@ -3,6 +3,7 @@ package entity.roster;
 import com.jidesoft.converter.ConverterContext;
 import com.jidesoft.grid.*;
 import entity.Homes;
+import entity.HomesTools;
 import entity.StationTools;
 import entity.system.Users;
 import entity.system.UsersTools;
@@ -73,8 +74,9 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     private final boolean readOnly;
     private Font font;
     // contains all users which are show on the table. not necessarily all users who own rplans.
-    ArrayList<Users> userlist;
-    ArrayList<Homes> homeslist;
+    ArrayList<Pair<Users, Homes>> userlist;
+    HashMap<Character, Homes> prefixMap;
+
     // ALL rplans for this roster. iteration over the keyset of this map will return ALL users who own rplanss.
     HashMap<Users, ArrayList<Rplan>> content;
     HashMap<Users, UserContracts> contracts;
@@ -90,7 +92,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     public CellStyle baseStyle;
 
     private Homes defaultHome;
-    //    HashMap<Homes, ArrayList<HomeStats>> homestats;
     HashMap<Users, StatsPerUser> userstats;
     private Closure updateFooter = null;
 
@@ -104,10 +105,10 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
         content = new HashMap<Users, ArrayList<Rplan>>();
         contracts = UsersTools.getUsersWithValidContractsIn(month);
-//        homestats = new HashMap<Homes, ArrayList<HomeStats>>();
+        prefixMap = new HashMap<Character, Homes>();
         userstats = new HashMap<Users, StatsPerUser>();
-        userlist = new ArrayList<Users>();
-        homeslist = new ArrayList<Homes>();
+        userlist = new ArrayList<Pair<Users, Homes>>();
+//        homeslist = new ArrayList<Homes>();
         rosterParameters = RostersTools.getParameters(roster);
         initUserlist();
         prepareContent();
@@ -251,7 +252,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 }
             }
 
-            Users user = userlist.get(rowIndex / 4);
+            Users user = userlist.get(rowIndex / 4).getFirst();
             if (user != null) {
                 if (rowIndex % 4 == 0) {
                     Rplan myRplan = content.get(user).get(columnIndex - ROW_HEADER);
@@ -299,7 +300,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
         boolean setUser = columnIndex == 0 && rowIndex % 4 == 0;
 
-        Users user = userlist.get(rowIndex / 4);
+        Users user = userlist.get(rowIndex / 4).getFirst();
 
         if (user != null && isInPlanningArea(columnIndex)) {
 
@@ -329,6 +330,10 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
     private void prepareContent() {
 
+        for (Homes home : HomesTools.getAll()) {
+            prefixMap.put(home.getPrefix(), home);
+        }
+
         for (Rplan rplan : RPlanTools.getAll(roster)) {
             Users user = rplan.getOwner();
 
@@ -353,7 +358,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     public void cleanup() {
         content.clear();
         contracts.clear();
-        homeslist.clear();
+//        homeslist.clear();
         userlist.clear();
 //        homestats.clear();
         userstats.clear();
@@ -382,18 +387,17 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
         if (aValue.toString().equalsIgnoreCase(getValueAt(rowIndex, columnIndex).toString())) return;
 
-        Users user = userlist.get(rowIndex / 4);
+        Users user = userlist.get(rowIndex / 4).getFirst();
 //        boolean selectUser = columnIndex == 0 && rowIndex % 4 == 0;
 
         int ct = getCellTypeAt(rowIndex, columnIndex);
 
         if (aValue instanceof Homes) {
-            homeslist.set(rowIndex / 4, (Homes) aValue);
+            userlist.set(rowIndex / 4, new Pair<Users, Homes>(user, (Homes) aValue));
             fireTableCellUpdated(rowIndex, columnIndex);
         } else if (aValue instanceof Users) {
             Users myUser = (Users) aValue;
-            userlist.set(rowIndex / 4, myUser);
-            homeslist.set(rowIndex / 4, defaultHome);
+            userlist.set(rowIndex / 4, new Pair<Users, Homes>(myUser, defaultHome));
 
             if (!userstats.containsKey(myUser)) {
                 userstats.put(myUser, new StatsPerUser(WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOURS), WorkAccountTools.getSick(month, myUser), WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOLIDAYS), rosterParameters));
@@ -408,8 +412,14 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         } else if (ct == CT_EMP_LASTNAME) {
             OPDE.debug(aValue);
         } else {
+
+            Homes prefixHome = null;
             String newSymbol = aValue.toString();
-//            Symbol prevSymbol = rosterParameters.getSymbol(getValueAt(rowIndex, columnIndex).toString());
+            if (aValue.toString().length() > 1 && prefixMap.containsKey(aValue.toString().charAt(0))) {
+                prefixHome = prefixMap.get(aValue.toString().charAt(0));
+                newSymbol = aValue.toString().substring(1);
+            }
+
             Symbol symbol = rosterParameters.getSymbol(newSymbol);
 
             if (!newSymbol.isEmpty() && symbol == null) return; // entered UNKNOWN symbol.
@@ -424,7 +434,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             try {
                 em.getTransaction().begin();
 
-                Homes preferredHome = em.merge(homeslist.get(rowIndex / 4));
+                Homes preferredHome = em.merge(prefixHome == null ? userlist.get(rowIndex / 4).getSecond() : prefixHome);
 
                 Rplan oldPlan = content.get(user).get(columnIndex - ROW_HEADER);
                 if (oldPlan == null) {
@@ -435,7 +445,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 em.lock(myRplan, LockModeType.OPTIMISTIC);
 
 //                HomeStats homeStat = homestats.get(myRplan.getHome1()).get(new LocalDate(myRplan.getStart()).getDayOfMonth() - 1);
-                boolean exam = contracts.get(myRplan.getOwner()).getParameterSet(month).isExam();
+//                boolean exam = contracts.get(myRplan.getOwner()).getParameterSet(month).isExam();
 
                 if (rowIndex % 4 == 0) {
                     myRplan.setP1(newSymbol);
@@ -465,7 +475,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 content.get(user).set(columnIndex - ROW_HEADER, myRplan);
                 userstats.get(user).update(content.get(user));
 
-                for (int i : indexOfAll(user, userlist)) {
+
+                for (int i : indexOfAllUser(user)) {
                     int startrow = i * 4;
 
                     OPDE.debug(startrow);
@@ -515,7 +526,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         Object value = "--";
         int ct = getCellTypeAt(rowIndex, columnIndex);
 
-        Users user = userlist.get(rowIndex / 4);
+        Users user = userlist.get(rowIndex / 4).getFirst();
 
         if (user == null) {
             return "";
@@ -526,7 +537,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         } else if (ct == CT_EMP_FIRSTNAME) {
             value = user.getVorname();
         } else if (ct == CT_EMP_PREFERRED_HOME) {
-            value = homeslist.get(rowIndex / 4);
+            value = userlist.get(rowIndex / 4).getSecond();
         } else if (ct == CT_EMP_QUALIFICATION) {
             if (contracts.get(user).getParameterSet(month).isTrainee()) {
                 value = "Schüler";
@@ -588,7 +599,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         if (rowIndex % 4 != 0) return;
 
 
-        userlist.set(rowIndex / 4, null);
+        userlist.set(rowIndex / 4, new Pair(null, null));
 
 
         int startrow = rowIndex - (rowIndex % 4);
@@ -616,7 +627,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
      */
     public void emptyCellInMaintable(int rowIndex, int columnIndex) {
 
-        Users user = userlist.get(rowIndex / 4);
+        Users user = userlist.get(rowIndex / 4).getFirst();
 
         Rplan oldPlan = content.get(user).get(columnIndex);
 
@@ -642,12 +653,12 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
 //            HomeStats stat = homestats.get(myRplan.getHome1()).get(new LocalDate(myRplan.getStart()).getDayOfMonth() - 1);
             em.lock(myRplan, LockModeType.OPTIMISTIC);
-            boolean exam = contracts.get(myRplan.getOwner()).getParameterSet(month).isExam();
+//            boolean exam = contracts.get(myRplan.getOwner()).getParameterSet(month).isExam();
 
 
             if (rowIndex % 4 == 0) {
                 em.remove(myRplan);
-                int type = rosterParameters.getSymbol(myRplan.getP1()).getSection() == RosterXML.SOCIAL ? StatsPerDay.SOCIAL : (exam ? StatsPerDay.EXAM : StatsPerDay.HELPER);
+//                int type = rosterParameters.getSymbol(myRplan.getP1()).getSection() == RosterXML.SOCIAL ? StatsPerDay.SOCIAL : (exam ? StatsPerDay.EXAM : StatsPerDay.HELPER);
 //                stat.subtract(type, rosterParameters.getSymbol(myRplan.getP1()));
 
                 myRplan = null;
@@ -666,7 +677,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 //                }
 
                 myRplan.setValuesFromSymbol(symbol, contracts.get(user).getParameterSet(getDay(columnIndex)));
-                int type = rosterParameters.getSymbol(myRplan.getEffectiveP()).getSection() == RosterXML.SOCIAL ? StatsPerDay.SOCIAL : (exam ? StatsPerDay.EXAM : StatsPerDay.HELPER);
+//                int type = rosterParameters.getSymbol(myRplan.getEffectiveP()).getSection() == RosterXML.SOCIAL ? StatsPerDay.SOCIAL : (exam ? StatsPerDay.EXAM : StatsPerDay.HELPER);
 //                stat.replace(type, rosterParameters.getSymbol(oldPlan.getEffectiveP()), rosterParameters.getSymbol(myRplan.getEffectiveP()));
             }
 
@@ -729,14 +740,13 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         for (String token1 : StringUtils.split(strUserlist, ',')) {
 
             if (token1.equalsIgnoreCase("null")) {
-                userlist.add(null);
-                homeslist.add(null);
+                userlist.add(new Pair(null, null));
             } else {
                 String[] strAssign = StringUtils.split(token1, '=');
                 Users myUser = em.find(Users.class, strAssign[0]);
                 Homes myHome = em.find(Homes.class, strAssign[1]);
-                userlist.add(myUser);
-                homeslist.add(myHome);
+                userlist.add(new Pair<Users, Homes>(myUser, myHome));
+
                 if (!userstats.containsKey(myUser)) {
                     userstats.put(myUser, new StatsPerUser(WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOURS), WorkAccountTools.getSick(month, myUser), WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOLIDAYS), rosterParameters));
                     content.put(myUser, new ArrayList<Rplan>());
@@ -754,15 +764,12 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     public String getUserList() {
         String strUserlist = "";
 
-        int index = 0;
-        for (Users user : userlist) {
-            if (user == null) {
+        for (Pair<Users, Homes> pairUH : userlist) {
+            if (pairUH.getFirst() == null) {
                 strUserlist += "null,";
             } else {
-                strUserlist += user.getUID() + "=" + homeslist.get(index).getEID() + ",";
+                strUserlist += pairUH.getFirst().getUID() + "=" + pairUH.getSecond().getEID() + ",";
             }
-
-            index++;
         }
 
         if (!strUserlist.isEmpty()) {
@@ -779,8 +786,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         JMenuItem itemInsertBlock = new JMenuItem(OPDE.lang.getString("opde.roster.insert.block"), SYSConst.icon22add);
         itemInsertBlock.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                userlist.add(rowIndex / 4, null);
-                homeslist.add(rowIndex / 4, null);
+                userlist.add(rowIndex / 4, new Pair(null, null));
                 fireTableDataChanged();
             }
         });
@@ -790,7 +796,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         itemRemoveBlock.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 userlist.remove(rowIndex / 4);
-                homeslist.remove(rowIndex / 4);
                 fireTableDataChanged();
             }
         });
@@ -828,7 +833,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
     public HashMap<Homes, StatsPerDay> getStatsPerDay(int columnIndex) {
         HashMap<Homes, StatsPerDay> mapStats = new HashMap<Homes, StatsPerDay>();
-        for (Homes home : homeslist) {
+
+        for (Homes home : prefixMap.values()) {
             mapStats.put(home, new StatsPerDay());
         }
 
@@ -850,6 +856,15 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         ArrayList<Integer> indexList = new ArrayList<Integer>();
         for (int i = 0; i < list.size(); i++)
             if (obj.equals(list.get(i)))
+                indexList.add(i);
+        return indexList;
+    }
+
+    private ArrayList<Integer> indexOfAllUser(Users user) {
+        ArrayList<Integer> indexList = new ArrayList<Integer>();
+        int i = 0;
+        for (Pair<Users, Homes> pair : userlist)
+            if (user.equals(pair.getFirst()))
                 indexList.add(i);
         return indexList;
     }

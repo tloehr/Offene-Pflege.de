@@ -2,9 +2,9 @@ package entity.roster;
 
 import op.OPDE;
 import op.tools.SYSCalendar;
-import org.joda.time.LocalDate;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
+import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
 import java.math.BigDecimal;
@@ -65,6 +65,10 @@ public class Symbol {
         shift2 = SHIFT_NONE;
         statval1 = BigDecimal.ZERO;
         statval2 = BigDecimal.ZERO;
+
+        grpmf;
+        // die pause nicht mit einrechnen.
+
     }
 
     public Symbol(String key, String description, String start, String end, int minutesBreak, String calc, String symboltype) throws Exception {
@@ -169,7 +173,8 @@ public class Symbol {
     }
 
     public DateTime getStart(LocalDate day) {
-        if (start == null) return day.toDateTime(new LocalTime().hourOfDay().withMinimumValue().minuteOfHour().withMinimumValue().secondOfMinute().withMinimumValue());
+        if (start == null)
+            return day.toDateTime(new LocalTime().hourOfDay().withMinimumValue().minuteOfHour().withMinimumValue().secondOfMinute().withMinimumValue());
         return day.toDateTime(start);
     }
 
@@ -204,12 +209,8 @@ public class Symbol {
         return contractsParameterSet.getDayValue();
     }
 
-    private BigDecimal getExtraHoursU(LocalDate day, ContractsParameterSet contractsParameterSet) {
-        if (day.getDayOfWeek() == DateTimeConstants.SUNDAY) {
-            return contractsParameterSet.getDayValue();
-        } else {
-            return BigDecimal.ZERO;
-        }
+    private BigDecimal getExtraHoursU(ContractsParameterSet contractsParameterSet) {
+        return contractsParameterSet.getDayValue();
     }
 
     private BigDecimal getBaseHoursA() {
@@ -247,16 +248,14 @@ public class Symbol {
     }
 
     public BigDecimal getExtraHours(LocalDate day, ContractsParameterSet contractsParameterSet) {
-        if (start == null) {
-            return BigDecimal.ZERO;
-        } else if (calc == AWERT) {
+        if (calc == AWERT) {
             return getExtraHoursA(day, contractsParameterSet);
         } else if (calc == KWERT) {
             return getExtraHoursK(contractsParameterSet);
         } else if (calc == XWERT) {
             return getExtraHoursX(day, contractsParameterSet);
         } else if (calc == UWERT) {
-            return getExtraHoursU(day, contractsParameterSet);
+            return getExtraHoursU(contractsParameterSet);
         } else if (calc == PVALUE) {
             return BigDecimal.ZERO;
         } else {

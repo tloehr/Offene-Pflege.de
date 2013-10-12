@@ -34,7 +34,6 @@ import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
@@ -313,7 +312,6 @@ public class FrmRoster extends JFrame {
         tsp1.getMainTable().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
 
-
 //        tsp1.getMainTable().getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 
 
@@ -524,7 +522,7 @@ public class FrmRoster extends JFrame {
     private void hotkeys() {
         int condition = JComponent.WHEN_IN_FOCUSED_WINDOW;
 //        tsp1.getMainTable().getInputMap().remove(KeyStroke.getKeyStroke(KeyEvent.VK_COPY, 0));
-        tsp1.getMainTable().getInputMap(condition).put(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_MASK), "paste");
+        tsp1.getMainTable().getInputMap(condition).put(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_MASK), "paste");
         InputMap inputMap = tsp1.getInputMap(condition);
         ActionMap actionMap = tsp1.getActionMap();
         /***
@@ -558,14 +556,13 @@ public class FrmRoster extends JFrame {
             }
         });
         /***
-         *
-         *       ___ ___  _ __  _   _
-         *      / __/ _ \| '_ \| | | |
-         *     | (_| (_) | |_) | |_| |
-         *      \___\___/| .__/ \__, |
-         *               |_|    |___/
+         *                      _
+         *      _ __   __ _ ___| |_ ___
+         *     | '_ \ / _` / __| __/ _ \
+         *     | |_) | (_| \__ \ ||  __/
+         *     | .__/ \__,_|___/\__\___|
+         *     |_|
          */
-//        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_PASTE, 0), "paste");
         tsp1.getMainTable().getActionMap().put("paste", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
 
@@ -597,12 +594,6 @@ public class FrmRoster extends JFrame {
                             }
                             row++;
                         }
-
-
-//                            if (tsp1.getMainTable().getSelectedColumnCount() == 1 && tsp1.getMainTable().getSelectedColumnCount() == 1) {
-//                                tmRoster.emptyCellInMaintable(tsp1.getMainTable().getSelectedRow(), tsp1.getMainTable().getSelectedColumn());
-//                            }
-
 
                     }
                 } catch (UnsupportedFlavorException ex) {
