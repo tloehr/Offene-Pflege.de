@@ -16,6 +16,8 @@ import org.joda.time.DateTimeConstants;
 
 import javax.swing.*;
 import java.awt.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 
 /**
@@ -48,43 +50,91 @@ public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIde
 
     @Override
     public CellStyle getCellStyleAt(int rowIndex, int columnIndex) {
+        boolean dateline = rowIndex == 0;
+        int lineidx = (rowIndex - 1) / 3;
         CellStyle myStyle = new CellStyle();
         myStyle.setHorizontalAlignment(SwingConstants.CENTER);
 
-        Color background = null;
+        Font font = basemodel.getFont();
 
-
-        myStyle.setBackground(SYSConst.bluegrey);
-
-        if (rowIndex / 3 % 2 == 0) {
-            background = SYSConst.bluegrey;
-        } else {
-            background = GUITools.blend(SYSConst.bluegrey, Color.white, 0.4f);
+        Homes home = null;
+        if (!dateline) {
+            home = listHomes.get((rowIndex - 1) / 3);
         }
+        Color background = SYSConst.bluegrey;
+        Color foreground = Color.BLACK;
+        if (dateline) {
+            if (basemodel.isInPlanningArea(columnIndex)) {
+                if (basemodel.getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SUNDAY || basemodel.getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SATURDAY) {
+                    background = GUITools.blend(SYSConst.bluegrey, Color.black, 0.85f);
+                }
+                if (OPDE.isHoliday(basemodel.getDay(columnIndex))) {
+                    background = GUITools.blend(SYSConst.bluegrey, Color.black, 0.8f);
+                }
+            } else {
+                background = SYSConst.bluegrey;
+            }
+        } else {
 
-        // basedata
-        if (columnIndex >= TMRoster.ROW_HEADER && columnIndex < getColumnCount() - TMRoster.ROW_FOOTER_WIDTH) {
-            if (basemodel.getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SUNDAY || basemodel.getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SATURDAY) {
-                if (rowIndex / 3 % 2 == 0) {
-                    if (basemodel.getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SUNDAY || basemodel.getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SATURDAY) {
-                        background = GUITools.blend(SYSConst.bluegrey, Color.black, 0.85f);
-                    }
-                    if (OPDE.isHoliday(basemodel.getDay(columnIndex))) {
-                        background = GUITools.blend(SYSConst.bluegrey, Color.black, 0.8f);
+            // basedata
+            if (columnIndex >= TMRoster.ROW_HEADER && columnIndex < getColumnCount() - TMRoster.ROW_FOOTER_WIDTH) {
+                if (basemodel.getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SUNDAY || basemodel.getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SATURDAY) {
+                    if (lineidx % 2 == 0) {
+                        if (basemodel.getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SUNDAY || basemodel.getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SATURDAY) {
+                            background = SYSConst.greyscale[SYSConst.light4];
+                        }
+                        if (OPDE.isHoliday(basemodel.getDay(columnIndex))) {
+                            background = SYSConst.greyscale[SYSConst.light3];
+                        }
+                    } else {
+
+                        if (basemodel.getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SUNDAY || basemodel.getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SATURDAY) {
+                            background = SYSConst.greyscale[SYSConst.medium2];
+                        }
+                        if (OPDE.isHoliday(basemodel.getDay(columnIndex))) {
+                            background = SYSConst.greyscale[SYSConst.medium3];
+                        }
                     }
                 } else {
-                    if (basemodel.getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SUNDAY || basemodel.getDay(columnIndex).getDayOfWeek() == DateTimeConstants.SATURDAY) {
-                        background = GUITools.blend(SYSConst.bluegrey, Color.black, 0.65f);
-                    }
-                    if (OPDE.isHoliday(basemodel.getDay(columnIndex))) {
-                        background = GUITools.blend(SYSConst.bluegrey, Color.black, 0.6f);
+                    if (lineidx % 2 == 0) {
+                        background = Color.WHITE;
+                    } else {
+                        background = SYSConst.greyscale[SYSConst.medium1];
                     }
                 }
+
+
+                if ((rowIndex - 1) % 3 == 0) {
+
+
+                    if (basemodel.getStatsPerDay().getExam_early(home, columnIndex - TMRoster.ROW_HEADER).equals(BigDecimal.ZERO) ||
+                            basemodel.getStatsPerDay().getExam_late(home, columnIndex - TMRoster.ROW_HEADER).equals(BigDecimal.ZERO) ||
+                            basemodel.getStatsPerDay().getExam_night(home, columnIndex - TMRoster.ROW_HEADER).equals(BigDecimal.ZERO)) {
+                        foreground = Color.red.darker();
+                    }
+
+
+//                    foreground = basemodel.getStatsPerDay().getExam_early(home, columnIndex - TMRoster.ROW_HEADER).equals(BigDecimal.ZERO) ? Color.RED.darker() : Color.BLACK;
+                }
+
+                font = font.deriveFont(13f);
+                font = font.deriveFont(Font.PLAIN);
+
+//                if ((rowIndex - 1) % 3 == 1) {
+//                    foreground = basemodel.getStatsPerDay().getExam_late(home, columnIndex - TMRoster.ROW_HEADER).equals(BigDecimal.ZERO) ? Color.RED.darker() : Color.BLACK;
+//                }
+//
+//                if ((rowIndex - 1) % 3 == 2) {
+//                    foreground = basemodel.getStatsPerDay().getExam_night(home, columnIndex - TMRoster.ROW_HEADER).equals(BigDecimal.ZERO) ? Color.RED.darker() : Color.BLACK;
+//                }
+
             }
         }
 
-        myStyle.setFont(basemodel.getFont());
+
+        myStyle.setFont(font);
         myStyle.setBackground(background);
+        myStyle.setForeground(foreground);
 
         return myStyle;
     }
@@ -111,7 +161,7 @@ public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIde
 
     @Override
     public int getRowCount() {
-        return listHomes.size() * 3;
+        return listHomes.size() * 3 + 1;
     }
 
     @Override
@@ -121,33 +171,43 @@ public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIde
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
+
+        boolean dateline = rowIndex == 0;
+        int lineidx = (rowIndex - 1) % 3;
+
         Object value = "footer";
         if (columnIndex == 0) {
             value = "";
-            if (rowIndex % 3 == 0) {
-                value = listHomes.get(rowIndex / 3).getShortname();
+
+            if (!dateline && lineidx == 0) {
+                value = listHomes.get((rowIndex - 1) / 3).getShortname();
             }
         } else if (columnIndex == 1) {
-            if (rowIndex % 3 == 0) {
-                value = "Examen F / S / N";
-            } else if (rowIndex % 3 == 1) {
-                value = "Helfer F / S / N";
-            } else if (rowIndex % 3 == 2) {
-                value = "Sozial F / S / N";
+            if (dateline) {
+                value = "Datum";
+            } else if (lineidx == 0) {
+                value = "Examen";
+            } else if (lineidx == 1) {
+                value = "Helfer";
+            } else if (lineidx == 2) {
+                value = "Sozial";
             }
         } else if (getColumnType(columnIndex) == FOOTER_COLUMN) {
             value = "";
-        } else { // here is the homestats data
-            //HomeStats stats = basemodel.getHomestats().get(listHomes.get(rowIndex / 3)).get(columnIndex - TMRoster.ROW_HEADER);
-
-            StatsPerDay stats = basemodel.getStatsPerDay(columnIndex - TMRoster.ROW_HEADER).get(listHomes.get(rowIndex / 3));
-
-            if (rowIndex % 3 == 0) {
-                value = String.format("EF%s ES%s EN%s", stats.exam_early, stats.exam_late, stats.exam_night);
-            } else if (rowIndex % 3 == 1) {
-                value = String.format("HF%s HS%s HN%s", stats.helper_early, stats.helper_late, stats.helper_night);
-            } else if (rowIndex % 3 == 2) {
-                value = String.format("SF%s SS%s SN%s", stats.social_early, stats.social_late, stats.social_night);
+        } else { // here are the homestats data
+            if (dateline) {
+                value = basemodel.getDay(columnIndex).toString("dd.MM.");
+            } else {
+                StatsPerDay stats = basemodel.getStatsPerDay();
+                Homes home = listHomes.get((rowIndex - 1) / 3);
+                int day = columnIndex - TMRoster.ROW_HEADER;
+                if (lineidx == 0) {
+                    value = String.format("F%s S%s N%s", stats.getExam_early(home, day).setScale(1, RoundingMode.HALF_UP), stats.getExam_late(home, day).setScale(1, RoundingMode.HALF_UP), stats.getExam_night(home, day).setScale(1, RoundingMode.HALF_UP));
+                } else if (lineidx == 1) {
+                    value = String.format("F%s S%s N%s", stats.getHelper_early(home, day).setScale(1, RoundingMode.HALF_UP), stats.getHelper_late(home, day).setScale(1, RoundingMode.HALF_UP), stats.getHelper_night(home, day).setScale(1, RoundingMode.HALF_UP));
+                } else if (lineidx == 2) {
+                    value = String.format("F%s S%s N%s", stats.getSocial_early(home, day).setScale(1, RoundingMode.HALF_UP), stats.getSocial_late(home, day).setScale(1, RoundingMode.HALF_UP), stats.getSocial_night(home, day).setScale(1, RoundingMode.HALF_UP));
+                }
             }
         }
 

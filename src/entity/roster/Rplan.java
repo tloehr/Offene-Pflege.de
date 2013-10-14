@@ -231,7 +231,6 @@ public class Rplan {
         this.breaktime = breaktime;
     }
 
-
     public int getType() {
         return type;
     }
@@ -253,16 +252,17 @@ public class Rplan {
         extrahours = symbol.getExtraHours(new LocalDate(start), contractsParameterSet);
         breaktime = symbol.getBreak();
         start = symbol.getStart(new LocalDate(start)).toDate();
+        type = symbol.getSymbolType();
         DateTime end = symbol.getEnd(new LocalDate(start));
         this.end = end == null ? null : end.toDate();
     }
 
     public BigDecimal getNetValue() {
-        return basehours.add(extrahours);
+        return basehours.add(extrahours).subtract(breaktime);
     }
 
     public BigDecimal getGrossValue() {
-        return basehours.add(extrahours).add(breaktime);
+        return basehours.add(extrahours);
     }
 
 

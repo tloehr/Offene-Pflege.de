@@ -65,10 +65,6 @@ public class Symbol {
         shift2 = SHIFT_NONE;
         statval1 = BigDecimal.ZERO;
         statval2 = BigDecimal.ZERO;
-
-        grpmf;
-        // die pause nicht mit einrechnen.
-
     }
 
     public Symbol(String key, String description, String start, String end, int minutesBreak, String calc, String symboltype) throws Exception {

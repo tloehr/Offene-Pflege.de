@@ -92,7 +92,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     public CellStyle baseStyle;
 
     private Homes defaultHome;
-    HashMap<Users, StatsPerUser> userstats;
+    HashMap<Users, StatsPerUser> statsPerUser;
+    StatsPerDay statsPerDay;
     private Closure updateFooter = null;
 
 
@@ -106,9 +107,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         content = new HashMap<Users, ArrayList<Rplan>>();
         contracts = UsersTools.getUsersWithValidContractsIn(month);
         prefixMap = new HashMap<Character, Homes>();
-        userstats = new HashMap<Users, StatsPerUser>();
+        statsPerUser = new HashMap<Users, StatsPerUser>();
         userlist = new ArrayList<Pair<Users, Homes>>();
-//        homeslist = new ArrayList<Homes>();
         rosterParameters = RostersTools.getParameters(roster);
         initUserlist();
         prepareContent();
@@ -118,6 +118,11 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
         baseStyle = new CellStyle();
         baseStyle.setFont(SYSConst.ARIAL16);
+
+
+        grpmf;
+        // TMRoster Header loswerden und nach vorne in Spalte 2 packen. Ist besser zu lesen.
+
     }
 
     @Override
@@ -349,9 +354,11 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
         }
 
-        for (Users user : userstats.keySet()) {
-            userstats.get(user).update(content.get(user));
+        for (Users user : statsPerUser.keySet()) {
+            statsPerUser.get(user).update(content.get(user));
         }
+
+        statsPerDay = new StatsPerDay(HomesTools.getAll(), month, content, contracts, rosterParameters);
 
     }
 
@@ -361,7 +368,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 //        homeslist.clear();
         userlist.clear();
 //        homestats.clear();
-        userstats.clear();
+        statsPerUser.clear();
+//        statsPerDay.clear();
     }
 
     @Override
@@ -399,8 +407,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             Users myUser = (Users) aValue;
             userlist.set(rowIndex / 4, new Pair<Users, Homes>(myUser, defaultHome));
 
-            if (!userstats.containsKey(myUser)) {
-                userstats.put(myUser, new StatsPerUser(WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOURS), WorkAccountTools.getSick(month, myUser), WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOLIDAYS), rosterParameters));
+            if (!statsPerUser.containsKey(myUser)) {
+                statsPerUser.put(myUser, new StatsPerUser(WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOURS), WorkAccountTools.getSick(month, myUser), WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOLIDAYS), rosterParameters));
                 content.put(myUser, new ArrayList<Rplan>());
                 for (int i = 0; i < month.dayOfMonth().withMaximumValue().getDayOfMonth(); i++) {
                     content.get(myUser).add(null);
@@ -473,7 +481,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
                 // update the content and stats
                 content.get(user).set(columnIndex - ROW_HEADER, myRplan);
-                userstats.get(user).update(content.get(user));
+                statsPerUser.get(user).update(content.get(user));
+                statsPerDay.update(content, columnIndex - ROW_HEADER);
 
 
                 for (int i : indexOfAllUser(user)) {
@@ -545,11 +554,11 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 value = contracts.get(user).getParameterSet(month).isExam() ? "<html><b>Examen</b></html>" : "Helfer";
             }
         } else if (ct == CT_CARRY_HOURS) {
-            value = "St: " + userstats.get(user).getHoursCarry().setScale(2, RoundingMode.HALF_UP).toString();
+            value = "St: " + statsPerUser.get(user).getHoursCarry().setScale(2, RoundingMode.HALF_UP).toString();
         } else if (ct == CT_CARRY_SICK) {
-            value = "Kr: " + userstats.get(user).getSickCarry().setScale(2, RoundingMode.HALF_UP).toString();
+            value = "Kr: " + statsPerUser.get(user).getSickCarry().setScale(2, RoundingMode.HALF_UP).toString();
         } else if (ct == CT_CARRY_HOLIDAY) {
-            value = "Url: " + userstats.get(user).getHolidayCarry().setScale(2, RoundingMode.HALF_UP).toString();
+            value = "Url: " + statsPerUser.get(user).getHolidayCarry().setScale(2, RoundingMode.HALF_UP).toString();
         } else if (ct == CT_P1) {
             value = content.get(user).get(columnIndex - ROW_HEADER) != null ? content.get(user).get(columnIndex - ROW_HEADER).getP1() : "";
 //            if (!value.toString().isEmpty()) {
@@ -560,13 +569,14 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         } else if (ct == CT_ACTUAL) {
             value = "";
         } else if (ct == CT_HOURS) {
-            value = content.get(user).get(columnIndex - ROW_HEADER) != null ? content.get(user).get(columnIndex - ROW_HEADER).getNetValue().setScale(2, RoundingMode.HALF_UP).toString() : "";
+            Rplan rplan = content.get(user).get(columnIndex - ROW_HEADER);
+            value = rplan != null && rplan.getType() != Symbol.PVALUE ? rplan.getNetValue().setScale(2, RoundingMode.HALF_UP).toString() : "";
         } else if (ct == CT_SUM_HOURS) {
-            value = "St: " + userstats.get(user).getHoursSum().setScale(2, RoundingMode.HALF_UP).toString();
+            value = "St: " + statsPerUser.get(user).getHoursSum().setScale(2, RoundingMode.HALF_UP).toString();
         } else if (ct == CT_SUM_SICK) {
-            value = "Kr: " + userstats.get(user).getSickSum().setScale(2, RoundingMode.HALF_UP).toString();
+            value = "Kr: " + statsPerUser.get(user).getSickSum().setScale(2, RoundingMode.HALF_UP).toString();
         } else if (ct == CT_SUM_HOLIDAY) {
-            value = "Url: " + userstats.get(user).getHolidaySum().setScale(2, RoundingMode.HALF_UP).toString();
+            value = "Url: " + statsPerUser.get(user).getHolidaySum().setScale(2, RoundingMode.HALF_UP).toString();
         }
 
         return value;
@@ -620,6 +630,10 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         }
 
 
+    }
+
+    public StatsPerDay getStatsPerDay() {
+        return statsPerDay;
     }
 
     /**
@@ -693,7 +707,9 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 content.get(user).set(columnIndex, myRplan);
             }
 
-            userstats.get(user).update(content.get(user));
+            statsPerUser.get(user).update(content.get(user));
+            statsPerDay.update(content, columnIndex);
+
 
             roster = myRoster;
 
@@ -747,8 +763,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 Homes myHome = em.find(Homes.class, strAssign[1]);
                 userlist.add(new Pair<Users, Homes>(myUser, myHome));
 
-                if (!userstats.containsKey(myUser)) {
-                    userstats.put(myUser, new StatsPerUser(WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOURS), WorkAccountTools.getSick(month, myUser), WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOLIDAYS), rosterParameters));
+                if (!statsPerUser.containsKey(myUser)) {
+                    statsPerUser.put(myUser, new StatsPerUser(WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOURS), WorkAccountTools.getSick(month, myUser), WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOLIDAYS), rosterParameters));
                     content.put(myUser, new ArrayList<Rplan>());
                     for (int i = 0; i < month.dayOfMonth().withMaximumValue().getDayOfMonth(); i++) {
                         content.get(myUser).add(null);
@@ -831,26 +847,25 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         return menu;
     }
 
-    public HashMap<Homes, StatsPerDay> getStatsPerDay(int columnIndex) {
-        HashMap<Homes, StatsPerDay> mapStats = new HashMap<Homes, StatsPerDay>();
-
-        for (Homes home : prefixMap.values()) {
-            mapStats.put(home, new StatsPerDay());
-        }
-
-        for (Users user : content.keySet()) {
-
-            Rplan rplan = content.get(user).get(columnIndex);
-            if (rplan != null) {
-                boolean exam = contracts.get(user).getParameterSet(getDay(columnIndex)).isExam();
-                Symbol symbol = rosterParameters.getSymbol(rplan.getEffectiveP());
-                int type = symbol.getSection() == RosterXML.SOCIAL ? StatsPerDay.SOCIAL : (exam ? StatsPerDay.EXAM : StatsPerDay.HELPER);
-                mapStats.get(rplan.getEffectiveHome()).add(type, rosterParameters.getSymbol(rplan.getEffectiveP()));
-            }
-
-        }
-        return mapStats;
-    }
+//    public HashMap<Homes, StatsPerDay> getStatsPerDay(int columnIndex) {
+//        HashMap<Homes, StatsPerDay> mapStats = new HashMap<Homes, StatsPerDay>();
+//
+//        for (Homes home : prefixMap.values()) {
+//            mapStats.put(home, new StatsPerDay());
+//        }
+//
+//        for (Users user : content.keySet()) {
+//            Rplan rplan = content.get(user).get(columnIndex);
+//            if (rplan != null) {
+//                boolean exam = contracts.get(user).getParameterSet(getDay(columnIndex)).isExam();
+//                Symbol symbol = rosterParameters.getSymbol(rplan.getEffectiveP());
+//                int type = symbol.getSection() == RosterXML.SOCIAL ? StatsPerDay.SOCIAL : (exam ? StatsPerDay.EXAM : StatsPerDay.HELPER);
+//                mapStats.get(rplan.getEffectiveHome()).add(type, rosterParameters.getSymbol(rplan.getEffectiveP()));
+//            }
+//
+//        }
+//        return mapStats;
+//    }
 
     static ArrayList<Integer> indexOfAll(Object obj, ArrayList list) {
         ArrayList<Integer> indexList = new ArrayList<Integer>();
@@ -863,9 +878,12 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     private ArrayList<Integer> indexOfAllUser(Users user) {
         ArrayList<Integer> indexList = new ArrayList<Integer>();
         int i = 0;
-        for (Pair<Users, Homes> pair : userlist)
-            if (user.equals(pair.getFirst()))
+        for (Pair<Users, Homes> pair : userlist) {
+            if (user.equals(pair.getFirst())) {
                 indexList.add(i);
+            }
+            i++;
+        }
         return indexList;
     }
 }

@@ -951,19 +951,19 @@ public class GUITools {
     /**
      * blends to colors and returns the result.
      *
-     * @param clOne
-     * @param clTwo
-     * @param fAmount the amount draws the line between the two colors. the more it tends towards 0, the more the first color is emphasized. the more it tends towards 1, the more the second color is emphasized.
+     * @param first
+     * @param second
+     * @param fAmount the amount draws the line between the two colors. the more it tends towards 0, the more the second color is emphasized. the more it tends towards 1, the more the first color is emphasized.
      * @return
      */
-    public static Color blend(Color clOne, Color clTwo, float fAmount) {
+    public static Color blend(Color first, Color second, float fAmount) {
         float fInverse = 1.0f - fAmount;
 
         // I had to look up getting colour components in java.  Google is good :)
         float afOne[] = new float[3];
-        clOne.getColorComponents(afOne);
+        first.getColorComponents(afOne);
         float afTwo[] = new float[3];
-        clTwo.getColorComponents(afTwo);
+        second.getColorComponents(afTwo);
 
         float afResult[] = new float[3];
         afResult[0] = afOne[0] * fAmount + afTwo[0] * fInverse;
