@@ -83,10 +83,11 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     RosterParameters rosterParameters = null;
 
     private final LocalDate month;
-    public static final int ROW_HEADER = 2;
+    public static final int ROW_HEADER = 3;
     public final int ROW_FOOTER;
-    public static final int ROW_FOOTER_WIDTH = 1;
+    public static final int ROW_FOOTER_WIDTH = 0;
     public static final int COL_HEADER = 2;
+    public static final int COL_SUM = 2;
     public final int COL_FOOTER;
 
     public CellStyle baseStyle;
@@ -118,11 +119,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
         baseStyle = new CellStyle();
         baseStyle.setFont(SYSConst.ARIAL16);
-
-
-        grpmf;
-        // TMRoster Header loswerden und nach vorne in Spalte 2 packen. Ist besser zu lesen.
-
     }
 
     @Override
@@ -164,6 +160,16 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             } else if (rowIndex % 4 == 3) {
                 cellType = CT_CARRY_HOURS;
             }
+        } else if (columnIndex == 2) { // homestats sum
+            if (rowIndex % 4 == 0) {
+                cellType = CT_SUM_SICK;
+            } else if (rowIndex % 4 == 1) {
+                cellType = CT_SUM_HOLIDAY;
+            } else if (rowIndex % 4 == 2) {
+                cellType = CT_SUM_EMPTY;
+            } else if (rowIndex % 4 == 3) {
+                cellType = CT_SUM_HOURS;
+            }
         } else if (columnIndex >= ROW_HEADER && columnIndex < ROW_FOOTER) {
             if (rowIndex % 4 == 0) {
                 cellType = CT_P1;
@@ -174,18 +180,19 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             } else if (rowIndex % 4 == 3) {
                 cellType = CT_HOURS;
             }
-        } else if (columnIndex == ROW_FOOTER) {
-            if (rowIndex % 4 == 0) {
-                cellType = CT_SUM_SICK;
-            } else if (rowIndex % 4 == 1) {
-                cellType = CT_SUM_HOLIDAY;
-            } else if (rowIndex % 4 == 2) {
-                cellType = CT_SUM_EMPTY;
-
-            } else if (rowIndex % 4 == 3) {
-                cellType = CT_SUM_HOURS;
-            }
         }
+//        else if (columnIndex == ROW_FOOTER) {
+//                   if (rowIndex % 4 == 0) {
+//                       cellType = CT_SUM_SICK;
+//                   } else if (rowIndex % 4 == 1) {
+//                       cellType = CT_SUM_HOLIDAY;
+//                   } else if (rowIndex % 4 == 2) {
+//                       cellType = CT_SUM_EMPTY;
+//
+//                   } else if (rowIndex % 4 == 3) {
+//                       cellType = CT_SUM_HOURS;
+//                   }
+//               }
 
         return cellType;
     }
@@ -215,6 +222,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         } else {
             return REGULAR_COLUMN;
         }
+
+//
 
     }
 
@@ -379,7 +388,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
     @Override
     public int getColumnCount() {
-        return month.dayOfMonth().withMaximumValue().getDayOfMonth() + ROW_HEADER + 1; // there is 1 sum col at the end
+        return month.dayOfMonth().withMaximumValue().getDayOfMonth() + ROW_HEADER; // there is 1 sum col at the end
     }
 
     public LocalDate getDay(int columnIndex) {
@@ -501,10 +510,10 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                     OPDE.debug(String.format("content(%s, %s): " + getValueAt(startrow + 3, columnIndex), startrow + 3, columnIndex));
 
 
-                    fireTableCellUpdated(startrow, getColumnCount() - 1);
-                    fireTableCellUpdated(startrow + 1, getColumnCount() - 1);
-                    fireTableCellUpdated(startrow + 2, getColumnCount() - 1);
-                    fireTableCellUpdated(startrow + 3, getColumnCount() - 1);
+                    fireTableCellUpdated(startrow, COL_SUM);
+                    fireTableCellUpdated(startrow + 1, COL_SUM);
+                    fireTableCellUpdated(startrow + 2, COL_SUM);
+                    fireTableCellUpdated(startrow + 3, COL_SUM);
 
                 }
 
@@ -643,6 +652,10 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
         Users user = userlist.get(rowIndex / 4).getFirst();
 
+        if (user == null){
+            return;
+        }
+
         Rplan oldPlan = content.get(user).get(columnIndex);
 
         if (oldPlan == null) {
@@ -733,10 +746,10 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             fireTableCellUpdated(startrow + 2, columnIndex + ROW_HEADER);
             fireTableCellUpdated(startrow + 3, columnIndex + ROW_HEADER);
 
-            fireTableCellUpdated(startrow, getColumnCount() - 1);
-            fireTableCellUpdated(startrow + 1, getColumnCount() - 1);
-            fireTableCellUpdated(startrow + 2, getColumnCount() - 1);
-            fireTableCellUpdated(startrow + 3, getColumnCount() - 1);
+            fireTableCellUpdated(startrow, COL_SUM);
+            fireTableCellUpdated(startrow + 1, COL_SUM);
+            fireTableCellUpdated(startrow + 2, COL_SUM);
+            fireTableCellUpdated(startrow + 3, COL_SUM);
 
             if (updateFooter != null) {
                 // adapt columnindex. the keypressed event ignores the column index of the row header table.

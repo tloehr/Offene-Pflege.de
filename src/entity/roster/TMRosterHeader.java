@@ -25,11 +25,11 @@ import java.awt.*;
 public class TMRosterHeader extends AbstractMultiTableModel implements ColumnIdentifierTableModel, StyleModel {
     TMRoster basemodel;
     private static final long serialVersionUID = -9132647394140127017L;
-    Pair<Point, Point> basetable;
+//    Pair<Point, Point> basetable;
 
     public TMRosterHeader(TMRoster model) {
         basemodel = model;
-        basetable = basemodel.getBaseTable();
+//        basetable = basemodel.getBaseTable();
     }
 
     public CellStyle getCellStyleAt(int rowIndex, int columnIndex) {
@@ -79,20 +79,20 @@ public class TMRosterHeader extends AbstractMultiTableModel implements ColumnIde
     }
 
     public Object getValueAt(int rowIndex, int columnIndex) {
-        String value = "ERR";
+        String value = "";
 
-        if (columnIndex >= basetable.getFirst().x && columnIndex < basemodel.getColumnCount() - 1) {
+        if (columnIndex >= TMRoster.ROW_HEADER && columnIndex < basemodel.getColumnCount()) {
             if (rowIndex == 0) {
                 value = basemodel.getDay(columnIndex).toString("dd.MM.");
             } else if (rowIndex == 1) {
                 String holiday = OPDE.getHoliday(basemodel.getDay(columnIndex));
                 value = basemodel.getDay(columnIndex).toString("EE") + (holiday.isEmpty() ? "" : " (" + holiday + ")");
             }
-        } else if (columnIndex == 0) {
+        } else if (columnIndex == 0 && rowIndex == 1) {
             value = "Username";
-        } else if (columnIndex == 1) {
+        } else if (columnIndex == 1 && rowIndex == 1) {
             value = "Vorher";
-        } else if (columnIndex >= basemodel.getColumnCount() - 1) {
+        } else if (columnIndex == 2 && rowIndex == 1) {
             value = "Nachher";
         }
         return value;

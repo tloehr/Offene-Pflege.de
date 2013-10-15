@@ -182,7 +182,7 @@ public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIde
             if (!dateline && lineidx == 0) {
                 value = listHomes.get((rowIndex - 1) / 3).getShortname();
             }
-        } else if (columnIndex == 1) {
+        } else if (columnIndex == 2) {
             if (dateline) {
                 value = "Datum";
             } else if (lineidx == 0) {
@@ -192,9 +192,7 @@ public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIde
             } else if (lineidx == 2) {
                 value = "Sozial";
             }
-        } else if (getColumnType(columnIndex) == FOOTER_COLUMN) {
-            value = "";
-        } else { // here are the homestats data
+        } else if (columnIndex >= TMRoster.COL_HEADER) { // here are the homestats data
             if (dateline) {
                 value = basemodel.getDay(columnIndex).toString("dd.MM.");
             } else {
@@ -209,6 +207,8 @@ public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIde
                     value = String.format("F%s S%s N%s", stats.getSocial_early(home, day).setScale(1, RoundingMode.HALF_UP), stats.getSocial_late(home, day).setScale(1, RoundingMode.HALF_UP), stats.getSocial_night(home, day).setScale(1, RoundingMode.HALF_UP));
                 }
             }
+        } else if (getColumnType(columnIndex) == FOOTER_COLUMN) {
+            value = "";
         }
 
         return value;

@@ -362,11 +362,12 @@ public class FrmRoster extends JFrame {
                 super.componentResized(evt);
                 tsp1.getRowHeaderTable().getColumnModel().getColumn(0).setPreferredWidth(120);
                 tsp1.getRowHeaderTable().getColumnModel().getColumn(1).setPreferredWidth(120);
+                tsp1.getRowHeaderTable().getColumnModel().getColumn(2).setPreferredWidth(120);
                 for (int col = 0; col < tsp1.getMainTable().getColumnCount(); col++) {  //(int day = 0; day < new LocalDate(roster.getMonth()).dayOfMonth().withMaximumValue().getDayOfMonth(); day++) {
                     tsp1.getMainTable().getColumnModel().getColumn(col).setPreferredWidth(100);
 
                 }
-                tsp1.getRowFooterTable().getColumnModel().getColumn(0).setPreferredWidth(140);
+//                tsp1.getRowFooterTable().getColumnModel().getColumn(0).setPreferredWidth(140);
             }
         });
 
@@ -645,25 +646,25 @@ public class FrmRoster extends JFrame {
             }
         });
 
-        tsp1.getRowFooterColumnHeaderTable().setFocusable(false);
-        tsp1.getRowFooterColumnHeaderTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (!tsp1.getRowFooterColumnHeaderTable().getSelectionModel().isSelectionEmpty()) {
-                    tsp1.getRowFooterColumnHeaderTable().getSelectionModel().clearSelection();
-                }
-            }
-        });
+//        tsp1.getRowFooterColumnHeaderTable().setFocusable(false);
+//        tsp1.getRowFooterColumnHeaderTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+//            @Override
+//            public void valueChanged(ListSelectionEvent e) {
+//                if (!tsp1.getRowFooterColumnHeaderTable().getSelectionModel().isSelectionEmpty()) {
+//                    tsp1.getRowFooterColumnHeaderTable().getSelectionModel().clearSelection();
+//                }
+//            }
+//        });
 
-        tsp1.getRowFooterColumnFooterTable().setFocusable(false);
-        tsp1.getRowFooterColumnFooterTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (!tsp1.getRowFooterColumnFooterTable().getSelectionModel().isSelectionEmpty()) {
-                    tsp1.getRowFooterColumnFooterTable().getSelectionModel().clearSelection();
-                }
-            }
-        });
+//        tsp1.getRowFooterColumnFooterTable().setFocusable(false);
+//        tsp1.getRowFooterColumnFooterTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+//            @Override
+//            public void valueChanged(ListSelectionEvent e) {
+//                if (!tsp1.getRowFooterColumnFooterTable().getSelectionModel().isSelectionEmpty()) {
+//                    tsp1.getRowFooterColumnFooterTable().getSelectionModel().clearSelection();
+//                }
+//            }
+//        });
 
         tsp1.getColumnHeaderTable().setFocusable(false);
         tsp1.getColumnHeaderTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
