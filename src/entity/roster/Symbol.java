@@ -186,7 +186,7 @@ public class Symbol {
     }
 
     private BigDecimal getExtraHoursA(LocalDate day, ContractsParameterSet contractsParameterSet) {
-        if (day.getDayOfWeek() == DateTimeConstants.SUNDAY && !OPDE.isHoliday(day)) {
+        if (OPDE.isHoliday(day)) {
             return contractsParameterSet.getDayValue();
         } else {
             return BigDecimal.ZERO;
@@ -194,7 +194,7 @@ public class Symbol {
     }
 
     private BigDecimal getExtraHoursX(LocalDate day, ContractsParameterSet contractsParameterSet) {
-        if (day.getDayOfWeek() == DateTimeConstants.SUNDAY && !OPDE.isHoliday(day)) {
+        if (OPDE.isHoliday(day)) {
             return contractsParameterSet.getDayValue();
         } else {
             return BigDecimal.ZERO;

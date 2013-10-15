@@ -24,6 +24,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 /**
@@ -652,7 +654,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
         Users user = userlist.get(rowIndex / 4).getFirst();
 
-        if (user == null){
+        if (user == null) {
             return;
         }
 
@@ -849,14 +851,48 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         OPDE.debug(rowIndex);
         OPDE.debug(columnIndex);
 
-        //        // SELECT
-        //        JMenuItem itemPopupShow = new JMenuItem(OPDE.lang.getString("misc.commands.show"), SYSConst.icon22magnify1);
-        //        itemPopupShow.addActionListener(new java.awt.event.ActionListener() {
-        //            public void actionPerformed(java.awt.event.ActionEvent evt) {
-        //
-        //            }
-        //        });
-        //        menu.add(itemPopupShow);
+
+        JMenu menuUserOperations = new JMenu("opde.roster.useroperations");
+        JMenuItem itemClearUsers = new JMenuItem("opde.roster.clear.users", SYSConst.icon22empty);
+        itemClearUsers.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                userlist.clear();
+                userlist.add(new Pair<Users, Homes>(null, null));
+                fireTableDataChanged();
+            }
+        });
+        menuUserOperations.add(itemClearUsers);
+
+
+        JMenuItem itemSortHomeExamName = new JMenuItem("opde.roster.sort.users.home.exam.name", SYSConst.icon22empty);
+        itemSortHomeExamName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Collections.sort(userlist, new Comparator<Pair<Users, Homes>>() {
+                    @Override
+                    public int compare(Pair<Users, Homes> o1, Pair<Users, Homes> o2) {
+                        int result = o1.getSecond().getShortname().compareTo(o2.getSecond().getShortname());
+                        if (result == 0) {
+                            UserContracts cs1 = contracts.get(o1.getFirst());
+                            UserContracts cs2 = contracts.get(o2.getFirst());
+                            result = new Boolean(cs1.getContractsWithinMonth(month).get(0).getParameterSet(month).exam).compareTo(new Boolean(cs2.getContractsWithinMonth(month).get(0).getParameterSet(month).exam));
+                        }
+                        if (result == 0) {
+                            result = o1.getFirst().getFullname().compareTo(o2.getFirst().getFullname());
+                        }
+                        if (result == 0) {
+                            result = o1.getFirst().getUID().compareTo(o2.getFirst().getUID());
+                        }
+                        return result;
+                    }
+                });
+
+                fireTableDataChanged();
+            }
+        });
+        menuUserOperations.add(itemSortHomeExamName);
+
+
+        menu.add(menuUserOperations);
         return menu;
     }
 

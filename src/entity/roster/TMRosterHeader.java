@@ -83,7 +83,7 @@ public class TMRosterHeader extends AbstractMultiTableModel implements ColumnIde
 
         if (columnIndex >= TMRoster.ROW_HEADER && columnIndex < basemodel.getColumnCount()) {
             if (rowIndex == 0) {
-                value = basemodel.getDay(columnIndex).toString("dd.MM.");
+                value = basemodel.getDay(columnIndex).toString("dd.MM.yy");
             } else if (rowIndex == 1) {
                 String holiday = OPDE.getHoliday(basemodel.getDay(columnIndex));
                 value = basemodel.getDay(columnIndex).toString("EE") + (holiday.isEmpty() ? "" : " (" + holiday + ")");
