@@ -592,16 +592,16 @@ public class PnlDFN extends NursingRecordsPanel {
              *                             |_|   |_|      |___/
              */
             JButton btnApply = new JButton(SYSConst.icon22apply);
-//            btnApply.setPressedIcon(SYSConst.icon22applyPressed);
+            btnApply.setPressedIcon(SYSConst.icon22applyPressed);
             btnApply.setAlignmentX(Component.RIGHT_ALIGNMENT);
-//            btnApply.setContentAreaFilled(false);
-//            btnApply.setBorder(null);
+            btnApply.setContentAreaFilled(false);
+            btnApply.setBorder(null);
             btnApply.addActionListener(applyActionListener);
             btnApply.setEnabled(!dfn.isOnDemand() && dfn.isOpen());
             cptitle.getRight().add(btnApply);
-            JPanel spacer = new JPanel();
-            spacer.setOpaque(false);
-            cptitle.getRight().add(spacer);
+//            JPanel spacer = new JPanel();
+//            spacer.setOpaque(false);
+//            cptitle.getRight().add(spacer);
             /***
              *      _     _          ____                     _
              *     | |__ | |_ _ __  / ___|__ _ _ __   ___ ___| |

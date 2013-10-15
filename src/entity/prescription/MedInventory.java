@@ -58,7 +58,7 @@ public class MedInventory implements Serializable, Comparable<MedInventory> {
         this.user = OPDE.getLogin().getUser();
         this.from = new Date();
         this.to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
-//        this.medStocks = new ArrayList<MedStock>();
+        this.medStocks = new ArrayList<MedStock>();
     }
 
     public Long getID() {
@@ -156,8 +156,8 @@ public class MedInventory implements Serializable, Comparable<MedInventory> {
         return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-//    public List<MedStock> getMedStocks() {
-//        return medStocks;
-//    }
+    public List<MedStock> getMedStocks() {
+        return medStocks;
+    }
 }
                                        

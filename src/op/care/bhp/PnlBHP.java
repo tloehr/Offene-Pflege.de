@@ -546,7 +546,7 @@ public class PnlBHP extends NursingRecordsPanel {
                         em.getTransaction().commit();
 
 
-                        if (myBHP.shouldBeCalculated() && involvedPresciption.isClosed()) {
+                        if (myBHP.shouldBeCalculated() && involvedPresciption.isClosed()) { // &&
                             reload();
                         } else {
                             mapBHP2Pane.put(myBHP, createCP4(myBHP));
@@ -580,7 +580,8 @@ public class PnlBHP extends NursingRecordsPanel {
                             mapShift2Pane.put(myBHP.getShift(), createCP4(myBHP.getShift()));
                             buildPanel(false);
                         }
-                    } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                    } catch (OptimisticLockException ole) {
+                        OPDE.warn(ole);
                         OPDE.warn(ole);
                         if (em.getTransaction().isActive()) {
                             em.getTransaction().rollback();
@@ -664,15 +665,17 @@ public class PnlBHP extends NursingRecordsPanel {
                  *                             |_|   |_|      |___/
                  */
                 JButton btnApply = new JButton(SYSConst.icon22apply);
+                btnApply.setPressedIcon(SYSConst.icon22applyPressed);
                 btnApply.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 btnApply.setToolTipText(OPDE.lang.getString(internalClassID + ".btnApply.tooltip"));
                 btnApply.addActionListener(applyActionListener);
-
+                btnApply.setContentAreaFilled(false);
+                btnApply.setBorder(null);
                 btnApply.setEnabled(bhp.isOpen() && (!bhp.hasMed() || mapPrescription2Stock.containsKey(bhp.getPrescription())));
                 cptitle.getRight().add(btnApply);
-                JPanel spacer = new JPanel();
-                spacer.setOpaque(false);
-                cptitle.getRight().add(spacer);
+//                JPanel spacer = new JPanel();
+//                spacer.setOpaque(false);
+//                cptitle.getRight().add(spacer);
 
                 /***
                  *                             ____  _             _
@@ -709,7 +712,8 @@ public class PnlBHP extends NursingRecordsPanel {
                                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage(String.format(OPDE.lang.getString("newstocks.stock.has.been.opened"), myStock.getID().toString())));
                                 reload();
 
-                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -786,7 +790,8 @@ public class PnlBHP extends NursingRecordsPanel {
                                 em.getTransaction().commit();
                                 mapShift2Pane.put(myBHP.getShift(), createCP4(myBHP.getShift()));
                                 buildPanel(false);
-                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -872,7 +877,8 @@ public class PnlBHP extends NursingRecordsPanel {
                                 em.getTransaction().commit();
                                 mapShift2Pane.put(myBHP.getShift(), createCP4(myBHP.getShift()));
                                 buildPanel(false);
-                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -941,10 +947,10 @@ public class PnlBHP extends NursingRecordsPanel {
                                 myBHP.setMDate(new Date());
 
                                 if (myBHP.shouldBeCalculated()) {
-                                    for (MedStockTransaction tx : MedStockTransactionTools.getAll(bhp)) {
-                                        em.remove(em.merge(tx));
+                                    for (MedStockTransaction tx : myBHP.getStockTransaction()) {
+                                        em.remove(tx);
                                     }
-//                                    myBHP.getStockTransaction().clear();
+                                    myBHP.getStockTransaction().clear();
                                 }
 
                                 mapBHP2Pane.put(myBHP, createCP4(myBHP));
@@ -960,7 +966,8 @@ public class PnlBHP extends NursingRecordsPanel {
                                 em.getTransaction().commit();
                                 mapShift2Pane.put(myBHP.getShift(), createCP4(myBHP.getShift()));
                                 buildPanel(false);
-                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }

@@ -153,7 +153,7 @@ public class MedStockTools {
 
     public static BigDecimal getSum(MedStock stock) {
         BigDecimal result = BigDecimal.ZERO;
-        for (MedStockTransaction buchung : MedStockTransactionTools.getAll(stock)) {
+        for (MedStockTransaction buchung : stock.getStockTransaction()) {
             result = result.add(buchung.getAmount());
         }
         return result;
@@ -167,7 +167,7 @@ public class MedStockTools {
      */
     public static BigDecimal getSumOfDosesInBHP(MedStock medStock) {
         BigDecimal result = BigDecimal.ZERO;
-        for (MedStockTransaction tx : MedStockTransactionTools.getAll(medStock)) {
+        for (MedStockTransaction tx : medStock.getStockTransaction()) {
             if (!tx.isPartOfCancelPair() && tx.isBHP()) {
                 result = result.add(tx.getBhp().getDose());
             }

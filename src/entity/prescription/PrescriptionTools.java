@@ -776,8 +776,8 @@ public class PrescriptionTools {
                     BigDecimal invSum = null;
                     BigDecimal stockSum = null;
                     try {
-                        invSum = MedInventoryTools.getSum(em, inventory);
-                        stockSum = MedStockTools.getSum(em, stockInUse);
+                        invSum = MedInventoryTools.getSum(inventory);
+                        stockSum = MedStockTools.getSum(stockInUse);
                     } catch (Exception e) {
                         OPDE.fatal(e);
                     } finally {

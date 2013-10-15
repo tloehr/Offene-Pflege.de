@@ -80,11 +80,11 @@ public class MedInventoryTools {
 //        return result;
 //    }
 
-    public static BigDecimal getSum(EntityManager em, MedInventory inventory) throws Exception {
+    public static BigDecimal getSum(MedInventory inventory) throws Exception {
         BigDecimal result = BigDecimal.ZERO;
-        for (MedStock stock : MedStockTools.getAll(inventory)) {
+        for (MedStock stock : inventory.getMedStocks()) {
             if (!stock.isClosed()) {
-                BigDecimal summe = MedStockTools.getSum(em, stock);
+                BigDecimal summe = MedStockTools.getSum(stock);
                 result = result.add(summe);
             }
         }
@@ -136,10 +136,10 @@ public class MedInventoryTools {
     public static MedStock openNext(MedInventory inventory) {
         MedStock result = null;
 
-//        java.util.List<MedStock> list = new ArrayList(inventory.getMedStocks());
-//        Collections.sort(list);
+        java.util.List<MedStock> list = new ArrayList(inventory.getMedStocks());
+        Collections.sort(list);
 
-        for (MedStock medStock : MedStockTools.getAll(inventory)) {
+        for (MedStock medStock : list) {
             if (medStock.getOut().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE) && medStock.getOpened().equals(SYSConst.DATE_UNTIL_FURTHER_NOTICE)) {
                 medStock.setOpened(new Date());
                 result = medStock;
@@ -147,6 +147,18 @@ public class MedInventoryTools {
             }
         }
 
+        return result;
+    }
+
+
+    public static BigDecimal getSum(EntityManager em, MedInventory inventory) throws Exception {
+        BigDecimal result = BigDecimal.ZERO;
+        for (MedStock stock : MedStockTools.getAll(inventory)) {
+            if (!stock.isClosed()) {
+                BigDecimal summe = MedStockTools.getSum(em, stock);
+                result = result.add(summe);
+            }
+        }
         return result;
     }
 
@@ -194,8 +206,8 @@ public class MedInventoryTools {
 
         // The TX for this turn
         MedStockTransaction tx = em.merge(new MedStockTransaction(stock, withdrawal.negate(), bhp));
-//        stock.getStockTransaction().add(tx);
-//        bhp.getStockTransaction().add(tx);
+        stock.getStockTransaction().add(tx);
+        bhp.getStockTransaction().add(tx);
         OPDE.debug("withdraw/4: tx: " + tx);
 
         if (stockSum.compareTo(quantity) == 0) {
@@ -239,7 +251,7 @@ public class MedInventoryTools {
 
     public static MedStock getNextToOpen(MedInventory inventory) {
         MedStock bestand = null;
-        java.util.List<MedStock> listStocks = MedStockTools.getAll(inventory);
+        java.util.List<MedStock> listStocks = inventory.getMedStocks();
         if (inventory != null && !listStocks.isEmpty()) {
             for (MedStock myBestand : listStocks) {
                 if (myBestand.isNew()) {
@@ -257,7 +269,7 @@ public class MedInventoryTools {
      */
     public static MedStock getCurrentOpened(MedInventory inventory) {
         MedStock stock = null;
-        java.util.List<MedStock> listStocks = MedStockTools.getAll(inventory);
+        java.util.List<MedStock> listStocks = inventory.getMedStocks();
         if (!listStocks.isEmpty()) {
             for (MedStock mystock : listStocks) {
                 if (mystock.isOpened()) {
@@ -333,7 +345,7 @@ public class MedInventoryTools {
             em.lock(myInventory, LockModeType.OPTIMISTIC);
 
             // close all stocks
-            for (MedStock stock : MedStockTools.getAll(inventory)) {
+            for (MedStock stock : inventory.getMedStocks()) {
                 if (!stock.isClosed()) {
                     MedStock mystock = em.merge(stock);
                     em.lock(mystock, LockModeType.OPTIMISTIC);
