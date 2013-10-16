@@ -1,78 +1,39 @@
-/*
- * Created by JFormDesigner on Tue Oct 15 16:17:33 CEST 2013
- */
-
 package op.roster;
 
-import java.awt.*;
-import javax.swing.*;
-import com.jgoodies.forms.factories.*;
-import com.jgoodies.forms.layout.*;
-import entity.roster.Rplan;
 import entity.roster.Workinglog;
+import entity.roster.WorkinglogTools;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.joda.time.LocalDate;
 
+import javax.swing.*;
+import java.util.ArrayList;
+
 /**
- * @author Torsten Löhr
+ * Created with IntelliJ IDEA.
+ * User: tloehr
+ * Date: 16.10.13
+ * Time: 15:55
+ * To change this template use File | Settings | File Templates.
  */
 public class PnlWorkingLogSingleDay extends JPanel {
+    private JList listLogs;
     private LocalDate day;
-    private Workinglog workinglog;
+//    private ArrayList<Workinglog> lstLogs;
 
-    public PnlWorkingLogSingleDay(Workinglog workinglog) {
-        this.workinglog = workinglog;
-        day = new LocalDate(workinglog.getRplan().getStart());
-
-        initComponents();
+    public PnlWorkingLogSingleDay(LocalDate day) {
+        super();
+        this.day = day;
         initPanel();
     }
 
-    void initPanel(){
-        lblDay.setText(day.toString("EE dd."));
-        lblPlan.setText(workinglog.getRplan().getEffectiveP());
-        txtActual.setText(workinglog.getActual());
-        txtAdditionalHours.setText(workinglog.getAdditional().toString());
-        txtAdditionalText.setText(workinglog.getText());
+    void initPanel() {
+//        lstLogs = WorkinglogTools.getAll(day, day);
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        listLogs = new JList(SYSTools.list2dlm(WorkinglogTools.getAll(day, day)));
+        JScrollPane scrl = new JScrollPane();
+        scrl.setViewportView(listLogs);
+        add(scrl);
+        add(new JButton(SYSConst.icon22add));
     }
-
-    private void initComponents() {
-        // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
-        lblDay = new JLabel();
-        lblPlan = new JLabel();
-        txtActual = new JTextField();
-        txtAdditionalHours = new JTextField();
-        txtAdditionalText = new JTextField();
-        lblHourSum = new JLabel();
-
-        //======== this ========
-        setLayout(new FormLayout(
-            "default:grow",
-            "5*(default, $lgap), default"));
-
-        //---- lblDay ----
-        lblDay.setText("text");
-        lblDay.setFont(new Font("Arial", Font.BOLD, 14));
-        add(lblDay, CC.xy(1, 1));
-
-        //---- lblPlan ----
-        lblPlan.setText("text");
-        add(lblPlan, CC.xy(1, 3));
-        add(txtActual, CC.xy(1, 5));
-        add(txtAdditionalHours, CC.xy(1, 7));
-        add(txtAdditionalText, CC.xy(1, 9));
-
-        //---- lblHourSum ----
-        lblHourSum.setText("text");
-        add(lblHourSum, CC.xy(1, 11));
-        // JFormDesigner - End of component initialization  //GEN-END:initComponents
-    }
-
-    // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-    private JLabel lblDay;
-    private JLabel lblPlan;
-    private JTextField txtActual;
-    private JTextField txtAdditionalHours;
-    private JTextField txtAdditionalText;
-    private JLabel lblHourSum;
-    // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

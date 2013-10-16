@@ -8,6 +8,7 @@ import entity.StationTools;
 import entity.system.Users;
 import entity.system.UsersTools;
 import op.OPDE;
+import op.roster.PnlWorkingLogWholeMonth;
 import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -832,6 +833,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         });
         menu.add(itemRemoveBlock);
 
+
 //        // SELECT
 //        JMenuItem itemPopupShow = new JMenuItem(OPDE.lang.getString("misc.commands.show"), SYSConst.icon22magnify1);
 //        itemPopupShow.addActionListener(new java.awt.event.ActionListener() {
@@ -851,6 +853,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         OPDE.debug(rowIndex);
         OPDE.debug(columnIndex);
 
+        final Users user = userlist.get(rowIndex/4).getFirst();
 
         JMenu menuUserOperations = new JMenu("opde.roster.useroperations");
         JMenuItem itemClearUsers = new JMenuItem("opde.roster.clear.users", SYSConst.icon22empty);
@@ -890,6 +893,18 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             }
         });
         menuUserOperations.add(itemSortHomeExamName);
+
+        JMenuItem itemEditWLog = new JMenuItem("opde.roster.edit.workinglog", SYSConst.icon22edit);
+        itemEditWLog.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                JFrame frm = new JFrame("test");
+                frm.setContentPane(new PnlWorkingLogWholeMonth(new LocalDate(), user));
+                frm.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+                frm.setVisible(true);
+            }
+        });
+        itemEditWLog.setEnabled(user != null);
+        menuUserOperations.add(itemEditWLog);
 
 
         menu.add(menuUserOperations);

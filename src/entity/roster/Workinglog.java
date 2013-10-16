@@ -6,6 +6,7 @@ import op.OPDE;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,25 +21,30 @@ public class Workinglog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private long id;
+    @Basic(optional = false)
+    @Column(name = "pit")
+    @Temporal(TemporalType.DATE)
+    private Date pit;
     @Column(name = "actual", nullable = true, insertable = true, updatable = true, length = 20, precision = 0)
     @Basic
     private String actual;
-    @Column(name = "additional", nullable = false, insertable = true, updatable = true, length = 9, precision = 4)
+    @Column(name = "hours", nullable = false, insertable = true, updatable = true, length = 9, precision = 4)
     @Basic
-    private BigDecimal additional;
-    @Column(name = "text", nullable = true, insertable = true, updatable = true, length = 200, precision = 0)
+    private BigDecimal hours;
+    @Column(name = "text", nullable = true, insertable = true, updatable = true, length = 400, precision = 0)
     @Basic
     private String text;
     @Column(name = "version", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
     @Version
     private long version;
+
     // ---
     @JoinColumn(name = "rplanid", referencedColumnName = "id")
-    @ManyToOne
+    @OneToOne
     private Rplan rplan;
-//    @JoinColumn(name = "owner", referencedColumnName = "UKennung")
-//    @ManyToOne
-//    private Users owner;
+    @JoinColumn(name = "owner", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users owner;
     @JoinColumn(name = "creator", referencedColumnName = "UKennung")
     @ManyToOne
     private Users creator;
@@ -53,12 +59,16 @@ public class Workinglog {
     public Workinglog() {
     }
 
-    public Workinglog(Rplan rplan) {
-        this.rplan = rplan;
-        this.home = rplan.getEffectiveHome();
-        this.actual = rplan.getEffectiveP();
+    public Workinglog(Homes home, Users owner, String actual, BigDecimal hours) {
+        this.home = home;
+        this.owner = owner;
+        this.actual = actual;
         this.creator = OPDE.getLogin().getUser();
-        this.additional = BigDecimal.ZERO;
+        this.hours = hours;
+    }
+
+    public Workinglog(Homes home, Users owner, BigDecimal hours) {
+        this(home, owner, null, hours);
     }
 
     public String getText() {
@@ -85,13 +95,6 @@ public class Workinglog {
         this.actual = actual;
     }
 
-    public BigDecimal getAdditional() {
-        return additional;
-    }
-
-    public void setAdditional(BigDecimal additional) {
-        this.additional = additional;
-    }
 
     public long getVersion() {
         return version;
@@ -101,13 +104,6 @@ public class Workinglog {
         this.version = version;
     }
 
-    public Rplan getRplan() {
-        return rplan;
-    }
-
-    public void setRplan(Rplan rplan) {
-        this.rplan = rplan;
-    }
 
     public Users getCreator() {
         return creator;
@@ -143,11 +139,12 @@ public class Workinglog {
         if (id != that.id) return false;
         if (version != that.version) return false;
         if (actual != null ? !actual.equals(that.actual) : that.actual != null) return false;
-        if (additional != null ? !additional.equals(that.additional) : that.additional != null) return false;
         if (controller != null ? !controller.equals(that.controller) : that.controller != null) return false;
         if (creator != null ? !creator.equals(that.creator) : that.creator != null) return false;
         if (home != null ? !home.equals(that.home) : that.home != null) return false;
-        if (rplan != null ? !rplan.equals(that.rplan) : that.rplan != null) return false;
+        if (hours != null ? !hours.equals(that.hours) : that.hours != null) return false;
+        if (owner != null ? !owner.equals(that.owner) : that.owner != null) return false;
+        if (pit != null ? !pit.equals(that.pit) : that.pit != null) return false;
         if (text != null ? !text.equals(that.text) : that.text != null) return false;
 
         return true;
@@ -156,14 +153,62 @@ public class Workinglog {
     @Override
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (pit != null ? pit.hashCode() : 0);
         result = 31 * result + (actual != null ? actual.hashCode() : 0);
-        result = 31 * result + (additional != null ? additional.hashCode() : 0);
+        result = 31 * result + (hours != null ? hours.hashCode() : 0);
         result = 31 * result + (text != null ? text.hashCode() : 0);
         result = 31 * result + (int) (version ^ (version >>> 32));
-        result = 31 * result + (rplan != null ? rplan.hashCode() : 0);
+        result = 31 * result + (owner != null ? owner.hashCode() : 0);
         result = 31 * result + (creator != null ? creator.hashCode() : 0);
         result = 31 * result + (controller != null ? controller.hashCode() : 0);
         result = 31 * result + (home != null ? home.hashCode() : 0);
         return result;
+    }
+
+    public Date getPit() {
+        return pit;
+    }
+
+    public void setPit(Date pit) {
+        this.pit = pit;
+    }
+
+
+    public BigDecimal getHours() {
+
+        return hours;
+    }
+
+    public void setHours(BigDecimal hours) {
+        this.hours = hours;
+    }
+
+    public Users getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Users owner) {
+        this.owner = owner;
+    }
+
+    public Rplan getRplan() {
+        return rplan;
+    }
+
+    public void setRplan(Rplan rplan) {
+        this.rplan = rplan;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Workinglog{" +
+                "id=" + id +
+                ", pit=" + pit +
+                ", actual='" + actual + '\'' +
+                ", hours=" + hours +
+                ", text='" + text + '\'' +
+                ", home=" + home +
+                "} " + super.toString();
     }
 }

@@ -402,6 +402,10 @@ public class FrmRoster extends JFrame {
         btnFontSize.setText(fonts[currentFontIndex].getFontName() + ", " + fonts[currentFontIndex].getSize());
     }
 
+    private void btnSortHomes2ActionPerformed(ActionEvent e) {
+
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         toolBar1 = new JToolBar();
@@ -414,8 +418,8 @@ public class FrmRoster extends JFrame {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "default, $lcgap, default:grow, $lcgap, default",
-                "default, $lgap, default:grow, 2*($lgap, default)"));
+            "default, $lcgap, default:grow, $lcgap, default",
+            "default, $lgap, default:grow, 2*($lgap, default)"));
 
         //======== toolBar1 ========
         {
@@ -436,6 +440,12 @@ public class FrmRoster extends JFrame {
 
             //---- btnSortHomes2 ----
             btnSortHomes2.setText("text");
+            btnSortHomes2.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnSortHomes2ActionPerformed(e);
+                }
+            });
             toolBar1.add(btnSortHomes2);
 
             //---- btnFontSize ----

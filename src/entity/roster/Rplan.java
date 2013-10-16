@@ -59,6 +59,9 @@ public class Rplan {
     @JoinColumn(name = "owner", referencedColumnName = "UKennung")
     @ManyToOne
     private Users owner;
+    @JoinColumn(name = "wlogid", referencedColumnName = "id")
+    @ManyToOne
+    private Workinglog workinglog;
     @JoinColumn(name = "homeid1", referencedColumnName = "EID")
     @ManyToOne
     private Homes home1;
@@ -247,9 +250,71 @@ public class Rplan {
         this.text = text;
     }
 
+
+    public Workinglog getWorkinglog() {
+        return workinglog;
+    }
+
+    public void setWorkinglog(Workinglog workinglog) {
+        this.workinglog = workinglog;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Rplan rplan = (Rplan) o;
+
+        if (id != rplan.id) return false;
+        if (type != rplan.type) return false;
+        if (version != rplan.version) return false;
+        if (basehours != null ? !basehours.equals(rplan.basehours) : rplan.basehours != null) return false;
+        if (breaktime != null ? !breaktime.equals(rplan.breaktime) : rplan.breaktime != null) return false;
+        if (end != null ? !end.equals(rplan.end) : rplan.end != null) return false;
+        if (extrahours != null ? !extrahours.equals(rplan.extrahours) : rplan.extrahours != null) return false;
+        if (home1 != null ? !home1.equals(rplan.home1) : rplan.home1 != null) return false;
+        if (home2 != null ? !home2.equals(rplan.home2) : rplan.home2 != null) return false;
+        if (home3 != null ? !home3.equals(rplan.home3) : rplan.home3 != null) return false;
+        if (owner != null ? !owner.equals(rplan.owner) : rplan.owner != null) return false;
+        if (p1 != null ? !p1.equals(rplan.p1) : rplan.p1 != null) return false;
+        if (p2 != null ? !p2.equals(rplan.p2) : rplan.p2 != null) return false;
+        if (p3 != null ? !p3.equals(rplan.p3) : rplan.p3 != null) return false;
+        if (roster != null ? !roster.equals(rplan.roster) : rplan.roster != null) return false;
+        if (start != null ? !start.equals(rplan.start) : rplan.start != null) return false;
+        if (text != null ? !text.equals(rplan.text) : rplan.text != null) return false;
+        if (workinglog != null ? !workinglog.equals(rplan.workinglog) : rplan.workinglog != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (p1 != null ? p1.hashCode() : 0);
+        result = 31 * result + (p2 != null ? p2.hashCode() : 0);
+        result = 31 * result + (p3 != null ? p3.hashCode() : 0);
+        result = 31 * result + (start != null ? start.hashCode() : 0);
+        result = 31 * result + (end != null ? end.hashCode() : 0);
+        result = 31 * result + (basehours != null ? basehours.hashCode() : 0);
+        result = 31 * result + (extrahours != null ? extrahours.hashCode() : 0);
+        result = 31 * result + (breaktime != null ? breaktime.hashCode() : 0);
+        result = 31 * result + type;
+        result = 31 * result + (text != null ? text.hashCode() : 0);
+        result = 31 * result + (owner != null ? owner.hashCode() : 0);
+        result = 31 * result + (workinglog != null ? workinglog.hashCode() : 0);
+        result = 31 * result + (home1 != null ? home1.hashCode() : 0);
+        result = 31 * result + (home2 != null ? home2.hashCode() : 0);
+        result = 31 * result + (home3 != null ? home3.hashCode() : 0);
+        result = 31 * result + (roster != null ? roster.hashCode() : 0);
+        result = 31 * result + (int) (version ^ (version >>> 32));
+        return result;
+    }
+
     public void setValuesFromSymbol(Symbol symbol, ContractsParameterSet contractsParameterSet) {
         basehours = symbol.getBaseHours();
         extrahours = symbol.getExtraHours(new LocalDate(start), contractsParameterSet);
+
         breaktime = symbol.getBreak();
         start = symbol.getStart(new LocalDate(start)).toDate();
         type = symbol.getSymbolType();
