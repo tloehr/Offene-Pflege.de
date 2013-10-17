@@ -3,10 +3,10 @@ package entity.roster;
 import entity.Homes;
 import entity.system.Users;
 import op.OPDE;
+import op.tools.SYSTools;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,15 +16,11 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-public class Workinglog {
+public class Workinglog implements Comparable<Workinglog> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private long id;
-    @Basic(optional = false)
-    @Column(name = "pit")
-    @Temporal(TemporalType.DATE)
-    private Date pit;
     @Column(name = "actual", nullable = true, insertable = true, updatable = true, length = 20, precision = 0)
     @Basic
     private String actual;
@@ -40,11 +36,8 @@ public class Workinglog {
 
     // ---
     @JoinColumn(name = "rplanid", referencedColumnName = "id")
-    @OneToOne
-    private Rplan rplan;
-    @JoinColumn(name = "owner", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users owner;
+    private Rplan rplan;
     @JoinColumn(name = "creator", referencedColumnName = "UKennung")
     @ManyToOne
     private Users creator;
@@ -54,22 +47,36 @@ public class Workinglog {
     @JoinColumn(name = "homeid", referencedColumnName = "EID")
     @ManyToOne
     private Homes home;
-
+    @JoinColumn(name = "editBy", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users editedBy;
+    @JoinColumn(name = "ReplacedBy", referencedColumnName = "id")
+    @OneToOne
+    private Workinglog replacedBy;
+    @JoinColumn(name = "ReplacementFor", referencedColumnName = "id")
+    @OneToOne
+    private Workinglog replacementFor;
 
     public Workinglog() {
     }
 
-    public Workinglog(Homes home, Users owner, String actual, BigDecimal hours) {
+    public Workinglog(Homes home, Rplan rplan, String actual, BigDecimal hours) {
         this.home = home;
-        this.owner = owner;
+        this.rplan = rplan;
         this.actual = actual;
         this.creator = OPDE.getLogin().getUser();
         this.hours = hours;
     }
 
-    public Workinglog(Homes home, Users owner, BigDecimal hours) {
-        this(home, owner, null, hours);
+    public Workinglog(Rplan rplan) {
+        this.rplan = rplan;
+        this.home = rplan.getEffectiveHome();
+        this.actual = rplan.getEffectiveP();
+        this.creator = OPDE.getLogin().getUser();
+        this.hours = rplan.getBasehours();
     }
+
+
 
     public String getText() {
         return text;
@@ -136,43 +143,27 @@ public class Workinglog {
 
         Workinglog that = (Workinglog) o;
 
-        if (id != that.id) return false;
-        if (version != that.version) return false;
-        if (actual != null ? !actual.equals(that.actual) : that.actual != null) return false;
-        if (controller != null ? !controller.equals(that.controller) : that.controller != null) return false;
-        if (creator != null ? !creator.equals(that.creator) : that.creator != null) return false;
-        if (home != null ? !home.equals(that.home) : that.home != null) return false;
-        if (hours != null ? !hours.equals(that.hours) : that.hours != null) return false;
-        if (owner != null ? !owner.equals(that.owner) : that.owner != null) return false;
-        if (pit != null ? !pit.equals(that.pit) : that.pit != null) return false;
-        if (text != null ? !text.equals(that.text) : that.text != null) return false;
 
-        return true;
+
+        return new Long(id).equals(that.getId());
     }
 
     @Override
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (pit != null ? pit.hashCode() : 0);
         result = 31 * result + (actual != null ? actual.hashCode() : 0);
         result = 31 * result + (hours != null ? hours.hashCode() : 0);
         result = 31 * result + (text != null ? text.hashCode() : 0);
         result = 31 * result + (int) (version ^ (version >>> 32));
-        result = 31 * result + (owner != null ? owner.hashCode() : 0);
+        result = 31 * result + (rplan != null ? rplan.hashCode() : 0);
         result = 31 * result + (creator != null ? creator.hashCode() : 0);
         result = 31 * result + (controller != null ? controller.hashCode() : 0);
         result = 31 * result + (home != null ? home.hashCode() : 0);
+        result = 31 * result + (editedBy != null ? editedBy.hashCode() : 0);
+        result = 31 * result + (replacedBy != null ? replacedBy.hashCode() : 0);
+        result = 31 * result + (replacementFor != null ? replacementFor.hashCode() : 0);
         return result;
     }
-
-    public Date getPit() {
-        return pit;
-    }
-
-    public void setPit(Date pit) {
-        this.pit = pit;
-    }
-
 
     public BigDecimal getHours() {
 
@@ -183,14 +174,6 @@ public class Workinglog {
         this.hours = hours;
     }
 
-    public Users getOwner() {
-        return owner;
-    }
-
-    public void setOwner(Users owner) {
-        this.owner = owner;
-    }
-
     public Rplan getRplan() {
         return rplan;
     }
@@ -199,12 +182,62 @@ public class Workinglog {
         this.rplan = rplan;
     }
 
+    public boolean isActual() {
+        return !SYSTools.catchNull(actual).isEmpty();
+    }
+
+    public Users getEditedBy() {
+        return editedBy;
+    }
+
+    public void setEditedBy(Users editedBy) {
+        this.editedBy = editedBy;
+    }
+
+    public Workinglog getReplacedBy() {
+        return replacedBy;
+    }
+
+    public void setReplacedBy(Workinglog replacedBy) {
+        this.replacedBy = replacedBy;
+    }
+
+    public Workinglog getReplacementFor() {
+        return replacementFor;
+    }
+
+    public void setReplacementFor(Workinglog replacementFor) {
+        this.replacementFor = replacementFor;
+    }
+
+    public boolean isReplaced() {
+        return replacedBy != null;
+
+    }
+
+    public boolean isReplacement() {
+        return replacementFor != null;
+    }
+
+    public boolean isDeleted() {
+        return editedBy != null && replacedBy == null && replacementFor == null;
+    }
+
+    @Override
+    public int compareTo(Workinglog o) {
+
+        int sort = SYSTools.nullCompare(getRplan(), o.getRplan()) * -1;
+        if (sort == 0) {
+            sort = new Long(id).compareTo(new Long(o.getId()));
+        }
+        return sort;
+
+    }
 
     @Override
     public String toString() {
         return "Workinglog{" +
                 "id=" + id +
-                ", pit=" + pit +
                 ", actual='" + actual + '\'' +
                 ", hours=" + hours +
                 ", text='" + text + '\'' +

@@ -148,8 +148,8 @@ public class Homes implements Serializable {
     }
 
     // todo: dummy implementation only. fix this!
-    public Character getPrefix(){
-        return shortname.charAt(0);
+    public String getPrefix(){
+        return shortname.substring(0,1);
     }
 
     @Override

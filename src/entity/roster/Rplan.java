@@ -9,6 +9,7 @@ import org.joda.time.LocalDate;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,7 +19,7 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-public class Rplan {
+public class Rplan implements Comparable<Rplan> {
     @Column(name = "id", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -59,9 +60,6 @@ public class Rplan {
     @JoinColumn(name = "owner", referencedColumnName = "UKennung")
     @ManyToOne
     private Users owner;
-    @JoinColumn(name = "wlogid", referencedColumnName = "id")
-    @ManyToOne
-    private Workinglog workinglog;
     @JoinColumn(name = "homeid1", referencedColumnName = "EID")
     @ManyToOne
     private Homes home1;
@@ -74,6 +72,8 @@ public class Rplan {
     @JoinColumn(name = "rosterid", referencedColumnName = "id")
     @ManyToOne
     private Rosters roster;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "rplan")
+    private List<Workinglog> workinglogs;
     @Column(name = "version", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
     @Version
     private long version;
@@ -251,12 +251,8 @@ public class Rplan {
     }
 
 
-    public Workinglog getWorkinglog() {
-        return workinglog;
-    }
-
-    public void setWorkinglog(Workinglog workinglog) {
-        this.workinglog = workinglog;
+    public List<Workinglog> getWorkinglogs() {
+        return workinglogs;
     }
 
     @Override
@@ -283,7 +279,6 @@ public class Rplan {
         if (roster != null ? !roster.equals(rplan.roster) : rplan.roster != null) return false;
         if (start != null ? !start.equals(rplan.start) : rplan.start != null) return false;
         if (text != null ? !text.equals(rplan.text) : rplan.text != null) return false;
-        if (workinglog != null ? !workinglog.equals(rplan.workinglog) : rplan.workinglog != null) return false;
 
         return true;
     }
@@ -302,7 +297,6 @@ public class Rplan {
         result = 31 * result + type;
         result = 31 * result + (text != null ? text.hashCode() : 0);
         result = 31 * result + (owner != null ? owner.hashCode() : 0);
-        result = 31 * result + (workinglog != null ? workinglog.hashCode() : 0);
         result = 31 * result + (home1 != null ? home1.hashCode() : 0);
         result = 31 * result + (home2 != null ? home2.hashCode() : 0);
         result = 31 * result + (home3 != null ? home3.hashCode() : 0);
@@ -320,6 +314,11 @@ public class Rplan {
         type = symbol.getSymbolType();
         DateTime end = symbol.getEnd(new LocalDate(start));
         this.end = end == null ? null : end.toDate();
+    }
+
+    @Override
+    public int compareTo(Rplan o) {
+        return getStart().compareTo(o.getStart());
     }
 
     public BigDecimal getNetValue() {

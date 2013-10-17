@@ -1,7 +1,7 @@
 package entity.roster;
 
+import entity.system.Users;
 import op.OPDE;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -43,6 +43,34 @@ public class RPlanTools {
         }
         return list;
     }
+
+    public static ArrayList<Rplan> getAll(LocalDate day, Users owner) {
+        EntityManager em = OPDE.createEM();
+        ArrayList<Rplan> list = null;
+        DateTime from = day.toDateTimeAtStartOfDay();
+        DateTime to = day.toDateTimeAtCurrentTime().hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue();
+
+        try {
+            String jpql = " SELECT rp " +
+                    " FROM Rplan rp" +
+                    " WHERE rp.owner = :owner AND rp.start >= :from AND rp.start <= :to " +
+                    " ORDER BY rp.start ASC ";
+
+            Query query = em.createQuery(jpql);
+            query.setParameter("owner", owner);
+            query.setParameter("from", from.toDate());
+            query.setParameter("to", to.toDate());
+
+            list = new ArrayList<Rplan>(query.getResultList());
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+        return list;
+    }
+
+
 
 
 }

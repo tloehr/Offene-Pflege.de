@@ -56,6 +56,17 @@ public class GUITools {
 
     }
 
+    public static JButton getTinyButton(Icon icon, ActionListener action) {
+        JButton btn = new JButton(icon);
+        if (action != null) {
+            btn.addActionListener(action);
+        }
+        btn.setPressedIcon(SYSConst.icon22Pressed);
+
+        btn.setBorder(null);
+        btn.setContentAreaFilled(false);
+        return btn;
+    }
 
     public static ByteArrayOutputStream getAsImage(JPanel pnl) throws Exception {
         BufferedImage bi = new BufferedImage(pnl.getPreferredSize().width, pnl.getPreferredSize().height, BufferedImage.TYPE_INT_ARGB);

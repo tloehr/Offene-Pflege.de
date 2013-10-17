@@ -1,11 +1,6 @@
 package entity.roster;
 
-import op.OPDE;
-import org.joda.time.LocalDate;
-
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-import java.util.ArrayList;
+import op.tools.SYSTools;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,34 +11,16 @@ import java.util.ArrayList;
  */
 public class WorkinglogTools {
 
-    public static ArrayList<Workinglog> getAll(LocalDate from, LocalDate to) {
-        EntityManager em = OPDE.createEM();
-        ArrayList<Workinglog> list = null;
-
-        try {
-            String jpql = " SELECT wl " +
-                    " FROM Workinglog wl" +
-                    " WHERE wl.pit >= :from AND wl.pit <= :to " +
-                    " ORDER BY wl.pit ASC ";
-
-            Query query = em.createQuery(jpql);
-            query.setParameter("from", from.toDate());
-            query.setParameter("to", to.toDate());
-
-            list = new ArrayList<Workinglog>(query.getResultList());
-        } catch (Exception se) {
-            OPDE.fatal(se);
-        } finally {
-            em.close();
+    public static String toPrettyString(Workinglog workinglog) {
+        String text = "";
+        if (workinglog.isActual()) {
+            text = workinglog.getActual() + ": " + workinglog.getHours();
+        } else {
+            text = workinglog.getText() + ": " + workinglog.getHours();
         }
-        return list;
+
+        return text;
     }
 
-    public static ArrayList<Workinglog> getAll(LocalDate month) {
-        //        DateTime from = month.dayOfMonth().withMinimumValue().toDateTimeAtStartOfDay();
-        //        DateTime to = month.dayOfMonth().withMaximumValue().toDateTimeAtCurrentTime().hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue();
 
-        return getAll(month.dayOfMonth().withMinimumValue(), month.dayOfMonth().withMaximumValue());
-
-    }
 }

@@ -1,13 +1,25 @@
 package op.roster;
 
+import com.jidesoft.swing.StyledLabel;
+import com.jidesoft.swing.StyledLabelBuilder;
+import entity.roster.Rplan;
 import entity.roster.Workinglog;
 import entity.roster.WorkinglogTools;
+import op.OPDE;
+import op.threads.DisplayManager;
+import op.tools.GUITools;
 import op.tools.SYSConst;
-import op.tools.SYSTools;
-import org.joda.time.LocalDate;
+import org.jdesktop.swingx.VerticalLayout;
 
+import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
+import javax.persistence.OptimisticLockException;
 import javax.swing.*;
-import java.util.ArrayList;
+import javax.swing.border.LineBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.DateFormat;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,23 +29,150 @@ import java.util.ArrayList;
  * To change this template use File | Settings | File Templates.
  */
 public class PnlWorkingLogSingleDay extends JPanel {
-    private JList listLogs;
-    private LocalDate day;
-//    private ArrayList<Workinglog> lstLogs;
+    //    private JList listLogs;
+    JScrollPane scrl;
+    JButton apply, add;
+    private Rplan rplan;
+    private Workinglog actual;
+    JPanel pnlList;
 
-    public PnlWorkingLogSingleDay(LocalDate day) {
+
+    public PnlWorkingLogSingleDay(Rplan rplan) {
         super();
-        this.day = day;
+        this.rplan = rplan;
+
+        scrl = new JScrollPane();
+        setBorder(new LineBorder(Color.DARK_GRAY, 2));
+
+//        lstPlans = RPlanTools.getAll(day, user);
         initPanel();
     }
 
     void initPanel() {
-//        lstLogs = WorkinglogTools.getAll(day, day);
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-        listLogs = new JList(SYSTools.list2dlm(WorkinglogTools.getAll(day, day)));
-        JScrollPane scrl = new JScrollPane();
-        scrl.setViewportView(listLogs);
-        add(scrl);
-        add(new JButton(SYSConst.icon22add));
+
+        setLayout(new BorderLayout());
+
+        apply = GUITools.getTinyButton(SYSConst.icon22apply, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                EntityManager em = OPDE.createEM();
+                try {
+                    em.getTransaction().begin();
+                    Rplan myRplan = em.merge(rplan);
+                    em.lock(myRplan, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                    Workinglog myWorkinglog = em.merge(new Workinglog(myRplan));
+                    myRplan.getWorkinglogs().add(myWorkinglog);
+                    em.getTransaction().commit();
+                    rplan = myRplan;
+                } catch (OptimisticLockException ole) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                } catch (Exception ex) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.fatal(ex);
+                } finally {
+                    em.close();
+                    updateList();
+                }
+
+            }
+        });
+        add = GUITools.getTinyButton(SYSConst.icon22add, null);
+
+        pnlList = new JPanel();
+        pnlList.setLayout(new VerticalLayout());
+        scrl.setViewportView(pnlList);
+        updateList();
+
+        JPanel pnlHeader = new JPanel();
+        pnlHeader.setLayout(new BorderLayout());
+
+        StyledLabel lblDate = StyledLabelBuilder.createStyledLabel(DateFormat.getDateInstance(DateFormat.SHORT).format(rplan.getStart()) + " {" + rplan.getEffectiveHome().getPrefix() + "." + rplan.getEffectiveP() + ":bold}");
+        lblDate.setAlignmentX(CENTER_ALIGNMENT);
+        JPanel pnlSurroundDate = new JPanel();
+        pnlSurroundDate.setLayout(new BoxLayout(pnlSurroundDate, BoxLayout.LINE_AXIS));
+        pnlSurroundDate.add(lblDate);
+        pnlHeader.add(pnlSurroundDate, BorderLayout.CENTER);
+
+        JPanel pnlButton = new JPanel();
+        pnlButton.setLayout(new BoxLayout(pnlButton, BoxLayout.LINE_AXIS));
+        pnlButton.add(apply);
+        pnlButton.add(add);
+        pnlHeader.add(pnlButton, BorderLayout.EAST);
+
+        add(pnlHeader, BorderLayout.NORTH);
+        add(scrl, BorderLayout.CENTER);
+
+    }
+
+    JPanel getLine(final Workinglog workinglog) {
+        JPanel pnlLine = new JPanel();
+        pnlLine.setLayout(new BorderLayout());
+
+        JPanel pnlButton = new JPanel();
+        pnlButton.setLayout(new BoxLayout(pnlButton, BoxLayout.LINE_AXIS));
+        pnlButton.add(GUITools.getTinyButton(SYSConst.icon22delete, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                EntityManager em = OPDE.createEM();
+                try {
+                    em.getTransaction().begin();
+                    Rplan myRplan = em.merge(rplan);
+                    em.lock(myRplan, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                    Workinglog myWorkinglog = em.merge(workinglog);
+                    em.remove(myWorkinglog);
+                    myRplan.getWorkinglogs().remove(workinglog);
+                    em.getTransaction().commit();
+                    rplan = myRplan;
+                } catch (OptimisticLockException ole) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                } catch (Exception ex) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.fatal(ex);
+                } finally {
+                    em.close();
+                    updateList();
+                }
+
+            }
+        }));
+
+        pnlLine.add(new JLabel(WorkinglogTools.toPrettyString(workinglog)), BorderLayout.CENTER);
+        pnlLine.add(pnlButton, BorderLayout.EAST);
+
+        pnlLine.setAlignmentY(TOP_ALIGNMENT);
+
+        return pnlLine;
+    }
+
+    void updateList() {
+        pnlList.removeAll();
+
+        if (!rplan.getWorkinglogs().isEmpty()) {
+            pnlList.setBackground(Color.WHITE);
+        }
+        pnlList.setOpaque(!rplan.getWorkinglogs().isEmpty());
+
+        actual = null;
+        for (Workinglog workinglog : rplan.getWorkinglogs()) {
+            if (workinglog.isActual()) {
+                actual = workinglog;
+            }
+            if (!workinglog.isDeleted() && !workinglog.isReplaced()) {
+                pnlList.add(getLine(workinglog));
+            }
+        }
+        apply.setEnabled(actual == null);
+        scrl.validate();
+        scrl.repaint();
     }
 }

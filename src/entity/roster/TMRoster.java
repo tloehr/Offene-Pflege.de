@@ -2,6 +2,7 @@ package entity.roster;
 
 import com.jidesoft.converter.ConverterContext;
 import com.jidesoft.grid.*;
+import com.jidesoft.popup.JidePopup;
 import entity.Homes;
 import entity.HomesTools;
 import entity.StationTools;
@@ -9,6 +10,7 @@ import entity.system.Users;
 import entity.system.UsersTools;
 import op.OPDE;
 import op.roster.PnlWorkingLogWholeMonth;
+import op.tools.GUITools;
 import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -78,7 +80,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     private Font font;
     // contains all users which are show on the table. not necessarily all users who own rplans.
     ArrayList<Pair<Users, Homes>> userlist;
-    HashMap<Character, Homes> prefixMap;
+    HashMap<String, Homes> prefixMap;
 
     // ALL rplans for this roster. iteration over the keyset of this map will return ALL users who own rplanss.
     HashMap<Users, ArrayList<Rplan>> content;
@@ -110,7 +112,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
         content = new HashMap<Users, ArrayList<Rplan>>();
         contracts = UsersTools.getUsersWithValidContractsIn(month);
-        prefixMap = new HashMap<Character, Homes>();
+        prefixMap = new HashMap<String, Homes>();
         statsPerUser = new HashMap<Users, StatsPerUser>();
         userlist = new ArrayList<Pair<Users, Homes>>();
         rosterParameters = RostersTools.getParameters(roster);
@@ -362,7 +364,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             }
 
             DateTime start = new DateTime(rplan.getStart());
-            content.get(user).add(start.getDayOfMonth() - 1, rplan);
+            content.get(user).set(start.getDayOfMonth() - 1, rplan);
 
         }
 
@@ -845,7 +847,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         return menu;
     }
 
-    public JPopupMenu getRowHeaderContextMenuAt(final int rowIndex, final int columnIndex) {
+    public JPopupMenu getRowHeaderContextMenuAt(final int rowIndex, final int columnIndex, final Component owner) {
         if (readOnly) return null;
 
         JPopupMenu menu = new JPopupMenu();
@@ -853,7 +855,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         OPDE.debug(rowIndex);
         OPDE.debug(columnIndex);
 
-        final Users user = userlist.get(rowIndex/4).getFirst();
+        final Users user = userlist.get(rowIndex / 4).getFirst();
 
         JMenu menuUserOperations = new JMenu("opde.roster.useroperations");
         JMenuItem itemClearUsers = new JMenuItem("opde.roster.clear.users", SYSConst.icon22empty);
@@ -897,13 +899,23 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         JMenuItem itemEditWLog = new JMenuItem("opde.roster.edit.workinglog", SYSConst.icon22edit);
         itemEditWLog.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                JFrame frm = new JFrame("test");
-                frm.setContentPane(new PnlWorkingLogWholeMonth(new LocalDate(), user));
-                frm.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-                frm.setVisible(true);
+
+                JidePopup popup = new JidePopup();
+
+                popup.setMovable(false);
+                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                popup.setOwner(owner);
+                popup.removeExcludedComponent(owner);
+                popup.getContentPane().add(new PnlWorkingLogWholeMonth(content.get(user)));
+                popup.setPreferredPopupSize(new Dimension(1100, 600));
+
+
+
+                GUITools.showPopup(popup, SwingConstants.CENTER);
+
             }
         });
-        itemEditWLog.setEnabled(user != null);
+        itemEditWLog.setEnabled(user != null && !content.get(user).isEmpty());
         menuUserOperations.add(itemEditWLog);
 
 

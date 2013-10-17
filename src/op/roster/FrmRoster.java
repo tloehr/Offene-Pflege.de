@@ -502,6 +502,7 @@ public class FrmRoster extends JFrame {
         table.setRowSelectionInterval(row, row);
         table.setColumnSelectionInterval(col, col);
 
+
 //        if (singleRowSelected) {
 //            lsm.setSelectionInterval(row, row);
 //        }
@@ -520,7 +521,7 @@ public class FrmRoster extends JFrame {
         if (table.equals(tsp1.getRowHeaderTable())) {
             if (SwingUtilities.isRightMouseButton(evt)) {
                 SYSTools.unregisterListeners(menu);
-                menu = tmRoster.getRowHeaderContextMenuAt(row, col);
+                menu = tmRoster.getRowHeaderContextMenuAt(row, col, this);
 
                 if (menu != null) {
                     menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
