@@ -251,6 +251,7 @@ public class MedInventoryTools {
 
     public static MedStock getNextToOpen(MedInventory inventory) {
         MedStock bestand = null;
+        if (inventory == null) return null;
         java.util.List<MedStock> listStocks = inventory.getMedStocks();
         if (inventory != null && !listStocks.isEmpty()) {
             for (MedStock myBestand : listStocks) {
