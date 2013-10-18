@@ -3,7 +3,7 @@ package entity.roster;
 import op.OPDE;
 import op.tools.SYSCalendar;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
+import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
@@ -131,8 +131,11 @@ public class Symbol {
     }
 
     public boolean isAllowed(LocalDate dm) {
-        //todo: holidays
-        return allowedDays.isEmpty() || allowedDays.contains(dm.getDayOfWeek());
+
+        boolean weekdayAllowed = allowedDays.isEmpty() || allowedDays.contains(dm.getDayOfWeek());
+        boolean holidayAllowed = allowedDays.isEmpty() || allowedDays.contains(HOLIDAY) || !OPDE.isHoliday(dm);
+
+        return weekdayAllowed && holidayAllowed;
     }
 
     public int getSymbolType() {
@@ -279,5 +282,39 @@ public class Symbol {
 
     public void setSection(int section) {
         this.section = section;
+    }
+
+    public BigDecimal getSunHolidayHours(LocalDate day) {
+        if (end == null) return BigDecimal.ZERO;
+
+    }
+
+    public BigDecimal getHolidayHours(LocalDate day) {
+        if (end == null) return BigDecimal.ZERO;
+
+        DateTime nightStart = day.toDateTime(contractsParameterSet.getNight().getFirst());
+        DateTime nightEnd = day.toDateTime(contractsParameterSet.getNight().getSecond());
+        if (nightEnd.isBefore(nightStart)) nightEnd = nightEnd.plusDays(1);
+
+        Interval nightInterval = new Interval(nightStart, nightEnd);
+        Interval shiftInterval = new Interval(getStart(day), getEnd(day));
+
+        return SYSCalendar.getDecimalHours(nightInterval.overlap(shiftInterval).getStart(), nightInterval.overlap(shiftInterval).getEnd());
+        return BigDecimal.ZERO;
+    }
+
+    public BigDecimal getNightHours(LocalDate day, ContractsParameterSet contractsParameterSet) {
+
+        if (end == null) return BigDecimal.ZERO;
+
+        DateTime nightStart = day.toDateTime(contractsParameterSet.getNight().getFirst());
+        DateTime nightEnd = day.toDateTime(contractsParameterSet.getNight().getSecond());
+        if (nightEnd.isBefore(nightStart)) nightEnd = nightEnd.plusDays(1);
+
+
+        Interval nightInterval = new Interval(nightStart, nightEnd);
+        Interval shiftInterval = new Interval(getStart(day), getEnd(day));
+
+        return SYSCalendar.getDecimalHours(nightInterval.overlap(shiftInterval).getStart(), nightInterval.overlap(shiftInterval).getEnd());
     }
 }

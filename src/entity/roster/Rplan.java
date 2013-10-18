@@ -322,12 +322,10 @@ public class Rplan implements Comparable<Rplan> {
     }
 
     public BigDecimal getNetValue() {
-        return basehours.add(extrahours).subtract(breaktime);
+        return basehours.subtract(breaktime);
     }
 
-    public BigDecimal getGrossValue() {
-        return basehours.add(extrahours);
-    }
+
 
 
 }

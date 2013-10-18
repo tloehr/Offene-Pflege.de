@@ -482,6 +482,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 //                }
 
                 myRplan.setValuesFromSymbol(symbol, contracts.get(user).getParameterSet(getDay(columnIndex)));
+                OPDE.debug(symbol.getNightHours(getDay(columnIndex), contracts.get(user).getParameterSet(getDay(columnIndex))));
+
 
 //                int type = symbol.getSection() == RosterXML.SOCIAL ? HomeStats.SOCIAL : (exam ? HomeStats.EXAM : HomeStats.HELPER);
 //

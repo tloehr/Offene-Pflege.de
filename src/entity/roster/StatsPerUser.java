@@ -12,6 +12,7 @@ public class StatsPerUser {
     private BigDecimal hours_sum;
     private BigDecimal sick_sum;
     private BigDecimal holiday_sum;
+    private BigDecimal extrahours_sum;
 
     public StatsPerUser(BigDecimal hours_carry, BigDecimal sick_carry, BigDecimal holiday_carry, RosterParameters rosterParameters) {
         this.hours_carry = hours_carry;
@@ -21,16 +22,21 @@ public class StatsPerUser {
         this.hours_sum = hours_carry;
         this.sick_sum = sick_carry;
         this.holiday_sum = holiday_carry;
+        this.extrahours_sum = BigDecimal.ZERO;
     }
+
+
 
     public void update(ArrayList<Rplan> data) {
         BigDecimal sumHours = hours_carry;
         BigDecimal sumSick = sick_carry;
         BigDecimal sumHol = holiday_carry;
+        BigDecimal sumExtra = BigDecimal.ZERO;
 
         for (Rplan rplan : data) {
             if (rplan != null) {
                 sumHours = sumHours.add(rplan.getNetValue());
+                sumExtra = sumExtra.add(rplan.getExtrahours());
                 if (rosterParameters.getSymbol(rplan.getEffectiveP()).getSymbolType() == Symbol.ONLEAVE) {
                     sumHol = sumHol.subtract(BigDecimal.ONE);
                 }
@@ -43,6 +49,8 @@ public class StatsPerUser {
         hours_sum = sumHours;
         sick_sum = sumSick;
         holiday_sum = sumHol;
+        extrahours_sum = sumExtra;
+
     }
 
     public BigDecimal getHoursSum() {
@@ -68,4 +76,8 @@ public class StatsPerUser {
     public BigDecimal getHolidayCarry() {
         return holiday_carry;
     }
+
+    public BigDecimal getExtraHoursSum() {
+            return extrahours_sum;
+        }
 }
