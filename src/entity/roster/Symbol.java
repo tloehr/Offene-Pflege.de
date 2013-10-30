@@ -188,7 +188,7 @@ public class Symbol {
         return SYSCalendar.getDecimalHours(getStart(today), getEnd(today));
     }
 
-    private BigDecimal getExtraHoursA(LocalDate day, ContractsParameterSet contractsParameterSet) {
+    private BigDecimal  getExtraHoursA(LocalDate day, ContractsParameterSet contractsParameterSet) {
         if (OPDE.isHoliday(day)) {
             return contractsParameterSet.getDayValue();
         } else {
@@ -284,6 +284,11 @@ public class Symbol {
         this.section = section;
     }
 
+    /**
+     * returns the extra hours for working on a sunday or a holliday.
+     * @param day
+     * @return
+     */
     public BigDecimal getSunHolidayHours(LocalDate day) {
         if (end == null) return BigDecimal.ZERO;
 
