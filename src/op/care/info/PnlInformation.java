@@ -74,6 +74,7 @@ public class PnlInformation extends NursingRecordsPanel {
     private Map<ResInfo, PnlEditResInfo> mapInfo2Editor;
     private Map<String, CollapsiblePane> mapKey2CP;
     private Map<Integer, ResInfoType> mapEquiv2Type;
+    private Map<String, CollapsiblePaneAdapter> cpListener;
 
 
     public PnlInformation(Resident resident, JScrollPane jspSearch, PnlCare pnlCare) {
@@ -87,6 +88,7 @@ public class PnlInformation extends NursingRecordsPanel {
     public void initPanel() {
         cpsAll = new CollapsiblePanes();
         jspMain.setViewportView(cpsAll);
+        cpListener = Collections.synchronizedMap(new HashMap<String, CollapsiblePaneAdapter>());
         mapCat2Type = Collections.synchronizedMap(new HashMap<ResInfoCategory, ArrayList<ResInfoType>>());
         mapType2ResInfos = Collections.synchronizedMap(new HashMap<ResInfoType, ArrayList<ResInfo>>());
         listAllInfos = Collections.synchronizedList(new ArrayList<ResInfo>());
@@ -190,12 +192,13 @@ public class PnlInformation extends NursingRecordsPanel {
 
                             final String keyResInfoCat = cat.getID() + ".resinfocat";
                             if (!mapKey2CP.containsKey(keyResInfoCat)) {
-
                                 synchronized (mapKey2CP) {
                                     mapKey2CP.put(keyResInfoCat, new CollapsiblePane());
                                 }
                                 mapKey2CP.get(keyResInfoCat).setStyle(CollapsiblePane.TREE_STYLE);
-                                mapKey2CP.get(keyResInfoCat).addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+
+
+                                CollapsiblePaneAdapter adapter = new CollapsiblePaneAdapter() {
                                     @Override
                                     public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
                                         SYSPropsTools.storeProp(keyResInfoCat + ".expanded", "true", OPDE.getLogin().getUser());
@@ -205,7 +208,16 @@ public class PnlInformation extends NursingRecordsPanel {
                                     public void paneCollapsed(CollapsiblePaneEvent collapsiblePaneEvent) {
                                         SYSPropsTools.storeProp(keyResInfoCat + ".expanded", "false", OPDE.getLogin().getUser());
                                     }
-                                });
+                                };
+                                synchronized (cpListener) {
+                                    if (cpListener.containsKey(keyResInfoCat)) {
+                                        mapKey2CP.get(keyResInfoCat).removeCollapsiblePaneListener(cpListener.get(keyResInfoCat));
+                                    }
+                                    cpListener.put(keyResInfoCat, adapter);
+                                }
+
+                                mapKey2CP.get(keyResInfoCat).addCollapsiblePaneListener(adapter);
+
                                 try {
                                     mapKey2CP.get(keyResInfoCat).setCollapsed(!SYSPropsTools.isBooleanTrue(keyResInfoCat + ".expanded"));
                                 } catch (PropertyVetoException e) {
@@ -336,7 +348,8 @@ public class PnlInformation extends NursingRecordsPanel {
                                         mapKey2CP.put(keyResInfoType, new CollapsiblePane());
                                     }
                                     mapKey2CP.get(keyResInfoType).setStyle(CollapsiblePane.TREE_STYLE);
-                                    mapKey2CP.get(keyResInfoType).addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+
+                                    CollapsiblePaneAdapter adapter = new CollapsiblePaneAdapter() {
                                         @Override
                                         public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
                                             SYSPropsTools.storeProp(keyResInfoType + ".expanded", "true", OPDE.getLogin().getUser());
@@ -346,7 +359,16 @@ public class PnlInformation extends NursingRecordsPanel {
                                         public void paneCollapsed(CollapsiblePaneEvent collapsiblePaneEvent) {
                                             SYSPropsTools.storeProp(keyResInfoType + ".expanded", "false", OPDE.getLogin().getUser());
                                         }
-                                    });
+                                    };
+
+                                    synchronized (cpListener) {
+                                        if (cpListener.containsKey(keyResInfoType)) {
+                                            mapKey2CP.get(keyResInfoType).removeCollapsiblePaneListener(cpListener.get(keyResInfoType));
+                                        }
+                                        cpListener.put(keyResInfoType, adapter);
+                                    }
+                                    mapKey2CP.get(keyResInfoType).addCollapsiblePaneListener(adapter);
+
                                     try {
                                         mapKey2CP.get(keyResInfoType).setCollapsed(!SYSPropsTools.isBooleanTrue(keyResInfoType + ".expanded"));
                                     } catch (PropertyVetoException e) {
@@ -1143,7 +1165,7 @@ public class PnlInformation extends NursingRecordsPanel {
         btnMenu.setEnabled(btnMenuEnabled);
 
 
-        cpInfo.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+        CollapsiblePaneAdapter adapter = new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
                 if (resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_ABSENCE || resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_STAY || resInfo.getResInfoType().getType() == ResInfoTypeTools.TYPE_DIAGNOSIS) {
@@ -1160,7 +1182,16 @@ public class PnlInformation extends NursingRecordsPanel {
                 }
 
             }
-        });
+        };
+
+
+        synchronized (cpListener) {
+            if (cpListener.containsKey(keyResInfo)) {
+                mapKey2CP.get(keyResInfo).removeCollapsiblePaneListener(cpListener.get(keyResInfo));
+            }
+            cpListener.put(keyResInfo, adapter);
+            mapKey2CP.get(keyResInfo).addCollapsiblePaneListener(adapter);
+        }
 
         cpInfo.setTitleLabelComponent(cptitle.getMain());
         try {
@@ -1206,6 +1237,11 @@ public class PnlInformation extends NursingRecordsPanel {
         synchronized (mapEquiv2Type) {
             mapEquiv2Type.clear();
         }
+
+        synchronized (cpListener) {
+            cpListener.clear();
+        }
+
     }
 
     @Override

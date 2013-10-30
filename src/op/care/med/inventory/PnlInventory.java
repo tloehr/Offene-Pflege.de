@@ -102,6 +102,7 @@ public class PnlInventory extends NursingRecordsPanel {
     private java.util.List<MedInventory> lstInventories;
     private Map<String, CollapsiblePane> cpMap;
     private Map<String, JToggleButton> mapKey2ClosedToggleButton;
+    private Map<String, CollapsiblePaneAdapter> cpListener;
 //    private Map<MedStockTransaction, JPanel> linemap;
 
     private JScrollPane jspSearch;
@@ -123,8 +124,10 @@ public class PnlInventory extends NursingRecordsPanel {
 
     private void initPanel() {
         cpMap = Collections.synchronizedMap(new HashMap<String, CollapsiblePane>());
+        cpListener = Collections.synchronizedMap(new HashMap<String, CollapsiblePaneAdapter>());
         lstInventories = Collections.synchronizedList(new ArrayList<MedInventory>());
-//        lstInventories = Collections.synchronizedList(new ArrayList<MedInventory>());
+
+
         mapKey2ClosedToggleButton = Collections.synchronizedMap(new HashMap<String, JToggleButton>());
         color1 = SYSConst.yellow1;
         color2 = SYSConst.greyscale;
@@ -159,9 +162,9 @@ public class PnlInventory extends NursingRecordsPanel {
         synchronized (mapKey2ClosedToggleButton) {
             SYSTools.clear(mapKey2ClosedToggleButton);
         }
-//        synchronized (linemap) {
-//            SYSTools.clear(linemap);
-//        }
+        synchronized (cpListener) {
+            SYSTools.clear(cpListener);
+        }
     }
 
 
@@ -566,12 +569,19 @@ public class PnlInventory extends NursingRecordsPanel {
             cptitle.getRight().add(tbClosedStock);
 
 
-            cpMap.get(key).addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+            CollapsiblePaneAdapter adapter = new CollapsiblePaneAdapter() {
                 @Override
                 public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
                     cpMap.get(key).setContentPane(createContentPanel4(inventory, tbClosedStock.isSelected()));
                 }
-            });
+            };
+            synchronized (cpListener) {
+                if (cpListener.containsKey(key)) {
+                    cpMap.get(key).removeCollapsiblePaneListener(cpListener.get(key));
+                }
+                cpListener.put(key, adapter);
+                cpMap.get(key).addCollapsiblePaneListener(adapter);
+            }
 
             if (!cpMap.get(key).isCollapsed()) {
                 cpMap.get(key).setContentPane(createContentPanel4(inventory, tbClosedStock.isSelected()));
@@ -719,20 +729,21 @@ public class PnlInventory extends NursingRecordsPanel {
             });
             cptitle.getRight().add(btnMenu);
 
-            /***
-             *                                 _ _      _            _                 _                      _
-             *      _   _ ___  ___ _ __    ___| (_) ___| | _____  __| |   ___  _ __   (_)_ ____   _____ _ __ | |_ ___  _ __ _   _
-             *     | | | / __|/ _ \ '__|  / __| | |/ __| |/ / _ \/ _` |  / _ \| '_ \  | | '_ \ \ / / _ \ '_ \| __/ _ \| '__| | | |
-             *     | |_| \__ \  __/ |    | (__| | | (__|   <  __/ (_| | | (_) | | | | | | | | \ V /  __/ | | | || (_) | |  | |_| |
-             *      \__,_|___/\___|_|     \___|_|_|\___|_|\_\___|\__,_|  \___/|_| |_| |_|_| |_|\_/ \___|_| |_|\__\___/|_|   \__, |
-             *                                                                                                              |___/
-             */
-            cpMap.get(key).addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+
+            CollapsiblePaneAdapter adapter = new CollapsiblePaneAdapter() {
                 @Override
                 public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
                     cpMap.get(key).setContentPane(createContentPanel4(stock));
                 }
-            });
+            };
+            synchronized (cpListener) {
+                if (cpListener.containsKey(key)) {
+                    cpMap.get(key).removeCollapsiblePaneListener(cpListener.get(key));
+                }
+                cpListener.put(key, adapter);
+                cpMap.get(key).addCollapsiblePaneListener(adapter);
+            }
+
 
             if (!cpMap.get(key).isCollapsed()) {
                 JPanel contentPane = createContentPanel4(stock);
@@ -741,7 +752,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
             cpMap.get(key).setHorizontalAlignment(SwingConstants.LEADING);
             cpMap.get(key).setOpaque(false);
-          cpMap.get(key).setBackground(getColor(SYSConst.light3, lstInventories.indexOf(stock.getInventory()) % 2 != 0));
+            cpMap.get(key).setBackground(getColor(SYSConst.light3, lstInventories.indexOf(stock.getInventory()) % 2 != 0));
 
 
             return cpMap.get(key);

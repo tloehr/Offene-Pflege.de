@@ -353,4 +353,8 @@ public class MedStock implements Serializable, Comparable<MedStock> {
     public String toString() {
         return "MedStock{bestID=" + id + '}';
     }
+
+    public Long getVersion() {
+        return version;
+    }
 }
