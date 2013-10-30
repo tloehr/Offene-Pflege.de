@@ -475,12 +475,12 @@ public class TXEAF {
     public static final String PSYCH_FAECAL = "Formular1[0].#subform[0].Optionsfeldliste[12]";
     public static final String PSYCH_FEAR = "Formular1[0].#subform[0].Optionsfeldliste[6]";
     public static final String PSYCH_FEARTEXT = "Formular1[0].#subform[0].DropdownListe2[0]";
-    public static final String PSYCH_GAMBLING = "Formular1[0].#subform[0].Kontrollkästchen1[4]";
+    public static final String PSYCH_GAMBLING = "Formular1[0].#subform[0].Kontrollkästchen1[3]";
     public static final String PSYCH_HALLUCINATION = "Formular1[0].#subform[0].Optionsfeldliste[5]";
     public static final String PSYCH_LOGO_TEXTFIELD = "Formular1[0].#subform[0].TextField2[0]";
     public static final String PSYCH_MANICDEPRESSIVE = "Formular1[0].#subform[0].Optionsfeldliste[3]";
     public static final String PSYCH_MEDS = "Formular1[0].#subform[0].Kontrollkästchen1[2]";
-    public static final String PSYCH_NICOTIN = "Formular1[0].#subform[0].Kontrollkästchen1[3]";
+    public static final String PSYCH_NICOTIN = "Formular1[0].#subform[0].Kontrollkästchen1[4]";
     public static final String PSYCH_PASSIVE = "Formular1[0].#subform[0].Optionsfeldliste[15]";
     public static final String PSYCH_PHONE = "Formular1[0].#subform[0].Telefonnummer[0]";
     public static final String PSYCH_REGRESSIVE = "Formular1[0].#subform[0].Optionsfeldliste[11]";
