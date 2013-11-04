@@ -2,14 +2,13 @@ package op.roster;
 
 import com.jidesoft.swing.StyledLabel;
 import com.jidesoft.swing.StyledLabelBuilder;
-import entity.roster.Rplan;
-import entity.roster.Workinglog;
-import entity.roster.WorkinglogTools;
+import entity.roster.*;
 import op.OPDE;
 import op.threads.DisplayManager;
 import op.tools.GUITools;
 import op.tools.SYSConst;
 import org.jdesktop.swingx.VerticalLayout;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -33,18 +32,23 @@ public class PnlWorkingLogSingleDay extends JPanel {
     JScrollPane scrl;
     JButton apply, add;
     private Rplan rplan;
+    private RosterParameters rosterParameters;
+    private UserContracts userContracts;
     private Workinglog actual;
-    JPanel pnlList;
+    private JPanel pnlList;
+//    private LocalDate day;
 
 
-    public PnlWorkingLogSingleDay(Rplan rplan) {
+    public PnlWorkingLogSingleDay(Rplan rplan, RosterParameters rosterParameters, UserContracts userContracts) {
         super();
         this.rplan = rplan;
-
+        this.rosterParameters = rosterParameters;
+        this.userContracts = userContracts;
+//        this.day = new LocalDate(rplan.getStart());
         scrl = new JScrollPane();
         setBorder(new LineBorder(Color.DARK_GRAY, 2));
 
-//        lstPlans = RPlanTools.getAll(day, user);
+
         initPanel();
     }
 
@@ -60,7 +64,13 @@ public class PnlWorkingLogSingleDay extends JPanel {
                     em.getTransaction().begin();
                     Rplan myRplan = em.merge(rplan);
                     em.lock(myRplan, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                    Workinglog myWorkinglog = em.merge(new Workinglog(myRplan));
+
+
+
+
+
+
+                    Workinglog myWorkinglog = em.merge(new Workinglog(myRplan, rosterParameters.getSymbol(myRplan.getEffectiveSymbol(), userContracts)));
                     myRplan.getWorkinglogs().add(myWorkinglog);
                     em.getTransaction().commit();
                     rplan = myRplan;
@@ -91,7 +101,7 @@ public class PnlWorkingLogSingleDay extends JPanel {
         JPanel pnlHeader = new JPanel();
         pnlHeader.setLayout(new BorderLayout());
 
-        StyledLabel lblDate = StyledLabelBuilder.createStyledLabel(DateFormat.getDateInstance(DateFormat.SHORT).format(rplan.getStart()) + " {" + rplan.getEffectiveHome().getPrefix() + "." + rplan.getEffectiveP() + ":bold}");
+        StyledLabel lblDate = StyledLabelBuilder.createStyledLabel(DateFormat.getDateInstance(DateFormat.SHORT).format(rplan.getStart()) + " {" + rplan.getEffectiveHome().getPrefix() + "." + rplan.getEffectiveSymbol() + ":bold}");
         lblDate.setAlignmentX(CENTER_ALIGNMENT);
         JPanel pnlSurroundDate = new JPanel();
         pnlSurroundDate.setLayout(new BoxLayout(pnlSurroundDate, BoxLayout.LINE_AXIS));

@@ -30,9 +30,9 @@ public class Rplan implements Comparable<Rplan> {
     @Column(name = "p2", nullable = true, insertable = true, updatable = true, length = 20, precision = 0)
     @Basic
     private String p2;
-    @Column(name = "p3", nullable = true, insertable = true, updatable = true, length = 20, precision = 0)
+    @Column(name = "actual", nullable = true, insertable = true, updatable = true, length = 20, precision = 0)
     @Basic
-    private String p3;
+    private String actual;
     @Column(name = "start", nullable = true, insertable = true, updatable = true, length = 19, precision = 0)
     @Temporal(TemporalType.TIMESTAMP)
     @Basic
@@ -41,18 +41,18 @@ public class Rplan implements Comparable<Rplan> {
     @Temporal(TemporalType.TIMESTAMP)
     @Basic
     private Date end;
-    @Column(name = "basehours", nullable = false, insertable = true, updatable = true, length = 9, precision = 4)
-    @Basic
-    private BigDecimal basehours;
-    @Column(name = "extrahours", nullable = false, insertable = true, updatable = true, length = 9, precision = 4)
-    @Basic
-    private BigDecimal extrahours;
-    @Column(name = "break", nullable = false, insertable = true, updatable = true, length = 9, precision = 4)
-    @Basic
-    private BigDecimal breaktime;
-    @Column(name = "type", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
-    @Basic
-    private int type;
+//    @Column(name = "basehours", nullable = false, insertable = true, updatable = true, length = 9, precision = 4)
+//    @Basic
+//    private BigDecimal basehours;
+//    @Column(name = "extrahours", nullable = false, insertable = true, updatable = true, length = 9, precision = 4)
+//    @Basic
+//    private BigDecimal extrahours;
+//    @Column(name = "break", nullable = false, insertable = true, updatable = true, length = 9, precision = 4)
+//    @Basic
+//    private BigDecimal breaktime;
+//    @Column(name = "type", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
+//    @Basic
+//    private int type;
     @Column(name = "text", nullable = true, insertable = true, updatable = true, length = 200, precision = 0)
     @Basic
     private String text;
@@ -66,9 +66,9 @@ public class Rplan implements Comparable<Rplan> {
     @JoinColumn(name = "homeid2", referencedColumnName = "EID")
     @ManyToOne
     private Homes home2;
-    @JoinColumn(name = "homeid3", referencedColumnName = "EID")
+    @JoinColumn(name = "homeactual", referencedColumnName = "EID")
     @ManyToOne
-    private Homes home3;
+    private Homes homeactual;
     @JoinColumn(name = "rosterid", referencedColumnName = "id")
     @ManyToOne
     private Rosters roster;
@@ -132,12 +132,8 @@ public class Rplan implements Comparable<Rplan> {
         }
     }
 
-    public void setP3(String p3) {
-        if (p3 != null) {
-            this.p3 = p3.toUpperCase();
-        } else {
-            this.p3 = null;
-        }
+    public void setActual(String actual) {
+        this.actual = actual;
     }
 
     public Homes getHome2() {
@@ -148,13 +144,7 @@ public class Rplan implements Comparable<Rplan> {
         this.home2 = home2;
     }
 
-    public Homes getHome3() {
-        return home3;
-    }
 
-    public void setHome3(Homes home3) {
-        this.home3 = home3;
-    }
 
     public String getP1() {
         return SYSTools.catchNull(p1).toUpperCase();
@@ -164,12 +154,20 @@ public class Rplan implements Comparable<Rplan> {
         return SYSTools.catchNull(p2).toUpperCase();
     }
 
-    public String getP3() {
-        return SYSTools.catchNull(p3).toUpperCase();
+    public String getActual() {
+        return actual;
     }
 
-    public String getEffectiveP() {
-        String p = getP3();
+    public Homes getHomeactual() {
+        return homeactual;
+    }
+
+    public void setHomeactual(Homes homeactual) {
+        this.homeactual = homeactual;
+    }
+
+    public String getEffectiveSymbol() {
+        String p = getActual();
         if (p.isEmpty()) {
             p = getP2();
         }
@@ -180,7 +178,7 @@ public class Rplan implements Comparable<Rplan> {
     }
 
     public Homes getEffectiveHome() {
-        Homes h = getHome3();
+        Homes h = getHomeactual();
         if (h == null) {
             h = getHome2();
         }
@@ -190,57 +188,6 @@ public class Rplan implements Comparable<Rplan> {
         return h;
     }
 
-    public Date getStart() {
-        return start;
-    }
-
-    public void setStart(Date start) {
-        this.start = start;
-    }
-
-
-    public Date getEnd() {
-        return end;
-    }
-
-    public void setEnd(Date end) {
-        this.end = end;
-    }
-
-
-    public BigDecimal getBasehours() {
-        return basehours;
-    }
-
-    public void setBasehours(BigDecimal basehours) {
-        this.basehours = basehours;
-    }
-
-
-    public BigDecimal getExtrahours() {
-        return extrahours;
-    }
-
-    public void setExtrahours(BigDecimal extrahours) {
-        this.extrahours = extrahours;
-    }
-
-
-    public BigDecimal getBreaktime() {
-        return breaktime;
-    }
-
-    public void setBreaktime(BigDecimal breaktime) {
-        this.breaktime = breaktime;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
-    }
 
     public String getText() {
         return text;
@@ -263,22 +210,19 @@ public class Rplan implements Comparable<Rplan> {
         Rplan rplan = (Rplan) o;
 
         if (id != rplan.id) return false;
-        if (type != rplan.type) return false;
         if (version != rplan.version) return false;
-        if (basehours != null ? !basehours.equals(rplan.basehours) : rplan.basehours != null) return false;
-        if (breaktime != null ? !breaktime.equals(rplan.breaktime) : rplan.breaktime != null) return false;
+        if (actual != null ? !actual.equals(rplan.actual) : rplan.actual != null) return false;
         if (end != null ? !end.equals(rplan.end) : rplan.end != null) return false;
-        if (extrahours != null ? !extrahours.equals(rplan.extrahours) : rplan.extrahours != null) return false;
         if (home1 != null ? !home1.equals(rplan.home1) : rplan.home1 != null) return false;
         if (home2 != null ? !home2.equals(rplan.home2) : rplan.home2 != null) return false;
-        if (home3 != null ? !home3.equals(rplan.home3) : rplan.home3 != null) return false;
+        if (homeactual != null ? !homeactual.equals(rplan.homeactual) : rplan.homeactual != null) return false;
         if (owner != null ? !owner.equals(rplan.owner) : rplan.owner != null) return false;
         if (p1 != null ? !p1.equals(rplan.p1) : rplan.p1 != null) return false;
         if (p2 != null ? !p2.equals(rplan.p2) : rplan.p2 != null) return false;
-        if (p3 != null ? !p3.equals(rplan.p3) : rplan.p3 != null) return false;
         if (roster != null ? !roster.equals(rplan.roster) : rplan.roster != null) return false;
         if (start != null ? !start.equals(rplan.start) : rplan.start != null) return false;
         if (text != null ? !text.equals(rplan.text) : rplan.text != null) return false;
+        if (workinglogs != null ? !workinglogs.equals(rplan.workinglogs) : rplan.workinglogs != null) return false;
 
         return true;
     }
@@ -288,30 +232,45 @@ public class Rplan implements Comparable<Rplan> {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + (p1 != null ? p1.hashCode() : 0);
         result = 31 * result + (p2 != null ? p2.hashCode() : 0);
-        result = 31 * result + (p3 != null ? p3.hashCode() : 0);
+        result = 31 * result + (actual != null ? actual.hashCode() : 0);
         result = 31 * result + (start != null ? start.hashCode() : 0);
         result = 31 * result + (end != null ? end.hashCode() : 0);
-        result = 31 * result + (basehours != null ? basehours.hashCode() : 0);
-        result = 31 * result + (extrahours != null ? extrahours.hashCode() : 0);
-        result = 31 * result + (breaktime != null ? breaktime.hashCode() : 0);
-        result = 31 * result + type;
         result = 31 * result + (text != null ? text.hashCode() : 0);
         result = 31 * result + (owner != null ? owner.hashCode() : 0);
         result = 31 * result + (home1 != null ? home1.hashCode() : 0);
         result = 31 * result + (home2 != null ? home2.hashCode() : 0);
-        result = 31 * result + (home3 != null ? home3.hashCode() : 0);
+        result = 31 * result + (homeactual != null ? homeactual.hashCode() : 0);
         result = 31 * result + (roster != null ? roster.hashCode() : 0);
+        result = 31 * result + (workinglogs != null ? workinglogs.hashCode() : 0);
         result = 31 * result + (int) (version ^ (version >>> 32));
         return result;
     }
 
-    public void setValuesFromSymbol(Symbol symbol, ContractsParameterSet contractsParameterSet) {
-        basehours = symbol.getBaseHours();
-        extrahours = symbol.getExtraHours(new LocalDate(start), contractsParameterSet);
+    public Date getStart() {
 
-        breaktime = symbol.getBreak();
+        return start;
+    }
+
+    public void setStart(Date start) {
+        this.start = start;
+    }
+
+    public Date getEnd() {
+        return end;
+    }
+
+    public void setEnd(Date end) {
+        this.end = end;
+    }
+
+    //
+    public void setStartEndFromSymbol(Symbol symbol) {
+//        basehours = symbol.getBaseHours();
+//        extrahours = symbol.getExtraHours(new LocalDate(start), contractsParameterSet);
+//
+//        breaktime = symbol.getBreak();
         start = symbol.getStart(new LocalDate(start)).toDate();
-        type = symbol.getSymbolType();
+//        type = symbol.getSymbolType();
         DateTime end = symbol.getEnd(new LocalDate(start));
         this.end = end == null ? null : end.toDate();
     }
@@ -321,9 +280,9 @@ public class Rplan implements Comparable<Rplan> {
         return getStart().compareTo(o.getStart());
     }
 
-    public BigDecimal getNetValue() {
-        return basehours.subtract(breaktime);
-    }
+//    public BigDecimal getNetValue() {
+//        return basehours.subtract(breaktime);
+//    }
 
 
 

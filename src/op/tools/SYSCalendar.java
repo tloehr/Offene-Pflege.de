@@ -27,10 +27,6 @@
 package op.tools;
 
 import com.toedter.calendar.JDateChooser;
-import entity.info.ResInfo;
-import entity.info.ResInfoTools;
-import entity.info.ResInfoTypeTools;
-import entity.info.Resident;
 import entity.nursingprocess.DFNTools;
 import entity.prescription.BHPTools;
 import op.OPDE;
@@ -45,7 +41,6 @@ import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.Time;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.NumberFormat;
@@ -60,8 +55,6 @@ public class SYSCalendar {
     }
 
 
-
-
     public static boolean isInFuture(long time) {
         return isInFuture(new Date(time));
     }
@@ -69,8 +62,6 @@ public class SYSCalendar {
     public static boolean isInFuture(Date date) {
         return date.after(new Date());
     }
-
-
 
 
     /**
@@ -116,7 +107,6 @@ public class SYSCalendar {
     }
 
 
-
     public static String toGermanTime(GregorianCalendar gc) {
         Date date = new Date(gc.getTimeInMillis());
         Format formatter;
@@ -124,7 +114,6 @@ public class SYSCalendar {
         formatter = new SimpleDateFormat("HH:mm");
         return formatter.format(date);
     }
-
 
 
     public static String WochentagName(GregorianCalendar gc) {
@@ -155,7 +144,6 @@ public class SYSCalendar {
             }
         }
     }
-
 
 
     /**
@@ -189,7 +177,7 @@ public class SYSCalendar {
         }
         if (dt.isAfter(max)) {
             dt = new LocalDate();
-            DisplayMessage dm = new DisplayMessage(dt.isAfter(new LocalDate())? OPDE.lang.getString("misc.msg.futuredate") : OPDE.lang.getString("misc.msg.wrongdate"));
+            DisplayMessage dm = new DisplayMessage(dt.isAfter(new LocalDate()) ? OPDE.lang.getString("misc.msg.futuredate") : OPDE.lang.getString("misc.msg.wrongdate"));
             OPDE.getDisplayManager().addSubMessage(dm);
         }
         if (dt.isBefore(min)) {
@@ -697,7 +685,6 @@ public class SYSCalendar {
     }
 
 
-
     /**
      * Entscheidet ob zwei Daten am selben Tag liegen.
      *
@@ -801,7 +788,6 @@ public class SYSCalendar {
     public static boolean betweenOverlap(Date from, Date to, Date date) {
         return betweenDisjunctive(from, to, date) || date.getTime() == from.getTime() || date.getTime() == to.getTime();
     }
-
 
 
     public static Date addTime2Date(Date date, Date time) {
@@ -1065,9 +1051,57 @@ public class SYSCalendar {
     }
 
 
-    public static BigDecimal getDecimalHours(DateTime from, DateTime to) {
+    public static BigDecimal getHoursAsDecimal(DateTime from, DateTime to) {
+        if (from == null || to == null) return null;
         Period period = new Period(from, to);
         return BigDecimal.valueOf(period.toStandardDuration().getMillis()).divide(BigDecimal.valueOf(DateTimeConstants.MILLIS_PER_HOUR), 2, RoundingMode.HALF_DOWN);
+    }
+
+    public static DateTime eod(DateTime date) {
+        return date.hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue();
+    }
+
+    public static DateTime eod(LocalDate date) {
+        return eod(date.toDateTimeAtStartOfDay());
+    }
+
+
+    /**
+     * calculates the intervals of int1 NOT IN int2
+     *
+     * @param int1 first interval in the notion in1 NOT IN int2
+     * @param int2 second interval in the notion in1 NOT IN int2
+     * @return a list of complementary intervals (maximum 2)
+     */
+    public static Interval[] notin(Interval int1, Interval int2) {
+        ArrayList<Interval> listComplement = new ArrayList<Interval>();
+
+        if (int1.gap(int2) != null) {
+            listComplement.add(int1);
+        } else if (int1.abuts(int2)) {
+            listComplement.add(int1);
+        } else if (int1.contains(int2)) {
+            if (!int1.getStart().equals(int2.getStart())) {
+                listComplement.add(new Interval(int1.getStart(), int2.getStart().minusMinutes(1)));
+            }
+            if (!int1.getEnd().equals(int2.getEnd())) {
+                listComplement.add(new Interval(int2.getEnd().plusMinutes(1), int1.getEnd()));
+            }
+        } else if (int1.overlaps(int2)) {
+            Interval overlap = int1.overlap(int2);
+            listComplement.add(new Interval(int1.getStart(), overlap.getStart().minusMinutes(1)));
+            listComplement.add(new Interval(overlap.getEnd().plusMinutes(1), int1.getEnd()));
+        }
+
+        Collections.sort(listComplement, new Comparator<Interval>() {
+            @Override
+            public int compare(Interval o1, Interval o2) {
+                return o1.getStart().compareTo(o2.getStart());
+            }
+        });
+
+        return listComplement.toArray(new Interval[0]);
+
     }
 
 

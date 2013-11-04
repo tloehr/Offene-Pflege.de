@@ -65,7 +65,7 @@ public class StatsPerDay {
 
             if (rplan != null) {
                 boolean exam = contracts.get(user).getParameterSet(month.plusDays(day)).isExam();
-                Symbol symbol = rosterParameters.getSymbol(rplan.getEffectiveP());
+                Symbol symbol = rosterParameters.getSymbol(rplan.getEffectiveSymbol());
                 int type = symbol.getSection() == RosterXML.SOCIAL ? StatsPerDay.SOCIAL : (exam ? StatsPerDay.EXAM : StatsPerDay.HELPER);
                 add(day, rplan.getEffectiveHome(), type, symbol);
             }

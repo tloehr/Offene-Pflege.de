@@ -30,7 +30,7 @@ public class PnlWorkingLogSingle extends JPanel {
     void initPanel() {
         lblDay.setText(day.toString("EE dd."));
         if (workinglog.getRplan() != null) {
-            lblPlan.setText(workinglog.getRplan().getEffectiveP());
+            lblPlan.setText(workinglog.getRplan().getEffectiveSymbol());
         }
 
         txtActual.setText(workinglog.getActual());

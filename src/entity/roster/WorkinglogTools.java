@@ -1,6 +1,8 @@
 package entity.roster;
 
-import op.tools.SYSTools;
+import org.joda.time.LocalDate;
+
+import java.util.ArrayList;
 
 /**
  * Created with IntelliJ IDEA.
@@ -11,15 +13,39 @@ import op.tools.SYSTools;
  */
 public class WorkinglogTools {
 
-    public static String toPrettyString(Workinglog workinglog) {
-        String text = "";
-        if (workinglog.isActual()) {
-            text = workinglog.getActual() + ": " + workinglog.getHours();
-        } else {
-            text = workinglog.getText() + ": " + workinglog.getHours();
-        }
+//    public static String toPrettyString(Workinglog workinglog) {
+//        String text = "";
+//        if (workinglog.isActual()) {
+//            text = workinglog.getActual() + ": " + workinglog.getHours();
+//        } else {
+//            text = workinglog.getText() + ": " + workinglog.getHours();
+//        }
+//
+//        return text;
+//    }
 
-        return text;
+
+    /**
+     * when entering an actual work log, the could be separate log entries to represent the hours and percentages for the specific
+     * time periods during that shift
+     *
+     * @param myRplan
+     * @param symbol
+     * @param userContracts
+     * @return
+     */
+    public static Workinglog[] createWorkingLogs(Rplan myRplan, Symbol symbol, UserContracts userContracts) {
+
+
+
+
+        ArrayList<Workinglog> listLogs = new ArrayList<Workinglog>();
+        LocalDate day = new LocalDate(myRplan.getStart());
+
+        symbol.getBaseHoursAsDecimalDay1(day);
+
+        return listLogs.toArray(new Workinglog[]{});
+        //myRplan, rosterParameters.getSymbol(myRplan.getEffectiveSymbol(), userContracts)
     }
 
 

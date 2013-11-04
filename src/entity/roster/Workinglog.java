@@ -4,6 +4,7 @@ import entity.Homes;
 import entity.system.Users;
 import op.OPDE;
 import op.tools.SYSTools;
+import org.joda.time.LocalDate;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -21,12 +22,15 @@ public class Workinglog implements Comparable<Workinglog> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private long id;
-    @Column(name = "actual", nullable = true, insertable = true, updatable = true, length = 20, precision = 0)
-    @Basic
-    private String actual;
     @Column(name = "hours", nullable = false, insertable = true, updatable = true, length = 9, precision = 4)
     @Basic
     private BigDecimal hours;
+    @Column(name = "extra", nullable = false, insertable = true, updatable = true, length = 9, precision = 4)
+    @Basic
+    private BigDecimal extra;
+    @Column(name = "percent", nullable = false, insertable = true, updatable = true, length = 9, precision = 4)
+    @Basic
+    private BigDecimal percent;
     @Column(name = "text", nullable = true, insertable = true, updatable = true, length = 400, precision = 0)
     @Basic
     private String text;
@@ -44,9 +48,6 @@ public class Workinglog implements Comparable<Workinglog> {
     @JoinColumn(name = "controller", referencedColumnName = "UKennung")
     @ManyToOne
     private Users controller;
-    @JoinColumn(name = "homeid", referencedColumnName = "EID")
-    @ManyToOne
-    private Homes home;
     @JoinColumn(name = "editBy", referencedColumnName = "UKennung")
     @ManyToOne
     private Users editedBy;
@@ -60,23 +61,94 @@ public class Workinglog implements Comparable<Workinglog> {
     public Workinglog() {
     }
 
-    public Workinglog(Homes home, Rplan rplan, String actual, BigDecimal hours) {
-        this.home = home;
+    public Workinglog(BigDecimal hours, BigDecimal extra, BigDecimal percent, Rplan rplan) {
+        this.hours = hours;
+        this.extra = extra;
+        this.percent = percent;
         this.rplan = rplan;
-        this.actual = actual;
         this.creator = OPDE.getLogin().getUser();
+    }
+
+    @Override
+    public String toString() {
+        return "Workinglog{" +
+                "id=" + id +
+                ", hours=" + hours +
+                ", extra=" + extra +
+                ", percent=" + percent +
+                ", text='" + text + '\'' +
+                ", version=" + version +
+                ", rplan=" + rplan.getId() +
+                ", creator=" + creator +
+                ", controller=" + controller +
+                ", editedBy=" + editedBy +
+                "} " + super.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Workinglog that = (Workinglog) o;
+
+        if (id != that.id) return false;
+        if (version != that.version) return false;
+        if (controller != null ? !controller.equals(that.controller) : that.controller != null) return false;
+        if (creator != null ? !creator.equals(that.creator) : that.creator != null) return false;
+        if (editedBy != null ? !editedBy.equals(that.editedBy) : that.editedBy != null) return false;
+        if (extra != null ? !extra.equals(that.extra) : that.extra != null) return false;
+        if (hours != null ? !hours.equals(that.hours) : that.hours != null) return false;
+        if (percent != null ? !percent.equals(that.percent) : that.percent != null) return false;
+        if (replacedBy != null ? !replacedBy.equals(that.replacedBy) : that.replacedBy != null) return false;
+        if (replacementFor != null ? !replacementFor.equals(that.replacementFor) : that.replacementFor != null)
+            return false;
+        if (rplan != null ? !rplan.equals(that.rplan) : that.rplan != null) return false;
+        if (text != null ? !text.equals(that.text) : that.text != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (hours != null ? hours.hashCode() : 0);
+        result = 31 * result + (extra != null ? extra.hashCode() : 0);
+        result = 31 * result + (percent != null ? percent.hashCode() : 0);
+        result = 31 * result + (text != null ? text.hashCode() : 0);
+        result = 31 * result + (int) (version ^ (version >>> 32));
+        result = 31 * result + (rplan != null ? rplan.hashCode() : 0);
+        result = 31 * result + (creator != null ? creator.hashCode() : 0);
+        result = 31 * result + (controller != null ? controller.hashCode() : 0);
+        result = 31 * result + (editedBy != null ? editedBy.hashCode() : 0);
+        result = 31 * result + (replacedBy != null ? replacedBy.hashCode() : 0);
+        result = 31 * result + (replacementFor != null ? replacementFor.hashCode() : 0);
+        return result;
+    }
+
+    public BigDecimal getHours() {
+        return hours;
+    }
+
+    public void setHours(BigDecimal hours) {
         this.hours = hours;
     }
 
-    public Workinglog(Rplan rplan) {
-        this.rplan = rplan;
-        this.home = rplan.getEffectiveHome();
-        this.actual = rplan.getEffectiveP();
-        this.creator = OPDE.getLogin().getUser();
-        this.hours = rplan.getBasehours();
+    public BigDecimal getExtra() {
+        return extra;
     }
 
+    public void setExtra(BigDecimal extra) {
+        this.extra = extra;
+    }
 
+    public BigDecimal getPercent() {
+        return percent;
+    }
+
+    public void setPercent(BigDecimal percent) {
+        this.percent = percent;
+    }
 
     public String getText() {
         return text;
@@ -93,15 +165,6 @@ public class Workinglog implements Comparable<Workinglog> {
     public void setId(long id) {
         this.id = id;
     }
-
-    public String getActual() {
-        return actual;
-    }
-
-    public void setActual(String actual) {
-        this.actual = actual;
-    }
-
 
     public long getVersion() {
         return version;
@@ -128,62 +191,12 @@ public class Workinglog implements Comparable<Workinglog> {
         this.controller = controller;
     }
 
-    public Homes getHome() {
-        return home;
-    }
-
-    public void setHome(Homes home) {
-        this.home = home;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Workinglog that = (Workinglog) o;
-
-
-
-        return new Long(id).equals(that.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (actual != null ? actual.hashCode() : 0);
-        result = 31 * result + (hours != null ? hours.hashCode() : 0);
-        result = 31 * result + (text != null ? text.hashCode() : 0);
-        result = 31 * result + (int) (version ^ (version >>> 32));
-        result = 31 * result + (rplan != null ? rplan.hashCode() : 0);
-        result = 31 * result + (creator != null ? creator.hashCode() : 0);
-        result = 31 * result + (controller != null ? controller.hashCode() : 0);
-        result = 31 * result + (home != null ? home.hashCode() : 0);
-        result = 31 * result + (editedBy != null ? editedBy.hashCode() : 0);
-        result = 31 * result + (replacedBy != null ? replacedBy.hashCode() : 0);
-        result = 31 * result + (replacementFor != null ? replacementFor.hashCode() : 0);
-        return result;
-    }
-
-    public BigDecimal getHours() {
-
-        return hours;
-    }
-
-    public void setHours(BigDecimal hours) {
-        this.hours = hours;
-    }
-
     public Rplan getRplan() {
         return rplan;
     }
 
     public void setRplan(Rplan rplan) {
         this.rplan = rplan;
-    }
-
-    public boolean isActual() {
-        return !SYSTools.catchNull(actual).isEmpty();
     }
 
     public Users getEditedBy() {
@@ -219,6 +232,8 @@ public class Workinglog implements Comparable<Workinglog> {
         return replacementFor != null;
     }
 
+
+
     public boolean isDeleted() {
         return editedBy != null && replacedBy == null && replacementFor == null;
     }
@@ -234,14 +249,5 @@ public class Workinglog implements Comparable<Workinglog> {
 
     }
 
-    @Override
-    public String toString() {
-        return "Workinglog{" +
-                "id=" + id +
-                ", actual='" + actual + '\'' +
-                ", hours=" + hours +
-                ", text='" + text + '\'' +
-                ", home=" + home +
-                "} " + super.toString();
-    }
+
 }

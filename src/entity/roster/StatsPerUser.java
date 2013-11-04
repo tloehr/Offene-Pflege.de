@@ -37,10 +37,10 @@ public class StatsPerUser {
             if (rplan != null) {
                 sumHours = sumHours.add(rplan.getNetValue());
                 sumExtra = sumExtra.add(rplan.getExtrahours());
-                if (rosterParameters.getSymbol(rplan.getEffectiveP()).getSymbolType() == Symbol.ONLEAVE) {
+                if (rosterParameters.getSymbol(rplan.getEffectiveSymbol()).getSymbolType() == Symbol.ONLEAVE) {
                     sumHol = sumHol.subtract(BigDecimal.ONE);
                 }
-                if (rosterParameters.getSymbol(rplan.getEffectiveP()).getSymbolType() == Symbol.SICK) {
+                if (rosterParameters.getSymbol(rplan.getEffectiveSymbol()).getSymbolType() == Symbol.SICK) {
                     sumSick = sumSick.add(BigDecimal.ONE);
                 }
             }

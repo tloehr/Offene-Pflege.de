@@ -328,7 +328,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             if (rplan == null) {
                 symbolEditable = rowIndex % 4 == 0; // empty plans must be started at the first row
             } else {
-                boolean p2 = rplan.getP3().isEmpty() && !rplan.getP1().isEmpty();
+                boolean p2 = rplan.getActual().isEmpty() && !rplan.getP1().isEmpty();
                 boolean p1 = (rplan.getP2().isEmpty() && !rplan.getP1().isEmpty()) || rplan.getP1().isEmpty();
 
                 if (rowIndex % 4 == 0) {
@@ -466,9 +466,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 Rplan myRplan = em.merge(oldPlan);
                 em.lock(myRplan, LockModeType.OPTIMISTIC);
 
-//                HomeStats homeStat = homestats.get(myRplan.getHome1()).get(new LocalDate(myRplan.getStart()).getDayOfMonth() - 1);
-//                boolean exam = contracts.get(myRplan.getOwner()).getParameterSet(month).isExam();
-
                 if (rowIndex % 4 == 0) {
                     myRplan.setP1(newSymbol);
                     myRplan.setHome1(preferredHome);
@@ -476,22 +473,10 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                     myRplan.setP2(newSymbol);
                     myRplan.setHome2(preferredHome);
                 }
-//                else if (rowIndex % 4 == 2) {
-//                    myRplan.setP3(newSymbol);
-//                    myRplan.setHome3(preferredHome);
-//                }
-
-                myRplan.setValuesFromSymbol(symbol, contracts.get(user).getParameterSet(getDay(columnIndex)));
-                OPDE.debug(symbol.getNightHours(getDay(columnIndex), contracts.get(user).getParameterSet(getDay(columnIndex))));
 
 
-//                int type = symbol.getSection() == RosterXML.SOCIAL ? HomeStats.SOCIAL : (exam ? HomeStats.EXAM : HomeStats.HELPER);
-//
-//                if (oldPlan.getId() == 0) {
-//                    homeStat.add(type, rosterParameters.getSymbol(myRplan.getEffectiveP()));
-//                } else {
-//                    homeStat.replace(type, rosterParameters.getSymbol(oldPlan.getEffectiveP()), rosterParameters.getSymbol(myRplan.getEffectiveP()));
-//                }
+                myRplan.setStartEndFromSymbol(symbol);
+//                OPDE.debug(symbol.getNightHours(getDay(columnIndex), contracts.get(user).getParameterSet(getDay(columnIndex))));
 
                 em.getTransaction().commit();
 
@@ -583,10 +568,19 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         } else if (ct == CT_P2) {
             value = content.get(user).get(columnIndex - ROW_HEADER) != null ? content.get(user).get(columnIndex - ROW_HEADER).getP2() : "";
         } else if (ct == CT_ACTUAL) {
-            value = "";
+            value = content.get(user).get(columnIndex - ROW_HEADER) != null ? content.get(user).get(columnIndex - ROW_HEADER).getActual() : "";
         } else if (ct == CT_HOURS) {
             Rplan rplan = content.get(user).get(columnIndex - ROW_HEADER);
-            value = rplan != null && rplan.getType() != Symbol.PVALUE ? rplan.getNetValue().setScale(2, RoundingMode.HALF_UP).toString() : "";
+            LocalDate day = getDay(columnIndex);
+            if (rplan != null) {
+
+                value = rosterParameters.getSymbol(rplan.getEffectiveSymbol()).getBaseHoursAsDecimalDay1(day).add(
+                        rosterParameters.getSymbol(rplan.getEffectiveSymbol()).getBaseHoursAsDecimalDay2(day)
+                ).setScale(2, RoundingMode.HALF_UP).toString();
+
+            } else {
+                value = "null";
+            }
         } else if (ct == CT_SUM_HOURS) {
             value = "St: " + statsPerUser.get(user).getHoursSum().setScale(2, RoundingMode.HALF_UP).toString();
         } else if (ct == CT_SUM_SICK) {
@@ -710,9 +704,9 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 //                    symbol = rosterParameters.getSymbol(myRplan.getP2());
 //                }
 
-                myRplan.setValuesFromSymbol(symbol, contracts.get(user).getParameterSet(getDay(columnIndex)));
-//                int type = rosterParameters.getSymbol(myRplan.getEffectiveP()).getSection() == RosterXML.SOCIAL ? StatsPerDay.SOCIAL : (exam ? StatsPerDay.EXAM : StatsPerDay.HELPER);
-//                stat.replace(type, rosterParameters.getSymbol(oldPlan.getEffectiveP()), rosterParameters.getSymbol(myRplan.getEffectiveP()));
+                myRplan.setStartEndFromSymbol(symbol);
+//                int type = rosterParameters.getSymbol(myRplan.getEffectiveSymbol()).getSection() == RosterXML.SOCIAL ? StatsPerDay.SOCIAL : (exam ? StatsPerDay.EXAM : StatsPerDay.HELPER);
+//                stat.replace(type, rosterParameters.getSymbol(oldPlan.getEffectiveSymbol()), rosterParameters.getSymbol(myRplan.getEffectiveSymbol()));
             }
 
 
@@ -912,7 +906,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 popup.setPreferredPopupSize(new Dimension(1100, 600));
 
 
-
                 GUITools.showPopup(popup, SwingConstants.CENTER);
 
             }
@@ -936,9 +929,9 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 //            Rplan rplan = content.get(user).get(columnIndex);
 //            if (rplan != null) {
 //                boolean exam = contracts.get(user).getParameterSet(getDay(columnIndex)).isExam();
-//                Symbol symbol = rosterParameters.getSymbol(rplan.getEffectiveP());
+//                Symbol symbol = rosterParameters.getSymbol(rplan.getEffectiveSymbol());
 //                int type = symbol.getSection() == RosterXML.SOCIAL ? StatsPerDay.SOCIAL : (exam ? StatsPerDay.EXAM : StatsPerDay.HELPER);
-//                mapStats.get(rplan.getEffectiveHome()).add(type, rosterParameters.getSymbol(rplan.getEffectiveP()));
+//                mapStats.get(rplan.getEffectiveHome()).add(type, rosterParameters.getSymbol(rplan.getEffectiveSymbol()));
 //            }
 //
 //        }
