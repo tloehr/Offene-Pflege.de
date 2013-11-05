@@ -5,6 +5,7 @@ import op.tools.SYSCalendar;
 import org.joda.time.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -145,12 +146,8 @@ public class Symbol {
     }
 
     public BigDecimal getBreak() {
-        if (start == null) {
-            return BigDecimal.ZERO;
-        }
-        DateTime now = new DateTime();
-        return SYSCalendar.getHoursAsDecimal(now, now.plusMinutes(minutesBreak));
-
+        if (minutesBreak == 0) return BigDecimal.ZERO;
+        return new BigDecimal(minutesBreak).divide(new BigDecimal(DateTimeConstants.MINUTES_PER_HOUR)).setScale(2, RoundingMode.HALF_UP);
     }
 
     public String getDescription() {
@@ -227,47 +224,6 @@ public class Symbol {
     }
 
 
-//    private BigDecimal getExtraHoursA(LocalDate day, ContractsParameterSet contractsParameterSet) {
-//        if (day.getDayOfWeek() != DateTimeConstants.SUNDAY && OPDE.isHoliday(day)) {
-//            return contractsParameterSet.getDayValue();
-//        } else {
-//            return BigDecimal.ZERO;
-//        }
-//    }
-//
-//    private BigDecimal getExtraHoursX(LocalDate day, ContractsParameterSet contractsParameterSet) {
-//        if (OPDE.isHoliday(day)) {
-//            return contractsParameterSet.getDayValue();
-//        } else {
-//            return BigDecimal.ZERO;
-//        }
-//    }
-//
-//    private BigDecimal getExtraHoursK(ContractsParameterSet contractsParameterSet) {
-//        return contractsParameterSet.getDayValue();
-//    }
-//
-//    private BigDecimal getExtraHoursU(ContractsParameterSet contractsParameterSet) {
-//        return contractsParameterSet.getDayValue();
-//    }
-//
-//    private BigDecimal getBaseHoursA() {
-//        return getBaseHoursAsDecimal();
-//    }
-//
-//    private BigDecimal getBaseHoursX() {
-//        return BigDecimal.ZERO;
-//    }
-//
-//    private BigDecimal getBaseHoursK() {
-//        return BigDecimal.ZERO;
-//    }
-//
-//    private BigDecimal getBaseHoursU() {
-//        return BigDecimal.ZERO;
-//    }
-
-
     /**
      * this is the amount of hours displayed on the roster during the planning phase.
      * these values will be replaced by the Workinglog entities, as soon as they exist.
@@ -276,45 +232,25 @@ public class Symbol {
      */
     public BigDecimal getDisplayHours() {
         if (start == null || end == null) {
-            return BigDecimal.ZERO;
+            return null;
         } else if (calc == AWERT) {
-            return getBaseHoursAsDecimal();
+            return getBaseHoursAsDecimal().subtract(getBreak());
         } else {
             return BigDecimal.ZERO;
         }
     }
 
-//    public BigDecimal getBaseHours() {
-//        if (start == null) {
-//            return BigDecimal.ZERO;
-//        } else if (calc == AWERT) {
-//            return getBaseHoursA();
-//        } else if (calc == KWERT) {
-//            return getBaseHoursK();
-//        } else if (calc == XWERT) {
-//            return getBaseHoursX();
-//        } else if (calc == UWERT) {
-//            return getBaseHoursU();
-//        } else if (calc == PVALUE) {
-//            return BigDecimal.ZERO;
-//        } else {
-//            return BigDecimal.ZERO;
-//        }
-//    }
-
     public BigDecimal getExtraHours(LocalDate day, ContractsParameterSet contractsParameterSet) {
         if (calc == AWERT) {
             if (day.getDayOfWeek() != DateTimeConstants.SUNDAY && OPDE.isHoliday(day)) {
+                return contractsParameterSet.getDayValue();
+            } else if (isOvernight() && day.plusDays(1).getDayOfWeek() != DateTimeConstants.SUNDAY && OPDE.isHoliday(day.plusDays(1))) {
                 return contractsParameterSet.getDayValue();
             } else {
                 return BigDecimal.ZERO;
             }
         } else if (calc == KWERT) {
-            if (OPDE.isHoliday(day)) {
-                return contractsParameterSet.getDayValue();
-            } else {
-                return BigDecimal.ZERO;
-            }
+            return contractsParameterSet.getDayValue();
         } else if (calc == XWERT) {
             return BigDecimal.ZERO;
         } else if (calc == UWERT) {
@@ -326,20 +262,6 @@ public class Symbol {
         }
     }
 
-//    /**
-//     * returns the working hours for this symbol. including all extras without the deduction of the break.
-//     *
-//     * @param day
-//     * @param contractsParameterSet
-//     * @return
-//     */
-//    public BigDecimal getHours(LocalDate day, ContractsParameterSet contractsParameterSet) {
-//        if (start == null) {
-//            return null;
-//        }
-//        return getBaseHours().add(getExtraHours(day, contractsParameterSet));
-//    }
-
     public int getSection() {
         return section;
     }
@@ -347,32 +269,6 @@ public class Symbol {
     public void setSection(int section) {
         this.section = section;
     }
-
-//    /**
-//     * returns the extra hours for working on a sunday or a holliday.
-//     *
-//     * @param day
-//     * @return
-//     */
-//    public BigDecimal getSunHolidayHours(LocalDate day) {
-//        if (end == null) return BigDecimal.ZERO;
-//
-//    }
-//
-//    public BigDecimal getHolidayHours(LocalDate day) {
-//        if (end == null) return BigDecimal.ZERO;
-//
-//        DateTime nightStart = day.toDateTime(contractsParameterSet.getNight().getFirst());
-//        DateTime nightEnd = day.toDateTime(contractsParameterSet.getNight().getSecond());
-//        if (nightEnd.isBefore(nightStart)) nightEnd = nightEnd.plusDays(1);
-//
-//        Interval nightInterval = new Interval(nightStart, nightEnd);
-//        Interval shiftInterval = new Interval(getStart(day), getEnd(day));
-//
-//        return SYSCalendar.getHoursAsDecimal(nightInterval.overlap(shiftInterval).getStart(), nightInterval.overlap(shiftInterval).getEnd());
-//        return BigDecimal.ZERO;
-//    }
-
 
     /**
      * the sum of night hours between the beginning of a shift and the end. if that end is on the next day only the
@@ -397,8 +293,9 @@ public class Symbol {
         mapHours.put("nighthours2", BigDecimal.ZERO);
         mapHours.put("holihours1", BigDecimal.ZERO);
         mapHours.put("holihours2", BigDecimal.ZERO);
-        mapHours.put("extra", BigDecimal.ZERO);
-//        mapHours.put("extra2", BigDecimal.ZERO);
+        mapHours.put("extra", getExtraHours(day, contractsParameterSet));
+        mapHours.put("break", getBreak());
+
 
         // determine the night hours according to the user's contract
         DateTime contractNightStart = day.toDateTime(contractsParameterSet.getNight().getFirst());
@@ -412,72 +309,43 @@ public class Symbol {
         DateTime endDay1 = isOvernight() ? SYSCalendar.eod(day) : day.toDateTime(end);
         DateTime endDay2 = isOvernight() ? day.toDateTime(end).plusDays(1) : null;
 
+        // probier die Nacht aus. Das stimmt was nicht mit START und END
         Interval shiftInterval1 = new Interval(startDay1, endDay1);
         Interval[] dayhours1 = SYSCalendar.notin(shiftInterval1, nightInterval);
+        BigDecimal dayh1 = BigDecimal.ZERO;
+        for (Interval interval : dayhours1) {
+            dayh1 = dayh1.add(SYSCalendar.getHoursAsDecimal(interval));
+        }
+        mapHours.put("dayhours1", dayh1);
+        if (day.getDayOfWeek() != DateTimeConstants.SUNDAY && OPDE.isHoliday(day)) {
+            mapHours.put("holihours1", dayh1);
+        }
+
         Interval nighthours1 = nightInterval.overlap(shiftInterval1);
+        mapHours.put("nighthours1", SYSCalendar.getHoursAsDecimal(nighthours1));
 
         if (isOvernight()) {
             Interval shiftInterval2 = new Interval(startDay2, endDay2);
             Interval[] dayhours2 = SYSCalendar.notin(shiftInterval2, nightInterval);
+            BigDecimal dayh2 = BigDecimal.ZERO;
+            for (Interval interval : dayhours2) {
+                dayh2 = dayh2.add(SYSCalendar.getHoursAsDecimal(interval));
+            }
+            mapHours.put("dayhours2", dayh2);
+            if (day.getDayOfWeek() != DateTimeConstants.SUNDAY && OPDE.isHoliday(day)) {
+                mapHours.put("holihours2", dayh2);
+            }
+
             Interval nighthours2 = nightInterval.overlap(shiftInterval2);
+            mapHours.put("nighthours2", SYSCalendar.getHoursAsDecimal(nighthours2));
         }
 
-
+        OPDE.debug(day);
+        OPDE.debug(mapHours);
+        OPDE.debug("---");
 
         return mapHours;
     }
 
-    /**
-     * the sum of night hours between the beginning of a shift and the end. if that end is on the next day only the
-     * sum until midnight is calculated, hence splitting the hours into two days. and this is <b>DAY 2</b>.
-     * night hours a special hours between to specific times during a night (usually between 23h and 6h), but
-     * contracts can have different notions of night shift.
-     * <p/>
-     * anyways, this method calcualtes the <b>OVERLAP</b> between the interval of the shift and the interval of the night hours for day 2.
-     *
-     * @return 0 if not overlapping or shift has no end time.
-     */
-    public BigDecimal getNightHoursDay2(LocalDate day, ContractsParameterSet contractsParameterSet) {
-
-        if (end == null) return BigDecimal.ZERO;
-
-        // determine the night hours according to the user's contract
-        DateTime nightStart = day.toDateTime(contractsParameterSet.getNight().getFirst());
-        DateTime nightEnd = day.toDateTime(contractsParameterSet.getNight().getSecond());
-        if (nightEnd.isBefore(nightStart)) nightEnd = nightEnd.plusDays(1);
-
-        Interval nightInterval = new Interval(nightStart, nightEnd);
-
-        // determine the shift hours according to the symbol settings
-        DateTime start = isOvernight() ? day.toDateTimeAtStartOfDay() : getStart(day);
-        Interval shiftInterval = new Interval(start, getEnd(day));
-
-        return SYSCalendar.getHoursAsDecimal(nightInterval.overlap(shiftInterval).getStart(), nightInterval.overlap(shiftInterval).getEnd());
-    }
-
-    /**
-     * the sum of hours between the beginning of a shift and the end. if that end is on the next day only the
-     * sum until midnight is calculated, hence splitting the hours into two days. and this is <b>DAY 1</b>.
-     *
-     * @return
-     */
-    public BigDecimal getBaseHoursAsDecimalDay1(LocalDate day) {
-        DateTime end = isOvernight() ? SYSCalendar.eod(day) : getEnd(day);
-
-        return SYSCalendar.getHoursAsDecimal(getStart(day), end);
-    }
-
-    /**
-     * the sum of hours between the beginning of a shift and the end. if that end is on the next day only the
-     * sum between midnight and the <b>end</b> is calculated, hence splitting the hours into two days. and this is <b>DAY 2</b>.
-     *
-     * @return
-     */
-    public BigDecimal getBaseHoursAsDecimalDay2(LocalDate day) {
-        if (!isOvernight()) return BigDecimal.ZERO;
-        DateTime start = day.plusDays(1).toDateTimeAtStartOfDay();
-
-        return SYSCalendar.getHoursAsDecimal(start, getEnd(day));
-    }
 
 }

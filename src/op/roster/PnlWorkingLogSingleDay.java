@@ -70,7 +70,8 @@ public class PnlWorkingLogSingleDay extends JPanel {
 
 
 
-                    Workinglog myWorkinglog = em.merge(new Workinglog(myRplan, rosterParameters.getSymbol(myRplan.getEffectiveSymbol(), userContracts)));
+//                    Workinglog myWorkinglog = em.merge(new Workinglog(myRplan, rosterParameters.getSymbol(myRplan.getEffectiveSymbol(), userContracts)));
+                    Workinglog myWorkinglog = null;
                     myRplan.getWorkinglogs().add(myWorkinglog);
                     em.getTransaction().commit();
                     rplan = myRplan;
@@ -174,12 +175,12 @@ public class PnlWorkingLogSingleDay extends JPanel {
 
         actual = null;
         for (Workinglog workinglog : rplan.getWorkinglogs()) {
-            if (workinglog.isActual()) {
-                actual = workinglog;
-            }
-            if (!workinglog.isDeleted() && !workinglog.isReplaced()) {
-                pnlList.add(getLine(workinglog));
-            }
+//            if (workinglog.isActual()) {
+//                actual = workinglog;
+//            }
+//            if (!workinglog.isDeleted() && !workinglog.isReplaced()) {
+//                pnlList.add(getLine(workinglog));
+//            }
         }
         apply.setEnabled(actual == null);
         scrl.validate();

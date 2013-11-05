@@ -13,16 +13,24 @@ import java.util.ArrayList;
  */
 public class WorkinglogTools {
 
-//    public static String toPrettyString(Workinglog workinglog) {
-//        String text = "";
+    // all AUTO types meaning an entry which has been created while applying the planned shift
+    public static final int TYPE_AUTO_DAY = 0;
+    public static final int TYPE_AUTO_NIGHT = 1;
+    public static final int TYPE_AUTO_HOLIDAY = 2;
+    public static final int TYPE_AUTO_BREAK = 3;
+    public static final int TYPE_MANUAL_HOURS = 4;
+
+
+    public static String toPrettyString(Workinglog workinglog) {
+        String text = "";
 //        if (workinglog.isActual()) {
 //            text = workinglog.getActual() + ": " + workinglog.getHours();
 //        } else {
 //            text = workinglog.getText() + ": " + workinglog.getHours();
 //        }
-//
-//        return text;
-//    }
+
+        return text;
+    }
 
 
     /**
@@ -42,7 +50,7 @@ public class WorkinglogTools {
         ArrayList<Workinglog> listLogs = new ArrayList<Workinglog>();
         LocalDate day = new LocalDate(myRplan.getStart());
 
-        symbol.getBaseHoursAsDecimalDay1(day);
+//        symbol.getBaseHoursAsDecimalDay1(day);
 
         return listLogs.toArray(new Workinglog[]{});
         //myRplan, rosterParameters.getSymbol(myRplan.getEffectiveSymbol(), userContracts)

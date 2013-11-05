@@ -1,10 +1,8 @@
 package entity.roster;
 
-import entity.Homes;
 import entity.system.Users;
 import op.OPDE;
 import op.tools.SYSTools;
-import org.joda.time.LocalDate;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -34,9 +32,13 @@ public class Workinglog implements Comparable<Workinglog> {
     @Column(name = "text", nullable = true, insertable = true, updatable = true, length = 400, precision = 0)
     @Basic
     private String text;
+    @Column(name = "type", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
+    @Version
+    private int type;
     @Column(name = "version", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
     @Version
     private long version;
+
 
     // ---
     @JoinColumn(name = "rplanid", referencedColumnName = "id")
@@ -232,6 +234,13 @@ public class Workinglog implements Comparable<Workinglog> {
         return replacementFor != null;
     }
 
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
 
 
     public boolean isDeleted() {

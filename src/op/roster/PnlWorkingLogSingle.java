@@ -33,7 +33,7 @@ public class PnlWorkingLogSingle extends JPanel {
             lblPlan.setText(workinglog.getRplan().getEffectiveSymbol());
         }
 
-        txtActual.setText(workinglog.getActual());
+        txtActual.setText(workinglog.getRplan().getActual());
         txtAdditionalHours.setText(workinglog.getHours().toString());
         txtAdditionalText.setText(workinglog.getText());
     }

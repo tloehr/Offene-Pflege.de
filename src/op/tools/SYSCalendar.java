@@ -1057,6 +1057,15 @@ public class SYSCalendar {
         return BigDecimal.valueOf(period.toStandardDuration().getMillis()).divide(BigDecimal.valueOf(DateTimeConstants.MILLIS_PER_HOUR), 2, RoundingMode.HALF_DOWN);
     }
 
+    public static BigDecimal getHoursAsDecimal(Interval interval) {
+        if (interval == null){
+            return BigDecimal.ZERO;
+        }
+        DateTime from = interval.getStart();
+        DateTime to = interval.getEnd();
+        return getHoursAsDecimal(from, to);
+    }
+
     public static DateTime eod(DateTime date) {
         return date.hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue();
     }

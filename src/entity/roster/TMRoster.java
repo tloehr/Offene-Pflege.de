@@ -25,6 +25,7 @@ import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import java.awt.*;
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -84,6 +85,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
     // ALL rplans for this roster. iteration over the keyset of this map will return ALL users who own rplanss.
     HashMap<Users, ArrayList<Rplan>> content;
+//    HashMap<Rplan, ArrayList<Workinglog>> workinglogs;
     HashMap<Users, UserContracts> contracts;
     RosterParameters rosterParameters = null;
 
@@ -111,6 +113,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         defaultHome = StationTools.getStationForThisHost().getHome();
 
         content = new HashMap<Users, ArrayList<Rplan>>();
+//        workinglogs = new HashMap<Rplan, ArrayList<Workinglog>>();
+
         contracts = UsersTools.getUsersWithValidContractsIn(month);
         prefixMap = new HashMap<String, Homes>();
         statsPerUser = new HashMap<Users, StatsPerUser>();
@@ -434,7 +438,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         } else if (ct == CT_EMP_LASTNAME) {
             OPDE.debug(aValue);
         } else {
-
+            LocalDate day = getDay(columnIndex);
             Homes prefixHome = null;
             String newSymbol = aValue.toString();
             if (aValue.toString().length() > 1 && prefixMap.containsKey(aValue.toString().charAt(0))) {
@@ -443,6 +447,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             }
 
             Symbol symbol = rosterParameters.getSymbol(newSymbol);
+
+            symbol.getHourStats(day, contracts.get(userlist.get(rowIndex / 4).getFirst()).getParameterSet(day));
 
             if (!newSymbol.isEmpty() && symbol == null) return; // entered UNKNOWN symbol.
             if (symbol != null && !rosterParameters.getSymbol(newSymbol).isAllowed(getDay(columnIndex)))
@@ -460,7 +466,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
                 Rplan oldPlan = content.get(user).get(columnIndex - ROW_HEADER);
                 if (oldPlan == null) {
-                    oldPlan = new Rplan(roster, preferredHome, getDay(columnIndex).toDate(), em.merge(user));
+                    oldPlan = new Rplan(roster, preferredHome, day.toDate(), em.merge(user));
                 }
 
                 Rplan myRplan = em.merge(oldPlan);
@@ -512,6 +518,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 if (updateFooter != null) {
                     updateFooter.execute(columnIndex);
                 }
+
 
             } catch (OptimisticLockException ole) {
                 OPDE.warn(ole);
@@ -573,13 +580,16 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             Rplan rplan = content.get(user).get(columnIndex - ROW_HEADER);
             LocalDate day = getDay(columnIndex);
             if (rplan != null) {
+                BigDecimal displayHours = rosterParameters.getSymbol(rplan.getEffectiveSymbol()).getDisplayHours();
 
-                value = rosterParameters.getSymbol(rplan.getEffectiveSymbol()).getBaseHoursAsDecimalDay1(day).add(
-                        rosterParameters.getSymbol(rplan.getEffectiveSymbol()).getBaseHoursAsDecimalDay2(day)
-                ).setScale(2, RoundingMode.HALF_UP).toString();
+                BigDecimal loghours = BigDecimal.ZERO;
+                for (Workinglog workinglog : rplan.getWorkinglogs()){
+                    loghours = loghours.add(workinglog.getHours());
+                }
 
+                value = displayHours == null ? "--" : displayHours.setScale(2, RoundingMode.HALF_UP).toString();
             } else {
-                value = "null";
+                value = "-/-";
             }
         } else if (ct == CT_SUM_HOURS) {
             value = "St: " + statsPerUser.get(user).getHoursSum().setScale(2, RoundingMode.HALF_UP).toString();
@@ -902,12 +912,10 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
                 popup.setOwner(owner);
                 popup.removeExcludedComponent(owner);
-                popup.getContentPane().add(new PnlWorkingLogWholeMonth(content.get(user)));
+                popup.getContentPane().add(new PnlWorkingLogWholeMonth(content.get(user), rosterParameters, contracts.get(user)));
                 popup.setPreferredPopupSize(new Dimension(1100, 600));
 
-
                 GUITools.showPopup(popup, SwingConstants.CENTER);
-
             }
         });
         itemEditWLog.setEnabled(user != null && !content.get(user).isEmpty());

@@ -7,7 +7,9 @@ package op.roster;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
+import entity.roster.RosterParameters;
 import entity.roster.Rplan;
+import entity.roster.UserContracts;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import org.apache.commons.collections.Closure;
@@ -23,13 +25,17 @@ import java.util.*;
  */
 public class PnlWorkingLogWholeMonth extends JPanel {
     private ArrayList<Rplan> listPlans;
+    private RosterParameters rosterParameters;
+    private UserContracts userContracts;
     private HashMap<LocalDate, Rplan> lookup;
     private LocalDate month;
 //    private Users user;
 
 
-    public PnlWorkingLogWholeMonth(ArrayList<Rplan> listPlans) {
+    public PnlWorkingLogWholeMonth(ArrayList<Rplan> listPlans, RosterParameters rosterParameters, UserContracts userContracts) {
         this.listPlans = listPlans;
+        this.rosterParameters = rosterParameters;
+        this.userContracts = userContracts;
         lookup = new HashMap<LocalDate, Rplan>();
 
         for (Rplan rplan : listPlans) {
@@ -104,7 +110,7 @@ public class PnlWorkingLogWholeMonth extends JPanel {
 
         for (int day = 1; day <= month.dayOfMonth().withMaximumValue().getDayOfMonth(); day++) {
             if (lookup.containsKey(month.plusDays(day - 1))) {
-                add(new PnlWorkingLogSingleDay(lookup.get(month.plusDays(day - 1))), CC.xy(posx, posy, CC.FILL, CC.FILL));
+                add(new PnlWorkingLogSingleDay(lookup.get(month.plusDays(day - 1)), rosterParameters, userContracts), CC.xy(posx, posy, CC.FILL, CC.FILL));
             } else {
                 JPanel blackpanel = new JPanel();
                 blackpanel.setBackground(Color.black);

@@ -35,8 +35,8 @@ public class StatsPerUser {
 
         for (Rplan rplan : data) {
             if (rplan != null) {
-                sumHours = sumHours.add(rplan.getNetValue());
-                sumExtra = sumExtra.add(rplan.getExtrahours());
+//                sumHours = sumHours.add(rplan.getNetValue());
+//                sumExtra = sumExtra.add(rplan.getExtrahours());
                 if (rosterParameters.getSymbol(rplan.getEffectiveSymbol()).getSymbolType() == Symbol.ONLEAVE) {
                     sumHol = sumHol.subtract(BigDecimal.ONE);
                 }

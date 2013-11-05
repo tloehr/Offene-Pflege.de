@@ -86,6 +86,7 @@ public class Rplan implements Comparable<Rplan> {
         this.owner = owner;
         this.roster = roster;
         this.home1 = home1;
+
     }
 
     public Homes getHome1() {
@@ -168,10 +169,10 @@ public class Rplan implements Comparable<Rplan> {
 
     public String getEffectiveSymbol() {
         String p = getActual();
-        if (p.isEmpty()) {
+        if (p == null || p.isEmpty()) {
             p = getP2();
         }
-        if (p.isEmpty()) {
+        if (p == null || p.isEmpty()) {
             p = getP1();
         }
         return p;
