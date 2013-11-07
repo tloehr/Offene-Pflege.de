@@ -16,6 +16,7 @@ import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -716,7 +717,7 @@ public class ResValueTools {
         return avg == null ? BigDecimal.ZERO : avg;
     }
 
-    public static HashMap<DateMidnight, BigDecimal> getLiquidIn(Resident resident, DateMidnight from) {
+    public static HashMap<LocalDate, BigDecimal> getLiquidIn(Resident resident, LocalDate from) {
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("" +
                 " SELECT rv FROM ResValue rv " +
@@ -732,47 +733,47 @@ public class ResValueTools {
         ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
         em.close();
 
-        HashMap<DateMidnight, BigDecimal> hm = new HashMap<DateMidnight, BigDecimal>();
-        for (DateMidnight day = from; day.compareTo(new DateMidnight()) <= 0; day = day.plusDays(1)) {
+        HashMap<LocalDate, BigDecimal> hm = new HashMap<LocalDate, BigDecimal>();
+        for (LocalDate day = from; day.compareTo(new LocalDate()) <= 0; day = day.plusDays(1)) {
             hm.put(day, BigDecimal.ZERO);
         }
 
         for (ResValue val : list) {
-            BigDecimal bd = hm.get(new DateMidnight(val.getPit()));
-            hm.put(new DateMidnight(val.getPit()), bd.add(val.getVal1()));
+            BigDecimal bd = hm.get(new LocalDate(val.getPit()));
+            hm.put(new LocalDate(val.getPit()), bd.add(val.getVal1()));
         }
 
         return hm;
     }
 
-    public static HashMap<DateMidnight, BigDecimal> getLiquidOut(Resident resident, DateMidnight from) {
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("" +
-                " SELECT rv FROM ResValue rv " +
-                " WHERE rv.resident = :resident " +
-                " AND rv.replacedBy IS NULL " +
-                " AND rv.vtype.valType = :valType " +
-                " AND rv.val1 < 0 " +
-                " AND rv.pit >= :from" +
-                " ORDER BY rv.pit DESC ");
-        query.setParameter("resident", resident);
-        query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
-        query.setParameter("from", from.toDate());
-        ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
-        em.close();
-
-        HashMap<DateMidnight, BigDecimal> hm = new HashMap<DateMidnight, BigDecimal>();
-        for (DateMidnight day = from; day.compareTo(new DateMidnight()) <= 0; day = day.plusDays(1)) {
-            hm.put(day, BigDecimal.ZERO);
-        }
-
-        for (ResValue val : list) {
-            BigDecimal bd = hm.get(new DateMidnight(val.getPit()));
-            hm.put(new DateMidnight(val.getPit()), bd.add(val.getVal1()));
-        }
-
-        return hm;
-    }
+//    public static HashMap<DateMidnight, BigDecimal> getLiquidOut(Resident resident, DateMidnight from) {
+//        EntityManager em = OPDE.createEM();
+//        Query query = em.createQuery("" +
+//                " SELECT rv FROM ResValue rv " +
+//                " WHERE rv.resident = :resident " +
+//                " AND rv.replacedBy IS NULL " +
+//                " AND rv.vtype.valType = :valType " +
+//                " AND rv.val1 < 0 " +
+//                " AND rv.pit >= :from" +
+//                " ORDER BY rv.pit DESC ");
+//        query.setParameter("resident", resident);
+//        query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
+//        query.setParameter("from", from.toDate());
+//        ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
+//        em.close();
+//
+//        HashMap<DateMidnight, BigDecimal> hm = new HashMap<DateMidnight, BigDecimal>();
+//        for (DateMidnight day = from; day.compareTo(new DateMidnight()) <= 0; day = day.plusDays(1)) {
+//            hm.put(day, BigDecimal.ZERO);
+//        }
+//
+//        for (ResValue val : list) {
+//            BigDecimal bd = hm.get(new DateMidnight(val.getPit()));
+//            hm.put(new DateMidnight(val.getPit()), bd.add(val.getVal1()));
+//        }
+//
+//        return hm;
+//    }
 
 
     /**
@@ -787,7 +788,7 @@ public class ResValueTools {
         Station currentStation = StationTools.getStationForThisHost();
         ArrayList<Resident> listResident = ResidentTools.getAllActive(currentStation.getHome());
 
-        DateTime now = new DateTime();
+//        DateTime now = new DateTime();
 
         for (Resident resident : listResident) {
             Properties controlling = resident.getControlling();
@@ -795,7 +796,7 @@ public class ResValueTools {
                 int days = Integer.parseInt(controlling.getProperty(ResidentTools.KEY_STOOLDAYS));
                 ResValue lastStool = getLast(resident, ResValueTypesTools.STOOL);
 
-                if (lastStool == null || lastStool.getPit().before(now.minusDays(days).toDate())) {
+                if (lastStool == null || new DateTime(lastStool.getPit()).toLocalDate().isBefore(new LocalDate().minusDays(days))) {
                     result.add(new Object[]{resident, lastStool, days});
                 }
             }
@@ -811,21 +812,21 @@ public class ResValueTools {
         Station currentStation = StationTools.getStationForThisHost();
         ArrayList<Resident> listResident = ResidentTools.getAllActive(currentStation.getHome());
 
-        DateMidnight now = new DateMidnight();
+        LocalDate now = new LocalDate();
         try {
             for (Resident resident : listResident) {
 
-                ArrayList<Pair<DateMidnight, BigDecimal>> violatingValues = new ArrayList<Pair<DateMidnight, BigDecimal>>();
+                ArrayList<Pair<LocalDate, BigDecimal>> violatingValues = new ArrayList<Pair<LocalDate, BigDecimal>>();
                 Properties controlling = resident.getControlling();
 
                 if (controlling.containsKey(ResidentTools.KEY_LOWIN) && !controlling.getProperty(ResidentTools.KEY_LOWIN).equals("off")) {
                     int days = Integer.parseInt(controlling.getProperty(ResidentTools.KEY_DAYSDRINK));
-                    HashMap<DateMidnight, BigDecimal> in = getLiquidIn(resident, now.minusDays(days));
+                    HashMap<LocalDate, BigDecimal> in = getLiquidIn(resident, now.minusDays(days));
                     if (!in.isEmpty()) {
-                        for (DateMidnight day = now.minusDays(days); day.compareTo(new DateMidnight()) <= 0; day = day.plusDays(1)) {
+                        for (LocalDate day = now.minusDays(days); day.compareTo(new LocalDate()) <= 0; day = day.plusDays(1)) {
 
                             if (in.get(day).compareTo(new BigDecimal(controlling.getProperty(ResidentTools.KEY_LOWIN))) < 0) {
-                                violatingValues.add(new Pair<DateMidnight, BigDecimal>(day, in.get(day)));
+                                violatingValues.add(new Pair<LocalDate, BigDecimal>(day, in.get(day)));
                             }
                         }
                     }
@@ -833,12 +834,12 @@ public class ResValueTools {
 
                 if (controlling.containsKey(ResidentTools.KEY_HIGHIN) && !controlling.getProperty(ResidentTools.KEY_HIGHIN).equals("off")) {
                     int days = Integer.parseInt(controlling.getProperty(ResidentTools.KEY_DAYSDRINK));
-                    HashMap<DateMidnight, BigDecimal> in = getLiquidIn(resident, now.minusDays(days));
+                    HashMap<LocalDate, BigDecimal> in = getLiquidIn(resident, now.minusDays(days));
                     if (!in.isEmpty()) {
-                        for (DateMidnight day = now.minusDays(days); day.compareTo(new DateMidnight()) <= 0; day = day.plusDays(1)) {
+                        for (LocalDate day = now.minusDays(days); day.compareTo(new LocalDate()) <= 0; day = day.plusDays(1)) {
 
                             if (in.get(day).compareTo(new BigDecimal(controlling.getProperty(ResidentTools.KEY_HIGHIN))) > 0) {
-                                violatingValues.add(new Pair<DateMidnight, BigDecimal>(day, in.get(day)));
+                                violatingValues.add(new Pair<LocalDate, BigDecimal>(day, in.get(day)));
                             }
                         }
                     }
