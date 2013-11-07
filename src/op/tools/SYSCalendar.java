@@ -1058,7 +1058,7 @@ public class SYSCalendar {
     }
 
     public static BigDecimal getHoursAsDecimal(Interval interval) {
-        if (interval == null){
+        if (interval == null) {
             return BigDecimal.ZERO;
         }
         DateTime from = interval.getStart();
@@ -1091,15 +1091,21 @@ public class SYSCalendar {
             listComplement.add(int1);
         } else if (int1.contains(int2)) {
             if (!int1.getStart().equals(int2.getStart())) {
-                listComplement.add(new Interval(int1.getStart(), int2.getStart().minusMinutes(1)));
+                listComplement.add(new Interval(int1.getStart(), int2.getStart()));
             }
             if (!int1.getEnd().equals(int2.getEnd())) {
-                listComplement.add(new Interval(int2.getEnd().plusMinutes(1), int1.getEnd()));
+                listComplement.add(new Interval(int2.getEnd(), int1.getEnd()));
             }
         } else if (int1.overlaps(int2)) {
+
             Interval overlap = int1.overlap(int2);
-            listComplement.add(new Interval(int1.getStart(), overlap.getStart().minusMinutes(1)));
-            listComplement.add(new Interval(overlap.getEnd().plusMinutes(1), int1.getEnd()));
+
+            if (int1.getStart().isBefore(overlap.getStart()))
+                listComplement.add(new Interval(int1.getStart(), overlap.getStart()));
+
+            if (overlap.getEnd().isBefore(int1.getEnd()))
+                listComplement.add(new Interval(overlap.getEnd(), int1.getEnd()));
+
         }
 
         Collections.sort(listComplement, new Comparator<Interval>() {

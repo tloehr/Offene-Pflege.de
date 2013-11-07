@@ -156,7 +156,7 @@ public class Rplan implements Comparable<Rplan> {
     }
 
     public String getActual() {
-        return actual;
+        return SYSTools.catchNull(actual).toUpperCase();
     }
 
     public Homes getHomeactual() {
@@ -169,10 +169,10 @@ public class Rplan implements Comparable<Rplan> {
 
     public String getEffectiveSymbol() {
         String p = getActual();
-        if (p == null || p.isEmpty()) {
+        if (p.isEmpty()) {
             p = getP2();
         }
-        if (p == null || p.isEmpty()) {
+        if (p.isEmpty()) {
             p = getP1();
         }
         return p;

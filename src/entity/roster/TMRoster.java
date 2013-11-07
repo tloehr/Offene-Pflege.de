@@ -39,7 +39,7 @@ import java.util.HashMap;
  * Time: 11:59
  * To change this template use File | Settings | File Templates.
  */
-public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifierTableModel, StyleModel {
+public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifierTableModel, StyleModel, SpanModel {
 
     public static final int CT_INVALID = -1;
     public static final int CT_EMP_LASTNAME = 0;
@@ -75,6 +75,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     public static final int CT_FOOTER_HOME_STAT = 30;
     public static final int CT_FOOTER_HOME_STAT_EMPTY1 = 31;
     public static final int CT_FOOTER_HOME_STAT_EMPTY2 = 32;
+    public static final int CT_STAT_TABLE = 33;
 
     private Rosters roster;
     private final boolean readOnly;
@@ -85,7 +86,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
     // ALL rplans for this roster. iteration over the keyset of this map will return ALL users who own rplanss.
     HashMap<Users, ArrayList<Rplan>> content;
-//    HashMap<Rplan, ArrayList<Workinglog>> workinglogs;
+    //    HashMap<Rplan, ArrayList<Workinglog>> workinglogs;
     HashMap<Users, UserContracts> contracts;
     RosterParameters rosterParameters = null;
 
@@ -137,6 +138,19 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     }
 
     @Override
+    public CellSpan getCellSpanAt(int rowIndex, int columnIndex) {
+        if (columnIndex == 1 || columnIndex == 2 && rowIndex % 4 == 0) {
+            return new CellSpan(rowIndex, columnIndex, 4, 2);
+        }
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public boolean isCellSpanOn() {
+        return true;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
     public Class<?> getCellClassAt(int rowIndex, int columnIndex) {
         if (columnIndex == 0 && rowIndex % 4 == 2) {
             return Homes.class;
@@ -160,25 +174,27 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 cellType = CT_EMP_QUALIFICATION;
             }
         } else if (columnIndex == 1) { // homestats carry
-            if (rowIndex % 4 == 0) {
-                cellType = CT_CARRY_SICK;
-            } else if (rowIndex % 4 == 1) {
-                cellType = CT_CARRY_HOLIDAY;
-            } else if (rowIndex % 4 == 2) {
-                cellType = CT_CARRY_EMPTY;
-            } else if (rowIndex % 4 == 3) {
-                cellType = CT_CARRY_HOURS;
-            }
+            cellType = CT_STAT_TABLE;
+//            if (rowIndex % 4 == 0) {
+//                cellType = CT_CARRY_SICK;
+//            } else if (rowIndex % 4 == 1) {
+//                cellType = CT_CARRY_HOLIDAY;
+//            } else if (rowIndex % 4 == 2) {
+//                cellType = CT_CARRY_EMPTY;
+//            } else if (rowIndex % 4 == 3) {
+//                cellType = CT_CARRY_HOURS;
+//            }
         } else if (columnIndex == 2) { // homestats sum
-            if (rowIndex % 4 == 0) {
-                cellType = CT_SUM_SICK;
-            } else if (rowIndex % 4 == 1) {
-                cellType = CT_SUM_HOLIDAY;
-            } else if (rowIndex % 4 == 2) {
-                cellType = CT_SUM_EMPTY;
-            } else if (rowIndex % 4 == 3) {
-                cellType = CT_SUM_HOURS;
-            }
+            cellType = CT_STAT_TABLE;
+//            if (rowIndex % 4 == 0) {
+//                cellType = CT_SUM_SICK;
+//            } else if (rowIndex % 4 == 1) {
+//                cellType = CT_SUM_HOLIDAY;
+//            } else if (rowIndex % 4 == 2) {
+//                cellType = CT_SUM_EMPTY;
+//            } else if (rowIndex % 4 == 3) {
+//                cellType = CT_SUM_HOURS;
+//            }
         } else if (columnIndex >= ROW_HEADER && columnIndex < ROW_FOOTER) {
             if (rowIndex % 4 == 0) {
                 cellType = CT_P1;
@@ -583,7 +599,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 BigDecimal displayHours = rosterParameters.getSymbol(rplan.getEffectiveSymbol()).getDisplayHours();
 
                 BigDecimal loghours = BigDecimal.ZERO;
-                for (Workinglog workinglog : rplan.getWorkinglogs()){
+                for (Workinglog workinglog : rplan.getWorkinglogs()) {
                     loghours = loghours.add(workinglog.getHours());
                 }
 
@@ -597,6 +613,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             value = "Kr: " + statsPerUser.get(user).getSickSum().setScale(2, RoundingMode.HALF_UP).toString();
         } else if (ct == CT_SUM_HOLIDAY) {
             value = "Url: " + statsPerUser.get(user).getHolidaySum().setScale(2, RoundingMode.HALF_UP).toString();
+        } else if (ct == CT_STAT_TABLE) {
+            value = "<html><h2>fat one</h2></html>";
         }
 
         return value;

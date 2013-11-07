@@ -54,7 +54,7 @@ public class PnlUsersWorklog extends CleanablePanel {
     private void initPanel() {
 
         EntityManager em = OPDE.createEM();
-        lstAllRosters = new ArrayList<Rosters>(em.createQuery("SELECT r FROM Rosters r ORDER BY r.month DESC").getResultList());
+        lstAllRosters = new ArrayList<Rosters>(em.createQuery("SELECT r FROM Rosters r ORDER BY r.month ASC").getResultList());
         em.close();
 
         lstRosters.setModel(SYSTools.list2dlm(lstAllRosters));

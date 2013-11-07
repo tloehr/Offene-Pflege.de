@@ -306,7 +306,7 @@ public class Symbol {
 
         DateTime startDay1 = day.toDateTime(start);
         DateTime startDay2 = isOvernight() ? day.plusDays(1).toDateTimeAtStartOfDay() : null;
-        DateTime endDay1 = isOvernight() ? SYSCalendar.eod(day) : day.toDateTime(end);
+        DateTime endDay1 = isOvernight() ? day.plusDays(1).toDateTimeAtStartOfDay() : day.toDateTime(end);
         DateTime endDay2 = isOvernight() ? day.toDateTime(end).plusDays(1) : null;
 
         // probier die Nacht aus. Das stimmt was nicht mit START und END
@@ -339,6 +339,8 @@ public class Symbol {
             Interval nighthours2 = nightInterval.overlap(shiftInterval2);
             mapHours.put("nighthours2", SYSCalendar.getHoursAsDecimal(nighthours2));
         }
+
+        mapHours.put("basehours", SYSCalendar.getHoursAsDecimal(new Interval(getStart(day), getEnd(day))));
 
         OPDE.debug(day);
         OPDE.debug(mapHours);
