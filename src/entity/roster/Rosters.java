@@ -57,7 +57,7 @@ public class Rosters {
 
     public Rosters(LocalDate month, String xml) {
         this.month = month.dayOfMonth().withMinimumValue().toDate();
-        this.flag = RostersTools.FLAG_ACTIVE;
+        this.flag = RostersTools.FLAG_PLANNING_STAGE;
         this.section = RostersTools.SECTION_CARE;
         this.xml = xml;
     }
@@ -114,17 +114,17 @@ public class Rosters {
         this.openedBy = openedBy;
     }
 
-    public boolean isActive() {
-        return flag == RostersTools.FLAG_ACTIVE;
-    }
-
-    public boolean isClosed() {
-        return flag == RostersTools.FLAG_CLOSED;
-    }
-
-    public boolean isLocked() {
-        return flag == RostersTools.FLAG_LOCKED;
-    }
+//    public boolean isActive() {
+//        return flag == RostersTools.FLAG_ACTIVE;
+//    }
+//
+//    public boolean isClosed() {
+//        return flag == RostersTools.FLAG_CLOSED;
+//    }
+//
+//    public boolean isLocked() {
+//        return flag == RostersTools.FLAG_LOCKED;
+//    }
 
     @Override
     public boolean equals(Object o) {

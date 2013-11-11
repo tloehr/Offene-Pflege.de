@@ -22,6 +22,16 @@ import java.util.HashSet;
 
 public class Symbol {
 
+    public static final String DAYHOURS1 = "dayhours1";
+    public static final String DAYHOURS2 = "dayhours2";
+    public static final String NIGHTHOURS1 = "nighthours1";
+    public static final String NIGHTHOURS2 = "nighthours2";
+    public static final String HOLIHOURS1 = "holihours1";
+    public static final String HOLIHOURS2 = "holihours2";
+    public static final String EXTRA = "extra";
+    public static final String BREAKTIME = "breaktime";
+    public static final String BASEHOURS = "basehours";
+
     public static final int AWERT = 0;
     public static final int KWERT = 1;
     public static final int UWERT = 2;
@@ -287,14 +297,14 @@ public class Symbol {
         if (symboltype == PVALUE) return null;
 
         HashMap<String, BigDecimal> mapHours = new HashMap<String, BigDecimal>();
-        mapHours.put("dayhours1", BigDecimal.ZERO);
-        mapHours.put("dayhours2", BigDecimal.ZERO);
-        mapHours.put("nighthours1", BigDecimal.ZERO);
-        mapHours.put("nighthours2", BigDecimal.ZERO);
-        mapHours.put("holihours1", BigDecimal.ZERO);
-        mapHours.put("holihours2", BigDecimal.ZERO);
-        mapHours.put("extra", getExtraHours(day, contractsParameterSet));
-        mapHours.put("break", getBreak());
+        mapHours.put(DAYHOURS1, BigDecimal.ZERO);
+        mapHours.put(DAYHOURS2, BigDecimal.ZERO);
+        mapHours.put(NIGHTHOURS1, BigDecimal.ZERO);
+        mapHours.put(NIGHTHOURS2, BigDecimal.ZERO);
+        mapHours.put(HOLIHOURS1, BigDecimal.ZERO);
+        mapHours.put(HOLIHOURS2, BigDecimal.ZERO);
+        mapHours.put(EXTRA, getExtraHours(day, contractsParameterSet));
+        mapHours.put(BREAKTIME, getBreak());
 
 
         // determine the night hours according to the user's contract
@@ -316,13 +326,13 @@ public class Symbol {
         for (Interval interval : dayhours1) {
             dayh1 = dayh1.add(SYSCalendar.getHoursAsDecimal(interval));
         }
-        mapHours.put("dayhours1", dayh1);
+        mapHours.put(DAYHOURS1, dayh1);
         if (day.getDayOfWeek() != DateTimeConstants.SUNDAY && OPDE.isHoliday(day)) {
-            mapHours.put("holihours1", dayh1);
+            mapHours.put(HOLIHOURS1, dayh1);
         }
 
         Interval nighthours1 = nightInterval.overlap(shiftInterval1);
-        mapHours.put("nighthours1", SYSCalendar.getHoursAsDecimal(nighthours1));
+        mapHours.put(NIGHTHOURS1, SYSCalendar.getHoursAsDecimal(nighthours1));
 
         if (isOvernight()) {
             Interval shiftInterval2 = new Interval(startDay2, endDay2);
@@ -331,20 +341,20 @@ public class Symbol {
             for (Interval interval : dayhours2) {
                 dayh2 = dayh2.add(SYSCalendar.getHoursAsDecimal(interval));
             }
-            mapHours.put("dayhours2", dayh2);
+            mapHours.put(DAYHOURS2, dayh2);
             if (day.getDayOfWeek() != DateTimeConstants.SUNDAY && OPDE.isHoliday(day)) {
-                mapHours.put("holihours2", dayh2);
+                mapHours.put(HOLIHOURS2, dayh2);
             }
 
             Interval nighthours2 = nightInterval.overlap(shiftInterval2);
-            mapHours.put("nighthours2", SYSCalendar.getHoursAsDecimal(nighthours2));
+            mapHours.put(NIGHTHOURS2, SYSCalendar.getHoursAsDecimal(nighthours2));
         }
 
-        mapHours.put("basehours", SYSCalendar.getHoursAsDecimal(new Interval(getStart(day), getEnd(day))));
+        mapHours.put(BASEHOURS, SYSCalendar.getHoursAsDecimal(new Interval(getStart(day), getEnd(day))));
 
-        OPDE.debug(day);
-        OPDE.debug(mapHours);
-        OPDE.debug("---");
+//        OPDE.debug(day);
+//        OPDE.debug(mapHours);
+//        OPDE.debug("---");
 
         return mapHours;
     }

@@ -34,6 +34,8 @@ import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
@@ -361,8 +363,8 @@ public class FrmRoster extends JFrame {
             public void componentResized(ComponentEvent evt) {
                 super.componentResized(evt);
                 tsp1.getRowHeaderTable().getColumnModel().getColumn(0).setPreferredWidth(120);
-                tsp1.getRowHeaderTable().getColumnModel().getColumn(1).setPreferredWidth(120);
-                tsp1.getRowHeaderTable().getColumnModel().getColumn(2).setPreferredWidth(120);
+                tsp1.getRowHeaderTable().getColumnModel().getColumn(1).setPreferredWidth(200);
+                tsp1.getRowHeaderTable().getColumnModel().getColumn(2).setPreferredWidth(200);
                 for (int col = 0; col < tsp1.getMainTable().getColumnCount(); col++) {  //(int day = 0; day < new LocalDate(roster.getMonth()).dayOfMonth().withMaximumValue().getDayOfMonth(); day++) {
                     tsp1.getMainTable().getColumnModel().getColumn(col).setPreferredWidth(100);
 
@@ -418,8 +420,8 @@ public class FrmRoster extends JFrame {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "default, $lcgap, default:grow, $lcgap, default",
-            "default, $lgap, default:grow, 2*($lgap, default)"));
+                "default, $lcgap, default:grow, $lcgap, default",
+                "default, $lgap, default:grow, 2*($lgap, default)"));
 
         //======== toolBar1 ========
         {

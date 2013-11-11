@@ -442,7 +442,16 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             userlist.set(rowIndex / 4, new Pair<Users, Homes>(myUser, defaultHome));
 
             if (!statsPerUser.containsKey(myUser)) {
-                statsPerUser.put(myUser, new StatsPerUser(WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOURS), WorkAccountTools.getSick(month, myUser), WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOLIDAYS), rosterParameters));
+                statsPerUser.put(myUser, new StatsPerUser(
+                        WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOURS),
+                        WorkAccountTools.getSick(month, myUser),
+                        WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOLIDAYS),
+                        WorkAccountTools.getSum(month.dayOfYear().withMinimumValue().minusDays(1), myUser, WorkAccountTools.HOLIDAYS),
+                        rosterParameters,
+                        contracts.get(myUser).getContractsWithinMonth(month).get(0).getDefaults(),
+                        roster.getFlag()
+                )
+                );
                 content.put(myUser, new ArrayList<Rplan>());
                 for (int i = 0; i < month.dayOfMonth().withMaximumValue().getDayOfMonth(); i++) {
                     content.get(myUser).add(null);
@@ -577,12 +586,12 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             } else {
                 value = contracts.get(user).getParameterSet(month).isExam() ? "<html><b>Examen</b></html>" : "Helfer";
             }
-        } else if (ct == CT_CARRY_HOURS) {
-            value = "St: " + statsPerUser.get(user).getHoursCarry().setScale(2, RoundingMode.HALF_UP).toString();
-        } else if (ct == CT_CARRY_SICK) {
-            value = "Kr: " + statsPerUser.get(user).getSickCarry().setScale(2, RoundingMode.HALF_UP).toString();
-        } else if (ct == CT_CARRY_HOLIDAY) {
-            value = "Url: " + statsPerUser.get(user).getHolidayCarry().setScale(2, RoundingMode.HALF_UP).toString();
+//        } else if (ct == CT_CARRY_HOURS) {
+//            value = "St: " + statsPerUser.get(user).getHoursCarry().setScale(2, RoundingMode.HALF_UP).toString();
+//        } else if (ct == CT_CARRY_SICK) {
+//            value = "Kr: " + statsPerUser.get(user).getSickCarry().setScale(2, RoundingMode.HALF_UP).toString();
+//        } else if (ct == CT_CARRY_HOLIDAY) {
+//            value = "Url: " + statsPerUser.get(user).getHolidayCarry().setScale(2, RoundingMode.HALF_UP).toString();
         } else if (ct == CT_P1) {
             value = content.get(user).get(columnIndex - ROW_HEADER) != null ? content.get(user).get(columnIndex - ROW_HEADER).getP1() : "";
 //            if (!value.toString().isEmpty()) {
@@ -614,7 +623,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         } else if (ct == CT_SUM_HOLIDAY) {
             value = "Url: " + statsPerUser.get(user).getHolidaySum().setScale(2, RoundingMode.HALF_UP).toString();
         } else if (ct == CT_STAT_TABLE) {
-            value = "<html><h2>fat one</h2></html>";
+            value = SYSTools.toHTMLForScreen(statsPerUser.get(user).getStatsAsHTML());
         }
 
         return value;
@@ -806,7 +815,15 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 userlist.add(new Pair<Users, Homes>(myUser, myHome));
 
                 if (!statsPerUser.containsKey(myUser)) {
-                    statsPerUser.put(myUser, new StatsPerUser(WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOURS), WorkAccountTools.getSick(month, myUser), WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOLIDAYS), rosterParameters));
+                    statsPerUser.put(myUser, new StatsPerUser(
+                            WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOURS),
+                            WorkAccountTools.getSick(month, myUser),
+                            WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOLIDAYS),
+                            WorkAccountTools.getSum(month.dayOfYear().withMinimumValue().minusDays(1), myUser, WorkAccountTools.HOLIDAYS),
+                            rosterParameters,
+                            contracts.get(myUser).getContractsWithinMonth(month).get(0).getDefaults(),
+                            roster.getFlag())
+                    );
                     content.put(myUser, new ArrayList<Rplan>());
                     for (int i = 0; i < month.dayOfMonth().withMaximumValue().getDayOfMonth(); i++) {
                         content.get(myUser).add(null);

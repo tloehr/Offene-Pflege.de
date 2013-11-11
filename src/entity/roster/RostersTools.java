@@ -34,9 +34,10 @@ import java.util.ArrayList;
  */
 public class RostersTools {
 
-    public static final int FLAG_ACTIVE = 0;
-    public static final int FLAG_CLOSED = 1;
-    public static final int FLAG_LOCKED = 2;
+    public static final int FLAG_PLANNING_STAGE = 0; // before the month has started
+    public static final int FLAG_USING_STAGE = 1; // during the running month
+    public static final int FLAG_CLOSED_STAGE = 2; // before calculating the wages
+    public static final int FLAG_LOCKED_STAGE = 3; // after the wages have been calculated and paid
 
     public static final int SECTION_CARE = 0;
     public static final int SECTION_KITCHEN = 0;
