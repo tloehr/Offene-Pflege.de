@@ -91,7 +91,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     RosterParameters rosterParameters = null;
 
     private final LocalDate month;
-    public static final int ROW_HEADER = 3;
+    public static final int ROW_HEADER = 2;
     public final int ROW_FOOTER;
     public static final int ROW_FOOTER_WIDTH = 0;
     public static final int COL_HEADER = 2;
@@ -139,8 +139,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
     @Override
     public CellSpan getCellSpanAt(int rowIndex, int columnIndex) {
-        if (columnIndex == 1 || columnIndex == 2 && rowIndex % 4 == 0) {
-            return new CellSpan(rowIndex, columnIndex, 4, 2);
+        if (columnIndex == 1 && rowIndex % 4 == 0) {
+            return new CellSpan(rowIndex, columnIndex, 4, 1);
         }
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
@@ -184,8 +184,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 //            } else if (rowIndex % 4 == 3) {
 //                cellType = CT_CARRY_HOURS;
 //            }
-        } else if (columnIndex == 2) { // homestats sum
-            cellType = CT_STAT_TABLE;
+//        } else if (columnIndex == 2) { // homestats sum
+//            cellType = CT_STAT_TABLE;
 //            if (rowIndex % 4 == 0) {
 //                cellType = CT_SUM_SICK;
 //            } else if (rowIndex % 4 == 1) {

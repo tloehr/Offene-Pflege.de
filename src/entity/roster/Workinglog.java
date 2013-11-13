@@ -33,7 +33,7 @@ public class Workinglog implements Comparable<Workinglog> {
     @Basic
     private String text;
     @Column(name = "type", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
-    @Version
+    @Basic
     private int type;
     @Column(name = "version", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
     @Version
@@ -63,11 +63,12 @@ public class Workinglog implements Comparable<Workinglog> {
     public Workinglog() {
     }
 
-    public Workinglog(BigDecimal hours, BigDecimal extra, BigDecimal percent, Rplan rplan) {
+    public Workinglog(BigDecimal hours, BigDecimal extra, BigDecimal percent, Rplan rplan, int type) {
         this.hours = hours;
         this.extra = extra;
         this.percent = percent;
         this.rplan = rplan;
+        this.type = type;
         this.creator = OPDE.getLogin().getUser();
     }
 

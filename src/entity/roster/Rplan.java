@@ -223,7 +223,7 @@ public class Rplan implements Comparable<Rplan> {
         if (roster != null ? !roster.equals(rplan.roster) : rplan.roster != null) return false;
         if (start != null ? !start.equals(rplan.start) : rplan.start != null) return false;
         if (text != null ? !text.equals(rplan.text) : rplan.text != null) return false;
-        if (workinglogs != null ? !workinglogs.equals(rplan.workinglogs) : rplan.workinglogs != null) return false;
+
 
         return true;
     }
@@ -242,7 +242,7 @@ public class Rplan implements Comparable<Rplan> {
         result = 31 * result + (home2 != null ? home2.hashCode() : 0);
         result = 31 * result + (homeactual != null ? homeactual.hashCode() : 0);
         result = 31 * result + (roster != null ? roster.hashCode() : 0);
-        result = 31 * result + (workinglogs != null ? workinglogs.hashCode() : 0);
+
         result = 31 * result + (int) (version ^ (version >>> 32));
         return result;
     }

@@ -175,14 +175,14 @@ public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIde
         boolean dateline = rowIndex == 0;
         int lineidx = (rowIndex - 1) % 3;
 
-        Object value = "footer";
+        Object value = "";
         if (columnIndex == 0) {
             value = "";
 
             if (!dateline && lineidx == 0) {
                 value = listHomes.get((rowIndex - 1) / 3).getShortname();
             }
-        } else if (columnIndex == 2) {
+        } else if (columnIndex == 1) {
             if (dateline) {
                 value = "Datum";
             } else if (lineidx == 0) {

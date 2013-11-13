@@ -65,7 +65,7 @@ public class StatsPerUser {
             if (rplan != null) {
                 HashMap<String, BigDecimal> map = rosterParameters.getSymbol(rplan.getEffectiveSymbol()).getHourStats(new LocalDate(rplan.getStart()), contractsParameterSet);
                 if (map != null) {
-                    hours_sum = hours_sum.add(map.get(Symbol.BASEHOURS));
+                    hours_sum = hours_sum.add(map.get(Symbol.BASEHOURS)).subtract(map.get(Symbol.BREAKTIME));
                     extra_hours = extra_hours.add(map.get(Symbol.HOLIHOURS1)).add(extra_hours.add(map.get(Symbol.HOLIHOURS2)));
                     night_hours = night_hours.add(map.get(Symbol.NIGHTHOURS1)).add(extra_hours.add(map.get(Symbol.NIGHTHOURS2)));
                 }

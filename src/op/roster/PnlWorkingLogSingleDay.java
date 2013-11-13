@@ -63,19 +63,22 @@ public class PnlWorkingLogSingleDay extends JPanel {
                 try {
                     em.getTransaction().begin();
                     Rplan myRplan = em.merge(rplan);
-                    em.lock(myRplan, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                    em.lock(myRplan, LockModeType.OPTIMISTIC);
 
 
+                    for (Workinglog workinglog : WorkinglogTools.createWorkingLogs(myRplan, rosterParameters.getSymbol(myRplan.getEffectiveSymbol()), userContracts.getParameterSet(new LocalDate(myRplan.getStart())))) {
+                        myRplan.getWorkinglogs().add(em.merge(workinglog));
+                    }
 
-
-
+                    myRplan.setActual(myRplan.getEffectiveSymbol());
 
 //                    Workinglog myWorkinglog = em.merge(new Workinglog(myRplan, rosterParameters.getSymbol(myRplan.getEffectiveSymbol(), userContracts)));
-                    Workinglog myWorkinglog = null;
-                    myRplan.getWorkinglogs().add(myWorkinglog);
+//                    Workinglog myWorkinglog = null;
+
                     em.getTransaction().commit();
                     rplan = myRplan;
                 } catch (OptimisticLockException ole) {
+                    OPDE.error(ole);
                     if (em.getTransaction().isActive()) {
                         em.getTransaction().rollback();
                     }
@@ -178,11 +181,11 @@ public class PnlWorkingLogSingleDay extends JPanel {
 //            if (workinglog.isActual()) {
 //                actual = workinglog;
 //            }
-//            if (!workinglog.isDeleted() && !workinglog.isReplaced()) {
-//                pnlList.add(getLine(workinglog));
-//            }
+            if (!workinglog.isDeleted() && !workinglog.isReplaced()) {
+                pnlList.add(getLine(workinglog));
+            }
         }
-        apply.setEnabled(actual == null);
+        apply.setEnabled(rplan.getActual().isEmpty());
         scrl.validate();
         scrl.repaint();
     }

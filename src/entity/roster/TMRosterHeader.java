@@ -8,7 +8,6 @@ import com.jidesoft.grid.ColumnIdentifierTableModel;
 import com.jidesoft.grid.StyleModel;
 import op.OPDE;
 import op.tools.GUITools;
-import op.tools.Pair;
 import op.tools.SYSConst;
 import org.joda.time.DateTimeConstants;
 
@@ -91,10 +90,9 @@ public class TMRosterHeader extends AbstractMultiTableModel implements ColumnIde
         } else if (columnIndex == 0 && rowIndex == 1) {
             value = "Username";
         } else if (columnIndex == 1 && rowIndex == 1) {
-            value = "Vorher";
-        } else if (columnIndex == 2 && rowIndex == 1) {
-            value = "Nachher";
+            value = "Statistik";
         }
+
         return value;
     }
 
