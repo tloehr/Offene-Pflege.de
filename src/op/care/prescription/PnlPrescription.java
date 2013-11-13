@@ -541,7 +541,7 @@ public class PnlPrescription extends NursingRecordsPanel {
     private java.util.List<Component> addFilters() {
         java.util.List<Component> list = new ArrayList<Component>();
 
-        tbClosed = GUITools.getNiceToggleButton(internalClassID + ".showclosed");
+        tbClosed = GUITools.getNiceToggleButton("nursingrecords.prescription.showclosed");
         tbClosed.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -558,7 +558,7 @@ public class PnlPrescription extends NursingRecordsPanel {
         java.util.List<Component> list = new ArrayList<Component>();
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
-            JideButton addRegular = GUITools.createHyperlinkButton(internalClassID + ".btnNewRegular", SYSConst.icon22add, new ActionListener() {
+            JideButton addRegular = GUITools.createHyperlinkButton("nursingrecords.prescription.btnNewRegular", SYSConst.icon22add, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     if (!resident.isActive()) {
@@ -621,7 +621,7 @@ public class PnlPrescription extends NursingRecordsPanel {
         }
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
-            JideButton addNewOnDemand = GUITools.createHyperlinkButton(internalClassID + ".btnNewOnDemand", SYSConst.icon22add, new ActionListener() {
+            JideButton addNewOnDemand = GUITools.createHyperlinkButton("nursingrecords.prescription.btnNewOnDemand", SYSConst.icon22add, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     if (!resident.isActive()) {
@@ -685,7 +685,7 @@ public class PnlPrescription extends NursingRecordsPanel {
         }
 
         if (resident.isCalcMediUPR1() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
-            JideButton buchenButton = GUITools.createHyperlinkButton(internalClassID + ".newstocks", new ImageIcon(getClass().getResource("/artwork/22x22/shetaddrow.png")), new ActionListener() {
+            JideButton buchenButton = GUITools.createHyperlinkButton("nursingrecords.prescription.newstocks", new ImageIcon(getClass().getResource("/artwork/22x22/shetaddrow.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     if (!resident.isActive()) {
@@ -700,7 +700,7 @@ public class PnlPrescription extends NursingRecordsPanel {
         }
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
-            JideButton printPrescription = GUITools.createHyperlinkButton(internalClassID + ".print", SYSConst.icon22print2, new ActionListener() {
+            JideButton printPrescription = GUITools.createHyperlinkButton("nursingrecords.prescription.print", SYSConst.icon22print2, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     SYSFilesTools.print(PrescriptionTools.getPrescriptionsAsHTML(lstPrescriptions, true, true, false, tbClosed.isSelected(), true), true);
@@ -708,7 +708,7 @@ public class PnlPrescription extends NursingRecordsPanel {
             });
             list.add(printPrescription);
 
-//            JideButton printDaily = GUITools.createHyperlinkButton(internalClassID + ".printdailyplan", SYSConst.icon22print2, new ActionListener() {
+//            JideButton printDaily = GUITools.createHyperlinkButton("nursingrecords.prescription.printdailyplan", SYSConst.icon22print2, new ActionListener() {
 //                @Override
 //                public void actionPerformed(ActionEvent actionEvent) {
 //                    SYSFilesTools.print(PrescriptionTools.printDailyPlan(resident.getStation().getHome()), true);
@@ -753,7 +753,7 @@ public class PnlPrescription extends NursingRecordsPanel {
              *      \____|_| |_|\__,_|_| |_|\__, |\___|
              *                              |___/
              */
-            final JButton btnChange = GUITools.createHyperlinkButton(internalClassID + ".btnChange.tooltip", SYSConst.icon22playerPlay, null);
+            final JButton btnChange = GUITools.createHyperlinkButton("nursingrecords.prescription.btnChange.tooltip", SYSConst.icon22playerPlay, null);
             btnChange.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnChange.addActionListener(new ActionListener() {
                 @Override
@@ -833,7 +833,7 @@ public class PnlPrescription extends NursingRecordsPanel {
              *     |____/ \__\___/| .__/
              *                    |_|
              */
-            final JButton btnStop = GUITools.createHyperlinkButton(internalClassID + ".btnStop.tooltip", SYSConst.icon22playerStop, null);
+            final JButton btnStop = GUITools.createHyperlinkButton("nursingrecords.prescription.btnStop.tooltip", SYSConst.icon22playerStop, null);
             btnStop.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnStop.addActionListener(new ActionListener() {
                 @Override
@@ -903,7 +903,7 @@ public class PnlPrescription extends NursingRecordsPanel {
              *     |_____\__,_|_|\__/
              *
              */
-            final JButton btnEdit = GUITools.createHyperlinkButton(internalClassID + ".btnEdit.tooltip", SYSConst.icon22edit3, null);
+            final JButton btnEdit = GUITools.createHyperlinkButton("nursingrecords.prescription.btnEdit.tooltip", SYSConst.icon22edit3, null);
             btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnEdit.addActionListener(new ActionListener() {
                 @Override
@@ -1049,7 +1049,7 @@ public class PnlPrescription extends NursingRecordsPanel {
              *     |____/ \___|_|\___|\__\___|
              *
              */
-            final JButton btnDelete = GUITools.createHyperlinkButton(internalClassID + ".btnDelete.tooltip", SYSConst.icon22delete, null);
+            final JButton btnDelete = GUITools.createHyperlinkButton("nursingrecords.prescription.btnDelete.tooltip", SYSConst.icon22delete, null);
             btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnDelete.addActionListener(new ActionListener() {
                 @Override
@@ -1172,7 +1172,7 @@ public class PnlPrescription extends NursingRecordsPanel {
              *      \____|_|\___/|___/\___|____/ \__\___/ \___|_|\_\
              *
              */
-            final JButton btnCloseStock = GUITools.createHyperlinkButton(PnlInventory.internalClassID + ".stock.btnout.tooltip", SYSConst.icon22ledRedOn, null);
+            final JButton btnCloseStock = GUITools.createHyperlinkButton(PnlInventory.internalClassID+".stock.btnout.tooltip", SYSConst.icon22ledRedOn, null);
             btnCloseStock.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnCloseStock.addActionListener(new ActionListener() {
                 @Override
@@ -1219,7 +1219,7 @@ public class PnlPrescription extends NursingRecordsPanel {
              *      \___/| .__/ \___|_| |_|____/ \__\___/ \___|_|\_\
              *           |_|
              */
-            final JButton btnOpenStock = GUITools.createHyperlinkButton(PnlInventory.internalClassID + ".stock.btnopen.tooltip", SYSConst.icon22ledGreenOn, null);
+            final JButton btnOpenStock = GUITools.createHyperlinkButton(PnlInventory.internalClassID+".stock.btnopen.tooltip", SYSConst.icon22ledGreenOn, null);
             btnOpenStock.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnOpenStock.addActionListener(new ActionListener() {
                 @Override

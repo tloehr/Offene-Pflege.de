@@ -174,12 +174,12 @@ public class BHP implements Serializable, Comparable<BHP> {
         this.iZeit = iZeit;
     }
 
-    public Byte getStatus() {
+    public Byte getState() {
         return state;
     }
 
-    public void setStatus(Byte status) {
-        this.state = status;
+    public void setState(Byte state) {
+        this.state = state;
     }
 
     public BigDecimal getDose() {

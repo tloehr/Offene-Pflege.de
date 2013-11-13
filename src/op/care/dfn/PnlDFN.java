@@ -35,7 +35,9 @@ import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import com.toedter.calendar.JDateChooser;
 import entity.EntityTools;
+import entity.files.SYSFilesTools;
 import entity.info.Resident;
+import entity.info.ResidentTools;
 import entity.nursingprocess.DFN;
 import entity.nursingprocess.DFNTools;
 import entity.nursingprocess.Intervention;
@@ -439,7 +441,7 @@ public class PnlDFN extends NursingRecordsPanel {
          *      \___|_|  \___|\__,_|\__\___|\____|_|      |_|
          *
          */
-        String title = "<html><font size=+1><b>" + OPDE.lang.getString(internalClassID + ".ondemand") + "</b></font></html>";
+        String title = "<html><font size=+1><b>" + OPDE.lang.getString("nursingrecords.dfn.ondemand") + "</b></font></html>";
 
         final CollapsiblePane npPane = new CollapsiblePane(title);
         npPane.setSlidingDirection(SwingConstants.SOUTH);
@@ -478,10 +480,10 @@ public class PnlDFN extends NursingRecordsPanel {
         java.util.List<Component> list = new ArrayList<Component>();
         list.add(new JSeparator());
         list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22ledBlueOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22ledOrangeOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription3"), SYSConst.icon22ledPurpleOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription4"), SYSConst.icon22stopSign, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString("nursingrecords.dfn.keydescription1"), SYSConst.icon22ledBlueOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString("nursingrecords.dfn.keydescription2"), SYSConst.icon22ledOrangeOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString("nursingrecords.dfn.keydescription3"), SYSConst.icon22ledPurpleOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString("nursingrecords.dfn.keydescription4"), SYSConst.icon22stopSign, SwingConstants.LEADING));
         return list;
     }
 
@@ -556,7 +558,7 @@ public class PnlDFN extends NursingRecordsPanel {
                     }
 
                 } else {
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".notchangeable")));
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.dfn.notchangeable")));
                 }
             }
         };
@@ -579,7 +581,7 @@ public class PnlDFN extends NursingRecordsPanel {
         cptitle.getAdditionalIconPanel().add(icon2);
 
         if (dfn.isFloating()) {
-            cptitle.getButton().setToolTipText(OPDE.lang.getString(internalClassID + ".enforced.tooltip") + ": " + DateFormat.getDateInstance().format(dfn.getStDatum()));
+            cptitle.getButton().setToolTipText(OPDE.lang.getString("nursingrecords.dfn.enforced.tooltip") + ": " + DateFormat.getDateInstance().format(dfn.getStDatum()));
         }
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) && (dfn.isOnDemand() || !dfn.getNursingProcess().isClosed())) {
@@ -615,7 +617,7 @@ public class PnlDFN extends NursingRecordsPanel {
             btnCancel.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnCancel.setContentAreaFilled(false);
             btnCancel.setBorder(null);
-//            btnCancel.setToolTipText(OPDE.lang.getString(internalClassID + ".btneval.tooltip"));
+//            btnCancel.setToolTipText(OPDE.lang.getString("nursingrecords.dfn.btneval.tooltip"));
             btnCancel.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -677,7 +679,7 @@ public class PnlDFN extends NursingRecordsPanel {
                         }
 
                     } else {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".notchangeable")));
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.dfn.notchangeable")));
                     }
                 }
             });
@@ -697,7 +699,7 @@ public class PnlDFN extends NursingRecordsPanel {
             btnEmpty.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnEmpty.setContentAreaFilled(false);
             btnEmpty.setBorder(null);
-//            btnCancel.setToolTipText(OPDE.lang.getString(internalClassID + ".btneval.tooltip"));
+//            btnCancel.setToolTipText(OPDE.lang.getString("nursingrecords.dfn.btneval.tooltip"));
             btnEmpty.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -770,7 +772,7 @@ public class PnlDFN extends NursingRecordsPanel {
                         }
 
                     } else {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".notchangeable")));
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.dfn.notchangeable")));
                     }
                 }
             });
@@ -791,12 +793,12 @@ public class PnlDFN extends NursingRecordsPanel {
             btnMinutes.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnMinutes.setContentAreaFilled(false);
             btnMinutes.setBorder(null);
-//            btnCancel.setToolTipText(OPDE.lang.getString(internalClassID + ".btneval.tooltip"));
+//            btnCancel.setToolTipText(OPDE.lang.getString("nursingrecords.dfn.btneval.tooltip"));
             btnMinutes.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     if (!DFNTools.isChangeable(dfn)) {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".notchangeable")));
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.dfn.notchangeable")));
                         return;
                     }
                     final JPopupMenu menu = SYSCalendar.getMinutesMenu(new int[]{1, 2, 3, 4, 5, 10, 15, 20, 30, 45, 60, 120, 240, 360}, new Closure() {
@@ -1072,7 +1074,7 @@ public class PnlDFN extends NursingRecordsPanel {
          */
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
 
-            final JideButton btnAdd = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".btnadd"), SYSConst.icon22add, null);
+            final JideButton btnAdd = GUITools.createHyperlinkButton(OPDE.lang.getString("nursingrecords.dfn.btnadd"), SYSConst.icon22add, null);
             btnAdd.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -1162,6 +1164,25 @@ public class PnlDFN extends NursingRecordsPanel {
 
         }
 
+        final JideButton printPrescription = GUITools.createHyperlinkButton("nursingrecords.dfn.print", SYSConst.icon22print2, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+
+                String html = "";
+
+                synchronized (mapShift2DFN) {
+                    html += "<h1 id=\"fonth1\" >" + ResidentTools.getFullName(resident) + "</h1>";
+                    html += SYSConst.html_h2(OPDE.lang.getString("nursingrecords.bhp") + ": " + SYSConst.html_bold(DateFormat.getDateInstance().format(jdcDate.getDate())));
+
+                    for (Byte shift : new Byte[]{DFNTools.SHIFT_ON_DEMAND, DFNTools.SHIFT_VERY_EARLY, DFNTools.SHIFT_EARLY, DFNTools.SHIFT_LATE, DFNTools.SHIFT_VERY_LATE}) {
+                        html += DFNTools.getDFNsAsHTMLtable(mapShift2DFN.get(shift));
+                    }
+                }
+
+                SYSFilesTools.print(html, true);
+            }
+        });
+        list.add(printPrescription);
         return list;
     }
 

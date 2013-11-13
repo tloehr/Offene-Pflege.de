@@ -390,7 +390,7 @@ public class BHPTools {
                         bhp.setSoll(date);
                         bhp.setSollZeit(BYTE_TIMEOFDAY);
                         bhp.setDosis(schedule.getMaxEDosis());
-                        bhp.setStatus(BHPTools.STATE_OPEN);
+                        bhp.setState(BHPTools.STATE_OPEN);
                         listBHP4ThisPrescription.add(bhp);
                     }
                 }
@@ -490,7 +490,7 @@ public class BHPTools {
             }
         } else {
 
-            if (bhp.getStatus() == STATE_DONE) {
+            if (bhp.getState() == STATE_DONE) {
                 text += DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getIst()) + " " + OPDE.lang.getString("misc.msg.Time.short");
             } else {
                 text += "--";
@@ -502,16 +502,16 @@ public class BHPTools {
     }
 
     public static Icon getIcon(BHP bhp) {
-        if (bhp.getStatus() == STATE_DONE) {
+        if (bhp.getState() == STATE_DONE) {
             return SYSConst.icon22apply;
         }
-        if (bhp.getStatus() == STATE_OPEN) {
+        if (bhp.getState() == STATE_OPEN) {
             return null;
         }
-        if (bhp.getStatus() == STATE_REFUSED) {
+        if (bhp.getState() == STATE_REFUSED) {
             return SYSConst.icon22cancel;
         }
-        if (bhp.getStatus() == STATE_REFUSED_DISCARDED) {
+        if (bhp.getState() == STATE_REFUSED_DISCARDED) {
             return SYSConst.icon22deleteall;
         }
         return null;
@@ -582,6 +582,56 @@ public class BHPTools {
     }
 
 
+    public static String getBHPsAsHTMLtable(List<BHP> list) {
+           String result = "";
+
+           if (!list.isEmpty()) {
+
+               BHP b1 = list.get(0);
+               result += SYSConst.html_h3((b1.isOnDemand() ? OPDE.lang.getString("nursingrecords.bhp.ondemand") : OPDE.lang.getString(SHIFT_TEXT[b1.getShift()])));
+
+
+               result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
+                       "<th>" + OPDE.lang.getString("nursingrecords.nursingprocess.interventions") + "</th><th>Zeit / Status</th><th>Benutzer / Zeit</th></tr>";
+
+               for (BHP bhp : list) {
+
+
+                   String text =
+                                  PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription())+
+                                  (bhp.hasMed() ? ", <b>" + SYSTools.getAsHTML(bhp.getDose()) +
+                                          " " + DosageFormTools.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
+                                  BHPTools.getScheduleText(bhp, ", ", "") +
+                                  (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser().getUID()) + "</i>" : "");
+
+
+                   result += "<tr>";
+                   result += "<td valign=\"top\">" + text + "</td>";
+                   result += "<td valign=\"top\">" + getStateAsHTML(bhp) + "<br/>";
+                   result += "<td valign=\"top\">" + (bhp.isOpen() ? "" : bhp.getUser().getUID() + "; " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(bhp.getIst())) + "</td>";
+   //                result += "<td valign=\"top\">" + myprescription.getPITAsHTML();
+
+                   result += "</td>";
+                   result += "</tr>";
+
+               }
+
+               result += "</table>";
+           }
+
+           return result;
+       }
+
+    public static String getStateAsHTML(BHP bhp) {
+           String html = "";
+           if (bhp.getState() == STATE_DONE) {
+               html = "&#x2713;";
+           }
+           if (bhp.getState() == STATE_REFUSED) {
+               html = "&#x2717;";
+           }
+           return html;
+       }
 
 
 }

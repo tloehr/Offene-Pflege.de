@@ -123,6 +123,7 @@ public class DFNTools {
 
     /**
      * Those DFNs which habe to be processed but weren't yet, have to be transferred to the current day.
+     *
      * @param em
      * @throws Exception
      */
@@ -543,6 +544,51 @@ public class DFNTools {
         em.close();
 
         return list;
+    }
+
+    public static String getDFNsAsHTMLtable(List<DFN> list) {
+        String result = "";
+
+        if (!list.isEmpty()) {
+
+            DFN d1 = list.get(0);
+            result += SYSConst.html_h3(d1.isOnDemand() ? OPDE.lang.getString("nursingrecords.dfn.ondemand") : OPDE.lang.getString(SHIFT_TEXT[d1.getShift()]));
+
+
+            result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
+                    "<th>" + OPDE.lang.getString("nursingrecords.nursingprocess.interventions") + "</th><th>Zeit / Status</th><th>Benutzer / Zeit</th></tr>";
+
+            for (DFN dfn : list) {
+
+
+                result += "<tr>";
+                result += "<td valign=\"top\">" + dfn.getIntervention().getBezeichnung() +
+                        (dfn.isOnDemand() || SYSTools.catchNull(dfn.getInterventionSchedule().getBemerkung()).isEmpty() ? "" : " <i>(" + dfn.getInterventionSchedule().getBemerkung() + ")</i>")
+                        + "</td>";
+                result += "<td valign=\"top\">" + getScheduleText(dfn, " [", "]") + getStateAsHTML(dfn) + "<br/>";
+                result += "<td valign=\"top\">" + (dfn.isOpen() ? "" : dfn.getUser().getUID() + "; " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(dfn.getIst())) + "</td>";
+//                result += "<td valign=\"top\">" + myprescription.getPITAsHTML();
+
+                result += "</td>";
+                result += "</tr>";
+
+            }
+
+            result += "</table>";
+        }
+
+        return result;
+    }
+
+    public static String getStateAsHTML(DFN dfn) {
+        String html = "";
+        if (dfn.getState() == STATE_DONE) {
+            html = "&#x2713;";
+        }
+        if (dfn.getState() == STATE_REFUSED) {
+            html = "&#x2717;";
+        }
+        return html;
     }
 
 }

@@ -32,10 +32,13 @@ import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
+import com.jidesoft.swing.JideButton;
 import com.jidesoft.utils.ColorUtils;
 import com.toedter.calendar.JDateChooser;
 import entity.EntityTools;
+import entity.files.SYSFilesTools;
 import entity.info.Resident;
+import entity.info.ResidentTools;
 import entity.prescription.*;
 import op.OPDE;
 import op.system.InternalClassACL;
@@ -58,6 +61,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
+import java.text.DateFormat;
 import java.util.*;
 
 /**
@@ -506,7 +510,7 @@ public class PnlBHP extends NursingRecordsPanel {
         ActionListener applyActionListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                if (bhp.getStatus() != BHPTools.STATE_OPEN) {
+                if (bhp.getState() != BHPTools.STATE_OPEN) {
                     return;
                 }
                 if (bhp.getPrescription().isClosed()) {
@@ -530,7 +534,7 @@ public class PnlBHP extends NursingRecordsPanel {
                             em.lock(myBHP.getPrescription(), LockModeType.OPTIMISTIC);
                         }
 
-                        myBHP.setStatus(BHPTools.STATE_DONE);
+                        myBHP.setState(BHPTools.STATE_DONE);
                         myBHP.setUser(em.merge(OPDE.getLogin().getUser()));
                         myBHP.setIst(new Date());
                         myBHP.setiZeit(SYSCalendar.whatTimeIDIs(new Date()));
@@ -756,7 +760,7 @@ public class PnlBHP extends NursingRecordsPanel {
                 btnRefuse.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        if (bhp.getStatus() != BHPTools.STATE_OPEN) {
+                        if (bhp.getState() != BHPTools.STATE_OPEN) {
                             return;
                         }
 
@@ -771,7 +775,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 em.lock(myBHP.getPrescriptionSchedule(), LockModeType.OPTIMISTIC);
                                 em.lock(myBHP.getPrescription(), LockModeType.OPTIMISTIC);
 
-                                myBHP.setStatus(BHPTools.STATE_REFUSED);
+                                myBHP.setState(BHPTools.STATE_REFUSED);
                                 myBHP.setUser(em.merge(OPDE.getLogin().getUser()));
                                 myBHP.setIst(new Date());
                                 myBHP.setiZeit(SYSCalendar.whatTimeIDIs(new Date()));
@@ -834,7 +838,7 @@ public class PnlBHP extends NursingRecordsPanel {
                 btnRefuseDiscard.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        if (bhp.getStatus() != BHPTools.STATE_OPEN) {
+                        if (bhp.getState() != BHPTools.STATE_OPEN) {
                             return;
                         }
 
@@ -849,7 +853,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 em.lock(myBHP.getPrescriptionSchedule(), LockModeType.OPTIMISTIC);
                                 em.lock(myBHP.getPrescription(), LockModeType.OPTIMISTIC);
 
-                                myBHP.setStatus(BHPTools.STATE_REFUSED_DISCARDED);
+                                myBHP.setState(BHPTools.STATE_REFUSED_DISCARDED);
                                 myBHP.setUser(em.merge(OPDE.getLogin().getUser()));
                                 myBHP.setIst(new Date());
                                 myBHP.setiZeit(SYSCalendar.whatTimeIDIs(new Date()));
@@ -923,7 +927,7 @@ public class PnlBHP extends NursingRecordsPanel {
                 btnEmpty.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        if (bhp.getStatus() == BHPTools.STATE_OPEN) {
+                        if (bhp.getState() == BHPTools.STATE_OPEN) {
                             return;
                         }
 
@@ -940,7 +944,7 @@ public class PnlBHP extends NursingRecordsPanel {
 
                                 // the normal BHPs (those assigned to a NursingProcess) are reset to the OPEN state.
                                 // TXs are deleted
-                                myBHP.setStatus(BHPTools.STATE_OPEN);
+                                myBHP.setState(BHPTools.STATE_OPEN);
                                 myBHP.setUser(null);
                                 myBHP.setIst(null);
                                 myBHP.setiZeit(null);
@@ -1111,7 +1115,8 @@ public class PnlBHP extends NursingRecordsPanel {
             OPDE.error(e);
         }
 
-//        searchPanes.add(addCommands());
+
+        GUITools.addAllComponents(searchPanes, addCommands());
         GUITools.addAllComponents(searchPanes, addFilter());
 
         GUITools.addAllComponents(searchPanes, addKey());
@@ -1236,8 +1241,36 @@ public class PnlBHP extends NursingRecordsPanel {
         return list;
     }
 
-//
+    private java.util.List<Component> addCommands() {
 
+        java.util.List<Component> list = new ArrayList<Component>();
+
+
+        final JideButton printPrescription = GUITools.createHyperlinkButton("nursingrecords.dfn.print", SYSConst.icon22print2, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+
+                String html = "";
+
+                synchronized (mapShift2BHP) {
+                    html += "<h1 id=\"fonth1\" >" + ResidentTools.getFullName(resident) + "</h1>";
+                    html += SYSConst.html_h2(OPDE.lang.getString("nursingrecords.bhp") + ": " + SYSConst.html_bold(DateFormat.getDateInstance().format(jdcDatum.getDate())));
+
+                    for (Byte shift : new Byte[]{BHPTools.SHIFT_ON_DEMAND, BHPTools.SHIFT_VERY_EARLY, BHPTools.SHIFT_EARLY, BHPTools.SHIFT_LATE, BHPTools.SHIFT_VERY_LATE}) {
+                        if (mapShift2BHP.containsKey(shift)) {
+                            html += BHPTools.getBHPsAsHTMLtable(mapShift2BHP.get(shift));
+                        }
+                    }
+                }
+
+                SYSFilesTools.print(html, true);
+            }
+        });
+        list.add(printPrescription);
+
+
+        return list;
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JScrollPane jspBHP;
