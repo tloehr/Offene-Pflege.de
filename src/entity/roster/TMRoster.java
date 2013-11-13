@@ -95,7 +95,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     public final int ROW_FOOTER;
     public static final int ROW_FOOTER_WIDTH = 0;
     public static final int COL_HEADER = 2;
-    public static final int COL_SUM = 2;
+    public static final int COL_SUM = 1;
     public final int COL_FOOTER;
 
     public CellStyle baseStyle;
@@ -399,11 +399,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     public void cleanup() {
         content.clear();
         contracts.clear();
-//        homeslist.clear();
         userlist.clear();
-//        homestats.clear();
         statsPerUser.clear();
-//        statsPerDay.clear();
     }
 
     @Override
@@ -419,10 +416,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     public LocalDate getDay(int columnIndex) {
         return month.plusDays(columnIndex - ROW_HEADER);
     }
-
-//    private int getBaseCol(int columnIndex) {
-//        return columnIndex - ROW_HEADER;
-//    }
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
@@ -534,9 +527,9 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
 
                     fireTableCellUpdated(startrow, COL_SUM);
-                    fireTableCellUpdated(startrow + 1, COL_SUM);
-                    fireTableCellUpdated(startrow + 2, COL_SUM);
-                    fireTableCellUpdated(startrow + 3, COL_SUM);
+//                    fireTableCellUpdated(startrow + 1, COL_SUM);
+//                    fireTableCellUpdated(startrow + 2, COL_SUM);
+//                    fireTableCellUpdated(startrow + 3, COL_SUM);
 
                 }
 
@@ -616,12 +609,12 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             } else {
                 value = "-/-";
             }
-        } else if (ct == CT_SUM_HOURS) {
-            value = "St: " + statsPerUser.get(user).getHoursSum().setScale(2, RoundingMode.HALF_UP).toString();
-        } else if (ct == CT_SUM_SICK) {
-            value = "Kr: " + statsPerUser.get(user).getSickSum().setScale(2, RoundingMode.HALF_UP).toString();
-        } else if (ct == CT_SUM_HOLIDAY) {
-            value = "Url: " + statsPerUser.get(user).getHolidaySum().setScale(2, RoundingMode.HALF_UP).toString();
+//        } else if (ct == CT_SUM_HOURS) {
+//            value = "St: " + statsPerUser.get(user).getHoursSum().setScale(2, RoundingMode.HALF_UP).toString();
+//        } else if (ct == CT_SUM_SICK) {
+//            value = "Kr: " + statsPerUser.get(user).getSickSum().setScale(2, RoundingMode.HALF_UP).toString();
+//        } else if (ct == CT_SUM_HOLIDAY) {
+//            value = "Url: " + statsPerUser.get(user).getHolidaySum().setScale(2, RoundingMode.HALF_UP).toString();
         } else if (ct == CT_STAT_TABLE) {
             value = SYSTools.toHTMLForScreen(statsPerUser.get(user).getStatsAsHTML());
         }
@@ -761,7 +754,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             statsPerUser.get(user).update(content.get(user));
             statsPerDay.update(content, columnIndex);
 
-
             roster = myRoster;
 
         } catch (OptimisticLockException ole) {
@@ -785,9 +777,9 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             fireTableCellUpdated(startrow + 3, columnIndex + ROW_HEADER);
 
             fireTableCellUpdated(startrow, COL_SUM);
-            fireTableCellUpdated(startrow + 1, COL_SUM);
-            fireTableCellUpdated(startrow + 2, COL_SUM);
-            fireTableCellUpdated(startrow + 3, COL_SUM);
+//            fireTableCellUpdated(startrow + 1, COL_SUM);
+//            fireTableCellUpdated(startrow + 2, COL_SUM);
+//            fireTableCellUpdated(startrow + 3, COL_SUM);
 
             if (updateFooter != null) {
                 // adapt columnindex. the keypressed event ignores the column index of the row header table.

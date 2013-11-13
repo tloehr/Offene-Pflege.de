@@ -6,6 +6,7 @@ import op.tools.SYSTools;
 import org.joda.time.LocalDate;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -52,26 +53,13 @@ public class StatsPerUser {
         this.holiday_sum = BigDecimal.ZERO;
     }
 
-//    public StatsPerUser(BigDecimal hours_carry, BigDecimal sick_carry, BigDecimal holiday_carry, RosterParameters rosterParameters) {
-//        this.hours_carry = hours_carry;
-//        this.sick_carry = sick_carry;
-//        this.holiday_carry = holiday_carry;
-//        this.rosterParameters = rosterParameters;
-//        this.hours_sum = hours_carry;
-//        this.sick_sum = sick_carry;
-//        this.holiday_lastyear_sum = holiday_carry;
-//        this.extrahours_sum = BigDecimal.ZERO;
-//    }
-
-
     public void update(ArrayList<Rplan> data) {
-//        BigDecimal sumHours = hours_carry;
-//        BigDecimal sumSick = sick_carry;
-//        BigDecimal sumHol = holiday_carry;
+
         BigDecimal sumExtra = BigDecimal.ZERO;
         hours_sum = BigDecimal.ZERO;
         sick_sum = BigDecimal.ZERO;
         extra_hours = BigDecimal.ZERO;
+        night_hours = BigDecimal.ZERO;
 
         for (Rplan rplan : data) {
             if (rplan != null) {
@@ -93,14 +81,6 @@ public class StatsPerUser {
 
         extrahours_sum = sumExtra;
     }
-
-//    private void subtract1Holidays() {
-//        if (holiday_lastyear_sum.compareTo(BigDecimal.ZERO) > 0) {
-//            holiday_lastyear_sum = holiday_lastyear_sum.subtract(BigDecimal.ONE);
-//        } else {
-//            holiday_thisyear_sum = holiday_thisyear_sum.subtract(BigDecimal.ONE);
-//        }
-//    }
 
     public BigDecimal getHoursSum() {
         return hours_sum;
@@ -145,12 +125,12 @@ public class StatsPerUser {
 
         content += SYSConst.html_table_tr(
                 SYSConst.html_table_th("Stunden") +
-                        SYSConst.html_table_td(contractsParameterSet.getTargetHoursPerMonth().toString()) +
-                        SYSConst.html_table_td(hours_sum.toString()) +
-                        SYSConst.html_table_td(hours_carry.toString()) +
-                        SYSConst.html_table_td(hours_carry.add(hours_sum).toString()) +
-                        SYSConst.html_table_td(extra_hours.toString()) +
-                        SYSConst.html_table_td(night_hours.toString())
+                        SYSConst.html_table_td(contractsParameterSet.getTargetHoursPerMonth().setScale(2, RoundingMode.HALF_UP).toString()) +
+                        SYSConst.html_table_td(hours_sum.setScale(2, RoundingMode.HALF_UP).toString()) +
+                        SYSConst.html_table_td(hours_carry.setScale(2, RoundingMode.HALF_UP).toString()) +
+                        SYSConst.html_table_td(hours_carry.add(hours_sum).setScale(2, RoundingMode.HALF_UP).toString()) +
+                        SYSConst.html_table_td(extra_hours.setScale(2, RoundingMode.HALF_UP).toString()) +
+                        SYSConst.html_table_td(night_hours.setScale(2, RoundingMode.HALF_UP).toString())
         );
 
         content += SYSConst.html_table_tr(
@@ -167,11 +147,11 @@ public class StatsPerUser {
 
         content += SYSConst.html_table_tr(
                 SYSConst.html_table_th("Url.Tage") +
-                        SYSConst.html_table_td(holiday_lastyear_carry.toString()) +
-                        SYSConst.html_table_td(holiday_thisyear_carry.toString()) +
-                        SYSConst.html_table_td(holiday_sum.toString()) +
-                        SYSConst.html_table_td(holidays.getFirst().toString()) +
-                        SYSConst.html_table_td(holidays.getSecond().toString()) +
+                        SYSConst.html_table_td(holiday_lastyear_carry.setScale(0, RoundingMode.HALF_UP).toString()) +
+                        SYSConst.html_table_td(holiday_thisyear_carry.setScale(0, RoundingMode.HALF_UP).toString()) +
+                        SYSConst.html_table_td(holiday_sum.setScale(0, RoundingMode.HALF_UP).toString()) +
+                        SYSConst.html_table_td(holidays.getFirst().setScale(0, RoundingMode.HALF_UP).toString()) +
+                        SYSConst.html_table_td(holidays.getSecond().setScale(0, RoundingMode.HALF_UP).toString()) +
                         SYSConst.html_table_td("")
         );
 
@@ -180,17 +160,23 @@ public class StatsPerUser {
     }
 
     public Pair<BigDecimal, BigDecimal> getRemainingHoliday() {
-        BigDecimal thisYearRemain;
+        BigDecimal thisYearRemain = BigDecimal.ZERO;
+        BigDecimal lastYearRemain = BigDecimal.ZERO;
 
         // Die Zahlen stimmen nicht
 
-        BigDecimal lastYearRemain = holiday_lastyear_carry.subtract(holiday_sum);
-        if (lastYearRemain.compareTo(BigDecimal.ZERO) <= 0) {
-            thisYearRemain = lastYearRemain.abs();
+
+        if (holiday_lastyear_carry.equals(BigDecimal.ZERO)) {
+            thisYearRemain = holiday_thisyear_carry.subtract(holiday_sum);
             lastYearRemain = BigDecimal.ZERO;
-        } else {
-            thisYearRemain = holiday_sum.subtract(lastYearRemain);
+        } else if (holiday_lastyear_carry.compareTo(holiday_sum) >= 0) {
+            thisYearRemain = holiday_thisyear_carry;
+            lastYearRemain = holiday_lastyear_carry.subtract(holiday_sum);
+        } else if (holiday_lastyear_carry.compareTo(holiday_sum) < 0) {
+            lastYearRemain = BigDecimal.ZERO;
+            thisYearRemain = holiday_thisyear_carry.add(holiday_lastyear_carry).subtract(holiday_sum);
         }
+
 
         return new Pair<BigDecimal, BigDecimal>(lastYearRemain, thisYearRemain);
     }
