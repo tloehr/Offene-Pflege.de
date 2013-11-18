@@ -1,5 +1,6 @@
 package entity.prescription;
 
+import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.tools.SYSTools;
 
@@ -77,6 +78,10 @@ public class MedPackageTools {
     /**
      * This method checks if a given string represents a valid german PZN, which may (as of 2013) have a length
      * of 7 or 8 chars. It must also be conform to the checksum algorithm defined by SecurPharm.
+     * <p/>
+     * Extension for the <b>austrian</b> PZN system. In austria the PZN as a fixed size of 7 (well, 6 + the checkdigit).
+     * It is integrated into an EAN13 of a special structure.
+     * <p/>
      * All the barcode scanners that came across added a "ß" at the front of the scanned number. So this
      * has to be removed if present.
      *
@@ -85,23 +90,54 @@ public class MedPackageTools {
      */
     public static String parsePZN(String pzn) {
         pzn = pzn.trim();
-        pzn = pzn.replaceAll( "[^\\d]", "");
+        pzn = pzn.replaceAll("[^\\d]", "");
 
-        if (pzn.matches("^\\d{7,8}")) {
-//            pzn = (pzn.startsWith("ß") ? pzn.substring(1) : pzn);
+        if (SYSPropsTools.getCountry().equals("germany")) {
+            if (pzn.matches("^\\d{7,8}")) {
+                //            pzn = (pzn.startsWith("ß") ? pzn.substring(1) : pzn);
 
-            // this is only temporarily until the PZN7's are gone completely. it may take some years.
-            if (pzn.length() == 7) {
-                pzn = "0" + pzn;
-            }
+                // this is only temporarily until the PZN7's are gone completely. it may take some years.
+                if (pzn.length() == 7) {
+                    pzn = "0" + pzn;
+                }
 
-            if (!isPZNValid(pzn)) {
+                if (!isPZNValid(pzn)) {
+                    pzn = null;
+                }
+
+            } else {
                 pzn = null;
             }
+        } else if (SYSPropsTools.getCountry().equals("austria")) {
+            // the austrian PZNs are also checked by teh MOD11 procedure.
+            if (pzn.matches("^\\d{7}")) {
 
-        } else {
-            pzn = null;
+                // this is only temporarily until the PZN7's are gone completely. it may take some years.
+                if (pzn.length() == 7) {
+                    pzn = "0" + pzn;
+                }
+
+                if (!isPZNValid(pzn)) {
+                    pzn = null;
+                }
+
+            } else if (pzn.matches("^\\d{13}")) { // when the EAN Code is used, the checkdigit of the PZN is not available anymore.
+
+                if (pzn.startsWith("908888")) { // 90 is austria, 8888 is the pharma code for 'ARGE Pharma'
+                    pzn = pzn.substring(6, 11);
+                    pzn += Integer.toString(getMOD11(pzn)); // calculate a proper MOD11 checksum.
+
+                    // this is only temporarily until the PZN7's are gone completely. it may take some years.
+                    if (pzn.length() == 7) {
+                        pzn = "0" + pzn;
+                    }
+                } else {
+                    pzn = null;
+                }
+            }
         }
+
+
         return pzn;
     }
 
@@ -119,12 +155,21 @@ public class MedPackageTools {
      * @return guess
      */
     private static boolean isPZNValid(String pzn) {
+        int calculatedChecksum = getMOD11(pzn);
+        int givenChecksum = Integer.parseInt(String.valueOf(pzn.charAt(pzn.length() - 1)));
+        if (calculatedChecksum != givenChecksum) {
+            OPDE.debug("PZN is NOT valid");
+        }
+
+        return calculatedChecksum == givenChecksum;
+    }
+
+    private static int getMOD11(String pzn) {
         int[] digits = new int[pzn.length() - 1];
 
         for (int c = 0; c < pzn.length() - 1; c++) {
             digits[c] = Integer.parseInt(String.valueOf(pzn.charAt(c)));
         }
-        int givenChecksum = Integer.parseInt(String.valueOf(pzn.charAt(pzn.length() - 1)));
 
         int weightedSum = 0;
         int w = 7;
@@ -133,11 +178,6 @@ public class MedPackageTools {
             w--;
         }
         int calculatedChecksum = weightedSum % 11;
-
-        if (calculatedChecksum != givenChecksum) {
-            OPDE.debug("PZN is NOT valid");
-        }
-
-        return calculatedChecksum == givenChecksum;
+        return calculatedChecksum;
     }
 }

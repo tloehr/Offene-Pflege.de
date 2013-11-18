@@ -5,7 +5,6 @@
 package entity.system;
 
 import op.OPDE;
-import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -27,6 +26,7 @@ public class SYSPropsTools {
     public static final String KEY_LOGICAL_PRINTER = "printer.logical.name";
     public static final String KEY_MEDSTOCK_LABEL = "printer.medstock.label.name";
     public static final String KEY_STATION = "station";
+    public static final String KEY_COUNTRY = "country";
     public static final String KEY_MAIL_HOST = "mail.smtp.host";
     public static final String KEY_MAIL_PORT = "mail.smtp.port";
     public static final String KEY_MAIL_PROTOCOL = "mail.transport.protocol";
@@ -227,6 +227,16 @@ public class SYSPropsTools {
         } else {
             cmb.setSelectedIndex(0);
         }
+    }
+
+    public static String getCountry() {
+        String country = "germany";
+        if (OPDE.getProps().containsKey(SYSPropsTools.KEY_COUNTRY)) {
+            country = OPDE.getProps().getProperty(SYSPropsTools.KEY_COUNTRY);
+        } else {
+            SYSPropsTools.storeProp(SYSPropsTools.KEY_COUNTRY, country);
+        }
+        return country;
     }
 
 }
