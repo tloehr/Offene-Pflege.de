@@ -52,7 +52,7 @@ new FormModel {
 				} )
 				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
 					"$columnSpecs": "left:default:grow"
-					"$rowSpecs": "default, linegap, default, relgap, fill:default, linegap, default"
+					"$rowSpecs": "default, linegap, default, relgap, fill:default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default"
 				} ) {
 					name: "panel2"
 					add( new FormComponent( "javax.swing.JComboBox" ) {
@@ -69,6 +69,31 @@ new FormModel {
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 						"gridX": 1
 						"gridY": 5
+					} )
+					add( new FormComponent( "javax.swing.JTextField" ) {
+						name: "txtPZN"
+						"toolTipText": "PZN Check"
+						addEvent( new FormEvent( "javax.swing.event.CaretListener", "caretUpdate", "txtPZNCaretUpdate", true ) )
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridX": 1
+						"gridY": 11
+						"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+					} )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "btnMod11"
+						"text": "calc mod11"
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnMod11ActionPerformed", true ) )
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridX": 1
+						"gridY": 13
+					} )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "btnImportMedDB"
+						"text": "import meddb.xls"
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnImportMedDBActionPerformed", true ) )
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridX": 1
+						"gridY": 17
 					} )
 				}, new FormLayoutConstraints( null ) {
 					"title": "text"

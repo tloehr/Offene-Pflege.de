@@ -222,7 +222,7 @@ public class PnlInventory extends NursingRecordsPanel {
             @Override
             public void itemStateChanged(ItemEvent e) {
 //                synchronized (lstInventories) {
-//                    lstInventories = tbClosedInventory.isSelected() ? MedInventoryTools.getAll(resident) : MedInventoryTools.getAllActive(resident);
+//                    lstInventories = tbClosedInventory.isSelected() ? MedInventoryTools.getAll(resident) : MedInventoryTools.getAll(resident);
 //                }
                 reload();
             }

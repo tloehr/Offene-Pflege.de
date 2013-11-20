@@ -128,12 +128,14 @@ public class TradeForm implements Serializable {
 
         TradeForm tradeForm = (TradeForm) o;
 
+        if (subtext != null ? !subtext.equals(tradeForm.subtext) : tradeForm.subtext != null) return false;
         if (dosageForm != null ? !dosageForm.equals(tradeForm.dosageForm) : tradeForm.dosageForm != null) return false;
-        if (id != null ? !id.equals(tradeForm.id) : tradeForm.id != null) return false;
         if (medProduct != null ? !medProduct.equals(tradeForm.medProduct) : tradeForm.medProduct != null) return false;
+        if (id != null ? !id.equals(tradeForm.id) : tradeForm.id != null) return false;
+
 //        if (packages != null ? !packages.equals(tradeForm.packages) : tradeForm.packages != null) return false;
 //        if (stocks != null ? !stocks.equals(tradeForm.stocks) : tradeForm.stocks != null) return false;
-        if (subtext != null ? !subtext.equals(tradeForm.subtext) : tradeForm.subtext != null) return false;
+
 
         return true;
     }
@@ -144,8 +146,9 @@ public class TradeForm implements Serializable {
         result = 31 * result + (subtext != null ? subtext.hashCode() : 0);
 //        result = 31 * result + (packages != null ? packages.hashCode() : 0);
 //        result = 31 * result + (stocks != null ? stocks.hashCode() : 0);
-        result = 31 * result + (medProduct != null ? medProduct.hashCode() : 0);
         result = 31 * result + (dosageForm != null ? dosageForm.hashCode() : 0);
+        result = 31 * result + (medProduct != null ? medProduct.hashCode() : 0);
+
         return result;
     }
 

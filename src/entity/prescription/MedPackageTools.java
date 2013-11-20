@@ -121,11 +121,10 @@ public class MedPackageTools {
                     pzn = null;
                 }
 
-            } else if (pzn.matches("^\\d{13}")) { // when the EAN Code is used, the checkdigit of the PZN is not available anymore.
-
+            } else if (pzn.matches("^\\d{13}")) { // when the EAN Code is used, the checkdigit of the PZN is not available anymore. It is unimportant anyways, because EAN13 makes sure, that there are no typos.
                 if (pzn.startsWith("908888")) { // 90 is austria, 8888 is the pharma code for 'ARGE Pharma'
-                    pzn = pzn.substring(6, 11);
-                    pzn += Integer.toString(getMOD11(pzn)); // calculate a proper MOD11 checksum.
+                    pzn = pzn.substring(6, 12);
+                    pzn += Integer.toString(getMOD11(pzn+"0")); // calculate a proper MOD11 checksum. the "0" is a dummy checksum with is ignored by MOD11 anyways
 
                     // this is only temporarily until the PZN7's are gone completely. it may take some years.
                     if (pzn.length() == 7) {
@@ -134,6 +133,8 @@ public class MedPackageTools {
                 } else {
                     pzn = null;
                 }
+            } else {
+                pzn = null;
             }
         }
 
@@ -164,7 +165,9 @@ public class MedPackageTools {
         return calculatedChecksum == givenChecksum;
     }
 
-    private static int getMOD11(String pzn) {
+    public static int getMOD11(String pzn) {
+        if (pzn.isEmpty()) return -1;
+//        OPDE.debug(pzn);
         int[] digits = new int[pzn.length() - 1];
 
         for (int c = 0; c < pzn.length() - 1; c++) {

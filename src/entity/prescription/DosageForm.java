@@ -136,6 +136,10 @@ public class DosageForm implements Serializable {
         return uprstate == DosageFormTools.STATE_UPRn;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public Intervention getIntervention() {
         return intervention;
     }

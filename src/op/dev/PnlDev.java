@@ -9,25 +9,34 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
 import entity.info.*;
 import entity.nursingprocess.DFNTools;
-import entity.prescription.BHPTools;
+import entity.prescription.*;
 import op.OPDE;
 import op.care.info.PnlEditResInfo;
+import op.threads.DisplayManager;
 import op.tools.CleanablePanel;
 import op.tools.GUITools;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
 import org.joda.time.DateMidnight;
 
 import javax.persistence.EntityManager;
+import javax.persistence.OptimisticLockException;
+import javax.persistence.Query;
 import javax.swing.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
@@ -285,6 +294,231 @@ public class PnlDev extends CleanablePanel {
         }
     }
 
+    private void txtPZNCaretUpdate(CaretEvent e) {
+        OPDE.debug(MedPackageTools.parsePZN(txtPZN.getText().trim()));
+    }
+
+    private void btnMod11ActionPerformed(ActionEvent e) {
+        OPDE.debug(MedPackageTools.getMOD11(txtPZN.getText().trim() + "0"));
+    }
+
+    private void btnImportMedDBActionPerformed(ActionEvent e) {
+
+        final int MPText = 0;
+        final int SUBTEXT = 1;
+        final int DosageFormID = 2;
+        final int EXPinDAYS = 3;
+        final int PZN = 4;
+        final int SIZE = 5;
+        final int AMOUNT = 6;
+        final int ACME_NAME = 7;
+        final int ACME_STREET = 8;
+        final int ACME_ZIP = 9;
+        final int ACME_CITY_COUNTRY = 10;
+        final int ACME_TEL = 11;
+        final int ACME_FAX = 12;
+        final int ACME_WWW = 13;
+        final int IMPORT_STATE = 14;
+
+        HashMap<String, MedProducts> mapMedProducts = new HashMap<String, MedProducts>();
+        HashMap<String, ACME> mapACME = new HashMap<String, ACME>();
+//        ArrayList<MedProducts> listMedProducts = new ArrayList<MedProducts>();
+
+        HashMap<Long, DosageForm> mapDosageForm = new HashMap<Long, DosageForm>();
+
+        String filename = "/local/meddb.xls";
+
+        try {
+
+            for (DosageForm dosageForm : DosageFormTools.getAll()) {
+                mapDosageForm.put(dosageForm.getId(), dosageForm);
+            }
+
+            FileInputStream fileInput = new FileInputStream(new File(filename));
+
+            //Get the workbook instance for XLS file
+            HSSFWorkbook workbook = new HSSFWorkbook(fileInput);
+
+            //Get first sheet from the workbook
+            HSSFSheet sheet = workbook.getSheetAt(0);
+
+            //Get iterator to all the rows in current sheet
+//            Iterator<Row> rowIterator = sheet.iterator();
+
+            for (int rowindex = 1; rowindex < sheet.getLastRowNum(); rowindex++) {
+                try {
+                    String keyMP = sheet.getRow(rowindex).getCell(MPText).getStringCellValue();
+                    String keyACME = sheet.getRow(rowindex).getCell(ACME_NAME).getStringCellValue();
+
+                    if (keyMP.isEmpty()) {
+                        throw new NullPointerException("MedProduct has no text");
+                    }
+
+                    if (keyACME.isEmpty()) {
+                        throw new NullPointerException("Company has no name");
+                    }
+
+                    if (!mapMedProducts.containsKey(keyMP)) {
+
+                        if (!mapACME.containsKey(keyACME)) {
+                            String street = sheet.getRow(rowindex).getCell(ACME_STREET) != null ? sheet.getRow(rowindex).getCell(ACME_STREET).getStringCellValue() : "";
+                            String zip = sheet.getRow(rowindex).getCell(ACME_ZIP) != null ? sheet.getRow(rowindex).getCell(ACME_ZIP).getStringCellValue() : "";
+                            String city = sheet.getRow(rowindex).getCell(ACME_CITY_COUNTRY) != null ? sheet.getRow(rowindex).getCell(ACME_CITY_COUNTRY).getStringCellValue() : "";
+                            String tel = sheet.getRow(rowindex).getCell(ACME_TEL) != null ? sheet.getRow(rowindex).getCell(ACME_TEL).getStringCellValue() : "";
+                            String fax = sheet.getRow(rowindex).getCell(ACME_FAX) != null ? sheet.getRow(rowindex).getCell(ACME_FAX).getStringCellValue() : "";
+                            String www = sheet.getRow(rowindex).getCell(ACME_WWW) != null ? sheet.getRow(rowindex).getCell(ACME_WWW).getStringCellValue() : "";
+
+                            mapACME.put(keyACME, new ACME(sheet.getRow(rowindex).getCell(ACME_NAME).getStringCellValue(), street, zip, city, tel, fax, www));
+                        }
+
+                        mapMedProducts.put(keyMP, new MedProducts(mapACME.get(keyACME), keyMP));
+                    }
+
+                    String subtext = sheet.getRow(rowindex).getCell(SUBTEXT) != null ? sheet.getRow(rowindex).getCell(SUBTEXT).getStringCellValue() : "";
+
+
+                    Long formid = -1l;
+                    if (sheet.getRow(rowindex).getCell(DosageFormID).getCellType() == Cell.CELL_TYPE_STRING) {
+                        formid = new Long(Long.parseLong(sheet.getRow(rowindex).getCell(DosageFormID).getStringCellValue()));
+                    } else if (sheet.getRow(rowindex).getCell(DosageFormID).getCellType() == Cell.CELL_TYPE_NUMERIC) {
+                        formid = new Long((long) sheet.getRow(rowindex).getCell(DosageFormID).getNumericCellValue());
+                    }
+
+                    if (!mapDosageForm.containsKey(formid)) {
+                        throw new NullPointerException("unknown or missing DosageForm");
+                    }
+
+                    int expindays = 0;
+                    if (sheet.getRow(rowindex).getCell(EXPinDAYS) != null) {
+                        if (sheet.getRow(rowindex).getCell(EXPinDAYS).getCellType() == Cell.CELL_TYPE_STRING) {
+                            expindays = Integer.parseInt(sheet.getRow(rowindex).getCell(EXPinDAYS).getStringCellValue());
+                        } else if (sheet.getRow(rowindex).getCell(EXPinDAYS).getCellType() == Cell.CELL_TYPE_NUMERIC) {
+                            expindays = (int) sheet.getRow(rowindex).getCell(EXPinDAYS).getNumericCellValue();
+                        }
+                    }
+
+                    TradeForm tf = null;
+                    for (TradeForm tradeForm : mapMedProducts.get(keyMP).getTradeforms()) {
+                        if (SYSTools.catchNull(tradeForm.getSubtext()).equals(subtext) && tradeForm.getDosageForm().getId().longValue() == formid) {
+                            tf = tradeForm;
+                            break;
+                        }
+                    }
+
+                    if (tf == null) {
+                        tf = new TradeForm(mapMedProducts.get(keyMP), subtext, mapDosageForm.get(formid));
+                        if (expindays > 0) {
+                            tf.setDaysToExpireAfterOpened(expindays);
+                        }
+
+                        mapMedProducts.get(keyMP).getTradeforms().add(tf);
+                    }
+
+                    String pzn = "";
+                    if (sheet.getRow(rowindex).getCell(PZN).getCellType() == Cell.CELL_TYPE_STRING) {
+                        pzn = sheet.getRow(rowindex).getCell(PZN).getStringCellValue();
+                        pzn = new Long(Long.parseLong(pzn)).toString();
+                    } else if (sheet.getRow(rowindex).getCell(PZN).getCellType() == Cell.CELL_TYPE_NUMERIC) {
+                        pzn = new Long((long) sheet.getRow(rowindex).getCell(PZN).getNumericCellValue()).toString();
+                    }
+
+                    if (pzn.isEmpty()) {
+                        throw new NullPointerException("missing PZN");
+                    }
+
+                    if (pzn.length() < 7) {
+                        pzn = StringUtils.repeat("0", 7 - pzn.length()) + pzn;
+                    }
+
+                    pzn = MedPackageTools.parsePZN(pzn);
+
+                    if (pzn == null) {
+                        throw new NullPointerException("illegal PZN");
+                    }
+
+                    int pos = 0;
+                    if (sheet.getRow(rowindex).getCell(SIZE) != null) {
+                        String sSize = "N1";
+                        if (sheet.getRow(rowindex).getCell(SIZE).getCellType() == Cell.CELL_TYPE_STRING) {
+                            sSize = SYSTools.catchNull(sheet.getRow(rowindex).getCell(SIZE).getStringCellValue(), "N1");
+                        }
+                        pos = Math.max(ArrayUtils.indexOf(MedPackageTools.GROESSE, sSize), 0);
+                    }
+
+                    BigDecimal amount = BigDecimal.ZERO;
+                    if (sheet.getRow(rowindex).getCell(AMOUNT).getCellType() == Cell.CELL_TYPE_STRING) {
+                        amount = SYSTools.parseBigDecimal(sheet.getRow(rowindex).getCell(AMOUNT).getStringCellValue());
+                    } else if (sheet.getRow(rowindex).getCell(AMOUNT).getCellType() == Cell.CELL_TYPE_NUMERIC) {
+                        amount = new BigDecimal(sheet.getRow(rowindex).getCell(AMOUNT).getNumericCellValue());
+                    }
+
+                    tf.getPackages().add(new MedPackage(tf, amount, (short) pos, pzn));
+
+                    sheet.getRow(rowindex).createCell(IMPORT_STATE).setCellValue("ok");
+
+                } catch (Exception exc) {
+                    // Structure error within the XLS file
+                    OPDE.warn(exc);
+                    sheet.getRow(rowindex).createCell(IMPORT_STATE).setCellValue("error: " + exc.getMessage());
+                }
+            }
+
+
+            fileInput.close();
+
+            FileOutputStream fileOutput = new FileOutputStream(filename);
+            workbook.write(fileOutput);
+            fileOutput.close();
+
+
+            EntityManager em = OPDE.createEM();
+            try {
+                em.getTransaction().begin();
+
+                Query q1 = em.createQuery("DELETE FROM MedProducts ");
+                Query q2 = em.createQuery("DELETE FROM TradeForm ");
+                Query q3 = em.createQuery("DELETE FROM MedPackage ");
+                Query q4 = em.createQuery("DELETE FROM ACME ");
+
+                q1.executeUpdate();
+                q2.executeUpdate();
+                q3.executeUpdate();
+                q4.executeUpdate();
+
+                for (MedProducts medProducts : mapMedProducts.values()) {
+                    em.persist(medProducts);
+                }
+
+                em.getTransaction().commit();
+
+            } catch (OptimisticLockException ole) {
+                OPDE.warn(ole);
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                    OPDE.getMainframe().emptyFrame();
+                    OPDE.getMainframe().afterLogin();
+                }
+                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+            } catch (Exception ex1) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                OPDE.fatal(ex1);
+            } finally {
+                em.close();
+            }
+
+            mapACME.clear();
+            mapMedProducts.clear();
+            mapACME.clear();
+
+        } catch (Exception ex) {
+            OPDE.error(ex);
+        }
+    }
+
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -298,6 +532,9 @@ public class PnlDev extends CleanablePanel {
         panel2 = new JPanel();
         cmbMonth = new JComboBox();
         button2 = new JButton();
+        txtPZN = new JTextField();
+        btnMod11 = new JButton();
+        btnImportMedDB = new JButton();
 
         //======== this ========
         setLayout(new BorderLayout());
@@ -352,7 +589,7 @@ public class PnlDev extends CleanablePanel {
             {
                 panel2.setLayout(new FormLayout(
                         "left:default:grow",
-                        "default, $lgap, default, $rgap, fill:default, $lgap, default"));
+                        "default, $lgap, default, $rgap, fill:default, 6*($lgap, default)"));
                 panel2.add(cmbMonth, CC.xy(1, 3, CC.FILL, CC.DEFAULT));
 
                 //---- button2 ----
@@ -364,6 +601,36 @@ public class PnlDev extends CleanablePanel {
                     }
                 });
                 panel2.add(button2, CC.xy(1, 5));
+
+                //---- txtPZN ----
+                txtPZN.setToolTipText("PZN Check");
+                txtPZN.addCaretListener(new CaretListener() {
+                    @Override
+                    public void caretUpdate(CaretEvent e) {
+                        txtPZNCaretUpdate(e);
+                    }
+                });
+                panel2.add(txtPZN, CC.xy(1, 11, CC.FILL, CC.DEFAULT));
+
+                //---- btnMod11 ----
+                btnMod11.setText("calc mod11");
+                btnMod11.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnMod11ActionPerformed(e);
+                    }
+                });
+                panel2.add(btnMod11, CC.xy(1, 13));
+
+                //---- btnImportMedDB ----
+                btnImportMedDB.setText("import meddb.xls");
+                btnImportMedDB.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnImportMedDBActionPerformed(e);
+                    }
+                });
+                panel2.add(btnImportMedDB, CC.xy(1, 17));
             }
             tabbedPane1.addTab("text", panel2);
         }
@@ -382,5 +649,8 @@ public class PnlDev extends CleanablePanel {
     private JPanel panel2;
     private JComboBox cmbMonth;
     private JButton button2;
+    private JTextField txtPZN;
+    private JButton btnMod11;
+    private JButton btnImportMedDB;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

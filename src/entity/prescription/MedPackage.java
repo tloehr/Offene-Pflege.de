@@ -35,6 +35,13 @@ public class MedPackage implements Serializable {
         this.tradeForm = tf;
     }
 
+    public MedPackage(TradeForm tradeForm, BigDecimal inhalt, Short groesse, String pzn) {
+        this.tradeForm = tradeForm;
+        this.inhalt = inhalt;
+        this.groesse = groesse;
+        this.pzn = pzn;
+    }
+
     public TradeForm getTradeForm() {
         return tradeForm;
     }

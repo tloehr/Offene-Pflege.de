@@ -59,7 +59,7 @@ public class MedProducts implements Serializable {
     }
 
     @JoinColumn(name = "MPHID", referencedColumnName = "MPHID")
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private ACME acme;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "medProduct")
@@ -78,10 +78,9 @@ public class MedProducts implements Serializable {
 
         MedProducts that = (MedProducts) o;
 
-        if (acme != null ? !acme.equals(that.acme) : that.acme != null) return false;
         if (medPID != null ? !medPID.equals(that.medPID) : that.medPID != null) return false;
         if (text != null ? !text.equals(that.text) : that.text != null) return false;
-//        if (tradeForms != null ? !tradeForms.equals(that.tradeForms) : that.tradeForms != null) return false;
+        if (acme != null ? !acme.equals(that.acme) : that.acme != null) return false;
 
         return true;
     }
@@ -91,7 +90,6 @@ public class MedProducts implements Serializable {
         int result = medPID != null ? medPID.hashCode() : 0;
         result = 31 * result + (text != null ? text.hashCode() : 0);
         result = 31 * result + (acme != null ? acme.hashCode() : 0);
-//        result = 31 * result + (tradeForms != null ? tradeForms.hashCode() : 0);
         return result;
     }
 }

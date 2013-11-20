@@ -4,8 +4,11 @@ import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA.
@@ -19,6 +22,18 @@ public class DosageFormTools {
     public static final short STATE_UPRn = 1;
     public static final short STATE_DONT_CALC = 2;
     public static final String[] UPR_STATES = new String[]{OPDE.lang.getString("state_upr1"), OPDE.lang.getString("state_uprn"), OPDE.lang.getString("state_dont_calc")};
+
+
+    public static ArrayList<DosageForm> getAll() {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT a FROM DosageForm a ");
+        ArrayList<DosageForm> listDF = new ArrayList<DosageForm>(query.getResultList());
+        em.close();
+
+        return listDF;
+
+    }
+
 
     /**
      * @param maxlen maximale Zeichenlänge pro Zeile. maxlen < 1 heisst egal.

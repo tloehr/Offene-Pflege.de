@@ -985,8 +985,8 @@ public class PnlSystemSettings extends CleanablePanel {
             //======== pnlLocal ========
             {
                 pnlLocal.setLayout(new FormLayout(
-                        "default, $lcgap, default:grow, $lcgap, default, $lcgap, default:grow, $lcgap, default",
-                        "6*(default, $lgap), pref, $lgap, default, $lgap, 14dlu"));
+                    "default, $lcgap, default:grow, $lcgap, default, $lcgap, default:grow, $lcgap, default",
+                    "6*(default, $lgap), pref, $lgap, default, $lgap, 14dlu"));
 
                 //---- lblPrinters ----
                 lblPrinters.setText("labelPrinter");
@@ -1066,8 +1066,8 @@ public class PnlSystemSettings extends CleanablePanel {
                 //======== pnlGlobal ========
                 {
                     pnlGlobal.setLayout(new FormLayout(
-                            "default, $lcgap, default:grow, $lcgap, default, $ugap, default:grow, $lcgap, default, $ugap, default:grow, 2*($lcgap, default)",
-                            "default, $lgap, pref, $lgap, fill:default:grow, $lgap, default, 2*($lgap), 2*(default, $lgap), fill:default:grow, 2*($lgap, default)"));
+                        "default, $lcgap, default:grow, $lcgap, default, $ugap, default:grow, $lcgap, default, $ugap, default:grow, 2*($lcgap, default)",
+                        "default, $lgap, pref, $lgap, fill:default:grow, $lgap, default, 2*($lgap), 2*(default, $lgap), fill:default:grow, 2*($lgap, default)"));
 
                     //======== panel5 ========
                     {
@@ -1112,8 +1112,8 @@ public class PnlSystemSettings extends CleanablePanel {
                     //======== pnlICD ========
                     {
                         pnlICD.setLayout(new FormLayout(
-                                "default:grow",
-                                "fill:default:grow, $lgap, default"));
+                            "default:grow",
+                            "fill:default:grow, $lgap, default"));
 
                         //---- btnImportICD ----
                         btnImportICD.setText("importICD");
@@ -1130,8 +1130,8 @@ public class PnlSystemSettings extends CleanablePanel {
                     //======== pnlMail ========
                     {
                         pnlMail.setLayout(new FormLayout(
-                                "default, $lcgap, default:grow",
-                                "12*(default, $lgap), default"));
+                            "default, $lcgap, default:grow",
+                            "12*(default, $lgap), default"));
 
                         //---- lblMailHost ----
                         lblMailHost.setText("host");
@@ -1243,16 +1243,16 @@ public class PnlSystemSettings extends CleanablePanel {
                     //======== pnlCalcMed ========
                     {
                         pnlCalcMed.setLayout(new FormLayout(
-                                "default:grow",
-                                "2*(default, $lgap), default"));
+                            "default:grow",
+                            "2*(default, $lgap), default"));
                     }
                     pnlGlobal.add(pnlCalcMed, CC.xy(7, 14));
 
                     //======== panel3 ========
                     {
                         panel3.setLayout(new FormLayout(
-                                "default, $lcgap, default:grow",
-                                "5*(default, $lgap), default"));
+                            "default, $lcgap, default:grow",
+                            "5*(default, $lgap), default"));
 
                         //---- lblFTPServer ----
                         lblFTPServer.setText("host");
