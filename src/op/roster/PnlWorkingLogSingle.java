@@ -23,6 +23,9 @@ public class PnlWorkingLogSingle extends JPanel {
         this.workinglog = workinglog;
         day = new LocalDate(workinglog.getRplan().getStart());
 
+        grmpf;
+        // den brauchen wir
+
         initComponents();
         initPanel();
     }

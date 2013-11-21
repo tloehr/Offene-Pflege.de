@@ -1,8 +1,10 @@
 package entity.roster;
 
 
+import op.OPDE;
 import op.tools.Pair;
-import org.joda.time.DateMidnight;
+import op.tools.SYSCalendar;
+import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
@@ -20,7 +22,7 @@ public class ContractsParameterSet implements Cloneable, Comparable<ContractsPar
 
     LocalDate from, to;
     Pair<LocalTime, LocalTime> night;
-    BigDecimal vacationDaysPerYear, wagePerHour, workingDaysPerWeek, targetHoursPerMonth, hollidayPremiumPercentage, nightPremiumPercentage;
+    BigDecimal vacationDaysPerYear, wagePerHour, workingDaysPerWeek, targetHoursPerMonth, holidayPremiumPercentage, nightPremiumPercentage;
     String section;
     boolean trainee;
 
@@ -39,7 +41,7 @@ public class ContractsParameterSet implements Cloneable, Comparable<ContractsPar
         this.wagePerHour = wagePerHour;
         this.workingDaysPerWeek = workingDaysPerWeek;
         this.targetHoursPerMonth = targetHoursPerMonth;
-        this.hollidayPremiumPercentage = hollidayPremiumPercentage;
+        this.holidayPremiumPercentage = hollidayPremiumPercentage;
         this.nightPremiumPercentage = nightPremiumPercentage;
         this.section = section;
         this.trainee = trainee;
@@ -47,8 +49,8 @@ public class ContractsParameterSet implements Cloneable, Comparable<ContractsPar
     }
 
     @Override
-    protected Object clone()  {
-        return new ContractsParameterSet(from, to, night, vacationDaysPerYear, wagePerHour, workingDaysPerWeek, targetHoursPerMonth, hollidayPremiumPercentage, nightPremiumPercentage, section, trainee, exam);
+    protected Object clone() {
+        return new ContractsParameterSet(from, to, night, vacationDaysPerYear, wagePerHour, workingDaysPerWeek, targetHoursPerMonth, holidayPremiumPercentage, nightPremiumPercentage, section, trainee, exam);
     }
 
     public boolean isExam() {
@@ -77,7 +79,11 @@ public class ContractsParameterSet implements Cloneable, Comparable<ContractsPar
         this.trainee = trainee;
     }
 
-
+    /**
+     * since when is/was this contract valid ?
+     *
+     * @return
+     */
     public LocalDate getFrom() {
         return from;
     }
@@ -86,6 +92,11 @@ public class ContractsParameterSet implements Cloneable, Comparable<ContractsPar
         this.from = from;
     }
 
+    /**
+     * when did/does it stop ?
+     *
+     * @return
+     */
     public LocalDate getTo() {
         return to;
     }
@@ -134,12 +145,12 @@ public class ContractsParameterSet implements Cloneable, Comparable<ContractsPar
         this.targetHoursPerMonth = targetHoursPerMonth;
     }
 
-    public BigDecimal getHollidayPremiumPercentage() {
-        return hollidayPremiumPercentage;
+    public BigDecimal getHolidayPremiumPercentage() {
+        return holidayPremiumPercentage;
     }
 
-    public void setHollidayPremiumPercentage(BigDecimal hollidayPremiumPercentage) {
-        this.hollidayPremiumPercentage = hollidayPremiumPercentage;
+    public void setHolidayPremiumPercentage(BigDecimal holidayPremiumPercentage) {
+        this.holidayPremiumPercentage = holidayPremiumPercentage;
     }
 
     public BigDecimal getNightPremiumPercentage() {
@@ -155,11 +166,37 @@ public class ContractsParameterSet implements Cloneable, Comparable<ContractsPar
     }
 
     public BigDecimal getTargetHoursPerWeek() {
-        return targetHoursPerMonth.multiply(new BigDecimal(12)).divide(new BigDecimal(52),4, RoundingMode.HALF_UP);
+        return targetHoursPerMonth.multiply(new BigDecimal(12)).divide(new BigDecimal(52), 4, RoundingMode.HALF_UP);
     }
 
-    public BigDecimal getDayValue(){
+    public BigDecimal getDayValue() {
         return getTargetHoursPerWeek().divide(getWorkingDaysPerWeek(), 4, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * how many holiday extra hours for the specific month for this contract ?
+     *
+     * @param month
+     * @return
+     */
+    public BigDecimal getHolidayHours(LocalDate month) {
+
+        LocalDate myfrom = new LocalDate(Math.max(SYSCalendar.bom(month).toDateTimeAtStartOfDay().getMillis(), from.toDateTimeAtStartOfDay().getMillis()));
+        LocalDate myto = new LocalDate(Math.min(SYSCalendar.eom(month).toDateTimeAtStartOfDay().getMillis(), to.toDateTimeAtStartOfDay().getMillis()));
+
+        if (myfrom.compareTo(myto) > 0) {
+            return BigDecimal.ZERO;
+        }
+
+        BigDecimal holidayHours = BigDecimal.ZERO;
+
+        for (LocalDate day = myfrom; day.compareTo(myto) <= 0; day = day.plusDays(1)) {
+            if (day.getDayOfWeek() != DateTimeConstants.SUNDAY && OPDE.isHoliday(day)) {
+                holidayHours = holidayHours.add(getDayValue());
+            }
+        }
+
+        return holidayHours;
     }
 
 }

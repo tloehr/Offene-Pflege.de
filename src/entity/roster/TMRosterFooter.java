@@ -42,7 +42,6 @@ public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIde
             public void execute(Object o) {
                 for (int row = 0; row < getRowCount(); row++) {
                     fireTableCellUpdated(row, (Integer) o);
-//                    OPDE.debug(String.format("row %s, col %s", row, o));
                 }
             }
         });
@@ -51,6 +50,7 @@ public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIde
     @Override
     public CellStyle getCellStyleAt(int rowIndex, int columnIndex) {
         boolean dateline = rowIndex == 0;
+
         int lineidx = (rowIndex - 1) / 3;
         CellStyle myStyle = new CellStyle();
         myStyle.setHorizontalAlignment(SwingConstants.CENTER);
@@ -113,20 +113,10 @@ public class TMRosterFooter extends AbstractMultiTableModel implements ColumnIde
                         foreground = Color.red.darker();
                     }
 
-
-//                    foreground = basemodel.getStatsPerDay().getExam_early(home, columnIndex - TMRoster.ROW_HEADER).equals(BigDecimal.ZERO) ? Color.RED.darker() : Color.BLACK;
                 }
 
                 font = font.deriveFont(13f);
                 font = font.deriveFont(Font.PLAIN);
-
-//                if ((rowIndex - 1) % 3 == 1) {
-//                    foreground = basemodel.getStatsPerDay().getExam_late(home, columnIndex - TMRoster.ROW_HEADER).equals(BigDecimal.ZERO) ? Color.RED.darker() : Color.BLACK;
-//                }
-//
-//                if ((rowIndex - 1) % 3 == 2) {
-//                    foreground = basemodel.getStatsPerDay().getExam_night(home, columnIndex - TMRoster.ROW_HEADER).equals(BigDecimal.ZERO) ? Color.RED.darker() : Color.BLACK;
-//                }
 
             }
         }

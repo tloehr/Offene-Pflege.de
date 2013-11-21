@@ -16,13 +16,15 @@ import java.util.HashMap;
 public class WorkinglogTools {
 
     // all AUTO types meaning an entry which has been created while applying the planned shift
-    public static final int TYPE_AUTO_DAY = 0;
-    public static final int TYPE_AUTO_NIGHT = 1;
-    public static final int TYPE_AUTO_HOLIDAY = 2;
-    public static final int TYPE_AUTO_BREAK = 3; // negative value
-    public static final int TYPE_MANUAL_HOURS = 4;
-    public static final int TYPE_AUTO_EXTRA = 5; // additional hours for holiday shifts
-    public static final String[] TYPES = new String[]{"Tag", "Nacht", "Urlaub", "Pausen", "Zuschlag"};
+    public static final int TYPE_AUTO_DAY1 = 0;
+    public static final int TYPE_AUTO_DAY2 = 1;
+    public static final int TYPE_AUTO_NIGHT1 = 2;
+    public static final int TYPE_AUTO_NIGHT2 = 3;
+    //    public static final int TYPE_AUTO_HOLIDAY = 2;
+    public static final int TYPE_AUTO_BREAK = 4; // negative value
+    //    public static final int TYPE_MANUAL_HOURS = 4;
+//    public static final int TYPE_AUTO_EXTRA = 5; // additional hours for holiday shifts
+    public static final String[] TYPES = new String[]{"Tag1", "Tag2", "Nacht1", "Nacht2", "Pause"};
 
     public static String toPrettyString(Workinglog workinglog) {
         String text = "";
@@ -42,45 +44,30 @@ public class WorkinglogTools {
      * @param parameterSet
      * @return
      */
-    public static Workinglog[] createWorkingLogs(Rplan myRplan, Symbol symbol, ContractsParameterSet parameterSet) {
+    public static Workinglog[] createWorkingLogs(Rplan myRplan, Symbol symbol, ContractsParameterSet parameterSet, long actual) {
         LocalDate day = new LocalDate(myRplan.getStart());
         HashMap<String, BigDecimal> map = symbol.getHourStats(day, parameterSet);
         ArrayList<Workinglog> listLogs = new ArrayList<Workinglog>();
 
-        grmpf;
-        // U und X so gut ?
-
         if (map != null) {
             if (map.get(Symbol.DAYHOURS1).compareTo(BigDecimal.ZERO) > 0) {
-                listLogs.add(new Workinglog(map.get(Symbol.DAYHOURS1), BigDecimal.ZERO, BigDecimal.ZERO, myRplan, WorkinglogTools.TYPE_AUTO_DAY));
+                listLogs.add(new Workinglog(map.get(Symbol.DAYHOURS1), BigDecimal.ZERO, myRplan, WorkinglogTools.TYPE_AUTO_DAY1, actual));
             }
             if (map.get(Symbol.DAYHOURS2).compareTo(BigDecimal.ZERO) > 0) {
-                listLogs.add(new Workinglog(map.get(Symbol.DAYHOURS2), BigDecimal.ZERO, BigDecimal.ZERO, myRplan, WorkinglogTools.TYPE_AUTO_DAY));
+                listLogs.add(new Workinglog(map.get(Symbol.DAYHOURS2), BigDecimal.ZERO, myRplan, WorkinglogTools.TYPE_AUTO_DAY1, actual));
             }
             if (map.get(Symbol.NIGHTHOURS1).compareTo(BigDecimal.ZERO) > 0) {
-                listLogs.add(new Workinglog(map.get(Symbol.NIGHTHOURS1), BigDecimal.ZERO, parameterSet.nightPremiumPercentage, myRplan, WorkinglogTools.TYPE_AUTO_NIGHT));
+                listLogs.add(new Workinglog(map.get(Symbol.NIGHTHOURS1), parameterSet.nightPremiumPercentage, myRplan, WorkinglogTools.TYPE_AUTO_NIGHT1, actual));
             }
             if (map.get(Symbol.NIGHTHOURS2).compareTo(BigDecimal.ZERO) > 0) {
-                listLogs.add(new Workinglog(map.get(Symbol.NIGHTHOURS2), BigDecimal.ZERO, parameterSet.getNightPremiumPercentage(), myRplan, WorkinglogTools.TYPE_AUTO_NIGHT));
-            }
-            if (map.get(Symbol.HOLIHOURS1).compareTo(BigDecimal.ZERO) > 0) {
-                listLogs.add(new Workinglog(map.get(Symbol.HOLIHOURS1), BigDecimal.ZERO, parameterSet.getHollidayPremiumPercentage(), myRplan, WorkinglogTools.TYPE_AUTO_HOLIDAY));
-            }
-            if (map.get(Symbol.HOLIHOURS2).compareTo(BigDecimal.ZERO) > 0) {
-                listLogs.add(new Workinglog(map.get(Symbol.HOLIHOURS2), BigDecimal.ZERO, parameterSet.getHollidayPremiumPercentage(), myRplan, WorkinglogTools.TYPE_AUTO_HOLIDAY));
-            }
-            if (map.get(Symbol.EXTRA).compareTo(BigDecimal.ZERO) > 0) {
-                listLogs.add(new Workinglog(BigDecimal.ZERO, map.get(Symbol.EXTRA), BigDecimal.ZERO, myRplan, WorkinglogTools.TYPE_AUTO_EXTRA));
+                listLogs.add(new Workinglog(map.get(Symbol.NIGHTHOURS2), parameterSet.getNightPremiumPercentage(), myRplan, WorkinglogTools.TYPE_AUTO_NIGHT2, actual));
             }
             if (map.get(Symbol.BREAKTIME).compareTo(BigDecimal.ZERO) > 0) {
-                listLogs.add(new Workinglog(map.get(Symbol.BREAKTIME).negate(), BigDecimal.ZERO, BigDecimal.ZERO, myRplan, WorkinglogTools.TYPE_AUTO_BREAK));
+                listLogs.add(new Workinglog(map.get(Symbol.BREAKTIME).negate(), BigDecimal.ZERO, myRplan, WorkinglogTools.TYPE_AUTO_BREAK, actual));
             }
         }
 
-//        symbol.getBaseHoursAsDecimalDay1(day);
-
         return listLogs.toArray(new Workinglog[]{});
-        //myRplan, rosterParameters.getSymbol(myRplan.getEffectiveSymbol(), userContracts)
     }
 
 

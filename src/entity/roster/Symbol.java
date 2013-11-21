@@ -26,9 +26,9 @@ public class Symbol {
     public static final String DAYHOURS2 = "dayhours2";
     public static final String NIGHTHOURS1 = "nighthours1";
     public static final String NIGHTHOURS2 = "nighthours2";
-    public static final String HOLIHOURS1 = "holihours1";
-    public static final String HOLIHOURS2 = "holihours2";
-    public static final String EXTRA = "extra";
+    //    public static final String HOLIHOURS1 = "holihours1";
+//    public static final String HOLIHOURS2 = "holihours2";
+//    public static final String EXTRA = "extra";
     public static final String BREAKTIME = "breaktime";
     public static final String BASEHOURS = "basehours";
 
@@ -177,7 +177,7 @@ public class Symbol {
     }
 
     public DateTime getStart(LocalDate day) {
-        if (start == null) return null;
+        if (start == null) return day.toDateTimeAtStartOfDay();
 
 //            return day.toDateTime(new LocalTime().hourOfDay().withMinimumValue().minuteOfHour().withMinimumValue().secondOfMinute().withMinimumValue());
         return day.toDateTime(start);
@@ -189,39 +189,10 @@ public class Symbol {
         return start.isAfter(end) ? endTime.plusDays(1) : endTime;
     }
 
-//    public DateTime getStart1(LocalDate day) {
-//        return getStart(day);
-//    }
-//
-//    public DateTime getStart2(LocalDate day) {
-//        if (isOvernight()) {
-//            return day.plusDays(1).toDateTimeAtStartOfDay();
-//        } else {
-//            return null;
-//        }
-//    }
-//
-//    public DateTime getEndDay1(LocalDate day) {
-//        if (isOvernight()) {
-//            return SYSCalendar.eod(day.toDateTimeAtCurrentTime());
-//        } else {
-//            return getEnd(day);
-//        }
-//    }
-//
-//    public DateTime getEndDay2(LocalDate day) {
-//        if (isOvernight()) {
-//            return getEnd(day);
-//        } else {
-//            return null;
-//        }
-//    }
-
     public boolean isOvernight() {
         if (end == null) return false;
         return start.isAfter(end);
     }
-
 
     /**
      * the sum of hours between the beginning of a shift and the end.
@@ -250,27 +221,30 @@ public class Symbol {
         }
     }
 
-    public BigDecimal getExtraHours(LocalDate day, ContractsParameterSet contractsParameterSet) {
-        if (calc == AWERT) {
-            if (day.getDayOfWeek() != DateTimeConstants.SUNDAY && OPDE.isHoliday(day)) {
-                return contractsParameterSet.getDayValue();
-            } else if (isOvernight() && day.plusDays(1).getDayOfWeek() != DateTimeConstants.SUNDAY && OPDE.isHoliday(day.plusDays(1))) {
-                return contractsParameterSet.getDayValue();
-            } else {
-                return BigDecimal.ZERO;
-            }
-        } else if (calc == KWERT) {
-            return contractsParameterSet.getDayValue();
-        } else if (calc == XWERT) {
-            return BigDecimal.ZERO;
-        } else if (calc == UWERT) {
-            return contractsParameterSet.getDayValue();
-        } else if (calc == PVALUE) {
-            return BigDecimal.ZERO;
-        } else {
-            return BigDecimal.ZERO;
-        }
-    }
+//    public BigDecimal getExtraHours(LocalDate day, ContractsParameterSet contractsParameterSet) {
+//        if (calc == AWERT) {
+//            if (day.getDayOfWeek() != DateTimeConstants.SUNDAY && OPDE.isHoliday(day)) {
+//                return contractsParameterSet.getDayValue();
+//            } else if (isOvernight() && day.plusDays(1).getDayOfWeek() != DateTimeConstants.SUNDAY && OPDE.isHoliday(day.plusDays(1))) {
+//                return contractsParameterSet.getDayValue();
+//            } else {
+//                return BigDecimal.ZERO;
+//            }
+//        } else if (calc == KWERT) {
+//            return contractsParameterSet.getDayValue();
+//        } else if (calc == XWERT) {
+//            if (day.getDayOfWeek() != DateTimeConstants.SUNDAY && OPDE.isHoliday(day)) {
+//                return contractsParameterSet.getDayValue();
+//            }
+//            return BigDecimal.ZERO;
+//        } else if (calc == UWERT) {
+//            return contractsParameterSet.getDayValue();
+//        } else if (calc == PVALUE) {
+//            return BigDecimal.ZERO;
+//        } else {
+//            return BigDecimal.ZERO;
+//        }
+//    }
 
     public int getSection() {
         return section;
@@ -301,11 +275,7 @@ public class Symbol {
         mapHours.put(DAYHOURS2, BigDecimal.ZERO);
         mapHours.put(NIGHTHOURS1, BigDecimal.ZERO);
         mapHours.put(NIGHTHOURS2, BigDecimal.ZERO);
-        mapHours.put(HOLIHOURS1, BigDecimal.ZERO);
-        mapHours.put(HOLIHOURS2, BigDecimal.ZERO);
-        mapHours.put(EXTRA, getExtraHours(day, contractsParameterSet));
         mapHours.put(BREAKTIME, getBreak());
-
 
         // determine the night hours according to the user's contract
         DateTime contractNightStart = day.toDateTime(contractsParameterSet.getNight().getFirst());
@@ -327,9 +297,9 @@ public class Symbol {
             dayh1 = dayh1.add(SYSCalendar.getHoursAsDecimal(interval));
         }
         mapHours.put(DAYHOURS1, dayh1);
-        if (day.getDayOfWeek() != DateTimeConstants.SUNDAY && OPDE.isHoliday(day)) {
-            mapHours.put(HOLIHOURS1, dayh1);
-        }
+//        if (day.getDayOfWeek() != DateTimeConstants.SUNDAY && OPDE.isHoliday(day)) {
+//            mapHours.put(HOLIHOURS1, dayh1);
+//        }
 
         Interval nighthours1 = nightInterval.overlap(shiftInterval1);
         mapHours.put(NIGHTHOURS1, SYSCalendar.getHoursAsDecimal(nighthours1));
@@ -342,19 +312,15 @@ public class Symbol {
                 dayh2 = dayh2.add(SYSCalendar.getHoursAsDecimal(interval));
             }
             mapHours.put(DAYHOURS2, dayh2);
-            if (day.getDayOfWeek() != DateTimeConstants.SUNDAY && OPDE.isHoliday(day)) {
-                mapHours.put(HOLIHOURS2, dayh2);
-            }
+//            if (day.getDayOfWeek() != DateTimeConstants.SUNDAY && OPDE.isHoliday(day)) {
+//                mapHours.put(HOLIHOURS2, dayh2);
+//            }
 
             Interval nighthours2 = nightInterval.overlap(shiftInterval2);
             mapHours.put(NIGHTHOURS2, SYSCalendar.getHoursAsDecimal(nighthours2));
         }
 
         mapHours.put(BASEHOURS, SYSCalendar.getHoursAsDecimal(new Interval(getStart(day), getEnd(day))));
-
-//        OPDE.debug(day);
-//        OPDE.debug(mapHours);
-//        OPDE.debug("---");
 
         return mapHours;
     }

@@ -32,6 +32,10 @@ public class RosterParameters {
         return section;
     }
 
+    public HashMap<String, Symbol> getSymbolMap() {
+        return symbolMap;
+    }
+
     public void setSection(int section) {
         this.section = section;
     }

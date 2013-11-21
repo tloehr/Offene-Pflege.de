@@ -15,7 +15,7 @@ public class StatsPerUser {
     private final BigDecimal hours_carry;
     private final BigDecimal sick_carry;
 
-    private BigDecimal extrahours_sum;
+//    private BigDecimal extrahours_sum;
 
     private BigDecimal extra_hours;
     private BigDecimal night_hours;
@@ -32,25 +32,27 @@ public class StatsPerUser {
 
 
     private final ContractsParameterSet contractsParameterSet;
-    private short rosterStage;
+    private Rosters roster;
 
-    public StatsPerUser(BigDecimal hours_carry, BigDecimal sick_carry, BigDecimal holiday_thisyear_carry, BigDecimal holiday_lastyear_carry, RosterParameters rosterParameters, ContractsParameterSet contractsParameterSet, short rosterStage) {
-//        this.hours_per_month = hours_per_month;
+
+    public StatsPerUser(BigDecimal hours_carry, BigDecimal sick_carry, BigDecimal holiday_thisyear_carry, BigDecimal holiday_lastyear_carry, RosterParameters rosterParameters, ContractsParameterSet contractsParameterSet, Rosters roster) {
+
         this.contractsParameterSet = contractsParameterSet;
-        this.rosterStage = rosterStage;
+        this.roster = roster;
+
         this.night_hours = BigDecimal.ZERO;
         this.hours_carry = hours_carry;
         this.sick_carry = sick_carry;
         this.holiday_thisyear_carry = holiday_thisyear_carry;
         this.holiday_lastyear_carry = holiday_lastyear_carry;
 
-        this.extrahours_sum = BigDecimal.ZERO;
-        this.extra_hours = BigDecimal.ZERO;
+        this.extra_hours = contractsParameterSet.getHolidayHours(new LocalDate(roster.getMonth()));
+
         this.rosterParameters = rosterParameters;
         this.hours_sum = BigDecimal.ZERO;
         this.sick_sum = BigDecimal.ZERO;
-//        this.holiday_lastyear_sum = BigDecimal.ZERO;
         this.holiday_sum = BigDecimal.ZERO;
+
     }
 
     public void update(ArrayList<Rplan> data) {
@@ -58,16 +60,17 @@ public class StatsPerUser {
         BigDecimal sumExtra = BigDecimal.ZERO;
         hours_sum = BigDecimal.ZERO;
         sick_sum = BigDecimal.ZERO;
-        extra_hours = BigDecimal.ZERO;
+//        extra_hours = BigDecimal.ZERO;
         night_hours = BigDecimal.ZERO;
+        holiday_sum = BigDecimal.ZERO;
 
         for (Rplan rplan : data) {
             if (rplan != null) {
                 HashMap<String, BigDecimal> map = rosterParameters.getSymbol(rplan.getEffectiveSymbol()).getHourStats(new LocalDate(rplan.getStart()), contractsParameterSet);
                 if (map != null) {
                     hours_sum = hours_sum.add(map.get(Symbol.BASEHOURS)).subtract(map.get(Symbol.BREAKTIME));
-                    extra_hours = extra_hours.add(map.get(Symbol.HOLIHOURS1)).add(extra_hours.add(map.get(Symbol.HOLIHOURS2)));
-                    night_hours = night_hours.add(map.get(Symbol.NIGHTHOURS1)).add(extra_hours.add(map.get(Symbol.NIGHTHOURS2)));
+//                    extra_hours = extra_hours.add(map.get(Symbol.HOLIHOURS1)).add(extra_hours.add(map.get(Symbol.HOLIHOURS2)));
+                    night_hours = night_hours.add(map.get(Symbol.NIGHTHOURS1)).add(map.get(Symbol.NIGHTHOURS2));
                 }
                 if (rosterParameters.getSymbol(rplan.getEffectiveSymbol()).getSymbolType() == Symbol.ONLEAVE) {
                     holiday_sum = holiday_sum.add(BigDecimal.ONE);
@@ -79,33 +82,29 @@ public class StatsPerUser {
         }
 
 
-        extrahours_sum = sumExtra;
+//        extrahours_sum = sumExtra;
     }
 
-    public BigDecimal getHoursSum() {
-        return hours_sum;
-    }
+//    public BigDecimal getHoursSum() {
+//        return hours_sum;
+//    }
+//
+//    public BigDecimal getSickSum() {
+//        return sick_sum;
+//    }
+//
+//    public BigDecimal getHolidaySum() {
+//        return holiday_sum;
+//    }
+//
+//    public BigDecimal getHoursCarry() {
+//        return hours_carry;
+//    }
+//
+//    public BigDecimal getSickCarry() {
+//        return sick_carry;
+//    }
 
-    public BigDecimal getSickSum() {
-        return sick_sum;
-    }
-
-    public BigDecimal getHolidaySum() {
-        return holiday_sum;
-    }
-
-    public BigDecimal getHoursCarry() {
-        return hours_carry;
-    }
-
-    public BigDecimal getSickCarry() {
-        return sick_carry;
-    }
-
-
-    public BigDecimal getExtraHoursSum() {
-        return extrahours_sum;
-    }
 
     public String getStatsAsHTML() {
 
@@ -115,44 +114,65 @@ public class StatsPerUser {
 
         content = SYSConst.html_table_tr(
                 SYSConst.html_table_th("--") +
+                        SYSConst.html_table_th("Übertr.") +
                         SYSConst.html_table_th("Soll") +
-                        SYSConst.html_table_th("Plan") +
-                        SYSConst.html_table_th("l.Monat") +
-                        SYSConst.html_table_th("d.Monat") +
-                        SYSConst.html_table_th("Feier.Std.") +
-                        SYSConst.html_table_th("Nacht.Std.")
+                        SYSConst.html_table_th("Arbeit") +
+                        SYSConst.html_table_th("Feier") +
+                        SYSConst.html_table_th("Urlaub") +
+                        SYSConst.html_table_th("Krank") +
+                        SYSConst.html_table_th("Summe")
         );
 
+        BigDecimal holiddayhours = contractsParameterSet.getDayValue().multiply(holiday_sum);
+        BigDecimal sickhours = contractsParameterSet.getDayValue().multiply(sick_sum);
+        BigDecimal targethours = contractsParameterSet.getTargetHoursPerMonth();
+
         content += SYSConst.html_table_tr(
-                SYSConst.html_table_th("Stunden") +
-                        SYSConst.html_table_td(contractsParameterSet.getTargetHoursPerMonth().setScale(2, RoundingMode.HALF_UP).toString()) +
-                        SYSConst.html_table_td(hours_sum.setScale(2, RoundingMode.HALF_UP).toString()) +
+                SYSConst.html_table_th("Std.") +
+                        // Carry
                         SYSConst.html_table_td(hours_carry.setScale(2, RoundingMode.HALF_UP).toString()) +
-                        SYSConst.html_table_td(hours_carry.add(hours_sum).setScale(2, RoundingMode.HALF_UP).toString()) +
+                        // Soll
+                        SYSConst.html_table_td(targethours.negate().setScale(2, RoundingMode.HALF_UP).toString()) +
+                        // Arbeit
+                        SYSConst.html_table_td(hours_sum.setScale(2, RoundingMode.HALF_UP).toString()) +
+                        // Feiertage
                         SYSConst.html_table_td(extra_hours.setScale(2, RoundingMode.HALF_UP).toString()) +
-                        SYSConst.html_table_td(night_hours.setScale(2, RoundingMode.HALF_UP).toString())
+                        // Urlaub
+                        SYSConst.html_table_td(holiddayhours.setScale(2, RoundingMode.HALF_UP).toString()) +
+                        // Krank
+                        SYSConst.html_table_td(sickhours.setScale(2, RoundingMode.HALF_UP).toString()) +
+                        // Summe
+                        SYSConst.html_table_td(hours_carry.subtract(targethours).add(hours_sum).add(extra_hours).add(holiddayhours).add(sickhours).setScale(2, RoundingMode.HALF_UP).toString())
+
+//                        SYSConst.html_table_td(night_hours.setScale(2, RoundingMode.HALF_UP).toString())
         );
 
         content += SYSConst.html_table_tr(
                 SYSConst.html_table_th("--") +
-                        SYSConst.html_table_th("l.Jahr") +
-                        SYSConst.html_table_th("d.Jahr") +
-                        SYSConst.html_table_th("Plan") +
-                        SYSConst.html_table_th("R.l.Jahr") +
-                        SYSConst.html_table_th("R.d.Jahr") +
-                        SYSConst.html_table_th("")
+                        SYSConst.html_table_th("Url.Plan") +
+                        SYSConst.html_table_th("Url.alt") +
+                        SYSConst.html_table_th("Url.neu") +
+                        SYSConst.html_table_th("Url.Rest") +
+                        SYSConst.html_table_th("Kr.vorh.") +
+                        SYSConst.html_table_th("Krank") +
+                        SYSConst.html_table_th("Kr.Summe")
+
         );
 
         Pair<BigDecimal, BigDecimal> holidays = getRemainingHoliday();
 
         content += SYSConst.html_table_tr(
-                SYSConst.html_table_th("Url.Tage") +
-                        SYSConst.html_table_td(holiday_lastyear_carry.setScale(0, RoundingMode.HALF_UP).toString()) +
-                        SYSConst.html_table_td(holiday_thisyear_carry.setScale(0, RoundingMode.HALF_UP).toString()) +
+                SYSConst.html_table_th("Tage") +
+
                         SYSConst.html_table_td(holiday_sum.setScale(0, RoundingMode.HALF_UP).toString()) +
+//                        SYSConst.html_table_td(holiday_lastyear_carry.setScale(0, RoundingMode.HALF_UP).toString()) +
+//                        SYSConst.html_table_td(holiday_thisyear_carry.setScale(0, RoundingMode.HALF_UP).toString()) +//
                         SYSConst.html_table_td(holidays.getFirst().setScale(0, RoundingMode.HALF_UP).toString()) +
                         SYSConst.html_table_td(holidays.getSecond().setScale(0, RoundingMode.HALF_UP).toString()) +
-                        SYSConst.html_table_td("")
+                        SYSConst.html_table_td(holidays.getFirst().add(holidays.getSecond()).setScale(0, RoundingMode.HALF_UP).toString()) +
+                        SYSConst.html_table_td(sick_carry.setScale(0, RoundingMode.HALF_UP).toString()) +
+                        SYSConst.html_table_td(sick_sum.setScale(0, RoundingMode.HALF_UP).toString()) +
+                        SYSConst.html_table_td(sick_carry.add(sick_sum).setScale(0, RoundingMode.HALF_UP).toString())
         );
 
         return "<table style=\"font-family:arial;font-size:9px;\" border=\"1\">" + SYSTools.xx(content) + "</table>\n";

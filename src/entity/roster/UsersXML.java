@@ -71,7 +71,7 @@ public class UsersXML extends DefaultHandler {
             } else if (tagName.equalsIgnoreCase("targethourspermonth")) {
                 mySet.setTargetHoursPerMonth(new BigDecimal(attributes.getValue("value")));
             } else if (tagName.equalsIgnoreCase("holidaypremiumpercentage")) {
-                mySet.setHollidayPremiumPercentage(new BigDecimal(attributes.getValue("value")));
+                mySet.setHolidayPremiumPercentage(new BigDecimal(attributes.getValue("value")));
             } else if (tagName.equalsIgnoreCase("nightpremiumpercentage")) {
                 mySet.setNightPremiumPercentage(new BigDecimal(attributes.getValue("value")));
             } else if (tagName.equalsIgnoreCase("night")) {

@@ -175,26 +175,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             }
         } else if (columnIndex == 1) { // homestats carry
             cellType = CT_STAT_TABLE;
-//            if (rowIndex % 4 == 0) {
-//                cellType = CT_CARRY_SICK;
-//            } else if (rowIndex % 4 == 1) {
-//                cellType = CT_CARRY_HOLIDAY;
-//            } else if (rowIndex % 4 == 2) {
-//                cellType = CT_CARRY_EMPTY;
-//            } else if (rowIndex % 4 == 3) {
-//                cellType = CT_CARRY_HOURS;
-//            }
-//        } else if (columnIndex == 2) { // homestats sum
-//            cellType = CT_STAT_TABLE;
-//            if (rowIndex % 4 == 0) {
-//                cellType = CT_SUM_SICK;
-//            } else if (rowIndex % 4 == 1) {
-//                cellType = CT_SUM_HOLIDAY;
-//            } else if (rowIndex % 4 == 2) {
-//                cellType = CT_SUM_EMPTY;
-//            } else if (rowIndex % 4 == 3) {
-//                cellType = CT_SUM_HOURS;
-//            }
+
         } else if (columnIndex >= ROW_HEADER && columnIndex < ROW_FOOTER) {
             if (rowIndex % 4 == 0) {
                 cellType = CT_P1;
@@ -206,18 +187,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 cellType = CT_HOURS;
             }
         }
-//        else if (columnIndex == ROW_FOOTER) {
-//                   if (rowIndex % 4 == 0) {
-//                       cellType = CT_SUM_SICK;
-//                   } else if (rowIndex % 4 == 1) {
-//                       cellType = CT_SUM_HOLIDAY;
-//                   } else if (rowIndex % 4 == 2) {
-//                       cellType = CT_SUM_EMPTY;
-//
-//                   } else if (rowIndex % 4 == 3) {
-//                       cellType = CT_SUM_HOURS;
-//                   }
-//               }
+
 
         return cellType;
     }
@@ -442,7 +412,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                         WorkAccountTools.getSum(month.dayOfYear().withMinimumValue().minusDays(1), myUser, WorkAccountTools.HOLIDAYS),
                         rosterParameters,
                         contracts.get(myUser).getContractsWithinMonth(month).get(0).getDefaults(),
-                        roster.getFlag()
+                        roster
                 )
                 );
                 content.put(myUser, new ArrayList<Rplan>());
@@ -579,24 +549,15 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             } else {
                 value = contracts.get(user).getParameterSet(month).isExam() ? "<html><b>Examen</b></html>" : "Helfer";
             }
-//        } else if (ct == CT_CARRY_HOURS) {
-//            value = "St: " + statsPerUser.get(user).getHoursCarry().setScale(2, RoundingMode.HALF_UP).toString();
-//        } else if (ct == CT_CARRY_SICK) {
-//            value = "Kr: " + statsPerUser.get(user).getSickCarry().setScale(2, RoundingMode.HALF_UP).toString();
-//        } else if (ct == CT_CARRY_HOLIDAY) {
-//            value = "Url: " + statsPerUser.get(user).getHolidayCarry().setScale(2, RoundingMode.HALF_UP).toString();
         } else if (ct == CT_P1) {
             value = content.get(user).get(columnIndex - ROW_HEADER) != null ? content.get(user).get(columnIndex - ROW_HEADER).getP1() : "";
-//            if (!value.toString().isEmpty()) {
-//                value = String.format("<html><b>%s</b></html>", value);
-//            }
         } else if (ct == CT_P2) {
             value = content.get(user).get(columnIndex - ROW_HEADER) != null ? content.get(user).get(columnIndex - ROW_HEADER).getP2() : "";
         } else if (ct == CT_ACTUAL) {
             value = content.get(user).get(columnIndex - ROW_HEADER) != null ? content.get(user).get(columnIndex - ROW_HEADER).getActual() : "";
         } else if (ct == CT_HOURS) {
             Rplan rplan = content.get(user).get(columnIndex - ROW_HEADER);
-            LocalDate day = getDay(columnIndex);
+//            LocalDate day = getDay(columnIndex);
             if (rplan != null) {
                 BigDecimal displayHours = rosterParameters.getSymbol(rplan.getEffectiveSymbol()).getDisplayHours();
 
@@ -609,12 +570,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             } else {
                 value = "-/-";
             }
-//        } else if (ct == CT_SUM_HOURS) {
-//            value = "St: " + statsPerUser.get(user).getHoursSum().setScale(2, RoundingMode.HALF_UP).toString();
-//        } else if (ct == CT_SUM_SICK) {
-//            value = "Kr: " + statsPerUser.get(user).getSickSum().setScale(2, RoundingMode.HALF_UP).toString();
-//        } else if (ct == CT_SUM_HOLIDAY) {
-//            value = "Url: " + statsPerUser.get(user).getHolidaySum().setScale(2, RoundingMode.HALF_UP).toString();
         } else if (ct == CT_STAT_TABLE) {
             value = SYSTools.toHTMLForScreen(statsPerUser.get(user).getStatsAsHTML());
         }
@@ -709,15 +664,10 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             Rosters myRoster = em.merge(roster);
             Rplan myRplan = em.merge(oldPlan);
 
-//            HomeStats stat = homestats.get(myRplan.getHome1()).get(new LocalDate(myRplan.getStart()).getDayOfMonth() - 1);
             em.lock(myRplan, LockModeType.OPTIMISTIC);
-//            boolean exam = contracts.get(myRplan.getOwner()).getParameterSet(month).isExam();
-
 
             if (rowIndex % 4 == 0) {
                 em.remove(myRplan);
-//                int type = rosterParameters.getSymbol(myRplan.getP1()).getSection() == RosterXML.SOCIAL ? StatsPerDay.SOCIAL : (exam ? StatsPerDay.EXAM : StatsPerDay.HELPER);
-//                stat.subtract(type, rosterParameters.getSymbol(myRplan.getP1()));
 
                 myRplan = null;
             } else {
@@ -728,15 +678,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 myRplan.setHome2(null);
                 symbol = rosterParameters.getSymbol(myRplan.getP1());
 
-//                } else if (rowIndex % 4 == 2) {
-//                    myRplan.setP3(null);
-//                    myRplan.setHome3(null);
-//                    symbol = rosterParameters.getSymbol(myRplan.getP2());
-//                }
 
                 myRplan.setStartEndFromSymbol(symbol);
-//                int type = rosterParameters.getSymbol(myRplan.getEffectiveSymbol()).getSection() == RosterXML.SOCIAL ? StatsPerDay.SOCIAL : (exam ? StatsPerDay.EXAM : StatsPerDay.HELPER);
-//                stat.replace(type, rosterParameters.getSymbol(oldPlan.getEffectiveSymbol()), rosterParameters.getSymbol(myRplan.getEffectiveSymbol()));
             }
 
 
@@ -814,7 +757,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                             WorkAccountTools.getSum(month.dayOfYear().withMinimumValue().minusDays(1), myUser, WorkAccountTools.HOLIDAYS),
                             rosterParameters,
                             contracts.get(myUser).getContractsWithinMonth(month).get(0).getDefaults(),
-                            roster.getFlag())
+                            roster)
                     );
                     content.put(myUser, new ArrayList<Rplan>());
                     for (int i = 0; i < month.dayOfMonth().withMaximumValue().getDayOfMonth(); i++) {

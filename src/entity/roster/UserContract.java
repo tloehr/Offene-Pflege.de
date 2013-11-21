@@ -1,6 +1,5 @@
 package entity.roster;
 
-import org.joda.time.DateMidnight;
 import org.joda.time.LocalDate;
 
 import java.text.DecimalFormat;
@@ -71,7 +70,7 @@ public class UserContract {
         xml += String.format("                <workingdaysperweek value=\"%s\"/>\n", df.format(defaults.getWorkingDaysPerWeek()).replace(",", "."));
         xml += String.format("                <targethourspermonth value=\"%s\"/>\n", df.format(defaults.getTargetHoursPerMonth()).replace(",", "."));
         xml += String.format("                <night from=\"%s\" to=\"%s\"/>\n", defaults.getNight().getFirst().toString("HH:mm"), defaults.getNight().getSecond().toString("HH:mm"));
-        xml += String.format("                <holidaypremiumpercentage value=\"%s\"/>\n", df.format(defaults.getHollidayPremiumPercentage()).replace(",", "."));
+        xml += String.format("                <holidaypremiumpercentage value=\"%s\"/>\n", df.format(defaults.getHolidayPremiumPercentage()).replace(",", "."));
         xml += String.format("                <nightpremiumpercentage value=\"%s\"/>\n", df.format(defaults.getNightPremiumPercentage()).replace(",", "."));
         xml += String.format("                <section value=\"%s\"/>\n", defaults.getSection());
         xml += (defaults.isExam() ? "                <exam/>\n" : "");
@@ -100,7 +99,7 @@ public class UserContract {
                 (set.getWorkingDaysPerWeek() != null ? String.format("                <workingdaysperweek value=\"%s\"/>\n", df.format(set.getWorkingDaysPerWeek()).replace(",", ".")) : "") +
                 (set.getTargetHoursPerMonth() != null ? String.format("                <targethourspermonth value=\"%s\"/>\n", df.format(set.getTargetHoursPerMonth()).replace(",", ".")) : "") +
                 (set.getNight() != null ? String.format("                <night from=\"%s\" to=\"%s\"/>\n", set.getNight().getFirst().toString("HH:mm"), set.getNight().getSecond().toString("HH:mm")) : "") +
-                (set.getHollidayPremiumPercentage() != null ? String.format("                <holidaypremiumpercentage value=\"%s\"/>\n", df.format(set.getHollidayPremiumPercentage()).replace(",", ".")) : "") +
+                (set.getHolidayPremiumPercentage() != null ? String.format("                <holidaypremiumpercentage value=\"%s\"/>\n", df.format(set.getHolidayPremiumPercentage()).replace(",", ".")) : "") +
                 (set.getNightPremiumPercentage() != null ? String.format("                <nightpremiumpercentage value=\"%s\"/>\n", df.format(set.getNightPremiumPercentage()).replace(",", ".")) : "") +
                 String.format("            </%s>\n", sectionName);
         return xml;
@@ -134,8 +133,8 @@ public class UserContract {
                         if (paramset.getTargetHoursPerMonth() != null) {
                             mySet.setTargetHoursPerMonth(paramset.getTargetHoursPerMonth());
                         }
-                        if (paramset.getHollidayPremiumPercentage() != null) {
-                            mySet.setHollidayPremiumPercentage(paramset.getHollidayPremiumPercentage());
+                        if (paramset.getHolidayPremiumPercentage() != null) {
+                            mySet.setHolidayPremiumPercentage(paramset.getHolidayPremiumPercentage());
                         }
                         if (paramset.getNightPremiumPercentage() != null) {
                             mySet.setNightPremiumPercentage(paramset.getNightPremiumPercentage());

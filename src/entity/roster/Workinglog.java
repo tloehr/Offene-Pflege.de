@@ -23,9 +23,6 @@ public class Workinglog implements Comparable<Workinglog> {
     @Column(name = "hours", nullable = false, insertable = true, updatable = true, length = 9, precision = 4)
     @Basic
     private BigDecimal hours;
-    @Column(name = "extra", nullable = false, insertable = true, updatable = true, length = 9, precision = 4)
-    @Basic
-    private BigDecimal extra;
     @Column(name = "percent", nullable = false, insertable = true, updatable = true, length = 9, precision = 4)
     @Basic
     private BigDecimal percent;
@@ -35,6 +32,9 @@ public class Workinglog implements Comparable<Workinglog> {
     @Column(name = "type", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
     @Basic
     private int type;
+    @Column(name = "actual", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
+    @Basic
+    private long actual;
     @Column(name = "version", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
     @Version
     private long version;
@@ -63,12 +63,12 @@ public class Workinglog implements Comparable<Workinglog> {
     public Workinglog() {
     }
 
-    public Workinglog(BigDecimal hours, BigDecimal extra, BigDecimal percent, Rplan rplan, int type) {
+    public Workinglog(BigDecimal hours, BigDecimal percent, Rplan rplan, int type, long actual) {
         this.hours = hours;
-        this.extra = extra;
         this.percent = percent;
         this.rplan = rplan;
         this.type = type;
+        this.actual = actual;
         this.creator = OPDE.getLogin().getUser();
     }
 
@@ -77,14 +77,17 @@ public class Workinglog implements Comparable<Workinglog> {
         return "Workinglog{" +
                 "id=" + id +
                 ", hours=" + hours +
-                ", extra=" + extra +
                 ", percent=" + percent +
                 ", text='" + text + '\'' +
+                ", type=" + type +
+                ", actual=" + actual +
                 ", version=" + version +
-                ", rplan=" + rplan.getId() +
+                ", rplan=" + rplan +
                 ", creator=" + creator +
                 ", controller=" + controller +
                 ", editedBy=" + editedBy +
+                ", replacedBy=" + replacedBy +
+                ", replacementFor=" + replacementFor +
                 "} " + super.toString();
     }
 
@@ -95,12 +98,13 @@ public class Workinglog implements Comparable<Workinglog> {
 
         Workinglog that = (Workinglog) o;
 
+        if (actual != that.actual) return false;
         if (id != that.id) return false;
+        if (type != that.type) return false;
         if (version != that.version) return false;
         if (controller != null ? !controller.equals(that.controller) : that.controller != null) return false;
         if (creator != null ? !creator.equals(that.creator) : that.creator != null) return false;
         if (editedBy != null ? !editedBy.equals(that.editedBy) : that.editedBy != null) return false;
-        if (extra != null ? !extra.equals(that.extra) : that.extra != null) return false;
         if (hours != null ? !hours.equals(that.hours) : that.hours != null) return false;
         if (percent != null ? !percent.equals(that.percent) : that.percent != null) return false;
         if (replacedBy != null ? !replacedBy.equals(that.replacedBy) : that.replacedBy != null) return false;
@@ -116,9 +120,10 @@ public class Workinglog implements Comparable<Workinglog> {
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + (hours != null ? hours.hashCode() : 0);
-        result = 31 * result + (extra != null ? extra.hashCode() : 0);
         result = 31 * result + (percent != null ? percent.hashCode() : 0);
         result = 31 * result + (text != null ? text.hashCode() : 0);
+        result = 31 * result + type;
+        result = 31 * result + (int) (actual ^ (actual >>> 32));
         result = 31 * result + (int) (version ^ (version >>> 32));
         result = 31 * result + (rplan != null ? rplan.hashCode() : 0);
         result = 31 * result + (creator != null ? creator.hashCode() : 0);
@@ -137,13 +142,6 @@ public class Workinglog implements Comparable<Workinglog> {
         this.hours = hours;
     }
 
-    public BigDecimal getExtra() {
-        return extra;
-    }
-
-    public void setExtra(BigDecimal extra) {
-        this.extra = extra;
-    }
 
     public BigDecimal getPercent() {
         return percent;
@@ -243,6 +241,13 @@ public class Workinglog implements Comparable<Workinglog> {
         this.type = type;
     }
 
+    public long getActualKey() {
+        return actual;
+    }
+
+    public void setActualKey(long actual) {
+        this.actual = actual;
+    }
 
     public boolean isDeleted() {
         return editedBy != null && replacedBy == null && replacementFor == null;

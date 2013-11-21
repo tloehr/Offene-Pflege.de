@@ -3,6 +3,8 @@ package op.roster;
 import com.jidesoft.swing.StyledLabel;
 import com.jidesoft.swing.StyledLabelBuilder;
 import entity.roster.*;
+import entity.system.Unique;
+import entity.system.UniqueTools;
 import op.OPDE;
 import op.threads.DisplayManager;
 import op.tools.GUITools;
@@ -19,6 +21,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created with IntelliJ IDEA.
@@ -49,6 +53,8 @@ public class PnlWorkingLogSingleDay extends JPanel {
         setBorder(new LineBorder(Color.DARK_GRAY, 2));
 
 
+
+
         initPanel();
     }
 
@@ -65,15 +71,13 @@ public class PnlWorkingLogSingleDay extends JPanel {
                     Rplan myRplan = em.merge(rplan);
                     em.lock(myRplan, LockModeType.OPTIMISTIC);
 
+                    Unique unique = UniqueTools.getNewUID(em, "wlog_");
 
-                    for (Workinglog workinglog : WorkinglogTools.createWorkingLogs(myRplan, rosterParameters.getSymbol(myRplan.getEffectiveSymbol()), userContracts.getParameterSet(new LocalDate(myRplan.getStart())))) {
+                    for (Workinglog workinglog : WorkinglogTools.createWorkingLogs(myRplan, rosterParameters.getSymbol(myRplan.getEffectiveSymbol()), userContracts.getParameterSet(new LocalDate(myRplan.getStart())), unique.getUid())) {
                         myRplan.getWorkinglogs().add(em.merge(workinglog));
                     }
 
                     myRplan.setActual(myRplan.getEffectiveSymbol());
-
-//                    Workinglog myWorkinglog = em.merge(new Workinglog(myRplan, rosterParameters.getSymbol(myRplan.getEffectiveSymbol(), userContracts)));
-//                    Workinglog myWorkinglog = null;
 
                     em.getTransaction().commit();
                     rplan = myRplan;
@@ -137,9 +141,27 @@ public class PnlWorkingLogSingleDay extends JPanel {
                     em.getTransaction().begin();
                     Rplan myRplan = em.merge(rplan);
                     em.lock(myRplan, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                    Workinglog myWorkinglog = em.merge(workinglog);
-                    em.remove(myWorkinglog);
-                    myRplan.getWorkinglogs().remove(workinglog);
+
+                    if (workinglog.getActualKey() > 0) {
+                        Collection<Workinglog> logs2remove = new ArrayList<Workinglog>();
+                        for (Workinglog wlog : myRplan.getWorkinglogs()) {
+                            if (wlog.getActualKey() == workinglog.getActualKey()) {
+                                Workinglog myWorkinglog = em.merge(wlog);
+                                em.remove(myWorkinglog);
+                                logs2remove.add(wlog);
+                            }
+                        }
+
+                        myRplan.getWorkinglogs().removeAll(logs2remove);
+                        myRplan.setActual(null);
+
+                    } else {
+                        Workinglog myWorkinglog = em.merge(workinglog);
+                        em.remove(myWorkinglog);
+                        myRplan.getWorkinglogs().remove(workinglog);
+                    }
+
+
                     em.getTransaction().commit();
                     rplan = myRplan;
                 } catch (OptimisticLockException ole) {
