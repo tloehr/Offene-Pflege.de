@@ -1616,7 +1616,7 @@ public class SYSTools {
     }
 
 
-    public static BigDecimal checkBigDecimal(javax.swing.event.CaretEvent evt, boolean nees2BePositive) {
+    public static BigDecimal checkBigDecimal(javax.swing.event.CaretEvent evt, boolean nees2BePositive, boolean allowNullReturns) {
         BigDecimal bd = null;
         JTextComponent txt = (JTextComponent) evt.getSource();
         Action toolTipAction = txt.getActionMap().get("hideTip");
@@ -1635,10 +1635,14 @@ public class SYSTools {
             }
 
         } catch (NumberFormatException ex) {
-            if (nees2BePositive) {
-                bd = BigDecimal.ONE;
+            if (allowNullReturns) {
+                bd = null;
             } else {
-                bd = BigDecimal.ZERO;
+                if (nees2BePositive) {
+                    bd = BigDecimal.ONE;
+                } else {
+                    bd = BigDecimal.ZERO;
+                }
             }
             txt.setToolTipText("<html><font color=\"red\"><b>" + OPDE.lang.getString("misc.msg.invalidnumber") + "</b></font></html>");
             toolTipAction = txt.getActionMap().get("postTip");

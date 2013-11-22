@@ -4,8 +4,8 @@ new FormModel {
 	contentType: "form/swing"
 	root: new FormRoot {
 		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-			"$columnSpecs": "default:grow"
-			"$rowSpecs": "default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default"
+			"$columnSpecs": "default, labelcompgap, 164dlu, labelcompgap, default"
+			"$rowSpecs": "default, linegap, default, linegap, default, linegap, default, linegap, default"
 		} ) {
 			name: "this"
 			add( new FormComponent( "javax.swing.JLabel" ) {
@@ -13,44 +13,37 @@ new FormModel {
 				"text": "text"
 				"font": new java.awt.Font( "Arial", 1, 14 )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridX": 1
-				"gridY": 1
-			} )
-			add( new FormComponent( "javax.swing.JLabel" ) {
-				name: "lblPlan"
-				"text": "text"
-			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridX": 1
+				"gridX": 3
 				"gridY": 3
 			} )
 			add( new FormComponent( "javax.swing.JTextField" ) {
-				name: "txtActual"
+				name: "txtHours"
+				"text": "1,0"
+				"horizontalAlignment": 11
+				addEvent( new FormEvent( "javax.swing.event.CaretListener", "caretUpdate", "txtAdditionalHoursCaretUpdate", true ) )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridX": 1
+				"gridX": 3
 				"gridY": 5
 			} )
 			add( new FormComponent( "javax.swing.JTextField" ) {
-				name: "txtAdditionalHours"
+				name: "txtComment"
+				addEvent( new FormEvent( "javax.swing.event.CaretListener", "caretUpdate", "txtCommentCaretUpdate", true ) )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridX": 1
+				"gridX": 3
 				"gridY": 7
 			} )
-			add( new FormComponent( "javax.swing.JTextField" ) {
-				name: "txtAdditionalText"
-			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridX": 1
-				"gridY": 9
-			} )
-			add( new FormComponent( "javax.swing.JLabel" ) {
-				name: "lblHourSum"
+			add( new FormComponent( "javax.swing.JButton" ) {
+				name: "btnApply"
 				"text": "text"
+				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnApplyActionPerformed", true ) )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridX": 1
-				"gridY": 11
+				"gridX": 3
+				"gridY": 9
+				"hAlign": sfield com.jgoodies.forms.layout.CellConstraints RIGHT
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
-			"size": new java.awt.Dimension( 400, 300 )
+			"size": new java.awt.Dimension( 365, 200 )
 		} )
 	}
 }

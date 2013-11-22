@@ -59,7 +59,7 @@ public class PnlWorkingLogWholeMonth extends JPanel {
         //======== this ========
         setLayout(new FormLayout(
             "8*(pref:grow, $lcgap), default",
-            "2*(default, $lgap), 8*(default:grow, $lgap), default"));
+            "2*(default, $lgap), pref:grow, 2*($lgap, 60dlu), 5*($lgap, default:grow), $lgap, default"));
 
         //---- lblUser ----
         lblUser.setText("text");
@@ -73,6 +73,10 @@ public class PnlWorkingLogWholeMonth extends JPanel {
         lblMonth.setFont(new Font("Arial", Font.PLAIN, 18));
         add(lblMonth, CC.xywh(1, 3, 15, 1));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
+    }
+
+    public Collection<Rplan> getRPlans(){
+        return lookup.values();
     }
 
     void initPanel() {
@@ -109,8 +113,16 @@ public class PnlWorkingLogWholeMonth extends JPanel {
         add(lblkw, CC.xy(1, 7));
 
         for (int day = 1; day <= month.dayOfMonth().withMaximumValue().getDayOfMonth(); day++) {
+            final LocalDate date = month.plusDays(day - 1);
             if (lookup.containsKey(month.plusDays(day - 1))) {
-                add(new PnlWorkingLogSingleDay(lookup.get(month.plusDays(day - 1)), rosterParameters, userContracts), CC.xy(posx, posy, CC.FILL, CC.FILL));
+                add(new PnlWorkingLogSingleDay(lookup.get(date), rosterParameters, userContracts.getParameterSet(date), new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        if (o != null){
+                            lookup.put(date, (Rplan) o);
+                        }
+                    }
+                }), CC.xy(posx, posy, CC.FILL, CC.FILL));
             } else {
                 JPanel blackpanel = new JPanel();
                 blackpanel.setBackground(Color.black);

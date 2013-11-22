@@ -1,5 +1,6 @@
 package op.roster;
 
+import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.StyledLabel;
 import com.jidesoft.swing.StyledLabelBuilder;
 import entity.roster.*;
@@ -9,8 +10,8 @@ import op.OPDE;
 import op.threads.DisplayManager;
 import op.tools.GUITools;
 import op.tools.SYSConst;
+import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
-import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -37,22 +38,27 @@ public class PnlWorkingLogSingleDay extends JPanel {
     JButton apply, add;
     private Rplan rplan;
     private RosterParameters rosterParameters;
-    private UserContracts userContracts;
+    private ContractsParameterSet contractsParameterSet;
+    private Closure afterAction;
+    //    private UserContracts userContracts;
     private Workinglog actual;
     private JPanel pnlList;
+    private Component owner;
 //    private LocalDate day;
 
 
-    public PnlWorkingLogSingleDay(Rplan rplan, RosterParameters rosterParameters, UserContracts userContracts) {
+    public PnlWorkingLogSingleDay(Rplan rplan, RosterParameters rosterParameters, ContractsParameterSet contractsParameterSet, Closure afterAction) {
         super();
         this.rplan = rplan;
         this.rosterParameters = rosterParameters;
-        this.userContracts = userContracts;
+        this.contractsParameterSet = contractsParameterSet;
+        this.afterAction = afterAction;
+
 //        this.day = new LocalDate(rplan.getStart());
         scrl = new JScrollPane();
         setBorder(new LineBorder(Color.DARK_GRAY, 2));
 
-
+        owner = this;
 
 
         initPanel();
@@ -73,7 +79,7 @@ public class PnlWorkingLogSingleDay extends JPanel {
 
                     Unique unique = UniqueTools.getNewUID(em, "wlog_");
 
-                    for (Workinglog workinglog : WorkinglogTools.createWorkingLogs(myRplan, rosterParameters.getSymbol(myRplan.getEffectiveSymbol()), userContracts.getParameterSet(new LocalDate(myRplan.getStart())), unique.getUid())) {
+                    for (Workinglog workinglog : WorkinglogTools.createWorkingLogs(myRplan, rosterParameters.getSymbol(myRplan.getEffectiveSymbol()), contractsParameterSet, unique.getUid())) {
                         myRplan.getWorkinglogs().add(em.merge(workinglog));
                     }
 
@@ -99,7 +105,55 @@ public class PnlWorkingLogSingleDay extends JPanel {
 
             }
         });
-        add = GUITools.getTinyButton(SYSConst.icon22add, null);
+        add = GUITools.getTinyButton(SYSConst.icon22add, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                final JidePopup popup = new JidePopup();
+
+                popup.setMovable(false);
+                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                popup.setOwner(add);
+                popup.removeExcludedComponent(owner);
+                popup.setDefaultFocusComponent(owner);
+
+                popup.getContentPane().add(new PnlWorkingLogSingle(rplan, rosterParameters, contractsParameterSet, new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        if (o != null) {
+                            popup.hidePopup();
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                Workinglog workinglog = em.merge((Workinglog) o);
+                                Rplan myRplan = em.merge(rplan);
+                                em.lock(myRplan, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                myRplan.getWorkinglogs().add(workinglog);
+
+                                em.getTransaction().commit();
+                                rplan = myRplan;
+                            } catch (OptimisticLockException ole) {
+                                OPDE.error(ole);
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception ex) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(ex);
+                            } finally {
+                                em.close();
+                                updateList();
+                            }
+                        }
+                    }
+                }));
+//                popup.setPreferredPopupSize(new Dimension(1100, 600));
+
+                GUITools.showPopup(popup, SwingConstants.CENTER);
+            }
+        });
 
         pnlList = new JPanel();
         pnlList.setLayout(new VerticalLayout());
@@ -207,6 +261,7 @@ public class PnlWorkingLogSingleDay extends JPanel {
                 pnlList.add(getLine(workinglog));
             }
         }
+        afterAction.execute(rplan);
         apply.setEnabled(rplan.getActual().isEmpty());
         scrl.validate();
         scrl.repaint();

@@ -24,6 +24,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import javax.swing.*;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -107,6 +109,11 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
 
     public TMRoster(Rosters roster, boolean readOnly, Font font) {
+
+//        JDialog dlg = new JDialog(new JFrame(), "Bitte warten");
+//
+//        dlg.setVisible(true);
+
         this.roster = roster;
         this.readOnly = readOnly;
         this.font = font;
@@ -114,7 +121,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         defaultHome = StationTools.getStationForThisHost().getHome();
 
         content = new HashMap<Users, ArrayList<Rplan>>();
-//        workinglogs = new HashMap<Rplan, ArrayList<Workinglog>>();
 
         contracts = UsersTools.getUsersWithValidContractsIn(month);
         prefixMap = new HashMap<String, Homes>();
@@ -878,11 +884,32 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
                 JidePopup popup = new JidePopup();
 
+                final PnlWorkingLogWholeMonth pnl = new PnlWorkingLogWholeMonth(content.get(user), rosterParameters, contracts.get(user));
+
                 popup.setMovable(false);
                 popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
                 popup.setOwner(owner);
                 popup.removeExcludedComponent(owner);
-                popup.getContentPane().add(new PnlWorkingLogWholeMonth(content.get(user), rosterParameters, contracts.get(user)));
+                popup.getContentPane().add(pnl);
+                popup.addPopupMenuListener(new PopupMenuListener() {
+                    @Override
+                    public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                        //To change body of implemented methods use File | Settings | File Templates.
+                    }
+
+                    @Override
+                    public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                        ArrayList<Rplan> listPlans = new ArrayList<Rplan>(pnl.getRPlans());
+                        Collections.sort(listPlans);
+                        content.put(user, listPlans);
+                        fireTableDataChanged();
+                    }
+
+                    @Override
+                    public void popupMenuCanceled(PopupMenuEvent e) {
+                        //To change body of implemented methods use File | Settings | File Templates.
+                    }
+                });
                 popup.setPreferredPopupSize(new Dimension(1100, 600));
 
                 GUITools.showPopup(popup, SwingConstants.CENTER);

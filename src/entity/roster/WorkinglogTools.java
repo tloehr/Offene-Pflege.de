@@ -17,14 +17,14 @@ public class WorkinglogTools {
 
     // all AUTO types meaning an entry which has been created while applying the planned shift
     public static final int TYPE_AUTO_DAY1 = 0;
-    public static final int TYPE_AUTO_DAY2 = 1;
-    public static final int TYPE_AUTO_NIGHT1 = 2;
-    public static final int TYPE_AUTO_NIGHT2 = 3;
+    public static final int TYPE_AUTO_NIGHT1 = 1;
+    public static final int TYPE_AUTO_NIGHT2 = 2;
+    public static final int TYPE_AUTO_DAY2 = 3;
     //    public static final int TYPE_AUTO_HOLIDAY = 2;
     public static final int TYPE_AUTO_BREAK = 4; // negative value
-    //    public static final int TYPE_MANUAL_HOURS = 4;
+    public static final int TYPE_MANUAL = 5;
 //    public static final int TYPE_AUTO_EXTRA = 5; // additional hours for holiday shifts
-    public static final String[] TYPES = new String[]{"Tag1", "Tag2", "Nacht1", "Nacht2", "Pause"};
+    public static final String[] TYPES = new String[]{"Tag1", "Nacht1", "Nacht2", "Tag2", "Pause", "Manuell"};
 
     public static String toPrettyString(Workinglog workinglog) {
         String text = "";
@@ -54,7 +54,7 @@ public class WorkinglogTools {
                 listLogs.add(new Workinglog(map.get(Symbol.DAYHOURS1), BigDecimal.ZERO, myRplan, WorkinglogTools.TYPE_AUTO_DAY1, actual));
             }
             if (map.get(Symbol.DAYHOURS2).compareTo(BigDecimal.ZERO) > 0) {
-                listLogs.add(new Workinglog(map.get(Symbol.DAYHOURS2), BigDecimal.ZERO, myRplan, WorkinglogTools.TYPE_AUTO_DAY1, actual));
+                listLogs.add(new Workinglog(map.get(Symbol.DAYHOURS2), BigDecimal.ZERO, myRplan, WorkinglogTools.TYPE_AUTO_DAY2, actual));
             }
             if (map.get(Symbol.NIGHTHOURS1).compareTo(BigDecimal.ZERO) > 0) {
                 listLogs.add(new Workinglog(map.get(Symbol.NIGHTHOURS1), parameterSet.nightPremiumPercentage, myRplan, WorkinglogTools.TYPE_AUTO_NIGHT1, actual));

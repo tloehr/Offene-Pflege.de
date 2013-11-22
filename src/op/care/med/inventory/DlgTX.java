@@ -220,7 +220,7 @@ public class DlgTX extends MyJDialog {
     }
 
     private void txtMengeCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtMengeCaretUpdate
-        amount = SYSTools.checkBigDecimal(evt, false);
+        amount = SYSTools.checkBigDecimal(evt, false, false);
         if (amount.compareTo(BigDecimal.ZERO) < 0) {
             btnBuchung.setEnabled(amount.negate().compareTo(bestandsumme) <= 0);
         } else if (amount.compareTo(BigDecimal.ZERO) > 0) {
