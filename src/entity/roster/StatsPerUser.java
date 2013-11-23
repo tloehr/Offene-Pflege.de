@@ -8,6 +8,7 @@ import org.joda.time.LocalDate;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 public class StatsPerUser {
@@ -17,7 +18,7 @@ public class StatsPerUser {
 
 //    private BigDecimal extrahours_sum;
 
-    private BigDecimal extra_hours;
+    private BigDecimal extra_hours_for_holidays;
     private BigDecimal night_hours;
 
     private final RosterParameters rosterParameters;
@@ -32,13 +33,13 @@ public class StatsPerUser {
 
 
     private final ContractsParameterSet contractsParameterSet;
-    private Rosters roster;
+//    private Rosters roster;
 
 
-    public StatsPerUser(BigDecimal hours_carry, BigDecimal sick_carry, BigDecimal holiday_thisyear_carry, BigDecimal holiday_lastyear_carry, RosterParameters rosterParameters, ContractsParameterSet contractsParameterSet, Rosters roster) {
+    public StatsPerUser(BigDecimal hours_carry, BigDecimal sick_carry, BigDecimal holiday_thisyear_carry, BigDecimal holiday_lastyear_carry, RosterParameters rosterParameters, ContractsParameterSet contractsParameterSet, Date month) {
 
         this.contractsParameterSet = contractsParameterSet;
-        this.roster = roster;
+//        this.roster = roster;
 
         this.night_hours = BigDecimal.ZERO;
         this.hours_carry = hours_carry;
@@ -46,7 +47,7 @@ public class StatsPerUser {
         this.holiday_thisyear_carry = holiday_thisyear_carry;
         this.holiday_lastyear_carry = holiday_lastyear_carry;
 
-        this.extra_hours = contractsParameterSet.getHolidayHours(new LocalDate(roster.getMonth()));
+        this.extra_hours_for_holidays = contractsParameterSet.getHolidayHours(new LocalDate(month));
 
         this.rosterParameters = rosterParameters;
         this.hours_sum = BigDecimal.ZERO;
@@ -81,30 +82,7 @@ public class StatsPerUser {
             }
         }
 
-
-//        extrahours_sum = sumExtra;
     }
-
-//    public BigDecimal getHoursSum() {
-//        return hours_sum;
-//    }
-//
-//    public BigDecimal getSickSum() {
-//        return sick_sum;
-//    }
-//
-//    public BigDecimal getHolidaySum() {
-//        return holiday_sum;
-//    }
-//
-//    public BigDecimal getHoursCarry() {
-//        return hours_carry;
-//    }
-//
-//    public BigDecimal getSickCarry() {
-//        return sick_carry;
-//    }
-
 
     public String getStatsAsHTML() {
 
@@ -136,15 +114,13 @@ public class StatsPerUser {
                         // Arbeit
                         SYSConst.html_table_td(hours_sum.setScale(2, RoundingMode.HALF_UP).toString()) +
                         // Feiertage
-                        SYSConst.html_table_td(extra_hours.setScale(2, RoundingMode.HALF_UP).toString()) +
+                        SYSConst.html_table_td(extra_hours_for_holidays.setScale(2, RoundingMode.HALF_UP).toString()) +
                         // Urlaub
                         SYSConst.html_table_td(holiddayhours.setScale(2, RoundingMode.HALF_UP).toString()) +
                         // Krank
                         SYSConst.html_table_td(sickhours.setScale(2, RoundingMode.HALF_UP).toString()) +
                         // Summe
-                        SYSConst.html_table_td(hours_carry.subtract(targethours).add(hours_sum).add(extra_hours).add(holiddayhours).add(sickhours).setScale(2, RoundingMode.HALF_UP).toString())
-
-//                        SYSConst.html_table_td(night_hours.setScale(2, RoundingMode.HALF_UP).toString())
+                        SYSConst.html_table_td(hours_carry.subtract(targethours).add(hours_sum).add(extra_hours_for_holidays).add(holiddayhours).add(sickhours).setScale(2, RoundingMode.HALF_UP).toString())
         );
 
         content += SYSConst.html_table_tr(
@@ -178,6 +154,10 @@ public class StatsPerUser {
         return "<table style=\"font-family:arial;font-size:9px;\" border=\"1\">" + SYSTools.xx(content) + "</table>\n";
 
     }
+
+    public BigDecimal getVacationSum() {
+            return holiday_lastyear_carry.add(holiday_thisyear_carry).subtract(holiday_sum);
+        }
 
     public Pair<BigDecimal, BigDecimal> getRemainingHoliday() {
         BigDecimal thisYearRemain = BigDecimal.ZERO;

@@ -15,10 +15,7 @@ import com.jidesoft.converter.ObjectConverterManager;
 import com.jidesoft.grid.*;
 import entity.Homes;
 import entity.HomesTools;
-import entity.roster.Rosters;
-import entity.roster.TMRoster;
-import entity.roster.TMRosterFooter;
-import entity.roster.TMRosterHeader;
+import entity.roster.*;
 import entity.system.SYSPropsTools;
 import entity.system.Users;
 import entity.system.UsersTools;
@@ -26,6 +23,7 @@ import op.OPDE;
 import op.tools.GUITools;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
@@ -34,8 +32,6 @@ import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
@@ -44,6 +40,7 @@ import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EventObject;
@@ -67,7 +64,8 @@ public class FrmRoster extends JFrame {
         this.roster = roster;
         this.readOnly = roster.getOpenedBy() != null;
 
-        setTitle(new LocalDate(roster.getMonth()).toString("MMMM yyyy"));
+
+        setTitle(new LocalDate(roster.getMonth()).toString("MMMM yyyy") + " (" + RostersTools.getStage(roster) + ")");
 
         currentFontIndex = SYSPropsTools.getInteger("opde.roster.fontsize");
         SYSPropsTools.storeProp("opde.roster.fontsize", Integer.toString(currentFontIndex), OPDE.getLogin().getUser());
@@ -297,11 +295,21 @@ public class FrmRoster extends JFrame {
         }, new EditorContext("DefaultTextEditor"));
 
 
-        tmRoster = new TMRoster(roster, readOnly, fonts[currentFontIndex]);
+        tmRoster = new TMRoster(roster, readOnly, fonts[currentFontIndex], new Closure() {
+            @Override
+            public void execute(Object o) {
+                OPDE.debug(((BigDecimal) o).toString() + " %");
+            }
+        });
         btnFontSize.setText(fonts[currentFontIndex].getFontName() + ", " + fonts[currentFontIndex].getSize());
+
+        OPDE.debug("1...");
 
         TMRosterHeader tmRosterHeader = new TMRosterHeader(tmRoster);
         TMRosterFooter tmRosterFooter = new TMRosterFooter(tmRoster);
+
+
+        OPDE.debug("2...");
 
         tsp1 = new TableScrollPane(tmRoster, tmRosterHeader, tmRosterFooter, false);
 
@@ -313,22 +321,7 @@ public class FrmRoster extends JFrame {
         tsp1.getColumnFooterTable().setAutoResizeMode(JideTable.AUTO_RESIZE_FILL);
         tsp1.getMainTable().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-
-//        tsp1.getMainTable().getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-
-
-//        tsp1.getRowHeaderTable().setFocusable(false);
-//        tsp1.getRowHeaderTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-//            @Override
-//            public void valueChanged(ListSelectionEvent e) {
-//                if (!tsp1.getRowHeaderTable().getSelectionModel().isSelectionEmpty()) {
-//                    tsp1.getRowHeaderTable().getSelectionModel().clearSelection();
-//                }
-//            }
-//        });
-//
-//        tsp1.getRowFooterTable().setFocusable(false);
-//
+        OPDE.debug("3...");
 
 //
         for (final JTable jTable : tsp1.getAllChildTables()) {
@@ -340,14 +333,14 @@ public class FrmRoster extends JFrame {
             });
 
 
+            OPDE.debug("..");
+
             TableUtils.autoResizeAllRows(jTable);
-//            JLabel lbl = new JLabel("X");
-//            lbl.setFont(SYSConst.ARIAL20);
-//
-//            jTable.setRowHeight(lbl.getPreferredSize().height);
 
         }
 
+
+        OPDE.debug("4...");
 
         blockHeaders();
         hotkeys();
@@ -379,6 +372,7 @@ public class FrmRoster extends JFrame {
         tsp1.setCellSelectionEnabled(true);
 
 
+
         tsp1.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
@@ -405,7 +399,11 @@ public class FrmRoster extends JFrame {
     }
 
     private void btnSortHomes2ActionPerformed(ActionEvent e) {
+        tmRoster.sortName();
+    }
 
+    private void btnSortHomesActionPerformed(ActionEvent e) {
+        tmRoster.sortHomesExamName();
     }
 
     private void initComponents() {
@@ -420,8 +418,8 @@ public class FrmRoster extends JFrame {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "default, $lcgap, default:grow, $lcgap, default",
-                "default, $lgap, default:grow, 2*($lgap, default)"));
+            "default, $lcgap, default:grow, $lcgap, default",
+            "default, $lgap, default:grow, 2*($lgap, default)"));
 
         //======== toolBar1 ========
         {
@@ -437,11 +435,17 @@ public class FrmRoster extends JFrame {
             toolBar1.add(btnLock);
 
             //---- btnSortHomes ----
-            btnSortHomes.setText("text");
+            btnSortHomes.setText("Homes / Exam / Name");
+            btnSortHomes.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnSortHomesActionPerformed(e);
+                }
+            });
             toolBar1.add(btnSortHomes);
 
             //---- btnSortHomes2 ----
-            btnSortHomes2.setText("text");
+            btnSortHomes2.setText("Name");
             btnSortHomes2.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {

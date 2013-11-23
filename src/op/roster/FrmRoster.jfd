@@ -19,11 +19,12 @@ new FormModel {
 				} )
 				add( new FormComponent( "javax.swing.JButton" ) {
 					name: "btnSortHomes"
-					"text": "text"
+					"text": "Homes / Exam / Name"
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnSortHomesActionPerformed", true ) )
 				} )
 				add( new FormComponent( "javax.swing.JButton" ) {
 					name: "btnSortHomes2"
-					"text": "text"
+					"text": "Name"
 					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnSortHomes2ActionPerformed", true ) )
 				} )
 				add( new FormComponent( "javax.swing.JButton" ) {

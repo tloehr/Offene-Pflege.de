@@ -25,28 +25,16 @@ import java.math.BigDecimal;
 public class PnlWorkingLogSingle extends JPanel {
     private LocalDate day;
     private Workinglog workinglog;
-    private Rosters rosters;
-    private Rplan rplan;
-    private RosterParameters rosterParameters;
-    private ContractsParameterSet contractsParameterSet;
     private Closure afterAction;
-    private UserContracts userContracts;
     private boolean ok1 = true, ok2 = false;
-    //    private ArrayList<JRadioButton> rbSymbols;
-    private ButtonGroup bg;
 
-    public PnlWorkingLogSingle(Rplan rplan, RosterParameters rosterParameters, ContractsParameterSet contractsParameterSet, Closure afterAction) {
-        this.rplan = rplan;
-        this.rosterParameters = rosterParameters;
-        this.contractsParameterSet = contractsParameterSet;
+    public PnlWorkingLogSingle(Rplan rplan, Closure afterAction) {
         this.afterAction = afterAction;
         workinglog = new Workinglog(BigDecimal.ONE, BigDecimal.ZERO, rplan, WorkinglogTools.TYPE_MANUAL, 0l);
         day = new LocalDate(rplan.getStart());
-        bg = new ButtonGroup();
 
         initComponents();
         initPanel();
-//        initSymbolPanel();
     }
 
     void initPanel() {

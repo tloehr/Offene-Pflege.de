@@ -26,9 +26,9 @@ public class Rosters {
     @Temporal(TemporalType.TIMESTAMP)
     @Basic
     private Date month;
-    @Column(name = "flag", nullable = false, insertable = true, updatable = true, length = 5, precision = 0)
+    @Column(name = "stage", nullable = false, insertable = true, updatable = true, length = 5, precision = 0)
     @Basic
-    private short flag;
+    private short stage;
     @Column(name = "xml", nullable = false, insertable = true, updatable = true, length = 16777215, precision = 0)
     @Basic
     private String xml;
@@ -57,7 +57,7 @@ public class Rosters {
 
     public Rosters(LocalDate month, String xml) {
         this.month = month.dayOfMonth().withMinimumValue().toDate();
-        this.flag = RostersTools.FLAG_PLANNING_STAGE;
+        this.stage = RostersTools.STAGE_PLANNING;
         this.section = RostersTools.SECTION_CARE;
         this.xml = xml;
     }
@@ -88,13 +88,12 @@ public class Rosters {
         this.month = month;
     }
 
-
-    public short getFlag() {
-        return flag;
+    public short getStage() {
+        return stage;
     }
 
-    public void setFlag(short flag) {
-        this.flag = flag;
+    public void setStage(short flag) {
+        this.stage = flag;
     }
 
 
@@ -114,17 +113,21 @@ public class Rosters {
         this.openedBy = openedBy;
     }
 
-//    public boolean isActive() {
-//        return flag == RostersTools.FLAG_ACTIVE;
-//    }
-//
-//    public boolean isClosed() {
-//        return flag == RostersTools.FLAG_CLOSED;
-//    }
-//
-//    public boolean isLocked() {
-//        return flag == RostersTools.FLAG_LOCKED;
-//    }
+    public boolean isPlanning() {
+        return stage == RostersTools.STAGE_PLANNING;
+    }
+
+    public boolean isActive() {
+        return stage == RostersTools.STAGE_ACTIVE;
+    }
+
+    public boolean isClosed() {
+        return stage == RostersTools.STAGE_CLOSED;
+    }
+
+    public boolean isLocked() {
+        return stage == RostersTools.STAGE_PLANNING;
+    }
 
     @Override
     public boolean equals(Object o) {

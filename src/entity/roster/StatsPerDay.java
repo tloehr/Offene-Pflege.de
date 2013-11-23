@@ -2,6 +2,8 @@ package entity.roster;
 
 import entity.Homes;
 import entity.system.Users;
+import op.OPDE;
+import org.apache.commons.collections.Closure;
 import org.joda.time.LocalDate;
 
 import java.math.BigDecimal;
@@ -33,7 +35,7 @@ public class StatsPerDay {
     private RosterParameters rosterParameters;
 
 
-    public StatsPerDay(List<Homes> homeslist, LocalDate month, HashMap<Users, ArrayList<Rplan>> content, HashMap<Users, UserContracts> contracts, RosterParameters rosterParameters) {
+    public StatsPerDay(List<Homes> homeslist, LocalDate month, HashMap<Users, ArrayList<Rplan>> content, HashMap<Users, UserContracts> contracts, RosterParameters rosterParameters, Closure pbAction) {
         this.month = month;
         this.contracts = contracts;
         this.rosterParameters = rosterParameters;
@@ -48,6 +50,7 @@ public class StatsPerDay {
         }
 
         for (int i = 0; i < month.dayOfMonth().withMaximumValue().getDayOfMonth(); i++) {
+            OPDE.debug(i);
             update(content, i);
         }
     }

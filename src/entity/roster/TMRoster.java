@@ -82,9 +82,10 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     private Rosters roster;
     private final boolean readOnly;
     private Font font;
+    private Closure pbAction;
     // contains all users which are show on the table. not necessarily all users who own rplans.
     ArrayList<Pair<Users, Homes>> userlist;
-    HashMap<String, Homes> prefixMap;
+    HashMap<Character, Homes> prefixMap;
 
     // ALL rplans for this roster. iteration over the keyset of this map will return ALL users who own rplanss.
     HashMap<Users, ArrayList<Rplan>> content;
@@ -106,28 +107,41 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     HashMap<Users, StatsPerUser> statsPerUser;
     StatsPerDay statsPerDay;
     private Closure updateFooter = null;
+    private BigDecimal progressCurrent, progressMax;
 
 
-    public TMRoster(Rosters roster, boolean readOnly, Font font) {
+    public TMRoster(Rosters roster, boolean readOnly, Font font, Closure pbAction) {
 
 //        JDialog dlg = new JDialog(new JFrame(), "Bitte warten");
 //
 //        dlg.setVisible(true);
 
+        OPDE.debug("A...");
+
         this.roster = roster;
         this.readOnly = readOnly;
         this.font = font;
+        this.pbAction = pbAction;
         this.month = new LocalDate(roster.getMonth());
         defaultHome = StationTools.getStationForThisHost().getHome();
 
         content = new HashMap<Users, ArrayList<Rplan>>();
 
+        OPDE.debug("B...");
         contracts = UsersTools.getUsersWithValidContractsIn(month);
-        prefixMap = new HashMap<String, Homes>();
+
+        prefixMap = new HashMap<Character, Homes>();
         statsPerUser = new HashMap<Users, StatsPerUser>();
         userlist = new ArrayList<Pair<Users, Homes>>();
         rosterParameters = RostersTools.getParameters(roster);
+
+        OPDE.debug("C...");
+
         initUserlist();
+
+
+        OPDE.debug("D...");
+
         prepareContent();
 
         ROW_FOOTER = getColumnCount() - ROW_FOOTER_WIDTH;
@@ -324,7 +338,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             if (rplan == null) {
                 symbolEditable = rowIndex % 4 == 0; // empty plans must be started at the first row
             } else {
-                boolean p2 = rplan.getActual().isEmpty() && !rplan.getP1().isEmpty();
+                boolean p2 = roster.isActive() && rplan.getActual().isEmpty() && !rplan.getP1().isEmpty(); // second line only in active stage. makes no sense otherwise
                 boolean p1 = (rplan.getP2().isEmpty() && !rplan.getP1().isEmpty()) || rplan.getP1().isEmpty();
 
                 if (rowIndex % 4 == 0) {
@@ -346,11 +360,19 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
     private void prepareContent() {
 
         for (Homes home : HomesTools.getAll()) {
-            prefixMap.put(home.getPrefix(), home);
+            prefixMap.put(home.getPrefix().charAt(0), home);
         }
 
-        for (Rplan rplan : RPlanTools.getAll(roster)) {
+        ArrayList<Rplan> listRPlan = RPlanTools.getAll(roster);
+
+        progressMax = new BigDecimal(listRPlan.size()).add(new BigDecimal(statsPerUser.size()));
+        progressCurrent = BigDecimal.ZERO;
+
+        for (Rplan rplan : listRPlan) {
             Users user = rplan.getOwner();
+
+            progressCurrent = progressCurrent.add(BigDecimal.ONE);
+            pbAction.execute(progressCurrent.divide(progressMax, 2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)));
 
             if (!content.containsKey(user)) {
                 content.put(user, new ArrayList<Rplan>());
@@ -365,10 +387,17 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         }
 
         for (Users user : statsPerUser.keySet()) {
+            progressCurrent = progressCurrent.add(BigDecimal.ONE);
+            pbAction.execute(progressCurrent.divide(progressMax, 2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)));
             statsPerUser.get(user).update(content.get(user));
         }
 
-        statsPerDay = new StatsPerDay(HomesTools.getAll(), month, content, contracts, rosterParameters);
+        statsPerDay = new StatsPerDay(HomesTools.getAll(), month, content, contracts, rosterParameters, new Closure() {
+            @Override
+            public void execute(Object o) {
+                //To change body of implemented methods use File | Settings | File Templates.
+            }
+        });
 
     }
 
@@ -405,7 +434,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
         if (aValue instanceof Homes) {
             userlist.set(rowIndex / 4, new Pair<Users, Homes>(user, (Homes) aValue));
-            fireTableCellUpdated(rowIndex, columnIndex);
+//            fireTableCellUpdated(rowIndex, columnIndex);
         } else if (aValue instanceof Users) {
             Users myUser = (Users) aValue;
             userlist.set(rowIndex / 4, new Pair<Users, Homes>(myUser, defaultHome));
@@ -418,7 +447,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                         WorkAccountTools.getSum(month.dayOfYear().withMinimumValue().minusDays(1), myUser, WorkAccountTools.HOLIDAYS),
                         rosterParameters,
                         contracts.get(myUser).getContractsWithinMonth(month).get(0).getDefaults(),
-                        roster
+                        roster.getMonth()
                 )
                 );
                 content.put(myUser, new ArrayList<Rplan>());
@@ -442,11 +471,17 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
             Symbol symbol = rosterParameters.getSymbol(newSymbol);
 
-            symbol.getHourStats(day, contracts.get(userlist.get(rowIndex / 4).getFirst()).getParameterSet(day));
+//            symbol.getHourStats(day, contracts.get(userlist.get(rowIndex / 4).getFirst()).getParameterSet(day));
 
             if (!newSymbol.isEmpty() && symbol == null) return; // entered UNKNOWN symbol.
-            if (symbol != null && !rosterParameters.getSymbol(newSymbol).isAllowed(getDay(columnIndex)))
+            if (symbol != null && !rosterParameters.getSymbol(newSymbol).isAllowed(getDay(columnIndex))) {
                 return; // the symbol is valid but not on THAT particular day
+            }
+
+            if (symbol != null && rosterParameters.getSymbol(newSymbol).getSymbolType() == Symbol.ONLEAVE && statsPerUser.get(user).getVacationSum().compareTo(BigDecimal.ONE) <= 0) {
+                return; // No more vacation days for this user
+            }
+
             if (newSymbol.isEmpty()) { // he wants to remove the symbol
                 emptyCellInMaintable(rowIndex, columnIndex);
                 return;
@@ -763,7 +798,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                             WorkAccountTools.getSum(month.dayOfYear().withMinimumValue().minusDays(1), myUser, WorkAccountTools.HOLIDAYS),
                             rosterParameters,
                             contracts.get(myUser).getContractsWithinMonth(month).get(0).getDefaults(),
-                            roster)
+                            roster.getMonth())
                     );
                     content.put(myUser, new ArrayList<Rplan>());
                     for (int i = 0; i < month.dayOfMonth().withMaximumValue().getDayOfMonth(); i++) {
@@ -829,6 +864,39 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         return menu;
     }
 
+    public void sortHomesExamName() {
+        Collections.sort(userlist, new Comparator<Pair<Users, Homes>>() {
+            @Override
+            public int compare(Pair<Users, Homes> o1, Pair<Users, Homes> o2) {
+                int result = o1.getSecond().getShortname().compareTo(o2.getSecond().getShortname());
+                if (result == 0) {
+                    UserContracts cs1 = contracts.get(o1.getFirst());
+                    UserContracts cs2 = contracts.get(o2.getFirst());
+                    result = new Boolean(cs1.getContractsWithinMonth(month).get(0).getParameterSet(month).exam).compareTo(new Boolean(cs2.getContractsWithinMonth(month).get(0).getParameterSet(month).exam));
+                }
+                if (result == 0) {
+                    result = o1.getFirst().getFullname().compareTo(o2.getFirst().getFullname());
+                }
+                if (result == 0) {
+                    result = o1.getFirst().getUID().compareTo(o2.getFirst().getUID());
+                }
+                return result;
+            }
+        });
+        fireTableDataChanged();
+    }
+
+    public void sortName() {
+        Collections.sort(userlist, new Comparator<Pair<Users, Homes>>() {
+            @Override
+            public int compare(Pair<Users, Homes> o1, Pair<Users, Homes> o2) {
+                return o1.getFirst().compareTo(o2.getFirst());
+
+            }
+        });
+        fireTableDataChanged();
+    }
+
     public JPopupMenu getRowHeaderContextMenuAt(final int rowIndex, final int columnIndex, final Component owner) {
         if (readOnly) return null;
 
@@ -851,32 +919,32 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         menuUserOperations.add(itemClearUsers);
 
 
-        JMenuItem itemSortHomeExamName = new JMenuItem("opde.roster.sort.users.home.exam.name", SYSConst.icon22empty);
-        itemSortHomeExamName.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                Collections.sort(userlist, new Comparator<Pair<Users, Homes>>() {
-                    @Override
-                    public int compare(Pair<Users, Homes> o1, Pair<Users, Homes> o2) {
-                        int result = o1.getSecond().getShortname().compareTo(o2.getSecond().getShortname());
-                        if (result == 0) {
-                            UserContracts cs1 = contracts.get(o1.getFirst());
-                            UserContracts cs2 = contracts.get(o2.getFirst());
-                            result = new Boolean(cs1.getContractsWithinMonth(month).get(0).getParameterSet(month).exam).compareTo(new Boolean(cs2.getContractsWithinMonth(month).get(0).getParameterSet(month).exam));
-                        }
-                        if (result == 0) {
-                            result = o1.getFirst().getFullname().compareTo(o2.getFirst().getFullname());
-                        }
-                        if (result == 0) {
-                            result = o1.getFirst().getUID().compareTo(o2.getFirst().getUID());
-                        }
-                        return result;
-                    }
-                });
-
-                fireTableDataChanged();
-            }
-        });
-        menuUserOperations.add(itemSortHomeExamName);
+//        JMenuItem itemSortHomeExamName = new JMenuItem("opde.roster.sort.users.home.exam.name", SYSConst.icon22empty);
+//        itemSortHomeExamName.addActionListener(new java.awt.event.ActionListener() {
+//            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                Collections.sort(userlist, new Comparator<Pair<Users, Homes>>() {
+//                    @Override
+//                    public int compare(Pair<Users, Homes> o1, Pair<Users, Homes> o2) {
+//                        int result = o1.getSecond().getShortname().compareTo(o2.getSecond().getShortname());
+//                        if (result == 0) {
+//                            UserContracts cs1 = contracts.get(o1.getFirst());
+//                            UserContracts cs2 = contracts.get(o2.getFirst());
+//                            result = new Boolean(cs1.getContractsWithinMonth(month).get(0).getParameterSet(month).exam).compareTo(new Boolean(cs2.getContractsWithinMonth(month).get(0).getParameterSet(month).exam));
+//                        }
+//                        if (result == 0) {
+//                            result = o1.getFirst().getFullname().compareTo(o2.getFirst().getFullname());
+//                        }
+//                        if (result == 0) {
+//                            result = o1.getFirst().getUID().compareTo(o2.getFirst().getUID());
+//                        }
+//                        return result;
+//                    }
+//                });
+//
+//                fireTableDataChanged();
+//            }
+//        });
+//        menuUserOperations.add(itemSortHomeExamName);
 
         JMenuItem itemEditWLog = new JMenuItem("opde.roster.edit.workinglog", SYSConst.icon22edit);
         itemEditWLog.addActionListener(new java.awt.event.ActionListener() {
@@ -922,26 +990,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         menu.add(menuUserOperations);
         return menu;
     }
-
-//    public HashMap<Homes, StatsPerDay> getStatsPerDay(int columnIndex) {
-//        HashMap<Homes, StatsPerDay> mapStats = new HashMap<Homes, StatsPerDay>();
-//
-//        for (Homes home : prefixMap.values()) {
-//            mapStats.put(home, new StatsPerDay());
-//        }
-//
-//        for (Users user : content.keySet()) {
-//            Rplan rplan = content.get(user).get(columnIndex);
-//            if (rplan != null) {
-//                boolean exam = contracts.get(user).getParameterSet(getDay(columnIndex)).isExam();
-//                Symbol symbol = rosterParameters.getSymbol(rplan.getEffectiveSymbol());
-//                int type = symbol.getSection() == RosterXML.SOCIAL ? StatsPerDay.SOCIAL : (exam ? StatsPerDay.EXAM : StatsPerDay.HELPER);
-//                mapStats.get(rplan.getEffectiveHome()).add(type, rosterParameters.getSymbol(rplan.getEffectiveSymbol()));
-//            }
-//
-//        }
-//        return mapStats;
-//    }
 
     static ArrayList<Integer> indexOfAll(Object obj, ArrayList list) {
         ArrayList<Integer> indexList = new ArrayList<Integer>();

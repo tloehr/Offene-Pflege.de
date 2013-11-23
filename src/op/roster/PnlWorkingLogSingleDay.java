@@ -116,7 +116,7 @@ public class PnlWorkingLogSingleDay extends JPanel {
                 popup.removeExcludedComponent(owner);
                 popup.setDefaultFocusComponent(owner);
 
-                popup.getContentPane().add(new PnlWorkingLogSingle(rplan, rosterParameters, contractsParameterSet, new Closure() {
+                popup.getContentPane().add(new PnlWorkingLogSingle(rplan, new Closure() {
                     @Override
                     public void execute(Object o) {
                         if (o != null) {
