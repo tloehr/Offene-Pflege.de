@@ -303,6 +303,7 @@ public class FrmRoster extends JFrame {
         });
         btnFontSize.setText(fonts[currentFontIndex].getFontName() + ", " + fonts[currentFontIndex].getSize());
 
+
         OPDE.debug("1...");
 
         TMRosterHeader tmRosterHeader = new TMRosterHeader(tmRoster);

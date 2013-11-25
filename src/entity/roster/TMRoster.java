@@ -327,7 +327,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         boolean symbolEditable = false;
         boolean preferredHomes = columnIndex == 0 && rowIndex % 4 == 2;
 
-        boolean setUser = columnIndex == 0 && rowIndex % 4 == 0;
+//        boolean setUser = columnIndex == 0 && rowIndex % 4 == 0;
 
         Users user = userlist.get(rowIndex / 4).getFirst();
 
@@ -349,7 +349,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                 }
             }
         }
-        return setUser || preferredHomes || (symbolEditable && user != null && isInPlanningArea(columnIndex));
+        return preferredHomes || (symbolEditable && user != null && isInPlanningArea(columnIndex));
     }
 
     public Pair<Point, Point> getBaseTable() {
