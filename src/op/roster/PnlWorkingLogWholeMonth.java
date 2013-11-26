@@ -59,7 +59,7 @@ public class PnlWorkingLogWholeMonth extends JPanel {
         //======== this ========
         setLayout(new FormLayout(
             "8*(pref:grow, $lcgap), default",
-            "2*(default, $lgap), pref:grow, 2*($lgap, 60dlu), 5*($lgap, default:grow), $lgap, default"));
+            "2*(default, $lgap), 3*(pref:grow, $lgap), 5*(default:grow, $lgap), default"));
 
         //---- lblUser ----
         lblUser.setText("text");

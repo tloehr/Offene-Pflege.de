@@ -42,7 +42,7 @@ public class RostersTools {
             "        <symbol key=\"F\" starttime=\"06:30\" endtime=\"13:15\" break=\"30\" calc=\"awert\" type=\"work\" description=\"Frühdienst\"  shift1=\"early\" statvalue1=\"1.00\"  shift2=\"\" statvalue2=\"0.00\" />\n" +
             "        <symbol key=\"B\" calc=\"pvalue\" type=\"work\" description=\"Ergo\" section=\"social\" />\n" +
             "        <symbol key=\"FB\" calc=\"awert\" type=\"work\" description=\"Fortbildung\" />\n" +
-            "        <symbol key=\"SL\" starttime=\"13:00\" endtime=\"21:00\" break=\"30\" calc=\"awert\" type=\"work\" description=\"Spätdienst, lang\" />\n" +
+            "        <symbol key=\"SL\" starttime=\"13:00\" endtime=\"21:00\" break=\"30\" calc=\"awert\" type=\"work\" description=\"Spätdienst, lang\" shift1=\"late\" statvalue1=\"1.00\"  shift2=\"\" statvalue2=\"0.00\"/>\n" +
             "        <symbol key=\"M\" calc=\"kwert\" type=\"sick\" description=\"Mutterschutz\" />\n" +
             "        <symbol key=\"S1\" starttime=\"16:45\" endtime=\"19:45\" break=\"0\" calc=\"awert\" type=\"work\" description=\"Spätdienst, kurz\"  shift1=\"late\" statvalue1=\"1.00\"  shift2=\"\" statvalue2=\"0.00\" />\n" +
             "        <symbol key=\"N\" starttime=\"20:45\" endtime=\"06:45\" break=\"60\" calc=\"awert\" type=\"work\" description=\"Nachtdienst\"  shift1=\"night\" statvalue1=\"1.00\"  shift2=\"\" statvalue2=\"0.00\" />\n" +

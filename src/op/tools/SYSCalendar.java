@@ -993,8 +993,8 @@ public class SYSCalendar {
             hm.put(new LocalDate(year, 1, 1), "Neujahrstag");
             hm.put(new LocalDate(year, 5, 1), "Maifeiertag");
             hm.put(new LocalDate(year, 10, 3), "Tag der Einheit");
-            hm.put(new LocalDate(year, 06, 05), "Torsten Tag 1");
-            hm.put(new LocalDate(year, 06, 27), "Torsten Tag 2");
+//            hm.put(new LocalDate(year, 06, 05), "Torsten Tag 1");
+//            hm.put(new LocalDate(year, 06, 27), "Torsten Tag 2");
             hm.put(new LocalDate(year, 11, 1), "Allerheiligen");
             hm.put(new LocalDate(year, 12, 25), "1. Weihnachtstag");
             hm.put(new LocalDate(year, 12, 26), "2. Weihnachtstag");

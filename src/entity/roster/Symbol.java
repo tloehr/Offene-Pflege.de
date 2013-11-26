@@ -26,9 +26,6 @@ public class Symbol {
     public static final String DAYHOURS2 = "dayhours2";
     public static final String NIGHTHOURS1 = "nighthours1";
     public static final String NIGHTHOURS2 = "nighthours2";
-    //    public static final String HOLIHOURS1 = "holihours1";
-//    public static final String HOLIHOURS2 = "holihours2";
-//    public static final String EXTRA = "extra";
     public static final String BREAKTIME = "breaktime";
     public static final String BASEHOURS = "basehours";
 
@@ -37,7 +34,6 @@ public class Symbol {
     public static final int UWERT = 2;
     public static final int XWERT = 3;
     public static final int PVALUE = 4; // only for planning reasons. No predicted work time. Comes only into effect, when the real worklog for this day is present.
-
     public static final String[] CALC = new String[]{"awert", "kwert", "uwert", "xwert", "pvalue"};
 
     public static final int WORK = 0;
@@ -45,14 +41,12 @@ public class Symbol {
     public static final int OFFDUTY = 2;
     public static final int ONLEAVE = 3; // For symbols denoting vacation days
     public static final int SCHOOL = 4;
-
     public static final String[] TYPE = new String[]{"work", "sick", "offduty", "onleave", "school"};
 
     public static final byte SHIFT_NONE = 0;
     public static final byte SHIFT_EARLY = 1;
     public static final byte SHIFT_LATE = 2;
     public static final byte SHIFT_NIGHT = 3;
-
     public static final String[] SHIFT = new String[]{"", "early", "late", "night"};
 
     public static final int HOLIDAY = 99;
@@ -95,12 +89,6 @@ public class Symbol {
         } else {
             this.end = new LocalTime(timeFormat.parse(end).getTime());
         }
-
-
-//        if (start != null && end != null) {
-//            grossWorkingTime = new Period(this.start, this.end).toStandardDuration().;
-//            System.out.println(key + ": " + grossWorkingTime.getHours() + ":" + grossWorkingTime.getMinutes());
-//        }
 
     }
 
@@ -179,7 +167,6 @@ public class Symbol {
     public DateTime getStart(LocalDate day) {
         if (start == null) return day.toDateTimeAtStartOfDay();
 
-//            return day.toDateTime(new LocalTime().hourOfDay().withMinimumValue().minuteOfHour().withMinimumValue().secondOfMinute().withMinimumValue());
         return day.toDateTime(start);
     }
 
@@ -296,4 +283,18 @@ public class Symbol {
     }
 
 
+    @Override
+    public String toString() {
+        return "Symbol{" +
+                "key='" + key + '\'' +
+                ", symboltype=" + symboltype +
+                ", minutesBreak=" + minutesBreak +
+                ", start=" + start +
+                ", end=" + end +
+                ", shift1=" + shift1 +
+                ", shift2=" + shift2 +
+                ", statval1=" + statval1 +
+                ", statval2=" + statval2 +
+                "} " + super.toString();
+    }
 }

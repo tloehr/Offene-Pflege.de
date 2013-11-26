@@ -410,7 +410,7 @@ public class FrmRoster extends JFrame {
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         toolBar1 = new JToolBar();
-        btnLock = new JButton();
+        btnLock = new JToggleButton();
         btnSortHomes = new JButton();
         btnSortHomes2 = new JButton();
         btnFontSize = new JButton();
@@ -427,12 +427,6 @@ public class FrmRoster extends JFrame {
 
             //---- btnLock ----
             btnLock.setText(null);
-            btnLock.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnSortUserActionPerformed(e);
-                }
-            });
             toolBar1.add(btnLock);
 
             //---- btnSortHomes ----
@@ -560,18 +554,19 @@ public class FrmRoster extends JFrame {
                     for (Point p : GUITools.getSelectedCells(tsp1.getMainTable())) {
                         tmRoster.emptyCellInMaintable(p.y, p.x);
                     }
-                } else if (GUITools.isSelectionInRowHeaderTable(tsp1)) {
-                    for (Point p : GUITools.getSelectedCells(tsp1.getRowHeaderTable())) {
-                        tmRoster.emptyCellInRowheaderTable(p.y, p.x);
-                    }
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            tsp1.validate();
-                            tsp1.repaint();
-                        }
-                    });
                 }
+//                else if (GUITools.isSelectionInRowHeaderTable(tsp1)) {
+//                    for (Point p : GUITools.getSelectedCells(tsp1.getRowHeaderTable())) {
+//                        tmRoster.emptyCellInRowheaderTable(p.y, p.x);
+//                    }
+//                    SwingUtilities.invokeLater(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            tsp1.validate();
+//                            tsp1.repaint();
+//                        }
+//                    });
+//                }
             }
         });
         /***
@@ -582,6 +577,7 @@ public class FrmRoster extends JFrame {
          *     | .__/ \__,_|___/\__\___|
          *     |_|
          */
+        // http://www.cordinc.com/blog/2010/12/cut-and-paste-from-java-swing.html
         tsp1.getMainTable().getActionMap().put("paste", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
 
@@ -707,7 +703,7 @@ public class FrmRoster extends JFrame {
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JToolBar toolBar1;
-    private JButton btnLock;
+    private JToggleButton btnLock;
     private JButton btnSortHomes;
     private JButton btnSortHomes2;
     private JButton btnFontSize;

@@ -12,10 +12,9 @@ new FormModel {
 			"$sizePolicy": 1
 			add( new FormContainer( "javax.swing.JToolBar", new FormLayoutManager( class javax.swing.JToolBar ) ) {
 				name: "toolBar1"
-				add( new FormComponent( "javax.swing.JButton" ) {
+				add( new FormComponent( "javax.swing.JToggleButton" ) {
 					name: "btnLock"
 					"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnSortUserActionPerformed", true ) )
 				} )
 				add( new FormComponent( "javax.swing.JButton" ) {
 					name: "btnSortHomes"

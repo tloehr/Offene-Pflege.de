@@ -5,7 +5,7 @@ new FormModel {
 	root: new FormRoot {
 		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
 			"$columnSpecs": "pref:grow, labelcompgap, pref:grow, labelcompgap, pref:grow, labelcompgap, pref:grow, labelcompgap, pref:grow, labelcompgap, pref:grow, labelcompgap, pref:grow, labelcompgap, pref:grow, labelcompgap, default"
-			"$rowSpecs": "default, linegap, default, linegap, pref:grow, linegap, 60dlu, linegap, 60dlu, linegap, default:grow, linegap, default:grow, linegap, default:grow, linegap, default:grow, linegap, default:grow, linegap, default"
+			"$rowSpecs": "default, linegap, default, linegap, pref:grow, linegap, pref:grow, linegap, pref:grow, linegap, default:grow, linegap, default:grow, linegap, default:grow, linegap, default:grow, linegap, default:grow, linegap, default"
 		} ) {
 			name: "this"
 			add( new FormComponent( "javax.swing.JLabel" ) {

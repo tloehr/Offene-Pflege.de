@@ -35,7 +35,7 @@ public class StatsPerDay {
     private RosterParameters rosterParameters;
 
 
-    public StatsPerDay(List<Homes> homeslist, LocalDate month, HashMap<Users, ArrayList<Rplan>> content, HashMap<Users, UserContracts> contracts, RosterParameters rosterParameters, Closure pbAction) {
+    public StatsPerDay(List<Homes> homeslist, LocalDate month, HashMap<Users, ArrayList<Rplan>> content, HashMap<Users, UserContracts> contracts, RosterParameters rosterParameters) {
         this.month = month;
         this.contracts = contracts;
         this.rosterParameters = rosterParameters;
@@ -50,7 +50,7 @@ public class StatsPerDay {
         }
 
         for (int i = 0; i < month.dayOfMonth().withMaximumValue().getDayOfMonth(); i++) {
-            OPDE.debug(i);
+//            OPDE.debug(i);
             update(content, i);
         }
     }
@@ -63,13 +63,21 @@ public class StatsPerDay {
         for (Homes home : daystats.keySet()) {
             clear(home, day);
         }
+//        OPDE.debug("StatsPerDay: day->"+day);
         for (Users user : content.keySet()) {
             Rplan rplan = content.get(user).get(day);
+
+//            OPDE.debug("StatsPerDay: user->"+user.getUID());
 
             if (rplan != null) {
                 boolean exam = contracts.get(user).getParameterSet(month.plusDays(day)).isExam();
                 Symbol symbol = rosterParameters.getSymbol(rplan.getEffectiveSymbol());
                 int type = symbol.getSection() == RosterXML.SOCIAL ? StatsPerDay.SOCIAL : (exam ? StatsPerDay.EXAM : StatsPerDay.HELPER);
+
+//                OPDE.debug("StatsPerDay: exam->"+exam);
+//                OPDE.debug("StatsPerDay: symbol->"+symbol);
+//                OPDE.debug("StatsPerDay: type->"+type);
+
                 add(day, rplan.getEffectiveHome(), type, symbol);
             }
         }

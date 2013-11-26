@@ -159,10 +159,15 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
     @Override
     public CellSpan getCellSpanAt(int rowIndex, int columnIndex) {
-        if (columnIndex == 1 && rowIndex % 4 == 0) {
-            return new CellSpan(rowIndex, columnIndex, 4, 1);
+
+
+        if (columnIndex == 1) {
+            int startrow = rowIndex - (rowIndex % 4);
+//            OPDE.debug("Cellspan: (row, col): (" + rowIndex + ", " + columnIndex);
+            return new CellSpan(startrow, columnIndex, 4, 1);
         }
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
+
     }
 
     @Override
@@ -392,12 +397,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             statsPerUser.get(user).update(content.get(user));
         }
 
-        statsPerDay = new StatsPerDay(HomesTools.getAll(), month, content, contracts, rosterParameters, new Closure() {
-            @Override
-            public void execute(Object o) {
-                //To change body of implemented methods use File | Settings | File Templates.
-            }
-        });
+        statsPerDay = new StatsPerDay(HomesTools.getAll(), month, content, contracts, rosterParameters);
 
     }
 
@@ -428,7 +428,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         if (aValue.toString().equalsIgnoreCase(getValueAt(rowIndex, columnIndex).toString())) return;
 
         Users user = userlist.get(rowIndex / 4).getFirst();
-//        boolean selectUser = columnIndex == 0 && rowIndex % 4 == 0;
 
         int ct = getCellTypeAt(rowIndex, columnIndex);
 
@@ -448,8 +447,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                         rosterParameters,
                         contracts.get(myUser).getContractsWithinMonth(month).get(0).getDefaults(),
                         roster.getMonth()
-                )
-                );
+                ));
                 content.put(myUser, new ArrayList<Rplan>());
                 for (int i = 0; i < month.dayOfMonth().withMaximumValue().getDayOfMonth(); i++) {
                     content.get(myUser).add(null);
@@ -535,9 +533,9 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                     OPDE.debug(String.format("content(%s, %s): " + getValueAt(startrow + 2, columnIndex), startrow + 2, columnIndex));
                     fireTableCellUpdated(startrow + 3, columnIndex);
                     OPDE.debug(String.format("content(%s, %s): " + getValueAt(startrow + 3, columnIndex), startrow + 3, columnIndex));
-
-
+//
                     fireTableCellUpdated(startrow, COL_SUM);
+
 //                    fireTableCellUpdated(startrow + 1, COL_SUM);
 //                    fireTableCellUpdated(startrow + 2, COL_SUM);
 //                    fireTableCellUpdated(startrow + 3, COL_SUM);
@@ -884,6 +882,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             }
         });
         fireTableDataChanged();
+//        fireTableStructureChanged();
+
     }
 
     public void sortName() {
@@ -895,6 +895,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             }
         });
         fireTableDataChanged();
+//        fireTableStructureChanged();
+
     }
 
     public JPopupMenu getRowHeaderContextMenuAt(final int rowIndex, final int columnIndex, final Component owner) {
@@ -978,7 +980,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
                         //To change body of implemented methods use File | Settings | File Templates.
                     }
                 });
-                popup.setPreferredPopupSize(new Dimension(1100, 600));
+//                popup.setPreferredPopupSize(new Dimension(1100, 600));
 
                 GUITools.showPopup(popup, SwingConstants.CENTER);
             }
