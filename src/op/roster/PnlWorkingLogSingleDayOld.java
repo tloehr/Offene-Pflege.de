@@ -18,7 +18,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -29,7 +29,7 @@ import java.util.Collection;
  * Time: 15:55
  * To change this template use File | Settings | File Templates.
  */
-public class PnlWorkingLogSingleDay extends JPanel {
+public class PnlWorkingLogSingleDayOld extends JPanel {
     //    private JList listLogs;
     JScrollPane scrl;
     //    JButton apply, add;
@@ -38,29 +38,22 @@ public class PnlWorkingLogSingleDay extends JPanel {
     private RosterParameters rosterParameters;
     private ContractsParameterSet contractsParameterSet;
     private Closure afterAction;
-    //    private UserContracts userContracts;
-//    private Workinglog actual;
-    private JPanel pnlList;
-    private Component owner;
-    //    private LocalDate day;
     private ItemListener mainItemListener;
     private Symbol effectiveSymbol;
 
 
-    public PnlWorkingLogSingleDay(Rplan rplan, RosterParameters rosterParameters, ContractsParameterSet contractsParameterSet, Closure afterAction) {
+    public PnlWorkingLogSingleDayOld(Rplan rplan, RosterParameters rosterParameters, ContractsParameterSet contractsParameterSet, Closure afterAction) {
         super();
         this.rplan = rplan;
         this.rosterParameters = rosterParameters;
         this.contractsParameterSet = contractsParameterSet;
         this.afterAction = afterAction;
-
         effectiveSymbol = rosterParameters.getSymbol(rplan.getEffectiveSymbol());
 
-//        this.day = new LocalDate(rplan.getStart());
         scrl = new JScrollPane();
 //        setBorder(new LineBorder(Color.DARK_GRAY, 2));
 
-        owner = this;
+//        owner = this;
 
 
         initPanel();
@@ -69,8 +62,8 @@ public class PnlWorkingLogSingleDay extends JPanel {
     void initPanel() {
 
         setLayout(new FormLayout(
-                "default:grow, $lcgap, default:grow",
-                "default:grow, $lgap, default"));
+                "2*(default:grow, $lcgap), default", // "default:grow, $lcgap, default:grow",
+                "2*(default:grow, $lgap), default")); // "default:grow, $lgap, default"
 
 
         mainItemListener = new ItemListener() {
@@ -187,26 +180,56 @@ public class PnlWorkingLogSingleDay extends JPanel {
 //        JPanel pnlHeader = new JPanel();
 //        pnlHeader.setLayout(new BorderLayout());
 
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.");
 
-        String text = DateFormat.getDateInstance(DateFormat.SHORT).format(rplan.getStart())
-                + "<br/>" + SYSTools.left(rplan.getEffectiveHome().getShortname(), 8)
-                + "<br/>" + effectiveSymbol.getKey()
-                + " (" + effectiveSymbol.getDescription() + ")";
+        String text = "<b><font size=\"+1\">" + sdf.format(rplan.getStart()) + " &rarr; " + effectiveSymbol.getKey().toUpperCase() + "</font></b>"
+                + "<br/><font size=\"-1\">" + rplan.getEffectiveHome().getShortname() + "</font>"
+                + "<br/><i><font size=\"-1\">" + effectiveSymbol.getDescription() + "</font></i>";
 
-        apply = new JToggleButton(SYSConst.icon32apply);
+        apply = new JToggleButton(SYSConst.icon32empty);
+        apply.setSelectedIcon(SYSConst.icon32apply);
         apply.setSelected(!rplan.getActual().isEmpty());
         apply.addItemListener(mainItemListener);
         apply.setHorizontalTextPosition(SwingConstants.TRAILING);
         apply.setVerticalTextPosition(SwingConstants.CENTER);
         apply.setText(SYSTools.toHTMLForScreen(text));
-        add(apply, CC.xywh(1, 1, 3, 1, CC.FILL, CC.FILL));
+        add(apply, CC.xywh(1, 1, 3, 3));
 
-        JToggleButton add1 = new JToggleButton(SYSConst.icon22calc);
-        add(add1, CC.xy(1, 3));
+        JToggleButton add1 = new JToggleButton(SYSConst.icon22ledBlueOff);
+        add1.setSelectedIcon(SYSConst.icon22ledBlueOn);
+        add1.setSelected(WorkinglogTools.getAdditional1(rplan) != null);
+        add1.setHorizontalTextPosition(SwingConstants.CENTER);
+        add1.setVerticalTextPosition(SwingConstants.CENTER);
+        add1.setText("+1");
+        add1.setFont(SYSConst.ARIAL18BOLD);
+        add1.setForeground(Color.YELLOW);
+        add(add1, CC.xy(1, 5));
 
-        JToggleButton add2 = new JToggleButton(SYSConst.icon22calc);
-        add(add2, CC.xy(3, 3));
+        JToggleButton add2 = new JToggleButton(SYSConst.icon22ledYellowOff);
+        add2.setSelectedIcon(SYSConst.icon22ledYellowOn);
+        add2.setSelected(WorkinglogTools.getAdditional2(rplan) != null);
+        add2.setHorizontalTextPosition(SwingConstants.CENTER);
+        add2.setVerticalTextPosition(SwingConstants.CENTER);
+        add2.setText("+2");
+        add2.setFont(SYSConst.ARIAL18BOLD);
+        add2.setForeground(Color.BLUE);
+        add(add2, CC.xy(3, 5));
 
+        String sum = SYSConst.html_table_tr(SYSConst.html_table_td("<font size=\"-1\">"+"1,25"+ "</font>", "right")) +
+                SYSConst.html_table_tr(SYSConst.html_table_td("<font size=\"-1\">"+"Z1: 1,25"+ "</font>", "right")) +
+                SYSConst.html_table_tr(SYSConst.html_table_td("<font size=\"-1\">"+"Z2: 1,25"+ "</font>", "right")) +
+                SYSConst.html_table_tr(SYSConst.html_table_td("==========","right")) +
+                SYSConst.html_table_tr(SYSConst.html_table_td("9,0","right"));
+
+        String tbl = "<font size=\"-1\">" + SYSConst.html_table(sum, "0") + "</font>";
+
+//        String sum = "<b><font size=\"+1\">" + sdf.format(rplan.getStart()) + " &rarr; " + effectiveSymbol.getKey().toUpperCase() + "</font></b>"
+//                + "<br/><font size=\"-1\">" + rplan.getEffectiveHome().getShortname() + "</font>"
+//                + "<br/><i><font size=\"-1\">" + effectiveSymbol.getDescription() + "</font></i>";
+        JLabel sumLabel = new JLabel(SYSTools.toHTMLForScreen(tbl));
+        add(sumLabel, CC.xywh(5, 1, 1, 5));
+
+        add2.setEnabled(add1.isSelected());
 //        add(scrl, BorderLayout.CENTER);
 
     }

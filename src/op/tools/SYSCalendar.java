@@ -676,6 +676,15 @@ public class SYSCalendar {
         return d.dayOfMonth().withMaximumValue().hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue();
     }
 
+
+    public static LocalDate bow(LocalDate d) {
+        return d.dayOfWeek().withMinimumValue();
+    }
+
+    public static LocalDate eow(LocalDate d) {
+        return d.dayOfWeek().withMaximumValue();
+    }
+
     public static LocalDate bom(LocalDate d) {
         return d.dayOfMonth().withMinimumValue();
     }

@@ -115,7 +115,7 @@ public class PnlWorkingLogWholeMonth extends JPanel {
         for (int day = 1; day <= month.dayOfMonth().withMaximumValue().getDayOfMonth(); day++) {
             final LocalDate date = month.plusDays(day - 1);
             if (lookup.containsKey(month.plusDays(day - 1))) {
-                add(new PnlWorkingLogSingleDay(lookup.get(date), rosterParameters, userContracts.getParameterSet(date), new Closure() {
+                add(new PnlWorkingLogDay(lookup.get(date), rosterParameters, userContracts.getParameterSet(date), new Closure() {
                     @Override
                     public void execute(Object o) {
                         if (o != null){

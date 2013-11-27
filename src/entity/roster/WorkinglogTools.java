@@ -73,4 +73,27 @@ public class WorkinglogTools {
     }
 
 
+    public static Workinglog getAdditional1(Rplan rplan) {
+        Workinglog workinglog = null;
+        for (Workinglog wlog : rplan.getWorkinglogs()) {
+            if (wlog.getType() == TYPE_ADDITIONAL1) {
+                workinglog = wlog;
+                break;
+            }
+        }
+        return workinglog;
+    }
+
+    public static Workinglog getAdditional2(Rplan rplan) {
+        Workinglog workinglog = null;
+        for (Workinglog wlog : rplan.getWorkinglogs()) {
+            if (wlog.getType() == TYPE_ADDITIONAL2) {
+                workinglog = wlog;
+                break;
+            }
+        }
+        return workinglog;
+    }
+
+
 }

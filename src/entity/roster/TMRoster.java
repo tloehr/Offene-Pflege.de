@@ -9,6 +9,7 @@ import entity.StationTools;
 import entity.system.Users;
 import entity.system.UsersTools;
 import op.OPDE;
+import op.roster.PnlWorkingLogWeek;
 import op.roster.PnlWorkingLogWholeMonth;
 import op.tools.GUITools;
 import op.tools.Pair;
@@ -907,7 +908,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         OPDE.debug(rowIndex);
         OPDE.debug(columnIndex);
 
-        final Users user = userlist.get(rowIndex / 4).getFirst();
+//        final Users user = userlist.get(rowIndex / 4).getFirst();
 
         JMenu menuUserOperations = new JMenu("opde.roster.useroperations");
         JMenuItem itemClearUsers = new JMenuItem("opde.roster.clear.users", SYSConst.icon22empty);
@@ -948,45 +949,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 //        });
 //        menuUserOperations.add(itemSortHomeExamName);
 
-        JMenuItem itemEditWLog = new JMenuItem("opde.roster.edit.workinglog", SYSConst.icon22edit);
-        itemEditWLog.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
 
-                JidePopup popup = new JidePopup();
-
-                final PnlWorkingLogWholeMonth pnl = new PnlWorkingLogWholeMonth(content.get(user), rosterParameters, contracts.get(user));
-
-                popup.setMovable(false);
-                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-                popup.setOwner(owner);
-                popup.removeExcludedComponent(owner);
-                popup.getContentPane().add(pnl);
-                popup.addPopupMenuListener(new PopupMenuListener() {
-                    @Override
-                    public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                        //To change body of implemented methods use File | Settings | File Templates.
-                    }
-
-                    @Override
-                    public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-                        ArrayList<Rplan> listPlans = new ArrayList<Rplan>(pnl.getRPlans());
-                        Collections.sort(listPlans);
-                        content.put(user, listPlans);
-                        fireTableDataChanged();
-                    }
-
-                    @Override
-                    public void popupMenuCanceled(PopupMenuEvent e) {
-                        //To change body of implemented methods use File | Settings | File Templates.
-                    }
-                });
-//                popup.setPreferredPopupSize(new Dimension(1100, 600));
-
-                GUITools.showPopup(popup, SwingConstants.CENTER);
-            }
-        });
-        itemEditWLog.setEnabled(user != null && !content.get(user).isEmpty());
-        menuUserOperations.add(itemEditWLog);
 
 
         menu.add(menuUserOperations);

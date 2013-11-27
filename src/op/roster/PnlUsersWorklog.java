@@ -8,11 +8,10 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.grid.TableScrollPane;
 import com.jidesoft.pane.CollapsiblePane;
+import entity.EntityTools;
 import entity.Homes;
 import entity.HomesTools;
-import entity.roster.Rosters;
-import entity.roster.RostersTools;
-import entity.roster.UserContracts;
+import entity.roster.*;
 import entity.system.SYSPropsTools;
 import entity.system.Users;
 import entity.system.UsersTools;
@@ -60,73 +59,13 @@ public class PnlUsersWorklog extends CleanablePanel {
         lstRosters.setModel(SYSTools.list2dlm(lstAllRosters));
         lstRosters.setCellRenderer(RostersTools.getRenderer());
 
-//        DateMidnight month = new DateMidnight(2013, 6, 15);
-//
-//        Rosters roster = RostersTools.get4Month(month);
-//
-//        ObjectConverterManager.initDefaultConverter();
-//        CellEditorManager.initDefaultEditor();
-//
-//        ObjectConverterManager.registerConverter(Homes.class, new ObjectConverter() {
-//            @Override
-//            public String toString(Object o, ConverterContext converterContext) {
-//                return o instanceof Homes ? ((Homes) o).getShortname() : "";
-//            }
-//
-//            @Override
-//            public boolean supportToString(Object o, ConverterContext converterContext) {
-//                return true;
-//            }
-//
-//            @Override
-//            public Object fromString(String s, ConverterContext converterContext) {
-//                return null;
-//            }
-//
-//            @Override
-//            public boolean supportFromString(String s, ConverterContext converterContext) {
-//                return false;
-//            }
-//        });
-//
-//        CellEditorManager.registerEditor(Homes.class, new CellEditorFactory() {
-//            public CellEditor create() {
-//                return new ExComboBoxCellEditor() {
-//                    @Override
-//                    public ExComboBox createExComboBox() {
-//                        ExComboBox myEditor = new ListExComboBox(HomesTools.getAll().toArray());
-//                        myEditor.setRenderer(HomesTools.getRenderer());
-//                        return myEditor;
-//                    }
-//                };
-//            }
-//        }, new EditorContext("HomesSelectionEditor"));
-//
-//        final TMRoster tmRoster = new TMRoster(roster, false);
-//
-//        TMRosterHeader tmRosterHeader = new TMRosterHeader(tmRoster);
-//        TMRosterFooter tmRosterFooter = new TMRosterFooter(tmRoster);
-//
-//        tsp1 = new TableScrollPane(tmRoster, tmRosterHeader, tmRosterFooter, false);
-//
-//        tsp1.getColumnHeaderTable().setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-//        tsp1.getColumnFooterTable().setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-//        tsp1.getMainTable().setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-//
-//        tsp1.getRowHeaderTable().getColumnModel().getColumn(0).setCellRenderer(new TableCellRenderer() {
-//            @Override
-//            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-//                StyledLabel lbl = StyledLabelBuilder.createStyledLabel(value.toString());
-//                lbl.setBackground(((StyleModel) table.getModel()).getCellStyleAt(row,column).getBackground());
-//                lbl.setOpaque(true);
-//                return lbl;  //To change body of implemented methods use File | Settings | File Templates.
-//            }
-//        });
-//
-//        tsp1.getRowHeaderTable().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-//        tsp1.getRowFooterTable().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-//
-//        add(tsp1);
+        Users user = EntityTools.find(Users.class, "glaumann");
+        Rosters roster = EntityTools.find(Rosters.class, 6l);
+        RosterParameters rosterParameters =  RostersTools.getParameters(roster);
+        UserContracts userContracts = UsersTools.getContracts(user);
+
+        pnlWorklog.add(new PnlWorkingLogWeek(user, new LocalDate(roster.getMonth()).plusWeeks(1), rosterParameters, userContracts));
+
     }
 
     private void lstRostersMouseClicked(MouseEvent e) {
@@ -253,44 +192,67 @@ public class PnlUsersWorklog extends CleanablePanel {
         }
     }
 
+
+
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
+        tabbedPane1 = new JTabbedPane();
+        pnlWorklog = new JPanel();
+        panel1 = new JPanel();
         scrollPane1 = new JScrollPane();
         lstRosters = new JList();
         btnNewRoster = new JButton();
 
         //======== this ========
-        setLayout(new FormLayout(
-            "default, $lcgap, default:grow, $lcgap, default",
-            "default, $lgap, default:grow, 2*($lgap, default)"));
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
-        //======== scrollPane1 ========
+        //======== tabbedPane1 ========
         {
 
-            //---- lstRosters ----
-            lstRosters.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    lstRostersMouseClicked(e);
-                }
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    lstRostersMousePressed(e);
-                }
-            });
-            scrollPane1.setViewportView(lstRosters);
-        }
-        add(scrollPane1, CC.xy(3, 3, CC.DEFAULT, CC.FILL));
-
-        //---- btnNewRoster ----
-        btnNewRoster.setText("new roster");
-        btnNewRoster.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnNewRosterActionPerformed(e);
+            //======== pnlWorklog ========
+            {
+                pnlWorklog.setLayout(new BoxLayout(pnlWorklog, BoxLayout.X_AXIS));
             }
-        });
-        add(btnNewRoster, CC.xy(3, 5));
+            tabbedPane1.addTab("Workinglog", pnlWorklog);
+
+            //======== panel1 ========
+            {
+                panel1.setLayout(new FormLayout(
+                    "default:grow",
+                    "default:grow, $lgap, default"));
+
+                //======== scrollPane1 ========
+                {
+
+                    //---- lstRosters ----
+                    lstRosters.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            lstRostersMouseClicked(e);
+                        }
+                        @Override
+                        public void mousePressed(MouseEvent e) {
+                            lstRostersMousePressed(e);
+                        }
+                    });
+                    scrollPane1.setViewportView(lstRosters);
+                }
+                panel1.add(scrollPane1, CC.xy(1, 1, CC.DEFAULT, CC.FILL));
+
+                //---- btnNewRoster ----
+                btnNewRoster.setText("new roster");
+                btnNewRoster.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnNewRosterActionPerformed(e);
+                    }
+                });
+                panel1.add(btnNewRoster, CC.xy(1, 3));
+            }
+            tabbedPane1.addTab("Roster", panel1);
+        }
+        add(tabbedPane1);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
@@ -310,6 +272,9 @@ public class PnlUsersWorklog extends CleanablePanel {
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+    private JTabbedPane tabbedPane1;
+    private JPanel pnlWorklog;
+    private JPanel panel1;
     private JScrollPane scrollPane1;
     private JList lstRosters;
     private JButton btnNewRoster;
