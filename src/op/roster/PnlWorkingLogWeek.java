@@ -48,25 +48,24 @@ public class PnlWorkingLogWeek extends JPanel {
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
-        lblUser = new JLabel();
-        lblMonth = new JLabel();
+        scrollPane1 = new JScrollPane();
+        pnlWeek = new JPanel();
 
         //======== this ========
-        setLayout(new FormLayout(
-            "default:grow, $rgap, default:grow",
-            "default, $lgap, fill:default, $lgap, pref, 3*($lgap, default)"));
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
-        //---- lblUser ----
-        lblUser.setText("text");
-        lblUser.setHorizontalAlignment(SwingConstants.CENTER);
-        lblUser.setFont(new Font("Arial", Font.BOLD, 18));
-        add(lblUser, CC.xywh(1, 1, 3, 1));
+        //======== scrollPane1 ========
+        {
 
-        //---- lblMonth ----
-        lblMonth.setText("text");
-        lblMonth.setHorizontalAlignment(SwingConstants.CENTER);
-        lblMonth.setFont(new Font("Arial", Font.PLAIN, 18));
-        add(lblMonth, CC.xywh(1, 3, 3, 1));
+            //======== pnlWeek ========
+            {
+                pnlWeek.setLayout(new FormLayout(
+                    "default:grow, $lcgap, default:grow",
+                    "3*(default, $lgap), default"));
+            }
+            scrollPane1.setViewportView(pnlWeek);
+        }
+        add(scrollPane1);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
@@ -82,19 +81,19 @@ public class PnlWorkingLogWeek extends JPanel {
         lblUser.setText(user.getFullname());
         lblMonth.setText("KW" + week.toString("ww/yyyy"));
 
-        int posy = 3;
+        int posy = -1;
         int posx = 1;
         for (int day = 0; day < 7; day++) {
             final LocalDate date = week.plusDays(day);
             posy += 2;
 
-            if (posy > 11) {
-                posy = 5;
+            if (posy > 7) {
+                posy = 1;
                 posx = 3;
             }
 
             if (lookup.containsKey(date)) {
-                add(new PnlWorkingLogDay(lookup.get(date), rosterParameters, userContracts.getParameterSet(date), new Closure() {
+                pnlWeek.add(new PnlWorkingLogDay(lookup.get(date), rosterParameters, userContracts.getParameterSet(date), new Closure() {
                     @Override
                     public void execute(Object o) {
                         if (o != null) {
@@ -103,7 +102,7 @@ public class PnlWorkingLogWeek extends JPanel {
                     }
                 }), CC.xy(posx, posy, CC.FILL, CC.FILL));
             } else {
-                add(new JLabel("--"), CC.xy(posx, posy, CC.FILL, CC.FILL));
+                pnlWeek.add(new JLabel("--"), CC.xy(posx, posy, CC.FILL, CC.FILL));
             }
 
 
@@ -113,7 +112,7 @@ public class PnlWorkingLogWeek extends JPanel {
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-    private JLabel lblUser;
-    private JLabel lblMonth;
+    private JScrollPane scrollPane1;
+    private JPanel pnlWeek;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

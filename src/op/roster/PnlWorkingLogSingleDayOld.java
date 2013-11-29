@@ -78,7 +78,7 @@ public class PnlWorkingLogSingleDayOld extends JPanel {
 
                         Unique unique = UniqueTools.getNewUID(em, "wlog_");
 
-                        for (Workinglog workinglog : WorkinglogTools.createWorkingLogs(myRplan, rosterParameters.getSymbol(myRplan.getEffectiveSymbol()), contractsParameterSet, unique.getUid())) {
+                        for (Workinglog workinglog : WorkinglogTools.createWorkingLogs(myRplan, rosterParameters.getSymbol(myRplan.getEffectiveSymbol()), contractsParameterSet)) {
                             myRplan.getWorkinglogs().add(em.merge(workinglog));
                         }
 
@@ -197,7 +197,7 @@ public class PnlWorkingLogSingleDayOld extends JPanel {
 
         JToggleButton add1 = new JToggleButton(SYSConst.icon22ledBlueOff);
         add1.setSelectedIcon(SYSConst.icon22ledBlueOn);
-        add1.setSelected(WorkinglogTools.getAdditional1(rplan) != null);
+//        add1.setSelected(WorkinglogTools.getAdditional1(rplan) != null);
         add1.setHorizontalTextPosition(SwingConstants.CENTER);
         add1.setVerticalTextPosition(SwingConstants.CENTER);
         add1.setText("+1");
@@ -207,7 +207,7 @@ public class PnlWorkingLogSingleDayOld extends JPanel {
 
         JToggleButton add2 = new JToggleButton(SYSConst.icon22ledYellowOff);
         add2.setSelectedIcon(SYSConst.icon22ledYellowOn);
-        add2.setSelected(WorkinglogTools.getAdditional2(rplan) != null);
+//        add2.setSelected(WorkinglogTools.getAdditional2(rplan) != null);
         add2.setHorizontalTextPosition(SwingConstants.CENTER);
         add2.setVerticalTextPosition(SwingConstants.CENTER);
         add2.setText("+2");

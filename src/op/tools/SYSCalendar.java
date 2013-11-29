@@ -1064,7 +1064,7 @@ public class SYSCalendar {
     public static BigDecimal getHoursAsDecimal(DateTime from, DateTime to) {
         if (from == null || to == null) return null;
         Period period = new Period(from, to);
-        return BigDecimal.valueOf(period.toStandardDuration().getMillis()).divide(BigDecimal.valueOf(DateTimeConstants.MILLIS_PER_HOUR), 2, RoundingMode.HALF_DOWN);
+        return BigDecimal.valueOf(period.toStandardDuration().getMillis()).divide(BigDecimal.valueOf(DateTimeConstants.MILLIS_PER_HOUR), 2, RoundingMode.HALF_UP);
     }
 
     public static BigDecimal getHoursAsDecimal(Interval interval) {
@@ -1128,6 +1128,62 @@ public class SYSCalendar {
         return listComplement.toArray(new Interval[0]);
 
     }
+
+
+    public static LocalTime parseLocalTime(String input) throws NumberFormatException {
+            if (input == null || input.equals("")) {
+                throw new NumberFormatException("leere Eingabe");
+            }
+            StringTokenizer st = new StringTokenizer(input, ":,.");
+            if (st.countTokens() < 2 || st.countTokens() > 3) {
+                throw new NumberFormatException("falsches Format");
+            }
+            String sStunde = st.nextToken();
+            String sMinute = st.nextToken();
+            String sSekunde = "00";
+
+            if (st.countTokens() == 1) { // Noch genau einer übrig, kann nur Sekunde sein.
+                sSekunde = st.nextToken();
+            }
+
+            int stunde, minute, sekunde;
+    //           GregorianCalendar now = (GregorianCalendar) gc.clone();
+
+            try {
+                stunde = Integer.parseInt(sStunde);
+            } catch (NumberFormatException nfe) {
+                throw new NumberFormatException("stunde");
+            }
+            try {
+                minute = Integer.parseInt(sMinute);
+            } catch (NumberFormatException nfe) {
+                throw new NumberFormatException("minute");
+            }
+            try {
+                sekunde = Integer.parseInt(sSekunde);
+            } catch (NumberFormatException nfe) {
+                throw new NumberFormatException("Sekunde");
+            }
+
+            if (stunde < 0) {
+                throw new NumberFormatException("stunde");
+            }
+            if (stunde > 23) {
+                throw new NumberFormatException("stunde");
+            }
+            if (minute < 0 || minute > 59) {
+                throw new NumberFormatException("minute");
+            }
+            if (sekunde < 0 || sekunde > 59) {
+                throw new NumberFormatException("Sekunde");
+            }
+
+    //
+    //        now.set(GregorianCalendar.HOUR_OF_DAY, stunde);
+    //        now.set(GregorianCalendar.MINUTE, minute);
+    //        now.set(GregorianCalendar.SECOND, sekunde);
+            return new LocalTime(stunde, minute, sekunde);
+        }
 
 
 }

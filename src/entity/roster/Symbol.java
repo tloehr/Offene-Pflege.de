@@ -52,7 +52,7 @@ public class Symbol {
     public static final int HOLIDAY = 99;
 
     String key, description;
-    int calc, symboltype, minutesBreak, section;
+    int calc, symboltype, minutesBreakDay, minutesBreakNight, section;
     LocalTime start, end;
 
     int shift1, shift2;
@@ -74,7 +74,8 @@ public class Symbol {
         this();
         this.key = key.toLowerCase();
         this.description = description;
-        this.minutesBreak = minutesBreak;
+        this.minutesBreakDay = minutesBreak;
+        this.minutesBreakNight = 0;
         this.calc = Arrays.asList(CALC).indexOf(calc.toLowerCase());
         this.symboltype = Arrays.asList(TYPE).indexOf(symboltype.toLowerCase());
         this.section = RosterXML.CARE;
@@ -144,9 +145,14 @@ public class Symbol {
     }
 
     public BigDecimal getBreak() {
-        if (minutesBreak == 0) return BigDecimal.ZERO;
-        return new BigDecimal(minutesBreak).divide(new BigDecimal(DateTimeConstants.MINUTES_PER_HOUR)).setScale(2, RoundingMode.HALF_UP);
+        if (minutesBreakDay == 0) return BigDecimal.ZERO;
+        return new BigDecimal(minutesBreakDay).divide(new BigDecimal(DateTimeConstants.MINUTES_PER_HOUR)).setScale(2, RoundingMode.HALF_UP);
     }
+
+    public BigDecimal getNBreak() {
+            if (minutesBreakDay == 0) return BigDecimal.ZERO;
+            return new BigDecimal(minutesBreakDay).divide(new BigDecimal(DateTimeConstants.MINUTES_PER_HOUR)).setScale(2, RoundingMode.HALF_UP);
+        }
 
     public String getDescription() {
         return description;
@@ -282,13 +288,20 @@ public class Symbol {
         return mapHours;
     }
 
+    public int getMinutesBreakDay() {
+        return minutesBreakDay;
+    }
+
+    public int getMinutesBreakNight() {
+        return minutesBreakNight;
+    }
 
     @Override
     public String toString() {
         return "Symbol{" +
                 "key='" + key + '\'' +
                 ", symboltype=" + symboltype +
-                ", minutesBreak=" + minutesBreak +
+                ", minutesBreak=" + minutesBreakDay +
                 ", start=" + start +
                 ", end=" + end +
                 ", shift1=" + shift1 +

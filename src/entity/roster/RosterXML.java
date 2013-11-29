@@ -54,6 +54,9 @@ public class RosterXML extends DefaultHandler {
             } else if (tagName.equalsIgnoreCase("hourstoworkperyear")) {
                 myRoster.setHoursperyear(Integer.parseInt(attributes.getValue("value")));
             } else if (tagName.equalsIgnoreCase("symbol")) {
+
+                //todo: implement "nbreak"
+
                 symbol = new Symbol(attributes.getValue("key"), attributes.getValue("description"), attributes.getValue("starttime"), attributes.getValue("endtime"), Integer.parseInt(SYSTools.catchNull(attributes.getValue("break"), "0")), attributes.getValue("calc"), attributes.getValue("type"));
 
                 if (attributes.getValue("shift1") != null) {

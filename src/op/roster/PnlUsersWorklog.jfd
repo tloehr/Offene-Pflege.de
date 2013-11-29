@@ -9,6 +9,12 @@ new FormModel {
 				name: "tabbedPane1"
 				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
 					name: "pnlWorklog"
+					add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+						name: "scrollPane2"
+						add( new FormComponent( "com.jidesoft.pane.CollapsiblePanes" ) {
+							name: "cpsWL"
+						} )
+					} )
 				}, new FormLayoutConstraints( null ) {
 					"title": "Workinglog"
 				} )

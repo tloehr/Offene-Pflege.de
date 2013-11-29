@@ -126,7 +126,7 @@ public class Rosters {
     }
 
     public boolean isLocked() {
-        return stage == RostersTools.STAGE_PLANNING;
+        return stage == RostersTools.STAGE_LOCKED;
     }
 
     @Override

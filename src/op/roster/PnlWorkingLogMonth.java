@@ -23,7 +23,7 @@ import java.util.*;
 /**
  * @author Torsten Löhr
  */
-public class PnlWorkingLogWholeMonth extends JPanel {
+public class PnlWorkingLogMonth extends JPanel {
     private ArrayList<Rplan> listPlans;
     private RosterParameters rosterParameters;
     private UserContracts userContracts;
@@ -32,7 +32,7 @@ public class PnlWorkingLogWholeMonth extends JPanel {
 //    private Users user;
 
 
-    public PnlWorkingLogWholeMonth(ArrayList<Rplan> listPlans, RosterParameters rosterParameters, UserContracts userContracts) {
+    public PnlWorkingLogMonth(ArrayList<Rplan> listPlans, RosterParameters rosterParameters, UserContracts userContracts) {
         this.listPlans = listPlans;
         this.rosterParameters = rosterParameters;
         this.userContracts = userContracts;

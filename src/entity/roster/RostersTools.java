@@ -1,19 +1,25 @@
 package entity.roster;
 
 
+import entity.reports.NReport;
 import op.OPDE;
+import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.eclipse.persistence.platform.xml.DefaultErrorHandler;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.swing.*;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.awt.*;
 import java.io.StringReader;
+import java.util.ArrayList;
 
 /**
  * Created with IntelliJ IDEA.
@@ -45,7 +51,7 @@ public class RostersTools {
             "        <symbol key=\"SL\" starttime=\"13:00\" endtime=\"21:00\" break=\"30\" calc=\"awert\" type=\"work\" description=\"Spätdienst, lang\" shift1=\"late\" statvalue1=\"1.00\"  shift2=\"\" statvalue2=\"0.00\"/>\n" +
             "        <symbol key=\"M\" calc=\"kwert\" type=\"sick\" description=\"Mutterschutz\" />\n" +
             "        <symbol key=\"S1\" starttime=\"16:45\" endtime=\"19:45\" break=\"0\" calc=\"awert\" type=\"work\" description=\"Spätdienst, kurz\"  shift1=\"late\" statvalue1=\"1.00\"  shift2=\"\" statvalue2=\"0.00\" />\n" +
-            "        <symbol key=\"N\" starttime=\"20:45\" endtime=\"06:45\" break=\"60\" calc=\"awert\" type=\"work\" description=\"Nachtdienst\"  shift1=\"night\" statvalue1=\"1.00\"  shift2=\"\" statvalue2=\"0.00\" />\n" +
+            "        <symbol key=\"N\" starttime=\"20:45\" endtime=\"06:45\" break=\"60\" nbreak=\"0\" calc=\"awert\" type=\"work\" description=\"Nachtdienst\"  shift1=\"night\" statvalue1=\"1.00\"  shift2=\"\" statvalue2=\"0.00\" />\n" +
             "        <symbol key=\"K\" calc=\"kwert\" type=\"sick\" description=\"Krank\">\n" +
             "            <monday/>\n" +
             "            <tuesday/>\n" +
@@ -180,6 +186,44 @@ public class RostersTools {
             stage = "opde.roster.stage.locked";
         }
         return OPDE.lang.getString(stage);
+    }
+
+    /**
+     * @return
+     */
+    public static Pair<LocalDate, LocalDate> getMinMax(int section) {
+        Pair<LocalDate, LocalDate> result = null;
+        long min, max;
+
+        EntityManager em = OPDE.createEM();
+        Query queryMin = em.createQuery("SELECT ro FROM Rosters ro WHERE ro.stage <> :locked AND ro.section = :section ORDER BY ro.month ASC ");
+        queryMin.setMaxResults(1);
+        queryMin.setParameter("locked", RostersTools.STAGE_LOCKED);
+        queryMin.setParameter("section", section);
+
+        Query queryMax = em.createQuery("SELECT ro FROM Rosters ro WHERE ro.stage <> :locked AND ro.section = :section ORDER BY ro.month DESC ");
+        queryMax.setParameter("locked", RostersTools.STAGE_LOCKED);
+        queryMax.setParameter("section", section);
+        queryMax.setMaxResults(1);
+
+        try {
+            ArrayList<Rosters> lmin = new ArrayList<Rosters>(queryMin.getResultList());
+            ArrayList<Rosters> lmax = new ArrayList<Rosters>(queryMax.getResultList());
+
+
+            if (lmin.isEmpty() && lmax.isEmpty()) { // that means, that there is now report at all
+                result = null;
+            } else {
+
+                result = new Pair<LocalDate, LocalDate>(new LocalDate(lmin.get(0).getMonth()), new LocalDate(lmax.get(0).getMonth()));
+
+            }
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+
+        em.close();
+        return result;
     }
 
 }

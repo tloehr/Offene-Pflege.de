@@ -111,11 +111,12 @@ public class RosterParameters {
                     String shift1 = symbol.getShift1() == Symbol.SHIFT_NONE ? "" : String.format(" shift1=\"%s\" statvalue1=\"%s\" ", Symbol.SHIFT[symbol.getShift1()], symbol.getStatval1().setScale(2, RoundingMode.HALF_UP));
                     String shift2 = symbol.getShift1() == Symbol.SHIFT_NONE ? "" : String.format(" shift2=\"%s\" statvalue2=\"%s\" ", Symbol.SHIFT[symbol.getShift2()], symbol.getStatval2().setScale(2, RoundingMode.HALF_UP));
 
-                    xml += String.format("        <symbol key=\"%s\" starttime=\"%s\" endtime=\"%s\" break=\"%s\" calc=\"%s\" type=\"%s\" description=\"%s\" " + shift1 + shift2 + closeTagEarly + ">\n",
+                    xml += String.format("        <symbol key=\"%s\" starttime=\"%s\" endtime=\"%s\" break=\"%s\" nbreak=\"%s\" calc=\"%s\" type=\"%s\" description=\"%s\" " + shift1 + shift2 + closeTagEarly + ">\n",
                             symbol.getKey().toUpperCase(),
                             symbol.getStart().toString("HH:mm"),
                             symbol.getEnd().toString("HH:mm"),
-                            symbol.getBreak().intValue(),
+                            symbol.getMinutesBreakDay(),
+                            symbol.getMinutesBreakNight(),
                             Symbol.CALC[symbol.getCalc()],
                             Symbol.TYPE[symbol.getSymbolType()],
                             SYSTools.catchNull(symbol.getDescription()));

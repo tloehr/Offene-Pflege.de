@@ -58,9 +58,6 @@ public class Workinglog implements Comparable<Workinglog> {
     @JoinColumn(name = "creator", referencedColumnName = "UKennung")
     @ManyToOne
     private Users creator;
-    @JoinColumn(name = "controller", referencedColumnName = "UKennung")
-    @ManyToOne
-    private Users controller;
     @JoinColumn(name = "editBy", referencedColumnName = "UKennung")
     @ManyToOne
     private Users editedBy;
@@ -74,13 +71,25 @@ public class Workinglog implements Comparable<Workinglog> {
     public Workinglog() {
     }
 
-    public Workinglog(BigDecimal hours, BigDecimal percent, Rplan rplan, int type, long actualkey) {
+    public Workinglog(BigDecimal hours, BigDecimal percent, Rplan rplan, int type) {
         this.hours = hours;
         this.percent = percent;
         this.rplan = rplan;
         this.type = type;
-        this.actualkey = actualkey;
         this.creator = OPDE.getLogin().getUser();
+        this.start = null;
+        this.end = null;
+    }
+
+    public Workinglog(BigDecimal hours, Date start, Date end, Rplan rplan, String text, int type) {
+        this.hours = hours;
+        this.percent = BigDecimal.ZERO;
+        this.start = start;
+        this.end = end;
+        this.rplan = rplan;
+        this.type = type;
+        this.creator = OPDE.getLogin().getUser();
+        this.text = text;
     }
 
     @Override
@@ -97,7 +106,6 @@ public class Workinglog implements Comparable<Workinglog> {
                 ", version=" + version +
                 ", rplan=" + rplan +
                 ", creator=" + creator +
-                ", controller=" + controller +
                 ", editedBy=" + editedBy +
                 ", replacedBy=" + replacedBy +
                 ", replacementFor=" + replacementFor +
@@ -115,7 +123,6 @@ public class Workinglog implements Comparable<Workinglog> {
         if (id != that.id) return false;
         if (type != that.type) return false;
         if (version != that.version) return false;
-        if (controller != null ? !controller.equals(that.controller) : that.controller != null) return false;
         if (creator != null ? !creator.equals(that.creator) : that.creator != null) return false;
         if (editedBy != null ? !editedBy.equals(that.editedBy) : that.editedBy != null) return false;
         if (end != null ? !end.equals(that.end) : that.end != null) return false;
@@ -144,7 +151,6 @@ public class Workinglog implements Comparable<Workinglog> {
         result = 31 * result + (int) (version ^ (version >>> 32));
         result = 31 * result + (rplan != null ? rplan.hashCode() : 0);
         result = 31 * result + (creator != null ? creator.hashCode() : 0);
-        result = 31 * result + (controller != null ? controller.hashCode() : 0);
         result = 31 * result + (editedBy != null ? editedBy.hashCode() : 0);
         result = 31 * result + (replacedBy != null ? replacedBy.hashCode() : 0);
         result = 31 * result + (replacementFor != null ? replacementFor.hashCode() : 0);
@@ -201,13 +207,6 @@ public class Workinglog implements Comparable<Workinglog> {
         this.creator = creator;
     }
 
-    public Users getController() {
-        return controller;
-    }
-
-    public void setController(Users controller) {
-        this.controller = controller;
-    }
 
     public Rplan getRplan() {
         return rplan;
@@ -263,20 +262,24 @@ public class Workinglog implements Comparable<Workinglog> {
     }
 
     public Date getStart() {
-         return start;
-     }
+        return start;
+    }
 
-     public void setStart(Date start) {
-         this.start = start;
-     }
+    public void setStart(Date start) {
+        this.start = start;
+    }
 
-     public Date getEnd() {
-         return end;
-     }
+    public Date getEnd() {
+        return end;
+    }
 
-     public void setEnd(Date end) {
-         this.end = end;
-     }
+    public void setEnd(Date end) {
+        this.end = end;
+    }
+
+    public boolean isAuto() {
+        return type != WorkinglogTools.TYPE_ADDITIONAL && type != WorkinglogTools.TYPE_MANUAL;
+    }
 
 
     public void setActualKey(long actual) {
@@ -291,6 +294,9 @@ public class Workinglog implements Comparable<Workinglog> {
     public int compareTo(Workinglog o) {
 
         int sort = SYSTools.nullCompare(getRplan(), o.getRplan()) * -1;
+        if (sort == 0) {
+            sort = new Integer(type).compareTo(new Integer(o.getType()));
+        }
         if (sort == 0) {
             sort = new Long(id).compareTo(new Long(o.getId()));
         }

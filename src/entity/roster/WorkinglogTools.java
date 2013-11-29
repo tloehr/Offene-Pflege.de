@@ -3,6 +3,7 @@ package entity.roster;
 import org.joda.time.LocalDate;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -22,16 +23,16 @@ public class WorkinglogTools {
     public static final int TYPE_AUTO_DAY2 = 3;
     //    public static final int TYPE_AUTO_HOLIDAY = 2;
     public static final int TYPE_AUTO_BREAK = 4; // negative value
-    public static final int TYPE_ADDITIONAL1 = 5;
-    public static final int TYPE_ADDITIONAL2 = 6;
-    public static final int TYPE_MANUAL = 7;
+    public static final int TYPE_ADDITIONAL = 5;
+    //    public static final int TYPE_ADDITIONAL2 = 6;
+    public static final int TYPE_MANUAL = 6;
     //    public static final int TYPE_AUTO_EXTRA = 5; // additional hours for holiday shifts
-    public static final String[] TYPES = new String[]{"Tag1", "Nacht1", "Nacht2", "Tag2", "Pause", "Zusätzlich1", "Zusätzlich2", "Manuell"};
+    public static final String[] TYPES = new String[]{"Tag1", "Nacht1", "Nacht2", "Tag2", "Pause", "Zusätzlich", "Manuell"};
 
     public static String toPrettyString(Workinglog workinglog) {
         String text = "";
 
-        text = TYPES[workinglog.getType()] + ": " + workinglog.getHours();
+        text = workinglog.getHours().setScale(2, RoundingMode.HALF_UP).toString();
 
         return text;
     }
@@ -46,26 +47,26 @@ public class WorkinglogTools {
      * @param parameterSet
      * @return
      */
-    public static Workinglog[] createWorkingLogs(Rplan myRplan, Symbol symbol, ContractsParameterSet parameterSet, long actual) {
+    public static Workinglog[] createWorkingLogs(Rplan myRplan, Symbol symbol, ContractsParameterSet parameterSet) {
         LocalDate day = new LocalDate(myRplan.getStart());
         HashMap<String, BigDecimal> map = symbol.getHourStats(day, parameterSet);
         ArrayList<Workinglog> listLogs = new ArrayList<Workinglog>();
 
         if (map != null) {
             if (map.get(Symbol.DAYHOURS1).compareTo(BigDecimal.ZERO) > 0) {
-                listLogs.add(new Workinglog(map.get(Symbol.DAYHOURS1), BigDecimal.ZERO, myRplan, WorkinglogTools.TYPE_AUTO_DAY1, actual));
+                listLogs.add(new Workinglog(map.get(Symbol.DAYHOURS1), BigDecimal.ZERO, myRplan, WorkinglogTools.TYPE_AUTO_DAY1));
             }
             if (map.get(Symbol.DAYHOURS2).compareTo(BigDecimal.ZERO) > 0) {
-                listLogs.add(new Workinglog(map.get(Symbol.DAYHOURS2), BigDecimal.ZERO, myRplan, WorkinglogTools.TYPE_AUTO_DAY2, actual));
+                listLogs.add(new Workinglog(map.get(Symbol.DAYHOURS2), BigDecimal.ZERO, myRplan, WorkinglogTools.TYPE_AUTO_DAY2));
             }
             if (map.get(Symbol.NIGHTHOURS1).compareTo(BigDecimal.ZERO) > 0) {
-                listLogs.add(new Workinglog(map.get(Symbol.NIGHTHOURS1), parameterSet.nightPremiumPercentage, myRplan, WorkinglogTools.TYPE_AUTO_NIGHT1, actual));
+                listLogs.add(new Workinglog(map.get(Symbol.NIGHTHOURS1), parameterSet.nightPremiumPercentage, myRplan, WorkinglogTools.TYPE_AUTO_NIGHT1));
             }
             if (map.get(Symbol.NIGHTHOURS2).compareTo(BigDecimal.ZERO) > 0) {
-                listLogs.add(new Workinglog(map.get(Symbol.NIGHTHOURS2), parameterSet.getNightPremiumPercentage(), myRplan, WorkinglogTools.TYPE_AUTO_NIGHT2, actual));
+                listLogs.add(new Workinglog(map.get(Symbol.NIGHTHOURS2), parameterSet.getNightPremiumPercentage(), myRplan, WorkinglogTools.TYPE_AUTO_NIGHT2));
             }
             if (map.get(Symbol.BREAKTIME).compareTo(BigDecimal.ZERO) > 0) {
-                listLogs.add(new Workinglog(map.get(Symbol.BREAKTIME).negate(), BigDecimal.ZERO, myRplan, WorkinglogTools.TYPE_AUTO_BREAK, actual));
+                listLogs.add(new Workinglog(map.get(Symbol.BREAKTIME).negate(), BigDecimal.ZERO, myRplan, WorkinglogTools.TYPE_AUTO_BREAK));
             }
         }
 
@@ -73,27 +74,27 @@ public class WorkinglogTools {
     }
 
 
-    public static Workinglog getAdditional1(Rplan rplan) {
-        Workinglog workinglog = null;
-        for (Workinglog wlog : rplan.getWorkinglogs()) {
-            if (wlog.getType() == TYPE_ADDITIONAL1) {
-                workinglog = wlog;
-                break;
-            }
-        }
-        return workinglog;
-    }
-
-    public static Workinglog getAdditional2(Rplan rplan) {
-        Workinglog workinglog = null;
-        for (Workinglog wlog : rplan.getWorkinglogs()) {
-            if (wlog.getType() == TYPE_ADDITIONAL2) {
-                workinglog = wlog;
-                break;
-            }
-        }
-        return workinglog;
-    }
+//    public static Workinglog getAdditional1(Rplan rplan) {
+//        Workinglog workinglog = null;
+//        for (Workinglog wlog : rplan.getWorkinglogs()) {
+//            if (wlog.getType() == TYPE_ADDITIONAL1) {
+//                workinglog = wlog;
+//                break;
+//            }
+//        }
+//        return workinglog;
+//    }
+//
+//    public static Workinglog getAdditional2(Rplan rplan) {
+//        Workinglog workinglog = null;
+//        for (Workinglog wlog : rplan.getWorkinglogs()) {
+//            if (wlog.getType() == TYPE_ADDITIONAL2) {
+//                workinglog = wlog;
+//                break;
+//            }
+//        }
+//        return workinglog;
+//    }
 
 
 }

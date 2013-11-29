@@ -8,17 +8,25 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.grid.TableScrollPane;
 import com.jidesoft.pane.CollapsiblePane;
+import com.jidesoft.pane.CollapsiblePanes;
+import com.jidesoft.pane.event.CollapsiblePaneAdapter;
+import com.jidesoft.pane.event.CollapsiblePaneEvent;
+import com.jidesoft.swing.JideBoxLayout;
 import entity.EntityTools;
 import entity.Homes;
 import entity.HomesTools;
-import entity.roster.*;
+import entity.roster.RosterParameters;
+import entity.roster.Rosters;
+import entity.roster.RostersTools;
+import entity.roster.UserContracts;
 import entity.system.SYSPropsTools;
 import entity.system.Users;
 import entity.system.UsersTools;
 import op.OPDE;
-import op.tools.CleanablePanel;
-import op.tools.SYSCalendar;
-import op.tools.SYSTools;
+import op.threads.DisplayManager;
+import op.threads.DisplayMessage;
+import op.tools.*;
+import org.joda.time.DateMidnight;
 import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
@@ -27,23 +35,24 @@ import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyVetoException;
+import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Torsten Löhr
  */
 public class PnlUsersWorklog extends CleanablePanel {
-    public static final String internalClassID = "opde.all.rosters";
+    public static final String internalClassID = "opde.roster";
 
     private Map<String, CollapsiblePane> cpMap;
     private Map<String, JPanel> contentmap;
     private TableScrollPane tsp1;
     private ArrayList<Rosters> lstAllRosters;
     private JPopupMenu menu;
+    Format weekFormater = new SimpleDateFormat("w yyyy");
 
     public PnlUsersWorklog() {
         initComponents();
@@ -52,6 +61,9 @@ public class PnlUsersWorklog extends CleanablePanel {
 
     private void initPanel() {
 
+        cpMap = Collections.synchronizedMap(new HashMap<String, CollapsiblePane>());
+        contentmap = Collections.synchronizedMap(new HashMap<String, JPanel>());
+
         EntityManager em = OPDE.createEM();
         lstAllRosters = new ArrayList<Rosters>(em.createQuery("SELECT r FROM Rosters r ORDER BY r.month ASC").getResultList());
         em.close();
@@ -59,12 +71,6 @@ public class PnlUsersWorklog extends CleanablePanel {
         lstRosters.setModel(SYSTools.list2dlm(lstAllRosters));
         lstRosters.setCellRenderer(RostersTools.getRenderer());
 
-        Users user = EntityTools.find(Users.class, "glaumann");
-        Rosters roster = EntityTools.find(Rosters.class, 6l);
-        RosterParameters rosterParameters =  RostersTools.getParameters(roster);
-        UserContracts userContracts = UsersTools.getContracts(user);
-
-        pnlWorklog.add(new PnlWorkingLogWeek(user, new LocalDate(roster.getMonth()).plusWeeks(1), rosterParameters, userContracts));
 
     }
 
@@ -192,13 +198,182 @@ public class PnlUsersWorklog extends CleanablePanel {
         }
     }
 
+    private CollapsiblePane createCP4Week(final LocalDate week) {
+        final String key = weekFormater.format(week.toDate()) + ".week";
+        synchronized (cpMap) {
+            if (!cpMap.containsKey(key)) {
+                cpMap.put(key, new CollapsiblePane());
+                try {
+                    cpMap.get(key).setCollapsed(true);
+                } catch (PropertyVetoException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
 
+            }
+        }
+        final CollapsiblePane cpWeek = cpMap.get(key);
+
+        String title = "<html><font size=+1><b>" +
+                DateFormat.getDateInstance(DateFormat.SHORT).format(week.dayOfWeek().withMaximumValue().toDate()) + " - " +
+                DateFormat.getDateInstance(DateFormat.SHORT).format(week.dayOfWeek().withMinimumValue().toDate()) +
+                " (" +
+                OPDE.lang.getString("misc.msg.weekinyear") +
+                week.getWeekOfWeekyear() +
+                ")" +
+                "</b>" +
+                "</font></html>";
+
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    cpWeek.setCollapsed(!cpWeek.isCollapsed());
+                } catch (PropertyVetoException pve) {
+                    // BAH!
+                }
+            }
+        });
+
+        GUITools.addExpandCollapseButtons(cpWeek, cptitle.getRight());
+
+//           if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
+//               final JButton btnPrintWeek = new JButton(SYSConst.icon22print2);
+//               btnPrintWeek.setPressedIcon(SYSConst.icon22print2Pressed);
+//               btnPrintWeek.setAlignmentX(Component.RIGHT_ALIGNMENT);
+//               btnPrintWeek.setContentAreaFilled(false);
+//               btnPrintWeek.setBorder(null);
+//               btnPrintWeek.setToolTipText(OPDE.lang.getString("misc.tooltips.btnprintweek"));
+//               btnPrintWeek.addActionListener(new ActionListener() {
+//                   @Override
+//                   public void actionPerformed(ActionEvent actionEvent) {
+//                       SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Week(resident, week), false, true, null, null), true);
+//                   }
+//               });
+//               cptitle.getRight().add(btnPrintWeek);
+//           }
+
+        cpWeek.setTitleLabelComponent(cptitle.getMain());
+        cpWeek.setSlidingDirection(SwingConstants.SOUTH);
+
+        cpWeek.setBackground(SYSConst.orange1[SYSConst.medium1]);
+        cpWeek.setOpaque(false);
+        cpWeek.setHorizontalAlignment(SwingConstants.LEADING);
+        //        cpMonth.setBackground(getColor(vtype, SYSConst.light3));
+
+
+        cpWeek.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+            @Override
+            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+                Users user = EntityTools.find(Users.class, "glaumann");
+                Rosters roster = EntityTools.find(Rosters.class, 6l);
+                RosterParameters rosterParameters = RostersTools.getParameters(roster);
+                UserContracts userContracts = UsersTools.getContracts(user);
+
+                pnlWorklog.add(new PnlWorkingLogWeek(user, new LocalDate(roster.getMonth()).plusWeeks(1), rosterParameters, userContracts));
+                cpWeek.setContentPane();
+            }
+        });
+
+        if (!cpWeek.isCollapsed()) {
+            cpWeek.setContentPane(createWeekContentPanel4(week));
+        }
+
+
+        return cpWeek;
+    }
+
+    private void reloadDisplay() {
+        /***
+         *               _                 _ ____  _           _
+         *      _ __ ___| | ___   __ _  __| |  _ \(_)___ _ __ | | __ _ _   _
+         *     | '__/ _ \ |/ _ \ / _` |/ _` | | | | / __| '_ \| |/ _` | | | |
+         *     | | |  __/ | (_) | (_| | (_| | |_| | \__ \ |_) | | (_| | |_| |
+         *     |_|  \___|_|\___/ \__,_|\__,_|____/|_|___/ .__/|_|\__,_|\__, |
+         *                                              |_|            |___/
+         */
+
+        synchronized (contentmap) {
+            SYSTools.clear(contentmap);
+        }
+        synchronized (cpMap) {
+            SYSTools.clear(cpMap);
+        }
+
+        OPDE.getMainframe().setBlocked(true);
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+
+        SwingWorker worker = new SwingWorker() {
+            Date max = null;
+
+            @Override
+            protected Object doInBackground() throws Exception {
+
+                GUITools.setResidentDisplay(resident);
+
+                Pair<LocalDate, LocalDate> minmax = RostersTools.getMinMax(RostersTools.SECTION_CARE);
+                if (minmax != null) {
+                    LocalDate start = SYSCalendar.bow(SYSCalendar.bom(minmax.getFirst()));
+                    LocalDate end = SYSCalendar.bow(SYSCalendar.eom(minmax.getSecond()));
+                    for (LocalDate week = start; week.isBefore(end); week = week.plusWeeks(1)) {
+
+                        max = minmax.getSecond().toDate();
+                        DateMidnight start = minmax.getFirst().toDateMidnight().dayOfMonth().withMinimumValue();
+                        DateMidnight end = resident.isActive() ? new DateMidnight() : minmax.getSecond().toDateMidnight().dayOfMonth().withMinimumValue();
+                        for (int year = end.getYear(); year >= start.getYear(); year--) {
+                            createCP4Year(year, start, end);
+                        }
+                    }
+
+                    return null;
+                }
+
+                @Override
+                protected void done () {
+
+                    buildPanel();
+                    initPhase = false;
+                    OPDE.getDisplayManager().setProgressBarMessage(null);
+                    OPDE.getMainframe().setBlocked(false);
+                    if (lockmessageAfterwards) OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                    if (max != null) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.lastEntry") + ": " + DateFormat.getDateInstance().format(max), 5));
+                    } else {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.noentryyet"), 5));
+                    }
+                }
+            }
+
+            ;
+            worker.execute();
+
+
+        }
+    }
+
+    private void buildPanel() {
+        cpsWL.removeAll();
+        cpsWL.setLayout(new JideBoxLayout(cpsWL, JideBoxLayout.Y_AXIS));
+
+        synchronized (cpMap) {
+            Pair<LocalDate, LocalDate> minmax = RostersTools.getMinMax(RostersTools.SECTION_CARE);
+            LocalDate start = SYSCalendar.bow(SYSCalendar.bom(minmax.getFirst()));
+            LocalDate end = SYSCalendar.bow(SYSCalendar.eom(minmax.getSecond()));
+            for (LocalDate week = start; week.isBefore(end); week = week.plusWeeks(1)) {
+                final String key = weekFormater.format(week.toDate()) + ".week";
+                cpsWL.add(cpMap.get(key));
+            }
+
+        }
+        cpsWL.addExpansion();
+    }
 
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         tabbedPane1 = new JTabbedPane();
         pnlWorklog = new JPanel();
+        scrollPane2 = new JScrollPane();
+        cpsWL = new CollapsiblePanes();
         panel1 = new JPanel();
         scrollPane1 = new JScrollPane();
         lstRosters = new JList();
@@ -213,14 +388,20 @@ public class PnlUsersWorklog extends CleanablePanel {
             //======== pnlWorklog ========
             {
                 pnlWorklog.setLayout(new BoxLayout(pnlWorklog, BoxLayout.X_AXIS));
+
+                //======== scrollPane2 ========
+                {
+                    scrollPane2.setViewportView(cpsWL);
+                }
+                pnlWorklog.add(scrollPane2);
             }
             tabbedPane1.addTab("Workinglog", pnlWorklog);
 
             //======== panel1 ========
             {
                 panel1.setLayout(new FormLayout(
-                    "default:grow",
-                    "default:grow, $lgap, default"));
+                        "default:grow",
+                        "default:grow, $lgap, default"));
 
                 //======== scrollPane1 ========
                 {
@@ -231,6 +412,7 @@ public class PnlUsersWorklog extends CleanablePanel {
                         public void mouseClicked(MouseEvent e) {
                             lstRostersMouseClicked(e);
                         }
+
                         @Override
                         public void mousePressed(MouseEvent e) {
                             lstRostersMousePressed(e);
@@ -274,6 +456,8 @@ public class PnlUsersWorklog extends CleanablePanel {
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JTabbedPane tabbedPane1;
     private JPanel pnlWorklog;
+    private JScrollPane scrollPane2;
+    private CollapsiblePanes cpsWL;
     private JPanel panel1;
     private JScrollPane scrollPane1;
     private JList lstRosters;

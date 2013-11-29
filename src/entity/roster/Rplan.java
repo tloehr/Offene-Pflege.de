@@ -72,6 +72,9 @@ public class Rplan implements Comparable<Rplan> {
     @JoinColumn(name = "rosterid", referencedColumnName = "id")
     @ManyToOne
     private Rosters roster;
+    @JoinColumn(name = "controller", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users controller;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "rplan")
     private List<Workinglog> workinglogs;
     @Column(name = "version", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
@@ -262,6 +265,18 @@ public class Rplan implements Comparable<Rplan> {
 
     public void setEnd(Date end) {
         this.end = end;
+    }
+
+    public Users getController() {
+        return controller;
+    }
+
+    public void setController(Users controller) {
+        this.controller = controller;
+    }
+
+    public boolean isLocked(){
+        return controller != null || roster.isLocked() || roster.isClosed();
     }
 
     //
