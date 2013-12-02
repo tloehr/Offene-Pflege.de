@@ -721,6 +721,7 @@ public class ResInfoTools {
         }
 
         ResValue weight = ResValueTools.getLast(resident, ResValueTypesTools.WEIGHT);
+
         BigDecimal theoreticalweight = weight == null ? null : weight.getVal1();
 
         result += "<tr><td valign=\"top\">Zuletzt bestimmtes Körpergewicht</td><td valign=\"top\"><b>";
@@ -746,65 +747,69 @@ public class ResInfoTools {
         }
         result += "</b></td></tr>";
 
-        ResValue height = ResValueTools.getLast(resident, ResValueTypesTools.HEIGHT);
-        result += "<tr><td valign=\"top\">Zuletzt bestimmte Körpergröße</td><td valign=\"top\"><b>";
-        if (height == null) {
-            result += "Bisher wurde noch keine Körpergröße ermittelt.";
-        } else {
-            result += height.getVal1().toPlainString() + " " + height.getType().getUnit1() + " (" + DateFormat.getDateInstance().format(height.getPit()) + ")";
+
+        if (resident.isActive()) {
+            ResValue height = ResValueTools.getLast(resident, ResValueTypesTools.HEIGHT);
+            result += "<tr><td valign=\"top\">Zuletzt bestimmte Körpergröße</td><td valign=\"top\"><b>";
+            if (height == null) {
+                result += "Bisher wurde noch keine Körpergröße ermittelt.";
+            } else {
+                result += height.getVal1().toPlainString() + " " + height.getType().getUnit1() + " (" + DateFormat.getDateInstance().format(height.getPit()) + ")";
+            }
+            result += "</b></td></tr>";
+
+            result += "<tr><td valign=\"top\">Ernährungsdaten</td><td valign=\"top\"><b>";
+
+            ResInfo food = getLastResinfo(resident, ResInfoTypeTools.TYPE_FOOD);
+
+
+            BigDecimal h = height == null ? null : height.getVal1();
+
+            BigDecimal bmi = ResValueTools.getBMI(theoreticalweight, h); // body mass index
+            BigDecimal ubw = getUBW(food); // usual body weight
+            BigDecimal ibw = ResValueTools.getIBW(h, resident.getGender()); // ideal body weight
+            BigDecimal bmr = ResValueTools.getBasalMetabolicRate(theoreticalweight, h, ResidentTools.getAge(resident).getYears(), resident.getGender()); // base metabolic rate
+            BigDecimal rl = ResValueTools.getRequiredLiquid(theoreticalweight); // required amount of liquid
+            BigDecimal tla = getTargetLiquidAmount(food);
+
+            if (bmi == null) {
+                result += "Ein BMI kann noch nicht bestimmt werden.<br/>";
+            } else {
+                result += "BMI: " + bmi.setScale(2, RoundingMode.HALF_UP) + "<br/>";
+            }
+
+
+            if (ubw == null) {
+                result += "Das übliche Gewicht ist bisher unbekannt.<br/>";
+            } else {
+                result += "Übliches Gewicht: " + ubw.setScale(2, RoundingMode.HALF_UP) + " " + ResValueTypesTools.getType(ResValueTypesTools.WEIGHT).getUnit1() + "<br/>";
+            }
+
+            if (ibw == null) {
+                result += "Das Idealgewicht konnte noch nicht bestimmt werden.<br/>";
+            } else {
+                result += "Idealgewicht: " + ibw.setScale(2, RoundingMode.HALF_UP) + " " + ResValueTypesTools.getType(ResValueTypesTools.WEIGHT).getUnit1() + "<br/>";
+            }
+
+            if (bmr == null) {
+                result += "Der Grundumsatz konnte noch nicht berechnet werden.<br/>";
+            } else {
+                result += "Grundumsatz: " + bmr.setScale(2, RoundingMode.HALF_UP) + " kcal/24h <br/>";
+                result += "tatsächlicher Umsatz: " + bmr.multiply(new BigDecimal(1.2)).setScale(2, RoundingMode.HALF_UP) + " kcal/24h (wenn Bettlägerig)  " + bmr.multiply(new BigDecimal(1.3)).setScale(2, RoundingMode.HALF_UP) + " kcal/24h (wenn normal mobilisiert)<br/>";
+            }
+
+            if (rl == null) {
+                result += "Der Flüssigkeitsbedarf konnte noch nicht berechnet werden.<br/>";
+            } else {
+                result += "Flüssigkeitsbedarf: " + rl.setScale(2, RoundingMode.HALF_UP) + " ml/24h<br/>";
+            }
+
+            if (tla != null) {
+                result += "Zieltrinkmenge: " + tla.setScale(2, RoundingMode.HALF_UP) + " ml/24h<br/>";
+            }
+
+            result += "</b></td></tr>";
         }
-        result += "</b></td></tr>";
-
-        result += "<tr><td valign=\"top\">Ernährungsdaten</td><td valign=\"top\"><b>";
-
-        ResInfo food = getLastResinfo(resident, ResInfoTypeTools.TYPE_FOOD);
-
-
-        BigDecimal h = height == null ? null : height.getVal1();
-
-        BigDecimal bmi = ResValueTools.getBMI(theoreticalweight, h); // body mass index
-        BigDecimal ubw = getUBW(food); // usual body weight
-        BigDecimal ibw = ResValueTools.getIBW(h, resident.getGender()); // ideal body weight
-        BigDecimal bmr = ResValueTools.getBasalMetabolicRate(theoreticalweight, h, ResidentTools.getAge(resident).getYears(), resident.getGender()); // base metabolic rate
-        BigDecimal rl = ResValueTools.getRequiredLiquid(theoreticalweight); // required amount of liquid
-        BigDecimal tla = getTargetLiquidAmount(food);
-
-        if (bmi == null) {
-            result += "Ein BMI kann noch nicht bestimmt werden.<br/>";
-        } else {
-            result += "BMI: " + bmi.setScale(2, RoundingMode.HALF_UP) + "<br/>";
-        }
-
-        if (ubw == null) {
-            result += "Das übliche Gewicht ist bisher unbekannt.<br/>";
-        } else {
-            result += "Übliches Gewicht: " + ubw.setScale(2, RoundingMode.HALF_UP) + " " + weight.getType().getUnit1() + "<br/>";
-        }
-
-        if (ibw == null) {
-            result += "Das Idealgewicht konnte noch nicht bestimmt werden.<br/>";
-        } else {
-            result += "Idealgewicht: " + ibw.setScale(2, RoundingMode.HALF_UP) + " " + weight.getType().getUnit1() + "<br/>";
-        }
-
-        if (bmr == null) {
-            result += "Der Grundumsatz konnte noch nicht berechnet werden.<br/>";
-        } else {
-            result += "Grundumsatz: " + bmr.setScale(2, RoundingMode.HALF_UP) + " kcal/24h <br/>";
-            result += "tatsächlicher Umsatz: " + bmr.multiply(new BigDecimal(1.2)).setScale(2, RoundingMode.HALF_UP) + " kcal/24h (wenn Bettlägerig)  " + bmr.multiply(new BigDecimal(1.3)).setScale(2, RoundingMode.HALF_UP) + " kcal/24h (wenn normal mobilisiert)<br/>";
-        }
-
-        if (rl == null) {
-            result += "Der Flüssigkeitsbedarf konnte noch nicht berechnet werden.<br/>";
-        } else {
-            result += "Flüssigkeitsbedarf: " + rl.setScale(2, RoundingMode.HALF_UP) + " ml/24h<br/>";
-        }
-
-        if (tla != null) {
-            result += "Zieltrinkmenge: " + tla.setScale(2, RoundingMode.HALF_UP) + " ml/24h<br/>";
-        }
-
-        result += "</b></td></tr>";
 
         ResValue bz = ResValueTools.getLast(resident, ResValueTypesTools.GLUCOSE);
         result += "<tr><td valign=\"top\">Zuletzt gemessener BZ</td><td valign=\"top\"><b>";
