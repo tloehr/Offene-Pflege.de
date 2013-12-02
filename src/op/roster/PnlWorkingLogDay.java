@@ -529,8 +529,8 @@ public class PnlWorkingLogDay extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "80dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default",
-                "default, $lgap, default"));
+            "80dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default",
+            "default, $lgap, default"));
 
         //---- btnApply ----
         btnApply.setText("text");
@@ -560,8 +560,8 @@ public class PnlWorkingLogDay extends JPanel {
         //======== pnlAdditional ========
         {
             pnlAdditional.setLayout(new FormLayout(
-                    "2*(default:grow)",
-                    "default, fill:default"));
+                "2*(default:grow)",
+                "default, fill:default"));
         }
         add(pnlAdditional, CC.xy(1, 3, CC.DEFAULT, CC.FILL));
 
