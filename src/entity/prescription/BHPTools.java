@@ -149,20 +149,29 @@ public class BHPTools {
         String internalClassID = "nursingrecords.bhpimport";
         int numbhp = 0;
 
-        DateMidnight lastbhp = new DateMidnight().minusDays(1);
+        LocalDate lastbhp = new LocalDate().minusDays(1);
         if (OPDE.getProps().containsKey("LASTBHPIMPORT")) {
-            lastbhp = new DateMidnight(DateTimeFormat.forPattern("yyyy-MM-dd").parseDateTime(OPDE.getProps().getProperty("LASTBHPIMPORT")));
+            lastbhp = new LocalDate(DateTimeFormat.forPattern("yyyy-MM-dd").parseDateTime(OPDE.getProps().getProperty("LASTBHPIMPORT")));
         }
 
-        if (lastbhp.isAfterNow()) {
+        if (lastbhp.isAfter(new LocalDate())) {
             throw new IndexOutOfBoundsException("The date of the last import is somewhere in the future. Can't be true.");
         }
 
-        DateMidnight targetdate = null;
+        if (lastbhp.equals(new LocalDate())) {
+            OPDE.info("Today's BHPImport is already done. Stopping.");
+            System.exit(0);
+        }
+
+//        if (lastbhp.isAfterNow()) {
+//            throw new IndexOutOfBoundsException("The date of the last import is somewhere in the future. Can't be true.");
+//        }
+
+        LocalDate targetdate = null;
 
         // If (for technical reasons) the lastdfn lies in the past (more than the usual 1 day),
         // then the generation is interated until the current day.
-        for (int days = 1; days <= Days.daysBetween(lastbhp.plusDays(1), new DateMidnight()).getDays() + 1; days++) {
+        for (int days = 1; days <= Days.daysBetween(lastbhp.plusDays(1), new LocalDate()).getDays() + 1; days++) {
 
             targetdate = lastbhp.plusDays(days);
 
@@ -225,7 +234,7 @@ public class BHPTools {
      * @param wholeday   true, dann wird für den ganzen Tag erzeugt. false, dann ab der aktuellen Zeit.
      * @return die Anzahl der erzeugten BHPs.
      */
-    public static int generate(EntityManager em, List<PrescriptionSchedule> list, DateMidnight targetdate, boolean wholeday) {
+    public static int generate(EntityManager em, List<PrescriptionSchedule> list, LocalDate targetdate, boolean wholeday) {
         String internalClassID = "nursingrecords.bhpimport";
         BigDecimal maxrows = new BigDecimal(list.size());
         int numbhp = 0;
@@ -254,7 +263,7 @@ public class BHPTools {
             if (!SYSCalendar.isInFuture(pSchedule.getLDatum()) && (pSchedule.isDaily() || pSchedule.isPassenderWochentag(targetdate.toDate()) || pSchedule.isPassenderTagImMonat(targetdate.toDate()))) {
 
                 boolean treffer = false;
-                DateMidnight ldatum = new DateMidnight(pSchedule.getLDatum());
+                LocalDate ldatum = new LocalDate(pSchedule.getLDatum());
 
                 // Genaue Ermittlung der Treffer
                 // =============================
@@ -322,9 +331,12 @@ public class BHPTools {
                         numbhp++;
                     }
                     if (uhrzeitOK && pSchedule.getUhrzeit() != null) {
-                        DateTime timeofday = new DateTime(pSchedule.getUhrzeit());
-                        Period period = new Period(timeofday.getHourOfDay(), timeofday.getMinuteOfHour(), timeofday.getSecondOfMinute(), timeofday.getMillisOfSecond());
-                        Date newTargetdate = targetdate.toDateTime().plus(period).toDate();
+                        LocalTime timeofday = new LocalTime(pSchedule.getUhrzeit());
+                        //                        Period period = new Period(timeofday.getHourOfDay(), timeofday.getMinuteOfHour(), timeofday.getSecondOfMinute(), timeofday.getMillisOfSecond());
+//                        DateTime timeofday = new DateTime(pSchedule.getUhrzeit());
+//                        Period period = new Period(timeofday.getHourOfDay(), timeofday.getMinuteOfHour(), timeofday.getSecondOfMinute(), timeofday.getMillisOfSecond());
+                        Date newTargetdate = targetdate.toDateTime(timeofday).toDate();
+//                        Date newTargetdate = targetdate.toDateTime().plus(period).toDate();
                         em.merge(new BHP(pSchedule, newTargetdate, SYSConst.UZ, pSchedule.getUhrzeitDosis()));
                         numbhp++;
                     }
@@ -583,55 +595,55 @@ public class BHPTools {
 
 
     public static String getBHPsAsHTMLtable(List<BHP> list) {
-           String result = "";
+        String result = "";
 
-           if (!list.isEmpty()) {
+        if (!list.isEmpty()) {
 
-               BHP b1 = list.get(0);
-               result += SYSConst.html_h3((b1.isOnDemand() ? OPDE.lang.getString("nursingrecords.bhp.ondemand") : OPDE.lang.getString(SHIFT_TEXT[b1.getShift()])));
-
-
-               result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
-                       "<th>" + OPDE.lang.getString("nursingrecords.nursingprocess.interventions") + "</th><th>Zeit / Status</th><th>Benutzer / Zeit</th></tr>";
-
-               for (BHP bhp : list) {
+            BHP b1 = list.get(0);
+            result += SYSConst.html_h3((b1.isOnDemand() ? OPDE.lang.getString("nursingrecords.bhp.ondemand") : OPDE.lang.getString(SHIFT_TEXT[b1.getShift()])));
 
 
-                   String text =
-                                  PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription())+
-                                  (bhp.hasMed() ? ", <b>" + SYSTools.getAsHTML(bhp.getDose()) +
-                                          " " + DosageFormTools.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
-                                  BHPTools.getScheduleText(bhp, ", ", "") +
-                                  (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser().getUID()) + "</i>" : "");
+            result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
+                    "<th>" + OPDE.lang.getString("nursingrecords.nursingprocess.interventions") + "</th><th>Zeit / Status</th><th>Benutzer / Zeit</th></tr>";
+
+            for (BHP bhp : list) {
 
 
-                   result += "<tr>";
-                   result += "<td valign=\"top\">" + text + "</td>";
-                   result += "<td valign=\"top\">" + getStateAsHTML(bhp) + "<br/>";
-                   result += "<td valign=\"top\">" + (bhp.isOpen() ? "" : bhp.getUser().getUID() + "; " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(bhp.getIst())) + "</td>";
-   //                result += "<td valign=\"top\">" + myprescription.getPITAsHTML();
+                String text =
+                        PrescriptionTools.getShortDescriptionAsCompactText(bhp.getPrescriptionSchedule().getPrescription()) +
+                                (bhp.hasMed() ? ", <b>" + SYSTools.getAsHTML(bhp.getDose()) +
+                                        " " + DosageFormTools.getUsageText(bhp.getPrescription().getTradeForm().getDosageForm()) + "</b>" : "") +
+                                BHPTools.getScheduleText(bhp, ", ", "") +
+                                (bhp.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(bhp.getUser().getUID()) + "</i>" : "");
 
-                   result += "</td>";
-                   result += "</tr>";
 
-               }
+                result += "<tr>";
+                result += "<td valign=\"top\">" + text + "</td>";
+                result += "<td valign=\"top\">" + getStateAsHTML(bhp) + "<br/>";
+                result += "<td valign=\"top\">" + (bhp.isOpen() ? "" : bhp.getUser().getUID() + "; " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(bhp.getIst())) + "</td>";
+                //                result += "<td valign=\"top\">" + myprescription.getPITAsHTML();
 
-               result += "</table>";
-           }
+                result += "</td>";
+                result += "</tr>";
 
-           return result;
-       }
+            }
+
+            result += "</table>";
+        }
+
+        return result;
+    }
 
     public static String getStateAsHTML(BHP bhp) {
-           String html = "";
-           if (bhp.getState() == STATE_DONE) {
-               html = "&#x2713;";
-           }
-           if (bhp.getState() == STATE_REFUSED) {
-               html = "&#x2717;";
-           }
-           return html;
-       }
+        String html = "";
+        if (bhp.getState() == STATE_DONE) {
+            html = "&#x2713;";
+        }
+        if (bhp.getState() == STATE_REFUSED) {
+            html = "&#x2717;";
+        }
+        return html;
+    }
 
 
 }

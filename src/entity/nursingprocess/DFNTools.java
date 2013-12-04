@@ -78,8 +78,13 @@ public class DFNTools {
             lastdfn = new LocalDate(DateTimeFormat.forPattern("yyyy-MM-dd").parseDateTime(OPDE.getProps().getProperty("LASTDFNIMPORT")));
         }
 
-        if (lastdfn.compareTo(new LocalDate()) >= 0) {
+        if (lastdfn.isAfter(new LocalDate())) {
             throw new IndexOutOfBoundsException("The date of the last import is somewhere in the future. Can't be true.");
+        }
+
+        if (lastdfn.equals(new LocalDate())) {
+            OPDE.info("Today's DFNImport is already done. Stopping.");
+            System.exit(0);
         }
 
         LocalDate targetdate = null;
