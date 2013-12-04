@@ -6,16 +6,18 @@ package op.roster;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.roster.RPlanTools;
-import entity.roster.RosterParameters;
-import entity.roster.Rplan;
-import entity.roster.UserContracts;
+import entity.roster.*;
 import entity.system.Users;
+import op.OPDE;
 import op.tools.SYSCalendar;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.LocalDate;
 
+import javax.persistence.EntityManager;
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.util.HashMap;
 
@@ -60,8 +62,8 @@ public class PnlWorkingLogWeek extends JPanel {
             //======== pnlWeek ========
             {
                 pnlWeek.setLayout(new FormLayout(
-                    "default:grow, $lcgap, default:grow",
-                    "3*(default, $lgap), default"));
+                        "default:grow, $lcgap, default:grow",
+                        "3*(default, $lgap), default"));
             }
             scrollPane1.setViewportView(pnlWeek);
         }
@@ -78,8 +80,6 @@ public class PnlWorkingLogWeek extends JPanel {
     }
 
     private void initPanel() {
-        lblUser.setText(user.getFullname());
-        lblMonth.setText("KW" + week.toString("ww/yyyy"));
 
         int posy = -1;
         int posx = 1;
@@ -102,7 +102,14 @@ public class PnlWorkingLogWeek extends JPanel {
                     }
                 }), CC.xy(posx, posy, CC.FILL, CC.FILL));
             } else {
-                pnlWeek.add(new JLabel("--"), CC.xy(posx, posy, CC.FILL, CC.FILL));
+
+                JPanel pnl = new JPanel(new BorderLayout());
+                pnl.add(BorderLayout.CENTER, new JLabel("Keine Daten / Außerhalb des Zeitraums"));
+                pnl.setBorder(new LineBorder(Color.BLACK, 2));
+                pnl.setPreferredSize(new Dimension(150, 50));
+
+
+                pnlWeek.add(pnl, CC.xy(posx, posy, CC.FILL, CC.FILL));
             }
 
 

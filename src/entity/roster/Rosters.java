@@ -14,7 +14,7 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 @Entity
-public class Rosters {
+public class Rosters implements Comparable<Rosters> {
     @Column(name = "id", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -139,6 +139,11 @@ public class Rosters {
         if (id != rosters.id) return false;
 
         return true;
+    }
+
+    @Override
+    public int compareTo(Rosters o) {
+        return month.compareTo(o.getMonth());
     }
 
     @Override

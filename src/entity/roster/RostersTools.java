@@ -1,13 +1,12 @@
 package entity.roster;
 
 
-import entity.reports.NReport;
+import entity.system.Users;
 import op.OPDE;
 import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.eclipse.persistence.platform.xml.DefaultErrorHandler;
-import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -187,6 +186,46 @@ public class RostersTools {
         }
         return OPDE.lang.getString(stage);
     }
+
+    public static java.util.List<Rosters> getAll(int section, int stage) {
+        ArrayList<Rosters> result = null;
+
+        try {
+            EntityManager em = OPDE.createEM();
+            Query query = em.createQuery("SELECT ro FROM Rosters ro WHERE ro.stage = :stage AND ro.section = :section ORDER BY ro.month ASC ");
+            query.setParameter("stage", stage);
+            query.setParameter("section", section);
+
+
+            result = new ArrayList<Rosters>(query.getResultList());
+
+            em.close();
+
+
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+
+
+        return result;
+    }
+
+
+    public static java.util.List<Users> getAllUsersIn(Rosters roster) {
+           ArrayList<Users> result = null;
+
+           try {
+               EntityManager em = OPDE.createEM();
+               Query query = em.createQuery("SELECT DISTINCT rp.owner FROM Rplan rp WHERE rp.roster = :roster ");
+               query.setParameter("roster", roster);
+               result = new ArrayList<Users>(query.getResultList());
+               em.close();
+           } catch (Exception e) {
+               OPDE.fatal(e);
+           }
+
+           return result;
+       }
 
     /**
      * @return

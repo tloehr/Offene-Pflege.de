@@ -4,6 +4,7 @@
 
 package op.roster;
 
+import javax.swing.border.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.swing.DefaultOverlayable;
@@ -68,6 +69,9 @@ public class PnlWorkingLogDay extends JPanel {
     }
 
     private void btnApplyItemStateChanged(ItemEvent e) {
+
+        lblOKIcon.setIcon(e.getStateChange() == ItemEvent.SELECTED ? SYSConst.icon32apply : null);
+
         if (initPhase) return;
 
         DateTime from = null;
@@ -524,19 +528,21 @@ public class PnlWorkingLogDay extends JPanel {
         pnlList = new JPanel();
         pnlAdditional = new JPanel();
         btnAdd = new JButton();
+        lblOKIcon = new JLabel();
         lblSum = new JLabel();
         btnController = new JToggleButton();
 
         //======== this ========
+        setBorder(new LineBorder(Color.black, 2, true));
         setLayout(new FormLayout(
-            "80dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default",
+            "80dlu, 2*($lcgap, default), $lcgap, default:grow, $lcgap, default",
             "default, $lgap, default"));
 
         //---- btnApply ----
         btnApply.setText("text");
-        btnApply.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/empty.png")));
+        btnApply.setIcon(null);
         btnApply.setHorizontalAlignment(SwingConstants.LEFT);
-        btnApply.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/apply.png")));
+        btnApply.setSelectedIcon(null);
         btnApply.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -555,7 +561,7 @@ public class PnlWorkingLogDay extends JPanel {
             }
             scrl.setViewportView(pnlList);
         }
-        add(scrl, CC.xywh(5, 1, 3, 1, CC.DEFAULT, CC.FILL));
+        add(scrl, CC.xywh(5, 1, 5, 1, CC.DEFAULT, CC.FILL));
 
         //======== pnlAdditional ========
         {
@@ -580,9 +586,13 @@ public class PnlWorkingLogDay extends JPanel {
         });
         add(btnAdd, CC.xy(3, 3));
 
+        //---- lblOKIcon ----
+        lblOKIcon.setText(null);
+        add(lblOKIcon, CC.xy(5, 3));
+
         //---- lblSum ----
         lblSum.setText("text");
-        add(lblSum, CC.xy(5, 3, CC.RIGHT, CC.DEFAULT));
+        add(lblSum, CC.xy(7, 3, CC.RIGHT, CC.DEFAULT));
 
         //---- btnController ----
         btnController.setText(null);
@@ -597,7 +607,7 @@ public class PnlWorkingLogDay extends JPanel {
                 btnControllerItemStateChanged(e);
             }
         });
-        add(btnController, CC.xy(7, 3));
+        add(btnController, CC.xy(9, 3));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
@@ -608,6 +618,7 @@ public class PnlWorkingLogDay extends JPanel {
     private JPanel pnlList;
     private JPanel pnlAdditional;
     private JButton btnAdd;
+    private JLabel lblOKIcon;
     private JLabel lblSum;
     private JToggleButton btnController;
     // JFormDesigner - End of variables declaration  //GEN-END:variables

@@ -1131,59 +1131,68 @@ public class SYSCalendar {
 
 
     public static LocalTime parseLocalTime(String input) throws NumberFormatException {
-            if (input == null || input.equals("")) {
-                throw new NumberFormatException("leere Eingabe");
-            }
-            StringTokenizer st = new StringTokenizer(input, ":,.");
-            if (st.countTokens() < 2 || st.countTokens() > 3) {
-                throw new NumberFormatException("falsches Format");
-            }
-            String sStunde = st.nextToken();
-            String sMinute = st.nextToken();
-            String sSekunde = "00";
-
-            if (st.countTokens() == 1) { // Noch genau einer übrig, kann nur Sekunde sein.
-                sSekunde = st.nextToken();
-            }
-
-            int stunde, minute, sekunde;
-    //           GregorianCalendar now = (GregorianCalendar) gc.clone();
-
-            try {
-                stunde = Integer.parseInt(sStunde);
-            } catch (NumberFormatException nfe) {
-                throw new NumberFormatException("stunde");
-            }
-            try {
-                minute = Integer.parseInt(sMinute);
-            } catch (NumberFormatException nfe) {
-                throw new NumberFormatException("minute");
-            }
-            try {
-                sekunde = Integer.parseInt(sSekunde);
-            } catch (NumberFormatException nfe) {
-                throw new NumberFormatException("Sekunde");
-            }
-
-            if (stunde < 0) {
-                throw new NumberFormatException("stunde");
-            }
-            if (stunde > 23) {
-                throw new NumberFormatException("stunde");
-            }
-            if (minute < 0 || minute > 59) {
-                throw new NumberFormatException("minute");
-            }
-            if (sekunde < 0 || sekunde > 59) {
-                throw new NumberFormatException("Sekunde");
-            }
-
-    //
-    //        now.set(GregorianCalendar.HOUR_OF_DAY, stunde);
-    //        now.set(GregorianCalendar.MINUTE, minute);
-    //        now.set(GregorianCalendar.SECOND, sekunde);
-            return new LocalTime(stunde, minute, sekunde);
+        if (input == null || input.equals("")) {
+            throw new NumberFormatException("leere Eingabe");
         }
+        StringTokenizer st = new StringTokenizer(input, ":,.");
+        if (st.countTokens() < 2 || st.countTokens() > 3) {
+            throw new NumberFormatException("falsches Format");
+        }
+        String sStunde = st.nextToken();
+        String sMinute = st.nextToken();
+        String sSekunde = "00";
+
+        if (st.countTokens() == 1) { // Noch genau einer übrig, kann nur Sekunde sein.
+            sSekunde = st.nextToken();
+        }
+
+        int stunde, minute, sekunde;
+        //           GregorianCalendar now = (GregorianCalendar) gc.clone();
+
+        try {
+            stunde = Integer.parseInt(sStunde);
+        } catch (NumberFormatException nfe) {
+            throw new NumberFormatException("stunde");
+        }
+        try {
+            minute = Integer.parseInt(sMinute);
+        } catch (NumberFormatException nfe) {
+            throw new NumberFormatException("minute");
+        }
+        try {
+            sekunde = Integer.parseInt(sSekunde);
+        } catch (NumberFormatException nfe) {
+            throw new NumberFormatException("Sekunde");
+        }
+
+        if (stunde < 0) {
+            throw new NumberFormatException("stunde");
+        }
+        if (stunde > 23) {
+            throw new NumberFormatException("stunde");
+        }
+        if (minute < 0 || minute > 59) {
+            throw new NumberFormatException("minute");
+        }
+        if (sekunde < 0 || sekunde > 59) {
+            throw new NumberFormatException("Sekunde");
+        }
+
+        //
+        //        now.set(GregorianCalendar.HOUR_OF_DAY, stunde);
+        //        now.set(GregorianCalendar.MINUTE, minute);
+        //        now.set(GregorianCalendar.SECOND, sekunde);
+        return new LocalTime(stunde, minute, sekunde);
+    }
+
+
+    public static LocalDate min(LocalDate a, LocalDate b) {
+        return new LocalDate(Math.min(a.toDateTimeAtStartOfDay().getMillis(), b.toDateTimeAtStartOfDay().getMillis()));
+    }
+
+    public static LocalDate max(LocalDate a, LocalDate b) {
+        return new LocalDate(Math.max(a.toDateTimeAtStartOfDay().getMillis(), b.toDateTimeAtStartOfDay().getMillis()));
+    }
 
 
 }
