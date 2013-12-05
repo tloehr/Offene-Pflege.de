@@ -106,7 +106,7 @@ public class PnlWelcome extends CleanablePanel {
         for (InternalClass ic : OPDE.getAppInfo().getMainClasses()) {
 
             if (!ic.getInternalClassID().equals(internalClassID)
-                    && (!ic.getInternalClassID().equals(PnlDev.internalClassID) || (OPDE.isDebug() && OPDE.isAdmin()))
+                    && (!ic.getInternalClassID().equals(PnlDev.internalClassID) || (OPDE.isExperimental() && OPDE.isAdmin()))
                     && OPDE.getAppInfo().isAllowedTo(InternalClassACL.EXECUTE, ic.getInternalClassID())) {
 
                 final String shortDescription = ic.getShortDescription();

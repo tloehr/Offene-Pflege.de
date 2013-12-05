@@ -24,6 +24,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.OptimisticLockException;
@@ -160,7 +161,7 @@ public class PnlDev extends CleanablePanel {
             }
         }
 
-        ArrayList<Object[]> listCare = DFNTools.getAVGTimesPerDay((DateMidnight) cmbMonth.getSelectedItem());
+        ArrayList<Object[]> listCare = DFNTools.getAVGTimesPerDay((LocalDate) cmbMonth.getSelectedItem());
         // pflege
         int pos = 0;
         for (Object[] objects : listCare) {
@@ -204,7 +205,7 @@ public class PnlDev extends CleanablePanel {
         behand = BigDecimal.ZERO;
 //        priorResident = "";
         pos = 0;
-        ArrayList<Object[]> listMed = BHPTools.getAVGTimesPerDay((DateMidnight) cmbMonth.getSelectedItem());
+        ArrayList<Object[]> listMed = BHPTools.getAVGTimesPerDay((LocalDate) cmbMonth.getSelectedItem());
         // behandlungspflege
         for (Object[] objects : listMed) {
             String rid = objects[0].toString();
@@ -231,7 +232,7 @@ public class PnlDev extends CleanablePanel {
         }
 
         System.out.println("Bewohner[in];Hauswirtschaft;Soziales;Grundpflege;Behandlungspflege;Sonstiges;PS MDK;PS berechnet");
-        System.out.println("Pflegestufen-Auswertung für " + sdf.format(((DateMidnight) cmbMonth.getSelectedItem()).toDate()) + ";;;;;;;");
+        System.out.println("Pflegestufen-Auswertung für " + sdf.format(((LocalDate) cmbMonth.getSelectedItem()).toDate()) + ";;;;;;;");
         // abschluss
         String line = "%s;%s;%s;%s;%s;%s;%s;%s";
         for (Resident res : listResident) {

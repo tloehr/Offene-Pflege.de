@@ -516,7 +516,7 @@ public class DFNTools {
         return dfn.isEmpty() ? null : dfn.get(0);
     }
 
-    public static ArrayList<Object[]> getAVGTimesPerDay(DateMidnight month) {
+    public static ArrayList<Object[]> getAVGTimesPerDay(LocalDate month) {
 
         String mysql = "" +
                 "SELECT i1 j1, (i4 / ?) j3, i3 j4  FROM " +
@@ -534,8 +534,8 @@ public class DFNTools {
         EntityManager em = OPDE.createEM();
         Query query = em.createNativeQuery(mysql);
 
-        DateTime f = month.toDateTime().dayOfMonth().withMinimumValue().secondOfDay().withMinimumValue();
-        DateTime t = month.toDateTime().dayOfMonth().withMaximumValue().secondOfDay().withMaximumValue();
+        DateTime f = month.toDateTimeAtStartOfDay().dayOfMonth().withMinimumValue(); // .secondOfDay().withMinimumValue();
+        DateTime t = month.toDateTimeAtStartOfDay().dayOfMonth().withMaximumValue().secondOfDay().withMaximumValue();
 
 
 //        OPDE.debug("period " + Days.daysBetween(f, t).getDays() + " days");

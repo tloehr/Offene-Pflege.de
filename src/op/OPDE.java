@@ -82,6 +82,7 @@ public class OPDE {
 
     protected static boolean animation = false;
     protected static boolean debug;
+    protected static boolean experimental;
     protected static String opwd = "";
     protected static String css = "";
 
@@ -281,6 +282,10 @@ public class OPDE {
         OPDE.login = login;
     }
 
+    public static boolean isExperimental() {
+        return experimental;
+    }
+
     /**
      * Hier ist die main Methode von OPDE. In dieser Methode wird auch festgestellt, wie OPDE gestartet wurde.
      * <ul>
@@ -380,6 +385,7 @@ public class OPDE {
         Options opts = new Options();
         opts.addOption("h", "hilfe", false, "Gibt die Hilfeseite für OPDE aus.");
         opts.addOption("v", "version", false, "Zeigt die Versionsinformationen an.");
+        opts.addOption("x", "experimental", false, "Schaltet experimentelle Programm-Module für User frei, die Admin Rechte haben. VORSICHT !!!!");
         opts.addOption("a", "anonym", false, "Blendet die Bewohnernamen in allen Ansichten aus. Spezieller Modus für Schulungsmaterial zu erstellen.");
         opts.addOption("l", "debug", false, "Schaltet alle Ausgaben ein auf der Konsole ein, auch die, die eigentlich nur während der Softwareentwicklung angezeigt werden.");
         Option optFTPserver = OptionBuilder.withLongOpt("ftpserver").withArgName("ip or hostname").hasArgs(1).withDescription(lang.getString("cmdline.ftpserver")).create("f");
@@ -501,6 +507,13 @@ public class OPDE {
             } else {
                 debug = false;
                 logger.setLevel(Level.INFO);
+            }
+
+            if (cl.hasOption("x") || SYSTools.catchNull(localProps.getProperty("experimental")).equalsIgnoreCase("true")) {
+                experimental = true;
+
+            } else {
+                experimental = false;
             }
 
 
