@@ -134,6 +134,9 @@ public class UsersTools {
     }
 
     public static UserContracts getContracts(Users user) {
+        if (SYSTools.catchNull(user.getXml()).isEmpty()){
+            return null;
+        }
         UsersXML usersXML = new UsersXML();
 
         SAXParserFactory spf = SAXParserFactory.newInstance();

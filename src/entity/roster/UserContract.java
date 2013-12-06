@@ -1,7 +1,9 @@
 package entity.roster;
 
+import op.tools.SYSConst;
 import org.joda.time.LocalDate;
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,7 +15,7 @@ import java.util.Collections;
  * Time: 14:57
  * To change this template use File | Settings | File Templates.
  */
-public class UserContract {
+public class UserContract implements Comparable<UserContract> {
 
     ContractsParameterSet defaults;
 
@@ -144,5 +146,55 @@ public class UserContract {
             }
         }
         return mySet;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        UserContract that = (UserContract) o;
+
+        if (alterations != null ? !alterations.equals(that.alterations) : that.alterations != null) return false;
+        if (defaults != null ? !defaults.equals(that.defaults) : that.defaults != null) return false;
+        if (extensions != null ? !extensions.equals(that.extensions) : that.extensions != null) return false;
+        if (probations != null ? !probations.equals(that.probations) : that.probations != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = defaults != null ? defaults.hashCode() : 0;
+        result = 31 * result + (probations != null ? probations.hashCode() : 0);
+        result = 31 * result + (extensions != null ? extensions.hashCode() : 0);
+        result = 31 * result + (alterations != null ? alterations.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public int compareTo(UserContract o) {
+        return getDefaults().getFrom().compareTo(o.getDefaults().getFrom());
+    }
+
+    public String getPeriodAsHTML() {
+        String result = "";
+        DateFormat df = DateFormat.getDateInstance();
+        result += "<table id=\"fonttext\" border=\"0\" cellspacing=\"0\">";
+        result += "<tr>";
+        result += "<td valign=\"top\">" + df.format(getDefaults().getFrom().toDate()) + "</td>";
+
+        if (getDefaults().getTo().toDate().equals(SYSConst.LD_UNTIL_FURTHER_NOTICE)){
+            result += "<td valign=\"top\">&raquo;&raquo;</td>";
+            result += "<td valign=\"top\"></td>";
+        } else {
+            result += "<td valign=\"top\">&raquo;</td>";
+            result += "<td valign=\"top\">" + df.format(getDefaults().getTo().toDate()) + "</td>";
+        }
+
+        result += "</tr>\n";
+        result += "</table>\n";
+
+        return result;
     }
 }

@@ -269,7 +269,7 @@ public class PnlUsersWorklog extends CleanablePanel {
         }
         final CollapsiblePane cpRoster = cpMap.get(key);
 
-        String title = "<html><font size=+1><b>" +
+        String title = "<html><font size=+2><b>" +
                 monthFormatter.format(roster.getMonth()) +
                 " (" +
                 RostersTools.getStage(roster) +
@@ -288,7 +288,7 @@ public class PnlUsersWorklog extends CleanablePanel {
             }
         });
 
-        GUITools.addExpandCollapseButtons(cpRoster, cptitle.getRight());
+//        GUITools.addExpandCollapseButtons(cpRoster, cptitle.getRight());
 
         //           if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
         //               final JButton btnPrintWeek = new JButton(SYSConst.icon22print2);
@@ -309,7 +309,7 @@ public class PnlUsersWorklog extends CleanablePanel {
         cpRoster.setTitleLabelComponent(cptitle.getMain());
         cpRoster.setSlidingDirection(SwingConstants.SOUTH);
 
-        cpRoster.setBackground(SYSConst.orange1[SYSConst.medium1]);
+        cpRoster.setBackground(Color.WHITE);
         cpRoster.setOpaque(false);
         cpRoster.setHorizontalAlignment(SwingConstants.LEADING);
         //        cpMonth.setBackground(getColor(vtype, SYSConst.light3));
@@ -331,7 +331,7 @@ public class PnlUsersWorklog extends CleanablePanel {
     }
 
 
-    private CollapsiblePane createCP4Week(final LocalDate week, final Rosters roster, final ArrayList<Users> listUsers) {
+    private CollapsiblePane createCP4(final LocalDate week, final Rosters roster, final ArrayList<Users> listUsers) {
         final String key = weekFormater.format(week.toDate()) + ".week";
         synchronized (cpMap) {
             if (!cpMap.containsKey(key)) {
@@ -374,7 +374,7 @@ public class PnlUsersWorklog extends CleanablePanel {
             }
         });
 
-        GUITools.addExpandCollapseButtons(cpWeek, cptitle.getRight());
+//        GUITools.addExpandCollapseButtons(cpWeek, cptitle.getRight());
 
         //           if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
         //               final JButton btnPrintWeek = new JButton(SYSConst.icon22print2);
@@ -395,9 +395,8 @@ public class PnlUsersWorklog extends CleanablePanel {
         cpWeek.setTitleLabelComponent(cptitle.getMain());
         cpWeek.setSlidingDirection(SwingConstants.SOUTH);
 
-        cpWeek.setBackground(SYSConst.orange1[SYSConst.medium1]);
-        cpWeek.setOpaque(false);
-        cpWeek.setHorizontalAlignment(SwingConstants.LEADING);
+        cpWeek.setBackground(Color.WHITE);
+        cpWeek.setOpaque(false);        cpWeek.setHorizontalAlignment(SwingConstants.LEADING);
         //        cpMonth.setBackground(getColor(vtype, SYSConst.light3));
 
 
@@ -416,83 +415,80 @@ public class PnlUsersWorklog extends CleanablePanel {
         return cpWeek;
     }
 
-//    private CollapsiblePane createCP4(final LocalDate week, final Users user) {
-//        final String key = weekFormater.format(week.toDate()) + "." + user.getUID() + ".weekuser";
-//        synchronized (cpMap) {
-//            if (!cpMap.containsKey(key)) {
-//                cpMap.put(key, new CollapsiblePane());
-//                try {
-//                    cpMap.get(key).setCollapsed(true);
-//                } catch (PropertyVetoException e) {
-//                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//                }
-//
-//            }
-//        }
-//        final CollapsiblePane cpWeek = cpMap.get(key);
-//
-//        String title = "<html><b>" +
-//                user.getFullname() +
-//                "</b>" +
-//                "</font></html>";
-//
-//        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                try {
-//                    cpWeek.setCollapsed(!cpWeek.isCollapsed());
-//                } catch (PropertyVetoException pve) {
-//                    // BAH!
-//                }
-//            }
-//        });
-//
+    private CollapsiblePane createCP4(final LocalDate week, final Rosters roster, final Users user) {
+        final String key = weekFormater.format(week.toDate()) + ".week." + user.getUID() + ".user";
+        synchronized (cpMap) {
+            if (!cpMap.containsKey(key)) {
+                cpMap.put(key, new CollapsiblePane());
+                try {
+                    cpMap.get(key).setCollapsed(true);
+                } catch (PropertyVetoException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+
+            }
+        }
+        final CollapsiblePane cpWeek = cpMap.get(key);
+
+        String title = "<html><b>" +
+                user.getFullname() +
+                "</b>" +
+                "</font></html>";
+
+        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    cpWeek.setCollapsed(!cpWeek.isCollapsed());
+                } catch (PropertyVetoException pve) {
+                    // BAH!
+                }
+            }
+        });
+
 //        GUITools.addExpandCollapseButtons(cpWeek, cptitle.getRight());
-//
-//        //           if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
-//        //               final JButton btnPrintWeek = new JButton(SYSConst.icon22print2);
-//        //               btnPrintWeek.setPressedIcon(SYSConst.icon22print2Pressed);
-//        //               btnPrintWeek.setAlignmentX(Component.RIGHT_ALIGNMENT);
-//        //               btnPrintWeek.setContentAreaFilled(false);
-//        //               btnPrintWeek.setBorder(null);
-//        //               btnPrintWeek.setToolTipText(OPDE.lang.getString("misc.tooltips.btnprintweek"));
-//        //               btnPrintWeek.addActionListener(new ActionListener() {
-//        //                   @Override
-//        //                   public void actionPerformed(ActionEvent actionEvent) {
-//        //                       SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Week(resident, week), false, true, null, null), true);
-//        //                   }
-//        //               });
-//        //               cptitle.getRight().add(btnPrintWeek);
-//        //           }
-//
-//        cpWeek.setTitleLabelComponent(cptitle.getMain());
-//        cpWeek.setSlidingDirection(SwingConstants.SOUTH);
-//
-//        cpWeek.setBackground(SYSConst.orange1[SYSConst.medium1]);
-//        cpWeek.setOpaque(false);
-//        cpWeek.setHorizontalAlignment(SwingConstants.LEADING);
-//        //        cpMonth.setBackground(getColor(vtype, SYSConst.light3));
-//
-//
-//        cpWeek.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
-//            @Override
-//            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-//                Users user = EntityTools.find(Users.class, "glaumann");
-//                Rosters roster = EntityTools.find(Rosters.class, 6l);
-//                RosterParameters rosterParameters = RostersTools.getParameters(roster);
-//                UserContracts userContracts = UsersTools.getContracts(user);
-//
-//                pnlWorklog.add(new PnlWorkingLogWeek(user, new LocalDate(roster.getMonth()).plusWeeks(1), rosterParameters, userContracts));
-//                cpWeek.setContentPane();
-//            }
-//        });
-//
-//        if (!cpWeek.isCollapsed()) {
-//            cpWeek.setContentPane(createWeekContentPanel4(week));
-//        }
-//
-//        return cpWeek;
-//    }
+
+        //           if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.PRINT, internalClassID)) {
+        //               final JButton btnPrintWeek = new JButton(SYSConst.icon22print2);
+        //               btnPrintWeek.setPressedIcon(SYSConst.icon22print2Pressed);
+        //               btnPrintWeek.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        //               btnPrintWeek.setContentAreaFilled(false);
+        //               btnPrintWeek.setBorder(null);
+        //               btnPrintWeek.setToolTipText(OPDE.lang.getString("misc.tooltips.btnprintweek"));
+        //               btnPrintWeek.addActionListener(new ActionListener() {
+        //                   @Override
+        //                   public void actionPerformed(ActionEvent actionEvent) {
+        //                       SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Week(resident, week), false, true, null, null), true);
+        //                   }
+        //               });
+        //               cptitle.getRight().add(btnPrintWeek);
+        //           }
+
+        cpWeek.setTitleLabelComponent(cptitle.getMain());
+        cpWeek.setSlidingDirection(SwingConstants.SOUTH);
+
+        cpWeek.setBackground(Color.WHITE);
+        cpWeek.setOpaque(false);
+        cpWeek.setHorizontalAlignment(SwingConstants.LEADING);
+        //        cpMonth.setBackground(getColor(vtype, SYSConst.light3));
+
+        cpWeek.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+            @Override
+            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+                RosterParameters rosterParameters = RostersTools.getParameters(roster);
+                UserContracts userContracts = UsersTools.getContracts(user);
+                cpWeek.setContentPane(new PnlWorkingLogWeek(user, week, rosterParameters, userContracts));
+            }
+        });
+
+        if (!cpWeek.isCollapsed()) {
+            RosterParameters rosterParameters = RostersTools.getParameters(roster);
+            UserContracts userContracts = UsersTools.getContracts(user);
+            cpWeek.setContentPane(new PnlWorkingLogWeek(user, week, rosterParameters, userContracts));
+        }
+
+        return cpWeek;
+    }
 
     private JPanel createContentPane4(final Rosters roster) {
         JPanel pnlMonth = new JPanel(new VerticalLayout());
@@ -510,19 +506,23 @@ public class PnlUsersWorklog extends CleanablePanel {
         } else if (listAllPossibleUsers.contains(OPDE.getLogin().getUser())) {
             listUsers.add(OPDE.getLogin().getUser());
         }
+        Collections.sort(listUsers);
         listAllPossibleUsers.clear();
 
         final LocalDate start = SYSCalendar.bow(SYSCalendar.bom(month));
         final LocalDate end = SYSCalendar.bow(SYSCalendar.eom(month));
 
         for (LocalDate week = start; !week.isAfter(end); week = week.plusWeeks(1)) {
-            pnlMonth.add(createCP4Week(week, roster, listUsers));
+            pnlMonth.add(createCP4(week, roster, listUsers));
         }
 
         return pnlMonth;
     }
 
     private JPanel createContentPane4(final LocalDate week, final Rosters roster, ArrayList<Users> listUsers) {
+
+        JPanel pnlWeek = new JPanel(new VerticalLayout());
+        pnlWeek.setOpaque(false);
 
 
 //        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID) || OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, internalClassID)) {
@@ -531,23 +531,18 @@ public class PnlUsersWorklog extends CleanablePanel {
 
         // hier muss noch eine weitere Unterteilung rein
 
-        RosterParameters rosterParameters = RostersTools.getParameters(roster);
-        UserContracts userContracts = UsersTools.getContracts(user);
+        for (Users user : listUsers) {
+            pnlWeek.add(createCP4(week, roster, user));
+        }
 
-        return new PnlWorkingLogWeek(user, week, rosterParameters, userContracts);
+
+        return pnlWeek;
+
+        //
 
     }
 
     private void reloadDisplay() {
-        /***
-         *               _                 _ ____  _           _
-         *      _ __ ___| | ___   __ _  __| |  _ \(_)___ _ __ | | __ _ _   _
-         *     | '__/ _ \ |/ _ \ / _` |/ _` | | | | / __| '_ \| |/ _` | | | |
-         *     | | |  __/ | (_) | (_| | (_| | |_| | \__ \ |_) | | (_| | |_| |
-         *     |_|  \___|_|\___/ \__,_|\__,_|____/|_|___/ .__/|_|\__,_|\__, |
-         *                                              |_|            |___/
-         */
-
         synchronized (contentmap) {
             SYSTools.clear(contentmap);
         }
@@ -568,6 +563,7 @@ public class PnlUsersWorklog extends CleanablePanel {
 
                 EntityManager em = OPDE.createEM();
                 synchronized (lstAllRosters) {
+                    lstAllRosters.addAll(RostersTools.getAll(RostersTools.SECTION_CARE, RostersTools.STAGE_PLANNING));
                     lstAllRosters.addAll(RostersTools.getAll(RostersTools.SECTION_CARE, RostersTools.STAGE_ACTIVE));
                     lstRosters.setModel(SYSTools.list2dlm(lstAllRosters));
                 }

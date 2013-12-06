@@ -20,6 +20,7 @@ import entity.system.SYSPropsTools;
 import entity.system.Users;
 import entity.system.UsersTools;
 import op.OPDE;
+import op.threads.DisplayMessage;
 import op.tools.GUITools;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -97,7 +98,6 @@ public class FrmRoster extends JFrame {
         initComponents();
         initFrame();
 
-        setVisible(true);
 
     }
 
@@ -137,249 +137,277 @@ public class FrmRoster extends JFrame {
 
     private void initFrame() {
 
-        btnLock.setIcon(readOnly ? SYSConst.icon22encrypted : SYSConst.icon22decrypted);
-        btnLock.setEnabled(readOnly);
 
-        ObjectConverterManager.initDefaultConverter();
-        CellEditorManager.initDefaultEditor();
-        CellRendererManager.initDefaultRenderer();
-//        CellRendererManager.registerRenderer(String.class, new DefaultTableCellRenderer() {
-//            @Override
-//            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-//                Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-//                if (comp instanceof JLabel) {
-////                    comp.setFont(SYSConst.ARIAL20);
-//                }
-//                return comp;
-//            }
-//        });
+        OPDE.getMainframe().setBlocked(true);
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
 
-        ObjectConverterManager.registerConverter(Homes.class, new ObjectConverter() {
-            @Override
-            public String toString(Object o, ConverterContext converterContext) {
-                return o instanceof Homes ? ((Homes) o).getShortname() : "";
-            }
+        SwingWorker worker = new SwingWorker() {
 
             @Override
-            public boolean supportToString(Object o, ConverterContext converterContext) {
-                return true;
-            }
+            protected Object doInBackground() throws Exception {
 
-            @Override
-            public Object fromString(String s, ConverterContext converterContext) {
+                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), 10, 100));
+
+                btnLock.setIcon(readOnly ? SYSConst.icon22encrypted : SYSConst.icon22decrypted);
+                btnLock.setEnabled(readOnly);
+
+                ObjectConverterManager.initDefaultConverter();
+                CellEditorManager.initDefaultEditor();
+                CellRendererManager.initDefaultRenderer();
+                //        CellRendererManager.registerRenderer(String.class, new DefaultTableCellRenderer() {
+                //            @Override
+                //            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                //                Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                //                if (comp instanceof JLabel) {
+                ////                    comp.setFont(SYSConst.ARIAL20);
+                //                }
+                //                return comp;
+                //            }
+                //        });
+
+                ObjectConverterManager.registerConverter(Homes.class, new ObjectConverter() {
+                    @Override
+                    public String toString(Object o, ConverterContext converterContext) {
+                        return o instanceof Homes ? ((Homes) o).getShortname() : "";
+                    }
+
+                    @Override
+                    public boolean supportToString(Object o, ConverterContext converterContext) {
+                        return true;
+                    }
+
+                    @Override
+                    public Object fromString(String s, ConverterContext converterContext) {
+                        return null;
+                    }
+
+                    @Override
+                    public boolean supportFromString(String s, ConverterContext converterContext) {
+                        return false;
+                    }
+                });
+
+                ObjectConverterManager.registerConverter(Users.class, new ObjectConverter() {
+                    @Override
+                    public String toString(Object o, ConverterContext converterContext) {
+                        return o instanceof Users ? ((Users) o).getName() : "";
+                    }
+
+                    @Override
+                    public boolean supportToString(Object o, ConverterContext converterContext) {
+                        return true;
+                    }
+
+                    @Override
+                    public Object fromString(String s, ConverterContext converterContext) {
+                        return null;
+                    }
+
+                    @Override
+                    public boolean supportFromString(String s, ConverterContext converterContext) {
+                        return false;
+                    }
+                });
+
+                CellEditorManager.registerEditor(Homes.class, new CellEditorFactory() {
+                    public CellEditor create() {
+                        return new ExComboBoxCellEditor() {
+                            ExComboBox myEditor;
+
+                            @Override
+                            public ExComboBox createExComboBox() {
+                                myEditor = new ListExComboBox(HomesTools.getAll().toArray());
+                                myEditor.setRenderer(HomesTools.getRenderer());
+                                //                        myEditor.setFont(SYSConst.ARIAL20);
+                                return myEditor;
+                            }
+
+                            @Override
+                            public void setCellEditorValue(Object o) {
+                                Homes myHome = (Homes) o;
+                                myEditor.setSelectedItem(myHome);
+                            }
+
+                            @Override
+                            public boolean isCellEditable(EventObject eventObject) {
+                                if (eventObject instanceof MouseEvent) {
+                                    return ((MouseEvent) eventObject).getClickCount() >= 2;
+                                }
+                                return true;
+
+                            }
+                        };
+                    }
+                }, new EditorContext("HomesSelectionEditor"));
+
+                CellEditorManager.registerEditor(Users.class, new CellEditorFactory() {
+                    public CellEditor create() {
+                        return new ExComboBoxCellEditor() {
+                            ExComboBox myEditor;
+
+                            @Override
+                            public ExComboBox createExComboBox() {
+                                ArrayList<Users> listAllAllowedUsers = new ArrayList<Users>(UsersTools.getUsersWithValidContractsIn(new LocalDate(roster.getMonth())).keySet());
+                                Collections.sort(listAllAllowedUsers);
+
+                                myEditor = new ListExComboBox(listAllAllowedUsers.toArray());
+                                myEditor.setRenderer(UsersTools.getRenderer());
+                                myEditor.setFont(SYSConst.ARIAL20);
+                                return myEditor;
+                            }
+
+                            @Override
+                            public void setCellEditorValue(Object o) {
+                                if (o instanceof Users) {
+                                    //                            Users myUser = (Users) o;
+                                    myEditor.setSelectedItem(o);
+                                }
+                            }
+
+                            @Override
+                            public boolean isCellEditable(EventObject eventObject) {
+                                if (eventObject instanceof MouseEvent) {
+                                    return ((MouseEvent) eventObject).getClickCount() >= 2;
+                                }
+                                return true;
+
+                            }
+                        };
+                    }
+                }, new EditorContext("UserSelectionEditor"));
+
+                CellEditorManager.registerEditor(String.class, new CellEditorFactory() {
+                    public CellEditor create() {
+                        return new TextFieldCellEditor(String.class) {
+                            JTextField myEditor;
+
+                            @Override
+                            protected JTextField createTextField() {
+                                myEditor = super.createTextField();
+                                //                        myEditor.setFont(SYSConst.ARIAL20);
+                                return myEditor;
+                            }
+
+                            @Override
+                            public void setCellEditorValue(Object o) {
+                                myEditor.setText(o.toString());
+                            }
+
+                            @Override
+                            public boolean isCellEditable(EventObject eventObject) {
+                                if (eventObject instanceof MouseEvent) {
+                                    return ((MouseEvent) eventObject).getClickCount() >= 2;
+                                }
+                                return true;
+
+                            }
+                        };
+                    }
+                }, new EditorContext("DefaultTextEditor"));
+
+
+                tmRoster = new TMRoster(roster, readOnly, fonts[currentFontIndex], new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        OPDE.debug(((BigDecimal) o).toString() + " %");
+                    }
+                });
+                btnFontSize.setText(fonts[currentFontIndex].getFontName() + ", " + fonts[currentFontIndex].getSize());
+
+
+                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), 20, 100));
+
+                TMRosterHeader tmRosterHeader = new TMRosterHeader(tmRoster);
+                TMRosterFooter tmRosterFooter = new TMRosterFooter(tmRoster);
+
+
+                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), 30, 100));
+
+                tsp1 = new TableScrollPane(tmRoster, tmRosterHeader, tmRosterFooter, false);
+
+                TableUtils.unifyTableCellSelection(tsp1.getAllChildTables(), tsp1.getMainTable());
+                TableUtils.unifyTableColumnSelection(tsp1.getAllChildTables());
+                TableUtils.unifyTableRowSelection(tsp1.getAllChildTables());
+
+                tsp1.getColumnHeaderTable().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+                tsp1.getColumnFooterTable().setAutoResizeMode(JideTable.AUTO_RESIZE_FILL);
+                tsp1.getMainTable().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), 40, 100));
+
+                int progress = 40;
+
+                //
+                for (final JTable jTable : tsp1.getAllChildTables()) {
+                    jTable.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mousePressed(MouseEvent e) {
+                            mousePressedOnTable(e, jTable);
+                        }
+                    });
+
+                    TableUtils.autoResizeAllRows(jTable);
+                    progress = progress + 5;
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 100));
+                }
+
+
+                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), 70, 100));
+
+                blockHeaders();
+                hotkeys();
+
+                tsp1.getRowHeaderTable().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+                tsp1.getRowFooterTable().setAutoResizeMode(JideTable.AUTO_RESIZE_FILL);
+
+                CellConstraints c = new CellConstraints();
+                add(tsp1, c.xy(3, 3, CellConstraints.FILL, CellConstraints.FILL));
+
+                tsp1.addComponentListener(new ComponentAdapter() {
+                    @Override
+                    public void componentResized(ComponentEvent evt) {
+                        super.componentResized(evt);
+                        tsp1.getRowHeaderTable().getColumnModel().getColumn(0).setPreferredWidth(120);
+                        tsp1.getRowHeaderTable().getColumnModel().getColumn(1).setPreferredWidth(450);
+                        //                tsp1.getRowHeaderTable().getColumnModel().getColumn(2).setPreferredWidth(200);
+                        for (int col = 0; col < tsp1.getMainTable().getColumnCount(); col++) {  //(int day = 0; day < new LocalDate(roster.getMonth()).dayOfMonth().withMaximumValue().getDayOfMonth(); day++) {
+                            tsp1.getMainTable().getColumnModel().getColumn(col).setPreferredWidth(100);
+
+                        }
+                    }
+                });
+
+                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), 90, 100));
+
+                tsp1.setRowSelectionAllowed(false);
+                tsp1.setColumnSelectionAllowed(false);
+                tsp1.setAllowMultiSelectionInDifferentTable(false);
+                tsp1.setCellSelectionEnabled(true);
+
+
+                tsp1.addPropertyChangeListener(new PropertyChangeListener() {
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        OPDE.debug(evt.getPropertyName() + ":" + evt.getNewValue());
+                    }
+                });
+
+                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), 100, 100));
+
                 return null;
             }
 
             @Override
-            public boolean supportFromString(String s, ConverterContext converterContext) {
-                return false;
-            }
-        });
+            protected void done() {
 
-        ObjectConverterManager.registerConverter(Users.class, new ObjectConverter() {
-            @Override
-            public String toString(Object o, ConverterContext converterContext) {
-                return o instanceof Users ? ((Users) o).getName() : "";
+
+                OPDE.getDisplayManager().setProgressBarMessage(null);
+                OPDE.getMainframe().setBlocked(false);
+                setVisible(true);
             }
 
-            @Override
-            public boolean supportToString(Object o, ConverterContext converterContext) {
-                return true;
-            }
-
-            @Override
-            public Object fromString(String s, ConverterContext converterContext) {
-                return null;
-            }
-
-            @Override
-            public boolean supportFromString(String s, ConverterContext converterContext) {
-                return false;
-            }
-        });
-
-        CellEditorManager.registerEditor(Homes.class, new CellEditorFactory() {
-            public CellEditor create() {
-                return new ExComboBoxCellEditor() {
-                    ExComboBox myEditor;
-
-                    @Override
-                    public ExComboBox createExComboBox() {
-                        myEditor = new ListExComboBox(HomesTools.getAll().toArray());
-                        myEditor.setRenderer(HomesTools.getRenderer());
-//                        myEditor.setFont(SYSConst.ARIAL20);
-                        return myEditor;
-                    }
-
-                    @Override
-                    public void setCellEditorValue(Object o) {
-                        Homes myHome = (Homes) o;
-                        myEditor.setSelectedItem(myHome);
-                    }
-
-                    @Override
-                    public boolean isCellEditable(EventObject eventObject) {
-                        if (eventObject instanceof MouseEvent) {
-                            return ((MouseEvent) eventObject).getClickCount() >= 2;
-                        }
-                        return true;
-
-                    }
-                };
-            }
-        }, new EditorContext("HomesSelectionEditor"));
-
-        CellEditorManager.registerEditor(Users.class, new CellEditorFactory() {
-            public CellEditor create() {
-                return new ExComboBoxCellEditor() {
-                    ExComboBox myEditor;
-
-                    @Override
-                    public ExComboBox createExComboBox() {
-                        ArrayList<Users> listAllAllowedUsers = new ArrayList<Users>(UsersTools.getUsersWithValidContractsIn(new LocalDate(roster.getMonth())).keySet());
-                        Collections.sort(listAllAllowedUsers);
-
-                        myEditor = new ListExComboBox(listAllAllowedUsers.toArray());
-                        myEditor.setRenderer(UsersTools.getRenderer());
-                        myEditor.setFont(SYSConst.ARIAL20);
-                        return myEditor;
-                    }
-
-                    @Override
-                    public void setCellEditorValue(Object o) {
-                        if (o instanceof Users) {
-//                            Users myUser = (Users) o;
-                            myEditor.setSelectedItem(o);
-                        }
-                    }
-
-                    @Override
-                    public boolean isCellEditable(EventObject eventObject) {
-                        if (eventObject instanceof MouseEvent) {
-                            return ((MouseEvent) eventObject).getClickCount() >= 2;
-                        }
-                        return true;
-
-                    }
-                };
-            }
-        }, new EditorContext("UserSelectionEditor"));
-
-        CellEditorManager.registerEditor(String.class, new CellEditorFactory() {
-            public CellEditor create() {
-                return new TextFieldCellEditor(String.class) {
-                    JTextField myEditor;
-
-                    @Override
-                    protected JTextField createTextField() {
-                        myEditor = super.createTextField();
-//                        myEditor.setFont(SYSConst.ARIAL20);
-                        return myEditor;
-                    }
-
-                    @Override
-                    public void setCellEditorValue(Object o) {
-                        myEditor.setText(o.toString());
-                    }
-
-                    @Override
-                    public boolean isCellEditable(EventObject eventObject) {
-                        if (eventObject instanceof MouseEvent) {
-                            return ((MouseEvent) eventObject).getClickCount() >= 2;
-                        }
-                        return true;
-
-                    }
-                };
-            }
-        }, new EditorContext("DefaultTextEditor"));
-
-
-        tmRoster = new TMRoster(roster, readOnly, fonts[currentFontIndex], new Closure() {
-            @Override
-            public void execute(Object o) {
-                OPDE.debug(((BigDecimal) o).toString() + " %");
-            }
-        });
-        btnFontSize.setText(fonts[currentFontIndex].getFontName() + ", " + fonts[currentFontIndex].getSize());
-
-
-        OPDE.debug("1...");
-
-        TMRosterHeader tmRosterHeader = new TMRosterHeader(tmRoster);
-        TMRosterFooter tmRosterFooter = new TMRosterFooter(tmRoster);
-
-
-        OPDE.debug("2...");
-
-        tsp1 = new TableScrollPane(tmRoster, tmRosterHeader, tmRosterFooter, false);
-
-        TableUtils.unifyTableCellSelection(tsp1.getAllChildTables(), tsp1.getMainTable());
-        TableUtils.unifyTableColumnSelection(tsp1.getAllChildTables());
-        TableUtils.unifyTableRowSelection(tsp1.getAllChildTables());
-
-        tsp1.getColumnHeaderTable().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        tsp1.getColumnFooterTable().setAutoResizeMode(JideTable.AUTO_RESIZE_FILL);
-        tsp1.getMainTable().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-
-        OPDE.debug("3...");
-
-//
-        for (final JTable jTable : tsp1.getAllChildTables()) {
-            jTable.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    mousePressedOnTable(e, jTable);
-                }
-            });
-
-
-            OPDE.debug("..");
-
-            TableUtils.autoResizeAllRows(jTable);
-
-        }
-
-
-        OPDE.debug("4...");
-
-        blockHeaders();
-        hotkeys();
-
-        tsp1.getRowHeaderTable().setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        tsp1.getRowFooterTable().setAutoResizeMode(JideTable.AUTO_RESIZE_FILL);
-
-        CellConstraints c = new CellConstraints();
-        add(tsp1, c.xy(3, 3, CellConstraints.FILL, CellConstraints.FILL));
-
-        tsp1.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent evt) {
-                super.componentResized(evt);
-                tsp1.getRowHeaderTable().getColumnModel().getColumn(0).setPreferredWidth(120);
-                tsp1.getRowHeaderTable().getColumnModel().getColumn(1).setPreferredWidth(450);
-//                tsp1.getRowHeaderTable().getColumnModel().getColumn(2).setPreferredWidth(200);
-                for (int col = 0; col < tsp1.getMainTable().getColumnCount(); col++) {  //(int day = 0; day < new LocalDate(roster.getMonth()).dayOfMonth().withMaximumValue().getDayOfMonth(); day++) {
-                    tsp1.getMainTable().getColumnModel().getColumn(col).setPreferredWidth(100);
-
-                }
-//                tsp1.getRowFooterTable().getColumnModel().getColumn(0).setPreferredWidth(140);
-            }
-        });
-
-        tsp1.setRowSelectionAllowed(false);
-        tsp1.setColumnSelectionAllowed(false);
-        tsp1.setAllowMultiSelectionInDifferentTable(false);
-        tsp1.setCellSelectionEnabled(true);
-
-
-
-        tsp1.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                OPDE.debug(evt.getPropertyName() + ":" + evt.getNewValue());
-            }
-        });
+        };
+        worker.execute();
 
 
     }
@@ -419,8 +447,8 @@ public class FrmRoster extends JFrame {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "default, $lcgap, default:grow, $lcgap, default",
-            "default, $lgap, default:grow, 2*($lgap, default)"));
+                "default, $lcgap, default:grow, $lcgap, default",
+                "default, $lgap, default:grow, 2*($lgap, default)"));
 
         //======== toolBar1 ========
         {

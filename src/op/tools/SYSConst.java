@@ -28,6 +28,7 @@ package op.tools;
 
 import op.OPDE;
 import op.system.AppInfo;
+import org.joda.time.LocalDate;
 
 import javax.swing.*;
 import java.awt.*;
@@ -230,6 +231,8 @@ public class SYSConst {
     public static final GregorianCalendar UNTIL_FURTHER_NOTICE = new GregorianCalendar(9999, GregorianCalendar.DECEMBER, 31, 23, 59, 59);
     public static final Date DATE_THE_VERY_BEGINNING = new Date(VERY_BEGINNING.getTimeInMillis());
     public static final Date DATE_UNTIL_FURTHER_NOTICE = new Date(UNTIL_FURTHER_NOTICE.getTimeInMillis());
+    public static final LocalDate LD_THE_VERY_BEGINNING = new LocalDate(VERY_BEGINNING.getTimeInMillis());
+    public static final LocalDate LD_UNTIL_FURTHER_NOTICE = new LocalDate(UNTIL_FURTHER_NOTICE.getTimeInMillis());
 
     public static final String UNITS[] = {"", OPDE.lang.getString("misc.msg.piece"), "ml", "l", "mg", "g", "cm", "m"};
 

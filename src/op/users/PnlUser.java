@@ -198,20 +198,18 @@ public class PnlUser extends CleanablePanel {
             }
             tabMain.addTab("text", jspUsers);
 
-
             //======== jspGroups ========
             {
 
                 //======== cpsGroups ========
                 {
                     cpsGroups.setLayout(new FormLayout(
-                            "default, $lcgap, default",
-                            "2*(default, $lgap), default"));
+                        "default, $lcgap, default",
+                        "2*(default, $lgap), default"));
                 }
                 jspGroups.setViewportView(cpsGroups);
             }
             tabMain.addTab("text", jspGroups);
-
         }
         add(tabMain);
     }// </editor-fold>//GEN-END:initComponents
