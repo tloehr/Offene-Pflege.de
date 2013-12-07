@@ -10,27 +10,33 @@ import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
+import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.JideBoxLayout;
 import entity.roster.Rosters;
+import entity.roster.RostersTools;
 import entity.roster.UserContract;
 import entity.roster.UserContracts;
 import entity.system.Users;
 import entity.system.UsersTools;
 import op.OPDE;
+import op.system.InternalClassACL;
 import op.threads.DisplayMessage;
 import op.tools.DefaultCPTitle;
 import op.tools.MyJDialog;
+import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
+import org.jdesktop.swingx.VerticalLayout;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.beans.PropertyVetoException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +50,8 @@ public class DlgUser extends MyJDialog {
     private Closure callback;
     private Map<String, CollapsiblePane> cpMap;
     UserContracts userContracts;
+    private JLabel lblFirstname, lblName, lblPW, lblUID, lblEmail;
+    private JTextField txtName, txtEMail, txtVorname, txtPW, txtUID;
 
     public DlgUser(Users user, Closure callback) {
         super(false);
@@ -51,6 +59,7 @@ public class DlgUser extends MyJDialog {
         this.callback = callback;
         initComponents();
         initDialog();
+        pack();
         setVisible(true);
     }
 
@@ -75,19 +84,52 @@ public class DlgUser extends MyJDialog {
             cpsContracts.addExpansion();
         }
 
-        lblFirstname.setText(OPDE.lang.getString("misc.msg.firstname"));
-        lblName.setText(OPDE.lang.getString("misc.msg.name"));
-        lblPW.setText(OPDE.lang.getString("misc.msg.password"));
-        lblUID.setText(OPDE.lang.getString("misc.msg.uid"));
-        lblEmail.setText(OPDE.lang.getString("misc.msg.email"));
 
-        txtName.setText(user.getName());
-        txtEMail.setText(user.getEMail());
-        txtVorname.setText(user.getVorname());
-        txtUID.setText(user.getUID());
+        lblFirstname = new JLabel(OPDE.lang.getString("misc.msg.firstname"));
+        lblName = new JLabel(OPDE.lang.getString("misc.msg.name"));
+        lblPW = new JLabel(OPDE.lang.getString("misc.msg.password"));
+        lblUID = new JLabel(OPDE.lang.getString("misc.msg.uid"));
+        lblEmail = new JLabel(OPDE.lang.getString("misc.msg.email"));
+
+        txtName = new JTextField(user.getName());
+        txtEMail = new JTextField(user.getEMail());
+        txtVorname = new JTextField(user.getVorname());
+        txtUID = new JTextField(user.getUID());
+        txtPW = new JTextField();
+
+        DefaultOverlayable overUID = new DefaultOverlayable(txtUID);
+//        lblUID.setHorizontalTextPosition(SwingConstants.TRAILING);
+        lblUID.setForeground(Color.LIGHT_GRAY);
+        overUID.addOverlayComponent(lblUID,SwingConstants.EAST);
+
+        pnlMain.add(overUID, CC.xy(3, 3, CC.FILL, CC.DEFAULT));
+
+        DefaultOverlayable overFirstname = new DefaultOverlayable(txtVorname);
+        lblFirstname.setHorizontalTextPosition(SwingConstants.TRAILING);
+        lblFirstname.setForeground(Color.LIGHT_GRAY);
+        overFirstname.addOverlayComponent(lblFirstname);
+        pnlMain.add(overFirstname, CC.xy(3, 5, CC.FILL, CC.DEFAULT));
+
+        DefaultOverlayable overName = new DefaultOverlayable(txtName);
+        lblName.setForeground(Color.LIGHT_GRAY);
+        overName.addOverlayComponent(lblName);
+        pnlMain.add(overName, CC.xy(3, 7, CC.FILL, CC.DEFAULT));
+
+        DefaultOverlayable overEmail = new DefaultOverlayable(txtEMail);
+        lblEmail.setForeground(Color.LIGHT_GRAY);
+        overEmail.addOverlayComponent(lblEmail);
+        pnlMain.add(overEmail, CC.xy(3, 9, CC.FILL, CC.DEFAULT));
+
+        DefaultOverlayable overPW = new DefaultOverlayable(txtPW);
+        lblPW.setForeground(Color.LIGHT_GRAY);
+        overPW.addOverlayComponent(lblPW);
+        pnlMain.add(overPW, CC.xy(3, 11, CC.FILL, CC.DEFAULT));
+
 
         txtPW.setEnabled(user.getUID() == null);
         txtUID.setEnabled(user.getUID() == null);
+
+
     }
 
     private void txtNameFocusLost(FocusEvent e) {
@@ -161,7 +203,7 @@ public class DlgUser extends MyJDialog {
 
             }
         }
-        final CollapsiblePane cpRoster = cpMap.get(key);
+        final CollapsiblePane cpContract = cpMap.get(key);
 
         String title = "<html>" + contract.getPeriodAsHTML() + "</html>";
 
@@ -169,51 +211,67 @@ public class DlgUser extends MyJDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    cpRoster.setCollapsed(!cpRoster.isCollapsed());
+                    cpContract.setCollapsed(!cpContract.isCollapsed());
                 } catch (PropertyVetoException pve) {
                     // BAH!
                 }
             }
         });
 
-        cpRoster.setTitleLabelComponent(cptitle.getMain());
-        cpRoster.setSlidingDirection(SwingConstants.SOUTH);
+        cpContract.setTitleLabelComponent(cptitle.getMain());
+        cpContract.setSlidingDirection(SwingConstants.SOUTH);
 
-        cpRoster.setBackground(Color.WHITE);
-        cpRoster.setOpaque(false);
-        cpRoster.setHorizontalAlignment(SwingConstants.LEADING);
+        cpContract.setBackground(Color.WHITE);
+        cpContract.setOpaque(false);
+        cpContract.setHorizontalAlignment(SwingConstants.LEADING);
 
-        cpRoster.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+        cpContract.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-//                cpRoster.setContentPane(createContentPane4(roster));
+                cpContract.setContentPane(createContentPane4(roster));
             }
         });
 
-        if (!cpRoster.isCollapsed()) {
+        if (!cpContract.isCollapsed()) {
 //            cpRoster.setContentPane(createContentPane4(roster));
         }
 
 
-        return cpRoster;
+        return cpContract;
     }
+
+
+    private JPanel createContentPane4(final UserContract contract) {
+            JPanel pnlContract = new JPanel(new VerticalLayout());
+            pnlContract.setOpaque(false);
+            LocalDate month = new LocalDate(roster.getMonth());
+
+            ArrayList<Users> listAllPossibleUsers = new ArrayList<Users>(RostersTools.getAllUsersIn(roster));
+            ArrayList<Users> listUsers = new ArrayList<Users>();
+            if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID) || OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, internalClassID)) {
+                listUsers.addAll(listAllPossibleUsers);
+            } else if (listAllPossibleUsers.contains(OPDE.getLogin().getUser())) {
+                listUsers.add(OPDE.getLogin().getUser());
+            }
+            Collections.sort(listUsers);
+            listAllPossibleUsers.clear();
+
+            final LocalDate start = SYSCalendar.bow(SYSCalendar.bom(month));
+            final LocalDate end = SYSCalendar.bow(SYSCalendar.eom(month));
+
+            for (LocalDate week = start; !week.isAfter(end); week = week.plusWeeks(1)) {
+                pnlContract.add(createCP4(week, roster, listUsers));
+            }
+
+            return pnlContract;
+        }
 
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
-        jPanel4 = new JPanel();
-        lblUID = new JLabel();
-        txtUID = new JTextField();
+        pnlMain = new JPanel();
         scrlContracts = new JScrollPane();
         cpsContracts = new CollapsiblePanes();
-        lblFirstname = new JLabel();
-        txtVorname = new JTextField();
-        lblEmail = new JLabel();
-        lblName = new JLabel();
-        txtName = new JTextField();
-        txtEMail = new JTextField();
-        lblPW = new JLabel();
-        txtPW = new JTextField();
         jPanel3 = new JPanel();
         btnCancel = new JButton();
         btnSave = new JButton();
@@ -222,78 +280,17 @@ public class DlgUser extends MyJDialog {
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
 
-        //======== jPanel4 ========
+        //======== pnlMain ========
         {
-            jPanel4.setLayout(new FormLayout(
-                    "14dlu, $lcgap, default, $lcgap, default:grow, $ugap, 14dlu:grow, $lcgap, default",
-                    "14dlu, 4*($lgap, fill:default), $lgap, default, 9dlu, default, $lgap, 14dlu"));
-
-            //---- lblUID ----
-            lblUID.setText("UKennung");
-            lblUID.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel4.add(lblUID, CC.xy(3, 3));
-
-            //---- txtUID ----
-            txtUID.setColumns(10);
-            txtUID.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel4.add(txtUID, CC.xy(5, 3));
+            pnlMain.setLayout(new FormLayout(
+                "14dlu, $lcgap, 160dlu:grow, $ugap, 229dlu:grow, $lcgap, 14dlu",
+                "14dlu, 4*($lgap, fill:default), $lgap, default, 9dlu, default, $lgap, 14dlu"));
 
             //======== scrlContracts ========
             {
                 scrlContracts.setViewportView(cpsContracts);
             }
-            jPanel4.add(scrlContracts, CC.xywh(7, 3, 1, 9));
-
-            //---- lblFirstname ----
-            lblFirstname.setText("Vorname");
-            lblFirstname.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel4.add(lblFirstname, CC.xy(3, 5));
-
-            //---- txtVorname ----
-            txtVorname.setDragEnabled(false);
-            txtVorname.setFont(new Font("Arial", Font.PLAIN, 14));
-            txtVorname.addFocusListener(new FocusAdapter() {
-                @Override
-                public void focusLost(FocusEvent e) {
-                    txtVornameFocusLost(e);
-                }
-            });
-            jPanel4.add(txtVorname, CC.xy(5, 5));
-
-            //---- lblEmail ----
-            lblEmail.setText("E-Mail");
-            lblEmail.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel4.add(lblEmail, CC.xy(3, 9));
-
-            //---- lblName ----
-            lblName.setText("Nachname");
-            lblName.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel4.add(lblName, CC.xy(3, 7));
-
-            //---- txtName ----
-            txtName.setDragEnabled(false);
-            txtName.setFont(new Font("Arial", Font.PLAIN, 14));
-            txtName.addFocusListener(new FocusAdapter() {
-                @Override
-                public void focusLost(FocusEvent e) {
-                    txtNameFocusLost(e);
-                }
-            });
-            jPanel4.add(txtName, CC.xy(5, 7));
-
-            //---- txtEMail ----
-            txtEMail.setDragEnabled(false);
-            txtEMail.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel4.add(txtEMail, CC.xy(5, 9));
-
-            //---- lblPW ----
-            lblPW.setText("Passwort");
-            lblPW.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel4.add(lblPW, CC.xy(3, 11));
-
-            //---- txtPW ----
-            txtPW.setFont(new Font("Arial", Font.PLAIN, 14));
-            jPanel4.add(txtPW, CC.xy(5, 11));
+            pnlMain.add(scrlContracts, CC.xywh(5, 3, 1, 9));
 
             //======== jPanel3 ========
             {
@@ -321,28 +318,18 @@ public class DlgUser extends MyJDialog {
                 });
                 jPanel3.add(btnSave);
             }
-            jPanel4.add(jPanel3, CC.xywh(7, 13, 2, 1, CC.RIGHT, CC.DEFAULT));
+            pnlMain.add(jPanel3, CC.xy(5, 13, CC.RIGHT, CC.DEFAULT));
         }
-        contentPane.add(jPanel4);
-        setSize(605, 295);
+        contentPane.add(pnlMain);
+        pack();
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-    private JPanel jPanel4;
-    private JLabel lblUID;
-    private JTextField txtUID;
+    private JPanel pnlMain;
     private JScrollPane scrlContracts;
     private CollapsiblePanes cpsContracts;
-    private JLabel lblFirstname;
-    private JTextField txtVorname;
-    private JLabel lblEmail;
-    private JLabel lblName;
-    private JTextField txtName;
-    private JTextField txtEMail;
-    private JLabel lblPW;
-    private JTextField txtPW;
     private JPanel jPanel3;
     private JButton btnCancel;
     private JButton btnSave;

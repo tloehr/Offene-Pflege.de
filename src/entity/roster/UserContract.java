@@ -169,6 +169,7 @@ public class UserContract implements Comparable<UserContract> {
         result = 31 * result + (probations != null ? probations.hashCode() : 0);
         result = 31 * result + (extensions != null ? extensions.hashCode() : 0);
         result = 31 * result + (alterations != null ? alterations.hashCode() : 0);
+
         return result;
     }
 
@@ -184,7 +185,7 @@ public class UserContract implements Comparable<UserContract> {
         result += "<tr>";
         result += "<td valign=\"top\">" + df.format(getDefaults().getFrom().toDate()) + "</td>";
 
-        if (getDefaults().getTo().toDate().equals(SYSConst.LD_UNTIL_FURTHER_NOTICE)){
+        if (getDefaults().getTo().equals(SYSConst.LD_UNTIL_FURTHER_NOTICE)) {
             result += "<td valign=\"top\">&raquo;&raquo;</td>";
             result += "<td valign=\"top\"></td>";
         } else {

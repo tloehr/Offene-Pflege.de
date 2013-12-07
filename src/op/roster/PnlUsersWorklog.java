@@ -495,10 +495,6 @@ public class PnlUsersWorklog extends CleanablePanel {
         pnlMonth.setOpaque(false);
         LocalDate month = new LocalDate(roster.getMonth());
 
-
-//        ArrayList<Users> listUsers = new ArrayList<Users>();
-//        ArrayList<Users> listUsers = new ArrayList<Users>(UsersTools.getUsersWithValidContractsIn(new LocalDate(roster.getMonth())).keySet());
-
         ArrayList<Users> listAllPossibleUsers = new ArrayList<Users>(RostersTools.getAllUsersIn(roster));
         ArrayList<Users> listUsers = new ArrayList<Users>();
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID) || OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, internalClassID)) {
@@ -647,8 +643,8 @@ public class PnlUsersWorklog extends CleanablePanel {
             //======== pnlRosters ========
             {
                 pnlRosters.setLayout(new FormLayout(
-                        "default:grow",
-                        "default:grow, $lgap, default"));
+                    "default:grow",
+                    "default:grow, $lgap, default"));
 
                 //======== scrollPane1 ========
                 {
@@ -659,7 +655,6 @@ public class PnlUsersWorklog extends CleanablePanel {
                         public void mouseClicked(MouseEvent e) {
                             lstRostersMouseClicked(e);
                         }
-
                         @Override
                         public void mousePressed(MouseEvent e) {
                             lstRostersMousePressed(e);
