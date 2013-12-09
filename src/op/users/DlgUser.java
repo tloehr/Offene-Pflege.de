@@ -228,7 +228,7 @@ public class DlgUser extends MyJDialog {
         cpContract.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                cpContract.setContentPane(createContentPane4(roster));
+//                cpContract.setContentPane(createContentPane4(roster));
             }
         });
 
@@ -241,30 +241,30 @@ public class DlgUser extends MyJDialog {
     }
 
 
-    private JPanel createContentPane4(final UserContract contract) {
-            JPanel pnlContract = new JPanel(new VerticalLayout());
-            pnlContract.setOpaque(false);
-            LocalDate month = new LocalDate(roster.getMonth());
-
-            ArrayList<Users> listAllPossibleUsers = new ArrayList<Users>(RostersTools.getAllUsersIn(roster));
-            ArrayList<Users> listUsers = new ArrayList<Users>();
-            if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID) || OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, internalClassID)) {
-                listUsers.addAll(listAllPossibleUsers);
-            } else if (listAllPossibleUsers.contains(OPDE.getLogin().getUser())) {
-                listUsers.add(OPDE.getLogin().getUser());
-            }
-            Collections.sort(listUsers);
-            listAllPossibleUsers.clear();
-
-            final LocalDate start = SYSCalendar.bow(SYSCalendar.bom(month));
-            final LocalDate end = SYSCalendar.bow(SYSCalendar.eom(month));
-
-            for (LocalDate week = start; !week.isAfter(end); week = week.plusWeeks(1)) {
-                pnlContract.add(createCP4(week, roster, listUsers));
-            }
-
-            return pnlContract;
-        }
+//    private JPanel createContentPane4(final UserContract contract) {
+//            JPanel pnlContract = new JPanel(new VerticalLayout());
+//            pnlContract.setOpaque(false);
+//            LocalDate month = new LocalDate(roster.getMonth());
+//
+//            ArrayList<Users> listAllPossibleUsers = new ArrayList<Users>(RostersTools.getAllUsersIn(roster));
+//            ArrayList<Users> listUsers = new ArrayList<Users>();
+//            if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID) || OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, internalClassID)) {
+//                listUsers.addAll(listAllPossibleUsers);
+//            } else if (listAllPossibleUsers.contains(OPDE.getLogin().getUser())) {
+//                listUsers.add(OPDE.getLogin().getUser());
+//            }
+//            Collections.sort(listUsers);
+//            listAllPossibleUsers.clear();
+//
+//            final LocalDate start = SYSCalendar.bow(SYSCalendar.bom(month));
+//            final LocalDate end = SYSCalendar.bow(SYSCalendar.eom(month));
+//
+//            for (LocalDate week = start; !week.isAfter(end); week = week.plusWeeks(1)) {
+//                pnlContract.add(createCP4(week, roster, listUsers));
+//            }
+//
+//            return pnlContract;
+//        }
 
 
     private void initComponents() {

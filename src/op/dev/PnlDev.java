@@ -10,12 +10,15 @@ import com.jidesoft.popup.JidePopup;
 import entity.info.*;
 import entity.nursingprocess.DFNTools;
 import entity.prescription.BHPTools;
+import entity.roster.ContractsParameterSet;
+import entity.roster.UserContract;
 import op.OPDE;
 import op.care.info.PnlEditResInfo;
 import op.tools.CleanablePanel;
 import op.tools.GUITools;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
+import op.users.PnlContractsEditor;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
 import org.joda.time.LocalDate;
@@ -286,6 +289,17 @@ public class PnlDev extends CleanablePanel {
         }
     }
 
+    private void button3ActionPerformed(ActionEvent e) {
+        JFrame frm = new JFrame();
+
+        UserContract contract = new UserContract(new ContractsParameterSet());
+        contract.getDefaults().setExam(true);
+
+        frm.setContentPane(new PnlContractsEditor(contract, OPDE.getLogin().getUser()));
+        frm.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        frm.setVisible(true);
+    }
+
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -297,6 +311,7 @@ public class PnlDev extends CleanablePanel {
         txtException = new JTextArea();
         button1 = new JButton();
         panel2 = new JPanel();
+        button3 = new JButton();
         cmbMonth = new JComboBox();
         button2 = new JButton();
 
@@ -309,8 +324,8 @@ public class PnlDev extends CleanablePanel {
             //======== panel1 ========
             {
                 panel1.setLayout(new FormLayout(
-                        "default, $lcgap, 130dlu, $lcgap, default:grow, $lcgap, default",
-                        "default, $lgap, fill:default:grow, 2*($lgap, default)"));
+                    "default, $lcgap, 130dlu, $lcgap, default:grow, $lcgap, default",
+                    "default, $lgap, fill:default:grow, 2*($lgap, default)"));
 
                 //======== scrollPane1 ========
                 {
@@ -352,8 +367,18 @@ public class PnlDev extends CleanablePanel {
             //======== panel2 ========
             {
                 panel2.setLayout(new FormLayout(
-                        "left:default:grow",
-                        "default, $lgap, default, $rgap, fill:default, $lgap, default"));
+                    "left:default:grow",
+                    "default, $lgap, default, $rgap, fill:default, $lgap, default"));
+
+                //---- button3 ----
+                button3.setText("ContracsEditor");
+                button3.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        button3ActionPerformed(e);
+                    }
+                });
+                panel2.add(button3, CC.xy(1, 1));
                 panel2.add(cmbMonth, CC.xy(1, 3, CC.FILL, CC.DEFAULT));
 
                 //---- button2 ----
@@ -381,6 +406,7 @@ public class PnlDev extends CleanablePanel {
     private JTextArea txtException;
     private JButton button1;
     private JPanel panel2;
+    private JButton button3;
     private JComboBox cmbMonth;
     private JButton button2;
     // JFormDesigner - End of variables declaration  //GEN-END:variables

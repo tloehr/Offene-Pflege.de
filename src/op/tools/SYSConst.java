@@ -512,6 +512,7 @@ public class SYSConst {
     public static final Icon icon22infoblue = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/infoblue.png"));
     public static final Icon icon22infogreen = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/infogreen.png"));
     public static final Icon icon22infored = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/infored.png"));
+    public static final Icon icon16infored = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/infored.png"));
     public static final Icon icon22infoyellow = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/infoyellow.png"));
     public static final Icon icon22link = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/link.png"));
     public static final Icon icon22linkPressed = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/link_pressed.png"));

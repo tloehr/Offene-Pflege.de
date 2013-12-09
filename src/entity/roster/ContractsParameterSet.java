@@ -29,12 +29,7 @@ public class ContractsParameterSet implements Cloneable, Comparable<ContractsPar
 
 
     public ContractsParameterSet() {
-
-        this.from = SYSCalendar.eom(new LocalDate()).plusDays(1);
-        this.to = SYSConst.LD_UNTIL_FURTHER_NOTICE;
-
-        // todo: hier müssen defaults für die neuen Verträge rein. wo immer die auch herkommen sollen.
-        grmpf;
+        this(SYSCalendar.eom(new LocalDate()).plusDays(1), SYSConst.LD_UNTIL_FURTHER_NOTICE);
 
         trainee = false;
         exam = false;
@@ -61,6 +56,10 @@ public class ContractsParameterSet implements Cloneable, Comparable<ContractsPar
         this.section = section;
         this.trainee = trainee;
         this.exam = exam;
+    }
+
+    public boolean hasSufficientParamters() {
+        return night != null && from != null && to != null && vacationDaysPerYear != null && wagePerHour != null && workingDaysPerWeek != null && targetHoursPerMonth != null && holidayPremiumPercentage != null && nightPremiumPercentage != null && section != null;
     }
 
     @Override
@@ -180,12 +179,36 @@ public class ContractsParameterSet implements Cloneable, Comparable<ContractsPar
         return from.compareTo(o.getFrom());
     }
 
-    public BigDecimal getTargetHoursPerWeek() {
-        return targetHoursPerMonth.multiply(new BigDecimal(12)).divide(new BigDecimal(52), 4, RoundingMode.HALF_UP);
+    public void setTargetHoursPerWeek(BigDecimal targetHoursPerWeek) {
+        if (targetHoursPerWeek == null) {
+            targetHoursPerMonth = null;
+            return;
+        }
+        targetHoursPerMonth = targetHoursPerWeek.multiply(new BigDecimal(52)).divide(new BigDecimal(12), 2, RoundingMode.HALF_UP);
     }
 
+    public void setTargetHoursPerDay(BigDecimal targetHoursPerDay) {
+        if (targetHoursPerDay == null) {
+            targetHoursPerMonth = null;
+            return;
+        }
+
+        targetHoursPerMonth = targetHoursPerDay.multiply(workingDaysPerWeek).multiply(new BigDecimal(52)).divide(new BigDecimal(12), 4, RoundingMode.HALF_UP);
+    }
+
+    public BigDecimal getTargetHoursPerWeek() {
+        if (targetHoursPerMonth == null) return null;
+        return targetHoursPerMonth.multiply(new BigDecimal(12)).divide(new BigDecimal(52), 2, RoundingMode.HALF_UP);
+    }
+
+    public BigDecimal getTargetHoursPerDay() {
+        if (targetHoursPerMonth == null || workingDaysPerWeek == null) return null;
+        return getTargetHoursPerWeek().divide(workingDaysPerWeek, 2, RoundingMode.HALF_UP);
+    }
+
+
     public BigDecimal getDayValue() {
-        return getTargetHoursPerWeek().divide(getWorkingDaysPerWeek(), 4, RoundingMode.HALF_UP);
+        return getTargetHoursPerWeek().divide(getWorkingDaysPerWeek(), 2, RoundingMode.HALF_UP);
     }
 
     /**
