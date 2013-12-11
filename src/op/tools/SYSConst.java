@@ -45,6 +45,7 @@ public class SYSConst {
 
     public static final String sep = System.getProperty("file.separator");
 
+    public static final Font ARIAL9BOLD = new Font("Arial", Font.BOLD, 9);
     public static final Font ARIAL10BOLD = new Font("Arial", Font.BOLD, 10);
     public static final Font ARIAL12BOLD = new Font("Arial", Font.BOLD, 12);
     public static final Font ARIAL14 = new Font("Arial", Font.PLAIN, 14);

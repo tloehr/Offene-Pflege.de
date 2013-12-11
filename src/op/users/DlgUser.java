@@ -10,24 +10,18 @@ import com.jidesoft.pane.CollapsiblePane;
 import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
+import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.JideBoxLayout;
-import entity.roster.Rosters;
-import entity.roster.RostersTools;
 import entity.roster.UserContract;
 import entity.roster.UserContracts;
 import entity.system.Users;
 import entity.system.UsersTools;
 import op.OPDE;
-import op.system.InternalClassACL;
 import op.threads.DisplayMessage;
-import op.tools.DefaultCPTitle;
-import op.tools.MyJDialog;
-import op.tools.SYSCalendar;
-import op.tools.SYSTools;
+import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
-import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.swing.*;
@@ -36,7 +30,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.beans.PropertyVetoException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -85,11 +78,11 @@ public class DlgUser extends MyJDialog {
         }
 
 
-        lblFirstname = new JLabel(OPDE.lang.getString("misc.msg.firstname"));
-        lblName = new JLabel(OPDE.lang.getString("misc.msg.name"));
-        lblPW = new JLabel(OPDE.lang.getString("misc.msg.password"));
-        lblUID = new JLabel(OPDE.lang.getString("misc.msg.uid"));
-        lblEmail = new JLabel(OPDE.lang.getString("misc.msg.email"));
+        lblFirstname = new JLabel(OPDE.lang.getString("misc.msg.firstname")+" ");
+        lblName = new JLabel(OPDE.lang.getString("misc.msg.name")+" ");
+        lblPW = new JLabel(OPDE.lang.getString("misc.msg.password")+" ");
+        lblUID = new JLabel(OPDE.lang.getString("misc.msg.uid")+" ");
+        lblEmail = new JLabel(OPDE.lang.getString("misc.msg.email")+" ");
 
         txtName = new JTextField(user.getName());
         txtEMail = new JTextField(user.getEMail());
@@ -98,31 +91,29 @@ public class DlgUser extends MyJDialog {
         txtPW = new JTextField();
 
         DefaultOverlayable overUID = new DefaultOverlayable(txtUID);
-//        lblUID.setHorizontalTextPosition(SwingConstants.TRAILING);
-        lblUID.setForeground(Color.LIGHT_GRAY);
-        overUID.addOverlayComponent(lblUID,SwingConstants.EAST);
+        lblUID.setForeground(SYSConst.bluegrey.darker());
+        overUID.addOverlayComponent(lblUID, SwingConstants.EAST);
 
         pnlMain.add(overUID, CC.xy(3, 3, CC.FILL, CC.DEFAULT));
 
         DefaultOverlayable overFirstname = new DefaultOverlayable(txtVorname);
-        lblFirstname.setHorizontalTextPosition(SwingConstants.TRAILING);
-        lblFirstname.setForeground(Color.LIGHT_GRAY);
-        overFirstname.addOverlayComponent(lblFirstname);
+        lblFirstname.setForeground(SYSConst.bluegrey.darker());
+        overFirstname.addOverlayComponent(lblFirstname, SwingConstants.EAST);
         pnlMain.add(overFirstname, CC.xy(3, 5, CC.FILL, CC.DEFAULT));
 
         DefaultOverlayable overName = new DefaultOverlayable(txtName);
-        lblName.setForeground(Color.LIGHT_GRAY);
-        overName.addOverlayComponent(lblName);
+        lblName.setForeground(SYSConst.bluegrey.darker());
+        overName.addOverlayComponent(lblName, SwingConstants.EAST);
         pnlMain.add(overName, CC.xy(3, 7, CC.FILL, CC.DEFAULT));
 
         DefaultOverlayable overEmail = new DefaultOverlayable(txtEMail);
-        lblEmail.setForeground(Color.LIGHT_GRAY);
-        overEmail.addOverlayComponent(lblEmail);
+        lblEmail.setForeground(SYSConst.bluegrey.darker());
+        overEmail.addOverlayComponent(lblEmail, SwingConstants.EAST);
         pnlMain.add(overEmail, CC.xy(3, 9, CC.FILL, CC.DEFAULT));
 
         DefaultOverlayable overPW = new DefaultOverlayable(txtPW);
-        lblPW.setForeground(Color.LIGHT_GRAY);
-        overPW.addOverlayComponent(lblPW);
+        lblPW.setForeground(SYSConst.bluegrey.darker());
+        overPW.addOverlayComponent(lblPW, SwingConstants.EAST);
         pnlMain.add(overPW, CC.xy(3, 11, CC.FILL, CC.DEFAULT));
 
 
@@ -190,7 +181,7 @@ public class DlgUser extends MyJDialog {
         dispose();
     }
 
-    private CollapsiblePane createCP4(UserContract contract) {
+    private CollapsiblePane createCP4(final UserContract contract) {
         final String key = contract.hashCode() + ".contract";
         synchronized (cpMap) {
             if (!cpMap.containsKey(key)) {
@@ -218,9 +209,34 @@ public class DlgUser extends MyJDialog {
             }
         });
 
+        final JButton btnMenu = new JButton(SYSConst.icon22menu);
+        btnMenu.setPressedIcon(SYSConst.icon22Pressed);
+        btnMenu.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnMenu.setAlignmentY(Component.TOP_ALIGNMENT);
+        btnMenu.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnMenu.setContentAreaFilled(false);
+        btnMenu.setBorder(null);
+        btnMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JidePopup popup = new JidePopup();
+                popup.setMovable(false);
+                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                popup.setOwner(btnMenu);
+                popup.removeExcludedComponent(btnMenu);
+                JPanel pnl = getMenu(contract);
+                popup.getContentPane().add(pnl);
+                popup.setDefaultFocusComponent(pnl);
+
+                GUITools.showPopup(popup, SwingConstants.WEST);
+            }
+        });
+        cptitle.getRight().add(btnMenu);
+        
         cpContract.setTitleLabelComponent(cptitle.getMain());
         cpContract.setSlidingDirection(SwingConstants.SOUTH);
 
+        
         cpContract.setBackground(Color.WHITE);
         cpContract.setOpaque(false);
         cpContract.setHorizontalAlignment(SwingConstants.LEADING);
@@ -228,12 +244,12 @@ public class DlgUser extends MyJDialog {
         cpContract.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-//                cpContract.setContentPane(createContentPane4(roster));
+                cpContract.setContentPane(new PnlContractsEditor(contract));
             }
         });
 
         if (!cpContract.isCollapsed()) {
-//            cpRoster.setContentPane(createContentPane4(roster));
+            cpContract.setContentPane(new PnlContractsEditor(contract));
         }
 
 
@@ -241,31 +257,62 @@ public class DlgUser extends MyJDialog {
     }
 
 
-//    private JPanel createContentPane4(final UserContract contract) {
-//            JPanel pnlContract = new JPanel(new VerticalLayout());
-//            pnlContract.setOpaque(false);
-//            LocalDate month = new LocalDate(roster.getMonth());
-//
-//            ArrayList<Users> listAllPossibleUsers = new ArrayList<Users>(RostersTools.getAllUsersIn(roster));
-//            ArrayList<Users> listUsers = new ArrayList<Users>();
-//            if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID) || OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, internalClassID)) {
-//                listUsers.addAll(listAllPossibleUsers);
-//            } else if (listAllPossibleUsers.contains(OPDE.getLogin().getUser())) {
-//                listUsers.add(OPDE.getLogin().getUser());
-//            }
-//            Collections.sort(listUsers);
-//            listAllPossibleUsers.clear();
-//
-//            final LocalDate start = SYSCalendar.bow(SYSCalendar.bom(month));
-//            final LocalDate end = SYSCalendar.bow(SYSCalendar.eom(month));
-//
-//            for (LocalDate week = start; !week.isAfter(end); week = week.plusWeeks(1)) {
-//                pnlContract.add(createCP4(week, roster, listUsers));
-//            }
-//
-//            return pnlContract;
-//        }
+    private JPanel getMenu(UserContract contract) {
 
+        final JPanel pnlMenu = new JPanel(new VerticalLayout());
+
+
+        JButton btnEndContract = GUITools.createHyperlinkButton("opde.users.dlgusers.end.contract", SYSConst.icon22playerStop, null);
+        btnEndContract.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnEndContract.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+
+
+            }
+        });
+        btnEndContract.setEnabled(true);
+        pnlMenu.add(btnEndContract);
+
+        JButton btnNewProbation = GUITools.createHyperlinkButton("opde.users.dlgusers.new.probation", SYSConst.icon22add, null);
+        btnNewProbation.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnNewProbation.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+
+
+            }
+        });
+        btnNewProbation.setEnabled(true);
+        pnlMenu.add(btnNewProbation);
+
+        JButton btnNewExtension = GUITools.createHyperlinkButton("opde.users.dlgusers.new.extension", SYSConst.icon22add, null);
+        btnNewExtension.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnNewExtension.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+
+
+            }
+        });
+        btnNewExtension.setEnabled(true);
+        pnlMenu.add(btnNewExtension);
+
+
+        JButton btnSetUnlimited = GUITools.createHyperlinkButton("opde.users.dlgusers.set.unlimited", SYSConst.icon22add, null);
+        btnSetUnlimited.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnSetUnlimited.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+
+
+            }
+        });
+        btnSetUnlimited.setEnabled(true);
+        pnlMenu.add(btnSetUnlimited);
+
+        return pnlMenu;
+    }
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -283,14 +330,14 @@ public class DlgUser extends MyJDialog {
         //======== pnlMain ========
         {
             pnlMain.setLayout(new FormLayout(
-                "14dlu, $lcgap, 160dlu:grow, $ugap, 229dlu:grow, $lcgap, 14dlu",
-                "14dlu, 4*($lgap, fill:default), $lgap, default, 9dlu, default, $lgap, 14dlu"));
+                    "14dlu, $lcgap, 160dlu:grow, $ugap, 229dlu:grow, $lcgap, 14dlu",
+                    "14dlu, 4*($lgap, fill:default), $lgap, default, fill:9dlu:grow, default, $lgap, 14dlu"));
 
             //======== scrlContracts ========
             {
                 scrlContracts.setViewportView(cpsContracts);
             }
-            pnlMain.add(scrlContracts, CC.xywh(5, 3, 1, 9));
+            pnlMain.add(scrlContracts, CC.xywh(5, 3, 1, 10));
 
             //======== jPanel3 ========
             {

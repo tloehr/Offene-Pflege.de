@@ -295,7 +295,7 @@ public class PnlDev extends CleanablePanel {
         UserContract contract = new UserContract(new ContractsParameterSet());
         contract.getDefaults().setExam(true);
 
-        frm.setContentPane(new PnlContractsEditor(contract, OPDE.getLogin().getUser()));
+        frm.setContentPane(new PnlContractsEditor(contract));
         frm.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         frm.setVisible(true);
     }

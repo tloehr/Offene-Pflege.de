@@ -31,7 +31,7 @@
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
-          <string>14dlu, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, default, 9dlu, default, linegap, 14dlu</string> 
+          <string>14dlu, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, fill:default, linegap, default, fill:9dlu:grow, default, linegap, 14dlu</string> 
          </void> 
         </object> 
         <void property="name"> 
@@ -67,7 +67,7 @@
           </void> 
           <void method="setProperty"> 
            <string>gridHeight</string> 
-           <int>9</int> 
+           <int>10</int> 
           </void> 
          </object> 
         </void> 
@@ -170,7 +170,7 @@
        <string>size</string> 
        <object class="java.awt.Dimension"> 
         <int>865</int> 
-        <int>290</int> 
+        <int>445</int> 
        </object> 
       </void> 
      </object> 
