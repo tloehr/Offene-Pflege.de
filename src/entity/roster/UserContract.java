@@ -1,5 +1,6 @@
 package entity.roster;
 
+import op.tools.Pair;
 import op.tools.SYSConst;
 import org.joda.time.LocalDate;
 
@@ -7,6 +8,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,46 +21,47 @@ public class UserContract implements Comparable<UserContract> {
 
     ContractsParameterSet defaults;
 
-    ArrayList<ContractsParameterSet> probations;
-    ArrayList<ContractsParameterSet> extensions;
-    ArrayList<ContractsParameterSet> alterations;
+    ArrayList<Pair<LocalDate, LocalDate>> probations;
+    ArrayList<Pair<LocalDate, LocalDate>> extensions;
+//    ArrayList<Pair<LocalDate, LocalDate>> alterations;
 
     public UserContract(ContractsParameterSet defaults) {
         this.defaults = defaults;
-        probations = new ArrayList<ContractsParameterSet>();
-        extensions = new ArrayList<ContractsParameterSet>();
-        alterations = new ArrayList<ContractsParameterSet>();
+        probations = new ArrayList<Pair<LocalDate, LocalDate>>();
+        extensions = new ArrayList<Pair<LocalDate, LocalDate>>();
+//        alterations = new ArrayList<Pair<LocalDate, LocalDate>>();
     }
 
     public ContractsParameterSet getDefaults() {
         return defaults;
     }
 
-    public void addProbation(ContractsParameterSet probation) {
+    public void addProbation(Pair<LocalDate, LocalDate> probation) {
         probations.add(probation);
-        Collections.sort(probations);
+        Collections.sort(probations, new Comparator<Pair<LocalDate, LocalDate>>() {
+            @Override
+            public int compare(Pair<LocalDate, LocalDate> o1, Pair<LocalDate, LocalDate> o2) {
+                return o1.getFirst().compareTo(o2.getFirst());
+            }
+        });
     }
 
-    public void addExtension(ContractsParameterSet extension) {
+    public void addExtension(Pair<LocalDate, LocalDate> extension) {
         extensions.add(extension);
-        Collections.sort(extensions);
+        Collections.sort(extensions, new Comparator<Pair<LocalDate, LocalDate>>() {
+            @Override
+            public int compare(Pair<LocalDate, LocalDate> o1, Pair<LocalDate, LocalDate> o2) {
+                return o1.getFirst().compareTo(o2.getFirst());
+            }
+        });
     }
 
-    public void addAlteration(ContractsParameterSet alteration) {
-        alterations.add(alteration);
-        Collections.sort(alterations);
-    }
-
-    public ArrayList<ContractsParameterSet> getProbations() {
+    public ArrayList<Pair<LocalDate, LocalDate>> getProbations() {
         return probations;
     }
 
-    public ArrayList<ContractsParameterSet> getExtensions() {
+    public ArrayList<Pair<LocalDate, LocalDate>> getExtensions() {
         return extensions;
-    }
-
-    public ArrayList<ContractsParameterSet> getAlterations() {
-        return alterations;
     }
 
     public String toXML() {
@@ -79,14 +82,11 @@ public class UserContract implements Comparable<UserContract> {
         xml += (defaults.isTrainee() ? "                <trainee/>\n" : "");
         xml += "           </defaults>\n";
 
-        for (ContractsParameterSet set : probations) {
-            xml += getSubSection(set, "probation");
+        for (Pair<LocalDate, LocalDate> p : probations) {
+            xml += String.format("            <%s from=\"%s\" to=\"%s\"></%s>\n", "probation", p.getFirst().toString("yyyy-MM-dd"), p.getSecond().toString("yyyy-MM-dd"));
         }
-        for (ContractsParameterSet set : extensions) {
-            xml += getSubSection(set, "extension");
-        }
-        for (ContractsParameterSet set : alterations) {
-            xml += getSubSection(set, "alteration");
+        for (Pair<LocalDate, LocalDate> e : extensions) {
+            xml += String.format("            <%s from=\"%s\" to=\"%s\"></%s>\n", "extension", e.getFirst().toString("yyyy-MM-dd"), e.getSecond().toString("yyyy-MM-dd"));
         }
 
         xml += "    </contract>\n";
@@ -113,37 +113,37 @@ public class UserContract implements Comparable<UserContract> {
         if (defaults.getFrom().compareTo(day) <= 0 && defaults.getTo().compareTo(day) >= 0) {
             mySet = (ContractsParameterSet) defaults.clone();
 
-            ArrayList<ContractsParameterSet>[] list = new ArrayList[]{probations, extensions, alterations};
+//            ArrayList<ContractsParameterSet>[] list = new ArrayList[]{probations, extensions};
 
-            // apply alterations, if any
-            for (ArrayList<ContractsParameterSet> set : list) {
-                for (ContractsParameterSet paramset : set) {
-                    // only those which are currently valid
-                    if (paramset.getFrom().compareTo(day) <= 0 && paramset.getTo().compareTo(day) >= 0) {
-                        if (paramset.getNight() != null) {
-                            mySet.setNight(paramset.getNight());
-                        }
-                        if (paramset.getVacationDaysPerYear() != null) {
-                            mySet.setVacationDaysPerYear(paramset.getVacationDaysPerYear());
-                        }
-                        if (paramset.getWagePerHour() != null) {
-                            mySet.setWagePerHour(paramset.getWagePerHour());
-                        }
-                        if (paramset.getWorkingDaysPerWeek() != null) {
-                            mySet.setWorkingDaysPerWeek(paramset.getWorkingDaysPerWeek());
-                        }
-                        if (paramset.getTargetHoursPerMonth() != null) {
-                            mySet.setTargetHoursPerMonth(paramset.getTargetHoursPerMonth());
-                        }
-                        if (paramset.getHolidayPremiumPercentage() != null) {
-                            mySet.setHolidayPremiumPercentage(paramset.getHolidayPremiumPercentage());
-                        }
-                        if (paramset.getNightPremiumPercentage() != null) {
-                            mySet.setNightPremiumPercentage(paramset.getNightPremiumPercentage());
-                        }
-                    }
-                }
-            }
+//            // apply alterations, if any
+//            for (ArrayList<ContractsParameterSet> set : list) {
+//                for (ContractsParameterSet paramset : set) {
+//                    // only those which are currently valid
+//                    if (paramset.getFrom().compareTo(day) <= 0 && paramset.getTo().compareTo(day) >= 0) {
+//                        if (paramset.getNight() != null) {
+//                            mySet.setNight(paramset.getNight());
+//                        }
+//                        if (paramset.getVacationDaysPerYear() != null) {
+//                            mySet.setVacationDaysPerYear(paramset.getVacationDaysPerYear());
+//                        }
+//                        if (paramset.getWagePerHour() != null) {
+//                            mySet.setWagePerHour(paramset.getWagePerHour());
+//                        }
+//                        if (paramset.getWorkingDaysPerWeek() != null) {
+//                            mySet.setWorkingDaysPerWeek(paramset.getWorkingDaysPerWeek());
+//                        }
+//                        if (paramset.getTargetHoursPerMonth() != null) {
+//                            mySet.setTargetHoursPerMonth(paramset.getTargetHoursPerMonth());
+//                        }
+//                        if (paramset.getHolidayPremiumPercentage() != null) {
+//                            mySet.setHolidayPremiumPercentage(paramset.getHolidayPremiumPercentage());
+//                        }
+//                        if (paramset.getNightPremiumPercentage() != null) {
+//                            mySet.setNightPremiumPercentage(paramset.getNightPremiumPercentage());
+//                        }
+//                    }
+//                }
+//            }
         }
         return mySet;
     }
@@ -155,7 +155,6 @@ public class UserContract implements Comparable<UserContract> {
 
         UserContract that = (UserContract) o;
 
-        if (alterations != null ? !alterations.equals(that.alterations) : that.alterations != null) return false;
         if (defaults != null ? !defaults.equals(that.defaults) : that.defaults != null) return false;
         if (extensions != null ? !extensions.equals(that.extensions) : that.extensions != null) return false;
         if (probations != null ? !probations.equals(that.probations) : that.probations != null) return false;
@@ -168,7 +167,6 @@ public class UserContract implements Comparable<UserContract> {
         int result = defaults != null ? defaults.hashCode() : 0;
         result = 31 * result + (probations != null ? probations.hashCode() : 0);
         result = 31 * result + (extensions != null ? extensions.hashCode() : 0);
-        result = 31 * result + (alterations != null ? alterations.hashCode() : 0);
 
         return result;
     }

@@ -127,7 +127,8 @@ public class SYSConst {
     public static Color yellow4 = new Color(0x8B, 0x8B, 0x00);
     public static Color grey80 = new Color(0xc7, 0xc7, 0xc5);
     public static Color grey50 = new Color(0x74, 0x71, 0x70);
-
+    public static Color mistyrose = new Color(251, 187, 185);
+    public static Color pearl = new Color(253, 238, 244);
 
     public static final int dark4 = 0;
     public static final int dark3 = 1;

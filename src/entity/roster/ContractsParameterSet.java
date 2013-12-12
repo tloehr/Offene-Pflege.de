@@ -29,7 +29,7 @@ public class ContractsParameterSet implements Cloneable, Comparable<ContractsPar
 
 
     public ContractsParameterSet() {
-        this(SYSCalendar.eom(new LocalDate()).plusDays(1), SYSConst.LD_UNTIL_FURTHER_NOTICE);
+        this(SYSCalendar.eom(new LocalDate()).plusDays(1), SYSCalendar.eom(new LocalDate()).plusDays(1).plusYears(1).minusDays(1));
 
         trainee = false;
         exam = false;

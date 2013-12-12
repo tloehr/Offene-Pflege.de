@@ -23,6 +23,7 @@ public class UsersXML extends DefaultHandler {
 
     String currentUID = "";
     ContractsParameterSet mySet = null;
+    Pair<LocalDate, LocalDate> period = null;
     UserContract contract = null;
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -53,15 +54,11 @@ public class UsersXML extends DefaultHandler {
             } else if (tagName.equalsIgnoreCase("probation")) {
                 LocalDate from = new LocalDate(sdf.parse(attributes.getValue("from")));
                 LocalDate to = new LocalDate(sdf.parse(attributes.getValue("to")));
-                mySet = new ContractsParameterSet(from, to);
+                period = new Pair<LocalDate, LocalDate>(from, to);
             } else if (tagName.equalsIgnoreCase("extension")) {
                 LocalDate from = new LocalDate(sdf.parse(attributes.getValue("from")));
                 LocalDate to = new LocalDate(sdf.parse(attributes.getValue("to")));
-                mySet = new ContractsParameterSet(from, to);
-            } else if (tagName.equalsIgnoreCase("alteration")) {
-                LocalDate from = new LocalDate(sdf.parse(attributes.getValue("from")));
-                LocalDate to = new LocalDate(sdf.parse(attributes.getValue("to")));
-                mySet = new ContractsParameterSet(from, to);
+                period = new Pair<LocalDate, LocalDate>(from, to);
             } else if (tagName.equalsIgnoreCase("vacationdays")) {
                 mySet.setVacationDaysPerYear(new BigDecimal(attributes.getValue("value")));
             } else if (tagName.equalsIgnoreCase("wageperhour")) {
@@ -98,11 +95,11 @@ public class UsersXML extends DefaultHandler {
         } else if (qName.equalsIgnoreCase("defaults")) {
             contract = new UserContract(mySet);
         } else if (qName.equalsIgnoreCase("probation")) {
-            contract.addProbation(mySet);
+            contract.addProbation(period);
+            period = null;
         } else if (qName.equalsIgnoreCase("extension")) {
-            contract.addExtension(mySet);
-        } else if (qName.equalsIgnoreCase("alteration")) {
-            contract.addAlteration(mySet);
+            contract.addExtension(period);
+            period = null;
         }
     }
 

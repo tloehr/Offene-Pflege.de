@@ -6,9 +6,7 @@ package op.users;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import com.jidesoft.swing.DefaultOverlayable;
 import entity.roster.UserContract;
-import entity.system.Users;
 import op.OPDE;
 import op.tools.Pair;
 import op.tools.SYSCalendar;
@@ -18,6 +16,7 @@ import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
@@ -31,18 +30,12 @@ import java.math.RoundingMode;
 public class PnlContractsEditor extends JPanel {
 
     private UserContract contract;
-    //    private JTextField txtWDPW, txtTHPM, txtTHPW, txtTHPD
-//    private Users user;
-    private JLabel lblOvrFrom, lblOvrTo, lblOvrWPH, lblOvrWDPW, lblOvrTHPM, lblOvrTHPW, lblOvrTHPD, lblOvrHPP, lblOvrNightFrom, lblOvrNightTo, lblOvrNightPercent;
+    private boolean editable;
     private int btnAddPeriodClickCount = -1;
 
-//    public PnlContractsEditor(Users user) {
-//        this(new UserContract(new ContractsParameterSet()), user);
-//        this.contract.getDefaults().setExam(UsersTools.isQualified(user)); // just as a suggestion for new contracts
-//    }
-
-    public PnlContractsEditor(UserContract contract) {
+    public PnlContractsEditor(UserContract contract, boolean editable) {
         this.contract = contract;
+        this.editable = editable;
 
         initComponents();
 
@@ -61,18 +54,6 @@ public class PnlContractsEditor extends JPanel {
 
     void initPanel() {
 
-        lblOvrFrom = new JLabel();
-        lblOvrTo = new JLabel();
-        lblOvrWPH = new JLabel();
-        lblOvrWDPW = new JLabel();
-        lblOvrTHPM = new JLabel();
-        lblOvrTHPW = new JLabel();
-        lblOvrTHPD = new JLabel();
-        lblOvrHPP = new JLabel();
-        lblOvrNightFrom = new JLabel();
-        lblOvrNightTo = new JLabel();
-        lblOvrNightPercent = new JLabel();
-
         txtFrom.setText(contract.getDefaults().getFrom().toString("dd.MM.yyyy"));
         if (contract.getDefaults().getTo().equals(SYSConst.LD_UNTIL_FURTHER_NOTICE)) {
             txtTo.setText(OPDE.lang.getString("opde.roster.unlimited"));
@@ -84,7 +65,7 @@ public class PnlContractsEditor extends JPanel {
         txtWDPW.setText(SYSTools.catchNull(contract.getDefaults().getWorkingDaysPerWeek()));
         txtTHPM.setText(SYSTools.catchNull(contract.getDefaults().getTargetHoursPerMonth()));
         txtTHPW.setText(SYSTools.catchNull(contract.getDefaults().getTargetHoursPerWeek()));
-        txtTHPD.setText(SYSTools.catchNull(contract.getDefaults().getTargetHoursPerDay()));
+        lblTHPDx.setText(SYSTools.catchNull(contract.getDefaults().getTargetHoursPerDay(), "?"));
 
         txtHolidayPercent.setText(SYSTools.catchNull(contract.getDefaults().getHolidayPremiumPercentage()));
         txtNightPercent.setText(SYSTools.catchNull(contract.getDefaults().getNightPremiumPercentage()));
@@ -93,102 +74,82 @@ public class PnlContractsEditor extends JPanel {
             txtNightTo.setText(contract.getDefaults().getNight().getSecond().toString("HH:mm"));
         }
 
-        JLabel lblFrom = new JLabel(OPDE.lang.getString("misc.msg.from") + " ");
-        lblFrom.setFont(SYSConst.ARIAL9BOLD);
-        lblFrom.setForeground(SYSConst.bluegrey.darker());
-        overFrom.addOverlayComponent(lblFrom, SwingConstants.EAST);
-        overFrom.addOverlayComponent(lblOvrFrom, SwingConstants.SOUTH_EAST);
+        lblFrom.setText(OPDE.lang.getString("misc.msg.from"));
+        lblTo.setText(OPDE.lang.getString("misc.msg.to"));
+        lblWPH.setText(OPDE.lang.getString("opde.roster.wage.per.hour"));
+        lblWDPW.setText(OPDE.lang.getString("opde.roster.workingdays.per.week"));
+        lblTHPM.setText(OPDE.lang.getString("opde.roster.targethours.per.month"));
+        lblTHPW.setText(OPDE.lang.getString("opde.roster.targethours.per.week"));
+        lblTHPD.setText(OPDE.lang.getString("opde.roster.targethours.per.day"));
+        lblHolidayPercent.setText(OPDE.lang.getString("opde.roster.holiday.premium.percent"));
+        lblNightFrom.setText(OPDE.lang.getString("opde.roster.night.from"));
+        lblNightTo.setText(OPDE.lang.getString("opde.roster.night.to"));
+        lblNightPercent.setText(OPDE.lang.getString("opde.roster.night.premium.percent"));
 
-        JLabel lblTo = new JLabel(OPDE.lang.getString("misc.msg.to") + " ");
-        lblTo.setFont(SYSConst.ARIAL9BOLD);
-        lblTo.setForeground(SYSConst.bluegrey.darker());
-        overTo.addOverlayComponent(lblTo, SwingConstants.EAST);
-        overTo.addOverlayComponent(lblOvrTo, SwingConstants.SOUTH_EAST);
 
-        JLabel lblWage = new JLabel(OPDE.lang.getString("opde.roster.wage.per.hour") + " ");
-        lblWage.setFont(SYSConst.ARIAL9BOLD);
-        lblWage.setForeground(SYSConst.bluegrey.darker());
-        overWPH.addOverlayComponent(lblWage, SwingConstants.EAST);
-        overWPH.addOverlayComponent(lblOvrWPH, SwingConstants.SOUTH_EAST);
+        LocalDate unlimitedSince = null;
+        for (Pair<LocalDate, LocalDate> probation : contract.getProbations()) {
+            JPanel pnl = new JPanel();
+            pnl.setLayout(new BoxLayout(pnl, BoxLayout.LINE_AXIS));
+            pnl.add(new JLabel(String.format("%s: %s -> %s", "Probezeit", probation.getFirst().toString("dd.MM.yyyy"), probation.getSecond().toString("dd.MM.yyyy"))));
+            unlimitedSince = probation.getSecond();
+            pnl.add(new JButton(SYSConst.icon22delete));
+            pnlPeriods.add(pnl);
+        }
+        for (Pair<LocalDate, LocalDate> extension : contract.getExtensions()) {
+            JPanel pnl = new JPanel();
+            pnl.setLayout(new BoxLayout(pnl, BoxLayout.LINE_AXIS));
+            pnl.add(new JLabel(String.format("%s: %s -> %s", "Verlängerung", extension.getFirst().toString("dd.MM.yyyy"), extension.getSecond().toString("dd.MM.yyyy"))));
+            unlimitedSince = extension.getSecond();
+            pnl.add(new JButton(SYSConst.icon22delete));
+            pnlPeriods.add(pnl);
+        }
+        if (contract.getDefaults().getTo().equals(SYSConst.LD_UNTIL_FURTHER_NOTICE)) {
+            pnlPeriods.add(new JLabel("unbefristet" + (unlimitedSince != null ? " seit: " + unlimitedSince.toString("dd.MM.yyyy") : "")));
+        }
 
-        JLabel lblWDPW = new JLabel(OPDE.lang.getString("opde.roster.workingdays.per.week") + " ");
-        lblWDPW.setFont(SYSConst.ARIAL9BOLD);
-        lblWDPW.setForeground(SYSConst.bluegrey.darker());
-        overWDPW.addOverlayComponent(lblWDPW, SwingConstants.EAST);
-        overWDPW.addOverlayComponent(lblOvrWDPW, SwingConstants.SOUTH_EAST);
-
-        JLabel lblTHPM = new JLabel(OPDE.lang.getString("opde.roster.targethours.per.month") + " ");
-        lblTHPM.setFont(SYSConst.ARIAL9BOLD);
-        lblTHPM.setForeground(SYSConst.bluegrey.darker());
-        overTHPM.addOverlayComponent(lblTHPM, SwingConstants.EAST);
-        overTHPM.addOverlayComponent(lblOvrTHPM, SwingConstants.SOUTH_EAST);
-
-        JLabel lblTHPW = new JLabel(OPDE.lang.getString("opde.roster.targethours.per.week") + " ");
-        lblTHPW.setFont(SYSConst.ARIAL9BOLD);
-        lblTHPW.setForeground(SYSConst.bluegrey.darker());
-        overTHPW.addOverlayComponent(lblTHPW, SwingConstants.EAST);
-        overTHPW.addOverlayComponent(lblOvrTHPW, SwingConstants.SOUTH_EAST);
-
-        JLabel lblTHPD = new JLabel(OPDE.lang.getString("opde.roster.targethours.per.day") + " ");
-        lblTHPD.setFont(SYSConst.ARIAL9BOLD);
-        lblTHPD.setForeground(SYSConst.bluegrey.darker());
-        overTHPD.addOverlayComponent(lblTHPD, SwingConstants.EAST);
-        overTHPD.addOverlayComponent(lblOvrTHPD, SwingConstants.SOUTH_EAST);
-
-        JLabel lblHPP = new JLabel(OPDE.lang.getString("opde.roster.holiday.premium.percent") + " ");
-        lblHPP.setFont(SYSConst.ARIAL9BOLD);
-        lblHPP.setForeground(SYSConst.bluegrey.darker());
-        overHolidayPercent.addOverlayComponent(lblHPP, SwingConstants.EAST);
-        overHolidayPercent.addOverlayComponent(lblOvrHPP, SwingConstants.SOUTH_EAST);
-
-        JLabel lblNightFrom = new JLabel(OPDE.lang.getString("opde.roster.night.from") + " ");
-        lblNightFrom.setFont(SYSConst.ARIAL9BOLD);
-        lblNightFrom.setForeground(SYSConst.bluegrey.darker());
-        overNightFrom.addOverlayComponent(lblNightFrom, SwingConstants.EAST);
-        overNightFrom.addOverlayComponent(lblOvrNightFrom, SwingConstants.SOUTH_EAST);
-
-        JLabel lblNightTo = new JLabel(OPDE.lang.getString("opde.roster.night.to") + " ");
-        lblNightTo.setFont(SYSConst.ARIAL9BOLD);
-        lblNightTo.setForeground(SYSConst.bluegrey.darker());
-        overNightTo.addOverlayComponent(lblNightTo, SwingConstants.EAST);
-        overNightTo.addOverlayComponent(lblOvrNightTo, SwingConstants.SOUTH_EAST);
-
-        JLabel lblNightPP = new JLabel(OPDE.lang.getString("opde.roster.night.premium.percent") + " ");
-        lblNightPP.setFont(SYSConst.ARIAL9BOLD);
-        lblNightPP.setForeground(SYSConst.bluegrey.darker());
-        overNightPercent.addOverlayComponent(lblNightPP, SwingConstants.EAST);
-        overNightPercent.addOverlayComponent(lblOvrNightPercent, SwingConstants.SOUTH_EAST);
+        txtFrom.setEditable(editable);
+        txtTo.setEditable(editable);
+        btnTo.setEnabled(editable);
+        txtWPH.setEditable(editable);
+        txtWDPW.setEditable(editable);
+        txtTHPM.setEditable(editable);
+        txtTHPW.setEditable(editable);
+        txtHolidayPercent.setEditable(editable);
+        txtNightFrom.setEditable(editable);
+        txtNightTo.setEditable(editable);
+        txtNightPercent.setEditable(editable);
 
         checkAll();
     }
 
     private boolean checkAll() {
 
+        Color red = SYSConst.pearl;
+
         boolean dateok = contract.getDefaults().getFrom().isBefore(contract.getDefaults().getTo());
-        lblOvrFrom.setIcon(dateok ? SYSConst.icon16apply : SYSConst.icon16infored);
-        lblOvrTo.setIcon(dateok ? SYSConst.icon16apply : SYSConst.icon16infored);
+        txtNightFrom.setBackground(dateok ? Color.WHITE : red);
+        txtNightTo.setBackground(dateok ? Color.WHITE : red);
 
         boolean wph = contract.getDefaults().getWagePerHour() != null;
-        lblOvrWPH.setIcon(wph ? SYSConst.icon16apply : SYSConst.icon16infored);
+        txtWPH.setBackground(wph ? Color.WHITE : red);
 
         boolean wdpw = contract.getDefaults().getWorkingDaysPerWeek() != null;
-        lblOvrWDPW.setIcon(wdpw ? SYSConst.icon16apply : SYSConst.icon16infored);
+        txtWDPW.setBackground(wdpw ? Color.WHITE : red);
 
         boolean thpm = contract.getDefaults().getTargetHoursPerMonth() != null;
-        lblOvrTHPM.setIcon(thpm ? SYSConst.icon16apply : SYSConst.icon16infored);
-        lblOvrTHPD.setIcon(thpm ? SYSConst.icon16apply : SYSConst.icon16infored);
-        lblOvrTHPW.setIcon(thpm ? SYSConst.icon16apply : SYSConst.icon16infored);
+        txtTHPM.setBackground(thpm ? Color.WHITE : red);
+        txtTHPW.setBackground(thpm ? Color.WHITE : red);
 
         boolean hpp = contract.getDefaults().getHolidayPremiumPercentage() != null;
-        lblOvrHPP.setIcon(hpp ? SYSConst.icon16apply : SYSConst.icon16infored);
+        txtHolidayPercent.setBackground(hpp ? Color.WHITE : red);
 
         boolean nightok = contract.getDefaults().getNight() != null;
-        lblOvrNightTo.setIcon(nightok ? SYSConst.icon16apply : SYSConst.icon16infored);
-        lblOvrNightFrom.setIcon(nightok ? SYSConst.icon16apply : SYSConst.icon16infored);
+        txtNightFrom.setBackground(nightok ? Color.WHITE : red);
+        txtNightTo.setBackground(nightok ? Color.WHITE : red);
 
         boolean npp = contract.getDefaults().getNightPremiumPercentage() != null;
-        lblOvrNightPercent.setIcon(npp ? SYSConst.icon16apply : SYSConst.icon16infored);
-
+        txtNightPercent.setBackground(npp ? Color.WHITE : red);
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -198,7 +159,7 @@ public class PnlContractsEditor extends JPanel {
             }
         });
 
-        btnApply.setEnabled(dateok && wph && wdpw && thpm && hpp && nightok && npp);
+        btnApply.setEnabled(editable && dateok && wph && wdpw && thpm && hpp && nightok && npp);
 
         return dateok && wph && wdpw && thpm && hpp && nightok && npp;
     }
@@ -263,7 +224,7 @@ public class PnlContractsEditor extends JPanel {
         } finally {
             txtWDPW.setText(SYSTools.catchNull(contract.getDefaults().getWorkingDaysPerWeek()));
             if (contract.getDefaults().getTargetHoursPerDay() != null) {
-                txtTHPD.setText(contract.getDefaults().getTargetHoursPerDay().setScale(2, RoundingMode.HALF_UP).toString());
+                lblTHPDx.setText(contract.getDefaults().getTargetHoursPerDay().setScale(2, RoundingMode.HALF_UP).toString());
             }
             checkAll();
         }
@@ -278,7 +239,7 @@ public class PnlContractsEditor extends JPanel {
                 txtTHPM.setText(contract.getDefaults().getTargetHoursPerMonth().setScale(2, RoundingMode.HALF_UP).toString());
                 txtTHPW.setText(contract.getDefaults().getTargetHoursPerWeek().setScale(2, RoundingMode.HALF_UP).toString());
                 if (contract.getDefaults().getTargetHoursPerDay() != null) {
-                    txtTHPD.setText(contract.getDefaults().getTargetHoursPerDay().setScale(2, RoundingMode.HALF_UP).toString());
+                    lblTHPDx.setText(contract.getDefaults().getTargetHoursPerDay().setScale(2, RoundingMode.HALF_UP).toString());
                 }
             }
         } catch (NumberFormatException e1) {
@@ -298,7 +259,7 @@ public class PnlContractsEditor extends JPanel {
                 txtTHPM.setText(contract.getDefaults().getTargetHoursPerMonth().setScale(2, RoundingMode.HALF_UP).toString());
                 txtTHPW.setText(contract.getDefaults().getTargetHoursPerWeek().setScale(2, RoundingMode.HALF_UP).toString());
                 if (contract.getDefaults().getTargetHoursPerDay() != null) {
-                    txtTHPD.setText(contract.getDefaults().getTargetHoursPerDay().setScale(2, RoundingMode.HALF_UP).toString());
+                    lblTHPDx.setText(contract.getDefaults().getTargetHoursPerDay().setScale(2, RoundingMode.HALF_UP).toString());
                 }
             }
         } catch (NumberFormatException e1) {
@@ -313,14 +274,14 @@ public class PnlContractsEditor extends JPanel {
             return;
         }
         try {
-            contract.getDefaults().setTargetHoursPerDay(BigDecimal.valueOf(Double.parseDouble(txtTHPD.getText().replaceAll(",", "\\."))));
+            contract.getDefaults().setTargetHoursPerDay(BigDecimal.valueOf(Double.parseDouble(lblTHPDx.getText().replaceAll(",", "\\."))));
             if (contract.getDefaults().getTargetHoursPerWeek().compareTo(BigDecimal.ZERO) <= 0) {
                 contract.getDefaults().setTargetHoursPerWeek(null);
             } else {
                 txtTHPM.setText(contract.getDefaults().getTargetHoursPerMonth().setScale(2, RoundingMode.HALF_UP).toString());
                 txtTHPW.setText(contract.getDefaults().getTargetHoursPerWeek().setScale(2, RoundingMode.HALF_UP).toString());
                 if (contract.getDefaults().getTargetHoursPerDay() != null) {
-                    txtTHPD.setText(contract.getDefaults().getTargetHoursPerDay().setScale(2, RoundingMode.HALF_UP).toString());
+                    lblTHPDx.setText(contract.getDefaults().getTargetHoursPerDay().setScale(2, RoundingMode.HALF_UP).toString());
                 }
             }
         } catch (NumberFormatException e1) {
@@ -440,69 +401,105 @@ public class PnlContractsEditor extends JPanel {
                 repaint();
             }
         });
-
     }
+
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
-        label3 = new JLabel();
-        panel1 = new JPanel();
-        overFrom = new DefaultOverlayable();
+        lblFrom = new JLabel();
+        lblTo = new JLabel();
+        txtFrom = new JTextField();
         label1 = new JLabel();
-        overTo = new DefaultOverlayable();
+        panel1 = new JPanel();
+        txtTo = new JTextField();
         btnTo = new JButton();
-        overWPH = new DefaultOverlayable();
-        panel2 = new JPanel();
-        overWDPW = new DefaultOverlayable();
-        overTHPM = new DefaultOverlayable();
-        overTHPW = new DefaultOverlayable();
-        overTHPD = new DefaultOverlayable();
-        overHolidayPercent = new DefaultOverlayable();
-        panel3 = new JPanel();
-        overNightFrom = new DefaultOverlayable();
-        label2 = new JLabel();
-        overNightTo = new DefaultOverlayable();
-        overNightPercent = new DefaultOverlayable();
-        pnlPeriods = new JPanel();
-        btnApply = new JButton();
+        lblWPH = new JLabel();
+        lblHolidayPercent = new JLabel();
+        txtWPH = new JTextField();
+        txtHolidayPercent = new JTextField();
+        lblWDPW = new JLabel();
+        lblTHPM = new JLabel();
+        lblTHPW = new JLabel();
+        lblTHPD = new JLabel();
         txtWDPW = new JTextField();
         txtTHPM = new JTextField();
         txtTHPW = new JTextField();
-        txtTHPD = new JTextField();
-        txtWPH = new JTextField();
-        txtHolidayPercent = new JTextField();
+        lblTHPDx = new JLabel();
+        lblNightFrom = new JLabel();
+        lblNightTo = new JLabel();
+        lblNightPercent = new JLabel();
         txtNightFrom = new JTextField();
+        label2 = new JLabel();
         txtNightTo = new JTextField();
         txtNightPercent = new JTextField();
-        txtFrom = new JTextField();
-        txtTo = new JTextField();
+        pnlPeriods = new JPanel();
+        btnApply = new JButton();
 
         //======== this ========
         setLayout(new FormLayout(
-            "default, $lcgap, 122dlu:grow, $lcgap, default",
-            "7*(default, $lgap), fill:default:grow, $lgap, default"));
+                "default, 4*($lcgap, default:grow), $lcgap, default",
+                "9*(default, $lgap), fill:default:grow, 2*($lgap, default)"));
 
-        //---- label3 ----
-        label3.setText("text");
-        label3.setFont(new Font("Arial", Font.BOLD, 9));
-        add(label3, CC.xy(3, 3));
+        //---- lblFrom ----
+        lblFrom.setText("text");
+        lblFrom.setFont(new Font("Arial", Font.BOLD, 9));
+        lblFrom.setHorizontalAlignment(SwingConstants.TRAILING);
+        add(lblFrom, CC.xy(3, 3));
+
+        //---- lblTo ----
+        lblTo.setText("text");
+        lblTo.setFont(new Font("Arial", Font.BOLD, 9));
+        lblTo.setHorizontalAlignment(SwingConstants.TRAILING);
+        add(lblTo, CC.xywh(7, 3, 3, 1));
+
+        //---- txtFrom ----
+        txtFrom.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                txtFocusGained(e);
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                txtFromFocusLost(e);
+            }
+        });
+        txtFrom.addPropertyChangeListener("text", new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent e) {
+                txtWDPWPropertyChange(e);
+            }
+        });
+        add(txtFrom, CC.xy(3, 5));
+
+        //---- label1 ----
+        label1.setText(null);
+        label1.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/2rightarrow.png")));
+        add(label1, CC.xy(5, 5, CC.CENTER, CC.DEFAULT));
 
         //======== panel1 ========
         {
             panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
 
-            //---- overFrom ----
-            overFrom.setActualComponent(txtFrom);
-            panel1.add(overFrom);
+            //---- txtTo ----
+            txtTo.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusGained(FocusEvent e) {
+                    txtFocusGained(e);
+                }
 
-            //---- label1 ----
-            label1.setText(null);
-            label1.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/1rightarrow.png")));
-            panel1.add(label1);
-
-            //---- overTo ----
-            overTo.setActualComponent(txtTo);
-            panel1.add(overTo);
+                @Override
+                public void focusLost(FocusEvent e) {
+                    txtToFocusLost(e);
+                }
+            });
+            txtTo.addPropertyChangeListener("text", new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent e) {
+                    txtWDPWPropertyChange(e);
+                }
+            });
+            panel1.add(txtTo);
 
             //---- btnTo ----
             btnTo.setText(null);
@@ -519,150 +516,28 @@ public class PnlContractsEditor extends JPanel {
             });
             panel1.add(btnTo);
         }
-        add(panel1, CC.xy(3, 5));
+        add(panel1, CC.xywh(7, 5, 3, 1));
 
-        //---- overWPH ----
-        overWPH.setActualComponent(txtWPH);
-        add(overWPH, CC.xy(3, 7));
+        //---- lblWPH ----
+        lblWPH.setText("text");
+        lblWPH.setFont(new Font("Arial", Font.BOLD, 9));
+        lblWPH.setHorizontalAlignment(SwingConstants.TRAILING);
+        add(lblWPH, CC.xywh(3, 7, 3, 1));
 
-        //======== panel2 ========
-        {
-            panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
-
-            //---- overWDPW ----
-            overWDPW.setActualComponent(txtWDPW);
-            panel2.add(overWDPW);
-
-            //---- overTHPM ----
-            overTHPM.setActualComponent(txtTHPM);
-            panel2.add(overTHPM);
-
-            //---- overTHPW ----
-            overTHPW.setActualComponent(txtTHPW);
-            panel2.add(overTHPW);
-
-            //---- overTHPD ----
-            overTHPD.setActualComponent(txtTHPD);
-            panel2.add(overTHPD);
-        }
-        add(panel2, CC.xy(3, 9, CC.DEFAULT, CC.FILL));
-
-        //---- overHolidayPercent ----
-        overHolidayPercent.setActualComponent(txtHolidayPercent);
-        add(overHolidayPercent, CC.xy(3, 11));
-
-        //======== panel3 ========
-        {
-            panel3.setLayout(new BoxLayout(panel3, BoxLayout.X_AXIS));
-
-            //---- overNightFrom ----
-            overNightFrom.setActualComponent(txtNightFrom);
-            panel3.add(overNightFrom);
-
-            //---- label2 ----
-            label2.setText(null);
-            label2.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/1rightarrow.png")));
-            panel3.add(label2);
-
-            //---- overNightTo ----
-            overNightTo.setActualComponent(txtNightTo);
-            panel3.add(overNightTo);
-
-            //---- overNightPercent ----
-            overNightPercent.setActualComponent(txtNightPercent);
-            panel3.add(overNightPercent);
-        }
-        add(panel3, CC.xy(3, 13));
-
-        //======== pnlPeriods ========
-        {
-            pnlPeriods.setLayout(new BoxLayout(pnlPeriods, BoxLayout.PAGE_AXIS));
-        }
-        add(pnlPeriods, CC.xy(3, 15, CC.DEFAULT, CC.FILL));
-
-        //---- btnApply ----
-        btnApply.setText(null);
-        btnApply.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-        add(btnApply, CC.xy(3, 17, CC.RIGHT, CC.DEFAULT));
-
-        //---- txtWDPW ----
-        txtWDPW.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                txtFocusGained(e);
-            }
-            @Override
-            public void focusLost(FocusEvent e) {
-                txtWDPWFocusLost(e);
-            }
-        });
-        txtWDPW.addPropertyChangeListener("text", new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent e) {
-                txtWDPWPropertyChange(e);
-            }
-        });
-
-        //---- txtTHPM ----
-        txtTHPM.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                txtFocusGained(e);
-            }
-            @Override
-            public void focusLost(FocusEvent e) {
-                txtTHPMFocusLost(e);
-            }
-        });
-        txtTHPM.addPropertyChangeListener("text", new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent e) {
-                txtWDPWPropertyChange(e);
-            }
-        });
-
-        //---- txtTHPW ----
-        txtTHPW.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                txtFocusGained(e);
-            }
-            @Override
-            public void focusLost(FocusEvent e) {
-                txtTHPWFocusLost(e);
-            }
-        });
-        txtTHPW.addPropertyChangeListener("text", new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent e) {
-                txtWDPWPropertyChange(e);
-            }
-        });
-
-        //---- txtTHPD ----
-        txtTHPD.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                txtFocusGained(e);
-            }
-            @Override
-            public void focusLost(FocusEvent e) {
-                txtTHPDFocusLost(e);
-            }
-        });
-        txtTHPD.addPropertyChangeListener("text", new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent e) {
-                txtWDPWPropertyChange(e);
-            }
-        });
+        //---- lblHolidayPercent ----
+        lblHolidayPercent.setText("text");
+        lblHolidayPercent.setFont(new Font("Arial", Font.BOLD, 9));
+        lblHolidayPercent.setHorizontalAlignment(SwingConstants.TRAILING);
+        add(lblHolidayPercent, CC.xywh(7, 7, 3, 1));
 
         //---- txtWPH ----
+        txtWPH.setHorizontalAlignment(SwingConstants.TRAILING);
         txtWPH.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
                 txtFocusGained(e);
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 txtWPHFocusLost(e);
@@ -674,6 +549,7 @@ public class PnlContractsEditor extends JPanel {
                 txtWDPWPropertyChange(e);
             }
         });
+        add(txtWPH, CC.xywh(3, 9, 3, 1));
 
         //---- txtHolidayPercent ----
         txtHolidayPercent.addFocusListener(new FocusAdapter() {
@@ -681,6 +557,7 @@ public class PnlContractsEditor extends JPanel {
             public void focusGained(FocusEvent e) {
                 txtFocusGained(e);
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 txtHolidayPercentFocusLost(e);
@@ -692,6 +569,118 @@ public class PnlContractsEditor extends JPanel {
                 txtWDPWPropertyChange(e);
             }
         });
+        add(txtHolidayPercent, CC.xywh(7, 9, 3, 1));
+
+        //---- lblWDPW ----
+        lblWDPW.setText("text");
+        lblWDPW.setFont(new Font("Arial", Font.BOLD, 9));
+        lblWDPW.setHorizontalAlignment(SwingConstants.TRAILING);
+        add(lblWDPW, CC.xy(3, 11));
+
+        //---- lblTHPM ----
+        lblTHPM.setText("text");
+        lblTHPM.setFont(new Font("Arial", Font.BOLD, 9));
+        lblTHPM.setHorizontalAlignment(SwingConstants.TRAILING);
+        add(lblTHPM, CC.xy(5, 11));
+
+        //---- lblTHPW ----
+        lblTHPW.setText("text");
+        lblTHPW.setFont(new Font("Arial", Font.BOLD, 9));
+        lblTHPW.setHorizontalAlignment(SwingConstants.TRAILING);
+        add(lblTHPW, CC.xy(7, 11));
+
+        //---- lblTHPD ----
+        lblTHPD.setText("text");
+        lblTHPD.setFont(new Font("Arial", Font.BOLD, 9));
+        lblTHPD.setHorizontalAlignment(SwingConstants.TRAILING);
+        add(lblTHPD, CC.xy(9, 11));
+
+        //---- txtWDPW ----
+        txtWDPW.setHorizontalAlignment(SwingConstants.TRAILING);
+        txtWDPW.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                txtFocusGained(e);
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                txtWDPWFocusLost(e);
+            }
+        });
+        txtWDPW.addPropertyChangeListener("text", new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent e) {
+                txtWDPWPropertyChange(e);
+            }
+        });
+        add(txtWDPW, CC.xy(3, 13));
+
+        //---- txtTHPM ----
+        txtTHPM.setHorizontalAlignment(SwingConstants.TRAILING);
+        txtTHPM.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                txtFocusGained(e);
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                txtTHPMFocusLost(e);
+            }
+        });
+        txtTHPM.addPropertyChangeListener("text", new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent e) {
+                txtWDPWPropertyChange(e);
+            }
+        });
+        add(txtTHPM, CC.xy(5, 13));
+
+        //---- txtTHPW ----
+        txtTHPW.setHorizontalAlignment(SwingConstants.TRAILING);
+        txtTHPW.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                txtFocusGained(e);
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                txtTHPWFocusLost(e);
+            }
+        });
+        txtTHPW.addPropertyChangeListener("text", new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent e) {
+                txtWDPWPropertyChange(e);
+            }
+        });
+        add(txtTHPW, CC.xy(7, 13));
+
+        //---- lblTHPDx ----
+        lblTHPDx.setText("text");
+        lblTHPDx.setHorizontalAlignment(SwingConstants.TRAILING);
+        lblTHPDx.setBorder(new LineBorder(Color.black));
+        add(lblTHPDx, CC.xy(9, 13));
+
+        //---- lblNightFrom ----
+        lblNightFrom.setText("text");
+        lblNightFrom.setFont(new Font("Arial", Font.BOLD, 9));
+        lblNightFrom.setHorizontalAlignment(SwingConstants.TRAILING);
+        add(lblNightFrom, CC.xy(3, 15));
+
+        //---- lblNightTo ----
+        lblNightTo.setText("text");
+        lblNightTo.setFont(new Font("Arial", Font.BOLD, 9));
+        lblNightTo.setHorizontalAlignment(SwingConstants.TRAILING);
+        add(lblNightTo, CC.xy(7, 15));
+
+        //---- lblNightPercent ----
+        lblNightPercent.setText("text");
+        lblNightPercent.setFont(new Font("Arial", Font.BOLD, 9));
+        lblNightPercent.setHorizontalAlignment(SwingConstants.TRAILING);
+        add(lblNightPercent, CC.xy(9, 15));
 
         //---- txtNightFrom ----
         txtNightFrom.addFocusListener(new FocusAdapter() {
@@ -699,6 +688,7 @@ public class PnlContractsEditor extends JPanel {
             public void focusGained(FocusEvent e) {
                 txtFocusGained(e);
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 txtNightFromFocusLost(e);
@@ -710,6 +700,12 @@ public class PnlContractsEditor extends JPanel {
                 txtWDPWPropertyChange(e);
             }
         });
+        add(txtNightFrom, CC.xy(3, 17));
+
+        //---- label2 ----
+        label2.setText(null);
+        label2.setIcon(new ImageIcon(getClass().getResource("/artwork/16x16/2rightarrow.png")));
+        add(label2, CC.xy(5, 17, CC.CENTER, CC.DEFAULT));
 
         //---- txtNightTo ----
         txtNightTo.addFocusListener(new FocusAdapter() {
@@ -717,6 +713,7 @@ public class PnlContractsEditor extends JPanel {
             public void focusGained(FocusEvent e) {
                 txtFocusGained(e);
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 txtNightToFocusLost(e);
@@ -728,13 +725,16 @@ public class PnlContractsEditor extends JPanel {
                 txtWDPWPropertyChange(e);
             }
         });
+        add(txtNightTo, CC.xy(7, 17));
 
         //---- txtNightPercent ----
+        txtNightPercent.setHorizontalAlignment(SwingConstants.TRAILING);
         txtNightPercent.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
                 txtFocusGained(e);
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 txtNightPercentFocusLost(e);
@@ -746,77 +746,50 @@ public class PnlContractsEditor extends JPanel {
                 txtWDPWPropertyChange(e);
             }
         });
+        add(txtNightPercent, CC.xy(9, 17));
 
-        //---- txtFrom ----
-        txtFrom.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                txtFocusGained(e);
-            }
-            @Override
-            public void focusLost(FocusEvent e) {
-                txtFromFocusLost(e);
-            }
-        });
-        txtFrom.addPropertyChangeListener("text", new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent e) {
-                txtWDPWPropertyChange(e);
-            }
-        });
+        //======== pnlPeriods ========
+        {
+            pnlPeriods.setLayout(new BoxLayout(pnlPeriods, BoxLayout.PAGE_AXIS));
+        }
+        add(pnlPeriods, CC.xywh(3, 19, 7, 1, CC.DEFAULT, CC.FILL));
 
-        //---- txtTo ----
-        txtTo.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                txtFocusGained(e);
-            }
-            @Override
-            public void focusLost(FocusEvent e) {
-                txtToFocusLost(e);
-            }
-        });
-        txtTo.addPropertyChangeListener("text", new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent e) {
-                txtWDPWPropertyChange(e);
-            }
-        });
+        //---- btnApply ----
+        btnApply.setText(null);
+        btnApply.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+        add(btnApply, CC.xy(9, 21, CC.RIGHT, CC.DEFAULT));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-    private JLabel label3;
-    private JPanel panel1;
-    private DefaultOverlayable overFrom;
+    private JLabel lblFrom;
+    private JLabel lblTo;
+    private JTextField txtFrom;
     private JLabel label1;
-    private DefaultOverlayable overTo;
+    private JPanel panel1;
+    private JTextField txtTo;
     private JButton btnTo;
-    private DefaultOverlayable overWPH;
-    private JPanel panel2;
-    private DefaultOverlayable overWDPW;
-    private DefaultOverlayable overTHPM;
-    private DefaultOverlayable overTHPW;
-    private DefaultOverlayable overTHPD;
-    private DefaultOverlayable overHolidayPercent;
-    private JPanel panel3;
-    private DefaultOverlayable overNightFrom;
-    private JLabel label2;
-    private DefaultOverlayable overNightTo;
-    private DefaultOverlayable overNightPercent;
-    private JPanel pnlPeriods;
-    private JButton btnApply;
+    private JLabel lblWPH;
+    private JLabel lblHolidayPercent;
+    private JTextField txtWPH;
+    private JTextField txtHolidayPercent;
+    private JLabel lblWDPW;
+    private JLabel lblTHPM;
+    private JLabel lblTHPW;
+    private JLabel lblTHPD;
     private JTextField txtWDPW;
     private JTextField txtTHPM;
     private JTextField txtTHPW;
-    private JTextField txtTHPD;
-    private JTextField txtWPH;
-    private JTextField txtHolidayPercent;
+    private JLabel lblTHPDx;
+    private JLabel lblNightFrom;
+    private JLabel lblNightTo;
+    private JLabel lblNightPercent;
     private JTextField txtNightFrom;
+    private JLabel label2;
     private JTextField txtNightTo;
     private JTextField txtNightPercent;
-    private JTextField txtFrom;
-    private JTextField txtTo;
+    private JPanel pnlPeriods;
+    private JButton btnApply;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

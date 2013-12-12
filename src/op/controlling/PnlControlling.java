@@ -468,7 +468,7 @@ public class PnlControlling extends CleanablePanel {
         cmbSocialTimes.setRenderer(new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                return new DefaultListCellRenderer().getListCellRendererComponent(list, monthFormatter.format(((DateMidnight) value).toDate()), index, isSelected, cellHasFocus);
+                return new DefaultListCellRenderer().getListCellRendererComponent(list, monthFormatter.format(((LocalDate) value).toDate()), index, isSelected, cellHasFocus);
             }
         });
         cmbSocialTimes.setSelectedIndex(cmbSocialTimes.getItemCount() - 2);

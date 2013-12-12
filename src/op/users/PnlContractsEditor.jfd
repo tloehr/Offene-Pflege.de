@@ -4,32 +4,54 @@ new FormModel {
 	contentType: "form/swing"
 	root: new FormRoot {
 		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-			"$columnSpecs": "default, labelcompgap, 122dlu:grow, labelcompgap, default"
-			"$rowSpecs": "default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, fill:default:grow, linegap, default"
+			"$columnSpecs": "default, labelcompgap, default:grow, labelcompgap, default:grow, labelcompgap, default:grow, labelcompgap, default:grow, labelcompgap, default"
+			"$rowSpecs": "default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, fill:default:grow, linegap, default, linegap, default"
 		} ) {
 			name: "this"
 			add( new FormComponent( "javax.swing.JLabel" ) {
-				name: "label3"
+				name: "lblFrom"
 				"text": "text"
-				"font": new java.awt.Font( "Arial", 1, 9 )
+				"font": &Font0 new java.awt.Font( "Arial", 1, 9 )
+				"horizontalAlignment": 11
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridY": 3
+				"gridX": 3
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblTo"
+				"text": "text"
+				"font": #Font0
+				"horizontalAlignment": 11
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 7
+				"gridY": 3
+				"gridWidth": 3
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "txtFrom"
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtFromFocusLost", true ) )
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusGained", "txtFocusGained", true ) )
+				addEvent( new FormEvent( "java.beans.PropertyChangeListener", "propertyChange", "txtWDPWPropertyChange", true, "text" ) )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 3
-				"gridY": 3
+				"gridY": 5
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "label1"
+				"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
+				"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/16x16/2rightarrow.png" )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 5
+				"gridY": 5
+				"hAlign": sfield com.jgoodies.forms.layout.CellConstraints CENTER
 			} )
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
 				name: "panel1"
-				add( new FormComponent( "com.jidesoft.swing.DefaultOverlayable" ) {
-					name: "overFrom"
-					"actualComponent": new FormReference( "txtFrom" )
-				} )
-				add( new FormComponent( "javax.swing.JLabel" ) {
-					name: "label1"
-					"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-					"icon": &SwingIcon0 new com.jformdesigner.model.SwingIcon( 0, "/artwork/16x16/1rightarrow.png" )
-				} )
-				add( new FormComponent( "com.jidesoft.swing.DefaultOverlayable" ) {
-					name: "overTo"
-					"actualComponent": new FormReference( "txtTo" )
+				add( new FormComponent( "javax.swing.JTextField" ) {
+					name: "txtTo"
+					addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtToFocusLost", true ) )
+					addEvent( new FormEvent( "java.awt.event.FocusListener", "focusGained", "txtFocusGained", true ) )
+					addEvent( new FormEvent( "java.beans.PropertyChangeListener", "propertyChange", "txtWDPWPropertyChange", true, "text" ) )
 				} )
 				add( new FormComponent( "javax.swing.JButton" ) {
 					name: "btnTo"
@@ -42,70 +64,189 @@ new FormModel {
 					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnToActionPerformed", true ) )
 				} )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 7
 				"gridY": 5
-				"gridX": 3
+				"gridWidth": 3
 			} )
-			add( new FormComponent( "com.jidesoft.swing.DefaultOverlayable" ) {
-				name: "overWPH"
-				"actualComponent": new FormReference( "txtWPH" )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblWPH"
+				"text": "text"
+				"font": #Font0
+				"horizontalAlignment": 11
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridX": 3
 				"gridY": 7
+				"gridX": 3
+				"gridWidth": 3
 			} )
-			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
-				name: "panel2"
-				add( new FormComponent( "com.jidesoft.swing.DefaultOverlayable" ) {
-					name: "overWDPW"
-					"actualComponent": new FormReference( "txtWDPW" )
-				} )
-				add( new FormComponent( "com.jidesoft.swing.DefaultOverlayable" ) {
-					name: "overTHPM"
-					"actualComponent": new FormReference( "txtTHPM" )
-				} )
-				add( new FormComponent( "com.jidesoft.swing.DefaultOverlayable" ) {
-					name: "overTHPW"
-					"actualComponent": new FormReference( "txtTHPW" )
-				} )
-				add( new FormComponent( "com.jidesoft.swing.DefaultOverlayable" ) {
-					name: "overTHPD"
-					"actualComponent": new FormReference( "txtTHPD" )
-				} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblHolidayPercent"
+				"text": "text"
+				"font": #Font0
+				"horizontalAlignment": 11
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridY": 7
+				"gridX": 7
+				"gridWidth": 3
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "txtWPH"
+				"horizontalAlignment": 11
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtWPHFocusLost", true ) )
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusGained", "txtFocusGained", true ) )
+				addEvent( new FormEvent( "java.beans.PropertyChangeListener", "propertyChange", "txtWDPWPropertyChange", true, "text" ) )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 3
 				"gridY": 9
-				"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+				"gridWidth": 3
 			} )
-			add( new FormComponent( "com.jidesoft.swing.DefaultOverlayable" ) {
-				name: "overHolidayPercent"
-				"actualComponent": new FormReference( "txtHolidayPercent" )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "txtHolidayPercent"
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtHolidayPercentFocusLost", true ) )
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusGained", "txtFocusGained", true ) )
+				addEvent( new FormEvent( "java.beans.PropertyChangeListener", "propertyChange", "txtWDPWPropertyChange", true, "text" ) )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridX": 3
-				"gridY": 11
+				"gridX": 7
+				"gridY": 9
+				"gridWidth": 3
 			} )
-			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
-				"axis": 0
-			} ) {
-				name: "panel3"
-				add( new FormComponent( "com.jidesoft.swing.DefaultOverlayable" ) {
-					name: "overNightFrom"
-					"actualComponent": new FormReference( "txtNightFrom" )
-				} )
-				add( new FormComponent( "javax.swing.JLabel" ) {
-					name: "label2"
-					"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-					"icon": #SwingIcon0
-				} )
-				add( new FormComponent( "com.jidesoft.swing.DefaultOverlayable" ) {
-					name: "overNightTo"
-					"actualComponent": new FormReference( "txtNightTo" )
-				} )
-				add( new FormComponent( "com.jidesoft.swing.DefaultOverlayable" ) {
-					name: "overNightPercent"
-					"actualComponent": new FormReference( "txtNightPercent" )
-				} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblWDPW"
+				"text": "text"
+				"font": #Font0
+				"horizontalAlignment": 11
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridY": 11
+				"gridX": 3
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblTHPM"
+				"text": "text"
+				"font": #Font0
+				"horizontalAlignment": 11
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridY": 11
+				"gridX": 5
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblTHPW"
+				"text": "text"
+				"font": #Font0
+				"horizontalAlignment": 11
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridY": 11
+				"gridX": 7
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblTHPD"
+				"text": "text"
+				"font": #Font0
+				"horizontalAlignment": 11
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridY": 11
+				"gridX": 9
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "txtWDPW"
+				"horizontalAlignment": 11
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtWDPWFocusLost", true ) )
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusGained", "txtFocusGained", true ) )
+				addEvent( new FormEvent( "java.beans.PropertyChangeListener", "propertyChange", "txtWDPWPropertyChange", true, "text" ) )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 3
 				"gridY": 13
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "txtTHPM"
+				"horizontalAlignment": 11
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtTHPMFocusLost", true ) )
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusGained", "txtFocusGained", true ) )
+				addEvent( new FormEvent( "java.beans.PropertyChangeListener", "propertyChange", "txtWDPWPropertyChange", true, "text" ) )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 5
+				"gridY": 13
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "txtTHPW"
+				"horizontalAlignment": 11
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtTHPWFocusLost", true ) )
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusGained", "txtFocusGained", true ) )
+				addEvent( new FormEvent( "java.beans.PropertyChangeListener", "propertyChange", "txtWDPWPropertyChange", true, "text" ) )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 7
+				"gridY": 13
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblTHPDx"
+				"text": "text"
+				"horizontalAlignment": 11
+				"border": new javax.swing.border.LineBorder( sfield java.awt.Color black, 1, false )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 9
+				"gridY": 13
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblNightFrom"
+				"text": "text"
+				"font": #Font0
+				"horizontalAlignment": 11
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridY": 15
+				"gridX": 3
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblNightTo"
+				"text": "text"
+				"font": #Font0
+				"horizontalAlignment": 11
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridY": 15
+				"gridX": 7
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblNightPercent"
+				"text": "text"
+				"font": #Font0
+				"horizontalAlignment": 11
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridY": 15
+				"gridX": 9
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "txtNightFrom"
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtNightFromFocusLost", true ) )
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusGained", "txtFocusGained", true ) )
+				addEvent( new FormEvent( "java.beans.PropertyChangeListener", "propertyChange", "txtWDPWPropertyChange", true, "text" ) )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 3
+				"gridY": 17
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "label2"
+				"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
+				"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/16x16/2rightarrow.png" )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 5
+				"gridY": 17
+				"hAlign": sfield com.jgoodies.forms.layout.CellConstraints CENTER
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "txtNightTo"
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtNightToFocusLost", true ) )
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusGained", "txtFocusGained", true ) )
+				addEvent( new FormEvent( "java.beans.PropertyChangeListener", "propertyChange", "txtWDPWPropertyChange", true, "text" ) )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 7
+				"gridY": 17
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "txtNightPercent"
+				"horizontalAlignment": 11
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtNightPercentFocusLost", true ) )
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusGained", "txtFocusGained", true ) )
+				addEvent( new FormEvent( "java.beans.PropertyChangeListener", "propertyChange", "txtWDPWPropertyChange", true, "text" ) )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 9
+				"gridY": 17
 			} )
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
 				"axis": 3
@@ -113,112 +254,22 @@ new FormModel {
 				name: "pnlPeriods"
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 3
-				"gridY": 15
+				"gridY": 19
 				"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+				"gridWidth": 7
 			} )
 			add( new FormComponent( "javax.swing.JButton" ) {
 				name: "btnApply"
 				"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
 				"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/apply.png" )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridX": 3
-				"gridY": 17
+				"gridX": 9
+				"gridY": 21
 				"hAlign": sfield com.jgoodies.forms.layout.CellConstraints RIGHT
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
 			"size": new java.awt.Dimension( 400, 390 )
-		} )
-		add( new FormComponent( "javax.swing.JTextField" ) {
-			name: "txtWDPW"
-			addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtWDPWFocusLost", true ) )
-			addEvent( new FormEvent( "java.awt.event.FocusListener", "focusGained", "txtFocusGained", true ) )
-			addEvent( new FormEvent( "java.beans.PropertyChangeListener", "propertyChange", "txtWDPWPropertyChange", true, "text" ) )
-		}, new FormLayoutConstraints( null ) {
-			"location": new java.awt.Point( 10, 395 )
-			"size": new java.awt.Dimension( 97, 27 )
-		} )
-		add( new FormComponent( "javax.swing.JTextField" ) {
-			name: "txtTHPM"
-			addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtTHPMFocusLost", true ) )
-			addEvent( new FormEvent( "java.awt.event.FocusListener", "focusGained", "txtFocusGained", true ) )
-			addEvent( new FormEvent( "java.beans.PropertyChangeListener", "propertyChange", "txtWDPWPropertyChange", true, "text" ) )
-		}, new FormLayoutConstraints( null ) {
-			"location": new java.awt.Point( 60, 450 )
-		} )
-		add( new FormComponent( "javax.swing.JTextField" ) {
-			name: "txtTHPW"
-			addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtTHPWFocusLost", true ) )
-			addEvent( new FormEvent( "java.awt.event.FocusListener", "focusGained", "txtFocusGained", true ) )
-			addEvent( new FormEvent( "java.beans.PropertyChangeListener", "propertyChange", "txtWDPWPropertyChange", true, "text" ) )
-		}, new FormLayoutConstraints( null ) {
-			"location": new java.awt.Point( 220, 455 )
-		} )
-		add( new FormComponent( "javax.swing.JTextField" ) {
-			name: "txtTHPD"
-			addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtTHPDFocusLost", true ) )
-			addEvent( new FormEvent( "java.awt.event.FocusListener", "focusGained", "txtFocusGained", true ) )
-			addEvent( new FormEvent( "java.beans.PropertyChangeListener", "propertyChange", "txtWDPWPropertyChange", true, "text" ) )
-		}, new FormLayoutConstraints( null ) {
-			"location": new java.awt.Point( 140, 335 )
-		} )
-		add( new FormComponent( "javax.swing.JTextField" ) {
-			name: "txtWPH"
-			addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtWPHFocusLost", true ) )
-			addEvent( new FormEvent( "java.awt.event.FocusListener", "focusGained", "txtFocusGained", true ) )
-			addEvent( new FormEvent( "java.beans.PropertyChangeListener", "propertyChange", "txtWDPWPropertyChange", true, "text" ) )
-		}, new FormLayoutConstraints( null ) {
-			"location": new java.awt.Point( 35, 65 )
-		} )
-		add( new FormComponent( "javax.swing.JTextField" ) {
-			name: "txtHolidayPercent"
-			addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtHolidayPercentFocusLost", true ) )
-			addEvent( new FormEvent( "java.awt.event.FocusListener", "focusGained", "txtFocusGained", true ) )
-			addEvent( new FormEvent( "java.beans.PropertyChangeListener", "propertyChange", "txtWDPWPropertyChange", true, "text" ) )
-		}, new FormLayoutConstraints( null ) {
-			"location": new java.awt.Point( 255, 415 )
-		} )
-		add( new FormComponent( "javax.swing.JTextField" ) {
-			name: "txtNightFrom"
-			addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtNightFromFocusLost", true ) )
-			addEvent( new FormEvent( "java.awt.event.FocusListener", "focusGained", "txtFocusGained", true ) )
-			addEvent( new FormEvent( "java.beans.PropertyChangeListener", "propertyChange", "txtWDPWPropertyChange", true, "text" ) )
-		}, new FormLayoutConstraints( null ) {
-			"location": new java.awt.Point( 260, 470 )
-		} )
-		add( new FormComponent( "javax.swing.JTextField" ) {
-			name: "txtNightTo"
-			addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtNightToFocusLost", true ) )
-			addEvent( new FormEvent( "java.awt.event.FocusListener", "focusGained", "txtFocusGained", true ) )
-			addEvent( new FormEvent( "java.beans.PropertyChangeListener", "propertyChange", "txtWDPWPropertyChange", true, "text" ) )
-		}, new FormLayoutConstraints( null ) {
-			"location": new java.awt.Point( 470, 510 )
-		} )
-		add( new FormComponent( "javax.swing.JTextField" ) {
-			name: "txtNightPercent"
-			addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtNightPercentFocusLost", true ) )
-			addEvent( new FormEvent( "java.awt.event.FocusListener", "focusGained", "txtFocusGained", true ) )
-			addEvent( new FormEvent( "java.beans.PropertyChangeListener", "propertyChange", "txtWDPWPropertyChange", true, "text" ) )
-		}, new FormLayoutConstraints( null ) {
-			"location": new java.awt.Point( 535, 490 )
-		} )
-		add( new FormComponent( "javax.swing.JTextField" ) {
-			name: "txtFrom"
-			addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtFromFocusLost", true ) )
-			addEvent( new FormEvent( "java.awt.event.FocusListener", "focusGained", "txtFocusGained", true ) )
-			addEvent( new FormEvent( "java.beans.PropertyChangeListener", "propertyChange", "txtWDPWPropertyChange", true, "text" ) )
-		}, new FormLayoutConstraints( null ) {
-			"location": new java.awt.Point( 100, 515 )
-			"size": new java.awt.Dimension( 155, 27 )
-		} )
-		add( new FormComponent( "javax.swing.JTextField" ) {
-			name: "txtTo"
-			addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtToFocusLost", true ) )
-			addEvent( new FormEvent( "java.awt.event.FocusListener", "focusGained", "txtFocusGained", true ) )
-			addEvent( new FormEvent( "java.beans.PropertyChangeListener", "propertyChange", "txtWDPWPropertyChange", true, "text" ) )
-		}, new FormLayoutConstraints( null ) {
-			"location": new java.awt.Point( 490, 605 )
-			"size": new java.awt.Dimension( 311, 27 )
 		} )
 	}
 }

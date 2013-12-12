@@ -69,20 +69,32 @@ public class DlgUser extends MyJDialog {
             cpsContracts.setLayout(new JideBoxLayout(cpsContracts, JideBoxLayout.Y_AXIS));
 
             synchronized (cpMap) {
+
                 for (UserContract userContract : userContracts.getListContracts()) {
                     final String key = userContract.hashCode() + ".contract";
                     cpsContracts.add(cpMap.get(key));
                 }
+
+            }
+            cpsContracts.addExpansion();
+        } else {
+            cpsContracts.removeAll();
+            cpsContracts.setLayout(new JideBoxLayout(cpsContracts, JideBoxLayout.Y_AXIS));
+
+            if (user.isActive()) {
+                cpsContracts.add(GUITools.createHyperlinkButton("User is active, aber nix vertrag. Du wolle vertrag ? Mache Drück!", SYSConst.icon22add, null));
+            } else {
+                cpsContracts.add(new JLabel("User nix active, nix vertrag"));
             }
             cpsContracts.addExpansion();
         }
 
 
-        lblFirstname = new JLabel(OPDE.lang.getString("misc.msg.firstname")+" ");
-        lblName = new JLabel(OPDE.lang.getString("misc.msg.name")+" ");
-        lblPW = new JLabel(OPDE.lang.getString("misc.msg.password")+" ");
-        lblUID = new JLabel(OPDE.lang.getString("misc.msg.uid")+" ");
-        lblEmail = new JLabel(OPDE.lang.getString("misc.msg.email")+" ");
+        lblFirstname = new JLabel(OPDE.lang.getString("misc.msg.firstname") + " ");
+        lblName = new JLabel(OPDE.lang.getString("misc.msg.name") + " ");
+        lblPW = new JLabel(OPDE.lang.getString("misc.msg.password") + " ");
+        lblUID = new JLabel(OPDE.lang.getString("misc.msg.uid") + " ");
+        lblEmail = new JLabel(OPDE.lang.getString("misc.msg.email") + " ");
 
         txtName = new JTextField(user.getName());
         txtEMail = new JTextField(user.getEMail());
@@ -115,7 +127,6 @@ public class DlgUser extends MyJDialog {
         lblPW.setForeground(SYSConst.bluegrey.darker());
         overPW.addOverlayComponent(lblPW, SwingConstants.EAST);
         pnlMain.add(overPW, CC.xy(3, 11, CC.FILL, CC.DEFAULT));
-
 
         txtPW.setEnabled(user.getUID() == null);
         txtUID.setEnabled(user.getUID() == null);
@@ -232,11 +243,11 @@ public class DlgUser extends MyJDialog {
             }
         });
         cptitle.getRight().add(btnMenu);
-        
+
         cpContract.setTitleLabelComponent(cptitle.getMain());
         cpContract.setSlidingDirection(SwingConstants.SOUTH);
 
-        
+
         cpContract.setBackground(Color.WHITE);
         cpContract.setOpaque(false);
         cpContract.setHorizontalAlignment(SwingConstants.LEADING);
@@ -244,12 +255,12 @@ public class DlgUser extends MyJDialog {
         cpContract.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                cpContract.setContentPane(new PnlContractsEditor(contract));
+                cpContract.setContentPane(new PnlContractsEditor(contract, false));
             }
         });
 
         if (!cpContract.isCollapsed()) {
-            cpContract.setContentPane(new PnlContractsEditor(contract));
+            cpContract.setContentPane(new PnlContractsEditor(contract, false));
         }
 
 
@@ -317,6 +328,7 @@ public class DlgUser extends MyJDialog {
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         pnlMain = new JPanel();
+        lbl = new JLabel();
         scrlContracts = new JScrollPane();
         cpsContracts = new CollapsiblePanes();
         jPanel3 = new JPanel();
@@ -331,13 +343,19 @@ public class DlgUser extends MyJDialog {
         {
             pnlMain.setLayout(new FormLayout(
                     "14dlu, $lcgap, 160dlu:grow, $ugap, 229dlu:grow, $lcgap, 14dlu",
-                    "14dlu, 4*($lgap, fill:default), $lgap, default, fill:9dlu:grow, default, $lgap, 14dlu"));
+                    "14dlu, $lgap, default, 4*($lgap, fill:default), $lgap, default, fill:135dlu, default, $lgap, 14dlu"));
+
+            //---- lbl ----
+            lbl.setText("Arbeitsvertr\u00e4ge");
+            lbl.setFont(new Font("Arial", Font.PLAIN, 11));
+            lbl.setHorizontalAlignment(SwingConstants.TRAILING);
+            pnlMain.add(lbl, CC.xy(5, 3));
 
             //======== scrlContracts ========
             {
                 scrlContracts.setViewportView(cpsContracts);
             }
-            pnlMain.add(scrlContracts, CC.xywh(5, 3, 1, 10));
+            pnlMain.add(scrlContracts, CC.xywh(5, 5, 1, 10));
 
             //======== jPanel3 ========
             {
@@ -365,7 +383,7 @@ public class DlgUser extends MyJDialog {
                 });
                 jPanel3.add(btnSave);
             }
-            pnlMain.add(jPanel3, CC.xy(5, 13, CC.RIGHT, CC.DEFAULT));
+            pnlMain.add(jPanel3, CC.xy(5, 15, CC.RIGHT, CC.DEFAULT));
         }
         contentPane.add(pnlMain);
         pack();
@@ -375,6 +393,7 @@ public class DlgUser extends MyJDialog {
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JPanel pnlMain;
+    private JLabel lbl;
     private JScrollPane scrlContracts;
     private CollapsiblePanes cpsContracts;
     private JPanel jPanel3;
