@@ -61,6 +61,7 @@ new FormModel {
 					"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
 					"contentAreaFilled": false
 					"cursor": new java.awt.Cursor( 12 )
+					"focusable": false
 					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnToActionPerformed", true ) )
 				} )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
@@ -76,7 +77,15 @@ new FormModel {
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridY": 7
 				"gridX": 3
-				"gridWidth": 3
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblVDPY"
+				"text": "text"
+				"font": #Font0
+				"horizontalAlignment": 11
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridY": 7
+				"gridX": 5
 			} )
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "lblHolidayPercent"
@@ -86,7 +95,15 @@ new FormModel {
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridY": 7
 				"gridX": 7
-				"gridWidth": 3
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblSection"
+				"text": "text"
+				"font": #Font0
+				"horizontalAlignment": 11
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridY": 7
+				"gridX": 9
 			} )
 			add( new FormComponent( "javax.swing.JTextField" ) {
 				name: "txtWPH"
@@ -97,7 +114,13 @@ new FormModel {
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 3
 				"gridY": 9
-				"gridWidth": 3
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "txtVDPY"
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtVDPYFocusLost", true ) )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 5
+				"gridY": 9
 			} )
 			add( new FormComponent( "javax.swing.JTextField" ) {
 				name: "txtHolidayPercent"
@@ -107,7 +130,13 @@ new FormModel {
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 7
 				"gridY": 9
-				"gridWidth": 3
+			} )
+			add( new FormComponent( "javax.swing.JComboBox" ) {
+				name: "cmbSection"
+				addEvent( new FormEvent( "java.awt.event.ItemListener", "itemStateChanged", "cmbSectionItemStateChanged", true ) )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 9
+				"gridY": 9
 			} )
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "lblWDPW"
@@ -257,15 +286,6 @@ new FormModel {
 				"gridY": 19
 				"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 				"gridWidth": 7
-			} )
-			add( new FormComponent( "javax.swing.JButton" ) {
-				name: "btnApply"
-				"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-				"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/apply.png" )
-			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridX": 9
-				"gridY": 21
-				"hAlign": sfield com.jgoodies.forms.layout.CellConstraints RIGHT
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )

@@ -295,8 +295,14 @@ public class PnlDev extends CleanablePanel {
         UserContract contract = new UserContract(new ContractsParameterSet());
         contract.getDefaults().setExam(true);
 
-        frm.setContentPane(new PnlContractsEditor(contract, false));
+        PnlContractsEditor pnl = new PnlContractsEditor(contract, true);
+
+        frm.setContentPane(pnl);
         frm.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        frm.setFocusTraversalPolicy(pnl.getFocusTraversalPolicy());
+        frm.setFocusTraversalPolicyProvider(true);
+        frm.setFocusCycleRoot(true);
+
         frm.setVisible(true);
     }
 

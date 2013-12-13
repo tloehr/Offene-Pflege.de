@@ -766,6 +766,9 @@ public class GUITools {
         btnPanel.setLayout(new BoxLayout(btnPanel, BoxLayout.X_AXIS));
 
         JButton saveButton = new JButton(SYSConst.icon22apply);
+        saveButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        saveButton.setPressedIcon(SYSConst.icon22applyPressed);
+
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

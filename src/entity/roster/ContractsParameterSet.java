@@ -4,7 +4,6 @@ package entity.roster;
 import op.OPDE;
 import op.tools.Pair;
 import op.tools.SYSCalendar;
-import op.tools.SYSConst;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
@@ -29,10 +28,9 @@ public class ContractsParameterSet implements Cloneable, Comparable<ContractsPar
 
 
     public ContractsParameterSet() {
-        this(SYSCalendar.eom(new LocalDate()).plusDays(1), SYSCalendar.eom(new LocalDate()).plusDays(1).plusYears(1).minusDays(1));
+        this(SYSCalendar.eom(new LocalDate()).plusDays(1), SYSCalendar.eom(new LocalDate()).plusDays(1).plusYears(1).minusDays(1), new Pair<LocalTime, LocalTime>(new LocalTime(23, 0), new LocalTime(6, 0)), new BigDecimal(30),
+                new BigDecimal(8.5d), new BigDecimal(6), new BigDecimal(158), new BigDecimal(15), new BigDecimal(25), RosterXML.sections[RosterXML.CARE], false, false);
 
-        trainee = false;
-        exam = false;
     }
 
     public ContractsParameterSet(LocalDate from, LocalDate to) {

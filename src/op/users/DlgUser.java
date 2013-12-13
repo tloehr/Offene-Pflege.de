@@ -13,6 +13,7 @@ import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.DefaultOverlayable;
 import com.jidesoft.swing.JideBoxLayout;
+import entity.roster.ContractsParameterSet;
 import entity.roster.UserContract;
 import entity.roster.UserContracts;
 import entity.system.Users;
@@ -45,15 +46,18 @@ public class DlgUser extends MyJDialog {
     UserContracts userContracts;
     private JLabel lblFirstname, lblName, lblPW, lblUID, lblEmail;
     private JTextField txtName, txtEMail, txtVorname, txtPW, txtUID;
+    private JDialog me;
 
     public DlgUser(Users user, Closure callback) {
         super(false);
         this.user = user;
         this.callback = callback;
+        me = this;
         initComponents();
         initDialog();
         pack();
         setVisible(true);
+
     }
 
     private void initDialog() {
@@ -82,9 +86,30 @@ public class DlgUser extends MyJDialog {
             cpsContracts.setLayout(new JideBoxLayout(cpsContracts, JideBoxLayout.Y_AXIS));
 
             if (user.isActive()) {
-                cpsContracts.add(GUITools.createHyperlinkButton("User is active, aber nix vertrag. Du wolle vertrag ? Mache Drück!", SYSConst.icon22add, null));
+
+                cpsContracts.add(GUITools.createHyperlinkButton(OPDE.lang.getString("opde.users.dlgusers.create.first.contract"), SYSConst.icon22add, new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        UserContract contract = new UserContract(new ContractsParameterSet());
+                        contract.getDefaults().setExam(UsersTools.isQualified(user));
+                        JidePopup popup = GUITools.createPanelPopup(new PnlContractsEditor(contract, true), new Closure() {
+                            @Override
+                            public void execute(Object o) {
+                                if (o != null){
+                                    UserContracts contracts = new UserContracts();
+                                    contracts.add((UserContract) o);
+
+                                    user.setXml(contracts.toXML());
+                                    OPDE.debug(user.getXml());
+                                    initDialog();
+                                }
+                            }
+                        }, me);
+                        GUITools.showPopup(popup, SwingUtilities.CENTER);
+                    }
+                }));
             } else {
-                cpsContracts.add(new JLabel("User nix active, nix vertrag"));
+                cpsContracts.add(new JLabel(OPDE.lang.getString("opde.users.dlgusers.not.active.no.contract")));
             }
             cpsContracts.addExpansion();
         }
@@ -278,8 +303,7 @@ public class DlgUser extends MyJDialog {
         btnEndContract.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-
-
+                grmpf. hier gehts weiter
             }
         });
         btnEndContract.setEnabled(true);
