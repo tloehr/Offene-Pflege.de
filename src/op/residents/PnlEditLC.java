@@ -234,6 +234,11 @@ public class PnlEditLC extends PopupPanel {
     }
 
     @Override
+    public String getReason() {
+        return "misc.msg.emptyentry";
+    }
+
+    @Override
     public Object getResult() {
         if (txtNachname.getText().isEmpty()) {
             return null;

@@ -76,8 +76,8 @@ public class PnlDosageForm extends PopupPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "2*(default, $lcgap), default:grow, $lcgap, default",
-            "9*(default, $lgap), default"));
+                "2*(default, $lcgap), default:grow, $lcgap, default",
+                "9*(default, $lgap), default"));
 
         //---- lblPreparation ----
         lblPreparation.setText("preparation");
@@ -204,6 +204,22 @@ public class PnlDosageForm extends PopupPanel {
         }
 
         return true;
+    }
+
+    @Override
+    public String getReason() {
+        if (SYSTools.catchNull(txtPreparation.getText()).trim().isEmpty() && SYSTools.catchNull(txtUsageText.getText()).trim().isEmpty()) {
+            return "opde.medication.pnlDosageForm.notbothmustbeempty";
+        }
+        if (SYSTools.catchNull(txtSameAs.getText()).trim().isEmpty()) {
+            return "misc.msg.emptyentry";
+
+        }
+        if (SYSTools.catchNull(txtDailyPlan.getText()).trim().isEmpty()) {
+            return "misc.msg.emptyentry";
+
+        }
+        return "";
     }
 
     @Override

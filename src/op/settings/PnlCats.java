@@ -63,12 +63,17 @@ public class PnlCats extends PopupPanel {
     @Override
     public boolean isSaveOK() {
         boolean ok = !txtName.getText().trim().isEmpty();
-
-        if (!ok) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.emptyFields", DisplayMessage.WARNING));
-        }
+//
+//        if (!ok) {
+//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.emptyFields", DisplayMessage.WARNING));
+//        }
 
         return ok;
+    }
+
+    @Override
+    public String getReason() {
+        return "misc.msg.emptyFields";
     }
 
     private void initComponents() {

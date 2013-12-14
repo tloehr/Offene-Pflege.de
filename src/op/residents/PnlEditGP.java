@@ -377,6 +377,11 @@ public class PnlEditGP extends PopupPanel {
     }
 
     @Override
+    public String getReason() {
+        return "misc.msg.emptyentry";
+    }
+
+    @Override
     public void setStartFocus() {
         txtAnrede.requestFocus();
     }

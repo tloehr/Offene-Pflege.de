@@ -8,7 +8,6 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.Homes;
 import op.OPDE;
-import op.threads.DisplayMessage;
 import op.tools.GUITools;
 import op.tools.PopupPanel;
 
@@ -76,12 +75,12 @@ public class PnlHomes extends PopupPanel {
     @Override
     public Object getResult() {
 
-            home.setName(txtName.getText().trim());
-            home.setStreet(txtStrasse.getText().trim());
-            home.setZip(txtPLZ.getText().trim());
-            home.setCity(txtOrt.getText().trim());
-            home.setTel(txtTel.getText().trim());
-            home.setFax(txtFax.getText().trim());
+        home.setName(txtName.getText().trim());
+        home.setStreet(txtStrasse.getText().trim());
+        home.setZip(txtPLZ.getText().trim());
+        home.setCity(txtOrt.getText().trim());
+        home.setTel(txtTel.getText().trim());
+        home.setFax(txtFax.getText().trim());
 //        } else {
 //            home = null;
 //        }
@@ -92,11 +91,16 @@ public class PnlHomes extends PopupPanel {
     public boolean isSaveOK() {
         boolean ok = !GUITools.containsEmpty(allTXT);
 
-        if (!ok) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.emptyFields", DisplayMessage.WARNING));
-        }
+//        if (!ok) {
+//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.emptyFields", DisplayMessage.WARNING));
+//        }
 
         return ok;
+    }
+
+    @Override
+    public String getReason() {
+        return "misc.msg.emptyFields";
     }
 
     private void initComponents() {

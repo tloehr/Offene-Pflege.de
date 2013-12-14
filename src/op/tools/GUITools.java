@@ -775,6 +775,8 @@ public class GUITools {
                 if (myPnl.isSaveOK()) {
                     popup.hidePopup();
                     saveAction.execute(myPnl.getResult());
+                } else {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(myPnl.getReason(), DisplayMessage.WARNING));
                 }
             }
         });

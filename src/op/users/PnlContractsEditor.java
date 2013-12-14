@@ -822,6 +822,11 @@ public class PnlContractsEditor extends PopupPanel {
         return saveOK;
     }
 
+    @Override
+    public String getReason() {
+        return "einfach so";
+    }
+
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JLabel lblFrom;
     private JLabel lblTo;

@@ -83,10 +83,10 @@ public class UserContract implements Comparable<UserContract> {
         xml += "           </defaults>\n";
 
         for (Pair<LocalDate, LocalDate> p : probations) {
-            xml += String.format("            <%s from=\"%s\" to=\"%s\"></%s>\n", "probation", p.getFirst().toString("yyyy-MM-dd"), p.getSecond().toString("yyyy-MM-dd"));
+            xml += String.format("            <%s from=\"%s\" to=\"%s\"></%s>\n", "probation", p.getFirst().toString("yyyy-MM-dd"), p.getSecond().toString("yyyy-MM-dd"), "probation");
         }
         for (Pair<LocalDate, LocalDate> e : extensions) {
-            xml += String.format("            <%s from=\"%s\" to=\"%s\"></%s>\n", "extension", e.getFirst().toString("yyyy-MM-dd"), e.getSecond().toString("yyyy-MM-dd"));
+            xml += String.format("            <%s from=\"%s\" to=\"%s\"></%s>\n", "extension", e.getFirst().toString("yyyy-MM-dd"), e.getSecond().toString("yyyy-MM-dd"), "extension");
         }
 
         xml += "    </contract>\n";
@@ -195,5 +195,22 @@ public class UserContract implements Comparable<UserContract> {
         result += "</table>\n";
 
         return result;
+    }
+
+//    public boolean isActive() {
+//        return getDefaults().getTo().compareTo();
+//    }
+
+    public boolean isValidOn(LocalDate day) {
+        return getDefaults().getFrom().compareTo(day) <= 0 && getDefaults().getTo().compareTo(day) >= 0;
+    }
+
+
+    public boolean endOn(LocalDate day) {
+        if (!isValidOn(day)) return false;
+
+        getDefaults().setTo(day);
+
+        return true;
     }
 }

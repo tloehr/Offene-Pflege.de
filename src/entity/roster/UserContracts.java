@@ -1,6 +1,7 @@
 package entity.roster;
 
 import entity.system.Users;
+import org.jdesktop.swingx.util.Contract;
 import org.joda.time.Days;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
@@ -215,5 +216,28 @@ public class UserContracts {
 
         return hasValid;
     }
+
+    public UserContract getValidContractOn(LocalDate day) {
+        UserContract valid = null;
+        for (UserContract contract : listContracts) {
+            if (contract.getDefaults().getFrom().compareTo(day) <= 0 && contract.getDefaults().getTo().compareTo(day) >= 0){
+                valid = contract;
+                break;
+            }
+        }
+        return valid;
+    }
+
+
+
+//    public boolean replaceContract(UserContract contract) {
+//
+//
+//        listContracts.
+//
+//        contract.getDefaults().setTo(day);
+//
+//        return true;
+//    }
 
 }

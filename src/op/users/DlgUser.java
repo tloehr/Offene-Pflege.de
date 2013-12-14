@@ -23,6 +23,7 @@ import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.swing.*;
@@ -32,8 +33,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.beans.PropertyVetoException;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Torsten Löhr
@@ -42,7 +41,7 @@ public class DlgUser extends MyJDialog {
     public static final String internalClassID = "opde.users.dlgusers";
     private Users user;
     private Closure callback;
-    private Map<String, CollapsiblePane> cpMap;
+    //    private Map<String, CollapsiblePane> cpMap;
     UserContracts userContracts;
     private JLabel lblFirstname, lblName, lblPW, lblUID, lblEmail;
     private JTextField txtName, txtEMail, txtVorname, txtPW, txtUID;
@@ -54,6 +53,9 @@ public class DlgUser extends MyJDialog {
         this.callback = callback;
         me = this;
         initComponents();
+
+        userContracts = UsersTools.getContracts(user);
+
         initDialog();
         pack();
         setVisible(true);
@@ -61,33 +63,16 @@ public class DlgUser extends MyJDialog {
     }
 
     private void initDialog() {
-        cpMap = Collections.synchronizedMap(new HashMap<String, CollapsiblePane>());
+//        cpMap = Collections.synchronizedMap(new HashMap<String, CollapsiblePane>());
 
-        userContracts = UsersTools.getContracts(user);
-        if (userContracts != null) {
-            Collections.sort(userContracts.getListContracts());
-            for (UserContract userContract : userContracts.getListContracts()) {
-                createCP4(userContract);
-            }
-            cpsContracts.removeAll();
-            cpsContracts.setLayout(new JideBoxLayout(cpsContracts, JideBoxLayout.Y_AXIS));
+        if (userContracts == null) {
 
-            synchronized (cpMap) {
-
-                for (UserContract userContract : userContracts.getListContracts()) {
-                    final String key = userContract.hashCode() + ".contract";
-                    cpsContracts.add(cpMap.get(key));
-                }
-
-            }
-            cpsContracts.addExpansion();
-        } else {
             cpsContracts.removeAll();
             cpsContracts.setLayout(new JideBoxLayout(cpsContracts, JideBoxLayout.Y_AXIS));
 
             if (user.isActive()) {
 
-                cpsContracts.add(GUITools.createHyperlinkButton(OPDE.lang.getString("opde.users.dlgusers.create.first.contract"), SYSConst.icon22add, new ActionListener() {
+                cpsContracts.add(GUITools.createHyperlinkButton(OPDE.lang.getString("no.entry.yet"), SYSConst.icon22add, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         UserContract contract = new UserContract(new ContractsParameterSet());
@@ -95,7 +80,7 @@ public class DlgUser extends MyJDialog {
                         JidePopup popup = GUITools.createPanelPopup(new PnlContractsEditor(contract, true), new Closure() {
                             @Override
                             public void execute(Object o) {
-                                if (o != null){
+                                if (o != null) {
                                     UserContracts contracts = new UserContracts();
                                     contracts.add((UserContract) o);
 
@@ -111,6 +96,19 @@ public class DlgUser extends MyJDialog {
             } else {
                 cpsContracts.add(new JLabel(OPDE.lang.getString("opde.users.dlgusers.not.active.no.contract")));
             }
+            cpsContracts.addExpansion();
+
+
+        } else {
+
+            cpsContracts.removeAll();
+            cpsContracts.setLayout(new JideBoxLayout(cpsContracts, JideBoxLayout.Y_AXIS));
+
+            Collections.sort(userContracts.getListContracts());
+            for (UserContract userContract : userContracts.getListContracts()) {
+                cpsContracts.add(createCP4(userContract));
+            }
+
             cpsContracts.addExpansion();
         }
 
@@ -155,7 +153,6 @@ public class DlgUser extends MyJDialog {
 
         txtPW.setEnabled(user.getUID() == null);
         txtUID.setEnabled(user.getUID() == null);
-
 
     }
 
@@ -218,19 +215,8 @@ public class DlgUser extends MyJDialog {
     }
 
     private CollapsiblePane createCP4(final UserContract contract) {
-        final String key = contract.hashCode() + ".contract";
-        synchronized (cpMap) {
-            if (!cpMap.containsKey(key)) {
-                cpMap.put(key, new CollapsiblePane());
-                try {
-                    cpMap.get(key).setCollapsed(true);
-                } catch (PropertyVetoException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
 
-            }
-        }
-        final CollapsiblePane cpContract = cpMap.get(key);
+        final CollapsiblePane cpContract = new CollapsiblePane();
 
         String title = "<html>" + contract.getPeriodAsHTML() + "</html>";
 
@@ -293,17 +279,34 @@ public class DlgUser extends MyJDialog {
     }
 
 
-    private JPanel getMenu(UserContract contract) {
-
+    private JPanel getMenu(final UserContract contract) {
         final JPanel pnlMenu = new JPanel(new VerticalLayout());
-
 
         JButton btnEndContract = GUITools.createHyperlinkButton("opde.users.dlgusers.end.contract", SYSConst.icon22playerStop, null);
         btnEndContract.setAlignmentX(Component.RIGHT_ALIGNMENT);
         btnEndContract.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                grmpf. hier gehts weiter
+                LocalDate min = contract.getDefaults().getFrom().plusDays(1);
+                LocalDate max = SYSConst.LD_UNTIL_FURTHER_NOTICE;
+
+                PnlDay pnlDay = new PnlDay(min, max, "opde.users.dlgusers.when.end.contract");
+                GUITools.showPopup(GUITools.createPanelPopup(pnlDay, new Closure() {
+                    @Override
+                    public void execute(final Object date) {
+                        new DlgYesNo("misc.questions.cancel", SYSConst.icon48playerStop, new Closure() {
+                            @Override
+                            public void execute(Object answer) {
+                                if (answer.equals(JOptionPane.YES_OPTION)) {
+                                    int i = userContracts.getListContracts().indexOf(contract);
+                                    userContracts.getListContracts().get(i).endOn(new LocalDate(date));
+                                    OPDE.debug(userContracts.toXML());
+                                    initDialog();
+                                }
+                            }
+                        });
+                    }
+                }, me), SwingConstants.CENTER);
             }
         });
         btnEndContract.setEnabled(true);
@@ -314,7 +317,26 @@ public class DlgUser extends MyJDialog {
         btnNewProbation.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
+//                LocalDate min = contract.getDefaults().getFrom().plusDays(1);
+//                LocalDate max = SYSConst.LD_UNTIL_FURTHER_NOTICE;
 
+                PnlFromTo pnlFromTo = new PnlFromTo("opde.users.dlgusers.period.add.probation");
+                GUITools.showPopup(GUITools.createPanelPopup(pnlFromTo, new Closure() {
+                    @Override
+                    public void execute(final Object date) {
+                        new DlgYesNo("misc.questions.add.entry", SYSConst.icon48playerStop, new Closure() {
+                            @Override
+                            public void execute(Object answer) {
+                                if (answer.equals(JOptionPane.YES_OPTION)) {
+                                    int i = userContracts.getListContracts().indexOf(contract);
+                                    userContracts.getListContracts().get(i).endOn(new LocalDate(date));
+                                    OPDE.debug(userContracts.toXML());
+                                    initDialog();
+                                }
+                            }
+                        });
+                    }
+                }, me), SwingConstants.CENTER);
 
             }
         });
