@@ -79,7 +79,6 @@ public class PnlUser extends CleanablePanel {
     private HashMap<String, CollapsiblePane> cpMap;
 
 
-
     private HashMap<String, Users> usermap;
 
 
@@ -161,7 +160,13 @@ public class PnlUser extends CleanablePanel {
 
     @Override
     public void reload() {
-        cleanup();
+        lstGroups.clear();
+        lstUsers.clear();
+        usermap.clear();
+        contentMap.clear();
+        cpMap.clear();
+        cpsGroups.removeAll();
+        cpsUsers.removeAll();
         reloadDisplay();
     }
 
@@ -204,8 +209,8 @@ public class PnlUser extends CleanablePanel {
                 //======== cpsGroups ========
                 {
                     cpsGroups.setLayout(new FormLayout(
-                        "default, $lcgap, default",
-                        "2*(default, $lgap), default"));
+                            "default, $lcgap, default",
+                            "2*(default, $lgap), default"));
                 }
                 jspGroups.setViewportView(cpsGroups);
             }
@@ -588,6 +593,8 @@ public class PnlUser extends CleanablePanel {
                             } finally {
                                 em.close();
                             }
+                        } else {
+                            reload();
                         }
                     }
                 });
@@ -612,7 +619,7 @@ public class PnlUser extends CleanablePanel {
         cp.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                if (!contentMap.containsKey(key)){
+                if (!contentMap.containsKey(key)) {
                     contentMap.put(key, new PnlEditMemberships(user, lstGroups));
                 }
                 cp.setContentPane(contentMap.get(key));

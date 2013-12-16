@@ -9,7 +9,6 @@ import org.joda.time.LocalDate;
 
 import javax.swing.*;
 import java.awt.*;
-import java.text.DateFormat;
 import java.util.Date;
 
 /**
@@ -29,6 +28,13 @@ public class PnlFromTo extends PopupPanel {
         initComponents();
         jdcFrom.setDate(new Date());
         jdcTo.setDate(new Date());
+        lblText.setText(SYSTools.xx(text));
+    }
+
+    public PnlFromTo(LocalDate from, LocalDate to, String text) {
+        initComponents();
+        jdcFrom.setDate(from.toDate());
+        jdcTo.setDate(to.toDate());
         lblText.setText(SYSTools.xx(text));
     }
 
@@ -98,7 +104,7 @@ public class PnlFromTo extends PopupPanel {
         return jdcFrom.getDate() != null && jdcTo.getDate() != null && jdcFrom.getDate().before(jdcTo.getDate());
     }
 
-    public String getReason(){
+    public String getReason() {
         return "geht halt nicht";
     }
 

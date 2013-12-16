@@ -55,7 +55,6 @@ public class DlgUser extends MyJDialog {
         initComponents();
 
         userContracts = UsersTools.getContracts(user);
-
         initDialog();
         pack();
         setVisible(true);
@@ -85,6 +84,8 @@ public class DlgUser extends MyJDialog {
                                     contracts.add((UserContract) o);
 
                                     user.setXml(contracts.toXML());
+                                    userContracts = UsersTools.getContracts(user);
+
                                     OPDE.debug(user.getXml());
                                     initDialog();
                                 }
@@ -289,22 +290,14 @@ public class DlgUser extends MyJDialog {
             public void actionPerformed(ActionEvent actionEvent) {
                 LocalDate min = contract.getDefaults().getFrom().plusDays(1);
                 LocalDate max = SYSConst.LD_UNTIL_FURTHER_NOTICE;
-
                 PnlDay pnlDay = new PnlDay(min, max, "opde.users.dlgusers.when.end.contract");
                 GUITools.showPopup(GUITools.createPanelPopup(pnlDay, new Closure() {
                     @Override
                     public void execute(final Object date) {
-                        new DlgYesNo("misc.questions.cancel", SYSConst.icon48playerStop, new Closure() {
-                            @Override
-                            public void execute(Object answer) {
-                                if (answer.equals(JOptionPane.YES_OPTION)) {
-                                    int i = userContracts.getListContracts().indexOf(contract);
-                                    userContracts.getListContracts().get(i).endOn(new LocalDate(date));
-                                    OPDE.debug(userContracts.toXML());
-                                    initDialog();
-                                }
-                            }
-                        });
+                        int i = userContracts.getListContracts().indexOf(contract);
+                        userContracts.getListContracts().get(i).endOn(new LocalDate(date));
+                        OPDE.debug(userContracts.toXML());
+                        initDialog();
                     }
                 }, me), SwingConstants.CENTER);
             }
@@ -317,27 +310,22 @@ public class DlgUser extends MyJDialog {
         btnNewProbation.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-//                LocalDate min = contract.getDefaults().getFrom().plusDays(1);
-//                LocalDate max = SYSConst.LD_UNTIL_FURTHER_NOTICE;
-
-                PnlFromTo pnlFromTo = new PnlFromTo("opde.users.dlgusers.period.add.probation");
+                LocalDate from = SYSCalendar.bom(new LocalDate().plusMonths(1));
+                LocalDate to = SYSCalendar.eom(from.plusMonths(6));
+                final PnlFromTo pnlFromTo = new PnlFromTo(from, to, "opde.users.dlgusers.period.add.probation");
                 GUITools.showPopup(GUITools.createPanelPopup(pnlFromTo, new Closure() {
                     @Override
-                    public void execute(final Object date) {
-                        new DlgYesNo("misc.questions.add.entry", SYSConst.icon48playerStop, new Closure() {
-                            @Override
-                            public void execute(Object answer) {
-                                if (answer.equals(JOptionPane.YES_OPTION)) {
-                                    int i = userContracts.getListContracts().indexOf(contract);
-                                    userContracts.getListContracts().get(i).endOn(new LocalDate(date));
-                                    OPDE.debug(userContracts.toXML());
-                                    initDialog();
-                                }
-                            }
-                        });
+                    public void execute(final Object o) {
+                        if (o != null) {
+                            final Pair<LocalDate, LocalDate> period = (Pair<LocalDate, LocalDate>) o;
+                            contract.addProbation(period);
+                            int i = userContracts.getListContracts().indexOf(contract);
+                            userContracts.getListContracts().set(i, contract);
+                            OPDE.debug(userContracts.toXML());
+                            initDialog();
+                        }
                     }
                 }, me), SwingConstants.CENTER);
-
             }
         });
         btnNewProbation.setEnabled(true);
@@ -348,7 +336,22 @@ public class DlgUser extends MyJDialog {
         btnNewExtension.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-
+                LocalDate from = SYSCalendar.bom(new LocalDate().plusMonths(1));
+                LocalDate to = SYSCalendar.eom(from.plusMonths(6));
+                final PnlFromTo pnlFromTo = new PnlFromTo(from, to, "opde.users.dlgusers.period.add.extension");
+                GUITools.showPopup(GUITools.createPanelPopup(pnlFromTo, new Closure() {
+                    @Override
+                    public void execute(final Object o) {
+                        if (o != null) {
+                            final Pair<LocalDate, LocalDate> period = (Pair<LocalDate, LocalDate>) o;
+                            contract.addExtension(period);
+                            int i = userContracts.getListContracts().indexOf(contract);
+                            userContracts.getListContracts().set(i, contract);
+                            OPDE.debug(userContracts.toXML());
+                            initDialog();
+                        }
+                    }
+                }, me), SwingConstants.CENTER);
 
             }
         });
@@ -361,8 +364,11 @@ public class DlgUser extends MyJDialog {
         btnSetUnlimited.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-
-
+                contract.getDefaults().setTo(SYSConst.LD_UNTIL_FURTHER_NOTICE);
+                int i = userContracts.getListContracts().indexOf(contract);
+                userContracts.getListContracts().set(i, contract);
+                OPDE.debug(userContracts.toXML());
+                initDialog();
             }
         });
         btnSetUnlimited.setEnabled(true);

@@ -13,11 +13,11 @@
        <class>com.jgoodies.forms.layout.FormLayout</class> 
        <void method="setProperty"> 
         <string>$columnSpecs</string> 
-        <string>13dlu, default, 13dlu</string> 
+        <string>13dlu, default, pref:grow</string> 
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
-        <string>13dlu, linegap, fill:48dlu:grow, linegap, default, linegap, 13dlu</string> 
+        <string>13dlu, linegap, top:pref:grow, linegap, default, linegap, 13dlu</string> 
        </void> 
       </object> 
       <void method="setProperty"> 
@@ -56,10 +56,6 @@
         <string>javax.swing.JPanel</string> 
         <object class="com.jformdesigner.model.FormLayoutManager"> 
          <class>org.jdesktop.swingx.VerticalLayout</class> 
-         <void method="setProperty"> 
-          <string>gap</string> 
-          <int>10</int> 
-         </void> 
         </object> 
         <void method="setProperty"> 
          <string>border</string> 
@@ -234,6 +230,33 @@
           </void> 
          </object> 
         </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JButton</string> 
+          <void method="setProperty"> 
+           <string>icon</string> 
+           <object id="SwingIcon0" class="com.jformdesigner.model.SwingIcon"> 
+            <int>0</int> 
+            <string>/artwork/22x22/apply.png</string> 
+           </object> 
+          </void> 
+          <void method="setProperty"> 
+           <string>actionCommand</string> 
+           <string>btnLogin</string> 
+          </void> 
+          <void property="name"> 
+           <string>btnWorkTime</string> 
+          </void> 
+          <void method="addEvent"> 
+           <object class="com.jformdesigner.model.FormEvent"> 
+            <string>java.awt.event.ActionListener</string> 
+            <string>actionPerformed</string> 
+            <string>btnWorkTimeActionPerformed</string> 
+            <boolean>true</boolean> 
+           </object> 
+          </void> 
+         </object> 
+        </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
         <class>com.jgoodies.forms.layout.CellConstraints</class> 
@@ -244,10 +267,6 @@
         <void method="setProperty"> 
          <string>gridY</string> 
          <int>3</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>hAlign</string> 
-         <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
         </void> 
        </object> 
       </void> 
@@ -296,10 +315,7 @@
           <string>javax.swing.JButton</string> 
           <void method="setProperty"> 
            <string>icon</string> 
-           <object class="com.jformdesigner.model.SwingIcon"> 
-            <int>0</int> 
-            <string>/artwork/22x22/apply.png</string> 
-           </object> 
+           <object idref="SwingIcon0"/> 
           </void> 
           <void method="setProperty"> 
            <string>actionCommand</string> 
@@ -315,6 +331,14 @@
             <string>DoLogin</string> 
             <boolean>true</boolean> 
            </object> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>com.jformdesigner.designer.wrapper.HSpacer</string> 
+          <void property="name"> 
+           <string>hSpacer2</string> 
           </void> 
          </object> 
         </void> 
@@ -344,7 +368,7 @@
       <void method="setProperty"> 
        <string>size</string> 
        <object class="java.awt.Dimension"> 
-        <int>320</int> 
+        <int>335</int> 
         <int>540</int> 
        </object> 
       </void> 

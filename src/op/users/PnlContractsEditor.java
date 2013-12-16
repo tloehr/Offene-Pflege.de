@@ -28,7 +28,7 @@ import java.util.Arrays;
  * @author Torsten Löhr
  */
 public class PnlContractsEditor extends PopupPanel {
-
+    private String reason = "";
     private UserContract contract;
     private boolean editable, saveOK = false;
 
@@ -53,14 +53,14 @@ public class PnlContractsEditor extends PopupPanel {
 
     }
 
-
-    public FocusTraversalPolicy getPolicy() {
-
-        return GUITools.createTraversalPolicy(new ArrayList<Component>(Arrays.asList(new Component[]{txtFrom, txtTo, txtWPH, txtVDPY, txtHolidayPercent, cmbSection, txtWDPW, txtTHPM, txtTHPW, txtNightFrom, txtNightTo, txtNightPercent})));
-
-    }
+//    public FocusTraversalPolicy getPolicy() {
+//
+//        return GUITools.createTraversalPolicy(new ArrayList<Component>(Arrays.asList(new Component[]{txtFrom, txtTo, txtWPH, txtVDPY, txtHolidayPercent, cmbSection, txtWDPW, txtTHPM, txtTHPW, txtNightFrom, txtNightTo, txtNightPercent})));
+//
+//    }
 
     void initPanel() {
+        pnlPeriods.removeAll();
 
         cmbSection.setModel(new DefaultComboBoxModel(RosterXML.sections));
         cmbSection.setRenderer(new DefaultListCellRenderer() {
@@ -78,6 +78,7 @@ public class PnlContractsEditor extends PopupPanel {
             txtTo.setText(contract.getDefaults().getTo().toString("dd.MM.yyyy"));
         }
 
+        txtVDPY.setText(SYSTools.catchNull(contract.getDefaults().getVacationDaysPerYear()));
         txtWPH.setText(SYSTools.catchNull(contract.getDefaults().getWagePerHour()));
         txtWDPW.setText(SYSTools.catchNull(contract.getDefaults().getWorkingDaysPerWeek()));
         txtTHPM.setText(SYSTools.catchNull(contract.getDefaults().getTargetHoursPerMonth()));
@@ -106,20 +107,32 @@ public class PnlContractsEditor extends PopupPanel {
 
 
         LocalDate unlimitedSince = null;
-        for (Pair<LocalDate, LocalDate> probation : contract.getProbations()) {
-            JPanel pnl = new JPanel();
-            pnl.setLayout(new BoxLayout(pnl, BoxLayout.LINE_AXIS));
-            pnl.add(new JLabel(String.format("%s: %s -> %s", "Probezeit", probation.getFirst().toString("dd.MM.yyyy"), probation.getSecond().toString("dd.MM.yyyy"))));
+        for (final Pair<LocalDate, LocalDate> probation : contract.getProbations()) {
+            JPanel pnl = new JPanel(new BorderLayout());
+            pnl.add(new JLabel(String.format("%s: %s >> %s", "Probezeit", probation.getFirst().toString("dd.MM.yyyy"), probation.getSecond().toString("dd.MM.yyyy"))), BorderLayout.CENTER);
             unlimitedSince = probation.getSecond();
-            pnl.add(new JButton(SYSConst.icon22delete));
+            JButton delButton = GUITools.getTinyButton(SYSConst.icon22delete, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    contract.getProbations().remove(probation);
+                    initPanel();
+                }
+            });
+            pnl.add(delButton, BorderLayout.EAST);
             pnlPeriods.add(pnl);
         }
-        for (Pair<LocalDate, LocalDate> extension : contract.getExtensions()) {
-            JPanel pnl = new JPanel();
-            pnl.setLayout(new BoxLayout(pnl, BoxLayout.LINE_AXIS));
-            pnl.add(new JLabel(String.format("%s: %s -> %s", "Verlängerung", extension.getFirst().toString("dd.MM.yyyy"), extension.getSecond().toString("dd.MM.yyyy"))));
+        for (final Pair<LocalDate, LocalDate> extension : contract.getExtensions()) {
+            JPanel pnl = new JPanel(new BorderLayout());
+            pnl.add(new JLabel(String.format("%s: %s >> %s", "Verlängerung", extension.getFirst().toString("dd.MM.yyyy"), extension.getSecond().toString("dd.MM.yyyy"))), BorderLayout.CENTER);
             unlimitedSince = extension.getSecond();
-            pnl.add(new JButton(SYSConst.icon22delete));
+            JButton delButton = GUITools.getTinyButton(SYSConst.icon22delete, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    contract.getExtensions().remove(extension);
+                    initPanel();
+                }
+            });
+            pnl.add(delButton, BorderLayout.EAST);
             pnlPeriods.add(pnl);
         }
         if (contract.getDefaults().getTo().equals(SYSConst.LD_UNTIL_FURTHER_NOTICE)) {
@@ -147,9 +160,9 @@ public class PnlContractsEditor extends PopupPanel {
 
         Color red = SYSConst.pearl;
 
-        boolean dateok = contract.getDefaults().getFrom().isBefore(contract.getDefaults().getTo());
-        txtNightFrom.setBackground(dateok ? Color.WHITE : red);
-        txtNightTo.setBackground(dateok ? Color.WHITE : red);
+        boolean dateok = contract.getDefaults().getFrom() != null && contract.getDefaults().getTo() != null && contract.getDefaults().getFrom().isBefore(contract.getDefaults().getTo());
+        txtFrom.setBackground(dateok ? Color.WHITE : red);
+        txtTo.setBackground(dateok ? Color.WHITE : red);
 
         boolean wph = contract.getDefaults().getWagePerHour() != null;
         txtWPH.setBackground(wph ? Color.WHITE : red);
@@ -429,6 +442,32 @@ public class PnlContractsEditor extends PopupPanel {
         }
     }
 
+    private void txtfieldActionPerformed(ActionEvent e) {
+        if (e.getSource().equals(txtFrom)) {
+            txtTo.requestFocus();
+        } else if (e.getSource().equals(txtTo)) {
+            txtWPH.requestFocus();
+        } else if (e.getSource().equals(txtWPH)) {
+            txtVDPY.requestFocus();
+        } else if (e.getSource().equals(txtVDPY)) {
+            txtHolidayPercent.requestFocus();
+        } else if (e.getSource().equals(txtHolidayPercent)) {
+            txtWDPW.requestFocus();
+        } else if (e.getSource().equals(txtWDPW)) {
+            txtTHPM.requestFocus();
+        } else if (e.getSource().equals(txtTHPM)) {
+            txtTHPW.requestFocus();
+        } else if (e.getSource().equals(txtTHPW)) {
+            txtNightFrom.requestFocus();
+        } else if (e.getSource().equals(txtNightFrom)) {
+            txtNightTo.requestFocus();
+        } else if (e.getSource().equals(txtNightTo)) {
+            txtNightPercent.requestFocus();
+        } else if (e.getSource().equals(txtNightPercent)) {
+            txtFrom.requestFocus();
+        }
+    }
+
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -466,8 +505,8 @@ public class PnlContractsEditor extends PopupPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "default, 4*($lcgap, default:grow), $lcgap, default",
-            "9*(default, $lgap), fill:default:grow, 2*($lgap, default)"));
+                "default, 4*($lcgap, default:grow), $lcgap, default",
+                "9*(default, $lgap), fill:default:grow, 2*($lgap, default)"));
 
         //---- lblFrom ----
         lblFrom.setText("text");
@@ -487,6 +526,7 @@ public class PnlContractsEditor extends PopupPanel {
             public void focusGained(FocusEvent e) {
                 txtFocusGained(e);
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 txtFromFocusLost(e);
@@ -496,6 +536,12 @@ public class PnlContractsEditor extends PopupPanel {
             @Override
             public void propertyChange(PropertyChangeEvent e) {
                 txtWDPWPropertyChange(e);
+            }
+        });
+        txtFrom.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                txtfieldActionPerformed(e);
             }
         });
         add(txtFrom, CC.xy(3, 5));
@@ -515,6 +561,7 @@ public class PnlContractsEditor extends PopupPanel {
                 public void focusGained(FocusEvent e) {
                     txtFocusGained(e);
                 }
+
                 @Override
                 public void focusLost(FocusEvent e) {
                     txtToFocusLost(e);
@@ -524,6 +571,12 @@ public class PnlContractsEditor extends PopupPanel {
                 @Override
                 public void propertyChange(PropertyChangeEvent e) {
                     txtWDPWPropertyChange(e);
+                }
+            });
+            txtTo.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    txtfieldActionPerformed(e);
                 }
             });
             panel1.add(txtTo);
@@ -577,6 +630,7 @@ public class PnlContractsEditor extends PopupPanel {
             public void focusGained(FocusEvent e) {
                 txtFocusGained(e);
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 txtWPHFocusLost(e);
@@ -588,23 +642,38 @@ public class PnlContractsEditor extends PopupPanel {
                 txtWDPWPropertyChange(e);
             }
         });
+        txtWPH.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                txtfieldActionPerformed(e);
+            }
+        });
         add(txtWPH, CC.xy(3, 9));
 
         //---- txtVDPY ----
+        txtVDPY.setHorizontalAlignment(SwingConstants.TRAILING);
         txtVDPY.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
                 txtVDPYFocusLost(e);
             }
         });
+        txtVDPY.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                txtfieldActionPerformed(e);
+            }
+        });
         add(txtVDPY, CC.xy(5, 9));
 
         //---- txtHolidayPercent ----
+        txtHolidayPercent.setHorizontalAlignment(SwingConstants.TRAILING);
         txtHolidayPercent.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
                 txtFocusGained(e);
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 txtHolidayPercentFocusLost(e);
@@ -614,6 +683,12 @@ public class PnlContractsEditor extends PopupPanel {
             @Override
             public void propertyChange(PropertyChangeEvent e) {
                 txtWDPWPropertyChange(e);
+            }
+        });
+        txtHolidayPercent.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                txtfieldActionPerformed(e);
             }
         });
         add(txtHolidayPercent, CC.xy(7, 9));
@@ -658,6 +733,7 @@ public class PnlContractsEditor extends PopupPanel {
             public void focusGained(FocusEvent e) {
                 txtFocusGained(e);
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 txtWDPWFocusLost(e);
@@ -669,6 +745,12 @@ public class PnlContractsEditor extends PopupPanel {
                 txtWDPWPropertyChange(e);
             }
         });
+        txtWDPW.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                txtfieldActionPerformed(e);
+            }
+        });
         add(txtWDPW, CC.xy(3, 13));
 
         //---- txtTHPM ----
@@ -678,6 +760,7 @@ public class PnlContractsEditor extends PopupPanel {
             public void focusGained(FocusEvent e) {
                 txtFocusGained(e);
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 txtTHPMFocusLost(e);
@@ -689,6 +772,12 @@ public class PnlContractsEditor extends PopupPanel {
                 txtWDPWPropertyChange(e);
             }
         });
+        txtTHPM.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                txtfieldActionPerformed(e);
+            }
+        });
         add(txtTHPM, CC.xy(5, 13));
 
         //---- txtTHPW ----
@@ -698,6 +787,7 @@ public class PnlContractsEditor extends PopupPanel {
             public void focusGained(FocusEvent e) {
                 txtFocusGained(e);
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 txtTHPWFocusLost(e);
@@ -707,6 +797,12 @@ public class PnlContractsEditor extends PopupPanel {
             @Override
             public void propertyChange(PropertyChangeEvent e) {
                 txtWDPWPropertyChange(e);
+            }
+        });
+        txtTHPW.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                txtfieldActionPerformed(e);
             }
         });
         add(txtTHPW, CC.xy(7, 13));
@@ -741,6 +837,7 @@ public class PnlContractsEditor extends PopupPanel {
             public void focusGained(FocusEvent e) {
                 txtFocusGained(e);
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 txtNightFromFocusLost(e);
@@ -750,6 +847,12 @@ public class PnlContractsEditor extends PopupPanel {
             @Override
             public void propertyChange(PropertyChangeEvent e) {
                 txtWDPWPropertyChange(e);
+            }
+        });
+        txtNightFrom.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                txtfieldActionPerformed(e);
             }
         });
         add(txtNightFrom, CC.xy(3, 17));
@@ -765,6 +868,7 @@ public class PnlContractsEditor extends PopupPanel {
             public void focusGained(FocusEvent e) {
                 txtFocusGained(e);
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 txtNightToFocusLost(e);
@@ -776,6 +880,12 @@ public class PnlContractsEditor extends PopupPanel {
                 txtWDPWPropertyChange(e);
             }
         });
+        txtNightTo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                txtfieldActionPerformed(e);
+            }
+        });
         add(txtNightTo, CC.xy(7, 17));
 
         //---- txtNightPercent ----
@@ -785,6 +895,7 @@ public class PnlContractsEditor extends PopupPanel {
             public void focusGained(FocusEvent e) {
                 txtFocusGained(e);
             }
+
             @Override
             public void focusLost(FocusEvent e) {
                 txtNightPercentFocusLost(e);
@@ -794,6 +905,12 @@ public class PnlContractsEditor extends PopupPanel {
             @Override
             public void propertyChange(PropertyChangeEvent e) {
                 txtWDPWPropertyChange(e);
+            }
+        });
+        txtNightPercent.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                txtfieldActionPerformed(e);
             }
         });
         add(txtNightPercent, CC.xy(9, 17));
@@ -824,7 +941,7 @@ public class PnlContractsEditor extends PopupPanel {
 
     @Override
     public String getReason() {
-        return "einfach so";
+        return reason;
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables

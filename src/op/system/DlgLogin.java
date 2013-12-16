@@ -25,26 +25,23 @@
  */
 package op.system;
 
-import java.awt.event.*;
-import com.jgoodies.forms.factories.CC;
-import com.jgoodies.forms.layout.FormLayout;
-import entity.files.SYSFilesTools;
+import com.jgoodies.forms.factories.*;
+import com.jgoodies.forms.layout.*;
+import entity.roster.ContractsParameterSet;
+import entity.roster.UserContract;
 import entity.system.SYSLoginTools;
-import entity.system.SYSProps;
 import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
+import op.users.PnlContractsEditor;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
+import java.awt.event.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -55,7 +52,7 @@ import java.net.URISyntaxException;
 public class DlgLogin extends MyJDialog {
 
     public static final String internalClassID = "dlglogin";
-
+    private PnlContractsEditor pnl;
     private Closure actionBlock;
 
     private void btnExitActionPerformed(ActionEvent e) {
@@ -64,6 +61,30 @@ public class DlgLogin extends MyJDialog {
 
     private void thisWindowActivated(WindowEvent e) {
         txtUsername.requestFocus();
+    }
+
+    private void btnWorkTimeActionPerformed(ActionEvent e) {
+                      // new FormLayout(
+                                  "13dlu, default, pref:grow",
+                                  "13dlu, $lgap, top:pref:grow, $lgap, default, $lgap, 13dlu")
+        if (pnl == null) {
+            UserContract contract = new UserContract(new ContractsParameterSet());
+            contract.getDefaults().setExam(true);
+            pnl = new PnlContractsEditor(contract, true);
+            add(pnl, CC.xywh(3, 3, 1, 2));
+        } else {
+            remove(pnl);
+            pnl = null;
+        }
+
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                pack();
+                validate();
+                repaint();
+            }
+        });
     }
 
     public DlgLogin(Closure actionBlock) {
@@ -86,10 +107,9 @@ public class DlgLogin extends MyJDialog {
         txtUsername.setText(defaultlogin);
         txtPassword.setText(defaultpw);
         lblUsernamePassword.setText(OPDE.lang.getString("misc.msg.username") + "/" + OPDE.lang.getString("misc.msg.password"));
-
+        pack();
         setVisible(true);
     }
-
 
 
     /**
@@ -106,10 +126,12 @@ public class DlgLogin extends MyJDialog {
         lblUsernamePassword = new JLabel();
         txtUsername = new JTextField();
         txtPassword = new JPasswordField();
+        btnWorkTime = new JButton();
         panel1 = new JPanel();
         btnExit = new JButton();
         hSpacer1 = new JPanel(null);
         btnLogin = new JButton();
+        hSpacer2 = new JPanel(null);
 
         //======== this ========
         setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
@@ -123,14 +145,14 @@ public class DlgLogin extends MyJDialog {
         });
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "13dlu, default, 13dlu",
-            "13dlu, $lgap, fill:48dlu:grow, $lgap, default, $lgap, 13dlu"));
+            "13dlu, default, pref:grow",
+            "13dlu, $lgap, top:pref:grow, $lgap, default, $lgap, 13dlu"));
 
         //======== jPanel2 ========
         {
             jPanel2.setBorder(new EmptyBorder(5, 5, 5, 5));
             jPanel2.setOpaque(false);
-            jPanel2.setLayout(new VerticalLayout(10));
+            jPanel2.setLayout(new VerticalLayout());
 
             //---- lblOPDE ----
             lblOPDE.setText("Offene-Pflege.de");
@@ -190,8 +212,19 @@ public class DlgLogin extends MyJDialog {
                 }
             });
             jPanel2.add(txtPassword);
+
+            //---- btnWorkTime ----
+            btnWorkTime.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+            btnWorkTime.setActionCommand("btnLogin");
+            btnWorkTime.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnWorkTimeActionPerformed(e);
+                }
+            });
+            jPanel2.add(btnWorkTime);
         }
-        contentPane.add(jPanel2, CC.xy(2, 3, CC.FILL, CC.DEFAULT));
+        contentPane.add(jPanel2, CC.xy(2, 3));
 
         //======== panel1 ========
         {
@@ -218,9 +251,10 @@ public class DlgLogin extends MyJDialog {
                 }
             });
             panel1.add(btnLogin);
+            panel1.add(hSpacer2);
         }
         contentPane.add(panel1, CC.xy(2, 5, CC.RIGHT, CC.DEFAULT));
-        setSize(320, 540);
+        setSize(335, 540);
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
@@ -250,7 +284,7 @@ public class DlgLogin extends MyJDialog {
 
     private void DoLogin(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DoLogin
 
-        if (SYSPropsTools.isTrue(SYSPropsTools.KEY_MAINTENANCE_MODE, null)){
+        if (SYSPropsTools.isTrue(SYSPropsTools.KEY_MAINTENANCE_MODE, null)) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("dlglogin.maintenance.mode", DisplayMessage.IMMEDIATELY, 5));
             return;
         }
@@ -302,9 +336,11 @@ public class DlgLogin extends MyJDialog {
     private JLabel lblUsernamePassword;
     private JTextField txtUsername;
     private JPasswordField txtPassword;
+    private JButton btnWorkTime;
     private JPanel panel1;
     private JButton btnExit;
     private JPanel hSpacer1;
     private JButton btnLogin;
+    private JPanel hSpacer2;
     // End of variables declaration//GEN-END:variables
 }
