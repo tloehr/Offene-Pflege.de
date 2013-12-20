@@ -31,6 +31,7 @@ public class SYSLoginTools {
 
     public static void logout() {
         logout(OPDE.getLogin());
+        OPDE.setLogin(null);
     }
 
     protected static void logout(SYSLogin login) {
@@ -43,9 +44,8 @@ public class SYSLoginTools {
         login.setLogout(new Date());
         try {
             em.getTransaction().begin();
-            login = em.merge(login);
+            em.merge(login);
             em.getTransaction().commit();
-            OPDE.setLogin(login);
         } catch (Exception e) {
             OPDE.fatal(e);
         } finally {

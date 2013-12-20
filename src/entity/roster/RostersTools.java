@@ -3,10 +3,12 @@ package entity.roster;
 
 import entity.system.Users;
 import op.OPDE;
-import op.tools.Pair;
+import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.eclipse.persistence.platform.xml.DefaultErrorHandler;
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -210,29 +212,75 @@ public class RostersTools {
         return result;
     }
 
+    public static java.util.List<Rosters> getAll(int section) {
+        ArrayList<Rosters> result = null;
+
+        try {
+            EntityManager em = OPDE.createEM();
+            Query query = em.createQuery("SELECT ro FROM Rosters ro WHERE ro.section = :section ORDER BY ro.month ASC ");
+
+            query.setParameter("section", section);
+
+
+            result = new ArrayList<Rosters>(query.getResultList());
+
+            em.close();
+
+
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+
+
+        return result;
+    }
+
+
+    public static Rosters get(LocalDate month, int section) {
+        ArrayList<Rosters> result = null;
+
+        try {
+            EntityManager em = OPDE.createEM();
+            Query query = em.createQuery("SELECT ro FROM Rosters ro WHERE ro.section = :section AND ro.month = :month ORDER BY ro.month ASC ");
+            query.setParameter("month", SYSCalendar.bom(month).toDate());
+            query.setParameter("section", section);
+
+            result = new ArrayList<Rosters>(query.getResultList());
+
+            em.close();
+
+
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
+
+        return result.isEmpty() ? null : result.get(0);
+    }
+
 
     public static java.util.List<Users> getAllUsersIn(Rosters roster) {
-           ArrayList<Users> result = null;
+        ArrayList<Users> result = null;
 
-           try {
-               EntityManager em = OPDE.createEM();
-               Query query = em.createQuery("SELECT DISTINCT rp.owner FROM Rplan rp WHERE rp.roster = :roster ");
-               query.setParameter("roster", roster);
-               result = new ArrayList<Users>(query.getResultList());
-               em.close();
-           } catch (Exception e) {
-               OPDE.fatal(e);
-           }
+        try {
+            EntityManager em = OPDE.createEM();
+            Query query = em.createQuery("SELECT DISTINCT rp.owner FROM Rplan rp WHERE rp.roster = :roster ");
+            query.setParameter("roster", roster);
+            result = new ArrayList<Users>(query.getResultList());
+            em.close();
+        } catch (Exception e) {
+            OPDE.fatal(e);
+        }
 
-           return result;
-       }
+        return result;
+    }
 
     /**
      * @return
      */
-    public static Pair<LocalDate, LocalDate> getMinMax(int section) {
-        Pair<LocalDate, LocalDate> result = null;
-        long min, max;
+    public static Interval getMinMax(int section) {
+//        Pair<LocalDate, LocalDate> result = null;
+        Interval result = null;
+//        long min, max;
 
         EntityManager em = OPDE.createEM();
         Query queryMin = em.createQuery("SELECT ro FROM Rosters ro WHERE ro.stage <> :locked AND ro.section = :section ORDER BY ro.month ASC ");
@@ -254,7 +302,7 @@ public class RostersTools {
                 result = null;
             } else {
 
-                result = new Pair<LocalDate, LocalDate>(new LocalDate(lmin.get(0).getMonth()), new LocalDate(lmax.get(0).getMonth()));
+                result = new Interval(new DateTime(lmin.get(0).getMonth()).withTimeAtStartOfDay(), new DateTime(SYSCalendar.endOfDay(lmax.get(0).getMonth())));
 
             }
         } catch (Exception e) {

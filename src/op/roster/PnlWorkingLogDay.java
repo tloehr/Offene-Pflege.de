@@ -57,7 +57,6 @@ public class PnlWorkingLogDay extends JPanel {
     public PnlWorkingLogDay(Rplan rplan, RosterParameters rosterParameters, ContractsParameterSet contractsParameterSet, Closure afterAction) {
         initPhase = true;
         this.rplan = rplan;
-        this.rplan = rplan;
         this.rosterParameters = rosterParameters;
         this.contractsParameterSet = contractsParameterSet;
         this.afterAction = afterAction;

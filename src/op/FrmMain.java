@@ -903,11 +903,22 @@ public class FrmMain extends JFrame {
         }
     }
 
+    public void setLabelUser(final String label){
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                labelUSER.setText(label);
+                validate();
+                repaint();
+            }
+        });
+    }
+
 
     private void logout() {
         emptyFrame();
 
-        for (Map.Entry<Date, FrmRoster> entry : openedRosters.entrySet()){
+        for (Map.Entry<Date, FrmRoster> entry : openedRosters.entrySet()) {
             entry.getValue().dispose();
         }
 

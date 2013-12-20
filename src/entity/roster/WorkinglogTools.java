@@ -21,13 +21,12 @@ public class WorkinglogTools {
     public static final int TYPE_AUTO_NIGHT1 = 1;
     public static final int TYPE_AUTO_NIGHT2 = 2;
     public static final int TYPE_AUTO_DAY2 = 3;
-    //    public static final int TYPE_AUTO_HOLIDAY = 2;
     public static final int TYPE_AUTO_BREAK = 4; // negative value
     public static final int TYPE_ADDITIONAL = 5;
-    //    public static final int TYPE_ADDITIONAL2 = 6;
     public static final int TYPE_MANUAL = 6;
-    //    public static final int TYPE_AUTO_EXTRA = 5; // additional hours for holiday shifts
-    public static final String[] TYPES = new String[]{"Tag1", "Nacht1", "Nacht2", "Tag2", "Pause", "Zusätzlich", "Manuell"};
+    public static final int TYPE_TIMECLOCK = 7; // Stechuhr
+
+    public static final String[] TYPES = new String[]{"Tag1", "Nacht1", "Nacht2", "Tag2", "Pause", "Zusätzlich", "Manuell", "Zeiterfassung"};
 
     public static String toPrettyString(Workinglog workinglog) {
         String text = "";

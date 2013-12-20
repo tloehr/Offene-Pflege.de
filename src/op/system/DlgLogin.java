@@ -25,16 +25,14 @@
  */
 package op.system;
 
-import com.jgoodies.forms.factories.*;
-import com.jgoodies.forms.layout.*;
-import entity.roster.ContractsParameterSet;
-import entity.roster.UserContract;
+import entity.roster.RostersTools;
 import entity.system.SYSLoginTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
+import op.roster.PnlTimeClock;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
-import op.users.PnlContractsEditor;
+import op.tools.SYSConst;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 
@@ -52,10 +50,11 @@ import java.net.URISyntaxException;
 public class DlgLogin extends MyJDialog {
 
     public static final String internalClassID = "dlglogin";
-    private PnlContractsEditor pnl;
+    private JPanel pnl;
     private Closure actionBlock;
 
     private void btnExitActionPerformed(ActionEvent e) {
+        SYSLoginTools.logout();
         dispose();
     }
 
@@ -64,17 +63,60 @@ public class DlgLogin extends MyJDialog {
     }
 
     private void btnWorkTimeActionPerformed(ActionEvent e) {
-                      // new FormLayout(
-                                  "13dlu, default, pref:grow",
-                                  "13dlu, $lgap, top:pref:grow, $lgap, default, $lgap, 13dlu")
+
+        if (RostersTools.getAll(RostersTools.SECTION_CARE).isEmpty()){
+            return;
+        }
+
         if (pnl == null) {
-            UserContract contract = new UserContract(new ContractsParameterSet());
-            contract.getDefaults().setExam(true);
-            pnl = new PnlContractsEditor(contract, true);
-            add(pnl, CC.xywh(3, 3, 1, 2));
+
+            if (SYSPropsTools.isTrue(SYSPropsTools.KEY_MAINTENANCE_MODE, null)) {
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("dlglogin.maintenance.mode", DisplayMessage.IMMEDIATELY, 5));
+                return;
+            }
+
+            String username = txtUsername.getText().trim();
+
+            try {
+                registerLogin();
+                if (OPDE.getLogin() == null) {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.usernameOrPasswordWrong"));
+                    OPDE.info(OPDE.lang.getString("misc.msg.usernameOrPasswordWrong") + ": " + username + "  " + OPDE.lang.getString("misc.msg.triedPassword") + ": " + new String(txtPassword.getPassword()));
+                } else {
+                    OPDE.initProps();
+                    OPDE.info("Login: " + username + "  LoginID: " + OPDE.getLogin().getLoginID());
+                }
+
+            } catch (Exception se) {
+                OPDE.fatal(se);
+                System.exit(1);
+            }
+
+
+            if (OPDE.getLogin() != null) {
+
+                OPDE.getMainframe().setLabelUser(OPDE.getLogin().getUser().getFullname());
+
+                pnl = new PnlTimeClock(OPDE.getLogin().getUser());
+//                pnl.add(new JLabel("Werbefläche zu vermieten"));
+                add(pnl, BorderLayout.EAST);
+                btnWorkTime.setIcon(SYSConst.icon222leftArrow);
+            } else {
+                OPDE.getMainframe().setLabelUser("--");
+            }
+
         } else {
+
+            btnWorkTime.setIcon(SYSConst.icon222rightArrow);
             remove(pnl);
             pnl = null;
+
+            SYSLoginTools.logout();
+            OPDE.getMainframe().setLabelUser("--");
+
+            // After the logout a forced garbage collection seems to be adequate
+            System.gc();
+
         }
 
         SwingUtilities.invokeLater(new Runnable() {
@@ -87,9 +129,38 @@ public class DlgLogin extends MyJDialog {
         });
     }
 
+    private void btnLoginActionPerformed(ActionEvent e) {
+        if (SYSPropsTools.isTrue(SYSPropsTools.KEY_MAINTENANCE_MODE, null)) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("dlglogin.maintenance.mode", DisplayMessage.IMMEDIATELY, 5));
+            return;
+        }
+
+        if (OPDE.getLogin() != null) {
+            dispose();
+            return;
+        }
+
+        String username = txtUsername.getText().trim();
+
+        try {
+            registerLogin();
+            if (OPDE.getLogin() == null) {
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.usernameOrPasswordWrong"));
+                OPDE.info(OPDE.lang.getString("misc.msg.usernameOrPasswordWrong") + ": " + username + "  " + OPDE.lang.getString("misc.msg.triedPassword") + ": " + new String(txtPassword.getPassword()));
+            } else {
+                OPDE.initProps();
+                OPDE.info("Login: " + username + "  LoginID: " + OPDE.getLogin().getLoginID());
+                dispose();
+            }
+
+        } catch (Exception se) {
+            OPDE.fatal(se);
+            System.exit(1);
+        }
+    }
+
     public DlgLogin(Closure actionBlock) {
         super(false);
-        OPDE.setLogin(null);
 
         this.actionBlock = actionBlock;
 
@@ -106,7 +177,8 @@ public class DlgLogin extends MyJDialog {
         }
         txtUsername.setText(defaultlogin);
         txtPassword.setText(defaultpw);
-        lblUsernamePassword.setText(OPDE.lang.getString("misc.msg.username") + "/" + OPDE.lang.getString("misc.msg.password"));
+        lblUsername.setText(OPDE.lang.getString("misc.msg.username"));
+        lblPassword.setText(OPDE.lang.getString("misc.msg.password"));
         pack();
         setVisible(true);
     }
@@ -120,18 +192,19 @@ public class DlgLogin extends MyJDialog {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jPanel2 = new JPanel();
+        pnlMain = new JPanel();
+        pnlButtons = new JPanel();
+        btnExit = new JButton();
+        pnlLogin = new JPanel();
         lblOPDE = new JLabel();
         btnAbout = new JButton();
-        lblUsernamePassword = new JLabel();
+        lblUsername = new JLabel();
         txtUsername = new JTextField();
+        lblPassword = new JLabel();
+        panel6 = new JPanel();
         txtPassword = new JPasswordField();
-        btnWorkTime = new JButton();
-        panel1 = new JPanel();
-        btnExit = new JButton();
-        hSpacer1 = new JPanel(null);
         btnLogin = new JButton();
-        hSpacer2 = new JPanel(null);
+        btnWorkTime = new JButton();
 
         //======== this ========
         setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
@@ -144,117 +217,147 @@ public class DlgLogin extends MyJDialog {
             }
         });
         Container contentPane = getContentPane();
-        contentPane.setLayout(new FormLayout(
-            "13dlu, default, pref:grow",
-            "13dlu, $lgap, top:pref:grow, $lgap, default, $lgap, 13dlu"));
+        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
 
-        //======== jPanel2 ========
+        //======== pnlMain ========
         {
-            jPanel2.setBorder(new EmptyBorder(5, 5, 5, 5));
-            jPanel2.setOpaque(false);
-            jPanel2.setLayout(new VerticalLayout());
+            pnlMain.setBorder(new EmptyBorder(15, 15, 15, 15));
+            pnlMain.setLayout(new BorderLayout());
 
-            //---- lblOPDE ----
-            lblOPDE.setText("Offene-Pflege.de");
-            lblOPDE.setFont(new Font("Arial", Font.PLAIN, 24));
-            lblOPDE.setHorizontalAlignment(SwingConstants.CENTER);
-            jPanel2.add(lblOPDE);
+            //======== pnlButtons ========
+            {
+                pnlButtons.setLayout(new BoxLayout(pnlButtons, BoxLayout.LINE_AXIS));
 
-            //---- btnAbout ----
-            btnAbout.setIcon(new ImageIcon(getClass().getResource("/artwork/256x256/opde-logo.png")));
-            btnAbout.setBorderPainted(false);
-            btnAbout.setBorder(null);
-            btnAbout.setOpaque(false);
-            btnAbout.setContentAreaFilled(false);
-            btnAbout.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            btnAbout.setToolTipText(null);
-            btnAbout.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnAboutActionPerformed(e);
-                }
-            });
-            jPanel2.add(btnAbout);
+                //---- btnExit ----
+                btnExit.setIcon(new ImageIcon(getClass().getResource("/artwork/32x32/exit.png")));
+                btnExit.setContentAreaFilled(false);
+                btnExit.setBorder(new EmptyBorder(5, 5, 5, 5));
+                btnExit.setSelectedIcon(null);
+                btnExit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnExit.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
+                btnExit.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnExitActionPerformed(e);
+                    }
+                });
+                pnlButtons.add(btnExit);
+            }
+            pnlMain.add(pnlButtons, BorderLayout.SOUTH);
 
-            //---- lblUsernamePassword ----
-            lblUsernamePassword.setText("text");
-            lblUsernamePassword.setFont(new Font("Arial", Font.PLAIN, 18));
-            jPanel2.add(lblUsernamePassword);
+            //======== pnlLogin ========
+            {
+                pnlLogin.setBorder(new EmptyBorder(5, 5, 5, 5));
+                pnlLogin.setOpaque(false);
+                pnlLogin.setLayout(new VerticalLayout());
 
-            //---- txtUsername ----
-            txtUsername.setFont(new Font("Arial", Font.PLAIN, 18));
-            txtUsername.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    txtUsernameActionPerformed(e);
-                }
-            });
-            txtUsername.addFocusListener(new FocusAdapter() {
-                @Override
-                public void focusGained(FocusEvent e) {
-                    txtUsernameFocusGained(e);
-                }
-            });
-            jPanel2.add(txtUsername);
+                //---- lblOPDE ----
+                lblOPDE.setText("Offene-Pflege.de");
+                lblOPDE.setFont(new Font("Arial", Font.PLAIN, 24));
+                lblOPDE.setHorizontalAlignment(SwingConstants.CENTER);
+                pnlLogin.add(lblOPDE);
 
-            //---- txtPassword ----
-            txtPassword.setFont(new Font("Arial", Font.PLAIN, 18));
-            txtPassword.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    txtPasswordActionPerformed(e);
-                }
-            });
-            txtPassword.addFocusListener(new FocusAdapter() {
-                @Override
-                public void focusGained(FocusEvent e) {
-                    txtPasswordFocusGained(e);
-                }
-            });
-            jPanel2.add(txtPassword);
+                //---- btnAbout ----
+                btnAbout.setIcon(new ImageIcon(getClass().getResource("/artwork/256x256/opde-logo.png")));
+                btnAbout.setBorderPainted(false);
+                btnAbout.setBorder(null);
+                btnAbout.setOpaque(false);
+                btnAbout.setContentAreaFilled(false);
+                btnAbout.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                btnAbout.setToolTipText(null);
+                btnAbout.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        btnAboutActionPerformed(e);
+                    }
+                });
+                pnlLogin.add(btnAbout);
 
-            //---- btnWorkTime ----
-            btnWorkTime.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-            btnWorkTime.setActionCommand("btnLogin");
-            btnWorkTime.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnWorkTimeActionPerformed(e);
+                //---- lblUsername ----
+                lblUsername.setText("text");
+                lblUsername.setFont(new Font("Arial", Font.PLAIN, 12));
+                lblUsername.setHorizontalAlignment(SwingConstants.LEFT);
+                pnlLogin.add(lblUsername);
+
+                //---- txtUsername ----
+                txtUsername.setFont(new Font("Arial", Font.PLAIN, 18));
+                txtUsername.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        txtUsernameActionPerformed(e);
+                    }
+                });
+                txtUsername.addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        txtUsernameFocusGained(e);
+                    }
+                });
+                pnlLogin.add(txtUsername);
+
+                //---- lblPassword ----
+                lblPassword.setText("text");
+                lblPassword.setFont(new Font("Arial", Font.PLAIN, 12));
+                lblPassword.setHorizontalAlignment(SwingConstants.LEFT);
+                pnlLogin.add(lblPassword);
+
+                //======== panel6 ========
+                {
+                    panel6.setLayout(new BoxLayout(panel6, BoxLayout.X_AXIS));
+
+                    //---- txtPassword ----
+                    txtPassword.setFont(new Font("Arial", Font.PLAIN, 18));
+                    txtPassword.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            txtPasswordActionPerformed(e);
+                        }
+                    });
+                    txtPassword.addFocusListener(new FocusAdapter() {
+                        @Override
+                        public void focusGained(FocusEvent e) {
+                            txtPasswordFocusGained(e);
+                        }
+                    });
+                    panel6.add(txtPassword);
+
+                    //---- btnLogin ----
+                    btnLogin.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+                    btnLogin.setActionCommand("btnLogin");
+                    btnLogin.setBorder(new EmptyBorder(0, 5, 0, 10));
+                    btnLogin.setContentAreaFilled(false);
+                    btnLogin.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    btnLogin.setSelectedIcon(null);
+                    btnLogin.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
+                    btnLogin.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            btnLoginActionPerformed(e);
+                        }
+                    });
+                    panel6.add(btnLogin);
+
+                    //---- btnWorkTime ----
+                    btnWorkTime.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/2rightarrow.png")));
+                    btnWorkTime.setActionCommand("btnLogin");
+                    btnWorkTime.setContentAreaFilled(false);
+                    btnWorkTime.setBorder(null);
+                    btnWorkTime.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
+                    btnWorkTime.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    btnWorkTime.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            btnWorkTimeActionPerformed(e);
+                        }
+                    });
+                    panel6.add(btnWorkTime);
                 }
-            });
-            jPanel2.add(btnWorkTime);
+                pnlLogin.add(panel6);
+            }
+            pnlMain.add(pnlLogin, BorderLayout.CENTER);
         }
-        contentPane.add(jPanel2, CC.xy(2, 3));
-
-        //======== panel1 ========
-        {
-            panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
-
-            //---- btnExit ----
-            btnExit.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/exit.png")));
-            btnExit.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnExitActionPerformed(e);
-                }
-            });
-            panel1.add(btnExit);
-            panel1.add(hSpacer1);
-
-            //---- btnLogin ----
-            btnLogin.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-            btnLogin.setActionCommand("btnLogin");
-            btnLogin.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    DoLogin(e);
-                }
-            });
-            panel1.add(btnLogin);
-            panel1.add(hSpacer2);
-        }
-        contentPane.add(panel1, CC.xy(2, 5, CC.RIGHT, CC.DEFAULT));
-        setSize(335, 540);
+        contentPane.add(pnlMain);
+        pack();
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
@@ -282,32 +385,6 @@ public class DlgLogin extends MyJDialog {
         txtPassword.requestFocus();
     }//GEN-LAST:event_txtUsernameActionPerformed
 
-    private void DoLogin(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DoLogin
-
-        if (SYSPropsTools.isTrue(SYSPropsTools.KEY_MAINTENANCE_MODE, null)) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("dlglogin.maintenance.mode", DisplayMessage.IMMEDIATELY, 5));
-            return;
-        }
-
-        String username = txtUsername.getText().trim();
-
-        try {
-            registerLogin();
-            if (OPDE.getLogin() == null) {
-                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.usernameOrPasswordWrong"));
-                OPDE.info(OPDE.lang.getString("misc.msg.usernameOrPasswordWrong") + ": " + username + "  " + OPDE.lang.getString("misc.msg.triedPassword") + ": " + new String(txtPassword.getPassword()));
-            } else {
-                OPDE.initProps();
-                OPDE.info("Login: " + username + "  LoginID: " + OPDE.getLogin().getLoginID());
-                dispose();
-            }
-
-        } catch (Exception se) {
-            OPDE.fatal(se);
-            System.exit(1);
-        }
-    }//GEN-LAST:event_DoLogin
-
     private void btnAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAboutActionPerformed
         if (Desktop.isDesktopSupported()) {
             Desktop desktop = Desktop.getDesktop();
@@ -330,17 +407,18 @@ public class DlgLogin extends MyJDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JPanel jPanel2;
+    private JPanel pnlMain;
+    private JPanel pnlButtons;
+    private JButton btnExit;
+    private JPanel pnlLogin;
     private JLabel lblOPDE;
     private JButton btnAbout;
-    private JLabel lblUsernamePassword;
+    private JLabel lblUsername;
     private JTextField txtUsername;
+    private JLabel lblPassword;
+    private JPanel panel6;
     private JPasswordField txtPassword;
-    private JButton btnWorkTime;
-    private JPanel panel1;
-    private JButton btnExit;
-    private JPanel hSpacer1;
     private JButton btnLogin;
-    private JPanel hSpacer2;
+    private JButton btnWorkTime;
     // End of variables declaration//GEN-END:variables
 }
