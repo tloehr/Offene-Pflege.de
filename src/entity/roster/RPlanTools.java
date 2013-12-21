@@ -19,7 +19,6 @@ import java.util.ArrayList;
  */
 public class RPlanTools {
 
-
     public static ArrayList<Rplan> getAll(Rosters roster) {
         EntityManager em = OPDE.createEM();
         ArrayList<Rplan> list = null;

@@ -111,7 +111,7 @@
              <string>pressedIcon</string> 
              <object class="com.jformdesigner.model.SwingIcon"> 
               <int>0</int> 
-              <string>/artwork/22x22/bw/pressed.png</string> 
+              <string>/artwork/32x32/exit_pressed.png</string> 
              </object> 
             </void> 
             <void property="name"> 

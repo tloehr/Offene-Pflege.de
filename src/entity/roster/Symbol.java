@@ -187,6 +187,7 @@ public class Symbol {
         return start.isAfter(end);
     }
 
+
     /**
      * the sum of hours between the beginning of a shift and the end.
      *

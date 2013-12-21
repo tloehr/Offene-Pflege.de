@@ -234,7 +234,7 @@ public class DlgLogin extends MyJDialog {
                 btnExit.setBorder(new EmptyBorder(5, 5, 5, 5));
                 btnExit.setSelectedIcon(null);
                 btnExit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnExit.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
+                btnExit.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/32x32/exit_pressed.png")));
                 btnExit.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {

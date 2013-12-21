@@ -302,7 +302,7 @@ public class RostersTools {
                 result = null;
             } else {
 
-                result = new Interval(new DateTime(lmin.get(0).getMonth()).withTimeAtStartOfDay(), new DateTime(SYSCalendar.endOfDay(lmax.get(0).getMonth())));
+                result = new Interval( SYSCalendar.bom(new DateTime(lmin.get(0).getMonth()).withTimeAtStartOfDay()), SYSCalendar.eom(new DateTime(SYSCalendar.endOfDay(lmax.get(0).getMonth()))));
 
             }
         } catch (Exception e) {

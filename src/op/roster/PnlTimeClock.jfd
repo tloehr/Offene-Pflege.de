@@ -4,7 +4,7 @@ new FormModel {
 	contentType: "form/swing"
 	root: new FormRoot {
 		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-			"$columnSpecs": "default, labelcompgap, default, labelcompgap, default, labelcompgap, default"
+			"$columnSpecs": "default:grow, labelcompgap, default, labelcompgap, default, labelcompgap, default"
 			"$rowSpecs": "default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default:grow, linegap, default"
 		} ) {
 			name: "this"
@@ -21,6 +21,7 @@ new FormModel {
 				name: "btnBack"
 				"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
 				"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/bw/player_rev.png" )
+				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnBackActionPerformed", true ) )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 3
 				"gridY": 1
@@ -29,6 +30,7 @@ new FormModel {
 				name: "btnFwd"
 				"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
 				"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/bw/player_fwd.png" )
+				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnFwdActionPerformed", true ) )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 5
 				"gridY": 1
@@ -37,6 +39,7 @@ new FormModel {
 				name: "btnNow"
 				"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
 				"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/bw/player_end.png" )
+				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnNowActionPerformed", true ) )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 7
 				"gridY": 1
@@ -44,7 +47,7 @@ new FormModel {
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "lblYourPlanMsg"
 				"text": "text"
-				"font": new com.jformdesigner.model.SwingDerivedFont( null, 65536, 0, false )
+				"font": new java.awt.Font( "Arial", 0, 16 )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridY": 3
 				"gridWidth": 7
@@ -57,7 +60,7 @@ new FormModel {
 				"gridWidth": 7
 			} )
 			add( new FormComponent( "javax.swing.JLabel" ) {
-				name: "lblFrom2"
+				name: "lblActual"
 				"text": "text"
 				"font": &Font0 new java.awt.Font( "Arial", 1, 9 )
 				"horizontalAlignment": 11
@@ -65,7 +68,7 @@ new FormModel {
 				"gridY": 7
 			} )
 			add( new FormComponent( "javax.swing.JLabel" ) {
-				name: "lblFrom3"
+				name: "lblHome"
 				"text": "text"
 				"font": #Font0
 				"horizontalAlignment": 11
