@@ -338,7 +338,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             if (rplan == null) {
                 symbolEditable = rowIndex % 4 == 0; // empty plans must be started at the first row
             } else {
-                boolean p2 = roster.isActive() && rplan.getActual().isEmpty() && !rplan.getP1().isEmpty(); // second line only in active stage. makes no sense otherwise
+                boolean p2 = roster.isActive() &&  !rplan.getP1().isEmpty(); // second line only in active stage. makes no sense otherwise  // rplan.getActual().isEmpty() && ??
                 boolean p1 = (rplan.getP2().isEmpty() && !rplan.getP1().isEmpty()) || rplan.getP1().isEmpty();
 
                 if (rowIndex % 4 == 0) {
@@ -588,7 +588,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
         } else if (ct == CT_P2) {
             value = content.get(user).get(columnIndex - ROW_HEADER) != null ? content.get(user).get(columnIndex - ROW_HEADER).getP2() : "";
         } else if (ct == CT_ACTUAL) {
-            value = content.get(user).get(columnIndex - ROW_HEADER) != null ? content.get(user).get(columnIndex - ROW_HEADER).getActual() : "";
+            value = "//";//  content.get(user).get(columnIndex - ROW_HEADER) != null ? content.get(user).get(columnIndex - ROW_HEADER).getActual() : "";
         } else if (ct == CT_HOURS) {
             Rplan rplan = content.get(user).get(columnIndex - ROW_HEADER);
 //            LocalDate day = getDay(columnIndex);

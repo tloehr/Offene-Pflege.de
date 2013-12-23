@@ -1130,6 +1130,12 @@ public class SYSCalendar {
     }
 
 
+    /**
+     * parses a standard german time string and returns a LocalTime object with the appropriate contents.
+     * @param input
+     * @return
+     * @throws NumberFormatException - when something is wrong with the string
+     */
     public static LocalTime parseLocalTime(String input) throws NumberFormatException {
         if (input == null || input.equals("")) {
             throw new NumberFormatException("leere Eingabe");
@@ -1178,10 +1184,6 @@ public class SYSCalendar {
             throw new NumberFormatException("Sekunde");
         }
 
-        //
-        //        now.set(GregorianCalendar.HOUR_OF_DAY, stunde);
-        //        now.set(GregorianCalendar.MINUTE, minute);
-        //        now.set(GregorianCalendar.SECOND, sekunde);
         return new LocalTime(stunde, minute, sekunde);
     }
 

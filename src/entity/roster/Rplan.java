@@ -30,9 +30,9 @@ public class Rplan implements Comparable<Rplan> {
     @Column(name = "p2", nullable = true, insertable = true, updatable = true, length = 20, precision = 0)
     @Basic
     private String p2;
-    @Column(name = "actual", nullable = true, insertable = true, updatable = true, length = 20, precision = 0)
-    @Basic
-    private String actual;
+//    @Column(name = "actual", nullable = true, insertable = true, updatable = true, length = 20, precision = 0)
+//    @Basic
+//    private String actual;
     @Column(name = "start", nullable = true, insertable = true, updatable = true, length = 19, precision = 0)
     @Temporal(TemporalType.TIMESTAMP)
     @Basic
@@ -66,16 +66,16 @@ public class Rplan implements Comparable<Rplan> {
     @JoinColumn(name = "homeid2", referencedColumnName = "EID")
     @ManyToOne
     private Homes home2;
-    @JoinColumn(name = "homeactual", referencedColumnName = "EID")
-    @ManyToOne
-    private Homes homeactual;
+//    @JoinColumn(name = "homeactual", referencedColumnName = "EID")
+//    @ManyToOne
+//    private Homes homeactual;
     @JoinColumn(name = "rosterid", referencedColumnName = "id")
     @ManyToOne
     private Rosters roster;
     @JoinColumn(name = "controller", referencedColumnName = "UKennung")
     @ManyToOne
     private Users controller;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "rplan")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "rplan", fetch = FetchType.EAGER)
     private List<Workinglog> workinglogs;
     @Column(name = "version", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
     @Version
@@ -136,9 +136,9 @@ public class Rplan implements Comparable<Rplan> {
         }
     }
 
-    public void setActual(String actual) {
-        this.actual = actual;
-    }
+//    public void setActual(String actual) {
+//        this.actual = actual;
+//    }
 
     public Homes getHome2() {
         return home2;
@@ -158,23 +158,23 @@ public class Rplan implements Comparable<Rplan> {
         return SYSTools.catchNull(p2).toUpperCase();
     }
 
-    public String getActual() {
-        return SYSTools.catchNull(actual).toUpperCase();
-    }
-
-    public Homes getHomeactual() {
-        return homeactual;
-    }
-
-    public void setHomeactual(Homes homeactual) {
-        this.homeactual = homeactual;
-    }
+//    public String getActual() {
+//        return SYSTools.catchNull(actual).toUpperCase();
+//    }
+//
+//    public Homes getHomeactual() {
+//        return homeactual;
+//    }
+//
+//    public void setHomeactual(Homes homeactual) {
+//        this.homeactual = homeactual;
+//    }
 
     public String getEffectiveSymbol() {
-        String p = getActual();
-        if (p.isEmpty()) {
-            p = getP2();
-        }
+        String p = getP2();
+//        if (p.isEmpty()) {
+//            p = getP2();
+//        }
         if (p.isEmpty()) {
             p = getP1();
         }
@@ -182,10 +182,10 @@ public class Rplan implements Comparable<Rplan> {
     }
 
     public Homes getEffectiveHome() {
-        Homes h = getHomeactual();
-        if (h == null) {
-            h = getHome2();
-        }
+        Homes h = getHome2();
+//        if (h == null) {
+//            h = getHome2();
+//        }
         if (h == null) {
             h = getHome1();
         }
@@ -215,11 +215,11 @@ public class Rplan implements Comparable<Rplan> {
 
         if (id != rplan.id) return false;
         if (version != rplan.version) return false;
-        if (actual != null ? !actual.equals(rplan.actual) : rplan.actual != null) return false;
+//        if (actual != null ? !actual.equals(rplan.actual) : rplan.actual != null) return false;
         if (end != null ? !end.equals(rplan.end) : rplan.end != null) return false;
         if (home1 != null ? !home1.equals(rplan.home1) : rplan.home1 != null) return false;
         if (home2 != null ? !home2.equals(rplan.home2) : rplan.home2 != null) return false;
-        if (homeactual != null ? !homeactual.equals(rplan.homeactual) : rplan.homeactual != null) return false;
+//        if (homeactual != null ? !homeactual.equals(rplan.homeactual) : rplan.homeactual != null) return false;
         if (owner != null ? !owner.equals(rplan.owner) : rplan.owner != null) return false;
         if (p1 != null ? !p1.equals(rplan.p1) : rplan.p1 != null) return false;
         if (p2 != null ? !p2.equals(rplan.p2) : rplan.p2 != null) return false;
@@ -236,14 +236,14 @@ public class Rplan implements Comparable<Rplan> {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + (p1 != null ? p1.hashCode() : 0);
         result = 31 * result + (p2 != null ? p2.hashCode() : 0);
-        result = 31 * result + (actual != null ? actual.hashCode() : 0);
+//        result = 31 * result + (actual != null ? actual.hashCode() : 0);
         result = 31 * result + (start != null ? start.hashCode() : 0);
         result = 31 * result + (end != null ? end.hashCode() : 0);
         result = 31 * result + (text != null ? text.hashCode() : 0);
         result = 31 * result + (owner != null ? owner.hashCode() : 0);
         result = 31 * result + (home1 != null ? home1.hashCode() : 0);
         result = 31 * result + (home2 != null ? home2.hashCode() : 0);
-        result = 31 * result + (homeactual != null ? homeactual.hashCode() : 0);
+//        result = 31 * result + (homeactual != null ? homeactual.hashCode() : 0);
         result = 31 * result + (roster != null ? roster.hashCode() : 0);
 
         result = 31 * result + (int) (version ^ (version >>> 32));

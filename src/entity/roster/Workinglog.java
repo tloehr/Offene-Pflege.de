@@ -1,5 +1,6 @@
 package entity.roster;
 
+import entity.Homes;
 import entity.system.Users;
 import op.OPDE;
 import op.tools.SYSTools;
@@ -37,7 +38,7 @@ public class Workinglog implements Comparable<Workinglog> {
     @Column(name = "percent", nullable = false, insertable = true, updatable = true, length = 9, precision = 4)
     @Basic
     private BigDecimal percent;
-    @Column(name = "text", nullable = true, insertable = true, updatable = true, length = 400, precision = 0)
+    @Column(name = "text", nullable = true, insertable = true, updatable = true, length = 1024, precision = 0)
     @Basic
     private String text;
     @Column(name = "type", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
@@ -50,6 +51,13 @@ public class Workinglog implements Comparable<Workinglog> {
     @Version
     private long version;
 
+    @Column(name = "actual", nullable = true, insertable = true, updatable = true, length = 20, precision = 0)
+    @Basic
+    private String actual;
+    @JoinColumn(name = "homeactual", referencedColumnName = "EID")
+    @ManyToOne
+    private Homes homeactual;
+
 
     // ---
     @JoinColumn(name = "rplanid", referencedColumnName = "id")
@@ -58,15 +66,21 @@ public class Workinglog implements Comparable<Workinglog> {
     @JoinColumn(name = "creator", referencedColumnName = "UKennung")
     @ManyToOne
     private Users creator;
-    @JoinColumn(name = "editBy", referencedColumnName = "UKennung")
+    @JoinColumn(name = "owner", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users editedBy;
-    @JoinColumn(name = "ReplacedBy", referencedColumnName = "id")
-    @OneToOne
-    private Workinglog replacedBy;
-    @JoinColumn(name = "ReplacementFor", referencedColumnName = "id")
-    @OneToOne
-    private Workinglog replacementFor;
+    private Users owner;
+
+    @Column(name = "timestamp", nullable = false, insertable = true, updatable = true, length = 19, precision = 0)
+    @Temporal(TemporalType.TIMESTAMP)
+    @Basic
+    private Date timestamp;
+
+//    @JoinColumn(name = "ReplacedBy", referencedColumnName = "id")
+//    @OneToOne
+//    private Workinglog replacedBy;
+//    @JoinColumn(name = "ReplacementFor", referencedColumnName = "id")
+//    @OneToOne
+//    private Workinglog replacementFor;
 
     public Workinglog() {
     }
@@ -79,6 +93,7 @@ public class Workinglog implements Comparable<Workinglog> {
         this.creator = OPDE.getLogin().getUser();
         this.start = null;
         this.end = null;
+        timestamp = new Date();
     }
 
     public Workinglog(BigDecimal hours, Date start, Date end, Rplan rplan, String text, int type) {
@@ -90,6 +105,7 @@ public class Workinglog implements Comparable<Workinglog> {
         this.type = type;
         this.creator = OPDE.getLogin().getUser();
         this.text = text;
+        timestamp = new Date();
     }
 
     @Override
@@ -104,12 +120,12 @@ public class Workinglog implements Comparable<Workinglog> {
                 ", type=" + type +
                 ", actualkey=" + actualkey +
                 ", version=" + version +
+                ", actual='" + actual + '\'' +
+                ", homeactual=" + homeactual +
                 ", rplan=" + rplan +
                 ", creator=" + creator +
-                ", editedBy=" + editedBy +
-                ", replacedBy=" + replacedBy +
-                ", replacementFor=" + replacementFor +
-                "} " + super.toString();
+                ", owner=" + owner +
+                '}';
     }
 
     @Override
@@ -123,14 +139,13 @@ public class Workinglog implements Comparable<Workinglog> {
         if (id != that.id) return false;
         if (type != that.type) return false;
         if (version != that.version) return false;
+        if (actual != null ? !actual.equals(that.actual) : that.actual != null) return false;
         if (creator != null ? !creator.equals(that.creator) : that.creator != null) return false;
-        if (editedBy != null ? !editedBy.equals(that.editedBy) : that.editedBy != null) return false;
         if (end != null ? !end.equals(that.end) : that.end != null) return false;
+        if (homeactual != null ? !homeactual.equals(that.homeactual) : that.homeactual != null) return false;
         if (hours != null ? !hours.equals(that.hours) : that.hours != null) return false;
+        if (owner != null ? !owner.equals(that.owner) : that.owner != null) return false;
         if (percent != null ? !percent.equals(that.percent) : that.percent != null) return false;
-        if (replacedBy != null ? !replacedBy.equals(that.replacedBy) : that.replacedBy != null) return false;
-        if (replacementFor != null ? !replacementFor.equals(that.replacementFor) : that.replacementFor != null)
-            return false;
         if (rplan != null ? !rplan.equals(that.rplan) : that.rplan != null) return false;
         if (start != null ? !start.equals(that.start) : that.start != null) return false;
         if (text != null ? !text.equals(that.text) : that.text != null) return false;
@@ -149,11 +164,11 @@ public class Workinglog implements Comparable<Workinglog> {
         result = 31 * result + type;
         result = 31 * result + (int) (actualkey ^ (actualkey >>> 32));
         result = 31 * result + (int) (version ^ (version >>> 32));
+        result = 31 * result + (actual != null ? actual.hashCode() : 0);
+        result = 31 * result + (homeactual != null ? homeactual.hashCode() : 0);
         result = 31 * result + (rplan != null ? rplan.hashCode() : 0);
         result = 31 * result + (creator != null ? creator.hashCode() : 0);
-        result = 31 * result + (editedBy != null ? editedBy.hashCode() : 0);
-        result = 31 * result + (replacedBy != null ? replacedBy.hashCode() : 0);
-        result = 31 * result + (replacementFor != null ? replacementFor.hashCode() : 0);
+        result = 31 * result + (owner != null ? owner.hashCode() : 0);
         return result;
     }
 
@@ -180,6 +195,7 @@ public class Workinglog implements Comparable<Workinglog> {
 
     public void setText(String text) {
         this.text = text;
+        timestamp = new Date();
     }
 
     public long getId() {
@@ -196,6 +212,7 @@ public class Workinglog implements Comparable<Workinglog> {
 
     public void setVersion(long version) {
         this.version = version;
+        timestamp = new Date();
     }
 
 
@@ -216,45 +233,38 @@ public class Workinglog implements Comparable<Workinglog> {
         this.rplan = rplan;
     }
 
-    public Users getEditedBy() {
-        return editedBy;
+    public long getActualkey() {
+        return actualkey;
     }
 
-    public void setEditedBy(Users editedBy) {
-        this.editedBy = editedBy;
+    public void setActualkey(long actualkey) {
+        this.actualkey = actualkey;
     }
 
-    public Workinglog getReplacedBy() {
-        return replacedBy;
+    public String getActual() {
+        return actual;
     }
 
-    public void setReplacedBy(Workinglog replacedBy) {
-        this.replacedBy = replacedBy;
+    public void setActual(String actual) {
+        this.actual = actual;
+        timestamp = new Date();
     }
 
-    public Workinglog getReplacementFor() {
-        return replacementFor;
+    public Homes getHomeactual() {
+        return homeactual;
     }
 
-    public void setReplacementFor(Workinglog replacementFor) {
-        this.replacementFor = replacementFor;
+    public void setHomeactual(Homes homeactual) {
+        this.homeactual = homeactual;
+        timestamp = new Date();
     }
 
-    public boolean isReplaced() {
-        return replacedBy != null;
-
-    }
-
-    public boolean isReplacement() {
-        return replacementFor != null;
+    public Users getOwner() {
+        return owner;
     }
 
     public int getType() {
         return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
     }
 
     public long getActualKey() {
@@ -267,6 +277,7 @@ public class Workinglog implements Comparable<Workinglog> {
 
     public void setStart(Date start) {
         this.start = start;
+        timestamp = new Date();
     }
 
     public Date getEnd() {
@@ -275,6 +286,7 @@ public class Workinglog implements Comparable<Workinglog> {
 
     public void setEnd(Date end) {
         this.end = end;
+        timestamp = new Date();
     }
 
     public boolean isAuto() {
@@ -286,9 +298,6 @@ public class Workinglog implements Comparable<Workinglog> {
         this.actualkey = actual;
     }
 
-    public boolean isDeleted() {
-        return editedBy != null && replacedBy == null && replacementFor == null;
-    }
 
     @Override
     public int compareTo(Workinglog o) {

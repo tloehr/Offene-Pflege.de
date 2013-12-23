@@ -51,6 +51,7 @@ public class DlgLogin extends MyJDialog {
 
     public static final String internalClassID = "dlglogin";
     private JPanel pnl;
+    private ComponentAdapter componentAdapter;
     private Closure actionBlock;
 
     private void btnExitActionPerformed(ActionEvent e) {
@@ -64,7 +65,7 @@ public class DlgLogin extends MyJDialog {
 
     private void btnWorkTimeActionPerformed(ActionEvent e) {
 
-        if (RostersTools.getAll(RostersTools.SECTION_CARE).isEmpty()){
+        if (RostersTools.getAll(RostersTools.SECTION_CARE).isEmpty()) {
             return;
         }
 
@@ -98,7 +99,6 @@ public class DlgLogin extends MyJDialog {
                 OPDE.getMainframe().setLabelUser(OPDE.getLogin().getUser().getFullname());
 
                 pnl = new PnlTimeClock(OPDE.getLogin().getUser());
-//                pnl.add(new JLabel("Werbefläche zu vermieten"));
                 add(pnl, BorderLayout.EAST);
                 btnWorkTime.setIcon(SYSConst.icon222leftArrow);
             } else {
@@ -109,6 +109,8 @@ public class DlgLogin extends MyJDialog {
 
             btnWorkTime.setIcon(SYSConst.icon222rightArrow);
             remove(pnl);
+            pnl.removeComponentListener(componentAdapter);
+            componentAdapter = null;
             pnl = null;
 
             SYSLoginTools.logout();
@@ -123,8 +125,7 @@ public class DlgLogin extends MyJDialog {
             @Override
             public void run() {
                 pack();
-                validate();
-                repaint();
+                setLocationRelativeTo(getOwner());
             }
         });
     }

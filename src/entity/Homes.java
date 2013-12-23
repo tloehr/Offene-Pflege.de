@@ -20,7 +20,7 @@ import java.util.List;
 @Entity
 @Table(name = "homes")
 
-public class Homes implements Serializable {
+public class Homes implements Serializable, Comparable<Homes> {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -155,6 +155,11 @@ public class Homes implements Serializable {
     @Override
     public String toString() {
         return shortname;
+    }
+
+    @Override
+    public int compareTo(Homes o) {
+        return eid.compareTo(o.getEID());
     }
 
     public List<Station> getStations() {

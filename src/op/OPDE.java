@@ -27,6 +27,8 @@ package op;
 
 import com.jidesoft.utils.Lm;
 import com.jidesoft.wizard.WizardStyle;
+import entity.Homes;
+import entity.HomesTools;
 import entity.files.SYSFilesTools;
 import entity.nursingprocess.DFNTools;
 import entity.prescription.BHPTools;
@@ -73,6 +75,7 @@ public class OPDE {
     protected static Logger logger;
     public static HashMap[] anonymize = null;
 
+    private static Map<String, Homes> homes;
     private static Map<LocalDate, String> holidays;
     private static List<Integer> yearsInHolidayMap;
 
@@ -318,10 +321,7 @@ public class OPDE {
          *
          */
         uptime = SYSCalendar.now();
-
-
-//        arial14 = new Font("Arial", Font.PLAIN, 14);
-//        arial28 = new Font("Arial", Font.PLAIN, 28);
+        homes = new HashMap<String, Homes>();
 
         /***
          *      _                                               ____                  _ _
@@ -574,6 +574,8 @@ public class OPDE {
                 System.exit(0);
             }
 
+            HomesTools.initHomes();
+
 
             /***
              *       ____                           _         ____  _____ _   _
@@ -640,7 +642,6 @@ public class OPDE {
                 }
                 System.exit(0);
             }
-
 
             // to speed things later. The first connection loads the while JPA system.
             EntityManager em1 = createEM();
@@ -841,4 +842,7 @@ public class OPDE {
         return holiday;
     }
 
+    public static Map<String, Homes> getHomes() {
+        return homes;
+    }
 }

@@ -1,5 +1,6 @@
 package entity.roster;
 
+import entity.Homes;
 import entity.system.Users;
 import op.OPDE;
 import op.tools.SYSCalendar;
@@ -96,6 +97,43 @@ public class RPlanTools {
             em.close();
         }
         return list;
+    }
+
+
+    public static Homes getActualHome(Rplan rplan) {
+        if (!rplan.isLocked()) return null;
+        Homes home = null;
+        for (Workinglog workinglog : rplan.getWorkinglogs()) {
+            if (workinglog.getType() != WorkinglogTools.TYPE_TIMECLOCK) {
+                home = workinglog.getHomeactual();
+                break;
+            }
+        }
+        return home;
+    }
+
+    public static String getActualSymbolKey(Rplan rplan) {
+        if (!rplan.isLocked()) return null;
+        String symbol = null;
+        for (Workinglog workinglog : rplan.getWorkinglogs()) {
+            if (workinglog.getType() != WorkinglogTools.TYPE_TIMECLOCK) {
+                symbol = workinglog.getActual();
+                break;
+            }
+        }
+        return symbol;
+    }
+
+    public static Workinglog getTimeClock(Rplan rplan) {
+        if (rplan == null) return null;
+        Workinglog timeclock = null;
+        for (Workinglog workinglog : rplan.getWorkinglogs()) {
+            if (workinglog.getType() == WorkinglogTools.TYPE_TIMECLOCK) {
+                timeclock = workinglog;
+                break;
+            }
+        }
+        return timeclock;
     }
 
     public static ArrayList<Rplan> getAllInWeek(LocalDate week, Users owner) {

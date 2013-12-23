@@ -116,7 +116,8 @@ public class PnlWorkingLogDay extends JPanel {
 
                 }
 
-                myRplan.setActual(myRplan.getEffectiveSymbol());
+                // TODO: Fixme
+//                myRplan.setActual(myRplan.getEffectiveSymbol());
 
                 em.getTransaction().commit();
                 rplan = myRplan;
@@ -155,7 +156,8 @@ public class PnlWorkingLogDay extends JPanel {
                 }
 
                 myRplan.getWorkinglogs().removeAll(logs2remove);
-                myRplan.setActual(null);
+                // TODO: Fixme
+//                myRplan.setActual(null);
                 if (effectiveSymbol.getSymbolType() == Symbol.PVALUE) {
                     myRplan.getWorkinglogs().add(em.merge(new Workinglog(addBD, from.toDate(), to.toDate(), myRplan, txtComment.getText().trim(), WorkinglogTools.TYPE_ADDITIONAL)));
                     myRplan.setStart(new DateTime(myRplan.getStart()).toLocalDate().toDateTimeAtStartOfDay().toDate());
@@ -233,7 +235,8 @@ public class PnlWorkingLogDay extends JPanel {
                 + "<br/><font size=\"-1\">" + rplan.getEffectiveHome().getShortname() + "</font>"
                 + "<br/><i><font size=\"-1\">" + effectiveSymbol.getDescription() + "</font></i>";
         btnApply.setText(SYSTools.toHTMLForScreen(text));
-        btnApply.setSelected(!rplan.getActual().isEmpty());
+        // TODO: Fixme
+//        btnApply.setSelected(!rplan.getActual().isEmpty());
 
         btnController.setSelected(rplan.isLocked());
         setButtonState();
@@ -242,8 +245,8 @@ public class PnlWorkingLogDay extends JPanel {
 
 
     private JPanel getLine() {
-
-        if (rplan.getActual().isEmpty()) return null;
+        // TODO: Fixme
+//        if (rplan.getActual().isEmpty()) return null;
 
         JPanel pnlLine = new JPanel();
         pnlLine.setLayout(new BorderLayout());
@@ -252,7 +255,7 @@ public class PnlWorkingLogDay extends JPanel {
         ArrayList<Workinglog> listActual = new ArrayList<Workinglog>();
         BigDecimal mySum = BigDecimal.ZERO;
         for (Workinglog workinglog : rplan.getWorkinglogs()) {
-            if (workinglog.isAuto() && !workinglog.isDeleted() && !workinglog.isReplaced()) {
+            if (workinglog.isAuto()) {
                 listActual.add(workinglog);
                 mySum = mySum.add(workinglog.getHours());
             }
@@ -379,7 +382,7 @@ public class PnlWorkingLogDay extends JPanel {
             //                actual = workinglog;
             //            }
 
-            if (!workinglog.isAuto() && !workinglog.isDeleted() && !workinglog.isReplaced()) {
+            if (!workinglog.isAuto()) {
                 pnlList.add(getLine(workinglog));
                 sum = sum.add(workinglog.getHours());
             }
@@ -517,7 +520,8 @@ public class PnlWorkingLogDay extends JPanel {
         txtFrom.setEnabled(!rplan.isLocked());
         txtTo.setEnabled(!rplan.isLocked());
         txtComment.setEnabled(!rplan.isLocked());
-        btnController.setEnabled(!rplan.getActual().isEmpty() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, PnlUsersWorklog.internalClassID));
+        // TODO: Fixme
+//        btnController.setEnabled(!rplan.getActual().isEmpty() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, PnlUsersWorklog.internalClassID));
     }
 
     private void initComponents() {
