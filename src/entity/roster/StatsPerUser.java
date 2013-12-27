@@ -13,7 +13,7 @@ import java.util.HashMap;
 
 public class StatsPerUser {
 
-    private final BigDecimal hours_carry;
+    private final BigDecimal hours_carry, targethours;
     private final BigDecimal sick_carry;
 
 //    private BigDecimal extrahours_sum;
@@ -36,7 +36,8 @@ public class StatsPerUser {
 //    private Rosters roster;
 
 
-    public StatsPerUser(BigDecimal hours_carry, BigDecimal sick_carry, BigDecimal holiday_thisyear_carry, BigDecimal holiday_lastyear_carry, RosterParameters rosterParameters, ContractsParameterSet contractsParameterSet, Date month) {
+    public StatsPerUser(BigDecimal hours_carry, BigDecimal targethours, BigDecimal sick_carry, BigDecimal holiday_thisyear_carry, BigDecimal holiday_lastyear_carry, RosterParameters rosterParameters, ContractsParameterSet contractsParameterSet, Date month) {
+        this.targethours = targethours;
 
         this.contractsParameterSet = contractsParameterSet;
 //        this.roster = roster;
@@ -103,14 +104,14 @@ public class StatsPerUser {
 
         BigDecimal holiddayhours = contractsParameterSet.getDayValue().multiply(holiday_sum);
         BigDecimal sickhours = contractsParameterSet.getDayValue().multiply(sick_sum);
-        BigDecimal targethours = contractsParameterSet.getTargetHoursPerMonth();
+//        BigDecimal targethours = contractsParameterSet.getTargetHoursPerMonth();
 
         content += SYSConst.html_table_tr(
                 SYSConst.html_table_th("Std.") +
                         // Carry
                         SYSConst.html_table_td(hours_carry.setScale(2, RoundingMode.HALF_UP).toString()) +
                         // Soll
-                        SYSConst.html_table_td(targethours.negate().setScale(2, RoundingMode.HALF_UP).toString()) +
+                        SYSConst.html_table_td(targethours.setScale(2, RoundingMode.HALF_UP).toString()) +
                         // Arbeit
                         SYSConst.html_table_td(hours_sum.setScale(2, RoundingMode.HALF_UP).toString()) +
                         // Feiertage
@@ -120,7 +121,7 @@ public class StatsPerUser {
                         // Krank
                         SYSConst.html_table_td(sickhours.setScale(2, RoundingMode.HALF_UP).toString()) +
                         // Summe
-                        SYSConst.html_table_td(hours_carry.subtract(targethours).add(hours_sum).add(extra_hours_for_holidays).add(holiddayhours).add(sickhours).setScale(2, RoundingMode.HALF_UP).toString())
+                        SYSConst.html_table_td(hours_carry.add(targethours).add(hours_sum).add(extra_hours_for_holidays).add(holiddayhours).add(sickhours).setScale(2, RoundingMode.HALF_UP).toString())
         );
 
         content += SYSConst.html_table_tr(

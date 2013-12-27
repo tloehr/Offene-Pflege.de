@@ -1,10 +1,10 @@
-JFDML JFormDesigner: "5.1.1.0.120" Java: "1.6.0_33" encoding: "UTF-8"
+JFDML JFormDesigner: "5.2.0.0.72" Java: "1.6.0_33" encoding: "UTF-8"
 
 new FormModel {
 	contentType: "form/swing"
 	root: new FormRoot {
 		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-			"$columnSpecs": "80dlu, labelcompgap, default, labelcompgap, default, labelcompgap, default:grow, labelcompgap, default"
+			"$columnSpecs": "80dlu, labelcompgap, default, labelcompgap, default, labelcompgap, default:grow"
 			"$rowSpecs": "default, linegap, default"
 		} ) {
 			name: "this"
@@ -28,7 +28,7 @@ new FormModel {
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 5
 				"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-				"gridWidth": 5
+				"gridWidth": 3
 			} )
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
 				"$columnSpecs": "default:grow, default:grow"
@@ -67,19 +67,6 @@ new FormModel {
 				"gridX": 7
 				"gridY": 3
 				"hAlign": sfield com.jgoodies.forms.layout.CellConstraints RIGHT
-			} )
-			add( new FormComponent( "javax.swing.JToggleButton" ) {
-				name: "btnController"
-				"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-				"selectedIcon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/encrypted.png" )
-				"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/decrypted.png" )
-				"borderPainted": false
-				"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
-				"contentAreaFilled": false
-				addEvent( new FormEvent( "java.awt.event.ItemListener", "itemStateChanged", "btnControllerItemStateChanged", true ) )
-			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-				"gridX": 9
-				"gridY": 3
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )

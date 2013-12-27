@@ -124,6 +124,12 @@ public class RPlanTools {
         return symbol;
     }
 
+    /**
+     * for every RPlan there is exactly one or none accompanying workinglog entity which is marked as "TIMECLOCK".
+     *
+     * @param rplan
+     * @return this method returns this very workinglog or null if there is none.
+     */
     public static Workinglog getTimeClock(Rplan rplan) {
         if (rplan == null) return null;
         Workinglog timeclock = null;

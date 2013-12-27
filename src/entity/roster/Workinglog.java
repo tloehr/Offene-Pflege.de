@@ -85,6 +85,18 @@ public class Workinglog implements Comparable<Workinglog> {
     public Workinglog() {
     }
 
+    public Workinglog(Rplan rplan) {
+        this.hours = BigDecimal.ZERO;
+        this.percent = BigDecimal.ZERO;
+        this.rplan = rplan;
+        this.type = WorkinglogTools.TYPE_TIMECLOCK;
+        this.creator = OPDE.getLogin().getUser();
+        this.owner = rplan.getOwner();
+        this.start = null;
+        this.end = null;
+        timestamp = new Date();
+    }
+
     public Workinglog(BigDecimal hours, BigDecimal percent, Rplan rplan, int type) {
         this.hours = hours;
         this.percent = percent;

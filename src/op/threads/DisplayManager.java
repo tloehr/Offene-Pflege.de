@@ -250,7 +250,6 @@ public class DisplayManager extends Thread {
                 lblSub.setText(null);
             }
 
-
             // Coloring
             if (!messageQ.isEmpty() && messageQ.getHead().getPriority() == DisplayMessage.IMMEDIATELY) {
                 jp.setForeground(Color.RED);

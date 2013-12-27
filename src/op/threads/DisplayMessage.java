@@ -209,7 +209,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
     }
 
     public boolean isUrgent(){
-        return priority == IMMEDIATELY;
+        return priority == IMMEDIATELY || priority == WARNING;
     }
 
     public String getUID() {

@@ -238,7 +238,7 @@ public class PnlWorkingLogDay extends JPanel {
         // TODO: Fixme
 //        btnApply.setSelected(!rplan.getActual().isEmpty());
 
-        btnController.setSelected(rplan.isLocked());
+//        btnController.setSelected(rplan.isLocked());
         setButtonState();
         updateList();
     }
@@ -533,13 +533,12 @@ public class PnlWorkingLogDay extends JPanel {
         btnAdd = new JButton();
         lblOKIcon = new JLabel();
         lblSum = new JLabel();
-        btnController = new JToggleButton();
 
         //======== this ========
         setBorder(new LineBorder(Color.black, 2, true));
         setLayout(new FormLayout(
-            "80dlu, 2*($lcgap, default), $lcgap, default:grow, $lcgap, default",
-            "default, $lgap, default"));
+                "80dlu, 2*($lcgap, default), $lcgap, default:grow",
+                "default, $lgap, default"));
 
         //---- btnApply ----
         btnApply.setText("text");
@@ -564,7 +563,7 @@ public class PnlWorkingLogDay extends JPanel {
             }
             scrl.setViewportView(pnlList);
         }
-        add(scrl, CC.xywh(5, 1, 5, 1, CC.DEFAULT, CC.FILL));
+        add(scrl, CC.xywh(5, 1, 3, 1, CC.DEFAULT, CC.FILL));
 
         //======== pnlAdditional ========
         {
@@ -596,21 +595,6 @@ public class PnlWorkingLogDay extends JPanel {
         //---- lblSum ----
         lblSum.setText("text");
         add(lblSum, CC.xy(7, 3, CC.RIGHT, CC.DEFAULT));
-
-        //---- btnController ----
-        btnController.setText(null);
-        btnController.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/encrypted.png")));
-        btnController.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/decrypted.png")));
-        btnController.setBorderPainted(false);
-        btnController.setBorder(null);
-        btnController.setContentAreaFilled(false);
-        btnController.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                btnControllerItemStateChanged(e);
-            }
-        });
-        add(btnController, CC.xy(9, 3));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
@@ -623,6 +607,5 @@ public class PnlWorkingLogDay extends JPanel {
     private JButton btnAdd;
     private JLabel lblOKIcon;
     private JLabel lblSum;
-    private JToggleButton btnController;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

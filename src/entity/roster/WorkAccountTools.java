@@ -2,6 +2,7 @@ package entity.roster;
 
 import entity.system.Users;
 import op.OPDE;
+import op.tools.SYSCalendar;
 import org.joda.time.DateMidnight;
 import org.joda.time.LocalDate;
 
@@ -69,6 +70,71 @@ public class WorkAccountTools {
 
         return sum == null ? BigDecimal.ZERO : sum;
     }
+
+    public static BigDecimal getSumB4(LocalDate day, Users owner, int[] types) {
+           EntityManager em = OPDE.createEM();
+           BigDecimal sum = null;
+
+           try {
+               String jpql = " SELECT SUM(wa.value) " +
+                       " FROM Workaccount wa " +
+                       " WHERE wa.owner = :owner AND wa.date < :day AND wa.type IN ( ";
+               for (int type : types) {
+                   jpql += type + ",";
+               }
+
+               jpql = jpql.substring(0, jpql.length() - 1) + ")";
+
+               Query query = em.createQuery(jpql);
+               query.setParameter("day", day.toDate());
+               query.setParameter("owner", owner);
+
+               sum = (BigDecimal) query.getSingleResult();
+           } catch (NonUniqueResultException nue) {
+               // thats ok
+           } catch (NoResultException nre) {
+               // thats ok
+           } catch (Exception se) {
+               OPDE.fatal(se);
+           } finally {
+               em.close();
+           }
+
+           return sum == null ? BigDecimal.ZERO : sum;
+       }
+
+    public static BigDecimal getSumInMonth(LocalDate month, Users owner, int[] types) {
+               EntityManager em = OPDE.createEM();
+               BigDecimal sum = null;
+
+               try {
+                   String jpql = " SELECT SUM(wa.value) " +
+                           " FROM Workaccount wa " +
+                           " WHERE wa.owner = :owner AND wa.date >= :bom AND wa.date <= :eom AND wa.type IN ( ";
+                   for (int type : types) {
+                       jpql += type + ",";
+                   }
+
+                   jpql = jpql.substring(0, jpql.length() - 1) + ")";
+
+                   Query query = em.createQuery(jpql);
+                   query.setParameter("bom", SYSCalendar.bom(month.toDateTimeAtStartOfDay()).toDate());
+                   query.setParameter("eom", SYSCalendar.eom(month.toDateTimeAtStartOfDay()).toDate());
+                   query.setParameter("owner", owner);
+
+                   sum = (BigDecimal) query.getSingleResult();
+               } catch (NonUniqueResultException nue) {
+                   // thats ok
+               } catch (NoResultException nre) {
+                   // thats ok
+               } catch (Exception se) {
+                   OPDE.fatal(se);
+               } finally {
+                   em.close();
+               }
+
+               return sum == null ? BigDecimal.ZERO : sum;
+           }
 
 
     public static BigDecimal getSick(LocalDate day, Users owner) {

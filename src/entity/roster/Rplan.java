@@ -8,6 +8,7 @@ import org.joda.time.LocalDate;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -30,9 +31,6 @@ public class Rplan implements Comparable<Rplan> {
     @Column(name = "p2", nullable = true, insertable = true, updatable = true, length = 20, precision = 0)
     @Basic
     private String p2;
-//    @Column(name = "actual", nullable = true, insertable = true, updatable = true, length = 20, precision = 0)
-//    @Basic
-//    private String actual;
     @Column(name = "start", nullable = true, insertable = true, updatable = true, length = 19, precision = 0)
     @Temporal(TemporalType.TIMESTAMP)
     @Basic
@@ -41,18 +39,6 @@ public class Rplan implements Comparable<Rplan> {
     @Temporal(TemporalType.TIMESTAMP)
     @Basic
     private Date end;
-//    @Column(name = "basehours", nullable = false, insertable = true, updatable = true, length = 9, precision = 4)
-//    @Basic
-//    private BigDecimal basehours;
-//    @Column(name = "extrahours", nullable = false, insertable = true, updatable = true, length = 9, precision = 4)
-//    @Basic
-//    private BigDecimal extrahours;
-//    @Column(name = "break", nullable = false, insertable = true, updatable = true, length = 9, precision = 4)
-//    @Basic
-//    private BigDecimal breaktime;
-//    @Column(name = "type", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
-//    @Basic
-//    private int type;
     @Column(name = "text", nullable = true, insertable = true, updatable = true, length = 200, precision = 0)
     @Basic
     private String text;
@@ -66,9 +52,6 @@ public class Rplan implements Comparable<Rplan> {
     @JoinColumn(name = "homeid2", referencedColumnName = "EID")
     @ManyToOne
     private Homes home2;
-//    @JoinColumn(name = "homeactual", referencedColumnName = "EID")
-//    @ManyToOne
-//    private Homes homeactual;
     @JoinColumn(name = "rosterid", referencedColumnName = "id")
     @ManyToOne
     private Rosters roster;
@@ -89,7 +72,7 @@ public class Rplan implements Comparable<Rplan> {
         this.owner = owner;
         this.roster = roster;
         this.home1 = home1;
-
+        workinglogs = new ArrayList<Workinglog>();
     }
 
     public Homes getHome1() {

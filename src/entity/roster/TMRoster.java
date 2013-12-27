@@ -338,7 +338,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
             if (rplan == null) {
                 symbolEditable = rowIndex % 4 == 0; // empty plans must be started at the first row
             } else {
-                boolean p2 = roster.isActive() &&  !rplan.getP1().isEmpty(); // second line only in active stage. makes no sense otherwise  // rplan.getActual().isEmpty() && ??
+                boolean p2 = roster.isActive() && !rplan.getP1().isEmpty(); // second line only in active stage. makes no sense otherwise  // rplan.getActual().isEmpty() && ??
                 boolean p1 = (rplan.getP2().isEmpty() && !rplan.getP1().isEmpty()) || rplan.getP1().isEmpty();
 
                 if (rowIndex % 4 == 0) {
@@ -435,7 +435,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
             if (!statsPerUser.containsKey(myUser)) {
                 statsPerUser.put(myUser, new StatsPerUser(
-                        WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOURS),
+                        WorkAccountTools.getSumB4(month, myUser, WorkAccountTools.HOURS),
+                        WorkAccountTools.getSumInMonth(month, myUser, WorkAccountTools.HOURS),
                         WorkAccountTools.getSick(month, myUser),
                         WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOLIDAYS),
                         WorkAccountTools.getSum(month.dayOfYear().withMinimumValue().minusDays(1), myUser, WorkAccountTools.HOLIDAYS),
@@ -785,7 +786,8 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
                 if (!statsPerUser.containsKey(myUser)) {
                     statsPerUser.put(myUser, new StatsPerUser(
-                            WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOURS),
+                            WorkAccountTools.getSumB4(month, myUser, WorkAccountTools.HOURS),
+                            WorkAccountTools.getSumInMonth(month, myUser, WorkAccountTools.HOURS),
                             WorkAccountTools.getSick(month, myUser),
                             WorkAccountTools.getSum(month, myUser, WorkAccountTools.HOLIDAYS),
                             WorkAccountTools.getSum(month.dayOfYear().withMinimumValue().minusDays(1), myUser, WorkAccountTools.HOLIDAYS),
@@ -942,8 +944,6 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 //            }
 //        });
 //        menuUserOperations.add(itemSortHomeExamName);
-
-
 
 
         menu.add(menuUserOperations);
