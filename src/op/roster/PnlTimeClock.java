@@ -125,7 +125,7 @@ public class PnlTimeClock extends JPanel {
             }
         }
 
-        if (myPlan == null) {
+        if (myPlan == null) { // this should never happen. fix this in the roster creation and the transition of the roster states
             // no rplan ? create an nearly empty one.
             myPlan = new Rplan(roster, StationTools.getStationForThisHost().getHome(), currentDate.toDate(), user);
 
@@ -334,20 +334,17 @@ public class PnlTimeClock extends JPanel {
     }
 
     private void setShift(String symbol, Homes home) {
-//        Object sselection = cmbSymbol.getSelectedItem();
-//        String symbol = sselection instanceof Symbol ? ((Symbol) sselection).getKey() : ((Rplan) sselection).getEffectiveSymbol();
+        timeclock.setActual(symbol);
+        timeclock.setHomeactual(home);
+//        if (myPlan.getP1() != null) {
+//            myPlan.setP2(symbol);
+//            myPlan.setHome2(home);
+//        } else {
+//            myPlan.setP1(symbol);
+//            myPlan.setHome1(home);
+//        }
 //
-//        Homes home = (Homes) cmbHome.getSelectedItem();
-
-        if (myPlan.getP1() != null) {
-            myPlan.setP2(symbol);
-            myPlan.setHome2(home);
-        } else {
-            myPlan.setP1(symbol);
-            myPlan.setHome1(home);
-        }
-
-        myPlan.setStartEndFromSymbol(rosterparameters.get(SYSCalendar.bom(currentDate)).getSymbol(symbol));
+//        myPlan.setStartEndFromSymbol(rosterparameters.get(SYSCalendar.bom(currentDate)).getSymbol(symbol));
     }
 
     private void cmbSymbolItemStateChanged(ItemEvent e) {
@@ -476,7 +473,7 @@ public class PnlTimeClock extends JPanel {
         {
             panel2.setLayout(new FormLayout(
                 "default:grow, 3*($lcgap, default)",
-                "8*(default, $lgap), default:grow, 2*($lgap, default)"));
+                "7*(default, $lgap), default:grow, 2*($lgap, default)"));
 
             //---- lblDay ----
             lblDay.setText("Freitag, den 20.12.2013");
@@ -526,7 +523,7 @@ public class PnlTimeClock extends JPanel {
             lblActual.setText("text");
             lblActual.setFont(new Font("Arial", Font.PLAIN, 11));
             lblActual.setHorizontalAlignment(SwingConstants.TRAILING);
-            panel2.add(lblActual, CC.xywh(1, 7, 7, 1));
+            panel2.add(lblActual, CC.xywh(1, 5, 7, 1));
 
             //---- cmbSymbol ----
             cmbSymbol.addItemListener(new ItemListener() {
@@ -535,19 +532,19 @@ public class PnlTimeClock extends JPanel {
                     cmbSymbolItemStateChanged(e);
                 }
             });
-            panel2.add(cmbSymbol, CC.xywh(1, 9, 7, 1));
+            panel2.add(cmbSymbol, CC.xywh(1, 7, 7, 1));
 
             //---- lblFrom ----
             lblFrom.setText("text");
             lblFrom.setFont(new Font("Arial", Font.PLAIN, 11));
             lblFrom.setHorizontalAlignment(SwingConstants.TRAILING);
-            panel2.add(lblFrom, CC.xy(1, 11));
+            panel2.add(lblFrom, CC.xy(1, 9));
 
             //---- lblTo ----
             lblTo.setText("text");
             lblTo.setFont(new Font("Arial", Font.PLAIN, 11));
             lblTo.setHorizontalAlignment(SwingConstants.TRAILING);
-            panel2.add(lblTo, CC.xywh(3, 11, 5, 1));
+            panel2.add(lblTo, CC.xywh(3, 9, 5, 1));
 
             //======== panel1 ========
             {
@@ -573,7 +570,7 @@ public class PnlTimeClock extends JPanel {
                 });
                 panel1.add(btnNowFrom);
             }
-            panel2.add(panel1, CC.xy(1, 13));
+            panel2.add(panel1, CC.xy(1, 11));
 
             //======== panel3 ========
             {
@@ -599,13 +596,13 @@ public class PnlTimeClock extends JPanel {
                 });
                 panel3.add(btnNowTo);
             }
-            panel2.add(panel3, CC.xywh(3, 13, 5, 1));
+            panel2.add(panel3, CC.xywh(3, 11, 5, 1));
 
             //---- lblText ----
             lblText.setText("text");
             lblText.setFont(new Font("Arial", Font.PLAIN, 11));
             lblText.setHorizontalAlignment(SwingConstants.TRAILING);
-            panel2.add(lblText, CC.xywh(1, 15, 7, 1));
+            panel2.add(lblText, CC.xywh(1, 13, 7, 1));
 
             //======== scrollPane1 ========
             {
@@ -619,8 +616,8 @@ public class PnlTimeClock extends JPanel {
                 });
                 scrollPane1.setViewportView(txtComment);
             }
-            panel2.add(scrollPane1, CC.xywh(1, 17, 7, 1, CC.FILL, CC.FILL));
-            panel2.add(cmbUser, CC.xywh(1, 19, 5, 1));
+            panel2.add(scrollPane1, CC.xywh(1, 15, 7, 1, CC.FILL, CC.FILL));
+            panel2.add(cmbUser, CC.xywh(1, 17, 5, 1));
 
             //---- btnSave ----
             btnSave.setText(null);
@@ -631,13 +628,13 @@ public class PnlTimeClock extends JPanel {
                     btnSaveActionPerformed(e);
                 }
             });
-            panel2.add(btnSave, CC.xy(7, 19));
+            panel2.add(btnSave, CC.xy(7, 17));
 
             //---- lblSaved ----
             lblSaved.setText(null);
             lblSaved.setHorizontalAlignment(SwingConstants.CENTER);
             lblSaved.setForeground(Color.red);
-            panel2.add(lblSaved, CC.xywh(1, 21, 7, 1));
+            panel2.add(lblSaved, CC.xywh(1, 19, 7, 1));
         }
         add(panel2, BorderLayout.CENTER);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents

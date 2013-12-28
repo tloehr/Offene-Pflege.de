@@ -8,7 +8,7 @@ new FormModel {
 			"border": new javax.swing.border.EmptyBorder( 15, 5, 15, 15 )
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
 				"$columnSpecs": "default:grow, labelcompgap, default, labelcompgap, default, labelcompgap, default"
-				"$rowSpecs": "default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default:grow, linegap, default, linegap, default"
+				"$rowSpecs": "default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default:grow, linegap, default, linegap, default"
 			} ) {
 				name: "panel2"
 				add( new FormComponent( "javax.swing.JLabel" ) {
@@ -61,14 +61,14 @@ new FormModel {
 					"font": &Font0 new java.awt.Font( "Arial", 0, 11 )
 					"horizontalAlignment": 11
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridY": 7
+					"gridY": 5
 					"gridWidth": 7
 				} )
 				add( new FormComponent( "javax.swing.JComboBox" ) {
 					name: "cmbSymbol"
 					addEvent( new FormEvent( "java.awt.event.ItemListener", "itemStateChanged", "cmbSymbolItemStateChanged", true ) )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridY": 9
+					"gridY": 7
 					"gridWidth": 7
 				} )
 				add( new FormComponent( "javax.swing.JLabel" ) {
@@ -77,7 +77,7 @@ new FormModel {
 					"font": #Font0
 					"horizontalAlignment": 11
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridY": 11
+					"gridY": 9
 				} )
 				add( new FormComponent( "javax.swing.JLabel" ) {
 					name: "lblTo"
@@ -85,7 +85,7 @@ new FormModel {
 					"font": #Font0
 					"horizontalAlignment": 11
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridY": 11
+					"gridY": 9
 					"gridX": 3
 					"gridWidth": 5
 				} )
@@ -102,7 +102,7 @@ new FormModel {
 						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnNowFromActionPerformed", true ) )
 					} )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridY": 13
+					"gridY": 11
 				} )
 				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
 					name: "panel3"
@@ -118,7 +118,7 @@ new FormModel {
 					} )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridX": 3
-					"gridY": 13
+					"gridY": 11
 					"gridWidth": 5
 				} )
 				add( new FormComponent( "javax.swing.JLabel" ) {
@@ -127,7 +127,7 @@ new FormModel {
 					"font": #Font0
 					"horizontalAlignment": 11
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridY": 15
+					"gridY": 13
 					"gridWidth": 7
 				} )
 				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
@@ -137,7 +137,7 @@ new FormModel {
 						addEvent( new FormEvent( "javax.swing.event.CaretListener", "caretUpdate", "txtCommentCaretUpdate", true ) )
 					} )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridY": 17
+					"gridY": 15
 					"gridWidth": 7
 					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 					"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
@@ -145,7 +145,7 @@ new FormModel {
 				add( new FormComponent( "javax.swing.JComboBox" ) {
 					name: "cmbUser"
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridY": 19
+					"gridY": 17
 					"gridWidth": 5
 				} )
 				add( new FormComponent( "javax.swing.JButton" ) {
@@ -155,7 +155,7 @@ new FormModel {
 					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnSaveActionPerformed", true ) )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridX": 7
-					"gridY": 19
+					"gridY": 17
 				} )
 				add( new FormComponent( "javax.swing.JLabel" ) {
 					name: "lblSaved"
@@ -163,7 +163,7 @@ new FormModel {
 					"horizontalAlignment": 0
 					"foreground": sfield java.awt.Color red
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridY": 21
+					"gridY": 19
 					"gridWidth": 7
 				} )
 			}, new FormLayoutConstraints( class java.lang.String ) {

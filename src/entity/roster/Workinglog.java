@@ -41,7 +41,7 @@ public class Workinglog implements Comparable<Workinglog> {
     @Column(name = "text", nullable = true, insertable = true, updatable = true, length = 1024, precision = 0)
     @Basic
     private String text;
-    @Column(name = "type", nullable = false, insertable = true, updatable = true, length = 10, precision = 0)
+    @Column(name = "type", nullable = false, insertable = true, updatable = true, length = 6, precision = 0)
     @Basic
     private int type;
     @Column(name = "actualkey", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
@@ -50,14 +50,15 @@ public class Workinglog implements Comparable<Workinglog> {
     @Column(name = "version", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
     @Version
     private long version;
-
+    @Column(name = "state", nullable = false, insertable = true, updatable = true, length = 6, precision = 0)
+    @Basic
+    private int state;
     @Column(name = "actual", nullable = true, insertable = true, updatable = true, length = 20, precision = 0)
     @Basic
     private String actual;
     @JoinColumn(name = "homeactual", referencedColumnName = "EID")
     @ManyToOne
     private Homes homeactual;
-
 
     // ---
     @JoinColumn(name = "rplanid", referencedColumnName = "id")
@@ -75,13 +76,6 @@ public class Workinglog implements Comparable<Workinglog> {
     @Basic
     private Date timestamp;
 
-//    @JoinColumn(name = "ReplacedBy", referencedColumnName = "id")
-//    @OneToOne
-//    private Workinglog replacedBy;
-//    @JoinColumn(name = "ReplacementFor", referencedColumnName = "id")
-//    @OneToOne
-//    private Workinglog replacementFor;
-
     public Workinglog() {
     }
 
@@ -90,6 +84,7 @@ public class Workinglog implements Comparable<Workinglog> {
         this.percent = BigDecimal.ZERO;
         this.rplan = rplan;
         this.type = WorkinglogTools.TYPE_TIMECLOCK;
+        this.type = WorkinglogTools.STATE_UNUSED;
         this.creator = OPDE.getLogin().getUser();
         this.owner = rplan.getOwner();
         this.start = null;
@@ -97,11 +92,14 @@ public class Workinglog implements Comparable<Workinglog> {
         timestamp = new Date();
     }
 
-    public Workinglog(BigDecimal hours, BigDecimal percent, Rplan rplan, int type) {
+    public Workinglog(BigDecimal hours, BigDecimal percent, String actual, Homes homeactual, Rplan rplan, int type) {
         this.hours = hours;
         this.percent = percent;
+        this.actual = actual;
+        this.homeactual = homeactual;
         this.rplan = rplan;
         this.type = type;
+        this.type = WorkinglogTools.STATE_UNUSED;
         this.creator = OPDE.getLogin().getUser();
         this.start = null;
         this.end = null;
@@ -115,6 +113,7 @@ public class Workinglog implements Comparable<Workinglog> {
         this.end = end;
         this.rplan = rplan;
         this.type = type;
+        this.type = WorkinglogTools.STATE_UNUSED;
         this.creator = OPDE.getLogin().getUser();
         this.text = text;
         timestamp = new Date();
@@ -188,19 +187,6 @@ public class Workinglog implements Comparable<Workinglog> {
         return hours;
     }
 
-    public void setHours(BigDecimal hours) {
-        this.hours = hours;
-    }
-
-
-    public BigDecimal getPercent() {
-        return percent;
-    }
-
-    public void setPercent(BigDecimal percent) {
-        this.percent = percent;
-    }
-
     public String getText() {
         return text;
     }
@@ -228,15 +214,6 @@ public class Workinglog implements Comparable<Workinglog> {
     }
 
 
-    public Users getCreator() {
-        return creator;
-    }
-
-    public void setCreator(Users creator) {
-        this.creator = creator;
-    }
-
-
     public Rplan getRplan() {
         return rplan;
     }
@@ -245,13 +222,6 @@ public class Workinglog implements Comparable<Workinglog> {
         this.rplan = rplan;
     }
 
-    public long getActualkey() {
-        return actualkey;
-    }
-
-    public void setActualkey(long actualkey) {
-        this.actualkey = actualkey;
-    }
 
     public String getActual() {
         return actual;
@@ -268,7 +238,6 @@ public class Workinglog implements Comparable<Workinglog> {
 
     public void setHomeactual(Homes homeactual) {
         this.homeactual = homeactual;
-        timestamp = new Date();
     }
 
     public Users getOwner() {
@@ -277,10 +246,6 @@ public class Workinglog implements Comparable<Workinglog> {
 
     public int getType() {
         return type;
-    }
-
-    public long getActualKey() {
-        return actualkey;
     }
 
     public Date getStart() {
@@ -302,7 +267,7 @@ public class Workinglog implements Comparable<Workinglog> {
     }
 
     public boolean isAuto() {
-        return type != WorkinglogTools.TYPE_ADDITIONAL && type != WorkinglogTools.TYPE_MANUAL;
+        return type != WorkinglogTools.TYPE_ADDITIONAL && type != WorkinglogTools.TYPE_MANUAL && type != WorkinglogTools.TYPE_TIMECLOCK;
     }
 
 
@@ -323,6 +288,14 @@ public class Workinglog implements Comparable<Workinglog> {
         }
         return sort;
 
+    }
+
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
     }
 
 

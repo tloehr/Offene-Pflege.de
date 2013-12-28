@@ -93,14 +93,17 @@ public class PnlWorkingLogWeek extends JPanel {
             }
 
             if (lookup.containsKey(date)) {
-                pnlWeek.add(new PnlWorkingLogDay(lookup.get(date), rosterParameters, userContracts.getParameterSet(date), new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        if (o != null) {
-                            lookup.put(date, (Rplan) o);
-                        }
-                    }
-                }), CC.xy(posx, posy, CC.FILL, CC.FILL));
+
+//                new PnlWorkingLogDay(lookup.get(date), rosterParameters, userContracts.getParameterSet(date), new Closure() {
+//                                   @Override
+//                                   public void execute(Object o) {
+//                                       if (o != null) {
+//                                           lookup.put(date, (Rplan) o);
+//                                       }
+//                                   }
+//                               }
+
+                pnlWeek.add(new PnlControllerView(lookup.get(date), rosterParameters, userContracts.getParameterSet(date)), CC.xy(posx, posy, CC.FILL, CC.FILL));
             } else {
 
                 JPanel pnl = new JPanel(new BorderLayout());

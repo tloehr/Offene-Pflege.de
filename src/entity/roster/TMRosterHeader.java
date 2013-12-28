@@ -42,7 +42,6 @@ public class TMRosterHeader extends AbstractMultiTableModel implements ColumnIde
             if (OPDE.isHoliday(basemodel.getDay(columnIndex))) {
                 cellStyle.setBackground(GUITools.blend(SYSConst.bluegrey, Color.black, 0.8f));
             }
-
         }
 
         cellStyle.setFont(basemodel.getFont());

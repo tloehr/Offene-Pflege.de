@@ -537,8 +537,8 @@ public class PnlWorkingLogDay extends JPanel {
         //======== this ========
         setBorder(new LineBorder(Color.black, 2, true));
         setLayout(new FormLayout(
-                "80dlu, 2*($lcgap, default), $lcgap, default:grow",
-                "default, $lgap, default"));
+            "80dlu, 2*($lcgap, default), $lcgap, default:grow",
+            "default, $lgap, default"));
 
         //---- btnApply ----
         btnApply.setText("text");

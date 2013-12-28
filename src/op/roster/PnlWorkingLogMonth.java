@@ -115,14 +115,17 @@ public class PnlWorkingLogMonth extends JPanel {
         for (int day = 1; day <= month.dayOfMonth().withMaximumValue().getDayOfMonth(); day++) {
             final LocalDate date = month.plusDays(day - 1);
             if (lookup.containsKey(month.plusDays(day - 1))) {
-                add(new PnlWorkingLogDay(lookup.get(date), rosterParameters, userContracts.getParameterSet(date), new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        if (o != null){
-                            lookup.put(date, (Rplan) o);
-                        }
-                    }
-                }), CC.xy(posx, posy, CC.FILL, CC.FILL));
+
+                // new PnlWorkingLogDay(lookup.get(date), rosterParameters, userContracts.getParameterSet(date), new Closure() {
+//                                    @Override
+//                                    public void execute(Object o) {
+//                                        if (o != null){
+//                                            lookup.put(date, (Rplan) o);
+//                                        }
+//                                    }
+//                                }
+
+                add(new PnlControllerView(lookup.get(date), rosterParameters, userContracts.getParameterSet(date)), CC.xy(posx, posy, CC.FILL, CC.FILL));
             } else {
                 JPanel blackpanel = new JPanel();
                 blackpanel.setBackground(Color.black);

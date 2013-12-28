@@ -25,8 +25,12 @@ public class WorkinglogTools {
     public static final int TYPE_ADDITIONAL = 5;
     public static final int TYPE_MANUAL = 6;
     public static final int TYPE_TIMECLOCK = 7; // Stechuhr
-
     public static final String[] TYPES = new String[]{"Tag1", "Nacht1", "Nacht2", "Tag2", "Pause", "Zusätzlich", "Manuell", "Zeiterfassung"};
+
+
+    public static final int STATE_UNUSED = 0;
+    public static final int STATE_REJECTED = 1;
+    public static final int STATE_ACCEPTED = 2;
 
     public static String toPrettyString(Workinglog workinglog) {
         String text = "";
@@ -53,19 +57,19 @@ public class WorkinglogTools {
 
         if (map != null) {
             if (map.get(Symbol.DAYHOURS1).compareTo(BigDecimal.ZERO) > 0) {
-                listLogs.add(new Workinglog(map.get(Symbol.DAYHOURS1), BigDecimal.ZERO, myRplan, WorkinglogTools.TYPE_AUTO_DAY1));
+                listLogs.add(new Workinglog(map.get(Symbol.DAYHOURS1), BigDecimal.ZERO, symbol.getKey(), myRplan.getEffectiveHome(), myRplan, WorkinglogTools.TYPE_AUTO_DAY1));
             }
             if (map.get(Symbol.DAYHOURS2).compareTo(BigDecimal.ZERO) > 0) {
-                listLogs.add(new Workinglog(map.get(Symbol.DAYHOURS2), BigDecimal.ZERO, myRplan, WorkinglogTools.TYPE_AUTO_DAY2));
+                listLogs.add(new Workinglog(map.get(Symbol.DAYHOURS2), BigDecimal.ZERO, symbol.getKey(), myRplan.getEffectiveHome(), myRplan, WorkinglogTools.TYPE_AUTO_DAY2));
             }
             if (map.get(Symbol.NIGHTHOURS1).compareTo(BigDecimal.ZERO) > 0) {
-                listLogs.add(new Workinglog(map.get(Symbol.NIGHTHOURS1), parameterSet.nightPremiumPercentage, myRplan, WorkinglogTools.TYPE_AUTO_NIGHT1));
+                listLogs.add(new Workinglog(map.get(Symbol.NIGHTHOURS1), parameterSet.nightPremiumPercentage, symbol.getKey(), myRplan.getEffectiveHome(), myRplan, WorkinglogTools.TYPE_AUTO_NIGHT1));
             }
             if (map.get(Symbol.NIGHTHOURS2).compareTo(BigDecimal.ZERO) > 0) {
-                listLogs.add(new Workinglog(map.get(Symbol.NIGHTHOURS2), parameterSet.getNightPremiumPercentage(), myRplan, WorkinglogTools.TYPE_AUTO_NIGHT2));
+                listLogs.add(new Workinglog(map.get(Symbol.NIGHTHOURS2), parameterSet.getNightPremiumPercentage(), symbol.getKey(), myRplan.getEffectiveHome(), myRplan, WorkinglogTools.TYPE_AUTO_NIGHT2));
             }
             if (map.get(Symbol.BREAKTIME).compareTo(BigDecimal.ZERO) > 0) {
-                listLogs.add(new Workinglog(map.get(Symbol.BREAKTIME).negate(), BigDecimal.ZERO, myRplan, WorkinglogTools.TYPE_AUTO_BREAK));
+                listLogs.add(new Workinglog(map.get(Symbol.BREAKTIME).negate(), BigDecimal.ZERO, symbol.getKey(), myRplan.getEffectiveHome(), myRplan, WorkinglogTools.TYPE_AUTO_BREAK));
             }
         }
 
