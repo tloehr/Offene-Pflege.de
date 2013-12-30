@@ -20,6 +20,7 @@ import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TemporalType;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
@@ -91,8 +92,8 @@ public class ResValueTools {
     }
 
     public static ArrayList<Date> getDaysWithValues(Resident resident, ResValueTypes type, int year) {
-        DateTime from = new DateMidnight(year, 1, 1).dayOfYear().withMinimumValue().toDateTime();
-        DateTime to = new DateMidnight(year, 1, 1).toDateTime().dayOfYear().withMaximumValue().secondOfDay().withMaximumValue();
+        DateTime from = new LocalDate(year, 1, 1).dayOfYear().withMinimumValue().toDateTimeAtStartOfDay();
+        DateTime to = new LocalDate(year, 1, 1).dayOfYear().withMaximumValue().toDateTimeAtStartOfDay().secondOfDay().withMaximumValue();
 
         EntityManager em = OPDE.createEM();
         Query query = em.createNativeQuery(" " +
@@ -359,7 +360,7 @@ public class ResValueTools {
         return list;
     }
 
-    public static ArrayList<ResValue> getResValues(Resident resident, ResValueTypes vtype, DateMidnight day) {
+    public static ArrayList<ResValue> getResValues(Resident resident, ResValueTypes vtype, LocalDate day) {
 
         //        DateTime theYear = new DateTime(year, 1, 1, 0, 0, 0);
         DateTime from = day.toDateTime().secondOfDay().withMinimumValue();
@@ -646,7 +647,7 @@ public class ResValueTools {
     }
 
 
-    public static BigDecimal getIngestion(Resident resident, DateMidnight day) {
+    public static BigDecimal getIngestion(Resident resident, LocalDate day) {
         // First BD is for the influx, second for the outflow
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("" +
@@ -661,15 +662,15 @@ public class ResValueTools {
 
         query.setParameter("resident", resident);
         query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
-        query.setParameter("from", day.toDateTime().hourOfDay().withMinimumValue().secondOfDay().withMinimumValue().toDate());
-        query.setParameter("to", day.toDateTime().hourOfDay().withMaximumValue().secondOfDay().withMaximumValue().toDate());
+        query.setParameter("from", day.toDateTimeAtStartOfDay().toDate());
+        query.setParameter("to", SYSCalendar.endOfDay(day.toDateTimeAtStartOfDay().toDate()));
         BigDecimal sum = (BigDecimal) query.getSingleResult();
         em.close();
 
         return sum == null ? BigDecimal.ZERO : sum;
     }
 
-    public static BigDecimal getEgestion(Resident resident, DateMidnight day) {
+    public static BigDecimal getEgestion(Resident resident, LocalDate day) {
         // First BD is for the influx, second for the outflow
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("" +
@@ -684,8 +685,8 @@ public class ResValueTools {
 
         query.setParameter("resident", resident);
         query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
-        query.setParameter("from", day.toDateTime().hourOfDay().withMinimumValue().secondOfDay().withMinimumValue().toDate());
-        query.setParameter("to", day.toDateTime().hourOfDay().withMaximumValue().secondOfDay().withMaximumValue().toDate());
+        query.setParameter("from", day.toDateTimeAtStartOfDay().toDate());
+        query.setParameter("to", SYSCalendar.endOfDay(day.toDateTimeAtStartOfDay().toDate()));
         BigDecimal sum = (BigDecimal) query.getSingleResult();
         em.close();
 
@@ -864,7 +865,7 @@ public class ResValueTools {
      * @return Required liquid in ml
      */
     public static BigDecimal getRequiredLiquid(BigDecimal weight) {
-        if (weight == null){
+        if (weight == null) {
             return null;
         }
         BigDecimal rl = new BigDecimal(1500); // for the first 20 kg of weight
@@ -882,7 +883,7 @@ public class ResValueTools {
      */
     public static BigDecimal getBasalMetabolicRate(BigDecimal weight, BigDecimal height, int age, int gender) {
 
-        if (weight == null || height == null){
+        if (weight == null || height == null) {
             return null;
         }
 
@@ -910,7 +911,7 @@ public class ResValueTools {
      */
     public static BigDecimal getIBW(BigDecimal height, int gender) {
 
-        if (height == null){
+        if (height == null) {
             return null;
         }
 

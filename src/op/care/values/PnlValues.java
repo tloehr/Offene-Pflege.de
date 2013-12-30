@@ -50,8 +50,9 @@ import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
-import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import javax.persistence.*;
 import javax.swing.*;
@@ -106,7 +107,7 @@ public class PnlValues extends NursingRecordsPanel {
 
 //        mapCollapsed = Collections.synchronizedMap(new HashMap<String, Boolean>());
 
-//        balances = Collections.synchronizedMap(new HashMap<DateMidnight, Pair<BigDecimal, BigDecimal>>());
+//        balances = Collections.synchronizedMap(new HashMap<LocalDate, Pair<BigDecimal, BigDecimal>>());
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT t FROM ResValueTypes t ORDER BY t.text");
@@ -716,8 +717,8 @@ public class PnlValues extends NursingRecordsPanel {
     }
 
 
-    private CollapsiblePane createCP4Weeks(final DateMidnight week) {
-        final String keyWeeks = LIQUIDBALANCE.getID() + ".xtypes." + week.dayOfWeek().withMinimumValue().getMillis() + ".week";
+    private CollapsiblePane createCP4Weeks(final LocalDate week) {
+        final String keyWeeks = LIQUIDBALANCE.getID() + ".xtypes." + week.weekOfWeekyear() + ".week";
         final CollapsiblePane cpWeek = getCP(keyWeeks);
 
         String title = DateFormat.getDateInstance(DateFormat.SHORT).format(week.dayOfWeek().withMaximumValue().toDate()) + " - " +
@@ -761,32 +762,32 @@ public class PnlValues extends NursingRecordsPanel {
 
     private JPanel createContentPanel4Year(final int year) {
         JPanel pnlWeek = new JPanel(new VerticalLayout());
-//        int year = new DateMidnight(listDays.get(0)).getYear();
+//        int year = new LocalDate(listDays.get(0)).getYear();
 
         ArrayList<Date> lstDays = ResValueTools.getDaysWithValues(resident, LIQUIDBALANCE, year);
 
         ArrayList<Integer> weeklist = new ArrayList<Integer>();
         for (Date day : lstDays) {
-            DateMidnight dm = new DateMidnight(day);
+            LocalDate dm = new LocalDate(day);
             if (!weeklist.contains(dm.getWeekOfWeekyear())) {
                 weeklist.add(dm.getWeekOfWeekyear());
             }
         }
 
         for (int weeknum : weeklist) {
-            final DateMidnight week = new DateMidnight(year, 1, 1).plusWeeks(weeknum - 1).dayOfWeek().withMinimumValue();
+            final LocalDate week = new LocalDate(year, 1, 1).plusWeeks(weeknum - 1).dayOfWeek().withMinimumValue();
             pnlWeek.add(createCP4Weeks(week));
         }
 
         return pnlWeek;
     }
 
-    private JPanel createContentPanel4Week(final DateMidnight weekstart) {
+    private JPanel createContentPanel4Week(final LocalDate weekstart) {
         JPanel pnlDays = new JPanel(new VerticalLayout());
-        DateMidnight weekend = weekstart.dayOfWeek().withMaximumValue();
+        LocalDate weekend = weekstart.dayOfWeek().withMaximumValue();
 
-        for (DateMidnight day = weekend; day.compareTo(weekstart) >= 0; day = day.minusDays(1)) {
-            final String keyDay = LIQUIDBALANCE.getID() + ".xtypes." + day.getMillis() + ".day";
+        for (LocalDate day = weekend; day.compareTo(weekstart) >= 0; day = day.minusDays(1)) {
+            final String keyDay = LIQUIDBALANCE.getID() + ".xtypes." + day + ".day";
             synchronized (mapType2Values) {
                 if (!mapType2Values.containsKey(keyDay)) {
                     mapType2Values.put(keyDay, ResValueTools.getResValues(resident, LIQUIDBALANCE, day));
@@ -801,8 +802,8 @@ public class PnlValues extends NursingRecordsPanel {
     }
 
 
-    private CollapsiblePane createCP4Day(final DateMidnight day) {
-        final String keyDay = LIQUIDBALANCE.getID() + ".xtypes." + day.getMillis() + ".day";
+    private CollapsiblePane createCP4Day(final LocalDate day) {
+        final String keyDay = LIQUIDBALANCE.getID() + ".xtypes." + day + ".day";
         final CollapsiblePane cpDay = getCP(keyDay);
 
         BigDecimal egestion = ResValueTools.getEgestion(resident, day);
@@ -879,9 +880,9 @@ public class PnlValues extends NursingRecordsPanel {
                                             if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
 
                                                 if (!cpMap.containsKey(keyWeek)) {
-                                                    createCP4Weeks(dt.toDateMidnight().dayOfWeek().withMinimumValue());
+                                                    createCP4Weeks(dt.toLocalDate().dayOfWeek().withMinimumValue());
                                                 } else if (!cpMap.containsKey(keyDay)) {
-                                                    createCP4Day(dt.toDateMidnight());
+                                                    createCP4Day(dt.toLocalDate());
                                                 }
 
                                                 if (cpMap.get(keyWeek).isCollapsed()) {
@@ -974,7 +975,7 @@ public class PnlValues extends NursingRecordsPanel {
     }
 
 
-    private JPanel createContentPanel4Day(final DateMidnight day) {
+    private JPanel createContentPanel4Day(final LocalDate day) {
         final String key = LIQUIDBALANCE.getID() + ".xtypes." + day.getMillis() + ".day";
         java.util.List<ResValue> listValues;
 
@@ -1339,7 +1340,7 @@ public class PnlValues extends NursingRecordsPanel {
 
                                     DateTime dt = new DateTime(newValue.getPit());
                                     final String keyType = vtype.getID() + ".xtypes";
-                                    final String key = newValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE ? vtype.getID() + ".xtypes." + dt.toDateMidnight().getMillis() + ".day" : vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
+                                    final String key = newValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE ? vtype.getID() + ".xtypes." + dt.toLocalDate().getMillis() + ".day" : vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
 
                                     synchronized (mapType2Values) {
                                         mapType2Values.get(key).remove(resValue);
@@ -1431,7 +1432,7 @@ public class PnlValues extends NursingRecordsPanel {
                                     DateTime dt = new DateTime(myValue.getPit());
                                     final String keyType = vtype.getID() + ".xtypes";
 
-                                    final String key = myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE ? vtype.getID() + ".xtypes." + dt.toDateMidnight().getMillis() + ".day" : vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
+                                    final String key = myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE ? vtype.getID() + ".xtypes." + dt.toLocalDate().getMillis() + ".day" : vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
 
                                     synchronized (mapType2Values) {
                                         mapType2Values.get(key).remove(resValue);
@@ -1667,9 +1668,9 @@ public class PnlValues extends NursingRecordsPanel {
 
                         DateTime dt = new DateTime(myValue.getPit());
 
-                        final String keyDay = vtype.getID() + ".xtypes." + dt.toDateMidnight().getMillis() + ".day";
+                        final String keyDay = vtype.getID() + ".xtypes." + dt.toLocalDate().getMillis() + ".day";
                         final String keyYear = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
-                        final String keyWeek = vtype.getID() + ".xtypes." + dt.toDateMidnight().dayOfWeek().withMinimumValue().getMillis() + ".week";
+                        final String keyWeek = vtype.getID() + ".xtypes." + dt.weekOfWeekyear() + ".week";
 
                         try {
                             synchronized (cpMap) {
@@ -1684,9 +1685,9 @@ public class PnlValues extends NursingRecordsPanel {
                                 if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
 
                                     if (!cpMap.containsKey(keyWeek)) {
-                                        createCP4Weeks(dt.toDateMidnight().dayOfWeek().withMinimumValue());
+                                        createCP4Weeks(dt.toLocalDate().dayOfWeek().withMinimumValue());
                                     } else if (!cpMap.containsKey(keyDay)) {
-                                        createCP4Day(dt.toDateMidnight());
+                                        createCP4Day(dt.toLocalDate());
                                     }
 
                                     if (cpMap.get(keyWeek).isCollapsed()) {
