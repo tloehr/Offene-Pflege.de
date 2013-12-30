@@ -32,9 +32,16 @@ public class PnlPIT extends JPanel {
         this(new Date(), new Date(), SYSConst.DATE_THE_VERY_BEGINNING);
     }
 
-    public PnlPIT(Date preset) {
+    public PnlPIT(Date preset, boolean enableDate) {
         this(preset, new Date(), SYSConst.DATE_THE_VERY_BEGINNING);
+        txtDate.setEnabled(enableDate);
     }
+
+    public PnlPIT(Date preset) {
+        this(preset, true);
+
+    }
+
 
     public PnlPIT(Date preset, Date max, Date min) {
         this.max = max;

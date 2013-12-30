@@ -50,7 +50,6 @@ import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
-import org.joda.time.LocalDate;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -372,9 +371,7 @@ public class PnlValues extends NursingRecordsPanel {
             btnAdd.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-
                     addValue(vtype);
-
                 }
             });
             pnlContent.add(btnAdd);
@@ -718,16 +715,18 @@ public class PnlValues extends NursingRecordsPanel {
 
 
     private CollapsiblePane createCP4Weeks(final LocalDate week) {
-        final String keyWeeks = LIQUIDBALANCE.getID() + ".xtypes." + week.weekOfWeekyear() + ".week";
+
+        final LocalDate to = SYSCalendar.min(SYSCalendar.eow(week), new LocalDate(week.getYear(), 12, 31));
+        final LocalDate from = SYSCalendar.max(SYSCalendar.bow(week), new LocalDate(week.getYear(), 1, 1));
+        final String keyWeeks = LIQUIDBALANCE.getID() + ".xtypes." + from + ".week";
         final CollapsiblePane cpWeek = getCP(keyWeeks);
 
-        String title = DateFormat.getDateInstance(DateFormat.SHORT).format(week.dayOfWeek().withMaximumValue().toDate()) + " - " +
-                DateFormat.getDateInstance(DateFormat.SHORT).format(week.dayOfWeek().withMinimumValue().toDate()) +
+        String title = DateFormat.getDateInstance(DateFormat.SHORT).format(to.toDate()) + " - " +
+                DateFormat.getDateInstance(DateFormat.SHORT).format(from.toDate()) +
                 " (" +
                 OPDE.lang.getString("misc.msg.weekinyear") +
-                week.getWeekOfWeekyear() +
+                week.getWeekOfWeekyear() + (week.getYear() != week.getWeekyear() ? "-" + week.getWeekyear() : "") +
                 ")";
-
 
         final DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
             @Override
@@ -749,12 +748,12 @@ public class PnlValues extends NursingRecordsPanel {
         cpWeek.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                cpWeek.setContentPane(createContentPanel4Week(week.dayOfWeek().withMinimumValue()));
+                cpWeek.setContentPane(createContentPanel4Week(from));
             }
         });
 
         if (!cpWeek.isCollapsed()) {
-            cpWeek.setContentPane(createContentPanel4Week(week.dayOfWeek().withMinimumValue()));
+            cpWeek.setContentPane(createContentPanel4Week(from));
         }
 
         return cpWeek;
@@ -762,31 +761,36 @@ public class PnlValues extends NursingRecordsPanel {
 
     private JPanel createContentPanel4Year(final int year) {
         JPanel pnlWeek = new JPanel(new VerticalLayout());
-//        int year = new LocalDate(listDays.get(0)).getYear();
-
         ArrayList<Date> lstDays = ResValueTools.getDaysWithValues(resident, LIQUIDBALANCE, year);
 
-        ArrayList<Integer> weeklist = new ArrayList<Integer>();
+        ArrayList<LocalDate> weeklist = new ArrayList<LocalDate>();
         for (Date day : lstDays) {
-            LocalDate dm = new LocalDate(day);
-            if (!weeklist.contains(dm.getWeekOfWeekyear())) {
-                weeklist.add(dm.getWeekOfWeekyear());
+            LocalDate ldDay = new LocalDate(day);
+            LocalDate dm = SYSCalendar.max(SYSCalendar.bow(ldDay), ldDay); //SYSCalendar.max(SYSCalendar.bow(ldDay), new LocalDate(ldDay.getYear(), 1, 1));
+            if (!weeklist.contains(dm)) {
+                weeklist.add(dm);
             }
         }
 
-        for (int weeknum : weeklist) {
-            final LocalDate week = new LocalDate(year, 1, 1).plusWeeks(weeknum - 1).dayOfWeek().withMinimumValue();
+        for (LocalDate week : weeklist) {
+//            final LocalDate week = new LocalDate(year, 1, 1).plusWeeks(weeknum - 1).dayOfWeek().withMinimumValue();
+            if (weeklist.indexOf(week) == weeklist.size() - 1) {
+                OPDE.debug("ende");
+            }
             pnlWeek.add(createCP4Weeks(week));
         }
 
         return pnlWeek;
     }
 
-    private JPanel createContentPanel4Week(final LocalDate weekstart) {
+    private JPanel createContentPanel4Week(final LocalDate week) {
         JPanel pnlDays = new JPanel(new VerticalLayout());
-        LocalDate weekend = weekstart.dayOfWeek().withMaximumValue();
+//        LocalDate weekend = weekstart.dayOfWeek().withMaximumValue();
 
-        for (LocalDate day = weekend; day.compareTo(weekstart) >= 0; day = day.minusDays(1)) {
+        LocalDate to = SYSCalendar.min(SYSCalendar.eow(week), new LocalDate(week.getYear(), 12, 31));
+        LocalDate from = SYSCalendar.max(SYSCalendar.bow(week), new LocalDate(week.getYear(), 1, 1));
+
+        for (LocalDate day = to; day.compareTo(from) >= 0; day = day.minusDays(1)) {
             final String keyDay = LIQUIDBALANCE.getID() + ".xtypes." + day + ".day";
             synchronized (mapType2Values) {
                 if (!mapType2Values.containsKey(keyDay)) {
@@ -848,7 +852,7 @@ public class PnlValues extends NursingRecordsPanel {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
 
-                    new DlgValue(new ResValue(resident, LIQUIDBALANCE, SYSCalendar.addCurrentTime(day).toDate()), false, new Closure() {
+                    new DlgValue(new ResValue(resident, LIQUIDBALANCE, day.toDateTimeAtCurrentTime().toDate()), DlgValue.MODE_NEW_SAMEDAY, new Closure() {
                         @Override
                         public void execute(Object o) {
                             if (o != null) {
@@ -864,7 +868,9 @@ public class PnlValues extends NursingRecordsPanel {
 
                                     final String keyType = LIQUIDBALANCE.getID() + ".xtypes";
                                     final String keyYear = LIQUIDBALANCE.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
-                                    final String keyWeek = LIQUIDBALANCE.getID() + ".xtypes." + day.dayOfWeek().withMinimumValue().getMillis() + ".week";
+//                                    final String keyWeek = LIQUIDBALANCE.getID() + ".xtypes." + day.dayOfWeek().withMinimumValue().getMillis() + ".week";
+                                    final LocalDate week = SYSCalendar.max(SYSCalendar.bow(dt.toLocalDate()), new LocalDate(dt.getYear(), 1, 1));
+                                    final String keyWeek = LIQUIDBALANCE.getID() + ".xtypes." + week + ".week";
 
                                     try {
                                         synchronized (cpMap) {
@@ -880,7 +886,7 @@ public class PnlValues extends NursingRecordsPanel {
                                             if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
 
                                                 if (!cpMap.containsKey(keyWeek)) {
-                                                    createCP4Weeks(dt.toLocalDate().dayOfWeek().withMinimumValue());
+                                                    createCP4Weeks(dt.toLocalDate()); // dt.toLocalDate().dayOfWeek().withMinimumValue()
                                                 } else if (!cpMap.containsKey(keyDay)) {
                                                     createCP4Day(dt.toLocalDate());
                                                 }
@@ -976,33 +982,14 @@ public class PnlValues extends NursingRecordsPanel {
 
 
     private JPanel createContentPanel4Day(final LocalDate day) {
-        final String key = LIQUIDBALANCE.getID() + ".xtypes." + day.getMillis() + ".day";
+        final String key = LIQUIDBALANCE.getID() + ".xtypes." + day + ".day";
         java.util.List<ResValue> listValues;
 
-//        synchronized (mapType2Values) {
-//            if (!mapType2Values.containsKey(key)) {
-//                mapType2Values.put(key, ResValueTools.getResValues(resident, LIQUIDBALANCE, day));
-//            }
-//            if (mapType2Values.get(key).isEmpty()) {
-//                JLabel lbl = new JLabel(OPDE.lang.getString("misc.msg.novalue"));
-//                JPanel pnl = new JPanel();
-//                pnl.add(lbl);
-//                return pnl;
-//            }
-//
-//            listValues = mapType2Values.get(key);
-//        }
-
-//        if (listValues.isEmpty()) {
-//            return null;
-//        }
         synchronized (mapType2Values) {
             listValues = mapType2Values.get(key);
         }
 
         JPanel pnlDay = new JPanel(new VerticalLayout());
-//        pnlDay.setBackground(getColor(LIQUIDBALANCE, SYSConst.light3));
-//        pnlDay.setBackground(GUITools.blend(LIQUIDBALANCE.getColor(), Color.WHITE, 0.1f));
         pnlDay.setOpaque(false);
 
         for (final ResValue resValue : listValues) {
@@ -1244,16 +1231,6 @@ public class PnlValues extends NursingRecordsPanel {
         return pnlDay;
     }
 
-//    private Color getColor(ResValueTypes vtype, int level) {
-//        synchronized (lstValueTypes) {
-//            if (lstValueTypes.indexOf(vtype) % 2 == 0) {
-//                return color1[level];
-//            } else {
-//                return color2[level];
-//            }
-//        }
-//    }
-
     @Override
     public void cleanup() {
         cpsValues.removeAll();
@@ -1307,7 +1284,7 @@ public class PnlValues extends NursingRecordsPanel {
             btnEdit.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgValue(resValue.clone(), true, new Closure() {
+                    new DlgValue(resValue.clone(), DlgValue.MODE_EDIT, new Closure() {
                         @Override
                         public void execute(Object o) {
                             if (o != null) {
@@ -1340,7 +1317,7 @@ public class PnlValues extends NursingRecordsPanel {
 
                                     DateTime dt = new DateTime(newValue.getPit());
                                     final String keyType = vtype.getID() + ".xtypes";
-                                    final String key = newValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE ? vtype.getID() + ".xtypes." + dt.toLocalDate().getMillis() + ".day" : vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
+                                    final String key = newValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE ? vtype.getID() + ".xtypes." + dt.toLocalDate() + ".day" : vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
 
                                     synchronized (mapType2Values) {
                                         mapType2Values.get(key).remove(resValue);
@@ -1432,7 +1409,7 @@ public class PnlValues extends NursingRecordsPanel {
                                     DateTime dt = new DateTime(myValue.getPit());
                                     final String keyType = vtype.getID() + ".xtypes";
 
-                                    final String key = myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE ? vtype.getID() + ".xtypes." + dt.toLocalDate().getMillis() + ".day" : vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
+                                    final String key = myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE ? vtype.getID() + ".xtypes." + dt.toLocalDate() + ".day" : vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
 
                                     synchronized (mapType2Values) {
                                         mapType2Values.get(key).remove(resValue);
@@ -1652,87 +1629,20 @@ public class PnlValues extends NursingRecordsPanel {
 
         final String keyType = vtype.getID() + ".xtypes";
 
-        new DlgValue(new ResValue(resident, vtype), false, new Closure() {
+        new DlgValue(new ResValue(resident, vtype), DlgValue.MODE_NEW, new Closure() {
             @Override
             public void execute(Object o) {
-
+                ResValue myValue = null;
 
                 if (o != null) {
 
                     EntityManager em = OPDE.createEM();
                     try {
                         em.getTransaction().begin();
-                        final ResValue myValue = em.merge((ResValue) o);
+                        myValue = em.merge((ResValue) o);
                         em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                         em.getTransaction().commit();
 
-                        DateTime dt = new DateTime(myValue.getPit());
-
-                        final String keyDay = vtype.getID() + ".xtypes." + dt.toLocalDate().getMillis() + ".day";
-                        final String keyYear = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
-                        final String keyWeek = vtype.getID() + ".xtypes." + dt.weekOfWeekyear() + ".week";
-
-                        try {
-                            synchronized (cpMap) {
-                                cpMap.get(keyType).setCollapsible(true);
-
-                                if (cpMap.get(keyType).isCollapsed()) {
-                                    cpMap.get(keyType).setCollapsed(false);
-                                }
-                                if (cpMap.containsKey(keyYear) && cpMap.get(keyYear).isCollapsed()) {
-                                    cpMap.get(keyYear).setCollapsed(false);
-                                }
-                                if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
-
-                                    if (!cpMap.containsKey(keyWeek)) {
-                                        createCP4Weeks(dt.toLocalDate().dayOfWeek().withMinimumValue());
-                                    } else if (!cpMap.containsKey(keyDay)) {
-                                        createCP4Day(dt.toLocalDate());
-                                    }
-
-                                    if (cpMap.get(keyWeek).isCollapsed()) {
-                                        cpMap.get(keyWeek).setCollapsed(false);
-                                    }
-                                    if (cpMap.get(keyDay).isCollapsed()) {
-                                        cpMap.get(keyDay).setCollapsed(false);
-                                    }
-                                }
-
-                            }
-                        } catch (PropertyVetoException e) {
-                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                        }
-
-                        synchronized (mapType2Values) {
-                            if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
-                                if (!mapType2Values.get(keyDay).contains(myValue)) {
-                                    mapType2Values.get(keyDay).add(myValue);
-                                    Collections.sort(mapType2Values.get(keyDay));
-                                }
-                            } else {
-                                if (!mapType2Values.containsKey(keyYear)) {
-                                    mapType2Values.put(keyYear, new ArrayList<ResValue>());
-                                }
-                                if (!mapType2Values.get(keyYear).contains(myValue)) {
-                                    mapType2Values.get(keyYear).add(myValue);
-                                    Collections.sort(mapType2Values.get(keyYear));
-                                }
-                            }
-                        }
-                        //                                    cptitle.getButton().setIcon(SYSConst.icon22ledGreenOn);
-
-                        createCP4Year(vtype, dt.getYear());
-
-                        buildPanel();
-
-                        synchronized (linemap) {
-                            GUITools.scroll2show(jspValues, linemap.get(myValue), cpsValues, new Closure() {
-                                @Override
-                                public void execute(Object o) {
-                                    GUITools.flashBackground(linemap.get(myValue), Color.YELLOW, 2);
-                                }
-                            });
-                        }
                     } catch (OptimisticLockException ole) {
                         OPDE.warn(ole);
                         if (em.getTransaction().isActive()) {
@@ -1752,7 +1662,83 @@ public class PnlValues extends NursingRecordsPanel {
                         em.close();
                     }
 
+                    if (myValue != null) {
 
+                        DateTime dt = new DateTime(myValue.getPit());
+
+                        final String keyDay = vtype.getID() + ".xtypes." + dt.toLocalDate() + ".day";
+                        final String keyYear = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
+                        final LocalDate week = SYSCalendar.max(SYSCalendar.bow(dt.toLocalDate()), new LocalDate(dt.getYear(), 1, 1));
+                        final String keyWeek = vtype.getID() + ".xtypes." + week + ".week";
+
+                        synchronized (mapType2Values) {
+                            if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
+                                if (!mapType2Values.containsKey(keyDay)) {
+                                    mapType2Values.put(keyDay, new ArrayList<ResValue>());
+                                }
+                                if (!mapType2Values.get(keyDay).contains(myValue)) {
+                                    mapType2Values.get(keyDay).add(myValue);
+                                    Collections.sort(mapType2Values.get(keyDay));
+                                }
+                            } else {
+                                if (!mapType2Values.containsKey(keyYear)) {
+                                    mapType2Values.put(keyYear, new ArrayList<ResValue>());
+                                }
+                                if (!mapType2Values.get(keyYear).contains(myValue)) {
+                                    mapType2Values.get(keyYear).add(myValue);
+                                    Collections.sort(mapType2Values.get(keyYear));
+                                }
+                            }
+                        }
+
+                        try {
+                            // eh ?
+                            synchronized (cpMap) {
+                                cpMap.get(keyType).setCollapsible(true);
+
+                                if (myValue.getType().getValType() == ResValueTypesTools.LIQUIDBALANCE) {
+                                    if (!cpMap.containsKey(keyWeek)) {
+                                        createCP4Weeks(dt.toLocalDate());
+                                    }
+                                    if (!cpMap.containsKey(keyDay)) {
+                                        createCP4Day(dt.toLocalDate());
+                                    }
+                                    if (cpMap.get(keyWeek).isCollapsed()) {
+                                        cpMap.get(keyWeek).setCollapsed(false);
+                                    }
+                                    if (cpMap.get(keyDay).isCollapsed()) {
+                                        cpMap.get(keyDay).setCollapsed(false);
+                                    }
+                                }
+
+                                if (cpMap.get(keyType).isCollapsed()) {
+                                    cpMap.get(keyType).setCollapsed(false);
+                                }
+                                if (cpMap.containsKey(keyYear) && cpMap.get(keyYear).isCollapsed()) {
+                                    cpMap.get(keyYear).setCollapsed(false);
+                                }
+
+
+                            }
+                        } catch (PropertyVetoException e) {
+                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                        }
+
+                        //createCP4Year(vtype, dt.getYear());
+                        createCP4Type(vtype);
+
+                        buildPanel();
+
+//                        synchronized (linemap) {
+//                            GUITools.scroll2show(jspValues, linemap.get(myValue), cpsValues, new Closure() {
+//                                @Override
+//                                public void execute(Object o) {
+//                                    GUITools.flashBackground(linemap.get(myValue), Color.YELLOW, 2);
+//                                }
+//                            });
+//                        }
+
+                    }
                 }
 
             }

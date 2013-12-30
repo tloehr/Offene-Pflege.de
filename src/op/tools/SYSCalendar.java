@@ -38,6 +38,7 @@ import op.threads.DisplayMessage;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -336,11 +337,11 @@ public class SYSCalendar {
      * @param d1 The first date.
      * @param d2 The second date.
      * @return The number of days between the two dates.  Zero is
-     *         returned if the dates are the same, one if the dates are
-     *         adjacent (d1 before d2) etc.
-     *         negative values denote that d2 is before d1;
-     *         If Calendar types of d1 and d2
-     *         are different, the result may not be accurate.
+     * returned if the dates are the same, one if the dates are
+     * adjacent (d1 before d2) etc.
+     * negative values denote that d2 is before d1;
+     * If Calendar types of d1 and d2
+     * are different, the result may not be accurate.
      */
     public static int getDaysBetween(java.util.Calendar d1, java.util.Calendar d2) {
         boolean swapped = false;
@@ -714,9 +715,9 @@ public class SYSCalendar {
 
     /**
      * @return Liste mit 4 Elementen. Die ersten beiden sind die byte Kennungen der beteiligten Schichten innerhalb der gewünschten
-     *         Anzeige. Kann sein SYSConst.FM oder SYSConst.MO etc. Die dritte Stelle enthält die Start-Uhrzeit als Zeichenkette (gemäß des
-     *         Eintrags in der SYSProps Tabelle. In der vierten Stelle steht die End-Uhrzeit, ebenfalls als Zeichenkette (minus 1 Minute). Damit
-     *         liegt diese Zeit in dem betreffenden Intervall.
+     * Anzeige. Kann sein SYSConst.FM oder SYSConst.MO etc. Die dritte Stelle enthält die Start-Uhrzeit als Zeichenkette (gemäß des
+     * Eintrags in der SYSProps Tabelle. In der vierten Stelle steht die End-Uhrzeit, ebenfalls als Zeichenkette (minus 1 Minute). Damit
+     * liegt diese Zeit in dem betreffenden Intervall.
      */
     public static ArrayList getZeiten4Schicht(byte schicht) {
         ArrayList result = new ArrayList(4);
@@ -860,6 +861,7 @@ public class SYSCalendar {
     /**
      * determines to which timeofday code a given date object belongs. The settings in SYSProps are taken into account.
      * or in short: it answers a question like "is 0800h early, noon or early in the morning ?"
+     *
      * @param date
      * @return timecode
      */
@@ -1216,7 +1218,7 @@ public class SYSCalendar {
         return new Date(addTime2Date(toGC(date), toGC(time)).getTimeInMillis());
     }
 
-    public static DateTime addCurrentTime(DateMidnight date){
+    public static DateTime addCurrentTime(DateMidnight date) {
         DateTime time = new DateTime();
 
         return date.toDateTime().withTime(time.getHourOfDay(), time.getMinuteOfHour(), time.getSecondOfMinute(), time.getMillisOfSecond());
@@ -1551,4 +1553,50 @@ public class SYSCalendar {
         }
         return GUITools.getColor(OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[shift] + "_BGBHP"));
     }
+
+    public static DateTime bod(DateTime date) {
+        return date.hourOfDay().withMinimumValue().minuteOfHour().withMinimumValue().secondOfDay().withMinimumValue();
+    }
+
+    public static DateTime eod(DateTime date) {
+        return date.hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfDay().withMaximumValue();
+    }
+
+    public static DateTime eod(LocalDate date) {
+        return eod(date.toDateTimeAtStartOfDay());
+    }
+
+    public static DateTime bom(DateTime d) {
+        return d.dayOfMonth().withMinimumValue().hourOfDay().withMinimumValue().minuteOfHour().withMinimumValue().secondOfMinute().withMinimumValue();
+    }
+
+    public static DateTime eom(DateTime d) {
+        return d.dayOfMonth().withMaximumValue().hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue();
+    }
+
+
+    public static LocalDate bow(LocalDate d) {
+        return d.dayOfWeek().withMinimumValue();
+    }
+
+    public static LocalDate eow(LocalDate d) {
+        return d.dayOfWeek().withMaximumValue();
+    }
+
+    public static LocalDate bom(LocalDate d) {
+        return d.dayOfMonth().withMinimumValue();
+    }
+
+    public static LocalDate eom(LocalDate d) {
+        return d.dayOfMonth().withMaximumValue();
+    }
+
+    public static LocalDate min(LocalDate a, LocalDate b) {
+        return new LocalDate(Math.min(a.toDateTimeAtStartOfDay().getMillis(), b.toDateTimeAtStartOfDay().getMillis()));
+    }
+
+    public static LocalDate max(LocalDate a, LocalDate b) {
+        return new LocalDate(Math.max(a.toDateTimeAtStartOfDay().getMillis(), b.toDateTimeAtStartOfDay().getMillis()));
+    }
+
 }

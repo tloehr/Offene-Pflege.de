@@ -27,9 +27,12 @@ public class DlgValue extends MyJDialog {
     private ResValue resValue;
     private Closure afterAction;
     private PnlPIT pnlPIT;
-    private boolean editMode;
+    private int editMode;
+    public static final int MODE_NEW = 0;
+    public static final int MODE_NEW_SAMEDAY = 1;
+    public static final int MODE_EDIT = 2;
 
-    public DlgValue(ResValue resValue, boolean editMode, Closure afterAction) {
+    public DlgValue(ResValue resValue, int editMode, Closure afterAction) {
         super();
         this.resValue = resValue;
         this.editMode = editMode;
@@ -42,11 +45,12 @@ public class DlgValue extends MyJDialog {
 
     public void initPanel() {
 
-        if (!editMode) {
-            pnlPIT = new PnlPIT(resValue.getPit());
-
+        if (editMode != MODE_EDIT) {
+            pnlPIT = new PnlPIT(resValue.getPit(), editMode == MODE_NEW);
             panel2.add(pnlPIT);
         }
+
+
 
         lblWert1.setVisible(resValue.getVal1() != null);
         txtWert1.setVisible(resValue.getVal1() != null);

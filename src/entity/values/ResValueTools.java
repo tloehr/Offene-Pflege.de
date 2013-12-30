@@ -362,9 +362,9 @@ public class ResValueTools {
 
     public static ArrayList<ResValue> getResValues(Resident resident, ResValueTypes vtype, LocalDate day) {
 
-        //        DateTime theYear = new DateTime(year, 1, 1, 0, 0, 0);
-        DateTime from = day.toDateTime().secondOfDay().withMinimumValue();
-        DateTime to = day.toDateTime().secondOfDay().withMaximumValue();
+//        //        DateTime theYear = new DateTime(year, 1, 1, 0, 0, 0);
+//        DateTime from = day.toDateTime().secondOfDay().withMinimumValue();
+//        DateTime to = day.toDateTime().secondOfDay().withMaximumValue();
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("" +
@@ -376,8 +376,8 @@ public class ResValueTools {
                 " ORDER BY rv.pit DESC ");
         query.setParameter("resident", resident);
         query.setParameter("vtype", vtype);
-        query.setParameter("from", from.toDate());
-        query.setParameter("to", to.toDate());
+        query.setParameter("from", day.toDateTimeAtStartOfDay().toDate());
+        query.setParameter("to", SYSCalendar.eod(day).toDate());
         ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
         em.close();
 
@@ -663,7 +663,7 @@ public class ResValueTools {
         query.setParameter("resident", resident);
         query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
         query.setParameter("from", day.toDateTimeAtStartOfDay().toDate());
-        query.setParameter("to", SYSCalendar.endOfDay(day.toDateTimeAtStartOfDay().toDate()));
+        query.setParameter("to", SYSCalendar.eod(day).toDate());
         BigDecimal sum = (BigDecimal) query.getSingleResult();
         em.close();
 
@@ -686,37 +686,37 @@ public class ResValueTools {
         query.setParameter("resident", resident);
         query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
         query.setParameter("from", day.toDateTimeAtStartOfDay().toDate());
-        query.setParameter("to", SYSCalendar.endOfDay(day.toDateTimeAtStartOfDay().toDate()));
+        query.setParameter("to", SYSCalendar.eod(day).toDate());
         BigDecimal sum = (BigDecimal) query.getSingleResult();
         em.close();
 
         return sum == null ? BigDecimal.ZERO : sum;
     }
 
-    public static BigDecimal getAvgIn(Resident resident, DateMidnight month) {
-        DateTime from = month.dayOfMonth().withMinimumValue().toDateTime();
-        DateTime to = month.dayOfMonth().withMaximumValue().plusDays(1).toDateTime().minusSeconds(1);
-
-        // First BD is for the influx, second for the outflow
-        EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("" +
-                " SELECT AVG(rv.val1) FROM ResValue rv " +
-                " WHERE rv.resident = :resident " +
-                " AND rv.replacedBy IS NULL " +
-                " AND rv.vtype.valType = :valType" +
-                " AND rv.val1 >= 0 " +
-                " AND rv.pit >= :from" +
-                " AND rv.pit <= :to" +
-                " ORDER BY rv.pit DESC ");
-        query.setParameter("resident", resident);
-        query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
-        query.setParameter("from", from.toDate());
-        query.setParameter("from", to.plusDays(1).toDateTime().minusSeconds(1).toDate());
-        BigDecimal avg = (BigDecimal) query.getSingleResult();
-        em.close();
-
-        return avg == null ? BigDecimal.ZERO : avg;
-    }
+//    public static BigDecimal getAvgIn(Resident resident, DateMidnight month) {
+//        DateTime from = month.dayOfMonth().withMinimumValue().toDateTime();
+//        DateTime to = month.dayOfMonth().withMaximumValue().plusDays(1).toDateTime().minusSeconds(1);
+//
+//        // First BD is for the influx, second for the outflow
+//        EntityManager em = OPDE.createEM();
+//        Query query = em.createQuery("" +
+//                " SELECT AVG(rv.val1) FROM ResValue rv " +
+//                " WHERE rv.resident = :resident " +
+//                " AND rv.replacedBy IS NULL " +
+//                " AND rv.vtype.valType = :valType" +
+//                " AND rv.val1 >= 0 " +
+//                " AND rv.pit >= :from" +
+//                " AND rv.pit <= :to" +
+//                " ORDER BY rv.pit DESC ");
+//        query.setParameter("resident", resident);
+//        query.setParameter("valType", ResValueTypesTools.LIQUIDBALANCE);
+//        query.setParameter("from", from.toDate());
+//        query.setParameter("from", to.plusDays(1).toDateTime().minusSeconds(1).toDate());
+//        BigDecimal avg = (BigDecimal) query.getSingleResult();
+//        em.close();
+//
+//        return avg == null ? BigDecimal.ZERO : avg;
+//    }
 
     public static HashMap<LocalDate, BigDecimal> getLiquidIn(Resident resident, LocalDate from) {
         EntityManager em = OPDE.createEM();
