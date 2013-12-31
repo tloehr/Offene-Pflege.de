@@ -1952,7 +1952,7 @@ public class SYSTools {
                     OPDE.error(e1);
                 }
             }
-            OPDE.error(e);
+            OPDE.warn(e);
         }
 
         OPDE.setUpdateAvailable(remoteBuildnum > mybuildnum, descriptionURL);

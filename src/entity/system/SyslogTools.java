@@ -5,16 +5,14 @@
 
 package entity.system;
 
-import java.net.InetAddress;
-import java.util.Date;
-
 import entity.EntityTools;
 import op.OPDE;
 
 import javax.persistence.EntityManager;
+import java.net.InetAddress;
+import java.util.Date;
 
 /**
- *
  * @author tloehr
  */
 public class SyslogTools {
@@ -23,27 +21,30 @@ public class SyslogTools {
     public static final short ERROR = 2;
     public static final short FATAL = 3;
 
-    public static void info(String message){
+    public static void info(String message) {
         addLog(message, INFO);
     }
 
-    public static void error(String message){
+    public static void error(String message) {
         addLog(message, ERROR);
     }
 
-    public static void warn(String message){
+    public static void warn(String message) {
         addLog(message, WARN);
     }
 
-    public static void fatal(String message){
+    public static void fatal(String message) {
         addLog(message, FATAL);
     }
 
-    public static void addLog(String message, short level){
+    public static void addLog(String message, short level) {
 
         InetAddress localMachine = null;
 
-        message = String.format("[%s] [%s] %s",Integer.toString(OPDE.getAppInfo().getBuildnum()), OPDE.getLogin().getUser().getUID(), message);
+
+        SYSLogin login = OPDE.getLogin();
+
+        message = String.format("[%s] [%s] %s", Integer.toString(OPDE.getAppInfo().getBuildnum()), login != null ? login.getUser().getUID() : "nobody" , message);
 
         try {
             localMachine = InetAddress.getLocalHost();
@@ -58,8 +59,8 @@ public class SyslogTools {
     public static void addLog(EntityManager em, String message, short level) throws Exception {
 
         InetAddress localMachine = null;
-
-        message = String.format("[%s] [%s] %s",Integer.toString(OPDE.getAppInfo().getBuildnum()), OPDE.getLogin().getUser().getUID(), message);
+        SYSLogin login = OPDE.getLogin();
+        message = String.format("[%s] [%s] %s", Integer.toString(OPDE.getAppInfo().getBuildnum()), login != null ? login.getUser().getUID() : "nobody", message);
 
         try {
             localMachine = InetAddress.getLocalHost();
