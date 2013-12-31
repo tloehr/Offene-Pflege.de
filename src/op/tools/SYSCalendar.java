@@ -1583,6 +1583,14 @@ public class SYSCalendar {
         return d.dayOfWeek().withMaximumValue();
     }
 
+    public static DateTime boy(int year) {
+        return new DateTime(year, 1, 1, 0, 0, 0);
+    }
+
+    public static DateTime eoy(int year) {
+        return new DateTime(year, 12, 31, 23, 59, 59);
+    }
+
     public static LocalDate bom(LocalDate d) {
         return d.dayOfMonth().withMinimumValue();
     }

@@ -386,9 +386,9 @@ public class ResValueTools {
 
     public static ArrayList<ResValue> getResValues(Resident resident, ResValueTypes vtype, int year) {
 
-        DateTime theYear = new DateTime(year, 1, 1, 0, 0, 0);
-        DateTime from = theYear.dayOfYear().withMinimumValue();
-        DateTime to = theYear.dayOfYear().withMaximumValue();
+//        DateTime theYear = new DateTime(year, 1, 1, 0, 0, 0);
+        DateTime from = SYSCalendar.boy(year);
+        DateTime to = SYSCalendar.eoy(year);
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("" +
