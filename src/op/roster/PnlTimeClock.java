@@ -125,14 +125,15 @@ public class PnlTimeClock extends JPanel {
             }
         }
 
-        if (myPlan == null) { // this should never happen. fix this in the roster creation and the transition of the roster states
-            // no rplan ? create an nearly empty one.
-            myPlan = new Rplan(roster, StationTools.getStationForThisHost().getHome(), currentDate.toDate(), user);
-
-            // todo: this is just a dirty trick. Fix this by creating a proper way to find an appropriate OFF_DUTY symbol
-            myPlan.setP1("X");
-            myPlan.setStartEndFromSymbol(rosterparameter.getSymbolMap().get("X"));
-        }
+            // todo: fix this in the roster creation and the transition of the roster states
+//        if (myPlan == null) { // this must never happen. fix this in the roster creation and the transition of the roster states
+//            // no rplan ? create an nearly empty one.
+//            myPlan = new Rplan(roster, StationTools.getStationForThisHost().getHome(), currentDate.toDate(), user);
+//
+//            // todo: this is just a dirty trick. Fix this by creating a proper way to find an appropriate OFF_DUTY symbol
+//            myPlan.setP1("X");
+//            myPlan.setStartEndFromSymbol(rosterparameter.getSymbolMap().get("X"));
+//        }
 
         String message = "";
         if (rosterparameter.getSymbol(myPlan.getEffectiveSymbol()).getSymbolType() != Symbol.WORK) {

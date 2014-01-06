@@ -84,7 +84,7 @@ public class Workinglog implements Comparable<Workinglog> {
         this.percent = BigDecimal.ZERO;
         this.rplan = rplan;
         this.type = WorkinglogTools.TYPE_TIMECLOCK;
-        this.type = WorkinglogTools.STATE_UNUSED;
+        this.state = WorkinglogTools.STATE_UNUSED;
         this.creator = OPDE.getLogin().getUser();
         this.owner = rplan.getOwner();
         this.start = null;
@@ -99,7 +99,7 @@ public class Workinglog implements Comparable<Workinglog> {
         this.homeactual = homeactual;
         this.rplan = rplan;
         this.type = type;
-        this.type = WorkinglogTools.STATE_UNUSED;
+        this.state = WorkinglogTools.STATE_UNUSED;
         this.creator = OPDE.getLogin().getUser();
         this.start = null;
         this.end = null;
@@ -113,7 +113,7 @@ public class Workinglog implements Comparable<Workinglog> {
         this.end = end;
         this.rplan = rplan;
         this.type = type;
-        this.type = WorkinglogTools.STATE_UNUSED;
+        this.state = WorkinglogTools.STATE_UNUSED;
         this.creator = OPDE.getLogin().getUser();
         this.text = text;
         timestamp = new Date();
@@ -129,6 +129,7 @@ public class Workinglog implements Comparable<Workinglog> {
                 ", percent=" + percent +
                 ", text='" + text + '\'' +
                 ", type=" + type +
+                ", state=" + state +
                 ", actualkey=" + actualkey +
                 ", version=" + version +
                 ", actual='" + actual + '\'' +
@@ -270,6 +271,10 @@ public class Workinglog implements Comparable<Workinglog> {
         return type != WorkinglogTools.TYPE_ADDITIONAL && type != WorkinglogTools.TYPE_MANUAL && type != WorkinglogTools.TYPE_TIMECLOCK;
     }
 
+
+    public boolean isTimeClock(){
+        return type == WorkinglogTools.TYPE_TIMECLOCK;
+    }
 
     public void setActualKey(long actual) {
         this.actualkey = actual;

@@ -5,7 +5,7 @@ new FormModel {
 	root: new FormRoot {
 		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
 			"$columnSpecs": "default:grow, labelcompgap, default:grow, labelcompgap, default, labelcompgap, default:grow"
-			"$rowSpecs": "default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, narrowlinegap, default, linegap, default, narrowlinegap, default, linegap, default:grow"
+			"$rowSpecs": "default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, linegap, default, narrowlinegap, 21dlu, linegap, default, narrowlinegap, default, linegap, bottom:default:grow"
 		} ) {
 			name: "this"
 			"border": new javax.swing.border.LineBorder( sfield java.awt.Color black, 2, false )
@@ -37,7 +37,6 @@ new FormModel {
 			add( new FormComponent( "javax.swing.JLabel" ) {
 				name: "lblList"
 				"text": "Ergebnis"
-				"horizontalAlignment": 11
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridY": 3
 				"gridX": 7
@@ -113,18 +112,18 @@ new FormModel {
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 1
 				"gridY": 19
+				"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 			} )
 			add( new FormComponent( "javax.swing.JTextField" ) {
 				name: "txtTo"
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 3
 				"gridY": 19
+				"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 			} )
 			add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
-				name: "scrollPane1"
-				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
-					"axis": 3
-				} ) {
+				name: "scrl"
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.swingx.VerticalLayout ) ) {
 					name: "pnlList"
 				} )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
@@ -178,6 +177,13 @@ new FormModel {
 				} )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridY": 23
+				"gridWidth": 3
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblSum"
+				"text": "text"
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridY": 25
 				"gridWidth": 3
 			} )
 		}, new FormLayoutConstraints( null ) {
