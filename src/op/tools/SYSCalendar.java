@@ -1555,11 +1555,11 @@ public class SYSCalendar {
     }
 
     public static DateTime bod(DateTime date) {
-        return date.hourOfDay().withMinimumValue().minuteOfHour().withMinimumValue().secondOfDay().withMinimumValue();
+        return date.hourOfDay().withMinimumValue().minuteOfHour().withMinimumValue().secondOfMinute().withMinimumValue();
     }
 
     public static DateTime eod(DateTime date) {
-        return date.hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfDay().withMaximumValue();
+        return date.hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue().millisOfSecond().withMaximumValue();
     }
 
     public static DateTime eod(LocalDate date) {
@@ -1567,11 +1567,11 @@ public class SYSCalendar {
     }
 
     public static DateTime bom(DateTime d) {
-        return d.dayOfMonth().withMinimumValue().hourOfDay().withMinimumValue().minuteOfHour().withMinimumValue().secondOfMinute().withMinimumValue();
+        return d.dayOfMonth().withMinimumValue().hourOfDay().withMinimumValue().minuteOfHour().withMinimumValue().secondOfMinute().withMinimumValue().millisOfSecond().withMinimumValue();
     }
 
     public static DateTime eom(DateTime d) {
-        return d.dayOfMonth().withMaximumValue().hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue();
+        return d.dayOfMonth().withMaximumValue().hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue().millisOfSecond().withMaximumValue();
     }
 
 

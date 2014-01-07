@@ -1682,8 +1682,11 @@ public class PnlValues extends NursingRecordsPanel {
                                 }
                             } else {
                                 if (!mapType2Values.containsKey(keyYear)) {
-                                    mapType2Values.put(keyYear, new ArrayList<ResValue>());
+                                    mapType2Values.put(keyYear, ResValueTools.getResValues(resident, vtype, dt.getYear()));
                                 }
+//                                if (!mapType2Values.containsKey(keyYear)) {
+//                                    mapType2Values.put(keyYear, new ArrayList<ResValue>());
+//                                }
                                 if (!mapType2Values.get(keyYear).contains(myValue)) {
                                     mapType2Values.get(keyYear).add(myValue);
                                     Collections.sort(mapType2Values.get(keyYear));
@@ -1724,19 +1727,20 @@ public class PnlValues extends NursingRecordsPanel {
                             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                         }
 
-                        //createCP4Year(vtype, dt.getYear());
+
                         createCP4Type(vtype);
 
                         buildPanel();
 
-//                        synchronized (linemap) {
-//                            GUITools.scroll2show(jspValues, linemap.get(myValue), cpsValues, new Closure() {
-//                                @Override
-//                                public void execute(Object o) {
-//                                    GUITools.flashBackground(linemap.get(myValue), Color.YELLOW, 2);
-//                                }
-//                            });
-//                        }
+                        final ResValue myValueCopy = myValue;
+                        synchronized (linemap) {
+                            GUITools.scroll2show(jspValues, linemap.get(myValueCopy), cpsValues, new Closure() {
+                                @Override
+                                public void execute(Object o) {
+                                    GUITools.flashBackground(linemap.get(myValueCopy), Color.YELLOW, 2);
+                                }
+                            });
+                        }
 
                     }
                 }

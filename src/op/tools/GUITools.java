@@ -521,6 +521,7 @@ public class GUITools {
             return; // this prevents NULL pointer exceptions when quickly switching the residents after the entry
         final Color originalColor = component.getBackground();
         final TimingSource ts = new SwingTimerTimingSource();
+        final boolean wasOpaque = component.isOpaque();
         Animator.setDefaultTimingSource(ts);
         ts.init();
         component.setOpaque(true);
@@ -543,7 +544,7 @@ public class GUITools {
 
             @Override
             public void end(Animator source) {
-                component.setOpaque(false);
+                component.setOpaque(wasOpaque);
                 component.repaint();
 //                SwingUtilities.invokeLater(new Runnable() {
 //                    @Override
