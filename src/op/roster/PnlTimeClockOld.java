@@ -8,7 +8,6 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.Homes;
 import entity.HomesTools;
-import entity.StationTools;
 import entity.roster.*;
 import entity.system.Users;
 import entity.system.UsersTools;
@@ -38,20 +37,20 @@ import java.util.*;
 /**
  * @author Torsten Löhr
  */
-public class PnlTimeClock extends JPanel {
+public class PnlTimeClockOld extends JPanel {
 
     private final int SECTION = RostersTools.SECTION_CARE;
     private Rplan myPlan;
     private LocalDate currentDate;
     private Users user;
-    private Workinglog timeclock;
+    private WLog timeclock;
     private HashMap<LocalDate, Rosters> rosters;
     private HashMap<LocalDate, RosterParameters> rosterparameters;
     private Interval minmax;
     public static final String internalClassID = "dlglogin.timeclock";
     private boolean changed = false;
 
-    public PnlTimeClock(Users u) {
+    public PnlTimeClockOld(Users u) {
         this.user = u;
         currentDate = new LocalDate();
         minmax = RostersTools.getMinMax(SECTION);
@@ -195,8 +194,8 @@ public class PnlTimeClock extends JPanel {
 
         timeclock = RPlanTools.getTimeClock(myPlan);
         if (timeclock == null) {
-            timeclock = new Workinglog(myPlan);
-            myPlan.getWorkinglogs().add(timeclock);
+            timeclock = new WLog(myPlan);
+            myPlan.getWLogs().add(timeclock);
         }
 
         txtComment.setText(SYSTools.catchNull(timeclock.getText()));
@@ -414,7 +413,7 @@ public class PnlTimeClock extends JPanel {
             Rplan thisPlan = em.merge(myPlan);
             em.lock(thisPlan, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-            Workinglog myTimeclock = em.merge(timeclock);
+            WLog myTimeclock = em.merge(timeclock);
             em.lock(myTimeclock, LockModeType.OPTIMISTIC);
 
             em.getTransaction().commit();

@@ -84,7 +84,7 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 
     // ALL rplans for this roster. iteration over the keyset of this map will return ALL users who own rplanss.
     HashMap<Users, ArrayList<Rplan>> content;
-    //    HashMap<Rplan, ArrayList<Workinglog>> workinglogs;
+    //    HashMap<Rplan, ArrayList<WLog>> workinglogs;
     HashMap<Users, UserContracts> contracts;
     RosterParameters rosterParameters = null;
 
@@ -595,13 +595,14 @@ public class TMRoster extends AbstractMultiTableModel implements ColumnIdentifie
 //            LocalDate day = getDay(columnIndex);
             if (rplan != null) {
                 BigDecimal displayHours = rosterParameters.getSymbol(rplan.getEffectiveSymbol()).getDisplayHours();
-
-                BigDecimal loghours = BigDecimal.ZERO;
-                for (Workinglog workinglog : rplan.getWorkinglogs()) {
-                    loghours = loghours.add(workinglog.getHours());
-                }
-
                 value = displayHours == null ? "--" : displayHours.setScale(2, RoundingMode.HALF_UP).toString();
+
+//                BigDecimal loghours = BigDecimal.ZERO;
+//                for (WLog WLog : rplan.getWLogs()) {
+//                    loghours = loghours.add(WLog.getHours());
+//                }
+//
+//                value = displayHours == null ? "--" : displayHours.setScale(2, RoundingMode.HALF_UP).toString();
             } else {
                 value = "-/-";
             }

@@ -65,9 +65,9 @@
         <class>entity.values.ResValueTypes</class>
         <class>entity.roster.Rosters</class>
         <class>entity.roster.Rplan</class>
-        <class>entity.roster.SpecialWorkdays</class>
         <class>entity.roster.Workaccount</class>
-        <class>entity.roster.Workinglog</class>
+        <class>entity.roster.WLog</class>
+        <class>entity.roster.WLogDetails</class>
         <class>entity.roster.Rplan</class>
     </persistence-unit>
 </persistence>

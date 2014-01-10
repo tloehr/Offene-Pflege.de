@@ -638,7 +638,7 @@ public class PnlUsersWorklog extends CleanablePanel {
                 }
                 pnlWorklog.add(scrollPane2);
             }
-            tabbedPane1.addTab("Workinglog", pnlWorklog);
+            tabbedPane1.addTab("WLog", pnlWorklog);
 
             //======== pnlRosters ========
             {

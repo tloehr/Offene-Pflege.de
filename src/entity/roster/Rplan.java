@@ -2,12 +2,12 @@ package entity.roster;
 
 import entity.Homes;
 import entity.system.Users;
+import op.OPDE;
 import op.tools.SYSTools;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -55,11 +55,11 @@ public class Rplan implements Comparable<Rplan> {
     @JoinColumn(name = "rosterid", referencedColumnName = "id")
     @ManyToOne
     private Rosters roster;
-    @JoinColumn(name = "controller", referencedColumnName = "UKennung")
+    @JoinColumn(name = "creator", referencedColumnName = "UKennung")
     @ManyToOne
-    private Users controller;
+    private Users creator;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "rplan", fetch = FetchType.EAGER)
-    private List<Workinglog> workinglogs;
+    private List<WLog> WLogs;
     @Column(name = "version", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
     @Version
     private long version;
@@ -70,9 +70,10 @@ public class Rplan implements Comparable<Rplan> {
     public Rplan(Rosters roster, Homes home1, Date start, Users owner) {
         this.start = start;
         this.owner = owner;
+        this.creator = OPDE.getLogin().getUser();
         this.roster = roster;
         this.home1 = home1;
-        workinglogs = new ArrayList<Workinglog>();
+        WLogs = new ArrayList<WLog>();
     }
 
     public Homes getHome1() {
@@ -185,8 +186,8 @@ public class Rplan implements Comparable<Rplan> {
     }
 
 
-    public List<Workinglog> getWorkinglogs() {
-        return workinglogs;
+    public List<WLog> getWLogs() {
+        return WLogs;
     }
 
     @Override
@@ -250,26 +251,20 @@ public class Rplan implements Comparable<Rplan> {
         this.end = end;
     }
 
-    public Users getController() {
-        return controller;
+    public Users getCreator() {
+        return creator;
     }
 
-    public void setController(Users controller) {
-        this.controller = controller;
+    public void setCreator(Users controller) {
+        this.creator = controller;
     }
 
     public boolean isLocked(){
-        return controller != null || roster.isLocked() || roster.isClosed();
+        return creator != null || roster.isLocked() || roster.isClosed();
     }
 
-    //
     public void setStartEndFromSymbol(Symbol symbol) {
-//        basehours = symbol.getBaseHours();
-//        extrahours = symbol.getExtraHours(new LocalDate(start), contractsParameterSet);
-//
-//        breaktime = symbol.getBreak();
         start = symbol.getStart(new LocalDate(start)).toDate();
-//        type = symbol.getSymbolType();
         DateTime end = symbol.getEnd(new LocalDate(start));
         this.end = end == null ? null : end.toDate();
     }
@@ -278,12 +273,6 @@ public class Rplan implements Comparable<Rplan> {
     public int compareTo(Rplan o) {
         return getStart().compareTo(o.getStart());
     }
-
-//    public BigDecimal getNetValue() {
-//        return basehours.subtract(breaktime);
-//    }
-
-
 
 
 }

@@ -32,10 +32,10 @@ public class WorkinglogTools {
     public static final int STATE_REJECTED = 1;
     public static final int STATE_ACCEPTED = 2;
 
-    public static String toPrettyString(Workinglog workinglog) {
+    public static String toPrettyString(WLog WLog) {
         String text = "";
 
-        text = workinglog.getHours().setScale(2, RoundingMode.HALF_UP).toString();
+        text = WLog.getHours().setScale(2, RoundingMode.HALF_UP).toString();
 
         return text;
     }
@@ -50,36 +50,36 @@ public class WorkinglogTools {
      * @param parameterSet
      * @return
      */
-    public static Workinglog[] createWorkingLogs(Rplan myRplan, Symbol symbol, ContractsParameterSet parameterSet) {
+    public static WLog[] createWorkingLogs(Rplan myRplan, Symbol symbol, ContractsParameterSet parameterSet) {
         LocalDate day = new LocalDate(myRplan.getStart());
         HashMap<String, BigDecimal> map = symbol.getHourStats(day, parameterSet);
-        ArrayList<Workinglog> listLogs = new ArrayList<Workinglog>();
+        ArrayList<WLog> listLogs = new ArrayList<WLog>();
 
         if (map != null) {
             if (map.get(Symbol.DAYHOURS1).compareTo(BigDecimal.ZERO) > 0) {
-                listLogs.add(new Workinglog(map.get(Symbol.DAYHOURS1), BigDecimal.ZERO, symbol.getKey(), myRplan.getEffectiveHome(), myRplan, WorkinglogTools.TYPE_AUTO_DAY1));
+                listLogs.add(new WLog(map.get(Symbol.DAYHOURS1), BigDecimal.ZERO, symbol.getKey(), myRplan.getEffectiveHome(), myRplan, WorkinglogTools.TYPE_AUTO_DAY1));
             }
             if (map.get(Symbol.DAYHOURS2).compareTo(BigDecimal.ZERO) > 0) {
-                listLogs.add(new Workinglog(map.get(Symbol.DAYHOURS2), BigDecimal.ZERO, symbol.getKey(), myRplan.getEffectiveHome(), myRplan, WorkinglogTools.TYPE_AUTO_DAY2));
+                listLogs.add(new WLog(map.get(Symbol.DAYHOURS2), BigDecimal.ZERO, symbol.getKey(), myRplan.getEffectiveHome(), myRplan, WorkinglogTools.TYPE_AUTO_DAY2));
             }
             if (map.get(Symbol.NIGHTHOURS1).compareTo(BigDecimal.ZERO) > 0) {
-                listLogs.add(new Workinglog(map.get(Symbol.NIGHTHOURS1), parameterSet.nightPremiumPercentage, symbol.getKey(), myRplan.getEffectiveHome(), myRplan, WorkinglogTools.TYPE_AUTO_NIGHT1));
+                listLogs.add(new WLog(map.get(Symbol.NIGHTHOURS1), parameterSet.nightPremiumPercentage, symbol.getKey(), myRplan.getEffectiveHome(), myRplan, WorkinglogTools.TYPE_AUTO_NIGHT1));
             }
             if (map.get(Symbol.NIGHTHOURS2).compareTo(BigDecimal.ZERO) > 0) {
-                listLogs.add(new Workinglog(map.get(Symbol.NIGHTHOURS2), parameterSet.getNightPremiumPercentage(), symbol.getKey(), myRplan.getEffectiveHome(), myRplan, WorkinglogTools.TYPE_AUTO_NIGHT2));
+                listLogs.add(new WLog(map.get(Symbol.NIGHTHOURS2), parameterSet.getNightPremiumPercentage(), symbol.getKey(), myRplan.getEffectiveHome(), myRplan, WorkinglogTools.TYPE_AUTO_NIGHT2));
             }
             if (map.get(Symbol.BREAKTIME).compareTo(BigDecimal.ZERO) > 0) {
-                listLogs.add(new Workinglog(map.get(Symbol.BREAKTIME).negate(), BigDecimal.ZERO, symbol.getKey(), myRplan.getEffectiveHome(), myRplan, WorkinglogTools.TYPE_AUTO_BREAK));
+                listLogs.add(new WLog(map.get(Symbol.BREAKTIME).negate(), BigDecimal.ZERO, symbol.getKey(), myRplan.getEffectiveHome(), myRplan, WorkinglogTools.TYPE_AUTO_BREAK));
             }
         }
 
-        return listLogs.toArray(new Workinglog[]{});
+        return listLogs.toArray(new WLog[]{});
     }
 
 
-//    public static Workinglog getAdditional1(Rplan rplan) {
-//        Workinglog workinglog = null;
-//        for (Workinglog wlog : rplan.getWorkinglogs()) {
+//    public static WLog getAdditional1(Rplan rplan) {
+//        WLog workinglog = null;
+//        for (WLog wlog : rplan.getWLogs()) {
 //            if (wlog.getType() == TYPE_ADDITIONAL1) {
 //                workinglog = wlog;
 //                break;
@@ -88,9 +88,9 @@ public class WorkinglogTools {
 //        return workinglog;
 //    }
 //
-//    public static Workinglog getAdditional2(Rplan rplan) {
-//        Workinglog workinglog = null;
-//        for (Workinglog wlog : rplan.getWorkinglogs()) {
+//    public static WLog getAdditional2(Rplan rplan) {
+//        WLog workinglog = null;
+//        for (WLog wlog : rplan.getWLogs()) {
 //            if (wlog.getType() == TYPE_ADDITIONAL2) {
 //                workinglog = wlog;
 //                break;

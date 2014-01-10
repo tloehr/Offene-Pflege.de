@@ -201,7 +201,7 @@ public class Symbol {
 
     /**
      * this is the amount of hours displayed on the roster during the planning phase.
-     * these values will be replaced by the Workinglog entities, as soon as they exist.
+     * these values will be replaced by the WLog entities, as soon as they exist.
      *
      * @return
      */

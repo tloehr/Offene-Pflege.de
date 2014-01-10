@@ -100,47 +100,47 @@ public class RPlanTools {
     }
 
 
-    public static Homes getActualHome(Rplan rplan) {
-        if (!rplan.isLocked()) return null;
-        Homes home = null;
-        for (Workinglog workinglog : rplan.getWorkinglogs()) {
-            if (workinglog.getType() != WorkinglogTools.TYPE_TIMECLOCK) {
-                home = workinglog.getHomeactual();
-                break;
-            }
-        }
-        return home;
-    }
+//    public static Homes getActualHome(Rplan rplan) {
+//        if (!rplan.isLocked()) return null;
+//        Homes home = null;
+//        for (WLog WLog : rplan.getWLogs()) {
+//            if (WLog.getType() != WorkinglogTools.TYPE_TIMECLOCK) {
+//                home = WLog.getHomeactual();
+//                break;
+//            }
+//        }
+//        return home;
+//    }
+//
+//    public static String getActualSymbolKey(Rplan rplan) {
+//        if (!rplan.isLocked()) return null;
+//        String symbol = null;
+//        for (WLog WLog : rplan.getWLogs()) {
+//            if (WLog.getType() != WorkinglogTools.TYPE_TIMECLOCK) {
+//                symbol = WLog.getActual();
+//                break;
+//            }
+//        }
+//        return symbol;
+//    }
 
-    public static String getActualSymbolKey(Rplan rplan) {
-        if (!rplan.isLocked()) return null;
-        String symbol = null;
-        for (Workinglog workinglog : rplan.getWorkinglogs()) {
-            if (workinglog.getType() != WorkinglogTools.TYPE_TIMECLOCK) {
-                symbol = workinglog.getActual();
-                break;
-            }
-        }
-        return symbol;
-    }
-
-    /**
-     * for every RPlan there is exactly one or none accompanying workinglog entity which is marked as "TIMECLOCK".
-     *
-     * @param rplan
-     * @return this method returns this very workinglog or null if there is none.
-     */
-    public static Workinglog getTimeClock(Rplan rplan) {
-        if (rplan == null) return null;
-        Workinglog timeclock = null;
-        for (Workinglog workinglog : rplan.getWorkinglogs()) {
-            if (workinglog.getType() == WorkinglogTools.TYPE_TIMECLOCK) {
-                timeclock = workinglog;
-                break;
-            }
-        }
-        return timeclock;
-    }
+//    /**
+//     * for every RPlan there is exactly one or none accompanying workinglog entity which is marked as "TIMECLOCK".
+//     *
+//     * @param rplan
+//     * @return this method returns this very workinglog or null if there is none.
+//     */
+//    public static WLog getTimeClock(Rplan rplan) {
+//        if (rplan == null) return null;
+//        WLog timeclock = null;
+//        for (WLog WLog : rplan.getWLogs()) {
+//            if (WLog.getType() == WorkinglogTools.TYPE_TIMECLOCK) {
+//                timeclock = WLog;
+//                break;
+//            }
+//        }
+//        return timeclock;
+//    }
 
     public static ArrayList<Rplan> getAllInWeek(LocalDate week, Users owner) {
         EntityManager em = OPDE.createEM();
