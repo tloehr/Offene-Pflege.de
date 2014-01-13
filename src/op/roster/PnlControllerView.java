@@ -6,7 +6,6 @@ package op.roster;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import entity.Homes;
 import entity.roster.*;
 import op.OPDE;
 import op.threads.DisplayManager;
@@ -17,22 +16,17 @@ import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 
 /**
  * @author Torsten Löhr
@@ -139,15 +133,15 @@ public class PnlControllerView extends JPanel {
 
 
 //                if (effectiveSymbol.getSymbolType() == Symbol.PVALUE) {
-//                    myRplan.getWLogs().add(em.merge(new WLog(addBD, from.toDate(), to.toDate(), myRplan, txtComment.getText().trim(), WorkinglogTools.TYPE_ADDITIONAL)));
+//                    myRplan.getWLogs().add(em.merge(new WLog(addBD, from.toDate(), to.toDate(), myRplan, txtComment.getText().trim(), WLogTools.TYPE_ADDITIONAL)));
 //                    myRplan.setStart(from.toDate());
 //                    myRplan.setEnd(to.toDate());
 //                } else {
 
-            for (WLog WLog : WorkinglogTools.createWorkingLogs(myRplan, rosterParameters.getSymbol(myRplan.getEffectiveSymbol()), contractsParameterSet)) {
-                WLog myWLog = em.merge(WLog);
-                myRplan.getWLogs().add(myWLog);
-            }
+
+            WLog myWLog = em.merge(WLogTools.createWorkingLog(myRplan, rosterParameters.getSymbol(myRplan.getEffectiveSymbol()), contractsParameterSet));
+            myRplan.getWLogs().add(myWLog);
+
 
             em.getTransaction().commit();
 
@@ -188,7 +182,7 @@ public class PnlControllerView extends JPanel {
 //                // TODO: Fixme
 //                //                myRplan.setActual(null);
 //                if (effectiveSymbol.getSymbolType() == Symbol.PVALUE) {
-//                    myRplan.getWLogs().add(em.merge(new WLog(addBD, from.toDate(), to.toDate(), myRplan, txtComment.getText().trim(), WorkinglogTools.TYPE_ADDITIONAL)));
+//                    myRplan.getWLogs().add(em.merge(new WLog(addBD, from.toDate(), to.toDate(), myRplan, txtComment.getText().trim(), WLogTools.TYPE_ADDITIONAL)));
 //                    myRplan.setStart(new DateTime(myRplan.getStart()).toLocalDate().toDateTimeAtStartOfDay().toDate());
 //                    myRplan.setEnd(null);
 //                }
@@ -244,8 +238,8 @@ public class PnlControllerView extends JPanel {
         //======== this ========
         setBorder(new LineBorder(Color.black, 2));
         setLayout(new FormLayout(
-            "2*(default:grow, $lcgap), default, $lcgap, default:grow",
-            "8*(default, $lgap), default, $nlgap, 21dlu, $lgap, default, $nlgap, default, $lgap, bottom:default:grow"));
+                "2*(default:grow, $lcgap), default, $lcgap, default:grow",
+                "8*(default, $lgap), default, $nlgap, 21dlu, $lgap, default, $nlgap, default, $lgap, bottom:default:grow"));
 
         //---- lblDate ----
         lblDate.setText("Mo, 03.06");
@@ -423,7 +417,7 @@ public class PnlControllerView extends JPanel {
 //
 //            DefaultMutableTreeNode root = new DefaultMutableTreeNode(actual.toUpperCase() + ": " + sum.setScale(2, RoundingMode.HALF_UP));
 //            for (WLog WLog : listActual) {
-//                root.add(new DefaultMutableTreeNode(WLog.getHours().setScale(2, RoundingMode.HALF_UP) + " [" + WorkinglogTools.TYPES[WLog.getType()] + "]"));
+//                root.add(new DefaultMutableTreeNode(WLog.getHours().setScale(2, RoundingMode.HALF_UP) + " [" + WLogTools.TYPES[WLog.getType()] + "]"));
 //            }
 //
 //
@@ -465,7 +459,7 @@ public class PnlControllerView extends JPanel {
 //
 //                root.add(new DefaultMutableTreeNode(OPDE.lang.getString("misc.msg.from") + ": " + new LocalTime(WLog.getStart()).toString("HH:mm")));
 //                root.add(new DefaultMutableTreeNode(OPDE.lang.getString("misc.msg.to") + ": " + new LocalTime(WLog.getEnd()).toString("HH:mm")));
-//                root.add(new DefaultMutableTreeNode(WLog.getHours().setScale(2, RoundingMode.HALF_UP) + " [" + WorkinglogTools.TYPES[WLog.getType()] + "]"));
+//                root.add(new DefaultMutableTreeNode(WLog.getHours().setScale(2, RoundingMode.HALF_UP) + " [" + WLogTools.TYPES[WLog.getType()] + "]"));
 //
 //                JTree tree = new JTree(root);
 //                tree.setShowsRootHandles(true);
@@ -494,8 +488,8 @@ public class PnlControllerView extends JPanel {
 //        }
 //
 //
-//        lblTimeclockUsed.setIcon(timeclock != null && timeclock.getState() == WorkinglogTools.STATE_ACCEPTED ? SYSConst.icon22ledGreenOn : SYSConst.icon22ledGreenOff);
-//        lblPlanUsed.setIcon(listActual.isEmpty() && (timeclock == null || timeclock.getState() != WorkinglogTools.STATE_ACCEPTED) ? SYSConst.icon22ledGreenOff : SYSConst.icon22ledGreenOn);
+//        lblTimeclockUsed.setIcon(timeclock != null && timeclock.getState() == WLogTools.STATE_ACCEPTED ? SYSConst.icon22ledGreenOn : SYSConst.icon22ledGreenOff);
+//        lblPlanUsed.setIcon(listActual.isEmpty() && (timeclock == null || timeclock.getState() != WLogTools.STATE_ACCEPTED) ? SYSConst.icon22ledGreenOff : SYSConst.icon22ledGreenOn);
 //        lblOverrideUsed.setIcon(SYSConst.icon22ledGreenOff);
 //
 //        lblSum.setText(OPDE.lang.getString("misc.msg.sum") + ": " + sum.setScale(2, RoundingMode.HALF_UP).toString());

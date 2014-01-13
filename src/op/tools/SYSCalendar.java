@@ -474,9 +474,9 @@ public class SYSCalendar {
 
     /**
      * @return Liste mit 4 Elementen. Die ersten beiden sind die byte Kennungen der beteiligten Schichten innerhalb der gewünschten
-     *         Anzeige. Kann sein SYSConst.FM oder SYSConst.MO etc. Die dritte Stelle enthält die Start-Uhrzeit als Zeichenkette (gemäß des
-     *         Eintrags in der SYSProps Tabelle. In der vierten Stelle steht die End-Uhrzeit, ebenfalls als Zeichenkette (minus 1 Minute). Damit
-     *         liegt diese Zeit in dem betreffenden Intervall.
+     * Anzeige. Kann sein SYSConst.FM oder SYSConst.MO etc. Die dritte Stelle enthält die Start-Uhrzeit als Zeichenkette (gemäß des
+     * Eintrags in der SYSProps Tabelle. In der vierten Stelle steht die End-Uhrzeit, ebenfalls als Zeichenkette (minus 1 Minute). Damit
+     * liegt diese Zeit in dem betreffenden Intervall.
      */
     public static ArrayList getZeiten4Schicht(byte schicht) {
         ArrayList result = new ArrayList(4);
@@ -668,27 +668,62 @@ public class SYSCalendar {
     }
 
 
+    /**
+     * bottom of month
+     *
+     * @param d
+     * @return
+     */
     public static DateTime bom(DateTime d) {
         return d.dayOfMonth().withMinimumValue().hourOfDay().withMinimumValue().minuteOfHour().withMinimumValue().secondOfMinute().withMinimumValue();
     }
 
+    /**
+     * end of month
+     *
+     * @param d
+     * @return
+     */
     public static DateTime eom(DateTime d) {
         return d.dayOfMonth().withMaximumValue().hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue();
     }
 
-
+    /**
+     * bottom of week
+     *
+     * @param d
+     * @return
+     */
     public static LocalDate bow(LocalDate d) {
         return d.dayOfWeek().withMinimumValue();
     }
 
+    /**
+     * end of week
+     *
+     * @param d
+     * @return
+     */
     public static LocalDate eow(LocalDate d) {
         return d.dayOfWeek().withMaximumValue();
     }
 
+    /**
+     * bottom of month
+     *
+     * @param d
+     * @return
+     */
     public static LocalDate bom(LocalDate d) {
         return d.dayOfMonth().withMinimumValue();
     }
 
+    /**
+     * end of month
+     *
+     * @param d
+     * @return
+     */
     public static LocalDate eom(LocalDate d) {
         return d.dayOfMonth().withMaximumValue();
     }
@@ -1076,8 +1111,14 @@ public class SYSCalendar {
         return getHoursAsDecimal(from, to);
     }
 
+    /**
+     * end of day
+     *
+     * @param date
+     * @return
+     */
     public static DateTime eod(DateTime date) {
-        return date.hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue();
+        return date.hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue();
     }
 
     public static DateTime eod(LocalDate date) {
@@ -1132,6 +1173,7 @@ public class SYSCalendar {
 
     /**
      * parses a standard german time string and returns a LocalTime object with the appropriate contents.
+     *
      * @param input
      * @return
      * @throws NumberFormatException - when something is wrong with the string

@@ -104,7 +104,7 @@ public class RPlanTools {
 //        if (!rplan.isLocked()) return null;
 //        Homes home = null;
 //        for (WLog WLog : rplan.getWLogs()) {
-//            if (WLog.getType() != WorkinglogTools.TYPE_TIMECLOCK) {
+//            if (WLog.getType() != WLogTools.TYPE_TIMECLOCK) {
 //                home = WLog.getHomeactual();
 //                break;
 //            }
@@ -116,7 +116,7 @@ public class RPlanTools {
 //        if (!rplan.isLocked()) return null;
 //        String symbol = null;
 //        for (WLog WLog : rplan.getWLogs()) {
-//            if (WLog.getType() != WorkinglogTools.TYPE_TIMECLOCK) {
+//            if (WLog.getType() != WLogTools.TYPE_TIMECLOCK) {
 //                symbol = WLog.getActual();
 //                break;
 //            }
@@ -134,7 +134,7 @@ public class RPlanTools {
 //        if (rplan == null) return null;
 //        WLog timeclock = null;
 //        for (WLog WLog : rplan.getWLogs()) {
-//            if (WLog.getType() == WorkinglogTools.TYPE_TIMECLOCK) {
+//            if (WLog.getType() == WLogTools.TYPE_TIMECLOCK) {
 //                timeclock = WLog;
 //                break;
 //            }

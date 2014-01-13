@@ -1,8 +1,5 @@
 package entity.roster;
 
-import entity.Homes;
-import entity.system.Users;
-import op.OPDE;
 import op.tools.SYSTools;
 
 import javax.persistence.*;
@@ -49,7 +46,7 @@ public class WLogDetails implements Comparable<WLogDetails> {
     private long version;
 
     // ---
-    @JoinColumn(name = "wlogid", referencedColumnName = "id")
+    @JoinColumn(name = "wlog", referencedColumnName = "id")
     @ManyToOne
     private WLog wlog;
 
@@ -61,7 +58,15 @@ public class WLogDetails implements Comparable<WLogDetails> {
     public WLogDetails() {
     }
 
-
+    public WLogDetails(BigDecimal hours, BigDecimal percent, int type, WLog wlog) {
+        this.start = null;
+        this.end = null;
+        this.hours = hours;
+        this.percent = percent;
+        this.type = type;
+        this.wlog = wlog;
+        this.timestamp = new Date();
+    }
 
     public BigDecimal getHours() {
         return hours;
@@ -94,7 +99,6 @@ public class WLogDetails implements Comparable<WLogDetails> {
     }
 
 
-
     public int getType() {
         return type;
     }
@@ -117,9 +121,9 @@ public class WLogDetails implements Comparable<WLogDetails> {
         timestamp = new Date();
     }
 
-    public boolean isAuto() {
-        return type != WorkinglogTools.TYPE_ADDITIONAL && type != WorkinglogTools.TYPE_MANUAL && type != WorkinglogTools.TYPE_TIMECLOCK;
-    }
+//    public boolean isAuto() {
+//        return type != WLogTools.TYPE_ADDITIONAL && type != WLogTools.TYPE_MANUAL && type != WLogTools.TYPE_TIMECLOCK;
+//    }
 
     public Date getTimestamp() {
         return timestamp;
@@ -166,7 +170,6 @@ public class WLogDetails implements Comparable<WLogDetails> {
         return sort;
 
     }
-
 
 
 }

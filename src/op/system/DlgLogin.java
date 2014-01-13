@@ -29,7 +29,7 @@ import entity.roster.RostersTools;
 import entity.system.SYSLoginTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
-import op.roster.PnlTimeClockOld;
+import op.roster.PnlTimeClock;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
 import op.tools.SYSConst;
@@ -98,7 +98,7 @@ public class DlgLogin extends MyJDialog {
 
                 OPDE.getMainframe().setLabelUser(OPDE.getLogin().getUser().getFullname());
 
-                pnl = new PnlTimeClockOld(OPDE.getLogin().getUser());
+                pnl = new PnlTimeClock();
                 add(pnl, BorderLayout.EAST);
                 btnWorkTime.setIcon(SYSConst.icon222leftArrow);
             } else {

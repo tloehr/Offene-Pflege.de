@@ -6,7 +6,9 @@ import op.OPDE;
 import op.tools.SYSTools;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -44,25 +46,41 @@ public class WLog implements Comparable<WLog> {
     @Basic
     private Date timestamp;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "wlog")
+    private List<WLogDetails> wLogDetails;
+
     public WLog() {
     }
 
-    public WLog(Rplan rplan) {
+    public WLog(Rplan rplan, String actual, Homes homeactual) {
         this.rplan = rplan;
         this.creator = OPDE.getLogin().getUser();
-        this.actual = null;
-        this.homeactual = null;
+        this.actual = actual;
+        this.homeactual = homeactual;
         timestamp = new Date();
+        wLogDetails = new ArrayList<WLogDetails>();
     }
 
-//    public WLog(BigDecimal hours, BigDecimal percent, String actual, Homes homeactual, Rplan rplan, int type) {
+    public List<WLogDetails> getwLogDetails() {
+        return wLogDetails;
+    }
+
+    public Users getCreator() {
+        return creator;
+    }
+
+    public void setCreator(Users creator) {
+        this.creator = creator;
+    }
+
+    //    public WLog(BigDecimal hours, BigDecimal percent, String actual, Homes homeactual, Rplan rplan, int type) {
 //        this.hours = hours;
 //        this.percent = percent;
 //        this.actual = actual;
 //        this.homeactual = homeactual;
 //        this.rplan = rplan;
 //        this.type = type;
-//        this.state = WorkinglogTools.STATE_UNUSED;
+//        this.state = WLogTools.STATE_UNUSED;
 //        this.creator = OPDE.getLogin().getUser();
 //        this.start = null;
 //        this.end = null;
@@ -76,7 +94,7 @@ public class WLog implements Comparable<WLog> {
 //        this.end = end;
 //        this.rplan = rplan;
 //        this.type = type;
-//        this.state = WorkinglogTools.STATE_UNUSED;
+//        this.state = WLogTools.STATE_UNUSED;
 //        this.creator = OPDE.getLogin().getUser();
 //        this.text = text;
 //        timestamp = new Date();
