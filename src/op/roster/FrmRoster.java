@@ -447,8 +447,8 @@ public class FrmRoster extends JFrame {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "default, $lcgap, default:grow, $lcgap, default",
-                "default, $lgap, default:grow, 2*($lgap, default)"));
+            "default, $lcgap, default:grow, $lcgap, default",
+            "default, $lgap, default:grow, 2*($lgap, default)"));
 
         //======== toolBar1 ========
         {

@@ -437,13 +437,13 @@
                <object idref="Cursor0"/> 
               </void> 
               <void property="name"> 
-               <string>btnWorkTime</string> 
+               <string>btnTimeclock</string> 
               </void> 
               <void method="addEvent"> 
                <object class="com.jformdesigner.model.FormEvent"> 
                 <string>java.awt.event.ActionListener</string> 
                 <string>actionPerformed</string> 
-                <string>btnWorkTimeActionPerformed</string> 
+                <string>btnTimeclockActionPerformed</string> 
                 <boolean>true</boolean> 
                </object> 
               </void> 

@@ -29,6 +29,8 @@ import com.jidesoft.utils.Lm;
 import com.jidesoft.wizard.WizardStyle;
 import entity.Homes;
 import entity.HomesTools;
+import entity.Station;
+import entity.StationTools;
 import entity.files.SYSFilesTools;
 import entity.nursingprocess.DFNTools;
 import entity.prescription.BHPTools;
@@ -90,6 +92,8 @@ public class OPDE {
     protected static boolean debug;
     protected static String opwd = "";
     protected static String css = "";
+
+    protected static Station myStation;
 
     //    protected static boolean FTPisWORKING = false;
     public static String UPDATE_FTPSERVER = "ftp.offene-pflege.de";
@@ -184,6 +188,14 @@ public class OPDE {
 
     public static String getUrl() {
         return url;
+    }
+
+    public static Station getMyStation() {
+        return myStation;
+    }
+
+    public static void setMyStation(Station station) {
+        myStation = station;
     }
 
     public static void initProps() {
@@ -575,7 +587,7 @@ public class OPDE {
             }
 
             HomesTools.initHomes();
-
+            myStation = StationTools.getStationForThisHost();
 
             /***
              *       ____                           _         ____  _____ _   _

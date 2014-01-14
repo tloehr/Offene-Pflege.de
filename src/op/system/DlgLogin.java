@@ -63,73 +63,6 @@ public class DlgLogin extends MyJDialog {
         txtUsername.requestFocus();
     }
 
-    private void btnWorkTimeActionPerformed(ActionEvent e) {
-
-        if (RostersTools.getAll(RostersTools.SECTION_CARE).isEmpty()) {
-            return;
-        }
-
-        if (pnl == null) {
-
-            if (SYSPropsTools.isTrue(SYSPropsTools.KEY_MAINTENANCE_MODE, null)) {
-                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("dlglogin.maintenance.mode", DisplayMessage.IMMEDIATELY, 5));
-                return;
-            }
-
-            String username = txtUsername.getText().trim();
-
-            try {
-                registerLogin();
-                if (OPDE.getLogin() == null) {
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.usernameOrPasswordWrong"));
-                    OPDE.info(OPDE.lang.getString("misc.msg.usernameOrPasswordWrong") + ": " + username + "  " + OPDE.lang.getString("misc.msg.triedPassword") + ": " + new String(txtPassword.getPassword()));
-                } else {
-                    OPDE.initProps();
-                    OPDE.info("Login: " + username + "  LoginID: " + OPDE.getLogin().getLoginID());
-                }
-
-            } catch (Exception se) {
-                OPDE.fatal(se);
-                System.exit(1);
-            }
-
-
-            if (OPDE.getLogin() != null) {
-
-                OPDE.getMainframe().setLabelUser(OPDE.getLogin().getUser().getFullname());
-
-                pnl = new PnlTimeClock();
-                add(pnl, BorderLayout.EAST);
-                btnWorkTime.setIcon(SYSConst.icon222leftArrow);
-            } else {
-                OPDE.getMainframe().setLabelUser("--");
-            }
-
-        } else {
-
-            btnWorkTime.setIcon(SYSConst.icon222rightArrow);
-            remove(pnl);
-            pnl.removeComponentListener(componentAdapter);
-            componentAdapter = null;
-            pnl = null;
-
-            SYSLoginTools.logout();
-            OPDE.getMainframe().setLabelUser("--");
-
-            // After the logout a forced garbage collection seems to be adequate
-            System.gc();
-
-        }
-
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                pack();
-                setLocationRelativeTo(getOwner());
-            }
-        });
-    }
-
     private void btnLoginActionPerformed(ActionEvent e) {
         if (SYSPropsTools.isTrue(SYSPropsTools.KEY_MAINTENANCE_MODE, null)) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("dlglogin.maintenance.mode", DisplayMessage.IMMEDIATELY, 5));
@@ -158,6 +91,74 @@ public class DlgLogin extends MyJDialog {
             OPDE.fatal(se);
             System.exit(1);
         }
+    }
+
+    private void btnTimeclockActionPerformed(ActionEvent e) {
+        if (RostersTools.getAll(RostersTools.SECTION_CARE).isEmpty()) {
+            return;
+        }
+
+        if (pnl == null) {
+
+            if (SYSPropsTools.isTrue(SYSPropsTools.KEY_MAINTENANCE_MODE, null)) {
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage("dlglogin.maintenance.mode", DisplayMessage.IMMEDIATELY, 5));
+                return;
+            }
+
+            String username = txtUsername.getText().trim();
+
+            try {
+                registerLogin();
+                if (OPDE.getLogin() == null) {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.usernameOrPasswordWrong"));
+                    OPDE.info(OPDE.lang.getString("misc.msg.usernameOrPasswordWrong") + ": " + username + "  " + OPDE.lang.getString("misc.msg.triedPassword") + ": " + new String(txtPassword.getPassword()));
+                } else {
+                    OPDE.initProps();
+                    OPDE.info("Login: " + username + "  LoginID: " + OPDE.getLogin().getLoginID());
+                }
+
+            } catch (Exception se) {
+                OPDE.fatal(se);
+                System.exit(1);
+            }
+
+            if (OPDE.getLogin() != null) {
+
+                OPDE.getMainframe().setLabelUser(OPDE.getLogin().getUser().getFullname());
+
+                pnl = new PnlTimeClock();
+                add(pnl, BorderLayout.EAST);
+                btnTimeclock.setIcon(SYSConst.icon222leftArrow);
+            } else {
+                OPDE.getMainframe().setLabelUser("--");
+            }
+
+        } else {
+
+            btnTimeclock.setIcon(SYSConst.icon222rightArrow);
+            remove(pnl);
+            pnl.removeComponentListener(componentAdapter);
+            componentAdapter = null;
+            pnl = null;
+
+            SYSLoginTools.logout();
+            OPDE.getMainframe().setLabelUser("--");
+
+            // After the logout a forced garbage collection seems to be adequate
+            System.gc();
+
+        }
+
+        txtUsername.setText(null);
+        txtPassword.setText(null);
+
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                pack();
+                setLocationRelativeTo(getOwner());
+            }
+        });
     }
 
     public DlgLogin(Closure actionBlock) {
@@ -205,7 +206,7 @@ public class DlgLogin extends MyJDialog {
         panel6 = new JPanel();
         txtPassword = new JPasswordField();
         btnLogin = new JButton();
-        btnWorkTime = new JButton();
+        btnTimeclock = new JButton();
 
         //======== this ========
         setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
@@ -338,20 +339,20 @@ public class DlgLogin extends MyJDialog {
                     });
                     panel6.add(btnLogin);
 
-                    //---- btnWorkTime ----
-                    btnWorkTime.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/2rightarrow.png")));
-                    btnWorkTime.setActionCommand("btnLogin");
-                    btnWorkTime.setContentAreaFilled(false);
-                    btnWorkTime.setBorder(null);
-                    btnWorkTime.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
-                    btnWorkTime.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    btnWorkTime.addActionListener(new ActionListener() {
+                    //---- btnTimeclock ----
+                    btnTimeclock.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/2rightarrow.png")));
+                    btnTimeclock.setActionCommand("btnLogin");
+                    btnTimeclock.setContentAreaFilled(false);
+                    btnTimeclock.setBorder(null);
+                    btnTimeclock.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/pressed.png")));
+                    btnTimeclock.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    btnTimeclock.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            btnWorkTimeActionPerformed(e);
+                            btnTimeclockActionPerformed(e);
                         }
                     });
-                    panel6.add(btnWorkTime);
+                    panel6.add(btnTimeclock);
                 }
                 pnlLogin.add(panel6);
             }
@@ -420,6 +421,6 @@ public class DlgLogin extends MyJDialog {
     private JPanel panel6;
     private JPasswordField txtPassword;
     private JButton btnLogin;
-    private JButton btnWorkTime;
+    private JButton btnTimeclock;
     // End of variables declaration//GEN-END:variables
 }

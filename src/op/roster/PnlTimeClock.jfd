@@ -36,7 +36,7 @@ new FormModel {
 				add( new FormComponent( "javax.swing.JLabel" ) {
 					name: "lblYouAre"
 					"text": "text"
-					"font": new java.awt.Font( "Arial", 0, 18 )
+					"font": new java.awt.Font( "Arial", 1, 18 )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridY": 3
 					"gridWidth": 3
@@ -44,7 +44,7 @@ new FormModel {
 				add( new FormComponent( "javax.swing.JLabel" ) {
 					name: "lblComment"
 					"text": "text"
-					"font": new java.awt.Font( "Arial", 1, 10 )
+					"font": new java.awt.Font( "Arial", 0, 11 )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridX": 3
 					"gridY": 5

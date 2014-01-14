@@ -31,6 +31,8 @@ import java.util.Vector;
  * @author Torsten Löhr
  */
 public class PnlTimeClock extends JPanel {
+    public static final String internalClassID = "dlglogin.timeclock";
+
     Vector<Vector> data;
     private Users user;
     private Timeclock activeTC;
@@ -41,7 +43,7 @@ public class PnlTimeClock extends JPanel {
         this.user = OPDE.getLogin().getUser();
         activeTC = null;
         initComponents();
-
+        lblComment.setText(OPDE.lang.getString("misc.msg.comment"));
         initPanel();
     }
 
@@ -72,7 +74,7 @@ public class PnlTimeClock extends JPanel {
             Vector line = new Vector(3);
             line.add(df.format(timeclock.getBegin()));
 
-            if (timeclock.isOpen()){
+            if (timeclock.isOpen()) {
                 line.add(">>>>>>>>");
             } else {
                 line.add(df.format(timeclock.getEnd()));
@@ -89,13 +91,15 @@ public class PnlTimeClock extends JPanel {
         initMode = true;
         btnCome.setSelected(activeTC != null && activeTC.isOpen());
         btnGo.setSelected(activeTC == null || !activeTC.isOpen());
+        lblYouAre.setText(btnCome.isSelected() ? OPDE.lang.getString("dlglogin.timeclock.youAreIn") : OPDE.lang.getString("dlglogin.timeclock.youAreOut"));
         initMode = false;
 
 
         Vector header = new Vector(3);
-        header.add("col1");
-        header.add("col2");
-        header.add("col3");
+        header.add(OPDE.lang.getString("dlglogin.timeclock.came"));
+        header.add(OPDE.lang.getString("dlglogin.timeclock.gone"));
+        header.add(OPDE.lang.getString("misc.msg.comment"));
+
 
         tblTimeclocks.setModel(new DefaultTableModel(data, header));
 
@@ -116,13 +120,17 @@ public class PnlTimeClock extends JPanel {
             EntityManager em = OPDE.createEM();
             try {
                 em.getTransaction().begin();
-                activeTC = em.merge(new Timeclock(user));
+                activeTC = em.merge(new Timeclock(user, OPDE.getMyStation().getHome()));
                 activeTC.setText(SYSTools.catchNull(txtComment.getText()));
 
                 Users myUser = em.merge(user);
                 em.lock(myUser, LockModeType.OPTIMISTIC);
 
                 em.getTransaction().commit();
+
+                initPanel();
+                lblYouAre.setText(OPDE.lang.getString("dlglogin.timeclock.youAreInNow"));
+
             } catch (OptimisticLockException ole) {
                 OPDE.warn(ole);
                 if (em.getTransaction().isActive()) {
@@ -137,7 +145,7 @@ public class PnlTimeClock extends JPanel {
                 em.close();
             }
 
-            initPanel();
+
         }
     }
 
@@ -161,8 +169,6 @@ public class PnlTimeClock extends JPanel {
                 }
                 myTimeclock.setText(text);
 
-
-
                 em.lock(myTimeclock, LockModeType.OPTIMISTIC);
                 myTimeclock.setEnd(new Date());
 
@@ -170,6 +176,9 @@ public class PnlTimeClock extends JPanel {
                 em.lock(myUser, LockModeType.OPTIMISTIC);
 
                 em.getTransaction().commit();
+
+                initPanel();
+                lblYouAre.setText(OPDE.lang.getString("dlglogin.timeclock.youAreOutNow"));
 
             } catch (OptimisticLockException ole) {
                 OPDE.warn(ole);
@@ -185,7 +194,7 @@ public class PnlTimeClock extends JPanel {
                 em.close();
             }
 
-            initPanel();
+
         }
     }
 
@@ -209,8 +218,8 @@ public class PnlTimeClock extends JPanel {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                "default:grow, $lcgap, default:grow",
-                "fill:default:grow, $rgap, 2*(default, $lgap), fill:30dlu:grow, $lgap, fill:default:grow, $lgap, default"));
+                    "default:grow, $lcgap, default:grow",
+                    "fill:default:grow, $rgap, 2*(default, $lgap), fill:30dlu:grow, $lgap, fill:default:grow, $lgap, default"));
 
             //---- btnCome ----
             btnCome.setText("gekommen");
@@ -240,12 +249,12 @@ public class PnlTimeClock extends JPanel {
 
             //---- lblYouAre ----
             lblYouAre.setText("text");
-            lblYouAre.setFont(new Font("Arial", Font.PLAIN, 18));
+            lblYouAre.setFont(new Font("Arial", Font.BOLD, 18));
             panel1.add(lblYouAre, CC.xywh(1, 3, 3, 1));
 
             //---- lblComment ----
             lblComment.setText("text");
-            lblComment.setFont(new Font("Arial", Font.BOLD, 10));
+            lblComment.setFont(new Font("Arial", Font.PLAIN, 11));
             panel1.add(lblComment, CC.xy(3, 5, CC.RIGHT, CC.DEFAULT));
 
             //======== scrollPane1 ========

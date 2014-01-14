@@ -70,11 +70,5 @@
         <class>entity.roster.WLogDetails</class>
         <class>entity.roster.Rplan</class>
         <class>entity.roster.Timeclock</class>
-        <properties>
-            <property name="eclipselink.jdbc.url" value="jdbc:mysql://localhost:3306/opde"/>
-            <property name="eclipselink.jdbc.driver" value="com.mysql.jdbc.Driver"/>
-            <property name="eclipselink.jdbc.user" value="root"/>
-            <property name="eclipselink.jdbc.password" value="dbase123"/>
-        </properties>
     </persistence-unit>
 </persistence>

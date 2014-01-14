@@ -1,5 +1,6 @@
 package entity.roster;
 
+import entity.Homes;
 import entity.system.Users;
 import op.tools.SYSConst;
 
@@ -50,8 +51,6 @@ public class Timeclock {
 
     }
 
-    home;
-
     @Basic
     @Column(name = "text", nullable = true, insertable = true, updatable = true, length = 16777215, precision = 0)
     private String text;
@@ -63,6 +62,10 @@ public class Timeclock {
     @JoinColumn(name = "owner", referencedColumnName = "UKennung")
     @ManyToOne
     private Users owner;
+
+    @JoinColumn(name = "home", referencedColumnName = "EID")
+    @ManyToOne
+    private Homes home;
 
     @JoinColumn(name = "wlog", referencedColumnName = "id")
     @ManyToOne
@@ -107,15 +110,23 @@ public class Timeclock {
         this.wlog = wlog;
     }
 
+    public Homes getHome() {
+        return home;
+    }
+
+    public void setHome(Homes home) {
+        this.home = home;
+    }
 
     public Timeclock() {
     }
 
-    public Timeclock(Users owner) {
+    public Timeclock(Users owner, Homes home) {
         this.owner = owner;
         this.begin = new Date();
         this.end = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
         this.state = TimeclockTools.STATE_UNCHECKED;
+        this.home = home;
     }
 
     public boolean isOpen() {
