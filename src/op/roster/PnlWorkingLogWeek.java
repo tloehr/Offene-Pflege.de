@@ -13,6 +13,7 @@ import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.lang3.StringUtils;
+import org.jdesktop.swingx.*;
 import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
@@ -61,9 +62,7 @@ public class PnlWorkingLogWeek extends JPanel {
 
             //======== pnlWeek ========
             {
-                pnlWeek.setLayout(new FormLayout(
-                        "default:grow, $lcgap, default:grow",
-                        "3*(default, $lgap), default"));
+                pnlWeek.setLayout(new VerticalLayout(1));
             }
             scrollPane1.setViewportView(pnlWeek);
         }
@@ -81,16 +80,17 @@ public class PnlWorkingLogWeek extends JPanel {
 
     private void initPanel() {
 
-        int posy = -1;
-        int posx = 1;
+//        int posy = -1;
+//        int posx = 1;
+        pnlWeek.add(new PnlControllerHeader());
         for (int day = 0; day < 7; day++) {
             final LocalDate date = week.plusDays(day);
-            posy += 2;
-
-            if (posy > 7) {
-                posy = 1;
-                posx = 3;
-            }
+//            posy += 2;
+//
+//            if (posy > 7) {
+//                posy = 1;
+//                posx = 3;
+//            }
 
             if (lookup.containsKey(date)) {
 
@@ -102,8 +102,8 @@ public class PnlWorkingLogWeek extends JPanel {
 //                                       }
 //                                   }
 //                               }
-
-                pnlWeek.add(new PnlControllerView(lookup.get(date), rosterParameters, userContracts.getParameterSet(date)), CC.xy(posx, posy, CC.FILL, CC.FILL));
+                //pnlWeek.add(new PnlControllerView(lookup.get(date), rosterParameters, userContracts.getParameterSet(date))); // , CC.xy(posx, posy, CC.FILL, CC.FILL)
+                pnlWeek.add(new PnlControllerLine(lookup.get(date), rosterParameters, userContracts.getParameterSet(date))); // , CC.xy(posx, posy, CC.FILL, CC.FILL)
             } else {
 
                 JPanel pnl = new JPanel(new BorderLayout());
@@ -112,7 +112,7 @@ public class PnlWorkingLogWeek extends JPanel {
                 pnl.setPreferredSize(new Dimension(150, 50));
 
 
-                pnlWeek.add(pnl, CC.xy(posx, posy, CC.FILL, CC.FILL));
+                pnlWeek.add(pnl); // , CC.xy(posx, posy, CC.FILL, CC.FILL)
             }
 
 

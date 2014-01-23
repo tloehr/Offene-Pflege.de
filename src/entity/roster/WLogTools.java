@@ -1,15 +1,8 @@
 package entity.roster;
 
-import entity.system.Users;
-import op.OPDE;
-import op.tools.SYSCalendar;
-import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -55,19 +48,19 @@ public class WLogTools {
 
         if (map != null) {
             if (map.get(Symbol.DAYHOURS1).compareTo(BigDecimal.ZERO) > 0) {
-                wlog.getwLogDetails().add(new WLogDetails(map.get(Symbol.DAYHOURS1), BigDecimal.ZERO, WLogDetailsTools.DAY1, wlog));
+                wlog.getWLogDetails().add(new WLogDetails(map.get(Symbol.DAYHOURS1), BigDecimal.ZERO, WLogDetailsTools.DAY1, wlog));
             }
             if (map.get(Symbol.DAYHOURS2).compareTo(BigDecimal.ZERO) > 0) {
-                wlog.getwLogDetails().add(new WLogDetails(map.get(Symbol.DAYHOURS2), BigDecimal.ZERO, WLogDetailsTools.DAY2, wlog));
+                wlog.getWLogDetails().add(new WLogDetails(map.get(Symbol.DAYHOURS2), BigDecimal.ZERO, WLogDetailsTools.DAY2, wlog));
             }
             if (map.get(Symbol.NIGHTHOURS1).compareTo(BigDecimal.ZERO) > 0) {
-                wlog.getwLogDetails().add(new WLogDetails(map.get(Symbol.NIGHTHOURS1), parameterSet.getNightPremiumPercentage(), WLogDetailsTools.NIGHT1, wlog));
+                wlog.getWLogDetails().add(new WLogDetails(map.get(Symbol.NIGHTHOURS1), parameterSet.getNightPremiumPercentage(), WLogDetailsTools.NIGHT1, wlog));
             }
             if (map.get(Symbol.NIGHTHOURS2).compareTo(BigDecimal.ZERO) > 0) {
-                wlog.getwLogDetails().add(new WLogDetails(map.get(Symbol.NIGHTHOURS2), parameterSet.getNightPremiumPercentage(), WLogDetailsTools.NIGHT2, wlog));
+                wlog.getWLogDetails().add(new WLogDetails(map.get(Symbol.NIGHTHOURS2), parameterSet.getNightPremiumPercentage(), WLogDetailsTools.NIGHT2, wlog));
             }
             if (map.get(Symbol.BREAKTIME).compareTo(BigDecimal.ZERO) > 0) {
-                wlog.getwLogDetails().add(new WLogDetails(map.get(Symbol.BREAKTIME).negate(), BigDecimal.ZERO, WLogDetailsTools.BREAK, wlog));
+                wlog.getWLogDetails().add(new WLogDetails(map.get(Symbol.BREAKTIME).negate(), BigDecimal.ZERO, WLogDetailsTools.BREAK, wlog));
             }
         }
 

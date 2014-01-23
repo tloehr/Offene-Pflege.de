@@ -140,7 +140,7 @@ public class PnlControllerView extends JPanel {
 
 
             WLog myWLog = em.merge(WLogTools.createWorkingLog(myRplan, rosterParameters.getSymbol(myRplan.getEffectiveSymbol()), contractsParameterSet));
-            myRplan.getWLogs().add(myWLog);
+//            myRplan.getWLogs().add(myWLog);
 
 
             em.getTransaction().commit();
@@ -238,8 +238,8 @@ public class PnlControllerView extends JPanel {
         //======== this ========
         setBorder(new LineBorder(Color.black, 2));
         setLayout(new FormLayout(
-                "2*(default:grow, $lcgap), default, $lcgap, default:grow",
-                "8*(default, $lgap), default, $nlgap, 21dlu, $lgap, default, $nlgap, default, $lgap, bottom:default:grow"));
+            "2*(default:grow, $lcgap), default, $lcgap, default:grow",
+            "8*(default, $lgap), default, $nlgap, 21dlu, $lgap, default, $nlgap, default, $lgap, bottom:default:grow"));
 
         //---- lblDate ----
         lblDate.setText("Mo, 03.06");
@@ -375,128 +375,7 @@ public class PnlControllerView extends JPanel {
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
-//    void updateList() {
-//
-//        pnlList.removeAll();
-//        sum = BigDecimal.ZERO;
-//
-//        if (!rplan.getWLogs().isEmpty()) {
-//            pnlList.setBackground(Color.WHITE);
-//        }
-//        pnlList.setOpaque(!rplan.getWLogs().isEmpty());
-//
-//        String actual = null;
-//        Homes homeactual = null;
-//
-//        ArrayList<WLog> listActual = new ArrayList<WLog>();
-//        ArrayList<WLog> listAdditional = new ArrayList<WLog>();
-//
-//        // 1. analyze the existing workinglogs
-//        for (WLog WLog : rplan.getWLogs()) {
-//            if (actual == null && WLog.getActual() != null) {
-//                actual = WLog.getActual();
-//                homeactual = WLog.getHomeactual();
-//            }
-//            if (WLog.isAuto()) {
-//                listActual.add(WLog);
-//                sum = sum.add(WLog.getHours());
-//            } else if (!WLog.isTimeClock()) {
-//                listAdditional.add(WLog);
-//                sum = sum.add(WLog.getHours());
-//            } else {
-//                timeclock = WLog;
-//            }
-//        }
-//
-//        // 2. build the list for the actual shift
-//        if (!listActual.isEmpty()) {
-//
-//            JPanel pnlActual = new JPanel();
-//            pnlActual.setLayout(new BorderLayout());
-//            pnlActual.setAlignmentY(TOP_ALIGNMENT);
-//
-//            DefaultMutableTreeNode root = new DefaultMutableTreeNode(actual.toUpperCase() + ": " + sum.setScale(2, RoundingMode.HALF_UP));
-//            for (WLog WLog : listActual) {
-//                root.add(new DefaultMutableTreeNode(WLog.getHours().setScale(2, RoundingMode.HALF_UP) + " [" + WLogTools.TYPES[WLog.getType()] + "]"));
-//            }
-//
-//
-//            JTree tree = new JTree(root);
-//            tree.setCellRenderer(new DefaultTreeCellRenderer() {
-//                @Override
-//                public Component getTreeCellRendererComponent(JTree tree,
-//                                                              Object value, boolean selected, boolean expanded,
-//                                                              boolean isLeaf, int row, boolean focused) {
-//                    Component c = super.getTreeCellRendererComponent(tree, value,
-//                            selected, expanded, isLeaf, row, focused);
-//                    if (((DefaultMutableTreeNode) value).isRoot()) {
-//                        setIcon(SYSConst.icon22addrow);
-//                    }
-//
-//                    return c;
-//                }
-//            });
-//            tree.setShowsRootHandles(true);
-//            SYSTools.collapseAll(tree);
-//
-//            pnlActual.add(tree, BorderLayout.CENTER);
-////                    pnlActual.add(pnlButton, BorderLayout.EAST);
-//            pnlActual.setAlignmentY(TOP_ALIGNMENT);
-//            pnlList.add(pnlActual);
-//
-//        }
-//
-//        // 3. build the list for the rest (without the timeclock)
-//        if (!listAdditional.isEmpty()) {
-//
-//            JPanel pnlAdditional = new JPanel();
-//            pnlAdditional.setLayout(new BorderLayout());
-//            pnlAdditional.setAlignmentY(TOP_ALIGNMENT);
-//
-//
-//            for (WLog WLog : listAdditional) {
-//                DefaultMutableTreeNode root = new DefaultMutableTreeNode(WLog.getHours().setScale(2, RoundingMode.HALF_UP).toString() + SYSTools.catchNull(WLog.getText(), " (", ")"));
-//
-//                root.add(new DefaultMutableTreeNode(OPDE.lang.getString("misc.msg.from") + ": " + new LocalTime(WLog.getStart()).toString("HH:mm")));
-//                root.add(new DefaultMutableTreeNode(OPDE.lang.getString("misc.msg.to") + ": " + new LocalTime(WLog.getEnd()).toString("HH:mm")));
-//                root.add(new DefaultMutableTreeNode(WLog.getHours().setScale(2, RoundingMode.HALF_UP) + " [" + WLogTools.TYPES[WLog.getType()] + "]"));
-//
-//                JTree tree = new JTree(root);
-//                tree.setShowsRootHandles(true);
-//                SYSTools.collapseAll(tree);
-//
-//                pnlAdditional.add(tree, BorderLayout.CENTER);
-//                //                    pnlActual.add(pnlButton, BorderLayout.EAST);
-//                pnlAdditional.setAlignmentY(TOP_ALIGNMENT);
-//
-//                tree.setCellRenderer(new DefaultTreeCellRenderer() {
-//                    @Override
-//                    public Component getTreeCellRendererComponent(JTree tree,
-//                                                                  Object value, boolean selected, boolean expanded,
-//                                                                  boolean isLeaf, int row, boolean focused) {
-//                        Component c = super.getTreeCellRendererComponent(tree, value,
-//                                selected, expanded, isLeaf, row, focused);
-//                        if (((DefaultMutableTreeNode) value).isRoot()) {
-//                            setIcon(SYSConst.icon22add);
-//                        }
-//                        return c;
-//                    }
-//                });
-//
-//            }
-//            pnlList.add(pnlAdditional);
-//        }
-//
-//
-//        lblTimeclockUsed.setIcon(timeclock != null && timeclock.getState() == WLogTools.STATE_ACCEPTED ? SYSConst.icon22ledGreenOn : SYSConst.icon22ledGreenOff);
-//        lblPlanUsed.setIcon(listActual.isEmpty() && (timeclock == null || timeclock.getState() != WLogTools.STATE_ACCEPTED) ? SYSConst.icon22ledGreenOff : SYSConst.icon22ledGreenOn);
-//        lblOverrideUsed.setIcon(SYSConst.icon22ledGreenOff);
-//
-//        lblSum.setText(OPDE.lang.getString("misc.msg.sum") + ": " + sum.setScale(2, RoundingMode.HALF_UP).toString());
-//
-//        scrl.validate();
-//        scrl.repaint();
-//    }
+
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JLabel lblDate;

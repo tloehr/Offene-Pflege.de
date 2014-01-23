@@ -53,7 +53,10 @@
                main="true"
                javaclass="op.roster.PnlUsersWorklog" icon="spreadsheet.png">
             <execute langbundle="appinfo.default.acl.execute"/>
+            <!-- manager is needed to set or remove the CTRL2 attribute of the RPLANS. -->
+            <!-- manager is needed to create a new roster or change its state -->
             <manager langbundle="opde.roster.appinfo.acl.manager"/>
+            <!-- user1 is needed to set or remove the CTRL1 attribute of the RPLANS. -->
             <user1 langbundle="opde.roster.appinfo.acl.user1"/>
         </class>
         <class name="opde.dev" short="Developer"

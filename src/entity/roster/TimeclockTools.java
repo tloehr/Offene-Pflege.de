@@ -5,6 +5,7 @@ import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -34,6 +35,32 @@ public class TimeclockTools {
             Query query = em.createQuery(jpql);
             query.setParameter("owner", owner);
             query.setParameter("from", from.toDate());
+
+            list = new ArrayList<Timeclock>(query.getResultList());
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+        return list;
+    }
+
+    public static ArrayList<Timeclock> getAllStartingOn(LocalDate startDate, Users owner) {
+        EntityManager em = OPDE.createEM();
+        ArrayList<Timeclock> list = null;
+        DateTime from = startDate.toDateTimeAtStartOfDay();
+        DateTime to = SYSCalendar.eod(startDate);
+
+        try {
+            String jpql = " SELECT tc " +
+                    " FROM Timeclock tc" +
+                    " WHERE tc.owner = :owner AND tc.begin >= :from AND tc.begin <= :to " +
+                    " ORDER BY tc.begin DESC ";
+
+            Query query = em.createQuery(jpql);
+            query.setParameter("owner", owner);
+            query.setParameter("from", from.toDate());
+            query.setParameter("to", to.toDate());
 
             list = new ArrayList<Timeclock>(query.getResultList());
         } catch (Exception se) {

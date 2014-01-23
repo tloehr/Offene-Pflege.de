@@ -1,4 +1,4 @@
-JFDML JFormDesigner: "5.2.0.0.54" Java: "1.6.0_33" encoding: "UTF-8"
+JFDML JFormDesigner: "5.2.0.0.72" Java: "1.6.0_33" encoding: "UTF-8"
 
 new FormModel {
 	contentType: "form/swing"
@@ -7,9 +7,8 @@ new FormModel {
 			name: "this"
 			add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 				name: "scrollPane1"
-				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-					"$columnSpecs": "default:grow, labelcompgap, default:grow"
-					"$rowSpecs": "default, linegap, default, linegap, default, linegap, default"
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.swingx.VerticalLayout ) {
+					"gap": 1
 				} ) {
 					name: "pnlWeek"
 				} )

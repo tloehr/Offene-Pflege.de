@@ -67,7 +67,6 @@ public class PnlUsersWorklog extends CleanablePanel {
 
         reloadDisplay();
 
-
     }
 
     private void lstRostersMouseClicked(MouseEvent e) {

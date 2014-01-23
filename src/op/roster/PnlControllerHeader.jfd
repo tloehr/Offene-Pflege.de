@@ -1,0 +1,64 @@
+JFDML JFormDesigner: "5.2.0.0.72" Java: "1.6.0_33" encoding: "UTF-8"
+
+new FormModel {
+	contentType: "form/swing"
+	root: new FormRoot {
+		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
+			"axis": 0
+		} ) {
+			name: "this"
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
+				"$columnSpecs": "60dlu, labelcompgap, 67dlu:grow, labelcompgap, 150dlu, labelcompgap, 150dlu"
+				"$rowSpecs": "pref"
+			} ) {
+				name: "panel1"
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "lblDate"
+					"text": "Date"
+					"font": &Font0 new java.awt.Font( "Arial", 1, 16 )
+					"horizontalAlignment": 0
+					"background": &Color0 new java.awt.Color( 204, 204, 255, 255 )
+					"opaque": true
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "lblPlan"
+					"text": "Plan"
+					"font": #Font0
+					"horizontalAlignment": 0
+					"background": #Color0
+					"opaque": true
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+					"gridX": 3
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "lblWorkingLog"
+					"text": "WorkingLog"
+					"font": #Font0
+					"horizontalAlignment": 0
+					"background": #Color0
+					"opaque": true
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+					"gridX": 5
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "lblTimeClock"
+					"text": "TimeClock"
+					"font": #Font0
+					"horizontalAlignment": 0
+					"background": #Color0
+					"opaque": true
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+					"gridX": 7
+				} )
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 0 )
+			"size": new java.awt.Dimension( 850, 175 )
+		} )
+	}
+}

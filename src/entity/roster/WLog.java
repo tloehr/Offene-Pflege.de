@@ -34,8 +34,8 @@ public class WLog implements Comparable<WLog> {
     private Homes homeactual;
 
     // ---
-    @JoinColumn(name = "rplanid", referencedColumnName = "id")
-    @ManyToOne
+    @JoinColumn(name = "rplanid")
+    @OneToOne
     private Rplan rplan;
     @JoinColumn(name = "creator", referencedColumnName = "UKennung")
     @ManyToOne
@@ -61,7 +61,7 @@ public class WLog implements Comparable<WLog> {
         wLogDetails = new ArrayList<WLogDetails>();
     }
 
-    public List<WLogDetails> getwLogDetails() {
+    public List<WLogDetails> getWLogDetails() {
         return wLogDetails;
     }
 
@@ -72,34 +72,6 @@ public class WLog implements Comparable<WLog> {
     public void setCreator(Users creator) {
         this.creator = creator;
     }
-
-    //    public WLog(BigDecimal hours, BigDecimal percent, String actual, Homes homeactual, Rplan rplan, int type) {
-//        this.hours = hours;
-//        this.percent = percent;
-//        this.actual = actual;
-//        this.homeactual = homeactual;
-//        this.rplan = rplan;
-//        this.type = type;
-//        this.state = WLogTools.STATE_UNUSED;
-//        this.creator = OPDE.getLogin().getUser();
-//        this.start = null;
-//        this.end = null;
-//        timestamp = new Date();
-//    }
-//
-//    public WLog(BigDecimal hours, Date start, Date end, Rplan rplan, String text, int type) {
-//        this.hours = hours;
-//        this.percent = BigDecimal.ZERO;
-//        this.start = start;
-//        this.end = end;
-//        this.rplan = rplan;
-//        this.type = type;
-//        this.state = WLogTools.STATE_UNUSED;
-//        this.creator = OPDE.getLogin().getUser();
-//        this.text = text;
-//        timestamp = new Date();
-//    }
-
 
     public long getId() {
         return id;

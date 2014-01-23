@@ -218,8 +218,8 @@ public class PnlTimeClock extends JPanel {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                    "default:grow, $lcgap, default:grow",
-                    "fill:default:grow, $rgap, 2*(default, $lgap), fill:30dlu:grow, $lgap, fill:default:grow, $lgap, default"));
+                "default:grow, $lcgap, default:grow",
+                "fill:default:grow, $rgap, 2*(default, $lgap), fill:30dlu:grow, $lgap, fill:default:grow, $lgap, default"));
 
             //---- btnCome ----
             btnCome.setText("gekommen");

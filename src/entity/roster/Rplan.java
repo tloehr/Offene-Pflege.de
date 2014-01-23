@@ -8,9 +8,7 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -58,8 +56,14 @@ public class Rplan implements Comparable<Rplan> {
     @JoinColumn(name = "creator", referencedColumnName = "UKennung")
     @ManyToOne
     private Users creator;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "rplan", fetch = FetchType.EAGER)
-    private List<WLog> WLogs;
+    @JoinColumn(name = "ctrl1", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users ctrl1;
+    @JoinColumn(name = "ctrl2", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users ctrl2;
+    @OneToOne(mappedBy = "rplan")
+    private WLog wlog;
     @Column(name = "version", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
     @Version
     private long version;
@@ -73,7 +77,10 @@ public class Rplan implements Comparable<Rplan> {
         this.creator = OPDE.getLogin().getUser();
         this.roster = roster;
         this.home1 = home1;
-        WLogs = new ArrayList<WLog>();
+    }
+
+    public WLog getWlog() {
+        return wlog;
     }
 
     public Homes getHome1() {
@@ -120,9 +127,6 @@ public class Rplan implements Comparable<Rplan> {
         }
     }
 
-//    public void setActual(String actual) {
-//        this.actual = actual;
-//    }
 
     public Homes getHome2() {
         return home2;
@@ -131,7 +135,6 @@ public class Rplan implements Comparable<Rplan> {
     public void setHome2(Homes home2) {
         this.home2 = home2;
     }
-
 
 
     public String getP1() {
@@ -185,10 +188,6 @@ public class Rplan implements Comparable<Rplan> {
         this.text = text;
     }
 
-
-    public List<WLog> getWLogs() {
-        return WLogs;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -259,8 +258,28 @@ public class Rplan implements Comparable<Rplan> {
         this.creator = controller;
     }
 
-    public boolean isLocked(){
+    public boolean isLocked() {
         return creator != null || roster.isLocked() || roster.isClosed();
+    }
+
+    public void setWlog(WLog wlog) {
+        this.wlog = wlog;
+    }
+
+    public Users getCtrl1() {
+        return ctrl1;
+    }
+
+    public void setCtrl1(Users ctrl1) {
+        this.ctrl1 = ctrl1;
+    }
+
+    public Users getCtrl2() {
+        return ctrl2;
+    }
+
+    public void setCtrl2(Users ctrl2) {
+        this.ctrl2 = ctrl2;
     }
 
     public void setStartEndFromSymbol(Symbol symbol) {

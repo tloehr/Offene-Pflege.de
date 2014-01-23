@@ -1,17 +1,16 @@
 package entity.roster;
 
 import entity.Homes;
-import entity.system.Users;
-import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
-import javax.persistence.EntityManager;
+import javax.swing.*;
+import java.awt.*;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
 
 /**
  * Created with IntelliJ IDEA.
@@ -60,6 +59,40 @@ public class RosterParameters {
 
     public int getHoursperyear() {
         return hoursperyear;
+    }
+
+    /**
+     * Setzt eine ComboBox mit der Liste der Homes. Wenn möglich wird direkt die eigene Einrichtung (abhängig von der Standard-Station) eingestellt.
+     *
+     * @param cmb
+     */
+    public void setComboBox(JComboBox cmb) {
+
+        Vector<Symbol> symbols = new Vector<Symbol>(symbolMap.values());
+        cmb.setModel(new DefaultComboBoxModel(symbols));
+
+        cmb.setRenderer(new ListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                Symbol symbol = (Symbol) value;
+
+                return new DefaultListCellRenderer().getListCellRendererComponent(list, SYSTools.toHTMLForScreen(toHTML(symbol.getKey(), null)), index, isSelected, cellHasFocus);
+            }
+        });
+
+
+    }
+
+    public String toHTML(String sym, Homes home) {
+
+        String s = "&nbsp;<font size=\"+1\">" + SYSConst.html_bold(getSymbol(sym).getKey().toUpperCase()) + "</font>" + "<br/>"
+                + "&nbsp;<i><font size=\"-1\">" + getSymbol(sym).getDescription() + "</font></i>";
+
+        if (home != null) {
+            s += "<br/>" + "&nbsp;<font size=\"-1\">" + home.getShortname() + "</font>";
+        }
+
+        return s;
     }
 
 

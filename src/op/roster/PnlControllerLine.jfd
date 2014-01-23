@@ -8,39 +8,13 @@ new FormModel {
 		} ) {
 			name: "this"
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-				"$columnSpecs": "default, labelcompgap, default:grow, labelcompgap, default:grow, labelcompgap, 85dlu:grow"
-				"$rowSpecs": "default, linegap, 62dlu:grow"
+				"$columnSpecs": "60dlu, 60dlu:grow, default:grow, 130dlu, default, 130dlu"
+				"$rowSpecs": "default, linegap, default"
 			} ) {
 				name: "panel1"
+				"border": new javax.swing.border.LineBorder( sfield java.awt.Color gray, 1, false )
 				add( new FormComponent( "javax.swing.JLabel" ) {
-					name: "label2"
-					"text": "Datum"
-				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridY": 1
-				} )
-				add( new FormComponent( "javax.swing.JLabel" ) {
-					name: "label3"
-					"text": "Soll/ist"
-				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridX": 3
-					"gridY": 1
-				} )
-				add( new FormComponent( "javax.swing.JLabel" ) {
-					name: "label4"
-					"text": "Zeiterfassung"
-				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridX": 5
-					"gridY": 1
-				} )
-				add( new FormComponent( "javax.swing.JLabel" ) {
-					name: "label5"
-					"text": "Arbeitszeiten"
-				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridX": 7
-					"gridY": 1
-				} )
-				add( new FormComponent( "javax.swing.JLabel" ) {
-					name: "lblDate2"
+					name: "lblDate"
 					"text": "03.06.14"
 					"font": new java.awt.Font( "Arial", 1, 16 )
 					"horizontalAlignment": 0
@@ -48,23 +22,19 @@ new FormModel {
 					"opaque": true
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-					"gridY": 3
+					"gridHeight": 3
 				} )
 				add( new FormComponent( "javax.swing.JLabel" ) {
-					name: "lblPlan"
+					name: "lblEffectivePlan"
 					"text": "text"
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridX": 3
-					"gridY": 3
+					"gridHeight": 3
+					"gridX": 2
 				} )
-				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
-					name: "scrollPane1"
-					add( new FormComponent( "javax.swing.JTable" ) {
-						name: "tblTimeclock"
-					} )
+				add( new FormComponent( "javax.swing.JComboBox" ) {
+					name: "cmbSymbol"
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridX": 5
-					"gridY": 3
+					"gridX": 3
 				} )
 				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 					name: "scrollPane2"
@@ -72,15 +42,53 @@ new FormModel {
 						name: "lstWLogs"
 					} )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridX": 7
-					"gridY": 3
+					"gridX": 4
 					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 					"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+					"gridHeight": 3
+				} )
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
+					"axis": 3
+				} ) {
+					name: "panel2"
+					add( new FormComponent( "javax.swing.JToggleButton" ) {
+						name: "btnOK1"
+						"text": "1"
+						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/leddarkyellow.png" )
+						"font": new java.awt.Font( "Arial", 1, 16 )
+						"selectedIcon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/ledyellow.png" )
+					} )
+					add( new FormComponent( "javax.swing.JToggleButton" ) {
+						name: "btnOK2"
+						"text": "2"
+						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/leddarkgreen.png" )
+						"font": new java.awt.Font( "Arial", 1, 16 )
+						"selectedIcon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/ledgreen.png" )
+					} )
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 5
+					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+					"gridHeight": 3
+				} )
+				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+					name: "scrollPane1"
+					add( new FormComponent( "javax.swing.JTable" ) {
+						name: "tblTimeclocks"
+					} )
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 6
+					"gridHeight": 3
+				} )
+				add( new FormComponent( "javax.swing.JComboBox" ) {
+					name: "cmbHome"
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 3
+					"gridY": 3
 				} )
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
-			"size": new java.awt.Dimension( 400, 175 )
+			"size": new java.awt.Dimension( 915, 175 )
 		} )
 	}
 }
