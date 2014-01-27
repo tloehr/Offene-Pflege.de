@@ -1,6 +1,7 @@
 package entity.roster;
 
 import entity.Homes;
+import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
@@ -67,20 +68,21 @@ public class RosterParameters {
      * @param cmb
      */
     public void setComboBox(JComboBox cmb) {
-
         Vector<Symbol> symbols = new Vector<Symbol>(symbolMap.values());
+        symbols.add(0, null);
         cmb.setModel(new DefaultComboBoxModel(symbols));
 
         cmb.setRenderer(new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                Symbol symbol = (Symbol) value;
-
-                return new DefaultListCellRenderer().getListCellRendererComponent(list, SYSTools.toHTMLForScreen(toHTML(symbol.getKey(), null)), index, isSelected, cellHasFocus);
+                String html = OPDE.lang.getString("misc.commands.>>noselection<<");
+                if (value != null) {
+                    Symbol symbol = (Symbol) value;
+                    html = toHTML(symbol.getKey(), null);
+                }
+                return new DefaultListCellRenderer().getListCellRendererComponent(list, SYSTools.toHTMLForScreen(html), index, isSelected, cellHasFocus);
             }
         });
-
-
     }
 
     public String toHTML(String sym, Homes home) {

@@ -67,10 +67,6 @@ public class Timeclock {
     @ManyToOne
     private Homes home;
 
-    @JoinColumn(name = "wlog", referencedColumnName = "id")
-    @ManyToOne
-    private WLog wlog;
-
     @Column(name = "version", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
     @Version
     private long version;
@@ -100,14 +96,6 @@ public class Timeclock {
 
     public void setOwner(Users owner) {
         this.owner = owner;
-    }
-
-    public WLog getWlog() {
-        return wlog;
-    }
-
-    public void setWlog(WLog wlog) {
-        this.wlog = wlog;
     }
 
     public Homes getHome() {
@@ -147,7 +135,6 @@ public class Timeclock {
         if (end != null ? !end.equals(timeclock.end) : timeclock.end != null) return false;
         if (owner != null ? !owner.equals(timeclock.owner) : timeclock.owner != null) return false;
         if (text != null ? !text.equals(timeclock.text) : timeclock.text != null) return false;
-        if (wlog != null ? !wlog.equals(timeclock.wlog) : timeclock.wlog != null) return false;
 
         return true;
     }
@@ -160,7 +147,6 @@ public class Timeclock {
         result = 31 * result + (text != null ? text.hashCode() : 0);
         result = 31 * result + state;
         result = 31 * result + (owner != null ? owner.hashCode() : 0);
-        result = 31 * result + (wlog != null ? wlog.hashCode() : 0);
         result = 31 * result + (int) (version ^ (version >>> 32));
         return result;
     }

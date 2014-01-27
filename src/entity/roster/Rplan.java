@@ -1,6 +1,7 @@
 package entity.roster;
 
 import entity.Homes;
+import entity.process.SYSNR2PROCESS;
 import entity.system.Users;
 import op.OPDE;
 import op.tools.SYSTools;
@@ -8,6 +9,8 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 
 /**
@@ -29,6 +32,9 @@ public class Rplan implements Comparable<Rplan> {
     @Column(name = "p2", nullable = true, insertable = true, updatable = true, length = 20, precision = 0)
     @Basic
     private String p2;
+    @Column(name = "actual", nullable = true, insertable = true, updatable = true, length = 20, precision = 0)
+    @Basic
+    private String actual;
     @Column(name = "start", nullable = true, insertable = true, updatable = true, length = 19, precision = 0)
     @Temporal(TemporalType.TIMESTAMP)
     @Basic
@@ -50,6 +56,9 @@ public class Rplan implements Comparable<Rplan> {
     @JoinColumn(name = "homeid2", referencedColumnName = "EID")
     @ManyToOne
     private Homes home2;
+    @JoinColumn(name = "homeactual", referencedColumnName = "EID")
+    @ManyToOne
+    private Homes homeactual;
     @JoinColumn(name = "rosterid", referencedColumnName = "id")
     @ManyToOne
     private Rosters roster;
@@ -62,11 +71,12 @@ public class Rplan implements Comparable<Rplan> {
     @JoinColumn(name = "ctrl2", referencedColumnName = "UKennung")
     @ManyToOne
     private Users ctrl2;
-    @OneToOne(mappedBy = "rplan")
-    private WLog wlog;
     @Column(name = "version", nullable = false, insertable = true, updatable = true, length = 20, precision = 0)
     @Version
     private long version;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "rplan")
+    private Collection<WLogDetails> wLogDetails;
 
     public Rplan() {
     }
@@ -77,10 +87,7 @@ public class Rplan implements Comparable<Rplan> {
         this.creator = OPDE.getLogin().getUser();
         this.roster = roster;
         this.home1 = home1;
-    }
-
-    public WLog getWlog() {
-        return wlog;
+        this.wLogDetails = new ArrayList<WLogDetails>();
     }
 
     public Homes getHome1() {
@@ -127,6 +134,9 @@ public class Rplan implements Comparable<Rplan> {
         }
     }
 
+    public Collection<WLogDetails> getWLogDetails() {
+        return wLogDetails;
+    }
 
     public Homes getHome2() {
         return home2;
@@ -144,18 +154,6 @@ public class Rplan implements Comparable<Rplan> {
     public String getP2() {
         return SYSTools.catchNull(p2).toUpperCase();
     }
-
-//    public String getActual() {
-//        return SYSTools.catchNull(actual).toUpperCase();
-//    }
-//
-//    public Homes getHomeactual() {
-//        return homeactual;
-//    }
-//
-//    public void setHomeactual(Homes homeactual) {
-//        this.homeactual = homeactual;
-//    }
 
     public String getEffectiveSymbol() {
         String p = getP2();
@@ -179,6 +177,22 @@ public class Rplan implements Comparable<Rplan> {
         return h;
     }
 
+
+    public String getActual() {
+        return actual;
+    }
+
+    public void setActual(String actual) {
+        this.actual = actual;
+    }
+
+    public Homes getHomeActual() {
+        return homeactual;
+    }
+
+    public void setHomeActual(Homes homeactual) {
+        this.homeactual = homeactual;
+    }
 
     public String getText() {
         return text;
@@ -260,10 +274,6 @@ public class Rplan implements Comparable<Rplan> {
 
     public boolean isLocked() {
         return creator != null || roster.isLocked() || roster.isClosed();
-    }
-
-    public void setWlog(WLog wlog) {
-        this.wlog = wlog;
     }
 
     public Users getCtrl1() {

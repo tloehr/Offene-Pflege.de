@@ -46,9 +46,9 @@ public class Workaccount {
     @JoinColumn(name = "creator", referencedColumnName = "UKennung")
     @ManyToOne
     private Users creator;
-    @JoinColumn(name = "workinglogid", referencedColumnName = "id")
-    @ManyToOne
-    private WLog WLog;
+//    @JoinColumn(name = "workinglogid", referencedColumnName = "id")
+//    @ManyToOne
+//    private WLog WLog;
 
     public Workaccount() {
     }
@@ -70,13 +70,13 @@ public class Workaccount {
     }
 
 
-    public WLog getWLog() {
-        return WLog;
-    }
-
-    public void setWLog(WLog WLog) {
-        this.WLog = WLog;
-    }
+//    public WLog getWLog() {
+//        return WLog;
+//    }
+//
+//    public void setWLog(WLog WLog) {
+//        this.WLog = WLog;
+//    }
 
     public Users getOwner() {
         return owner;

@@ -14,23 +14,15 @@ import java.util.HashMap;
  */
 public class WLogTools {
 
-    // all AUTO types meaning an entry which has been created while applying the planned shift
-    public static final int TYPE_AUTO = 0;
-    public static final int TYPE_ADDITIONAL = 1;
-    public static final int TYPE_MANUAL = 2;
 
-    //    public static final int TYPE_TIMECLOCK = 7; // Stechuhr
-    public static final String[] TYPES = new String[]{"Tag1", "Nacht1", "Nacht2", "Tag2", "Pause", "Zusätzlich", "Manuell"};
-
-
-    public static String toPrettyString(WLog WLog) {
-        String text = "";
-
-        //text = WLog.getHours().setScale(2, RoundingMode.HALF_UP).toString();
-
-        return text;
-    }
-
+//    public static String toPrettyString(WLog WLog) {
+//        String text = "";
+//
+//        //text = WLog.getHours().setScale(2, RoundingMode.HALF_UP).toString();
+//
+//        return text;
+//    }
+//
 
     /**
      * when entering an actual work log, there could be separate necessary details to represent the hours and percentages for the specific
@@ -41,31 +33,31 @@ public class WLogTools {
      * @param parameterSet
      * @return
      */
-    public static WLog createWorkingLog(Rplan myRplan, Symbol symbol, ContractsParameterSet parameterSet) {
-        LocalDate day = new LocalDate(myRplan.getStart());
-        HashMap<String, BigDecimal> map = symbol.getHourStats(day, parameterSet);
-        WLog wlog = new WLog(myRplan, symbol.getKey(), myRplan.getEffectiveHome());
-
-        if (map != null) {
-            if (map.get(Symbol.DAYHOURS1).compareTo(BigDecimal.ZERO) > 0) {
-                wlog.getWLogDetails().add(new WLogDetails(map.get(Symbol.DAYHOURS1), BigDecimal.ZERO, WLogDetailsTools.DAY1, wlog));
-            }
-            if (map.get(Symbol.DAYHOURS2).compareTo(BigDecimal.ZERO) > 0) {
-                wlog.getWLogDetails().add(new WLogDetails(map.get(Symbol.DAYHOURS2), BigDecimal.ZERO, WLogDetailsTools.DAY2, wlog));
-            }
-            if (map.get(Symbol.NIGHTHOURS1).compareTo(BigDecimal.ZERO) > 0) {
-                wlog.getWLogDetails().add(new WLogDetails(map.get(Symbol.NIGHTHOURS1), parameterSet.getNightPremiumPercentage(), WLogDetailsTools.NIGHT1, wlog));
-            }
-            if (map.get(Symbol.NIGHTHOURS2).compareTo(BigDecimal.ZERO) > 0) {
-                wlog.getWLogDetails().add(new WLogDetails(map.get(Symbol.NIGHTHOURS2), parameterSet.getNightPremiumPercentage(), WLogDetailsTools.NIGHT2, wlog));
-            }
-            if (map.get(Symbol.BREAKTIME).compareTo(BigDecimal.ZERO) > 0) {
-                wlog.getWLogDetails().add(new WLogDetails(map.get(Symbol.BREAKTIME).negate(), BigDecimal.ZERO, WLogDetailsTools.BREAK, wlog));
-            }
-        }
-
-        return wlog;
-    }
+//    public static WLog createWorkingLog(Rplan myRplan, Symbol symbol, ContractsParameterSet parameterSet) {
+//        LocalDate day = new LocalDate(myRplan.getStart());
+//        HashMap<String, BigDecimal> map = symbol.getHourStats(day, parameterSet);
+//        WLog wlog = new WLog(myRplan, symbol.getKey(), myRplan.getEffectiveHome());
+//
+//        if (map != null) {
+//            if (map.get(Symbol.DAYHOURS1).compareTo(BigDecimal.ZERO) > 0) {
+//                wlog.getWLogDetails().add(new WLogDetails(map.get(Symbol.DAYHOURS1), BigDecimal.ZERO, WLogDetailsTools.DAY1, wlog));
+//            }
+//            if (map.get(Symbol.DAYHOURS2).compareTo(BigDecimal.ZERO) > 0) {
+//                wlog.getWLogDetails().add(new WLogDetails(map.get(Symbol.DAYHOURS2), BigDecimal.ZERO, WLogDetailsTools.DAY2, wlog));
+//            }
+//            if (map.get(Symbol.NIGHTHOURS1).compareTo(BigDecimal.ZERO) > 0) {
+//                wlog.getWLogDetails().add(new WLogDetails(map.get(Symbol.NIGHTHOURS1), parameterSet.getNightPremiumPercentage(), WLogDetailsTools.NIGHT1, wlog));
+//            }
+//            if (map.get(Symbol.NIGHTHOURS2).compareTo(BigDecimal.ZERO) > 0) {
+//                wlog.getWLogDetails().add(new WLogDetails(map.get(Symbol.NIGHTHOURS2), parameterSet.getNightPremiumPercentage(), WLogDetailsTools.NIGHT2, wlog));
+//            }
+//            if (map.get(Symbol.BREAKTIME).compareTo(BigDecimal.ZERO) > 0) {
+//                wlog.getWLogDetails().add(new WLogDetails(map.get(Symbol.BREAKTIME).negate(), BigDecimal.ZERO, WLogDetailsTools.BREAK, wlog));
+//            }
+//        }
+//
+//        return wlog;
+//    }
 
 
 

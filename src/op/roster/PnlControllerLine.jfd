@@ -8,7 +8,7 @@ new FormModel {
 		} ) {
 			name: "this"
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-				"$columnSpecs": "60dlu, 60dlu:grow, default:grow, 130dlu, default, 130dlu"
+				"$columnSpecs": "60dlu, 60dlu:grow, default:grow, default, 130dlu, default, 130dlu"
 				"$rowSpecs": "default, linegap, default"
 			} ) {
 				name: "panel1"
@@ -36,13 +36,22 @@ new FormModel {
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridX": 3
 				} )
-				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
-					name: "scrollPane2"
-					add( new FormComponent( "javax.swing.JList" ) {
-						name: "lstWLogs"
-					} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "btnProcess"
+					"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
+					"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/work.png" )
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnProcessActionPerformed", true ) )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridX": 4
+					"gridHeight": 3
+				} )
+				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+					name: "scrl2"
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.swingx.VerticalLayout ) ) {
+						name: "pnlList"
+					} )
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 5
 					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 					"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 					"gridHeight": 3
@@ -66,7 +75,7 @@ new FormModel {
 						"selectedIcon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/ledgreen.png" )
 					} )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridX": 5
+					"gridX": 6
 					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 					"gridHeight": 3
 				} )
@@ -76,7 +85,7 @@ new FormModel {
 						name: "tblTimeclocks"
 					} )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridX": 6
+					"gridX": 7
 					"gridHeight": 3
 				} )
 				add( new FormComponent( "javax.swing.JComboBox" ) {

@@ -46,9 +46,9 @@ public class WLogDetails implements Comparable<WLogDetails> {
     private long version;
 
     // ---
-    @JoinColumn(name = "wlog", referencedColumnName = "id")
+    @JoinColumn(name = "rplanid", referencedColumnName = "id")
     @ManyToOne
-    private WLog wlog;
+    private Rplan rplan;
 
     @Column(name = "timestamp", nullable = false, insertable = true, updatable = true, length = 19, precision = 0)
     @Temporal(TemporalType.TIMESTAMP)
@@ -58,13 +58,13 @@ public class WLogDetails implements Comparable<WLogDetails> {
     public WLogDetails() {
     }
 
-    public WLogDetails(BigDecimal hours, BigDecimal percent, int type, WLog wlog) {
+    public WLogDetails(BigDecimal hours, BigDecimal percent, int type, Rplan rplan) {
         this.start = null;
         this.end = null;
         this.hours = hours;
         this.percent = percent;
         this.type = type;
-        this.wlog = wlog;
+        this.rplan = rplan;
         this.timestamp = new Date();
     }
 
@@ -149,18 +149,12 @@ public class WLogDetails implements Comparable<WLogDetails> {
         this.type = type;
     }
 
-    public WLog getWlog() {
-        return wlog;
-    }
-
-    public void setWlog(WLog wlog) {
-        this.wlog = wlog;
-    }
 
     @Override
     public int compareTo(WLogDetails o) {
 
-        int sort = SYSTools.nullCompare(wlog.getRplan(), o.getWlog().getRplan()) * -1;
+        int sort = 0;
+//        int sort = SYSTools.nullCompare(rplan., o.getWlog().getRplan()) * -1;
         if (sort == 0) {
             sort = new Integer(type).compareTo(new Integer(o.getType()));
         }
