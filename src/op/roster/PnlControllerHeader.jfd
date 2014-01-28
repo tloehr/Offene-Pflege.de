@@ -8,7 +8,7 @@ new FormModel {
 		} ) {
 			name: "this"
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-				"$columnSpecs": "60dlu, labelcompgap, 67dlu:grow, labelcompgap, 150dlu, labelcompgap, 150dlu"
+				"$columnSpecs": "60dlu, 60dlu:grow, 60dlu:grow, default, 100dlu, default, 100dlu"
 				"$rowSpecs": "pref"
 			} ) {
 				name: "panel1"
@@ -31,7 +31,29 @@ new FormModel {
 					"opaque": true
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+					"gridX": 2
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "lblActual"
+					"text": "Tatsächlich"
+					"font": #Font0
+					"horizontalAlignment": 0
+					"background": #Color0
+					"opaque": true
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 					"gridX": 3
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "lblOperations"
+					"text": "Übernahme"
+					"font": #Font0
+					"horizontalAlignment": 0
+					"background": #Color0
+					"opaque": true
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+					"gridX": 4
 				} )
 				add( new FormComponent( "javax.swing.JLabel" ) {
 					name: "lblWorkingLog"
@@ -43,6 +65,17 @@ new FormModel {
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 					"gridX": 5
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "lblCtrl"
+					"text": "Kontrolle"
+					"font": #Font0
+					"horizontalAlignment": 0
+					"background": #Color0
+					"opaque": true
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+					"gridX": 6
 				} )
 				add( new FormComponent( "javax.swing.JLabel" ) {
 					name: "lblTimeClock"
