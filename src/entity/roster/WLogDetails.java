@@ -1,7 +1,5 @@
 package entity.roster;
 
-import op.tools.SYSTools;
-
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -152,12 +150,7 @@ public class WLogDetails implements Comparable<WLogDetails> {
 
     @Override
     public int compareTo(WLogDetails o) {
-
-        int sort = 0;
-//        int sort = SYSTools.nullCompare(rplan., o.getWlog().getRplan()) * -1;
-        if (sort == 0) {
-            sort = new Integer(type).compareTo(new Integer(o.getType()));
-        }
+        int sort = new Integer(type).compareTo(new Integer(o.getType()));
         if (sort == 0) {
             sort = new Long(id).compareTo(new Long(o.getId()));
         }

@@ -6,6 +6,7 @@ package op.roster;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jidesoft.popup.JidePopup;
 import entity.Homes;
 import entity.HomesTools;
 import entity.roster.*;
@@ -15,6 +16,7 @@ import op.threads.DisplayManager;
 import op.tools.GUITools;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
@@ -35,6 +37,7 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * @author Torsten Löhr
@@ -92,8 +95,8 @@ public class PnlControllerLine extends JPanel {
 
         btnOK1.setSelected(rplan.getCtrl1() != null);
         btnOK2.setSelected(rplan.getCtrl2() != null);
-        btnOK1.setEnabled(!btnOK2.isSelected() && (OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, PnlUsersWorklog.internalClassID) || OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlUsersWorklog.internalClassID)));
-        btnOK2.setEnabled(btnOK1.isSelected() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlUsersWorklog.internalClassID));
+        btnOK1.setEnabled(!rplan.getWLogDetails().isEmpty() && !btnOK2.isSelected() && (OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, PnlUsersWorklog.internalClassID) || OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlUsersWorklog.internalClassID)));
+        btnOK2.setEnabled(!rplan.getWLogDetails().isEmpty() && btnOK1.isSelected() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlUsersWorklog.internalClassID));
 
         btnOK1.addItemListener(new ItemListener() {
             @Override
@@ -236,13 +239,20 @@ public class PnlControllerLine extends JPanel {
     private void btnOK1ItemStateChanged(ItemEvent e) {
         rplan.setCtrl1(OPDE.getLogin().getUser());
         btnOK2.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+        btnProcess.setEnabled(e.getStateChange() != ItemEvent.SELECTED);
     }
 
 
     private void btnProcessActionPerformed(ActionEvent e) {
         if (cmbSymbol.getSelectedItem() == null) {
             cmbSymbol.setSelectedItem(rosterParameters.getSymbol(rplan.getEffectiveSymbol()));
+        }
 
+        // no need to repeat the same operation twice
+        if (rplan.getActual() != null) {
+            if (rosterParameters.getSymbol(rplan.getActual()).equals(cmbSymbol.getSelectedItem())) {
+                return;
+            }
         }
 
         EntityManager em = OPDE.createEM();
@@ -260,6 +270,9 @@ public class PnlControllerLine extends JPanel {
             em.getTransaction().commit();
             rplan = myRplan;
             cmbSymbol.setSelectedItem(rosterParameters.getSymbol(rplan.getActual()));
+
+            updateList();
+            btnOK1.setEnabled(true);
 
         } catch (OptimisticLockException ole) {
             OPDE.error(ole);
@@ -341,15 +354,15 @@ public class PnlControllerLine extends JPanel {
             root.add(node);
         }
 
-        root.setUserObject(sumHours.toString());
+        root.setUserObject(rosterParameters.toString(rplan.getActual(), rplan.getHomeActual()) + " >> " + sumHours.toString());
 
         tree.setModel(new DefaultTreeModel(root));
 
         JPanel pnlLine = new JPanel();
         pnlLine.setLayout(new BorderLayout());
 
-        JPanel pnlButton = new JPanel();
-        pnlButton.setLayout(new BoxLayout(pnlButton, BoxLayout.LINE_AXIS));
+        JPanel pnlButton = new JPanel(new GridLayout(1, 2));
+//        pnlButton.setLayout(new BoxLayout(pnlButton, BoxLayout.LINE_AXIS));
         pnlButton.add(GUITools.getTinyButton(SYSConst.icon22delete, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -380,6 +393,8 @@ public class PnlControllerLine extends JPanel {
 
             }
         }));
+
+        tree.collapseRow(0);
         pnlLine.add(tree, BorderLayout.CENTER);
         pnlLine.add(pnlButton, BorderLayout.EAST);
 
@@ -390,6 +405,7 @@ public class PnlControllerLine extends JPanel {
 
     void updateList() {
         pnlList.removeAll();
+        sumHours = BigDecimal.ZERO;
 
         if (!rplan.getWLogDetails().isEmpty()) {
             pnlList.setBackground(Color.WHITE);
@@ -407,12 +423,37 @@ public class PnlControllerLine extends JPanel {
                 listSingleDetails.add(wld);
             }
         }
+        Collections.sort(listBlockedDetails);
+        Collections.sort(listSingleDetails);
 
-        pnlList.add(getLine(listBlockedDetails));
+        if (!listBlockedDetails.isEmpty()) {
+            pnlList.add(getLine(listBlockedDetails));
+        }
+        for (WLogDetails wld : listSingleDetails) {
+            pnlList.add(getLine(wld));
+        }
 
+        pnlList.add(new JLabel("Summe: " + sumHours));
 
         scrl2.validate();
         scrl2.repaint();
+    }
+
+    private void btnAdditionalActionPerformed(ActionEvent e) {
+        final JidePopup popupAdd = new JidePopup();
+        popupAdd.setMovable(false);
+        PnlAdditional pnlAdd = new PnlAdditional(new Closure() {
+            @Override
+            public void execute(Object o) {
+                OPDE.debug(o);
+            }
+        });
+        popupAdd.setContentPane(pnlAdd);
+        popupAdd.removeExcludedComponent(pnlAdd);
+        popupAdd.setDefaultFocusComponent(pnlAdd);
+
+        popupAdd.setOwner(btnAdditional);
+        GUITools.showPopup(popupAdd, SwingConstants.NORTH_EAST);
     }
 
 
@@ -429,7 +470,7 @@ public class PnlControllerLine extends JPanel {
         scrollPane1 = new JScrollPane();
         pnlTimeClock = new JPanel();
         cmbHome = new JComboBox();
-        button1 = new JButton();
+        btnAdditional = new JButton();
         btnOK2 = new JToggleButton();
 
         //======== this ========
@@ -439,8 +480,8 @@ public class PnlControllerLine extends JPanel {
         {
             panel1.setBorder(LineBorder.createGrayLineBorder());
             panel1.setLayout(new FormLayout(
-                    "60dlu, 2*(60dlu:grow), 2*(default, 100dlu)",
-                    "2*(default)"));
+                "60dlu, 2*(60dlu:grow), 2*(default, 100dlu)",
+                "2*(default)"));
 
             //---- lblDate ----
             lblDate.setText("03.06.14");
@@ -489,17 +530,23 @@ public class PnlControllerLine extends JPanel {
 
                 //======== pnlTimeClock ========
                 {
-                    pnlTimeClock.setLayout(new GridLayout());
+                    pnlTimeClock.setLayout(new VerticalLayout());
                 }
                 scrollPane1.setViewportView(pnlTimeClock);
             }
             panel1.add(scrollPane1, CC.xywh(7, 1, 1, 2));
             panel1.add(cmbHome, CC.xy(3, 2, CC.DEFAULT, CC.FILL));
 
-            //---- button1 ----
-            button1.setText(null);
-            button1.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit_add.png")));
-            panel1.add(button1, CC.xy(4, 2, CC.DEFAULT, CC.FILL));
+            //---- btnAdditional ----
+            btnAdditional.setText(null);
+            btnAdditional.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/edit_add.png")));
+            btnAdditional.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnAdditionalActionPerformed(e);
+                }
+            });
+            panel1.add(btnAdditional, CC.xy(4, 2, CC.DEFAULT, CC.FILL));
 
             //---- btnOK2 ----
             btnOK2.setText("2");
@@ -524,7 +571,7 @@ public class PnlControllerLine extends JPanel {
     private JScrollPane scrollPane1;
     private JPanel pnlTimeClock;
     private JComboBox cmbHome;
-    private JButton button1;
+    private JButton btnAdditional;
     private JToggleButton btnOK2;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

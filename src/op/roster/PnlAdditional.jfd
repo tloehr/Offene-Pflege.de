@@ -1,0 +1,107 @@
+JFDML JFormDesigner: "5.2.0.0.72" Java: "1.6.0_33" encoding: "UTF-8"
+
+new FormModel {
+	contentType: "form/swing"
+	root: new FormRoot {
+		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
+			"$columnSpecs": "default, labelcompgap, 80dlu, labelcompgap, 80dlu, labelcompgap, default"
+			"$rowSpecs": "linegap, default, linegap, default, linegap, default, linegap, default, pargap, default"
+		} ) {
+			name: "this"
+			"focusCycleRoot": true
+			"focusTraversalPolicyProvider": true
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblFrom"
+				"text": "text"
+				"font": &Font0 new java.awt.Font( "Arial", 0, 11 )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 3
+				"gridY": 2
+				"hAlign": sfield com.jgoodies.forms.layout.CellConstraints RIGHT
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblTo"
+				"text": "text"
+				"font": #Font0
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridY": 2
+				"hAlign": sfield com.jgoodies.forms.layout.CellConstraints RIGHT
+				"gridX": 5
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "txtFrom"
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtFromFocusLost", true ) )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 3
+				"gridY": 4
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "txtTo"
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtToFocusLost", true ) )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 5
+				"gridY": 4
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblHours"
+				"text": "text"
+				"font": #Font0
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridY": 6
+				"gridX": 3
+				"hAlign": sfield com.jgoodies.forms.layout.CellConstraints RIGHT
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblText"
+				"text": "text"
+				"font": #Font0
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 5
+				"gridY": 6
+				"hAlign": sfield com.jgoodies.forms.layout.CellConstraints RIGHT
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "txtHours"
+				addEvent( new FormEvent( "javax.swing.event.CaretListener", "caretUpdate", "txtHoursCaretUpdate", true ) )
+				addEvent( new FormEvent( "java.awt.event.FocusListener", "focusLost", "txtHoursFocusLost", true ) )
+				addEvent( new FormEvent( "java.awt.event.KeyListener", "keyTyped", "txtHoursKeyTyped", true ) )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 3
+				"gridY": 8
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "txtText"
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 5
+				"gridY": 8
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
+				"$columnSpecs": "default:grow"
+				"$rowSpecs": "default"
+			} ) {
+				name: "panel1"
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "btnApply"
+					"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
+					"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/apply.png" )
+					"borderPainted": false
+					"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
+					"contentAreaFilled": false
+					"selectedIcon": sfield com.jformdesigner.model.FormObject NULL_VALUE
+					"pressedIcon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/apply_pressed.png" )
+					"focusable": false
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnApplyActionPerformed", true ) )
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"hAlign": sfield com.jgoodies.forms.layout.CellConstraints RIGHT
+				} )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 3
+				"gridY": 10
+				"gridWidth": 3
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 0 )
+			"size": new java.awt.Dimension( 400, 140 )
+		} )
+	}
+}

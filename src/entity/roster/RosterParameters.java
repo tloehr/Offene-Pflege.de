@@ -97,6 +97,17 @@ public class RosterParameters {
         return s;
     }
 
+    public String toString(String sym, Homes home) {
+
+        String s = getSymbol(sym).getKey().toUpperCase();
+
+        if (home != null) {
+            s += ", " + home.getShortname();
+        }
+
+        return s;
+    }
+
 
 //    public void addPreferredHome(String uid, String homeid) {
 //        EntityManager em = OPDE.createEM();
