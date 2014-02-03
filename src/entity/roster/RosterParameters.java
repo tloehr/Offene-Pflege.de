@@ -102,7 +102,7 @@ public class RosterParameters {
         String s = getSymbol(sym).getKey().toUpperCase();
 
         if (home != null) {
-            s += ", " + home.getShortname();
+            s += ", " + SYSTools.left(home.getShortname(), 4);
         }
 
         return s;

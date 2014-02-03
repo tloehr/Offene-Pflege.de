@@ -18,6 +18,7 @@ import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
+import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
 
@@ -121,6 +122,9 @@ public class PnlControllerLine extends JPanel {
          *        \_/\_/  |_____\___/ \__, |____/ \___|\__\__,_|_|_|___/
          *                            |___/
          */
+
+        pnlList.setBackground(Color.WHITE);
+        pnlList.setOpaque(false);
         updateList();
 
         /***
@@ -255,39 +259,43 @@ public class PnlControllerLine extends JPanel {
             }
         }
 
-        EntityManager em = OPDE.createEM();
-        try {
-            em.getTransaction().begin();
-            Rplan myRplan = em.merge(rplan);
-            em.lock(myRplan, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-            em.lock(myRplan.getRoster(), LockModeType.OPTIMISTIC);
+        // PValue ? We need to know the exact time.
+        if (((Symbol) cmbSymbol.getSelectedItem()).getCalc() == Symbol.PVALUE) {
 
-            myRplan.setHomeActual(em.merge((Homes) cmbHome.getSelectedItem()));
-            myRplan.setActual(((Symbol) cmbSymbol.getSelectedItem()).getKey());
+        } else { // ==============================================================================
+            EntityManager em = OPDE.createEM();
+            try {
+                em.getTransaction().begin();
+                Rplan myRplan = em.merge(rplan);
+                em.lock(myRplan, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                em.lock(myRplan.getRoster(), LockModeType.OPTIMISTIC);
 
-            WLogDetailsTools.setDetails(em, myRplan, (Symbol) cmbSymbol.getSelectedItem(), contractsParameterSet);
+                myRplan.setHomeActual(em.merge((Homes) cmbHome.getSelectedItem()));
+                myRplan.setActual(((Symbol) cmbSymbol.getSelectedItem()).getKey());
 
-            em.getTransaction().commit();
-            rplan = myRplan;
-            cmbSymbol.setSelectedItem(rosterParameters.getSymbol(rplan.getActual()));
+                WLogDetailsTools.setDetails(em, myRplan, (Symbol) cmbSymbol.getSelectedItem(), contractsParameterSet);
 
-            updateList();
-            btnOK1.setEnabled(true);
+                em.getTransaction().commit();
+                rplan = myRplan;
+                cmbSymbol.setSelectedItem(rosterParameters.getSymbol(rplan.getActual()));
 
-        } catch (OptimisticLockException ole) {
-            OPDE.error(ole);
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
+                updateList();
+                btnOK1.setEnabled(true);
+
+            } catch (OptimisticLockException ole) {
+                OPDE.error(ole);
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+            } catch (Exception ex) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                OPDE.fatal(ex);
+            } finally {
+                em.close();
             }
-            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-        } catch (Exception ex) {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            OPDE.fatal(ex);
-        } finally {
-            em.close();
-
         }
     }
 
@@ -350,11 +358,12 @@ public class PnlControllerLine extends JPanel {
 
         for (WLogDetails wld : listDetails) {
             sumHours = sumHours.add(wld.getHours());
-            DefaultMutableTreeNode node = new DefaultMutableTreeNode(WLogDetailsTools.TYPES[wld.getType()] + ": " + wld.getHours().toString());
+            DefaultMutableTreeNode node = new DefaultMutableTreeNode(WLogDetailsTools.TYPES[wld.getType()] + ": " + SYSTools.roundScale2(wld.getHours()));
             root.add(node);
         }
 
-        root.setUserObject(rosterParameters.toString(rplan.getActual(), rplan.getHomeActual()) + " >> " + sumHours.toString());
+        root.setUserObject(rosterParameters.toString(rplan.getActual(), rplan.getHomeActual()) + " >> " + SYSTools.roundScale2(sumHours));
+
 
         tree.setModel(new DefaultTreeModel(root));
 
@@ -407,10 +416,11 @@ public class PnlControllerLine extends JPanel {
         pnlList.removeAll();
         sumHours = BigDecimal.ZERO;
 
-        if (!rplan.getWLogDetails().isEmpty()) {
-            pnlList.setBackground(Color.WHITE);
-        }
-        pnlList.setOpaque(!rplan.getWLogDetails().isEmpty());
+
+//        if (!rplan.getWLogDetails().isEmpty()) {
+//            pnlList.setBackground(Color.WHITE);
+//        }
+//        pnlList.setOpaque(!rplan.getWLogDetails().isEmpty());
 
         ArrayList<WLogDetails> listBlockedDetails = new ArrayList<WLogDetails>();
         ArrayList<WLogDetails> listSingleDetails = new ArrayList<WLogDetails>();
@@ -428,12 +438,35 @@ public class PnlControllerLine extends JPanel {
 
         if (!listBlockedDetails.isEmpty()) {
             pnlList.add(getLine(listBlockedDetails));
+        } else {
+            if (rplan.getActual() != null) {
+                Symbol actualSymbol = rosterParameters.getSymbol(rplan.getActual());
+                if (actualSymbol.getSymbolType() == Symbol.SICK) {
+                    JLabel lblOnLeave = new JLabel("KRANK");
+                    lblOnLeave.setOpaque(false);
+                    pnlList.add(lblOnLeave);
+                } else if (actualSymbol.getSymbolType() == Symbol.OFFDUTY) {
+                    JLabel lblOnLeave = new JLabel("FREI");
+                    lblOnLeave.setOpaque(false);
+                    pnlList.add(lblOnLeave);
+                } else if (actualSymbol.getSymbolType() == Symbol.HOLIDAY) {
+                    JLabel lblOnLeave = new JLabel("URLAUB");
+                    lblOnLeave.setOpaque(false);
+                    pnlList.add(lblOnLeave);
+                } else if (actualSymbol.getSymbolType() == Symbol.SCHOOL) {
+                    JLabel lblOnLeave = new JLabel("SCHULE");
+                    lblOnLeave.setOpaque(false);
+                    pnlList.add(lblOnLeave);
+                }
+            }
         }
         for (WLogDetails wld : listSingleDetails) {
             pnlList.add(getLine(wld));
         }
 
-        pnlList.add(new JLabel("Summe: " + sumHours));
+        JLabel sumLabel = new JLabel(SYSTools.toHTMLForScreen(SYSConst.html_bold("Summe: " + SYSTools.roundScale2(sumHours))));
+        sumLabel.setOpaque(false);
+        pnlList.add(sumLabel);
 
         scrl2.validate();
         scrl2.repaint();
@@ -442,10 +475,49 @@ public class PnlControllerLine extends JPanel {
     private void btnAdditionalActionPerformed(ActionEvent e) {
         final JidePopup popupAdd = new JidePopup();
         popupAdd.setMovable(false);
-        PnlAdditional pnlAdd = new PnlAdditional(new Closure() {
+        PnlAdditional pnlAdd = new PnlAdditional(refDate, new Closure() {
             @Override
             public void execute(Object o) {
-                OPDE.debug(o);
+                popupAdd.hidePopup();
+
+                if (o == null) return;
+
+                Object[] objects = (Object[]) o;
+                DateTime from = (DateTime) objects[0];
+                DateTime to = (DateTime) objects[1];
+                BigDecimal hours = (BigDecimal) objects[2];
+                String text = objects[3].toString();
+
+                EntityManager em = OPDE.createEM();
+                try {
+                    em.getTransaction().begin();
+                    Rplan myRplan = em.merge(rplan);
+                    em.lock(myRplan, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                    em.lock(myRplan.getRoster(), LockModeType.OPTIMISTIC);
+
+                    myRplan.getWLogDetails().add(new WLogDetails(hours, BigDecimal.ZERO, WLogDetailsTools.ADDITIONAL, myRplan));
+
+                    em.getTransaction().commit();
+                    rplan = myRplan;
+
+                    updateList();
+                    btnOK1.setEnabled(true);
+
+                } catch (OptimisticLockException ole) {
+                    OPDE.error(ole);
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                } catch (Exception ex) {
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    OPDE.fatal(ex);
+                } finally {
+                    em.close();
+                }
+
             }
         });
         popupAdd.setContentPane(pnlAdd);
@@ -480,8 +552,8 @@ public class PnlControllerLine extends JPanel {
         {
             panel1.setBorder(LineBorder.createGrayLineBorder());
             panel1.setLayout(new FormLayout(
-                "60dlu, 2*(60dlu:grow), 2*(default, 100dlu)",
-                "2*(default)"));
+                    "60dlu, 2*(60dlu:grow), 2*(default, 100dlu)",
+                    "2*(default)"));
 
             //---- lblDate ----
             lblDate.setText("03.06.14");

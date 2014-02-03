@@ -29,13 +29,15 @@ public class Symbol {
     public static final String BREAKTIME = "breaktime";
     public static final String BASEHOURS = "basehours";
 
+    // CalcTypes
     public static final int AWERT = 0;
     public static final int KWERT = 1;
     public static final int UWERT = 2;
     public static final int XWERT = 3;
-    public static final int PVALUE = 4; // only for planning reasons. No predicted work time. Comes only into effect, when the real worklog for this day is present.
+    public static final int PVALUE = 4; // only for planning reasons. No predicted work time. Comes only into effect, when the real worklog for this day is present. Mainly for social workers.
     public static final String[] CALC = new String[]{"awert", "kwert", "uwert", "xwert", "pvalue"};
 
+    // SymbolTypes
     public static final int WORK = 0;
     public static final int SICK = 1;
     public static final int OFFDUTY = 2;
@@ -150,9 +152,9 @@ public class Symbol {
     }
 
     public BigDecimal getNBreak() {
-            if (minutesBreakDay == 0) return BigDecimal.ZERO;
-            return new BigDecimal(minutesBreakDay).divide(new BigDecimal(DateTimeConstants.MINUTES_PER_HOUR)).setScale(2, RoundingMode.HALF_UP);
-        }
+        if (minutesBreakDay == 0) return BigDecimal.ZERO;
+        return new BigDecimal(minutesBreakDay).divide(new BigDecimal(DateTimeConstants.MINUTES_PER_HOUR)).setScale(2, RoundingMode.HALF_UP);
+    }
 
     public String getDescription() {
         return description;
@@ -232,12 +234,11 @@ public class Symbol {
      * anyways, this method calcualtes the <b>OVERLAP</b> between the interval of the shift and the interval of the night hours for day 1.
      *
      * @return 0 a map with the hours for every part of the shift. the following keys are used for the map: "dayhours1", "dayhours2", "nighthours1", "nighthours2", "holihours1", "holihours2", "extra1", "extra2".
-     *         <code>NULL</code> if calculation is not possible. e.g. when using pure PLANNING symbols.
+     * <code>NULL</code> if calculation is not possible. e.g. when using pure PLANNING symbols.
      */
     public HashMap<String, BigDecimal> getHourStats(LocalDate day, ContractsParameterSet contractsParameterSet) {
 
-        if (start == null || end == null) return null;
-        if (symboltype == PVALUE) return null;
+        if (calc == PVALUE) return null;
 
         HashMap<String, BigDecimal> mapHours = new HashMap<String, BigDecimal>();
         mapHours.put(DAYHOURS1, BigDecimal.ZERO);
@@ -246,46 +247,54 @@ public class Symbol {
         mapHours.put(NIGHTHOURS2, BigDecimal.ZERO);
         mapHours.put(BREAKTIME, getBreak());
 
-        // determine the night hours according to the user's contract
-        DateTime contractNightStart = day.toDateTime(contractsParameterSet.getNight().getFirst());
-        DateTime contractNightEnd = day.toDateTime(contractsParameterSet.getNight().getSecond());
-        if (contractNightEnd.isBefore(contractNightStart)) contractNightEnd = contractNightEnd.plusDays(1);
+        if (calc == XWERT) {
+            mapHours.put(DAYHOURS1, BigDecimal.ZERO);
+        } else if (calc == KWERT) {
+            mapHours.put(DAYHOURS1, contractsParameterSet.getDayValue());
+        } else if (calc == UWERT) {
+            mapHours.put(DAYHOURS1, contractsParameterSet.getDayValue());
+        } else { // AWERT
 
-        Interval nightInterval = new Interval(contractNightStart, contractNightEnd);
+            // determine the night hours according to the user's contract
+            DateTime contractNightStart = day.toDateTime(contractsParameterSet.getNight().getFirst());
+            DateTime contractNightEnd = day.toDateTime(contractsParameterSet.getNight().getSecond());
+            if (contractNightEnd.isBefore(contractNightStart)) contractNightEnd = contractNightEnd.plusDays(1);
 
-        DateTime startDay1 = day.toDateTime(start);
-        DateTime startDay2 = isOvernight() ? day.plusDays(1).toDateTimeAtStartOfDay() : null;
-        DateTime endDay1 = isOvernight() ? day.plusDays(1).toDateTimeAtStartOfDay() : day.toDateTime(end);
-        DateTime endDay2 = isOvernight() ? day.toDateTime(end).plusDays(1) : null;
+            Interval nightInterval = new Interval(contractNightStart, contractNightEnd);
 
-        // probier die Nacht aus. Das stimmt was nicht mit START und END
-        Interval shiftInterval1 = new Interval(startDay1, endDay1);
-        Interval[] dayhours1 = SYSCalendar.notin(shiftInterval1, nightInterval);
-        BigDecimal dayh1 = BigDecimal.ZERO;
-        for (Interval interval : dayhours1) {
-            dayh1 = dayh1.add(SYSCalendar.getHoursAsDecimal(interval));
-        }
-        mapHours.put(DAYHOURS1, dayh1);
+            DateTime startDay1 = day.toDateTime(start);
+            DateTime startDay2 = isOvernight() ? day.plusDays(1).toDateTimeAtStartOfDay() : null;
+            DateTime endDay1 = isOvernight() ? day.plusDays(1).toDateTimeAtStartOfDay() : day.toDateTime(end);
+            DateTime endDay2 = isOvernight() ? day.toDateTime(end).plusDays(1) : null;
 
-        Interval nighthours1 = nightInterval.overlap(shiftInterval1);
-        mapHours.put(NIGHTHOURS1, SYSCalendar.getHoursAsDecimal(nighthours1));
-
-        if (isOvernight()) {
-            Interval shiftInterval2 = new Interval(startDay2, endDay2);
-            Interval[] dayhours2 = SYSCalendar.notin(shiftInterval2, nightInterval);
-            BigDecimal dayh2 = BigDecimal.ZERO;
-            for (Interval interval : dayhours2) {
-                dayh2 = dayh2.add(SYSCalendar.getHoursAsDecimal(interval));
+            // probier die Nacht aus. Das stimmt was nicht mit START und END
+            Interval shiftInterval1 = new Interval(startDay1, endDay1);
+            Interval[] dayhours1 = SYSCalendar.notin(shiftInterval1, nightInterval);
+            BigDecimal dayh1 = BigDecimal.ZERO;
+            for (Interval interval : dayhours1) {
+                dayh1 = dayh1.add(SYSCalendar.getHoursAsDecimal(interval));
             }
-            mapHours.put(DAYHOURS2, dayh2);
+            mapHours.put(DAYHOURS1, dayh1);
+
+            Interval nighthours1 = nightInterval.overlap(shiftInterval1);
+            mapHours.put(NIGHTHOURS1, SYSCalendar.getHoursAsDecimal(nighthours1));
+
+            if (isOvernight()) {
+                Interval shiftInterval2 = new Interval(startDay2, endDay2);
+                Interval[] dayhours2 = SYSCalendar.notin(shiftInterval2, nightInterval);
+                BigDecimal dayh2 = BigDecimal.ZERO;
+                for (Interval interval : dayhours2) {
+                    dayh2 = dayh2.add(SYSCalendar.getHoursAsDecimal(interval));
+                }
+                mapHours.put(DAYHOURS2, dayh2);
 
 
-            Interval nighthours2 = nightInterval.overlap(shiftInterval2);
-            mapHours.put(NIGHTHOURS2, SYSCalendar.getHoursAsDecimal(nighthours2));
+                Interval nighthours2 = nightInterval.overlap(shiftInterval2);
+                mapHours.put(NIGHTHOURS2, SYSCalendar.getHoursAsDecimal(nighthours2));
+            }
+
+            mapHours.put(BASEHOURS, SYSCalendar.getHoursAsDecimal(new Interval(getStart(day), getEnd(day))));
         }
-
-        mapHours.put(BASEHOURS, SYSCalendar.getHoursAsDecimal(new Interval(getStart(day), getEnd(day))));
-
         return mapHours;
     }
 

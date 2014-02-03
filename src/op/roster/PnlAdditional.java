@@ -42,7 +42,7 @@ public class PnlAdditional extends JPanel {
         lblTo.setText(OPDE.lang.getString("misc.msg.to"));
         lblHours.setText(OPDE.lang.getString("misc.msg.Hours"));
         lblText.setText(OPDE.lang.getString("misc.msg.comment"));
-
+        txtFrom.requestFocus();
     }
 
     private void btnApplyActionPerformed(ActionEvent e) {
@@ -51,7 +51,7 @@ public class PnlAdditional extends JPanel {
 
     private void txtFromFocusLost(FocusEvent e) {
         try {
-            from = SYSCalendar.parseLocalTime(txtFrom.getText()).toDateTimeToday();
+            from = SYSCalendar.parseLocalTime(txtFrom.getText()).toDateTime(refDate.toDateTimeAtStartOfDay());
 
             if (to == null) {
                 hours = null;
@@ -70,7 +70,7 @@ public class PnlAdditional extends JPanel {
 
     private void txtToFocusLost(FocusEvent e) {
         try {
-            to = SYSCalendar.parseLocalTime(txtTo.getText()).toDateTimeToday();
+            to = SYSCalendar.parseLocalTime(txtTo.getText()).toDateTime(refDate.toDateTimeAtStartOfDay());
 
             if (from == null) {
                 hours = null;
