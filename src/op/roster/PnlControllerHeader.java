@@ -38,7 +38,6 @@ public class PnlControllerHeader extends JPanel {
         lblActual = new JLabel();
         lblOperations = new JLabel();
         lblWorkingLog = new JLabel();
-        lblCtrl = new JLabel();
         lblTimeClock = new JLabel();
 
         //======== this ========
@@ -47,7 +46,7 @@ public class PnlControllerHeader extends JPanel {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                "60dlu, 2*(60dlu:grow), 2*(default, 100dlu)",
+                "60dlu, 2*(60dlu:grow), 25dlu, 2*(100dlu)",
                 "pref"));
 
             //---- lblDate ----
@@ -75,7 +74,7 @@ public class PnlControllerHeader extends JPanel {
             panel1.add(lblActual, CC.xy(3, 1, CC.DEFAULT, CC.FILL));
 
             //---- lblOperations ----
-            lblOperations.setText("\u00dcbernahme");
+            lblOperations.setText("Fkt.");
             lblOperations.setFont(new Font("Arial", Font.BOLD, 16));
             lblOperations.setHorizontalAlignment(SwingConstants.CENTER);
             lblOperations.setBackground(new Color(204, 204, 255));
@@ -90,21 +89,13 @@ public class PnlControllerHeader extends JPanel {
             lblWorkingLog.setOpaque(true);
             panel1.add(lblWorkingLog, CC.xy(5, 1, CC.DEFAULT, CC.FILL));
 
-            //---- lblCtrl ----
-            lblCtrl.setText("Kontrolle");
-            lblCtrl.setFont(new Font("Arial", Font.BOLD, 16));
-            lblCtrl.setHorizontalAlignment(SwingConstants.CENTER);
-            lblCtrl.setBackground(new Color(204, 204, 255));
-            lblCtrl.setOpaque(true);
-            panel1.add(lblCtrl, CC.xy(6, 1, CC.DEFAULT, CC.FILL));
-
             //---- lblTimeClock ----
             lblTimeClock.setText("TimeClock");
             lblTimeClock.setFont(new Font("Arial", Font.BOLD, 16));
             lblTimeClock.setHorizontalAlignment(SwingConstants.CENTER);
             lblTimeClock.setBackground(new Color(204, 204, 255));
             lblTimeClock.setOpaque(true);
-            panel1.add(lblTimeClock, CC.xy(7, 1, CC.DEFAULT, CC.FILL));
+            panel1.add(lblTimeClock, CC.xy(6, 1, CC.DEFAULT, CC.FILL));
         }
         add(panel1);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
@@ -117,7 +108,6 @@ public class PnlControllerHeader extends JPanel {
     private JLabel lblActual;
     private JLabel lblOperations;
     private JLabel lblWorkingLog;
-    private JLabel lblCtrl;
     private JLabel lblTimeClock;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

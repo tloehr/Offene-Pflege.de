@@ -8,7 +8,7 @@ new FormModel {
 		} ) {
 			name: "this"
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-				"$columnSpecs": "60dlu, 60dlu:grow, 60dlu:grow, default, 100dlu, default, 100dlu"
+				"$columnSpecs": "60dlu, 60dlu:grow, 60dlu:grow, 25dlu, 100dlu, 100dlu"
 				"$rowSpecs": "default, default"
 			} ) {
 				name: "panel1"
@@ -37,14 +37,62 @@ new FormModel {
 					"gridX": 3
 					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 				} )
-				add( new FormComponent( "javax.swing.JButton" ) {
-					name: "btnProcess"
-					"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-					"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/work.png" )
-					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnProcessActionPerformed", true ) )
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) {
+					"columns": 2
+					"rows": 2
+				} ) {
+					name: "panel2"
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "btnProcess"
+						"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
+						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/work.png" )
+						"contentAreaFilled": false
+						"borderPainted": false
+						"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
+						"cursor": &Cursor0 new java.awt.Cursor( 12 )
+						"pressedIcon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/work_inverse.png" )
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnProcessActionPerformed", true ) )
+					} )
+					add( new FormComponent( "javax.swing.JToggleButton" ) {
+						name: "btnOK1"
+						"text": "1"
+						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/leddarkyellow.png" )
+						"font": new java.awt.Font( "Arial", 1, 16 )
+						"selectedIcon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/ledyellow.png" )
+						"contentAreaFilled": false
+						"borderPainted": false
+						"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
+						"cursor": #Cursor0
+						"horizontalTextPosition": 0
+						"foreground": new java.awt.Color( 255, 255, 153, 255 )
+					} )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "btnAdditional"
+						"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
+						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/edit_add.png" )
+						"contentAreaFilled": false
+						"borderPainted": false
+						"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
+						"cursor": #Cursor0
+						"pressedIcon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/edit_add_inverse.png" )
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnAdditionalActionPerformed", true ) )
+					} )
+					add( new FormComponent( "javax.swing.JToggleButton" ) {
+						name: "btnOK2"
+						"text": "2"
+						"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/leddarkgreen.png" )
+						"font": new java.awt.Font( "Arial", 1, 16 )
+						"selectedIcon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/ledgreen.png" )
+						"contentAreaFilled": false
+						"borderPainted": false
+						"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
+						"cursor": #Cursor0
+						"foreground": new java.awt.Color( 153, 255, 153, 255 )
+						"horizontalTextPosition": 0
+					} )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridX": 4
-					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
+					"gridHeight": 2
 				} )
 				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 					name: "scrl2"
@@ -57,23 +105,13 @@ new FormModel {
 					"hAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 					"gridHeight": 2
 				} )
-				add( new FormComponent( "javax.swing.JToggleButton" ) {
-					name: "btnOK1"
-					"text": "1"
-					"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/leddarkyellow.png" )
-					"font": new java.awt.Font( "Arial", 1, 16 )
-					"selectedIcon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/ledyellow.png" )
-				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridX": 6
-					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-				} )
 				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 					name: "scrollPane1"
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.swingx.VerticalLayout ) ) {
 						name: "pnlTimeClock"
 					} )
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridX": 7
+					"gridX": 6
 					"gridHeight": 2
 				} )
 				add( new FormComponent( "javax.swing.JComboBox" ) {
@@ -81,27 +119,6 @@ new FormModel {
 				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 					"gridX": 3
 					"gridY": 2
-					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-				} )
-				add( new FormComponent( "javax.swing.JButton" ) {
-					name: "btnAdditional"
-					"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
-					"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/edit_add.png" )
-					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "btnAdditionalActionPerformed", true ) )
-				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridX": 4
-					"gridY": 2
-					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
-				} )
-				add( new FormComponent( "javax.swing.JToggleButton" ) {
-					name: "btnOK2"
-					"text": "2"
-					"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/leddarkgreen.png" )
-					"font": new java.awt.Font( "Arial", 1, 16 )
-					"selectedIcon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/ledgreen.png" )
-				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-					"gridY": 2
-					"gridX": 6
 					"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 				} )
 			} )

@@ -238,6 +238,7 @@ public class Symbol {
      */
     public HashMap<String, BigDecimal> getHourStats(LocalDate day, ContractsParameterSet contractsParameterSet) {
 
+        if (start == null || end == null) return null;
         if (calc == PVALUE) return null;
 
         HashMap<String, BigDecimal> mapHours = new HashMap<String, BigDecimal>();
@@ -246,14 +247,6 @@ public class Symbol {
         mapHours.put(NIGHTHOURS1, BigDecimal.ZERO);
         mapHours.put(NIGHTHOURS2, BigDecimal.ZERO);
         mapHours.put(BREAKTIME, getBreak());
-
-        if (calc == XWERT) {
-            mapHours.put(DAYHOURS1, BigDecimal.ZERO);
-        } else if (calc == KWERT) {
-            mapHours.put(DAYHOURS1, contractsParameterSet.getDayValue());
-        } else if (calc == UWERT) {
-            mapHours.put(DAYHOURS1, contractsParameterSet.getDayValue());
-        } else { // AWERT
 
             // determine the night hours according to the user's contract
             DateTime contractNightStart = day.toDateTime(contractsParameterSet.getNight().getFirst());
@@ -294,7 +287,7 @@ public class Symbol {
             }
 
             mapHours.put(BASEHOURS, SYSCalendar.getHoursAsDecimal(new Interval(getStart(day), getEnd(day))));
-        }
+//        }
         return mapHours;
     }
 

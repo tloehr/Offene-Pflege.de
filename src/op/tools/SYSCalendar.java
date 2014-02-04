@@ -1182,6 +1182,11 @@ public class SYSCalendar {
         if (input == null || input.equals("")) {
             throw new NumberFormatException("leere Eingabe");
         }
+
+        if (input.matches("\\d*")){
+            input += ":00";
+        }
+
         StringTokenizer st = new StringTokenizer(input, ":,.");
         if (st.countTokens() < 2 || st.countTokens() > 3) {
             throw new NumberFormatException("falsches Format");

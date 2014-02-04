@@ -4,6 +4,7 @@ import entity.Homes;
 import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.joda.time.LocalDate;
 
 import javax.swing.*;
 import java.awt.*;
@@ -65,10 +66,18 @@ public class RosterParameters {
     /**
      * Setzt eine ComboBox mit der Liste der Homes. Wenn möglich wird direkt die eigene Einrichtung (abhängig von der Standard-Station) eingestellt.
      *
-     * @param cmb
+     * @param cmb the combobox that should be filled
+     * @param date as not every symbol is meant for every day, you can restrict the date for which this combobox is used. if you handover a null value, no restrictions are applied.
      */
-    public void setComboBox(JComboBox cmb) {
-        Vector<Symbol> symbols = new Vector<Symbol>(symbolMap.values());
+    public void setComboBox(JComboBox cmb, LocalDate date) {
+        Vector<Symbol> symbols = new Vector<Symbol>();
+
+        for (Symbol symbol : symbolMap.values()){
+            if (date == null || symbol.isAllowed(date)){
+                symbols.add(symbol);
+            }
+        }
+
         symbols.add(0, null);
         cmb.setModel(new DefaultComboBoxModel(symbols));
 
@@ -102,7 +111,7 @@ public class RosterParameters {
         String s = getSymbol(sym).getKey().toUpperCase();
 
         if (home != null) {
-            s += ", " + SYSTools.left(home.getShortname(), 4);
+            s += ", " + SYSTools.left(home.getShortname(), 2, ".");
         }
 
         return s;
