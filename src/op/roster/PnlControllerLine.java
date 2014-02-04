@@ -55,6 +55,7 @@ public class PnlControllerLine extends JPanel {
     ArrayList<Timeclock> listTimeClocks;
     SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yy");
     private BigDecimal sumHours;
+    private boolean ignoreLEDEvent, selRed, selYellow, selGreen;
 
     public PnlControllerLine(Rplan rplan, RosterParameters rosterParameters, ContractsParameterSet contractsParameterSet) {
         this.rplan = rplan;
@@ -95,22 +96,32 @@ public class PnlControllerLine extends JPanel {
             cmbHome.setSelectedItem(rplan.getEffectiveHome());
         }
 
-        btnOK1.setSelected(rplan.getCtrl1() != null);
-        btnOK2.setSelected(rplan.getCtrl2() != null);
-        btnOK1.setEnabled(!rplan.getWLogDetails().isEmpty() && !btnOK2.isSelected() && (OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, PnlUsersWorklog.internalClassID) || OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlUsersWorklog.internalClassID)));
-        btnOK2.setEnabled(!rplan.getWLogDetails().isEmpty() && btnOK1.isSelected() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlUsersWorklog.internalClassID));
+        btnRed.setSelected(rplan.getCtrl1() == null && rplan.getCtrl2() == null);
+        btnYellow.setSelected(rplan.getCtrl1() != null);
+        btnGreen.setSelected(rplan.getCtrl2() != null);
 
-        btnOK1.addItemListener(new ItemListener() {
+//        btnOK1.setEnabled(!rplan.getWLogDetails().isEmpty() && !btnOK2.isSelected() && (OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, PnlUsersWorklog.internalClassID) || OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlUsersWorklog.internalClassID)));
+//        btnOK2.setEnabled(!rplan.getWLogDetails().isEmpty() && btnOK1.isSelected() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlUsersWorklog.internalClassID));
+
+        btnRed.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                btnOK1ItemStateChanged(e);
+                btnRedItemStateChanged(e);
             }
         });
 
-        btnOK2.addItemListener(new ItemListener() {
+
+        btnYellow.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                btnOK2ItemStateChanged(e);
+                btnYellowItemStateChanged(e);
+            }
+        });
+
+        btnGreen.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                btnGreenItemStateChanged(e);
             }
         });
 
@@ -165,7 +176,19 @@ public class PnlControllerLine extends JPanel {
     }
 
 
-    private void btnOK2ItemStateChanged(ItemEvent e) {
+    private void btnGreenItemStateChanged(ItemEvent e) {
+        if (ignoreLEDEvent) return;
+        if (e.getStateChange() != ItemEvent.SELECTED) return;
+        if (rplan.getWLogDetails().isEmpty()) {
+            // OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.noaccess"));
+            resetLED();
+            return;
+        }
+        if (!OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlUsersWorklog.internalClassID)) {
+            // OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.noaccess"));
+            resetLED();
+            return;
+        }
 
         EntityManager em = OPDE.createEM();
         try {
@@ -174,6 +197,9 @@ public class PnlControllerLine extends JPanel {
             em.lock(myRplan, LockModeType.OPTIMISTIC);
             em.lock(myRplan.getRoster(), LockModeType.OPTIMISTIC);
 
+            if (myRplan.getCtrl1() == null) {
+                myRplan.setCtrl1(em.merge(OPDE.getLogin().getUser()));
+            }
             myRplan.setCtrl2(em.merge(OPDE.getLogin().getUser()));
 
             em.getTransaction().commit();
@@ -194,11 +220,61 @@ public class PnlControllerLine extends JPanel {
             em.close();
         }
 
-        btnOK1.setEnabled(e.getStateChange() != ItemEvent.SELECTED);
-        btnOK2.setForeground(e.getStateChange() == ItemEvent.SELECTED ? Color.BLACK : new Color(153, 255, 153));
+        selRed = false;
+        selYellow = false;
+        selGreen = true;
+
+//        btnOK1.setEnabled(e.getStateChange() != ItemEvent.SELECTED);
+
     }
 
-    private void btnOK1ItemStateChanged(ItemEvent e) {
+    private void btnRedItemStateChanged(ItemEvent e) {
+        if (e.getStateChange() != ItemEvent.SELECTED) return;
+        if (btnGreen.isSelected() && !OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlUsersWorklog.internalClassID))
+            return; // only a manager may take back the green light
+        if (!OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, PnlUsersWorklog.internalClassID) || !OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlUsersWorklog.internalClassID))
+            return;
+
+
+        EntityManager em = OPDE.createEM();
+        try {
+            em.getTransaction().begin();
+            Rplan myRplan = em.merge(rplan);
+            em.lock(myRplan, LockModeType.OPTIMISTIC);
+            em.lock(myRplan.getRoster(), LockModeType.OPTIMISTIC);
+
+            myRplan.setCtrl1(null);
+            myRplan.setCtrl2(null);
+
+            em.getTransaction().commit();
+            rplan = myRplan;
+
+        } catch (OptimisticLockException ole) {
+            OPDE.error(ole);
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+        } catch (Exception ex) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            OPDE.fatal(ex);
+        } finally {
+            em.close();
+        }
+        selRed = true;
+        selYellow = false;
+        selGreen = false;
+    }
+
+    private void btnYellowItemStateChanged(ItemEvent e) {
+        if (e.getStateChange() != ItemEvent.SELECTED) return;
+        if (rplan.getWLogDetails().isEmpty()) return; // only if there are details to apply
+        if (btnGreen.isSelected() && !OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlUsersWorklog.internalClassID))
+            return; // only a manager may take back the green light
+        if (!OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, PnlUsersWorklog.internalClassID) || !OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlUsersWorklog.internalClassID))
+            return;
 
         EntityManager em = OPDE.createEM();
         try {
@@ -208,6 +284,7 @@ public class PnlControllerLine extends JPanel {
             em.lock(myRplan.getRoster(), LockModeType.OPTIMISTIC);
 
             myRplan.setCtrl1(em.merge(OPDE.getLogin().getUser()));
+            myRplan.setCtrl2(null);
 
             em.getTransaction().commit();
             rplan = myRplan;
@@ -227,8 +304,11 @@ public class PnlControllerLine extends JPanel {
             em.close();
         }
 
-        btnOK2.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
-        btnOK1.setForeground(e.getStateChange() == ItemEvent.SELECTED ? Color.BLACK : new Color(255, 255, 153));
+//        btnOK2.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+
+        selRed = false;
+        selYellow = true;
+        selGreen = false;
 
         btnProcess.setEnabled(e.getStateChange() != ItemEvent.SELECTED);
         btnAdditional.setEnabled(e.getStateChange() != ItemEvent.SELECTED);
@@ -284,7 +364,7 @@ public class PnlControllerLine extends JPanel {
                         rplan = myRplan;
 
                         updateList();
-                        btnOK1.setEnabled(true);
+//                        btnOK1.setEnabled(true);
 
                     } catch (OptimisticLockException ole) {
                         OPDE.error(ole);
@@ -327,7 +407,7 @@ public class PnlControllerLine extends JPanel {
                 cmbSymbol.setSelectedItem(rosterParameters.getSymbol(rplan.getActual()));
 
                 updateList();
-                btnOK1.setEnabled(true);
+//                btnOK1.setEnabled(true);
 
             } catch (OptimisticLockException ole) {
                 OPDE.error(ole);
@@ -360,7 +440,7 @@ public class PnlControllerLine extends JPanel {
         pnlButton.add(GUITools.getTinyButton(SYSConst.icon22delete, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (btnOK1.isSelected()) {
+                if (!btnRed.isSelected()) {
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.roster.controllerview.alreadyLocked"));
                     return;
                 }
@@ -431,7 +511,7 @@ public class PnlControllerLine extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                if (btnOK1.isSelected()) {
+                if (!btnRed.isSelected()) {
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.roster.controllerview.alreadyLocked"));
                     return;
                 }
@@ -562,7 +642,7 @@ public class PnlControllerLine extends JPanel {
                     rplan = myRplan;
 
                     updateList();
-                    btnOK1.setEnabled(true);
+//                    btnOK1.setEnabled(true);
 
                 } catch (OptimisticLockException ole) {
                     OPDE.error(ole);
@@ -589,6 +669,15 @@ public class PnlControllerLine extends JPanel {
         GUITools.showPopup(popupAdd, SwingConstants.NORTH_EAST);
     }
 
+    void resetLED() {
+        ignoreLEDEvent = true;
+        btnRed.setSelected(selRed);
+
+        btnYellow.setSelected(selYellow);
+        btnGreen.setSelected(selGreen);
+        ignoreLEDEvent = false;
+    }
+
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -598,9 +687,11 @@ public class PnlControllerLine extends JPanel {
         cmbSymbol = new JComboBox();
         panel2 = new JPanel();
         btnProcess = new JButton();
-        btnOK1 = new JToggleButton();
         btnAdditional = new JButton();
-        btnOK2 = new JToggleButton();
+        panel3 = new JPanel();
+        btnRed = new JToggleButton();
+        btnYellow = new JToggleButton();
+        btnGreen = new JToggleButton();
         scrl2 = new JScrollPane();
         pnlList = new JPanel();
         scrollPane1 = new JScrollPane();
@@ -615,7 +706,7 @@ public class PnlControllerLine extends JPanel {
             panel1.setBorder(LineBorder.createGrayLineBorder());
             panel1.setLayout(new FormLayout(
                     "60dlu, 2*(60dlu:grow), 25dlu, 2*(100dlu)",
-                    "2*(default)"));
+                    "fill:default, default"));
 
             //---- lblDate ----
             lblDate.setText("03.06.14");
@@ -632,7 +723,9 @@ public class PnlControllerLine extends JPanel {
 
             //======== panel2 ========
             {
-                panel2.setLayout(new GridLayout(2, 2));
+                panel2.setLayout(new FormLayout(
+                        "2*(default:grow)",
+                        "2*(fill:default:grow)"));
 
                 //---- btnProcess ----
                 btnProcess.setText(null);
@@ -648,20 +741,7 @@ public class PnlControllerLine extends JPanel {
                         btnProcessActionPerformed(e);
                     }
                 });
-                panel2.add(btnProcess);
-
-                //---- btnOK1 ----
-                btnOK1.setText("1");
-                btnOK1.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/leddarkyellow.png")));
-                btnOK1.setFont(new Font("Arial", Font.BOLD, 16));
-                btnOK1.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/ledyellow.png")));
-                btnOK1.setContentAreaFilled(false);
-                btnOK1.setBorderPainted(false);
-                btnOK1.setBorder(null);
-                btnOK1.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnOK1.setHorizontalTextPosition(SwingConstants.CENTER);
-                btnOK1.setForeground(new Color(255, 255, 153));
-                panel2.add(btnOK1);
+                panel2.add(btnProcess, CC.xy(1, 1));
 
                 //---- btnAdditional ----
                 btnAdditional.setText(null);
@@ -677,22 +757,54 @@ public class PnlControllerLine extends JPanel {
                         btnAdditionalActionPerformed(e);
                     }
                 });
-                panel2.add(btnAdditional);
+                panel2.add(btnAdditional, CC.xy(1, 2));
 
-                //---- btnOK2 ----
-                btnOK2.setText("2");
-                btnOK2.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/leddarkgreen.png")));
-                btnOK2.setFont(new Font("Arial", Font.BOLD, 16));
-                btnOK2.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/ledgreen.png")));
-                btnOK2.setContentAreaFilled(false);
-                btnOK2.setBorderPainted(false);
-                btnOK2.setBorder(null);
-                btnOK2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnOK2.setForeground(new Color(153, 255, 153));
-                btnOK2.setHorizontalTextPosition(SwingConstants.CENTER);
-                panel2.add(btnOK2);
+                //======== panel3 ========
+                {
+                    panel3.setLayout(new BoxLayout(panel3, BoxLayout.PAGE_AXIS));
+
+                    //---- btnRed ----
+                    btnRed.setText(null);
+                    btnRed.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/leddarkred.png")));
+                    btnRed.setFont(new Font("Arial", Font.BOLD, 16));
+                    btnRed.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/ledred.png")));
+                    btnRed.setContentAreaFilled(false);
+                    btnRed.setBorderPainted(false);
+                    btnRed.setBorder(null);
+                    btnRed.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    btnRed.setHorizontalTextPosition(SwingConstants.CENTER);
+                    btnRed.setForeground(Color.black);
+                    panel3.add(btnRed);
+
+                    //---- btnYellow ----
+                    btnYellow.setText(null);
+                    btnYellow.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/leddarkyellow.png")));
+                    btnYellow.setFont(new Font("Arial", Font.BOLD, 16));
+                    btnYellow.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/ledyellow.png")));
+                    btnYellow.setContentAreaFilled(false);
+                    btnYellow.setBorderPainted(false);
+                    btnYellow.setBorder(null);
+                    btnYellow.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    btnYellow.setHorizontalTextPosition(SwingConstants.CENTER);
+                    btnYellow.setForeground(new Color(255, 255, 153));
+                    panel3.add(btnYellow);
+
+                    //---- btnGreen ----
+                    btnGreen.setText(null);
+                    btnGreen.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/leddarkgreen.png")));
+                    btnGreen.setFont(new Font("Arial", Font.BOLD, 16));
+                    btnGreen.setSelectedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/ledgreen.png")));
+                    btnGreen.setContentAreaFilled(false);
+                    btnGreen.setBorderPainted(false);
+                    btnGreen.setBorder(null);
+                    btnGreen.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    btnGreen.setForeground(new Color(153, 255, 153));
+                    btnGreen.setHorizontalTextPosition(SwingConstants.CENTER);
+                    panel3.add(btnGreen);
+                }
+                panel2.add(panel3, CC.xywh(2, 1, 1, 2));
             }
-            panel1.add(panel2, CC.xywh(4, 1, 1, 2));
+            panel1.add(panel2, CC.xywh(4, 1, 1, 2, CC.DEFAULT, CC.TOP));
 
             //======== scrl2 ========
             {
@@ -718,6 +830,12 @@ public class PnlControllerLine extends JPanel {
             panel1.add(cmbHome, CC.xy(3, 2, CC.DEFAULT, CC.FILL));
         }
         add(panel1);
+
+        //---- buttonGroup1 ----
+        ButtonGroup buttonGroup1 = new ButtonGroup();
+        buttonGroup1.add(btnRed);
+        buttonGroup1.add(btnYellow);
+        buttonGroup1.add(btnGreen);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
@@ -728,9 +846,11 @@ public class PnlControllerLine extends JPanel {
     private JComboBox cmbSymbol;
     private JPanel panel2;
     private JButton btnProcess;
-    private JToggleButton btnOK1;
     private JButton btnAdditional;
-    private JToggleButton btnOK2;
+    private JPanel panel3;
+    private JToggleButton btnRed;
+    private JToggleButton btnYellow;
+    private JToggleButton btnGreen;
     private JScrollPane scrl2;
     private JPanel pnlList;
     private JScrollPane scrollPane1;
