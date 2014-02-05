@@ -55,7 +55,7 @@ public class PnlControllerLine extends JPanel {
     ArrayList<Timeclock> listTimeClocks;
     SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yy");
     private BigDecimal sumHours;
-    private boolean ignoreLEDEvent, selRed, selYellow, selGreen;
+    private boolean ignoreLEDEvent, selGreen, selYellow, selRed;
 
     public PnlControllerLine(Rplan rplan, RosterParameters rosterParameters, ContractsParameterSet contractsParameterSet) {
         this.rplan = rplan;
@@ -96,20 +96,21 @@ public class PnlControllerLine extends JPanel {
             cmbHome.setSelectedItem(rplan.getEffectiveHome());
         }
 
-        btnRed.setSelected(rplan.getCtrl1() == null && rplan.getCtrl2() == null);
-        btnYellow.setSelected(rplan.getCtrl1() != null);
-        btnGreen.setSelected(rplan.getCtrl2() != null);
+        cmbSymbol.setEnabled(!rplan.isLocked());
+        cmbHome.setEnabled(!rplan.isLocked());
 
-//        btnOK1.setEnabled(!rplan.getWLogDetails().isEmpty() && !btnOK2.isSelected() && (OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, PnlUsersWorklog.internalClassID) || OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlUsersWorklog.internalClassID)));
-//        btnOK2.setEnabled(!rplan.getWLogDetails().isEmpty() && btnOK1.isSelected() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlUsersWorklog.internalClassID));
+
+        selGreen = rplan.getCtrl1() == null && rplan.getCtrl2() == null;
+        selYellow = rplan.getCtrl1() != null;
+        selRed = rplan.getCtrl2() != null;
+        resetLED();
 
         btnRed.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                btnRedItemStateChanged(e);
+                btnGreenItemStateChanged(e);
             }
         });
-
 
         btnYellow.addItemListener(new ItemListener() {
             @Override
@@ -121,7 +122,7 @@ public class PnlControllerLine extends JPanel {
         btnGreen.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                btnGreenItemStateChanged(e);
+                btnRedItemStateChanged(e);
             }
         });
 
@@ -136,7 +137,7 @@ public class PnlControllerLine extends JPanel {
          */
 
         pnlList.setBackground(Color.WHITE);
-        pnlList.setOpaque(false);
+        pnlList.setOpaque(true);
         updateList();
 
         /***
@@ -147,7 +148,8 @@ public class PnlControllerLine extends JPanel {
          *       |_| |_|_| |_| |_|\___|\____|_|\___/ \___|_|\_\
          *
          */
-
+        pnlTimeClock.setBackground(Color.WHITE);
+        pnlTimeClock.setOpaque(true);
         if (refDate.compareTo(new LocalDate()) <= 0 && !listTimeClocks.isEmpty()) {
 
             pnlTimeClock.setLayout(new GridLayout(0, 2));
@@ -176,7 +178,7 @@ public class PnlControllerLine extends JPanel {
     }
 
 
-    private void btnGreenItemStateChanged(ItemEvent e) {
+    private void btnRedItemStateChanged(ItemEvent e) {
         if (ignoreLEDEvent) return;
         if (e.getStateChange() != ItemEvent.SELECTED) return;
         if (rplan.getWLogDetails().isEmpty()) {
@@ -220,20 +222,31 @@ public class PnlControllerLine extends JPanel {
             em.close();
         }
 
-        selRed = false;
+        selGreen = false;
         selYellow = false;
-        selGreen = true;
+        selRed = true;
 
-//        btnOK1.setEnabled(e.getStateChange() != ItemEvent.SELECTED);
-
+        cmbSymbol.setEnabled(!rplan.isLocked());
+        cmbHome.setEnabled(!rplan.isLocked());
     }
 
-    private void btnRedItemStateChanged(ItemEvent e) {
+    private void btnGreenItemStateChanged(ItemEvent e) {
         if (e.getStateChange() != ItemEvent.SELECTED) return;
-        if (btnGreen.isSelected() && !OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlUsersWorklog.internalClassID))
-            return; // only a manager may take back the green light
-        if (!OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, PnlUsersWorklog.internalClassID) || !OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlUsersWorklog.internalClassID))
+
+        if (rplan.getWLogDetails().isEmpty()) {
+            resetLED();
             return;
+        } // only if there are details to apply
+
+        if (btnGreen.isSelected() && !OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlUsersWorklog.internalClassID)) {
+            resetLED();
+            return; // only a manager may take back the green light
+        }
+
+        if (!OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, PnlUsersWorklog.internalClassID) || !OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlUsersWorklog.internalClassID)) {
+            resetLED();
+            return;
+        }
 
 
         EntityManager em = OPDE.createEM();
@@ -263,18 +276,29 @@ public class PnlControllerLine extends JPanel {
         } finally {
             em.close();
         }
-        selRed = true;
+        selGreen = true;
         selYellow = false;
-        selGreen = false;
+        selRed = false;
+
+        cmbSymbol.setEnabled(!rplan.isLocked());
+        cmbHome.setEnabled(!rplan.isLocked());
     }
 
     private void btnYellowItemStateChanged(ItemEvent e) {
         if (e.getStateChange() != ItemEvent.SELECTED) return;
-        if (rplan.getWLogDetails().isEmpty()) return; // only if there are details to apply
-        if (btnGreen.isSelected() && !OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlUsersWorklog.internalClassID))
-            return; // only a manager may take back the green light
-        if (!OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, PnlUsersWorklog.internalClassID) || !OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlUsersWorklog.internalClassID))
+        if (rplan.getWLogDetails().isEmpty()) {
+            resetLED();
             return;
+        } // only if there are details to apply
+        if (btnGreen.isSelected() && !OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlUsersWorklog.internalClassID)) {
+            resetLED();
+            return; // only a manager may take back the green light
+        }
+
+        if (!OPDE.getAppInfo().isAllowedTo(InternalClassACL.USER1, PnlUsersWorklog.internalClassID) || !OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlUsersWorklog.internalClassID)) {
+            resetLED();
+            return;
+        }
 
         EntityManager em = OPDE.createEM();
         try {
@@ -306,16 +330,22 @@ public class PnlControllerLine extends JPanel {
 
 //        btnOK2.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
 
-        selRed = false;
-        selYellow = true;
         selGreen = false;
+        selYellow = true;
+        selRed = false;
 
-        btnProcess.setEnabled(e.getStateChange() != ItemEvent.SELECTED);
-        btnAdditional.setEnabled(e.getStateChange() != ItemEvent.SELECTED);
+        cmbSymbol.setEnabled(!rplan.isLocked());
+        cmbHome.setEnabled(!rplan.isLocked());
     }
 
 
     private void btnProcessActionPerformed(ActionEvent e) {
+
+        if (rplan.isLocked()) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.roster.controllerview.alreadyLocked"));
+            return;
+        }
+
         if (cmbSymbol.getSelectedItem() == null) {
             cmbSymbol.setSelectedItem(rosterParameters.getSymbol(rplan.getEffectiveSymbol()));
         }
@@ -440,7 +470,7 @@ public class PnlControllerLine extends JPanel {
         pnlButton.add(GUITools.getTinyButton(SYSConst.icon22delete, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (!btnRed.isSelected()) {
+                if (rplan.isLocked()) {
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.roster.controllerview.alreadyLocked"));
                     return;
                 }
@@ -511,7 +541,7 @@ public class PnlControllerLine extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                if (!btnRed.isSelected()) {
+                if (rplan.isLocked()) {
                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.roster.controllerview.alreadyLocked"));
                     return;
                 }
@@ -601,7 +631,8 @@ public class PnlControllerLine extends JPanel {
         }
 
         JLabel sumLabel = new JLabel(SYSTools.toHTMLForScreen(SYSConst.html_bold("Summe: " + SYSTools.roundScale2(sumHours))));
-        sumLabel.setOpaque(false);
+//        sumLabel.setOpaque(false);
+        sumLabel.setBackground(Color.white);
         pnlList.add(sumLabel);
 
         scrl2.validate();
@@ -609,6 +640,12 @@ public class PnlControllerLine extends JPanel {
     }
 
     private void btnAdditionalActionPerformed(ActionEvent e) {
+
+        if (rplan.isLocked()) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.roster.controllerview.alreadyLocked"));
+            return;
+        }
+
         final JidePopup popupAdd = new JidePopup();
         popupAdd.setMovable(false);
         PnlAdditional pnlAdd = new PnlAdditional(refDate, new Closure() {
@@ -671,10 +708,10 @@ public class PnlControllerLine extends JPanel {
 
     void resetLED() {
         ignoreLEDEvent = true;
-        btnRed.setSelected(selRed);
+        btnRed.setSelected(selGreen);
 
         btnYellow.setSelected(selYellow);
-        btnGreen.setSelected(selGreen);
+        btnGreen.setSelected(selRed);
         ignoreLEDEvent = false;
     }
 
@@ -772,8 +809,8 @@ public class PnlControllerLine extends JPanel {
                     btnRed.setBorderPainted(false);
                     btnRed.setBorder(null);
                     btnRed.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    btnRed.setForeground(new Color(153, 255, 153));
                     btnRed.setHorizontalTextPosition(SwingConstants.CENTER);
-                    btnRed.setForeground(Color.black);
                     panel3.add(btnRed);
 
                     //---- btnYellow ----
@@ -798,8 +835,8 @@ public class PnlControllerLine extends JPanel {
                     btnGreen.setBorderPainted(false);
                     btnGreen.setBorder(null);
                     btnGreen.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    btnGreen.setForeground(new Color(153, 255, 153));
                     btnGreen.setHorizontalTextPosition(SwingConstants.CENTER);
+                    btnGreen.setForeground(Color.black);
                     panel3.add(btnGreen);
                 }
                 panel2.add(panel3, CC.xywh(2, 1, 1, 2));

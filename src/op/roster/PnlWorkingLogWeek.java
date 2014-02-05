@@ -8,8 +8,10 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import entity.roster.*;
 import entity.system.Users;
+import entity.system.UsersTools;
 import op.OPDE;
 import op.tools.SYSCalendar;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.lang3.StringUtils;
@@ -82,7 +84,26 @@ public class PnlWorkingLogWeek extends JPanel {
 
 //        int posy = -1;
 //        int posx = 1;
+
+        LocalDate month = new LocalDate(rosterParameters..getMonth());
+        LocalDate start = SYSCalendar.max(SYSCalendar.bow(week), SYSCalendar.bom(month));
+                LocalDate end = SYSCalendar.min(SYSCalendar.eow(week), SYSCalendar.eom(month));
+
+
+                String title = "<html><font size=+1><b>" +
+                        start.toString("dd.MM.yy") + " - " + end.toString("dd.MM.yy") +
+                        " (" +
+                        OPDE.lang.getString("misc.msg.weekinyear") +
+                        start.getWeekOfWeekyear() +
+                        ")" +
+                        "</b>" +
+                        "</font></html>";
+
         pnlWeek.add(new PnlControllerHeader());
+
+        JPanel pnlHeader = new JPanel();
+        pnlHeader.add(new JLabel(user.getFullname() + " " + ));
+        pnlHeader.setBackground(SYSConst.bluegrey);
         for (int day = 0; day < 7; day++) {
             final LocalDate date = week.plusDays(day);
 //            posy += 2;

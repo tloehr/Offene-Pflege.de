@@ -273,7 +273,7 @@ public class Rplan implements Comparable<Rplan> {
     }
 
     public boolean isLocked() {
-        return creator != null || roster.isLocked() || roster.isClosed();
+        return ctrl1 != null || ctrl2 != null || roster.isLocked() || roster.isClosed();
     }
 
     public Users getCtrl1() {

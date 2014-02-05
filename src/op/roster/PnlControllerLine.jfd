@@ -78,21 +78,21 @@ new FormModel {
 							name: "btnRed"
 							"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
 							"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/leddarkred.png" )
-							"font": &Font0 new java.awt.Font( "Arial", 1, 16 )
+							"font": new java.awt.Font( "Arial", 1, 16 )
 							"selectedIcon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/ledred.png" )
 							"contentAreaFilled": false
 							"borderPainted": false
 							"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
 							"cursor": #Cursor0
+							"foreground": new java.awt.Color( 153, 255, 153, 255 )
 							"horizontalTextPosition": 0
-							"foreground": new java.awt.Color( 0, 0, 0, 255 )
 							"$buttonGroup": new FormReference( "buttonGroup1" )
 						} )
 						add( new FormComponent( "javax.swing.JToggleButton" ) {
 							name: "btnYellow"
 							"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
 							"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/leddarkyellow.png" )
-							"font": #Font0
+							"font": &Font0 new java.awt.Font( "Arial", 1, 16 )
 							"selectedIcon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/ledyellow.png" )
 							"contentAreaFilled": false
 							"borderPainted": false
@@ -106,14 +106,14 @@ new FormModel {
 							name: "btnGreen"
 							"text": sfield com.jformdesigner.model.FormObject NULL_VALUE
 							"icon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/leddarkgreen.png" )
-							"font": new java.awt.Font( "Arial", 1, 16 )
+							"font": #Font0
 							"selectedIcon": new com.jformdesigner.model.SwingIcon( 0, "/artwork/22x22/ledgreen.png" )
 							"contentAreaFilled": false
 							"borderPainted": false
 							"border": sfield com.jformdesigner.model.FormObject NULL_VALUE
 							"cursor": #Cursor0
-							"foreground": new java.awt.Color( 153, 255, 153, 255 )
 							"horizontalTextPosition": 0
+							"foreground": new java.awt.Color( 0, 0, 0, 255 )
 							"$buttonGroup": new FormReference( "buttonGroup1" )
 						} )
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
