@@ -742,8 +742,8 @@ public class PnlControllerLine extends JPanel {
         {
             panel1.setBorder(LineBorder.createGrayLineBorder());
             panel1.setLayout(new FormLayout(
-                    "60dlu, 2*(60dlu:grow), 25dlu, 2*(100dlu)",
-                    "fill:default, default"));
+                "60dlu, 2*(60dlu:grow), 25dlu, 2*(100dlu)",
+                "fill:default, default"));
 
             //---- lblDate ----
             lblDate.setText("03.06.14");
@@ -761,8 +761,8 @@ public class PnlControllerLine extends JPanel {
             //======== panel2 ========
             {
                 panel2.setLayout(new FormLayout(
-                        "2*(default:grow)",
-                        "2*(fill:default:grow)"));
+                    "2*(default:grow)",
+                    "2*(fill:default:grow)"));
 
                 //---- btnProcess ----
                 btnProcess.setText(null);
