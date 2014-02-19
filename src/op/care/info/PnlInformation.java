@@ -629,7 +629,7 @@ public class PnlInformation extends NursingRecordsPanel {
 
         final CollapsiblePane cpInfo = mapKey2CP.get(keyResInfo);
 
-        final boolean btnMenuEnabled = resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_ABSENCE && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY;
+        final boolean normalInfoType = resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_ABSENCE && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY;
 
         String title = "";
 
@@ -875,7 +875,7 @@ public class PnlInformation extends NursingRecordsPanel {
             }
         });
         cptitle.getRight().add(btnPrint);
-        btnPrint.setEnabled(btnMenuEnabled);
+        btnPrint.setEnabled(normalInfoType);
 
         // forward declaration
         final JButton btnEdit = new JButton(SYSConst.icon22edit3);
@@ -917,7 +917,7 @@ public class PnlInformation extends NursingRecordsPanel {
                     @Override
                     public void execute(final Object o) {
                         btnPrint.setEnabled(true);
-                        btnMenu.setEnabled(btnMenuEnabled);
+                        btnMenu.setEnabled(normalInfoType);
                         mapInfo2Editor.get(resInfo).setEnabled(false, PnlEditResInfo.CHANGE);
                         btnChange.setEnabled(wasChangeable);
                         btnEdit.setEnabled(wasEditable);
@@ -999,6 +999,7 @@ public class PnlInformation extends NursingRecordsPanel {
         btnChange.setEnabled(
                 resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_DIAGNOSIS
                         && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_STAY
+                        && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_ABSENCE
                         && !resInfo.getResInfoType().isObsolete()
                         && !resInfo.isClosed()
                         && !resInfo.isSingleIncident()
@@ -1045,7 +1046,7 @@ public class PnlInformation extends NursingRecordsPanel {
                     @Override
                     public void execute(final Object o) {
                         btnPrint.setEnabled(true);
-                        btnMenu.setEnabled(btnMenuEnabled);
+                        btnMenu.setEnabled(normalInfoType);
                         mapInfo2Editor.get(resInfo).setEnabled(false, PnlEditResInfo.EDIT);
                         btnChange.setEnabled(wasChangeable);
                         btnEdit.setEnabled(wasEditable);
@@ -1162,7 +1163,7 @@ public class PnlInformation extends NursingRecordsPanel {
             }
         });
         cptitle.getRight().add(btnMenu);
-        btnMenu.setEnabled(btnMenuEnabled);
+//        btnMenu.setEnabled(normalInfoType);
 
 
         CollapsiblePaneAdapter adapter = new CollapsiblePaneAdapter() {
@@ -1691,168 +1692,169 @@ public class PnlInformation extends NursingRecordsPanel {
                     pnlMenu.add(new JSeparator());
                 }
             }
-            if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
-                /***
-                 *      _     _         _____ _ _
-                 *     | |__ | |_ _ __ |  ___(_) | ___  ___
-                 *     | '_ \| __| '_ \| |_  | | |/ _ \/ __|
-                 *     | |_) | |_| | | |  _| | | |  __/\__ \
-                 *     |_.__/ \__|_| |_|_|   |_|_|\___||___/
-                 *
-                 */
-                final JButton btnFiles = GUITools.createHyperlinkButton(resInfo.isClosed() ? "misc.btnfiles.tooltip.closed" : "misc.btnfiles.tooltip", SYSConst.icon22attach, null);
-                btnFiles.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                btnFiles.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
-                        // If the closure is null, only attached files can be viewed but no new ones can be attached.
-                        Closure closure = null;
-                        if (!resInfo.isClosed() && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD) {
-                            closure = new Closure() {
-                                @Override
-                                public void execute(Object o) {
-                                    EntityManager em = OPDE.createEM();
-                                    final ResInfo editinfo = em.find(ResInfo.class, resInfo.getID());
-                                    em.close();
-
-                                    synchronized (mapType2ResInfos) {
-                                        int oldIndex = mapType2ResInfos.get(resInfo.getResInfoType()).indexOf(resInfo);
-                                        mapType2ResInfos.get(resInfo.getResInfoType()).remove(resInfo);
-                                        mapType2ResInfos.get(editinfo.getResInfoType()).add(oldIndex, editinfo);
-                                    }
-                                    synchronized (listAllInfos) {
-                                        listAllInfos.remove(resInfo);
-                                        listAllInfos.add(editinfo);
-                                    }
-                                    synchronized (mapKey2CP) {
-                                        mapKey2CP.remove(keyResInfo);
-                                    }
-                                    sortData();
-                                    reloadDisplay();
-                                }
-                            };
-                        }
-                        new DlgFiles(resInfo, closure);
-                    }
-                });
-                btnFiles.setEnabled(OPDE.isFTPworking());
-                pnlMenu.add(btnFiles);
-
-
-                /***
-                 *      _     _         ____
-                 *     | |__ | |_ _ __ |  _ \ _ __ ___   ___ ___  ___ ___
-                 *     | '_ \| __| '_ \| |_) | '__/ _ \ / __/ _ \/ __/ __|
-                 *     | |_) | |_| | | |  __/| | | (_) | (_|  __/\__ \__ \
-                 *     |_.__/ \__|_| |_|_|   |_|  \___/ \___\___||___/___/
-                 *
-                 */
-                final JButton btnProcess = GUITools.createHyperlinkButton("misc.btnprocess.tooltip", SYSConst.icon22link, null);
-                btnProcess.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                btnProcess.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
-                        new DlgProcessAssign(resInfo, new Closure() {
+        }
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
+            /***
+             *      _     _         _____ _ _
+             *     | |__ | |_ _ __ |  ___(_) | ___  ___
+             *     | '_ \| __| '_ \| |_  | | |/ _ \/ __|
+             *     | |_) | |_| | | |  _| | | |  __/\__ \
+             *     |_.__/ \__|_| |_|_|   |_|_|\___||___/
+             *
+             */
+            final JButton btnFiles = GUITools.createHyperlinkButton(resInfo.isClosed() ? "misc.btnfiles.tooltip.closed" : "misc.btnfiles.tooltip", SYSConst.icon22attach, null);
+            btnFiles.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnFiles.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    // If the closure is null, only attached files can be viewed but no new ones can be attached.
+                    Closure closure = null;
+                    if (!resInfo.isClosed() && resInfo.getResInfoType().getType() != ResInfoTypeTools.TYPE_OLD) {
+                        closure = new Closure() {
                             @Override
                             public void execute(Object o) {
-                                if (o == null) {
-                                    return;
-                                }
-                                Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = (Pair<ArrayList<QProcess>, ArrayList<QProcess>>) o;
-
-                                ArrayList<QProcess> assigned = result.getFirst();
-                                ArrayList<QProcess> unassigned = result.getSecond();
-
                                 EntityManager em = OPDE.createEM();
+                                final ResInfo editinfo = em.find(ResInfo.class, resInfo.getID());
+                                em.close();
 
-                                try {
-                                    em.getTransaction().begin();
+                                synchronized (mapType2ResInfos) {
+                                    int oldIndex = mapType2ResInfos.get(resInfo.getResInfoType()).indexOf(resInfo);
+                                    mapType2ResInfos.get(resInfo.getResInfoType()).remove(resInfo);
+                                    mapType2ResInfos.get(editinfo.getResInfoType()).add(oldIndex, editinfo);
+                                }
+                                synchronized (listAllInfos) {
+                                    listAllInfos.remove(resInfo);
+                                    listAllInfos.add(editinfo);
+                                }
+                                synchronized (mapKey2CP) {
+                                    mapKey2CP.remove(keyResInfo);
+                                }
+                                sortData();
+                                reloadDisplay();
+                            }
+                        };
+                    }
+                    new DlgFiles(resInfo, closure);
+                }
+            });
+            btnFiles.setEnabled(OPDE.isFTPworking());
+            pnlMenu.add(btnFiles);
 
-                                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                    final ResInfo myInfo = em.merge(resInfo);
-                                    em.lock(myInfo, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-                                    ArrayList<SYSINF2PROCESS> attached = new ArrayList<SYSINF2PROCESS>(myInfo.getAttachedQProcessConnections());
-                                    for (SYSINF2PROCESS linkObject : attached) {
-                                        if (unassigned.contains(linkObject.getQProcess())) {
-                                            linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
-                                            linkObject.getResInfo().getAttachedQProcessConnections().remove(linkObject);
-                                            em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myInfo.getTitle() + " ID: " + myInfo.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
-                                            em.remove(linkObject);
-                                        }
-                                    }
-                                    attached.clear();
+            /***
+             *      _     _         ____
+             *     | |__ | |_ _ __ |  _ \ _ __ ___   ___ ___  ___ ___
+             *     | '_ \| __| '_ \| |_) | '__/ _ \ / __/ _ \/ __/ __|
+             *     | |_) | |_| | | |  __/| | | (_) | (_|  __/\__ \__ \
+             *     |_.__/ \__|_| |_|_|   |_|  \___/ \___\___||___/___/
+             *
+             */
+            final JButton btnProcess = GUITools.createHyperlinkButton("misc.btnprocess.tooltip", SYSConst.icon22link, null);
+            btnProcess.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnProcess.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    new DlgProcessAssign(resInfo, new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            if (o == null) {
+                                return;
+                            }
+                            Pair<ArrayList<QProcess>, ArrayList<QProcess>> result = (Pair<ArrayList<QProcess>, ArrayList<QProcess>>) o;
 
-                                    for (QProcess qProcess : assigned) {
-                                        java.util.List<QProcessElement> listElements = qProcess.getElements();
-                                        if (!listElements.contains(myInfo)) {
-                                            QProcess myQProcess = em.merge(qProcess);
-                                            SYSINF2PROCESS myLinkObject = em.merge(new SYSINF2PROCESS(myQProcess, myInfo));
-                                            em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myInfo.getTitle() + " ID: " + myInfo.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
-                                            qProcess.getAttachedResInfoConnections().add(myLinkObject);
-                                            myInfo.getAttachedQProcessConnections().add(myLinkObject);
-                                        }
-                                    }
+                            ArrayList<QProcess> assigned = result.getFirst();
+                            ArrayList<QProcess> unassigned = result.getSecond();
 
-                                    em.getTransaction().commit();
+                            EntityManager em = OPDE.createEM();
 
-                                    synchronized (listAllInfos) {
-                                        listAllInfos.remove(resInfo);
-                                        listAllInfos.add(myInfo);
-                                    }
-                                    synchronized (mapKey2CP) {
-                                        mapKey2CP.remove(keyResInfo);
-                                    }
-                                    sortData();
-                                    reloadDisplay();
+                            try {
+                                em.getTransaction().begin();
 
-                                } catch (OptimisticLockException ole) {
-                                    OPDE.warn(ole);
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
+                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                final ResInfo myInfo = em.merge(resInfo);
+                                em.lock(myInfo, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
+                                ArrayList<SYSINF2PROCESS> attached = new ArrayList<SYSINF2PROCESS>(myInfo.getAttachedQProcessConnections());
+                                for (SYSINF2PROCESS linkObject : attached) {
+                                    if (unassigned.contains(linkObject.getQProcess())) {
+                                        linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
+                                        linkObject.getResInfo().getAttachedQProcessConnections().remove(linkObject);
+                                        em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myInfo.getTitle() + " ID: " + myInfo.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                        em.remove(linkObject);
                                     }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
+                                }
+                                attached.clear();
+
+                                for (QProcess qProcess : assigned) {
+                                    java.util.List<QProcessElement> listElements = qProcess.getElements();
+                                    if (!listElements.contains(myInfo)) {
+                                        QProcess myQProcess = em.merge(qProcess);
+                                        SYSINF2PROCESS myLinkObject = em.merge(new SYSINF2PROCESS(myQProcess, myInfo));
+                                        em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myInfo.getTitle() + " ID: " + myInfo.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
+                                        qProcess.getAttachedResInfoConnections().add(myLinkObject);
+                                        myInfo.getAttachedQProcessConnections().add(myLinkObject);
                                     }
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                } catch (RollbackException ole) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    }
-                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                                } catch (Exception e) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
                                 }
 
-                            }
-                        });
-                    }
-                });
-                btnProcess.setEnabled(ResInfoTools.isEditable(resInfo));
+                                em.getTransaction().commit();
 
-                if (!resInfo.getAttachedQProcessConnections().isEmpty()) {
-                    JLabel lblNum = new JLabel(Integer.toString(resInfo.getAttachedQProcessConnections().size()), SYSConst.icon16redStar, SwingConstants.CENTER);
-                    lblNum.setFont(SYSConst.ARIAL14BOLD);
-                    lblNum.setForeground(Color.YELLOW);
-                    lblNum.setHorizontalTextPosition(SwingConstants.CENTER);
-                    DefaultOverlayable overlayableBtn = new DefaultOverlayable(btnProcess, lblNum, DefaultOverlayable.SOUTH_EAST);
-                    overlayableBtn.setOpaque(false);
-                    pnlMenu.add(overlayableBtn);
-                } else {
-                    pnlMenu.add(btnProcess);
+                                synchronized (listAllInfos) {
+                                    listAllInfos.remove(resInfo);
+                                    listAllInfos.add(myInfo);
+                                }
+                                synchronized (mapKey2CP) {
+                                    mapKey2CP.remove(keyResInfo);
+                                }
+                                sortData();
+                                reloadDisplay();
+
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (RollbackException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+                            }
+
+                        }
+                    });
                 }
+            });
+            btnProcess.setEnabled(ResInfoTools.isEditable(resInfo));
+
+            if (!resInfo.getAttachedQProcessConnections().isEmpty()) {
+                JLabel lblNum = new JLabel(Integer.toString(resInfo.getAttachedQProcessConnections().size()), SYSConst.icon16redStar, SwingConstants.CENTER);
+                lblNum.setFont(SYSConst.ARIAL14BOLD);
+                lblNum.setForeground(Color.YELLOW);
+                lblNum.setHorizontalTextPosition(SwingConstants.CENTER);
+                DefaultOverlayable overlayableBtn = new DefaultOverlayable(btnProcess, lblNum, DefaultOverlayable.SOUTH_EAST);
+                overlayableBtn.setOpaque(false);
+                pnlMenu.add(overlayableBtn);
+            } else {
+                pnlMenu.add(btnProcess);
             }
         }
+
         return pnlMenu;
     }
 
