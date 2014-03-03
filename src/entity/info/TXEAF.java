@@ -1,11 +1,7 @@
 package entity.info;
 
 /**
- * Created with IntelliJ IDEA.
- * User: tloehr
- * Date: 15.06.13
- * Time: 12:27
- * To change this template use File | Settings | File Templates.
+ * This class contains the translation between the string constants and the keys of the specific places in the PDF template documents.
  */
 public class TXEAF {
     public static final String PAGE3_TX3_DATE = "Formular1[0].Patientenüberleitung-Seite3[0].Textfeld27[0]";

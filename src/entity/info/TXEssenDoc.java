@@ -25,7 +25,6 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -54,8 +53,8 @@ public class TXEssenDoc {
     private PdfContentByte over = null;
     private PdfWriter writer = null;
     //     = null;
-    ByteArrayOutputStream medListStream = null;
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+    ByteArrayOutputStream medListStream = null, icdListStream = null;
+    //    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
     boolean mre, psych = false;
     int progress, max;
 
@@ -314,8 +313,12 @@ public class TXEssenDoc {
         PdfReader reader1 = new PdfReader(new FileInputStream(file1));
         maxpages += reader1.getNumberOfPages();
 
-        PdfReader reader1a = medListStream == null ? null : new PdfReader(new ByteArrayInputStream(medListStream.toByteArray()));
-        maxpages += reader1a == null ? 0 : reader1a.getNumberOfPages();
+
+        PdfReader readerAdditionalMeds = medListStream == null ? null : new PdfReader(new ByteArrayInputStream(medListStream.toByteArray()));
+        maxpages += readerAdditionalMeds == null ? 0 : readerAdditionalMeds.getNumberOfPages();
+
+        PdfReader readerICD = icdListStream == null ? null : new PdfReader(new ByteArrayInputStream(icdListStream.toByteArray()));
+        maxpages += readerICD == null ? 0 : readerICD.getNumberOfPages();
 
         PdfReader readerMRE = filemre == null ? null : new PdfReader(new FileInputStream(filemre));
         maxpages += readerMRE == null ? 0 : readerMRE.getNumberOfPages();
@@ -340,10 +343,25 @@ public class TXEssenDoc {
             copy.addPage(page);
         }
 
-        if (reader1a != null) {
-            for (int p = 1; p <= reader1a.getNumberOfPages(); p++) {
+        if (readerAdditionalMeds != null) {
+            for (int p = 1; p <= readerAdditionalMeds.getNumberOfPages(); p++) {
                 runningPage++;
-                page = copy.getImportedPage(reader1a, p);
+                page = copy.getImportedPage(readerAdditionalMeds, p);
+                stamp = copy.createPageStamp(page);
+                String sidenote = String.format(OPDE.lang.getString("pdf.pagefooter"), runningPage, maxpages)
+                        + " // " + ResidentTools.getLabelText(resident)
+                        + " // " + OPDE.lang.getString("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
+                        + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum();
+                ColumnText.showTextAligned(stamp.getUnderContent(), Element.ALIGN_LEFT, new Phrase(sidenote, pdf_font_small), Utilities.millimetersToPoints(207), Utilities.millimetersToPoints(260), 270);
+                stamp.alterContents();
+                copy.addPage(page);
+            }
+        }
+
+        if (readerICD != null) {
+            for (int p = 1; p <= readerICD.getNumberOfPages(); p++) {
+                runningPage++;
+                page = copy.getImportedPage(readerICD, p);
                 stamp = copy.createPageStamp(page);
                 String sidenote = String.format(OPDE.lang.getString("pdf.pagefooter"), runningPage, maxpages)
                         + " // " + ResidentTools.getLabelText(resident)
@@ -862,7 +880,7 @@ public class TXEssenDoc {
 
 
         }
-        content.put(TXEAF.FOOD_BMI, setBD(bmi)+remark);
+        content.put(TXEAF.FOOD_BMI, setBD(bmi) + remark);
 
 
         content.put(TXEAF.FOOD_PARENTERAL, setCheckbox(getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "parenteral")));
@@ -1143,23 +1161,8 @@ public class TXEssenDoc {
     }
 
     private void createContent4SectionICD() {
-
-        String sICD = "";
-
-        for (ResInfo icd : listICD) {
-
-            mapInfo2Properties.get(icd).getProperty("");
-            sICD += mapInfo2Properties.get(icd).getProperty("icd");
-            sICD += ": " + mapInfo2Properties.get(icd).getProperty("text");
-            sICD += " (" + (mapInfo2Properties.get(icd).getProperty("koerperseite").equalsIgnoreCase("nicht festgelegt") ? "" : mapInfo2Properties.get(icd).getProperty("koerperseite") + ", ");
-            sICD += mapInfo2Properties.get(icd).getProperty("diagnosesicherheit") + ")";
-
-            sICD += "; ";
-        }
-
-        if (!sICD.isEmpty()) {
-            content.put(TXEAF.DIAG_ICD10, sICD.substring(0, sICD.length() - 2));
-        }
+        getAdditionICDs();
+        content.put(TXEAF.DIAG_ICD10, listICD.isEmpty() ? OPDE.lang.getString("nursingrecords.info.tx.no.diags") : OPDE.lang.getString("nursingrecords.info.tx.diags.to.follow"));
     }
 
     /**
@@ -1229,7 +1232,7 @@ public class TXEssenDoc {
             table.addCell(PDF.cell("misc.msg.dosage", PDF.bold(), Element.ALIGN_CENTER, Element.ALIGN_MIDDLE));
             table.setHeaderRows(1);
 
-            table.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
+            table.getDefaultCell().setVerticalAlignment(Element.ALIGN_TOP);
             table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_LEFT);
 
             for (int pr = startAt; pr < listRegularMeds.size(); pr++) {
@@ -1238,6 +1241,60 @@ public class TXEssenDoc {
 
                 table.addCell(new Phrase(PrescriptionTools.getShortDescriptionAsCompactText(prescription)));
                 table.addCell(new Phrase(PrescriptionTools.getDoseAsCompactText(prescription)));
+
+            }
+            document.add(table);
+            document.close();
+
+        } catch (DocumentException d) {
+
+        }
+
+    }
+
+
+    private void getAdditionICDs() {
+        if (listICD.isEmpty()) return;
+
+        try {
+            Document document = new Document(PageSize.A4, Utilities.millimetersToPoints(10), Utilities.millimetersToPoints(10), Utilities.millimetersToPoints(20), Utilities.millimetersToPoints(20));
+            icdListStream = new ByteArrayOutputStream();
+            PdfWriter.getInstance(document, icdListStream);
+            document.open();
+
+            Paragraph h1 = new Paragraph(new Phrase(OPDE.lang.getString("nursingrecords.info.dlg.diags"), PDF.plain(PDF.sizeH1())));
+            h1.setAlignment(Element.ALIGN_CENTER);
+            document.add(h1);
+
+            Paragraph p = new Paragraph(new Phrase(ResidentTools.getLabelText(resident)));
+            p.setAlignment(Element.ALIGN_CENTER);
+            document.add(p);
+            document.add(Chunk.NEWLINE);
+
+            PdfPTable table = new PdfPTable(new float[]{1, 3});
+            table.setTotalWidth(Utilities.millimetersToPoints(150));
+            table.setLockedWidth(true);
+
+            table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
+            table.addCell(PDF.cell("misc.msg.diag.icd10", PDF.bold(), Element.ALIGN_CENTER, Element.ALIGN_MIDDLE));
+            table.addCell(PDF.cell("misc.msg.Text", PDF.bold(), Element.ALIGN_CENTER, Element.ALIGN_MIDDLE));
+            table.setHeaderRows(1);
+
+            table.getDefaultCell().setVerticalAlignment(Element.ALIGN_TOP);
+            table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_LEFT);
+
+            for (ResInfo icd : listICD) {
+                String sICD = "";
+                sICD += mapInfo2Properties.get(icd).getProperty("text");
+                sICD += " (" + (mapInfo2Properties.get(icd).getProperty("koerperseite").equalsIgnoreCase("nicht festgelegt") ? "" : mapInfo2Properties.get(icd).getProperty("koerperseite") + ", ");
+                sICD += mapInfo2Properties.get(icd).getProperty("diagnosesicherheit") + ")";
+
+//                if (listICD.indexOf(icd) < listICD.size()) {
+//                    sICD += "; ";
+//                }
+
+                table.addCell(new Phrase(mapInfo2Properties.get(icd).getProperty("icd")));
+                table.addCell(new Phrase(sICD));
 
             }
             document.add(table);
