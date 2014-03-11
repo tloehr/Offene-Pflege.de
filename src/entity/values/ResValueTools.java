@@ -20,7 +20,6 @@ import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import javax.persistence.TemporalType;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
@@ -336,11 +335,11 @@ public class ResValueTools {
         return list;
     }
 
-    public static ArrayList<ResValue> getResValues(Resident resident, short type, DateMidnight f, DateMidnight t) {
+    public static ArrayList<ResValue> getResValues(Resident resident, short type, LocalDate f, LocalDate t) {
 
         //        DateTime theYear = new DateTime(year, 1, 1, 0, 0, 0);
-        DateTime from = f.toDateTime().secondOfDay().withMinimumValue();
-        DateTime to = t.toDateTime().secondOfDay().withMaximumValue();
+        DateTime from = f.toDateTimeAtStartOfDay();
+        DateTime to = SYSCalendar.eod(t);
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("" +
@@ -359,6 +358,31 @@ public class ResValueTools {
 
         return list;
     }
+
+    public static ArrayList<ResValue> getResValuesNoEdits(Resident resident, short type, LocalDate f, LocalDate t) {
+
+            //        DateTime theYear = new DateTime(year, 1, 1, 0, 0, 0);
+            DateTime from = f.toDateTimeAtStartOfDay();
+            DateTime to = SYSCalendar.eod(t);
+
+            EntityManager em = OPDE.createEM();
+            Query query = em.createQuery("" +
+                    " SELECT rv FROM ResValue rv " +
+                    " WHERE rv.resident = :resident " +
+                    " AND rv.pit >= :from" +
+                    " AND rv.pit <= :to" +
+                    " AND rv.vtype.valType = :type " +
+                    " AND rv.editedBy IS NULL " +
+                    " ORDER BY rv.pit DESC ");
+            query.setParameter("resident", resident);
+            query.setParameter("type", type);
+            query.setParameter("from", from.toDate());
+            query.setParameter("to", to.toDate());
+            ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
+            em.close();
+
+            return list;
+        }
 
     public static ArrayList<ResValue> getResValues(Resident resident, ResValueTypes vtype, LocalDate day) {
 
@@ -603,6 +627,8 @@ public class ResValueTools {
 
         return html.toString();
     }
+
+
 
 
     public static HashMap<DateMidnight, Pair<BigDecimal, BigDecimal>> getLiquidBalancePerDay(Resident resident, DateMidnight from, DateMidnight to) {
@@ -947,6 +973,31 @@ public class ResValueTools {
 
         return bmi;
 
+    }
+
+
+    public static ArrayList<Object[]> getLiquidBalances(Resident resident, LocalDate start, int entriesBack) {
+
+//            DateTime to = new LocalDate(year, 1, 1).dayOfYear().withMaximumValue().toDateTimeAtStartOfDay().secondOfDay().withMaximumValue();
+
+        EntityManager em = OPDE.createEM();
+        Query query = em.createNativeQuery(" " +
+                " SELECT DATE(pit), SUM(Wert) FROM resvalue " +
+                " WHERE TYPE = ? AND BWKennung = ? AND DATE(pit) <= ? AND EditBy IS NULL" +
+                " GROUP BY DATE(Pit) " +
+                " ORDER BY PIT DESC " +
+                " LIMIT 0,? ");
+
+        query.setParameter(1, ResValueTypesTools.LIQUIDBALANCE);
+        query.setParameter(2, resident.getRID());
+        query.setParameter(3, start.toDateTimeAtStartOfDay().toDate());
+        query.setParameter(4, entriesBack);
+        ArrayList<Object[]> result = new ArrayList(query.getResultList());
+
+
+
+        em.close();
+        return result;
     }
 
 }

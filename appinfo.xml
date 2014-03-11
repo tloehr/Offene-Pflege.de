@@ -81,6 +81,9 @@
             <print langbundle="appinfo.default.acl.print"/>
             <update langbundle="appinfo.default.acl.update"/>
         </class>
+        <class name="nursingrecords.liquidbalances" short="Pflegeakte/Ein- und Ausfuhr"
+               long="Das Modul zur Bearbeitung der täglichen Trinkmengen.">
+        </class>
         <class name="nursingrecords.bhp" short="Pflegeakte/Behandlungspflege" long="">
             <update langbundle="appinfo.default.acl.update"/>
         </class>

@@ -22,6 +22,7 @@ import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -408,7 +409,7 @@ public class PnlEditResInfo {
         }
         if (preset.equalsIgnoreCase("weight-1m")) {
             long target = new DateTime().minusMonths(1).getMillis();
-            ArrayList<ResValue> list = ResValueTools.getResValues(resident, ResValueTypesTools.WEIGHT, new DateMidnight().minusDays(45), new DateMidnight().minusDays(15));
+            ArrayList<ResValue> list = ResValueTools.getResValues(resident, ResValueTypesTools.WEIGHT, new LocalDate().minusDays(45), new LocalDate().minusDays(15));
 
             ResValue closest = null;
             long distance = Long.MAX_VALUE;
@@ -423,7 +424,7 @@ public class PnlEditResInfo {
         }
         if (preset.equalsIgnoreCase("weight-6m")) {
             long target = new DateTime().minusMonths(6).getMillis();
-            ArrayList<ResValue> list = ResValueTools.getResValues(resident, ResValueTypesTools.WEIGHT, new DateMidnight().minusMonths(6).minusDays(15), new DateMidnight().minusMonths(5).minusDays(15));
+            ArrayList<ResValue> list = ResValueTools.getResValues(resident, ResValueTypesTools.WEIGHT, new LocalDate().minusMonths(6).minusDays(15), new LocalDate().minusMonths(5).minusDays(15));
 
             ResValue closest = null;
             long distance = Long.MAX_VALUE;
@@ -438,7 +439,7 @@ public class PnlEditResInfo {
         }
         if (preset.equalsIgnoreCase("weight-1y")) {
             long target = new DateTime().minusYears(1).getMillis();
-            ArrayList<ResValue> list = ResValueTools.getResValues(resident, ResValueTypesTools.WEIGHT, new DateMidnight().minusYears(1).minusDays(15), new DateMidnight().minusMonths(11).minusDays(15));
+            ArrayList<ResValue> list = ResValueTools.getResValues(resident, ResValueTypesTools.WEIGHT, new LocalDate().minusYears(1).minusDays(15), new LocalDate().minusMonths(11).minusDays(15));
 
             ResValue closest = null;
             long distance = Long.MAX_VALUE;

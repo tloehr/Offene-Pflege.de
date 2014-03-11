@@ -378,7 +378,35 @@ public class PnlInformation extends NursingRecordsPanel {
                                 }
 
                                 CollapsiblePane cpResInfoType = mapKey2CP.get(keyResInfoType);
-                                cpResInfoType.setTitle(resInfoType.getShortDescription());
+
+                                int active = 0;
+                                int closed = 0;
+                                int single = 0;
+                                for (ResInfo resInfo : mapType2ResInfos.get(resInfoType)) {
+                                    if (resInfo.isSingleIncident()) {
+                                        single++;
+                                    } else {
+                                        if (resInfo.isClosed()) {
+                                            closed++;
+                                        } else {
+                                            active++;
+                                        }
+                                    }
+                                }
+
+                                if (resInfoType.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS) {
+                                    cpResInfoType.setTitle(resInfoType.getShortDescription() + " [" + single + "]");
+                                } else {
+
+                                    if (active + closed == 0) {
+                                        cpResInfoType.setTitle(resInfoType.getShortDescription());
+                                    } else {
+                                        cpResInfoType.setTitle(resInfoType.getShortDescription() + " [" + OPDE.lang.getString("misc.msg.active") + ": " + active +
+                                                " " + OPDE.lang.getString("misc.msg.closed") + ": " + closed +
+                                                "]");
+                                    }
+                                }
+
 
                                 cpResInfoType.setFont(SYSConst.ARIAL18);
 

@@ -18,6 +18,7 @@ import op.care.nursingprocess.PnlNursingProcess;
 import op.care.prescription.PnlPrescription;
 import op.care.reports.PnlReport;
 import op.care.sysfiles.PnlFiles;
+import op.care.values.PnlLiquidBalance;
 import op.care.values.PnlValues;
 import op.process.PnlProcess;
 import op.tools.CleanablePanel;
@@ -39,13 +40,14 @@ public class PnlCare extends NursingRecordsPanel {
     public static final int TAB_PB = 1;
     public static final int TAB_DFN = 2;
     public static final int TAB_BHP = 3;
-    public static final int TAB_VITAL = 4;
-    public static final int TAB_VERORDNUNG = 5;
-    public static final int TAB_VORRAT = 6;
-    public static final int TAB_INFO = 7;
-    public static final int TAB_PPLANUNG = 8;
-    public static final int TAB_VORGANG = 9;
-    public static final int TAB_FILES = 10;
+    public static final int TAB_LIQUID = 4;
+    public static final int TAB_VITAL = 5;
+    public static final int TAB_VERORDNUNG = 6;
+    public static final int TAB_VORRAT = 7;
+    public static final int TAB_INFO = 8;
+    public static final int TAB_PPLANUNG = 9;
+    public static final int TAB_VORGANG = 10;
+    public static final int TAB_FILES = 11;
 
     private boolean initPhase;
     private String[] tabs = new String[]{
@@ -53,6 +55,7 @@ public class PnlCare extends NursingRecordsPanel {
             OPDE.lang.getString("nursingrecords.main.tab2"),
             OPDE.lang.getString("nursingrecords.main.tab3"),
             OPDE.lang.getString("nursingrecords.main.tab4"),
+            OPDE.lang.getString("nursingrecords.main.tab4a"),
             OPDE.lang.getString("nursingrecords.main.tab5"),
             OPDE.lang.getString("nursingrecords.main.tab6"),
             OPDE.lang.getString("nursingrecords.main.tab7"),
@@ -149,6 +152,12 @@ public class PnlCare extends NursingRecordsPanel {
                 previousPanel = new PnlDFN(resident, jspSearch);
                 jtpPflegeakte.setComponentAt(TAB_DFN, previousPanel);
                 OPDE.getMainframe().setCurrentClassname(PnlReport.internalClassID);
+                break;
+            }
+            case TAB_LIQUID: {
+                previousPanel = new PnlLiquidBalance(resident, jspSearch);
+                jtpPflegeakte.setComponentAt(TAB_LIQUID, previousPanel);
+                OPDE.getMainframe().setCurrentClassname(previousPanel.getInternalClassID());
                 break;
             }
             case TAB_VITAL: {
