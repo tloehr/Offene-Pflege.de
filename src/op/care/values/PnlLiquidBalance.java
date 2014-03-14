@@ -135,8 +135,8 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-            "pref, $lcgap, pref:grow",
-            "default, default:grow, $lgap, default"));
+                "pref, $lcgap, pref:grow",
+                "default, default:grow, $lgap, default"));
 
         //---- lblLeft ----
         lblLeft.setText("text");
@@ -268,8 +268,8 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
         }
 
         Vector<String> headerLeft = new Vector<>();
-        headerLeft.add("Datum");
-        headerLeft.add("Bilanz");
+        headerLeft.add(OPDE.lang.getString("misc.msg.Date"));
+        headerLeft.add(OPDE.lang.getString("misc.msg.liquid.result"));
 
         DefaultTableModel tmLeft = new DefaultTableModel(dataLeft, headerLeft) {
             @Override
@@ -313,6 +313,9 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
                 return new DefaultTableCellRenderer().getTableCellRendererComponent(table, text, isSelected, hasFocus, row, column);
             }
         });
+        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+        rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
+        tblLeft.getColumnModel().getColumn(1).setCellRenderer(rightRenderer);
     }
 
     void loadRightTable(final LocalDate from, final LocalDate to) {
@@ -322,78 +325,101 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
         }
         listValues = ResValueTools.getResValuesNoEdits(resident, ResValueTypesTools.LIQUIDBALANCE, from, to);
 
-        Object[][] data = new Object[listValues.size()][4];
+        Object[][] data = new Object[listValues.size()][5];
         int row = 0;
         for (ResValue val : listValues) {
             data[row][0] = df.format(val.getPit());
             data[row][1] = nf.format(val.getVal1());
-            data[row][2] = val.getUser().toString();
-            data[row][3] = SYSConst.icon22delete;
+            data[row][2] = val.getText();
+            data[row][3] = val.getUser().getUID();
+            data[row][4] = SYSConst.icon22delete;
             row++;
         }
 
-        Object[] headers = new Object[]{"Datum", "Menge", "Benutzer", "Löschen"};
+        Object[] headers = new Object[]{OPDE.lang.getString("misc.msg.Date"), OPDE.lang.getString("misc.msg.amount"), OPDE.lang.getString("misc.msg.Text"), OPDE.lang.getString("misc.msg.user"), OPDE.lang.getString("misc.msg.delete")};
 
         final DefaultTableModel tmRight = new DefaultTableModel(data, headers) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 3; // only the del-button
+                return column == 4; // only the del-button
             }
         };
 
-        tmRight.setColumnCount(4);
+        tmRight.setColumnCount(5);
         tblRight.setModel(tmRight);
 
         tblRight.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        TableUtils.autoResizeAllColumns(tblRight, null, new int[]{200, 200, 200, 40}, true, true);
+
+        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+        rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
+        tblRight.getColumnModel().getColumn(1).setCellRenderer(rightRenderer);
+
+        TableUtils.autoResizeAllColumns(tblRight, null, new int[]{200, 200, 200, 200, 100}, true, false);
         TableUtils.autoResizeAllRows(tblRight);
 
+        /***
+         *      ____       _      _
+         *     |  _ \  ___| | ___| |_ ___
+         *     | | | |/ _ \ |/ _ \ __/ _ \
+         *     | |_| |  __/ |  __/ ||  __/
+         *     |____/ \___|_|\___|\__\___|
+         *
+         */
         ButtonColumn bc = new ButtonColumn(tblRight, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                int row = Integer.parseInt(ae.getActionCommand());
-
-                EntityManager em = OPDE.createEM();
-                try {
-                    em.getTransaction().begin();
-                    ResValue myValue = em.merge(listValues.get(row));
-                    em.lock(myValue, LockModeType.OPTIMISTIC);
-                    myValue.setDeletedBy(em.merge(OPDE.getLogin().getUser()));
-                    for (SYSVAL2FILE file : myValue.getAttachedFilesConnections()) {
-                        em.remove(file);
-                    }
-                    myValue.getAttachedFilesConnections().clear();
-                    for (SYSVAL2PROCESS connObj : myValue.getAttachedProcessConnections()) {
-                        em.remove(connObj);
-                    }
-                    myValue.getAttachedProcessConnections().clear();
-                    myValue.getAttachedProcesses().clear();
-                    em.getTransaction().commit();
-                    listValues.remove(row);
-                    tmRight.removeRow(row);
-                    loadLeftTable();
-                } catch (OptimisticLockException ole) {
-                    OPDE.warn(ole);
-                    if (em.getTransaction().isActive()) {
-                        em.getTransaction().rollback();
-                    }
-                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                        OPDE.getMainframe().emptyFrame();
-                        OPDE.getMainframe().afterLogin();
-                    }
-                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                } catch (Exception e) {
-                    if (em.getTransaction().isActive()) {
-                        em.getTransaction().rollback();
-                    }
-                    OPDE.fatal(e);
-                } finally {
-                    em.close();
-                }
+                final int row = Integer.parseInt(ae.getActionCommand());
+                final ResValue val2Delete = listValues.get(row);
+                new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<br/><i>" + "<br/><i>" + df.format(val2Delete.getPit()) + "<br/>" + nf.format(val2Delete.getVal1()) + " ml<br/>" + val2Delete.getUser().toString() + "</i><br/>" + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
+                    @Override
+                    public void execute(Object answer) {
+                        if (answer.equals(JOptionPane.YES_OPTION)) {
 
 
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                ResValue myValue = em.merge(val2Delete);
+                                em.lock(myValue, LockModeType.OPTIMISTIC);
+                                myValue.setDeletedBy(em.merge(OPDE.getLogin().getUser()));
+                                for (SYSVAL2FILE file : myValue.getAttachedFilesConnections()) {
+                                    em.remove(file);
+                                }
+                                myValue.getAttachedFilesConnections().clear();
+                                for (SYSVAL2PROCESS connObj : myValue.getAttachedProcessConnections()) {
+                                    em.remove(connObj);
+                                }
+                                myValue.getAttachedProcessConnections().clear();
+                                myValue.getAttachedProcesses().clear();
+                                em.getTransaction().commit();
+                                listValues.remove(row);
+                                tmRight.removeRow(row);
+                                loadLeftTable();
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+                            }
+
+
+                        }
+                    }
+                });
             }
-        }, 3);
+        }, 4);
         bc.setMnemonic(KeyEvent.VK_DELETE);
 
     }
@@ -484,10 +510,12 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
                             } finally {
                                 em.close();
                             }
+
+                            startDay = new LocalDate(myValue.getPit());
+                            loadLeftTable();
+                            loadRightTable(startDay, startDay);
                         }
-                        startDay = new LocalDate(myValue.getPit());
-                        loadLeftTable();
-                        loadRightTable(startDay, startDay);
+
                     }
                 });
 
