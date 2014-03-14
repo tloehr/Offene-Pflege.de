@@ -78,9 +78,7 @@ new FormModel {
 				"gridY": 4
 				"hAlign": sfield com.jgoodies.forms.layout.CellConstraints CENTER
 			} )
-			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) {
-				"axis": 0
-			} ) {
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class javax.swing.BoxLayout ) ) {
 				name: "panel2"
 				add( new FormComponent( "javax.swing.JButton" ) {
 					name: "btnPrint"

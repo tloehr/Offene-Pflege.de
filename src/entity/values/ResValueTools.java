@@ -361,28 +361,28 @@ public class ResValueTools {
 
     public static ArrayList<ResValue> getResValuesNoEdits(Resident resident, short type, LocalDate f, LocalDate t) {
 
-            //        DateTime theYear = new DateTime(year, 1, 1, 0, 0, 0);
-            DateTime from = f.toDateTimeAtStartOfDay();
-            DateTime to = SYSCalendar.eod(t);
+        //        DateTime theYear = new DateTime(year, 1, 1, 0, 0, 0);
+        DateTime from = f.toDateTimeAtStartOfDay();
+        DateTime to = SYSCalendar.eod(t);
 
-            EntityManager em = OPDE.createEM();
-            Query query = em.createQuery("" +
-                    " SELECT rv FROM ResValue rv " +
-                    " WHERE rv.resident = :resident " +
-                    " AND rv.pit >= :from" +
-                    " AND rv.pit <= :to" +
-                    " AND rv.vtype.valType = :type " +
-                    " AND rv.editedBy IS NULL " +
-                    " ORDER BY rv.pit DESC ");
-            query.setParameter("resident", resident);
-            query.setParameter("type", type);
-            query.setParameter("from", from.toDate());
-            query.setParameter("to", to.toDate());
-            ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
-            em.close();
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("" +
+                " SELECT rv FROM ResValue rv " +
+                " WHERE rv.resident = :resident " +
+                " AND rv.pit >= :from" +
+                " AND rv.pit <= :to" +
+                " AND rv.vtype.valType = :type " +
+                " AND rv.editedBy IS NULL " +
+                " ORDER BY rv.pit DESC ");
+        query.setParameter("resident", resident);
+        query.setParameter("type", type);
+        query.setParameter("from", from.toDate());
+        query.setParameter("to", to.toDate());
+        ArrayList<ResValue> list = new ArrayList<ResValue>(query.getResultList());
+        em.close();
 
-            return list;
-        }
+        return list;
+    }
 
     public static ArrayList<ResValue> getResValues(Resident resident, ResValueTypes vtype, LocalDate day) {
 
@@ -627,8 +627,6 @@ public class ResValueTools {
 
         return html.toString();
     }
-
-
 
 
     public static HashMap<DateMidnight, Pair<BigDecimal, BigDecimal>> getLiquidBalancePerDay(Resident resident, DateMidnight from, DateMidnight to) {
@@ -981,19 +979,48 @@ public class ResValueTools {
 //            DateTime to = new LocalDate(year, 1, 1).dayOfYear().withMaximumValue().toDateTimeAtStartOfDay().secondOfDay().withMaximumValue();
 
         EntityManager em = OPDE.createEM();
+//        Query query = em.createNativeQuery(" " +
+//                " SELECT DATE(pit), SUM(Wert) FROM resvalue " +
+//                " WHERE TYPE = ? AND BWKennung = ? AND DATE(pit) <= ? AND EditBy IS NULL" +
+//                " GROUP BY DATE(Pit) " +
+//                " ORDER BY PIT DESC " +
+//                " LIMIT 0,? ");
+
         Query query = em.createNativeQuery(" " +
-                " SELECT DATE(pit), SUM(Wert) FROM resvalue " +
-                " WHERE TYPE = ? AND BWKennung = ? AND DATE(pit) <= ? AND EditBy IS NULL" +
-                " GROUP BY DATE(Pit) " +
-                " ORDER BY PIT DESC " +
-                " LIMIT 0,? ");
+                " SELECT d1, IFNULL(i, 0), IFNULL(o,0), IFNULL(s,0) FROM (" +
+                "       SELECT DATE(pit) d1, SUM(Wert) i FROM resvalue" +
+                "       WHERE TYPE = ? AND BWKennung = ? AND DATE(pit) <= ? AND EditBy IS NULL AND Wert > 0" +
+                "       GROUP BY DATE(Pit)" +
+                "       ORDER BY PIT DESC" +
+                "       LIMIT 0,? " +
+                " ) a LEFT OUTER JOIN (" +
+                "       SELECT DATE(pit) d2, SUM(Wert) o FROM resvalue" +
+                "       WHERE TYPE = ? AND BWKennung = ? AND DATE(pit) <= ? AND EditBy IS NULL AND Wert < 0" +
+                "       GROUP BY DATE(Pit)" +
+                "       ORDER BY PIT DESC" +
+                "       LIMIT 0,? " +
+                ") b ON d1 = d2 LEFT OUTER JOIN (" +
+                "       SELECT DATE(pit) d3, SUM(Wert) s FROM resvalue" +
+                "       WHERE TYPE = ? AND BWKennung = ? AND DATE(pit) <= ? AND EditBy IS NULL" +
+                "       GROUP BY DATE(Pit)" +
+                "       ORDER BY PIT DESC" +
+                "       LIMIT 0,?" +
+                ") c ON d1 = d3 ");
+
 
         query.setParameter(1, ResValueTypesTools.LIQUIDBALANCE);
         query.setParameter(2, resident.getRID());
         query.setParameter(3, start.toDateTimeAtStartOfDay().toDate());
         query.setParameter(4, entriesBack);
+        query.setParameter(5, ResValueTypesTools.LIQUIDBALANCE);
+        query.setParameter(6, resident.getRID());
+        query.setParameter(7, start.toDateTimeAtStartOfDay().toDate());
+        query.setParameter(8, entriesBack);
+        query.setParameter(9, ResValueTypesTools.LIQUIDBALANCE);
+        query.setParameter(10, resident.getRID());
+        query.setParameter(11, start.toDateTimeAtStartOfDay().toDate());
+        query.setParameter(12, entriesBack);
         ArrayList<Object[]> result = new ArrayList(query.getResultList());
-
 
 
         em.close();

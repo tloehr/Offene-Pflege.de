@@ -135,8 +135,8 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "pref, $lcgap, pref:grow",
-                "default, default:grow, $lgap, default"));
+            "pref, $lcgap, pref:grow",
+            "default, default:grow, $lgap, default"));
 
         //---- lblLeft ----
         lblLeft.setText("text");
@@ -264,12 +264,16 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
             Vector line = new Vector();
             line.add(new LocalDate(((java.sql.Date) obj[0]).getTime()));
             line.add(obj[1]);
+            line.add(obj[2]);
+            line.add(obj[3]);
             dataLeft.add(line);
         }
 
         Vector<String> headerLeft = new Vector<>();
-        headerLeft.add(OPDE.lang.getString("misc.msg.Date"));
-        headerLeft.add(OPDE.lang.getString("misc.msg.liquid.result"));
+        headerLeft.add(SYSTools.xx("misc.msg.Date"));
+        headerLeft.add(SYSTools.xx("misc.msg.ingestion"));
+        headerLeft.add(SYSTools.xx("misc.msg.egestion"));
+        headerLeft.add(SYSTools.xx("misc.msg.liquid.result"));
 
         DefaultTableModel tmLeft = new DefaultTableModel(dataLeft, headerLeft) {
             @Override
@@ -316,6 +320,8 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
         DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
         rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
         tblLeft.getColumnModel().getColumn(1).setCellRenderer(rightRenderer);
+        tblLeft.getColumnModel().getColumn(2).setCellRenderer(rightRenderer);
+        tblLeft.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
     }
 
     void loadRightTable(final LocalDate from, final LocalDate to) {
