@@ -287,7 +287,6 @@ public class PnlAway extends JPanel {
             }
             tab1.addTab("text", pnlKH);
 
-
             //======== pnlHolliday ========
             {
                 pnlHolliday.setLayout(new BorderLayout());
@@ -308,7 +307,6 @@ public class PnlAway extends JPanel {
             }
             tab1.addTab("text", pnlHolliday);
 
-
             //======== pnlOther ========
             {
                 pnlOther.setLayout(new BorderLayout());
@@ -328,7 +326,6 @@ public class PnlAway extends JPanel {
                 pnlOther.add(scrollPane2, BorderLayout.CENTER);
             }
             tab1.addTab("text", pnlOther);
-
         }
         add(tab1, CC.xy(3, 3));
 

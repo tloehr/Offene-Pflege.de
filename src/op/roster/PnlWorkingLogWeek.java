@@ -85,7 +85,7 @@ public class PnlWorkingLogWeek extends JPanel {
 //        int posy = -1;
 //        int posx = 1;
 
-        LocalDate month = new LocalDate(rosterParameters..getMonth());
+        LocalDate month =  week.dayOfMonth().withMinimumValue();  //new LocalDate(rosterParameters..getMonth());
         LocalDate start = SYSCalendar.max(SYSCalendar.bow(week), SYSCalendar.bom(month));
                 LocalDate end = SYSCalendar.min(SYSCalendar.eow(week), SYSCalendar.eom(month));
 
@@ -102,7 +102,7 @@ public class PnlWorkingLogWeek extends JPanel {
         pnlWeek.add(new PnlControllerHeader());
 
         JPanel pnlHeader = new JPanel();
-        pnlHeader.add(new JLabel(user.getFullname() + " " + ));
+        pnlHeader.add(new JLabel(user.getFullname() + " ?" ));
         pnlHeader.setBackground(SYSConst.bluegrey);
         for (int day = 0; day < 7; day++) {
             final LocalDate date = week.plusDays(day);
