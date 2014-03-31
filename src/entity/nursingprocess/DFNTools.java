@@ -179,6 +179,7 @@ public class DFNTools {
      * @return die Anzahl der erzeugten BHPs.
      */
     public static int generate(EntityManager em, List<InterventionSchedule> list, LocalDate targetdate, boolean wholeday) {
+        DateTimeZone dtz = DateTimeZone.getDefault();
         String internalClassID = "nursingrecords.dfnimport";
         BigDecimal maxrows = new BigDecimal(list.size());
         int numdfn = 0;
@@ -296,13 +297,20 @@ public class DFNTools {
                     if (uhrzeitOK && termin.getUhrzeit() != null) {
 
                         // This adds a Time Value to a given Date
+
+                        // Correction for Daylight Savings
                         LocalTime timeofday = new LocalTime(termin.getUhrzeit());
-//                        Period period = new Period(timeofday.getHourOfDay(), timeofday.getMinuteOfHour(), timeofday.getSecondOfMinute(), timeofday.getMillisOfSecond());
-                        Date newTargetdate = targetdate.toDateTime(timeofday).toDate();
-//                        Date neuerStichtag = SYSCalendar.addTime2Date(stichtag.toDate(), termin.getUhrzeit());
-//                        OPDE.debug("SYSConst.UZ, " + termin.getUhrzeit() + ", " + DateFormat.getDateTimeInstance().format(newTargetdate));
+                        LocalDateTime localTargetDateTime = targetdate.toLocalDateTime(timeofday);
+
+                        if (dtz.isLocalDateTimeGap(localTargetDateTime)) {
+                            //todo: find a better way to calculate this (getOffsetFromLocal)
+                            localTargetDateTime = localTargetDateTime.plusHours(1);
+                            OPDE.info(SYSTools.xx("Correcting for DST. [TermID=" + termin.getTermID() + "] " + localTargetDateTime.toString()));
+                        }
+
+//                        Date newTargetdate = localTargetDateTime.toDate();
                         for (int dfncount = 1; dfncount <= termin.getUhrzeitAnzahl(); dfncount++) {
-                            em.merge(new DFN(termin, newTargetdate, SYSConst.UZ));
+                            em.merge(new DFN(termin, localTargetDateTime.toDate(), SYSConst.UZ));
                             numdfn++;
                         }
                     }
