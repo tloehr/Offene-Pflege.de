@@ -235,6 +235,7 @@ public class BHPTools {
      * @return die Anzahl der erzeugten BHPs.
      */
     public static int generate(EntityManager em, List<PrescriptionSchedule> list, LocalDate targetdate, boolean wholeday) {
+        DateTimeZone dtz = DateTimeZone.getDefault();
         String internalClassID = "nursingrecords.bhpimport";
         BigDecimal maxrows = new BigDecimal(list.size());
         int numbhp = 0;
@@ -331,13 +332,17 @@ public class BHPTools {
                         numbhp++;
                     }
                     if (uhrzeitOK && pSchedule.getUhrzeit() != null) {
+                        // Correction for Daylight Savings
                         LocalTime timeofday = new LocalTime(pSchedule.getUhrzeit());
-                        //                        Period period = new Period(timeofday.getHourOfDay(), timeofday.getMinuteOfHour(), timeofday.getSecondOfMinute(), timeofday.getMillisOfSecond());
-//                        DateTime timeofday = new DateTime(pSchedule.getUhrzeit());
-//                        Period period = new Period(timeofday.getHourOfDay(), timeofday.getMinuteOfHour(), timeofday.getSecondOfMinute(), timeofday.getMillisOfSecond());
-                        Date newTargetdate = targetdate.toDateTime(timeofday).toDate();
-//                        Date newTargetdate = targetdate.toDateTime().plus(period).toDate();
-                        em.merge(new BHP(pSchedule, newTargetdate, SYSConst.UZ, pSchedule.getUhrzeitDosis()));
+                        LocalDateTime localTargetDateTime = targetdate.toLocalDateTime(timeofday);
+
+                        if (dtz.isLocalDateTimeGap(localTargetDateTime)) {
+                            //todo: find a better way to calculate this (getOffsetFromLocal)
+                            localTargetDateTime = localTargetDateTime.plusHours(1);
+                            OPDE.info(SYSTools.xx("Correcting for DST. [BHPPID=" + pSchedule.getBhppid() + "] " + localTargetDateTime.toString()));
+                        }
+
+                        em.merge(new BHP(pSchedule, localTargetDateTime.toDate(), SYSConst.UZ, pSchedule.getUhrzeitDosis()));
                         numbhp++;
                     }
 
