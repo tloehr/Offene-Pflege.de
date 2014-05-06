@@ -1,5 +1,7 @@
 package entity.prescription;
 
+import op.tools.SYSTools;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -24,7 +26,7 @@ public class Situations implements Serializable {
     }
 
     public Situations(String text) {
-        this.text = text;
+        this.text = SYSTools.tidy(text);
     }
 
     public Long getSitID() {
@@ -56,7 +58,7 @@ public class Situations implements Serializable {
     }
 
     public void setText(String text) {
-        this.text = text;
+        this.text = SYSTools.tidy(text);
     }
 
     @Override

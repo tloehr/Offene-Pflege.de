@@ -7,6 +7,7 @@ package entity.process;
 import entity.info.Resident;
 import entity.system.Users;
 import op.OPDE;
+import op.tools.SYSTools;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -47,7 +48,7 @@ public class PReport implements Serializable, QProcessElement {
     }
 
     public PReport(String text, short art, QProcess qProcess) {
-        this.text = text;
+        this.text = SYSTools.tidy(text);
         this.art = art;
         this.qProcess = qProcess;
         this.pit = new Date();
@@ -76,7 +77,7 @@ public class PReport implements Serializable, QProcessElement {
     }
 
     public void setText(String text) {
-        this.text = text;
+        this.text = SYSTools.tidy(text);
     }
 
     public Date getPit() {

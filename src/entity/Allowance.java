@@ -8,6 +8,7 @@ package entity;
 import entity.info.Resident;
 import entity.system.Users;
 import op.OPDE;
+import op.tools.SYSTools;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -122,7 +123,7 @@ public class Allowance implements Serializable, Comparable<Allowance> {
     }
 
     public void setText(String text) {
-        this.text = text;
+        this.text = SYSTools.tidy(text);
     }
 
     public BigDecimal getAmount() {

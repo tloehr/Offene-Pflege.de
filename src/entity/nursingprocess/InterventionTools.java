@@ -65,6 +65,9 @@ public class InterventionTools {
     public static final int FLAG_GAVAGE_FOOD_100ML = 38;
     public static final int FLAG_GAVAGE_LIQUID_100ML = 39;
 
+    // special flag for interventions that will trigger a mandantory remark, when checking them
+    public static final int FLAG_SYSTEM_REQUIRES_TEXT = 10000;
+
 //    public static final String[] FLAGS = new String[]{"nursingrecords.nursingprocess.flag.none",
 //            "nursingrecords.nursingprocess.flag.contracture",
 //            "nursingrecords.nursingprocess.flag.bedsore",
@@ -107,8 +110,8 @@ public class InterventionTools {
 
 
         Query query = em.createQuery(" " +
-                " SELECT m FROM Intervention m WHERE m.bezeichnung like :search " +
-                " ORDER BY m.bezeichnung "
+                        " SELECT m FROM Intervention m WHERE m.bezeichnung like :search " +
+                        " ORDER BY m.bezeichnung "
         );
 
         if (!SYSTools.catchNull(suche).isEmpty()) {
@@ -127,9 +130,9 @@ public class InterventionTools {
         EntityManager em = OPDE.createEM();
 
         Query query = em.createQuery(" " +
-                " SELECT m FROM Intervention m WHERE m.active = TRUE AND m.interventionType = :art " +
-                (SYSTools.catchNull(suche).isEmpty() ? "" : " AND m.bezeichnung like :suche ") +
-                " ORDER BY m.bezeichnung "
+                        " SELECT m FROM Intervention m WHERE m.active = TRUE AND m.interventionType = :art " +
+                        (SYSTools.catchNull(suche).isEmpty() ? "" : " AND m.bezeichnung like :suche ") +
+                        " ORDER BY m.bezeichnung "
         );
 
         query.setParameter("art", massArt);
@@ -149,8 +152,8 @@ public class InterventionTools {
         EntityManager em = OPDE.createEM();
 
         Query query = em.createQuery(" " +
-                " SELECT m FROM Intervention m WHERE m.active = TRUE AND m.category = :cat " +
-                " ORDER BY m.bezeichnung "
+                        " SELECT m FROM Intervention m WHERE m.active = TRUE AND m.category = :cat " +
+                        " ORDER BY m.bezeichnung "
         );
 
         query.setParameter("cat", category);

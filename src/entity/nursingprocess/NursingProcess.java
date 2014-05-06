@@ -139,7 +139,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
     }
 
     public void setSituation(String situation) {
-        this.situation = situation;
+        this.situation = SYSTools.tidy(situation);
     }
 
     public Collection<SYSNP2FILE> getAttachedFilesConnections() {
@@ -151,7 +151,7 @@ public class NursingProcess implements Serializable, QProcessElement, Comparable
     }
 
     public void setGoal(String ziel) {
-        this.goal = ziel;
+        this.goal = SYSTools.tidy(ziel);
     }
 
     public Date getFrom() {

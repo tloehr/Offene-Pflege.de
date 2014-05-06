@@ -1,6 +1,7 @@
 package entity.values;
 
 import op.tools.GUITools;
+import op.tools.SYSTools;
 
 import javax.persistence.*;
 import java.awt.*;
@@ -76,7 +77,7 @@ public class ResValueTypes {
     }
 
     public void setText(String text) {
-        this.text = text;
+        this.text = SYSTools.tidy(text);
     }
 
 

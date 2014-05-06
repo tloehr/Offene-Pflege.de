@@ -6,6 +6,7 @@
 package entity.nursingprocess;
 
 import entity.info.ResInfoCategory;
+import op.tools.SYSTools;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -52,7 +53,7 @@ public class Intervention implements Serializable {
     }
 
     public Intervention(String bezeichnung, BigDecimal dauer, int interventionType, ResInfoCategory category) {
-        this.bezeichnung = bezeichnung;
+        this.bezeichnung = SYSTools.tidy(bezeichnung);
         this.dauer = dauer;
         this.interventionType = interventionType;
         this.category = category;
@@ -72,7 +73,7 @@ public class Intervention implements Serializable {
     }
 
     public void setBezeichnung(String bezeichnung) {
-        this.bezeichnung = bezeichnung;
+        this.bezeichnung = SYSTools.tidy(bezeichnung);
     }
 
     public BigDecimal getDauer() {

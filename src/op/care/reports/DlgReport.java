@@ -172,14 +172,14 @@ public class DlgReport extends MyJDialog {
         });
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "13dlu, default:grow, $lcgap, 13dlu",
-                "13dlu, $lgap, fill:default:grow, $lgap, 13dlu"));
+            "13dlu, default:grow, $lcgap, 13dlu",
+            "13dlu, $lgap, fill:default:grow, $lgap, 13dlu"));
 
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                    "$rgap, $lcgap, default, $lcgap, 177dlu:grow, $lcgap, 115dlu:grow, 0dlu, $rgap",
-                    "0dlu, 2*($lgap, default), $lgap, fill:default:grow, $lgap, default, $lgap, $rgap"));
+                "$rgap, $lcgap, default, $lcgap, 177dlu:grow, $lcgap, 115dlu:grow, 0dlu, $rgap",
+                "0dlu, 2*($lgap, default), $lgap, fill:default:grow, $lgap, default, $lgap, $rgap"));
             panel1.add(pnlTags, CC.xywh(7, 3, 1, 5, CC.FILL, CC.FILL));
 
             //---- label3 ----

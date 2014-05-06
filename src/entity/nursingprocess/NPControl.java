@@ -7,6 +7,7 @@ package entity.nursingprocess;
 
 import entity.system.Users;
 import op.OPDE;
+import op.tools.SYSTools;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -46,7 +47,7 @@ public class NPControl implements Serializable, Comparable<NPControl> {
     }
 
     public NPControl(String bemerkung, NursingProcess nursingProcess) {
-        this.bemerkung = bemerkung;
+        this.bemerkung = SYSTools.tidy(bemerkung);
         this.lastValidation = false;
         this.nursingProcess = nursingProcess;
         this.user = OPDE.getLogin().getUser();

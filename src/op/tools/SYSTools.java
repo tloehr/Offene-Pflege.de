@@ -37,6 +37,7 @@ import op.OPDE;
 import op.system.AppInfo;
 import op.threads.DisplayMessage;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.TimingSource;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
@@ -899,15 +900,19 @@ public class SYSTools {
         return out;
     }
 
-    public static String unHTML(String in) {
-        String result = in;
-        result = SYSTools.replace(result, "<ul>", "", false);
-        result = SYSTools.replace(result, "</ul>", "", false);
-        result = unHTML2(result);
-        result = SYSTools.replace(result, "</font>", "", false);
-        result = result.replaceAll("\\<font.*?\\>", "");
-        result = result.replaceAll("&diams;", "");
-        return result;
+    /**
+     * removes any dangerous char or html stuff from a string.
+     * @param in
+     * @return
+     */
+    public static String tidy(String in) {
+
+        String result = in.replaceAll("\\<[^>]*>","");
+
+        result = result.replaceAll("[\\>\\<]","");
+        result = result.replaceAll("\\&.*\\;","");
+
+        return result.trim();
     }
 
     public static String escapeXML(String in) {

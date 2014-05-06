@@ -6,6 +6,7 @@
 package entity.nursingprocess;
 
 import op.tools.SYSCalendar;
+import op.tools.SYSTools;
 import org.joda.time.DateMidnight;
 
 import javax.persistence.*;
@@ -343,7 +344,7 @@ public class InterventionSchedule implements Serializable, Cloneable, Comparable
     }
 
     public void setBemerkung(String bemerkung) {
-        this.bemerkung = bemerkung;
+        this.bemerkung = SYSTools.tidy(bemerkung);
     }
 
     public Intervention getIntervention() {

@@ -176,7 +176,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
         this.to = to;
         this.toEndOfPackage = toEndOfPackage;
         this.relation = relation;
-        this.text = text;
+        this.text = SYSTools.tidy(text);
         this.showOnDailyPlan = showOnDailyPlan;
         this.attachedFilesConnections = attachedFilesConnections;
         this.attachedProcessConnections = attachedProcessConnections;
@@ -262,7 +262,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
     }
 
     public void setText(String bemerkung) {
-        this.text = bemerkung;
+        this.text = SYSTools.tidy(bemerkung);
     }
 
     public boolean isOnDailyPlan() {

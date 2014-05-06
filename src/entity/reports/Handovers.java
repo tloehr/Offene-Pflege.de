@@ -10,6 +10,7 @@ import entity.process.QProcess;
 import entity.process.QProcessElement;
 import entity.system.Users;
 import op.OPDE;
+import op.tools.SYSTools;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -80,7 +81,7 @@ public class Handovers implements Serializable, QProcessElement, Comparable<Hand
     }
 
     public void setText(String text) {
-        this.text = text;
+        this.text = SYSTools.tidy(text);
     }
 
     public Homes getHome() {

@@ -6,6 +6,7 @@
 package entity;
 
 import entity.info.Resident;
+import op.tools.SYSTools;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -42,7 +43,7 @@ public class Station implements Serializable, Comparable<Station> {
     }
 
     public Station(String name, Homes home) {
-        this.name = name;
+        this.name = SYSTools.tidy(name);
         this.home = home;
         rooms = new ArrayList<Rooms>();
         residents = new ArrayList<Resident>();
@@ -61,7 +62,7 @@ public class Station implements Serializable, Comparable<Station> {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = SYSTools.tidy(name);
     }
 
     public Homes getHome() {

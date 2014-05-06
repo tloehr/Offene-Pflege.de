@@ -1,6 +1,7 @@
 package entity.nursingprocess;
 
 import entity.info.Resident;
+import entity.reports.NReport;
 import entity.system.Users;
 import op.OPDE;
 import op.tools.GUITools;
@@ -66,6 +67,18 @@ public class DFN implements Serializable, Comparable<DFN> {
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
     private Users user;
+
+    public NReport getNReport() {
+        return nReport;
+    }
+
+    public void setNReport(NReport nReport) {
+        this.nReport = nReport;
+    }
+
+    @JoinColumn(name = "NReportID", referencedColumnName = "pbid")
+    @ManyToOne
+    private NReport nReport;
 
     @JoinColumn(name = "MassID", referencedColumnName = "MassID")
     @ManyToOne

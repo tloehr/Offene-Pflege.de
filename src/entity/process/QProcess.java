@@ -13,6 +13,7 @@ import entity.system.Users;
 import entity.values.ResValue;
 import op.OPDE;
 import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 
@@ -153,7 +154,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
 
     public QProcess(String title, Resident resident, PCat pcat) {
         this(resident);
-        this.title = title;
+        this.title = SYSTools.tidy(title);
         this.pcat = pcat;
     }
 
@@ -202,7 +203,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
     }
 
     public void setTitle(String title) {
-        this.title = title;
+        this.title = SYSTools.tidy(title);
     }
 
     public Date getFrom() {

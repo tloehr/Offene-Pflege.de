@@ -1,6 +1,7 @@
 package entity.prescription;
 
 import entity.info.Resident;
+import entity.reports.NReport;
 import entity.system.Users;
 import op.OPDE;
 import op.tools.GUITools;
@@ -113,6 +114,17 @@ public class BHP implements Serializable, Comparable<BHP> {
     @ManyToOne
     private Users user;
 
+    public NReport getNReport() {
+        return nReport;
+    }
+
+    public void setNReport(NReport nReport) {
+        this.nReport = nReport;
+    }
+
+    @JoinColumn(name = "NReportID", referencedColumnName = "pbid")
+    @ManyToOne
+    private NReport nReport;
 
     public PrescriptionSchedule getPrescriptionSchedule() {
         return prescriptionSchedule;
@@ -228,7 +240,7 @@ public class BHP implements Serializable, Comparable<BHP> {
     }
 
     public void setBemerkung(String bemerkung) {
-        this.bemerkung = bemerkung;
+        this.bemerkung = SYSTools.tidy(bemerkung);
     }
 
     public Date getMDate() {

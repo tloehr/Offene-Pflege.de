@@ -100,7 +100,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
     private NReport(Date pit, Date editpit, String text, int minutes, Users user, Resident resident, Users editedBy, NReport replacedBy, NReport replacementFor) {
         this.pit = pit;
         this.editpit = editpit;
-        this.text = text;
+        this.text = SYSTools.tidy(text);
         this.minutes = minutes;
         this.user = user;
         this.resident = resident;
@@ -164,7 +164,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
     }
 
     public void setText(String text) {
-        this.text = text;
+        this.text = SYSTools.tidy(text);
     }
 
     public int getMinutes() {

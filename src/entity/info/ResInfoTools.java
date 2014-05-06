@@ -120,9 +120,21 @@ public class ResInfoTools {
         return resInfos;
     }
 
+    public static ArrayList<ResInfo> getActive(Resident resident, ResInfoType type) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner AND b.bwinfotyp = :bwinfotyp AND b.from <= :from AND b.to >= :to ORDER BY b.from DESC");
+        query.setParameter("bewohner", resident);
+        query.setParameter("bwinfotyp", type);
+        query.setParameter("from", new Date());
+        query.setParameter("to", new Date());
+        ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
+        em.close();
+        return resInfos;
+    }
+
     public static ArrayList<ResInfo> getAll(Resident resident) {
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner ORDER BY b.from DESC");
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resident = :bewohner  ORDER BY b.from DESC");
         query.setParameter("bewohner", resident);
         ArrayList<ResInfo> resInfos = new ArrayList<ResInfo>(query.getResultList());
         em.close();
@@ -879,11 +891,11 @@ public class ResInfoTools {
         result += "</table>";
 
         /***
-         *      _   _                                _
-         *     | | | | __ _ _   _ ___  __ _ _ __ ___| |_
-         *     | |_| |/ _` | | | / __|/ _` | '__|_  / __|
-         *     |  _  | (_| | |_| \__ \ (_| | |   / /| |_
-         *     |_| |_|\__,_|\__,_|___/\__,_|_|  /___|\__|
+         *       ____                           _   ____                 _   _ _   _
+         *      / ___| ___ _ __   ___ _ __ __ _| | |  _ \ _ __ __ _  ___| |_(_) |_(_) ___  _ __   ___ _ __
+         *     | |  _ / _ \ '_ \ / _ \ '__/ _` | | | |_) | '__/ _` |/ __| __| | __| |/ _ \| '_ \ / _ \ '__|
+         *     | |_| |  __/ | | |  __/ | | (_| | | |  __/| | | (_| | (__| |_| | |_| | (_) | | | |  __/ |
+         *      \____|\___|_| |_|\___|_|  \__,_|_| |_|   |_|  \__,_|\___|\__|_|\__|_|\___/|_| |_|\___|_|
          *
          */
         if (resident.getGP() != null) {
@@ -896,6 +908,33 @@ public class ResInfoTools {
                 result += GPTools.getFullName(resident.getGP()) + ", " + resident.getGP().getStreet();
                 result += ", " + resident.getGP().getZIP() + " " + resident.getGP().getCity();
                 result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + resident.getGP().getTel() + ", " + OPDE.lang.getString("misc.msg.fax") + ": " + resident.getGP().getFax();
+            }
+            result += "</div>";
+
+        }
+
+        /***
+         *      ____                  _       _ _     _
+         *     / ___| _ __   ___  ___(_) __ _| (_)___| |_ ___
+         *     \___ \| '_ \ / _ \/ __| |/ _` | | / __| __/ __|
+         *      ___) | |_) |  __/ (__| | (_| | | \__ \ |_\__ \
+         *     |____/| .__/ \___|\___|_|\__,_|_|_|___/\__|___/
+         *           |_|
+         */
+
+
+        final ArrayList<ResInfo> specialists = ResInfoTools.getActive(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_SPECIALIST));
+
+        if (!specialists.isEmpty()) {
+            result += "<h2 id=\"fonth2\">" + OPDE.lang.getString("misc.msg.specialists") + "</h2>";
+
+            result += "<div id=\"fonttext\">";
+            if (OPDE.isAnonym()) {
+                result += "[" + OPDE.lang.getString("misc.msg.anon") + "]";
+            } else {
+                for (ResInfo specialist : specialists) {
+                    result += getContentAsHTML(specialist);
+                }
             }
             result += "</div>";
 

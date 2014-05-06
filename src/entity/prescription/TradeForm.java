@@ -1,5 +1,7 @@
 package entity.prescription;
 
+import op.tools.SYSTools;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -41,7 +43,7 @@ public class TradeForm implements Serializable {
 
     public TradeForm(MedProducts medProduct, String subtext, DosageForm dosageForm) {
         this.medProduct = medProduct;
-        this.subtext = subtext;
+        this.subtext = SYSTools.tidy(subtext);
         this.dosageForm = dosageForm;
         this.packages = new ArrayList<MedPackage>();
         this.stocks = new ArrayList<MedStock>();
@@ -57,7 +59,7 @@ public class TradeForm implements Serializable {
     }
 
     public void setSubtext(String zusatz) {
-        this.subtext = zusatz;
+        this.subtext = SYSTools.tidy(zusatz);
     }
 
     public Collection<MedPackage> getPackages() {
