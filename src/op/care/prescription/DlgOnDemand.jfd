@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_33" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_65" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void property="contentType"> 
    <string>form/swing</string> 
@@ -488,11 +488,11 @@
            <class>com.jgoodies.forms.layout.FormLayout</class> 
            <void method="setProperty"> 
             <string>$columnSpecs</string> 
-            <string>default, labelcompgap, pref, labelcompgap, default, labelcompgap, 37dlu</string> 
+            <string>default, labelcompgap, pref, labelcompgap, default, labelcompgap, 37dlu:grow</string> 
            </void> 
            <void method="setProperty"> 
             <string>$rowSpecs</string> 
-            <string>23dlu, fill:22dlu</string> 
+            <string>23dlu, fill:22dlu, unrelgap, default</string> 
            </void> 
           </object> 
           <void property="name"> 
@@ -689,6 +689,68 @@
             <void method="setProperty"> 
              <string>gridY</string> 
              <int>2</int> 
+            </void> 
+           </object> 
+          </void> 
+          <void method="add"> 
+           <object class="com.jformdesigner.model.FormComponent"> 
+            <string>javax.swing.JLabel</string> 
+            <void method="setProperty"> 
+             <string>text</string> 
+             <string>Nachkontrolle:</string> 
+            </void> 
+            <void property="name"> 
+             <string>lblCheckResultAfter</string> 
+            </void> 
+           </object> 
+           <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+            <class>com.jgoodies.forms.layout.CellConstraints</class> 
+            <void method="setProperty"> 
+             <string>gridY</string> 
+             <int>4</int> 
+            </void> 
+           </object> 
+          </void> 
+          <void method="add"> 
+           <object class="com.jformdesigner.model.FormComponent"> 
+            <string>javax.swing.JComboBox</string> 
+            <void method="setProperty"> 
+             <string>model</string> 
+             <object class="javax.swing.DefaultComboBoxModel"> 
+              <void property="selectedItem"> 
+               <string>keine Nachkontrolle</string> 
+              </void> 
+              <void method="addElement"> 
+               <string>keine Nachkontrolle</string> 
+              </void> 
+              <void method="addElement"> 
+               <string>nach 1 Stunde</string> 
+              </void> 
+              <void method="addElement"> 
+               <string>nach 2 Stunden</string> 
+              </void> 
+              <void method="addElement"> 
+               <string>nach 3 Stunden</string> 
+              </void> 
+             </object> 
+            </void> 
+            <void property="name"> 
+             <string>cmbCheckAfter</string> 
+            </void> 
+           </object> 
+           <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+            <class>com.jgoodies.forms.layout.CellConstraints</class> 
+            <void method="setProperty"> 
+             <string>gridX</string> 
+             <int>3</int> 
+            </void> 
+            <void method="setProperty"> 
+             <string>gridY</string> 
+             <int>4</int> 
+            </void> 
+            <void method="setProperty"> 
+             <string>gridWidth</string> 
+             <int>5</int> 
             </void> 
            </object> 
           </void> 

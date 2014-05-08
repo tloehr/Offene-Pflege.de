@@ -547,6 +547,14 @@ public class PnlBHP extends NursingRecordsPanel {
                             // Was the prescription closed during this withdraw ?
                             involvedPresciption = em.find(Prescription.class, myBHP.getPrescription().getID());
                         }
+
+                        // add outcome check BHP if necessary
+                        if (myBHP.getPrescriptionSchedule().getCheckAfterHours() != null){
+
+//                            BHP outcomeBHP = new BHP(myBHP.getPrescriptionSchedule(), );
+
+                        }
+
                         em.getTransaction().commit();
 
 
@@ -677,9 +685,7 @@ public class PnlBHP extends NursingRecordsPanel {
                 btnApply.setBorder(null);
                 btnApply.setEnabled(bhp.isOpen() && (!bhp.hasMed() || mapPrescription2Stock.containsKey(bhp.getPrescription())));
                 cptitle.getRight().add(btnApply);
-//                JPanel spacer = new JPanel();
-//                spacer.setOpaque(false);
-//                cptitle.getRight().add(spacer);
+
 
                 /***
                  *                             ____  _             _

@@ -429,6 +429,31 @@ public class SYSCalendar {
         ((JTextField) evt.getSource()).setText(DateFormat.getDateInstance().format(dt.toDate()));
     }
 
+
+    public static void handleDateFocusLost(FocusEvent evt, LocalDate min, LocalDate max) {
+            LocalDate dt;
+            if (max == null) {
+                max = new LocalDate();
+            }
+            try {
+                dt = new LocalDate(parseDate(((JTextField) evt.getSource()).getText()));
+            } catch (NumberFormatException ex) {
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wrongdate")));
+                dt = new LocalDate();
+            }
+            if (dt.isAfter(max)) {
+                dt = new LocalDate();
+                DisplayMessage dm = new DisplayMessage(dt.isAfter(max) ? OPDE.lang.getString("misc.msg.futuredate") : OPDE.lang.getString("misc.msg.wrongdate"));
+                OPDE.getDisplayManager().addSubMessage(dm);
+            }
+            if (dt.isBefore(min)) {
+                dt = new LocalDate();
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.DateTooOld")));
+            }
+
+            ((JTextField) evt.getSource()).setText(DateFormat.getDateInstance().format(dt.toDate()));
+        }
+
     /**
      * Expiry dates usually have a form like "12-10" oder "12/10" to indicate that the product in question is
      * best before December 31st, 2010. This method parses dates like this.

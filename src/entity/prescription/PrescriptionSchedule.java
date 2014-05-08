@@ -69,6 +69,9 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
     @Column(name = "LDatum")
     @Temporal(TemporalType.TIMESTAMP)
     private Date lDatum;
+    @Column(name = "checkAfterHrs")
+    private BigDecimal checkAfterHours;
+
 
     public PrescriptionSchedule() {
 
@@ -319,6 +322,17 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
         this.son = son;
     }
 
+    /**
+     * this is the time in hours after a mandantory description of the outcome of the application of that specific on-demand-prescription needs to be entered by the user.
+     * @return
+     */
+    public BigDecimal getCheckAfterHours() {
+        return checkAfterHours;
+    }
+
+    public void setCheckAfterHours(BigDecimal checkAfterHours) {
+        this.checkAfterHours = checkAfterHours;
+    }
 
     /**
      * sums up the applications in the morning (that means early in the morning, in the morning and everything between 0h and midday)
@@ -503,7 +517,7 @@ public class PrescriptionSchedule implements Serializable, Cloneable, Comparable
     /**
      * @param date, zu prüfendes Datum.
      * @return Ist <code>true</code>, wenn diese Planung monatlich gilt und das Attribut <code>tagnum</code> dem aktuellen Tag im Monat entspricht
-     *         <b>oder</b> das Attribut mit dem aktuellen Wochentagsnamen gleich dem Wochentag im Monat entpricht (der erste Mitwwoch im Monat hat 1, der zweite 2 usw...).
+     * <b>oder</b> das Attribut mit dem aktuellen Wochentagsnamen gleich dem Wochentag im Monat entpricht (der erste Mitwwoch im Monat hat 1, der zweite 2 usw...).
      */
     public boolean isPassenderTagImMonat(Date date) {
         boolean passend = false;

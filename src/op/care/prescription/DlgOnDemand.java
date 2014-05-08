@@ -43,7 +43,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.prompt.PromptSupport;
-import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -98,7 +98,6 @@ public class DlgOnDemand extends MyJDialog {
             prescription.getPrescriptionSchedule().add(schedule);
         }
         schedule = prescription.getPrescriptionSchedule().get(0);
-
         this.actionBlock = actionBlock;
         this.prescription = prescription;
         schedules2delete = new ArrayList<PrescriptionSchedule>();
@@ -108,6 +107,7 @@ public class DlgOnDemand extends MyJDialog {
         pack();
         setVisible(true);
     }
+
 
     private void txtSitActionPerformed(ActionEvent e) {
         if (txtSit.getText().isEmpty()) {
@@ -132,6 +132,29 @@ public class DlgOnDemand extends MyJDialog {
             cmbSit.setModel(new DefaultComboBoxModel(query.getResultList().toArray()));
         }
         em.close();
+    }
+
+    private ListCellRenderer getRenderer() {
+        return new ListCellRenderer() {
+            @Override
+            public java.awt.Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
+                String text;
+                if (o == null) {
+                    text = "<i>" + OPDE.lang.getString("nursingrecords.prescription.dlgOnDemand.noOutcomeCheck") + "</i>";
+                } else if (o instanceof BigDecimal) {
+                    if (o.equals(new BigDecimal("0.5"))) {
+                        text = "&frac12; " + OPDE.lang.getString("misc.msg.Hour");
+                    } else if (o.equals(BigDecimal.ONE)) {
+                        text = "1 " + OPDE.lang.getString("misc.msg.Hour");
+                    } else {
+                        text = o.toString() + " " + OPDE.lang.getString("misc.msg.Hours");
+                    }
+                } else {
+                    text = o.toString();
+                }
+                return new DefaultListCellRenderer().getListCellRendererComponent(jList, SYSTools.toHTMLForScreen(text), i, isSelected, cellHasFocus);
+            }
+        };
     }
 
     private void btnSituationActionPerformed(ActionEvent e) {
@@ -253,7 +276,7 @@ public class DlgOnDemand extends MyJDialog {
     }
 
     private void txtOFFFocusLost(FocusEvent evt) {
-        SYSCalendar.handleDateFocusLost(evt, new DateMidnight(), new DateMidnight().plusYears(1));
+        SYSCalendar.handleDateFocusLost(evt, new LocalDate(), new LocalDate().plusYears(1));
     }
 
     private void txtMaxTimesFocusLost(FocusEvent e) {
@@ -295,12 +318,12 @@ public class DlgOnDemand extends MyJDialog {
     private void initComponents() {
         jPanel1 = new JPanel();
         txtMed = new JXSearchField();
-        cmbMed = new JComboBox();
+        cmbMed = new JComboBox<>();
         panel4 = new JPanel();
         btnMedWizard = new JButton();
-        cmbIntervention = new JComboBox();
+        cmbIntervention = new JComboBox<>();
         txtSit = new JXSearchField();
-        cmbSit = new JComboBox();
+        cmbSit = new JComboBox<>();
         panel3 = new JPanel();
         btnAddSit = new JButton();
         txtIntervention = new JXSearchField();
@@ -311,6 +334,8 @@ public class DlgOnDemand extends MyJDialog {
         txtMaxTimes = new JTextField();
         lblX = new JLabel();
         txtEDosis = new JTextField();
+        lblCheckResultAfter = new JLabel();
+        cmbCheckAfter = new JComboBox<>();
         jPanel3 = new JPanel();
         pnlOFF = new JPanel();
         rbActive = new JRadioButton();
@@ -320,8 +345,8 @@ public class DlgOnDemand extends MyJDialog {
         txtBemerkung = new JTextPane();
         lblText = new JLabel();
         pnlON = new JPanel();
-        cmbDocON = new JComboBox();
-        cmbHospitalON = new JComboBox();
+        cmbDocON = new JComboBox<>();
+        cmbHospitalON = new JComboBox<>();
         panel1 = new JPanel();
         btnClose = new JButton();
         btnSave = new JButton();
@@ -332,15 +357,15 @@ public class DlgOnDemand extends MyJDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "14dlu, $lcgap, default, 6dlu, default:grow, $lcgap, 14dlu",
-                "14dlu, $lgap, fill:default:grow, $lgap, fill:default, $lgap, 14dlu"));
+            "14dlu, $lcgap, default, 6dlu, default:grow, $lcgap, 14dlu",
+            "14dlu, $lgap, fill:default:grow, $lgap, fill:default, $lgap, 14dlu"));
 
         //======== jPanel1 ========
         {
             jPanel1.setBorder(null);
             jPanel1.setLayout(new FormLayout(
-                    "68dlu, $lcgap, pref:grow, $lcgap, pref",
-                    "3*(16dlu, $lgap), default, $lgap, fill:default:grow"));
+                "68dlu, $lcgap, pref:grow, $lcgap, pref",
+                "3*(16dlu, $lgap), default, $lgap, fill:default:grow"));
 
             //---- txtMed ----
             txtMed.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -361,11 +386,11 @@ public class DlgOnDemand extends MyJDialog {
             jPanel1.add(txtMed, CC.xy(1, 1));
 
             //---- cmbMed ----
-            cmbMed.setModel(new DefaultComboBoxModel(new String[]{
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+            cmbMed.setModel(new DefaultComboBoxModel<>(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
             }));
             cmbMed.setFont(new Font("Arial", Font.PLAIN, 14));
             cmbMed.addItemListener(new ItemListener() {
@@ -399,11 +424,11 @@ public class DlgOnDemand extends MyJDialog {
             jPanel1.add(panel4, CC.xy(5, 1));
 
             //---- cmbIntervention ----
-            cmbIntervention.setModel(new DefaultComboBoxModel(new String[]{
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+            cmbIntervention.setModel(new DefaultComboBoxModel<>(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
             }));
             cmbIntervention.setFont(new Font("Arial", Font.PLAIN, 14));
             jPanel1.add(cmbIntervention, CC.xywh(3, 5, 3, 1));
@@ -420,11 +445,11 @@ public class DlgOnDemand extends MyJDialog {
             jPanel1.add(txtSit, CC.xy(1, 3));
 
             //---- cmbSit ----
-            cmbSit.setModel(new DefaultComboBoxModel(new String[]{
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+            cmbSit.setModel(new DefaultComboBoxModel<>(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
             }));
             cmbSit.setFont(new Font("Arial", Font.PLAIN, 14));
             cmbSit.addItemListener(new ItemListener() {
@@ -477,8 +502,8 @@ public class DlgOnDemand extends MyJDialog {
             //======== jPanel2 ========
             {
                 jPanel2.setLayout(new FormLayout(
-                        "default, $lcgap, pref, $lcgap, default, $lcgap, 37dlu",
-                        "23dlu, fill:22dlu"));
+                    "default, $lcgap, pref, $lcgap, default, $lcgap, 37dlu:grow",
+                    "23dlu, fill:22dlu, $ugap, default"));
 
                 //---- lblNumber ----
                 lblNumber.setText("Anzahl");
@@ -506,7 +531,6 @@ public class DlgOnDemand extends MyJDialog {
                     public void focusGained(FocusEvent e) {
                         txtMaxTimesFocusGained(e);
                     }
-
                     @Override
                     public void focusLost(FocusEvent e) {
                         txtMaxTimesFocusLost(e);
@@ -526,7 +550,6 @@ public class DlgOnDemand extends MyJDialog {
                     public void focusGained(FocusEvent e) {
                         txtEDosisFocusGained(e);
                     }
-
                     @Override
                     public void focusLost(FocusEvent e) {
                         txtEDosisFocusLost(e);
@@ -539,6 +562,19 @@ public class DlgOnDemand extends MyJDialog {
                     }
                 });
                 jPanel2.add(txtEDosis, CC.xy(7, 2));
+
+                //---- lblCheckResultAfter ----
+                lblCheckResultAfter.setText("Nachkontrolle:");
+                jPanel2.add(lblCheckResultAfter, CC.xy(1, 4));
+
+                //---- cmbCheckAfter ----
+                cmbCheckAfter.setModel(new DefaultComboBoxModel<>(new String[] {
+                    "keine Nachkontrolle",
+                    "nach 1 Stunde",
+                    "nach 2 Stunden",
+                    "nach 3 Stunden"
+                }));
+                jPanel2.add(cmbCheckAfter, CC.xywh(3, 4, 5, 1));
             }
             jPanel1.add(jPanel2, CC.xywh(1, 7, 5, 3, CC.CENTER, CC.CENTER));
         }
@@ -548,15 +584,15 @@ public class DlgOnDemand extends MyJDialog {
         {
             jPanel3.setBorder(null);
             jPanel3.setLayout(new FormLayout(
-                    "149dlu",
-                    "3*(fill:default, $lgap), fill:100dlu:grow"));
+                "149dlu",
+                "3*(fill:default, $lgap), fill:100dlu:grow"));
 
             //======== pnlOFF ========
             {
                 pnlOFF.setBorder(new TitledBorder("Absetzung"));
                 pnlOFF.setLayout(new FormLayout(
-                        "pref, 86dlu:grow",
-                        "fill:17dlu, $lgap, fill:17dlu"));
+                    "pref, 86dlu:grow",
+                    "fill:17dlu, $lgap, fill:17dlu"));
 
                 //---- rbActive ----
                 rbActive.setText("text");
@@ -614,15 +650,15 @@ public class DlgOnDemand extends MyJDialog {
             {
                 pnlON.setBorder(new TitledBorder("Ansetzung"));
                 pnlON.setLayout(new FormLayout(
-                        "119dlu:grow",
-                        "17dlu, $lgap, fill:17dlu"));
+                    "119dlu:grow",
+                    "17dlu, $lgap, fill:17dlu"));
 
                 //---- cmbDocON ----
-                cmbDocON.setModel(new DefaultComboBoxModel(new String[]{
-                        "Item 1",
-                        "Item 2",
-                        "Item 3",
-                        "Item 4"
+                cmbDocON.setModel(new DefaultComboBoxModel<>(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
                 }));
                 cmbDocON.addKeyListener(new KeyAdapter() {
                     @Override
@@ -633,11 +669,11 @@ public class DlgOnDemand extends MyJDialog {
                 pnlON.add(cmbDocON, CC.xy(1, 1));
 
                 //---- cmbHospitalON ----
-                cmbHospitalON.setModel(new DefaultComboBoxModel(new String[]{
-                        "Item 1",
-                        "Item 2",
-                        "Item 3",
-                        "Item 4"
+                cmbHospitalON.setModel(new DefaultComboBoxModel<>(new String[] {
+                    "Item 1",
+                    "Item 2",
+                    "Item 3",
+                    "Item 4"
                 }));
                 pnlON.add(cmbHospitalON, CC.xy(1, 3));
             }
@@ -686,7 +722,9 @@ public class DlgOnDemand extends MyJDialog {
 
         ignoreEvent = true;
 
-        rbActive.setText(OPDE.lang.getString(PnlPrescription.internalClassID + ".dlgOnDemand.rbActive"));
+        lblCheckResultAfter.setText(OPDE.lang.getString("nursingrecords.prescription.dlgOnDemand.outcomeCheck")+":");
+
+        rbActive.setText(OPDE.lang.getString("nursingrecords.prescription.dlgOnDemand.rbActive"));
 
         txtMed.setText("");
 
@@ -706,6 +744,8 @@ public class DlgOnDemand extends MyJDialog {
         cmbIntervention.setEnabled(cmbMed.getModel().getSize() == 0);
         txtIntervention.setEnabled(cmbIntervention.isEnabled());
         cmbIntervention.setSelectedItem(prescription.getIntervention());
+
+        cmbCheckAfter.setSelectedItem(schedule.getCheckAfterHours());
 
         cmbSit.setRenderer(SituationsTools.getSituationenRenderer());
         cmbSit.setModel(new DefaultComboBoxModel(new Situations[]{prescription.getSituation()}));
@@ -850,6 +890,8 @@ public class DlgOnDemand extends MyJDialog {
 
         schedule.setTagNum((short) 0);
 
+        schedule.setCheckAfterHours((BigDecimal) cmbCheckAfter.getSelectedItem());
+
         schedule.setMaxEDosis(new BigDecimal(Double.parseDouble(txtEDosis.getText())));
         schedule.setMaxAnzahl(Integer.parseInt(txtMaxTimes.getText()));
 
@@ -862,9 +904,9 @@ public class DlgOnDemand extends MyJDialog {
         prescription.setUserON(OPDE.getLogin().getUser());
         prescription.setDocON((GP) cmbDocON.getSelectedItem());
 
-        prescription.setFrom(new DateMidnight().toDate());
+        prescription.setFrom(new LocalDate().toDate());
         if (rbDate.isSelected()) {
-            prescription.setTo(new DateMidnight(SYSCalendar.parseDate(txtOFF.getText())).plusDays(1).toDateTime().minusSeconds(1).toDate());
+            prescription.setTo(SYSCalendar.eod(new LocalDate(SYSCalendar.parseDate(txtOFF.getText()))).toDate());
             prescription.setUserOFF(OPDE.getLogin().getUser());
             prescription.setHospitalOFF(prescription.getHospitalON());
             prescription.setDocOFF(prescription.getDocON());
@@ -905,17 +947,21 @@ public class DlgOnDemand extends MyJDialog {
         cmbHospitalON.setModel(new DefaultComboBoxModel(listKH.toArray()));
         cmbHospitalON.setRenderer(HospitalTools.getKHRenderer());
         cmbHospitalON.setSelectedIndex(0);
+
+
+        cmbCheckAfter.setModel(new DefaultComboBoxModel(new BigDecimal[]{null, new BigDecimal("0.5"), new BigDecimal("1"), new BigDecimal("2"), new BigDecimal("3"), new BigDecimal("4"), new BigDecimal("5"), new BigDecimal("6"), new BigDecimal("8"), new BigDecimal("12"), new BigDecimal("18"), new BigDecimal("24")}));
+        cmbCheckAfter.setRenderer(getRenderer());
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel jPanel1;
     private JXSearchField txtMed;
-    private JComboBox cmbMed;
+    private JComboBox<String> cmbMed;
     private JPanel panel4;
     private JButton btnMedWizard;
-    private JComboBox cmbIntervention;
+    private JComboBox<String> cmbIntervention;
     private JXSearchField txtSit;
-    private JComboBox cmbSit;
+    private JComboBox<String> cmbSit;
     private JPanel panel3;
     private JButton btnAddSit;
     private JXSearchField txtIntervention;
@@ -926,6 +972,8 @@ public class DlgOnDemand extends MyJDialog {
     private JTextField txtMaxTimes;
     private JLabel lblX;
     private JTextField txtEDosis;
+    private JLabel lblCheckResultAfter;
+    private JComboBox<String> cmbCheckAfter;
     private JPanel jPanel3;
     private JPanel pnlOFF;
     private JRadioButton rbActive;
@@ -935,8 +983,8 @@ public class DlgOnDemand extends MyJDialog {
     private JTextPane txtBemerkung;
     private JLabel lblText;
     private JPanel pnlON;
-    private JComboBox cmbDocON;
-    private JComboBox cmbHospitalON;
+    private JComboBox<String> cmbDocON;
+    private JComboBox<String> cmbHospitalON;
     private JPanel panel1;
     private JButton btnClose;
     private JButton btnSave;

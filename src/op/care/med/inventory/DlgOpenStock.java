@@ -81,11 +81,9 @@ public class DlgOpenStock extends MyJDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         lbl1 = new JLabel();
-        cmbBestID = new JComboBox();
+        cmbBestID = new JComboBox<>();
         lbl2 = new JLabel();
-        panel1 = new JPanel();
         btnClose = new JButton();
-        hSpacer1 = new JPanel(null);
         btnOK = new JButton();
 
         //======== this ========
@@ -93,8 +91,8 @@ public class DlgOpenStock extends MyJDialog {
         setResizable(false);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "default, $lcgap, default:grow, $lcgap, default, $lcgap, default:grow, $lcgap, default",
-            "default, $lgap, fill:default, $lgap, fill:36dlu, $lgap, default"));
+            "default, $lcgap, default:grow, 2*($lcgap, default), $lcgap, default:grow, $lcgap, default",
+            "default, $lgap, fill:default, 21dlu, default, $lgap, default"));
 
         //---- lbl1 ----
         lbl1.setText("Die Packung mit der Nummer:");
@@ -102,7 +100,7 @@ public class DlgOpenStock extends MyJDialog {
         contentPane.add(lbl1, CC.xy(3, 3));
 
         //---- cmbBestID ----
-        cmbBestID.setModel(new DefaultComboBoxModel(new String[] {
+        cmbBestID.setModel(new DefaultComboBoxModel<>(new String[] {
             "Item 1",
             "Item 2",
             "Item 3",
@@ -120,34 +118,27 @@ public class DlgOpenStock extends MyJDialog {
         //---- lbl2 ----
         lbl2.setText("anbrechen.");
         lbl2.setFont(new Font("Arial", Font.PLAIN, 14));
-        contentPane.add(lbl2, CC.xy(7, 3));
+        contentPane.add(lbl2, CC.xywh(7, 3, 3, 1));
 
-        //======== panel1 ========
-        {
-            panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
+        //---- btnClose ----
+        btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
+        btnClose.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnCloseActionPerformed(e);
+            }
+        });
+        contentPane.add(btnClose, CC.xy(7, 5));
 
-            //---- btnClose ----
-            btnClose.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-            btnClose.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnCloseActionPerformed(e);
-                }
-            });
-            panel1.add(btnClose);
-            panel1.add(hSpacer1);
-
-            //---- btnOK ----
-            btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-            btnOK.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    btnOKActionPerformed(e);
-                }
-            });
-            panel1.add(btnOK);
-        }
-        contentPane.add(panel1, CC.xy(7, 5, CC.DEFAULT, CC.BOTTOM));
+        //---- btnOK ----
+        btnOK.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+        btnOK.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnOKActionPerformed(e);
+            }
+        });
+        contentPane.add(btnOK, CC.xy(9, 5));
         setSize(455, 165);
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
@@ -224,11 +215,9 @@ public class DlgOpenStock extends MyJDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JLabel lbl1;
-    private JComboBox cmbBestID;
+    private JComboBox<String> cmbBestID;
     private JLabel lbl2;
-    private JPanel panel1;
     private JButton btnClose;
-    private JPanel hSpacer1;
     private JButton btnOK;
     // End of variables declaration//GEN-END:variables
 }

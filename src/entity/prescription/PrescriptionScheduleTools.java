@@ -355,6 +355,17 @@ public class PrescriptionScheduleTools {
             result += "<b>" + OPDE.lang.getString("nursingrecords.prescription.maxDailyDose") + ": ";
             result += schedule.getMaxAnzahl() + "x " + SYSTools.printDouble(schedule.getMaxEDosis().doubleValue());
             result += "</b><br/>";
+            if (schedule.getCheckAfterHours() != null) {
+                result += OPDE.lang.getString("nursingrecords.prescription.dlgOnDemand.outcomeCheck") + ": ";
+                if (schedule.getCheckAfterHours().equals(new BigDecimal("0.5"))) {
+                    result += "&frac12; " + OPDE.lang.getString("misc.msg.Hour");
+                } else if (schedule.getCheckAfterHours().equals(BigDecimal.ONE)) {
+                    result += "1 " + OPDE.lang.getString("misc.msg.Hour");
+                } else {
+                    result += schedule.getCheckAfterHours() + " " + OPDE.lang.getString("misc.msg.Hours");
+                }
+                result += "<br/>";
+            }
         } else if (getTerminStatus(schedule) == EXACTTIME) {
             if (headerNeeded) {
                 result += "<table border=\"1\" cellspacing=\"0\" >" +
@@ -407,6 +418,10 @@ public class PrescriptionScheduleTools {
         } else if (getTerminStatus(schedule) == MAXDOSE) {
             result += OPDE.lang.getString("nursingrecords.prescription.maxDailyDose") + ": ";
             result += schedule.getMaxAnzahl() + "x " + SYSTools.printDouble(schedule.getMaxEDosis().doubleValue());
+            if (schedule.getCheckAfterHours() != null) {
+                result += OPDE.lang.getString("nursingrecords.prescription.dlgOnDemand.outcomeCheck") + ": ";
+                result += schedule.getCheckAfterHours() + " " + OPDE.lang.getString("misc.msg.Hour(s)");
+            }
         } else if (getTerminStatus(schedule) == EXACTTIME) {
 
             DateTime dt = new DateTime(schedule.getUhrzeit());

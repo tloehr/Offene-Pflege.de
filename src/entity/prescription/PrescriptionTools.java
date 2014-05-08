@@ -728,23 +728,21 @@ public class PrescriptionTools {
     }
 
     public static String getDoseAsHTML(Prescription prescription, boolean showInventory) {
-        //        long timestart = System.currentTimeMillis();
         String result = "";
         if (prescription.getPrescriptionSchedule().size() > 1) {
             Collections.sort(prescription.getPrescriptionSchedule());
         }
         Iterator<PrescriptionSchedule> planungen = prescription.getPrescriptionSchedule().iterator();
 
-
         if (planungen.hasNext()) {
-            PrescriptionSchedule vorherigePlanung = null;
-            PrescriptionSchedule planung = null;
+            PrescriptionSchedule previousSchedule = null;
+            PrescriptionSchedule schedule = null;
             while (planungen.hasNext()) {
-                planung = planungen.next();
-                result += PrescriptionScheduleTools.getDoseAsHTML(planung, vorherigePlanung, false);
-                vorherigePlanung = planung;
+                schedule = planungen.next();
+                result += PrescriptionScheduleTools.getDoseAsHTML(schedule, previousSchedule, false);
+                previousSchedule = schedule;
             }
-            if (PrescriptionScheduleTools.getTerminStatus(planung) != PrescriptionScheduleTools.MAXDOSE) {
+            if (PrescriptionScheduleTools.getTerminStatus(schedule) != PrescriptionScheduleTools.MAXDOSE) {
                 // Wenn die letzte Planung eine Tabelle benötigte (das tut sie dann, wenn
                 // es keine Bedarfsverordnung war), dann müssen wir die Tabelle hier noch
                 // schließen.
