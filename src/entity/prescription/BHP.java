@@ -1,7 +1,6 @@
 package entity.prescription;
 
 import entity.info.Resident;
-import entity.reports.NReport;
 import entity.system.Users;
 import op.OPDE;
 import op.tools.GUITools;
@@ -9,6 +8,7 @@ import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 import org.eclipse.persistence.annotations.OptimisticLocking;
 import org.eclipse.persistence.annotations.OptimisticLockingType;
+import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import java.awt.*;
@@ -46,14 +46,18 @@ public class BHP implements Serializable, Comparable<BHP> {
     @Column(name = "Status")
     private Byte state;
     @Lob
-    @Column(name = "Bemerkung")
-    private String bemerkung;
+    @Column(name = "text")
+    private String text;
     @Basic(optional = false)
     @Column(name = "MDate")
     @Temporal(TemporalType.TIMESTAMP)
     private Date mdate;
     @Column(name = "Dauer")
     private Short dauer;
+    @Column(name = "needsText")
+    private Boolean needsText;
+    @Column(name = "relID")
+    private Long relID;
     @Basic(optional = false)
     @Column(name = "nanotime")
     private Long nanotime;
@@ -71,6 +75,34 @@ public class BHP implements Serializable, Comparable<BHP> {
         this.version = 0l;
         this.nanotime = System.nanoTime();
         this.mdate = new Date();
+        this.needsText = false;
+        this.dauer = 0;
+    }
+
+    /**
+     * constructs an outcome text BHP
+     *
+     * @param bhp
+     */
+    public BHP(BHP bhp, long uid) {
+        // looks redundant but simplifies enormously
+        this.prescriptionSchedule = bhp.getPrescriptionSchedule();
+        this.prescription = this.prescriptionSchedule.getPrescription();
+        this.resident = this.prescriptionSchedule.getPrescription().getResident();
+        this.tradeform = this.prescriptionSchedule.getPrescription().getTradeForm();
+
+        DateTime targetTime = new DateTime().plusMinutes(this.prescriptionSchedule.getCheckAfterHours().multiply(new BigDecimal(60)).intValue());
+
+        this.soll = targetTime.toDate();
+        this.version = 0l;
+        this.nanotime = System.nanoTime();
+        this.sZeit = BHPTools.BYTE_TIMEOFDAY;
+        this.dosis = BigDecimal.ONE.negate();
+        this.state = BHPTools.STATE_OPEN;
+        this.mdate = new Date();
+        stockTransaction = new ArrayList<MedStockTransaction>();
+        this.relID = uid;
+        this.needsText = true;
         this.dauer = 0;
     }
 
@@ -88,6 +120,7 @@ public class BHP implements Serializable, Comparable<BHP> {
         this.state = BHPTools.STATE_OPEN;
         this.mdate = new Date();
         stockTransaction = new ArrayList<MedStockTransaction>();
+        this.needsText = false;
         this.dauer = 0;
     }
 
@@ -113,18 +146,6 @@ public class BHP implements Serializable, Comparable<BHP> {
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
     private Users user;
-
-    public NReport getNReport() {
-        return nReport;
-    }
-
-    public void setNReport(NReport nReport) {
-        this.nReport = nReport;
-    }
-
-    @JoinColumn(name = "NReportID", referencedColumnName = "pbid")
-    @ManyToOne
-    private NReport nReport;
 
     public PrescriptionSchedule getPrescriptionSchedule() {
         return prescriptionSchedule;
@@ -235,12 +256,12 @@ public class BHP implements Serializable, Comparable<BHP> {
         this.dosis = dosis;
     }
 
-    public String getBemerkung() {
-        return bemerkung;
+    public String getText() {
+        return text;
     }
 
-    public void setBemerkung(String bemerkung) {
-        this.bemerkung = SYSTools.tidy(bemerkung);
+    public void setText(String bemerkung) {
+        this.text = SYSTools.tidy(bemerkung);
     }
 
     public Date getMDate() {
@@ -279,8 +300,48 @@ public class BHP implements Serializable, Comparable<BHP> {
         return tradeform;
     }
 
+    /**
+     * true if the underlying prescription is of type "OnDemand".
+     *
+     * @return
+     */
     public boolean isOnDemand() {
         return prescription.isOnDemand();
+    }
+
+    /**
+     * determines whether the confirmation of a BHP should trigger a mandantory note or not. (default NOT)
+     *
+     * @return
+     */
+    public Boolean getNeedsText() {
+        return needsText;
+    }
+
+    public void setNeedsText(Boolean needsText) {
+        this.needsText = needsText;
+    }
+
+    /**
+     * a unique numeric key which connects different BHPs together. null, when they are unconnected (default NULL)
+     *
+     * @return
+     */
+    public Long getRelID() {
+        return relID;
+    }
+
+    public void setRelID(Long relID) {
+        this.relID = relID;
+    }
+
+    /**
+     * BHPs with a dose of -1 are considered to be outcome text BHPs for on demand BHPs.
+     *
+     * @return
+     */
+    public boolean isOutComeText() {
+        return dosis.equals(BigDecimal.ONE.negate());
     }
 
 
@@ -337,9 +398,6 @@ public class BHP implements Serializable, Comparable<BHP> {
             }
         }
 
-//        if (result == 0) {
-//            result = nanotime.compareTo(that.nanotime);
-//        }
         if (result == 0) {
             bhpid.compareTo(that.bhpid);
         }
@@ -350,16 +408,13 @@ public class BHP implements Serializable, Comparable<BHP> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) {
-//            if (o != null) {
-//                OPDE.debug("not instance of BHP " + o.toString());
-//            }
-//            OPDE.debug("i am a bhp with id: " + bhpid);
+
             return false;
         }
 
         BHP bhp = (BHP) o;
 
-        if (bemerkung != null ? !bemerkung.equals(bhp.bemerkung) : bhp.bemerkung != null) return false;
+        if (text != null ? !text.equals(bhp.text) : bhp.text != null) return false;
         if (bhpid != null ? !bhpid.equals(bhp.bhpid) : bhp.bhpid != null) return false;
         if (dauer != null ? !dauer.equals(bhp.dauer) : bhp.dauer != null) return false;
         if (dosis != null ? !dosis.equals(bhp.dosis) : bhp.dosis != null) return false;
@@ -393,7 +448,7 @@ public class BHP implements Serializable, Comparable<BHP> {
         result = 31 * result + (iZeit != null ? iZeit.hashCode() : 0);
         result = 31 * result + (dosis != null ? dosis.hashCode() : 0);
         result = 31 * result + (state != null ? state.hashCode() : 0);
-        result = 31 * result + (bemerkung != null ? bemerkung.hashCode() : 0);
+        result = 31 * result + (text != null ? text.hashCode() : 0);
         result = 31 * result + (mdate != null ? mdate.hashCode() : 0);
         result = 31 * result + (dauer != null ? dauer.hashCode() : 0);
         result = 31 * result + (nanotime != null ? nanotime.hashCode() : 0);

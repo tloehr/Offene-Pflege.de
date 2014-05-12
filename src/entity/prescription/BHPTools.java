@@ -56,6 +56,7 @@ public class BHPTools {
     public static final byte BYTE_EVENING = 5;
     public static final byte BYTE_LATE_AT_NIGHT = 6;
 
+    public static final String UIDPREFIX = "__bhp";
 
     public static BHP getLastBHP(Prescription prescription) {
         EntityManager em = OPDE.createEM();
@@ -375,6 +376,7 @@ public class BHPTools {
     public static ArrayList<BHP> getBHPsOnDemand(Resident resident, Date date) {
 
         List<Prescription> listPrescriptions = PrescriptionTools.getOnDemandPrescriptions(resident, date);
+        LocalDate lDate = new LocalDate(date);
         long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
         ArrayList<BHP> listBHP = new ArrayList<BHP>();
@@ -391,8 +393,8 @@ public class BHPTools {
 
             for (Prescription prescription : listPrescriptions) {
                 query.setParameter("prescription", prescription);
-                query.setParameter("from", new DateTime(date).toDateMidnight().toDate());
-                query.setParameter("to", new DateTime(date).toDateMidnight().plusDays(1).toDateTime().minusSeconds(1).toDate());
+                query.setParameter("from", lDate.toDateTimeAtStartOfDay().toDate());
+                query.setParameter("to", SYSCalendar.eod(lDate).toDate());
 
                 ArrayList<BHP> listBHP4ThisPrescription = new ArrayList<BHP>(query.getResultList());
 
@@ -445,9 +447,10 @@ public class BHPTools {
 
             Query query = em.createQuery(jpql);
 
+            LocalDate lDate = new LocalDate(date);
             query.setParameter("resident", resident);
-            query.setParameter("von", new DateTime(date).toDateMidnight().toDate());
-            query.setParameter("bis", new DateTime(date).toDateMidnight().plusDays(1).toDateTime().minusSeconds(1).toDate());
+            query.setParameter("von", lDate.toDateTimeAtStartOfDay().toDate());
+            query.setParameter("bis", SYSCalendar.eod(lDate).toDate());
 
             listBHP = new ArrayList<BHP>(query.getResultList());
             Collections.sort(listBHP);
@@ -465,7 +468,7 @@ public class BHPTools {
      * @param date
      * @return
      */
-    public static ArrayList<BHP> getOpenBHPs(DateMidnight date, Homes home) {
+    public static ArrayList<BHP> getOpenBHPs(LocalDate date, Homes home) {
         long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
         ArrayList<BHP> listBHP = null;
@@ -481,8 +484,8 @@ public class BHPTools {
             Query query = em.createQuery(jpql);
             query.setParameter("state", STATE_OPEN);
             query.setParameter("home", home);
-            query.setParameter("from", date.toDate());
-            query.setParameter("to", date.plusDays(1).toDateTime().minusSeconds(1).toDate());
+            query.setParameter("from", date.toDateTimeAtStartOfDay().toDate());
+            query.setParameter("to", SYSCalendar.eod(date).toDate());
 
             listBHP = new ArrayList<BHP>(query.getResultList());
             Collections.sort(listBHP);

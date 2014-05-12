@@ -66,7 +66,8 @@ public class InterventionTools {
     public static final int FLAG_GAVAGE_LIQUID_100ML = 39;
 
     // special flag for interventions that will trigger a mandantory remark, when checking them
-    public static final int FLAG_SYSTEM_REQUIRES_TEXT = 10000;
+    // there must be exactly ONE of this system records
+    public static final int FLAG_SYSTEM_BHP_OUTCOME_TEXT = 10000;
 
 //    public static final String[] FLAGS = new String[]{"nursingrecords.nursingprocess.flag.none",
 //            "nursingrecords.nursingprocess.flag.contracture",
@@ -163,6 +164,18 @@ public class InterventionTools {
         em.close();
 
         return list;
+    }
+
+    public static Intervention getBHPOutcomeIntervention() {
+        Intervention outcomeIntervention = null;
+
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery(" SELECT m FROM Intervention m WHERE m.active = TRUE AND m.flag = :flag");
+        query.setParameter("flag", FLAG_SYSTEM_BHP_OUTCOME_TEXT);
+        outcomeIntervention = (Intervention) query.getSingleResult();
+        em.close();
+
+        return outcomeIntervention;
     }
 
 

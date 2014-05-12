@@ -68,17 +68,17 @@ public class DFN implements Serializable, Comparable<DFN> {
     @ManyToOne
     private Users user;
 
-    public NReport getNReport() {
-        return nReport;
-    }
-
-    public void setNReport(NReport nReport) {
-        this.nReport = nReport;
-    }
-
-    @JoinColumn(name = "NReportID", referencedColumnName = "pbid")
-    @ManyToOne
-    private NReport nReport;
+//    public NReport getNReport() {
+//        return nReport;
+//    }
+//
+//    public void setNReport(NReport nReport) {
+//        this.nReport = nReport;
+//    }
+//
+//    @JoinColumn(name = "NReportID", referencedColumnName = "pbid")
+//    @ManyToOne
+//    private NReport nReport;
 
     @JoinColumn(name = "MassID", referencedColumnName = "MassID")
     @ManyToOne

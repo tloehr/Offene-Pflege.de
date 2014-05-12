@@ -11,11 +11,13 @@ import entity.info.ResidentTools;
 import entity.process.QProcessElement;
 import op.OPDE;
 import op.tools.Pair;
+import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -127,14 +129,14 @@ public class NReportTools {
     }
 
 
-    public static long getNum(Resident resident, DateMidnight day) {
+    public static long getNum(Resident resident, LocalDate day) {
         long num = 0;
 
         EntityManager em = OPDE.createEM();
         Query queryMin = em.createQuery("SELECT COUNT(nr) FROM NReport nr WHERE nr.resident = :resident AND nr.pit >= :start AND nr.pit <= :end");
         queryMin.setParameter("resident", resident);
-        queryMin.setParameter("start", day.toDate());
-        queryMin.setParameter("end", day.plusDays(1).toDateTime().minusSeconds(1).toDate());
+        queryMin.setParameter("start", day.toDateTimeAtStartOfDay().toDate());
+        queryMin.setParameter("end", SYSCalendar.eod(day).toDate());
 
         try {
             num = (Long) queryMin.getSingleResult();

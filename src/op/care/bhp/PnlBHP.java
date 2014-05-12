@@ -40,6 +40,7 @@ import entity.files.SYSFilesTools;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.prescription.*;
+import entity.system.UniqueTools;
 import op.OPDE;
 import op.system.InternalClassACL;
 import op.threads.DisplayManager;
@@ -526,7 +527,10 @@ public class PnlBHP extends NursingRecordsPanel {
                         BHP myBHP = em.merge(bhp);
                         em.lock(myBHP, LockModeType.OPTIMISTIC);
 
-                        if (myBHP.isOnDemand()) {
+
+                        if (myBHP.isOutComeText()) {
+                            // TODO: ask for text here
+                        } else if (myBHP.isOnDemand()) {
                             em.lock(myBHP.getPrescriptionSchedule(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
                             em.lock(myBHP.getPrescription(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
                         } else {
@@ -549,11 +553,12 @@ public class PnlBHP extends NursingRecordsPanel {
                         }
 
                         // add outcome check BHP if necessary
-                        if (myBHP.getPrescriptionSchedule().getCheckAfterHours() != null){
-
-//                            BHP outcomeBHP = new BHP(myBHP.getPrescriptionSchedule(), );
-
+                        if (myBHP.getPrescriptionSchedule().getCheckAfterHours() != null) {
+                            long uid = UniqueTools.getNewUID(em, BHPTools.UIDPREFIX).getUid();
+                            BHP outcomeBHP = em.merge(new BHP(myBHP, uid));
+                            myBHP.setRelID(uid);
                         }
+
 
                         em.getTransaction().commit();
 
@@ -567,7 +572,7 @@ public class PnlBHP extends NursingRecordsPanel {
                             mapShift2BHP.get(myBHP.getShift()).add(position, myBHP);
                             if (myBHP.isOnDemand()) {
                                 // This whole thing here is only to handle the BPHs on Demand
-                                // Fix the other BHPs on demand. If not, you will get locking excpetions,
+                                // Fix the other BHPs on demand. If not, you will get locking exceptions,
                                 // we FORCED INCREMENTED LOCKS on the Schedule and the Prescription.
                                 ArrayList<BHP> changeList = new ArrayList<BHP>();
                                 for (BHP bhp : mapShift2BHP.get(BHPTools.SHIFT_ON_DEMAND)) {

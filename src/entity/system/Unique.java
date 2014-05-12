@@ -51,6 +51,10 @@ public class Unique implements Serializable {
         this.uniqid = uniqid;
     }
 
+    /**
+     * a unique long number for the given PREFIX.
+     * @return
+     */
     public long getUid() {
         return uid;
     }

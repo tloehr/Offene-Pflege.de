@@ -20,6 +20,7 @@ import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -133,7 +134,7 @@ public class HandoversTools {
         return result;
     }
 
-    public static void printSupervision(final DateMidnight day, final Homes home, final Closure afterAction) {
+    public static void printSupervision(final LocalDate day, final Homes home, final Closure afterAction) {
         SwingWorker worker = new SwingWorker() {
             HashMap<Resident, Date> mapAbsentSince = new HashMap<Resident, Date>();
             ArrayList<Resident> listAllActiveResidents;

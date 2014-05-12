@@ -112,8 +112,8 @@ public class DFNTools {
             // die wirklichen Treffer nachher genauer ermittelt werden.
 
             OPDE.info("[DFNImport] " + OPDE.lang.getString("misc.msg.writingto") + ": " + OPDE.getUrl());
-            select.setParameter("von", new DateTime(targetdate.toDate()).hourOfDay().withMinimumValue().minuteOfHour().withMinimumValue().secondOfMinute().withMinimumValue().toDate());
-            select.setParameter("bis", new DateTime(targetdate.toDate()).hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue().toDate());
+            select.setParameter("von", targetdate.toDateTimeAtStartOfDay().toDate());
+            select.setParameter("bis", SYSCalendar.eod(targetdate).toDateTime());
             select.setParameter("ldatum", targetdate.toDate());
 
             List<InterventionSchedule> list = select.getResultList();
@@ -365,9 +365,10 @@ public class DFNTools {
 
             Query query = em.createQuery(jpql);
 
+            LocalDate lDate = new LocalDate(date);
             query.setParameter("resident", resident);
-            query.setParameter("von", new DateTime(date).hourOfDay().withMinimumValue().minuteOfHour().withMinimumValue().secondOfMinute().withMinimumValue().toDate());
-            query.setParameter("bis", new DateTime(date).hourOfDay().withMaximumValue().minuteOfHour().withMaximumValue().secondOfMinute().withMaximumValue().toDate());
+            query.setParameter("von", lDate.toDateTimeAtStartOfDay().toDate());
+            query.setParameter("bis", SYSCalendar.eod(lDate).toDate());
 
             listDFN = new ArrayList<DFN>(query.getResultList());
             Collections.sort(listDFN);
@@ -380,31 +381,31 @@ public class DFNTools {
         return listDFN;
     }
 
-    public static String getInterventionAsHTML(DFN dfn) {
-        String result = SYSConst.html_div_open;
-
-        if (dfn.getNursingProcess() != null && dfn.getNursingProcess().isClosed()) {
-            result += "<s>";
-        }
-        result += "<b>" + dfn.getIntervention().getBezeichnung() + "</b>";
-        result += "<font size=\"-1\">";
-        result += "<br/>Dauer: <b>" + dfn.getMinutes() + "</b> " + OPDE.lang.getString("misc.msg.Minutes");
-
-        if (dfn.getNursingProcess() == null) { // on demand
-            result += " " + OPDE.lang.getString(PnlDFN.internalClassID + ".ondemand");
-        } else {
-            result += " <font color=\"blue\">(" + dfn.getNursingProcess().getCategory().getText() + "</font>)";
-        }
-
-        result += "</font>";
-
-        if (dfn.getNursingProcess() != null && dfn.getNursingProcess().isClosed()) {
-            result += "</s>";
-        }
-
-        result += SYSConst.html_div_close;
-        return result;
-    }
+//    public static String getInterventionAsHTML(DFN dfn) {
+//        String result = SYSConst.html_div_open;
+//
+//        if (dfn.getNursingProcess() != null && dfn.getNursingProcess().isClosed()) {
+//            result += "<s>";
+//        }
+//        result += "<b>" + dfn.getIntervention().getBezeichnung() + "</b>";
+//        result += "<font size=\"-1\">";
+//        result += "<br/>Dauer: <b>" + dfn.getMinutes() + "</b> " + OPDE.lang.getString("misc.msg.Minutes");
+//
+//        if (dfn.getNursingProcess() == null) { // on demand
+//            result += " " + OPDE.lang.getString(PnlDFN.internalClassID + ".ondemand");
+//        } else {
+//            result += " <font color=\"blue\">(" + dfn.getNursingProcess().getCategory().getText() + "</font>)";
+//        }
+//
+//        result += "</font>";
+//
+//        if (dfn.getNursingProcess() != null && dfn.getNursingProcess().isClosed()) {
+//            result += "</s>";
+//        }
+//
+//        result += SYSConst.html_div_close;
+//        return result;
+//    }
 
     public static Icon getIcon(DFN dfn) {
         if (dfn.getState() == STATE_DONE) {
@@ -542,8 +543,8 @@ public class DFNTools {
         EntityManager em = OPDE.createEM();
         Query query = em.createNativeQuery(mysql);
 
-        DateTime f = month.toDateTimeAtStartOfDay().dayOfMonth().withMinimumValue(); // .secondOfDay().withMinimumValue();
-        DateTime t = month.toDateTimeAtStartOfDay().dayOfMonth().withMaximumValue().secondOfDay().withMaximumValue();
+        DateTime f = month.toDateTimeAtStartOfDay().dayOfMonth().withMinimumValue();
+        DateTime t = SYSCalendar.eod(month.toDateTimeAtStartOfDay().dayOfMonth().withMaximumValue()).toDateTime();//.secondOfDay().withMaximumValue();
 
 
 //        OPDE.debug("period " + Days.daysBetween(f, t).getDays() + " days");
