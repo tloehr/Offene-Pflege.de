@@ -56,11 +56,12 @@ public class BHP implements Serializable, Comparable<BHP> {
     private Short dauer;
     @Column(name = "needsText")
     private Boolean needsText;
-    @Column(name = "relID")
-    private Long relID;
     @Basic(optional = false)
     @Column(name = "nanotime")
     private Long nanotime;
+    @JoinColumn(name = "outcome4", referencedColumnName = "BHPID")
+    @ManyToOne
+    private BHP outcome4;
 
     public BHP() {
     }
@@ -84,7 +85,7 @@ public class BHP implements Serializable, Comparable<BHP> {
      *
      * @param bhp
      */
-    public BHP(BHP bhp, long uid) {
+    public BHP(BHP bhp) {
         // looks redundant but simplifies enormously
         this.prescriptionSchedule = bhp.getPrescriptionSchedule();
         this.prescription = this.prescriptionSchedule.getPrescription();
@@ -101,7 +102,7 @@ public class BHP implements Serializable, Comparable<BHP> {
         this.state = BHPTools.STATE_OPEN;
         this.mdate = new Date();
         stockTransaction = new ArrayList<MedStockTransaction>();
-        this.relID = uid;
+        this.outcome4 = bhp;
         this.needsText = true;
         this.dauer = 0;
     }
@@ -220,34 +221,40 @@ public class BHP implements Serializable, Comparable<BHP> {
     }
 
     public boolean hasMed() {
-        return prescription.getTradeForm() != null;
+        return !isOutcomeText() && prescription.getTradeForm() != null;
     }
 
     public boolean shouldBeCalculated() {
-        return hasMed() && resident.isCalcMediUPR1();
+        return !isOutcomeText() && hasMed() && resident.isCalcMediUPR1();
     }
 
     public boolean isOpen() {
         return state == BHPTools.STATE_OPEN;
     }
 
-    public String getFGHTML() {
-        if (isOnDemand()) {
-            return "#" + OPDE.getProps().getProperty("ON_DEMAND_FGBHP");
-        }
-        return "#" + OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[getShift()] + "_FGBHP");
-    }
+//    public String getFGHTML() {
+//        if (isOnDemand()) {
+//            return "#" + OPDE.getProps().getProperty("ON_DEMAND_FGBHP");
+//        }
+//        return "#" + OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[getShift()] + "_FGBHP");
+//    }
 
     public Color getFG() {
-        if (isOnDemand()) {
+        if (isOnDemand() && !isOutcomeText()) {
             return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGBHP"));
+        }
+        if (isOutcomeText()) {
+            return Color.WHITE;
         }
         return GUITools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[getShift()] + "_FGBHP"));
     }
 
     public Color getBG() {
-        if (isOnDemand()) {
+        if (isOnDemand() && !isOutcomeText()) {
             return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGBHP"));
+        }
+        if (isOutcomeText()) {
+            return Color.LIGHT_GRAY;
         }
         return GUITools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[getShift()] + "_BGBHP"));
     }
@@ -260,8 +267,8 @@ public class BHP implements Serializable, Comparable<BHP> {
         return text;
     }
 
-    public void setText(String bemerkung) {
-        this.text = SYSTools.tidy(bemerkung);
+    public void setText(String text) {
+        this.text = SYSTools.tidy(text);
     }
 
     public Date getMDate() {
@@ -306,7 +313,7 @@ public class BHP implements Serializable, Comparable<BHP> {
      * @return
      */
     public boolean isOnDemand() {
-        return prescription.isOnDemand();
+        return prescription.isOnDemand() && !isOutcomeText();
     }
 
     /**
@@ -322,32 +329,31 @@ public class BHP implements Serializable, Comparable<BHP> {
         this.needsText = needsText;
     }
 
+
     /**
-     * a unique numeric key which connects different BHPs together. null, when they are unconnected (default NULL)
+     * BHPs which are "outcome4" another BHP are supposed to have a description text.
      *
      * @return
      */
-    public Long getRelID() {
-        return relID;
+    public boolean isOutcomeText() {
+        return outcome4 != null;
     }
 
-    public void setRelID(Long relID) {
-        this.relID = relID;
+
+    public BHP getOutcome4() {
+        return outcome4;
     }
 
-    /**
-     * BHPs with a dose of -1 are considered to be outcome text BHPs for on demand BHPs.
-     *
-     * @return
-     */
-    public boolean isOutComeText() {
-        return dosis.equals(BigDecimal.ONE.negate());
+    public void setOutcome4(BHP outcome4) {
+        this.outcome4 = outcome4;
     }
-
 
     public Byte getShift() {
         if (isOnDemand()) {
             return BHPTools.SHIFT_ON_DEMAND;
+        }
+        if (isOutcomeText()) {
+            return BHPTools.SHIFT_OUTCOMES;
         }
         if (sZeit == BHPTools.BYTE_TIMEOFDAY) {
             return SYSCalendar.whatShiftIs(this.soll);

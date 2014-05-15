@@ -51,6 +51,7 @@ import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.OptimisticLockException;
@@ -975,7 +976,7 @@ public class PnlHandover extends NursingRecordsPanel {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 btnControllingToday.setEnabled(false);
-                HandoversTools.printSupervision(new DateMidnight(), (Homes) cmbHomes.getSelectedItem(), new Closure() {
+                HandoversTools.printSupervision(new LocalDate(), (Homes) cmbHomes.getSelectedItem(), new Closure() {
                     @Override
                     public void execute(Object o) {
                         btnControllingToday.setEnabled(true);
@@ -990,7 +991,7 @@ public class PnlHandover extends NursingRecordsPanel {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 btnControllingYesterday.setEnabled(false);
-                HandoversTools.printSupervision(new DateMidnight().minusDays(1), (Homes) cmbHomes.getSelectedItem(), new Closure() {
+                HandoversTools.printSupervision(new LocalDate().minusDays(1), (Homes) cmbHomes.getSelectedItem(), new Closure() {
                     @Override
                     public void execute(Object o) {
                         btnControllingYesterday.setEnabled(true);

@@ -718,7 +718,7 @@ public class GUITools {
             @Override
             public void actionPerformed(ActionEvent e) {
                 popup.hidePopup();
-                saveClosure.execute(editor.getText());
+                saveClosure.execute(SYSTools.tidy(editor.getText()));
             }
         });
 

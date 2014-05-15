@@ -431,28 +431,28 @@ public class SYSCalendar {
 
 
     public static void handleDateFocusLost(FocusEvent evt, LocalDate min, LocalDate max) {
-            LocalDate dt;
-            if (max == null) {
-                max = new LocalDate();
-            }
-            try {
-                dt = new LocalDate(parseDate(((JTextField) evt.getSource()).getText()));
-            } catch (NumberFormatException ex) {
-                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wrongdate")));
-                dt = new LocalDate();
-            }
-            if (dt.isAfter(max)) {
-                dt = new LocalDate();
-                DisplayMessage dm = new DisplayMessage(dt.isAfter(max) ? OPDE.lang.getString("misc.msg.futuredate") : OPDE.lang.getString("misc.msg.wrongdate"));
-                OPDE.getDisplayManager().addSubMessage(dm);
-            }
-            if (dt.isBefore(min)) {
-                dt = new LocalDate();
-                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.DateTooOld")));
-            }
-
-            ((JTextField) evt.getSource()).setText(DateFormat.getDateInstance().format(dt.toDate()));
+        LocalDate dt;
+        if (max == null) {
+            max = new LocalDate();
         }
+        try {
+            dt = new LocalDate(parseDate(((JTextField) evt.getSource()).getText()));
+        } catch (NumberFormatException ex) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wrongdate")));
+            dt = new LocalDate();
+        }
+        if (dt.isAfter(max)) {
+            dt = new LocalDate();
+            DisplayMessage dm = new DisplayMessage(dt.isAfter(max) ? OPDE.lang.getString("misc.msg.futuredate") : OPDE.lang.getString("misc.msg.wrongdate"));
+            OPDE.getDisplayManager().addSubMessage(dm);
+        }
+        if (dt.isBefore(min)) {
+            dt = new LocalDate();
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.DateTooOld")));
+        }
+
+        ((JTextField) evt.getSource()).setText(DateFormat.getDateInstance().format(dt.toDate()));
+    }
 
     /**
      * Expiry dates usually have a form like "12-10" oder "12/10" to indicate that the product in question is
@@ -1555,6 +1555,9 @@ public class SYSCalendar {
         if (shift == BHPTools.SHIFT_ON_DEMAND) {
             return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGSHIFT"));
         }
+        if (shift == BHPTools.SHIFT_OUTCOMES) {
+                   return Color.LIGHT_GRAY;
+               }
         return GUITools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[shift] + "_FGSHIFT"));
     }
 
@@ -1562,22 +1565,25 @@ public class SYSCalendar {
         if (shift == BHPTools.SHIFT_ON_DEMAND) {
             return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGSHIFT"));
         }
+        if (shift == BHPTools.SHIFT_OUTCOMES) {
+            return Color.DARK_GRAY;
+        }
         return GUITools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[shift] + "_BGSHIFT"));
     }
 
-    public static Color getFG(Byte shift) {
-        if (shift == -1) {
-            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGBHP"));
-        }
-        return GUITools.getColor(OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[shift] + "_FGBHP"));
-    }
-
-    public static Color getBG(Byte shift) {
-        if (shift == -1) {
-            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGBHP"));
-        }
-        return GUITools.getColor(OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[shift] + "_BGBHP"));
-    }
+//    public static Color getFG(Byte shift) {
+//        if (shift == -1) {
+//            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGBHP"));
+//        }
+//        return GUITools.getColor(OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[shift] + "_FGBHP"));
+//    }
+//
+//    public static Color getBG(Byte shift) {
+//        if (shift == -1) {
+//            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGBHP"));
+//        }
+//        return GUITools.getColor(OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[shift] + "_BGBHP"));
+//    }
 
     public static DateTime bod(DateTime date) {
         return date.hourOfDay().withMinimumValue().minuteOfHour().withMinimumValue().secondOfMinute().withMinimumValue();

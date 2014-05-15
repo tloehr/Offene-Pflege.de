@@ -5,7 +5,6 @@ import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.system.SYSPropsTools;
 import op.OPDE;
-import op.care.bhp.PnlBHP;
 import op.tools.GUITools;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
@@ -35,6 +34,7 @@ public class BHPTools {
     public static final byte STATE_REFUSED = 2;
     public static final byte STATE_REFUSED_DISCARDED = 3;
 
+    public static final byte SHIFT_OUTCOMES = -2;
     public static final byte SHIFT_ON_DEMAND = -1;
     public static final byte SHIFT_VERY_EARLY = 0;
     public static final byte SHIFT_EARLY = 1;
@@ -44,7 +44,7 @@ public class BHPTools {
     public static final Byte[] SHIFTS = new Byte[]{SHIFT_VERY_EARLY, SHIFT_EARLY, SHIFT_LATE, SHIFT_VERY_LATE};
 
     public static final String[] SHIFT_KEY_TEXT = new String[]{"VERY_EARLY", "EARLY", "LATE", "VERY_LATE"};
-    public static final String[] SHIFT_TEXT = new String[]{PnlBHP.internalClassID + ".shift.veryearly", PnlBHP.internalClassID + ".shift.early", PnlBHP.internalClassID + ".shift.late", PnlBHP.internalClassID + ".shift.verylate"};
+    public static final String[] SHIFT_TEXT = new String[]{"nursingrecords.bhp.shift.veryearly", "nursingrecords.bhp.shift.early", "nursingrecords.bhp.shift.late", "nursingrecords.bhp.shift.verylate"};
     public static final String[] TIMEIDTEXTLONG = new String[]{"misc.msg.Time.long", "misc.msg.earlyinthemorning.long", "misc.msg.morning.long", "misc.msg.noon.long", "misc.msg.afternoon.long", "misc.msg.evening.long", "misc.msg.lateatnight.long"};
     public static final String[] TIMEIDTEXTSHORT = new String[]{"misc.msg.Time.short", "misc.msg.earlyinthemorning.short", "misc.msg.morning.short", "misc.msg.noon.short", "misc.msg.afternoon.short", "misc.msg.evening.short", "misc.msg.lateatnight.short"};
 
@@ -115,6 +115,15 @@ public class BHPTools {
                 if (result == 0) {
                     result = o1.getPrescription().compareTo(o2.getPrescription());
                 }
+//                if (result == 0) {
+//                    Long l1 = o1.getOutcome4();
+//                    Long l2 = o2.getOutcome4();
+//                    if (l1 != null && l2 != null) {
+//                        result = l1.compareTo(l2);
+//                    } else {
+//                        result = SYSTools.nullCompare(l1, l2);
+//                    }
+//                }
 
                 return result;
             }
@@ -387,16 +396,15 @@ public class BHPTools {
             String jpql = " SELECT bhp " +
                     " FROM BHP bhp " +
                     " WHERE bhp.prescription = :prescription " +
-                    " AND bhp.soll >= :from AND bhp.soll <= :to ";
-
-            Query query = em.createQuery(jpql);
+                    " AND bhp.soll >= :from AND bhp.soll <= :to AND bhp.dosis > 0 ";
+            Query queryOnDemand = em.createQuery(jpql);
 
             for (Prescription prescription : listPrescriptions) {
-                query.setParameter("prescription", prescription);
-                query.setParameter("from", lDate.toDateTimeAtStartOfDay().toDate());
-                query.setParameter("to", SYSCalendar.eod(lDate).toDate());
+                queryOnDemand.setParameter("prescription", prescription);
+                queryOnDemand.setParameter("from", lDate.toDateTimeAtStartOfDay().toDate());
+                queryOnDemand.setParameter("to", SYSCalendar.eod(lDate).toDate());
 
-                ArrayList<BHP> listBHP4ThisPrescription = new ArrayList<BHP>(query.getResultList());
+                ArrayList<BHP> listBHP4ThisPrescription = new ArrayList<BHP>(queryOnDemand.getResultList());
 
                 PrescriptionSchedule schedule = prescription.getPrescriptionSchedule().get(0);
                 // On Demand prescriptions have exactly one schedule, hence the .get(0).
@@ -414,6 +422,8 @@ public class BHPTools {
                     }
                 }
                 listBHP.addAll(listBHP4ThisPrescription);
+                // outcome BHPs
+//                listBHP.addAll(new ArrayList<BHP>(queryOutcome.getResultList()));
             }
 
             Collections.sort(listBHP, getOnDemandComparator());
@@ -427,14 +437,15 @@ public class BHPTools {
     }
 
     /**
-     * retrieves a list of BHPs for a given resident for a given day. Only regular prescriptions are used (not OnDemand)
+     * retrieves a list of BHPs for a given resident for a given day. Only regular prescriptions are used (not OnDemand).
+     * Outcome BHPs included, even if they originate from onDemand Prescriptions.
      *
      * @param resident
      * @param date
      * @return
      */
     public static ArrayList<BHP> getBHPs(Resident resident, Date date) {
-        long begin = System.currentTimeMillis();
+//        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
         ArrayList<BHP> listBHP = null;
 
@@ -442,7 +453,7 @@ public class BHPTools {
 
             String jpql = " SELECT bhp " +
                     " FROM BHP bhp " +
-                    " WHERE bhp.resident = :resident AND bhp.prescription.situation IS NULL " +
+                    " WHERE bhp.resident = :resident AND bhp.prescription.situation IS NULL" +
                     " AND bhp.soll >= :von AND bhp.soll <= :bis ";
 
             Query query = em.createQuery(jpql);
@@ -460,9 +471,88 @@ public class BHPTools {
         } finally {
             em.close();
         }
-        SYSTools.showTimeDifference(begin);
+//        SYSTools.showTimeDifference(begin);
         return listBHP;
     }
+
+
+    /**
+     * tells us, if the BHP is commented upon.
+     *
+     * @param bhp
+     * @return
+     */
+    public static BHP getComment(BHP bhp) {
+        if (bhp.getPrescriptionSchedule().getCheckAfterHours() == null) {
+            return null;
+        }
+
+        if (bhp.isOutcomeText()){
+            return null;
+        }
+
+        EntityManager em = OPDE.createEM();
+        ArrayList<BHP> listBHP = null;
+
+        try {
+
+            String jpql = " SELECT bhp " +
+                    " FROM BHP bhp " +
+                    " WHERE bhp.outcome4 = :outcome4  ";
+
+            Query query = em.createQuery(jpql);
+
+            query.setParameter("outcome4", bhp);
+
+            listBHP = new ArrayList<BHP>(query.getResultList());
+
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+        return listBHP.isEmpty() ? null : listBHP.get(0);
+    }
+
+    /**
+     * retrieves a list of BHPs for a given resident for a given day. Only regular prescriptions are used (not OnDemand).
+     * Outcome BHPs included, even if they originate from onDemand Prescriptions.
+     *
+     * @param resident
+     * @param date
+     * @return
+     */
+    public static ArrayList<BHP> getOutcomeBHPs(Resident resident, Date date) {
+//            long begin = System.currentTimeMillis();
+        EntityManager em = OPDE.createEM();
+        ArrayList<BHP> listBHP = null;
+
+        try {
+
+            String jpql = " SELECT bhp " +
+                    " FROM BHP bhp " +
+                    " WHERE bhp.resident = :resident AND bhp.outcome4 IS NOT NULL " +
+                    " AND bhp.soll >= :von AND bhp.soll <= :bis ";
+
+            Query query = em.createQuery(jpql);
+
+            LocalDate lDate = new LocalDate(date);
+            query.setParameter("resident", resident);
+            query.setParameter("von", lDate.toDateTimeAtStartOfDay().toDate());
+            query.setParameter("bis", SYSCalendar.eod(lDate).toDate());
+
+            listBHP = new ArrayList<BHP>(query.getResultList());
+            Collections.sort(listBHP);
+
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+//            SYSTools.showTimeDifference(begin);
+        return listBHP;
+    }
+
 
     /**
      * @param date

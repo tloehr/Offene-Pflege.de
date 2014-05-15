@@ -6,7 +6,6 @@ package op.tools;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
-import op.tools.MyJDialog;
 import org.apache.commons.collections.Closure;
 
 import javax.swing.*;
@@ -20,26 +19,55 @@ import java.awt.event.ActionListener;
  */
 public class DlgYesNo extends MyJDialog {
     private Closure actionBlock;
-    private int result;
+    //    private int result;
+    private boolean editorMode;
 
     public DlgYesNo(String message, Icon icon, Closure actionBlock) {
         super(false);
+        editorMode = false;
         initComponents();
         this.actionBlock = actionBlock;
-        txtMessage.setText(SYSTools.toHTML("<div id=\"fonttext\">"+message+"</div>"));
-        result = JOptionPane.CANCEL_OPTION;
+        txtMessage.setText(SYSTools.toHTML("<div id=\"fonttext\">" + message + "</div>"));
+//        result = JOptionPane.CANCEL_OPTION;
+        lblIcon.setIcon(icon);
+        pack();
+        setVisible(true);
+    }
+
+    /**
+     * Same as the other constructor, but converts this Dlg into a Texteditor.
+     *
+     * @param icon
+     * @param actionBlock
+     */
+    public DlgYesNo(Icon icon, Closure actionBlock) {
+        super(false);
+        editorMode = true;
+        initComponents();
+        this.actionBlock = actionBlock;
+        txtMessage.setEditable(true);
+        txtMessage.setText(null);
+        txtMessage.setContentType("text/plain");
         lblIcon.setIcon(icon);
         pack();
         setVisible(true);
     }
 
     private void cancelButtonActionPerformed(ActionEvent e) {
-        actionBlock.execute(JOptionPane.NO_OPTION);
+        if (editorMode) {
+            actionBlock.execute(null);
+        } else {
+            actionBlock.execute(JOptionPane.NO_OPTION);
+        }
         dispose();
     }
 
     private void okButtonActionPerformed(ActionEvent e) {
-        actionBlock.execute(JOptionPane.YES_OPTION);
+        if (editorMode) {
+            actionBlock.execute(SYSTools.catchNull(txtMessage.getText()).isEmpty() ? null : txtMessage.getText());
+        } else {
+            actionBlock.execute(JOptionPane.YES_OPTION);
+        }
         dispose();
     }
 
@@ -66,8 +94,8 @@ public class DlgYesNo extends MyJDialog {
             //======== contentPanel ========
             {
                 contentPanel.setLayout(new FormLayout(
-                    "default, $lcgap, 171dlu",
-                    "124dlu, $lgap, pref"));
+                        "default, $lcgap, 171dlu",
+                        "124dlu, $lgap, pref"));
                 contentPanel.add(lblIcon, CC.xy(1, 1, CC.DEFAULT, CC.TOP));
 
                 //======== scrollPane1 ========

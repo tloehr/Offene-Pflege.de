@@ -19,6 +19,7 @@ import op.care.prescription.PnlPrescription;
 import op.system.PDF;
 import op.threads.DisplayMessage;
 import op.tools.HTMLTools;
+import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.joda.time.DateMidnight;
@@ -935,8 +936,8 @@ public class PrescriptionTools {
 
         Query query = em.createQuery("SELECT p FROM Prescription p WHERE p.resident = :resident AND p.situation IS NOT NULL AND p.from <= :from AND p.to >= :to ORDER BY p.situation.text, p.id");
         query.setParameter("resident", resident);
-        query.setParameter("from", new DateTime(date).toDateMidnight().toDate());
-        query.setParameter("to", new DateTime(date).toDateMidnight().plusDays(1).toDateTime().minusSeconds(1).toDate());
+        query.setParameter("from", new LocalDate(date).toDateTimeAtStartOfDay().toDate());
+        query.setParameter("to", SYSCalendar.eod(new LocalDate(date)).toDate());
 
         List<Prescription> list = query.getResultList();
 

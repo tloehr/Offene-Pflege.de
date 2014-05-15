@@ -907,6 +907,10 @@ public class SYSTools {
      */
     public static String tidy(String in) {
 
+        if (in == null){
+            return null;
+        }
+
         String result = in.replaceAll("\\<[^>]*>","");
 
         result = result.replaceAll("[\\>\\<]","");
