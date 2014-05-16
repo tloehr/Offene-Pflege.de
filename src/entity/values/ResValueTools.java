@@ -445,7 +445,7 @@ public class ResValueTools {
             result += "<i>" + SYSTools.catchNull(rv.getText(), "--") + "</i>";
         } else {
             DecimalFormat dcf = new DecimalFormat(rv.getType().getFormat1());
-            result += "<b>" + dcf.format(rv.getVal1()) + " " + rv.getType().getUnit1() + "</b>";
+            result += "<b>" + dcf.format(rv.getVal1()) + " " + SYSTools.catchNull(rv.getType().getUnit1()) + "</b>";
         }
         result += (rv.isDeleted() || rv.isReplaced() ? "</s>" : "");
         return result;

@@ -12,11 +12,14 @@ public class MedProducts implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "MedPID")
+    @Column(name = "medpid")
     private Long medPID;
     @Basic(optional = false)
-    @Column(name = "Bezeichnung")
+    @Column(name = "text")
     private String text;
+    @Basic(optional = false)
+    @Column(name = "sideeffects")
+    private String sideeffects;
 
     public MedProducts() {
     }
@@ -42,6 +45,10 @@ public class MedProducts implements Serializable {
     }
 
 
+    public void setText(String text) {
+        this.text = text;
+    }
+
     public String getText() {
         return text;
     }
@@ -54,11 +61,19 @@ public class MedProducts implements Serializable {
         this.acme = acme;
     }
 
+    public String getSideeffects() {
+        return sideeffects;
+    }
+
+    public void setSideeffects(String sideeffects) {
+        this.sideeffects = sideeffects;
+    }
+
     public Collection<TradeForm> getTradeforms() {
         return tradeForms;
     }
 
-    @JoinColumn(name = "MPHID", referencedColumnName = "MPHID")
+    @JoinColumn(name = "acmeid", referencedColumnName = "MPHID")
     @ManyToOne(cascade = CascadeType.PERSIST)
     private ACME acme;
 

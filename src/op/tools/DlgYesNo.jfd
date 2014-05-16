@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_33" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_65" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void property="contentType"> 
    <string>form/swing</string> 
@@ -41,11 +41,30 @@
            </void> 
            <void method="setProperty"> 
             <string>$rowSpecs</string> 
-            <string>124dlu, linegap, pref</string> 
+            <string>pref, linegap, 124dlu, linegap, pref</string> 
            </void> 
           </object> 
           <void property="name"> 
            <string>contentPanel</string> 
+          </void> 
+          <void method="add"> 
+           <object class="com.jformdesigner.model.FormComponent"> 
+            <string>javax.swing.JLabel</string> 
+            <void method="setProperty"> 
+             <string>text</string> 
+             <string>text</string> 
+            </void> 
+            <void property="name"> 
+             <string>lblTitle</string> 
+            </void> 
+           </object> 
+           <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+            <class>com.jgoodies.forms.layout.CellConstraints</class> 
+            <void method="setProperty"> 
+             <string>gridWidth</string> 
+             <int>3</int> 
+            </void> 
+           </object> 
           </void> 
           <void method="add"> 
            <object class="com.jformdesigner.model.FormComponent"> 
@@ -62,7 +81,7 @@
             </void> 
             <void method="setProperty"> 
              <string>gridY</string> 
-             <int>1</int> 
+             <int>3</int> 
             </void> 
             <void method="setProperty"> 
              <string>vAlign</string> 
@@ -112,7 +131,7 @@
             </void> 
             <void method="setProperty"> 
              <string>gridY</string> 
-             <int>1</int> 
+             <int>3</int> 
             </void> 
             <void method="setProperty"> 
              <string>vAlign</string> 
@@ -201,7 +220,7 @@
             </void> 
             <void method="setProperty"> 
              <string>gridY</string> 
-             <int>3</int> 
+             <int>5</int> 
             </void> 
             <void method="setProperty"> 
              <string>hAlign</string> 
@@ -244,7 +263,7 @@
        <string>size</string> 
        <object class="java.awt.Dimension"> 
         <int>400</int> 
-        <int>300</int> 
+        <int>320</int> 
        </object> 
       </void> 
      </object> 

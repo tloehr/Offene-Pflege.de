@@ -30,6 +30,7 @@ import entity.process.QProcess;
 import entity.process.QProcessElement;
 import entity.process.SYSINF2PROCESS;
 import entity.system.Users;
+import entity.values.ResValue;
 import op.OPDE;
 import op.care.info.PnlInformation;
 import op.tools.SYSConst;
@@ -89,6 +90,9 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
     @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
     @ManyToOne
     private Resident resident;
+    @JoinColumn(name = "resvalueid", referencedColumnName = "BWID")
+    @ManyToOne
+    private ResValue resValue;
     // ==
     // M:N Relationen
     // ==
@@ -130,6 +134,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
         this.resident = resident;
         this.attachedFilesConnections = new ArrayList<SYSINF2FILE>();
         this.attachedProcessConnections = new ArrayList<SYSINF2PROCESS>();
+        this.resValue = null;
     }
 
     public ResInfo(Date from, Date to, String html, String properties, String bemerkung, ResInfoType bwinfotyp, Resident resident, Users userON, Users userOFF) {
@@ -142,6 +147,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
         this.userON = userON;
         this.userOFF = userOFF;
         this.resident = resident;
+        this.resValue = null;
         this.attachedFilesConnections = new ArrayList<SYSINF2FILE>();
         this.attachedProcessConnections = new ArrayList<SYSINF2PROCESS>();
     }
@@ -264,6 +270,14 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
 
     public boolean isSingleIncident() {
         return bwinfotyp.getIntervalMode() == ResInfoTypeTools.MODE_INTERVAL_SINGLE_INCIDENTS;
+    }
+
+    public ResValue getResValue() {
+        return resValue;
+    }
+
+    public void setResValue(ResValue resValue) {
+        this.resValue = resValue;
     }
 
     public boolean isNoConstraints() {

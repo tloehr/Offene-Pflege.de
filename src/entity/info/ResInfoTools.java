@@ -942,6 +942,18 @@ public class ResInfoTools {
         return result;
     }
 
+    public static List<ResInfo> getInfosFor(ResValue resValue) {
+        EntityManager em = OPDE.createEM();
+        Query query = em.createQuery("SELECT b FROM ResInfo b WHERE b.resValue= :resValue ");
+        query.setParameter("resValue", resValue);
+
+
+        List<ResInfo> bwinfos = query.getResultList();
+        em.close();
+        return bwinfos;
+    }
+
+
     public static String getTXReport(Resident resident, boolean withlongheader,
                                      boolean medi, boolean bilanz, boolean withNReports,
                                      boolean diag, boolean grundpflege, boolean haut, boolean vital, boolean withHTMLIcons) {

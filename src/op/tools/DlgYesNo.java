@@ -28,6 +28,7 @@ public class DlgYesNo extends MyJDialog {
         initComponents();
         this.actionBlock = actionBlock;
         txtMessage.setText(SYSTools.toHTML("<div id=\"fonttext\">" + message + "</div>"));
+        lblTitle.setText(null);
 //        result = JOptionPane.CANCEL_OPTION;
         lblIcon.setIcon(icon);
         pack();
@@ -40,11 +41,12 @@ public class DlgYesNo extends MyJDialog {
      * @param icon
      * @param actionBlock
      */
-    public DlgYesNo(Icon icon, Closure actionBlock) {
+    public DlgYesNo(Icon icon, Closure actionBlock, String title) {
         super(false);
         editorMode = true;
         initComponents();
         this.actionBlock = actionBlock;
+        lblTitle.setText(SYSTools.xx(title));
         txtMessage.setEditable(true);
         txtMessage.setText(null);
         txtMessage.setContentType("text/plain");
@@ -75,6 +77,7 @@ public class DlgYesNo extends MyJDialog {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         dialogPane = new JPanel();
         contentPanel = new JPanel();
+        lblTitle = new JLabel();
         lblIcon = new JLabel();
         scrollPane1 = new JScrollPane();
         txtMessage = new JTextPane();
@@ -94,9 +97,13 @@ public class DlgYesNo extends MyJDialog {
             //======== contentPanel ========
             {
                 contentPanel.setLayout(new FormLayout(
-                        "default, $lcgap, 171dlu",
-                        "124dlu, $lgap, pref"));
-                contentPanel.add(lblIcon, CC.xy(1, 1, CC.DEFAULT, CC.TOP));
+                    "default, $lcgap, 171dlu",
+                    "pref, $lgap, 124dlu, $lgap, pref"));
+
+                //---- lblTitle ----
+                lblTitle.setText("text");
+                contentPanel.add(lblTitle, CC.xywh(1, 1, 3, 1));
+                contentPanel.add(lblIcon, CC.xy(1, 3, CC.DEFAULT, CC.TOP));
 
                 //======== scrollPane1 ========
                 {
@@ -107,7 +114,7 @@ public class DlgYesNo extends MyJDialog {
                     txtMessage.setContentType("text/html");
                     scrollPane1.setViewportView(txtMessage);
                 }
-                contentPanel.add(scrollPane1, CC.xy(3, 1, CC.FILL, CC.FILL));
+                contentPanel.add(scrollPane1, CC.xy(3, 3, CC.FILL, CC.FILL));
 
                 //======== buttonBar ========
                 {
@@ -134,7 +141,7 @@ public class DlgYesNo extends MyJDialog {
                     });
                     buttonBar.add(okButton);
                 }
-                contentPanel.add(buttonBar, CC.xy(3, 3, CC.RIGHT, CC.DEFAULT));
+                contentPanel.add(buttonBar, CC.xy(3, 5, CC.RIGHT, CC.DEFAULT));
             }
             dialogPane.add(contentPanel, BorderLayout.CENTER);
         }
@@ -147,6 +154,7 @@ public class DlgYesNo extends MyJDialog {
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JPanel dialogPane;
     private JPanel contentPanel;
+    private JLabel lblTitle;
     private JLabel lblIcon;
     private JScrollPane scrollPane1;
     private JTextPane txtMessage;

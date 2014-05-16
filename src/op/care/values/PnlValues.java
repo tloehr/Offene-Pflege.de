@@ -35,6 +35,7 @@ import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import entity.files.SYSFilesTools;
 import entity.files.SYSVAL2FILE;
+import entity.info.ResInfoTools;
 import entity.info.Resident;
 import entity.process.*;
 import entity.values.ResValue;
@@ -745,7 +746,9 @@ public class PnlValues extends NursingRecordsPanel {
 
         JPanel pnlMenu = new JPanel(new VerticalLayout());
 
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
+        boolean doesNotBelongToResInfos = ResInfoTools.getInfosFor(resValue).isEmpty();
+
+        if (doesNotBelongToResInfos && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
             /***
              *      _____    _ _ _
              *     | ____|__| (_) |_
@@ -1141,10 +1144,10 @@ public class PnlValues extends NursingRecordsPanel {
 
                         DateTime dt = new DateTime(myValue.getPit());
 
-                        final String keyDay = vtype.getID() + ".xtypes." + dt.toLocalDate() + ".day";
+//                        final String keyDay = vtype.getID() + ".xtypes." + dt.toLocalDate() + ".day";
                         final String keyYear = vtype.getID() + ".xtypes." + Integer.toString(dt.getYear()) + ".year";
                         final LocalDate week = SYSCalendar.max(SYSCalendar.bow(dt.toLocalDate()), new LocalDate(dt.getYear(), 1, 1));
-                        final String keyWeek = vtype.getID() + ".xtypes." + week + ".week";
+//                        final String keyWeek = vtype.getID() + ".xtypes." + week + ".week";
 
                         synchronized (mapType2Values) {
 

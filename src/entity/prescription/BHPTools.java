@@ -377,6 +377,7 @@ public class BHPTools {
 
     /**
      * retrieves a list of BHPs for a given resident for a given day. Only OnDemand prescriptions are used (not regular ones)
+     * This method creates a list of existing BHPs, as well as possible appliable BHPs which may be clicked by the user.
      *
      * @param resident
      * @param date
@@ -487,7 +488,7 @@ public class BHPTools {
             return null;
         }
 
-        if (bhp.isOutcomeText()){
+        if (bhp.isOutcomeText()) {
             return null;
         }
 
@@ -522,7 +523,7 @@ public class BHPTools {
      * @param date
      * @return
      */
-    public static ArrayList<BHP> getOutcomeBHPs(Resident resident, Date date) {
+    public static ArrayList<BHP> getOutcomeBHPs(Resident resident, LocalDate date) {
 //            long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
         ArrayList<BHP> listBHP = null;
@@ -536,10 +537,9 @@ public class BHPTools {
 
             Query query = em.createQuery(jpql);
 
-            LocalDate lDate = new LocalDate(date);
             query.setParameter("resident", resident);
-            query.setParameter("von", lDate.toDateTimeAtStartOfDay().toDate());
-            query.setParameter("bis", SYSCalendar.eod(lDate).toDate());
+            query.setParameter("von", date.toDateTimeAtStartOfDay().toDate());
+            query.setParameter("bis", SYSCalendar.eod(date).toDate());
 
             listBHP = new ArrayList<BHP>(query.getResultList());
             Collections.sort(listBHP);
@@ -554,12 +554,43 @@ public class BHPTools {
     }
 
 
+    public static boolean isOnDemandBHPs(Resident resident, LocalDate date) {
+        EntityManager em = OPDE.createEM();
+        boolean result = false;
+        try {
+            String jpql = " " +
+                    " SELECT bhp " +
+                    " FROM BHP bhp " +
+                    " WHERE bhp.prescription.situation IS NOT NULL " +
+                    " AND bhp.resident = :resident " +
+                    " AND bhp.outcome4 IS NULL " +
+                    " AND bhp.soll >= :from AND bhp.soll <= :to ";
+
+            Query query = em.createQuery(jpql);
+
+            query.setParameter("resident", resident);
+            query.setParameter("from", date.toDateTimeAtStartOfDay().toDate());
+            query.setParameter("to", SYSCalendar.eod(date).toDate());
+
+            result = !new ArrayList<BHP>(query.getResultList()).isEmpty();
+
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+        return result;
+    }
+
+
+
+
     /**
      * @param date
      * @return
      */
     public static ArrayList<BHP> getOpenBHPs(LocalDate date, Homes home) {
-        long begin = System.currentTimeMillis();
+//        long begin = System.currentTimeMillis();
         EntityManager em = OPDE.createEM();
         ArrayList<BHP> listBHP = null;
 
@@ -585,7 +616,7 @@ public class BHPTools {
         } finally {
             em.close();
         }
-        SYSTools.showTimeDifference(begin);
+//        SYSTools.showTimeDifference(begin);
         return listBHP;
     }
 

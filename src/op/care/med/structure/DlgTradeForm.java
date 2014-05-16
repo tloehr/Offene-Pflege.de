@@ -173,7 +173,7 @@ public class DlgTradeForm extends MyJDialog {
     private void initComponents() {
         jPanel1 = new JPanel();
         txtZusatz = new JTextField();
-        cmbForm = new JComboBox();
+        cmbForm = new JComboBox<>();
         panel2 = new JPanel();
         btnAdd = new JButton();
         hSpacer1 = new JPanel(null);
@@ -197,19 +197,19 @@ public class DlgTradeForm extends MyJDialog {
         //======== jPanel1 ========
         {
             jPanel1.setLayout(new FormLayout(
-                    "14dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default, $lcgap, 14dlu",
-                    "fill:14dlu, 2*($lgap, fill:default), $lgap, default, 2*($lgap, fill:default), $lgap, 14dlu"));
+                "14dlu, $lcgap, default, $lcgap, default:grow, $lcgap, default, $lcgap, 14dlu",
+                "fill:14dlu, 2*($lgap, fill:default), $lgap, default, 2*($lgap, fill:default), $lgap, 14dlu"));
 
             //---- txtZusatz ----
             txtZusatz.setFont(new Font("Arial", Font.PLAIN, 14));
             jPanel1.add(txtZusatz, CC.xywh(3, 3, 5, 1));
 
             //---- cmbForm ----
-            cmbForm.setModel(new DefaultComboBoxModel(new String[]{
-                    "Item 1",
-                    "Item 2",
-                    "Item 3",
-                    "Item 4"
+            cmbForm.setModel(new DefaultComboBoxModel<>(new String[] {
+                "Item 1",
+                "Item 2",
+                "Item 3",
+                "Item 4"
             }));
             cmbForm.setFont(new Font("Arial", Font.PLAIN, 14));
             jPanel1.add(cmbForm, CC.xywh(3, 5, 3, 1));
@@ -353,7 +353,7 @@ public class DlgTradeForm extends MyJDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel jPanel1;
     private JTextField txtZusatz;
-    private JComboBox cmbForm;
+    private JComboBox<String> cmbForm;
     private JPanel panel2;
     private JButton btnAdd;
     private JPanel hSpacer1;

@@ -13,7 +13,7 @@ import java.awt.*;
  * To change this template use File | Settings | File Templates.
  */
 public class ACMETools {
-    public static ListCellRenderer getHerstellerRenderer(int maxlen) {
+    public static ListCellRenderer getRenderer(int maxlen) {
         final int max = maxlen;
         return new ListCellRenderer() {
             @Override

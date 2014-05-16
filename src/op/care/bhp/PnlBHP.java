@@ -49,6 +49,7 @@ import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -158,7 +159,7 @@ public class PnlBHP extends NursingRecordsPanel {
          */
         initPhase = true;
 
-        final boolean withworker = false;
+        final boolean withworker = true;
         if (withworker) {
 
             OPDE.getMainframe().setBlocked(true);
@@ -214,7 +215,7 @@ public class PnlBHP extends NursingRecordsPanel {
                             if (!mapShift2BHP.containsKey(BHPTools.SHIFT_OUTCOMES)) {
                                 mapShift2BHP.put(BHPTools.SHIFT_OUTCOMES, new ArrayList<BHP>());
                             }
-                            mapShift2BHP.get(BHPTools.SHIFT_OUTCOMES).addAll(BHPTools.getOutcomeBHPs(resident, jdcDatum.getDate()));
+                            mapShift2BHP.get(BHPTools.SHIFT_OUTCOMES).addAll(BHPTools.getOutcomeBHPs(resident, new LocalDate(jdcDatum.getDate())));
                         }
 
                         synchronized (mapShift2Pane) {
@@ -276,7 +277,7 @@ public class PnlBHP extends NursingRecordsPanel {
             if (!mapShift2BHP.containsKey(BHPTools.SHIFT_OUTCOMES)) {
                 mapShift2BHP.put(BHPTools.SHIFT_OUTCOMES, new ArrayList<BHP>());
             }
-            mapShift2BHP.get(BHPTools.SHIFT_OUTCOMES).addAll(BHPTools.getOutcomeBHPs(resident, jdcDatum.getDate()));
+            mapShift2BHP.get(BHPTools.SHIFT_OUTCOMES).addAll(BHPTools.getOutcomeBHPs(resident, new LocalDate(jdcDatum.getDate())));
 
             for (Byte shift : new Byte[]{BHPTools.SHIFT_ON_DEMAND, BHPTools.SHIFT_OUTCOMES, BHPTools.SHIFT_VERY_EARLY, BHPTools.SHIFT_EARLY, BHPTools.SHIFT_LATE, BHPTools.SHIFT_VERY_LATE}) {
                 mapShift2Pane.put(shift, createCP4(shift));
@@ -298,11 +299,21 @@ public class PnlBHP extends NursingRecordsPanel {
             cpBHP.removeAll();
             cpBHP.setLayout(new JideBoxLayout(cpBHP, JideBoxLayout.Y_AXIS));
             for (Byte shift : new Byte[]{BHPTools.SHIFT_ON_DEMAND, BHPTools.SHIFT_OUTCOMES, BHPTools.SHIFT_VERY_EARLY, BHPTools.SHIFT_EARLY, BHPTools.SHIFT_LATE, BHPTools.SHIFT_VERY_LATE}) {
-                OPDE.debug(shift);
                 cpBHP.add(mapShift2Pane.get(shift));
+
                 if (resetCollapseState) {
                     try {
-                        mapShift2Pane.get(shift).setCollapsed(shift != SYSCalendar.whatShiftIs(new Date()));
+
+                        LocalDate day = new LocalDate(jdcDatum.getDate());
+                        if (shift == BHPTools.SHIFT_ON_DEMAND) {
+                            mapShift2Pane.get(BHPTools.SHIFT_ON_DEMAND).setCollapsed(!BHPTools.isOnDemandBHPs(resident, day));
+                        } else if (shift == BHPTools.SHIFT_OUTCOMES) {
+                            mapShift2Pane.get(BHPTools.SHIFT_OUTCOMES).setCollapsed(BHPTools.getOutcomeBHPs(resident, day).isEmpty());
+                        } else {
+                            mapShift2Pane.get(shift).setCollapsed(shift != SYSCalendar.whatShiftIs(new Date()));
+                        }
+
+
                     } catch (PropertyVetoException e) {
                         OPDE.debug(e);
                     }
@@ -583,15 +594,14 @@ public class PnlBHP extends NursingRecordsPanel {
                                     outcomeText = o.toString();
                                 }
                             }
-                        });
+                        }, "nursingrecords.bhp.describe.outcome");
 
                     }
 
                     if (bhp.getNeedsText() && outcomeText == null) {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("no text, no outcome", DisplayMessage.WARNING));
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("nursingrecords.bhp.notext.nooutcome", DisplayMessage.WARNING));
                         return;
                     }
-
 
                     EntityManager em = OPDE.createEM();
                     try {
@@ -1174,7 +1184,7 @@ public class PnlBHP extends NursingRecordsPanel {
                         txt.setText(SYSTools.toHTML(SYSConst.html_div(bhp.getPrescription().getText())));
                     }
 
-                    txt.setText(SYSTools.toHTML(SYSConst.html_div(bhp.getPrescription().getText())));
+//                    txt.setText(SYSTools.toHTML(SYSConst.html_div(bhp.getPrescription().getText())));
                     GUITools.showPopup(popupInfo, SwingConstants.SOUTH_WEST);
                 }
             });

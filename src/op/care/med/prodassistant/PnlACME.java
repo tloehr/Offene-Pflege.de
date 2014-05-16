@@ -46,7 +46,7 @@ public class PnlACME extends JPanel {
         EntityManager em = OPDE.createEM();
         Query query2 = em.createQuery("SELECT m FROM ACME m ORDER BY m.name, m.city");
         lstHersteller.setModel(new DefaultComboBoxModel(query2.getResultList().toArray(new ACME[]{})));
-        lstHersteller.setCellRenderer(ACMETools.getHerstellerRenderer(0));
+        lstHersteller.setCellRenderer(ACMETools.getRenderer(0));
         em.close();
     }
 

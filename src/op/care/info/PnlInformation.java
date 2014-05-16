@@ -17,6 +17,7 @@ import entity.files.SYSFilesTools;
 import entity.info.*;
 import entity.process.*;
 import entity.system.SYSPropsTools;
+import entity.values.ResValue;
 import op.OPDE;
 import op.care.PnlCare;
 import op.care.sysfiles.DlgFiles;
@@ -410,8 +411,6 @@ public class PnlInformation extends NursingRecordsPanel {
 
                                 cpResInfoType.setFont(SYSConst.ARIAL18);
 
-
-                                //                    cpResInfoType.setBackground((GUITools.blend(cat.getColor(), Color.WHITE, 0.7f)));
                                 cpResInfoType.setForeground((GUITools.blend(cat.getColor(), Color.BLACK, 0.7f)));
                                 cpResInfoType.setBackground(Color.WHITE);
 
@@ -534,6 +533,7 @@ public class PnlInformation extends NursingRecordsPanel {
                                                     public void execute(Object o) {
                                                         popup.hidePopup();
                                                         if (o != null) {
+
                                                             EntityManager em = OPDE.createEM();
                                                             try {
                                                                 em.getTransaction().begin();
@@ -547,6 +547,7 @@ public class PnlInformation extends NursingRecordsPanel {
 
 
                                                                 final ResInfo newinfo = em.merge((ResInfo) o);
+
                                                                 newinfo.setHtml(ResInfoTools.getContentAsHTML(newinfo));
 
                                                                 // only for the screen refresh
@@ -970,12 +971,12 @@ public class PnlInformation extends NursingRecordsPanel {
                                     if (!answer.equals(JOptionPane.YES_OPTION)) {
                                         return;
                                     }
+
+
                                     EntityManager em = OPDE.createEM();
                                     try {
                                         em.getTransaction().begin();
                                         ResInfo oldinfo = em.merge(resInfo);
-
-
                                         ResInfo newinfo = em.merge((ResInfo) o);
 //                                    mapInfo2Editor.get(resInfo).getResInfo()
                                         em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
@@ -1116,6 +1117,11 @@ public class PnlInformation extends NursingRecordsPanel {
                                         editinfo.setHtml(ResInfoTools.getContentAsHTML(tmpInfo));
                                         editinfo.setProperties(tmpInfo.getProperties());
                                         editinfo.setText(tmpInfo.getText());
+                                        if (editinfo.getResValue() != null){
+                                            ResValue oldValue = editinfo.getResValue();
+                                            editinfo.setResValue(em.merge(tmpInfo.getResValue()));
+                                            em.remove(oldValue);
+                                        }
                                         editinfo.setUserON(em.merge(OPDE.getLogin().getUser()));
 
                                         em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
@@ -1520,9 +1526,15 @@ public class PnlInformation extends NursingRecordsPanel {
                                         try {
                                             em.getTransaction().begin();
                                             ResInfo editinfo = em.merge(resInfo);
+
                                             em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
                                             em.lock(editinfo, LockModeType.OPTIMISTIC);
+
+                                            if (editinfo.getResValue() != null) {
+                                                em.remove(em.merge(editinfo.getResValue()));
+                                            }
                                             em.remove(editinfo);
+
                                             em.getTransaction().commit();
 
 

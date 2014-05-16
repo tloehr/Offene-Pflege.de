@@ -14,6 +14,7 @@ import entity.prescription.GP;
 import entity.prescription.GPTools;
 import entity.values.ResValue;
 import entity.values.ResValueTools;
+import entity.values.ResValueTypes;
 import entity.values.ResValueTypesTools;
 import op.OPDE;
 import op.system.PDF;
@@ -72,11 +73,12 @@ public class PnlEditResInfo {
     private final int TYPE_TIME = 4;
     private int mode;
     private boolean scalemode;
+    //    private ResValue scaleValue = null;
     private final int TEXTFIELD_STANDARD_WIDTH = 35;
 
     boolean initPanel = false;
     Properties content;
-    private JLabel sumlabel;
+    private JTextArea sumlabel;
     private Component focusOwner = null;
 
     boolean enabled;
@@ -206,9 +208,11 @@ public class PnlEditResInfo {
             lblComment.setForeground(Color.LIGHT_GRAY);
             lblComment.setFont(SYSConst.ARIAL18BOLD);
             ovrComment.addOverlayComponent(lblComment, DefaultOverlayable.SOUTH_EAST);
-            ovrComment.setPreferredSize(new Dimension(h.getPanel().getPreferredSize().width, txtComment.getPreferredSize().height));
+            if (resInfo.getResValue() != null) {
+                pnlContent.add(new JLabel(SYSTools.xx("nursingrecords.info.dlg.will.create.value")), BorderLayout.NORTH);
+            }
             pnlContent.add(h.getPanel(), BorderLayout.CENTER);
-            pnlContent.add(ovrComment, BorderLayout.SOUTH);
+            pnlContent.add(new JScrollPane(ovrComment), BorderLayout.SOUTH);
 
         } catch (SAXException ex1) {
             ex1.printStackTrace();
@@ -265,13 +269,6 @@ public class PnlEditResInfo {
                 if (resInfo != null) {
                     closure.execute(getResInfo());
                 } else {
-//                    // remove content form disabled controls
-//                    for (String key : content.stringPropertyNames()) {
-//                        if (!((Component) components.get(key)).isEnabled()) {
-//                            content.remove(key);
-//                            OPDE.debug("removing content for: " + key);
-//                        }
-//                    }
                     closure.execute(content);
                 }
                 cleanup();
@@ -592,7 +589,7 @@ public class PnlEditResInfo {
                 if (c[i] instanceof JComponent) {
                     JComponent jc = (JComponent) c[i];
 
-                    OPDE.debug(SYSTools.catchNull(jc.getName()));
+                    // OPDE.debug(SYSTools.catchNull(jc.getName()));
 
                     if (!enabled) {
                         setXEnabled(jc, enabled);
@@ -631,7 +628,6 @@ public class PnlEditResInfo {
         }
 
         if (scaleriskmodel != null && scalesum != null) {
-
             String risiko = "unbekanntes Risiko";
             String color = "black";
             String rating = "0";
@@ -649,9 +645,12 @@ public class PnlEditResInfo {
             content.put("scalesum", scalesum.toString());
             content.put("risk", risiko);
             content.put("rating", rating);
+
+            if (resInfo.getResValue() != null) {
+                resInfo.getResValue().setVal1(scalesum);
+                resInfo.getResValue().setText(SYSTools.xx("nursingrecords.info.dlg.value.from.info") + ": " + resInfo.getResInfoType().getShortDescription() + " " + resInfo.getResInfoType().getLongDescription() + ": " + risiko);
+            }
         }
-
-
     }
 
     /**
@@ -972,6 +971,13 @@ public class PnlEditResInfo {
                 scalesumlabeltext = attributes.getValue("label");
                 scaleButtonGroups = new ArrayList();
                 scaleriskmodel = new ArrayList();
+                try {
+                    ResValueTypes scaleValueType = ResValueTypesTools.getType(Short.parseShort(SYSTools.catchNull(attributes.getValue("resvaltype"))));
+                    resInfo.setResValue(new ResValue(resInfo.getResident(), scaleValueType, resInfo.getFrom()));
+                    resInfo.getResValue().setVal1(BigDecimal.ZERO);
+                } catch (NumberFormatException nfe) {
+                    resInfo.setResValue(null);
+                }
             }
             if (tagName.equalsIgnoreCase("risk")) {
                 scaleriskmodel.add(new RiskBean(attributes.getValue("from"), attributes.getValue("to"), attributes.getValue("label"), attributes.getValue("color"), attributes.getValue("rating")));
@@ -1388,9 +1394,13 @@ public class PnlEditResInfo {
             }
             if (qName.equalsIgnoreCase("scale")) {
                 outerpanel.add("p hfill", new JSeparator());
-                sumlabel = new JLabel();
+
+                sumlabel = new JTextArea();
+                sumlabel.setRows(3);
+                sumlabel.setEditable(false);
+
                 sumlabel.setFont(SYSConst.ARIAL20BOLD);
-                outerpanel.add("br", sumlabel);
+                outerpanel.add("br hfill", new JScrollPane(sumlabel));
             }
             if (qName.equalsIgnoreCase("combobox")) {
                 JComboBox j = (JComboBox) components.get(groupname);
