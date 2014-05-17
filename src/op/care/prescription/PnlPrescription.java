@@ -38,7 +38,11 @@ import entity.prescription.*;
 import entity.process.*;
 import entity.system.UniqueTools;
 import op.OPDE;
-import op.care.med.inventory.*;
+import op.care.med.inventory.DlgCloseStock;
+import op.care.med.inventory.DlgNewStocks;
+import op.care.med.inventory.DlgOpenStock;
+import op.care.med.inventory.PnlExpiry;
+import op.care.med.structure.PnlMed;
 import op.care.sysfiles.DlgFiles;
 import op.process.DlgProcessAssign;
 import op.system.InternalClassACL;
@@ -47,7 +51,6 @@ import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -354,7 +357,8 @@ public class PnlPrescription extends NursingRecordsPanel {
                                 buildPanel();
                                 GUITools.flashBackground(myCP, Color.YELLOW, 2);
 
-                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -595,7 +599,8 @@ public class PnlPrescription extends NursingRecordsPanel {
                                             });
                                         }
                                     });
-                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -659,7 +664,8 @@ public class PnlPrescription extends NursingRecordsPanel {
                                         }
                                     });
 
-                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -800,7 +806,8 @@ public class PnlPrescription extends NursingRecordsPanel {
                                     final CollapsiblePane myNewCP = createCP4(newPrescription);
                                     buildPanel();
                                     GUITools.flashBackground(myNewCP, Color.YELLOW, 2);
-                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -872,7 +879,8 @@ public class PnlPrescription extends NursingRecordsPanel {
                                         }
                                     });
 
-                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -946,7 +954,8 @@ public class PnlPrescription extends NursingRecordsPanel {
                                             }
                                         });
 
-                                    } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                    } catch (OptimisticLockException ole) {
+                                        OPDE.warn(ole);
                                         if (em.getTransaction().isActive()) {
                                             em.getTransaction().rollback();
                                         }
@@ -1013,7 +1022,8 @@ public class PnlPrescription extends NursingRecordsPanel {
                                             }
                                         });
 
-                                    } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                    } catch (OptimisticLockException ole) {
+                                        OPDE.warn(ole);
                                         if (em.getTransaction().isActive()) {
                                             em.getTransaction().rollback();
                                         }
@@ -1077,7 +1087,8 @@ public class PnlPrescription extends NursingRecordsPanel {
                                     OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.Deleted") + ": " + PrescriptionTools.toPrettyString(myverordnung)));
                                     lstPrescriptions.remove(prescription);
                                     buildPanel();
-                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1135,7 +1146,8 @@ public class PnlPrescription extends NursingRecordsPanel {
                                 em.getTransaction().commit();
                                 createCP4(prescription);
                                 buildPanel();
-                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -1173,7 +1185,7 @@ public class PnlPrescription extends NursingRecordsPanel {
              *      \____|_|\___/|___/\___|____/ \__\___/ \___|_|\_\
              *
              */
-            final JButton btnCloseStock = GUITools.createHyperlinkButton(PnlInventory.internalClassID+".stock.btnout.tooltip", SYSConst.icon22ledRedOn, null);
+            final JButton btnCloseStock = GUITools.createHyperlinkButton("nursingrecords.inventory.stock.btnout.tooltip", SYSConst.icon22ledRedOn, null);
             btnCloseStock.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnCloseStock.addActionListener(new ActionListener() {
                 @Override
@@ -1220,7 +1232,7 @@ public class PnlPrescription extends NursingRecordsPanel {
              *      \___/| .__/ \___|_| |_|____/ \__\___/ \___|_|\_\
              *           |_|
              */
-            final JButton btnOpenStock = GUITools.createHyperlinkButton(PnlInventory.internalClassID+".stock.btnopen.tooltip", SYSConst.icon22ledGreenOn, null);
+            final JButton btnOpenStock = GUITools.createHyperlinkButton("nursingrecords.inventory.stock.btnopen.tooltip", SYSConst.icon22ledGreenOn, null);
             btnOpenStock.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnOpenStock.addActionListener(new ActionListener() {
                 @Override
@@ -1238,6 +1250,53 @@ public class PnlPrescription extends NursingRecordsPanel {
             });
             btnOpenStock.setEnabled(inventory != null && stockInUse == null && !prescription.isClosed());
             pnlMenu.add(btnOpenStock);
+
+            /***
+             *      ____  _     _      _____  __  __           _
+             *     / ___|(_) __| | ___| ____|/ _|/ _| ___  ___| |_ ___
+             *     \___ \| |/ _` |/ _ \  _| | |_| |_ / _ \/ __| __/ __|
+             *      ___) | | (_| |  __/ |___|  _|  _|  __/ (__| |_\__ \
+             *     |____/|_|\__,_|\___|_____|_| |_|  \___|\___|\__|___/
+             *
+             */
+            final JButton btnEditSideEffects = GUITools.createHyperlinkButton("nursingrecords.prescription.edit.sideeffects", SYSConst.icon22sideeffects, null);
+            btnEditSideEffects.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnEditSideEffects.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    new DlgYesNo(SYSConst.icon48sideeffects, new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            if (o != null) {
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    MedProducts myProduct = em.merge(prescription.getTradeForm().getMedProduct());
+                                    myProduct.setSideEffects(o.toString().trim());
+                                    for (TradeForm tf : myProduct.getTradeforms()) {
+                                        em.lock(em.merge(tf), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                        for (MedPackage mp : tf.getPackages()) {
+                                            em.lock(em.merge(mp), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                                        }
+                                    }
+                                    em.lock(myProduct, LockModeType.OPTIMISTIC);
+                                    em.getTransaction().commit();
+                                    reload();
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+                            }
+                        }
+                    }, "nursingrecords.prescription.edit.sideeffects", prescription.getTradeForm().getMedProduct().getSideEffects());
+                }
+            });
+            btnEditSideEffects.setEnabled(prescription.hasMed() && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, PnlMed.internalClassID));
+            pnlMenu.add(btnEditSideEffects);
 
             pnlMenu.add(new JSeparator());
 
@@ -1343,7 +1402,8 @@ public class PnlPrescription extends NursingRecordsPanel {
                                 buildPanel();
                                 GUITools.flashBackground(myCP, Color.YELLOW, 2);
 
-                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }

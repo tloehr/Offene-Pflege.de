@@ -650,15 +650,20 @@ public class PrescriptionTools {
 //        return result;
 //    }
 
-    public static String getRemark(Prescription verordnung) {
+    public static String getRemark(Prescription prescription) {
         String result = "<div id=\"fonttext\">";
 
-        if (verordnung.isOnDemand()) {
-            result += "<b><u>" + OPDE.lang.getString("misc.msg.ondemand") + ":</u> <font color=\"blue\">" + verordnung.getSituation().getText() + "</font></b>";
+        if (prescription.hasMed() && prescription.getTradeForm().getMedProduct().hasSideEffects()){
+            result += "<b><u>" + OPDE.lang.getString("misc.msg.sideeffects") + ":</u> <font color=\"orange\">" + prescription.getTradeForm().getMedProduct().getSideEffects() + "</font></b>";
+
         }
-        if (!verordnung.getText().isEmpty()) {
+        if (prescription.isOnDemand()) {
             result += result.isEmpty() ? "" : "<br/>";
-            result += "<b><u>" + OPDE.lang.getString("misc.msg.comment") + ":</u> </b>" + verordnung.getText();
+            result += "<b><u>" + OPDE.lang.getString("misc.msg.ondemand") + ":</u> <font color=\"blue\">" + prescription.getSituation().getText() + "</font></b>";
+        }
+        if (!prescription.getText().isEmpty()) {
+            result += result.isEmpty() ? "" : "<br/>";
+            result += "<b><u>" + OPDE.lang.getString("misc.msg.comment") + ":</u> </b>" + prescription.getText();
         }
         return result + "</div>";
     }

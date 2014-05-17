@@ -41,15 +41,15 @@ public class DlgYesNo extends MyJDialog {
      * @param icon
      * @param actionBlock
      */
-    public DlgYesNo(Icon icon, Closure actionBlock, String title) {
+    public DlgYesNo(Icon icon, Closure actionBlock, String title, String preset) {
         super(false);
         editorMode = true;
         initComponents();
         this.actionBlock = actionBlock;
         lblTitle.setText(SYSTools.xx(title));
         txtMessage.setEditable(true);
-        txtMessage.setText(null);
         txtMessage.setContentType("text/plain");
+        txtMessage.setText(SYSTools.catchNull(preset));
         lblIcon.setIcon(icon);
         pack();
         setVisible(true);
@@ -66,7 +66,7 @@ public class DlgYesNo extends MyJDialog {
 
     private void okButtonActionPerformed(ActionEvent e) {
         if (editorMode) {
-            actionBlock.execute(SYSTools.catchNull(txtMessage.getText()).isEmpty() ? null : txtMessage.getText());
+            actionBlock.execute(txtMessage.getText() == null ? null : txtMessage.getText().trim());
         } else {
             actionBlock.execute(JOptionPane.YES_OPTION);
         }

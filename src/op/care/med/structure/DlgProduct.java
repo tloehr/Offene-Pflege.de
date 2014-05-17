@@ -30,22 +30,17 @@ package op.care.med.structure;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
-import entity.EntityTools;
-import entity.prescription.ACME;
-import entity.prescription.ACMETools;
-import entity.prescription.MedProducts;
-import entity.prescription.TradeForm;
+import entity.prescription.*;
 import op.OPDE;
 import op.care.med.prodassistant.DlgACME;
 import op.tools.MyJDialog;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.Query;
 import javax.swing.*;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -62,11 +57,13 @@ public class DlgProduct extends MyJDialog {
     /**
      * Creates new form DlgProdukt
      */
-    public DlgProduct(JFrame parent, MedProducts produkt) {
-        super(parent, true);
-        this.product = produkt;
+    public DlgProduct(String title, MedProducts product) {
+        super(false);
+        this.product = product;
+        setTitle(title);
         initComponents();
         initDialog();
+        pack();
         setVisible(true);
     }
 
@@ -97,10 +94,14 @@ public class DlgProduct extends MyJDialog {
     }
 
     private void cmbAcmeItemStateChanged(ItemEvent e) {
-       saveOK();
+
     }
 
     private void initDialog() {
+
+        lblProductName.setText(SYSTools.xx("newstocks.lblProd"));
+        lblAcme.setText(SYSTools.xx("misc.msg.acme"));
+        lblSideEffects.setText(SYSTools.xx("misc.msg.sideeffects"));
 
         EntityManager em = OPDE.createEM();
         Query query2 = em.createQuery("SELECT m FROM ACME m ORDER BY m.name, m.city");
@@ -112,6 +113,8 @@ public class DlgProduct extends MyJDialog {
             cmbAcme.setSelectedItem(product.getACME());
         }
 
+        txtName.setText(product.getText());
+        txtSideEffects.setText(product.getSideEffects());
 
     }
 
@@ -136,24 +139,20 @@ public class DlgProduct extends MyJDialog {
         btnOK = new JButton();
 
         //======== this ========
-        setLayout(new FormLayout(
+        setModal(true);
+        Container contentPane = getContentPane();
+        contentPane.setLayout(new FormLayout(
             "2*(default, $lcgap), default:grow, 2*($lcgap, default)",
             "default, 2*($lgap, fill:default), $lgap, fill:default:grow, $lgap, fill:default, $lgap, default"));
 
         //---- lblProductName ----
         lblProductName.setText("Produktname");
         lblProductName.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(lblProductName, CC.xy(3, 3));
+        contentPane.add(lblProductName, CC.xy(3, 3));
 
         //---- txtName ----
         txtName.setFont(new Font("Arial", Font.PLAIN, 14));
-        txtName.addCaretListener(new CaretListener() {
-            @Override
-            public void caretUpdate(CaretEvent e) {
-                txtBezeichnungCaretUpdate(e);
-            }
-        });
-        add(txtName, CC.xywh(5, 3, 3, 1));
+        contentPane.add(txtName, CC.xywh(5, 3, 3, 1));
 
         //---- cmbAcme ----
         cmbAcme.setModel(new DefaultComboBoxModel<>(new String[] {
@@ -169,12 +168,12 @@ public class DlgProduct extends MyJDialog {
                 cmbAcmeItemStateChanged(e);
             }
         });
-        add(cmbAcme, CC.xy(5, 5));
+        contentPane.add(cmbAcme, CC.xy(5, 5));
 
         //---- lblAcme ----
         lblAcme.setText("Hersteller");
         lblAcme.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(lblAcme, CC.xy(3, 5));
+        contentPane.add(lblAcme, CC.xy(3, 5));
 
         //---- btnAdd ----
         btnAdd.setText(null);
@@ -189,12 +188,12 @@ public class DlgProduct extends MyJDialog {
                 btnAddActionPerformed(e);
             }
         });
-        add(btnAdd, CC.xy(7, 5, CC.LEFT, CC.DEFAULT));
+        contentPane.add(btnAdd, CC.xy(7, 5, CC.LEFT, CC.DEFAULT));
 
         //---- lblSideEffects ----
         lblSideEffects.setText("Hersteller");
         lblSideEffects.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(lblSideEffects, CC.xy(3, 7, CC.DEFAULT, CC.TOP));
+        contentPane.add(lblSideEffects, CC.xy(3, 7, CC.DEFAULT, CC.TOP));
 
         //======== scrollPane1 ========
         {
@@ -203,7 +202,7 @@ public class DlgProduct extends MyJDialog {
             txtSideEffects.setFont(new Font("Arial", Font.PLAIN, 14));
             scrollPane1.setViewportView(txtSideEffects);
         }
-        add(scrollPane1, CC.xywh(5, 7, 3, 1));
+        contentPane.add(scrollPane1, CC.xywh(5, 7, 3, 1));
 
         //======== panel1 ========
         {
@@ -231,20 +230,47 @@ public class DlgProduct extends MyJDialog {
             });
             panel1.add(btnOK);
         }
-        add(panel1, CC.xywh(5, 9, 3, 1, CC.RIGHT, CC.DEFAULT));
+        contentPane.add(panel1, CC.xywh(5, 9, 3, 1, CC.RIGHT, CC.DEFAULT));
+        setSize(585, 285);
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
 
-        EntityManager em = OPDE.createEM();
-        MedProducts myProduct = em.merge(product);
-        product.setACME(em.merge((ACME) cmbAcme.getSelectedItem()));
-        product.setText(txtName.getText().trim());
+        if (!saveOK()) return;
 
-        for (TradeForm tf : product.getTradeforms()){
-            em.lock(tf, LockModeType.OPTIMISTIC);
+        EntityManager em = OPDE.createEM();
+        try {
+            em.getTransaction().begin();
+            MedProducts myProduct = em.merge(product);
+
+            myProduct.setText(txtName.getText().trim());
+            myProduct.setSideEffects(txtSideEffects.getText().trim());
+            myProduct.setACME(em.merge((ACME) cmbAcme.getSelectedItem()));
+
+            for (TradeForm tf : myProduct.getTradeforms()) {
+                em.lock(em.merge(tf), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                for (MedPackage mp : tf.getPackages()) {
+                    em.lock(em.merge(mp), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                }
+            }
+
+            em.lock(myProduct, LockModeType.OPTIMISTIC);
+
+            em.getTransaction().commit();
+
+            product = myProduct;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            OPDE.fatal(e);
+        } finally {
+            em.close();
         }
+        dispose();
+
 
         //hier gehts weiter. prüf auch die anderen locks bei den anderen editoren
 
@@ -255,17 +281,13 @@ public class DlgProduct extends MyJDialog {
     }
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        product = null;
+//        product = null;
         dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
 
-    private void txtBezeichnungCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtBezeichnungCaretUpdate
-        btnOK.setEnabled(!txtBezeichnung.getText().equals("") && cmbHersteller.getSelectedIndex() > 0);
-    }//GEN-LAST:event_txtBezeichnungCaretUpdate
 
-
-    private void saveOK(){
-        btnOK.setEnabled(!txtBezeichnung.getText().equals("") && cmbHersteller.getSelectedIndex() > 0);
+    private boolean saveOK() {
+        return !txtName.getText().trim().isEmpty() && cmbAcme.getSelectedItem() != null;
     }
 
     // Variablendeklaration - nicht modifizieren//GEN-BEGIN:variables

@@ -60,6 +60,7 @@ import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
 import op.threads.PrintProcessor;
 import op.tools.*;
+import op.training.PnlTraining;
 import op.users.PnlUser;
 import op.welcome.PnlWelcome;
 import org.apache.commons.collections.Closure;
@@ -652,6 +653,8 @@ public class FrmMain extends JFrame {
             panel = new PnlUserSettings(jspSearch);
         } else if (classname.equals("op.dev.PnlDev")) {
             panel = new PnlDev();
+        } else if (classname.equals("op.training.PnlTraining")) {
+            panel = new PnlTraining();
         }
         return panel;
     }

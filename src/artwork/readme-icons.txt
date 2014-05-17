@@ -24,7 +24,8 @@ Lots of different icons and symbols taken fromTemplate www.wpclipart.com. This m
 -- diabetes.png (modification of http://www.wpclipart.com/medical/anatomy/blood/blood_drop_T.png and http://openclipart.org/detail/169880/pointer-by-frankes)
 -- allergy.png (http://www.wpclipart.com/smiley/assorted_smiley/assorted_3/smiley_sneeze_T.png)
 -- warning.png (http://openclipart.org/detail/48349/warning-sign-by-palomaironique)
-
+-- prescription_bottle.png (http://www.wpclipart.com/medical/pills/perscription_bottle_T.png)
+-- teacher_blackboard.png (http://www.wpclipart.com/education/chalkboard/more_boards/teacher_blackboard_icon_T.png)
 -- stuff from findicons
 -- system_preferences.png (http://findicons.com/icon/130192/system_preferences?width=256), says "public domain, non commercial"
 -- package_network.png (http://findicons.com/icon/234318/package_network), GNU/GPL

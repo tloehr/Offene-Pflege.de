@@ -72,7 +72,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
     private Collection<SYSNR2PROCESS> attachedProcessConnections;
 
     // ==
-    // M:N Relationen
+    // M:N Relations
     // ==
     @ManyToMany
     @JoinTable(name = "nr2tags", joinColumns =

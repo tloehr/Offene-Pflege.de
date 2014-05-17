@@ -135,6 +135,10 @@ public class DlgTradeForm extends MyJDialog {
         setVisible(true);
     }
 
+    public TradeForm getTradeForm() {
+        return tradeForm;
+    }
+
     private void initDialog() {
         initPhase = true;
         cmbDaysWeeks.setModel(new DefaultComboBoxModel(new String[]{OPDE.lang.getString("misc.msg.Days"), OPDE.lang.getString("misc.msg.weeks")}));
@@ -191,6 +195,7 @@ public class DlgTradeForm extends MyJDialog {
         //======== this ========
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
+        setModal(true);
         Container contentPane = getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
 
@@ -339,6 +344,8 @@ public class DlgTradeForm extends MyJDialog {
             myTradeForm.setDosageForm(dosageForm);
 
             em.getTransaction().commit();
+
+            tradeForm = myTradeForm;
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();

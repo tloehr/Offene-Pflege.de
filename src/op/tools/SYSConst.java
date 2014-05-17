@@ -608,6 +608,10 @@ public class SYSConst {
     public static final Icon icon16diabetes = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/diabetes.png"));
     public static final Icon icon22medical = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/medical.png"));
     public static final Icon icon22warning = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/warning.png"));
+    public static final Icon icon48sideeffects = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/prescription_bottle.png"));
+    public static final Icon icon22sideeffects = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/prescription_bottle.png"));
+    public static final Icon icon48teacher = new ImageIcon(SYSConst.class.getResource("/artwork/48x48/teacher_blackboard.png"));
+    public static final Icon icon22teacher = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/teacher_blackboard.png"));
     public static final Icon icon16warning = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/warning.png"));
     public static final Icon icon22work = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/work.png"));
     public static final Icon icon22colorset = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/colorset.png"));

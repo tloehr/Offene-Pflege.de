@@ -63,7 +63,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * @author tloehr
@@ -72,7 +71,7 @@ public class PnlMed extends CleanablePanel {
 
     public static final String internalClassID = "opde.medication";
     private DefaultTreeModel tree;
-    private MedProducts produkt;
+    private MedProducts product;
     private JPopupMenu menu;
     private CollapsiblePanes searchPanes;
     private JScrollPane jspSearch;
@@ -104,7 +103,7 @@ public class PnlMed extends CleanablePanel {
 
     private void initDialog() {
         prepareSearchArea();
-        produkt = null;
+        product = null;
         treeMed.setModel(new DefaultTreeModel(new DefaultMutableTreeNode()));
         treeMed.setVisible(false);
     }
@@ -142,7 +141,7 @@ public class PnlMed extends CleanablePanel {
 
     private void lstPraepValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lstPraepValueChanged
         if (!evt.getValueIsAdjusting() && lstPraep.getSelectedValue() != null) {
-            produkt = (MedProducts) lstPraep.getSelectedValue();
+            product = (MedProducts) lstPraep.getSelectedValue();
             createTree();
         }
     }//GEN-LAST:event_lstPraepValueChanged
@@ -168,7 +167,7 @@ public class PnlMed extends CleanablePanel {
     }//GEN-LAST:event_txtSucheActionPerformed
 
     private void treeMedMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_treeMedMousePressed
-        if (produkt == null) return;
+        if (product == null) return;
         if (!OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)) return;
 
         if (SwingUtilities.isRightMouseButton(evt)) {
@@ -183,13 +182,13 @@ public class PnlMed extends CleanablePanel {
 //            });
 //            menu.add(itemdaf);
 
-            if (treeMed.getRowForLocation(evt.getX(), evt.getY()) != -1) {
+            if (treeMed.getRowForLocation(evt.getX(), evt.getY()) != -1 && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
                 JMenuItem itemedit = null;
                 JMenuItem itemUPRedit = null;
 //                JMenuItem itemnew = null;
 //                JMenuItem itempack = null;
                 TreePath curPath = treeMed.getPathForLocation(evt.getX(), evt.getY());
-                DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) curPath.getLastPathComponent();
+                final DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) curPath.getLastPathComponent();
                 treeMed.setSelectionPath(curPath);
 //                final ListElement le = (ListElement) dmtn.getUserObject();
 //                int nodetype = ((Integer) le.getObject()).intValue();
@@ -234,13 +233,18 @@ public class PnlMed extends CleanablePanel {
                             createTree();
                         }
                     });
+                } else if (dmtn.getUserObject() instanceof MedProducts) {
+
+                    itemedit = new JMenuItem("Bearbeiten");
+                    itemedit.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                            DlgProduct dlg = new DlgProduct(OPDE.lang.getString("misc.msg.edit"), (MedProducts) dmtn.getUserObject());
+                            product = dlg.getProduct();
+                            createTree();
+                        }
+                    });
                 }
-//
-//                if (itemedit != null || itemdelete != null || itemnew != null) {
-//                    menu.add(new JSeparator(JSeparator.HORIZONTAL));
-//                }
-//                if (itemnew != null) menu.add(itemnew);
-//                if (itempack != null) menu.add(itempack);
+
                 if (itemedit != null) menu.add(itemedit);
                 if (itemUPRedit != null) menu.add(itemUPRedit);
             }
@@ -249,7 +253,7 @@ public class PnlMed extends CleanablePanel {
     }//GEN-LAST:event_treeMedMousePressed
 
     private void createTree() {
-        if (produkt == null) return;
+        if (product == null) return;
         treeMed.setVisible(true);
         tree = new DefaultTreeModel(getRoot());
         treeMed.setModel(tree);
@@ -259,7 +263,7 @@ public class PnlMed extends CleanablePanel {
 
     private DefaultMutableTreeNode getRoot() {
         DefaultMutableTreeNode root;
-        root = new DefaultMutableTreeNode(produkt);
+        root = new DefaultMutableTreeNode(product);
         SYSTools.addAllNodes(root, getDAF());
         return root;
     }
@@ -269,7 +273,7 @@ public class PnlMed extends CleanablePanel {
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT m FROM TradeForm m WHERE m.medProduct = :medProdukt ORDER BY m.dosageForm.preparation");
-        query.setParameter("medProdukt", produkt);
+        query.setParameter("medProdukt", product);
 
         java.util.List<TradeForm> listDAF = query.getResultList();
         em.close();

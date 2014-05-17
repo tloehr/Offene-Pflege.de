@@ -109,6 +109,8 @@ public class TradeForm implements Serializable {
         return stocks;
     }
 
+
+
     /**
      * This is only relevant for DosageFormTypes UPRn. If this UPR is null, then the UPRs from the single MedStocks are
      * used for calculation. If this UPR is NOT null then it is used for calculations instead.

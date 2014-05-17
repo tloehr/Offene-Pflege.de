@@ -17,9 +17,15 @@
 
             Main Classes werden im Hauptprogramm angeboten, neben den Pflegeakten. Sofern der Benutzer die EXECUTE Rechte dafür hat.
         -->
-        <class name="opde.controlling" short="Controlling"
+        <class name="opde.controlling" short="Qualitätssicherung"
                long="Hier können verschiedene Abfragen für das Controlling gemacht werden." main="true"
                javaclass="op.controlling.PnlControlling" icon="kfind.png">
+            <execute langbundle="appinfo.default.acl.execute"/>
+        </class>
+        <class name="opde.training" short="Fortbildungen"
+               long="Mit diesem Modul behälst Du die Übersicht über die Fortbildungen in Deiner Einrichtung."
+               main="true"
+               javaclass="op.training.PnlTraining" icon="teacher_blackboard.png">
             <execute langbundle="appinfo.default.acl.execute"/>
         </class>
         <class name="opde.systemsettings" short="System-Einstellungen"
@@ -104,6 +110,7 @@
                javaclass="op.care.med.structure.PnlMed" icon="agt_virussafe.png">
             <execute langbundle="appinfo.default.acl.execute"/>
             <insert langbundle="appinfo.default.acl.insert"/>
+            <update langbundle="appinfo.default.acl.update"/>
             <manager langbundle="appinfo.default.acl.manager"/>
         </class>
         <class name="opde.users" short="Benutzerverwaltung"

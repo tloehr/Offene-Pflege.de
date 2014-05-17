@@ -83,7 +83,7 @@ public class DlgPack extends MyJDialog {
     // <editor-fold defaultstate="collapsed" desc=" Erzeugter Quelltext ">//GEN-BEGIN:initComponents
     private void initComponents() {
         lblPZN = new JLabel();
-        cmbGroesse = new JComboBox();
+        cmbGroesse = new JComboBox<>();
         jLabel3 = new JLabel();
         txtPZN = new javax.swing.JFormattedTextField(new DecimalFormat("0000000"));;
         lblInhalt = new JLabel();
@@ -96,6 +96,7 @@ public class DlgPack extends MyJDialog {
         //======== this ========
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
+        setModal(true);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
             "14dlu, $lcgap, default, 2*($lcgap, default:grow), $lcgap, default, $lcgap, 14dlu",
@@ -107,7 +108,7 @@ public class DlgPack extends MyJDialog {
         contentPane.add(lblPZN, CC.xy(3, 3));
 
         //---- cmbGroesse ----
-        cmbGroesse.setModel(new DefaultComboBoxModel(new String[] {
+        cmbGroesse.setModel(new DefaultComboBoxModel<>(new String[] {
             "Item 1",
             "Item 2",
             "Item 3",
@@ -246,7 +247,7 @@ public class DlgPack extends MyJDialog {
 
     // Variablendeklaration - nicht modifizieren//GEN-BEGIN:variables
     private JLabel lblPZN;
-    private JComboBox cmbGroesse;
+    private JComboBox<String> cmbGroesse;
     private JLabel jLabel3;
     private JFormattedTextField txtPZN;
     private JLabel lblInhalt;

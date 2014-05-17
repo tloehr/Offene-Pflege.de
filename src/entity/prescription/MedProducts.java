@@ -1,5 +1,7 @@
 package entity.prescription;
 
+import op.tools.SYSTools;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -20,6 +22,9 @@ public class MedProducts implements Serializable {
     @Basic(optional = false)
     @Column(name = "sideeffects")
     private String sideeffects;
+    @Version
+    @Column(name = "version")
+    private Long version;
 
     public MedProducts() {
     }
@@ -61,16 +66,20 @@ public class MedProducts implements Serializable {
         this.acme = acme;
     }
 
-    public String getSideeffects() {
+    public String getSideEffects() {
         return sideeffects;
     }
 
-    public void setSideeffects(String sideeffects) {
+    public void setSideEffects(String sideeffects) {
         this.sideeffects = sideeffects;
     }
 
     public Collection<TradeForm> getTradeforms() {
         return tradeForms;
+    }
+
+    public boolean hasSideEffects() {
+        return !SYSTools.catchNull(sideeffects).isEmpty();
     }
 
     @JoinColumn(name = "acmeid", referencedColumnName = "MPHID")

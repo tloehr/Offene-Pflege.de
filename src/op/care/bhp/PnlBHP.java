@@ -588,13 +588,13 @@ public class PnlBHP extends NursingRecordsPanel {
                         new DlgYesNo(SYSConst.icon48comment, new Closure() {
                             @Override
                             public void execute(Object o) {
-                                if (o == null) {
+                                if (SYSTools.catchNull(o).isEmpty()) {
                                     outcomeText = null;
                                 } else {
                                     outcomeText = o.toString();
                                 }
                             }
-                        }, "nursingrecords.bhp.describe.outcome");
+                        }, "nursingrecords.bhp.describe.outcome", null);
 
                     }
 

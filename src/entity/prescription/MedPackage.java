@@ -23,6 +23,9 @@ public class MedPackage implements Serializable {
     @Basic(optional = false)
     @Column(name = "Inhalt")
     private BigDecimal inhalt;
+    @Version
+    @Column(name = "version")
+    private Long version;
 
     @JoinColumn(name = "DafID", referencedColumnName = "DafID")
     @ManyToOne

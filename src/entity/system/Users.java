@@ -30,6 +30,7 @@ import entity.files.SYSINF2FILE;
 import entity.files.SYSNR2FILE;
 import entity.files.SYSPRE2FILE;
 import entity.reports.NReport;
+import entity.staff.Training;
 import op.tools.SYSTools;
 import org.eclipse.persistence.annotations.OptimisticLocking;
 import org.eclipse.persistence.annotations.OptimisticLockingType;
@@ -85,6 +86,11 @@ public class Users implements Serializable, Comparable<Users> {
     private Collection<NReport> korrigierteNReport;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Collection<SYSLogin> logins;
+    @ManyToMany
+    @JoinTable(name = "training2users", joinColumns =
+    @JoinColumn(name = "UID"), inverseJoinColumns =
+    @JoinColumn(name = "TRID"))
+    private Collection<Training> trainings;
 
     public Users() {
         uid = null;
@@ -212,7 +218,6 @@ public class Users implements Serializable, Comparable<Users> {
         result = 31 * result + (eMail != null ? eMail.hashCode() : 0);
         return result;
     }
-
 
 
     @Override
