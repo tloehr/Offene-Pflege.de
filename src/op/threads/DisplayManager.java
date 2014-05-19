@@ -95,7 +95,7 @@ public class DisplayManager extends Thread {
             @Override
             public void run() {
 //                OPDE.debug("DisplayManager.setMainMessage");
-                lblMain.setText(message);
+                lblMain.setText(SYSTools.xx(message));
                 lblMain.setIcon(null);
                 lblMain.setToolTipText(tooltip);
             }

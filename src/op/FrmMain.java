@@ -654,7 +654,7 @@ public class FrmMain extends JFrame {
         } else if (classname.equals("op.dev.PnlDev")) {
             panel = new PnlDev();
         } else if (classname.equals("op.training.PnlTraining")) {
-            panel = new PnlTraining();
+            panel = new PnlTraining(jspSearch);
         }
         return panel;
     }

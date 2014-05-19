@@ -12,11 +12,13 @@ import java.util.Collection;
 @Entity
 public class Training {
 
-
-
     @Id
     @Column(name = "id", nullable = false, insertable = true, updatable = true)
     private long id;
+
+    public long getId() {
+        return id;
+    }
 
     @Basic
     @Column(name = "date", nullable = false, insertable = true, updatable = true)
@@ -80,14 +82,6 @@ public class Training {
     @Column(name = "version")
     private Long version;
 
-    // ==
-    // M:N Relations
-    // ==
-    @ManyToMany
-    @JoinTable(name = "training2users", joinColumns =
-    @JoinColumn(name = "TRID"), inverseJoinColumns =
-    @JoinColumn(name = "UID"))
-    private Collection<Users> users;
 
     @Override
     public boolean equals(Object o) {

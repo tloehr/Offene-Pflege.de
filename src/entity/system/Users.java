@@ -86,11 +86,11 @@ public class Users implements Serializable, Comparable<Users> {
     private Collection<NReport> korrigierteNReport;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Collection<SYSLogin> logins;
-    @ManyToMany
-    @JoinTable(name = "training2users", joinColumns =
-    @JoinColumn(name = "UID"), inverseJoinColumns =
-    @JoinColumn(name = "TRID"))
-    private Collection<Training> trainings;
+//    @ManyToMany
+//    @JoinTable(name = "training2users", joinColumns =
+//    @JoinColumn(name = "UID"), inverseJoinColumns =
+//    @JoinColumn(name = "TRID"))
+//    private Collection<Training> trainings;
 
     public Users() {
         uid = null;

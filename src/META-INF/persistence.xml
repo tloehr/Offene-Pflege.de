@@ -63,13 +63,9 @@
         <class>entity.process.PCat</class>
         <class>entity.process.QProcess</class>
         <class>entity.values.ResValueTypes</class>
-        <class>entity.staff.training</class>
         <class>entity.staff.Training</class>
-        <properties>
-            <property name="eclipselink.jdbc.url" value="jdbc:mysql://localhost:3306/opde"/>
-            <property name="eclipselink.jdbc.driver" value="com.mysql.jdbc.Driver"/>
-            <property name="eclipselink.jdbc.user" value="root"/>
-            <property name="eclipselink.jdbc.password" value="dbase123"/>
-        </properties>
+        <class>entity.staff.Training2Users</class>
+        <class>entity.files.Training2File</class>
+        <class>entity.files.User2File</class>
     </persistence-unit>
 </persistence>
