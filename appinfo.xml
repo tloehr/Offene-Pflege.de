@@ -27,6 +27,7 @@
                main="true"
                javaclass="op.training.PnlTraining" icon="teacher_blackboard.png">
             <execute langbundle="appinfo.default.acl.execute"/>
+            <update langbundle="appinfo.default.acl.update"/>
         </class>
         <class name="opde.systemsettings" short="System-Einstellungen"
                long="Systemeinstellungen" main="true"

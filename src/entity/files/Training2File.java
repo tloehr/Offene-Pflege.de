@@ -1,9 +1,9 @@
 package entity.files;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import entity.staff.Training;
+import entity.values.ResValue;
+
+import javax.persistence.*;
 import java.sql.Timestamp;
 
 /**
@@ -11,41 +11,19 @@ import java.sql.Timestamp;
  */
 @Entity
 public class Training2File {
-    private long id;
-    private long trainid;
-    private long fid;
     private Timestamp pit;
     private String editor;
     private long version;
 
     @Id
     @Column(name = "id", nullable = false, insertable = true, updatable = true)
+    private long id;
     public long getId() {
         return id;
     }
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    @Basic
-    @Column(name = "trainid", nullable = false, insertable = true, updatable = true)
-    public long getTrainid() {
-        return trainid;
-    }
-
-    public void setTrainid(long trainid) {
-        this.trainid = trainid;
-    }
-
-    @Basic
-    @Column(name = "fid", nullable = false, insertable = true, updatable = true)
-    public long getFid() {
-        return fid;
-    }
-
-    public void setFid(long fid) {
-        this.fid = fid;
     }
 
     @Basic
@@ -78,6 +56,14 @@ public class Training2File {
         this.version = version;
     }
 
+    @JoinColumn(name = "trainid", referencedColumnName = "id")
+    @ManyToOne
+    private Training training;
+
+    @JoinColumn(name = "fid", referencedColumnName = "OCFID")
+    @ManyToOne
+    private SYSFiles sysfile;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -85,12 +71,12 @@ public class Training2File {
 
         Training2File that = (Training2File) o;
 
-        if (fid != that.fid) return false;
         if (id != that.id) return false;
-        if (trainid != that.trainid) return false;
         if (version != that.version) return false;
         if (editor != null ? !editor.equals(that.editor) : that.editor != null) return false;
         if (pit != null ? !pit.equals(that.pit) : that.pit != null) return false;
+        if (sysfile != null ? !sysfile.equals(that.sysfile) : that.sysfile != null) return false;
+        if (training != null ? !training.equals(that.training) : that.training != null) return false;
 
         return true;
     }
@@ -98,11 +84,11 @@ public class Training2File {
     @Override
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (int) (trainid ^ (trainid >>> 32));
-        result = 31 * result + (int) (fid ^ (fid >>> 32));
         result = 31 * result + (pit != null ? pit.hashCode() : 0);
         result = 31 * result + (editor != null ? editor.hashCode() : 0);
         result = 31 * result + (int) (version ^ (version >>> 32));
+        result = 31 * result + (training != null ? training.hashCode() : 0);
+        result = 31 * result + (sysfile != null ? sysfile.hashCode() : 0);
         return result;
     }
 }

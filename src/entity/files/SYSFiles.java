@@ -26,7 +26,6 @@
 package entity.files;
 
 import entity.info.Resident;
-import entity.process.SYSNP2PROCESS;
 import entity.system.Users;
 
 import javax.persistence.*;
@@ -87,6 +86,8 @@ public class SYSFiles implements Serializable, Comparable {
     private Collection<SYSVAL2FILE> valAssignCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
     private Collection<SYSNP2FILE> npAssignCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
+    private Collection<Training2File> trAssignCollection;
 
     public SYSFiles() {
     }
@@ -107,6 +108,10 @@ public class SYSFiles implements Serializable, Comparable {
 
     public Collection<SYSINF2FILE> getBwiAssignCollection() {
         return bwiAssignCollection;
+    }
+
+    public Collection<Training2File> getTrAssignCollection() {
+        return trAssignCollection;
     }
 
     public Users getUser() {

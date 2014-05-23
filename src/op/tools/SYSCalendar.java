@@ -706,161 +706,161 @@ public class SYSCalendar {
         return schicht;
     }
 
-    public static int ermittleSchicht(Date date) {
-        return ermittleSchicht(date.getTime());
-    }
-
-    public static String getHTMLColor4Schicht(Byte schicht) {
-
-        String color = "";
-        switch (schicht) {
-            case SYSConst.ZEIT_FRUEH: {
-                color = "color=\"blue\"";
-                break;
-            }
-            case SYSConst.ZEIT_SPAET: {
-                color = SYSConst.html_darkgreen;
-                break;
-            }
-            case SYSConst.ZEIT_NACHT_AB: {
-                color = SYSConst.html_darkred;
-                break;
-            }
-            case SYSConst.ZEIT_NACHT_MO: {
-                color = SYSConst.html_darkred;
-                break;
-            }
-            default: {
-                color = "color=\"black\"";
-                break;
-            }
-        }
-        return color;
-    }
-
-    /**
-     * @return Liste mit 4 Elementen. Die ersten beiden sind die byte Kennungen der beteiligten Schichten innerhalb der gewünschten
-     * Anzeige. Kann sein SYSConst.FM oder SYSConst.MO etc. Die dritte Stelle enthält die Start-Uhrzeit als Zeichenkette (gemäß des
-     * Eintrags in der SYSProps Tabelle. In der vierten Stelle steht die End-Uhrzeit, ebenfalls als Zeichenkette (minus 1 Minute). Damit
-     * liegt diese Zeit in dem betreffenden Intervall.
-     */
-    public static ArrayList getZeiten4Schicht(byte schicht) {
-        ArrayList result = new ArrayList(4);
-        String z1, z2;
-        byte s1, s2;
-        switch (schicht) {
-            case SYSConst.ZEIT_NACHT_MO: {
-                z1 = "FM";
-                z2 = "MO";
-                s1 = SYSConst.FM;
-                s2 = SYSConst.FM;
-                break;
-            }
-            case SYSConst.ZEIT_FRUEH: {
-                z1 = "MO";
-                z2 = "NM";
-                s1 = SYSConst.MO;
-                s2 = SYSConst.MI;
-                break;
-            }
-            case SYSConst.ZEIT_SPAET: {
-                z1 = "NM";
-                z2 = "NA";
-                s1 = SYSConst.NM;
-                s2 = SYSConst.AB;
-                break;
-            }
-            case SYSConst.ZEIT_NACHT_AB: {
-                z1 = "NA";
-                z2 = "FM";
-                s1 = SYSConst.NA;
-                s2 = Byte.MAX_VALUE; // kleiner Trick :-$
-                break;
-            }
-            default: {
-                z1 = "";
-                z2 = "";
-                s1 = -1;
-                s2 = -1;
-            }
-        }
-
-        result.add(s1);
-        result.add(s2);
-
-        result.add(z1.isEmpty() ? "" : OPDE.getProps().getProperty(z1));
-
-        if (!z2.isEmpty()) {
-            GregorianCalendar gc = SYSCalendar.parseTime(OPDE.getProps().getProperty(z2));
-            gc.add(GregorianCalendar.MINUTE, -1);
-            result.add(SYSCalendar.toGermanTime(gc));
-        } else {
-            result.add("");
-        }
-        return result;
-    }
-
-    public static Pair<Byte, Byte> getTimeIDs4Shift(byte shiftid) {
-        byte id1 = -1, id2 = -1;
-        switch (shiftid) {
-            case DFNTools.SHIFT_VERY_EARLY: {
-                id1 = DFNTools.BYTE_EARLY_IN_THE_MORNING;
-                id2 = DFNTools.BYTE_EARLY_IN_THE_MORNING;
-                break;
-            }
-            case DFNTools.SHIFT_EARLY: {
-                id1 = DFNTools.BYTE_MORNING;
-                id2 = DFNTools.BYTE_NOON;
-                break;
-            }
-            case DFNTools.SHIFT_LATE: {
-                id1 = DFNTools.BYTE_AFTERNOON;
-                id2 = DFNTools.BYTE_LATE_AT_NIGHT;
-                break;
-            }
-            case DFNTools.SHIFT_VERY_LATE: {
-                id1 = DFNTools.BYTE_LATE_AT_NIGHT;
-                id2 = Byte.MAX_VALUE;
-                break;
-            }
-        }
-
-        return new Pair<Byte, Byte>(id1, id2);
-    }
-
-    public static Pair<Date, Date> getTimeOfDay4Shift(byte shiftid) {
-        String id1 = "", id2 = "";
-        switch (shiftid) {
-            case DFNTools.SHIFT_VERY_EARLY: {
-                id1 = DFNTools.STRING_EARLY_IN_THE_MORNING;
-                id2 = DFNTools.STRING_MORNING;
-                break;
-            }
-            case DFNTools.SHIFT_EARLY: {
-                id1 = DFNTools.STRING_MORNING;
-                id2 = DFNTools.STRING_AFTERNOON;
-                break;
-            }
-            case DFNTools.SHIFT_LATE: {
-                id1 = DFNTools.STRING_AFTERNOON;
-                id2 = DFNTools.STRING_LATE_AT_NIGHT;
-                break;
-            }
-            case DFNTools.SHIFT_VERY_LATE: {
-                id1 = DFNTools.STRING_LATE_AT_NIGHT;
-                id2 = DFNTools.STRING_EARLY_IN_THE_MORNING;
-                break;
-            }
-        }
-
-        DateTimeFormatter parser = DateTimeFormat.forPattern("HH:mm");
-        DateTime time1 = parser.parseDateTime(OPDE.getProps().getProperty(id1));
-        DateTime time2 = parser.parseDateTime(OPDE.getProps().getProperty(id2)).minusSeconds(1);
-        Period period1 = new Period(time1.getHourOfDay(), time1.getMinuteOfHour(), time1.getSecondOfMinute(), time1.getMillisOfSecond());
-        Period period2 = new Period(time2.getHourOfDay(), time2.getMinuteOfHour(), time2.getSecondOfMinute(), time2.getMillisOfSecond());
-
-        return new Pair<Date, Date>(new DateMidnight().toDateTime().plus(period1).toDate(), new DateMidnight().toDateTime().plus(period2).toDate());
-    }
+//    public static int ermittleSchicht(Date date) {
+//        return ermittleSchicht(date.getTime());
+//    }
+//
+//    public static String getHTMLColor4Schicht(Byte schicht) {
+//
+//        String color = "";
+//        switch (schicht) {
+//            case SYSConst.ZEIT_FRUEH: {
+//                color = "color=\"blue\"";
+//                break;
+//            }
+//            case SYSConst.ZEIT_SPAET: {
+//                color = SYSConst.html_darkgreen;
+//                break;
+//            }
+//            case SYSConst.ZEIT_NACHT_AB: {
+//                color = SYSConst.html_darkred;
+//                break;
+//            }
+//            case SYSConst.ZEIT_NACHT_MO: {
+//                color = SYSConst.html_darkred;
+//                break;
+//            }
+//            default: {
+//                color = "color=\"black\"";
+//                break;
+//            }
+//        }
+//        return color;
+//    }
+//
+//    /**
+//     * @return Liste mit 4 Elementen. Die ersten beiden sind die byte Kennungen der beteiligten Schichten innerhalb der gewünschten
+//     * Anzeige. Kann sein SYSConst.FM oder SYSConst.MO etc. Die dritte Stelle enthält die Start-Uhrzeit als Zeichenkette (gemäß des
+//     * Eintrags in der SYSProps Tabelle. In der vierten Stelle steht die End-Uhrzeit, ebenfalls als Zeichenkette (minus 1 Minute). Damit
+//     * liegt diese Zeit in dem betreffenden Intervall.
+//     */
+//    public static ArrayList getZeiten4Schicht(byte schicht) {
+//        ArrayList result = new ArrayList(4);
+//        String z1, z2;
+//        byte s1, s2;
+//        switch (schicht) {
+//            case SYSConst.ZEIT_NACHT_MO: {
+//                z1 = "FM";
+//                z2 = "MO";
+//                s1 = SYSConst.FM;
+//                s2 = SYSConst.FM;
+//                break;
+//            }
+//            case SYSConst.ZEIT_FRUEH: {
+//                z1 = "MO";
+//                z2 = "NM";
+//                s1 = SYSConst.MO;
+//                s2 = SYSConst.MI;
+//                break;
+//            }
+//            case SYSConst.ZEIT_SPAET: {
+//                z1 = "NM";
+//                z2 = "NA";
+//                s1 = SYSConst.NM;
+//                s2 = SYSConst.AB;
+//                break;
+//            }
+//            case SYSConst.ZEIT_NACHT_AB: {
+//                z1 = "NA";
+//                z2 = "FM";
+//                s1 = SYSConst.NA;
+//                s2 = Byte.MAX_VALUE; // kleiner Trick :-$
+//                break;
+//            }
+//            default: {
+//                z1 = "";
+//                z2 = "";
+//                s1 = -1;
+//                s2 = -1;
+//            }
+//        }
+//
+//        result.add(s1);
+//        result.add(s2);
+//
+//        result.add(z1.isEmpty() ? "" : OPDE.getProps().getProperty(z1));
+//
+//        if (!z2.isEmpty()) {
+//            GregorianCalendar gc = SYSCalendar.parseTime(OPDE.getProps().getProperty(z2));
+//            gc.add(GregorianCalendar.MINUTE, -1);
+//            result.add(SYSCalendar.toGermanTime(gc));
+//        } else {
+//            result.add("");
+//        }
+//        return result;
+//    }
+//
+//    public static Pair<Byte, Byte> getTimeIDs4Shift(byte shiftid) {
+//        byte id1 = -1, id2 = -1;
+//        switch (shiftid) {
+//            case DFNTools.SHIFT_VERY_EARLY: {
+//                id1 = DFNTools.BYTE_EARLY_IN_THE_MORNING;
+//                id2 = DFNTools.BYTE_EARLY_IN_THE_MORNING;
+//                break;
+//            }
+//            case DFNTools.SHIFT_EARLY: {
+//                id1 = DFNTools.BYTE_MORNING;
+//                id2 = DFNTools.BYTE_NOON;
+//                break;
+//            }
+//            case DFNTools.SHIFT_LATE: {
+//                id1 = DFNTools.BYTE_AFTERNOON;
+//                id2 = DFNTools.BYTE_LATE_AT_NIGHT;
+//                break;
+//            }
+//            case DFNTools.SHIFT_VERY_LATE: {
+//                id1 = DFNTools.BYTE_LATE_AT_NIGHT;
+//                id2 = Byte.MAX_VALUE;
+//                break;
+//            }
+//        }
+//
+//        return new Pair<Byte, Byte>(id1, id2);
+//    }
+//
+//    public static Pair<Date, Date> getTimeOfDay4Shift(byte shiftid) {
+//        String id1 = "", id2 = "";
+//        switch (shiftid) {
+//            case DFNTools.SHIFT_VERY_EARLY: {
+//                id1 = DFNTools.STRING_EARLY_IN_THE_MORNING;
+//                id2 = DFNTools.STRING_MORNING;
+//                break;
+//            }
+//            case DFNTools.SHIFT_EARLY: {
+//                id1 = DFNTools.STRING_MORNING;
+//                id2 = DFNTools.STRING_AFTERNOON;
+//                break;
+//            }
+//            case DFNTools.SHIFT_LATE: {
+//                id1 = DFNTools.STRING_AFTERNOON;
+//                id2 = DFNTools.STRING_LATE_AT_NIGHT;
+//                break;
+//            }
+//            case DFNTools.SHIFT_VERY_LATE: {
+//                id1 = DFNTools.STRING_LATE_AT_NIGHT;
+//                id2 = DFNTools.STRING_EARLY_IN_THE_MORNING;
+//                break;
+//            }
+//        }
+//
+//        DateTimeFormatter parser = DateTimeFormat.forPattern("HH:mm");
+//        DateTime time1 = parser.parseDateTime(OPDE.getProps().getProperty(id1));
+//        DateTime time2 = parser.parseDateTime(OPDE.getProps().getProperty(id2)).minusSeconds(1);
+//        Period period1 = new Period(time1.getHourOfDay(), time1.getMinuteOfHour(), time1.getSecondOfMinute(), time1.getMillisOfSecond());
+//        Period period2 = new Period(time2.getHourOfDay(), time2.getMinuteOfHour(), time2.getSecondOfMinute(), time2.getMillisOfSecond());
+//
+//        return new Pair<Date, Date>(new DateMidnight().toDateTime().plus(period1).toDate(), new DateMidnight().toDateTime().plus(period2).toDate());
+//    }
 
 
     public static byte whatShiftIs(byte timeID) {

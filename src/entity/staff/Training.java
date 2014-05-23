@@ -1,10 +1,11 @@
 package entity.staff;
 
 import entity.system.Users;
+import op.tools.SYSTools;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Date;
 
 /**
  * Created by tloehr on 17.05.14.
@@ -22,34 +23,32 @@ public class Training {
 
     @Basic
     @Column(name = "date", nullable = false, insertable = true, updatable = true)
-
-    private Timestamp date;
-    public Timestamp getDate() {
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date date;
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(Timestamp date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
     @Basic
     @Column(name = "title", nullable = false, insertable = true, updatable = true, length = 200)
     private String title;
-
     public String getTitle() {
         return title;
     }
-
     public void setTitle(String title) {
-        this.title = title;
+        this.title = SYSTools.tidy(title);
     }
 
     @Basic
-    @Column(name = "docent", nullable = false, insertable = true, updatable = true, length = 200)
+    @Column(name = "docent", nullable = true, insertable = true, updatable = true, length = 200)
     private String docent;
 
     public String getDocent() {
-        return docent;
+        return SYSTools.tidy(docent);
     }
 
     public void setDocent(String docent) {
@@ -59,17 +58,19 @@ public class Training {
     @Basic
     @Column(name = "text", nullable = true, insertable = true, updatable = true, length = 16777215)
     private String text;
+
     public String getText() {
         return text;
     }
 
     public void setText(String text) {
-        this.text = text;
+        this.text = SYSTools.tidy(text);
     }
 
     @Basic
     @Column(name = "internal", nullable = false, insertable = true, updatable = true)
     private boolean internal;
+
     public boolean getInternal() {
         return internal;
     }
@@ -78,10 +79,18 @@ public class Training {
         this.internal = internal;
     }
 
+
+    @ManyToMany(mappedBy = "trainings")
+    private Collection<Users> attendees;
+
+
     @Version
     @Column(name = "version")
     private Long version;
 
+    public Collection<Users> getAttendees() {
+        return attendees;
+    }
 
     @Override
     public boolean equals(Object o) {

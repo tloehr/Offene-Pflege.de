@@ -695,7 +695,7 @@ public class BHPTools {
     public static ArrayList<Object[]> getAVGTimesPerDay(LocalDate month) {
 
         String mysql = " " +
-                " SELECT bhp.BWKennung i1, (SUM(intv.Dauer) / ?) i4 FROM BHP bhp " +
+                " SELECT bhp.BWKennung i1, (SUM(intv.Dauer) / ?) i4 FROM bhp bhp " +
                 " INNER JOIN prescription ver ON ver.VERID = bhp.VERID " +
                 " INNER JOIN Intervention intv ON ver.MassID = intv.MassID " +
                 " INNER JOIN resident res ON res.BWKennung = bhp.BWKennung " +

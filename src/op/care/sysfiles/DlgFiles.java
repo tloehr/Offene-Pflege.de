@@ -6,12 +6,13 @@ package op.care.sysfiles;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import entity.files.SYSFiles;
+import entity.files.SYSFilesTools;
 import entity.info.ResInfo;
 import entity.nursingprocess.NursingProcess;
 import entity.prescription.Prescription;
 import entity.reports.NReport;
-import entity.files.SYSFiles;
-import entity.files.SYSFilesTools;
+import entity.staff.Training;
 import entity.values.ResValue;
 import op.OPDE;
 import op.system.FileDrop;
@@ -137,23 +138,23 @@ public class DlgFiles extends MyJDialog {
         EntityManager em = OPDE.createEM();
         if (attachable instanceof NReport) {
             Query query = em.createQuery(" SELECT s "
-                + " FROM SYSFiles s "
-                + " JOIN s.pbAssignCollection sf "
-                + " WHERE sf.nReport = :nReport ");
+                    + " FROM SYSFiles s "
+                    + " JOIN s.pbAssignCollection sf "
+                    + " WHERE sf.nReport = :nReport ");
             query.setParameter("nReport", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
         } else if (attachable instanceof Prescription) {
             Query query = em.createQuery(" SELECT s "
-                + " FROM SYSFiles s "
-                + " JOIN s.verAssignCollection sf "
-                + " WHERE sf.verordnung = :verordnung ");
+                    + " FROM SYSFiles s "
+                    + " JOIN s.verAssignCollection sf "
+                    + " WHERE sf.verordnung = :verordnung ");
             query.setParameter("verordnung", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
         } else if (attachable instanceof ResInfo) {
             Query query = em.createQuery(" SELECT s "
-                + " FROM SYSFiles s "
-                + " JOIN s.bwiAssignCollection sf "
-                + " WHERE sf.bwinfo = :bwinfo ");
+                    + " FROM SYSFiles s "
+                    + " JOIN s.bwiAssignCollection sf "
+                    + " WHERE sf.bwinfo = :bwinfo ");
             query.setParameter("bwinfo", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
         } else if (attachable instanceof ResValue) {
@@ -163,6 +164,10 @@ public class DlgFiles extends MyJDialog {
         } else if (attachable instanceof NursingProcess) {
             Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.npAssignCollection sf WHERE sf.nursingProcess = :np ");
             query.setParameter("np", attachable);
+            files = new ArrayList<SYSFiles>(query.getResultList());
+        } else if (attachable instanceof Training) {
+            Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.trAssignCollection sf WHERE sf.training = :training ");
+            query.setParameter("training", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
         }
         Collections.sort(files);

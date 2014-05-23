@@ -279,19 +279,19 @@ public class PnlReport extends NursingRecordsPanel {
             }
         });
         list.add(cmbTags);
-//        SYSPropsTools.restoreState(internalClassID + ":cmbTags", cmbTags);
+//        SYSPropsTools.restoreState("nursingrecords.reports:cmbTags", cmbTags);
 
 //        tbFilesOnly = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.filters.filesonly"));
 //        tbFilesOnly.addItemListener(new ItemListener() {
 //            @Override
 //            public void itemStateChanged(ItemEvent itemEvent) {
 //                if (initPhase) return;
-////                SYSPropsTools.storeState(internalClassID + ":tbFilesOnly", tbFilesOnly);
+////                SYSPropsTools.storeState("nursingrecords.reports:tbFilesOnly", tbFilesOnly);
 //                reload();
 //            }
 //        });
 //        labelPanel.add(tbFilesOnly);
-////        SYSPropsTools.restoreState(internalClassID + ":tbFilesOnly", tbFilesOnly);
+////        SYSPropsTools.restoreState("nursingrecords.reports:tbFilesOnly", tbFilesOnly);
 //        tbFilesOnly.setHorizontalAlignment(SwingConstants.LEFT);
 
         tbShowReplaced = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.filters.showreplaced"));
@@ -1224,7 +1224,7 @@ public class PnlReport extends NursingRecordsPanel {
              *     |_____\__,_|_|\__|
              *
              */
-            final JButton btnEdit = GUITools.createHyperlinkButton(internalClassID + ".btnEdit.tooltip", SYSConst.icon22edit3, null);
+            final JButton btnEdit = GUITools.createHyperlinkButton("nursingrecords.reports.btnEdit.tooltip", SYSConst.icon22edit3, null);
             btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnEdit.addActionListener(new ActionListener() {
                 @Override
@@ -1323,7 +1323,7 @@ public class PnlReport extends NursingRecordsPanel {
              *     |____/ \___|_|\___|\__\___|
              *
              */
-            final JButton btnDelete = GUITools.createHyperlinkButton(internalClassID + ".btnDelete.tooltip", SYSConst.icon22delete, null);
+            final JButton btnDelete = GUITools.createHyperlinkButton("nursingrecords.reports.btnDelete.tooltip", SYSConst.icon22delete, null);
             btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnDelete.addActionListener(new ActionListener() {
                 @Override
@@ -1407,7 +1407,7 @@ public class PnlReport extends NursingRecordsPanel {
              *     |_.__/ \__|_| |_|_/_/   \_\____|___/
              *
              */
-            final JButton btnTAGs = GUITools.createHyperlinkButton(internalClassID + ".btntags.tooltip", SYSConst.icon22checkbox, null);
+            final JButton btnTAGs = GUITools.createHyperlinkButton("nursingrecords.reports.btntags.tooltip", SYSConst.icon22checkbox, null);
             btnTAGs.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnTAGs.addActionListener(new ActionListener() {
                 @Override
@@ -1509,7 +1509,7 @@ public class PnlReport extends NursingRecordsPanel {
              *     |_.__/ \__|_| |_|_|  |_|_|_| |_|\__,_|\__\___||___/
              *
              */
-            final JButton btnMinutes = GUITools.createHyperlinkButton(internalClassID + ".btnminutes.tooltip", SYSConst.icon22clock, null);
+            final JButton btnMinutes = GUITools.createHyperlinkButton("nursingrecords.reports.btnminutes.tooltip", SYSConst.icon22clock, null);
             btnMinutes.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnMinutes.addActionListener(new ActionListener() {
                 @Override

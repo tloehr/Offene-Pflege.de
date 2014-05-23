@@ -531,7 +531,7 @@ public class DFNTools {
                 "SELECT i1 j1, (i4 / ?) j3, i3 j4  FROM " +
                 " (" +
                 "SELECT dfn.BWKennung i1, DATE(dfn.Soll) i2, intv.BWIKID i3, SUM(dfn.Dauer) i4 FROM DFN dfn " +
-                "INNER JOIN Intervention intv ON dfn.MassID = intv.MassID " +
+                "INNER JOIN intervention intv ON dfn.MassID = intv.MassID " +
                 " INNER JOIN resident res ON res.BWKennung = dfn.BWKennung " +
                 " WHERE dfn.Soll >= ? AND dfn.Soll <= ? AND res.StatID IS NOT NULL " +
                 " GROUP BY dfn.BWKennung, intv.BWIKID " +
