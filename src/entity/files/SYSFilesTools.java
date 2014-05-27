@@ -99,7 +99,7 @@ public class SYSFilesTools {
      * <li>Wenn die letzten beiden Schritte erfolgreich waren, dann wird die neue EB als Ergebnis zurück gegeben. null, bei Fehler.</li>
      * </ol>
      *
-     * @param file File Obkjekt der zu speichernden Datei
+     * @param file File Objekt der zu speichernden Datei
      * @return EB der neuen Datei. null bei Fehler.
      */
     private static SYSFiles putFile(EntityManager em, FileTransferClient ftp, File file, Resident resident) throws Exception {
@@ -121,16 +121,20 @@ public class SYSFilesTools {
             OPDE.info(OPDE.lang.getString("misc.msg.upload") + ": " + sysfile.getFilename() + " (" + sysfile.getMd5() + ")");
 //            fis.close();
         } else { // Ansonsten die bestehende Datei zurückgeben
+
+            sysfile = alreadyExistingFiles.get(0);
+
+
             // Does the User own this file already ?
-            for (SYSFiles mySYSfile : alreadyExistingFiles) {
-                if (mySYSfile.getResident().equals(resident)) {
-                    sysfile = mySYSfile;
-                    break;
-                }
-            }
-            if (sysfile == null) {
-                sysfile = em.merge(new SYSFiles(file.getName(), md5, new Date(file.lastModified()), file.length(), OPDE.getLogin().getUser(), resident));
-            }
+//            for (SYSFiles mySYSfile : alreadyExistingFiles) {
+//                if (mySYSfile.getResident().equals(resident)) {
+//                    sysfile = mySYSfile;
+//                    break;
+//                }
+//            }
+//            if (sysfile == null) {
+//                sysfile = em.merge(new SYSFiles(file.getName(), md5, new Date(file.lastModified()), file.length(), OPDE.getLogin().getUser(), resident));
+//            }
         }
 
         return sysfile;
@@ -165,7 +169,9 @@ public class SYSFilesTools {
             EntityManager em = OPDE.createEM();
             try {
                 em.getTransaction().begin();
-                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                if (resident != null){
+                    em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                }
                 for (File file : files) {
                     if (file.isFile()) { // prevents exceptions if somebody has the bright idea to include directories.
                         SYSFiles sysfile = putFile(em, ftp, file, resident);

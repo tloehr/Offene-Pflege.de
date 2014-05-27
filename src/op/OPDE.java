@@ -86,6 +86,8 @@ public class OPDE {
     protected static String opwd = "";
     protected static String css = "";
 
+//    private static int TIMEOUT = 0;
+
     //    protected static boolean FTPisWORKING = false;
     public static String UPDATE_FTPSERVER = "ftp.offene-pflege.de";
     protected static boolean updateAvailable = false;
@@ -257,6 +259,19 @@ public class OPDE {
 
     public static Properties getLocalProps() {
         return localProps;
+    }
+
+    public static int getTimeout() {
+        int timeout = 0;
+        // timeout
+        if (props.containsKey("timeout")) {
+            try {
+                timeout = Integer.parseInt(props.getProperty("timeout"));
+            } catch (NumberFormatException nfe) {
+                timeout = 0;
+            }
+        }
+        return timeout;
     }
 
     public static void saveLocalProps() {
@@ -479,7 +494,6 @@ public class OPDE {
          *                                                 |_|             |_|
          */
         if (loadLocalProperties()) {
-
 
             try {
                 FileAppender fileAppender = new FileAppender(layout, opwd + sep + "opde.log", true);

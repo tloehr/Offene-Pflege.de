@@ -8,7 +8,6 @@
 -->
 
 <app>
-
     <classes>
         <!--
             Module, Erklärungen und ACLs, die von OPDE unterstützt werden. Hier steht drin, welche Klasse welche Fähigkeiten hat.
@@ -18,9 +17,11 @@
             Main Classes werden im Hauptprogramm angeboten, neben den Pflegeakten. Sofern der Benutzer die EXECUTE Rechte dafür hat.
         -->
         <class name="opde.controlling" short="Qualitätssicherung"
-               long="Hier können verschiedene Abfragen für das Controlling gemacht werden." main="true"
+               long="Hier können verschiedene Abfragen und Massnahmen für die Qualitätssicherung durchgeführt werden." main="true"
                javaclass="op.controlling.PnlControlling" icon="kfind.png">
             <execute langbundle="appinfo.default.acl.execute"/>
+            <manager langbundle="appinfo.default.acl.manager"/>
+            <user1 langbundle="opde.controlling.acl.user1"/>
         </class>
         <class name="opde.training" short="Fortbildungen"
                long="Mit diesem Modul behälst Du die Übersicht über die Fortbildungen in Deiner Einrichtung."
@@ -28,6 +29,7 @@
                javaclass="op.training.PnlTraining" icon="teacher_blackboard.png">
             <execute langbundle="appinfo.default.acl.execute"/>
             <update langbundle="appinfo.default.acl.update"/>
+            <delete langbundle="appinfo.default.acl.delete"/>
         </class>
         <class name="opde.systemsettings" short="System-Einstellungen"
                long="Systemeinstellungen" main="true"

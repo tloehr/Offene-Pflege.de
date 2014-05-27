@@ -1,25 +1,23 @@
 package entity.files;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import entity.system.Users;
+
+import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * Created by tloehr on 19.05.14.
  */
 @Entity
 public class User2File {
-    private long id;
-    private String uid;
-    private long fid;
-    private Timestamp pit;
-    private String editor;
-    private long version;
+
 
     @Id
     @Column(name = "id", nullable = false, insertable = true, updatable = true)
+
+    private long id;
+
     public long getId() {
         return id;
     }
@@ -29,47 +27,23 @@ public class User2File {
     }
 
     @Basic
-    @Column(name = "uid", nullable = false, insertable = true, updatable = true, length = 10)
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
-    @Basic
-    @Column(name = "fid", nullable = false, insertable = true, updatable = true)
-    public long getFid() {
-        return fid;
-    }
-
-    public void setFid(long fid) {
-        this.fid = fid;
-    }
-
-    @Basic
     @Column(name = "pit", nullable = false, insertable = true, updatable = true)
-    public Timestamp getPit() {
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date pit;
+
+    public Date getPit() {
         return pit;
     }
 
-    public void setPit(Timestamp pit) {
+    public void setPit(Date pit) {
         this.pit = pit;
     }
 
     @Basic
-    @Column(name = "editor", nullable = false, insertable = true, updatable = true, length = 10)
-    public String getEditor() {
-        return editor;
-    }
 
-    public void setEditor(String editor) {
-        this.editor = editor;
-    }
-
-    @Basic
     @Column(name = "version", nullable = false, insertable = true, updatable = true)
+    private long version;
+
     public long getVersion() {
         return version;
     }
@@ -78,6 +52,19 @@ public class User2File {
         this.version = version;
     }
 
+
+    @JoinColumn(name = "editor", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users editor;
+
+    @JoinColumn(name = "uid", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users user;
+
+    @JoinColumn(name = "fid", referencedColumnName = "OCFID")
+    @ManyToOne
+    private SYSFiles sysfile;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -85,12 +72,12 @@ public class User2File {
 
         User2File user2File = (User2File) o;
 
-        if (fid != user2File.fid) return false;
         if (id != user2File.id) return false;
         if (version != user2File.version) return false;
         if (editor != null ? !editor.equals(user2File.editor) : user2File.editor != null) return false;
         if (pit != null ? !pit.equals(user2File.pit) : user2File.pit != null) return false;
-        if (uid != null ? !uid.equals(user2File.uid) : user2File.uid != null) return false;
+        if (sysfile != null ? !sysfile.equals(user2File.sysfile) : user2File.sysfile != null) return false;
+        if (user != null ? !user.equals(user2File.user) : user2File.user != null) return false;
 
         return true;
     }
@@ -98,11 +85,11 @@ public class User2File {
     @Override
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (uid != null ? uid.hashCode() : 0);
-        result = 31 * result + (int) (fid ^ (fid >>> 32));
         result = 31 * result + (pit != null ? pit.hashCode() : 0);
-        result = 31 * result + (editor != null ? editor.hashCode() : 0);
         result = 31 * result + (int) (version ^ (version >>> 32));
+        result = 31 * result + (editor != null ? editor.hashCode() : 0);
+        result = 31 * result + (user != null ? user.hashCode() : 0);
+        result = 31 * result + (sysfile != null ? sysfile.hashCode() : 0);
         return result;
     }
 }

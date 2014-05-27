@@ -53,7 +53,7 @@ public class SYSFiles implements Serializable, Comparable {
     @Column(name = "Filename")
     private String filename;
     @Basic(optional = false)
-    @Column(name = "MD5")
+    @Column(name = "MD5", unique = true)
     private String md5;
     @Basic(optional = false)
     @Column(name = "Filedate")
@@ -88,6 +88,8 @@ public class SYSFiles implements Serializable, Comparable {
     private Collection<SYSNP2FILE> npAssignCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
     private Collection<Training2File> trAssignCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
+    private Collection<User2File> usersAssignCollection;
 
     public SYSFiles() {
     }

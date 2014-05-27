@@ -52,6 +52,7 @@ public class DlgUser extends MyJDialog {
         txtVorname.setText(user.getVorname());
         txtUID.setText(user.getUID());
 
+
         txtPW.setEnabled(user.getUID() == null);
         txtUID.setEnabled(user.getUID() == null);
     }

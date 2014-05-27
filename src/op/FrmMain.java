@@ -119,6 +119,26 @@ public class FrmMain extends JFrame {
         initPhase = true;
         initComponents();
 
+        pbTimeout.setToolTipText(OPDE.lang.getString("opde.mainframe.pbTimeout.tooltip"));
+        // for the timeout function
+        Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
+            @Override
+            public void eventDispatched(AWTEvent event) {
+                if (OPDE.getLogin() != null) {
+                    displayManager.touch();
+                }
+            }
+        }, AWTEvent.MOUSE_MOTION_EVENT_MASK);
+
+        Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
+            @Override
+            public void eventDispatched(AWTEvent event) {
+                if (OPDE.getLogin() != null) {
+                    displayManager.touch();
+                }
+            }
+        }, AWTEvent.KEY_EVENT_MASK);
+
         currentVisiblePanel = null;
         currentResident = null;
         lblWait.setText(OPDE.lang.getString("misc.msg.wait"));
@@ -136,7 +156,14 @@ public class FrmMain extends JFrame {
 
         setTitle(SYSTools.getWindowTitle(""));
 
-        displayManager = new DisplayManager(pbMsg, lblMainMsg, lblSubMsg, pnlIcons);
+        displayManager = new DisplayManager(pbMsg, lblMainMsg, lblSubMsg, pnlIcons, pbTimeout, new Closure() {
+            @Override
+            public void execute(Object o) {
+                OPDE.debug("TIMEOUT");
+                logout();
+                showLogin();
+            }
+        });
         displayManager.start();
 
         printProcessor = new PrintProcessor();
@@ -253,14 +280,6 @@ public class FrmMain extends JFrame {
 
             new TXEssenDoc(currentResident);
 
-//            if ((e.getModifiers() & InputEvent.CTRL_MASK) != 0) {
-//                SYSFilesTools.print(ResInfoTools.getTXReport(currentResident, true, true, true, true, true, true, true, true, true), true);
-//            } else {
-//
-//
-//            }
-//
-
 
         } else {
             displayManager.addSubMessage(new DisplayMessage("misc.msg.choose.a.resident.first"));
@@ -304,7 +323,9 @@ public class FrmMain extends JFrame {
 
     }
 
+
     public void afterLogin() {
+        OPDE.getDisplayManager().touch();
         dlgLogin = null;
 
         if (specialities != null) {
@@ -371,6 +392,7 @@ public class FrmMain extends JFrame {
         pnlCard = new JPanel();
         pnlWait = new JPanel();
         lblWait = new JLabel();
+        pbTimeout = new JProgressBar();
         statusBar = new StatusBar();
 
         //======== this ========
@@ -389,7 +411,7 @@ public class FrmMain extends JFrame {
         {
             pnlMain.setLayout(new FormLayout(
                     "0dlu, $lcgap, pref, $lcgap, left:default:grow, 2*($rgap)",
-                    "$rgap, default, $rgap, default:grow, $lgap, pref, $lgap, 0dlu"));
+                    "$rgap, default, $rgap, default:grow, $lgap, 3dlu, $nlgap, pref, $lgap, 0dlu"));
 
             //======== pnlMainMessage ========
             {
@@ -532,10 +554,11 @@ public class FrmMain extends JFrame {
                 pnlCard.add(pnlWait, "cardWait");
             }
             pnlMain.add(pnlCard, CC.xy(5, 4, CC.FILL, CC.FILL));
+            pnlMain.add(pbTimeout, CC.xywh(3, 6, 4, 1, CC.FILL, CC.DEFAULT));
 
             //---- statusBar ----
             statusBar.setBackground(new Color(238, 238, 238));
-            pnlMain.add(statusBar, CC.xywh(3, 6, 4, 1, CC.FILL, CC.FILL));
+            pnlMain.add(statusBar, CC.xywh(3, 8, 4, 1, CC.FILL, CC.FILL));
         }
         contentPane.add(pnlMain);
         setSize(945, 695);
@@ -947,6 +970,7 @@ public class FrmMain extends JFrame {
     private JPanel pnlCard;
     private JPanel pnlWait;
     private JLabel lblWait;
+    private JProgressBar pbTimeout;
     private StatusBar statusBar;
     // End of variables declaration//GEN-END:variables
 

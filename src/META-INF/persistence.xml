@@ -64,8 +64,8 @@
         <class>entity.process.QProcess</class>
         <class>entity.values.ResValueTypes</class>
         <class>entity.staff.Training</class>
-        <class>entity.staff.Training2Users</class>
         <class>entity.files.Training2File</class>
         <class>entity.files.User2File</class>
+        <class>entity.files.Resident2File</class>
     </persistence-unit>
 </persistence>

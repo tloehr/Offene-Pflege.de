@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_33" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_65" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void property="contentType"> 
    <string>form/swing</string> 
@@ -43,7 +43,7 @@
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
-          <string>relgap, default, relgap, default:grow, linegap, pref, linegap, 0dlu</string> 
+          <string>relgap, default, relgap, default:grow, linegap, 3dlu, narrowlinegap, pref, linegap, 0dlu</string> 
          </void> 
         </object> 
         <void property="name"> 
@@ -676,6 +676,33 @@
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JProgressBar</string> 
+          <void property="name"> 
+           <string>pbTimeout</string> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jgoodies.forms.layout.CellConstraints</class> 
+          <void method="setProperty"> 
+           <string>gridX</string> 
+           <int>3</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridY</string> 
+           <int>6</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>hAlign</string> 
+           <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridWidth</string> 
+           <int>4</int> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
           <string>com.jidesoft.status.StatusBar</string> 
           <void method="setProperty"> 
            <string>background</string> 
@@ -698,7 +725,7 @@
           </void> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>6</int> 
+           <int>8</int> 
           </void> 
           <void method="setProperty"> 
            <string>hAlign</string> 

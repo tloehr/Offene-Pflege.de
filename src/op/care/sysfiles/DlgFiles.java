@@ -13,6 +13,7 @@ import entity.nursingprocess.NursingProcess;
 import entity.prescription.Prescription;
 import entity.reports.NReport;
 import entity.staff.Training;
+import entity.system.Users;
 import entity.values.ResValue;
 import op.OPDE;
 import op.system.FileDrop;
@@ -168,6 +169,10 @@ public class DlgFiles extends MyJDialog {
         } else if (attachable instanceof Training) {
             Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.trAssignCollection sf WHERE sf.training = :training ");
             query.setParameter("training", attachable);
+            files = new ArrayList<SYSFiles>(query.getResultList());
+        } else if (attachable instanceof Users) {
+            Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.usersAssignCollection uf WHERE uf.user = :user ");
+            query.setParameter("user", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
         }
         Collections.sort(files);

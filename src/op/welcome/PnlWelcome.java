@@ -535,10 +535,11 @@ public class PnlWelcome extends CleanablePanel {
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         panel1 = new JPanel();
+        btnAbout = new JButton();
         scrollPane1 = new JScrollPane();
         cpsWelcome = new CollapsiblePanes();
+        panel2 = new JScrollPane();
         pnlApps = new JPanel();
-        btnAbout = new JButton();
 
         //======== this ========
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -546,8 +547,27 @@ public class PnlWelcome extends CleanablePanel {
         //======== panel1 ========
         {
             panel1.setLayout(new FormLayout(
-                "default:grow, $lcgap, default",
-                "default:grow"));
+                "default:grow, $lcgap, pref",
+                "default, default:grow"));
+
+            //---- btnAbout ----
+            btnAbout.setText(null);
+            btnAbout.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/OPDE-blue.png")));
+            btnAbout.setHorizontalAlignment(SwingConstants.TRAILING);
+            btnAbout.setFont(new Font("Arial", Font.BOLD, 14));
+            btnAbout.setForeground(Color.red);
+            btnAbout.setHorizontalTextPosition(SwingConstants.LEADING);
+            btnAbout.setBorderPainted(false);
+            btnAbout.setContentAreaFilled(false);
+            btnAbout.setBorder(null);
+            btnAbout.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            btnAbout.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnAboutActionPerformed(e);
+                }
+            });
+            panel1.add(btnAbout, CC.xy(3, 1));
 
             //======== scrollPane1 ========
             {
@@ -558,32 +578,18 @@ public class PnlWelcome extends CleanablePanel {
                 }
                 scrollPane1.setViewportView(cpsWelcome);
             }
-            panel1.add(scrollPane1, CC.xy(1, 1, CC.DEFAULT, CC.FILL));
+            panel1.add(scrollPane1, CC.xywh(1, 1, 1, 2, CC.DEFAULT, CC.FILL));
 
-            //======== pnlApps ========
+            //======== panel2 ========
             {
-                pnlApps.setLayout(new VerticalLayout(2));
 
-                //---- btnAbout ----
-                btnAbout.setText(null);
-                btnAbout.setIcon(new ImageIcon(getClass().getResource("/artwork/64x64/OPDE-blue.png")));
-                btnAbout.setHorizontalAlignment(SwingConstants.TRAILING);
-                btnAbout.setFont(new Font("Arial", Font.BOLD, 14));
-                btnAbout.setForeground(Color.red);
-                btnAbout.setHorizontalTextPosition(SwingConstants.LEADING);
-                btnAbout.setBorderPainted(false);
-                btnAbout.setContentAreaFilled(false);
-                btnAbout.setBorder(null);
-                btnAbout.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                btnAbout.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnAboutActionPerformed(e);
-                    }
-                });
-                pnlApps.add(btnAbout);
+                //======== pnlApps ========
+                {
+                    pnlApps.setLayout(new VerticalLayout(2));
+                }
+                panel2.setViewportView(pnlApps);
             }
-            panel1.add(pnlApps, CC.xy(3, 1, CC.DEFAULT, CC.FILL));
+            panel1.add(panel2, CC.xy(3, 2, CC.DEFAULT, CC.FILL));
         }
         add(panel1);
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
@@ -640,9 +646,10 @@ public class PnlWelcome extends CleanablePanel {
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     private JPanel panel1;
+    private JButton btnAbout;
     private JScrollPane scrollPane1;
     private CollapsiblePanes cpsWelcome;
+    private JScrollPane panel2;
     private JPanel pnlApps;
-    private JButton btnAbout;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

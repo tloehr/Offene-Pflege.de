@@ -64,6 +64,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
     @JoinColumn(name = "ReplacementFor", referencedColumnName = "PBID")
     @OneToOne
     private NReport replacementFor;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nReport")
     private Collection<SYSNR2FILE> attachedFilesConnections;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bericht")

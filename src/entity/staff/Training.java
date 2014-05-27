@@ -1,5 +1,6 @@
 package entity.staff;
 
+import entity.files.Training2File;
 import entity.system.Users;
 import op.tools.SYSTools;
 
@@ -25,6 +26,7 @@ public class Training {
     @Column(name = "date", nullable = false, insertable = true, updatable = true)
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
+
     public Date getDate() {
         return date;
     }
@@ -36,9 +38,11 @@ public class Training {
     @Basic
     @Column(name = "title", nullable = false, insertable = true, updatable = true, length = 200)
     private String title;
+
     public String getTitle() {
         return title;
     }
+
     public void setTitle(String title) {
         this.title = SYSTools.tidy(title);
     }
@@ -80,9 +84,16 @@ public class Training {
     }
 
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "training")
+    private Collection<Training2File> attachedFilesConnections;
+
     @ManyToMany(mappedBy = "trainings")
     private Collection<Users> attendees;
 
+
+    public Collection<Training2File> getAttachedFilesConnections() {
+        return attachedFilesConnections;
+    }
 
     @Version
     @Column(name = "version")

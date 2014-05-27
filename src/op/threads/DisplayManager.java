@@ -1,7 +1,6 @@
 package op.threads;
 
 import entity.files.SYSFilesTools;
-import entity.info.ResInfoTools;
 import entity.system.SYSLoginTools;
 import entity.system.SYSPropsTools;
 import op.OPDE;
@@ -9,10 +8,12 @@ import op.tools.FadingLabel;
 import op.tools.Pair;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
+import org.apache.commons.collections.Closure;
 import org.joda.time.DateTime;
 
 import javax.swing.*;
 import java.awt.*;
+import java.math.BigDecimal;
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,6 +24,8 @@ import java.awt.*;
  */
 public class DisplayManager extends Thread {
     public static final String internalClassID = "opde.displaymanager";
+    private final Closure timeoutAction;
+    private final JProgressBar pbTimeout;
     private boolean interrupted;
     private JProgressBar jp;
     private JLabel lblMain;
@@ -37,19 +40,22 @@ public class DisplayManager extends Thread {
     private JLabel lblBiohazard, lblDiabetes, lblAllergy, lblWarning;
     private long step = 0;
     private int lastMinute;
+    private long lastoperation; // used for the timeout function to automatically log out idle users
+//    private int TIMEOUTMINS;
 
 //    private DateFormat df;
 
     /**
      * Creates a new instance of HeapStat
      */
-    public DisplayManager(JProgressBar p, JLabel lblM, FadingLabel lblS, JPanel pnlIcons) {
+    public DisplayManager(JProgressBar p, JLabel lblM, FadingLabel lblS, JPanel pnlIcons, JProgressBar pbTimeout, Closure timeoutAction) {
         super();
+        this.pbTimeout = pbTimeout;
         progressBarMessage = new Pair<String, Integer>("", -1);
-//        this.pnlIcons = pnlIcons;
+        this.timeoutAction = timeoutAction;
         setName("DisplayManager");
+        touch();
         interrupted = false;
-//        dbAction = false;
         jp = p;
         jp.setStringPainted(false);
         jp.setValue(0);
@@ -79,7 +85,6 @@ public class DisplayManager extends Thread {
         pnlIcons.add(lblDiabetes);
         pnlIcons.add(lblAllergy);
 
-//        this.lblDB.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/db.png")));
         lblMain.setText(" ");
         lblSub.setText(" ");
         messageQ = new MessageQ();
@@ -266,14 +271,14 @@ public class DisplayManager extends Thread {
     }
 
     private void check4MaintenanceMode() {
-        if (OPDE.getLogin() == null){
+        if (OPDE.getLogin() == null) {
             return;
         }
         int minute = new DateTime().getMinuteOfHour();
         if (minute != lastMinute) {
             lastMinute = minute;
-            if (SYSPropsTools.isTrue(SYSPropsTools.KEY_MAINTENANCE_MODE, null)){
-                SYSFilesTools.print(OPDE.lang.getString("maintenance.mode.sorry"),false);
+            if (SYSPropsTools.isTrue(SYSPropsTools.KEY_MAINTENANCE_MODE, null)) {
+                SYSFilesTools.print(OPDE.lang.getString("maintenance.mode.sorry"), false);
                 SYSLoginTools.logout();
                 System.exit(0);
             }
@@ -303,6 +308,10 @@ public class DisplayManager extends Thread {
 
     }
 
+    public void touch() {
+        lastoperation = System.currentTimeMillis();
+    }
+
     public static DisplayMessage getLockMessage() {
         return new DisplayMessage(OPDE.lang.getString("misc.msg.lockingexception"), DisplayMessage.IMMEDIATELY, OPDE.WARNING_TIME);
     }
@@ -329,6 +338,24 @@ public class DisplayManager extends Thread {
                 processSubMessage();
                 check4MaintenanceMode();
 
+                int timeoutmins = OPDE.getTimeout();
+                if (timeoutmins > 0) {
+                    // Timeout functions
+                    if (OPDE.getLogin() != null) {
+                        long timeoutPeriodInMillis = timeoutmins * 60 * 1000;
+                        long millisOfTimeout = lastoperation + timeoutPeriodInMillis;
+                        long millisToGo = millisOfTimeout - System.currentTimeMillis();
+                        pbTimeout.setMaximum(new BigDecimal(timeoutmins * 60).intValue());
+                        pbTimeout.setValue(new BigDecimal(millisToGo / 1000).intValue());
+//                        pbTimeout.setToolTipText("Abmeldung in " + millisToGo / 1000 + " sekunden");
+                    } else {
+                        pbTimeout.setValue(0);
+                    }
+
+                    if (OPDE.getLogin() != null && System.currentTimeMillis() > lastoperation + (timeoutmins * 60 * 1000)) {
+                        timeoutAction.execute(null);
+                    }
+                }
                 Thread.sleep(50);
             } catch (InterruptedException ie) {
                 interrupted = true;

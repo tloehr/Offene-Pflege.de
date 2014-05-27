@@ -52,10 +52,11 @@ public class DlgTraining extends MyJDialog {
 
         if (training.getId() != 0) {
             jdcDate.setDate(training.getDate());
-            DateFormat.getTimeInstance(DateFormat.SHORT).format(training.getDate());
+            txtTime.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(training.getDate()));
             txtTitle.setText(training.getTitle());
             txtDocent.setText(training.getDocent());
             txtTitle.setText(training.getTitle());
+            txtText.setText(training.getText());
             cbInternal.setSelected(training.getInternal());
         }
 
@@ -144,8 +145,8 @@ public class DlgTraining extends MyJDialog {
             //======== contentPanel ========
             {
                 contentPanel.setLayout(new FormLayout(
-                        "pref, $ugap, default:grow",
-                        "default, $rgap, default, $lgap, 2*(default, $rgap), default:grow, $lgap, default"));
+                    "pref, $ugap, default:grow",
+                    "default, $rgap, default, $lgap, 2*(default, $rgap), default:grow, $lgap, default"));
 
                 //---- lblDate ----
                 lblDate.setText("text");
@@ -214,8 +215,8 @@ public class DlgTraining extends MyJDialog {
             {
                 buttonBar.setBorder(new EmptyBorder(12, 0, 0, 0));
                 buttonBar.setLayout(new GridBagLayout());
-                ((GridBagLayout) buttonBar.getLayout()).columnWidths = new int[]{0, 85, 80};
-                ((GridBagLayout) buttonBar.getLayout()).columnWeights = new double[]{1.0, 0.0, 0.0};
+                ((GridBagLayout)buttonBar.getLayout()).columnWidths = new int[] {0, 85, 80};
+                ((GridBagLayout)buttonBar.getLayout()).columnWeights = new double[] {1.0, 0.0, 0.0};
 
                 //---- btnCancel ----
                 btnCancel.setText(null);
@@ -227,8 +228,8 @@ public class DlgTraining extends MyJDialog {
                     }
                 });
                 buttonBar.add(btnCancel, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-                        GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                        new Insets(0, 0, 0, 5), 0, 0));
+                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                    new Insets(0, 0, 0, 5), 0, 0));
 
                 //---- btnApply ----
                 btnApply.setText(null);
@@ -240,8 +241,8 @@ public class DlgTraining extends MyJDialog {
                     }
                 });
                 buttonBar.add(btnApply, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-                        GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                        new Insets(0, 0, 0, 0), 0, 0));
+                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                    new Insets(0, 0, 0, 0), 0, 0));
             }
             dialogPane.add(buttonBar, BorderLayout.SOUTH);
         }
