@@ -67,5 +67,15 @@
         <class>entity.files.Training2File</class>
         <class>entity.files.User2File</class>
         <class>entity.files.Resident2File</class>
+        <class>entity.qms.Qms</class>
+        <class>entity.qms.Qmsplan</class>
+        <class>entity.qms.Qmssched</class>
+        <class>entity.system.Commontags</class>
+        <properties>
+            <property name="eclipselink.jdbc.url" value="jdbc:mysql://srv0007:3306/opde"/>
+            <property name="eclipselink.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+            <property name="eclipselink.jdbc.user" value="root"/>
+            <property name="eclipselink.jdbc.password" value="db883klox172"/>
+        </properties>
     </persistence-unit>
 </persistence>

@@ -51,7 +51,7 @@ public class SYSPRE2FILE implements Serializable {
     private Date pit;
     @JoinColumn(name = "VERID", referencedColumnName = "VerID")
     @ManyToOne
-    private Prescription verordnung;
+    private Prescription prescription;
     @JoinColumn(name = "FID", referencedColumnName = "OCFID")
     @ManyToOne
     private SYSFiles sysfile;
@@ -62,9 +62,9 @@ public class SYSPRE2FILE implements Serializable {
     public SYSPRE2FILE() {
     }
 
-    public SYSPRE2FILE(SYSFiles sysfile, Prescription verordnung, Users user, Date pit) {
+    public SYSPRE2FILE(SYSFiles sysfile, Prescription prescription, Users user, Date pit) {
         this.sysfile = sysfile;
-        this.verordnung = verordnung;
+        this.prescription = prescription;
         this.user = user;
         this.pit = pit;
     }
@@ -87,7 +87,7 @@ public class SYSPRE2FILE implements Serializable {
     }
 
     public Prescription getPrescription() {
-        return verordnung;
+        return prescription;
     }
 
     public Long getId() {

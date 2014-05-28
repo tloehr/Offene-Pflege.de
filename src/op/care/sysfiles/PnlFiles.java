@@ -52,6 +52,7 @@ import java.awt.event.*;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 
 /**
  * @author tloehr
@@ -105,14 +106,42 @@ public class PnlFiles extends NursingRecordsPanel {
 
     void reloadTable() {
 
+        HashSet<SYSFiles> filesSet = new HashSet<>();
+
         EntityManager em = OPDE.createEM();
-        Query query = em.createQuery("SELECT s FROM SYSFiles s WHERE s.resident = :bewohner ORDER BY s.pit DESC");
-        query.setParameter("bewohner", resident);
-        ArrayList<SYSFiles> files = new ArrayList<SYSFiles>(query.getResultList());
-//        Collections.sort(files);
+
+        Query query0 = em.createQuery("SELECT s FROM SYSFiles s JOIN s.residentAssignCollection res WHERE res.resident = :resident");
+        query0.setParameter("resident", resident);
+        filesSet.addAll(query0.getResultList());
+
+
+        Query query1 = em.createQuery("SELECT s FROM SYSFiles s JOIN s.nrAssignCollection nr WHERE nr.nReport.resident = :resident");
+        query1.setParameter("resident", resident);
+        filesSet.addAll(query1.getResultList());
+
+        Query query2 = em.createQuery("SELECT s FROM SYSFiles s JOIN s.bwiAssignCollection bwi WHERE bwi.bwinfo.resident = :resident");
+        query2.setParameter("resident", resident);
+        filesSet.addAll(query2.getResultList());
+
+        Query query3 = em.createQuery("SELECT s FROM SYSFiles s JOIN s.preAssignCollection pre WHERE pre.prescription.resident = :resident");
+        query3.setParameter("resident", resident);
+        filesSet.addAll(query3.getResultList());
+
+        Query query4 = em.createQuery("SELECT s FROM SYSFiles s JOIN s.valAssignCollection val WHERE val.value.resident = :resident");
+        query4.setParameter("resident", resident);
+        filesSet.addAll(query4.getResultList());
+
+        Query query5 = em.createQuery("SELECT s FROM SYSFiles s JOIN s.npAssignCollection np WHERE np.nursingProcess.resident = :resident");
+        query5.setParameter("resident", resident);
+        filesSet.addAll(query5.getResultList());
+
         em.close();
 
-        tblFiles.setModel(new TMSYSFiles(files));
+        ArrayList<SYSFiles> listFiles = new ArrayList<>(filesSet);
+
+        Collections.sort(listFiles);
+
+        tblFiles.setModel(new TMSYSFiles(listFiles));
         tblFiles.getColumnModel().getColumn(0).setCellRenderer(new RNDHTML());
         tblFiles.getColumnModel().getColumn(1).setCellRenderer(new RNDHTML());
         tblFiles.getColumnModel().getColumn(2).setCellRenderer(new RNDHTML());
@@ -157,15 +186,15 @@ public class PnlFiles extends NursingRecordsPanel {
 
                 //---- tblFiles ----
                 tblFiles.setModel(new DefaultTableModel(
-                    new Object[][] {
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                    },
-                    new String[] {
-                        "Title 1", "Title 2", "Title 3", "Title 4"
-                    }
+                        new Object[][]{
+                                {null, null, null, null},
+                                {null, null, null, null},
+                                {null, null, null, null},
+                                {null, null, null, null},
+                        },
+                        new String[]{
+                                "Title 1", "Title 2", "Title 3", "Title 4"
+                        }
                 ));
                 tblFiles.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
                 tblFiles.addMouseListener(new MouseAdapter() {

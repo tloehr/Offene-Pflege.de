@@ -25,7 +25,6 @@
  */
 package entity.files;
 
-import entity.info.Resident;
 import entity.system.Users;
 
 import javax.persistence.*;
@@ -50,7 +49,7 @@ public class SYSFiles implements Serializable, Comparable {
     @Column(name = "version")
     private Long version;
     @Basic(optional = false)
-    @Column(name = "Filename")
+    @Column(name = "Filename", length = 500)
     private String filename;
     @Basic(optional = false)
     @Column(name = "MD5", unique = true)
@@ -72,16 +71,13 @@ public class SYSFiles implements Serializable, Comparable {
     @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
     @ManyToOne
     private Users user;
-    @JoinColumn(name = "BWKennung", referencedColumnName = "BWKennung")
-    @ManyToOne
-    private Resident resident;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
-    private Collection<SYSNR2FILE> pbAssignCollection;
+    private Collection<SYSNR2FILE> nrAssignCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
     private Collection<SYSINF2FILE> bwiAssignCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
-    private Collection<SYSPRE2FILE> verAssignCollection;
+    private Collection<SYSPRE2FILE> preAssignCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
     private Collection<SYSVAL2FILE> valAssignCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
@@ -90,18 +86,27 @@ public class SYSFiles implements Serializable, Comparable {
     private Collection<Training2File> trAssignCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
     private Collection<User2File> usersAssignCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
+    private Collection<Resident2File> residentAssignCollection;
 
     public SYSFiles() {
     }
 
-    public SYSFiles(String filename, String md5, Date filedate, long filesize, Users user, Resident resident) {
+    public Collection<User2File> getUsersAssignCollection() {
+        return usersAssignCollection;
+    }
+
+    public Collection<Resident2File> getResidentAssignCollection() {
+        return residentAssignCollection;
+    }
+
+    public SYSFiles(String filename, String md5, Date filedate, long filesize, Users user) {
         this.filename = filename;
         this.md5 = md5;
         this.filedate = filedate;
         this.filesize = filesize;
         this.user = user;
         this.pit = new Date();
-        this.resident = resident;
     }
 
     public Collection<SYSVAL2FILE> getValAssignCollection() {
@@ -124,12 +129,12 @@ public class SYSFiles implements Serializable, Comparable {
         this.user = user;
     }
 
-    public Collection<SYSNR2FILE> getPbAssignCollection() {
-        return pbAssignCollection;
+    public Collection<SYSNR2FILE> getNrAssignCollection() {
+        return nrAssignCollection;
     }
 
-    public Collection<SYSPRE2FILE> getVerAssignCollection() {
-        return verAssignCollection;
+    public Collection<SYSPRE2FILE> getPreAssignCollection() {
+        return preAssignCollection;
     }
 
     public Collection<SYSNP2FILE> getNpAssignCollection() {
@@ -154,14 +159,6 @@ public class SYSFiles implements Serializable, Comparable {
 
     public String getMd5() {
         return md5;
-    }
-
-    public Resident getResident() {
-        return resident;
-    }
-
-    public void setResident(Resident resident) {
-        this.resident = resident;
     }
 
     public String getRemoteFilename() {

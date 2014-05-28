@@ -115,7 +115,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
     // ==
     // 1:N Relationen
     // ==
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "verordnung")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
     private List<SYSPRE2FILE> attachedFilesConnections;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "prescription")
     private List<SYSPRE2PROCESS> attachedProcessConnections;

@@ -28,6 +28,7 @@ package entity.info;
 import entity.Allowance;
 import entity.Rooms;
 import entity.Station;
+import entity.files.Resident2File;
 import entity.prescription.GP;
 import entity.system.Users;
 import op.OPDE;
@@ -85,6 +86,9 @@ public class Resident implements Serializable, Comparable<Resident> {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "resident")
     private Collection<ResInfo> resInfoCollection;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "resident")
+    private Collection<Resident2File> attachedFilesConnections;
+
     @JoinColumn(name = "StatID", referencedColumnName = "StatID")
     @ManyToOne
     private Station station;
@@ -117,6 +121,10 @@ public class Resident implements Serializable, Comparable<Resident> {
         this.adminonly = 0;
         this.controlling = null;
         this.calcMediUPR1 = OPDE.isCalcMediUPR1();
+    }
+
+    public Collection<Resident2File> getAttachedFilesConnections() {
+        return attachedFilesConnections;
     }
 
     public String getRIDAnonymous() {

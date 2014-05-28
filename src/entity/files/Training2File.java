@@ -4,13 +4,13 @@ import entity.staff.Training;
 import entity.system.Users;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.Date;
 
 /**
  * Created by tloehr on 19.05.14.
  */
 @Entity
+@Table(name = "training2file")
 public class Training2File {
 
     @Id
@@ -49,6 +49,16 @@ public class Training2File {
     @JoinColumn(name = "fid", referencedColumnName = "OCFID")
     @ManyToOne
     private SYSFiles sysfile;
+
+    public Training2File() {
+    }
+
+    public Training2File(SYSFiles sysfile, Training training, Users editor, Date pit) {
+        this.sysfile = sysfile;
+        this.training = training;
+        this.editor = editor;
+        this.pit = pit;
+    }
 
     @Override
     public boolean equals(Object o) {

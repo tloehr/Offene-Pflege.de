@@ -25,10 +25,7 @@
  */
 package entity.system;
 
-import entity.files.SYSFiles;
-import entity.files.SYSINF2FILE;
-import entity.files.SYSNR2FILE;
-import entity.files.SYSPRE2FILE;
+import entity.files.*;
 import entity.reports.NReport;
 import entity.staff.Training;
 import op.tools.SYSTools;
@@ -91,6 +88,13 @@ public class Users implements Serializable, Comparable<Users> {
     @JoinColumn(name = "UID"), inverseJoinColumns =
     @JoinColumn(name = "TRID"))
     private Collection<Training> trainings;
+
+    public Collection<User2File> getAttachedFilesConnections() {
+        return attachedFilesConnections;
+    }
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private Collection<User2File> attachedFilesConnections;
 
     public Users() {
         uid = null;

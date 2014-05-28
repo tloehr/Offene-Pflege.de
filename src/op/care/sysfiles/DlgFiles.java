@@ -140,15 +140,15 @@ public class DlgFiles extends MyJDialog {
         if (attachable instanceof NReport) {
             Query query = em.createQuery(" SELECT s "
                     + " FROM SYSFiles s "
-                    + " JOIN s.pbAssignCollection sf "
+                    + " JOIN s.nrAssignCollection sf "
                     + " WHERE sf.nReport = :nReport ");
             query.setParameter("nReport", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
         } else if (attachable instanceof Prescription) {
             Query query = em.createQuery(" SELECT s "
                     + " FROM SYSFiles s "
-                    + " JOIN s.verAssignCollection sf "
-                    + " WHERE sf.verordnung = :verordnung ");
+                    + " JOIN s.preAssignCollection sf "
+                    + " WHERE sf.prescription = :verordnung ");
             query.setParameter("verordnung", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
         } else if (attachable instanceof ResInfo) {

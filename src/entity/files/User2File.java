@@ -3,13 +3,13 @@ package entity.files;
 import entity.system.Users;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.Date;
 
 /**
  * Created by tloehr on 19.05.14.
  */
 @Entity
+@Table(name = "user2file")
 public class User2File {
 
 
@@ -64,6 +64,16 @@ public class User2File {
     @JoinColumn(name = "fid", referencedColumnName = "OCFID")
     @ManyToOne
     private SYSFiles sysfile;
+
+    public User2File() {
+    }
+
+    public User2File(SYSFiles sysfile, Users user, Users editor, Date pit) {
+        this.pit = pit;
+        this.editor = editor;
+        this.user = user;
+        this.sysfile = sysfile;
+    }
 
     @Override
     public boolean equals(Object o) {

@@ -28,7 +28,6 @@ package op.care.sysfiles;
 import entity.files.SYSFiles;
 import entity.files.SYSFilesTools;
 import op.OPDE;
-import op.care.sysfiles.PnlFiles;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
@@ -87,9 +86,9 @@ public class TMSYSFiles extends AbstractTableModel {
         SYSFiles sysfile = mymodel.get(row);
         String result = "";
 
-        result += sysfile.getPbAssignCollection().isEmpty() ? "" : OPDE.lang.getString("nursingrecords.reports") + " " + sysfile.getPbAssignCollection().size() + ", ";
+        result += sysfile.getNrAssignCollection().isEmpty() ? "" : OPDE.lang.getString("nursingrecords.reports") + " " + sysfile.getNrAssignCollection().size() + ", ";
         result += sysfile.getBwiAssignCollection().isEmpty() ? "" : OPDE.lang.getString("nursingrecords.info") + " " + sysfile.getBwiAssignCollection().size() + ", ";
-        result += sysfile.getVerAssignCollection().isEmpty() ? "" : OPDE.lang.getString("nursingrecords.prescription") + " " + sysfile.getVerAssignCollection().size() + ", ";
+        result += sysfile.getPreAssignCollection().isEmpty() ? "" : OPDE.lang.getString("nursingrecords.prescription") + " " + sysfile.getPreAssignCollection().size() + ", ";
 
         String html = OPDE.lang.getString(PnlFiles.internalClassID+".Attachments")+": ";
         if (result.isEmpty()) {
