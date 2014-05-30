@@ -1174,9 +1174,9 @@ public class SYSCalendar {
      * @param start Beginn der Liste
      * @param end Ende der Liste
      */
-    public static DefaultComboBoxModel createMonthList(DateMidnight start, DateMidnight end) {
+    public static DefaultComboBoxModel createMonthList(LocalDate start, LocalDate end) {
         DefaultComboBoxModel dcbm = new DefaultComboBoxModel();
-        for (DateMidnight month = start; month.compareTo(end) <= 0; month = month.plusMonths(1)) {
+        for (LocalDate month = start; month.compareTo(end) <= 0; month = month.plusMonths(1)) {
             dcbm.addElement(month);
         }
         return dcbm;
@@ -1480,28 +1480,28 @@ public class SYSCalendar {
      *
      * @return Eine Hashmap, die je das Datum als Zeichenkette der PrinterForm "jjjj-mm-tt" enthält und dazu die Bezeichnung des Feiertags.
      */
-    public static HashMap<DateMidnight, String> getHolidays(int from, int to) {
+    public static HashMap<LocalDate, String> getHolidays(int from, int to) {
 
-        HashMap<DateMidnight, String> hm = new HashMap<DateMidnight, String>();
+        HashMap<LocalDate, String> hm = new HashMap<LocalDate, String>();
 
         // TODO: i18n
         for (int year = from; year <= to; year++) {
             // Feste Feiertage
-            hm.put(new DateMidnight(year, 1, 1), "Neujahrstag");
-            hm.put(new DateMidnight(year, 5, 1), "Maifeiertag");
-            hm.put(new DateMidnight(year, 10, 3), "Tag der Einheit");
-            hm.put(new DateMidnight(year, 11, 1), "Allerheiligen");
-            hm.put(new DateMidnight(year, 12, 25), "1. Weihnachtstag");
-            hm.put(new DateMidnight(year, 12, 26), "2. Weihnachtstag");
+            hm.put(new LocalDate(year, 1, 1), "Neujahrstag");
+            hm.put(new LocalDate(year, 5, 1), "Maifeiertag");
+            hm.put(new LocalDate(year, 10, 3), "Tag der Einheit");
+            hm.put(new LocalDate(year, 11, 1), "Allerheiligen");
+            hm.put(new LocalDate(year, 12, 25), "1. Weihnachtstag");
+            hm.put(new LocalDate(year, 12, 26), "2. Weihnachtstag");
 
             // Bewegliche Feiertage
-            hm.put(new DateMidnight(Karfreitag(year)), "Karfreitag");
-            hm.put(new DateMidnight(Ostersonntag(year)), "Ostersonntag");
-            hm.put(new DateMidnight(Ostermontag(year)), "Ostermontag");
-            hm.put(new DateMidnight(ChristiHimmelfahrt(year)), "Christi Himmelfahrt");
-            hm.put(new DateMidnight(Pfingstsonntag(year)), "Pfingstsonntag");
-            hm.put(new DateMidnight(Pfingstmontag(year)), "Pfingstmontag");
-            hm.put(new DateMidnight(Fronleichnam(year)), "Fronleichnam");
+            hm.put(new LocalDate(Karfreitag(year)), "Karfreitag");
+            hm.put(new LocalDate(Ostersonntag(year)), "Ostersonntag");
+            hm.put(new LocalDate(Ostermontag(year)), "Ostermontag");
+            hm.put(new LocalDate(ChristiHimmelfahrt(year)), "Christi Himmelfahrt");
+            hm.put(new LocalDate(Pfingstsonntag(year)), "Pfingstsonntag");
+            hm.put(new LocalDate(Pfingstmontag(year)), "Pfingstmontag");
+            hm.put(new LocalDate(Fronleichnam(year)), "Fronleichnam");
         }
 
         return hm;
@@ -1622,6 +1622,11 @@ public class SYSCalendar {
         return new DateTime(year, 12, 31, 23, 59, 59);
     }
 
+    /**
+     * bottom of month
+     * @param d
+     * @return
+     */
     public static LocalDate bom(LocalDate d) {
         return d.dayOfMonth().withMinimumValue();
     }

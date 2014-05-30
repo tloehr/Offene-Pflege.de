@@ -48,7 +48,6 @@ import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXComboBox;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
@@ -82,7 +81,7 @@ public class PnlHandover extends NursingRecordsPanel {
     private Map<String, ArrayList<NReport>> cacheNR;
     //    private Map<NReport, JPanel> linemapNR;
 //    private Map<Handovers, JPanel> linemapHO;
-    private HashMap<DateMidnight, String> hollidays;
+    private HashMap<LocalDate, String> hollidays;
     private JComboBox cmbHomes;
     private JToggleButton tbResidentFirst;
     private Comparator myComparator;
@@ -272,21 +271,21 @@ public class PnlHandover extends NursingRecordsPanel {
         if (minmax != null) {
 
             hollidays = SYSCalendar.getHolidays(minmax.getFirst().getYear(), minmax.getSecond().getYear());
-            DateMidnight start = minmax.getFirst().toDateMidnight().dayOfMonth().withMinimumValue();
-            DateMidnight end = new DateMidnight();
+            LocalDate start = SYSCalendar.bom(minmax.getFirst()).toLocalDate();
+            LocalDate end = new LocalDate();
             for (int year = end.getYear(); year >= start.getYear(); year--) {
                 createCP4Year(year, start, end);
             }
         }
 
-        expandDay(new DateMidnight());
+        expandDay(new LocalDate());
 
         buildPanel();
 
     }
 
 
-    private void expandDay(DateMidnight day) {
+    private void expandDay(LocalDate day) {
         final String keyYear = Integer.toString(day.getYear()) + ".year";
         if (cpMap.containsKey(keyYear) && cpMap.get(keyYear).isCollapsed()) {
             try {
@@ -313,7 +312,7 @@ public class PnlHandover extends NursingRecordsPanel {
         }
     }
 
-    private CollapsiblePane createCP4Year(final int year, DateMidnight min, DateMidnight max) {
+    private CollapsiblePane createCP4Year(final int year, LocalDate min, LocalDate max) {
         /***
          *                          _        ____ ____     __             __   _______    _    ____
          *       ___ _ __ ___  __ _| |_ ___ / ___|  _ \   / _| ___  _ __  \ \ / / ____|  / \  |  _ \
@@ -323,8 +322,8 @@ public class PnlHandover extends NursingRecordsPanel {
          *
          */
 
-        final DateMidnight start = new DateMidnight(year, 1, 1).isBefore(min.dayOfMonth().withMinimumValue()) ? min.dayOfMonth().withMinimumValue() : new DateMidnight(year, 1, 1);
-        final DateMidnight end = new DateMidnight(year, 12, 31).isAfter(max.dayOfMonth().withMaximumValue()) ? max.dayOfMonth().withMaximumValue() : new DateMidnight(year, 12, 31);
+        final LocalDate start = new LocalDate(year, 1, 1).isBefore(min.dayOfMonth().withMinimumValue()) ? min.dayOfMonth().withMinimumValue() : new LocalDate(year, 1, 1);
+        final LocalDate end = new LocalDate(year, 12, 31).isAfter(max.dayOfMonth().withMaximumValue()) ? max.dayOfMonth().withMaximumValue() : new LocalDate(year, 12, 31);
 
         final String keyYear = Integer.toString(year) + ".year";
         synchronized (cpMap) {
@@ -377,7 +376,7 @@ public class PnlHandover extends NursingRecordsPanel {
                 JPanel pnlContent = new JPanel(new VerticalLayout());
 
                 // somebody clicked on the year
-                for (DateMidnight month = end; month.compareTo(start) >= 0; month = month.minusMonths(1)) {
+                for (LocalDate month = end; month.compareTo(start) >= 0; month = month.minusMonths(1)) {
                     pnlContent.add(createCP4Month(month));
                 }
 
@@ -389,7 +388,7 @@ public class PnlHandover extends NursingRecordsPanel {
         if (!cpYear.isCollapsed()) {
             JPanel pnlContent = new JPanel(new VerticalLayout());
 
-            for (DateMidnight month = end; month.compareTo(start) >= 0; month = month.minusMonths(1)) {
+            for (LocalDate month = end; month.compareTo(start) >= 0; month = month.minusMonths(1)) {
                 pnlContent.add(createCP4Month(month));
             }
 
@@ -403,7 +402,7 @@ public class PnlHandover extends NursingRecordsPanel {
         return cpYear;
     }
 
-    private CollapsiblePane createCP4Month(final DateMidnight month) {
+    private CollapsiblePane createCP4Month(final LocalDate month) {
         /***
          *                          _        ____ ____     __                      __  __  ___  _   _ _____ _   _
          *       ___ _ __ ___  __ _| |_ ___ / ___|  _ \   / _| ___  _ __    __ _  |  \/  |/ _ \| \ | |_   _| | | |
@@ -463,7 +462,7 @@ public class PnlHandover extends NursingRecordsPanel {
     }
 
 
-    private JPanel createContentPanel4Month(DateMidnight month) {
+    private JPanel createContentPanel4Month(LocalDate month) {
         /***
          *                      _             _      __              __  __  ___  _   _ _____ _   _
          *       ___ ___  _ __ | |_ ___ _ __ | |_   / _| ___  _ __  |  \/  |/ _ \| \ | |_   _| | | |
@@ -476,21 +475,21 @@ public class PnlHandover extends NursingRecordsPanel {
 
         pnlMonth.setOpaque(false);
 
-        DateMidnight now = new DateMidnight();
+        LocalDate now = new LocalDate();
 
         boolean sameMonth = now.dayOfMonth().withMaximumValue().equals(month.dayOfMonth().withMaximumValue());
 
-        final DateMidnight start = sameMonth ? now : month.dayOfMonth().withMaximumValue();
-        final DateMidnight end = month.dayOfMonth().withMinimumValue();
+        final LocalDate start = sameMonth ? now : month.dayOfMonth().withMaximumValue();
+        final LocalDate end = month.dayOfMonth().withMinimumValue();
 
-        for (DateMidnight day = start; end.compareTo(day) <= 0; day = day.minusDays(1)) {
+        for (LocalDate day = start; end.compareTo(day) <= 0; day = day.minusDays(1)) {
             pnlMonth.add(createCP4Day(day));
         }
 
         return pnlMonth;
     }
 
-    private CollapsiblePane createCP4Day(final DateMidnight day) {
+    private CollapsiblePane createCP4Day(final LocalDate day) {
         final String key = DateFormat.getDateInstance().format(day.toDate());
         synchronized (cpMap) {
             if (!cpMap.containsKey(key)) {
@@ -616,7 +615,7 @@ public class PnlHandover extends NursingRecordsPanel {
     }
 
 
-    private void createContentPanel4Day(final DateMidnight day, final CollapsiblePane cpDay) {
+    private void createContentPanel4Day(final LocalDate day, final CollapsiblePane cpDay) {
 
         final JPanel dayPanel = new JPanel(new VerticalLayout());
 
@@ -893,8 +892,8 @@ public class PnlHandover extends NursingRecordsPanel {
 
         Pair<DateTime, DateTime> minmax = NReportTools.getMinMax();
         if (minmax != null) {
-            DateMidnight start = minmax.getFirst().toDateMidnight().dayOfMonth().withMinimumValue();
-            DateMidnight end = new DateMidnight();
+            LocalDate start = SYSCalendar.bom(minmax.getFirst()).toLocalDate();
+            LocalDate end = new LocalDate();
 
             for (int year = end.getYear(); year >= start.getYear(); year--) {
                 final String keyYear = Integer.toString(year) + ".year";
@@ -932,7 +931,7 @@ public class PnlHandover extends NursingRecordsPanel {
                                     myHO.getUsersAcknowledged().add(em.merge(new Handover2User(myHO, OPDE.getLogin().getUser())));
                                     em.getTransaction().commit();
 
-                                    DateMidnight day = new DateMidnight(myHO.getPit());
+                                    LocalDate day = new LocalDate(myHO.getPit());
 
                                     final String key = DateFormat.getDateInstance().format(myHO.getPit());
 
@@ -1011,7 +1010,7 @@ public class PnlHandover extends NursingRecordsPanel {
         Pair<DateTime, DateTime> minmax = NReportTools.getMinMax();
         if (minmax != null) {
             final DefaultComboBoxModel yearModel = new DefaultComboBoxModel();
-            for (int year = new DateMidnight().getYear(); year >= minmax.getFirst().getYear(); year--) {
+            for (int year = new LocalDate().getYear(); year >= minmax.getFirst().getYear(); year--) {
                 yearModel.addElement(year);
             }
 

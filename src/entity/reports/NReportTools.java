@@ -15,7 +15,7 @@ import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
-import org.joda.time.DateMidnight;
+
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -355,7 +355,7 @@ public class NReportTools {
     }
 
 
-    public static String getBVActivites(DateMidnight from, Closure progress) {
+    public static String getBVActivites(LocalDate from, Closure progress) {
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT);
         ArrayList<Resident> listResidents = ResidentTools.getAllActive();
         StringBuilder html = new StringBuilder(1000);
@@ -404,7 +404,7 @@ public class NReportTools {
     }
 
 
-    public static String getComplaints(DateMidnight from, Closure progress) {
+    public static String getComplaints(LocalDate from, Closure progress) {
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT);
 
 
@@ -429,7 +429,7 @@ public class NReportTools {
                     " ORDER BY n.resident.rid, n.pit DESC ";
             Query query2 = em.createQuery(jpql2);
             query2.setParameter("tagsystem", NReportTAGSTools.TYPE_SYS_COMPLAINT);
-            query2.setParameter("from", from.toDate());
+            query2.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
             ArrayList<NReport> listReports = new ArrayList<NReport>(query2.getResultList());
 
             em.close();
@@ -468,7 +468,7 @@ public class NReportTools {
         return html.toString();
     }
 
-    public static ArrayList<NReport> getBVActivities(Resident resident, DateMidnight from) {
+    public static ArrayList<NReport> getBVActivities(Resident resident, LocalDate from) {
 
         EntityManager em = OPDE.createEM();
         ArrayList<NReport> list = null;
@@ -489,7 +489,7 @@ public class NReportTools {
 
             Query query = em.createQuery(jpql);
             query.setParameter("resident", resident);
-            query.setParameter("from", from.toDate());
+            query.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
             query.setParameter("bv", NReportTAGSTools.TYPE_SYS_BV);
 
             list = new ArrayList<NReport>(query.getResultList());
@@ -504,11 +504,12 @@ public class NReportTools {
         return list;
     }
 
-    public static String getTimes4SocialReports(DateMidnight month, Closure progress) {
+    public static String getTimes4SocialReports(LocalDate month, Closure progress) {
         StringBuilder html = new StringBuilder(1000);
         Format monthFormmatter = new SimpleDateFormat("MMMM yyyy");
-        DateTime from = month.dayOfMonth().withMinimumValue().toDateTime();
-        DateTime to = month.dayOfMonth().withMaximumValue().plusDays(1).toDateTime().minusSeconds(1);
+
+        DateTime from = SYSCalendar.bom(month).toDateTimeAtStartOfDay();
+        DateTime to = SYSCalendar.eod(SYSCalendar.eom(month));
 
         int p = -1;
         progress.execute(new Pair<Integer, Integer>(p, 100));
@@ -598,11 +599,12 @@ public class NReportTools {
         return html.toString();
     }
 
-    public static ArrayList<NReport> getNReports4Month(Resident resident, DateMidnight month) {
+    public static ArrayList<NReport> getNReports4Month(Resident resident, LocalDate month) {
         EntityManager em = OPDE.createEM();
         ArrayList<NReport> list = null;
-        DateTime from = month.dayOfMonth().withMinimumValue().toDateTime();
-        DateTime to = month.toDateTime().dayOfMonth().withMaximumValue().secondOfDay().withMaximumValue();
+        DateTime from = SYSCalendar.bom(month).toDateTimeAtStartOfDay();
+                DateTime to = SYSCalendar.eod(SYSCalendar.eom(month));
+
         OPDE.debug(to);
         try {
 
@@ -628,11 +630,12 @@ public class NReportTools {
         return list;
     }
 
-    public static ArrayList<NReport> getNReports4Week(Resident resident, DateMidnight week) {
+    public static ArrayList<NReport> getNReports4Week(Resident resident, LocalDate week) {
         EntityManager em = OPDE.createEM();
         ArrayList<NReport> list = null;
-        DateTime from = week.dayOfWeek().withMinimumValue().toDateTime();
-        DateTime to = week.toDateTime().dayOfWeek().withMaximumValue().secondOfDay().withMaximumValue();
+        DateTime from = SYSCalendar.bow(week).toDateTimeAtStartOfDay();
+                DateTime to = SYSCalendar.eod(SYSCalendar.eow(week));
+
         OPDE.debug(to);
         try {
 
@@ -658,11 +661,9 @@ public class NReportTools {
         return list;
     }
 
-    public static ArrayList<NReport> getNReports4Day(Resident resident, DateMidnight day) {
+    public static ArrayList<NReport> getNReports4Day(Resident resident, LocalDate day) {
         EntityManager em = OPDE.createEM();
         ArrayList<NReport> list = null;
-        DateTime from = day.toDateTime();
-        DateTime to = day.plusDays(1).toDateTime().minusSeconds(1);
 
         try {
 
@@ -675,8 +676,8 @@ public class NReportTools {
             Query query = em.createQuery(jpql);
 
             query.setParameter("resident", resident);
-            query.setParameter("from", from.toDate());
-            query.setParameter("to", to.toDate());
+            query.setParameter("from", day.toDateTimeAtStartOfDay().toDate());
+            query.setParameter("to", SYSCalendar.eod(day).toDate());
 
 //            long a = System.currentTimeMillis();
 
@@ -729,8 +730,8 @@ public class NReportTools {
     public static ArrayList getNReports4Handover(Homes home, String searchphrase, int year) {
         EntityManager em = OPDE.createEM();
         ArrayList list = new ArrayList();
-        DateTime from = new DateMidnight(year, 1, 1).dayOfMonth().withMinimumValue().toDateTime();
-        DateTime to = new DateMidnight(year, 12, 31).dayOfMonth().withMaximumValue().plusDays(1).toDateTime().minusSeconds(1);
+        LocalDate from = new LocalDate(year, 1, 1);
+        LocalDate to = new LocalDate(year, 12, 31);
 
         try {
 
@@ -744,8 +745,8 @@ public class NReportTools {
 
             Query query = em.createQuery(jpql);
 
-            query.setParameter("from", from.toDate());
-            query.setParameter("to", to.toDate());
+            query.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
+            query.setParameter("to", SYSCalendar.eod(to).toDate());
             query.setParameter("home", home);
             query.setParameter("handover", NReportTAGSTools.TYPE_SYS_HANDOVER);
             query.setParameter("emergency", NReportTAGSTools.TYPE_SYS_EMERGENCY);
@@ -791,9 +792,8 @@ public class NReportTools {
      * @param day
      * @return
      */
-    public static ArrayList<NReport> getNReports4Handover(DateMidnight day, Homes home) {
-        DateTime from = day.toDateTime();
-        DateTime to = day.plusDays(1).toDateTime().minusSeconds(1);
+    public static ArrayList<NReport> getNReports4Handover(LocalDate day, Homes home) {
+
         EntityManager em = OPDE.createEM();
         ArrayList<NReport> list = null;
 
@@ -810,8 +810,8 @@ public class NReportTools {
 
             Query query = em.createQuery(jpql);
 
-            query.setParameter("from", from.toDate());
-            query.setParameter("to", to.toDate());
+            query.setParameter("from", day.toDateTimeAtStartOfDay().toDate());
+            query.setParameter("to", SYSCalendar.eod(day).toDate());
             query.setParameter("home", home);
             query.setParameter("handover", NReportTAGSTools.TYPE_SYS_HANDOVER);
             query.setParameter("emergency", NReportTAGSTools.TYPE_SYS_EMERGENCY);

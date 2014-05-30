@@ -52,9 +52,9 @@ import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
+import org.joda.time.LocalDate;
 
 import javax.persistence.*;
 import javax.swing.*;
@@ -81,7 +81,7 @@ public class PnlReport extends NursingRecordsPanel {
     private Map<String, JPanel> contentmap;
     private Map<String, ArrayList<NReport>> valuecache;
     private Map<NReport, JPanel> linemap;
-    private Map<DateMidnight, String> holidays;
+    private Map<LocalDate, String> holidays;
 
     private Resident resident;
     private boolean initPhase;
@@ -121,7 +121,7 @@ public class PnlReport extends NursingRecordsPanel {
         cpMap = Collections.synchronizedMap(new HashMap<String, CollapsiblePane>());
         valuecache = Collections.synchronizedMap(new HashMap<String, ArrayList<NReport>>());
         linemap = Collections.synchronizedMap(new HashMap<NReport, JPanel>());
-        holidays = new HashMap<DateMidnight, String>();
+        holidays = new HashMap<LocalDate, String>();
         prepareSearchArea();
     }
 
@@ -365,8 +365,8 @@ public class PnlReport extends NursingRecordsPanel {
                                                 Collections.sort(valuecache.get(keyDay));
                                             }
                                         }
-                                        createCP4Day(new DateMidnight(myReport.getPit()));
-                                        expandDay(new DateMidnight(myReport.getPit()));
+                                        createCP4Day(new LocalDate(myReport.getPit()));
+                                        expandDay(new LocalDate(myReport.getPit()));
 
                                         buildPanel();
                                         GUITools.scroll2show(jspReports, cpMap.get(keyDay), cpsReports, new Closure() {
@@ -376,7 +376,8 @@ public class PnlReport extends NursingRecordsPanel {
                                             }
                                         });
                                     }
-                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -452,8 +453,8 @@ public class PnlReport extends NursingRecordsPanel {
 
                 if (minmax != null) {
                     max = minmax.getSecond().toDate();
-                    DateMidnight start = minmax.getFirst().toDateMidnight().dayOfMonth().withMinimumValue();
-                    DateMidnight end = resident.isActive() ? new DateMidnight() : minmax.getSecond().toDateMidnight().dayOfMonth().withMinimumValue();
+                    LocalDate start = SYSCalendar.bom(minmax.getFirst()).toLocalDate();
+                    LocalDate end = resident.isActive() ? new LocalDate() : SYSCalendar.bom(minmax.getSecond()).toLocalDate();
                     for (int year = end.getYear(); year >= start.getYear(); year--) {
                         createCP4Year(year, start, end);
                     }
@@ -483,7 +484,7 @@ public class PnlReport extends NursingRecordsPanel {
 
     }
 
-    private CollapsiblePane createCP4Year(final int year, DateMidnight min, DateMidnight max) {
+    private CollapsiblePane createCP4Year(final int year, LocalDate min, LocalDate max) {
         /***
          *                          _        ____ ____     __             __   _______    _    ____
          *       ___ _ __ ___  __ _| |_ ___ / ___|  _ \   / _| ___  _ __  \ \ / / ____|  / \  |  _ \
@@ -493,8 +494,8 @@ public class PnlReport extends NursingRecordsPanel {
          *
          */
 
-        final DateMidnight start = new DateMidnight(year, 1, 1).isBefore(min.dayOfMonth().withMinimumValue()) ? min.dayOfMonth().withMinimumValue() : new DateMidnight(year, 1, 1);
-        final DateMidnight end = new DateMidnight(year, 12, 31).isAfter(max.dayOfMonth().withMaximumValue()) ? max.dayOfMonth().withMaximumValue() : new DateMidnight(year, 12, 31);
+        final LocalDate start = new LocalDate(year, 1, 1).isBefore(min.dayOfMonth().withMinimumValue()) ? min.dayOfMonth().withMinimumValue() : new LocalDate(year, 1, 1);
+        final LocalDate end = new LocalDate(year, 12, 31).isAfter(max.dayOfMonth().withMaximumValue()) ? max.dayOfMonth().withMaximumValue() : new LocalDate(year, 12, 31);
 
         final String keyYear = Integer.toString(year) + ".year";
         synchronized (cpMap) {
@@ -546,7 +547,7 @@ public class PnlReport extends NursingRecordsPanel {
                 JPanel pnlContent = new JPanel(new VerticalLayout());
 
                 // somebody clicked on the year
-                for (DateMidnight month = end; month.compareTo(start) >= 0; month = month.minusMonths(1)) {
+                for (LocalDate month = end; month.compareTo(start) >= 0; month = month.minusMonths(1)) {
                     pnlContent.add(createCP4Month(month));
                 }
 
@@ -559,7 +560,7 @@ public class PnlReport extends NursingRecordsPanel {
         if (!cpYear.isCollapsed()) {
             JPanel pnlContent = new JPanel(new VerticalLayout());
 
-            for (DateMidnight month = end; month.compareTo(start) >= 0; month = month.minusMonths(1)) {
+            for (LocalDate month = end; month.compareTo(start) >= 0; month = month.minusMonths(1)) {
                 pnlContent.add(createCP4Month(month));
             }
 
@@ -574,7 +575,7 @@ public class PnlReport extends NursingRecordsPanel {
     }
 
 
-    private CollapsiblePane createCP4Month(final DateMidnight month) {
+    private CollapsiblePane createCP4Month(final LocalDate month) {
         /***
          *                          _        ____ ____     __                      __  __  ___  _   _ _____ _   _
          *       ___ _ __ ___  __ _| |_ ___ / ___|  _ \   / _| ___  _ __    __ _  |  \/  |/ _ \| \ | |_   _| | | |
@@ -658,7 +659,7 @@ public class PnlReport extends NursingRecordsPanel {
     }
 
 
-    private JPanel createContentPanel4Month(DateMidnight month) {
+    private JPanel createContentPanel4Month(LocalDate month) {
         /***
          *                      _             _      __              __  __  ___  _   _ _____ _   _
          *       ___ ___  _ __ | |_ ___ _ __ | |_   / _| ___  _ __  |  \/  |/ _ \| \ | |_   _| | | |
@@ -675,21 +676,21 @@ public class PnlReport extends NursingRecordsPanel {
 
         pnlMonth.setOpaque(false);
 
-        DateMidnight now = new DateMidnight();
+        LocalDate now = new LocalDate();
 
         boolean sameMonth = now.dayOfMonth().withMaximumValue().equals(month.dayOfMonth().withMaximumValue());
 
-        final DateMidnight start = sameMonth ? now : month.dayOfMonth().withMaximumValue();
-        final DateMidnight end = month.dayOfMonth().withMinimumValue();
+        final LocalDate start = sameMonth ? now : SYSCalendar.eom(month);
+        final LocalDate end = SYSCalendar.bom(month);
 
-        for (DateMidnight week = start; end.compareTo(week) <= 0; week = week.minusWeeks(1)) {
+        for (LocalDate week = start; end.compareTo(week) <= 0; week = week.minusWeeks(1)) {
             pnlMonth.add(createCP4Week(week));
         }
 
         return pnlMonth;
     }
 
-    private CollapsiblePane createCP4Week(final DateMidnight week) {
+    private CollapsiblePane createCP4Week(final LocalDate week) {
         final String key = weekFormater.format(week.toDate()) + ".week";
         synchronized (cpMap) {
             if (!cpMap.containsKey(key)) {
@@ -774,19 +775,19 @@ public class PnlReport extends NursingRecordsPanel {
         return cpWeek;
     }
 
-    private JPanel createWeekContentPanel4(DateMidnight week) {
+    private JPanel createWeekContentPanel4(LocalDate week) {
         JPanel pnlWeek = new JPanel(new VerticalLayout());
 
         pnlWeek.setOpaque(false);
 
-        DateMidnight now = new DateMidnight();
+        LocalDate now = new LocalDate();
 
         boolean sameWeek = now.dayOfWeek().withMaximumValue().equals(week.dayOfWeek().withMaximumValue());
 
-        final DateMidnight start = sameWeek ? now : week.dayOfWeek().withMaximumValue();
-        final DateMidnight end = week.dayOfWeek().withMinimumValue();
+        final LocalDate start = sameWeek ? now : SYSCalendar.eow(week);
+        final LocalDate end = SYSCalendar.bow(week);
 
-        for (DateMidnight day = start; end.compareTo(day) <= 0; day = day.minusDays(1)) {
+        for (LocalDate day = start; end.compareTo(day) <= 0; day = day.minusDays(1)) {
             pnlWeek.add(createCP4Day(day));
         }
 
@@ -794,7 +795,7 @@ public class PnlReport extends NursingRecordsPanel {
     }
 
 
-    private CollapsiblePane createCP4Day(final DateMidnight day) {
+    private CollapsiblePane createCP4Day(final LocalDate day) {
         final String key = DateFormat.getDateInstance().format(day.toDate());
         synchronized (cpMap) {
             if (!cpMap.containsKey(key)) {
@@ -866,7 +867,7 @@ public class PnlReport extends NursingRecordsPanel {
         return cpDay;
     }
 
-    private JPanel createContentPanel4Day(DateMidnight day) {
+    private JPanel createContentPanel4Day(LocalDate day) {
 //        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage("misc.msg.wait", progress, progressMax));
 //        progress++;
 
@@ -963,7 +964,7 @@ public class PnlReport extends NursingRecordsPanel {
                                             Collections.sort(valuecache.get(keyNewDay));
                                         }
 
-                                        createCP4Day(new DateMidnight(myReport.getPit()));
+                                        createCP4Day(new LocalDate(myReport.getPit()));
 
                                         buildPanel();
                                         GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
@@ -1061,11 +1062,12 @@ public class PnlReport extends NursingRecordsPanel {
                                                 Collections.sort(valuecache.get(keyNewDay));
                                             }
 
-                                            createCP4Day(new DateMidnight(myReport.getPit()));
+                                            createCP4Day(new LocalDate(myReport.getPit()));
 
                                             buildPanel();
                                             GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-                                        } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                        } catch (OptimisticLockException ole) {
+                                            OPDE.warn(ole);
                                             if (em.getTransaction().isActive()) {
                                                 em.getTransaction().rollback();
                                             }
@@ -1163,8 +1165,8 @@ public class PnlReport extends NursingRecordsPanel {
         synchronized (cpMap) {
             Pair<DateTime, DateTime> minmax = NReportTools.getMinMax(resident);
             if (minmax != null) {
-                DateMidnight start = minmax.getFirst().toDateMidnight().dayOfMonth().withMinimumValue();
-                DateMidnight end = resident.isActive() ? new DateMidnight() : minmax.getSecond().toDateMidnight().dayOfMonth().withMinimumValue();
+                LocalDate start = SYSCalendar.bom(minmax.getFirst()).toLocalDate();
+                LocalDate end = resident.isActive() ? new LocalDate() : SYSCalendar.eom(minmax.getSecond()).toLocalDate();
                 for (int year = end.getYear(); year >= start.getYear(); year--) {
                     final String keyYear = Integer.toString(year) + ".year";
 
@@ -1175,7 +1177,7 @@ public class PnlReport extends NursingRecordsPanel {
         cpsReports.addExpansion();
     }
 
-    private void expandDay(DateMidnight day) {
+    private void expandDay(LocalDate day) {
         final String keyYear = Integer.toString(day.getYear()) + ".year";
         if (cpMap.containsKey(keyYear) && cpMap.get(keyYear).isCollapsed()) {
             try {
@@ -1280,8 +1282,8 @@ public class PnlReport extends NursingRecordsPanel {
                                         }
                                     }
 
-                                    createCP4Day(new DateMidnight(oldReport.getPit()));
-                                    createCP4Day(new DateMidnight(newReport.getPit()));
+                                    createCP4Day(new LocalDate(oldReport.getPit()));
+                                    createCP4Day(new LocalDate(newReport.getPit()));
 
                                     buildPanel();
                                     GUITools.scroll2show(jspReports, cpMap.get(keyNewDay), cpsReports, new Closure() {
@@ -1290,7 +1292,8 @@ public class PnlReport extends NursingRecordsPanel {
                                             GUITools.flashBackground(linemap.get(newReport), Color.YELLOW, 2);
                                         }
                                     });
-                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1365,13 +1368,14 @@ public class PnlReport extends NursingRecordsPanel {
                                         Collections.sort(valuecache.get(keyDay));
                                     }
 
-                                    createCP4Day(new DateMidnight(delReport.getPit()));
+                                    createCP4Day(new LocalDate(delReport.getPit()));
 
                                     buildPanel();
                                     if (tbShowReplaced.isSelected()) {
                                         GUITools.flashBackground(linemap.get(delReport), Color.YELLOW, 2);
                                     }
-                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1449,11 +1453,12 @@ public class PnlReport extends NursingRecordsPanel {
                                     Collections.sort(valuecache.get(keyNewDay));
                                 }
 
-                                createCP4Day(new DateMidnight(myReport.getPit()));
+                                createCP4Day(new LocalDate(myReport.getPit()));
 
                                 buildPanel();
                                 GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -1547,11 +1552,12 @@ public class PnlReport extends NursingRecordsPanel {
                                     Collections.sort(valuecache.get(keyNewDay));
                                 }
 
-                                createCP4Day(new DateMidnight(myReport.getPit()));
+                                createCP4Day(new LocalDate(myReport.getPit()));
 
                                 buildPanel();
                                 GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -1616,7 +1622,7 @@ public class PnlReport extends NursingRecordsPanel {
                                 Collections.sort(valuecache.get(keyNewDay));
                             }
 
-                            createCP4Day(new DateMidnight(myReport.getPit()));
+                            createCP4Day(new LocalDate(myReport.getPit()));
 
                             buildPanel();
                             GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
@@ -1702,11 +1708,12 @@ public class PnlReport extends NursingRecordsPanel {
                                     Collections.sort(valuecache.get(keyNewDay));
                                 }
 
-                                createCP4Day(new DateMidnight(myReport.getPit()));
+                                createCP4Day(new LocalDate(myReport.getPit()));
 
                                 buildPanel();
                                 GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }
@@ -1770,7 +1777,7 @@ public class PnlReport extends NursingRecordsPanel {
             }
         }
 
-        final String keyLastYear = Integer.toString(new DateMidnight().minusWeeks(1).getYear()) + ".year";
+        final String keyLastYear = Integer.toString(new LocalDate().minusWeeks(1).getYear()) + ".year";
         if (cpMap.containsKey(keyLastYear)) {
             try {
                 cpMap.get(keyLastYear).setCollapsed(false);
@@ -1778,7 +1785,7 @@ public class PnlReport extends NursingRecordsPanel {
                 // bah!
             }
         }
-        final String keyLastMonth = monthFormatter.format(new DateMidnight().minusWeeks(1).toDate()) + ".month";
+        final String keyLastMonth = monthFormatter.format(new LocalDate().minusWeeks(1).toDate()) + ".month";
         if (cpMap.containsKey(keyLastMonth)) {
             try {
                 cpMap.get(keyLastMonth).setCollapsed(false);
@@ -1786,7 +1793,7 @@ public class PnlReport extends NursingRecordsPanel {
                 // bah!
             }
         }
-        final String keyLastWeek = weekFormater.format(new DateMidnight().minusWeeks(1).toDate()) + ".week";
+        final String keyLastWeek = weekFormater.format(new LocalDate().minusWeeks(1).toDate()) + ".week";
         if (cpMap.containsKey(keyLastWeek)) {
             try {
                 GUITools.setCollapsed(cpMap.get(keyLastWeek), false);

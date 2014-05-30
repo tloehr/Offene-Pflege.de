@@ -451,6 +451,7 @@ public class SYSConst {
     public static final Icon icon22redStar = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/redstar.png"));
     public static final Icon icon22greenStar = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/greenstar.png"));
     public static final Icon icon16unlink = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/unlink.png"));
+    public static final Icon icon16delete = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/edit_remove.png"));
     public static final Icon icon16unlinkPressed = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/unlink_pressed.png"));
     public static final Icon icon22add = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/add.png"));
     public static final Icon icon22addGroup = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/add_group.png"));

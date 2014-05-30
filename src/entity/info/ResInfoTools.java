@@ -14,8 +14,8 @@ import op.OPDE;
 import op.controlling.PnlControlling;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -1331,7 +1331,7 @@ public class ResInfoTools {
 
     public static String getFallsAnonymous(int monthsback, Closure progress) {
         StringBuilder html = new StringBuilder(1000);
-        DateMidnight from = new DateMidnight().minusMonths(monthsback).dayOfMonth().withMinimumValue();
+        LocalDate from = SYSCalendar.bom(new LocalDate().minusMonths(monthsback));
         EntityManager em = OPDE.createEM();
         DateFormat df = DateFormat.getDateInstance();
         SimpleDateFormat monthFormatter = new SimpleDateFormat("MMMM yyyy");
@@ -1347,7 +1347,7 @@ public class ResInfoTools {
 
         Query query = em.createQuery(jpql);
         query.setParameter("type", ResInfoTypeTools.TYPE_FALL);
-        query.setParameter("from", from.toDate());
+        query.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
         ArrayList<ResInfo> listData = new ArrayList<ResInfo>(query.getResultList());
 
         Query query1 = em.createQuery("SELECT s FROM Station s ORDER BY s.name ");
@@ -1359,8 +1359,8 @@ public class ResInfoTools {
         Station exResident = new Station(OPDE.lang.getString(PnlControlling.internalClassID + ".nursing.falls.exResidents"), null);
 
         // Init Maps
-        HashMap<DateMidnight, HashMap<Station, Integer>> statMap = new HashMap<DateMidnight, HashMap<Station, Integer>>();
-        for (DateMidnight month = from; month.compareTo(new DateMidnight().dayOfMonth().withMinimumValue()) <= 0; month = month.plusMonths(1)) {
+        HashMap<LocalDate, HashMap<Station, Integer>> statMap = new HashMap<LocalDate, HashMap<Station, Integer>>();
+        for (LocalDate month = from; month.compareTo(SYSCalendar.bom(new LocalDate())) <= 0; month = month.plusMonths(1)) {
             statMap.put(month, new HashMap<Station, Integer>());
             for (Station station : listStation) {
                 statMap.get(month).put(station, 0);
@@ -1373,13 +1373,13 @@ public class ResInfoTools {
         for (ResInfo ri : listData) {
             p++;
             progress.execute(new Pair<Integer, Integer>(p, listData.size()));
-            DateMidnight currentMonth = new DateMidnight(ri.getFrom()).dayOfMonth().withMinimumValue();
+            LocalDate currentMonth = SYSCalendar.bom(new LocalDate(ri.getFrom()));
             Station station = ri.getResident().getStation() == null ? exResident : ri.getResident().getStation();
             int numFalls = statMap.get(currentMonth).get(station) + 1;
             statMap.get(currentMonth).put(station, numFalls);
         }
 
-        ArrayList<DateMidnight> listMonths = new ArrayList<DateMidnight>(statMap.keySet());
+        ArrayList<LocalDate> listMonths = new ArrayList<LocalDate>(statMap.keySet());
         Collections.sort(listMonths);
 
         html.append(SYSConst.html_h1(PnlControlling.internalClassID + ".nursing.falls.anonymous"));
@@ -1395,7 +1395,7 @@ public class ResInfoTools {
         listStation.add(exResident);
 
         int zebra = 0;
-        for (DateMidnight currentMonth : listMonths) {
+        for (LocalDate currentMonth : listMonths) {
             zebra++;
             for (Station station : listStation) {
                 table.append(SYSConst.html_table_tr(
@@ -1419,7 +1419,7 @@ public class ResInfoTools {
 
     public static String getFallsByResidents(int monthsback, Closure progress) {
         StringBuilder html = new StringBuilder(1000);
-        DateMidnight from = new DateMidnight().minusMonths(monthsback).dayOfMonth().withMinimumValue();
+        LocalDate from = SYSCalendar.bom(new LocalDate().minusMonths(monthsback));
         EntityManager em = OPDE.createEM();
         DateFormat df = DateFormat.getDateInstance();
 
@@ -1435,7 +1435,7 @@ public class ResInfoTools {
 
         Query query1 = em.createQuery(jpql1);
         query1.setParameter("type", ResInfoTypeTools.TYPE_FALL);
-        query1.setParameter("from", from.toDate());
+        query1.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
         ArrayList<QProcessElement> listData = new ArrayList<QProcessElement>(query1.getResultList());
 
         p = 0;

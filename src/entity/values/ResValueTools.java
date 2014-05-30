@@ -451,11 +451,12 @@ public class ResValueTools {
         return result;
     }
 
-    public static String getLiquidBalance(DateMidnight month, Closure progress) {
+    public static String getLiquidBalance(LocalDate month, Closure progress) {
         ArrayList<Resident> listResidents = ResidentTools.getAllActive(month);
         Format monthFormmatter = new SimpleDateFormat("MMMM yyyy");
-        DateTime from = month.dayOfMonth().withMinimumValue().toDateTime();
-        DateTime to = month.dayOfMonth().withMaximumValue().plusDays(1).toDateTime().minusSeconds(1);
+
+        DateTime from = SYSCalendar.bom(month).toDateTimeAtStartOfDay();
+        DateTime to = SYSCalendar.eod(SYSCalendar.eom(month));
 
         int p = -1;
         progress.execute(new Pair<Integer, Integer>(p, listResidents.size()));

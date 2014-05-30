@@ -4,19 +4,18 @@
 
 package op.dev;
 
+import javax.swing.border.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
 import entity.info.*;
 import entity.nursingprocess.DFNTools;
 import entity.prescription.*;
+import entity.system.Commontags;
 import op.OPDE;
 import op.care.info.PnlEditResInfo;
 import op.threads.DisplayManager;
-import op.tools.CleanablePanel;
-import op.tools.GUITools;
-import op.tools.SYSCalendar;
-import op.tools.SYSTools;
+import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -42,10 +41,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * @author Torsten Löhr
@@ -56,7 +52,9 @@ public class PnlDev extends CleanablePanel {
     public PnlDev() {
         initComponents();
 
-        cmbMonth.setModel(SYSCalendar.createMonthList(new DateMidnight().minusYears(1), new DateMidnight()));
+        cmbMonth.setModel(SYSCalendar.createMonthList(new LocalDate().minusYears(1), new LocalDate()));
+
+        tabbedPane1.setComponentAt(1, new PnlCommonTags(new HashSet<Commontags>()));
 
     }
 
@@ -530,6 +528,7 @@ public class PnlDev extends CleanablePanel {
         scrollPane2 = new JScrollPane();
         txtException = new JTextArea();
         button1 = new JButton();
+        panel3 = new JPanel();
         panel2 = new JPanel();
         cmbMonth = new JComboBox();
         button2 = new JButton();
@@ -546,8 +545,8 @@ public class PnlDev extends CleanablePanel {
             //======== panel1 ========
             {
                 panel1.setLayout(new FormLayout(
-                        "default, $lcgap, 130dlu, $lcgap, default:grow, $lcgap, default",
-                        "default, $lgap, fill:default:grow, 2*($lgap, default)"));
+                    "default, $lcgap, 130dlu, $lcgap, default:grow, $lcgap, default",
+                    "default, $lgap, fill:default:grow, 2*($lgap, default)"));
 
                 //======== scrollPane1 ========
                 {
@@ -586,15 +585,26 @@ public class PnlDev extends CleanablePanel {
             }
             tabbedPane1.addTab("text", panel1);
 
+            //======== panel3 ========
+            {
+                panel3.setLayout(new BoxLayout(panel3, BoxLayout.X_AXIS));
+            }
+            tabbedPane1.addTab("text", panel3);
+
             //======== panel2 ========
             {
                 panel2.setLayout(new FormLayout(
-                        "left:default:grow",
-                        "default, $lgap, default, $rgap, fill:default, 6*($lgap, default)"));
+                    "left:default:grow",
+                    "default, $lgap, default, $rgap, fill:default, 6*($lgap, default)"));
                 panel2.add(cmbMonth, CC.xy(1, 3, CC.FILL, CC.DEFAULT));
 
                 //---- button2 ----
                 button2.setText("mach mal");
+                button2.setContentAreaFilled(false);
+                button2.setBorderPainted(false);
+                button2.setBorder(null);
+                button2.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/1downarrow.png")));
+                button2.setHorizontalTextPosition(SwingConstants.LEADING);
                 button2.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -615,6 +625,7 @@ public class PnlDev extends CleanablePanel {
 
                 //---- btnMod11 ----
                 btnMod11.setText("calc mod11");
+                btnMod11.setBorder(new SoftBevelBorder(SoftBevelBorder.LOWERED));
                 btnMod11.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -647,6 +658,7 @@ public class PnlDev extends CleanablePanel {
     private JScrollPane scrollPane2;
     private JTextArea txtException;
     private JButton button1;
+    private JPanel panel3;
     private JPanel panel2;
     private JComboBox cmbMonth;
     private JButton button2;

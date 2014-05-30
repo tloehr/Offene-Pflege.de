@@ -9,6 +9,7 @@ import java.util.Date;
  * Created by tloehr on 28.05.14.
  */
 @Entity
+@Table(name = "qms")
 public class Qms {
 
     @Id

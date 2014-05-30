@@ -31,6 +31,7 @@ import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.swing.JideBoxLayout;
+import com.jidesoft.swing.JideTabbedPane;
 import entity.Station;
 import entity.StationTools;
 import entity.files.SYSFilesTools;
@@ -50,11 +51,13 @@ import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
-import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -68,6 +71,11 @@ import java.util.*;
  * @author tloehr
  */
 public class PnlControlling extends CleanablePanel {
+
+    public static final int TAB_CONTROLLING = 0;
+    public static final int TAB_QMS = 1;
+    public static final int TAB_QMSPLAN = 2;
+
     public static final String internalClassID = "opde.controlling";
     private JScrollPane jspSearch;
     Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
@@ -75,8 +83,11 @@ public class PnlControlling extends CleanablePanel {
 
     // Variables declaration - do not modify
     //GEN-BEGIN:variables
+    private JideTabbedPane tabMain;
     private JScrollPane scrollPane1;
     private CollapsiblePanes cpsControlling;
+    private JPanel panel1;
+    private JPanel panel2;
     // End of variables declaration//GEN-END:variables
 
 
@@ -107,31 +118,11 @@ public class PnlControlling extends CleanablePanel {
         };
         initComponents();
         initPanel();
-        reloadDisplay();
+        reload();
     }
 
     private void initPanel() {
 
-    }
-
-    private void reloadDisplay() {
-        /***
-         *               _                 _ ____  _           _
-         *      _ __ ___| | ___   __ _  __| |  _ \(_)___ _ __ | | __ _ _   _
-         *     | '__/ _ \ |/ _ \ / _` |/ _` | | | | / __| '_ \| |/ _` | | | |
-         *     | | |  __/ | (_) | (_| | (_| | |_| | \__ \ |_) | | (_| | |_| |
-         *     |_|  \___|_|\___/ \__,_|\__,_|____/|_|___/ .__/|_|\__,_|\__, |
-         *                                              |_|            |___/
-         */
-        cpsControlling.removeAll();
-        cpsControlling.setLayout(new JideBoxLayout(cpsControlling, JideBoxLayout.Y_AXIS));
-        cpsControlling.add(createCP4Orga());
-        cpsControlling.add(createCP4Nursing());
-        cpsControlling.add(createCP4Nutrition());
-        if (OPDE.isCalcMediUPR1()) {
-            cpsControlling.add(createCP4Drugs());
-        }
-        cpsControlling.addExpansion();
     }
 
 
@@ -312,7 +303,7 @@ public class PnlControlling extends CleanablePanel {
                     @Override
                     protected Object doInBackground() throws Exception {
                         SYSPropsTools.storeProp("opde.controlling::bvactivitiesWeeksBack", txtBVWeeksBack.getText(), OPDE.getLogin().getUser());
-                        SYSFilesTools.print(NReportTools.getBVActivites(new DateMidnight().minusWeeks(Integer.parseInt(txtBVWeeksBack.getText())), progressClosure), false);
+                        SYSFilesTools.print(NReportTools.getBVActivites(new LocalDate().minusWeeks(Integer.parseInt(txtBVWeeksBack.getText())), progressClosure), false);
                         return null;
                     }
 
@@ -361,7 +352,7 @@ public class PnlControlling extends CleanablePanel {
                         int monthsback = Integer.parseInt(txtComplaintsMonthsBack.getText());
 
                         String content = QProcessTools.getComplaintsAnalysis(monthsback, progressClosure);
-                        content += NReportTools.getComplaints(new DateMidnight().minusMonths(monthsback).dayOfMonth().withMinimumValue(), progressClosure);
+                        content += NReportTools.getComplaints(new LocalDate().minusMonths(monthsback).dayOfMonth().withMinimumValue(), progressClosure);
 
                         SYSFilesTools.print(content, false);
                         return null;
@@ -442,7 +433,7 @@ public class PnlControlling extends CleanablePanel {
          */
         JPanel pblSocialTimes = new JPanel(new BorderLayout());
         final JButton btnSocialTimes = GUITools.createHyperlinkButton("opde.controlling.nursing.social", null, null);
-        final JComboBox cmbSocialTimes = new JComboBox(SYSCalendar.createMonthList(new DateMidnight().minusYears(1), new DateMidnight()));
+        final JComboBox cmbSocialTimes = new JComboBox(SYSCalendar.createMonthList(new LocalDate().minusYears(1), new LocalDate()));
         btnSocialTimes.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -450,7 +441,7 @@ public class PnlControlling extends CleanablePanel {
                 SwingWorker worker = new SwingWorker() {
                     @Override
                     protected Object doInBackground() throws Exception {
-                        DateMidnight month = (DateMidnight) cmbSocialTimes.getSelectedItem();
+                        LocalDate month = (LocalDate) cmbSocialTimes.getSelectedItem();
                         SYSFilesTools.print(NReportTools.getTimes4SocialReports(month, progressClosure), false);
                         return null;
                     }
@@ -467,7 +458,7 @@ public class PnlControlling extends CleanablePanel {
         cmbSocialTimes.setRenderer(new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                return new DefaultListCellRenderer().getListCellRendererComponent(list, monthFormatter.format(((DateMidnight) value).toDate()), index, isSelected, cellHasFocus);
+                return new DefaultListCellRenderer().getListCellRendererComponent(list, monthFormatter.format(((LocalDate) value).toDate()), index, isSelected, cellHasFocus);
             }
         });
         cmbSocialTimes.setSelectedIndex(cmbSocialTimes.getItemCount() - 2);
@@ -624,7 +615,7 @@ public class PnlControlling extends CleanablePanel {
          */
         JPanel pnlLiquidBalance = new JPanel(new BorderLayout());
         final JButton btnLiquidBalance = GUITools.createHyperlinkButton("opde.controlling.nutrition.liquidbalance", null, null);
-        final JComboBox cmbLiquidBalanceMonth = new JComboBox(SYSCalendar.createMonthList(new DateMidnight().minusYears(1), new DateMidnight()));
+        final JComboBox cmbLiquidBalanceMonth = new JComboBox(SYSCalendar.createMonthList(new LocalDate().minusYears(1), new LocalDate()));
         btnLiquidBalance.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -632,7 +623,7 @@ public class PnlControlling extends CleanablePanel {
                 SwingWorker worker = new SwingWorker() {
                     @Override
                     protected Object doInBackground() throws Exception {
-                        DateMidnight month = (DateMidnight) cmbLiquidBalanceMonth.getSelectedItem();
+                        LocalDate month = (LocalDate) cmbLiquidBalanceMonth.getSelectedItem();
                         SYSFilesTools.print(ResValueTools.getLiquidBalance(month, progressClosure), false);
                         return null;
                     }
@@ -649,7 +640,7 @@ public class PnlControlling extends CleanablePanel {
         cmbLiquidBalanceMonth.setRenderer(new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                return new DefaultListCellRenderer().getListCellRendererComponent(list, monthFormatter.format(((DateMidnight) value).toDate()), index, isSelected, cellHasFocus);
+                return new DefaultListCellRenderer().getListCellRendererComponent(list, monthFormatter.format(((LocalDate) value).toDate()), index, isSelected, cellHasFocus);
             }
         });
         cmbLiquidBalanceMonth.setSelectedIndex(cmbLiquidBalanceMonth.getItemCount() - 2);
@@ -704,14 +695,46 @@ public class PnlControlling extends CleanablePanel {
         return pnlContent;
     }
 
+
     @Override
     public void cleanup() {
         cpsControlling.removeAll();
     }
 
+    private void tabMainStateChanged(ChangeEvent e) {
+        reload();
+    }
+
     @Override
     public void reload() {
-        reloadDisplay();
+
+
+        switch (tabMain.getSelectedIndex()) {
+            case TAB_CONTROLLING: {
+                cpsControlling.removeAll();
+                cpsControlling.setLayout(new JideBoxLayout(cpsControlling, JideBoxLayout.Y_AXIS));
+                cpsControlling.add(createCP4Orga());
+                cpsControlling.add(createCP4Nursing());
+                cpsControlling.add(createCP4Nutrition());
+                if (OPDE.isCalcMediUPR1()) {
+                    cpsControlling.add(createCP4Drugs());
+                }
+                cpsControlling.addExpansion();
+                break;
+            }
+            case TAB_QMS: {
+//                tabMain.setComponentAt(TAB_QMS, previousPanel);
+                break;
+            }
+            case TAB_QMSPLAN: {
+//                tabMain.setComponentAt(TAB_QMSPLAN, previousPanel);
+                break;
+            }
+            default: {
+            }
+        }
+
+
     }
 
 
@@ -723,22 +746,50 @@ public class PnlControlling extends CleanablePanel {
 //     */
 //    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        tabMain = new JideTabbedPane();
         scrollPane1 = new JScrollPane();
         cpsControlling = new CollapsiblePanes();
+        panel1 = new JPanel();
+        panel2 = new JPanel();
 
         //======== this ========
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
-        //======== scrollPane1 ========
+        //======== tabMain ========
         {
+            tabMain.setTabPlacement(SwingConstants.LEFT);
+            tabMain.setBoldActiveTab(true);
+            tabMain.addChangeListener(new ChangeListener() {
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                    tabMainStateChanged(e);
+                }
+            });
 
-            //======== cpsControlling ========
+            //======== scrollPane1 ========
             {
-                cpsControlling.setLayout(new BoxLayout(cpsControlling, BoxLayout.X_AXIS));
+
+                //======== cpsControlling ========
+                {
+                    cpsControlling.setLayout(new BoxLayout(cpsControlling, BoxLayout.X_AXIS));
+                }
+                scrollPane1.setViewportView(cpsControlling);
             }
-            scrollPane1.setViewportView(cpsControlling);
+            tabMain.addTab("controlling", scrollPane1);
+
+            //======== panel1 ========
+            {
+                panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
+            }
+            tabMain.addTab("text", panel1);
+
+            //======== panel2 ========
+            {
+                panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS));
+            }
+            tabMain.addTab("text", panel2);
         }
-        add(scrollPane1);
+        add(tabMain);
     }// </editor-fold>//GEN-END:initComponents
 
 
@@ -748,7 +799,7 @@ public class PnlControlling extends CleanablePanel {
         int p = -1;
         progress.execute(new Pair<Integer, Integer>(p, 100));
 
-        DateMidnight from = new DateMidnight().minusMonths(monthsback).dayOfMonth().withMinimumValue();
+        LocalDate from = new LocalDate().minusMonths(monthsback).dayOfMonth().withMinimumValue();
         EntityManager em = OPDE.createEM();
         DateFormat df = DateFormat.getDateInstance();
 

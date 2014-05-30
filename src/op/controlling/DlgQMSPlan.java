@@ -24,21 +24,21 @@
  * schreiben Sie an die Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA.
  * 
  */
-package op.care.nursingprocess;
+package op.controlling;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.popup.JidePopup;
-import com.jidesoft.swing.AutoCompletion;
-import com.jidesoft.swing.SelectAllUtils;
 import com.toedter.calendar.JDateChooser;
 import entity.info.ResInfoCategory;
 import entity.info.ResInfoCategoryTools;
 import entity.nursingprocess.Intervention;
 import entity.nursingprocess.InterventionSchedule;
 import entity.nursingprocess.NursingProcess;
-import entity.nursingprocess.NursingProcessTools;
 import op.OPDE;
+import op.care.nursingprocess.PnlSchedule;
+import op.care.nursingprocess.PnlSelectIntervention;
+import op.care.nursingprocess.TMPlan;
 import op.threads.DisplayMessage;
 import op.tools.GUITools;
 import op.tools.MyJDialog;
@@ -61,8 +61,8 @@ import java.util.Date;
 /**
  * @author root
  */
-public class DlgNursingProcess extends MyJDialog {
-    public static final String internalClassID = "nursingrecords.nursingprocess.dlgplanung";
+public class DlgQMSPlan extends MyJDialog {
+    public static final String internalClassID = "opde.controlling.dlgqmsplan";
     private Closure actionBlock;
     private NursingProcess nursingProcess;
     private JPopupMenu menu;
@@ -71,7 +71,7 @@ public class DlgNursingProcess extends MyJDialog {
     /**
      * Creates new form DlgNursingProcess
      */
-    public DlgNursingProcess(NursingProcess nursingProcess, Closure actionBlock) {
+    public DlgQMSPlan(NursingProcess nursingProcess, Closure actionBlock) {
         super(false);
         this.nursingProcess = nursingProcess;
         this.actionBlock = actionBlock;
@@ -128,7 +128,7 @@ public class DlgNursingProcess extends MyJDialog {
 
     private void reloadInterventions() {
         tblPlanung.setModel(new TMPlan(nursingProcess));
-        tblPlanung.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        tblPlanung.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         tblPlanung.getColumnModel().getColumn(TMPlan.COL_TXT).setCellRenderer(new RNDHTML());
         tblPlanung.getColumnModel().getColumn(TMPlan.COL_TXT).setHeaderValue(OPDE.lang.getString("nursingrecords.nursingprocess.interventions"));
     }
@@ -456,12 +456,12 @@ public class DlgNursingProcess extends MyJDialog {
     }// </editor-fold>//GEN-END:initComponents
 
 
-    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+    private void btnCancelActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         nursingProcess = null;
         dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
 
-    private void jspPlanungComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jspPlanungComponentResized
+    private void jspPlanungComponentResized(ComponentEvent evt) {//GEN-FIRST:event_jspPlanungComponentResized
         JScrollPane jsp = (JScrollPane) evt.getComponent();
         if (tblPlanung.getRowCount() <= 0) {
             return;
@@ -473,14 +473,14 @@ public class DlgNursingProcess extends MyJDialog {
         tcm1.getColumn(0).setHeaderValue(OPDE.lang.getString("nursingrecords.nursingprocess.interventions"));
     }//GEN-LAST:event_jspPlanungComponentResized
 
-    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
+    private void btnSaveActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         if (saveOK()) {
             save();
             dispose();
         }
     }//GEN-LAST:event_btnSaveActionPerformed
 
-    private void tblPlanungMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblPlanungMousePressed
+    private void tblPlanungMousePressed(MouseEvent evt) {//GEN-FIRST:event_tblPlanungMousePressed
         if (!SwingUtilities.isRightMouseButton(evt)) {
             return;
         }
@@ -503,8 +503,8 @@ public class DlgNursingProcess extends MyJDialog {
          *                                    |_|         |_|
          */
         JMenuItem itemPopupDelete = new JMenuItem(OPDE.lang.getString("misc.commands.delete"), SYSConst.icon22delete);
-        itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        itemPopupDelete.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 for (int row : tblPlanung.getSelectedRows()) {
                     listInterventionSchedule2Remove.add(((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row));
                     nursingProcess.getInterventionSchedule().remove(((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row));
@@ -523,9 +523,9 @@ public class DlgNursingProcess extends MyJDialog {
          *                                    |_|         |_|
          */
         final JMenuItem itemPopupSchedule = new JMenuItem(OPDE.lang.getString("misc.commands.editsheduling"), SYSConst.icon22clock);
-        itemPopupSchedule.addActionListener(new java.awt.event.ActionListener() {
+        itemPopupSchedule.addActionListener(new ActionListener() {
 
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(ActionEvent evt) {
                 final JidePopup popup = new JidePopup();
 
                 /**

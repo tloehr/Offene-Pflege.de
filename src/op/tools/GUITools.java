@@ -171,6 +171,16 @@ public class GUITools {
         return tb;
     }
 
+
+    public static JButton getTinyButton(String tooltip, Icon icon){
+        JButton jButton = new JButton(icon);
+        jButton.setContentAreaFilled(false);
+        jButton.setBorder(null);
+        jButton.setBorderPainted(false);
+        jButton.setToolTipText(tooltip);
+        return jButton;
+    }
+
     /**
      * Shows a JidePopup in relation to its owner. Calculates the new position that it leaves the owner
      * visible. The popup is placed according to the <code>location</code> setting. The size of the content

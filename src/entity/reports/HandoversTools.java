@@ -18,7 +18,6 @@ import op.threads.DisplayMessage;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -56,10 +55,9 @@ public class HandoversTools {
      * @param day
      * @return
      */
-    public static ArrayList<Handovers> getBy(DateMidnight day, Homes home) {
-        DateTime from = day.toDateTime();
-        DateTime to = day.plusDays(1).toDateTime().minusSeconds(1);
-        return getBy(from, to, home);
+    public static ArrayList<Handovers> getBy(LocalDate day, Homes home) {
+
+        return getBy(day.toDateTimeAtStartOfDay(), SYSCalendar.eod(day), home);
     }
 
     public static ArrayList<Handovers> getBy(int year, Homes home) {

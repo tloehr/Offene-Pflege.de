@@ -51,7 +51,6 @@ import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
@@ -98,7 +97,6 @@ public class PnlNursingProcess extends NursingRecordsPanel {
     }
 
     private void initPanel() {
-//        planungCollapsiblePaneMap = new HashMap<NursingProcess, CollapsiblePane>();
         cpMap = new HashMap<String, CollapsiblePane>();
         valuecache = new HashMap<ResInfoCategory, ArrayList<NursingProcess>>();
         categories = ResInfoCategoryTools.getAll4NP();
@@ -183,81 +181,20 @@ public class PnlNursingProcess extends NursingRecordsPanel {
     }
 
     private void reloadDisplay() {
-        /***
-         *               _                 _ ____  _           _
-         *      _ __ ___| | ___   __ _  __| |  _ \(_)___ _ __ | | __ _ _   _
-         *     | '__/ _ \ |/ _ \ / _` |/ _` | | | | / __| '_ \| |/ _` | | | |
-         *     | | |  __/ | (_) | (_| | (_| | |_| | \__ \ |_) | | (_| | |_| |
-         *     |_|  \___|_|\___/ \__,_|\__,_|____/|_|___/ .__/|_|\__,_|\__, |
-         *                                              |_|            |___/
-         */
-
-        final boolean withworker = false;
-        if (withworker) {
-
-//            OPDE.getMainframe().setBlocked(true);
-//            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
-//
-//            cpPlan.removeAll();
-//
-//            SwingWorker worker = new SwingWorker() {
-//
-//                @Override
-//                protected Object doInBackground() throws Exception {
-//                    try {
-//                        int progress = 0;
-//
-//                        if (categories.isEmpty()) {
-//                            // Elmininate empty categories
-//                            for (final ResInfoCategory kat : ResInfoCategoryTools.getAll4ResInfo()) {
-//                                if (!NursingProcessTools.findByKategorieAndBewohner(resident, kat).isEmpty()) {
-//                                    categories.add(kat);
-//                                }
-//                            }
-//                        }
-//
-//                        cpPlan.setLayout(new JideBoxLayout(cpPlan, JideBoxLayout.Y_AXIS));
-//                        for (ResInfoCategory kat : categories) {
-//                            progress++;
-//                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, categories.size()));
-//                            cpPlan.add(createNPPanel(kat));
-//                        }
-//
-//
-//                    } catch (Exception e) {
-//                        OPDE.fatal(e);
-//                    }
-//                    return null;
-//                }
-//
-//                @Override
-//                protected void done() {
-//                    cpPlan.addExpansion();
-//                    initPhase = false;
-//                    OPDE.getDisplayManager().setProgressBarMessage(null);
-//                    OPDE.getMainframe().setBlocked(false);
-//                }
-//            };
-//            worker.execute();
-
-        } else {
-
-            if (valuecache.isEmpty()) {
-                for (NursingProcess np : listNP) {
-                    if (!valuecache.containsKey(np.getCategory())) {
-                        valuecache.put(np.getCategory(), new ArrayList<NursingProcess>());
-                    }
-                    valuecache.get(np.getCategory()).add(np);
+        if (valuecache.isEmpty()) {
+            for (NursingProcess np : listNP) {
+                if (!valuecache.containsKey(np.getCategory())) {
+                    valuecache.put(np.getCategory(), new ArrayList<NursingProcess>());
                 }
+                valuecache.get(np.getCategory()).add(np);
             }
-
-            for (ResInfoCategory cat : categories) {
-                createCP4(cat);
-            }
-
-            buildPanel();
         }
 
+        for (ResInfoCategory cat : categories) {
+            createCP4(cat);
+        }
+
+        buildPanel();
     }
 
 
@@ -519,7 +456,8 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     createCP4(myNP.getCategory());
                                     buildPanel();
 
-                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -754,7 +692,8 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                             });
                                         }
                                     });
-                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -848,7 +787,8 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                                         });
                                                     }
                                                 });
-                                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                            } catch (OptimisticLockException ole) {
+                                                OPDE.warn(ole);
                                                 if (em.getTransaction().isActive()) {
                                                     em.getTransaction().rollback();
                                                 }
@@ -989,7 +929,8 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     createCP4(myNewNP.getCategory());
                                     buildPanel();
                                     GUITools.flashBackground(contenPanelMap.get(myNewNP), Color.YELLOW, 2);
-                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1066,7 +1007,8 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     buildPanel();
 //                                    GUITools.flashBackground(contenPanelMap.get(myOldNP), Color.YELLOW, 2);
 
-                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1150,7 +1092,8 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     buildPanel();
                                     GUITools.flashBackground(contenPanelMap.get(mynp), Color.YELLOW, 2);
 
-                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1221,7 +1164,8 @@ public class PnlNursingProcess extends NursingRecordsPanel {
 
                                     OPDE.getDisplayManager().addSubMessage(DisplayManager.getSuccessMessage(np.getTopic(), "deleted"));
 
-                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1295,7 +1239,8 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     buildPanel();
                                     GUITools.flashBackground(contenPanelMap.get(evaluatedNP), Color.YELLOW, 2);
 
-                                } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
@@ -1438,7 +1383,8 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                 createCP4(myNP.getCategory());
                                 buildPanel();
 
-                            } catch (OptimisticLockException ole) { OPDE.warn(ole);
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
                                 if (em.getTransaction().isActive()) {
                                     em.getTransaction().rollback();
                                 }

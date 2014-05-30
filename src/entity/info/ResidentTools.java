@@ -16,6 +16,7 @@ import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.joda.time.Years;
 
 import javax.persistence.EntityManager;
@@ -223,9 +224,9 @@ public class ResidentTools {
      * @param month
      * @return
      */
-    public static ArrayList<Resident> getAllActive(DateMidnight month) {
-        DateTime from = month.dayOfMonth().withMinimumValue().toDateTime();
-        DateTime to = month.dayOfMonth().withMaximumValue().plusDays(1).toDateTime().minusSeconds(1);
+    public static ArrayList<Resident> getAllActive(LocalDate month) {
+        DateTime from = SYSCalendar.bom(month).toDateTimeAtStartOfDay();
+        DateTime to = SYSCalendar.eod(SYSCalendar.eom(month));
         ArrayList<Resident> list = null;
         EntityManager em = OPDE.createEM();
         try {

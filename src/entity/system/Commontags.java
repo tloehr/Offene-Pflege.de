@@ -9,6 +9,7 @@ import java.util.Collection;
  * Created by tloehr on 28.05.14.
  */
 @Entity
+@Table(name = "commontags")
 public class Commontags {
 
     @Id
@@ -24,7 +25,7 @@ public class Commontags {
     }
 
     @Basic
-    @Column(name = "text", nullable = false, insertable = true, updatable = true, length = 100)
+    @Column(name = "text", nullable = false, insertable = true, updatable = true, length = 100, unique = true)
     private String text;
 
     public String getText() {
@@ -81,5 +82,10 @@ public class Commontags {
         result = 31 * result + (active ? 1 : 0);
         result = 31 * result + (qmsplans != null ? qmsplans.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return text;
     }
 }

@@ -40,13 +40,13 @@ public class Qmssched {
     @Basic
     @Column(name = "time", nullable = true, insertable = true, updatable = true)
     @Temporal(TemporalType.TIME)
-    private Time time;
+    private Date time;
 
-    public Time getTime() {
+    public Date getTime() {
         return time;
     }
 
-    public void setTime(Time time) {
+    public void setTime(Date time) {
         this.time = time;
     }
 
