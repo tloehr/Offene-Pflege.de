@@ -2,10 +2,15 @@ package entity.qms;
 
 import entity.system.Commontags;
 import entity.system.Users;
+import op.OPDE;
+import op.tools.SYSCalendar;
+import op.tools.SYSConst;
+import op.tools.SYSTools;
 
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 
 /**
  * Created by tloehr on 28.05.14.
@@ -77,6 +82,18 @@ public class Qmsplan {
     @JoinColumn(name = "ctagid"))
     private Collection<Commontags> commontags;
 
+
+    public Qmsplan() {
+    }
+
+    public Qmsplan(String title) {
+        this.title = title;
+        this.userON = OPDE.getLogin().getUser();
+        this.from = new Date();
+        this.to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
+        this.userOFF = null;
+        commontags = new HashSet<>();
+    }
 
     public Collection<Commontags> getCommontags() {
         return commontags;

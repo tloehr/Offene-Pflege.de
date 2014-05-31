@@ -43,7 +43,9 @@ public class SYSConst {
     public static final String sep = System.getProperty("file.separator");
 
     public static final Font ARIAL10BOLD = new Font("Arial", Font.BOLD, 10);
+    public static final Font ARIAL10 = new Font("Arial", Font.PLAIN, 10);
     public static final Font ARIAL12BOLD = new Font("Arial", Font.BOLD, 12);
+    public static final Font ARIAL12 = new Font("Arial", Font.PLAIN, 12);
     public static final Font ARIAL14 = new Font("Arial", Font.PLAIN, 14);
     public static final Font ARIAL14BOLD = new Font("Arial", Font.BOLD, 16);
     public static final Font ARIAL16 = new Font("Arial", Font.PLAIN, 16);
@@ -451,7 +453,7 @@ public class SYSConst {
     public static final Icon icon22redStar = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/redstar.png"));
     public static final Icon icon22greenStar = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/greenstar.png"));
     public static final Icon icon16unlink = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/unlink.png"));
-    public static final Icon icon16delete = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/edit_remove.png"));
+    public static final Icon icon16delete = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/deleteall.png"));
     public static final Icon icon16unlinkPressed = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/unlink_pressed.png"));
     public static final Icon icon22add = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/bw/add.png"));
     public static final Icon icon22addGroup = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/add_group.png"));

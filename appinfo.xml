@@ -17,10 +17,12 @@
             Main Classes werden im Hauptprogramm angeboten, neben den Pflegeakten. Sofern der Benutzer die EXECUTE Rechte dafür hat.
         -->
         <class name="opde.controlling" short="Qualitätssicherung"
-               long="Hier können verschiedene Abfragen und Massnahmen für die Qualitätssicherung durchgeführt werden." main="true"
+               long="Hier können verschiedene Abfragen und Massnahmen für die Qualitätssicherung durchgeführt werden."
+               main="true"
                javaclass="op.controlling.PnlControlling" icon="kfind.png">
             <execute langbundle="appinfo.default.acl.execute"/>
-            <manager langbundle="appinfo.default.acl.manager"/>
+            <update langbundle="appinfo.default.acl.update"/>
+            <delete langbundle="appinfo.default.acl.delete"/>
             <user1 langbundle="opde.controlling.acl.user1"/>
         </class>
         <class name="opde.training" short="Fortbildungen"

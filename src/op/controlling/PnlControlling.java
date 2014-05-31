@@ -31,6 +31,7 @@ import com.jidesoft.pane.CollapsiblePanes;
 import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.swing.JideBoxLayout;
+import com.jidesoft.swing.JideButton;
 import com.jidesoft.swing.JideTabbedPane;
 import entity.Station;
 import entity.StationTools;
@@ -42,11 +43,13 @@ import entity.info.ResidentTools;
 import entity.prescription.MedStockTools;
 import entity.process.QProcessElement;
 import entity.process.QProcessTools;
+import entity.qms.Qmsplan;
 import entity.reports.NReportTAGSTools;
 import entity.reports.NReportTools;
 import entity.system.SYSPropsTools;
 import entity.values.ResValueTools;
 import op.OPDE;
+import op.system.InternalClassACL;
 import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
@@ -54,6 +57,7 @@ import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
+import javax.persistence.OptimisticLockException;
 import javax.persistence.Query;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -80,6 +84,7 @@ public class PnlControlling extends CleanablePanel {
     private JScrollPane jspSearch;
     Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
     private Closure progressClosure;
+    private CollapsiblePanes searchPanes;
 
     // Variables declaration - do not modify
     //GEN-BEGIN:variables
@@ -108,7 +113,6 @@ public class PnlControlling extends CleanablePanel {
      */
     public PnlControlling(JScrollPane jspSearch) {
         this.jspSearch = jspSearch;
-        jspSearch.setViewportView(new JPanel());
         progressClosure = new Closure() {
             @Override
             public void execute(Object o) {
@@ -118,11 +122,11 @@ public class PnlControlling extends CleanablePanel {
         };
         initComponents();
         initPanel();
-        reload();
     }
 
     private void initPanel() {
-
+        prepareSearchArea();
+        reload();
     }
 
 
@@ -872,5 +876,90 @@ public class PnlControlling extends CleanablePanel {
         return html.toString();
     }
 
+    private void prepareSearchArea() {
 
+        searchPanes = new CollapsiblePanes();
+        searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
+        jspSearch.setViewportView(searchPanes);
+
+        JPanel mypanel = new JPanel();
+        mypanel.setLayout(new VerticalLayout(5));
+        mypanel.setBackground(Color.WHITE);
+
+        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
+        searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
+        searchPane.setCollapsible(false);
+
+        try {
+            searchPane.setCollapsed(false);
+        } catch (PropertyVetoException e) {
+            OPDE.error(e);
+        }
+
+        GUITools.addAllComponents(mypanel, addCommands());
+//           GUITools.addAllComponents(mypanel, addFilters());
+
+        searchPane.setContentPane(mypanel);
+
+        searchPanes.add(searchPane);
+        searchPanes.addExpansion();
+
+
+    }
+
+
+    private java.util.List<Component> addCommands() {
+        java.util.List<Component> list = new ArrayList<Component>();
+
+        /***
+         *      _   _
+         *     | \ | | _____      __
+         *     |  \| |/ _ \ \ /\ / /
+         *     | |\  |  __/\ V  V /
+         *     |_| \_|\___| \_/\_/
+         *
+         */
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
+            JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    new DlgQMSPlan(new Qmsplan(""), new Closure() {
+                        @Override
+                        public void execute(Object qmsplan) {
+                            if (qmsplan != null) {
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    final Qmsplan myQMSPlan = (Qmsplan) em.merge(qmsplan);
+                                    em.getTransaction().commit();
+
+
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    } else {
+                                        reload();
+                                    }
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+            list.add(addButton);
+        }
+        return list;
+    }
 }
