@@ -1,7 +1,6 @@
 package entity.qms;
 
 import javax.persistence.*;
-import java.sql.Time;
 import java.util.Date;
 
 /**
@@ -195,6 +194,19 @@ public class Qmssched {
         this.lDate = lDate;
     }
 
+
+    @Basic
+    @Column(name = "text", nullable = true, insertable = true, updatable = true, length = 16777215)
+    private String text;
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
     @Version
     @Column(name = "version", nullable = false, insertable = true, updatable = true)
     private long version;
@@ -225,11 +237,13 @@ public class Qmssched {
         if (daynum != null ? !daynum.equals(qmssched.daynum) : qmssched.daynum != null) return false;
         if (fri != null ? !fri.equals(qmssched.fri) : qmssched.fri != null) return false;
         if (lDate != null ? !lDate.equals(qmssched.lDate) : qmssched.lDate != null) return false;
+        if (measure != null ? !measure.equals(qmssched.measure) : qmssched.measure != null) return false;
         if (mon != null ? !mon.equals(qmssched.mon) : qmssched.mon != null) return false;
         if (monthly != null ? !monthly.equals(qmssched.monthly) : qmssched.monthly != null) return false;
         if (qmsplan != null ? !qmsplan.equals(qmssched.qmsplan) : qmssched.qmsplan != null) return false;
         if (sat != null ? !sat.equals(qmssched.sat) : qmssched.sat != null) return false;
         if (sun != null ? !sun.equals(qmssched.sun) : qmssched.sun != null) return false;
+        if (text != null ? !text.equals(qmssched.text) : qmssched.text != null) return false;
         if (thu != null ? !thu.equals(qmssched.thu) : qmssched.thu != null) return false;
         if (time != null ? !time.equals(qmssched.time) : qmssched.time != null) return false;
         if (tue != null ? !tue.equals(qmssched.tue) : qmssched.tue != null) return false;
@@ -242,6 +256,7 @@ public class Qmssched {
     @Override
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (measure != null ? measure.hashCode() : 0);
         result = 31 * result + (time != null ? time.hashCode() : 0);
         result = 31 * result + (daily != null ? daily.hashCode() : 0);
         result = 31 * result + (weekly != null ? weekly.hashCode() : 0);
@@ -255,6 +270,7 @@ public class Qmssched {
         result = 31 * result + (sat != null ? sat.hashCode() : 0);
         result = 31 * result + (sun != null ? sun.hashCode() : 0);
         result = 31 * result + (lDate != null ? lDate.hashCode() : 0);
+        result = 31 * result + (text != null ? text.hashCode() : 0);
         result = 31 * result + (int) (version ^ (version >>> 32));
         result = 31 * result + (qmsplan != null ? qmsplan.hashCode() : 0);
         return result;

@@ -843,7 +843,7 @@ public class SYSTools {
                     + "<title>" + OPDE.getAppInfo().getProgname() + "</title>"
                     + OPDE.getCSS()
                     + "</head>"
-                    + "<body>" + in + "</body></html>";
+                    + "<body>" + xx(in) + "</body></html>";
         }
         return htmlUmlautConversion(out);
     }

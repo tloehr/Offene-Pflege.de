@@ -28,13 +28,12 @@ package op.controlling;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jidesoft.popup.JidePopup;
+import entity.nursingprocess.Intervention;
 import entity.qms.Qmsplan;
 import entity.qms.Qmssched;
 import op.OPDE;
-import op.tools.MyJDialog;
-import op.tools.Pair;
-import op.tools.PnlCommonTags;
-import op.tools.SYSTools;
+import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.HorizontalLayout;
 
@@ -51,7 +50,7 @@ import java.util.HashSet;
  * @author root
  */
 public class DlgQMSPlan extends MyJDialog {
-    public static final String internalClassID = "opde.controlling.dlgqmsplan";
+    public static final String internalClassID = "opde.controlling.qms.dlgqmsplan";
     private Qmsplan qmsplan;
     private Closure actionBlock;
     private JPopupMenu menu;
@@ -110,29 +109,29 @@ public class DlgQMSPlan extends MyJDialog {
 
 
     private void btnAddQMSActionPerformed(ActionEvent e) {
-        //        final JidePopup popup = new JidePopup();
-        //        PnlSelectIntervention pnlSelectIntervention = new PnlSelectIntervention(new Closure() {
-        //            @Override
-        //            public void execute(Object o) {
-        //                popup.hidePopup();
-        //                if (o != null) {
-        //                    for (Object obj : (Object[]) o) {
-        //                        Intervention intervention = (Intervention) obj;
-        //                        nursingProcess.getInterventionSchedule().add(new InterventionSchedule(nursingProcess, intervention));
-        //                    }
-        //                    reloadInterventions();
-        //                }
-        //            }
-        //        });
-        //
-        //        popup.setMovable(false);
-        //        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-        //
-        //        popup.setOwner(btnAddIntervention);
-        //        popup.removeExcludedComponent(btnAddIntervention);
-        //        popup.getContentPane().add(pnlSelectIntervention);
-        //        popup.setDefaultFocusComponent(pnlSelectIntervention);
-        //        GUITools.showPopup(popup, SwingConstants.NORTH_WEST);
+                final JidePopup popup = new JidePopup();
+                PnlQMSSchedule pnlQMSSchedule = new PnlQMSSchedule(new Qmssched(), new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        popup.hidePopup();
+//                        if (o != null) {
+//                            for (Object obj : (Object[]) o) {
+//                                Intervention intervention = (Intervention) obj;
+//                                nursingProcess.getInterventionSchedule().add(new InterventionSchedule(nursingProcess, intervention));
+//                            }
+//                            reloadInterventions();
+//                        }
+                    }
+                });
+
+                popup.setMovable(false);
+                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+
+                popup.setOwner(btnAddQMS);
+                popup.removeExcludedComponent(btnAddQMS);
+                popup.getContentPane().add(pnlQMSSchedule);
+                popup.setDefaultFocusComponent(pnlQMSSchedule);
+                GUITools.showPopup(popup, SwingConstants.NORTH_WEST);
     }
 
     private void txtTitleFocusGained(FocusEvent e) {

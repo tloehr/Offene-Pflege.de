@@ -300,7 +300,7 @@ public class PnlSchedule extends JPanel {
         btnJedenMonat = new JButton();
         label5 = new JLabel();
         spinMonatTag = new JSpinner();
-        cmbTag = new JComboBox();
+        cmbTag = new JComboBox<>();
         panel2 = new JPanel();
         jLabel13 = new JLabel();
         txtLDate = new JTextField();
@@ -636,7 +636,6 @@ public class PnlSchedule extends JPanel {
                 }
                 tabWdh.addTab("T\u00e4glich", pnlDaily);
 
-
                 //======== pnlWeekly ========
                 {
                     pnlWeekly.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -809,7 +808,6 @@ public class PnlSchedule extends JPanel {
                 }
                 tabWdh.addTab("W\u00f6chentlich", pnlWeekly);
 
-
                 //======== pnlMonthly ========
                 {
                     pnlMonthly.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -860,7 +858,7 @@ public class PnlSchedule extends JPanel {
                     pnlMonthly.add(spinMonatTag, CC.xy(5, 7));
 
                     //---- cmbTag ----
-                    cmbTag.setModel(new DefaultComboBoxModel(new String[] {
+                    cmbTag.setModel(new DefaultComboBoxModel<>(new String[] {
                         "Tag des Monats",
                         "Montag",
                         "Dienstag",
@@ -874,7 +872,6 @@ public class PnlSchedule extends JPanel {
                     pnlMonthly.add(cmbTag, CC.xywh(7, 7, 3, 1));
                 }
                 tabWdh.addTab("Monatlich", pnlMonthly);
-
             }
             panelMain.add(tabWdh, CC.xy(3, 7, CC.FILL, CC.FILL));
 
@@ -958,7 +955,7 @@ public class PnlSchedule extends JPanel {
     private void cbSonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbSonActionPerformed
 
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID+".needoneweekday")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.needoneweekday")));
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
 
@@ -966,42 +963,42 @@ public class PnlSchedule extends JPanel {
 
     private void cbSamActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbSamActionPerformed
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID+".needoneweekday")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.needoneweekday")));
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
     }//GEN-LAST:event_cbSamActionPerformed
 
     private void cbFreActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbFreActionPerformed
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID+".needoneweekday")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.needoneweekday")));
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
     }//GEN-LAST:event_cbFreActionPerformed
 
     private void cbDonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbDonActionPerformed
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID+".needoneweekday")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.needoneweekday")));
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
     }//GEN-LAST:event_cbDonActionPerformed
 
     private void cbMitActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbMitActionPerformed
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID+".needoneweekday")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.needoneweekday")));
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
     }//GEN-LAST:event_cbMitActionPerformed
 
     private void cbDieActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbDieActionPerformed
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID+".needoneweekday")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.needoneweekday")));
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
     }//GEN-LAST:event_cbDieActionPerformed
 
     private void cbMonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbMonActionPerformed
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID+".needoneweekday")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.needoneweekday")));
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
     }//GEN-LAST:event_cbMonActionPerformed
@@ -1220,7 +1217,7 @@ public class PnlSchedule extends JPanel {
     private JButton btnJedenMonat;
     private JLabel label5;
     private JSpinner spinMonatTag;
-    private JComboBox cmbTag;
+    private JComboBox<String> cmbTag;
     private JPanel panel2;
     private JLabel jLabel13;
     private JTextField txtLDate;

@@ -89,22 +89,7 @@ public class SYSCalendar {
 
 
     /**
-     * Generiert ein Array aus Uhrzeiten in der PrinterForm {"17:00","17:15"...}
-     * Der verwendete Datentyp ist Time.
-     */
-    public static ArrayList fillUhrzeiten() {
-        ArrayList list = new ArrayList();
-        GregorianCalendar gc = today();
-        for (int i = 1; i <= 96; i++) {
-            list.add(new ListElement(toGermanTime(gc), gc.clone()));
-            gc.add(GregorianCalendar.MINUTE, 15);
-        }
-        return list;
-    }
-
-
-    /**
-     * Generiert ein Array aus Uhrzeiten in der PrinterForm {"17:00","17:15"...}
+     * Generates an ArrayList of Dates. Stepping through the day in 15 minutes steps like {"17:00","17:15"...}
      * Der verwendete Datentyp ist GregorianCalendar
      */
     public static ArrayList<Date> getTimeList() {
@@ -126,10 +111,10 @@ public class SYSCalendar {
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                 String text;
                 if (o == null) {
-                    text = SYSTools.toHTML("<i>Keine Auswahl</i>");
+                    text = SYSTools.xx("misc.commands.>>noselection<<");
                 } else if (o instanceof Date) {
                     Date date = (Date) o;
-                    text = timeFormat.format(date) + " Uhr";
+                    text = timeFormat.format(date) + " " + SYSTools.xx("misc.msg.Time.short");
                 } else {
                     text = o.toString();
                 }
@@ -1556,8 +1541,8 @@ public class SYSCalendar {
             return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGSHIFT"));
         }
         if (shift == BHPTools.SHIFT_OUTCOMES) {
-                   return Color.LIGHT_GRAY;
-               }
+            return Color.LIGHT_GRAY;
+        }
         return GUITools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[shift] + "_FGSHIFT"));
     }
 
@@ -1624,6 +1609,7 @@ public class SYSCalendar {
 
     /**
      * bottom of month
+     *
      * @param d
      * @return
      */

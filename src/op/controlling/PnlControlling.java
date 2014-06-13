@@ -85,6 +85,7 @@ public class PnlControlling extends CleanablePanel {
     Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
     private Closure progressClosure;
     private CollapsiblePanes searchPanes;
+    private CleanablePanel pnlQMSPlan;
 
     // Variables declaration - do not modify
     //GEN-BEGIN:variables
@@ -126,6 +127,7 @@ public class PnlControlling extends CleanablePanel {
 
     private void initPanel() {
         prepareSearchArea();
+        pnlQMSPlan = null;
         reload();
     }
 
@@ -731,6 +733,9 @@ public class PnlControlling extends CleanablePanel {
                 break;
             }
             case TAB_QMSPLAN: {
+//                if (pnlQMSPlan == null){
+//                    pnlQMSPlan = new PnlQ
+//                }
 //                tabMain.setComponentAt(TAB_QMSPLAN, previousPanel);
                 break;
             }
