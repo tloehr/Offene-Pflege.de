@@ -13,26 +13,26 @@ public class CommontagsTools {
 
 
     public static ArrayList<Commontags> getAllActive() {
-           EntityManager em = OPDE.createEM();
-           ArrayList<Commontags> list = null;
+        EntityManager em = OPDE.createEM();
+        ArrayList<Commontags> list = null;
 
-           try {
+        try {
 
-               String jpql = " SELECT c " +
-                       " FROM Commontags c " +
-                       " WHERE c.active = TRUE " +
-                       " ORDER BY c.text DESC ";
+            String jpql = " SELECT c " +
+                    " FROM Commontags c " +
+                    " WHERE c.active = TRUE " +
+                    " ORDER BY c.text DESC ";
 
-               Query query = em.createQuery(jpql);
-               list = new ArrayList<Commontags>(query.getResultList());
+            Query query = em.createQuery(jpql);
+            list = new ArrayList<Commontags>(query.getResultList());
 
-           } catch (Exception se) {
-               OPDE.fatal(se);
-           } finally {
-               em.close();
-           }
-           return list;
-       }
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+        return list;
+    }
 
 
 }

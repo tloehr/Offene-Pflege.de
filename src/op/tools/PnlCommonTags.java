@@ -30,12 +30,13 @@ public class PnlCommonTags extends JPanel {
 
     HashMap<String, Commontags> mapAllTags = new HashMap<>();
     HashSet<Commontags> listSelectedTags;
+    HashMap<Commontags, JButton> mapButtons;
     ArrayList<String> completionList;
     JTextField txtTags;
-
+    final int MAXLINE = 8;
 
     public PnlCommonTags(HashSet<Commontags> listSelectedTags) {
-        initComponents();
+        setLayout(new RiverLayout(10, 5));
 
         this.listSelectedTags = listSelectedTags;
         this.completionList = new ArrayList<>();
@@ -57,6 +58,8 @@ public class PnlCommonTags extends JPanel {
             }
         });
         add(txtTags);
+
+        mapButtons = new HashMap<>();
 
         for (Commontags commontags : CommontagsTools.getAllActive()) {
             mapAllTags.put(commontags.getText(), commontags);
@@ -94,7 +97,13 @@ public class PnlCommonTags extends JPanel {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    add(createButton(mapAllTags.get(txtTags.getText())));
+
+                    if (listSelectedTags.size() % MAXLINE == 0) {
+                        add(createButton(mapAllTags.get(txtTags.getText())), RiverLayout.LINE_BREAK);
+                    } else {
+                        add(createButton(mapAllTags.get(txtTags.getText())), RiverLayout.LEFT);
+                    }
+
                     txtTags.setText("");
                     revalidate();
                     repaint();
@@ -103,15 +112,13 @@ public class PnlCommonTags extends JPanel {
         }
     }
 
-    private void initComponents() {
-        // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
-
-        //======== this ========
-        setLayout(new FlowLayout(FlowLayout.LEADING, 10, 5));
-        // JFormDesigner - End of component initialization  //GEN-END:initComponents
-    }
 
     private JButton createButton(final Commontags commontags) {
+
+        if (mapButtons.containsKey(commontags)) {
+            OPDE.debug("shortcut");
+            return mapButtons.get(commontags);
+        }
 
         final JButton jButton = new JButton(commontags.getText(), SYSConst.icon16delete);
         jButton.setFont(SYSConst.ARIAL12);
@@ -124,9 +131,24 @@ public class PnlCommonTags extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 listSelectedTags.remove(commontags);
+                mapButtons.remove(commontags);
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
+                        removeAll();
+
+                        add(txtTags);
+                        int tagnum = 1;
+
+                        for (JButton btn : mapButtons.values()) {
+                            if (tagnum % MAXLINE == 0) {
+                                add(btn, RiverLayout.LINE_BREAK);
+                            } else {
+                                add(btn, RiverLayout.LEFT);
+                            }
+                            tagnum++;
+                        }
+
                         remove(jButton);
                         revalidate();
                         repaint();
@@ -134,6 +156,8 @@ public class PnlCommonTags extends JPanel {
                 });
             }
         });
+
+        mapButtons.put(commontags, jButton);
 
         return jButton;
     }
@@ -148,7 +172,7 @@ public class PnlCommonTags extends JPanel {
         }
 
         public Insets getBorderInsets(Component c) {
-            return new Insets(5,5,5,5); // this.radius + 1, this.radius + 1, this.radius + 2, this.radius
+            return new Insets(5, 5, 5, 5); // this.radius + 1, this.radius + 1, this.radius + 2, this.radius
         }
 
 
@@ -169,7 +193,7 @@ public class PnlCommonTags extends JPanel {
         @Override
         public void replace(FilterBypass fb, int i, int i1, String string, AttributeSet as) throws BadLocationException {
 
-            if (string.isEmpty()){
+            if (string.isEmpty()) {
                 super.replace(fb, i, i1, string, as);//allow update to take place for the given character
                 return;
             }

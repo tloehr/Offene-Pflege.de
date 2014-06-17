@@ -44,6 +44,7 @@ import entity.prescription.MedStockTools;
 import entity.process.QProcessElement;
 import entity.process.QProcessTools;
 import entity.qms.Qmsplan;
+import entity.qms.QmsplanTools;
 import entity.reports.NReportTAGSTools;
 import entity.reports.NReportTools;
 import entity.system.SYSPropsTools;
@@ -126,7 +127,7 @@ public class PnlControlling extends CleanablePanel {
     }
 
     private void initPanel() {
-        prepareSearchArea();
+//        prepareSearchArea();
         pnlQMSPlan = null;
         reload();
     }
@@ -714,6 +715,8 @@ public class PnlControlling extends CleanablePanel {
     @Override
     public void reload() {
 
+        // defers from my usual method, because every tab can have its own searcharea.
+        prepareSearchArea();
 
         switch (tabMain.getSelectedIndex()) {
             case TAB_CONTROLLING: {
@@ -733,10 +736,10 @@ public class PnlControlling extends CleanablePanel {
                 break;
             }
             case TAB_QMSPLAN: {
-//                if (pnlQMSPlan == null){
-//                    pnlQMSPlan = new PnlQ
-//                }
-//                tabMain.setComponentAt(TAB_QMSPLAN, previousPanel);
+                if (pnlQMSPlan == null) {
+                    pnlQMSPlan = new PnlQMSPlan(QmsplanTools.getAllActive());
+                    tabMain.setComponentAt(TAB_QMSPLAN, pnlQMSPlan);
+                }
                 break;
             }
             default: {
@@ -901,6 +904,7 @@ public class PnlControlling extends CleanablePanel {
             OPDE.error(e);
         }
 
+
         GUITools.addAllComponents(mypanel, addCommands());
 //           GUITools.addAllComponents(mypanel, addFilters());
 
@@ -916,54 +920,49 @@ public class PnlControlling extends CleanablePanel {
     private java.util.List<Component> addCommands() {
         java.util.List<Component> list = new ArrayList<Component>();
 
-        /***
-         *      _   _
-         *     | \ | | _____      __
-         *     |  \| |/ _ \ \ /\ / /
-         *     | |\  |  __/\ V  V /
-         *     |_| \_|\___| \_/\_/
-         *
-         */
-        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
-            JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgQMSPlan(new Qmsplan(""), new Closure() {
-                        @Override
-                        public void execute(Object qmsplan) {
-                            if (qmsplan != null) {
-                                EntityManager em = OPDE.createEM();
-                                try {
-                                    em.getTransaction().begin();
-                                    final Qmsplan myQMSPlan = (Qmsplan) em.merge(qmsplan);
-                                    em.getTransaction().commit();
+        if (tabMain.getSelectedIndex() == TAB_QMSPLAN) {
+
+            if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
+                JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        new DlgQMSPlan(new Qmsplan(""), new Closure() {
+                            @Override
+                            public void execute(Object qmsplan) {
+                                if (qmsplan != null) {
+                                    EntityManager em = OPDE.createEM();
+                                    try {
+                                        em.getTransaction().begin();
+                                        final Qmsplan myQMSPlan = (Qmsplan) em.merge(qmsplan);
+                                        em.getTransaction().commit();
 
 
-                                } catch (OptimisticLockException ole) {
-                                    OPDE.warn(ole);
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
+                                    } catch (OptimisticLockException ole) {
+                                        OPDE.warn(ole);
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                            OPDE.getMainframe().emptyFrame();
+                                            OPDE.getMainframe().afterLogin();
+                                        } else {
+                                            reload();
+                                        }
+                                    } catch (Exception e) {
+                                        if (em.getTransaction().isActive()) {
+                                            em.getTransaction().rollback();
+                                        }
+                                        OPDE.fatal(e);
+                                    } finally {
+                                        em.close();
                                     }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    } else {
-                                        reload();
-                                    }
-                                } catch (Exception e) {
-                                    if (em.getTransaction().isActive()) {
-                                        em.getTransaction().rollback();
-                                    }
-                                    OPDE.fatal(e);
-                                } finally {
-                                    em.close();
                                 }
                             }
-                        }
-                    });
-                }
-            });
-            list.add(addButton);
+                        });
+                    }
+                });
+                list.add(addButton);
+            }
         }
         return list;
     }

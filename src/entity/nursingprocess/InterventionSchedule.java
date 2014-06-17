@@ -8,6 +8,7 @@ package entity.nursingprocess;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -99,7 +100,7 @@ public class InterventionSchedule implements Serializable, Cloneable, Comparable
     public InterventionSchedule(NursingProcess planung, Intervention intervention) {
         this.morgens = 1;
         this.taeglich = 1;
-        this.lDatum = new DateMidnight().toDate();
+        this.lDatum = new LocalDate().toDate();
         this.dauer = intervention.getDauer();
         this.nursingProcess = planung;
         this.intervention = intervention;

@@ -76,7 +76,7 @@
            <int>11</int> 
           </void> 
           <void property="name"> 
-           <string>lblQMS</string> 
+           <string>lblMeasure</string> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1512,36 +1512,20 @@
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JTextField</string> 
-          <void method="setProperty"> 
-           <string>font</string> 
-           <object class="java.awt.Font"> 
-            <string>Arial</string> 
-            <int>0</int> 
-            <int>14</int> 
-           </object> 
-          </void> 
+          <string>com.toedter.calendar.JDateChooser</string> 
           <void property="name"> 
-           <string>txtLDate</string> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.FocusListener</string> 
-            <string>focusLost</string> 
-            <string>txtLDateFocusLost</string> 
-            <boolean>true</boolean> 
-           </object> 
+           <string>jdcLDate</string> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
           <class>com.jgoodies.forms.layout.CellConstraints</class> 
           <void method="setProperty"> 
-           <string>gridY</string> 
-           <int>13</int> 
-          </void> 
-          <void method="setProperty"> 
            <string>gridX</string> 
            <int>3</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridY</string> 
+           <int>13</int> 
           </void> 
          </object> 
         </void> 

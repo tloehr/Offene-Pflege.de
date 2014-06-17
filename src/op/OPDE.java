@@ -561,6 +561,7 @@ public class OPDE {
             Properties jpaProps = new Properties();
             jpaProps.put("javax.persistence.jdbc.user", localProps.getProperty("javax.persistence.jdbc.user"));
 
+
             try {
                 jpaProps.put("javax.persistence.jdbc.password", desEncrypter.decrypt(cryptpassword));
             } catch (Exception e) {
@@ -575,7 +576,6 @@ public class OPDE {
             jpaProps.put("javax.persistence.jdbc.driver", localProps.getProperty("javax.persistence.jdbc.driver"));
             jpaProps.put("javax.persistence.jdbc.url", url);
 
-            // Turn of JPA Cache
             jpaProps.put("eclipselink.cache.shared.default", "false");
             jpaProps.put("eclipselink.session.customizer", "op.system.JPAEclipseLinkSessionCustomizer");
             emf = Persistence.createEntityManagerFactory("OPDEPU", jpaProps);

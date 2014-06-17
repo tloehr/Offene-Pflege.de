@@ -3,14 +3,10 @@ package entity.qms;
 import entity.system.Commontags;
 import entity.system.Users;
 import op.OPDE;
-import op.tools.SYSCalendar;
 import op.tools.SYSConst;
-import op.tools.SYSTools;
 
 import javax.persistence.*;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
+import java.util.*;
 
 /**
  * Created by tloehr on 28.05.14.
@@ -20,6 +16,7 @@ import java.util.HashSet;
 public class Qmsplan {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, insertable = true, updatable = true)
     private long id;
 
@@ -56,18 +53,14 @@ public class Qmsplan {
     }
 
     @Basic
-    @Column(name = "from", nullable = false, insertable = true, updatable = true)
+    @Column(name = "starttime", nullable = false, insertable = true, updatable = true)
     @Temporal(TemporalType.TIMESTAMP)
     private Date from;
 
     @Basic
-    @Column(name = "to", nullable = false, insertable = true, updatable = true)
+    @Column(name = "endtime", nullable = false, insertable = true, updatable = true)
     @Temporal(TemporalType.TIMESTAMP)
     private Date to;
-
-    @Version
-    @Column(name = "version", nullable = false, insertable = true, updatable = true)
-    private long version;
 
     @JoinColumn(name = "uidon", referencedColumnName = "UKennung")
     @ManyToOne
@@ -76,12 +69,22 @@ public class Qmsplan {
     @ManyToOne
     private Users userOFF;
 
+    @Version
+    @Column(name = "version")
+    private Long version;
+
     @ManyToMany
     @JoinTable(name = "qmsp2tags", joinColumns =
     @JoinColumn(name = "qmspid"), inverseJoinColumns =
     @JoinColumn(name = "ctagid"))
     private Collection<Commontags> commontags;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "qmsplan")
+    private List<Qmssched> qmsschedules;
+
+    public List<Qmssched> getQmsschedules() {
+        return qmsschedules;
+    }
 
     public Qmsplan() {
     }
@@ -93,6 +96,8 @@ public class Qmsplan {
         this.to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
         this.userOFF = null;
         commontags = new HashSet<>();
+        qmsschedules = new ArrayList<>();
+        this.version = 0l;
     }
 
     public Collection<Commontags> getCommontags() {

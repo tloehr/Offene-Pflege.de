@@ -39,7 +39,7 @@
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
-          <string>fill:default, relgap, fill:default:grow, linegap, fill:default</string> 
+          <string>fill:default, relgap, fill:default:grow, linegap, pref</string> 
          </void> 
         </object> 
         <void property="name"> 
@@ -409,7 +409,7 @@
              <int>4</int> 
             </void> 
             <void property="name"> 
-             <string>tblPlanung</string> 
+             <string>tblScheds</string> 
             </void> 
             <void method="addEvent"> 
              <object class="com.jformdesigner.model.FormEvent"> 

@@ -1,5 +1,7 @@
 package entity.qms;
 
+import org.joda.time.LocalDate;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -12,6 +14,7 @@ public class Qmssched {
 
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, insertable = true, updatable = true)
     private long id;
 
@@ -222,6 +225,45 @@ public class Qmssched {
 
     public void setQmsplan(Qmsplan qmsplan) {
         this.qmsplan = qmsplan;
+    }
+
+    public Qmssched() {
+    }
+
+    public Qmssched(Qmsplan qmsplan) {
+        this.qmsplan = qmsplan;
+
+        this.daily = 1;
+        this.lDate = new LocalDate().toDateTimeAtStartOfDay().toDate();
+
+        this.measure = "";
+
+        this.time = null;
+        this.weekly = 0;
+        this.monthly = 0;
+
+        this.mon = 0;
+        this.tue = 0;
+        this.wed = 0;
+        this.thu = 0;
+        this.fri = 0;
+        this.sat = 0;
+        this.sun = 0;
+        this.daynum = 0;
+
+        this.text = null;
+    }
+
+    public boolean isDaily() {
+        return daily > 0;
+    }
+
+    public boolean isWeekly() {
+        return weekly > 0;
+    }
+
+    public boolean isMonthly() {
+        return monthly > 0;
     }
 
     @Override

@@ -30,6 +30,7 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.swing.JideLabel;
 import com.jidesoft.swing.JideTabbedPane;
+import com.toedter.calendar.*;
 import entity.qms.Qmssched;
 import op.OPDE;
 import op.threads.DisplayMessage;
@@ -157,8 +158,8 @@ public class PnlQMSSchedule extends JPanel {
             tabWdh.setSelectedIndex(TAB_MONTHLY);
         }
 
-        txtLDate.setText(DateFormat.getDateInstance().format(new Date(Math.max(qmssched.getlDate().getTime(), new LocalDate().toDateTimeAtStartOfDay().getMillis()))));
-
+        jdcLDate.setMinSelectableDate(new Date());
+        jdcLDate.setDate(qmssched.getlDate());
 
         ArrayList<Date> timelist = SYSCalendar.getTimeList();
         cmbTime.setModel(new DefaultComboBoxModel(timelist.toArray()));
@@ -175,11 +176,13 @@ public class PnlQMSSchedule extends JPanel {
             }
         }
         cmbTime.setSelectedItem(now);
-        lblTime.setText(OPDE.lang.getString("misc.msg.Time"));
 
         txtBemerkung.setText(qmssched.getText());
+        txtQMS.setText(qmssched.getMeasure());
 
-        
+        lblMeasure.setText(OPDE.lang.getString("misc.msg.measure"));
+        lblTime.setText(OPDE.lang.getString("misc.msg.Time"));
+        lblLDate.setText(OPDE.lang.getString("opde.controlling.qms.dlgqmsplan.pnlschedule.ldate"));
     }
 
     /**
@@ -191,7 +194,7 @@ public class PnlQMSSchedule extends JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         panelMain = new JPanel();
-        lblQMS = new JLabel();
+        lblMeasure = new JLabel();
         txtQMS = new JTextField();
         lblTime = new JLabel();
         cmbTime = new JComboBox();
@@ -230,7 +233,7 @@ public class PnlQMSSchedule extends JPanel {
         spinMonatTag = new JSpinner();
         cmbTag = new JComboBox<>();
         lblLDate = new JLabel();
-        txtLDate = new JTextField();
+        jdcLDate = new JDateChooser();
         jScrollPane1 = new JScrollPane();
         txtBemerkung = new JTextArea();
         btnSave = new JButton();
@@ -251,11 +254,11 @@ public class PnlQMSSchedule extends JPanel {
                 "$rgap, $lcgap, 223dlu:grow, $lcgap, $rgap",
                 "default, $nlgap, default, $lgap, default, $nlgap, default, $lgap, pref, $lgap, default, $nlgap, default, $lgap, 72dlu:grow, $lgap, default, $lgap, $rgap"));
 
-            //---- lblQMS ----
-            lblQMS.setText("text");
-            lblQMS.setFont(new Font("Arial", Font.PLAIN, 10));
-            lblQMS.setHorizontalAlignment(SwingConstants.TRAILING);
-            panelMain.add(lblQMS, CC.xy(3, 1));
+            //---- lblMeasure ----
+            lblMeasure.setText("text");
+            lblMeasure.setFont(new Font("Arial", Font.PLAIN, 10));
+            lblMeasure.setHorizontalAlignment(SwingConstants.TRAILING);
+            panelMain.add(lblMeasure, CC.xy(3, 1));
             panelMain.add(txtQMS, CC.xy(3, 3));
 
             //---- lblTime ----
@@ -546,16 +549,7 @@ public class PnlQMSSchedule extends JPanel {
             lblLDate.setFont(new Font("Arial", Font.PLAIN, 10));
             lblLDate.setHorizontalAlignment(SwingConstants.TRAILING);
             panelMain.add(lblLDate, CC.xy(3, 11));
-
-            //---- txtLDate ----
-            txtLDate.setFont(new Font("Arial", Font.PLAIN, 14));
-            txtLDate.addFocusListener(new FocusAdapter() {
-                @Override
-                public void focusLost(FocusEvent e) {
-                    txtLDateFocusLost(e);
-                }
-            });
-            panelMain.add(txtLDate, CC.xy(3, 13));
+            panelMain.add(jdcLDate, CC.xy(3, 13));
 
             //======== jScrollPane1 ========
             {
@@ -661,15 +655,19 @@ public class PnlQMSSchedule extends JPanel {
     }//GEN-LAST:event_spinMonatTagStateChanged
 
     private void btnSaveActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        try {
+        if (isSaveOK()) {
             save();
             actionBlock.execute(qmssched);
-        } catch (NumberFormatException nfe) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("opde.controlling.qms.dlgqmsplan.pnlschedule.parseerror") + nfe.getLocalizedMessage(), 2));
         }
+
     }//GEN-LAST:event_btnSaveActionPerformed
 
+    public boolean isSaveOK(){
+        return jdcLDate.getDate() != null && !SYSTools.tidy(txtQMS.getText()).isEmpty();
+    }
+
     public void save() throws NumberFormatException {
+
 
 
         qmssched.setTime((Date) cmbTime.getSelectedItem());
@@ -679,13 +677,7 @@ public class PnlQMSSchedule extends JPanel {
         qmssched.setMonthly(tabWdh.getSelectedIndex() == TAB_MONTHLY ? Byte.parseByte(spinMonat.getValue().toString()) : (byte) 0);
 
 
-        LocalDate day;
-        try {
-            day = new LocalDate(SYSCalendar.parseDate(txtLDate.getText()));
-        } catch (NumberFormatException ex) {
-            day = new LocalDate();
-        }
-        qmssched.setlDate(day.toDate());
+        qmssched.setlDate(jdcLDate.getDate());
 
         qmssched.setMon(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbMon.isSelected() ? (byte) 1 : (byte) 0);
         qmssched.setTue(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbDie.isSelected() ? (byte) 1 : (byte) 0);
@@ -716,7 +708,8 @@ public class PnlQMSSchedule extends JPanel {
             }
         }
 
-        qmssched.setText(txtBemerkung.getText());
+        qmssched.setMeasure(SYSTools.tidy(txtQMS.getText()));
+        qmssched.setText(SYSTools.tidy(txtBemerkung.getText()));
 
 //        if (!qmssched.isValid()) {
 //            throw new NumberFormatException("Anzahl muss min. 1 sein");
@@ -743,7 +736,7 @@ public class PnlQMSSchedule extends JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel panelMain;
-    private JLabel lblQMS;
+    private JLabel lblMeasure;
     private JTextField txtQMS;
     private JLabel lblTime;
     private JComboBox cmbTime;
@@ -782,7 +775,7 @@ public class PnlQMSSchedule extends JPanel {
     private JSpinner spinMonatTag;
     private JComboBox<String> cmbTag;
     private JLabel lblLDate;
-    private JTextField txtLDate;
+    private JDateChooser jdcLDate;
     private JScrollPane jScrollPane1;
     private JTextArea txtBemerkung;
     private JButton btnSave;

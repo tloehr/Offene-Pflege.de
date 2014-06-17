@@ -13,6 +13,7 @@ import java.util.Date;
 public class Qms {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, insertable = true, updatable = true)
     private long id;
 

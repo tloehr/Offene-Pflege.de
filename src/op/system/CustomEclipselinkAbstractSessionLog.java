@@ -19,6 +19,9 @@ public class CustomEclipselinkAbstractSessionLog extends AbstractSessionLog impl
      */
     @Override
     public void log(SessionLogEntry sessionLogEntry) {
+
+//        OPDE.debug("[JPA] " + sessionLogEntry.getMessage());
+
         if (sessionLogEntry.getLevel() >= JavaLog.INFO || sessionLogEntry.hasException()) {
             OPDE.debug("[JPA] " + sessionLogEntry.getMessage());
         } else if (sessionLogEntry.getMessage().startsWith("INSERT") || sessionLogEntry.getMessage().startsWith("DELETE") || sessionLogEntry.getMessage().startsWith("UPDATE")) {
