@@ -5,6 +5,7 @@
 package op.tools;
 
 import com.jidesoft.swing.AutoCompletion;
+import com.jidesoft.swing.AutoCompletionComboBox;
 import entity.system.Commontags;
 import entity.system.CommontagsTools;
 import op.OPDE;
@@ -50,6 +51,8 @@ public class PnlCommonTags extends JPanel {
 
     private void initPanel() {
 
+
+
         txtTags = new JTextField(10);
         txtTags.addActionListener(new ActionListener() {
             @Override
@@ -73,9 +76,27 @@ public class PnlCommonTags extends JPanel {
 
         completionList = new ArrayList(mapAllTags.keySet());
 
-        AutoCompletion autoCompletion = new AutoCompletion(txtTags, completionList);
+
+
+        AutoCompletion autoCompletion = new AutoCompletion(txtTags, completionList.toArray());
         autoCompletion.setStrict(false);
 
+        cmbTags = new AutoCompletionComboBox(_fontNames);
+                                     autoCompletionComboBox.setName("AutoCompletion JComboBox (Strict)");
+                                     autoCompletionComboBox.setToolTipText("AutoCompletion JComboBox (Strict)");
+                                     panel.add(new JLabel("AutoCompletion JComboBox (Strict)"));
+
+                                     panel.add(autoCompletionComboBox);
+                                     panel.add(Box.createVerticalStrut(12), JideBoxLayout.FIX);
+
+       //        txtTags = new JTextField(10);
+       //        txtTags.addActionListener(new ActionListener() {
+       //            @Override
+       //            public void actionPerformed(ActionEvent e) {
+       //                txtTagsActionPerformed(e);
+       //            }
+       //        });
+       //        add(txtTags);
     }
 
     private void txtTagsActionPerformed(ActionEvent e) {

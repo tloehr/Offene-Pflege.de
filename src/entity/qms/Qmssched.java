@@ -1,5 +1,7 @@
 package entity.qms;
 
+import entity.Homes;
+import entity.Station;
 import org.joda.time.LocalDate;
 
 import javax.persistence.*;
@@ -214,6 +216,16 @@ public class Qmssched {
     @Column(name = "version", nullable = false, insertable = true, updatable = true)
     private long version;
 
+
+    @JoinColumn(name = "station", referencedColumnName = "StatID")
+    @ManyToOne
+    private Station station;
+
+    @JoinColumn(name = "home", referencedColumnName = "EID")
+    @ManyToOne
+    private Homes home;
+
+
     @JoinColumn(name = "qmspid", referencedColumnName = "id")
     @ManyToOne
     private Qmsplan qmsplan;
@@ -254,6 +266,22 @@ public class Qmssched {
         this.text = null;
     }
 
+    public Station getStation() {
+        return station;
+    }
+
+    public void setStation(Station station) {
+        this.station = station;
+    }
+
+    public Homes getHome() {
+        return home;
+    }
+
+    public void setHome(Homes home) {
+        this.home = home;
+    }
+
     public boolean isDaily() {
         return daily > 0;
     }
@@ -264,6 +292,10 @@ public class Qmssched {
 
     public boolean isMonthly() {
         return monthly > 0;
+    }
+
+    public boolean hasTime(){
+        return time != null;
     }
 
     @Override
@@ -278,12 +310,14 @@ public class Qmssched {
         if (daily != null ? !daily.equals(qmssched.daily) : qmssched.daily != null) return false;
         if (daynum != null ? !daynum.equals(qmssched.daynum) : qmssched.daynum != null) return false;
         if (fri != null ? !fri.equals(qmssched.fri) : qmssched.fri != null) return false;
+        if (home != null ? !home.equals(qmssched.home) : qmssched.home != null) return false;
         if (lDate != null ? !lDate.equals(qmssched.lDate) : qmssched.lDate != null) return false;
         if (measure != null ? !measure.equals(qmssched.measure) : qmssched.measure != null) return false;
         if (mon != null ? !mon.equals(qmssched.mon) : qmssched.mon != null) return false;
         if (monthly != null ? !monthly.equals(qmssched.monthly) : qmssched.monthly != null) return false;
         if (qmsplan != null ? !qmsplan.equals(qmssched.qmsplan) : qmssched.qmsplan != null) return false;
         if (sat != null ? !sat.equals(qmssched.sat) : qmssched.sat != null) return false;
+        if (station != null ? !station.equals(qmssched.station) : qmssched.station != null) return false;
         if (sun != null ? !sun.equals(qmssched.sun) : qmssched.sun != null) return false;
         if (text != null ? !text.equals(qmssched.text) : qmssched.text != null) return false;
         if (thu != null ? !thu.equals(qmssched.thu) : qmssched.thu != null) return false;
@@ -314,6 +348,8 @@ public class Qmssched {
         result = 31 * result + (lDate != null ? lDate.hashCode() : 0);
         result = 31 * result + (text != null ? text.hashCode() : 0);
         result = 31 * result + (int) (version ^ (version >>> 32));
+        result = 31 * result + (station != null ? station.hashCode() : 0);
+        result = 31 * result + (home != null ? home.hashCode() : 0);
         result = 31 * result + (qmsplan != null ? qmsplan.hashCode() : 0);
         return result;
     }

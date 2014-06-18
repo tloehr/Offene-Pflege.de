@@ -30,11 +30,11 @@
          <class>com.jgoodies.forms.layout.FormLayout</class> 
          <void method="setProperty"> 
           <string>$columnSpecs</string> 
-          <string>relgap, labelcompgap, 223dlu:grow, labelcompgap, relgap</string> 
+          <string>relgap, labelcompgap, 35dlu:grow, unrelgap, 105dlu:grow, labelcompgap, relgap</string> 
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
-          <string>default, narrowlinegap, default, linegap, default, narrowlinegap, default, linegap, pref, linegap, default, narrowlinegap, default, linegap, 72dlu:grow, linegap, default, linegap, relgap</string> 
+          <string>default, narrowlinegap, default, linegap, default, narrowlinegap, default, linegap, default, linegap, pref, linegap, default, narrowlinegap, default, linegap, 72dlu:grow, linegap, default, linegap, relgap</string> 
          </void> 
         </object> 
         <void method="setProperty"> 
@@ -83,7 +83,7 @@
           <class>com.jgoodies.forms.layout.CellConstraints</class> 
           <void method="setProperty"> 
            <string>gridX</string> 
-           <int>3</int> 
+           <int>5</int> 
           </void> 
          </object> 
         </void> 
@@ -102,6 +102,10 @@
           </void> 
           <void method="setProperty"> 
            <string>gridY</string> 
+           <int>3</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridWidth</string> 
            <int>3</int> 
           </void> 
          </object> 
@@ -139,6 +143,37 @@
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JLabel</string> 
+          <void method="setProperty"> 
+           <string>text</string> 
+           <string>text</string> 
+          </void> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object idref="Font0"/> 
+          </void> 
+          <void method="setProperty"> 
+           <string>horizontalAlignment</string> 
+           <int>11</int> 
+          </void> 
+          <void property="name"> 
+           <string>lblLocation</string> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jgoodies.forms.layout.CellConstraints</class> 
+          <void method="setProperty"> 
+           <string>gridY</string> 
+           <int>5</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridX</string> 
+           <int>5</int> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
           <string>javax.swing.JComboBox</string> 
           <void property="name"> 
            <string>cmbTime</string> 
@@ -149,6 +184,25 @@
           <void method="setProperty"> 
            <string>gridX</string> 
            <int>3</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridY</string> 
+           <int>7</int> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>com.jidesoft.combobox.TreeComboBox</string> 
+          <void property="name"> 
+           <string>cmbLocation</string> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jgoodies.forms.layout.CellConstraints</class> 
+          <void method="setProperty"> 
+           <string>gridX</string> 
+           <int>5</int> 
           </void> 
           <void method="setProperty"> 
            <string>gridY</string> 
@@ -1475,7 +1529,11 @@
           </void> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>9</int> 
+           <int>11</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridWidth</string> 
+           <int>3</int> 
           </void> 
          </object> 
         </void> 
@@ -1502,11 +1560,11 @@
           <class>com.jgoodies.forms.layout.CellConstraints</class> 
           <void method="setProperty"> 
            <string>gridX</string> 
-           <int>3</int> 
+           <int>5</int> 
           </void> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>11</int> 
+           <int>13</int> 
           </void> 
          </object> 
         </void> 
@@ -1525,7 +1583,11 @@
           </void> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>13</int> 
+           <int>15</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridWidth</string> 
+           <int>3</int> 
           </void> 
          </object> 
         </void> 
@@ -1559,7 +1621,7 @@
           <class>com.jgoodies.forms.layout.CellConstraints</class> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>15</int> 
+           <int>17</int> 
           </void> 
           <void method="setProperty"> 
            <string>gridX</string> 
@@ -1568,6 +1630,10 @@
           <void method="setProperty"> 
            <string>vAlign</string> 
            <object class="com.jgoodies.forms.layout.CellConstraints" field="FILL"/> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridWidth</string> 
+           <int>3</int> 
           </void> 
          </object> 
         </void> 
@@ -1597,7 +1663,7 @@
           <class>com.jgoodies.forms.layout.CellConstraints</class> 
           <void method="setProperty"> 
            <string>gridY</string> 
-           <int>17</int> 
+           <int>19</int> 
           </void> 
           <void method="setProperty"> 
            <string>hAlign</string> 
@@ -1605,7 +1671,7 @@
           </void> 
           <void method="setProperty"> 
            <string>gridX</string> 
-           <int>3</int> 
+           <int>5</int> 
           </void> 
          </object> 
         </void> 

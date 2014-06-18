@@ -86,7 +86,7 @@ public class PnlControlling extends CleanablePanel {
     Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
     private Closure progressClosure;
     private CollapsiblePanes searchPanes;
-    private CleanablePanel pnlQMSPlan;
+    private PnlQMSPlan pnlQMSPlan;
 
     // Variables declaration - do not modify
     //GEN-BEGIN:variables
@@ -129,6 +129,9 @@ public class PnlControlling extends CleanablePanel {
     private void initPanel() {
 //        prepareSearchArea();
         pnlQMSPlan = null;
+        tabMain.setTitleAt(TAB_CONTROLLING, OPDE.lang.getString("opde.controlling.tab.controlling"));
+        tabMain.setTitleAt(TAB_QMS, OPDE.lang.getString("opde.controlling.tab.qms"));
+        tabMain.setTitleAt(TAB_QMSPLAN, OPDE.lang.getString("opde.controlling.tab.qmsplan"));
         reload();
     }
 
@@ -934,9 +937,9 @@ public class PnlControlling extends CleanablePanel {
                                     try {
                                         em.getTransaction().begin();
                                         final Qmsplan myQMSPlan = (Qmsplan) em.merge(qmsplan);
+                                        pnlQMSPlan.getListQMSPlans().add(myQMSPlan);
+                                        pnlQMSPlan.reload();
                                         em.getTransaction().commit();
-
-
                                     } catch (OptimisticLockException ole) {
                                         OPDE.warn(ole);
                                         if (em.getTransaction().isActive()) {

@@ -1,6 +1,7 @@
 package entity.qms;
 
 import op.OPDE;
+import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.joda.time.LocalDate;
 
@@ -11,27 +12,21 @@ import java.text.DateFormat;
  */
 public class QmsschedTools {
 
-    public static String getScheduleAsHTML(Qmssched qmssched) {
+    public static String getAsHTML(Qmssched qmssched) {
         String result = "";
 
-        result += SYSTools.catchNull(qmssched.getText(), "<div id=\"fonttext\"><b>" + OPDE.lang.getString("misc.msg.comment") + ": </b>", "</div><br/>&nbsp;");
-
-        result += "<table id=\"fonttext\" border=\"1\" >" +
-                "   <tr>" +
-                "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.Time.long") + "</th>" +
-                "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.repeat.short") + "</th>" +
-                "   </tr>";
-
+        result += SYSTools.catchNull(qmssched.getText()).isEmpty() ? "" : SYSConst.html_paragraph(SYSConst.html_bold(OPDE.lang.getString("misc.msg.comment") + ": "+qmssched.getText()));
 
         String wdh = getRepeatPattern(qmssched);
-        result += "    <tr>" +
-                "      <td align=\"center\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(qmssched.getTime()) + " " + OPDE.lang.getString("misc.msg.Time.short") + "</td>" +
-                "      <td>" + wdh + "</td>" +
-                "    </tr>";
+        result += SYSConst.html_paragraph(qmssched.hasTime() ? DateFormat.getTimeInstance(DateFormat.SHORT).format(qmssched.getTime()) + " " + OPDE.lang.getString("misc.msg.Time.short") + ", " + wdh : wdh);
 
+        if (qmssched.getStation() != null) {
+            result += SYSConst.html_paragraph(OPDE.lang.getString("misc.msg.station") + ": " + qmssched.getStation().getName() + ", " + qmssched.getStation().getHome().getName());
+        } else if (qmssched.getHome() != null) {
+            result += SYSConst.html_paragraph(OPDE.lang.getString("misc.msg.home") + ": " + qmssched.getHome().getName());
+        }
 
-        result += "</table>";
-
+//        result += "</table>";
 
 
         return result;

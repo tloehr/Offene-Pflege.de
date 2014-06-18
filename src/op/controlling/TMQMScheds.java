@@ -31,17 +31,13 @@ package op.controlling;
  * @author tloehr
  */
 
-import entity.nursingprocess.InterventionSchedule;
-import entity.nursingprocess.InterventionScheduleTools;
-import entity.nursingprocess.NursingProcess;
 import entity.qms.Qmsplan;
+import entity.qms.Qmssched;
 import entity.qms.QmsschedTools;
-import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.swing.table.AbstractTableModel;
-import java.util.Collections;
 
 /**
  * @author tloehr
@@ -65,6 +61,10 @@ public class TMQMScheds extends AbstractTableModel {
         return 1;
     }
 
+    public Qmssched getSchedule(int row){
+        return qmsplan.getQmsschedules().get(row);
+    }
+
     @Override
     public Class getColumnClass(int c) {
         return String.class;
@@ -77,7 +77,7 @@ public class TMQMScheds extends AbstractTableModel {
             case COL_TXT: {
                 String html = SYSConst.html_div_open;
                 html += SYSConst.html_bold(qmsplan.getQmsschedules().get(row).getMeasure());
-                html += QmsschedTools.getScheduleAsHTML(qmsplan.getQmsschedules().get(row));
+                html += QmsschedTools.getAsHTML(qmsplan.getQmsschedules().get(row));
                 html += SYSConst.html_div_close;
                 result = SYSTools.toHTML(html);
                 break;

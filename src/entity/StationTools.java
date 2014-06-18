@@ -10,6 +10,7 @@ import op.OPDE;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.ArrayList;
 
 /**
@@ -30,11 +31,37 @@ public class StationTools {
 
     /**
      * returns the station where the current host is located.
+     *
      * @return
      */
     public static Station getStationForThisHost() {
         long statid = OPDE.getLocalProps().containsKey("station") ? Long.parseLong(OPDE.getLocalProps().getProperty("station")) : 1l;
         return EntityTools.find(Station.class, statid);
+    }
+
+
+    public static DefaultMutableTreeNode getCompleteStructure() {
+
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(OPDE.lang.getString("misc.commands.noselection"));
+
+        EntityManager em = OPDE.createEM();
+        Query queryHomes = em.createQuery("SELECT h FROM Homes h ORDER BY h.name ");
+        ArrayList<Homes> listHomes = new ArrayList<Homes>(queryHomes.getResultList());
+        em.close();
+
+        for (Homes home : listHomes) {
+            DefaultMutableTreeNode homeNode = new DefaultMutableTreeNode(home);
+
+            if (home.getStations().size() > 1) {
+                for (Station station : home.getStations()) {
+                    homeNode.add(new DefaultMutableTreeNode(station));
+                }
+            }
+
+            root.add(homeNode);
+        }
+
+        return root;
     }
 
 

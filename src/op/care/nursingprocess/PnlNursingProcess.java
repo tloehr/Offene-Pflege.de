@@ -568,11 +568,11 @@ public class PnlNursingProcess extends NursingRecordsPanel {
         java.util.List<Component> list = new ArrayList<Component>();
         list.add(new JSeparator());
         list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22stopSign, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription3"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription4"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription5"), SYSConst.icon22ledGreenOff, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString("nursingrecords.nursingprocess.keydescription1"), SYSConst.icon22stopSign, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString("nursingrecords.nursingprocess.keydescription2"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString("nursingrecords.nursingprocess.keydescription3"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString("nursingrecords.nursingprocess.keydescription4"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
+        list.add(new JLabel(OPDE.lang.getString("nursingrecords.nursingprocess.keydescription5"), SYSConst.icon22ledGreenOff, SwingConstants.LEADING));
 
         return list;
     }
@@ -882,7 +882,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
              *      \____|_| |_|\__,_|_| |_|\__, |\___|
              *                              |___/
              */
-            JButton btnChange = GUITools.createHyperlinkButton(internalClassID + ".btnchange.tooltip", SYSConst.icon22playerPlay, null);
+            JButton btnChange = GUITools.createHyperlinkButton("nursingrecords.nursingprocess.btnchange.tooltip", SYSConst.icon22playerPlay, null);
             btnChange.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnChange.addActionListener(new ActionListener() {
                 @Override
@@ -966,7 +966,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
              *                                                     |_|
              */
 
-            final JButton btnStop = GUITools.createHyperlinkButton(internalClassID + ".btnstop.tooltip", SYSConst.icon22stop, null);
+            final JButton btnStop = GUITools.createHyperlinkButton("nursingrecords.nursingprocess.btnstop.tooltip", SYSConst.icon22stop, null);
             btnStop.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnStop.addActionListener(new ActionListener() {
                 @Override
@@ -1055,7 +1055,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
              *
              */
 
-            JButton btnEdit = GUITools.createHyperlinkButton(internalClassID + ".btnedit.tooltip", SYSConst.icon22edit, null);
+            JButton btnEdit = GUITools.createHyperlinkButton("nursingrecords.nursingprocess.btnedit.tooltip", SYSConst.icon22edit, null);
             btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnEdit.addActionListener(new ActionListener() {
                 @Override
@@ -1129,7 +1129,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
          *
          */
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, internalClassID)) {  // => ACL_MATRIX
-            JButton btnDelete = GUITools.createHyperlinkButton(internalClassID + ".btndelete.tooltip", SYSConst.icon22delete, null);
+            JButton btnDelete = GUITools.createHyperlinkButton("nursingrecords.nursingprocess.btndelete.tooltip", SYSConst.icon22delete, null);
             btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnDelete.addActionListener(new ActionListener() {
                 @Override
@@ -1201,7 +1201,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
          *
          */
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
-            final JButton btnEval = GUITools.createHyperlinkButton(internalClassID + ".btneval.tooltip", SYSConst.icon22redo, null);
+            final JButton btnEval = GUITools.createHyperlinkButton("nursingrecords.nursingprocess.btneval.tooltip", SYSConst.icon22redo, null);
             btnEval.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnEval.addActionListener(new ActionListener() {
                 @Override
@@ -1258,7 +1258,7 @@ public class PnlNursingProcess extends NursingRecordsPanel {
                                     em.close();
                                 }
 
-                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".success.neweval")));
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.nursingprocess.success.neweval")));
                                 reloadDisplay();
                             }
                         }

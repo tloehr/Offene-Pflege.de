@@ -83,7 +83,7 @@ public class DlgQMSPlan extends MyJDialog {
         txtTitle.setText(qmsplan.getTitle());
         txtDescription.setText(qmsplan.getDescription());
 
-        reloadInterventions();
+        reloadMeasures();
 
 //        cmbFlags.setModel(new DefaultComboBoxModel(NursingProcessTools.FLAGS));
 //        cmbFlags.setSelectedIndex(nursingProcess.getFlag());
@@ -102,7 +102,7 @@ public class DlgQMSPlan extends MyJDialog {
         }
     }
 
-    private void reloadInterventions() {
+    private void reloadMeasures() {
         tblScheds.setModel(new TMQMScheds(qmsplan));
         tblScheds.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         tblScheds.getColumnModel().getColumn(TMQMScheds.COL_TXT).setCellRenderer(new RNDHTML());
@@ -118,7 +118,7 @@ public class DlgQMSPlan extends MyJDialog {
                 popup.hidePopup();
                 if (o != null) {
                     qmsplan.getQmsschedules().add((Qmssched) o);
-                    reloadInterventions();
+                    reloadMeasures();
                 }
             }
         });
@@ -210,14 +210,14 @@ public class DlgQMSPlan extends MyJDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "14dlu, $lcgap, 280dlu:grow, $ugap, pref, $lcgap, 14dlu",
-            "fill:14dlu, $lgap, default, $rgap, pref, $lgap, 14dlu"));
+                "14dlu, $lcgap, 280dlu:grow, $ugap, pref, $lcgap, 14dlu",
+                "fill:14dlu, $lgap, default, $rgap, pref, $lgap, 14dlu"));
 
         //======== pnlLeft ========
         {
             pnlLeft.setLayout(new FormLayout(
-                "default, $lcgap, default:grow",
-                "fill:default, $rgap, fill:default:grow, $lgap, pref"));
+                    "default, $lcgap, default:grow",
+                    "fill:default, $rgap, fill:default:grow, $lgap, pref"));
 
             //---- lblTitle ----
             lblTitle.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -268,8 +268,8 @@ public class DlgQMSPlan extends MyJDialog {
         //======== pnlRight ========
         {
             pnlRight.setLayout(new FormLayout(
-                "default:grow",
-                "default, $lgap, default"));
+                    "default:grow",
+                    "default, $lgap, default"));
 
             //======== jspPlanung ========
             {
@@ -282,15 +282,15 @@ public class DlgQMSPlan extends MyJDialog {
 
                 //---- tblScheds ----
                 tblScheds.setModel(new DefaultTableModel(
-                    new Object[][] {
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                    },
-                    new String[] {
-                        "Title 1", "Title 2", "Title 3", "Title 4"
-                    }
+                        new Object[][]{
+                                {null, null, null, null},
+                                {null, null, null, null},
+                                {null, null, null, null},
+                                {null, null, null, null},
+                        },
+                        new String[]{
+                                "Title 1", "Title 2", "Title 3", "Title 4"
+                        }
                 ));
                 tblScheds.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
                 tblScheds.addMouseListener(new MouseAdapter() {
@@ -383,7 +383,87 @@ public class DlgQMSPlan extends MyJDialog {
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void tblPlanungMousePressed(MouseEvent evt) {//GEN-FIRST:event_tblPlanungMousePressed
+        if (!SwingUtilities.isRightMouseButton(evt)) {
+            return;
+        }
 
+        Point p = evt.getPoint();
+        ListSelectionModel lsm = tblScheds.getSelectionModel();
+        final int startRow = tblScheds.rowAtPoint(p);
+        if (lsm.isSelectionEmpty() || (lsm.getMinSelectionIndex() == lsm.getMaxSelectionIndex())) {
+            lsm.setSelectionInterval(startRow, startRow);
+        }
+
+        menu = new JPopupMenu();
+
+        /***
+         *      _ _                 ____                         ____       _      _
+         *     (_) |_ ___ _ __ ___ |  _ \ ___  _ __  _   _ _ __ |  _ \  ___| | ___| |_ ___
+         *     | | __/ _ \ '_ ` _ \| |_) / _ \| '_ \| | | | '_ \| | | |/ _ \ |/ _ \ __/ _ \
+         *     | | ||  __/ | | | | |  __/ (_) | |_) | |_| | |_) | |_| |  __/ |  __/ ||  __/
+         *     |_|\__\___|_| |_| |_|_|   \___/| .__/ \__,_| .__/|____/ \___|_|\___|\__\___|
+         *                                    |_|         |_|
+         */
+        JMenuItem itemPopupDelete = new JMenuItem(OPDE.lang.getString("misc.commands.delete"), SYSConst.icon22delete);
+        itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+
+
+                for (int r : tblScheds.getSelectedRows()) {
+
+//                    listInterventionSchedule2Remove.add(((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row));
+
+                    qmsplan.getQmsschedules().remove(((TMQMScheds) tblScheds.getModel()).getSchedule(r));
+                }
+                ((TMQMScheds) tblScheds.getModel()).fireTableDataChanged();
+            }
+        });
+        menu.add(itemPopupDelete);
+
+        /***
+         *      _ _                 ____                        ____       _              _       _
+         *     (_) |_ ___ _ __ ___ |  _ \ ___  _ __  _   _ _ __/ ___|  ___| |__   ___  __| |_   _| | ___
+         *     | | __/ _ \ '_ ` _ \| |_) / _ \| '_ \| | | | '_ \___ \ / __| '_ \ / _ \/ _` | | | | |/ _ \
+         *     | | ||  __/ | | | | |  __/ (_) | |_) | |_| | |_) |__) | (__| | | |  __/ (_| | |_| | |  __/
+         *     |_|\__\___|_| |_| |_|_|   \___/| .__/ \__,_| .__/____/ \___|_| |_|\___|\__,_|\__,_|_|\___|
+         *                                    |_|         |_|
+         */
+        final JMenuItem itemPopupEditSchedule = new JMenuItem(OPDE.lang.getString("misc.commands.editsheduling"), SYSConst.icon22clock);
+
+        itemPopupEditSchedule.addActionListener(new java.awt.event.ActionListener() {
+
+
+            final Qmssched selectedQmssched = ((TMQMScheds) tblScheds.getModel()).getSchedule(startRow);
+
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                final JidePopup popup = new JidePopup();
+                PnlQMSSchedule pnlQMSSchedule = new PnlQMSSchedule(selectedQmssched, new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        popup.hidePopup();
+                        if (o != null) {
+                            qmsplan.getQmsschedules().remove(selectedQmssched);
+                            qmsplan.getQmsschedules().add((Qmssched) o);
+                            ((TMQMScheds) tblScheds.getModel()).fireTableDataChanged();
+                        }
+                    }
+                });
+
+                popup.setMovable(false);
+                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+
+                popup.setOwner(btnAddQMS);
+                popup.removeExcludedComponent(btnAddQMS);
+                popup.getContentPane().add(pnlQMSSchedule);
+                popup.setDefaultFocusComponent(pnlQMSSchedule);
+                GUITools.showPopup(popup, SwingConstants.NORTH_WEST);
+            }
+        });
+        menu.add(itemPopupEditSchedule);
+        itemPopupEditSchedule.setEnabled(true);
+
+
+        menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
     }//GEN-LAST:event_tblPlanungMousePressed
 
 

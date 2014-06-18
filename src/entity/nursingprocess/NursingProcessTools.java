@@ -90,7 +90,7 @@ public class NursingProcessTools {
 
         DateFormat df = DateFormat.getDateInstance();
         if (!np.isClosed()) {
-            html += "<b>" + OPDE.lang.getString(PnlNursingProcess.internalClassID + ".pnleval.nextevaldate") + ":</b> " + df.format(np.getNextEval()) + "<br/>";
+            html += "<b>" + OPDE.lang.getString("nursingrecords.nursingprocess.pnleval.nextevaldate") + ":</b> " + df.format(np.getNextEval()) + "<br/>";
         }
 
         if (withDetails) {
@@ -109,7 +109,7 @@ public class NursingProcessTools {
         html += SYSConst.html_h3("misc.msg.Goal[s]") +
                 SYSTools.replace(np.getGoal(), "\n", "<br/>", false);
 
-        html += SYSConst.html_h3(PnlNursingProcess.internalClassID + ".interventions");
+        html += SYSConst.html_h3("nursingrecords.nursingprocess.interventions");
 
         if (np.getInterventionSchedule().isEmpty()) {
             html += "<ul><li><b>" + OPDE.lang.getString("misc.msg.MissingInterventions") + " !!!</b></li></ul>";

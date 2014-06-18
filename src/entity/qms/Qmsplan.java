@@ -79,7 +79,7 @@ public class Qmsplan {
     @JoinColumn(name = "ctagid"))
     private Collection<Commontags> commontags;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "qmsplan")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "qmsplan", orphanRemoval = true)
     private List<Qmssched> qmsschedules;
 
     public List<Qmssched> getQmsschedules() {
@@ -137,6 +137,10 @@ public class Qmsplan {
         this.userOFF = userOFF;
     }
 
+    public boolean isClosed(){
+        return to.before(new Date());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -146,7 +150,7 @@ public class Qmsplan {
 
         if (id != qmsplan.id) return false;
         if (version != qmsplan.version) return false;
-        if (commontags != null ? !commontags.equals(qmsplan.commontags) : qmsplan.commontags != null) return false;
+//        if (commontags != null ? !commontags.equals(qmsplan.commontags) : qmsplan.commontags != null) return false;
         if (description != null ? !description.equals(qmsplan.description) : qmsplan.description != null) return false;
         if (from != null ? !from.equals(qmsplan.from) : qmsplan.from != null) return false;
         if (title != null ? !title.equals(qmsplan.title) : qmsplan.title != null) return false;
@@ -167,7 +171,7 @@ public class Qmsplan {
         result = 31 * result + (int) (version ^ (version >>> 32));
         result = 31 * result + (userON != null ? userON.hashCode() : 0);
         result = 31 * result + (userOFF != null ? userOFF.hashCode() : 0);
-        result = 31 * result + (commontags != null ? commontags.hashCode() : 0);
+//        result = 31 * result + (commontags != null ? commontags.hashCode() : 0);
         return result;
     }
 }

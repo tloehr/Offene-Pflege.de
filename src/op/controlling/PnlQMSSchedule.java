@@ -28,9 +28,13 @@ package op.controlling;
 
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jidesoft.combobox.TreeComboBox;
 import com.jidesoft.swing.JideLabel;
 import com.jidesoft.swing.JideTabbedPane;
-import com.toedter.calendar.*;
+import com.toedter.calendar.JDateChooser;
+import entity.Homes;
+import entity.Station;
+import entity.StationTools;
 import entity.qms.Qmssched;
 import op.OPDE;
 import op.threads.DisplayMessage;
@@ -43,9 +47,11 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.*;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -162,20 +168,23 @@ public class PnlQMSSchedule extends JPanel {
         jdcLDate.setDate(qmssched.getlDate());
 
         ArrayList<Date> timelist = SYSCalendar.getTimeList();
-        cmbTime.setModel(new DefaultComboBoxModel(timelist.toArray()));
+        DefaultComboBoxModel dcbm = new DefaultComboBoxModel(timelist.toArray());
+        dcbm.insertElementAt(null, 0);
+
+        cmbTime.setModel(dcbm);
         cmbTime.setRenderer(SYSCalendar.getTimeRenderer());
 
-        Date now = qmssched.getTime();
-        if (now == null) now = new Date();
-
-
-        for (Date time : timelist) {
-            if (SYSCalendar.compareTime(time, now) >= 0) {
-                now = time;
-                break;
-            }
-        }
-        cmbTime.setSelectedItem(now);
+//        Date now = qmssched.getTime();
+//        if (now == null) now = new Date();
+//
+//
+//        for (Date time : timelist) {
+//            if (SYSCalendar.compareTime(time, now) >= 0) {
+//                now = time;
+//                break;
+//            }
+//        }
+        cmbTime.setSelectedItem(null);
 
         txtBemerkung.setText(qmssched.getText());
         txtQMS.setText(qmssched.getMeasure());
@@ -183,6 +192,10 @@ public class PnlQMSSchedule extends JPanel {
         lblMeasure.setText(OPDE.lang.getString("misc.msg.measure"));
         lblTime.setText(OPDE.lang.getString("misc.msg.Time"));
         lblLDate.setText(OPDE.lang.getString("opde.controlling.qms.dlgqmsplan.pnlschedule.ldate"));
+        lblLocation.setText(OPDE.lang.getString("opde.controlling.qms.dlgqmsplan.pnlschedule.location"));
+
+        cmbLocation.setTreeModel(new DefaultTreeModel(StationTools.getCompleteStructure()));
+
     }
 
     /**
@@ -197,7 +210,9 @@ public class PnlQMSSchedule extends JPanel {
         lblMeasure = new JLabel();
         txtQMS = new JTextField();
         lblTime = new JLabel();
+        lblLocation = new JLabel();
         cmbTime = new JComboBox();
+        cmbLocation = new TreeComboBox();
         tabWdh = new JideTabbedPane();
         pnlDaily = new JPanel();
         label3 = new JLabel();
@@ -251,22 +266,29 @@ public class PnlQMSSchedule extends JPanel {
                 }
             });
             panelMain.setLayout(new FormLayout(
-                "$rgap, $lcgap, 223dlu:grow, $lcgap, $rgap",
-                "default, $nlgap, default, $lgap, default, $nlgap, default, $lgap, pref, $lgap, default, $nlgap, default, $lgap, 72dlu:grow, $lgap, default, $lgap, $rgap"));
+                    "$rgap, $lcgap, 35dlu:grow, $ugap, 105dlu:grow, $lcgap, $rgap",
+                    "default, $nlgap, default, $lgap, default, $nlgap, 2*(default, $lgap), pref, $lgap, default, $nlgap, default, $lgap, 72dlu:grow, $lgap, default, $lgap, $rgap"));
 
             //---- lblMeasure ----
             lblMeasure.setText("text");
             lblMeasure.setFont(new Font("Arial", Font.PLAIN, 10));
             lblMeasure.setHorizontalAlignment(SwingConstants.TRAILING);
-            panelMain.add(lblMeasure, CC.xy(3, 1));
-            panelMain.add(txtQMS, CC.xy(3, 3));
+            panelMain.add(lblMeasure, CC.xy(5, 1));
+            panelMain.add(txtQMS, CC.xywh(3, 3, 3, 1));
 
             //---- lblTime ----
             lblTime.setText("text");
             lblTime.setFont(new Font("Arial", Font.PLAIN, 10));
             lblTime.setHorizontalAlignment(SwingConstants.TRAILING);
             panelMain.add(lblTime, CC.xy(3, 5));
+
+            //---- lblLocation ----
+            lblLocation.setText("text");
+            lblLocation.setFont(new Font("Arial", Font.PLAIN, 10));
+            lblLocation.setHorizontalAlignment(SwingConstants.TRAILING);
+            panelMain.add(lblLocation, CC.xy(5, 5));
             panelMain.add(cmbTime, CC.xy(3, 7));
+            panelMain.add(cmbLocation, CC.xy(5, 7));
 
             //======== tabWdh ========
             {
@@ -275,8 +297,8 @@ public class PnlQMSSchedule extends JPanel {
                 {
                     pnlDaily.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlDaily.setLayout(new FormLayout(
-                        "2*(default), $rgap, $lcgap, 40dlu, $rgap, default",
-                        "default, $lgap, pref, $lgap, default"));
+                            "2*(default), $rgap, $lcgap, 40dlu, $rgap, default",
+                            "default, $lgap, pref, $lgap, default"));
 
                     //---- label3 ----
                     label3.setText("alle");
@@ -309,14 +331,14 @@ public class PnlQMSSchedule extends JPanel {
                 {
                     pnlWeekly.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlWeekly.setLayout(new FormLayout(
-                        "default, 7*(13dlu), $lcgap, default:grow",
-                        "$ugap, $lgap, default, $lgap, pref, $nlgap, default:grow, $lgap, $rgap"));
+                            "default, 7*(13dlu), $lcgap, default:grow",
+                            "$ugap, $lgap, default, $lgap, pref, $nlgap, default:grow, $lgap, $rgap"));
 
                     //======== panel3 ========
                     {
                         panel3.setLayout(new FormLayout(
-                            "default, $rgap, 40dlu, $rgap, 2*(default), $lcgap, default, $lcgap",
-                            "default:grow, $lgap, default"));
+                                "default, $rgap, 40dlu, $rgap, 2*(default), $lcgap, default, $lcgap",
+                                "default:grow, $lgap, default"));
 
                         //---- btnJedeWoche ----
                         btnJedeWoche.setText("Jede Woche");
@@ -481,8 +503,8 @@ public class PnlQMSSchedule extends JPanel {
                 {
                     pnlMonthly.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlMonthly.setLayout(new FormLayout(
-                        "default, $lcgap, pref, $lcgap, 40dlu, $lcgap, pref, $lcgap, 61dlu",
-                        "3*(default, $lgap), default"));
+                            "default, $lcgap, pref, $lcgap, 40dlu, $lcgap, pref, $lcgap, 61dlu",
+                            "3*(default, $lgap), default"));
 
                     //---- label4 ----
                     label4.setText("jeden");
@@ -527,29 +549,29 @@ public class PnlQMSSchedule extends JPanel {
                     pnlMonthly.add(spinMonatTag, CC.xy(5, 7));
 
                     //---- cmbTag ----
-                    cmbTag.setModel(new DefaultComboBoxModel<>(new String[] {
-                        "Tag des Monats",
-                        "Montag",
-                        "Dienstag",
-                        "Mittwoch",
-                        "Donnerstag",
-                        "Freitag",
-                        "Samstag",
-                        "Sonntag"
+                    cmbTag.setModel(new DefaultComboBoxModel<>(new String[]{
+                            "Tag des Monats",
+                            "Montag",
+                            "Dienstag",
+                            "Mittwoch",
+                            "Donnerstag",
+                            "Freitag",
+                            "Samstag",
+                            "Sonntag"
                     }));
                     cmbTag.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlMonthly.add(cmbTag, CC.xywh(7, 7, 3, 1));
                 }
                 tabWdh.addTab("Monatlich", pnlMonthly);
             }
-            panelMain.add(tabWdh, CC.xy(3, 9, CC.FILL, CC.FILL));
+            panelMain.add(tabWdh, CC.xywh(3, 11, 3, 1, CC.FILL, CC.FILL));
 
             //---- lblLDate ----
             lblLDate.setText("text");
             lblLDate.setFont(new Font("Arial", Font.PLAIN, 10));
             lblLDate.setHorizontalAlignment(SwingConstants.TRAILING);
-            panelMain.add(lblLDate, CC.xy(3, 11));
-            panelMain.add(jdcLDate, CC.xy(3, 13));
+            panelMain.add(lblLDate, CC.xy(5, 13));
+            panelMain.add(jdcLDate, CC.xywh(3, 15, 3, 1));
 
             //======== jScrollPane1 ========
             {
@@ -559,7 +581,7 @@ public class PnlQMSSchedule extends JPanel {
                 txtBemerkung.setRows(5);
                 jScrollPane1.setViewportView(txtBemerkung);
             }
-            panelMain.add(jScrollPane1, CC.xy(3, 15, CC.DEFAULT, CC.FILL));
+            panelMain.add(jScrollPane1, CC.xywh(3, 17, 3, 1, CC.DEFAULT, CC.FILL));
 
             //---- btnSave ----
             btnSave.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
@@ -569,7 +591,7 @@ public class PnlQMSSchedule extends JPanel {
                     btnSaveActionPerformed(e);
                 }
             });
-            panelMain.add(btnSave, CC.xy(3, 17, CC.RIGHT, CC.DEFAULT));
+            panelMain.add(btnSave, CC.xy(5, 19, CC.RIGHT, CC.DEFAULT));
         }
         add(panelMain, BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
@@ -662,13 +684,11 @@ public class PnlQMSSchedule extends JPanel {
 
     }//GEN-LAST:event_btnSaveActionPerformed
 
-    public boolean isSaveOK(){
+    public boolean isSaveOK() {
         return jdcLDate.getDate() != null && !SYSTools.tidy(txtQMS.getText()).isEmpty();
     }
 
     public void save() throws NumberFormatException {
-
-
 
         qmssched.setTime((Date) cmbTime.getSelectedItem());
 
@@ -711,10 +731,28 @@ public class PnlQMSSchedule extends JPanel {
         qmssched.setMeasure(SYSTools.tidy(txtQMS.getText()));
         qmssched.setText(SYSTools.tidy(txtBemerkung.getText()));
 
-//        if (!qmssched.isValid()) {
-//            throw new NumberFormatException("Anzahl muss min. 1 sein");
-//        }
 
+        if (cmbLocation.getSelectedItem() == null) {
+            qmssched.setHome(null);
+            qmssched.setStation(null);
+        } else if (cmbLocation.getSelectedItem() instanceof TreePath) {
+            TreePath treePath = (TreePath) cmbLocation.getSelectedItem();
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) treePath.getLastPathComponent();
+            if (node.getUserObject() instanceof Station) {
+                qmssched.setStation((Station) node.getUserObject());
+                qmssched.setHome(null);
+            } else if (node.getUserObject() instanceof Homes) {
+                qmssched.setHome((Homes) node.getUserObject());
+                qmssched.setStation(null);
+            } else {
+                qmssched.setHome(null);
+                qmssched.setStation(null);
+            }
+        } else {
+            qmssched.setHome(null);
+            qmssched.setStation(null);
+        }
+        cmbLocation.setEditable(false);
     }
 
     private void txtFocusGained(FocusEvent evt) {//GEN-FIRST:event_txtFocusGained
@@ -739,7 +777,9 @@ public class PnlQMSSchedule extends JPanel {
     private JLabel lblMeasure;
     private JTextField txtQMS;
     private JLabel lblTime;
+    private JLabel lblLocation;
     private JComboBox cmbTime;
+    private TreeComboBox cmbLocation;
     private JideTabbedPane tabWdh;
     private JPanel pnlDaily;
     private JLabel label3;
