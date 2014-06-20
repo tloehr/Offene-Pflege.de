@@ -32,6 +32,7 @@ import com.jidesoft.popup.JidePopup;
 import entity.qms.Qmsplan;
 import entity.qms.Qmssched;
 import op.OPDE;
+import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.HorizontalLayout;
@@ -55,7 +56,6 @@ public class DlgQMSPlan extends MyJDialog {
     private Closure actionBlock;
     private JPopupMenu menu;
     private PnlCommonTags pnlCommonTags;
-    private ArrayList<Qmssched> listSchedules2Remove = new ArrayList();
 
     /**
      * Creates new form DlgNursingProcess
@@ -84,11 +84,6 @@ public class DlgQMSPlan extends MyJDialog {
         txtDescription.setText(qmsplan.getDescription());
 
         reloadMeasures();
-
-//        cmbFlags.setModel(new DefaultComboBoxModel(NursingProcessTools.FLAGS));
-//        cmbFlags.setSelectedIndex(nursingProcess.getFlag());
-
-
     }
 
     @Override
@@ -148,15 +143,11 @@ public class DlgQMSPlan extends MyJDialog {
      */
     private boolean saveOK() {
 
-//        if (txtStichwort.getText().trim().isEmpty()) {
-//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.stichwortxx"), DisplayMessage.WARNING));
-//            return false;
-//        }
-//
-//        if (jdcKontrolle.getDate() == null) {
-//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.datumxx"), DisplayMessage.WARNING));
-//            return false;
-//        }
+        if (SYSTools.tidy(txtTitle.getText()).isEmpty()) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("opde.controlling.qms.dlgqmsplan.titlexx"), DisplayMessage.WARNING));
+            return false;
+        }
+
 //
 //        if (cmbKategorie.getSelectedItem() == null) {
 //            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.kategoriexx"), DisplayMessage.WARNING));
@@ -168,10 +159,10 @@ public class DlgQMSPlan extends MyJDialog {
 //            return false;
 //        }
 //
-//        if (txtSituation.getText().isEmpty()) {
-//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.situationxx"), DisplayMessage.WARNING));
-//            return false;
-//        }
+        if (txtDescription.getText().isEmpty()) {
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("opde.controlling.qms.dlgqmsplan.descriptionxx"), DisplayMessage.WARNING));
+            return false;
+        }
 //
 //        if (txtZiele.getText().isEmpty()) {
 //            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.goalxx"), DisplayMessage.WARNING));

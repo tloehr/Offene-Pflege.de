@@ -10,6 +10,7 @@ import entity.qms.Qmsplan;
 import entity.qms.QmsplanTools;
 import op.OPDE;
 import op.system.InternalClassACL;
+import op.threads.DisplayManager;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
@@ -198,15 +199,14 @@ public class PnlQMSPlan extends CleanablePanel {
 
 
             /***
-             *      ____        _   _                _____    _ _ _
-             *     | __ ) _   _| |_| |_ ___  _ __   | ____|__| (_) |_
-             *     |  _ \| | | | __| __/ _ \| '_ \  |  _| / _` | | __|
-             *     | |_) | |_| | |_| || (_) | | | | | |__| (_| | | |_
-             *     |____/ \__,_|\__|\__\___/|_| |_| |_____\__,_|_|\__|
+             *               _ _ _
+             *       ___  __| (_) |_
+             *      / _ \/ _` | | __|
+             *     |  __/ (_| | | |_
+             *      \___|\__,_|_|\__|
              *
              */
-
-            JButton btnEdit = GUITools.createHyperlinkButton("misc.msg.edit", SYSConst.icon22edit, null);
+            JButton btnEdit = GUITools.createHyperlinkButton("misc.commands.edit", SYSConst.icon22edit, null);
             btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnEdit.addActionListener(new ActionListener() {
                 @Override
@@ -249,6 +249,65 @@ public class PnlQMSPlan extends CleanablePanel {
             });
             btnEdit.setEnabled(!qmsplan.isClosed() && numQMS == 0);
             pnlMenu.add(btnEdit);
+        }
+
+        /***
+         *          _      _      _
+         *       __| | ___| | ___| |_ ___
+         *      / _` |/ _ \ |/ _ \ __/ _ \
+         *     | (_| |  __/ |  __/ ||  __/
+         *      \__,_|\___|_|\___|\__\___|
+         *
+         */
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, internalClassID)) {  // => ACL_MATRIX
+            JButton btnDelete = GUITools.createHyperlinkButton("misc.commands.delete", SYSConst.icon22delete, null);
+            btnDelete.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnDelete.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<br/><b>" + qmsplan.getTitle() + "</b><br/>" + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
+                        @Override
+                        public void execute(Object o) {
+                            if (o.equals(JOptionPane.YES_OPTION)) {
+                                EntityManager em = OPDE.createEM();
+                                try {
+                                    em.getTransaction().begin();
+                                    Qmsplan myQMSPlan = (Qmsplan) em.merge(qmsplan);
+                                    em.remove(myQMSPlan);
+                                    em.getTransaction().commit();
+
+
+                                    // Refresh Display
+                                    listQMSPlans.remove(qmsplan);
+                                    reload();
+
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getSuccessMessage(qmsplan.getTitle(), "deleted"));
+
+                                } catch (OptimisticLockException ole) {
+                                    OPDE.warn(ole);
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                        OPDE.getMainframe().emptyFrame();
+                                        OPDE.getMainframe().afterLogin();
+                                    }
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                } catch (Exception e) {
+                                    if (em.getTransaction().isActive()) {
+                                        em.getTransaction().rollback();
+                                    }
+                                    OPDE.fatal(e);
+                                } finally {
+                                    em.close();
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+            btnDelete.setEnabled(!qmsplan.isClosed() && numQMS == 0);
+            pnlMenu.add(btnDelete);
         }
 
 

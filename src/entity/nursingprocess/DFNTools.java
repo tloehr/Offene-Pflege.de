@@ -113,7 +113,7 @@ public class DFNTools {
 
             OPDE.info("[DFNImport] " + OPDE.lang.getString("misc.msg.writingto") + ": " + OPDE.getUrl());
             select.setParameter("von", targetdate.toDateTimeAtStartOfDay().toDate());
-            select.setParameter("bis", SYSCalendar.eod(targetdate).toDateTime());
+            select.setParameter("bis", SYSCalendar.eod(targetdate).toDate());
             select.setParameter("ldatum", targetdate.toDate());
 
             List<InterventionSchedule> list = select.getResultList();

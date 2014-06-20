@@ -5,7 +5,7 @@
 package op.tools;
 
 import com.jidesoft.swing.AutoCompletion;
-import com.jidesoft.swing.AutoCompletionComboBox;
+import com.jidesoft.swing.SelectAllUtils;
 import entity.system.Commontags;
 import entity.system.CommontagsTools;
 import op.OPDE;
@@ -13,13 +13,14 @@ import op.threads.DisplayMessage;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +35,8 @@ public class PnlCommonTags extends JPanel {
     HashMap<Commontags, JButton> mapButtons;
     ArrayList<String> completionList;
     JTextField txtTags;
+    AutoCompletion ac;
+
     final int MAXLINE = 8;
 
     public PnlCommonTags(HashSet<Commontags> listSelectedTags) {
@@ -51,17 +54,6 @@ public class PnlCommonTags extends JPanel {
 
     private void initPanel() {
 
-
-
-        txtTags = new JTextField(10);
-        txtTags.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtTagsActionPerformed(e);
-            }
-        });
-        add(txtTags);
-
         mapButtons = new HashMap<>();
 
         for (Commontags commontags : CommontagsTools.getAllActive()) {
@@ -72,57 +64,66 @@ public class PnlCommonTags extends JPanel {
             add(createButton(selectedTags));
         }
 
-        ((AbstractDocument) txtTags.getDocument()).setDocumentFilter(new MyDocumentFilter());
 
-        completionList = new ArrayList(mapAllTags.keySet());
+        txtTags = new JTextField(10);
+
+        SelectAllUtils.install(txtTags);
+        ac = new AutoCompletion(txtTags, mapAllTags.keySet().toArray(new String[]{}));
+
+        ac.setStrict(false);
+        ac.setStrictCompletion(false);
+        txtTags.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cmbTagsActionPerformed(e);
+            }
+        });
 
 
+        txtTags.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                char c = e.getKeyChar();
+                if (Character.isAlphabetic(c) || Character.isDigit(c)) {
+                    super.keyTyped(e);
+                } else {
+                    e.consume();
+                }
+            }
+        });
 
-        AutoCompletion autoCompletion = new AutoCompletion(txtTags, completionList.toArray());
-        autoCompletion.setStrict(false);
+        add(txtTags);
 
-        cmbTags = new AutoCompletionComboBox(_fontNames);
-                                     autoCompletionComboBox.setName("AutoCompletion JComboBox (Strict)");
-                                     autoCompletionComboBox.setToolTipText("AutoCompletion JComboBox (Strict)");
-                                     panel.add(new JLabel("AutoCompletion JComboBox (Strict)"));
-
-                                     panel.add(autoCompletionComboBox);
-                                     panel.add(Box.createVerticalStrut(12), JideBoxLayout.FIX);
-
-       //        txtTags = new JTextField(10);
-       //        txtTags.addActionListener(new ActionListener() {
-       //            @Override
-       //            public void actionPerformed(ActionEvent e) {
-       //                txtTagsActionPerformed(e);
-       //            }
-       //        });
-       //        add(txtTags);
     }
 
-    private void txtTagsActionPerformed(ActionEvent e) {
+    private void cmbTagsActionPerformed(ActionEvent e) {
 
         if (txtTags.getText().isEmpty()) return;
         if (txtTags.getText().length() > 100) return;
 
 
-        if (!mapAllTags.containsKey(SYSTools.tidy(txtTags.getText()))) {
-            Commontags commontags = new Commontags(SYSTools.tidy(txtTags.getText()));
-            mapAllTags.put(txtTags.getText(), commontags);
+        final String enteredText = SYSTools.tidy(txtTags.getText()).toLowerCase();
+
+        if (!mapAllTags.containsKey(enteredText)) {
+            Commontags myNewCommontag = new Commontags(SYSTools.tidy(enteredText));
+            mapAllTags.put(enteredText, myNewCommontag);
+            ac.uninstallListeners();
+            ac = new AutoCompletion(txtTags, mapAllTags.keySet().toArray(new String[]{}));
+            ac.setStrict(false);
+            ac.setStrictCompletion(false);
         }
 
-        final boolean wasInItAlready = listSelectedTags.contains(mapAllTags.get(txtTags.getText()));
+        if (!listSelectedTags.contains(mapAllTags.get(enteredText))) {
+            listSelectedTags.add(mapAllTags.get(enteredText));
 
-        listSelectedTags.add(mapAllTags.get(txtTags.getText()));
-
-        if (!wasInItAlready) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
 
                     if (listSelectedTags.size() % MAXLINE == 0) {
-                        add(createButton(mapAllTags.get(txtTags.getText())), RiverLayout.LINE_BREAK);
+                        add(createButton(mapAllTags.get(enteredText)), RiverLayout.LINE_BREAK);
                     } else {
-                        add(createButton(mapAllTags.get(txtTags.getText())), RiverLayout.LEFT);
+                        add(createButton(mapAllTags.get(enteredText)), RiverLayout.LEFT);
                     }
 
                     txtTags.setText("");
@@ -207,41 +208,6 @@ public class PnlCommonTags extends JPanel {
         }
     }
 
-
-    // http://stackoverflow.com/questions/14058505/jtextfield-accept-only-alphabet-and-white-space
-    class MyDocumentFilter extends DocumentFilter {
-
-        @Override
-        public void replace(FilterBypass fb, int i, int i1, String string, AttributeSet as) throws BadLocationException {
-
-            if (string.isEmpty()) {
-                super.replace(fb, i, i1, string, as);//allow update to take place for the given character
-                return;
-            }
-
-            // an inserted string may be more than a single character i.e a copy and paste of 'aaa123d', also we iterate from the back as super.XX implementation will put last insterted string
-            // first and so on thus 'aa123d' would be 'daa', but because we iterate from the back its 'aad' like we want
-            for (int n = string.length(); n > 0; n--) {
-                char c = string.charAt(n - 1);//get a single character of the string
-                if (Character.isAlphabetic(c) || Character.isDigit(c)) {//if its an alphabetic character or white space
-                    super.replace(fb, i, i1, String.valueOf(c), as);//allow update to take place for the given character
-                } else {//it was not an alphabetic character or white space
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.wrongentry"));
-                }
-            }
-        }
-
-        @Override
-        public void remove(FilterBypass fb, int i, int i1) throws BadLocationException {
-            super.remove(fb, i, i1);
-        }
-
-        @Override
-        public void insertString(FilterBypass fb, int i, String string, AttributeSet as) throws BadLocationException {
-            super.insertString(fb, i, string, as);
-
-        }
-    }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     // JFormDesigner - End of variables declaration  //GEN-END:variables

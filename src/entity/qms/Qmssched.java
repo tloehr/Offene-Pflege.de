@@ -5,7 +5,9 @@ import entity.Station;
 import org.joda.time.LocalDate;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by tloehr on 28.05.14.
@@ -231,6 +233,13 @@ public class Qmssched {
     private Qmsplan qmsplan;
 
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "qmssched", orphanRemoval = true)
+       private List<Qms> qmsList;
+
+    public List<Qms> getQmsList() {
+        return qmsList;
+    }
+
     public Qmsplan getQmsplan() {
         return qmsplan;
     }
@@ -262,6 +271,8 @@ public class Qmssched {
         this.sat = 0;
         this.sun = 0;
         this.daynum = 0;
+
+        this.qmsList = new ArrayList<>();
 
         this.text = null;
     }

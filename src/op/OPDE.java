@@ -86,7 +86,7 @@ public class OPDE {
     protected static String opwd = "";
     protected static String css = "";
 
-//    private static int TIMEOUT = 0;
+    private static int DEFAULT_TIMEOUT = 30;
 
     //    protected static boolean FTPisWORKING = false;
     public static String UPDATE_FTPSERVER = "ftp.offene-pflege.de";
@@ -261,14 +261,18 @@ public class OPDE {
         return localProps;
     }
 
+    /**
+     * returns the minutes until the system timeouts the current login automatically when no user action is detected.
+     * if the timeout value is 0, no timeout is performed.
+     * @return
+     */
     public static int getTimeout() {
-        int timeout = 0;
-        // timeout
+        int timeout = DEFAULT_TIMEOUT;
         if (props.containsKey("timeout")) {
             try {
                 timeout = Integer.parseInt(props.getProperty("timeout"));
             } catch (NumberFormatException nfe) {
-                timeout = 0;
+                timeout = DEFAULT_TIMEOUT;
             }
         }
         return timeout;
