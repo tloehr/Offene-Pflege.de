@@ -14,6 +14,7 @@ import java.util.Date;
 public class Training2File {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, insertable = true, updatable = true)
     private long id;
 

@@ -1,5 +1,6 @@
 package entity.qms;
 
+import entity.files.Qmsplan2File;
 import entity.system.Commontags;
 import entity.system.Users;
 import op.OPDE;
@@ -82,6 +83,10 @@ public class Qmsplan {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "qmsplan", orphanRemoval = true)
     private List<Qmssched> qmsschedules;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "qmsplan")
+    private Collection<Qmsplan2File> attachedFilesConnections;
+
+
     public List<Qmssched> getQmsschedules() {
         return qmsschedules;
     }
@@ -107,6 +112,10 @@ public class Qmsplan {
     public Date getFrom() {
 
         return from;
+    }
+
+    public Collection<Qmsplan2File> getAttachedFilesConnections() {
+        return attachedFilesConnections;
     }
 
     public void setFrom(Date from) {
@@ -137,7 +146,7 @@ public class Qmsplan {
         this.userOFF = userOFF;
     }
 
-    public boolean isClosed(){
+    public boolean isClosed() {
         return to.before(new Date());
     }
 

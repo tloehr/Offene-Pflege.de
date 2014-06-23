@@ -37,7 +37,6 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "sysinf2file")
-
 public class SYSINF2FILE implements Serializable {
 
     private static final long serialVersionUID = 1L;

@@ -1603,8 +1603,17 @@ public class SYSCalendar {
         return new DateTime(year, 1, 1, 0, 0, 0);
     }
 
+    public static LocalDate boy(LocalDate year) {
+        return new LocalDate(year.getYear(), 1, 1);
+    }
+
     public static DateTime eoy(int year) {
         return new DateTime(year, 12, 31, 23, 59, 59);
+    }
+
+
+    public static LocalDate eoy(LocalDate day) {
+        return new LocalDate(day.getYear(), 12, 31);
     }
 
     /**
@@ -1628,5 +1637,15 @@ public class SYSCalendar {
     public static LocalDate max(LocalDate a, LocalDate b) {
         return new LocalDate(Math.max(a.toDateTimeAtStartOfDay().getMillis(), b.toDateTimeAtStartOfDay().getMillis()));
     }
+
+    public static io.lamma.Date toLammaDate(java.util.Date in) {
+        LocalDate ld = new LocalDate(in);
+        return new io.lamma.Date(ld.getYear(), ld.getMonthOfYear(), ld.getDayOfMonth());
+    }
+
+    public static LocalDate toLocalDate(io.lamma.Date in) {
+            return new LocalDate(in.yyyy(), in.mm(), in.dd());
+
+        }
 
 }

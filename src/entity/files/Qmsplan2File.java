@@ -1,16 +1,18 @@
 package entity.files;
 
-import entity.info.Resident;
+import entity.qms.Qmsplan;
 import entity.system.Users;
+
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.Date;
 
 /**
  * Created by tloehr on 19.05.14.
  */
 @Entity
-@Table(name = "resident2file")
-public class Resident2File {
+@Table(name = "qmsplan2file")
+public class Qmsplan2File {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,41 +40,28 @@ public class Resident2File {
         this.pit = pit;
     }
 
-    @Basic
-
-    @Column(name = "version", nullable = false, insertable = true, updatable = true)
-    private long version;
-
-    public long getVersion() {
-        return version;
-    }
-
-    public void setVersion(long version) {
-        this.version = version;
-    }
-
-
     @JoinColumn(name = "editor", referencedColumnName = "UKennung")
     @ManyToOne
     private Users editor;
 
-    @JoinColumn(name = "rid", referencedColumnName = "BWKennung")
+    @JoinColumn(name = "qmsplanid", referencedColumnName = "id")
     @ManyToOne
-    private Resident resident;
+    private Qmsplan qmsplan;
 
     @JoinColumn(name = "fid", referencedColumnName = "OCFID")
     @ManyToOne
     private SYSFiles sysfile;
 
 
-    public Resident2File() {
+
+    public Qmsplan2File() {
     }
 
-    public Resident2File(SYSFiles sysfile, Resident resident, Users editor, Date pit) {
-        this.pit = pit;
-        this.editor = editor;
-        this.resident = resident;
+    public Qmsplan2File(SYSFiles sysfile, Qmsplan qmsplan, Users editor, Date pit) {
         this.sysfile = sysfile;
+        this.qmsplan = qmsplan;
+        this.editor = editor;
+        this.pit = pit;
     }
 
     @Override
@@ -80,14 +69,13 @@ public class Resident2File {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Resident2File that = (Resident2File) o;
+        Qmsplan2File that = (Qmsplan2File) o;
 
         if (id != that.id) return false;
-        if (version != that.version) return false;
         if (editor != null ? !editor.equals(that.editor) : that.editor != null) return false;
         if (pit != null ? !pit.equals(that.pit) : that.pit != null) return false;
-        if (resident != null ? !resident.equals(that.resident) : that.resident != null) return false;
         if (sysfile != null ? !sysfile.equals(that.sysfile) : that.sysfile != null) return false;
+        if (qmsplan != null ? !qmsplan.equals(that.qmsplan) : that.qmsplan != null) return false;
 
         return true;
     }
@@ -96,9 +84,8 @@ public class Resident2File {
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + (pit != null ? pit.hashCode() : 0);
-        result = 31 * result + (int) (version ^ (version >>> 32));
         result = 31 * result + (editor != null ? editor.hashCode() : 0);
-        result = 31 * result + (resident != null ? resident.hashCode() : 0);
+        result = 31 * result + (qmsplan != null ? qmsplan.hashCode() : 0);
         result = 31 * result + (sysfile != null ? sysfile.hashCode() : 0);
         return result;
     }

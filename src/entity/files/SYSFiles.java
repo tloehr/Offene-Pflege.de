@@ -68,7 +68,7 @@ public class SYSFiles implements Serializable, Comparable {
     @Basic(optional = false)
     @Column(name = "Beschreibung")
     private String beschreibung;
-    @JoinColumn(name = "UKennung", referencedColumnName = "UKennung")
+    @JoinColumn(name = "UID", referencedColumnName = "UKennung")
     @ManyToOne
     private Users user;
 
@@ -88,6 +88,8 @@ public class SYSFiles implements Serializable, Comparable {
     private Collection<User2File> usersAssignCollection;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
     private Collection<Resident2File> residentAssignCollection;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sysfile")
+    private Collection<Qmsplan2File> qmsplanAssignCollection;
 
     public SYSFiles() {
     }
@@ -139,6 +141,10 @@ public class SYSFiles implements Serializable, Comparable {
 
     public Collection<SYSNP2FILE> getNpAssignCollection() {
         return npAssignCollection;
+    }
+
+    public Collection<Qmsplan2File> getQmsplanAssignCollection() {
+        return qmsplanAssignCollection;
     }
 
     public Long getOcfid() {

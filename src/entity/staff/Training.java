@@ -12,9 +12,11 @@ import java.util.Date;
  * Created by tloehr on 17.05.14.
  */
 @Entity
+@Table(name = "training")
 public class Training {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, insertable = true, updatable = true)
     private long id;
 

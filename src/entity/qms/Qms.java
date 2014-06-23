@@ -1,6 +1,8 @@
 package entity.qms;
 
+import entity.prescription.BHPTools;
 import entity.system.Users;
+import op.tools.SYSTools;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -10,7 +12,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "qms")
-public class Qms {
+public class Qms implements Comparable<Qms> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -83,9 +85,9 @@ public class Qms {
     public Qms() {
     }
 
-    public Qms(Date target, Qmsplan qmsplan, Qmssched qmssched) {
+    public Qms(Date target, Qmssched qmssched) {
         this.target = target;
-        this.qmsplan = qmsplan;
+        this.qmsplan = qmssched.getQmsplan();
         this.qmssched = qmssched;
         this.user = null;
         this.actual = null;
@@ -115,6 +117,10 @@ public class Qms {
     public void setQmssched(Qmssched qmssched) {
         this.qmssched = qmssched;
     }
+
+    public boolean isOpen() {
+           return state == QmsTools.STATE_OPEN;
+       }
 
     @Override
     public boolean equals(Object o) {
@@ -146,5 +152,21 @@ public class Qms {
         result = 31 * result + (qmsplan != null ? qmsplan.hashCode() : 0);
         result = 31 * result + (qmssched != null ? qmssched.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Qms{" +
+                "id=" + SYSTools.catchNull(id, "<NULL>") +
+                "target=" + target +
+                ", state=" + state +
+                ", qmssched=" + qmssched.getId() +
+                '}';
+    }
+
+    @Override
+    public int compareTo(Qms o) {
+
+        return target.compareTo(o.getTarget());
     }
 }

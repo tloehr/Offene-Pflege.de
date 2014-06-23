@@ -1,11 +1,15 @@
 package entity.qms;
 
+import io.lamma.LammaConst;
+import io.lamma.LammaConversion;
+import io.lamma.Recurrence;
 import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.joda.time.LocalDate;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 
 /**
  * Created by tloehr on 17.06.14.
@@ -15,7 +19,7 @@ public class QmsschedTools {
     public static String getAsHTML(Qmssched qmssched) {
         String result = "";
 
-        result += SYSTools.catchNull(qmssched.getText()).isEmpty() ? "" : SYSConst.html_paragraph(SYSConst.html_bold(OPDE.lang.getString("misc.msg.comment") + ": "+qmssched.getText()));
+        result += SYSTools.catchNull(qmssched.getText()).isEmpty() ? "" : SYSConst.html_paragraph(SYSConst.html_bold(OPDE.lang.getString("misc.msg.comment") + ": " + qmssched.getText()));
 
         String wdh = getRepeatPattern(qmssched);
         result += SYSConst.html_paragraph(qmssched.hasTime() ? DateFormat.getTimeInstance(DateFormat.SHORT).format(qmssched.getTime()) + " " + OPDE.lang.getString("misc.msg.Time.short") + ", " + wdh : wdh);
@@ -59,7 +63,7 @@ public class QmsschedTools {
             daylist += (qmssched.getSun() > 0 ? OPDE.lang.getString("misc.msg.sunday").substring(0, 3) + ", " : "");
 
             if (!daylist.isEmpty()) {
-                result += "{" + daylist.substring(0, daylist.length() - 2) + "}";
+                result += " {" + daylist.substring(0, daylist.length() - 2) + "}";
             }
 
         } else if (qmssched.isMonthly()) {
@@ -106,6 +110,82 @@ public class QmsschedTools {
         }
 
         return result;
+    }
+
+
+    /**
+     * takes the recurrence pattern inside a qmssched and creates a list of recurrences for a lamma sequence generator.
+     * @param qmssched
+     * @return
+     */
+    public static ArrayList<Recurrence> getRecurrences(Qmssched qmssched) {
+
+        ArrayList<Recurrence> recurrences = new ArrayList<>();
+
+        if (qmssched.isDaily()) {
+            recurrences.add(LammaConversion.days(qmssched.getDaily()));
+        } else if (qmssched.isWeekly()) {
+            if (qmssched.getMon() > 0) {
+                recurrences.add(LammaConversion.weeks(qmssched.getWeekly(), LammaConst.MONDAY));
+            }
+
+            if (qmssched.getTue() > 0) {
+                recurrences.add(LammaConversion.weeks(qmssched.getWeekly(), LammaConst.TUESDAY));
+            }
+
+            if (qmssched.getWed() > 0) {
+                recurrences.add(LammaConversion.weeks(qmssched.getWeekly(), LammaConst.WEDNESDAY));
+            }
+
+            if (qmssched.getThu() > 0) {
+                recurrences.add(LammaConversion.weeks(qmssched.getWeekly(), LammaConst.THURSDAY));
+            }
+
+            if (qmssched.getFri() > 0) {
+                recurrences.add(LammaConversion.weeks(qmssched.getWeekly(), LammaConst.FRIDAY));
+            }
+
+            if (qmssched.getSat() > 0) {
+                recurrences.add(LammaConversion.weeks(qmssched.getWeekly(), LammaConst.SATURDAY));
+            }
+
+            if (qmssched.getSun() > 0) {
+                recurrences.add(LammaConversion.weeks(qmssched.getWeekly(), LammaConst.SUNDAY));
+            }
+        } else if (qmssched.isMonthly()) {
+            if (qmssched.getDaynum() > 0) {
+                recurrences.add(LammaConversion.months(qmssched.getMonthly(), LammaConversion.nthDayOfMonth(qmssched.getDaynum())));
+            } else {
+                if (qmssched.getMon() > 0) {
+                    recurrences.add(LammaConversion.months(qmssched.getMonthly(), LammaConversion.nthWeekdayOfMonth(qmssched.getMon(), LammaConst.MONDAY)));
+                }
+
+                if (qmssched.getTue() > 0) {
+                    recurrences.add(LammaConversion.months(qmssched.getMonthly(), LammaConversion.nthWeekdayOfMonth(qmssched.getTue(), LammaConst.TUESDAY)));
+                }
+
+                if (qmssched.getWed() > 0) {
+                    recurrences.add(LammaConversion.months(qmssched.getMonthly(), LammaConversion.nthWeekdayOfMonth(qmssched.getWed(), LammaConst.WEDNESDAY)));
+                }
+
+                if (qmssched.getThu() > 0) {
+                    recurrences.add(LammaConversion.months(qmssched.getMonthly(), LammaConversion.nthWeekdayOfMonth(qmssched.getThu(), LammaConst.THURSDAY)));
+                }
+
+                if (qmssched.getFri() > 0) {
+                    recurrences.add(LammaConversion.months(qmssched.getMonthly(), LammaConversion.nthWeekdayOfMonth(qmssched.getFri(), LammaConst.FRIDAY)));
+                }
+
+                if (qmssched.getSat() > 0) {
+                    recurrences.add(LammaConversion.months(qmssched.getMonthly(), LammaConversion.nthWeekdayOfMonth(qmssched.getSat(), LammaConst.SATURDAY)));
+                }
+
+                if (qmssched.getSun() > 0) {
+                    recurrences.add(LammaConversion.months(qmssched.getMonthly(), LammaConversion.nthWeekdayOfMonth(qmssched.getSun(), LammaConst.SUNDAY)));
+                }
+            }
+        }
+        return recurrences;
     }
 
 }

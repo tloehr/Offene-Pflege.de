@@ -75,13 +75,13 @@ public class GUITools {
     }
 
     public static JideButton createHyperlinkButton(String titleORlangbundle, Icon icon, ActionListener actionListener) {
-        String title = SYSTools.catchNull(titleORlangbundle);
-        try {
-            title = OPDE.lang.getString(titleORlangbundle);
-        } catch (Exception e) {
-            // ok, its not a langbundle key
-        }
-        final JideButton button = new JideButton(title, icon);
+//        String title = SYSTools.catchNull(titleORlangbundle);
+//        try {
+//            title = OPDE.lang.getString(titleORlangbundle);
+//        } catch (Exception e) {
+//            // ok, its not a langbundle key
+//        }
+        final JideButton button = new JideButton(SYSTools.xx(titleORlangbundle), icon);
         button.setButtonStyle(JideButton.HYPERLINK_STYLE);
         button.setFont(SYSConst.ARIAL14);
 

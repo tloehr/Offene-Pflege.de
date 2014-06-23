@@ -33,6 +33,7 @@ import entity.info.ResInfo;
 import entity.info.Resident;
 import entity.nursingprocess.NursingProcess;
 import entity.prescription.Prescription;
+import entity.qms.Qmsplan;
 import entity.reports.NReport;
 import entity.staff.Training;
 import entity.system.SYSPropsTools;
@@ -188,6 +189,10 @@ public class SYSFilesTools {
                                 Resident2File link = em.merge(new Resident2File(sysfile, (Resident) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getResidentAssignCollection().add(link);
                                 ((Resident) attachable).getAttachedFilesConnections().add(link);
+                            } else if (attachable instanceof Qmsplan) {
+                                Qmsplan2File link = em.merge(new Qmsplan2File(sysfile, (Qmsplan) attachable, OPDE.getLogin().getUser(), new Date()));
+                                sysfile.getQmsplanAssignCollection().add(link);
+                                ((Qmsplan) attachable).getAttachedFilesConnections().add(link);
                             }
                         }
                         successful.add(sysfile);
@@ -335,8 +340,6 @@ public class SYSFilesTools {
 
         return success;
     }
-
-
 
 
 //    private static ArrayList<SYSFiles> getConnectedFiles(String md5) {

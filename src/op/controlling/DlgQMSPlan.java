@@ -159,10 +159,10 @@ public class DlgQMSPlan extends MyJDialog {
 //            return false;
 //        }
 //
-        if (txtDescription.getText().isEmpty()) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("opde.controlling.qms.dlgqmsplan.descriptionxx"), DisplayMessage.WARNING));
-            return false;
-        }
+//        if (txtDescription.getText().isEmpty()) {
+//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("opde.controlling.qms.dlgqmsplan.descriptionxx"), DisplayMessage.WARNING));
+//            return false;
+//        }
 //
 //        if (txtZiele.getText().isEmpty()) {
 //            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.goalxx"), DisplayMessage.WARNING));
@@ -201,14 +201,14 @@ public class DlgQMSPlan extends MyJDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-                "14dlu, $lcgap, 280dlu:grow, $ugap, pref, $lcgap, 14dlu",
-                "fill:14dlu, $lgap, default, $rgap, pref, $lgap, 14dlu"));
+            "14dlu, $lcgap, 280dlu:grow, $ugap, pref, $lcgap, 14dlu",
+            "fill:14dlu, $lgap, default, $rgap, pref, $lgap, 14dlu"));
 
         //======== pnlLeft ========
         {
             pnlLeft.setLayout(new FormLayout(
-                    "default, $lcgap, default:grow",
-                    "fill:default, $rgap, fill:default:grow, $lgap, pref"));
+                "default, $lcgap, default:grow",
+                "fill:default, $rgap, fill:default:grow, $lgap, pref"));
 
             //---- lblTitle ----
             lblTitle.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -259,8 +259,8 @@ public class DlgQMSPlan extends MyJDialog {
         //======== pnlRight ========
         {
             pnlRight.setLayout(new FormLayout(
-                    "default:grow",
-                    "default, $lgap, default"));
+                "default:grow",
+                "default, $lgap, default"));
 
             //======== jspPlanung ========
             {
@@ -273,15 +273,15 @@ public class DlgQMSPlan extends MyJDialog {
 
                 //---- tblScheds ----
                 tblScheds.setModel(new DefaultTableModel(
-                        new Object[][]{
-                                {null, null, null, null},
-                                {null, null, null, null},
-                                {null, null, null, null},
-                                {null, null, null, null},
-                        },
-                        new String[]{
-                                "Title 1", "Title 2", "Title 3", "Title 4"
-                        }
+                    new Object[][] {
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null},
+                    },
+                    new String[] {
+                        "Title 1", "Title 2", "Title 3", "Title 4"
+                    }
                 ));
                 tblScheds.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
                 tblScheds.addMouseListener(new MouseAdapter() {
