@@ -1,6 +1,5 @@
 package entity.qms;
 
-import entity.prescription.BHPTools;
 import entity.system.Users;
 import op.tools.SYSTools;
 
@@ -65,6 +64,18 @@ public class Qms implements Comparable<Qms> {
         this.state = state;
     }
 
+    @Basic
+    @Column(name = "sequence", nullable = false, insertable = true, updatable = true)
+    private int sequence;
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
+    }
+
     @Version
     @Column(name = "version", nullable = false, insertable = true, updatable = true)
     private long version;
@@ -85,13 +96,14 @@ public class Qms implements Comparable<Qms> {
     public Qms() {
     }
 
-    public Qms(Date target, Qmssched qmssched) {
+    public Qms(Date target, Qmssched qmssched, int sequence) {
         this.target = target;
         this.qmsplan = qmssched.getQmsplan();
         this.qmssched = qmssched;
         this.user = null;
         this.actual = null;
         this.state = QmsTools.STATE_OPEN;
+        this.sequence = sequence;
     }
 
     public Users getUser() {
@@ -119,8 +131,8 @@ public class Qms implements Comparable<Qms> {
     }
 
     public boolean isOpen() {
-           return state == QmsTools.STATE_OPEN;
-       }
+        return state == QmsTools.STATE_OPEN;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -130,6 +142,7 @@ public class Qms implements Comparable<Qms> {
         Qms qms = (Qms) o;
 
         if (id != qms.id) return false;
+        if (sequence != qms.sequence) return false;
         if (version != qms.version) return false;
         if (actual != null ? !actual.equals(qms.actual) : qms.actual != null) return false;
         if (qmsplan != null ? !qmsplan.equals(qms.qmsplan) : qms.qmsplan != null) return false;
@@ -147,6 +160,7 @@ public class Qms implements Comparable<Qms> {
         result = 31 * result + (target != null ? target.hashCode() : 0);
         result = 31 * result + (actual != null ? actual.hashCode() : 0);
         result = 31 * result + (state != null ? state.hashCode() : 0);
+        result = 31 * result + sequence;
         result = 31 * result + (int) (version ^ (version >>> 32));
         result = 31 * result + (user != null ? user.hashCode() : 0);
         result = 31 * result + (qmsplan != null ? qmsplan.hashCode() : 0);

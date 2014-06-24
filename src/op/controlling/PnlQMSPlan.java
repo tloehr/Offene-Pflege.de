@@ -6,18 +6,14 @@ import com.jidesoft.pane.event.CollapsiblePaneAdapter;
 import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
-import entity.prescription.PrescriptionTools;
 import entity.qms.*;
-import io.lamma.Date;
-import io.lamma.Lamma4j;
-import io.lamma.Recurrence;
+
 import op.OPDE;
 import op.system.InternalClassACL;
 import op.threads.DisplayManager;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
-import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -28,11 +24,12 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-import static io.lamma.LammaConversion.everyYear;
+
 
 /**
  * Created by tloehr on 17.06.14.
@@ -40,7 +37,10 @@ import static io.lamma.LammaConversion.everyYear;
 public class PnlQMSPlan extends CleanablePanel {
     public static final String internalClassID = "opde.controlling.qms.pnlqmsplan";
     CollapsiblePanes cpsMain;
+
+    private HashMap<Qms, JPanel> mapQms2Panel;
     private HashMap<String, CollapsiblePane> cpMap;
+//    private ArrayList<Qmsplan> listQMSPlans;
     private ArrayList<Qmsplan> listQMSPlans;
     private int MAX_TEXT_LENGTH = 65;
 
@@ -64,7 +64,7 @@ public class PnlQMSPlan extends CleanablePanel {
 
     @Override
     public void reload() {
-
+        cpMap.clear();
         for (Qmsplan qmsplan : listQMSPlans) {
             createCP4(qmsplan);
         }
@@ -317,145 +317,145 @@ public class PnlQMSPlan extends CleanablePanel {
         ArrayList<Qms> listQMS = new ArrayList<>(qmssched.getQmsList());
         Collections.sort(listQMS);
 
-        JPanel pnlYear = new JPanel(new VerticalLayout());
-        pnlYear.setOpaque(false);
+        JPanel pnlSched = new JPanel(new VerticalLayout());
+        pnlSched.setOpaque(false);
 
-        LocalDate now = new LocalDate();
-        LocalDate from = listQMS.isEmpty() ? now : new LocalDate(listQMS.get(0).getTarget());
-        LocalDate to = now.plusYears(2).dayOfYear().withMaximumValue();
-        to = SYSCalendar.min(to, new LocalDate(qmssched.getQmsplan().getTo()));
-
-        for (int year = from.getYear(); year <= to.getYear(); year++) {
-            pnlYear.add(createCP4(year, qmssched));
+        for (Qms qms : listQMS) {
+            pnlSched.add(createCP4(qms));
         }
 
-        return pnlYear;
+        return pnlSched;
 
     }
 
-    private CollapsiblePane createCP4(final int year, final Qmssched qmssched) {
-        ArrayList<Qms> listQMS = new ArrayList<>(qmssched.getQmsList());
+//    private CollapsiblePane createCP4(final int year, final Qmssched qmssched) {
+////        ArrayList<Qms> listQMS = new ArrayList<>(qmssched.getQmsList());
+//
+//        final String key = year + ".year" + qmssched.getId() + ".qmssched";
+//        synchronized (cpMap) {
+//            if (!cpMap.containsKey(key)) {
+//                cpMap.put(key, new CollapsiblePane());
+//                try {
+//                    cpMap.get(key).setCollapsed(true);
+//                } catch (PropertyVetoException e) {
+//                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//                }
+//
+//            }
+//        }
+//        final CollapsiblePane cpYear = cpMap.get(key);
+//
+//        String title = "<html><font size=+1><b>" +
+//                year +
+//                "</b>" +
+//                "</font></html>";
+//
+//        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                try {
+//                    cpYear.setCollapsed(!cpYear.isCollapsed());
+//                } catch (PropertyVetoException pve) {
+//                    // BAH!
+//                }
+//            }
+//        });
+//
+//        GUITools.addExpandCollapseButtons(cpYear, cptitle.getRight());
+//
+//
+//        cpYear.setTitleLabelComponent(cptitle.getMain());
+//        cpYear.setSlidingDirection(SwingConstants.SOUTH);
+//
+//        cpYear.setBackground(SYSConst.orange1[SYSConst.medium1]);
+//        cpYear.setOpaque(false);
+//        cpYear.setHorizontalAlignment(SwingConstants.LEADING);
+//
+//        cpYear.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+//            @Override
+//            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
+//                cpYear.setContentPane(createContent4(year, qmssched));
+//            }
+//        });
+//
+//        if (!cpYear.isCollapsed()) {
+//            cpYear.setContentPane(createContent4(year, qmssched));
+//        }
+//
+//
+//        return cpYear;
+//    }
 
-        final String key = year + ".year" + qmssched.getId() + ".qmssched";
-        synchronized (cpMap) {
-            if (!cpMap.containsKey(key)) {
-                cpMap.put(key, new CollapsiblePane());
-                try {
-                    cpMap.get(key).setCollapsed(true);
-                } catch (PropertyVetoException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
 
-            }
-        }
-        final CollapsiblePane cpYear = cpMap.get(key);
-
-        String title = "<html><font size=+1><b>" +
-                year +
-                "</b>" +
-                "</font></html>";
-
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    cpYear.setCollapsed(!cpYear.isCollapsed());
-                } catch (PropertyVetoException pve) {
-                    // BAH!
-                }
-            }
-        });
-
-        GUITools.addExpandCollapseButtons(cpYear, cptitle.getRight());
-
-
-        cpYear.setTitleLabelComponent(cptitle.getMain());
-        cpYear.setSlidingDirection(SwingConstants.SOUTH);
-
-        cpYear.setBackground(SYSConst.orange1[SYSConst.medium1]);
-        cpYear.setOpaque(false);
-        cpYear.setHorizontalAlignment(SwingConstants.LEADING);
-
-        cpYear.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
-            @Override
-            public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                cpYear.setContentPane(createContent4(year, qmssched));
-            }
-        });
-
-        if (!cpYear.isCollapsed()) {
-            cpYear.setContentPane(createContent4(year, qmssched));
-        }
-
-
-        return cpYear;
-    }
-
-
-    private JPanel createContent4(final int year, final Qmssched qmssched) {
-
-//        ArrayList<Qms> listQMS = new ArrayList<>(qmssched.getQmsList());
+//    private JPanel createContent4(final int year, final Qmssched qmssched) {
+//
+////        ArrayList<Qms> listQMS = new ArrayList<>(qmssched.getQmsList());
+////        Collections.sort(listQMS);
+//
+//        JPanel pnlYear = new JPanel(new VerticalLayout());
+//        pnlYear.setOpaque(false);
+//
+//        LocalDate ldYear = new LocalDate(year, 1, 1);
+//
+//        LocalDate from = SYSCalendar.max(ldYear, new LocalDate(qmssched.getQmsplan().getFrom()));
+//        LocalDate to = SYSCalendar.min(SYSCalendar.eoy(ldYear), new LocalDate(qmssched.getQmsplan().getTo()));
+//
+//
+//        // reading and indexing the existing QMS for this Schedule
+//        ArrayList<Qms> listQMS = QmsTools.get(qmssched, ldYear);
+//        HashMap<LocalDate, Qms> mapQMS = new HashMap<>();
+//        for (Qms qms : listQMS) {
+//            mapQMS.put(new LocalDate(qms.getTarget()), qms);
+//        }
+//
+//
+//        // adding those who may be used in the future.
+//        ArrayList<Date> lstPotentialTargetDates = new ArrayList<>();
+//        for (Recurrence recurrence : QmsschedTools.getRecurrences(qmssched)) {
+//            lstPotentialTargetDates.addAll(new ArrayList(Lamma4j.sequence(SYSCalendar.toLammaDate(from.toDate()), SYSCalendar.toLammaDate(to.toDate()), recurrence)));
+//        }
+//
+//        for (Date lammaDate : lstPotentialTargetDates) {
+//            if (!mapQMS.containsKey(SYSCalendar.toLocalDate(lammaDate))) {
+//                listQMS.add(new Qms(SYSCalendar.toLocalDate(lammaDate).toDate(), qmssched));
+//            }
+//        }
+//
 //        Collections.sort(listQMS);
-
-        JPanel pnlYear = new JPanel(new VerticalLayout());
-        pnlYear.setOpaque(false);
-
-        LocalDate ldYear = new LocalDate(year, 1, 1);
-
-        LocalDate from = SYSCalendar.max(ldYear, new LocalDate(qmssched.getQmsplan().getFrom()));
-        LocalDate to = SYSCalendar.min(SYSCalendar.eoy(ldYear), new LocalDate(qmssched.getQmsplan().getTo()));
-
-
-        // reading and indexing the existing QMS for this Schedule
-        ArrayList<Qms> listQMS = QmsTools.get(qmssched, ldYear);
-        HashMap<LocalDate, Qms> mapQMS = new HashMap<>();
-        for (Qms qms : listQMS) {
-            mapQMS.put(new LocalDate(qms.getTarget()), qms);
-        }
-
-
-        // adding those who may be used in the future.
-        ArrayList<Date> lstPotentialTargetDates = new ArrayList<>();
-        for (Recurrence recurrence : QmsschedTools.getRecurrences(qmssched)) {
-            lstPotentialTargetDates.addAll(new ArrayList(Lamma4j.sequence(SYSCalendar.toLammaDate(from.toDate()), SYSCalendar.toLammaDate(to.toDate()), recurrence)));
-        }
-
-        for (Date lammaDate : lstPotentialTargetDates) {
-            if (!mapQMS.containsKey(SYSCalendar.toLocalDate(lammaDate))) {
-                listQMS.add(new Qms(SYSCalendar.toLocalDate(lammaDate).toDate(), qmssched));
-            }
-        }
-
-        Collections.sort(listQMS);
-
-
-        for (Qms qms : listQMS) {
-            pnlYear.add(createCP4(qms));
-        }
-
-        mapQMS.clear();
-
-        return pnlYear;
-
-    }
+//
+////        CollapsiblePanes cps = new CollapsiblePanes();
+//
+//        for (Qms qms : listQMS) {
+//            pnlYear.add(createCP4(qms));
+//        }
+//
+////        cps.addExpansion();
+////
+////        pnlYear.add(cps);
+//
+////        mapQMS.clear();
+//
+//        return pnlYear;
+//
+//    }
 
     private CollapsiblePane createCP4(final Qms qms) {
 
-        final String key = qms.getId() + ".qms";
-        synchronized (cpMap) {
-            if (!cpMap.containsKey(key)) {
-                cpMap.put(key, new CollapsiblePane());
-                try {
-                    cpMap.get(key).setCollapsed(true);
-                } catch (PropertyVetoException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
-
-            }
-        }
+//        final String key = qms.getId() + "/" + qms.getTarget().getTime() + ".qms";
+//        synchronized (cpMap) {
+//            if (!cpMap.containsKey(key)) {
+//                cpMap.put(key, new CollapsiblePane());
+//                try {
+//                    cpMap.get(key).setCollapsed(true);
+//                } catch (PropertyVetoException e) {
+//                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//                }
+//
+//            }
+//        }
 //        final CollapsiblePane cpYear = cpMap.get(key);
 
-        final CollapsiblePane cpYear = cpMap.get(key);
+        final CollapsiblePane cpYear = new CollapsiblePane();
 
         cpYear.setCollapseOnTitleClick(false);
 
@@ -474,19 +474,29 @@ public class PnlQMSPlan extends CleanablePanel {
                 try {
                     em.getTransaction().begin();
                     Qms myQms = em.merge(qms);
-                    em.lock(myQms.getQmssched(), LockModeType.OPTIMISTIC);
-                    em.lock(myQms.getQmsplan(), LockModeType.OPTIMISTIC);
+
+                    Qmssched myQmssched = em.merge(myQms.getQmssched());
+                    Qmsplan myQmsplan = em.merge(myQms.getQmsplan());
+
+                    em.lock(myQmssched, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                    em.lock(myQmsplan, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
                     myQms.setState(QmsTools.STATE_DONE);
                     myQms.setUser(em.merge(OPDE.getLogin().getUser()));
                     myQms.setActual(new java.util.Date());
 
+                    QmsTools.generate(myQmssched, 1);
+
+                    listQMSPlans.set(listQMSPlans.indexOf(qms.getQmsplan()), myQmsplan);
+
                     em.getTransaction().commit();
 
-                    cpMap.remove(qms);
-                    createCP4(myQms);
+                    reload();
 
-                    buildPanel();
+//                    cpMap.remove(key);
+//                    createCP4(myQms);
+//
+//                    buildPanel();
 
                 } catch (OptimisticLockException ole) {
                     OPDE.warn(ole);
@@ -523,8 +533,7 @@ public class PnlQMSPlan extends CleanablePanel {
 
 
         String title = "<html><font size=+1>" +
-                SYSTools.left(qms.getQmssched().getMeasure(), MAX_TEXT_LENGTH) +
-
+                SYSTools.left(DateFormat.getDateInstance().format(qms.getTarget()), MAX_TEXT_LENGTH) +
                 "</font></html>";
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, PnlControlling.internalClassID) ? applyActionListener : null);
@@ -582,8 +591,8 @@ public class PnlQMSPlan extends CleanablePanel {
                         try {
                             em.getTransaction().begin();
                             Qms myQms = em.merge(qms);
-                            em.lock(myQms.getQmssched(), LockModeType.OPTIMISTIC);
-                            em.lock(myQms.getQmsplan(), LockModeType.OPTIMISTIC);
+                            em.lock(myQms.getQmssched(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                            em.lock(myQms.getQmsplan(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
                             myQms.setState(QmsTools.STATE_REFUSED);
                             myQms.setUser(em.merge(OPDE.getLogin().getUser()));
@@ -591,10 +600,9 @@ public class PnlQMSPlan extends CleanablePanel {
 
                             em.getTransaction().commit();
 
-                            cpMap.remove(qms);
-                            createCP4(myQms);
+                            reload();
 
-                            buildPanel();
+//                            buildPanel();
                         } catch (OptimisticLockException ole) {
                             OPDE.warn(ole);
                             if (em.getTransaction().isActive()) {
@@ -649,16 +657,12 @@ public class PnlQMSPlan extends CleanablePanel {
 
                             em.getTransaction().begin();
                             Qms myQms = em.merge(qms);
-                            em.lock(myQms.getQmssched(), LockModeType.OPTIMISTIC);
-                            em.lock(myQms.getQmsplan(), LockModeType.OPTIMISTIC);
+                            em.lock(myQms.getQmssched(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                            em.lock(myQms.getQmsplan(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
                             em.remove(myQms);
                             em.getTransaction().commit();
 
-                            cpMap.remove(qms);
-                            createCP4(new Qms(myQms.getTarget(), myQms.getQmssched()));
-
-                            buildPanel();
-
+                            reload();
 
                         } catch (OptimisticLockException ole) {
                             OPDE.warn(ole);
@@ -702,7 +706,6 @@ public class PnlQMSPlan extends CleanablePanel {
         }
 
 
-
         cpYear.setHorizontalAlignment(SwingConstants.LEADING);
         cpYear.setOpaque(false);
         return cpYear;
@@ -739,6 +742,7 @@ public class PnlQMSPlan extends CleanablePanel {
                                 try {
                                     em.getTransaction().begin();
                                     Qmsplan myQMSPlan = (Qmsplan) em.merge(qmsplan);
+                                    em.lock(myQMSPlan, LockModeType.OPTIMISTIC);
                                     em.getTransaction().commit();
                                     listQMSPlans.remove(qmsplan);
                                     listQMSPlans.add(myQMSPlan);
@@ -792,7 +796,7 @@ public class PnlQMSPlan extends CleanablePanel {
                                 EntityManager em = OPDE.createEM();
                                 try {
                                     em.getTransaction().begin();
-                                    Qmsplan myQMSPlan = (Qmsplan) em.merge(qmsplan);
+                                    Qmsplan myQMSPlan = em.merge(qmsplan);
                                     em.remove(myQMSPlan);
                                     em.getTransaction().commit();
 
@@ -837,10 +841,6 @@ public class PnlQMSPlan extends CleanablePanel {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
 
-                LocalDate ld = new LocalDate(qmsplan.getFrom());
-
-                Lamma4j.sequence(SYSCalendar.toLammaDate(qmsplan.getFrom()), SYSCalendar.toLammaDate(qmsplan.getTo()), everyYear());
-
 
             }
         });
@@ -849,6 +849,8 @@ public class PnlQMSPlan extends CleanablePanel {
 
         return pnlMenu;
     }
+
+
 
 
 }

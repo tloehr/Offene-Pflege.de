@@ -463,6 +463,10 @@ public class DlgQMSPlan extends MyJDialog {
         qmsplan.setDescription(SYSTools.tidy(txtDescription.getText()));
         qmsplan.getCommontags().clear();
         qmsplan.getCommontags().addAll(pnlCommonTags.getListSelectedTags());
+
+
+
+
     }
 
     //GEN-BEGIN:variables

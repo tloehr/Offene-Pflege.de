@@ -35,7 +35,12 @@ import com.toedter.calendar.JDateChooser;
 import entity.Homes;
 import entity.Station;
 import entity.StationTools;
+import entity.qms.Qms;
+import entity.qms.QmsTools;
 import entity.qms.Qmssched;
+import entity.qms.QmsschedTools;
+import io.lamma.Lamma4j;
+import io.lamma.Recurrence;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.SYSCalendar;
@@ -51,7 +56,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -82,11 +90,6 @@ public class PnlQMSSchedule extends JPanel {
 //        SYSTools.showSide(splitRegular, splitRegularPos);
     }
 
-    private void cmbUhrzeitItemStateChanged(ItemEvent e) {
-//        currentSelectedTime = (Date) e.getItem();
-//        lblUhrzeit.setText("Dosis um " + DateFormat.getTimeInstance(DateFormat.SHORT).format(e.getItem()) + " Uhr");
-    }
-
     private void btnJedenTagActionPerformed(ActionEvent e) {
         spinTaeglich.setValue(1);
     }
@@ -97,11 +100,6 @@ public class PnlQMSSchedule extends JPanel {
 
     private void btnJedenMonatActionPerformed(ActionEvent e) {
         spinMonat.setValue(1);
-    }
-
-
-    private void txtLDateFocusLost(FocusEvent evt) {
-        SYSCalendar.handleDateFocusLost(evt, new LocalDate(), new LocalDate().plusWeeks(4));
     }
 
 
@@ -696,7 +694,6 @@ public class PnlQMSSchedule extends JPanel {
         qmssched.setWeekly(tabWdh.getSelectedIndex() == TAB_WEEKLY ? Byte.parseByte(spinWoche.getValue().toString()) : (byte) 0);
         qmssched.setMonthly(tabWdh.getSelectedIndex() == TAB_MONTHLY ? Byte.parseByte(spinMonat.getValue().toString()) : (byte) 0);
 
-
         qmssched.setlDate(jdcLDate.getDate());
 
         qmssched.setMon(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbMon.isSelected() ? (byte) 1 : (byte) 0);
@@ -731,7 +728,6 @@ public class PnlQMSSchedule extends JPanel {
         qmssched.setMeasure(SYSTools.tidy(txtQMS.getText()));
         qmssched.setText(SYSTools.tidy(txtBemerkung.getText()));
 
-
         if (cmbLocation.getSelectedItem() == null) {
             qmssched.setHome(null);
             qmssched.setStation(null);
@@ -753,24 +749,27 @@ public class PnlQMSSchedule extends JPanel {
             qmssched.setStation(null);
         }
         cmbLocation.setEditable(false);
+
+        QmsTools.generate(qmssched, 2);
+
     }
 
-    private void txtFocusGained(FocusEvent evt) {//GEN-FIRST:event_txtFocusGained
-        SYSTools.markAllTxt((JTextField) evt.getSource());
-    }//GEN-LAST:event_txtFocusGained
-
-    private void txtMaxTimesCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtMaxTimesCaretUpdate
-        if (ignoreEvent) {
-            return;
-        }
-        try {
-            Integer.parseInt(((JTextField) evt.getSource()).getText());
-            btnSave.setEnabled(true);
-        } catch (NumberFormatException nfe) {
-            btnSave.setEnabled(false);
-        }
-    }//GEN-LAST:event_txtMaxTimesCaretUpdate
-
+//    private void txtFocusGained(FocusEvent evt) {//GEN-FIRST:event_txtFocusGained
+//        SYSTools.markAllTxt((JTextField) evt.getSource());
+//    }//GEN-LAST:event_txtFocusGained
+//
+//    private void txtMaxTimesCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtMaxTimesCaretUpdate
+//        if (ignoreEvent) {
+//            return;
+//        }
+//        try {
+//            Integer.parseInt(((JTextField) evt.getSource()).getText());
+//            btnSave.setEnabled(true);
+//        } catch (NumberFormatException nfe) {
+//            btnSave.setEnabled(false);
+//        }
+//    }//GEN-LAST:event_txtMaxTimesCaretUpdate
+//
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel panelMain;

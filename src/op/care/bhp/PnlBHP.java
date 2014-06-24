@@ -86,13 +86,13 @@ public class PnlBHP extends NursingRecordsPanel {
     private CollapsiblePanes searchPanes;
     private JDateChooser jdcDatum;
 
-    private JPanel thisPanel;
+//    private JPanel thisPanel;
     private String outcomeText = null;
 
     public PnlBHP(Resident resident, JScrollPane jspSearch) {
         initComponents();
         this.jspSearch = jspSearch;
-        thisPanel = this;
+//        thisPanel = this;
         initPanel();
         switchResident(resident);
     }
