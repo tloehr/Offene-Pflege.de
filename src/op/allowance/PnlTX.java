@@ -66,8 +66,8 @@ public class PnlTX extends JPanel {
 
     private void txtTextFocusLost(FocusEvent e) {
         if (txtText.getText().trim().isEmpty()) {
-            txtText.setText(OPDE.lang.getString(internalClassID + ".txtText"));
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.emptyentry")));
+            txtText.setText(SYSTools.xx(internalClassID + ".txtText"));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.emptyentry")));
         }
     }
 
@@ -211,14 +211,14 @@ public class PnlTX extends JPanel {
     }
 
     private void initPanel() {
-        lblResident.setText(OPDE.lang.getString("misc.msg.resident"));
-        lblDate.setText(OPDE.lang.getString(internalClassID + ".lbldate"));
-        lblText.setText(OPDE.lang.getString(internalClassID + ".lbltext"));
-        lblCash.setText(OPDE.lang.getString(internalClassID + ".lblcash"));
+        lblResident.setText(SYSTools.xx("misc.msg.resident"));
+        lblDate.setText(SYSTools.xx(internalClassID + ".lbldate"));
+        lblText.setText(SYSTools.xx(internalClassID + ".lbltext"));
+        lblCash.setText(SYSTools.xx(internalClassID + ".lblcash"));
         txtDate.setText(DateFormat.getDateInstance().format(tx.getPit()));
         txtCash.setText(cf.format(tx.getAmount()));
         if (tx.getId() == null) {
-            txtText.setText(OPDE.lang.getString(internalClassID + ".txtText"));
+            txtText.setText(SYSTools.xx(internalClassID + ".txtText"));
         } else {
             txtText.setText(tx.getText());
         }
@@ -294,11 +294,11 @@ public class PnlTX extends JPanel {
         BigDecimal myamount = SYSTools.parseCurrency(text);
         if (myamount != null) {
             if (myamount.equals(BigDecimal.ZERO)) {
-                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.emptycash")));
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.emptycash")));
                 myamount = defaultAmount;
             }
         } else {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wrongcash")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.wrongcash")));
             myamount = defaultAmount;
         }
         return myamount;

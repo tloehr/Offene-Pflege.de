@@ -92,7 +92,7 @@ public class PnlWelcome extends CleanablePanel {
 
     private void initPanel() {
         if (OPDE.isUpdateAvailable()) {
-            btnAbout.setText(OPDE.lang.getString("misc.msg.updateAvailable"));
+            btnAbout.setText(SYSTools.xx("misc.msg.updateAvailable"));
         }
         addApps();
 
@@ -154,14 +154,14 @@ public class PnlWelcome extends CleanablePanel {
         cpsWelcome.setLayout(new JideBoxLayout(cpsWelcome, JideBoxLayout.Y_AXIS));
 
         OPDE.getMainframe().setBlocked(true);
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 
         SwingWorker worker = new SwingWorker() {
 
             @Override
             protected Object doInBackground() throws Exception {
                 int progress = -1;
-                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 100));
+                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, 100));
                 processList = QProcessTools.getActiveProcesses4(OPDE.getLogin().getUser());
                 birthdayList = ResidentTools.getAllWithBirthdayIn(BIRTHDAY);
                 expiryList = MedStockTools.getExpiryList(7);
@@ -172,13 +172,13 @@ public class PnlWelcome extends CleanablePanel {
 
                 if (!processList.isEmpty()) {
                     String title = "<html><font size=+1>" +
-                            OPDE.lang.getString(PnlProcess.internalClassID) +
+                            SYSTools.xx(PnlProcess.internalClassID) +
                             "</font></html>";
                     CollapsiblePane cp = new CollapsiblePane(title);
                     JPanel pnlContent = new JPanel(new VerticalLayout());
                     for (QProcess process : processList) {
                         progress++;
-                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
                         pnlContent.add(createCP4(process).getMain());
                     }
                     cp.setContentPane(pnlContent);
@@ -187,13 +187,13 @@ public class PnlWelcome extends CleanablePanel {
 
                 if (!expiryList.isEmpty()) {
                     String title = "<html><font size=+1>" +
-                            OPDE.lang.getString("misc.msg.expiredStocks") +
+                            SYSTools.xx("misc.msg.expiredStocks") +
                             "</font></html>";
                     CollapsiblePane cp = new CollapsiblePane(title);
                     JPanel pnlContent = new JPanel(new VerticalLayout());
                     for (MedStock process : expiryList) {
                         progress++;
-                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
                         pnlContent.add(createCP4(process).getMain());
                     }
                     cp.setContentPane(pnlContent);
@@ -202,7 +202,7 @@ public class PnlWelcome extends CleanablePanel {
 
                 if (!birthdayList.isEmpty()) {
                     String title = "<html><font size=+1>" +
-                            OPDE.lang.getString("opde.welcome.birthdayNext") + " " + BIRTHDAY + " " + OPDE.lang.getString("misc.msg.Days") +
+                            SYSTools.xx("opde.welcome.birthdayNext") + " " + BIRTHDAY + " " + SYSTools.xx("misc.msg.Days") +
                             "</font></html>";
                     CollapsiblePane cp = new CollapsiblePane(title);
                     JPanel pnlContent = new JPanel(new VerticalLayout());
@@ -216,7 +216,7 @@ public class PnlWelcome extends CleanablePanel {
                         Resident resident = em.find(Resident.class, objects[RESID]);
 
                         progress++;
-                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
                         pnlContent.add(createCP4Birthdays(resident, ((Double) objects[NEWAGE]).intValue(), ((Long) objects[DAYS2BIRTHDAY]).intValue()).getMain());
 
                     }
@@ -229,12 +229,12 @@ public class PnlWelcome extends CleanablePanel {
 
                 if (!noStoolList.isEmpty()) {
                     String title = "<html><font size=+1>" +
-                            OPDE.lang.getString(PnlValues.internalClassID + ".residentsWithNoStool") + "</font></html>";
+                            SYSTools.xx(PnlValues.internalClassID + ".residentsWithNoStool") + "</font></html>";
                     CollapsiblePane cp = new CollapsiblePane(title);
                     JPanel pnlContent = new JPanel(new VerticalLayout());
                     for (Object[] ns : noStoolList) {
                         progress++;
-                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
                         pnlContent.add(createCP4NoStool(ns).getMain());
                     }
                     cp.setContentPane(pnlContent);
@@ -243,12 +243,12 @@ public class PnlWelcome extends CleanablePanel {
 
                 if (!violatingLiquidValues.isEmpty()) {
                     String title = "<html><font size=+1>" +
-                            OPDE.lang.getString("nursingrecords.vitalparameters.residentsWithHighOrLowIn") + "</font></html>";
+                            SYSTools.xx("nursingrecords.vitalparameters.residentsWithHighOrLowIn") + "</font></html>";
                     CollapsiblePane cp = new CollapsiblePane(title);
                     JPanel pnlContent = new JPanel(new VerticalLayout());
                     for (Object[] ns : violatingLiquidValues) {
                         progress++;
-                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
                         pnlContent.add(createCP4HighLowIn(ns).getMain());
                     }
                     cp.setContentPane(pnlContent);
@@ -257,7 +257,7 @@ public class PnlWelcome extends CleanablePanel {
 
                 if (max == 0) {
                     JPanel pnlContent = new JPanel(new VerticalLayout());
-                    JLabel lbl = new JLabel(OPDE.lang.getString("misc.msg.noEntries"));
+                    JLabel lbl = new JLabel(SYSTools.xx("misc.msg.noEntries"));
                     lbl.setFont(SYSConst.ARIAL18BOLD);
                     pnlContent.add(lbl);
 
@@ -287,10 +287,10 @@ public class PnlWelcome extends CleanablePanel {
                 "<tr valign=\"top\">" +
                 "<td width=\"200\" align=\"left\">" +
                 "<b>" + ResidentTools.getTextCompact(resident) + "</b></td>" +
-                "<td width=\"200\" align=\"left\">" + OPDE.lang.getString("opde.welcome.lastStool") + ": " +
-                (lastStool == null ? OPDE.lang.getString("misc.msg.noentryyet") : DateFormat.getDateInstance().format(lastStool.getPit())) + "</td>" +
-                "<td width=\"200\" align=\"left\">" + OPDE.lang.getString("opde.welcome.controlPeriod") + ": " +
-                daysControl + " " + OPDE.lang.getString("misc.msg.Days2") + "</td>" +
+                "<td width=\"200\" align=\"left\">" + SYSTools.xx("opde.welcome.lastStool") + ": " +
+                (lastStool == null ? SYSTools.xx("misc.msg.noentryyet") : DateFormat.getDateInstance().format(lastStool.getPit())) + "</td>" +
+                "<td width=\"200\" align=\"left\">" + SYSTools.xx("opde.welcome.controlPeriod") + ": " +
+                daysControl + " " + SYSTools.xx("misc.msg.Days2") + "</td>" +
                 "</tr>" +
                 "</table>" +
                 "</html>";
@@ -347,12 +347,12 @@ public class PnlWelcome extends CleanablePanel {
             // TODO: replace ml with the values of the ResValueTypes
             if (highin != null && highin.compareTo(val.getSecond()) < 0) {
                 title += "<td width=\"350\" align=\"left\"><b>" +
-                        OPDE.lang.getString("misc.msg.tooHigh") + "</b>, " + OPDE.lang.getString("opde.welcome.highin") +
+                        SYSTools.xx("misc.msg.tooHigh") + "</b>, " + SYSTools.xx("opde.welcome.highin") +
                         ": " + highin.setScale(2, RoundingMode.HALF_UP).toPlainString() + " ml</td>";
             }
             if (lowin != null && lowin.compareTo(val.getSecond()) > 0) {
                 title += "<td width=\"350\" align=\"left\"><b>" +
-                        OPDE.lang.getString("misc.msg.tooLow") + "</b>, " + OPDE.lang.getString("opde.welcome.lowin") +
+                        SYSTools.xx("misc.msg.tooLow") + "</b>, " + SYSTools.xx("opde.welcome.lowin") +
                         ": " + lowin.setScale(2, RoundingMode.HALF_UP).toPlainString() + " ml</td>";
             }
 
@@ -385,18 +385,18 @@ public class PnlWelcome extends CleanablePanel {
     private DefaultCPTitle createCP4Birthdays(final Resident resident, int newAge, int days2Birthday) {
 
 
-        String textInTheMiddle = OPDE.lang.getString("opde.welcome.becomesindays") + " " + days2Birthday + " " + OPDE.lang.getString("misc.msg.Days");
+        String textInTheMiddle = SYSTools.xx("opde.welcome.becomesindays") + " " + days2Birthday + " " + SYSTools.xx("misc.msg.Days");
         if (days2Birthday == 1) {
-            textInTheMiddle = OPDE.lang.getString("misc.msg.becomes") + " " + OPDE.lang.getString("misc.msg.tomorrow");
+            textInTheMiddle = SYSTools.xx("misc.msg.becomes") + " " + SYSTools.xx("misc.msg.tomorrow");
         } else if (days2Birthday == 0) {
-            textInTheMiddle = OPDE.lang.getString("misc.msg.becomes") + " " + OPDE.lang.getString("misc.msg.today");
+            textInTheMiddle = SYSTools.xx("misc.msg.becomes") + " " + SYSTools.xx("misc.msg.today");
         }
 
         String title = "<html><table border=\"0\">" +
                 "<tr valign=\"top\">" +
                 "<td width=\"100\" align=\"left\">" + DateFormat.getDateInstance().format(resident.getDOB()) + "</td>" +
                 "<td width=\"400\" align=\"left\">" +
-                "<b>" + ResidentTools.getTextCompact(resident) + "</b> " + textInTheMiddle + " " + newAge + " " + OPDE.lang.getString("opde.welcome.yearsold") +
+                "<b>" + ResidentTools.getTextCompact(resident) + "</b> " + textInTheMiddle + " " + newAge + " " + SYSTools.xx("opde.welcome.yearsold") +
                 "</td>" +
                 "</tr>" +
                 "</table>" +
@@ -495,7 +495,7 @@ public class PnlWelcome extends CleanablePanel {
         mypanel.setLayout(new VerticalLayout());
         mypanel.setBackground(Color.WHITE);
 
-        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
+        CollapsiblePane searchPane = new CollapsiblePane(SYSTools.xx(internalClassID));
         searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
         searchPane.setCollapsible(false);
 
@@ -600,7 +600,7 @@ public class PnlWelcome extends CleanablePanel {
         java.util.List<Component> list = new ArrayList<Component>();
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlInformation.internalClassID)) { // => ACLMATRIX
-            JideButton addbw = GUITools.createHyperlinkButton(OPDE.lang.getString("opde.welcome.addbw"), SYSConst.icon22addbw, null);
+            JideButton addbw = GUITools.createHyperlinkButton(SYSTools.xx("opde.welcome.addbw"), SYSConst.icon22addbw, null);
 //            final MyJDialog dlg = new MyJDialog();
             addbw.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
 
@@ -627,7 +627,7 @@ public class PnlWelcome extends CleanablePanel {
 
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, PnlNursingProcess.internalClassID)) {
-            JideButton editInterventions = GUITools.createHyperlinkButton(OPDE.lang.getString("opde.welcome.editInterventions"), SYSConst.icon22work, null);
+            JideButton editInterventions = GUITools.createHyperlinkButton(SYSTools.xx("opde.welcome.editInterventions"), SYSConst.icon22work, null);
             //            final MyJDialog dlg = new MyJDialog();
             editInterventions.addMouseListener(GUITools.getHyperlinkStyleMouseAdapter());
             editInterventions.setAlignmentX(Component.LEFT_ALIGNMENT);

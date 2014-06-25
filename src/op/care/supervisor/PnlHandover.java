@@ -111,9 +111,9 @@ public class PnlHandover extends NursingRecordsPanel {
     private java.util.List<Component> addKey() {
         java.util.List<Component> list = new ArrayList<Component>();
         list.add(new JSeparator());
-        list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription1"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString(internalClassID + ".keydescription2"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
+        list.add(new JLabel(SYSTools.xx("misc.msg.key")));
+        list.add(new JLabel(SYSTools.xx(internalClassID + ".keydescription1"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
+        list.add(new JLabel(SYSTools.xx(internalClassID + ".keydescription2"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
         return list;
     }
 
@@ -140,7 +140,7 @@ public class PnlHandover extends NursingRecordsPanel {
 //        linemapHO = Collections.synchronizedMap(new HashMap<Handovers, JPanel>());
         cacheHO = Collections.synchronizedMap(new HashMap<String, ArrayList<Handovers>>());
         cacheNR = Collections.synchronizedMap(new HashMap<String, ArrayList<NReport>>());
-        OPDE.getDisplayManager().setMainMessage(OPDE.lang.getString(internalClassID));
+        OPDE.getDisplayManager().setMainMessage(SYSTools.xx(internalClassID));
         prepareSearchArea();
     }
 
@@ -184,7 +184,7 @@ public class PnlHandover extends NursingRecordsPanel {
         mypanel.setLayout(new VerticalLayout(2));
         mypanel.setBackground(Color.WHITE);
 
-        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
+        CollapsiblePane searchPane = new CollapsiblePane(SYSTools.xx(internalClassID));
         searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
         searchPane.setCollapsible(false);
 
@@ -522,7 +522,7 @@ public class PnlHandover extends NursingRecordsPanel {
 
         final JButton btnAcknowledge = new JButton(SYSConst.icon163ledGreenOn);
         btnAcknowledge.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        btnAcknowledge.setToolTipText(OPDE.lang.getString(internalClassID + ".tooltips.btnAcknowledge"));
+        btnAcknowledge.setToolTipText(SYSTools.xx(internalClassID + ".tooltips.btnAcknowledge"));
         btnAcknowledge.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -620,7 +620,7 @@ public class PnlHandover extends NursingRecordsPanel {
         final JPanel dayPanel = new JPanel(new VerticalLayout());
 
 
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
         OPDE.getMainframe().setBlocked(true);
 
         SwingWorker worker = new SwingWorker() {
@@ -639,12 +639,12 @@ public class PnlHandover extends NursingRecordsPanel {
                 int max = listHO.size() + listNR.size();
                 int i = 0; // for zebra pattern and progress
                 for (final Handovers handover : listHO) {
-                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), i, max));
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), i, max));
 
                     String title = "<html><table border=\"0\">" +
                             "<tr valign=\"top\">" +
                             "<td width=\"100\" align=\"left\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(handover.getPit()) +
-                            " " + OPDE.lang.getString("misc.msg.Time.short") +
+                            " " + SYSTools.xx("misc.msg.Time.short") +
                             "</td>" +
                             "<td width=\"100\" align=\"center\">--</td>" +
                             "<td width=\"400\" align=\"left\">" +
@@ -704,7 +704,7 @@ public class PnlHandover extends NursingRecordsPanel {
                     btnInfo.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
                             OPDE.getMainframe().setBlocked(true);
 
                             SwingWorker worker = new SwingWorker() {
@@ -747,14 +747,14 @@ public class PnlHandover extends NursingRecordsPanel {
                     dayPanel.add(zebra);
                 }
                 for (final NReport nreport : listNR) {
-                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), i, max));
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), i, max));
 
 
                     String title = "<html><table border=\"0\">" +
                             "<tr valign=\"top\">" +
                             "<td width=\"100\" align=\"left\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
-                            " " + OPDE.lang.getString("misc.msg.Time.short") +
-                            "<br/>" + nreport.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)") +
+                            " " + SYSTools.xx("misc.msg.Time.short") +
+                            "<br/>" + nreport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)") +
                             "</td>" +
                             "<td width=\"100\" align=\"left\">" + ResidentTools.getTextCompact(nreport.getResident()) + "</td>" +
                             "<td width=\"400\" align=\"left\">" +
@@ -814,7 +814,7 @@ public class PnlHandover extends NursingRecordsPanel {
                     btnInfo.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
                             OPDE.getMainframe().setBlocked(true);
 
                             SwingWorker worker = new SwingWorker() {
@@ -917,7 +917,7 @@ public class PnlHandover extends NursingRecordsPanel {
          *
          */
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.INSERT, internalClassID)) {
-            JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".tooltips.btnadd"), SYSConst.icon22add, new ActionListener() {
+            JideButton addButton = GUITools.createHyperlinkButton(SYSTools.xx(internalClassID + ".tooltips.btnadd"), SYSConst.icon22add, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     new DlgHOReport(new Handovers((Homes) cmbHomes.getSelectedItem()), new Closure() {
@@ -970,7 +970,7 @@ public class PnlHandover extends NursingRecordsPanel {
             list.add(addButton);
         }
 
-        final JideButton btnControllingToday = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".tooltips.btnControllingToday"), SYSConst.icon22magnify1, null);
+        final JideButton btnControllingToday = GUITools.createHyperlinkButton(SYSTools.xx(internalClassID + ".tooltips.btnControllingToday"), SYSConst.icon22magnify1, null);
         btnControllingToday.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -985,7 +985,7 @@ public class PnlHandover extends NursingRecordsPanel {
         });
         list.add(btnControllingToday);
 
-        final JideButton btnControllingYesterday = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".tooltips.btnControllingYesterday"), SYSConst.icon22magnify1, null);
+        final JideButton btnControllingYesterday = GUITools.createHyperlinkButton(SYSTools.xx(internalClassID + ".tooltips.btnControllingYesterday"), SYSConst.icon22magnify1, null);
         btnControllingYesterday.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -1017,7 +1017,7 @@ public class PnlHandover extends NursingRecordsPanel {
             JPanel innerPanel = new JPanel();
             innerPanel.setOpaque(false);
             innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.PAGE_AXIS));
-            txtSearch = new JXSearchField(OPDE.lang.getString("misc.msg.searchphrase"));
+            txtSearch = new JXSearchField(SYSTools.xx("misc.msg.searchphrase"));
             txtSearch.setInstantSearchDelay(100000);
             txtSearch.setFont(SYSConst.ARIAL14);
             txtSearch.addActionListener(new ActionListener() {

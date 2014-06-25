@@ -138,7 +138,7 @@ public class MedStockTools {
             if (days >= 7) {
                 weeks = days / 7;
             }
-            String exp = weeks > 0 ? weeks + OPDE.lang.getString("misc.msg.weeks").substring(0, 1).toUpperCase() : days + OPDE.lang.getString("misc.msg.Days").substring(0, 1).toUpperCase();
+            String exp = weeks > 0 ? weeks + SYSTools.xx("misc.msg.weeks").substring(0, 1).toUpperCase() : days + SYSTools.xx("misc.msg.Days").substring(0, 1).toUpperCase();
             hm.put("medstock.tradeform.expires.after.opened", "!!" + exp);
         }
 
@@ -336,7 +336,7 @@ public class MedStockTools {
         result += "<font color=\"blue\"><b>" + bestand.getTradeForm().getMedProduct().getText() + " " + bestand.getTradeForm().getSubtext() + ", ";
 
         if (bestand.getPackage() != null && !SYSTools.catchNull(bestand.getPackage().getPzn()).isEmpty()) {
-            result += OPDE.lang.getString("misc.msg.PZN") + ": " + bestand.getPackage().getPzn() + ", ";
+            result += SYSTools.xx("misc.msg.PZN") + ": " + bestand.getPackage().getPzn() + ", ";
             result += MedPackageTools.GROESSE[bestand.getPackage().getSize()] + ", " + bestand.getPackage().getContent() + " " + SYSConst.UNITS[bestand.getTradeForm().getDosageForm().getPackUnit()] + " ";
             String zubereitung = SYSTools.catchNull(bestand.getTradeForm().getDosageForm().getPreparation());
             String anwtext = SYSTools.catchNull(bestand.getTradeForm().getDosageForm().getUsageText());
@@ -363,29 +363,29 @@ public class MedStockTools {
         if (stock.getTradeForm().getDosageForm().isUPRn()) {
             result += ", APV: ";
             if (stock.getTradeForm().getUPR() != null) {
-                result += stock.getTradeForm().getUPR().setScale(2, RoundingMode.HALF_UP).toString() + " (" + OPDE.lang.getString(DlgUPREditor.internalClassID + ".constant.upr") + ")";
+                result += stock.getTradeForm().getUPR().setScale(2, RoundingMode.HALF_UP).toString() + " (" + SYSTools.xx(DlgUPREditor.internalClassID + ".constant.upr") + ")";
             } else {
                 result += stock.getUPR().setScale(2, RoundingMode.HALF_UP).toString();
             }
-            result += " " + (stock.getUPRDummyMode() == REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING && stock.getTradeForm().getUPR() != null ? OPDE.lang.getString(PnlInventory.internalClassID + ".UPRwillBeReplaced") : "");
+            result += " " + (stock.getUPRDummyMode() == REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING && stock.getTradeForm().getUPR() != null ? SYSTools.xx(PnlInventory.internalClassID + ".UPRwillBeReplaced") : "");
         }
 
         if (stock.hasNext2Open()) {
-            result += ", <b>" + OPDE.lang.getString(PnlInventory.internalClassID + ".nextstock") + ": " + stock.getNextStock().getID() + "</b>";
+            result += ", <b>" + SYSTools.xx(PnlInventory.internalClassID + ".nextstock") + ": " + stock.getNextStock().getID() + "</b>";
         } else if (stock.isToBeClosedSoon()) {
-            result += ", <b>" + OPDE.lang.getString(PnlInventory.internalClassID + ".stockWillBeClosedSoon") + "</b>";
+            result += ", <b>" + SYSTools.xx(PnlInventory.internalClassID + ".stockWillBeClosedSoon") + "</b>";
         }
 
         DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
 
-        result += "&nbsp;<font color=\"blue\">" + OPDE.lang.getString("misc.msg.incoming") + ": " + df.format(stock.getIN()) + "</font>";
+        result += "&nbsp;<font color=\"blue\">" + SYSTools.xx("misc.msg.incoming") + ": " + df.format(stock.getIN()) + "</font>";
         if (stock.isOpened()) {
-            result += "&nbsp;<font color=\"green\">" + OPDE.lang.getString("misc.msg.opening") + ": " + df.format(stock.getOpened()) + "</font>";
+            result += "&nbsp;<font color=\"green\">" + SYSTools.xx("misc.msg.opening") + ": " + df.format(stock.getOpened()) + "</font>";
 
             // variable expiry ?
             if (stock.getTradeForm().getDaysToExpireAfterOpened() != null) {
                 String color = stock.isExpired() ? "red" : "black";
-                result += "&nbsp;<font color=\"" + color + "\">" + OPDE.lang.getString("misc.msg.expiresAfterOpened") + ": " + df.format(new DateTime(stock.getOpened()).plusDays(stock.getTradeForm().getDaysToExpireAfterOpened()).toDate()) + "</font>";
+                result += "&nbsp;<font color=\"" + color + "\">" + SYSTools.xx("misc.msg.expiresAfterOpened") + ": " + df.format(new DateTime(stock.getOpened()).plusDays(stock.getTradeForm().getDaysToExpireAfterOpened()).toDate()) + "</font>";
             }
 
         }
@@ -399,11 +399,11 @@ public class MedStockTools {
             if (new DateMidnight(stock.getExpires()).equals(new DateMidnight(stock.getExpires()).dayOfMonth().withMaximumValue())) {
                 sdf = new SimpleDateFormat("MM/yy");
             }
-            result += "&nbsp;<font color=\"" + color + "\">" + OPDE.lang.getString("misc.msg.expires") + ": " + sdf.format(stock.getExpires()) + "</font>";
+            result += "&nbsp;<font color=\"" + color + "\">" + SYSTools.xx("misc.msg.expires") + ": " + sdf.format(stock.getExpires()) + "</font>";
         }
 
         if (stock.isClosed()) {
-            result += SYSConst.html_bold("&nbsp;<font color=\"black\">" + OPDE.lang.getString("misc.msg.outgoing") + ": " + df.format(stock.getOut()) + "</font>");
+            result += SYSConst.html_bold("&nbsp;<font color=\"black\">" + SYSTools.xx("misc.msg.outgoing") + ": " + df.format(stock.getOut()) + "</font>");
         }
         result += "</font>";
 
@@ -419,7 +419,7 @@ public class MedStockTools {
 //        if (stock.hasPackage()) {
 //            result += ", " + MedPackageTools.toPrettyString(stock.getPackage());
 //        }
-//        result += ", APV: " + NumberFormat.getNumberInstance().format(stock.getUPR()) + " " + (stock.isDummyUPR() ? OPDE.lang.getString(PnlInventory.internalClassID + ".UPRwillBeReplaced") : "");
+//        result += ", APV: " + NumberFormat.getNumberInstance().format(stock.getUPR()) + " " + (stock.isDummyUPR() ? SYSTools.xx(PnlInventory.internalClassID + ".UPRwillBeReplaced") : "");
 //        return result;
 //    }
 
@@ -463,7 +463,7 @@ public class MedStockTools {
         DateFormat df = DateFormat.getDateInstance();
 
         html.append(SYSConst.html_h1(PnlControlling.internalClassID + ".drugs.controllist"));
-        html.append(SYSConst.html_h2(OPDE.lang.getString("misc.msg.subdivision") + ": " + station.getName()));
+        html.append(SYSConst.html_h2(SYSTools.xx("misc.msg.subdivision") + ": " + station.getName()));
         html.append(SYSConst.html_h3("misc.msg.key"));
         html.append(SYSConst.html_ul(
                 SYSConst.html_li(PnlControlling.internalClassID + ".drugs.controllist.key.1") +

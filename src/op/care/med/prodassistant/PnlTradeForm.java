@@ -51,12 +51,12 @@ public class PnlTradeForm extends JPanel {
         this.product = product;
         if (!product.getTradeforms().isEmpty()) {
             ArrayList model = new ArrayList(product.getTradeforms());
-            model.add(0, "<html><b>" + OPDE.lang.getString("misc.msg.noneOfThem") + "</b></html>");
+            model.add(0, "<html><b>" + SYSTools.xx("misc.msg.noneOfThem") + "</b></html>");
             DefaultListModel lmDaf = SYSTools.list2dlm(model);
             lstDaf.setModel(lmDaf);
             lstDaf.setCellRenderer(TradeFormTools.getRenderer(TradeFormTools.LONG));
         }
-        lblMsg.setText(OPDE.lang.getString(internalClassID + ".existingTradeforms"));
+        lblMsg.setText(SYSTools.xx(internalClassID + ".existingTradeforms"));
         lblMsg.setVisible(!product.getTradeforms().isEmpty());
         jsp1.setVisible(!product.getTradeforms().isEmpty());
         lstDaf.setVisible(!product.getTradeforms().isEmpty());
@@ -80,16 +80,16 @@ public class PnlTradeForm extends JPanel {
         cmbFormen.setRenderer(DosageFormTools.getRenderer(0));
         em.close();
 
-        cmbDaysWeeks.setModel(new DefaultComboBoxModel(new String[]{OPDE.lang.getString("misc.msg.Days"), OPDE.lang.getString("misc.msg.weeks")}));
+        cmbDaysWeeks.setModel(new DefaultComboBoxModel(new String[]{SYSTools.xx("misc.msg.Days"), SYSTools.xx("misc.msg.weeks")}));
 
         dosageForm = (DosageForm) cmbFormen.getSelectedItem();
-        cbExpiresAfterOpened.setText(OPDE.lang.getString("tradeform.subtext.expiresAfterOpenedIn"));
+        cbExpiresAfterOpened.setText(SYSTools.xx("tradeform.subtext.expiresAfterOpenedIn"));
         cbExpiresAfterOpened.setSelected(false);
         tradeForm = new TradeForm(product, "", dosageForm);
 
         rbCalcUPR.setSelected(true);
-        rbCalcUPR.setText(OPDE.lang.getString(internalClassID + ".calcUPR"));
-        rbSetUPR.setText(OPDE.lang.getString(internalClassID + ".setUPR"));
+        rbCalcUPR.setText(SYSTools.xx(internalClassID + ".calcUPR"));
+        rbSetUPR.setText(SYSTools.xx(internalClassID + ".setUPR"));
         txtUPR.setText("10");
         txtUPR.setEnabled(false);
         pnlUPR.setVisible(false);
@@ -134,7 +134,7 @@ public class PnlTradeForm extends JPanel {
 
         // selection of constant UPR ?
         if (dosageForm.isUPRn()) {
-            lblTo1.setText(" " + SYSConst.UNITS[dosageForm.getUsageUnit()] + " " + OPDE.lang.getString("misc.msg.to1") + " " + SYSConst.UNITS[dosageForm.getPackUnit()]);
+            lblTo1.setText(" " + SYSConst.UNITS[dosageForm.getUsageUnit()] + " " + SYSTools.xx("misc.msg.to1") + " " + SYSConst.UNITS[dosageForm.getPackUnit()]);
             pnlUPR.setVisible(true);
             rbCalcUPR.setSelected(true);
         } else {

@@ -86,13 +86,13 @@ public class TMSYSFiles extends AbstractTableModel {
         SYSFiles sysfile = mymodel.get(row);
         String result = "";
 
-        result += sysfile.getNrAssignCollection().isEmpty() ? "" : OPDE.lang.getString("nursingrecords.reports") + " " + sysfile.getNrAssignCollection().size() + ", ";
-        result += sysfile.getBwiAssignCollection().isEmpty() ? "" : OPDE.lang.getString("nursingrecords.info") + " " + sysfile.getBwiAssignCollection().size() + ", ";
-        result += sysfile.getPreAssignCollection().isEmpty() ? "" : OPDE.lang.getString("nursingrecords.prescription") + " " + sysfile.getPreAssignCollection().size() + ", ";
+        result += sysfile.getNrAssignCollection().isEmpty() ? "" : SYSTools.xx("nursingrecords.reports") + " " + sysfile.getNrAssignCollection().size() + ", ";
+        result += sysfile.getBwiAssignCollection().isEmpty() ? "" : SYSTools.xx("nursingrecords.info") + " " + sysfile.getBwiAssignCollection().size() + ", ";
+        result += sysfile.getPreAssignCollection().isEmpty() ? "" : SYSTools.xx("nursingrecords.prescription") + " " + sysfile.getPreAssignCollection().size() + ", ";
 
-        String html = OPDE.lang.getString(PnlFiles.internalClassID+".Attachments")+": ";
+        String html = SYSTools.xx(PnlFiles.internalClassID+".Attachments")+": ";
         if (result.isEmpty()) {
-            html += html = OPDE.lang.getString("misc.msg.none");
+            html += html = SYSTools.xx("misc.msg.none");
         } else {
             html += result; //result.substring(0, result.length() - 3);
         }
@@ -111,7 +111,7 @@ public class TMSYSFiles extends AbstractTableModel {
             case 1: {
                 value += SYSConst.html_fontface;
                 value += mymodel.get(row).getFilename() + ", ";
-                value += OPDE.lang.getString("misc.msg.Size") + ": " + BigDecimal.valueOf(mymodel.get(row).getFilesize()).divide(new BigDecimal(1048576), 2, BigDecimal.ROUND_HALF_UP) + " mb";
+                value += SYSTools.xx("misc.msg.Size") + ": " + BigDecimal.valueOf(mymodel.get(row).getFilesize()).divide(new BigDecimal(1048576), 2, BigDecimal.ROUND_HALF_UP) + " mb";
 //                value += ", " + getAttachmentsAsHTML(row);
                 value += "</font>";
                 break;

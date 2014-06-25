@@ -51,19 +51,19 @@ public class PnlCare extends NursingRecordsPanel {
 
     private boolean initPhase;
     private String[] tabs = new String[]{
-            OPDE.lang.getString("nursingrecords.main.tab1"),
-            OPDE.lang.getString("nursingrecords.main.tab2"),
-            OPDE.lang.getString("nursingrecords.main.tab3"),
-            OPDE.lang.getString("nursingrecords.main.tab4"),
-            OPDE.lang.getString("nursingrecords.main.tab4a"),
-            OPDE.lang.getString("nursingrecords.main.tab5"),
-            OPDE.lang.getString("nursingrecords.main.tab6"),
-            OPDE.lang.getString("nursingrecords.main.tab7"),
-            OPDE.lang.getString("nursingrecords.main.tab8"),
-            OPDE.lang.getString("nursingrecords.main.tab9"),
-            OPDE.lang.getString("nursingrecords.main.tab10"),
-            OPDE.lang.getString("nursingrecords.main.tab11")
-//            OPDE.lang.getString("nursingrecords.main.tab12")
+            SYSTools.xx("nursingrecords.main.tab1"),
+            SYSTools.xx("nursingrecords.main.tab2"),
+            SYSTools.xx("nursingrecords.main.tab3"),
+            SYSTools.xx("nursingrecords.main.tab4"),
+            SYSTools.xx("nursingrecords.main.tab4a"),
+            SYSTools.xx("nursingrecords.main.tab5"),
+            SYSTools.xx("nursingrecords.main.tab6"),
+            SYSTools.xx("nursingrecords.main.tab7"),
+            SYSTools.xx("nursingrecords.main.tab8"),
+            SYSTools.xx("nursingrecords.main.tab9"),
+            SYSTools.xx("nursingrecords.main.tab10"),
+            SYSTools.xx("nursingrecords.main.tab11")
+//            SYSTools.xx("nursingrecords.main.tab12")
     };
     private Resident resident = null;
     private CollapsiblePanes searchPanes;

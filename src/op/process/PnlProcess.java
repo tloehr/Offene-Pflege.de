@@ -203,7 +203,7 @@ public class PnlProcess extends NursingRecordsPanel {
             btnPrint.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnPrint.setContentAreaFilled(false);
             btnPrint.setBorder(null);
-            btnPrint.setToolTipText(OPDE.lang.getString("nursingrecords.qprocesses.btnrevision.tooltip"));
+            btnPrint.setToolTipText(SYSTools.xx("nursingrecords.qprocesses.btnrevision.tooltip"));
             btnPrint.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -309,7 +309,7 @@ public class PnlProcess extends NursingRecordsPanel {
                         public void actionPerformed(ActionEvent evt) {
 
                             if (editor.getText().trim().isEmpty()) {
-                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.emptyentry")));
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.emptyentry")));
                                 return;
                             }
 
@@ -439,11 +439,11 @@ public class PnlProcess extends NursingRecordsPanel {
         btnUnlink.setContentAreaFilled(false);
         btnUnlink.setOpaque(false);
         btnUnlink.setBorder(null);
-        btnUnlink.setToolTipText(OPDE.lang.getString("nursingrecords.qprocesses.btnunlink.tooltip"));
+        btnUnlink.setToolTipText(SYSTools.xx("nursingrecords.qprocesses.btnunlink.tooltip"));
         btnUnlink.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                new DlgYesNo(OPDE.lang.getString("nursingrecords.qprocesses.question.unlink") + "<p>" + element.getContentAsHTML() + "</p>", SYSConst.icon48delete, new Closure() {
+                new DlgYesNo(SYSTools.xx("nursingrecords.qprocesses.question.unlink") + "<p>" + element.getContentAsHTML() + "</p>", SYSConst.icon48delete, new Closure() {
                     @Override
                     public void execute(Object answer) {
                         if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -579,11 +579,11 @@ public class PnlProcess extends NursingRecordsPanel {
     private java.util.List<Component> addKey() {
         java.util.List<Component> list = new ArrayList<Component>();
         list.add(new JSeparator());
-        list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.qprocesses.keydescription1"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.qprocesses.keydescription2"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.qprocesses.keydescription3"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.qprocesses.keydescription4"), SYSConst.icon22stopSign, SwingConstants.LEADING));
+        list.add(new JLabel(SYSTools.xx("misc.msg.key")));
+        list.add(new JLabel(SYSTools.xx("nursingrecords.qprocesses.keydescription1"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
+        list.add(new JLabel(SYSTools.xx("nursingrecords.qprocesses.keydescription2"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
+        list.add(new JLabel(SYSTools.xx("nursingrecords.qprocesses.keydescription3"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
+        list.add(new JLabel(SYSTools.xx("nursingrecords.qprocesses.keydescription4"), SYSConst.icon22stopSign, SwingConstants.LEADING));
 
 //        if (qProcess.isRevisionPastDue()) {
 //                   cptitle.getButton().setIcon(SYSConst.icon22ledRedOn);
@@ -607,7 +607,7 @@ public class PnlProcess extends NursingRecordsPanel {
         mypanel.setLayout(new VerticalLayout());
         mypanel.setBackground(Color.WHITE);
 
-        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
+        CollapsiblePane searchPane = new CollapsiblePane(SYSTools.xx(internalClassID));
         searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
         searchPane.setCollapsible(false);
 
@@ -703,7 +703,7 @@ public class PnlProcess extends NursingRecordsPanel {
                 });
                 list.add(cmbPCat);
 
-                final JideButton btnAll = GUITools.createHyperlinkButton(OPDE.lang.getString("nursingrecords.qprocesses.btnallactive"), SYSConst.icon22link, new ActionListener() {
+                final JideButton btnAll = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.qprocesses.btnallactive"), SYSConst.icon22link, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         processList = QProcessTools.getAllActive();
@@ -721,7 +721,7 @@ public class PnlProcess extends NursingRecordsPanel {
                 });
                 list.add(btnAll);
 
-                final JideButton btnRunningOut = GUITools.createHyperlinkButton(OPDE.lang.getString("nursingrecords.qprocesses.btnrunningout"), SYSConst.icon22clock, new ActionListener() {
+                final JideButton btnRunningOut = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.qprocesses.btnrunningout"), SYSConst.icon22clock, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         processList = QProcessTools.getProcessesRunningOutIn(5);
@@ -740,7 +740,7 @@ public class PnlProcess extends NursingRecordsPanel {
                 list.add(btnRunningOut);
             }
 
-            final JideButton btnMyProcesses = GUITools.createHyperlinkButton(OPDE.lang.getString("nursingrecords.qprocesses.btnmyprocesses"), SYSConst.icon22myself, new ActionListener() {
+            final JideButton btnMyProcesses = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.qprocesses.btnmyprocesses"), SYSConst.icon22myself, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     initPhase = true;
@@ -767,7 +767,7 @@ public class PnlProcess extends NursingRecordsPanel {
          *      \__|_.__/ \____|_|\___/|___/\___|\__,_|
          *
          */
-        tbClosed = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.filters.showclosed"));
+        tbClosed = GUITools.getNiceToggleButton(SYSTools.xx("misc.filters.showclosed"));
         tbClosed.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
@@ -787,7 +787,7 @@ public class PnlProcess extends NursingRecordsPanel {
          *      \__|_.__/____/ \__, |___/\__\___|_| |_| |_|
          *                     |___/
          */
-        tbSystem = GUITools.getNiceToggleButton(OPDE.lang.getString("nursingrecords.qprocesses.tbsystem.text"));
+        tbSystem = GUITools.getNiceToggleButton(SYSTools.xx("nursingrecords.qprocesses.tbsystem.text"));
         tbSystem.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
@@ -824,7 +824,7 @@ public class PnlProcess extends NursingRecordsPanel {
             }
         }
         if (empty) {
-            CollapsiblePane emptyPane = new CollapsiblePane(OPDE.lang.getString("misc.msg.nodata"));
+            CollapsiblePane emptyPane = new CollapsiblePane(SYSTools.xx("misc.msg.nodata"));
             emptyPane.setCollapsible(false);
             cpProcess.add(emptyPane);
         }
@@ -844,7 +844,7 @@ public class PnlProcess extends NursingRecordsPanel {
          *
          */
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
-            final JideButton btnAdd = GUITools.createHyperlinkButton(OPDE.lang.getString("nursingrecords.qprocesses.btnadd"), SYSConst.icon22add, null);
+            final JideButton btnAdd = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.qprocesses.btnadd"), SYSConst.icon22add, null);
             btnAdd.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -900,7 +900,7 @@ public class PnlProcess extends NursingRecordsPanel {
                 btnClose.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        new DlgYesNo(OPDE.lang.getString("nursingrecords.qprocesses.question.close") + "<p>" + qProcess.getTitle() + "</p>", SYSConst.icon48playerStop, new Closure() {
+                        new DlgYesNo(SYSTools.xx("nursingrecords.qprocesses.question.close") + "<p>" + qProcess.getTitle() + "</p>", SYSConst.icon48playerStop, new Closure() {
                             @Override
                             public void execute(Object answer) {
                                 if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -914,7 +914,7 @@ public class PnlProcess extends NursingRecordsPanel {
                                         }
                                         em.lock(myProcess, LockModeType.OPTIMISTIC);
 
-                                        PReport pReport = em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_CLOSE), PReportTools.PREPORT_TYPE_CLOSE, myProcess));
+                                        PReport pReport = em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_CLOSE), PReportTools.PREPORT_TYPE_CLOSE, myProcess));
 
                                         myProcess.setTo(new Date());
                                         myProcess.getPReports().add(pReport);
@@ -963,7 +963,7 @@ public class PnlProcess extends NursingRecordsPanel {
                 btnReopen.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        new DlgYesNo(OPDE.lang.getString("nursingrecords.qprocesses.question.reopen") + "<p>" + qProcess.getTitle() + "</p>", SYSConst.icon48play, new Closure() {
+                        new DlgYesNo(SYSTools.xx("nursingrecords.qprocesses.question.reopen") + "<p>" + qProcess.getTitle() + "</p>", SYSConst.icon48play, new Closure() {
                             @Override
                             public void execute(Object answer) {
                                 if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -976,7 +976,7 @@ public class PnlProcess extends NursingRecordsPanel {
                                             em.lock(em.merge(myProcess.getResident()), LockModeType.OPTIMISTIC);
                                         }
                                         em.lock(myProcess, LockModeType.OPTIMISTIC);
-                                        PReport pReport = em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_REOPEN), PReportTools.PREPORT_TYPE_REOPEN, qProcess));
+                                        PReport pReport = em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REOPEN), PReportTools.PREPORT_TYPE_REOPEN, qProcess));
                                         myProcess.setTo(SYSConst.DATE_UNTIL_FURTHER_NOTICE);
                                         myProcess.getPReports().add(pReport);
                                         em.getTransaction().commit();
@@ -1027,7 +1027,7 @@ public class PnlProcess extends NursingRecordsPanel {
             btnDelete.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgYesNo(OPDE.lang.getString("nursingrecords.qprocesses.question.delete") + "<p>" + qProcess.getTitle() + "</p>", SYSConst.icon48delete, new Closure() {
+                    new DlgYesNo(SYSTools.xx("nursingrecords.qprocesses.question.delete") + "<p>" + qProcess.getTitle() + "</p>", SYSConst.icon48delete, new Closure() {
                         @Override
                         public void execute(Object answer) {
                             if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -1116,7 +1116,7 @@ public class PnlProcess extends NursingRecordsPanel {
                         public void actionPerformed(ActionEvent evt) {
 
                             if (editor.getDate() == null) {
-                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wrongentry")));
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.wrongentry")));
                                 return;
                             }
 
@@ -1128,7 +1128,7 @@ public class PnlProcess extends NursingRecordsPanel {
                                     em.lock(em.merge(myProcess.getResident()), LockModeType.OPTIMISTIC);
                                 }
                                 em.lock(myProcess, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                                PReport pReport = new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_WV) + ": " + DateFormat.getDateInstance().format(editor.getDate()), PReportTools.PREPORT_TYPE_WV, myProcess);
+                                PReport pReport = new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_WV) + ": " + DateFormat.getDateInstance().format(editor.getDate()), PReportTools.PREPORT_TYPE_WV, myProcess);
                                 myProcess.setRevision(editor.getDate());
                                 myProcess.getPReports().add(pReport);
                                 em.getTransaction().commit();
@@ -1200,13 +1200,13 @@ public class PnlProcess extends NursingRecordsPanel {
                  *     |_|   |____/ \____/_/   \_\
                  *
                  */
-                final JPopupMenu pdcaMenu = new JPopupMenu(OPDE.lang.getString("nursingrecords.qprocesses.set.pdca"));
+                final JPopupMenu pdcaMenu = new JPopupMenu(SYSTools.xx("nursingrecords.qprocesses.set.pdca"));
 
-                JMenuItem pdca_plan = new JMenuItem(OPDE.lang.getString("nursingrecords.qprocesses.set.pdca.plan"));
+                JMenuItem pdca_plan = new JMenuItem(SYSTools.xx("nursingrecords.qprocesses.set.pdca.plan"));
                 pdca_plan.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        new DlgYesNo(OPDE.lang.getString("misc.msg.are.you.sure"), null, new Closure() {
+                        new DlgYesNo(SYSTools.xx("misc.msg.are.you.sure"), null, new Closure() {
                             @Override
                             public void execute(Object answer) {
                                 if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -1219,11 +1219,11 @@ public class PnlProcess extends NursingRecordsPanel {
                 pdca_plan.setEnabled(!qProcess.isPDCA() || qProcess.getPDCA() == QProcessTools.PDCA_ACT);
                 pdcaMenu.add(pdca_plan);
 
-                JMenuItem pdca_do = new JMenuItem(OPDE.lang.getString("nursingrecords.qprocesses.set.pdca.do"));
+                JMenuItem pdca_do = new JMenuItem(SYSTools.xx("nursingrecords.qprocesses.set.pdca.do"));
                 pdca_do.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        new DlgYesNo(OPDE.lang.getString("misc.msg.are.you.sure"), null, new Closure() {
+                        new DlgYesNo(SYSTools.xx("misc.msg.are.you.sure"), null, new Closure() {
                             @Override
                             public void execute(Object answer) {
                                 if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -1236,11 +1236,11 @@ public class PnlProcess extends NursingRecordsPanel {
                 pdca_do.setEnabled(qProcess.isPDCA() && qProcess.getPDCA() == QProcessTools.PDCA_PLAN);
                 pdcaMenu.add(pdca_do);
 
-                JMenuItem pdca_check = new JMenuItem(OPDE.lang.getString("nursingrecords.qprocesses.set.pdca.check"));
+                JMenuItem pdca_check = new JMenuItem(SYSTools.xx("nursingrecords.qprocesses.set.pdca.check"));
                 pdca_check.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        new DlgYesNo(OPDE.lang.getString("misc.msg.are.you.sure"), null, new Closure() {
+                        new DlgYesNo(SYSTools.xx("misc.msg.are.you.sure"), null, new Closure() {
                             @Override
                             public void execute(Object answer) {
                                 if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -1253,11 +1253,11 @@ public class PnlProcess extends NursingRecordsPanel {
                 pdca_check.setEnabled(qProcess.isPDCA() && qProcess.getPDCA() == QProcessTools.PDCA_DO);
                 pdcaMenu.add(pdca_check);
 
-                JMenuItem pdca_act = new JMenuItem(OPDE.lang.getString("nursingrecords.qprocesses.set.pdca.act"));
+                JMenuItem pdca_act = new JMenuItem(SYSTools.xx("nursingrecords.qprocesses.set.pdca.act"));
                 pdca_act.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        new DlgYesNo(OPDE.lang.getString("misc.msg.are.you.sure"), null, new Closure() {
+                        new DlgYesNo(SYSTools.xx("misc.msg.are.you.sure"), null, new Closure() {
                             @Override
                             public void execute(Object answer) {
                                 if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -1271,11 +1271,11 @@ public class PnlProcess extends NursingRecordsPanel {
                 pdcaMenu.add(pdca_act);
 
                 pdcaMenu.add(new JSeparator());
-                JMenuItem pdca_clear = new JMenuItem(OPDE.lang.getString("nursingrecords.qprocesses.clear.pdca"));
+                JMenuItem pdca_clear = new JMenuItem(SYSTools.xx("nursingrecords.qprocesses.clear.pdca"));
                 pdca_clear.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        new DlgYesNo(OPDE.lang.getString("misc.msg.are.you.sure"), null, new Closure() {
+                        new DlgYesNo(SYSTools.xx("misc.msg.are.you.sure"), null, new Closure() {
                             @Override
                             public void execute(Object answer) {
                                 if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -1328,7 +1328,7 @@ public class PnlProcess extends NursingRecordsPanel {
                             public void actionPerformed(ActionEvent evt) {
 
                                 if (editor.getSelectedValue() == null) {
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.emptyentry")));
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.emptyentry")));
                                     return;
                                 }
 
@@ -1342,7 +1342,7 @@ public class PnlProcess extends NursingRecordsPanel {
                                     }
                                     em.lock(myProcess, LockModeType.OPTIMISTIC);
 
-                                    PReport pReport = em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_SET_OWNERSHIP) + ": " + handOverTo.getFullname(), PReportTools.PREPORT_TYPE_SET_OWNERSHIP, myProcess));
+                                    PReport pReport = em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_SET_OWNERSHIP) + ": " + handOverTo.getFullname(), PReportTools.PREPORT_TYPE_SET_OWNERSHIP, myProcess));
                                     myProcess.setOwner(handOverTo);
                                     myProcess.getPReports().add(pReport);
                                     em.getTransaction().commit();
@@ -1408,7 +1408,7 @@ public class PnlProcess extends NursingRecordsPanel {
                 btbTakeOver.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        new DlgYesNo(OPDE.lang.getString("nursingrecords.qprocesses.question.takeover") + "<p>" + qProcess.getTitle() + "</p>", SYSConst.icon48play, new Closure() {
+                        new DlgYesNo(SYSTools.xx("nursingrecords.qprocesses.question.takeover") + "<p>" + qProcess.getTitle() + "</p>", SYSConst.icon48play, new Closure() {
                             @Override
                             public void execute(Object answer) {
                                 if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -1421,7 +1421,7 @@ public class PnlProcess extends NursingRecordsPanel {
                                             em.lock(em.merge(myProcess.getResident()), LockModeType.OPTIMISTIC);
                                         }
                                         em.lock(myProcess, LockModeType.OPTIMISTIC);
-                                        PReport pReport = em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_TAKE_OWNERSHIP) + ": " + OPDE.getLogin().getUser().getFullname(), PReportTools.PREPORT_TYPE_TAKE_OWNERSHIP, myProcess));
+                                        PReport pReport = em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_TAKE_OWNERSHIP) + ": " + OPDE.getLogin().getUser().getFullname(), PReportTools.PREPORT_TYPE_TAKE_OWNERSHIP, myProcess));
                                         myProcess.getPReports().add(pReport);
                                         myProcess.setOwner(em.merge(OPDE.getLogin().getUser()));
                                         em.getTransaction().commit();

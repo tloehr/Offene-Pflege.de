@@ -231,7 +231,7 @@ public class SYSConst {
     public static final Date DATE_THE_VERY_BEGINNING = new Date(VERY_BEGINNING.getTimeInMillis());
     public static final Date DATE_UNTIL_FURTHER_NOTICE = new Date(UNTIL_FURTHER_NOTICE.getTimeInMillis());
 
-    public static final String UNITS[] = {"", OPDE.lang.getString("misc.msg.piece"), "ml", "l", "mg", "g", "cm", "m"};
+    public static final String UNITS[] = {"", SYSTools.xx("misc.msg.piece"), "ml", "l", "mg", "g", "cm", "m"};
 
     public static final byte UZ = 0; // Solluhrzeit
     public static final byte FM = 1; // Nacht Morgens
@@ -337,7 +337,7 @@ public class SYSConst {
 
 //    public static final String html_report_footer = "<hr/>" +
 //            html_fontface +
-//            "<b>" + OPDE.lang.getString("misc.msg.endofreport") + "</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getFullname()) : "")
+//            "<b>" + SYSTools.xx("misc.msg.endofreport") + "</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getFullname()) : "")
 //            + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
 //            + "<br/>http://www.offene-pflege.de</font>\n";
 

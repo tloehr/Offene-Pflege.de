@@ -6,6 +6,7 @@
 package entity;
 
 import op.OPDE;
+import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -42,7 +43,7 @@ public class StationTools {
 
     public static DefaultMutableTreeNode getCompleteStructure() {
 
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode(OPDE.lang.getString("misc.commands.noselection"));
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(SYSTools.xx("misc.commands.noselection"));
 
         EntityManager em = OPDE.createEM();
         Query queryHomes = em.createQuery("SELECT h FROM Homes h ORDER BY h.name ");

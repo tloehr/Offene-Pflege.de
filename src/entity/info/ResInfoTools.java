@@ -226,7 +226,7 @@ public class ResInfoTools {
                     html += resInfo.isClosed() ? "<br/>" + SYSConst.html_22x22_StopSign : "";
                     html += "</td>";
                     html += "<td valign=\"top\">" + resInfo.getHtml();
-                    html += !SYSTools.catchNull(resInfo.getText()).isEmpty() ? "<p>" + OPDE.lang.getString("misc.msg.comment") + ": " + resInfo.getText() + "</p>" : "";
+                    html += !SYSTools.catchNull(resInfo.getText()).isEmpty() ? "<p>" + SYSTools.xx("misc.msg.comment") + ": " + resInfo.getText() + "</p>" : "";
                     html += "</td>";
                     html += "</tr>\n";
                 }
@@ -388,7 +388,7 @@ public class ResInfoTools {
                                     if (infonode.getTagName().equalsIgnoreCase("scalegroup")) {
                                         scalesum = scalesum == null ? thisNode.getScore() : scalesum.add(thisNode.getScore());
 //                                        Double score = (Double) ((Object[]) thisNode.getUserObject())[3];
-                                        html += "<li><b>" + infonode.getLabel() + ":</b> " + text + " (" + OPDE.lang.getString("misc.msg.scaleriskvalue") + ": " + thisNode.getScore().setScale(2, BigDecimal.ROUND_UP).toPlainString() + ")</li>";
+                                        html += "<li><b>" + infonode.getLabel() + ":</b> " + text + " (" + SYSTools.xx("misc.msg.scaleriskvalue") + ": " + thisNode.getScore().setScale(2, BigDecimal.ROUND_UP).toPlainString() + ")</li>";
 //                                        scalesum += score;
                                     } else {
                                         html += "<li><b>" + infonode.getLabel() + ":</b> " + text + "</li>";
@@ -413,11 +413,11 @@ public class ResInfoTools {
                         }
 
                         if (!bodyparts.isEmpty()) {
-                            // + " " + OPDE.lang.getString("misc.msg.for")+
-                            html += "<li><b>" + OPDE.lang.getString("misc.msg.bodylocations") + ":</b> ";
+                            // + " " + SYSTools.xx("misc.msg.for")+
+                            html += "<li><b>" + SYSTools.xx("misc.msg.bodylocations") + ":</b> ";
                             html += "<ul>";
                             for (String bodykey : bodyparts) {
-                                html += "<li>" + OPDE.lang.getString(bodykey) + "</li>";
+                                html += "<li>" + SYSTools.xx(bodykey) + "</li>";
                             }
                             html += "</ul>";
                             html += "</li>";
@@ -440,7 +440,7 @@ public class ResInfoTools {
             // nun noch die Einschätzung des Risikos
             // Bezeichnung und Farbe
 
-            String risiko = OPDE.lang.getString("misc.msg.scalerisk.unknown");
+            String risiko = SYSTools.xx("misc.msg.scalerisk.unknown");
             String color = "black";
             for (RiskBean risk : scaleriskmodel) {
                 if (risk.getFrom().compareTo(scalesum) <= 0 && scalesum.compareTo(risk.getTo()) <= 0) {
@@ -449,7 +449,7 @@ public class ResInfoTools {
                     break;
                 }
             }
-            html += "<b><font color=\"" + color + "\">" + OPDE.lang.getString("misc.msg.scalerisk.rating") + ": " + scalesum + " (" + risiko + ")</font></b><br/>";
+            html += "<b><font color=\"" + color + "\">" + SYSTools.xx("misc.msg.scalerisk.rating") + ": " + scalesum + " (" + risiko + ")</font></b><br/>";
         }
         return html;
     }
@@ -484,7 +484,7 @@ public class ResInfoTools {
                                     if (infonode.getTagName().equalsIgnoreCase("scalegroup")) {
                                         scalesum = scalesum == null ? thisNode.getScore() : scalesum.add(thisNode.getScore());
                                         //                                        Double score = (Double) ((Object[]) thisNode.getUserObject())[3];
-                                        plaintext += infonode.getLabel() + ": " + text + " (" + OPDE.lang.getString("misc.msg.scaleriskvalue") + ": " + thisNode.getScore().setScale(2, BigDecimal.ROUND_UP).toPlainString() + "); ";
+                                        plaintext += infonode.getLabel() + ": " + text + " (" + SYSTools.xx("misc.msg.scaleriskvalue") + ": " + thisNode.getScore().setScale(2, BigDecimal.ROUND_UP).toPlainString() + "); ";
                                         //                                        scalesum += score;
                                     } else {
                                         plaintext += infonode.getLabel() + ": " + text + "; ";
@@ -509,10 +509,10 @@ public class ResInfoTools {
                         }
 
                         if (!bodyparts.isEmpty()) {
-                            // + " " + OPDE.lang.getString("misc.msg.for")+
-                            plaintext += OPDE.lang.getString("misc.msg.bodylocations") + ": ";
+                            // + " " + SYSTools.xx("misc.msg.for")+
+                            plaintext += SYSTools.xx("misc.msg.bodylocations") + ": ";
                             for (String bodykey : bodyparts) {
-                                plaintext += OPDE.lang.getString(bodykey) + ", ";
+                                plaintext += SYSTools.xx(bodykey) + ", ";
                             }
                             plaintext = plaintext.substring(0, plaintext.length() - 2) + "; ";
                         }
@@ -534,14 +534,14 @@ public class ResInfoTools {
             // nun noch die Einschätzung des Risikos
             // Bezeichnung und Farbe
 
-            String risiko = OPDE.lang.getString("misc.msg.scalerisk.unknown");
+            String risiko = SYSTools.xx("misc.msg.scalerisk.unknown");
             for (RiskBean risk : scaleriskmodel) {
                 if (risk.getFrom().compareTo(scalesum) <= 0 && scalesum.compareTo(risk.getTo()) <= 0) {
                     risiko = risk.getLabel();
                     break;
                 }
             }
-            plaintext += OPDE.lang.getString("misc.msg.scalerisk.rating") + ": " + scalesum + " (" + risiko + "); ";
+            plaintext += SYSTools.xx("misc.msg.scalerisk.rating") + ": " + scalesum + " (" + risiko + "); ";
         }
         return plaintext.substring(0, plaintext.length() - 2);
     }
@@ -749,7 +749,7 @@ public class ResInfoTools {
                 result += weight.getVal1().toPlainString() + " " + weight.getType().getUnit1() + " (" + DateFormat.getDateInstance().format(weight.getPit()) + ")";
             } else {
                 result += "Das Körpergewicht muss aufgrund von Amputationen angepasst werden.<br/>";
-                result += OPDE.lang.getString("misc.msg.amputation") + ": " + getAmputationAsCompactText(amputation) + "<br/>";
+                result += SYSTools.xx("misc.msg.amputation") + ": " + getAmputationAsCompactText(amputation) + "<br/>";
                 result += "Mess-Gewicht: " + weight.getVal1().setScale(2, RoundingMode.HALF_UP) + " " + weight.getType().getUnit1() + " (" + DateFormat.getDateInstance().format(weight.getPit()) + ")<br/>";
                 result += "Prozentuale Anpassung: " + adjustmentPercentage.setScale(2, RoundingMode.HALF_UP) + "&#37;<br/>";
                 theoreticalweight = weight.getVal1().multiply(BigDecimal.ONE.add(adjustmentPercentage.multiply(new BigDecimal(0.01))));
@@ -834,14 +834,14 @@ public class ResInfoTools {
 
         ResInfo bwinfo_hauf = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
         if (bwinfo_hauf != null) {
-            result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.movein") + "</td><td valign=\"top\">";
+            result += "<tr><td valign=\"top\">" + SYSTools.xx("misc.msg.movein") + "</td><td valign=\"top\">";
             result += "<b>" + DateFormat.getDateInstance().format(bwinfo_hauf.getFrom()) + "</b>";
             result += "</td></tr>";
         }
 
         ResInfo bwinfo_pstf = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.TYPE_NURSING_INSURANCE);
         if (bwinfo_pstf != null) {
-            result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.ps") + "</td><td valign=\"top\">";
+            result += "<tr><td valign=\"top\">" + SYSTools.xx("misc.msg.ps") + "</td><td valign=\"top\">";
             result += bwinfo_pstf.getHtml();
             result += "</td></tr>";
         }
@@ -849,17 +849,17 @@ public class ResInfoTools {
 
         ResInfo lc = getLastResinfo(resident, ResInfoTypeTools.TYPE_LEGALCUSTODIANS);
         if (lc != null && !lc.isClosed()) {
-            result += "<tr><td valign=\"top\">" + OPDE.lang.getString("misc.msg.lc") + "</td><td valign=\"top\">";
+            result += "<tr><td valign=\"top\">" + SYSTools.xx("misc.msg.lc") + "</td><td valign=\"top\">";
 //            result += LCustodianTools.getFullName(resident.getLCustodian1());
 
             if (!OPDE.isAnonym()) {
 
                 result += lc.getHtml();
 //                result += ", " + resident.getLCustodian1().getPlz() + " " + resident.getLCustodian1().getOrt();
-//                result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + resident.getLCustodian1().getTel();
+//                result += ", " + SYSTools.xx("misc.msg.phone") + ": " + resident.getLCustodian1().getTel();
 //
 //                if (!SYSTools.catchNull(resident.getLCustodian1().getMobil()).isEmpty()) {
-//                    result += ", " + OPDE.lang.getString("misc.msg.mobilephone") + ": " + resident.getLCustodian1().getMobil();
+//                    result += ", " + SYSTools.xx("misc.msg.mobilephone") + ": " + resident.getLCustodian1().getMobil();
 //                }
 
             }
@@ -868,7 +868,7 @@ public class ResInfoTools {
         }
 
         if (resident.getPN1() != null) {
-            result += "<tr id=\"fonttext\"><td valign=\"top\">" + OPDE.lang.getString("misc.msg.primaryNurse") + "</td><td valign=\"top\">";
+            result += "<tr id=\"fonttext\"><td valign=\"top\">" + SYSTools.xx("misc.msg.primaryNurse") + "</td><td valign=\"top\">";
             result += resident.getPN1().getFullname();
             result += "</td></tr>";
         }
@@ -876,14 +876,14 @@ public class ResInfoTools {
 
         Date absentSince = ResInfoTools.absentSince(resident);
         if (absentSince != null) {
-            result += "<tr id=\"fonttext\"><td valign=\"top\">" + OPDE.lang.getString("misc.msg.ResidentAbsentSince") + "</td><td valign=\"top\">";
+            result += "<tr id=\"fonttext\"><td valign=\"top\">" + SYSTools.xx("misc.msg.ResidentAbsentSince") + "</td><td valign=\"top\">";
             result += DateFormat.getDateInstance().format(absentSince);
             result += "</td></tr>";
         }
 
         ResInfo bwinfo_angeh = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByID("CONFIDANTS"));
         if (bwinfo_angeh != null) {
-            result += "<tr id=\"fonttext\"><td valign=\"top\">" + OPDE.lang.getString("misc.msg.relatives") + "</td><td valign=\"top\">";
+            result += "<tr id=\"fonttext\"><td valign=\"top\">" + SYSTools.xx("misc.msg.relatives") + "</td><td valign=\"top\">";
             result += bwinfo_angeh.getHtml();
             result += "</td></tr>";
         }
@@ -899,15 +899,15 @@ public class ResInfoTools {
          *
          */
         if (resident.getGP() != null) {
-            result += "<h2 id=\"fonth2\">" + OPDE.lang.getString("misc.msg.gp") + "</h2>";
+            result += "<h2 id=\"fonth2\">" + SYSTools.xx("misc.msg.gp") + "</h2>";
 
             result += "<div id=\"fonttext\">";
             if (OPDE.isAnonym()) {
-                result += "[" + OPDE.lang.getString("misc.msg.anon") + "]";
+                result += "[" + SYSTools.xx("misc.msg.anon") + "]";
             } else {
                 result += GPTools.getFullName(resident.getGP()) + ", " + resident.getGP().getStreet();
                 result += ", " + resident.getGP().getZIP() + " " + resident.getGP().getCity();
-                result += ", " + OPDE.lang.getString("misc.msg.phone") + ": " + resident.getGP().getTel() + ", " + OPDE.lang.getString("misc.msg.fax") + ": " + resident.getGP().getFax();
+                result += ", " + SYSTools.xx("misc.msg.phone") + ": " + resident.getGP().getTel() + ", " + SYSTools.xx("misc.msg.fax") + ": " + resident.getGP().getFax();
             }
             result += "</div>";
 
@@ -926,11 +926,11 @@ public class ResInfoTools {
         final ArrayList<ResInfo> specialists = ResInfoTools.getActive(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_SPECIALIST));
 
         if (!specialists.isEmpty()) {
-            result += "<h2 id=\"fonth2\">" + OPDE.lang.getString("misc.msg.specialists") + "</h2>";
+            result += "<h2 id=\"fonth2\">" + SYSTools.xx("misc.msg.specialists") + "</h2>";
 
             result += "<div id=\"fonttext\">";
             if (OPDE.isAnonym()) {
-                result += "[" + OPDE.lang.getString("misc.msg.anon") + "]";
+                result += "[" + SYSTools.xx("misc.msg.anon") + "]";
             } else {
                 for (ResInfo specialist : specialists) {
                     result += getContentAsHTML(specialist);
@@ -1045,7 +1045,7 @@ public class ResInfoTools {
 
             boolean hateinfuhren = ResValueTools.hatEinfuhren(resident);
             boolean hatausfuhren = ResValueTools.hatAusfuhren(resident);
-            result += hateinfuhren || hatausfuhren ? "<h2 id=\"fonth2\">" + OPDE.lang.getString("misc.msg.liquid.result") + "</h2>" : "";
+            result += hateinfuhren || hatausfuhren ? "<h2 id=\"fonth2\">" + SYSTools.xx("misc.msg.liquid.result") + "</h2>" : "";
 
             if (hatausfuhren) {
                 EntityManager em = OPDE.createEM();
@@ -1078,7 +1078,7 @@ public class ResInfoTools {
 
                 if (!list.isEmpty()) {
                     result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"> <tr>"
-                            + "<th>" + OPDE.lang.getString("misc.msg.Date") + "</th><th>" + OPDE.lang.getString("misc.msg.ingestion") + "</th><th>" + OPDE.lang.getString("misc.msg.egestion") + "</th><th>" + OPDE.lang.getString("misc.msg.result") + "</th><th>" + OPDE.lang.getString("misc.msg.rating") + "</th></tr>";
+                            + "<th>" + SYSTools.xx("misc.msg.Date") + "</th><th>" + SYSTools.xx("misc.msg.ingestion") + "</th><th>" + SYSTools.xx("misc.msg.egestion") + "</th><th>" + SYSTools.xx("misc.msg.result") + "</th><th>" + SYSTools.xx("misc.msg.rating") + "</th></tr>";
 
                     for (Object[] objects : list) {
 
@@ -1126,7 +1126,7 @@ public class ResInfoTools {
                 if (!list.isEmpty()) {
 
                     result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>"
-                            + "<th>" + OPDE.lang.getString("misc.msg.Date") + "</th><th>" + OPDE.lang.getString("misc.msg.ingestion") + "</th><th>" + OPDE.lang.getString("misc.msg.rating") + "</th></tr>";
+                            + "<th>" + SYSTools.xx("misc.msg.Date") + "</th><th>" + SYSTools.xx("misc.msg.ingestion") + "</th><th>" + SYSTools.xx("misc.msg.rating") + "</th></tr>";
 
                     for (Object[] objects : list) {
 
@@ -1356,7 +1356,7 @@ public class ResInfoTools {
         em.close();
 
         // virtual station. is never persisted
-        Station exResident = new Station(OPDE.lang.getString(PnlControlling.internalClassID + ".nursing.falls.exResidents"), null);
+        Station exResident = new Station(SYSTools.xx(PnlControlling.internalClassID + ".nursing.falls.exResidents"), null);
 
         // Init Maps
         HashMap<LocalDate, HashMap<Station, Integer>> statMap = new HashMap<LocalDate, HashMap<Station, Integer>>();
@@ -1383,7 +1383,7 @@ public class ResInfoTools {
         Collections.sort(listMonths);
 
         html.append(SYSConst.html_h1(PnlControlling.internalClassID + ".nursing.falls.anonymous"));
-        html.append(SYSConst.html_h2(OPDE.lang.getString("misc.msg.analysis") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
+        html.append(SYSConst.html_h2(SYSTools.xx("misc.msg.analysis") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
 
         StringBuffer table = new StringBuffer(1000);
         table.append(SYSConst.html_table_tr(
@@ -1455,7 +1455,7 @@ public class ResInfoTools {
         em.close();
 
         html.append(SYSConst.html_h1(PnlControlling.internalClassID + ".nursing.falls.byResident"));
-        html.append(SYSConst.html_h2(OPDE.lang.getString("misc.msg.analysis") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
+        html.append(SYSConst.html_h2(SYSTools.xx("misc.msg.analysis") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
 
         p = 0;
         for (Resident resident : listResident) {
@@ -1529,7 +1529,7 @@ public class ResInfoTools {
     public static String getCompactHTML(ResInfo resInfo) {
         String result = SYSConst.html_div(resInfo.getHtml());
         if (!SYSTools.catchNull(resInfo.getText()).isEmpty()) {
-            result += SYSConst.html_paragraph(SYSConst.html_bold(OPDE.lang.getString("misc.msg.comment")) + ":<br/>" + resInfo.getText().trim());
+            result += SYSConst.html_paragraph(SYSConst.html_bold(SYSTools.xx("misc.msg.comment")) + ":<br/>" + resInfo.getText().trim());
         }
         return result;
     }
@@ -1618,16 +1618,16 @@ public class ResInfoTools {
                 if (content.containsKey(key)) {
                     String prop = content.getProperty(key);
                     if (prop.equalsIgnoreCase("hand")) {
-                        result += OPDE.lang.getString("amputation.hand");
+                        result += SYSTools.xx("amputation.hand");
                     } else if (prop.equalsIgnoreCase("belowellbow")) {
-                        result += OPDE.lang.getString("amputation.belowellbow");
+                        result += SYSTools.xx("amputation.belowellbow");
                     } else if (prop.equalsIgnoreCase("aboveellbow")) {
-                        result += OPDE.lang.getString("amputation.aboveellbow");
+                        result += SYSTools.xx("amputation.aboveellbow");
                     } else if (prop.equalsIgnoreCase("complete")) {
-                        result += OPDE.lang.getString("amputation.complete.arm");
+                        result += SYSTools.xx("amputation.complete.arm");
                     }
                     if (!prop.equalsIgnoreCase("none")) {
-                        result += ", " + (key.equals("upperleft") ? OPDE.lang.getString("misc.msg.left") : OPDE.lang.getString("misc.msg.right")) + "; ";
+                        result += ", " + (key.equals("upperleft") ? SYSTools.xx("misc.msg.left") : SYSTools.xx("misc.msg.right")) + "; ";
                     }
                 }
 
@@ -1637,16 +1637,16 @@ public class ResInfoTools {
                 if (content.containsKey(key)) {
                     String prop = content.getProperty(key);
                     if (prop.equalsIgnoreCase("foot")) {
-                        result += OPDE.lang.getString("amputation.foot");
+                        result += SYSTools.xx("amputation.foot");
                     } else if (prop.equalsIgnoreCase("belowknee")) {
-                        result += OPDE.lang.getString("amputation.belowknee");
+                        result += SYSTools.xx("amputation.belowknee");
                     } else if (prop.equalsIgnoreCase("aboveknee")) {
-                        result += OPDE.lang.getString("amputation.aboveknee");
+                        result += SYSTools.xx("amputation.aboveknee");
                     } else if (prop.equalsIgnoreCase("complete")) {
-                        result += OPDE.lang.getString("amputation.complete.leg");
+                        result += SYSTools.xx("amputation.complete.leg");
                     }
                     if (!prop.equalsIgnoreCase("none")) {
-                        result += ", " + (key.equals("lowerleft") ? OPDE.lang.getString("misc.msg.left") : OPDE.lang.getString("misc.msg.right")) + "; ";
+                        result += ", " + (key.equals("lowerleft") ? SYSTools.xx("misc.msg.left") : SYSTools.xx("misc.msg.right")) + "; ";
                     }
                 }
             }

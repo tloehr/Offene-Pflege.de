@@ -264,9 +264,9 @@ public class DlgCloseStock extends MyJDialog {
     }
 
     private void initDialog() {
-        String text = OPDE.lang.getString(internalClassID + ".youWantToClose1a") + medStock.getID() + OPDE.lang.getString(internalClassID + ".youWantToClose1b");
+        String text = SYSTools.xx(internalClassID + ".youWantToClose1a") + medStock.getID() + SYSTools.xx(internalClassID + ".youWantToClose1b");
         text += "<br/>" + MedStockTools.getTextASHTML(medStock) + "</br>";
-        text += "<br/>" + OPDE.lang.getString(internalClassID + ".chooseAReason") + ":";
+        text += "<br/>" + SYSTools.xx(internalClassID + ".chooseAReason") + ":";
         txtInfo.setContentType("text/html");
         txtInfo.setText(SYSTools.toHTML(SYSConst.html_div(text)));
 
@@ -280,7 +280,7 @@ public class DlgCloseStock extends MyJDialog {
         query.setParameter("out", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
         query.setParameter("opened", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
         DefaultComboBoxModel dcbm = new DefaultComboBoxModel(query.getResultList().toArray());
-        dcbm.insertElementAt(OPDE.lang.getString("misc.msg.none"), 0);
+        dcbm.insertElementAt(SYSTools.xx("misc.msg.none"), 0);
         cmbBestID.setModel(dcbm);
         cmbBestID.setRenderer(new ListCellRenderer() {
             @Override
@@ -294,7 +294,7 @@ public class DlgCloseStock extends MyJDialog {
         int index = Math.min(2, cmbBestID.getItemCount());
         cmbBestID.setSelectedIndex(index - 1);
 
-        lblEinheiten.setText(SYSConst.UNITS[medStock.getTradeForm().getDosageForm().getPackUnit()] + " " + OPDE.lang.getString("misc.msg.usedup"));
+        lblEinheiten.setText(SYSConst.UNITS[medStock.getTradeForm().getDosageForm().getPackUnit()] + " " + SYSTools.xx("misc.msg.usedup"));
         txtLetzte.setText("");
         txtLetzte.setEnabled(false);
         // Das mit dem Vorabstellen nur bei Formen, die auf Stück basieren also APV = 1
@@ -348,32 +348,32 @@ public class DlgCloseStock extends MyJDialog {
             em.lock(em.merge(myStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
             em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
 
-            OPDE.important("StockID: " + myStock.getID() + " " + OPDE.lang.getString("misc.msg.closed"));
+            OPDE.important("StockID: " + myStock.getID() + " " + SYSTools.xx("misc.msg.closed"));
             OPDE.important("UID: " + OPDE.getLogin().getUser().getUID());
 
             MedStock nextBest = null;
             if (cmbBestID.getSelectedIndex() > 0) {
                 nextBest = em.merge((MedStock) cmbBestID.getSelectedItem());
-                OPDE.important(OPDE.lang.getString(internalClassID + ".LOG.STATE_EDIT_EMPTY_SOON1") + ": " + nextBest.getID());
+                OPDE.important(SYSTools.xx(internalClassID + ".LOG.STATE_EDIT_EMPTY_SOON1") + ": " + nextBest.getID());
                 em.lock(nextBest, LockModeType.OPTIMISTIC);
                 myStock.setNextStock(nextBest);
             }
 
             if (rbStellen.isSelected()) {
                 BigDecimal inhalt = new BigDecimal(Double.parseDouble(txtLetzte.getText().replace(",", ".")));
-                MedStockTools.setStockTo(em, myStock, inhalt, OPDE.lang.getString(internalClassID + ".TX.STATE_EDIT_EMPTY_SOON"), MedStockTransactionTools.STATE_EDIT_EMPTY_SOON);
+                MedStockTools.setStockTo(em, myStock, inhalt, SYSTools.xx(internalClassID + ".TX.STATE_EDIT_EMPTY_SOON"), MedStockTransactionTools.STATE_EDIT_EMPTY_SOON);
                 myStock.setState(MedStockTools.STATE_WILL_BE_CLOSED_SOON);
-                OPDE.important(OPDE.lang.getString(internalClassID + ".LOG.STATE_EDIT_EMPTY_SOON1") + ": " + inhalt);
+                OPDE.important(SYSTools.xx(internalClassID + ".LOG.STATE_EDIT_EMPTY_SOON1") + ": " + inhalt);
             } else {
                 if (rbGefallen.isSelected()) {
-                    MedStockTools.close(em, myStock, OPDE.lang.getString(internalClassID + ".TX.STATE_EDIT_EMPTY_BROKEN_OR_LOST"), MedStockTransactionTools.STATE_EDIT_EMPTY_BROKEN_OR_LOST);
-                    OPDE.important(OPDE.lang.getString(internalClassID + ".LOG.STATE_EDIT_EMPTY_BROKEN_OR_LOST"));
+                    MedStockTools.close(em, myStock, SYSTools.xx(internalClassID + ".TX.STATE_EDIT_EMPTY_BROKEN_OR_LOST"), MedStockTransactionTools.STATE_EDIT_EMPTY_BROKEN_OR_LOST);
+                    OPDE.important(SYSTools.xx(internalClassID + ".LOG.STATE_EDIT_EMPTY_BROKEN_OR_LOST"));
                 } else if (rbAbgelaufen.isSelected()) {
-                    MedStockTools.close(em, myStock, OPDE.lang.getString(internalClassID + ".TX.STATE_EDIT_EMPTY_PAST_EXPIRY"), MedStockTransactionTools.STATE_EDIT_EMPTY_PAST_EXPIRY);
-                    OPDE.important(OPDE.lang.getString(internalClassID + ".LOG.STATE_EDIT_EMPTY_PAST_EXPIRY"));
+                    MedStockTools.close(em, myStock, SYSTools.xx(internalClassID + ".TX.STATE_EDIT_EMPTY_PAST_EXPIRY"), MedStockTransactionTools.STATE_EDIT_EMPTY_PAST_EXPIRY);
+                    OPDE.important(SYSTools.xx(internalClassID + ".LOG.STATE_EDIT_EMPTY_PAST_EXPIRY"));
                 } else {
-                    MedStockTools.close(em, myStock, OPDE.lang.getString(internalClassID + ".TX.STATE_EDIT_EMPTY_NOW"), MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
-                    OPDE.important(OPDE.lang.getString(internalClassID + ".LOG.STATE_EDIT_EMPTY_NOW"));
+                    MedStockTools.close(em, myStock, SYSTools.xx(internalClassID + ".TX.STATE_EDIT_EMPTY_NOW"), MedStockTransactionTools.STATE_EDIT_EMPTY_NOW);
+                    OPDE.important(SYSTools.xx(internalClassID + ".LOG.STATE_EDIT_EMPTY_NOW"));
                 }
             }
 

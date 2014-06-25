@@ -8,6 +8,7 @@ import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import op.OPDE;
 import op.tools.SYSCalendar;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateTime;
 
@@ -30,7 +31,7 @@ public class PnlExpiry extends JPanel {
         lblTitle.setText(title);
         cbExpiry.setSelected(expiry != null);
         txtExpiry.setEnabled(expiry != null);
-        cbExpiry.setText(OPDE.lang.getString("misc.msg.expires"));
+        cbExpiry.setText(SYSTools.xx("misc.msg.expires"));
         if (expiry != null) {
             txtExpiry.setText(DateFormat.getDateInstance().format(expiry));
         } else {

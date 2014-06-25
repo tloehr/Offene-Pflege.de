@@ -359,7 +359,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
 
     @Override
     public String getTitle() {
-        return OPDE.lang.getString("misc.msg.report") + ": " + text;
+        return SYSTools.xx("misc.msg.report") + ": " + text;
     }
 
     @Override

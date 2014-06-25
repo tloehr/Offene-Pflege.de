@@ -51,7 +51,7 @@ public class PReportTools {
         if (preport.isPDCA()) return "<b>" + getPDCA(preport) + "</b>";
 
         String html = "";
-        html += "<b>" + OPDE.lang.getString("nursingrecords.qprocesses.preport") + "</b>";
+        html += "<b>" + SYSTools.xx("nursingrecords.qprocesses.preport") + "</b>";
         html += "<p>" + SYSTools.replace(preport.getText(), "\n", "<br/>", true) + "</p>";
         return html;
     }
@@ -66,16 +66,16 @@ public class PReportTools {
     public static String getPDCA(PReport preport) {
 
         if (preport.getArt() == PREPORT_TYPE_SET_PDCA_PLAN) {
-            return OPDE.lang.getString(PReportTools.PREPORT_TEXT_PDCA_PLAN);
+            return SYSTools.xx(PReportTools.PREPORT_TEXT_PDCA_PLAN);
         }
         if (preport.getArt() == PREPORT_TYPE_SET_PDCA_DO) {
-            return OPDE.lang.getString(PReportTools.PREPORT_TEXT_PDCA_DO);
+            return SYSTools.xx(PReportTools.PREPORT_TEXT_PDCA_DO);
         }
         if (preport.getArt() == PREPORT_TYPE_SET_PDCA_CHECK) {
-            return OPDE.lang.getString(PReportTools.PREPORT_TEXT_PDCA_CHECK);
+            return SYSTools.xx(PReportTools.PREPORT_TEXT_PDCA_CHECK);
         }
         if (preport.getArt() == PREPORT_TYPE_SET_PDCA_ACT) {
-            return OPDE.lang.getString(PReportTools.PREPORT_TEXT_PDCA_ACT);
+            return SYSTools.xx(PReportTools.PREPORT_TEXT_PDCA_ACT);
         }
         return "";
     }

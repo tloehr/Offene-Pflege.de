@@ -57,18 +57,18 @@ public class MedProductWizard {
         wizard = new WizardDialog(OPDE.getMainframe(), false);
         PageList model = new PageList();
 
-        AbstractWizardPage page1 = new WelcomePage(OPDE.lang.getString("opde.medication.medproduct.wizard.page1.title"),
-                OPDE.lang.getString("opde.medication.medproduct.wizard.page1.description"));
-        AbstractWizardPage page2 = new ProductPage(OPDE.lang.getString("opde.medication.medproduct.wizard.page2.title"),
-                OPDE.lang.getString("opde.medication.medproduct.wizard.page2.description"));
-        AbstractWizardPage page3 = new SubtextPage(OPDE.lang.getString("opde.medication.medproduct.wizard.page3.title"),
-                OPDE.lang.getString("opde.medication.medproduct.wizard.page3.description"));
-        AbstractWizardPage page4 = new PackagePage(OPDE.lang.getString("opde.medication.medproduct.wizard.page4.title"),
-                OPDE.lang.getString("opde.medication.medproduct.wizard.page4.description"));
-        AbstractWizardPage page5 = new ACMEPage(OPDE.lang.getString("opde.medication.medproduct.wizard.page5.title"),
-                OPDE.lang.getString("opde.medication.medproduct.wizard.page5.description"));
-        AbstractWizardPage page6 = new CompletionPage(OPDE.lang.getString("opde.medication.medproduct.wizard.page6.title"),
-                OPDE.lang.getString("opde.medication.medproduct.wizard.page6.description"));
+        AbstractWizardPage page1 = new WelcomePage(SYSTools.xx("opde.medication.medproduct.wizard.page1.title"),
+                SYSTools.xx("opde.medication.medproduct.wizard.page1.description"));
+        AbstractWizardPage page2 = new ProductPage(SYSTools.xx("opde.medication.medproduct.wizard.page2.title"),
+                SYSTools.xx("opde.medication.medproduct.wizard.page2.description"));
+        AbstractWizardPage page3 = new SubtextPage(SYSTools.xx("opde.medication.medproduct.wizard.page3.title"),
+                SYSTools.xx("opde.medication.medproduct.wizard.page3.description"));
+        AbstractWizardPage page4 = new PackagePage(SYSTools.xx("opde.medication.medproduct.wizard.page4.title"),
+                SYSTools.xx("opde.medication.medproduct.wizard.page4.description"));
+        AbstractWizardPage page5 = new ACMEPage(SYSTools.xx("opde.medication.medproduct.wizard.page5.title"),
+                SYSTools.xx("opde.medication.medproduct.wizard.page5.description"));
+        AbstractWizardPage page6 = new CompletionPage(SYSTools.xx("opde.medication.medproduct.wizard.page6.title"),
+                SYSTools.xx("opde.medication.medproduct.wizard.page6.description"));
 
         model.append(page1);
         model.append(page2);
@@ -120,7 +120,7 @@ public class MedProductWizard {
             tradeform.getPackages().add(aPackage);
 
             em.getTransaction().commit();
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(product.getText() + ", " + TradeFormTools.toPrettyString(tradeform) + ", " + MedPackageTools.toPrettyString(aPackage) + " " + OPDE.lang.getString("misc.msg.entrysuccessful")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(product.getText() + ", " + TradeFormTools.toPrettyString(tradeform) + ", " + MedPackageTools.toPrettyString(aPackage) + " " + SYSTools.xx("misc.msg.entrysuccessful")));
             finishAction.execute(aPackage);
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
@@ -150,23 +150,23 @@ public class MedProductWizard {
             txt.setContentType("text/html");
             txt.setOpaque(false);
             txt.setText("<html>" + SYSConst.html_fontface +
-                    OPDE.lang.getString("opde.medication.medproduct.wizard.welcome") +
+                    SYSTools.xx("opde.medication.medproduct.wizard.welcome") +
                     "</font></html>");
 
             main.add(BorderLayout.CENTER, txt);
             JLabel gfx = new JLabel(SYSConst.gfx259x203medic0);
             main.add(BorderLayout.EAST, gfx);
             addComponent(main, true);
-            addText(OPDE.lang.getString("opde.wizards.buttontext.letsgo"), SYSConst.ARIAL14);
+            addText(SYSTools.xx("opde.wizards.buttontext.letsgo"), SYSConst.ARIAL14);
         }
 
         @Override
         public void setupWizardButtons() {
             super.setupWizardButtons();
-            fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.BACK, OPDE.lang.getString("opde.wizards.buttontext.back"));
-            fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.NEXT, OPDE.lang.getString("opde.wizards.buttontext.next"));
-            fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.FINISH, OPDE.lang.getString("opde.wizards.buttontext.finish"));
-            fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.CANCEL, OPDE.lang.getString("opde.wizards.buttontext.cancel"));
+            fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.BACK, SYSTools.xx("opde.wizards.buttontext.back"));
+            fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.NEXT, SYSTools.xx("opde.wizards.buttontext.next"));
+            fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.FINISH, SYSTools.xx("opde.wizards.buttontext.finish"));
+            fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.CANCEL, SYSTools.xx("opde.wizards.buttontext.cancel"));
 
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.BACK);
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
@@ -377,7 +377,7 @@ public class MedProductWizard {
             txt.setOpaque(false);
             addComponent(txt, true);
             addSpace();
-            addText(OPDE.lang.getString("opde.wizards.buttontext.letsgo"), SYSConst.ARIAL14);
+            addText(SYSTools.xx("opde.wizards.buttontext.letsgo"), SYSConst.ARIAL14);
         }
 
         @Override
@@ -387,24 +387,24 @@ public class MedProductWizard {
         }
 
         private String check() {
-            String result = "<b>" + OPDE.lang.getString("opde.medication.medproduct.wizard.page6.summaryline1") + "</b><br/>";
-            result += OPDE.lang.getString("opde.medication.medproduct.wizard.page6.summaryline2") + "<br/>";
+            String result = "<b>" + SYSTools.xx("opde.medication.medproduct.wizard.page6.summaryline1") + "</b><br/>";
+            result += SYSTools.xx("opde.medication.medproduct.wizard.page6.summaryline2") + "<br/>";
             result += "<ul>";
-            result += "<li>" + OPDE.lang.getString("misc.msg.drug") + ": <b>" + product.getText() + "</b>" + (product.getMedPID() == null ? " <i>" + OPDE.lang.getString("misc.msg.willBeCreated") + "</i>" : " <i>" + OPDE.lang.getString("misc.msg.alreadyExits") + "</i>") + "</li>";
-            result += "<li>" + OPDE.lang.getString("opde.medication.medproduct.wizard.page3.title") + ": <b>" + TradeFormTools.toPrettyStringMediumWithExpiry(tradeform) + "</b>" + (tradeform.getID() == null ? " <i>" + OPDE.lang.getString("misc.msg.willBeCreated") + "</i>" : " <i>" + OPDE.lang.getString("misc.msg.alreadyExits") + "</i>") + "</li>";
+            result += "<li>" + SYSTools.xx("misc.msg.drug") + ": <b>" + product.getText() + "</b>" + (product.getMedPID() == null ? " <i>" + SYSTools.xx("misc.msg.willBeCreated") + "</i>" : " <i>" + SYSTools.xx("misc.msg.alreadyExits") + "</i>") + "</li>";
+            result += "<li>" + SYSTools.xx("opde.medication.medproduct.wizard.page3.title") + ": <b>" + TradeFormTools.toPrettyStringMediumWithExpiry(tradeform) + "</b>" + (tradeform.getID() == null ? " <i>" + SYSTools.xx("misc.msg.willBeCreated") + "</i>" : " <i>" + SYSTools.xx("misc.msg.alreadyExits") + "</i>") + "</li>";
             if (tradeform.getDosageForm().getUPRState() == DosageFormTools.STATE_UPRn) {
 
-                result += "<li>" + OPDE.lang.getString("misc.msg.upr") + ": <b>";
-                result += (tradeform.getUPR() == null ? OPDE.lang.getString("opde.medication.medproduct.wizard.page6.calcUPR") : OPDE.lang.getString("opde.medication.medproduct.wizard.page6.setUPR") + SYSConst.UNITS[tradeform.getDosageForm().getUsageUnit()] + " " + tradeform.getDosageForm().getUsageText() + " " + OPDE.lang.getString("misc.msg.to1") + " " + SYSConst.UNITS[tradeform.getDosageForm().getPackUnit()]) + "</b>" + "</li>";
+                result += "<li>" + SYSTools.xx("misc.msg.upr") + ": <b>";
+                result += (tradeform.getUPR() == null ? SYSTools.xx("opde.medication.medproduct.wizard.page6.calcUPR") : SYSTools.xx("opde.medication.medproduct.wizard.page6.setUPR") + SYSConst.UNITS[tradeform.getDosageForm().getUsageUnit()] + " " + tradeform.getDosageForm().getUsageText() + " " + SYSTools.xx("misc.msg.to1") + " " + SYSConst.UNITS[tradeform.getDosageForm().getPackUnit()]) + "</b>" + "</li>";
             }
-            result += "<li>" + OPDE.lang.getString("opde.medication.medproduct.wizard.page6.newPackageWillBeCreated") + ": <b>" + MedPackageTools.toPrettyString(aPackage) + "</b></li>";
+            result += "<li>" + SYSTools.xx("opde.medication.medproduct.wizard.page6.newPackageWillBeCreated") + ": <b>" + MedPackageTools.toPrettyString(aPackage) + "</b></li>";
 
             ACME displayFactory = acme == null ? product.getACME() : acme;
-            result += "<li>" + OPDE.lang.getString("opde.medication.medproduct.wizard.page5.title") + ": <b>" + displayFactory.getName() + ", " + displayFactory.getCity() + "</b>" + (displayFactory.getMphid() == null ? " <i>" + OPDE.lang.getString("misc.msg.willBeCreated") + "</i>" : " <i>" + OPDE.lang.getString("misc.msg.alreadyExits") + "</i>") + "</li>";
+            result += "<li>" + SYSTools.xx("opde.medication.medproduct.wizard.page5.title") + ": <b>" + displayFactory.getName() + ", " + displayFactory.getCity() + "</b>" + (displayFactory.getMphid() == null ? " <i>" + SYSTools.xx("misc.msg.willBeCreated") + "</i>" : " <i>" + SYSTools.xx("misc.msg.alreadyExits") + "</i>") + "</li>";
 
             result += "</ul>";
 
-            result += "<p>" + OPDE.lang.getString("opde.medication.medproduct.wizard.page6.summaryline1") + "</p>" +
+            result += "<p>" + SYSTools.xx("opde.medication.medproduct.wizard.page6.summaryline1") + "</p>" +
                     "</font>";
             return result;
         }

@@ -141,7 +141,7 @@ public class PnlResOverview extends NursingRecordsPanel {
             initPhase = true;
 
             OPDE.getMainframe().setBlocked(true);
-            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 
             SwingWorker worker = new SwingWorker() {
                 String html = "";
@@ -172,7 +172,7 @@ public class PnlResOverview extends NursingRecordsPanel {
         } else {
             initPhase = true;
             OPDE.getMainframe().setBlocked(true);
-            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 
 //            txtUebersicht.repaint();
             SwingUtilities.invokeLater(new Runnable() {
@@ -195,7 +195,7 @@ public class PnlResOverview extends NursingRecordsPanel {
 
 
         OPDE.getMainframe().setBlocked(true);
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 
         SwingWorker worker = new SwingWorker() {
             String html = "";
@@ -225,11 +225,11 @@ public class PnlResOverview extends NursingRecordsPanel {
         labelPanel.setBackground(Color.WHITE);
         labelPanel.setLayout(new VerticalLayout(3));
 
-        CollapsiblePane panelFilter = new CollapsiblePane(OPDE.lang.getString("misc.msg.Filter"));
+        CollapsiblePane panelFilter = new CollapsiblePane(SYSTools.xx("misc.msg.Filter"));
         panelFilter.setStyle(CollapsiblePane.PLAIN_STYLE);
         panelFilter.setCollapsible(false);
 
-        tbMedi = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.msg.medication"));
+        tbMedi = GUITools.getNiceToggleButton(SYSTools.xx("misc.msg.medication"));
         tbMedi.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -242,7 +242,7 @@ public class PnlResOverview extends NursingRecordsPanel {
         labelPanel.add(tbMedi);
 //        SYSPropsTools.restoreState(internalClassID + ":tbMedi", tbMedi);
 
-        tbBerichte = GUITools.getNiceToggleButton(OPDE.lang.getString(PnlReport.internalClassID));
+        tbBerichte = GUITools.getNiceToggleButton(SYSTools.xx(PnlReport.internalClassID));
         tbBerichte.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -255,7 +255,7 @@ public class PnlResOverview extends NursingRecordsPanel {
         labelPanel.add(tbBerichte);
 //        SYSPropsTools.restoreState(internalClassID + ":tbBerichte", tbBerichte);
 
-        tbBilanz = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.msg.liquid.result"));
+        tbBilanz = GUITools.getNiceToggleButton(SYSTools.xx("misc.msg.liquid.result"));
         tbBilanz.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -268,7 +268,7 @@ public class PnlResOverview extends NursingRecordsPanel {
         labelPanel.add(tbBilanz);
 //        SYSPropsTools.restoreState(internalClassID + ":tbBilanz", tbBilanz);
 
-//        tbBWInfo = GUITools.getNiceToggleButton(OPDE.lang.getString(PnlInfo.internalClassID));
+//        tbBWInfo = GUITools.getNiceToggleButton(SYSTools.xx(PnlInfo.internalClassID));
 //        tbBWInfo.addItemListener(new ItemListener() {
 //            @Override
 //            public void itemStateChanged(ItemEvent e) {
@@ -294,7 +294,7 @@ public class PnlResOverview extends NursingRecordsPanel {
         searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
 
 
-        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
+        CollapsiblePane searchPane = new CollapsiblePane(SYSTools.xx(internalClassID));
         searchPane.setSlidingDirection(SwingConstants.SOUTH);
         searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
         searchPane.setCollapsible(false);

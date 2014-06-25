@@ -17,6 +17,7 @@ import op.process.PnlProcess;
 import op.tools.GUITools;
 import op.tools.Pair;
 import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
 
@@ -107,7 +108,7 @@ public class QProcessTools {
 
         em.remove(connectionObject);
 
-        qProcess.getPReports().add(em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + QProcessTools.getNameOfElement(element) + " ID: " + element.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, qProcess)));
+        qProcess.getPReports().add(em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + QProcessTools.getNameOfElement(element) + " ID: " + element.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, qProcess)));
 
     }
 
@@ -137,13 +138,13 @@ public class QProcessTools {
         html += "<div id=\"fonttext\" >";
 
         if (qProcess.getResident() != null) {
-            html += "<br/>" + OPDE.lang.getString(PnlProcess.internalClassID + ".belongsto") + ": <b>" + ResidentTools.getLabelText(qProcess.getResident()) + "</b><br/>";
+            html += "<br/>" + SYSTools.xx(PnlProcess.internalClassID + ".belongsto") + ": <b>" + ResidentTools.getLabelText(qProcess.getResident()) + "</b><br/>";
         } else {
-            html += "<br/>" + OPDE.lang.getString(PnlProcess.internalClassID + ".commonprocess") + "<br/>";
+            html += "<br/>" + SYSTools.xx(PnlProcess.internalClassID + ".commonprocess") + "<br/>";
         }
-        html += "<b>" + OPDE.lang.getString("misc.msg.from") + ":</b> " + DateFormat.getDateInstance().format(qProcess.getFrom());
+        html += "<b>" + SYSTools.xx("misc.msg.from") + ":</b> " + DateFormat.getDateInstance().format(qProcess.getFrom());
         if (qProcess.isClosed()) {
-            html += "&nbsp;&nbsp;<b>" + OPDE.lang.getString("misc.msg.to") + ":</b> " + DateFormat.getDateInstance().format(qProcess.getTo());
+            html += "&nbsp;&nbsp;<b>" + SYSTools.xx("misc.msg.to") + ":</b> " + DateFormat.getDateInstance().format(qProcess.getTo());
         }
 
 //        DateMidnight revision = new DateMidnight(qProcess.getRevision());
@@ -159,10 +160,10 @@ public class QProcessTools {
             html += "<font " + SYSConst.html_darkgreen + ">";
         }
 
-        html += "&nbsp;&nbsp;<b>" + OPDE.lang.getString(PnlProcess.internalClassID + ".revision") + ":</b> ";
+        html += "&nbsp;&nbsp;<b>" + SYSTools.xx(PnlProcess.internalClassID + ".revision") + ":</b> ";
         html += DateFormat.getDateInstance().format(qProcess.getRevision()) + "</font>";
-        html += "<br/><b>" + OPDE.lang.getString(PnlProcess.internalClassID + ".createdby") + ":</b> " + qProcess.getCreator().getFullname();
-        html += "&nbsp;&nbsp;<b>" + OPDE.lang.getString(PnlProcess.internalClassID + ".ownedby") + ":</b> " + qProcess.getOwner().getFullname();
+        html += "<br/><b>" + SYSTools.xx(PnlProcess.internalClassID + ".createdby") + ":</b> " + qProcess.getCreator().getFullname();
+        html += "&nbsp;&nbsp;<b>" + SYSTools.xx(PnlProcess.internalClassID + ".ownedby") + ":</b> " + qProcess.getOwner().getFullname();
 
         if (qProcess.getPDCA() != null) {
             html += "<br/><b>" + getPDCA(qProcess.getPDCA()) + "</b>";
@@ -176,16 +177,16 @@ public class QProcessTools {
     public static String getPDCA(Integer pdca) {
         if (pdca == null) return "";
         if (pdca == PDCA_PLAN) {
-            return OPDE.lang.getString(PReportTools.PREPORT_TEXT_PDCA_PLAN);
+            return SYSTools.xx(PReportTools.PREPORT_TEXT_PDCA_PLAN);
         }
         if (pdca == PDCA_DO) {
-            return OPDE.lang.getString(PReportTools.PREPORT_TEXT_PDCA_DO);
+            return SYSTools.xx(PReportTools.PREPORT_TEXT_PDCA_DO);
         }
         if (pdca == PDCA_CHECK) {
-            return OPDE.lang.getString(PReportTools.PREPORT_TEXT_PDCA_CHECK);
+            return SYSTools.xx(PReportTools.PREPORT_TEXT_PDCA_CHECK);
         }
         if (pdca == PDCA_ACT) {
-            return OPDE.lang.getString(PReportTools.PREPORT_TEXT_PDCA_ACT);
+            return SYSTools.xx(PReportTools.PREPORT_TEXT_PDCA_ACT);
         }
         return "";
     }
@@ -193,9 +194,9 @@ public class QProcessTools {
     public static String getElementsAsHTML(QProcess qProcess, boolean includeSystemReports) {
         String html = "";
         DateFormat df = DateFormat.getDateTimeInstance();
-        html += "<h2  id=\"fonth2\" >" + OPDE.lang.getString(PnlProcess.internalClassID + ".elementlist") + "</h2>";
+        html += "<h2  id=\"fonth2\" >" + SYSTools.xx(PnlProcess.internalClassID + ".elementlist") + "</h2>";
         html += "<table  id=\"fonttext\" border=\"1\"><tr>" +
-                "<th>" + OPDE.lang.getString("misc.msg.Date") + "</th><th>" + OPDE.lang.getString("misc.msg.content") + "</th></tr>";
+                "<th>" + SYSTools.xx("misc.msg.Date") + "</th><th>" + SYSTools.xx("misc.msg.content") + "</th></tr>";
 
         for (QProcessElement element : qProcess.getElements()) {
             if (includeSystemReports || !(element instanceof PReport) || !((PReport) element).isSystem()) {
@@ -287,7 +288,7 @@ public class QProcessTools {
         for (QProcess qp : qProcesses) {
             QProcess myProcess = em.merge(qp);
             em.lock(myProcess, LockModeType.OPTIMISTIC);
-            PReport pReport = em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_CLOSE), PReportTools.PREPORT_TYPE_CLOSE, myProcess));
+            PReport pReport = em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_CLOSE), PReportTools.PREPORT_TYPE_CLOSE, myProcess));
             myProcess.setTo(enddate);
             myProcess.getPReports().add(pReport);
         }
@@ -329,7 +330,7 @@ public class QProcessTools {
         ArrayList<QProcess> listData = new ArrayList<QProcess>(query1.getResultList());
 
         html.append(SYSConst.html_h1("opde.controlling.orga.complaints"));
-        html.append(SYSConst.html_h2(OPDE.lang.getString("misc.msg.analysis") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
+        html.append(SYSConst.html_h2(SYSTools.xx("misc.msg.analysis") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
 
         // By Month
         HashMap<DateMidnight, Integer> monthMap = new HashMap<DateMidnight, Integer>();

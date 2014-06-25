@@ -37,8 +37,8 @@ public class PnlHAUF extends JPanel {
     }
 
     private void initPanel() {
-        lblHAUF.setText(OPDE.lang.getString("misc.msg.movein"));
-        lblStation.setText(OPDE.lang.getString("misc.msg.subdivision"));
+        lblHAUF.setText(SYSTools.xx("misc.msg.movein"));
+        lblStation.setText(SYSTools.xx("misc.msg.subdivision"));
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT s FROM Station s ORDER BY s.name");

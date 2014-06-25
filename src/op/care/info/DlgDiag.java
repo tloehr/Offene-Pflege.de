@@ -80,17 +80,17 @@ public class DlgDiag extends MyJDialog {
     private void initDialog() {
         fillCMBs();
 
-        String tooltip = OPDE.lang.getString("nursingrecords.info.dlg.diags.tx.tooltip").replace('[', '<').replace(']', '>');
+        String tooltip = SYSTools.xx("nursingrecords.info.dlg.diags.tx.tooltip").replace('[', '<').replace(']', '>');
         lblTX.setToolTipText(SYSTools.toHTMLForScreen("<p style=\"width:300px;\">" + tooltip + "</p>"));
 
-        txtSuche.setPrompt(OPDE.lang.getString("misc.msg.search"));
-        lblDiagBy.setText(OPDE.lang.getString("nursingrecords.info.dlg.diags.by"));
-        lblSide.setText(OPDE.lang.getString("misc.msg.diag.side"));
-        lblSecurity.setText(OPDE.lang.getString("misc.msg.diag.security"));
-        lblInterval.setText(OPDE.lang.getString("nursingrecords.info.dlg.interval_noconstraints"));
+        txtSuche.setPrompt(SYSTools.xx("misc.msg.search"));
+        lblDiagBy.setText(SYSTools.xx("nursingrecords.info.dlg.diags.by"));
+        lblSide.setText(SYSTools.xx("misc.msg.diag.side"));
+        lblSecurity.setText(SYSTools.xx("misc.msg.diag.security"));
+        lblInterval.setText(SYSTools.xx("nursingrecords.info.dlg.interval_noconstraints"));
         lblInterval.setIcon(SYSConst.icon22intervalNoConstraints);
         reloadTable();
-        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.info.dlg.diags"), 10));
+        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("nursingrecords.info.dlg.diags"), 10));
     }
 
     private void txtSucheActionPerformed(ActionEvent e) {
@@ -118,19 +118,19 @@ public class DlgDiag extends MyJDialog {
         cmbKH.setSelectedIndex(0);
 
         cmbSicherheit.setModel(new DefaultComboBoxModel(new String[]{
-                OPDE.lang.getString("misc.msg.diag.security.na"),
-                OPDE.lang.getString("misc.msg.diag.security.confirmed"),
-                OPDE.lang.getString("misc.msg.diag.security.suspected"),
-                OPDE.lang.getString("misc.msg.diag.security.rulingout"),
-                OPDE.lang.getString("misc.msg.diag.security.conditionafter")
+                SYSTools.xx("misc.msg.diag.security.na"),
+                SYSTools.xx("misc.msg.diag.security.confirmed"),
+                SYSTools.xx("misc.msg.diag.security.suspected"),
+                SYSTools.xx("misc.msg.diag.security.rulingout"),
+                SYSTools.xx("misc.msg.diag.security.conditionafter")
         }));
         cmbSicherheit.setSelectedIndex(1);
 
         cmbKoerper.setModel(new DefaultComboBoxModel(new String[]{
-                OPDE.lang.getString("misc.msg.diag.side.na"),
-                OPDE.lang.getString("misc.msg.diag.side.left"),
-                OPDE.lang.getString("misc.msg.diag.side.right"),
-                OPDE.lang.getString("misc.msg.diag.side.both")
+                SYSTools.xx("misc.msg.diag.side.na"),
+                SYSTools.xx("misc.msg.diag.side.left"),
+                SYSTools.xx("misc.msg.diag.side.right"),
+                SYSTools.xx("misc.msg.diag.side.both")
         }));
     }
 
@@ -331,12 +331,12 @@ public class DlgDiag extends MyJDialog {
         boolean saveOK = true;
 
         if (cmbArzt.getSelectedItem() == null && cmbKH.getSelectedItem() == null) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.gpANDhospitalempty")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.gpANDhospitalempty")));
             saveOK = false;
         }
 
         if (lstDiag.getSelectedValue() == null) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.info.dlg.diags.emptydiag")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("nursingrecords.info.dlg.diags.emptydiag")));
             saveOK = false;
         }
 
@@ -359,18 +359,18 @@ public class DlgDiag extends MyJDialog {
 
         String html = "";
         html += "<br/>" + SYSConst.html_bold(icd.getICD10() + ": " + icd.getText()) + "<br/>";
-        html += OPDE.lang.getString(internalClassID + ".by") + ": ";
+        html += SYSTools.xx(internalClassID + ".by") + ": ";
         if (kh != null) {
             html += SYSConst.html_bold(HospitalTools.getFullName(kh));
         }
         if (doc != null) {
             if (kh != null) {
-                html += "<br/>" + OPDE.lang.getString("misc.msg.confirmedby") + ": ";
+                html += "<br/>" + SYSTools.xx("misc.msg.confirmedby") + ": ";
             }
             html += SYSConst.html_bold(GPTools.getFullName(doc)) + "<br/>";
         }
-        html += OPDE.lang.getString("misc.msg.diag.side") + ": " + SYSConst.html_bold(cmbKoerper.getSelectedItem().toString()) + "<br/>";
-        html += OPDE.lang.getString("misc.msg.diag.security") + ": " + SYSConst.html_bold(cmbSicherheit.getSelectedItem().toString()) + "<br/>";
+        html += SYSTools.xx("misc.msg.diag.side") + ": " + SYSConst.html_bold(cmbKoerper.getSelectedItem().toString()) + "<br/>";
+        html += SYSTools.xx("misc.msg.diag.security") + ": " + SYSConst.html_bold(cmbSicherheit.getSelectedItem().toString()) + "<br/>";
 
         ResInfoTools.setContent(diag, props);
         diag.setHtml(html);

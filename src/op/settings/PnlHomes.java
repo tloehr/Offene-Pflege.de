@@ -11,6 +11,7 @@ import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.GUITools;
 import op.tools.PopupPanel;
+import op.tools.SYSTools;
 
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
@@ -40,12 +41,12 @@ public class PnlHomes extends PopupPanel {
     }
 
     private void initPanel() {
-        lblName.setText(OPDE.lang.getString(internalClassID + ".lblName"));
-        lblStrasse.setText(OPDE.lang.getString("misc.msg.street"));
-        lblPLZ.setText(OPDE.lang.getString("misc.msg.zipcode"));
-        lblOrt.setText(OPDE.lang.getString("misc.msg.city"));
-        lblTel.setText(OPDE.lang.getString("misc.msg.phone"));
-        lblFax.setText(OPDE.lang.getString("misc.msg.fax"));
+        lblName.setText(SYSTools.xx(internalClassID + ".lblName"));
+        lblStrasse.setText(SYSTools.xx("misc.msg.street"));
+        lblPLZ.setText(SYSTools.xx("misc.msg.zipcode"));
+        lblOrt.setText(SYSTools.xx("misc.msg.city"));
+        lblTel.setText(SYSTools.xx("misc.msg.phone"));
+        lblFax.setText(SYSTools.xx("misc.msg.fax"));
 
         txtName.setText(home.getName());
         txtStrasse.setText(home.getStreet());

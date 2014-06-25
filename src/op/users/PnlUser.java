@@ -105,8 +105,8 @@ public class PnlUser extends CleanablePanel {
         usermap = new HashMap<String, Users>();
         OPDE.getDisplayManager().setMainMessage(OPDE.getAppInfo().getInternalClasses().get(internalClassID).getShortDescription());
         prepareSearchArea();
-        tabMain.setTitleAt(TAB_USER, OPDE.lang.getString(internalClassID + ".tab.users"));
-        tabMain.setTitleAt(TAB_GROUPS, OPDE.lang.getString(internalClassID + ".tab.groups"));
+        tabMain.setTitleAt(TAB_USER, SYSTools.xx(internalClassID + ".tab.users"));
+        tabMain.setTitleAt(TAB_GROUPS, SYSTools.xx(internalClassID + ".tab.groups"));
         tabMain.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -236,7 +236,7 @@ public class PnlUser extends CleanablePanel {
         mypanel.setLayout(new VerticalLayout(3));
         mypanel.setBackground(Color.WHITE);
 
-        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
+        CollapsiblePane searchPane = new CollapsiblePane(SYSTools.xx(internalClassID));
         searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
         searchPane.setCollapsible(false);
 
@@ -267,7 +267,7 @@ public class PnlUser extends CleanablePanel {
          *      \__|_.__/ \___/|_|\__,_|\___/|___/\___|_|  |___/
          *
          */
-        tbOldUsers = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".showclosedmembers"));
+        tbOldUsers = GUITools.getNiceToggleButton(SYSTools.xx(internalClassID + ".showclosedmembers"));
         tbOldUsers.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
@@ -294,7 +294,7 @@ public class PnlUser extends CleanablePanel {
          *     /_/   \_\__,_|\__,_|\___/|___/\___|_|
          *
          */
-        final JideButton btnAddUser = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".btnAddUser"), SYSConst.icon22addUser, null);
+        final JideButton btnAddUser = GUITools.createHyperlinkButton(SYSTools.xx(internalClassID + ".btnAddUser"), SYSConst.icon22addUser, null);
         btnAddUser.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -339,7 +339,7 @@ public class PnlUser extends CleanablePanel {
          *     /_/   \_\__,_|\__,_|\____|_|  \___/ \__,_| .__/
          *                                              |_|
          */
-        final JideButton btnAddGroup = GUITools.createHyperlinkButton(OPDE.lang.getString(internalClassID + ".btnAddGroup"), SYSConst.icon22addGroup, null);
+        final JideButton btnAddGroup = GUITools.createHyperlinkButton(SYSTools.xx(internalClassID + ".btnAddGroup"), SYSConst.icon22addGroup, null);
         btnAddGroup.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -381,7 +381,7 @@ public class PnlUser extends CleanablePanel {
          *     |_.__/ \__|_| |_|_|   |_|  |_|_| |_|\__|
          *
          */
-//        JideButton btnPrint = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.print"), SYSConst.icon22print2, new ActionListener() {
+//        JideButton btnPrint = GUITools.createHyperlinkButton(SYSTools.xx("misc.commands.print"), SYSConst.icon22print2, new ActionListener() {
 //            @Override
 //            public void actionPerformed(ActionEvent actionEvent) {
 //
@@ -408,7 +408,7 @@ public class PnlUser extends CleanablePanel {
         DefaultCPTitle cptitle = new DefaultCPTitle("<html><font size=+1>" +
                 user.toString() +
                 (UsersTools.isQualified(user) ?
-                        ", " + OPDE.lang.getString(internalClassID + ".qualifiedNurse") : "") +
+                        ", " + SYSTools.xx(internalClassID + ".qualifiedNurse") : "") +
                 "</font></html>", new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -434,7 +434,7 @@ public class PnlUser extends CleanablePanel {
         btnChangePW.setAlignmentX(Component.RIGHT_ALIGNMENT);
         btnChangePW.setContentAreaFilled(false);
         btnChangePW.setBorder(null);
-        btnChangePW.setToolTipText(OPDE.lang.getString(internalClassID + ".btnChangePW.tooltip"));
+        btnChangePW.setToolTipText(SYSTools.xx(internalClassID + ".btnChangePW.tooltip"));
         btnChangePW.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -455,7 +455,7 @@ public class PnlUser extends CleanablePanel {
 
                     SYSTools.printpw(newpw, myUser);
 
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".pwchanged")));
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx(internalClassID + ".pwchanged")));
                 } catch (OptimisticLockException ole) { OPDE.warn(ole);
                     if (em.getTransaction().isActive()) {
                         em.getTransaction().rollback();
@@ -489,7 +489,7 @@ public class PnlUser extends CleanablePanel {
         btnActiveInactive.setAlignmentX(Component.RIGHT_ALIGNMENT);
         btnActiveInactive.setContentAreaFilled(false);
         btnActiveInactive.setBorder(null);
-        btnActiveInactive.setToolTipText(OPDE.lang.getString(internalClassID + (user.isActive() ? ".btnActiveInactive.stop" : ".btnActiveInactive.play")));
+        btnActiveInactive.setToolTipText(SYSTools.xx(internalClassID + (user.isActive() ? ".btnActiveInactive.stop" : ".btnActiveInactive.play")));
         btnActiveInactive.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -548,7 +548,7 @@ public class PnlUser extends CleanablePanel {
         btnEdit.setAlignmentX(Component.RIGHT_ALIGNMENT);
         btnEdit.setContentAreaFilled(false);
         btnEdit.setBorder(null);
-        btnEdit.setToolTipText(OPDE.lang.getString(internalClassID + ".btnEdit"));
+        btnEdit.setToolTipText(SYSTools.xx(internalClassID + ".btnEdit"));
         btnEdit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -665,7 +665,7 @@ public class PnlUser extends CleanablePanel {
         DefaultCPTitle cpTitle = new DefaultCPTitle("<html><font size=+1>" +
                 group.getGID().toUpperCase() +
                 (group.isQualified() ?
-                        ", " + OPDE.lang.getString(internalClassID + ".qualifiedGroup") : "") +
+                        ", " + SYSTools.xx(internalClassID + ".qualifiedGroup") : "") +
                 "</font></html>", new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -690,11 +690,11 @@ public class PnlUser extends CleanablePanel {
         btnDeleteGroup.setAlignmentX(Component.RIGHT_ALIGNMENT);
         btnDeleteGroup.setContentAreaFilled(false);
         btnDeleteGroup.setBorder(null);
-        btnDeleteGroup.setToolTipText(OPDE.lang.getString(internalClassID + ".btnDeleteGroup"));
+        btnDeleteGroup.setToolTipText(SYSTools.xx(internalClassID + ".btnDeleteGroup"));
         btnDeleteGroup.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<br/><i>" + group.getGID() + "</i><br/>" + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
+                new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + group.getGID() + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
                     @Override
                     public void execute(Object o) {
                         if (o.equals(JOptionPane.YES_OPTION)) {
@@ -762,7 +762,7 @@ public class PnlUser extends CleanablePanel {
 
     private JPanel createMemberPanel4(final Groups group) {
 
-        CollapsiblePane cpMember = new CollapsiblePane(OPDE.lang.getString(internalClassID + ".members"));
+        CollapsiblePane cpMember = new CollapsiblePane(SYSTools.xx(internalClassID + ".members"));
         cpMember.setBackground(bg.darker()); // a little darker
         cpMember.setForeground(Color.WHITE);
 
@@ -782,7 +782,7 @@ public class PnlUser extends CleanablePanel {
     private JPanel createClassesPanel4(final Groups group) {
 
         HashMap<String, SYSGROUPS2ACL> lookup = SYSGROUPS2ACLTools.getIntClassesMap(group);
-        CollapsiblePane cpClasses = new CollapsiblePane(OPDE.lang.getString(internalClassID + ".modules"));
+        CollapsiblePane cpClasses = new CollapsiblePane(SYSTools.xx(internalClassID + ".modules"));
         try {
             cpClasses.setCollapsed(true);
         } catch (PropertyVetoException e) {

@@ -117,7 +117,7 @@ public class PnlControlling extends CleanablePanel {
             @Override
             public void execute(Object o) {
                 Pair<Integer, Integer> progress = (Pair<Integer, Integer>) o;
-                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress.getFirst(), progress.getSecond()));
+                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress.getFirst(), progress.getSecond()));
             }
         };
         initComponents();
@@ -127,9 +127,9 @@ public class PnlControlling extends CleanablePanel {
     private void initPanel() {
 //        prepareSearchArea();
         pnlQMSPlan = null;
-        tabMain.setTitleAt(TAB_CONTROLLING, OPDE.lang.getString("opde.controlling.tab.controlling"));
-//        tabMain.setTitleAt(TAB_QMS, OPDE.lang.getString("opde.controlling.tab.qms"));
-        tabMain.setTitleAt(TAB_QMSPLAN, OPDE.lang.getString("opde.controlling.tab.qmsplan"));
+        tabMain.setTitleAt(TAB_CONTROLLING, SYSTools.xx("opde.controlling.tab.controlling"));
+//        tabMain.setTitleAt(TAB_QMS, SYSTools.xx("opde.controlling.tab.qms"));
+        tabMain.setTitleAt(TAB_QMSPLAN, SYSTools.xx("opde.controlling.tab.qmsplan"));
         reload();
     }
 
@@ -138,7 +138,7 @@ public class PnlControlling extends CleanablePanel {
         final CollapsiblePane cpOrga = new CollapsiblePane();
 
         String title = "<html><font size=+1>" +
-                OPDE.lang.getString("opde.controlling.orga") +
+                SYSTools.xx("opde.controlling.orga") +
                 "</font></html>";
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
@@ -175,7 +175,7 @@ public class PnlControlling extends CleanablePanel {
         final CollapsiblePane cpOrga = new CollapsiblePane();
 
         String title = "<html><font size=+1>" +
-                OPDE.lang.getString("opde.controlling.nutrition") +
+                SYSTools.xx("opde.controlling.nutrition") +
                 "</font></html>";
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
@@ -212,7 +212,7 @@ public class PnlControlling extends CleanablePanel {
         final CollapsiblePane cpOrga = new CollapsiblePane();
 
         String title = "<html><font size=+1>" +
-                OPDE.lang.getString("opde.controlling.drugs") +
+                SYSTools.xx("opde.controlling.drugs") +
                 "</font></html>";
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
@@ -248,7 +248,7 @@ public class PnlControlling extends CleanablePanel {
         final CollapsiblePane cpOrga = new CollapsiblePane();
 
         String title = "<html><font size=+1>" +
-                OPDE.lang.getString("opde.controlling.nursing") +
+                SYSTools.xx("opde.controlling.nursing") +
                 "</font></html>";
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
@@ -301,7 +301,7 @@ public class PnlControlling extends CleanablePanel {
             bvWeeksBack = 7;
         }
         final JTextField txtBVWeeksBack = GUITools.createIntegerTextField(1, 52, bvWeeksBack);
-        txtBVWeeksBack.setToolTipText(OPDE.lang.getString("misc.msg.weeksback"));
+        txtBVWeeksBack.setToolTipText(SYSTools.xx("misc.msg.weeksback"));
         btnBVActivities.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -346,7 +346,7 @@ public class PnlControlling extends CleanablePanel {
             complaintsMonthBack = 7;
         }
         final JTextField txtComplaintsMonthsBack = GUITools.createIntegerTextField(1, 12, complaintsMonthBack);
-        txtComplaintsMonthsBack.setToolTipText(OPDE.lang.getString("misc.msg.monthsback"));
+        txtComplaintsMonthsBack.setToolTipText(SYSTools.xx("misc.msg.monthsback"));
 
         btnComplaints.addActionListener(new ActionListener() {
             @Override
@@ -403,7 +403,7 @@ public class PnlControlling extends CleanablePanel {
             woundsMonthsBack = 7;
         }
         final JTextField txtWoundsMonthsBack = GUITools.createIntegerTextField(1, 12, woundsMonthsBack);
-        txtWoundsMonthsBack.setToolTipText(OPDE.lang.getString("misc.msg.monthsback"));
+        txtWoundsMonthsBack.setToolTipText(SYSTools.xx("misc.msg.monthsback"));
 
         btnWounds.addActionListener(new ActionListener() {
             @Override
@@ -491,7 +491,7 @@ public class PnlControlling extends CleanablePanel {
             fallsMonthsBack = 7;
         }
         final JTextField txtFallsMonthsBack = GUITools.createIntegerTextField(1, 120, fallsMonthsBack);
-        txtFallsMonthsBack.setToolTipText(OPDE.lang.getString("misc.msg.monthsback"));
+        txtFallsMonthsBack.setToolTipText(SYSTools.xx("misc.msg.monthsback"));
 
         btnFallsAnon.addActionListener(new ActionListener() {
             @Override
@@ -535,7 +535,7 @@ public class PnlControlling extends CleanablePanel {
             fallsResMonthsBack = 7;
         }
         final JTextField txtResFallsMonthsBack = GUITools.createIntegerTextField(1, 120, fallsResMonthsBack);
-        txtResFallsMonthsBack.setToolTipText(OPDE.lang.getString("misc.msg.monthsback"));
+        txtResFallsMonthsBack.setToolTipText(SYSTools.xx("misc.msg.monthsback"));
 
         btnFallsRes.addActionListener(new ActionListener() {
             @Override
@@ -673,7 +673,7 @@ public class PnlControlling extends CleanablePanel {
             wsMonthsBack = 7;
         }
         final JTextField txtWSMonthsBack = GUITools.createIntegerTextField(1, 24, wsMonthsBack);
-        txtWSMonthsBack.setToolTipText(OPDE.lang.getString("misc.msg.monthsback"));
+        txtWSMonthsBack.setToolTipText(SYSTools.xx("misc.msg.monthsback"));
         btnWeightStats.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -837,8 +837,8 @@ private void initComponents() {
         ArrayList<Resident> listResident = new ArrayList<Resident>(listData.keySet());
         Collections.sort(listResident);
 
-        html.append(SYSConst.html_h1(OPDE.lang.getString("opde.controlling.nursing.wounds") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
-//        html.append(SYSConst.html_h2(OPDE.lang.getString("misc.msg.analysis") + ": " + );
+        html.append(SYSConst.html_h1(SYSTools.xx("opde.controlling.nursing.wounds") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
+//        html.append(SYSConst.html_h2(SYSTools.xx("misc.msg.analysis") + ": " + );
 
         p = 0;
 
@@ -884,7 +884,7 @@ private void initComponents() {
         mypanel.setLayout(new VerticalLayout(5));
         mypanel.setBackground(Color.WHITE);
 
-        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
+        CollapsiblePane searchPane = new CollapsiblePane(SYSTools.xx(internalClassID));
         searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
         searchPane.setCollapsible(false);
 
@@ -913,7 +913,7 @@ private void initComponents() {
         if (tabMain.getSelectedIndex() == TAB_QMSPLAN) {
 
             if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
-                JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
+                JideButton addButton = GUITools.createHyperlinkButton(SYSTools.xx("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
                         new DlgQMSPlan(new Qmsplan(""), new Closure() {

@@ -45,7 +45,7 @@ public class PnlProduct extends JPanel {
 
     private void initPanel() {
         lblProdMsg.setVisible(false);
-        lblProdMsg.setText(OPDE.lang.getString(internalClassID + ".existingProducts"));
+        lblProdMsg.setText(SYSTools.xx(internalClassID + ".existingProducts"));
         jsp1.setVisible(false);
         lstProd.setVisible(false);
         txtProd.setText(template);
@@ -70,7 +70,7 @@ public class PnlProduct extends JPanel {
             lblProdMsg.setVisible(true);
             jsp1.setVisible(true);
             lstProd.setVisible(true);
-            listProd.add(0, "<html><b>" + OPDE.lang.getString("misc.msg.noneOfThem") + "</b></html>");
+            listProd.add(0, "<html><b>" + SYSTools.xx("misc.msg.noneOfThem") + "</b></html>");
             DefaultListModel lmProd;
             lmProd = SYSTools.list2dlm(listProd);
             lstProd.setModel(lmProd);

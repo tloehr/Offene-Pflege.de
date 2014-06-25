@@ -370,7 +370,7 @@ public class ResValue implements Serializable, QProcessElement, Cloneable, Compa
 
     @Override
     public String getTitle() {
-        return OPDE.lang.getString(PnlValues.internalClassID) + ": " + vtype.getText();
+        return SYSTools.xx(PnlValues.internalClassID) + ": " + vtype.getText();
     }
 
     @Override

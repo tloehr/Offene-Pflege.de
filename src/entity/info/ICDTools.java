@@ -15,7 +15,7 @@ public class ICDTools {
 //            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
 //                String text;
 //                if (o == null) {
-//                    text = OPDE.lang.getString("misc.commands.>>noselection<<");
+//                    text = SYSTools.xx("misc.commands.>>noselection<<");
 //                } else if (o instanceof ICD) {
 ////                    text = ((GP) o).getName() + ", " + ((GP) o).getFirstname() + ", " + ((GP) o).getCity();
 //                    text = getFullName((GP) o);

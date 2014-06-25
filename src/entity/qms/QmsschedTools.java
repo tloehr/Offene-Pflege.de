@@ -22,17 +22,17 @@ public class QmsschedTools {
     public static final byte STATE_ARCHIVE = 2;
 
     public static String getAsHTML(Qmssched qmssched) {
-        String result = "";
+        String result = " ";
 
-        result += SYSTools.catchNull(qmssched.getText()).isEmpty() ? "" : SYSConst.html_paragraph(SYSConst.html_bold(OPDE.lang.getString("misc.msg.comment") + ": " + qmssched.getText()));
+        result += SYSTools.catchNull(qmssched.getText()).isEmpty() ? "" : SYSConst.html_paragraph(SYSConst.html_bold(SYSTools.xx("misc.msg.comment") + ": " + qmssched.getText()));
 
         result += getRepeatPattern(qmssched);
-//        result += SYSConst.html_paragraph(qmssched.hasTime() ? DateFormat.getTimeInstance(DateFormat.SHORT).format(qmssched.getTime()) + " " + OPDE.lang.getString("misc.msg.Time.short") + ", " + wdh : wdh);
+//        result += SYSConst.html_paragraph(qmssched.hasTime() ? DateFormat.getTimeInstance(DateFormat.SHORT).format(qmssched.getTime()) + " " + SYSTools.xx("misc.msg.Time.short") + ", " + wdh : wdh);
 
         if (qmssched.getStation() != null) {
-            result += SYSConst.html_paragraph(OPDE.lang.getString("misc.msg.station") + ": " + qmssched.getStation().getName() + ", " + qmssched.getStation().getHome().getName());
+            result += SYSConst.html_paragraph(SYSTools.xx("misc.msg.station") + ": " + qmssched.getStation().getName() + ", " + qmssched.getStation().getHome().getName());
         } else if (qmssched.getHome() != null) {
-            result += SYSConst.html_paragraph(OPDE.lang.getString("misc.msg.home") + ": " + qmssched.getHome().getName());
+            result += SYSConst.html_paragraph(SYSTools.xx("misc.msg.home") + ": " + qmssched.getHome().getName());
         }
 
 //        result += "</table>";
@@ -46,15 +46,15 @@ public class QmsschedTools {
 
         if (qmssched.isDaily()) {
             if (qmssched.getDaily() > 1) {
-                result += OPDE.lang.getString("misc.msg.every") + " " + qmssched.getDaily() + " " + OPDE.lang.getString("misc.msg.Days2");
+                result += SYSTools.xx("misc.msg.every") + " " + qmssched.getDaily() + " " + SYSTools.xx("misc.msg.Days2");
             } else {
-                result += OPDE.lang.getString("misc.msg.everyDay");
+                result += SYSTools.xx("misc.msg.everyDay");
             }
         } else if (qmssched.isWeekly()) {
             if (qmssched.getWeekly() == 1) {
-                result += result += OPDE.lang.getString("misc.msg.everyWeek");
+                result += result += SYSTools.xx("misc.msg.everyWeek");
             } else {
-                result += OPDE.lang.getString("misc.msg.every") + " " + qmssched.getWeekly() + " " + OPDE.lang.getString("misc.msg.weeks");
+                result += SYSTools.xx("misc.msg.every") + " " + qmssched.getWeekly() + " " + SYSTools.xx("misc.msg.weeks");
             }
 
             MutableDateTime mdt = new MutableDateTime();
@@ -67,15 +67,15 @@ public class QmsschedTools {
                 MutableDateTime mdt = new MutableDateTime();
                 mdt.setDayOfWeek(qmssched.getWeekday());
 
-                result += OPDE.lang.getString("misc.msg.every") + " " + qmssched.getDayinmonth() + ". " + mdt.dayOfWeek().getAsText() + " " + SYSTools.xx("in");
+                result += SYSTools.xx("misc.msg.every") + " " + qmssched.getDayinmonth() + ". " + mdt.dayOfWeek().getAsText() + " " + SYSTools.xx("in");
             } else {
-                result += OPDE.lang.getString("misc.msg.every") + " " + qmssched.getDayinmonth() + ". " + OPDE.lang.getString("misc.msg.day");
+                result += SYSTools.xx("misc.msg.every") + " " + qmssched.getDayinmonth() + ". " + SYSTools.xx("misc.msg.day");
             }
 
             if (qmssched.getMonthly() == 1) {
-                result += OPDE.lang.getString("misc.msg.everyMonth") + " ";
+                result += SYSTools.xx("misc.msg.everyMonth") + " ";
             } else {
-                result += OPDE.lang.getString("misc.msg.every") + " " + qmssched.getMonthly() + " " + OPDE.lang.getString("misc.msg.months") + " ";
+                result += SYSTools.xx("misc.msg.every") + " " + qmssched.getMonthly() + " " + SYSTools.xx("misc.msg.months") + " ";
             }
 
         } else if (qmssched.isYearly()) {
@@ -84,15 +84,15 @@ public class QmsschedTools {
                 MutableDateTime mdt = new MutableDateTime();
                 mdt.setDayOfWeek(qmssched.getWeekday());
 
-                result += OPDE.lang.getString("misc.msg.every") + " " + qmssched.getDayinmonth() + ". " + mdt.dayOfWeek().getAsText() + " " + SYSTools.xx("in");
+                result += SYSTools.xx("misc.msg.every") + " " + qmssched.getDayinmonth() + ". " + mdt.dayOfWeek().getAsText() + " " + SYSTools.xx("in");
             } else {
-                result += OPDE.lang.getString("misc.msg.every") + " " + qmssched.getDayinmonth() + ". " + OPDE.lang.getString("misc.msg.day");
+                result += SYSTools.xx("misc.msg.every") + " " + qmssched.getDayinmonth() + ". " + SYSTools.xx("misc.msg.day");
             }
 
             if (qmssched.getYearly() == 1) {
-                result += OPDE.lang.getString("misc.msg.everyYear") + " ";
+                result += SYSTools.xx("misc.msg.everyYear") + " ";
             } else {
-                result += OPDE.lang.getString("misc.msg.every") + " " + qmssched.getYearly() + " " + OPDE.lang.getString("misc.msg.Years") + " ";
+                result += SYSTools.xx("misc.msg.every") + " " + qmssched.getYearly() + " " + SYSTools.xx("misc.msg.Years") + " ";
             }
 
         } else {
@@ -103,7 +103,7 @@ public class QmsschedTools {
         LocalDate today = new LocalDate();
 
         if (ldatum.compareTo(today) > 0) { // Die erste Ausführung liegt in der Zukunft
-            result += OPDE.lang.getString("opde.controlling.qms.dlgqmsplan.pnlschedule.ldate") + ": " + DateFormat.getDateInstance().format(qmssched.getStartingOn());
+            result += SYSTools.xx("opde.controlling.qms.dlgqmsplan.pnlschedule.ldate") + ": " + DateFormat.getDateInstance().format(qmssched.getStartingOn());
         }
 
         return result;

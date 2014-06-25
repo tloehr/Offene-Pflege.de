@@ -10,6 +10,7 @@ import entity.info.Resident;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.SYSCalendar;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
@@ -42,12 +43,12 @@ public class PnlBWBasisInfo extends JPanel {
     }
 
     private void initPanel() {
-        lblName.setText(OPDE.lang.getString("misc.msg.surname"));
-        lblVorname.setText(OPDE.lang.getString("misc.msg.firstname"));
+        lblName.setText(SYSTools.xx("misc.msg.surname"));
+        lblVorname.setText(SYSTools.xx("misc.msg.firstname"));
         lblAge.setText(null);
-        lblGebdatum.setText(OPDE.lang.getString("misc.msg.dob"));
-        lblGeschlecht.setText(OPDE.lang.getString("misc.msg.gender"));
-        cmbGender.setModel(new DefaultComboBoxModel(new String[]{OPDE.lang.getString("misc.msg.male"), OPDE.lang.getString("misc.msg.female")}));
+        lblGebdatum.setText(SYSTools.xx("misc.msg.dob"));
+        lblGeschlecht.setText(SYSTools.xx("misc.msg.gender"));
+        cmbGender.setModel(new DefaultComboBoxModel(new String[]{SYSTools.xx("misc.msg.male"), SYSTools.xx("misc.msg.female")}));
         txtDOB.setText(DateFormat.getDateInstance().format(new Date()));
 
         gebdatum = null;
@@ -66,7 +67,7 @@ public class PnlBWBasisInfo extends JPanel {
             query.setParameter("gebdatum", gebdatum);
             query.setParameter("geschlecht", geschlecht);
             if (query.getResultList().size() > 0) {
-                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".alreadyexists"), DisplayMessage.WARNING));
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx(internalClassID + ".alreadyexists"), DisplayMessage.WARNING));
             } else {
                 resident = new Resident(nachname, vorname, geschlecht, gebdatum);
                 OPDE.getDisplayManager().clearSubMessages();
@@ -104,21 +105,21 @@ public class PnlBWBasisInfo extends JPanel {
 //            gebdatum = SYSCalendar.parseDate(txtDOB.getText());
 //            if (!SYSCalendar.isBirthdaySane(gebdatum)) {
 //                gebdatum = null;
-//                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".dobXX"), DisplayMessage.WARNING));
+//                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx(internalClassID + ".dobXX"), DisplayMessage.WARNING));
 //            } else {
 //                txtDOB.setText(DateFormat.getDateInstance().format(gebdatum));
 //            }
 //        } catch (NumberFormatException e1) {
 //            gebdatum = null;
 //            txtDOB.setText(DateFormat.getDateInstance().format(new Date()));
-//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".dobXX"), DisplayMessage.WARNING));
+//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx(internalClassID + ".dobXX"), DisplayMessage.WARNING));
 //        }
 //
         if (SYSCalendar.isBirthdaySane(gebdatum)) {
             DateMidnight birthdate = new DateTime(gebdatum).toDateMidnight();
             DateTime now = new DateTime();
             Years age = Years.yearsBetween(birthdate, now);
-            lblAge.setText(age.getYears() + " " + OPDE.lang.getString("misc.msg.Years"));
+            lblAge.setText(age.getYears() + " " + SYSTools.xx("misc.msg.Years"));
 //            gebdatum = birthdate.toDate();
         } else {
             gebdatum = null;

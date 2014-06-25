@@ -144,7 +144,7 @@ public class QProcess implements Serializable, Comparable<QProcess> {
         this.resident = resident;
         this.pcat = null;
         this.PReports = new ArrayList<PReport>();
-        this.PReports.add(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_CREATE), PReportTools.PREPORT_TYPE_CREATE, this));
+        this.PReports.add(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_CREATE), PReportTools.PREPORT_TYPE_CREATE, this));
         this.attachedNReportConnections = new ArrayList<SYSNR2PROCESS>();
         this.attachedPrescriptionConnections = new ArrayList<SYSPRE2PROCESS>();
         this.attachedResInfoConnections = new ArrayList<SYSINF2PROCESS>();

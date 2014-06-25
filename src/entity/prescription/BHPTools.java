@@ -201,7 +201,7 @@ public class BHPTools {
             // Wahrscheinlich jedoch mehr als diese. Anhand des LDatums müssen
             // die wirklichen Treffer nachher genauer ermittelt werden.
 
-            OPDE.info(OPDE.lang.getString(internalClassID) + " " + OPDE.lang.getString("misc.msg.writingto") + ": " + OPDE.getUrl());
+            OPDE.info(SYSTools.xx(internalClassID) + " " + SYSTools.xx("misc.msg.writingto") + ": " + OPDE.getUrl());
 
             select.setParameter("andatum", new Date(SYSCalendar.startOfDay(targetdate.toDate())));
             select.setParameter("abdatum", new Date(SYSCalendar.endOfDay(targetdate.toDate())));
@@ -211,7 +211,7 @@ public class BHPTools {
 
             numbhp += generate(em, list, targetdate, true);
 
-            OPDE.important(em, OPDE.lang.getString(internalClassID) + " " + OPDE.lang.getString(internalClassID + ".completed") + ": " + DateFormat.getDateInstance().format(targetdate.toDate()) + " " + OPDE.lang.getString(internalClassID + ".numCreatedEntities") + ": " + numbhp);
+            OPDE.important(em, SYSTools.xx(internalClassID) + " " + SYSTools.xx(internalClassID + ".completed") + ": " + DateFormat.getDateInstance().format(targetdate.toDate()) + " " + SYSTools.xx(internalClassID + ".numCreatedEntities") + ": " + numbhp);
         }
 
         SYSPropsTools.storeProp(em, "LASTBHPIMPORT", DateTimeFormat.forPattern("yyyy-MM-dd").print(targetdate));
@@ -256,8 +256,8 @@ public class BHPTools {
         BigDecimal row = BigDecimal.ZERO;
 
         System.out.println("------------------------------------------");
-        System.out.println(OPDE.lang.getString(internalClassID) + " " + OPDE.lang.getString(internalClassID + ".generationForDate") + ": " + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()));
-        System.out.println(OPDE.lang.getString(internalClassID + ".progress"));
+        System.out.println(SYSTools.xx(internalClassID) + " " + SYSTools.xx(internalClassID + ".generationForDate") + ": " + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()));
+        System.out.println(SYSTools.xx(internalClassID + ".progress"));
 
         for (PrescriptionSchedule pSchedule : list) {
             int numbhpbefore = numbhp;
@@ -365,7 +365,7 @@ public class BHPTools {
         }
 
         System.out.println();
-        System.out.println(OPDE.lang.getString(internalClassID + ".numCreatedEntities") + " [" + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()) + "]: " + numbhp);
+        System.out.println(SYSTools.xx(internalClassID + ".numCreatedEntities") + " [" + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()) + "]: " + numbhp);
         System.out.println("------------------------------------------");
 
         OPDE.debug("number of bhps overall: " + Integer.toString(numbhp));
@@ -624,7 +624,7 @@ public class BHPTools {
         String text = "";
         if (!bhp.isOnDemand()) {
             if (bhp.getSollZeit() == BYTE_TIMEOFDAY) {
-                text += "<font color=\"blue\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getSoll()) + " " + OPDE.lang.getString("misc.msg.Time.short") + "</font>";
+                text += "<font color=\"blue\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getSoll()) + " " + SYSTools.xx("misc.msg.Time.short") + "</font>";
             } else {
                 String[] msg = GUITools.getLocalizedMessages(TIMEIDTEXTLONG);
                 text += msg[bhp.getSollZeit()];
@@ -632,7 +632,7 @@ public class BHPTools {
         } else {
 
             if (bhp.getState() == STATE_DONE) {
-                text += DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getIst()) + " " + OPDE.lang.getString("misc.msg.Time.short");
+                text += DateFormat.getTimeInstance(DateFormat.SHORT).format(bhp.getIst()) + " " + SYSTools.xx("misc.msg.Time.short");
             } else {
                 text += "--";
             }
@@ -729,11 +729,11 @@ public class BHPTools {
         if (!list.isEmpty()) {
 
             BHP b1 = list.get(0);
-            result += SYSConst.html_h3((b1.isOnDemand() ? OPDE.lang.getString("nursingrecords.bhp.ondemand") : OPDE.lang.getString(SHIFT_TEXT[b1.getShift()])));
+            result += SYSConst.html_h3((b1.isOnDemand() ? SYSTools.xx("nursingrecords.bhp.ondemand") : SYSTools.xx(SHIFT_TEXT[b1.getShift()])));
 
 
             result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
-                    "<th>" + OPDE.lang.getString("nursingrecords.nursingprocess.interventions") + "</th><th>Zeit / Status</th><th>Benutzer / Zeit</th></tr>";
+                    "<th>" + SYSTools.xx("nursingrecords.nursingprocess.interventions") + "</th><th>Zeit / Status</th><th>Benutzer / Zeit</th></tr>";
 
             for (BHP bhp : list) {
 

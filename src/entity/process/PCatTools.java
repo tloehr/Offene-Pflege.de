@@ -31,7 +31,7 @@ public class PCatTools {
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                 String text;
                 if (o == null) {
-                    text = SYSTools.toHTMLForScreen(OPDE.lang.getString("misc.commands.>>noselection<<"));
+                    text = SYSTools.toHTMLForScreen(SYSTools.xx("misc.commands.>>noselection<<"));
                 } else if (o instanceof PCat) {
                     text = o.toString();
                 } else {

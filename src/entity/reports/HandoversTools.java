@@ -138,7 +138,7 @@ public class HandoversTools {
             ArrayList<Resident> listAllActiveResidents;
             HashMap<Resident, HashMap<Byte, Long>> bhpStats;
             ArrayList<BHP> listOpenBHPs;
-            String html = "<h1 id=\"fonth1\" >" + OPDE.lang.getString(PnlHandover.internalClassID + ".supervisorsReport") + ": " + DateFormat.getDateInstance().format(day.toDate()) + "</h1>";
+            String html = "<h1 id=\"fonth1\" >" + SYSTools.xx(PnlHandover.internalClassID + ".supervisorsReport") + ": " + DateFormat.getDateInstance().format(day.toDate()) + "</h1>";
 
             @Override
             protected Object doInBackground() throws Exception {
@@ -148,7 +148,7 @@ public class HandoversTools {
                 int progress = 1;
 
 
-                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 
                 listAllActiveResidents = ResidentTools.getAllActive(home);
                 bhpStats = new HashMap<Resident, HashMap<Byte, Long>>();
@@ -164,11 +164,11 @@ public class HandoversTools {
                  *     |_____|_| |_| |_| .__/ \__|\__, | |_| \_|_| \_\___| .__/ \___/|_|   \__|___/
                  *                     |_|        |___/                  |_|
                  */
-                html += "<h2 id=\"fonth2\" >" + OPDE.lang.getString(PnlHandover.internalClassID + ".residentsWONReports") + "</h2>";
+                html += "<h2 id=\"fonth2\" >" + SYSTools.xx(PnlHandover.internalClassID + ".residentsWONReports") + "</h2>";
 
                 String htmlul1 = "";
                 for (Resident resident : listAllActiveResidents) {
-                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
                     progress++;
                     Date absentSince = ResInfoTools.absentSince(resident);
                     if (absentSince != null) {
@@ -180,13 +180,13 @@ public class HandoversTools {
                     if (num == 0) {
                         htmlul1 += "<li>" + ResidentTools.getTextCompact(resident);
                         if (mapAbsentSince.containsKey(resident)) {
-                            htmlul1 += OPDE.lang.getString("misc.msg.ResidentAbsentSince") + ": " + DateFormat.getDateInstance().format(mapAbsentSince.get(resident));
+                            htmlul1 += SYSTools.xx("misc.msg.ResidentAbsentSince") + ": " + DateFormat.getDateInstance().format(mapAbsentSince.get(resident));
                         }
                         htmlul1 += "</li>";
                     }
                 }
                 if (htmlul1.isEmpty()) {
-                    html += "<h3 id=\"fonth3\">" + OPDE.lang.getString("misc.msg.noEntries") + "...</h3>";
+                    html += "<h3 id=\"fonth3\">" + SYSTools.xx("misc.msg.noEntries") + "...</h3>";
                 } else {
                     html += "<ul>" + htmlul1 + "</ul>";
                 }
@@ -199,8 +199,8 @@ public class HandoversTools {
                  *      \___/| .__/ \___|_| |_| |____/|_| |_|_|   |___/
                  *           |_|
                  */
-                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), 2, 4));
-                html += "<h2 id=\"fonth2\" >" + OPDE.lang.getString(PnlHandover.internalClassID + ".openBHPs") + "</h2>";
+                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), 2, 4));
+                html += "<h2 id=\"fonth2\" >" + SYSTools.xx(PnlHandover.internalClassID + ".openBHPs") + "</h2>";
 
                 Collections.sort(listOpenBHPs, new Comparator<BHP>() {
                     @Override
@@ -215,7 +215,7 @@ public class HandoversTools {
 
                 // resident -> shift -> num of empty BHPs
                 for (BHP bhp : listOpenBHPs) {
-                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
                     progress++;
                     if (!bhpStats.containsKey(bhp.getResident())) {
                         bhpStats.put(bhp.getResident(), new HashMap<Byte, Long>());
@@ -229,12 +229,12 @@ public class HandoversTools {
                 }
 
                 if (bhpStats.isEmpty()) {
-                    html += "<h3 id=\"fonth3\">" + OPDE.lang.getString("misc.msg.noEntries") + "...</h3>";
+                    html += "<h3 id=\"fonth3\">" + SYSTools.xx("misc.msg.noEntries") + "...</h3>";
                 } else {
                     for (Resident resident : bhpStats.keySet()) {
                         html += "<h3 id=\"fonth3\">" + ResidentTools.getTextCompact(resident);
                         if (mapAbsentSince.containsKey(resident)) {
-                            htmlul1 += OPDE.lang.getString("misc.msg.ResidentAbsentSince") + ": " + DateFormat.getDateInstance().format(mapAbsentSince.get(resident));
+                            htmlul1 += SYSTools.xx("misc.msg.ResidentAbsentSince") + ": " + DateFormat.getDateInstance().format(mapAbsentSince.get(resident));
                         }
                         html += "</h3>";
 
@@ -242,7 +242,7 @@ public class HandoversTools {
                         int i = 0;
                         for (Byte shift : BHPTools.SHIFTS) {
                             if (bhpStats.get(resident).get(shift) > 0l) {
-                                html += "<li>" + OPDE.lang.getString(BHPTools.SHIFT_TEXT[i]) + ": " + bhpStats.get(resident).get(shift) + "</li>";
+                                html += "<li>" + SYSTools.xx(BHPTools.SHIFT_TEXT[i]) + ": " + bhpStats.get(resident).get(shift) + "</li>";
                             }
                             i++;
                         }
@@ -258,11 +258,11 @@ public class HandoversTools {
                  *     |_____|_| |_| |_| .__/ \__|\__, | |_|  |_|\___|\__,_|___|_| |_|\_/ \___|\__\___/|_|  |_|\___||___/
                  *                     |_|        |___/
                  */
-                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), 3, 4));
-                html += "<h2 id=\"fonth2\" >" + OPDE.lang.getString(PnlHandover.internalClassID + ".emptyInventories") + "</h2>";
+                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), 3, 4));
+                html += "<h2 id=\"fonth2\" >" + SYSTools.xx(PnlHandover.internalClassID + ".emptyInventories") + "</h2>";
                 String htmlul3 = "";
                 for (Resident resident : listAllActiveResidents) {
-                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
                     progress++;
                     String htmlul2 = "";
                     ArrayList<MedInventory> listInventories = MedInventoryTools.getAllActive(resident);
@@ -276,8 +276,8 @@ public class HandoversTools {
                         if (stock == null || stockSum.compareTo(BigDecimal.ZERO) <= 0) {
                             htmlul2 += "<li>" + inventory.getText() + ": <b>";
                             htmlul2 += (stock == null ?
-                                    OPDE.lang.getString(PnlInventory.internalClassID + ".noOpenStock") :
-                                    "[" + stock.getID() + "] " + OPDE.lang.getString(PnlInventory.internalClassID + ".StockSum") + " " + stockSum.setScale(2, BigDecimal.ROUND_HALF_UP) + " " + TradeFormTools.getPackUnit(stock.getTradeForm()));
+                                    SYSTools.xx(PnlInventory.internalClassID + ".noOpenStock") :
+                                    "[" + stock.getID() + "] " + SYSTools.xx(PnlInventory.internalClassID + ".StockSum") + " " + stockSum.setScale(2, BigDecimal.ROUND_HALF_UP) + " " + TradeFormTools.getPackUnit(stock.getTradeForm()));
                             htmlul2 += "</b></li>";
                         }
                     }
@@ -287,7 +287,7 @@ public class HandoversTools {
                 }
 
                 if (htmlul3.isEmpty()) {
-                    html += "<h3 id=\"fonth3\">" + OPDE.lang.getString("misc.msg.noEntries") + "...</h3>";
+                    html += "<h3 id=\"fonth3\">" + SYSTools.xx("misc.msg.noEntries") + "...</h3>";
                 } else {
                     html += "<ul>" + htmlul3 + "</ul>";
                 }

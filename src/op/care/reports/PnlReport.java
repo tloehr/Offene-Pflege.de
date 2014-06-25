@@ -135,7 +135,7 @@ public class PnlReport extends NursingRecordsPanel {
         mypanel.setLayout(new VerticalLayout(5));
         mypanel.setBackground(Color.WHITE);
 
-        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
+        CollapsiblePane searchPane = new CollapsiblePane(SYSTools.xx(internalClassID));
         searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
         searchPane.setCollapsible(false);
 
@@ -222,14 +222,14 @@ public class PnlReport extends NursingRecordsPanel {
     private java.util.List<Component> addFilters() {
         java.util.List<Component> list = new ArrayList<Component>();
 
-        txtSearch = new JXSearchField(OPDE.lang.getString("misc.msg.searchphrase"));
+        txtSearch = new JXSearchField(SYSTools.xx("misc.msg.searchphrase"));
         txtSearch.setInstantSearchDelay(100000);
         txtSearch.setFont(SYSConst.ARIAL14);
         txtSearch.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (SYSTools.catchNull(txtSearch.getText()).trim().length() > 3) {
-                    SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Search(resident, txtSearch.getText().trim()), false, true, OPDE.lang.getString("misc.msg.searchresults") + ": &quot;" + txtSearch.getText().trim() + "&quot;", txtSearch.getText().trim()), false);
+                    SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Search(resident, txtSearch.getText().trim()), false, true, SYSTools.xx("misc.msg.searchresults") + ": &quot;" + txtSearch.getText().trim() + "&quot;", txtSearch.getText().trim()), false);
                 }
             }
         });
@@ -264,7 +264,7 @@ public class PnlReport extends NursingRecordsPanel {
         DefaultComboBoxModel dcbm = new DefaultComboBoxModel(query.getResultList().toArray());
         em.close();
 
-        dcbm.insertElementAt(OPDE.lang.getString("misc.commands.noselection"), 0);
+        dcbm.insertElementAt(SYSTools.xx("misc.commands.noselection"), 0);
         cmbTags = new JComboBox(dcbm);
         cmbTags.setFont(SYSConst.ARIAL14);
         cmbTags.setRenderer(NReportTAGSTools.getPBerichtTAGSRenderer());
@@ -281,7 +281,7 @@ public class PnlReport extends NursingRecordsPanel {
         list.add(cmbTags);
 //        SYSPropsTools.restoreState("nursingrecords.reports:cmbTags", cmbTags);
 
-//        tbFilesOnly = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.filters.filesonly"));
+//        tbFilesOnly = GUITools.getNiceToggleButton(SYSTools.xx("misc.filters.filesonly"));
 //        tbFilesOnly.addItemListener(new ItemListener() {
 //            @Override
 //            public void itemStateChanged(ItemEvent itemEvent) {
@@ -294,7 +294,7 @@ public class PnlReport extends NursingRecordsPanel {
 ////        SYSPropsTools.restoreState("nursingrecords.reports:tbFilesOnly", tbFilesOnly);
 //        tbFilesOnly.setHorizontalAlignment(SwingConstants.LEFT);
 
-        tbShowReplaced = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.filters.showreplaced"));
+        tbShowReplaced = GUITools.getNiceToggleButton(SYSTools.xx("misc.filters.showreplaced"));
         tbShowReplaced.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
@@ -305,7 +305,7 @@ public class PnlReport extends NursingRecordsPanel {
         list.add(tbShowReplaced);
         tbShowReplaced.setHorizontalAlignment(SwingConstants.LEFT);
 
-//        JideButton resetButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.resetFilter"), SYSConst.icon22undo, new ActionListener() {
+//        JideButton resetButton = GUITools.createHyperlinkButton(SYSTools.xx("misc.commands.resetFilter"), SYSConst.icon22undo, new ActionListener() {
 //            @Override
 //            public void actionPerformed(ActionEvent actionEvent) {
 //                initPhase = true;
@@ -333,7 +333,7 @@ public class PnlReport extends NursingRecordsPanel {
          *
          */
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
-            JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
+            JideButton addButton = GUITools.createHyperlinkButton(SYSTools.xx("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     if (!resident.isActive()) {
@@ -437,7 +437,7 @@ public class PnlReport extends NursingRecordsPanel {
 
 
         OPDE.getMainframe().setBlocked(true);
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 
         SwingWorker worker = new SwingWorker() {
             Date max = null;
@@ -473,9 +473,9 @@ public class PnlReport extends NursingRecordsPanel {
                 OPDE.getMainframe().setBlocked(false);
                 if (lockmessageAfterwards) OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
                 if (max != null) {
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.lastEntry") + ": " + DateFormat.getDateInstance().format(max), 5));
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.lastEntry") + ": " + DateFormat.getDateInstance().format(max), 5));
                 } else {
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.noentryyet"), 5));
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.noentryyet"), 5));
                 }
             }
         };
@@ -628,7 +628,7 @@ public class PnlReport extends NursingRecordsPanel {
             btnPrintMonth.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnPrintMonth.setContentAreaFilled(false);
             btnPrintMonth.setBorder(null);
-            btnPrintMonth.setToolTipText(OPDE.lang.getString("misc.tooltips.btnprintmonth"));
+            btnPrintMonth.setToolTipText(SYSTools.xx("misc.tooltips.btnprintmonth"));
             btnPrintMonth.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -709,7 +709,7 @@ public class PnlReport extends NursingRecordsPanel {
                 DateFormat.getDateInstance(DateFormat.SHORT).format(week.dayOfWeek().withMaximumValue().toDate()) + " - " +
                 DateFormat.getDateInstance(DateFormat.SHORT).format(week.dayOfWeek().withMinimumValue().toDate()) +
                 " (" +
-                OPDE.lang.getString("misc.msg.weekinyear") +
+                SYSTools.xx("misc.msg.weekinyear") +
                 week.getWeekOfWeekyear() +
                 ")" +
                 "</b>" +
@@ -734,7 +734,7 @@ public class PnlReport extends NursingRecordsPanel {
             btnPrintWeek.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnPrintWeek.setContentAreaFilled(false);
             btnPrintWeek.setBorder(null);
-            btnPrintWeek.setToolTipText(OPDE.lang.getString("misc.tooltips.btnprintweek"));
+            btnPrintWeek.setToolTipText(SYSTools.xx("misc.tooltips.btnprintweek"));
             btnPrintWeek.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -829,7 +829,7 @@ public class PnlReport extends NursingRecordsPanel {
             btnPrintDay.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnPrintDay.setContentAreaFilled(false);
             btnPrintDay.setBorder(null);
-            btnPrintDay.setToolTipText(OPDE.lang.getString("misc.tooltips.btnprintday"));
+            btnPrintDay.setToolTipText(SYSTools.xx("misc.tooltips.btnprintday"));
             btnPrintDay.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -893,8 +893,8 @@ public class PnlReport extends NursingRecordsPanel {
                     String title = "<html><table border=\"0\">" +
                             "<tr valign=\"top\">" +
                             "<td width=\"100\" align=\"left\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
-                            " " + OPDE.lang.getString("misc.msg.Time.short") +
-                            "<br/>" + nreport.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)") +
+                            " " + SYSTools.xx("misc.msg.Time.short") +
+                            "<br/>" + nreport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)") +
                             "</td>" +
                             "<td width=\"100\" align=\"left\">" + SYSTools.catchNull(NReportTools.getTagsAsHTML(nreport), " [", "]") + "</td>" +
                             "<td width=\"400\" align=\"left\">" +
@@ -928,7 +928,7 @@ public class PnlReport extends NursingRecordsPanel {
                          *
                          */
                         final JButton btnFiles = new JButton(Integer.toString(nreport.getAttachedFilesConnections().size()), SYSConst.icon22greenStar);
-                        btnFiles.setToolTipText(OPDE.lang.getString("misc.btnfiles.tooltip"));
+                        btnFiles.setToolTipText(SYSTools.xx("misc.btnfiles.tooltip"));
                         btnFiles.setForeground(Color.BLUE);
                         btnFiles.setHorizontalTextPosition(SwingUtilities.CENTER);
                         btnFiles.setFont(SYSConst.ARIAL18BOLD);
@@ -988,7 +988,7 @@ public class PnlReport extends NursingRecordsPanel {
                          *
                          */
                         final JButton btnProcess = new JButton(Integer.toString(nreport.getAttachedQProcessConnections().size()), SYSConst.icon22redStar);
-                        btnProcess.setToolTipText(OPDE.lang.getString("misc.btnprocess.tooltip"));
+                        btnProcess.setToolTipText(SYSTools.xx("misc.btnprocess.tooltip"));
                         btnProcess.setForeground(Color.YELLOW);
                         btnProcess.setHorizontalTextPosition(SwingUtilities.CENTER);
                         btnProcess.setFont(SYSConst.ARIAL18BOLD);
@@ -1026,7 +1026,7 @@ public class PnlReport extends NursingRecordsPanel {
                                                 if (unassigned.contains(linkObject.getQProcess())) {
                                                     linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
                                                     linkObject.getNReport().getAttachedQProcessConnections().remove(linkObject);
-                                                    em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                                    em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
 
                                                     em.remove(linkObject);
                                                 }
@@ -1038,7 +1038,7 @@ public class PnlReport extends NursingRecordsPanel {
                                                 if (!listElements.contains(myReport)) {
                                                     QProcess myQProcess = em.merge(qProcess);
                                                     SYSNR2PROCESS myLinkObject = em.merge(new SYSNR2PROCESS(myQProcess, myReport));
-                                                    em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
+                                                    em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
                                                     qProcess.getAttachedNReportConnections().add(myLinkObject);
                                                     myReport.getAttachedQProcessConnections().add(myLinkObject);
                                                 }
@@ -1331,7 +1331,7 @@ public class PnlReport extends NursingRecordsPanel {
             btnDelete.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<br/><i>" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(nreport.getPit()) + "</i><br/>" + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
+                    new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(nreport.getPit()) + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
                         @Override
                         public void execute(Object answer) {
                             if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -1673,7 +1673,7 @@ public class PnlReport extends NursingRecordsPanel {
                                     if (unassigned.contains(linkObject.getQProcess())) {
                                         linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
                                         linkObject.getNReport().getAttachedQProcessConnections().remove(linkObject);
-                                        em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                        em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
                                         em.remove(linkObject);
                                     }
                                 }
@@ -1684,7 +1684,7 @@ public class PnlReport extends NursingRecordsPanel {
                                     if (!listElements.contains(myReport)) {
                                         QProcess myQProcess = em.merge(qProcess);
                                         SYSNR2PROCESS myLinkObject = em.merge(new SYSNR2PROCESS(myQProcess, myReport));
-                                        em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
+                                        em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + nreport.getTitle() + " ID: " + nreport.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
                                         qProcess.getAttachedNReportConnections().add(myLinkObject);
                                         myReport.getAttachedQProcessConnections().add(myLinkObject);
                                     }

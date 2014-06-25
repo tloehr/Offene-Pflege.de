@@ -58,49 +58,49 @@ public class Qmssched {
 
     @Basic
     @Column(name = "daily", nullable = true, insertable = true, updatable = true)
-    private Byte daily;
+    private int daily;
 
-    public Byte getDaily() {
+    public int getDaily() {
         return daily;
     }
 
-    public void setDaily(Byte daily) {
+    public void setDaily(int daily) {
         this.daily = daily;
     }
 
     @Basic
     @Column(name = "weekly", nullable = true, insertable = true, updatable = true)
-    private Byte weekly;
+    private int weekly;
 
-    public Byte getWeekly() {
+    public int getWeekly() {
         return weekly;
     }
 
-    public void setWeekly(Byte weekly) {
+    public void setWeekly(int weekly) {
         this.weekly = weekly;
     }
 
     @Basic
     @Column(name = "monthly", nullable = true, insertable = true, updatable = true)
-    private Byte monthly;
+    private int monthly;
 
-    public Byte getMonthly() {
+    public int getMonthly() {
         return monthly;
     }
 
-    public void setMonthly(Byte monthly) {
+    public void setMonthly(int monthly) {
         this.monthly = monthly;
     }
 
     @Basic
     @Column(name = "yearly", nullable = true, insertable = true, updatable = true)
-    private Byte yearly;
+    private int yearly;
 
-    public Byte getYearly() {
+    public int getYearly() {
         return yearly;
     }
 
-    public void setYearly(Byte yearly) {
+    public void setYearly(int yearly) {
         this.yearly = yearly;
     }
 
@@ -269,23 +269,23 @@ public class Qmssched {
 
         Qmssched qmssched = (Qmssched) o;
 
+        if (daily != qmssched.daily) return false;
         if (dayinmonth != qmssched.dayinmonth) return false;
         if (id != qmssched.id) return false;
         if (monthinyear != qmssched.monthinyear) return false;
+        if (monthly != qmssched.monthly) return false;
         if (version != qmssched.version) return false;
         if (weekday != qmssched.weekday) return false;
+        if (weekly != qmssched.weekly) return false;
         if (workingday != qmssched.workingday) return false;
-        if (daily != null ? !daily.equals(qmssched.daily) : qmssched.daily != null) return false;
+        if (yearly != qmssched.yearly) return false;
         if (home != null ? !home.equals(qmssched.home) : qmssched.home != null) return false;
         if (measure != null ? !measure.equals(qmssched.measure) : qmssched.measure != null) return false;
-        if (monthly != null ? !monthly.equals(qmssched.monthly) : qmssched.monthly != null) return false;
         if (qmsList != null ? !qmsList.equals(qmssched.qmsList) : qmssched.qmsList != null) return false;
         if (qmsplan != null ? !qmsplan.equals(qmssched.qmsplan) : qmssched.qmsplan != null) return false;
         if (startingOn != null ? !startingOn.equals(qmssched.startingOn) : qmssched.startingOn != null) return false;
         if (station != null ? !station.equals(qmssched.station) : qmssched.station != null) return false;
         if (text != null ? !text.equals(qmssched.text) : qmssched.text != null) return false;
-        if (weekly != null ? !weekly.equals(qmssched.weekly) : qmssched.weekly != null) return false;
-        if (yearly != null ? !yearly.equals(qmssched.yearly) : qmssched.yearly != null) return false;
 
         return true;
     }
@@ -295,10 +295,10 @@ public class Qmssched {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + (measure != null ? measure.hashCode() : 0);
         result = 31 * result + (startingOn != null ? startingOn.hashCode() : 0);
-        result = 31 * result + (daily != null ? daily.hashCode() : 0);
-        result = 31 * result + (weekly != null ? weekly.hashCode() : 0);
-        result = 31 * result + (monthly != null ? monthly.hashCode() : 0);
-        result = 31 * result + (yearly != null ? yearly.hashCode() : 0);
+        result = 31 * result + daily;
+        result = 31 * result + weekly;
+        result = 31 * result + monthly;
+        result = 31 * result + yearly;
         result = 31 * result + monthinyear;
         result = 31 * result + dayinmonth;
         result = 31 * result + weekday;

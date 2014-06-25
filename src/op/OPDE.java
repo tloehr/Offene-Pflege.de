@@ -570,7 +570,7 @@ public class OPDE {
                 jpaProps.put("javax.persistence.jdbc.password", desEncrypter.decrypt(cryptpassword));
             } catch (Exception e) {
                 if (Desktop.isDesktopSupported()) {
-                    JOptionPane.showMessageDialog(null, OPDE.lang.getString("misc.msg.decryption.failure"), appInfo.getProgname(), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, SYSTools.xx("misc.msg.decryption.failure"), appInfo.getProgname(), JOptionPane.ERROR_MESSAGE);
                 } else {
                     OPDE.fatal(e);
                 }

@@ -136,7 +136,7 @@ public class DlgReport extends MyJDialog {
 
     private void btnApplyActionPerformed(ActionEvent e) {
         if (SYSTools.catchNull(txtBericht.getText()).trim().isEmpty()) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.emptyentry")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.emptyentry")));
             return;
         }
         nReport.setText(txtBericht.getText());

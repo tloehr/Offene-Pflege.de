@@ -21,7 +21,7 @@ public class DosageFormTools {
     public static final short STATE_UPR1 = 0;
     public static final short STATE_UPRn = 1;
     public static final short STATE_DONT_CALC = 2;
-    public static final String[] UPR_STATES = new String[]{OPDE.lang.getString("state_upr1"), OPDE.lang.getString("state_uprn"), OPDE.lang.getString("state_dont_calc")};
+    public static final String[] UPR_STATES = new String[]{SYSTools.xx("state_upr1"), SYSTools.xx("state_uprn"), SYSTools.xx("state_dont_calc")};
 
 
     public static ArrayList<DosageForm> getAll() {
@@ -46,12 +46,12 @@ public class DosageFormTools {
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                 String text;
                 if (o == null) {
-                    text = SYSTools.toHTML("<i>" + OPDE.lang.getString("misc.commands.noselection") + "</i>");
+                    text = SYSTools.toHTML("<i>" + SYSTools.xx("misc.commands.noselection") + "</i>");
                 } else if (o instanceof DosageForm) {
                     DosageForm form = (DosageForm) o;
 
                     text = toPrettyString(form);
-                    text += ", " + OPDE.lang.getString("misc.msg.upr") + " " + UPR_STATES[form.getUPRState()];
+                    text += ", " + SYSTools.xx("misc.msg.upr") + " " + UPR_STATES[form.getUPRState()];
 
                 } else {
                     text = o.toString();

@@ -24,7 +24,7 @@ public class GPTools {
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                 String text;
                 if (o == null) {
-                    text = OPDE.lang.getString("misc.commands.>>noselection<<");
+                    text = SYSTools.xx("misc.commands.>>noselection<<");
                 } else if (o instanceof GP) {
 //                    text = ((GP) o).getName() + ", " + ((GP) o).getFirstname() + ", " + ((GP) o).getCity();
                     text = getFullName((GP) o);
@@ -39,22 +39,22 @@ public class GPTools {
     public static String getFullName(GP doc) {
         if (doc != null) {
             if (OPDE.isAnonym()) {
-                return "[" + OPDE.lang.getString("misc.msg.anon") + "]";
+                return "[" + SYSTools.xx("misc.msg.anon") + "]";
             }
             return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitle(), "", " ") + doc.getName() + " " + doc.getFirstname() + ", " + doc.getCity();
         } else {
-            return OPDE.lang.getString("misc.msg.noentryyet");
+            return SYSTools.xx("misc.msg.noentryyet");
         }
     }
 
     public static String getCompleteAddress(GP doc) {
         if (doc != null) {
             if (OPDE.isAnonym()) {
-                return "[" + OPDE.lang.getString("misc.msg.anon") + "]";
+                return "[" + SYSTools.xx("misc.msg.anon") + "]";
             }
             return doc.getAnrede() + " " + SYSTools.catchNull(doc.getTitle(), "", " ") + doc.getFirstname() + " " + doc.getName() + ", " + doc.getStreet() + ", " + doc.getZIP() + " " + doc.getCity() + ", Tel: " + doc.getTel();
         } else {
-            return OPDE.lang.getString("misc.msg.noentryyet");
+            return SYSTools.xx("misc.msg.noentryyet");
         }
     }
 

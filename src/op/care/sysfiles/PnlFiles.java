@@ -146,9 +146,9 @@ public class PnlFiles extends NursingRecordsPanel {
         tblFiles.getColumnModel().getColumn(1).setCellRenderer(new RNDHTML());
         tblFiles.getColumnModel().getColumn(2).setCellRenderer(new RNDHTML());
 
-        tblFiles.getColumnModel().getColumn(0).setHeaderValue(OPDE.lang.getString(internalClassID + ".tabheader1"));
-        tblFiles.getColumnModel().getColumn(1).setHeaderValue(OPDE.lang.getString(internalClassID + ".tabheader2"));
-        tblFiles.getColumnModel().getColumn(2).setHeaderValue(OPDE.lang.getString(internalClassID + ".tabheader3"));
+        tblFiles.getColumnModel().getColumn(0).setHeaderValue(SYSTools.xx(internalClassID + ".tabheader1"));
+        tblFiles.getColumnModel().getColumn(1).setHeaderValue(SYSTools.xx(internalClassID + ".tabheader2"));
+        tblFiles.getColumnModel().getColumn(2).setHeaderValue(SYSTools.xx(internalClassID + ".tabheader3"));
 
 
         jspFiles.dispatchEvent(new ComponentEvent(jspFiles, ComponentEvent.COMPONENT_RESIZED));
@@ -235,7 +235,7 @@ public class PnlFiles extends NursingRecordsPanel {
             menu = new JPopupMenu();
 
             // SELECT
-            JMenuItem itemPopupShow = new JMenuItem(OPDE.lang.getString("misc.commands.show"), SYSConst.icon22magnify1);
+            JMenuItem itemPopupShow = new JMenuItem(SYSTools.xx("misc.commands.show"), SYSConst.icon22magnify1);
             itemPopupShow.addActionListener(new java.awt.event.ActionListener() {
 
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -247,7 +247,7 @@ public class PnlFiles extends NursingRecordsPanel {
 
             if (col == TMSYSFiles.COL_DESCRIPTION && OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
 
-                final JMenuItem itemPopupEdit = new JMenuItem(OPDE.lang.getString("misc.commands.edit"), SYSConst.icon22edit3);
+                final JMenuItem itemPopupEdit = new JMenuItem(SYSTools.xx("misc.commands.edit"), SYSConst.icon22edit3);
                 itemPopupEdit.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
 
@@ -308,12 +308,12 @@ public class PnlFiles extends NursingRecordsPanel {
 
 
             if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.DELETE, internalClassID)) {
-                JMenuItem itemPopupDelete = new JMenuItem(OPDE.lang.getString("misc.commands.delete"), SYSConst.icon22delete);
+                JMenuItem itemPopupDelete = new JMenuItem(SYSTools.xx("misc.commands.delete"), SYSConst.icon22delete);
                 itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
 
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
 
-                        new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<br/><b>" + sysfile.getFilename() + "</b><br/>" + OPDE.lang.getString("misc.questions.delete2"), new ImageIcon(getClass().getResource("/artwork/48x48/bw/trashcan_empty.png")), new Closure() {
+                        new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><b>" + sysfile.getFilename() + "</b><br/>" + SYSTools.xx("misc.questions.delete2"), new ImageIcon(getClass().getResource("/artwork/48x48/bw/trashcan_empty.png")), new Closure() {
                             @Override
                             public void execute(Object o) {
                                 if (o.equals(JOptionPane.YES_OPTION)) {
@@ -368,7 +368,7 @@ public class PnlFiles extends NursingRecordsPanel {
         mypanel.setLayout(new VerticalLayout());
         mypanel.setBackground(Color.WHITE);
 
-        CollapsiblePane cmdPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
+        CollapsiblePane cmdPane = new CollapsiblePane(SYSTools.xx(internalClassID));
         cmdPane.setStyle(CollapsiblePane.PLAIN_STYLE);
         cmdPane.setCollapsible(false);
 
@@ -383,7 +383,7 @@ public class PnlFiles extends NursingRecordsPanel {
             public void filesDropped(java.io.File[] files) {
                 java.util.List<SYSFiles> successful = SYSFilesTools.putFiles(files, resident);
                 if (!successful.isEmpty()) {
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(successful.size() + " " + OPDE.lang.getString("misc.msg.Files") + " " + OPDE.lang.getString("misc.msg.added")));
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(successful.size() + " " + SYSTools.xx("misc.msg.Files") + " " + SYSTools.xx("misc.msg.added")));
                 }
                 reloadTable();
             }

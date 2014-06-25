@@ -132,7 +132,7 @@ public class PnlSchedule extends JPanel {
 
     private void initPanel() {
 
-        pnlBemerkung.setBorder(new TitledBorder(OPDE.lang.getString(internalClassID + ".bordertitle4textfield")));
+        pnlBemerkung.setBorder(new TitledBorder(SYSTools.xx(internalClassID + ".bordertitle4textfield")));
 
         ArrayList<Date> timelist = SYSCalendar.getTimeList();
         cmbUhrzeit.setModel(new DefaultComboBoxModel(timelist.toArray()));
@@ -224,14 +224,14 @@ public class PnlSchedule extends JPanel {
             }
         }
         cmbUhrzeit.setSelectedItem(now);
-        lblUhrzeit.setText(OPDE.lang.getString("misc.msg.Number"));
+        lblUhrzeit.setText(SYSTools.xx("misc.msg.Number"));
 
         txtBemerkung.setText(is.getBemerkung());
 
-        lblMinutes.setText(OPDE.lang.getString("misc.msg.Minute(s)"));
+        lblMinutes.setText(SYSTools.xx("misc.msg.Minute(s)"));
         txtMinutes.setText(is.getDauer().toPlainString());
         
-        tbFloating = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".floatinginterventions"));
+        tbFloating = GUITools.getNiceToggleButton(SYSTools.xx(internalClassID + ".floatinginterventions"));
         tbFloating.setSelected(is.isFloating());
         panelMain.add(tbFloating, CC.xy(3, 5));
 
@@ -955,7 +955,7 @@ public class PnlSchedule extends JPanel {
     private void cbSonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbSonActionPerformed
 
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.needoneweekday")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.needoneweekday")));
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
 
@@ -963,42 +963,42 @@ public class PnlSchedule extends JPanel {
 
     private void cbSamActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbSamActionPerformed
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.needoneweekday")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.needoneweekday")));
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
     }//GEN-LAST:event_cbSamActionPerformed
 
     private void cbFreActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbFreActionPerformed
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.needoneweekday")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.needoneweekday")));
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
     }//GEN-LAST:event_cbFreActionPerformed
 
     private void cbDonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbDonActionPerformed
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.needoneweekday")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.needoneweekday")));
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
     }//GEN-LAST:event_cbDonActionPerformed
 
     private void cbMitActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbMitActionPerformed
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.needoneweekday")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.needoneweekday")));
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
     }//GEN-LAST:event_cbMitActionPerformed
 
     private void cbDieActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbDieActionPerformed
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.needoneweekday")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.needoneweekday")));
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
     }//GEN-LAST:event_cbDieActionPerformed
 
     private void cbMonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbMonActionPerformed
         if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.needoneweekday")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.needoneweekday")));
             ((JCheckBox) evt.getSource()).setSelected(true);
         }
     }//GEN-LAST:event_cbMonActionPerformed
@@ -1029,7 +1029,7 @@ public class PnlSchedule extends JPanel {
             save();
             actionBlock.execute(is);
         } catch (NumberFormatException nfe) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".parseerror") + nfe.getLocalizedMessage(), 2));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx(internalClassID + ".parseerror") + nfe.getLocalizedMessage(), 2));
         }
     }//GEN-LAST:event_btnSaveActionPerformed
 

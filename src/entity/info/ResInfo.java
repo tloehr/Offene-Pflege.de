@@ -372,7 +372,7 @@ public class ResInfo implements Serializable, QProcessElement, Cloneable, Compar
 
     @Override
     public String getTitle() {
-        return OPDE.lang.getString(PnlInformation.internalClassID) + ": " + bwinfotyp.getShortDescription();
+        return SYSTools.xx(PnlInformation.internalClassID) + ": " + bwinfotyp.getShortDescription();
     }
 
     @Override

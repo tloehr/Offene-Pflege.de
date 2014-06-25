@@ -163,14 +163,14 @@ public class ResValueTools {
 
         DateFormat df = DateFormat.getDateTimeInstance();
         if (resValue.isDeleted()) {
-            result += OPDE.lang.getString("misc.msg.thisentryhasbeendeleted") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(resValue.getEditDate()) + " <br/>" + OPDE.lang.getString("misc.msg.Bywhom") + " " + resValue.getEditedBy().getFullname() + "<br/>";
+            result += SYSTools.xx("misc.msg.thisentryhasbeendeleted") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(resValue.getEditDate()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + " " + resValue.getEditedBy().getFullname() + "<br/>";
         }
         if (resValue.isReplacement() && !resValue.isReplaced()) {
-            result += OPDE.lang.getString("misc.msg.thisEntryIsAReplacement") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(resValue.getCreateDate()) + "<br/>" + OPDE.lang.getString("misc.msg.originalentry") + ": " + resValue.getReplacementFor().getID() + "<br/>";
+            result += SYSTools.xx("misc.msg.thisEntryIsAReplacement") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(resValue.getCreateDate()) + "<br/>" + SYSTools.xx("misc.msg.originalentry") + ": " + resValue.getReplacementFor().getID() + "<br/>";
         }
         if (resValue.isReplaced()) {
-            result += OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(resValue.getCreateDate()) + "<br/>" + OPDE.lang.getString("misc.msg.Bywhom") + " " + resValue.getEditedBy().getFullname();
-            result += "<br/>" + OPDE.lang.getString("misc.msg.replaceentry") + ": " + resValue.getReplacedBy().getID() + "</i><br/>";
+            result += SYSTools.xx("misc.msg.thisentryhasbeenedited") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(resValue.getCreateDate()) + "<br/>" + SYSTools.xx("misc.msg.Bywhom") + " " + resValue.getEditedBy().getFullname();
+            result += "<br/>" + SYSTools.xx("misc.msg.replaceentry") + ": " + resValue.getReplacedBy().getID() + "</i><br/>";
         }
         if (!resValue.getText().trim().isEmpty()) {
             result += "<br/>" + SYSConst.html_bold("misc.msg.comment") + ":";
@@ -187,7 +187,7 @@ public class ResValueTools {
 //        if (param.getType() == RR) {
 //            result += "<b>" + param.getValue1() + "/" + param.getValue2() + " " + UNITS[RR] + " " + VALUES[PULSE] + ": " + param.getValue3() + " " + UNITS[PULSE] + "</b>";
 //        } else if (param.getType() == STOOL || param.getType() == VOMIT) {
-//            result += "<i>" + OPDE.lang.getString("misc.msg.novalue") + "</i>";
+//            result += "<i>" + SYSTools.xx("misc.msg.novalue") + "</i>";
 //        } else {
 //            result += "<b>" + param.getValue1() + " " + UNITS[param.getType()] + "</b>";
 //        }
@@ -204,7 +204,7 @@ public class ResValueTools {
                     color = OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[SYSCalendar.whatShiftIs(wert.getPit())] + "_FGBHP");
                 }
             }
-            result = "<font " + color + " " + SYSConst.html_arial14 + ">" + "<b>" + OPDE.lang.getString("misc.msg.comment") + ":</b> " + wert.getText() + "</font>";
+            result = "<font " + color + " " + SYSConst.html_arial14 + ">" + "<b>" + SYSTools.xx("misc.msg.comment") + ":</b> " + wert.getText() + "</font>";
         }
         return result;
     }
@@ -222,9 +222,9 @@ public class ResValueTools {
         html += SYSConst.html_h2(ResidentTools.getLabelText(resValues.get(0).getResident()));
 
         html += "<table  id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
-                "<th style=\"width:20%\">" + OPDE.lang.getString(PnlValues.internalClassID + ".tabheader1") +
-                "</th><th style=\"width:40%\">" + OPDE.lang.getString(PnlValues.internalClassID + ".tabheader2") + "</th>" +
-                "</th><th style=\"width:40%\">" + OPDE.lang.getString(PnlValues.internalClassID + ".tabheader3") + "</th></tr>\n";
+                "<th style=\"width:20%\">" + SYSTools.xx(PnlValues.internalClassID + ".tabheader1") +
+                "</th><th style=\"width:40%\">" + SYSTools.xx(PnlValues.internalClassID + ".tabheader2") + "</th>" +
+                "</th><th style=\"width:40%\">" + SYSTools.xx(PnlValues.internalClassID + ".tabheader3") + "</th></tr>\n";
 
         for (ResValue resValue : resValues) {
             html += "<tr>";
@@ -463,7 +463,7 @@ public class ResValueTools {
 
         StringBuilder html = new StringBuilder(1000);
 
-        html.append(SYSConst.html_h1(OPDE.lang.getString(PnlControlling.internalClassID + ".nutrition.liquidbalance")));
+        html.append(SYSConst.html_h1(SYSTools.xx(PnlControlling.internalClassID + ".nutrition.liquidbalance")));
         html.append(SYSConst.html_h2(monthFormmatter.format(month.toDate())));
 
         p = 0;
@@ -475,7 +475,7 @@ public class ResValueTools {
                 BigDecimal targetIn = SYSTools.parseBigDecimal(controlling.getProperty(ResidentTools.KEY_TARGETIN));
 
                 html.append(SYSConst.html_h3(ResidentTools.getTextCompact(resident)));
-                html.append(SYSConst.html_div(SYSConst.html_bold(OPDE.lang.getString("misc.msg.targetDrink")) + ": " + targetIn.setScale(2, RoundingMode.HALF_UP).toString() + " ml"));
+                html.append(SYSConst.html_div(SYSConst.html_bold(SYSTools.xx("misc.msg.targetDrink")) + ": " + targetIn.setScale(2, RoundingMode.HALF_UP).toString() + " ml"));
 
                 HashMap<DateMidnight, Pair<BigDecimal, BigDecimal>> balanceMap = getLiquidBalancePerDay(resident, from.toDateMidnight(), to.toDateMidnight());
 
@@ -484,10 +484,10 @@ public class ResValueTools {
 
                 StringBuilder table = new StringBuilder(1000);
                 table.append(SYSConst.html_table_tr(
-                        SYSConst.html_table_th(OPDE.lang.getString("misc.msg.Date")) +
-                                SYSConst.html_table_th(OPDE.lang.getString("misc.msg.ingestion")) +
-                                SYSConst.html_table_th(OPDE.lang.getString("misc.msg.egestion")) +
-                                SYSConst.html_table_th(OPDE.lang.getString("misc.msg.balance"))
+                        SYSConst.html_table_th(SYSTools.xx("misc.msg.Date")) +
+                                SYSConst.html_table_th(SYSTools.xx("misc.msg.ingestion")) +
+                                SYSConst.html_table_th(SYSTools.xx("misc.msg.egestion")) +
+                                SYSConst.html_table_th(SYSTools.xx("misc.msg.balance"))
                 ));
                 for (DateMidnight day : listDays) {
                     BigDecimal linesum = balanceMap.get(day).getFirst().add(balanceMap.get(day).getSecond());
@@ -549,8 +549,8 @@ public class ResValueTools {
         ArrayList<Resident> listResidents = new ArrayList<Resident>(listData.keySet());
         Collections.sort(listResidents);
 
-        html.append(SYSConst.html_h1(OPDE.lang.getString(PnlControlling.internalClassID + ".nutrition.weightstats")));
-        html.append(SYSConst.html_h2(OPDE.lang.getString("misc.msg.analysis") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
+        html.append(SYSConst.html_h1(SYSTools.xx(PnlControlling.internalClassID + ".nutrition.weightstats")));
+        html.append(SYSConst.html_h2(SYSTools.xx("misc.msg.analysis") + ": " + df.format(from.toDate()) + " &raquo;&raquo; " + df.format(new Date())));
 
         ResValueTypes heightType = ResValueTypesTools.getType(ResValueTypesTools.HEIGHT);
         ResValueTypes weightType = ResValueTypesTools.getType(ResValueTypesTools.WEIGHT);
@@ -566,7 +566,7 @@ public class ResValueTools {
 
             html.append(
                     SYSConst.html_div(
-                            heightType.getText() + ": " + (height == null ? OPDE.lang.getString("misc.msg.noentryyet") : height.getVal1().setScale(2, RoundingMode.HALF_UP).toString() + " " + heightType.getUnit1())
+                            heightType.getText() + ": " + (height == null ? SYSTools.xx("misc.msg.noentryyet") : height.getVal1().setScale(2, RoundingMode.HALF_UP).toString() + " " + heightType.getUnit1())
                     )
             );
 

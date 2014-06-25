@@ -137,16 +137,16 @@ public class PnlDosageForm extends PopupPanel {
 
     private void initPanel() {
 
-        lblPreparation.setText(OPDE.lang.getString(internalClassID + ".preparation"));
-        lblUsage.setText(OPDE.lang.getString(internalClassID + ".usagetext"));
-        lblUsageUnit.setText(OPDE.lang.getString(internalClassID + ".usageUnit"));
-        lblPackUnit.setText(OPDE.lang.getString(internalClassID + ".packUnit"));
-        lblIntervention.setText(OPDE.lang.getString(internalClassID + ".intervention"));
-        lblDailyPlan.setText(OPDE.lang.getString(internalClassID + ".dailyPlan"));
-        lblEquiv.setText(OPDE.lang.getString(internalClassID + ".sameas"));
-        lblUPRState.setText(OPDE.lang.getString(internalClassID + ".uprstate"));
+        lblPreparation.setText(SYSTools.xx(internalClassID + ".preparation"));
+        lblUsage.setText(SYSTools.xx(internalClassID + ".usagetext"));
+        lblUsageUnit.setText(SYSTools.xx(internalClassID + ".usageUnit"));
+        lblPackUnit.setText(SYSTools.xx(internalClassID + ".packUnit"));
+        lblIntervention.setText(SYSTools.xx(internalClassID + ".intervention"));
+        lblDailyPlan.setText(SYSTools.xx(internalClassID + ".dailyPlan"));
+        lblEquiv.setText(SYSTools.xx(internalClassID + ".sameas"));
+        lblUPRState.setText(SYSTools.xx(internalClassID + ".uprstate"));
 
-        cmbUPR.setModel(new DefaultComboBoxModel(new String[]{OPDE.lang.getString("state_upr1"), OPDE.lang.getString("state_uprn"), OPDE.lang.getString("state_dont_calc")}));
+        cmbUPR.setModel(new DefaultComboBoxModel(new String[]{SYSTools.xx("state_upr1"), SYSTools.xx("state_uprn"), SYSTools.xx("state_dont_calc")}));
         cmbUPR.setSelectedIndex(form.getUPRState());
         cmbIntervention.setModel(new DefaultComboBoxModel(InterventionTools.findBy(InterventionTools.TYPE_PRESCRIPTION).toArray()));
         cmbUsageUnit.setModel(new DefaultComboBoxModel(Arrays.copyOfRange(SYSConst.UNITS, 1, SYSConst.UNITS.length - 1)));

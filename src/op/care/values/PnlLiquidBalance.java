@@ -77,8 +77,8 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
 
     private void initPanel() {
         startDay = new LocalDate();
-        lblLeft.setText(OPDE.lang.getString("nursingrecords.liquidbalances.summary"));
-        lblRight.setText(OPDE.lang.getString("nursingrecords.liquidbalances.details"));
+        lblLeft.setText(SYSTools.xx("nursingrecords.liquidbalances.summary"));
+        lblRight.setText(SYSTools.xx("nursingrecords.liquidbalances.details"));
 
         df = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT);
         nf = DecimalFormat.getNumberInstance();
@@ -307,7 +307,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
             public Component getTableCellRendererComponent(JTable table, Object o, boolean isSelected, boolean hasFocus, int row, int column) {
                 String text;
                 if (o == null) {
-                    text = OPDE.lang.getString("misc.commands.>>noselection<<");
+                    text = SYSTools.xx("misc.commands.>>noselection<<");
                 } else if (o instanceof LocalDate) {
                     //                    text = ((GP) o).getName() + ", " + ((GP) o).getFirstname() + ", " + ((GP) o).getCity();
                     text = ((LocalDate) o).toString("dd.MM.yyyy");
@@ -342,7 +342,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
             row++;
         }
 
-        Object[] headers = new Object[]{OPDE.lang.getString("misc.msg.Date"), OPDE.lang.getString("misc.msg.amount"), OPDE.lang.getString("misc.msg.Text"), OPDE.lang.getString("misc.msg.user"), OPDE.lang.getString("misc.msg.delete")};
+        Object[] headers = new Object[]{SYSTools.xx("misc.msg.Date"), SYSTools.xx("misc.msg.amount"), SYSTools.xx("misc.msg.Text"), SYSTools.xx("misc.msg.user"), SYSTools.xx("misc.msg.delete")};
 
         final DefaultTableModel tmRight = new DefaultTableModel(data, headers) {
             @Override
@@ -376,7 +376,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
             public void actionPerformed(ActionEvent ae) {
                 final int row = Integer.parseInt(ae.getActionCommand());
                 final ResValue val2Delete = listValues.get(row);
-                new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<br/><i>" + "<br/><i>" + df.format(val2Delete.getPit()) + "<br/>" + nf.format(val2Delete.getVal1()) + " ml<br/>" + val2Delete.getUser().toString() + "</i><br/>" + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
+                new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + "<br/><i>" + df.format(val2Delete.getPit()) + "<br/>" + nf.format(val2Delete.getVal1()) + " ml<br/>" + val2Delete.getUser().toString() + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
                     @Override
                     public void execute(Object answer) {
                         if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -445,7 +445,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
         mypanel.setLayout(new VerticalLayout(3));
         mypanel.setBackground(Color.WHITE);
 
-        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
+        CollapsiblePane searchPane = new CollapsiblePane(SYSTools.xx(internalClassID));
         searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
         searchPane.setCollapsible(false);
 
@@ -477,7 +477,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
          *
          */
 
-        JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
+        JideButton addButton = GUITools.createHyperlinkButton(SYSTools.xx("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 if (!resident.isActive()) {
@@ -530,7 +530,7 @@ public class PnlLiquidBalance extends NursingRecordsPanel {
         list.add(addButton);
 
 
-        JideButton controlButton = GUITools.createHyperlinkButton(OPDE.lang.getString("nursingrecords.vitalparameters.btnControlling.tooltip"), SYSConst.icon22magnify1, new ActionListener() {
+        JideButton controlButton = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.vitalparameters.btnControlling.tooltip"), SYSConst.icon22magnify1, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 if (!resident.isActive()) {

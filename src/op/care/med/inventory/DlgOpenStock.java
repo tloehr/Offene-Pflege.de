@@ -197,7 +197,7 @@ public class DlgOpenStock extends MyJDialog {
         query.setParameter("aus", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
         query.setParameter("anbruch", SYSConst.DATE_UNTIL_FURTHER_NOTICE);
         DefaultComboBoxModel dcbm = new DefaultComboBoxModel(query.getResultList().toArray());
-        dcbm.insertElementAt(OPDE.lang.getString("misc.msg.none"), 0);
+        dcbm.insertElementAt(SYSTools.xx("misc.msg.none"), 0);
         cmbBestID.setModel(dcbm);
         cmbBestID.setRenderer(MedStockTools.getBestandOnlyIDRenderer());
 

@@ -80,8 +80,8 @@ public class DlgValue extends MyJDialog {
         }
 
         txtText.setText(SYSTools.catchNull(resValue.getText()));
-        lblText.setText(OPDE.lang.getString("misc.msg.comment"));
-        lblNoValue.setText(OPDE.lang.getString("misc.msg.novaluesneeded"));
+        lblText.setText(SYSTools.xx("misc.msg.comment"));
+        lblNoValue.setText(SYSTools.xx("misc.msg.novaluesneeded"));
         lblNoValue.setVisible(resValue.getVal1() == null && resValue.getVal2() == null && resValue.getVal3() == null);
 
     }

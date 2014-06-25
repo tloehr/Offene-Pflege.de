@@ -182,7 +182,7 @@ public class PnlInventory extends NursingRecordsPanel {
         mypanel.setLayout(new VerticalLayout(3));
         mypanel.setBackground(Color.WHITE);
 
-        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString("nursingrecords.inventory"));
+        CollapsiblePane searchPane = new CollapsiblePane(SYSTools.xx("nursingrecords.inventory"));
         searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
         searchPane.setCollapsible(false);
 
@@ -205,7 +205,7 @@ public class PnlInventory extends NursingRecordsPanel {
     private java.util.List<Component> addFilters() {
         java.util.List<Component> list = new ArrayList<Component>();
 
-        JXSearchField search = new JXSearchField(OPDE.lang.getString("nursingrecords.inventory.search.stockid"));
+        JXSearchField search = new JXSearchField(SYSTools.xx("nursingrecords.inventory.search.stockid"));
         search.setFont(new Font("Arial", Font.PLAIN, 14));
         search.setFocusBehavior(org.jdesktop.swingx.prompt.PromptSupport.FocusBehavior.HIGHLIGHT_PROMPT);
         search.addActionListener(new ActionListener() {
@@ -217,7 +217,7 @@ public class PnlInventory extends NursingRecordsPanel {
         search.setInstantSearchDelay(5000);
         list.add(search);
 
-        tbClosedInventory = GUITools.getNiceToggleButton(OPDE.lang.getString("nursingrecords.inventory.showclosedinventories"));
+        tbClosedInventory = GUITools.getNiceToggleButton(SYSTools.xx("nursingrecords.inventory.showclosedinventories"));
         tbClosedInventory.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -235,10 +235,10 @@ public class PnlInventory extends NursingRecordsPanel {
     private java.util.List<Component> addKey() {
         java.util.List<Component> list = new ArrayList<Component>();
         list.add(new JSeparator());
-        list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.inventory.keydescription1"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.inventory.keydescription2"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.inventory.keydescription3"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
+        list.add(new JLabel(SYSTools.xx("misc.msg.key")));
+        list.add(new JLabel(SYSTools.xx("nursingrecords.inventory.keydescription1"), SYSConst.icon22ledGreenOn, SwingConstants.LEADING));
+        list.add(new JLabel(SYSTools.xx("nursingrecords.inventory.keydescription2"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
+        list.add(new JLabel(SYSTools.xx("nursingrecords.inventory.keydescription3"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
 
         return list;
     }
@@ -304,7 +304,7 @@ public class PnlInventory extends NursingRecordsPanel {
         }
 
         OPDE.getMainframe().setBlocked(true);
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 
         SwingWorker worker = new SwingWorker() {
 
@@ -313,11 +313,11 @@ public class PnlInventory extends NursingRecordsPanel {
                 int progress = 0;
 
                 synchronized (lstInventories) {
-                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, lstInventories.size()));
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, lstInventories.size()));
                     for (MedInventory inventory : lstInventories) {
                         progress++;
                         createCP4(inventory);
-                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, lstInventories.size()));
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, lstInventories.size()));
                     }
                 }
 
@@ -425,12 +425,12 @@ public class PnlInventory extends NursingRecordsPanel {
                 btnCloseInventory.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 btnCloseInventory.setContentAreaFilled(false);
                 btnCloseInventory.setBorder(null);
-                btnCloseInventory.setToolTipText(OPDE.lang.getString("nursingrecords.inventory.btncloseinventory.tooltip"));
+                btnCloseInventory.setToolTipText(SYSTools.xx("nursingrecords.inventory.btncloseinventory.tooltip"));
                 btnCloseInventory.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        new DlgYesNo(OPDE.lang.getString("nursingrecords.inventory.question.close1") + "<br/><b>" + inventory.getText() + "</b>" +
-                                "<br/>" + OPDE.lang.getString("nursingrecords.inventory.question.close2"), SYSConst.icon48playerStop, new Closure() {
+                        new DlgYesNo(SYSTools.xx("nursingrecords.inventory.question.close1") + "<br/><b>" + inventory.getText() + "</b>" +
+                                "<br/>" + SYSTools.xx("nursingrecords.inventory.question.close2"), SYSConst.icon48playerStop, new Closure() {
                             @Override
                             public void execute(Object answer) {
                                 if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -448,7 +448,7 @@ public class PnlInventory extends NursingRecordsPanel {
                                                 MedStock mystock = em.merge(stock);
                                                 em.lock(mystock, LockModeType.OPTIMISTIC);
                                                 mystock.setNextStock(null);
-                                                MedStockTools.close(em, mystock, OPDE.lang.getString("nursingrecords.inventory.stock.msg.inventory_closed"), MedStockTransactionTools.STATE_EDIT_INVENTORY_CLOSED);
+                                                MedStockTools.close(em, mystock, SYSTools.xx("nursingrecords.inventory.stock.msg.inventory_closed"), MedStockTransactionTools.STATE_EDIT_INVENTORY_CLOSED);
                                             }
                                         }
                                         // close inventory
@@ -501,12 +501,12 @@ public class PnlInventory extends NursingRecordsPanel {
                 btnDelInventory.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 btnDelInventory.setContentAreaFilled(false);
                 btnDelInventory.setBorder(null);
-                btnDelInventory.setToolTipText(OPDE.lang.getString("nursingrecords.inventory.btndelinventory.tooltip"));
+                btnDelInventory.setToolTipText(SYSTools.xx("nursingrecords.inventory.btndelinventory.tooltip"));
                 btnDelInventory.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        new DlgYesNo(OPDE.lang.getString("nursingrecords.inventory.question.delete1") + "<br/><b>" + inventory.getText() + "</b>" +
-                                "<br/>" + OPDE.lang.getString("nursingrecords.inventory.question.delete2"), SYSConst.icon48delete, new Closure() {
+                        new DlgYesNo(SYSTools.xx("nursingrecords.inventory.question.delete1") + "<br/><b>" + inventory.getText() + "</b>" +
+                                "<br/>" + SYSTools.xx("nursingrecords.inventory.question.delete2"), SYSConst.icon48delete, new Closure() {
                             @Override
                             public void execute(Object answer) {
                                 if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -552,7 +552,7 @@ public class PnlInventory extends NursingRecordsPanel {
 
 
             final JToggleButton tbClosedStock = GUITools.getNiceToggleButton(null);
-            tbClosedStock.setToolTipText(OPDE.lang.getString("nursingrecords.inventory.showclosedstocks"));
+            tbClosedStock.setToolTipText(SYSTools.xx("nursingrecords.inventory.showclosedstocks"));
             if (!inventory.isClosed()) {
                 tbClosedStock.addItemListener(new ItemListener() {
                     @Override
@@ -684,7 +684,7 @@ public class PnlInventory extends NursingRecordsPanel {
                 btnPrintLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 btnPrintLabel.setContentAreaFilled(false);
                 btnPrintLabel.setBorder(null);
-                btnPrintLabel.setToolTipText(OPDE.lang.getString("nursingrecords.inventory.stock.btnprintlabel.tooltip"));
+                btnPrintLabel.setToolTipText(SYSTools.xx("nursingrecords.inventory.stock.btnprintlabel.tooltip"));
                 btnPrintLabel.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
@@ -845,7 +845,7 @@ public class PnlInventory extends NursingRecordsPanel {
                             em.lock(em.merge(myStock.getInventory().getResident()), LockModeType.OPTIMISTIC);
                             em.lock(em.merge(myStock.getInventory()), LockModeType.OPTIMISTIC);
                             myStock.setNextStock(null);
-                            MedStockTools.close(em, myStock, OPDE.lang.getString("nursingrecords.inventory.stockpanel.STATE_EDIT_STOCK_CLOSED"), MedStockTransactionTools.STATE_EDIT_STOCK_CLOSED);
+                            MedStockTools.close(em, myStock, SYSTools.xx("nursingrecords.inventory.stockpanel.STATE_EDIT_STOCK_CLOSED"), MedStockTransactionTools.STATE_EDIT_STOCK_CLOSED);
                             myStock.setState(MedStockTools.STATE_NOTHING);
                             em.getTransaction().commit();
 //                            synchronized (lstInventories) {
@@ -1177,7 +1177,7 @@ public class PnlInventory extends NursingRecordsPanel {
          *
          */
         OPDE.getMainframe().setBlocked(true);
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 
         SwingWorker worker = new SwingWorker() {
 
@@ -1187,13 +1187,13 @@ public class PnlInventory extends NursingRecordsPanel {
 
 
                 List<MedStockTransaction> listTX = MedStockTransactionTools.getAll(stock);
-                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, listTX.size()));
+                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, listTX.size()));
 
                 BigDecimal rowsum = MedStockTools.getSum(stock);
 //                Collections.sort(stock.getStockTransaction());
                 for (final MedStockTransaction tx : listTX) {
                     progress++;
-                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, listTX.size()));
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, listTX.size()));
                     String title = "<html><table border=\"0\">" +
                             "<tr>" +
                             "<td width=\"130\" align=\"left\">" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(tx.getPit())
@@ -1239,12 +1239,12 @@ public class PnlInventory extends NursingRecordsPanel {
                         btnDelTX.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                         btnDelTX.setContentAreaFilled(false);
                         btnDelTX.setBorder(null);
-                        btnDelTX.setToolTipText(OPDE.lang.getString("nursingrecords.inventory.tx.btndelete.tooltip"));
+                        btnDelTX.setToolTipText(SYSTools.xx("nursingrecords.inventory.tx.btndelete.tooltip"));
                         btnDelTX.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent actionEvent) {
-                                new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<br/><i>" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(tx.getPit()) +
-                                        "&nbsp;" + tx.getUser().getUID() + "</i><br/>" + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
+                                new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(tx.getPit()) +
+                                        "&nbsp;" + tx.getUser().getUID() + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
                                     @Override
                                     public void execute(Object answer) {
                                         if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -1319,12 +1319,12 @@ public class PnlInventory extends NursingRecordsPanel {
                     btnUndoTX.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     btnUndoTX.setContentAreaFilled(false);
                     btnUndoTX.setBorder(null);
-                    btnUndoTX.setToolTipText(OPDE.lang.getString("nursingrecords.inventory.tx.btnUndoTX.tooltip"));
+                    btnUndoTX.setToolTipText(SYSTools.xx("nursingrecords.inventory.tx.btnUndoTX.tooltip"));
                     btnUndoTX.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent actionEvent) {
-                            new DlgYesNo(OPDE.lang.getString("misc.questions.undo1") + "<br/><i>" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(tx.getPit()) +
-                                    "&nbsp;" + tx.getUser().getUID() + "</i><br/>" + OPDE.lang.getString("misc.questions.undo2"), SYSConst.icon48undo, new Closure() {
+                            new DlgYesNo(SYSTools.xx("misc.questions.undo1") + "<br/><i>" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(tx.getPit()) +
+                                    "&nbsp;" + tx.getUser().getUID() + "</i><br/>" + SYSTools.xx("misc.questions.undo2"), SYSConst.icon48undo, new Closure() {
                                 @Override
                                 public void execute(Object answer) {
                                     if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -1336,8 +1336,8 @@ public class PnlInventory extends NursingRecordsPanel {
 
                                             myOldTX.setState(MedStockTransactionTools.STATE_CANCELLED);
                                             final MedStockTransaction myNewTX = em.merge(new MedStockTransaction(myStock, myOldTX.getAmount().negate(), MedStockTransactionTools.STATE_CANCEL_REC));
-                                            myOldTX.setText(OPDE.lang.getString("misc.msg.reversedBy") + ": " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(myNewTX.getPit()));
-                                            myNewTX.setText(OPDE.lang.getString("misc.msg.reversalFor") + ": " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(myOldTX.getPit()));
+                                            myOldTX.setText(SYSTools.xx("misc.msg.reversedBy") + ": " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(myNewTX.getPit()));
+                                            myNewTX.setText(SYSTools.xx("misc.msg.reversalFor") + ": " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(myOldTX.getPit()));
 
 //                                            myStock.getStockTransaction().add(myNewTX);
 //                                            myStock.getStockTransaction().remove(tx);
@@ -1572,8 +1572,8 @@ public class PnlInventory extends NursingRecordsPanel {
             btnDelete.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<br/><b>" + OPDE.lang.getString("nursingrecords.inventory.search.stockid") + ": " + stock.getID() + "</b>" +
-                            "<br/>" + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
+                    new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><b>" + SYSTools.xx("nursingrecords.inventory.search.stockid") + ": " + stock.getID() + "</b>" +
+                            "<br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
                         @Override
                         public void execute(Object answer) {
                             if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -1640,7 +1640,7 @@ public class PnlInventory extends NursingRecordsPanel {
                 final JidePopup popup = new JidePopup();
                 popup.setMovable(false);
 
-                PnlExpiry pnlExpiry = new PnlExpiry(stock.getExpires(), OPDE.lang.getString("nursingrecords.inventory.pnlExpiry.title") + ": " + stock.getID(), new Closure() {
+                PnlExpiry pnlExpiry = new PnlExpiry(stock.getExpires(), SYSTools.xx("nursingrecords.inventory.pnlExpiry.title") + ": " + stock.getID(), new Closure() {
                     @Override
                     public void execute(Object o) {
                         popup.hidePopup();

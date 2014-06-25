@@ -33,6 +33,7 @@ import entity.prescription.*;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
@@ -76,7 +77,7 @@ public class DlgDiscontinue extends MyJDialog {
         this.actionBlock = actionBlock;
         this.prescription = prescription;
         initComponents();
-        lblQuestion.setText(OPDE.lang.getString(PnlPrescription.internalClassID + ".dlgDiscontinue.question"));
+        lblQuestion.setText(SYSTools.xx(PnlPrescription.internalClassID + ".dlgDiscontinue.question"));
         fillCMBs();
         setVisible(true);
     }

@@ -33,6 +33,7 @@ import entity.nursingprocess.NursingProcess;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.Pair;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateTime;
 
@@ -64,13 +65,13 @@ public class PnlEval extends JPanel {
     }
 
     private void initPanel() {
-        pnlReason.setBorder(new TitledBorder(OPDE.lang.getString(internalClassID + (disableDate ? ".title4close" : ".title4change"))));
+        pnlReason.setBorder(new TitledBorder(SYSTools.xx(internalClassID + (disableDate ? ".title4close" : ".title4change"))));
 
         if (disableDate) {
             lblNextEval.setVisible(false);
             jdcNextEval.setVisible(false);
         } else {
-            lblNextEval.setText(OPDE.lang.getString(internalClassID + ".nextevaldate") + ": ");
+            lblNextEval.setText(SYSTools.xx(internalClassID + ".nextevaldate") + ": ");
             jdcNextEval.setDate(new DateTime().plusWeeks(4).toDate());
             jdcNextEval.setMinSelectableDate(new DateTime().plusDays(1).toDate());
             jdcNextEval.setMaxSelectableDate(new DateTime().plusYears(1).toDate());
@@ -155,11 +156,11 @@ public class PnlEval extends JPanel {
 
     private void btnOKActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
         if (txtBemerkung.getText().trim().isEmpty()) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".textxx"), DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx(internalClassID + ".textxx"), DisplayMessage.WARNING));
             return;
         }
         if (!disableDate && jdcNextEval.getDate() == null) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".datexx"), DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx(internalClassID + ".datexx"), DisplayMessage.WARNING));
             return;
         }
         np.setNextEval(disableDate ? new Date() : jdcNextEval.getDate());

@@ -36,13 +36,13 @@ public class PnlUserSettings extends CleanablePanel {
     }
 
     private void initPanel() {
-        OPDE.getDisplayManager().setMainMessage(OPDE.lang.getString(internalClassID));
+        OPDE.getDisplayManager().setMainMessage(SYSTools.xx(internalClassID));
         OPDE.getDisplayManager().clearAllIcons();
 
-        lblPWTitle.setText(OPDE.lang.getString(internalClassID + ".pwtitle"));
-        lblNew.setText(OPDE.lang.getString(internalClassID + ".newpw"));
-        lblOld.setText(OPDE.lang.getString(internalClassID + ".oldpw"));
-        btnChangePW.setToolTipText(OPDE.lang.getString(internalClassID + ".pwtitle"));
+        lblPWTitle.setText(SYSTools.xx(internalClassID + ".pwtitle"));
+        lblNew.setText(SYSTools.xx(internalClassID + ".newpw"));
+        lblOld.setText(SYSTools.xx(internalClassID + ".oldpw"));
+        btnChangePW.setToolTipText(SYSTools.xx(internalClassID + ".pwtitle"));
 
         prepareSearchArea();
     }
@@ -66,11 +66,11 @@ public class PnlUserSettings extends CleanablePanel {
         EntityManager em = OPDE.createEM();
         Users user = em.merge(OPDE.getLogin().getUser());
         if (!user.getMd5pw().equals(SYSTools.hashword(txtOld.getText().trim()))) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".oldpwwrong")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx(internalClassID + ".oldpwwrong")));
             return;
         }
         if (txtNew.getText().trim().isEmpty()) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".newpwempty")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx(internalClassID + ".newpwempty")));
             return;
         }
 

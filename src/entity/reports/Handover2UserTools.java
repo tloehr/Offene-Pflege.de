@@ -8,6 +8,7 @@ package entity.reports;
 import entity.system.Users;
 import op.OPDE;
 import op.care.supervisor.PnlHandover;
+import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -47,13 +48,13 @@ public class Handover2UserTools {
 
     public static String getAsHTML(Handovers handover) {
         String result = "";
-        result += "<h2 id=\"fonth2\" >" + OPDE.lang.getString(PnlHandover.internalClassID) + "</h2>";
+        result += "<h2 id=\"fonth2\" >" + SYSTools.xx(PnlHandover.internalClassID) + "</h2>";
         if (!handover.getUsersAcknowledged().isEmpty()) {
-            result += "<h3 id=\"fonth3\" >" + OPDE.lang.getString(PnlHandover.internalClassID + ".ListOfUsersAcknowledged") + "</h3>";
+            result += "<h3 id=\"fonth3\" >" + SYSTools.xx(PnlHandover.internalClassID + ".ListOfUsersAcknowledged") + "</h3>";
             result += HandoversTools.getAsHTML(handover);
 
             result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
-                    "<th>" + OPDE.lang.getString("misc.msg.DateAndTime") + "</th><th>" + OPDE.lang.getString("misc.msg.Users") + "</th></tr>";
+                    "<th>" + SYSTools.xx("misc.msg.DateAndTime") + "</th><th>" + SYSTools.xx("misc.msg.Users") + "</th></tr>";
 
             Collections.sort(handover.getUsersAcknowledged());
 
@@ -66,7 +67,7 @@ public class Handover2UserTools {
 
             result += "</table>";
         } else {
-            result += "<i>" + OPDE.lang.getString("misc.msg.currentlynoentry") + "</i>";
+            result += "<i>" + SYSTools.xx("misc.msg.currentlynoentry") + "</i>";
         }
         return result;
     }

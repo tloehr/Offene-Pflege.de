@@ -162,17 +162,17 @@ public class SYSCalendar {
         try {
             dt = new DateTime(parseDate(((JTextField) evt.getSource()).getText()));
         } catch (NumberFormatException ex) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wrongdate")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.wrongdate")));
             dt = new DateTime();
         }
         if (dt.isAfter(max)) {
             dt = new DateTime();
-            DisplayMessage dm = new DisplayMessage(dt.isAfterNow() ? OPDE.lang.getString("misc.msg.futuredate") : OPDE.lang.getString("misc.msg.wrongdate"));
+            DisplayMessage dm = new DisplayMessage(dt.isAfterNow() ? SYSTools.xx("misc.msg.futuredate") : SYSTools.xx("misc.msg.wrongdate"));
             OPDE.getDisplayManager().addSubMessage(dm);
         }
         if (dt.isBefore(min)) {
             dt = new DateTime();
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.DateTooOld")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.DateTooOld")));
         }
 
         ((JTextField) evt.getSource()).setText(DateFormat.getDateInstance().format(dt.toDate()));
@@ -187,17 +187,17 @@ public class SYSCalendar {
         try {
             dt = new LocalDate(parseDate(((JTextField) evt.getSource()).getText()));
         } catch (NumberFormatException ex) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wrongdate")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.wrongdate")));
             dt = new LocalDate();
         }
         if (dt.isAfter(max)) {
             dt = new LocalDate();
-            DisplayMessage dm = new DisplayMessage(dt.isAfter(max) ? OPDE.lang.getString("misc.msg.futuredate") : OPDE.lang.getString("misc.msg.wrongdate"));
+            DisplayMessage dm = new DisplayMessage(dt.isAfter(max) ? SYSTools.xx("misc.msg.futuredate") : SYSTools.xx("misc.msg.wrongdate"));
             OPDE.getDisplayManager().addSubMessage(dm);
         }
         if (dt.isBefore(min)) {
             dt = new LocalDate();
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.DateTooOld")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.DateTooOld")));
         }
 
         ((JTextField) evt.getSource()).setText(DateFormat.getDateInstance().format(dt.toDate()));
@@ -1094,14 +1094,14 @@ public class SYSCalendar {
 
 
     public static JPopupMenu getMinutesMenu(int[] mins, final Closure action) {
-        JPopupMenu timemenu = new JPopupMenu(OPDE.lang.getString("misc.commands.changeeffort"));
+        JPopupMenu timemenu = new JPopupMenu(SYSTools.xx("misc.commands.changeeffort"));
 
         for (int min : mins) {
             String title = "";
             if (min % 60 == 0) {
-                title = min / 60 + " " + OPDE.lang.getString("misc.msg.Hour(s)");
+                title = min / 60 + " " + SYSTools.xx("misc.msg.Hour(s)");
             } else {
-                title = min + " " + OPDE.lang.getString("misc.msg.Minute(s)");
+                title = min + " " + SYSTools.xx("misc.msg.Minute(s)");
             }
 
             JMenuItem item = new JMenuItem(title);

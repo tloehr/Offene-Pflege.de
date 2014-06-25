@@ -35,8 +35,8 @@ public class ResidentTools {
     public static final int AGE_MINOR = 18;
     public static final int MALE = 1;
     public static final int FEMALE = 2;
-    public static final String GENDER[] = {"", OPDE.lang.getString("misc.msg.male"), OPDE.lang.getString("misc.msg.female")};
-    public static final String ADDRESS[] = {"", OPDE.lang.getString("misc.msg.termofaddress.mr"), OPDE.lang.getString("misc.msg.termofaddress.mrs")};
+    public static final String GENDER[] = {"", SYSTools.xx("misc.msg.male"), SYSTools.xx("misc.msg.female")};
+    public static final String ADDRESS[] = {"", SYSTools.xx("misc.msg.termofaddress.mr"), SYSTools.xx("misc.msg.termofaddress.mrs")};
     public static final String KEY_STOOLDAYS = "stooldays";
     public static final String KEY_BALANCE = "liquidbalance";
     public static final String KEY_LOWIN = "lowin";
@@ -67,7 +67,7 @@ public class ResidentTools {
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                 String text;
                 if (o == null) {
-                    text = SYSTools.toHTMLForScreen(OPDE.lang.getString("misc.commands.>>noselection<<"));
+                    text = SYSTools.toHTMLForScreen(SYSTools.xx("misc.commands.>>noselection<<"));
                 } else if (o instanceof Resident) {
                     text = o.toString();
                 } else {
@@ -128,10 +128,10 @@ public class ResidentTools {
         String result = resident.getName() + ", " + resident.getFirstname() + " (*" + df.format(resident.getDOB()) + "), ";
 
 
-        result += getAge(resident).getYears() + " " + OPDE.lang.getString("misc.msg.Years") + " [" + resident.getRIDAnonymous() + "]";
+        result += getAge(resident).getYears() + " " + SYSTools.xx("misc.msg.Years") + " [" + resident.getRIDAnonymous() + "]";
 
         if (dead || left) {
-            result += "  " + (dead ? OPDE.lang.getString("misc.msg.late") : OPDE.lang.getString("misc.msg.movedout")) + ": " + df.format(stay.getTo()) + ", ";
+            result += "  " + (dead ? SYSTools.xx("misc.msg.late") : SYSTools.xx("misc.msg.movedout")) + ": " + df.format(stay.getTo()) + ", ";
         }
 
         return result;

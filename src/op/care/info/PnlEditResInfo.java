@@ -204,7 +204,7 @@ public class PnlEditResInfo {
                 }
             });
             ovrComment = new DefaultOverlayable(txtComment);
-            JLabel lblComment = new JLabel(OPDE.lang.getString("misc.msg.comment"));
+            JLabel lblComment = new JLabel(SYSTools.xx("misc.msg.comment"));
             lblComment.setForeground(Color.LIGHT_GRAY);
             lblComment.setFont(SYSConst.ARIAL18BOLD);
             ovrComment.addOverlayComponent(lblComment, DefaultOverlayable.SOUTH_EAST);
@@ -458,7 +458,7 @@ public class PnlEditResInfo {
 
             final PDF pdf = new PDF(null, "", 10);
 
-            Paragraph h1 = new Paragraph(new Phrase(OPDE.lang.getString("nursingrecords.info.single"), PDF.plain(PDF.sizeH1())));
+            Paragraph h1 = new Paragraph(new Phrase(SYSTools.xx("nursingrecords.info.single"), PDF.plain(PDF.sizeH1())));
             h1.setAlignment(Element.ALIGN_CENTER);
             pdf.getDocument().add(h1);
 
@@ -1250,7 +1250,7 @@ public class PnlEditResInfo {
                 cmb.setSelectedIndex(-1);
                 pnl.add("left hfill", cmb);
 
-                JButton btnCopyOver = new JButton(OPDE.lang.getString("nursingrecords.info.dlg.copyfromtemplate"));
+                JButton btnCopyOver = new JButton(SYSTools.xx("nursingrecords.info.dlg.copyfromtemplate"));
                 btnCopyOver.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {

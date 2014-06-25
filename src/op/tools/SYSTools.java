@@ -95,7 +95,7 @@ public class SYSTools {
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                 String text;
                 if (o == null) {
-                    text = OPDE.lang.getString("misc.commands.>>noselection<<");
+                    text = SYSTools.xx("misc.commands.>>noselection<<");
                 } else {
                     text = o.toString();
                 }
@@ -136,16 +136,16 @@ public class SYSTools {
         try {
             myInt = Integer.parseInt(((JTextField) evt.getSource()).getText());
         } catch (NumberFormatException ex) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wrongentry")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.wrongentry")));
             myInt = def;
         }
         if (myInt < min) {
             myInt = min;
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.entryTooSmall")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.entryTooSmall")));
         }
         if (myInt > max) {
             myInt = max;
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.entryTooBig")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.entryTooBig")));
         }
 
         ((JTextField) evt.getSource()).setText(Integer.toString(myInt));
@@ -156,16 +156,16 @@ public class SYSTools {
         try {
             myBD = BigDecimal.valueOf(Double.parseDouble(((JTextField) evt.getSource()).getText().replaceAll(",", "\\.")));
         } catch (NumberFormatException ex) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wrongentry")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.wrongentry")));
             myBD = def;
         }
         if (myBD.compareTo(min) < 0) {
             myBD = min;
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.entryTooSmall")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.entryTooSmall")));
         }
         if (myBD.compareTo(max) > 0) {
             myBD = max;
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.entryTooBig")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.entryTooBig")));
         }
 
         ((JTextField) evt.getSource()).setText(myBD.setScale(2, RoundingMode.HALF_UP).toString());
@@ -372,7 +372,7 @@ public class SYSTools {
     }
 
     public static String anonymizeString(String in) {
-        String out = "[" + OPDE.lang.getString("misc.msg.anon") + "]";
+        String out = "[" + SYSTools.xx("misc.msg.anon") + "]";
         if (!OPDE.isAnonym()) {
             out = in;
         }
@@ -1636,7 +1636,7 @@ public class SYSTools {
         try {
             bd = BigDecimal.valueOf(Double.parseDouble(txt.getText().replaceAll(",", "\\.")));
             if (nees2BePositive && bd.compareTo(BigDecimal.ZERO) <= 0) {
-                txt.setToolTipText("<html><font color=\"red\"><b>" + OPDE.lang.getString("misc.msg.invalidnumber") + "</b></font></html>");
+                txt.setToolTipText("<html><font color=\"red\"><b>" + SYSTools.xx("misc.msg.invalidnumber") + "</b></font></html>");
                 toolTipAction = txt.getActionMap().get("postTip");
                 bd = BigDecimal.ONE;
             } else {
@@ -1649,7 +1649,7 @@ public class SYSTools {
             } else {
                 bd = BigDecimal.ZERO;
             }
-            txt.setToolTipText("<html><font color=\"red\"><b>" + OPDE.lang.getString("misc.msg.invalidnumber") + "</b></font></html>");
+            txt.setToolTipText("<html><font color=\"red\"><b>" + SYSTools.xx("misc.msg.invalidnumber") + "</b></font></html>");
             toolTipAction = txt.getActionMap().get("postTip");
             if (toolTipAction != null) {
                 ActionEvent postTip = new ActionEvent(txt, ActionEvent.ACTION_PERFORMED, "");

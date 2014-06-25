@@ -73,7 +73,7 @@ public class DlgFiles extends MyJDialog {
     private JPanel getFileDropPanel() {
         JPanel dropPanel = new JPanel();
         dropPanel.setLayout(new BorderLayout());
-        JLabel dropLabel = new JLabel(OPDE.lang.getString(PnlFiles.internalClassID + ".drophere"), SYSConst.icon48kgetdock, SwingConstants.CENTER);
+        JLabel dropLabel = new JLabel(SYSTools.xx(PnlFiles.internalClassID + ".drophere"), SYSConst.icon48kgetdock, SwingConstants.CENTER);
         dropLabel.setFont(SYSConst.ARIAL20);
         dropLabel.setHorizontalTextPosition(SwingConstants.CENTER);
         dropLabel.setVerticalTextPosition(SwingConstants.BOTTOM);
@@ -87,7 +87,7 @@ public class DlgFiles extends MyJDialog {
                 java.util.List<SYSFiles> successful = SYSFilesTools.putFiles(files, attachable);
                 if (!successful.isEmpty()) {
                     list.setModel(SYSTools.list2dlm(getAttachedFilesList(attachable)));
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(successful.size() + " " + OPDE.lang.getString("misc.msg.Files") + " " + OPDE.lang.getString("misc.msg.added")));
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(successful.size() + " " + SYSTools.xx("misc.msg.Files") + " " + SYSTools.xx("misc.msg.added")));
                     filesAttached = true;
                 }
             }

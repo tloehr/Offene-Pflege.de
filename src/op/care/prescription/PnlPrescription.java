@@ -134,14 +134,14 @@ public class PnlPrescription extends NursingRecordsPanel {
         if (withworker) {
 
             OPDE.getMainframe().setBlocked(true);
-            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 
             SwingWorker worker = new SwingWorker() {
 
                 @Override
                 protected Object doInBackground() throws Exception {
                     int progress = -1;
-                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, lstPrescriptions.size()));
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, lstPrescriptions.size()));
 
                     if (tbClosed.isSelected()) {
                         lstPrescriptions = PrescriptionTools.getAll(resident);
@@ -153,7 +153,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                     for (Prescription prescription : lstPrescriptions) {
                         progress++;
                         createCP4(prescription);
-                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, lstPrescriptions.size()));
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, lstPrescriptions.size()));
                     }
 
                     return null;
@@ -246,7 +246,7 @@ public class PnlPrescription extends NursingRecordsPanel {
              *
              */
             final JButton btnFiles = new JButton(Integer.toString(prescription.getAttachedFilesConnections().size()), SYSConst.icon22greenStar);
-            btnFiles.setToolTipText(OPDE.lang.getString("misc.btnfiles.tooltip"));
+            btnFiles.setToolTipText(SYSTools.xx("misc.btnfiles.tooltip"));
             btnFiles.setForeground(Color.BLUE);
             btnFiles.setHorizontalTextPosition(SwingUtilities.CENTER);
             btnFiles.setFont(SYSConst.ARIAL18BOLD);
@@ -292,7 +292,7 @@ public class PnlPrescription extends NursingRecordsPanel {
              *
              */
             final JButton btnProcess = new JButton(Integer.toString(prescription.getAttachedProcessConnections().size()), SYSConst.icon22redStar);
-            btnProcess.setToolTipText(OPDE.lang.getString("misc.btnprocess.tooltip"));
+            btnProcess.setToolTipText(SYSTools.xx("misc.btnprocess.tooltip"));
             btnProcess.setForeground(Color.YELLOW);
             btnProcess.setHorizontalTextPosition(SwingUtilities.CENTER);
             btnProcess.setFont(SYSConst.ARIAL18BOLD);
@@ -330,7 +330,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                                     if (unassigned.contains(linkObject.getQProcess())) {
                                         linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
                                         linkObject.getPrescription().getAttachedProcessConnections().remove(linkObject);
-                                        em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myPrescription.getTitle() + " ID: " + myPrescription.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                        em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myPrescription.getTitle() + " ID: " + myPrescription.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
                                         em.remove(linkObject);
                                     }
                                 }
@@ -342,7 +342,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                                     if (!listElements.contains(myPrescription)) {
                                         QProcess myQProcess = em.merge(qProcess);
                                         SYSPRE2PROCESS myLinkObject = em.merge(new SYSPRE2PROCESS(myQProcess, myPrescription));
-                                        em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myPrescription.getTitle() + " ID: " + myPrescription.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
+                                        em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myPrescription.getTitle() + " ID: " + myPrescription.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
                                         qProcess.getAttachedPrescriptionConnections().add(myLinkObject);
                                         myPrescription.getAttachedProcessConnections().add(myLinkObject);
                                     }
@@ -509,7 +509,7 @@ public class PnlPrescription extends NursingRecordsPanel {
         mypanel.setLayout(new VerticalLayout(3));
         mypanel.setBackground(Color.WHITE);
 
-        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
+        CollapsiblePane searchPane = new CollapsiblePane(SYSTools.xx(internalClassID));
         searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
         searchPane.setCollapsible(false);
 
@@ -533,12 +533,12 @@ public class PnlPrescription extends NursingRecordsPanel {
     private java.util.List<Component> addKey() {
         java.util.List<Component> list = new ArrayList<Component>();
         list.add(new JSeparator());
-        list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.prescription.keydescription1"), SYSConst.icon22stopSign, SwingConstants.LEADING));
+        list.add(new JLabel(SYSTools.xx("misc.msg.key")));
+        list.add(new JLabel(SYSTools.xx("nursingrecords.prescription.keydescription1"), SYSConst.icon22stopSign, SwingConstants.LEADING));
 //        if (resident.isCalcMediUPR1()) {
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.prescription.keydescription2"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.prescription.keydescription3"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.prescription.keydescription4"), SYSConst.icon22ledOrangeOn, SwingConstants.LEADING));
+        list.add(new JLabel(SYSTools.xx("nursingrecords.prescription.keydescription2"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
+        list.add(new JLabel(SYSTools.xx("nursingrecords.prescription.keydescription3"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
+        list.add(new JLabel(SYSTools.xx("nursingrecords.prescription.keydescription4"), SYSConst.icon22ledOrangeOn, SwingConstants.LEADING));
 //        }
         return list;
     }
@@ -1066,7 +1066,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
 
-                    new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<br/>" + PrescriptionTools.toPrettyString(prescription) + "</br>" + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
+                    new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/>" + PrescriptionTools.toPrettyString(prescription) + "</br>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
                         @Override
                         public void execute(Object answer) {
                             if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -1084,7 +1084,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                                     delQuery.executeUpdate();
                                     em.getTransaction().commit();
 
-                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.Deleted") + ": " + PrescriptionTools.toPrettyString(myverordnung)));
+                                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.Deleted") + ": " + PrescriptionTools.toPrettyString(myverordnung)));
                                     lstPrescriptions.remove(prescription);
                                     buildPanel();
                                 } catch (OptimisticLockException ole) {
@@ -1131,7 +1131,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                     final JidePopup popup = new JidePopup();
                     popup.setMovable(false);
 
-                    PnlExpiry pnlExpiry = new PnlExpiry(stockInUse.getExpires(), OPDE.lang.getString("nursingrecords.inventory.pnlExpiry.title") + ": " + stockInUse.getID(), new Closure() {
+                    PnlExpiry pnlExpiry = new PnlExpiry(stockInUse.getExpires(), SYSTools.xx("nursingrecords.inventory.pnlExpiry.title") + ": " + stockInUse.getID(), new Closure() {
                         @Override
                         public void execute(Object o) {
                             popup.hidePopup();
@@ -1376,7 +1376,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                                     if (unassigned.contains(linkObject.getQProcess())) {
                                         linkObject.getQProcess().getAttachedNReportConnections().remove(linkObject);
                                         linkObject.getPrescription().getAttachedProcessConnections().remove(linkObject);
-                                        em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myPrescription.getTitle() + " ID: " + myPrescription.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
+                                        em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_REMOVE_ELEMENT) + ": " + myPrescription.getTitle() + " ID: " + myPrescription.getID(), PReportTools.PREPORT_TYPE_REMOVE_ELEMENT, linkObject.getQProcess()));
                                         em.remove(linkObject);
                                     }
                                 }
@@ -1387,7 +1387,7 @@ public class PnlPrescription extends NursingRecordsPanel {
                                     if (!listElements.contains(myPrescription)) {
                                         QProcess myQProcess = em.merge(qProcess);
                                         SYSPRE2PROCESS myLinkObject = em.merge(new SYSPRE2PROCESS(myQProcess, myPrescription));
-                                        em.merge(new PReport(OPDE.lang.getString(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myPrescription.getTitle() + " ID: " + myPrescription.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
+                                        em.merge(new PReport(SYSTools.xx(PReportTools.PREPORT_TEXT_ASSIGN_ELEMENT) + ": " + myPrescription.getTitle() + " ID: " + myPrescription.getID(), PReportTools.PREPORT_TYPE_ASSIGN_ELEMENT, myQProcess));
                                         qProcess.getAttachedPrescriptionConnections().add(myLinkObject);
                                         myPrescription.getAttachedProcessConnections().add(myLinkObject);
                                     }

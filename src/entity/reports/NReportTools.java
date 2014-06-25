@@ -179,7 +179,7 @@ public class NReportTools {
         boolean ihavesomethingtoshow = false;
 
         if (!nReports.isEmpty()) {
-            html += "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.reports") + (withlongheader ? " " + OPDE.lang.getString("misc.msg.for") + " " + ResidentTools.getLabelText(nReports.get(0).getResident()) : "") + "</h2>\n";
+            html += "<h2 id=\"fonth2\" >" + SYSTools.xx("nursingrecords.reports") + (withlongheader ? " " + SYSTools.xx("misc.msg.for") + " " + ResidentTools.getLabelText(nReports.get(0).getResident()) : "") + "</h2>\n";
             html += SYSTools.catchNull(subtitle).isEmpty() ? "" : "<h3 id=\"fonth3\" >" + subtitle + "</h3>\n";
             html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>"
                     + "<th>Info</th><th>Text</th>\n</tr>";
@@ -209,8 +209,8 @@ public class NReportTools {
 //        boolean ihavesomethingtoshow = false;
 
         if (!reports.isEmpty()) {
-            html += SYSConst.html_h2(OPDE.lang.getString("nursingrecords.handover.searchresults"));
-            html += SYSConst.html_h3(OPDE.lang.getString("misc.msg.period") + ": " + year);
+            html += SYSConst.html_h2(SYSTools.xx("nursingrecords.handover.searchresults"));
+            html += SYSConst.html_h3(SYSTools.xx("misc.msg.period") + ": " + year);
 
             String table = "";
             table += SYSConst.html_table_tr(
@@ -282,7 +282,7 @@ public class NReportTools {
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd.MM.yyyy HH:mm");
         result = sdf.format(nReport.getPit()) + "; " + nReport.getUser().getFullname();
         if (showMinutes && !nReport.isDeleted() && !nReport.isReplaced()) {
-            result += "<br/>" + OPDE.lang.getString("misc.msg.Effort") + ": " + nReport.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)");
+            result += "<br/>" + SYSTools.xx("misc.msg.Effort") + ": " + nReport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)");
         }
         result += SYSTools.catchNull(getTagsAsHTML(nReport), "<br/>[", "]") + " ";
         if (showIDs) {
@@ -306,14 +306,14 @@ public class NReportTools {
         DateFormat df = DateFormat.getDateTimeInstance();
 
         if (nReport.isDeleted()) {
-            result += "<br/>" + OPDE.lang.getString("misc.msg.thisentryhasbeendeleted") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(nReport.getEditDate()) + " <br/>" + OPDE.lang.getString("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname() + "<br/>";
+            result += "<br/>" + SYSTools.xx("misc.msg.thisentryhasbeendeleted") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getEditDate()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname() + "<br/>";
         }
         if (nReport.isReplacement() && !nReport.isReplaced()) {
-            result += "<br/>" + OPDE.lang.getString("misc.msg.thisEntryIsAReplacement") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(nReport.getReplacementFor().getEditDate()) + " <br/>" + "<br/>" + OPDE.lang.getString("misc.msg.originalentry") + ": " + nReport.getReplacementFor().getPbid() + "<br/>";
+            result += "<br/>" + SYSTools.xx("misc.msg.thisEntryIsAReplacement") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getReplacementFor().getEditDate()) + " <br/>" + "<br/>" + SYSTools.xx("misc.msg.originalentry") + ": " + nReport.getReplacementFor().getPbid() + "<br/>";
         }
         if (nReport.isReplaced()) {
-            result += "<br/>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(nReport.getEditDate()) + " <br/>" + OPDE.lang.getString("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname();
-            result += "<br/>" + OPDE.lang.getString("misc.msg.replaceentry") + ": " + nReport.getReplacedBy().getPbid() + "<br/>";
+            result += "<br/>" + SYSTools.xx("misc.msg.thisentryhasbeenedited") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getEditDate()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname();
+            result += "<br/>" + SYSTools.xx("misc.msg.replaceentry") + ": " + nReport.getReplacedBy().getPbid() + "<br/>";
         }
 //        if (!nReport.getAttachedFilesConnections().isEmpty()) {
 //            result += "<font color=\"green\">&#9679;</font>";
@@ -340,14 +340,14 @@ public class NReportTools {
 
         DateFormat df = DateFormat.getDateTimeInstance();
         if (nReport.isDeleted()) {
-            result += "<br/>" + OPDE.lang.getString("misc.msg.thisentryhasbeendeleted") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(nReport.getEditDate()) + " <br/>" + OPDE.lang.getString("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname() + "<br/>";
+            result += "<br/>" + SYSTools.xx("misc.msg.thisentryhasbeendeleted") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getEditDate()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname() + "<br/>";
         } else if (nReport.isReplacement() && !nReport.isReplaced()) {
-            result += "<br/>" + OPDE.lang.getString("misc.msg.thisEntryIsAReplacement") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(nReport.getReplacementFor().getEditDate()) + " <br/>" + "<br/>" + OPDE.lang.getString("misc.msg.originalentry") + ": " + nReport.getReplacementFor().getPbid() + "<br/>";
+            result += "<br/>" + SYSTools.xx("misc.msg.thisEntryIsAReplacement") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getReplacementFor().getEditDate()) + " <br/>" + "<br/>" + SYSTools.xx("misc.msg.originalentry") + ": " + nReport.getReplacementFor().getPbid() + "<br/>";
         } else if (nReport.isReplaced()) {
-            result += "<br/>" + OPDE.lang.getString("misc.msg.thisentryhasbeenedited") + " <br/>" + OPDE.lang.getString("misc.msg.atchrono") + " " + df.format(nReport.getEditDate()) + " <br/>" + OPDE.lang.getString("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname();
-            result += "<br/>" + OPDE.lang.getString("misc.msg.replaceentry") + ": " + nReport.getReplacedBy().getPbid() + "<br/>";
+            result += "<br/>" + SYSTools.xx("misc.msg.thisentryhasbeenedited") + " <br/>" + SYSTools.xx("misc.msg.atchrono") + " " + df.format(nReport.getEditDate()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + " " + nReport.getEditedBy().getFullname();
+            result += "<br/>" + SYSTools.xx("misc.msg.replaceentry") + ": " + nReport.getReplacedBy().getPbid() + "<br/>";
         } else {
-            result += "<br/>" + OPDE.lang.getString("misc.msg.created") + " " + OPDE.lang.getString("misc.msg.atchrono") + ": " + df.format(nReport.getEditDate()) + " <br/>" + OPDE.lang.getString("misc.msg.Bywhom") + ": " + nReport.getUser().getFullname();
+            result += "<br/>" + SYSTools.xx("misc.msg.created") + " " + SYSTools.xx("misc.msg.atchrono") + ": " + df.format(nReport.getEditDate()) + " <br/>" + SYSTools.xx("misc.msg.Bywhom") + ": " + nReport.getUser().getFullname();
         }
 
 
@@ -363,7 +363,7 @@ public class NReportTools {
         int p = -1;
         progress.execute(new Pair<Integer, Integer>(p, listResidents.size()));
 
-        html.append(SYSConst.html_h1_open + OPDE.lang.getString("opde.controlling.orga.bvactivities") + SYSConst.html_h1_close);
+        html.append(SYSConst.html_h1_open + SYSTools.xx("opde.controlling.orga.bvactivities") + SYSConst.html_h1_close);
 
         p = 0;
         for (Resident resident : listResidents) {
@@ -375,19 +375,19 @@ public class NReportTools {
             html.append(SYSConst.html_h2_open + ResidentTools.getTextCompact(resident) + SYSConst.html_h2_close);
 
             if (resident.getPN1() == null) {
-                html.append(SYSConst.html_div(SYSConst.html_bold(OPDE.lang.getString("opde.controlling.orga.bvactivities.nobv"))));
+                html.append(SYSConst.html_div(SYSConst.html_bold(SYSTools.xx("opde.controlling.orga.bvactivities.nobv"))));
             } else {
-                html.append(SYSConst.html_div(SYSConst.html_bold(OPDE.lang.getString("misc.msg.primaryNurse")) + ": " + resident.getPN1().getFullname()));
+                html.append(SYSConst.html_div(SYSConst.html_bold(SYSTools.xx("misc.msg.primaryNurse")) + ": " + resident.getPN1().getFullname()));
             }
 
             if (listReports.isEmpty()) {
-                html.append(SYSConst.html_div(SYSConst.html_bold(OPDE.lang.getString("misc.msg.nodata"))));
+                html.append(SYSConst.html_div(SYSConst.html_bold(SYSTools.xx("misc.msg.nodata"))));
             } else {
                 html.append("<table id=\"fonttext\" border=\"1\">" +
                         SYSConst.html_table_tr(
-                                SYSConst.html_table_th(OPDE.lang.getString("misc.msg.Date")) +
-                                        SYSConst.html_table_th(OPDE.lang.getString("misc.msg.Text")) +
-                                        SYSConst.html_table_th(OPDE.lang.getString("misc.msg.user"))
+                                SYSConst.html_table_th(SYSTools.xx("misc.msg.Date")) +
+                                        SYSConst.html_table_th(SYSTools.xx("misc.msg.Text")) +
+                                        SYSConst.html_table_th(SYSTools.xx("misc.msg.user"))
                         ));
 
                 for (NReport nReport : listReports) {
@@ -437,14 +437,14 @@ public class NReportTools {
             p = 0;
 
             if (listReports.isEmpty()) {
-                html.append(SYSConst.html_div(SYSConst.html_bold(OPDE.lang.getString("misc.msg.nodata"))));
+                html.append(SYSConst.html_div(SYSConst.html_bold(SYSTools.xx("misc.msg.nodata"))));
             } else {
                 String table = "";
                 table += SYSConst.html_table_tr(
-                        SYSConst.html_table_th(OPDE.lang.getString("misc.msg.Date")) +
-                                SYSConst.html_table_th(OPDE.lang.getString("misc.msg.resident")) +
-                                SYSConst.html_table_th(OPDE.lang.getString("misc.msg.Text")) +
-                                SYSConst.html_table_th(OPDE.lang.getString("misc.msg.user"))
+                        SYSConst.html_table_th(SYSTools.xx("misc.msg.Date")) +
+                                SYSConst.html_table_th(SYSTools.xx("misc.msg.resident")) +
+                                SYSConst.html_table_th(SYSTools.xx("misc.msg.Text")) +
+                                SYSConst.html_table_th(SYSTools.xx("misc.msg.user"))
                 );
 
                 for (NReport nReport : listReports) {
@@ -554,19 +554,19 @@ public class NReportTools {
             statmap.put(nr.getResident(), new Pair<Integer, Integer>(socialtime, peatime));
         }
 
-        html.append(SYSConst.html_h1(OPDE.lang.getString("opde.controlling.nursing.social")));
+        html.append(SYSConst.html_h1(SYSTools.xx("opde.controlling.nursing.social")));
         html.append(SYSConst.html_h2(monthFormmatter.format(month.toDate())));
 
 
         StringBuilder table = new StringBuilder(1000);
         table.append(SYSConst.html_table_tr(
                 SYSConst.html_table_th("misc.msg.resident") +
-                        SYSConst.html_table_th(OPDE.lang.getString("misc.msg.Effort") + " (" + OPDE.lang.getString("misc.msg.Minutes") + ")") +
-                        SYSConst.html_table_th(OPDE.lang.getString("misc.msg.Effort") + " (" + OPDE.lang.getString("misc.msg.Hours") + ")") +
-                        SYSConst.html_table_th(OPDE.lang.getString("opde.controlling.nursing.social.averageHoursPerDay")) +
-                        SYSConst.html_table_th("PEA " + OPDE.lang.getString("misc.msg.Effort") + " (" + OPDE.lang.getString("misc.msg.Minutes") + ")") +
-                        SYSConst.html_table_th("PEA " + OPDE.lang.getString("misc.msg.Effort") + " (" + OPDE.lang.getString("misc.msg.Hours") + ")") +
-                        SYSConst.html_table_th("PEA " + OPDE.lang.getString("opde.controlling.nursing.social.averageHoursPerDay"))
+                        SYSConst.html_table_th(SYSTools.xx("misc.msg.Effort") + " (" + SYSTools.xx("misc.msg.Minutes") + ")") +
+                        SYSConst.html_table_th(SYSTools.xx("misc.msg.Effort") + " (" + SYSTools.xx("misc.msg.Hours") + ")") +
+                        SYSConst.html_table_th(SYSTools.xx("opde.controlling.nursing.social.averageHoursPerDay")) +
+                        SYSConst.html_table_th("PEA " + SYSTools.xx("misc.msg.Effort") + " (" + SYSTools.xx("misc.msg.Minutes") + ")") +
+                        SYSConst.html_table_th("PEA " + SYSTools.xx("misc.msg.Effort") + " (" + SYSTools.xx("misc.msg.Hours") + ")") +
+                        SYSConst.html_table_th("PEA " + SYSTools.xx("opde.controlling.nursing.social.averageHoursPerDay"))
         ));
 
         BigDecimal daysinmonth = new BigDecimal(month.dayOfMonth().withMaximumValue().getDayOfMonth());

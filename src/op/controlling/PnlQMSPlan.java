@@ -557,7 +557,7 @@ public class PnlQMSPlan extends CleanablePanel {
                 JButton btnApply = new JButton(SYSConst.icon22apply);
                 btnApply.setPressedIcon(SYSConst.icon22applyPressed);
                 btnApply.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                btnApply.setToolTipText(OPDE.lang.getString("nursingrecords.bhp.btnApply.tooltip"));
+                btnApply.setToolTipText(SYSTools.xx("nursingrecords.bhp.btnApply.tooltip"));
                 btnApply.addActionListener(applyActionListener);
                 btnApply.setContentAreaFilled(false);
                 btnApply.setBorder(null);
@@ -578,7 +578,7 @@ public class PnlQMSPlan extends CleanablePanel {
                 btnRefuse.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 btnRefuse.setContentAreaFilled(false);
                 btnRefuse.setBorder(null);
-                btnRefuse.setToolTipText(SYSTools.toHTMLForScreen(OPDE.lang.getString("nursingrecords.bhp.btnRefuse.tooltip")));
+                btnRefuse.setToolTipText(SYSTools.toHTMLForScreen(SYSTools.xx("nursingrecords.bhp.btnRefuse.tooltip")));
                 btnRefuse.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
@@ -642,7 +642,7 @@ public class PnlQMSPlan extends CleanablePanel {
                 btnEmpty.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 btnEmpty.setContentAreaFilled(false);
                 btnEmpty.setBorder(null);
-                btnEmpty.setToolTipText(OPDE.lang.getString("nursingrecords.bhp.btnEmpty.tooltip"));
+                btnEmpty.setToolTipText(SYSTools.xx("nursingrecords.bhp.btnEmpty.tooltip"));
                 btnEmpty.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
@@ -789,7 +789,7 @@ public class PnlQMSPlan extends CleanablePanel {
             btnDelete.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<br/><b>" + qmsplan.getTitle() + "</b><br/>" + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
+                    new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><b>" + qmsplan.getTitle() + "</b><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
                         @Override
                         public void execute(Object o) {
                             if (o.equals(JOptionPane.YES_OPTION)) {

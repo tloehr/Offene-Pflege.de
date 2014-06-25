@@ -635,13 +635,13 @@ public class DlgRegular extends MyJDialog {
     public void initDialog() {
         fillComboBoxes();
 
-        String tooltip = OPDE.lang.getString("nursingrecords.prescription.dlgRegular.tx.tooltip").replace('[', '<').replace(']', '>');
+        String tooltip = SYSTools.xx("nursingrecords.prescription.dlgRegular.tx.tooltip").replace('[', '<').replace(']', '>');
         lblTX.setToolTipText(SYSTools.toHTMLForScreen("<p style=\"width:300px;\">" + tooltip + "</p>"));
 
         ignoreEvent = true;
 
-        rbActive.setText(OPDE.lang.getString("nursingrecords.prescription.dlgRegular.rbActive"));
-        rbEndOfPackage.setText(OPDE.lang.getString("nursingrecords.prescription.dlgRegular.rbEndOfPackage"));
+        rbActive.setText(SYSTools.xx("nursingrecords.prescription.dlgRegular.rbActive"));
+        rbEndOfPackage.setText(SYSTools.xx("nursingrecords.prescription.dlgRegular.rbEndOfPackage"));
 
         txtMed.setText("");
         cmbMed.setRenderer(TradeFormTools.getRenderer(TradeFormTools.LONG));
@@ -845,7 +845,7 @@ public class DlgRegular extends MyJDialog {
         menu = new JPopupMenu();
 
         //-----------------------------------------
-        JMenuItem itemPopupDelete = new JMenuItem(OPDE.lang.getString("misc.msg.delete"), SYSConst.icon22delete);
+        JMenuItem itemPopupDelete = new JMenuItem(SYSTools.xx("misc.msg.delete"), SYSConst.icon22delete);
         itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
 
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -896,7 +896,7 @@ public class DlgRegular extends MyJDialog {
         tblDosis.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jspDosis.dispatchEvent(new ComponentEvent(jspDosis, ComponentEvent.COMPONENT_RESIZED));
         tblDosis.getColumnModel().getColumn(TMDose.COL_Dosis).setCellRenderer(new RNDHTML());
-        tblDosis.getColumnModel().getColumn(TMDose.COL_Dosis).setHeaderValue(OPDE.lang.getString("misc.msg.usage"));
+        tblDosis.getColumnModel().getColumn(TMDose.COL_Dosis).setHeaderValue(SYSTools.xx("misc.msg.usage"));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

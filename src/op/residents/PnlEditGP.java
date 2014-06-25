@@ -36,17 +36,17 @@ public class PnlEditGP extends PopupPanel {
     }
 
     private void initPanel() {
-        lblAnrede.setText(OPDE.lang.getString("misc.msg.termofaddress"));
-        lblTitel.setText(OPDE.lang.getString("misc.msg.title"));
-        lblNachname.setText(OPDE.lang.getString("misc.msg.surname"));
-        lblVorname.setText(OPDE.lang.getString("misc.msg.firstname"));
-        lblStrasse.setText(OPDE.lang.getString("misc.msg.street"));
-        lblPLZ.setText(OPDE.lang.getString("misc.msg.zipcode"));
-        lblOrt.setText(OPDE.lang.getString("misc.msg.city"));
-        lblTel.setText(OPDE.lang.getString("misc.msg.phone"));
-        lblFax.setText(OPDE.lang.getString("misc.msg.fax"));
-        lblMobil.setText(OPDE.lang.getString("misc.msg.mobilephone"));
-        lblEMAIL.setText(OPDE.lang.getString("misc.msg.email"));
+        lblAnrede.setText(SYSTools.xx("misc.msg.termofaddress"));
+        lblTitel.setText(SYSTools.xx("misc.msg.title"));
+        lblNachname.setText(SYSTools.xx("misc.msg.surname"));
+        lblVorname.setText(SYSTools.xx("misc.msg.firstname"));
+        lblStrasse.setText(SYSTools.xx("misc.msg.street"));
+        lblPLZ.setText(SYSTools.xx("misc.msg.zipcode"));
+        lblOrt.setText(SYSTools.xx("misc.msg.city"));
+        lblTel.setText(SYSTools.xx("misc.msg.phone"));
+        lblFax.setText(SYSTools.xx("misc.msg.fax"));
+        lblMobil.setText(SYSTools.xx("misc.msg.mobilephone"));
+        lblEMAIL.setText(SYSTools.xx("misc.msg.email"));
 
         txtAnrede.setText(doc.getAnrede());
         txtTitel.setText(doc.getTitle());

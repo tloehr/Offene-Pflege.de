@@ -98,7 +98,7 @@ public class PnlTraining extends CleanablePanel {
             SYSTools.clear(cpMap);
         }
         OPDE.getMainframe().setBlocked(true);
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 
         SwingWorker worker = new SwingWorker() {
             Date max = null;
@@ -251,7 +251,7 @@ public class PnlTraining extends CleanablePanel {
              *
              */
             final JButton btnFiles = new JButton(Integer.toString(training.getAttachedFilesConnections().size()), SYSConst.icon22greenStar);
-            btnFiles.setToolTipText(OPDE.lang.getString("misc.btnfiles.tooltip"));
+            btnFiles.setToolTipText(SYSTools.xx("misc.btnfiles.tooltip"));
             btnFiles.setForeground(Color.BLUE);
             btnFiles.setHorizontalTextPosition(SwingUtilities.CENTER);
             btnFiles.setFont(SYSConst.ARIAL18BOLD);
@@ -585,7 +585,7 @@ public class PnlTraining extends CleanablePanel {
         mypanel.setLayout(new VerticalLayout(5));
         mypanel.setBackground(Color.WHITE);
 
-        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
+        CollapsiblePane searchPane = new CollapsiblePane(SYSTools.xx(internalClassID));
         searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
         searchPane.setCollapsible(false);
 
@@ -686,7 +686,7 @@ public class PnlTraining extends CleanablePanel {
             btnDelete.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<br/><i>" + training.getTitle() + ", " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(training.getDate()) + "</i><br/>" + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
+                    new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + training.getTitle() + ", " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(training.getDate()) + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
                         @Override
                         public void execute(Object answer) {
                             if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -792,7 +792,7 @@ public class PnlTraining extends CleanablePanel {
          *
          */
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
-            JideButton addButton = GUITools.createHyperlinkButton(OPDE.lang.getString("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
+            JideButton addButton = GUITools.createHyperlinkButton(SYSTools.xx("misc.commands.new"), new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")), new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     new DlgTraining(new Training(), new Closure() {

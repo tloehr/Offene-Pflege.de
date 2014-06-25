@@ -54,10 +54,10 @@ public class PnlSelectIntervention extends JPanel {
     }
 
     private void initPanel() {
-        lblText.setText(OPDE.lang.getString(internalClassID + ".lbltext"));
-        lblLength.setText(OPDE.lang.getString(internalClassID + ".lbllength"));
-        lblCat.setText(OPDE.lang.getString(internalClassID + ".lblcat"));
-        lblType.setText(OPDE.lang.getString(internalClassID + ".lbltype"));
+        lblText.setText(SYSTools.xx(internalClassID + ".lbltext"));
+        lblLength.setText(SYSTools.xx(internalClassID + ".lbllength"));
+        lblCat.setText(SYSTools.xx(internalClassID + ".lblcat"));
+        lblType.setText(SYSTools.xx(internalClassID + ".lbltype"));
 
         lstInterventions.setModel(new DefaultListModel());
         tbAktiv = GUITools.getNiceToggleButton(internalClassID + ".activeIntervention");
@@ -69,7 +69,7 @@ public class PnlSelectIntervention extends JPanel {
             }
         });
 
-        cmbType.setModel(new DefaultComboBoxModel(new String[]{OPDE.lang.getString("misc.msg.interventions.CARE"), OPDE.lang.getString("misc.msg.interventions.PRESCRIPTION"), OPDE.lang.getString("misc.msg.interventions.SOCIAL")}));
+        cmbType.setModel(new DefaultComboBoxModel(new String[]{SYSTools.xx("misc.msg.interventions.CARE"), SYSTools.xx("misc.msg.interventions.PRESCRIPTION"), SYSTools.xx("misc.msg.interventions.SOCIAL")}));
         cmbCat.setModel(new DefaultComboBoxModel(ResInfoCategoryTools.getAll4NP().toArray()));
         cmbCategory.setModel(new DefaultComboBoxModel(ResInfoCategoryTools.getAll4NP().toArray()));
         cmbCategory.setSelectedItem(null);
@@ -138,7 +138,7 @@ public class PnlSelectIntervention extends JPanel {
 
     private boolean saveok() {
         if (txtText.getText().trim().isEmpty()) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".textempty"), DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx(internalClassID + ".textempty"), DisplayMessage.WARNING));
             return false;
         }
         return true;

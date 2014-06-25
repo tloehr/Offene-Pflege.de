@@ -41,11 +41,11 @@ public class DlgUser extends MyJDialog {
 
     private void initPanel() {
 
-        lblFirstname.setText(OPDE.lang.getString("misc.msg.firstname"));
-        lblName.setText(OPDE.lang.getString("misc.msg.name"));
-        lblPW.setText(OPDE.lang.getString("misc.msg.password"));
-        lblUID.setText(OPDE.lang.getString("misc.msg.uid"));
-        lblEmail.setText(OPDE.lang.getString("misc.msg.email"));
+        lblFirstname.setText(SYSTools.xx("misc.msg.firstname"));
+        lblName.setText(SYSTools.xx("misc.msg.name"));
+        lblPW.setText(SYSTools.xx("misc.msg.password"));
+        lblUID.setText(SYSTools.xx("misc.msg.uid"));
+        lblEmail.setText(SYSTools.xx("misc.msg.email"));
 
         txtName.setText(user.getName());
         txtEMail.setText(user.getEMail());
@@ -88,7 +88,7 @@ public class DlgUser extends MyJDialog {
         }
 
         if (!txtEMail.getText().isEmpty() && !SYSTools.isValidEMail(txtEMail.getText().trim())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".wrongemail")));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx(internalClassID + ".wrongemail")));
             return;
         }
 
@@ -97,7 +97,7 @@ public class DlgUser extends MyJDialog {
             Users check4user = em.find(Users.class, txtUID.getText().trim());
             em.close();
             if (check4user != null) {
-                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".uidtaken")));
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx(internalClassID + ".uidtaken")));
                 return;
             }
         }

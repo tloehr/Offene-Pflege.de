@@ -160,7 +160,7 @@ public class LCustodian implements Serializable {
     }
 
     public String getMobil() {
-        return SYSTools.catchNull(mobil).isEmpty() ? OPDE.lang.getString("misc.msg.unknown") : mobil;
+        return SYSTools.catchNull(mobil).isEmpty() ? SYSTools.xx("misc.msg.unknown") : mobil;
     }
 
     public void setMobil(String mobil) {

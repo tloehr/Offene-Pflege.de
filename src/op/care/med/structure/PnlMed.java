@@ -196,14 +196,14 @@ public class PnlMed extends CleanablePanel {
 
                 if (dmtn.getUserObject() instanceof TradeForm) {
                     final TradeForm tradeForm = (TradeForm) dmtn.getUserObject();
-                    itemedit = new JMenuItem(OPDE.lang.getString("misc.msg.edit"));
+                    itemedit = new JMenuItem(SYSTools.xx("misc.msg.edit"));
                     itemedit.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
                             new DlgTradeForm(tradeForm);
                             createTree();
                         }
                     });
-                    itemUPRedit = new JMenuItem(OPDE.lang.getString("upreditor.tooltip"));
+                    itemUPRedit = new JMenuItem(SYSTools.xx("upreditor.tooltip"));
                     itemUPRedit.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
                             new DlgUPREditor(tradeForm, new Closure() {
@@ -229,7 +229,7 @@ public class PnlMed extends CleanablePanel {
                     itemedit = new JMenuItem("Bearbeiten");
                     itemedit.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
-                            new DlgPack(OPDE.lang.getString("misc.msg.edit"), packung);
+                            new DlgPack(SYSTools.xx("misc.msg.edit"), packung);
                             createTree();
                         }
                     });
@@ -238,7 +238,7 @@ public class PnlMed extends CleanablePanel {
                     itemedit = new JMenuItem("Bearbeiten");
                     itemedit.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
-                            DlgProduct dlg = new DlgProduct(OPDE.lang.getString("misc.msg.edit"), (MedProducts) dmtn.getUserObject());
+                            DlgProduct dlg = new DlgProduct(SYSTools.xx("misc.msg.edit"), (MedProducts) dmtn.getUserObject());
                             product = dlg.getProduct();
                             createTree();
                         }
@@ -346,7 +346,7 @@ public class PnlMed extends CleanablePanel {
         mypanel.setLayout(new VerticalLayout(3));
         mypanel.setBackground(Color.WHITE);
 
-        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
+        CollapsiblePane searchPane = new CollapsiblePane(SYSTools.xx(internalClassID));
         searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
         searchPane.setCollapsible(false);
 

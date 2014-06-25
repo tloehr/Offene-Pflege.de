@@ -182,7 +182,7 @@ public class PnlDFN extends NursingRecordsPanel {
         if (withworker) {
 
             OPDE.getMainframe().setBlocked(true);
-            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 
             cpDFN.removeAll();
 
@@ -192,7 +192,7 @@ public class PnlDFN extends NursingRecordsPanel {
                 protected Object doInBackground() throws Exception {
 
                     int progress = 0;
-                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 100));
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, 100));
 
                     ArrayList<DFN> listDFNs = DFNTools.getDFNs(resident, jdcDate.getDate());
 
@@ -214,7 +214,7 @@ public class PnlDFN extends NursingRecordsPanel {
                                 OPDE.debug(e);
                             }
                             progress += 20;
-                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 100));
+                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, 100));
                         }
                     }
                     return null;
@@ -283,7 +283,7 @@ public class PnlDFN extends NursingRecordsPanel {
         if (containsKey) {
             if (shift == DFNTools.SHIFT_EARLY) {
 
-                final CollapsiblePane morning = new CollapsiblePane("<html><font size=+1>" + OPDE.lang.getString("misc.msg.morning.long") + "</font></html>", null);
+                final CollapsiblePane morning = new CollapsiblePane("<html><font size=+1>" + SYSTools.xx("misc.msg.morning.long") + "</font></html>", null);
                 morning.setSlidingDirection(SwingConstants.SOUTH);
                 morning.setBackground(SYSCalendar.getBGSHIFT(shift).darker());
                 morning.setForeground(Color.white);
@@ -292,7 +292,7 @@ public class PnlDFN extends NursingRecordsPanel {
                 pnlMorning.setLayout(new VerticalLayout());
                 morning.setContentPane(pnlMorning);
 
-                final CollapsiblePane noon = new CollapsiblePane("<html><font size=+1>" + OPDE.lang.getString("misc.msg.noon.long") + "</font></html>", null);
+                final CollapsiblePane noon = new CollapsiblePane("<html><font size=+1>" + SYSTools.xx("misc.msg.noon.long") + "</font></html>", null);
                 noon.setSlidingDirection(SwingConstants.SOUTH);
                 noon.setBackground(SYSCalendar.getBGSHIFT(shift).darker());
                 noon.setForeground(Color.white);
@@ -301,7 +301,7 @@ public class PnlDFN extends NursingRecordsPanel {
                 pnlNoon.setLayout(new VerticalLayout());
                 noon.setContentPane(pnlNoon);
 
-                final CollapsiblePane clock = new CollapsiblePane("<html><font size=+1>" + OPDE.lang.getString("misc.msg.Time.long") + "</font></html>", null);
+                final CollapsiblePane clock = new CollapsiblePane("<html><font size=+1>" + SYSTools.xx("misc.msg.Time.long") + "</font></html>", null);
                 clock.setSlidingDirection(SwingConstants.SOUTH);
                 clock.setBackground(SYSCalendar.getBGSHIFT(shift).darker());
                 clock.setForeground(Color.white);
@@ -341,7 +341,7 @@ public class PnlDFN extends NursingRecordsPanel {
                 }
 
             } else if (shift == DFNTools.SHIFT_LATE) {
-                final CollapsiblePane afternoon = new CollapsiblePane("<html><font size=+1>" + OPDE.lang.getString("misc.msg.afternoon.long") + "</font></html>", null);
+                final CollapsiblePane afternoon = new CollapsiblePane("<html><font size=+1>" + SYSTools.xx("misc.msg.afternoon.long") + "</font></html>", null);
                 afternoon.setSlidingDirection(SwingConstants.SOUTH);
                 afternoon.setBackground(SYSCalendar.getBGSHIFT(shift).darker());
                 afternoon.setForeground(Color.white);
@@ -350,7 +350,7 @@ public class PnlDFN extends NursingRecordsPanel {
                 pnlAfternoon.setLayout(new VerticalLayout());
                 afternoon.setContentPane(pnlAfternoon);
 
-                final CollapsiblePane evening = new CollapsiblePane("<html><font size=+1>" + OPDE.lang.getString("misc.msg.evening.long") + "</font></html>", null);
+                final CollapsiblePane evening = new CollapsiblePane("<html><font size=+1>" + SYSTools.xx("misc.msg.evening.long") + "</font></html>", null);
                 evening.setSlidingDirection(SwingConstants.SOUTH);
                 evening.setBackground(SYSCalendar.getBGSHIFT(shift).darker());
                 evening.setForeground(Color.white);
@@ -359,7 +359,7 @@ public class PnlDFN extends NursingRecordsPanel {
                 pnlEvening.setLayout(new VerticalLayout());
                 evening.setContentPane(pnlEvening);
 
-                final CollapsiblePane clock = new CollapsiblePane("<html><font size=+1>" + OPDE.lang.getString("misc.msg.Time.long") + "</font></html>", null);
+                final CollapsiblePane clock = new CollapsiblePane("<html><font size=+1>" + SYSTools.xx("misc.msg.Time.long") + "</font></html>", null);
                 clock.setSlidingDirection(SwingConstants.SOUTH);
                 clock.setBackground(SYSCalendar.getBGSHIFT(shift).darker());
                 clock.setForeground(Color.white);
@@ -441,7 +441,7 @@ public class PnlDFN extends NursingRecordsPanel {
          *      \___|_|  \___|\__,_|\__\___|\____|_|      |_|
          *
          */
-        String title = "<html><font size=+1><b>" + OPDE.lang.getString("nursingrecords.dfn.ondemand") + "</b></font></html>";
+        String title = "<html><font size=+1><b>" + SYSTools.xx("nursingrecords.dfn.ondemand") + "</b></font></html>";
 
         final CollapsiblePane npPane = new CollapsiblePane(title);
         npPane.setSlidingDirection(SwingConstants.SOUTH);
@@ -479,11 +479,11 @@ public class PnlDFN extends NursingRecordsPanel {
     private java.util.List<Component> addKey() {
         java.util.List<Component> list = new ArrayList<Component>();
         list.add(new JSeparator());
-        list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.dfn.keydescription1"), SYSConst.icon22ledBlueOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.dfn.keydescription2"), SYSConst.icon22ledOrangeOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.dfn.keydescription3"), SYSConst.icon22ledPurpleOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.dfn.keydescription4"), SYSConst.icon22stopSign, SwingConstants.LEADING));
+        list.add(new JLabel(SYSTools.xx("misc.msg.key")));
+        list.add(new JLabel(SYSTools.xx("nursingrecords.dfn.keydescription1"), SYSConst.icon22ledBlueOn, SwingConstants.LEADING));
+        list.add(new JLabel(SYSTools.xx("nursingrecords.dfn.keydescription2"), SYSConst.icon22ledOrangeOn, SwingConstants.LEADING));
+        list.add(new JLabel(SYSTools.xx("nursingrecords.dfn.keydescription3"), SYSConst.icon22ledPurpleOn, SwingConstants.LEADING));
+        list.add(new JLabel(SYSTools.xx("nursingrecords.dfn.keydescription4"), SYSConst.icon22stopSign, SwingConstants.LEADING));
         return list;
     }
 
@@ -558,7 +558,7 @@ public class PnlDFN extends NursingRecordsPanel {
                     }
 
                 } else {
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.dfn.notchangeable")));
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("nursingrecords.dfn.notchangeable")));
                 }
             }
         };
@@ -567,7 +567,7 @@ public class PnlDFN extends NursingRecordsPanel {
 //                (dfn.isFloating() ? (dfn.isActive() ? "(!) " : "(OK) ") : "") +
                 SYSTools.left(dfn.getIntervention().getBezeichnung(), MAX_TEXT_LENGTH) +
                 DFNTools.getScheduleText(dfn, " [", "]") +
-                ", " + dfn.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)") + (dfn.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(dfn.getUser().getUID()) + "</i>" : "") +
+                ", " + dfn.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)") + (dfn.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(dfn.getUser().getUID()) + "</i>" : "") +
                 "</font></html>";
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) ? applyActionListener : null);
@@ -581,7 +581,7 @@ public class PnlDFN extends NursingRecordsPanel {
         cptitle.getAdditionalIconPanel().add(icon2);
 
         if (dfn.isFloating()) {
-            cptitle.getButton().setToolTipText(OPDE.lang.getString("nursingrecords.dfn.enforced.tooltip") + ": " + DateFormat.getDateInstance().format(dfn.getStDatum()));
+            cptitle.getButton().setToolTipText(SYSTools.xx("nursingrecords.dfn.enforced.tooltip") + ": " + DateFormat.getDateInstance().format(dfn.getStDatum()));
         }
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID) && (dfn.isOnDemand() || !dfn.getNursingProcess().isClosed())) {
@@ -617,7 +617,7 @@ public class PnlDFN extends NursingRecordsPanel {
             btnCancel.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnCancel.setContentAreaFilled(false);
             btnCancel.setBorder(null);
-//            btnCancel.setToolTipText(OPDE.lang.getString("nursingrecords.dfn.btneval.tooltip"));
+//            btnCancel.setToolTipText(SYSTools.xx("nursingrecords.dfn.btneval.tooltip"));
             btnCancel.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -679,7 +679,7 @@ public class PnlDFN extends NursingRecordsPanel {
                         }
 
                     } else {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.dfn.notchangeable")));
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("nursingrecords.dfn.notchangeable")));
                     }
                 }
             });
@@ -699,7 +699,7 @@ public class PnlDFN extends NursingRecordsPanel {
             btnEmpty.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnEmpty.setContentAreaFilled(false);
             btnEmpty.setBorder(null);
-//            btnCancel.setToolTipText(OPDE.lang.getString("nursingrecords.dfn.btneval.tooltip"));
+//            btnCancel.setToolTipText(SYSTools.xx("nursingrecords.dfn.btneval.tooltip"));
             btnEmpty.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -772,7 +772,7 @@ public class PnlDFN extends NursingRecordsPanel {
                         }
 
                     } else {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.dfn.notchangeable")));
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("nursingrecords.dfn.notchangeable")));
                     }
                 }
             });
@@ -793,12 +793,12 @@ public class PnlDFN extends NursingRecordsPanel {
             btnMinutes.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnMinutes.setContentAreaFilled(false);
             btnMinutes.setBorder(null);
-//            btnCancel.setToolTipText(OPDE.lang.getString("nursingrecords.dfn.btneval.tooltip"));
+//            btnCancel.setToolTipText(SYSTools.xx("nursingrecords.dfn.btneval.tooltip"));
             btnMinutes.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     if (!DFNTools.isChangeable(dfn)) {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.dfn.notchangeable")));
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("nursingrecords.dfn.notchangeable")));
                         return;
                     }
                     final JPopupMenu menu = SYSCalendar.getMinutesMenu(new int[]{1, 2, 3, 4, 5, 10, 15, 20, 30, 45, 60, 120, 240, 360}, new Closure() {
@@ -933,7 +933,7 @@ public class PnlDFN extends NursingRecordsPanel {
         mypanel.setLayout(new VerticalLayout());
         mypanel.setBackground(Color.WHITE);
 
-        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
+        CollapsiblePane searchPane = new CollapsiblePane(SYSTools.xx(internalClassID));
         searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
         searchPane.setCollapsible(false);
 
@@ -1074,7 +1074,7 @@ public class PnlDFN extends NursingRecordsPanel {
          */
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
 
-            final JideButton btnAdd = GUITools.createHyperlinkButton(OPDE.lang.getString("nursingrecords.dfn.btnadd"), SYSConst.icon22add, null);
+            final JideButton btnAdd = GUITools.createHyperlinkButton(SYSTools.xx("nursingrecords.dfn.btnadd"), SYSConst.icon22add, null);
             btnAdd.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -1172,7 +1172,7 @@ public class PnlDFN extends NursingRecordsPanel {
 
                 synchronized (mapShift2DFN) {
                     html += "<h1 id=\"fonth1\" >" + ResidentTools.getFullName(resident) + "</h1>";
-                    html += SYSConst.html_h2(OPDE.lang.getString("nursingrecords.bhp") + ": " + SYSConst.html_bold(DateFormat.getDateInstance().format(jdcDate.getDate())));
+                    html += SYSConst.html_h2(SYSTools.xx("nursingrecords.bhp") + ": " + SYSConst.html_bold(DateFormat.getDateInstance().format(jdcDate.getDate())));
 
                     for (Byte shift : new Byte[]{DFNTools.SHIFT_ON_DEMAND, DFNTools.SHIFT_VERY_EARLY, DFNTools.SHIFT_EARLY, DFNTools.SHIFT_LATE, DFNTools.SHIFT_VERY_LATE}) {
                         html += DFNTools.getDFNsAsHTMLtable(mapShift2DFN.get(shift));

@@ -120,7 +120,7 @@ public class SYSFilesTools {
             ftp.uploadFile(file.getPath(), sysfile.getRemoteFilename());
 
 //            ftp.storeF.storeFile(file.getPath(),sysfile.getRemoteFilename());
-            OPDE.info(OPDE.lang.getString("misc.msg.upload") + ": " + sysfile.getFilename() + " (" + sysfile.getMd5() + ")");
+            OPDE.info(SYSTools.xx("misc.msg.upload") + ": " + sysfile.getFilename() + " (" + sysfile.getMd5() + ")");
 //            fis.close();
         } else { // Ansonsten die bestehende Datei zurückgeben
 
@@ -198,7 +198,7 @@ public class SYSFilesTools {
                         successful.add(sysfile);
                     }
                     if (successful.size() != files.length) {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.nodirectories")));
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.nodirectories")));
                     }
                 }
                 em.getTransaction().commit();
@@ -275,7 +275,7 @@ public class SYSFilesTools {
             target = new File(OPDE.getOPCache() + sep + sysfile.getFilename());
             // File present in cache directory ?
             if (!target.exists() || !SYSTools.getMD5Checksum(target).equals(sysfile.getMd5())) {
-                OPDE.info(OPDE.lang.getString("misc.msg.download") + ": " + OPDE.getProps().getProperty("FTPServer") + "://" + OPDE.getProps().getProperty("FTPWorkingDirectory") + "/" + sysfile.getFilename());
+                OPDE.info(SYSTools.xx("misc.msg.download") + ": " + OPDE.getProps().getProperty("FTPServer") + "://" + OPDE.getProps().getProperty("FTPWorkingDirectory") + "/" + sysfile.getFilename());
                 FileUtils.deleteQuietly(target);
 
                 ftp.setEventListener(eventListener);
@@ -410,19 +410,19 @@ public class SYSFilesTools {
                     try {
                         desktop.open(file);
                     } catch (IOException ex) {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.noviewer"), DisplayMessage.WARNING));
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.noviewer"), DisplayMessage.WARNING));
                     }
                 } else if (action == Desktop.Action.PRINT && desktop.isSupported(Desktop.Action.PRINT)) {
                     try {
                         desktop.print(file);
                     } catch (IOException ex) {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.noprintprog"), DisplayMessage.WARNING));
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.noprintprog"), DisplayMessage.WARNING));
                     }
                 } else {
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.nofilehandler"), DisplayMessage.WARNING));
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.nofilehandler"), DisplayMessage.WARNING));
                 }
             } else {
-                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.nojavadesktop"), DisplayMessage.WARNING));
+                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.nojavadesktop"), DisplayMessage.WARNING));
             }
         }
     }
@@ -517,7 +517,7 @@ public class SYSFilesTools {
             text += "</head><body>" + SYSTools.htmlUmlautConversion(html)
                     + "<hr/>" +
                     "<div id=\"fonttext\">" +
-                    "<b>" + OPDE.lang.getString("misc.msg.endofreport") + "</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getUID()) : "")
+                    "<b>" + SYSTools.xx("misc.msg.endofreport") + "</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getUID()) : "")
                     + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
                     + "<br/>" + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum() + "</div></body></html>";
 

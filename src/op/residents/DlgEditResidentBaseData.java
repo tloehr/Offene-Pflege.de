@@ -60,17 +60,17 @@ public class DlgEditResidentBaseData extends MyJDialog {
 
 
     private void initDialog() {
-        lblName.setText(OPDE.lang.getString("misc.msg.name"));
-        lblFirstname.setText(OPDE.lang.getString("misc.msg.firstname"));
-        lblDOB.setText(OPDE.lang.getString("misc.msg.dob"));
-        lblGender.setText(OPDE.lang.getString("misc.msg.gender"));
-        lblRoom.setText(OPDE.lang.getString("misc.msg.room"));
-        lblStation.setText(OPDE.lang.getString("misc.msg.subdivision"));
-        lblPrimNurse1.setText(OPDE.lang.getString("misc.msg.primaryNurse") + " 1");
-        lblPrimNurse2.setText(OPDE.lang.getString("misc.msg.primaryNurse") + " 2");
-        lblGP.setText(OPDE.lang.getString("misc.msg.gp"));
-        rbMale.setText(OPDE.lang.getString("misc.msg.male"));
-        rbFemale.setText(OPDE.lang.getString("misc.msg.female"));
+        lblName.setText(SYSTools.xx("misc.msg.name"));
+        lblFirstname.setText(SYSTools.xx("misc.msg.firstname"));
+        lblDOB.setText(SYSTools.xx("misc.msg.dob"));
+        lblGender.setText(SYSTools.xx("misc.msg.gender"));
+        lblRoom.setText(SYSTools.xx("misc.msg.room"));
+        lblStation.setText(SYSTools.xx("misc.msg.subdivision"));
+        lblPrimNurse1.setText(SYSTools.xx("misc.msg.primaryNurse") + " 1");
+        lblPrimNurse2.setText(SYSTools.xx("misc.msg.primaryNurse") + " 2");
+        lblGP.setText(SYSTools.xx("misc.msg.gp"));
+        rbMale.setText(SYSTools.xx("misc.msg.male"));
+        rbFemale.setText(SYSTools.xx("misc.msg.female"));
 
         rbMale.setSelected(resident.getGender() == ResidentTools.MALE);
         rbFemale.setSelected(resident.getGender() == ResidentTools.FEMALE);
@@ -131,12 +131,12 @@ public class DlgEditResidentBaseData extends MyJDialog {
             }
         });
 
-        tbCalcMediUPR1 = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID+".tbCalcMediUPR1"));
-        tbCalcMediUPR1.setToolTipText(OPDE.lang.getString(internalClassID+".tooltip.tbCalcMediUPR1"));
+        tbCalcMediUPR1 = GUITools.getNiceToggleButton(SYSTools.xx(internalClassID+".tbCalcMediUPR1"));
+        tbCalcMediUPR1.setToolTipText(SYSTools.xx(internalClassID+".tooltip.tbCalcMediUPR1"));
         tbCalcMediUPR1.setSelected(resident.isCalcMediUPR1());
         add(tbCalcMediUPR1, CC.xywh(3, 23, 3, 1, CC.LEFT, CC.FILL));
 
-        tbAdminOnly = GUITools.getNiceToggleButton(OPDE.lang.getString("misc.msg.adminonly"));
+        tbAdminOnly = GUITools.getNiceToggleButton(SYSTools.xx("misc.msg.adminonly"));
         tbAdminOnly.setSelected(resident.getAdminonly() == 2);
         add(tbAdminOnly, CC.xywh(3, 25, 3, 1, CC.LEFT, CC.FILL));
     }
@@ -157,7 +157,7 @@ public class DlgEditResidentBaseData extends MyJDialog {
             dob = null;
         }
         if (!SYSCalendar.isBirthdaySane(dob)) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(internalClassID + ".dobXX"), DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx(internalClassID + ".dobXX"), DisplayMessage.WARNING));
             return false;
         }
 

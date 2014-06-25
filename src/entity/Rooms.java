@@ -6,6 +6,7 @@
 package entity;
 
 import op.OPDE;
+import op.tools.SYSTools;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -105,7 +106,7 @@ public class Rooms implements Serializable {
 
     @Override
     public String toString() {
-        return OPDE.lang.getString("misc.msg.room") + " " + text + ", " + station.getName() + ", " + station.getHome().getName();
+        return SYSTools.xx("misc.msg.room") + " " + text + ", " + station.getName() + ", " + station.getHome().getName();
     }
 
 }

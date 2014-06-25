@@ -12,6 +12,7 @@ import op.allowance.PnlAllowance;
 import op.tools.Pair;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
+import op.tools.SYSTools;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 
@@ -53,7 +54,7 @@ public class AllowanceTools {
         int elementNumber = 1;
         boolean pagebreak = false;
 
-        String header = OPDE.lang.getString(PnlAllowance.internalClassID + ".printheader") + " " + ResidentTools.getLabelText(resident);
+        String header = SYSTools.xx(PnlAllowance.internalClassID + ".printheader") + " " + ResidentTools.getLabelText(resident);
 
         String html = "";
 
@@ -273,7 +274,7 @@ public class AllowanceTools {
     public static String getOverallSumAsHTML(int monthsback) {
         DecimalFormat cf = new DecimalFormat("######.00");
         Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
-        String html = "<h1  align=\"center\" id=\"fonth1\">" + OPDE.lang.getString(PnlAllowance.internalClassID + ".overallsum") + "</h1>";
+        String html = "<h1  align=\"center\" id=\"fonth1\">" + SYSTools.xx(PnlAllowance.internalClassID + ".overallsum") + "</h1>";
 
         EntityManager em = OPDE.createEM();
         Query query = em.createQuery("SELECT SUM(al.amount) FROM Allowance al WHERE al.pit <= :end");

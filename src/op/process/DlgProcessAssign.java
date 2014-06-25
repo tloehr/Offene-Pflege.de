@@ -59,8 +59,8 @@ public class DlgProcessAssign extends MyJDialog {
         Collections.sort(unassigned);
         listAssigned.setModel(SYSTools.list2dlm(assigned));
         listUnassigned.setModel(SYSTools.list2dlm(unassigned));
-        lblAssigned.setText(OPDE.lang.getString(internalClassID+".assigned"));
-        lblUnAssigned.setText(OPDE.lang.getString(internalClassID+".unassigned"));
+        lblAssigned.setText(SYSTools.xx(internalClassID+".assigned"));
+        lblUnAssigned.setText(SYSTools.xx(internalClassID+".unassigned"));
         cmbPCat.setModel(SYSTools.list2cmb(PCatTools.getPCats()));
     }
 

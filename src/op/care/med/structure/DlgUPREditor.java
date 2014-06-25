@@ -49,7 +49,7 @@ public class DlgUPREditor extends MyJDialog {
     private void initPanel() {
 
         OPDE.getMainframe().setBlocked(true);
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 
         SwingWorker worker = new SwingWorker() {
 
@@ -57,15 +57,15 @@ public class DlgUPREditor extends MyJDialog {
             protected Object doInBackground() throws Exception {
 
                 int progress = 0;
-                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 100));
+                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, 100));
 
 
                 lblProduct.setText(tradeForm.getMedProduct().getText() + " " + TradeFormTools.toPrettyStringMedium(tradeForm));
 
                 mapEffectiveUPRs = new HashMap<MedStock, Pair<BigDecimal, BigDecimal>>();
 
-                rbUPRConst.setText(OPDE.lang.getString("upreditor.constant.upr"));
-                rbUPRAuto.setText(OPDE.lang.getString("upreditor.calculated.upr"));
+                rbUPRConst.setText(SYSTools.xx("upreditor.constant.upr"));
+                rbUPRAuto.setText(SYSTools.xx("upreditor.calculated.upr"));
 
 
                 //        Query query = em.createQuery("SELECT m FROM DosageForm m ORDER BY m.preparation, m.usageText");
@@ -89,7 +89,7 @@ public class DlgUPREditor extends MyJDialog {
                 // calculate effective UPRs for every closed stock for that tradeform
                 for (MedStock stock : listStocks) {
                     progress++;
-                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, listStocks.size()));
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, listStocks.size()));
                     if (stock.isClosed()) {
                         mapEffectiveUPRs.put(stock, new Pair<BigDecimal, BigDecimal>(MedStockTools.getSumOfDosesInBHP(stock), MedStockTools.getEffectiveUPR(stock)));
                     }
@@ -166,7 +166,7 @@ public class DlgUPREditor extends MyJDialog {
     }
 
     private void btnSaveActionPerformed(ActionEvent e) {
-        new DlgYesNo(OPDE.lang.getString("upreditor.changeupr.yesno"), SYSConst.icon48playerStop, new Closure() {
+        new DlgYesNo(SYSTools.xx("upreditor.changeupr.yesno"), SYSConst.icon48playerStop, new Closure() {
             @Override
             public void execute(Object answer) {
                 if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -188,7 +188,7 @@ public class DlgUPREditor extends MyJDialog {
                                 if (rbUPRAuto.isSelected()) {
 
                                     int progress = 0;
-                                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 100));
+                                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, 100));
 
                                     BigDecimal upr = checkUPR(txtSetUPR.getText());
                                     TradeForm mytf = em.merge(tradeForm);
@@ -197,7 +197,7 @@ public class DlgUPREditor extends MyJDialog {
 
                                     for (MedStock s : listStocks) {
                                         progress++;
-                                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, listStocks.size()));
+                                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, listStocks.size()));
                                         MedStock stock = em.merge(s);
                                         em.lock(stock, LockModeType.OPTIMISTIC);
                                         em.lock(stock.getInventory(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
@@ -394,7 +394,7 @@ public class DlgUPREditor extends MyJDialog {
         String[] columnNames;
 
         private MDLStock() {
-            columnNames = new String[]{OPDE.lang.getString("upreditor.col1"), OPDE.lang.getString("upreditor.col2"), OPDE.lang.getString("upreditor.col3"), OPDE.lang.getString("upreditor.col4"), OPDE.lang.getString("upreditor.col5"), OPDE.lang.getString("upreditor.col6"), OPDE.lang.getString("upreditor.col7")};
+            columnNames = new String[]{SYSTools.xx("upreditor.col1"), SYSTools.xx("upreditor.col2"), SYSTools.xx("upreditor.col3"), SYSTools.xx("upreditor.col4"), SYSTools.xx("upreditor.col5"), SYSTools.xx("upreditor.col6"), SYSTools.xx("upreditor.col7")};
         }
 
         @Override

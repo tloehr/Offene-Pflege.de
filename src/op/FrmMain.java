@@ -119,7 +119,7 @@ public class FrmMain extends JFrame {
         initPhase = true;
         initComponents();
 
-        pbTimeout.setToolTipText(OPDE.lang.getString("opde.mainframe.pbTimeout.tooltip"));
+        pbTimeout.setToolTipText(SYSTools.xx("opde.mainframe.pbTimeout.tooltip"));
         // for the timeout function
         Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
             @Override
@@ -141,10 +141,10 @@ public class FrmMain extends JFrame {
 
         currentVisiblePanel = null;
         currentResident = null;
-        lblWait.setText(OPDE.lang.getString("misc.msg.wait"));
+        lblWait.setText(SYSTools.xx("misc.msg.wait"));
         lblWait.setVisible(false);
         listOfNursingrecords = new ArrayList<CollapsiblePane>();
-        btnHelp.setToolTipText(OPDE.lang.getString("opde.mainframe.btnHelp.tooltip"));
+        btnHelp.setToolTipText(SYSTools.xx("opde.mainframe.btnHelp.tooltip"));
 
         iconPanels = Collections.synchronizedMap(new HashMap<Resident, JPanel>());
 
@@ -265,7 +265,7 @@ public class FrmMain extends JFrame {
     private void btnHelpActionPerformed(ActionEvent e) {
         if (currentVisiblePanel != null && Desktop.isDesktopSupported() && currentVisiblePanel.getInternalClassID() != null && OPDE.lang.containsKey(currentVisiblePanel.getInternalClassID() + ".helpurl")) {
             try {
-                URI uri = new URI(OPDE.lang.getString(currentVisiblePanel.getInternalClassID() + ".helpurl"));
+                URI uri = new URI(SYSTools.xx(currentVisiblePanel.getInternalClassID() + ".helpurl"));
                 Desktop.getDesktop().browse(uri);
             } catch (Exception ex) {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.mainframe.noHelpAvailable"));
@@ -590,7 +590,7 @@ public class FrmMain extends JFrame {
         panesApps.setLayout(new JideBoxLayout(panesApps, JideBoxLayout.Y_AXIS));
 
 
-        homeButton = GUITools.createHyperlinkButton(OPDE.lang.getString(PnlWelcome.internalClassID), SYSConst.icon22home, new ActionListener() {
+        homeButton = GUITools.createHyperlinkButton(SYSTools.xx(PnlWelcome.internalClassID), SYSConst.icon22home, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 if (previousProgButton != null) {
@@ -601,8 +601,8 @@ public class FrmMain extends JFrame {
                 previousProgButton = (JideButton) actionEvent.getSource();
                 previousProgButton.setBackground(Color.YELLOW);
                 previousProgButton.setOpaque(true);
-                displayManager.setMainMessage(OPDE.lang.getString(PnlWelcome.internalClassID));
-                displayManager.addSubMessage(new DisplayMessage(OPDE.lang.getString(PnlWelcome.internalClassID + ".longDescription")));
+                displayManager.setMainMessage(SYSTools.xx(PnlWelcome.internalClassID));
+                displayManager.addSubMessage(new DisplayMessage(SYSTools.xx(PnlWelcome.internalClassID + ".longDescription")));
                 displayManager.clearAllIcons();
                 setPanelTo(new PnlWelcome(jspSearch));
             }
@@ -704,7 +704,7 @@ public class FrmMain extends JFrame {
         ArrayList<Resident> residentList = new ArrayList<Resident>(query.getResultList());
         em.close();
 
-        CollapsiblePane mypane = new CollapsiblePane(station == null ? OPDE.lang.getString("misc.msg.Archive") : station.getName());
+        CollapsiblePane mypane = new CollapsiblePane(station == null ? SYSTools.xx("misc.msg.Archive") : station.getName());
         mypane.setFont(SYSConst.ARIAL14);
         mypane.setEmphasized(station != null && station.equals(StationTools.getStationForThisHost()));
         mypane.setStyle(CollapsiblePane.PLAIN_STYLE);

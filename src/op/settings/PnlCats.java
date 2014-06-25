@@ -11,6 +11,7 @@ import entity.info.ResInfoCategoryTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.PopupPanel;
+import op.tools.SYSTools;
 
 import javax.swing.*;
 import java.awt.*;
@@ -39,8 +40,8 @@ public class PnlCats extends PopupPanel {
     }
 
     private void initPanel() {
-        lblName.setText(OPDE.lang.getString("misc.msg.category"));
-        lblCatType.setText(OPDE.lang.getString("misc.msg.type"));
+        lblName.setText(SYSTools.xx("misc.msg.category"));
+        lblCatType.setText(SYSTools.xx("misc.msg.type"));
 
         txtName.setText(resInfoCategory.getText());
         cmbCatType.setModel(new DefaultComboBoxModel(ResInfoCategoryTools.TYPESS));

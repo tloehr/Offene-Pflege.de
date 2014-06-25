@@ -77,7 +77,7 @@ public class GUITools {
     public static JideButton createHyperlinkButton(String titleORlangbundle, Icon icon, ActionListener actionListener) {
 //        String title = SYSTools.catchNull(titleORlangbundle);
 //        try {
-//            title = OPDE.lang.getString(titleORlangbundle);
+//            title = SYSTools.xx(titleORlangbundle);
 //        } catch (Exception e) {
 //            // ok, its not a langbundle key
 //        }
@@ -154,7 +154,7 @@ public class GUITools {
     public static JToggleButton getNiceToggleButton(String titleORlangbundle) {
         String title = SYSTools.catchNull(titleORlangbundle);
         try {
-            title = OPDE.lang.getString(titleORlangbundle);
+            title = SYSTools.xx(titleORlangbundle);
         } catch (Exception e) {
             // ok, its not a langbundle key
         }
@@ -326,7 +326,7 @@ public class GUITools {
 
 
     public static JPanel getDropPanel(FileDrop.Listener dropListener) {
-        return getDropPanel(dropListener, OPDE.lang.getString(PnlFiles.internalClassID + ".drophere"));
+        return getDropPanel(dropListener, SYSTools.xx(PnlFiles.internalClassID + ".drophere"));
     }
 
     public static JPanel getDropPanel(FileDrop.Listener dropListener, String text) {
@@ -372,7 +372,7 @@ public class GUITools {
         String[] result = new String[languagekeys.length];
         int index = 0;
         for (String key : languagekeys) {
-            result[index] = OPDE.lang.getString(key);
+            result[index] = SYSTools.xx(key);
             index++;
         }
         return result;
@@ -672,7 +672,7 @@ public class GUITools {
         btnExpandAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
         btnExpandAll.setContentAreaFilled(false);
         btnExpandAll.setBorder(null);
-        btnExpandAll.setToolTipText(OPDE.lang.getString("misc.msg.expandall"));
+        btnExpandAll.setToolTipText(SYSTools.xx("misc.msg.expandall"));
         btnExpandAll.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -692,7 +692,7 @@ public class GUITools {
         btnCollapseAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
         btnCollapseAll.setContentAreaFilled(false);
         btnCollapseAll.setBorder(null);
-        btnCollapseAll.setToolTipText(OPDE.lang.getString("misc.msg.collapseall"));
+        btnCollapseAll.setToolTipText(SYSTools.xx("misc.msg.collapseall"));
         btnCollapseAll.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {

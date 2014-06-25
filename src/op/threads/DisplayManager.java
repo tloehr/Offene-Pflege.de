@@ -278,7 +278,7 @@ public class DisplayManager extends Thread {
         if (minute != lastMinute) {
             lastMinute = minute;
             if (SYSPropsTools.isTrue(SYSPropsTools.KEY_MAINTENANCE_MODE, null)) {
-                SYSFilesTools.print(OPDE.lang.getString("maintenance.mode.sorry"), false);
+                SYSFilesTools.print(SYSTools.xx("maintenance.mode.sorry"), false);
                 SYSLoginTools.logout();
                 System.exit(0);
             }
@@ -313,7 +313,7 @@ public class DisplayManager extends Thread {
     }
 
     public static DisplayMessage getLockMessage() {
-        return new DisplayMessage(OPDE.lang.getString("misc.msg.lockingexception"), DisplayMessage.IMMEDIATELY, OPDE.WARNING_TIME);
+        return new DisplayMessage(SYSTools.xx("misc.msg.lockingexception"), DisplayMessage.IMMEDIATELY, OPDE.WARNING_TIME);
     }
 
     /**
@@ -322,7 +322,7 @@ public class DisplayManager extends Thread {
      * @return
      */
     public static DisplayMessage getSuccessMessage(String text, String operation) {
-        return new DisplayMessage("&raquo;" + text + " " + "&laquo; " + OPDE.lang.getString("misc.msg.successfully") + " " + OPDE.lang.getString("misc.msg." + operation), DisplayMessage.NORMAL);
+        return new DisplayMessage("&raquo;" + text + " " + "&laquo; " + SYSTools.xx("misc.msg.successfully") + " " + SYSTools.xx("misc.msg." + operation), DisplayMessage.NORMAL);
     }
 
     @Override

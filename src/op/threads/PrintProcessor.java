@@ -7,6 +7,7 @@ import op.OPDE;
 import op.system.LogicalPrinter;
 import op.system.PrinterForm;
 import op.tools.PrintListElement;
+import op.tools.SYSTools;
 
 import javax.print.DocFlavor;
 import java.io.UnsupportedEncodingException;
@@ -116,7 +117,7 @@ public class PrintProcessor extends Thread {
                             OPDE.getLogicalPrinters().print(getPrintableObject(thisElement), thisElement.getPrintername(), DocFlavor.SERVICE_FORMATTED.PRINTABLE);
 
 //                            pb.setValue(progressbar);
-                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.printing") + " " + OPDE.lang.getString("misc.msg.number") + " " + progressbar, progressbar, printQueue.size()));
+                            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.printing") + " " + SYSTools.xx("misc.msg.number") + " " + progressbar, progressbar, printQueue.size()));
 //                            OPDE.debug("Drucke Nr. " + progressbar);
                             progressbar++;
 
@@ -154,7 +155,7 @@ public class PrintProcessor extends Thread {
                                     OPDE.error("invalid printer object. can't print a NULL value. please check printers.xml for typos");
                                 }
 
-                                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.printing") + " " + OPDE.lang.getString("misc.msg.number") + " " + progressbar, progressbar, printQueue.size()));
+                                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.printing") + " " + SYSTools.xx("misc.msg.number") + " " + progressbar, progressbar, printQueue.size()));
 
                                 progressbar++;
 
@@ -167,7 +168,7 @@ public class PrintProcessor extends Thread {
                                 encoded = printjob.getBytes(printerType.getEncoding());
                                 OPDE.getLogicalPrinters().print(encoded, printername, flavor);
 
-                                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.printing") + " " + OPDE.lang.getString("misc.msg.number") + " " + progressbar, progressbar, printQueue.size()));
+                                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.printing") + " " + SYSTools.xx("misc.msg.number") + " " + progressbar, progressbar, printQueue.size()));
 
                                 progressbar++;
 

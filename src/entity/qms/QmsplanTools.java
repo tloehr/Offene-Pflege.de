@@ -77,7 +77,7 @@ public class QmsplanTools {
         html += SYSConst.html_h3("misc.msg.measures");
 
         if (qmsplan.getQmsschedules().isEmpty()) {
-            html += "<ul><li><b>" + OPDE.lang.getString("misc.msg.MissingInterventions") + " !!!</b></li></ul>";
+            html += "<ul><li><b>" + SYSTools.xx("misc.msg.MissingInterventions") + " !!!</b></li></ul>";
         }
 //         else {
 //            html += "<ul>";
@@ -91,7 +91,7 @@ public class QmsplanTools {
 //        }
 
         //        if (np.getFlag() > 0) {
-        //            html += "<br/><b>" + OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.lblFlag") + ":</b> " + FLAGS[np.getFlag()];
+        //            html += "<br/><b>" + SYSTools.xx("nursingrecords.nursingprocess.dlgplanung.lblFlag") + ":</b> " + FLAGS[np.getFlag()];
         //        }
 
 

@@ -141,8 +141,8 @@ public class DlgTradeForm extends MyJDialog {
 
     private void initDialog() {
         initPhase = true;
-        cmbDaysWeeks.setModel(new DefaultComboBoxModel(new String[]{OPDE.lang.getString("misc.msg.Days"), OPDE.lang.getString("misc.msg.weeks")}));
-        cbExpiresAfterOpened.setText(OPDE.lang.getString("tradeform.subtext.expiresAfterOpenedIn"));
+        cmbDaysWeeks.setModel(new DefaultComboBoxModel(new String[]{SYSTools.xx("misc.msg.Days"), SYSTools.xx("misc.msg.weeks")}));
+        cbExpiresAfterOpened.setText(SYSTools.xx("tradeform.subtext.expiresAfterOpenedIn"));
         cbExpiresAfterOpened.setSelected(tradeForm.getDaysToExpireAfterOpened() != null);
         txtExpiresIn.setEnabled(cbExpiresAfterOpened.isSelected());
         cmbDaysWeeks.setEnabled(cbExpiresAfterOpened.isSelected());

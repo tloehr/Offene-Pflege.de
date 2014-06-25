@@ -66,13 +66,13 @@ public class PnlAway extends JPanel {
         cmbHospital.setModel(new DefaultComboBoxModel(list.toArray()));
         cmbHospital.setRenderer(HospitalTools.getKHRenderer());
 
-        tab1.setTitleAt(TAB_KH, OPDE.lang.getString("misc.msg.hospital"));
-        tab1.setTitleAt(TAB_HOLLIDAY, OPDE.lang.getString("misc.msg.holliday"));
-        tab1.setTitleAt(TAB_OTHER, OPDE.lang.getString("misc.msg.otherreasons"));
+        tab1.setTitleAt(TAB_KH, SYSTools.xx("misc.msg.hospital"));
+        tab1.setTitleAt(TAB_HOLLIDAY, SYSTools.xx("misc.msg.holliday"));
+        tab1.setTitleAt(TAB_OTHER, SYSTools.xx("misc.msg.otherreasons"));
 
-        lblKH.setText(OPDE.lang.getString("misc.msg.pleaseenterdescription"));
-        lblHolliday.setText(OPDE.lang.getString("misc.msg.pleaseenterdescription"));
-        lblOther.setText(OPDE.lang.getString("misc.msg.pleaseenterdescription"));
+        lblKH.setText(SYSTools.xx("misc.msg.pleaseenterdescription"));
+        lblHolliday.setText(SYSTools.xx("misc.msg.pleaseenterdescription"));
+        lblOther.setText(SYSTools.xx("misc.msg.pleaseenterdescription"));
 
         props = ResInfoTools.getContent(abwesenheit);
 
@@ -143,7 +143,7 @@ public class PnlAway extends JPanel {
                     hospital = EntityTools.merge(hospital);
                 }
 
-                abwesenheit.setHtml("<br/><b><u>" + OPDE.lang.getString("misc.msg.hospital") + "</u></b>" +
+                abwesenheit.setHtml("<br/><b><u>" + SYSTools.xx("misc.msg.hospital") + "</u></b>" +
                         "<ul><li>" + HospitalTools.getFullName(hospital) + "</li></ul>");
 
                 props.put("type", ResInfoTypeTools.TYPE_ABSENCE_HOSPITAL);
@@ -152,13 +152,13 @@ public class PnlAway extends JPanel {
             }
             case TAB_HOLLIDAY: {
                 abwesenheit.setText(txtHolliday.getText().trim());
-                abwesenheit.setHtml("<i>" + OPDE.lang.getString("misc.msg.holliday") + "</i><br/>");
+                abwesenheit.setHtml("<i>" + SYSTools.xx("misc.msg.holliday") + "</i><br/>");
                 props.put("type", ResInfoTypeTools.TYPE_ABSENCE_HOLLIDAY);
                 break;
             }
             case TAB_OTHER: {
                 abwesenheit.setText(txtOther.getText().trim());
-                abwesenheit.setHtml("<i>" + OPDE.lang.getString("misc.msg.otherreasons") + "</i><br/>");
+                abwesenheit.setHtml("<i>" + SYSTools.xx("misc.msg.otherreasons") + "</i><br/>");
                 props.put("type", ResInfoTypeTools.TYPE_ABSENCE_OTHER);
                 break;
             }

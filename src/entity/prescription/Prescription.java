@@ -325,7 +325,7 @@ public class Prescription implements Serializable, QProcessElement, Cloneable, C
 
     @Override
     public String getTitle() {
-        return OPDE.lang.getString(PnlPrescription.internalClassID) + ": " + PrescriptionTools.getShortDescriptionAsCompactText(this);
+        return SYSTools.xx(PnlPrescription.internalClassID) + ": " + PrescriptionTools.getShortDescriptionAsCompactText(this);
     }
 
     public Resident getResident() {

@@ -52,7 +52,7 @@ public class DlgIntervention extends MyJDialog {
         tbActive = GUITools.getNiceToggleButton(PnlSelectIntervention.internalClassID + ".activeIntervention");
         tbActive.setEnabled(false);
         panel2.add(tbActive, CC.xywh(1, 9, 3, 1, CC.LEFT, CC.DEFAULT));
-        cmbType.setModel(new DefaultComboBoxModel(new String[]{OPDE.lang.getString("misc.msg.interventions.CARE"), OPDE.lang.getString("misc.msg.interventions.PRESCRIPTION"), OPDE.lang.getString("misc.msg.interventions.SOCIAL")}));
+        cmbType.setModel(new DefaultComboBoxModel(new String[]{SYSTools.xx("misc.msg.interventions.CARE"), SYSTools.xx("misc.msg.interventions.PRESCRIPTION"), SYSTools.xx("misc.msg.interventions.SOCIAL")}));
         cmbCat.setModel(new DefaultComboBoxModel(ResInfoCategoryTools.getAll4NP().toArray()));
     }
 
@@ -82,15 +82,15 @@ public class DlgIntervention extends MyJDialog {
 
     private boolean saveok() {
         if (txtText.getText().trim().isEmpty()) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString(PnlSelectIntervention.internalClassID + ".textempty"), DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx(PnlSelectIntervention.internalClassID + ".textempty"), DisplayMessage.WARNING));
             return false;
         }
         if (cmbType.getSelectedIndex() < 0) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.emptyFields"), DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.emptyFields"), DisplayMessage.WARNING));
             return false;
         }
         if (cmbCat.getSelectedItem() == null) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.emptyFields"), DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("misc.msg.emptyFields"), DisplayMessage.WARNING));
             return false;
         }
         return true;

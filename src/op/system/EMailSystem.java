@@ -58,14 +58,14 @@ public class EMailSystem {
             OPDE.error(uhe);
         }
 
-        String bodyText = OPDE.lang.getString("mail.errormail.line1") + "\n" +
-                OPDE.lang.getString("mail.errormail.line2") + ": " + localMachine != null ? localMachine.getHostName() : "??" + "\n" +
-                OPDE.lang.getString("mail.errormail.line3") + ": " + localMachine != null ? localMachine.getHostAddress() : "??" + "\n" +
-                OPDE.lang.getString("mail.errormail.line4") + ": " + OPDE.getLogin().getUser().getUID() + "\n" +
-                OPDE.lang.getString("mail.errormail.line5") + ": " + DateFormat.getDateTimeInstance().format(new Date()) + "\n\n\n" +
-                OPDE.lang.getString("mail.errormail.line6");
+        String bodyText = SYSTools.xx("mail.errormail.line1") + "\n" +
+                SYSTools.xx("mail.errormail.line2") + ": " + localMachine != null ? localMachine.getHostName() : "??" + "\n" +
+                SYSTools.xx("mail.errormail.line3") + ": " + localMachine != null ? localMachine.getHostAddress() : "??" + "\n" +
+                SYSTools.xx("mail.errormail.line4") + ": " + OPDE.getLogin().getUser().getUID() + "\n" +
+                SYSTools.xx("mail.errormail.line5") + ": " + DateFormat.getDateTimeInstance().format(new Date()) + "\n\n\n" +
+                SYSTools.xx("mail.errormail.line6");
 
-        return send(OPDE.lang.getString("mail.errormail.subject") + ": " + message, bodyText, pairs, new File[]{attachment}, OPDE.getProps());
+        return send(SYSTools.xx("mail.errormail.subject") + ": " + message, bodyText, pairs, new File[]{attachment}, OPDE.getProps());
 
     }
 
@@ -77,7 +77,7 @@ public class EMailSystem {
     }
 
     public static boolean sendTestmail(Pair<String, String>[] recipients, File[] attach, Properties props) {
-            return send(OPDE.lang.getString(PnlSystemSettings.internalClassID+".global.mail.testsubject"), OPDE.lang.getString(PnlSystemSettings.internalClassID+".global.mail.testbody"), recipients, attach, props);
+            return send(SYSTools.xx(PnlSystemSettings.internalClassID+".global.mail.testsubject"), SYSTools.xx(PnlSystemSettings.internalClassID+".global.mail.testbody"), recipients, attach, props);
         }
 
     private static boolean send(String subject, String bodyText, Pair<String, String>[] recipients, File[] attach, final Properties mailProps) {

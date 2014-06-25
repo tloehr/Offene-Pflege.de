@@ -76,9 +76,9 @@ public class DlgQMSPlan extends MyJDialog {
         pnlCommonTags = new PnlCommonTags(new HashSet<>(qmsplan.getCommontags()));
         pnlLeft.add(pnlCommonTags, CC.xy(3, 5));
 
-        lblTitle.setText(OPDE.lang.getString("misc.msg.title"));
-        lblDescription.setText(OPDE.lang.getString("misc.msg.description"));
-        lblTags.setText(OPDE.lang.getString("misc.msg.tags"));
+        lblTitle.setText(SYSTools.xx("misc.msg.title"));
+        lblDescription.setText(SYSTools.xx("misc.msg.description"));
+        lblTags.setText(SYSTools.xx("misc.msg.tags"));
 
         txtTitle.setText(qmsplan.getTitle());
         txtDescription.setText(qmsplan.getDescription());
@@ -101,7 +101,7 @@ public class DlgQMSPlan extends MyJDialog {
         tblScheds.setModel(new TMQMScheds(qmsplan));
         tblScheds.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         tblScheds.getColumnModel().getColumn(TMQMScheds.COL_TXT).setCellRenderer(new RNDHTML());
-        tblScheds.getColumnModel().getColumn(TMQMScheds.COL_TXT).setHeaderValue(OPDE.lang.getString("misc.msg.measures"));
+        tblScheds.getColumnModel().getColumn(TMQMScheds.COL_TXT).setHeaderValue(SYSTools.xx("misc.msg.measures"));
     }
 
 
@@ -144,28 +144,28 @@ public class DlgQMSPlan extends MyJDialog {
     private boolean saveOK() {
 
         if (SYSTools.tidy(txtTitle.getText()).isEmpty()) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("opde.controlling.qms.dlgqmsplan.titlexx"), DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("opde.controlling.qms.dlgqmsplan.titlexx"), DisplayMessage.WARNING));
             return false;
         }
 
 //
 //        if (cmbKategorie.getSelectedItem() == null) {
-//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.kategoriexx"), DisplayMessage.WARNING));
+//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("nursingrecords.nursingprocess.dlgplanung.kategoriexx"), DisplayMessage.WARNING));
 //            return false;
 //        }
 //
 //        if (nursingProcess.getInterventionSchedule().isEmpty()) {
-//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.schedulexx"), DisplayMessage.WARNING));
+//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("nursingrecords.nursingprocess.dlgplanung.schedulexx"), DisplayMessage.WARNING));
 //            return false;
 //        }
 //
 //        if (txtDescription.getText().isEmpty()) {
-//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("opde.controlling.qms.dlgqmsplan.descriptionxx"), DisplayMessage.WARNING));
+//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("opde.controlling.qms.dlgqmsplan.descriptionxx"), DisplayMessage.WARNING));
 //            return false;
 //        }
 //
 //        if (txtZiele.getText().isEmpty()) {
-//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.goalxx"), DisplayMessage.WARNING));
+//            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("nursingrecords.nursingprocess.dlgplanung.goalxx"), DisplayMessage.WARNING));
 //            return false;
 //        }
 
@@ -363,7 +363,7 @@ public class DlgQMSPlan extends MyJDialog {
         int textWidth = dim.width - 25;
         TableColumnModel tcm1 = tblScheds.getColumnModel();
         tcm1.getColumn(0).setPreferredWidth(textWidth);
-        tcm1.getColumn(0).setHeaderValue(OPDE.lang.getString("misc.msg.measures"));
+        tcm1.getColumn(0).setHeaderValue(SYSTools.xx("misc.msg.measures"));
     }//GEN-LAST:event_jspPlanungComponentResized
 
     private void btnSaveActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
@@ -395,7 +395,7 @@ public class DlgQMSPlan extends MyJDialog {
          *     |_|\__\___|_| |_| |_|_|   \___/| .__/ \__,_| .__/|____/ \___|_|\___|\__\___|
          *                                    |_|         |_|
          */
-        JMenuItem itemPopupDelete = new JMenuItem(OPDE.lang.getString("misc.commands.delete"), SYSConst.icon22delete);
+        JMenuItem itemPopupDelete = new JMenuItem(SYSTools.xx("misc.commands.delete"), SYSConst.icon22delete);
         itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
 
@@ -419,7 +419,7 @@ public class DlgQMSPlan extends MyJDialog {
          *     |_|\__\___|_| |_| |_|_|   \___/| .__/ \__,_| .__/____/ \___|_| |_|\___|\__,_|\__,_|_|\___|
          *                                    |_|         |_|
          */
-        final JMenuItem itemPopupEditSchedule = new JMenuItem(OPDE.lang.getString("misc.commands.editsheduling"), SYSConst.icon22clock);
+        final JMenuItem itemPopupEditSchedule = new JMenuItem(SYSTools.xx("misc.commands.editsheduling"), SYSConst.icon22clock);
 
         itemPopupEditSchedule.addActionListener(new java.awt.event.ActionListener() {
 

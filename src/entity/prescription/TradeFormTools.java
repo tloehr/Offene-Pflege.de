@@ -85,7 +85,7 @@ public class TradeFormTools {
             String altPreparation = SYSTools.catchNull(alternative.getDosageForm().getPreparation());
             String altUsageText = SYSTools.catchNull(alternative.getDosageForm().getUsageText());
             String altSubtext = SYSTools.catchNull(alternative.getSubtext());
-            text += "(" + OPDE.lang.getString(PnlPrescription.internalClassID + ".originalprescription") + ": " + alternative.getMedProduct().getText() + (altSubtext.isEmpty() ? "" : " " + altSubtext);
+            text += "(" + SYSTools.xx(PnlPrescription.internalClassID + ".originalprescription") + ": " + alternative.getMedProduct().getText() + (altSubtext.isEmpty() ? "" : " " + altSubtext);
             text += altPreparation.isEmpty() ? " " : ", " + altPreparation + ", ";
             text += altUsageText.isEmpty() ? SYSConst.UNITS[alternative.getDosageForm().getUsageUnit()] : altUsageText;
             text += ")";
@@ -110,7 +110,7 @@ public class TradeFormTools {
     public static String toPrettyStringMediumWithExpiry(TradeForm tradeForm) {
 
         String text = toPrettyStringMedium(tradeForm);
-        text += SYSTools.catchNull(getExpiresInAsString(tradeForm), ", "+OPDE.lang.getString("tradeform.subtext.expiresAfterOpenedIn")+" ", "");
+        text += SYSTools.catchNull(getExpiresInAsString(tradeForm), ", "+SYSTools.xx("tradeform.subtext.expiresAfterOpenedIn")+" ", "");
         return text;
     }
 
@@ -297,7 +297,7 @@ public class TradeFormTools {
         } else {
             int days = pair.getFirst();
             int weeks = pair.getSecond();
-            return weeks > 0 ? weeks + " " + OPDE.lang.getString("misc.msg.weeks") : days + " " + OPDE.lang.getString("misc.msg.Days");
+            return weeks > 0 ? weeks + " " + SYSTools.xx("misc.msg.weeks") : days + " " + SYSTools.xx("misc.msg.Days");
         }
     }
 

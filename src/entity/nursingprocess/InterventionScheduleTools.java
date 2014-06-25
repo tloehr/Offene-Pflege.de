@@ -49,13 +49,13 @@ public class InterventionScheduleTools {
             if (headerNeeded) {
                 result += "<table id=\"fonttext\" border=\"1\">" +
                         "   <tr>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.earlyinthemorning.short") + "</th>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.morning.short") + "</th>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.noon.short") + "</th>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.afternoon.short") + "</th>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.evening.short") + "</th>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.lateatnight.short") + "</th>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.repeat.short") + "</th>" +
+                        "      <th align=\"center\">" + SYSTools.xx("misc.msg.earlyinthemorning.short") + "</th>" +
+                        "      <th align=\"center\">" + SYSTools.xx("misc.msg.morning.short") + "</th>" +
+                        "      <th align=\"center\">" + SYSTools.xx("misc.msg.noon.short") + "</th>" +
+                        "      <th align=\"center\">" + SYSTools.xx("misc.msg.afternoon.short") + "</th>" +
+                        "      <th align=\"center\">" + SYSTools.xx("misc.msg.evening.short") + "</th>" +
+                        "      <th align=\"center\">" + SYSTools.xx("misc.msg.lateatnight.short") + "</th>" +
+                        "      <th align=\"center\">" + SYSTools.xx("misc.msg.repeat.short") + "</th>" +
                         "   </tr>";
             }
             String wdh = getRepeatPattern(termin);
@@ -73,9 +73,9 @@ public class InterventionScheduleTools {
             if (headerNeeded) {
                 result += "<table id=\"fonttext\" border=\"1\" >" +
                         "   <tr>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.Time.long") + "</th>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.Number") + "</th>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.repeat.short") + "</th>" +
+                        "      <th align=\"center\">" + SYSTools.xx("misc.msg.Time.long") + "</th>" +
+                        "      <th align=\"center\">" + SYSTools.xx("misc.msg.Number") + "</th>" +
+                        "      <th align=\"center\">" + SYSTools.xx("misc.msg.repeat.short") + "</th>" +
                         "   </tr>";
             }
 
@@ -91,10 +91,10 @@ public class InterventionScheduleTools {
 
         result += "</table>";
 
-        result += SYSTools.catchNull(termin.getBemerkung(), "<div id=\"fonttext\"><b>" + OPDE.lang.getString("misc.msg.comment") + ": </b>", "</div><br/>&nbsp;");
+        result += SYSTools.catchNull(termin.getBemerkung(), "<div id=\"fonttext\"><b>" + SYSTools.xx("misc.msg.comment") + ": </b>", "</div><br/>&nbsp;");
 
         if (termin.isFloating()) {
-            result += "<div id=\"fonttext\"><font color=\"blue\">" + OPDE.lang.getString(PnlNursingProcess.internalClassID + ".floatinginterventions") + "</font></div>";
+            result += "<div id=\"fonttext\"><font color=\"blue\">" + SYSTools.xx(PnlNursingProcess.internalClassID + ".floatinginterventions") + "</font></div>";
         }
 
         return result;
@@ -118,13 +118,13 @@ public class InterventionScheduleTools {
 
             String daylist = "";
 
-            daylist += (schedule.getMon() > 0 ? OPDE.lang.getString("misc.msg.monday").substring(0, 3) + ", " : "");
-            daylist += (schedule.getDie() > 0 ? OPDE.lang.getString("misc.msg.tuesday").substring(0, 3) + ", " : "");
-            daylist += (schedule.getMit() > 0 ? OPDE.lang.getString("misc.msg.wednesday").substring(0, 3) + ", " : "");
-            daylist += (schedule.getDon() > 0 ? OPDE.lang.getString("misc.msg.thursday").substring(0, 3) + ", " : "");
-            daylist += (schedule.getFre() > 0 ? OPDE.lang.getString("misc.msg.friday").substring(0, 3) + ", " : "");
-            daylist += (schedule.getSam() > 0 ? OPDE.lang.getString("misc.msg.saturday").substring(0, 3) + ", " : "");
-            daylist += (schedule.getSon() > 0 ? OPDE.lang.getString("misc.msg.sunday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getMon() > 0 ? SYSTools.xx("misc.msg.monday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getDie() > 0 ? SYSTools.xx("misc.msg.tuesday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getMit() > 0 ? SYSTools.xx("misc.msg.wednesday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getDon() > 0 ? SYSTools.xx("misc.msg.thursday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getFre() > 0 ? SYSTools.xx("misc.msg.friday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getSam() > 0 ? SYSTools.xx("misc.msg.saturday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getSon() > 0 ? SYSTools.xx("misc.msg.sunday").substring(0, 3) + ", " : "");
 
             if (!daylist.isEmpty()) {
                 result += "{" + daylist.substring(0, daylist.length() - 2) + "}";
@@ -132,25 +132,25 @@ public class InterventionScheduleTools {
 
         } else if (schedule.isMonatlich()) {
             if (schedule.getMonatlich() == 1) {
-                result += OPDE.lang.getString("misc.msg.everyMonth") + " ";
+                result += SYSTools.xx("misc.msg.everyMonth") + " ";
             } else {
-                result += OPDE.lang.getString("misc.msg.every") + " " + schedule.getMonatlich() + " " + OPDE.lang.getString("misc.msg.months") + " ";
+                result += SYSTools.xx("misc.msg.every") + " " + schedule.getMonatlich() + " " + SYSTools.xx("misc.msg.months") + " ";
 //                result += "alle " + schedule.getMonatlich() + " Monate ";
             }
 
             if (schedule.getTagNum() > 0) {
-                result += OPDE.lang.getString("misc.msg.atchrono") + " " + schedule.getTagNum() + ". " + OPDE.lang.getString("misc.msg.ofTheMonth");
+                result += SYSTools.xx("misc.msg.atchrono") + " " + schedule.getTagNum() + ". " + SYSTools.xx("misc.msg.ofTheMonth");
 //                result += "jeweils am " + schedule.getTagNum() + ". des Monats";
             } else {
                 int wtag = 0;
                 String tag = "";
-                tag += (schedule.getMon() > 0 ? OPDE.lang.getString("misc.msg.monday") : "");
-                tag += (schedule.getDie() > 0 ? OPDE.lang.getString("misc.msg.tuesday") : "");
-                tag += (schedule.getMit() > 0 ? OPDE.lang.getString("misc.msg.wednesday") : "");
-                tag += (schedule.getDon() > 0 ? OPDE.lang.getString("misc.msg.thursday") : "");
-                tag += (schedule.getFre() > 0 ? OPDE.lang.getString("misc.msg.friday") : "");
-                tag += (schedule.getSam() > 0 ? OPDE.lang.getString("misc.msg.saturday") : "");
-                tag += (schedule.getSon() > 0 ? OPDE.lang.getString("misc.msg.sunday") : "");
+                tag += (schedule.getMon() > 0 ? SYSTools.xx("misc.msg.monday") : "");
+                tag += (schedule.getDie() > 0 ? SYSTools.xx("misc.msg.tuesday") : "");
+                tag += (schedule.getMit() > 0 ? SYSTools.xx("misc.msg.wednesday") : "");
+                tag += (schedule.getDon() > 0 ? SYSTools.xx("misc.msg.thursday") : "");
+                tag += (schedule.getFre() > 0 ? SYSTools.xx("misc.msg.friday") : "");
+                tag += (schedule.getSam() > 0 ? SYSTools.xx("misc.msg.saturday") : "");
+                tag += (schedule.getSon() > 0 ? SYSTools.xx("misc.msg.sunday") : "");
 
                 // In this case, only one of the below can be >0. So this will work.
                 wtag += schedule.getMon();
@@ -161,7 +161,7 @@ public class InterventionScheduleTools {
                 wtag += schedule.getSam();
                 wtag += schedule.getSon();
 
-                result += OPDE.lang.getString("misc.msg.atchrono") + " " + wtag + ". " + tag + " " + OPDE.lang.getString("misc.msg.ofTheMonth");
+                result += SYSTools.xx("misc.msg.atchrono") + " " + wtag + ". " + tag + " " + SYSTools.xx("misc.msg.ofTheMonth");
             }
         } else {
             result = "";
@@ -171,7 +171,7 @@ public class InterventionScheduleTools {
         DateMidnight today = new DateMidnight();
 
         if (ldatum.compareTo(today) > 0) { // Die erste Ausführung liegt in der Zukunft
-            result += OPDE.lang.getString("nursingrecords.prescription.firstApplication") + ": " + DateFormat.getDateInstance().format(schedule.getLDatum());
+            result += SYSTools.xx("nursingrecords.prescription.firstApplication") + ": " + DateFormat.getDateInstance().format(schedule.getLDatum());
         }
 
         return result;
@@ -206,12 +206,12 @@ public class InterventionScheduleTools {
         }
 
         if (currentState == ZEIT) {
-            result += (schedule.getNachtMo() > 0 ? OPDE.lang.getString("misc.msg.earlyinthemorning.medium") + ", " : "") +
-                    (schedule.getMorgens() > 0 ? OPDE.lang.getString("misc.msg.morning.medium") + ", " : "") +
-                    (schedule.getMittags() > 0 ? OPDE.lang.getString("misc.msg.noon.medium") : "") + ", " +
-                    (schedule.getNachmittags() > 0 ? OPDE.lang.getString("misc.msg.afternoon.medium") + ", " : "") +
-                    (schedule.getAbends() > 0 ? OPDE.lang.getString("misc.msg.evening.medium") + ", " : "") +
-                    (schedule.getNachtAb() > 0 ? OPDE.lang.getString("misc.msg.lateatnight.medium") + ", " : "");
+            result += (schedule.getNachtMo() > 0 ? SYSTools.xx("misc.msg.earlyinthemorning.medium") + ", " : "") +
+                    (schedule.getMorgens() > 0 ? SYSTools.xx("misc.msg.morning.medium") + ", " : "") +
+                    (schedule.getMittags() > 0 ? SYSTools.xx("misc.msg.noon.medium") : "") + ", " +
+                    (schedule.getNachmittags() > 0 ? SYSTools.xx("misc.msg.afternoon.medium") + ", " : "") +
+                    (schedule.getAbends() > 0 ? SYSTools.xx("misc.msg.evening.medium") + ", " : "") +
+                    (schedule.getNachtAb() > 0 ? SYSTools.xx("misc.msg.lateatnight.medium") + ", " : "");
 
             if (schedule.getTaeglich() != 1){
                 result += getRepeatPattern(schedule);

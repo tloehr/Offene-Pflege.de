@@ -39,8 +39,8 @@ public class PnlTemplate extends JPanel {
     }
 
     private void initPanel() {
-        txtSearch.setPrompt(OPDE.lang.getString(internalClassID + ".searchtopic"));
-        tbInactive = GUITools.getNiceToggleButton(OPDE.lang.getString(internalClassID + ".inactive"));
+        txtSearch.setPrompt(SYSTools.xx(internalClassID + ".searchtopic"));
+        tbInactive = GUITools.getNiceToggleButton(SYSTools.xx(internalClassID + ".inactive"));
         SYSPropsTools.restoreState(internalClassID + ".tbInactive", tbInactive);
         tbInactive.addItemListener(new ItemListener() {
             @Override

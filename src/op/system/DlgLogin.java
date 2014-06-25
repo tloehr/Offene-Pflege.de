@@ -35,6 +35,7 @@ import entity.system.SYSPropsTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
 
@@ -85,7 +86,7 @@ public class DlgLogin extends MyJDialog {
         }
         txtUsername.setText(defaultlogin);
         txtPassword.setText(defaultpw);
-        lblUsernamePassword.setText(OPDE.lang.getString("misc.msg.username") + "/" + OPDE.lang.getString("misc.msg.password"));
+        lblUsernamePassword.setText(SYSTools.xx("misc.msg.username") + "/" + SYSTools.xx("misc.msg.password"));
 
         setVisible(true);
     }
@@ -261,7 +262,7 @@ public class DlgLogin extends MyJDialog {
             registerLogin();
             if (OPDE.getLogin() == null) {
                 OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.usernameOrPasswordWrong"));
-                OPDE.info(OPDE.lang.getString("misc.msg.usernameOrPasswordWrong") + ": " + username + "  " + OPDE.lang.getString("misc.msg.triedPassword") + ": " + new String(txtPassword.getPassword()));
+                OPDE.info(SYSTools.xx("misc.msg.usernameOrPasswordWrong") + ": " + username + "  " + SYSTools.xx("misc.msg.triedPassword") + ": " + new String(txtPassword.getPassword()));
             } else {
                 OPDE.initProps();
                 OPDE.info("Login: " + username + "  LoginID: " + OPDE.getLogin().getLoginID());

@@ -111,14 +111,14 @@ public class DFNTools {
             // Wahrscheinlich jedoch mehr als diese. Anhand des LDatums müssen
             // die wirklichen Treffer nachher genauer ermittelt werden.
 
-            OPDE.info("[DFNImport] " + OPDE.lang.getString("misc.msg.writingto") + ": " + OPDE.getUrl());
+            OPDE.info("[DFNImport] " + SYSTools.xx("misc.msg.writingto") + ": " + OPDE.getUrl());
             select.setParameter("von", targetdate.toDateTimeAtStartOfDay().toDate());
             select.setParameter("bis", SYSCalendar.eod(targetdate).toDate());
             select.setParameter("ldatum", targetdate.toDate());
 
             List<InterventionSchedule> list = select.getResultList();
             numdfn += generate(em, list, targetdate, true);
-            OPDE.important(em, OPDE.lang.getString("nursingrecords.dfnimport") + " " + OPDE.lang.getString("nursingrecords.dfnimport.completed") + ": " + DateFormat.getDateInstance().format(targetdate.toDate()) + " " + OPDE.lang.getString("nursingrecords.dfnimport.numCreatedEntities") + ": " + numdfn);
+            OPDE.important(em, SYSTools.xx("nursingrecords.dfnimport") + " " + SYSTools.xx("nursingrecords.dfnimport.completed") + ": " + DateFormat.getDateInstance().format(targetdate.toDate()) + " " + SYSTools.xx("nursingrecords.dfnimport.numCreatedEntities") + ": " + numdfn);
         }
 
         SYSPropsTools.storeProp(em, "LASTDFNIMPORT", DateTimeFormat.forPattern("yyyy-MM-dd").print(targetdate));
@@ -150,7 +150,7 @@ public class DFNTools {
             affectedOldDFNs++;
         }
 
-        OPDE.important(em, affectedOldDFNs + " " + OPDE.lang.getString("nursingrecords.dfnimport.floatingMoved"));
+        OPDE.important(em, affectedOldDFNs + " " + SYSTools.xx("nursingrecords.dfnimport.floatingMoved"));
     }
 
     /**
@@ -189,8 +189,8 @@ public class DFNTools {
 
         BigDecimal row = BigDecimal.ZERO;
 
-        System.out.println(OPDE.lang.getString(internalClassID) + " " + OPDE.lang.getString(internalClassID + ".generationForDate") + ": " + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()));
-        System.out.println(OPDE.lang.getString(internalClassID + ".progress"));
+        System.out.println(SYSTools.xx(internalClassID) + " " + SYSTools.xx(internalClassID + ".generationForDate") + ": " + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()));
+        System.out.println(SYSTools.xx(internalClassID + ".progress"));
 
         for (InterventionSchedule termin : list) {
 
@@ -325,7 +325,7 @@ public class DFNTools {
         }
 
         System.out.println();
-        System.out.println(OPDE.lang.getString(internalClassID + ".numCreatedEntities") + " [" + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()) + "]: " + numdfn);
+        System.out.println(SYSTools.xx(internalClassID + ".numCreatedEntities") + " [" + DateFormat.getDateInstance(DateFormat.SHORT).format(targetdate.toDate()) + "]: " + numdfn);
 //        System.out.println("------------------------------------------");
         return numdfn;
     }
@@ -389,10 +389,10 @@ public class DFNTools {
 //        }
 //        result += "<b>" + dfn.getIntervention().getBezeichnung() + "</b>";
 //        result += "<font size=\"-1\">";
-//        result += "<br/>Dauer: <b>" + dfn.getMinutes() + "</b> " + OPDE.lang.getString("misc.msg.Minutes");
+//        result += "<br/>Dauer: <b>" + dfn.getMinutes() + "</b> " + SYSTools.xx("misc.msg.Minutes");
 //
 //        if (dfn.getNursingProcess() == null) { // on demand
-//            result += " " + OPDE.lang.getString(PnlDFN.internalClassID + ".ondemand");
+//            result += " " + SYSTools.xx(PnlDFN.internalClassID + ".ondemand");
 //        } else {
 //            result += " <font color=\"blue\">(" + dfn.getNursingProcess().getCategory().getText() + "</font>)";
 //        }
@@ -460,7 +460,7 @@ public class DFNTools {
                 text += msg[dfn.getsZeit()];
             }
         } else {
-            text += DateFormat.getTimeInstance(DateFormat.SHORT).format(dfn.getSoll()) + " " + OPDE.lang.getString("misc.msg.Time.short");
+            text += DateFormat.getTimeInstance(DateFormat.SHORT).format(dfn.getSoll()) + " " + SYSTools.xx("misc.msg.Time.short");
         }
 
         return prefix + text + postfix;
@@ -566,11 +566,11 @@ public class DFNTools {
         if (!list.isEmpty()) {
 
             DFN d1 = list.get(0);
-            result += SYSConst.html_h3(d1.isOnDemand() ? OPDE.lang.getString("nursingrecords.dfn.ondemand") : OPDE.lang.getString(SHIFT_TEXT[d1.getShift()]));
+            result += SYSConst.html_h3(d1.isOnDemand() ? SYSTools.xx("nursingrecords.dfn.ondemand") : SYSTools.xx(SHIFT_TEXT[d1.getShift()]));
 
 
             result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
-                    "<th>" + OPDE.lang.getString("nursingrecords.nursingprocess.interventions") + "</th><th>Zeit / Status</th><th>Benutzer / Zeit</th></tr>";
+                    "<th>" + SYSTools.xx("nursingrecords.nursingprocess.interventions") + "</th><th>Zeit / Status</th><th>Benutzer / Zeit</th></tr>";
 
             for (DFN dfn : list) {
 

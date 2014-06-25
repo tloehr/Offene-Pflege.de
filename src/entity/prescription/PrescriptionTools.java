@@ -115,7 +115,7 @@ public class PrescriptionTools {
     private static void printDailyPlanAsPDF(final Station station, final List data) throws Exception {
 
         OPDE.getMainframe().setBlocked(true);
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 
         final Font whiteFont = PDF.bold();
         whiteFont.setColor(BaseColor.WHITE);
@@ -125,7 +125,7 @@ public class PrescriptionTools {
 
             @Override
             protected Object doInBackground() throws Exception {
-                String header = OPDE.lang.getString("nursingrecords.prescription.dailyplan.header1") + " " + DateFormat.getDateInstance().format(new Date()) + " (" + station.getName() + ")";
+                String header = SYSTools.xx("nursingrecords.prescription.dailyplan.header1") + " " + DateFormat.getDateInstance().format(new Date()) + " (" + station.getName() + ")";
                 final PDF pdf = new PDF(null, header, 10);
                 pdf.getDocument().add(new Header(OPDE.getAppInfo().getSignature(), header));
 
@@ -142,14 +142,14 @@ public class PrescriptionTools {
 
                 DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
                 int progress = -1;
-                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, data.size()));
+                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, data.size()));
                 String resID = "";
                 PdfPTable table = null;
 
                 for (Object obj : data) {
                     progress++;
 
-                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, data.size()));
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, data.size()));
 
                     Object[] objects = (Object[]) obj;
                     Prescription prescription = em.find(Prescription.class, ((BigInteger) objects[0]).longValue());
@@ -227,7 +227,7 @@ public class PrescriptionTools {
                     if (bestid != null) {
                         MedStock stock = em.find(MedStock.class, bestid.longValue());
                         col1.add(Chunk.NEWLINE);
-                        col1.add(PDF.chunk(OPDE.lang.getString("nursingrecords.prescription.dailyplan.stockInUse") + " " + OPDE.lang.getString("misc.msg.number") + " " + stock.getID(), PDF.italic()));
+                        col1.add(PDF.chunk(SYSTools.xx("nursingrecords.prescription.dailyplan.stockInUse") + " " + SYSTools.xx("misc.msg.number") + " " + stock.getID(), PDF.italic()));
 
                         String warning = "";
                         warning += (stock.expiresIn(7) ? "!!" : "");
@@ -235,7 +235,7 @@ public class PrescriptionTools {
                         // variable expiry ?
                         if (stock.getTradeForm().getDaysToExpireAfterOpened() != null) {
                             col1.add(Chunk.NEWLINE);
-                            col1.add(PDF.chunk(warning + " " + OPDE.lang.getString("misc.msg.expiresAfterOpened") + ": " + df.format(new DateTime(stock.getOpened()).plusDays(stock.getTradeForm().getDaysToExpireAfterOpened()).toDate())));
+                            col1.add(PDF.chunk(warning + " " + SYSTools.xx("misc.msg.expiresAfterOpened") + ": " + df.format(new DateTime(stock.getOpened()).plusDays(stock.getTradeForm().getDaysToExpireAfterOpened()).toDate())));
                         }
                         if (stock.getExpires() != null) {
                             DateFormat sdf = df;
@@ -244,7 +244,7 @@ public class PrescriptionTools {
                                 sdf = new SimpleDateFormat("MM/yy");
                             }
                             col1.add(Chunk.NEWLINE);
-                            col1.add(PDF.chunk(OPDE.lang.getString("misc.msg.expires") + ": " + sdf.format(stock.getExpires())));
+                            col1.add(PDF.chunk(SYSTools.xx("misc.msg.expires") + ": " + sdf.format(stock.getExpires())));
                         }
                     }
                     table.addCell(col1);
@@ -258,7 +258,7 @@ public class PrescriptionTools {
                         cellTime.setVerticalAlignment(Element.ALIGN_MIDDLE);
                         cellTime.setColspan(6);
 
-                        Chunk timeChunk = PDF.chunk(DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getUhrzeit()) + " " + OPDE.lang.getString("misc.msg.Time.short"), PDF.bold());
+                        Chunk timeChunk = PDF.chunk(DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getUhrzeit()) + " " + SYSTools.xx("misc.msg.Time.short"), PDF.bold());
                         timeChunk.setUnderline(0.4f, -1f);
 
                         Phrase contentTime = new Phrase();
@@ -323,7 +323,7 @@ public class PrescriptionTools {
     private static void printDailyPlan(final Station station, final List data) {
 
         OPDE.getMainframe().setBlocked(true);
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 
         final EntityManager em = OPDE.createEM();
 
@@ -334,18 +334,18 @@ public class PrescriptionTools {
                 DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
                 int progress = -1;
                 int DAILYPLAN_PAGEBREAK_AFTER_ELEMENT_NO = Integer.parseInt(OPDE.getProps().getProperty(SYSPropsTools.KEY_DAILYPLAN_PAGEBREAK));
-                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, data.size()));
+                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, data.size()));
                 String resID = "";
                 int elementNumber = 1;
                 boolean pagebreak = false;
-                String header = OPDE.lang.getString("nursingrecords.prescription.dailyplan.header1") + " " + DateFormat.getDateInstance().format(new Date());
+                String header = SYSTools.xx("nursingrecords.prescription.dailyplan.header1") + " " + DateFormat.getDateInstance().format(new Date());
                 String html = SYSConst.html_h1(header + " (" + station.getName() + ")");
-                html += "<div align=\"center\" id=\"fonttext\" >" + OPDE.lang.getString("nursingrecords.prescription.dailyplan.warning") + "</div>\n";
+                html += "<div align=\"center\" id=\"fonttext\" >" + SYSTools.xx("nursingrecords.prescription.dailyplan.warning") + "</div>\n";
 
                 for (Object obj : data) {
                     progress++;
 
-                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, data.size()));
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, data.size()));
 
                     Object[] objects = (Object[]) obj;
                     Prescription prescription = em.find(Prescription.class, ((BigInteger) objects[0]).longValue());
@@ -404,10 +404,10 @@ public class PrescriptionTools {
 
                     html += "<tr style=\"page-break-before:avoid\" " + (gray ? "id=\"fonttextgray14\">" : ">\n");
                     html += "<td width=\"300\" valign=\"top\">" + getShortDescription(prescription);   // (verordnung.hasMed() ? "<b>" + TradeFormTools.toPrettyString(verordnung.getTradeForm()) + "</b>" : verordnung.getIntervention().getName())
-//                    html += (bestid != null ? "<br/><i>" + OPDE.lang.getString("nursingrecords.prescription.dailyplan.stockInUse") + " " + OPDE.lang.getString("misc.msg.number") + " " + bestid + "</i>" : "") + "</td>\n";
+//                    html += (bestid != null ? "<br/><i>" + SYSTools.xx("nursingrecords.prescription.dailyplan.stockInUse") + " " + SYSTools.xx("misc.msg.number") + " " + bestid + "</i>" : "") + "</td>\n";
                     if (bestid != null) {
                         MedStock stock = em.find(MedStock.class, bestid.longValue());
-                        html += "<br/><i>" + OPDE.lang.getString("nursingrecords.prescription.dailyplan.stockInUse") + " " + OPDE.lang.getString("misc.msg.number") + " " + stock.getID() + "</i>";
+                        html += "<br/><i>" + SYSTools.xx("nursingrecords.prescription.dailyplan.stockInUse") + " " + SYSTools.xx("misc.msg.number") + " " + stock.getID() + "</i>";
 
 
                         String warning = "";
@@ -415,7 +415,7 @@ public class PrescriptionTools {
                         warning += (stock.expiresIn(0) ? "!!!!" : "");
                         // variable expiry ?
                         if (stock.getTradeForm().getDaysToExpireAfterOpened() != null) {
-                            html += "<br/>" + warning + "&nbsp;" + OPDE.lang.getString("misc.msg.expiresAfterOpened") + ": " + df.format(new DateTime(stock.getOpened()).plusDays(stock.getTradeForm().getDaysToExpireAfterOpened()).toDate());
+                            html += "<br/>" + warning + "&nbsp;" + SYSTools.xx("misc.msg.expiresAfterOpened") + ": " + df.format(new DateTime(stock.getOpened()).plusDays(stock.getTradeForm().getDaysToExpireAfterOpened()).toDate());
                         }
                         if (stock.getExpires() != null) {
                             DateFormat sdf = df;
@@ -423,7 +423,7 @@ public class PrescriptionTools {
                             if (new DateMidnight(stock.getExpires()).equals(new DateMidnight(stock.getExpires()).dayOfMonth().withMaximumValue())) {
                                 sdf = new SimpleDateFormat("MM/yy");
                             }
-                            html += "<br/>" + OPDE.lang.getString("misc.msg.expires") + ": " + sdf.format(stock.getExpires());
+                            html += "<br/>" + SYSTools.xx("misc.msg.expires") + ": " + sdf.format(stock.getExpires());
                         }
                     }
                     html += "</td>\n";
@@ -431,7 +431,7 @@ public class PrescriptionTools {
                     if (schedule.usesTime()) {
                         html += "<td colspan=\"6\" align=\"center\">";
 
-                        html += "<b><u>" + DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getUhrzeit()) + " " + OPDE.lang.getString("misc.msg.Time.short") + "</u></b> ";
+                        html += "<b><u>" + DateFormat.getTimeInstance(DateFormat.SHORT).format(schedule.getUhrzeit()) + " " + SYSTools.xx("misc.msg.Time.short") + "</u></b> ";
                         html += HTMLTools.printDouble(schedule.getUhrzeitDosis());
                         html += schedule.getPrescription().hasMed() ? " " + SYSConst.UNITS[schedule.getPrescription().getTradeForm().getDosageForm().getUsageUnit()] : "x";
 
@@ -447,7 +447,7 @@ public class PrescriptionTools {
                     }
                     html += "<td width=\"300\" >" + PrescriptionScheduleTools.getRemark(schedule);
                     if (prescription.getTo().before(SYSConst.DATE_UNTIL_FURTHER_NOTICE)) {
-                        html += "<br/><b>" + OPDE.lang.getString(PnlPrescription.internalClassID + ".endsAtChrono") + ": " + DateFormat.getDateInstance().format(prescription.getTo()) + "</b>";
+                        html += "<br/><b>" + SYSTools.xx(PnlPrescription.internalClassID + ".endsAtChrono") + ": " + DateFormat.getDateInstance().format(prescription.getTo()) + "</b>";
                     }
                     html += "</td>\n";
                     html += "</tr>\n\n";
@@ -620,7 +620,7 @@ public class PrescriptionTools {
 //                            (stockInUse.getTradeForm().getSubtext().isEmpty() ? "" : " " + stockInUse.getTradeForm().getSubtext()) + "</b>" +
 //                            (stockInUse.getTradeForm().getDosageForm().getPreparation().isEmpty() ? "" : " " + stockInUse.getTradeForm().getDosageForm().getPreparation()) + " " +
 //                            (stockInUse.getTradeForm().getDosageForm().getUsageText().isEmpty() ? SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getUsageUnit()] : stockInUse.getTradeForm().getDosageForm().getUsageText());
-//                    result += " <i>(" + OPDE.lang.getString(PnlPrescription.internalClassID + ".originalprescription") + ": " + presription.getTradeForm().getMedProduct().getName();
+//                    result += " <i>(" + SYSTools.xx(PnlPrescription.internalClassID + ".originalprescription") + ": " + presription.getTradeForm().getMedProduct().getName();
 //                    result += (stockInUse.getTradeForm().getSubtext().isEmpty() ? "" : " " + stockInUse.getTradeForm().getSubtext()) + ")</i>";
                 } else {
 
@@ -654,16 +654,16 @@ public class PrescriptionTools {
         String result = "<div id=\"fonttext\">";
 
         if (prescription.hasMed() && prescription.getTradeForm().getMedProduct().hasSideEffects()){
-            result += "<b><u>" + OPDE.lang.getString("misc.msg.sideeffects") + ":</u> <font color=\"orange\">" + prescription.getTradeForm().getMedProduct().getSideEffects() + "</font></b>";
+            result += "<b><u>" + SYSTools.xx("misc.msg.sideeffects") + ":</u> <font color=\"orange\">" + prescription.getTradeForm().getMedProduct().getSideEffects() + "</font></b>";
 
         }
         if (prescription.isOnDemand()) {
             result += result.isEmpty() ? "" : "<br/>";
-            result += "<b><u>" + OPDE.lang.getString("misc.msg.ondemand") + ":</u> <font color=\"blue\">" + prescription.getSituation().getText() + "</font></b>";
+            result += "<b><u>" + SYSTools.xx("misc.msg.ondemand") + ":</u> <font color=\"blue\">" + prescription.getSituation().getText() + "</font></b>";
         }
         if (!prescription.getText().isEmpty()) {
             result += result.isEmpty() ? "" : "<br/>";
-            result += "<b><u>" + OPDE.lang.getString("misc.msg.comment") + ":</u> </b>" + prescription.getText();
+            result += "<b><u>" + SYSTools.xx("misc.msg.comment") + ":</u> </b>" + prescription.getText();
         }
         return result + "</div>";
     }
@@ -678,7 +678,7 @@ public class PrescriptionTools {
 //        }
 //        if (verordnung.getDocON() != null) {
 //            if (verordnung.getHospitalON() != null) {
-//                result += " <i>" + OPDE.lang.getString("misc.msg.confirmedby") + ":</i> ";
+//                result += " <i>" + SYSTools.xx("misc.msg.confirmedby") + ":</i> ";
 //            }
 //            result += verordnung.getDocON().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getDocON().getName(), SYSTools.INDEX_LASTNAME);
 //        }
@@ -699,7 +699,7 @@ public class PrescriptionTools {
 //
 //            if (verordnung.getDocOFF() != null) {
 //                if (verordnung.getHospitalOFF() != null) {
-//                    result += " <i>" + OPDE.lang.getString("misc.msg.confirmedby") + ":</i> ";
+//                    result += " <i>" + SYSTools.xx("misc.msg.confirmedby") + ":</i> ";
 //                }
 //                result += verordnung.getDocOFF().getAnrede() + " " + SYSTools.anonymizeName(verordnung.getDocOFF().getName(), SYSTools.INDEX_LASTNAME);
 //            }
@@ -727,7 +727,7 @@ public class PrescriptionTools {
             }
             result = result.substring(0, result.length() - 2);
         } else {
-            result += OPDE.lang.getString("nursingrecords.prescription.noDosageYet");
+            result += SYSTools.xx("nursingrecords.prescription.noDosageYet");
         }
 
         return result;
@@ -755,7 +755,7 @@ public class PrescriptionTools {
                 result += "</table>";
             }
         } else {
-            result += "<i>" + OPDE.lang.getString("nursingrecords.prescription.noDosageYet") + "</i><br/>";
+            result += "<i>" + SYSTools.xx("nursingrecords.prescription.noDosageYet") + "</i><br/>";
         }
 
         result += showInventory ? getInventoryInformationAsHTML(prescription) : "";
@@ -771,7 +771,7 @@ public class PrescriptionTools {
             MedStock stockInUse = MedStockTools.getStockInUse(inventory);
 
             if (prescription.isUntilEndOfPackage()) {
-                result += "<b>" + OPDE.lang.getString("misc.msg.onlyUntilEndOfPackage") + "</b><br/>";
+                result += "<b>" + SYSTools.xx("misc.msg.onlyUntilEndOfPackage") + "</b><br/>";
             }
             if (!prescription.isClosed()) {
                 if (stockInUse != null) {
@@ -789,30 +789,30 @@ public class PrescriptionTools {
                     }
 
                     if (invSum != null && invSum.compareTo(BigDecimal.ZERO) > 0) {
-                        result += "<b><u>" + OPDE.lang.getString("misc.msg.inventory") + ":</u> <font color=\"green\">" + invSum.setScale(2, BigDecimal.ROUND_UP) + " " +
+                        result += "<b><u>" + SYSTools.xx("misc.msg.inventory") + ":</u> <font color=\"green\">" + invSum.setScale(2, BigDecimal.ROUND_UP) + " " +
                                 SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getPackUnit()] +
                                 "</font></b>";
                         if (stockInUse.getTradeForm().getDosageForm().isUPRn()) {
                             BigDecimal anwmenge = invSum.multiply(stockInUse.getUPR());
 
-                            result += " " + OPDE.lang.getString("misc.msg.equalTo") + " " + anwmenge.setScale(2, BigDecimal.ROUND_UP) + " " +
+                            result += " " + SYSTools.xx("misc.msg.equalTo") + " " + anwmenge.setScale(2, BigDecimal.ROUND_UP) + " " +
                                     DosageFormTools.getUsageText(stockInUse.getTradeForm().getDosageForm());
-                            result += " (" + OPDE.lang.getString("misc.msg.upr") + ": " + stockInUse.getUPR().setScale(2, BigDecimal.ROUND_UP) + " " + OPDE.lang.getString("misc.msg.to1");
+                            result += " (" + SYSTools.xx("misc.msg.upr") + ": " + stockInUse.getUPR().setScale(2, BigDecimal.ROUND_UP) + " " + SYSTools.xx("misc.msg.to1");
                             if (stockInUse.getUPRDummyMode() == MedStockTools.REPLACE_WITH_EFFECTIVE_UPR_WHEN_CLOSING) {
-                                result += ", " + OPDE.lang.getString("misc.msg.preliminary");
+                                result += ", " + SYSTools.xx("misc.msg.preliminary");
                             }
                             result += ")";
                         }
 
-                        result += "<br/>" + OPDE.lang.getString("misc.msg.stockInUse") + ": <b><font color=\"green\">" + stockInUse.getID() + "</font></b>";
+                        result += "<br/>" + SYSTools.xx("misc.msg.stockInUse") + ": <b><font color=\"green\">" + stockInUse.getID() + "</font></b>";
 
                         if (invSum.compareTo(stockSum) != 0) {
-                            result += "<br/>" + OPDE.lang.getString("misc.msg.leftInStock") + ": <b><font color=\"green\">" + stockSum.setScale(2, BigDecimal.ROUND_UP) + " " +
+                            result += "<br/>" + SYSTools.xx("misc.msg.leftInStock") + ": <b><font color=\"green\">" + stockSum.setScale(2, BigDecimal.ROUND_UP) + " " +
                                     SYSConst.UNITS[stockInUse.getTradeForm().getDosageForm().getPackUnit()] + "</font></b>";
                             if (stockInUse.getTradeForm().getDosageForm().isUPRn()) {
                                 BigDecimal usage = stockSum.multiply(stockInUse.getUPR());
 
-                                result += " (" + OPDE.lang.getString("misc.msg.equalTo") + " " + usage.setScale(2, BigDecimal.ROUND_UP) + " " +
+                                result += " (" + SYSTools.xx("misc.msg.equalTo") + " " + usage.setScale(2, BigDecimal.ROUND_UP) + " " +
                                         DosageFormTools.getUsageText(stockInUse.getTradeForm().getDosageForm()) + ")";
                             }
                         }
@@ -821,27 +821,27 @@ public class PrescriptionTools {
                         // variable expiry ?
                         if (stockInUse.getTradeForm().getDaysToExpireAfterOpened() != null) {
                             String color = stockInUse.isExpired() ? "red" : "black";
-                            result += "<br/><font color=\"" + color + "\">" + OPDE.lang.getString("misc.msg.expiresAfterOpened") + ": " + df.format(new DateTime(stockInUse.getOpened()).plusDays(stockInUse.getTradeForm().getDaysToExpireAfterOpened()).toDate()) + "</font>";
+                            result += "<br/><font color=\"" + color + "\">" + SYSTools.xx("misc.msg.expiresAfterOpened") + ": " + df.format(new DateTime(stockInUse.getOpened()).plusDays(stockInUse.getTradeForm().getDaysToExpireAfterOpened()).toDate()) + "</font>";
                         }
 
                         // fixed expiry ?
                         if (stockInUse.getExpires() != null) {
                             String color = stockInUse.isExpired() ? "red" : "black";
-                            result += "<br/><font color=\"" + color + "\">" + OPDE.lang.getString("misc.msg.expires") + ": " + new SimpleDateFormat("MM/yy").format(stockInUse.getExpires()) + "</font>";
+                            result += "<br/><font color=\"" + color + "\">" + SYSTools.xx("misc.msg.expires") + ": " + new SimpleDateFormat("MM/yy").format(stockInUse.getExpires()) + "</font>";
                         }
 
 
                     } else {
-                        result += "<b><font color=\"red\">" + OPDE.lang.getString("misc.msg.emptyInventory") + "</font></b>";
+                        result += "<b><font color=\"red\">" + SYSTools.xx("misc.msg.emptyInventory") + "</font></b>";
                     }
                 } else {
                     if (inventory == null) {
-                        result += "<b><font color=\"red\">" + OPDE.lang.getString("misc.msg.noInventoryYet") + "</font></b>";
+                        result += "<b><font color=\"red\">" + SYSTools.xx("misc.msg.noInventoryYet") + "</font></b>";
                     } else {
                         if (MedInventoryTools.getNextToOpen(inventory) != null) {
-                            result += "<br/><b><font color=\"red\">" + OPDE.lang.getString("misc.msg.noOpenStock") + "</font></b>";
+                            result += "<br/><b><font color=\"red\">" + SYSTools.xx("misc.msg.noOpenStock") + "</font></b>";
                         } else {
-                            result += "<br/><b><font color=\"red\">" + OPDE.lang.getString("misc.msg.noOpenStock") + "</font></b>";
+                            result += "<br/><b><font color=\"red\">" + SYSTools.xx("misc.msg.noOpenStock") + "</font></b>";
                         }
 
                     }
@@ -961,7 +961,7 @@ public class PrescriptionTools {
 
         if (!list.isEmpty()) {
             Prescription prescription = list.get(0);
-            result += withheader ? "<h2 id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.prescription") + (withlongheader ? " für " + ResidentTools.getLabelText(prescription.getResident()) : "") + "</h2>" : "";
+            result += withheader ? "<h2 id=\"fonth2\" >" + SYSTools.xx("nursingrecords.prescription") + (withlongheader ? " für " + ResidentTools.getLabelText(prescription.getResident()) : "") + "</h2>" : "";
 
             result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>" +
                     "<th>Medikament/Massnahme</th><th>Dosierung / Hinweise</th><th>Angesetzt</th></tr>";
@@ -983,7 +983,7 @@ public class PrescriptionTools {
 
             result += "</table>";
         } else {
-            result += "<h2  id=\"fonth2\" >" + OPDE.lang.getString("nursingrecords.prescription") + "</h2><i>" + OPDE.lang.getString("misc.msg.currentlynoentry") + "</i>";
+            result += "<h2  id=\"fonth2\" >" + SYSTools.xx("nursingrecords.prescription") + "</h2><i>" + SYSTools.xx("misc.msg.currentlynoentry") + "</i>";
         }
         return result;
     }
@@ -1013,7 +1013,7 @@ public class PrescriptionTools {
             myPretty = verordnung.getIntervention().getBezeichnung();
         }
 
-        myPretty += verordnung.isOnDemand() ? " (" + OPDE.lang.getString("misc.msg.ondemand") + ": " + verordnung.getSituation().getText() + ")" : "";
+        myPretty += verordnung.isOnDemand() ? " (" + SYSTools.xx("misc.msg.ondemand") + ": " + verordnung.getSituation().getText() + ")" : "";
 
         return myPretty;
     }

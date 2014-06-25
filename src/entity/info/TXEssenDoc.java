@@ -62,7 +62,7 @@ public class TXEssenDoc {
 
     public TXEssenDoc(Resident res) {
         OPDE.getMainframe().setBlocked(true);
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 
         //    #docs  #mre  #psych  + allActive.size()
         max = 21 + 1 + 1;
@@ -82,7 +82,7 @@ public class TXEssenDoc {
 
                 for (ResInfo info : ResInfoTools.getAllActive(resident)) {
 
-                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
 
                     if (!info.isSingleIncident() && !info.isNoConstraints()) {
                         mapID2Info.put(info.getResInfoType().getType(), info);
@@ -103,7 +103,7 @@ public class TXEssenDoc {
                     listICD.clear();
 
                     progress++;
-                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
                     File filemre = null;
                     if (mre) {
                         filemre = createDocMRE();
@@ -111,7 +111,7 @@ public class TXEssenDoc {
                     }
 
                     progress++;
-                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
                     File filepsych = null;
                     if (psych) {
                         filepsych = createDocPSYCH();
@@ -178,87 +178,87 @@ public class TXEssenDoc {
         PdfStamper stamper = new PdfStamper(new PdfReader(OPDE.getOPWD() + File.separator + OPDE.SUBDIR_TEMPLATES + File.separator + SOURCEDOC1), new FileOutputStream(outfile1));
 
         progress++;
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
         createContent4Section1();
 
         progress++;
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
         createContent4Section2();
 
         progress++;
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
         createContent4Section3();
 
         progress++;
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
         createContent4Section4();
 
         progress++;
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
         createContent4Section5();
 
         progress++;
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
         createContent4Section6();
 
         progress++;
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
         createContent4Section7();
 
         progress++;
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
         createContent4Section8();
 
         progress++;
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
         createContent4Section9();
 
         progress++;
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
         createContent4Section10();
 
         progress++;
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
         createContent4Section11();
 
         progress++;
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
         createContent4Section12();
 
         progress++;
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
         createContent4Section13();
 
         progress++;
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
         createContent4Section14();
 
         progress++;
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
         createContent4Section15();
 
         progress++;
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
         createContent4Section16();
 
         progress++;
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
         createContent4Section17();
 
         progress++;
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
         createContent4Section18();
 
         progress++;
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
         createContent4Section19(stamper);
 
         progress++;
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
         createContent4SectionICD();
 
         progress++;
-        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, max));
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, max));
         createContent4Meds();
 
         String docs = mre ? "MRE, " : "";
@@ -332,10 +332,10 @@ public class TXEssenDoc {
             runningPage++;
             page = copy.getImportedPage(reader1, p);
             stamp = copy.createPageStamp(page);
-            String sidenote = String.format(OPDE.lang.getString("pdf.pagefooter"), runningPage, maxpages)
+            String sidenote = String.format(SYSTools.xx("pdf.pagefooter"), runningPage, maxpages)
                     + " // " + ResidentTools.getLabelText(resident)
                     + " // " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(new Date())
-                    + " // " + OPDE.lang.getString("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
+                    + " // " + SYSTools.xx("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
                     + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum();
 
             ColumnText.showTextAligned(stamp.getUnderContent(), Element.ALIGN_LEFT, new Phrase(sidenote, pdf_font_small), Utilities.millimetersToPoints(207), Utilities.millimetersToPoints(260), 270);
@@ -348,9 +348,9 @@ public class TXEssenDoc {
                 runningPage++;
                 page = copy.getImportedPage(readerAdditionalMeds, p);
                 stamp = copy.createPageStamp(page);
-                String sidenote = String.format(OPDE.lang.getString("pdf.pagefooter"), runningPage, maxpages)
+                String sidenote = String.format(SYSTools.xx("pdf.pagefooter"), runningPage, maxpages)
                         + " // " + ResidentTools.getLabelText(resident)
-                        + " // " + OPDE.lang.getString("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
+                        + " // " + SYSTools.xx("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
                         + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum();
                 ColumnText.showTextAligned(stamp.getUnderContent(), Element.ALIGN_LEFT, new Phrase(sidenote, pdf_font_small), Utilities.millimetersToPoints(207), Utilities.millimetersToPoints(260), 270);
                 stamp.alterContents();
@@ -363,9 +363,9 @@ public class TXEssenDoc {
                 runningPage++;
                 page = copy.getImportedPage(readerICD, p);
                 stamp = copy.createPageStamp(page);
-                String sidenote = String.format(OPDE.lang.getString("pdf.pagefooter"), runningPage, maxpages)
+                String sidenote = String.format(SYSTools.xx("pdf.pagefooter"), runningPage, maxpages)
                         + " // " + ResidentTools.getLabelText(resident)
-                        + " // " + OPDE.lang.getString("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
+                        + " // " + SYSTools.xx("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
                         + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum();
                 ColumnText.showTextAligned(stamp.getUnderContent(), Element.ALIGN_LEFT, new Phrase(sidenote, pdf_font_small), Utilities.millimetersToPoints(207), Utilities.millimetersToPoints(260), 270);
                 stamp.alterContents();
@@ -379,9 +379,9 @@ public class TXEssenDoc {
                 runningPage++;
                 page = copy.getImportedPage(readerMRE, p);
                 stamp = copy.createPageStamp(page);
-                String sidenote = String.format(OPDE.lang.getString("pdf.pagefooter"), runningPage, maxpages)
+                String sidenote = String.format(SYSTools.xx("pdf.pagefooter"), runningPage, maxpages)
                         + " // " + ResidentTools.getLabelText(resident)
-                        + " // " + OPDE.lang.getString("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
+                        + " // " + SYSTools.xx("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
                         + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum();
                 ColumnText.showTextAligned(stamp.getUnderContent(), Element.ALIGN_LEFT, new Phrase(sidenote, pdf_font_small), Utilities.millimetersToPoints(207), Utilities.millimetersToPoints(260), 270);
                 stamp.alterContents();
@@ -395,9 +395,9 @@ public class TXEssenDoc {
                 runningPage++;
                 page = copy.getImportedPage(readerPSYCH, p);
                 stamp = copy.createPageStamp(page);
-                String sidenote = String.format(OPDE.lang.getString("pdf.pagefooter"), runningPage, maxpages)
+                String sidenote = String.format(SYSTools.xx("pdf.pagefooter"), runningPage, maxpages)
                         + " // " + ResidentTools.getLabelText(resident)
-                        + " // " + OPDE.lang.getString("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
+                        + " // " + SYSTools.xx("misc.msg.createdby") + ": " + (OPDE.getLogin() != null ? OPDE.getLogin().getUser().getFullname() : "")
                         + " // " + OPDE.getAppInfo().getProgname() + ", v" + OPDE.getAppInfo().getVersion() + "/" + OPDE.getAppInfo().getBuildnum();
                 ColumnText.showTextAligned(stamp.getUnderContent(), Element.ALIGN_LEFT, new Phrase(sidenote, pdf_font_small), Utilities.millimetersToPoints(207), Utilities.millimetersToPoints(260), 270);
                 stamp.alterContents();
@@ -645,10 +645,10 @@ public class TXEssenDoc {
         boolean pads2 = getValue(ResInfoTypeTools.TYPE_INCOAID, "dbinden").equalsIgnoreCase("true");
         boolean undersheet = getValue(ResInfoTypeTools.TYPE_INCOAID, "krunterlagen").equalsIgnoreCase("true");
 
-        String incoaidtext = (diapers ? OPDE.lang.getString("misc.msg.diaper") + ", " : "") +
-                (pads1 ? OPDE.lang.getString("misc.msg.incopad") + ", " : "") +
-                (pads2 ? OPDE.lang.getString("misc.msg.sanitarypads") + ", " : "") +
-                (undersheet ? OPDE.lang.getString("misc.msg.undersheet") + ", " : "");
+        String incoaidtext = (diapers ? SYSTools.xx("misc.msg.diaper") + ", " : "") +
+                (pads1 ? SYSTools.xx("misc.msg.incopad") + ", " : "") +
+                (pads2 ? SYSTools.xx("misc.msg.sanitarypads") + ", " : "") +
+                (undersheet ? SYSTools.xx("misc.msg.undersheet") + ", " : "");
 
         content.put(TXEAF.EXCRETIONS_ONEWAY_AID, setCheckbox(diapers || pads1 || pads2 || undersheet));
         content.put(TXEAF.EXCRETIONS_CURRENT_USED_AID, incoaidtext.isEmpty() ? "--" : incoaidtext.substring(0, incoaidtext.length() - 2));
@@ -836,7 +836,7 @@ public class TXEssenDoc {
         String tubetype = "--";
         if (!getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "bitesize").equals("--")) {
             String langKey = "misc.msg." + getValue(ResInfoTypeTools.TYPE_ARTIFICIAL_NUTRTITION, "tubetype");
-            tubetype = OPDE.lang.getString(langKey);
+            tubetype = SYSTools.xx(langKey);
         }
 
         content.put(TXEAF.FOOD_TUBETYPE, tubetype);
@@ -1093,7 +1093,7 @@ public class TXEssenDoc {
                 ResInfo currentWound = mapID2Info.get(type);
                 lineno++;
 
-                content.put(pdfbody[lineno], OPDE.lang.getString(descriptionKey) + " " + DateFormat.getDateInstance().format(currentWound.getFrom()) + ": " + ResInfoTools.getContentAsPlainText(currentWound, true));
+                content.put(pdfbody[lineno], SYSTools.xx(descriptionKey) + " " + DateFormat.getDateInstance().format(currentWound.getFrom()) + ": " + ResInfoTools.getContentAsPlainText(currentWound, true));
 
                 AcroFields.FieldPosition pos1 = form.getFieldPositions(pdfbody[lineno]).get(0);
                 directcontent.saveState();
@@ -1162,7 +1162,7 @@ public class TXEssenDoc {
 
     private void createContent4SectionICD() {
         getAdditionICDs();
-        content.put(TXEAF.DIAG_ICD10, listICD.isEmpty() ? OPDE.lang.getString("nursingrecords.info.tx.no.diags") : OPDE.lang.getString("nursingrecords.info.tx.diags.to.follow"));
+        content.put(TXEAF.DIAG_ICD10, listICD.isEmpty() ? SYSTools.xx("nursingrecords.info.tx.no.diags") : SYSTools.xx("nursingrecords.info.tx.diags.to.follow"));
     }
 
     /**
@@ -1192,7 +1192,7 @@ public class TXEssenDoc {
         }
 
         if (listRegularMeds.size() > MAXLINESONPDF) {
-            content.put(TXEAF.MEDS_WARNINGTEXT, listRegularMeds.size() - MAXLINESONPDF + " " + OPDE.lang.getString("nursingrecords.info.tx.more.meds.to.follow"));
+            content.put(TXEAF.MEDS_WARNINGTEXT, listRegularMeds.size() - MAXLINESONPDF + " " + SYSTools.xx("nursingrecords.info.tx.more.meds.to.follow"));
             getAdditionMeds(listRegularMeds, MAXLINESONPDF);
         }
 
@@ -1213,7 +1213,7 @@ public class TXEssenDoc {
             PdfWriter.getInstance(document, medListStream);
             document.open();
 
-            Paragraph h1 = new Paragraph(new Phrase(OPDE.lang.getString("misc.msg.additional.medslist"), PDF.plain(PDF.sizeH1())));
+            Paragraph h1 = new Paragraph(new Phrase(SYSTools.xx("misc.msg.additional.medslist"), PDF.plain(PDF.sizeH1())));
             h1.setAlignment(Element.ALIGN_CENTER);
             document.add(h1);
 
@@ -1262,7 +1262,7 @@ public class TXEssenDoc {
             PdfWriter.getInstance(document, icdListStream);
             document.open();
 
-            Paragraph h1 = new Paragraph(new Phrase(OPDE.lang.getString("nursingrecords.info.dlg.diags"), PDF.plain(PDF.sizeH1())));
+            Paragraph h1 = new Paragraph(new Phrase(SYSTools.xx("nursingrecords.info.dlg.diags"), PDF.plain(PDF.sizeH1())));
             h1.setAlignment(Element.ALIGN_CENTER);
             document.add(h1);
 

@@ -140,14 +140,14 @@ public class DlgOnDemand extends MyJDialog {
             public java.awt.Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                 String text;
                 if (o == null) {
-                    text = "<i>" + OPDE.lang.getString("nursingrecords.prescription.dlgOnDemand.noOutcomeCheck") + "</i>";
+                    text = "<i>" + SYSTools.xx("nursingrecords.prescription.dlgOnDemand.noOutcomeCheck") + "</i>";
                 } else if (o instanceof BigDecimal) {
                     if (o.equals(new BigDecimal("0.5"))) {
-                        text = "&frac12; " + OPDE.lang.getString("misc.msg.Hour");
+                        text = "&frac12; " + SYSTools.xx("misc.msg.Hour");
                     } else if (o.equals(BigDecimal.ONE)) {
-                        text = "1 " + OPDE.lang.getString("misc.msg.Hour");
+                        text = "1 " + SYSTools.xx("misc.msg.Hour");
                     } else {
-                        text = o.toString() + " " + OPDE.lang.getString("misc.msg.Hours");
+                        text = o.toString() + " " + SYSTools.xx("misc.msg.Hours");
                     }
                 } else {
                     text = o.toString();
@@ -722,9 +722,9 @@ public class DlgOnDemand extends MyJDialog {
 
         ignoreEvent = true;
 
-        lblCheckResultAfter.setText(OPDE.lang.getString("nursingrecords.prescription.dlgOnDemand.outcomeCheck")+":");
+        lblCheckResultAfter.setText(SYSTools.xx("nursingrecords.prescription.dlgOnDemand.outcomeCheck")+":");
 
-        rbActive.setText(OPDE.lang.getString("nursingrecords.prescription.dlgOnDemand.rbActive"));
+        rbActive.setText(SYSTools.xx("nursingrecords.prescription.dlgOnDemand.rbActive"));
 
         txtMed.setText("");
 

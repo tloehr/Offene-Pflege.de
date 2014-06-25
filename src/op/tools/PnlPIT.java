@@ -47,8 +47,8 @@ public class PnlPIT extends JPanel {
         this.max = max;
         this.min = min;
         initComponents();
-        labelDatum.setText(OPDE.lang.getString("misc.msg.Date"));
-        labelUhrzeit.setText(OPDE.lang.getString("misc.msg.Time.long"));
+        labelDatum.setText(SYSTools.xx("misc.msg.Date"));
+        labelUhrzeit.setText(SYSTools.xx("misc.msg.Time.long"));
         this.preset = preset;
 
 

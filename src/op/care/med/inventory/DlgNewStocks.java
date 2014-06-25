@@ -181,14 +181,14 @@ public class DlgNewStocks extends MyJDialog {
             btnPrint.setSelected(false);
         }
 
-        lblPZN.setText(OPDE.lang.getString("newstocks.lblPZN"));
-        lblProd.setText(OPDE.lang.getString("newstocks.lblProd"));
-        lblPack.setText(OPDE.lang.getString("newstocks.lblPack"));
-        lblAmount.setText(OPDE.lang.getString("newstocks.lblAmount"));
-        lblInventory.setText(OPDE.lang.getString("newstocks.lblInventory"));
-        lblRemark.setText(OPDE.lang.getString("misc.msg.comment"));
-        lblExpires.setText(OPDE.lang.getString("misc.msg.expires"));
-        lblResident.setText(OPDE.lang.getString("misc.msg.resident"));
+        lblPZN.setText(SYSTools.xx("newstocks.lblPZN"));
+        lblProd.setText(SYSTools.xx("newstocks.lblProd"));
+        lblPack.setText(SYSTools.xx("newstocks.lblPack"));
+        lblAmount.setText(SYSTools.xx("newstocks.lblAmount"));
+        lblInventory.setText(SYSTools.xx("newstocks.lblInventory"));
+        lblRemark.setText(SYSTools.xx("misc.msg.comment"));
+        lblExpires.setText(SYSTools.xx("misc.msg.expires"));
+        lblResident.setText(SYSTools.xx("misc.msg.resident"));
 
         amount = null;
         cmbMProdukt.setRenderer(TradeFormTools.getRenderer(TradeFormTools.LONG));
@@ -223,7 +223,7 @@ public class DlgNewStocks extends MyJDialog {
 
         if (resident == null) {
             ovrBW.addOverlayComponent(attentionIconBW, DefaultOverlayable.SOUTH_WEST);
-            attentionIconBW.setToolTipText(OPDE.lang.getString("misc.msg.emptyselection"));
+            attentionIconBW.setToolTipText(SYSTools.xx("misc.msg.emptyselection"));
         } else {
             txtBWSuche.setEnabled(false);
             cmbBW.setModel(new DefaultComboBoxModel(new Resident[]{resident}));
@@ -523,7 +523,7 @@ public class DlgNewStocks extends MyJDialog {
             txtExpires.setText(null);
             txtMedSuche.requestFocus();
         } else {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("newstocks.registration.failed") + ": " + text, DisplayMessage.WARNING));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("newstocks.registration.failed") + ": " + text, DisplayMessage.WARNING));
         }
     }//GEN-LAST:event_btnApplyActionPerformed
 
@@ -577,7 +577,7 @@ public class DlgNewStocks extends MyJDialog {
             }
 
             // if the label printer is not used, the new number is shown until the next message, so the user has time to write the number down manually.
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("newstocks.registration.success.1") + " <b>" + newStock.getID() + "</b> " + OPDE.lang.getString("newstocks.registration.success.2"), btnPrint.isSelected() ? 2 : 0));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("newstocks.registration.success.1") + " <b>" + newStock.getID() + "</b> " + SYSTools.xx("newstocks.registration.success.2"), btnPrint.isSelected() ? 2 : 0));
         } catch (OptimisticLockException ole) { OPDE.warn(ole);
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();

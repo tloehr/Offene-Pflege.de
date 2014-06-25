@@ -26,6 +26,7 @@
  */
 package op.controlling;
 
+import java.awt.event.*;
 import com.jgoodies.forms.factories.CC;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.combobox.TreeComboBox;
@@ -37,8 +38,6 @@ import entity.Station;
 import entity.StationTools;
 import entity.qms.QmsTools;
 import entity.qms.Qmssched;
-import op.OPDE;
-import op.threads.DisplayMessage;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
@@ -99,13 +98,23 @@ public class PnlQMSSchedule extends JPanel {
         spinMonat.setValue(1);
     }
 
+    private void cmbTagItemStateChanged(ItemEvent e) {
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            if (cmbTag.getSelectedIndex() == 0){
+                spinMonatTag.setModel(new SpinnerNumberModel(1, 1, 31, 1));
+            } else {
+                spinMonatTag.setModel(new SpinnerNumberModel(1, 1, 5, 1));
+            }
+        }
+    }
+
 
     private void initPanel() {
 
-        tabWdh.setTitleAt(TAB_DAILY, OPDE.lang.getString("misc.msg.daily"));
-        tabWdh.setTitleAt(TAB_WEEKLY, OPDE.lang.getString("misc.msg.weekly"));
-        tabWdh.setTitleAt(TAB_MONTHLY, OPDE.lang.getString("misc.msg.monthly"));
-        tabWdh.setTitleAt(TAB_YEARLY, OPDE.lang.getString("misc.msg.yearly"));
+        tabWdh.setTitleAt(TAB_DAILY, SYSTools.xx("misc.msg.daily"));
+        tabWdh.setTitleAt(TAB_WEEKLY, SYSTools.xx("misc.msg.weekly"));
+        tabWdh.setTitleAt(TAB_MONTHLY, SYSTools.xx("misc.msg.monthly"));
+        tabWdh.setTitleAt(TAB_YEARLY, SYSTools.xx("misc.msg.yearly"));
 
         spinTaeglich.setModel(new SpinnerNumberModel(1, 1, 365, 1));
         spinWoche.setModel(new SpinnerNumberModel(1, 1, 52, 1));
@@ -117,6 +126,7 @@ public class PnlQMSSchedule extends JPanel {
         spinMonat.setValue(Math.max(qmssched.getMonthly(), 1));
         spinMonatTag.setValue(Math.max(qmssched.getDayinmonth(), 1));
 
+        cbMon.setSelected(true);
 
         if (qmssched.isDaily()) {
             tabWdh.setSelectedIndex(TAB_DAILY);
@@ -149,9 +159,9 @@ public class PnlQMSSchedule extends JPanel {
         txtBemerkung.setText(qmssched.getText());
         txtQMS.setText(qmssched.getMeasure());
 
-        lblMeasure.setText(OPDE.lang.getString("misc.msg.measure"));
-        lblLDate.setText(OPDE.lang.getString("opde.controlling.qms.dlgqmsplan.pnlschedule.startingon"));
-        lblLocation.setText(OPDE.lang.getString("opde.controlling.qms.dlgqmsplan.pnlschedule.location"));
+        lblMeasure.setText(SYSTools.xx("misc.msg.measure"));
+        lblLDate.setText(SYSTools.xx("opde.controlling.qms.dlgqmsplan.pnlschedule.startingon"));
+        lblLocation.setText(SYSTools.xx("opde.controlling.qms.dlgqmsplan.pnlschedule.location"));
 
         cmbLocation.setTreeModel(new DefaultTreeModel(StationTools.getCompleteStructure()));
 
@@ -511,6 +521,12 @@ public class PnlQMSSchedule extends JPanel {
                         "Sonntag"
                     }));
                     cmbTag.setFont(new Font("Arial", Font.PLAIN, 14));
+                    cmbTag.addItemListener(new ItemListener() {
+                        @Override
+                        public void itemStateChanged(ItemEvent e) {
+                            cmbTagItemStateChanged(e);
+                        }
+                    });
                     pnlMonthly.add(cmbTag, CC.xywh(7, 7, 3, 1));
                 }
                 tabWdh.addTab("Monatlich", pnlMonthly);
@@ -636,10 +652,15 @@ public class PnlQMSSchedule extends JPanel {
 
     public void save() throws NumberFormatException {
 
-        qmssched.setDaily(tabWdh.getSelectedIndex() == TAB_DAILY ? Byte.parseByte(spinTaeglich.getValue().toString()) : (byte) 0);
-        qmssched.setWeekly(tabWdh.getSelectedIndex() == TAB_WEEKLY ? Byte.parseByte(spinWoche.getValue().toString()) : (byte) 0);
-        qmssched.setMonthly(tabWdh.getSelectedIndex() == TAB_MONTHLY ? Byte.parseByte(spinMonat.getValue().toString()) : (byte) 0);
+        qmssched.setDaily(tabWdh.getSelectedIndex() == TAB_DAILY ? Byte.parseByte(spinTaeglich.getValue().toString()) :  0);
+        qmssched.setWeekly(tabWdh.getSelectedIndex() == TAB_WEEKLY ? Byte.parseByte(spinWoche.getValue().toString()) :  0);
+        qmssched.setMonthly(tabWdh.getSelectedIndex() == TAB_MONTHLY ? Byte.parseByte(spinMonat.getValue().toString()) :  0);
+        qmssched.setYearly(tabWdh.getSelectedIndex() == TAB_YEARLY ? Byte.parseByte(spinMonat.getValue().toString()) : 0);
         qmssched.setStartingOn(jdcStartingOn.getDate());
+
+        if (tabWdh.getSelectedIndex() == TAB_DAILY) {
+            qmssched.setWeekday(0);
+        }
 
         if (tabWdh.getSelectedIndex() == TAB_MONTHLY) {
             int b = Integer.parseInt(spinMonatTag.getValue().toString());
@@ -672,6 +693,8 @@ public class PnlQMSSchedule extends JPanel {
             qmssched.setStation(null);
         }
         cmbLocation.setEditable(false);
+
+        //todo: hier weiter gucken. irgendwie klappt das noch nciht
 
         QmsTools.generate(qmssched, 2);
 

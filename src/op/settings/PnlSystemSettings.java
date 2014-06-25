@@ -149,7 +149,7 @@ public class PnlSystemSettings extends CleanablePanel {
                 @Override
                 public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                     if (o == null)
-                        return new DefaultListCellRenderer().getListCellRendererComponent(jList, OPDE.lang.getString("misc.msg.error"), i, isSelected, cellHasFocus);
+                        return new DefaultListCellRenderer().getListCellRendererComponent(jList, SYSTools.xx("misc.msg.error"), i, isSelected, cellHasFocus);
                     return new DefaultListCellRenderer().getListCellRendererComponent(jList, ((PrintService) o).getName(), i, isSelected, cellHasFocus);
                 }
             });
@@ -158,7 +158,7 @@ public class PnlSystemSettings extends CleanablePanel {
                 @Override
                 public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                     if (o == null)
-                        return new DefaultListCellRenderer().getListCellRendererComponent(jList, OPDE.lang.getString("misc.msg.error"), i, isSelected, cellHasFocus);
+                        return new DefaultListCellRenderer().getListCellRendererComponent(jList, SYSTools.xx("misc.msg.error"), i, isSelected, cellHasFocus);
                     return new DefaultListCellRenderer().getListCellRendererComponent(jList, ((LogicalPrinter) o).getLabel(), i, isSelected, cellHasFocus);
                 }
             });
@@ -166,7 +166,7 @@ public class PnlSystemSettings extends CleanablePanel {
                 @Override
                 public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                     if (o == null)
-                        return new DefaultListCellRenderer().getListCellRendererComponent(jList, OPDE.lang.getString("misc.msg.error"), i, isSelected, cellHasFocus);
+                        return new DefaultListCellRenderer().getListCellRendererComponent(jList, SYSTools.xx("misc.msg.error"), i, isSelected, cellHasFocus);
                     return new DefaultListCellRenderer().getListCellRendererComponent(jList, ((PrinterForm) o).getLabel(), i, isSelected, cellHasFocus);
                 }
             });
@@ -264,8 +264,8 @@ public class PnlSystemSettings extends CleanablePanel {
         cmbLogicalPrinters.setEnabled(prservices != null);
         cmbPhysicalPrinters.setEnabled(prservices != null);
 
-        lblPrinters.setText(OPDE.lang.getString("opde.settings.local.labelPrinters"));
-        lblStation.setText(OPDE.lang.getString("opde.settings.local.station"));
+        lblPrinters.setText(SYSTools.xx("opde.settings.local.labelPrinters"));
+        lblStation.setText(SYSTools.xx("opde.settings.local.station"));
 
         cmbStation.setModel(StationTools.getAll4Combobox(false));
         cmbStation.setSelectedItem(StationTools.getStationForThisHost());
@@ -292,7 +292,7 @@ public class PnlSystemSettings extends CleanablePanel {
     }
 
     private void createICDImporter() {
-        btnImportICD.setText(OPDE.lang.getString("opde.settings.global.btnImportICD"));
+        btnImportICD.setText(SYSTools.xx("opde.settings.global.btnImportICD"));
         btnImportICD.setIcon(SYSConst.icon22ledRedOn);
         pnlICD.add(GUITools.getDropPanel(new FileDrop.Listener() {
             public void filesDropped(java.io.File[] files) {
@@ -322,12 +322,12 @@ public class PnlSystemSettings extends CleanablePanel {
                 }
 
             }
-        }, OPDE.lang.getString("opde.settings.global.dropICDHere")), CC.xy(1, 1));
+        }, SYSTools.xx("opde.settings.global.dropICDHere")), CC.xy(1, 1));
     }
 
 
     private void createMailSystem() {
-        btnTestmail.setText(OPDE.lang.getString("opde.settings.global.mail.btnTestmail"));
+        btnTestmail.setText(SYSTools.xx("opde.settings.global.mail.btnTestmail"));
 
         txtMailHost.setText(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_HOST)));
         txtMailPort.setText(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_PORT), "25"));
@@ -338,31 +338,31 @@ public class PnlSystemSettings extends CleanablePanel {
         txtMailSenderPersonal.setText(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_SENDER_PERSONAL)));
         txtMailRecipientPersonal.setText(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_RECIPIENT_PERSONAL)));
 
-        lblMailHost.setText(OPDE.lang.getString("opde.settings.global.mail.host"));
-        lblMailPort.setText(OPDE.lang.getString("opde.settings.global.mail.port"));
-        lblMailUser.setText(OPDE.lang.getString("opde.settings.global.mail.user"));
-        lblMailPassword.setText(OPDE.lang.getString("opde.settings.global.mail.password"));
-        lblMailSender.setText(OPDE.lang.getString("opde.settings.global.mail.sender"));
-        lblMailRecipient.setText(OPDE.lang.getString("opde.settings.global.mail.recipient"));
-        lblMailSenderPersonal.setText(OPDE.lang.getString("opde.settings.global.mail.sender.personal"));
-        lblMailRecipientPersonal.setText(OPDE.lang.getString("opde.settings.global.mail.recipient.personal"));
+        lblMailHost.setText(SYSTools.xx("opde.settings.global.mail.host"));
+        lblMailPort.setText(SYSTools.xx("opde.settings.global.mail.port"));
+        lblMailUser.setText(SYSTools.xx("opde.settings.global.mail.user"));
+        lblMailPassword.setText(SYSTools.xx("opde.settings.global.mail.password"));
+        lblMailSender.setText(SYSTools.xx("opde.settings.global.mail.sender"));
+        lblMailRecipient.setText(SYSTools.xx("opde.settings.global.mail.recipient"));
+        lblMailSenderPersonal.setText(SYSTools.xx("opde.settings.global.mail.sender.personal"));
+        lblMailRecipientPersonal.setText(SYSTools.xx("opde.settings.global.mail.recipient.personal"));
 
-        lblAuth.setText(OPDE.lang.getString("opde.settings.global.mail.auth"));
+        lblAuth.setText(SYSTools.xx("opde.settings.global.mail.auth"));
         tbauth = GUITools.getNiceToggleButton(null);
         tbauth.setSelected(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_AUTH)).equalsIgnoreCase("true"));
         pnlMail.add(tbauth, CC.xywh(3, 17, 1, 1, CC.LEFT, CC.DEFAULT));
 
-        lblStarttls.setText(OPDE.lang.getString("opde.settings.global.mail.starttls"));
+        lblStarttls.setText(SYSTools.xx("opde.settings.global.mail.starttls"));
         tbstarttls = GUITools.getNiceToggleButton(null);
         tbstarttls.setSelected(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_STARTTLS)).equalsIgnoreCase("true"));
         pnlMail.add(tbstarttls, CC.xywh(3, 19, 1, 1, CC.LEFT, CC.DEFAULT));
 
-        lblTLS.setText(OPDE.lang.getString("opde.settings.global.mail.tls"));
+        lblTLS.setText(SYSTools.xx("opde.settings.global.mail.tls"));
         tbtls = GUITools.getNiceToggleButton(null);
         tbtls.setSelected(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_TLS)).equalsIgnoreCase("true"));
         pnlMail.add(tbtls, CC.xywh(3, 21, 1, 1, CC.LEFT, CC.DEFAULT));
 
-        lblActive.setText(OPDE.lang.getString("opde.settings.global.mail.active"));
+        lblActive.setText(SYSTools.xx("opde.settings.global.mail.active"));
         tbactive = GUITools.getNiceToggleButton(null);
         tbactive.setSelected(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_SYSTEM_ACTIVE)).equalsIgnoreCase("true"));
         pnlMail.add(tbactive, CC.xywh(3, 25, 1, 1, CC.LEFT, CC.DEFAULT));
@@ -388,7 +388,7 @@ public class PnlSystemSettings extends CleanablePanel {
         cmbCountry.setRenderer(new ListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList jList, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                String text = OPDE.lang.getString("country." + value.toString());
+                String text = SYSTools.xx("country." + value.toString());
                 return new DefaultListCellRenderer().getListCellRendererComponent(jList, text, index, isSelected, cellHasFocus);
             }
         });
@@ -413,7 +413,7 @@ public class PnlSystemSettings extends CleanablePanel {
     }
 
     private void createCalcMed() {
-        lblCalcMed.setText(OPDE.lang.getString("opde.settings.global.calcmed"));
+        lblCalcMed.setText(SYSTools.xx("opde.settings.global.calcmed"));
         tbCalcMed = GUITools.getNiceToggleButton("opde.settings.global.tbCalcMed");
         tbCalcMed.setSelected(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_CALC_MEDI_UPR1)).equalsIgnoreCase("true"));
         pnlCalcMed.add(tbCalcMed, CC.xy(1, 1));
@@ -426,7 +426,7 @@ public class PnlSystemSettings extends CleanablePanel {
     }
 
     private void createFTPSystem() {
-        btnFTPTest.setText(OPDE.lang.getString("opde.settings.global.mail.btnFTPTest"));
+        btnFTPTest.setText(SYSTools.xx("opde.settings.global.mail.btnFTPTest"));
 
         txtFTPServer.setText(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_FTP_SERVER)));
         txtFTPPort.setText(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_FTP_PORT), "21"));
@@ -434,12 +434,12 @@ public class PnlSystemSettings extends CleanablePanel {
         txtFTPPassword.setText(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_FTP_PASSWORD)));
         txtFTPWorkingDir.setText(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_FTP_WD)));
 
-        lblFTP.setText(OPDE.lang.getString("opde.settings.global.ftp"));
-        lblFTPServer.setText(OPDE.lang.getString("opde.settings.global.ftp.server"));
-        lblFTPPort.setText(OPDE.lang.getString("opde.settings.global.ftp.port"));
-        lblFTPUser.setText(OPDE.lang.getString("opde.settings.global.ftp.user"));
-        lblFTPPassword.setText(OPDE.lang.getString("opde.settings.global.ftp.password"));
-        lblFTPWD.setText(OPDE.lang.getString("opde.settings.global.ftp.wd"));
+        lblFTP.setText(SYSTools.xx("opde.settings.global.ftp"));
+        lblFTPServer.setText(SYSTools.xx("opde.settings.global.ftp.server"));
+        lblFTPPort.setText(SYSTools.xx("opde.settings.global.ftp.port"));
+        lblFTPUser.setText(SYSTools.xx("opde.settings.global.ftp.user"));
+        lblFTPPassword.setText(SYSTools.xx("opde.settings.global.ftp.password"));
+        lblFTPWD.setText(SYSTools.xx("opde.settings.global.ftp.wd"));
 
     }
 
@@ -586,7 +586,7 @@ public class PnlSystemSettings extends CleanablePanel {
                     btnDeleteStation.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<br/><i>" + station.getName() + "</i><br/>" + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
+                            new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + station.getName() + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
                                 @Override
                                 public void execute(Object answer) {
                                     if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -689,7 +689,7 @@ public class PnlSystemSettings extends CleanablePanel {
                 btnDeleteHome.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        new DlgYesNo(OPDE.lang.getString("misc.questions.delete1") + "<br/><i>" + HomesTools.getAsText(home) + "</i><br/>" + OPDE.lang.getString("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
+                        new DlgYesNo(SYSTools.xx("misc.questions.delete1") + "<br/><i>" + HomesTools.getAsText(home) + "</i><br/>" + SYSTools.xx("misc.questions.delete2"), SYSConst.icon48delete, new Closure() {
                             @Override
                             public void execute(Object answer) {
                                 if (answer.equals(JOptionPane.YES_OPTION)) {
@@ -1347,14 +1347,14 @@ public class PnlSystemSettings extends CleanablePanel {
     }
 
     private void initPanel() {
-        OPDE.getDisplayManager().setMainMessage(OPDE.lang.getString(internalClassID));
+        OPDE.getDisplayManager().setMainMessage(SYSTools.xx(internalClassID));
         OPDE.getDisplayManager().clearAllIcons();
 
-        tabMain.setTitleAt(TAB_LOCAL, OPDE.lang.getString("opde.settings.local"));
-        tabMain.setTitleAt(TAB_GLOBAL, OPDE.lang.getString("opde.settings.global"));
+        tabMain.setTitleAt(TAB_LOCAL, SYSTools.xx("opde.settings.local"));
+        tabMain.setTitleAt(TAB_GLOBAL, SYSTools.xx("opde.settings.global"));
 
-        lblHomes.setText(OPDE.lang.getString("opde.settings.global.homes"));
-        lblCat.setText(OPDE.lang.getString("opde.settings.global.categories"));
+        lblHomes.setText(SYSTools.xx("opde.settings.global.homes"));
+        lblCat.setText(SYSTools.xx("opde.settings.global.categories"));
         tabMainStateChanged(null);
 
 

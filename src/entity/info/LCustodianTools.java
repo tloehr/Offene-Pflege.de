@@ -24,7 +24,7 @@ public class LCustodianTools {
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                 String text;
                 if (o == null) {
-                    text = OPDE.lang.getString("misc.commands.>>noselection<<");
+                    text = SYSTools.xx("misc.commands.>>noselection<<");
                 } else if (o instanceof LCustodian) {
 //                    text = ((LCustodian) o).getName() + ", " + ((LCustodian) o).getFirstname() + ", " + ((LCustodian) o).getCity();
                     text = getFullName((LCustodian) o);
@@ -40,7 +40,7 @@ public class LCustodianTools {
         if (lcustodian != null) {
             return SYSTools.anonymizeString(lcustodian.getAnrede() + " " + lcustodian.getVorname() + " " + lcustodian.getName());
         } else {
-            return OPDE.lang.getString("misc.msg.noentryyet");
+            return SYSTools.xx("misc.msg.noentryyet");
         }
     }
 

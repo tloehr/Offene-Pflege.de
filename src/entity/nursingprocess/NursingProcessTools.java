@@ -80,17 +80,17 @@ public class NursingProcessTools {
      * @return
      */
     public static String getAsHTML(NursingProcess np, boolean withHeader, boolean withDetails, boolean withIcon, boolean showAllEvals) {
-        String html = SYSConst.html_h2((withHeader ? OPDE.lang.getString(PnlNursingProcess.internalClassID) + " " + OPDE.lang.getString("misc.msg.for") + " (" + ResidentTools.getTextCompact(np.getResident()) + ")" : "") + "&nbsp;&raquo;" + np.getTopic() + "&laquo");
+        String html = SYSConst.html_h2((withHeader ? SYSTools.xx(PnlNursingProcess.internalClassID) + " " + SYSTools.xx("misc.msg.for") + " (" + ResidentTools.getTextCompact(np.getResident()) + ")" : "") + "&nbsp;&raquo;" + np.getTopic() + "&laquo");
 
         html += withIcon && np.isClosed() ? SYSConst.html_22x22_StopSign : "";
 
         html += "<div id=\"fonttext\">";
 
-        html += withHeader ? "<b>" + OPDE.lang.getString("misc.msg.category") + ":</b> " + np.getCategory().getText() + "<br/>" : "";
+        html += withHeader ? "<b>" + SYSTools.xx("misc.msg.category") + ":</b> " + np.getCategory().getText() + "<br/>" : "";
 
         DateFormat df = DateFormat.getDateInstance();
         if (!np.isClosed()) {
-            html += "<b>" + OPDE.lang.getString("nursingrecords.nursingprocess.pnleval.nextevaldate") + ":</b> " + df.format(np.getNextEval()) + "<br/>";
+            html += "<b>" + SYSTools.xx("nursingrecords.nursingprocess.pnleval.nextevaldate") + ":</b> " + df.format(np.getNextEval()) + "<br/>";
         }
 
         if (withDetails) {
@@ -112,12 +112,12 @@ public class NursingProcessTools {
         html += SYSConst.html_h3("nursingrecords.nursingprocess.interventions");
 
         if (np.getInterventionSchedule().isEmpty()) {
-            html += "<ul><li><b>" + OPDE.lang.getString("misc.msg.MissingInterventions") + " !!!</b></li></ul>";
+            html += "<ul><li><b>" + SYSTools.xx("misc.msg.MissingInterventions") + " !!!</b></li></ul>";
         } else {
             html += "<ul>";
             for (InterventionSchedule interventionSchedule : np.getInterventionSchedule()) {
                 html += "<li>";
-                html += "<div id=\"fonttext\"><b>" + interventionSchedule.getIntervention().getBezeichnung() + "</b> (" + interventionSchedule.getDauer().toPlainString() + " " + OPDE.lang.getString("misc.msg.Minutes") + ")</div>";
+                html += "<div id=\"fonttext\"><b>" + interventionSchedule.getIntervention().getBezeichnung() + "</b> (" + interventionSchedule.getDauer().toPlainString() + " " + SYSTools.xx("misc.msg.Minutes") + ")</div>";
                 html += InterventionScheduleTools.getTerminAsHTML(interventionSchedule);
                 html += "</li>";
             }
@@ -125,11 +125,11 @@ public class NursingProcessTools {
         }
 
 //        if (np.getFlag() > 0) {
-//            html += "<br/><b>" + OPDE.lang.getString("nursingrecords.nursingprocess.dlgplanung.lblFlag") + ":</b> " + FLAGS[np.getFlag()];
+//            html += "<br/><b>" + SYSTools.xx("nursingrecords.nursingprocess.dlgplanung.lblFlag") + ":</b> " + FLAGS[np.getFlag()];
 //        }
 
         if (!np.getEvaluations().isEmpty()) {
-            html += SYSConst.html_h3(OPDE.lang.getString("misc.msg.DateOfEvals"));
+            html += SYSConst.html_h3(SYSTools.xx("misc.msg.DateOfEvals"));
             html += "<ul>";
             int numEvals = 0;
             Collections.sort(np.getEvaluations());
@@ -137,7 +137,7 @@ public class NursingProcessTools {
                 numEvals++;
                 html += "<li><div id=\"fonttext\">" + NPControlTools.getAsHTML(npControl) + "</div></li>";
                 if (!showAllEvals && np.getEvaluations().size() > MAXNumOfEvals && numEvals >= MAXNumOfEvals) {
-                    html += "<li>" + SYSConst.html_italic((np.getEvaluations().size() - numEvals) + " " + OPDE.lang.getString("misc.msg.moreToShow")) + " </li>";
+                    html += "<li>" + SYSConst.html_italic((np.getEvaluations().size() - numEvals) + " " + SYSTools.xx("misc.msg.moreToShow")) + " </li>";
                     break;
                 }
             }

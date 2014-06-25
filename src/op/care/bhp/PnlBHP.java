@@ -163,7 +163,7 @@ public class PnlBHP extends NursingRecordsPanel {
         if (withworker) {
 
             OPDE.getMainframe().setBlocked(true);
-            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+            OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 
 
             synchronized (mapPrescription2Stock) {
@@ -198,7 +198,7 @@ public class PnlBHP extends NursingRecordsPanel {
                     try {
 
                         int progress = 0;
-                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), -1, 100));
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 
                         synchronized (mapShift2BHP) {
                             for (BHP bhp : BHPTools.getBHPs(resident, jdcDatum.getDate())) {
@@ -227,7 +227,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                     OPDE.debug(e);
                                 }
                                 progress += 20;
-                                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.wait"), progress, 100));
+                                OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, 100));
                             }
                         }
                     } catch (Exception exc) {
@@ -342,7 +342,7 @@ public class PnlBHP extends NursingRecordsPanel {
          *      \____|_|      |_|  \___/ \__,_|\__\___\___/|_| |_| |_|\___|
          *
          */
-        String title = "<html><font size=+1><b>" + OPDE.lang.getString("nursingrecords.prescription.dlgOnDemand.outcomeCheck") + "</b></font></html>";
+        String title = "<html><font size=+1><b>" + SYSTools.xx("nursingrecords.prescription.dlgOnDemand.outcomeCheck") + "</b></font></html>";
 
         final CollapsiblePane mainPane = new CollapsiblePane(title);
         mainPane.setSlidingDirection(SwingConstants.SOUTH);
@@ -381,7 +381,7 @@ public class PnlBHP extends NursingRecordsPanel {
          *      \___|_|  \___|\__,_|\__\___|\____|_|      |_|  \___/|_| |_|____/ \___|_| |_| |_|\__,_|_| |_|\__,_|
          *
          */
-        String title = "<html><font size=+1><b>" + OPDE.lang.getString("nursingrecords.bhp.ondemand") + "</b></font></html>";
+        String title = "<html><font size=+1><b>" + SYSTools.xx("nursingrecords.bhp.ondemand") + "</b></font></html>";
 
         final CollapsiblePane mainPane = new CollapsiblePane(title);
         mainPane.setSlidingDirection(SwingConstants.SOUTH);
@@ -452,7 +452,7 @@ public class PnlBHP extends NursingRecordsPanel {
 
             if (shift == BHPTools.SHIFT_EARLY) {
 
-                final CollapsiblePane morning = new CollapsiblePane("<html><font size=+1>" + OPDE.lang.getString("misc.msg.morning.long") + "</font></html>", null);
+                final CollapsiblePane morning = new CollapsiblePane("<html><font size=+1>" + SYSTools.xx("misc.msg.morning.long") + "</font></html>", null);
                 morning.setSlidingDirection(SwingConstants.SOUTH);
                 morning.setBackground(SYSCalendar.getBGSHIFT(shift).darker());
                 morning.setForeground(Color.white);
@@ -461,7 +461,7 @@ public class PnlBHP extends NursingRecordsPanel {
                 pnlMorning.setLayout(new VerticalLayout());
                 morning.setContentPane(pnlMorning);
 
-                final CollapsiblePane noon = new CollapsiblePane("<html><font size=+1>" + OPDE.lang.getString("misc.msg.noon.long") + "</font></html>", null);
+                final CollapsiblePane noon = new CollapsiblePane("<html><font size=+1>" + SYSTools.xx("misc.msg.noon.long") + "</font></html>", null);
                 noon.setSlidingDirection(SwingConstants.SOUTH);
                 noon.setBackground(SYSCalendar.getBGSHIFT(shift).darker());
                 noon.setForeground(Color.white);
@@ -470,7 +470,7 @@ public class PnlBHP extends NursingRecordsPanel {
                 pnlNoon.setLayout(new VerticalLayout());
                 noon.setContentPane(pnlNoon);
 
-                final CollapsiblePane clock = new CollapsiblePane("<html><font size=+1>" + OPDE.lang.getString("misc.msg.Time.long") + "</font></html>", null);
+                final CollapsiblePane clock = new CollapsiblePane("<html><font size=+1>" + SYSTools.xx("misc.msg.Time.long") + "</font></html>", null);
                 clock.setSlidingDirection(SwingConstants.SOUTH);
                 clock.setBackground(SYSCalendar.getBGSHIFT(shift).darker());
                 clock.setForeground(Color.white);
@@ -502,7 +502,7 @@ public class PnlBHP extends NursingRecordsPanel {
                 }
 
             } else if (shift == BHPTools.SHIFT_LATE) {
-                final CollapsiblePane afternoon = new CollapsiblePane("<html><font size=+1>" + OPDE.lang.getString("misc.msg.afternoon.long") + "</font></html>", null);
+                final CollapsiblePane afternoon = new CollapsiblePane("<html><font size=+1>" + SYSTools.xx("misc.msg.afternoon.long") + "</font></html>", null);
                 afternoon.setSlidingDirection(SwingConstants.SOUTH);
                 afternoon.setBackground(SYSCalendar.getBGSHIFT(shift).darker());
                 afternoon.setForeground(Color.white);
@@ -511,7 +511,7 @@ public class PnlBHP extends NursingRecordsPanel {
                 pnlAfternoon.setLayout(new VerticalLayout());
                 afternoon.setContentPane(pnlAfternoon);
 
-                final CollapsiblePane evening = new CollapsiblePane("<html><font size=+1>" + OPDE.lang.getString("misc.msg.evening.long") + "</font></html>", null);
+                final CollapsiblePane evening = new CollapsiblePane("<html><font size=+1>" + SYSTools.xx("misc.msg.evening.long") + "</font></html>", null);
                 evening.setSlidingDirection(SwingConstants.SOUTH);
                 evening.setBackground(SYSCalendar.getBGSHIFT(shift).darker());
                 evening.setForeground(Color.white);
@@ -520,7 +520,7 @@ public class PnlBHP extends NursingRecordsPanel {
                 pnlEvening.setLayout(new VerticalLayout());
                 evening.setContentPane(pnlEvening);
 
-                final CollapsiblePane clock = new CollapsiblePane("<html><font size=+1>" + OPDE.lang.getString("misc.msg.Time.long") + "</font></html>", null);
+                final CollapsiblePane clock = new CollapsiblePane("<html><font size=+1>" + SYSTools.xx("misc.msg.Time.long") + "</font></html>", null);
                 clock.setSlidingDirection(SwingConstants.SOUTH);
                 clock.setBackground(SYSCalendar.getBGSHIFT(shift).darker());
                 clock.setForeground(Color.white);
@@ -709,7 +709,7 @@ public class PnlBHP extends NursingRecordsPanel {
                     }
 
                 } else {
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.bhp.notchangeable")));
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("nursingrecords.bhp.notchangeable")));
                 }
             }
         };
@@ -795,7 +795,7 @@ public class PnlBHP extends NursingRecordsPanel {
                 JButton btnApply = new JButton(SYSConst.icon22apply);
                 btnApply.setPressedIcon(SYSConst.icon22applyPressed);
                 btnApply.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                btnApply.setToolTipText(OPDE.lang.getString("nursingrecords.bhp.btnApply.tooltip"));
+                btnApply.setToolTipText(SYSTools.xx("nursingrecords.bhp.btnApply.tooltip"));
                 btnApply.addActionListener(applyActionListener);
                 btnApply.setContentAreaFilled(false);
                 btnApply.setBorder(null);
@@ -817,7 +817,7 @@ public class PnlBHP extends NursingRecordsPanel {
                     btnOpenStock.setAlignmentX(Component.RIGHT_ALIGNMENT);
                     btnOpenStock.setContentAreaFilled(false);
                     btnOpenStock.setBorder(null);
-                    btnOpenStock.setToolTipText(SYSTools.toHTMLForScreen(OPDE.lang.getString("nursingrecords.inventory.stock.btnopen.tooltip")));
+                    btnOpenStock.setToolTipText(SYSTools.toHTMLForScreen(SYSTools.xx("nursingrecords.inventory.stock.btnopen.tooltip")));
                     btnOpenStock.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent actionEvent) {
@@ -835,7 +835,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 em.lock(myStock, LockModeType.OPTIMISTIC);
                                 em.getTransaction().commit();
 
-                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(String.format(OPDE.lang.getString("newstocks.stock.has.been.opened"), myStock.getID().toString())));
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(String.format(SYSTools.xx("newstocks.stock.has.been.opened"), myStock.getID().toString())));
                                 reload();
 
                             } catch (OptimisticLockException ole) {
@@ -879,7 +879,7 @@ public class PnlBHP extends NursingRecordsPanel {
                     btnRefuse.setAlignmentX(Component.RIGHT_ALIGNMENT);
                     btnRefuse.setContentAreaFilled(false);
                     btnRefuse.setBorder(null);
-                    btnRefuse.setToolTipText(SYSTools.toHTMLForScreen(OPDE.lang.getString("nursingrecords.bhp.btnRefuse.tooltip")));
+                    btnRefuse.setToolTipText(SYSTools.toHTMLForScreen(SYSTools.xx("nursingrecords.bhp.btnRefuse.tooltip")));
                     btnRefuse.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent actionEvent) {
@@ -937,7 +937,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 }
 
                             } else {
-                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.bhp.notchangeable")));
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("nursingrecords.bhp.notchangeable")));
                             }
                         }
                     });
@@ -957,7 +957,7 @@ public class PnlBHP extends NursingRecordsPanel {
                     btnRefuseDiscard.setAlignmentX(Component.RIGHT_ALIGNMENT);
                     btnRefuseDiscard.setContentAreaFilled(false);
                     btnRefuseDiscard.setBorder(null);
-                    btnRefuseDiscard.setToolTipText(SYSTools.toHTMLForScreen(OPDE.lang.getString("nursingrecords.bhp.btnRefuseDiscard.tooltip")));
+                    btnRefuseDiscard.setToolTipText(SYSTools.toHTMLForScreen(SYSTools.xx("nursingrecords.bhp.btnRefuseDiscard.tooltip")));
                     btnRefuseDiscard.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent actionEvent) {
@@ -1024,7 +1024,7 @@ public class PnlBHP extends NursingRecordsPanel {
                                 }
 
                             } else {
-                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.bhp.notchangeable")));
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("nursingrecords.bhp.notchangeable")));
                             }
                         }
                     });
@@ -1046,7 +1046,7 @@ public class PnlBHP extends NursingRecordsPanel {
                 btnEmpty.setAlignmentX(Component.RIGHT_ALIGNMENT);
                 btnEmpty.setContentAreaFilled(false);
                 btnEmpty.setBorder(null);
-                btnEmpty.setToolTipText(OPDE.lang.getString("nursingrecords.bhp.btnEmpty.tooltip"));
+                btnEmpty.setToolTipText(SYSTools.xx("nursingrecords.bhp.btnEmpty.tooltip"));
                 btnEmpty.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
@@ -1139,7 +1139,7 @@ public class PnlBHP extends NursingRecordsPanel {
                             }
 
                         } else {
-                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("nursingrecords.bhp.notchangeable")));
+                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(SYSTools.xx("nursingrecords.bhp.notchangeable")));
                         }
                     }
                 });
@@ -1162,7 +1162,7 @@ public class PnlBHP extends NursingRecordsPanel {
             btnInfo.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnInfo.setContentAreaFilled(false);
             btnInfo.setBorder(null);
-            btnInfo.setToolTipText(OPDE.lang.getString("nursingrecords.bhp.btnInfo.tooltip"));
+            btnInfo.setToolTipText(SYSTools.xx("nursingrecords.bhp.btnInfo.tooltip"));
             final JTextPane txt = new JTextPane();
             txt.setContentType("text/html");
             txt.setEditable(false);
@@ -1266,7 +1266,7 @@ public class PnlBHP extends NursingRecordsPanel {
         mypanel.setLayout(new VerticalLayout());
         mypanel.setBackground(Color.WHITE);
 
-        CollapsiblePane searchPane = new CollapsiblePane(OPDE.lang.getString(internalClassID));
+        CollapsiblePane searchPane = new CollapsiblePane(SYSTools.xx(internalClassID));
         searchPane.setStyle(CollapsiblePane.PLAIN_STYLE);
         searchPane.setCollapsible(false);
 
@@ -1289,11 +1289,11 @@ public class PnlBHP extends NursingRecordsPanel {
     private java.util.List<Component> addKey() {
         java.util.List<Component> list = new ArrayList<Component>();
         list.add(new JSeparator());
-        list.add(new JLabel(OPDE.lang.getString("misc.msg.key")));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.bhp.keydescription3"), SYSConst.icon22stopSign, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.bhp.keydescription1"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.bhp.keydescription2"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
-        list.add(new JLabel(OPDE.lang.getString("nursingrecords.bhp.keydescription4"), SYSConst.icon22ledOrangeOn, SwingConstants.LEADING));
+        list.add(new JLabel(SYSTools.xx("misc.msg.key")));
+        list.add(new JLabel(SYSTools.xx("nursingrecords.bhp.keydescription3"), SYSConst.icon22stopSign, SwingConstants.LEADING));
+        list.add(new JLabel(SYSTools.xx("nursingrecords.bhp.keydescription1"), SYSConst.icon22ledYellowOn, SwingConstants.LEADING));
+        list.add(new JLabel(SYSTools.xx("nursingrecords.bhp.keydescription2"), SYSConst.icon22ledRedOn, SwingConstants.LEADING));
+        list.add(new JLabel(SYSTools.xx("nursingrecords.bhp.keydescription4"), SYSConst.icon22ledOrangeOn, SwingConstants.LEADING));
         return list;
     }
 
@@ -1415,7 +1415,7 @@ public class PnlBHP extends NursingRecordsPanel {
 
                 synchronized (mapShift2BHP) {
                     html += "<h1 id=\"fonth1\" >" + ResidentTools.getFullName(resident) + "</h1>";
-                    html += SYSConst.html_h2(OPDE.lang.getString("nursingrecords.bhp") + ": " + SYSConst.html_bold(DateFormat.getDateInstance().format(jdcDatum.getDate())));
+                    html += SYSConst.html_h2(SYSTools.xx("nursingrecords.bhp") + ": " + SYSConst.html_bold(DateFormat.getDateInstance().format(jdcDatum.getDate())));
 
                     for (Byte shift : new Byte[]{BHPTools.SHIFT_ON_DEMAND, BHPTools.SHIFT_VERY_EARLY, BHPTools.SHIFT_EARLY, BHPTools.SHIFT_LATE, BHPTools.SHIFT_VERY_LATE}) {
                         if (mapShift2BHP.containsKey(shift)) {

@@ -11,6 +11,7 @@ import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.GUITools;
 import op.tools.MyJDialog;
+import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 
 import javax.persistence.EntityManager;
@@ -47,8 +48,8 @@ public class DlgGroup extends MyJDialog {
         txtGID.setEnabled(group.getGID() == null);
         txtGID.setText(group.getGID());
 
-        lblGID.setText(OPDE.lang.getString(internalClassID + ".gid"));
-        lblText.setText(OPDE.lang.getString(internalClassID + ".text"));
+        lblGID.setText(SYSTools.xx(internalClassID + ".gid"));
+        lblText.setText(SYSTools.xx(internalClassID + ".text"));
         getContentPane().add(tbQualified, CC.xyw(3, 7, 3, CC.LEFT, CC.DEFAULT));
 
     }

@@ -358,7 +358,7 @@ public class SYSPrint {
 //            text += "</head><body>" + SYSTools.htmlUmlautConversion(html)
 //                    + "<hr/>" +
 //                    "<div font=\"fonttext\">" +
-//                    "<b>"+OPDE.lang.getString("misc.msg.endofreport")+"</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getFullname()) : "")
+//                    "<b>"+SYSTools.xx("misc.msg.endofreport")+"</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getFullname()) : "")
 //                    + "<br/>" + DateFormat.getDateTimeInstance().format(new Date())
 //                    + "<br/>http://www.offene-pflege.de</div></body></html>";
 //

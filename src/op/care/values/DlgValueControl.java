@@ -52,37 +52,37 @@ public class DlgValueControl extends MyJDialog {
     private void initDialog() {
 
 
-        String tooltip = OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.tx.tooltip").replace('[', '<').replace(']', '>');
+        String tooltip = SYSTools.xx("nursingrecords.vitalparameters.DlgValueControl.tx.tooltip").replace('[', '<').replace(']', '>');
         lblTX.setToolTipText(SYSTools.toHTMLForScreen("<p style=\"width:300px;\">" + tooltip + "</p>"));
-        tooltip = OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.tx.hiloin.tooltip").replace('[', '<').replace(']', '>');
+        tooltip = SYSTools.xx("nursingrecords.vitalparameters.DlgValueControl.tx.hiloin.tooltip").replace('[', '<').replace(']', '>');
         lblTX2.setToolTipText(SYSTools.toHTMLForScreen("<p style=\"width:300px;\">" + tooltip + "</p>"));
         lblTX3.setToolTipText(SYSTools.toHTMLForScreen("<p style=\"width:300px;\">" + tooltip + "</p>"));
 
-        tbStool = GUITools.getNiceToggleButton(OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.tbStool.tooltip"));
+        tbStool = GUITools.getNiceToggleButton(SYSTools.xx("nursingrecords.vitalparameters.DlgValueControl.tbStool.tooltip"));
         tbStool.setFont(SYSConst.ARIAL14BOLD);
         tbStool.setHorizontalAlignment(SwingConstants.LEFT);
         panel1.add(tbStool, CC.xyw(3, 3, 2));
 
-        tbBalance = GUITools.getNiceToggleButton(OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.tbBalance.tooltip"));
+        tbBalance = GUITools.getNiceToggleButton(SYSTools.xx("nursingrecords.vitalparameters.DlgValueControl.tbBalance.tooltip"));
         tbBalance.setHorizontalAlignment(SwingConstants.LEFT);
         tbBalance.setFont(SYSConst.ARIAL14BOLD);
         panel1.add(tbBalance, CC.xy(3, 11));
 
-        tbLowIn = GUITools.getNiceToggleButton(OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.tbLowIn.tooltip"));
+        tbLowIn = GUITools.getNiceToggleButton(SYSTools.xx("nursingrecords.vitalparameters.DlgValueControl.tbLowIn.tooltip"));
         tbLowIn.setHorizontalAlignment(SwingConstants.LEFT);
         tbLowIn.setFont(SYSConst.ARIAL14BOLD);
         panel1.add(tbLowIn, CC.xyw(3, 13, 2));
 
-        tbHighIn = GUITools.getNiceToggleButton(OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.tbHighIn.tooltip"));
+        tbHighIn = GUITools.getNiceToggleButton(SYSTools.xx("nursingrecords.vitalparameters.DlgValueControl.tbHighIn.tooltip"));
         tbHighIn.setHorizontalAlignment(SwingConstants.LEFT);
         tbHighIn.setFont(SYSConst.ARIAL14BOLD);
         panel1.add(tbHighIn, CC.xyw(3, 15, 2));
 
-        lblDaysDrink.setText(OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.lblDaysDrink.tooltip"));
-        lblDayStool.setText(OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.lblDayStool.tooltip"));
-        lblMin.setText(OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.lblMin.tooltip"));
-        lblMax.setText(OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.lblMax.tooltip"));
-        lblTarget.setText(OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.lblTarget.tooltip"));
+        lblDaysDrink.setText(SYSTools.xx("nursingrecords.vitalparameters.DlgValueControl.lblDaysDrink.tooltip"));
+        lblDayStool.setText(SYSTools.xx("nursingrecords.vitalparameters.DlgValueControl.lblDayStool.tooltip"));
+        lblMin.setText(SYSTools.xx("nursingrecords.vitalparameters.DlgValueControl.lblMin.tooltip"));
+        lblMax.setText(SYSTools.xx("nursingrecords.vitalparameters.DlgValueControl.lblMax.tooltip"));
+        lblTarget.setText(SYSTools.xx("nursingrecords.vitalparameters.DlgValueControl.lblTarget.tooltip"));
 
         tbStool.setSelected(props.containsKey(ResidentTools.KEY_STOOLDAYS) && !props.getProperty(ResidentTools.KEY_STOOLDAYS).equals("off"));
         tbBalance.setSelected(props.containsKey(ResidentTools.KEY_BALANCE) && !props.getProperty(ResidentTools.KEY_BALANCE).equals("off"));
@@ -167,12 +167,12 @@ public class DlgValueControl extends MyJDialog {
         boolean sanityOK = aLESSERb(lowin, targetin) && aLESSERb(lowin, highin) && aLESSERb(targetin, highin) && isGreaterZero(lowin) && isGreaterZero(highin) && isGreaterZero(targetin);
 
         String reason = "";
-        reason += (stoolOK ? "" : OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.stoolXX"));
-        reason += (highinOK ? "" : OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.highinXX"));
-        reason += (lowinOK ? "" : OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.lowinXX"));
-        reason += (daysOK ? "" : OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.daysdrinkXX"));
-        reason += (sanityOK ? "" : OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.sanityXX"));
-        reason += (targetinOK ? "" : OPDE.lang.getString("nursingrecords.vitalparameters.DlgValueControl.targetinXX"));
+        reason += (stoolOK ? "" : SYSTools.xx("nursingrecords.vitalparameters.DlgValueControl.stoolXX"));
+        reason += (highinOK ? "" : SYSTools.xx("nursingrecords.vitalparameters.DlgValueControl.highinXX"));
+        reason += (lowinOK ? "" : SYSTools.xx("nursingrecords.vitalparameters.DlgValueControl.lowinXX"));
+        reason += (daysOK ? "" : SYSTools.xx("nursingrecords.vitalparameters.DlgValueControl.daysdrinkXX"));
+        reason += (sanityOK ? "" : SYSTools.xx("nursingrecords.vitalparameters.DlgValueControl.sanityXX"));
+        reason += (targetinOK ? "" : SYSTools.xx("nursingrecords.vitalparameters.DlgValueControl.targetinXX"));
 
         if (!reason.isEmpty()) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage(reason, DisplayMessage.WARNING));

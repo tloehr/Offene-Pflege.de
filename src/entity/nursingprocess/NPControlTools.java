@@ -2,6 +2,7 @@ package entity.nursingprocess;
 
 import op.OPDE;
 import op.care.nursingprocess.PnlNursingProcess;
+import op.tools.SYSTools;
 
 import java.text.DateFormat;
 
@@ -21,7 +22,7 @@ public class NPControlTools {
 //        result += "<p><b>Durchgeführt von:</b> " + kontrolle.getUser().getFullname() + "</p>";
 //        result += "<p><b>Ergebnis:</b> " + kontrolle.getText() + "</p>";
         if (npcontrol.isLastValidation()) {
-            result += "<br/><b>"+ OPDE.lang.getString(PnlNursingProcess.internalClassID+".isClosedAfterThisNPControl")+"</b>";
+            result += "<br/><b>"+ SYSTools.xx(PnlNursingProcess.internalClassID + ".isClosedAfterThisNPControl")+"</b>";
         }
 
         return result;

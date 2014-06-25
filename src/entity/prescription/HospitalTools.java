@@ -21,7 +21,7 @@ public class HospitalTools {
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                 String text;
                 if (o == null) {
-                    text = OPDE.lang.getString("misc.commands.>>noselection<<");
+                    text = SYSTools.xx("misc.commands.>>noselection<<");
                 } else if (o instanceof Hospital) {
                     text = ((Hospital) o).getName() + ", " + ((Hospital) o).getCity();
                 } else {
@@ -38,13 +38,13 @@ public class HospitalTools {
 
 
         if (OPDE.isAnonym()) {
-                         return "[" + OPDE.lang.getString("misc.msg.anon") + "]";
+                         return "[" + SYSTools.xx("misc.msg.anon") + "]";
                     }
 
         String string = kh.getName() + SYSTools.catchNull(kh.getCity(), ", ", "");
-//        string += SYSTools.catchNull(kh.getTel(), OPDE.lang.getString("misc.msg.phone") + ": ", " ") + SYSTools.catchNull(kh.getFax(), OPDE.lang.getString("misc.msg.fax") + ": ", " ");
+//        string += SYSTools.catchNull(kh.getTel(), SYSTools.xx("misc.msg.phone") + ": ", " ") + SYSTools.catchNull(kh.getFax(), SYSTools.xx("misc.msg.fax") + ": ", " ");
 //        String string = kh.getName() + ", " + SYSTools.catchNull(kh.getStreet(), "", ", ") + SYSTools.catchNull(kh.getZIP(), "", " ") + SYSTools.catchNull(kh.getCity(), "", ", ");
-//        string += SYSTools.catchNull(kh.getTel(), OPDE.lang.getString("misc.msg.phone") + ": ", " ") + SYSTools.catchNull(kh.getFax(), OPDE.lang.getString("misc.msg.fax") + ": ", " ");
+//        string += SYSTools.catchNull(kh.getTel(), SYSTools.xx("misc.msg.phone") + ": ", " ") + SYSTools.catchNull(kh.getFax(), SYSTools.xx("misc.msg.fax") + ": ", " ");
         return string;
     }
 }

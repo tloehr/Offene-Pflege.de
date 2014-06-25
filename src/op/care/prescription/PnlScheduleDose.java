@@ -112,7 +112,7 @@ public class PnlScheduleDose extends CleanablePanel {
 
     private void cmbUhrzeitItemStateChanged(ItemEvent e) {
 //        currentSelectedTime = (Date) e.getItem();
-        lblTimeDose.setText(OPDE.lang.getString(internalClassID + ".lblTimeDose") + " " + DateFormat.getTimeInstance(DateFormat.SHORT).format(e.getItem()) + " " + OPDE.lang.getString("misc.msg.Time.short"));
+        lblTimeDose.setText(SYSTools.xx(internalClassID + ".lblTimeDose") + " " + DateFormat.getTimeInstance(DateFormat.SHORT).format(e.getItem()) + " " + SYSTools.xx("misc.msg.Time.short"));
     }
 
     private void btnJedenTagActionPerformed(ActionEvent e) {
@@ -178,41 +178,41 @@ public class PnlScheduleDose extends CleanablePanel {
 
     private void initPanel() {
 
-        tabWdh.setTitleAt(0, OPDE.lang.getString("misc.msg.daily"));
-        tabWdh.setTitleAt(1, OPDE.lang.getString("misc.msg.weekly"));
-        tabWdh.setTitleAt(2, OPDE.lang.getString("misc.msg.monthly"));
+        tabWdh.setTitleAt(0, SYSTools.xx("misc.msg.daily"));
+        tabWdh.setTitleAt(1, SYSTools.xx("misc.msg.weekly"));
+        tabWdh.setTitleAt(2, SYSTools.xx("misc.msg.monthly"));
 
-        lblLDate.setText(OPDE.lang.getString(internalClassID + ".lblLDate") + " ");
-        lblOnThe.setText(OPDE.lang.getString(internalClassID + ".lblOnThe"));
-        lblMonth.setText(OPDE.lang.getString("misc.msg.months"));
-        lblEach.setText(OPDE.lang.getString("misc.msg.every"));
-        lblEvery1.setText(OPDE.lang.getString("misc.msg.every"));
-        lblEvery2.setText(OPDE.lang.getString("misc.msg.every"));
-        lblWeeksAt.setText(OPDE.lang.getString("misc.msg.weeks") + " " + OPDE.lang.getString("misc.msg.atchrono"));
-        lblDays.setText(OPDE.lang.getString("misc.msg.Days2"));
+        lblLDate.setText(SYSTools.xx(internalClassID + ".lblLDate") + " ");
+        lblOnThe.setText(SYSTools.xx(internalClassID + ".lblOnThe"));
+        lblMonth.setText(SYSTools.xx("misc.msg.months"));
+        lblEach.setText(SYSTools.xx("misc.msg.every"));
+        lblEvery1.setText(SYSTools.xx("misc.msg.every"));
+        lblEvery2.setText(SYSTools.xx("misc.msg.every"));
+        lblWeeksAt.setText(SYSTools.xx("misc.msg.weeks") + " " + SYSTools.xx("misc.msg.atchrono"));
+        lblDays.setText(SYSTools.xx("misc.msg.Days2"));
 
         ArrayList<Date> timelist = SYSCalendar.getTimeList();
         cmbUhrzeit.setModel(new DefaultComboBoxModel(timelist.toArray()));
         cmbUhrzeit.setRenderer(SYSCalendar.getTimeRenderer());
 
-        String[] wdaymodel = new String[]{OPDE.lang.getString("misc.msg.dayOfMonth"), OPDE.lang.getString("misc.msg.monday"), OPDE.lang.getString("misc.msg.tuesday"), OPDE.lang.getString("misc.msg.wednesday"),
-                OPDE.lang.getString("misc.msg.thursday"), OPDE.lang.getString("misc.msg.friday"), OPDE.lang.getString("misc.msg.saturday"), OPDE.lang.getString("misc.msg.sunday")};
+        String[] wdaymodel = new String[]{SYSTools.xx("misc.msg.dayOfMonth"), SYSTools.xx("misc.msg.monday"), SYSTools.xx("misc.msg.tuesday"), SYSTools.xx("misc.msg.wednesday"),
+                SYSTools.xx("misc.msg.thursday"), SYSTools.xx("misc.msg.friday"), SYSTools.xx("misc.msg.saturday"), SYSTools.xx("misc.msg.sunday")};
         cmbWDay.setModel(new DefaultComboBoxModel(wdaymodel));
 
-        lblMon.setText(OPDE.lang.getString("misc.msg.monday"));
-        lblTue.setText(OPDE.lang.getString("misc.msg.tuesday"));
-        lblWed.setText(OPDE.lang.getString("misc.msg.wednesday"));
-        lblThu.setText(OPDE.lang.getString("misc.msg.thursday"));
-        lblFri.setText(OPDE.lang.getString("misc.msg.friday"));
-        lblSat.setText(OPDE.lang.getString("misc.msg.saturday"));
-        lblSun.setText(OPDE.lang.getString("misc.msg.sunday"));
+        lblMon.setText(SYSTools.xx("misc.msg.monday"));
+        lblTue.setText(SYSTools.xx("misc.msg.tuesday"));
+        lblWed.setText(SYSTools.xx("misc.msg.wednesday"));
+        lblThu.setText(SYSTools.xx("misc.msg.thursday"));
+        lblFri.setText(SYSTools.xx("misc.msg.friday"));
+        lblSat.setText(SYSTools.xx("misc.msg.saturday"));
+        lblSun.setText(SYSTools.xx("misc.msg.sunday"));
 
-        lblVeryEarly.setText(OPDE.lang.getString("misc.msg.earlyinthemorning.long"));
-        lblMorning.setText(OPDE.lang.getString("misc.msg.morning.long"));
-        lblNoon.setText(OPDE.lang.getString("misc.msg.noon.long"));
-        lblAfternoon.setText(OPDE.lang.getString("misc.msg.afternoon.long"));
-        lblEvening.setText(OPDE.lang.getString("misc.msg.evening.long"));
-        lblVeryLate.setText(OPDE.lang.getString("misc.msg.lateatnight.long"));
+        lblVeryEarly.setText(SYSTools.xx("misc.msg.earlyinthemorning.long"));
+        lblMorning.setText(SYSTools.xx("misc.msg.morning.long"));
+        lblNoon.setText(SYSTools.xx("misc.msg.noon.long"));
+        lblAfternoon.setText(SYSTools.xx("misc.msg.afternoon.long"));
+        lblEvening.setText(SYSTools.xx("misc.msg.evening.long"));
+        lblVeryLate.setText(SYSTools.xx("misc.msg.lateatnight.long"));
 
         txtEveryDay.setText("1");
         txtEveryWeek.setText("1");
@@ -306,7 +306,7 @@ public class PnlScheduleDose extends CleanablePanel {
             }
         }
         cmbUhrzeit.setSelectedItem(now);
-        lblTimeDose.setText(OPDE.lang.getString(internalClassID + ".lblTimeDose") + " " + DateFormat.getTimeInstance(DateFormat.SHORT).format(now) + " " + OPDE.lang.getString("misc.msg.Time.short"));
+        lblTimeDose.setText(SYSTools.xx(internalClassID + ".lblTimeDose") + " " + DateFormat.getTimeInstance(DateFormat.SHORT).format(now) + " " + SYSTools.xx("misc.msg.Time.short"));
 
         panelMainComponentResized(null);
     }

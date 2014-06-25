@@ -36,7 +36,7 @@ public class ResInfoCategoryTools {
             public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected, boolean cellHasFocus) {
                 String text;
                 if (o == null) {
-                    text = SYSTools.toHTML(OPDE.lang.getString("misc.commands.>>noselection<<"));
+                    text = SYSTools.toHTML(SYSTools.xx("misc.commands.>>noselection<<"));
                 } else {
                     int type = (Integer) o;
                     switch (type) {
@@ -44,7 +44,7 @@ public class ResInfoCategoryTools {
 
                         }
                         default: {
-                            text = OPDE.lang.getString("misc.msg.error");
+                            text = SYSTools.xx("misc.msg.error");
                         }
                     }
 

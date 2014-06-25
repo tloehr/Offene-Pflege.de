@@ -59,27 +59,27 @@ public class PrescriptionScheduleTools {
 
         if (schedule.isDaily()) {
             if (schedule.getTaeglich() > 1) {
-                result += "<b>" + OPDE.lang.getString("misc.msg.every") + " " + schedule.getTaeglich() + " " + OPDE.lang.getString("misc.msg.Days2") + "</b>";
+                result += "<b>" + SYSTools.xx("misc.msg.every") + " " + schedule.getTaeglich() + " " + SYSTools.xx("misc.msg.Days2") + "</b>";
             } else if (writeTaeglich) {
-                result += "<b>" + OPDE.lang.getString("misc.msg.daily") + "</b>";
+                result += "<b>" + SYSTools.xx("misc.msg.daily") + "</b>";
             }
         } else if (schedule.isWeekly()) {
             result += "<b>";
             if (schedule.getWoechentlich() == 1) {
-                result += OPDE.lang.getString("misc.msg.everyWeek") + " ";
+                result += SYSTools.xx("misc.msg.everyWeek") + " ";
             } else {
-                result += OPDE.lang.getString("misc.msg.every") + " " + schedule.getWoechentlich() + " " + OPDE.lang.getString("misc.msg.weeks") + " ";
+                result += SYSTools.xx("misc.msg.every") + " " + schedule.getWoechentlich() + " " + SYSTools.xx("misc.msg.weeks") + " ";
             }
 
             String daylist = "";
 
-            daylist += (schedule.getMon() > 0 ? OPDE.lang.getString("misc.msg.monday").substring(0, 3) + ", " : "");
-            daylist += (schedule.getTue() > 0 ? OPDE.lang.getString("misc.msg.tuesday").substring(0, 3) + ", " : "");
-            daylist += (schedule.getWed() > 0 ? OPDE.lang.getString("misc.msg.wednesday").substring(0, 3) + ", " : "");
-            daylist += (schedule.getThu() > 0 ? OPDE.lang.getString("misc.msg.thursday").substring(0, 3) + ", " : "");
-            daylist += (schedule.getFri() > 0 ? OPDE.lang.getString("misc.msg.friday").substring(0, 3) + ", " : "");
-            daylist += (schedule.getSat() > 0 ? OPDE.lang.getString("misc.msg.saturday").substring(0, 3) + ", " : "");
-            daylist += (schedule.getSun() > 0 ? OPDE.lang.getString("misc.msg.sunday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getMon() > 0 ? SYSTools.xx("misc.msg.monday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getTue() > 0 ? SYSTools.xx("misc.msg.tuesday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getWed() > 0 ? SYSTools.xx("misc.msg.wednesday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getThu() > 0 ? SYSTools.xx("misc.msg.thursday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getFri() > 0 ? SYSTools.xx("misc.msg.friday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getSat() > 0 ? SYSTools.xx("misc.msg.saturday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getSun() > 0 ? SYSTools.xx("misc.msg.sunday").substring(0, 3) + ", " : "");
 
             if (!daylist.isEmpty()) {
                 result += "{" + daylist.substring(0, daylist.length() - 2) + "}";
@@ -89,25 +89,25 @@ public class PrescriptionScheduleTools {
         } else if (schedule.isMonthly()) {
             result += "<b>";
             if (schedule.getMonatlich() == 1) {
-                result += OPDE.lang.getString("misc.msg.everyMonth") + " ";
+                result += SYSTools.xx("misc.msg.everyMonth") + " ";
             } else {
-                result += OPDE.lang.getString("misc.msg.every") + " " + schedule.getMonatlich() + " " + OPDE.lang.getString("misc.msg.months") + " ";
+                result += SYSTools.xx("misc.msg.every") + " " + schedule.getMonatlich() + " " + SYSTools.xx("misc.msg.months") + " ";
             }
 
             if (schedule.getTagNum() > 0) {
-                result += OPDE.lang.getString("misc.msg.atchrono") + " " + schedule.getTagNum() + ". " + OPDE.lang.getString("misc.msg.ofTheMonth");
+                result += SYSTools.xx("misc.msg.atchrono") + " " + schedule.getTagNum() + ". " + SYSTools.xx("misc.msg.ofTheMonth");
             } else {
                 int wtag = 0;
                 String tag = "";
 
                 // In diesem fall kann immer nur ein Wochentag >0 sein. Daher klappt das so.
-                tag += (schedule.getMon() > 0 ? OPDE.lang.getString("misc.msg.monday") : "");
-                tag += (schedule.getTue() > 0 ? OPDE.lang.getString("misc.msg.tuesday") : "");
-                tag += (schedule.getWed() > 0 ? OPDE.lang.getString("misc.msg.wednesday") : "");
-                tag += (schedule.getThu() > 0 ? OPDE.lang.getString("misc.msg.thursday") : "");
-                tag += (schedule.getFri() > 0 ? OPDE.lang.getString("misc.msg.friday") : "");
-                tag += (schedule.getSat() > 0 ? OPDE.lang.getString("misc.msg.saturday") : "");
-                tag += (schedule.getSun() > 0 ? OPDE.lang.getString("misc.msg.sunday") : "");
+                tag += (schedule.getMon() > 0 ? SYSTools.xx("misc.msg.monday") : "");
+                tag += (schedule.getTue() > 0 ? SYSTools.xx("misc.msg.tuesday") : "");
+                tag += (schedule.getWed() > 0 ? SYSTools.xx("misc.msg.wednesday") : "");
+                tag += (schedule.getThu() > 0 ? SYSTools.xx("misc.msg.thursday") : "");
+                tag += (schedule.getFri() > 0 ? SYSTools.xx("misc.msg.friday") : "");
+                tag += (schedule.getSat() > 0 ? SYSTools.xx("misc.msg.saturday") : "");
+                tag += (schedule.getSun() > 0 ? SYSTools.xx("misc.msg.sunday") : "");
 
                 wtag += schedule.getMon();
                 wtag += schedule.getTue();
@@ -117,7 +117,7 @@ public class PrescriptionScheduleTools {
                 wtag += schedule.getSat();
                 wtag += schedule.getSun();
 
-                result += OPDE.lang.getString("misc.msg.atchrono") + " " + wtag + ". " + tag + " " + OPDE.lang.getString("misc.msg.ofTheMonth");
+                result += SYSTools.xx("misc.msg.atchrono") + " " + wtag + ". " + tag + " " + SYSTools.xx("misc.msg.ofTheMonth");
             }
             result += "</b>";
         } else {
@@ -126,10 +126,10 @@ public class PrescriptionScheduleTools {
 
         DateFormat df = DateFormat.getDateInstance();
         if (SYSCalendar.isInFuture(schedule.getLDatum().getTime())) {
-            result += "<br/><font color=\"red\">" + OPDE.lang.getString("nursingrecords.prescription.firstApplication") + ": " + df.format(schedule.getLDatum()) + "</font>";
+            result += "<br/><font color=\"red\">" + SYSTools.xx("nursingrecords.prescription.firstApplication") + ": " + df.format(schedule.getLDatum()) + "</font>";
         } else {
             if (schedule.getTaeglich() != 1) { // Wenn nicht jeden Tag, dann das letzte mal anzeigen.
-                result += "<br/>" + OPDE.lang.getString("nursingrecords.prescription.mostRecentApplication") + ": ";
+                result += "<br/>" + SYSTools.xx("nursingrecords.prescription.mostRecentApplication") + ": ";
                 result += df.format(schedule.getLDatum());
             }
         }
@@ -148,26 +148,26 @@ public class PrescriptionScheduleTools {
 
         if (schedule.isDaily()) {
             if (schedule.getTaeglich() > 1) {
-                result += OPDE.lang.getString("misc.msg.every") + " " + schedule.getTaeglich() + " " + OPDE.lang.getString("misc.msg.Days2");
+                result += SYSTools.xx("misc.msg.every") + " " + schedule.getTaeglich() + " " + SYSTools.xx("misc.msg.Days2");
             }
         } else if (schedule.isWeekly()) {
             String text = "";
             if (schedule.getWoechentlich() == 1) {
 
-                text += OPDE.lang.getString("misc.msg.everyWeek") + " ";
+                text += SYSTools.xx("misc.msg.everyWeek") + " ";
             } else {
-                text += OPDE.lang.getString("misc.msg.every") + " " + schedule.getWoechentlich() + " " + OPDE.lang.getString("misc.msg.weeks") + " ";
+                text += SYSTools.xx("misc.msg.every") + " " + schedule.getWoechentlich() + " " + SYSTools.xx("misc.msg.weeks") + " ";
             }
 
             String daylist = "";
 
-            daylist += (schedule.getMon() > 0 ? OPDE.lang.getString("misc.msg.monday").substring(0, 3) + ", " : "");
-            daylist += (schedule.getTue() > 0 ? OPDE.lang.getString("misc.msg.tuesday").substring(0, 3) + ", " : "");
-            daylist += (schedule.getWed() > 0 ? OPDE.lang.getString("misc.msg.wednesday").substring(0, 3) + ", " : "");
-            daylist += (schedule.getThu() > 0 ? OPDE.lang.getString("misc.msg.thursday").substring(0, 3) + ", " : "");
-            daylist += (schedule.getFri() > 0 ? OPDE.lang.getString("misc.msg.friday").substring(0, 3) + ", " : "");
-            daylist += (schedule.getSat() > 0 ? OPDE.lang.getString("misc.msg.saturday").substring(0, 3) + ", " : "");
-            daylist += (schedule.getSun() > 0 ? OPDE.lang.getString("misc.msg.sunday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getMon() > 0 ? SYSTools.xx("misc.msg.monday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getTue() > 0 ? SYSTools.xx("misc.msg.tuesday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getWed() > 0 ? SYSTools.xx("misc.msg.wednesday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getThu() > 0 ? SYSTools.xx("misc.msg.thursday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getFri() > 0 ? SYSTools.xx("misc.msg.friday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getSat() > 0 ? SYSTools.xx("misc.msg.saturday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getSun() > 0 ? SYSTools.xx("misc.msg.sunday").substring(0, 3) + ", " : "");
 
             if (!daylist.isEmpty()) {
                 text += "{" + daylist.substring(0, daylist.length() - 2) + "}";
@@ -178,25 +178,25 @@ public class PrescriptionScheduleTools {
         } else if (schedule.isMonthly()) {
             String text = "";
             if (schedule.getMonatlich() == 1) {
-                text += OPDE.lang.getString("misc.msg.everyMonth") + " ";
+                text += SYSTools.xx("misc.msg.everyMonth") + " ";
             } else {
-                text += OPDE.lang.getString("misc.msg.every") + " " + schedule.getMonatlich() + " " + OPDE.lang.getString("misc.msg.months") + " ";
+                text += SYSTools.xx("misc.msg.every") + " " + schedule.getMonatlich() + " " + SYSTools.xx("misc.msg.months") + " ";
             }
 
             if (schedule.getTagNum() > 0) {
-                text += OPDE.lang.getString("misc.msg.atchrono") + " " + schedule.getTagNum() + ". " + OPDE.lang.getString("misc.msg.ofTheMonth");
+                text += SYSTools.xx("misc.msg.atchrono") + " " + schedule.getTagNum() + ". " + SYSTools.xx("misc.msg.ofTheMonth");
             } else {
                 int wtag = 0;
                 String tag = "";
 
                 // In diesem fall kann immer nur ein Wochentag >0 sein. Daher klappt das so.
-                tag += (schedule.getMon() > 0 ? OPDE.lang.getString("misc.msg.monday") : "");
-                tag += (schedule.getTue() > 0 ? OPDE.lang.getString("misc.msg.tuesday") : "");
-                tag += (schedule.getWed() > 0 ? OPDE.lang.getString("misc.msg.wednesday") : "");
-                tag += (schedule.getThu() > 0 ? OPDE.lang.getString("misc.msg.thursday") : "");
-                tag += (schedule.getFri() > 0 ? OPDE.lang.getString("misc.msg.friday") : "");
-                tag += (schedule.getSat() > 0 ? OPDE.lang.getString("misc.msg.saturday") : "");
-                tag += (schedule.getSun() > 0 ? OPDE.lang.getString("misc.msg.sunday") : "");
+                tag += (schedule.getMon() > 0 ? SYSTools.xx("misc.msg.monday") : "");
+                tag += (schedule.getTue() > 0 ? SYSTools.xx("misc.msg.tuesday") : "");
+                tag += (schedule.getWed() > 0 ? SYSTools.xx("misc.msg.wednesday") : "");
+                tag += (schedule.getThu() > 0 ? SYSTools.xx("misc.msg.thursday") : "");
+                tag += (schedule.getFri() > 0 ? SYSTools.xx("misc.msg.friday") : "");
+                tag += (schedule.getSat() > 0 ? SYSTools.xx("misc.msg.saturday") : "");
+                tag += (schedule.getSun() > 0 ? SYSTools.xx("misc.msg.sunday") : "");
 
                 wtag += schedule.getMon();
                 wtag += schedule.getTue();
@@ -206,17 +206,17 @@ public class PrescriptionScheduleTools {
                 wtag += schedule.getSat();
                 wtag += schedule.getSun();
 
-                text += OPDE.lang.getString("misc.msg.atchrono") + " " + wtag + ". " + tag + " " + OPDE.lang.getString("misc.msg.ofTheMonth");
+                text += SYSTools.xx("misc.msg.atchrono") + " " + wtag + ". " + tag + " " + SYSTools.xx("misc.msg.ofTheMonth");
             }
             result += text;
         }
 
         DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
         if (SYSCalendar.isInFuture(schedule.getLDatum().getTime())) {
-            result += " !" + OPDE.lang.getString("nursingrecords.prescription.firstApplication") + ": " + df.format(schedule.getLDatum());
+            result += " !" + SYSTools.xx("nursingrecords.prescription.firstApplication") + ": " + df.format(schedule.getLDatum());
         } else {
             if (schedule.getTaeglich() != 1) { // Wenn nicht jeden Tag, dann das letzte mal anzeigen.
-                result += " " + OPDE.lang.getString("misc.msg.mostRecent") + " " + df.format(schedule.getLDatum());
+                result += " " + SYSTools.xx("misc.msg.mostRecent") + " " + df.format(schedule.getLDatum());
             }
         }
 
@@ -228,7 +228,7 @@ public class PrescriptionScheduleTools {
 
         if (schedule.isDaily()) {
             if (schedule.getTaeglich() > 1) {
-                phrase.add(new Chunk(OPDE.lang.getString("misc.msg.every") + " " + schedule.getTaeglich() + " " + OPDE.lang.getString("misc.msg.Days2"), PDF.bold()));
+                phrase.add(new Chunk(SYSTools.xx("misc.msg.every") + " " + schedule.getTaeglich() + " " + SYSTools.xx("misc.msg.Days2"), PDF.bold()));
             } else if (writeDaily) {
                 phrase.add(new Chunk("misc.msg.daily", PDF.bold()));
             }
@@ -236,20 +236,20 @@ public class PrescriptionScheduleTools {
             String text = "";
             if (schedule.getWoechentlich() == 1) {
 
-                text += OPDE.lang.getString("misc.msg.everyWeek") + " ";
+                text += SYSTools.xx("misc.msg.everyWeek") + " ";
             } else {
-                text += OPDE.lang.getString("misc.msg.every") + " " + schedule.getWoechentlich() + " " + OPDE.lang.getString("misc.msg.weeks") + " ";
+                text += SYSTools.xx("misc.msg.every") + " " + schedule.getWoechentlich() + " " + SYSTools.xx("misc.msg.weeks") + " ";
             }
 
             String daylist = "";
 
-            daylist += (schedule.getMon() > 0 ? OPDE.lang.getString("misc.msg.monday").substring(0, 3) + ", " : "");
-            daylist += (schedule.getTue() > 0 ? OPDE.lang.getString("misc.msg.tuesday").substring(0, 3) + ", " : "");
-            daylist += (schedule.getWed() > 0 ? OPDE.lang.getString("misc.msg.wednesday").substring(0, 3) + ", " : "");
-            daylist += (schedule.getThu() > 0 ? OPDE.lang.getString("misc.msg.thursday").substring(0, 3) + ", " : "");
-            daylist += (schedule.getFri() > 0 ? OPDE.lang.getString("misc.msg.friday").substring(0, 3) + ", " : "");
-            daylist += (schedule.getSat() > 0 ? OPDE.lang.getString("misc.msg.saturday").substring(0, 3) + ", " : "");
-            daylist += (schedule.getSun() > 0 ? OPDE.lang.getString("misc.msg.sunday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getMon() > 0 ? SYSTools.xx("misc.msg.monday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getTue() > 0 ? SYSTools.xx("misc.msg.tuesday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getWed() > 0 ? SYSTools.xx("misc.msg.wednesday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getThu() > 0 ? SYSTools.xx("misc.msg.thursday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getFri() > 0 ? SYSTools.xx("misc.msg.friday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getSat() > 0 ? SYSTools.xx("misc.msg.saturday").substring(0, 3) + ", " : "");
+            daylist += (schedule.getSun() > 0 ? SYSTools.xx("misc.msg.sunday").substring(0, 3) + ", " : "");
 
             if (!daylist.isEmpty()) {
                 text += "{" + daylist.substring(0, daylist.length() - 2) + "}";
@@ -260,25 +260,25 @@ public class PrescriptionScheduleTools {
         } else if (schedule.isMonthly()) {
             String text = "";
             if (schedule.getMonatlich() == 1) {
-                text += OPDE.lang.getString("misc.msg.everyMonth") + " ";
+                text += SYSTools.xx("misc.msg.everyMonth") + " ";
             } else {
-                text += OPDE.lang.getString("misc.msg.every") + " " + schedule.getMonatlich() + " " + OPDE.lang.getString("misc.msg.months") + " ";
+                text += SYSTools.xx("misc.msg.every") + " " + schedule.getMonatlich() + " " + SYSTools.xx("misc.msg.months") + " ";
             }
 
             if (schedule.getTagNum() > 0) {
-                text += OPDE.lang.getString("misc.msg.atchrono") + " " + schedule.getTagNum() + ". " + OPDE.lang.getString("misc.msg.ofTheMonth");
+                text += SYSTools.xx("misc.msg.atchrono") + " " + schedule.getTagNum() + ". " + SYSTools.xx("misc.msg.ofTheMonth");
             } else {
                 int wtag = 0;
                 String tag = "";
 
                 // In diesem fall kann immer nur ein Wochentag >0 sein. Daher klappt das so.
-                tag += (schedule.getMon() > 0 ? OPDE.lang.getString("misc.msg.monday") : "");
-                tag += (schedule.getTue() > 0 ? OPDE.lang.getString("misc.msg.tuesday") : "");
-                tag += (schedule.getWed() > 0 ? OPDE.lang.getString("misc.msg.wednesday") : "");
-                tag += (schedule.getThu() > 0 ? OPDE.lang.getString("misc.msg.thursday") : "");
-                tag += (schedule.getFri() > 0 ? OPDE.lang.getString("misc.msg.friday") : "");
-                tag += (schedule.getSat() > 0 ? OPDE.lang.getString("misc.msg.saturday") : "");
-                tag += (schedule.getSun() > 0 ? OPDE.lang.getString("misc.msg.sunday") : "");
+                tag += (schedule.getMon() > 0 ? SYSTools.xx("misc.msg.monday") : "");
+                tag += (schedule.getTue() > 0 ? SYSTools.xx("misc.msg.tuesday") : "");
+                tag += (schedule.getWed() > 0 ? SYSTools.xx("misc.msg.wednesday") : "");
+                tag += (schedule.getThu() > 0 ? SYSTools.xx("misc.msg.thursday") : "");
+                tag += (schedule.getFri() > 0 ? SYSTools.xx("misc.msg.friday") : "");
+                tag += (schedule.getSat() > 0 ? SYSTools.xx("misc.msg.saturday") : "");
+                tag += (schedule.getSun() > 0 ? SYSTools.xx("misc.msg.sunday") : "");
 
                 wtag += schedule.getMon();
                 wtag += schedule.getTue();
@@ -288,7 +288,7 @@ public class PrescriptionScheduleTools {
                 wtag += schedule.getSat();
                 wtag += schedule.getSun();
 
-                text += OPDE.lang.getString("misc.msg.atchrono") + " " + wtag + ". " + tag + " " + OPDE.lang.getString("misc.msg.ofTheMonth");
+                text += SYSTools.xx("misc.msg.atchrono") + " " + wtag + ". " + tag + " " + SYSTools.xx("misc.msg.ofTheMonth");
             }
             phrase.add(PDF.chunk(text, PDF.bold()));
         }
@@ -298,11 +298,11 @@ public class PrescriptionScheduleTools {
             phrase.add(Chunk.NEWLINE);
             Font red = PDF.plain();
             red.setColor(BaseColor.RED);
-            phrase.add(PDF.chunk(OPDE.lang.getString("nursingrecords.prescription.firstApplication") + ": " + df.format(schedule.getLDatum()), red));
+            phrase.add(PDF.chunk(SYSTools.xx("nursingrecords.prescription.firstApplication") + ": " + df.format(schedule.getLDatum()), red));
         } else {
             if (schedule.getTaeglich() != 1) { // Wenn nicht jeden Tag, dann das letzte mal anzeigen.
                 phrase.add(Chunk.NEWLINE);
-                phrase.add(PDF.chunk(OPDE.lang.getString("nursingrecords.prescription.mostRecentApplication") + ": " + df.format(schedule.getLDatum())));
+                phrase.add(PDF.chunk(SYSTools.xx("nursingrecords.prescription.mostRecentApplication") + ": " + df.format(schedule.getLDatum())));
             }
         }
 
@@ -330,13 +330,13 @@ public class PrescriptionScheduleTools {
             if (headerNeeded) {
                 result += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\">" +
                         "   <tr>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.earlyinthemorning.short") + "</th>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.morning.short") + "</th>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.noon.short") + "</th>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.afternoon.short") + "</th>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.evening.short") + "</th>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.lateatnight.short") + "</th>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.repeat.short") + ".</th>" +
+                        "      <th align=\"center\">" + SYSTools.xx("misc.msg.earlyinthemorning.short") + "</th>" +
+                        "      <th align=\"center\">" + SYSTools.xx("misc.msg.morning.short") + "</th>" +
+                        "      <th align=\"center\">" + SYSTools.xx("misc.msg.noon.short") + "</th>" +
+                        "      <th align=\"center\">" + SYSTools.xx("misc.msg.afternoon.short") + "</th>" +
+                        "      <th align=\"center\">" + SYSTools.xx("misc.msg.evening.short") + "</th>" +
+                        "      <th align=\"center\">" + SYSTools.xx("misc.msg.lateatnight.short") + "</th>" +
+                        "      <th align=\"center\">" + SYSTools.xx("misc.msg.repeat.short") + ".</th>" +
                         "   </tr>";
             }
             result += "    <tr>" +
@@ -352,17 +352,17 @@ public class PrescriptionScheduleTools {
                 result += "</table>";
             }
         } else if (getTerminStatus(schedule) == MAXDOSE) {
-            result += "<b>" + OPDE.lang.getString("nursingrecords.prescription.maxDailyDose") + ": ";
+            result += "<b>" + SYSTools.xx("nursingrecords.prescription.maxDailyDose") + ": ";
             result += schedule.getMaxAnzahl() + "x " + SYSTools.printDouble(schedule.getMaxEDosis().doubleValue());
             result += "</b><br/>";
             if (schedule.getCheckAfterHours() != null) {
-                result += OPDE.lang.getString("nursingrecords.prescription.dlgOnDemand.outcomeCheck") + ": ";
+                result += SYSTools.xx("nursingrecords.prescription.dlgOnDemand.outcomeCheck") + ": ";
                 if (schedule.getCheckAfterHours().equals(new BigDecimal("0.5"))) {
-                    result += "&frac12; " + OPDE.lang.getString("misc.msg.Hour");
+                    result += "&frac12; " + SYSTools.xx("misc.msg.Hour");
                 } else if (schedule.getCheckAfterHours().equals(BigDecimal.ONE)) {
-                    result += "1 " + OPDE.lang.getString("misc.msg.Hour");
+                    result += "1 " + SYSTools.xx("misc.msg.Hour");
                 } else {
-                    result += schedule.getCheckAfterHours() + " " + OPDE.lang.getString("misc.msg.Hours");
+                    result += schedule.getCheckAfterHours() + " " + SYSTools.xx("misc.msg.Hours");
                 }
                 result += "<br/>";
             }
@@ -370,14 +370,14 @@ public class PrescriptionScheduleTools {
             if (headerNeeded) {
                 result += "<table border=\"1\" cellspacing=\"0\" >" +
                         "   <tr>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.Time") + "</th>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.Number") + "</th>" +
-                        "      <th align=\"center\">" + OPDE.lang.getString("misc.msg.repeat.short") + ".</th>" +
+                        "      <th align=\"center\">" + SYSTools.xx("misc.msg.Time") + "</th>" +
+                        "      <th align=\"center\">" + SYSTools.xx("misc.msg.Number") + "</th>" +
+                        "      <th align=\"center\">" + SYSTools.xx("misc.msg.repeat.short") + ".</th>" +
                         "   </tr>";
             }
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
             result += "    <tr>" +
-                    "      <td align=\"center\">" + sdf.format(schedule.getUhrzeit()) + " " + OPDE.lang.getString("misc.msg.Time.short") + "</td>" +
+                    "      <td align=\"center\">" + sdf.format(schedule.getUhrzeit()) + " " + SYSTools.xx("misc.msg.Time.short") + "</td>" +
                     "      <td align=\"center\">" + schedule.getUhrzeitDosis().toPlainString() + "</td>" +
                     "      <td>" + getRepeatPattern(schedule, true) + "</td>" +
                     "    </tr>";
@@ -385,7 +385,7 @@ public class PrescriptionScheduleTools {
                 result += "</table>";
             }
         } else {
-            result = "!!" + OPDE.lang.getString("misc.msg.error") + "!!";
+            result = "!!" + SYSTools.xx("misc.msg.error") + "!!";
         }
         return result + "</div>";
     }
@@ -402,12 +402,12 @@ public class PrescriptionScheduleTools {
 
         if (getTerminStatus(schedule) == ROUGHLY) {
 
-            result += schedule.getNachtMo().compareTo(BigDecimal.ZERO) > 0 ? OPDE.lang.getString("misc.msg.earlyinthemorning.medium") + ". " + df.format(schedule.getNachtMo()).replace(",", ".") + ", " : "";
-            result += schedule.getMorgens().compareTo(BigDecimal.ZERO) > 0 ? OPDE.lang.getString("misc.msg.morning.medium") + ". " + df.format(schedule.getMorgens()).replace(",", ".") + ", " : "";
-            result += schedule.getMittags().compareTo(BigDecimal.ZERO) > 0 ? OPDE.lang.getString("misc.msg.noon.medium") + ". " + df.format(schedule.getMittags()).replace(",", ".") + ", " : "";
-            result += schedule.getNachmittags().compareTo(BigDecimal.ZERO) > 0 ? OPDE.lang.getString("misc.msg.afternoon.medium") + ". " + df.format(schedule.getNachmittags()).replace(",", ".") + ", " : "";
-            result += schedule.getAbends().compareTo(BigDecimal.ZERO) > 0 ? OPDE.lang.getString("misc.msg.evening.medium") + ". " + df.format(schedule.getAbends()).replace(",", ".") + ", " : "";
-            result += schedule.getNachtAb().compareTo(BigDecimal.ZERO) > 0 ? OPDE.lang.getString("misc.msg.lateatnight.medium") + ". " + df.format(schedule.getNachtAb()).replace(",", ".") + ", " : "";
+            result += schedule.getNachtMo().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.earlyinthemorning.medium") + ". " + df.format(schedule.getNachtMo()).replace(",", ".") + ", " : "";
+            result += schedule.getMorgens().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.morning.medium") + ". " + df.format(schedule.getMorgens()).replace(",", ".") + ", " : "";
+            result += schedule.getMittags().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.noon.medium") + ". " + df.format(schedule.getMittags()).replace(",", ".") + ", " : "";
+            result += schedule.getNachmittags().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.afternoon.medium") + ". " + df.format(schedule.getNachmittags()).replace(",", ".") + ", " : "";
+            result += schedule.getAbends().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.evening.medium") + ". " + df.format(schedule.getAbends()).replace(",", ".") + ", " : "";
+            result += schedule.getNachtAb().compareTo(BigDecimal.ZERO) > 0 ? SYSTools.xx("misc.msg.lateatnight.medium") + ". " + df.format(schedule.getNachtAb()).replace(",", ".") + ", " : "";
 
             result = result.substring(0, result.length() - 2);
 
@@ -416,11 +416,11 @@ public class PrescriptionScheduleTools {
                 result = "(" + result + " => " + repeat + ")";
             }
         } else if (getTerminStatus(schedule) == MAXDOSE) {
-            result += OPDE.lang.getString("nursingrecords.prescription.maxDailyDose") + ": ";
+            result += SYSTools.xx("nursingrecords.prescription.maxDailyDose") + ": ";
             result += schedule.getMaxAnzahl() + "x " + SYSTools.printDouble(schedule.getMaxEDosis().doubleValue());
             if (schedule.getCheckAfterHours() != null) {
-                result += OPDE.lang.getString("nursingrecords.prescription.dlgOnDemand.outcomeCheck") + ": ";
-                result += schedule.getCheckAfterHours() + " " + OPDE.lang.getString("misc.msg.Hour(s)");
+                result += SYSTools.xx("nursingrecords.prescription.dlgOnDemand.outcomeCheck") + ": ";
+                result += schedule.getCheckAfterHours() + " " + SYSTools.xx("misc.msg.Hour(s)");
             }
         } else if (getTerminStatus(schedule) == EXACTTIME) {
 
@@ -438,7 +438,7 @@ public class PrescriptionScheduleTools {
                 result = "(" + result + " => " + repeat + ")";
             }
         } else {
-            result = "!!" + OPDE.lang.getString("misc.msg.error") + "!!";
+            result = "!!" + SYSTools.xx("misc.msg.error") + "!!";
         }
         return result;
     }
@@ -447,7 +447,7 @@ public class PrescriptionScheduleTools {
         Phrase phrase = new Phrase();
 
         if (schedule.getPrescription().isOnDemand()) {
-            phrase.add(OPDE.lang.getString("nursingrecords.prescription.maxDailyDose") + ": ");
+            phrase.add(SYSTools.xx("nursingrecords.prescription.maxDailyDose") + ": ");
             phrase.add(schedule.getMaxAnzahl() + "x " + HTMLTools.printDouble(schedule.getMaxEDosis()) + " " + SYSConst.UNITS[schedule.getPrescription().getTradeForm().getDosageForm().getUsageUnit()]);
             phrase.add(Chunk.NEWLINE);
         }
@@ -468,7 +468,7 @@ public class PrescriptionScheduleTools {
 
         if (schedule.getPrescription().getTo().before(SYSConst.DATE_UNTIL_FURTHER_NOTICE)) {
             phrase.add(Chunk.NEWLINE);
-            phrase.add(PDF.chunk(OPDE.lang.getString("nursingrecords.prescription.endsAtChrono") + ": " + DateFormat.getDateInstance().format(schedule.getPrescription().getTo()), PDF.bold()));
+            phrase.add(PDF.chunk(SYSTools.xx("nursingrecords.prescription.endsAtChrono") + ": " + DateFormat.getDateInstance().format(schedule.getPrescription().getTo()), PDF.bold()));
         }
 
         return phrase;
@@ -479,7 +479,7 @@ public class PrescriptionScheduleTools {
         String result = "";
 
         if (schedule.getPrescription().isOnDemand()) {
-            result += OPDE.lang.getString("nursingrecords.prescription.maxDailyDose") + ": ";
+            result += SYSTools.xx("nursingrecords.prescription.maxDailyDose") + ": ";
             result += schedule.getMaxAnzahl() + "x " + HTMLTools.printDouble(schedule.getMaxEDosis()) + " " + SYSConst.UNITS[schedule.getPrescription().getTradeForm().getDosageForm().getUsageUnit()];
             result += "<br/>";
         }
@@ -502,7 +502,7 @@ public class PrescriptionScheduleTools {
             if (!wiederholung.isEmpty()) {
                 result += "<br/>";
             }
-            result += "<b><u>" + OPDE.lang.getString("misc.msg.comment") + ":</u></b> " + schedule.getPrescription().getText();
+            result += "<b><u>" + SYSTools.xx("misc.msg.comment") + ":</u></b> " + schedule.getPrescription().getText();
 
         }
 

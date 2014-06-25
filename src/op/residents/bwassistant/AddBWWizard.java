@@ -50,13 +50,13 @@ public class AddBWWizard {
         wizard = new WizardDialog(new JFrame(), false);
         PageList model = new PageList();
 
-        AbstractWizardPage page1 = new WelcomePage(OPDE.lang.getString(internalClassID + ".page1.title"), OPDE.lang.getString(internalClassID + ".page1.description"));
-        AbstractWizardPage page2 = new BasisInfoPage(OPDE.lang.getString(PnlBWBasisInfo.internalClassID + ".title"), OPDE.lang.getString(PnlBWBasisInfo.internalClassID + ".description"));
-        AbstractWizardPage page3 = new PNPage(OPDE.lang.getString(PnlBV.internalClassID + ".title"), OPDE.lang.getString(PnlBV.internalClassID + ".description"));
-        AbstractWizardPage page4 = new GPPage(OPDE.lang.getString(PnlGP.internalClassID + ".title"), OPDE.lang.getString(PnlGP.internalClassID + ".description"));
-//        AbstractWizardPage page5 = new LCPage(OPDE.lang.getString(PnlLC.internalClassID + ".title"), OPDE.lang.getString(PnlLC.internalClassID + ".description"));
-        AbstractWizardPage page6 = new HaufPage(OPDE.lang.getString(PnlHAUF.internalClassID + ".title"), OPDE.lang.getString(PnlHAUF.internalClassID + ".description"));
-        AbstractWizardPage page7 = new CompletionPage(OPDE.lang.getString(internalClassID + ".page7.title"), OPDE.lang.getString(internalClassID + ".page7.description"));
+        AbstractWizardPage page1 = new WelcomePage(SYSTools.xx(internalClassID + ".page1.title"), SYSTools.xx(internalClassID + ".page1.description"));
+        AbstractWizardPage page2 = new BasisInfoPage(SYSTools.xx(PnlBWBasisInfo.internalClassID + ".title"), SYSTools.xx(PnlBWBasisInfo.internalClassID + ".description"));
+        AbstractWizardPage page3 = new PNPage(SYSTools.xx(PnlBV.internalClassID + ".title"), SYSTools.xx(PnlBV.internalClassID + ".description"));
+        AbstractWizardPage page4 = new GPPage(SYSTools.xx(PnlGP.internalClassID + ".title"), SYSTools.xx(PnlGP.internalClassID + ".description"));
+//        AbstractWizardPage page5 = new LCPage(SYSTools.xx(PnlLC.internalClassID + ".title"), SYSTools.xx(PnlLC.internalClassID + ".description"));
+        AbstractWizardPage page6 = new HaufPage(SYSTools.xx(PnlHAUF.internalClassID + ".title"), SYSTools.xx(PnlHAUF.internalClassID + ".description"));
+        AbstractWizardPage page7 = new CompletionPage(SYSTools.xx(internalClassID + ".page7.title"), SYSTools.xx(internalClassID + ".page7.description"));
 
         model.append(page1);
         model.append(page2);
@@ -108,7 +108,7 @@ public class AddBWWizard {
             resident = em.merge(resident);
             bwinfo_hauf = em.merge(bwinfo_hauf);
             em.getTransaction().commit();
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ResidentTools.getTextCompact(resident) + " " + OPDE.lang.getString("misc.msg.entrysuccessful"), 6));
+            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ResidentTools.getTextCompact(resident) + " " + SYSTools.xx("misc.msg.entrysuccessful"), 6));
             finishAction.execute(resident);
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
@@ -135,12 +135,12 @@ public class AddBWWizard {
             txt.setContentType("text/html");
             txt.setOpaque(false);
             txt.setText("<html><font face=\"" + SYSConst.ARIAL14.getFamily() + "\">" +
-                    OPDE.lang.getString(internalClassID + ".page1.welcome") +
+                    SYSTools.xx(internalClassID + ".page1.welcome") +
                     "</font></html>");
 
             addComponent(txt, true);
             addSpace();
-            addText(OPDE.lang.getString("opde.wizards.buttontext.letsgo"), SYSConst.ARIAL14);
+            addText(SYSTools.xx("opde.wizards.buttontext.letsgo"), SYSConst.ARIAL14);
         }
 
 //        @Override
@@ -151,10 +151,10 @@ public class AddBWWizard {
         @Override
         public void setupWizardButtons() {
             super.setupWizardButtons();
-            fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.BACK, OPDE.lang.getString("opde.wizards.buttontext.back"));
-            fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.NEXT, OPDE.lang.getString("opde.wizards.buttontext.next"));
-            fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.FINISH, OPDE.lang.getString("opde.wizards.buttontext.finish"));
-            fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.CANCEL, OPDE.lang.getString("opde.wizards.buttontext.cancel"));
+            fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.BACK, SYSTools.xx("opde.wizards.buttontext.back"));
+            fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.NEXT, SYSTools.xx("opde.wizards.buttontext.next"));
+            fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.FINISH, SYSTools.xx("opde.wizards.buttontext.finish"));
+            fireButtonEvent(ButtonEvent.CHANGE_BUTTON_TEXT, ButtonNames.CANCEL, SYSTools.xx("opde.wizards.buttontext.cancel"));
 
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.BACK);
             fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.FINISH);
@@ -406,21 +406,21 @@ public class AddBWWizard {
         }
 
         private String check() {
-            String result = "<b>" + OPDE.lang.getString(internalClassID + ".page7.summaryline1") + "</b><br/>";
-            result += OPDE.lang.getString(internalClassID + ".page7.summaryline2") + "<br/>";
+            String result = "<b>" + SYSTools.xx(internalClassID + ".page7.summaryline1") + "</b><br/>";
+            result += SYSTools.xx(internalClassID + ".page7.summaryline2") + "<br/>";
             result += "<ul>";
             result += "<li>" + ResidentTools.getFullName(resident) + "</li>";
-            result += "<li>" + OPDE.lang.getString("misc.msg.dob") + ": " + DateFormat.getDateInstance().format(resident.getDOB()) + "</li>";
-            result += "<li>" + OPDE.lang.getString("misc.msg.primaryNurse") + ": " + (resident.getPN1() == null ? OPDE.lang.getString("misc.msg.noentryyet") : resident.getPN1().getFullname()) + "</li>";
-            result += "<li>" + OPDE.lang.getString("misc.msg.gp") + ": " + GPTools.getFullName(resident.getGP()) + "</li>";
-//            result += "<li>" + OPDE.lang.getString("misc.msg.lc") + ": " + LCustodianTools.getFullName(resident.getLCustodian1()) + "</li>";
+            result += "<li>" + SYSTools.xx("misc.msg.dob") + ": " + DateFormat.getDateInstance().format(resident.getDOB()) + "</li>";
+            result += "<li>" + SYSTools.xx("misc.msg.primaryNurse") + ": " + (resident.getPN1() == null ? SYSTools.xx("misc.msg.noentryyet") : resident.getPN1().getFullname()) + "</li>";
+            result += "<li>" + SYSTools.xx("misc.msg.gp") + ": " + GPTools.getFullName(resident.getGP()) + "</li>";
+//            result += "<li>" + SYSTools.xx("misc.msg.lc") + ": " + LCustodianTools.getFullName(resident.getLCustodian1()) + "</li>";
 
-            result += "<li>" + OPDE.lang.getString("misc.msg.movein") + ": " + DateFormat.getDateInstance().format(bwinfo_hauf.getFrom()) + "</li>";
-            result += "<li>" + OPDE.lang.getString("misc.msg.subdivision") + ": " + resident.getStation().getName() + "</li>";
+            result += "<li>" + SYSTools.xx("misc.msg.movein") + ": " + DateFormat.getDateInstance().format(bwinfo_hauf.getFrom()) + "</li>";
+            result += "<li>" + SYSTools.xx("misc.msg.subdivision") + ": " + resident.getStation().getName() + "</li>";
 
             result += "</ul>";
 
-            result += "<p>" + OPDE.lang.getString(internalClassID + ".page7.summaryline3") + "</p>";
+            result += "<p>" + SYSTools.xx(internalClassID + ".page7.summaryline3") + "</p>";
             return result;
         }
 
