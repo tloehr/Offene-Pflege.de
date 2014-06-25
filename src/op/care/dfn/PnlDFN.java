@@ -564,7 +564,7 @@ public class PnlDFN extends NursingRecordsPanel {
         };
 
         String title = "<html><font size=+1>" +
-//                (dfn.isFloating() ? (dfn.isOpen() ? "(!) " : "(OK) ") : "") +
+//                (dfn.isFloating() ? (dfn.isActive() ? "(!) " : "(OK) ") : "") +
                 SYSTools.left(dfn.getIntervention().getBezeichnung(), MAX_TEXT_LENGTH) +
                 DFNTools.getScheduleText(dfn, " [", "]") +
                 ", " + dfn.getMinutes() + " " + OPDE.lang.getString("misc.msg.Minute(s)") + (dfn.getUser() != null ? ", <i>" + SYSTools.anonymizeUser(dfn.getUser().getUID()) + "</i>" : "") +

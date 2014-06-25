@@ -154,7 +154,7 @@ public class PnlQMSPlan extends CleanablePanel {
             }
         });
 
-        btnMenu.setEnabled(!qmsplan.isClosed());
+        btnMenu.setEnabled(qmsplan.isActive());
 
         cptitle.getRight().add(btnMenu);
 
@@ -466,7 +466,7 @@ public class PnlQMSPlan extends CleanablePanel {
                 if (qms.getState() != QmsTools.STATE_OPEN) {
                     return;
                 }
-                if (qms.getQmsplan().isClosed()) {
+                if (!qms.getQmsplan().isActive()) {
                     return;
                 }
 
@@ -544,7 +544,7 @@ public class PnlQMSPlan extends CleanablePanel {
 
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, PnlControlling.internalClassID)) {
-            if (!qms.getQmsplan().isClosed()) {
+            if (qms.getQmsplan().isActive()) {
 
                 /***
                  *      _     _            _                _
@@ -771,7 +771,7 @@ public class PnlQMSPlan extends CleanablePanel {
                     });
                 }
             });
-            btnEdit.setEnabled(!qmsplan.isClosed() && numQMS == 0);
+            btnEdit.setEnabled(qmsplan.isActive() && numQMS == 0);
             pnlMenu.add(btnEdit);
         }
 
@@ -830,7 +830,7 @@ public class PnlQMSPlan extends CleanablePanel {
                     });
                 }
             });
-            btnDelete.setEnabled(!qmsplan.isClosed() && numQMS == 0);
+            btnDelete.setEnabled(qmsplan.isActive() && numQMS == 0);
             pnlMenu.add(btnDelete);
         }
 

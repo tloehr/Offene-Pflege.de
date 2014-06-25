@@ -126,37 +126,6 @@
            <int>11</int> 
           </void> 
           <void property="name"> 
-           <string>lblTime</string> 
-          </void> 
-         </object> 
-         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-          <class>com.jgoodies.forms.layout.CellConstraints</class> 
-          <void method="setProperty"> 
-           <string>gridY</string> 
-           <int>5</int> 
-          </void> 
-          <void method="setProperty"> 
-           <string>gridX</string> 
-           <int>3</int> 
-          </void> 
-         </object> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JLabel</string> 
-          <void method="setProperty"> 
-           <string>text</string> 
-           <string>text</string> 
-          </void> 
-          <void method="setProperty"> 
-           <string>font</string> 
-           <object idref="Font0"/> 
-          </void> 
-          <void method="setProperty"> 
-           <string>horizontalAlignment</string> 
-           <int>11</int> 
-          </void> 
-          <void property="name"> 
            <string>lblLocation</string> 
           </void> 
          </object> 
@@ -174,9 +143,9 @@
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JComboBox</string> 
+          <string>com.jidesoft.combobox.TreeComboBox</string> 
           <void property="name"> 
-           <string>cmbTime</string> 
+           <string>cmbLocation</string> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -189,24 +158,9 @@
            <string>gridY</string> 
            <int>7</int> 
           </void> 
-         </object> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>com.jidesoft.combobox.TreeComboBox</string> 
-          <void property="name"> 
-           <string>cmbLocation</string> 
-          </void> 
-         </object> 
-         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-          <class>com.jgoodies.forms.layout.CellConstraints</class> 
           <void method="setProperty"> 
-           <string>gridX</string> 
-           <int>5</int> 
-          </void> 
-          <void method="setProperty"> 
-           <string>gridY</string> 
-           <int>7</int> 
+           <string>gridWidth</string> 
+           <int>3</int> 
           </void> 
          </object> 
         </void> 
@@ -887,7 +841,7 @@
             </void> 
             <void method="add"> 
              <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JCheckBox</string> 
+              <string>javax.swing.JRadioButton</string> 
               <void method="setProperty"> 
                <string>border</string> 
                <object class="javax.swing.border.EmptyBorder"> 
@@ -904,6 +858,12 @@
                 <int>0</int> 
                 <int>0</int> 
                 <int>0</int> 
+               </object> 
+              </void> 
+              <void method="setProperty"> 
+               <string>$buttonGroup</string> 
+               <object class="com.jformdesigner.model.FormReference"> 
+                <string>buttonGroup1</string> 
                </object> 
               </void> 
               <void property="name"> 
@@ -936,7 +896,7 @@
             </void> 
             <void method="add"> 
              <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JCheckBox</string> 
+              <string>javax.swing.JRadioButton</string> 
               <void method="setProperty"> 
                <string>border</string> 
                <object class="javax.swing.border.EmptyBorder"> 
@@ -953,6 +913,12 @@
                 <int>0</int> 
                 <int>0</int> 
                 <int>0</int> 
+               </object> 
+              </void> 
+              <void method="setProperty"> 
+               <string>$buttonGroup</string> 
+               <object class="com.jformdesigner.model.FormReference"> 
+                <string>buttonGroup1</string> 
                </object> 
               </void> 
               <void property="name"> 
@@ -985,7 +951,7 @@
             </void> 
             <void method="add"> 
              <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JCheckBox</string> 
+              <string>javax.swing.JRadioButton</string> 
               <void method="setProperty"> 
                <string>border</string> 
                <object class="javax.swing.border.EmptyBorder"> 
@@ -1002,6 +968,12 @@
                 <int>0</int> 
                 <int>0</int> 
                 <int>0</int> 
+               </object> 
+              </void> 
+              <void method="setProperty"> 
+               <string>$buttonGroup</string> 
+               <object class="com.jformdesigner.model.FormReference"> 
+                <string>buttonGroup1</string> 
                </object> 
               </void> 
               <void property="name"> 
@@ -1034,7 +1006,7 @@
             </void> 
             <void method="add"> 
              <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JCheckBox</string> 
+              <string>javax.swing.JRadioButton</string> 
               <void method="setProperty"> 
                <string>border</string> 
                <object class="javax.swing.border.EmptyBorder"> 
@@ -1051,6 +1023,12 @@
                 <int>0</int> 
                 <int>0</int> 
                 <int>0</int> 
+               </object> 
+              </void> 
+              <void method="setProperty"> 
+               <string>$buttonGroup</string> 
+               <object class="com.jformdesigner.model.FormReference"> 
+                <string>buttonGroup1</string> 
                </object> 
               </void> 
               <void property="name"> 
@@ -1083,7 +1061,7 @@
             </void> 
             <void method="add"> 
              <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JCheckBox</string> 
+              <string>javax.swing.JRadioButton</string> 
               <void method="setProperty"> 
                <string>border</string> 
                <object class="javax.swing.border.EmptyBorder"> 
@@ -1100,6 +1078,12 @@
                 <int>0</int> 
                 <int>0</int> 
                 <int>0</int> 
+               </object> 
+              </void> 
+              <void method="setProperty"> 
+               <string>$buttonGroup</string> 
+               <object class="com.jformdesigner.model.FormReference"> 
+                <string>buttonGroup1</string> 
                </object> 
               </void> 
               <void property="name"> 
@@ -1132,7 +1116,7 @@
             </void> 
             <void method="add"> 
              <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JCheckBox</string> 
+              <string>javax.swing.JRadioButton</string> 
               <void method="setProperty"> 
                <string>border</string> 
                <object class="javax.swing.border.EmptyBorder"> 
@@ -1149,6 +1133,12 @@
                 <int>0</int> 
                 <int>0</int> 
                 <int>0</int> 
+               </object> 
+              </void> 
+              <void method="setProperty"> 
+               <string>$buttonGroup</string> 
+               <object class="com.jformdesigner.model.FormReference"> 
+                <string>buttonGroup1</string> 
                </object> 
               </void> 
               <void property="name"> 
@@ -1181,7 +1171,7 @@
             </void> 
             <void method="add"> 
              <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JCheckBox</string> 
+              <string>javax.swing.JRadioButton</string> 
               <void method="setProperty"> 
                <string>border</string> 
                <object class="javax.swing.border.EmptyBorder"> 
@@ -1198,6 +1188,12 @@
                 <int>0</int> 
                 <int>0</int> 
                 <int>0</int> 
+               </object> 
+              </void> 
+              <void method="setProperty"> 
+               <string>$buttonGroup</string> 
+               <object class="com.jformdesigner.model.FormReference"> 
+                <string>buttonGroup1</string> 
                </object> 
               </void> 
               <void property="name"> 
@@ -1512,6 +1508,32 @@
             </void> 
            </object> 
           </void> 
+          <void method="add"> 
+           <object class="com.jformdesigner.model.FormContainer"> 
+            <string>javax.swing.JPanel</string> 
+            <object class="com.jformdesigner.model.FormLayoutManager"> 
+             <class>com.jgoodies.forms.layout.FormLayout</class> 
+             <void method="setProperty"> 
+              <string>$columnSpecs</string> 
+              <string>default, labelcompgap, default</string> 
+             </void> 
+             <void method="setProperty"> 
+              <string>$rowSpecs</string> 
+              <string>default, linegap, default, linegap, default</string> 
+             </void> 
+            </object> 
+            <void property="name"> 
+             <string>pnlYearly</string> 
+            </void> 
+           </object> 
+           <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+            <null/> 
+            <void method="setProperty"> 
+             <string>title</string> 
+             <string>text</string> 
+            </void> 
+           </object> 
+          </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
           <class>com.jgoodies.forms.layout.CellConstraints</class> 
@@ -1572,7 +1594,7 @@
          <object class="com.jformdesigner.model.FormComponent"> 
           <string>com.toedter.calendar.JDateChooser</string> 
           <void property="name"> 
-           <string>jdcLDate</string> 
+           <string>jdcStartingOn</string> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1699,6 +1721,24 @@
        <object class="java.awt.Point"> 
         <int>5</int> 
         <int>5</int> 
+       </object> 
+      </void> 
+     </object> 
+    </void> 
+    <void method="add"> 
+     <object class="com.jformdesigner.model.FormNonVisual"> 
+      <string>javax.swing.ButtonGroup</string> 
+      <void property="name"> 
+       <string>buttonGroup1</string> 
+      </void> 
+     </object> 
+     <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+      <null/> 
+      <void method="setProperty"> 
+       <string>location</string> 
+       <object class="java.awt.Point"> 
+        <int>0</int> 
+        <int>575</int> 
        </object> 
       </void> 
      </object> 

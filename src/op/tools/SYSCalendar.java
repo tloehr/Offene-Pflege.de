@@ -33,6 +33,9 @@ import entity.info.ResInfoTypeTools;
 import entity.info.Resident;
 import entity.nursingprocess.DFNTools;
 import entity.prescription.BHPTools;
+import io.lamma.LammaConst;
+import io.lamma.Month;
+import io.lamma.Weekday;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import org.apache.commons.collections.Closure;
@@ -55,29 +58,17 @@ import java.util.*;
 
 public class SYSCalendar {
 
-    public static String printGC(GregorianCalendar gc) {
-        return (gc.get(GregorianCalendar.YEAR) + "-" + (gc.get(GregorianCalendar.MONTH) + 1) + "-" + gc.get(GregorianCalendar.DAY_OF_MONTH));
-    }
 
-    public static GregorianCalendar heute() {
-        return new GregorianCalendar();
-    }
 
-    public static Date today_date() {
-        return new Date();
-    }
+    // the beginning null makes it compatible with the joda int constants.
+    public final static Month[] months = new Month[]{null, LammaConst.JANUARY, LammaConst.FEBRUARY, LammaConst.MARCH,
+            LammaConst.APRIL, LammaConst.MAY, LammaConst.JUNE, LammaConst.JULY,
+            LammaConst.AUGUST, LammaConst.SEPTEMBER, LammaConst.OCTOBER, LammaConst.NOVEMBER, LammaConst.DECEMBER};
 
-    /**
-     * Dasselbe wie die gleichnamige Methode, jedoch wird hier als Referenzzeitpunkt immer
-     * die aktuelle Zeit genommen.
-     *
-     * @param time   Zeitpunkt in der Vergangenheit, der geprüft werden soll.
-     * @param offset Anzahl der Minuten, welche die zwei Zeipunkte maximal auseinader liegen dürfen.
-     * @return true, wenn offset nicht überschritten wird. false, sonst.
-     */
-    public static boolean earlyEnough(long time, int offset) {
-        return earlyEnough(now(), time, offset);
-    }
+    public final static Weekday[] weeksdays = new Weekday[]{null, LammaConst.MONDAY, LammaConst.TUESDAY, LammaConst.WEDNESDAY, LammaConst.THURSDAY,
+            LammaConst.FRIDAY, LammaConst.SATURDAY, LammaConst.SUNDAY};
+
+
 
     public static boolean isInFuture(long time) {
         return isInFuture(new Date(time));
@@ -123,86 +114,6 @@ public class SYSCalendar {
         };
     }
 
-    /**
-     * Ermittelt ob zwei Zeitpunkte nur höchstens eine bestimmte Anzahl von Minuten auseinanderliegen.
-     *
-     * @param reftime Ausgangszeitpunkt. Wird meistens die aktuelle Zeit sein.
-     * @param time    Zeitpunkt in der Vergangenheit, der geprüft werden soll.
-     * @param offset  Anzahl der Minuten, welche die zwei Zeipunkte maximal auseinader liegen dürfen.
-     * @return true, wenn offset nicht überschritten wird. false, sonst.
-     */
-    public static boolean earlyEnough(long reftime, long time, int offset) {
-        GregorianCalendar gcreftime = new GregorianCalendar();
-        gcreftime.setTimeInMillis(reftime);
-        GregorianCalendar gctime = new GregorianCalendar();
-        gctime.setTimeInMillis(time);
-        gctime.add(GregorianCalendar.MINUTE, offset);
-        return gctime.after(gcreftime);
-    }
-
-    public static String printGCGermanStyle(GregorianCalendar gc) {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        String result;
-        Date d = new Date(gc.getTimeInMillis());
-        //result =  gc.get(GregorianCalendar.DAY_OF_MONTH) + "." + (gc.get(GregorianCalendar.MONTH)+1) + "." + gc.get(GregorianCalendar.YEAR);
-        result = formatter.format(d);
-        if (gc.equals(SYSConst.UNTIL_FURTHER_NOTICE)) {
-            result = "bis auf weiteres";
-        }
-        if (gc.equals(SYSConst.VERY_BEGINNING)) {
-            result = "von anfang an";
-        }
-        return (result);
-    }
-
-    public static String GC_MMMYY(GregorianCalendar gc) {
-        return (MonatName(gc) + " " + gc.get(GregorianCalendar.YEAR));
-    }
-
-    public static String printGermanStyle(Date d) {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-        String result;
-        GregorianCalendar gc = new GregorianCalendar();
-        gc.setTime(d);
-        result = formatter.format(d);
-        if (gc.equals(SYSConst.UNTIL_FURTHER_NOTICE)) {
-            result = "bis auf weiteres";
-        }
-        if (gc.equals(SYSConst.VERY_BEGINNING)) {
-            result = "von anfang an";
-        }
-        return (result);
-    }
-
-//    public static String printGermanStyleShort(Date d) {
-//        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yy");
-//        String result;
-//        GregorianCalendar gc = new GregorianCalendar();
-//        gc.setTime(d);
-//        result = formatter.format(d);
-//        if (gc.equals(SYSConst.BIS_AUF_WEITERES_WO_TIME)) {
-//            result = "==>";
-//        }
-//        if (gc.equals(SYSConst.VERY_BEGINNING)) {
-//            result = "|<=";
-//        }
-//        if (sameDay(gc, new GregorianCalendar()) == 0) {
-//            result = "heute";
-//        }
-//        GregorianCalendar heute = new GregorianCalendar();
-//        GregorianCalendar morgen = (GregorianCalendar) heute.clone();
-//        morgen.add(GregorianCalendar.DATE, +1);
-//        GregorianCalendar gestern = (GregorianCalendar) heute.clone();
-//        gestern.add(GregorianCalendar.DATE, -1);
-//
-//        if (sameDay(gc, gestern) == 0) {
-//            result = "gestern";
-//        }
-//        if (sameDay(gc, morgen) == 0) {
-//            result = "morgen";
-//        }
-//        return (result);
-//    }
 
     public static GregorianCalendar toGC(Date d) {
         GregorianCalendar gc = new GregorianCalendar();
@@ -223,153 +134,6 @@ public class SYSCalendar {
 
         formatter = new SimpleDateFormat("HH:mm");
         return formatter.format(date);
-    }
-
-    public static String toGermanTime(Time t) {
-        if (t == null) {
-            return "";
-        }
-        Date d = new Date(t.getTime());
-        Format formatter;
-
-        formatter = new SimpleDateFormat("HH:mm");
-        return formatter.format(d);
-    }
-
-
-    public static String MonatName(GregorianCalendar gc) {
-        switch (gc.get(GregorianCalendar.MONTH)) {
-            case GregorianCalendar.JANUARY: {
-                return "Januar";
-            }
-            case GregorianCalendar.FEBRUARY: {
-                return "Februar";
-            }
-            case GregorianCalendar.MARCH: {
-                return "März";
-            }
-            case GregorianCalendar.APRIL: {
-                return "April";
-            }
-            case GregorianCalendar.MAY: {
-                return "Mai";
-            }
-            case GregorianCalendar.JUNE: {
-                return "Juni";
-            }
-            case GregorianCalendar.JULY: {
-                return "Juli";
-            }
-            case GregorianCalendar.AUGUST: {
-                return "August";
-            }
-            case GregorianCalendar.SEPTEMBER: {
-                return "September";
-            }
-            case GregorianCalendar.OCTOBER: {
-                return "Oktober";
-            }
-            case GregorianCalendar.NOVEMBER: {
-                return "November";
-            }
-            case GregorianCalendar.DECEMBER: {
-                return "Dezember";
-            }
-
-            default: {
-                return "";
-            }
-        }
-    } // MonatName(GregorianCalendar gc)
-
-    public static String WochentagName(GregorianCalendar gc) {
-        switch (gc.get(GregorianCalendar.DAY_OF_WEEK)) {
-            case GregorianCalendar.SUNDAY: {
-                return "Sonntag";
-            }
-            case GregorianCalendar.MONDAY: {
-                return "Montag";
-            }
-            case GregorianCalendar.TUESDAY: {
-                return "Dienstag";
-            }
-            case GregorianCalendar.WEDNESDAY: {
-                return "Mittwoch";
-            }
-            case GregorianCalendar.THURSDAY: {
-                return "Donnerstag";
-            }
-            case GregorianCalendar.FRIDAY: {
-                return "Freitag";
-            }
-            case GregorianCalendar.SATURDAY: {
-                return "Samstag";
-            }
-            default: {
-                return "";
-            }
-        }
-    }
-
-    public static String WochentagName(Date d) {
-        return WochentagName(toGC(d));
-    }
-
-    /**
-     * Calculates the number of days between two calendar days in a manner
-     * which is independent of the Calendar type used.
-     *
-     * @param d1 The first date.
-     * @param d2 The second date.
-     * @return The number of days between the two dates.  Zero is
-     * returned if the dates are the same, one if the dates are
-     * adjacent (d1 before d2) etc.
-     * negative values denote that d2 is before d1;
-     * If Calendar types of d1 and d2
-     * are different, the result may not be accurate.
-     */
-    public static int getDaysBetween(java.util.Calendar d1, java.util.Calendar d2) {
-        boolean swapped = false;
-        if (d1.after(d2)) {  // swap dates so that d1 is start and d2 is end
-            java.util.Calendar swap = d1;
-            d1 = d2;
-            d2 = swap;
-            swapped = true;
-        }
-        int days = d2.get(java.util.Calendar.DAY_OF_YEAR) -
-                d1.get(java.util.Calendar.DAY_OF_YEAR);
-        int y2 = d2.get(java.util.Calendar.YEAR);
-        if (d1.get(java.util.Calendar.YEAR) != y2) {
-            d1 = (java.util.Calendar) d1.clone();
-            do {
-                days += d1.getActualMaximum(java.util.Calendar.DAY_OF_YEAR);
-                d1.add(java.util.Calendar.YEAR, 1);
-            } while (d1.get(java.util.Calendar.YEAR) != y2);
-        }
-
-        if (swapped) {
-            days = days * -1;
-        }
-
-        return days;
-    } // getDaysBetween()
-
-    /**
-     * A date is "sane", when it is after the start of the first stay of the resident. When there is no stay yet,
-     * then its must not before now. It must also never be in future.
-     *
-     * @param resident
-     * @param date
-     * @return
-     */
-    public static boolean isDateSane(Resident resident, Date date) {
-        DateMidnight d = new DateMidnight(date);
-        if (d.isAfterNow()) {
-            return false;
-        }
-        ResInfo firstStay = ResInfoTools.getFirstResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
-        DateMidnight min = firstStay == null ? new DateMidnight().dayOfMonth().withMinimumValue() : new DateMidnight(firstStay.getFrom());
-        return new DateMidnight(date).isAfter(min);
     }
 
     /**
@@ -662,14 +426,6 @@ public class SYSCalendar {
         return zeit;
     }
 
-    public static byte ermittleZeit() {
-        return ermittleZeit(new Date().getTime());
-    }
-
-    public static int ermittleSchicht() {
-        return ermittleSchicht(new Date().getTime());
-    }
-
     /**
      * Ermittelt zu einer gegebenen Zeit die entsprechende Schicht.
      *
@@ -690,162 +446,6 @@ public class SYSCalendar {
         }
         return schicht;
     }
-
-//    public static int ermittleSchicht(Date date) {
-//        return ermittleSchicht(date.getTime());
-//    }
-//
-//    public static String getHTMLColor4Schicht(Byte schicht) {
-//
-//        String color = "";
-//        switch (schicht) {
-//            case SYSConst.ZEIT_FRUEH: {
-//                color = "color=\"blue\"";
-//                break;
-//            }
-//            case SYSConst.ZEIT_SPAET: {
-//                color = SYSConst.html_darkgreen;
-//                break;
-//            }
-//            case SYSConst.ZEIT_NACHT_AB: {
-//                color = SYSConst.html_darkred;
-//                break;
-//            }
-//            case SYSConst.ZEIT_NACHT_MO: {
-//                color = SYSConst.html_darkred;
-//                break;
-//            }
-//            default: {
-//                color = "color=\"black\"";
-//                break;
-//            }
-//        }
-//        return color;
-//    }
-//
-//    /**
-//     * @return Liste mit 4 Elementen. Die ersten beiden sind die byte Kennungen der beteiligten Schichten innerhalb der gewünschten
-//     * Anzeige. Kann sein SYSConst.FM oder SYSConst.MO etc. Die dritte Stelle enthält die Start-Uhrzeit als Zeichenkette (gemäß des
-//     * Eintrags in der SYSProps Tabelle. In der vierten Stelle steht die End-Uhrzeit, ebenfalls als Zeichenkette (minus 1 Minute). Damit
-//     * liegt diese Zeit in dem betreffenden Intervall.
-//     */
-//    public static ArrayList getZeiten4Schicht(byte schicht) {
-//        ArrayList result = new ArrayList(4);
-//        String z1, z2;
-//        byte s1, s2;
-//        switch (schicht) {
-//            case SYSConst.ZEIT_NACHT_MO: {
-//                z1 = "FM";
-//                z2 = "MO";
-//                s1 = SYSConst.FM;
-//                s2 = SYSConst.FM;
-//                break;
-//            }
-//            case SYSConst.ZEIT_FRUEH: {
-//                z1 = "MO";
-//                z2 = "NM";
-//                s1 = SYSConst.MO;
-//                s2 = SYSConst.MI;
-//                break;
-//            }
-//            case SYSConst.ZEIT_SPAET: {
-//                z1 = "NM";
-//                z2 = "NA";
-//                s1 = SYSConst.NM;
-//                s2 = SYSConst.AB;
-//                break;
-//            }
-//            case SYSConst.ZEIT_NACHT_AB: {
-//                z1 = "NA";
-//                z2 = "FM";
-//                s1 = SYSConst.NA;
-//                s2 = Byte.MAX_VALUE; // kleiner Trick :-$
-//                break;
-//            }
-//            default: {
-//                z1 = "";
-//                z2 = "";
-//                s1 = -1;
-//                s2 = -1;
-//            }
-//        }
-//
-//        result.add(s1);
-//        result.add(s2);
-//
-//        result.add(z1.isEmpty() ? "" : OPDE.getProps().getProperty(z1));
-//
-//        if (!z2.isEmpty()) {
-//            GregorianCalendar gc = SYSCalendar.parseTime(OPDE.getProps().getProperty(z2));
-//            gc.add(GregorianCalendar.MINUTE, -1);
-//            result.add(SYSCalendar.toGermanTime(gc));
-//        } else {
-//            result.add("");
-//        }
-//        return result;
-//    }
-//
-//    public static Pair<Byte, Byte> getTimeIDs4Shift(byte shiftid) {
-//        byte id1 = -1, id2 = -1;
-//        switch (shiftid) {
-//            case DFNTools.SHIFT_VERY_EARLY: {
-//                id1 = DFNTools.BYTE_EARLY_IN_THE_MORNING;
-//                id2 = DFNTools.BYTE_EARLY_IN_THE_MORNING;
-//                break;
-//            }
-//            case DFNTools.SHIFT_EARLY: {
-//                id1 = DFNTools.BYTE_MORNING;
-//                id2 = DFNTools.BYTE_NOON;
-//                break;
-//            }
-//            case DFNTools.SHIFT_LATE: {
-//                id1 = DFNTools.BYTE_AFTERNOON;
-//                id2 = DFNTools.BYTE_LATE_AT_NIGHT;
-//                break;
-//            }
-//            case DFNTools.SHIFT_VERY_LATE: {
-//                id1 = DFNTools.BYTE_LATE_AT_NIGHT;
-//                id2 = Byte.MAX_VALUE;
-//                break;
-//            }
-//        }
-//
-//        return new Pair<Byte, Byte>(id1, id2);
-//    }
-//
-//    public static Pair<Date, Date> getTimeOfDay4Shift(byte shiftid) {
-//        String id1 = "", id2 = "";
-//        switch (shiftid) {
-//            case DFNTools.SHIFT_VERY_EARLY: {
-//                id1 = DFNTools.STRING_EARLY_IN_THE_MORNING;
-//                id2 = DFNTools.STRING_MORNING;
-//                break;
-//            }
-//            case DFNTools.SHIFT_EARLY: {
-//                id1 = DFNTools.STRING_MORNING;
-//                id2 = DFNTools.STRING_AFTERNOON;
-//                break;
-//            }
-//            case DFNTools.SHIFT_LATE: {
-//                id1 = DFNTools.STRING_AFTERNOON;
-//                id2 = DFNTools.STRING_LATE_AT_NIGHT;
-//                break;
-//            }
-//            case DFNTools.SHIFT_VERY_LATE: {
-//                id1 = DFNTools.STRING_LATE_AT_NIGHT;
-//                id2 = DFNTools.STRING_EARLY_IN_THE_MORNING;
-//                break;
-//            }
-//        }
-//
-//        DateTimeFormatter parser = DateTimeFormat.forPattern("HH:mm");
-//        DateTime time1 = parser.parseDateTime(OPDE.getProps().getProperty(id1));
-//        DateTime time2 = parser.parseDateTime(OPDE.getProps().getProperty(id2)).minusSeconds(1);
-//        Period period1 = new Period(time1.getHourOfDay(), time1.getMinuteOfHour(), time1.getSecondOfMinute(), time1.getMillisOfSecond());
-//        Period period2 = new Period(time2.getHourOfDay(), time2.getMinuteOfHour(), time2.getSecondOfMinute(), time2.getMillisOfSecond());
-//
-//        return new Pair<Date, Date>(new DateMidnight().toDateTime().plus(period1).toDate(), new DateMidnight().toDateTime().plus(period2).toDate());
-//    }
 
 
     public static byte whatShiftIs(byte timeID) {
@@ -1493,25 +1093,6 @@ public class SYSCalendar {
     }
 
 
-    public static ComboBoxModel getMinuteCMBModelForDFNs(int[] mins) {
-        DefaultComboBoxModel dcbm = new DefaultComboBoxModel();
-//        Pair<Integer, String>[]
-
-        dcbm.addElement(new Pair<String, Integer>("--", -1)); // empty selection
-
-        for (int min : mins) {
-            if (min % 60 == 0) {
-                dcbm.addElement(new Pair<String, Integer>(min / 60 + " " + OPDE.lang.getString("misc.msg.Hour(s)"), min));
-            } else {
-                dcbm.addElement(new Pair<String, Integer>(min + " " + OPDE.lang.getString("misc.msg.Minute(s)"), min));
-            }
-        }
-
-        return dcbm;
-
-    }
-
-
     public static JPopupMenu getMinutesMenu(int[] mins, final Closure action) {
         JPopupMenu timemenu = new JPopupMenu(OPDE.lang.getString("misc.commands.changeeffort"));
 
@@ -1554,24 +1135,6 @@ public class SYSCalendar {
             return Color.DARK_GRAY;
         }
         return GUITools.getColor(OPDE.getProps().getProperty(BHPTools.SHIFT_KEY_TEXT[shift] + "_BGSHIFT"));
-    }
-
-//    public static Color getFG(Byte shift) {
-//        if (shift == -1) {
-//            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_FGBHP"));
-//        }
-//        return GUITools.getColor(OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[shift] + "_FGBHP"));
-//    }
-//
-//    public static Color getBG(Byte shift) {
-//        if (shift == -1) {
-//            return GUITools.getColor(OPDE.getProps().getProperty("ON_DEMAND_BGBHP"));
-//        }
-//        return GUITools.getColor(OPDE.getProps().getProperty(DFNTools.SHIFT_KEY_TEXT[shift] + "_BGBHP"));
-//    }
-
-    public static DateTime bod(DateTime date) {
-        return date.hourOfDay().withMinimumValue().minuteOfHour().withMinimumValue().secondOfMinute().withMinimumValue();
     }
 
     public static DateTime eod(DateTime date) {
@@ -1644,8 +1207,8 @@ public class SYSCalendar {
     }
 
     public static LocalDate toLocalDate(io.lamma.Date in) {
-            return new LocalDate(in.yyyy(), in.mm(), in.dd());
+        return new LocalDate(in.yyyy(), in.mm(), in.dd());
 
-        }
+    }
 
 }

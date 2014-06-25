@@ -54,21 +54,8 @@ public class Qmsplan {
     }
 
     @Basic
-    @Column(name = "starttime", nullable = false, insertable = true, updatable = true)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date from;
-
-    @Basic
-    @Column(name = "endtime", nullable = false, insertable = true, updatable = true)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date to;
-
-    @JoinColumn(name = "uidon", referencedColumnName = "UKennung")
-    @ManyToOne
-    private Users userON;
-    @JoinColumn(name = "uidoff", referencedColumnName = "UKennung")
-    @ManyToOne
-    private Users userOFF;
+    @Column(name = "state", nullable = false, insertable = true, updatable = true)
+    private byte state;
 
     @Version
     @Column(name = "version")
@@ -96,12 +83,9 @@ public class Qmsplan {
 
     public Qmsplan(String title) {
         this.title = title;
-        this.userON = OPDE.getLogin().getUser();
-        this.from = new Date();
-        this.to = SYSConst.DATE_UNTIL_FURTHER_NOTICE;
-        this.userOFF = null;
         commontags = new HashSet<>();
         qmsschedules = new ArrayList<>();
+        this.state = QmsplanTools.STATE_ACTIVE;
         this.version = 0l;
     }
 
@@ -109,45 +93,14 @@ public class Qmsplan {
         return commontags;
     }
 
-    public Date getFrom() {
-
-        return from;
-    }
 
     public Collection<Qmsplan2File> getAttachedFilesConnections() {
         return attachedFilesConnections;
     }
 
-    public void setFrom(Date from) {
-        this.from = from;
-    }
 
-    public Date getTo() {
-        return to;
-    }
-
-    public void setTo(Date to) {
-        this.to = to;
-    }
-
-    public Users getUserON() {
-        return userON;
-    }
-
-    public void setUserON(Users userON) {
-        this.userON = userON;
-    }
-
-    public Users getUserOFF() {
-        return userOFF;
-    }
-
-    public void setUserOFF(Users userOFF) {
-        this.userOFF = userOFF;
-    }
-
-    public boolean isClosed() {
-        return to.before(new Date());
+    public boolean isActive() {
+        return state != QmsplanTools.STATE_ACTIVE;
     }
 
     @Override
@@ -158,14 +111,15 @@ public class Qmsplan {
         Qmsplan qmsplan = (Qmsplan) o;
 
         if (id != qmsplan.id) return false;
-        if (version != qmsplan.version) return false;
-//        if (commontags != null ? !commontags.equals(qmsplan.commontags) : qmsplan.commontags != null) return false;
+        if (state != qmsplan.state) return false;
+        if (attachedFilesConnections != null ? !attachedFilesConnections.equals(qmsplan.attachedFilesConnections) : qmsplan.attachedFilesConnections != null)
+            return false;
+        if (commontags != null ? !commontags.equals(qmsplan.commontags) : qmsplan.commontags != null) return false;
         if (description != null ? !description.equals(qmsplan.description) : qmsplan.description != null) return false;
-        if (from != null ? !from.equals(qmsplan.from) : qmsplan.from != null) return false;
+        if (qmsschedules != null ? !qmsschedules.equals(qmsplan.qmsschedules) : qmsplan.qmsschedules != null)
+            return false;
         if (title != null ? !title.equals(qmsplan.title) : qmsplan.title != null) return false;
-        if (to != null ? !to.equals(qmsplan.to) : qmsplan.to != null) return false;
-        if (userOFF != null ? !userOFF.equals(qmsplan.userOFF) : qmsplan.userOFF != null) return false;
-        if (userON != null ? !userON.equals(qmsplan.userON) : qmsplan.userON != null) return false;
+        if (version != null ? !version.equals(qmsplan.version) : qmsplan.version != null) return false;
 
         return true;
     }
@@ -175,12 +129,11 @@ public class Qmsplan {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (from != null ? from.hashCode() : 0);
-        result = 31 * result + (to != null ? to.hashCode() : 0);
-        result = 31 * result + (int) (version ^ (version >>> 32));
-        result = 31 * result + (userON != null ? userON.hashCode() : 0);
-        result = 31 * result + (userOFF != null ? userOFF.hashCode() : 0);
-//        result = 31 * result + (commontags != null ? commontags.hashCode() : 0);
+        result = 31 * result + (int) state;
+        result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (commontags != null ? commontags.hashCode() : 0);
+        result = 31 * result + (qmsschedules != null ? qmsschedules.hashCode() : 0);
+        result = 31 * result + (attachedFilesConnections != null ? attachedFilesConnections.hashCode() : 0);
         return result;
     }
 }

@@ -35,18 +35,14 @@ import com.toedter.calendar.JDateChooser;
 import entity.Homes;
 import entity.Station;
 import entity.StationTools;
-import entity.qms.Qms;
 import entity.qms.QmsTools;
 import entity.qms.Qmssched;
-import entity.qms.QmsschedTools;
-import io.lamma.Lamma4j;
-import io.lamma.Recurrence;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
-import org.joda.time.LocalDate;
+import org.joda.time.DateTimeConstants;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -76,6 +72,7 @@ public class PnlQMSSchedule extends JPanel {
     private final int TAB_DAILY = 0;
     private final int TAB_WEEKLY = 1;
     private final int TAB_MONTHLY = 2;
+    private final int TAB_YEARLY = 3;
 
     public PnlQMSSchedule(Qmssched qmssched, Closure actionBlock) {
         this.qmssched = qmssched;
@@ -105,6 +102,10 @@ public class PnlQMSSchedule extends JPanel {
 
     private void initPanel() {
 
+        tabWdh.setTitleAt(TAB_DAILY, OPDE.lang.getString("misc.msg.daily"));
+        tabWdh.setTitleAt(TAB_WEEKLY, OPDE.lang.getString("misc.msg.weekly"));
+        tabWdh.setTitleAt(TAB_MONTHLY, OPDE.lang.getString("misc.msg.monthly"));
+        tabWdh.setTitleAt(TAB_YEARLY, OPDE.lang.getString("misc.msg.yearly"));
 
         spinTaeglich.setModel(new SpinnerNumberModel(1, 1, 365, 1));
         spinWoche.setModel(new SpinnerNumberModel(1, 1, 52, 1));
@@ -114,82 +115,42 @@ public class PnlQMSSchedule extends JPanel {
         spinTaeglich.setValue(Math.max(qmssched.getDaily(), 1));
         spinWoche.setValue(Math.max(qmssched.getWeekly(), 1));
         spinMonat.setValue(Math.max(qmssched.getMonthly(), 1));
-        spinMonatTag.setValue(Math.max(qmssched.getDaynum(), 1));
+        spinMonatTag.setValue(Math.max(qmssched.getDayinmonth(), 1));
 
-        tabWdh.setSelectedIndex(TAB_DAILY);
 
-        if (qmssched.getWeekly() > 0) {
-            cbMon.setSelected(qmssched.getMon() > 0);
-            cbDie.setSelected(qmssched.getTue() > 0);
-            cbMit.setSelected(qmssched.getWed() > 0);
-            cbDon.setSelected(qmssched.getThu() > 0);
-            cbFre.setSelected(qmssched.getFri() > 0);
-            cbSam.setSelected(qmssched.getSat() > 0);
-            cbSon.setSelected(qmssched.getSun() > 0);
+        if (qmssched.isDaily()) {
+            tabWdh.setSelectedIndex(TAB_DAILY);
+        } else if (qmssched.isWeekly()) {
+            cbMon.setSelected(qmssched.getWeekday() == DateTimeConstants.MONDAY);
+            cbDie.setSelected(qmssched.getWeekday() == DateTimeConstants.TUESDAY);
+            cbMit.setSelected(qmssched.getWeekday() == DateTimeConstants.WEDNESDAY);
+            cbDon.setSelected(qmssched.getWeekday() == DateTimeConstants.THURSDAY);
+            cbFre.setSelected(qmssched.getWeekday() == DateTimeConstants.FRIDAY);
+            cbSam.setSelected(qmssched.getWeekday() == DateTimeConstants.SATURDAY);
+            cbSon.setSelected(qmssched.getWeekday() == DateTimeConstants.SUNDAY);
+
             tabWdh.setSelectedIndex(TAB_WEEKLY);
-        }
+        } else if (qmssched.isMonthly()) {
 
-        if (qmssched.getMonthly() > 0) {
-            if (qmssched.getDaynum() > 0) {
+            spinMonatTag.setValue(qmssched.getDayinmonth());
+            cmbTag.setSelectedIndex(qmssched.getWeekday());
 
-                spinMonatTag.setValue(qmssched.getDaynum());
-                cmbTag.setSelectedIndex(0);
-            } else {
-
-                if (qmssched.getMon() > 0) {
-                    cmbTag.setSelectedIndex(1);
-                    spinMonatTag.setValue(qmssched.getMon());
-                } else if (qmssched.getTue() > 0) {
-                    cmbTag.setSelectedIndex(2);
-                    spinMonatTag.setValue(qmssched.getTue());
-                } else if (qmssched.getWed() > 0) {
-                    cmbTag.setSelectedIndex(3);
-                    spinMonatTag.setValue(qmssched.getWed());
-                } else if (qmssched.getThu() > 0) {
-                    cmbTag.setSelectedIndex(4);
-                    spinMonatTag.setValue(qmssched.getThu());
-                } else if (qmssched.getFri() > 0) {
-                    cmbTag.setSelectedIndex(5);
-                    spinMonatTag.setValue(qmssched.getFri());
-                } else if (qmssched.getSat() > 0) {
-                    cmbTag.setSelectedIndex(6);
-                    spinMonatTag.setValue(qmssched.getSat());
-                } else if (qmssched.getSun() > 0) {
-                    cmbTag.setSelectedIndex(7);
-                    spinMonatTag.setValue(qmssched.getSun());
-                }
-            }
             tabWdh.setSelectedIndex(TAB_MONTHLY);
         }
 
-        jdcLDate.setMinSelectableDate(new Date());
-        jdcLDate.setDate(qmssched.getlDate());
+        jdcStartingOn.setMinSelectableDate(new Date());
+        jdcStartingOn.setDate(qmssched.getStartingOn());
 
         ArrayList<Date> timelist = SYSCalendar.getTimeList();
         DefaultComboBoxModel dcbm = new DefaultComboBoxModel(timelist.toArray());
         dcbm.insertElementAt(null, 0);
 
-        cmbTime.setModel(dcbm);
-        cmbTime.setRenderer(SYSCalendar.getTimeRenderer());
-
-//        Date now = qmssched.getTime();
-//        if (now == null) now = new Date();
-//
-//
-//        for (Date time : timelist) {
-//            if (SYSCalendar.compareTime(time, now) >= 0) {
-//                now = time;
-//                break;
-//            }
-//        }
-        cmbTime.setSelectedItem(null);
 
         txtBemerkung.setText(qmssched.getText());
         txtQMS.setText(qmssched.getMeasure());
 
         lblMeasure.setText(OPDE.lang.getString("misc.msg.measure"));
-        lblTime.setText(OPDE.lang.getString("misc.msg.Time"));
-        lblLDate.setText(OPDE.lang.getString("opde.controlling.qms.dlgqmsplan.pnlschedule.ldate"));
+        lblLDate.setText(OPDE.lang.getString("opde.controlling.qms.dlgqmsplan.pnlschedule.startingon"));
         lblLocation.setText(OPDE.lang.getString("opde.controlling.qms.dlgqmsplan.pnlschedule.location"));
 
         cmbLocation.setTreeModel(new DefaultTreeModel(StationTools.getCompleteStructure()));
@@ -207,9 +168,7 @@ public class PnlQMSSchedule extends JPanel {
         panelMain = new JPanel();
         lblMeasure = new JLabel();
         txtQMS = new JTextField();
-        lblTime = new JLabel();
         lblLocation = new JLabel();
-        cmbTime = new JComboBox();
         cmbLocation = new TreeComboBox();
         tabWdh = new JideTabbedPane();
         pnlDaily = new JPanel();
@@ -230,13 +189,13 @@ public class PnlQMSSchedule extends JPanel {
         lblUhrzeit6 = new JideLabel();
         lblUhrzeit7 = new JideLabel();
         lblUhrzeit8 = new JideLabel();
-        cbMon = new JCheckBox();
-        cbDie = new JCheckBox();
-        cbMit = new JCheckBox();
-        cbDon = new JCheckBox();
-        cbFre = new JCheckBox();
-        cbSam = new JCheckBox();
-        cbSon = new JCheckBox();
+        cbMon = new JRadioButton();
+        cbDie = new JRadioButton();
+        cbMit = new JRadioButton();
+        cbDon = new JRadioButton();
+        cbFre = new JRadioButton();
+        cbSam = new JRadioButton();
+        cbSon = new JRadioButton();
         pnlMonthly = new JPanel();
         label4 = new JLabel();
         spinMonat = new JSpinner();
@@ -245,8 +204,9 @@ public class PnlQMSSchedule extends JPanel {
         label5 = new JLabel();
         spinMonatTag = new JSpinner();
         cmbTag = new JComboBox<>();
+        pnlYearly = new JPanel();
         lblLDate = new JLabel();
-        jdcLDate = new JDateChooser();
+        jdcStartingOn = new JDateChooser();
         jScrollPane1 = new JScrollPane();
         txtBemerkung = new JTextArea();
         btnSave = new JButton();
@@ -264,8 +224,8 @@ public class PnlQMSSchedule extends JPanel {
                 }
             });
             panelMain.setLayout(new FormLayout(
-                    "$rgap, $lcgap, 35dlu:grow, $ugap, 105dlu:grow, $lcgap, $rgap",
-                    "default, $nlgap, default, $lgap, default, $nlgap, 2*(default, $lgap), pref, $lgap, default, $nlgap, default, $lgap, 72dlu:grow, $lgap, default, $lgap, $rgap"));
+                "$rgap, $lcgap, 35dlu:grow, $ugap, 105dlu:grow, $lcgap, $rgap",
+                "default, $nlgap, default, $lgap, default, $nlgap, 2*(default, $lgap), pref, $lgap, default, $nlgap, default, $lgap, 72dlu:grow, $lgap, default, $lgap, $rgap"));
 
             //---- lblMeasure ----
             lblMeasure.setText("text");
@@ -274,19 +234,12 @@ public class PnlQMSSchedule extends JPanel {
             panelMain.add(lblMeasure, CC.xy(5, 1));
             panelMain.add(txtQMS, CC.xywh(3, 3, 3, 1));
 
-            //---- lblTime ----
-            lblTime.setText("text");
-            lblTime.setFont(new Font("Arial", Font.PLAIN, 10));
-            lblTime.setHorizontalAlignment(SwingConstants.TRAILING);
-            panelMain.add(lblTime, CC.xy(3, 5));
-
             //---- lblLocation ----
             lblLocation.setText("text");
             lblLocation.setFont(new Font("Arial", Font.PLAIN, 10));
             lblLocation.setHorizontalAlignment(SwingConstants.TRAILING);
             panelMain.add(lblLocation, CC.xy(5, 5));
-            panelMain.add(cmbTime, CC.xy(3, 7));
-            panelMain.add(cmbLocation, CC.xy(5, 7));
+            panelMain.add(cmbLocation, CC.xywh(3, 7, 3, 1));
 
             //======== tabWdh ========
             {
@@ -295,8 +248,8 @@ public class PnlQMSSchedule extends JPanel {
                 {
                     pnlDaily.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlDaily.setLayout(new FormLayout(
-                            "2*(default), $rgap, $lcgap, 40dlu, $rgap, default",
-                            "default, $lgap, pref, $lgap, default"));
+                        "2*(default), $rgap, $lcgap, 40dlu, $rgap, default",
+                        "default, $lgap, pref, $lgap, default"));
 
                     //---- label3 ----
                     label3.setText("alle");
@@ -329,14 +282,14 @@ public class PnlQMSSchedule extends JPanel {
                 {
                     pnlWeekly.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlWeekly.setLayout(new FormLayout(
-                            "default, 7*(13dlu), $lcgap, default:grow",
-                            "$ugap, $lgap, default, $lgap, pref, $nlgap, default:grow, $lgap, $rgap"));
+                        "default, 7*(13dlu), $lcgap, default:grow",
+                        "$ugap, $lgap, default, $lgap, pref, $nlgap, default:grow, $lgap, $rgap"));
 
                     //======== panel3 ========
                     {
                         panel3.setLayout(new FormLayout(
-                                "default, $rgap, 40dlu, $rgap, 2*(default), $lcgap, default, $lcgap",
-                                "default:grow, $lgap, default"));
+                            "default, $rgap, 40dlu, $rgap, 2*(default), $lcgap, default, $lcgap",
+                            "default:grow, $lgap, default"));
 
                         //---- btnJedeWoche ----
                         btnJedeWoche.setText("Jede Woche");
@@ -501,8 +454,8 @@ public class PnlQMSSchedule extends JPanel {
                 {
                     pnlMonthly.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlMonthly.setLayout(new FormLayout(
-                            "default, $lcgap, pref, $lcgap, 40dlu, $lcgap, pref, $lcgap, 61dlu",
-                            "3*(default, $lgap), default"));
+                        "default, $lcgap, pref, $lcgap, 40dlu, $lcgap, pref, $lcgap, 61dlu",
+                        "3*(default, $lgap), default"));
 
                     //---- label4 ----
                     label4.setText("jeden");
@@ -547,20 +500,28 @@ public class PnlQMSSchedule extends JPanel {
                     pnlMonthly.add(spinMonatTag, CC.xy(5, 7));
 
                     //---- cmbTag ----
-                    cmbTag.setModel(new DefaultComboBoxModel<>(new String[]{
-                            "Tag des Monats",
-                            "Montag",
-                            "Dienstag",
-                            "Mittwoch",
-                            "Donnerstag",
-                            "Freitag",
-                            "Samstag",
-                            "Sonntag"
+                    cmbTag.setModel(new DefaultComboBoxModel<>(new String[] {
+                        "Tag des Monats",
+                        "Montag",
+                        "Dienstag",
+                        "Mittwoch",
+                        "Donnerstag",
+                        "Freitag",
+                        "Samstag",
+                        "Sonntag"
                     }));
                     cmbTag.setFont(new Font("Arial", Font.PLAIN, 14));
                     pnlMonthly.add(cmbTag, CC.xywh(7, 7, 3, 1));
                 }
                 tabWdh.addTab("Monatlich", pnlMonthly);
+
+                //======== pnlYearly ========
+                {
+                    pnlYearly.setLayout(new FormLayout(
+                        "default, $lcgap, default",
+                        "2*(default, $lgap), default"));
+                }
+                tabWdh.addTab("text", pnlYearly);
             }
             panelMain.add(tabWdh, CC.xywh(3, 11, 3, 1, CC.FILL, CC.FILL));
 
@@ -569,7 +530,7 @@ public class PnlQMSSchedule extends JPanel {
             lblLDate.setFont(new Font("Arial", Font.PLAIN, 10));
             lblLDate.setHorizontalAlignment(SwingConstants.TRAILING);
             panelMain.add(lblLDate, CC.xy(5, 13));
-            panelMain.add(jdcLDate, CC.xywh(3, 15, 3, 1));
+            panelMain.add(jdcStartingOn, CC.xywh(3, 15, 3, 1));
 
             //======== jScrollPane1 ========
             {
@@ -592,6 +553,16 @@ public class PnlQMSSchedule extends JPanel {
             panelMain.add(btnSave, CC.xy(5, 19, CC.RIGHT, CC.DEFAULT));
         }
         add(panelMain, BorderLayout.CENTER);
+
+        //---- buttonGroup1 ----
+        ButtonGroup buttonGroup1 = new ButtonGroup();
+        buttonGroup1.add(cbMon);
+        buttonGroup1.add(cbDie);
+        buttonGroup1.add(cbMit);
+        buttonGroup1.add(cbDon);
+        buttonGroup1.add(cbFre);
+        buttonGroup1.add(cbSam);
+        buttonGroup1.add(cbSon);
     }// </editor-fold>//GEN-END:initComponents
 
 
@@ -603,54 +574,31 @@ public class PnlQMSSchedule extends JPanel {
 //    }
 
     private void cbSonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbSonActionPerformed
-
-        if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.needoneweekday")));
-            ((JCheckBox) evt.getSource()).setSelected(true);
-        }
-
+        qmssched.setWeekday(DateTimeConstants.SUNDAY);
     }//GEN-LAST:event_cbSonActionPerformed
 
     private void cbSamActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbSamActionPerformed
-        if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.needoneweekday")));
-            ((JCheckBox) evt.getSource()).setSelected(true);
-        }
+        qmssched.setWeekday(DateTimeConstants.SATURDAY);
     }//GEN-LAST:event_cbSamActionPerformed
 
     private void cbFreActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbFreActionPerformed
-        if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.needoneweekday")));
-            ((JCheckBox) evt.getSource()).setSelected(true);
-        }
+        qmssched.setWeekday(DateTimeConstants.FRIDAY);
     }//GEN-LAST:event_cbFreActionPerformed
 
     private void cbDonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbDonActionPerformed
-        if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.needoneweekday")));
-            ((JCheckBox) evt.getSource()).setSelected(true);
-        }
+        qmssched.setWeekday(DateTimeConstants.THURSDAY);
     }//GEN-LAST:event_cbDonActionPerformed
 
     private void cbMitActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbMitActionPerformed
-        if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.needoneweekday")));
-            ((JCheckBox) evt.getSource()).setSelected(true);
-        }
+        qmssched.setWeekday(DateTimeConstants.WEDNESDAY);
     }//GEN-LAST:event_cbMitActionPerformed
 
     private void cbDieActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbDieActionPerformed
-        if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.needoneweekday")));
-            ((JCheckBox) evt.getSource()).setSelected(true);
-        }
+        qmssched.setWeekday(DateTimeConstants.TUESDAY);
     }//GEN-LAST:event_cbDieActionPerformed
 
     private void cbMonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_cbMonActionPerformed
-        if (!(cbSon.isSelected() || cbSam.isSelected() || cbFre.isSelected() || cbDon.isSelected() || cbMit.isSelected() || cbDie.isSelected() || cbMon.isSelected())) {
-            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(OPDE.lang.getString("misc.msg.needoneweekday")));
-            ((JCheckBox) evt.getSource()).setSelected(true);
-        }
+        qmssched.setWeekday(DateTimeConstants.MONDAY);
     }//GEN-LAST:event_cbMonActionPerformed
 
 //    private void spinMonatWTagStateChanged(ChangeEvent evt) {//GEN-FIRST:event_spinMonatWTagStateChanged
@@ -683,46 +631,21 @@ public class PnlQMSSchedule extends JPanel {
     }//GEN-LAST:event_btnSaveActionPerformed
 
     public boolean isSaveOK() {
-        return jdcLDate.getDate() != null && !SYSTools.tidy(txtQMS.getText()).isEmpty();
+        return jdcStartingOn.getDate() != null && !SYSTools.tidy(txtQMS.getText()).isEmpty();
     }
 
     public void save() throws NumberFormatException {
 
-        qmssched.setTime((Date) cmbTime.getSelectedItem());
-
         qmssched.setDaily(tabWdh.getSelectedIndex() == TAB_DAILY ? Byte.parseByte(spinTaeglich.getValue().toString()) : (byte) 0);
         qmssched.setWeekly(tabWdh.getSelectedIndex() == TAB_WEEKLY ? Byte.parseByte(spinWoche.getValue().toString()) : (byte) 0);
         qmssched.setMonthly(tabWdh.getSelectedIndex() == TAB_MONTHLY ? Byte.parseByte(spinMonat.getValue().toString()) : (byte) 0);
-
-        qmssched.setlDate(jdcLDate.getDate());
-
-        qmssched.setMon(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbMon.isSelected() ? (byte) 1 : (byte) 0);
-        qmssched.setTue(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbDie.isSelected() ? (byte) 1 : (byte) 0);
-        qmssched.setWed(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbMit.isSelected() ? (byte) 1 : (byte) 0);
-        qmssched.setThu(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbDon.isSelected() ? (byte) 1 : (byte) 0);
-        qmssched.setFri(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbFre.isSelected() ? (byte) 1 : (byte) 0);
-        qmssched.setSat(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbSam.isSelected() ? (byte) 1 : (byte) 0);
-        qmssched.setSun(tabWdh.getSelectedIndex() == TAB_WEEKLY && cbSon.isSelected() ? (byte) 1 : (byte) 0);
+        qmssched.setStartingOn(jdcStartingOn.getDate());
 
         if (tabWdh.getSelectedIndex() == TAB_MONTHLY) {
-            byte b = Byte.parseByte(spinMonatTag.getValue().toString());
-            qmssched.setDaynum(cmbTag.getSelectedIndex() == 0 ? b : (byte) 0);
+            int b = Integer.parseInt(spinMonatTag.getValue().toString());
+            qmssched.setDayinmonth(cmbTag.getSelectedIndex() == 0 ? b : 0);
 
-            if (cmbTag.getSelectedIndex() == 1) {
-                qmssched.setMon(b);
-            } else if (cmbTag.getSelectedIndex() == 2) {
-                qmssched.setTue(b);
-            } else if (cmbTag.getSelectedIndex() == 3) {
-                qmssched.setWed(b);
-            } else if (cmbTag.getSelectedIndex() == 4) {
-                qmssched.setThu(b);
-            } else if (cmbTag.getSelectedIndex() == 5) {
-                qmssched.setFri(b);
-            } else if (cmbTag.getSelectedIndex() == 6) {
-                qmssched.setSat(b);
-            } else if (cmbTag.getSelectedIndex() == 7) {
-                qmssched.setSun(b);
-            }
+            qmssched.setWeekday(cmbTag.getSelectedIndex());
         }
 
         qmssched.setMeasure(SYSTools.tidy(txtQMS.getText()));
@@ -775,9 +698,7 @@ public class PnlQMSSchedule extends JPanel {
     private JPanel panelMain;
     private JLabel lblMeasure;
     private JTextField txtQMS;
-    private JLabel lblTime;
     private JLabel lblLocation;
-    private JComboBox cmbTime;
     private TreeComboBox cmbLocation;
     private JideTabbedPane tabWdh;
     private JPanel pnlDaily;
@@ -798,13 +719,13 @@ public class PnlQMSSchedule extends JPanel {
     private JideLabel lblUhrzeit6;
     private JideLabel lblUhrzeit7;
     private JideLabel lblUhrzeit8;
-    private JCheckBox cbMon;
-    private JCheckBox cbDie;
-    private JCheckBox cbMit;
-    private JCheckBox cbDon;
-    private JCheckBox cbFre;
-    private JCheckBox cbSam;
-    private JCheckBox cbSon;
+    private JRadioButton cbMon;
+    private JRadioButton cbDie;
+    private JRadioButton cbMit;
+    private JRadioButton cbDon;
+    private JRadioButton cbFre;
+    private JRadioButton cbSam;
+    private JRadioButton cbSon;
     private JPanel pnlMonthly;
     private JLabel label4;
     private JSpinner spinMonat;
@@ -813,8 +734,9 @@ public class PnlQMSSchedule extends JPanel {
     private JLabel label5;
     private JSpinner spinMonatTag;
     private JComboBox<String> cmbTag;
+    private JPanel pnlYearly;
     private JLabel lblLDate;
-    private JDateChooser jdcLDate;
+    private JDateChooser jdcStartingOn;
     private JScrollPane jScrollPane1;
     private JTextArea txtBemerkung;
     private JButton btnSave;

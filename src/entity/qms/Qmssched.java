@@ -44,16 +44,16 @@ public class Qmssched {
 
 
     @Basic
-    @Column(name = "time", nullable = true, insertable = true, updatable = true)
-    @Temporal(TemporalType.TIME)
-    private Date time;
+    @Column(name = "startingon", nullable = false, insertable = true, updatable = true)
+    @Temporal(TemporalType.DATE)
+    private Date startingOn;
 
-    public Date getTime() {
-        return time;
+    public Date getStartingOn() {
+        return startingOn;
     }
 
-    public void setTime(Date time) {
-        this.time = time;
+    public void setStartingOn(Date startingOn) {
+        this.startingOn = startingOn;
     }
 
     @Basic
@@ -93,114 +93,64 @@ public class Qmssched {
     }
 
     @Basic
-    @Column(name = "daynum", nullable = true, insertable = true, updatable = true)
-    private Byte daynum;
+    @Column(name = "yearly", nullable = true, insertable = true, updatable = true)
+    private Byte yearly;
 
-    public Byte getDaynum() {
-        return daynum;
+    public Byte getYearly() {
+        return yearly;
     }
 
-    public void setDaynum(Byte daynum) {
-        this.daynum = daynum;
-    }
-
-    @Basic
-    @Column(name = "mon", nullable = true, insertable = true, updatable = true)
-    private Byte mon;
-
-    public Byte getMon() {
-        return mon;
-    }
-
-    public void setMon(Byte mon) {
-        this.mon = mon;
+    public void setYearly(Byte yearly) {
+        this.yearly = yearly;
     }
 
     @Basic
-    @Column(name = "tue", nullable = true, insertable = true, updatable = true)
-    private Byte tue;
+    @Column(name = "monthinyear", nullable = true, insertable = true, updatable = true)
+    private int monthinyear;
 
-    public Byte getTue() {
-        return tue;
+    public int getMonthinyear() {
+        return monthinyear;
     }
 
-    public void setTue(Byte tue) {
-        this.tue = tue;
-    }
-
-    @Basic
-    @Column(name = "wed", nullable = true, insertable = true, updatable = true)
-    private Byte wed;
-
-    public Byte getWed() {
-        return wed;
-    }
-
-    public void setWed(Byte wed) {
-        this.wed = wed;
+    public void setMonthinyear(int monthinyear) {
+        this.monthinyear = monthinyear;
     }
 
     @Basic
-    @Column(name = "thu", nullable = true, insertable = true, updatable = true)
-    private Byte thu;
+    @Column(name = "dayinmonth", nullable = true, insertable = true, updatable = true)
+    private int dayinmonth;
 
-    public Byte getThu() {
-        return thu;
+    public int getDayinmonth() {
+        return dayinmonth;
     }
 
-    public void setThu(Byte thu) {
-        this.thu = thu;
-    }
-
-    @Basic
-    @Column(name = "fri", nullable = true, insertable = true, updatable = true)
-    private Byte fri;
-
-    public Byte getFri() {
-        return fri;
-    }
-
-    public void setFri(Byte fri) {
-        this.fri = fri;
+    public void setDayinmonth(int dayinmonth) {
+        this.dayinmonth = dayinmonth;
     }
 
     @Basic
-    @Column(name = "sat", nullable = true, insertable = true, updatable = true)
-    private Byte sat;
+    @Column(name = "weekday", nullable = true, insertable = true, updatable = true)
+    private int weekday;
 
-    public Byte getSat() {
-        return sat;
+    public int getWeekday() {
+        return weekday;
     }
 
-    public void setSat(Byte sat) {
-        this.sat = sat;
-    }
-
-    @Basic
-    @Column(name = "sun", nullable = true, insertable = true, updatable = true)
-    private Byte sun;
-
-    public Byte getSun() {
-        return sun;
-    }
-
-    public void setSun(Byte sun) {
-        this.sun = sun;
+    public void setWeekday(int weekday) {
+        this.weekday = weekday;
     }
 
     @Basic
-    @Column(name = "LDate", nullable = false, insertable = true, updatable = true)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date lDate;
+       @Column(name = "workingday", nullable = true, insertable = true, updatable = true)
+       private int workingday;
 
-    public Date getlDate() {
-        return lDate;
+    public int getWorkingday() {
+        return workingday;
     }
 
-    public void setlDate(Date lDate) {
-        this.lDate = lDate;
+    public void setWorkingday(int workingday) {
+        this.workingday = workingday;
     }
-
 
     @Basic
     @Column(name = "text", nullable = true, insertable = true, updatable = true, length = 16777215)
@@ -234,7 +184,7 @@ public class Qmssched {
 
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "qmssched", orphanRemoval = true)
-       private List<Qms> qmsList;
+    private List<Qms> qmsList;
 
     public List<Qms> getQmsList() {
         return qmsList;
@@ -254,27 +204,29 @@ public class Qmssched {
     public Qmssched(Qmsplan qmsplan) {
         this.qmsplan = qmsplan;
 
-        this.daily = 1;
-        this.lDate = new LocalDate().toDateTimeAtStartOfDay().toDate();
+        this.startingOn = new LocalDate().toDate();
 
         this.measure = "";
 
-        this.time = null;
+        this.daily = 0;
         this.weekly = 0;
         this.monthly = 0;
+        this.yearly = 0;
 
-        this.mon = 0;
-        this.tue = 0;
-        this.wed = 0;
-        this.thu = 0;
-        this.fri = 0;
-        this.sat = 0;
-        this.sun = 0;
-        this.daynum = 0;
+        this.dayinmonth = 0;
+        this.monthinyear = 0;
+        this.weekday = 0;
+
+
+
+        this.home = null;
+        this.station = null;
+
+        this.text = null;
 
         this.qmsList = new ArrayList<>();
 
-        this.text = null;
+
     }
 
     public Station getStation() {
@@ -305,9 +257,10 @@ public class Qmssched {
         return monthly > 0;
     }
 
-    public boolean hasTime(){
-        return time != null;
+    public boolean isYearly() {
+        return yearly > 0;
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -316,26 +269,23 @@ public class Qmssched {
 
         Qmssched qmssched = (Qmssched) o;
 
+        if (dayinmonth != qmssched.dayinmonth) return false;
         if (id != qmssched.id) return false;
+        if (monthinyear != qmssched.monthinyear) return false;
         if (version != qmssched.version) return false;
+        if (weekday != qmssched.weekday) return false;
+        if (workingday != qmssched.workingday) return false;
         if (daily != null ? !daily.equals(qmssched.daily) : qmssched.daily != null) return false;
-        if (daynum != null ? !daynum.equals(qmssched.daynum) : qmssched.daynum != null) return false;
-        if (fri != null ? !fri.equals(qmssched.fri) : qmssched.fri != null) return false;
         if (home != null ? !home.equals(qmssched.home) : qmssched.home != null) return false;
-        if (lDate != null ? !lDate.equals(qmssched.lDate) : qmssched.lDate != null) return false;
         if (measure != null ? !measure.equals(qmssched.measure) : qmssched.measure != null) return false;
-        if (mon != null ? !mon.equals(qmssched.mon) : qmssched.mon != null) return false;
         if (monthly != null ? !monthly.equals(qmssched.monthly) : qmssched.monthly != null) return false;
+        if (qmsList != null ? !qmsList.equals(qmssched.qmsList) : qmssched.qmsList != null) return false;
         if (qmsplan != null ? !qmsplan.equals(qmssched.qmsplan) : qmssched.qmsplan != null) return false;
-        if (sat != null ? !sat.equals(qmssched.sat) : qmssched.sat != null) return false;
+        if (startingOn != null ? !startingOn.equals(qmssched.startingOn) : qmssched.startingOn != null) return false;
         if (station != null ? !station.equals(qmssched.station) : qmssched.station != null) return false;
-        if (sun != null ? !sun.equals(qmssched.sun) : qmssched.sun != null) return false;
         if (text != null ? !text.equals(qmssched.text) : qmssched.text != null) return false;
-        if (thu != null ? !thu.equals(qmssched.thu) : qmssched.thu != null) return false;
-        if (time != null ? !time.equals(qmssched.time) : qmssched.time != null) return false;
-        if (tue != null ? !tue.equals(qmssched.tue) : qmssched.tue != null) return false;
-        if (wed != null ? !wed.equals(qmssched.wed) : qmssched.wed != null) return false;
         if (weekly != null ? !weekly.equals(qmssched.weekly) : qmssched.weekly != null) return false;
+        if (yearly != null ? !yearly.equals(qmssched.yearly) : qmssched.yearly != null) return false;
 
         return true;
     }
@@ -344,24 +294,21 @@ public class Qmssched {
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + (measure != null ? measure.hashCode() : 0);
-        result = 31 * result + (time != null ? time.hashCode() : 0);
+        result = 31 * result + (startingOn != null ? startingOn.hashCode() : 0);
         result = 31 * result + (daily != null ? daily.hashCode() : 0);
         result = 31 * result + (weekly != null ? weekly.hashCode() : 0);
         result = 31 * result + (monthly != null ? monthly.hashCode() : 0);
-        result = 31 * result + (daynum != null ? daynum.hashCode() : 0);
-        result = 31 * result + (mon != null ? mon.hashCode() : 0);
-        result = 31 * result + (tue != null ? tue.hashCode() : 0);
-        result = 31 * result + (wed != null ? wed.hashCode() : 0);
-        result = 31 * result + (thu != null ? thu.hashCode() : 0);
-        result = 31 * result + (fri != null ? fri.hashCode() : 0);
-        result = 31 * result + (sat != null ? sat.hashCode() : 0);
-        result = 31 * result + (sun != null ? sun.hashCode() : 0);
-        result = 31 * result + (lDate != null ? lDate.hashCode() : 0);
+        result = 31 * result + (yearly != null ? yearly.hashCode() : 0);
+        result = 31 * result + monthinyear;
+        result = 31 * result + dayinmonth;
+        result = 31 * result + weekday;
+        result = 31 * result + workingday;
         result = 31 * result + (text != null ? text.hashCode() : 0);
         result = 31 * result + (int) (version ^ (version >>> 32));
         result = 31 * result + (station != null ? station.hashCode() : 0);
         result = 31 * result + (home != null ? home.hashCode() : 0);
         result = 31 * result + (qmsplan != null ? qmsplan.hashCode() : 0);
+        result = 31 * result + (qmsList != null ? qmsList.hashCode() : 0);
         return result;
     }
 }
