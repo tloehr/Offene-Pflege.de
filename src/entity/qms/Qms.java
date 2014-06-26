@@ -93,6 +93,18 @@ public class Qms implements Comparable<Qms> {
     @ManyToOne
     private Qmssched qmssched;
 
+    @Basic
+       @Column(name = "text", nullable = true, insertable = true, updatable = true, length = 16777215)
+       private String text;
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
     public Qms() {
     }
 
@@ -104,6 +116,10 @@ public class Qms implements Comparable<Qms> {
         this.actual = null;
         this.state = QmsTools.STATE_OPEN;
         this.sequence = sequence;
+    }
+
+    public boolean hasText(){
+        return !SYSTools.catchNull(text).isEmpty();
     }
 
     public Users getUser() {

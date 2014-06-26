@@ -7,28 +7,29 @@ import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import entity.qms.*;
-
 import op.OPDE;
 import op.system.InternalClassACL;
 import op.threads.DisplayManager;
+import op.threads.DisplayMessage;
 import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.VerticalLayout;
+import org.joda.time.LocalDate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.RollbackException;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-
 
 
 /**
@@ -38,15 +39,18 @@ public class PnlQMSPlan extends CleanablePanel {
     public static final String internalClassID = "opde.controlling.qms.pnlqmsplan";
     CollapsiblePanes cpsMain;
 
-    private HashMap<Qms, JPanel> mapQms2Panel;
+    private HashMap<Qms, CollapsiblePane> mapQms2Panel;
     private HashMap<String, CollapsiblePane> cpMap;
-//    private ArrayList<Qmsplan> listQMSPlans;
+    //    private ArrayList<Qmsplan> listQMSPlans;
     private ArrayList<Qmsplan> listQMSPlans;
-    private int MAX_TEXT_LENGTH = 65;
+
+    private final int MAX_TEXT_LENGTH = 65;
+    private final int MAX_MONTHS_IN_ADVANCE_TO_CONFIRM_QMS = 6;
 
     public PnlQMSPlan(ArrayList<Qmsplan> listQMSPlans) {
         this.listQMSPlans = listQMSPlans;
         cpMap = new HashMap<>();
+        mapQms2Panel = new HashMap<>();
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         cpsMain = new CollapsiblePanes();
         add(new JScrollPane(cpsMain));
@@ -59,12 +63,15 @@ public class PnlQMSPlan extends CleanablePanel {
 
     @Override
     public void cleanup() {
+        cpMap.clear();
+        mapQms2Panel.clear();
         cpsMain.removeAll();
     }
 
     @Override
     public void reload() {
         cpMap.clear();
+        mapQms2Panel.clear();
         for (Qmsplan qmsplan : listQMSPlans) {
             createCP4(qmsplan);
         }
@@ -83,6 +90,14 @@ public class PnlQMSPlan extends CleanablePanel {
             cpsMain.add(cpMap.get(qmsplan.getId() + ".qmsplan"));
         }
         cpsMain.addExpansion();
+
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                revalidate();
+                repaint();
+            }
+        });
     }
 
 
@@ -98,9 +113,7 @@ public class PnlQMSPlan extends CleanablePanel {
         }
         final CollapsiblePane cpPlan = cpMap.get(key);
 
-        String title = "<html><font size=+1><b>" +
-                qmsplan.getTitle() +
-                "</b></font></html>";
+        String title = qmsplan.getTitle();
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
             @Override
@@ -116,6 +129,9 @@ public class PnlQMSPlan extends CleanablePanel {
             }
         });
 
+        cptitle.getButton().setFont(SYSConst.ARIAL24BOLD);
+        cptitle.getButton().setForeground(qmsplan.getColor());
+        cpPlan.setBackground(Color.white);
         cpPlan.setTitleLabelComponent(cptitle.getMain());
         cpPlan.setSlidingDirection(SwingConstants.SOUTH);
 //            cpPlan.setBackground(getColor(cat)[SYSConst.medium2]);
@@ -198,11 +214,9 @@ public class PnlQMSPlan extends CleanablePanel {
                 // Bah!
             }
         }
-        final CollapsiblePane cpPlan = cpMap.get(key);
+        final CollapsiblePane cpSched = cpMap.get(key);
 
-        String title = "<html><font size=+1><b>" +
-                QmsschedTools.getAsHTML(qmssched) +
-                "</b></font></html>";
+        String title = SYSTools.toHTMLForScreen(SYSConst.html_color(GUITools.blend(qmssched.getQmsplan().getColor(), Color.BLACK, 0.55f), QmsschedTools.getAsHTML(qmssched)));
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
             @Override
@@ -211,18 +225,20 @@ public class PnlQMSPlan extends CleanablePanel {
                     //                    if (cpCat.isCollapsed() && !tbInactive.isSelected()  && !isEmpty(cat) && containsOnlyClosedNPs(cat)) {
                     //                        tbInactive.setSelected(true);
                     //                    }
-                    cpPlan.setCollapsed(!cpPlan.isCollapsed());
+                    cpSched.setCollapsed(!cpSched.isCollapsed());
                 } catch (PropertyVetoException pve) {
                     // BAH!
                 }
             }
         });
 
-        cpPlan.setTitleLabelComponent(cptitle.getMain());
-        cpPlan.setSlidingDirection(SwingConstants.SOUTH);
+
+        cpSched.setBackground(Color.WHITE);
+        cpSched.setTitleLabelComponent(cptitle.getMain());
+        cpSched.setSlidingDirection(SwingConstants.SOUTH);
         //            cpPlan.setBackground(getColor(cat)[SYSConst.medium2]);
-        cpPlan.setOpaque(true);
-        cpPlan.setHorizontalAlignment(SwingConstants.LEADING);
+        cpSched.setOpaque(true);
+        cpSched.setHorizontalAlignment(SwingConstants.LEADING);
 
 
 //           /***
@@ -260,7 +276,7 @@ public class PnlQMSPlan extends CleanablePanel {
 //
 //           cptitle.getRight().add(btnMenu);
 
-        cpPlan.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
+        cpSched.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
                 //                JPanel pnlContent = new JPanel(new VerticalLayout());
@@ -275,28 +291,85 @@ public class PnlQMSPlan extends CleanablePanel {
                 //                    i++;
                 //                    //                        }
                 //                }
-                cpPlan.setContentPane(createContent4(qmssched));
+                cpSched.setContentPane(createContent4(qmssched));
 
 
             }
         });
 
-        if (!cpPlan.isCollapsed()) {
-            cpPlan.setContentPane(createContent4(qmssched));
+        if (!cpSched.isCollapsed()) {
+            cpSched.setContentPane(createContent4(qmssched));
 
         }
 
-        return cpPlan;
+        return cpSched;
     }
 
 
     private JPanel createContent4(final Qmsplan qmsplan) {
         JPanel pnl = new JPanel(new VerticalLayout());
-//        pnl.setLayout(new BoxLayout(pnl, BoxLayout.X_AXIS));
+
+        pnl.setBackground(GUITools.blend(qmsplan.getColor(), Color.WHITE, 0.1f));
+        pnl.setOpaque(true);
 
         String title = SYSTools.toHTMLForScreen(SYSConst.html_paragraph(QmsplanTools.getAsHTML(qmsplan)));
         pnl.add(new JLabel(title));
 
+        final JButton btnNewSched = GUITools.createHyperlinkButton("opde.controlling.qms.pnlqmsplan.new.measure", SYSConst.icon22add, null);
+
+        btnNewSched.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                final JidePopup popup = new JidePopup();
+                PnlQMSSchedule pnlQMSSchedule = new PnlQMSSchedule(new Qmssched(qmsplan), new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        popup.hidePopup();
+                        if (o != null) {
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                Qmsplan myQMSPlan = em.merge(qmsplan);
+                                myQMSPlan.getQmsschedules().add(em.merge((Qmssched) o));
+                                em.lock(myQMSPlan, LockModeType.OPTIMISTIC);
+                                em.getTransaction().commit();
+                                listQMSPlans.remove(qmsplan);
+                                listQMSPlans.add(myQMSPlan);
+                                createCP4(myQMSPlan);
+                                buildPanel();
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                reload();
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+                            }
+
+                        }
+                    }
+                });
+
+                popup.setMovable(false);
+                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+
+                popup.setOwner(btnNewSched);
+                popup.removeExcludedComponent(btnNewSched);
+                popup.getContentPane().add(pnlQMSSchedule);
+                popup.setDefaultFocusComponent(pnlQMSSchedule);
+                GUITools.showPopup(popup, SwingConstants.CENTER);
+            }
+        });
+
+        pnl.add(btnNewSched);
         for (Qmssched qmssched : qmsplan.getQmsschedules()) {
             pnl.add(createCP4(qmssched));
         }
@@ -318,7 +391,7 @@ public class PnlQMSPlan extends CleanablePanel {
         Collections.sort(listQMS);
 
         JPanel pnlSched = new JPanel(new VerticalLayout());
-        pnlSched.setOpaque(false);
+        pnlSched.setOpaque(true);
 
         for (Qms qms : listQMS) {
             pnlSched.add(createCP4(qms));
@@ -441,6 +514,10 @@ public class PnlQMSPlan extends CleanablePanel {
 
     private CollapsiblePane createCP4(final Qms qms) {
 
+        if (mapQms2Panel.containsKey(qms)) {
+            return mapQms2Panel.get(qms);
+        }
+
 //        final String key = qms.getId() + "/" + qms.getTarget().getTime() + ".qms";
 //        synchronized (cpMap) {
 //            if (!cpMap.containsKey(key)) {
@@ -455,14 +532,17 @@ public class PnlQMSPlan extends CleanablePanel {
 //        }
 //        final CollapsiblePane cpYear = cpMap.get(key);
 
-        final CollapsiblePane cpYear = new CollapsiblePane();
+        final CollapsiblePane cpQMS = new CollapsiblePane();
 
-        cpYear.setCollapseOnTitleClick(false);
-
+        cpQMS.setCollapseOnTitleClick(false);
 
         ActionListener applyActionListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
+                if (new LocalDate(qms.getTarget()).isAfter(new LocalDate().plusMonths(MAX_MONTHS_IN_ADVANCE_TO_CONFIRM_QMS))) {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.toFarIntoFuture"));
+                    return;
+                }
                 if (qms.getState() != QmsTools.STATE_OPEN) {
                     return;
                 }
@@ -487,16 +567,12 @@ public class PnlQMSPlan extends CleanablePanel {
 
                     QmsTools.generate(myQmssched, 1);
 
-                    listQMSPlans.set(listQMSPlans.indexOf(qms.getQmsplan()), myQmsplan);
-
                     em.getTransaction().commit();
 
-                    reload();
-
-//                    cpMap.remove(key);
-//                    createCP4(myQms);
-//
-//                    buildPanel();
+                    listQMSPlans.set(listQMSPlans.indexOf(qms.getQmsplan()), myQmsplan);
+                    mapQms2Panel.remove(qms);
+                    createCP4(myQmsplan);
+                    buildPanel();
 
                 } catch (OptimisticLockException ole) {
                     OPDE.warn(ole);
@@ -532,15 +608,13 @@ public class PnlQMSPlan extends CleanablePanel {
         };
 
 
-        String title = "<html><font size=+1>" +
-                SYSTools.left(DateFormat.getDateInstance().format(qms.getTarget()), MAX_TEXT_LENGTH) +
-                "</font></html>";
+        String title = SYSTools.toHTMLForScreen(SYSConst.html_color(GUITools.blend(qms.getQmsplan().getColor(), Color.BLACK, 0.4f), QmsTools.toHTML(qms)));
+
 
         DefaultCPTitle cptitle = new DefaultCPTitle(title, OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, PnlControlling.internalClassID) ? applyActionListener : null);
 
 
-        JLabel icon1 = new JLabel(QmsTools.getIcon(qms));
-        icon1.setOpaque(false);
+        cptitle.getButton().setIcon(QmsTools.getIcon(qms));
 
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, PnlControlling.internalClassID)) {
@@ -591,8 +665,11 @@ public class PnlQMSPlan extends CleanablePanel {
                         try {
                             em.getTransaction().begin();
                             Qms myQms = em.merge(qms);
-                            em.lock(myQms.getQmssched(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                            em.lock(myQms.getQmsplan(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                            Qmssched myQmssched = em.merge(myQms.getQmssched());
+                            Qmsplan myQmsplan = em.merge(myQms.getQmsplan());
+
+                            em.lock(myQmssched, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                            em.lock(myQmsplan, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
                             myQms.setState(QmsTools.STATE_REFUSED);
                             myQms.setUser(em.merge(OPDE.getLogin().getUser()));
@@ -600,19 +677,18 @@ public class PnlQMSPlan extends CleanablePanel {
 
                             em.getTransaction().commit();
 
-                            reload();
-
-//                            buildPanel();
+                            listQMSPlans.set(listQMSPlans.indexOf(qms.getQmsplan()), myQmsplan);
+                            mapQms2Panel.remove(qms);
+                            createCP4(myQmsplan);
+                            buildPanel();
                         } catch (OptimisticLockException ole) {
                             OPDE.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
-                            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                OPDE.getMainframe().emptyFrame();
-                                OPDE.getMainframe().afterLogin();
-                            }
+
                             OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            reload();
                         } catch (Exception e) {
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
@@ -657,23 +733,28 @@ public class PnlQMSPlan extends CleanablePanel {
 
                             em.getTransaction().begin();
                             Qms myQms = em.merge(qms);
-                            em.lock(myQms.getQmssched(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-                            em.lock(myQms.getQmsplan(), LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                            Qmssched myQmssched = em.merge(myQms.getQmssched());
+                            Qmsplan myQmsplan = em.merge(myQms.getQmsplan());
+
+                            em.lock(myQmssched, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                            em.lock(myQmsplan, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
                             em.remove(myQms);
                             em.getTransaction().commit();
 
-                            reload();
+                            listQMSPlans.set(listQMSPlans.indexOf(qms.getQmsplan()), myQmsplan);
+                            mapQms2Panel.remove(qms);
+                            createCP4(myQmsplan);
+                            buildPanel();
 
                         } catch (OptimisticLockException ole) {
                             OPDE.warn(ole);
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
                             }
-                            if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                OPDE.getMainframe().emptyFrame();
-                                OPDE.getMainframe().afterLogin();
-                            }
+
                             OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            reload();
                         } catch (Exception e) {
                             if (em.getTransaction().isActive()) {
                                 em.getTransaction().rollback();
@@ -691,24 +772,80 @@ public class PnlQMSPlan extends CleanablePanel {
 
         }
 
-        cpYear.setTitleLabelComponent(cptitle.getMain());
-        cpYear.setSlidingDirection(SwingConstants.SOUTH);
+        /***
+         *               _ _ _  _____         _
+         *       ___  __| (_) ||_   _|____  _| |_
+         *      / _ \/ _` | | __|| |/ _ \ \/ / __|
+         *     |  __/ (_| | | |_ | |  __/>  <| |_
+         *      \___|\__,_|_|\__||_|\___/_/\_\\__|
+         *
+         */
+                    final JButton btnInfo = new JButton(SYSConst.icon22info);
+
+                    btnInfo.setPressedIcon(SYSConst.icon22infoPressed);
+                    btnInfo.setAlignmentX(Component.RIGHT_ALIGNMENT);
+                    btnInfo.setContentAreaFilled(false);
+                    btnInfo.setBorder(null);
+                    btnInfo.setToolTipText(SYSTools.xx("misc.msg.edit.text"));
+                    final JTextPane txt = new JTextPane();
+                    txt.setContentType("text/html");
+                    txt.setEditable(false);
+                    final JidePopup popupInfo = new JidePopup();
+                    popupInfo.setMovable(false);
+                    popupInfo.setContentPane(new JScrollPane(txt));
+                    popupInfo.removeExcludedComponent(txt);
+                    popupInfo.setDefaultFocusComponent(txt);
+
+
+                    btnInfo.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent actionEvent) {
+                            popupInfo.setOwner(btnInfo);
+
+                            if (bhp.isOutcomeText() && !bhp.isOpen()) {
+                                txt.setText(SYSTools.toHTML(SYSConst.html_div(bhp.getText())));
+                            } else {
+                                txt.setText(SYSTools.toHTML(SYSConst.html_div(bhp.getPrescription().getText())));
+                            }
+
+        //                    txt.setText(SYSTools.toHTML(SYSConst.html_div(bhp.getPrescription().getText())));
+                            GUITools.showPopup(popupInfo, SwingConstants.SOUTH_WEST);
+                        }
+                    });
+
+                    if (bhp.isOutcomeText() && !bhp.isOpen()) {
+                        btnInfo.setEnabled(true);
+                    } else {
+                        btnInfo.setEnabled(!SYSTools.catchNull(bhp.getPrescription().getText()).isEmpty());
+                    }
+
+                    cptitle.getRight().add(btnInfo);
+
+        cpQMS.setTitleLabelComponent(cptitle.getMain());
+        cpQMS.setSlidingDirection(SwingConstants.SOUTH);
+
+        cpQMS.setBackground(GUITools.blend(qms.getQmsplan().getColor(), Color.WHITE, 0.04f));
+
+        cpQMS.setCollapsible(qms.hasText());
 
         final JTextPane contentPane = new JTextPane();
         contentPane.setEditable(false);
         contentPane.setContentType("text/html");
-        cpYear.setContentPane(contentPane);
+        cpQMS.setContentPane(contentPane);
 
         try {
-            cpYear.setCollapsed(true);
+            cpQMS.setCollapsed(true);
         } catch (PropertyVetoException e) {
             OPDE.error(e);
         }
 
 
-        cpYear.setHorizontalAlignment(SwingConstants.LEADING);
-        cpYear.setOpaque(false);
-        return cpYear;
+        cpQMS.setHorizontalAlignment(SwingConstants.LEADING);
+        cpQMS.setOpaque(false);
+
+        mapQms2Panel.put(qms, cpQMS);
+
+        return cpQMS;
 
     }
 
@@ -752,12 +889,9 @@ public class PnlQMSPlan extends CleanablePanel {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    } else {
-                                        reload();
-                                    }
+
+                                    OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                    reload();
                                 } catch (Exception e) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -812,11 +946,8 @@ public class PnlQMSPlan extends CleanablePanel {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
                                     }
-                                    if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                        OPDE.getMainframe().emptyFrame();
-                                        OPDE.getMainframe().afterLogin();
-                                    }
                                     OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                                    reload();
                                 } catch (Exception e) {
                                     if (em.getTransaction().isActive()) {
                                         em.getTransaction().rollback();
@@ -834,23 +965,75 @@ public class PnlQMSPlan extends CleanablePanel {
             pnlMenu.add(btnDelete);
         }
 
+        /***
+         *                _
+         *       ___ ___ | | ___  _ __
+         *      / __/ _ \| |/ _ \| '__|
+         *     | (_| (_) | | (_) | |
+         *      \___\___/|_|\___/|_|
+         *
+         */
+        if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, internalClassID)) {
+            final JButton btnColor = GUITools.createHyperlinkButton("misc.msg.colorset", SYSConst.icon22colorset, null);
+            btnColor.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnColor.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    final JColorChooser clr = new JColorChooser(qmsplan.getColor());
+                    final JidePopup popup = new JidePopup();
+                    clr.getSelectionModel().addChangeListener(new ChangeListener() {
+                        @Override
+                        public void stateChanged(ChangeEvent e) {
+                            popup.hidePopup();
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                Qmsplan myQMSPlan = em.merge(qmsplan);
+                                myQMSPlan.setColor(clr.getColor());
+                                em.lock(myQMSPlan, LockModeType.OPTIMISTIC);
+                                em.getTransaction().commit();
+                                listQMSPlans.remove(qmsplan);
+                                listQMSPlans.add(myQMSPlan);
+                                reload();
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (RollbackException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(new DisplayMessage(ole.getMessage(), DisplayMessage.IMMEDIATELY));
+                            } catch (Exception ex) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(ex);
+                            } finally {
+                                em.close();
+                            }
+                        }
+                    });
 
-        JButton btnTmp = GUITools.createHyperlinkButton("shedule!", SYSConst.icon22calendar, null);
-        btnTmp.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        btnTmp.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
+                    popup.setMovable(false);
+                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                    popup.setPopupType(JidePopup.HEAVY_WEIGHT_POPUP);
 
-
-            }
-        });
-        pnlMenu.add(btnTmp);
-
+                    popup.setOwner(btnColor);
+                    popup.removeExcludedComponent(btnColor);
+                    popup.setTransient(false);
+                    popup.getContentPane().add(clr);
+                    popup.setDefaultFocusComponent(clr);
+                    GUITools.showPopup(popup, SwingConstants.SOUTH_WEST);
+                }
+            });
+            pnlMenu.add(btnColor);
+        }
 
         return pnlMenu;
     }
-
-
 
 
 }

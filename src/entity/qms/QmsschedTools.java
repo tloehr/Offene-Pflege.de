@@ -2,7 +2,6 @@ package entity.qms;
 
 import io.lamma.LammaConversion;
 import io.lamma.Recurrence;
-import op.OPDE;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
@@ -22,9 +21,7 @@ public class QmsschedTools {
     public static final byte STATE_ARCHIVE = 2;
 
     public static String getAsHTML(Qmssched qmssched) {
-        String result = " ";
-
-        result += SYSTools.catchNull(qmssched.getText()).isEmpty() ? "" : SYSConst.html_paragraph(SYSConst.html_bold(SYSTools.xx("misc.msg.comment") + ": " + qmssched.getText()));
+        String result = SYSConst.html_paragraph(SYSConst.html_bold(qmssched.getMeasure()));
 
         result += getRepeatPattern(qmssched);
 //        result += SYSConst.html_paragraph(qmssched.hasTime() ? DateFormat.getTimeInstance(DateFormat.SHORT).format(qmssched.getTime()) + " " + SYSTools.xx("misc.msg.Time.short") + ", " + wdh : wdh);
@@ -34,8 +31,7 @@ public class QmsschedTools {
         } else if (qmssched.getHome() != null) {
             result += SYSConst.html_paragraph(SYSTools.xx("misc.msg.home") + ": " + qmssched.getHome().getName());
         }
-
-//        result += "</table>";
+        result += SYSTools.catchNull(qmssched.getText(), "<p><i>", "</i></p>");
 
 
         return result;
@@ -59,28 +55,37 @@ public class QmsschedTools {
 
             MutableDateTime mdt = new MutableDateTime();
             mdt.setDayOfWeek(qmssched.getWeekday());
-            result += " " + mdt.dayOfWeek().getAsText();
+
+            result += ", " + SYSTools.xx("misc.msg.each") + " " + SYSTools.xx("misc.msg.atchrono") + " " + mdt.dayOfWeek().getAsText();
 
         } else if (qmssched.isMonthly()) {
 
+
+            if (qmssched.getMonthly() == 1) {
+                result += SYSTools.xx("misc.msg.everyMonth") + ", ";
+            } else {
+                result += SYSTools.xx("misc.msg.every") + " " + qmssched.getMonthly() + " " + SYSTools.xx("misc.msg.months") + ", ";
+            }
+
             if (qmssched.getWeekday() > 0) { // with a nth weekday in that month
                 MutableDateTime mdt = new MutableDateTime();
                 mdt.setDayOfWeek(qmssched.getWeekday());
 
-                result += SYSTools.xx("misc.msg.every") + " " + qmssched.getDayinmonth() + ". " + mdt.dayOfWeek().getAsText() + " " + SYSTools.xx("in");
+                result += SYSTools.xx("misc.msg.each") + " " + SYSTools.xx("misc.msg.atchrono") + " " + qmssched.getDayinmonth() + ". " + mdt.dayOfWeek().getAsText();
             } else {
-                result += SYSTools.xx("misc.msg.every") + " " + qmssched.getDayinmonth() + ". " + SYSTools.xx("misc.msg.day");
+                result += SYSTools.xx("misc.msg.each") + " " + SYSTools.xx("misc.msg.atchrono") + " " + qmssched.getDayinmonth() + ". " + SYSTools.xx("misc.msg.day");
             }
 
-            if (qmssched.getMonthly() == 1) {
-                result += SYSTools.xx("misc.msg.everyMonth") + " ";
-            } else {
-                result += SYSTools.xx("misc.msg.every") + " " + qmssched.getMonthly() + " " + SYSTools.xx("misc.msg.months") + " ";
-            }
 
         } else if (qmssched.isYearly()) {
 
-            if (qmssched.getWeekday() > 0) { // with a nth weekday in that month
+            if (qmssched.getYearly() == 1) {
+                result += SYSTools.xx("misc.msg.everyYear") + ", ";
+            } else {
+                result += SYSTools.xx("misc.msg.every") + " " + qmssched.getYearly() + " " + SYSTools.xx("misc.msg.Years") + ", ";
+            }
+
+            if (qmssched.getMonthinyear() > 0) {
                 MutableDateTime mdt = new MutableDateTime();
                 mdt.setDayOfWeek(qmssched.getWeekday());
 
@@ -89,11 +94,6 @@ public class QmsschedTools {
                 result += SYSTools.xx("misc.msg.every") + " " + qmssched.getDayinmonth() + ". " + SYSTools.xx("misc.msg.day");
             }
 
-            if (qmssched.getYearly() == 1) {
-                result += SYSTools.xx("misc.msg.everyYear") + " ";
-            } else {
-                result += SYSTools.xx("misc.msg.every") + " " + qmssched.getYearly() + " " + SYSTools.xx("misc.msg.Years") + " ";
-            }
 
         } else {
             result = "";
@@ -103,7 +103,7 @@ public class QmsschedTools {
         LocalDate today = new LocalDate();
 
         if (ldatum.compareTo(today) > 0) { // Die erste Ausführung liegt in der Zukunft
-            result += SYSTools.xx("opde.controlling.qms.dlgqmsplan.pnlschedule.ldate") + ": " + DateFormat.getDateInstance().format(qmssched.getStartingOn());
+            result += "<br/>" + SYSTools.xx("opde.controlling.qms.dlgqmsplan.pnlschedule.startingon") + ": " + DateFormat.getDateInstance().format(qmssched.getStartingOn());
         }
 
         return result;

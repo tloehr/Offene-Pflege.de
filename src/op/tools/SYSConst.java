@@ -335,6 +335,10 @@ public class SYSConst {
     public static final String html_div_open = "<div id=\"fonttext\">";
     public static final String html_div_close = "</div>";
 
+    public static final String html_color(Color color, String in) {
+        return "<font color=#" + GUITools.toHexString(color) + ">" + in + "</font>";
+    }
+
 //    public static final String html_report_footer = "<hr/>" +
 //            html_fontface +
 //            "<b>" + SYSTools.xx("misc.msg.endofreport") + "</b><br/>" + (OPDE.getLogin() != null ? SYSTools.htmlUmlautConversion(OPDE.getLogin().getUser().getFullname()) : "")

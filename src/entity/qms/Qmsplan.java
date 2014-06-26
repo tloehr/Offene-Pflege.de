@@ -4,10 +4,14 @@ import entity.files.Qmsplan2File;
 import entity.system.Commontags;
 import entity.system.Users;
 import op.OPDE;
-import op.tools.SYSConst;
+import op.tools.GUITools;
 
 import javax.persistence.*;
-import java.util.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * Created by tloehr on 28.05.14.
@@ -57,6 +61,30 @@ public class Qmsplan {
     @Column(name = "state", nullable = false, insertable = true, updatable = true)
     private byte state;
 
+    @JoinColumn(name = "uid", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users user;
+
+    public Users getUser() {
+        return user;
+    }
+
+    public void setUser(Users user) {
+        this.user = user;
+    }
+
+    @Column(name = "color", nullable = false, insertable = true, updatable = true, length = 6)
+    private String color;
+
+    public Color getColor() {
+        return GUITools.getColor(color);
+    }
+
+    public void setColor(Color newColor) {
+        color = GUITools.toHexString(newColor);
+    }
+
+
     @Version
     @Column(name = "version")
     private Long version;
@@ -85,7 +113,9 @@ public class Qmsplan {
         this.title = title;
         commontags = new HashSet<>();
         qmsschedules = new ArrayList<>();
+        this.user = OPDE.getLogin().getUser();
         this.state = QmsplanTools.STATE_ACTIVE;
+        this.color = "ffffff"; // Back in black
         this.version = 0l;
     }
 
@@ -100,7 +130,7 @@ public class Qmsplan {
 
 
     public boolean isActive() {
-        return state != QmsplanTools.STATE_ACTIVE;
+        return state == QmsplanTools.STATE_ACTIVE;
     }
 
     @Override
@@ -132,7 +162,7 @@ public class Qmsplan {
         result = 31 * result + (int) state;
         result = 31 * result + (version != null ? version.hashCode() : 0);
         result = 31 * result + (commontags != null ? commontags.hashCode() : 0);
-        result = 31 * result + (qmsschedules != null ? qmsschedules.hashCode() : 0);
+//        result = 31 * result + (qmsschedules != null ? qmsschedules.hashCode() : 0);
         result = 31 * result + (attachedFilesConnections != null ? attachedFilesConnections.hashCode() : 0);
         return result;
     }

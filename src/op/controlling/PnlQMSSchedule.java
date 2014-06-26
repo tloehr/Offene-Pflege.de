@@ -101,9 +101,9 @@ public class PnlQMSSchedule extends JPanel {
     private void cmbTagItemStateChanged(ItemEvent e) {
         if (e.getStateChange() == ItemEvent.SELECTED) {
             if (cmbTag.getSelectedIndex() == 0){
-                spinMonatTag.setModel(new SpinnerNumberModel(1, 1, 31, 1));
+                spinDayInMonth.setModel(new SpinnerNumberModel(1, 1, 31, 1));
             } else {
-                spinMonatTag.setModel(new SpinnerNumberModel(1, 1, 5, 1));
+                spinDayInMonth.setModel(new SpinnerNumberModel(1, 1, 5, 1));
             }
         }
     }
@@ -119,12 +119,12 @@ public class PnlQMSSchedule extends JPanel {
         spinTaeglich.setModel(new SpinnerNumberModel(1, 1, 365, 1));
         spinWoche.setModel(new SpinnerNumberModel(1, 1, 52, 1));
         spinMonat.setModel(new SpinnerNumberModel(1, 1, 12, 1));
-        spinMonatTag.setModel(new SpinnerNumberModel(1, 1, 31, 1));
+        spinDayInMonth.setModel(new SpinnerNumberModel(1, 1, 31, 1));
 
         spinTaeglich.setValue(Math.max(qmssched.getDaily(), 1));
         spinWoche.setValue(Math.max(qmssched.getWeekly(), 1));
         spinMonat.setValue(Math.max(qmssched.getMonthly(), 1));
-        spinMonatTag.setValue(Math.max(qmssched.getDayinmonth(), 1));
+        spinDayInMonth.setValue(Math.max(qmssched.getDayinmonth(), 1));
 
         cbMon.setSelected(true);
 
@@ -142,7 +142,7 @@ public class PnlQMSSchedule extends JPanel {
             tabWdh.setSelectedIndex(TAB_WEEKLY);
         } else if (qmssched.isMonthly()) {
 
-            spinMonatTag.setValue(qmssched.getDayinmonth());
+            spinDayInMonth.setValue(qmssched.getDayinmonth());
             cmbTag.setSelectedIndex(qmssched.getWeekday());
 
             tabWdh.setSelectedIndex(TAB_MONTHLY);
@@ -212,7 +212,7 @@ public class PnlQMSSchedule extends JPanel {
         label6 = new JLabel();
         btnJedenMonat = new JButton();
         label5 = new JLabel();
-        spinMonatTag = new JSpinner();
+        spinDayInMonth = new JSpinner();
         cmbTag = new JComboBox<>();
         pnlYearly = new JPanel();
         lblLDate = new JLabel();
@@ -499,15 +499,15 @@ public class PnlQMSSchedule extends JPanel {
                     label5.setHorizontalAlignment(SwingConstants.TRAILING);
                     pnlMonthly.add(label5, CC.xy(3, 7));
 
-                    //---- spinMonatTag ----
-                    spinMonatTag.setFont(new Font("Arial", Font.PLAIN, 14));
-                    spinMonatTag.addChangeListener(new ChangeListener() {
+                    //---- spinDayInMonth ----
+                    spinDayInMonth.setFont(new Font("Arial", Font.PLAIN, 14));
+                    spinDayInMonth.addChangeListener(new ChangeListener() {
                         @Override
                         public void stateChanged(ChangeEvent e) {
                             spinMonatTagStateChanged(e);
                         }
                     });
-                    pnlMonthly.add(spinMonatTag, CC.xy(5, 7));
+                    pnlMonthly.add(spinDayInMonth, CC.xy(5, 7));
 
                     //---- cmbTag ----
                     cmbTag.setModel(new DefaultComboBoxModel<>(new String[] {
@@ -663,9 +663,7 @@ public class PnlQMSSchedule extends JPanel {
         }
 
         if (tabWdh.getSelectedIndex() == TAB_MONTHLY) {
-            int b = Integer.parseInt(spinMonatTag.getValue().toString());
-            qmssched.setDayinmonth(cmbTag.getSelectedIndex() == 0 ? b : 0);
-
+            qmssched.setDayinmonth(Integer.parseInt(spinDayInMonth.getValue().toString()));
             qmssched.setWeekday(cmbTag.getSelectedIndex());
         }
 
@@ -692,9 +690,6 @@ public class PnlQMSSchedule extends JPanel {
             qmssched.setHome(null);
             qmssched.setStation(null);
         }
-        cmbLocation.setEditable(false);
-
-        //todo: hier weiter gucken. irgendwie klappt das noch nciht
 
         QmsTools.generate(qmssched, 2);
 
@@ -755,7 +750,7 @@ public class PnlQMSSchedule extends JPanel {
     private JLabel label6;
     private JButton btnJedenMonat;
     private JLabel label5;
-    private JSpinner spinMonatTag;
+    private JSpinner spinDayInMonth;
     private JComboBox<String> cmbTag;
     private JPanel pnlYearly;
     private JLabel lblLDate;

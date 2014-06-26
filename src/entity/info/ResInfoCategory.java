@@ -34,6 +34,14 @@ public class ResInfoCategory implements Serializable, Comparable {
     @Column(name = "color")
     private String color;
 
+    public Color getColor() {
+        return GUITools.getColor(color);
+    }
+
+    public void setColor(Color newColor) {
+        color = GUITools.toHexString(newColor);
+    }
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "resInfoCat")
     private Collection<ResInfoType> resInfoTypes;
 
@@ -59,7 +67,7 @@ public class ResInfoCategory implements Serializable, Comparable {
 
     @Override
     public int compareTo(Object o) {
-        return  text.compareTo(((ResInfoCategory) o).getText()); //id.compareTo(((ResInfoCategory) o).getID());
+        return text.compareTo(((ResInfoCategory) o).getText()); //id.compareTo(((ResInfoCategory) o).getID());
     }
 
     public void setText(String text) {
@@ -71,13 +79,6 @@ public class ResInfoCategory implements Serializable, Comparable {
         return catType;
     }
 
-    public Color getColor() {
-        return GUITools.getColor(color);
-    }
-
-    public void setColor(Color newColor){
-        color = GUITools.toHexString(newColor);
-    }
 
     public void setCatType(Integer catType) {
         this.catType = catType;

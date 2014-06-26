@@ -298,7 +298,7 @@ public class PnlAllowance extends CleanablePanel {
             btnPrintResident.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnPrintResident.setContentAreaFilled(false);
             btnPrintResident.setBorder(null);
-            btnPrintResident.setToolTipText(SYSTools.xx(internalClassID + ".btnprintresident.tooltip"));
+            btnPrintResident.setToolTipText(SYSTools.xx("admin.residents.cash.btnprintresident.tooltip"));
             btnPrintResident.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -434,7 +434,7 @@ public class PnlAllowance extends CleanablePanel {
         popupTX.removeExcludedComponent(pnlTX);
         popupTX.setDefaultFocusComponent(pnlTX);
 
-        final JideButton btnNewTX = GUITools.createHyperlinkButton(SYSTools.xx(internalClassID + ".enterTXs"), SYSConst.icon22add, null);
+        final JideButton btnNewTX = GUITools.createHyperlinkButton(SYSTools.xx("admin.residents.cash.enterTXs"), SYSConst.icon22add, null);
         btnNewTX.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -455,7 +455,7 @@ public class PnlAllowance extends CleanablePanel {
                 OPDE.getMainframe().setCurrentResident(currentResident);
             }
 
-            CollapsiblePane cpArchive = new CollapsiblePane(SYSTools.xx(internalClassID + ".archive"));
+            CollapsiblePane cpArchive = new CollapsiblePane(SYSTools.xx("admin.residents.cash.archive"));
             try {
                 cpArchive.setCollapsed(true);
             } catch (PropertyVetoException e) {
@@ -798,7 +798,7 @@ public class PnlAllowance extends CleanablePanel {
         });
         list.add(cmbResident);
 
-        final JideButton btnAllActiveResidents = GUITools.createHyperlinkButton(SYSTools.xx(internalClassID + ".showallactiveresidents"), SYSConst.icon22residentActive, null);
+        final JideButton btnAllActiveResidents = GUITools.createHyperlinkButton(SYSTools.xx("admin.residents.cash.showallactiveresidents"), SYSConst.icon22residentActive, null);
         btnAllActiveResidents.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -811,7 +811,7 @@ public class PnlAllowance extends CleanablePanel {
         list.add(btnAllActiveResidents);
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.ARCHIVE, internalClassID)) {
-            final JideButton btnAllInactiveResidents = GUITools.createHyperlinkButton(SYSTools.xx(internalClassID + ".showallinactiveresidents"), SYSConst.icon22residentInactive, null);
+            final JideButton btnAllInactiveResidents = GUITools.createHyperlinkButton(SYSTools.xx("admin.residents.cash.showallinactiveresidents"), SYSConst.icon22residentInactive, null);
             btnAllInactiveResidents.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -823,7 +823,7 @@ public class PnlAllowance extends CleanablePanel {
             });
             list.add(btnAllInactiveResidents);
 
-            final JideButton btnAllResidents = GUITools.createHyperlinkButton(SYSTools.xx(internalClassID + ".showallresidents"), SYSConst.icon22residentBoth, null);
+            final JideButton btnAllResidents = GUITools.createHyperlinkButton(SYSTools.xx("admin.residents.cash.showallresidents"), SYSConst.icon22residentBoth, null);
             btnAllResidents.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -931,7 +931,7 @@ public class PnlAllowance extends CleanablePanel {
         popupTX.removeExcludedComponent(pnlTX);
         popupTX.setDefaultFocusComponent(pnlTX);
 
-        final JideButton btnNewTX = GUITools.createHyperlinkButton(SYSTools.xx(internalClassID + ".enterTXs"), SYSConst.icon22add, null);
+        final JideButton btnNewTX = GUITools.createHyperlinkButton(SYSTools.xx("admin.residents.cash.enterTXs"), SYSConst.icon22add, null);
         btnNewTX.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -942,7 +942,7 @@ public class PnlAllowance extends CleanablePanel {
         list.add(btnNewTX);
 
         if (OPDE.getAppInfo().isAllowedTo(InternalClassACL.MANAGER, internalClassID)) {
-            final JideButton btnPrintStat = GUITools.createHyperlinkButton(SYSTools.xx(internalClassID + ".printstat"), SYSConst.icon22calc, null);
+            final JideButton btnPrintStat = GUITools.createHyperlinkButton(SYSTools.xx("admin.residents.cash.printstat"), SYSConst.icon22calc, null);
             btnPrintStat.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
@@ -992,7 +992,7 @@ public class PnlAllowance extends CleanablePanel {
             JLabel lblEOM = new JLabel("<html><table border=\"0\">" +
                     "<tr>" +
                     "<td width=\"130\" align=\"left\">" + DateFormat.getDateInstance().format(month.dayOfMonth().withMaximumValue().toDate()) + "</td>" +
-                    "<td width=\"400\" align=\"left\">" + SYSTools.xx(internalClassID + ".endofmonth") + "</td>" +
+                    "<td width=\"400\" align=\"left\">" + SYSTools.xx("admin.residents.cash.endofmonth") + "</td>" +
                     "<td width=\"100\" align=\"right\"></td>" +
                     "<td width=\"100\" align=\"right\">" +
                     (rowsum.compareTo(BigDecimal.ZERO) < 0 ? "<font color=\"red\">" : "") +
@@ -1049,7 +1049,7 @@ public class PnlAllowance extends CleanablePanel {
                     btnEdit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     btnEdit.setContentAreaFilled(false);
                     btnEdit.setBorder(null);
-                    btnEdit.setToolTipText(SYSTools.xx(internalClassID + ".btnedit.tooltip"));
+                    btnEdit.setToolTipText(SYSTools.xx("admin.residents.cash.btnedit.tooltip"));
                     btnEdit.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent actionEvent) {
@@ -1135,7 +1135,7 @@ public class PnlAllowance extends CleanablePanel {
                     btnUndoTX.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     btnUndoTX.setContentAreaFilled(false);
                     btnUndoTX.setBorder(null);
-                    btnUndoTX.setToolTipText(SYSTools.xx(internalClassID + ".btnundotx.tooltip"));
+                    btnUndoTX.setToolTipText(SYSTools.xx("admin.residents.cash.btnundotx.tooltip"));
                     btnUndoTX.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent actionEvent) {
@@ -1217,7 +1217,7 @@ public class PnlAllowance extends CleanablePanel {
                     btnDelete.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     btnDelete.setContentAreaFilled(false);
                     btnDelete.setBorder(null);
-                    btnDelete.setToolTipText(SYSTools.xx(internalClassID + ".btndelete.tooltip"));
+                    btnDelete.setToolTipText(SYSTools.xx("admin.residents.cash.btndelete.tooltip"));
                     btnDelete.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent actionEvent) {
@@ -1302,7 +1302,7 @@ public class PnlAllowance extends CleanablePanel {
             JLabel lblBOM = new JLabel("<html><table border=\"0\">" +
                     "<tr>" +
                     "<td width=\"130\" align=\"left\">" + DateFormat.getDateInstance().format(month.dayOfMonth().withMinimumValue().toDate()) + "</td>" +
-                    "<td width=\"400\" align=\"left\">" + SYSTools.xx(internalClassID + ".startofmonth") + "</td>" +
+                    "<td width=\"400\" align=\"left\">" + SYSTools.xx("admin.residents.cash.startofmonth") + "</td>" +
                     "<td width=\"100\" align=\"right\"></td>" +
                     "<td width=\"100\" align=\"right\">" +
                     (rowsum.compareTo(BigDecimal.ZERO) < 0 ? "<font color=\"red\">" : "") +

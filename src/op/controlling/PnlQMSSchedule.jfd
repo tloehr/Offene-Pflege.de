@@ -1417,7 +1417,7 @@
                <object idref="Font6"/> 
               </void> 
               <void property="name"> 
-               <string>spinMonatTag</string> 
+               <string>spinDayInMonth</string> 
               </void> 
               <void method="addEvent"> 
                <object class="com.jformdesigner.model.FormEvent"> 

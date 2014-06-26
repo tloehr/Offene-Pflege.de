@@ -2,6 +2,8 @@ package entity.qms;
 
 import entity.Homes;
 import entity.Station;
+import entity.system.Users;
+import op.OPDE;
 import org.joda.time.LocalDate;
 
 import javax.persistence.*;
@@ -141,8 +143,8 @@ public class Qmssched {
     }
 
     @Basic
-       @Column(name = "workingday", nullable = true, insertable = true, updatable = true)
-       private int workingday;
+    @Column(name = "workingday", nullable = true, insertable = true, updatable = true)
+    private int workingday;
 
     public int getWorkingday() {
         return workingday;
@@ -182,6 +184,17 @@ public class Qmssched {
     @ManyToOne
     private Qmsplan qmsplan;
 
+    @JoinColumn(name = "uid", referencedColumnName = "UKennung")
+    @ManyToOne
+    private Users user;
+
+    public Users getUser() {
+        return user;
+    }
+
+    public void setUser(Users user) {
+        this.user = user;
+    }
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "qmssched", orphanRemoval = true)
     private List<Qms> qmsList;
@@ -217,15 +230,13 @@ public class Qmssched {
         this.monthinyear = 0;
         this.weekday = 0;
 
-
-
         this.home = null;
         this.station = null;
 
         this.text = null;
 
         this.qmsList = new ArrayList<>();
-
+        this.user = OPDE.getLogin().getUser();
 
     }
 
@@ -307,8 +318,8 @@ public class Qmssched {
         result = 31 * result + (int) (version ^ (version >>> 32));
         result = 31 * result + (station != null ? station.hashCode() : 0);
         result = 31 * result + (home != null ? home.hashCode() : 0);
-        result = 31 * result + (qmsplan != null ? qmsplan.hashCode() : 0);
-        result = 31 * result + (qmsList != null ? qmsList.hashCode() : 0);
+//        result = 31 * result + (qmsplan != null ? qmsplan.hashCode() : 0);
+//        result = 31 * result + (qmsList != null ? qmsList.hashCode() : 0);
         return result;
     }
 }
