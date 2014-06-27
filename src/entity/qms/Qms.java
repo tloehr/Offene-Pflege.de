@@ -1,9 +1,12 @@
 package entity.qms;
 
+import entity.files.Qms2File;
+import entity.files.Qmsplan2File;
 import entity.system.Users;
 import op.tools.SYSTools;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.Date;
 
 /**
@@ -94,15 +97,22 @@ public class Qms implements Comparable<Qms> {
     private Qmssched qmssched;
 
     @Basic
-       @Column(name = "text", nullable = true, insertable = true, updatable = true, length = 16777215)
-       private String text;
+    @Column(name = "text", nullable = true, insertable = true, updatable = true, length = 16777215)
+    private String text;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "qms")
+    private Collection<Qms2File> attachedFilesConnections;
+
+    public Collection<Qms2File> getAttachedFilesConnections() {
+        return attachedFilesConnections;
+    }
 
     public String getText() {
         return text;
     }
 
     public void setText(String text) {
-        this.text = text;
+        this.text = SYSTools.tidy(text);
     }
 
     public Qms() {
@@ -118,7 +128,7 @@ public class Qms implements Comparable<Qms> {
         this.sequence = sequence;
     }
 
-    public boolean hasText(){
+    public boolean hasText() {
         return !SYSTools.catchNull(text).isEmpty();
     }
 

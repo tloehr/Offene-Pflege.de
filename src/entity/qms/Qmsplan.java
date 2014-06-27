@@ -146,8 +146,8 @@ public class Qmsplan {
             return false;
         if (commontags != null ? !commontags.equals(qmsplan.commontags) : qmsplan.commontags != null) return false;
         if (description != null ? !description.equals(qmsplan.description) : qmsplan.description != null) return false;
-        if (qmsschedules != null ? !qmsschedules.equals(qmsplan.qmsschedules) : qmsplan.qmsschedules != null)
-            return false;
+//        if (qmsschedules != null ? !qmsschedules.equals(qmsplan.qmsschedules) : qmsplan.qmsschedules != null)
+//            return false;
         if (title != null ? !title.equals(qmsplan.title) : qmsplan.title != null) return false;
         if (version != null ? !version.equals(qmsplan.version) : qmsplan.version != null) return false;
 

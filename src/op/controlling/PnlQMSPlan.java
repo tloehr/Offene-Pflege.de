@@ -8,6 +8,7 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import entity.qms.*;
 import op.OPDE;
+import op.care.sysfiles.DlgFiles;
 import op.system.InternalClassACL;
 import op.threads.DisplayManager;
 import op.threads.DisplayMessage;
@@ -150,7 +151,7 @@ public class PnlQMSPlan extends CleanablePanel {
         final JButton btnMenu = new JButton(SYSConst.icon22menu);
         btnMenu.setPressedIcon(SYSConst.icon22Pressed);
         btnMenu.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        btnMenu.setAlignmentY(Component.TOP_ALIGNMENT);
+        btnMenu.setAlignmentY(Component.CENTER_ALIGNMENT);
         btnMenu.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnMenu.setContentAreaFilled(false);
         btnMenu.setBorder(null);
@@ -177,21 +178,7 @@ public class PnlQMSPlan extends CleanablePanel {
         cpPlan.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-//                JPanel pnlContent = new JPanel(new VerticalLayout());
-//
-//                int i = 0; // for zebra pattern
-//                for (Qmsplan myQmsplan : listQMSPlans) {
-//                    //                        if (!np.isClosed()) { // tbInactive.isSelected() ||
-//                    JPanel pnl = createContent4(myQmsplan);
-//                    pnl.setBackground(i % 2 == 0 ? Color.WHITE : Color.DARK_GRAY);
-//                    pnl.setOpaque(true);
-//                    pnlContent.add(pnl);
-//                    i++;
-//                    //                        }
-//                }
                 cpPlan.setContentPane(createContent4(qmsplan));
-
-
             }
         });
 
@@ -726,10 +713,8 @@ public class PnlQMSPlan extends CleanablePanel {
                             return;
                         }
 
-
                         EntityManager em = OPDE.createEM();
                         try {
-
 
                             em.getTransaction().begin();
                             Qms myQms = em.merge(qms);
@@ -739,7 +724,10 @@ public class PnlQMSPlan extends CleanablePanel {
                             em.lock(myQmssched, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
                             em.lock(myQmsplan, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
 
-                            em.remove(myQms);
+                            myQms.setState(QmsTools.STATE_OPEN);
+                            myQms.setUser(null);
+                            myQms.setActual(null);
+
                             em.getTransaction().commit();
 
                             listQMSPlans.set(listQMSPlans.indexOf(qms.getQmsplan()), myQmsplan);
@@ -766,7 +754,7 @@ public class PnlQMSPlan extends CleanablePanel {
 
                     }
                 });
-                btnEmpty.setEnabled(!qms.isOpen());
+                btnEmpty.setEnabled(qms.getQmssched().isActive());
                 cptitle.getRight().add(btnEmpty);
             }
 
@@ -780,46 +768,109 @@ public class PnlQMSPlan extends CleanablePanel {
          *      \___|\__,_|_|\__||_|\___/_/\_\\__|
          *
          */
-                    final JButton btnInfo = new JButton(SYSConst.icon22info);
+        final JButton btnText = new JButton(SYSConst.icon22edit3);
+        btnText.setPressedIcon(SYSConst.icon22edit3Pressed);
+        btnText.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnText.setContentAreaFilled(false);
+        btnText.setBorder(null);
+        btnText.setToolTipText(SYSTools.xx("misc.msg.edit.text"));
 
-                    btnInfo.setPressedIcon(SYSConst.icon22infoPressed);
-                    btnInfo.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                    btnInfo.setContentAreaFilled(false);
-                    btnInfo.setBorder(null);
-                    btnInfo.setToolTipText(SYSTools.xx("misc.msg.edit.text"));
-                    final JTextPane txt = new JTextPane();
-                    txt.setContentType("text/html");
-                    txt.setEditable(false);
-                    final JidePopup popupInfo = new JidePopup();
-                    popupInfo.setMovable(false);
-                    popupInfo.setContentPane(new JScrollPane(txt));
-                    popupInfo.removeExcludedComponent(txt);
-                    popupInfo.setDefaultFocusComponent(txt);
+        btnText.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                new DlgYesNo(SYSConst.icon48comment, new Closure() {
+                    @Override
+                    public void execute(Object o) {
 
+                        if (o == null) return;
 
-                    btnInfo.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent actionEvent) {
-                            popupInfo.setOwner(btnInfo);
+                        EntityManager em = OPDE.createEM();
+                        try {
 
-                            if (bhp.isOutcomeText() && !bhp.isOpen()) {
-                                txt.setText(SYSTools.toHTML(SYSConst.html_div(bhp.getText())));
-                            } else {
-                                txt.setText(SYSTools.toHTML(SYSConst.html_div(bhp.getPrescription().getText())));
+                            em.getTransaction().begin();
+                            Qms myQms = em.merge(qms);
+                            myQms.setText(SYSTools.catchNull(o));
+                            Qmssched myQmssched = em.merge(myQms.getQmssched());
+                            Qmsplan myQmsplan = em.merge(myQms.getQmsplan());
+
+                            em.lock(myQmssched, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+                            em.lock(myQmsplan, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
+                            em.getTransaction().commit();
+
+                            listQMSPlans.set(listQMSPlans.indexOf(qms.getQmsplan()), myQmsplan);
+                            mapQms2Panel.remove(qms);
+                            createCP4(myQmsplan);
+                            buildPanel();
+
+                        } catch (OptimisticLockException ole) {
+                            OPDE.warn(ole);
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
                             }
 
-        //                    txt.setText(SYSTools.toHTML(SYSConst.html_div(bhp.getPrescription().getText())));
-                            GUITools.showPopup(popupInfo, SwingConstants.SOUTH_WEST);
+                            OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            reload();
+                        } catch (Exception e) {
+                            if (em.getTransaction().isActive()) {
+                                em.getTransaction().rollback();
+                            }
+                            OPDE.fatal(e);
+                        } finally {
+                            em.close();
                         }
-                    });
-
-                    if (bhp.isOutcomeText() && !bhp.isOpen()) {
-                        btnInfo.setEnabled(true);
-                    } else {
-                        btnInfo.setEnabled(!SYSTools.catchNull(bhp.getPrescription().getText()).isEmpty());
                     }
+                }, "misc.msg.comment", qms.getText());
+            }
+        });
 
-                    cptitle.getRight().add(btnInfo);
+
+        /***
+         *      _     _         _____ _ _
+         *     | |__ | |_ _ __ |  ___(_) | ___  ___
+         *     | '_ \| __| '_ \| |_  | | |/ _ \/ __|
+         *     | |_) | |_| | | |  _| | | |  __/\__ \
+         *     |_.__/ \__|_| |_|_|   |_|_|\___||___/
+         *
+         */
+        final JButton btnFiles = qms.getAttachedFilesConnections().isEmpty() ? new JButton(SYSConst.icon22attach) : new JButton(Integer.toString(qms.getAttachedFilesConnections().size()), SYSConst.icon22greenStar);
+        btnFiles.setToolTipText(SYSTools.xx("misc.btnfiles.tooltip"));
+        btnFiles.setForeground(Color.BLUE);
+        btnFiles.setHorizontalTextPosition(SwingUtilities.CENTER);
+        btnFiles.setFont(SYSConst.ARIAL18BOLD);
+        btnFiles.setPressedIcon(SYSConst.icon22Pressed);
+        btnFiles.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        btnFiles.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnFiles.setContentAreaFilled(false);
+        btnFiles.setBorder(null);
+
+        btnFiles.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                Closure fileHandleClosure = new Closure() {
+                    @Override
+                    public void execute(Object o) {
+                        EntityManager em = OPDE.createEM();
+//                        final Qms updateQms = em.find(Qms.class, qms.getId());
+                        final Qmsplan updateQmsplan = em.find(Qmsplan.class, qms.getQmsplan().getId());
+                        em.close();
+
+                        listQMSPlans.set(listQMSPlans.indexOf(qms.getQmsplan()), updateQmsplan);
+                        mapQms2Panel.remove(qms);
+                        createCP4(updateQmsplan);
+
+                        buildPanel();
+                    }
+                };
+                new DlgFiles(qms, fileHandleClosure);
+            }
+        });
+        btnFiles.setEnabled(OPDE.isFTPworking());
+        cptitle.getRight().add(btnFiles);
+
+
+        btnText.setEnabled(true);
+        cptitle.getRight().add(btnText);
 
         cpQMS.setTitleLabelComponent(cptitle.getMain());
         cpQMS.setSlidingDirection(SwingConstants.SOUTH);
@@ -828,17 +879,27 @@ public class PnlQMSPlan extends CleanablePanel {
 
         cpQMS.setCollapsible(qms.hasText());
 
-        final JTextPane contentPane = new JTextPane();
-        contentPane.setEditable(false);
-        contentPane.setContentType("text/html");
-        cpQMS.setContentPane(contentPane);
+        JPanel pnl = new JPanel(new VerticalLayout());
+
+//        final JTextPane textPane = new JTextPane();
+//        textPane.setText("test");
+//        textPane.setEditable(false);
+//        textPane.setContentType("text/html");
+
+        JTextArea txtArea = new JTextArea(qms.getText());
+        txtArea.setWrapStyleWord(true);
+        txtArea.setLineWrap(true);
+
+        pnl.add(txtArea);
+        pnl.setOpaque(false);
+
+        cpQMS.setContentPane(pnl);
 
         try {
             cpQMS.setCollapsed(true);
         } catch (PropertyVetoException e) {
             OPDE.error(e);
         }
-
 
         cpQMS.setHorizontalAlignment(SwingConstants.LEADING);
         cpQMS.setOpaque(false);

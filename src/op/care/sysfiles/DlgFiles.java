@@ -11,6 +11,8 @@ import entity.files.SYSFilesTools;
 import entity.info.ResInfo;
 import entity.nursingprocess.NursingProcess;
 import entity.prescription.Prescription;
+import entity.qms.Qms;
+import entity.qms.Qmsplan;
 import entity.reports.NReport;
 import entity.staff.Training;
 import entity.system.Users;
@@ -173,6 +175,14 @@ public class DlgFiles extends MyJDialog {
         } else if (attachable instanceof Users) {
             Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.usersAssignCollection uf WHERE uf.user = :user ");
             query.setParameter("user", attachable);
+            files = new ArrayList<SYSFiles>(query.getResultList());
+        } else if (attachable instanceof Qmsplan) {
+            Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.qmsplanAssignCollection ac WHERE ac.qmsplan = :qmsplan ");
+            query.setParameter("qmsplan", attachable);
+            files = new ArrayList<SYSFiles>(query.getResultList());
+        } else if (attachable instanceof Qms) {
+            Query query = em.createQuery("SELECT s FROM SYSFiles s JOIN s.qmsAssignCollection ac WHERE ac.qms = :qms ");
+            query.setParameter("qms", attachable);
             files = new ArrayList<SYSFiles>(query.getResultList());
         }
         Collections.sort(files);

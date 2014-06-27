@@ -68,6 +68,7 @@
         <class>entity.files.User2File</class>
         <class>entity.files.Resident2File</class>
         <class>entity.files.Qmsplan2File</class>
+        <class>entity.files.Qms2File</class>
         <class>entity.qms.Qms</class>
         <class>entity.qms.Qmsplan</class>
         <class>entity.qms.Qmssched</class>

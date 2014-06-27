@@ -170,6 +170,17 @@ public class Qmssched {
     @Column(name = "version", nullable = false, insertable = true, updatable = true)
     private long version;
 
+    @Basic
+    @Column(name = "state", nullable = false, insertable = true, updatable = true)
+    private byte state;
+
+    public byte getState() {
+        return state;
+    }
+
+    public void setState(byte state) {
+        this.state = state;
+    }
 
     @JoinColumn(name = "station", referencedColumnName = "StatID")
     @ManyToOne
@@ -237,6 +248,7 @@ public class Qmssched {
 
         this.qmsList = new ArrayList<>();
         this.user = OPDE.getLogin().getUser();
+        this.state = QmsschedTools.STATE_ACTIVE;
 
     }
 
@@ -272,6 +284,10 @@ public class Qmssched {
         return yearly > 0;
     }
 
+    public boolean isActive() {
+        return qmsplan.isActive() && state == QmsschedTools.STATE_ACTIVE;
+    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -292,8 +308,8 @@ public class Qmssched {
         if (yearly != qmssched.yearly) return false;
         if (home != null ? !home.equals(qmssched.home) : qmssched.home != null) return false;
         if (measure != null ? !measure.equals(qmssched.measure) : qmssched.measure != null) return false;
-        if (qmsList != null ? !qmsList.equals(qmssched.qmsList) : qmssched.qmsList != null) return false;
-        if (qmsplan != null ? !qmsplan.equals(qmssched.qmsplan) : qmssched.qmsplan != null) return false;
+//        if (qmsList != null ? !qmsList.equals(qmssched.qmsList) : qmssched.qmsList != null) return false;
+//        if (qmsplan != null ? !qmsplan.equals(qmssched.qmsplan) : qmssched.qmsplan != null) return false;
         if (startingOn != null ? !startingOn.equals(qmssched.startingOn) : qmssched.startingOn != null) return false;
         if (station != null ? !station.equals(qmssched.station) : qmssched.station != null) return false;
         if (text != null ? !text.equals(qmssched.text) : qmssched.text != null) return false;

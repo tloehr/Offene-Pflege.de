@@ -33,6 +33,7 @@ import entity.info.ResInfo;
 import entity.info.Resident;
 import entity.nursingprocess.NursingProcess;
 import entity.prescription.Prescription;
+import entity.qms.Qms;
 import entity.qms.Qmsplan;
 import entity.reports.NReport;
 import entity.staff.Training;
@@ -193,6 +194,10 @@ public class SYSFilesTools {
                                 Qmsplan2File link = em.merge(new Qmsplan2File(sysfile, (Qmsplan) attachable, OPDE.getLogin().getUser(), new Date()));
                                 sysfile.getQmsplanAssignCollection().add(link);
                                 ((Qmsplan) attachable).getAttachedFilesConnections().add(link);
+                            } else if (attachable instanceof Qms) {
+                                Qms2File link = em.merge(new Qms2File(sysfile, (Qms) attachable, OPDE.getLogin().getUser(), new Date()));
+                                sysfile.getQmsAssignCollection().add(link);
+                                ((Qms) attachable).getAttachedFilesConnections().add(link);
                             }
                         }
                         successful.add(sysfile);
