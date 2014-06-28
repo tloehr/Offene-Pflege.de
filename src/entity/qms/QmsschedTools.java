@@ -154,4 +154,13 @@ public class QmsschedTools {
         return recurrence;
     }
 
+    public static boolean isUnused(Qmssched qmssched) {
+        boolean unused = true;
+        for (Qms qms : qmssched.getQmsList()) {
+            unused = qms.isOpen();
+            if (!unused) break;
+        }
+        return unused;
+    }
+
 }

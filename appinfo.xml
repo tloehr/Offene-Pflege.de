@@ -20,9 +20,9 @@
                long="Hier können verschiedene Abfragen und Massnahmen für die Qualitätssicherung durchgeführt werden."
                main="true"
                javaclass="op.controlling.PnlControlling" icon="kfind.png">
-            <execute langbundle="appinfo.default.acl.execute"/>
-            <update langbundle="appinfo.default.acl.update"/>
-            <delete langbundle="appinfo.default.acl.delete"/>
+            <execute langbundle="opde.controlling.acl.execute"/>
+            <update langbundle="opde.controlling.acl.update"/>
+            <delete langbundle="opde.controlling.acl.delete"/>
             <user1 langbundle="opde.controlling.acl.user1"/>
         </class>
         <class name="opde.training" short="Fortbildungen"

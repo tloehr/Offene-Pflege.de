@@ -60,7 +60,7 @@ public class QmsplanTools {
         String html = "";
 
 
-        DateFormat df = DateFormat.getDateInstance();
+//        DateFormat df = DateFormat.getDateInstance();
 
 
 //        html += SYSConst.html_bold("misc.msg.createdby") + ": " + qmsplan.getUserON().getFullname() + " ";
@@ -74,11 +74,11 @@ public class QmsplanTools {
         html += SYSConst.html_h3("misc.msg.description") +
                 SYSTools.replace(qmsplan.getDescription(), "\n", "<br/>", false);
 
-        html += SYSConst.html_h3("misc.msg.measures");
-
-        if (qmsplan.getQmsschedules().isEmpty()) {
-            html += "<ul><li><b>" + SYSTools.xx("misc.msg.MissingInterventions") + " !!!</b></li></ul>";
-        }
+//        html += SYSConst.html_h3("misc.msg.measures");
+//
+//        if (qmsplan.getQmsschedules().isEmpty()) {
+//            html += "<ul><li><b>" + SYSTools.xx("misc.msg.MissingInterventions") + " !!!</b></li></ul>";
+//        }
 //         else {
 //            html += "<ul>";
 //            for (Qmssched qmssched : qmsplan.getQmsschedules()) {

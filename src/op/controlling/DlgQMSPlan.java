@@ -71,7 +71,7 @@ public class DlgQMSPlan extends MyJDialog {
 
     private void initDialog() {
 
-        tblScheds.setModel(new DefaultTableModel());
+//        tblScheds.setModel(new DefaultTableModel());
 
         pnlCommonTags = new PnlCommonTags(new HashSet<>(qmsplan.getCommontags()));
         pnlLeft.add(pnlCommonTags, CC.xy(3, 5));
@@ -83,7 +83,7 @@ public class DlgQMSPlan extends MyJDialog {
         txtTitle.setText(qmsplan.getTitle());
         txtDescription.setText(qmsplan.getDescription());
 
-        reloadMeasures();
+//        reloadMeasures();
     }
 
     @Override
@@ -97,36 +97,36 @@ public class DlgQMSPlan extends MyJDialog {
         }
     }
 
-    private void reloadMeasures() {
-        tblScheds.setModel(new TMQMScheds(qmsplan));
-        tblScheds.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        tblScheds.getColumnModel().getColumn(TMQMScheds.COL_TXT).setCellRenderer(new RNDHTML());
-        tblScheds.getColumnModel().getColumn(TMQMScheds.COL_TXT).setHeaderValue(SYSTools.xx("misc.msg.measures"));
-    }
+//    private void reloadMeasures() {
+//        tblScheds.setModel(new TMQMScheds(qmsplan));
+//        tblScheds.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+//        tblScheds.getColumnModel().getColumn(TMQMScheds.COL_TXT).setCellRenderer(new RNDHTML());
+//        tblScheds.getColumnModel().getColumn(TMQMScheds.COL_TXT).setHeaderValue(SYSTools.xx("misc.msg.measures"));
+//    }
 
 
-    private void btnAddQMSActionPerformed(ActionEvent e) {
-        final JidePopup popup = new JidePopup();
-        PnlQMSSchedule pnlQMSSchedule = new PnlQMSSchedule(new Qmssched(qmsplan), new Closure() {
-            @Override
-            public void execute(Object o) {
-                popup.hidePopup();
-                if (o != null) {
-                    qmsplan.getQmsschedules().add((Qmssched) o);
-                    reloadMeasures();
-                }
-            }
-        });
-
-        popup.setMovable(false);
-        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-
-        popup.setOwner(btnAddQMS);
-        popup.removeExcludedComponent(btnAddQMS);
-        popup.getContentPane().add(pnlQMSSchedule);
-        popup.setDefaultFocusComponent(pnlQMSSchedule);
-        GUITools.showPopup(popup, SwingConstants.NORTH_WEST);
-    }
+//    private void btnAddQMSActionPerformed(ActionEvent e) {
+//        final JidePopup popup = new JidePopup();
+//        PnlQMSSchedule pnlQMSSchedule = new PnlQMSSchedule(new Qmssched(qmsplan), new Closure() {
+//            @Override
+//            public void execute(Object o) {
+//                popup.hidePopup();
+//                if (o != null) {
+//                    qmsplan.getQmsschedules().add((Qmssched) o);
+//                    reloadMeasures();
+//                }
+//            }
+//        });
+//
+//        popup.setMovable(false);
+//        popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+//
+//        popup.setOwner(btnAddQMS);
+//        popup.removeExcludedComponent(btnAddQMS);
+//        popup.getContentPane().add(pnlQMSSchedule);
+//        popup.setDefaultFocusComponent(pnlQMSSchedule);
+//        GUITools.showPopup(popup, SwingConstants.NORTH_WEST);
+//    }
 
     private void txtTitleFocusGained(FocusEvent e) {
         ((JTextComponent) e.getSource()).selectAll();
@@ -188,11 +188,6 @@ public class DlgQMSPlan extends MyJDialog {
         txtDescription = new JTextArea();
         lblDescription = new JLabel();
         lblTags = new JLabel();
-        pnlRight = new JPanel();
-        jspPlanung = new JScrollPane();
-        tblScheds = new JTable();
-        panel3 = new JPanel();
-        btnAddQMS = new JButton();
         panel1 = new JPanel();
         btnCancel = new JButton();
         btnSave = new JButton();
@@ -201,8 +196,8 @@ public class DlgQMSPlan extends MyJDialog {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "14dlu, $lcgap, 280dlu:grow, $ugap, pref, $lcgap, 14dlu",
-            "fill:14dlu, $lgap, default, $rgap, pref, $lgap, 14dlu"));
+            "14dlu, $lcgap, pref:grow, $ugap, pref",
+            "fill:14dlu, $lgap, fill:default:grow, $rgap, pref, $lgap, 14dlu"));
 
         //======== pnlLeft ========
         {
@@ -256,67 +251,6 @@ public class DlgQMSPlan extends MyJDialog {
         }
         contentPane.add(pnlLeft, CC.xy(3, 3, CC.DEFAULT, CC.FILL));
 
-        //======== pnlRight ========
-        {
-            pnlRight.setLayout(new FormLayout(
-                "default:grow",
-                "default, $lgap, default"));
-
-            //======== jspPlanung ========
-            {
-                jspPlanung.addComponentListener(new ComponentAdapter() {
-                    @Override
-                    public void componentResized(ComponentEvent e) {
-                        jspPlanungComponentResized(e);
-                    }
-                });
-
-                //---- tblScheds ----
-                tblScheds.setModel(new DefaultTableModel(
-                    new Object[][] {
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                    },
-                    new String[] {
-                        "Title 1", "Title 2", "Title 3", "Title 4"
-                    }
-                ));
-                tblScheds.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-                tblScheds.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        tblPlanungMousePressed(e);
-                    }
-                });
-                jspPlanung.setViewportView(tblScheds);
-            }
-            pnlRight.add(jspPlanung, CC.xy(1, 1));
-
-            //======== panel3 ========
-            {
-                panel3.setLayout(new BoxLayout(panel3, BoxLayout.X_AXIS));
-
-                //---- btnAddQMS ----
-                btnAddQMS.setText(null);
-                btnAddQMS.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add.png")));
-                btnAddQMS.setContentAreaFilled(false);
-                btnAddQMS.setBorderPainted(false);
-                btnAddQMS.setBorder(null);
-                btnAddQMS.setPressedIcon(new ImageIcon(getClass().getResource("/artwork/22x22/bw/add-pressed.png")));
-                btnAddQMS.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnAddQMSActionPerformed(e);
-                    }
-                });
-                panel3.add(btnAddQMS);
-            }
-            pnlRight.add(panel3, CC.xy(1, 3));
-        }
-        contentPane.add(pnlRight, CC.xy(5, 3));
-
         //======== panel1 ========
         {
             panel1.setLayout(new HorizontalLayout(5));
@@ -343,8 +277,8 @@ public class DlgQMSPlan extends MyJDialog {
             });
             panel1.add(btnSave);
         }
-        contentPane.add(panel1, CC.xy(5, 5, CC.RIGHT, CC.DEFAULT));
-        setSize(1145, 570);
+        contentPane.add(panel1, CC.xy(3, 5, CC.RIGHT, CC.DEFAULT));
+        setSize(710, 495);
         setLocationRelativeTo(getOwner());
     }// </editor-fold>//GEN-END:initComponents
 
@@ -354,17 +288,17 @@ public class DlgQMSPlan extends MyJDialog {
         dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
 
-    private void jspPlanungComponentResized(ComponentEvent evt) {//GEN-FIRST:event_jspPlanungComponentResized
-        JScrollPane jsp = (JScrollPane) evt.getComponent();
-        if (tblScheds.getRowCount() <= 0) {
-            return;
-        }
-        Dimension dim = jsp.getSize();
-        int textWidth = dim.width - 25;
-        TableColumnModel tcm1 = tblScheds.getColumnModel();
-        tcm1.getColumn(0).setPreferredWidth(textWidth);
-        tcm1.getColumn(0).setHeaderValue(SYSTools.xx("misc.msg.measures"));
-    }//GEN-LAST:event_jspPlanungComponentResized
+//    private void jspPlanungComponentResized(ComponentEvent evt) {//GEN-FIRST:event_jspPlanungComponentResized
+//        JScrollPane jsp = (JScrollPane) evt.getComponent();
+//        if (tblScheds.getRowCount() <= 0) {
+//            return;
+//        }
+//        Dimension dim = jsp.getSize();
+//        int textWidth = dim.width - 25;
+//        TableColumnModel tcm1 = tblScheds.getColumnModel();
+//        tcm1.getColumn(0).setPreferredWidth(textWidth);
+//        tcm1.getColumn(0).setHeaderValue(SYSTools.xx("misc.msg.measures"));
+//    }//GEN-LAST:event_jspPlanungComponentResized
 
     private void btnSaveActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         if (saveOK()) {
@@ -373,89 +307,89 @@ public class DlgQMSPlan extends MyJDialog {
         }
     }//GEN-LAST:event_btnSaveActionPerformed
 
-    private void tblPlanungMousePressed(MouseEvent evt) {//GEN-FIRST:event_tblPlanungMousePressed
-        if (!SwingUtilities.isRightMouseButton(evt)) {
-            return;
-        }
-
-        Point p = evt.getPoint();
-        ListSelectionModel lsm = tblScheds.getSelectionModel();
-        final int startRow = tblScheds.rowAtPoint(p);
-        if (lsm.isSelectionEmpty() || (lsm.getMinSelectionIndex() == lsm.getMaxSelectionIndex())) {
-            lsm.setSelectionInterval(startRow, startRow);
-        }
-
-        menu = new JPopupMenu();
-
-        /***
-         *      _ _                 ____                         ____       _      _
-         *     (_) |_ ___ _ __ ___ |  _ \ ___  _ __  _   _ _ __ |  _ \  ___| | ___| |_ ___
-         *     | | __/ _ \ '_ ` _ \| |_) / _ \| '_ \| | | | '_ \| | | |/ _ \ |/ _ \ __/ _ \
-         *     | | ||  __/ | | | | |  __/ (_) | |_) | |_| | |_) | |_| |  __/ |  __/ ||  __/
-         *     |_|\__\___|_| |_| |_|_|   \___/| .__/ \__,_| .__/|____/ \___|_|\___|\__\___|
-         *                                    |_|         |_|
-         */
-        JMenuItem itemPopupDelete = new JMenuItem(SYSTools.xx("misc.commands.delete"), SYSConst.icon22delete);
-        itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-
-
-                for (int r : tblScheds.getSelectedRows()) {
-
-//                    listInterventionSchedule2Remove.add(((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row));
-
-                    qmsplan.getQmsschedules().remove(((TMQMScheds) tblScheds.getModel()).getSchedule(r));
-                }
-                ((TMQMScheds) tblScheds.getModel()).fireTableDataChanged();
-            }
-        });
-        menu.add(itemPopupDelete);
-
-        /***
-         *      _ _                 ____                        ____       _              _       _
-         *     (_) |_ ___ _ __ ___ |  _ \ ___  _ __  _   _ _ __/ ___|  ___| |__   ___  __| |_   _| | ___
-         *     | | __/ _ \ '_ ` _ \| |_) / _ \| '_ \| | | | '_ \___ \ / __| '_ \ / _ \/ _` | | | | |/ _ \
-         *     | | ||  __/ | | | | |  __/ (_) | |_) | |_| | |_) |__) | (__| | | |  __/ (_| | |_| | |  __/
-         *     |_|\__\___|_| |_| |_|_|   \___/| .__/ \__,_| .__/____/ \___|_| |_|\___|\__,_|\__,_|_|\___|
-         *                                    |_|         |_|
-         */
-        final JMenuItem itemPopupEditSchedule = new JMenuItem(SYSTools.xx("misc.commands.editsheduling"), SYSConst.icon22clock);
-
-        itemPopupEditSchedule.addActionListener(new java.awt.event.ActionListener() {
-
-
-            final Qmssched selectedQmssched = ((TMQMScheds) tblScheds.getModel()).getSchedule(startRow);
-
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                final JidePopup popup = new JidePopup();
-                PnlQMSSchedule pnlQMSSchedule = new PnlQMSSchedule(selectedQmssched, new Closure() {
-                    @Override
-                    public void execute(Object o) {
-                        popup.hidePopup();
-                        if (o != null) {
-                            qmsplan.getQmsschedules().remove(selectedQmssched);
-                            qmsplan.getQmsschedules().add((Qmssched) o);
-                            ((TMQMScheds) tblScheds.getModel()).fireTableDataChanged();
-                        }
-                    }
-                });
-
-                popup.setMovable(false);
-                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-
-                popup.setOwner(btnAddQMS);
-                popup.removeExcludedComponent(btnAddQMS);
-                popup.getContentPane().add(pnlQMSSchedule);
-                popup.setDefaultFocusComponent(pnlQMSSchedule);
-                GUITools.showPopup(popup, SwingConstants.NORTH_WEST);
-            }
-        });
-        menu.add(itemPopupEditSchedule);
-        itemPopupEditSchedule.setEnabled(true);
-
-
-        menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
-    }//GEN-LAST:event_tblPlanungMousePressed
+//    private void tblPlanungMousePressed(MouseEvent evt) {//GEN-FIRST:event_tblPlanungMousePressed
+//        if (!SwingUtilities.isRightMouseButton(evt)) {
+//            return;
+//        }
+//
+//        Point p = evt.getPoint();
+//        ListSelectionModel lsm = tblScheds.getSelectionModel();
+//        final int startRow = tblScheds.rowAtPoint(p);
+//        if (lsm.isSelectionEmpty() || (lsm.getMinSelectionIndex() == lsm.getMaxSelectionIndex())) {
+//            lsm.setSelectionInterval(startRow, startRow);
+//        }
+//
+//        menu = new JPopupMenu();
+//
+//        /***
+//         *      _ _                 ____                         ____       _      _
+//         *     (_) |_ ___ _ __ ___ |  _ \ ___  _ __  _   _ _ __ |  _ \  ___| | ___| |_ ___
+//         *     | | __/ _ \ '_ ` _ \| |_) / _ \| '_ \| | | | '_ \| | | |/ _ \ |/ _ \ __/ _ \
+//         *     | | ||  __/ | | | | |  __/ (_) | |_) | |_| | |_) | |_| |  __/ |  __/ ||  __/
+//         *     |_|\__\___|_| |_| |_|_|   \___/| .__/ \__,_| .__/|____/ \___|_|\___|\__\___|
+//         *                                    |_|         |_|
+//         */
+//        JMenuItem itemPopupDelete = new JMenuItem(SYSTools.xx("misc.commands.delete"), SYSConst.icon22delete);
+//        itemPopupDelete.addActionListener(new java.awt.event.ActionListener() {
+//            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//
+//
+//                for (int r : tblScheds.getSelectedRows()) {
+//
+////                    listInterventionSchedule2Remove.add(((TMPlan) tblPlanung.getModel()).getInterventionSchedule(row));
+//
+//                    qmsplan.getQmsschedules().remove(((TMQMScheds) tblScheds.getModel()).getSchedule(r));
+//                }
+//                ((TMQMScheds) tblScheds.getModel()).fireTableDataChanged();
+//            }
+//        });
+//        menu.add(itemPopupDelete);
+//
+//        /***
+//         *      _ _                 ____                        ____       _              _       _
+//         *     (_) |_ ___ _ __ ___ |  _ \ ___  _ __  _   _ _ __/ ___|  ___| |__   ___  __| |_   _| | ___
+//         *     | | __/ _ \ '_ ` _ \| |_) / _ \| '_ \| | | | '_ \___ \ / __| '_ \ / _ \/ _` | | | | |/ _ \
+//         *     | | ||  __/ | | | | |  __/ (_) | |_) | |_| | |_) |__) | (__| | | |  __/ (_| | |_| | |  __/
+//         *     |_|\__\___|_| |_| |_|_|   \___/| .__/ \__,_| .__/____/ \___|_| |_|\___|\__,_|\__,_|_|\___|
+//         *                                    |_|         |_|
+//         */
+//        final JMenuItem itemPopupEditSchedule = new JMenuItem(SYSTools.xx("misc.commands.editsheduling"), SYSConst.icon22clock);
+//
+//        itemPopupEditSchedule.addActionListener(new java.awt.event.ActionListener() {
+//
+//
+//            final Qmssched selectedQmssched = ((TMQMScheds) tblScheds.getModel()).getSchedule(startRow);
+//
+//            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                final JidePopup popup = new JidePopup();
+//                PnlQMSSchedule pnlQMSSchedule = new PnlQMSSchedule(selectedQmssched, new Closure() {
+//                    @Override
+//                    public void execute(Object o) {
+//                        popup.hidePopup();
+//                        if (o != null) {
+//                            qmsplan.getQmsschedules().remove(selectedQmssched);
+//                            qmsplan.getQmsschedules().add((Qmssched) o);
+//                            ((TMQMScheds) tblScheds.getModel()).fireTableDataChanged();
+//                        }
+//                    }
+//                });
+//
+//                popup.setMovable(false);
+//                popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+//
+//                popup.setOwner(btnAddQMS);
+//                popup.removeExcludedComponent(btnAddQMS);
+//                popup.getContentPane().add(pnlQMSSchedule);
+//                popup.setDefaultFocusComponent(pnlQMSSchedule);
+//                GUITools.showPopup(popup, SwingConstants.NORTH_WEST);
+//            }
+//        });
+//        menu.add(itemPopupEditSchedule);
+//        itemPopupEditSchedule.setEnabled(true);
+//
+//
+//        menu.show(evt.getComponent(), (int) p.getX(), (int) p.getY());
+//    }//GEN-LAST:event_tblPlanungMousePressed
 
 
     private void save() {
@@ -477,11 +411,6 @@ public class DlgQMSPlan extends MyJDialog {
     private JTextArea txtDescription;
     private JLabel lblDescription;
     private JLabel lblTags;
-    private JPanel pnlRight;
-    private JScrollPane jspPlanung;
-    private JTable tblScheds;
-    private JPanel panel3;
-    private JButton btnAddQMS;
     private JPanel panel1;
     private JButton btnCancel;
     private JButton btnSave;

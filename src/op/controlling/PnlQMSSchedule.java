@@ -77,6 +77,8 @@ public class PnlQMSSchedule extends JPanel {
         this.qmssched = qmssched;
         this.actionBlock = actionBlock;
 
+        this.qmssched.getQmsList().clear();
+
         initComponents();
         initPanel();
     }
