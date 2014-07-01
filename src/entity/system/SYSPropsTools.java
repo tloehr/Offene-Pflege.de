@@ -28,6 +28,7 @@ public class SYSPropsTools {
     public static final String KEY_STATION = "station";
     public static final String KEY_COUNTRY = "country";
     public static final String KEY_MAIL_HOST = "mail.smtp.host";
+    public static final String KEY_MAIL_SPAMFILTER_KEY = "mail.spamfilter.key";
     public static final String KEY_MAIL_PORT = "mail.smtp.port";
     public static final String KEY_MAIL_PROTOCOL = "mail.transport.protocol";
     public static final String KEY_MAIL_AUTH = "mail.smtp.auth";

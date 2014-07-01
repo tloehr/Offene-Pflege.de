@@ -63,6 +63,7 @@ public class PnlSystemSettings extends CleanablePanel {
     private ArrayList<Homes> listHomes;
     private File opdeicd = null;
     private JToggleButton tbauth, tbtls, tbstarttls, tbactive, tbCalcMed;
+    private DefaultListModel<File> dlmICDFiles;
 
     public PnlSystemSettings(JScrollPane jspSearch) {
         jspSearch.setViewportView(new JPanel());
@@ -296,30 +297,56 @@ public class PnlSystemSettings extends CleanablePanel {
         btnImportICD.setIcon(SYSConst.icon22ledRedOn);
         pnlICD.add(GUITools.getDropPanel(new FileDrop.Listener() {
             public void filesDropped(java.io.File[] files) {
-                if (files.length == 1) {
-                    opdeicd = files[0].exists() ? files[0] : null;
-                    if (!SYSFilesTools.filenameExtension(opdeicd.getPath()).equalsIgnoreCase("xml")) {
-                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.global.wrongfile", DisplayMessage.WARNING));
-                        btnImportICD.setIcon(SYSConst.icon22ledRedOn);
-                        opdeicd = null;
-                    } else {
 
-                        try {
-                            SAXParserFactory factory = SAXParserFactory.newInstance();
-                            SAXParser saxParser = factory.newSAXParser();
-                            saxParser.parse(opdeicd, new ICDImporter(null));
-                            btnImportICD.setIcon(SYSConst.icon22ledGreenOn);
-                        } catch (Exception e) {
-                            OPDE.getDisplayManager().addSubMessage("opde.settings.global.noICDFile");
-                            opdeicd = null;
-                            btnImportICD.setIcon(SYSConst.icon22ledRedOn);
-                        }
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.nodirectories"));
+                        return;
                     }
-                } else {
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.global.only1file", DisplayMessage.WARNING));
-                    btnImportICD.setIcon(SYSConst.icon22ledRedOn);
-                    opdeicd = null;
                 }
+
+                boolean attached = false;
+                for (File file : files) {
+                    if (!dlmICDFiles.contains(file)) {
+                        dlmICDFiles.addElement(file);
+                        attached = true;
+                    }
+                }
+
+                if (attached) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            lstIcdFiles.revalidate();
+                            lstIcdFiles.repaint();
+                        }
+                    });
+                }
+
+//                if (files.length == 1) {
+//                    opdeicd = files[0].exists() ? files[0] : null;
+//                    if (!SYSFilesTools.filenameExtension(opdeicd.getPath()).equalsIgnoreCase("xml")) {
+//                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.global.wrongfile", DisplayMessage.WARNING));
+//                        btnImportICD.setIcon(SYSConst.icon22ledRedOn);
+//                        opdeicd = null;
+//                    } else {
+//
+//                        try {
+//                            SAXParserFactory factory = SAXParserFactory.newInstance();
+//                            SAXParser saxParser = factory.newSAXParser();
+//                            saxParser.parse(opdeicd, new ICDImporter(null));
+//                            btnImportICD.setIcon(SYSConst.icon22ledGreenOn);
+//                        } catch (Exception e) {
+//                            OPDE.getDisplayManager().addSubMessage("opde.settings.global.noICDFile");
+//                            opdeicd = null;
+//                            btnImportICD.setIcon(SYSConst.icon22ledRedOn);
+//                        }
+//                    }
+//                } else {
+//                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.global.only1file", DisplayMessage.WARNING));
+//                    btnImportICD.setIcon(SYSConst.icon22ledRedOn);
+//                    opdeicd = null;
+//                }
 
             }
         }, SYSTools.xx("opde.settings.global.dropICDHere")), CC.xy(1, 1));
@@ -337,6 +364,7 @@ public class PnlSystemSettings extends CleanablePanel {
         txtMailRecipient.setText(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_RECIPIENT)));
         txtMailSenderPersonal.setText(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_SENDER_PERSONAL)));
         txtMailRecipientPersonal.setText(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_RECIPIENT_PERSONAL)));
+        txtMailSpamfilter.setText(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_SPAMFILTER_KEY)));
 
         lblMailHost.setText(SYSTools.xx("opde.settings.global.mail.host"));
         lblMailPort.setText(SYSTools.xx("opde.settings.global.mail.port"));
@@ -346,26 +374,27 @@ public class PnlSystemSettings extends CleanablePanel {
         lblMailRecipient.setText(SYSTools.xx("opde.settings.global.mail.recipient"));
         lblMailSenderPersonal.setText(SYSTools.xx("opde.settings.global.mail.sender.personal"));
         lblMailRecipientPersonal.setText(SYSTools.xx("opde.settings.global.mail.recipient.personal"));
+        lblMailSpamFilter.setText(SYSTools.xx("opde.settings.global.mail.recipient.spamfilter"));
 
         lblAuth.setText(SYSTools.xx("opde.settings.global.mail.auth"));
         tbauth = GUITools.getNiceToggleButton(null);
         tbauth.setSelected(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_AUTH)).equalsIgnoreCase("true"));
-        pnlMail.add(tbauth, CC.xywh(3, 17, 1, 1, CC.LEFT, CC.DEFAULT));
+        pnlMail.add(tbauth, CC.xywh(3, 19, 1, 1, CC.LEFT, CC.DEFAULT));
 
         lblStarttls.setText(SYSTools.xx("opde.settings.global.mail.starttls"));
         tbstarttls = GUITools.getNiceToggleButton(null);
         tbstarttls.setSelected(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_STARTTLS)).equalsIgnoreCase("true"));
-        pnlMail.add(tbstarttls, CC.xywh(3, 19, 1, 1, CC.LEFT, CC.DEFAULT));
+        pnlMail.add(tbstarttls, CC.xywh(3, 21, 1, 1, CC.LEFT, CC.DEFAULT));
 
         lblTLS.setText(SYSTools.xx("opde.settings.global.mail.tls"));
         tbtls = GUITools.getNiceToggleButton(null);
         tbtls.setSelected(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_TLS)).equalsIgnoreCase("true"));
-        pnlMail.add(tbtls, CC.xywh(3, 21, 1, 1, CC.LEFT, CC.DEFAULT));
+        pnlMail.add(tbtls, CC.xywh(3, 23, 1, 1, CC.LEFT, CC.DEFAULT));
 
         lblActive.setText(SYSTools.xx("opde.settings.global.mail.active"));
         tbactive = GUITools.getNiceToggleButton(null);
         tbactive.setSelected(SYSTools.catchNull(OPDE.getProps().getProperty(SYSPropsTools.KEY_MAIL_SYSTEM_ACTIVE)).equalsIgnoreCase("true"));
-        pnlMail.add(tbactive, CC.xywh(3, 25, 1, 1, CC.LEFT, CC.DEFAULT));
+        pnlMail.add(tbactive, CC.xywh(3, 27, 1, 1, CC.LEFT, CC.DEFAULT));
         tbactive.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -396,14 +425,14 @@ public class PnlSystemSettings extends CleanablePanel {
         cmbCountry.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED){
+                if (e.getStateChange() == ItemEvent.SELECTED) {
                     SYSPropsTools.storeProp(SYSPropsTools.KEY_COUNTRY, e.getItem().toString());
                 }
             }
         });
 
 
-        if (OPDE.getProps().containsKey(SYSPropsTools.KEY_COUNTRY)){
+        if (OPDE.getProps().containsKey(SYSPropsTools.KEY_COUNTRY)) {
             cmbCountry.setSelectedItem(OPDE.getProps().getProperty(SYSPropsTools.KEY_COUNTRY));
         } else {
             cmbCountry.setSelectedItem("germany");
@@ -822,6 +851,7 @@ public class PnlSystemSettings extends CleanablePanel {
         myMailProps.put(SYSPropsTools.KEY_MAIL_AUTH, Boolean.toString(tbauth.isSelected()));
         myMailProps.put(SYSPropsTools.KEY_MAIL_TLS, Boolean.toString(tbtls.isSelected()));
         myMailProps.put(SYSPropsTools.KEY_MAIL_STARTTLS, Boolean.toString(tbstarttls.isSelected()));
+        myMailProps.put(SYSPropsTools.KEY_MAIL_SPAMFILTER_KEY, SYSTools.tidy(SYSTools.catchNull(txtMailSpamfilter.getText())));
         return myMailProps;
     }
 
@@ -900,6 +930,20 @@ public class PnlSystemSettings extends CleanablePanel {
 
     }
 
+    private void btnEmptyListActionPerformed(ActionEvent e) {
+
+
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                dlmICDFiles.clear();
+                lstIcdFiles.revalidate();
+                lstIcdFiles.repaint();
+            }
+        });
+
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         tabMain = new JTabbedPane();
@@ -923,6 +967,9 @@ public class PnlSystemSettings extends CleanablePanel {
         jspHomeStation = new JScrollPane();
         cpsHomes = new CollapsiblePanes();
         pnlICD = new JPanel();
+        scrollPane1 = new JScrollPane();
+        lstIcdFiles = new JList();
+        btnEmptyList = new JButton();
         btnImportICD = new JButton();
         pnlMail = new JPanel();
         lblMailHost = new JLabel();
@@ -941,6 +988,8 @@ public class PnlSystemSettings extends CleanablePanel {
         txtMailSenderPersonal = new JTextField();
         lblMailRecipientPersonal = new JLabel();
         txtMailRecipientPersonal = new JTextField();
+        lblMailSpamFilter = new JLabel();
+        txtMailSpamfilter = new JTextField();
         lblAuth = new JLabel();
         lblStarttls = new JLabel();
         lblTLS = new JLabel();
@@ -1113,7 +1162,23 @@ public class PnlSystemSettings extends CleanablePanel {
                     {
                         pnlICD.setLayout(new FormLayout(
                             "default:grow",
-                            "fill:default:grow, $lgap, default"));
+                            "fill:default:grow, 3*($lgap, default)"));
+
+                        //======== scrollPane1 ========
+                        {
+                            scrollPane1.setViewportView(lstIcdFiles);
+                        }
+                        pnlICD.add(scrollPane1, CC.xy(1, 3));
+
+                        //---- btnEmptyList ----
+                        btnEmptyList.setText("text");
+                        btnEmptyList.addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                btnEmptyListActionPerformed(e);
+                            }
+                        });
+                        pnlICD.add(btnEmptyList, CC.xy(1, 5));
 
                         //---- btnImportICD ----
                         btnImportICD.setText("importICD");
@@ -1123,7 +1188,7 @@ public class PnlSystemSettings extends CleanablePanel {
                                 btnImportICDActionPerformed(e);
                             }
                         });
-                        pnlICD.add(btnImportICD, CC.xy(1, 3, CC.LEFT, CC.DEFAULT));
+                        pnlICD.add(btnImportICD, CC.xy(1, 7, CC.LEFT, CC.DEFAULT));
                     }
                     pnlGlobal.add(pnlICD, CC.xywh(7, 5, 1, 3));
 
@@ -1131,7 +1196,7 @@ public class PnlSystemSettings extends CleanablePanel {
                     {
                         pnlMail.setLayout(new FormLayout(
                             "default, $lcgap, default:grow",
-                            "12*(default, $lgap), default"));
+                            "13*(default, $lgap), default"));
 
                         //---- lblMailHost ----
                         lblMailHost.setText("host");
@@ -1173,17 +1238,22 @@ public class PnlSystemSettings extends CleanablePanel {
                         pnlMail.add(lblMailRecipientPersonal, CC.xy(1, 15));
                         pnlMail.add(txtMailRecipientPersonal, CC.xy(3, 15));
 
+                        //---- lblMailSpamFilter ----
+                        lblMailSpamFilter.setText("text");
+                        pnlMail.add(lblMailSpamFilter, CC.xy(1, 17));
+                        pnlMail.add(txtMailSpamfilter, CC.xy(3, 17));
+
                         //---- lblAuth ----
                         lblAuth.setText("auth");
-                        pnlMail.add(lblAuth, CC.xy(1, 17));
+                        pnlMail.add(lblAuth, CC.xy(1, 19));
 
                         //---- lblStarttls ----
                         lblStarttls.setText("starttls");
-                        pnlMail.add(lblStarttls, CC.xy(1, 19));
+                        pnlMail.add(lblStarttls, CC.xy(1, 21));
 
                         //---- lblTLS ----
                         lblTLS.setText("tls");
-                        pnlMail.add(lblTLS, CC.xy(1, 21));
+                        pnlMail.add(lblTLS, CC.xy(1, 23));
 
                         //---- btnTestmail ----
                         btnTestmail.setText("Send Testmail");
@@ -1193,11 +1263,11 @@ public class PnlSystemSettings extends CleanablePanel {
                                 btnTestmailActionPerformed(e);
                             }
                         });
-                        pnlMail.add(btnTestmail, CC.xywh(1, 23, 3, 1, CC.LEFT, CC.DEFAULT));
+                        pnlMail.add(btnTestmail, CC.xywh(1, 25, 3, 1, CC.LEFT, CC.DEFAULT));
 
                         //---- lblActive ----
                         lblActive.setText("active");
-                        pnlMail.add(lblActive, CC.xy(1, 25));
+                        pnlMail.add(lblActive, CC.xy(1, 27));
                     }
                     pnlGlobal.add(pnlMail, CC.xywh(11, 5, 1, 3));
                     pnlGlobal.add(cmbCountry, CC.xy(3, 7));
@@ -1350,6 +1420,9 @@ public class PnlSystemSettings extends CleanablePanel {
         OPDE.getDisplayManager().setMainMessage(SYSTools.xx(internalClassID));
         OPDE.getDisplayManager().clearAllIcons();
 
+        dlmICDFiles = new DefaultListModel<>();
+        lstIcdFiles.setModel(dlmICDFiles);
+
         tabMain.setTitleAt(TAB_LOCAL, SYSTools.xx("opde.settings.local"));
         tabMain.setTitleAt(TAB_GLOBAL, SYSTools.xx("opde.settings.global"));
 
@@ -1382,6 +1455,9 @@ public class PnlSystemSettings extends CleanablePanel {
     private JScrollPane jspHomeStation;
     private CollapsiblePanes cpsHomes;
     private JPanel pnlICD;
+    private JScrollPane scrollPane1;
+    private JList lstIcdFiles;
+    private JButton btnEmptyList;
     private JButton btnImportICD;
     private JPanel pnlMail;
     private JLabel lblMailHost;
@@ -1400,6 +1476,8 @@ public class PnlSystemSettings extends CleanablePanel {
     private JTextField txtMailSenderPersonal;
     private JLabel lblMailRecipientPersonal;
     private JTextField txtMailRecipientPersonal;
+    private JLabel lblMailSpamFilter;
+    private JTextField txtMailSpamfilter;
     private JLabel lblAuth;
     private JLabel lblStarttls;
     private JLabel lblTLS;

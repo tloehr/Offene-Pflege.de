@@ -553,7 +553,7 @@ public class PnlQMSPlan extends CleanablePanel {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 if (new LocalDate(qms.getTarget()).isAfter(new LocalDate().plusMonths(MAX_MONTHS_IN_ADVANCE_TO_CONFIRM_QMS))) {
-                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.toFarIntoFuture"));
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.DateTooFarAway"));
                     return;
                 }
                 if (!qms.isOpen()) {
@@ -625,7 +625,18 @@ public class PnlQMSPlan extends CleanablePanel {
         String title = SYSTools.toHTMLForScreen(SYSConst.html_color(GUITools.blend(qms.getQmsplan().getColor(), Color.BLACK, 0.4f), QmsTools.toHTML(qms)));
 
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, OPDE.getAppInfo().isAllowedTo(InternalClassACL.UPDATE, PnlControlling.internalClassID) ? applyActionListener : null);
+        final DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (cpQMS.isCollapsible()){
+                    try {
+                        cpQMS.setCollapsed(cpQMS.isExpanded());
+                    } catch (PropertyVetoException e1) {
+                        // bah!
+                    }
+                }
+            }
+        });
 
 
         cptitle.getButton().setIcon(QmsTools.getIcon(qms));
@@ -671,7 +682,7 @@ public class PnlQMSPlan extends CleanablePanel {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
                         if (new LocalDate(qms.getTarget()).isAfter(new LocalDate().plusMonths(MAX_MONTHS_IN_ADVANCE_TO_CONFIRM_QMS))) {
-                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.toFarIntoFuture"));
+                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage("misc.msg.DateTooFarAway"));
                             return;
                         }
                         if (!qms.isOpen()) {
@@ -803,8 +814,8 @@ public class PnlQMSPlan extends CleanablePanel {
              *      \___|\__,_|_|\__||_|\___/_/\_\\__|
              *
              */
-            final JButton btnText = new JButton(SYSConst.icon22edit3);
-            btnText.setPressedIcon(SYSConst.icon22edit3Pressed);
+            final JButton btnText = new JButton(SYSConst.icon22chat);
+            btnText.setPressedIcon(SYSConst.icon22Pressed);
             btnText.setAlignmentX(Component.RIGHT_ALIGNMENT);
             btnText.setContentAreaFilled(false);
             btnText.setBorder(null);
@@ -814,6 +825,7 @@ public class PnlQMSPlan extends CleanablePanel {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     if (qms.isOpen()) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.controlling.qms.pnlqmsplan.cant.comment"));
                         return;
                     }
                     if (!qms.getQmssched().isActive()) {

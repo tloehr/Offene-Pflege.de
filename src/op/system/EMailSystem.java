@@ -77,7 +77,7 @@ public class EMailSystem {
     }
 
     public static boolean sendTestmail(Pair<String, String>[] recipients, File[] attach, Properties props) {
-            return send(SYSTools.xx(PnlSystemSettings.internalClassID+".global.mail.testsubject"), SYSTools.xx(PnlSystemSettings.internalClassID+".global.mail.testbody"), recipients, attach, props);
+            return send(SYSTools.xx("opde.settings.global.mail.testsubject"), SYSTools.xx("opde.settings.global.mail.testbody"), recipients, attach, props);
         }
 
     private static boolean send(String subject, String bodyText, Pair<String, String>[] recipients, File[] attach, final Properties mailProps) {
@@ -106,7 +106,15 @@ public class EMailSystem {
 
 
             BodyPart messageBodyPart = new MimeBodyPart();
-            messageBodyPart.setText(bodyText);
+
+
+            String sendText = bodyText;
+            if (mailProps.containsKey(SYSPropsTools.KEY_MAIL_SPAMFILTER_KEY)){
+                sendText += "\n--\n"+SYSTools.xx("opde.settings.global.mail.recipient.spamfilter")+": "+mailProps.getProperty(SYSPropsTools.KEY_MAIL_SPAMFILTER_KEY);
+            }
+
+
+            messageBodyPart.setText(sendText);
 
             Multipart multipart = new MimeMultipart();
             multipart.addBodyPart(messageBodyPart);

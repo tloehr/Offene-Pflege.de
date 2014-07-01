@@ -71,8 +71,8 @@ public class QmsplanTools {
 //            html += SYSConst.html_bold("misc.msg.atchrono") + ": " + df.format(qmsplan.getTo());
 //        }
 
-        html += SYSConst.html_h3("misc.msg.description") +
-                SYSTools.replace(qmsplan.getDescription(), "\n", "<br/>", false);
+        html += !SYSTools.catchNull(qmsplan.getDescription()).isEmpty() ? SYSConst.html_h3("misc.msg.description") +
+                SYSTools.replace(qmsplan.getDescription(), "\n", "<br/>", false) : "";
 
 //        html += SYSConst.html_h3("misc.msg.measures");
 //
