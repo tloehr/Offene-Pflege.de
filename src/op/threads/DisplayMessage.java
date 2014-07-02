@@ -2,7 +2,6 @@ package op.threads;
 
 
 import op.OPDE;
-import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import java.util.UUID;
@@ -37,7 +36,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         String title = SYSTools.catchNull(message);
         try {
             title = SYSTools.xx(message);
-        } catch (Exception e){
+        } catch (Exception e) {
             // ok, its not a langbundle key
         }
 
@@ -56,7 +55,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         String title = SYSTools.catchNull(message);
         try {
             title = SYSTools.xx(message);
-        } catch (Exception e){
+        } catch (Exception e) {
             // ok, its not a langbundle key
         }
 
@@ -74,7 +73,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         String title = SYSTools.catchNull(message);
         try {
             title = SYSTools.xx(message);
-        } catch (Exception e){
+        } catch (Exception e) {
             // ok, its not a langbundle key
         }
 
@@ -83,7 +82,12 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         this.timestamp = System.currentTimeMillis();
         this.processed = 0;
         this.secondsToShow = 0;
-        this.percentage = new Double(new Double(progress) / new Double(max) * 100d).intValue();
+        if (max < 0) {
+            percentage = -1;
+        } else {
+            percentage = new Double(new Double(progress) / new Double(max) * 100d).intValue();
+        }
+
         uid = UUID.randomUUID().toString();
         this.classname = "";
     }
@@ -92,7 +96,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         String title = SYSTools.catchNull(message);
         try {
             title = SYSTools.xx(message);
-        } catch (Exception e){
+        } catch (Exception e) {
             // ok, its not a langbundle key
         }
 
@@ -110,7 +114,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         String title = SYSTools.catchNull(message);
         try {
             title = SYSTools.xx(message);
-        } catch (Exception e){
+        } catch (Exception e) {
             // ok, its not a langbundle key
         }
 
@@ -134,7 +138,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         String title = SYSTools.catchNull(message);
         try {
             title = SYSTools.xx(message);
-        } catch (Exception e){
+        } catch (Exception e) {
             // ok, its not a langbundle key
         }
         this.message = title;
@@ -181,8 +185,8 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
     }
 
     public void setProcessed() {
-            this.processed = System.currentTimeMillis();
-        }
+        this.processed = System.currentTimeMillis();
+    }
 
     public int getSecondsToShow() {
         return secondsToShow;
@@ -208,7 +212,7 @@ public class DisplayMessage implements Comparable<DisplayMessage> {
         this.classname = classname;
     }
 
-    public boolean isUrgent(){
+    public boolean isUrgent() {
         return priority == IMMEDIATELY;
     }
 

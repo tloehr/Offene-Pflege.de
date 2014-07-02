@@ -7,6 +7,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,14 +18,20 @@ import javax.persistence.EntityManager;
  */
 public class ICDImporter extends DefaultHandler {
 
-    private final EntityManager em;
+//    private final EntityManager em;
     private String firstElement;
     private StringBuilder content;
     String code = null;
+    ArrayList<ICD> listICDs;
 
-    public ICDImporter(EntityManager em) throws Exception {
-        this.em = em;
+    public ICDImporter() throws Exception {
+//        this.em = em;
+        listICDs = new ArrayList<>(10000);
         firstElement = null;
+    }
+
+    public ArrayList<ICD> getICDs() {
+        return listICDs;
     }
 
     @Override
@@ -53,10 +60,7 @@ public class ICDImporter extends DefaultHandler {
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
         if (qName.equalsIgnoreCase("icd")) {
-            // only persist if needed. Check only otherwise.
-            if (em != null) {
-                em.merge(new ICD(code, content.toString()));
-            }
+            listICDs.add(new ICD(code, content.toString()));
             code = null;
             content = null;
         }

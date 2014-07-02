@@ -268,14 +268,19 @@ public class OPDE {
      */
     public static int getTimeout() {
         int timeout = DEFAULT_TIMEOUT;
-        if (props.containsKey("timeout")) {
+        if (localProps.containsKey("timeout")) {
             try {
-                timeout = Integer.parseInt(props.getProperty("timeout"));
+                timeout = Integer.parseInt(localProps.getProperty("timeout"));
             } catch (NumberFormatException nfe) {
                 timeout = DEFAULT_TIMEOUT;
             }
         }
         return timeout;
+    }
+
+    public static void setTimeout(int timeout){
+        localProps.setProperty("timeout", Integer.toString(timeout));
+        saveLocalProps();
     }
 
     public static void saveLocalProps() {

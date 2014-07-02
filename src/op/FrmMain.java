@@ -119,7 +119,7 @@ public class FrmMain extends JFrame {
         initPhase = true;
         initComponents();
 
-        pbTimeout.setToolTipText(SYSTools.xx("opde.mainframe.pbTimeout.tooltip"));
+//        pbTimeout.setToolTipText(SYSTools.xx("opde.mainframe.pbTimeout.tooltip"));
         // for the timeout function
         Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
             @Override

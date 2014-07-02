@@ -17,6 +17,7 @@ import entity.HomesTools;
 import entity.Station;
 import entity.StationTools;
 import entity.files.SYSFilesTools;
+import entity.info.ICD;
 import entity.info.ResInfoCategory;
 import entity.info.ResInfoCategoryTools;
 import entity.prescription.MedStock;
@@ -48,6 +49,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -61,14 +64,15 @@ public class PnlSystemSettings extends CleanablePanel {
     private HashMap<String, CollapsiblePane> cpMap;
     private HashMap<String, JPanel> cpPanel;
     private ArrayList<Homes> listHomes;
-    private File opdeicd = null;
     private JToggleButton tbauth, tbtls, tbstarttls, tbactive, tbCalcMed;
     private DefaultListModel<File> dlmICDFiles;
+    private ArrayList<ICD> listICDs;
 
     public PnlSystemSettings(JScrollPane jspSearch) {
         jspSearch.setViewportView(new JPanel());
         cpMap = new HashMap<String, CollapsiblePane>();
         cpPanel = new HashMap<String, JPanel>();
+        listICDs = new ArrayList<>();
         initComponents();
         initPanel();
     }
@@ -267,6 +271,18 @@ public class PnlSystemSettings extends CleanablePanel {
 
         lblPrinters.setText(SYSTools.xx("opde.settings.local.labelPrinters"));
         lblStation.setText(SYSTools.xx("opde.settings.local.station"));
+        lblTimeout.setText(SYSTools.xx("opde.settings.local.timeout"));
+
+        SpinnerNumberModel snm = new SpinnerNumberModel(OPDE.getTimeout(), 0, 999, 1);
+        final JSpinner spinTimeout = new JSpinner(snm);
+        spinTimeout.setToolTipText(SYSTools.xx("opde.settings.local.timeout.tooltip"));
+        spinTimeout.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                OPDE.setTimeout( (Integer) spinTimeout.getValue());
+            }
+        });
+        pnlLocal.add(spinTimeout, CC.xy(7, 9));
 
         cmbStation.setModel(StationTools.getAll4Combobox(false));
         cmbStation.setSelectedItem(StationTools.getStationForThisHost());
@@ -295,8 +311,10 @@ public class PnlSystemSettings extends CleanablePanel {
     private void createICDImporter() {
         btnImportICD.setText(SYSTools.xx("opde.settings.global.btnImportICD"));
         btnImportICD.setIcon(SYSConst.icon22ledRedOn);
+        btnEmptyList.setToolTipText(SYSTools.xx("opde.settings.global.btnEmptyList"));
         pnlICD.add(GUITools.getDropPanel(new FileDrop.Listener() {
             public void filesDropped(java.io.File[] files) {
+//                File opdeicd = null, dimdixml = null, dimdidtd = null;
 
                 for (File file : files) {
                     if (file.isDirectory()) {
@@ -323,33 +341,87 @@ public class PnlSystemSettings extends CleanablePanel {
                     });
                 }
 
-//                if (files.length == 1) {
-//                    opdeicd = files[0].exists() ? files[0] : null;
-//                    if (!SYSFilesTools.filenameExtension(opdeicd.getPath()).equalsIgnoreCase("xml")) {
-//                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.global.wrongfile", DisplayMessage.WARNING));
-//                        btnImportICD.setIcon(SYSConst.icon22ledRedOn);
-//                        opdeicd = null;
-//                    } else {
-//
-//                        try {
-//                            SAXParserFactory factory = SAXParserFactory.newInstance();
-//                            SAXParser saxParser = factory.newSAXParser();
-//                            saxParser.parse(opdeicd, new ICDImporter(null));
-//                            btnImportICD.setIcon(SYSConst.icon22ledGreenOn);
-//                        } catch (Exception e) {
-//                            OPDE.getDisplayManager().addSubMessage("opde.settings.global.noICDFile");
-//                            opdeicd = null;
-//                            btnImportICD.setIcon(SYSConst.icon22ledRedOn);
-//                        }
-//                    }
-//                } else {
-//                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.global.only1file", DisplayMessage.WARNING));
-//                    btnImportICD.setIcon(SYSConst.icon22ledRedOn);
-//                    opdeicd = null;
-//                }
 
+                if (dlmICDFiles.size() == 1) {
+                    File opdeicd = dlmICDFiles.elementAt(0).exists() ? dlmICDFiles.elementAt(0) : null;
+
+                    if (!SYSFilesTools.filenameExtension(opdeicd.getPath()).equalsIgnoreCase("xml")) {
+                        OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.global.wrongfile", DisplayMessage.WARNING));
+                        btnImportICD.setIcon(SYSConst.icon22ledRedOn);
+                    } else {
+                        try {
+                            SAXParserFactory factory = SAXParserFactory.newInstance();
+                            SAXParser saxParser = factory.newSAXParser();
+                            ICDImporter icdImporter = new ICDImporter();
+                            saxParser.parse(opdeicd, icdImporter);
+
+                            listICDs.clear();
+                            listICDs.addAll(icdImporter.getICDs());
+
+                            btnImportICD.setIcon(SYSConst.icon22ledGreenOn);
+                        } catch (Exception e) {
+                            OPDE.getDisplayManager().addSubMessage("opde.settings.global.noICDFile");
+                            listICDs.clear();
+                            btnImportICD.setIcon(SYSConst.icon22ledRedOn);
+                        }
+                    }
+                } else if (dlmICDFiles.size() == 2) {
+
+                    File dimdixml = null, dimdidtd = null;
+
+                    File file1 = dlmICDFiles.elementAt(0).exists() ? dlmICDFiles.elementAt(0) : null;
+                    File file2 = dlmICDFiles.elementAt(1).exists() ? dlmICDFiles.elementAt(1) : null;
+
+                    if (SYSFilesTools.filenameExtension(file1.getPath()).equalsIgnoreCase("xml")) {
+                        dimdixml = file1;
+                    }
+                    if (SYSFilesTools.filenameExtension(file2.getPath()).equalsIgnoreCase("xml")) {
+                        dimdixml = file2;
+                    }
+                    if (SYSFilesTools.filenameExtension(file1.getPath()).equalsIgnoreCase("dtd")) {
+                        dimdidtd = file1;
+                    }
+                    if (SYSFilesTools.filenameExtension(file2.getPath()).equalsIgnoreCase("dtd")) {
+                        dimdidtd = file2;
+                    }
+
+                    if (dimdidtd != null && dimdixml != null) {
+                        try {
+
+                            Path tempDir = Files.createTempDirectory("icdimport");
+                            FileUtils.copyFileToDirectory(dimdidtd, tempDir.toFile(), false);
+                            FileUtils.copyFileToDirectory(dimdixml, tempDir.toFile(), false);
+                            File claML = new File(tempDir.toString() + SYSConst.sep + dimdixml.getName());
+
+                            SAXParserFactory factory = SAXParserFactory.newInstance();
+                            SAXParser saxParser = factory.newSAXParser();
+                            ClaMLImporter cl = new ClaMLImporter();
+                            saxParser.parse(claML, cl);
+
+                            listICDs.clear();
+                            listICDs.addAll(cl.getICDs());
+
+                            btnImportICD.setIcon(SYSConst.icon22ledGreenOn);
+
+                        } catch (Exception e) {
+                            listICDs.clear();
+                            OPDE.getDisplayManager().addSubMessage(new DisplayMessage(e.getMessage(), DisplayMessage.WARNING));
+                            btnImportICD.setIcon(SYSConst.icon22ledRedOn);
+                        }
+//
+                    } else {
+                        OPDE.getDisplayManager().addSubMessage("opde.settings.global.noICDFile");
+                        listICDs.clear();
+                        btnImportICD.setIcon(SYSConst.icon22ledRedOn);
+                    }
+
+                } else {
+                    OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.global.only1or2files", DisplayMessage.WARNING));
+                    btnImportICD.setIcon(SYSConst.icon22ledRedOn);
+                    listICDs.clear();
+                }
             }
-        }, SYSTools.xx("opde.settings.global.dropICDHere")), CC.xy(1, 1));
+        }, SYSTools.xx("opde.settings.global.dropICDHere")), CC.xyw(1, 1, 2));
     }
 
 
@@ -812,30 +884,70 @@ public class PnlSystemSettings extends CleanablePanel {
     }
 
     private void btnImportICDActionPerformed(ActionEvent e) {
-        if (opdeicd == null) {
+        if (listICDs.isEmpty()) {
             OPDE.getDisplayManager().addSubMessage(new DisplayMessage("opde.settings.global.noICDFile", DisplayMessage.WARNING));
             return;
         }
 
-        EntityManager em = OPDE.createEM();
-        try {
-            em.getTransaction().begin();
 
-            Query query = em.createQuery("DELETE FROM ICD icd");
-            query.executeUpdate();
+        OPDE.getMainframe().setBlocked(true);
+        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, listICDs.size()));
 
-            SAXParserFactory factory = SAXParserFactory.newInstance();
-            SAXParser saxParser = factory.newSAXParser();
 
-            saxParser.parse(opdeicd, new ICDImporter(em));
+        SwingWorker worker = new SwingWorker() {
 
-            em.getTransaction().commit();
-        } catch (Exception ex) {
-            em.getTransaction().rollback();
-            OPDE.fatal(ex);
-        } finally {
-            em.close();
-        }
+
+            @Override
+            protected Object doInBackground() throws Exception {
+
+                EntityManager em = OPDE.createEM();
+
+                try {
+
+                    int progress = 0;
+
+
+                    em.getTransaction().begin();
+
+                    Query query = em.createQuery("DELETE FROM ICD icd");
+                    query.executeUpdate();
+
+                    for (ICD icd : listICDs) {
+                        progress++;
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), progress, listICDs.size()));
+                        em.merge(icd);
+                    }
+
+                    OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait.for.db") + " " + listICDs.size() + " ICDs.", progress, -1));
+
+                    em.getTransaction().commit();
+
+                } catch (Exception ex) {
+                    em.getTransaction().rollback();
+                    OPDE.fatal(ex);
+                } finally {
+                    em.close();
+
+                }
+
+
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                listICDs.clear();
+                dlmICDFiles.clear();
+                lstIcdFiles.revalidate();
+                lstIcdFiles.repaint();
+                btnImportICD.setIcon(SYSConst.icon22ledRedOn);
+                OPDE.getDisplayManager().setProgressBarMessage(null);
+                OPDE.getMainframe().setBlocked(false);
+            }
+        };
+        worker.execute();
+
+
     }
 
     private Properties getMailProps() {
@@ -954,6 +1066,7 @@ public class PnlSystemSettings extends CleanablePanel {
         cmbPhysicalPrinters = new JComboBox();
         cmbStation = new JComboBox();
         cmbLogicalPrinters = new JComboBox();
+        lblTimeout = new JLabel();
         cmbForm = new JComboBox();
         btnTestLabel = new JButton();
         panel1 = new JPanel();
@@ -971,6 +1084,7 @@ public class PnlSystemSettings extends CleanablePanel {
         lstIcdFiles = new JList();
         btnEmptyList = new JButton();
         btnImportICD = new JButton();
+        panel8 = new JScrollPane();
         pnlMail = new JPanel();
         lblMailHost = new JLabel();
         txtMailHost = new JTextField();
@@ -1035,7 +1149,7 @@ public class PnlSystemSettings extends CleanablePanel {
             {
                 pnlLocal.setLayout(new FormLayout(
                     "default, $lcgap, default:grow, $lcgap, default, $lcgap, default:grow, $lcgap, default",
-                    "6*(default, $lgap), pref, $lgap, default, $lgap, 14dlu"));
+                    "6*(default, $lgap), pref, $lgap, default, $lgap, 14dlu, $lgap, default"));
 
                 //---- lblPrinters ----
                 lblPrinters.setText("labelPrinter");
@@ -1081,6 +1195,11 @@ public class PnlSystemSettings extends CleanablePanel {
                 });
                 pnlLocal.add(cmbLogicalPrinters, CC.xy(3, 7));
 
+                //---- lblTimeout ----
+                lblTimeout.setText("Timeout");
+                lblTimeout.setFont(new Font("Arial", Font.BOLD, 18));
+                pnlLocal.add(lblTimeout, CC.xy(7, 7));
+
                 //---- cmbForm ----
                 cmbForm.addItemListener(new ItemListener() {
                     @Override
@@ -1116,7 +1235,7 @@ public class PnlSystemSettings extends CleanablePanel {
                 {
                     pnlGlobal.setLayout(new FormLayout(
                         "default, $lcgap, default:grow, $lcgap, default, $ugap, default:grow, $lcgap, default, $ugap, default:grow, 2*($lcgap, default)",
-                        "default, $lgap, pref, $lgap, fill:default:grow, $lgap, default, 2*($lgap), 2*(default, $lgap), fill:default:grow, 2*($lgap, default)"));
+                        "default, $lgap, pref, $lgap, fill:default:grow, $lgap, pref, 2*($lgap), 2*(default, $lgap), fill:default:grow, 2*($lgap, default)"));
 
                     //======== panel5 ========
                     {
@@ -1161,8 +1280,8 @@ public class PnlSystemSettings extends CleanablePanel {
                     //======== pnlICD ========
                     {
                         pnlICD.setLayout(new FormLayout(
-                            "default:grow",
-                            "fill:default:grow, 3*($lgap, default)"));
+                            "default:grow, default",
+                            "fill:default:grow, $lgap, 60dlu, $lgap, default"));
 
                         //======== scrollPane1 ========
                         {
@@ -1171,14 +1290,15 @@ public class PnlSystemSettings extends CleanablePanel {
                         pnlICD.add(scrollPane1, CC.xy(1, 3));
 
                         //---- btnEmptyList ----
-                        btnEmptyList.setText("text");
+                        btnEmptyList.setText(null);
+                        btnEmptyList.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/deleteall.png")));
                         btnEmptyList.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 btnEmptyListActionPerformed(e);
                             }
                         });
-                        pnlICD.add(btnEmptyList, CC.xy(1, 5));
+                        pnlICD.add(btnEmptyList, CC.xy(2, 3, CC.DEFAULT, CC.FILL));
 
                         //---- btnImportICD ----
                         btnImportICD.setText("importICD");
@@ -1188,88 +1308,93 @@ public class PnlSystemSettings extends CleanablePanel {
                                 btnImportICDActionPerformed(e);
                             }
                         });
-                        pnlICD.add(btnImportICD, CC.xy(1, 7, CC.LEFT, CC.DEFAULT));
+                        pnlICD.add(btnImportICD, CC.xy(1, 5, CC.LEFT, CC.DEFAULT));
                     }
                     pnlGlobal.add(pnlICD, CC.xywh(7, 5, 1, 3));
 
-                    //======== pnlMail ========
+                    //======== panel8 ========
                     {
-                        pnlMail.setLayout(new FormLayout(
-                            "default, $lcgap, default:grow",
-                            "13*(default, $lgap), default"));
 
-                        //---- lblMailHost ----
-                        lblMailHost.setText("host");
-                        pnlMail.add(lblMailHost, CC.xy(1, 1));
-                        pnlMail.add(txtMailHost, CC.xy(3, 1));
+                        //======== pnlMail ========
+                        {
+                            pnlMail.setLayout(new FormLayout(
+                                "default, $lcgap, default:grow",
+                                "13*(default, $lgap), default"));
 
-                        //---- lblMailPort ----
-                        lblMailPort.setText("port");
-                        pnlMail.add(lblMailPort, CC.xy(1, 3));
-                        pnlMail.add(txtMailPort, CC.xy(3, 3));
+                            //---- lblMailHost ----
+                            lblMailHost.setText("host");
+                            pnlMail.add(lblMailHost, CC.xy(1, 1));
+                            pnlMail.add(txtMailHost, CC.xy(3, 1));
 
-                        //---- lblMailUser ----
-                        lblMailUser.setText("user");
-                        pnlMail.add(lblMailUser, CC.xy(1, 5));
-                        pnlMail.add(txtMailUser, CC.xy(3, 5));
+                            //---- lblMailPort ----
+                            lblMailPort.setText("port");
+                            pnlMail.add(lblMailPort, CC.xy(1, 3));
+                            pnlMail.add(txtMailPort, CC.xy(3, 3));
 
-                        //---- lblMailPassword ----
-                        lblMailPassword.setText("password");
-                        pnlMail.add(lblMailPassword, CC.xy(1, 7));
-                        pnlMail.add(txtMailPassword, CC.xy(3, 7));
+                            //---- lblMailUser ----
+                            lblMailUser.setText("user");
+                            pnlMail.add(lblMailUser, CC.xy(1, 5));
+                            pnlMail.add(txtMailUser, CC.xy(3, 5));
 
-                        //---- lblMailSender ----
-                        lblMailSender.setText("sender");
-                        pnlMail.add(lblMailSender, CC.xy(1, 9));
-                        pnlMail.add(txtMailSender, CC.xy(3, 9));
+                            //---- lblMailPassword ----
+                            lblMailPassword.setText("password");
+                            pnlMail.add(lblMailPassword, CC.xy(1, 7));
+                            pnlMail.add(txtMailPassword, CC.xy(3, 7));
 
-                        //---- lblMailRecipient ----
-                        lblMailRecipient.setText("error-recipient");
-                        pnlMail.add(lblMailRecipient, CC.xy(1, 11));
-                        pnlMail.add(txtMailRecipient, CC.xy(3, 11));
+                            //---- lblMailSender ----
+                            lblMailSender.setText("sender");
+                            pnlMail.add(lblMailSender, CC.xy(1, 9));
+                            pnlMail.add(txtMailSender, CC.xy(3, 9));
 
-                        //---- lblMailSenderPersonal ----
-                        lblMailSenderPersonal.setText("sender personal");
-                        pnlMail.add(lblMailSenderPersonal, CC.xy(1, 13));
-                        pnlMail.add(txtMailSenderPersonal, CC.xy(3, 13));
+                            //---- lblMailRecipient ----
+                            lblMailRecipient.setText("error-recipient");
+                            pnlMail.add(lblMailRecipient, CC.xy(1, 11));
+                            pnlMail.add(txtMailRecipient, CC.xy(3, 11));
 
-                        //---- lblMailRecipientPersonal ----
-                        lblMailRecipientPersonal.setText("recipient personal");
-                        pnlMail.add(lblMailRecipientPersonal, CC.xy(1, 15));
-                        pnlMail.add(txtMailRecipientPersonal, CC.xy(3, 15));
+                            //---- lblMailSenderPersonal ----
+                            lblMailSenderPersonal.setText("sender personal");
+                            pnlMail.add(lblMailSenderPersonal, CC.xy(1, 13));
+                            pnlMail.add(txtMailSenderPersonal, CC.xy(3, 13));
 
-                        //---- lblMailSpamFilter ----
-                        lblMailSpamFilter.setText("text");
-                        pnlMail.add(lblMailSpamFilter, CC.xy(1, 17));
-                        pnlMail.add(txtMailSpamfilter, CC.xy(3, 17));
+                            //---- lblMailRecipientPersonal ----
+                            lblMailRecipientPersonal.setText("recipient personal");
+                            pnlMail.add(lblMailRecipientPersonal, CC.xy(1, 15));
+                            pnlMail.add(txtMailRecipientPersonal, CC.xy(3, 15));
 
-                        //---- lblAuth ----
-                        lblAuth.setText("auth");
-                        pnlMail.add(lblAuth, CC.xy(1, 19));
+                            //---- lblMailSpamFilter ----
+                            lblMailSpamFilter.setText("text");
+                            pnlMail.add(lblMailSpamFilter, CC.xy(1, 17));
+                            pnlMail.add(txtMailSpamfilter, CC.xy(3, 17));
 
-                        //---- lblStarttls ----
-                        lblStarttls.setText("starttls");
-                        pnlMail.add(lblStarttls, CC.xy(1, 21));
+                            //---- lblAuth ----
+                            lblAuth.setText("auth");
+                            pnlMail.add(lblAuth, CC.xy(1, 19));
 
-                        //---- lblTLS ----
-                        lblTLS.setText("tls");
-                        pnlMail.add(lblTLS, CC.xy(1, 23));
+                            //---- lblStarttls ----
+                            lblStarttls.setText("starttls");
+                            pnlMail.add(lblStarttls, CC.xy(1, 21));
 
-                        //---- btnTestmail ----
-                        btnTestmail.setText("Send Testmail");
-                        btnTestmail.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                btnTestmailActionPerformed(e);
-                            }
-                        });
-                        pnlMail.add(btnTestmail, CC.xywh(1, 25, 3, 1, CC.LEFT, CC.DEFAULT));
+                            //---- lblTLS ----
+                            lblTLS.setText("tls");
+                            pnlMail.add(lblTLS, CC.xy(1, 23));
 
-                        //---- lblActive ----
-                        lblActive.setText("active");
-                        pnlMail.add(lblActive, CC.xy(1, 27));
+                            //---- btnTestmail ----
+                            btnTestmail.setText("Send Testmail");
+                            btnTestmail.addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    btnTestmailActionPerformed(e);
+                                }
+                            });
+                            pnlMail.add(btnTestmail, CC.xywh(1, 25, 3, 1, CC.LEFT, CC.DEFAULT));
+
+                            //---- lblActive ----
+                            lblActive.setText("active");
+                            pnlMail.add(lblActive, CC.xy(1, 27));
+                        }
+                        panel8.setViewportView(pnlMail);
                     }
-                    pnlGlobal.add(pnlMail, CC.xywh(11, 5, 1, 3));
+                    pnlGlobal.add(panel8, CC.xywh(11, 5, 1, 3));
                     pnlGlobal.add(cmbCountry, CC.xy(3, 7));
 
                     //======== panel7 ========
@@ -1404,6 +1529,9 @@ public class PnlSystemSettings extends CleanablePanel {
         cpMap.clear();
         cpPanel.clear();
         cpsHomes.removeAll();
+        if (listICDs != null) {
+            listICDs.clear();
+        }
     }
 
     @Override
@@ -1442,6 +1570,7 @@ public class PnlSystemSettings extends CleanablePanel {
     private JComboBox cmbPhysicalPrinters;
     private JComboBox cmbStation;
     private JComboBox cmbLogicalPrinters;
+    private JLabel lblTimeout;
     private JComboBox cmbForm;
     private JButton btnTestLabel;
     private JPanel panel1;
@@ -1459,6 +1588,7 @@ public class PnlSystemSettings extends CleanablePanel {
     private JList lstIcdFiles;
     private JButton btnEmptyList;
     private JButton btnImportICD;
+    private JScrollPane panel8;
     private JPanel pnlMail;
     private JLabel lblMailHost;
     private JTextField txtMailHost;

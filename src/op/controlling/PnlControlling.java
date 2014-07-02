@@ -715,7 +715,7 @@ public class PnlControlling extends CleanablePanel {
     @Override
     public void cleanup() {
         cpsControlling.removeAll();
-        if (pnlQMSPlan == null) {
+        if (pnlQMSPlan != null) {
             pnlQMSPlan.cleanup();
         }
     }

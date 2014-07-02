@@ -35,7 +35,7 @@ public class DisplayManager extends Thread {
     private final Color defaultColor = new Color(105, 80, 69);
     private Icon icondead, iconaway, icongone, iconbiohazard;
     //    private SwingWorker worker;
-    private boolean isIndeterminate = false;
+//    private boolean isIndeterminate = false;
     //    private JPanel pnlIcons;
     private JLabel lblBiohazard, lblDiabetes, lblAllergy, lblWarning;
     private long step = 0;
@@ -289,20 +289,35 @@ public class DisplayManager extends Thread {
         synchronized (progressBarMessage) {
             if (!progressBarMessage.getFirst().isEmpty() || progressBarMessage.getSecond() >= 0) {  //  && zyklen/5%2 == 0 && zyklen % 5 == 0
                 if (progressBarMessage.getSecond() < 0) {
-                    if (!isIndeterminate) {
-                        isIndeterminate = true;
+                    if (!jp.isIndeterminate()) {
+                        jp.setIndeterminate(true);
                     }
                 } else {
-                    isIndeterminate = false;
+
+                    if (jp.isIndeterminate()) {
+                        jp.setIndeterminate(false);
+                    }
                     jp.setValue(progressBarMessage.getSecond());
                 }
                 jp.setString(progressBarMessage.getFirst());
             } else {
-                if (jp.getValue() > 0) {
+
+
+                if (progressBarMessage.getSecond() < 0) {
+                    jp.setIndeterminate(false);
                     jp.setValue(0);
                     jp.setString(null);
                 }
-                isIndeterminate = false;
+
+                if (jp.getValue() > 0) {
+                    if (jp.isIndeterminate()) {
+                        jp.setIndeterminate(false);
+                    }
+                    jp.setValue(0);
+                    jp.setString(null);
+                }
+
+
             }
         }
 
@@ -339,7 +354,12 @@ public class DisplayManager extends Thread {
                 check4MaintenanceMode();
 
                 int timeoutmins = OPDE.getTimeout();
+                if (timeoutmins == 0) {
+                    pbTimeout.setValue(0);
+                    pbTimeout.setToolTipText(SYSTools.xx("misc.msg.auto.logoff") + " " + SYSTools.xx("misc.msg.turned.off"));
+                }
                 if (timeoutmins > 0) {
+                    pbTimeout.setToolTipText(SYSTools.xx("misc.msg.auto.logoff") + " " + SYSTools.xx("misc.msg.in") + " " + timeoutmins + " " + SYSTools.xx("misc.msg.Minute(s)"));
                     // Timeout functions
                     if (OPDE.getLogin() != null) {
                         long timeoutPeriodInMillis = timeoutmins * 60 * 1000;
@@ -347,7 +367,6 @@ public class DisplayManager extends Thread {
                         long millisToGo = millisOfTimeout - System.currentTimeMillis();
                         pbTimeout.setMaximum(new BigDecimal(timeoutmins * 60).intValue());
                         pbTimeout.setValue(new BigDecimal(millisToGo / 1000).intValue());
-//                        pbTimeout.setToolTipText("Abmeldung in " + millisToGo / 1000 + " sekunden");
                     } else {
                         pbTimeout.setValue(0);
                     }
