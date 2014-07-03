@@ -93,18 +93,18 @@ public class NReportTAGSTools {
         return panel;
     }
 
-    /**
-     * Kleine Hilfsmethode, die ich brauche um festzustellen ob ein bestimmter bericht
-     * ein Sozial Bericht ist.
-     */
-    public static boolean isSozial(NReport bericht) {
-        Iterator<NReportTAGS> itTags = bericht.getTags().iterator();
-        boolean yes = false;
-        while (!yes && itTags.hasNext()) {
-            yes = itTags.next().getKurzbezeichnung().equalsIgnoreCase("soz");
-        }
-        return yes;
-    }
+//    /**
+//     * Kleine Hilfsmethode, die ich brauche um festzustellen ob ein bestimmter bericht
+//     * ein Sozial Bericht ist.
+//     */
+//    public static boolean isSozial(NReport bericht) {
+//        Iterator<NReportTAGS> itTags = bericht.getTags().iterator();
+//        boolean yes = false;
+//        while (!yes && itTags.hasNext()) {
+//            yes = itTags.next().getKurzbezeichnung().equalsIgnoreCase("soz");
+//        }
+//        return yes;
+//    }
 
     public static NReportTAGS getByShortDescription(String s){
         EntityManager em = OPDE.createEM();

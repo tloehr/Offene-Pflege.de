@@ -54,6 +54,7 @@ public class AppInfo {
     public static final String dirArtwork = "artwork";
     public static final String dirTemplates = "templates";
     public static final String dirJar = "jar";
+    public static final String dirArtwork16 = "16x16";
     public static final String dirArtwork22 = "22x22";
     public static final String dirArtwork48 = "48x48";
     public static final String dirArtwork64 = "64x64";

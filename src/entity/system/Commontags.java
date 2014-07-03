@@ -1,6 +1,7 @@
 package entity.system;
 
 import entity.qms.Qmsplan;
+import entity.staff.Training;
 
 import javax.persistence.*;
 import java.util.Collection;
@@ -49,6 +50,8 @@ public class Commontags {
         this.active = active;
     }
 
+    @ManyToMany(mappedBy = "commontags")
+    private Collection<Training> trainings;
 
     @ManyToMany(mappedBy = "commontags")
     private Collection<Qmsplan> qmsplans;
@@ -72,6 +75,7 @@ public class Commontags {
         if (id != that.id) return false;
         if (qmsplans != null ? !qmsplans.equals(that.qmsplans) : that.qmsplans != null) return false;
         if (text != null ? !text.equals(that.text) : that.text != null) return false;
+        if (trainings != null ? !trainings.equals(that.trainings) : that.trainings != null) return false;
 
         return true;
     }
@@ -81,6 +85,7 @@ public class Commontags {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + (text != null ? text.hashCode() : 0);
         result = 31 * result + (active ? 1 : 0);
+        result = 31 * result + (trainings != null ? trainings.hashCode() : 0);
         result = 31 * result + (qmsplans != null ? qmsplans.hashCode() : 0);
         return result;
     }

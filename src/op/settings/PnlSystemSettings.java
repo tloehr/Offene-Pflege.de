@@ -275,6 +275,7 @@ public class PnlSystemSettings extends CleanablePanel {
 
         SpinnerNumberModel snm = new SpinnerNumberModel(OPDE.getTimeout(), 0, 999, 1);
         final JSpinner spinTimeout = new JSpinner(snm);
+
         spinTimeout.setToolTipText(SYSTools.xx("opde.settings.local.timeout.tooltip"));
         spinTimeout.addChangeListener(new ChangeListener() {
             @Override

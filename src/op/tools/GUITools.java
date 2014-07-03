@@ -5,7 +5,6 @@ import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideButton;
 import entity.info.*;
 import op.OPDE;
-import op.care.sysfiles.PnlFiles;
 import op.system.FileDrop;
 import op.threads.DisplayMessage;
 import org.apache.commons.collections.Closure;
@@ -326,7 +325,7 @@ public class GUITools {
 
 
     public static JPanel getDropPanel(FileDrop.Listener dropListener) {
-        return getDropPanel(dropListener, SYSTools.xx(PnlFiles.internalClassID + ".drophere"));
+        return getDropPanel(dropListener, SYSTools.xx("nursingrecords.files.drophere"));
     }
 
     public static JPanel getDropPanel(FileDrop.Listener dropListener, String text) {

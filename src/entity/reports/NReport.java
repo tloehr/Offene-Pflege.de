@@ -9,6 +9,7 @@ import entity.info.Resident;
 import entity.process.QProcess;
 import entity.process.QProcessElement;
 import entity.process.SYSNR2PROCESS;
+import entity.system.Commontags;
 import entity.system.Users;
 import op.OPDE;
 import op.tools.SYSTools;
@@ -75,11 +76,19 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
     // ==
     // M:N Relations
     // ==
+//    @ManyToMany
+//    @JoinTable(name = "nr2tags", joinColumns =
+//    @JoinColumn(name = "PBID"), inverseJoinColumns =
+//    @JoinColumn(name = "PBTAGID"))
+//    private Collection<NReportTAGS> tags;
+
+
+
     @ManyToMany
-    @JoinTable(name = "nr2tags", joinColumns =
-    @JoinColumn(name = "PBID"), inverseJoinColumns =
-    @JoinColumn(name = "PBTAGID"))
-    private Collection<NReportTAGS> tags;
+    @JoinTable(name = "qmsp2tags", joinColumns =
+    @JoinColumn(name = "qmspid"), inverseJoinColumns =
+    @JoinColumn(name = "ctagid"))
+    private Collection<Commontags> commontags;
 
     public NReport() {
     }
@@ -92,7 +101,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         this.resident = resident;
         this.user = OPDE.getLogin().getUser();
         this.attachedFilesConnections = new ArrayList<SYSNR2FILE>();
-        this.tags = new ArrayList<NReportTAGS>();
+        this.commontags = new ArrayList<Commontags>();
         this.attachedProcessConnections = new ArrayList<SYSNR2PROCESS>();
         this.usersAcknowledged = new ArrayList<NR2User>();
         this.version = 0l;
@@ -109,7 +118,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         this.replacedBy = replacedBy;
         this.replacementFor = replacementFor;
         this.attachedFilesConnections = new ArrayList<SYSNR2FILE>();
-        this.tags = new ArrayList<NReportTAGS>();
+        this.commontags = new ArrayList<Commontags>();
         this.attachedProcessConnections = new ArrayList<SYSNR2PROCESS>();
         this.usersAcknowledged = new ArrayList<NR2User>();
         this.version = 0l;
@@ -195,15 +204,15 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         replacementFor = null;
     }
 
-    public boolean isSpecial() {
-        boolean found = false;
-
-        Iterator<NReportTAGS> it = tags.iterator();
-        while (!found && it.hasNext()) {
-            found = it.next().isBesonders();
-        }
-        return found;
-    }
+//    public boolean isSpecial() {
+//        boolean found = false;
+//
+//        Iterator<NReportTAGS> it = tags.iterator();
+//        while (!found && it.hasNext()) {
+//            found = it.next().isBesonders();
+//        }
+//        return found;
+//    }
 
     /**
      * NReport, die gelöscht oder geändert wurden enthalten als <code>editBy</code> den User, der die Änderung vorgenommen hat.
@@ -266,8 +275,8 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
         this.replacementFor = replacementFor;
     }
 
-    public Collection<NReportTAGS> getTags() {
-        return tags;
+    public Collection<Commontags> getCommontags() {
+        return commontags;
     }
 
 //    public void setTags(Collection<NReportTAGS> tags) {
@@ -298,7 +307,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
 //        if (replacementFor != null ? !replacementFor.equals(nReport.replacementFor) : nReport.replacementFor != null)
 //            return false;
         if (resident != null ? !resident.equals(nReport.resident) : nReport.resident != null) return false;
-        if (tags != null ? !tags.equals(nReport.tags) : nReport.tags != null) return false;
+        if (commontags != null ? !commontags.equals(nReport.commontags) : nReport.commontags != null) return false;
         if (text != null ? !text.equals(nReport.text) : nReport.text != null) return false;
         if (user != null ? !user.equals(nReport.user) : nReport.user != null) return false;
         if (version != null ? !version.equals(nReport.version) : nReport.version != null) return false;
@@ -319,7 +328,7 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
 //        result = 31 * result + (editedBy != null ? editedBy.hashCode() : 0);
 //        result = 31 * result + (replacedBy != null ? replacedBy.hashCode() : 0);
 //        result = 31 * result + (replacementFor != null ? replacementFor.hashCode() : 0);
-        result = 31 * result + (tags != null ? tags.hashCode() : 0);
+        result = 31 * result + (commontags != null ? commontags.hashCode() : 0);
         return result;
     }
 
@@ -367,9 +376,9 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
 
         final NReport clonedReport = new NReport(pit, editpit, text, minutes, user, resident, editedBy, null, null);
 
-        CollectionUtils.forAllDo(tags, new Closure() {
+        CollectionUtils.forAllDo(commontags, new Closure() {
             public void execute(Object o) {
-                clonedReport.tags.add((NReportTAGS) o);
+                clonedReport.commontags.add((Commontags) o);
             }
         });
 

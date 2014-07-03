@@ -9,19 +9,14 @@ import com.jidesoft.swing.SelectAllUtils;
 import entity.system.Commontags;
 import entity.system.CommontagsTools;
 import op.OPDE;
-import op.threads.DisplayMessage;
 
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DocumentFilter;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -30,6 +25,7 @@ import java.util.HashSet;
  */
 public class PnlCommonTags extends JPanel {
 
+    private final boolean editmode;
     HashMap<String, Commontags> mapAllTags = new HashMap<>();
     HashSet<Commontags> listSelectedTags;
     HashMap<Commontags, JButton> mapButtons;
@@ -37,12 +33,22 @@ public class PnlCommonTags extends JPanel {
     JTextField txtTags;
     AutoCompletion ac;
 
-    final int MAXLINE = 8;
+    int MAXLINE = 8;
 
-    public PnlCommonTags(HashSet<Commontags> listSelectedTags) {
+    public PnlCommonTags(Collection<Commontags> listSelectedTags) {
+        this(listSelectedTags, false);
+    }
+
+    public PnlCommonTags(Collection<Commontags> listSelectedTags, boolean editmode, int maxline) {
+        this(listSelectedTags, editmode);
+        MAXLINE = maxline;
+    }
+
+    public PnlCommonTags(Collection<Commontags> listSelectedTags, boolean editmode) {
+        this.editmode = editmode;
         setLayout(new RiverLayout(10, 5));
 
-        this.listSelectedTags = listSelectedTags;
+        this.listSelectedTags = new HashSet<>(listSelectedTags);
         this.completionList = new ArrayList<>();
 
         initPanel();
@@ -64,39 +70,41 @@ public class PnlCommonTags extends JPanel {
             add(createButton(selectedTags));
         }
 
+        if (editmode) {
+            txtTags = new JTextField(10);
 
-        txtTags = new JTextField(10);
+            SelectAllUtils.install(txtTags);
+            ac = new AutoCompletion(txtTags, mapAllTags.keySet().toArray(new String[]{}));
 
-        SelectAllUtils.install(txtTags);
-        ac = new AutoCompletion(txtTags, mapAllTags.keySet().toArray(new String[]{}));
-
-        ac.setStrict(false);
-        ac.setStrictCompletion(false);
-        txtTags.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                cmbTagsActionPerformed(e);
-            }
-        });
-
-
-        txtTags.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                char c = e.getKeyChar();
-                if (Character.isAlphabetic(c) || Character.isDigit(c)) {
-                    super.keyTyped(e);
-                } else {
-                    e.consume();
+            ac.setStrict(false);
+            ac.setStrictCompletion(false);
+            txtTags.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cmbTagsActionPerformed(e);
                 }
-            }
-        });
+            });
 
-        add(txtTags);
 
+            txtTags.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyTyped(KeyEvent e) {
+                    char c = e.getKeyChar();
+                    if (Character.isAlphabetic(c) || Character.isDigit(c)) {
+                        super.keyTyped(e);
+                    } else {
+                        e.consume();
+                    }
+                }
+            });
+
+            add(txtTags);
+        }
     }
 
     private void cmbTagsActionPerformed(ActionEvent e) {
+
+        if (!editmode) return;
 
         if (txtTags.getText().isEmpty()) return;
         if (txtTags.getText().length() > 100) return;
@@ -135,78 +143,68 @@ public class PnlCommonTags extends JPanel {
     }
 
 
-    private JButton createButton(final Commontags commontags) {
+    private JButton createButton(final Commontags commontag) {
 
-        if (mapButtons.containsKey(commontags)) {
+        if (mapButtons.containsKey(commontag)) {
             OPDE.debug("shortcut");
-            return mapButtons.get(commontags);
+            return mapButtons.get(commontag);
         }
 
-        final JButton jButton = new JButton(commontags.getText(), SYSConst.icon16delete);
+        final JButton jButton = new JButton(commontag.getText(), editmode ? SYSConst.icon16tagPurpleDelete2 : SYSConst.icon16tagPurple);
         jButton.setFont(SYSConst.ARIAL12);
         jButton.setBorder(new RoundedBorder(10));
         jButton.setHorizontalTextPosition(SwingConstants.LEADING);
 //        jButton.setMargin(new Insets(2, 2, 2, 2));
-        jButton.setForeground(Color.BLUE);
+        jButton.setForeground(SYSConst.purple1[SYSConst.dark1]);
 
-        jButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                listSelectedTags.remove(commontags);
-                mapButtons.remove(commontags);
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        removeAll();
+        if (editmode) {
 
-                        add(txtTags);
-                        int tagnum = 1;
+            jButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    listSelectedTags.remove(commontag);
+                    mapButtons.remove(commontag);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            removeAll();
 
-                        for (JButton btn : mapButtons.values()) {
-                            if (tagnum % MAXLINE == 0) {
-                                add(btn, RiverLayout.LINE_BREAK);
-                            } else {
-                                add(btn, RiverLayout.LEFT);
+                            add(txtTags);
+                            int tagnum = 1;
+
+                            for (JButton btn : mapButtons.values()) {
+                                if (tagnum % MAXLINE == 0) {
+                                    add(btn, RiverLayout.LINE_BREAK);
+                                } else {
+                                    add(btn, RiverLayout.LEFT);
+                                }
+                                tagnum++;
                             }
-                            tagnum++;
+
+                            remove(jButton);
+                            revalidate();
+                            repaint();
                         }
-
-                        remove(jButton);
-                        revalidate();
-                        repaint();
-                    }
-                });
-            }
-        });
-
-        mapButtons.put(commontags, jButton);
+                    });
+                }
+            });
+        }
+        mapButtons.put(commontag, jButton);
 
         return jButton;
     }
 
-    // http://stackoverflow.com/questions/423950/java-rounded-swing-jbutton
-    class RoundedBorder implements Border {
 
-        private int radius;
-
-        RoundedBorder(int radius) {
-            this.radius = radius;
-        }
-
-        public Insets getBorderInsets(Component c) {
-            return new Insets(5, 5, 5, 5); // this.radius + 1, this.radius + 1, this.radius + 2, this.radius
-        }
-
-
-        public boolean isBorderOpaque() {
-            return true;
-        }
-
-
-        public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
-            g.drawRoundRect(x, y, width - 1, height - 1, radius, radius);
-        }
-    }
+//    public static JButton createFilterButton(final Commontags commontag, ActionListener al) {
+//
+//
+//        jButton.setFont(SYSConst.ARIAL12);
+//        jButton.setBorder(new RoundedBorder(10));
+//        jButton.setHorizontalTextPosition(SwingConstants.LEADING);
+//        jButton.setForeground(SYSConst.purple1[SYSConst.medium4]);
+//
+//        return jButton;
+//    }
 
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables

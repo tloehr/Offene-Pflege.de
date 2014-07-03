@@ -47,6 +47,8 @@ import entity.qms.Qmsplan;
 import entity.qms.QmsplanTools;
 import entity.reports.NReportTAGSTools;
 import entity.reports.NReportTools;
+import entity.system.Commontags;
+import entity.system.CommontagsTools;
 import entity.system.SYSPropsTools;
 import entity.values.ResValueTools;
 import op.OPDE;
@@ -907,7 +909,7 @@ public class PnlControlling extends CleanablePanel {
 
 
         GUITools.addAllComponents(mypanel, addCommands());
-//           GUITools.addAllComponents(mypanel, addFilters());
+        GUITools.addAllComponents(mypanel, addFilters());
 
         searchPane.setContentPane(mypanel);
 
@@ -935,9 +937,9 @@ public class PnlControlling extends CleanablePanel {
                                     try {
                                         em.getTransaction().begin();
                                         final Qmsplan myQMSPlan = (Qmsplan) em.merge(qmsplan);
+                                        em.getTransaction().commit();
                                         pnlQMSPlan.getListQMSPlans().add(myQMSPlan);
                                         pnlQMSPlan.reload();
-                                        em.getTransaction().commit();
                                     } catch (OptimisticLockException ole) {
                                         OPDE.warn(ole);
                                         if (em.getTransaction().isActive()) {
@@ -965,6 +967,60 @@ public class PnlControlling extends CleanablePanel {
                 list.add(addButton);
             }
         }
+        return list;
+    }
+
+    private java.util.List<Component> addFilters() {
+        java.util.List<Component> list = new ArrayList<Component>();
+
+        if (tabMain.getSelectedIndex() == TAB_QMSPLAN) {
+
+
+            final JToggleButton tbClosedOnes2 = new JToggleButton();
+            tbClosedOnes2.setSelected(true);
+
+            ArrayList<Commontags> listTags = CommontagsTools.getAllUsedInQMSPlans(tbClosedOnes2.isSelected());
+            if (!listTags.isEmpty()) {
+
+                JPanel pnlTags = new JPanel(new RiverLayout(10, 5));
+                pnlTags.setOpaque(false);
+
+                final JButton btnReset = GUITools.createHyperlinkButton("misc.commands.resetFilter", SYSConst.icon16tagPurpleDelete4, new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        pnlQMSPlan.cleanup();
+                        pnlQMSPlan = new PnlQMSPlan(QmsplanTools.getAllActive());
+                        tabMain.setComponentAt(TAB_QMSPLAN, pnlQMSPlan);
+                    }
+                });
+                pnlTags.add(btnReset, RiverLayout.LEFT);
+
+                int counter = 1;
+                for (final Commontags commontag : listTags) {
+                    counter++;
+
+                    final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            pnlQMSPlan.cleanup();
+                            pnlQMSPlan = new PnlQMSPlan(QmsplanTools.getAll(commontag, QmsplanTools.STATE_ACTIVE));
+                            tabMain.setComponentAt(TAB_QMSPLAN, pnlQMSPlan);
+
+                        }
+                    });
+                    if (counter > 3) {
+                        counter = 0;
+                        pnlTags.add(btnTag, RiverLayout.LINE_BREAK);
+                    } else {
+                        pnlTags.add(btnTag, RiverLayout.LEFT);
+                    }
+
+
+                }
+                list.add(pnlTags);
+            }
+        }
+
         return list;
     }
 }

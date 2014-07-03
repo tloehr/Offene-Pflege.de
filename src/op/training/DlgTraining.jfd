@@ -11,7 +11,7 @@ new FormModel {
 				"border": new javax.swing.border.EmptyBorder( 12, 12, 12, 12 )
 				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
 					"$columnSpecs": "pref, unrelgap, default:grow"
-					"$rowSpecs": "default, relgap, default, linegap, default, relgap, default, relgap, default:grow, linegap, default"
+					"$rowSpecs": "default, relgap, default, linegap, default, relgap, default, relgap, default:grow, linegap, pref, linegap, default"
 				} ) {
 					name: "contentPanel"
 					add( new FormComponent( "javax.swing.JLabel" ) {
@@ -95,11 +95,19 @@ new FormModel {
 						"gridY": 9
 						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints FILL
 					} )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "lblTags"
+						"text": "text"
+						"font": #Font0
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridY": 11
+						"vAlign": sfield com.jgoodies.forms.layout.CellConstraints TOP
+					} )
 					add( new FormComponent( "javax.swing.JCheckBox" ) {
 						name: "cbInternal"
 						"text": "text"
 					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
-						"gridY": 11
+						"gridY": 13
 						"gridWidth": 3
 					} )
 				}, new FormLayoutConstraints( class java.lang.String ) {
@@ -143,4 +151,3 @@ new FormModel {
 		} )
 	}
 }
-

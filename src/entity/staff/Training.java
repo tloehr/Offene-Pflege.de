@@ -1,6 +1,7 @@
 package entity.staff;
 
 import entity.files.Training2File;
+import entity.system.Commontags;
 import entity.system.Users;
 import op.tools.SYSTools;
 
@@ -92,6 +93,11 @@ public class Training {
     @ManyToMany(mappedBy = "trainings")
     private Collection<Users> attendees;
 
+    @ManyToMany
+    @JoinTable(name = "training2tags", joinColumns =
+    @JoinColumn(name = "trainid"), inverseJoinColumns =
+    @JoinColumn(name = "ctagid"))
+    private Collection<Commontags> commontags;
 
     public Collection<Training2File> getAttachedFilesConnections() {
         return attachedFilesConnections;
@@ -105,6 +111,14 @@ public class Training {
         return attendees;
     }
 
+    public Collection<Commontags> getCommontags() {
+        return commontags;
+    }
+
+    public void setCommontags(Collection<Commontags> commontags) {
+        this.commontags = commontags;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -115,8 +129,10 @@ public class Training {
         if (id != training.id) return false;
         if (internal != training.internal) return false;
         if (date != null ? !date.equals(training.date) : training.date != null) return false;
+        if (docent != null ? !docent.equals(training.docent) : training.docent != null) return false;
         if (text != null ? !text.equals(training.text) : training.text != null) return false;
         if (title != null ? !title.equals(training.title) : training.title != null) return false;
+        if (version != null ? !version.equals(training.version) : training.version != null) return false;
 
         return true;
     }
@@ -126,8 +142,10 @@ public class Training {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + (date != null ? date.hashCode() : 0);
         result = 31 * result + (title != null ? title.hashCode() : 0);
+        result = 31 * result + (docent != null ? docent.hashCode() : 0);
         result = 31 * result + (text != null ? text.hashCode() : 0);
-
+        result = 31 * result + (internal ? 1 : 0);
+        result = 31 * result + (version != null ? version.hashCode() : 0);
         return result;
     }
 }

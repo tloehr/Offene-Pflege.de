@@ -73,7 +73,7 @@ public class DlgQMSPlan extends MyJDialog {
 
 //        tblScheds.setModel(new DefaultTableModel());
 
-        pnlCommonTags = new PnlCommonTags(new HashSet<>(qmsplan.getCommontags()));
+        pnlCommonTags = new PnlCommonTags(qmsplan.getCommontags(), true);
         pnlLeft.add(pnlCommonTags, CC.xy(3, 5));
 
         lblTitle.setText(SYSTools.xx("misc.msg.title"));

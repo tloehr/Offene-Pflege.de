@@ -29,5 +29,6 @@ Lots of different icons and symbols taken fromTemplate www.wpclipart.com. This m
 -- stuff from findicons
 -- system_preferences.png (http://findicons.com/icon/130192/system_preferences?width=256), says "public domain, non commercial"
 -- package_network.png (http://findicons.com/icon/234318/package_network), GNU/GPL
--- radiobuttons for resident tx report
-http://www.adaluni.de/wp-content/uploads/2009/04/radiobutton.gif
+-- radiobuttons for resident tx report (http://www.adaluni.de/wp-content/uploads/2009/04/radiobutton.gif)
+-- tag_purple_delete4.png, tag_purple.png, tag_purple_delete2.png (downloaded from findicons.com, created by http://momentumdesignlab.com/, License CC-BY)
+

@@ -1,16 +1,13 @@
 package entity.qms;
 
-import entity.nursingprocess.NPControl;
-import entity.nursingprocess.NPControlTools;
+import entity.system.Commontags;
 import op.OPDE;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 
 /**
  * Created by tloehr on 17.06.14.
@@ -49,6 +46,43 @@ public class QmsplanTools {
         return list;
     }
 
+
+    public static ArrayList<Qmsplan> getAll(Commontags commontag, int state) {
+        EntityManager em = OPDE.createEM();
+        ArrayList<Qmsplan> list = null;
+
+        try {
+
+
+            if (commontag == null) {
+                String jpql = " SELECT q " +
+                        " FROM Qmsplan q" +
+                        " WHERE q.state = :state " +
+                        " ORDER BY q.title DESC ";
+
+                Query query = em.createQuery(jpql);
+                query.setParameter("state", state);
+                list = new ArrayList<Qmsplan>(query.getResultList());
+            } else {
+                String jpql = " SELECT q " +
+                        " FROM Qmsplan q " +
+                        " WHERE q.state = :state " +
+                        " AND :commontag MEMBER OF q.commontags " +
+                        " ORDER BY q.title DESC ";
+
+                Query query = em.createQuery(jpql);
+                query.setParameter("commontag", commontag);
+                query.setParameter("state", state);
+
+                list = new ArrayList<Qmsplan>(query.getResultList());
+            }
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+        return list;
+    }
 
     /**
      * returns a HTML representation of the given Qmsplan.
@@ -93,7 +127,6 @@ public class QmsplanTools {
         //        if (np.getFlag() > 0) {
         //            html += "<br/><b>" + SYSTools.xx("nursingrecords.nursingprocess.dlgplanung.lblFlag") + ":</b> " + FLAGS[np.getFlag()];
         //        }
-
 
 
         html += "</div>";

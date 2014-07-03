@@ -7,6 +7,7 @@ import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import entity.qms.*;
+import entity.system.Commontags;
 import op.OPDE;
 import op.care.sysfiles.DlgFiles;
 import op.system.InternalClassACL;
@@ -49,7 +50,7 @@ public class PnlQMSPlan extends CleanablePanel {
     //    private ArrayList<Qmsplan> listQMSPlans;
     private ArrayList<Qmsplan> listQMSPlans;
 
-    private final int MAX_TEXT_LENGTH = 65;
+//    private final int MAX_TEXT_LENGTH = 65;
     private final int MAX_MONTHS_IN_ADVANCE_TO_CONFIRM_QMS = 6;
 
     public PnlQMSPlan(ArrayList<Qmsplan> listQMSPlans) {
@@ -452,6 +453,20 @@ public class PnlQMSPlan extends CleanablePanel {
         String title = SYSTools.toHTMLForScreen(SYSConst.html_paragraph(QmsplanTools.getAsHTML(qmsplan)));
         pnl.add(new JLabel(title));
 
+        if (!qmsplan.getCommontags().isEmpty()) {
+            JPanel pnlTags = new JPanel(new RiverLayout(10, 5));
+            int counter = 0;
+            for (Commontags ctag : qmsplan.getCommontags()) {
+                if (counter > 10) {
+                    counter = 0;
+                    pnlTags.add(new JLabel(ctag.getText(), SYSConst.icon16tagPurple, SwingConstants.LEADING), RiverLayout.LINE_BREAK);
+                } else {
+                    pnlTags.add(new JLabel(ctag.getText(), SYSConst.icon16tagPurple, SwingConstants.LEADING), RiverLayout.LEFT);
+                }
+            }
+            pnl.add(pnlTags);
+        }
+
         final JButton btnNewSched = GUITools.createHyperlinkButton("opde.controlling.qms.pnlqmsplan.new.measure", SYSConst.icon22add, null);
 
         btnNewSched.addActionListener(new ActionListener() {
@@ -628,7 +643,7 @@ public class PnlQMSPlan extends CleanablePanel {
         final DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (cpQMS.isCollapsible()){
+                if (cpQMS.isCollapsible()) {
                     try {
                         cpQMS.setCollapsed(cpQMS.isExpanded());
                     } catch (PropertyVetoException e1) {

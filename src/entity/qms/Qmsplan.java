@@ -115,7 +115,7 @@ public class Qmsplan {
         qmsschedules = new ArrayList<>();
         this.user = OPDE.getLogin().getUser();
         this.state = QmsplanTools.STATE_ACTIVE;
-        this.color = "ffffff"; // Back in black
+        this.color = "000000"; // Back in black
         this.version = 0l;
     }
 
@@ -142,12 +142,7 @@ public class Qmsplan {
 
         if (id != qmsplan.id) return false;
         if (state != qmsplan.state) return false;
-        if (attachedFilesConnections != null ? !attachedFilesConnections.equals(qmsplan.attachedFilesConnections) : qmsplan.attachedFilesConnections != null)
-            return false;
-        if (commontags != null ? !commontags.equals(qmsplan.commontags) : qmsplan.commontags != null) return false;
         if (description != null ? !description.equals(qmsplan.description) : qmsplan.description != null) return false;
-//        if (qmsschedules != null ? !qmsschedules.equals(qmsplan.qmsschedules) : qmsplan.qmsschedules != null)
-//            return false;
         if (title != null ? !title.equals(qmsplan.title) : qmsplan.title != null) return false;
         if (version != null ? !version.equals(qmsplan.version) : qmsplan.version != null) return false;
 
@@ -161,9 +156,6 @@ public class Qmsplan {
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (int) state;
         result = 31 * result + (version != null ? version.hashCode() : 0);
-        result = 31 * result + (commontags != null ? commontags.hashCode() : 0);
-//        result = 31 * result + (qmsschedules != null ? qmsschedules.hashCode() : 0);
-        result = 31 * result + (attachedFilesConnections != null ? attachedFilesConnections.hashCode() : 0);
         return result;
     }
 }

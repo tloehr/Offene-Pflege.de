@@ -81,6 +81,10 @@ public class SYSConst {
     public static String html_48x48_warning = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/warning.png\" border=\"0\">";
     public static String html_48x48_diabetes = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/diabetes.png\" border=\"0\">";
     public static String html_48x48_allergy = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/allergy.png\" border=\"0\">";
+    public static String html_16x16_tagPurple = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/tag_purple.png\" border=\"0\">";
+    public static String html_16x16_tagPurple_internal = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/tag_purple.png").toString() +"\" border=\"0\">";
+
+    String p = getClass().getResource("artwork/16x16/tag_purple.png" ).toString();
 
     public static String html_darkgreen = "color=\"#007600\"";
     public static String html_darkred = "color=\"#bd0000\"";
@@ -633,5 +637,13 @@ public class SYSConst {
     public static final Icon gfx259x203medic2 = new ImageIcon(SYSConst.class.getResource("/artwork/other/medicine2.png"));
     public static final Icon gfx259x203medic3 = new ImageIcon(SYSConst.class.getResource("/artwork/other/medicine3.png"));
     public static final Icon gfx259x203medic4 = new ImageIcon(SYSConst.class.getResource("/artwork/other/medicine4.png"));
+
+    public static final Icon icon22tagPurpleDelete2 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/tag_purple_delete2.png"));
+    public static final Icon icon22tagPurpleDelete4 = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/tag_purple_delete4.png"));
+    public static final Icon icon22tagPurple = new ImageIcon(SYSConst.class.getResource("/artwork/22x22/tag_purple.png"));
+    
+    public static final Icon icon16tagPurpleDelete2 = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/tag_purple_delete2.png"));
+    public static final Icon icon16tagPurpleDelete4 = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/tag_purple_delete4.png"));
+    public static final Icon icon16tagPurple = new ImageIcon(SYSConst.class.getResource("/artwork/16x16/tag_purple.png"));
 
 }

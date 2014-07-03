@@ -13,6 +13,8 @@ import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
 import entity.staff.Training;
 import entity.staff.TrainingTools;
+import entity.system.Commontags;
+import entity.system.CommontagsTools;
 import entity.system.Users;
 import entity.system.UsersTools;
 import op.OPDE;
@@ -51,10 +53,12 @@ public class PnlTraining extends CleanablePanel {
     private Map<String, CollapsiblePane> cpMap;
     private Map<String, ArrayList<Users>> userMap;
     private Map<String, Training> trainingMap;
+    private Commontags filterTag;
 
     public PnlTraining(JScrollPane jspSearch) {
         initComponents();
         this.jspSearch = jspSearch;
+        filterTag = null;
         initPanel();
         reload();
     }
@@ -81,22 +85,23 @@ public class PnlTraining extends CleanablePanel {
         trainingMap = Collections.synchronizedMap(new HashMap<String, Training>());
         prepareSearchArea();
         OPDE.getDisplayManager().setMainMessage(internalClassID);
-
     }
 
     @Override
     public void cleanup() {
-
-    }
-
-    @Override
-    public void reload() {
         synchronized (userMap) {
             SYSTools.clear(userMap);
         }
         synchronized (cpMap) {
             SYSTools.clear(cpMap);
         }
+    }
+
+    @Override
+    public void reload() {
+
+        cleanup();
+
         OPDE.getMainframe().setBlocked(true);
         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
 
@@ -106,14 +111,15 @@ public class PnlTraining extends CleanablePanel {
             @Override
             protected Object doInBackground() throws Exception {
 
-                Pair<LocalDate, LocalDate> minmax = TrainingTools.getMinMax();
+                Pair<LocalDate, LocalDate> minmax = TrainingTools.getMinMax(filterTag);
 
                 if (minmax != null) {
                     max = minmax.getSecond().toDate();
                     LocalDate start = minmax.getFirst().dayOfYear().withMinimumValue();
                     LocalDate end = minmax.getSecond().dayOfYear().withMinimumValue();
+
                     for (int year = end.getYear(); year >= start.getYear(); year--) {
-                        createCP4(year);
+                        createCP4(TrainingTools.getTrainings4(year, filterTag));
                     }
                 }
 
@@ -122,19 +128,20 @@ public class PnlTraining extends CleanablePanel {
 
             @Override
             protected void done() {
-
                 buildPanel();
-//                initPhase = false;
                 OPDE.getDisplayManager().setProgressBarMessage(null);
                 OPDE.getMainframe().setBlocked(false);
-
             }
         };
         worker.execute();
     }
 
 
-    private CollapsiblePane createCP4(final int year) {
+    private CollapsiblePane createCP4(final ArrayList<Training> listTrainingsThisYear) {
+        if (listTrainingsThisYear.isEmpty()) return null;
+
+        final int year = new LocalDate(listTrainingsThisYear.get(0).getDate()).getYear();
+
         final String keyYear = Integer.toString(year) + ".year";
         synchronized (cpMap) {
             if (!cpMap.containsKey(keyYear)) {
@@ -176,7 +183,7 @@ public class PnlTraining extends CleanablePanel {
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
                 JPanel pnlContent = new JPanel(new VerticalLayout());
 
-                for (Training training : TrainingTools.getTrainings4(year)) {
+                for (Training training : listTrainingsThisYear) {
                     pnlContent.add(createCP4(training));
                 }
 
@@ -188,7 +195,7 @@ public class PnlTraining extends CleanablePanel {
         if (!cpYear.isCollapsed()) {
             JPanel pnlContent = new JPanel(new VerticalLayout());
 
-            for (Training training : TrainingTools.getTrainings4(year)) {
+            for (Training training : listTrainingsThisYear) {
                 pnlContent.add(createCP4(training));
             }
 
@@ -224,12 +231,20 @@ public class PnlTraining extends CleanablePanel {
             trainingMap.put(key, training);
         }
 
-        String title = "<html><font size=+1><b>" +
+        String title = "<font size=+1><b>" +
                 training.getTitle() + ", " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(training.getDate()) +
-                "</b>" +
-                "</font></html>";
+                "</b></font><p>";
 
-        DefaultCPTitle cptitle = new DefaultCPTitle(title, new ActionListener() {
+        for (Commontags ctag : training.getCommontags()) {
+
+            title += SYSConst.html_16x16_tagPurple_internal + "&nbsp;" + ctag.getText() + "&nbsp;";
+        }
+
+
+        title += "</p>";
+
+
+        DefaultCPTitle cptitle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -561,14 +576,15 @@ public class PnlTraining extends CleanablePanel {
         cpsMain.setLayout(new JideBoxLayout(cpsMain, JideBoxLayout.Y_AXIS));
 
         synchronized (cpMap) {
-            Pair<LocalDate, LocalDate> minmax = TrainingTools.getMinMax();
+            Pair<LocalDate, LocalDate> minmax = TrainingTools.getMinMax(filterTag);
             if (minmax != null) {
                 LocalDate start = minmax.getFirst().dayOfYear().withMinimumValue();
                 LocalDate end = minmax.getSecond().dayOfYear().withMinimumValue();
                 for (int year = end.getYear(); year >= start.getYear(); year--) {
                     final String keyYear = Integer.toString(year) + ".year";
-
-                    cpsMain.add(cpMap.get(keyYear));
+                    if (cpMap.containsKey(keyYear)) {
+                        cpsMain.add(cpMap.get(keyYear));
+                    }
                 }
             }
         }
@@ -596,7 +612,7 @@ public class PnlTraining extends CleanablePanel {
         }
 
         GUITools.addAllComponents(mypanel, addCommands());
-//           GUITools.addAllComponents(mypanel, addFilters());
+        GUITools.addAllComponents(mypanel, addFilters());
 
         searchPane.setContentPane(mypanel);
 
@@ -810,7 +826,8 @@ public class PnlTraining extends CleanablePanel {
                                     if (!cpMap.containsKey(keyYear)) {
                                         reload();
                                     } else {
-                                        createCP4(new LocalDate(myTraining.getDate()).getYear());
+                                        filterTag = null;
+                                        createCP4(TrainingTools.getTrainings4(new LocalDate(myTraining.getDate()).getYear(), filterTag));
                                         buildPanel();
                                     }
                                 } catch (OptimisticLockException ole) {
@@ -839,6 +856,52 @@ public class PnlTraining extends CleanablePanel {
             });
             list.add(addButton);
         }
+        return list;
+    }
+
+
+    private java.util.List<Component> addFilters() {
+        java.util.List<Component> list = new ArrayList<Component>();
+
+        ArrayList<Commontags> listTags = CommontagsTools.getAllUsedInTrainings();
+        if (!listTags.isEmpty()) {
+
+            JPanel pnlTags = new JPanel(new RiverLayout(10, 5));
+            pnlTags.setOpaque(false);
+
+            final JButton btnReset = GUITools.createHyperlinkButton("misc.commands.resetFilter", SYSConst.icon16tagPurpleDelete4, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    filterTag = null;
+                    reload();
+                }
+            });
+            pnlTags.add(btnReset, RiverLayout.LEFT);
+
+            int counter = 1;
+            for (final Commontags commontag : listTags) {
+                counter++;
+
+                final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        filterTag = commontag;
+                        reload();
+                    }
+                });
+                if (counter > 3) {
+                    counter = 0;
+                    pnlTags.add(btnTag, RiverLayout.LINE_BREAK);
+                } else {
+                    pnlTags.add(btnTag, RiverLayout.LEFT);
+                }
+
+
+            }
+            list.add(pnlTags);
+        }
+
+
         return list;
     }
 

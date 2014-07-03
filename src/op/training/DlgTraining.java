@@ -11,6 +11,7 @@ import entity.staff.Training;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
+import op.tools.PnlCommonTags;
 import op.tools.SYSCalendar;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
@@ -31,12 +32,14 @@ import java.util.Date;
 public class DlgTraining extends MyJDialog {
     private Training training;
     private final Closure actionBlock;
+    private final PnlCommonTags pnlCommonTags;
 
     public DlgTraining(Training training, Closure actionBlock) {
         super();
         this.training = training;
         this.actionBlock = actionBlock;
         initComponents();
+        pnlCommonTags = new PnlCommonTags(training.getCommontags(), true, 3);
         initDialog();
 //        pack();
         setVisible(true);
@@ -48,6 +51,7 @@ public class DlgTraining extends MyJDialog {
         lblTitle.setText(SYSTools.xx("misc.msg.title"));
         lblDocent.setText(SYSTools.xx("opde.training.docent"));
         lblText.setText(SYSTools.xx("misc.msg.details"));
+        lblTags.setText(SYSTools.xx("misc.msg.tags"));
         cbInternal.setText(SYSTools.xx("opde.training.internal"));
 
         if (training.getId() != 0) {
@@ -60,6 +64,7 @@ public class DlgTraining extends MyJDialog {
             cbInternal.setSelected(training.getInternal());
         }
 
+        contentPanel.add(new JScrollPane(pnlCommonTags), CC.xy(3, 11));
     }
 
     private void btnCancelActionPerformed(ActionEvent e) {
@@ -76,28 +81,25 @@ public class DlgTraining extends MyJDialog {
     private void btnApplyActionPerformed(ActionEvent e) {
         if (!saveOK()) return;
 
-        training.setTitle(txtTitle.getText());
+        training.setTitle(SYSTools.tidy(txtTitle.getText()));
         training.setDate(SYSCalendar.addTime2Date(jdcDate.getDate(), new Date(SYSCalendar.parseTime(txtTime.getText()).getTimeInMillis())));
         training.setDocent(txtDocent.getText());
-        training.setText(txtText.getText());
+        training.setText(SYSTools.tidy(txtText.getText()));
         training.setInternal(cbInternal.isSelected());
+        training.getCommontags().clear();
+        training.getCommontags().addAll(pnlCommonTags.getListSelectedTags());
 
         dispose();
 
     }
 
     private boolean saveOK() {
-//        try {
-//            SYSCalendar.parseTime(txtTime.getText());
-//        } catch (NumberFormatException nfe) {
-//            return false;
-//        }
 
-        if (jdcDate.getDate() == null){
+        if (jdcDate.getDate() == null) {
             return false;
         }
 
-        if (txtTitle.getText().trim().isEmpty()){
+        if (txtTitle.getText().trim().isEmpty()) {
             return false;
         }
 
@@ -128,6 +130,7 @@ public class DlgTraining extends MyJDialog {
         lblText = new JLabel();
         scrollPane1 = new JScrollPane();
         txtText = new JTextArea();
+        lblTags = new JLabel();
         cbInternal = new JCheckBox();
         buttonBar = new JPanel();
         btnCancel = new JButton();
@@ -146,7 +149,7 @@ public class DlgTraining extends MyJDialog {
             {
                 contentPanel.setLayout(new FormLayout(
                     "pref, $ugap, default:grow",
-                    "default, $rgap, default, $lgap, 2*(default, $rgap), default:grow, $lgap, default"));
+                    "default, $rgap, default, $lgap, 2*(default, $rgap), default:grow, $lgap, pref, $lgap, default"));
 
                 //---- lblDate ----
                 lblDate.setText("text");
@@ -205,9 +208,14 @@ public class DlgTraining extends MyJDialog {
                 }
                 contentPanel.add(scrollPane1, CC.xy(3, 9, CC.DEFAULT, CC.FILL));
 
+                //---- lblTags ----
+                lblTags.setText("text");
+                lblTags.setFont(new Font("Arial", Font.PLAIN, 14));
+                contentPanel.add(lblTags, CC.xy(1, 11, CC.DEFAULT, CC.TOP));
+
                 //---- cbInternal ----
                 cbInternal.setText("text");
-                contentPanel.add(cbInternal, CC.xywh(1, 11, 3, 1));
+                contentPanel.add(cbInternal, CC.xywh(1, 13, 3, 1));
             }
             dialogPane.add(contentPanel, BorderLayout.CENTER);
 
@@ -266,6 +274,7 @@ public class DlgTraining extends MyJDialog {
     private JLabel lblText;
     private JScrollPane scrollPane1;
     private JTextArea txtText;
+    private JLabel lblTags;
     private JCheckBox cbInternal;
     private JPanel buttonBar;
     private JButton btnCancel;
