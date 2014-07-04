@@ -14,11 +14,10 @@ import entity.info.ResInfo;
 import entity.info.ResInfoTools;
 import entity.info.ResInfoTypeTools;
 import entity.reports.NReport;
-import entity.reports.NReportTAGS;
-import entity.reports.NReportTAGSTools;
 import op.OPDE;
 import op.threads.DisplayMessage;
 import op.tools.MyJDialog;
+import op.tools.PnlCommonTags;
 import op.tools.PnlPIT;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
@@ -40,6 +39,7 @@ public class DlgReport extends MyJDialog {
     private JLabel attentionIcon;
     private PnlPIT pnlPIT;
     private int defaultMinutes;
+    private PnlCommonTags pnlCommonTags;
 
     public DlgReport(NReport nReport, Closure actionBlock) {
         super();
@@ -51,21 +51,13 @@ public class DlgReport extends MyJDialog {
     }
 
     private void initDialog() {
-        pnlTags.setViewportView(NReportTAGSTools.createCheckBoxPanelForTags(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                JCheckBox cb = (JCheckBox) e.getSource();
-                NReportTAGS tag = (NReportTAGS) cb.getClientProperty("UserObject");
-                if (e.getStateChange() == ItemEvent.DESELECTED) {
-                    nReport.getTags().remove(tag);
-                } else {
-                    nReport.getTags().add(tag);
-                }
-            }
-        }, nReport.getTags(), new GridLayout(0, 1)));
+
         ResInfo firstStay = ResInfoTools.getFirstResinfo(nReport.getResident(), ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
         pnlPIT = new PnlPIT(nReport.getPit(), new Date(), firstStay == null ? new Date() : firstStay.getFrom());
-        panel1.add(pnlPIT, CC.xywh(3, 3, 3, 1, CC.DEFAULT, CC.FILL));
+        add(pnlPIT, CC.xyw(2, 2, 3));
+
+        pnlCommonTags = new PnlCommonTags(nReport.getCommontags(), true, 8);
+        add(new JScrollPane(pnlCommonTags), CC.xyw(2, 5, 3));
 
         txtBericht.setText(nReport.getText());
         defaultMinutes = nReport.getMinutes();
@@ -85,7 +77,7 @@ public class DlgReport extends MyJDialog {
         attentionIcon = new JLabel(OverlayableUtils.getPredefinedOverlayIcon(OverlayableIconsFactory.ATTENTION));
         ovrDauer = new DefaultOverlayable(txtDauer, attentionIcon, DefaultOverlayable.SOUTH_EAST);
         ovrDauer.setOverlayVisible(true);
-        panel1.add(ovrDauer, CC.xy(5, 5));
+        add(ovrDauer, CC.xy(3, 3));
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -140,6 +132,9 @@ public class DlgReport extends MyJDialog {
             return;
         }
         nReport.setText(txtBericht.getText());
+        nReport.getCommontags().clear();
+        nReport.getCommontags().addAll(pnlCommonTags.getListSelectedTags());
+
         nReport.setPit(pnlPIT.getPIT());
         nReport.setUser(OPDE.getLogin().getUser());
         dispose();
@@ -151,8 +146,6 @@ public class DlgReport extends MyJDialog {
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
-        panel1 = new JPanel();
-        pnlTags = new JScrollPane();
         label3 = new JLabel();
         scrollPane1 = new JScrollPane();
         txtBericht = new JTextArea();
@@ -172,67 +165,56 @@ public class DlgReport extends MyJDialog {
         });
         Container contentPane = getContentPane();
         contentPane.setLayout(new FormLayout(
-            "13dlu, default:grow, $lcgap, 13dlu",
-            "13dlu, $lgap, fill:default:grow, $lgap, 13dlu"));
+            "13dlu, pref, $rgap, default:grow, 13dlu",
+            "3*(default), fill:default:grow, fill:pref, default, 13dlu"));
 
-        //======== panel1 ========
+        //---- label3 ----
+        label3.setText("Dauer");
+        label3.setFont(new Font("Arial", Font.PLAIN, 14));
+        contentPane.add(label3, CC.xy(2, 3));
+
+        //======== scrollPane1 ========
         {
-            panel1.setLayout(new FormLayout(
-                "$rgap, $lcgap, default, $lcgap, 177dlu:grow, $lcgap, 115dlu:grow, 0dlu, $rgap",
-                "0dlu, 2*($lgap, default), $lgap, fill:default:grow, $lgap, default, $lgap, $rgap"));
-            panel1.add(pnlTags, CC.xywh(7, 3, 1, 5, CC.FILL, CC.FILL));
 
-            //---- label3 ----
-            label3.setText("Dauer");
-            label3.setFont(new Font("Arial", Font.PLAIN, 14));
-            panel1.add(label3, CC.xy(3, 5));
-
-            //======== scrollPane1 ========
-            {
-
-                //---- txtBericht ----
-                txtBericht.setFont(new Font("Arial", Font.PLAIN, 14));
-                txtBericht.setWrapStyleWord(true);
-                txtBericht.setLineWrap(true);
-                scrollPane1.setViewportView(txtBericht);
-            }
-            panel1.add(scrollPane1, CC.xywh(3, 7, 3, 1, CC.FILL, CC.FILL));
-
-            //======== panel2 ========
-            {
-                panel2.setLayout(new BoxLayout(panel2, BoxLayout.LINE_AXIS));
-
-                //---- btnCancel ----
-                btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
-                btnCancel.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnCancelActionPerformed(e);
-                    }
-                });
-                panel2.add(btnCancel);
-
-                //---- btnApply ----
-                btnApply.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
-                btnApply.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        btnApplyActionPerformed(e);
-                    }
-                });
-                panel2.add(btnApply);
-            }
-            panel1.add(panel2, CC.xywh(3, 9, 5, 1, CC.RIGHT, CC.FILL));
+            //---- txtBericht ----
+            txtBericht.setFont(new Font("Arial", Font.PLAIN, 14));
+            txtBericht.setWrapStyleWord(true);
+            txtBericht.setLineWrap(true);
+            scrollPane1.setViewportView(txtBericht);
         }
-        contentPane.add(panel1, CC.xy(2, 3));
-        setSize(865, 455);
+        contentPane.add(scrollPane1, CC.xywh(2, 4, 3, 1, CC.FILL, CC.FILL));
+
+        //======== panel2 ========
+        {
+            panel2.setLayout(new BoxLayout(panel2, BoxLayout.LINE_AXIS));
+
+            //---- btnCancel ----
+            btnCancel.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/cancel.png")));
+            btnCancel.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnCancelActionPerformed(e);
+                }
+            });
+            panel2.add(btnCancel);
+
+            //---- btnApply ----
+            btnApply.setIcon(new ImageIcon(getClass().getResource("/artwork/22x22/apply.png")));
+            btnApply.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    btnApplyActionPerformed(e);
+                }
+            });
+            panel2.add(btnApply);
+        }
+        contentPane.add(panel2, CC.xy(4, 6, CC.RIGHT, CC.FILL));
+        setSize(770, 455);
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-    private JPanel panel1;
-    private JScrollPane pnlTags;
     private JLabel label3;
     private JScrollPane scrollPane1;
     private JTextArea txtBericht;

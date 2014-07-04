@@ -236,7 +236,6 @@ public class PnlTraining extends CleanablePanel {
                 "</b></font><p>";
 
         for (Commontags ctag : training.getCommontags()) {
-
             title += SYSConst.html_16x16_tagPurple_internal + "&nbsp;" + ctag.getText() + "&nbsp;";
         }
 

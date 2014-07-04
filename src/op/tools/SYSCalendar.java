@@ -589,95 +589,95 @@ public class SYSCalendar {
 //        }
     } // eom
 
-    /**
-     * Entscheidet ob zwei Daten in der selben Woche liegen. Berücksichtigt dabei die Jahreszahlen, so dass KW 34/2006 != KW 34/2005.
-     */
-    public static int sameWeek(GregorianCalendar a, GregorianCalendar b) {
-        NumberFormat form = new java.text.DecimalFormat("00");
+//    /**
+//     * Entscheidet ob zwei Daten in der selben Woche liegen. Berücksichtigt dabei die Jahreszahlen, so dass KW 34/2006 != KW 34/2005.
+//     */
+//    public static int sameWeek(GregorianCalendar a, GregorianCalendar b) {
+//        NumberFormat form = new java.text.DecimalFormat("00");
+//
+//        int aYear = a.get(GregorianCalendar.YEAR);
+//        int bYear = b.get(GregorianCalendar.YEAR);
+//
+//        // Die KW der letzten Tage eines Jahres gehören manchmal schon zum neuen Jahr. So gehörte der 29.12.2008 schon zur KW1 von 2009.
+//        // Diese Zeilen berücksichtigen das. Sie erhöhen die Jahreszahl wenn der Monat Dezember ist und die KW trotzdem 1.
+//        // Bug 0000016: Fehlende Einträge in der Behandlungspflege
+//        if (a.get(GregorianCalendar.WEEK_OF_YEAR) == 1 && a.get(GregorianCalendar.MONTH) == GregorianCalendar.DECEMBER) {
+//            aYear++;
+//        }
+//        if (b.get(GregorianCalendar.WEEK_OF_YEAR) == 1 && b.get(GregorianCalendar.MONTH) == GregorianCalendar.DECEMBER) {
+//            bYear++;
+//        }
+//
+//        String sa = Integer.toString(aYear) + form.format(a.get(GregorianCalendar.WEEK_OF_YEAR));
+//        String sb = Integer.toString(bYear) + form.format(b.get(GregorianCalendar.WEEK_OF_YEAR));
+//        int ia = Integer.parseInt(sa);
+//        int ib = Integer.parseInt(sb);
+//
+//        if (ia > ib) {
+//            return 1;
+//        }
+//        if (ia < ib) {
+//            return -1;
+//        }
+//        return 0;
+//    }
+//
+//    /**
+//     * Entscheidet ob zwei Daten im selben Monat liegen. Berücksichtigt dabei die Jahreszahlen, so dass Monat 12/2006 != Monat 12/2005.
+//     */
+//    public static int sameMonth(GregorianCalendar a, GregorianCalendar b) {
+//        NumberFormat form = new java.text.DecimalFormat("00");
+//        String sa = Integer.toString(a.get(GregorianCalendar.YEAR)) + form.format(a.get(GregorianCalendar.MONTH));
+//        String sb = Integer.toString(b.get(GregorianCalendar.YEAR)) + form.format(b.get(GregorianCalendar.MONTH));
+//        int ia = Integer.parseInt(sa);
+//        int ib = Integer.parseInt(sb);
+//
+//        if (ia > ib) {
+//            return 1;
+//        }
+//        if (ia < ib) {
+//            return -1;
+//        }
+//        return 0;
+//    }
 
-        int aYear = a.get(GregorianCalendar.YEAR);
-        int bYear = b.get(GregorianCalendar.YEAR);
+//    /**
+//     * Entscheidet ob zwei Daten am selben Tag liegen.
+//     *
+//     * @param a Datum a
+//     * @param b Datum b
+//     * @return 0, wenn a und b am selben Tag liegen. -1, wenn a <b>vor</b> b ist. und +1 wenn a <b>nach</b> b ist.
+//     */
+//    public static int sameDay(GregorianCalendar a, GregorianCalendar b) {
+//        NumberFormat form = new java.text.DecimalFormat("00");
+//        String sa = Integer.toString(a.get(GregorianCalendar.YEAR)) + form.format(a.get(GregorianCalendar.MONTH)) + form.format(a.get(GregorianCalendar.DATE));
+//        String sb = Integer.toString(b.get(GregorianCalendar.YEAR)) + form.format(b.get(GregorianCalendar.MONTH)) + form.format(b.get(GregorianCalendar.DATE));
+//        int ia = Integer.parseInt(sa);
+//        int ib = Integer.parseInt(sb);
+//
+//        if (ia > ib) {
+//            return 1;
+//        }
+//        if (ia < ib) {
+//            return -1;
+//        }
+//        return 0;
+//    }
 
-        // Die KW der letzten Tage eines Jahres gehören manchmal schon zum neuen Jahr. So gehörte der 29.12.2008 schon zur KW1 von 2009.
-        // Diese Zeilen berücksichtigen das. Sie erhöhen die Jahreszahl wenn der Monat Dezember ist und die KW trotzdem 1.
-        // Bug 0000016: Fehlende Einträge in der Behandlungspflege
-        if (a.get(GregorianCalendar.WEEK_OF_YEAR) == 1 && a.get(GregorianCalendar.MONTH) == GregorianCalendar.DECEMBER) {
-            aYear++;
-        }
-        if (b.get(GregorianCalendar.WEEK_OF_YEAR) == 1 && b.get(GregorianCalendar.MONTH) == GregorianCalendar.DECEMBER) {
-            bYear++;
-        }
-
-        String sa = Integer.toString(aYear) + form.format(a.get(GregorianCalendar.WEEK_OF_YEAR));
-        String sb = Integer.toString(bYear) + form.format(b.get(GregorianCalendar.WEEK_OF_YEAR));
-        int ia = Integer.parseInt(sa);
-        int ib = Integer.parseInt(sb);
-
-        if (ia > ib) {
-            return 1;
-        }
-        if (ia < ib) {
-            return -1;
-        }
-        return 0;
-    }
-
-    /**
-     * Entscheidet ob zwei Daten im selben Monat liegen. Berücksichtigt dabei die Jahreszahlen, so dass Monat 12/2006 != Monat 12/2005.
-     */
-    public static int sameMonth(GregorianCalendar a, GregorianCalendar b) {
-        NumberFormat form = new java.text.DecimalFormat("00");
-        String sa = Integer.toString(a.get(GregorianCalendar.YEAR)) + form.format(a.get(GregorianCalendar.MONTH));
-        String sb = Integer.toString(b.get(GregorianCalendar.YEAR)) + form.format(b.get(GregorianCalendar.MONTH));
-        int ia = Integer.parseInt(sa);
-        int ib = Integer.parseInt(sb);
-
-        if (ia > ib) {
-            return 1;
-        }
-        if (ia < ib) {
-            return -1;
-        }
-        return 0;
-    }
-
-    /**
-     * Entscheidet ob zwei Daten am selben Tag liegen.
-     *
-     * @param a Datum a
-     * @param b Datum b
-     * @return 0, wenn a und b am selben Tag liegen. -1, wenn a <b>vor</b> b ist. und +1 wenn a <b>nach</b> b ist.
-     */
-    public static int sameDay(GregorianCalendar a, GregorianCalendar b) {
-        NumberFormat form = new java.text.DecimalFormat("00");
-        String sa = Integer.toString(a.get(GregorianCalendar.YEAR)) + form.format(a.get(GregorianCalendar.MONTH)) + form.format(a.get(GregorianCalendar.DATE));
-        String sb = Integer.toString(b.get(GregorianCalendar.YEAR)) + form.format(b.get(GregorianCalendar.MONTH)) + form.format(b.get(GregorianCalendar.DATE));
-        int ia = Integer.parseInt(sa);
-        int ib = Integer.parseInt(sb);
-
-        if (ia > ib) {
-            return 1;
-        }
-        if (ia < ib) {
-            return -1;
-        }
-        return 0;
-    }
-
-    /**
-     * Entscheidet ob zwei Daten am selben Tag liegen.
-     *
-     * @param a Datum a
-     * @param b Datum b
-     * @return 0, wenn a und b am selben Tag liegen. -1, wenn a <b>vor</b> b ist. und +1 wenn a <b>nach</b> b ist.
-     */
-    public static int sameDay(Date a, Date b) {
-        return sameDay(toGC(a), toGC(b));
-    }
-
-    public static int sameDay(long a, long b) {
-        return sameDay(toGC(a), toGC(b));
-    }
+//    /**
+//     * Entscheidet ob zwei Daten am selben Tag liegen.
+//     *
+//     * @param a Datum a
+//     * @param b Datum b
+//     * @return 0, wenn a und b am selben Tag liegen. -1, wenn a <b>vor</b> b ist. und +1 wenn a <b>nach</b> b ist.
+//     */
+//    public static int sameDay(Date a, Date b) {
+//        return sameDay(toGC(a), toGC(b));
+//    }
+//
+//    public static int sameDay(long a, long b) {
+//        return sameDay(toGC(a), toGC(b));
+//    }
 
 //    public static int calculateAge(GregorianCalendar a, GregorianCalendar b) {
 //        return getDaysBetween(a, b) / 365;
@@ -696,11 +696,11 @@ public class SYSCalendar {
         }
     }
 
-    public static boolean isJDCValid(JDateChooser jdc) {
-        boolean valid = false;
-        boolean dateTrouble = (jdc.getDate() == null);
-        return !dateTrouble && isInRange(jdc);
-    }
+//    public static boolean isJDCValid(JDateChooser jdc) {
+//        boolean valid = false;
+//        boolean dateTrouble = (jdc.getDate() == null);
+//        return !dateTrouble && isInRange(jdc);
+//    }
 
     /**
      * Addiert (bzw. Subtrahiert) eine angebenene Anzahl von Tagen auf das (bzw. von dem)
@@ -727,11 +727,11 @@ public class SYSCalendar {
 //        return result;
 //    }
 
-    public static Date addField(Date date, int amount, int field) {
-        GregorianCalendar gc = toGC(date);
-        gc.add(field, amount);
-        return new Date(gc.getTimeInMillis());
-    }
+//    public static Date addField(Date date, int amount, int field) {
+//        GregorianCalendar gc = toGC(date);
+//        gc.add(field, amount);
+//        return new Date(gc.getTimeInMillis());
+//    }
 
     public static Date min(Date d1, Date d2) {
         Date result;

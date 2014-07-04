@@ -45,7 +45,6 @@ import entity.process.QProcessElement;
 import entity.process.QProcessTools;
 import entity.qms.Qmsplan;
 import entity.qms.QmsplanTools;
-import entity.reports.NReportTAGSTools;
 import entity.reports.NReportTools;
 import entity.system.Commontags;
 import entity.system.CommontagsTools;
@@ -826,14 +825,14 @@ public class PnlControlling extends CleanablePanel {
 
         String jpql2 = " " +
                 " SELECT n FROM NReport n " +
-                " JOIN n.tags t " +
+                " JOIN n.commontags ct " +
                 " WHERE n.pit > :from " +
                 " AND n.resident.adminonly <> 2 " +
                 " AND n.replacedBy IS NULL " +
-                " AND t.system = :tagsystem " +
+                " AND ct.type = :type " +
                 " ORDER BY n.resident.rid, n.pit DESC ";
         Query query2 = em.createQuery(jpql2);
-        query2.setParameter("tagsystem", NReportTAGSTools.TYPE_SYS_WOUNDS);
+        query2.setParameter("type", CommontagsTools.TYPE_SYS_WOUNDS);
         query2.setParameter("from", from.toDate());
         listVal.addAll(new ArrayList<QProcessElement>(query2.getResultList()));
 

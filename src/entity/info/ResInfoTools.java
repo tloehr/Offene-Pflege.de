@@ -5,8 +5,8 @@ import entity.Station;
 import entity.prescription.GPTools;
 import entity.prescription.PrescriptionTools;
 import entity.process.QProcessElement;
-import entity.reports.NReportTAGSTools;
 import entity.reports.NReportTools;
+import entity.system.CommontagsTools;
 import entity.values.ResValue;
 import entity.values.ResValueTools;
 import entity.values.ResValueTypesTools;
@@ -1018,14 +1018,14 @@ public class ResInfoTools {
             EntityManager em = OPDE.createEM();
             Query query = em.createQuery(" " +
                     " SELECT p FROM NReport p " +
-                    " JOIN p.tags t "
-                    + " WHERE p.resident = :bewohner AND (t.system = :handover OR t.system = :emergency ) AND p.pit >= :von "
+                    " JOIN p.commontags ct "
+                    + " WHERE p.resident = :bewohner AND (ct.type = :handover OR ct.type = :emergency ) AND p.pit >= :von "
                     + " ORDER BY p.pit DESC ");
 
             query.setParameter("bewohner", resident);
             query.setParameter("von", new DateTime().toDateMidnight().minusDays(7).toDate());
-            query.setParameter("handover", NReportTAGSTools.TYPE_SYS_HANDOVER);
-            query.setParameter("emergency", NReportTAGSTools.TYPE_SYS_EMERGENCY);
+            query.setParameter("handover", CommontagsTools.TYPE_SYS_HANDOVER);
+            query.setParameter("emergency", CommontagsTools.TYPE_SYS_EMERGENCY);
             result += NReportTools.getReportsAsHTML(query.getResultList(), true, false, null, null);
             em.close();
 

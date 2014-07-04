@@ -84,9 +84,9 @@ public class NReport implements Serializable, QProcessElement, Comparable<NRepor
 
 
 
-    @ManyToMany
-    @JoinTable(name = "qmsp2tags", joinColumns =
-    @JoinColumn(name = "qmspid"), inverseJoinColumns =
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "nreports2tags", joinColumns =
+    @JoinColumn(name = "pbid"), inverseJoinColumns =
     @JoinColumn(name = "ctagid"))
     private Collection<Commontags> commontags;
 

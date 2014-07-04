@@ -62,7 +62,7 @@ public class PnlCommonTags extends JPanel {
 
         mapButtons = new HashMap<>();
 
-        for (Commontags commontags : CommontagsTools.getAllActive()) {
+        for (Commontags commontags : CommontagsTools.getAll()) {
             mapAllTags.put(commontags.getText(), commontags);
         }
 
@@ -109,8 +109,7 @@ public class PnlCommonTags extends JPanel {
         if (txtTags.getText().isEmpty()) return;
         if (txtTags.getText().length() > 100) return;
 
-
-        final String enteredText = SYSTools.tidy(txtTags.getText()).toLowerCase();
+        final String enteredText = SYSTools.tidy(txtTags.getText());
 
         if (!mapAllTags.containsKey(enteredText)) {
             Commontags myNewCommontag = new Commontags(SYSTools.tidy(enteredText));

@@ -1,9 +1,12 @@
 package entity.system;
 
 import entity.qms.Qmsplan;
+import entity.reports.NReport;
 import entity.staff.Training;
+import op.tools.GUITools;
 
 import javax.persistence.*;
+import java.awt.*;
 import java.util.Collection;
 
 /**
@@ -38,16 +41,28 @@ public class Commontags {
         this.text = text;
     }
 
-    @Basic
-    @Column(name = "active", nullable = false, insertable = true, updatable = true)
-    private boolean active;
 
-    public boolean getActive() {
-        return active;
+    @Basic
+    @Column(name = "type", nullable = true, insertable = true, updatable = true)
+    private int type;
+
+    public int getType() {
+        return type;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    @Column(name = "color", nullable = false, insertable = true, updatable = true, length = 6)
+    private String color;
+
+    public Color getColor() {
+        return GUITools.getColor(color);
+    }
+
+    public void setColor(Color newColor) {
+        color = GUITools.toHexString(newColor);
     }
 
     @ManyToMany(mappedBy = "commontags")
@@ -56,12 +71,16 @@ public class Commontags {
     @ManyToMany(mappedBy = "commontags")
     private Collection<Qmsplan> qmsplans;
 
+    @ManyToMany(mappedBy = "commontags")
+    private Collection<NReport> nReports;
+
     public Commontags() {
     }
 
     public Commontags(String text) {
         this.text = text;
-        this.active = true;
+        this.type = CommontagsTools.TYPE_SYS_USER;
+        this.color = "000000";
     }
 
     @Override
@@ -71,11 +90,10 @@ public class Commontags {
 
         Commontags that = (Commontags) o;
 
-        if (active != that.active) return false;
         if (id != that.id) return false;
-        if (qmsplans != null ? !qmsplans.equals(that.qmsplans) : that.qmsplans != null) return false;
+        if (type != that.type) return false;
+        if (color != null ? !color.equals(that.color) : that.color != null) return false;
         if (text != null ? !text.equals(that.text) : that.text != null) return false;
-        if (trainings != null ? !trainings.equals(that.trainings) : that.trainings != null) return false;
 
         return true;
     }
@@ -84,9 +102,8 @@ public class Commontags {
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + (text != null ? text.hashCode() : 0);
-        result = 31 * result + (active ? 1 : 0);
-        result = 31 * result + (trainings != null ? trainings.hashCode() : 0);
-        result = 31 * result + (qmsplans != null ? qmsplans.hashCode() : 0);
+        result = 31 * result + type;
+        result = 31 * result + (color != null ? color.hashCode() : 0);
         return result;
     }
 

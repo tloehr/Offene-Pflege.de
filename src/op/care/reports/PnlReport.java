@@ -39,9 +39,9 @@ import entity.files.SYSNR2FILE;
 import entity.info.Resident;
 import entity.process.*;
 import entity.reports.NReport;
-import entity.reports.NReportTAGS;
-import entity.reports.NReportTAGSTools;
 import entity.reports.NReportTools;
+import entity.system.Commontags;
+import entity.system.CommontagsTools;
 import op.OPDE;
 import op.care.sysfiles.DlgFiles;
 import op.process.DlgProcessAssign;
@@ -55,11 +55,18 @@ import org.jdesktop.swingx.VerticalLayout;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
+import org.joda.time.Years;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
+import javax.persistence.OptimisticLockException;
+import javax.persistence.RollbackException;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.text.Format;
@@ -75,7 +82,6 @@ public class PnlReport extends NursingRecordsPanel {
 
     private JXSearchField txtSearch;
     private JToggleButton tbShowReplaced;
-    private JComboBox cmbTags;
 
     private Map<String, CollapsiblePane> cpMap;
     private Map<String, JPanel> contentmap;
@@ -228,7 +234,7 @@ public class PnlReport extends NursingRecordsPanel {
         txtSearch.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (SYSTools.catchNull(txtSearch.getText()).trim().length() > 3) {
+                if (SYSTools.catchNull(txtSearch.getText()).trim().length() >= 3) {
                     SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Search(resident, txtSearch.getText().trim()), false, true, SYSTools.xx("misc.msg.searchresults") + ": &quot;" + txtSearch.getText().trim() + "&quot;", txtSearch.getText().trim()), false);
                 }
             }
@@ -236,63 +242,60 @@ public class PnlReport extends NursingRecordsPanel {
 
         list.add(txtSearch);
 
-//        jdcVon = new JDateChooser(new Date());
-//        jdcVon.setBackground(Color.WHITE);
-//        jdcVon.setFont(SYSConst.ARIAL14);
-//        jdcVon.addPropertyChangeListener(new PropertyChangeListener() {
-//            @Override
-//            public void propertyChange(PropertyChangeEvent evt) {
-//                if (initPhase) {
-//                    return;
-//                }
-//                if (!evt.getPropertyName().equals("date")) {
-//                    return;
-//                }
-//                reloadDisplay(NReportTools.getReports(resident, jdcVon.getDate(), WEEKS_BACK));
-//            }
-//        });
-//        labelPanel.add(jdcVon);
+//        EntityManager em = OPDE.createEM();
+//        MouseAdapter ma = GUITools.getHyperlinkStyleMouseAdapter();
+//        Query query = em.createQuery("SELECT p FROM NReportTAGS p WHERE p.aktiv = TRUE ORDER BY p.besonders DESC, p.sort DESC, p.bezeichnung");
+//        DefaultComboBoxModel dcbm = new DefaultComboBoxModel(query.getResultList().toArray());
+//        em.close();
 //
-//        JPanel buttonPanel = new JPanel();
-//        buttonPanel.setBackground(Color.WHITE);
-//        buttonPanel.setLayout(new HorizontalLayout(5));
-//        buttonPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
-
-        EntityManager em = OPDE.createEM();
-        MouseAdapter ma = GUITools.getHyperlinkStyleMouseAdapter();
-        Query query = em.createQuery("SELECT p FROM NReportTAGS p WHERE p.aktiv = TRUE ORDER BY p.besonders DESC, p.sort DESC, p.bezeichnung");
-        DefaultComboBoxModel dcbm = new DefaultComboBoxModel(query.getResultList().toArray());
-        em.close();
-
-        dcbm.insertElementAt(SYSTools.xx("misc.commands.noselection"), 0);
-        cmbTags = new JComboBox(dcbm);
-        cmbTags.setFont(SYSConst.ARIAL14);
-        cmbTags.setRenderer(NReportTAGSTools.getPBerichtTAGSRenderer());
-        cmbTags.setSelectedIndex(0);
-        cmbTags.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
-                if (initPhase || itemEvent.getStateChange() != ItemEvent.SELECTED || !(cmbTags.getSelectedItem() instanceof NReportTAGS))
-                    return;
-                SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Tags(resident, (NReportTAGS) cmbTags.getSelectedItem()), false, true, null, null), true);
-
-            }
-        });
-        list.add(cmbTags);
-//        SYSPropsTools.restoreState("nursingrecords.reports:cmbTags", cmbTags);
-
-//        tbFilesOnly = GUITools.getNiceToggleButton(SYSTools.xx("misc.filters.filesonly"));
-//        tbFilesOnly.addItemListener(new ItemListener() {
+//        dcbm.insertElementAt(SYSTools.xx("misc.commands.noselection"), 0);
+//        cmbTags = new JComboBox(dcbm);
+//        cmbTags.setFont(SYSConst.ARIAL14);
+//        cmbTags.setRenderer(NReportTAGSTools.getPBerichtTAGSRenderer());
+//        cmbTags.setSelectedIndex(0);
+//        cmbTags.addItemListener(new ItemListener() {
 //            @Override
 //            public void itemStateChanged(ItemEvent itemEvent) {
-//                if (initPhase) return;
-////                SYSPropsTools.storeState("nursingrecords.reports:tbFilesOnly", tbFilesOnly);
-//                reload();
+//                if (initPhase || itemEvent.getStateChange() != ItemEvent.SELECTED || !(cmbTags.getSelectedItem() instanceof NReportTAGS))
+//                    return;
+//                SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Tags(resident, (NReportTAGS) cmbTags.getSelectedItem()), false, true, null, null), true);
+//
 //            }
 //        });
-//        labelPanel.add(tbFilesOnly);
-////        SYSPropsTools.restoreState("nursingrecords.reports:tbFilesOnly", tbFilesOnly);
-//        tbFilesOnly.setHorizontalAlignment(SwingConstants.LEFT);
+//        list.add(cmbTags);
+
+
+        ArrayList<Commontags> listTags = CommontagsTools.getAll();
+        if (!listTags.isEmpty()) {
+
+            JPanel pnlTags = new JPanel();
+            pnlTags.setLayout(new BoxLayout(pnlTags, BoxLayout.Y_AXIS));
+            pnlTags.setOpaque(false);
+
+            int counter = 0;
+            for (final Commontags commontag : listTags) {
+                counter++;
+
+                final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Tags(resident, commontag), false, true, null, null), false);
+                    }
+                });
+
+                pnlTags.add(btnTag);
+//                if (counter > 3) {
+//                    counter = 0;
+//                    pnlTags.add(btnTag, RiverLayout.LINE_BREAK);
+//                } else {
+//                    pnlTags.add(btnTag, RiverLayout.LEFT);
+//                }
+
+
+            }
+            list.add(pnlTags);
+        }
+
 
         tbShowReplaced = GUITools.getNiceToggleButton(SYSTools.xx("misc.filters.showreplaced"));
         tbShowReplaced.addItemListener(new ItemListener() {
@@ -305,18 +308,6 @@ public class PnlReport extends NursingRecordsPanel {
         list.add(tbShowReplaced);
         tbShowReplaced.setHorizontalAlignment(SwingConstants.LEFT);
 
-//        JideButton resetButton = GUITools.createHyperlinkButton(SYSTools.xx("misc.commands.resetFilter"), SYSConst.icon22undo, new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent actionEvent) {
-//                initPhase = true;
-//                cmbTags.setSelectedIndex(0);
-//                tbShowReplaced.setSelected(false);
-//                txtSearch.setText(null);
-//                initPhase = false;
-//                reloadDisplay();
-//            }
-//        });
-//        list.add(resetButton);
 
         return list;
     }
@@ -455,7 +446,14 @@ public class PnlReport extends NursingRecordsPanel {
                     max = minmax.getSecond().toDate();
                     LocalDate start = SYSCalendar.bom(minmax.getFirst()).toLocalDate();
                     LocalDate end = resident.isActive() ? new LocalDate() : SYSCalendar.bom(minmax.getSecond()).toLocalDate();
+
+
+                    int maxYears = Years.yearsBetween(start.toDateTimeAtStartOfDay(), end.toDateTimeAtStartOfDay()).getYears();
+
+                    int i = 0;
                     for (int year = end.getYear(); year >= start.getYear(); year--) {
+                        i++;
+                        OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), i, maxYears));
                         createCP4Year(year, start, end);
                     }
                 }
@@ -480,8 +478,6 @@ public class PnlReport extends NursingRecordsPanel {
             }
         };
         worker.execute();
-
-
     }
 
     private CollapsiblePane createCP4Year(final int year, LocalDate min, LocalDate max) {
@@ -763,19 +759,19 @@ public class PnlReport extends NursingRecordsPanel {
         cpWeek.addCollapsiblePaneListener(new CollapsiblePaneAdapter() {
             @Override
             public void paneExpanded(CollapsiblePaneEvent collapsiblePaneEvent) {
-                cpWeek.setContentPane(createWeekContentPanel4(week));
+                cpWeek.setContentPane(createContenPanel4Week(week));
             }
         });
 
         if (!cpWeek.isCollapsed()) {
-            cpWeek.setContentPane(createWeekContentPanel4(week));
+            cpWeek.setContentPane(createContenPanel4Week(week));
         }
 
 
         return cpWeek;
     }
 
-    private JPanel createWeekContentPanel4(LocalDate week) {
+    private JPanel createContenPanel4Week(LocalDate week) {
         JPanel pnlWeek = new JPanel(new VerticalLayout());
 
         pnlWeek.setOpaque(false);
@@ -890,27 +886,36 @@ public class PnlReport extends NursingRecordsPanel {
 
                 if (tbShowReplaced.isSelected() || !nreport.isObsolete()) {
 
-                    String title = "<html><table border=\"0\">" +
-                            "<tr valign=\"top\">" +
-                            "<td width=\"100\" align=\"left\">" + DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
-                            " " + SYSTools.xx("misc.msg.Time.short") +
-                            "<br/>" + nreport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)") +
-                            "</td>" +
-                            "<td width=\"100\" align=\"left\">" + SYSTools.catchNull(NReportTools.getTagsAsHTML(nreport), " [", "]") + "</td>" +
-                            "<td width=\"400\" align=\"left\">" +
-                            SYSTools.replace(nreport.getText(), "\n", "<br/>", false) +
-                            "</td>" +
-                            "<td width=\"200\" align=\"left\">" + nreport.getUser().getFullname() + "</td>" +
-                            "</tr>" +
-                            "</table>" +
-                            "</html>";
+                    String title = SYSTools.toHTMLForScreen(
+                            SYSConst.html_table(
+                                    SYSConst.html_table_tr(
+                                            "<td width=\"800\" align=\"left\">" +
+                                                    (nreport.isObsolete() ? SYSConst.html_16x16_Eraser : "") +
+                                                    (nreport.isReplacement() ? SYSConst.html_16x16_Edited : "") +
+                                                    "<b>" + DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
+                                                    " " + SYSTools.xx("misc.msg.Time.short") +
+                                                    ", " + nreport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)") +
+                                                    ", " + nreport.getUser().getFullname() +
+                                                    (nreport.getCommontags().isEmpty() ? "" : "&nbsp;"+ NReportTools.getTagsAsHTML(nreport)) + "</b></td>"
+                                    ) +
+//                                            (nreport.getCommontags().isEmpty() ? "" : SYSConst.html_table_tr(
+//                                                    "<td width=\"800\" align=\"left\">" + NReportTools.getTagsAsHTML(nreport) +
+//                                                            "</td>"
+//                                            )) +
+                                            SYSConst.html_table_tr(
+                                                    "<td width=\"800\" align=\"left\">" + SYSTools.replace(nreport.getText(), "\n", "<br/>", false) +
+                                                            "</td>"
+                                            )
+                                    , "0")
+                    );
+
 
                     final DefaultCPTitle pnlSingle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), null);
-                    if (nreport.isObsolete()) {
-                        pnlSingle.getButton().setIcon(SYSConst.icon22eraser);
-                    } else if (nreport.isReplacement()) {
-                        pnlSingle.getButton().setIcon(SYSConst.icon22edited);
-                    }
+//                    if (nreport.isObsolete()) {
+//                        pnlSingle.getButton().setIcon(SYSConst.icon22eraser);
+//                    } else if (nreport.isReplacement()) {
+//                        pnlSingle.getButton().setIcon(SYSConst.icon22edited);
+//                    }
                     pnlSingle.getButton().addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -1402,109 +1407,6 @@ public class PnlReport extends NursingRecordsPanel {
             btnDelete.setEnabled(NReportTools.isChangeable(nreport));
             pnlMenu.add(btnDelete);
 
-
-            /***
-             *      _     _       _____  _    ____
-             *     | |__ | |_ _ _|_   _|/ \  / ___|___
-             *     | '_ \| __| '_ \| | / _ \| |  _/ __|
-             *     | |_) | |_| | | | |/ ___ \ |_| \__ \
-             *     |_.__/ \__|_| |_|_/_/   \_\____|___/
-             *
-             */
-            final JButton btnTAGs = GUITools.createHyperlinkButton("nursingrecords.reports.btntags.tooltip", SYSConst.icon22checkbox, null);
-            btnTAGs.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            btnTAGs.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    JidePopup popup = new JidePopup();
-                    ItemListener il = new ItemListener() {
-                        @Override
-                        public void itemStateChanged(ItemEvent itemEvent) {
-                            JCheckBox cb = (JCheckBox) itemEvent.getSource();
-                            NReportTAGS tag = (NReportTAGS) cb.getClientProperty("UserObject");
-
-                            EntityManager em = OPDE.createEM();
-                            try {
-                                em.getTransaction().begin();
-                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
-                                final NReport myReport = em.merge(nreport);
-                                em.lock(myReport, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
-
-                                if (itemEvent.getStateChange() == ItemEvent.DESELECTED) {
-                                    myReport.getTags().remove(tag);
-                                } else {
-                                    myReport.getTags().add(tag);
-                                }
-                                em.getTransaction().commit();
-
-                                final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
-
-
-                                synchronized (contentmap) {
-                                    contentmap.remove(keyNewDay);
-                                }
-                                synchronized (linemap) {
-                                    linemap.remove(nreport);
-                                }
-
-                                synchronized (valuecache) {
-                                    valuecache.get(keyNewDay).remove(nreport);
-                                    valuecache.get(keyNewDay).add(myReport);
-                                    Collections.sort(valuecache.get(keyNewDay));
-                                }
-
-                                createCP4Day(new LocalDate(myReport.getPit()));
-
-                                buildPanel();
-                                GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
-                            } catch (OptimisticLockException ole) {
-                                OPDE.warn(ole);
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                } else {
-                                    reloadDisplay(true);
-                                }
-                            } catch (RollbackException ole) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
-                                    OPDE.getMainframe().emptyFrame();
-                                    OPDE.getMainframe().afterLogin();
-                                }
-                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
-                            } catch (Exception e) {
-                                if (em.getTransaction().isActive()) {
-                                    em.getTransaction().rollback();
-                                }
-                                OPDE.fatal(e);
-                            } finally {
-                                em.close();
-                            }
-
-
-                        }
-                    };
-
-                    popup = new JidePopup();
-                    JPanel pnl = NReportTAGSTools.createCheckBoxPanelForTags(il, nreport.getTags(), new GridLayout(8, 4));
-                    popup.setMovable(false);
-                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
-                    popup.setOwner(btnTAGs);
-                    popup.removeExcludedComponent(btnTAGs);
-                    popup.getContentPane().add(pnl);
-                    popup.setDefaultFocusComponent(pnl);
-
-                    GUITools.showPopup(popup, SwingConstants.WEST);
-
-                }
-            });
-            btnTAGs.setEnabled(NReportTools.isChangeable(nreport) && NReportTools.isMine(nreport));
-            pnlMenu.add(btnTAGs);
 
             /***
              *      _     _         __  __ _             _

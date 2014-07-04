@@ -113,9 +113,9 @@ public class ResidentTools {
     public static Years getAge(Resident resident) {
         boolean dead = ResInfoTools.isDead(resident);
         ResInfo stay = ResInfoTools.getLastResinfo(resident, ResInfoTypeTools.getByType(ResInfoTypeTools.TYPE_STAY));
-        DateMidnight birthdate = new DateTime(resident.getDOB()).toDateMidnight();
+        LocalDate birthdate = new DateTime(resident.getDOB()).toLocalDate();
         DateTime refdate = dead ? new DateTime(stay.getTo()) : new DateTime();
-        return Years.yearsBetween(birthdate, refdate);
+        return Years.yearsBetween(birthdate.toDateTimeAtStartOfDay(), refdate);
 
     }
 

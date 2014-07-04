@@ -9,13 +9,14 @@ import entity.Homes;
 import entity.info.Resident;
 import entity.info.ResidentTools;
 import entity.process.QProcessElement;
+import entity.system.Commontags;
+import entity.system.CommontagsTools;
 import op.OPDE;
 import op.tools.Pair;
 import op.tools.SYSCalendar;
 import op.tools.SYSConst;
 import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
-
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -184,16 +185,16 @@ public class NReportTools {
             html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>"
                     + "<th>Info</th><th>Text</th>\n</tr>";
             for (NReport nReport : nReports) {
-                if (!specialsOnly || nReport.isSpecial()) {
-                    ihavesomethingtoshow = true;
-                    html += "<tr>";
-                    html += "<td valign=\"top\">" + getDateAndUser(nReport, true, false);
-                    html += nReport.isReplaced() ? SYSConst.html_22x22_Eraser : "";
-                    html += nReport.isReplacement() ? SYSConst.html_22x22_Edited : "";
-                    html += "</td>";
-                    html += "<td valign=\"top\">" + getAsHTML(nReport, highlight) + "</td>";
-                    html += "</tr>\n";
-                }
+//                if (!specialsOnly || nReport.isSpecial()) {
+                ihavesomethingtoshow = true;
+                html += "<tr>";
+                html += "<td valign=\"top\">" + getDateAndUser(nReport, true, false);
+                html += nReport.isReplaced() ? SYSConst.html_22x22_Eraser : "";
+                html += nReport.isReplacement() ? SYSConst.html_22x22_Edited : "";
+                html += "</td>";
+                html += "<td valign=\"top\">" + getAsHTML(nReport, highlight) + "</td>";
+                html += "</tr>\n";
+//                }
             }
             html += "</table>\n";
         }
@@ -263,17 +264,11 @@ public class NReportTools {
         return color;
     }
 
-    public static String getTagsAsHTML(NReport bericht) {
+    public static String getTagsAsHTML(NReport nReport) {
         String result = "";
-        Iterator<NReportTAGS> itTags = bericht.getTags().iterator();
-        while (itTags.hasNext()) {
-            NReportTAGS tag = itTags.next();
-            result += (tag.isBesonders() ? "<b>" : "");
-            result += tag.getKurzbezeichnung();
-            result += (tag.isBesonders() ? "</b>" : "");
-            result += (itTags.hasNext() ? " " : "");
+        for (Commontags ctag : nReport.getCommontags()) {
+            result += SYSConst.html_16x16_tagPurple_internal + "&nbsp;" + "<font color=\"#" + ctag.getColor() + "\">" + ctag.getText() + "</font>" + "&nbsp;";
         }
-        result += "";
         return result;
     }
 
@@ -284,7 +279,7 @@ public class NReportTools {
         if (showMinutes && !nReport.isDeleted() && !nReport.isReplaced()) {
             result += "<br/>" + SYSTools.xx("misc.msg.Effort") + ": " + nReport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)");
         }
-        result += SYSTools.catchNull(getTagsAsHTML(nReport), "<br/>[", "]") + " ";
+//        result += SYSTools.catchNull(getTagsAsHTML(nReport), "<br/>[", "]") + " ";
         if (showIDs) {
             result += "<br/><i>[" + nReport.getPbid() + "]</i>";
         }
@@ -421,14 +416,14 @@ public class NReportTools {
 
             String jpql2 = " " +
                     " SELECT n FROM NReport n " +
-                    " JOIN n.tags t " +
+                    " JOIN n.commontags ct " +
                     " WHERE n.pit > :from " +
                     " AND n.resident.adminonly <> 2 " +
                     " AND n.replacedBy IS NULL " +
-                    " AND t.system = :tagsystem " +
+                    " AND ct.type = :type " +
                     " ORDER BY n.resident.rid, n.pit DESC ";
             Query query2 = em.createQuery(jpql2);
-            query2.setParameter("tagsystem", NReportTAGSTools.TYPE_SYS_COMPLAINT);
+            query2.setParameter("type", CommontagsTools.TYPE_SYS_COMPLAINT);
             query2.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
             ArrayList<NReport> listReports = new ArrayList<NReport>(query2.getResultList());
 
@@ -477,20 +472,17 @@ public class NReportTools {
 
             String jpql = " SELECT DISTINCT nr " +
                     " FROM NReport nr " +
-                    " JOIN nr.tags tg " +
-                    " WHERE " +
-                    " nr.resident = :resident " +
+                    " JOIN nr.commontags ct " +
+                    " WHERE nr.resident = :resident " +
                     " AND nr.pit >= :from " +
-                    " AND tg.system = :bv " +
+                    " AND ct.type = :type " +
                     " AND nr.replacedBy IS NULL " +
-//                    " AND nr.resident.station IS NOT NULL " +
-//                    " AND nr.resident.adminonly <> 2 " +
                     " ORDER BY nr.pit ";
 
             Query query = em.createQuery(jpql);
             query.setParameter("resident", resident);
             query.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
-            query.setParameter("bv", NReportTAGSTools.TYPE_SYS_BV);
+            query.setParameter("type", CommontagsTools.TYPE_SYS_BV);
 
             list = new ArrayList<NReport>(query.getResultList());
 
@@ -518,18 +510,16 @@ public class NReportTools {
 
         String jpql1 = " " +
                 " SELECT DISTINCT n FROM NReport n " +
-                " JOIN n.tags t " +
-                " WHERE n.pit >= :from AND n.pit <= :to AND n.replacedBy IS NULL AND n.resident.adminonly <> 2 AND t.system = :tagsystem ORDER BY n.resident.rid ";
+                " JOIN n.commontags ct " +
+                " WHERE n.pit >= :from AND n.pit <= :to AND n.replacedBy IS NULL AND n.resident.adminonly <> 2 AND (ct.type = :type1 OR ct.type = :type2) ORDER BY n.resident.rid ";
         Query query1 = em.createQuery(jpql1);
-        query1.setParameter("tagsystem", NReportTAGSTools.TYPE_SYS_SOCIAL);
+        query1.setParameter("type1", CommontagsTools.TYPE_SYS_SOCIAL);
+        query1.setParameter("type2", CommontagsTools.TYPE_SYS_SOCIAL2);
         query1.setParameter("from", from.toDate());
         query1.setParameter("to", to.toDate());
         ArrayList<NReport> listNR = new ArrayList<NReport>(query1.getResultList());
 
         em.close();
-
-        NReportTAGS pea = NReportTAGSTools.getByShortDescription("PEA");
-        NReportTAGS social = NReportTAGSTools.getByShortDescription("Soz");
 
         HashMap<Resident, Pair<Integer, Integer>> statmap = new HashMap<Resident, Pair<Integer, Integer>>();
         p = 0;
@@ -544,11 +534,14 @@ public class NReportTools {
             int socialtime = pair.getFirst();
             int peatime = pair.getSecond();
 
-            if (nr.getTags().contains(pea)) {
-                peatime += nr.getMinutes();
-            }
-            if (nr.getTags().contains(social)) {
-                socialtime += nr.getMinutes();
+
+            for (Commontags ctag : nr.getCommontags()) {
+                if (ctag.getType() == CommontagsTools.TYPE_SYS_SOCIAL) {
+                    socialtime += nr.getMinutes();
+                }
+                if (ctag.getType() == CommontagsTools.TYPE_SYS_SOCIAL2) {
+                    peatime += nr.getMinutes();
+                }
             }
 
             statmap.put(nr.getResident(), new Pair<Integer, Integer>(socialtime, peatime));
@@ -603,7 +596,7 @@ public class NReportTools {
         EntityManager em = OPDE.createEM();
         ArrayList<NReport> list = null;
         DateTime from = SYSCalendar.bom(month).toDateTimeAtStartOfDay();
-                DateTime to = SYSCalendar.eod(SYSCalendar.eom(month));
+        DateTime to = SYSCalendar.eod(SYSCalendar.eom(month));
 
         OPDE.debug(to);
         try {
@@ -634,7 +627,7 @@ public class NReportTools {
         EntityManager em = OPDE.createEM();
         ArrayList<NReport> list = null;
         DateTime from = SYSCalendar.bow(week).toDateTimeAtStartOfDay();
-                DateTime to = SYSCalendar.eod(SYSCalendar.eow(week));
+        DateTime to = SYSCalendar.eod(SYSCalendar.eow(week));
 
         OPDE.debug(to);
         try {
@@ -664,6 +657,8 @@ public class NReportTools {
     public static ArrayList<NReport> getNReports4Day(Resident resident, LocalDate day) {
         EntityManager em = OPDE.createEM();
         ArrayList<NReport> list = null;
+
+//        OPDE.debug(day.toString());
 
         try {
 
@@ -737,9 +732,8 @@ public class NReportTools {
 
             String jpql = " SELECT DISTINCT nr " +
                     " FROM NReport nr " +
-                    " JOIN nr.tags t " +
-                    " WHERE " +
-                    " nr.pit >= :from AND nr.pit <= :to AND (t.system = :handover OR t.system = :emergency) AND nr.text LIKE :search" +
+                    " JOIN nr.commontags ct " +
+                    " WHERE nr.pit >= :from AND nr.pit <= :to AND (ct.type = :handover OR ct.type = :emergency) AND nr.text LIKE :search" +
                     " AND nr.resident.station.home = :home " +
                     " AND nr.replacedBy IS NULL AND nr.editedBy IS NULL ";
 
@@ -748,16 +742,15 @@ public class NReportTools {
             query.setParameter("from", from.toDateTimeAtStartOfDay().toDate());
             query.setParameter("to", SYSCalendar.eod(to).toDate());
             query.setParameter("home", home);
-            query.setParameter("handover", NReportTAGSTools.TYPE_SYS_HANDOVER);
-            query.setParameter("emergency", NReportTAGSTools.TYPE_SYS_EMERGENCY);
+            query.setParameter("handover", CommontagsTools.TYPE_SYS_HANDOVER);
+            query.setParameter("emergency", CommontagsTools.TYPE_SYS_EMERGENCY);
             query.setParameter("search", EntityTools.getMySQLsearchPattern(searchphrase));
 
             list.addAll(query.getResultList());
 
             String jpql2 = " SELECT ho " +
                     " FROM Handovers ho " +
-                    " WHERE " +
-                    " ho.pit >= :from AND ho.pit <= :to AND ho.text LIKE :search " +
+                    " WHERE ho.pit >= :from AND ho.pit <= :to AND ho.text LIKE :search " +
                     " AND ho.home = :home ";
 
             Query query2 = em.createQuery(jpql2);
@@ -801,9 +794,8 @@ public class NReportTools {
 
             String jpql = " SELECT DISTINCT nr " +
                     " FROM NReport nr " +
-                    " JOIN nr.tags t " +
-                    " WHERE " +
-                    " nr.pit >= :from AND nr.pit <= :to AND (t.system = :handover OR t.nrtagid = :emergency) " +
+                    " JOIN nr.commontags ct " +
+                    " WHERE nr.pit >= :from AND nr.pit <= :to AND (ct.type = :handover OR ct.type = :emergency) " +
                     " AND nr.resident.station.home = :home " +
                     " AND nr.replacedBy IS NULL AND nr.editedBy IS NULL ";
 //                    " ORDER BY nr.pit DESC ";
@@ -813,8 +805,8 @@ public class NReportTools {
             query.setParameter("from", day.toDateTimeAtStartOfDay().toDate());
             query.setParameter("to", SYSCalendar.eod(day).toDate());
             query.setParameter("home", home);
-            query.setParameter("handover", NReportTAGSTools.TYPE_SYS_HANDOVER);
-            query.setParameter("emergency", NReportTAGSTools.TYPE_SYS_EMERGENCY);
+            query.setParameter("handover", CommontagsTools.TYPE_SYS_HANDOVER);
+            query.setParameter("emergency", CommontagsTools.TYPE_SYS_EMERGENCY);
 
             list = new ArrayList<NReport>(query.getResultList());
 
@@ -826,7 +818,7 @@ public class NReportTools {
         return list;
     }
 
-    public static ArrayList<NReport> getNReports4Tags(Resident resident, NReportTAGS tag) {
+    public static ArrayList<NReport> getNReports4Tags(Resident resident, Commontags tag) {
 //        DateTime from = day.toDateTime();
 //        DateTime to = day.plusDays(1).toDateTime().minusSeconds(1);
         EntityManager em = OPDE.createEM();
@@ -836,7 +828,7 @@ public class NReportTools {
 
             String jpql = " SELECT nr " +
                     " FROM NReport nr " +
-                    " JOIN nr.tags t " +
+                    " JOIN nr.commontags t " +
                     " WHERE nr.resident = :resident " +
                     " AND t = :tag " +
 //                    " AND nr.pit >= :from AND nr.pit <= :to  " +

@@ -21,9 +21,10 @@ public class CommontagsTools {
     public static final int TYPE_SYS_FALLS = 6;
     public static final int TYPE_SYS_PAIN = 7;
     public static final int TYPE_SYS_SOCIAL = 8;
+    public static final int TYPE_SYS_SOCIAL2 = 10;
     public static final int TYPE_SYS_COMPLAINT = 9;
 
-    public static ArrayList<Commontags> getAllActive() {
+    public static ArrayList<Commontags> getAll() {
         EntityManager em = OPDE.createEM();
         ArrayList<Commontags> list = null;
 
@@ -31,8 +32,7 @@ public class CommontagsTools {
 
             String jpql = " SELECT c " +
                     " FROM Commontags c " +
-                    " WHERE c.active = TRUE " +
-                    " ORDER BY c.text DESC ";
+                    " ORDER BY c.text ASC ";
 
             Query query = em.createQuery(jpql);
             list = new ArrayList<Commontags>(query.getResultList());
@@ -89,5 +89,27 @@ public class CommontagsTools {
         }
         return list;
     }
+
+    public static ArrayList<Commontags> getAllUsedInNReports() {
+         EntityManager em = OPDE.createEM();
+         ArrayList<Commontags> list = null;
+
+         try {
+
+             String jpql = " SELECT DISTINCT c " +
+                     " FROM Commontags c " +
+                     " JOIN c.nReports nr " +
+                     " ORDER BY c.text ASC ";
+
+             Query query = em.createQuery(jpql);
+             list = new ArrayList<Commontags>(query.getResultList());
+
+         } catch (Exception se) {
+             OPDE.fatal(se);
+         } finally {
+             em.close();
+         }
+         return list;
+     }
 
 }

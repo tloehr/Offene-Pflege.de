@@ -83,6 +83,8 @@ public class SYSConst {
     public static String html_48x48_allergy = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork48 + "/allergy.png\" border=\"0\">";
     public static String html_16x16_tagPurple = "<img src=\"" + SYSTools.replace(OPDE.getOPWD(), "\\", "/", true) + "/" + AppInfo.dirArtwork + "/" + AppInfo.dirArtwork16 + "/tag_purple.png\" border=\"0\">";
     public static String html_16x16_tagPurple_internal = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/tag_purple.png").toString() +"\" border=\"0\">";
+    public static String html_16x16_Eraser = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/eraser.png").toString() +"\" border=\"0\">";
+    public static String html_16x16_Edited = "<img src=\"" + SYSConst.class.getResource("/artwork/16x16/edited.png").toString() +"\" border=\"0\">";
 
     String p = getClass().getResource("artwork/16x16/tag_purple.png" ).toString();
 
