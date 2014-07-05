@@ -1,5 +1,6 @@
 package entity.system;
 
+import entity.info.Resident;
 import op.OPDE;
 
 import javax.persistence.EntityManager;
@@ -90,26 +91,35 @@ public class CommontagsTools {
         return list;
     }
 
-    public static ArrayList<Commontags> getAllUsedInNReports() {
-         EntityManager em = OPDE.createEM();
-         ArrayList<Commontags> list = null;
+    public static ArrayList<Commontags> getAllUsedInNReports(Resident resident) {
+        EntityManager em = OPDE.createEM();
+        ArrayList<Commontags> list = null;
 
-         try {
+        try {
 
-             String jpql = " SELECT DISTINCT c " +
-                     " FROM Commontags c " +
-                     " JOIN c.nReports nr " +
-                     " ORDER BY c.text ASC ";
+//             String mysql = " SELECT DISTINCT ctagid FROM nreports2tags ";
+//             Query query = em.createNativeQuery(mysql);
+//
+//             for ()
 
-             Query query = em.createQuery(jpql);
-             list = new ArrayList<Commontags>(query.getResultList());
 
-         } catch (Exception se) {
-             OPDE.fatal(se);
-         } finally {
-             em.close();
-         }
-         return list;
-     }
+            String jpql = " SELECT DISTINCT c " +
+                    " FROM Commontags c " +
+                    " JOIN c.nReports nr " +
+                    " WHERE nr.resident = :resident " +
+                    " ORDER BY c.text ASC ";
+
+
+            Query query = em.createQuery(jpql);
+            query.setParameter("resident", resident);
+            list = new ArrayList<Commontags>(query.getResultList());
+
+        } catch (Exception se) {
+            OPDE.fatal(se);
+        } finally {
+            em.close();
+        }
+        return list;
+    }
 
 }

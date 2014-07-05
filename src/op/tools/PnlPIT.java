@@ -131,13 +131,13 @@ public class PnlPIT extends JPanel {
 
         //======== this ========
         setLayout(new FormLayout(
-                "default, $lcgap, default:grow",
-                "16dlu, $lgap, 16dlu"));
+            "default, $lcgap, default:grow",
+            "16dlu, $nlgap, 16dlu"));
 
         //---- labelDatum ----
         labelDatum.setText("Datum");
         labelDatum.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(labelDatum, CC.xy(1, 1));
+        add(labelDatum, CC.xy(1, 1, CC.DEFAULT, CC.FILL));
 
         //---- txtDate ----
         txtDate.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -146,7 +146,6 @@ public class PnlPIT extends JPanel {
             public void focusGained(FocusEvent e) {
                 txtDateFocusGained(e);
             }
-
             @Override
             public void focusLost(FocusEvent e) {
                 txtDateFocusLost(e);
@@ -158,7 +157,7 @@ public class PnlPIT extends JPanel {
                 txtDateActionPerformed(e);
             }
         });
-        add(txtDate, CC.xy(3, 1));
+        add(txtDate, CC.xy(3, 1, CC.DEFAULT, CC.FILL));
 
         //---- txtUhrzeit ----
         txtUhrzeit.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -167,7 +166,6 @@ public class PnlPIT extends JPanel {
             public void focusGained(FocusEvent e) {
                 txtUhrzeitFocusGained(e);
             }
-
             @Override
             public void focusLost(FocusEvent e) {
                 txtUhrzeitFocusLost(e);
@@ -179,12 +177,12 @@ public class PnlPIT extends JPanel {
                 txtUhrzeitActionPerformed(e);
             }
         });
-        add(txtUhrzeit, CC.xy(3, 3));
+        add(txtUhrzeit, CC.xy(3, 3, CC.DEFAULT, CC.FILL));
 
         //---- labelUhrzeit ----
         labelUhrzeit.setText("Uhrzeit");
         labelUhrzeit.setFont(new Font("Arial", Font.PLAIN, 14));
-        add(labelUhrzeit, CC.xy(1, 3));
+        add(labelUhrzeit, CC.xy(1, 3, CC.DEFAULT, CC.FILL));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 

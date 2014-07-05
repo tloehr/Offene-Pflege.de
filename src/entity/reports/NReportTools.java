@@ -19,6 +19,7 @@ import op.tools.SYSTools;
 import org.apache.commons.collections.Closure;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.joda.time.MutableInterval;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -100,8 +101,9 @@ public class NReportTools {
      * @param resident
      * @return
      */
-    public static Pair<DateTime, DateTime> getMinMax(Resident resident) {
-        Pair<DateTime, DateTime> result = null;
+    public static MutableInterval getMinMax(Resident resident) {
+        long time = System.currentTimeMillis();
+        MutableInterval result = null;
 
         EntityManager em = OPDE.createEM();
         Query queryMin = em.createQuery("SELECT nr FROM NReport nr WHERE nr.resident = :resident ORDER BY nr.pit ASC ");
@@ -118,14 +120,16 @@ public class NReportTools {
             if (min.isEmpty()) {
                 result = null;
             } else {
-                result = new Pair<DateTime, DateTime>(new DateTime(min.get(0).getPit()), new DateTime(max.get(0).getPit()));
+                result = new MutableInterval(new DateTime(min.get(0).getPit()), new DateTime(max.get(0).getPit()));
             }
 
         } catch (Exception e) {
             OPDE.fatal(e);
         }
 
+
         em.close();
+        OPDE.debug((System.currentTimeMillis() - time) + " ms_xx");
         return result;
     }
 
@@ -175,33 +179,48 @@ public class NReportTools {
         return html;
     }
 
-    public static String getReportsAsHTML(List<NReport> nReports, boolean specialsOnly, boolean withlongheader, String subtitle, String highlight) {
+    public static String getReportsAsHTML(List<NReport> nReports, boolean withlongheader, String subtitle, String highlight) {
         String html = "";
-        boolean ihavesomethingtoshow = false;
 
         if (!nReports.isEmpty()) {
-            html += "<h2 id=\"fonth2\" >" + SYSTools.xx("nursingrecords.reports") + (withlongheader ? " " + SYSTools.xx("misc.msg.for") + " " + ResidentTools.getLabelText(nReports.get(0).getResident()) : "") + "</h2>\n";
-            html += SYSTools.catchNull(subtitle).isEmpty() ? "" : "<h3 id=\"fonth3\" >" + subtitle + "</h3>\n";
-            html += "<table id=\"fonttext\" border=\"1\" cellspacing=\"0\"><tr>"
-                    + "<th>Info</th><th>Text</th>\n</tr>";
-            for (NReport nReport : nReports) {
-//                if (!specialsOnly || nReport.isSpecial()) {
-                ihavesomethingtoshow = true;
-                html += "<tr>";
-                html += "<td valign=\"top\">" + getDateAndUser(nReport, true, false);
-                html += nReport.isReplaced() ? SYSConst.html_22x22_Eraser : "";
-                html += nReport.isReplacement() ? SYSConst.html_22x22_Edited : "";
-                html += "</td>";
-                html += "<td valign=\"top\">" + getAsHTML(nReport, highlight) + "</td>";
-                html += "</tr>\n";
-//                }
+            html += "<h1 id=\"fonth1\" >" + SYSTools.xx("nursingrecords.reports") + (withlongheader ? " " + SYSTools.xx("misc.msg.for") + " " + ResidentTools.getLabelText(nReports.get(0).getResident()) : "") + "</h1>\n";
+            html += SYSTools.catchNull(subtitle).isEmpty() ? "" : "<h2 id=\"fonth2\" >" + subtitle + "</h2>\n";
+
+
+            LocalDate prevDate = null;
+            for (NReport nreport : nReports) {
+
+                LocalDate currentDate = new LocalDate(nreport.getPit());
+
+                if (prevDate == null || !prevDate.equals(currentDate)) {
+                    prevDate = currentDate;
+                    html += SYSTools.catchNull(subtitle).isEmpty() ? "<h2 id=\"fonth2\" >" + currentDate.toString("EEEE, dd.MM.yyyy") + "</h2>\n" : "<h3 id=\"fonth3\" >" + currentDate.toString("EEEE, dd.MM.yyyy") + "</h3>\n";
+                }
+
+
+                html += SYSConst.html_bold(
+                                SYSConst.html_paragraph(
+                                        (nreport.isObsolete() ? SYSConst.html_16x16_Eraser : "") +
+                                                (nreport.isReplacement() ? SYSConst.html_16x16_Edited : "") +
+                                                DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
+                                                " " + SYSTools.xx("misc.msg.Time.short") +
+                                                ", " + nreport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)") +
+                                                ", " + nreport.getUser().getFullname() +
+                                                (nreport.getCommontags().isEmpty() ? "" : " " + NReportTools.getTagsAsHTML(nreport, SYSConst.html_16x16_tagPurple, 0))
+                                )
+                );
+
+                html += "<br/>";
+                html += getAsHTML(nreport, highlight);
+                html += "<br/>";
+
             }
-            html += "</table>\n";
+
+        } else {
+            html = SYSConst.html_italic("misc.msg.noentryyet");
         }
 
-        if (nReports.isEmpty() || !ihavesomethingtoshow) {
-            html = ""; //SYSConst.html_italic("misc.msg.noentryyet");
-        }
+
         return html;
     }
 
@@ -264,10 +283,15 @@ public class NReportTools {
         return color;
     }
 
-    public static String getTagsAsHTML(NReport nReport) {
+    public static String getTagsAsHTML(NReport nReport, String icon, int breakAfter) {
         String result = "";
+        int b = -1;
         for (Commontags ctag : nReport.getCommontags()) {
-            result += SYSConst.html_16x16_tagPurple_internal + "&nbsp;" + "<font color=\"#" + ctag.getColor() + "\">" + ctag.getText() + "</font>" + "&nbsp;";
+            b++;
+            result += icon + " " + "<font color=\"#" + ctag.getColor() + "\">" + ctag.getText() + "</font>" + (b > breakAfter ? "<br/>" : "");
+            if (b > breakAfter) {
+                b = 0;
+            }
         }
         return result;
     }

@@ -75,7 +75,7 @@ public class PrescriptionTools {
         EntityManager em = OPDE.createEM();
         try {
             Query query = em.createNativeQuery("" +
-                    " SELECT v.VerID, bhp.BHPPID, best.BestID, vor.VorID, F.FormID, M.MedPID, M.Bezeichnung, Ms.Bezeichnung " +
+                    " SELECT v.VerID, bhp.BHPPID, best.BestID, vor.VorID, F.FormID, M.MedPID, M.Text, Ms.Bezeichnung " +
                     " FROM prescription v " +
                     " INNER JOIN resident bw ON v.BWKennung = bw.BWKennung  " +
                     " INNER JOIN intervention Ms ON Ms.MassID = v.MassID " +
@@ -96,7 +96,7 @@ public class PrescriptionTools {
                     " WHERE bw.adminonly <> 2 " +
                     " AND v.AnDatum < now() AND v.AbDatum > now() AND Date(bhp.LDatum) <= Date(now()) AND v.SitID IS NULL AND (v.DafID IS NOT NULL OR v.Stellplan IS TRUE) " +
                     " AND bw.StatID = ? " +
-                    " ORDER BY CONCAT(bw.nachname,bw.vorname), bw.BWKennung, v.DafID IS NOT NULL, bhp.Uhrzeit, F.Stellplan, CONCAT( M.Bezeichnung, Ms.Bezeichnung)");
+                    " ORDER BY CONCAT(bw.nachname,bw.vorname), bw.BWKennung, v.DafID IS NOT NULL, bhp.Uhrzeit, F.Stellplan, CONCAT( M.Text, Ms.Bezeichnung)");
             query.setParameter(1, station.getStatID());
 
             if (type.equalsIgnoreCase("html")) {

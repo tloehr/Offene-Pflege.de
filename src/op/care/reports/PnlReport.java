@@ -33,7 +33,6 @@ import com.jidesoft.pane.event.CollapsiblePaneEvent;
 import com.jidesoft.popup.JidePopup;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideButton;
-import entity.EntityTools;
 import entity.files.SYSFilesTools;
 import entity.files.SYSNR2FILE;
 import entity.info.Resident;
@@ -52,10 +51,7 @@ import op.tools.*;
 import org.apache.commons.collections.Closure;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.VerticalLayout;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.LocalDate;
-import org.joda.time.Years;
+import org.joda.time.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -72,6 +68,7 @@ import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.List;
 
 /**
  * @author root
@@ -88,12 +85,17 @@ public class PnlReport extends NursingRecordsPanel {
     private Map<String, ArrayList<NReport>> valuecache;
     private Map<NReport, JPanel> linemap;
     private Map<LocalDate, String> holidays;
+    private List<Commontags> listUsedCommontags;
 
     private Resident resident;
     private boolean initPhase;
 
     private JScrollPane jspSearch;
     private CollapsiblePanes searchPanes;
+
+
+    private MutableInterval minmax = null;
+//    private Pair<DateTime, DateTime> minmax = null;
 
     Format monthFormatter = new SimpleDateFormat("MMMM yyyy");
     Format weekFormater = new SimpleDateFormat("w yyyy");
@@ -113,8 +115,6 @@ public class PnlReport extends NursingRecordsPanel {
         initComponents();
         this.jspSearch = jspSearch;
 
-        prepareSearchArea();
-
         initPanel();
         this.initPhase = false;
 
@@ -128,10 +128,12 @@ public class PnlReport extends NursingRecordsPanel {
         valuecache = Collections.synchronizedMap(new HashMap<String, ArrayList<NReport>>());
         linemap = Collections.synchronizedMap(new HashMap<NReport, JPanel>());
         holidays = new HashMap<LocalDate, String>();
-        prepareSearchArea();
+        listUsedCommontags = Collections.synchronizedList(new ArrayList<Commontags>());
+//        prepareSearchArea();
     }
 
     private void prepareSearchArea() {
+        if (searchPanes != null) searchPanes.removeAll();
 
         searchPanes = new CollapsiblePanes();
         searchPanes.setLayout(new JideBoxLayout(searchPanes, JideBoxLayout.Y_AXIS));
@@ -212,16 +214,25 @@ public class PnlReport extends NursingRecordsPanel {
         synchronized (holidays) {
             SYSTools.clear(holidays);
         }
+        synchronized (listUsedCommontags) {
+            SYSTools.clear(listUsedCommontags);
+        }
     }
 
     @Override
-    public void switchResident(Resident res) {
-        this.resident = EntityTools.find(Resident.class, res.getRID());
+    public void switchResident(Resident resident) {
+        this.resident = resident;
+
+        synchronized (listUsedCommontags) {
+            listUsedCommontags.clear();
+            listUsedCommontags.addAll(CommontagsTools.getAllUsedInNReports(resident));
+        }
+
         GUITools.setResidentDisplay(resident);
-//        txtSearch.setText(null);
-//        firstReport = NReportTools.getFirstReport(resident);
-//        jdcVon.setMaxSelectableDate(new Date());
-//        jdcVon.setMinSelectableDate(firstReport.getPit());
+        prepareSearchArea();
+
+        minmax = null;
+
         reloadDisplay();
     }
 
@@ -235,66 +246,12 @@ public class PnlReport extends NursingRecordsPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (SYSTools.catchNull(txtSearch.getText()).trim().length() >= 3) {
-                    SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Search(resident, txtSearch.getText().trim()), false, true, SYSTools.xx("misc.msg.searchresults") + ": &quot;" + txtSearch.getText().trim() + "&quot;", txtSearch.getText().trim()), false);
+                    SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Search(resident, txtSearch.getText().trim()), false, SYSTools.xx("misc.msg.searchresults") + ": &quot;" + txtSearch.getText().trim() + "&quot;", txtSearch.getText().trim()), false);
                 }
             }
         });
 
         list.add(txtSearch);
-
-//        EntityManager em = OPDE.createEM();
-//        MouseAdapter ma = GUITools.getHyperlinkStyleMouseAdapter();
-//        Query query = em.createQuery("SELECT p FROM NReportTAGS p WHERE p.aktiv = TRUE ORDER BY p.besonders DESC, p.sort DESC, p.bezeichnung");
-//        DefaultComboBoxModel dcbm = new DefaultComboBoxModel(query.getResultList().toArray());
-//        em.close();
-//
-//        dcbm.insertElementAt(SYSTools.xx("misc.commands.noselection"), 0);
-//        cmbTags = new JComboBox(dcbm);
-//        cmbTags.setFont(SYSConst.ARIAL14);
-//        cmbTags.setRenderer(NReportTAGSTools.getPBerichtTAGSRenderer());
-//        cmbTags.setSelectedIndex(0);
-//        cmbTags.addItemListener(new ItemListener() {
-//            @Override
-//            public void itemStateChanged(ItemEvent itemEvent) {
-//                if (initPhase || itemEvent.getStateChange() != ItemEvent.SELECTED || !(cmbTags.getSelectedItem() instanceof NReportTAGS))
-//                    return;
-//                SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Tags(resident, (NReportTAGS) cmbTags.getSelectedItem()), false, true, null, null), true);
-//
-//            }
-//        });
-//        list.add(cmbTags);
-
-
-        ArrayList<Commontags> listTags = CommontagsTools.getAll();
-        if (!listTags.isEmpty()) {
-
-            JPanel pnlTags = new JPanel();
-            pnlTags.setLayout(new BoxLayout(pnlTags, BoxLayout.Y_AXIS));
-            pnlTags.setOpaque(false);
-
-            int counter = 0;
-            for (final Commontags commontag : listTags) {
-                counter++;
-
-                final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Tags(resident, commontag), false, true, null, null), false);
-                    }
-                });
-
-                pnlTags.add(btnTag);
-//                if (counter > 3) {
-//                    counter = 0;
-//                    pnlTags.add(btnTag, RiverLayout.LINE_BREAK);
-//                } else {
-//                    pnlTags.add(btnTag, RiverLayout.LEFT);
-//                }
-
-
-            }
-            list.add(pnlTags);
-        }
 
 
         tbShowReplaced = GUITools.getNiceToggleButton(SYSTools.xx("misc.filters.showreplaced"));
@@ -307,6 +264,27 @@ public class PnlReport extends NursingRecordsPanel {
         });
         list.add(tbShowReplaced);
         tbShowReplaced.setHorizontalAlignment(SwingConstants.LEFT);
+
+
+//        ArrayList<Commontags> listTags = listUsedCommonTags;
+        if (!listUsedCommontags.isEmpty()) {
+
+            JPanel pnlTags = new JPanel();
+            pnlTags.setLayout(new BoxLayout(pnlTags, BoxLayout.Y_AXIS));
+            pnlTags.setOpaque(false);
+
+            for (final Commontags commontag : listUsedCommontags) {
+                final JButton btnTag = GUITools.createHyperlinkButton(commontag.getText(), SYSConst.icon16tagPurple, new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Tags(resident, commontag), false, null, null), false);
+                    }
+                });
+
+                pnlTags.add(btnTag);
+            }
+            list.add(pnlTags);
+        }
 
 
         return list;
@@ -356,6 +334,27 @@ public class PnlReport extends NursingRecordsPanel {
                                                 Collections.sort(valuecache.get(keyDay));
                                             }
                                         }
+                                        synchronized (listUsedCommontags) {
+                                            boolean reloadSearch = false;
+                                            for (Commontags ctag : myReport.getCommontags()) {
+                                                if (!listUsedCommontags.contains(ctag)) {
+                                                    listUsedCommontags.add(ctag);
+                                                    reloadSearch = true;
+                                                }
+                                            }
+                                            if (reloadSearch) {
+                                                prepareSearchArea();
+                                            }
+                                        }
+
+                                        if (!minmax.isAfter(new DateTime(myReport.getPit()))) {
+                                            minmax.setStart(new DateTime(myReport.getPit()));
+                                        }
+
+                                        if (!minmax.isBefore(new DateTime(myReport.getPit()))) {
+                                            minmax.setEnd(new DateTime(myReport.getPit()));
+                                        }
+
                                         createCP4Day(new LocalDate(myReport.getPit()));
                                         expandDay(new LocalDate(myReport.getPit()));
 
@@ -429,33 +428,40 @@ public class PnlReport extends NursingRecordsPanel {
 
         OPDE.getMainframe().setBlocked(true);
         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), -1, 100));
+        final long time = System.currentTimeMillis();
 
         SwingWorker worker = new SwingWorker() {
             Date max = null;
+
 
             @Override
             protected Object doInBackground() throws Exception {
 
                 GUITools.setResidentDisplay(resident);
 
-                Pair<DateTime, DateTime> minmax = NReportTools.getMinMax(resident);
+                if (minmax == null) {
+                    minmax = NReportTools.getMinMax(resident);
+                }
 
-                holidays = Collections.synchronizedMap(SYSCalendar.getHolidays(minmax.getFirst().getYear(), minmax.getSecond().getYear()));
+                holidays = Collections.synchronizedMap(SYSCalendar.getHolidays(minmax.getStart().getYear(), minmax.getEnd().getYear()));
 
                 if (minmax != null) {
-                    max = minmax.getSecond().toDate();
-                    LocalDate start = SYSCalendar.bom(minmax.getFirst()).toLocalDate();
-                    LocalDate end = resident.isActive() ? new LocalDate() : SYSCalendar.bom(minmax.getSecond()).toLocalDate();
+                    max = minmax.getEnd().toDate();
+                    LocalDate start = SYSCalendar.bom(minmax.getStart()).toLocalDate();
+                    LocalDate end = resident.isActive() ? new LocalDate() : SYSCalendar.bom(minmax.getEnd()).toLocalDate();
 
 
                     int maxYears = Years.yearsBetween(start.toDateTimeAtStartOfDay(), end.toDateTimeAtStartOfDay()).getYears();
 
                     int i = 0;
                     for (int year = end.getYear(); year >= start.getYear(); year--) {
+                        OPDE.debug((System.currentTimeMillis() - time) + " ms");
                         i++;
                         OPDE.getDisplayManager().setProgressBarMessage(new DisplayMessage(SYSTools.xx("misc.msg.wait"), i, maxYears));
                         createCP4Year(year, start, end);
                     }
+
+                    OPDE.debug((System.currentTimeMillis() - time) + " ms1");
                 }
 
                 return null;
@@ -463,9 +469,12 @@ public class PnlReport extends NursingRecordsPanel {
 
             @Override
             protected void done() {
+                OPDE.debug((System.currentTimeMillis() - time) + " ms2");
                 expandTheLast2Weeks();
 
+                OPDE.debug((System.currentTimeMillis() - time) + " ms3");
                 buildPanel();
+                OPDE.debug((System.currentTimeMillis() - time) + " ms4");
                 initPhase = false;
                 OPDE.getDisplayManager().setProgressBarMessage(null);
                 OPDE.getMainframe().setBlocked(false);
@@ -628,7 +637,7 @@ public class PnlReport extends NursingRecordsPanel {
             btnPrintMonth.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Month(resident, month), false, true, null, null), true);
+                    SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Month(resident, month), false, null, null), true);
                 }
             });
             cptitle.getRight().add(btnPrintMonth);
@@ -734,7 +743,7 @@ public class PnlReport extends NursingRecordsPanel {
             btnPrintWeek.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Week(resident, week), false, true, null, null), true);
+                    SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Week(resident, week), false, null, null), true);
                 }
             });
             cptitle.getRight().add(btnPrintWeek);
@@ -829,7 +838,7 @@ public class PnlReport extends NursingRecordsPanel {
             btnPrintDay.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Day(resident, day), false, true, null, null), true);
+                    SYSFilesTools.print(NReportTools.getReportsAsHTML(NReportTools.getNReports4Day(resident, day), false, null, null), true);
                 }
             });
             titleCPDay.getRight().add(btnPrintDay);
@@ -890,18 +899,15 @@ public class PnlReport extends NursingRecordsPanel {
                             SYSConst.html_table(
                                     SYSConst.html_table_tr(
                                             "<td width=\"800\" align=\"left\">" +
-                                                    (nreport.isObsolete() ? SYSConst.html_16x16_Eraser : "") +
-                                                    (nreport.isReplacement() ? SYSConst.html_16x16_Edited : "") +
-                                                    "<b>" + DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
+                                                    "<b><p>" +
+                                                    (nreport.isObsolete() ? SYSConst.html_16x16_Eraser_internal : "") +
+                                                    (nreport.isReplacement() ? SYSConst.html_16x16_Edited_internal : "") +
+                                                    DateFormat.getTimeInstance(DateFormat.SHORT).format(nreport.getPit()) +
                                                     " " + SYSTools.xx("misc.msg.Time.short") +
                                                     ", " + nreport.getMinutes() + " " + SYSTools.xx("misc.msg.Minute(s)") +
                                                     ", " + nreport.getUser().getFullname() +
-                                                    (nreport.getCommontags().isEmpty() ? "" : "&nbsp;"+ NReportTools.getTagsAsHTML(nreport)) + "</b></td>"
+                                                    (nreport.getCommontags().isEmpty() ? "" : " " + NReportTools.getTagsAsHTML(nreport, SYSConst.html_16x16_tagPurple_internal, 5)) + "</p></b></td>"
                                     ) +
-//                                            (nreport.getCommontags().isEmpty() ? "" : SYSConst.html_table_tr(
-//                                                    "<td width=\"800\" align=\"left\">" + NReportTools.getTagsAsHTML(nreport) +
-//                                                            "</td>"
-//                                            )) +
                                             SYSConst.html_table_tr(
                                                     "<td width=\"800\" align=\"left\">" + SYSTools.replace(nreport.getText(), "\n", "<br/>", false) +
                                                             "</td>"
@@ -911,11 +917,6 @@ public class PnlReport extends NursingRecordsPanel {
 
 
                     final DefaultCPTitle pnlSingle = new DefaultCPTitle(SYSTools.toHTMLForScreen(title), null);
-//                    if (nreport.isObsolete()) {
-//                        pnlSingle.getButton().setIcon(SYSConst.icon22eraser);
-//                    } else if (nreport.isReplacement()) {
-//                        pnlSingle.getButton().setIcon(SYSConst.icon22edited);
-//                    }
                     pnlSingle.getButton().addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -1168,10 +1169,10 @@ public class PnlReport extends NursingRecordsPanel {
         cpsReports.setLayout(new JideBoxLayout(cpsReports, JideBoxLayout.Y_AXIS));
 
         synchronized (cpMap) {
-            Pair<DateTime, DateTime> minmax = NReportTools.getMinMax(resident);
+//            Pair<DateTime, DateTime> minmax = NReportTools.getMinMax(resident);
             if (minmax != null) {
-                LocalDate start = SYSCalendar.bom(minmax.getFirst()).toLocalDate();
-                LocalDate end = resident.isActive() ? new LocalDate() : SYSCalendar.eom(minmax.getSecond()).toLocalDate();
+                LocalDate start = SYSCalendar.bom(minmax.getStart()).toLocalDate();
+                LocalDate end = resident.isActive() ? new LocalDate() : SYSCalendar.eom(minmax.getEnd()).toLocalDate();
                 for (int year = end.getYear(); year >= start.getYear(); year--) {
                     final String keyYear = Integer.toString(year) + ".year";
 
@@ -1285,6 +1286,27 @@ public class PnlReport extends NursingRecordsPanel {
                                             valuecache.get(keyNewDay).add(newReport);
                                             Collections.sort(valuecache.get(keyNewDay));
                                         }
+                                    }
+
+                                    synchronized (listUsedCommontags) {
+                                        boolean reloadSearch = false;
+                                        for (Commontags ctag : newReport.getCommontags()) {
+                                            if (!listUsedCommontags.contains(ctag)) {
+                                                listUsedCommontags.add(ctag);
+                                                reloadSearch = true;
+                                            }
+                                        }
+                                        if (reloadSearch) {
+                                            prepareSearchArea();
+                                        }
+                                    }
+
+                                    if (!minmax.isAfter(new DateTime(newReport.getPit()))) {
+                                        minmax.setStart(new DateTime(newReport.getPit()));
+                                    }
+
+                                    if (!minmax.isBefore(new DateTime(newReport.getPit()))) {
+                                        minmax.setEnd(new DateTime(newReport.getPit()));
                                     }
 
                                     createCP4Day(new LocalDate(oldReport.getPit()));
@@ -1406,6 +1428,119 @@ public class PnlReport extends NursingRecordsPanel {
             });
             btnDelete.setEnabled(NReportTools.isChangeable(nreport));
             pnlMenu.add(btnDelete);
+
+
+            /***
+             *      _     _       _____  _    ____
+             *     | |__ | |_ _ _|_   _|/ \  / ___|___
+             *     | '_ \| __| '_ \| | / _ \| |  _/ __|
+             *     | |_) | |_| | | | |/ ___ \ |_| \__ \
+             *     |_.__/ \__|_| |_|_/_/   \_\____|___/
+             *
+             */
+            final JButton btnTAGs = GUITools.createHyperlinkButton("nursingrecords.reports.btntags.tooltip", SYSConst.icon22tagPurple, null);
+            btnTAGs.setAlignmentX(Component.RIGHT_ALIGNMENT);
+            btnTAGs.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    JidePopup popup = new JidePopup();
+
+                    JPanel pnl = new JPanel(new BorderLayout(5, 5));
+                    final PnlCommonTags pnlCommonTags = new PnlCommonTags(nreport.getCommontags(), true, 5);
+                    pnl.add(pnlCommonTags, BorderLayout.CENTER);
+                    JButton btnApply = new JButton(SYSConst.icon22apply);
+                    pnl.add(btnApply, BorderLayout.SOUTH);
+                    btnApply.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent ae) {
+                            EntityManager em = OPDE.createEM();
+                            try {
+                                em.getTransaction().begin();
+                                em.lock(em.merge(resident), LockModeType.OPTIMISTIC);
+                                final NReport myReport = em.merge(nreport);
+                                em.lock(myReport, LockModeType.OPTIMISTIC_FORCE_INCREMENT);
+
+                                myReport.getCommontags().clear();
+                                myReport.getCommontags().addAll(pnlCommonTags.getListSelectedTags());
+
+                                em.getTransaction().commit();
+
+                                final String keyNewDay = DateFormat.getDateInstance().format(myReport.getPit());
+
+                                synchronized (contentmap) {
+                                    contentmap.remove(keyNewDay);
+                                }
+                                synchronized (linemap) {
+                                    linemap.remove(nreport);
+                                }
+
+                                synchronized (valuecache) {
+                                    valuecache.get(keyNewDay).remove(nreport);
+                                    valuecache.get(keyNewDay).add(myReport);
+                                    Collections.sort(valuecache.get(keyNewDay));
+                                }
+
+                                synchronized (listUsedCommontags) {
+                                    boolean reloadSearch = false;
+                                    for (Commontags ctag : myReport.getCommontags()) {
+                                        if (!listUsedCommontags.contains(ctag)) {
+                                            listUsedCommontags.add(ctag);
+                                            reloadSearch = true;
+                                        }
+                                    }
+                                    if (reloadSearch) {
+                                        prepareSearchArea();
+                                    }
+                                }
+
+                                createCP4Day(new LocalDate(myReport.getPit()));
+
+                                buildPanel();
+                                GUITools.flashBackground(linemap.get(myReport), Color.YELLOW, 2);
+                            } catch (OptimisticLockException ole) {
+                                OPDE.warn(ole);
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                } else {
+                                    reloadDisplay(true);
+                                }
+                            } catch (RollbackException ole) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                if (ole.getMessage().indexOf("Class> entity.info.Bewohner") > -1) {
+                                    OPDE.getMainframe().emptyFrame();
+                                    OPDE.getMainframe().afterLogin();
+                                }
+                                OPDE.getDisplayManager().addSubMessage(DisplayManager.getLockMessage());
+                            } catch (Exception e) {
+                                if (em.getTransaction().isActive()) {
+                                    em.getTransaction().rollback();
+                                }
+                                OPDE.fatal(e);
+                            } finally {
+                                em.close();
+                            }
+                        }
+                    });
+
+                    popup.setMovable(false);
+                    popup.getContentPane().setLayout(new BoxLayout(popup.getContentPane(), BoxLayout.LINE_AXIS));
+                    popup.setOwner(btnTAGs);
+                    popup.removeExcludedComponent(btnTAGs);
+                    popup.getContentPane().add(pnl);
+                    popup.setDefaultFocusComponent(pnl);
+
+                    GUITools.showPopup(popup, SwingConstants.WEST);
+
+                }
+            });
+            btnTAGs.setEnabled(NReportTools.isChangeable(nreport) && NReportTools.isMine(nreport));
+            pnlMenu.add(btnTAGs);
 
 
             /***
@@ -1679,30 +1814,30 @@ public class PnlReport extends NursingRecordsPanel {
             }
         }
 
-        final String keyLastYear = Integer.toString(new LocalDate().minusWeeks(1).getYear()) + ".year";
-        if (cpMap.containsKey(keyLastYear)) {
-            try {
-                cpMap.get(keyLastYear).setCollapsed(false);
-            } catch (PropertyVetoException e) {
-                // bah!
-            }
-        }
-        final String keyLastMonth = monthFormatter.format(new LocalDate().minusWeeks(1).toDate()) + ".month";
-        if (cpMap.containsKey(keyLastMonth)) {
-            try {
-                cpMap.get(keyLastMonth).setCollapsed(false);
-            } catch (PropertyVetoException e) {
-                // bah!
-            }
-        }
-        final String keyLastWeek = weekFormater.format(new LocalDate().minusWeeks(1).toDate()) + ".week";
-        if (cpMap.containsKey(keyLastWeek)) {
-            try {
-                GUITools.setCollapsed(cpMap.get(keyLastWeek), false);
-            } catch (PropertyVetoException e) {
-                // bah!
-            }
-        }
+//        final String keyLastYear = Integer.toString(new LocalDate().minusWeeks(1).getYear()) + ".year";
+//        if (cpMap.containsKey(keyLastYear)) {
+//            try {
+//                cpMap.get(keyLastYear).setCollapsed(false);
+//            } catch (PropertyVetoException e) {
+//                // bah!
+//            }
+//        }
+//        final String keyLastMonth = monthFormatter.format(new LocalDate().minusWeeks(1).toDate()) + ".month";
+//        if (cpMap.containsKey(keyLastMonth)) {
+//            try {
+//                cpMap.get(keyLastMonth).setCollapsed(false);
+//            } catch (PropertyVetoException e) {
+//                // bah!
+//            }
+//        }
+//        final String keyLastWeek = weekFormater.format(new LocalDate().minusWeeks(1).toDate()) + ".week";
+//        if (cpMap.containsKey(keyLastWeek)) {
+//            try {
+//                GUITools.setCollapsed(cpMap.get(keyLastWeek), false);
+//            } catch (PropertyVetoException e) {
+//                // bah!
+//            }
+//        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -57,12 +57,12 @@ public class Commontags {
     @Column(name = "color", nullable = false, insertable = true, updatable = true, length = 6)
     private String color;
 
-    public Color getColor() {
-        return GUITools.getColor(color);
+    public String getColor() {
+        return color;
     }
 
-    public void setColor(Color newColor) {
-        color = GUITools.toHexString(newColor);
+    public void setColor(String color) {
+        this.color = color;
     }
 
     @ManyToMany(mappedBy = "commontags")
